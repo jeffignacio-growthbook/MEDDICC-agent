@@ -30,9 +30,9 @@ EXCLUDED_PIPELINES = ['renewal', '866608541']
 DISQUALIFIED_STAGES = ['68509551']
 
 # Exclude Meeting Set stages (always filter these out in active mode)
-# 'appointmentscheduled' = Discovery in some views, but actually Meeting Set
 # '79653122' = Meeting Set (numeric ID)
-MEETING_SET_STAGES = ['appointmentscheduled', '79653122']
+# NOTE: 'appointmentscheduled' is Discovery stage, NOT Meeting Set - do not exclude
+MEETING_SET_STAGES = ['79653122']
 
 # Closed stage IDs for history mode deal_status tagging
 CLOSED_WON_STAGES = ['closedwon', '1297321623']
