@@ -1,326 +1,215 @@
 # Business Context Configuration
-# This file teaches the AI about your industry, competitors, common objections,
-# feature gaps, and value metrics. Students fill this in via the onboarding skill.
-#
-# INSTRUCTIONS:
-# 1. Uncomment sections you want to use (remove the # at the start of each line)
-# 2. Replace example values with your organization's actual data
-# 3. Add or remove items as needed - these are just templates
-# 4. This file is read by the MEDDICC analysis system to provide domain context
+# Client: GrowthBook
+# Generated: 2026-08-05
 
-# ============================================================================
-# COMPETITIVE LANDSCAPE
-# ============================================================================
-# List all competitors your sales team encounters
-# Used to detect competitor mentions in call transcripts
+company:
+  name: "GrowthBook"
+  product: "Feature flagging and experimentation platform that lets product and engineering teams control feature rollouts and run A/B tests without needing to ship new code for every change or experiment"
+  positioning: "Warehouse-native, open-source experimentation with predictable pricing"
+  icp:
+    company_size: "100K+ monthly visitors (traffic-based threshold)"
+    industry: "Technical/behavioral fit (no specific vertical)"
+    stage: "Product-Led Growth companies with modern data infrastructure"
+    buyer_role: "VP/Director of Growth, Experimentation, or Product (Experimentation Leader)"
+    buyer_pain: "Need to scale experimentation, challenges with metric definitions and rigor, need to democratize experimentation for self-service"
+
+methodology: "MEDDICC"
 
 competitors:
-  # Direct competitors (same category, similar features)
-  direct:
-    # - name: "LaunchDarkly"
-    #   category: "Feature Management"
-    #   strengths:
-    #     - "Market leader"
-    #     - "Strong enterprise brand"
-    #   weaknesses:
-    #     - "Expensive"
-    #     - "Complex setup"
-    #   typical_deal_size: "enterprise"  # Options: smb, mid-market, enterprise
+  - name: "LaunchDarkly"
+    type: direct
+    prospect_language:
+      - "We're already using LaunchDarkly"
+      - "Evaluating LaunchDarkly vs you"
+    differentiation: "GrowthBook offers true warehouse-native experimentation with statistical rigor, while LaunchDarkly treats A/B testing as afterthought with expensive vendor lock-in pricing"
+    win_condition: "When experimentation rigor, predictable pricing, and warehouse-native architecture matter (80% win rate)"
+    loss_condition: "When enterprise release governance is the top priority over experimentation"
+    aliases:
+      - "LD"
+      - "Launch Darkly"
 
-    # - name: "Optimizely"
-    #   category: "Experimentation Platform"
-    #   strengths:
-    #     - "Full-stack testing"
-    #     - "Statistics engine"
-    #   weaknesses:
-    #     - "High cost"
-    #     - "Legacy UI"
-    #   typical_deal_size: "enterprise"
+  - name: "Statsig"
+    type: direct
+    prospect_language:
+      - "We're looking at Statsig"
+      - "Statsig seems simpler"
+    differentiation: "Platform flexibility, world-class feature flags, and cost-effective pricing at scale vs Statsig's all-in-one suite that doesn't scale with advanced needs"
+    win_condition: "When teams need advanced experimentation capabilities and platform flexibility"
+    loss_condition: "When simplicity is prioritized over advanced capabilities"
+    aliases:
+      - "Statsig"
 
-    # - name: "Statsig"
-    #   category: "Feature Flags & Experimentation"
-    #   strengths:
-    #     - "Modern product"
-    #     - "Good pricing"
-    #   weaknesses:
-    #     - "Newer player"
-    #     - "Limited integrations"
-    #   typical_deal_size: "mid-market"
+  - name: "EPPO"
+    type: direct
+    prospect_language:
+      - "We're using EPPO"
+      - "EPPO has strong stats"
+      - "Datadog Experiments"
+    differentiation: "Open-source, self-hosting option, and predictable pricing without platform lock-in vs EPPO's observability bundling and less comprehensive feature flagging"
+    win_condition: "When teams want statistical rigor plus comprehensive feature flagging without vendor lock-in"
+    loss_condition: "When they're already committed to Datadog observability suite"
+    aliases:
+      - "Eppo"
+      - "Datadog Experiments"
+      - "Datadog"
 
-  # Indirect competitors (adjacent solutions)
-  indirect:
-    # - name: "Amplitude"
-    #   category: "Product Analytics"
-    #   why_compared: "Some experimentation features"
+  - name: "Optimizely"
+    type: direct
+    prospect_language:
+      - "We're using Optimizely"
+      - "Optimizely is expensive"
+    differentiation: "Product/engineering focus with predictable pricing vs Optimizely's marketing-first approach and high cost"
+    win_condition: "When buyer is technical/product team, not marketing"
+    loss_condition: "When marketing team owns the decision and needs visual builder"
+    aliases:
+      - "Optimizely"
 
-    # - name: "Mixpanel"
-    #   category: "Product Analytics"
-    #   why_compared: "Basic A/B testing capabilities"
-
-  # Incumbent solutions
-  incumbents:
-    # - name: "Homegrown"
-    #   description: "Custom-built internal feature flagging system"
-    #   typical_pain_points:
-    #     - "No analytics integration"
-    #     - "Lacks experimentation capabilities"
-    #     - "High engineering maintenance cost"
-
-    # - name: "None"
-    #   description: "Manual feature releases, no flagging"
-    #   typical_pain_points:
-    #     - "Risky releases"
-    #     - "Can't test before full rollout"
-    #     - "No way to measure feature impact"
-
-# ============================================================================
-# OBJECTION CATEGORIES
-# ============================================================================
-# Common sales objections your team encounters
-# Used to categorize and track objection patterns
+  - name: "Homegrown"
+    type: internal_tool
+    prospect_language:
+      - "We built our own"
+      - "Engineering already has a solution"
+      - "We have an internal tool"
+    differentiation: "Statistical rigor, maintained SDKs, and proven experimentation capabilities vs high engineering maintenance cost and lack of statistical rigor"
+    win_condition: "When showing hidden costs of maintenance and lack of rigor"
+    loss_condition: "When engineering team is defensive about their tool"
+    aliases:
+      - "Internal tool"
+      - "Custom built"
+      - "In-house"
 
 objection_categories:
-  # pricing:
-  #   patterns:
-  #     - "Too expensive"
-  #     - "Outside our budget"
-  #     - "Cheaper alternatives available"
-  #   typical_responses:
-  #     - "Demonstrate ROI with specific metrics"
-  #     - "Break down cost per user/experiment"
-  #     - "Compare to cost of failed releases"
+  switching_cost:
+    label: "Switching Cost"
+    signals:
+      - "We're already using"
+      - "We've already invested in"
+      - "We already have a homegrown solution"
+      - "Engineering can build this"
+    best_responses:
+      - "Show migration path is incremental"
+      - "Highlight cost savings over time"
+      - "Reference displacement wins like ShiftKey and StackBlitz"
+      - "For homegrown: show hidden maintenance costs and lack of statistical rigor"
+    typical_stage: "Discovery / Scoping"
 
-  # timing:
-  #   patterns:
-  #     - "Not ready yet"
-  #     - "No budget until next quarter"
-  #     - "Want to wait until after [milestone]"
-  #   typical_responses:
-  #     - "Understand the specific blocker"
-  #     - "Align timeline with their budget cycle"
-  #     - "Offer pilot to build internal momentum"
+  technical:
+    label: "Technical Complexity"
+    signals:
+      - "We're not ready for warehouse-native"
+      - "Our data warehouse isn't mature enough"
+      - "This seems complex to implement"
+    best_responses:
+      - "Show setup is simpler than expected"
+      - "Offer managed cloud as starting point"
+      - "Provide warehouse-native migration path"
+    typical_stage: "Discovery / Technical Evaluation"
 
-  # technical_complexity:
-  #   patterns:
-  #     - "Too complex to implement"
-  #     - "Engineering team is busy"
-  #     - "Concerned about integration effort"
-  #   typical_responses:
-  #     - "Show quick integration examples"
-  #     - "Offer implementation support"
-  #     - "Reference similar customer integrations"
+  product_gap:
+    label: "Product Gap"
+    signals:
+      - "We need [specific feature] you don't have"
+      - "LaunchDarkly has more mature"
+      - "Does it support"
+    best_responses:
+      - "Check roadmap"
+      - "Identify workarounds"
+      - "Understand if must-have vs nice-to-have"
+    typical_stage: "Scoping / Proposal"
 
-  # feature_gaps:
-  #   patterns:
-  #     - "Missing [specific feature]"
-  #     - "Doesn't integrate with [our tool]"
-  #     - "Can't support our use case"
-  #   typical_responses:
-  #     - "Check product roadmap"
-  #     - "Find workarounds or alternatives"
-  #     - "Escalate to product team for feasibility"
+  budget:
+    label: "Budget / ROI"
+    signals:
+      - "Other tools seem cheaper"
+      - "What's the ROI"
+      - "Too expensive"
+      - "Outside our budget"
+    best_responses:
+      - "Show total cost of ownership"
+      - "Demonstrate ROI through experimentation velocity gains"
+      - "Emphasize predictable pricing vs vendor lock-in risks"
+    typical_stage: "Proposal / Negotiating"
 
-  # stakeholder_alignment:
-  #   patterns:
-  #     - "Need to convince [other team]"
-  #     - "Legal/Security has concerns"
-  #     - "Multiple teams need to approve"
-  #   typical_responses:
-  #     - "Map out all stakeholders"
-  #     - "Offer separate demo for each team"
-  #     - "Provide security/compliance docs early"
+  timing:
+    label: "Timing / Priority"
+    signals:
+      - "We'll evaluate next quarter"
+      - "Not a priority right now"
+      - "We're not ready yet"
+    best_responses:
+      - "Understand real blocker"
+      - "Identify what would make it urgent"
+      - "Offer pilot to build momentum"
+    typical_stage: "Discovery / Qualification"
 
-# ============================================================================
-# FEATURE GAPS & PRODUCT FEEDBACK
-# ============================================================================
-# Track common feature requests and product gaps
-# Used to identify patterns in what prospects need
+  internal_politics:
+    label: "Internal Politics"
+    signals:
+      - "Need to convince [other team]"
+      - "Data team owns this"
+      - "Engineering won't approve"
+    best_responses:
+      - "Map out all stakeholders"
+      - "Offer separate demo for each team"
+      - "Understand decision-making process"
+    typical_stage: "Scoping / Proposal"
 
 feature_gaps:
-  # high_priority:
-  #   # Frequently requested, significant impact on deals
-  #   - name: "SSO/SAML Integration"
-  #     request_frequency: "high"
-  #     impact_on_deals: "high"
-  #     status: "on_roadmap"  # Options: on_roadmap, planned, not_planned
-  #     workaround: "Manual user provisioning via API"
-
-  #   - name: "Advanced Role-Based Access Control"
-  #     request_frequency: "medium"
-  #     impact_on_deals: "high"
-  #     status: "planned"
-  #     workaround: "Basic team-level permissions available"
-
-  # medium_priority:
-  #   - name: "Slack Integration for Experiment Results"
-  #     request_frequency: "medium"
-  #     impact_on_deals: "low"
-  #     status: "not_planned"
-  #     workaround: "Email notifications + Zapier"
-
-  # low_priority:
-  #   - name: "Dark Mode UI"
-  #     request_frequency: "low"
-  #     impact_on_deals: "low"
-  #     status: "not_planned"
-  #     workaround: "None"
-
-# ============================================================================
-# VALUE METRICS
-# ============================================================================
-# Quantifiable business outcomes your solution delivers
-# Used to identify when prospects mention these metrics in calls
+  # To be learned from call analysis
+  # Agent will populate this section as patterns emerge
 
 value_metrics:
-  # Direct business impact
-  # revenue_metrics:
-  #   - name: "Conversion Rate Improvement"
-  #     typical_range: "10-30%"
-  #     measurement: "Increase in checkout completion, signup rate, etc."
+  - metric: "Experimentation velocity"
+    typical_claim: "Run 5x more experiments"
+    measurement: "Number of experiments per quarter"
+    proof_point: "Comparison page claims 5x more experiments at 1/2 the cost"
 
-  #   - name: "Revenue Per User"
-  #     typical_range: "5-20%"
-  #     measurement: "Higher ARPU from optimized pricing/upsells"
+  - metric: "Cost reduction"
+    typical_claim: "1/2 the cost of competitors"
+    measurement: "Total platform cost vs LaunchDarkly/Optimizely"
+    proof_point: "Predictable pricing without event-based limits"
 
-  # cost_savings:
-  #   - name: "Reduced Failed Releases"
-  #     typical_range: "$100K-$500K annually"
-  #     measurement: "Avoided cost of bugs, rollbacks, downtime"
+  # Additional metrics to be learned from call analysis:
+  # - Engineering time saved
+  # - Faster time to ship features
+  # - Reduction in failed releases
 
-  #   - name: "Engineering Efficiency"
-  #     typical_range: "20-40 hours/month saved"
-  #     measurement: "Less time spent on manual feature management"
+good_discovery:
+  questions_to_ask:
+    - "What's your current experimentation setup?"
+    - "What challenges are you facing with metric definitions?"
+    - "How many experiments do you run per quarter?"
+    - "Who owns experimentation - Product, Growth, or Engineering?"
+    - "What's your data warehouse setup? (Snowflake, BigQuery, Redshift, Postgres)"
+    - "What does your modern data stack look like? (Segment, Amplitude, etc.)"
 
-  # risk_reduction:
-  #   - name: "Faster Rollback Time"
-  #     typical_range: "Minutes vs. hours"
-  #     measurement: "Toggle features off instantly vs. emergency deploy"
+  signals_of_strong_call:
+    - "Commitment to moving to warehouse native solution"
+    - "Goal to scale experimentation"
+    - "Challenges with metric definitions"
+    - "Challenges with rigor"
+    - "Need to democratize / achieve self-service so experimentation scales"
+    - "Focused on Product experimentation (not just Marketing use cases)"
+    - "100K+ monthly visitors mentioned"
+    - "Modern tech stack in place (Segment, Amplitude)"
 
-  #   - name: "Reduced Deployment Risk"
-  #     typical_range: "80% reduction in production incidents"
-  #     measurement: "Gradual rollouts catch issues before full release"
-
-  # velocity_improvements:
-  #   - name: "Release Frequency"
-  #     typical_range: "2-5x increase"
-  #     measurement: "Deploy multiple times per day vs. weekly"
-
-  #   - name: "Time to Value"
-  #     typical_range: "50% reduction"
-  #     measurement: "Ship features to users faster"
-
-# ============================================================================
-# INDUSTRY-SPECIFIC CONTEXT
-# ============================================================================
-# Domain knowledge about the industries you serve
-# Helps AI understand customer pain points and use cases
-
-industries:
-  # - name: "SaaS / B2B Software"
-  #   common_use_cases:
-  #     - "Freemium to paid conversion optimization"
-  #     - "New feature beta testing"
-  #     - "Pricing experiment for different tiers"
-  #   typical_pain_points:
-  #     - "Slow release cycles hurt competitive positioning"
-  #     - "Can't test pricing changes without full commit"
-  #     - "Hard to measure feature adoption"
-
-  # - name: "E-Commerce / Retail"
-  #   common_use_cases:
-  #     - "Checkout flow optimization"
-  #     - "Promotional campaign testing"
-  #     - "Product recommendation algorithms"
-  #   typical_pain_points:
-  #     - "High cart abandonment rates"
-  #     - "Seasonal campaigns need rapid iteration"
-  #     - "Can't test changes without impacting revenue"
-
-  # - name: "FinTech / Financial Services"
-  #   common_use_cases:
-  #     - "Compliance-safe feature rollouts"
-  #     - "Fraud detection algorithm testing"
-  #     - "Regional feature launches"
-  #   typical_pain_points:
-  #     - "Regulatory requirements slow releases"
-  #     - "Need audit trail for all changes"
-  #     - "High cost of errors in production"
-
-# ============================================================================
-# CHAMPION INDICATORS
-# ============================================================================
-# Signals that someone might be (or become) a champion
-# Used to identify champion strength in calls
-
-champion_indicators:
-  # strong_signals:
-  #   - "Mentions internal evangelizing ('I've been telling my team...')"
-  #   - "Proactively schedules additional stakeholder intros"
-  #   - "Shares competitive intel or insider info"
-  #   - "Asks about reference customers to build internal case"
-  #   - "Volunteers to present to their leadership"
-
-  # medium_signals:
-  #   - "Asks detailed implementation questions"
-  #   - "Responsive to outreach"
-  #   - "Brings other team members to calls"
-  #   - "Requests marketing materials or case studies"
-
-  # weak_signals:
-  #   - "Passively interested but not advocating"
-  #   - "Needs convincing themselves"
-  #   - "Only responds when pinged"
-
-# ============================================================================
-# LEARNING CONFIGURATION
-# ============================================================================
-# Settings for the continuous learning system
-# Controls how evaluator feedback improves future analyses
+  signals_of_weak_call:
+    - "Marketing-only use case"
+    - "No clear experimentation leader identified"
+    - "Low traffic volume (under 100K monthly visitors)"
+    - "No data warehouse infrastructure"
+    - "Only interested in feature flags, not experimentation"
 
 learning:
-  # enabled: true
-
-  # # How often to update prompts based on learnings
-  # prompt_update_frequency: "weekly"  # Options: daily, weekly, monthly
-
-  # # Minimum iterations before auto-updating prompts
-  # minimum_iterations_before_update: 10
-
-  # # Track common failure patterns
-  # track_failure_patterns: true
-
-  # # Categories of learnings to capture
-  # learning_categories:
-  #   - "evidence_quality"
-  #   - "score_calibration"
-  #   - "false_gap_detection"
-  #   - "stage_alignment"
-  #   - "action_specificity"
-
-# ============================================================================
-# CUSTOMIZATION WORKFLOW
-# ============================================================================
-#
-# FOR STUDENTS:
-# This file is intentionally commented out. Use the onboarding skill to:
-#
-# 1. Review each section
-# 2. Uncomment relevant items
-# 3. Replace example values with your actual data
-# 4. Add new items specific to your organization
-#
-# PRIORITY ORDER:
-# 1. Start with competitors (most immediate impact on MEDDICC Competition scoring)
-# 2. Add value_metrics (helps with Metrics component)
-# 3. Define objection_categories (tracks objection patterns)
-# 4. Fill in feature_gaps (improves product feedback loop)
-# 5. Add industries and champion_indicators (nice-to-have)
-#
-# After completing this file, the system will:
-# - Better detect competitor mentions in calls
-# - Recognize when prospects mention your value metrics
-# - Categorize objections automatically
-# - Track feature gap patterns
-# - Provide more contextual MEDDICC analyses
-#
-# See README.md for detailed onboarding instructions.
+  min_evidence_companies: 2
+  protected_instructions: []
+  track_failure_patterns: true
+  learning_categories:
+    - "evidence_quality"
+    - "score_calibration"
+    - "false_gap_detection"
+    - "stage_alignment"
+    - "action_specificity"
+    - "competitive_mentions"
+    - "objection_patterns"
+    - "value_metric_claims"

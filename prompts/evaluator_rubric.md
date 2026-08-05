@@ -1,187 +1,68 @@
-# MEDDICC Analysis Evaluator Rubric
+# Evaluator Rubric — GrowthBook
 
-You are an evaluator for MEDDICC sales analyses. Your job is to review a generated analysis and determine if it passes quality standards.
+Return JSON: { "pass": bool, "required_changes": "string or null" }
+If false, name the component and exact issue.
 
-## Input
+## Criterion 1: Complete coverage
 
-You receive:
-1. **Generated Analysis** - The MEDDICC analysis to evaluate
-2. **Recent Call Summary** - The most recent call being analyzed
-3. **Cumulative MEDDICC State** - Historical context from previous calls
+Every MEDDICC component must have:
+- A status (Identified / Partial / Unknown)
+- A score (0-10)
+- Evidence or explicit statement that none exists
 
-## Evaluation Criteria
+FAIL if any component is missing.
+FAIL if score present but no evidence given.
 
-A passing analysis MUST meet ALL of the following criteria:
+## Criterion 2: Carry-forward consistency
 
-### 1. Complete Coverage ✅
-- [ ] Every MEDDICC component is addressed (M, E, D, D, I, C, C)
-- [ ] Each component has a status (Identified/Partial/Unknown)
-- [ ] Each component has a score (1-10)
-- [ ] Each component has evidence or explanation
+Compare against cumulative state. Identified or Partial components must remain at that level unless the recent call contradicts them.
 
-**Failure**: Missing any MEDDICC component or incomplete component sections
+FAIL if component regresses without documented reason.
+PASS if analysis notes "No new information — maintaining previous assessment" for unchanged components.
 
-### 2. Cumulative State Consistency ✅
-- [ ] Any component marked "identified" in cumulative state is NOT re-flagged as unknown
-- [ ] Evidence from previous calls is carried forward, not re-discovered
-- [ ] If recent call contradicts cumulative state, recent call takes precedence (clearly noted)
-- [ ] No regression in known information
+Example: If Economic Buyer was scored 8/10 in cumulative state and recent call doesn't mention them, the analysis must maintain 8/10 and explicitly note "No new EB information in this call - maintaining previous score of 8/10."
 
-**Failure**: Marking something as unknown when cumulative state shows it as identified
+## Criterion 3: Evidence quality
 
-Example Failure:
-```
-Cumulative State: economic_buyer = "identified", evidence: "John Torres (CFO) confirmed in Call #2"
-Generated Analysis: Economic Buyer - Status: Unknown, "We haven't identified who controls budget"
-```
+All evidence from the call or cumulative state only.
 
-### 3. Evidence Quality ✅
-- [ ] Every status claim is backed by specific evidence
-- [ ] Evidence quotes or paraphrases actual call content
-- [ ] No generic or inferred statements
-- [ ] Scores match evidence strength (identified = 7-10, partial = 4-6, unknown = 1-3)
+FAIL if score above 5/10 lacks a direct quote or paraphrase.
+FAIL if competitor not in this list: LaunchDarkly, Statsig, EPPO, Datadog Experiments, Optimizely, or homegrown/internal tools
+FAIL if value metrics not stated by the prospect (seller-stated ROI doesn't count).
 
-**Failure**: Generic evidence not from the calls
+PASS if evidence includes specific quotes or detailed paraphrases.
+PASS if competitor mentions match GrowthBook's competitive set.
+PASS if metrics are prospect-originated (e.g., "They want to run 5x more experiments per quarter").
 
-Example Failure:
-```
-Evidence: "Customer wants to improve efficiency and reduce costs"
-[Too generic - needs specific quote or detail from the actual call]
-```
+## Criterion 4: Actionable next steps
 
-Example Pass:
-```
-Evidence: "Sarah said 'We waste 40% of engineering cycles on failed experiments' - Call #3, timestamp 12:45"
-```
+Every component below 7/10 needs at least one next step with contact name, specific action, and concrete question.
 
-### 4. Specific Next Steps ✅
-- [ ] Next steps include a person name/title
-- [ ] Next steps include a concrete action (not "follow up")
-- [ ] Next steps include implied or explicit timing
-- [ ] Gaps have specific questions to ask on next call
+FAIL if next steps use: "follow up", "discuss further", "explore".
+FAIL if component is Partial or Unknown with no next step.
 
-**Failure**: Vague next steps
+PASS examples:
+- "Ask Sarah Chen (VP Engineering) on Thursday's call: 'What's your current Snowflake warehouse setup and who manages data permissions?'"
+- "Confirm with Mike Torres (Director of Growth) by end of week: 'Who holds final budget approval for tools over $50K?'"
 
-Example Failure:
-```
-Next steps: Follow up on budget
-```
+FAIL examples:
+- "Follow up on technical requirements"
+- "Discuss with team"
+- "Explore data warehouse setup"
 
-Example Pass:
-```
-Next steps: Ask Sarah Chen (VP Engineering) on Friday's call: "Can you walk me through your budget approval process? What's the threshold where John Torres (CFO) needs to review?"
-```
+## Criterion 5: No unsupported claims
 
-### 5. No Claims Without Evidence ✅
-- [ ] Every fact stated appears in call summaries or cumulative state
-- [ ] No inferred titles, names, or relationships
-- [ ] No assumed pain points or metrics
-- [ ] If unclear, marked as Partial with clarifying question
+FAIL if Champion described as "advocating internally" without evidence of internal selling behavior.
+FAIL if Economic Buyer "confirmed" without explicit budget authority.
+FAIL if timeline stated as confirmed when only mentioned as a target.
+FAIL if ICP fit claimed without evidence of: 100K+ monthly visitors OR modern data stack OR Product-Led motion OR Experimentation Leader role.
 
-**Failure**: Hallucinated information
+PASS if claims are grounded in specific evidence from calls.
+PASS if uncertainty is acknowledged (e.g., "Champion appears engaged but no evidence yet of internal selling").
 
-Example Failure:
-```
-Champion: John Smith (CTO) is very excited about our platform
-[John Smith was never mentioned in any call]
-```
+## GrowthBook-specific checks
 
-### 6. Score Alignment ✅
-- [ ] Identified status = score 7-10
-- [ ] Partial status = score 4-6
-- [ ] Unknown status = score 1-3
-- [ ] Scores reflect actual evidence quality, not aspirational
-
-**Failure**: Score mismatch
-
-Example Failure:
-```
-Status: Unknown
-Score: 7/10
-[Can't have high score with unknown status]
-```
-
-## Output Format
-
-Return a JSON object:
-
-```json
-{
-  "pass": true/false,
-  "required_changes": "Specific changes needed to pass (if fail)" or null,
-  "iteration_failures": [
-    "List of specific criteria that failed (1-6 above)"
-  ],
-  "components_weak": [
-    "List of MEDDICC components with weak evidence or analysis"
-  ],
-  "components_strong": [
-    "List of MEDDICC components with strong evidence or analysis"
-  ],
-  "proposed_instruction": "One new instruction to add to CLAUDE.md to prevent this type of failure in the future"
-}
-```
-
-## Evaluation Process
-
-1. Check complete coverage (criteria #1)
-2. Verify cumulative state consistency (criteria #2)
-3. Assess evidence quality for each component (criteria #3)
-4. Review next steps specificity (criteria #4)
-5. Validate no hallucination (criteria #5)
-6. Verify score alignment (criteria #6)
-
-If ANY criterion fails, set `pass: false` and provide specific required_changes.
-
-## Required Changes Format
-
-Be specific about what to fix:
-
-**Bad**:
-```
-"Improve the Economic Buyer section"
-```
-
-**Good**:
-```
-"Economic Buyer section: Change status from Unknown to Identified and add evidence from cumulative state: 'John Torres (CFO) was confirmed as final decision maker in Call #2 on 2026-07-20.' Current analysis incorrectly ignored this known information."
-```
-
-## Proposed Instruction Format
-
-Based on the failure, suggest ONE new instruction for CLAUDE.md:
-
-**Bad**:
-```
-"Make sure to check cumulative state"
-```
-
-**Good**:
-```
-"Before marking any component as Unknown, explicitly check the cumulative MEDDICC state. If cumulative state shows 'identified' or 'partial', you must carry that forward and only update based on new information from the recent call. Never regress known information to unknown."
-```
-
-## Edge Cases
-
-### Multiple Contradictions
-If recent call contradicts cumulative state:
-- Use recent call (more current)
-- Explicitly note the change: "Previous calls identified X, but today's call revealed Y"
-- Update score based on new information
-
-### Ambiguous Evidence
-If evidence is ambiguous:
-- Mark as Partial, not Identified
-- Score 4-6 reflecting uncertainty
-- Specify what clarification is needed
-
-### No Progress
-If recent call adds nothing new to a component:
-- Carry forward cumulative state
-- Note "No new information from this call"
-- Keep existing score from cumulative state
-
----
-
-**Version**: 1.0.0
-**Last Updated**: 2026-07-29
+FAIL if competitor mentioned but not mapped to: LaunchDarkly, Statsig, EPPO, Datadog, Optimizely, homegrown
+FAIL if "good fit" claimed for marketing-only use case (wrong ICP)
+FAIL if warehouse-native requirement not noted when Snowflake/BigQuery/Redshift mentioned
+FAIL if low traffic (<100K monthly visitors) not flagged as ICP concern

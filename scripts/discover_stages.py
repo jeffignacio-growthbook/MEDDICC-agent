@@ -21,7 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 try:
-    from hubspot_deals import HubSpotDeals
+    from hubspot_deals import HubSpotDealsClient as HubSpotDeals
 except ImportError:
     print("❌ Error: hubspot_deals.py not found")
     print("   Make sure you're running from the repo root")
