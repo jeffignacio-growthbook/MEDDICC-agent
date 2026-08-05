@@ -1,6 +1,6 @@
 {
-  "last_etl_date": "2026-08-05T22:34:56.360660",
-  "total_deals": 79,
+  "last_etl_date": "2026-08-05T22:46:50.890922",
+  "total_deals": 162,
   "excluded_closed_stages": [
     "closedwon",
     "closedlost",
@@ -8,7 +8,6 @@
     "1297321624"
   ],
   "excluded_meeting_set_stages": [
-    "appointmentscheduled",
     "79653122"
   ],
   "excluded_disqualified_stages": [
@@ -29,7 +28,7 @@
       "arr": null,
       "close_date": null,
       "owner_id": "87079750",
-      "last_modified": "2026-08-05T22:34:38.601175"
+      "last_modified": "2026-08-05T22:45:30.664874"
     },
     "9093743432": {
       "deal_id": "9093743432",
@@ -41,7 +40,7 @@
       "arr": "1000",
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:38.821936"
+      "last_modified": "2026-08-05T22:45:31.285628"
     },
     "11023288135": {
       "deal_id": "11023288135",
@@ -53,7 +52,7 @@
       "arr": "1000",
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:38.974402"
+      "last_modified": "2026-08-05T22:45:31.820859"
     },
     "11023961379": {
       "deal_id": "11023961379",
@@ -65,7 +64,7 @@
       "arr": "5000",
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:39.241096"
+      "last_modified": "2026-08-05T22:45:32.280968"
     },
     "11023961439": {
       "deal_id": "11023961439",
@@ -77,7 +76,7 @@
       "arr": "3000",
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:39.411184"
+      "last_modified": "2026-08-05T22:45:32.692995"
     },
     "11024003429": {
       "deal_id": "11024003429",
@@ -89,7 +88,7 @@
       "arr": null,
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:39.559054"
+      "last_modified": "2026-08-05T22:45:33.074763"
     },
     "11029888047": {
       "deal_id": "11029888047",
@@ -101,7 +100,7 @@
       "arr": null,
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:39.743185"
+      "last_modified": "2026-08-05T22:45:33.684131"
     },
     "33774339943": {
       "deal_id": "33774339943",
@@ -113,7 +112,7 @@
       "arr": "20000",
       "close_date": "2025-05-21T17:49:58.727Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:39.943219"
+      "last_modified": "2026-08-05T22:45:34.092620"
     },
     "28294219184": {
       "deal_id": "28294219184",
@@ -125,7 +124,7 @@
       "arr": "40000",
       "close_date": "2025-05-31T17:41:58.789Z",
       "owner_id": "88723213",
-      "last_modified": "2026-08-05T22:34:40.113291"
+      "last_modified": "2026-08-05T22:45:34.663254"
     },
     "36325681303": {
       "deal_id": "36325681303",
@@ -137,7 +136,19 @@
       "arr": "60000",
       "close_date": "2025-07-24T22:00:37.158Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:40.293872"
+      "last_modified": "2026-08-05T22:45:35.071480"
+    },
+    "58135909154": {
+      "deal_id": "58135909154",
+      "deal_name": "AxisCare / Enterprise Upgrade / Liebenow",
+      "company_name": "AxisCare",
+      "company_slug": "axiscare",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "75000",
+      "close_date": "2026-04-30T15:49:31.995Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:45:35.650917"
     },
     "59418415718": {
       "deal_id": "59418415718",
@@ -149,7 +160,55 @@
       "arr": "30100",
       "close_date": "2026-06-30T13:09:33.353Z",
       "owner_id": "88723213",
-      "last_modified": "2026-08-05T22:34:40.451377"
+      "last_modified": "2026-08-05T22:45:36.171224"
+    },
+    "59342236338": {
+      "deal_id": "59342236338",
+      "deal_name": "UserTesting - Demo Request",
+      "company_name": "User Testing Inc",
+      "company_slug": "user_testing_inc",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "0",
+      "close_date": "2026-07-18T02:23:19.034Z",
+      "owner_id": "82957388",
+      "last_modified": "2026-08-05T22:45:36.670543"
+    },
+    "60036027012": {
+      "deal_id": "60036027012",
+      "deal_name": "Tesoro XP, Inc. - Demo Request",
+      "company_name": "Tesoro XP, Inc.",
+      "company_slug": "tesoro_xp_inc",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "15000",
+      "close_date": "2026-08-03T18:10:04.203Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:45:37.109206"
+    },
+    "60056558933": {
+      "deal_id": "60056558933",
+      "deal_name": "18Birdies - Outbound",
+      "company_name": "18Birdies",
+      "company_slug": "18birdies",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "25000",
+      "close_date": "2026-08-04T19:05:49.385Z",
+      "owner_id": "87079750",
+      "last_modified": "2026-08-05T22:45:37.675697"
+    },
+    "60142222672": {
+      "deal_id": "60142222672",
+      "deal_name": "Rappi - Outbound",
+      "company_name": "Rappi",
+      "company_slug": "rappi",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "185000",
+      "close_date": "2026-08-06T17:46:17.847Z",
+      "owner_id": "87079750",
+      "last_modified": "2026-08-05T22:45:38.223705"
     },
     "58630730677": {
       "deal_id": "58630730677",
@@ -161,7 +220,7 @@
       "arr": "40000",
       "close_date": "2026-08-14T20:04:03.019Z",
       "owner_id": "88723213",
-      "last_modified": "2026-08-05T22:34:40.608932"
+      "last_modified": "2026-08-05T22:45:38.740881"
     },
     "60217095483": {
       "deal_id": "60217095483",
@@ -173,7 +232,19 @@
       "arr": "120000",
       "close_date": "2026-08-22T15:13:03.550Z",
       "owner_id": "87079750",
-      "last_modified": "2026-08-05T22:34:40.761660"
+      "last_modified": "2026-08-05T22:45:39.169344"
+    },
+    "60715077158": {
+      "deal_id": "60715077158",
+      "deal_name": "Douglas - Outbound",
+      "company_name": "Douglas",
+      "company_slug": "douglas",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": null,
+      "close_date": "2026-08-27T18:58:43.694Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:45:39.552003"
     },
     "61475205473": {
       "deal_id": "61475205473",
@@ -185,7 +256,7 @@
       "arr": "40000",
       "close_date": "2026-08-28T09:54:23.225Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:40.932086"
+      "last_modified": "2026-08-05T22:45:40.122456"
     },
     "60868340629": {
       "deal_id": "60868340629",
@@ -197,7 +268,7 @@
       "arr": "45000",
       "close_date": "2026-08-28T19:10:43.714Z",
       "owner_id": "87079750",
-      "last_modified": "2026-08-05T22:34:41.111136"
+      "last_modified": "2026-08-05T22:45:40.806728"
     },
     "61398761834": {
       "deal_id": "61398761834",
@@ -209,7 +280,7 @@
       "arr": "20000",
       "close_date": "2026-08-31T07:28:35.476Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:41.284481"
+      "last_modified": "2026-08-05T22:45:41.410682"
     },
     "62725080086": {
       "deal_id": "62725080086",
@@ -221,7 +292,7 @@
       "arr": "40000",
       "close_date": "2026-08-31T09:17:53.617Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:41.450645"
+      "last_modified": "2026-08-05T22:45:41.852208"
     },
     "60069831015": {
       "deal_id": "60069831015",
@@ -233,7 +304,7 @@
       "arr": "142174",
       "close_date": "2026-08-31T10:22:47.896Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:41.655205"
+      "last_modified": "2026-08-05T22:45:42.348520"
     },
     "62921497713": {
       "deal_id": "62921497713",
@@ -245,7 +316,7 @@
       "arr": "100000",
       "close_date": "2026-08-31T20:05:51.804Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:42.049747"
+      "last_modified": "2026-08-05T22:45:43.336142"
     },
     "61602481512": {
       "deal_id": "61602481512",
@@ -257,7 +328,19 @@
       "arr": "25000",
       "close_date": "2026-09-01T00:07:25.144Z",
       "owner_id": "87079750",
-      "last_modified": "2026-08-05T22:34:42.255223"
+      "last_modified": "2026-08-05T22:45:43.869222"
+    },
+    "61076825943": {
+      "deal_id": "61076825943",
+      "deal_name": "Usim - Demo Request",
+      "company_name": "USIM",
+      "company_slug": "usim",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "0",
+      "close_date": "2026-09-11T20:43:20.568Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:45:44.670772"
     },
     "60785721693": {
       "deal_id": "60785721693",
@@ -269,7 +352,7 @@
       "arr": "300000",
       "close_date": "2026-09-16T06:32:44.721Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:42.408154"
+      "last_modified": "2026-08-05T22:45:45.320489"
     },
     "62121618183": {
       "deal_id": "62121618183",
@@ -281,7 +364,7 @@
       "arr": "75000",
       "close_date": "2026-09-16T15:32:24.727Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:42.561294"
+      "last_modified": "2026-08-05T22:45:45.762070"
     },
     "58939926620": {
       "deal_id": "58939926620",
@@ -293,7 +376,43 @@
       "arr": "220000.0",
       "close_date": "2026-09-18T21:07:49.613Z",
       "owner_id": "87079750",
-      "last_modified": "2026-08-05T22:34:42.823055"
+      "last_modified": "2026-08-05T22:45:46.350161"
+    },
+    "61582382687": {
+      "deal_id": "61582382687",
+      "deal_name": "Lola Blankets - Demo Request",
+      "company_name": "Lola Blankets",
+      "company_slug": "lola_blankets",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000",
+      "close_date": "2026-09-22T00:00:00Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:45:46.816441"
+    },
+    "61615709775": {
+      "deal_id": "61615709775",
+      "deal_name": "MVF Global - Demo Request",
+      "company_name": "MVF Global",
+      "company_slug": "mvf_global",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "60000",
+      "close_date": "2026-09-23T00:00:00Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:45:47.470188"
+    },
+    "58169341204": {
+      "deal_id": "58169341204",
+      "deal_name": "Yoto- Demo Request",
+      "company_name": "Yoto",
+      "company_slug": "yoto",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "75000",
+      "close_date": "2026-09-23T08:12:47.650Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:45:47.891883"
     },
     "61045491056": {
       "deal_id": "61045491056",
@@ -305,7 +424,43 @@
       "arr": "63750",
       "close_date": "2026-09-23T16:56:22.896Z",
       "owner_id": "90300126",
-      "last_modified": "2026-08-05T22:34:42.973131"
+      "last_modified": "2026-08-05T22:45:48.400935"
+    },
+    "61626028439": {
+      "deal_id": "61626028439",
+      "deal_name": "Convera - Demo Request",
+      "company_name": "Convera",
+      "company_slug": "convera",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": null,
+      "close_date": "2026-09-24T00:00:00Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:45:48.915290"
+    },
+    "61841688666": {
+      "deal_id": "61841688666",
+      "deal_name": "TRT - Demo Request",
+      "company_name": "TRT",
+      "company_slug": "trt",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "80000",
+      "close_date": "2026-09-28T00:00:00Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:45:49.504415"
+    },
+    "62402578522": {
+      "deal_id": "62402578522",
+      "deal_name": "Deel / Amplitude Replacement / Liebenow",
+      "company_name": "Deel",
+      "company_slug": "deel",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "175000",
+      "close_date": "2026-09-28T15:13:58.578Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:45:50.121833"
     },
     "62875661161": {
       "deal_id": "62875661161",
@@ -317,7 +472,7 @@
       "arr": "3000",
       "close_date": "2026-09-29T14:02:26.711Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:43.150168"
+      "last_modified": "2026-08-05T22:45:50.538549"
     },
     "60053279602": {
       "deal_id": "60053279602",
@@ -329,7 +484,31 @@
       "arr": "75000",
       "close_date": "2026-09-30T00:00:00Z",
       "owner_id": "90300126",
-      "last_modified": "2026-08-05T22:34:43.323861"
+      "last_modified": "2026-08-05T22:45:51.064647"
+    },
+    "62135862588": {
+      "deal_id": "62135862588",
+      "deal_name": "Everyday Health Group - Demo Request",
+      "company_name": "MedPage Today",
+      "company_slug": "medpage_today",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "20000",
+      "close_date": "2026-09-30T00:00:00Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:45:51.610431"
+    },
+    "62485423801": {
+      "deal_id": "62485423801",
+      "deal_name": "March Networks - Outbound",
+      "company_name": "March Networks",
+      "company_slug": "march_networks",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000",
+      "close_date": "2026-09-30T00:00:00Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:45:52.204872"
     },
     "62620904729": {
       "deal_id": "62620904729",
@@ -341,7 +520,19 @@
       "arr": "50000",
       "close_date": "2026-09-30T00:00:00Z",
       "owner_id": "90300126",
-      "last_modified": "2026-08-05T22:34:43.475665"
+      "last_modified": "2026-08-05T22:45:52.969666"
+    },
+    "58029773373": {
+      "deal_id": "58029773373",
+      "deal_name": "Simpro - Enterprise Contract ",
+      "company_name": "Simpro",
+      "company_slug": "simpro",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": null,
+      "close_date": "2026-09-30T13:24:08.702Z",
+      "owner_id": "88723213",
+      "last_modified": "2026-08-05T22:45:53.393407"
     },
     "54956375177": {
       "deal_id": "54956375177",
@@ -353,7 +544,19 @@
       "arr": "100000",
       "close_date": "2026-09-30T15:59:07.702Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:43.691089"
+      "last_modified": "2026-08-05T22:45:53.801626"
+    },
+    "59369997485": {
+      "deal_id": "59369997485",
+      "deal_name": "Purple - New Deal",
+      "company_name": "Purple",
+      "company_slug": "purple",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "150000.0",
+      "close_date": "2026-09-30T16:21:17.183Z",
+      "owner_id": "82957388",
+      "last_modified": "2026-08-05T22:45:54.238662"
     },
     "61176368035": {
       "deal_id": "61176368035",
@@ -365,7 +568,7 @@
       "arr": "200000",
       "close_date": "2026-09-30T16:59:15.888Z",
       "owner_id": "88723213",
-      "last_modified": "2026-08-05T22:34:43.903913"
+      "last_modified": "2026-08-05T22:45:54.772608"
     },
     "60257621387": {
       "deal_id": "60257621387",
@@ -377,7 +580,55 @@
       "arr": "250000",
       "close_date": "2026-09-30T17:15:10.969Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:44.073302"
+      "last_modified": "2026-08-05T22:45:55.188224"
+    },
+    "60786197152": {
+      "deal_id": "60786197152",
+      "deal_name": "Seat Expansion -",
+      "company_name": "1800Flowers",
+      "company_slug": "1800flowers",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "10000",
+      "close_date": "2026-09-30T17:55:29.318Z",
+      "owner_id": "88723213",
+      "last_modified": "2026-08-05T22:45:55.625330"
+    },
+    "47879623775": {
+      "deal_id": "47879623775",
+      "deal_name": "Whatnot - New Deal",
+      "company_name": "Whatnot",
+      "company_slug": "whatnot",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "150000",
+      "close_date": "2026-09-30T19:24:03.040Z",
+      "owner_id": "82957388",
+      "last_modified": "2026-08-05T22:45:56.048787"
+    },
+    "62355039834": {
+      "deal_id": "62355039834",
+      "deal_name": "Split Pay / SH Enterprise / Liebenow",
+      "company_name": "Visible",
+      "company_slug": "visible",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "150000",
+      "close_date": "2026-10-05T00:00:00Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:45:56.503013"
+    },
+    "62360994147": {
+      "deal_id": "62360994147",
+      "deal_name": "On3 / Greenfield / Liebenow",
+      "company_name": "On3",
+      "company_slug": "on3",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "100000",
+      "close_date": "2026-10-05T00:00:00Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:45:57.050316"
     },
     "63222360840": {
       "deal_id": "63222360840",
@@ -389,7 +640,19 @@
       "arr": "85000",
       "close_date": "2026-10-16T18:55:03.885Z",
       "owner_id": "88723213",
-      "last_modified": "2026-08-05T22:34:44.237405"
+      "last_modified": "2026-08-05T22:45:57.453959"
+    },
+    "63051341647": {
+      "deal_id": "63051341647",
+      "deal_name": "Vio.com ",
+      "company_name": "Vio",
+      "company_slug": "vio",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "0",
+      "close_date": "2026-10-21T00:00:00Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:45:58.062011"
     },
     "60275604099": {
       "deal_id": "60275604099",
@@ -401,7 +664,115 @@
       "arr": "200000",
       "close_date": "2026-10-21T14:19:59.405Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:44.464484"
+      "last_modified": "2026-08-05T22:45:58.758170"
+    },
+    "63065867572": {
+      "deal_id": "63065867572",
+      "deal_name": "The Boston Globe - Demo Request",
+      "company_name": "The Boston Globe",
+      "company_slug": "boston_globe",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "0",
+      "close_date": "2026-10-22T00:00:00Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:45:59.394882"
+    },
+    "63165080439": {
+      "deal_id": "63165080439",
+      "deal_name": "Mekari - Demo Request",
+      "company_name": "Mekari",
+      "company_slug": "mekari",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "15000",
+      "close_date": "2026-10-25T00:00:00Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:45:59.827750"
+    },
+    "63182567432": {
+      "deal_id": "63182567432",
+      "deal_name": "Intelligent Lending Limited (trading as Ocean / Ocean Finance) - Demo Request",
+      "company_name": "Intelligent Lending Limited (trading as Ocean / Ocean Finance)",
+      "company_slug": "intelligent_lending_limited_trading_as_ocean_ocean_finance",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "40000",
+      "close_date": "2026-10-25T00:00:00Z",
+      "owner_id": "87573414",
+      "last_modified": "2026-08-05T22:46:00.429365"
+    },
+    "54646610299": {
+      "deal_id": "54646610299",
+      "deal_name": "Paymob / Enterprise / Liebenow",
+      "company_name": "Paymob",
+      "company_slug": "paymob",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "35000",
+      "close_date": "2026-10-26T14:39:23.851Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:01.002967"
+    },
+    "62296851044": {
+      "deal_id": "62296851044",
+      "deal_name": "Electronic Arts / SH Feature Flags / Liebenow",
+      "company_name": "Electronic Arts",
+      "company_slug": "electronic_arts",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "150000",
+      "close_date": "2026-10-26T15:58:55.475Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:01.585292"
+    },
+    "51560286629": {
+      "deal_id": "51560286629",
+      "deal_name": "ArtWorkout / Enterprise Upgrade (ClickHouse Feature) / Liebenow",
+      "company_name": "ArtWorkout Limited",
+      "company_slug": "artworkout_limited",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "10000",
+      "close_date": "2026-10-26T16:16:19.495Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:01.985352"
+    },
+    "39350410660": {
+      "deal_id": "39350410660",
+      "deal_name": "Flipp / Feature Flags / Liebenow",
+      "company_name": "Flipp",
+      "company_slug": "flipp",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "51408.45",
+      "close_date": "2026-10-26T16:16:31.653Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:02.379520"
+    },
+    "60615627143": {
+      "deal_id": "60615627143",
+      "deal_name": "PÚBLICO - Demo Request",
+      "company_name": "PÚBLICO_DEV",
+      "company_slug": "pblicodev",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000",
+      "close_date": "2026-10-26T16:17:30.533Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:02.802100"
+    },
+    "60423886694": {
+      "deal_id": "60423886694",
+      "deal_name": "Jusbrasil / Enterprise Upgrade / Liebenow",
+      "company_name": "Jusbrasil Test",
+      "company_slug": "jusbrasil_test",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "125000",
+      "close_date": "2026-10-26T16:17:36.149Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:03.359247"
     },
     "9092472450": {
       "deal_id": "9092472450",
@@ -413,7 +784,7 @@
       "arr": "10000",
       "close_date": "2026-10-26T17:30:25.778Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:44.632185"
+      "last_modified": "2026-08-05T22:46:03.757115"
     },
     "59019110029": {
       "deal_id": "59019110029",
@@ -425,7 +796,67 @@
       "arr": "75000.0",
       "close_date": "2026-10-26T17:31:22.244Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:44.828211"
+      "last_modified": "2026-08-05T22:46:04.164932"
+    },
+    "51293158260": {
+      "deal_id": "51293158260",
+      "deal_name": "Mighty Digital / 20 Enterprise Users / Liebenow",
+      "company_name": "Mighty Digital",
+      "company_slug": "mighty_digital",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "45000",
+      "close_date": "2026-10-26T17:33:51.358Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:04.624190"
+    },
+    "57531453253": {
+      "deal_id": "57531453253",
+      "deal_name": "AMBOSS / OSS --> Enterprise / Liebenow",
+      "company_name": "AMBOSS",
+      "company_slug": "amboss",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000.0",
+      "close_date": "2026-10-26T17:35:03.040Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:05.108168"
+    },
+    "57531932257": {
+      "deal_id": "57531932257",
+      "deal_name": "Hey Harper / Visual Editor / Liebenow",
+      "company_name": "Hey Harper",
+      "company_slug": "hey_harper",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000",
+      "close_date": "2026-10-26T17:35:47.144Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:05.590416"
+    },
+    "58135849096": {
+      "deal_id": "58135849096",
+      "deal_name": "Neuroth / 1 Pro user? / Liebenow",
+      "company_name": "Neuroth",
+      "company_slug": "neuroth",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000.0",
+      "close_date": "2026-10-26T17:36:52.797Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:06.044789"
+    },
+    "60837964868": {
+      "deal_id": "60837964868",
+      "deal_name": "Carrefour / SH Enterprise / Liebenow",
+      "company_name": "Carrefour",
+      "company_slug": "carrefour",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "200000",
+      "close_date": "2026-10-26T19:43:11.060Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:06.466697"
     },
     "61149585726": {
       "deal_id": "61149585726",
@@ -437,7 +868,19 @@
       "arr": "75000",
       "close_date": "2026-10-26T19:48:25.182Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:45.043115"
+      "last_modified": "2026-08-05T22:46:06.974070"
+    },
+    "60964814258": {
+      "deal_id": "60964814258",
+      "deal_name": "Medcof / Pro --> Ent / Liebenow",
+      "company_name": "MedCof",
+      "company_slug": "medcof",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "150000",
+      "close_date": "2026-10-26T19:52:47.990Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:07.763121"
     },
     "54599396690": {
       "deal_id": "54599396690",
@@ -449,7 +892,7 @@
       "arr": "1500",
       "close_date": "2026-10-26T21:07:35.875Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:45.206000"
+      "last_modified": "2026-08-05T22:46:08.167130"
     },
     "55478324562": {
       "deal_id": "55478324562",
@@ -461,7 +904,7 @@
       "arr": "25000",
       "close_date": "2026-10-26T21:07:40.584Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:45.467253"
+      "last_modified": "2026-08-05T22:46:08.583872"
     },
     "56685250888": {
       "deal_id": "56685250888",
@@ -473,7 +916,7 @@
       "arr": "50000",
       "close_date": "2026-10-26T21:08:18.750Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:45.670411"
+      "last_modified": "2026-08-05T22:46:09.043996"
     },
     "58867845224": {
       "deal_id": "58867845224",
@@ -485,7 +928,7 @@
       "arr": "75000",
       "close_date": "2026-10-26T21:08:24.328Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:45.995979"
+      "last_modified": "2026-08-05T22:46:09.450288"
     },
     "57553904779": {
       "deal_id": "57553904779",
@@ -497,7 +940,19 @@
       "arr": "70000",
       "close_date": "2026-10-26T21:08:29.743Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:46.318555"
+      "last_modified": "2026-08-05T22:46:09.991789"
+    },
+    "63316026654": {
+      "deal_id": "63316026654",
+      "deal_name": "Ziff Davis - Demo Request",
+      "company_name": "Ziff Davis",
+      "company_slug": "ziff_davis",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "150000",
+      "close_date": "2026-10-29T00:00:00Z",
+      "owner_id": "82957388",
+      "last_modified": "2026-08-05T22:46:10.384659"
     },
     "53466496122": {
       "deal_id": "53466496122",
@@ -509,7 +964,7 @@
       "arr": "70000.0",
       "close_date": "2026-10-30T01:31:59.542Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:46.472694"
+      "last_modified": "2026-08-05T22:46:10.798503"
     },
     "60665391542": {
       "deal_id": "60665391542",
@@ -521,7 +976,7 @@
       "arr": "300000",
       "close_date": "2026-10-30T12:41:06.401Z",
       "owner_id": "90300126",
-      "last_modified": "2026-08-05T22:34:46.790719"
+      "last_modified": "2026-08-05T22:46:11.252220"
     },
     "58956770692": {
       "deal_id": "58956770692",
@@ -533,7 +988,7 @@
       "arr": "150000",
       "close_date": "2026-10-30T14:09:42.510Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:47.307907"
+      "last_modified": "2026-08-05T22:46:11.668282"
     },
     "59571754108": {
       "deal_id": "59571754108",
@@ -545,7 +1000,7 @@
       "arr": "39400",
       "close_date": "2026-10-30T14:20:02.912Z",
       "owner_id": "90300126",
-      "last_modified": "2026-08-05T22:34:47.474594"
+      "last_modified": "2026-08-05T22:46:12.162369"
     },
     "62635592329": {
       "deal_id": "62635592329",
@@ -557,7 +1012,7 @@
       "arr": "30000",
       "close_date": "2026-10-30T14:21:14.275Z",
       "owner_id": "88723213",
-      "last_modified": "2026-08-05T22:34:47.727371"
+      "last_modified": "2026-08-05T22:46:12.657929"
     },
     "61437846967": {
       "deal_id": "61437846967",
@@ -569,7 +1024,19 @@
       "arr": "200000",
       "close_date": "2026-10-30T14:40:10.567Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:47.909470"
+      "last_modified": "2026-08-05T22:46:13.229287"
+    },
+    "63220208693": {
+      "deal_id": "63220208693",
+      "deal_name": "A24 Films - Demo Request",
+      "company_name": "A24 Films",
+      "company_slug": "a24_films",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "100000",
+      "close_date": "2026-10-30T15:36:55.594Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:13.784013"
     },
     "60652001696": {
       "deal_id": "60652001696",
@@ -581,7 +1048,19 @@
       "arr": "175000",
       "close_date": "2026-10-30T15:49:00.145Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:48.080010"
+      "last_modified": "2026-08-05T22:46:14.450154"
+    },
+    "61093099416": {
+      "deal_id": "61093099416",
+      "deal_name": "Holded - Demo Request",
+      "company_name": "Holded",
+      "company_slug": "holded",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "30000",
+      "close_date": "2026-10-30T16:00:52.288Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:14.864696"
     },
     "55660576681": {
       "deal_id": "55660576681",
@@ -593,7 +1072,67 @@
       "arr": "125000",
       "close_date": "2026-10-30T17:11:25.834Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:48.344586"
+      "last_modified": "2026-08-05T22:46:15.635941"
+    },
+    "63120688011": {
+      "deal_id": "63120688011",
+      "deal_name": "Fanatics Live / Homegrown / Liebenow",
+      "company_name": "Fanatics Live",
+      "company_slug": "fanatics_live",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "250000",
+      "close_date": "2026-10-30T18:42:45.983Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:16.055319"
+    },
+    "63433850647": {
+      "deal_id": "63433850647",
+      "deal_name": "Voyage Privé - New Deal",
+      "company_name": "Voyage Privé FR",
+      "company_slug": "voyage_priv_fr",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "100000",
+      "close_date": "2026-10-30T19:37:42.199Z",
+      "owner_id": "82957388",
+      "last_modified": "2026-08-05T22:46:16.699551"
+    },
+    "61631402640": {
+      "deal_id": "61631402640",
+      "deal_name": "Aditya Birla Fashion and Retail Limited - Demo Request",
+      "company_name": "Aditya Birla Fashion and Retail Limited",
+      "company_slug": "aditya_birla_fashion_retail_limited",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "25000",
+      "close_date": "2026-10-30T21:18:09.368Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:17.123940"
+    },
+    "62622458398": {
+      "deal_id": "62622458398",
+      "deal_name": "Box / Adobe Target + Split Replacement / Liebenow",
+      "company_name": "Box",
+      "company_slug": "box",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "250000",
+      "close_date": "2026-10-30T21:41:16.729Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:17.524312"
+    },
+    "60644372558": {
+      "deal_id": "60644372558",
+      "deal_name": "Spotahome - Outbound",
+      "company_name": "Spotahome",
+      "company_slug": "spotahome",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "75000",
+      "close_date": "2026-10-31T00:00:00Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:17.941554"
     },
     "61625300846": {
       "deal_id": "61625300846",
@@ -605,7 +1144,19 @@
       "arr": "50000",
       "close_date": "2026-10-31T00:00:00Z",
       "owner_id": "90300126",
-      "last_modified": "2026-08-05T22:34:48.588771"
+      "last_modified": "2026-08-05T22:46:18.353138"
+    },
+    "62452805994": {
+      "deal_id": "62452805994",
+      "deal_name": "RE/MAX Holdings, - Demo Request",
+      "company_name": "RE/MAX Holdings,",
+      "company_slug": "re_max_holdings",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "95000",
+      "close_date": "2026-10-31T00:00:00Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:18.863607"
     },
     "59171632668": {
       "deal_id": "59171632668",
@@ -617,7 +1168,7 @@
       "arr": "50000.0",
       "close_date": "2026-10-31T01:31:19.497Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:48.732981"
+      "last_modified": "2026-08-05T22:46:19.522762"
     },
     "56258367868": {
       "deal_id": "56258367868",
@@ -629,7 +1180,7 @@
       "arr": "90000",
       "close_date": "2026-10-31T01:31:56.559Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:49.052005"
+      "last_modified": "2026-08-05T22:46:19.927054"
     },
     "49689180024": {
       "deal_id": "49689180024",
@@ -641,7 +1192,19 @@
       "arr": "50000.0",
       "close_date": "2026-10-31T01:32:14.958Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:49.347368"
+      "last_modified": "2026-08-05T22:46:20.329795"
+    },
+    "63327879453": {
+      "deal_id": "63327879453",
+      "deal_name": "Mews - New Deal",
+      "company_name": "Mews",
+      "company_slug": "mews",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "100000",
+      "close_date": "2026-10-31T11:44:20.406Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:46:20.738961"
     },
     "62160567676": {
       "deal_id": "62160567676",
@@ -653,7 +1216,31 @@
       "arr": "250000",
       "close_date": "2026-10-31T13:10:31.344Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:49.486010"
+      "last_modified": "2026-08-05T22:46:21.198263"
+    },
+    "62756829850": {
+      "deal_id": "62756829850",
+      "deal_name": "ASAPP / Self Hosted Enterprise / Liebenow",
+      "company_name": "ASAPP",
+      "company_slug": "asapp",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "200000",
+      "close_date": "2026-10-31T16:54:10.398Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:21.619714"
+    },
+    "62741857928": {
+      "deal_id": "62741857928",
+      "deal_name": "World Vision USA / Optimizely Replacement / Liebenow",
+      "company_name": "World Vision USA",
+      "company_slug": "world_vision_usa",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000",
+      "close_date": "2026-10-31T20:05:05.362Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:22.024121"
     },
     "58134855076": {
       "deal_id": "58134855076",
@@ -665,7 +1252,7 @@
       "arr": "75000.0",
       "close_date": "2026-10-31T20:47:44.921Z",
       "owner_id": "88723213",
-      "last_modified": "2026-08-05T22:34:49.890111"
+      "last_modified": "2026-08-05T22:46:22.431791"
     },
     "59458798354": {
       "deal_id": "59458798354",
@@ -677,7 +1264,19 @@
       "arr": "75000.0",
       "close_date": "2026-11-12T20:44:00.514Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:50.052391"
+      "last_modified": "2026-08-05T22:46:22.850278"
+    },
+    "60178287462": {
+      "deal_id": "60178287462",
+      "deal_name": "GetAway Group - Demo Request",
+      "company_name": "Getaway Group",
+      "company_slug": "getaway_group",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "30000",
+      "close_date": "2026-11-19T14:44:17.326Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:46:23.233478"
     },
     "60667714821": {
       "deal_id": "60667714821",
@@ -689,7 +1288,7 @@
       "arr": "300000",
       "close_date": "2026-11-30T05:00:00Z",
       "owner_id": "88723213",
-      "last_modified": "2026-08-05T22:34:50.183838"
+      "last_modified": "2026-08-05T22:46:23.700485"
     },
     "59387794836": {
       "deal_id": "59387794836",
@@ -701,7 +1300,19 @@
       "arr": "225000.0",
       "close_date": "2026-11-30T14:04:56.007Z",
       "owner_id": "90300126",
-      "last_modified": "2026-08-05T22:34:50.505911"
+      "last_modified": "2026-08-05T22:46:24.119541"
+    },
+    "60419710634": {
+      "deal_id": "60419710634",
+      "deal_name": "Square - Tech Consolodiation ",
+      "company_name": "Square",
+      "company_slug": "square",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "200000",
+      "close_date": "2026-11-30T15:48:49.214Z",
+      "owner_id": "88723213",
+      "last_modified": "2026-08-05T22:46:24.575283"
     },
     "60456295956": {
       "deal_id": "60456295956",
@@ -713,7 +1324,7 @@
       "arr": "51000",
       "close_date": "2026-11-30T16:47:08.116Z",
       "owner_id": "90300126",
-      "last_modified": "2026-08-05T22:34:50.865524"
+      "last_modified": "2026-08-05T22:46:25.039508"
     },
     "43491034751": {
       "deal_id": "43491034751",
@@ -725,7 +1336,7 @@
       "arr": "150000",
       "close_date": "2026-11-30T22:08:29.794Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:51.159856"
+      "last_modified": "2026-08-05T22:46:25.586840"
     },
     "60036684928": {
       "deal_id": "60036684928",
@@ -737,7 +1348,7 @@
       "arr": "50000",
       "close_date": "2026-12-01T02:32:20.324Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:51.576730"
+      "last_modified": "2026-08-05T22:46:26.014722"
     },
     "60173271471": {
       "deal_id": "60173271471",
@@ -749,7 +1360,55 @@
       "arr": "50000",
       "close_date": "2026-12-02T15:58:08.979Z",
       "owner_id": "90300126",
-      "last_modified": "2026-08-05T22:34:52.055022"
+      "last_modified": "2026-08-05T22:46:26.432939"
+    },
+    "62395520059": {
+      "deal_id": "62395520059",
+      "deal_name": "DocPlanner - Demo Request",
+      "company_name": "DocPlanner",
+      "company_slug": "docplanner",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "125000",
+      "close_date": "2026-12-09T20:45:56.343Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:46:27.271794"
+    },
+    "58373987402": {
+      "deal_id": "58373987402",
+      "deal_name": "Square Enix LTD - CRO / A/B Testing",
+      "company_name": "Square Enix, Inc.",
+      "company_slug": "square_enix_inc",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000.0",
+      "close_date": "2026-12-09T20:46:27.415Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:46:27.732515"
+    },
+    "61474132833": {
+      "deal_id": "61474132833",
+      "deal_name": "Brussels Airlines - RFP",
+      "company_name": "Brussels Airlines",
+      "company_slug": "brussels_airlines",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "200000",
+      "close_date": "2026-12-15T11:09:57.487Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:46:28.129856"
+    },
+    "59369345948": {
+      "deal_id": "59369345948",
+      "deal_name": "Decathlon - Outbound",
+      "company_name": "Decathlon",
+      "company_slug": "decathlon",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "0",
+      "close_date": "2026-12-16T10:39:36.330Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:46:28.638357"
     },
     "60853753009": {
       "deal_id": "60853753009",
@@ -761,7 +1420,19 @@
       "arr": "120000",
       "close_date": "2026-12-16T16:41:29.311Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:52.250203"
+      "last_modified": "2026-08-05T22:46:29.067300"
+    },
+    "60840137793": {
+      "deal_id": "60840137793",
+      "deal_name": "Zurich Insurance Group Ltd - New Deal",
+      "company_name": "Zurich Insurance Group Ltd",
+      "company_slug": "zurich_insurance_group_ltd",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000",
+      "close_date": "2026-12-16T17:18:39.558Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:46:29.463325"
     },
     "58659164971": {
       "deal_id": "58659164971",
@@ -773,7 +1444,7 @@
       "arr": "75000.0",
       "close_date": "2026-12-16T20:45:41.631Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:52.388797"
+      "last_modified": "2026-08-05T22:46:30.026410"
     },
     "59173115702": {
       "deal_id": "59173115702",
@@ -785,7 +1456,7 @@
       "arr": "100000.0",
       "close_date": "2026-12-16T22:18:24.150Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:52.533906"
+      "last_modified": "2026-08-05T22:46:30.424453"
     },
     "45092496128": {
       "deal_id": "45092496128",
@@ -797,7 +1468,7 @@
       "arr": "25000",
       "close_date": "2026-12-18T02:30:40.358Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:52.862780"
+      "last_modified": "2026-08-05T22:46:30.819562"
     },
     "59853485971": {
       "deal_id": "59853485971",
@@ -809,7 +1480,7 @@
       "arr": "50000",
       "close_date": "2026-12-18T15:27:52.308Z",
       "owner_id": "90300126",
-      "last_modified": "2026-08-05T22:34:53.232964"
+      "last_modified": "2026-08-05T22:46:31.208879"
     },
     "60182251329": {
       "deal_id": "60182251329",
@@ -821,7 +1492,139 @@
       "arr": "300000",
       "close_date": "2026-12-31T00:00:00Z",
       "owner_id": "90300126",
-      "last_modified": "2026-08-05T22:34:53.731966"
+      "last_modified": "2026-08-05T22:46:31.619751"
+    },
+    "60860413064": {
+      "deal_id": "60860413064",
+      "deal_name": "Buff - Demo Request",
+      "company_name": "BUFF",
+      "company_slug": "buff",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "55000",
+      "close_date": "2026-12-31T00:00:00Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:32.399360"
+    },
+    "62678252395": {
+      "deal_id": "62678252395",
+      "deal_name": "Expedia Group — B2B ML Experimentation",
+      "company_name": "Expedia Group",
+      "company_slug": "expedia_group",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000",
+      "close_date": "2026-12-31T00:00:00Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:32.798571"
+    },
+    "63320139316": {
+      "deal_id": "63320139316",
+      "deal_name": "PlatinumRx - Demo Request",
+      "company_name": "PlatinumRx",
+      "company_slug": "platinumrx",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "30000",
+      "close_date": "2026-12-31T00:00:00Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:33.233252"
+    },
+    "62852783774": {
+      "deal_id": "62852783774",
+      "deal_name": "Bla Bla Car - 300 seats/Feature Flag Deal",
+      "company_name": "BlaBlaCar",
+      "company_slug": "blablacar",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "200000",
+      "close_date": "2026-12-31T13:10:59.321Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:46:33.959169"
+    },
+    "60355556645": {
+      "deal_id": "60355556645",
+      "deal_name": "Plata Card aka dif.etch - Enterprise Agreement.",
+      "company_name": "Plata Card aka dif.etch",
+      "company_slug": "plata_card_aka_difetch",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "150000",
+      "close_date": "2026-12-31T15:12:37.570Z",
+      "owner_id": "88723213",
+      "last_modified": "2026-08-05T22:46:34.361953"
+    },
+    "60694377392": {
+      "deal_id": "60694377392",
+      "deal_name": "Aras Corporation - Outbound",
+      "company_name": "Aras Corporation",
+      "company_slug": "aras_corporation",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000",
+      "close_date": "2026-12-31T23:03:41.972Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:34.834347"
+    },
+    "58798224498": {
+      "deal_id": "58798224498",
+      "deal_name": "Comcast - New Deal",
+      "company_name": "Comcast",
+      "company_slug": "comcast",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "350000.0",
+      "close_date": "2027-01-01T01:49:27.678Z",
+      "owner_id": "82957388",
+      "last_modified": "2026-08-05T22:46:35.263351"
+    },
+    "62111798456": {
+      "deal_id": "62111798456",
+      "deal_name": "Fabric Analytics - Enterprise Expansion",
+      "company_name": "Fabric Analytics",
+      "company_slug": "fabric_analytics",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000",
+      "close_date": "2027-01-22T17:37:25.534Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:35.705238"
+    },
+    "59021351952": {
+      "deal_id": "59021351952",
+      "deal_name": "Signet Jewelers / Podcast Guest - Craig Kistler / Liebenow",
+      "company_name": "Signet Jewelers Ltd.",
+      "company_slug": "signet_jewelers_ltd",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "100000.0",
+      "close_date": "2027-01-25T16:15:30.370Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:36.168432"
+    },
+    "54442852124": {
+      "deal_id": "54442852124",
+      "deal_name": "Perplexity / Eppo Takeout / Liebenow",
+      "company_name": "Perplexity AI",
+      "company_slug": "perplexity_ai",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "300000",
+      "close_date": "2027-01-25T18:07:02.894Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:36.582493"
+    },
+    "62622489357": {
+      "deal_id": "62622489357",
+      "deal_name": "JPMorganChase / Podcast Lead / Liebenow",
+      "company_name": "JPMorganChase",
+      "company_slug": "jpmorganchase",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "250000",
+      "close_date": "2027-01-25T18:17:25.288Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:37.038014"
     },
     "55475383924": {
       "deal_id": "55475383924",
@@ -833,7 +1636,55 @@
       "arr": "150000",
       "close_date": "2027-01-25T18:17:26.249Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:54.037385"
+      "last_modified": "2026-08-05T22:46:37.494851"
+    },
+    "61507488889": {
+      "deal_id": "61507488889",
+      "deal_name": "Superhuman / Statsig Replacement / Liebenow",
+      "company_name": "Superhuman",
+      "company_slug": "superhuman",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "150000",
+      "close_date": "2027-01-25T19:14:50.064Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:38.017682"
+    },
+    "62447700618": {
+      "deal_id": "62447700618",
+      "deal_name": "United Wheels / OSS --> Enterprise / Liebenow",
+      "company_name": "United Wheels",
+      "company_slug": "united_wheels",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "150000",
+      "close_date": "2027-01-25T19:42:47.097Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:38.502355"
+    },
+    "62985360945": {
+      "deal_id": "62985360945",
+      "deal_name": "Electronic Arts / Statsig Takeout / Liebenow",
+      "company_name": "Electronic Arts",
+      "company_slug": "electronic_arts",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "200000",
+      "close_date": "2027-01-25T21:06:51.605Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:38.898420"
+    },
+    "59680315298": {
+      "deal_id": "59680315298",
+      "deal_name": "Genius Sports / Outbound / Liebenow",
+      "company_name": "Genius Sports",
+      "company_slug": "genius_sports",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "150000",
+      "close_date": "2027-01-25T22:09:39.264Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:39.303745"
     },
     "53500422798": {
       "deal_id": "53500422798",
@@ -845,7 +1696,19 @@
       "arr": "250000",
       "close_date": "2027-01-25T22:51:02.485Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:54.183030"
+      "last_modified": "2026-08-05T22:46:39.727273"
+    },
+    "56162812495": {
+      "deal_id": "56162812495",
+      "deal_name": "WorkAxle / Self Hosted FF + Product Analytics / Liebenow",
+      "company_name": "WorkAxle",
+      "company_slug": "workaxle",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "25000",
+      "close_date": "2027-01-25T22:57:45.533Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:40.165350"
     },
     "9087197490": {
       "deal_id": "9087197490",
@@ -857,7 +1720,7 @@
       "arr": "15000",
       "close_date": "2027-01-25T22:58:02.999Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:54.338508"
+      "last_modified": "2026-08-05T22:46:41.126395"
     },
     "14545547901": {
       "deal_id": "14545547901",
@@ -869,7 +1732,31 @@
       "arr": "27500",
       "close_date": "2027-01-25T22:58:12.385Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:54.526980"
+      "last_modified": "2026-08-05T22:46:41.526182"
+    },
+    "59245644951": {
+      "deal_id": "59245644951",
+      "deal_name": "Route / 5 Experiments / Liebenow",
+      "company_name": "Route",
+      "company_slug": "route",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000.0",
+      "close_date": "2027-01-25T22:58:21.310Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:41.956597"
+    },
+    "51050838887": {
+      "deal_id": "51050838887",
+      "deal_name": "RBI Retail Innovation LLC- Demo Request",
+      "company_name": "RBI Retail Innovation",
+      "company_slug": "rbi_retail_innovation",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "0",
+      "close_date": "2027-01-25T22:58:29.781Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:42.550425"
     },
     "9092495692": {
       "deal_id": "9092495692",
@@ -881,7 +1768,7 @@
       "arr": "10000",
       "close_date": "2027-01-25T22:58:57.964Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:54.835328"
+      "last_modified": "2026-08-05T22:46:43.080280"
     },
     "9092495281": {
       "deal_id": "9092495281",
@@ -893,7 +1780,31 @@
       "arr": "15000",
       "close_date": "2027-01-25T22:59:22.531Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:55.079043"
+      "last_modified": "2026-08-05T22:46:43.533766"
+    },
+    "57100375199": {
+      "deal_id": "57100375199",
+      "deal_name": "Catena Media / $50k New Logo Land / Liebenow",
+      "company_name": "Catena Media",
+      "company_slug": "catena_media",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000",
+      "close_date": "2027-01-25T22:59:42.768Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:43.965482"
+    },
+    "61626656091": {
+      "deal_id": "61626656091",
+      "deal_name": "Sword Health / Enterprise / Liebenow",
+      "company_name": "Sword Health Inc",
+      "company_slug": "sword_health_inc",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "175000",
+      "close_date": "2027-01-26T00:35:25.211Z",
+      "owner_id": "84883357",
+      "last_modified": "2026-08-05T22:46:44.440222"
     },
     "50347229229": {
       "deal_id": "50347229229",
@@ -905,7 +1816,7 @@
       "arr": "500000",
       "close_date": "2027-01-29T14:50:18.643Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:55.296249"
+      "last_modified": "2026-08-05T22:46:45.180506"
     },
     "54074159735": {
       "deal_id": "54074159735",
@@ -917,7 +1828,19 @@
       "arr": "5000",
       "close_date": "2027-01-29T21:42:11.686Z",
       "owner_id": "84883357",
-      "last_modified": "2026-08-05T22:34:55.667746"
+      "last_modified": "2026-08-05T22:46:45.812654"
+    },
+    "61024408734": {
+      "deal_id": "61024408734",
+      "deal_name": "CFI - Demo Request",
+      "company_name": "CFI Global",
+      "company_slug": "cfi_global",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "50000",
+      "close_date": "2027-01-31T00:00:00Z",
+      "owner_id": "88723214",
+      "last_modified": "2026-08-05T22:46:46.499945"
     },
     "54169480766": {
       "deal_id": "54169480766",
@@ -929,7 +1852,7 @@
       "arr": "150000",
       "close_date": "2027-02-01T02:27:53.148Z",
       "owner_id": "82957388",
-      "last_modified": "2026-08-05T22:34:55.842887"
+      "last_modified": "2026-08-05T22:46:46.932630"
     },
     "58966766773": {
       "deal_id": "58966766773",
@@ -941,7 +1864,19 @@
       "arr": "30000.0",
       "close_date": "2027-02-10T22:18:03.733Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:56.026939"
+      "last_modified": "2026-08-05T22:46:47.365717"
+    },
+    "61174979943": {
+      "deal_id": "61174979943",
+      "deal_name": "Neologix - Demo Request",
+      "company_name": "Neologix",
+      "company_slug": "neologix",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": null,
+      "close_date": "2027-02-26T20:40:27.399Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:47.919866"
     },
     "58897463067": {
       "deal_id": "58897463067",
@@ -953,7 +1888,31 @@
       "arr": "52000.0",
       "close_date": "2027-03-23T12:41:27.627Z",
       "owner_id": "88723214",
-      "last_modified": "2026-08-05T22:34:56.193691"
+      "last_modified": "2026-08-05T22:46:48.327417"
+    },
+    "59812480590": {
+      "deal_id": "59812480590",
+      "deal_name": "Uzum - Expansion at next renewal = $37k (review prior comms with Danil)",
+      "company_name": "Uzum",
+      "company_slug": "uzum",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "37250",
+      "close_date": "2027-04-15T13:38:01.007Z",
+      "owner_id": "88723213",
+      "last_modified": "2026-08-05T22:46:48.773725"
+    },
+    "60355159912": {
+      "deal_id": "60355159912",
+      "deal_name": "shiftkey / 2027 Renewal ",
+      "company_name": "shiftkey",
+      "company_slug": "shiftkey",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "129750",
+      "close_date": "2027-04-30T16:16:49.299Z",
+      "owner_id": "88723213",
+      "last_modified": "2026-08-05T22:46:49.207903"
     },
     "58208197272": {
       "deal_id": "58208197272",
@@ -965,7 +1924,43 @@
       "arr": "130000.0",
       "close_date": "2027-05-19T12:23:26.710Z",
       "owner_id": "88723213",
-      "last_modified": "2026-08-05T22:34:56.360589"
+      "last_modified": "2026-08-05T22:46:49.634619"
+    },
+    "60807400737": {
+      "deal_id": "60807400737",
+      "deal_name": "Beamery Enterprise",
+      "company_name": "Beamery",
+      "company_slug": "beamery",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "25000",
+      "close_date": "2027-06-16T13:05:35.695Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:50.036204"
+    },
+    "60997806511": {
+      "deal_id": "60997806511",
+      "deal_name": "Jibble - Demo Request",
+      "company_name": "Jibble",
+      "company_slug": "jibble",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "60000",
+      "close_date": "2027-06-25T19:23:01.981Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:50.480913"
+    },
+    "63194010663": {
+      "deal_id": "63194010663",
+      "deal_name": "JonnieByDesign - Demo Request",
+      "company_name": "JonnieByDesign",
+      "company_slug": "jonniebydesign",
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "240",
+      "close_date": "2027-06-30T16:35:13.050Z",
+      "owner_id": "90300126",
+      "last_modified": "2026-08-05T22:46:50.890886"
     }
   }
 }
