@@ -1,0 +1,29 @@
+{
+  "company": "Review of new",
+  "slug": "review-of-new",
+  "last_etl_date": "2026-08-05T15:57:31.315049",
+  "calls": [
+    {
+      "id": "6a22f925b8037d001888bf85",
+      "source": "apollo",
+      "title": "Review of new AI messaging on home page",
+      "date": "2026-06-05",
+      "duration_minutes": 12,
+      "summary": "[Summary failed] [Elyse Fox]: Do we. Do we have a skill or a prompt that we can run that does that?\n[Scott Bailey]: We do actually now have a skill for the ramp schedules. So part of the idea here was to make sure tha",
+      "host": "Ashley Stirrup",
+      "participants": 4
+    },
+    {
+      "id": "01KT73MA65J73YRDJJFXV5QX07",
+      "source": "fireflies",
+      "title": "Review of new AI messaging on home page",
+      "date": "2026-06-05",
+      "duration_minutes": 23,
+      "summary": "The team finalized the headline 'Build smarter ship safely grow at the speed of AI', prioritizing execution speed while remaining open to future revisions. They decided to enhance product visuals by simplifying existing screenshots and integrating AI elements to better showcase capabilities. The messaging around experimentation was refined to highlight AI's role in accelerating results while emphasizing practical outcomes, with the agreement to retain 'Faster Results, Bigger Impact' as a core headline. Discussions on feature flag creation focused on separating roles of creation and monitoring. The inclusion of customer stories was emphasized to illustrate AI's impact, alongside a need for technical adjustments to improve live site content clarity.",
+      "organizer": "ashley@growthbook.io",
+      "participants": 6,
+      "keywords": "AI messaging, homepage redesign, feature flags, safe rollout, product analytics, customer testimonials",
+      "action_items": "\n**Karen Henke**\nShare homepage headline and content mockups with the team for further review and iteration (22:20)\n\n**Scott Bailey**\nProvide a screenshot of the AI skill CLI prompt for creating a safe rollout to be used in the homepage image section (15:25)\nHelp locate or create an improved feature flag screenshot that clearly shows rule logic and ramp-up progress for the website (21:50)\n\n**Marketing team**\nSubmit additional headline ideas for homepage AI messaging into the marketing channel for collaborative review and iteration (22:03)\n\n**Development/Operations team**\nFix broken feature flag screenshot display issue on the live site immediately following the meeting (20:18)\n"
+    }
+  ]
+}
