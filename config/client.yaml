@@ -39,6 +39,7 @@ excluded_stages:
   meeting_set:
     - name: "Meeting Set"
       id: "79653122"
+    # NOTE: appointmentscheduled is "Discovery" stage, NOT Meeting Set - do not exclude
 
   # Disqualified deals
   disqualified:
