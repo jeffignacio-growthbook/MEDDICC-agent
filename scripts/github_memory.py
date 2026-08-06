@@ -359,22 +359,27 @@ class GitHubMemory:
                 print(f"   ⚠️  Error loading cache {slug}.json: {e}")
                 return None
 
-        # Fuzzy match: find files containing the slug
-        # Example: slug='notion' matches 'notion-growthbook.json'
+        # Fuzzy match: handle both patterns
+        # - company-growthbook.json  (e.g., clickhouse-growthbook.json)
+        # - growthbook-company.json  (e.g., growthbook-clickhouse.json)
         try:
-            matching_files = []
-            for file in self.calls_dir.glob("*.json"):
-                filename = file.stem  # Remove .json extension
-                if slug in filename or filename in slug:
-                    matching_files.append(file)
+            matching_files = [
+                f for f in self.calls_dir.glob("*.json")
+                if f.stem == slug
+                or f.stem.startswith(slug + '-')
+                or f.stem == f'growthbook-{slug}'
+                or f.stem.startswith(f'growthbook-{slug}-')
+            ]
 
             if not matching_files:
                 return None
 
-            # Prefer shorter filenames (more specific match)
-            # e.g., 'notion.json' is better than 'notion-growthbook.json'
-            best_match = min(matching_files, key=lambda f: len(f.stem))
+            # Ambiguity guard: if multiple matches, warn and return None
+            if len(matching_files) > 1:
+                print(f"   ⚠️  Ambiguous match for '{slug}': {[f.name for f in matching_files]}")
+                return None
 
+            best_match = matching_files[0]
             print(f"   🔍 Fuzzy match: {slug} → {best_match.name}")
 
             with open(best_match, 'r', encoding='utf-8') as f:
@@ -400,16 +405,20 @@ class GitHubMemory:
         if exact_path.exists():
             existing_file = exact_path
         else:
-            # Fuzzy match to find existing file
+            # Fuzzy match to find existing file (same patterns as load_call_cache)
             try:
-                matching_files = []
-                for file in self.calls_dir.glob("*.json"):
-                    filename = file.stem
-                    if slug in filename or filename in slug:
-                        matching_files.append(file)
+                matching_files = [
+                    f for f in self.calls_dir.glob("*.json")
+                    if f.stem == slug
+                    or f.stem.startswith(slug + '-')
+                    or f.stem == f'growthbook-{slug}'
+                    or f.stem.startswith(f'growthbook-{slug}-')
+                ]
 
-                if matching_files:
-                    # Use the same file we would have loaded from
+                if len(matching_files) == 1:
+                    existing_file = matching_files[0]
+                elif len(matching_files) > 1:
+                    # Multiple matches - use shortest to avoid creating duplicates
                     existing_file = min(matching_files, key=lambda f: len(f.stem))
             except:
                 pass
