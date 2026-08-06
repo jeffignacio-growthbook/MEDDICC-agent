@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_012",
+  "timestamp": "2026-08-06T01:05:12.559750",
+  "company": "TickPick",
+  "criterion_fired": "Criterion 2 (Carry-Forward Consistency), Criterion 3 (Evidence Quality), Criterion 4 (Actionable Next Steps), Criterion 5 (No Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criteria are appropriate. Add to CLAUDE.md: (1) Carry-forward template: 'No new information in [call] (reason) \u2014 maintaining previous score of X/10'; (2) Absence evidence rule: absence of discussion \u2260 valid evidence; require confirmation or unknown flag; (3) Next steps rule: every action must include owner name, deadline (day/time), and execution method; (4) Score-validation rule: if validation data missing/incomplete, cap score or lower by 1\u20132 points with explicit notation."
+}

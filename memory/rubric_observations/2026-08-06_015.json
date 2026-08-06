@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_015",
+  "timestamp": "2026-08-06T01:17:05.690551",
+  "company": "Zoro",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 5 (No unsupported claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 should add: 'If a component was Identified/Partial in prior call but recent call provides no explicit re-affirmation or contradiction, mark component as \"Unvalidated\u2014prior assessment maintained pending confirmation\" rather than asserting carry-forward without explicit evidence in current call data.'"
+}

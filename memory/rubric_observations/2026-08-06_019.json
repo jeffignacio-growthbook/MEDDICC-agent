@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_019",
+  "timestamp": "2026-08-06T01:31:25.385840",
+  "company": "Unity",
+  "criterion_fired": "Criterion 1, 2, 4, 5 (multiple simultaneous)",
+  "was_appropriate": false,
+  "suggested_change": "Separate concerns: (1) Score changes must be justified by call evidence OR carry-forward language (mutually exclusive rules per condition), not both. (2) When call data is corrupted/incomplete, allow explicit 'no change' rather than forcing carry-forward language. (3) Next-step concreteness should be evaluated independently of score regression logic. Current rubric conflates state consistency, evidence standards, and question quality into overlapping criteria."
+}

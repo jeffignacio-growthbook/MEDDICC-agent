@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_021",
+  "timestamp": "2026-08-06T01:39:54.260385",
+  "company": "Square",
+  "criterion_fired": "Criterion 5 (Deal Parameters), Criterion 3 (ICP Fit), Criterion 4 (Next Steps Specificity)",
+  "was_appropriate": true,
+  "suggested_change": "CLAUDE.md should explicitly require: (1) flag HubSpot-sourced dates as 'internal estimates, not confirmed'; (2) ICP validation must cite prospect-stated visitor count or data stack tools, not inferred potential; (3) next steps require named contact + explicit confirmation method; (4) follow-up timelines must reference actual calendar dates or prior call confirmation, not relative terms like 'by end of week'."
+}

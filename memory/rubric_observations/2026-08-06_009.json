@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_009",
+  "timestamp": "2026-08-06T00:48:23.206266",
+  "company": "Notion",
+  "criterion_fired": "Criterion 2 and Criterion 4 (conflicting requirements)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should state: 'For components with Unknown/Partial status, analyst must explicitly state whether the recent call provided new evidence or not (one sentence max per component).' Criterion 4 should allow: 'Next steps must be concrete and specific, but \"Schedule 30-min call with [role]\" and \"Email [contact] by [date]\" are acceptable if the preceding analysis justifies the timing.' Remove the requirement to rephrase sales activities as 'direct engagement questions'\u2014they are not equivalent."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_005",
+  "timestamp": "2026-08-06T00:36:10.836919",
+  "company": "BESTSELLER",
+  "criterion_fired": "Criterion 1, 3, 5, 2, 4",
+  "was_appropriate": true,
+  "suggested_change": "Criteria are sound but CLAUDE.md should clarify: (1) minimum evidence specificity for each score tier (0/10 requires no data; 1-3/10 requires direct quotes; 4+/10 requires multiple corroborating quotes), (2) ICP fit cannot be claimed without confirming all required attributes from the call itself, and (3) next steps must include concrete acquisition targets (e.g., 'obtain contact name from CRM') before dependent actions."
+}

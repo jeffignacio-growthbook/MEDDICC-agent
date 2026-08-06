@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_016",
+  "timestamp": "2026-08-06T01:20:03.600695",
+  "company": "Taskrabbit",
+  "criterion_fired": "Criterion 2 (Champion), Criterion 3 (Competition), Criterion 4 (Economic Buyer), Criterion 5 (Deal Health), Criterion 1 (Metrics)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 3 needs explicit guidance: 'Score Unknown if no competitive data present; score 3/10 only if specific alternative mentioned without our differentiation.' Criterion 1 should clarify: 'If new evidence emerges in recent call, reassess rather than claim no change.' Criterion 5 should require: 'All forward-looking claims must cite specific timeline contradictions from call data, not inference.' Criterion 4 should define: 'Acceptable next steps must include date precision (specific date or 'within X business days with confirmation') and named contact.'"
+}

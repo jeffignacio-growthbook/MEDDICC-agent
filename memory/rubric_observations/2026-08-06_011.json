@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_011",
+  "timestamp": "2026-08-06T01:01:16.260361",
+  "company": "KBX",
+  "criterion_fired": "Criterion 2 (Decision Process) and Criterion 1 (Recent Call Summary)",
+  "was_appropriate": false,
+  "suggested_change": "Separate data quality assessment from analysis quality: (1) explicitly allow score regression when new information contradicts prior data or timelines change, documenting the reasoning; (2) clarify that missing transcripts ([Summary failed]) should trigger a 'data insufficient' flag rather than a score failure, with guidance on whether to retain prior cumulative state or mark that period as unassessed."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_020",
+  "timestamp": "2026-08-06T01:34:36.963510",
+  "company": "Livesport",
+  "criterion_fired": "Criterion 1 (Complete Coverage) and Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1 should explicitly state: 'If no call participants are identified, the analysis must flag this as a blocker and recommend immediate follow-up to identify attendees before proceeding with component scoring.' Criterion 4 should allow 'Follow up with [Account name] to identify call participants' as a valid Prerequisite step when participants are unknown."
+}

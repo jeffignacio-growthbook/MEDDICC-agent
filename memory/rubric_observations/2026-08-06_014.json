@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_014",
+  "timestamp": "2026-08-06T01:10:59.389554",
+  "company": "Aircall",
+  "criterion_fired": "Competition (Criterion 3), Economic Buyer (Criterion 5), Champion (Criterion 4), Metrics (Criterion 4)",
+  "was_appropriate": true,
+  "suggested_change": "Refine Competition criterion to require direct mention/evidence, not inference. Refine Economic Buyer criterion to distinguish budget visibility from budget authority. Refine Champion criterion to require specific names/titles and explicit next-step questions. Refine Metrics criterion to require quantified targets or explicit commitment to elicit them."
+}

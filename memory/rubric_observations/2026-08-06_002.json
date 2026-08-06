@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_002",
+  "timestamp": "2026-08-06T00:23:45.787702",
+  "company": "BESTSELLER",
+  "criterion_fired": "CRITERION 4 & 5",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'Next steps must include concrete contact name/title and calendar date. If contact info missing or ICP blockers (data warehouse, visitor threshold) unvalidated, flag as BLOCKED and recommend qualification call before follow-up planning.'"
+}
