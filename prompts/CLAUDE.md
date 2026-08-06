@@ -107,6 +107,41 @@ Weak signals to note:
 
 **Scores 4-10:** Follow the component-specific calibration guidelines below. Higher scores require increasingly specific evidence, direct quotes, and demonstrated progress (not just stated intent).
 
+## Champion and Economic Buyer — score on action, not sentiment
+
+The two most commonly inflated components are Champion
+and Economic Buyer. Transcripts reward whoever sounded
+most enthusiastic. Score what the buyer DOES, not how
+they FELT.
+
+### Champion
+Score on buyer-owned next steps, not enthusiasm:
+  1/10 — Engaged, asked good questions. No internal action.
+  2/10 — Committed to an internal action they own:
+          "I'll loop in my team", "Let me schedule the CFO"
+  3/10 — Actively selling internally with evidence:
+          "I'm building the business case",
+          "I got VP approval to move to POC"
+
+A contact who sounds excited but owns no internal next
+step scores 1/10. Enthusiasm is not championing.
+
+### Economic Buyer
+Score on confirmed authority and buyer-owned action:
+  1/10 — Title or name mentioned. No authority confirmed.
+  2/10 — EB identified, referenced budget they own, or
+          committed to a specific approval step
+  3/10 — EB confirmed authority explicitly AND owns a
+          next step in the decision process
+
+"Finance needs to approve" = 1/10 (no name, no action)
+"Our CFO has the budget, reviewing Q3" = 2/10
+"Sarah Chen confirmed she owns the budget and is
+presenting to the board next week" = 3/10
+
+Do not upgrade Champion or Economic Buyer based on
+tone, warmth, or expressed interest alone.
+
 ## Carry-forward rule — exact language required
 
 A component established in a prior call must carry forward. Do not re-flag it as a gap because it wasn't in the recent call. Document explicitly if a score changes from cumulative state.
