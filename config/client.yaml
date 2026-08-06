@@ -9,6 +9,8 @@ organization:
   name: "GrowthBook"
   crm: "HubSpot"
   sales_methodology: "MEDDICC"  # Options: MEDDICC, MEDDPICC, MEDDIC
+  internal_domains:
+    - "growthbook.io"
 
 # ============================================================================
 # HUBSPOT PIPELINE CONFIGURATION

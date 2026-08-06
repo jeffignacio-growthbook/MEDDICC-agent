@@ -1,7 +1,7 @@
 {
   "company": "Oda + GrowthBook",
   "slug": "oda-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.321631",
+  "last_etl_date": "2026-08-05T17:02:18.353915",
   "calls": [
     {
       "id": "69c29eee993f7d0011e35f07",
@@ -23,7 +23,10 @@
       "organizer": "christian@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, ODA, Enterprise Proposal, Self-Hosting, Pricing Model, Experimentation",
-      "action_items": "\n**Christian Liebenow**\nSend Fredrik the detailed slides and proposal deck shortly after the meeting (23:10)\nProvide a detailed explanation paragraph on GrowthBook’s data storage and porting specifics (03:04)\nFollow up via email to continue discussions and await internal feedback on budget constraints (25:23)\n\n**Fredrik**\nShare the proposal slides and pricing details with the CTO for review and decision-making on budget and adoption (21:33)\nExplore the possibility of proceeding without platform fee and support commitments with the CTO (19:20)\nConfirm and commit to participating in a case study and press release collaboration if GrowthBook proves successful (22:10)\nProvide Christian with feedback and next steps after the internal CTO discussion (25:23)\n"
+      "action_items": "\n**Christian Liebenow**\nSend Fredrik the detailed slides and proposal deck shortly after the meeting (23:10)\nProvide a detailed explanation paragraph on GrowthBook’s data storage and porting specifics (03:04)\nFollow up via email to continue discussions and await internal feedback on budget constraints (25:23)\n\n**Fredrik**\nShare the proposal slides and pricing details with the CTO for review and decision-making on budget and adoption (21:33)\nExplore the possibility of proceeding without platform fee and support commitments with the CTO (19:20)\nConfirm and commit to participating in a case study and press release collaboration if GrowthBook proves successful (22:10)\nProvide Christian with feedback and next steps after the internal CTO discussion (25:23)\n",
+      "participant_domains": [
+        "oda.com"
+      ]
     },
     {
       "id": "01KNNAD3ARVT9BJ80RHSTFJR41",
@@ -35,7 +38,11 @@
       "organizer": "ashley@growthbook.io",
       "participants": 6,
       "keywords": "GrowthBook, experimentation, Bayesian statistics, product personalization, A/B testing, data analytics",
-      "action_items": "\n**Frederik Jorgensen**\nShare initial Slack messages and GrowthBook analysis graphs related to early experimentation to support the case study and future knowledge sharing (30:55)\n\n**Chris Newton**\nPrepare and share a written summary of the conversation for review and clarification (30:37)\n\n**All (Oda and GrowthBook teams)**\nContinue dialogue and share concrete experiment case examples or learnings that helped accelerate or improve results for collaborative insights (31:19)\n"
+      "action_items": "\n**Frederik Jorgensen**\nShare initial Slack messages and GrowthBook analysis graphs related to early experimentation to support the case study and future knowledge sharing (30:55)\n\n**Chris Newton**\nPrepare and share a written summary of the conversation for review and clarification (30:37)\n\n**All (Oda and GrowthBook teams)**\nContinue dialogue and share concrete experiment case examples or learnings that helped accelerate or improve results for collaborative insights (31:19)\n",
+      "participant_domains": [
+        "newtongrowth.com",
+        "oda.com"
+      ]
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "company": "Chaos + GrowthBook",
   "slug": "chaos-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.395621",
+  "last_etl_date": "2026-08-05T16:51:19.523859",
   "calls": [
     {
       "id": "01KJT558J6CN4YT75JDB65KH5R",
@@ -13,7 +13,11 @@
       "organizer": "christian@growthbook.io",
       "participants": 8,
       "keywords": "A/B Testing, Feature Flags, Experimentation, Roketta CMS, Core Web Vitals, Product Analytics",
-      "action_items": "\n**Christian Liebenow**\nSend detailed documentation on flicker avoidance, latency minimization, core web vitals impact, and GDPR cookie compliance to Bozhidar Kamenski (50:00)\nProvide detailed integration approaches for GrowthBook with Roketta CMS, especially cache and edge handling (50:00)\n\n**Bozhidar Kamenski**\nReview GrowthBook documentation on integration and compliance and send any additional technical questions following review (50:20)\n\n**Jake Wallace**\nCoordinate internal review of GrowthBook materials and sync with team to determine next steps for proof of concept or initial experimentation launch (51:40)\n\n**Logan Bates**\nProvide demo and detailed answers regarding product analytics, experiment setup, and feature flagging capabilities (00:00)\n"
+      "action_items": "\n**Christian Liebenow**\nSend detailed documentation on flicker avoidance, latency minimization, core web vitals impact, and GDPR cookie compliance to Bozhidar Kamenski (50:00)\nProvide detailed integration approaches for GrowthBook with Roketta CMS, especially cache and edge handling (50:00)\n\n**Bozhidar Kamenski**\nReview GrowthBook documentation on integration and compliance and send any additional technical questions following review (50:20)\n\n**Jake Wallace**\nCoordinate internal review of GrowthBook materials and sync with team to determine next steps for proof of concept or initial experimentation launch (51:40)\n\n**Logan Bates**\nProvide demo and detailed answers regarding product analytics, experiment setup, and feature flagging capabilities (00:00)\n",
+      "participant_domains": [
+        "chaos.com",
+        "raketadesign.com"
+      ]
     }
   ]
 }

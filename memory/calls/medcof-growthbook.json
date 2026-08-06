@@ -1,7 +1,7 @@
 {
   "company": "Medcof + GrowthBook",
   "slug": "medcof-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.354039",
+  "last_etl_date": "2026-08-05T16:51:18.367649",
   "calls": [
     {
       "id": "01KV63MFSY2ZY6FEMJJ9XF3W20",
@@ -13,7 +13,10 @@
       "organizer": "christian@growthbook.io",
       "participants": 8,
       "keywords": "experiment setup, feature flags, data pipelines, Google Analytics integration, AI assistant, product analytics",
-      "action_items": "\n**Bruno Mello**\nWork on connecting GrowthBook with Google Analytics and setting up relevant events and metrics for experimentation (43:40)\nCoordinate internal work on deciding which user events and metrics to collect for experimentation needs (40:22)\n\n**Leonardo Branco**\nContinue to experiment and refine usage of GrowthBook for A/B testing and metrics setup (15:34)\nProvide feedback to GrowthBook on AI assistant functionality and other tools as they try them out (22:32)\n\n**Christian Liebenow**\nSchedule follow-up meeting with Medkoff in about three weeks to check progress and discuss next steps regarding Google Analytics integration and GrowthBook Enterprise adoption (43:45)\nCreate Slack channel for Medkoff to facilitate questions and support access (44:15)\nShare documentation and guidelines about GrowthBook dev mode flag and disabling dev tools in production (37:39)\nAssist Medkoff with understanding pricing and transitioning from Pro to Enterprise plan as usage expands (41:48)\n\n**Logan Bates**\nSupport explanations and demonstrations of GrowthBook features such as data pipelines, AI assistant, metric groups, and developer tools during and after the meeting (10:28)\nProvide examples and links to GrowthBook skills library for AI and integration workflows (32:08)\n"
+      "action_items": "\n**Bruno Mello**\nWork on connecting GrowthBook with Google Analytics and setting up relevant events and metrics for experimentation (43:40)\nCoordinate internal work on deciding which user events and metrics to collect for experimentation needs (40:22)\n\n**Leonardo Branco**\nContinue to experiment and refine usage of GrowthBook for A/B testing and metrics setup (15:34)\nProvide feedback to GrowthBook on AI assistant functionality and other tools as they try them out (22:32)\n\n**Christian Liebenow**\nSchedule follow-up meeting with Medkoff in about three weeks to check progress and discuss next steps regarding Google Analytics integration and GrowthBook Enterprise adoption (43:45)\nCreate Slack channel for Medkoff to facilitate questions and support access (44:15)\nShare documentation and guidelines about GrowthBook dev mode flag and disabling dev tools in production (37:39)\nAssist Medkoff with understanding pricing and transitioning from Pro to Enterprise plan as usage expands (41:48)\n\n**Logan Bates**\nSupport explanations and demonstrations of GrowthBook features such as data pipelines, AI assistant, metric groups, and developer tools during and after the meeting (10:28)\nProvide examples and links to GrowthBook skills library for AI and integration workflows (32:08)\n",
+      "participant_domains": [
+        "medcof.tech"
+      ]
     }
   ]
 }

@@ -78,7 +78,7 @@ def slugify(name: str) -> str:
     )
     company_part = re.sub(r'\s+', ' ', company_part).strip().lower()
     company_part = re.sub(r'[^a-z0-9\s]', '', company_part)
-    slug = company_part.replace(' ', '_').strip('_')
+    slug = company_part.replace(' ', '-').strip('-')
     return slug if len(slug) >= 3 else ''
 
 

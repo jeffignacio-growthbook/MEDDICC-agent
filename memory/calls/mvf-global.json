@@ -1,7 +1,7 @@
 {
   "company": "MVF Global &",
   "slug": "mvf-global",
-  "last_etl_date": "2026-08-05T15:57:31.344871",
+  "last_etl_date": "2026-08-05T16:47:54.916560",
   "calls": [
     {
       "id": "01KWCSXF697XZVMVX2QVJ3C5VB",
@@ -13,7 +13,10 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, experimentation, feature flags, Snowflake integration, API, visual editor",
-      "action_items": "\n**James Shannon**\nFollow up with MVF on API capabilities regarding JavaScript/CSS injection for experiments to clarify if GrowthBook supports a single endpoint similar to Optimizely (46:15)\nProvide pricing options that are competitively lower than MVF's current Optimizely spend to support GrowthBook's commercial discussions (57:57)\nArrange a follow-up call to discuss commercial terms and next steps with MVF's Billy Amps to maintain engagement and progress the sales process (59:00)\n\n**Billy Amps**\nReview and present potential pricing proposals from GrowthBook to MVF’s leadership team to facilitate decision-making (56:29)\nContinue discussions with GrowthBook on a weekly or as-appropriate basis to maintain momentum and explore product fit and commercial terms (58:22)\n"
+      "action_items": "\n**James Shannon**\nFollow up with MVF on API capabilities regarding JavaScript/CSS injection for experiments to clarify if GrowthBook supports a single endpoint similar to Optimizely (46:15)\nProvide pricing options that are competitively lower than MVF's current Optimizely spend to support GrowthBook's commercial discussions (57:57)\nArrange a follow-up call to discuss commercial terms and next steps with MVF's Billy Amps to maintain engagement and progress the sales process (59:00)\n\n**Billy Amps**\nReview and present potential pricing proposals from GrowthBook to MVF’s leadership team to facilitate decision-making (56:29)\nContinue discussions with GrowthBook on a weekly or as-appropriate basis to maintain momentum and explore product fit and commercial terms (58:22)\n",
+      "participant_domains": [
+        "mvfglobal.com"
+      ]
     }
   ]
 }

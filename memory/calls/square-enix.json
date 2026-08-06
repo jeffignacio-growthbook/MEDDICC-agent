@@ -1,7 +1,7 @@
 {
   "company": "Square Enix &",
   "slug": "square-enix",
-  "last_etl_date": "2026-08-05T15:57:31.372071",
+  "last_etl_date": "2026-08-05T16:51:12.921933",
   "calls": [
     {
       "id": "01KPBF6M2BTCV6GN8PV5EZCWSF",
@@ -13,7 +13,10 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 5,
       "keywords": "A/B Testing, GrowthBook, Adobe Target, Feature Flags, Experimentation Analytics, Self-Hosting",
-      "action_items": "\n**Léonie Lindo**\nProvide estimated number of experiments per month to GrowthBook team once decided with Japan (40:00)\nDiscuss potential Slack channel for questions and communication with Kim and team to get approval (38:36)\n\n**Chris Kekeke**\nContinue local setup including spinning up SQL server and firing events to see metrics flow (29:50)\nExplore options for running local experiments and testing user bucketing via Chrome DevTools (34:41)\n\n**James Shannon**\nFollow up with Square Enix in a few weeks to check progress and offer support (39:22)\nProvide ongoing relevant case studies and updates on GrowthBook developments (42:47)\nShare details of planned June executive dinner event in London for experimentation professionals (43:13)\nOffer to set up Slack communication channel, pending Square Enix internal approval (38:19)\n\n**Logan Bates**\nAssist with technical questions related to experimentation setup and local testing (26:55)\nClarify migration paths between self-hosted and cloud versions as needed (31:19)\n"
+      "action_items": "\n**Léonie Lindo**\nProvide estimated number of experiments per month to GrowthBook team once decided with Japan (40:00)\nDiscuss potential Slack channel for questions and communication with Kim and team to get approval (38:36)\n\n**Chris Kekeke**\nContinue local setup including spinning up SQL server and firing events to see metrics flow (29:50)\nExplore options for running local experiments and testing user bucketing via Chrome DevTools (34:41)\n\n**James Shannon**\nFollow up with Square Enix in a few weeks to check progress and offer support (39:22)\nProvide ongoing relevant case studies and updates on GrowthBook developments (42:47)\nShare details of planned June executive dinner event in London for experimentation professionals (43:13)\nOffer to set up Slack communication channel, pending Square Enix internal approval (38:19)\n\n**Logan Bates**\nAssist with technical questions related to experimentation setup and local testing (26:55)\nClarify migration paths between self-hosted and cloud versions as needed (31:19)\n",
+      "participant_domains": [
+        "eu.square-enix.com"
+      ]
     }
   ]
 }
