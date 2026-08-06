@@ -1,7 +1,7 @@
 {
   "company": "Douglas and GrowthBook",
   "slug": "douglas-and-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.360736",
+  "last_etl_date": "2026-08-05T16:50:46.113042",
   "calls": [
     {
       "id": "01KT6MJS88A33318G7J666MV1H",
@@ -13,7 +13,10 @@
       "organizer": "jake.stangl@growthbook.io",
       "participants": 3,
       "keywords": "A/B testing, Data warehouse, Experimentation platform, AI-driven experimentation, Pricing model, User experience",
-      "action_items": "\n**James Shannon**\nIntroduce a German-speaking GrowthBook team member to Douglas to enhance communication and support (37:05)\nProvide Douglas with updated information on GrowthBook platform features and pricing changes (37:50)\n\n**Stane Zabot**\nShare Douglas’s current and future experimentation requirements with GrowthBook to ensure alignment and readiness (31:10)\n\n**Niklas Bräutigam**\nMaintain and update the experimentation platform comparison document to include GrowthBook’s latest features and pricing details (07:20)\n"
+      "action_items": "\n**James Shannon**\nIntroduce a German-speaking GrowthBook team member to Douglas to enhance communication and support (37:05)\nProvide Douglas with updated information on GrowthBook platform features and pricing changes (37:50)\n\n**Stane Zabot**\nShare Douglas’s current and future experimentation requirements with GrowthBook to ensure alignment and readiness (31:10)\n\n**Niklas Bräutigam**\nMaintain and update the experimentation platform comparison document to include GrowthBook’s latest features and pricing details (07:20)\n",
+      "participant_domains": [
+        "douglas.de"
+      ]
     }
   ]
 }

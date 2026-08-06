@@ -1,7 +1,7 @@
 {
   "company": "Hublo & GrowthBook",
   "slug": "hublo-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.374607",
+  "last_etl_date": "2026-08-05T17:02:06.788749",
   "calls": [
     {
       "id": "01KQEPK1AMZ3V9GN108VFVRHMR",
@@ -13,7 +13,10 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 5,
       "keywords": "GrowthBook, LaunchDarkly, Pricing, Experimentation, Feature Flagging, Product Analytics",
-      "action_items": "\n**James Shannon**\nSend migration document from LaunchDarkly to GrowthBook and provide adjusted pricing proposals for both cloud and on-premise options reflecting the actual seat count (09:43)\nPrepare and send a detailed email summarizing pricing and product benefits to Gaëlle for her review (18:50)\nSchedule a follow-up call during the week of May 18th to review decision status and address any additional questions (18:41)\n\n**Gaëlle Nordström-Schüler**\nFinalize internal evaluations of platform options and collate pricing information to prepare a recommendation for the head of product and product team (05:31)\nInclude Julie, the head of product, in ongoing conversations as the team progresses toward a final decision and budget approval (17:58)\n"
+      "action_items": "\n**James Shannon**\nSend migration document from LaunchDarkly to GrowthBook and provide adjusted pricing proposals for both cloud and on-premise options reflecting the actual seat count (09:43)\nPrepare and send a detailed email summarizing pricing and product benefits to Gaëlle for her review (18:50)\nSchedule a follow-up call during the week of May 18th to review decision status and address any additional questions (18:41)\n\n**Gaëlle Nordström-Schüler**\nFinalize internal evaluations of platform options and collate pricing information to prepare a recommendation for the head of product and product team (05:31)\nInclude Julie, the head of product, in ongoing conversations as the team progresses toward a final decision and budget approval (17:58)\n",
+      "participant_domains": [
+        "hublo.com"
+      ]
     }
   ]
 }

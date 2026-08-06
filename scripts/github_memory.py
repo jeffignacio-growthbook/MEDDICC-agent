@@ -342,28 +342,86 @@ class GitHubMemory:
     # ─────────────────────────────────────────────────────────────────
 
     def load_call_cache(self, slug: str) -> Optional[dict]:
-        """Load call cache for a company slug."""
-        cache_path = self.calls_dir / f"{slug}.json"
-        if not cache_path.exists():
-            return None
+        """
+        Load call cache for a company slug.
 
+        First tries exact match, then falls back to fuzzy matching:
+        - Search for files containing the slug (e.g., 'notion' matches 'notion-growthbook.json')
+        - Prefer shorter filenames (more specific match)
+        """
+        # Try exact match first (fast path)
+        cache_path = self.calls_dir / f"{slug}.json"
+        if cache_path.exists():
+            try:
+                with open(cache_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"   ⚠️  Error loading cache {slug}.json: {e}")
+                return None
+
+        # Fuzzy match: find files containing the slug
+        # Example: slug='notion' matches 'notion-growthbook.json'
         try:
-            with open(cache_path, 'r', encoding='utf-8') as f:
+            matching_files = []
+            for file in self.calls_dir.glob("*.json"):
+                filename = file.stem  # Remove .json extension
+                if slug in filename or filename in slug:
+                    matching_files.append(file)
+
+            if not matching_files:
+                return None
+
+            # Prefer shorter filenames (more specific match)
+            # e.g., 'notion.json' is better than 'notion-growthbook.json'
+            best_match = min(matching_files, key=lambda f: len(f.stem))
+
+            print(f"   🔍 Fuzzy match: {slug} → {best_match.name}")
+
+            with open(best_match, 'r', encoding='utf-8') as f:
                 return json.load(f)
+
         except Exception as e:
-            print(f"   ⚠️  Error loading cache {slug}.json: {e}")
+            print(f"   ⚠️  Error in fuzzy match for {slug}: {e}")
             return None
 
     def save_call_cache(self, slug: str, cache_data: dict):
-        """Save call cache for a company slug."""
-        cache_path = self.calls_dir / f"{slug}.json"
+        """
+        Save call cache for a company slug.
+
+        Uses fuzzy matching to find existing file (to avoid creating duplicates).
+        If no existing file found, creates new file with exact slug.
+        """
         cache_data['last_etl_date'] = datetime.now().isoformat()
+
+        # Try to find existing file via fuzzy matching
+        existing_file = None
+        exact_path = self.calls_dir / f"{slug}.json"
+
+        if exact_path.exists():
+            existing_file = exact_path
+        else:
+            # Fuzzy match to find existing file
+            try:
+                matching_files = []
+                for file in self.calls_dir.glob("*.json"):
+                    filename = file.stem
+                    if slug in filename or filename in slug:
+                        matching_files.append(file)
+
+                if matching_files:
+                    # Use the same file we would have loaded from
+                    existing_file = min(matching_files, key=lambda f: len(f.stem))
+            except:
+                pass
+
+        # Use existing file if found, otherwise create new with exact slug
+        cache_path = existing_file if existing_file else exact_path
 
         try:
             with open(cache_path, 'w', encoding='utf-8') as f:
                 json.dump(cache_data, f, indent=2, ensure_ascii=False)
         except Exception as e:
-            print(f"   ⚠️  Error saving cache {slug}.json: {e}")
+            print(f"   ⚠️  Error saving cache {cache_path.name}: {e}")
 
     def load_deal_index(self) -> dict:
         """Load deal index mapping deal_id -> company_slug."""

@@ -1,7 +1,7 @@
 {
   "company": "Route + GrowthBook",
   "slug": "route-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.378121",
+  "last_etl_date": "2026-08-05T16:51:16.358504",
   "calls": [
     {
       "id": "01KP95SF6CAGKH1Y968TB0TGDD",
@@ -13,7 +13,10 @@
       "organizer": "christian@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, A/B testing, feature flags, mutual exclusivity, Amplitude, warehouse-native analytics",
-      "action_items": "\n**Christian Liebenow**\nEmail Zachariah Holub with multiple tailored demo time slots for next week and send additional resource links related to key features discussed (34:56)\nPrepare a tailored demo focusing on non-technical experiment creation, mutual exclusivity, bucketing by custom attributes, and AI-powered analytics (33:10)\n\n**Zachariah Holub**\nCheck current Amplitude pricing and expenditure to inform GrowthBook pricing discussions (30:10)\nCoordinate with manager to decide on next demo participation and align schedules for a follow-up meeting with GrowthBook (34:33)\n\n**Logan Bates**\nSupport demo preparation and provide technical explanation of GrowthBook’s feature flagging, experimentation, mutual exclusivity, and AI features during next call (24:13)\n"
+      "action_items": "\n**Christian Liebenow**\nEmail Zachariah Holub with multiple tailored demo time slots for next week and send additional resource links related to key features discussed (34:56)\nPrepare a tailored demo focusing on non-technical experiment creation, mutual exclusivity, bucketing by custom attributes, and AI-powered analytics (33:10)\n\n**Zachariah Holub**\nCheck current Amplitude pricing and expenditure to inform GrowthBook pricing discussions (30:10)\nCoordinate with manager to decide on next demo participation and align schedules for a follow-up meeting with GrowthBook (34:33)\n\n**Logan Bates**\nSupport demo preparation and provide technical explanation of GrowthBook’s feature flagging, experimentation, mutual exclusivity, and AI features during next call (24:13)\n",
+      "participant_domains": [
+        "route.com"
+      ]
     },
     {
       "id": "01KPTY1BJT3W40XR3WQPBHASQV",
@@ -25,7 +28,10 @@
       "organizer": "christian@growthbook.io",
       "participants": 4,
       "keywords": "Experimentation, Feature Flags, Self-hosted Solution, AI Hypothesis Generation, Data Warehouse Integration, Pricing Model",
-      "action_items": "\n**Augusto Pedroza**\nCoordinate internal discussion with Zachariah on GrowthBook demo and evaluate next steps regarding experimentation platform selection (28:52)\n\n**Zachariah Holub**\nReview GrowthBook demo recording shared by Christian to evaluate platform fit and share with relevant stakeholders at Route (43:18)\nFollow up internally on integration and re-architecting data flow to potentially switch from Amplitude event ingestion to central warehouse querying for GrowthBook (30:52)\n\n**Christian Liebenow**\nShare demo recording of GrowthBook presentation with Zachariah for internal review at Route (43:18)\nFollow up with Route team in 1-2 weeks to check on evaluation progress and discuss next steps (43:18)\n\n**Graham McNicoll**\nOffer additional information on pricing policies upon request from Route team (28:40)\n"
+      "action_items": "\n**Augusto Pedroza**\nCoordinate internal discussion with Zachariah on GrowthBook demo and evaluate next steps regarding experimentation platform selection (28:52)\n\n**Zachariah Holub**\nReview GrowthBook demo recording shared by Christian to evaluate platform fit and share with relevant stakeholders at Route (43:18)\nFollow up internally on integration and re-architecting data flow to potentially switch from Amplitude event ingestion to central warehouse querying for GrowthBook (30:52)\n\n**Christian Liebenow**\nShare demo recording of GrowthBook presentation with Zachariah for internal review at Route (43:18)\nFollow up with Route team in 1-2 weeks to check on evaluation progress and discuss next steps (43:18)\n\n**Graham McNicoll**\nOffer additional information on pricing policies upon request from Route team (28:40)\n",
+      "participant_domains": [
+        "route.com"
+      ]
     }
   ]
 }

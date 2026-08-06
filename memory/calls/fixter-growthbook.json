@@ -1,7 +1,7 @@
 {
   "company": "Fixter & GrowthBook",
   "slug": "fixter-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.312738",
+  "last_etl_date": "2026-08-05T16:50:48.019059",
   "calls": [
     {
       "id": "6a47dd0eaab2ce001c17778e",
@@ -23,7 +23,11 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
       "keywords": "experiment formatting, tool crashing, GrowthBook setup, traffic allocation, conversion rate metrics, troubleshooting support",
-      "action_items": "\n**James Shannon**\nConnect Fiona with the GrowthBook Solutions team via Slack to troubleshoot crashes and formatting issues she encountered (06:55)\nProvide the GrowthBook Solutions team with a detailed briefing on the formatting and stability issues observed during Fiona's tool exploration (17:02)\nAdd Christian to the ongoing discussion to ensure visibility and coordination regarding the tool issues and support progress (17:02)\nShare the meeting recording with Christian to keep him informed about the discussion and issues raised (17:36)\n\n**Fiona Nematbakhsh**\nArchive older experiments in the tool to enable access to sample experiment data during exploration (07:33)\nUse the recommended search techniques within the tool to efficiently locate specific experiments (08:33)\n"
+      "action_items": "\n**James Shannon**\nConnect Fiona with the GrowthBook Solutions team via Slack to troubleshoot crashes and formatting issues she encountered (06:55)\nProvide the GrowthBook Solutions team with a detailed briefing on the formatting and stability issues observed during Fiona's tool exploration (17:02)\nAdd Christian to the ongoing discussion to ensure visibility and coordination regarding the tool issues and support progress (17:02)\nShare the meeting recording with Christian to keep him informed about the discussion and issues raised (17:36)\n\n**Fiona Nematbakhsh**\nArchive older experiments in the tool to enable access to sample experiment data during exploration (07:33)\nUse the recommended search techniques within the tool to efficiently locate specific experiments (08:33)\n",
+      "participant_domains": [
+        "bcc.hubspot.com",
+        "fixter.co.uk"
+      ]
     }
   ]
 }

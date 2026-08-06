@@ -1,7 +1,7 @@
 {
   "company": "Nodir Nasirov and",
   "slug": "nodir-nasirov-and",
-  "last_etl_date": "2026-08-05T15:57:31.366026",
+  "last_etl_date": "2026-08-05T16:51:25.106149",
   "calls": [
     {
       "id": "01KSMVSV18Z3TTE1AMXXTT6RCD",
@@ -13,7 +13,10 @@
       "organizer": "cary@growthbook.io",
       "participants": 1,
       "keywords": "Growth Book, Cloud Hosting, Self-Hosted, Proxy Requests, Experimentation, AI Integration",
-      "action_items": "\n**Nodir Nasirov**\nForward the two Growth Book contract quotes Cary sent to Mark to Nodir's manager and explain the cost implications of cloud hosting (12:36)\nProvide detailed data on proxy request volumes to Growth Book team for further pricing evaluation (20:26)\n\n**Cary Rakin**\nSend Nodir the two existing contract quotes previously sent to Mark for internal review (12:38)\nConfirm with Growth Book team whether proxy API requests from Growth Proxy will incur additional charges or be covered under platform fees (16:51)\nArrange a technical call between Growth Book engineers and Conde Nast team to review proxy request impact and AI system integration for experiment automation (22:09)\nProvide updated pricing quotes based on user growth and proxy request considerations before formal contract submission (25:50)\n"
+      "action_items": "\n**Nodir Nasirov**\nForward the two Growth Book contract quotes Cary sent to Mark to Nodir's manager and explain the cost implications of cloud hosting (12:36)\nProvide detailed data on proxy request volumes to Growth Book team for further pricing evaluation (20:26)\n\n**Cary Rakin**\nSend Nodir the two existing contract quotes previously sent to Mark for internal review (12:38)\nConfirm with Growth Book team whether proxy API requests from Growth Proxy will incur additional charges or be covered under platform fees (16:51)\nArrange a technical call between Growth Book engineers and Conde Nast team to review proxy request impact and AI system integration for experiment automation (22:09)\nProvide updated pricing quotes based on user growth and proxy request considerations before formal contract submission (25:50)\n",
+      "participant_domains": [
+        "condenast.com"
+      ]
     }
   ]
 }

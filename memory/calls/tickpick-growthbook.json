@@ -1,7 +1,7 @@
 {
   "company": "TickPick + GrowthBook",
   "slug": "tickpick-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.312356",
+  "last_etl_date": "2026-08-05T16:50:50.560102",
   "calls": [
     {
       "id": "01KV8YRQ1AT49RRKWAFJRQV5QX",
@@ -13,7 +13,10 @@
       "organizer": "christian@growthbook.io",
       "participants": 4,
       "keywords": "Experimentation, Feature Flags, Cost Model, Data Warehouse Integration, Bayesian Analysis, Self-Hosting",
-      "action_items": "\n**Huy**\nProvide GrowthBook team with monthly estimate of CDN requests to clarify cost impact (06:58)\nExplore GrowthBook's API and skills library for programmatic experiment and feature flag management integration with existing tools (30:23)\n\n**Christian Liebenow**\nProvide exact details regarding CDN request cost model and technical documentation for TickPick’s evaluation (15:10)\nProvide exact details regarding CDN request cost model and technical documentation for TickPick’s evaluation (41:12)\n\n**TickPick Team**\nReview GrowthBook documentation and AI agent tool for ease of onboarding and experiment setup (42:12)\nConduct standalone exploration of GrowthBook’s feature flagging, experiment creation, and results reporting capabilities using provided demo and tutorials (37:36)\n"
+      "action_items": "\n**Huy**\nProvide GrowthBook team with monthly estimate of CDN requests to clarify cost impact (06:58)\nExplore GrowthBook's API and skills library for programmatic experiment and feature flag management integration with existing tools (30:23)\n\n**Christian Liebenow**\nProvide exact details regarding CDN request cost model and technical documentation for TickPick’s evaluation (15:10)\nProvide exact details regarding CDN request cost model and technical documentation for TickPick’s evaluation (41:12)\n\n**TickPick Team**\nReview GrowthBook documentation and AI agent tool for ease of onboarding and experiment setup (42:12)\nConduct standalone exploration of GrowthBook’s feature flagging, experiment creation, and results reporting capabilities using provided demo and tutorials (37:36)\n",
+      "participant_domains": [
+        "tickpick.com"
+      ]
     },
     {
       "id": "6a4eacdd192cf90020c9c841",
@@ -35,7 +38,10 @@
       "organizer": "christian@growthbook.io",
       "participants": 4,
       "keywords": "GrowthBook, Experimentation, CDN Usage, Cost Monitoring, Product Analytics, Namespace",
-      "action_items": "\n**Matt Ellis**\nCoordinate a follow-up meeting in coming weeks to discuss TickPick’s experimentation vision and alignment with GrowthBook capabilities (29:34)\nReview and monitor GrowthBook invoice and usage dashboard; explore possibilities for building internal monitoring scripts to track cumulative costs (13:58)\n\n**Christian Liebenow**\nInvestigate options for usage cost alerting or webhook notifications to help TickPick avoid unexpected billing spikes (14:19)\nPass along Matt Ellis’s feedback about alert thresholds and billing transparency to GrowthBook product team for possible feature development (35:56)\n\n**Huy Le**\nContinue using ciphered payloads for security; research and consider implementing remote evaluation proxy options if needed (17:47)\nExplore GrowthBook’s namespaces and skills features more deeply; leverage them to separate experiments in checkout or funnel experiences (20:24)\nIncrease internal adoption of GrowthBook analytics and experiment sharing; use Slack and presentation tools to enhance company-wide engagement (27:50)\n\n**Logan Bates**\nProvide documentation links and demos on skills and namespaces to the TickPick team (22:30)\nSupport discussion about experiment auto-update frequency settings with TickPick (27:40)\nCollaborate with Christian to follow up on cost-monitoring improvements and user feedback (36:30)\n"
+      "action_items": "\n**Matt Ellis**\nCoordinate a follow-up meeting in coming weeks to discuss TickPick’s experimentation vision and alignment with GrowthBook capabilities (29:34)\nReview and monitor GrowthBook invoice and usage dashboard; explore possibilities for building internal monitoring scripts to track cumulative costs (13:58)\n\n**Christian Liebenow**\nInvestigate options for usage cost alerting or webhook notifications to help TickPick avoid unexpected billing spikes (14:19)\nPass along Matt Ellis’s feedback about alert thresholds and billing transparency to GrowthBook product team for possible feature development (35:56)\n\n**Huy Le**\nContinue using ciphered payloads for security; research and consider implementing remote evaluation proxy options if needed (17:47)\nExplore GrowthBook’s namespaces and skills features more deeply; leverage them to separate experiments in checkout or funnel experiences (20:24)\nIncrease internal adoption of GrowthBook analytics and experiment sharing; use Slack and presentation tools to enhance company-wide engagement (27:50)\n\n**Logan Bates**\nProvide documentation links and demos on skills and namespaces to the TickPick team (22:30)\nSupport discussion about experiment auto-update frequency settings with TickPick (27:40)\nCollaborate with Christian to follow up on cost-monitoring improvements and user feedback (36:30)\n",
+      "participant_domains": [
+        "tickpick.com"
+      ]
     }
   ]
 }

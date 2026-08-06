@@ -34,7 +34,7 @@ class FirefliesClient:
         return response.json()
 
     def get_transcripts(self, limit: int = 50, skip: int = 0) -> List[dict]:
-        """Get recent transcripts with summaries (not full text)."""
+        """Get recent transcripts with summaries and meeting attendees."""
         query = """
         query Transcripts($limit: Int, $skip: Int) {
             transcripts(limit: $limit, skip: $skip) {
@@ -44,6 +44,11 @@ class FirefliesClient:
                 duration
                 organizer_email
                 participants
+                meeting_attendees {
+                    displayName
+                    email
+                    name
+                }
                 summary {
                     keywords
                     action_items
@@ -55,6 +60,23 @@ class FirefliesClient:
         """
         result = self._query(query, {"limit": limit, "skip": skip})
         return result.get("data", {}).get("transcripts") or []
+
+    def get_meeting_attendees(self, transcript_id: str) -> List[dict]:
+        """Get meeting attendees for a specific transcript."""
+        query = """
+        query Transcript($transcriptId: String!) {
+            transcript(id: $transcriptId) {
+                meeting_attendees {
+                    displayName
+                    email
+                    name
+                }
+            }
+        }
+        """
+        result = self._query(query, {"transcriptId": transcript_id})
+        transcript = result.get("data", {}).get("transcript") or {}
+        return transcript.get("meeting_attendees") or []
 
     def search_by_contact_emails(self, contact_emails: List[str], max_results: int = 100, since_date: Optional[datetime] = None) -> List[dict]:
         """

@@ -1,7 +1,7 @@
 {
   "company": "Carrefour + GrowthBook",
   "slug": "carrefour-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.350270",
+  "last_etl_date": "2026-08-05T17:02:03.101500",
   "calls": [
     {
       "id": "01KT9F681SHTNNK1P8W813QTKS",
@@ -13,7 +13,10 @@
       "organizer": "christian@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, Carrefour, Enterprise License, Feature Flagging, Experimentation, A/B Testing",
-      "action_items": "\n**Paul Chabert**\nSend two to three use cases from Carrefour’s front-end, algorithm, and pricing teams to GrowthBook for targeted solution discussion (30:59)\nCoordinate internal discussions and prepare to engage leadership with value arguments from GrowthBook based on follow-up session (28:43)\n\n**Christian Liebenow**\nProvide additional demo videos of GrowthBook’s AI-powered visual editor for non-technical experimentation capabilities (15:39)\nOrganize and conduct a follow-up meeting next week to compare GrowthBook enterprise with A/B Tasty, provide ROI estimates, and review Paul’s submitted use cases (29:12)\nShare implementation notes and technical details about GrowthBook’s Cupid variance reduction method and operational overhead (26:32)\n\n**Logan Bates**\nSupport technical clarifications during demos and future meetings, specifically on feature flag SDK usage, targeting, and metrics computation (20:08)\n"
+      "action_items": "\n**Paul Chabert**\nSend two to three use cases from Carrefour’s front-end, algorithm, and pricing teams to GrowthBook for targeted solution discussion (30:59)\nCoordinate internal discussions and prepare to engage leadership with value arguments from GrowthBook based on follow-up session (28:43)\n\n**Christian Liebenow**\nProvide additional demo videos of GrowthBook’s AI-powered visual editor for non-technical experimentation capabilities (15:39)\nOrganize and conduct a follow-up meeting next week to compare GrowthBook enterprise with A/B Tasty, provide ROI estimates, and review Paul’s submitted use cases (29:12)\nShare implementation notes and technical details about GrowthBook’s Cupid variance reduction method and operational overhead (26:32)\n\n**Logan Bates**\nSupport technical clarifications during demos and future meetings, specifically on feature flag SDK usage, targeting, and metrics computation (20:08)\n",
+      "participant_domains": [
+        "ext.carrefour.com"
+      ]
     }
   ]
 }

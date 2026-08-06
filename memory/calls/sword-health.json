@@ -1,7 +1,7 @@
 {
   "company": "SWORD Health +",
   "slug": "sword-health",
-  "last_etl_date": "2026-08-05T15:57:31.343018",
+  "last_etl_date": "2026-08-05T16:51:06.245714",
   "calls": [
     {
       "id": "01KWYESHMNBXG4AXEQ7JNFVS7D",
@@ -13,7 +13,10 @@
       "organizer": "christian@growthbook.io",
       "participants": 7,
       "keywords": "experimentation, feature flags, data warehouse native, BigQuery, mobile SDK, onboarding optimization",
-      "action_items": "\n**Christian Liebenow**\nFollow up with a call summary and provide detailed GrowthBook pricing model including compliance-related tier options (33:13)\nCoordinate setting up an enterprise free trial of GrowthBook for Sword Health to enable hands-on experimentation evaluation (33:43)\n\n**Eva Salgado and team at Sword Health**\nReview GrowthBook pricing information and determine next steps on evaluation (33:13)\n\n**GrowthBook team (Christian Liebenow and Logan Bates)**\nBe available for additional demos or in-depth technical support as needed following initial evaluation (30:53)\n\n**Sword Health engineering team (Eduardo Alves and Pedro Lopes)**\nPrepare for initial SDK integration and JSON configuration work for mobile onboarding experiments if proceeding with GrowthBook (31:58)\n"
+      "action_items": "\n**Christian Liebenow**\nFollow up with a call summary and provide detailed GrowthBook pricing model including compliance-related tier options (33:13)\nCoordinate setting up an enterprise free trial of GrowthBook for Sword Health to enable hands-on experimentation evaluation (33:43)\n\n**Eva Salgado and team at Sword Health**\nReview GrowthBook pricing information and determine next steps on evaluation (33:13)\n\n**GrowthBook team (Christian Liebenow and Logan Bates)**\nBe available for additional demos or in-depth technical support as needed following initial evaluation (30:53)\n\n**Sword Health engineering team (Eduardo Alves and Pedro Lopes)**\nPrepare for initial SDK integration and JSON configuration work for mobile onboarding experiments if proceeding with GrowthBook (31:58)\n",
+      "participant_domains": [
+        "swordhealth.com"
+      ]
     }
   ]
 }

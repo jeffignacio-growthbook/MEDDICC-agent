@@ -1,7 +1,7 @@
 {
   "company": "Tesoro XP +",
   "slug": "tesoro-xp",
-  "last_etl_date": "2026-08-05T15:57:31.372812",
+  "last_etl_date": "2026-08-05T16:51:24.458646",
   "calls": [
     {
       "id": "01KQWN65TBNY9KBZNXV8HRRCED",
@@ -13,7 +13,10 @@
       "organizer": "christian@growthbook.io",
       "participants": 3,
       "keywords": "Experimentation, Feature Flags, Google Analytics, BigQuery Integration, A/B Testing, SaaS Pricing",
-      "action_items": "\n**Beau Button**\nBegin self-service sign-up for GrowthBook Pro tier and configure integration with Google Analytics BigQuery export for initial funnel experiment (10:30)\nInform internal teams, especially marketing, about experimentation platform selection and upcoming experiment rollout (12:25)\nLimit initial user access to 4-5 people to pilot platform use and assess impact on funnel problem (15:50)\nMonitor platform use, gather team feedback, and evaluate need for Enterprise tier or lower user commitment plan in future discussions (15:50)\n\n**Logan Bates**\nProvide support and assistance as needed during Beau’s onboarding and initial experimentation phase (12:10)\nConfirm pricing, user licenses, and clarify tier feature sets for Beau’s team to facilitate decision-making (12:35)\n\n**Christian Liebenow**\nExplain pricing structure and Enterprise tier requirements, including minimum commitments and SSO features (06:48)\nShare marketing insights regarding how Beau’s search discovery relates to GrowthBook’s SEO/SEM efforts (16:10)\n"
+      "action_items": "\n**Beau Button**\nBegin self-service sign-up for GrowthBook Pro tier and configure integration with Google Analytics BigQuery export for initial funnel experiment (10:30)\nInform internal teams, especially marketing, about experimentation platform selection and upcoming experiment rollout (12:25)\nLimit initial user access to 4-5 people to pilot platform use and assess impact on funnel problem (15:50)\nMonitor platform use, gather team feedback, and evaluate need for Enterprise tier or lower user commitment plan in future discussions (15:50)\n\n**Logan Bates**\nProvide support and assistance as needed during Beau’s onboarding and initial experimentation phase (12:10)\nConfirm pricing, user licenses, and clarify tier feature sets for Beau’s team to facilitate decision-making (12:35)\n\n**Christian Liebenow**\nExplain pricing structure and Enterprise tier requirements, including minimum commitments and SSO features (06:48)\nShare marketing insights regarding how Beau’s search discovery relates to GrowthBook’s SEO/SEM efforts (16:10)\n",
+      "participant_domains": [
+        "tesoroxp.com"
+      ]
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook / Decathlon",
   "slug": "growthbook-decathlon",
-  "last_etl_date": "2026-08-05T15:57:31.378485",
+  "last_etl_date": "2026-08-05T16:50:52.877935",
   "calls": [
     {
       "id": "01KPQQ45JQWC9WBEHEW7074VHT",
@@ -13,7 +13,10 @@
       "organizer": "jake.stangl@growthbook.io",
       "participants": 3,
       "keywords": "automation, experimentation, data ingestion, AI agents, variance reduction, statistical models",
-      "action_items": "\n**Antoine TISSIER**\nAttend upcoming meeting next week to explore data ingestion features with Statsig (07:32)\nContinue providing feedback and ideas on variance reduction techniques and power analysis improvements for experimentation tools (23:57)\nConsider potential future collaboration for deeper statistical and AI-related tooling with GrowthBook data science team, without current commitment to RFP (20:29)\n\n**James Shannon**\nOffer detailed presentations on GrowthBook’s statistical models and AI capabilities in future conversations (20:29)\nKeep Antoine informed about GrowthBook’s product roadmap, AI features, and developments over next 6 to 8 months (26:24)\nProvide insights on implications and changes related to the OpenAI acquisition of Statsig when relevant (05:42)\n"
+      "action_items": "\n**Antoine TISSIER**\nAttend upcoming meeting next week to explore data ingestion features with Statsig (07:32)\nContinue providing feedback and ideas on variance reduction techniques and power analysis improvements for experimentation tools (23:57)\nConsider potential future collaboration for deeper statistical and AI-related tooling with GrowthBook data science team, without current commitment to RFP (20:29)\n\n**James Shannon**\nOffer detailed presentations on GrowthBook’s statistical models and AI capabilities in future conversations (20:29)\nKeep Antoine informed about GrowthBook’s product roadmap, AI features, and developments over next 6 to 8 months (26:24)\nProvide insights on implications and changes related to the OpenAI acquisition of Statsig when relevant (05:42)\n",
+      "participant_domains": [
+        "decathlon.com"
+      ]
     }
   ]
 }

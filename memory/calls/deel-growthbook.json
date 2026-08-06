@@ -1,7 +1,7 @@
 {
   "company": "Deel + GrowthBook",
   "slug": "deel-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.311535",
+  "last_etl_date": "2026-08-05T16:51:20.702717",
   "calls": [
     {
       "id": "6a565176880aac001cd29617",
@@ -23,7 +23,10 @@
       "organizer": "christian@growthbook.io",
       "participants": 3,
       "keywords": "feature flags, experimentation, self-hosted, pricing model, performance, funnels",
-      "action_items": "\n**Dmitry Christie**\nFinalize and send proposal to leadership for Growth Book adoption by end of week; gather leadership feedback (34:31)\nEvaluate Growth Book enterprise self-hosted trial for Proof of Concept (POC) (27:15)\n\n**Christian Liebenow**\nProvide Dmitry with Growth Book pricing comparison document versus competitors (23:34)\nProvision Growth Book enterprise self-hosted license key and send to Dmitry (27:35)\nInitiate Slack channel for ongoing communication with Dmitry and team (34:04)\nSchedule follow-up meeting with Dmitry for Monday, 27th to discuss leadership feedback and next steps (35:35)\n\n**Logan Bates**\nShare documentation on Growth Book’s identity resolution and fallback attributes feature with Dmitry (25:23)\nSupport Dmitry’s technical inquiries and advocate for any additional requested Growth Book features (26:14)\n"
+      "action_items": "\n**Dmitry Christie**\nFinalize and send proposal to leadership for Growth Book adoption by end of week; gather leadership feedback (34:31)\nEvaluate Growth Book enterprise self-hosted trial for Proof of Concept (POC) (27:15)\n\n**Christian Liebenow**\nProvide Dmitry with Growth Book pricing comparison document versus competitors (23:34)\nProvision Growth Book enterprise self-hosted license key and send to Dmitry (27:35)\nInitiate Slack channel for ongoing communication with Dmitry and team (34:04)\nSchedule follow-up meeting with Dmitry for Monday, 27th to discuss leadership feedback and next steps (35:35)\n\n**Logan Bates**\nShare documentation on Growth Book’s identity resolution and fallback attributes feature with Dmitry (25:23)\nSupport Dmitry’s technical inquiries and advocate for any additional requested Growth Book features (26:14)\n",
+      "participant_domains": [
+        "deel.com"
+      ]
     }
   ]
 }

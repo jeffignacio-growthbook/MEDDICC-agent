@@ -1,7 +1,7 @@
 {
   "company": "Zalando + GrowthBook",
   "slug": "zalando-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.327240",
+  "last_etl_date": "2026-08-05T17:01:18.301769",
   "calls": [
     {
       "id": "697a39d0d3ad08000d2d531a",
@@ -23,7 +23,10 @@
       "organizer": "graham@growthbook.io",
       "participants": 4,
       "keywords": "Hybrid Experimentation, Synthetic Users, Experimentation Platform, Metrics Standardization, Knowledge Repository, Datadog Acquisition",
-      "action_items": "\n**Nils Stotz**\nShare deeper insights and documentation on Zalando’s hybrid experimentation platform setup during follow-up meetings (06:00)\nDevelop internal knowledge repository for institutional experimentation knowledge in 2024 (29:40)\nContinue dialogue and share feedback with GrowthBook team post-meeting to challenge and refine ideas (31:05)\n\n**Graham McNicoll**\nAssist Zalando with migration tooling for transition to Datadog’s platform (30:22)\nPrepare to demonstrate GrowthBook’s advanced metric treatment and analysis features in future sessions (31:41)\n"
+      "action_items": "\n**Nils Stotz**\nShare deeper insights and documentation on Zalando’s hybrid experimentation platform setup during follow-up meetings (06:00)\nDevelop internal knowledge repository for institutional experimentation knowledge in 2024 (29:40)\nContinue dialogue and share feedback with GrowthBook team post-meeting to challenge and refine ideas (31:05)\n\n**Graham McNicoll**\nAssist Zalando with migration tooling for transition to Datadog’s platform (30:22)\nPrepare to demonstrate GrowthBook’s advanced metric treatment and analysis features in future sessions (31:41)\n",
+      "participant_domains": [
+        "zalando.de"
+      ]
     }
   ]
 }

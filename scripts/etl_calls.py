@@ -48,6 +48,28 @@ def slugify(company_name: str) -> str:
     return slug
 
 
+def get_external_domains(meeting_attendees: list, internal_domains: list) -> list:
+    """
+    Extract prospect email domains from meeting attendees.
+    Excludes organizer's own company domains and common personal email providers.
+    """
+    skip_domains = set(internal_domains + [
+        'gmail.com', 'outlook.com', 'hotmail.com',
+        'yahoo.com', 'icloud.com',
+        'resource.calendar.google.com',
+        'calendar.google.com',
+        'group.calendar.google.com',
+    ])
+    domains = set()
+    for attendee in (meeting_attendees or []):
+        email = (attendee.get('email') or '').lower().strip()
+        if '@' in email:
+            domain = email.split('@')[1]
+            if domain and domain not in skip_domains:
+                domains.add(domain)
+    return sorted(list(domains))
+
+
 def extract_company_from_title(title: str) -> str:
     """
     Extract company name from call title.
@@ -147,6 +169,17 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
         print(f"   ⚠️  Could not load call adapter: {e}")
         return
 
+    # Load internal domains from config for participant filtering
+    config_path = REPO_ROOT / 'config' / 'client.yaml'
+    internal_domains = ['growthbook.io']  # default
+    if config_path.exists():
+        try:
+            with open(config_path) as f:
+                config = yaml.safe_load(f)
+                internal_domains = config.get('organization', {}).get('internal_domains', ['growthbook.io'])
+        except Exception as e:
+            print(f"   ⚠️  Could not load internal_domains from config: {e}")
+
     platform_name = "Gong" if adapter_type == "GongAdapter" else "Fireflies"
     print(f"\n🎙️  Fetching new {platform_name} calls since {since_date.strftime('%Y-%m-%d')}")
 
@@ -214,7 +247,12 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
                 else:
                     # Fireflies format
                     summary_dict = call.get('summary', {}) or {}
-                    calls_by_company[slug]["calls"].append({
+
+                    # Extract external participant domains
+                    meeting_attendees = call.get('meeting_attendees', [])
+                    participant_domains = get_external_domains(meeting_attendees, internal_domains)
+
+                    call_dict = {
                         "id": call.get('id'),
                         "source": "fireflies",
                         "title": title,
@@ -225,7 +263,13 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
                         "participants": len(call.get('participants', []) or []),
                         "keywords": ', '.join(summary_dict.get('keywords', []) or []),
                         "action_items": ', '.join(summary_dict.get('action_items', []) or [])
-                    })
+                    }
+
+                    # Add participant_domains if any external domains found
+                    if participant_domains:
+                        call_dict["participant_domains"] = participant_domains
+
+                    calls_by_company[slug]["calls"].append(call_dict)
 
                 total_new += 1
 

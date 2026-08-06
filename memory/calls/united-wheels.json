@@ -1,7 +1,7 @@
 {
   "company": "United Wheels +",
   "slug": "united-wheels",
-  "last_etl_date": "2026-08-05T15:57:31.339638",
+  "last_etl_date": "2026-08-05T16:47:53.222314",
   "calls": [
     {
       "id": "01KXECP3DAB1KQZ63YBGQ1XAK7",
@@ -13,7 +13,10 @@
       "organizer": "christian@growthbook.io",
       "participants": 3,
       "keywords": "A/B testing, experimentation platform, warehouse-native, feature flags, open source, GrowthBook",
-      "action_items": "\n**Jason Sauer**\nReview GrowthBook demo materials and consider implementation possibilities on current Magento system before Shopify migration (06:38)\nExplore custom reporting and metric creation capabilities relevant to United Wheels experimentation needs (39:30)\n\n**Lukasz Waszczuk**\nLead internal assessment and initial setup of GrowthBook open source version for experimentation trial (39:26)\nCoordinate usage evaluation and feedback to GrowthBook team, including ease of setup and fit for their data environment (40:52)\n\n**Christian Liebenow**\nSend post-meeting summary email including GrowthBook visual editor demo video and relevant open source Slack community links (41:46)\nProvide ongoing support and answer follow-up questions during United Wheels’ open source evaluation phase (41:55)\n"
+      "action_items": "\n**Jason Sauer**\nReview GrowthBook demo materials and consider implementation possibilities on current Magento system before Shopify migration (06:38)\nExplore custom reporting and metric creation capabilities relevant to United Wheels experimentation needs (39:30)\n\n**Lukasz Waszczuk**\nLead internal assessment and initial setup of GrowthBook open source version for experimentation trial (39:26)\nCoordinate usage evaluation and feedback to GrowthBook team, including ease of setup and fit for their data environment (40:52)\n\n**Christian Liebenow**\nSend post-meeting summary email including GrowthBook visual editor demo video and relevant open source Slack community links (41:46)\nProvide ongoing support and answer follow-up questions during United Wheels’ open source evaluation phase (41:55)\n",
+      "participant_domains": [
+        "unitedwheels.com"
+      ]
     }
   ]
 }
