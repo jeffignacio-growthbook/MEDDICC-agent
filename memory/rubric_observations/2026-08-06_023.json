@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_023",
+  "timestamp": "2026-08-06T05:22:29.060057",
+  "company": "Oda",
+  "criterion_fired": "Criterion 2 (Champion), Criterion 3 (Competition), Criterion 4 (Champion next steps), Criterion 5 (Economic Buyer authority)",
+  "was_appropriate": true,
+  "suggested_change": "Strengthen CLAUDE.md with: (1) explicit rule that champion scores must be supported by new evidence from current call, not prior state; (2) champion identification requires named individual or explicit acknowledgment of 'advocate potential' vs 'no advocate'; (3) competition scores require evidence of evaluation activity, not mere incumbent status; (4) next steps must include timeline and fallback contact; (5) Economic Buyer section must explicitly state approval chain completeness (is this person final decision-maker or do others override?)"
+}

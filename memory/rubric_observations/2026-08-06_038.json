@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_038",
+  "timestamp": "2026-08-06T06:29:21.633388",
+  "company": "Livesport",
+  "criterion_fired": "Criterion 4 (Actionable Next Steps) and Criterion 3 (Evidence Quality)",
+  "was_appropriate": true,
+  "suggested_change": "Add to Criterion 4: 'All next steps must include contact name, title, and specific date. If contact unknown, next step must be \"identify primary contact\" before any other follow-up.' This prevents unactionable recommendations when caller identity is unclear."
+}

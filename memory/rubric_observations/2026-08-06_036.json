@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_036",
+  "timestamp": "2026-08-06T06:23:39.318099",
+  "company": "Skyscanner",
+  "criterion_fired": "Criterion 2 (Champion Status Regression) and Criterion 4 (Champion Next Step Defective)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 should specify: Next steps must name a specific contact and include a concrete delivery date/deadline. Next steps are forward-looking actions, not backward verification questions. Example: 'Send [contact name] [deliverable] by [date] to enable them to present to [stakeholder] with follow-up call on [date].'"
+}

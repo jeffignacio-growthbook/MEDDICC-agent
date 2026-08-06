@@ -1,0 +1,21 @@
+{
+  "company": "Hublo",
+  "deal_id": "58897463067",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 0,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 - CRITERION 3 FAILURES: (1) Metrics: Score 1/10 but evidence only paraphrases, lacks direct quotes. Vague strategic statements do not support a score above 0 without quantification attempt. (2) Economic Buyer: Score 1/10 is appropriate but next step uses 'schedule time' and 'align on value'\u2014language that violates actionable specificity. Rewrite as concrete question with timeline. (3) Decision Criteria: Score 6/10 lacks sufficient evidence\u2014'balancing deployment speed and user experience' is stated but no weighted importance or formal evaluation criteria shown. Score should be lower (3-4) or evidence expanded. (4) Decision Process: Score 7/10 contradicts evidence level; timeline is clear (end of May) but approval steps, stakeholders, and procurement process completely unknown. Score should be 5/10. (5) Identified Pain: Score 5/10 for Partial status but evidence is entirely implied ('strategic shift,' 'smooth migration' suggests dissatisfaction). No explicit pain statement from prospect. This is Unknown (1-2/10), not Partial. (6) Champion: Score 6/10 for Partial but analysis explicitly states 'no evidence she's advocating for GrowthBook specifically vs. neutrally evaluating' and 'no internal selling actions documented.' This is Unknown (1-2/10), not Partial. Ga\u00eblle shows engagement but zero champion behavior. (7) Competition: Amplitude flagged correctly as non-competitor (analytics, not feature flagging), but LaunchDarkly limitations not discussed and third platform unidentified. Score 4/10 is low but evidence section does not explain why score is not 1/10 given incomplete competitive intel. (8) CRITERION 5 VIOLATION - Champion: Analysis claims Ga\u00eblle 'is driving platform evaluation and emphasized decision criteria' (Partial status) but acknowledges 'no evidence of internal selling' and 'no stakeholders brought in.' These contradict. Cannot score as Partial without evidence of champion behavior (internal advocacy). Reframe as Unknown. (9) ICP FIT: Assertion that 'no confirmation' of traffic/data stack is correct, but analysis should fail the deal or require immediate qualification before presentation. Currently treated as secondary concern but is critical blocker. (10) NEXT STEPS CRITERION 4 VIOLATIONS: Multiple next steps use weak language: 'Help me understand' (not specific), 'Walk me through' (vague), 'Can you clarify' (non-actionable phrasing). Rewrite all next steps with format: 'Contact: [name/title], Action: [specific deliverable], Question: [exact question].' Example: 'Contact Ga\u00eblle by Thursday, Request: formal evaluation scorecard with weighted criteria, Question: Are deployment speed and PM UX weighted higher than cost in your decision matrix?'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-06_006",
+  "timestamp": "2026-08-06T06:59:15.961984"
+}

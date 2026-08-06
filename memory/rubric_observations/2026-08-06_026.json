@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_026",
+  "timestamp": "2026-08-06T05:32:36.278760",
+  "company": "InPost",
+  "criterion_fired": "CRITERION 1, 3, 4, 5",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: (1) Scoring rubric anchors\u2014what evidence minimum justifies each score 1-10 for each MEDDICC component; (2) ICP validation checklist\u2014must verify visitor count OR experimentation leader role before claiming fit; (3) Next steps specificity rules\u2014actionable steps require named contact, day/time or explicit escalation blocker; (4) Pain evidence threshold\u2014score >3/10 requires prospect-stated urgency phrase or quantified impact."
+}

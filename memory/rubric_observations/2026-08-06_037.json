@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_037",
+  "timestamp": "2026-08-06T06:26:26.471379",
+  "company": "Unity",
+  "criterion_fired": "Criteria 1, 3, 4, 5 (multiple simultaneous failures across metrics, call data integrity, actionable next steps, and deal health summary consistency)",
+  "was_appropriate": false,
+  "suggested_change": "Separate 'quality of evidence' (Criterion 1) from 'quality of next steps' (Criterion 4). Criterion 1 should accept 'partial quantification' or 'Unknown' as valid scores if evidence exists, not require affirmative proof. Criterion 4 should define specificity thresholds upfront (e.g., 'next steps must include: by-date, stakeholder name, specific question or commitment sought'). Criterion 3 should require agent to flag missing/corrupted call data rather than penalize for incomplete transcript. Criterion 5 should clarify that 'technical engagement' \u2260 'champion advocacy' in deal health summary language."
+}

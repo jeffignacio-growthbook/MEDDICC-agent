@@ -1,0 +1,21 @@
+{
+  "company": "shiftkey",
+  "deal_id": "60355159912",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 10,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Metrics: Gap identified ('No baseline metrics provided') but no evidence statement confirming baseline metrics do NOT exist in cumulative state. Must explicitly state: 'Cumulative calls contain no baseline metrics (current experiments per quarter, current warehouse costs).' CRITERION 3 FAILURE - Competition: Mixpanel and Snowflake are correctly identified as non-competitors, but analysis claims 'no Statsig, EPPO, Optimizely, or homegrown solution discussion captured' without confirming these were actually discussed in cumulative calls. The cumulative state only mentions LaunchDarkly, Mixpanel, and Snowflake - must verify if Statsig/EPPO/Optimizely/homegrown were ever discussed before claiming absence. CRITERION 4 FAILURE - Economic Buyer next step uses phrase 'What's blocking final approval?' which is vague exploration language. Must be rewritten to: 'Confirm the April 30 contract signature deadline: Who specifically holds signature authority, and what are the remaining approval steps between Chris Sanders and that decision-maker?' CRITERION 4 FAILURE - Champion next step is actionable but Decision Process next step ('Our records show contract signing was targeted for end of April') is identical to Economic Buyer action - consolidate into one contact action to avoid duplication. CRITERION 5 FAILURE - ICP Fit Assessment claims 'slow pace and disengagement may indicate poor ICP fit' without evidence that ShiftKey is outside ICP. The 2000 teams, LaunchDarkly migration, and data-driven culture goals strongly suggest enterprise scale meeting ICP. Disengagement is execution issue, not ICP disqualifier. Remove this speculation. CRITERION 2 FAILURE - Competition score revised from 6/10 to 4/10 without documented reason in the revision section. State explicitly: 'Score reduced from 6/10 to 4/10 because prior analysis incorrectly classified Mixpanel/Snowflake as competitive alternatives when they are complementary data platforms, not experimentation platform competitors. Only LaunchDarkly confirmed; GrowthBook selection rationale unknown.' CRITICAL INTERNAL CONSISTENCY - Economic Buyer status changed from 'Partial' to 'Unknown' and score dropped 5/10 to 3/10, but justification cites 'recent call shows operational team managing cadence reduction' - this is Decision Process deterioration, not Economic Buyer evidence. Budget ($129K) was mentioned in prior calls. Separate the issues: Economic Buyer status should remain 'Partial' (budget negotiated, authority holder unknown) with score 4/10 (known budget but unknown approver). Decision Process is properly downgraded. Champion status change to 'Unknown' (from 'Partial') is appropriate given disengagement, but score jump 4/10 to 2/10 is extreme - justify why 2/10 vs 3/10. All next steps must include specific contact name, date/deadline, and concrete question without exploratory language.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-06_006",
+  "timestamp": "2026-08-06T07:03:03.956195"
+}

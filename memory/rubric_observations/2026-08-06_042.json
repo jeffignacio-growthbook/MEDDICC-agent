@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_042",
+  "timestamp": "2026-08-06T06:40:06.557302",
+  "company": "Square",
+  "criterion_fired": "CRITERION 1 (Decision Criteria) and CRITERION 3 (ICP Fit Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 1 should specify: 'Decision criteria are buyer-stated requirements (e.g., \"must integrate with X\", \"budget of Y\") that will drive selection, not general constraints or use-case fit.' Criterion 3 should specify: 'ICP fit assessment requires explicit call evidence (e.g., stated monthly visitors, product architecture, experiment frequency) or must be marked as 'insufficient data' rather than inferred."
+}

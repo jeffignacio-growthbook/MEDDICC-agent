@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_041",
+  "timestamp": "2026-08-06T06:37:15.403206",
+  "company": "Ryanair",
+  "criterion_fired": "CRITERION 2, 3, 5 (multiple violations around evidence-score alignment)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'When carry-forward data is unconfirmed, explicitly note whether confidence remains unchanged or downgrades. Pain scores require direct prospect quote or clear business-impact statement; seller interpretation alone is insufficient. Absence of economic buyer at deal stage $225K+ requires flagged risk notation even if score is mathematically correct.'"
+}

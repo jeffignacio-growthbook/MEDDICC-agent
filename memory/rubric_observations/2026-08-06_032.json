@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_032",
+  "timestamp": "2026-08-06T06:07:15.751550",
+  "company": "MedCof",
+  "criterion_fired": "Criterion 1 (Complete Coverage), Criterion 3 (Evidence Quality), Criterion 4 (Actionable Next Steps), Criterion 5 (No Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 3 should specify: 'All capability and stakeholder claims require direct verbatim quotes; paraphrases alone insufficient.' Criterion 4 should add: 'Next steps must include specific contact name, title, or method for execution (e.g., ask X for Y).' Criterion 5 should clarify: 'Distinguish prospect language (quoted) from analyst interpretation (labeled as inference, not claim).'"
+}

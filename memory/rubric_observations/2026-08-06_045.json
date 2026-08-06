@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_045",
+  "timestamp": "2026-08-06T06:56:33.733047",
+  "company": "Route",
+  "criterion_fired": "Criteria 1, 2, 4, 5 - rubric inconsistencies",
+  "was_appropriate": false,
+  "suggested_change": "Rubric requires: (1) Clear score-to-evidence mapping with explicit thresholds (e.g., '7/10 requires specific quantification' must be stated upfront, not revealed as failure reason). (2) Regression detection should require justification only when evidence actually changes, not when score stays 'Partial'. (3) Next steps criterion should specify whether generic language is acceptable at draft stage or always requires named contacts/specific thresholds. (4) Timeline criterion must resolve contradictions between 'confirmed' label and 'no specific date confirmed' statement in evaluation itself before penalizing agent."
+}

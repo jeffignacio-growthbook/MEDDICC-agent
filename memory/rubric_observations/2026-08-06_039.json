@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_039",
+  "timestamp": "2026-08-06T06:32:01.198862",
+  "company": "ASAPP",
+  "criterion_fired": "Criterion 4 (Next Steps Actionability) and Criterion 5 (ICP Validation)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4: Explicitly list prohibited next_step patterns: 'TBD', 'must be captured', 'schedule call to [role]', 'email [name TBD]'. Require concrete contact name + specific question + target date for each step. Criterion 5: Require direct quote or explicit call transcript reference for each ICP role claim; paraphrase + inference insufficient."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_044",
+  "timestamp": "2026-08-06T06:52:32.373363",
+  "company": "Stone",
+  "criterion_fired": "Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Next steps must include: (1) specific contact name, (2) concrete day/date (not relative phrases like 'Tuesday next week'), and (3) a single, direct question\u2014not conditional branches or vague placeholders like 'next scheduled call'."
+}

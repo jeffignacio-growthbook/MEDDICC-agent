@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_029",
+  "timestamp": "2026-08-06T05:45:23.713946",
+  "company": "ECCO",
+  "criterion_fired": "Criterion 1 (Champion), Criterion 3 (Metrics), Criterion 4 (Actionable next steps), Criterion 5 (Unsupported claims)",
+  "was_appropriate": true,
+  "suggested_change": "CLAUDE.md should mandate: (1) explicit 'Evidence: [quote/detail]' or 'Evidence: None' for each component; (2) required format for next steps: '{contact_name} ({title}) on {date/timeframe}: {specific_question}'; (3) confidence language rule: claims without direct evidence must state 'appears X but unconfirmed' rather than definitive assertions; (4) ICP validation gating: if 100K+ visitors not confirmed, flag as blocker before proceeding to deal scoring."
+}

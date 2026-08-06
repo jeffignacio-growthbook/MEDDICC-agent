@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_043",
+  "timestamp": "2026-08-06T06:42:47.797913",
+  "company": "Decathlon",
+  "criterion_fired": "CRITERION 2 (Carry-forward consistency) and CRITERION 4 (Actionable next steps)",
+  "was_appropriate": true,
+  "suggested_change": "On first call with zero prior context, all component scores must start at 0/10 with explicit note 'No prior context \u2014 first call on record.' Scores may only advance if evidence directly supports the specific level. Next steps must be hypothesis-free discovery ('Is anyone else aware?' not 'Who else is interested?') and explicitly name competitor tools by product rather than vague references."
+}

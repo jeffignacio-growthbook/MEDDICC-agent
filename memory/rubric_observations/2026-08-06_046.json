@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_046",
+  "timestamp": "2026-08-06T06:59:15.962346",
+  "company": "Hublo",
+  "criterion_fired": "Champion, Decision Criteria, Decision Process, Identified Pain, Next Steps",
+  "was_appropriate": false,
+  "suggested_change": "Champion: require explicit internal advocacy or stakeholder-selling actions; score Unknown (1-2) if only neutral evaluation documented. Decision Criteria: require weighted importance ranking or formal evaluation matrix to score above 3. Decision Process: require approval chain + procurement steps to score above 4. Identified Pain: require direct prospect statement or explicit dissatisfaction signal, not implication. Next Steps: mandate format 'Contact [name], Request [specific deliverable], Question [exact ask]' to enforce actionability."
+}
