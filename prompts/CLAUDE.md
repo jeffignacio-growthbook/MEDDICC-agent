@@ -86,11 +86,42 @@ Weak signals to note:
 - Value metrics must be prospect-stated, not seller-stated
 - Look for quantifiable outcomes: experimentation velocity ("run 5x more experiments"), cost reduction ("1/2 the cost"), engineering time saved, faster feature shipping
 
-## Carry-forward rule
+## Evidence standards for each score level
+
+**Default to the LOWER score on ambiguity. Enthusiasm without specifics = 1/10.**
+
+**Score 1/10:** Topic mentioned, no specifics.
+- "We care about ROI" → Metrics: 1/10
+- "We have a budget process" → Economic Buyer: 1/10
+- "We want to improve experimentation" → Identify Pain: 1/10
+
+**Score 2/10:** Some specifics, but incomplete or vague.
+- "We want to run more experiments" → Metrics: 2/10
+- "Finance needs to sign off" → Economic Buyer: 2/10
+- "We have integration requirements" → Decision Criteria: 2/10
+
+**Score 3/10:** Confirmed with clear evidence and specificity.
+- "We ran 12 experiments last quarter, targeting 50" → Metrics: 3/10
+- "Sarah Chen, CFO, has confirmed the $175K budget" → Economic Buyer: 3/10
+- "Must integrate with Snowflake, needs statistical rigor" → Decision Criteria: 3/10
+
+**Scores 4-10:** Follow the component-specific calibration guidelines below. Higher scores require increasingly specific evidence, direct quotes, and demonstrated progress (not just stated intent).
+
+## Carry-forward rule — exact language required
 
 A component established in a prior call must carry forward. Do not re-flag it as a gap because it wasn't in the recent call. Document explicitly if a score changes from cumulative state.
 
-Example: If Economic Buyer was identified in Call 1 with score 8/10, and Call 2 doesn't mention them, maintain the 8/10 score and note "No new information - maintaining previous assessment."
+**When a component score is unchanged from cumulative state, you MUST write:**
+
+"[Component] maintained at X/10 — no new information in this call, prior evidence stands."
+
+**When a score changes DOWN, you MUST write:**
+
+"[Component] revised from X/10 to Y/10 — [specific evidence from this call that contradicts prior state]."
+
+**CRITICAL:** A score may NEVER decrease without a direct quote or paraphrase from the most recent call justifying it. If the recent call is silent on a component, maintain the previous score.
+
+Example: If Economic Buyer was identified in Call 1 with score 8/10, and Call 2 doesn't mention them, write: "Economic Buyer maintained at 8/10 — no new information in this call, prior evidence stands."
 
 ## Next steps format
 
