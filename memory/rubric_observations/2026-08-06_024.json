@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_024",
+  "timestamp": "2026-08-06T05:25:27.979355",
+  "company": "Douglas",
+  "criterion_fired": "Criterion 4 (Next Steps) and Criterion 3 (Competition)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 should explicitly require: 'Each next step must include (a) specific person/role, (b) concrete question/ask, (c) deadline (day of week or date), and (d) expected outcome.' Criterion 3 should require: 'If competitor status unclear, resolution step must be the first next step: e.g., \"Ask [contact]: Is Chameleon built in-house or a third-party tool?\"'"
+}

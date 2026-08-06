@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_033",
+  "timestamp": "2026-08-06T06:12:45.067516",
+  "company": "Aircall",
+  "criterion_fired": "Economic Buyer (Criterion 1), Champion (Criterion 4), Competition (Criterion 4), Deal Health (Criterion 5)",
+  "was_appropriate": true,
+  "suggested_change": "Rubric should require: (1) Unknown=0 when no EB identified, not 3 for 'acknowledgment of absence'; (2) Next steps must name specific person + concrete question + deadline, not generic asks; (3) Deal Health claims must cite documented blockers or pending timelines, not unsupported assertions"
+}

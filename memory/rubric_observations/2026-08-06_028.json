@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_028",
+  "timestamp": "2026-08-06T05:42:41.749449",
+  "company": "OpenTable",
+  "criterion_fired": "Criterion 1, 2, 3, 5 (contradictory cluster)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Carry-forward scores should only be downgraded if new call data contradicts prior evidence; (2) 'No new information' calls must preserve prior score with explicit carry-forward note; (3) Evidence standard must be consistent across all components\u2014either third-party descriptions count as evidence or they don't; (4) 'At Risk' health determination should depend only on objective call data, not on scoring contradictions."
+}

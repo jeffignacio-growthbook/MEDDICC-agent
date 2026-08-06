@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_035",
+  "timestamp": "2026-08-06T06:20:04.976094",
+  "company": "Zoro",
+  "criterion_fired": "Criterion 1, 2, 3, 5 (all related to same contradiction)",
+  "was_appropriate": false,
+  "suggested_change": "Separate 'contradiction detection' (valid) from 'contradiction resolution burden' (inappropriate to require agent prove which prior assessment was wrong when source is ambiguous). Instead: if cumulative and analysis diverge on interpretation, agent should flag ambiguity and present both readings, rather than choose one and be marked wrong for not documenting the choice."
+}

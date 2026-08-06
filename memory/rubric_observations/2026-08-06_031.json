@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_031",
+  "timestamp": "2026-08-06T06:05:09.623550",
+  "company": "TickPick",
+  "criterion_fired": "Criterion 4 (Next Steps specificity) and Criterion 5 (Call summary completeness)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 5 should require: 'Call summary must be complete and readable before evaluating Criterion 4 specificity. If summary is corrupted/incomplete, mark as data_error and do not fail on downstream criteria dependent on call content verification.'"
+}

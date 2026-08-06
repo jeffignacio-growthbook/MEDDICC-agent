@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_047",
+  "timestamp": "2026-08-06T07:03:03.956548",
+  "company": "shiftkey",
+  "criterion_fired": "Criteria 1, 2, 3, 4, 5 - systemic rubric issues",
+  "was_appropriate": false,
+  "suggested_change": "Refactor rubric to: (1) Require 'Baseline metrics identified: [specific metrics]' OR 'No baseline metrics discussed' (not absence-confirmation); (2) For competitors, accept 'Competitors confirmed in calls: [list]' without requiring proof of non-mention; (3) Consolidate duplicate next steps rather than penalize; (4) Distinguish execution risk from ICP fit; (5) Require score-change justification in revision section format, not retroactively in required_changes; (6) Define Economic Buyer/Champion/Decision Process scoring independently without conflating categories."
+}

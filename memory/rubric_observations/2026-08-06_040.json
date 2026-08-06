@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_040",
+  "timestamp": "2026-08-06T06:34:32.274901",
+  "company": "Square",
+  "criterion_fired": "CRITERION 1, 3, 4, 5, CRITERION 2",
+  "was_appropriate": false,
+  "suggested_change": "Separate 'status field consistency' from 'actionable next steps specificity' (currently conflated). For dates: allow bracketed placeholders OR require concrete dates, not both. For ICP/scalability: require explicit Go/No-Go decision OR mark as 'unresolved blocker' rather than penalizing contradictory analysis. For C3 Competition: clarify whether 'direct quote' is required when call transcript lacks technical dissatisfaction details."
+}

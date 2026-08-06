@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_030",
+  "timestamp": "2026-08-06T05:59:38.924129",
+  "company": "KBX",
+  "criterion_fired": "Criterion 1, 2, 3, 4, 5 (multiple)",
+  "was_appropriate": false,
+  "suggested_change": "Separate 'Evidence Quality' (what was said) from 'Information Completeness' (what remains unknown). Allow 8/10 scores for validated information even when other fields are unknown. For Decision Process: score 8/10 only if deadline verbatim confirmed in current call OR cumulative state explicitly tagged 'verified in call [DATE]'. For next steps: require either (a) specific contact + date or (b) explicit 'awaiting contact information' note\u2014don't penalize for unknowns. For Competition: define 5/10 as 'incumbent identified, alternatives unknown' rather than 'partial mapping confirmed.'"
+}

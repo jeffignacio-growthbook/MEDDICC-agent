@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_025",
+  "timestamp": "2026-08-06T05:29:45.916482",
+  "company": "Fixter",
+  "criterion_fired": "Criterion 1 (Complete Coverage) and Criterion 5 (No Unsupported Claims)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1 should explicitly permit 'classification hold' status: 'All seven components have status and scores OR a documented classification hold with rationale explaining why MEDDICC qualification is suspended pending prerequisite resolution.' Criterion 5 should clarify that contradictions between CRM data and call evidence should trigger a 'verify classification' step, not failure of the entire assessment."
+}

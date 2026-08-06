@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_034",
+  "timestamp": "2026-08-06T06:16:56.472234",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency), Criterion 3 (Competitor evidence), Criterion 4 (Actionable specificity), Criterion 5 (ICP validation)",
+  "was_appropriate": true,
+  "suggested_change": "All four criteria were appropriately applied. The rubric itself is sound; the instruction gaps are in CLAUDE.md guidance on: (a) when to flag vs. extract from degraded transcripts, (b) how to operationalize 'evidence from calls' for numeric thresholds, and (c) how to write next steps with date/method/prerequisite specificity."
+}
