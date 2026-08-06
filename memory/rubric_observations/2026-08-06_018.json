@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_018",
+  "timestamp": "2026-08-06T01:27:01.293714",
+  "company": "Box",
+  "criterion_fired": "Criterion 1 (MEDDICC component scoring) and Criterion 2 (cumulative state maintenance)",
+  "was_appropriate": true,
+  "suggested_change": "Clarify that data quality blockers (identity mismatch, missing participants) should be flagged separately as 'Assessment Context: [blocker]' while MEDDICC scoring proceeds with Unknown/0-3 scores where evidence is insufficient, not as a reason to refuse all scoring."
+}

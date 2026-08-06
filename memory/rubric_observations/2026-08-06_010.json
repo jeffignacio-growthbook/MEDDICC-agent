@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_010",
+  "timestamp": "2026-08-06T00:52:19.109595",
+  "company": "On3",
+  "criterion_fired": "CRITERION 3 (Evidence Quality) and CRITERION 5 (No Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit CLAUDE.md rule: 'Score pain/decision criteria \u22655/10 only if prospect explicitly stated the need or demonstrated urgency; seller-presented features or inferred requirements score \u22644/10 regardless of fit. When prospect signals low urgency (willing to delay), cap pain scores at 4/10 even if pain is acknowledged.'"
+}

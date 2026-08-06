@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_001",
+  "timestamp": "2026-08-06T00:18:50.210421",
+  "company": "Oda",
+  "criterion_fired": "Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Next steps should be concrete and traceable (named contact, clear action, timeline) but should NOT require specific question verbatim or exact milestone dates if the call data doesn't support that level of precision. Rephrase: 'Next step identifies a specific stakeholder, intended action type (call/email), and a 2-week window. Vague language (e.g., \"explore\", \"discuss\") is flagged only if no concrete contact or timeline is present.'"
+}

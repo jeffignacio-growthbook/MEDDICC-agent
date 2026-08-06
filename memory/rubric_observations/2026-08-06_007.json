@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_007",
+  "timestamp": "2026-08-06T00:42:06.912767",
+  "company": "ECCO",
+  "criterion_fired": "Criterion 1, Criterion 4, Criterion 5, Criterion 3",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Accept 'No statements about X' as valid evidence category; distinguish between 'explicitly absent' vs 'not yet discussed'. Criterion 5: Clarify that Partial status requires minimum one positive signal; if zero signals exist, use Unknown. Criterion 4: Allow next steps referencing 'current contact' or 'primary contact' if the person exists in transcript; name specificity should only apply when multiple contacts exist. Criterion 3: Define ICP validation as pass/fail binary rather than gradient; don't score components when ICP fit cannot be determined from call data."
+}

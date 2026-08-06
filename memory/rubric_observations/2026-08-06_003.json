@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_003",
+  "timestamp": "2026-08-06T00:26:45.249540",
+  "company": "Fixter",
+  "criterion_fired": "Multiple: Competition (1), Metrics (3), Next Steps (4), Champion (5), Identified Pain (2)",
+  "was_appropriate": false,
+  "suggested_change": "Add explicit scoring logic to CLAUDE.md: (a) Competition\u2014require tool name or explicit 'not stated' note; (b) Metrics\u2014score 4+ only if prospect quantifies outcome not capability; (c) Next Steps\u2014enforce named attendee confirmation and actual dates or relative anchors; (d) Champion\u2014downgrade to Unknown/1 if only passive engagement, no internal advocacy evidence; (e) Identified Pain\u2014require explicit notation when score changes between calls with source citation."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_006",
+  "timestamp": "2026-08-06T00:39:27.882842",
+  "company": "OpenTable",
+  "criterion_fired": "Criterion 2 and Criterion 5 (contradictory)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: 'Score changes require explicit recent-call evidence. If recent call provides no new data on a component, maintain prior score with notation. Do not apply new evidentiary standards retroactively to prior calls.' Remove conflicting instruction about 'historical evidence justification' when recent call is silent."
+}

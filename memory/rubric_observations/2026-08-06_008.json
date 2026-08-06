@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_008",
+  "timestamp": "2026-08-06T00:44:32.013913",
+  "company": "Deel",
+  "criterion_fired": "Criterion 1, 3, 4, 5",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 3 (Competition): Define explicit threshold\u2014'Identified' requires \u22652 confirmed alternatives; \u22641 known = 'Partial' (0-3 pts). Criterion 5 (Champion): Clarify 'internal selling behavior' with examples (forwarding to peers, presenting in meetings, etc.); discussing requirements alone should map to score 1-2 'Unknown', not 4/10 'Partial'. Criterion 4: Accept 'next call' language if timeline exists elsewhere in transcript; otherwise require explicit date. These conflicts created contradictory failure modes rather than instructional gaps."
+}

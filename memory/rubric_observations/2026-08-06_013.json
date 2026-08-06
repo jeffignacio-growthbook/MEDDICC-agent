@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_013",
+  "timestamp": "2026-08-06T01:07:17.466601",
+  "company": "MedCof",
+  "criterion_fired": "Criterion 1 (MEDDICC components) and Criterion 5 (expansion validation)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 1 should explicitly require direct prospect quotes or named speaker attribution for each MEDDICC component; Criterion 5 should require explicit confirmation of current tool usage and validated ICP fit (traffic volume, role, stack) before classifying as expansion"
+}

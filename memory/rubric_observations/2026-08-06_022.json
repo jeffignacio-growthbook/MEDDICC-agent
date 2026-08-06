@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_022",
+  "timestamp": "2026-08-06T01:46:48.261229",
+  "company": "UPS",
+  "criterion_fired": "Criterion 1, 3, 4, 5",
+  "was_appropriate": true,
+  "suggested_change": "Add instruction: 'When prospect requirement conflicts with product architecture (e.g., Adobe Analytics integration + warehouse-native positioning), flag as deal_risk and ask clarifying question: \"How critical is Adobe Analytics integration vs. our warehouse-native approach?\" Do not proceed past qualification without resolution.' Also add: 'Next steps must use specific question format, never vague qualifiers like must-haves, nice-to-haves, or open-ended likes/dislikes.'"
+}

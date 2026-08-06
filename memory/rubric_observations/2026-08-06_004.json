@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_004",
+  "timestamp": "2026-08-06T00:32:51.731013",
+  "company": "Pronto",
+  "criterion_fired": "CRITERION 1, 3, 4, 5",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1 should accept 'mentioned' over 10 experiments as sufficient without verbatim quote. Criterion 3 should flag ICP misalignment as a 'concern' not auto-fail if order volume ~1.2M/month is documented. Criterion 4 should accept '[contact name TBD]' as acceptable in discovery phase\u2014require specificity only for final recommendations. Criterion 5 should require explicit ICP rejection statement only if company explicitly stated non-ICP characteristics (e.g., 'no data warehouse'), not absence of evidence."
+}
