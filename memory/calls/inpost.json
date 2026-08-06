@@ -1,7 +1,7 @@
 {
-  "company": "GrowthBook & InPost",
-  "slug": "growthbook-inpost",
-  "last_etl_date": "2026-08-05T15:57:31.330513",
+  "company": "InPost & GrowthBook",
+  "slug": "inpost",
+  "last_etl_date": "2026-08-05T17:45:21.927446",
   "calls": [
     {
       "id": "01KY4KKQRJRVANX4ESE7F34AED",
@@ -14,6 +14,21 @@
       "participants": 3,
       "keywords": "GrowthBook, feature flags, A/B testing, implementation, pricing model, self-hosting",
       "action_items": "\n**Anita Krasińska**\nReview updated pricing from James and validate against expected scale and budgets (39:45)\nCoordinate and notify relevant stakeholders about scheduling the GrowthBook product demonstration (38:10)\nConfirm any formal procurement thresholds or processes regarding budgeting for the tool (07:22)\n\n**James Shannon**\nSend detailed answers to the technical and commercial questions submitted by InPost team (23:40)\nProvide updated, scale-adjusted pricing reflecting InPost’s large user base and experiment volume (39:45)\nOrganize and schedule the product demonstration session with InPost stakeholders (37:00)\nRecord the demonstration meeting as requested (39:30)\n\n**Michal Mańko**\nAssist Anita in confirming technical implementation needs, especially involving mobile engineers and backend involvement if any (16:00)\nDiscuss internal alignment on decision-making and decision makers for experimentation versus feature flags adoption (35:30)\nCoordinate with Michael Biavas to participate in upcoming meetings and demonstrations (38:40)\n"
+    },
+    {
+      "id": "01KYF3N1Y970VYR4T4AACAAC8C",
+      "source": "fireflies",
+      "title": "InPost & GrowthBook Demo",
+      "date": "2026-07-28",
+      "duration_minutes": 62,
+      "summary": "The team discussed the need for a robust experimentation platform tailored for mobile applications, emphasizing mobile-focused A/B testing that evaluates backend recommendation models and frontend UI changes. They expressed interest in migrating from Firebase to GrowthBook for enhanced feature flag management and experimentation capabilities. Preventing experiment overlap and introducing attribute-based targeting were also key discussion points. Furthermore, the integration of data warehouses like Postgres and Databricks was highlighted, with a need for upfront setup of multiple metrics for efficient analysis. The GrowthBook SDK is designed for local evaluation and tracking, facilitating self-serve experimentation after initial engineering input. Finally, the strategic support structure and vision for scalable experimentation across industries were outlined.",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 17,
+      "keywords": "Feature Flags, Experimentation, Mobile Testing, Data Integration, GrowthBook, AI Assistant",
+      "action_items": "\n**Anita Krasińska**\nDiscuss GrowthBook proposal internally and provide feedback by end of the week (59:24)\nArrange internal contact after departure on holiday or delegate communication (59:38)\n\n**James Shannon**\nShare meeting recording and transcript with InPost team (01:08)\nProvide documentation on feature namespaces to prevent experiment overlap (28:25)\nSupport InPost’s data team with setting up data models and metrics in Postgres/databricks during trial phase (52:20)\nProvide free trial access to GrowthBook and assist with implementation and onboarding if InPost decides to proceed (58:50)\n\n**Unassigned**\nEvaluate GrowthBook’s fit during trial period using demo and shared materials; discuss internally among product, engineering, data, and marketing teams (55:00)\n",
+      "participant_domains": [
+        "inpost.pl"
+      ]
     }
   ]
 }
