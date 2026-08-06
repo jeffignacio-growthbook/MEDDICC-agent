@@ -143,7 +143,7 @@ def main():
     """Main entry point for nightly MEDDICC analysis."""
     # Start runtime tracking to prevent timeout
     run_start = time.time()
-    MAX_RUNTIME_SECONDS = 90 * 60  # 90 minutes, leaves buffer before GitHub Actions timeout
+    MAX_RUNTIME_SECONDS = 105 * 60  # 105 minutes, leaves 15-min buffer before 120-min GitHub Actions timeout
 
     print("=" * 80)
     print("MEDDICC AGENT NIGHTLY RUN")
@@ -321,6 +321,9 @@ def main():
             print(f'\n⏰ Runtime limit reached ({elapsed/60:.1f} min)')
             print(f'   Processed {deals_processed} of {len(active_deals)} deals')
             print(f'   Remaining deals will be processed tomorrow')
+            # Save token usage before exiting
+            print('   Saving token usage before exit...')
+            tracker.save()
             break
 
         deal_id = deal.get('deal_id')
