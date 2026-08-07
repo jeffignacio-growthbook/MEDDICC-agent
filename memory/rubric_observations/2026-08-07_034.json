@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_034",
+  "timestamp": "2026-08-07T04:32:10.475080",
+  "company": "Fixter",
+  "criterion_fired": "Criterion 2 (Champion component carry-forward reasoning)",
+  "was_appropriate": true,
+  "suggested_change": "When multi-call state exists: If score changes >1 point, agent must state either 'Prior calls overstated [aspect]\u2014Call N clarifies [new interpretation] because [evidence]' OR 'Call N confirms prior calls; score maintained at X/10 despite [new detail] because [reasoning]'. Document what changed: data, interpretation, or both."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_047",
+  "timestamp": "2026-08-07T04:52:36.432904",
+  "company": "shiftkey",
+  "criterion_fired": "Criterion 2 & 5 (Decision Process scoring & logical consistency)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should state: 'Score changes must be justified by explicit evidence. If score is maintained despite changed inputs, explicitly document why the change does NOT alter confidence level.' Criterion 5 should clarify: 'Flag logical tensions (e.g., reduced cadence + hard deadline) as observations requiring explicit agent reasoning, not automatic violations. Agent must either explain why tension is benign OR recommend score adjustment.'"
+}

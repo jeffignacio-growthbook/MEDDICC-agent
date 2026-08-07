@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_041",
+  "timestamp": "2026-08-07T04:42:57.084586",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency), Criterion 4 (Next steps specificity), Criterion 5 (ICP fit assessment)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2: Add explicit rule\u2014'If cumulative_calls_context = 1 AND current call transcript is incomplete, note explicitly that no carry-forward applies; state scores unchanged due to insufficient data, not rule application.' Criterion 4: Require all next steps to include ISO dates or relative dates anchored to known events (e.g., 'by Call 3 on [date]'), never 'next scheduled call' alone. Criterion 5: Expand to mandate ICP fit assessment (data scale, infrastructure readiness, org maturity) as prerequisite for deal health score."
+}

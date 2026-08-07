@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_042",
+  "timestamp": "2026-08-07T04:44:12.160435",
+  "company": "Taskrabbit",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 4 (actionable next steps)",
+  "was_appropriate": true,
+  "suggested_change": "For Criterion 4, clarify that 'actionable next step' must specify: (1) who will be contacted, (2) what concrete outcome is required (e.g., meeting scheduled, stakeholder identified, document delivered), and (3) explicit success criteria\u2014not open-ended discovery questions. Example: '[Contact: David] Schedule 15-min call with budget-approval stakeholder to present business case and document evaluation criteria' vs. 'Ask David if he discussed with leadership.'"
+}

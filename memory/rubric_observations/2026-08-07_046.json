@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_046",
+  "timestamp": "2026-08-07T04:51:12.510729",
+  "company": "Route",
+  "criterion_fired": "CRITERION 2 (Decision Process scoring logic) and CRITERION 4 (next step specificity)",
+  "was_appropriate": true,
+  "suggested_change": "CLAUDE.md should require: (1) explicit reasoning linking score changes to new evidence, (2) next steps template distinguishing 'exploratory' from 'discovery' questions with concrete examples, (3) ICP gate requiring documented scale signals before proceeding to scoring"
+}

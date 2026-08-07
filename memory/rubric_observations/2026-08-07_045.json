@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_045",
+  "timestamp": "2026-08-07T04:51:02.121960",
+  "company": "Hublo",
+  "criterion_fired": "CRITERION 4 (Next Steps Specificity) and CRITERION 3 (ICP Fit Assessment)",
+  "was_appropriate": true,
+  "suggested_change": "CRITERION 3 should require 'Unknown' rating when call data does not explicitly validate ICP signals; CRITERION 4 should mandate template: 'Contact [person] via [method] by [date]: Ask \"[specific question]\"' to prevent vague actions."
+}

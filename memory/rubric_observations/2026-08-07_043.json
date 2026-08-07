@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_043",
+  "timestamp": "2026-08-07T04:44:44.157753",
+  "company": "Unity",
+  "criterion_fired": "Criterion 4 (Actionable next steps specificity) and Criterion 3 (Evidence quality)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 4 should allow 'Ask [role/department]' when contact name unknown from call; require only: concrete action verb + mechanism (call/email/meeting) + reasonable timeline. Criterion 3 should note when transcript is incomplete rather than fail the agent for missing data outside its scope."
+}

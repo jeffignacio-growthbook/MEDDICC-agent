@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_037",
+  "timestamp": "2026-08-07T04:37:09.297030",
+  "company": "Notion",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 4 (Actionable Next Steps), Criterion 5 (Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "CLAUDE.md should add: (1) When prior transcript is corrupted/unusable, carry forward prior score with explicit notation rather than regressing; (2) Next steps must use format '[Contact Name]: Action verb + specific question + date' not generic discovery lists; (3) Distinguish 'no evidence found' (appropriate for early deals, neutral tone) from 'contradictory evidence' (red flag language only when calls explicitly contradict prior claims); (4) Remove speculative footnotes unsupported by call content\u2014flag unknowns as open questions instead."
+}
