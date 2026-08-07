@@ -20,6 +20,7 @@ import yaml
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Dict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import agent components
 from fireflies_client import get_fireflies_client
@@ -137,6 +138,277 @@ def get_most_recent_call_date(fireflies_calls: list, apollo_calls: list) -> date
                 pass
 
     return max(dates) if dates else None
+
+
+def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer,
+                        fireflies, apollo) -> dict:
+    """
+    Process one deal — context builder → generator → evaluator → reflection → write outputs.
+    Thread-safe function for parallel execution.
+
+    Returns dict with processing result:
+        {
+            'deal_id': str,
+            'company': str,
+            'status': 'analyzed' | 'skipped' | 'failed',
+            'reason': str (if skipped),
+            'passed': bool (if analyzed),
+            'iterations': int (if analyzed),
+            'learning': dict (if outcome warrants),
+        }
+    """
+    deal_id = deal.get('deal_id')
+    deal_name = deal.get('deal_name', 'Unknown')
+    company_name = deal.get('company_name', '')
+    slug = deal.get('company_slug', '')
+
+    try:
+        # Company info validation
+        if not company_name:
+            return {
+                'deal_id': deal_id,
+                'company': deal_name,
+                'status': 'skipped',
+                'reason': 'no company name'
+            }
+
+        if not slug:
+            return {
+                'deal_id': deal_id,
+                'company': company_name,
+                'status': 'skipped',
+                'reason': 'invalid company slug'
+            }
+
+        # Build deal_context dict for agent
+        deal_context = {
+            'deal': {
+                'properties': {
+                    'dealstage': deal.get('stage', 'Unknown'),
+                    'closedate': deal.get('close_date', 'Unknown'),
+                    'incremental_arr': deal.get('arr', '0'),
+                    'dealname': deal.get('deal_name', company_name),
+                }
+            },
+            'company': {
+                'properties': {
+                    'name': company_name,
+                }
+            },
+            'contacts': []
+        }
+
+        # Use last analysis date from deal index to skip deals with no new calls
+        since_date_str = deal.get('last_analyzed')
+        since_date = None
+        if since_date_str:
+            try:
+                since_date = datetime.fromisoformat(since_date_str)
+            except:
+                since_date = None
+
+        # Get calls from cache only (ETL handles freshness)
+        fireflies_calls, apollo_calls, new_count = get_calls_for_company(
+            company_name, since_date, memory
+        )
+
+        total_calls = len(fireflies_calls) + len(apollo_calls)
+
+        # Combine and sort by date
+        all_calls_sorted = sorted(
+            fireflies_calls + apollo_calls,
+            key=lambda c: c.get('date', ''),
+        )
+
+        all_summaries = []
+        for call in all_calls_sorted:
+            if 'formatted_summary' in call and call['formatted_summary']:
+                summary = call['formatted_summary']
+            elif 'summary' in call and call['summary']:
+                summary = call['summary']
+            elif call.get('source') == 'fireflies':
+                summary = fireflies.format_summary_for_meddicc(call) if fireflies else ''
+            else:
+                summary = apollo.format_conversation_for_meddicc(call) if apollo else ''
+
+            if summary and summary.strip():
+                all_summaries.append((call.get('date', ''), summary))
+
+        # Sort by date ascending, extract just summaries
+        all_summaries.sort(key=lambda x: x[0])
+        all_summaries = [s for _, s in all_summaries]
+
+        # GUARD 1: No calls found
+        if len(all_summaries) == 0:
+            if since_date:
+                return {
+                    'deal_id': deal_id,
+                    'company': company_name,
+                    'status': 'skipped',
+                    'reason': f'no new calls since {since_date.strftime("%Y-%m-%d")}'
+                }
+            else:
+                return {
+                    'deal_id': deal_id,
+                    'company': company_name,
+                    'status': 'skipped',
+                    'reason': 'no calls found'
+                }
+
+        # GUARD 4: Most recent call already analyzed
+        if since_date:
+            last_call_date = get_most_recent_call_date(fireflies_calls, apollo_calls)
+            if last_call_date and last_call_date <= since_date:
+                return {
+                    'deal_id': deal_id,
+                    'company': company_name,
+                    'status': 'skipped',
+                    'reason': f'most recent call ({last_call_date.strftime("%Y-%m-%d")}) already analyzed'
+                }
+
+        # GUARD 2: Single call - skip context builder
+        if len(all_summaries) == 1:
+            recent_call_summary = all_summaries[0]
+            historical_summaries = []
+            cumulative_state = {
+                "company": company_name,
+                "calls_reviewed": 0,
+                "meddicc_state": {
+                    k: {"status": "unknown", "evidence": "", "score": 0}
+                    for k in ["metrics", "economic_buyer", "decision_criteria",
+                             "decision_process", "identified_pain", "champion", "competition"]
+                },
+                "key_context": "First call on record — no prior context."
+            }
+        else:
+            # Split: all except most recent = cumulative, last = recent
+            recent_call_summary = all_summaries[-1]
+            historical_summaries = all_summaries[:-1]
+
+            # Build cumulative MEDDICC state
+            cumulative_state = build_cumulative_meddicc(historical_summaries, company_name, tracker)
+
+        # GUARD 3: Most recent call summary too short
+        if len(recent_call_summary.strip()) < 100:
+            return {
+                'deal_id': deal_id,
+                'company': company_name,
+                'status': 'skipped',
+                'reason': f'most recent call summary too short ({len(recent_call_summary)} chars)'
+            }
+
+        # Run MEDDICC agent
+        result = run_agent(
+            call_summary=recent_call_summary,
+            cumulative_state=cumulative_state,
+            deal_context=deal_context,
+            tracker=tracker,
+            company=company_name
+        )
+
+        # Extract results
+        analysis = result['draft']
+        evaluation = result['evaluation']
+        iterations = result['iterations']
+        passed = result['passed']
+        outcome = result['outcome']
+        root_cause = result['root_cause']
+
+        # Save analysis to file
+        output_dir = Path(__file__).parent.parent / "output"
+        output_dir.mkdir(exist_ok=True)
+
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        output_file = output_dir / f"meddicc_analysis_{deal_id}_{timestamp}.md"
+
+        with open(output_file, 'w') as f:
+            f.write(f"# MEDDICC Analysis: {company_name}\n\n")
+            f.write(f"**Deal ID:** {deal_id}\n")
+            f.write(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}\n")
+            f.write(f"**Calls Analyzed:** {total_calls}\n")
+            f.write(f"**Iterations:** {iterations}\n")
+            f.write(f"**Status:** {'✓ Passed' if passed else '✗ Failed'}\n\n")
+            f.write("---\n\n")
+            f.write(analysis)
+
+        # Update last_analyzed timestamp in deal index
+        deal['last_analyzed'] = datetime.now().isoformat()
+
+        # Update HubSpot deal note
+        try:
+            hubspot.upsert_meddicc_note(
+                deal_id=deal_id,
+                analysis_content=analysis,
+                calls_count=total_calls
+            )
+        except Exception as hub_error:
+            print(f"   ⚠️  {company_name}: HubSpot note failed (analysis saved to file): {hub_error}")
+
+        # Write analysis to Supabase
+        if sb_writer:
+            try:
+                from hubspot_deals import HubSpotDealsClient
+                hs = HubSpotDealsClient.__new__(HubSpotDealsClient)
+                scores = hs._extract_scores_from_analysis(analysis)
+                sb_writer.insert_analysis(
+                    deal_id=str(deal_id),
+                    company_name=company_name,
+                    result=result,
+                    scores=scores,
+                    output_file=str(output_file.name)
+                )
+            except Exception as e:
+                print(f"   ⚠️  {company_name}: Supabase analysis write failed: {e}")
+
+        # Build learning entry with reflection outcome
+        learning = {
+            "company": company_name,
+            "deal_id": deal_id,
+            "outcome": outcome,
+            "root_cause": root_cause,
+            "confidence": 0.8 if outcome == "candidate" else 0.5 if outcome == "observation" else 0.0,
+            "loop_performance": {
+                "iterations_to_pass": iterations,
+                "passed": passed,
+                "budget_exhausted": iterations >= 3 and not passed
+            },
+            "cumulative_calls_context": len(historical_summaries),
+            "iteration_1_failures": evaluation.get('iteration_failures', []) if iterations > 1 else [],
+            "components_weak": evaluation.get('components_weak', []),
+            "components_strong": evaluation.get('components_strong', []),
+            "required_changes_injected": evaluation.get('required_changes') if iterations > 1 else None,
+            "resolution": "Passed" if passed else f"Failed after {iterations} iterations",
+            "proposed_instruction": evaluation.get('proposed_instruction', '')
+        }
+
+        # Conditional save based on outcome
+        if outcome in ["observation", "candidate"]:
+            memory.save_learning(learning)
+        elif outcome in ["bug", "prompt_issue"]:
+            memory.save_issue(learning)
+
+        # Save rubric observation
+        rubric_obs = result.get('rubric_observation', {})
+        if rubric_obs:
+            memory.save_rubric_observation(rubric_obs, company_name)
+
+        return {
+            'deal_id': deal_id,
+            'company': company_name,
+            'status': 'analyzed',
+            'passed': passed,
+            'iterations': iterations,
+            'outcome': outcome,
+            'learning': learning if outcome in ["observation", "candidate", "bug", "prompt_issue"] else None
+        }
+
+    except Exception as e:
+        return {
+            'deal_id': deal_id,
+            'company': company_name,
+            'status': 'failed',
+            'error': str(e)
+        }
 
 
 def main():
@@ -302,8 +574,13 @@ def main():
                 'updated': datetime.now().isoformat()
             }
 
-    # Process each deal
+    # Process deals in parallel
     print(f"\n4. Processing deals...")
+
+    MAX_WORKERS = 3  # Conservative — respects Anthropic rate limits
+    estimated_minutes = (len(active_deals) / MAX_WORKERS) * 2.5  # ~2.5 min avg per deal
+    print(f"   Estimated runtime: {estimated_minutes:.0f} min ({MAX_WORKERS} workers × {len(active_deals)} deals)")
+
     learnings = []
     errors = []
     skipped = 0
@@ -314,285 +591,84 @@ def main():
     analyses_written = 0
     learnings_written = 0
 
-    for i, deal in enumerate(active_deals, 1):
-        # Check runtime limit before processing each deal
-        elapsed = time.time() - run_start
-        if elapsed > MAX_RUNTIME_SECONDS:
-            print(f'\n⏰ Runtime limit reached ({elapsed/60:.1f} min)')
-            print(f'   Processed {deals_processed} of {len(active_deals)} deals')
-            print(f'   Remaining deals will be processed tomorrow')
-            # Save token usage before exiting
-            print('   Saving token usage before exit...')
-            tracker.save()
-            break
+    results = []
 
-        deal_id = deal.get('deal_id')
-        deal_name = deal.get('deal_name', 'Unknown')
-        company_name = deal.get('company_name', '')
-        slug = deal.get('company_slug', '')
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        # Submit all deals for processing
+        futures = {
+            executor.submit(
+                process_single_deal,
+                deal, memory, tracker, hubspot, sb_writer, fireflies, apollo
+            ): deal
+            for deal in active_deals
+        }
 
-        print(f"\n[{i}/{len(active_deals)}] {deal_name}")
+        # Process results as they complete
+        for i, future in enumerate(as_completed(futures), 1):
+            deal = futures[future]
+            company_name = deal.get('company_name', 'Unknown')
+            deal_id = deal.get('deal_id')
 
-        try:
-            # Company info already in index - no API call needed
-            if not company_name:
-                print(f"   ⏭️  {deal_name}: skipped — no company name")
-                skipped += 1
-                continue
+            # Check runtime limit
+            elapsed = time.time() - run_start
+            if elapsed > MAX_RUNTIME_SECONDS:
+                print(f'\n⏰ Runtime limit reached ({elapsed/60:.1f} min)')
+                print(f'   Processed {i-1} of {len(active_deals)} deals')
+                print(f'   Cancelling remaining futures...')
+                # Cancel pending futures
+                for f in futures:
+                    if not f.done():
+                        f.cancel()
+                # Save token usage before exiting
+                print('   Saving token usage before exit...')
+                tracker.save()
+                break
 
-            if not slug:
-                print(f"   ⏭️  {company_name}: skipped — invalid company slug")
-                skipped += 1
-                continue
+            try:
+                result = future.result()
+                results.append(result)
 
-            # Build deal_context dict for agent
-            deal_context = {
-                'deal': {
-                    'properties': {
-                        'dealstage': deal.get('stage', 'Unknown'),
-                        'closedate': deal.get('close_date', 'Unknown'),
-                        'incremental_arr': deal.get('arr', '0'),
-                        'dealname': deal.get('deal_name', company_name),
-                    }
-                },
-                'company': {
-                    'properties': {
-                        'name': company_name,
-                    }
-                },
-                'contacts': []
-            }
+                status = result.get('status')
+                print(f"\n[{i}/{len(active_deals)}] {company_name}: {status}")
 
-            # Use last analysis date from deal index to skip
-            # deals with no new calls since last analysis
-            since_date_str = deal.get('last_analyzed')
-            since_date = None
-            if since_date_str:
-                try:
-                    since_date = datetime.fromisoformat(since_date_str)
-                except:
-                    since_date = None
+                if status == 'analyzed':
+                    print(f"   {'✓' if result['passed'] else '✗'} {'Passed' if result['passed'] else 'Failed'} after {result['iterations']} iteration(s)")
+                    deals_processed += 1
+                    analyses_written += 1
 
-            # Get calls from cache only (ETL handles freshness)
-            print(f"   Searching for calls: {company_name}")
-            fireflies_calls, apollo_calls, new_count = get_calls_for_company(
-                company_name, since_date, memory
-            )
+                    if result.get('learning'):
+                        learnings.append(result['learning'])
+                        learnings_written += 1
+                        print(f"   ✓ Learning/issue saved (outcome={result['outcome']})")
 
-            total_calls = len(fireflies_calls) + len(apollo_calls)
-            print(f"   Found {total_calls} calls ({len(fireflies_calls)} Fireflies, {len(apollo_calls)} Apollo)")
-
-            # Combine and sort by date so all_summaries[-1] is
-            # the most recent call regardless of source
-            all_calls_sorted = sorted(
-                fireflies_calls + apollo_calls,
-                key=lambda c: c.get('date', ''),
-            )
-
-            all_summaries = []
-            for call in all_calls_sorted:
-                if 'formatted_summary' in call and call['formatted_summary']:
-                    summary = call['formatted_summary']
-                elif 'summary' in call and call['summary']:
-                    summary = call['summary']
-                elif call.get('source') == 'fireflies':
-                    summary = fireflies.format_summary_for_meddicc(call) if fireflies else ''
-                else:
-                    summary = apollo.format_conversation_for_meddicc(call) if apollo else ''
-
-                if summary and summary.strip():
-                    all_summaries.append((call.get('date', ''), summary))
-
-            # Sort by date ascending, extract just summaries
-            all_summaries.sort(key=lambda x: x[0])
-            all_summaries = [s for _, s in all_summaries]
-
-            # GUARD 1: No calls found for company
-            if len(all_summaries) == 0:
-                if since_date:
-                    print(f"   ⏭️  {company_name}: skipped — no new calls since {since_date.strftime('%Y-%m-%d')}")
-                    skipped_no_new_calls += 1
-                else:
-                    print(f"   ⏭️  {company_name}: skipped — no calls found")
-                    skipped_no_calls += 1
-                skipped += 1
-                continue
-
-            # GUARD 4: Most recent call already analyzed
-            if since_date:
-                last_call_date = get_most_recent_call_date(fireflies_calls, apollo_calls)
-                if last_call_date and last_call_date <= since_date:
-                    print(f"   ⏭️  {company_name}: skipped — most recent call ({last_call_date.strftime('%Y-%m-%d')}) already analyzed")
-                    skipped_no_new_calls += 1
+                elif status == 'skipped':
+                    reason = result.get('reason', '')
+                    print(f"   ⏭️  Skipped: {reason}")
                     skipped += 1
-                    continue
 
-            # GUARD 2: Only one call exists (nothing to contextualize)
-            if len(all_summaries) == 1:
-                print(f"   ⚡ {company_name}: single call — skipping context builder, analyzing directly")
-                recent_call_summary = all_summaries[0]
-                historical_summaries = []
-                cumulative_state = {
+                    if 'no calls' in reason:
+                        skipped_no_calls += 1
+                    elif 'no new calls' in reason or 'already analyzed' in reason:
+                        skipped_no_new_calls += 1
+                    elif 'too short' in reason:
+                        skipped_short += 1
+
+                elif status == 'failed':
+                    error_msg = result.get('error', 'Unknown error')
+                    print(f"   ✗ Error: {error_msg}")
+                    errors.append({
+                        "deal_id": deal_id,
+                        "company": company_name,
+                        "error": error_msg
+                    })
+
+            except Exception as e:
+                print(f"\n[{i}/{len(active_deals)}] {company_name}: ✗ Future failed: {e}")
+                errors.append({
+                    "deal_id": deal_id,
                     "company": company_name,
-                    "calls_reviewed": 0,
-                    "meddicc_state": {
-                        k: {"status": "unknown", "evidence": "", "score": 0}
-                        for k in ["metrics", "economic_buyer", "decision_criteria",
-                                 "decision_process", "identified_pain", "champion", "competition"]
-                    },
-                    "key_context": "First call on record — no prior context."
-                }
-            else:
-                # Split: all except most recent = cumulative, last = recent
-                recent_call_summary = all_summaries[-1]
-                historical_summaries = all_summaries[:-1]
-
-                # Build cumulative MEDDICC state
-                print(f"   Building cumulative state from {len(historical_summaries)} historical calls...")
-                cumulative_state = build_cumulative_meddicc(historical_summaries, company_name, tracker)
-
-            # GUARD 3: Most recent call is below minimum signal threshold
-            if len(recent_call_summary.strip()) < 100:
-                print(f"   ⏭️  {company_name}: most recent call summary too short ({len(recent_call_summary)} chars) — skipping")
-                skipped_short += 1
-                skipped += 1
-                continue
-
-            # Run MEDDICC agent
-            print(f"   Running MEDDICC generator/evaluator loop...")
-            try:
-                result = run_agent(
-                    call_summary=recent_call_summary,
-                    cumulative_state=cumulative_state,
-                    deal_context=deal_context,
-                    tracker=tracker,
-                    company=company_name
-                )
-            except Exception as agent_error:
-                print(f"   ❌ run_agent FAILED: {type(agent_error).__name__}: {agent_error}")
-                import traceback
-                traceback.print_exc()
-                skipped += 1
-                continue
-
-            # Extract results
-            analysis = result['draft']
-            evaluation = result['evaluation']
-            iterations = result['iterations']
-            passed = result['passed']
-            outcome = result['outcome']
-            root_cause = result['root_cause']
-
-            print(f"   {'✓' if passed else '✗'} Analysis {'passed' if passed else 'failed'} after {iterations} iteration(s)")
-            print(f"   Reflection: outcome={outcome}, root_cause={root_cause}")
-
-            # Save analysis to file
-            print(f"   Saving analysis to file...")
-            output_dir = Path(__file__).parent.parent / "output"
-            output_dir.mkdir(exist_ok=True)
-
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            output_file = output_dir / f"meddicc_analysis_{deal_id}_{timestamp}.md"
-
-            with open(output_file, 'w') as f:
-                f.write(f"# MEDDICC Analysis: {company_name}\n\n")
-                f.write(f"**Deal ID:** {deal_id}\n")
-                f.write(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}\n")
-                f.write(f"**Calls Analyzed:** {total_calls}\n")
-                f.write(f"**Iterations:** {iterations}\n")
-                f.write(f"**Status:** {'✓ Passed' if passed else '✗ Failed'}\n\n")
-                f.write("---\n\n")
-                f.write(analysis)
-
-            print(f"   ✓ Saved to {output_file}")
-            analyses_written += 1
-
-            # Update last_analyzed timestamp in deal index
-            deal['last_analyzed'] = datetime.now().isoformat()
-
-            # Update HubSpot deal note
-            print(f"   Updating HubSpot deal note...")
-            try:
-                hubspot.upsert_meddicc_note(
-                    deal_id=deal_id,
-                    analysis_content=analysis,
-                    calls_count=total_calls
-                )
-                print(f"   ✓ HubSpot note updated")
-            except Exception as hub_error:
-                print(f"   ⚠️  HubSpot note failed (analysis saved to file): {hub_error}")
-
-            # Write analysis to Supabase
-            if sb_writer:
-                print(f"   Writing to Supabase...")
-                try:
-                    from hubspot_deals import HubSpotDealsClient
-                    hs = HubSpotDealsClient.__new__(HubSpotDealsClient)
-                    scores = hs._extract_scores_from_analysis(analysis)
-                    sb_writer.insert_analysis(
-                        deal_id=str(deal_id),
-                        company_name=company_name,
-                        result=result,
-                        scores=scores,
-                        output_file=str(output_file.name)
-                    )
-                    print(f"   ✓ Supabase analysis written")
-                except Exception as e:
-                    print(f"   ⚠️  Supabase analysis write failed: {e}")
-
-            # Build learning entry with reflection outcome
-            learning = {
-                "company": company_name,
-                "deal_id": deal_id,
-                "outcome": outcome,
-                "root_cause": root_cause,
-                "confidence": 0.8 if outcome == "candidate" else 0.5 if outcome == "observation" else 0.0,
-                "loop_performance": {
-                    "iterations_to_pass": iterations,
-                    "passed": passed,
-                    "budget_exhausted": iterations >= 3 and not passed
-                },
-                "cumulative_calls_context": len(historical_summaries),
-                "iteration_1_failures": evaluation.get('iteration_failures', []) if iterations > 1 else [],
-                "components_weak": evaluation.get('components_weak', []),
-                "components_strong": evaluation.get('components_strong', []),
-                "required_changes_injected": evaluation.get('required_changes') if iterations > 1 else None,
-                "resolution": "Passed" if passed else f"Failed after {iterations} iterations",
-                "proposed_instruction": evaluation.get('proposed_instruction', '')
-            }
-
-            # Conditional save based on outcome
-            if outcome in ["observation", "candidate"]:
-                learnings.append(learning)
-                memory.save_learning(learning)
-                learnings_written += 1
-                print(f"   ✓ Learning saved (outcome={outcome})")
-            elif outcome in ["bug", "prompt_issue"]:
-                memory.save_issue(learning)
-                learnings_written += 1
-                print(f"   ✓ Issue saved (outcome={outcome})")
-            else:
-                # no_learning - skip save entirely
-                print(f"   ✓ No learning generated (outcome={outcome})")
-
-            # Save rubric observation (runs regardless of outcome)
-            rubric_obs = result.get('rubric_observation', {})
-            if rubric_obs:
-                saved = memory.save_rubric_observation(
-                    rubric_obs, company_name)
-                if saved:
-                    print(f"   ✓ Rubric observation saved")
-
-            deals_processed += 1
-            print(f"   ✓ Complete")
-
-        except Exception as e:
-            print(f"   ✗ Error: {e}")
-            errors.append({
-                "deal_id": deal_id,
-                "deal_name": deal_name,
-                "error": str(e)
-            })
+                    "error": str(e)
+                })
 
     # Update counter
     print("\n5. Updating run counter...")
