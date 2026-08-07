@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_038",
+  "timestamp": "2026-08-07T04:38:03.273416",
+  "company": "KBX",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Add CLAUDE.md guidance: (1) When call summary fails, use template: 'No new information collected in this call \u2014 maintaining prior score of X/10. Prior evidence: [cite].' (2) For next steps, require pattern matching: if suggesting 'materials,' specify which materials and what behavior they should trigger; if 'address gaps,' name the gap explicitly and link to a concrete stakeholder question or deliverable."
+}

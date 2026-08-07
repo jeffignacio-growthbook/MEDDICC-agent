@@ -1,0 +1,21 @@
+{
+  "company": "Route",
+  "deal_id": "59245644951",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION: Decision Process score increased from 4/10 to 5/10 without documented justification. Analysis notes 'No specific timeline beyond contract renewal reference' yet maintains Partial status with higher score. Either regressed reasoning or score inflation. CRITERION 4 VIOLATION: Multiple components below 7/10 (Economic Buyer 1/10, Champion 1/10, Decision Process 5/10) have next steps that use vague language: 'Walk me through' and 'Can you help us understand' lack concrete specific questions. Example: 'Who internally is most excited about making this change?' is open-ended, not a specific actionable question like 'Is Sarah Chen or Mike Torres the owner of the business case?' CRITERION 3 VIOLATION: Metrics component claims 'strong specificity' but evidence shows only directional intent ('enhance conversion metrics', 'growth in experiment volume') without quantifiable targets. Score of 7/10 requires either specific prospect-stated numbers or explicit acknowledgment of gap; current evidence supports max 5/10. ICP CHECK: Route's profile (scale unknown, no revenue/user count provided, modern data stack signals present via BigQuery) lacks sufficient verification that they meet >100K user threshold or explicit scale signals. Should note ICP verification needed.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-07_008",
+  "timestamp": "2026-08-07T04:51:12.510391"
+}

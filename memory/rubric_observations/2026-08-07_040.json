@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_040",
+  "timestamp": "2026-08-07T04:41:38.189927",
+  "company": "Aircall",
+  "criterion_fired": "Criterion 3 (Competition), Criterion 4 (Champion - next steps specificity), Criterion 5 (Champion internal advocacy), Criterion 1 (Decision Criteria justification)",
+  "was_appropriate": false,
+  "suggested_change": "Redefine scoring thresholds with explicit evidence requirements: Competition 3/10 requires \u22651 named competitor mention; Champion 3/10 requires documented internal selling action (not negotiation alone); score revisions must cite specific new call data contradicting prior assessment. Add instruction: 'Only revise scores downward if new contradictory evidence surfaces; maintain prior score + note if no new information contradicts it.'"
+}

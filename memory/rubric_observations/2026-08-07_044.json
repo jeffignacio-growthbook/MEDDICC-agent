@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_044",
+  "timestamp": "2026-08-07T04:50:27.000101",
+  "company": "Stone",
+  "criterion_fired": "Criterion 2, 3, 4, 5",
+  "was_appropriate": false,
+  "suggested_change": "Criteria 2, 4, 5 are appropriate but CLAUDE.md lacks explicit rules for: (1) marking incomplete transcripts with 'no new information' statements per component, (2) enforcing specific actor-action format ('Ask [person] on next call:') vs vague verbs like 'Follow up', (3) validating date references against deal timeline. Criterion 3 should explicitly require ICP fit assessment based on company profile signals (user count, tech stack, product priorities)."
+}

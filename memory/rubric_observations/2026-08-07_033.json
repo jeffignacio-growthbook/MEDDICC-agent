@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_033",
+  "timestamp": "2026-08-07T04:30:41.039396",
+  "company": "Oda",
+  "criterion_fired": "Criterion 2, 3, and 4 collectively",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Replace exact-phrase matching ('No new information in this call \u2014 maintaining previous score of X/10') with outcome-focused language ('Score unchanged from prior call because [reason]'). Criterion 4: Replace 'concrete timing + contact + action verb' requirement with 'next step must specify: (a) who, (b) what question/objective, (c) dependency or constraint' without mandating call cadence format. Criterion 3: Add 'Explicit ICP fit statement required\u2014confirm fit OR flag concern with reason' as separate sub-criterion rather than embedded evaluation."
+}

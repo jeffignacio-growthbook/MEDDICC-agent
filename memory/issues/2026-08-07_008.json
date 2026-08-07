@@ -1,0 +1,21 @@
+{
+  "company": "shiftkey",
+  "deal_id": "60355159912",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 10,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Decision Process: Score decreased from 8/10 to 7/10 without documented contradiction. Cumulative state shows 'Regular Tuesday syncs established' at 8/10. Recent call documents shift to biweekly/monthly meetings. The analysis acknowledges this could signal 'confidence' OR 'reduced urgency' but treats it as ambiguous rather than a clear reason for regression. The score drop must either be justified with evidence that meeting frequency reduction contradicts prior confidence signals, OR the score must be maintained at 8/10 with explicit note that reduced meeting cadence reflects stable progress. CRITERION 4 VIOLATION - Champion component: Next step uses vague verb 'building the business case' without concrete action. Should be: 'Ask Chris Sanders by April 8th: \"Which specific stakeholders (names/titles) need to approve the GrowthBook contract, and can you share the exact objections or questions they've raised in the past week?\"' CRITERION 4 VIOLATION - Economic Buyer next step is acceptable but could be more specific by asking for a direct meeting with the EB rather than just an introduction. CRITERION 5 VIOLATION - Decision Process describes shift to monthly meetings but does not flag whether this contradicts the stated April 30th signature target. If urgency were high, would meeting frequency decrease? This unsupported claim (that reduced meetings = steady progress) needs evidence or explicit uncertainty. Maintain 8/10 OR reduce to 6/10 with clear reasoning.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-07_008",
+  "timestamp": "2026-08-07T04:52:36.432567"
+}

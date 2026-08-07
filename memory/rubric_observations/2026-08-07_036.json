@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_036",
+  "timestamp": "2026-08-07T04:34:23.102486",
+  "company": "BESTSELLER",
+  "criterion_fired": "CRITERION 2 (Decision Criteria scoring) and CRITERION 4 (Actionable next steps specificity)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should specify: 'Scores may only decrease if new call data explicitly contradicts or retracts prior criteria; absence of reinforcement = maintain prior score with carry-forward note.' Criterion 4 should require: 'All next steps must include [actual contact name/role from cumulative context] or explicit reason why name remains unknown; [TBD] only valid if zero calls have identified that contact.'"
+}

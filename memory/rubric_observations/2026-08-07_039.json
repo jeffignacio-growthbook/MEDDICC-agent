@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_039",
+  "timestamp": "2026-08-07T04:40:46.360200",
+  "company": "TickPick",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) vs Criterion 3 (Evidence quality)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify that carry-forward consistency applies only when evidence is re-interpreted identically; if re-analysis of existing call data reveals the prior score misclassified evidence quality, revision is permitted with explicit notation of 'Prior score based on [X], re-evaluated evidence shows [Y], revised to [Z].'"
+}
