@@ -780,9 +780,12 @@ def create_incremental_pr(memory: any, learnings: List[dict]) -> None:
         if learning.get('outcome') not in ['observation', 'candidate']:
             continue
 
-        instruction = learning.get('proposed_instruction', '').strip()
-        if not instruction:
+        # Defensive null check: proposed_instruction may be None
+        proposed = learning.get('proposed_instruction')
+        if not proposed or not proposed.strip():
             continue
+
+        instruction = proposed.strip()
 
         # Check if already in CLAUDE.md
         if instruction in current_claude_md:
