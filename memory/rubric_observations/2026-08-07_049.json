@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_049",
+  "timestamp": "2026-08-07T15:08:00.960068",
+  "company": "InPost",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency), Criterion 3 (Evidence quality for Competition), Criterion 4 (Actionable next steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 3 should clarify: 'Competition score must align with evidence status: Unknown (0-2/10) when no competitors mentioned; Partial (4-6/10) only when at least one alternative vendor is acknowledged or discussed by prospect; Full (7-10/10) when multiple vendors actively evaluated.' Criterion 4 should require: 'Next steps must include explicit timing (e.g., date, meeting type) and method (call/email/in-person) even when contact TBD; templates should show: \"During [meeting type] on [timeframe], ask [specific question]\" rather than standalone questions.'"
+}

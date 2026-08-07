@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_059",
+  "timestamp": "2026-08-07T15:21:27.381210",
+  "company": "Unity",
+  "criterion_fired": "Criterion 4 (actionable next steps specificity) and Criterion 5 (Champion internal selling behavior assessment + ICP scale framing)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 5 should specify: 'For unknown individuals, state role uncertainty rather than claiming absence of advocacy. For scale assessment, distinguish between company-level vs. team/department-level fit. Criterion 4 should require: next steps must be phrased as discovery questions the agent will ask, not seller actions or vague introductions.'"
+}

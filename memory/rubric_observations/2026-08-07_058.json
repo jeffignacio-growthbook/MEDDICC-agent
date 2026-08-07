@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_058",
+  "timestamp": "2026-08-07T15:20:04.989590",
+  "company": "Skyscanner",
+  "criterion_fired": "Criteria 2, 4, 5 (contradictory pass/fail)",
+  "was_appropriate": false,
+  "suggested_change": "Rubric must define whether criterion violations on lower-priority items (borderline next steps, framing nuance) constitute hard failures or soft flags. Current all-or-nothing approach creates impossible grading where 'structurally compliant' analysis still fails."
+}

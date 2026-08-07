@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_056",
+  "timestamp": "2026-08-07T15:17:40.970009",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 3 (Evidence quality)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should explicitly state: 'If recent call summary is unavailable or failed, analysis must flag this and NOT claim consistency without acknowledging the data gap.' Criterion 3 should add: 'If call summary failed to generate, analysis must state this explicitly and note which scores are carry-forward vs. based on failed data.'"
+}

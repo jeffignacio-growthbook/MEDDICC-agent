@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_061",
+  "timestamp": "2026-08-07T15:24:26.313639",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 3 (Evidence quality)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Accept 'maintained at X/10' or 'revised from X to Y/10' as valid carry-forward acknowledgment formats; explicit template language ('No new information') is not required if intent is clear. Criterion 3: Define 2/10 as 'incumbent identified with minor concern signals' rather than requiring prospect-originated dissatisfaction; indirect evidence of tool limitations is sufficient at this tier."
+}

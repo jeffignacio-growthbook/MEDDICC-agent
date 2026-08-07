@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_060",
+  "timestamp": "2026-08-07T15:24:19.227271",
+  "company": "Square",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 3 (Competition), Criterion 4 (Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 next steps should require: (a) at least one yes/no question, (b) at least one numerical target or timeline, (c) explicit 'verify vs. assume' language to block speculative claims without confirmation."
+}

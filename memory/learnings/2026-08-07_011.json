@@ -1,0 +1,21 @@
+{
+  "company": "Superhuman",
+  "deal_id": "61507488889",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 0,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 VIOLATION \u2014 Decision Criteria scored 3/10 with Partial status, but evidence provided is seller-stated (GrowthBook's offerings: 'warehouse-native architecture, AI-powered workflows, metric governance controls, sticky bucketing'). No buyer-confirmed criteria or pass/fail thresholds exist. Score should be 0/10 Unknown or evidence must include prospect-stated evaluation criteria. CRITERION 3 VIOLATION \u2014 Identified Pain scored 6/10 but lacks direct quotes from call. Evidence consists of paraphrases ('scalability gaps', 'inconsistent best practices') without speaker attribution or verbatim language from the call summary. To justify 6/10, need specific quotes showing urgency or business impact quantification. Current evidence is insufficient for score above 5/10. CRITERION 4 VIOLATION \u2014 Decision Criteria (3/10 Partial) next step uses vague language: 'Walk me through your formal evaluation criteria' is too open-ended. Needs specific actions like: 'Ask [contact name]: Which of these are must-haves vs. nice-to-haves: warehouse-native, metric governance, sticky bucketing? For each must-have, what is the specific go/no-go threshold?' CRITERION 4 VIOLATION \u2014 Decision Process (1/10 Unknown) next step should be more actionable. Current step 'Walk me through your decision-making process' is exploratory phrasing. Should be: '[contact TBD]: Confirm the approval chain for a $150K tool decision\u2014who are the 3-5 stakeholders and in what sequence do they need to sign off?' CRITERION 2 EXCEPTION ACKNOWLEDGED \u2014 Cumulative state shows calls_reviewed: 0, so carry-forward rules do not apply. All Unknown/low scores on first call are correct and expected.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-07_011",
+  "timestamp": "2026-08-07T15:27:52.900322"
+}

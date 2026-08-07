@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_051",
+  "timestamp": "2026-08-07T15:10:04.866715",
+  "company": "OpenTable",
+  "criterion_fired": "Criterion 2 (Carry-forward rules for Identified components)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'Do not downgrade an Identified component based on absence of evidence across historical calls. Only downgrade if the most recent call contains explicit contradictory behavior or statements. Generic lack of documentation is insufficient; document what changed in THIS call.'"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_055",
+  "timestamp": "2026-08-07T15:16:36.562785",
+  "company": "Aircall",
+  "criterion_fired": "Criterion 5 (No Unsupported Claims) + Criterion 3 (Evidence Quality)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify carry-forward rule: 'If a component score is maintained across calls due to lack of new evidence, explicitly state 'No new [component] discussion\u2014maintaining prior score of X/10' only when new call data exists. If no new call data exists, absence of notation is acceptable. Do not penalize low scores retroactively unless new evidence contradicts them.'"
+}
