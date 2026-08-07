@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_063",
+  "timestamp": "2026-08-07T15:28:05.883787",
+  "company": "Stone",
+  "criterion_fired": "Criterion 2 (carry-forward consistency), Criterion 3 (Decision Criteria evidence), Criterion 5 (Economic Buyer/ICP assessment)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Carry-forward rule applies only when NO new call data exists; if new call added, prior scores must be re-justified with cumulative evidence or explicitly downgraded with contradictory evidence cited. (2) Decision Criteria evidence requirement: accept prospect-articulated technical requirements from cumulative_calls_context as valid evidence without requiring redundant quotes per call. (3) Economic Buyer/ICP: define whether absence of named EB is a failure (Criterion 5) or if scale/infrastructure signals suffice for ICP validation."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_053",
+  "timestamp": "2026-08-07T15:13:53.332644",
+  "company": "KBX",
+  "criterion_fired": "Criterion 4 (Actionable Next Steps) and Criterion 5 (No Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4: Next steps must name a single, specific ask with confirmation gate; multi-part questions require explicit sequencing. Criterion 5: Flag disengagement risk (greeting-only call + 3-week close window) as deal health threat before scoring components\u2014do not rely on Overall Assessment to catch severity delta."
+}

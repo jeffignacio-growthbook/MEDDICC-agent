@@ -1,0 +1,21 @@
+{
+  "company": "Route",
+  "deal_id": "59245644951",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Decision Criteria score revised from 8/10 to 6/10 without documented reason in the analysis. The cumulative state shows score 8 with evidence of identified requirements. The new analysis must either: (A) maintain 8/10 with explicit note 'No new contradictory information - Decision Criteria remain identified at 8/10', OR (B) if downgrading to 6/10, provide clear justification for the regression (e.g., 'Recent call revealed missing formal scorecard and budget ceiling, downgrading confidence'). Currently the revision lacks transparent reasoning. CRITERION 2 VIOLATION - Decision Process score revised from 3/10 to 4/10. While revision is minor and justified by 'more detail on evaluation process', the analysis should explicitly state 'Based on recent call, upgrading from 3/10 to 4/10 due to clearer evidence of active team evaluation.' CRITERION 4 VIOLATION - Decision Criteria next step uses vague language: 'Specifically: What's your maximum budget for this tool?' should be reframed as a concrete action (e.g., 'Request written evaluation scorecard by [date] showing weighted criteria and budget ceiling'). CRITERION 4 VIOLATION - Decision Process next step is actionable but '[contact TBD]' pattern acceptable per rubric; however, the primary contact should be named if known from calls. Since no contact is named in cumulative state, this is acceptable. CRITERION 1 PASS - All 6 MEDDICC components present with status, score, and evidence. CRITERION 3 PASS - Evidence includes specific quotes and paraphrases from calls. Amplitude competitor appropriately mapped. Metrics are prospect-stated (democratize, reduce costs, volume). CRITERION 5 PASS - No unsupported claims. Champion correctly rated 1/10 with evidence of distributed 'team' language without named individual. Economic Buyer correctly unknown.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-07_011",
+  "timestamp": "2026-08-07T15:29:28.367272"
+}

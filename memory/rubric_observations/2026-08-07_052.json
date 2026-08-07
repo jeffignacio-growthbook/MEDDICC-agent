@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_052",
+  "timestamp": "2026-08-07T15:12:50.694828",
+  "company": "Notion",
+  "criterion_fired": "Criterion 2 (score carry-forward logic) and Criterion 4 (next steps specificity)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should explicitly state: 'Carry-forward is only appropriate when the prior call produced valid evidence. If a recent call is corrupted/unusable, flag this explicitly and either (a) reject the carry-forward with justification, or (b) note data gap and schedule a replacement call.' Criterion 4 should require: 'Each next step must include a concrete timeframe, named contact, and specific question or deliverable\u2014e.g., \"Schedule 30-min call with Graham by [date] to discuss [specific topic].\"'"
+}

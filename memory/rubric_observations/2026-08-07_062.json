@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_062",
+  "timestamp": "2026-08-07T15:27:52.900759",
+  "company": "Superhuman",
+  "criterion_fired": "Decision Criteria (Criterion 1) and Decision Process (Criterion 4)",
+  "was_appropriate": true,
+  "suggested_change": "CLAUDE.md should include template: 'Next steps for Decision Criteria must ask: [contact name], rank these {feature list} as must-have vs. nice-to-have, then for each must-have specify the quantified go/no-go threshold.' Similarly for Decision Process: 'Next steps must identify and confirm the approval chain by name, title, and sequence.'"
+}

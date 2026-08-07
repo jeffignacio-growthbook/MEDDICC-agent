@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_057",
+  "timestamp": "2026-08-07T15:18:14.715743",
+  "company": "Zoro",
+  "criterion_fired": "CRITERION 2 (Carry-forward consistency) and CRITERION 4 (Next steps specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 should clarify: 'Scores at Identified or Partial remain unchanged unless recent call data explicitly contradicts the component. Absence of re-validation in a single call does not constitute contradiction. Carry forward with confidence level note (e.g., Last validated: Call 1) and flag re-validation gaps for follow-up.' Criterion 4 should require: 'Next steps must include: (a) assigned owner, (b) specific date or deadline, (c) concrete deliverable or question, not placeholder verbs like confirm/walk-through.'"
+}

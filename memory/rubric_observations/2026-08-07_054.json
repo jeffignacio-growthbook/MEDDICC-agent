@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_054",
+  "timestamp": "2026-08-07T15:15:18.720866",
+  "company": "TickPick",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 4 (Next steps specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Add instruction: 'If recent call summary is unintelligible or contains only greeting fragments with no substantive content, explicitly flag the call as corrupted before apply carry-forward logic. Do not claim carry-forward validity without confirming call data quality.'"
+}

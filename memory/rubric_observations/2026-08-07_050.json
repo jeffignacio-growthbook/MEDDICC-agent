@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_050",
+  "timestamp": "2026-08-07T15:09:46.136412",
+  "company": "BESTSELLER",
+  "criterion_fired": "Criteria 2, 3, 4, 5",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 3: clarify score thresholds\u2014does 7/10 require direct quote or is paraphrase acceptable with reasoning? Criterion 5: define 'confirmed pilot' vs. 'pilot in planning' with explicit evidence markers. Criterion 4: specify whether vague next steps violate the criterion or if placeholder exception covers all specificity gaps. Criterion 2: document whether carry-forward consistency applies when call count updates mid-analysis or if prior state supersedes updated context."
+}
