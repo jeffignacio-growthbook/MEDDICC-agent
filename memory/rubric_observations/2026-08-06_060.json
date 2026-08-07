@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_060",
+  "timestamp": "2026-08-06T21:36:48.725066",
+  "company": "Zoro",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: 'Criterion 2 applies only when cumulative_calls_context > 1. When cumulative_calls_context \u2264 1, score independently on call data present and note \"first call\" or \"limited prior context\" in evidence. No carry-forward penalty applies in this case.'"
+}

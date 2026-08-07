@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_058",
+  "timestamp": "2026-08-06T21:32:58.538626",
+  "company": "KBX",
+  "criterion_fired": "Criterion 2 (Champion regression without evidence) and Criterion 3 (status/score contradiction)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Score changes require new evidence from current call data, not inference from failed connections; (2) 'Partial' status requires documented champion actions (introductions, internal advocacy, business case building), not passive participation; (3) Define when 'Unknown' status applies vs. 'Partial' with low scores"
+}

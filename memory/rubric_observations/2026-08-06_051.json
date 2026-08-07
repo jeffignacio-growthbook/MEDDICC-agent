@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_051",
+  "timestamp": "2026-08-06T21:26:27.545549",
+  "company": "InPost",
+  "criterion_fired": "Criterion 1 (ICP Fit Validation scoring) and Criterion 4 (Next Steps actionability)",
+  "was_appropriate": true,
+  "suggested_change": "For Criterion 4, explicitly define 'vague verb' as any form of 'ask', 'request', 'confirm', or 'discuss' without a preceding concrete action phrase (e.g., 'Send email to [role] requesting X, then ask: [specific question]'). For Criterion 1, clarify whether ICP is a MEDDICC component requiring 0-10 score or a supporting assessment excluded from main evaluation."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_068",
+  "timestamp": "2026-08-06T21:47:00.802714",
+  "company": "Hublo",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 3 (Metrics & Champion), Criterion 4 (Next Steps & Contact Specification)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Unknown/0/10 is required when zero evidence exists; scoring 1+ requires explicit baseline data. (2) Next steps must be direct, assigned questions, not conditional exploratory phrases. (3) On first calls with identified contact, next steps default to that contact unless explicitly TBD."
+}

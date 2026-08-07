@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_052",
+  "timestamp": "2026-08-06T21:26:51.324870",
+  "company": "Pronto",
+  "criterion_fired": "Criterion 3: Economic Buyer scoring and inference validation",
+  "was_appropriate": true,
+  "suggested_change": "Clarify in CLAUDE.md that Economic Buyer identification requires explicit budget authority confirmation (named person with approval power), not inferred alignment from budget range discussion alone. Budget estimates \u2260 EB identification."
+}

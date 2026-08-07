@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_064",
+  "timestamp": "2026-08-06T21:42:04.227934",
+  "company": "Square",
+  "criterion_fired": "Criterion 1 (Metrics/Decision Process scoring), Criterion 4 (next-step actionability), Criterion 5 (Champion evidence threshold)",
+  "was_appropriate": false,
+  "suggested_change": "Establish explicit first-call scoring baseline: scores above 1-2/10 require direct evidence; define 'actionable next step' as prospect-facing action with named contact + specific timing/question; clarify Champion criterion to require explicit internal advocacy language (e.g., 'looped in', 'pitched to', 'championing') rather than infer from problem emphasis."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_063",
+  "timestamp": "2026-08-06T21:41:52.284872",
+  "company": "Square",
+  "criterion_fired": "Criterion 1 (Complete Coverage), Criterion 3 (Champion Scoring), Criterion 4 (Actionable Next Steps), Criterion 5 (No Unsupported Claims)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 3: Define 'Champion' score floor explicitly\u2014does 2/10 require observed internal advocacy, or is pain awareness + seniority sufficient for 'Partial'? Criterion 4: Provide word-list of acceptable action verbs vs. vague verbs (currently 'Ask/Confirm' vs. 'Quantify/Map' is interpretive). Criterion 5: Define inference boundary\u2014is 'company-wide initiative implies sponsorship' inference vs. 'stated X, therefore Y' inference allowed? Clarify what counts as 'grounded evidence' vs. analyst interpretation."
+}

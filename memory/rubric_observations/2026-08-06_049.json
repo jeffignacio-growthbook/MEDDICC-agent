@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_049",
+  "timestamp": "2026-08-06T21:23:56.555874",
+  "company": "BESTSELLER",
+  "criterion_fired": "Criterion 2 (carry-forward consistency), Criterion 4 (specificity), Criterion 5 (evidence-based scoring)",
+  "was_appropriate": true,
+  "suggested_change": "Criteria are appropriate. The instruction gap is in CLAUDE.md: add explicit requirement to validate cumulative_calls_context cardinality before analysis, and add rule 'score only on direct evidence from transcript, never on inference or context implication'."
+}

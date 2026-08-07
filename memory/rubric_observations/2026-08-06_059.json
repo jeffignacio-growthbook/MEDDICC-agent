@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_059",
+  "timestamp": "2026-08-06T21:36:43.605727",
+  "company": "Taskrabbit",
+  "criterion_fired": "Champion component scoring consistency",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: 'Champion scores carry forward from cumulative state unless new call evidence explicitly contradicts prior findings. Neutral calls (no new champion behaviors, no contradictions) maintain prior score with notation. Only downgrades require documented contradictory evidence.'"
+}

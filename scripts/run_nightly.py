@@ -670,32 +670,38 @@ def main():
                     "error": str(e)
                 })
 
-    # Update counter
-    print("\n5. Updating run counter...")
-    counter = memory.update_counter(is_full_rewrite=is_full_rewrite)
+    # Wrap remaining steps in try/finally to ensure token tracking always saves
+    try:
+        # Update counter
+        print("\n5. Updating run counter...")
+        counter = memory.update_counter(is_full_rewrite=is_full_rewrite)
 
-    # Generate PR
-    print("\n6. Creating GitHub PR...")
+        # Generate PR
+        print("\n6. Creating GitHub PR...")
 
-    if is_full_rewrite:
-        create_full_rewrite_pr(memory, learnings)
-    else:
-        create_incremental_pr(memory, learnings)
+        if is_full_rewrite:
+            create_full_rewrite_pr(memory, learnings)
+        else:
+            create_incremental_pr(memory, learnings)
 
-    # Print guard summary
-    print(f"\n=== RUN SUMMARY ===")
-    print(f"  Deals evaluated:    {deals_processed}")
-    print(f"  Skipped (no calls): {skipped_no_calls}")
-    print(f"  Skipped (no new):   {skipped_no_new_calls}")
-    print(f"  Skipped (too short):{skipped_short}")
-    print(f"  Analyses written:   {analyses_written}")
-    print(f"  Learning entries:   {learnings_written}")
+        # Print guard summary
+        print(f"\n=== RUN SUMMARY ===")
+        print(f"  Deals evaluated:    {deals_processed}")
+        print(f"  Skipped (no calls): {skipped_no_calls}")
+        print(f"  Skipped (no new):   {skipped_no_new_calls}")
+        print(f"  Skipped (too short):{skipped_short}")
+        print(f"  Analyses written:   {analyses_written}")
+        print(f"  Learning entries:   {learnings_written}")
 
-    # Save and print token usage
-    print("\n7. Saving token usage...")
-    usage_summary = tracker.save()
-    tracker.print_summary(usage_summary,
-                          deals_processed=len(learnings))
+    finally:
+        # CRITICAL: Always save token usage, even if PR creation fails
+        print("\n7. Saving token usage...")
+        try:
+            usage_summary = tracker.save()
+            tracker.print_summary(usage_summary,
+                                  deals_processed=len(learnings))
+        except Exception as e:
+            print(f"   ⚠️  Token tracker save failed: {e}")
 
     # Print summary
     print("\n" + "=" * 80)

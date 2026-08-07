@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_048",
+  "timestamp": "2026-08-06T21:23:11.448937",
+  "company": "Oda",
+  "criterion_fired": "CRITERION 2 (Carry-forward consistency), CRITERION 3 (Evidence quality), CRITERION 4 (Actionable next steps)",
+  "was_appropriate": false,
+  "suggested_change": "Define explicit rules: (1) Score changes require documented new evidence or rationale in analysis; (2) Competition/Champion/Pain statuses must match evidence presence\u2014if detailed next steps exist, status cannot be 'Unknown'; (3) Clarify whether scoring unknown/unresolved components (e.g., Competition = 2/10 with ambiguous GrowthBook context) should default to 1 or require explicit evaluation evidence."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_069",
+  "timestamp": "2026-08-06T21:48:49.967424",
+  "company": "shiftkey",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 5 (Unsupported Claims)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: 'Score regression requires explicit contradictory evidence from the call (e.g., stated date changes, abandoned milestones). Behavioral changes (meeting frequency reduction) without explicit timeline contradiction should be flagged as uncertainty in next steps, not score regression. If timeline dates are not explicitly refuted in the call, maintain prior score and note the ambiguity as a follow-up question.'"
+}

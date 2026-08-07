@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_057",
+  "timestamp": "2026-08-06T21:32:09.062346",
+  "company": "Notion",
+  "criterion_fired": "CRITERION 1, 2, 4, 5 (multiple simultaneous)",
+  "was_appropriate": false,
+  "suggested_change": "Rubric should distinguish between: (A) legitimate score regression with documented call evidence vs. (B) unexplained regression; (C) establish clear carry-forward rules\u2014either scores must persist unless contradicted by new data, or analysis may reset with explicit justification. CRITERION 4 should accept 'by next call' if call cadence is documented, or define required specificity thresholds upfront. CRITERION 5 should not contradict explicit cumulative state without citing specific new call content."
+}

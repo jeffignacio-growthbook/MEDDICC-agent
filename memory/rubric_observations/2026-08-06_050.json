@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_050",
+  "timestamp": "2026-08-06T21:24:15.658685",
+  "company": "Fixter",
+  "criterion_fired": "Criteria 1, 3, 4, 5",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Clarify that score maintenance requires explicit statement 'X/10 unchanged; current call added [specific evidence or: zero new evidence]'. Criterion 3: Define competitor narrowly\u2014only evaluate against stated list; mention of conflicting tools \u2260 competitive evaluation. Criterion 4: Define 'specific' with examples (quantified metrics required). Criterion 5: Rewrite ICP logic from 'ANY present = PASS' to 'PASS if 2+ of [traffic volume confirmed AND buyer role identified AND data stack mentioned AND PLG signal]. CONCERN if 1 or 0 present; ARR <$50K + unconfirmed signals = escalate for qualification.'"
+}
