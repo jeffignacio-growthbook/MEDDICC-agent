@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_012",
+  "timestamp": "2026-08-07T01:18:14.650611",
+  "company": "On3",
+  "criterion_fired": "Metrics, Identified Pain, Champion, Decision Process, ICP Fit",
+  "was_appropriate": false,
+  "suggested_change": "Metrics: Accept prospect-stated desires as valid baseline when no hard numbers exist; score based on whether seller identified and acknowledged them, not on whether prospect volunteered quantified baselines. Identified Pain: A 5/10 should require either direct quote OR clear paraphrase with impact language; vague acknowledgment = 2/10, not automatic failure. Champion: Scoring should distinguish between 'contact name unknown' (acceptable in early call, plan to obtain) vs. 'no attempt to identify decision-maker' (failure). Decision Process: Accept 'Q4' as valid timeline if prospect stated it; only penalize if seller never asked. ICP Fit: Only flag as failure if seller had data points available but failed to validate; don't penalize for missing data prospect didn't volunteer. Recalibrate rubric to reflect discovery-stage realism."
+}

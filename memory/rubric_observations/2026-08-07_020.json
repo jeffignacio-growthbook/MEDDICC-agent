@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_020",
+  "timestamp": "2026-08-07T01:45:56.314154",
+  "company": "Skyscanner",
+  "criterion_fired": "CRITERION 2, CRITERION 4, CRITERION 5",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Accept score maintenance when cumulative state unavailable or transcript corrupted; remove requirement for contradictory evidence. Criterion 4: Accept 'Ask directly' phrasing when call timing confirmed in prior records; only require 'schedule within X days' when no timing exists at all. Criterion 5: Define single standard\u2014either claims must cite confirmed deadline OR aspirational, not both simultaneously."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_032",
+  "timestamp": "2026-08-07T02:22:39.115720",
+  "company": "Hublo",
+  "criterion_fired": "Criterion 4 (Next Steps specificity) and Criterion 5 (ICP resolution before scoring)",
+  "was_appropriate": true,
+  "suggested_change": "Add instruction: 'If ICP risks are identified, halt component scoring until Economic Buyer/Decision Process are mapped. Next steps must include a specific hypothesis or known gap (e.g., \"ask X about Y weakness\"), never open-ended questions like \"What would drive outcome X.\"'"
+}

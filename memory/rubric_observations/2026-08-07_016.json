@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_016",
+  "timestamp": "2026-08-07T01:33:45.613060",
+  "company": "Aircall",
+  "criterion_fired": "Criterion 2, 3, 4, 5",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit rules: (2) new evidence must logically update prior scores or justify why it doesn't; (3) distinguish prospect-stated vs. seller-interpreted; (4) metric discovery questions must be closed-ended with concrete anchors; (5) stage gates require ICP validation completion before advancement."
+}

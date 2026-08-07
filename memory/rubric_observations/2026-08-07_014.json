@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_014",
+  "timestamp": "2026-08-07T01:25:20.130430",
+  "company": "TickPick",
+  "criterion_fired": "Criterion 2 (Carry-Forward Consistency) vs Criterion 3 (Champion Assessment) & Criterion 1 (Decision Criteria)",
+  "was_appropriate": false,
+  "suggested_change": "Add explicit rule: 'Score revisions require either (a) new contradictory evidence from current call, or (b) explicit statement \"No new data\u2014maintaining prior score.\" Absence of evidence \u2260 evidence of absence. Scores regress only on affirmative new information, not silence.'"
+}

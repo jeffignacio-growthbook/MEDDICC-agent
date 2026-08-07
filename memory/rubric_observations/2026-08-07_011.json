@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_011",
+  "timestamp": "2026-08-07T01:14:25.150597",
+  "company": "Notion",
+  "criterion_fired": "CRITERION 1 (Complete coverage) and CRITERION 4 (Actionable next steps)",
+  "was_appropriate": true,
+  "suggested_change": "Add prerequisite rule: 'Do not assign MEDDICC dimension scores > 1/10 if required context fields (primary contact name/title, economic buyer name, decision gate owners) are missing from cumulative state. Flag as Unknown/1/10 and block next steps until data is captured in a dedicated prospecting call.'"
+}

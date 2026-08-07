@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_025",
+  "timestamp": "2026-08-07T01:59:58.192141",
+  "company": "Ryanair",
+  "criterion_fired": "CRITERION 1 (Metrics) and CRITERION 3 (ICP Fit)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'If a metric was scored above 5/10 in prior analysis, that score is void unless the current call provides independent supporting evidence. Explicit statements like \"No quantifiable outcomes discussed in current call\" reset the score to \u22645/10 unless new data emerges.'"
+}

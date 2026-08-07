@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_004",
+  "timestamp": "2026-08-07T00:52:32.482520",
+  "company": "InPost",
+  "criterion_fired": "ICP Fit Assessment, Champion Identification, Competition Evidence",
+  "was_appropriate": false,
+  "suggested_change": "ICP Fit: Change 'AND' logic to 'OR' (prospect qualifies if ANY of: 100K+ visitors, modern data stack confirmed, Product-Led motion, or Experimentation Leader role exists). Champion: Define threshold explicitly\u2014e.g., 'Partial (3/10) = expressed interest + stakeholder engagement without internal advocacy; Full (7/10) = active internal selling.' Competition: Clarify whether Firebase status-quo counts as competitive evidence or requires comparison to named competitors; align scoring with available call data."
+}

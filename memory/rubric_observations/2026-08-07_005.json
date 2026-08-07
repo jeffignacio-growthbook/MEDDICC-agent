@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_005",
+  "timestamp": "2026-08-07T00:55:52.132777",
+  "company": "Pronto",
+  "criterion_fired": "Criterion 1 & Criterion 4",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 1: Require explicit statement 'Baseline: [prospect-stated value] OR Baseline: Not provided by prospect' for any score \u22653. Criterion 4: Reword to 'Next steps must name a specific contact by role/name AND state the exact question to ask; discovery tasks (e.g., identify, review, gather) are internal work, not next steps.'"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_021",
+  "timestamp": "2026-08-07T01:48:53.918693",
+  "company": "Unity",
+  "criterion_fired": "CRITERION 1 - Incomplete Evidence for Scored Components",
+  "was_appropriate": true,
+  "suggested_change": "Scores above 5/10 require direct quotes or detailed paraphrases with call date and speaker name; claims about prior calls must include specific evidence or revert score to unvalidated range (\u22645/10)."
+}

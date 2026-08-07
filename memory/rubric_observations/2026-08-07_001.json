@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_001",
+  "timestamp": "2026-08-07T00:41:21.391530",
+  "company": "Oda",
+  "criterion_fired": "CRITERION 2 (Decision Process regression logic) and CRITERION 5 (target timeline confirmation)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (A) If recent call provides no NEW contradictory evidence, maintain prior score with notation 'No change from prior assessment'; (B) If recent call DOES provide contradictory evidence, explicitly state what changed and why prior score is now invalid; (C) Remove requirement to justify regression ONLY via documented reason\u2014allow 'insufficient evidence in this call' as valid basis for lower score if call data is genuinely thinner than prior calls."
+}

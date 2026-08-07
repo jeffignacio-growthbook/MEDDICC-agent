@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_015",
+  "timestamp": "2026-08-07T01:27:38.750103",
+  "company": "MedCof",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 3 (Champion), Criterion 4 (Next Steps specificity), Criterion 5 (Champion advocacy + ICP)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 3 should clarify: 'Champion: Score \u22657/10 requires *direct quote or detailed paraphrase* demonstrating internal selling behavior (e.g., building business case, advocating to peers/leadership), not engagement signals (attending demos, exploring product). Criterion 1 should require quantified prospect metrics with attribution (direct quote vs. paraphrase). Criterion 5 should add: 'ICP validation must include prospect-stated or observable signals matching target profile (e.g., >100K monthly visitors, modern data stack); engagement alone does not confirm ICP fit.'"
+}

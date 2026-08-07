@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_028",
+  "timestamp": "2026-08-07T02:07:37.286662",
+  "company": "UPS",
+  "criterion_fired": "Criterion 1, 2, 3, 4, 5 (multiple)",
+  "was_appropriate": false,
+  "suggested_change": "Separate 'evidence quality' penalties from 'call advancement' penalties. Remove ICP validation as a first-call failure criterion. Replace 'seller-generated analysis' penalty with 'prospect articulation required' only for later-stage deals. Clarify baseline carry-forward rule: either require explicit documentation OR accept score variance on first call. Remove timeline 'realism speculation' requirement; accept stated timelines unless contradicted by prospect language."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_006",
+  "timestamp": "2026-08-07T00:59:39.757631",
+  "company": "BESTSELLER",
+  "criterion_fired": "CRITERION 4 - Actionable next steps",
+  "was_appropriate": false,
+  "suggested_change": "When primary contact is unknown, accept 'Return to sales to identify [role] contact' as valid next step; require executable actions only for roles/information already present in call data. Separate 'data gaps' from 'poor specificity' as two distinct failure modes."
+}

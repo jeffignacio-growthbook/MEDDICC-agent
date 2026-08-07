@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_027",
+  "timestamp": "2026-08-07T02:04:52.524307",
+  "company": "Decathlon",
+  "criterion_fired": "CRITERION 1, CRITERION 4, CRITERION 5",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 1: 'Metrics score requires direct quote or detailed paraphrase of stated baseline/target; inference alone scores 1/10 max.' Criterion 5: 'Champion status requires evidence of active internal selling or business case building; absence of such behavior = Unknown/1 regardless of engagement level.' Criterion 4: 'Next steps must be phrased as concrete customer conversations (e.g., \"Ask X: Y?\") not internal task instructions.'"
+}

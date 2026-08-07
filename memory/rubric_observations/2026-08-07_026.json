@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_026",
+  "timestamp": "2026-08-07T02:02:14.116558",
+  "company": "Square",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 3 (Competition), Criterion 4 (Decision Criteria), Criterion 5 (Deal Health Assessment), ICP Check",
+  "was_appropriate": true,
+  "suggested_change": "Add CLAUDE.md section on: (1) mandatory explicit null statements for missing data (e.g., 'No metrics identified...'), (2) minimum evidence requirements per score level (score >5 requires direct quote or specific paraphrase), (3) cross-component consistency validation (summary claims must align with component scores), (4) prohibited vague language list with specific replacements ('quantify' \u2192 ask user count/frequency, 'explore' \u2192 ask specific technical requirements with examples), (5) ICP validation checklist requiring explicit confirmation of each criterion before marking pass."
+}

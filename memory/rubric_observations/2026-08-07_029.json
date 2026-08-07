@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_029",
+  "timestamp": "2026-08-07T02:11:27.906896",
+  "company": "Superhuman",
+  "criterion_fired": "Criterion 1 (Incomplete Evidence), Criterion 2 (Carry-forward Logic), Criterion 3 (Evidence Quality), Criterion 4 (Next Steps Specificity), Criterion 5 (Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Rubric criteria are appropriate. CLAUDE.md should add: (1) explicit template for carry-forward cumulative state with baseline reset language; (2) clear distinction between direct quotes, paraphrases, and inferences with evidence-type labeling; (3) next-step format requiring [Contact Name] [Action] [Concrete Question] with validation that contact names are known before use; (4) warning against mixing external knowledge (ICP definitions, product features) with call evidence; (5) scoring locks\u2014e.g., any score >1 without direct quote is invalid."
+}
