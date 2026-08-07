@@ -9,6 +9,7 @@ organization:
   name: "GrowthBook"
   crm: "HubSpot"
   sales_methodology: "MEDDICC"  # Options: MEDDICC, MEDDPICC, MEDDIC
+  timezone: "America/Los_Angeles"  # Used for meddicc_last_analyzed date field
   internal_domains:
     - "growthbook.io"
 

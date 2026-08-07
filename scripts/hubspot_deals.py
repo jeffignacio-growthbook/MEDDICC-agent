@@ -6,8 +6,21 @@ Manages active deals and deal notes for MEDDICC analysis.
 import os
 import sys
 import requests
+import yaml
+import pytz
 from typing import List, Dict, Optional
 from datetime import datetime
+from pathlib import Path
+
+
+def get_client_timezone() -> str:
+    """Get client timezone from config/client.yaml, default to UTC."""
+    try:
+        config_path = Path(__file__).parent.parent / 'config/client.yaml'
+        config = yaml.safe_load(open(config_path))
+        return config.get('organization', {}).get('timezone', 'UTC')
+    except:
+        return 'UTC'
 
 
 class HubSpotDealsClient:
@@ -352,7 +365,9 @@ class HubSpotDealsClient:
         - meddicc_economic_buyer_score (0-10)
         - meddicc_analysis_summary (2-sentence summary)
         """
-        today = datetime.now().strftime('%Y-%m-%d')
+        # Get client timezone and convert to local date
+        tz = pytz.timezone(get_client_timezone())
+        today = datetime.now(pytz.utc).astimezone(tz).strftime('%Y-%m-%d')
 
         # Extract structured scores from analysis
         scores = self._extract_scores_from_analysis(analysis_content)
