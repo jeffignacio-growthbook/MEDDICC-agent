@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_067",
+  "timestamp": "2026-08-06T21:46:42.596137",
+  "company": "Route",
+  "criterion_fired": "Criterion 2 (carry-forward consistency), Criterion 1 (contact identification), Criterion 4 (next-step specificity)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify Criterion 2 exception: 'Carry-forward rules apply only when cumulative_calls_context > 1. When = 1, scores reflect current state only; adjust only if new evidence contradicts prior call.' Criterion 1: explicitly require '[contact TBD]: [action]' format in next steps when no contacts identified. Criterion 4: define 'specificity' with template: '[contact/role]: [verb + object] by [deadline] to [success criterion].'"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_065",
+  "timestamp": "2026-08-06T21:42:20.688786",
+  "company": "Ryanair",
+  "criterion_fired": "CRITERION 2 (Carry-forward Consistency) and CRITERION 3 (Decision Process)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: 'Score carries forward if no NEW contradictory information is presented in the recent call. Absence of metric discussion \u2260 regression. Only reduce score if recent call explicitly contradicts or materially weakens prior evidence.' Separately: 'Timeline revisions require explicit new date information; less specific language alone does not justify score reduction.'"
+}

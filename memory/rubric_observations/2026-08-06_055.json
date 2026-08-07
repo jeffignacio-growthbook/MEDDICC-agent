@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_055",
+  "timestamp": "2026-08-06T21:29:33.937966",
+  "company": "OpenTable",
+  "criterion_fired": "Criterion 2, 3, 4 (Carry-forward consistency, Evidence quality, Metrics/Competition next steps)",
+  "was_appropriate": false,
+  "suggested_change": "Separate 'score regression requires justification' from 'next steps require timing specificity.' Current rubric conflates them. Also clarify: does 'next steps' timing live in the analysis (call-specific) or the system prompt (all-future actions)? Criterion 3 should acknowledge seller-flagged friction as valid input to pain assessment, not dismiss it as non-prospect pain."
+}

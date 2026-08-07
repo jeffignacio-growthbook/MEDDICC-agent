@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_054",
+  "timestamp": "2026-08-06T21:29:10.489506",
+  "company": "ECCO",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 4 (Next Steps), Criterion 5 (ICP Fit)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 5 should explicitly require: 'ICP fit claims must cite direct prospect statements or call data; inferences from product tier or feature interest alone are insufficient. Flag unsupported claims.' Criterion 4 should require: 'All next steps must name a contact (or state 'TBD') and include a specific question to ask, not generic discovery tasks.' Criterion 1 should clarify: 'Metric scores of 0 are acceptable only if accompanied by explicit statement 'No evidence of quantifiable outcomes in call.' Scores >0 require specific metric discussion or outcome mention.'"
+}

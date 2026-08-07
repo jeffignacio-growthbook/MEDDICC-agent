@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_062",
+  "timestamp": "2026-08-06T21:39:08.621169",
+  "company": "Skyscanner",
+  "criterion_fired": "Criterion 2 (carry-forward consistency) and Criterion 3 (recent call evidence)",
+  "was_appropriate": false,
+  "suggested_change": "When recent call data is corrupted/unusable, explicitly permit score maintenance with notation 'Score maintained from prior calls; recent call insufficient for re-evaluation' rather than requiring justification from the corrupted data itself. Separate the 'document what changed' requirement from the 'justify all maintained scores from this call' requirement."
+}

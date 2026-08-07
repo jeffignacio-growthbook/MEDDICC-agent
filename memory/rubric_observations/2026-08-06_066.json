@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_066",
+  "timestamp": "2026-08-06T21:46:00.327095",
+  "company": "Stone",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 needs explicit carry-forward rule: 'If no new data exists for a component, score must equal prior cumulative score with notation \"no new information.\" If score changes, analysis must cite which prior call's interpretation was incorrect.' Criterion 4 should remove date placeholder expectations: 'Next steps must specify concrete action OR actual date (not placeholder brackets); vague action words like \"document\" must include deliverable detail.'"
+}

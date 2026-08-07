@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_056",
+  "timestamp": "2026-08-06T21:29:47.221056",
+  "company": "Deel",
+  "criterion_fired": "CRITERION 1, 2, 3, 4 (all)",
+  "was_appropriate": false,
+  "suggested_change": "Restructure criteria to distinguish between: (A) score maintenance rules (when to preserve vs. revise), (B) evidence burden (what constitutes sufficient contradiction), and (C) next-steps format. Current rubric conflates analyst error with criterion violation and does not specify: how many calls establish a baseline score, whether social-only calls can justify downgrades, and whether absence of evidence equals evidence of absence for Champion/internal selling."
+}

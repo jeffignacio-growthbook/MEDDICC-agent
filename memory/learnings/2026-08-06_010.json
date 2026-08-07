@@ -1,0 +1,21 @@
+{
+  "company": "Unity",
+  "deal_id": "49689180024",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Incomplete evidence for high scores: Decision Criteria (8/10) and Identified Pain (8/10) both lack direct quotes or detailed paraphrases. Evidence states 'Clear technical requirements outlined' and 'Multiple specific challenges identified' but provides only bullet-point lists with no call-sourced quotes or paraphrases. For scores above 5/10, direct evidence from calls is required. CRITERION 2 FAILURE - Carry-forward applied incorrectly to corrupted call: Analysis states 'no new information in this call (call transcript incomplete/corrupted)' repeatedly, then maintains all cumulative scores without acknowledging this is single-call context equivalent. Per exception in Criterion 2, when call data is corrupted/incomplete, analysis should either flag the data quality issue or revert to 'Unknown' for all components, not blindly carry forward. CRITERION 4 FAILURE - Vague action verbs: 'Quantify urgency' (no specific action verb), 'Uncover competitive landscape' (explore-adjacent), 'Probe current state' (explore-adjacent). Examples should be: 'Ask Jake Heier on [date]: [specific question]' with concrete verb. CRITERION 5 FAILURE - Unsupported claim on ICP: No evidence provided that Unity meets GrowthBook ICP. No mention of company size, data stack, experimentation as priority, or product-led growth. Analysis should flag ICP confirmation as unknown or require validation. STRUCTURAL - Recent call summary is corrupted/truncated (ends mid-sentence at '[Dani'), rendering this entire analysis unreliable. Analysis should have flagged this as data quality issue blocking evaluation.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-06_010",
+  "timestamp": "2026-08-06T21:38:57.622585"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-06_061",
+  "timestamp": "2026-08-06T21:38:57.623762",
+  "company": "Unity",
+  "criterion_fired": "Criterion 2 (Carry-forward logic on corrupted data) and Criterion 4 (Action verb specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2: 'When call transcript is incomplete or corrupted, flag as data quality issue and revert all component scores to Unknown rather than applying carry-forward.' Criterion 4: 'All next steps must use format: [Specific person/title]: [Concrete question with measurable outcome]' with verb examples: Ask, Confirm, Validate, Quantify (+ unit), not Probe/Uncover."
+}
