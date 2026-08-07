@@ -1,0 +1,2711 @@
+{
+  "date": "2026-08-07",
+  "summary": {
+    "total_cost_usd": 6.030542,
+    "total_input_tokens": 1018238,
+    "total_output_tokens": 308284,
+    "total_calls": 296,
+    "by_model": {
+      "claude-haiku-4-5-20251001": {
+        "input_tokens": 469066,
+        "output_tokens": 71030,
+        "cost_usd": 0.824216,
+        "calls": 180
+      },
+      "claude-sonnet-4-5-20250929": {
+        "input_tokens": 549172,
+        "output_tokens": 237254,
+        "cost_usd": 5.206326,
+        "calls": 116
+      }
+    },
+    "by_role": {
+      "context_builder": {
+        "input_tokens": 20687,
+        "output_tokens": 12190,
+        "cost_usd": 0.081637
+      },
+      "generator": {
+        "input_tokens": 549172,
+        "output_tokens": 237254,
+        "cost_usd": 5.206326
+      },
+      "evaluator": {
+        "input_tokens": 412389,
+        "output_tokens": 49588,
+        "cost_usd": 0.660329
+      },
+      "reflection": {
+        "input_tokens": 35990,
+        "output_tokens": 9252,
+        "cost_usd": 0.08225
+      }
+    }
+  },
+  "records": [
+    {
+      "timestamp": "2026-08-07T00:38:41.740500",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Oda",
+      "input_tokens": 798,
+      "output_tokens": 621,
+      "cost_usd": 0.003903
+    },
+    {
+      "timestamp": "2026-08-07T00:39:37.232210",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Oda",
+      "input_tokens": 4645,
+      "output_tokens": 2360,
+      "cost_usd": 0.049335
+    },
+    {
+      "timestamp": "2026-08-07T00:39:42.890033",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Oda",
+      "input_tokens": 4074,
+      "output_tokens": 357,
+      "cost_usd": 0.005859
+    },
+    {
+      "timestamp": "2026-08-07T00:40:25.286229",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Oda",
+      "input_tokens": 5015,
+      "output_tokens": 1955,
+      "cost_usd": 0.04437
+    },
+    {
+      "timestamp": "2026-08-07T00:40:30.656814",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Oda",
+      "input_tokens": 3669,
+      "output_tokens": 436,
+      "cost_usd": 0.005849
+    },
+    {
+      "timestamp": "2026-08-07T00:41:10.182206",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Oda",
+      "input_tokens": 5094,
+      "output_tokens": 1833,
+      "cost_usd": 0.042777
+    },
+    {
+      "timestamp": "2026-08-07T00:41:16.232826",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Oda",
+      "input_tokens": 3547,
+      "output_tokens": 457,
+      "cost_usd": 0.005832
+    },
+    {
+      "timestamp": "2026-08-07T00:41:19.545978",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Oda",
+      "input_tokens": 924,
+      "output_tokens": 266,
+      "cost_usd": 0.002254
+    },
+    {
+      "timestamp": "2026-08-07T00:41:56.759184",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Rappi",
+      "input_tokens": 4237,
+      "output_tokens": 1563,
+      "cost_usd": 0.036156
+    },
+    {
+      "timestamp": "2026-08-07T00:41:58.320744",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Rappi",
+      "input_tokens": 2869,
+      "output_tokens": 26,
+      "cost_usd": 0.002999
+    },
+    {
+      "timestamp": "2026-08-07T00:41:59.360691",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Rappi",
+      "input_tokens": 478,
+      "output_tokens": 103,
+      "cost_usd": 0.000993
+    },
+    {
+      "timestamp": "2026-08-07T00:42:34.446237",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Douglas",
+      "input_tokens": 4290,
+      "output_tokens": 1510,
+      "cost_usd": 0.03552
+    },
+    {
+      "timestamp": "2026-08-07T00:42:40.383646",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Douglas",
+      "input_tokens": 2873,
+      "output_tokens": 381,
+      "cost_usd": 0.004778
+    },
+    {
+      "timestamp": "2026-08-07T00:43:16.656319",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Douglas",
+      "input_tokens": 4684,
+      "output_tokens": 1704,
+      "cost_usd": 0.039612
+    },
+    {
+      "timestamp": "2026-08-07T00:43:17.336411",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Douglas",
+      "input_tokens": 3067,
+      "output_tokens": 26,
+      "cost_usd": 0.003197
+    },
+    {
+      "timestamp": "2026-08-07T00:43:19.648537",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Douglas",
+      "input_tokens": 478,
+      "output_tokens": 115,
+      "cost_usd": 0.001053
+    },
+    {
+      "timestamp": "2026-08-07T00:43:24.058706",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "BESTSELLER",
+      "input_tokens": 709,
+      "output_tokens": 474,
+      "cost_usd": 0.003079
+    },
+    {
+      "timestamp": "2026-08-07T00:44:11.722055",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "BESTSELLER",
+      "input_tokens": 4491,
+      "output_tokens": 2063,
+      "cost_usd": 0.044418
+    },
+    {
+      "timestamp": "2026-08-07T00:44:18.463068",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "BESTSELLER",
+      "input_tokens": 3623,
+      "output_tokens": 471,
+      "cost_usd": 0.005978
+    },
+    {
+      "timestamp": "2026-08-07T00:45:08.456438",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "BESTSELLER",
+      "input_tokens": 4975,
+      "output_tokens": 2057,
+      "cost_usd": 0.04578
+    },
+    {
+      "timestamp": "2026-08-07T00:45:15.159748",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "BESTSELLER",
+      "input_tokens": 3617,
+      "output_tokens": 476,
+      "cost_usd": 0.005997
+    },
+    {
+      "timestamp": "2026-08-07T00:46:14.846342",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "BESTSELLER",
+      "input_tokens": 4980,
+      "output_tokens": 2556,
+      "cost_usd": 0.05328
+    },
+    {
+      "timestamp": "2026-08-07T00:46:21.473436",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "BESTSELLER",
+      "input_tokens": 4116,
+      "output_tokens": 454,
+      "cost_usd": 0.006386
+    },
+    {
+      "timestamp": "2026-08-07T00:46:24.165758",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "BESTSELLER",
+      "input_tokens": 914,
+      "output_tokens": 225,
+      "cost_usd": 0.002039
+    },
+    {
+      "timestamp": "2026-08-07T00:46:29.308995",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Fixter",
+      "input_tokens": 775,
+      "output_tokens": 510,
+      "cost_usd": 0.003325
+    },
+    {
+      "timestamp": "2026-08-07T00:47:10.784289",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Fixter",
+      "input_tokens": 4516,
+      "output_tokens": 1963,
+      "cost_usd": 0.042993
+    },
+    {
+      "timestamp": "2026-08-07T00:47:18.898270",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Fixter",
+      "input_tokens": 3548,
+      "output_tokens": 598,
+      "cost_usd": 0.006538
+    },
+    {
+      "timestamp": "2026-08-07T00:48:18.321766",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Fixter",
+      "input_tokens": 5127,
+      "output_tokens": 2669,
+      "cost_usd": 0.055416
+    },
+    {
+      "timestamp": "2026-08-07T00:48:25.123822",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Fixter",
+      "input_tokens": 4254,
+      "output_tokens": 477,
+      "cost_usd": 0.006639
+    },
+    {
+      "timestamp": "2026-08-07T00:49:17.549906",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Fixter",
+      "input_tokens": 5005,
+      "output_tokens": 2291,
+      "cost_usd": 0.04938
+    },
+    {
+      "timestamp": "2026-08-07T00:49:23.877340",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Fixter",
+      "input_tokens": 3876,
+      "output_tokens": 417,
+      "cost_usd": 0.005961
+    },
+    {
+      "timestamp": "2026-08-07T00:49:27.291874",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Fixter",
+      "input_tokens": 868,
+      "output_tokens": 274,
+      "cost_usd": 0.002238
+    },
+    {
+      "timestamp": "2026-08-07T00:49:32.085059",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "InPost",
+      "input_tokens": 731,
+      "output_tokens": 506,
+      "cost_usd": 0.003261
+    },
+    {
+      "timestamp": "2026-08-07T00:50:13.333368",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "InPost",
+      "input_tokens": 4528,
+      "output_tokens": 1840,
+      "cost_usd": 0.041184
+    },
+    {
+      "timestamp": "2026-08-07T00:50:19.781563",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "InPost",
+      "input_tokens": 3438,
+      "output_tokens": 428,
+      "cost_usd": 0.005578
+    },
+    {
+      "timestamp": "2026-08-07T00:51:08.748081",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "InPost",
+      "input_tokens": 4969,
+      "output_tokens": 2249,
+      "cost_usd": 0.048642
+    },
+    {
+      "timestamp": "2026-08-07T00:51:15.585238",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "InPost",
+      "input_tokens": 3847,
+      "output_tokens": 430,
+      "cost_usd": 0.005997
+    },
+    {
+      "timestamp": "2026-08-07T00:52:16.425923",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "InPost",
+      "input_tokens": 4971,
+      "output_tokens": 2513,
+      "cost_usd": 0.052608
+    },
+    {
+      "timestamp": "2026-08-07T00:52:28.485727",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "InPost",
+      "input_tokens": 4111,
+      "output_tokens": 884,
+      "cost_usd": 0.008531
+    },
+    {
+      "timestamp": "2026-08-07T00:52:31.797505",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "InPost",
+      "input_tokens": 1335,
+      "output_tokens": 265,
+      "cost_usd": 0.00266
+    },
+    {
+      "timestamp": "2026-08-07T00:53:22.956624",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Pronto",
+      "input_tokens": 4335,
+      "output_tokens": 2019,
+      "cost_usd": 0.04329
+    },
+    {
+      "timestamp": "2026-08-07T00:53:29.491778",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Pronto",
+      "input_tokens": 3423,
+      "output_tokens": 409,
+      "cost_usd": 0.005468
+    },
+    {
+      "timestamp": "2026-08-07T00:54:18.554367",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Pronto",
+      "input_tokens": 4757,
+      "output_tokens": 2077,
+      "cost_usd": 0.045426
+    },
+    {
+      "timestamp": "2026-08-07T00:54:25.388473",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Pronto",
+      "input_tokens": 3481,
+      "output_tokens": 499,
+      "cost_usd": 0.005976
+    },
+    {
+      "timestamp": "2026-08-07T00:55:35.735322",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Pronto",
+      "input_tokens": 4846,
+      "output_tokens": 2772,
+      "cost_usd": 0.056118
+    },
+    {
+      "timestamp": "2026-08-07T00:55:47.688070",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Pronto",
+      "input_tokens": 4176,
+      "output_tokens": 864,
+      "cost_usd": 0.008496
+    },
+    {
+      "timestamp": "2026-08-07T00:55:51.258342",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Pronto",
+      "input_tokens": 1315,
+      "output_tokens": 250,
+      "cost_usd": 0.002565
+    },
+    {
+      "timestamp": "2026-08-07T00:56:15.109441",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "USIM",
+      "input_tokens": 4228,
+      "output_tokens": 1102,
+      "cost_usd": 0.029214
+    },
+    {
+      "timestamp": "2026-08-07T00:56:15.740270",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "USIM",
+      "input_tokens": 2401,
+      "output_tokens": 26,
+      "cost_usd": 0.002531
+    },
+    {
+      "timestamp": "2026-08-07T00:56:16.661789",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "USIM",
+      "input_tokens": 478,
+      "output_tokens": 105,
+      "cost_usd": 0.001003
+    },
+    {
+      "timestamp": "2026-08-07T00:56:20.463985",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "BESTSELLER",
+      "input_tokens": 709,
+      "output_tokens": 481,
+      "cost_usd": 0.003114
+    },
+    {
+      "timestamp": "2026-08-07T00:57:15.670631",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "BESTSELLER",
+      "input_tokens": 4498,
+      "output_tokens": 2428,
+      "cost_usd": 0.049914
+    },
+    {
+      "timestamp": "2026-08-07T00:57:24.359231",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "BESTSELLER",
+      "input_tokens": 3995,
+      "output_tokens": 635,
+      "cost_usd": 0.00717
+    },
+    {
+      "timestamp": "2026-08-07T00:58:19.207882",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "BESTSELLER",
+      "input_tokens": 5146,
+      "output_tokens": 2356,
+      "cost_usd": 0.050778
+    },
+    {
+      "timestamp": "2026-08-07T00:58:25.821067",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "BESTSELLER",
+      "input_tokens": 3923,
+      "output_tokens": 453,
+      "cost_usd": 0.006188
+    },
+    {
+      "timestamp": "2026-08-07T00:59:29.945892",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "BESTSELLER",
+      "input_tokens": 4964,
+      "output_tokens": 2854,
+      "cost_usd": 0.057702
+    },
+    {
+      "timestamp": "2026-08-07T00:59:36.754207",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "BESTSELLER",
+      "input_tokens": 4421,
+      "output_tokens": 493,
+      "cost_usd": 0.006886
+    },
+    {
+      "timestamp": "2026-08-07T00:59:39.201067",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "BESTSELLER",
+      "input_tokens": 956,
+      "output_tokens": 200,
+      "cost_usd": 0.001956
+    },
+    {
+      "timestamp": "2026-08-07T00:59:43.917055",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "OpenTable",
+      "input_tokens": 1331,
+      "output_tokens": 522,
+      "cost_usd": 0.003941
+    },
+    {
+      "timestamp": "2026-08-07T01:00:29.302342",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "OpenTable",
+      "input_tokens": 4535,
+      "output_tokens": 2012,
+      "cost_usd": 0.043785
+    },
+    {
+      "timestamp": "2026-08-07T01:00:37.127965",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "OpenTable",
+      "input_tokens": 3617,
+      "output_tokens": 468,
+      "cost_usd": 0.005957
+    },
+    {
+      "timestamp": "2026-08-07T01:01:27.164291",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "OpenTable",
+      "input_tokens": 5016,
+      "output_tokens": 2313,
+      "cost_usd": 0.049743
+    },
+    {
+      "timestamp": "2026-08-07T01:01:34.279847",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "OpenTable",
+      "input_tokens": 3918,
+      "output_tokens": 457,
+      "cost_usd": 0.006203
+    },
+    {
+      "timestamp": "2026-08-07T01:02:19.201136",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "OpenTable",
+      "input_tokens": 5005,
+      "output_tokens": 1985,
+      "cost_usd": 0.04479
+    },
+    {
+      "timestamp": "2026-08-07T01:02:25.329889",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "OpenTable",
+      "input_tokens": 3590,
+      "output_tokens": 418,
+      "cost_usd": 0.00568
+    },
+    {
+      "timestamp": "2026-08-07T01:02:28.572474",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "OpenTable",
+      "input_tokens": 877,
+      "output_tokens": 225,
+      "cost_usd": 0.002002
+    },
+    {
+      "timestamp": "2026-08-07T01:03:20.274166",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "ECCO",
+      "input_tokens": 4307,
+      "output_tokens": 2047,
+      "cost_usd": 0.043626
+    },
+    {
+      "timestamp": "2026-08-07T01:03:26.880420",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "ECCO",
+      "input_tokens": 3423,
+      "output_tokens": 402,
+      "cost_usd": 0.005433
+    },
+    {
+      "timestamp": "2026-08-07T01:04:11.581073",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "ECCO",
+      "input_tokens": 4721,
+      "output_tokens": 1770,
+      "cost_usd": 0.040713
+    },
+    {
+      "timestamp": "2026-08-07T01:04:16.409910",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "ECCO",
+      "input_tokens": 3146,
+      "output_tokens": 305,
+      "cost_usd": 0.004671
+    },
+    {
+      "timestamp": "2026-08-07T01:05:04.067156",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "ECCO",
+      "input_tokens": 4625,
+      "output_tokens": 1967,
+      "cost_usd": 0.04338
+    },
+    {
+      "timestamp": "2026-08-07T01:05:12.926842",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "ECCO",
+      "input_tokens": 3343,
+      "output_tokens": 631,
+      "cost_usd": 0.006498
+    },
+    {
+      "timestamp": "2026-08-07T01:05:15.757551",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "ECCO",
+      "input_tokens": 1082,
+      "output_tokens": 258,
+      "cost_usd": 0.002372
+    },
+    {
+      "timestamp": "2026-08-07T01:05:20.742328",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Deel",
+      "input_tokens": 906,
+      "output_tokens": 538,
+      "cost_usd": 0.003596
+    },
+    {
+      "timestamp": "2026-08-07T01:05:58.460515",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Deel",
+      "input_tokens": 4479,
+      "output_tokens": 1830,
+      "cost_usd": 0.040887
+    },
+    {
+      "timestamp": "2026-08-07T01:06:02.933162",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Deel",
+      "input_tokens": 3379,
+      "output_tokens": 302,
+      "cost_usd": 0.004889
+    },
+    {
+      "timestamp": "2026-08-07T01:06:42.610228",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Deel",
+      "input_tokens": 4793,
+      "output_tokens": 1915,
+      "cost_usd": 0.043104
+    },
+    {
+      "timestamp": "2026-08-07T01:06:47.431525",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Deel",
+      "input_tokens": 3464,
+      "output_tokens": 354,
+      "cost_usd": 0.005234
+    },
+    {
+      "timestamp": "2026-08-07T01:07:33.158779",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Deel",
+      "input_tokens": 4846,
+      "output_tokens": 1979,
+      "cost_usd": 0.044223
+    },
+    {
+      "timestamp": "2026-08-07T01:07:38.972261",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Deel",
+      "input_tokens": 3528,
+      "output_tokens": 403,
+      "cost_usd": 0.005543
+    },
+    {
+      "timestamp": "2026-08-07T01:07:41.906064",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Deel",
+      "input_tokens": 854,
+      "output_tokens": 218,
+      "cost_usd": 0.001944
+    },
+    {
+      "timestamp": "2026-08-07T01:08:14.345201",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Purple",
+      "input_tokens": 4231,
+      "output_tokens": 1393,
+      "cost_usd": 0.033588
+    },
+    {
+      "timestamp": "2026-08-07T01:08:15.631447",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Purple",
+      "input_tokens": 2695,
+      "output_tokens": 26,
+      "cost_usd": 0.002825
+    },
+    {
+      "timestamp": "2026-08-07T01:08:16.570928",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Purple",
+      "input_tokens": 478,
+      "output_tokens": 99,
+      "cost_usd": 0.000973
+    },
+    {
+      "timestamp": "2026-08-07T01:08:56.174326",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "ClickHouse",
+      "input_tokens": 4328,
+      "output_tokens": 1722,
+      "cost_usd": 0.038814
+    },
+    {
+      "timestamp": "2026-08-07T01:09:02.979858",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "ClickHouse",
+      "input_tokens": 3119,
+      "output_tokens": 466,
+      "cost_usd": 0.005449
+    },
+    {
+      "timestamp": "2026-08-07T01:10:00.821154",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "ClickHouse",
+      "input_tokens": 4806,
+      "output_tokens": 2548,
+      "cost_usd": 0.052638
+    },
+    {
+      "timestamp": "2026-08-07T01:10:12.791621",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "ClickHouse",
+      "input_tokens": 3945,
+      "output_tokens": 889,
+      "cost_usd": 0.00839
+    },
+    {
+      "timestamp": "2026-08-07T01:11:08.910585",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "ClickHouse",
+      "input_tokens": 5230,
+      "output_tokens": 2401,
+      "cost_usd": 0.051705
+    },
+    {
+      "timestamp": "2026-08-07T01:11:16.366265",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "ClickHouse",
+      "input_tokens": 3798,
+      "output_tokens": 515,
+      "cost_usd": 0.006373
+    },
+    {
+      "timestamp": "2026-08-07T01:11:20.179332",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "ClickHouse",
+      "input_tokens": 976,
+      "output_tokens": 315,
+      "cost_usd": 0.002551
+    },
+    {
+      "timestamp": "2026-08-07T01:11:26.405657",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Notion",
+      "input_tokens": 900,
+      "output_tokens": 536,
+      "cost_usd": 0.00358
+    },
+    {
+      "timestamp": "2026-08-07T01:12:19.399451",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Notion",
+      "input_tokens": 4479,
+      "output_tokens": 2158,
+      "cost_usd": 0.045807
+    },
+    {
+      "timestamp": "2026-08-07T01:12:26.972300",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Notion",
+      "input_tokens": 3707,
+      "output_tokens": 501,
+      "cost_usd": 0.006212
+    },
+    {
+      "timestamp": "2026-08-07T01:13:05.478355",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Notion",
+      "input_tokens": 4993,
+      "output_tokens": 1784,
+      "cost_usd": 0.041739
+    },
+    {
+      "timestamp": "2026-08-07T01:13:12.314620",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Notion",
+      "input_tokens": 3333,
+      "output_tokens": 494,
+      "cost_usd": 0.005803
+    },
+    {
+      "timestamp": "2026-08-07T01:14:13.374115",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Notion",
+      "input_tokens": 4986,
+      "output_tokens": 2481,
+      "cost_usd": 0.052173
+    },
+    {
+      "timestamp": "2026-08-07T01:14:20.379789",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Notion",
+      "input_tokens": 4030,
+      "output_tokens": 493,
+      "cost_usd": 0.006495
+    },
+    {
+      "timestamp": "2026-08-07T01:14:24.201332",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Notion",
+      "input_tokens": 944,
+      "output_tokens": 226,
+      "cost_usd": 0.002074
+    },
+    {
+      "timestamp": "2026-08-07T01:14:59.687453",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "1800Flowers",
+      "input_tokens": 4283,
+      "output_tokens": 1422,
+      "cost_usd": 0.034179
+    },
+    {
+      "timestamp": "2026-08-07T01:15:07.189465",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "1800Flowers",
+      "input_tokens": 2772,
+      "output_tokens": 551,
+      "cost_usd": 0.005527
+    },
+    {
+      "timestamp": "2026-08-07T01:15:33.221213",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "1800Flowers",
+      "input_tokens": 4847,
+      "output_tokens": 1154,
+      "cost_usd": 0.031851
+    },
+    {
+      "timestamp": "2026-08-07T01:15:36.209048",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "1800Flowers",
+      "input_tokens": 2504,
+      "output_tokens": 26,
+      "cost_usd": 0.002634
+    },
+    {
+      "timestamp": "2026-08-07T01:15:37.216114",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "1800Flowers",
+      "input_tokens": 478,
+      "output_tokens": 107,
+      "cost_usd": 0.001013
+    },
+    {
+      "timestamp": "2026-08-07T01:16:15.946897",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "On3",
+      "input_tokens": 4299,
+      "output_tokens": 1642,
+      "cost_usd": 0.037527
+    },
+    {
+      "timestamp": "2026-08-07T01:16:20.846132",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "On3",
+      "input_tokens": 3013,
+      "output_tokens": 338,
+      "cost_usd": 0.004703
+    },
+    {
+      "timestamp": "2026-08-07T01:17:08.566655",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "On3",
+      "input_tokens": 4649,
+      "output_tokens": 2161,
+      "cost_usd": 0.046362
+    },
+    {
+      "timestamp": "2026-08-07T01:17:14.453288",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "On3",
+      "input_tokens": 3532,
+      "output_tokens": 390,
+      "cost_usd": 0.005482
+    },
+    {
+      "timestamp": "2026-08-07T01:18:01.587176",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "On3",
+      "input_tokens": 4702,
+      "output_tokens": 2163,
+      "cost_usd": 0.046551
+    },
+    {
+      "timestamp": "2026-08-07T01:18:09.269355",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "On3",
+      "input_tokens": 3534,
+      "output_tokens": 535,
+      "cost_usd": 0.006209
+    },
+    {
+      "timestamp": "2026-08-07T01:18:13.947770",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "On3",
+      "input_tokens": 986,
+      "output_tokens": 337,
+      "cost_usd": 0.002671
+    },
+    {
+      "timestamp": "2026-08-07T01:18:19.629174",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "KBX",
+      "input_tokens": 1004,
+      "output_tokens": 612,
+      "cost_usd": 0.004064
+    },
+    {
+      "timestamp": "2026-08-07T01:18:56.105749",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "KBX",
+      "input_tokens": 4525,
+      "output_tokens": 1827,
+      "cost_usd": 0.04098
+    },
+    {
+      "timestamp": "2026-08-07T01:19:00.457633",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "KBX",
+      "input_tokens": 3421,
+      "output_tokens": 293,
+      "cost_usd": 0.004886
+    },
+    {
+      "timestamp": "2026-08-07T01:19:57.496833",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "KBX",
+      "input_tokens": 4831,
+      "output_tokens": 2688,
+      "cost_usd": 0.054813
+    },
+    {
+      "timestamp": "2026-08-07T01:20:04.978181",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "KBX",
+      "input_tokens": 4282,
+      "output_tokens": 516,
+      "cost_usd": 0.006862
+    },
+    {
+      "timestamp": "2026-08-07T01:20:53.457583",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "KBX",
+      "input_tokens": 5054,
+      "output_tokens": 2220,
+      "cost_usd": 0.048462
+    },
+    {
+      "timestamp": "2026-08-07T01:20:59.217007",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "KBX",
+      "input_tokens": 3814,
+      "output_tokens": 432,
+      "cost_usd": 0.005974
+    },
+    {
+      "timestamp": "2026-08-07T01:21:05.677532",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "KBX",
+      "input_tokens": 883,
+      "output_tokens": 275,
+      "cost_usd": 0.002258
+    },
+    {
+      "timestamp": "2026-08-07T01:21:47.468430",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Carrefour",
+      "input_tokens": 4318,
+      "output_tokens": 1824,
+      "cost_usd": 0.040314
+    },
+    {
+      "timestamp": "2026-08-07T01:21:54.532936",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Carrefour",
+      "input_tokens": 3210,
+      "output_tokens": 484,
+      "cost_usd": 0.00563
+    },
+    {
+      "timestamp": "2026-08-07T01:22:48.896265",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Carrefour",
+      "input_tokens": 4815,
+      "output_tokens": 2223,
+      "cost_usd": 0.04779
+    },
+    {
+      "timestamp": "2026-08-07T01:22:49.590056",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Carrefour",
+      "input_tokens": 3609,
+      "output_tokens": 26,
+      "cost_usd": 0.003739
+    },
+    {
+      "timestamp": "2026-08-07T01:22:50.772958",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Carrefour",
+      "input_tokens": 478,
+      "output_tokens": 116,
+      "cost_usd": 0.001058
+    },
+    {
+      "timestamp": "2026-08-07T01:22:55.782951",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "TickPick",
+      "input_tokens": 929,
+      "output_tokens": 623,
+      "cost_usd": 0.004044
+    },
+    {
+      "timestamp": "2026-08-07T01:23:30.166963",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "TickPick",
+      "input_tokens": 4554,
+      "output_tokens": 1605,
+      "cost_usd": 0.037737
+    },
+    {
+      "timestamp": "2026-08-07T01:23:34.938659",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "TickPick",
+      "input_tokens": 3227,
+      "output_tokens": 363,
+      "cost_usd": 0.005042
+    },
+    {
+      "timestamp": "2026-08-07T01:24:09.822512",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "TickPick",
+      "input_tokens": 4930,
+      "output_tokens": 1563,
+      "cost_usd": 0.038235
+    },
+    {
+      "timestamp": "2026-08-07T01:24:16.334853",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "TickPick",
+      "input_tokens": 3185,
+      "output_tokens": 443,
+      "cost_usd": 0.0054
+    },
+    {
+      "timestamp": "2026-08-07T01:25:09.823884",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "TickPick",
+      "input_tokens": 5010,
+      "output_tokens": 2377,
+      "cost_usd": 0.050685
+    },
+    {
+      "timestamp": "2026-08-07T01:25:16.685242",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "TickPick",
+      "input_tokens": 3999,
+      "output_tokens": 482,
+      "cost_usd": 0.006409
+    },
+    {
+      "timestamp": "2026-08-07T01:25:19.208058",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "TickPick",
+      "input_tokens": 941,
+      "output_tokens": 219,
+      "cost_usd": 0.002036
+    },
+    {
+      "timestamp": "2026-08-07T01:25:56.700853",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "MedCof",
+      "input_tokens": 4319,
+      "output_tokens": 1657,
+      "cost_usd": 0.037812
+    },
+    {
+      "timestamp": "2026-08-07T01:26:01.987843",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "MedCof",
+      "input_tokens": 3044,
+      "output_tokens": 364,
+      "cost_usd": 0.004864
+    },
+    {
+      "timestamp": "2026-08-07T01:26:39.347689",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "MedCof",
+      "input_tokens": 4695,
+      "output_tokens": 1739,
+      "cost_usd": 0.04017
+    },
+    {
+      "timestamp": "2026-08-07T01:26:44.393082",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "MedCof",
+      "input_tokens": 3126,
+      "output_tokens": 374,
+      "cost_usd": 0.004996
+    },
+    {
+      "timestamp": "2026-08-07T01:27:28.460278",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "MedCof",
+      "input_tokens": 4706,
+      "output_tokens": 1896,
+      "cost_usd": 0.042558
+    },
+    {
+      "timestamp": "2026-08-07T01:27:34.178186",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "MedCof",
+      "input_tokens": 3283,
+      "output_tokens": 385,
+      "cost_usd": 0.005208
+    },
+    {
+      "timestamp": "2026-08-07T01:27:38.081871",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "MedCof",
+      "input_tokens": 839,
+      "output_tokens": 297,
+      "cost_usd": 0.002324
+    },
+    {
+      "timestamp": "2026-08-07T01:27:43.362169",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Harper",
+      "input_tokens": 740,
+      "output_tokens": 509,
+      "cost_usd": 0.003285
+    },
+    {
+      "timestamp": "2026-08-07T01:28:16.880648",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Chaos",
+      "input_tokens": 4298,
+      "output_tokens": 1521,
+      "cost_usd": 0.035709
+    },
+    {
+      "timestamp": "2026-08-07T01:28:22.698284",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Chaos",
+      "input_tokens": 2889,
+      "output_tokens": 330,
+      "cost_usd": 0.004539
+    },
+    {
+      "timestamp": "2026-08-07T01:29:09.917359",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Chaos",
+      "input_tokens": 4641,
+      "output_tokens": 2117,
+      "cost_usd": 0.045678
+    },
+    {
+      "timestamp": "2026-08-07T01:29:18.248032",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Chaos",
+      "input_tokens": 3485,
+      "output_tokens": 556,
+      "cost_usd": 0.006265
+    },
+    {
+      "timestamp": "2026-08-07T01:30:06.911563",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Chaos",
+      "input_tokens": 4867,
+      "output_tokens": 2091,
+      "cost_usd": 0.045966
+    },
+    {
+      "timestamp": "2026-08-07T01:30:07.665168",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Chaos",
+      "input_tokens": 3459,
+      "output_tokens": 26,
+      "cost_usd": 0.003589
+    },
+    {
+      "timestamp": "2026-08-07T01:30:09.692977",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Chaos",
+      "input_tokens": 478,
+      "output_tokens": 109,
+      "cost_usd": 0.001023
+    },
+    {
+      "timestamp": "2026-08-07T01:30:15.214518",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Aircall",
+      "input_tokens": 1156,
+      "output_tokens": 669,
+      "cost_usd": 0.004501
+    },
+    {
+      "timestamp": "2026-08-07T01:31:08.304356",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Aircall",
+      "input_tokens": 4695,
+      "output_tokens": 2252,
+      "cost_usd": 0.047865
+    },
+    {
+      "timestamp": "2026-08-07T01:31:17.858763",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Aircall",
+      "input_tokens": 4016,
+      "output_tokens": 668,
+      "cost_usd": 0.007356
+    },
+    {
+      "timestamp": "2026-08-07T01:32:33.869064",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Aircall",
+      "input_tokens": 5376,
+      "output_tokens": 3023,
+      "cost_usd": 0.061473
+    },
+    {
+      "timestamp": "2026-08-07T01:32:42.066762",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Aircall",
+      "input_tokens": 4787,
+      "output_tokens": 571,
+      "cost_usd": 0.007642
+    },
+    {
+      "timestamp": "2026-08-07T01:33:35.113651",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Aircall",
+      "input_tokens": 5279,
+      "output_tokens": 2246,
+      "cost_usd": 0.049527
+    },
+    {
+      "timestamp": "2026-08-07T01:33:41.169457",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Aircall",
+      "input_tokens": 4010,
+      "output_tokens": 382,
+      "cost_usd": 0.00592
+    },
+    {
+      "timestamp": "2026-08-07T01:33:44.761245",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Aircall",
+      "input_tokens": 849,
+      "output_tokens": 243,
+      "cost_usd": 0.002064
+    },
+    {
+      "timestamp": "2026-08-07T01:34:14.140548",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Taxfix",
+      "input_tokens": 4226,
+      "output_tokens": 1225,
+      "cost_usd": 0.031053
+    },
+    {
+      "timestamp": "2026-08-07T01:34:14.777223",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Taxfix",
+      "input_tokens": 2521,
+      "output_tokens": 26,
+      "cost_usd": 0.002651
+    },
+    {
+      "timestamp": "2026-08-07T01:34:16.312877",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Taxfix",
+      "input_tokens": 478,
+      "output_tokens": 99,
+      "cost_usd": 0.000973
+    },
+    {
+      "timestamp": "2026-08-07T01:34:21.759060",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Zalando",
+      "input_tokens": 740,
+      "output_tokens": 566,
+      "cost_usd": 0.00357
+    },
+    {
+      "timestamp": "2026-08-07T01:35:10.488919",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Zalando",
+      "input_tokens": 4512,
+      "output_tokens": 2212,
+      "cost_usd": 0.046716
+    },
+    {
+      "timestamp": "2026-08-07T01:35:16.513263",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Zalando",
+      "input_tokens": 3793,
+      "output_tokens": 423,
+      "cost_usd": 0.005908
+    },
+    {
+      "timestamp": "2026-08-07T01:36:07.735269",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Zalando",
+      "input_tokens": 4947,
+      "output_tokens": 2299,
+      "cost_usd": 0.049326
+    },
+    {
+      "timestamp": "2026-08-07T01:36:15.442945",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Zalando",
+      "input_tokens": 3880,
+      "output_tokens": 528,
+      "cost_usd": 0.00652
+    },
+    {
+      "timestamp": "2026-08-07T01:36:59.759503",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Zalando",
+      "input_tokens": 5053,
+      "output_tokens": 2173,
+      "cost_usd": 0.047754
+    },
+    {
+      "timestamp": "2026-08-07T01:37:06.473559",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Zalando",
+      "input_tokens": 3754,
+      "output_tokens": 453,
+      "cost_usd": 0.006019
+    },
+    {
+      "timestamp": "2026-08-07T01:37:14.958302",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Zalando",
+      "input_tokens": 916,
+      "output_tokens": 285,
+      "cost_usd": 0.002341
+    },
+    {
+      "timestamp": "2026-08-07T01:37:19.879585",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Zoro",
+      "input_tokens": 712,
+      "output_tokens": 491,
+      "cost_usd": 0.003167
+    },
+    {
+      "timestamp": "2026-08-07T01:37:57.160613",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Zoro",
+      "input_tokens": 4529,
+      "output_tokens": 1831,
+      "cost_usd": 0.041052
+    },
+    {
+      "timestamp": "2026-08-07T01:38:05.698789",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Zoro",
+      "input_tokens": 3429,
+      "output_tokens": 554,
+      "cost_usd": 0.006199
+    },
+    {
+      "timestamp": "2026-08-07T01:38:50.915689",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Zoro",
+      "input_tokens": 5096,
+      "output_tokens": 1933,
+      "cost_usd": 0.044283
+    },
+    {
+      "timestamp": "2026-08-07T01:38:57.764379",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Zoro",
+      "input_tokens": 3531,
+      "output_tokens": 434,
+      "cost_usd": 0.005701
+    },
+    {
+      "timestamp": "2026-08-07T01:40:03.036712",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Zoro",
+      "input_tokens": 4976,
+      "output_tokens": 2802,
+      "cost_usd": 0.056958
+    },
+    {
+      "timestamp": "2026-08-07T01:40:10.553253",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Zoro",
+      "input_tokens": 4400,
+      "output_tokens": 514,
+      "cost_usd": 0.00697
+    },
+    {
+      "timestamp": "2026-08-07T01:40:13.333749",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Zoro",
+      "input_tokens": 969,
+      "output_tokens": 230,
+      "cost_usd": 0.002119
+    },
+    {
+      "timestamp": "2026-08-07T01:40:18.824280",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Taskrabbit",
+      "input_tokens": 1094,
+      "output_tokens": 605,
+      "cost_usd": 0.004119
+    },
+    {
+      "timestamp": "2026-08-07T01:41:01.837791",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Taskrabbit",
+      "input_tokens": 4622,
+      "output_tokens": 1920,
+      "cost_usd": 0.042666
+    },
+    {
+      "timestamp": "2026-08-07T01:41:08.614410",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Taskrabbit",
+      "input_tokens": 3610,
+      "output_tokens": 401,
+      "cost_usd": 0.005615
+    },
+    {
+      "timestamp": "2026-08-07T01:42:01.877292",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Taskrabbit",
+      "input_tokens": 5036,
+      "output_tokens": 2403,
+      "cost_usd": 0.051153
+    },
+    {
+      "timestamp": "2026-08-07T01:42:09.123952",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Taskrabbit",
+      "input_tokens": 4093,
+      "output_tokens": 482,
+      "cost_usd": 0.006503
+    },
+    {
+      "timestamp": "2026-08-07T01:42:56.914359",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Taskrabbit",
+      "input_tokens": 5117,
+      "output_tokens": 2033,
+      "cost_usd": 0.045846
+    },
+    {
+      "timestamp": "2026-08-07T01:43:01.002767",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Taskrabbit",
+      "input_tokens": 3723,
+      "output_tokens": 285,
+      "cost_usd": 0.005148
+    },
+    {
+      "timestamp": "2026-08-07T01:43:03.952365",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Taskrabbit",
+      "input_tokens": 743,
+      "output_tokens": 208,
+      "cost_usd": 0.001783
+    },
+    {
+      "timestamp": "2026-08-07T01:43:13.298952",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Skyscanner",
+      "input_tokens": 2281,
+      "output_tokens": 919,
+      "cost_usd": 0.006876
+    },
+    {
+      "timestamp": "2026-08-07T01:43:51.265576",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Skyscanner",
+      "input_tokens": 4860,
+      "output_tokens": 2210,
+      "cost_usd": 0.04773
+    },
+    {
+      "timestamp": "2026-08-07T01:43:56.642150",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Skyscanner",
+      "input_tokens": 4138,
+      "output_tokens": 298,
+      "cost_usd": 0.005628
+    },
+    {
+      "timestamp": "2026-08-07T01:44:43.959185",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Skyscanner",
+      "input_tokens": 5171,
+      "output_tokens": 2340,
+      "cost_usd": 0.050613
+    },
+    {
+      "timestamp": "2026-08-07T01:44:49.732471",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Skyscanner",
+      "input_tokens": 4268,
+      "output_tokens": 383,
+      "cost_usd": 0.006183
+    },
+    {
+      "timestamp": "2026-08-07T01:45:47.285682",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Skyscanner",
+      "input_tokens": 5256,
+      "output_tokens": 2787,
+      "cost_usd": 0.057573
+    },
+    {
+      "timestamp": "2026-08-07T01:45:52.889011",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Skyscanner",
+      "input_tokens": 4715,
+      "output_tokens": 388,
+      "cost_usd": 0.006655
+    },
+    {
+      "timestamp": "2026-08-07T01:45:55.616868",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Skyscanner",
+      "input_tokens": 839,
+      "output_tokens": 241,
+      "cost_usd": 0.002044
+    },
+    {
+      "timestamp": "2026-08-07T01:46:00.584985",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Unity",
+      "input_tokens": 928,
+      "output_tokens": 536,
+      "cost_usd": 0.003608
+    },
+    {
+      "timestamp": "2026-08-07T01:46:41.878508",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Unity",
+      "input_tokens": 4485,
+      "output_tokens": 1889,
+      "cost_usd": 0.04179
+    },
+    {
+      "timestamp": "2026-08-07T01:46:48.864598",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Unity",
+      "input_tokens": 3445,
+      "output_tokens": 514,
+      "cost_usd": 0.006015
+    },
+    {
+      "timestamp": "2026-08-07T01:47:45.211712",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Unity",
+      "input_tokens": 5012,
+      "output_tokens": 2517,
+      "cost_usd": 0.052791
+    },
+    {
+      "timestamp": "2026-08-07T01:47:53.739922",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Unity",
+      "input_tokens": 4073,
+      "output_tokens": 605,
+      "cost_usd": 0.007098
+    },
+    {
+      "timestamp": "2026-08-07T01:48:43.129840",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Unity",
+      "input_tokens": 5103,
+      "output_tokens": 2324,
+      "cost_usd": 0.050169
+    },
+    {
+      "timestamp": "2026-08-07T01:48:50.939622",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Unity",
+      "input_tokens": 3880,
+      "output_tokens": 550,
+      "cost_usd": 0.00663
+    },
+    {
+      "timestamp": "2026-08-07T01:48:53.287083",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Unity",
+      "input_tokens": 1001,
+      "output_tokens": 185,
+      "cost_usd": 0.001926
+    },
+    {
+      "timestamp": "2026-08-07T01:49:32.442965",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Livesport",
+      "input_tokens": 4291,
+      "output_tokens": 1718,
+      "cost_usd": 0.038643
+    },
+    {
+      "timestamp": "2026-08-07T01:49:37.983889",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Livesport",
+      "input_tokens": 3077,
+      "output_tokens": 348,
+      "cost_usd": 0.004817
+    },
+    {
+      "timestamp": "2026-08-07T01:50:33.784789",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Livesport",
+      "input_tokens": 4652,
+      "output_tokens": 2369,
+      "cost_usd": 0.049491
+    },
+    {
+      "timestamp": "2026-08-07T01:50:40.554003",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Livesport",
+      "input_tokens": 3728,
+      "output_tokens": 461,
+      "cost_usd": 0.006033
+    },
+    {
+      "timestamp": "2026-08-07T01:51:25.702682",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Livesport",
+      "input_tokens": 4763,
+      "output_tokens": 1902,
+      "cost_usd": 0.042819
+    },
+    {
+      "timestamp": "2026-08-07T01:51:30.975060",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Livesport",
+      "input_tokens": 3261,
+      "output_tokens": 386,
+      "cost_usd": 0.005191
+    },
+    {
+      "timestamp": "2026-08-07T01:51:33.622741",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Livesport",
+      "input_tokens": 857,
+      "output_tokens": 208,
+      "cost_usd": 0.001897
+    },
+    {
+      "timestamp": "2026-08-07T01:52:14.209236",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "ASAPP",
+      "input_tokens": 4318,
+      "output_tokens": 1676,
+      "cost_usd": 0.038094
+    },
+    {
+      "timestamp": "2026-08-07T01:52:22.446908",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "ASAPP",
+      "input_tokens": 3063,
+      "output_tokens": 582,
+      "cost_usd": 0.005973
+    },
+    {
+      "timestamp": "2026-08-07T01:53:15.724780",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "ASAPP",
+      "input_tokens": 4913,
+      "output_tokens": 2233,
+      "cost_usd": 0.048234
+    },
+    {
+      "timestamp": "2026-08-07T01:53:23.763404",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "ASAPP",
+      "input_tokens": 3620,
+      "output_tokens": 464,
+      "cost_usd": 0.00594
+    },
+    {
+      "timestamp": "2026-08-07T01:54:24.601316",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "ASAPP",
+      "input_tokens": 4795,
+      "output_tokens": 2455,
+      "cost_usd": 0.05121
+    },
+    {
+      "timestamp": "2026-08-07T01:54:34.878659",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "ASAPP",
+      "input_tokens": 3842,
+      "output_tokens": 746,
+      "cost_usd": 0.007572
+    },
+    {
+      "timestamp": "2026-08-07T01:54:37.569916",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "ASAPP",
+      "input_tokens": 1206,
+      "output_tokens": 241,
+      "cost_usd": 0.002411
+    },
+    {
+      "timestamp": "2026-08-07T01:55:23.578911",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Square",
+      "input_tokens": 4298,
+      "output_tokens": 1917,
+      "cost_usd": 0.041649
+    },
+    {
+      "timestamp": "2026-08-07T01:55:30.927964",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Square",
+      "input_tokens": 3286,
+      "output_tokens": 494,
+      "cost_usd": 0.005756
+    },
+    {
+      "timestamp": "2026-08-07T01:56:10.266728",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Square",
+      "input_tokens": 4805,
+      "output_tokens": 1687,
+      "cost_usd": 0.03972
+    },
+    {
+      "timestamp": "2026-08-07T01:56:16.693667",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Square",
+      "input_tokens": 3056,
+      "output_tokens": 462,
+      "cost_usd": 0.005366
+    },
+    {
+      "timestamp": "2026-08-07T01:57:13.213649",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Square",
+      "input_tokens": 4773,
+      "output_tokens": 2406,
+      "cost_usd": 0.050409
+    },
+    {
+      "timestamp": "2026-08-07T01:57:20.568998",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Square",
+      "input_tokens": 3775,
+      "output_tokens": 488,
+      "cost_usd": 0.006215
+    },
+    {
+      "timestamp": "2026-08-07T01:57:25.278023",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Square",
+      "input_tokens": 942,
+      "output_tokens": 291,
+      "cost_usd": 0.002397
+    },
+    {
+      "timestamp": "2026-08-07T01:57:30.030237",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Ryanair",
+      "input_tokens": 731,
+      "output_tokens": 539,
+      "cost_usd": 0.003426
+    },
+    {
+      "timestamp": "2026-08-07T01:58:10.709038",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Ryanair",
+      "input_tokens": 4557,
+      "output_tokens": 2062,
+      "cost_usd": 0.044601
+    },
+    {
+      "timestamp": "2026-08-07T01:58:14.598671",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Ryanair",
+      "input_tokens": 3687,
+      "output_tokens": 256,
+      "cost_usd": 0.004967
+    },
+    {
+      "timestamp": "2026-08-07T01:58:59.728841",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Ryanair",
+      "input_tokens": 4826,
+      "output_tokens": 2272,
+      "cost_usd": 0.048558
+    },
+    {
+      "timestamp": "2026-08-07T01:59:08.285637",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Ryanair",
+      "input_tokens": 3897,
+      "output_tokens": 601,
+      "cost_usd": 0.006902
+    },
+    {
+      "timestamp": "2026-08-07T01:59:49.279432",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Ryanair",
+      "input_tokens": 5171,
+      "output_tokens": 1935,
+      "cost_usd": 0.044538
+    },
+    {
+      "timestamp": "2026-08-07T01:59:54.962629",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Ryanair",
+      "input_tokens": 3560,
+      "output_tokens": 401,
+      "cost_usd": 0.005565
+    },
+    {
+      "timestamp": "2026-08-07T01:59:57.653599",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Ryanair",
+      "input_tokens": 852,
+      "output_tokens": 210,
+      "cost_usd": 0.001902
+    },
+    {
+      "timestamp": "2026-08-07T02:00:40.864807",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Square",
+      "input_tokens": 4298,
+      "output_tokens": 1824,
+      "cost_usd": 0.040254
+    },
+    {
+      "timestamp": "2026-08-07T02:00:45.221790",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Square",
+      "input_tokens": 3193,
+      "output_tokens": 219,
+      "cost_usd": 0.004288
+    },
+    {
+      "timestamp": "2026-08-07T02:01:19.815853",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Square",
+      "input_tokens": 4529,
+      "output_tokens": 1631,
+      "cost_usd": 0.038052
+    },
+    {
+      "timestamp": "2026-08-07T02:01:25.157802",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Square",
+      "input_tokens": 3000,
+      "output_tokens": 413,
+      "cost_usd": 0.005065
+    },
+    {
+      "timestamp": "2026-08-07T02:02:02.660821",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Square",
+      "input_tokens": 4724,
+      "output_tokens": 1665,
+      "cost_usd": 0.039147
+    },
+    {
+      "timestamp": "2026-08-07T02:02:09.537512",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Square",
+      "input_tokens": 3034,
+      "output_tokens": 437,
+      "cost_usd": 0.005219
+    },
+    {
+      "timestamp": "2026-08-07T02:02:13.602921",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Square",
+      "input_tokens": 895,
+      "output_tokens": 298,
+      "cost_usd": 0.002385
+    },
+    {
+      "timestamp": "2026-08-07T02:02:54.251045",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Decathlon",
+      "input_tokens": 4290,
+      "output_tokens": 1619,
+      "cost_usd": 0.037155
+    },
+    {
+      "timestamp": "2026-08-07T02:03:03.000687",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Decathlon",
+      "input_tokens": 2980,
+      "output_tokens": 615,
+      "cost_usd": 0.006055
+    },
+    {
+      "timestamp": "2026-08-07T02:03:53.838197",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Decathlon",
+      "input_tokens": 4918,
+      "output_tokens": 2007,
+      "cost_usd": 0.044859
+    },
+    {
+      "timestamp": "2026-08-07T02:04:00.930203",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Decathlon",
+      "input_tokens": 3368,
+      "output_tokens": 488,
+      "cost_usd": 0.005808
+    },
+    {
+      "timestamp": "2026-08-07T02:04:40.328983",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Decathlon",
+      "input_tokens": 4791,
+      "output_tokens": 1556,
+      "cost_usd": 0.037713
+    },
+    {
+      "timestamp": "2026-08-07T02:04:47.057525",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Decathlon",
+      "input_tokens": 2917,
+      "output_tokens": 433,
+      "cost_usd": 0.005082
+    },
+    {
+      "timestamp": "2026-08-07T02:04:51.713066",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Decathlon",
+      "input_tokens": 884,
+      "output_tokens": 279,
+      "cost_usd": 0.002279
+    },
+    {
+      "timestamp": "2026-08-07T02:05:32.946036",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "UPS",
+      "input_tokens": 4312,
+      "output_tokens": 1725,
+      "cost_usd": 0.038811
+    },
+    {
+      "timestamp": "2026-08-07T02:05:38.428813",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "UPS",
+      "input_tokens": 3109,
+      "output_tokens": 337,
+      "cost_usd": 0.004794
+    },
+    {
+      "timestamp": "2026-08-07T02:06:28.585412",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "UPS",
+      "input_tokens": 4662,
+      "output_tokens": 2108,
+      "cost_usd": 0.045606
+    },
+    {
+      "timestamp": "2026-08-07T02:06:35.369621",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "UPS",
+      "input_tokens": 3492,
+      "output_tokens": 372,
+      "cost_usd": 0.005352
+    },
+    {
+      "timestamp": "2026-08-07T02:07:25.420561",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "UPS",
+      "input_tokens": 4697,
+      "output_tokens": 2106,
+      "cost_usd": 0.045681
+    },
+    {
+      "timestamp": "2026-08-07T02:07:33.516649",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "UPS",
+      "input_tokens": 3490,
+      "output_tokens": 555,
+      "cost_usd": 0.006265
+    },
+    {
+      "timestamp": "2026-08-07T02:07:36.704735",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "UPS",
+      "input_tokens": 1018,
+      "output_tokens": 257,
+      "cost_usd": 0.002303
+    },
+    {
+      "timestamp": "2026-08-07T02:08:16.239566",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Comcast",
+      "input_tokens": 4213,
+      "output_tokens": 1624,
+      "cost_usd": 0.036999
+    },
+    {
+      "timestamp": "2026-08-07T02:08:17.222537",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Comcast",
+      "input_tokens": 2906,
+      "output_tokens": 26,
+      "cost_usd": 0.003036
+    },
+    {
+      "timestamp": "2026-08-07T02:08:18.110835",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Comcast",
+      "input_tokens": 478,
+      "output_tokens": 99,
+      "cost_usd": 0.000973
+    },
+    {
+      "timestamp": "2026-08-07T02:09:07.217417",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Superhuman",
+      "input_tokens": 4325,
+      "output_tokens": 2084,
+      "cost_usd": 0.044235
+    },
+    {
+      "timestamp": "2026-08-07T02:09:15.062313",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Superhuman",
+      "input_tokens": 3478,
+      "output_tokens": 499,
+      "cost_usd": 0.005973
+    },
+    {
+      "timestamp": "2026-08-07T02:10:07.533704",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Superhuman",
+      "input_tokens": 4837,
+      "output_tokens": 2221,
+      "cost_usd": 0.047826
+    },
+    {
+      "timestamp": "2026-08-07T02:10:15.757403",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Superhuman",
+      "input_tokens": 3615,
+      "output_tokens": 535,
+      "cost_usd": 0.00629
+    },
+    {
+      "timestamp": "2026-08-07T02:11:13.240932",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Superhuman",
+      "input_tokens": 4872,
+      "output_tokens": 2347,
+      "cost_usd": 0.049821
+    },
+    {
+      "timestamp": "2026-08-07T02:11:23.866748",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Superhuman",
+      "input_tokens": 3741,
+      "output_tokens": 764,
+      "cost_usd": 0.007561
+    },
+    {
+      "timestamp": "2026-08-07T02:11:27.245850",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Superhuman",
+      "input_tokens": 1216,
+      "output_tokens": 311,
+      "cost_usd": 0.002771
+    },
+    {
+      "timestamp": "2026-08-07T02:11:33.376002",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Stone",
+      "input_tokens": 979,
+      "output_tokens": 649,
+      "cost_usd": 0.004224
+    },
+    {
+      "timestamp": "2026-08-07T02:12:22.898304",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Stone",
+      "input_tokens": 4587,
+      "output_tokens": 2126,
+      "cost_usd": 0.045651
+    },
+    {
+      "timestamp": "2026-08-07T02:12:32.661130",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Stone",
+      "input_tokens": 3784,
+      "output_tokens": 413,
+      "cost_usd": 0.005849
+    },
+    {
+      "timestamp": "2026-08-07T02:13:11.699113",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Stone",
+      "input_tokens": 5013,
+      "output_tokens": 2024,
+      "cost_usd": 0.045399
+    },
+    {
+      "timestamp": "2026-08-07T02:13:18.436814",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Stone",
+      "input_tokens": 3682,
+      "output_tokens": 426,
+      "cost_usd": 0.005812
+    },
+    {
+      "timestamp": "2026-08-07T02:14:15.160777",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Stone",
+      "input_tokens": 5025,
+      "output_tokens": 2509,
+      "cost_usd": 0.05271
+    },
+    {
+      "timestamp": "2026-08-07T02:14:25.618680",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Stone",
+      "input_tokens": 4167,
+      "output_tokens": 677,
+      "cost_usd": 0.007552
+    },
+    {
+      "timestamp": "2026-08-07T02:14:29.944785",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Stone",
+      "input_tokens": 1132,
+      "output_tokens": 314,
+      "cost_usd": 0.002702
+    },
+    {
+      "timestamp": "2026-08-07T02:15:04.783091",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "WorkAxle",
+      "input_tokens": 4292,
+      "output_tokens": 1471,
+      "cost_usd": 0.034941
+    },
+    {
+      "timestamp": "2026-08-07T02:15:09.460546",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "WorkAxle",
+      "input_tokens": 2832,
+      "output_tokens": 270,
+      "cost_usd": 0.004182
+    },
+    {
+      "timestamp": "2026-08-07T02:16:02.885339",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "WorkAxle",
+      "input_tokens": 4574,
+      "output_tokens": 2287,
+      "cost_usd": 0.048027
+    },
+    {
+      "timestamp": "2026-08-07T02:16:13.998019",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "WorkAxle",
+      "input_tokens": 3648,
+      "output_tokens": 843,
+      "cost_usd": 0.007863
+    },
+    {
+      "timestamp": "2026-08-07T02:17:06.803581",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "WorkAxle",
+      "input_tokens": 5148,
+      "output_tokens": 2363,
+      "cost_usd": 0.050889
+    },
+    {
+      "timestamp": "2026-08-07T02:17:07.579942",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "WorkAxle",
+      "input_tokens": 3724,
+      "output_tokens": 26,
+      "cost_usd": 0.003854
+    },
+    {
+      "timestamp": "2026-08-07T02:17:08.752408",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "WorkAxle",
+      "input_tokens": 478,
+      "output_tokens": 108,
+      "cost_usd": 0.001018
+    },
+    {
+      "timestamp": "2026-08-07T02:17:13.863765",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Route",
+      "input_tokens": 708,
+      "output_tokens": 525,
+      "cost_usd": 0.003333
+    },
+    {
+      "timestamp": "2026-08-07T02:17:58.591749",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Route",
+      "input_tokens": 4552,
+      "output_tokens": 1974,
+      "cost_usd": 0.043266
+    },
+    {
+      "timestamp": "2026-08-07T02:18:04.679552",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Route",
+      "input_tokens": 3597,
+      "output_tokens": 437,
+      "cost_usd": 0.005782
+    },
+    {
+      "timestamp": "2026-08-07T02:18:59.148555",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Route",
+      "input_tokens": 5002,
+      "output_tokens": 2356,
+      "cost_usd": 0.050346
+    },
+    {
+      "timestamp": "2026-08-07T02:19:06.324664",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Route",
+      "input_tokens": 3979,
+      "output_tokens": 421,
+      "cost_usd": 0.006084
+    },
+    {
+      "timestamp": "2026-08-07T02:19:56.355415",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Route",
+      "input_tokens": 4986,
+      "output_tokens": 2101,
+      "cost_usd": 0.046473
+    },
+    {
+      "timestamp": "2026-08-07T02:20:02.441110",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Route",
+      "input_tokens": 3724,
+      "output_tokens": 397,
+      "cost_usd": 0.005709
+    },
+    {
+      "timestamp": "2026-08-07T02:20:04.739861",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Route",
+      "input_tokens": 848,
+      "output_tokens": 214,
+      "cost_usd": 0.001918
+    },
+    {
+      "timestamp": "2026-08-07T02:20:39.517068",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Hublo",
+      "input_tokens": 4317,
+      "output_tokens": 1560,
+      "cost_usd": 0.036351
+    },
+    {
+      "timestamp": "2026-08-07T02:20:44.529322",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Hublo",
+      "input_tokens": 2946,
+      "output_tokens": 368,
+      "cost_usd": 0.004786
+    },
+    {
+      "timestamp": "2026-08-07T02:21:38.666666",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Hublo",
+      "input_tokens": 4698,
+      "output_tokens": 2183,
+      "cost_usd": 0.046839
+    },
+    {
+      "timestamp": "2026-08-07T02:21:46.458356",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Hublo",
+      "input_tokens": 3569,
+      "output_tokens": 552,
+      "cost_usd": 0.006329
+    },
+    {
+      "timestamp": "2026-08-07T02:22:30.137456",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "Hublo",
+      "input_tokens": 4874,
+      "output_tokens": 1823,
+      "cost_usd": 0.041967
+    },
+    {
+      "timestamp": "2026-08-07T02:22:35.769535",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Hublo",
+      "input_tokens": 3209,
+      "output_tokens": 411,
+      "cost_usd": 0.005264
+    },
+    {
+      "timestamp": "2026-08-07T02:22:38.592743",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Hublo",
+      "input_tokens": 871,
+      "output_tokens": 220,
+      "cost_usd": 0.001971
+    },
+    {
+      "timestamp": "2026-08-07T02:22:47.428473",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "shiftkey",
+      "input_tokens": 1826,
+      "output_tokens": 759,
+      "cost_usd": 0.005621
+    },
+    {
+      "timestamp": "2026-08-07T02:23:26.226786",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "shiftkey",
+      "input_tokens": 4776,
+      "output_tokens": 1843,
+      "cost_usd": 0.041973
+    },
+    {
+      "timestamp": "2026-08-07T02:23:31.826212",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "shiftkey",
+      "input_tokens": 3688,
+      "output_tokens": 337,
+      "cost_usd": 0.005373
+    },
+    {
+      "timestamp": "2026-08-07T02:24:09.078810",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "shiftkey",
+      "input_tokens": 5126,
+      "output_tokens": 1927,
+      "cost_usd": 0.044283
+    },
+    {
+      "timestamp": "2026-08-07T02:24:20.043967",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "shiftkey",
+      "input_tokens": 3772,
+      "output_tokens": 408,
+      "cost_usd": 0.005812
+    },
+    {
+      "timestamp": "2026-08-07T02:25:06.750321",
+      "model": "claude-sonnet-4-5-20250929",
+      "role": "generator",
+      "company": "shiftkey",
+      "input_tokens": 5197,
+      "output_tokens": 2210,
+      "cost_usd": 0.048741
+    },
+    {
+      "timestamp": "2026-08-07T02:25:08.484319",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "shiftkey",
+      "input_tokens": 4055,
+      "output_tokens": 26,
+      "cost_usd": 0.004185
+    },
+    {
+      "timestamp": "2026-08-07T02:25:09.496411",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "shiftkey",
+      "input_tokens": 478,
+      "output_tokens": 107,
+      "cost_usd": 0.001013
+    }
+  ]
+}

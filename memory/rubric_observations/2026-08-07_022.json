@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_022",
+  "timestamp": "2026-08-07T01:51:34.182702",
+  "company": "Livesport",
+  "criterion_fired": "CRITERION 5 (Deal Stage Qualification) + CRITERION 3 (ICP Fit)",
+  "was_appropriate": true,
+  "suggested_change": "CRITERION 5 should explicitly state: 'If ICP fit is marked NOT confirmed, deal must remain in Discovery stage regardless of ARR estimate. Qualified to Buy requires explicit ICP confirmation.' Instruction must define: unconfirmed ICP = blocking condition, not warning."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_023",
+  "timestamp": "2026-08-07T01:54:38.322354",
+  "company": "ASAPP",
+  "criterion_fired": "Criterion 4 (Actionable Next Steps) and Criterion 5 (Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 wording is appropriate but would benefit from explicit examples in CLAUDE.md showing forbidden vs. required next-step format. Criterion 5 is appropriate but CLAUDE.md should clarify that inferences about prospect commitment (e.g., 'POC commitment') require explicit prospect language confirming intent, not just mention of activity."
+}

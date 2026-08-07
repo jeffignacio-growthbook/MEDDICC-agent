@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_010",
+  "timestamp": "2026-08-07T01:11:20.910907",
+  "company": "ClickHouse",
+  "criterion_fired": "Criterion 1 (Identified Pain) + Criterion 5 (ICP Fit)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Define minimum evidence threshold\u2014either (a) explicit 'Unknown/0/10' if only technical symptoms exist without quantified business impact, OR (b) require >1 business metric quote (revenue, volume, or timeline) to score \u22653/10. Criterion 5: Remove database-scale-as-ICP-proxy logic. Require actual SaaS product usage metrics (e.g., published traffic data, customer testimonials) or mark as 'Insufficient data' rather than assumed 100K+. Also: make Engineer-led deal without Product/Growth stakeholder an explicit disqualifier, not a risk flag."
+}

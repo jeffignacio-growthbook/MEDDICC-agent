@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_007",
+  "timestamp": "2026-08-07T01:02:29.141739",
+  "company": "OpenTable",
+  "criterion_fired": "Criterion 2 (Decision Process), Criterion 4 (Next Steps specificity across Champion, Decision Criteria, Identified Pain)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: (1) 'When status changes, explicitly document why new call data contradicts or updates prior assessment; maintain prior score if no contradictory evidence exists.' (2) 'Champion questions must name specific stakeholders and decision deadlines. Pain discovery questions must uncover outcomes without presupposing pain exists; frame as discovery not validation.'"
+}

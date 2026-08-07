@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_030",
+  "timestamp": "2026-08-07T02:14:30.668964",
+  "company": "Stone",
+  "criterion_fired": "Criterion 1, 2, 3, 4, 5 - multiple simultaneous failures suggest rubric miscalibration",
+  "was_appropriate": false,
+  "suggested_change": "Separate 'evidence quality' (is it direct or inferred?) from 'MEDDICC completeness' (do we have prospect engagement on this element?). A 5/10 on Metrics with qualitative pain is valid for early-stage discovery; don't retroactively penalize it. Score on what the call stage supports, not on what a mature close-stage call should contain. Remove ICP validation from MEDDICC rubric unless it's a deal-kill criterion defined upfront."
+}

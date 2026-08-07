@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_017",
+  "timestamp": "2026-08-07T01:37:15.656947",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 1, 2, 4, 5 (multiple simultaneous failures)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Clarify whether 'Unknown' status requires explicit negative statement or absence of evidence suffices. Criterion 2: Define 'internal selling behavior' threshold\u2014does Partial require proof of prospect using contact as seller, or just credible positioning as technical influencer? Criterion 5: Resolve Decision Process contradiction\u2014if October 2026 close is stated as expected, timeline should not score 1/10 Unknown; clarify whether 'expected' requires board-level confirmation or verbal indication suffices. ICP criterion: specify whether ecommerce platform + visitor count = sufficient or if additional vertical signals required."
+}

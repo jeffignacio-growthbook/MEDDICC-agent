@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_009",
+  "timestamp": "2026-08-07T01:07:42.449880",
+  "company": "Deel",
+  "criterion_fired": "CRITERION 2 (Carry-forward Consistency) and CRITERION 5 (No Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Add instruction: 'When analysis identifies prior assumptions as unvalidated or unconfirmed, explicitly adjust the corresponding MEDDIC component score to 0-3/10 (Unknown) rather than carrying forward the prior score. Document which evidence remains valid and which is now invalidated.'"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_003",
+  "timestamp": "2026-08-07T00:49:27.940506",
+  "company": "Fixter",
+  "criterion_fired": "Criterion 1 (Metrics evidence quality), Criterion 3 (Pain direct evidence), Criterion 4 (Next steps concreteness), Criterion 5 (Champion advocacy support)",
+  "was_appropriate": true,
+  "suggested_change": "Criteria are appropriate but CLAUDE.md needs explicit rules: (1) every score \u22657 requires direct quote or specific paraphrase; (2) score revisions must be documented in evidence statement, not separated; (3) next steps must use format 'Ask [stakeholder]: [specific question expecting measurable answer]' not open-ended discovery phrasing; (4) Champion requires documented internal advocacy examples, not role description alone"
+}

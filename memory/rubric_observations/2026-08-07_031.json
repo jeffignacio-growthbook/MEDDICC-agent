@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_031",
+  "timestamp": "2026-08-07T02:20:05.382478",
+  "company": "Route",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 3 (Metrics), Criterion 4 (Metrics & Competition), Criterion 5 (Decision Process)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'Next steps must include specific contact name and calendar date. Metrics evidence requires prospect-stated numbers (X to Y, by date). Do not score above 5/10 for any dimension without prospect-originated quantification or confirmed timeline.'"
+}

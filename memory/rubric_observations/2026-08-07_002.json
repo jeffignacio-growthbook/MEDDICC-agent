@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-07_002",
+  "timestamp": "2026-08-07T00:46:24.859304",
+  "company": "BESTSELLER",
+  "criterion_fired": "Criterion 4, 5, 3",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 4: Accept '[contact TBD]' placeholders as valid when contacts are unknown, requiring only that first action be 'identify contacts'; Criterion 5: Downgrade only when explicit objection quoted, not design realities; Criterion 3: Score 'Unknown' for unaddressed competitive landscape, not 'Absent'."
+}
