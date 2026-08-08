@@ -1,0 +1,21 @@
+{
+  "company": "Airalo",
+  "deal_id": "62121618183",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 0,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "FAIL Criterion 1 (Complete Coverage): Decision Process component lacks evidence statement. The analysis states 'No discussion of timeline beyond this presentation' and 'No approval process discussed' but does not explicitly state 'None exists' or provide a clear evidence summary for the Unknown status at 2/10. FAIL Criterion 3 (Evidence Quality): Metrics component claims 'Partial' status with score 4/10 but the only concrete evidence is '30 million users' and paraphrased 'move to high-throughput approach'\u2014no direct quote or specific metric statement from prospect justifies a 4/10 score. Below 5/10 requires explicit evidence; this lacks it. FAIL Criterion 4 (Actionable Next Steps): Multiple components have vague next steps. Decision Criteria next step asks to 'confirm attendee availability' then uses 'confirm' action\u2014this is borderline vague. More critically, Identified Pain next step asks Dan Popa to confirm availability 'before scheduled presentation' but the specific question is sound. However, Competition next step asks 'confirm attendee availability' which is procedurally vague before the substantive question. The core issue: several next steps lead with '[Contact TBD]' or '[confirm availability]' phrasing that obscures the actual sales action. Reframe to lead with the concrete question, not the contact-confirmation ritual. FAIL Criterion 4 (Actionable Next Steps): Champion component next step defers identification until 'after upcoming presentation' with instruction to 'note who asks the most strategic questions'\u2014this is not actionable enough. The next step should specify a concrete action for the upcoming presentation (e.g., 'During presentation, ask each attendee directly: [specific question about internal selling']). PASS Criterion 2 (Carry-Forward Consistency): Cumulative state shows 0 prior calls; carry-forward rules do not apply per exception. All Unknown scores on first call are correct. PASS Criterion 5 (No Unsupported Claims): No unsupported claims made. ICP fit is solid: 30M users, warehouse-native requirement, product-led growth signals evident. GrowthBook-specific checks pass: no competitor miscategorization, warehouse-native flagged appropriately, scale signals present.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-08_014",
+  "timestamp": "2026-08-08T17:56:32.571860"
+}
