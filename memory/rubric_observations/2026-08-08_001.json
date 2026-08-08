@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_001",
+  "timestamp": "2026-08-08T03:31:06.227142",
+  "company": "Oda",
+  "criterion_fired": "Competition component scoring and state management criteria (1-5)",
+  "was_appropriate": false,
+  "suggested_change": "Separate 'analysis quality' (did agent identify Oda is existing customer?) from 'scoring format' (must use N/A vs Unknown). Current rubric conflates these. Recommend: (1) Agent must identify deal type (new/renewal/expansion); (2) Competition scoring: 0/10 if unknown, N/A if confirmed existing, 1-10 if new. (3) Remove requirement for explicit 'maintaining score' language\u2014carry-forward is implicit when no contradictory data exists."
+}

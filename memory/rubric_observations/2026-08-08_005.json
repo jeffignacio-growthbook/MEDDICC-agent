@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_005",
+  "timestamp": "2026-08-08T03:38:52.181840",
+  "company": "KBX",
+  "criterion_fired": "Criterion 2 (carry-forward consistency), Criterion 3 (competition evidence), Criterion 4 (next steps specificity)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: 'Score changes require new call evidence; scores may stabilize if no new information emerges\u2014explicitly document 'no change' rather than penalize maintenance.' Criterion 3: 'Competitive positioning score should reflect evidence of competitors mentioned/evaluated, not penalize absence of discussion in discovery calls.' Criterion 4: 'Next steps should specify intent (discovery/validation/decision) and rough timing; exploratory questions in discovery phase are appropriate and distinct from vague execution steps.'"
+}

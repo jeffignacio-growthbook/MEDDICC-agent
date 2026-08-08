@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_006",
+  "timestamp": "2026-08-08T03:40:48.115978",
+  "company": "TickPick",
+  "criterion_fired": "Criterion 1, 2, 4, 5 (multiple rubric definition issues)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Carry-forward rule should explicitly define when reinterpretation of prior evidence quality justifies score changes. (2) ICP fit criterion should enumerate disqualifiers, not absence of signals. (3) Criterion 4 should specify whether conditional/exploratory questions violate specificity if they surface new information pathways. (4) Criterion 5 should clarify the boundary between prospect-stated ROI concerns (valid) and seller inferences about value gaps (invalid)."
+}

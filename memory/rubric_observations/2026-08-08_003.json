@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_003",
+  "timestamp": "2026-08-08T03:37:31.272184",
+  "company": "Notion",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 3 (Evidence Quality), Criterion 4 (Actionable Next Steps), Criterion 5 (No Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 should explicitly require: contact name or '[Name TBD]' label, specific action verb + deliverable, deadline format, measurable success metric. Example template: 'Email [contact name/TBD] by [date]: Request [specific document/metric] showing [measurable outcome]. Success = receipt of [concrete data].' Current 'Request dashboard' fails this standard."
+}

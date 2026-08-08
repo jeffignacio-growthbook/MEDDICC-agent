@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_010",
+  "timestamp": "2026-08-08T03:48:32.990804",
+  "company": "Square",
+  "criterion_fired": "Criterion 3, 4, 1, 5",
+  "was_appropriate": true,
+  "suggested_change": "Criteria are appropriate; instruction gaps in agent behavior (competitor validation logic, next-step verb requirements, status contradiction detection, evidence-claim alignment) should be codified in CLAUDE.md with explicit validation checks."
+}

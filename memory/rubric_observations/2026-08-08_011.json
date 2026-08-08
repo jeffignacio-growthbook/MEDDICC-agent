@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_011",
+  "timestamp": "2026-08-08T03:49:08.047519",
+  "company": "Ryanair",
+  "criterion_fired": "CRITERION 2 and CRITERION 4",
+  "was_appropriate": true,
+  "suggested_change": "CRITERION 2: 'Score may only change if new evidence directly contradicts prior assessment; contextual execution factors do not justify reduction. Document the contradiction explicitly.' CRITERION 4: 'Next step questions must extract a specific metric or decision owner, not pose hypothetical scenarios. Use interrogative phrases like \"how many,\" \"who decides,\" \"by when\" rather than \"what if\" or \"how would.\""
+}

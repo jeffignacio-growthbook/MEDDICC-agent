@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_002",
+  "timestamp": "2026-08-08T03:31:28.403702",
+  "company": "InPost",
+  "criterion_fired": "Criterion 1 (Identified Pain evidence sufficiency) and Criterion 4 (next step specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 next-step language should explicitly require: contact name, proposed day/week, and commitment phrase (e.g., 'Schedule call with [contact] by [date] to validate...'). Criterion 1 should clarify: 'Pain must be prospect-stated in own words about business impact, cost, or timeline\u2014not inferred capability gaps.'"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_012",
+  "timestamp": "2026-08-08T03:51:17.424361",
+  "company": "UPS",
+  "criterion_fired": "Criterion 1, 3, 4, 5",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit CLAUDE.md rule: 'All evidence citations must use direct quotes from call transcript or summary; paraphrasing or inference is flagged as unsupported. First-call component scores >5/10 require quantified impact metrics or explicit customer statement; absence triggers score cap at 5/10 and Unknown flag.'"
+}

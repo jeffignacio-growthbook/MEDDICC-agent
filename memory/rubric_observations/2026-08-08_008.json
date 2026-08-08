@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_008",
+  "timestamp": "2026-08-08T03:43:45.666831",
+  "company": "Zoro",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 4 (Actionable next steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2: 'Score revisions across calls require explicit evidence of contradiction or new contradictory information; re-evaluations of the same call data should note consistency rather than downgrade.' Criterion 4: 'Concrete dates must be specific calendar references (e.g., Friday EOD, next Tuesday) or explicit deal milestones, not placeholder timeframe ranges.'"
+}

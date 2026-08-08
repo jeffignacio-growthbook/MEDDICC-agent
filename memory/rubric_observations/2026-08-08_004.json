@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_004",
+  "timestamp": "2026-08-08T03:38:01.929842",
+  "company": "OpenTable",
+  "criterion_fired": "Criterion 2 (Pain) and Criterion 4/5 (Metrics/Competition)",
+  "was_appropriate": true,
+  "suggested_change": "Clarify: 'Do not regress scores unless current call explicitly contradicts prior evidence. Prior pain/market signals persist unless refuted. Next steps must include: [contact name], [specific timing], [exact question phrased as open-ended or closed format].'"
+}

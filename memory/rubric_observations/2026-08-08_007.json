@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_007",
+  "timestamp": "2026-08-08T03:43:38.725515",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 3 (Evidence Quality), Criterion 4 (Actionable Next Steps), Criterion 5 (Unsupported Claims)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Define score bands explicitly (e.g., 7-10 = specific metrics present, 4-6 = partial metrics, 1-3 = no quantifiable data). Criterion 3: Require minimum threshold of direct quotes vs. paraphrasing; fail if source material is corrupted/unusable. Criterion 4: Define 'actionable' as requiring [person] + [day/date] + [specific question/task], reject 'schedule X call' without temporal specificity. Criterion 5: Prohibit champion claims without explicit evidence of proactive advocacy behavior in transcript."
+}
