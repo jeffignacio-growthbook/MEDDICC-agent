@@ -1,7 +1,7 @@
 {
   "company": "bi-weekly sync w/GB",
   "slug": "bi-weekly-sync-w-gb",
-  "last_etl_date": "2026-08-05T15:57:31.338090",
+  "last_etl_date": "2026-08-08T17:33:40.673970",
   "calls": [
     {
       "id": "01KN7H41ZFKXK83MTKZJQ5363P",
@@ -206,6 +206,22 @@
       "participants": 12,
       "keywords": "sticky bucketing, Java SDK, GrowthBook, feature flags, assignment storage, bug fixes",
       "action_items": "\n**Brian Schultz**\nSend detailed sticky bucketing implementation examples and questions to Chris Sanders via Slack or email for review by the GrowthBook SDK team (06:46)\nPost questions and examples in the GrowthBook Teams Slack channel to facilitate team review and quicker response (10:57)\n\n**Chris Sanders**\nReview Brian’s provided examples and investigate the Java SDK’s handling of sticky bucketing to determine if internal method calls to retrieve saved assignments are missing or implemented incorrectly (06:46)\nCoordinate with the SDK team as needed to resolve the sticky bucketing implementation issue for the Java SDK (11:35)\n\n**Andrew Muller**\nContinue supporting bug fixes and assist other teams in their implementation efforts, particularly addressing some outstanding flagging items (09:19)\n"
+    },
+    {
+      "id": "01KYR7QHYT49TNKK0FZWDTX9CW",
+      "source": "fireflies",
+      "title": "bi-weekly sync w/GB team",
+      "date": "2026-08-06",
+      "duration_minutes": 24,
+      "summary": "The discussion focused on enhancing the clarity and usability of GrowthBook by removing device type from metric slices in all fact tables to reduce user confusion while maintaining it as a filterable dimension. The team identified inconsistencies and bugs related to sticky buckets, specifically in the display and behavior during variation weight changes, prompting Chris Sanders to escalate these issues to the engineering team for resolution. Additionally, the team agreed to shift from weekly calls to an as-needed meeting schedule, utilizing Slack and Teams for ongoing communication, ensuring efficient use of time. Overall, the changes aim to improve user experience, streamline data interpretation, and reinforce the reliability of the platform.",
+      "organizer": "jake@growthbook.io",
+      "participants": 12,
+      "keywords": "GrowthBook, metric slices, sticky buckets, fact table configuration, UI bugs, experiment settings",
+      "action_items": "\n, *, *, B, r, i, a, n,  , S, c, h, u, l, t, z, *, *, \n, U, n, c, h, e, c, k,  , d, e, v, i, c, e,  , t, y, p, e,  , f, r, o, m,  , a, l, l,  , f, a, c, t,  , t, a, b, l, e, s, ’,  , m, e, t, r, i, c,  , s, l, i, c, e, r,  , s, e, t, t, i, n, g, s,  , i, n,  , G, r, o, w, t, h, B, o, o, k,  , t, o,  , a, v, o, i, d,  , c, o, n, f, u, s, i, o, n,  , f, o, r,  , u, s, e, r, s,  , (, 0, 3, :, 4, 9, ), \n, \n, *, *, C, h, r, i, s,  , S, a, n, d, e, r, s, *, *, \n, R, e, p, o, r, t,  , a, n, d,  , e, s, c, a, l, a, t, e,  , t, h, e,  , s, t, i, c, k, y,  , b, u, c, k, e, t,  , w, e, i, g, h, t,  , v, a, r, i, a, t, i, o, n,  , U, I,  , i, n, c, o, n, s, i, s, t, e, n, c, y,  , b, u, g,  , t, o,  , G, r, o, w, t, h, B, o, o, k,  , d, e, v, e, l, o, p, m, e, n, t,  , t, e, a, m,  , (, 0, 5, :, 4, 8, ), \n, R, e, p, o, r, t,  , a, n, d,  , e, s, c, a, l, a, t, e,  , t, h, e,  , c, u, s, t, o, m,  , s, t, i, c, k, y,  , b, u, c, k, e, t,  , c, h, e, c, k, b, o, x,  , s, y, n, c, h, r, o, n, i, z, a, t, i, o, n,  , b, u, g,  , t, o,  , G, r, o, w, t, h, B, o, o, k,  , d, e, v, e, l, o, p, m, e, n, t,  , t, e, a, m,  , (, 0, 8, :, 0, 3, ), \n, \n, *, *, U, n, a, s, s, i, g, n, e, d, *, *, \n, C, a, n, c, e, l,  , r, e, c, u, r, r, i, n, g,  , b, i, -, w, e, e, k, l, y,  , s, y, n, c,  , c, a, l, l, s, ;,  , s, w, i, t, c, h,  , t, o,  , o, n, -, d, e, m, a, n, d,  , m, e, e, t, i, n, g,  , s, c, h, e, d, u, l, i, n, g, ,,  , c, o, n, t, i, n, u, e,  , c, o, m, m, u, n, i, c, a, t, i, o, n,  , t, h, r, o, u, g, h,  , S, l, a, c, k, /, T, e, a, m, s,  , (, 0, 9, :, 0, 0, ), \n",
+      "participant_domains": [
+        "1800flowers.com",
+        "harryanddavid.com"
+      ]
     }
   ]
 }
