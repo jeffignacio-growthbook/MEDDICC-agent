@@ -1,0 +1,19 @@
+{
+  "company": "Scott / Rémy",
+  "slug": "scott-r-my",
+  "last_etl_date": "2026-08-08T17:33:40.676133",
+  "calls": [
+    {
+      "id": "01KZBGW4JFY9F9TBGM33D7VCMF",
+      "source": "fireflies",
+      "title": "Scott / Rémy",
+      "date": "2026-08-06",
+      "duration_minutes": 1,
+      "summary": "",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "keywords": "",
+      "action_items": ""
+    }
+  ]
+}
