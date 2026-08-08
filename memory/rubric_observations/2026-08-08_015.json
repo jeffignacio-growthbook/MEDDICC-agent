@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_015",
+  "timestamp": "2026-08-08T03:55:17.115564",
+  "company": "shiftkey",
+  "criterion_fired": "Criterion 2, 3, and 4",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should accept score revisions with clear reasoning without mandating specific reconciliation language. Criterion 3 should allow paraphrased evidence when direct quotes unavailable, with call-source citation. Criterion 4 should require 'specific next step with contact and timeframe' rather than prescribing exact format (call vs. email). Current rubric conflates format compliance with analytical rigor."
+}

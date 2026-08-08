@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_014",
+  "timestamp": "2026-08-08T03:54:10.118382",
+  "company": "Hublo",
+  "criterion_fired": "CRITERION 3 - Competition component",
+  "was_appropriate": true,
+  "suggested_change": "Competition assessment must validate that identified competitors operate in the same category (experimentation platforms, not adjacent analytics tools) before scoring. If category mismatch exists, flag as 'not applicable' rather than scoring."
+}

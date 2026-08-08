@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_009",
+  "timestamp": "2026-08-08T03:46:09.368296",
+  "company": "Unity",
+  "criterion_fired": "Criterion 5 (Overall Deal Health severity tone) and Criterion 2 exception interaction",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 5 should state: 'Severity language must match expected maturity for call count\u2014unknown status on calls 1-3 should be framed as normal progression, not critical gap. Reserve critical language for calls 4+ where status remains unknown or contradicts prior context.'"
+}

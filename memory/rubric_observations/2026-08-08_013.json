@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-08_013",
+  "timestamp": "2026-08-08T03:52:34.257772",
+  "company": "Stone",
+  "criterion_fired": "CRITERION 2 (Carry-forward inconsistency) and CRITERION 4 (Actionable next steps)",
+  "was_appropriate": true,
+  "suggested_change": "Both criteria are appropriate. CLAUDE.md should explicitly mandate: (1) when cumulative_calls_context \u2265 2, always carry forward prior scores unless new contradictory evidence exists; document reason for any regression; (2) next steps format must include [Person]: [Specific Action] by [DATE]. [Exact Question or Deliverable], never use 'ask directly' without specifics."
+}
