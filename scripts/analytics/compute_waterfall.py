@@ -26,9 +26,11 @@ def main():
     from supabase import create_client
     import sys
     sys.path.insert(0, str(REPO_ROOT / 'scripts'))
-    from utils import load_client_config
+    from utils import load_client_config, get_fiscal_quarter
+    from datetime import datetime
 
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
+    config = load_client_config()
 
     # Find the two most recent distinct snapshot dates
     dates_result = sb.table('deals_snapshot')\
@@ -61,7 +63,9 @@ def main():
     new_snap = load_snapshot(new_date)
     prev_snap = load_snapshot(prev_date)
 
-    config = load_client_config()
+    # Get current fiscal quarter boundaries
+    q_start, q_end, q_label = get_fiscal_quarter(date.fromisoformat(new_date), config)
+    print(f"  Fiscal quarter: {q_label} ({q_start} to {q_end})")
 
     # Diff into waterfall categories per pipeline
     from collections import defaultdict
@@ -71,6 +75,9 @@ def main():
         'moved_backward_value': 0.0,
         'won_value': 0.0,
         'lost_value': 0.0,
+        'pulled_in_value': 0.0,
+        'pushed_out_value': 0.0,
+        'arr_change_value': 0.0,
         'net_change': 0.0,
         'deals_created_count': 0,
         'deals_qualified_count': 0,
@@ -108,36 +115,98 @@ def main():
             n_status = n.get('deal_status', 'active')
             p_status = p.get('deal_status', 'active')
 
+            # Parse close dates for fiscal quarter analysis
+            n_close_raw = n.get('close_date')
+            p_close_raw = p.get('close_date')
+
+            try:
+                n_close = date.fromisoformat(n_close_raw) if n_close_raw else None
+            except (ValueError, TypeError):
+                n_close = None
+
+            try:
+                p_close = date.fromisoformat(p_close_raw) if p_close_raw else None
+            except (ValueError, TypeError):
+                p_close = None
+
+            # Detect all changes
+            changes = []
+
             if n_status == 'won' and p_status != 'won':
-                wf['won_value'] += value
-                wf['details'].append({
-                    'deal_id': deal_id,
-                    'change_type': 'won', 'value': value,
-                })
+                changes.append('won')
             elif n_status == 'lost' and p_status != 'lost':
-                wf['lost_value'] += value
-                wf['details'].append({
-                    'deal_id': deal_id,
-                    'change_type': 'lost', 'value': value,
-                })
-            elif n_order > p_order:
-                wf['moved_forward_value'] += value
-                wf['details'].append({
-                    'deal_id': deal_id,
-                    'change_type': 'moved_forward',
-                    'from_order': p_order,
-                    'to_order': n_order,
-                    'value': value,
-                })
+                changes.append('lost')
+
+            # Check pulled_in/pushed_out
+            if n_close and p_close:
+                n_in_quarter = q_start <= n_close <= q_end
+                p_in_quarter = q_start <= p_close <= q_end
+
+                if not p_in_quarter and n_in_quarter:
+                    changes.append('pulled_in')
+                elif p_in_quarter and not n_in_quarter:
+                    changes.append('pushed_out')
+
+            # Check stage movement
+            if n_order > p_order:
+                changes.append('moved_forward')
             elif n_order < p_order:
+                changes.append('moved_backward')
+
+            # Check ARR change
+            n_value = float(n.get('deal_value') or 0)
+            p_value = float(p.get('deal_value') or 0)
+            if n_value != p_value:
+                changes.append('arr_change')
+
+            # Apply value to highest precedence category
+            precedence = ['won', 'lost', 'pulled_in', 'pushed_out', 'moved_forward', 'moved_backward', 'arr_change']
+            primary_change = None
+            for category in precedence:
+                if category in changes:
+                    primary_change = category
+                    break
+
+            # Update waterfall values
+            if primary_change == 'won':
+                wf['won_value'] += value
+            elif primary_change == 'lost':
+                wf['lost_value'] += value
+            elif primary_change == 'pulled_in':
+                wf['pulled_in_value'] += value
+            elif primary_change == 'pushed_out':
+                wf['pushed_out_value'] += value
+            elif primary_change == 'moved_forward':
+                wf['moved_forward_value'] += value
+            elif primary_change == 'moved_backward':
                 wf['moved_backward_value'] += value
-                wf['details'].append({
+            elif primary_change == 'arr_change':
+                wf['arr_change_value'] += value
+
+            # Add to details with all relevant metadata
+            if changes:
+                detail = {
                     'deal_id': deal_id,
-                    'change_type': 'moved_backward',
-                    'from_order': p_order,
-                    'to_order': n_order,
+                    'change_type': primary_change,
                     'value': value,
-                })
+                }
+
+                if 'moved_forward' in changes or 'moved_backward' in changes:
+                    detail['from_order'] = p_order
+                    detail['to_order'] = n_order
+
+                if 'pulled_in' in changes or 'pushed_out' in changes:
+                    detail['prev_close_date'] = p_close_raw
+                    detail['new_close_date'] = n_close_raw
+
+                if 'arr_change' in changes:
+                    detail['prev_value'] = p_value
+                    detail['new_value'] = n_value
+
+                if len(changes) > 1:
+                    detail['secondary_changes'] = [c for c in changes if c != primary_change]
+
+                wf['details'].append(detail)
 
     for pipeline_id, wf in pipeline_waterfalls.items():
         wf['net_change'] = (
@@ -155,6 +224,9 @@ def main():
             'moved_backward_value': wf['moved_backward_value'],
             'won_value': wf['won_value'],
             'lost_value': wf['lost_value'],
+            'pulled_in_value': wf['pulled_in_value'],
+            'pushed_out_value': wf['pushed_out_value'],
+            'arr_change_value': wf['arr_change_value'],
             'net_change': wf['net_change'],
             'deals_created_count': wf['deals_created_count'],
             'deals_qualified_count': wf['deals_qualified_count'],
