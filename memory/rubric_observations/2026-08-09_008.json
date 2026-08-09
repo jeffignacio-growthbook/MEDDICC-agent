@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_008",
+  "timestamp": "2026-08-09T02:34:07.347159",
+  "company": "Aircall",
+  "criterion_fired": "CRITERION 2 - CARRY-FORWARD CONSISTENCY",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'For each component, document whether the recent call provided new information. If new information exists (even if confirming prior evidence), note the update and re-evaluate the score. Mark 'no new information' only when the recent call transcript contains zero relevant mentions of that component.'"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_013",
+  "timestamp": "2026-08-09T02:42:25.394377",
+  "company": "UPS",
+  "criterion_fired": "Identified Pain and Decision Criteria scoring inconsistency",
+  "was_appropriate": false,
+  "suggested_change": "Add explicit scoring anchors: 0-1/10 = no mention, 2-3/10 = high-level statement without quotes/quantification, 4-5/10 = specific examples with one metric or timeline, 6+/10 = multiple quantified impacts with prospect language. Current rubric allows too much interpreter discretion."
+}

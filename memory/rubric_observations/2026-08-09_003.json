@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_003",
+  "timestamp": "2026-08-09T02:24:32.257898",
+  "company": "Rula",
+  "criterion_fired": "CRITERION 2 (Decision Process), CRITERION 3 (Competition), CRITERION 4 (Metrics)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Require explicit statement 'Maintaining/Revising from prior X/10 because [new evidence name]' as part of score narrative, not optional mid-text note. Criterion 3: Specify minimum evidence density (e.g., 'named competitor + at least one evaluation signal (demo/pricing/stage) required for 4/10+; single name alone = max 3/10'). Criterion 4: Require next steps in format 'Contact [name] by [day]: Ask [1-2 specific questions with decision lever]' not generic phrasing."
+}

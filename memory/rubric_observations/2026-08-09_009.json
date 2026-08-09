@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_009",
+  "timestamp": "2026-08-09T02:35:58.079992",
+  "company": "Taskrabbit",
+  "criterion_fired": "Criterion 2 vs Criterion 3 contradiction",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: 'When recent call contains no substantive content (<30 seconds of pleasantries), explicitly state this in the preamble and note that MEDDICC scores carry forward due to insufficient new data. Do not attempt to reflect non-existent call content.'"
+}

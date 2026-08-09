@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_012",
+  "timestamp": "2026-08-09T02:39:48.842935",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 2 (Decision Process)",
+  "was_appropriate": true,
+  "suggested_change": "Clarify: 'Do not lower a component score unless the recent call directly contradicts prior evidence. Adding blockers or execution risk = document as notes, maintain prior score. Score change only when timeline, authority, or confirmed decision changes.'"
+}

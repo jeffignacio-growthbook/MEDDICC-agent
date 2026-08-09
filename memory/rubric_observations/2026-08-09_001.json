@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_001",
+  "timestamp": "2026-08-09T02:21:11.377907",
+  "company": "Oda",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 3 (Pain), Criterion 2 (Decision Process), Criterion 5 (Stage)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Scores 6+/10 require direct prospect quotes; if absent, cap at 5. (2) Pain must be prospect-articulated; budget constraints alone = 2/10 max. (3) Decision Process updates must justify why new call data doesn't warrant score adjustment. (4) Stage assessment must logically align with component scores\u2014if Champion=1/10 and Competition=1/10, stage cannot be 'Decision Maker Bought In' regardless of other scores."
+}

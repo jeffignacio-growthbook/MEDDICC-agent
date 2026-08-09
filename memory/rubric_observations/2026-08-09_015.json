@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_015",
+  "timestamp": "2026-08-09T02:45:57.228554",
+  "company": "shiftkey",
+  "criterion_fired": "CRITERION 4 - Next Steps Specificity",
+  "was_appropriate": true,
+  "suggested_change": "Next step must include: (1) specific contact method (call/email), (2) concrete deadline or day, (3) exact question. Format: '[Method] [contact name] by [date]: [question]'. Vague language like 'Ask Chris Sanders' without timeline/method fails."
+}
