@@ -154,6 +154,61 @@ class HubSpotDealsClient:
 
         return all_deals
 
+    def get_all_deals_including_closed(self) -> List[dict]:
+        """
+        Get ALL deals including Closed Won/Lost (for analytics mode).
+
+        Returns deals with company associations and key properties.
+        No stage filtering - fetches everything.
+        """
+        endpoint = "/crm/v3/objects/deals/search"
+
+        body = {
+            'filterGroups': [],  # No filters - get everything
+            'properties': [
+                'dealname',
+                'dealstage',
+                'pipeline',
+                'closedate',
+                'incremental_arr',
+                'amount',
+                'hubspot_owner_id',
+                'dealtype',
+                'createdate',
+                'hs_lastmodifieddate',
+                'last_meddicc_analysis_date',
+                # Phase B.6 cardinal-rule fields
+                'new_revenue',
+                'expansion_revenue',
+                'prior_arr',
+                'sao',
+                'hs_manual_forecast_category'
+            ],
+            'sorts': [
+                {'propertyName': 'hs_lastmodifieddate', 'direction': 'DESCENDING'}
+            ],
+            'limit': 100
+        }
+
+        all_deals = []
+        after = None
+
+        while True:
+            if after:
+                body['after'] = after
+
+            response = self._post(endpoint, body)
+            results = response.get('results', [])
+            all_deals.extend(results)
+
+            paging = response.get('paging', {})
+            after = paging.get('next', {}).get('after')
+
+            if not after:
+                break
+
+        return all_deals
+
     def get_deals_modified_since(self, since_date: str) -> List[dict]:
         """
         Fetch only deals modified after since_date.
