@@ -21,6 +21,8 @@ REPO_ROOT = Path(__file__).parent.parent
 DEALS_DIR = REPO_ROOT / 'memory' / 'deals'
 sys.path.insert(0, str(REPO_ROOT / 'scripts'))
 
+from utils import slugify
+
 DEALS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Exclude Renewal Pipeline (both by name and ID)
@@ -60,26 +62,186 @@ def calculate_days_to_close(create_date_str: str, close_date_str: str) -> int:
         return None
 
 
-def slugify(name: str) -> str:
+def _excluded_stages_from_pipeline_config(config: dict) -> dict:
     """
-    Convert company name to slug (e.g., 'Skyscanner + GrowthBook' -> 'skyscanner').
-    Same logic as etl_calls.py for consistency.
-    """
-    if not name:
-        return ''
+    Extract excluded stages from NEW pipeline config shape.
 
-    parts = re.split(r'\s*[-–—]\s+', name, maxsplit=1)
-    company_part = parts[0]
-    company_part = re.sub(r'growthbook', '', company_part, flags=re.IGNORECASE)
-    company_part = re.sub(r'[+<>&/,]', ' ', company_part)
-    company_part = re.sub(
-        r'\b(and|the|with|vs|versus|for|at|in|of)\b',
-        '', company_part, flags=re.IGNORECASE
-    )
-    company_part = re.sub(r'\s+', ' ', company_part).strip().lower()
-    company_part = re.sub(r'[^a-z0-9\s]', '', company_part)
-    slug = company_part.replace(' ', '-').strip('-')
-    return slug if len(slug) >= 3 else ''
+    New shape (pipeline.pipelines[] with per-stage flags):
+      pipeline:
+        pipelines:
+          - id: "default"
+            name: "Sales Pipeline"
+            stages:
+              - id: "79653122"
+                name: "Meeting Set"
+                order: 1
+                exclude_from_analysis: true  # Too early
+              - id: "68509551"
+                name: "Disqualified"
+                order: 99
+                is_lost: true
+                exclude_from_analysis: true
+              - id: "closedwon"
+                name: "Closed Won"
+                order: 100
+                is_won: true
+
+    RULE: Disqualified stages get BOTH is_lost=true AND exclude_from_analysis=true.
+    Lost stages (is_lost=true) are included in waterfall unless exclude_from_analysis=true.
+    """
+    meeting_set = []
+    disqualified = []
+    closed_won = []
+    closed_lost = []
+    excluded_pipelines = []
+
+    pipeline_config = config.get('pipeline', {})
+
+    # Extract excluded pipeline IDs
+    for pipeline in pipeline_config.get('excluded_pipelines', []):
+        pipeline_id = pipeline.get('id', '')
+        if pipeline_id and 'YOUR_' not in str(pipeline_id):
+            excluded_pipelines.append(pipeline_id)
+
+    # Extract stage exclusions from pipeline.pipelines[] structure
+    for pipeline in pipeline_config.get('pipelines', []):
+        for stage in pipeline.get('stages', []):
+            stage_id = stage.get('id', '')
+            if not stage_id or 'YOUR_' in str(stage_id):
+                continue
+
+            # Closed won stages
+            if stage.get('is_won', False):
+                closed_won.append(stage_id)
+
+            # Closed lost stages (exclude disqualified - they go in disqualified bucket)
+            if stage.get('is_lost', False) and not stage.get('exclude_from_analysis', False):
+                closed_lost.append(stage_id)
+
+            # Disqualified stages (BOTH is_lost AND exclude_from_analysis)
+            if stage.get('is_lost', False) and stage.get('exclude_from_analysis', False):
+                disqualified.append(stage_id)
+
+            # Meeting set stages (exclude_from_analysis but not is_lost)
+            if stage.get('exclude_from_analysis', False) and not stage.get('is_lost', False):
+                meeting_set.append(stage_id)
+
+    return {
+        'meeting_set': meeting_set,
+        'disqualified': disqualified,
+        'closed_won': closed_won or CLOSED_WON_STAGES,
+        'closed_lost': closed_lost or CLOSED_LOST_STAGES,
+        'excluded_pipelines': excluded_pipelines or EXCLUDED_PIPELINES,
+    }
+
+
+def _excluded_stages_from_legacy_config(config: dict) -> dict:
+    """
+    Extract excluded stages from LEGACY config shape (for backward compatibility).
+
+    Legacy shape (excluded_stages.meeting_set[], etc.):
+      excluded_stages:
+        meeting_set:
+          - name: "Meeting Set"
+            id: "79653122"
+        disqualified:
+          - name: "Disqualified"
+            id: "68509551"
+        closed_won:
+          - name: "Closed Won"
+            id: "closedwon"
+    """
+    excluded = config.get('excluded_stages', {})
+
+    def get_ids(section):
+        stages = excluded.get(section, [])
+        if isinstance(stages, list):
+            return [s.get('id') for s in stages if s.get('id')
+                    and 'YOUR_' not in str(s.get('id', ''))]
+        return []
+
+    excluded_pipelines = []
+    for pipeline in config.get('pipelines', {}).get('excluded', []):
+        pipeline_id = pipeline.get('id', '')
+        if pipeline_id and 'YOUR_' not in str(pipeline_id):
+            excluded_pipelines.append(pipeline_id)
+
+    return {
+        'meeting_set': get_ids('meeting_set'),
+        'disqualified': get_ids('disqualified'),
+        'closed_won': get_ids('closed_won') or CLOSED_WON_STAGES,
+        'closed_lost': get_ids('closed_lost') or CLOSED_LOST_STAGES,
+        'excluded_pipelines': excluded_pipelines or EXCLUDED_PIPELINES,
+    }
+
+
+def get_excluded_stages() -> dict:
+    """
+    Load stage exclusions from config/client.yaml.
+
+    Supports TWO config shapes:
+    1. NEW: pipeline.pipelines[] with per-stage flags (Phase A analytics)
+    2. LEGACY: excluded_stages.meeting_set[] (backward compatible)
+
+    The new shape wins if both exist. Falls back to legacy if only legacy exists.
+    Falls back to hardcoded defaults if config doesn't exist.
+
+    Returns:
+        dict: {
+            'meeting_set': [stage_ids],
+            'disqualified': [stage_ids],
+            'closed_won': [stage_ids],
+            'closed_lost': [stage_ids],
+            'excluded_pipelines': [pipeline_ids]
+        }
+    """
+    try:
+        import yaml
+        config_path = REPO_ROOT / 'config' / 'client.yaml'
+        if not config_path.exists():
+            print("  ⚠️  config/client.yaml not found")
+            print("     Run: python scripts/discover_stages.py")
+            print("     Then configure your stage IDs in client.yaml")
+            return {
+                'meeting_set': MEETING_SET_STAGES,
+                'disqualified': DISQUALIFIED_STAGES,
+                'closed_won': CLOSED_WON_STAGES,
+                'closed_lost': CLOSED_LOST_STAGES,
+                'excluded_pipelines': EXCLUDED_PIPELINES,
+            }
+
+        with open(config_path) as f:
+            config = yaml.safe_load(f)
+
+        # NEW SHAPE: Check for pipeline.pipelines[] structure
+        if 'pipeline' in config and 'pipelines' in config['pipeline']:
+            pipelines = config['pipeline'].get('pipelines', [])
+            if pipelines and isinstance(pipelines, list) and len(pipelines) > 0:
+                # Has new shape - use it
+                return _excluded_stages_from_pipeline_config(config)
+
+        # LEGACY SHAPE: Fall back to excluded_stages.*
+        if 'excluded_stages' in config:
+            return _excluded_stages_from_legacy_config(config)
+
+        # No config - use defaults
+        return {
+            'meeting_set': MEETING_SET_STAGES,
+            'disqualified': DISQUALIFIED_STAGES,
+            'closed_won': CLOSED_WON_STAGES,
+            'closed_lost': CLOSED_LOST_STAGES,
+            'excluded_pipelines': EXCLUDED_PIPELINES,
+        }
+
+    except Exception as e:
+        print(f"  ⚠️  Could not load client.yaml: {e}")
+        return {
+            'meeting_set': MEETING_SET_STAGES,
+            'disqualified': DISQUALIFIED_STAGES,
+            'closed_won': CLOSED_WON_STAGES,
+            'closed_lost': CLOSED_LOST_STAGES,
+            'excluded_pipelines': EXCLUDED_PIPELINES,
+        }
 
 
 def get_meeting_set_stages(hubspot):
@@ -136,6 +298,9 @@ def main():
     print("=" * 80)
     print(f"HUBSPOT DEALS ETL - MODE: {args.mode.upper()}")
     print("=" * 80)
+
+    # Load stage exclusions from config
+    excluded = get_excluded_stages()
 
     # Initialize HubSpot client
     print("\n1. Connecting to HubSpot API...")
@@ -242,12 +407,12 @@ def main():
         # In active mode, apply stage filters. In history mode, include everything.
         if args.mode == 'active':
             # Filter: exclude Renewal pipeline (by ID or name)
-            if pipeline in EXCLUDED_PIPELINES or any(excl in pipeline.lower() for excl in EXCLUDED_PIPELINES if excl.isalpha()):
+            if pipeline in excluded['excluded_pipelines'] or any(excl in pipeline.lower() for excl in excluded['excluded_pipelines'] if excl.isalpha()):
                 skipped['renewal_pipeline'] += 1
                 continue
 
             # Filter: exclude Disqualified stage
-            if stage in DISQUALIFIED_STAGES:
+            if stage in excluded['disqualified']:
                 skipped['disqualified'] += 1
                 continue
 
@@ -314,8 +479,8 @@ def main():
             'total_deals': len(deals),
             'excluded_closed_stages': closed_stages,
             'excluded_meeting_set_stages': meeting_set_stages,
-            'excluded_disqualified_stages': DISQUALIFIED_STAGES,
-            'excluded_renewal_pipeline': EXCLUDED_PIPELINES,
+            'excluded_disqualified_stages': excluded['disqualified'],
+            'excluded_renewal_pipeline': excluded['excluded_pipelines'],
             'deals': deals,
         }
 
