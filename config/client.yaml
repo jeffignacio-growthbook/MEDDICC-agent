@@ -58,36 +58,44 @@ pipeline:
           order: 3
 
         - id: "presentationscheduled"
-          name: "Proposal"
+          name: "Technical Evaluation"
           order: 4
 
-        - id: "decisionmakerboughtin"
+        - id: "24682892"
           name: "Negotiating"
           order: 5
 
+        - id: "43449439"
+          name: "Awaiting Signature"
+          order: 6
+
         - id: "closedwon"
           name: "Closed Won (default)"
-          order: 100
+          order: 7
           is_won: true
 
         - id: "1297321623"
           name: "Closed Won"
-          order: 100
+          order: 7
           is_won: true
 
         - id: "closedlost"
           name: "Closed Lost (default)"
-          order: 101
+          order: 8
           is_lost: true
 
         - id: "1297321624"
           name: "Closed Lost"
-          order: 101
+          order: 8
           is_lost: true
+
+        - id: "decisionmakerboughtin"
+          name: "Review"
+          order: 9
 
         - id: "68509551"
           name: "Disqualified"
-          order: 102
+          order: 10
           is_lost: true
           exclude_from_analysis: true  # Both flags: lost AND excluded
 
