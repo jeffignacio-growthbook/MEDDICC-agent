@@ -72,9 +72,12 @@ class SupabaseWriter:
         self.client: Client = create_client(url, key)
 
     def upsert_deal(self, deal: dict) -> None:
-        """Upsert a deal from the deal index."""
-        self.client.table('deals').upsert({
-            'deal_id':       str(deal['deal_id']),
+        """Upsert a deal from the deal index or analytics ETL."""
+        deal_id = str(deal['deal_id'])
+
+        # Base fields (active/history/analytics modes)
+        row = {
+            'deal_id':       deal_id,
             'company_name':  deal.get('company_name', ''),
             'company_slug':  deal.get('company_slug', ''),
             'stage':         deal.get('stage'),
@@ -84,7 +87,44 @@ class SupabaseWriter:
             'owner_email':   deal.get('owner'),
             'last_analyzed': deal.get('last_analyzed'),
             'updated_at':    datetime.now().isoformat(),
-        }, on_conflict='deal_id').execute()
+        }
+
+        # Analytics-specific fields
+        if 'deal_status' in deal:
+            row['deal_status'] = deal['deal_status']
+        if 'pipeline_id' in deal:
+            row['pipeline_id'] = deal['pipeline_id']
+        if 'stage_id' in deal:
+            row['stage_id'] = deal['stage_id']
+        if 'deal_value' in deal:
+            row['deal_value'] = _safe_numeric(deal['deal_value'])
+        if 'lost_reason' in deal:
+            row['lost_reason'] = deal.get('lost_reason')
+        if 'stage_source' in deal:
+            row['stage_source'] = deal['stage_source']
+        if 'create_date' in deal:
+            row['create_date'] = _safe_date(deal['create_date'])
+        if 'days_to_close' in deal:
+            row['days_to_close'] = _safe_int(deal['days_to_close'])
+
+        # Handle highest_stage_order_reached (max logic)
+        if 'current_stage_order' in deal:
+            current_order = deal['current_stage_order']
+            # Read existing value
+            existing = self.client.table('deals')\
+                .select('highest_stage_order_reached')\
+                .eq('deal_id', deal_id)\
+                .execute()
+
+            existing_highest = 0
+            if existing.data and len(existing.data) > 0:
+                existing_highest = existing.data[0].get('highest_stage_order_reached') or 0
+
+            # Use max of current and existing
+            row['highest_stage_order_reached'] = max(current_order, existing_highest)
+
+        self.client.table('deals').upsert(
+            row, on_conflict='deal_id').execute()
 
     def upsert_call(self, call: dict, company_name: str) -> None:
         """Upsert a call from the call cache."""
