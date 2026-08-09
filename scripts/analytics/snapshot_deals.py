@@ -47,9 +47,7 @@ def main():
 
     snapshots = []
     for d in deals:
-        order = get_stage_order(
-            d.get('stage', ''),
-            d.get('pipeline_id', 'default')) or 0
+        order = get_stage_order(d.get('stage', '')) or 0
         snapshots.append({
             'deal_id': d['deal_id'],
             'snapshot_date': today,
