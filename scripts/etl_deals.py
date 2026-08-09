@@ -97,24 +97,25 @@ def _excluded_stages_from_pipeline_config(config: dict) -> dict:
 
     pipeline_config = config.get('pipeline', {})
 
-    # Extract excluded pipeline IDs
-    for pipeline in pipeline_config.get('excluded_pipelines', []):
-        pipeline_id = pipeline.get('id', '')
-        if pipeline_id and 'YOUR_' not in str(pipeline_id):
-            excluded_pipelines.append(pipeline_id)
-
     # Extract stage exclusions from pipeline.pipelines[] structure
     for pipeline in pipeline_config.get('pipelines', []):
+        pipeline_id = pipeline.get('id', '')
+
+        # Derive excluded_pipelines from analyze: false
+        if pipeline.get('analyze', True) is False:
+            if pipeline_id and 'YOUR_' not in str(pipeline_id):
+                excluded_pipelines.append(pipeline_id)
+
         for stage in pipeline.get('stages', []):
             stage_id = stage.get('id', '')
             if not stage_id or 'YOUR_' in str(stage_id):
                 continue
 
-            # Closed won stages
+            # Closed won stages (aggregate across ALL pipelines for terminal detection)
             if stage.get('is_won', False):
                 closed_won.append(stage_id)
 
-            # Closed lost stages (exclude disqualified - they go in disqualified bucket)
+            # Closed lost stages (aggregate across ALL pipelines; exclude disqualified)
             if stage.get('is_lost', False) and not stage.get('exclude_from_analysis', False):
                 closed_lost.append(stage_id)
 
@@ -437,10 +438,9 @@ def main():
                 skipped['meeting_set'] += 1
                 continue
         elif args.mode == 'analytics':
-            # Analytics mode: exclude renewal pipeline only, keep all stages
-            if pipeline in excluded['excluded_pipelines'] or any(excl in pipeline.lower() for excl in excluded['excluded_pipelines'] if excl.isalpha()):
-                skipped['renewal_pipeline'] += 1
-                continue
+            # Analytics mode: include ALL pipelines and stages (no exclusions)
+            # Renewal pipeline is now included for GRR/NRR metrics
+            pass
         # history mode: include everything, no filters
 
         # Get company (with error handling)
@@ -492,7 +492,8 @@ def main():
 
         # Add analytics-specific fields
         if args.mode == 'analytics':
-            from utils import is_won_stage, is_lost_stage, get_stage_order, get_pipeline_config
+            from utils import (is_won_stage, is_lost_stage, get_stage_order,
+                             get_pipeline_config, compute_deal_value, load_client_config)
 
             # Determine deal_status using pipeline config
             if is_won_stage(stage):
@@ -502,11 +503,45 @@ def main():
             else:
                 deal_status = 'active'
 
+            # Compute deal value using NULL-safe ARR component sum
+            config = load_client_config()
+            deal_value = compute_deal_value(props, config)
+
+            # Parse ARR components (NULL-safe)
+            def safe_numeric(val):
+                if val in (None, '', 'null'):
+                    return None
+                try:
+                    return float(str(val).replace('$', '').replace(',', '').strip())
+                except (ValueError, TypeError):
+                    return None
+
+            new_arr = safe_numeric(props.get('new_revenue'))
+            expansion_arr = safe_numeric(props.get('expansion_revenue'))
+            prior_arr = safe_numeric(props.get('prior_arr'))
+
+            # Parse SAO (boolean)
+            sao_raw = props.get('sao')
+            if isinstance(sao_raw, bool):
+                sao = sao_raw
+            elif isinstance(sao_raw, str):
+                sao = sao_raw.lower() in ('true', '1', 'yes')
+            else:
+                sao = None
+
+            # Forecast category (string)
+            forecast_category = props.get('hs_manual_forecast_category')
+
             deal_dict['deal_status'] = deal_status
             deal_dict['create_date'] = create_date
             deal_dict['pipeline_id'] = pipeline if pipeline else 'default'
             deal_dict['stage_id'] = stage
-            deal_dict['deal_value'] = arr
+            deal_dict['deal_value'] = deal_value
+            deal_dict['new_arr'] = new_arr
+            deal_dict['expansion_arr'] = expansion_arr
+            deal_dict['prior_arr'] = prior_arr
+            deal_dict['sao'] = sao
+            deal_dict['forecast_category'] = forecast_category
 
             # Get current stage order
             current_order = get_stage_order(stage) or 0
