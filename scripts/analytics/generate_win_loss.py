@@ -53,6 +53,7 @@ def main():
     import sys
     sys.path.insert(0, str(REPO_ROOT / 'scripts'))
     from token_tracker import TokenTracker
+    from supabase_client import select_all
 
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
     tracker = TokenTracker()
@@ -66,20 +67,20 @@ def main():
         print(f"Processing deals closed after: {cutoff}")
         print("  (use --include-historical for older deals)")
 
-    # Find closed deals without a narrative yet
-    query = sb.table('deals')\
-        .select('deal_id, company_name, deal_status, '
-                'lost_reason, close_date')\
-        .in_('deal_status', ['won', 'lost'])
+    # Find closed deals without a narrative yet (paginated)
+    filters = [('in_', 'deal_status', ['won', 'lost'])]
     if cutoff:
-        query = query.gte('close_date', cutoff)
-    closed = query.execute().data or []
+        filters.append(('gte', 'close_date', cutoff))
+    closed = select_all(
+        sb, 'deals',
+        'deal_id, company_name, deal_status, lost_reason, close_date',
+        filters=filters
+    )
 
-    # Filter out deals that already have narratives
+    # Filter out deals that already have narratives (paginated)
     existing_ids = {
         r['deal_id'] for r in
-        sb.table('win_loss_narratives')
-        .select('deal_id').execute().data or []
+        select_all(sb, 'win_loss_narratives', 'deal_id')
     }
     to_process = [d for d in closed
                   if d['deal_id'] not in existing_ids][:args.limit]
