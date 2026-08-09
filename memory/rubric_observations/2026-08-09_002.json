@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_002",
+  "timestamp": "2026-08-09T02:21:56.318214",
+  "company": "InPost",
+  "criterion_fired": "CRITERION 2: Carry-forward consistency",
+  "was_appropriate": true,
+  "suggested_change": "When a component score regresses from prior iterations, explicitly document the contradicting evidence from the recent call that justifies the change. If no contradicting evidence exists, maintain the prior score with a note explaining why (e.g., 'no new information to reassess')."
+}

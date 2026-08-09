@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_010",
+  "timestamp": "2026-08-09T02:39:00.020228",
+  "company": "Unity",
+  "criterion_fired": "Criteria 1, 2, 4, 5 (multiple)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Explicitly define 'carry-forward' as 'maintain prior score with explicit note OR change score with justification; do not express uncertainty about own scoring.' Criterion 4: Define 'actionable substantive next step' with clear distinction: procedural steps (reschedule, confirm) are only acceptable if paired with specific inquiry; Criterion 5: Require explicit ICP disqualifier statement: 'Minimum [metric]: [threshold]. Disqualifiers: [list]. Unknown data blocks: [list].'"
+}

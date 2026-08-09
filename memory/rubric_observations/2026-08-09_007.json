@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_007",
+  "timestamp": "2026-08-09T02:33:10.250910",
+  "company": "Chaos",
+  "criterion_fired": "CRITERION 2 (Champion assessment consistency)",
+  "was_appropriate": false,
+  "suggested_change": "Revise to: 'Champion score may remain stable across iterations if no new contradictory evidence emerges. Only flag as violation if new call data explicitly contradicts prior assessment (e.g., champion disengagement). Absence of new evidence does not constitute regression.' Also clarify: explicit instruction to preserve prior scores when new calls add no new champion signals."
+}

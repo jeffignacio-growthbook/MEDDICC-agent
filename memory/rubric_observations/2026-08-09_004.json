@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_004",
+  "timestamp": "2026-08-09T02:26:04.661408",
+  "company": "Deel",
+  "criterion_fired": "Criterion 2 (Carry-Forward Consistency)",
+  "was_appropriate": true,
+  "suggested_change": "CLAUDE.md should explicitly require: (1) any score decrease from cumulative state must include explicit justification tied to current call evidence, (2) corrections to prior analysis must be labeled '[CORRECTION TO PRIOR CALL]' and justified separately, not embedded in current assessment, (3) 'maintaining previous score' language required when no new evidence exists."
+}

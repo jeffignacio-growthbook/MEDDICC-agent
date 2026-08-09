@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_005",
+  "timestamp": "2026-08-09T02:27:25.586993",
+  "company": "Notion",
+  "criterion_fired": "Criterion 4 (Next Steps Specificity) and Criterion 5 (Deal Health Assessment Evidencing)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 should explicitly require: each next step must include WHO (named contact or role), HOW (channel), and BY WHEN (date or relative timeframe). Criterion 5 should require: deal health claims must cite specific call transcript evidence, not inferred engagement (e.g., 'Slack channel confirmed in call [timestamp]' vs. 'technical engagement exists')."
+}

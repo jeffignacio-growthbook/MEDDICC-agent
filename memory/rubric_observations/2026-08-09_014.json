@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_014",
+  "timestamp": "2026-08-09T02:44:57.470570",
+  "company": "Hublo",
+  "criterion_fired": "Criterion 3 (Evidence quality) and Criterion 5 (No unsupported claims)",
+  "was_appropriate": true,
+  "suggested_change": "Clarify that when ICP signals are missing or unvalidated, scores in Metrics (M) and Decision Quality (I-C) must reflect reduced confidence, and next steps must include specific confirmation criteria (e.g., 'confirm Amplitude scope vs GrowthBook') rather than open-ended exploration."
+}

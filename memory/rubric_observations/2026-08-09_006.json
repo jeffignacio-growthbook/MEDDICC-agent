@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_006",
+  "timestamp": "2026-08-09T02:32:08.649466",
+  "company": "TickPick",
+  "criterion_fired": "Criterion 2 (carry-forward consistency) and Criterion 4 (next steps specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 should require: 'Next steps must state the specific person, the exact question to ask, and the TickPick context being probed. Generic exploration language (e.g., \"validate\", \"quantify\", \"map\") is insufficient.'"
+}

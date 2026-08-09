@@ -1,0 +1,21 @@
+{
+  "company": "shiftkey",
+  "deal_id": "60355159912",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 10,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Champion: Analysis states 'Champion maintained at 5/10 \u2014 no new information in this call, prior evidence stands' but then immediately contradicts this by analyzing recent call behavior (meeting frequency reduction, Tyler Reber support, Clark Finley cancellation request) as evidence of 'operational comfort' rather than championship. The recent call DOES contain new information that should either maintain the 5/10 (with explicit note 'No new champion evidence in this call') or adjust the score with evidence. As written, the analysis both claims no new information AND analyzes new information in the same section, violating carry-forward consistency. CRITERION 4 VIOLATION - Champion next step uses vague language: 'Ask Chris Sanders directly: Who internally is owning the business case...' lacks a specific scheduled contact date/method. Should specify 'Call Chris Sanders by [date]' or 'Email Chris Sanders Thursday morning asking...'. CRITERION 4 VIOLATION - Decision Criteria next step is vague: 'Confirm with Chris Sanders' lacks a specific contact method or timeline. Should be 'Call Chris Sanders by Thursday: Ask...' CRITERION 4 VIOLATION - Competition next step is vague: 'Ask Chris Sanders' lacks specific timeline. Should specify 'Call Chris Sanders by [date]:'. All three next steps violate the 'specific action' requirement by omitting contact method and concrete deadline.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-09_015",
+  "timestamp": "2026-08-09T02:45:57.228054"
+}
