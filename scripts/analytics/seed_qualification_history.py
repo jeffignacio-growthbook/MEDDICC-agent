@@ -152,17 +152,12 @@ def main():
                 skipped += 1
                 continue
 
-            confidence = ('low_unmapped_stages'
-                          if result['unmapped_stage_ids']
-                          else 'high')
-
             updates.append({
                 'deal_id': deal_id,
                 'highest_stage_order_reached':
                     result['highest_stage_order_reached'],
                 'qualified_date': result['qualified_date'],
                 'stage_source': 'backfilled',
-                'backfill_confidence': confidence,
             })
             seeded += 1
 
@@ -188,8 +183,7 @@ def main():
         for u in updates[:5]:
             print(f"  Would update {u['deal_id']}: "
                   f"highest={u['highest_stage_order_reached']}, "
-                  f"qualified_date={u['qualified_date']}, "
-                  f"confidence={u['backfill_confidence']}")
+                  f"qualified_date={u['qualified_date']}")
         return
 
     # Write to Supabase
@@ -200,13 +194,25 @@ def main():
     from supabase import create_client
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
     written = 0
+    unmatched = []
     for u in updates:
         try:
-            sb.table('deals').upsert(u,
-                                      on_conflict='deal_id').execute()
-            written += 1
+            resp = sb.table('deals').update({
+                'highest_stage_order_reached': u['highest_stage_order_reached'],
+                'qualified_date': u['qualified_date'],
+                'stage_source': u['stage_source'],
+            }).eq('deal_id', str(u['deal_id'])).execute()
+            if resp.data:
+                written += 1
+            else:
+                unmatched.append(u['deal_id'])
         except Exception as e:
             print(f"  Supabase error {u['deal_id']}: {e}")
+
+    if unmatched:
+        print(f"\n⚠️  {len(unmatched)} deals in index not found in Supabase")
+        print(f"   First 5: {unmatched[:5]}")
+        print(f"   (Probable deal_id type mismatch or ETL filtering)")
 
     # Write analytics_meta.json timestamp
     meta_path = REPO_ROOT / 'memory' / 'meta' / 'analytics_meta.json'
@@ -216,6 +222,7 @@ def main():
     meta['qualification_seeded_at'] = datetime.utcnow().isoformat()
     meta['seeded_deal_count'] = written
     meta['unmapped_stage_count'] = len(unmapped_log)
+    meta['unmatched_deal_count'] = len(unmatched)
     with open(meta_path, 'w') as f:
         json.dump(meta, f, indent=2)
 
