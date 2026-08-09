@@ -34,23 +34,24 @@ def main():
     config = load_client_config()
 
     # Find the two most recent distinct snapshot dates
-    dates_result = sb.table('deals_snapshot')\
-        .select('snapshot_date')\
-        .order('snapshot_date', desc=True)\
-        .limit(200)\
-        .execute()
+    def latest_date_before(sb, before=None):
+        q = sb.table('deals_snapshot')\
+            .select('snapshot_date')\
+            .order('snapshot_date', desc=True)\
+            .limit(1)
+        if before:
+            q = q.lt('snapshot_date', before)
+        rows = q.execute().data or []
+        return rows[0]['snapshot_date'] if rows else None
 
-    distinct_dates = sorted(set(
-        r['snapshot_date'] for r in (dates_result.data or [])
-    ), reverse=True)
+    new_date  = latest_date_before(sb)
+    prev_date = latest_date_before(sb, before=new_date)
 
-    if len(distinct_dates) < 2:
+    if not new_date or not prev_date:
         print("Insufficient snapshot history — need at least 2 "
               "snapshot dates. Skipping waterfall computation.")
         return
 
-    new_date = distinct_dates[0]
-    prev_date = distinct_dates[1]
     print(f"Comparing {new_date} vs {prev_date}")
 
     # Load both snapshots (paginated)
