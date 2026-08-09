@@ -279,9 +279,12 @@ def main():
     parser.add_argument(
         '--mode',
         type=str,
-        choices=['active', 'history'],
+        choices=['active', 'history', 'analytics'],
         default='active',
-        help='active: fetch active deals only (default) | history: fetch ALL deals including closed'
+        help=('active (default): active deals for MEDDICC agent\n'
+              'history: all deals including closed (Supabase only)\n'
+              'analytics: ALL deals all stages (Supabase only, '
+              'for snapshot/waterfall/qualification-rate)')
     )
     parser.add_argument(
         '--file',
@@ -326,6 +329,18 @@ def main():
             closed_stages = hubspot._get_closed_stage_ids()
             print(f"   Fetched {len(all_deals_api)} deals")
             print(f"   Auto-excluded closed stages: {closed_stages}")
+        except Exception as e:
+            print(f"❌ Failed to fetch deals: {e}")
+            return
+    elif args.mode == 'analytics':
+        # Analytics mode: fetch ALL deals (no stage exclusions)
+        meeting_set_stages = []
+        closed_stages = []
+
+        print("\n2. Fetching ALL deals from HubSpot API (analytics mode)...")
+        try:
+            all_deals_api = hubspot.get_all_deals_including_closed()
+            print(f"   Fetched {len(all_deals_api)} deals (all stages)")
         except Exception as e:
             print(f"❌ Failed to fetch deals: {e}")
             return
@@ -404,8 +419,9 @@ def main():
         if not deal_id:
             continue
 
-        # In active mode, apply stage filters. In history mode, include everything.
+        # Apply filters based on mode
         if args.mode == 'active':
+            # Active mode: apply stage filters
             # Filter: exclude Renewal pipeline (by ID or name)
             if pipeline in excluded['excluded_pipelines'] or any(excl in pipeline.lower() for excl in excluded['excluded_pipelines'] if excl.isalpha()):
                 skipped['renewal_pipeline'] += 1
@@ -420,6 +436,12 @@ def main():
             if stage in meeting_set_stages:
                 skipped['meeting_set'] += 1
                 continue
+        elif args.mode == 'analytics':
+            # Analytics mode: exclude renewal pipeline only, keep all stages
+            if pipeline in excluded['excluded_pipelines'] or any(excl in pipeline.lower() for excl in excluded['excluded_pipelines'] if excl.isalpha()):
+                skipped['renewal_pipeline'] += 1
+                continue
+        # history mode: include everything, no filters
 
         # Get company (with error handling)
         try:
@@ -468,9 +490,42 @@ def main():
                 days = calculate_days_to_close(create_date, close_date)
                 deal_dict['days_to_close'] = days
 
+        # Add analytics-specific fields
+        if args.mode == 'analytics':
+            from utils import is_won_stage, is_lost_stage, get_stage_order, get_pipeline_config
+
+            # Determine deal_status using pipeline config
+            if is_won_stage(stage):
+                deal_status = 'won'
+            elif is_lost_stage(stage):
+                deal_status = 'lost'
+            else:
+                deal_status = 'active'
+
+            deal_dict['deal_status'] = deal_status
+            deal_dict['create_date'] = create_date
+            deal_dict['pipeline_id'] = pipeline if pipeline else 'default'
+            deal_dict['stage_id'] = stage
+            deal_dict['deal_value'] = arr
+
+            # Get current stage order
+            current_order = get_stage_order(stage) or 0
+            deal_dict['current_stage_order'] = current_order
+
+            # highest_stage_order_reached will be computed during Supabase write
+            # by comparing current_order with existing value
+
+            # Capture lost_reason if deal is lost
+            if deal_status == 'lost':
+                pipeline_config = get_pipeline_config()
+                lost_reason_field = pipeline_config.get('lost_reason_field', 'closed_lost_reason')
+                deal_dict['lost_reason'] = props.get(lost_reason_field, '')
+
+            deal_dict['stage_source'] = 'prospective'
+
         deals[deal_id] = deal_dict
 
-    # In active mode, write memory/deals/index.json. In history mode, skip (Supabase only).
+    # In active mode, write memory/deals/index.json. In history/analytics mode, skip (Supabase only).
     if args.mode == 'active':
         # Build index
         print(f"\n5. Building index...")
@@ -496,6 +551,38 @@ def main():
         print(f'    {skipped["no_company"]} No company')
         print(f'    {skipped["no_slug"]} Invalid slug')
         print(f'  Output: {out}')
+    elif args.mode == 'analytics':
+        print(f"\n5. Analytics mode: {len(deals)} deals fetched")
+        # Count by status
+        status_counts = {'active': 0, 'won': 0, 'lost': 0}
+        qualified_count = 0
+        unmapped_stages = set()
+        from utils import get_stage_order, get_pipeline_config
+
+        pipeline_config = get_pipeline_config()
+        qualified_order = pipeline_config.get('qualified_stage_order', 3)
+
+        for d in deals.values():
+            status = d.get('deal_status', 'unknown')
+            status_counts[status] = status_counts.get(status, 0) + 1
+
+            # Count qualified deals
+            current_order = d.get('current_stage_order', 0)
+            if current_order >= qualified_order:
+                qualified_count += 1
+
+            # Track unmapped stages
+            if current_order == 0 and d.get('stage_id'):
+                unmapped_stages.add(d.get('stage_id'))
+
+        print(f'  {status_counts.get("active", 0)} active, '
+              f'{status_counts.get("won", 0)} won, '
+              f'{status_counts.get("lost", 0)} lost')
+        print(f'  {qualified_count} qualified (stage order >= {qualified_order})')
+        if unmapped_stages:
+            print(f'  ⚠️  {len(unmapped_stages)} stage IDs not in config: {sorted(unmapped_stages)}')
+        print(f'  Qualification rate: {qualified_count}/{len(deals)} '
+              f'({100*qualified_count/len(deals):.1f}%)')
     else:  # history mode
         print(f"\n5. Processed {len(deals)} deals (active + closed)")
         # Count by status
