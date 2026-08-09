@@ -27,6 +27,7 @@ def main():
     import sys
     sys.path.insert(0, str(REPO_ROOT / 'scripts'))
     from utils import load_client_config, get_fiscal_quarter
+    from supabase_client import select_all
     from datetime import datetime
 
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -52,13 +53,13 @@ def main():
     prev_date = distinct_dates[1]
     print(f"Comparing {new_date} vs {prev_date}")
 
-    # Load both snapshots
+    # Load both snapshots (paginated)
     def load_snapshot(snap_date: str) -> dict:
-        result = sb.table('deals_snapshot')\
-            .select('*')\
-            .eq('snapshot_date', snap_date)\
-            .execute()
-        return {r['deal_id']: r for r in (result.data or [])}
+        rows = select_all(
+            sb, 'deals_snapshot', '*',
+            filters=[('eq', 'snapshot_date', snap_date)]
+        )
+        return {r['deal_id']: r for r in rows}
 
     new_snap = load_snapshot(new_date)
     prev_snap = load_snapshot(prev_date)

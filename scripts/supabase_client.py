@@ -60,6 +60,23 @@ def _safe_date(val) -> Optional[str]:
         return None
 
 
+def select_all(sb, table, columns='*', filters=None, page_size=1000):
+    """Paginated select — PostgREST caps unpaginated responses
+    at 1,000 rows silently."""
+    rows, page = [], 0
+    while True:
+        q = sb.table(table).select(columns)
+        for f in (filters or []):
+            q = getattr(q, f[0])(*f[1:])
+        batch = (q.range(page*page_size,
+                 (page+1)*page_size - 1).execute().data
+                 or [])
+        rows.extend(batch)
+        if len(batch) < page_size:
+            return rows
+        page += 1
+
+
 class SupabaseWriter:
     """Client for writing MEDDICC agent data to Supabase."""
 

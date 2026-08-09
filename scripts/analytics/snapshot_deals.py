@@ -24,25 +24,26 @@ def main():
         return
 
     from supabase import create_client
+    import sys
+    sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+    from supabase_client import select_all
+
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
 
     today = date.today().isoformat()
 
-    # Read all current deals from Supabase
-    result = sb.table('deals').select(
+    # Read all current deals from Supabase (paginated)
+    deals = select_all(
+        sb, 'deals',
         'deal_id, pipeline_id, stage, deal_value, '
         'close_date, owner_email, deal_status, '
         'highest_stage_order_reached'
-    ).execute()
-
-    deals = result.data or []
+    )
     if not deals:
         print("No deals in Supabase — run etl_deals.py first")
         return
 
     # Build snapshot rows
-    import sys
-    sys.path.insert(0, str(REPO_ROOT / 'scripts'))
     from utils import get_stage_order
 
     snapshots = []
