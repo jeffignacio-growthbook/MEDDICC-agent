@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_025",
+  "timestamp": "2026-08-09T04:03:32.183524",
+  "company": "Aircall",
+  "criterion_fired": "CRITERION 4 (Next Steps specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Next steps must follow format: '[Contact Name]: [Specific Action] with [Named Participants] to [Concrete Question]' and include timeframe; vague terms like 'reach out to likely power users' or 'map competitive landscape' without contact/timeline are insufficient."
+}

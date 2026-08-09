@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_031",
+  "timestamp": "2026-08-09T04:12:28.873392",
+  "company": "Stone",
+  "criterion_fired": "CRITERION 2 - Carry-forward consistency",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: 'When recent call summary is corrupted or provides zero new data on a component, maintain the cumulative score AND explicitly document this as 'no new data' rather than treating absence of contradiction as justification for downgrade. Downgrade only when recent call contains affirmative contradictory evidence.'"
+}

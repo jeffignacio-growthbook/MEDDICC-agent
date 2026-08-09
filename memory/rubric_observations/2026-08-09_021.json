@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_021",
+  "timestamp": "2026-08-09T03:58:44.757834",
+  "company": "OpenTable",
+  "criterion_fired": "Criterion 2 (Champion), Criterion 3 (Decision Criteria), Criterion 5 (Champion Accessibility)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 & 5 need clarification: Does 'Champion Identified' require demonstrated internal advocacy/selling, or is process facilitation sufficient at early deal stages? Criterion 3 needs definition: Should Decision Criteria score reflect documented evidence of business criteria OR explicit acknowledgment that criteria remain unknown? Current rubric penalizes absence-of-evidence as evidence-of-partial, creating unfalsifiable scoring."
+}

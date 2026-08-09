@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_020",
+  "timestamp": "2026-08-09T03:57:05.814774",
+  "company": "Notion",
+  "criterion_fired": "Criteria 1, 2, 3, 4, 5",
+  "was_appropriate": true,
+  "suggested_change": "CLAUDE.md should explicitly define: (1) evidence threshold\u2014exact quote length or paraphrase detail required for each score band; (2) carry-forward syntax when cumulative_calls_context > 0; (3) contact retrieval protocol: when [TBD] is acceptable vs. when prior call names must be retrieved; (4) ICP assessment template for enterprise deals; (5) actionable next steps structure with required specificity."
+}

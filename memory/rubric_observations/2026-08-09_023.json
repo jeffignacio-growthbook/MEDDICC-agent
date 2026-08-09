@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_023",
+  "timestamp": "2026-08-09T04:01:17.566928",
+  "company": "TickPick",
+  "criterion_fired": "CRITERION 2 & CRITERION 4",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'When a component score decreases between iterations, explicitly document the new evidence causing the change. If no new contradictory evidence exists, maintain prior score and note stability. Confirm champion identity (name + role) before asking activation questions; do not assume identity from job title alone.'"
+}

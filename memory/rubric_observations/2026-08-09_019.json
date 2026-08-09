@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_019",
+  "timestamp": "2026-08-09T03:53:39.619110",
+  "company": "ECCO",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 3 (Evidence Quality), Criterion 4 (Next Steps), Criterion 5 (Champion & Decision Process)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 3 should explicitly define 'direct quote' vs. 'detailed paraphrase' with word count threshold (e.g., \u226520 words with specific business detail). Criterion 5 should separate 'Champion Strength' (active internal selling evidence) from 'Decision Process Clarity' (stakeholder names/titles extracted, not inferred). Criterion 4 should mandate '[Contact Name]: [Exact Question]' format for all next steps, with '[TBD]' for unknowns."
+}

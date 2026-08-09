@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_028",
+  "timestamp": "2026-08-09T04:07:30.250511",
+  "company": "Unity",
+  "criterion_fired": "Criterion 3 (Evidence Quality) + Criterion 1 (Metrics)",
+  "was_appropriate": false,
+  "suggested_change": "Add explicit rule: 'When recent call data is corrupted/unavailable, scores derived from prior calls must be explicitly re-validated or downscored to 5/10 pending verification. Do not carry forward cumulative state without auditable evidence trail.'"
+}
