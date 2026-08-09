@@ -14,19 +14,33 @@ from typing import Dict, List, Any, Optional
 # PIPELINE CONFIGURATION HELPERS
 # ============================================================================
 
-def get_pipeline_config() -> Dict[str, Any]:
+def load_client_config() -> Dict[str, Any]:
+    """
+    Load full client configuration from config/client.yaml.
+
+    Returns:
+        dict: Full configuration dictionary
+    """
+    config_path = Path(__file__).parent.parent / 'config' / 'client.yaml'
+    if not config_path.exists():
+        return {}
+
+    with open(config_path) as f:
+        return yaml.safe_load(f)
+
+
+def get_pipeline_config(config: Optional[Dict] = None) -> Dict[str, Any]:
     """
     Load pipeline configuration from config/client.yaml.
+
+    Args:
+        config: Optional pre-loaded config dict (loaded if not provided)
 
     Returns:
         dict: Pipeline configuration with 'pipelines' key containing stage details
     """
-    config_path = Path(__file__).parent.parent / 'config' / 'client.yaml'
-    if not config_path.exists():
-        return {'pipelines': []}
-
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
+    if config is None:
+        config = load_client_config()
 
     return config.get('pipeline', {})
 
