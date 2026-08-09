@@ -535,7 +535,7 @@ def main():
             deal_dict['deal_status'] = deal_status
             deal_dict['create_date'] = create_date
             deal_dict['pipeline_id'] = pipeline if pipeline else 'default'
-            deal_dict['stage_id'] = stage
+            deal_dict['stage'] = stage
             deal_dict['deal_value'] = deal_value
             deal_dict['new_arr'] = new_arr
             deal_dict['expansion_arr'] = expansion_arr
