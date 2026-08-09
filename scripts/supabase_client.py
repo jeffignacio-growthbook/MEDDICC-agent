@@ -107,6 +107,18 @@ class SupabaseWriter:
         if 'days_to_close' in deal:
             row['days_to_close'] = _safe_int(deal['days_to_close'])
 
+        # Phase B.6 cardinal-rule fields
+        if 'new_arr' in deal:
+            row['new_arr'] = _safe_numeric(deal['new_arr'])
+        if 'expansion_arr' in deal:
+            row['expansion_arr'] = _safe_numeric(deal['expansion_arr'])
+        if 'prior_arr' in deal:
+            row['prior_arr'] = _safe_numeric(deal['prior_arr'])
+        if 'sao' in deal:
+            row['sao'] = deal.get('sao')  # Boolean, no conversion needed
+        if 'forecast_category' in deal:
+            row['forecast_category'] = deal.get('forecast_category')
+
         # Handle highest_stage_order_reached (max logic)
         if 'current_stage_order' in deal:
             current_order = deal['current_stage_order']
