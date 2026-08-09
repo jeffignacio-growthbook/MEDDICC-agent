@@ -56,7 +56,7 @@ def main():
     from supabase_client import select_all
 
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
-    tracker = TokenTracker()
+    tracker = TokenTracker(REPO_ROOT / 'memory')
 
     # Determine cutoff date
     meta_path = REPO_ROOT / 'memory' / 'meta' / 'analytics_meta.json'
