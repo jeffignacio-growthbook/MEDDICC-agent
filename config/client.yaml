@@ -18,6 +18,85 @@ organization:
 # ============================================================================
 # Use scripts/discover_stages.py to find your organization's stage IDs
 
+# ============================================================================
+# PHASE A: New pipeline configuration shape (for analytics layer)
+# ============================================================================
+# This new shape enables waterfall tracking, conversion analysis, and
+# qualification trending. The legacy excluded_stages block below is kept
+# for backward compatibility during transition.
+
+pipeline:
+  # Analytics configuration
+  value_field: "incremental_arr"  # or "amount" - which field to use for deal value
+  qualified_stage_order: 2  # Stages with order >= this are "qualified" (entered pipeline)
+
+  # Pipeline exclusions (renewal, partner pipelines, etc.)
+  excluded_pipelines:
+    - name: "Renewal"
+      id: "866608541"
+
+  # Pipeline definitions with per-stage configuration
+  pipelines:
+    - id: "default"
+      name: "Sales Pipeline"
+      stages:
+        # RULE: Disqualified stages get BOTH is_lost=true AND exclude_from_analysis=true
+        # Lost stages (is_lost=true) are included in waterfall unless exclude_from_analysis=true
+
+        - id: "79653122"
+          name: "Meeting Set"
+          order: 1
+          exclude_from_analysis: true  # Too early - not qualified yet
+
+        - id: "appointmentscheduled"
+          name: "Discovery"
+          order: 2
+          qualified_stage_order: 2  # First qualified stage
+
+        - id: "qualifiedtobuy"
+          name: "Scoping"
+          order: 3
+
+        - id: "presentationscheduled"
+          name: "Proposal"
+          order: 4
+
+        - id: "decisionmakerboughtin"
+          name: "Negotiating"
+          order: 5
+
+        - id: "closedwon"
+          name: "Closed Won (default)"
+          order: 100
+          is_won: true
+
+        - id: "1297321623"
+          name: "Closed Won"
+          order: 100
+          is_won: true
+
+        - id: "closedlost"
+          name: "Closed Lost (default)"
+          order: 101
+          is_lost: true
+
+        - id: "1297321624"
+          name: "Closed Lost"
+          order: 101
+          is_lost: true
+
+        - id: "68509551"
+          name: "Disqualified"
+          order: 102
+          is_lost: true
+          exclude_from_analysis: true  # Both flags: lost AND excluded
+
+# ============================================================================
+# LEGACY: Backward-compatible excluded_stages configuration
+# ============================================================================
+# This block is kept for backward compatibility during Phase A transition.
+# The new pipeline.pipelines[] shape above takes precedence when both exist.
+
 pipelines:
   # Pipelines to include in active deal analysis
   # Only deals in these pipelines will be analyzed nightly
