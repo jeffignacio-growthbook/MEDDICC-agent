@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_024",
+  "timestamp": "2026-08-09T04:02:29.591696",
+  "company": "Chaos",
+  "criterion_fired": "CRITERION 2 (Carry-forward consistency) and CRITERION 4 (Next steps specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Both criteria are appropriate. Add to CLAUDE.md: (1) 'When updating component scores, explicitly justify why new call data warrants the change by citing specific quotes or facts,' and (2) 'All next steps must include: contact name, action verb (email/call/ask), timeline (specific day/week), and concrete question or request.'"
+}

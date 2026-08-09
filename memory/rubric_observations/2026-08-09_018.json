@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_018",
+  "timestamp": "2026-08-09T03:52:40.592770",
+  "company": "Airalo",
+  "criterion_fired": "Criterion 4: Decision Criteria next step specificity",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit rubric rule: 'Next-step questions in Criteria component must avoid ambiguous verbs (evaluate, assess, understand) and instead use direct action verbs (ask, confirm, quantify, identify) with measurable outcomes.'"
+}

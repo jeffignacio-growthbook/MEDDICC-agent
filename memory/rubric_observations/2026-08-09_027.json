@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_027",
+  "timestamp": "2026-08-09T04:06:13.361779",
+  "company": "Skyscanner",
+  "criterion_fired": "Criterion 2: Carry-forward consistency",
+  "was_appropriate": false,
+  "suggested_change": "When call data is corrupted or missing, carry-forward maintenance of prior scores is acceptable without explicit per-component 'No new information' statements. Criterion should require carry-forward *reasoning* only when scores are *adjusted* or when new evidence contradicts prior findings."
+}

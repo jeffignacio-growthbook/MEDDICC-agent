@@ -1,0 +1,21 @@
+{
+  "company": "Route",
+  "deal_id": "59245644951",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward Consistency: cumulative_calls_context shows 1 call reviewed, but the analysis references 'Call 2' throughout. The rubric states carry-forward rules do NOT apply when only one call exists. The analysis must be re-evaluated based solely on what is in the recent call summary provided, not on a phantom 'Call 2'. All components claiming 'maintained from prior call' are invalid when the cumulative state shows only 1 call. Re-score Metrics, Decision Criteria, Identified Pain, and Competition based exclusively on the recent call summary. CRITERION 4 VIOLATION - Actionable Next Steps: Multiple next steps use vague verbs without specific actions: (1) Metrics: 'Schedule during technical deep-dive' - lacks specificity on what will be asked; (2) Decision Process: 'Map out' is too vague - needs specific question format; (3) Competition: 'Map full competitive landscape' uses weak verb. Rewrite all next steps to follow the exact format: '[Contact]: [Specific action/question with concrete detail]'. CRITERION 3 VIOLATION - Evidence Quality for Competition (5/10): Score of 5/10 requires supporting evidence per rubric, but only states 'Amplitude identified as incumbent' with no evidence of what competitors are being evaluated. Either provide evidence of competitive evaluation or lower score to 1-2/10 (Unknown status). CRITERION 1 VIOLATION - Completeness: Every component except Decision Process and Competition must explicitly state 'no new information' and confirm the prior score is maintained, with justification tied to the recent call summary. Currently, components claim carry-forward without explicitly confirming that the recent call summary contains no contradictory or new information on that dimension.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-09_016",
+  "timestamp": "2026-08-09T04:13:05.726482"
+}

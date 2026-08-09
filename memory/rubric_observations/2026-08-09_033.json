@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_033",
+  "timestamp": "2026-08-09T04:15:08.202042",
+  "company": "shiftkey",
+  "criterion_fired": "CRITERION 2 - Carry-forward consistency",
+  "was_appropriate": true,
+  "suggested_change": "When prior calls establish an Identified component (e.g., Pain: 8/10) and new call data contradicts scope without explicit prospect statement of scope change, do NOT downgrade the score. Instead: maintain the prior status, document the contradiction as a red flag, and add explicit note requesting clarification. Score reduction requires direct prospect confirmation that the prior identified element no longer applies."
+}

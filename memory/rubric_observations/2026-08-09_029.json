@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_029",
+  "timestamp": "2026-08-09T04:09:20.714557",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency), Criterion 3 (Evidence quality), Criterion 4 (Actionable next steps)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'When cumulative_calls_context = 1, do NOT apply carry-forward logic. Score only on content present in the current call. For next steps: use specific company/product names and concrete asks (e.g., \"Ask if GrowthBook's feature X meets their Y requirement\" not \"Are you scoring on X, Y, or Z?\"). For Competition: only score 4+ if evidence shows active head-to-head evaluation; tool mentions alone = 1-2."
+}

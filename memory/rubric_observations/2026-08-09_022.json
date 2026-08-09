@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_022",
+  "timestamp": "2026-08-09T03:59:28.727019",
+  "company": "KBX",
+  "criterion_fired": "Criterion 4 (next step specificity) and Criterion 5 (score-evidence alignment)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 5 should explicitly require: 'If engagement level contradicts numerical score, agent must surface and reconcile the contradiction in evidence statement before finalizing score.' Criterion 4 should require: 'All next steps must follow template: [Contact Name] + [Specific Question or Directive] + [Target Date], applied uniformly across all components.'"
+}

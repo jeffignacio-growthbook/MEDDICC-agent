@@ -1,0 +1,21 @@
+{
+  "company": "shiftkey",
+  "deal_id": "60355159912",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 10,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward consistency broken: Identified Pain regressed from 8/10 (Identified) to 5/10 (Partial) without sufficient documented reason. The analysis notes scope uncertainty but fails to maintain the identified status while flagging the contradiction as a clarification need. The prior cumulative state clearly documents '2000 teams' migration as identified pain. The recent call's mention of 'only one feature flag set in use' creates a contradiction that requires investigation, but this should trigger urgent follow-up actions and a FLAG for re-assessment, not an immediate score reduction without explicit prospect statement that scope has changed. The analysis correctly identifies this as a red flag but incorrectly downgrades the component status. RECOMMENDATION: Maintain Identified/8/10 for Identified Pain, add explicit note 'Scope contradiction detected - awaiting clarification from Chris Sanders before final re-assessment.' CRITERION 4 VIOLATION - Actionable next steps use vague language: 'Monitor for any new requirements as implementation progresses' under Decision Criteria is not actionable. CRITERION 4 VIOLATION - Champion next step lacks specificity on timing: 'by next week' is vague; should specify exact date. CRITERION 1 - PASS: All seven components have status, score, and evidence. CRITERION 3 - PASS: All evidence sourced from calls; LaunchDarkly is in competitive set; metrics are prospect-originated. CRITERION 5 - PASS: No unsupported claims about champion's internal selling; analysis appropriately flags lack of evidence rather than claiming advocacy.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-09_016",
+  "timestamp": "2026-08-09T04:15:08.201556"
+}

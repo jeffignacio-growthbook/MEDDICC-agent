@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_016",
+  "timestamp": "2026-08-09T03:48:31.376397",
+  "company": "Oda",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency), Criterion 3 (Evidence quality), Criterion 4 (Actionable next steps), Criterion 5 (Unsupported claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criteria are appropriate. Instruction gap: CLAUDE.md should mandate (1) score delta explanations when prior cumulative state exists, (2) pain scores require direct quotes + urgency framing, (3) next steps must include concrete probe categories or question stems, (4) deal stage must be explicitly cross-checked against champion/stakeholder/commitment evidence in analysis output"
+}

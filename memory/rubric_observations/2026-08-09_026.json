@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_026",
+  "timestamp": "2026-08-09T04:04:51.121736",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 3 (Evidence quality), Criterion 4 (Actionable next steps), Criterion 5 (No unsupported claims)",
+  "was_appropriate": true,
+  "suggested_change": "Strengthen CLAUDE.md on: (1) Evidence requirement: 'Score >5/10 requires direct quote or verbatim paraphrase, not seller interpretation'; (2) Actionable phrasing: 'Next steps must specify exact question or action, not procedural placeholders like 'probe' or 'discuss in next call''; (3) Inference handling: 'Flag assumptions with '[ASSUMPTION TO VALIDATE]' and do not bake inferences into ICP fit assessment without call-grounded evidence.'"
+}

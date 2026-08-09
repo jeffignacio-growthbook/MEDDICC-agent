@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-09_032",
+  "timestamp": "2026-08-09T04:13:05.727477",
+  "company": "Route",
+  "criterion_fired": "Criterion 1, 2, 3, 4 (multiple simultaneous violations)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify carry-forward rules: (1) Define when 'no new information' must be explicitly stated vs. implied silence; (2) Set minimum evidence bar for competition scores (currently 5/10 requires evidence but threshold is unclear); (3) Separate 'carry-forward consistency check' from 'component completeness'\u2014don't penalize both in same iteration; (4) Define acceptable specificity level for next steps ('map out' vs. exact Q&A format) with examples, not binary rejection."
+}
