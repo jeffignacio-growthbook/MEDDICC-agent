@@ -30,7 +30,7 @@ def main():
 
     # Read all current deals from Supabase
     result = sb.table('deals').select(
-        'deal_id, pipeline_id, stage_id, deal_value, '
+        'deal_id, pipeline_id, stage, deal_value, '
         'close_date, owner_email, deal_status, '
         'highest_stage_order_reached'
     ).execute()
@@ -48,13 +48,13 @@ def main():
     snapshots = []
     for d in deals:
         order = get_stage_order(
-            d.get('stage_id', ''),
+            d.get('stage', ''),
             d.get('pipeline_id', 'default')) or 0
         snapshots.append({
             'deal_id': d['deal_id'],
             'snapshot_date': today,
             'pipeline_id': d.get('pipeline_id', 'default'),
-            'stage_id': d.get('stage_id'),
+            'stage_id': d.get('stage'),
             'stage_order': order,
             'deal_value': d.get('deal_value'),
             'close_date': d.get('close_date'),
