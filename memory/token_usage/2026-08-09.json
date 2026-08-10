@@ -1,16 +1,16 @@
 {
   "date": "2026-08-09",
   "summary": {
-    "total_cost_usd": 9.849582,
-    "total_input_tokens": 1741591,
-    "total_output_tokens": 488775,
-    "total_calls": 514,
+    "total_cost_usd": 9.922188,
+    "total_input_tokens": 1779952,
+    "total_output_tokens": 495624,
+    "total_calls": 617,
     "by_model": {
       "claude-haiku-4-5-20251001": {
-        "input_tokens": 833268,
-        "output_tokens": 104028,
-        "cost_usd": 1.353408,
-        "calls": 323
+        "input_tokens": 871629,
+        "output_tokens": 110877,
+        "cost_usd": 1.426014,
+        "calls": 426
       },
       "claude-sonnet-4-5-20250929": {
         "input_tokens": 908323,
@@ -39,6 +39,16 @@
         "input_tokens": 55699,
         "output_tokens": 13235,
         "cost_usd": 0.121874
+      },
+      "objection_extraction": {
+        "input_tokens": 22501,
+        "output_tokens": 3830,
+        "cost_usd": 0.041651
+      },
+      "feature_gap_extraction": {
+        "input_tokens": 15860,
+        "output_tokens": 3019,
+        "cost_usd": 0.030955
       }
     }
   },
@@ -4668,6 +4678,933 @@
       "input_tokens": 832,
       "output_tokens": 215,
       "cost_usd": 0.001907
+    },
+    {
+      "timestamp": "2026-08-09T19:52:34.967150",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 372,
+      "output_tokens": 9,
+      "cost_usd": 0.000417
+    },
+    {
+      "timestamp": "2026-08-09T19:52:35.533411",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 376,
+      "output_tokens": 9,
+      "cost_usd": 0.000421
+    },
+    {
+      "timestamp": "2026-08-09T19:52:36.579632",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 1551,
+      "output_tokens": 63,
+      "cost_usd": 0.001866
+    },
+    {
+      "timestamp": "2026-08-09T19:52:37.197283",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Power + Metrics",
+      "input_tokens": 348,
+      "output_tokens": 9,
+      "cost_usd": 0.000393
+    },
+    {
+      "timestamp": "2026-08-09T19:52:37.891327",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Customer Success Overview",
+      "input_tokens": 360,
+      "output_tokens": 9,
+      "cost_usd": 0.000405
+    },
+    {
+      "timestamp": "2026-08-09T19:53:42.622991",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 372,
+      "output_tokens": 9,
+      "cost_usd": 0.000417
+    },
+    {
+      "timestamp": "2026-08-09T19:53:43.329783",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 376,
+      "output_tokens": 9,
+      "cost_usd": 0.000421
+    },
+    {
+      "timestamp": "2026-08-09T19:53:44.422043",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 1551,
+      "output_tokens": 68,
+      "cost_usd": 0.001891
+    },
+    {
+      "timestamp": "2026-08-09T19:53:45.234940",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Power + Metrics",
+      "input_tokens": 348,
+      "output_tokens": 9,
+      "cost_usd": 0.000393
+    },
+    {
+      "timestamp": "2026-08-09T19:53:46.390360",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Customer Success Overview",
+      "input_tokens": 360,
+      "output_tokens": 9,
+      "cost_usd": 0.000405
+    },
+    {
+      "timestamp": "2026-08-09T19:53:49.377313",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Growthbook Contracts Discussion",
+      "input_tokens": 374,
+      "output_tokens": 243,
+      "cost_usd": 0.001589
+    },
+    {
+      "timestamp": "2026-08-09T19:53:51.866349",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Onboarding + Growth",
+      "input_tokens": 365,
+      "output_tokens": 245,
+      "cost_usd": 0.00159
+    },
+    {
+      "timestamp": "2026-08-09T19:53:52.993650",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "KBYG",
+      "input_tokens": 358,
+      "output_tokens": 9,
+      "cost_usd": 0.000403
+    },
+    {
+      "timestamp": "2026-08-09T19:53:53.669454",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Google Ads",
+      "input_tokens": 1559,
+      "output_tokens": 9,
+      "cost_usd": 0.001604
+    },
+    {
+      "timestamp": "2026-08-09T19:53:54.854721",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 362,
+      "output_tokens": 9,
+      "cost_usd": 0.000407
+    },
+    {
+      "timestamp": "2026-08-09T20:21:38.123653",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1:1 Product Research",
+      "input_tokens": 356,
+      "output_tokens": 9,
+      "cost_usd": 0.000401
+    },
+    {
+      "timestamp": "2026-08-09T20:21:40.408899",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1:30 CST Jake",
+      "input_tokens": 362,
+      "output_tokens": 170,
+      "cost_usd": 0.001212
+    },
+    {
+      "timestamp": "2026-08-09T20:21:41.138225",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1-800-Flowers<>GrowthBook",
+      "input_tokens": 281,
+      "output_tokens": 9,
+      "cost_usd": 0.000326
+    },
+    {
+      "timestamp": "2026-08-09T20:21:43.291900",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1-800-Flowers<>GrowthBook",
+      "input_tokens": 260,
+      "output_tokens": 9,
+      "cost_usd": 0.000305
+    },
+    {
+      "timestamp": "2026-08-09T20:21:44.342242",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1-hr 1:1 with",
+      "input_tokens": 353,
+      "output_tokens": 55,
+      "cost_usd": 0.000628
+    },
+    {
+      "timestamp": "2026-08-09T20:24:05.436113",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1:30 CST Jake",
+      "input_tokens": 362,
+      "output_tokens": 110,
+      "cost_usd": 0.000912
+    },
+    {
+      "timestamp": "2026-08-09T20:24:08.381385",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1-hr 1:1 with",
+      "input_tokens": 353,
+      "output_tokens": 55,
+      "cost_usd": 0.000628
+    },
+    {
+      "timestamp": "2026-08-09T20:24:10.212838",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1800Flowers Account Review",
+      "input_tokens": 334,
+      "output_tokens": 255,
+      "cost_usd": 0.001609
+    },
+    {
+      "timestamp": "2026-08-09T20:24:10.795410",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "2:30p PT Intro",
+      "input_tokens": 357,
+      "output_tokens": 9,
+      "cost_usd": 0.000402
+    },
+    {
+      "timestamp": "2026-08-09T20:24:13.705527",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "30 min with Scott (Julie van der Hoop)",
+      "input_tokens": 355,
+      "output_tokens": 198,
+      "cost_usd": 0.001345
+    },
+    {
+      "timestamp": "2026-08-09T20:24:54.644144",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1:1 Product Research",
+      "input_tokens": 351,
+      "output_tokens": 9,
+      "cost_usd": 0.000396
+    },
+    {
+      "timestamp": "2026-08-09T20:24:56.731856",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1:30 CST Jake",
+      "input_tokens": 357,
+      "output_tokens": 80,
+      "cost_usd": 0.000757
+    },
+    {
+      "timestamp": "2026-08-09T20:24:58.476481",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1-800-Flowers<>GrowthBook",
+      "input_tokens": 276,
+      "output_tokens": 9,
+      "cost_usd": 0.000321
+    },
+    {
+      "timestamp": "2026-08-09T20:24:59.144433",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1-800-Flowers<>GrowthBook",
+      "input_tokens": 255,
+      "output_tokens": 9,
+      "cost_usd": 0.0003
+    },
+    {
+      "timestamp": "2026-08-09T20:24:59.739247",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1-hr 1:1 with",
+      "input_tokens": 348,
+      "output_tokens": 9,
+      "cost_usd": 0.000393
+    },
+    {
+      "timestamp": "2026-08-09T20:48:19.194492",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1:30 CST Jake",
+      "input_tokens": 362,
+      "output_tokens": 116,
+      "cost_usd": 0.000942
+    },
+    {
+      "timestamp": "2026-08-09T20:48:20.520771",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1-hr 1:1 with",
+      "input_tokens": 353,
+      "output_tokens": 55,
+      "cost_usd": 0.000628
+    },
+    {
+      "timestamp": "2026-08-09T20:48:22.287271",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1800Flowers Account Review",
+      "input_tokens": 334,
+      "output_tokens": 225,
+      "cost_usd": 0.001459
+    },
+    {
+      "timestamp": "2026-08-09T20:48:24.701363",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "30 min with Scott (Julie van der Hoop)",
+      "input_tokens": 355,
+      "output_tokens": 200,
+      "cost_usd": 0.001355
+    },
+    {
+      "timestamp": "2026-08-09T20:48:25.736964",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "30 minute meeting",
+      "input_tokens": 285,
+      "output_tokens": 9,
+      "cost_usd": 0.00033
+    },
+    {
+      "timestamp": "2026-08-09T21:08:17.560454",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1800Flowers",
+      "input_tokens": 281,
+      "output_tokens": 9,
+      "cost_usd": 0.000326
+    },
+    {
+      "timestamp": "2026-08-09T21:08:18.232024",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1800Flowers",
+      "input_tokens": 260,
+      "output_tokens": 9,
+      "cost_usd": 0.000305
+    },
+    {
+      "timestamp": "2026-08-09T21:08:18.985200",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Acorns",
+      "input_tokens": 381,
+      "output_tokens": 9,
+      "cost_usd": 0.000426
+    },
+    {
+      "timestamp": "2026-08-09T21:08:19.838951",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Acorns",
+      "input_tokens": 341,
+      "output_tokens": 9,
+      "cost_usd": 0.000386
+    },
+    {
+      "timestamp": "2026-08-09T21:08:20.648899",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "AGS - American Gaming Systems",
+      "input_tokens": 271,
+      "output_tokens": 49,
+      "cost_usd": 0.000516
+    },
+    {
+      "timestamp": "2026-08-09T21:08:24.228737",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1800Flowers",
+      "input_tokens": 276,
+      "output_tokens": 9,
+      "cost_usd": 0.000321
+    },
+    {
+      "timestamp": "2026-08-09T21:08:25.164750",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1800Flowers",
+      "input_tokens": 255,
+      "output_tokens": 9,
+      "cost_usd": 0.0003
+    },
+    {
+      "timestamp": "2026-08-09T21:08:26.623307",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Acorns",
+      "input_tokens": 376,
+      "output_tokens": 186,
+      "cost_usd": 0.001306
+    },
+    {
+      "timestamp": "2026-08-09T21:08:27.897431",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Acorns",
+      "input_tokens": 336,
+      "output_tokens": 9,
+      "cost_usd": 0.000381
+    },
+    {
+      "timestamp": "2026-08-09T21:08:29.319782",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "AGS - American Gaming Systems",
+      "input_tokens": 266,
+      "output_tokens": 9,
+      "cost_usd": 0.000311
+    },
+    {
+      "timestamp": "2026-08-09T21:13:48.198159",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Airalo",
+      "input_tokens": 371,
+      "output_tokens": 136,
+      "cost_usd": 0.001051
+    },
+    {
+      "timestamp": "2026-08-09T21:13:49.292572",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Aircall",
+      "input_tokens": 277,
+      "output_tokens": 9,
+      "cost_usd": 0.000322
+    },
+    {
+      "timestamp": "2026-08-09T21:13:50.453689",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Aircall",
+      "input_tokens": 355,
+      "output_tokens": 114,
+      "cost_usd": 0.000925
+    },
+    {
+      "timestamp": "2026-08-09T21:13:51.647025",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Aircall",
+      "input_tokens": 273,
+      "output_tokens": 9,
+      "cost_usd": 0.000318
+    },
+    {
+      "timestamp": "2026-08-09T21:13:52.436361",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Aircall",
+      "input_tokens": 351,
+      "output_tokens": 9,
+      "cost_usd": 0.000396
+    },
+    {
+      "timestamp": "2026-08-09T21:13:54.111474",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Aircall",
+      "input_tokens": 352,
+      "output_tokens": 212,
+      "cost_usd": 0.001412
+    },
+    {
+      "timestamp": "2026-08-09T21:13:56.160240",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Aircall",
+      "input_tokens": 363,
+      "output_tokens": 84,
+      "cost_usd": 0.000783
+    },
+    {
+      "timestamp": "2026-08-09T21:13:57.604642",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Alpine Home Air",
+      "input_tokens": 331,
+      "output_tokens": 142,
+      "cost_usd": 0.001041
+    },
+    {
+      "timestamp": "2026-08-09T21:13:58.723031",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Amanotes",
+      "input_tokens": 298,
+      "output_tokens": 9,
+      "cost_usd": 0.000343
+    },
+    {
+      "timestamp": "2026-08-09T21:14:00.116140",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Amar Bank",
+      "input_tokens": 360,
+      "output_tokens": 149,
+      "cost_usd": 0.001105
+    },
+    {
+      "timestamp": "2026-08-09T21:14:01.224361",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Amar Bank",
+      "input_tokens": 353,
+      "output_tokens": 115,
+      "cost_usd": 0.000928
+    },
+    {
+      "timestamp": "2026-08-09T21:14:02.087393",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "ASAPP",
+      "input_tokens": 372,
+      "output_tokens": 9,
+      "cost_usd": 0.000417
+    },
+    {
+      "timestamp": "2026-08-09T21:14:02.974031",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "ASAPP",
+      "input_tokens": 342,
+      "output_tokens": 9,
+      "cost_usd": 0.000387
+    },
+    {
+      "timestamp": "2026-08-09T21:14:04.007942",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Beamery",
+      "input_tokens": 277,
+      "output_tokens": 9,
+      "cost_usd": 0.000322
+    },
+    {
+      "timestamp": "2026-08-09T21:14:04.845752",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "BESTSELLER",
+      "input_tokens": 350,
+      "output_tokens": 9,
+      "cost_usd": 0.000395
+    },
+    {
+      "timestamp": "2026-08-09T21:14:09.465331",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "BESTSELLER",
+      "input_tokens": 341,
+      "output_tokens": 63,
+      "cost_usd": 0.000656
+    },
+    {
+      "timestamp": "2026-08-09T21:14:11.174309",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "BESTSELLER",
+      "input_tokens": 354,
+      "output_tokens": 115,
+      "cost_usd": 0.000929
+    },
+    {
+      "timestamp": "2026-08-09T21:14:12.635158",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "BioTechUSA",
+      "input_tokens": 362,
+      "output_tokens": 110,
+      "cost_usd": 0.000912
+    },
+    {
+      "timestamp": "2026-08-09T21:14:14.450958",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Box",
+      "input_tokens": 355,
+      "output_tokens": 135,
+      "cost_usd": 0.00103
+    },
+    {
+      "timestamp": "2026-08-09T21:14:16.154907",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Capture Higher Ed",
+      "input_tokens": 370,
+      "output_tokens": 123,
+      "cost_usd": 0.000985
+    },
+    {
+      "timestamp": "2026-08-09T21:14:17.145287",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Carrefour",
+      "input_tokens": 370,
+      "output_tokens": 9,
+      "cost_usd": 0.000415
+    },
+    {
+      "timestamp": "2026-08-09T21:14:17.983820",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Chaos",
+      "input_tokens": 354,
+      "output_tokens": 60,
+      "cost_usd": 0.000654
+    },
+    {
+      "timestamp": "2026-08-09T21:14:20.083035",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Chaos",
+      "input_tokens": 354,
+      "output_tokens": 246,
+      "cost_usd": 0.001584
+    },
+    {
+      "timestamp": "2026-08-09T21:14:21.743141",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Circle",
+      "input_tokens": 388,
+      "output_tokens": 62,
+      "cost_usd": 0.000698
+    },
+    {
+      "timestamp": "2026-08-09T21:14:22.898243",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Comcast",
+      "input_tokens": 267,
+      "output_tokens": 9,
+      "cost_usd": 0.000312
+    },
+    {
+      "timestamp": "2026-08-09T21:14:23.769585",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Conversionista!",
+      "input_tokens": 328,
+      "output_tokens": 9,
+      "cost_usd": 0.000373
+    },
+    {
+      "timestamp": "2026-08-09T21:14:24.820536",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Deel",
+      "input_tokens": 391,
+      "output_tokens": 75,
+      "cost_usd": 0.000766
+    },
+    {
+      "timestamp": "2026-08-09T21:14:25.571735",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Deel",
+      "input_tokens": 279,
+      "output_tokens": 9,
+      "cost_usd": 0.000324
+    },
+    {
+      "timestamp": "2026-08-09T21:14:26.329342",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Deel",
+      "input_tokens": 353,
+      "output_tokens": 9,
+      "cost_usd": 0.000398
+    },
+    {
+      "timestamp": "2026-08-09T21:15:07.268307",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Airalo",
+      "input_tokens": 366,
+      "output_tokens": 165,
+      "cost_usd": 0.001191
+    },
+    {
+      "timestamp": "2026-08-09T21:15:08.309042",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Aircall",
+      "input_tokens": 272,
+      "output_tokens": 9,
+      "cost_usd": 0.000317
+    },
+    {
+      "timestamp": "2026-08-09T21:15:10.286768",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Aircall",
+      "input_tokens": 350,
+      "output_tokens": 171,
+      "cost_usd": 0.001205
+    },
+    {
+      "timestamp": "2026-08-09T21:15:11.258137",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Aircall",
+      "input_tokens": 268,
+      "output_tokens": 9,
+      "cost_usd": 0.000313
+    },
+    {
+      "timestamp": "2026-08-09T21:15:13.231360",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Aircall",
+      "input_tokens": 346,
+      "output_tokens": 9,
+      "cost_usd": 0.000391
+    },
+    {
+      "timestamp": "2026-08-09T21:15:13.925886",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Aircall",
+      "input_tokens": 347,
+      "output_tokens": 9,
+      "cost_usd": 0.000392
+    },
+    {
+      "timestamp": "2026-08-09T21:15:16.099279",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Aircall",
+      "input_tokens": 358,
+      "output_tokens": 79,
+      "cost_usd": 0.000753
+    },
+    {
+      "timestamp": "2026-08-09T21:15:17.832416",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Alpine Home Air",
+      "input_tokens": 326,
+      "output_tokens": 121,
+      "cost_usd": 0.000931
+    },
+    {
+      "timestamp": "2026-08-09T21:15:18.949051",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Amanotes",
+      "input_tokens": 293,
+      "output_tokens": 9,
+      "cost_usd": 0.000338
+    },
+    {
+      "timestamp": "2026-08-09T21:15:20.937903",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Amar Bank",
+      "input_tokens": 355,
+      "output_tokens": 134,
+      "cost_usd": 0.001025
+    },
+    {
+      "timestamp": "2026-08-09T21:15:22.426187",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Amar Bank",
+      "input_tokens": 348,
+      "output_tokens": 125,
+      "cost_usd": 0.000973
+    },
+    {
+      "timestamp": "2026-08-09T21:15:24.290894",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "ASAPP",
+      "input_tokens": 367,
+      "output_tokens": 9,
+      "cost_usd": 0.000412
+    },
+    {
+      "timestamp": "2026-08-09T21:15:25.159790",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "ASAPP",
+      "input_tokens": 337,
+      "output_tokens": 9,
+      "cost_usd": 0.000382
+    },
+    {
+      "timestamp": "2026-08-09T21:15:26.232310",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Beamery",
+      "input_tokens": 272,
+      "output_tokens": 9,
+      "cost_usd": 0.000317
+    },
+    {
+      "timestamp": "2026-08-09T21:15:28.199326",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "BESTSELLER",
+      "input_tokens": 345,
+      "output_tokens": 131,
+      "cost_usd": 0.001
+    },
+    {
+      "timestamp": "2026-08-09T21:15:29.512378",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "BESTSELLER",
+      "input_tokens": 336,
+      "output_tokens": 63,
+      "cost_usd": 0.000651
+    },
+    {
+      "timestamp": "2026-08-09T21:15:31.051437",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "BESTSELLER",
+      "input_tokens": 349,
+      "output_tokens": 144,
+      "cost_usd": 0.001069
+    },
+    {
+      "timestamp": "2026-08-09T21:15:32.476828",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "BioTechUSA",
+      "input_tokens": 357,
+      "output_tokens": 84,
+      "cost_usd": 0.000777
+    },
+    {
+      "timestamp": "2026-08-09T21:15:34.512111",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Box",
+      "input_tokens": 350,
+      "output_tokens": 182,
+      "cost_usd": 0.00126
+    },
+    {
+      "timestamp": "2026-08-09T21:15:36.689311",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Capture Higher Ed",
+      "input_tokens": 365,
+      "output_tokens": 135,
+      "cost_usd": 0.00104
+    },
+    {
+      "timestamp": "2026-08-09T21:15:37.617367",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Carrefour",
+      "input_tokens": 365,
+      "output_tokens": 9,
+      "cost_usd": 0.00041
+    },
+    {
+      "timestamp": "2026-08-09T21:15:38.569410",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Chaos",
+      "input_tokens": 349,
+      "output_tokens": 76,
+      "cost_usd": 0.000729
+    },
+    {
+      "timestamp": "2026-08-09T21:15:41.396726",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Chaos",
+      "input_tokens": 349,
+      "output_tokens": 197,
+      "cost_usd": 0.001334
+    },
+    {
+      "timestamp": "2026-08-09T21:15:42.962288",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Circle",
+      "input_tokens": 383,
+      "output_tokens": 73,
+      "cost_usd": 0.000748
+    },
+    {
+      "timestamp": "2026-08-09T21:15:43.895815",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Comcast",
+      "input_tokens": 262,
+      "output_tokens": 9,
+      "cost_usd": 0.000307
+    },
+    {
+      "timestamp": "2026-08-09T21:15:44.492294",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Conversionista!",
+      "input_tokens": 323,
+      "output_tokens": 9,
+      "cost_usd": 0.000368
+    },
+    {
+      "timestamp": "2026-08-09T21:15:45.129113",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Deel",
+      "input_tokens": 386,
+      "output_tokens": 9,
+      "cost_usd": 0.000431
+    },
+    {
+      "timestamp": "2026-08-09T21:15:45.895614",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Deel",
+      "input_tokens": 274,
+      "output_tokens": 9,
+      "cost_usd": 0.000319
+    },
+    {
+      "timestamp": "2026-08-09T21:15:47.556026",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Deel",
+      "input_tokens": 348,
+      "output_tokens": 169,
+      "cost_usd": 0.001193
     }
   ]
 }
