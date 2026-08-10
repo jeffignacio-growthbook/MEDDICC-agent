@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-Extract structured feature gaps from call transcripts already
-in memory/calls/*.json. Runs against calls not yet scanned
-(feature_gaps_scanned_at IS NULL in Supabase).
+Extract structured feature gaps from call transcripts in memory/calls/*.json.
+Runs against calls not yet in the enrichment_scans ledger.
 
 Usage:
   python scripts/enrichment/extract_feature_gaps.py
@@ -17,6 +16,7 @@ from pathlib import Path
 from datetime import datetime
 
 REPO_ROOT = Path(__file__).parent.parent.parent
+JOB_NAME = 'feature_gaps'
 
 PROMPT = """Read this sales call summary and identify any moments
 where the prospect asked for a capability GrowthBook doesn't
@@ -42,9 +42,21 @@ Return a JSON array. Empty array if none. No prose outside
 the JSON."""
 
 
+def _stamp(sb, call_id, job, slug, n):
+    """Record scan completion in enrichment_scans ledger."""
+    sb.table('enrichment_scans').upsert({
+        'call_id': call_id,
+        'job': job,
+        'company_slug': slug,
+        'items_found': n,
+        'scanned_at': datetime.utcnow().isoformat(),
+    }, on_conflict='call_id,job').execute()
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--limit', type=int, default=50)
+    parser.add_argument('--limit', type=int, default=50,
+                        help='Max calls to scan (across all files)')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--yes', action='store_true')
     args = parser.parse_args()
@@ -60,16 +72,79 @@ def main():
     import sys
     sys.path.insert(0, str(REPO_ROOT / 'scripts'))
     from supabase_client import select_all
+    from utils import slugify
 
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-    # Get unscanned calls
-    unscanned = select_all(
-        sb, 'calls',
-        columns='call_id,company_name,company_slug,deal_id,stage_when_captured',
-        filters=[('is_', 'feature_gaps_scanned_at', 'null')]
-    )
-    to_process = unscanned[:args.limit]
+    # 1. Load scan ledger once
+    scanned = {r['call_id'] for r in select_all(
+        sb, 'enrichment_scans', columns='call_id,job',
+        filters=[('eq', 'job', JOB_NAME)])}
+
+    # 2. Load deal map once (company-anchored resolution)
+    deals = select_all(sb, 'deals',
+        columns='deal_id,company_name,create_date,close_date')
+    by_slug = {}
+    for d in deals:
+        by_slug.setdefault(slugify(d.get('company_name') or ''),
+                           []).append(d)
+
+    def resolve_deal_id(slug, call_date):
+        """Best-effort deal_id resolution: one deal total, or one deal live on call_date."""
+        cands = by_slug.get(slug, [])
+        if len(cands) == 1:
+            return cands[0]['deal_id']
+        if call_date:
+            live = [d for d in cands
+                    if (d.get('create_date') or '') <= call_date
+                    and (not d.get('close_date')
+                         or d['close_date'] >= call_date)]
+            if len(live) == 1:
+                return live[0]['deal_id']
+        return None
+
+    # 3. Gather calls to process
+    cache_dir = REPO_ROOT / 'memory' / 'calls'
+    if not cache_dir.exists():
+        print(f"⚠️  Cache directory not found: {cache_dir}")
+        return
+
+    to_process = []
+    for cache_file in sorted(cache_dir.glob('*.json')):
+        try:
+            data = json.load(open(cache_file))
+        except Exception as e:
+            print(f"⚠️  Could not read {cache_file}: {e}")
+            continue
+
+        company = data.get('company') or cache_file.stem.replace('-', ' ').title()
+        # Normalize slug using utils.slugify to match deal slugs
+        normalized_slug = slugify(company)
+        if not normalized_slug:
+            continue  # Skip if slug is too short or invalid
+
+        for call in data.get('calls', []):
+            call_id = str(call.get('id') or '')
+            if not call_id or call_id in scanned:
+                continue
+
+            summary = call.get('formatted_summary') or call.get('summary', '')
+            call_date = (call.get('date') or '')[:10]
+
+            to_process.append({
+                'call_id': call_id,
+                'slug': normalized_slug,
+                'company': company,
+                'summary': summary,
+                'call_date': call_date,
+                'deal_id': resolve_deal_id(normalized_slug, call_date),
+            })
+
+            if len(to_process) >= args.limit:
+                break
+
+        if len(to_process) >= args.limit:
+            break
 
     if not to_process:
         print("No unscanned calls found.")
@@ -79,16 +154,19 @@ def main():
     print(f"{len(to_process)} calls to scan, "
           f"estimated cost: ${est_cost:.2f}")
 
-    if len(to_process) >= 20 and not args.yes and not args.dry_run:
+    if args.dry_run:
+        print("\n--dry-run: First 15 calls:")
+        for i, c in enumerate(to_process[:15], 1):
+            print(f"  {i:2d}. {c['company']:30s} | "
+                  f"call:{c['call_id'][:20]} | "
+                  f"date:{c['call_date'] or 'unknown':10s} | "
+                  f"deal_id:{c['deal_id'] or 'NULL'}")
+        return
+
+    if len(to_process) >= 20 and not args.yes:
         if input("Proceed? (y/N): ").lower() != 'y':
             print("Aborted.")
             return
-
-    if args.dry_run:
-        for c in to_process[:10]:
-            print(f"  Would scan: {c.get('company_name')} / "
-                  f"call {c.get('call_id')}")
-        return
 
     import anthropic
     client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
@@ -96,27 +174,20 @@ def main():
     tracker = TokenTracker(REPO_ROOT / 'memory')
 
     written, scanned = 0, 0
-    for call in to_process:
-        call_id = call['call_id']
-        company = call.get('company_name', '')
-        deal_id = call.get('deal_id')
-        slug = call.get('company_slug', company.lower().replace(' ', '-'))
-        cache_path = REPO_ROOT / 'memory' / 'calls' / f'{slug}.json'
-        summary = ''
+    deal_id_resolved = 0
+    companies = set()
 
-        if cache_path.exists():
-            cache = json.load(open(cache_path))
-            for c in cache.get('calls', []):
-                if c.get('id') == call_id:
-                    summary = c.get('formatted_summary') or c.get('summary', '')
-                    break
+    for call_data in to_process:
+        call_id = call_data['call_id']
+        company = call_data['company']
+        slug = call_data['slug']
+        summary = call_data['summary']
+        call_date = call_data['call_date']
+        deal_id = call_data['deal_id']
 
-        if not summary or len(summary) < 100:
-            # stamp scanned anyway — nothing to extract, but
-            # don't rescan a call with no usable content
-            sb.table('calls').update(
-                {'feature_gaps_scanned_at': datetime.utcnow().isoformat()}
-            ).eq('call_id', call_id).execute()
+        if len(summary) < 100:
+            # Stamp scanned anyway — nothing to extract
+            _stamp(sb, call_id, JOB_NAME, slug, 0)
             scanned += 1
             continue
 
@@ -131,8 +202,13 @@ def main():
             tracker.record(resp, 'claude-haiku-4-5-20251001',
                            'feature_gap_extraction', company)
 
-            # Parse JSON response
-            feature_gaps = json.loads(resp.content[0].text.strip())
+            # Parse JSON response (strip markdown code fences if present)
+            text = resp.content[0].text.strip()
+            if text.startswith('```'):
+                # Remove markdown code fences
+                text = text.split('\n', 1)[1]  # Remove first line (```json)
+                text = text.rsplit('\n', 1)[0]  # Remove last line (```)
+            feature_gaps = json.loads(text.strip())
 
             for gap in feature_gaps:
                 sb.table('feature_gaps').insert({
@@ -142,24 +218,30 @@ def main():
                     'feature_description': gap.get('feature_description', ''),
                     'category': gap.get('category', 'other'),
                     'competitor_mentioned': gap.get('competitor_mentioned'),
-                    'stage_when_raised': call.get('stage_when_captured'),
+                    'stage_when_raised': None,  # Cache doesn't carry stage
                     'severity': gap.get('severity', 'nice_to_have'),
                     'extracted_at': datetime.utcnow().isoformat(),
                 }).execute()
                 written += 1
 
-            sb.table('calls').update(
-                {'feature_gaps_scanned_at': datetime.utcnow().isoformat()}
-            ).eq('call_id', call_id).execute()
+            _stamp(sb, call_id, JOB_NAME, slug, len(feature_gaps))
             scanned += 1
+            companies.add(slug)
+            if deal_id:
+                deal_id_resolved += 1
             print(f"  ✓ {company}: {len(feature_gaps)} feature gap(s)")
 
         except Exception as e:
-            print(f"  ✗ {company} ({call_id}): {e}")
+            print(f"  ✗ {company} ({call_id[:20]}): {e}")
 
     summary_stats = tracker.save()
     tracker.print_summary(summary_stats, scanned)
+
+    pct_resolved = (deal_id_resolved / scanned * 100) if scanned > 0 else 0
     print(f"\n✓ Scanned {scanned} calls, {written} feature gaps written")
+    print(f"  Deal ID resolved: {deal_id_resolved} ({pct_resolved:.1f}%)")
+    print(f"  Deal ID NULL: {scanned - deal_id_resolved} ({100-pct_resolved:.1f}%)")
+    print(f"  Distinct companies: {len(companies)}")
 
 
 if __name__ == '__main__':
