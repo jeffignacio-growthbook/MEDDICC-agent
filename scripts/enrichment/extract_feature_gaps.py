@@ -126,6 +126,20 @@ def main():
     print(f"{len(known_slugs)} companies have deals; scanning {len(cache_files)} matching cache files")
     print(f"  (skipped {len(all_cache_files) - len(cache_files)} with no associated deal).")
 
+    # Count total qualifying calls (in matched cache files, not yet scanned)
+    total_qualifying_calls = 0
+    for f in cache_files:
+        try:
+            data = json.load(open(f))
+            for call in data.get('calls', []):
+                call_id = str(call.get('id') or '')
+                if call_id and call_id not in scanned:
+                    total_qualifying_calls += 1
+        except:
+            continue
+
+    print(f"  Total qualifying calls remaining (in deal-matched cache files, unscanned): {total_qualifying_calls}")
+
     to_process = []
     for cache_file in cache_files:
         try:
