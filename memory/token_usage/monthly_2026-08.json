@@ -22,12 +22,12 @@
       "total_output_tokens": 244734
     },
     "2026-08-09": {
-      "total_cost_usd": 9.876853,
-      "total_input_tokens": 1757272,
-      "total_output_tokens": 491093
+      "total_cost_usd": 9.881431,
+      "total_input_tokens": 1760315,
+      "total_output_tokens": 491400
     }
   },
-  "total_cost_usd": 26.095968,
+  "total_cost_usd": 26.100546,
   "by_model": {},
   "by_role": {}
 }

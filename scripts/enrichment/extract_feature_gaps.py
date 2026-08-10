@@ -103,25 +103,47 @@ def main():
                 return live[0]['deal_id']
         return None
 
-    # 3. Gather calls to process
+    # 3. Pre-filter to known-deal companies only
     cache_dir = REPO_ROOT / 'memory' / 'calls'
     if not cache_dir.exists():
         print(f"⚠️  Cache directory not found: {cache_dir}")
         return
 
+    known_slugs = set(by_slug.keys())
+    all_cache_files = list(cache_dir.glob('*.json'))
+
+    # Filter to cache files whose company slug matches a known deal
+    cache_files = []
+    for f in sorted(all_cache_files):
+        try:
+            data = json.load(open(f))
+            company = data.get('company') or f.stem.replace('-', ' ').title()
+            if slugify(company) in known_slugs:
+                cache_files.append(f)
+        except:
+            continue
+
+    print(f"{len(known_slugs)} companies have deals; scanning {len(cache_files)} matching cache files")
+    print(f"  (skipped {len(all_cache_files) - len(cache_files)} with no associated deal).")
+
     to_process = []
-    for cache_file in sorted(cache_dir.glob('*.json')):
+    for cache_file in cache_files:
         try:
             data = json.load(open(cache_file))
         except Exception as e:
             print(f"⚠️  Could not read {cache_file}: {e}")
             continue
 
-        company = data.get('company') or cache_file.stem.replace('-', ' ').title()
         # Normalize slug using utils.slugify to match deal slugs
-        normalized_slug = slugify(company)
+        cache_company = data.get('company') or cache_file.stem.replace('-', ' ').title()
+        normalized_slug = slugify(cache_company)
         if not normalized_slug:
             continue  # Skip if slug is too short or invalid
+
+        # Prefer deal's real company_name over cache file's 'company' field
+        matched_deals = by_slug.get(normalized_slug, [])
+        company = (matched_deals[0]['company_name'] if matched_deals
+                   else cache_company)
 
         for call in data.get('calls', []):
             call_id = str(call.get('id') or '')
