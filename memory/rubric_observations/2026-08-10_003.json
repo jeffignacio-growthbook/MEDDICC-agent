@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_003",
+  "timestamp": "2026-08-10T19:18:52.035165",
+  "company": "InPost",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 3 (Evidence Quality), Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 should explicitly define 'actionable' as requiring [Contact Name] + [Specific Request] + [Target Date/Method], not generic verbs like 'ask' or 'map out.' Criterion 2 should clarify that score regressions without explicit reasoning flagging prior error are violations."
+}

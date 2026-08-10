@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_009",
+  "timestamp": "2026-08-10T19:31:31.179919",
+  "company": "Aircall",
+  "criterion_fired": "CRITERION 2, 3, 4, 5",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (C2) Define what constitutes a 'regression' vs. normal re-assessment across iterations. (C3) Explicitly codify carry-forward rule: 'If no contradictory evidence appears in current call, prior MEDDICC score persists; document as maintained.' (C4) Define 'specificity': require named stakeholder + concrete date or trigger, not just vague action. (C5) Change status from 'Partial' to 'Unknown' unless \u22652 named competitors from competitive set appear in call evidence."
+}

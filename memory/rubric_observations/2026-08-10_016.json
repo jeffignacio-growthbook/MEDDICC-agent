@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_016",
+  "timestamp": "2026-08-10T19:41:41.424971",
+  "company": "Stone",
+  "criterion_fired": "CRITERION 1 & 3 - Metrics evidence quality",
+  "was_appropriate": false,
+  "suggested_change": "Distinguish between (a) cumulative score maintained due to no new data (acceptable, flag as unchanged) vs. (b) cumulative score carried forward when original evidence itself was below threshold (unacceptable). Revise: 'If recent call provided no substantive discussion, carry forward cumulative score AND explicitly mark as 'no new evidence to update.' If cumulative evidence lacks required specificity, recommend score reduction or evidence re-gathering before carry-forward.'"
+}

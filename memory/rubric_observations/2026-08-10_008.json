@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_008",
+  "timestamp": "2026-08-10T19:30:51.302133",
+  "company": "Chaos",
+  "criterion_fired": "Criterion 2 (Decision Process) and Criterion 3 (Competition)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: 'Score reflects only explicit evidence from the most recent call; carry-forward confidence from prior calls is context only, not score justification.' Criterion 3: 'Competitor intelligence requires named tools/alternatives in the call transcript, not inferred from customer concerns about tool categories.'"
+}

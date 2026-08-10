@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_006",
+  "timestamp": "2026-08-10T19:27:21.458155",
+  "company": "KBX",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 4 (Actionable Next Steps) and Criterion 3 (Evidence Quality)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify Criterion 2: 'For maintained scores, include carry-forward notation only when substantive prior call data exists; omit boilerplate if call provided no new information.' Criterion 4 should allow template-style next steps (e.g., '[date + X days]') in analysis outputs with explicit note 'See implementation notes for concrete dates.' Criterion 3 exception rule should be pre-stated in rubric, not discovered mid-evaluation."
+}

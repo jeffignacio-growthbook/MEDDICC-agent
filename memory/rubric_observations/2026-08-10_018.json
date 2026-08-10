@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_018",
+  "timestamp": "2026-08-10T19:44:43.299964",
+  "company": "shiftkey",
+  "criterion_fired": "Criterion 2 (Decision Process), Criterion 4 (Champion), Criterion 5 (ICP Fit)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 should explicitly require: 'Score changes must document material change to decision timeline/structure, not just communication frequency.' Criterion 4 should add: 'Next step must include specific deliverable (document, meeting, call), recipient name, and measurable outcome.' Criterion 5 should require: 'Analysis must include explicit ICP confirmation or flag statement.'"
+}

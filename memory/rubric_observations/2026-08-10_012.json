@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_012",
+  "timestamp": "2026-08-10T19:37:26.502133",
+  "company": "Livesport",
+  "criterion_fired": "Criterion 3 (Evidence Quality) and Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 3: Add explicit instruction 'Verify each competitor mention against the known competitive set; if outside set, flag as out-of-scope and reduce score accordingly.' Criterion 4: Replace 'Listen for champion signals' language with 'Identify a specific, concrete ask that moves champion relationship forward (e.g., internal presentation request, objection pre-emption question, or commitment to next meeting).' Both changes address generalizable instruction gaps."
+}
