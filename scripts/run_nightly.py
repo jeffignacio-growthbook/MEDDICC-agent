@@ -470,7 +470,7 @@ def main():
 
     hubspot = get_hubspot_deals_client()
     memory = get_memory_manager()
-    tracker = TokenTracker(memory.memory_dir)
+    tracker = TokenTracker(memory.memory_dir, job='nightly')
 
     # Initialize Supabase writer if configured
     sb_writer = None
