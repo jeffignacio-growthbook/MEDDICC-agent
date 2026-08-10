@@ -1,16 +1,16 @@
 {
   "date": "2026-08-09",
   "summary": {
-    "total_cost_usd": 9.876853,
-    "total_input_tokens": 1757272,
-    "total_output_tokens": 491093,
-    "total_calls": 549,
+    "total_cost_usd": 9.881431,
+    "total_input_tokens": 1760315,
+    "total_output_tokens": 491400,
+    "total_calls": 559,
     "by_model": {
       "claude-haiku-4-5-20251001": {
-        "input_tokens": 848949,
-        "output_tokens": 106346,
-        "cost_usd": 1.380679,
-        "calls": 358
+        "input_tokens": 851992,
+        "output_tokens": 106653,
+        "cost_usd": 1.385257,
+        "calls": 368
       },
       "claude-sonnet-4-5-20250929": {
         "input_tokens": 908323,
@@ -41,14 +41,14 @@
         "cost_usd": 0.121874
       },
       "objection_extraction": {
-        "input_tokens": 11076,
-        "output_tokens": 1687,
-        "cost_usd": 0.019511
+        "input_tokens": 12610,
+        "output_tokens": 1772,
+        "cost_usd": 0.02147
       },
       "feature_gap_extraction": {
-        "input_tokens": 4605,
-        "output_tokens": 631,
-        "cost_usd": 0.00776
+        "input_tokens": 6114,
+        "output_tokens": 853,
+        "cost_usd": 0.010379
       }
     }
   },
@@ -4993,6 +4993,96 @@
       "input_tokens": 285,
       "output_tokens": 9,
       "cost_usd": 0.00033
+    },
+    {
+      "timestamp": "2026-08-09T21:08:17.560454",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1800Flowers",
+      "input_tokens": 281,
+      "output_tokens": 9,
+      "cost_usd": 0.000326
+    },
+    {
+      "timestamp": "2026-08-09T21:08:18.232024",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1800Flowers",
+      "input_tokens": 260,
+      "output_tokens": 9,
+      "cost_usd": 0.000305
+    },
+    {
+      "timestamp": "2026-08-09T21:08:18.985200",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Acorns",
+      "input_tokens": 381,
+      "output_tokens": 9,
+      "cost_usd": 0.000426
+    },
+    {
+      "timestamp": "2026-08-09T21:08:19.838951",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Acorns",
+      "input_tokens": 341,
+      "output_tokens": 9,
+      "cost_usd": 0.000386
+    },
+    {
+      "timestamp": "2026-08-09T21:08:20.648899",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "AGS - American Gaming Systems",
+      "input_tokens": 271,
+      "output_tokens": 49,
+      "cost_usd": 0.000516
+    },
+    {
+      "timestamp": "2026-08-09T21:08:24.228737",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1800Flowers",
+      "input_tokens": 276,
+      "output_tokens": 9,
+      "cost_usd": 0.000321
+    },
+    {
+      "timestamp": "2026-08-09T21:08:25.164750",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1800Flowers",
+      "input_tokens": 255,
+      "output_tokens": 9,
+      "cost_usd": 0.0003
+    },
+    {
+      "timestamp": "2026-08-09T21:08:26.623307",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Acorns",
+      "input_tokens": 376,
+      "output_tokens": 186,
+      "cost_usd": 0.001306
+    },
+    {
+      "timestamp": "2026-08-09T21:08:27.897431",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Acorns",
+      "input_tokens": 336,
+      "output_tokens": 9,
+      "cost_usd": 0.000381
+    },
+    {
+      "timestamp": "2026-08-09T21:08:29.319782",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "AGS - American Gaming Systems",
+      "input_tokens": 266,
+      "output_tokens": 9,
+      "cost_usd": 0.000311
     }
   ]
 }
