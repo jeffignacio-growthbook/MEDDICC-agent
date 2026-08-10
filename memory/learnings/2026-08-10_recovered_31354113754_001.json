@@ -1,0 +1,23 @@
+{
+  "company": "shiftkey",
+  "deal_id": "60355159912",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 10,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Metrics component: Evidence states 'cost-saving data pipeline optimizations potentially reducing warehouse costs by up to 90%' in cumulative state, but analysis claims 'the specific percentage reduction appears to be a seller projection rather than a buyer-stated metric' without documenting that this is a carry-forward issue or noting when/how this was determined. The analysis should either: (1) maintain the 8/10 score and explicitly note 'Maintaining previous Metrics score of 8/10 based on cumulative evidence including A/B testing on mobile, feature parity, and user behavior measurement. Cost reduction percentage flagged as seller projection in prior assessment.' OR (2) lower the score with documented reasoning for the downgrade. CRITERION 4 VIOLATION - Champion component (4/10, Partial status): Next step uses vague language 'walk me through how you'll present this internally' without a concrete, specific action. Should be: '[Contact: Chris Sanders]: Schedule 30-minute call by March 15th. Provide him a one-page business case template covering: (1) June 30th LaunchDarkly deadline, (2) production migration completion and feature parity achieved, (3) monthly cost savings estimate. Ask specifically: What are the top 3 approval criteria from your CFO? Who are the 2-3 people blocking this contract and what will convince each of them? When can you present to the approval committee?' CRITERION 4 VIOLATION - Economic Buyer component (4/10, Partial status): Next step is acceptable per exception rule for early-stage deals where no contacts identified, however the step is worded as a condition ('Is it a VP Finance, CFO, or procurement lead') rather than a direct request for the specific name and title. Reword to: 'Who specifically has signature authority for vendor contracts over $100K? Get me their name and title by March 12th so we can tailor the business case to their approval criteria.'  CRITERION 5 VIOLATION - ICP fit not addressed in analysis. No explicit confirmation that ShiftKey meets GrowthBook ICP (100K+ users, modern data stack, PLG motion, or experimentation priority). While 'approximately 2000 teams' suggests scale, the analysis does not state whether this meets user/revenue thresholds or confirm warehouse-native capability requirements.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-10_recovered_31354113754_001",
+  "timestamp": "2026-08-10T04:28:00.640767",
+  "recovered_from_run": "31354113754",
+  "original_id": "2026-08-10_recovered_31354113754_001"
+}
