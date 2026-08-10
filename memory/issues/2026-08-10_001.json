@@ -1,0 +1,21 @@
+{
+  "company": "Stone",
+  "deal_id": "53500422798",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 4,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Metrics (4/10): Score present but evidence is vague and does not clearly establish what was actually discussed. The evidence states 'Team mentioned maximizing effectiveness of experimentation and driving business value' but provides no direct quote or specific paraphrase from any call transcript. The recent call summary provided is a technical failure with only greeting exchanges ('Are you good?' / 'Good to see you') - no substantive discussion occurred, so maintaining a 4/10 score based purely on cumulative state is appropriate, but the original evidence in cumulative state lacks the required specificity for a score above 5/10. CRITERION 3 FAILURE - Evidence Quality for Metrics: The evidence 'Team mentioned maximizing effectiveness of experimentation and driving business value' lacks a direct quote or detailed paraphrase that would justify a 4/10 score. This is seller-interpreted benefit language, not prospect-originated metrics. CRITERION 4 FAILURE - Actionable Next Steps: The Metrics next step 'Call Newton Calegari by Monday to ask: What quantifiable outcomes are you measuring success by?' is acceptable, but the analysis should note that without substantive call discussion in the recent session, the Metrics score cannot improve from the cumulative 4/10. CRITERION 2 CONCERN - Carry-forward Consistency: The analysis correctly maintains all scores from cumulative state given the recent call was a technical failure, which is appropriate. However, the write-up could be clearer that scores are unchanged due to lack of call data rather than implicit acceptance of cumulative evidence quality. The Champion evidence 'Pilot group of PMs identified as early adopters using GrowthBook for experimentation, but no specific internal champion or advocate named' describes awareness/usage without evidence of internal selling or advocacy behavior - this correctly scores 3/10 but next step to find 'who is most excited' is sound. No unsupported claims detected. Competitors (Amplitude) are mapped correctly. ICP fit evident (data infrastructure rebuild, Kafka/Databricks, experimentation focus). Primary issue: Metrics evidence quality below threshold for its stated score when evaluated against original cumulative evidence.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-10_001",
+  "timestamp": "2026-08-10T19:41:41.424463"
+}

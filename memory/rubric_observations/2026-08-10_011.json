@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_011",
+  "timestamp": "2026-08-10T19:35:59.592656",
+  "company": "Unity",
+  "criterion_fired": "Criterion 1, 2, 4, 5",
+  "was_appropriate": true,
+  "suggested_change": "Criteria are appropriate but CLAUDE.md should consolidate them into a single 'Output Format' section with templates for (a) score justification with call-level evidence, (b) carry-forward statement format, (c) next steps with exact questions, and (d) ICP check template."
+}

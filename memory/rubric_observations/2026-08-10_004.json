@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_004",
+  "timestamp": "2026-08-10T19:22:20.971241",
+  "company": "Rula",
+  "criterion_fired": "Criterion 4 (Actionable next steps)",
+  "was_appropriate": true,
+  "suggested_change": "Next steps must use concrete action verbs (Schedule, Request introduction, Prepare, Send, Obtain) paired with specific timeline and contact name. Conditional language ('Would it be helpful', 'Ask X: question') fails unless immediately followed by concrete commitment action."
+}

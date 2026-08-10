@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_010",
+  "timestamp": "2026-08-10T19:32:08.718062",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 2, 4, and 5",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2: 'Score may only change if new contradictory evidence emerges; if call data is missing/failed, explicitly state score holds at prior level with rationale.' Criterion 4: 'Next steps must name specific people, dates, and exact questions\u2014no open-ended asks.' Criterion 5: 'Deal stage downgrade requires documented disengagement or explicit customer objection; missing EB/Decision Process alone does not justify downgrade from Qualified to Buy.'"
+}

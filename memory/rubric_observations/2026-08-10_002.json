@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_002",
+  "timestamp": "2026-08-10T19:18:15.767716",
+  "company": "Oda",
+  "criterion_fired": "Criterion 5 (Unsupported claims) and Criterion 3 (Evidence threshold for scores >5/10)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 5 should explicitly state: 'Score elevations require causal evidence, not just supporting quotes. Goals/objectives \u2260 pain. Named individuals with internal advocacy \u2260 team-level future planning. Quote presence alone is insufficient; the logic connecting quote to score change must be defensible.'"
+}

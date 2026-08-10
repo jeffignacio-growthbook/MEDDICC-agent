@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_007",
+  "timestamp": "2026-08-10T19:28:52.225494",
+  "company": "TickPick",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 4 (Next Steps Specificity)",
+  "was_appropriate": true,
+  "suggested_change": "The rubric criteria are appropriate. The issue is the output template should mandate: (1) explicit '[Component]: No new information \u2192 maintaining [X]/10' sentence per component, and (2) contact names in all next-step fields when available in cumulative state. Consider revising MEDDICC output schema rather than CLAUDE.md instructions."
+}

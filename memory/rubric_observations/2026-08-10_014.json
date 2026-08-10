@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-10_014",
+  "timestamp": "2026-08-10T19:38:37.979007",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 1, 3, 4, 5, 2",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit rules to CLAUDE.md: (1) Scores >5/10 on Metrics require direct prospect quote or reject; (2) Define 'competitor' as alternatives being actively evaluated, not tools being replaced; (3) Specify prohibited next-step keywords (e.g., 'monitor', 'explore', 'support'); (4) Flag unresolved data conflicts as conditional findings; (5) Require revision justification in status maintenance section when rescoring."
+}
