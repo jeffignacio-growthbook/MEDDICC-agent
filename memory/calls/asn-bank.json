@@ -1,0 +1,22 @@
+{
+  "company": "ASN Bank",
+  "slug": "asn-bank",
+  "last_etl_date": "2026-08-10T17:46:10.824768",
+  "calls": [
+    {
+      "id": "01KZNEAT2GFNXXG59GNCJ1TW87",
+      "source": "fireflies",
+      "title": "Demo Call Growthbook - ASN Bank",
+      "date": "2026-08-10",
+      "duration_minutes": 39.15999984741211,
+      "summary": "The discussion revolved around GrowthBook’s unique position as a flexible experimentation platform that caters to the needs of regulated industries, offering self-hosted options to ensure data control. Key topics included its technical architecture, enabling direct integration with data warehouses, and the implementation of features like statistical rigor in experiment management. Robin emphasized the need for enhanced KPI tracking, forecasting tools, and more robust reporting capabilities to align leadership goals with experiment outcomes. While GrowthBook provides dashboards and an AI assistant for improved reporting, gaps in comprehensive forecasting remain. The team’s current reliance on Adobe Target for experimentation presents limitations like manual data analysis, underscoring the need for GrowthBook’s advanced features to elevate their experimentation practices.",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "keywords": "Conversion Rate Optimization, Adobe Target, Feature Flags, Data Warehouse Integration, Stakeholder Management, Experiment Forecasting",
+      "action_items": "\n, *, *, J, a, m, e, s,  , S, h, a, n, n, o, n, *, *, \n, F, o, l, l, o, w,  , u, p,  , a, f, t, e, r,  , R, o, b, i, n, ’, s,  , h, o, l, i, d, a, y,  , i, n,  , e, a, r, l, y,  , S, e, p, t, e, m, b, e, r,  , t, o,  , a, r, r, a, n, g, e,  , a,  , d, e, e, p, e, r,  , t, e, c, h, n, i, c, a, l,  , s, e, s, s, i, o, n,  , w, i, t, h,  , a,  , d, a, t, a,  , s, c, i, e, n, t, i, s, t,  , t, o,  , a, d, d, r, e, s, s,  , f, o, r, e, c, a, s, t, i, n, g,  , a, n, d,  , m, e, t, r, i, c,  , a, g, g, r, e, g, a, t, i, o, n,  , f, e, a, t, u, r, e, s,  , i, n,  , G, r, o, w, t, h, B, o, o, k,  , (, 3, 7, :, 1, 9, ), \n, P, r, e, p, a, r, e,  , d, e, t, a, i, l, e, d,  , e, x, p, l, a, n, a, t, i, o, n,  , a, n, d,  , d, e, m, o,  , o, f,  , G, r, o, w, t, h, B, o, o, k, ’, s,  , s, c, a, l, e, d,  , i, m, p, a, c, t,  , a, n, d,  , m, e, t, r, i, c,  , e, f, f, e, c, t, s,  , f, e, a, t, u, r, e, s,  , f, o, r,  , t, h, e,  , f, o, l, l, o, w, -, u, p,  , s, e, s, s, i, o, n,  , (, 3, 6, :, 5, 9, ), \n, \n, *, *, R, o, b, i, n,  , C, o, p, i, e, r, *, *, \n, C, o, n, f, i, r, m,  , a, v, a, i, l, a, b, i, l, i, t, y,  , f, o, r,  , a,  , f, o, l, l, o, w, -, u, p,  , s, e, s, s, i, o, n,  , p, o, s, t, -, h, o, l, i, d, a, y,  , t, o,  , c, o, n, t, i, n, u, e,  , d, i, s, c, u, s, s, i, o, n,  , o, n,  , s, t, a, k, e, h, o, l, d, e, r,  , m, a, n, a, g, e, m, e, n, t,  , a, n, d,  , f, o, r, e, c, a, s, t, i, n, g,  , f, e, a, t, u, r, e, s,  , (, 3, 7, :, 0, 6, ), \n",
+      "participant_domains": [
+        "asnbank.nl"
+      ]
+    }
+  ]
+}
