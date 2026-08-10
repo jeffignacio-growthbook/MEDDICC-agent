@@ -1,16 +1,16 @@
 {
   "date": "2026-08-09",
   "summary": {
-    "total_cost_usd": 9.849582,
-    "total_input_tokens": 1741591,
-    "total_output_tokens": 488775,
-    "total_calls": 514,
+    "total_cost_usd": 9.876853,
+    "total_input_tokens": 1757272,
+    "total_output_tokens": 491093,
+    "total_calls": 549,
     "by_model": {
       "claude-haiku-4-5-20251001": {
-        "input_tokens": 833268,
-        "output_tokens": 104028,
-        "cost_usd": 1.353408,
-        "calls": 323
+        "input_tokens": 848949,
+        "output_tokens": 106346,
+        "cost_usd": 1.380679,
+        "calls": 358
       },
       "claude-sonnet-4-5-20250929": {
         "input_tokens": 908323,
@@ -39,6 +39,16 @@
         "input_tokens": 55699,
         "output_tokens": 13235,
         "cost_usd": 0.121874
+      },
+      "objection_extraction": {
+        "input_tokens": 11076,
+        "output_tokens": 1687,
+        "cost_usd": 0.019511
+      },
+      "feature_gap_extraction": {
+        "input_tokens": 4605,
+        "output_tokens": 631,
+        "cost_usd": 0.00776
       }
     }
   },
@@ -4668,6 +4678,321 @@
       "input_tokens": 832,
       "output_tokens": 215,
       "cost_usd": 0.001907
+    },
+    {
+      "timestamp": "2026-08-09T19:52:34.967150",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 372,
+      "output_tokens": 9,
+      "cost_usd": 0.000417
+    },
+    {
+      "timestamp": "2026-08-09T19:52:35.533411",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 376,
+      "output_tokens": 9,
+      "cost_usd": 0.000421
+    },
+    {
+      "timestamp": "2026-08-09T19:52:36.579632",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 1551,
+      "output_tokens": 63,
+      "cost_usd": 0.001866
+    },
+    {
+      "timestamp": "2026-08-09T19:52:37.197283",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Power + Metrics",
+      "input_tokens": 348,
+      "output_tokens": 9,
+      "cost_usd": 0.000393
+    },
+    {
+      "timestamp": "2026-08-09T19:52:37.891327",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Customer Success Overview",
+      "input_tokens": 360,
+      "output_tokens": 9,
+      "cost_usd": 0.000405
+    },
+    {
+      "timestamp": "2026-08-09T19:53:42.622991",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 372,
+      "output_tokens": 9,
+      "cost_usd": 0.000417
+    },
+    {
+      "timestamp": "2026-08-09T19:53:43.329783",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 376,
+      "output_tokens": 9,
+      "cost_usd": 0.000421
+    },
+    {
+      "timestamp": "2026-08-09T19:53:44.422043",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 1551,
+      "output_tokens": 68,
+      "cost_usd": 0.001891
+    },
+    {
+      "timestamp": "2026-08-09T19:53:45.234940",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Power + Metrics",
+      "input_tokens": 348,
+      "output_tokens": 9,
+      "cost_usd": 0.000393
+    },
+    {
+      "timestamp": "2026-08-09T19:53:46.390360",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "Customer Success Overview",
+      "input_tokens": 360,
+      "output_tokens": 9,
+      "cost_usd": 0.000405
+    },
+    {
+      "timestamp": "2026-08-09T19:53:49.377313",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Growthbook Contracts Discussion",
+      "input_tokens": 374,
+      "output_tokens": 243,
+      "cost_usd": 0.001589
+    },
+    {
+      "timestamp": "2026-08-09T19:53:51.866349",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Onboarding + Growth",
+      "input_tokens": 365,
+      "output_tokens": 245,
+      "cost_usd": 0.00159
+    },
+    {
+      "timestamp": "2026-08-09T19:53:52.993650",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "KBYG",
+      "input_tokens": 358,
+      "output_tokens": 9,
+      "cost_usd": 0.000403
+    },
+    {
+      "timestamp": "2026-08-09T19:53:53.669454",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Google Ads",
+      "input_tokens": 1559,
+      "output_tokens": 9,
+      "cost_usd": 0.001604
+    },
+    {
+      "timestamp": "2026-08-09T19:53:54.854721",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "Demo Call with",
+      "input_tokens": 362,
+      "output_tokens": 9,
+      "cost_usd": 0.000407
+    },
+    {
+      "timestamp": "2026-08-09T20:21:38.123653",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1:1 Product Research",
+      "input_tokens": 356,
+      "output_tokens": 9,
+      "cost_usd": 0.000401
+    },
+    {
+      "timestamp": "2026-08-09T20:21:40.408899",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1:30 CST Jake",
+      "input_tokens": 362,
+      "output_tokens": 170,
+      "cost_usd": 0.001212
+    },
+    {
+      "timestamp": "2026-08-09T20:21:41.138225",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1-800-Flowers<>GrowthBook",
+      "input_tokens": 281,
+      "output_tokens": 9,
+      "cost_usd": 0.000326
+    },
+    {
+      "timestamp": "2026-08-09T20:21:43.291900",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1-800-Flowers<>GrowthBook",
+      "input_tokens": 260,
+      "output_tokens": 9,
+      "cost_usd": 0.000305
+    },
+    {
+      "timestamp": "2026-08-09T20:21:44.342242",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1-hr 1:1 with",
+      "input_tokens": 353,
+      "output_tokens": 55,
+      "cost_usd": 0.000628
+    },
+    {
+      "timestamp": "2026-08-09T20:24:05.436113",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1:30 CST Jake",
+      "input_tokens": 362,
+      "output_tokens": 110,
+      "cost_usd": 0.000912
+    },
+    {
+      "timestamp": "2026-08-09T20:24:08.381385",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1-hr 1:1 with",
+      "input_tokens": 353,
+      "output_tokens": 55,
+      "cost_usd": 0.000628
+    },
+    {
+      "timestamp": "2026-08-09T20:24:10.212838",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1800Flowers Account Review",
+      "input_tokens": 334,
+      "output_tokens": 255,
+      "cost_usd": 0.001609
+    },
+    {
+      "timestamp": "2026-08-09T20:24:10.795410",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "2:30p PT Intro",
+      "input_tokens": 357,
+      "output_tokens": 9,
+      "cost_usd": 0.000402
+    },
+    {
+      "timestamp": "2026-08-09T20:24:13.705527",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "30 min with Scott (Julie van der Hoop)",
+      "input_tokens": 355,
+      "output_tokens": 198,
+      "cost_usd": 0.001345
+    },
+    {
+      "timestamp": "2026-08-09T20:24:54.644144",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1:1 Product Research",
+      "input_tokens": 351,
+      "output_tokens": 9,
+      "cost_usd": 0.000396
+    },
+    {
+      "timestamp": "2026-08-09T20:24:56.731856",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1:30 CST Jake",
+      "input_tokens": 357,
+      "output_tokens": 80,
+      "cost_usd": 0.000757
+    },
+    {
+      "timestamp": "2026-08-09T20:24:58.476481",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1-800-Flowers<>GrowthBook",
+      "input_tokens": 276,
+      "output_tokens": 9,
+      "cost_usd": 0.000321
+    },
+    {
+      "timestamp": "2026-08-09T20:24:59.144433",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1-800-Flowers<>GrowthBook",
+      "input_tokens": 255,
+      "output_tokens": 9,
+      "cost_usd": 0.0003
+    },
+    {
+      "timestamp": "2026-08-09T20:24:59.739247",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "feature_gap_extraction",
+      "company": "1-hr 1:1 with",
+      "input_tokens": 348,
+      "output_tokens": 9,
+      "cost_usd": 0.000393
+    },
+    {
+      "timestamp": "2026-08-09T20:48:19.194492",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1:30 CST Jake",
+      "input_tokens": 362,
+      "output_tokens": 116,
+      "cost_usd": 0.000942
+    },
+    {
+      "timestamp": "2026-08-09T20:48:20.520771",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1-hr 1:1 with",
+      "input_tokens": 353,
+      "output_tokens": 55,
+      "cost_usd": 0.000628
+    },
+    {
+      "timestamp": "2026-08-09T20:48:22.287271",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "1800Flowers Account Review",
+      "input_tokens": 334,
+      "output_tokens": 225,
+      "cost_usd": 0.001459
+    },
+    {
+      "timestamp": "2026-08-09T20:48:24.701363",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "30 min with Scott (Julie van der Hoop)",
+      "input_tokens": 355,
+      "output_tokens": 200,
+      "cost_usd": 0.001355
+    },
+    {
+      "timestamp": "2026-08-09T20:48:25.736964",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "objection_extraction",
+      "company": "30 minute meeting",
+      "input_tokens": 285,
+      "output_tokens": 9,
+      "cost_usd": 0.00033
     }
   ]
 }
