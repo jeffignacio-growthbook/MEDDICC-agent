@@ -15,7 +15,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install supabase pyyaml
+          pip install supabase pyyaml python-dateutil
 
       - name: Reset and recompute waterfall
         env:
