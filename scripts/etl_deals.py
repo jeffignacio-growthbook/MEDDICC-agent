@@ -290,13 +290,19 @@ def main():
     parser.add_argument(
         '--file',
         type=str,
-        help='CSV file path (for history mode bulk import from HubSpot export)'
+        help='Deals CSV file path (for history/analytics mode bulk import from HubSpot export)'
+    )
+    parser.add_argument(
+        '--companies-file',
+        type=str,
+        help='Companies CSV file path (optional, for joining employee counts in analytics mode)'
     )
     args = parser.parse_args()
 
-    # Validate: --file requires --mode history
-    if args.file and args.mode != 'history':
-        print("ERROR: --file can only be used with --mode history")
+    # Validate: --file requires --mode history or analytics
+    if args.file and args.mode == 'active':
+        print("ERROR: --file can only be used with --mode history or --mode analytics")
+        print("       Active mode fetches live data from HubSpot API")
         return
 
     print("=" * 80)
@@ -306,15 +312,19 @@ def main():
     # Load stage exclusions from config
     excluded = get_excluded_stages()
 
-    # Initialize HubSpot client
-    print("\n1. Connecting to HubSpot API...")
-    try:
-        from hubspot_deals import get_hubspot_deals_client
-        hubspot = get_hubspot_deals_client()
-    except Exception as e:
-        print(f"❌ Failed to initialize HubSpot client: {e}")
-        print("\nMake sure HUBSPOT_API_KEY environment variable is set.")
-        return
+    # Initialize HubSpot client (skip if using CSV mode)
+    hubspot = None
+    if not args.file:
+        print("\n1. Connecting to HubSpot API...")
+        try:
+            from hubspot_deals import get_hubspot_deals_client
+            hubspot = get_hubspot_deals_client()
+        except Exception as e:
+            print(f"❌ Failed to initialize HubSpot client: {e}")
+            print("\nMake sure HUBSPOT_API_KEY environment variable is set.")
+            return
+    else:
+        print("\n1. CSV Mode - skipping HubSpot API connection")
 
     # Determine which deals to fetch based on mode
     if args.mode == 'active':
@@ -338,43 +348,79 @@ def main():
         meeting_set_stages = []
         closed_stages = []
 
-        print("\n2. Fetching ALL deals from HubSpot API (analytics mode)...")
-        try:
-            all_deals_api = hubspot.get_all_deals_including_closed()
-            print(f"   Fetched {len(all_deals_api)} deals (all stages)")
-        except Exception as e:
-            print(f"❌ Failed to fetch deals: {e}")
-            return
+        if args.file:
+            # Load from CSV export(s)
+            print("\n2. Loading from CSV export (analytics mode)...")
+            from csv_loader import load_deals_from_csv
 
-        # Batch fetch company associations and employee counts for segmentation
-        print("\n3. Batch fetching company associations and employee counts...")
-        deal_ids = [d.get('id') for d in all_deals_api if d.get('id')]
-        print(f"   Fetching company associations for {len(deal_ids)} deals...")
+            try:
+                all_deals_api, csv_stats = load_deals_from_csv(
+                    args.file,
+                    args.companies_file
+                )
 
-        # Step 1: Batch get company IDs for all deals
-        deal_to_company = hubspot.batch_get_deal_company_associations(deal_ids)
-        companies_found = sum(1 for cid in deal_to_company.values() if cid)
-        print(f"   Found {companies_found}/{len(deal_ids)} deals with company associations")
+                # For CSV mode, pre-populate company data from the CSV join
+                # (no API calls needed)
+                deal_to_company = {}
+                company_properties = {}
 
-        # Step 2: Get unique company IDs
-        unique_company_ids = list(set(cid for cid in deal_to_company.values() if cid))
-        print(f"   Fetching employee counts for {len(unique_company_ids)} unique companies...")
+                for deal in all_deals_api:
+                    deal_id = deal.get('id')
+                    company_id = deal.get('company_id')
+                    company_name = deal.get('company_name', '')
+                    employee_count = deal.get('company_numberofemployees', '')
 
-        # Step 3: Batch fetch company properties
-        company_properties = hubspot.batch_get_companies(
-            unique_company_ids,
-            properties=['name', 'numberofemployees']
-        )
-        print(f"   Retrieved properties for {len(company_properties)} companies")
+                    deal_to_company[deal_id] = company_id
+                    if company_id:
+                        company_properties[company_id] = {
+                            'name': company_name,
+                            'numberofemployees': employee_count
+                        }
 
-        # API call estimate:
-        # - Associations: ceil(deal_count / 100) POST requests
-        # - Companies: ceil(unique_company_count / 100) POST requests
-        # Total: ~ceil(1676/100) + ceil(~1000/100) = ~17 + ~10 = ~27 calls vs 1676*2 = 3352 calls (99% reduction)
-        assoc_calls = (len(deal_ids) + 99) // 100
-        company_calls = (len(unique_company_ids) + 99) // 100
-        print(f"   API calls: {assoc_calls} association batches + {company_calls} company batches = {assoc_calls + company_calls} total")
-        print(f"   (vs {len(deal_ids) * 2} individual calls = {100 - int(100 * (assoc_calls + company_calls) / (len(deal_ids) * 2))}% reduction)")
+                print(f"\n  CSV Mode: {len(all_deals_api)} deals loaded with pre-joined company data")
+
+            except Exception as e:
+                print(f"❌ Failed to load CSV: {e}")
+                import traceback
+                traceback.print_exc()
+                return
+
+        else:
+            # Fetch from HubSpot API
+            print("\n2. Fetching ALL deals from HubSpot API (analytics mode)...")
+            try:
+                all_deals_api = hubspot.get_all_deals_including_closed()
+                print(f"   Fetched {len(all_deals_api)} deals (all stages)")
+            except Exception as e:
+                print(f"❌ Failed to fetch deals: {e}")
+                return
+
+            # Batch fetch company associations and employee counts for segmentation
+            print("\n3. Batch fetching company associations and employee counts...")
+            deal_ids = [d.get('id') for d in all_deals_api if d.get('id')]
+            print(f"   Fetching company associations for {len(deal_ids)} deals...")
+
+            # Step 1: Batch get company IDs for all deals
+            deal_to_company = hubspot.batch_get_deal_company_associations(deal_ids)
+            companies_found = sum(1 for cid in deal_to_company.values() if cid)
+            print(f"   Found {companies_found}/{len(deal_ids)} deals with company associations")
+
+            # Step 2: Get unique company IDs
+            unique_company_ids = list(set(cid for cid in deal_to_company.values() if cid))
+            print(f"   Fetching employee counts for {len(unique_company_ids)} unique companies...")
+
+            # Step 3: Batch fetch company properties
+            company_properties = hubspot.batch_get_companies(
+                unique_company_ids,
+                properties=['name', 'numberofemployees']
+            )
+            print(f"   Retrieved properties for {len(company_properties)} companies")
+
+            # API call estimate
+            assoc_calls = (len(deal_ids) + 99) // 100
+            company_calls = (len(unique_company_ids) + 99) // 100
+            print(f"   API calls: {assoc_calls} association batches + {company_calls} company batches = {assoc_calls + company_calls} total")
+            print(f"   (vs {len(deal_ids) * 2} individual calls = {100 - int(100 * (assoc_calls + company_calls) / (len(deal_ids) * 2))}% reduction)")
     else:  # history mode
         meeting_set_stages = []
         closed_stages = []
