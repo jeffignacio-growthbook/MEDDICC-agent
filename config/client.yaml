@@ -37,7 +37,7 @@ pipeline:
     # This is GrowthBook's Incremental ARR without the
     # NULL-out hazard of the HubSpot calculated field.
     # NEVER use the amount field for GrowthBook reporting.
-  qualified_stage_order: 2  # Stages with order >= this are "qualified" (entered pipeline)
+  qualified_stage_order: 1  # Stages with order >= this are "qualified" (entered pipeline)
   win_rate_qualified_field: "sao"  # Win rate denominator = deals where SAO is true
 
   # Pipeline definitions with per-stage configuration
@@ -50,56 +50,56 @@ pipeline:
 
         - id: "79653122"
           name: "Meeting Set"
-          order: 1
+          order: 0
           stage_probability: 0.05
           exclude_from_analysis: true  # Too early - not qualified yet
 
         - id: "appointmentscheduled"
           name: "Discovery"
-          order: 2
+          order: 1
           stage_probability: 0.10
-          qualified_stage_order: 2  # First qualified stage
+          qualified_stage_order: 1  # First qualified stage
 
         - id: "qualifiedtobuy"
           name: "Scoping"
-          order: 3
+          order: 2
           stage_probability: 0.10
 
         - id: "presentationscheduled"
           name: "Technical Evaluation"
-          order: 4
+          order: 3
           stage_probability: 0.40
 
         - id: "24682892"
           name: "Negotiating"
-          order: 5
+          order: 4
           stage_probability: 0.60
 
         - id: "43449439"
           name: "Awaiting Signature"
-          order: 6
+          order: 5
           stage_probability: 0.90
 
         - id: "closedwon"
           name: "Closed Won (default)"
-          order: 7
+          order: 6
           stage_probability: 1.0
           is_won: true
 
         - id: "closedlost"
           name: "Closed Lost (default)"
-          order: 8
+          order: 7
           stage_probability: 0.0
           is_lost: true
 
         - id: "decisionmakerboughtin"
           name: "Review"
-          order: 9
+          order: 8
           stage_probability: 0.50
 
         - id: "68509551"
           name: "Disqualified"
-          order: 10
+          order: 9
           stage_probability: 0.0
           is_lost: true
           exclude_from_analysis: true  # Both flags: lost AND excluded
@@ -107,31 +107,31 @@ pipeline:
     - id: "866608541"
       name: "Renewal Pipeline"
       analyze: false  # MEDDICC agent skips; analytics INCLUDES for GRR/NRR
-      qualified_stage_order: 1
+      qualified_stage_order: 0
       stages:
         - id: "1297321618"
           name: "Upcoming Renewal"
-          order: 1
+          order: 0
           stage_probability: 0.75
 
         - id: "1297321619"
           name: "Renewal Engaged"
-          order: 2
+          order: 1
           stage_probability: 0.85
 
         - id: "1297321620"
           name: "Pricing Presented"
-          order: 3
+          order: 2
           stage_probability: 0.90
 
         - id: "1297321622"
           name: "Contract Sent"
-          order: 4
+          order: 3
           stage_probability: 0.95
 
         - id: "1297321623"
           name: "Closed Won (Renewal)"
-          order: 5
+          order: 4
           stage_probability: 1.0
           is_won: true
 
