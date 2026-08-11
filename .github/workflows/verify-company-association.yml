@@ -1,0 +1,129 @@
+name: Verify Company Association
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests supabase
+
+      - name: Test company associations
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os, json, requests
+          from supabase import create_client
+
+          api_key = os.getenv('HUBSPOT_API_KEY')
+          headers = {'Authorization': f'Bearer {api_key}'}
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+
+          # Get 5 diverse open deals
+          result = sb.table('deals')\
+            .select('deal_id, company_name, deal_value')\
+            .eq('deal_status', 'active')\
+            .limit(200)\
+            .execute()
+
+          # Pick diverse set by value (small, medium, large)
+          deals = sorted(result.data, key=lambda d: float(d.get('deal_value') or 0))
+          sample_deals = [
+              deals[5],   # Small
+              deals[len(deals)//4],  # Lower quartile
+              deals[len(deals)//2],  # Median
+              deals[3*len(deals)//4],  # Upper quartile
+              deals[-5]   # Large
+          ]
+
+          print('='*80)
+          print('TASK 0: VERIFY COMPANY ASSOCIATION PATH')
+          print('='*80)
+          print()
+
+          company_count = 0
+          employee_count = 0
+          all_properties = set()
+
+          for i, deal in enumerate(sample_deals, 1):
+              deal_id = deal['deal_id']
+              company = deal.get('company_name', 'Unknown')
+              value = float(deal.get('deal_value') or 0)
+
+              print(f'{i}. {company} (\${value:,.0f})')
+              print(f'   deal_id: {deal_id}')
+
+              # Step 1: Get company association
+              assoc_url = f'https://api.hubapi.com/crm/v3/objects/deals/{deal_id}/associations/companies'
+              assoc_resp = requests.get(assoc_url, headers=headers)
+
+              if assoc_resp.status_code != 200:
+                  print(f'   ❌ No company association')
+                  print()
+                  continue
+
+              assoc_data = assoc_resp.json()
+              results = assoc_data.get('results', [])
+
+              if not results:
+                  print(f'   ❌ No company associated')
+                  print()
+                  continue
+
+              company_id = results[0].get('id')
+              print(f'   ✓ Company ID: {company_id}')
+              company_count += 1
+
+              # Step 2: Get company properties
+              comp_url = f'https://api.hubapi.com/crm/v3/objects/companies/{company_id}'
+              comp_resp = requests.get(comp_url, headers=headers)
+
+              if comp_resp.status_code != 200:
+                  print(f'   ❌ Could not fetch company')
+                  print()
+                  continue
+
+              comp_data = comp_resp.json()
+              props = comp_data.get('properties', {})
+
+              # Collect all property names
+              all_properties.update(props.keys())
+
+              # Look for employee count fields
+              emp_fields = {k: v for k, v in props.items()
+                           if 'employee' in k.lower() or 'headcount' in k.lower()}
+
+              if emp_fields:
+                  print(f'   Employee-related fields:')
+                  for k, v in emp_fields.items():
+                      print(f'     {k}: {v}')
+                      if v and v != '':
+                          employee_count += 1
+              else:
+                  print(f'   ⚠️  No employee-related fields found')
+
+              print()
+
+          print('='*80)
+          print('SUMMARY')
+          print('='*80)
+          print(f'Sample size: {len(sample_deals)} deals')
+          print(f'Deals with company association: {company_count}/{len(sample_deals)} ({100*company_count//len(sample_deals)}%)')
+          print(f'Companies with employee field populated: {employee_count}/{company_count}')
+          print()
+          print('All company property names found:')
+          for prop in sorted(all_properties):
+              if 'employee' in prop.lower() or 'size' in prop.lower() or 'headcount' in prop.lower():
+                  print(f'  → {prop}')
+          "
