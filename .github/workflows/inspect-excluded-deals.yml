@@ -18,32 +18,49 @@ jobs:
 
       - name: Find deals matching exclusion patterns
         env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
           python -c "
-          import os
+          import os, requests
           from supabase import create_client
 
+          api_key = os.getenv('HUBSPOT_API_KEY')
+          headers = {'Authorization': f'Bearer {api_key}'}
           sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
 
-          # Find deals with names containing the excluded patterns
-          result = sb.table('deals').select('deal_id, deal_name, company_name, deal_value, deal_status, create_date, close_date').execute()
+          # Get all deal IDs from Supabase (which came from HubSpot)
+          result = sb.table('deals').select('deal_id').execute()
+          deal_ids = [d['deal_id'] for d in result.data]
+
+          print(f'Checking {len(deal_ids)} deals from Supabase...')
+          print()
 
           excluded_patterns = ['anthropic', 'x.ai', 'x-']
           matching_deals = []
 
-          for d in result.data:
-              name = d.get('deal_name', '').lower()
+          # Check each deal's name in HubSpot (batch would be better but this works)
+          for i, deal_id in enumerate(deal_ids[:100]):  # Limit to first 100 for speed
+              url = f'https://api.hubapi.com/crm/v3/objects/deals/{deal_id}'
+              params = {'properties': 'dealname,amount,dealstage,closedate'}
+              resp = requests.get(url, headers=headers, params=params)
+
+              if resp.status_code != 200:
+                  continue
+
+              deal_data = resp.json()
+              props = deal_data.get('properties', {})
+              dealname = props.get('dealname', '')
+
               for pattern in excluded_patterns:
-                  if pattern in name:
+                  if pattern.lower() in dealname.lower():
                       matching_deals.append({
-                          'deal_name': d.get('deal_name'),
-                          'company_name': d.get('company_name'),
-                          'deal_value': d.get('deal_value'),
-                          'deal_status': d.get('deal_status'),
-                          'create_date': d.get('create_date'),
-                          'close_date': d.get('close_date'),
+                          'deal_id': deal_id,
+                          'dealname': dealname,
+                          'amount': props.get('amount'),
+                          'stage': props.get('dealstage'),
+                          'closedate': props.get('closedate'),
                           'pattern': pattern
                       })
                       break
@@ -54,16 +71,15 @@ jobs:
           print(f'Total deals matching exclusion patterns: {len(matching_deals)}')
           print()
 
-          # Show first 5 as examples
-          print('Sample deal names (first 5):')
+          # Show all matching deals
+          print('All matching deal names:')
           print()
-          for i, d in enumerate(matching_deals[:5], 1):
-              print(f'{i}. \"{d[\"deal_name\"]}\"')
-              print(f'   Company: {d[\"company_name\"]}')
-              print(f'   Value: \${float(d.get(\"deal_value\") or 0):,.0f}')
-              print(f'   Status: {d[\"deal_status\"]}')
-              print(f'   Created: {d[\"create_date\"]}')
-              print(f'   Close date: {d[\"close_date\"]}')
+          for i, d in enumerate(matching_deals, 1):
+              print(f'{i}. \"{d[\"dealname\"]}\"')
+              print(f'   Deal ID: {d[\"deal_id\"]}')
+              print(f'   Amount: \${float(d.get(\"amount\") or 0):,.0f}')
+              print(f'   Stage: {d[\"stage\"]}')
+              print(f'   Close date: {d[\"closedate\"]}')
               print(f'   Matched pattern: \"{d[\"pattern\"]}\"')
               print()
           "
