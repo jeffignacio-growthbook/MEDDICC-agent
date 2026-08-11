@@ -85,9 +85,10 @@ jobs:
               print(f'   ✓ Company ID: {company_id}')
               company_count += 1
 
-              # Step 2: Get company properties
+              # Step 2: Get company properties (request numberofemployees explicitly)
               comp_url = f'https://api.hubapi.com/crm/v3/objects/companies/{company_id}'
-              comp_resp = requests.get(comp_url, headers=headers)
+              comp_params = {'properties': 'name,domain,numberofemployees,num_associated_deals'}
+              comp_resp = requests.get(comp_url, headers=headers, params=comp_params)
 
               if comp_resp.status_code != 200:
                   print(f'   ❌ Could not fetch company')
