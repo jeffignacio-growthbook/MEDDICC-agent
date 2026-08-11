@@ -345,6 +345,36 @@ def main():
         except Exception as e:
             print(f"❌ Failed to fetch deals: {e}")
             return
+
+        # Batch fetch company associations and employee counts for segmentation
+        print("\n3. Batch fetching company associations and employee counts...")
+        deal_ids = [d.get('id') for d in all_deals_api if d.get('id')]
+        print(f"   Fetching company associations for {len(deal_ids)} deals...")
+
+        # Step 1: Batch get company IDs for all deals
+        deal_to_company = hubspot.batch_get_deal_company_associations(deal_ids)
+        companies_found = sum(1 for cid in deal_to_company.values() if cid)
+        print(f"   Found {companies_found}/{len(deal_ids)} deals with company associations")
+
+        # Step 2: Get unique company IDs
+        unique_company_ids = list(set(cid for cid in deal_to_company.values() if cid))
+        print(f"   Fetching employee counts for {len(unique_company_ids)} unique companies...")
+
+        # Step 3: Batch fetch company properties
+        company_properties = hubspot.batch_get_companies(
+            unique_company_ids,
+            properties=['name', 'numberofemployees']
+        )
+        print(f"   Retrieved properties for {len(company_properties)} companies")
+
+        # API call estimate:
+        # - Associations: ceil(deal_count / 100) POST requests
+        # - Companies: ceil(unique_company_count / 100) POST requests
+        # Total: ~ceil(1676/100) + ceil(~1000/100) = ~17 + ~10 = ~27 calls vs 1676*2 = 3352 calls (99% reduction)
+        assoc_calls = (len(deal_ids) + 99) // 100
+        company_calls = (len(unique_company_ids) + 99) // 100
+        print(f"   API calls: {assoc_calls} association batches + {company_calls} company batches = {assoc_calls + company_calls} total")
+        print(f"   (vs {len(deal_ids) * 2} individual calls = {100 - int(100 * (assoc_calls + company_calls) / (len(deal_ids) * 2))}% reduction)")
     else:  # history mode
         meeting_set_stages = []
         closed_stages = []
@@ -392,7 +422,8 @@ def main():
                 return
 
     # Process deals
-    print("\n4. Processing deals and fetching company info...")
+    print_step = "\n5" if args.mode == 'analytics' else "\n4"
+    print(f"{print_step}. Processing deals and fetching company info...")
     deals = {}
     skipped = {
         'renewal_pipeline': 0,
@@ -443,21 +474,36 @@ def main():
             pass
         # history mode: include everything, no filters
 
-        # Get company (with error handling)
-        try:
-            company_obj = hubspot.get_deal_company(deal_id)
-            if not company_obj:
+        # Get company - use batch data in analytics mode, individual calls otherwise
+        if args.mode == 'analytics':
+            # Use pre-fetched batch data
+            company_id = deal_to_company.get(deal_id)
+            if not company_id:
                 skipped['no_company'] += 1
                 continue
 
-            company_name = company_obj.get('properties', {}).get('name', '')
+            company_props = company_properties.get(company_id, {})
+            company_name = company_props.get('name', '')
             if not company_name.strip():
                 skipped['no_company'] += 1
                 continue
 
-        except Exception as e:
-            skipped['no_company'] += 1
-            continue
+        else:
+            # Active/history mode: individual API calls
+            try:
+                company_obj = hubspot.get_deal_company(deal_id)
+                if not company_obj:
+                    skipped['no_company'] += 1
+                    continue
+
+                company_name = company_obj.get('properties', {}).get('name', '')
+                if not company_name.strip():
+                    skipped['no_company'] += 1
+                    continue
+
+            except Exception as e:
+                skipped['no_company'] += 1
+                continue
 
         # Generate slug
         slug = slugify(company_name)
@@ -493,7 +539,8 @@ def main():
         # Add analytics-specific fields
         if args.mode == 'analytics':
             from utils import (is_won_stage, is_lost_stage, get_stage_order,
-                             get_pipeline_config, compute_deal_value, load_client_config)
+                             get_pipeline_config, compute_deal_value, load_client_config,
+                             get_segment)
 
             # Determine deal_status using pipeline config
             if is_won_stage(stage):
@@ -506,6 +553,20 @@ def main():
             # Compute deal value using NULL-safe ARR component sum
             config = load_client_config()
             deal_value = compute_deal_value(props, config)
+
+            # Compute segmentation from company employee count
+            company_employee_count = None
+            segment = 'Unknown'
+            if company_id:
+                emp_raw = company_props.get('numberofemployees')
+                try:
+                    if emp_raw and emp_raw != '':
+                        company_employee_count = int(emp_raw)
+                except (ValueError, TypeError):
+                    pass
+
+            # Get segment from employee count
+            segment, expected_cycle_days = get_segment(company_employee_count, config)
 
             # Parse ARR components (NULL-safe)
             def safe_numeric(val):
@@ -542,6 +603,11 @@ def main():
             deal_dict['prior_arr'] = prior_arr
             deal_dict['sao'] = sao
             deal_dict['forecast_category'] = forecast_category
+
+            # Segmentation fields
+            deal_dict['company_id'] = company_id
+            deal_dict['company_employee_count'] = company_employee_count
+            deal_dict['segment'] = segment
 
             # Get current stage order
             current_order = get_stage_order(stage) or 0

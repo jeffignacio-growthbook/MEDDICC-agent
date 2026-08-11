@@ -136,6 +136,14 @@ class SupabaseWriter:
         if 'forecast_category' in deal:
             row['forecast_category'] = deal.get('forecast_category')
 
+        # Segmentation fields (migration 013)
+        if 'company_id' in deal:
+            row['company_id'] = deal.get('company_id')
+        if 'company_employee_count' in deal:
+            row['company_employee_count'] = _safe_int(deal['company_employee_count'])
+        if 'segment' in deal:
+            row['segment'] = deal.get('segment')
+
         # Handle highest_stage_order_reached (max logic)
         if 'current_stage_order' in deal:
             current_order = deal['current_stage_order']
