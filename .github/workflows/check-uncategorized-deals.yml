@@ -1,0 +1,86 @@
+name: Check Uncategorized Deals
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install supabase python-dateutil pyyaml
+
+      - name: Find uncategorized deals
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os, sys
+          sys.path.insert(0, 'scripts')
+          from supabase import create_client
+          from utils import load_client_config, get_fiscal_quarter
+          from datetime import date
+
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+          config = load_client_config()
+
+          # Get known categories from config
+          known_categories = set(config.get('forecast', {}).get('category_weights', {}).keys())
+          print(f'Known categories: {sorted(known_categories)}')
+          print()
+
+          # Query all active deals
+          result = sb.table('deals')\
+            .select('deal_id, company_name, forecast_category, deal_value, close_date, pipeline_id')\
+            .eq('deal_status', 'active')\
+            .execute()
+
+          # Filter for uncategorized (non-null but not in known categories)
+          uncategorized = []
+          for d in result.data:
+              cat = d.get('forecast_category')
+              if cat is not None and cat not in known_categories:
+                  # Get fiscal quarter
+                  try:
+                      close_dt = date.fromisoformat(str(d['close_date'])[:10])
+                      _, _, fq = get_fiscal_quarter(close_dt, config)
+                      d['fiscal_quarter'] = fq
+                  except:
+                      d['fiscal_quarter'] = 'UNKNOWN'
+                  uncategorized.append(d)
+
+          print('='*80)
+          print('UNCATEGORIZED DEALS (non-null forecast_category not in config)')
+          print('='*80)
+          print(f'Total: {len(uncategorized)} deals')
+          print()
+
+          # Group by fiscal quarter
+          from collections import defaultdict
+          by_quarter = defaultdict(list)
+          for d in uncategorized:
+              by_quarter[d['fiscal_quarter']].append(d)
+
+          for fq in sorted(by_quarter.keys()):
+              deals = by_quarter[fq]
+              total_value = sum(float(d.get('deal_value') or 0) for d in deals)
+              print(f'{fq}:')
+              print(f'  {len(deals)} deals, \${total_value:,.0f} total')
+              print()
+              for d in deals:
+                  company = d.get('company_name', 'Unknown')[:30]
+                  cat = d.get('forecast_category', '')
+                  value = float(d.get('deal_value') or 0)
+                  deal_id = d.get('deal_id', '')
+                  pipeline = d.get('pipeline_id', 'default')
+                  print(f'    {company:30s} | {cat:20s} | \${value:>10,.0f} | {pipeline}')
+                  print(f'      deal_id: {deal_id}')
+              print()
+          "
