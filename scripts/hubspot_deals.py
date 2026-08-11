@@ -343,6 +343,12 @@ class HubSpotDealsClient:
                 response = self._post(endpoint, data)
                 results = response.get('results', [])
 
+                # Debug: report batch results
+                if i == 0:  # First batch only
+                    print(f"  [DEBUG] First batch: sent {len(batch)} deal IDs, got {len(results)} results")
+                    if results:
+                        print(f"  [DEBUG] Sample result structure: {results[0]}")
+
                 for result in results:
                     from_deal_id = result.get('from', {}).get('id')
                     to_companies = result.get('to', [])
@@ -356,6 +362,8 @@ class HubSpotDealsClient:
 
             except Exception as e:
                 print(f"  ⚠️  Batch association request failed for {len(batch)} deals: {e}")
+                import traceback
+                print(f"  [DEBUG] Full error: {traceback.format_exc()}")
                 # Add None entries for failed batch
                 for deal_id in batch:
                     deal_to_company[deal_id] = None

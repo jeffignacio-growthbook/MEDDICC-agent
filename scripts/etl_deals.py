@@ -682,8 +682,11 @@ def main():
         print(f'  {qualified_count} qualified (stage order >= {qualified_order})')
         if unmapped_stages:
             print(f'  ⚠️  {len(unmapped_stages)} stage IDs not in config: {sorted(unmapped_stages)}')
-        print(f'  Qualification rate: {qualified_count}/{len(deals)} '
-              f'({100*qualified_count/len(deals):.1f}%)')
+        if len(deals) > 0:
+            print(f'  Qualification rate: {qualified_count}/{len(deals)} '
+                  f'({100*qualified_count/len(deals):.1f}%)')
+        else:
+            print(f'  ⚠️  No deals processed - check skipped breakdown')
     else:  # history mode
         print(f"\n5. Processed {len(deals)} deals (active + closed)")
         # Count by status
