@@ -1,0 +1,55 @@
+name: Resync Forecast Category
+
+on:
+  workflow_dispatch:
+
+jobs:
+  resync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Re-run analytics ETL to sync forecast_category
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python scripts/etl_deals.py --mode analytics
+
+      - name: Verify forecast_category distribution
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os
+          from supabase import create_client
+
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+
+          result = sb.table('deals')\
+            .select('forecast_category', count='exact')\
+            .eq('deal_status', 'active')\
+            .execute()
+
+          # Count by category
+          from collections import Counter
+          cats = [r.get('forecast_category') for r in result.data]
+          dist = Counter(cats)
+
+          print('='*70)
+          print('FORECAST_CATEGORY DISTRIBUTION AFTER ETL')
+          print('='*70)
+          for cat in sorted(dist.keys(), key=lambda k: dist[k], reverse=True):
+              cat_label = cat if cat else 'NULL'
+              print(f'{cat_label:20s} {dist[cat]:>5d} deals')
+          print('-'*70)
+          print(f'Total active deals: {len(cats)}')
+          "

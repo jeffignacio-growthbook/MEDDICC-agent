@@ -90,13 +90,23 @@ def main():
 
         # Category-weighted
         cat = d.get('forecast_category')
-        weight = category_weights.get(cat)
-        if weight is None:
-            g['uncategorized_value'] += value
-            cat_label = cat or 'NULL'
-            weight = 0.0
-        else:
+
+        # NULL treated same as OMIT (0.0 weight) - not a data quality issue
+        # Only genuinely unrecognized non-null values are data quality issues
+        if cat is None:
+            # NULL = not yet categorized by rep, treat as OMIT (0.0)
+            weight = category_weights.get('OMIT', 0.0)
+            cat_label = 'NULL'
+        elif cat in category_weights:
+            # Recognized category
+            weight = category_weights[cat]
             cat_label = cat
+        else:
+            # Unrecognized non-null value (typo, new picklist value, etc.)
+            weight = 0.0
+            cat_label = cat
+            g['uncategorized_value'] += value
+
         weighted_value = value * weight
         g['category_weighted'] += weighted_value
         cb = g['category_breakdown'][cat_label]
