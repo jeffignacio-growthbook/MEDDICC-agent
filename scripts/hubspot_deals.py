@@ -312,6 +312,102 @@ class HubSpotDealsClient:
             print(f"Error getting contacts for deal {deal_id}: {e}")
             return []
 
+    def batch_get_deal_company_associations(self, deal_ids: List[str]) -> dict:
+        """
+        Batch fetch company associations for multiple deals.
+
+        Uses HubSpot's batch associations API to fetch company IDs for
+        multiple deals in a single request (or batches of 100).
+
+        Args:
+            deal_ids: List of deal IDs to fetch company associations for
+
+        Returns:
+            dict: Mapping of deal_id -> company_id (or None if no association)
+                  e.g. {'12345': '67890', '12346': '67891', ...}
+        """
+        deal_to_company = {}
+
+        # HubSpot batch associations API limit: 100 per request
+        BATCH_SIZE = 100
+
+        for i in range(0, len(deal_ids), BATCH_SIZE):
+            batch = deal_ids[i:i + BATCH_SIZE]
+
+            endpoint = "/crm/v4/associations/deals/companies/batch/read"
+            data = {
+                "inputs": [{"id": deal_id} for deal_id in batch]
+            }
+
+            try:
+                response = self._post(endpoint, data)
+                results = response.get('results', [])
+
+                for result in results:
+                    from_deal_id = result.get('from', {}).get('id')
+                    to_companies = result.get('to', [])
+
+                    if to_companies:
+                        # Take first associated company
+                        company_id = to_companies[0].get('id')
+                        deal_to_company[from_deal_id] = company_id
+                    else:
+                        deal_to_company[from_deal_id] = None
+
+            except Exception as e:
+                print(f"  ⚠️  Batch association request failed for {len(batch)} deals: {e}")
+                # Add None entries for failed batch
+                for deal_id in batch:
+                    deal_to_company[deal_id] = None
+
+        return deal_to_company
+
+    def batch_get_companies(self, company_ids: List[str], properties: List[str] = None) -> dict:
+        """
+        Batch fetch company properties for multiple company IDs.
+
+        Uses HubSpot's batch companies read API to fetch properties for
+        multiple companies in a single request (or batches of 100).
+
+        Args:
+            company_ids: List of company IDs to fetch
+            properties: List of property names to fetch (default: name, numberofemployees)
+
+        Returns:
+            dict: Mapping of company_id -> properties dict
+                  e.g. {'67890': {'name': 'Acme', 'numberofemployees': '100'}, ...}
+        """
+        if properties is None:
+            properties = ['name', 'numberofemployees']
+
+        company_data = {}
+
+        # HubSpot batch read API limit: 100 per request
+        BATCH_SIZE = 100
+
+        for i in range(0, len(company_ids), BATCH_SIZE):
+            batch = company_ids[i:i + BATCH_SIZE]
+
+            endpoint = "/crm/v3/objects/companies/batch/read"
+            data = {
+                "properties": properties,
+                "inputs": [{"id": company_id} for company_id in batch]
+            }
+
+            try:
+                response = self._post(endpoint, data)
+                results = response.get('results', [])
+
+                for result in results:
+                    company_id = result.get('id')
+                    props = result.get('properties', {})
+                    company_data[company_id] = props
+
+            except Exception as e:
+                print(f"  ⚠️  Batch company request failed for {len(batch)} companies: {e}")
+
+        return company_data
+
     def update_deal_property(self, deal_id: str, property_name: str, value: str) -> dict:
         """Update a single deal property."""
         endpoint = f"/crm/v3/objects/deals/{deal_id}"
