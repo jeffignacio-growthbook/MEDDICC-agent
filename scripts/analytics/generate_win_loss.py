@@ -18,6 +18,7 @@ Usage:
 """
 
 import os
+import re
 import json
 import argparse
 from datetime import datetime
@@ -172,7 +173,10 @@ Return JSON only, no prose outside it:
   "narrative": "...",
   "competitor_mentioned": "...",
   "key_factors": ["...", "..."]
-}}"""
+}}
+
+Return ONLY the JSON object, no markdown formatting,
+no code fences, no preamble or explanation."""
 
         try:
             resp = client.messages.create(
@@ -183,6 +187,10 @@ Return JSON only, no prose outside it:
             tracker.record(resp, 'claude-sonnet-4-5-20250929',
                            'win_loss', company_name)
             raw = resp.content[0].text.strip()
+            if raw.startswith('```'):
+                raw = re.sub(r'^```[a-z]*\n?', '', raw)
+                raw = re.sub(r'\n?```$', '', raw)
+                raw = raw.strip()
             parsed = json.loads(raw)
 
             sb.table('win_loss_narratives').upsert({
