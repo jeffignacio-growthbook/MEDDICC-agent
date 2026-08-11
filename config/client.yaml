@@ -35,6 +35,37 @@ forecast:
   # historical close rates once you have enough data.
 
 # ============================================================================
+# SEGMENTATION CONFIGURATION
+# ============================================================================
+# Company-size based segmentation for pipeline generation and in-quarter
+# contribution analysis. Enables tracking of different sales cycle lengths
+# by segment.
+
+segmentation:
+  source: "company"  # Segmentation reads from associated Company object
+  field: "numberofemployees"  # HubSpot property on Company object
+  bands:
+    - name: "SMB"
+      max: 250
+      expected_cycle_days: 33
+      # Small/Medium Business: ≤250 employees, avg 33-day sales cycle
+
+    - name: "Mid-Market"
+      min: 251
+      max: 2000
+      expected_cycle_days: 84
+      # Mid-Market: 251-2,000 employees, avg 84-day sales cycle
+
+    - name: "Enterprise"
+      min: 2001
+      expected_cycle_days: 132
+      # Enterprise: 2,001+ employees, avg 132-day sales cycle
+
+    - name: "Unknown"
+      expected_cycle_days: null
+      # No employee count or no company association - cannot predict cycle
+
+# ============================================================================
 # HUBSPOT PIPELINE CONFIGURATION
 # ============================================================================
 # Use scripts/discover_stages.py to find your organization's stage IDs
