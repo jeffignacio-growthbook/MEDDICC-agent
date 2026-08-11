@@ -36,11 +36,17 @@ jobs:
           print('='*90)
           print('FORECAST_WEEKLY TABLE VERIFICATION')
           print('='*90)
-          print(f'{'Fiscal Quarter':<15} {'Pipeline':<15} {'Open Value':>15} {'Stage-Wtd':>15} {'Cat-Wtd':>15} {'Uncat':>15}')
+          print(f\"{'Fiscal Quarter':<15} {'Pipeline':<15} {'Open Value':>15} {'Stage-Wtd':>15} {'Cat-Wtd':>15} {'Uncat':>15}\")
           print('-'*90)
 
           for r in rows:
-              print(f\"{r['fiscal_quarter']:<15} {r['pipeline_id']:<15} \${r['open_pipeline_value']:>14,.0f} \${r['stage_weighted_forecast']:>14,.0f} \${r['category_weighted_forecast']:>14,.0f} \${r['uncategorized_value']:>14,.0f}\")
+              fq = r['fiscal_quarter']
+              pid = r['pipeline_id']
+              opv = r['open_pipeline_value']
+              swf = r['stage_weighted_forecast']
+              cwf = r['category_weighted_forecast']
+              ucv = r['uncategorized_value']
+              print(f\"{fq:<15} {pid:<15} \${opv:>14,.0f} \${swf:>14,.0f} \${cwf:>14,.0f} \${ucv:>14,.0f}\")
 
           print('-'*90)
           print(f'Total rows: {len(rows)}')
