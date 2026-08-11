@@ -14,7 +14,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install supabase pyyaml
+        run: pip install supabase pyyaml python-dateutil
 
       - name: Run forecast computation
         env:
