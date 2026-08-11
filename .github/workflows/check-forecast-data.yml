@@ -1,0 +1,68 @@
+name: Check Forecast Data
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install supabase
+
+      - name: Check forecast category data
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os
+          from supabase import create_client
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+
+          print('='*70)
+          print('FORECAST_CATEGORY DISTRIBUTION')
+          print('='*70)
+          result = sb.rpc('exec_sql', {
+              'sql': '''
+                  SELECT forecast_category,
+                         count(*) as deal_count,
+                         sum(deal_value)::numeric as total_value
+                  FROM deals
+                  WHERE deal_status = 'active'
+                  GROUP BY forecast_category
+                  ORDER BY count(*) DESC
+              '''
+          }).execute()
+
+          if result.data and len(result.data) > 0 and 'rows' in result.data[0]:
+              for row in result.data[0]['rows']:
+                  cat = row[0] if row[0] else 'NULL'
+                  count = row[1]
+                  value = float(row[2]) if row[2] else 0
+                  print(f'{cat:20s} {count:>5d} deals  ${value:>15,.0f}')
+
+          print()
+          print('='*70)
+          print('STAGE PROBABILITY CHECK')
+          print('='*70)
+          result2 = sb.rpc('exec_sql', {
+              'sql': '''
+                  SELECT
+                      CASE WHEN stage IS NOT NULL THEN 'has_stage' ELSE 'null_stage' END as has_stage,
+                      count(*)
+                  FROM deals
+                  GROUP BY CASE WHEN stage IS NOT NULL THEN 'has_stage' ELSE 'null_stage' END
+              '''
+          }).execute()
+
+          if result2.data and len(result2.data) > 0 and 'rows' in result2.data[0]:
+              for row in result2.data[0]['rows']:
+                  print(f'{row[0]:15s} {row[1]:>6d} deals')
+          "
