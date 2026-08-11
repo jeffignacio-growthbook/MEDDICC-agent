@@ -1,0 +1,70 @@
+name: Fix Snapshots and Recompute Waterfall
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix-and-recompute:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install supabase pyyaml python-dateutil
+
+      - name: Fix snapshot stage_order values
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python fix_snapshot_stage_orders.py
+
+      - name: Delete old waterfall data
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os
+          from supabase import create_client
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+          sb.table('waterfall_weekly').delete().eq('week_ending', '2026-08-11').execute()
+          print('✓ Deleted old waterfall data')
+          "
+
+      - name: Recompute waterfall
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python scripts/analytics/compute_waterfall.py
+
+      - name: Show results
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os
+          from supabase import create_client
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+          result = sb.table('waterfall_weekly').select('*').order('week_ending', desc=True).limit(2).execute()
+
+          print('\n=== Waterfall Results ===')
+          print(f\"{'Week':<12} {'Pipeline':<10} {'New':<12} {'Fwd':<12} {'Back':<12} {'Won':<12} {'Lost':<12} {'Net':<12}\")
+          print('-' * 100)
+
+          for row in result.data:
+              week = row['week_ending']
+              pipe = row['pipeline_id']
+              new = row['new_pipeline_value'] or 0
+              fwd = row['moved_forward_value'] or 0
+              back = row['moved_backward_value'] or 0
+              won = row['won_value'] or 0
+              lost = row['lost_value'] or 0
+              net = row['net_change'] or 0
+              print(f\"{week:<12} {pipe:<10} {new:>11,.0f} {fwd:>11,.0f} {back:>11,.0f} {won:>11,.0f} {lost:>11,.0f} {net:>11,.0f}\")
+          "
