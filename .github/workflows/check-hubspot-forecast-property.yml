@@ -1,0 +1,59 @@
+name: Check HubSpot Forecast Property
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Check forecast category property definition
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          python -c "
+          import os, requests, json
+
+          api_key = os.getenv('HUBSPOT_API_KEY')
+          headers = {'Authorization': f'Bearer {api_key}'}
+
+          # Get deal properties
+          url = 'https://api.hubapi.com/crm/v3/properties/deals/hs_manual_forecast_category'
+          response = requests.get(url, headers=headers)
+
+          if response.status_code == 200:
+              prop = response.json()
+              print('='*70)
+              print('hs_manual_forecast_category Property Definition')
+              print('='*70)
+              print(f\"Name: {prop.get('name')}\")
+              print(f\"Label: {prop.get('label')}\")
+              print(f\"Type: {prop.get('type')}\")
+              print(f\"Field Type: {prop.get('fieldType')}\")
+              print()
+              print('Picklist Options:')
+              print('-'*70)
+
+              options = prop.get('options', [])
+              for opt in options:
+                  label = opt.get('label')
+                  value = opt.get('value')
+                  hidden = opt.get('hidden', False)
+                  print(f\"  {value:20s} (label: {label:20s}) hidden={hidden}\")
+
+              print()
+              print(f'Total options: {len(options)}')
+              print(f'Visible options: {sum(1 for o in options if not o.get(\"hidden\", False))}')
+          else:
+              print(f'Error: HTTP {response.status_code}')
+              print(response.text)
+          "
