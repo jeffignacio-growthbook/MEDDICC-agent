@@ -1,0 +1,47 @@
+name: Verify Forecast Data
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install supabase
+
+      - name: Query forecast_weekly table
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os
+          from supabase import create_client
+
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+
+          rows = sb.table('forecast_weekly')\
+            .select('fiscal_quarter, pipeline_id, open_pipeline_value, stage_weighted_forecast, category_weighted_forecast, uncategorized_value')\
+            .order('fiscal_quarter')\
+            .order('pipeline_id')\
+            .execute().data
+
+          print('='*90)
+          print('FORECAST_WEEKLY TABLE VERIFICATION')
+          print('='*90)
+          print(f'{'Fiscal Quarter':<15} {'Pipeline':<15} {'Open Value':>15} {'Stage-Wtd':>15} {'Cat-Wtd':>15} {'Uncat':>15}')
+          print('-'*90)
+
+          for r in rows:
+              print(f\"{r['fiscal_quarter']:<15} {r['pipeline_id']:<15} \${r['open_pipeline_value']:>14,.0f} \${r['stage_weighted_forecast']:>14,.0f} \${r['category_weighted_forecast']:>14,.0f} \${r['uncategorized_value']:>14,.0f}\")
+
+          print('-'*90)
+          print(f'Total rows: {len(rows)}')
+          "
