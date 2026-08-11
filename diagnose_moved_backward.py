@@ -25,13 +25,13 @@ sb = create_client(SUPABASE_URL, SUPABASE_KEY)
 # Get all snapshot records for both dates
 prev_snap = select_all(
     sb, 'deals_snapshot',
-    'deal_id, stage_order, deal_value, company_name, deal_status',
+    'deal_id, stage_order, deal_value, deal_status',
     filters=[('eq', 'snapshot_date', '2026-08-09')]
 )
 
 curr_snap = select_all(
     sb, 'deals_snapshot',
-    'deal_id, stage_order, deal_value, company_name, deal_status',
+    'deal_id, stage_order, deal_value, deal_status',
     filters=[('eq', 'snapshot_date', '2026-08-11')]
 )
 
@@ -68,7 +68,6 @@ for deal_id, curr in curr_dict.items():
         if curr_order_real < prev_order_real:
             backward_deals.append({
                 'deal_id': deal_id,
-                'company_name': curr.get('company_name', 'Unknown'),
                 'prev_order': prev_order,
                 'curr_order': curr_order,
                 'deal_value': curr.get('deal_value', 0)
@@ -78,19 +77,18 @@ for deal_id, curr in curr_dict.items():
 backward_deals.sort(key=lambda x: x['deal_value'] or 0, reverse=True)
 
 print("Deals Moving Backward (active deals, stage_order > 0):")
-print("=" * 100)
-print(f"{'Company':<30} {'Deal ID':<20} {'Prev→Curr':<12} {'Value':>15}")
-print("-" * 100)
+print("=" * 80)
+print(f"{'Deal ID':<30} {'Prev→Curr':<15} {'Value':>15}")
+print("-" * 80)
 
 total_value = 0
 for deal in backward_deals[:20]:  # Top 20
-    company = (deal['company_name'] or 'Unknown')[:29]
-    deal_id = str(deal['deal_id'])[:19]
+    deal_id = str(deal['deal_id'])[:29]
     movement = f"{deal['prev_order']} → {deal['curr_order']}"
     value = deal['deal_value'] or 0
     total_value += value
-    print(f"{company:<30} {deal_id:<20} {movement:<12} {value:>15,.0f}")
+    print(f"{deal_id:<30} {movement:<15} {value:>15,.0f}")
 
-print("-" * 100)
+print("-" * 80)
 print(f"Total shown: {len(backward_deals[:20])} deals, ${total_value:,.0f}")
 print(f"Total backward: {len(backward_deals)} deals, ${sum(d['deal_value'] or 0 for d in backward_deals):,.0f}")
