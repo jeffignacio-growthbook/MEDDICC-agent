@@ -194,6 +194,48 @@ def is_lost_stage(stage_id: str, pipeline_config: Optional[Dict] = None) -> bool
     return False
 
 
+def get_segment(employee_count: Optional[int], config: Optional[Dict] = None) -> tuple:
+    """
+    Return (segment_name, expected_cycle_days) for an employee count.
+
+    Maps employee count to configured segmentation bands (SMB, Mid-Market,
+    Enterprise). Returns 'Unknown' for None/missing employee counts.
+
+    Args:
+        employee_count: Number of employees (from Company.numberofemployees)
+        config: Optional full config dict (loaded if not provided)
+
+    Returns:
+        tuple: (segment_name, expected_cycle_days)
+            e.g. ('SMB', 33), ('Enterprise', 132), ('Unknown', None)
+
+    Examples:
+        get_segment(100) -> ('SMB', 33)
+        get_segment(500) -> ('Mid-Market', 84)
+        get_segment(5000) -> ('Enterprise', 132)
+        get_segment(None) -> ('Unknown', None)
+    """
+    if config is None:
+        config = load_client_config()
+
+    bands = config.get('segmentation', {}).get('bands', [])
+
+    # Handle None/missing employee count -> Unknown
+    if employee_count is None:
+        unknown = next((b for b in bands if b['name'] == 'Unknown'), None)
+        return ('Unknown', unknown.get('expected_cycle_days') if unknown else None)
+
+    # Find matching band
+    for band in bands:
+        lo = band.get('min', 0)
+        hi = band.get('max', float('inf'))
+        if lo <= employee_count <= hi:
+            return (band['name'], band.get('expected_cycle_days'))
+
+    # No match found -> Unknown
+    return ('Unknown', None)
+
+
 # ============================================================================
 # STRING UTILITIES
 # ============================================================================
