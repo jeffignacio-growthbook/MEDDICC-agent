@@ -15,7 +15,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install supabase
+          pip install supabase pyyaml
 
       - name: Reset and recompute waterfall
         env:
