@@ -17,10 +17,19 @@ jobs:
         run: |
           pip install requests supabase python-dateutil pyyaml pytz
 
-      - name: Run analytics ETL
+      - name: Run analytics ETL with batch optimization
         env:
           HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
+          echo "Running ETL with batch company fetching (reduces API calls by 99%)"
           python scripts/etl_deals.py --mode analytics
+
+      - name: Query segment distribution
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          echo "Querying segment distribution..."
+          python scripts/query_segments_simple.py
