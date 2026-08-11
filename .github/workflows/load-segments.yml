@@ -1,0 +1,75 @@
+name: Load Segments and Query Distribution
+
+on:
+  workflow_dispatch:
+
+jobs:
+  load-and-query:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests supabase python-dateutil pyyaml pytz
+
+      - name: Run ETL with batch optimization
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          echo "Running ETL with batch company association fetching..."
+          python scripts/etl_deals.py --mode analytics
+
+      - name: Query segment distribution
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os
+          from supabase import create_client
+
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+
+          # Query segment distribution
+          result = sb.table('deals').select(
+              'segment, deal_value, deal_status'
+          ).eq('deal_status', 'active').execute()
+
+          if result.data:
+              from collections import defaultdict
+              segments = defaultdict(lambda: {'count': 0, 'total': 0.0})
+
+              for deal in result.data:
+                  seg = deal.get('segment', 'Unknown')
+                  val = float(deal.get('deal_value') or 0)
+                  segments[seg]['count'] += 1
+                  segments[seg]['total'] += val
+
+              print('\n' + '='*80)
+              print('Segment Distribution (Active Deals)')
+              print('='*80)
+              print(f\"{'Segment':<15} {'Count':>8} {'Total Value':>15} {'Avg Value':>12}\")
+              print('-'*80)
+
+              for seg in sorted(segments.keys(), key=lambda s: segments[s]['count'], reverse=True):
+                  data = segments[seg]
+                  count = data['count']
+                  total = data['total']
+                  avg = total / count if count else 0
+                  print(f\"{seg:<15} {count:>8} \${total:>14,.0f} \${avg:>11,.0f}\")
+
+              print('-'*80)
+              total_deals = sum(d['count'] for d in segments.values())
+              unknown_count = segments.get('Unknown', {}).get('count', 0)
+              unknown_pct = (100 * unknown_count / total_deals) if total_deals else 0
+              print(f'Total Active Deals: {total_deals}')
+              print(f'Unknown Bucket: {unknown_count} deals ({unknown_pct:.1f}%)')
+              print('='*80)
+          "
