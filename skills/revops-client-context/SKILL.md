@@ -65,10 +65,29 @@ Value metrics:
 
 ## Phase 5 — HubSpot stage configuration
 
-Tell the user to run: python scripts/discover_stages.py
-Ask them to paste the output.
+**Stage ordering — choose one path:**
 
-Parse it and identify stages to EXCLUDE:
+**Option A (recommended): Add deals.schema.read scope**
+This lets discover_stages.py fetch displayOrder directly from HubSpot
+so stage order values never drift when pipelines change.
+
+  1. HubSpot Settings → Integrations → Private Apps
+     → your app → Scopes → CRM → add **deals.schema.read**
+  2. Tell user to run: `python scripts/discover_stages.py`
+  3. Ask them to paste the output
+
+**Option B: Screenshot the pipeline**
+If they can't modify app scopes:
+  1. HubSpot Settings → Objects → Deals → Pipelines
+  2. Click Edit on their pipeline
+  3. Screenshot the stages — they appear top-to-bottom in display order
+  4. Assign order: 1, 2, 3... from top to bottom when configuring
+
+⚠️ Do NOT use either option and then manually edit the order values.
+They will drift when HubSpot's pipeline changes and cause false
+waterfall movements.
+
+Parse the discover_stages.py output and identify stages to EXCLUDE:
 - Meeting Set equivalents (too early)
 - Closed Won stages
 - Closed Lost stages

@@ -150,47 +150,53 @@ def compute_deal_value(properties: dict, config: Optional[Dict] = None) -> float
     return total
 
 
-def is_won_stage(stage_id: str, pipeline_config: Optional[Dict] = None) -> bool:
+def is_won_stage(stage_id: str, pipeline_id: Optional[str] = None, config: Optional[Dict] = None) -> bool:
     """
     Check if a stage ID is a won stage.
 
     Args:
         stage_id: HubSpot stage ID
-        pipeline_config: Optional pipeline config dict (loaded if not provided)
+        pipeline_id: Optional pipeline ID to limit search (if None, checks all pipelines)
+        config: Optional full config dict (loaded if not provided)
 
     Returns:
         bool: True if stage is marked as won
     """
-    if pipeline_config is None:
-        pipeline_config = get_pipeline_config()
+    if config is None:
+        config = load_client_config()
 
-    for pipeline in pipeline_config.get('pipelines', []):
-        for stage in pipeline.get('stages', []):
-            if stage.get('id') == stage_id:
-                return stage.get('is_won', False)
-
+    pipelines = config.get('pipeline', {}).get('pipelines', [])
+    for p in pipelines:
+        if pipeline_id and p['id'] != pipeline_id:
+            continue
+        for s in p.get('stages', []):
+            if s['id'] == stage_id:
+                return bool(s.get('is_won'))
     return False
 
 
-def is_lost_stage(stage_id: str, pipeline_config: Optional[Dict] = None) -> bool:
+def is_lost_stage(stage_id: str, pipeline_id: Optional[str] = None, config: Optional[Dict] = None) -> bool:
     """
     Check if a stage ID is a lost stage.
 
     Args:
         stage_id: HubSpot stage ID
-        pipeline_config: Optional pipeline config dict (loaded if not provided)
+        pipeline_id: Optional pipeline ID to limit search (if None, checks all pipelines)
+        config: Optional full config dict (loaded if not provided)
 
     Returns:
         bool: True if stage is marked as lost
     """
-    if pipeline_config is None:
-        pipeline_config = get_pipeline_config()
+    if config is None:
+        config = load_client_config()
 
-    for pipeline in pipeline_config.get('pipelines', []):
-        for stage in pipeline.get('stages', []):
-            if stage.get('id') == stage_id:
-                return stage.get('is_lost', False)
-
+    pipelines = config.get('pipeline', {}).get('pipelines', [])
+    for p in pipelines:
+        if pipeline_id and p['id'] != pipeline_id:
+            continue
+        for s in p.get('stages', []):
+            if s['id'] == stage_id:
+                return bool(s.get('is_lost'))
     return False
 
 

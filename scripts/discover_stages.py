@@ -31,9 +31,11 @@ except ImportError:
 def format_stage_for_yaml(stage, indent=4):
     """Format a stage dict as YAML with proper indentation"""
     spaces = " " * indent
+    display_order = stage.get('displayOrder', 0)
     return (
         f"{spaces}- name: \"{stage['label']}\"\n"
-        f"{spaces}  id: \"{stage['id']}\""
+        f"{spaces}  id: \"{stage['id']}\"\n"
+        f"{spaces}  order: {display_order}  # HubSpot displayOrder"
     )
 
 
@@ -78,15 +80,24 @@ def main():
             pipeline_id = pipeline.get('id', 'unknown')
             stages = pipeline.get('stages', [])
 
+            # Sort stages by displayOrder (HubSpot's authoritative order)
+            stages_sorted = sorted(stages, key=lambda s: s.get('displayOrder', 0))
+
             # Print pipeline header
             print(f"# {pipeline_label} (ID: {pipeline_id})")
             print(f"# {len(stages)} stages")
             print()
+            print("# Stage order values are HubSpot's displayOrder.")
+            print("# They remain stable unless you reorder stages in")
+            print("# HubSpot's pipeline settings. Do NOT assign arbitrary")
+            print("# numbers — they will drift when stages change.")
+            print()
 
             # Print stages
-            for idx, stage in enumerate(stages, 1):
+            for stage in stages_sorted:
                 stage_label = stage.get('label', 'Unknown')
                 stage_id = stage.get('id', 'unknown')
+                display_order = stage.get('displayOrder', 0)
                 metadata = stage.get('metadata', {})
                 is_closed_won = metadata.get('isClosed') == 'true' and metadata.get('probability') == '1.0'
                 is_closed_lost = metadata.get('isClosed') == 'true' and metadata.get('probability') == '0.0'
@@ -102,7 +113,7 @@ def main():
                 elif 'disqualified' in stage_label.lower():
                     annotation = "  # ← Consider excluding (disqualified)"
 
-                print(f"  {idx}. {stage_label:<30} (ID: {stage_id}){annotation}")
+                print(f"  {display_order}. {stage_label:<30} (ID: {stage_id}){annotation}")
 
             print()
             print("-" * 80)
@@ -219,6 +230,11 @@ def main():
         print("=" * 80)
         print()
         print("✅ Stage discovery complete!")
+        print()
+        print("✓ Stage order values sourced from HubSpot displayOrder.")
+        print("  These are stable as long as your pipeline stage order")
+        print("  doesn't change in HubSpot Settings → Objects → Deals →")
+        print("  Pipelines.")
         print()
         print("Next steps:")
         print("  1. Copy relevant sections above into config/client.yaml")
