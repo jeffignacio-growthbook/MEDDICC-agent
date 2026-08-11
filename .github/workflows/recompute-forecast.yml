@@ -1,0 +1,49 @@
+name: Recompute Forecast
+
+on:
+  workflow_dispatch:
+
+jobs:
+  compute:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install supabase pyyaml python-dateutil
+
+      - name: Clear old forecast data
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os
+          from supabase import create_client
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+          sb.table('forecast_weekly').delete().neq('week_ending', '1900-01-01').execute()
+          print('✓ Cleared old forecast data')
+          "
+
+      - name: Uncomment forecast config
+        run: |
+          sed -i 's/^# forecast:/forecast:/' config/client.yaml
+          sed -i 's/^#   category_weights:/  category_weights:/' config/client.yaml
+          sed -i 's/^#     COMMIT:/    COMMIT:/' config/client.yaml
+          sed -i 's/^#     MOST_LIKELY:/    MOST_LIKELY:/' config/client.yaml
+          sed -i 's/^#     BEST_CASE:/    BEST_CASE:/' config/client.yaml
+          sed -i 's/^#     PIPELINE:/    PIPELINE:/' config/client.yaml
+          sed -i 's/^#     OMIT:/    OMIT:/' config/client.yaml
+          sed -i 's/^#     CLOSED:/    CLOSED:/' config/client.yaml
+          sed -i 's/^#   #/  #/' config/client.yaml
+          echo "✓ Uncommented forecast config"
+
+      - name: Run forecast computation
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python scripts/analytics/compute_forecast.py
