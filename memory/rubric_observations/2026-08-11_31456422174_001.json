@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_001",
+  "timestamp": "2026-08-11T03:51:05.996230",
+  "company": "InPost",
+  "criterion_fired": "CRITERION 3 (Identified Pain) and CRITERION 4 (Decision Process)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'When downgrading a cumulative Pain score, cite the specific new contradictory evidence from the recent call. If evidence is incremental only, carry forward the prior level.' For next steps: 'Replace action verbs (Request, Discuss, Follow up) with concrete questions and role assignments (e.g., [Contact: Name/TBD]: Ask X about Y by date Z).'"
+}

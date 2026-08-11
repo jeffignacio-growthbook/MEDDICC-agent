@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_009",
+  "timestamp": "2026-08-11T04:03:50.702677",
+  "company": "Chaos",
+  "criterion_fired": "Criteria 1, 2, 4, 5",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1 should clarify: 'Score increases require *explicit new evidence* OR explicit recalibration of prior evidence; state which occurred.' Criterion 2 should separate single-call scoring from multi-call carry-forward rules. Criterion 4 should allow 'Jake Wallace, next scheduled call' as valid specificity for cases where meetings are not yet booked. Criterion 5 should state: 'ICP fit assessment is required IF call data contains sufficient modern data stack or usage signals; if absent, note as 'insufficient data' rather than failure.'"
+}

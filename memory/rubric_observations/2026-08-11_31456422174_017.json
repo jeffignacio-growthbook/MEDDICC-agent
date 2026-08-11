@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_017",
+  "timestamp": "2026-08-11T04:14:25.077621",
+  "company": "Stone",
+  "criterion_fired": "CRITERION 4 (Actionable Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Separate placeholder rules by scenario: '[DATE TBD]' and '[contact TBD]' are acceptable ONLY when data is unavailable; when contact names exist in transcript, next steps must assign specific names OR explicitly note 'contact ownership unclear from call - confirm with sales team'. [DATE TBD] should never appear\u2014replace with 'per customer cadence' or 'relative to deal stage' if exact date unknown."
+}

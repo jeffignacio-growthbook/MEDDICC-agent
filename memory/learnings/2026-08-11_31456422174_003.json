@@ -1,0 +1,21 @@
+{
+  "company": "BESTSELLER",
+  "deal_id": "60785721693",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward Consistency: Metrics score increased from 5/10 to 6/10 without documented reason. Cumulative state shows score 5; new analysis shows 6/10. The rationale states 'Scaling metric is clear (1\u219212-15 storefronts)' \u2014 this same evidence existed in Call 1 and was scored 5/10. If score is justified at 6/10, the analysis must explicitly state what NEW evidence or reasoning prompted the increase. Otherwise, maintain 5/10 or document the change rationale. CRITERION 2 VIOLATION \u2014 Carry-forward Consistency: Decision Process score increased from 6/10 to 7/10 without documented reason. Cumulative state shows 6/10; new analysis shows 7/10. The evidence ('phased approach: first brand storefront near launch, pilot focused on Sanity integration') overlaps with cumulative evidence ('First brand nearing launch'). The recent call adds 'pilot focused on Sanity integration' but this was already known. Explicitly state what new information justifies the increase, or maintain 6/10. CRITERION 2 VIOLATION \u2014 Carry-forward Consistency: Competition score increased from 4/10 to 5/10 without documented reason. The recent call provides NO new competitive information \u2014 it only reinforces 'no mention of competing platforms.' If the score should remain 4/10 due to unchanged information, maintain that score and note 'No new competitive intelligence in this call \u2014 maintaining previous score of 4/10.' CRITERION 3 VIOLATION \u2014 Evidence Quality: Champion status is scored 2/10 with evidence that 'Technical team committed to pilot...demonstrates ownership of tactical execution but not internal selling.' This reasoning does not support the increase from cumulative 1/10 to 2/10. Tactical execution ownership is not champion behavior. Either score remains 1/10 (Unknown \u2014 no champion identified), or provide explicit evidence of internal advocacy/selling behavior to justify 2/10.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-11_31456422174_003",
+  "timestamp": "2026-08-11T03:53:53.465573"
+}

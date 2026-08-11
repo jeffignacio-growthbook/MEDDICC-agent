@@ -1,0 +1,21 @@
+{
+  "company": "Livesport",
+  "deal_id": "62160567676",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Champion component has status 'Unknown' with score 1/10 but provides no evidence statement about why evidence doesn't exist. The component states 'No specific internal advocate identified in either call summary' which is evidence of absence, but must explicitly state 'No evidence of champion activity identified in calls' to meet standard. CRITERION 4 FAILURE - Champion (score 1/10) has next steps but they violate the actionable requirement: 'Get their full name, title, and confirm they are attending Tuesday's session' is too vague without a specific question format. Must be rewritten as: '[Contact TBD]: Email whoever scheduled Tuesday's presentation and ask: \"Who is leading this evaluation internally? What is your full name and title? And will you be attending Tuesday's session?\"' CRITERION 4 FAILURE - Economic Buyer (score 2/10, below 7) next step uses 'Implied' budget authority language without a clear specific contact action. Rewrite as: '[Contact TBD]: Ask in Tuesday presentation or follow-up call: \"Who specifically approves \u20ac250K software contracts at Livesport - is it your CFO, CEO, or a procurement committee? And what is their timeline for reviewing the cost analysis after Tuesday?\"' CRITERION 2 WARNING - Decision Process score increased from 4/10 to 5/10 with justification, but cumulative_calls_context shows only 1 call reviewed previously, yet analysis now references 'two calls'. The historical cumulative state shows calls_reviewed: 1, but the new analysis treats this as Call 2. Clarify: Is this the second call or first call? If first call in the system, no carry-forward applies and score should be based solely on this call's evidence. CRITERION 3 MINOR - Competition section flags Airship/Extreme Push as 'NOT experimentation competitors' which is correct, but then assumes this is a scope misalignment red flag without evidence from the prospect that they are confused. Reframe as: 'Airship and Extreme Push appear to be mobile messaging platforms, not experimentation platforms. This suggests either scope separation or potential misalignment - need to clarify with the buyer.' rather than stating it as definitive misalignment.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-11_31456422174_007",
+  "timestamp": "2026-08-11T04:09:35.342611"
+}

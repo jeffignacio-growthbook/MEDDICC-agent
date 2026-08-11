@@ -1,0 +1,21 @@
+{
+  "company": "Chaos",
+  "deal_id": "56685250888",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Complete Coverage: Decision Process score increased from 4/10 to 5/10 without justification. The analysis states 'no new timeline or stakeholder information in this call, prior evidence stands' yet presents a higher score than the cumulative state (4/10). This is contradictory\u2014if no new information supports a higher score, the score should remain at 4/10 or the evidence must explicitly explain the increase. CRITERION 2 FAILURE - Carry-forward Consistency: Competition component score jumped from 1/10 to 5/10 based on 'past AB testing tools' being mentioned, but the cumulative state explicitly documents this is call 1 only (calls_reviewed: 1). The recent call summary is presented as if it's a second call, creating confusion about whether carry-forward rules apply. If this is truly a second call, the cumulative context header is incorrect and should be updated. CRITERION 4 FAILURE - Actionable Next Steps: Multiple next steps violate the specificity requirement. Examples: 'Ask Jake Wallace directly on next call (scheduled within 1 week)' uses vague phrasing without a concrete scheduled contact or specific action date. 'On next call, ask Jake Wallace' lacks a defined meeting time or owner assignment. The rubric requires 'contact name, specific action, and concrete question'\u2014these meet the question standard but fail on contact specificity and scheduled action. CRITERION 5 FAILURE - Unsupported Claims: ICP fit is never assessed despite being GrowthBook-specific check. The deal context does not explicitly confirm modern data stack signals (BigQuery is mentioned in technical discussion but not confirmed as core infrastructure choice). Additionally, the 1 million visits/monthly traffic is below typical enterprise ICP threshold but is not flagged as an ICP concern per rubric requirement.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-11_31456422174_004",
+  "timestamp": "2026-08-11T04:03:50.701862"
+}

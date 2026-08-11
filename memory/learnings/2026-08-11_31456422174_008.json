@@ -1,0 +1,21 @@
+{
+  "company": "Square",
+  "deal_id": "58134855076",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 0,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 2 violation: Carry-forward rules do not apply on first call (cumulative_calls_context = 0), so scores based on call content alone are appropriate. However, Criterion 4 violation: Next steps for all components below 7/10 use vague language. Specifically: (1) Metrics next step says 'ask' but lacks specific contact name\u2014should be 'Ask Andr\u00e9 Madeira' not just 'On next call with Andr\u00e9'; (2) Economic Buyer next step is acceptable with contact name; (3) Decision Criteria next step uses multiple vague verbs\u2014'tell me specifically' and 'must it support' are indirect. Rewrite as direct questions like 'Confirm with Andr\u00e9: Does the solution require native Snowflake/BigQuery integration?'; (4) Decision Process next step says 'What's the timeline' and 'Who else needs to approve'\u2014these are acceptable but could be more actionable. Add: 'Request org chart or approval workflow document from Andr\u00e9 by end of week'; (5) Identified Pain next step asks 'What happens if' which is speculative. Rewrite as: 'Ask Andr\u00e9 to quantify: How many days per quarter are spent managing tool fragmentation? What revenue impact has slow feature shipping caused?'; (6) Champion next step is vague\u2014'Are you the person' is open-ended. Rewrite as: 'Confirm Andr\u00e9 is project sponsor: Ask him to name the three stakeholders he'll need to convince and request introductions within one week'; (7) Competition next step uses 'What's the plan' (vague). Rewrite as: 'Confirm with Andr\u00e9 by email: Is LaunchDarkly being replaced entirely or kept for specific use cases? Request a list of other platforms being evaluated.' Additionally, Criterion 3 note: ICP fit is present (100K+ user audiences, modern data stack implied by 'data-driven' and multiple tools), so no ICP failure. All evidence is call-sourced and appropriate.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-11_31456422174_008",
+  "timestamp": "2026-08-11T04:09:36.575151"
+}

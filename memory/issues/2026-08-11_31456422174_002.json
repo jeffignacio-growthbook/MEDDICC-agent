@@ -1,0 +1,21 @@
+{
+  "company": "Rula",
+  "deal_id": "63578787480",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward Inconsistency: Decision Process component scored 5/10 in this analysis but was 7/10 in cumulative state. The analysis claims 'no new information in this call' for Identified Pain and Champion (correctly maintaining scores), but then downgrades Decision Process from 7/10 to 5/10 with rationale 'Previous 7/10 score overstated clarity.' This is a regression without documented reason from a recent call that contradicts prior assessment. Either maintain 7/10 with explicit note 'No new information\u2014maintaining previous assessment' OR provide specific contradictory evidence from the recent call that justifies the downgrade. Similarly, Competition was 7/10 in cumulative state but downgraded to 5/10 with rationale 'Without knowing Optimizely's status...downgraded to 5/10 Partial.' The recent call contains no contradictory information about Optimizely; the downgrade appears to reflect absence of new information rather than new negative information. This violates carry-forward consistency. CRITERION 3 VIOLATION - Evidence Quality: Metrics component scored 2/10 with statement 'The prospect has not stated any quantifiable business outcomes' but provides no direct quote or paraphrase showing the prospect explicitly rejected metrics discussion or stated none exist. The evidence should include paraphrase like '[Prospect name] stated they have no current success metrics defined' or similar. Absence of metrics mention in a first/early call is expected, not evidence of rejection. CRITERION 4 VIOLATION - Actionable Next Steps: Champion component next step asks 'Have you shared the POC results with your product leadership, engineering leadership, or finance team without our involvement?' This is a Yes/No question that does not constitute a specific actionable step with concrete objective. Recommend: 'Ask Pallabi Barua to name one person in product or engineering leadership she will share POC results with this week and confirm by [date]' to make it concrete and verifiable.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-11_31456422174_002",
+  "timestamp": "2026-08-11T03:55:07.926430"
+}

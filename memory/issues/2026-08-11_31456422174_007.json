@@ -1,0 +1,21 @@
+{
+  "company": "Unity",
+  "deal_id": "49689180024",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Metrics (4/10): Score present but evidence is vague and indirect. Statement 'no new information in this call, prior evidence stands' does not constitute evidence FROM the call. The prior evidence cited ('testing efficiency challenges', 'need for better visibility') are paraphrases, not specific quotes or concrete metrics. For a score of 4/10 in Partial status, need direct evidence of what metrics were discussed. CRITERION 4 FAILURE \u2014 Multiple components below 7/10 lack actionable next steps: (1) Metrics next step is acceptable. (2) Economic Buyer next step uses vague language 'ensure our proposal addresses their priorities' \u2014 should be specific question like 'Who owns the $50K budget decision and can you make an introduction by [date]?' (3) Decision Process next step is acceptable. (4) Champion next step is acceptable. (5) Competition next step is acceptable. CRITERION 3 FAILURE \u2014 Recent call summary is incomplete and truncated ('[Dani' cuts off mid-word). Cannot verify if new information contradicts or confirms cumulative state. Analysis claims 'no new information in this call, prior evidence stands' but the call summary provided is insufficient to make that determination. If call was truly reviewed, analysis should reference substantive content from it. CRITERION 5 FAILURE \u2014 Analysis maintains Champion at 1/10 'Unknown' but concludes deal health as 'At Risk' \u2014 if Champion truly unknown (1/10), this is expected on a 3-call deal and not a failure per se. However, the statement 'there is no evidence of anyone actively selling GrowthBook internally' is reasonable. No unsupported claims detected here. PRIMARY ISSUE: The recent call summary is truncated and cannot be evaluated against the analysis. Either provide complete call summary or explicitly state the call was not reviewed/summarized. The analysis appears to be a carry-forward with placeholder next steps rather than analysis of new information.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-11_31456422174_007",
+  "timestamp": "2026-08-11T04:08:19.988532"
+}

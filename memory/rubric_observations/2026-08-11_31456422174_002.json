@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_002",
+  "timestamp": "2026-08-11T03:51:06.152057",
+  "company": "Oda",
+  "criterion_fired": "CRITERION 2 (Carry-forward consistency)",
+  "was_appropriate": true,
+  "suggested_change": "Clarify that carry-forward must document whether new call data explicitly validates/strengthens prior evidence (raise score) vs. merely confirms existing inference (maintain score); agent must cite specific new phrase, then justify why it does/doesn't materially change component score."
+}

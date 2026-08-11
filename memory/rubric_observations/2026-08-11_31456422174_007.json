@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_007",
+  "timestamp": "2026-08-11T04:00:53.224411",
+  "company": "KBX",
+  "criterion_fired": "Criterion 1 (carry-forward consistency), Criterion 3 (ICP assessment evidence), Criterion 4 (next steps specificity), Criterion 5 (unsupported inference)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 3 should explicitly state: 'ICP assessment must cite prospect-generated evidence (customer statements, job titles, documented practices) not product feature names.' Criterion 4 should require: 'Next steps must include a specific, answerable question\u2014not vague process goals.' Criterion 1 should clarify: 'When cumulative state contradicts new data, explicitly state which date/fact is now authoritative and why, or mark as Unknown pending clarification.'"
+}

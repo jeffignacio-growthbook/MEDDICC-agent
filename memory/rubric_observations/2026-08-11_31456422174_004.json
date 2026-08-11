@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_004",
+  "timestamp": "2026-08-11T03:53:53.465920",
+  "company": "BESTSELLER",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 3 (Evidence Quality)",
+  "was_appropriate": true,
+  "suggested_change": "CLAUDE.md should specify: (1) Score changes require explicit statement of new information not present in prior call; (2) Champion (2/10+) requires internal advocacy/selling evidence, not tactical execution ownership; (3) When call reinforces prior evidence without new detail, maintain prior score and document reason."
+}
