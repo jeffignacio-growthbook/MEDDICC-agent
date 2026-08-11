@@ -22,17 +22,17 @@ fiscal:
 # Category-weighted forecast multipliers based on HubSpot's forecast_category field
 # Uncomment to enable category-weighted forecasting in analytics
 
-# forecast:
-#   category_weights:
-#     COMMIT: 0.85
-#     MOST_LIKELY: 0.65
-#     BEST_CASE: 0.50
-#     PIPELINE: 0.15
-#     OMIT: 0.0
-#     CLOSED: 1.0
-#   # Used for category-weighted forecast. Values are a
-#   # RevOps-standard starting point — tune to your own
-#   # historical close rates once you have enough data.
+forecast:
+  category_weights:
+    COMMIT: 0.85
+    MOST_LIKELY: 0.65
+    BEST_CASE: 0.50
+    PIPELINE: 0.15
+    OMIT: 0.0
+    CLOSED: 1.0
+  # Used for category-weighted forecast. Values are a
+  # RevOps-standard starting point — tune to your own
+  # historical close rates once you have enough data.
 
 # ============================================================================
 # HUBSPOT PIPELINE CONFIGURATION
