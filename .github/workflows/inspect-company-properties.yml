@@ -1,0 +1,78 @@
+name: Inspect Company Properties
+
+on:
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests supabase
+
+      - name: Inspect all company properties
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os, json, requests
+          from supabase import create_client
+
+          api_key = os.getenv('HUBSPOT_API_KEY')
+          headers = {'Authorization': f'Bearer {api_key}'}
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+
+          # Get one open deal
+          result = sb.table('deals')\
+            .select('deal_id, company_name, deal_value')\
+            .eq('deal_status', 'active')\
+            .limit(1)\
+            .execute()
+
+          deal = result.data[0]
+          deal_id = deal['deal_id']
+          company = deal.get('company_name', 'Unknown')
+
+          print(f'Inspecting company properties for: {company}')
+          print(f'Deal ID: {deal_id}')
+          print()
+
+          # Get company association
+          assoc_url = f'https://api.hubapi.com/crm/v3/objects/deals/{deal_id}/associations/companies'
+          assoc_resp = requests.get(assoc_url, headers=headers)
+          assoc_data = assoc_resp.json()
+          company_id = assoc_data.get('results', [])[0].get('id')
+
+          print(f'Company ID: {company_id}')
+          print()
+
+          # Get ALL company properties
+          comp_url = f'https://api.hubapi.com/crm/v3/objects/companies/{company_id}'
+          comp_resp = requests.get(comp_url, headers=headers)
+          comp_data = comp_resp.json()
+          props = comp_data.get('properties', {})
+
+          print('='*80)
+          print('ALL COMPANY PROPERTIES')
+          print('='*80)
+          print()
+
+          # Sort and display all properties
+          for key in sorted(props.keys()):
+              value = props[key]
+              if value:  # Only show non-empty
+                  print(f'{key:40s} = {value}')
+
+          print()
+          print('='*80)
+          print(f'Total properties: {len(props)}')
+          print(f'Populated properties: {sum(1 for v in props.values() if v)}')
+          "
