@@ -17,6 +17,24 @@ fiscal:
   fy_start_month: 2  # FY starts Feb 1; Q2 FY2027 = May 1 - Jul 31 2026
 
 # ============================================================================
+# FORECAST CONFIGURATION
+# ============================================================================
+# Category-weighted forecast multipliers based on HubSpot's forecast_category field
+# Uncomment to enable category-weighted forecasting in analytics
+
+# forecast:
+#   category_weights:
+#     COMMIT: 0.85
+#     MOST_LIKELY: 0.65
+#     BEST_CASE: 0.50
+#     PIPELINE: 0.15
+#     OMIT: 0.0
+#     CLOSED: 1.0
+#   # Used for category-weighted forecast. Values are a
+#   # RevOps-standard starting point — tune to your own
+#   # historical close rates once you have enough data.
+
+# ============================================================================
 # HUBSPOT PIPELINE CONFIGURATION
 # ============================================================================
 # Use scripts/discover_stages.py to find your organization's stage IDs
