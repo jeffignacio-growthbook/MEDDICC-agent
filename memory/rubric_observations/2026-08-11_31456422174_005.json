@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_005",
+  "timestamp": "2026-08-11T03:55:07.927284",
+  "company": "Rula",
+  "criterion_fired": "CRITERION 2 (Carry-forward Inconsistency) and CRITERION 3 (Evidence Quality)",
+  "was_appropriate": false,
+  "suggested_change": "CRITERION 2: Clarify that score regressions require *contradictory evidence from recent call*, not mere absence of reinforcement. Add: 'Maintain prior score if no new call data contradicts it; only regress if call contains explicit new negative information.' CRITERION 3: Distinguish between 'prospect explicitly stated metrics don't exist' vs. 'metrics not discussed in early call.' Reword to: 'Evidence Quality violation only if prospect actively rejected metrics or stated none exist (with quote); absence in early calls is expected and not scorable.'"
+}

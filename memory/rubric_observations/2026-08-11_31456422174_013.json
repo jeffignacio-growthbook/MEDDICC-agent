@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_013",
+  "timestamp": "2026-08-11T04:09:35.342975",
+  "company": "Livesport",
+  "criterion_fired": "Criterion 1 (Champion evidence statement), Criterion 4 (next-step actionability), Criterion 2 (multi-call context clarity)",
+  "was_appropriate": true,
+  "suggested_change": "CLAUDE.md should explicitly require: (1) Evidence statements must state 'No evidence of X identified in calls' when status is Unknown; (2) Next steps must include [Contact name], specific question format in quotes, and expected outcome; (3) When cumulative_calls_context.calls_reviewed > 1, agent must reconcile prior findings with new data before scoring changes."
+}

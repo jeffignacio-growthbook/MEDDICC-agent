@@ -1,0 +1,21 @@
+{
+  "company": "KBX",
+  "deal_id": "59019110029",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Carry-forward consistency violation on Decision Process: Score downgraded from 8/10 to 6/10 due to timeline conflict, but analysis does not explicitly state whether the September 1st deadline from cumulative state remains valid or should be marked Unknown. The analysis identifies a conflict between two dates but doesn't clarify which one is authoritative going forward. CRITERION 4 FAILURE - Incomplete next steps for Decision Process (6/10 component): The 'Emergency call' next step uses vague language ('resolve timeline') without a specific, concrete question framed as a yes/no or specific-answer query. CRITERION 3 FAILURE - ICP Fit Assessment: Analysis claims 'Modern tech stack implied: Boolean flags across four environments, cloud data warehouse integrations' but boolean flags and cloud warehouse integrations are GrowthBook product features, not evidence of prospect's modern data stack. No evidence provided that KBX uses dbt, modern warehousing, or data-first practices. CRITERION 5 FAILURE - Unsupported claim in Deal Health summary: 'Call 4 captured zero substantive content, indicating potential disengagement' is an inference not supported by the rubric. Call 4 was a greeting exchange, which is documented, but characterizing this as 'disengagement' requires evidence of missed meetings or ignored outreach, which is not present in the source material.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-11_31456422174_006",
+  "timestamp": "2026-08-11T04:00:53.223624"
+}

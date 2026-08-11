@@ -1,0 +1,21 @@
+{
+  "company": "Oda",
+  "deal_id": "11024003429",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward consistency broken for multiple components. Analysis states 'maintained at X/10 \u2014 no new information in this call, prior evidence stands' for M, E, D (both), I, Champion, and Competition, but recent call summary contains NEW evidence that should update scores: (1) METRICS: Call 3 explicitly states 'plan to leverage new features from Growth Book to accelerate experimentation cycles' \u2014 this is forward-looking intent and should raise M from 4/10 with evidence of velocity/expansion ambition. Analysis failed to incorporate this. (2) DECISION CRITERIA: Call 3 confirms 'Snowflake and Looker' integration AND 'flexibility and deep data integration' \u2014 analysis notes this but incorrectly claims 'already implied in cumulative state' when cumulative state only mentions self-hosting, not specific warehouse validation. This is new evidence strengthening D-Criteria. (3) IDENTIFIED PAIN: Call 3 states 'accelerate experimentation cycles' and 'foster a culture of continuous learning' \u2014 these are new forward-looking pain signals beyond budget constraints. Analysis should raise I from 3/10 with evidence of velocity/culture constraints. (4) CHAMPION: Call 3 says 'The team detailed their significant advancements' \u2014 implies multiple stakeholders, but analysis missed opportunity to probe who owns internal selling. This is acceptable carry-forward, but language 'No new information' is inaccurate when team structure is mentioned. SPECIFIC FIXES REQUIRED: (A) M-Metrics: Incorporate 'accelerate experimentation cycles' as forward-looking signal. Raise to 5-6/10 with evidence. (B) D-Criteria: Update to reflect Snowflake/Looker warehouse validation as NEW evidence in Call 3, raise to 6/10. (C) I-Identified Pain: Add velocity/culture as new pain signals from 'accelerate cycles' language, raise to 4-5/10. (D) Rewrite carry-forward notes to accurately reflect what IS vs. IS NOT new in Call 3. Current language 'no new information' is demonstrably false given warehouse stack and experimentation velocity language present in call summary.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-11_31456422174_002",
+  "timestamp": "2026-08-11T03:51:06.151721"
+}

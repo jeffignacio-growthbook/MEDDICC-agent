@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_010",
+  "timestamp": "2026-08-11T04:05:10.003729",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should explicitly state: 'Score changes are justified only by contradictory evidence within the same call or explicit new information. Absence of evidence (failed calls, no contact) does not contradict prior evidence and should not trigger downgrades\u2014only additions or explicit contradiction warrant changes. Failed connections warrant urgency notes, not score reductions.'"
+}

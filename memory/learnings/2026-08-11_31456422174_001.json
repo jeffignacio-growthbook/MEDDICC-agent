@@ -1,0 +1,21 @@
+{
+  "company": "InPost",
+  "deal_id": "60069831015",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 3 VIOLATION - Identified Pain: Score downgraded from 5/10 (cumulative state) to 4/10 without documented justification for regression. Analysis notes 'Interest without quantified consequences' but cumulative state already established this as Partial/5/10 with same evidence ('Current tool inadequacies noted'). Recent call adds 'migration interest from Firebase' but this is incremental, not contradictory. Per Carry-forward rules: 'Identified or Partial components must remain at that level unless the recent call contradicts them.' No contradiction documented. If score reduction is justified, analysis must explicitly state: 'Recent call reveals [specific new information] that downgrades assessment from 5 to 4.' Currently states only generic reasoning. CRITERION 4 VIOLATION - Decision Process: Next step 'Request stakeholder meeting within 2 weeks' uses vague action verb 'Request' without concrete question or specific action. Should be: '[contact TBD]: Confirm on POC scoping call who needs to approve post-POC and what timeline exists for each approval stage.' CRITERION 1 VIOLATION - ICP Fit Assessment: Status marked as 'Partially Confirmed' but this is not a required MEDDICC component in the standard framework. The analysis correctly covers the 7 components (M,E,D,D,I,C,C) but ICP should be supporting context, not a scored component. No pass/fail impact but formatting note. PASS elements: Decision Criteria (8/10) properly maintained with detailed carry-forward evidence. Competition evidence now includes Firebase incumbent with migration intent (upgraded rationale provided). Economic Buyer and Champion correctly remain 1/10 Unknown across both calls with no unsupported claims.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-11_31456422174_001",
+  "timestamp": "2026-08-11T03:51:05.995895"
+}

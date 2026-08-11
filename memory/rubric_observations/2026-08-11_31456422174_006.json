@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_006",
+  "timestamp": "2026-08-11T03:58:27.790623",
+  "company": "Notion",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 3 (Evidence Quality), Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 should explicitly require: 'For each carried-forward component, state: \"No new information in recent call; maintaining [score] based on cumulative evidence from [X] prior calls.\"' Criterion 3 should distinguish strong vs. weak evidence and require direct quote attribution or explicit 'paraphrased from call [date]' labeling. Criterion 4 should require next steps to include exact question phrasing in quotation marks, not just action verbs like 'validate'."
+}

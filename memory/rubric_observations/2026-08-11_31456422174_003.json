@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_003",
+  "timestamp": "2026-08-11T03:52:32.577015",
+  "company": "BESTSELLER",
+  "criterion_fired": "Criterion 2 (Metrics), Criterion 3 (Identified Pain), Criterion 4 (Economic Buyer/Decision Criteria/Competition), Criterion 5 (Champion)",
+  "was_appropriate": false,
+  "suggested_change": "Add explicit rule: 'If cumulative_calls_context < 2, carry-forward state validation is skipped. Treat analysis as first comprehensive review unless explicitly marked as incremental addition.' Also clarify Criterion 5 exception: '[contact TBD] satisfies Unknown status only if this is calls_reviewed == 1; once calls_reviewed >= 2, at least one champion candidate must be named or marked [needs identification].'"
+}

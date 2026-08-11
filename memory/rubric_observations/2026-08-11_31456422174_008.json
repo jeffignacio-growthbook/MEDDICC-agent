@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_008",
+  "timestamp": "2026-08-11T04:03:21.788397",
+  "company": "TickPick",
+  "criterion_fired": "Criterion 1, 2, 3, 4, 5 (systemic)",
+  "was_appropriate": false,
+  "suggested_change": "Establish explicit handling rule: When recent call data is corrupted/unintelligible, evaluator must either (a) mark that call unscoreable and evaluate only against prior cumulative state with explicit notation, or (b) lower confidence thresholds. Separate champion scoring from evidence discovery: A 4/10 should explicitly state whether it reflects 'insufficient evidence gathered' vs 'evidence contradicts champion criteria.' Vague verb rule (follow-up) should specify it applies only to primary next steps, not secondary parallel actions. Accept that some criteria cannot be fully evaluated on corrupted data rather than creating conflicting failure modes."
+}

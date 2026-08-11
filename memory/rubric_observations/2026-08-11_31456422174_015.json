@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_015",
+  "timestamp": "2026-08-11T04:10:49.533477",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 4 (Actionable next steps) and Criterion 2 (Carry-forward consistency)",
+  "was_appropriate": true,
+  "suggested_change": "Add CLAUDE.md section: 'Next steps must avoid exploratory verbs (what, is, have you). Use imperative verbs (send, schedule, deliver) with specific owner, asset, and deadline. Score increases require explicit delta justification citing new call evidence vs. prior state.'"
+}

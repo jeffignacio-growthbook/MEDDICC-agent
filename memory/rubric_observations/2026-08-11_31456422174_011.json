@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-11_31456422174_011",
+  "timestamp": "2026-08-11T04:06:51.373158",
+  "company": "Skyscanner",
+  "criterion_fired": "CRITERION 2 (Carry-forward Consistency) and CRITERION 4 (Actionable Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "CRITERION 2: 'Reassessments are permitted if driven by new call information OR by logical synthesis across multiple calls. Document the reasoning. Carry-forward constraint applies only when data is truly static across calls.' CRITERION 4: 'Next steps must be specific and actionable. Retroactive rewording of prior analysis is not required unless the prior step was explicitly vague in the original output.'"
+}

@@ -1,0 +1,21 @@
+{
+  "company": "OpenTable",
+  "deal_id": "58939926620",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 8,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 4 VIOLATION - Actionable Next Steps: Multiple components below 7/10 have vague next steps that violate the rubric. METRICS (1/10): 'Schedule a 30-minute business value discussion with Federico within 1 week' uses vague language ('discuss'). Rewrite as: 'Call Federico by [date]: Ask specifically: \"How many experiments per quarter are you running today vs. target? What does your current setup cost annually? What experimentation velocity increase would justify this investment?\"' COMPETITION (1/10): 'Ask Federico on next call: \"What are you using today for feature flagging and experimentation? What made you decide to evaluate new solutions now?\"' - the action is too vague. Rewrite as: 'Federico call by [date]: Obtain names and product types of 2-3 tools currently in use or evaluated (e.g., LaunchDarkly, Statsig, EPPO, Datadog, Optimizely, or homegrown). Specific question: \"What solutions did you evaluate in your RFP process, and what are you using today?\"' ECONOMIC BUYER (4/10): The next step 'Request: \"Can we schedule a 15-minute call with your CFO or budget holder before the end of Q3 to confirm the investment timeline?\"' lacks specificity on contact and deadline. Rewrite as: '[contact TBD via Federico]: Federico must provide name and title of budget approver by [date]. Schedule 15-min call by [date before Q3 end] to confirm: \"Who owns final budget approval for $220K spend? What is your approval process timeline?\"' DECISION CRITERIA (5/10): 'Request: \"What technical capabilities beyond warehouse-native are must-haves vs. nice-to-haves for your final decision?\"' is acceptable but the first action 'Ask Federico or Rahul's team: \"Beyond security compliance and Snowflake integration, what are the other formal evaluation criteria you're using to select a solution? Do you have a scorecard you can share?\"' uses vague phrasing. Rewrite as: 'Rahul's team call by [date]: Request shared evaluation scorecard or criteria document. Ask: \"List the 5-7 formal criteria driving your decision, ranked by importance.\"' These must be specific actions with concrete questions, not exploratory discussions.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-11_31456422174_005",
+  "timestamp": "2026-08-11T04:00:36.074062"
+}

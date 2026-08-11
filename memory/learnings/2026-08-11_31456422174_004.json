@@ -1,0 +1,21 @@
+{
+  "company": "Notion",
+  "deal_id": "60257621387",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward Consistency: The analysis states 'Recent call corrupted, no new information assessed' for all components, yet the recent call summary provided is from 'Mattel Barbie' (not Notion) and is unintelligible/corrupted. The analysis should either: (a) explicitly note that no recent call data exists for Notion and maintain cumulative scores with clear carry-forward language, OR (b) acknowledge the data quality issue upfront. The current approach creates ambiguity about whether a recent Notion call was reviewed or not. CRITERION 4 VIOLATION - Actionable Next Steps: Multiple components use vague verbs without specific actions: (1) Metrics: 'validate quantified goals' and 'validate' are non-specific; (2) Identified Pain: 'validate cost concern severity' and 'Validate competitive landscape' use 'validate' without concrete question phrasing in some instances; (3) Competition next step #2 'what's driving you' is too open-ended without a specific probe. All next steps must include exact questions as shown in the rubric examples. CRITERION 3 VIOLATION - Evidence Quality: The entire analysis relies on paraphrases of 'prior calls' without specific quotes. While cumulative state exists, the analysis does not differentiate between what evidence is strong vs. weak. For a $250K ARR deal at 'Presentation Scheduled' stage, Metrics (3/10), Economic Buyer (1/10), Champion (1/10), and Competition (1/10) scores are appropriate for carry-forward, but next steps must be more concrete. Example failure: 'During next technical sync with [contact TBD - technical lead], ask directly' - the word 'directly' does not strengthen specificity when the contact is still TBD and the question is stated. CRITERION 1 PARTIAL: All components have status, score, and evidence statements, so Criterion 1 passes, but the evidence quality is weak (paraphrases without quotes). The analysis should note explicitly for each carried-forward component: 'No new information in recent call; maintaining [score] based on cumulative evidence from [X] prior calls.'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-11_31456422174_004",
+  "timestamp": "2026-08-11T03:58:27.790268"
+}
