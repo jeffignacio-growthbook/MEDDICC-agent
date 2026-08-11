@@ -22,47 +22,41 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
           python -c "
-          import os
+          import os, sys
+          sys.path.insert(0, 'scripts')
           from supabase import create_client
+          from supabase_client import select_all
+          from collections import Counter
+
           sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
 
           print('='*70)
           print('FORECAST_CATEGORY DISTRIBUTION')
           print('='*70)
-          result = sb.rpc('exec_sql', {
-              'sql': '''
-                  SELECT forecast_category,
-                         count(*) as deal_count,
-                         sum(deal_value)::numeric as total_value
-                  FROM deals
-                  WHERE deal_status = 'active'
-                  GROUP BY forecast_category
-                  ORDER BY count(*) DESC
-              '''
-          }).execute()
 
-          if result.data and len(result.data) > 0 and 'rows' in result.data[0]:
-              for row in result.data[0]['rows']:
-                  cat = row[0] if row[0] else 'NULL'
-                  count = row[1]
-                  value = float(row[2]) if row[2] else 0
-                  print(f'{cat:20s} {count:>5d} deals  ${value:>15,.0f}')
+          deals = select_all(sb, 'deals', columns='forecast_category, deal_value, deal_status, stage')
+          active_deals = [d for d in deals if d.get('deal_status') == 'active']
+
+          # Group by forecast_category
+          cat_stats = {}
+          for d in active_deals:
+              cat = d.get('forecast_category') or 'NULL'
+              if cat not in cat_stats:
+                  cat_stats[cat] = {'count': 0, 'value': 0.0}
+              cat_stats[cat]['count'] += 1
+              cat_stats[cat]['value'] += float(d.get('deal_value') or 0)
+
+          # Sort by count descending
+          for cat in sorted(cat_stats.keys(), key=lambda k: cat_stats[k]['count'], reverse=True):
+              stats = cat_stats[cat]
+              print(f'{cat:20s} {stats[\"count\"]:>5d} deals  \${stats[\"value\"]:>15,.0f}')
 
           print()
           print('='*70)
-          print('STAGE PROBABILITY CHECK')
+          print('STAGE COVERAGE CHECK')
           print('='*70)
-          result2 = sb.rpc('exec_sql', {
-              'sql': '''
-                  SELECT
-                      CASE WHEN stage IS NOT NULL THEN 'has_stage' ELSE 'null_stage' END as has_stage,
-                      count(*)
-                  FROM deals
-                  GROUP BY CASE WHEN stage IS NOT NULL THEN 'has_stage' ELSE 'null_stage' END
-              '''
-          }).execute()
-
-          if result2.data and len(result2.data) > 0 and 'rows' in result2.data[0]:
-              for row in result2.data[0]['rows']:
-                  print(f'{row[0]:15s} {row[1]:>6d} deals')
+          has_stage = sum(1 for d in deals if d.get('stage'))
+          null_stage = sum(1 for d in deals if not d.get('stage'))
+          print(f'has_stage       {has_stage:>6d} deals')
+          print(f'null_stage      {null_stage:>6d} deals')
           "
