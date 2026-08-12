@@ -9,11 +9,15 @@ IMPORTANT: This tracks QUALIFIED pipeline only (highest_stage_order_reached >= 2
 Meeting Set stage deals (order 0-1) are excluded from beginning/ending values
 and all waterfall movements to match HubSpot's qualified pipeline definition.
 
-Usage: python scripts/analytics/compute_waterfall.py
+Usage:
+    python scripts/analytics/compute_waterfall.py              # Prospective mode (latest week)
+    python scripts/analytics/compute_waterfall.py --backfill   # Historical mode (all weeks)
 """
 
 import os
+import sys
 import json
+import argparse
 from datetime import date
 from pathlib import Path
 
@@ -21,6 +25,11 @@ REPO_ROOT = Path(__file__).parent.parent.parent
 
 
 def main():
+    parser = argparse.ArgumentParser(description='Compute pipeline waterfall')
+    parser.add_argument('--backfill', action='store_true',
+                       help='Backfill mode: compute waterfall for all historical snapshot pairs')
+    args = parser.parse_args()
+
     SUPABASE_URL = os.getenv('SUPABASE_URL')
     SUPABASE_KEY = os.getenv('SUPABASE_SERVICE_KEY')
     if not SUPABASE_URL or not SUPABASE_KEY:
@@ -55,26 +64,95 @@ def main():
     }
     print(f"Loaded qualification data for {len(qual_map)} deals")
 
-    # Find the two most recent distinct snapshot dates
-    def latest_date_before(sb, before=None):
-        q = sb.table('deals_snapshot')\
+    if args.backfill:
+        # Backfill mode: get all snapshot dates and compute waterfalls for all pairs
+        print()
+        print("=" * 70)
+        print("BACKFILL MODE: Computing waterfall for all historical snapshot pairs")
+        print("=" * 70)
+        print()
+
+        # Get all distinct snapshot dates in ascending order
+        snapshot_dates = sb.table('deals_snapshot')\
             .select('snapshot_date')\
-            .order('snapshot_date', desc=True)\
-            .limit(1)
-        if before:
-            q = q.lt('snapshot_date', before)
-        rows = q.execute().data or []
-        return rows[0]['snapshot_date'] if rows else None
+            .order('snapshot_date', desc=False)\
+            .execute().data or []
 
-    new_date  = latest_date_before(sb)
-    prev_date = latest_date_before(sb, before=new_date)
+        unique_dates = sorted(set(row['snapshot_date'] for row in snapshot_dates))
 
-    if not new_date or not prev_date:
-        print("Insufficient snapshot history — need at least 2 "
-              "snapshot dates. Skipping waterfall computation.")
-        return
+        if len(unique_dates) < 2:
+            print("Insufficient snapshot history — need at least 2 snapshot dates")
+            return
 
-    print(f"Comparing {new_date} vs {prev_date}")
+        print(f"Found {len(unique_dates)} snapshot dates")
+        print(f"  Oldest: {unique_dates[0]}")
+        print(f"  Newest: {unique_dates[-1]}")
+        print()
+        print(f"Will compute {len(unique_dates) - 1} weekly waterfalls")
+        print()
+
+        # Compute waterfall for each consecutive pair
+        for i in range(len(unique_dates) - 1):
+            prev_date = unique_dates[i]
+            new_date = unique_dates[i + 1]
+
+            print(f"[{i + 1}/{len(unique_dates) - 1}] Computing {new_date} vs {prev_date}")
+
+            compute_waterfall_for_dates(
+                sb, config, qual_map, threshold,
+                prev_date, new_date,
+                computed_source='backfill'
+            )
+            print()
+
+        print("=" * 70)
+        print("✓ BACKFILL COMPLETE")
+        print("=" * 70)
+
+    else:
+        # Prospective mode: compute waterfall for the two most recent snapshots
+        def latest_date_before(sb, before=None):
+            q = sb.table('deals_snapshot')\
+                .select('snapshot_date')\
+                .order('snapshot_date', desc=True)\
+                .limit(1)
+            if before:
+                q = q.lt('snapshot_date', before)
+            rows = q.execute().data or []
+            return rows[0]['snapshot_date'] if rows else None
+
+        new_date  = latest_date_before(sb)
+        prev_date = latest_date_before(sb, before=new_date)
+
+        if not new_date or not prev_date:
+            print("Insufficient snapshot history — need at least 2 "
+                  "snapshot dates. Skipping waterfall computation.")
+            return
+
+        print(f"Comparing {new_date} vs {prev_date}")
+
+        compute_waterfall_for_dates(
+            sb, config, qual_map, threshold,
+            prev_date, new_date,
+            computed_source='prospective'
+        )
+
+
+def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_date, computed_source='prospective'):
+    """
+    Compute waterfall between two snapshot dates.
+
+    Args:
+        sb: Supabase client
+        config: Client configuration
+        qual_map: Deal qualification data (highest_stage_order_reached, qualified_date)
+        threshold: Qualification stage_order threshold
+        prev_date: Previous snapshot date (str)
+        new_date: New snapshot date (str)
+        computed_source: 'prospective' or 'backfill'
+    """
+    from utils import get_fiscal_quarter
+    from supabase_client import select_all
 
     # Load both snapshots (paginated)
     def load_snapshot(snap_date: str) -> dict:
@@ -89,7 +167,8 @@ def main():
 
     # Get current fiscal quarter boundaries
     q_start, q_end, q_label = get_fiscal_quarter(date.fromisoformat(new_date), config)
-    print(f"  Fiscal quarter: {q_label} ({q_start} to {q_end})")
+    if computed_source == 'prospective':
+        print(f"  Fiscal quarter: {q_label} ({q_start} to {q_end})")
 
     # Diff into waterfall categories per pipeline
     from collections import defaultdict
@@ -324,40 +403,41 @@ def main():
             'deals_created_count': wf['deals_created_count'],
             'deals_qualified_count': wf['deals_qualified_count'],
             'details': json.dumps(wf['details']),
-            'computed_source': 'prospective',
+            'computed_source': computed_source,
         }
         sb.table('waterfall_weekly').upsert(
             row, on_conflict='week_ending,pipeline_id'
         ).execute()
 
-        print(f"\n{'='*70}")
-        print(f"✓ Waterfall {new_date} / {pipeline_id} (QUALIFIED PIPELINE ONLY)")
-        print(f"{'='*70}")
-        print(f"Beginning Value:        ${wf['beginning_value']:>12,.0f}")
-        print(f"")
-        print(f"+ New Created:          ${wf['new_pipeline_value']:>12,.0f}  ({wf['deals_created_count']} deals)")
-        print(f"+ Newly Qualified:      ${wf['newly_qualified_value']:>12,.0f}  ({wf['deals_qualified_count']} deals)")
-        print(f"+ Moved Forward:        ${wf['moved_forward_value']:>12,.0f}")
-        print(f"- Moved Backward:       ${wf['moved_backward_value']:>12,.0f}")
-        print(f"- Won:                  ${wf['won_value']:>12,.0f}")
-        print(f"- Lost:                 ${wf['lost_value']:>12,.0f}")
-        print(f"")
-        print(f"= Net Change:           ${wf['net_change']:>12,.0f}")
-        print(f"")
-        print(f"Ending Value:           ${wf['ending_value']:>12,.0f}")
-        print(f"{'='*70}")
+        if computed_source == 'prospective':
+            print(f"\n{'='*70}")
+            print(f"✓ Waterfall {new_date} / {pipeline_id} (QUALIFIED PIPELINE ONLY)")
+            print(f"{'='*70}")
+            print(f"Beginning Value:        ${wf['beginning_value']:>12,.0f}")
+            print(f"")
+            print(f"+ New Created:          ${wf['new_pipeline_value']:>12,.0f}  ({wf['deals_created_count']} deals)")
+            print(f"+ Newly Qualified:      ${wf['newly_qualified_value']:>12,.0f}  ({wf['deals_qualified_count']} deals)")
+            print(f"+ Moved Forward:        ${wf['moved_forward_value']:>12,.0f}")
+            print(f"- Moved Backward:       ${wf['moved_backward_value']:>12,.0f}")
+            print(f"- Won:                  ${wf['won_value']:>12,.0f}")
+            print(f"- Lost:                 ${wf['lost_value']:>12,.0f}")
+            print(f"")
+            print(f"= Net Change:           ${wf['net_change']:>12,.0f}")
+            print(f"")
+            print(f"Ending Value:           ${wf['ending_value']:>12,.0f}")
+            print(f"{'='*70}")
 
-        # Reconciliation check
-        calc_end = (wf['beginning_value'] + wf['new_pipeline_value'] +
-                    wf['moved_forward_value'] - wf['moved_backward_value'] -
-                    wf['won_value'] - wf['lost_value'])
-        diff = abs(calc_end - wf['ending_value'])
-        if diff > 1:
-            print(f"⚠️  Reconciliation gap: ${diff:,.0f}")
-            print(f"    This can occur when two snapshots were built")
-            print(f"    with different deal_status classification rules")
-            print(f"    (e.g. after a config change). Gap resolves")
-            print(f"    naturally once both snapshots use the same config.")
+            # Reconciliation check
+            calc_end = (wf['beginning_value'] + wf['new_pipeline_value'] +
+                        wf['moved_forward_value'] - wf['moved_backward_value'] -
+                        wf['won_value'] - wf['lost_value'])
+            diff = abs(calc_end - wf['ending_value'])
+            if diff > 1:
+                print(f"⚠️  Reconciliation gap: ${diff:,.0f}")
+                print(f"    This can occur when two snapshots were built")
+                print(f"    with different deal_status classification rules")
+                print(f"    (e.g. after a config change). Gap resolves")
+                print(f"    naturally once both snapshots use the same config.")
 
 
 if __name__ == '__main__':
