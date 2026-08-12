@@ -193,11 +193,17 @@ class SnapshotBackfiller:
         snapshot = {
             'deal_id': deal_id,
             'snapshot_date': snapshot_date.date().isoformat(),
-            'stage': stage_id,
+            'stage_id': stage_id,  # Column is stage_id not stage
             'stage_order': stage_order,
             'deal_status': deal_status,
+            'snapshot_source': 'backfilled',  # Mark as backfilled data
             'backfill_confidence': confidence,
-            'has_property_history': has_history
+            'has_property_history': has_history,
+            # Optional columns - will be NULL if not provided
+            'pipeline_id': None,
+            'deal_value': None,
+            'close_date': None,
+            'owner_email': None
         }
 
         return snapshot
@@ -300,7 +306,7 @@ class SnapshotBackfiller:
             print("Sample snapshots (first 5):")
             for snap in snapshots_to_insert[:5]:
                 print(f"  Deal {snap['deal_id']} @ {snap['snapshot_date']}: "
-                      f"{snap['stage']} ({snap['deal_status']}) - "
+                      f"{snap['stage_id']} ({snap['deal_status']}) - "
                       f"confidence: {snap['backfill_confidence']}")
         else:
             print("Writing snapshots to Supabase...")
