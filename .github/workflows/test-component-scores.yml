@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests anthropic
+          pip install requests anthropic pyyaml pytz
 
       - name: Run dry-run test
         env:
