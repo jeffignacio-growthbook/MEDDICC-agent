@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_009",
+  "timestamp": "2026-08-12T04:25:32.288677",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) & Criterion 3 (Evidence Quality)",
+  "was_appropriate": false,
+  "suggested_change": "Rubric must clarify: (A) If cumulative_calls_context=1, are components scored only on recent call evidence (resetting unknowns when transcript fails), or (B) do they carry forward with explicit 'no change' notation when new data doesn't contradict? Current rubric enforces both simultaneously, making it impossible to pass when transcript fails mid-analysis."
+}

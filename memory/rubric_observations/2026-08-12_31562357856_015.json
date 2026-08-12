@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_015",
+  "timestamp": "2026-08-12T04:32:00.707118",
+  "company": "Decathlon",
+  "criterion_fired": "Criterion 3 and Criterion 4 (conflicting evidence standards)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 3 should accept either direct quote OR paraphrased evidence with timestamp; Criterion 4 should accept structured next steps in format '[Contact]: [Action]: [Topic]' without requiring rigid question templates, allowing natural follow-up phrasing alongside specificity."
+}

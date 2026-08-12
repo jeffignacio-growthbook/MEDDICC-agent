@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_005",
+  "timestamp": "2026-08-12T04:19:09.285931",
+  "company": "InPost",
+  "criterion_fired": "Criterion 4 (Decision Process, Champion, Carry-forward next steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 should explicitly state: 'Next steps for components <7/10 must use format: \"[contact name or TBD]: Specific action \u2014 concrete question.\" When no contact is identified, '[contact TBD]' is the required placeholder; generic phrases like \"primary contact\" are not acceptable.'"
+}

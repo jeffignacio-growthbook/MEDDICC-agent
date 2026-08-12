@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_012",
+  "timestamp": "2026-08-12T04:28:49.473911",
+  "company": "Unity",
+  "criterion_fired": "Criterion 2 (Decision Criteria & Identified Pain), Criterion 3 (Evidence Quality), Criterion 4 (Next Steps Specificity), Criterion 5 (ICP Fit)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 and 3 should clarify: 'If revising a score from cumulative state, cite specific contradictory evidence from current call. If no new evidence, explicitly maintain prior score with rationale. Evidence for scores \u22656/10 requires direct quotes or detailed paraphrases.' Criterion 4 should specify: 'All dates must be concrete calendar dates (MM/DD), not [date within X] placeholders. Economic buyer next steps must confirm contact's access or propose identification method.' Criterion 5 should require: 'ICP assessment mandatory: state explicit fit/gap against company scale, data stack, and use case alignment.'"
+}

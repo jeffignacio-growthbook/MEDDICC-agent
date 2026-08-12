@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_004",
+  "timestamp": "2026-08-12T04:16:33.972314",
+  "company": "Deel",
+  "criterion_fired": "CRITERION 2 (Carry-forward Consistency), CRITERION 4 (Actionable Next Steps), CRITERION 5 (No Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Add instruction: 'When a call contains only pleasantries with no substantive MEDDICC content, explicitly classify it as a courtesy call and state upfront that all assessments reflect prior substantive calls only. For next steps, always include scheduling clarity: specify whether contact is pending, estimated timing, or confirm scheduled date. For deal momentum, distinguish between lack of recent substantive discussion (valid momentum concern) versus absence of scheduled substantive calls (different implication).'"
+}

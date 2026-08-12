@@ -1,0 +1,21 @@
+{
+  "company": "Livesport",
+  "deal_id": "62160567676",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Metrics: Score 4/10 with no direct quote or paraphrase of prospect-stated business outcomes. Current evidence is seller interpretation ('they seek', 'they want') not prospect statements. Need direct quote showing quantified metric. CRITERION 2 FAILURE - Identified Pain: Regressed from 8/10 (cumulative) to 6/10 without documented reason. Analysis notes pain 'lacks quantification' but prior call established 'reducing engineering overhead and costs' and 'accelerate experimentation cycles' - this should maintain 8/10 or explicitly note what new information contradicted it. CRITERION 3 FAILURE - Competition: Airship and Extreme Push flagged as out-of-scope but analysis still discusses them. Competitor mapping incomplete - no evidence LaunchDarkly, Statsig, or EPPO were evaluated. Firebase is correctly identified as non-competitor but discussion muddies the competitive picture. CRITERION 4 FAILURE - Multiple components below 7/10 with insufficient next steps: Metrics next step uses vague 'Can you quantify' framing without specific question structure; Economic Buyer next step lacks concrete day/time commitment ('by end of this week' is too vague); Champion next step asks 'who will you present to' when we should already know attendees before Tuesday presentation. CRITERION 5 FAILURE - Decision Process claimed 'Partial' at 6/10 but evidence shows: specific presentation date (Tuesday), specific follow-up step (cost analysis), specific approval step (leadership review), and specific signing target (January 1st). This meets 'Identified' threshold (score should be 7+). ICP concern not flagged: '100 million impressions' without monthly active user context and \u20ac250K ARR vs \u20ac60K current spend suggests potential scale misalignment - analysis notes this but doesn't flag as ICP risk requiring resolution. CRITERION 4 FAILURE - Decision Criteria next step asks to 'confirm' criteria during presentation, but Decision Criteria already scored 8/10 Identified - this step is redundant and suggests score may be inflated.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-12_31562357856_007",
+  "timestamp": "2026-08-12T04:29:46.263862"
+}

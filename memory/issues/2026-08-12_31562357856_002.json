@@ -1,0 +1,21 @@
+{
+  "company": "InPost",
+  "deal_id": "60069831015",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward inconsistency on Competition component. The analysis upgrades Competition from 4/10 to 5/10 based on Call 2 explicitly naming Firebase as the current tool. However, cumulative_calls_context shows calls_reviewed: 1, meaning only Call 1 evidence exists in the cumulative state. Call 2 is NEW information being added for the first time in this analysis. The upgrade from 4/10 to 5/10 is justified by new evidence and does not violate carry-forward rules. RECHECK: The analysis correctly applies new information. However, CRITERION 4 VIOLATION \u2014 Decision Process component (5/10, Partial status) lacks actionable next steps with specific contact and concrete question. The next step provided is: 'On next call with primary contact, ask: \"Walk me through your decision timeline...\"' This uses generic language ('primary contact') without naming a specific individual or accepting the '[contact TBD]' placeholder explicitly. Since no contacts are identified in HubSpot (stated: 'No contacts currently associated in HubSpot'), the analysis should either: (a) explicitly use '[contact TBD]' as the placeholder per Criterion 4 exception, OR (b) provide a named contact. The current phrasing is ambiguous and does not meet the standard. CRITERION 4 VIOLATION \u2014 Champion component (3/10, Partial status) next step reads: 'assess championship potential by asking: \"How are you planning to build the internal case...\"' This is acceptable if directed to '[contact TBD]' but the analysis does not explicitly assign it. The placeholder should be clear. CRITERION 4 VIOLATION \u2014 Identified Pain component (7/10, Identified status) does not require next steps per rubric (only components below 7/10 need them), but the analysis provides one anyway, which is good practice. However, no explicit contact is named here either. REQUIRED CHANGES: (1) For Decision Process next step, replace 'On next call with primary contact' with '[contact TBD]: Walk me through your decision timeline...' to meet Criterion 4 exception standard. (2) For Champion next step, replace 'On next call with primary contact' with '[contact TBD]: Assess championship potential by asking...' (3) Confirm all next steps follow the format: '[contact name or TBD]: Specific action \u2014 concrete question' with no vague verbs (explore, discuss, follow up). The current next steps mostly pass this test but lack explicit placeholder assignment where contacts are unknown.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-12_31562357856_002",
+  "timestamp": "2026-08-12T04:19:09.285596"
+}

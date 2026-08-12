@@ -1,0 +1,21 @@
+{
+  "company": "BESTSELLER",
+  "deal_id": "60785721693",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Competition status must be corrected. Cumulative state shows Competition scored 4/10 with 'partial' status based on Shopify and Sanity transition, but these are commerce/CMS platforms, not experimentation competitors. The new analysis correctly identifies this (score 2/10, Unknown status) but fails carry-forward consistency check: the component regressed from 4/10 to 2/10 without documented reason explaining why the previous assessment was incorrect. Per Criterion 2, this regression requires explicit justification. Add language: 'Previous assessment incorrectly classified Shopify/Sanity as competitive alternatives; they are infrastructure partners, not experimentation platforms. No actual experimentation competitors identified. Downgrading from 4/10 to 2/10 to reflect this clarification.' Additionally, the recent call summary provides no new information about competition landscape\u2014explicitly state carry-forward logic if maintaining or correcting the previous score.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-12_31562357856_002",
+  "timestamp": "2026-08-12T04:14:13.490207"
+}

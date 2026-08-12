@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_003",
+  "timestamp": "2026-08-12T04:16:01.341201",
+  "company": "Rula",
+  "criterion_fired": "All five criteria (ICP Fit, Carry-forward Consistency, Metrics, Champion, Economic Buyer)",
+  "was_appropriate": false,
+  "suggested_change": "Rubric requires explicit calibration rules: (1) Define score thresholds numerically tied to status labels (e.g., 'Identified' = 8+/10 with ALL gaps resolved, 'Partial' = 5-7/10 with <2 gaps). (2) For scoring increases, require rule: 'Score increases only when new evidence directly contradicts prior assessment, not refinements of existing findings.' (3) For next-step verbs, specify: 'Champion actions must name exact question or stakeholder conversation, not exploratory language.' (4) Economic Buyer: clarify whether 'pricing discussions' by non-buyer counts toward score, or require explicit budget authority acknowledgment. Current rubric uses subjective judgment rather than decision rules."
+}

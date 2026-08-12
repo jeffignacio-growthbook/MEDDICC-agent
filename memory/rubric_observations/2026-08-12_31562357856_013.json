@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_013",
+  "timestamp": "2026-08-12T04:29:46.264195",
+  "company": "Livesport",
+  "criterion_fired": "Metrics, Identified Pain, Competition, Next Steps, Decision Process",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 5 (Decision Process) score of 6/10 'Partial' is misaligned with evidence: specific presentation date, follow-up step, approval gate, and signing target present should meet 'Identified' (7+) threshold. Suggested rewording: score 'Identified (7+)' when decision timeline, approval chain, and signing criteria are explicit; reserve 'Partial' for missing one of these three elements."
+}

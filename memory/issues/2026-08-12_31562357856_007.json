@@ -1,0 +1,21 @@
+{
+  "company": "Decathlon",
+  "deal_id": "59369345948",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 0,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 2 violation: Cumulative state shows calls_reviewed = 0 (first call context), so carry-forward rules do not apply. However, the analysis treats this as if prior context exists. Since this IS a first call, all Unknown/low scores are correct and expected. PASS on that front.\n\nCriterion 3 violation - Evidence quality for Metrics (2/10): Score of 2/10 lacks sufficient detail. The evidence states 'mentioned the need' and 'haven't articulated specific targets' but provides no direct quote or paraphrase from Antoine's actual words. For a score above 0, need specific language Antoine used (e.g., exact quote about what metrics matter).\n\nCriterion 4 violation - Actionable next steps: Multiple next steps use prohibited vague language:\n- Metrics: 'Walk me through how you measure' is acceptable, but 'specific targets' language is vague\n- Economic Buyer: Next step uses 'discuss investment priorities' (vague verb)\n- Decision Criteria: 'Share' is acceptable but 'nice-to-haves' is vague framing\n- Decision Process: 'Map out the process' is vague language\n- Identified Pain: 'Can you help me understand' is vague; needs specific action like 'Ask Antoine directly: [specific question]'\n- Champion: 'Test for champion potential' is vague; should be 'Ask Antoine directly' with specific question format\n- Competition: 'Quick question to help me tailor' is vague framing\n\nAll next steps need format: '[Contact]: [Specific action verb]: [Concrete question or outcome]' without phrase verbs like 'help understand', 'discuss', 'explore', 'map out'.\n\nCriterion 1: All components have status, score, and evidence statement. PASS.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-12_31562357856_007",
+  "timestamp": "2026-08-12T04:32:00.706671"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_002",
+  "timestamp": "2026-08-12T04:14:13.490519",
+  "company": "BESTSELLER",
+  "criterion_fired": "Criterion 2 (carry-forward consistency)",
+  "was_appropriate": true,
+  "suggested_change": "When a component score decreases between iterations, require explicit justification stating what prior assessment was incorrect and why the correction was necessary. For Competition specifically: clarify that infrastructure/commerce platforms (Shopify, Sanity) should not score as experimentation competitors unless they offer direct feature parity."
+}
