@@ -197,8 +197,7 @@ class SnapshotBackfiller:
             'stage_order': stage_order,
             'deal_status': deal_status,
             'backfill_confidence': confidence,
-            'has_property_history': has_history,
-            'created_at': datetime.now().isoformat()
+            'has_property_history': has_history
         }
 
         return snapshot
