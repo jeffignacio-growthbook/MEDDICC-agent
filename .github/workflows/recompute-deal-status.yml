@@ -1,0 +1,44 @@
+name: Recompute Deal Status
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+jobs:
+  recompute-status:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run analytics ETL to recompute deal_status
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          echo "========================================================================"
+          echo "Running analytics ETL to recompute deal_status after stage ID fix"
+          echo "========================================================================"
+          echo ""
+          echo "This will:"
+          echo "  - Fetch all 1,792 deals from HubSpot with corrected stage IDs"
+          echo "  - Recompute deal_status using is_won_stage()/is_lost_stage()"
+          echo "  - Fix 795 closedlost deals (active → lost)"
+          echo "  - Fix 223 closedwon deals (active → won)"
+          echo ""
+
+          python scripts/etl_deals.py --mode analytics
+
+          echo ""
+          echo "========================================================================"
+          echo "ETL complete - verifying results"
+          echo "========================================================================"
