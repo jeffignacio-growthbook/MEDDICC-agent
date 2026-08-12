@@ -310,8 +310,8 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer,
             # Build cumulative MEDDICC state
             cumulative_state = build_cumulative_meddicc(historical_summaries, company_name, tracker)
 
-            # Extract component details for HubSpot/Supabase write-back
-            component_details = _extract_component_details(cumulative_state)
+        # Extract component details for HubSpot/Supabase write-back
+        component_details = _extract_component_details(cumulative_state)
 
         # GUARD 3: Most recent call summary too short
         if len(recent_call_summary.strip()) < 100:
