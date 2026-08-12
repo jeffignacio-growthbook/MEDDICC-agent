@@ -58,8 +58,8 @@ class BackfillValidator:
         print("1. Checking migration 017 status...")
 
         try:
-            # Query deal_snapshots table to check for backfill_confidence column
-            result = self.client.table('deal_snapshots')\
+            # Query deals_snapshot table to check for backfill_confidence column
+            result = self.client.table('deals_snapshot')\
                 .select('backfill_confidence')\
                 .limit(1)\
                 .execute()
