@@ -48,7 +48,7 @@ jobs:
           python scripts/analytics/hubspot_history.py --resume
 
       - name: Upload property history cache
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: property-history-cache
           path: property_history_cache.json
