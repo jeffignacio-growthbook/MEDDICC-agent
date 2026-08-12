@@ -93,6 +93,7 @@ pipeline:
   pipelines:
     - id: "default"
       name: "Sales Pipeline"
+      qualified_stage_order: 1
       stages:
         # RULE: Disqualified stages get BOTH is_lost=true AND exclude_from_analysis=true
         # Lost stages (is_lost=true) are included in waterfall unless exclude_from_analysis=true
@@ -107,7 +108,6 @@ pipeline:
           name: "Discovery"
           order: 1
           stage_probability: 0.10
-          qualified_stage_order: 1  # First qualified stage
 
         - id: "qualifiedtobuy"
           name: "Scoping"
