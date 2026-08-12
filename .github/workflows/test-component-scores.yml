@@ -7,12 +7,18 @@ on:
         description: 'Company name to test'
         required: true
         default: 'Skyscanner'
+      branch:
+        description: 'Branch to test from'
+        required: true
+        default: 'phase-f-component-scoring'
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
