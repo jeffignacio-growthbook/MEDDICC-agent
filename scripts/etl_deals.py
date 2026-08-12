@@ -607,7 +607,8 @@ def main():
                 emp_raw = company_props.get('numberofemployees')
                 try:
                     if emp_raw and emp_raw != '':
-                        company_employee_count = int(emp_raw)
+                        # Handle decimal strings from CSV (e.g., "8521.0")
+                        company_employee_count = int(float(emp_raw))
                 except (ValueError, TypeError):
                     pass
 
