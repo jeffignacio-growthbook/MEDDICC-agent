@@ -255,14 +255,15 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
                 'qualified_date': qualified_date_str,
             })
         else:
-            n_order = n.get('stage_order', 0) or 0
-            p_order = p.get('stage_order', 0) or 0
-            n_status = n.get('deal_status', 'active')
-            p_status = p.get('deal_status', 'active')
+            # Handle existing deals (may be None if deal only exists in one snapshot)
+            n_order = n.get('stage_order', 0) or 0 if n else 0
+            p_order = p.get('stage_order', 0) or 0 if p else 0
+            n_status = n.get('deal_status', 'active') if n else 'active'
+            p_status = p.get('deal_status', 'active') if p else 'active'
 
             # Parse close dates for fiscal quarter analysis
-            n_close_raw = n.get('close_date')
-            p_close_raw = p.get('close_date')
+            n_close_raw = n.get('close_date') if n else None
+            p_close_raw = p.get('close_date') if p else None
 
             try:
                 n_close = date.fromisoformat(n_close_raw) if n_close_raw else None
@@ -310,8 +311,8 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
                 # the qualified pipeline yet.
 
             # Check ARR change
-            n_value = float(n.get('deal_value') or 0)
-            p_value = float(p.get('deal_value') or 0)
+            n_value = float(n.get('deal_value') or 0) if n else 0.0
+            p_value = float(p.get('deal_value') or 0) if p else 0.0
             if n_value != p_value:
                 changes.append('arr_change')
 
@@ -343,8 +344,8 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
             if changes:
                 detail = {
                     'deal_id': deal_id,
-                    'company_name': n.get('company_name', ''),
-                    'close_date': n.get('close_date'),
+                    'company_name': n.get('company_name', '') if n else (p.get('company_name', '') if p else ''),
+                    'close_date': n.get('close_date') if n else (p.get('close_date') if p else None),
                     'change_type': primary_change,
                     'value': value,
                 }
