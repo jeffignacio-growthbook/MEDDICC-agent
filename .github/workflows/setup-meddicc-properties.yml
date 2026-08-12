@@ -1,0 +1,25 @@
+name: Setup MEDDICC Properties
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Setup HubSpot MEDDICC properties
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: python scripts/setup_hubspot_properties.py
