@@ -1,0 +1,85 @@
+name: Test HubSpot dealstage Property
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+jobs:
+  test-dealstage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install requests
+        run: pip install requests
+
+      - name: Test what HubSpot returns for dealstage
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          python3 << 'TEST_DEALSTAGE'
+          import os, requests, json
+
+          # Deal ID that has 'Closed lost' (display name) in Supabase
+          deal_id = '61602481512'
+
+          print("=" * 70)
+          print("TESTING: What does HubSpot API return for dealstage property?")
+          print("=" * 70)
+          print(f"Deal ID: {deal_id}")
+          print(f"Current stage in Supabase: 'Closed lost' (display name)")
+          print("")
+
+          resp = requests.get(
+              f'https://api.hubapi.com/crm/v3/objects/deals/{deal_id}',
+              params={'properties': 'dealstage,pipeline,dealname'},
+              headers={'Authorization': f'Bearer {os.environ["HUBSPOT_API_KEY"]}'}
+          )
+
+          if resp.status_code != 200:
+              print(f"ERROR: HTTP {resp.status_code}")
+              print(resp.text)
+              exit(1)
+
+          data = resp.json()
+          props = data.get('properties', {})
+
+          print("RAW HUBSPOT API RESPONSE:")
+          print("-" * 70)
+          print(json.dumps(data, indent=2))
+          print("")
+
+          print("CRITICAL VALUES:")
+          print("-" * 70)
+          dealstage = props.get('dealstage')
+          pipeline = props.get('pipeline')
+          dealname = props.get('dealname')
+
+          print(f"Deal Name:  {dealname}")
+          print(f"Pipeline:   {pipeline}")
+          print(f"dealstage:  {repr(dealstage)}")
+          print("")
+
+          print("INTERPRETATION:")
+          print("-" * 70)
+          if dealstage == 'closedlost':
+              print("✓ HubSpot returns STAGE ID: 'closedlost'")
+              print("  → ETL is safe, UPDATEs won't be reverted")
+              print("  → Can run correction UPDATEs immediately")
+          elif dealstage == 'Closed lost':
+              print("✗ HubSpot returns DISPLAY NAME: 'Closed lost'")
+              print("  → ETL will re-corrupt data on next run")
+              print("  → MUST add normalization to etl_deals.py BEFORE UPDATEs")
+          else:
+              print(f"? Unexpected dealstage value: {repr(dealstage)}")
+              print("  → Investigation needed")
+
+          print("")
+          print("=" * 70)
+          TEST_DEALSTAGE
