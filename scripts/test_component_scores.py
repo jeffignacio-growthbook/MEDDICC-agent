@@ -81,7 +81,7 @@ def main():
     # Initialize clients
     hubspot = get_hubspot_deals_client()
     memory = get_memory_manager()
-    tracker = TokenTracker()
+    tracker = TokenTracker(memory.memory_dir, job='test')
 
     # Load calls from cache
     cache = memory.load_call_cache(slug)
