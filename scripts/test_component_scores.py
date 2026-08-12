@@ -194,7 +194,12 @@ def main():
     print(f"Would write {len(component_details) * 3} properties to HubSpot deal {deal_id}")
     print(f"Would write component_details JSONB to Supabase analyses")
     print()
-    print(f"Token usage: {tracker.total_tokens_used():,} tokens")
+
+    # Calculate total tokens from session records
+    total_tokens = sum(r['input_tokens'] + r['output_tokens']
+                      for r in tracker.session_records)
+    if total_tokens > 0:
+        print(f"Token usage: {total_tokens:,} tokens")
     print()
 
     return 0
