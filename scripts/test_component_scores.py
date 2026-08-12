@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+"""
+Dry-run validation for Phase F component scoring.
+
+Tests the component_details extraction and formatting for a single
+deal without writing to HubSpot or Supabase. Shows what WOULD be
+written to help validate the evidence quality before nightly runs.
+
+Usage:
+    HUBSPOT_API_KEY=... FIREFLIES_API_KEY=... \\
+    python scripts/test_component_scores.py \\
+      --company "Box"
+"""
+
+import os
+import sys
+import json
+import argparse
+from pathlib import Path
+
+# Add scripts to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from hubspot_deals import get_hubspot_deals_client
+from github_memory import get_memory_manager
+from context_builder import build_cumulative_meddicc
+from token_tracker import TokenTracker
+
+
+def slugify(name: str) -> str:
+    """Convert company name to slug."""
+    import re
+    if not name:
+        return ''
+    parts = re.split(r'\s*[-–—]\s+', name, maxsplit=1)
+    company_part = parts[0]
+    company_part = re.sub(r'growthbook', '', company_part, flags=re.IGNORECASE)
+    company_part = re.sub(r'[\s+&]+', ' ', company_part)
+    slug = company_part.strip().lower()
+    slug = re.sub(r'[^a-z0-9]+', '', slug)
+    return slug if len(slug) >= 3 else ''
+
+
+def extract_component_details(cumulative_state: dict) -> dict:
+    """
+    Extract component details from cumulative MEDDICC state.
+    Same logic as run_nightly.py.
+    """
+    state = cumulative_state.get('meddicc_state', {})
+    details = {}
+    for component, data in state.items():
+        if not isinstance(data, dict):
+            continue
+        details[component] = {
+            'score':    data.get('score', 0),
+            'status':   data.get('status', 'unknown'),
+            'evidence': (data.get('evidence') or '').strip()[:1000],
+        }
+    return details
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Test component scoring for a single deal'
+    )
+    parser.add_argument('--company', required=True,
+                       help='Company name (e.g., "Box")')
+    args = parser.parse_args()
+
+    company_name = args.company
+    slug = slugify(company_name)
+
+    if not slug:
+        print(f"❌ Invalid company name: {company_name}")
+        return 1
+
+    print(f"Testing component scoring for: {company_name}")
+    print(f"Slug: {slug}")
+    print()
+
+    # Initialize clients
+    hubspot = get_hubspot_deals_client()
+    memory = get_memory_manager()
+    tracker = TokenTracker()
+
+    # Load calls from cache
+    cache = memory.load_call_cache(slug)
+    if not cache:
+        print(f"❌ No call cache found for {slug}")
+        print(f"   Run: python scripts/cache_fireflies_calls.py --company \"{company_name}\"")
+        return 1
+
+    cached_calls = cache.get('calls', [])
+    if not cached_calls:
+        print(f"❌ Empty call cache for {slug}")
+        return 1
+
+    print(f"✓ Found {len(cached_calls)} cached calls")
+    print()
+
+    # Find deal_id for this company
+    deals = hubspot.get_active_deals()
+    deal = None
+    for d in deals:
+        if slugify(d.get('company', '')) == slug:
+            deal = d
+            break
+
+    if not deal:
+        print(f"❌ No active deal found for {company_name}")
+        print(f"   Active deals: {[d.get('company') for d in deals[:5]]}")
+        return 1
+
+    deal_id = deal['deal_id']
+    print(f"✓ Found deal: {deal_id}")
+    print()
+
+    # Build call summaries
+    summaries = []
+    for call in cached_calls:
+        summary = call.get('formatted_summary') or call.get('summary') or ''
+        if summary.strip():
+            summaries.append(summary)
+
+    if not summaries:
+        print(f"❌ No call summaries found")
+        return 1
+
+    print(f"✓ Built {len(summaries)} call summaries")
+    print()
+
+    # Build cumulative MEDDICC state
+    historical_summaries = summaries[:-1] if len(summaries) > 1 else []
+
+    print(f"Building cumulative MEDDICC state from {len(historical_summaries)} historical calls...")
+    cumulative_state = build_cumulative_meddicc(
+        historical_summaries, company_name, tracker
+    )
+
+    # Extract component details
+    component_details = extract_component_details(cumulative_state)
+
+    if not component_details:
+        print(f"❌ No component details extracted")
+        print(f"   Cumulative state keys: {list(cumulative_state.keys())}")
+        return 1
+
+    # Format output
+    print()
+    print("=" * 70)
+    print(f"Component Details for {company_name} (from {len(summaries)} calls):")
+    print("=" * 70)
+    print()
+
+    component_labels = {
+        'metrics': 'METRICS',
+        'economic_buyer': 'ECONOMIC BUYER',
+        'decision_criteria': 'DECISION CRITERIA',
+        'decision_process': 'DECISION PROCESS',
+        'identified_pain': 'IDENTIFIED PAIN',
+        'champion': 'CHAMPION',
+        'competition': 'COMPETITION',
+    }
+
+    for component_key in component_labels:
+        if component_key in component_details:
+            data = component_details[component_key]
+            label = component_labels[component_key]
+
+            print(f"{label:<20} score={data['score']:<2} status={data['status']}")
+
+            evidence = data.get('evidence', '').strip()
+            if evidence:
+                # Wrap evidence text at 60 chars
+                import textwrap
+                wrapped = textwrap.fill(evidence, width=60,
+                                       initial_indent='  "',
+                                       subsequent_indent='   ')
+                print(wrapped + '"')
+            else:
+                print('  (no evidence)')
+            print()
+
+    print()
+    print("=" * 70)
+    print("WRITE SUMMARY")
+    print("=" * 70)
+    print(f"Would write {len(component_details) * 3} properties to HubSpot deal {deal_id}")
+    print(f"Would write component_details JSONB to Supabase analyses")
+    print()
+    print(f"Token usage: {tracker.total_tokens_used():,} tokens")
+    print()
+
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

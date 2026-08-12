@@ -548,6 +548,37 @@ class HubSpotDealsClient:
         print(f"  ✓ Updated deal properties (score: {scores['overall_score']}/70, status: {scores['status']})")
         return result
 
+    def write_component_scores(self, deal_id: str,
+                                component_details: dict) -> dict:
+        """
+        Write per-component MEDDICC scores, statuses, and
+        evidence rationale to HubSpot deal properties.
+        Uses the cumulative state from context_builder —
+        NOT the regex-extracted scores from markdown.
+
+        Property naming convention:
+          meddicc_{component}_score     — integer 1-10
+          meddicc_{component}_status    — identified/partial/unknown
+          meddicc_{component}_rationale — evidence text (max 1000 chars)
+
+        Run setup_hubspot_properties.py once before using this.
+        """
+        properties = {}
+        for component, data in component_details.items():
+            score    = data.get('score', 0)
+            status   = data.get('status', 'unknown')
+            evidence = (data.get('evidence') or '').strip()[:1000]
+
+            properties[f"meddicc_{component}_score"]    = str(score)
+            properties[f"meddicc_{component}_status"]   = status
+            properties[f"meddicc_{component}_rationale"]= evidence
+
+        if not properties:
+            return {}
+
+        endpoint = f"/crm/v3/objects/deals/{deal_id}"
+        return self._patch(endpoint, {"properties": properties})
+
     def get_deal_context(self, deal_id: str) -> dict:
         """
         Get full deal context for MEDDICC analysis.

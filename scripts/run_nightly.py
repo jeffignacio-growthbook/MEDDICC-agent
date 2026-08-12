@@ -60,6 +60,27 @@ def slugify(name: str) -> str:
     return slug if len(slug) >= 3 else ''
 
 
+def _extract_component_details(cumulative_state: dict) -> dict:
+    """
+    Pulls per-component {score, status, evidence} from the
+    context builder's cumulative MEDDICC state.
+    Returns a dict keyed by component name, ready for
+    HubSpot write-back and Supabase storage.
+    """
+    state = cumulative_state.get('meddicc_state', {})
+    details = {}
+    for component, data in state.items():
+        if not isinstance(data, dict):
+            continue
+        details[component] = {
+            'score':    data.get('score', 0),
+            'status':   data.get('status', 'unknown'),
+            'evidence': (data.get('evidence') or '').strip()[:1000],
+            # truncate to 1000 chars — HubSpot textarea limit
+        }
+    return details
+
+
 def get_calls_for_company(company_name: str, since_date, memory) -> tuple:
     """
     Load calls from cache only. No live API calls.
@@ -289,6 +310,9 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer,
             # Build cumulative MEDDICC state
             cumulative_state = build_cumulative_meddicc(historical_summaries, company_name, tracker)
 
+            # Extract component details for HubSpot/Supabase write-back
+            component_details = _extract_component_details(cumulative_state)
+
         # GUARD 3: Most recent call summary too short
         if len(recent_call_summary.strip()) < 100:
             return {
@@ -345,6 +369,15 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer,
         except Exception as hub_error:
             print(f"   ⚠️  {company_name}: HubSpot note failed (analysis saved to file): {hub_error}")
 
+        # Write component scores to HubSpot properties
+        try:
+            hubspot.write_component_scores(
+                deal_id=deal_id,
+                component_details=component_details
+            )
+        except Exception as comp_error:
+            print(f"   ⚠️  {company_name}: HubSpot component scores failed: {comp_error}")
+
         # Write analysis to Supabase
         if sb_writer:
             try:
@@ -356,7 +389,8 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer,
                     company_name=company_name,
                     result=result,
                     scores=scores,
-                    output_file=str(output_file.name)
+                    output_file=str(output_file.name),
+                    component_details=component_details
                 )
             except Exception as e:
                 print(f"   ⚠️  {company_name}: Supabase analysis write failed: {e}")
