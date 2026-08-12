@@ -10,6 +10,7 @@ Handles parallel writes to Supabase alongside GitHub for:
 from supabase import create_client, Client
 import os
 import re
+import json
 from datetime import datetime, date
 from typing import Optional
 
@@ -189,7 +190,7 @@ class SupabaseWriter:
 
     def insert_analysis(self, deal_id: str, company_name: str,
                         result: dict, scores: dict,
-                        output_file: str) -> None:
+                        output_file: str, component_details: dict = None) -> None:
         """Insert a new MEDDICC analysis row."""
         self.client.table('analyses').insert({
             'deal_id':                 str(deal_id),
@@ -220,6 +221,7 @@ class SupabaseWriter:
             'full_analysis_text':      result.get('draft', ''),
             'summary':                 scores.get('summary', ''),
             'output_file':             output_file,
+            'component_details':       json.dumps(component_details) if component_details else None,
         }).execute()
 
     def bulk_upsert_calls(self, calls: list,
