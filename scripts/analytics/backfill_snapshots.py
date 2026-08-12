@@ -193,14 +193,14 @@ class SnapshotBackfiller:
         snapshot = {
             'deal_id': deal_id,
             'snapshot_date': snapshot_date.date().isoformat(),
-            'stage_id': stage_id,  # Column is stage_id not stage
+            'pipeline_id': 'default',  # All deals are in default pipeline
+            'stage_id': stage_id,
             'stage_order': stage_order,
             'deal_status': deal_status,
-            'snapshot_source': 'backfilled',  # Mark as backfilled data
+            'snapshot_source': 'backfilled',
             'backfill_confidence': confidence,
             'has_property_history': has_history,
             # Optional columns - will be NULL if not provided
-            'pipeline_id': None,
             'deal_value': None,
             'close_date': None,
             'owner_email': None
