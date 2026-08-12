@@ -1,0 +1,68 @@
+name: Fetch HubSpot Property History
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+jobs:
+  fetch-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch property history from HubSpot
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          echo "========================================================================"
+          echo "Fetching HubSpot property history for all deals"
+          echo "========================================================================"
+          echo ""
+          echo "This will:"
+          echo "  - Fetch dealstage property history for all deals"
+          echo "  - Rate limit: 5 calls/sec (conservative)"
+          echo "  - Cache results to property_history_cache.json"
+          echo "  - Estimated time: ~6 minutes for 1,792 deals"
+          echo ""
+
+          python scripts/analytics/hubspot_history.py --all --rate-limit 5
+
+          echo ""
+          echo "========================================================================"
+          echo "Fetch complete - verifying cache"
+          echo "========================================================================"
+
+          # Show cache stats
+          python scripts/analytics/hubspot_history.py --resume
+
+      - name: Upload property history cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: property-history-cache
+          path: property_history_cache.json
+          retention-days: 7
+
+      - name: Show cache summary
+        run: |
+          echo ""
+          echo "========================================================================"
+          echo "Property history cache uploaded as artifact"
+          echo "========================================================================"
+          echo ""
+          echo "Download the artifact from the Actions tab and place it in the"
+          echo "repository root as 'property_history_cache.json' to run validation"
+          echo "and dry-run backfill locally."
+          echo ""
+          ls -lh property_history_cache.json
