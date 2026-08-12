@@ -7,6 +7,11 @@ Uses HubSpot property history to create weekly snapshots showing:
 - Deal status (active/won/lost) at each snapshot date
 - Confidence scoring for data quality
 
+IMPORTANT: deal_value and close_date use today's values as a proxy for
+historical ARR. This means backfilled arr_change will read as 0 (deals
+can't change their own value retroactively in this model), but won_value
+and lost_value will reflect the deal's actual ARR at close.
+
 Requires:
 - Property history cache from hubspot_history.py
 - Migration 017 (backfill confidence fields)
@@ -71,16 +76,13 @@ class SnapshotBackfiller:
 
         print(f"Loaded property history for {len(self.property_history)} deals")
 
-        # Load current deal stages and company names for mismatch detection
-        all_deals = select_all(self.client, 'deals', columns='deal_id, stage, company_name')
-        self.current_deals = {
-            d['deal_id']: {
-                'stage': d.get('stage'),
-                'company_name': d.get('company_name', 'Unknown')
-            }
-            for d in all_deals
-        }
-        print(f"Loaded current stage for {len(self.current_deals)} deals")
+        # Load current deal data for mismatch detection and ARR values
+        all_deals = select_all(
+            self.client, 'deals',
+            columns='deal_id,stage,company_name,deal_value,close_date,owner_email,pipeline_id'
+        )
+        self.current_deals = {d['deal_id']: d for d in all_deals}
+        print(f"Loaded current data for {len(self.current_deals)} deals")
 
     def get_stage_order(self, stage_id: str) -> Optional[int]:
         """Get stage order, returns None if unmapped."""
@@ -190,20 +192,22 @@ class SnapshotBackfiller:
         stage_order = self.get_stage_order(stage_id)
         deal_status = self.get_deal_status(stage_id)
 
+        # Pull current deal values (today's ARR as proxy for historical ARR)
+        current = self.current_deals.get(deal_id, {})
+
         snapshot = {
             'deal_id': deal_id,
             'snapshot_date': snapshot_date.date().isoformat(),
-            'pipeline_id': 'default',  # All deals are in default pipeline
+            'pipeline_id': current.get('pipeline_id') or 'default',
             'stage_id': stage_id,
             'stage_order': stage_order,
+            'deal_value': current.get('deal_value'),      # Today's ARR
+            'close_date': current.get('close_date'),      # Today's close date
+            'owner_email': current.get('owner_email'),
             'deal_status': deal_status,
             'snapshot_source': 'backfilled',
             'backfill_confidence': confidence,
-            'has_property_history': has_history,
-            # Optional columns - will be NULL if not provided
-            'deal_value': None,
-            'close_date': None,
-            'owner_email': None
+            'has_property_history': has_history
         }
 
         return snapshot
