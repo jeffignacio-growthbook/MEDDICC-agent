@@ -71,6 +71,17 @@ class SnapshotBackfiller:
 
         print(f"Loaded property history for {len(self.property_history)} deals")
 
+        # Load current deal stages and company names for mismatch detection
+        all_deals = select_all(self.client, 'deals', columns='deal_id, stage, company_name')
+        self.current_deals = {
+            d['deal_id']: {
+                'stage': d.get('stage'),
+                'company_name': d.get('company_name', 'Unknown')
+            }
+            for d in all_deals
+        }
+        print(f"Loaded current stage for {len(self.current_deals)} deals")
+
     def get_stage_order(self, stage_id: str) -> Optional[int]:
         """Get stage order, returns None if unmapped."""
         if not stage_id or stage_id not in self.stage_map:
@@ -210,35 +221,73 @@ class SnapshotBackfiller:
             'total_snapshot_dates': len(snapshot_dates),
             'snapshots_generated': 0,
             'snapshots_skipped': 0,
+            'mismatched_deals': 0,
             'by_confidence': {
                 'exact': 0,
                 'interpolated': 0,
                 'inferred': 0,
-                'unknown': 0
+                'unknown': 0,
+                'excluded_mismatch': 0
             },
             'by_status': {
                 'active': 0,
                 'won': 0,
                 'lost': 0
-            }
+            },
+            'mismatch_examples': []
         }
 
         snapshots_to_insert = []
 
         for deal_id in deal_ids:
+            deal_snapshots = []
+
+            # Build all snapshots for this deal
             for snapshot_date in snapshot_dates:
                 snapshot = self.build_snapshot(deal_id, snapshot_date)
 
                 if snapshot:
-                    stats['snapshots_generated'] += 1
-                    stats['by_confidence'][snapshot['backfill_confidence']] += 1
-                    stats['by_status'][snapshot['deal_status']] += 1
-                    snapshots_to_insert.append(snapshot)
+                    deal_snapshots.append(snapshot)
                 else:
                     stats['snapshots_skipped'] += 1
 
+            # Check for history replay mismatch
+            if deal_snapshots:
+                final_snapshot = deal_snapshots[-1]  # Last snapshot (most recent)
+                final_stage = final_snapshot['stage']
+                current_deal = self.current_deals.get(deal_id)
+                current_stage = current_deal.get('stage') if current_deal else None
+                company_name = current_deal.get('company_name', 'Unknown') if current_deal else 'Unknown'
+
+                if current_stage and final_stage != current_stage:
+                    # MISMATCH: History replay doesn't match current stage
+                    stats['mismatched_deals'] += 1
+
+                    # Mark ALL snapshots for this deal as excluded_mismatch
+                    for snap in deal_snapshots:
+                        snap['backfill_confidence'] = 'excluded_mismatch'
+
+                    # Print mismatch clearly
+                    print(f"  MISMATCH: {company_name} | final_stage={final_stage} current_stage={current_stage} — excluded from win-rate analysis")
+
+                    # Track example for report (first 10)
+                    if len(stats['mismatch_examples']) < 10:
+                        stats['mismatch_examples'].append({
+                            'company_name': company_name,
+                            'deal_id': deal_id,
+                            'final_replay_stage': final_stage,
+                            'current_actual_stage': current_stage
+                        })
+
+                # Add to insert list and update stats
+                for snap in deal_snapshots:
+                    stats['snapshots_generated'] += 1
+                    stats['by_confidence'][snap['backfill_confidence']] += 1
+                    stats['by_status'][snap['deal_status']] += 1
+                    snapshots_to_insert.append(snap)
+
             # Progress update every 50 deals
-            if len([d for d in deal_ids if deal_ids.index(d) <= deal_ids.index(deal_id)]) % 50 == 0:
+            if (deal_ids.index(deal_id) + 1) % 50 == 0:
                 progress = deal_ids.index(deal_id) + 1
                 print(f"  Processed {progress}/{len(deal_ids)} deals...")
 
@@ -268,7 +317,7 @@ class SnapshotBackfiller:
 
         for i in range(0, total, batch_size):
             batch = snapshots[i:i + batch_size]
-            self.client.table('deal_snapshots').upsert(
+            self.client.table('deals_snapshot').upsert(
                 batch,
                 on_conflict='deal_id,snapshot_date'
             ).execute()
@@ -320,6 +369,26 @@ def main():
     for status, count in stats['by_status'].items():
         pct = count / stats['snapshots_generated'] * 100 if stats['snapshots_generated'] > 0 else 0
         print(f"  {status}: {count} ({pct:.1f}%)")
+    print()
+
+    # Report on mismatches
+    if stats['mismatched_deals'] > 0:
+        print("=" * 70)
+        print("HISTORY REPLAY MISMATCHES (excluded from win-rate)")
+        print("=" * 70)
+        print(f"Deals with mismatches: {stats['mismatched_deals']}")
+        print()
+        print("First 10 examples:")
+        print()
+        for ex in stats['mismatch_examples']:
+            print(f"  {ex['company_name']}")
+            print(f"    Deal ID: {ex['deal_id']}")
+            print(f"    Final replay stage: {ex['final_replay_stage']}")
+            print(f"    Current actual stage: {ex['current_actual_stage']}")
+            print()
+        print("These deals are flagged as 'excluded_mismatch' and should be")
+        print("excluded from win-rate and conversion analysis.")
+        print("=" * 70)
 
     return 0
 
