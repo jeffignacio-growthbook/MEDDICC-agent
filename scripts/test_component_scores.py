@@ -98,20 +98,26 @@ def main():
     print(f"✓ Found {len(cached_calls)} cached calls")
     print()
 
-    # Find deal_id for this company
-    deals = hubspot.get_active_deals()
-    deal = None
-    for d in deals:
-        if slugify(d.get('company', '')) == slug:
-            deal = d
-            break
-
-    if not deal:
-        print(f"❌ No active deal found for {company_name}")
-        print(f"   Active deals: {[d.get('company') for d in deals[:5]]}")
+    # Find deal_id for this company from deal index
+    deal_index_path = memory.memory_dir / 'calls' / '_deal_index.json'
+    if not deal_index_path.exists():
+        print(f"❌ Deal index not found at {deal_index_path}")
         return 1
 
-    deal_id = deal['deal_id']
+    import json
+    with open(deal_index_path) as f:
+        deal_index = json.load(f)
+
+    deal_id = None
+    for did, deal_info in deal_index.items():
+        if deal_info.get('slug') == slug:
+            deal_id = did
+            break
+
+    if not deal_id:
+        print(f"❌ No active deal found for {company_name} (slug: {slug})")
+        print(f"   Available companies: {list(set([d['company_name'] for d in deal_index.values()][:10]))}")
+        return 1
     print(f"✓ Found deal: {deal_id}")
     print()
 
