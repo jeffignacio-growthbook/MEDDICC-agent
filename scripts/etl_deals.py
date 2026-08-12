@@ -524,15 +524,11 @@ def main():
         if args.mode == 'analytics':
             # Use pre-fetched batch data
             company_id = deal_to_company.get(deal_id)
-            if not company_id:
-                skipped['no_company'] += 1
-                continue
+            company_props = company_properties.get(company_id, {}) if company_id else {}
+            company_name = company_props.get('name', '') if company_id else ''
 
-            company_props = company_properties.get(company_id, {})
-            company_name = company_props.get('name', '')
-            if not company_name.strip():
-                skipped['no_company'] += 1
-                continue
+            # Don't skip deals without companies - they'll get segment='Unknown'
+            # and we'll track the reason in segment_reason field
 
         else:
             # Active/history mode: individual API calls
@@ -551,11 +547,8 @@ def main():
                 skipped['no_company'] += 1
                 continue
 
-        # Generate slug
-        slug = slugify(company_name)
-        if not slug:
-            skipped['no_slug'] += 1
-            continue
+        # Generate slug (handle missing company name)
+        slug = slugify(company_name) if company_name else 'unknown'
 
         # Build deal object with mode-specific fields
         deal_dict = {
@@ -603,7 +596,12 @@ def main():
             # Compute segmentation from company employee count
             company_employee_count = None
             segment = 'Unknown'
-            if company_id:
+            segment_reason = None
+
+            if not company_id:
+                # No company association at all
+                segment_reason = 'no_company'
+            elif company_id:
                 emp_raw = company_props.get('numberofemployees')
                 try:
                     if emp_raw and emp_raw != '':
@@ -611,6 +609,10 @@ def main():
                         company_employee_count = int(float(emp_raw))
                 except (ValueError, TypeError):
                     pass
+
+                if company_employee_count is None:
+                    # Has company but no employee count
+                    segment_reason = 'no_employee_count'
 
             # Get segment from employee count
             segment, expected_cycle_days = get_segment(company_employee_count, config)
@@ -655,6 +657,7 @@ def main():
             deal_dict['company_id'] = company_id
             deal_dict['company_employee_count'] = company_employee_count
             deal_dict['segment'] = segment
+            deal_dict['segment_reason'] = segment_reason  # Diagnostic: 'no_company' or 'no_employee_count'
 
             # Get current stage order
             current_order = get_stage_order(stage) or 0
