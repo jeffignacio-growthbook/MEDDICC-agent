@@ -1,0 +1,21 @@
+{
+  "company": "Notion",
+  "deal_id": "60257621387",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward Consistency: The analysis states 'No new information in this call' repeatedly for all components, but the recent call summary provided is corrupted/incomplete ('[Summary failed] [811 - Mattel Barbie]...') and does not contain any Notion-related information. The analysis cannot claim to maintain scores based on 'no new information' when the recent call data is unintelligible. Either: (1) acknowledge the call summary is unreadable and reassess based solely on cumulative state, OR (2) provide a readable recent call summary. As written, the carry-forward claims are unsupported because there is no legible recent call to compare against. CRITERION 4 VIOLATION - Actionable Next Steps: All next steps use placeholder '[Contact TBD]' which is acceptable per rubric for early-stage deals, BUT the critical next steps at the end of the analysis use vague language: 'Email primary POC contact asking' and 'Schedule 30-minute call asking' - these are discussion/explore actions without specific contact name or concrete timing commitment (e.g., 'by EOD Wednesday'). Examples like 'Ask current POC contact' lack specificity required by the rubric. CRITERION 3 MINOR ISSUE - Evidence Quality: The evidence statements for each component are circular - they reference themselves ('Evidence from calls: [paraphrase of status]') rather than citing specific quotes or detailed paraphrases from actual call transcripts. The cumulative state is properly sourced, but the analysis repeats it without adding new grounding.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-12_31562357856_004",
+  "timestamp": "2026-08-12T04:19:52.460446"
+}

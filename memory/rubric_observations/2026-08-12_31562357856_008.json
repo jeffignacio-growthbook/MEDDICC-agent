@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_008",
+  "timestamp": "2026-08-12T04:25:04.106420",
+  "company": "Aircall",
+  "criterion_fired": "Criterion 2 (Economic Buyer), Criterion 4 (Competition), Criterion 5 (Champion)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2/5: Replace exact phrasing requirements with outcome-focused rules (e.g., 'explicitly state whether new information was found'). Criterion 4: Clarify whether next steps must be competition-only or can integrate across criteria. Add guidance on how to handle missing data: use 'No evidence identified' rather than inferring absence. ARR reconciliation: require conflict flagging when deal context contradicts call discussion rather than penalizing analysis for data inconsistency."
+}

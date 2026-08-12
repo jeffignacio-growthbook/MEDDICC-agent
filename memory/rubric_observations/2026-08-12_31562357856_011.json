@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_011",
+  "timestamp": "2026-08-12T04:27:54.647369",
+  "company": "Skyscanner",
+  "criterion_fired": "Criterion 1 (Competition evidence), Criterion 4 (Competition next step + Champion prerequisite validation)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Require explicit evidence statement ('No evidence of X exists' or 'Evidence: [specific mention]'). Criterion 4: Separate 'next step specificity' (dates, named contacts, measurable deliverables) from 'prerequisite validation' (confirm authority/willingness before assigning action). For Champion: add rule\u2014'If assigning action to named person, prerequisite is explicit confirmation of that person's authority or prior commitment; absence = score ceiling 5/10'."
+}

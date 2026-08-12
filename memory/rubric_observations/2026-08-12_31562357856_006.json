@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_006",
+  "timestamp": "2026-08-12T04:19:52.461198",
+  "company": "Notion",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 should explicitly state: 'If recent call summary is unreadable or missing, acknowledge this limitation and score components based on cumulative state only, without claiming evidence from that call.' Criterion 4 should clarify: 'Actionable next steps must include either (a) specific contact name/role, OR (b) concrete timing commitment (e.g., by EOD Wednesday), OR (c) acknowledgment that [Contact TBD] due to early stage. Generic verbs like \"ask\" or \"email\" without any specificity fail this criterion.'"
+}

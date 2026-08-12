@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_014",
+  "timestamp": "2026-08-12T04:31:16.382796",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 2 (Champion carry-forward consistency) and Criterion 3 (Next steps specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 should state: 'Champion scores must be maintained if no contradictory evidence exists in the current call. Only regress if new information explicitly contradicts prior assessment. If call contains no new champion activity, explicitly note carry-forward rationale.' Criterion 3/4 should state: 'Next steps must specify concrete actions (request, confirm, introduce, schedule) with recipients and target dates, not open-ended questions.'"
+}

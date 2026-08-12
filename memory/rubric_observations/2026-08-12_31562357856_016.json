@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_016",
+  "timestamp": "2026-08-12T04:35:13.648398",
+  "company": "Route",
+  "criterion_fired": "Criterion 2: Carry-forward consistency",
+  "was_appropriate": false,
+  "suggested_change": "Replace binary carry-forward rule with: 'Score may regress if new call data introduces contradictory or weaker evidence than prior calls. Agent must explicitly state: (a) what evidence from prior call justified the prior score, (b) what new evidence contradicts it, (c) why the new evidence is more reliable. Absence of new quantification = maintain prior score only if prior evidence remains valid in context.'"
+}

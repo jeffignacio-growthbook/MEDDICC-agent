@@ -1,0 +1,21 @@
+{
+  "company": "Taskrabbit",
+  "deal_id": "60652001696",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 7,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Decision Process: Cumulative state shows 'identified' status with score 9/10, but generated analysis downgrades to 'partial' with score 7/10 due to timeline discrepancy. This regression lacks documented reason in the cumulative context. The 16-month gap (August 25 vs October 30, 2026) was not mentioned in previous calls, so this is new information, but the analysis should either: (1) maintain the 9/10 decision_process score and flag the discrepancy as a separate concern, or (2) explicitly document in the analysis that previous calls did not surface this timeline conflict and the recent call revealed it. As written, the downgrade appears unsupported by the carry-forward rule. CRITERION 3 VIOLATION - Competition: Analysis states 'Client favors GrowthBook due to its stable Data Science team and product roadmap confidence, despite concerns over Statsig's recent acquisition' but then correctly notes this preference 'has not been explicitly stated by the client in documented calls. Preference is inferred, not confirmed.' This is evidence of seller inference, not prospect-originated evidence. The score of 8/10 is not justified by explicit quotes or paraphrases from the prospect - the evidence provided is only 'GrowthBook and Statsig are the two finalists.' Per Criterion 3, scores above 5/10 require direct quotes or detailed paraphrases; inferred preference does not qualify. Reduce to 6/10 or provide a direct quote confirming client preference. CRITERION 4 VIOLATION - Champion next step is vague: 'Once identified, request that person present POC results internally to build internal advocacy' uses 'build internal advocacy' without a specific question or concrete action. Should be: '[identified contact]: Present POC results to [specific internal audience, e.g., product leadership] with focus on [specific outcome, e.g., reducing engineering dependency for experiment setup].' CRITERION 5 VIOLATION - Competition: The statement 'Client favors GrowthBook due to its stable Data Science team and product roadmap confidence' is presented as fact without evidence, then contradicted by the next sentence admitting it is 'inferred, not confirmed.' This creates an unsupported claim. Remove the preference assertion or ground it in explicit client evidence.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-12_31562357856_005",
+  "timestamp": "2026-08-12T04:25:55.375609"
+}

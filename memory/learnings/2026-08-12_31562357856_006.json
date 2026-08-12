@@ -1,0 +1,21 @@
+{
+  "company": "Unity",
+  "deal_id": "49689180024",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "1. CRITERION 2 VIOLATION - Decision Criteria: Score revised from 7/10 to 5/10 without documented reason in cumulative state. Analysis states 'revised from 7/10' but provides no explanation of what contradicted the prior assessment. The cumulative state shows these were 'Identified' with score 7/10. If no new call information contradicts this, the score should be maintained at 7/10 with explicit note: 'No new decision criteria information in this call - maintaining previous score of 7/10.' If downgrading is warranted, the analysis must cite specific contradictory evidence from the recent call.\n\n2. CRITERION 2 VIOLATION - Identified Pain: Score revised from 8/10 to 6/10 without documented reason. Cumulative state shows 'Identified' status with score 8/10. Analysis claims pain 'is mentioned but not validated as urgent' but provides no evidence that a recent call contradicted the prior 8/10 assessment. Must either: (a) maintain 8/10 with explicit note about no new information, or (b) cite specific recent call evidence showing pain is less validated than previously assessed.\n\n3. CRITERION 4 VIOLATION - Next steps use vague language: 'Schedule follow-up with Jake Heier' (violates 'follow up'), 'Schedule 45-minute criteria alignment call' (lacks specific action verb - 'ask' is present but phrasing is vague), multiple instances of '[specific date within X]' and '[date within X]' instead of concrete dates.\n\n4. CRITERION 4 VIOLATION - Economic Buyer next step references 'Jake Heier' but no evidence provided that Jake Heier knows who the economic buyer is or can facilitate introduction. Next step should clarify: 'Ask Jake Heier: Does he have direct access to budget authority, or should we identify who does?'\n\n5. CRITERION 1 VIOLATION - Contact titles: Analysis lists five contacts (Logan Bates, Sarel Matza, Jake Heier, Shachar Sasson, Maya Tugendreich) but explicitly notes 'titles not provided in transcripts.' This creates ambiguity for targeting. While not a complete criterion failure, the analysis should flag this as a requirement for next steps: identify and document all contact titles.\n\n6. CRITERION 5 VIOLATION - ICP fit not assessed: No statement on whether Unity meets GrowthBook ICP. No mention of: company scale (user base, revenue), modern data stack usage, product-led growth motion, or experimentation priority. Analysis must include ICP assessment: 'Unity appears to meet ICP (multiple team members evaluating, active experimentation/feature flag use case, technical sophistication evident)' or note gaps.\n\n7. CRITERION 3 VIOLATION - Evidence quality for Decision Criteria and Identified Pain: Analysis acknowledges 'No direct quotes available' and 'without direct quotes.' For scores above 5/10, direct quotes or detailed paraphrases required. Current evidence is insufficient for prior 8/10 on pain or 7/10 on criteria. If these scores are maintained from cumulative state, analysis must explicitly state this carry-forward rationale.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-12_31562357856_006",
+  "timestamp": "2026-08-12T04:28:49.473556"
+}

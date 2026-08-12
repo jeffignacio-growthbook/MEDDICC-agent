@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_007",
+  "timestamp": "2026-08-12T04:22:17.293635",
+  "company": "OpenTable",
+  "criterion_fired": "Criterion 3 & 2 (Identified Pain scoring)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 3 (Identified Pain) should explicitly distinguish: 'Business pain (6+/10) = quantified revenue loss, conversion/velocity targets at risk. Operational/process friction (3-5/10) = delays, approval loops, setup complexity. If evidence shows only operational friction, score 3-5/10; do not inflate to 6/10.'"
+}

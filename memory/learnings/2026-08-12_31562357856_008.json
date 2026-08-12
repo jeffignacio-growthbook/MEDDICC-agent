@@ -1,0 +1,21 @@
+{
+  "company": "Ryanair",
+  "deal_id": "59387794836",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Champion component regressed from 5/10 (Partial) to 1/10 (Unknown) without documented reason. The analysis states 'Champion revised from 5/10 to 1/10 \u2014 this call provides no evidence of internal selling behavior' but this violates carry-forward consistency. The cumulative state identified Liam and Scott as leaders with ownership roles (score 5/10). The recent call does not contradict this; it simply provides no new information. Per Criterion 2, the analysis must maintain 5/10 and explicitly note 'No new champion activity information in this call - maintaining previous assessment of 5/10 based on Liam's leadership transition and Scott's migration planning ownership.' Only regress if evidence contradicts prior assessment (e.g., 'Liam stated he is not involved in the renewal decision'). This is a carry-forward error, not a score correction. CRITERION 3 VIOLATION - Champion next steps contain vague verbs without specific actions. Example: '[Paul Sheridan]: Who internally is actively building the case for renewing GrowthBook' asks an open question but does not specify a concrete action like 'Ask Paul to introduce you to [name] and schedule a call to discuss the business case' or 'Request Paul to send you the internal evaluation criteria document by [date].' Next steps must include specific actions, not just open questions. CRITERION 4 VIOLATION - Identified Pain next step lacks specificity: '[Paul Sheridan]: How urgent is solving the resource constraints...' is a discussion question, not an actionable next step. Replace with: 'Confirm with Paul Sheridan by Thursday: Are resource constraints blocking the trial success before August-September, and can we allocate dedicated GrowthBook resources to accelerate engagement improvements?' All other components pass evaluation.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-12_31562357856_008",
+  "timestamp": "2026-08-12T04:31:16.382000"
+}

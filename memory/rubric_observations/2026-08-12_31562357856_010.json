@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-12_31562357856_010",
+  "timestamp": "2026-08-12T04:25:55.375939",
+  "company": "Taskrabbit",
+  "criterion_fired": "Criterion 2 (Decision Process), Criterion 3 (Competition), Criterion 4 (Champion), Criterion 5 (Competition)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'Scores 5+/10 require direct quotes or detailed paraphrases, never inferred preference. Score regressions must document root cause in analysis. Champion next steps must name specific person, audience, and measurable outcome, never use vague phrases like build advocacy.'"
+}
