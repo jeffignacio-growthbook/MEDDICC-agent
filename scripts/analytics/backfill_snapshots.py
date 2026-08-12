@@ -192,13 +192,17 @@ class SnapshotBackfiller:
         stage_order = self.get_stage_order(stage_id)
         deal_status = self.get_deal_status(stage_id)
 
+        # Get pipeline_id from stage_map (uses pipeline['id'] not pipeline['name'])
+        stage_info = self.stage_map.get(stage_id, {})
+        pipeline_id = stage_info.get('pipeline_id', 'default')
+
         # Pull current deal values (today's ARR as proxy for historical ARR)
         current = self.current_deals.get(deal_id, {})
 
         snapshot = {
             'deal_id': deal_id,
             'snapshot_date': snapshot_date.date().isoformat(),
-            'pipeline_id': current.get('pipeline_id') or 'default',
+            'pipeline_id': pipeline_id,
             'stage_id': stage_id,
             'stage_order': stage_order,
             'deal_value': current.get('deal_value'),      # Today's ARR
