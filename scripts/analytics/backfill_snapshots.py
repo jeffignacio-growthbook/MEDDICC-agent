@@ -219,6 +219,25 @@ class SnapshotBackfiller:
         Returns summary statistics.
         """
         snapshot_dates = self.generate_snapshot_dates(weeks=52)
+
+        # Find earliest prospective snapshot date — never backfill
+        # on or after this date
+        prospective = select_all(self.client, 'deals_snapshot',
+            columns='snapshot_date',
+            filters=[('eq', 'snapshot_source', 'prospective')])
+        if prospective:
+            earliest_prospective = min(r['snapshot_date'] for r in prospective)
+            earliest_prospective_dt = datetime.fromisoformat(earliest_prospective)
+            print(f"Earliest prospective snapshot: {earliest_prospective}")
+            print(f"Backfill will stop before this date")
+            print()
+        else:
+            earliest_prospective_dt = None
+
+        # Filter out dates >= earliest prospective
+        if earliest_prospective_dt:
+            snapshot_dates = [d for d in snapshot_dates if d < earliest_prospective_dt]
+
         deal_ids = list(self.property_history.keys())
 
         print(f"Generating snapshots for {len(deal_ids)} deals")
