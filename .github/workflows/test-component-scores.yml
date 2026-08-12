@@ -1,0 +1,32 @@
+name: Test Component Scores (Dry-run)
+
+on:
+  workflow_dispatch:
+    inputs:
+      company:
+        description: 'Company name to test'
+        required: true
+        default: 'Skyscanner'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests anthropic
+
+      - name: Run dry-run test
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          FIREFLIES_API_KEY: ${{ secrets.FIREFLIES_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python scripts/test_component_scores.py --company "${{ github.event.inputs.company }}"
