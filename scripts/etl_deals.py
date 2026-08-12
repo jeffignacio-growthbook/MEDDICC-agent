@@ -489,6 +489,22 @@ def main():
         deal_name = props.get('dealname', '')
         pipeline = props.get('pipeline') or ''
         stage = props.get('dealstage') or ''
+
+        # Normalize display names to stage IDs (HubSpot CSV exports return display names)
+        STAGE_NAME_TO_ID = {
+            'Closed lost': 'closedlost',
+            'Closed won': 'closedwon',
+            'Disqualified': '68509551',
+            'Meeting Set': '79653122',
+            'Discovery': 'appointmentscheduled',
+            'Scoping': 'qualifiedtobuy',
+            'Technical Evaluation': 'presentationscheduled',
+            'Review': 'decisionmakerboughtin',
+            'Negotiating': '24682892',
+            'Awaiting Signature': '43449439'
+        }
+        stage = STAGE_NAME_TO_ID.get(stage, stage)
+
         arr = props.get('incremental_arr') or props.get('amount', '0')
         close_date = props.get('closedate', '')
         create_date = props.get('createdate', '')
