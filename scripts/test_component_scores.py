@@ -65,6 +65,8 @@ def main():
     )
     parser.add_argument('--company', required=True,
                        help='Company name (e.g., "Box")')
+    parser.add_argument('--write', action='store_true',
+                       help='Actually write to HubSpot and Supabase (default: dry-run only)')
     args = parser.parse_args()
 
     company_name = args.company
@@ -191,9 +193,63 @@ def main():
     print("=" * 70)
     print("WRITE SUMMARY")
     print("=" * 70)
-    print(f"Would write {len(component_details) * 3} properties to HubSpot deal {deal_id}")
-    print(f"Would write component_details JSONB to Supabase analyses")
-    print()
+
+    if args.write:
+        # Actually write to HubSpot and Supabase
+        print(f"✍️  Writing {len(component_details) * 3} properties to HubSpot deal {deal_id}...")
+        try:
+            hubspot.write_component_scores(
+                deal_id=deal_id,
+                component_details=component_details
+            )
+            print(f"✓ HubSpot component scores written successfully")
+        except Exception as e:
+            print(f"❌ HubSpot write failed: {e}")
+            return 1
+
+        print(f"✍️  Writing component_details to Supabase analyses...")
+        try:
+            from supabase_client import SupabaseWriter
+            sb_writer = SupabaseWriter()
+
+            # Create minimal result and scores for insert_analysis
+            result = {
+                'draft': f'Test analysis for {company_name}',
+                'iterations': 1,
+                'passed': True,
+                'outcome': 'test'
+            }
+            scores = {
+                'overall_score': sum(d['score'] for d in component_details.values()),
+                'status': 'test',
+                'metrics_score': component_details.get('metrics', {}).get('score', 0),
+                'economic_buyer_score': component_details.get('economic_buyer', {}).get('score', 0),
+                'decision_criteria_score': component_details.get('decision_criteria', {}).get('score', 0),
+                'decision_process_score': component_details.get('decision_process', {}).get('score', 0),
+                'pain_score': component_details.get('identified_pain', {}).get('score', 0),
+                'champion_score': component_details.get('champion', {}).get('score', 0),
+                'competition_score': component_details.get('competition', {}).get('score', 0),
+                'summary': 'Test run'
+            }
+
+            sb_writer.insert_analysis(
+                deal_id=str(deal_id),
+                company_name=company_name,
+                result=result,
+                scores=scores,
+                output_file='test_run',
+                component_details=component_details
+            )
+            print(f"✓ Supabase component_details written successfully")
+        except Exception as e:
+            print(f"❌ Supabase write failed: {e}")
+            return 1
+        print()
+    else:
+        print(f"Would write {len(component_details) * 3} properties to HubSpot deal {deal_id}")
+        print(f"Would write component_details JSONB to Supabase analyses")
+        print(f"(Use --write flag to actually write)")
+        print()
 
     # Calculate total tokens from session records
     total_tokens = sum(r['input_tokens'] + r['output_tokens']
