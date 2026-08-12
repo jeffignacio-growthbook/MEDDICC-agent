@@ -1,0 +1,29 @@
+name: Audit MEDDICC Properties
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Audit HubSpot MEDDICC properties
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          python3 - <<'EOF'
+          import os, requests, json
+          resp = requests.get(
+            'https://api.hubapi.com/crm/v3/properties/deals',
+            params={'limit': 1000},
+            headers={'Authorization': f'Bearer {os.environ["HUBSPOT_API_KEY"]}'}
+          )
+          props = resp.json().get('results', [])
+          meddicc = [p for p in props
+                     if 'meddicc' in p['name'].lower()
+                     or 'meddicc' in (p.get('label') or '').lower()]
+          for p in sorted(meddicc, key=lambda x: x['name']):
+              print(f"{p['name']:45s} type={p['type']} label={p.get('label')!r}")
+          print(f"\nTotal MEDDICC properties: {len(meddicc)}")
+          EOF
