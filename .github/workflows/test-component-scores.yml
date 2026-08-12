@@ -10,7 +10,11 @@ on:
       branch:
         description: 'Branch to test from'
         required: true
-        default: 'phase-f-component-scoring'
+        default: 'main'
+      write:
+        description: 'Actually write to HubSpot/Supabase (true/false)'
+        required: false
+        default: 'false'
 
 jobs:
   test:
@@ -27,12 +31,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests anthropic pyyaml pytz
+          pip install requests anthropic pyyaml pytz supabase
 
-      - name: Run dry-run test
+      - name: Run test
         env:
           HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
           FIREFLIES_API_KEY: ${{ secrets.FIREFLIES_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
-          python scripts/test_component_scores.py --company "${{ github.event.inputs.company }}"
+          if [ "${{ github.event.inputs.write }}" = "true" ]; then
+            python scripts/test_component_scores.py --company "${{ github.event.inputs.company }}" --write
+          else
+            python scripts/test_component_scores.py --company "${{ github.event.inputs.company }}"
+          fi
