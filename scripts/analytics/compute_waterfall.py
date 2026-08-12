@@ -72,31 +72,37 @@ def main():
         print("=" * 70)
         print()
 
-        # Get all distinct snapshot dates in ascending order
-        # Use raw SQL to get DISTINCT dates efficiently
-        from supabase_client import select_all
+        # Get ONLY dates where ALL snapshots are backfilled
+        # (excludes overlap dates that have prospective rows)
+        all_snapshots = select_all(sb, 'deals_snapshot',
+                                   columns='snapshot_date,snapshot_source')
+        from collections import defaultdict
+        date_sources = defaultdict(set)
+        for row in all_snapshots:
+            date_sources[row['snapshot_date']].add(row['snapshot_source'])
 
-        # Get all unique snapshot dates via select_all (handles pagination)
-        all_snapshots = select_all(sb, 'deals_snapshot', columns='snapshot_date')
-        unique_dates = sorted(set(row['snapshot_date'] for row in all_snapshots))
+        backfill_dates = sorted(
+            d for d, sources in date_sources.items()
+            if sources == {'backfilled'}   # ONLY pure backfill dates
+        )
 
-        if len(unique_dates) < 2:
-            print("Insufficient snapshot history — need at least 2 snapshot dates")
+        if len(backfill_dates) < 2:
+            print("Insufficient backfilled snapshot history — skipping")
             return
 
-        print(f"Found {len(unique_dates)} snapshot dates")
-        print(f"  Oldest: {unique_dates[0]}")
-        print(f"  Newest: {unique_dates[-1]}")
+        print(f"Found {len(backfill_dates)} backfilled snapshot dates")
+        print(f"  Oldest: {backfill_dates[0]}")
+        print(f"  Newest: {backfill_dates[-1]}")
         print()
-        print(f"Will compute {len(unique_dates) - 1} weekly waterfalls")
+        print(f"Will compute {len(backfill_dates) - 1} weekly waterfalls")
         print()
 
         # Compute waterfall for each consecutive pair
-        for i in range(len(unique_dates) - 1):
-            prev_date = unique_dates[i]
-            new_date = unique_dates[i + 1]
+        for i in range(len(backfill_dates) - 1):
+            prev_date = backfill_dates[i]
+            new_date = backfill_dates[i + 1]
 
-            print(f"[{i + 1}/{len(unique_dates) - 1}] Computing {new_date} vs {prev_date}")
+            print(f"[{i + 1}/{len(backfill_dates) - 1}] Computing {new_date} vs {prev_date}")
 
             compute_waterfall_for_dates(
                 sb, config, qual_map, threshold,
@@ -406,6 +412,19 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
             'details': json.dumps(wf['details']),
             'computed_source': computed_source,
         }
+
+        if computed_source == 'backfill':
+            existing = sb.table('waterfall_weekly')\
+                .select('computed_source')\
+                .eq('week_ending', new_date)\
+                .eq('pipeline_id', pipeline_id)\
+                .execute()
+            if existing.data and existing.data[0].get(
+                    'computed_source') == 'prospective':
+                print(f"  Skipping {pipeline_id} {new_date} — "
+                      f"prospective row exists")
+                continue
+
         sb.table('waterfall_weekly').upsert(
             row, on_conflict='week_ending,pipeline_id'
         ).execute()
