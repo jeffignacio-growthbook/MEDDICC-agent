@@ -259,7 +259,7 @@ class SnapshotBackfiller:
             # Check for history replay mismatch
             if deal_snapshots:
                 final_snapshot = deal_snapshots[-1]  # Last snapshot (most recent)
-                final_stage = final_snapshot['stage']
+                final_stage = final_snapshot['stage_id']
                 current_deal = self.current_deals.get(deal_id)
                 current_stage = current_deal.get('stage') if current_deal else None
                 company_name = current_deal.get('company_name', 'Unknown') if current_deal else 'Unknown'
