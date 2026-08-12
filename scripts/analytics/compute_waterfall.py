@@ -73,12 +73,12 @@ def main():
         print()
 
         # Get all distinct snapshot dates in ascending order
-        snapshot_dates = sb.table('deals_snapshot')\
-            .select('snapshot_date')\
-            .order('snapshot_date', desc=False)\
-            .execute().data or []
+        # Use raw SQL to get DISTINCT dates efficiently
+        from supabase_client import select_all
 
-        unique_dates = sorted(set(row['snapshot_date'] for row in snapshot_dates))
+        # Get all unique snapshot dates via select_all (handles pagination)
+        all_snapshots = select_all(sb, 'deals_snapshot', columns='snapshot_date')
+        unique_dates = sorted(set(row['snapshot_date'] for row in all_snapshots))
 
         if len(unique_dates) < 2:
             print("Insufficient snapshot history — need at least 2 snapshot dates")
