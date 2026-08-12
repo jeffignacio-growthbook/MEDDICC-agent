@@ -1,0 +1,19 @@
+{
+  "company": "Aug 11, 10:32",
+  "slug": "aug-11-10-32",
+  "last_etl_date": "2026-08-12T03:35:51.831663",
+  "calls": [
+    {
+      "id": "01KZRY4GGAGEG303FJGJBBCE87",
+      "source": "fireflies",
+      "title": "Aug 11, 10:32 AM",
+      "date": "2026-08-11",
+      "duration_minutes": 0.03999999910593033,
+      "summary": "",
+      "organizer": "gabe@growthbook.io",
+      "participants": 1,
+      "keywords": "",
+      "action_items": ""
+    }
+  ]
+}

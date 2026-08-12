@@ -1,0 +1,22 @@
+{
+  "company": "jack/alyssa/scott",
+  "slug": "jack-alyssa-scott",
+  "last_etl_date": "2026-08-12T03:35:51.830847",
+  "calls": [
+    {
+      "id": "01KZM4D1VVE9AGCY57C4PYJG0P",
+      "source": "fireflies",
+      "title": "jack/alyssa/scott",
+      "date": "2026-08-11",
+      "duration_minutes": 48.029998779296875,
+      "summary": "The meeting addressed the introduction and expanded use of the MCP server, now supporting not only engineers but also product managers and growth teams. Key points discussed included the ongoing one-shot installation process and the need to update documentation affected by the Mintlify migration. The conversation highlighted preferences for human oversight in agent autonomy, emphasizing validation features for safety. Additionally, the meeting covered how the MCP server is designed to support the entire experimentation lifecycle with a robust REST API, and it positioned GrowthBook as a leading open-source feature flag and experimentation platform, enhanced by in-app AI tooling that broadens its user base.",
+      "organizer": "alyssa@growthbook.io",
+      "participants": 3,
+      "keywords": "GrowthBook, MCP server, AI agents, Speakeasy, feature flagging, experimentation workflows",
+      "action_items": "*, *, S, c, o, t, t,  , B, a, i, l, e, y, *, *,  ,  , \n, P, i, n, g,  , O, m, a, r,  , t, o,  , u, p, d, a, t, e,  , M, C, P,  , s, e, r, v, e, r,  , d, o, c, u, m, e, n, t, a, t, i, o, n,  , (, 0, 5, :, 1, 2, ),  ,  , \n, \n, *, *, A, l, y, s, s, a,  , N, i, c, o, l, l, *, *,  ,  , \n, P, r, o, v, i, d, e,  , g, o, v, e, r, n, a, n, c, e,  , b, l, o, g,  , p, o, s, t, s,  , a, n, d,  , r, e, l, e, a, s, e,  , n, o, t, e, s,  , t, o,  , J, a, c, k,  , (, 3, 5, :, 5, 4, ),  ,  , \n, S, e, n, d,  , m, e, e, t, i, n, g,  , t, r, a, n, s, c, r, i, p, t,  , a, n, d,  , g, o, v, e, r, n, a, n, c, e,  , l, i, n, k,  , t, o,  , J, a, c, k,  , (, 4, 0, :, 5, 5, ),  ,  , \n, \n, *, *, J, a, c, k,  , V, i, r, a, g, *, *,  ,  , \n, I, n, i, t, i, a, t, e,  , S, l, a, c, k,  , c, h, a, t,  , f, o, r,  , M, C, P,  , s, e, r, v, e, r,  , f, o, l, l, o, w, -, u, p,  , (, 4, 0, :, 4, 5, )",
+      "participant_domains": [
+        "deadwater.ai"
+      ]
+    }
+  ]
+}

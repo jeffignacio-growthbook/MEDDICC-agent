@@ -1,0 +1,19 @@
+{
+  "company": "Scott Keller's Personal",
+  "slug": "scott-keller-s-personal",
+  "last_etl_date": "2026-08-12T03:35:51.836562",
+  "calls": [
+    {
+      "id": "01KZRCHT67FQDG859K28F76Y9T",
+      "source": "fireflies",
+      "title": "Scott Keller's Personal Meeting Room",
+      "date": "2026-08-11",
+      "duration_minutes": 11.489999771118164,
+      "summary": "",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "keywords": "",
+      "action_items": ""
+    }
+  ]
+}

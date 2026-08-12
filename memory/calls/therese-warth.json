@@ -1,0 +1,22 @@
+{
+  "company": "Therese Warth",
+  "slug": "therese-warth",
+  "last_etl_date": "2026-08-12T03:35:51.835513",
+  "calls": [
+    {
+      "id": "01KZKM8W8EB2MY1KQXBEANZS3E",
+      "source": "fireflies",
+      "title": "GrowthBook Product Analytics Feedback (Therese Warth)",
+      "date": "2026-08-11",
+      "duration_minutes": 23.969999313354492,
+      "summary": "The discussion covered several key areas, starting with user feedback on the contextual bandit insight and the value of the visual editor for design and marketing. Attention was given to user experience metrics such as clicks, views, and session depth, while product managers expressed the need for more customizable dashboard options. Challenges with data integration were noted, as only key fact tables are currently imported, limiting product analytics effectiveness. Confusion arose from having a separate funnel builder from the dashboard, prompting plans to unify these experiences. Feedback highlighted issues with the AI chatbot, including outdated data and difficulties interpreting test results, leading to intentions for further investigation into the chatbot's data access. Finally, plans for a new learnings module and future user testing were confirmed.",
+      "organizer": "alyssa@growthbook.io",
+      "participants": 3,
+      "keywords": "product analytics, A/B testing, dashboards, AI chatbot, user experience metrics, data self-service",
+      "action_items": "*, *, E, l, y, s, e,  , F, o, x, *, *,  ,  , \n, S, e, n, d,  , F, i, r, e, f, l, i, e, s,  , c, a, l, l,  , l, i, n, k, s,  , t, o,  , A, l, y, s, s, a,  , N, i, c, o, l, l,  , (, 0, 0, :, 3, 9, ),  ,  , \n, C, o, o, r, d, i, n, a, t, e,  , f, o, l, l, o, w, -, u, p,  , w, i, t, h,  , T, h, e, r, e, s, e,  , W, a, r, t, h,  , (, 2, 0, :, 5, 1, ),  ,  , \n, C, o, n, n, e, c, t,  , w, i, t, h,  , T, h, e, r, e, s, e,  , W, a, r, t, h, ', s,  , p, r, o, d, u, c, t,  , m, a, n, a, g, e, r, s,  , (, 2, 2, :, 3, 2, ),  ,  , \n, \n, *, *, A, l, y, s, s, a,  , N, i, c, o, l, l, *, *,  ,  , \n, I, n, v, e, s, t, i, g, a, t, e,  , A, I,  , c, h, a, t, b, o, t,  , s, t, a, l, e,  , d, a, t, a,  , i, s, s, u, e,  , (, 1, 0, :, 3, 9, ),  ,  , \n, R, e, a, c, h,  , o, u, t,  , t, o,  , T, h, e, r, e, s, e,  , W, a, r, t, h,  , o, n,  , A, I,  , l, e, a, r, n, i, n, g,  , m, o, d, u, l, e,  , (, 1, 8, :, 2, 4, ),  ,  , \n, G, a, t, h, e, r,  , a, n, s, w, e, r, s,  , t, o,  , T, h, e, r, e, s, e, ', s,  , E, x, p, l, o, r, e, r,  , f, e, e, d, b, a, c, k,  , (, 2, 0, :, 4, 3, ),  ,  , \n, \n, *, *, T, h, e, r, e, s, e,  , W, a, r, t, h, *, *,  ,  , \n, F, a, c, i, l, i, t, a, t, e,  , c, o, n, n, e, c, t, i, o, n,  , w, i, t, h,  , p, r, o, d, u, c, t,  , m, a, n, a, g, e, r, s,  , (, 2, 2, :, 2, 4, )",
+      "participant_domains": [
+        "funkemedien.de"
+      ]
+    }
+  ]
+}

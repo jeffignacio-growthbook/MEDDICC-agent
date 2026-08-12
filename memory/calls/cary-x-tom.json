@@ -1,0 +1,22 @@
+{
+  "company": "Cary x Tom",
+  "slug": "cary-x-tom",
+  "last_etl_date": "2026-08-12T03:35:51.830649",
+  "calls": [
+    {
+      "id": "01KZS9ZWAG1C7FX7KV5438GEMF",
+      "source": "fireflies",
+      "title": "Cary x Tom - QBR Prep",
+      "date": "2026-08-11",
+      "duration_minutes": 1,
+      "summary": "",
+      "organizer": "cary@growthbook.io",
+      "participants": 3,
+      "keywords": "",
+      "action_items": "",
+      "participant_domains": [
+        "sony.com"
+      ]
+    }
+  ]
+}

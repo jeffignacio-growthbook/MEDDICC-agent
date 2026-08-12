@@ -1,0 +1,19 @@
+{
+  "company": "Chris S. v.",
+  "slug": "chris-s-v",
+  "last_etl_date": "2026-08-12T03:35:51.831519",
+  "calls": [
+    {
+      "id": "01KZS0ABVTAQT52V5GPX2HS91A",
+      "source": "fireflies",
+      "title": "Chris S. v. JM",
+      "date": "2026-08-11",
+      "duration_minutes": 20.3799991607666,
+      "summary": "The discussion elaborated on how to set up experiments by linking data sources and user variations effectively. The team clarified the process of creating managed warehouses, configuring SDKs, and writing queries for user ID consistency. They also reviewed the significance of fact tables for flexible multi-metric event tracking, emphasizing how traffic splits are managed using hash ranges to ensure consistent user experiences throughout experiments. Additionally, the role of feature flags in delivering targeted variants was addressed, highlighting how complex targeting rules can refine user exposure. Overall, the meeting reinforced a shared understanding of the experiment setup, aiding in better design choices and cross-team alignment.",
+      "organizer": "johnny@growthbook.io",
+      "participants": 1,
+      "keywords": "experiment assignment, SDK setup, feature flags, hash bucketing, fact tables, traffic targeting",
+      "action_items": "\n, *, *, C, h, r, i, s,  , S, a, n, d, e, r, s, *, *, \n, P, r, o, v, i, d, e,  , f, u, r, t, h, e, r,  , e, x, p, l, a, n, a, t, i, o, n,  , o, r,  , s, u, p, p, o, r, t,  , i, f,  , c, u, s, t, o, m, e, r, s,  , e, n, c, o, u, n, t, e, r,  , I, D,  , m, i, s, m, a, t, c, h, e, s,  , c, a, u, s, i, n, g,  , s, a, m, p, l, e,  , r, a, t, i, o,  , i, s, s, u, e, s,  , (, 0, 4, :, 4, 0, ), \n, \n, *, *, J, o, h, n, n, y,  , M, a, r, t, i, n, e, z, *, *, \n, R, e, v, i, e, w,  , t, h, e,  , r, e, c, o, r, d, i, n, g,  , a, g, a, i, n,  , t, o,  , s, o, l, i, d, i, f, y,  , u, n, d, e, r, s, t, a, n, d, i, n, g,  , o, f,  , e, x, p, e, r, i, m, e, n, t,  , s, e, t, u, p,  , a, n, d,  , f, e, a, t, u, r, e,  , f, l, a, g,  , i, n, t, e, g, r, a, t, i, o, n,  , f, o, r,  , p, r, o, d, u, c, t,  , d, e, s, i, g, n,  , i, m, p, r, o, v, e, m, e, n, t, s,  , (, 1, 9, :, 0, 8, ), \n"
+    }
+  ]
+}
