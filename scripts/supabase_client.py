@@ -143,6 +143,8 @@ class SupabaseWriter:
             row['company_employee_count'] = _safe_int(deal['company_employee_count'])
         if 'segment' in deal:
             row['segment'] = deal.get('segment')
+        if 'segment_reason' in deal:
+            row['segment_reason'] = deal.get('segment_reason')  # Diagnostic field
 
         # Handle highest_stage_order_reached (max logic)
         if 'current_stage_order' in deal:
