@@ -261,11 +261,87 @@ async def query_deal(params: dict, sb) -> dict:
         columns="category,verbatim_quote,rep_response",
         filters=[("eq", "company_name", deal["company_name"])])
 
-    return {
-        "deal":       deal,
+    # Check for deal-specific analysis file
+    from pathlib import Path
+    import sys
+    REPO_ROOT = Path(__file__).parent.parent
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+    from utils import slugify
+
+    company_slug = slugify(deal["company_name"])
+    output_file = REPO_ROOT / "memory" / "analyses" / f"{company_slug}.md"
+
+    result = {
+        "deal": deal,
         "latest_analysis": latest,
         "objections": objections,
     }
+
+    if output_file.exists():
+        content = output_file.read_text()[:3000]
+        result["deal_specific_next_steps"] = content
+        result["next_steps_source"] = "deal_analysis"
+    else:
+        # Fall back to rubric bands
+        from api.rubric import get_band, get_next_steps
+        component_details = latest.get("component_details") or {}
+        for component, data in component_details.items():
+            if isinstance(data, dict):
+                score = data.get("score", 0)
+                data["band"] = get_band(component, score)
+                data["next_steps"] = get_next_steps(component, score)
+        result["next_steps_source"] = "rubric_fallback"
+
+    return result
+
+
+async def query_rubric(params: dict, sb) -> dict:
+    """
+    General rubric questions like 'what does a 6 mean for champion?'
+    Returns band descriptions and next steps guidance.
+    """
+    from api.rubric import RUBRIC, get_band, get_next_steps, get_band_description
+
+    # Extract component and score from params if specified
+    # Otherwise return full rubric
+    component = params.get("component")
+    score = params.get("score")
+
+    if component and score is not None:
+        # Specific component + score query
+        band = get_band(component, score)
+        description = get_band_description(component, score)
+        next_steps = get_next_steps(component, score)
+
+        return {
+            "component": component,
+            "score": score,
+            "band": band,
+            "description": description,
+            "next_steps": next_steps,
+        }
+    elif component:
+        # Just component, return all bands
+        component_key = component.lower().replace(" ", "_")
+        if component_key in RUBRIC:
+            return {
+                "component": component,
+                "bands": RUBRIC[component_key]["bands"],
+                "next_steps": RUBRIC[component_key]["next_steps"],
+            }
+        else:
+            return {"error": f"Unknown component: {component}"}
+    else:
+        # General rubric query - return overview
+        return {
+            "rubric_overview": {
+                comp: {
+                    "bands": data["bands"],
+                    "next_steps": data["next_steps"],
+                }
+                for comp, data in RUBRIC.items()
+            }
+        }
 
 
 async def generate_win_loss(params: dict, sb) -> dict:

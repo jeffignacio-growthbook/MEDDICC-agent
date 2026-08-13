@@ -29,6 +29,7 @@ Handlers:
   query_feature_gaps    - feature gaps by severity/competitor
   query_coverage        - pipeline coverage vs target, quota attainment
   query_deal            - deep dive on a specific company's deal
+  query_rubric          - general scoring questions like "what does a 6 mean for champion?"
   generate_win_loss     - full narrative for a specific closed deal (slow)
   set_target            - admin: set quota or target (requires auth)
   dynamic_query         - question requires combining data from multiple tables
@@ -444,7 +445,14 @@ async def route_question(question: str, user_id: str,
             "- Keep answers to 5-8 lines max — Slack is not a report\n"
             "- Lead with the direct answer, then supporting detail\n"
             "- End with one actionable insight if relevant\n"
-            "- Never invent numbers. Use $ and K/M suffixes."
+            "- Never invent numbers. Use $ and K/M suffixes.\n\n"
+            "COACHING GUIDANCE:\n"
+            "- If next_steps_source = 'deal_analysis': Reference the "
+            "deal-specific analysis for tailored coaching.\n"
+            "- If next_steps_source = 'rubric_fallback': Use the band "
+            "descriptions and generic next steps from the rubric.\n"
+            "- If band/next_steps fields present in component_details, "
+            "include them in your answer."
         ),
         messages=[
             *[{"role": m["role"], "content": m["content"]}
