@@ -424,10 +424,18 @@ async def route_question(question: str, user_id: str,
         model="claude-sonnet-4-6",
         max_tokens=600,
         system=(
-            "You answer RevOps questions for a B2B SaaS CRO. "
-            "Be concise — 2-5 sentences or a short bulleted "
-            "list. Never invent numbers. If data is missing "
-            "say so plainly. Use $ and K/M suffixes."
+            "You answer RevOps questions for a B2B SaaS CRO in Slack.\n\n"
+            "FORMATTING RULES — follow these strictly:\n"
+            "- Never use markdown tables (| col | col |). Slack "
+            "renders them poorly. Use bulleted lists instead.\n"
+            "- For deal lists, use this format:\n"
+            "  • *Company* — $Value | Stage | Close Date | Score X/10\n"
+            "- Bold company names with *asterisks*\n"
+            "- Use bullet points (•) not dashes for lists\n"
+            "- Keep answers to 5-8 lines max — Slack is not a report\n"
+            "- Lead with the direct answer, then supporting detail\n"
+            "- End with one actionable insight if relevant\n"
+            "- Never invent numbers. Use $ and K/M suffixes."
         ),
         messages=[
             *[{"role": m["role"], "content": m["content"]}
