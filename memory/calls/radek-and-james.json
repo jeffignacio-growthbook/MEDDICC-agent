@@ -1,0 +1,22 @@
+{
+  "company": "Radek and James",
+  "slug": "radek-and-james",
+  "last_etl_date": "2026-08-13T03:42:39.064011",
+  "calls": [
+    {
+      "id": "01KZQP2SS070EBQTKEJTY87GGG",
+      "source": "fireflies",
+      "title": "Radek and James Shannon",
+      "date": "2026-08-12",
+      "duration_minutes": 37.95000076293945,
+      "summary": "The meeting detailed how GrowthBook addresses client needs in e-commerce experimentation and analytics. Radek highlighted challenges clients face with tool selection and the demand for integrated A/B testing features. James discussed GrowthBook’s engineering-led design that caters to both technical and non-technical users, emphasizing its AI integration and warehouse-native approach to minimize event cost spikes. They confirmed its mobile app support and local SDK caching for performance. Security concerns were addressed, ensuring GDPR compliance and user opt-in tracking. Pricing structures were laid out, including a free tier and Pro version aimed at empowering marketing teams, while participants emphasized the importance of understanding experimentation concepts for effective usage.",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "keywords": "A/B testing, feature flags, GrowthBook, data warehouse integration, e-commerce, SDK support",
+      "action_items": "\n, *, *, J, a, m, e, s,  , S, h, a, n, n, o, n, *, *, \n, S, e, n, d,  , R, a, d, e, k,  , t, h, e,  , G, r, o, w, t, h, B, o, o, k,  , p, i, t, c, h,  , f, o, l, d, e, r, ,,  , p, r, e, s, e, n, t, a, t, i, o, n,  , m, a, t, e, r, i, a, l, s, ,,  , a, n, d,  , r, e, c, o, r, d, i, n, g,  , o, f,  , t, h, i, s,  , s, e, s, s, i, o, n,  , t, o,  , s, u, p, p, o, r, t,  , h, i, s,  , r, e, v, i, e, w,  , a, n, d,  , c, u, s, t, o, m, e, r,  , a, d, v, i, s, i, n, g,  , (, 3, 6, :, 1, 6, ), \n, P, r, o, v, i, d, e,  , d, o, c, u, m, e, n, t, a, t, i, o, n,  , a, n, d,  , r, e, s, p, o, n, d,  , t, o,  , a, n, y,  , s, p, e, c, i, f, i, c,  , t, e, c, h, n, i, c, a, l,  , q, u, e, s, t, i, o, n, s,  , R, a, d, e, k,  , m, a, y,  , h, a, v, e,  , a, f, t, e, r,  , r, e, v, i, e, w, i, n, g,  , t, h, e,  , m, a, t, e, r, i, a, l, s,  , (, 3, 3, :, 2, 1, ), \n, \n, *, *, R, a, d, e, k,  , K, u, c, h, t, a, *, *, \n, R, e, v, i, e, w,  , t, h, e,  , p, r, o, v, i, d, e, d,  , G, r, o, w, t, h, B, o, o, k,  , m, a, t, e, r, i, a, l, s,  , a, n, d,  , d, o, c, u, m, e, n, t, a, t, i, o, n,  , t, o,  , g, a, i, n,  , d, e, e, p, e, r,  , u, n, d, e, r, s, t, a, n, d, i, n, g,  , a, n, d,  , a, d, v, i, s, e,  , c, u, s, t, o, m, e, r, s,  , e, f, f, e, c, t, i, v, e, l, y,  , (, 3, 6, :, 1, 6, ), \n, I, n, i, t, i, a, t, e,  , i, n, t, e, g, r, a, t, i, o, n,  , p, r, o, c, e, s, s,  , b, y,  , a, c, c, e, s, s, i, n, g,  , B, i, g, Q, u, e, r, y,  , a, n, d,  , c, o, n, n, e, c, t, i, n, g,  , i, n, i, t, i, a, l,  , e, x, p, e, r, i, m, e, n, t, s,  , f, o, r,  , c, l, i, e, n, t,  , t, e, s, t, i, n, g,  , (, 3, 6, :, 1, 6, ), \n",
+      "participant_domains": [
+        "kaliop.com"
+      ]
+    }
+  ]
+}
