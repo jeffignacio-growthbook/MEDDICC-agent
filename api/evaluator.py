@@ -27,7 +27,7 @@ def evaluate_result(result: dict, handler_name: str) -> str:
     STRUCTURED_HANDLERS = {
         "query_deal":      ["deal"],
         "query_rubric":    ["description", "rubric_overview"],  # score-specific or general
-        "query_win_loss":  ["wins"],
+        "query_win_loss":  ["losses"],  # check losses instead of wins
         "generate_win_loss": ["narrative"],
         "set_target":      ["set"],
         "query_arr":       ["arr_by_customer"],

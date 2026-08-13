@@ -71,26 +71,36 @@ async def assess_correctness(
 
     # Check if answer is an honest data gap explanation
     answer_lower = answer.lower()
-    honest_gap_signals = [
+    HONEST_GAP_SIGNALS = [
         "no lost_reason",
         "not recorded",
         "data is missing",
+        "data on our last",
         "no company name",
         "crm hygiene",
         "worth flagging",
         "no objections recorded",
         "no data",
         "not captured",
+        "data simply isn't there",
+        "can't determine why",
+        "largely missing",
+        "very sparse",
+        "blank in the crm",
+        "reps aren't logging",
+        "no actionable",
+        "unfortunately",  # most honest gap answers start this way
     ]
-    if any(signal in answer_lower
-           for signal in honest_gap_signals):
-        return {
-            "correct": True,
-            "score": 0.9,
-            "issue": "data_gap",
-            "skipped": False,
-            "reason": "honest_gap_answer",
-        }
+    if any(sig in answer_lower for sig in HONEST_GAP_SIGNALS):
+        # Also verify the answer has SOME content (>100 chars)
+        if len(answer.strip()) > 100:
+            return {
+                "correct": True,
+                "score": 0.9,
+                "issue": "data_gap",
+                "skipped": True,
+                "reason": "honest_gap_answer",
+            }
 
     # Compact the tool results to save tokens
     summary = _compact_results(tool_results)

@@ -46,16 +46,18 @@ async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by
     if invalid_ops:
         return {"error": f"Invalid operators: {invalid_ops}. Use one of: {sorted(VALID_OPS)}"}
 
-    # Handle None values for null operators
+    # Before building filters, handle None values
     processed_filters = []
-    for op, col, val in valid_filters:
+    for f in valid_filters:
+        op, col, val = f[0], f[1], f[2] if len(f) > 2 else None
         if val is None:
             if op in ("eq", "is_"):
                 processed_filters.append(("is_", col, "null"))
-            elif op in ("neq", "not.is_"):
-                processed_filters.append(("not.is_", col, "null"))
-        elif op == "ilike":
-            processed_filters.append(("ilike", col, val))
+            elif op in ("neq", "not_is_", "not.is_"):
+                # Mark for special handling — supabase-py
+                # needs .not_.is_() not a chained attr
+                processed_filters.append(
+                    ("__not_null__", col, None))
         else:
             processed_filters.append((op, col, val))
 
