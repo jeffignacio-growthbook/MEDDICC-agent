@@ -96,8 +96,9 @@ async def process_and_reply(text: str, user_id: str,
 
     answer = result.get("answer", "")
     await send_to_zap(channel, thread_ts, answer)
+    tool_results = result.get("tool_results", {})
     save_thread(sb, thread_ts, channel,
-                history, text, answer)
+                history, text, answer, tool_results)
 
 @app.get("/health")
 def health():
