@@ -107,6 +107,12 @@ class SupabaseWriter:
             'updated_at':    datetime.now().isoformat(),
         }
 
+        # Preserve existing values for fields that should never be cleared
+        # If company_name or company_slug is None, exclude from upsert
+        PRESERVE_IF_EXISTING = {'company_name', 'company_slug'}
+        row = {k: v for k, v in row.items()
+               if k not in PRESERVE_IF_EXISTING or v is not None}
+
         # Analytics-specific fields
         if 'deal_status' in deal:
             row['deal_status'] = deal['deal_status']
