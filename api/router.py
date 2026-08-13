@@ -22,6 +22,7 @@ these handler types. Reply with JSON only.
 Handlers:
   query_waterfall       - pipeline movement, new/won/lost this week/quarter
   query_new_deals       - which deals were created, added to pipeline, or started in a time window
+  query_won_deals       - which deals did we win/close, wins this quarter/period, closed-won deals, bookings
   query_arr             - ARR by customer, total ARR
   query_deals_at_risk   - weak MEDDICC scores, deals at risk, champion gaps
   query_win_loss        - why deals were won/lost, narratives
@@ -496,6 +497,102 @@ async def route_question(question: str, user_id: str,
     )
     verified = verify_resp.content[0].text.strip()
 
+    # ── 8. Correctness assessment + retry loop ───────────
+    from api.assessor import (assess_correctness,
+                               should_retry,
+                               build_retry_context)
+
+    MAX_RETRIES = 2
+    retry_count = 0
+    tokens_used = (intent_resp.usage.input_tokens +
+                   intent_resp.usage.output_tokens +
+                   answer_resp.usage.input_tokens +
+                   answer_resp.usage.output_tokens +
+                   verify_resp.usage.input_tokens +
+                   verify_resp.usage.output_tokens)
+
+    while retry_count <= MAX_RETRIES:
+        assessment = await assess_correctness(
+            question=question,
+            handler_used=handler_name,
+            tool_results=tool_results,
+            answer=verified,
+            client=client,
+            budget_used=tokens_used * 0.000003,
+            # approximate cost: tokens × $3/1M
+        )
+
+        print(f"[ASSESS] score={assessment.get('score', 0):.2f} "
+              f"issue={assessment.get('issue')} "
+              f"retry={retry_count}", flush=True)
+
+        if assessment.get("correct", True) or \
+           not should_retry(assessment, retry_count):
+            break
+
+        # ── Guided retry ──────────────────────────────────
+        retry_count += 1
+        retry_context = build_retry_context(assessment, question)
+
+        print(f"[RETRY {retry_count}] {retry_context[:100]}",
+              flush=True)
+
+        # Try the suggested handler first
+        suggested = assessment.get("suggested_handler")
+        if suggested and suggested != handler_name:
+            handler_fn = getattr(handlers, suggested, None)
+            if handler_fn:
+                try:
+                    tool_results = await handler_fn(params, sb)
+                    handler_name = suggested
+                except Exception as e:
+                    print(f"[RETRY] handler failed: {e}",
+                          flush=True)
+                    tool_results = {}
+
+        # If no suggested handler or it failed, try dynamic
+        if not tool_results or not tool_results.get("rows",
+            tool_results.get("deal")):
+            tool_results_text = await dynamic_query_loop(
+                question=question,
+                history=history,
+                params=params,
+                sb=sb,
+                client=client,
+                hint=retry_context,
+            )
+            # dynamic_query_loop returns a string answer directly
+            if tool_results_text and \
+               "don't have data" not in tool_results_text.lower() and \
+               "couldn't" not in tool_results_text.lower():
+                # Log the learning note before returning
+                _log_learning(sb, question, handler_name,
+                             assessment, retry_count)
+                return {"answer": tool_results_text,
+                        "needs_ack": is_slow}
+            break
+
+        # Re-synthesize with the new tool results
+        answer_resp = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=600,
+            system=SYNTHESIS_SYSTEM_PROMPT,
+            messages=[
+                *[{"role": m["role"], "content": m["content"]}
+                  for m in history[-4:]
+                  if m.get("role") in ("user", "assistant")],
+                {"role": "user",
+                 "content": f"Question: {question}\n\n"
+                            f"Context: {retry_context}\n\n"
+                            f"Data:\n{json.dumps(tool_results, indent=2, default=str)[:3000]}"}
+            ]
+        )
+        verified = answer_resp.content[0].text.strip()
+
+    # ── 9. Log learning note (win or lose) ────────────────
+    _log_learning(sb, question, handler_name,
+                 assessment, retry_count)
+
     return {"answer": verified, "needs_ack": is_slow}
 
 
@@ -505,3 +602,27 @@ def _log_unanswered(sb, question, user_id, reason):
         log_unanswered(sb, question, user_id, "", "", reason)
     except Exception:
         pass
+
+
+def _log_learning(sb, question, handler, assessment,
+                  retries_used):
+    """Log the assessment for the weekly learning report."""
+    try:
+        note = assessment.get("learning_note")
+        issue = assessment.get("issue")
+        suggested_fix = assessment.get("suggested_handler")
+        retry_succeeded = assessment.get("correct", False)
+
+        if not note and not issue:
+            return
+
+        sb.table("learning_log").insert({
+            "question":  question,
+            "handler_used": handler,
+            "issue_type": issue,
+            "suggested_fix": suggested_fix or note,
+            "retry_succeeded": retry_succeeded,
+            "retries_used": retries_used,
+        }).execute()
+    except Exception as e:
+        print(f"[LEARNING] log failed: {e}", flush=True)
