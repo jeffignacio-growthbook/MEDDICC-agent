@@ -26,7 +26,7 @@ def evaluate_result(result: dict, handler_name: str) -> str:
     # Check the primary key field is populated
     STRUCTURED_HANDLERS = {
         "query_deal":      "deal",
-        "query_rubric":    "rubric_bands",
+        "query_rubric":    "description",
         "query_win_loss":  "wins",
         "generate_win_loss": "narrative",
         "set_target":      "set",
