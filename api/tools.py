@@ -45,11 +45,30 @@ async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by
     invalid_ops = [(op,col,val) for op,col,val in valid_filters if op not in VALID_OPS]
     if invalid_ops:
         return {"error": f"Invalid operators: {invalid_ops}. Use one of: {sorted(VALID_OPS)}"}
-    rows = select_all(sb, table, columns=",".join(cols) if cols else "*", filters=valid_filters)
+
+    # Handle None values for null operators
+    processed_filters = []
+    for op, col, val in valid_filters:
+        if val is None:
+            if op in ("eq", "is_"):
+                processed_filters.append(("is_", col, "null"))
+            elif op in ("neq", "not.is_"):
+                processed_filters.append(("not.is_", col, "null"))
+        elif op == "ilike":
+            processed_filters.append(("ilike", col, val))
+        else:
+            processed_filters.append((op, col, val))
+
+    rows = select_all(sb, table, columns=",".join(cols) if cols else "*", filters=processed_filters)
     if order_by:
         col, *dir_ = order_by.split()
         rev = "DESC" in (dir_[0].upper() if dir_ else "")
-        rows.sort(key=lambda x: (x.get(col) is None, x.get(col) or 0), reverse=rev)
+        rows.sort(
+            key=lambda x: (
+                x.get(col) is None,
+                str(x.get(col)) if x.get(col) is not None else ""
+            ),
+            reverse=rev)
     return {"rows": rows[:limit], "total_found": len(rows), "table": table, "truncated": len(rows) > limit}
 
 async def join_tables(sb, primary_table, primary_key, joined_table, foreign_key,
