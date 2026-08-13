@@ -121,9 +121,16 @@ TOOLS YOU CAN CALL:
   join_tables(primary_table, primary_key, joined_table,
               foreign_key, primary_filters, joined_columns, limit)
   aggregate_results(data, group_by, aggregations)
-    - aggregations MUST be a dict, not a list
-    - CORRECT: {{"deal_value": "sum", "deal_id": "count"}}
-    - WRONG: [{{"column": "deal_value", "agg": "sum"}}]
+    data: list of dicts from a previous filter_table result,
+          OR the string key "step_N" to reference a prior
+          tool result (e.g. "step_0" for the first result)
+    group_by: column name to group by
+    aggregations: dict of {{"column": "sum"|"count"|"avg"}}
+    Example: aggregate_results(
+      data="step_1",
+      group_by="owner_email",
+      aggregations={{"deal_value": "sum", "deal_id": "count"}}
+    )
   compare_periods(table, column, agg, period_a, period_b,
                   date_column)
 
@@ -312,11 +319,13 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     f"I can't answer this question with available data.")
 
         if tool_name == "aggregate_results":
-            data_key = tool_params.pop("data_key",
-                                       list(accumulated_data)[-1]
-                                       if accumulated_data else "")
-            tool_params["data"] = accumulated_data.get(
-                data_key, {}).get("rows", [])
+            data = tool_params.get("data", [])
+            if isinstance(data, str):
+                # Agent passed a key reference like "step_0"
+                data = accumulated_data.get(data, {}).get("rows", [])
+            elif not isinstance(data, list):
+                data = []
+            tool_params["data"] = data
             result = await tool_fn(**tool_params)
         elif tool_name == "compare_periods":
             result = await tool_fn(sb, **tool_params)
