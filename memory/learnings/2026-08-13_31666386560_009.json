@@ -1,0 +1,21 @@
+{
+  "company": "Livesport",
+  "deal_id": "62160567676",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Competition component: Score 3/10 assigned but evidence provided does not support score above 1/10. Analysis correctly identifies that Airship and Extreme Push are mobile messaging platforms (not experimentation competitors) and explicitly states 'No other valid experimentation platforms...have been mentioned.' This contradicts a 3/10 score. Score must be 1/10 to match evidence that only Optimizely is identified as a real competitor. CRITERION 3 FAILURE - Competition component: Airship and Extreme Push mentioned in call summary but explicitly noted as invalid competitors (non-experimentation platforms). These should not be listed as evidence of competition assessment. Only Optimizely qualifies as valid competitive intelligence. CRITERION 4 FAILURE - Metrics component (score 6/10): Next step uses vague language 'What specific cost reduction target would make this project successful' without concrete specificity. Should ask: 'Is your cost reduction target to maintain \u20ac60K annual spend while handling higher impression volumes, or achieve a specific percentage reduction from \u20ac60K?' CRITERION 5 FAILURE - Deal Health summary claims 'substantial traffic volume' but 100M impressions is impressions-per-year, not monthly visitors. This misinterprets scale indicator and overstates ICP fit confidence without clarifying monthly unique visitor count. ICP Fit Assessment needs explicit statement: 'Monthly visitor count unknown - 100M annual impressions insufficient to confirm >100K monthly visitor threshold without additional context.'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-13_31666386560_009",
+  "timestamp": "2026-08-13T04:34:18.509016"
+}

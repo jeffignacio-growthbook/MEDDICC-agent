@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_002",
+  "timestamp": "2026-08-13T04:19:19.079630",
+  "company": "Rula",
+  "criterion_fired": "Criterion 2 (Decision Criteria), Criterion 3 (Competition), Criterion 4 (Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'When carry-forwarding scores across calls, explicitly note new evidence that confirms, challenges, or refines prior assessment. Do not claim absence of information if recent call data exists. All Competition claims require direct quote. Next steps must specify concrete deliverables, timelines, or meeting structures\u2014avoid open-ended discussion prompts.'"
+}

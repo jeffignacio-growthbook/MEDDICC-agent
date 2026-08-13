@@ -1,0 +1,21 @@
+{
+  "company": "Notion",
+  "deal_id": "60257621387",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Competition component regressed from score 1/10 to 0/10 without documented reason. The analysis states 'Competition revised from 1/10 to 0/10 due to inability to assess with corrupted recent call data' but this violates carry-forward consistency rules. With cumulative_calls_context = 3 (three previous calls exist), the Competition score of 1/10 from prior calls should be maintained at 1/10 with explicit note: 'No new competition information in this call - maintaining previous score of 1/10.' Downgrading to 0/10 is unsupported and contradicts the cumulative state.\n\nCRITERION 4 FAILURE - Identified Pain next step uses vague verb 'What business problem is not getting solved today' without a concrete, specific action. This must be rewritten as: '[contact TBD] or Logan Bates: Ask by [specific date]: \"Does the inability to run experiments block product launches, slow feature releases, or prevent data-driven decisions - which one costs you most?\"' The current phrasing is exploratory rather than actionable.\n\nCRITERION 2 PARTIAL CONCERN - While carry-forward was maintained for most components, the decision to downgrade Competition violates the explicit rule that Identified or Partial/Unknown components must remain at their level unless recent call contradicts them. A corrupted transcript cannot trigger regression; it must trigger maintenance of prior score.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-13_31666386560_004",
+  "timestamp": "2026-08-13T04:23:07.705569"
+}

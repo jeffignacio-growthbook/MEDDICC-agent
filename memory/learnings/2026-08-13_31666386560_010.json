@@ -1,0 +1,21 @@
+{
+  "company": "Square",
+  "deal_id": "58134855076",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 0,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 3 FAILURE \u2014 Competition component: Amplitude is correctly identified as non-competitor (analytics platform), but the analysis states 'Amplitude mentioned but is not a GrowthBook competitor' without properly establishing that GrowthBook's actual competitive set includes LaunchDarkly, Statsig, EPPO, Optimizely, or Datadog Experiments. The analysis correctly identifies LaunchDarkly as a direct competitor but fails to establish evidence that prospects have evaluated or considered other members of GrowthBook's competitive set. CRITERION 4 FAILURE \u2014 Multiple components below 7/10 with insufficient next steps specificity: (1) Metrics (4/10): next step asks 'what metrics are you using' but doesn't specify concrete ask like 'confirm experimentation volume target in writing by [date]'; (2) Economic Buyer (1/10): next step lacks contact name even as placeholder and doesn't confirm '[contact TBD]' format is acceptable for first call; (3) Decision Criteria (3/10): asks open-ended question 'what other criteria' without first confirming current 100K+ requirement is actually a non-negotiable constraint versus exploratory concern; (4) Decision Process (2/10): asks for stakeholder map but doesn't specify 'request org chart with decision rights by [specific date]'; (5) Champion (2/10): asks 'are you able to share the business case' which is exploratory rather than action-oriented\u2014should specify '[contact TBD] or Andr\u00e9: Confirm by [date] whether you have internal champion who can facilitate 3 stakeholder introductions (data eng, product, finance) this month'. CRITERION 5 FAILURE \u2014 Unsupported claim: Analysis states 'Meeting underscored the critical importance of migration to Growth Book' but this language appears in source material as sales language, not prospect language. This misrepresents what the prospect actually committed to. Andr\u00e9's language was 'critical importance of migration to Growth Book to achieve a more data-driven organization'\u2014ambiguous whether this is Andr\u00e9's conviction or meeting summary language. CRITERION 1 PARTIAL \u2014 While all components have status and score, the Champion component's evidence ('Andr\u00e9 highlighted inefficiencies and is discussing the initiative, but no indication of active championing beyond participation in the call') states absence of evidence correctly, but the analysis should more explicitly acknowledge that on a first call, low Champion scores are expected and correct, not a deficiency.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-13_31666386560_010",
+  "timestamp": "2026-08-13T04:34:54.586766"
+}

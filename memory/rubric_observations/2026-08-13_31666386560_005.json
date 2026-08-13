@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_005",
+  "timestamp": "2026-08-13T04:23:07.706056",
+  "company": "Notion",
+  "criterion_fired": "CRITERION 1 (Competition score regression) and CRITERION 4 (vague next step verb)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 1 should specify: 'Identified/Partial components revert to 0/10 only if current call directly contradicts prior evidence; missing/corrupted data requires maintaining prior score with explicit carry-forward note.' Criterion 4 should specify: 'Next steps must include contact name, specific date, and question format that drives a binary/ranked answer, not open exploration.'"
+}

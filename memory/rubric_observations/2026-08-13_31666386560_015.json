@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_015",
+  "timestamp": "2026-08-13T04:39:40.357120",
+  "company": "Stone",
+  "criterion_fired": "Criterion 2 (Champion)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit rule: 'If new call transcript is corrupted or provides no new information, maintain the previous cumulative score and note the data gap. Only downgrade if new call evidence explicitly contradicts prior assessment. Absence of evidence in a corrupted transcript is not evidence of absence.'"
+}
