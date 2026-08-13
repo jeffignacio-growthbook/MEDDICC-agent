@@ -320,10 +320,19 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     f"has_answer={'answer' in (parsed or {})}")
 
         if not parsed:
+            # Check if model gave prose answer directly
+            stripped = raw.strip()
+            if (stripped and
+                not stripped.startswith('{') and
+                not stripped.startswith('```') and
+                len(stripped) > 50 and
+                'tool' not in stripped[:20].lower()):
+                # Treat as direct prose answer
+                logger.info(f"[LOOP iter={iteration}] prose answer detected")
+                return stripped
+            # Otherwise log parse failure as before
             logger.info(f"[LOOP] JSON parse failed, raw={raw[:300]}")
-            return (f"I couldn't parse my own response as JSON. "
-                   f"This question may be too complex for dynamic querying. "
-                   f"Raw response: {raw[:200]}")
+            continue
 
         if "answer" in parsed:
             # Evaluate answer quality with Haiku
