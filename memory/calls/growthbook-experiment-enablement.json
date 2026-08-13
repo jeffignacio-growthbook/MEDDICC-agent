@@ -1,0 +1,24 @@
+{
+  "company": "GrowthBook Experiment Enablement",
+  "slug": "growthbook-experiment-enablement",
+  "last_etl_date": "2026-08-13T03:42:39.061970",
+  "calls": [
+    {
+      "id": "01KYR7QJ011X1EE9F8169TDSJ2",
+      "source": "fireflies",
+      "title": "GrowthBook Experiment Enablement",
+      "date": "2026-08-12",
+      "duration_minutes": 52.34000015258789,
+      "summary": "The team is preparing to conduct A/B tests in GrowthBook, having successfully integrated data flows from BigQuery and Google Analytics. Key discussions included the mechanics of experiment bucketing, traffic allocation strategies, and the use of namespaces to avoid experiment overlap. The meeting highlighted the importance of gradual traffic rollout to prevent users from being rebucketed mid-experiment, and the need for distinct metrics defined through SQL on fact tables for analysis. Additionally, participants considered feature flags that control rollout and targeting rules based on user attributes. Advanced options such as multi-armed bandits were also explored for optimizing variant allocation. Emphasis was placed on starting simple and gradually increasing complexity, integrating AI for experiment ideation, and utilizing governance tools for collaboration.",
+      "organizer": "chris@growthbook.io",
+      "participants": 7,
+      "keywords": "Experimentation, GrowthBook, Feature Flags, Bayesian Statistics, AI Assistant, Metrics",
+      "action_items": "\n, *, *, S, i, m, o, n,  , D, a, v, i, d, s, s, o, n, *, *, \n, C, o, o, r, d, i, n, a, t, e,  , i, n, i, t, i, a, l,  , s, i, m, p, l, e,  , A, /, B,  , e, x, p, e, r, i, m, e, n, t, s,  , u, s, i, n, g,  , G, r, o, w, t, h, B, o, o, k,  , a, s, s, i, s, t, a, n, t,  , t, o,  , f, a, m, i, l, i, a, r, i, z, e,  , t, h, e,  , t, e, a, m,  , w, i, t, h,  , t, h, e,  , e, x, p, e, r, i, m, e, n, t, a, t, i, o, n,  , p, r, o, c, e, s, s,  , (, 4, 9, :, 2, 7, ), \n, E, n, g, a, g, e,  , G, r, o, w, t, h, B, o, o, k,  , f, o, r,  , a,  , s, t, r, a, t, e, g, y,  , s, e, s, s, i, o, n,  , t, o,  , d, i, s, c, u, s, s,  , e, x, p, e, r, i, m, e, n, t,  , p, r, i, o, r, i, t, i, z, a, t, i, o, n,  , a, n, d,  , o, r, g, a, n, i, z, a, t, i, o, n, a, l,  , r, o, l, e, s,  , w, h, e, n,  , r, e, a, d, y,  , (, 4, 8, :, 0, 6, ), \n, \n, *, *, W, a, l, e, n, t, i, n,  , W, i, d, g, r, e, n, *, *, \n, C, o, n, t, i, n, u, e,  , i, n, t, e, g, r, a, t, i, o, n,  , t, e, s, t, i, n, g,  , a, n, d,  , r, e, a, d, i, n, e, s, s,  , f, o, r,  , r, u, n, n, i, n, g,  , e, x, p, e, r, i, m, e, n, t, s,  , i, n,  , G, r, o, w, t, h, B, o, o, k,  , (, 0, 2, :, 2, 7, ), \n, F, o, l, l, o, w,  , u, p,  , o, n,  , r, e, s, p, o, n, s, i, b, i, l, i, t, y,  , f, o, r,  , f, a, c, t,  , t, a, b, l, e,  , a, n, d,  , q, u, e, r, y,  , s, e, t, u, p,  , w, i, t, h, i, n,  , t, h, e,  , d, a, t, a,  , o, r, g, a, n, i, z, a, t, i, o, n,  , t, o,  , s, u, p, p, o, r, t,  , e, x, p, e, r, i, m, e, n, t,  , m, e, t, r, i, c, s,  , (, 1, 4, :, 2, 5, ), \n, \n, *, *, E, r, i, k,  , B, e, r, t, i, l, s, s, o, n, *, *, \n, U, t, i, l, i, z, e,  , G, r, o, w, t, h, B, o, o, k,  , a, s, s, i, s, t, a, n, t,  , o, r,  , C, l, a, u, d, e,  , A, I,  , t, o,  , i, d, e, n, t, i, f, y,  , a, n, d,  , p, r, i, o, r, i, t, i, z, e,  , e, x, p, e, r, i, m, e, n, t, s,  , b, a, s, e, d,  , o, n,  , p, l, a, n, n, e, d,  , c, h, a, n, g, e, s,  , (, 5, 0, :, 2, 9, ), \n, \n, *, *, G, r, o, w, t, h, B, o, o, k,  , T, e, a, m,  , (, C, h, r, i, s,  , S, a, n, d, e, r, s,  , a, n, d,  , J, a, k, e, ), *, *, \n, P, r, o, v, i, d, e,  , c, o, n, t, i, n, u, e, d,  , t, e, c, h, n, i, c, a, l,  , s, u, p, p, o, r, t,  , a, n, d,  , o, n, b, o, a, r, d, i, n, g,  , g, u, i, d, a, n, c, e,  , v, i, a,  , S, l, a, c, k,  , a, n, d,  , d, i, r, e, c, t,  , c, o, m, m, u, n, i, c, a, t, i, o, n,  , (, 0, 0, :, 1, 3, ), \n, O, f, f, e, r,  , a, d, d, i, t, i, o, n, a, l,  , t, r, a, i, n, i, n, g,  , o, r,  , s, t, r, a, t, e, g, y,  , s, e, s, s, i, o, n, s,  , o, n,  , e, x, p, e, r, i, m, e, n, t,  , d, e, s, i, g, n, ,,  , A, I,  , u, t, i, l, i, z, a, t, i, o, n, ,,  , a, n, d,  , a, d, v, a, n, c, e, d,  , f, e, a, t, u, r, e, s,  , a, s,  , r, e, q, u, e, s, t, e, d,  , b, y,  , t, h, e,  , c, l, i, e, n, t,  , t, e, a, m,  , (, 4, 8, :, 0, 6, ), \n",
+      "participant_domains": [
+        "curamando.com",
+        "eqtpartners.com",
+        "umain.com"
+      ]
+    }
+  ]
+}

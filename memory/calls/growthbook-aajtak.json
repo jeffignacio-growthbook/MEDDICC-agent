@@ -1,0 +1,22 @@
+{
+  "company": "Growthbook <> Aajtak",
+  "slug": "growthbook-aajtak",
+  "last_etl_date": "2026-08-13T03:42:39.061817",
+  "calls": [
+    {
+      "id": "01KZF0XC9YS5J049CGN6R9GFQK",
+      "source": "fireflies",
+      "title": "Growthbook <> Aajtak - Intro/Demo",
+      "date": "2026-08-12",
+      "duration_minutes": 5,
+      "summary": "Dan Wathne outlined his travel plans for late July, prioritizing a trip to Bellingham over eastern Washington due to smoke concerns and scheduling a family trip to Norway from July 20 to 31. He discussed balancing time between a family cabin and Oslo, weighing the serene fishing experience against urban activities like museums. Logistical challenges were raised regarding the travel time between locations; the cabin is three hours from Oslo, which adds significantly to travel time. The importance of coordinating family gatherings around weekends when Dan's sisters are available was also emphasized. Additionally, Dan confirmed a meeting time the following day with Logan, showcasing effective calendar management and ensuring ongoing project momentum. Technical adjustments, such as improving audio clarity, were also mentioned.",
+      "organizer": "dan@growthbook.io",
+      "participants": 6,
+      "keywords": "Norway, travel planning, family cabin, Oslo, meeting scheduling, audio setup",
+      "action_items": "\n, *, *, D, a, n,  , W, a, t, h, n, e, *, *, \n, C, o, n, f, i, r, m,  , t, r, a, v, e, l,  , p, l, a, n, s,  , f, o, r,  , N, o, r, w, a, y,  , t, r, i, p, ,,  , i, n, c, l, u, d, i, n, g,  , d, e, c, i, s, i, o, n,  , o, n,  , w, h, e, t, h, e, r,  , t, o,  , s, t, a, y,  , a, t,  , t, h, e,  , f, a, m, i, l, y,  , c, a, b, i, n,  , o, r,  , e, x, p, l, o, r, e,  , O, s, l, o, ,,  , a, n, d,  , m, a, n, a, g, e,  , t, h, e,  , i, t, i, n, e, r, a, r, y,  , a, c, c, o, r, d, i, n, g, l, y,  , (, 0, 1, :, 5, 0, ), \n, \n, *, *, D, a, n,  , W, a, t, h, n, e,  , a, n, d,  , L, o, g, a, n,  , B, a, t, e, s, *, *, \n, A, t, t, e, n, d,  , t, h, e,  , s, c, h, e, d, u, l, e, d,  , m, e, e, t, i, n, g,  , t, o, m, o, r, r, o, w,  , a, t,  , t, h, e,  , a, g, r, e, e, d,  , t, i, m, e,  , (, 0, 4, :, 2, 8, ), \n",
+      "participant_domains": [
+        "aajtak.com"
+      ]
+    }
+  ]
+}

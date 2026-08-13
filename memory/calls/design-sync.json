@@ -1,0 +1,19 @@
+{
+  "company": "Design Sync",
+  "slug": "design-sync",
+  "last_etl_date": "2026-08-13T03:42:39.061342",
+  "calls": [
+    {
+      "id": "01KZVCR674TK3ARKVTWS0G38BP",
+      "source": "fireflies",
+      "title": "Design Sync",
+      "date": "2026-08-12",
+      "duration_minutes": 34.970001220703125,
+      "summary": "The team discussed refinements to the experiment detail page, emphasizing simplified editing for running experiments, which limits editable fields to essential ones like analysis settings and metrics. Additionally, they aimed to reduce complexity in the experiment creation modal by pre-selecting defaults, thus cutting down the number of fields. Highlighting the importance of goal metrics for experiment success, the team acknowledged the need for clearer metric display to avoid confusion. The analysis settings modal's layout was also a focus, ensuring data source and metric selection are separate for better workflow. Enhancements to screenshot displays were proposed without urgent priority, while recognizing longstanding challenges in the design that require broader solutions beyond quick fixes.",
+      "organizer": "kari@growthbook.io",
+      "participants": 3,
+      "keywords": "Experiment Design, Metrics Management, Analysis Settings, UI Redesign, Screenshots UI, Decision Framework",
+      "action_items": "\n, *, *, G, a, b, e,  , M, e, l, e, a, n, *, *, \n, L, e, a, d,  , r, e, d, e, s, i, g, n,  , e, f, f, o, r, t, s,  , f, o, r,  , t, h, e,  , a, n, a, l, y, s, i, s,  , s, e, t, t, i, n, g, s,  , c, o, n, t, a, i, n, e, r,  , f, o, c, u, s, i, n, g,  , o, n,  , b, e, t, t, e, r,  , m, e, t, r, i, c,  , p, r, i, o, r, i, t, i, z, a, t, i, o, n,  , a, n, d,  , u, s, a, b, i, l, i, t, y,  , (, 3, 1, :, 4, 8, ), \n, P, r, o, v, i, d, e,  , l, i, n, k, s,  , t, o,  , f, i, n, i, s, h, e, d,  , s, t, y, l, e,  , g, u, i, d, e, s,  , f, o, r,  , r, e, v, i, e, w,  , b, y,  , K, a, r, i,  , K, a, y,  , (, 3, 2, :, 1, 7, ), \n, \n, *, *, J, o, h, n, n, y,  , M, a, r, t, i, n, e, z, *, *, \n, W, o, r, k,  , o, n,  , U, I,  , i, m, p, r, o, v, e, m, e, n, t, s,  , f, o, r,  , t, h, e,  , s, c, r, e, e, n, s, h, o, t, s,  , s, e, c, t, i, o, n, ,,  , i, n, c, l, u, d, i, n, g,  , b, e, t, t, e, r,  , t, h, u, m, b, n, a, i, l,  , p, l, a, c, e, m, e, n, t, ,,  , n, a, v, i, g, a, t, i, o, n, ,,  , a, n, d,  , i, m, a, g, e,  , s, c, a, l, i, n, g,  , (, 3, 1, :, 4, 0, ), \n, \n, *, *, K, a, r, i,  , K, a, y, *, *, \n, A, d, d,  , d, i, s, c, u, s, s, e, d,  , d, e, s, i, g, n,  , t, a, s, k, s,  , a, n, d,  , p, r, o, g, r, e, s, s,  , t, o,  , t, h, e,  , N, o, t, i, o, n,  , t, r, a, c, k, e, r,  , f, o, r,  , t, e, a, m,  , v, i, s, i, b, i, l, i, t, y,  , a, n, d,  , f, o, l, l, o, w, -, u, p,  , (, 3, 3, :, 2, 8, ), \n, R, e, v, i, e, w,  , s, t, y, l, e,  , g, u, i, d, e, s,  , s, h, a, r, e, d,  , b, y,  , G, a, b, e,  , t, o,  , e, n, s, u, r, e,  , c, o, n, s, i, s, t, e, n, c, y,  , w, i, t, h,  , p, r, o, p, o, s, e, d,  , U, I,  , c, h, a, n, g, e, s,  , (, 3, 2, :, 1, 7, ), \n, M, a, i, n, t, a, i, n,  , c, o, m, m, u, n, i, c, a, t, i, o, n,  , w, i, t, h,  , e, n, g, i, n, e, e, r, i, n, g,  , t, e, a, m, s,  , t, o,  , e, n, s, u, r, e,  , u, p, d, a, t, e, s,  , o, n,  , U, I,  , c, h, a, n, g, e, s,  , a, r, e,  , c, o, o, r, d, i, n, a, t, e, d,  , a, n, d,  , n, o, t,  , i, m, p, l, e, m, e, n, t, e, d,  , w, i, t, h, o, u, t,  , d, e, s, i, g, n,  , i, n, p, u, t,  , (, 3, 2, :, 1, 7, ), \n"
+    }
+  ]
+}
