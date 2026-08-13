@@ -402,8 +402,8 @@ etl:
 # Phase G: CRO Slack Agent configuration
 admin:
   slack_user_ids:
-    - UXXXXXXXXX    # Jeff — replace with real Slack user ID
-    - UYYYYYYYYY    # Ryan — replace with real Slack user ID
+    - U0AAMMUPSA2    # Jeff
+    - U09PMRV270T    # Ryan
   # Get your Slack user ID: click your name → Profile →
   # More (⋯) → Copy member ID
 
