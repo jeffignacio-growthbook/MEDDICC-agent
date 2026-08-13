@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_012",
+  "timestamp": "2026-08-13T04:34:18.509530",
+  "company": "Livesport",
+  "criterion_fired": "Competition (Criterion 1 & 3) and Metrics (Criterion 4 & 5)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1 should explicitly require: 'Competitor score reflects only valid experimentation platforms mentioned; platforms serving different use cases (messaging, push notification) score 0 even if named.' Criterion 5 should specify: 'ICP Fit assessment must distinguish annual/monthly metrics and explicitly flag when key thresholds (monthly visitors) cannot be confirmed from available data.'"
+}

@@ -1,0 +1,21 @@
+{
+  "company": "Rula",
+  "deal_id": "63578787480",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Decision Criteria: Analysis states 'maintained at 8/10 \u2014 no new information in Call 3' but this is incorrect application of carry-forward rules. Call 3 explicitly provides NEW evidence: 'Security considerations are paramount, with focus on role-based access controls and BAA for compliance with health data regulations; self-hosted solution for data privacy.' This is new information that should be reflected in the evidence section, not dismissed as 'no new information.' The score of 8/10 may be correct, but the reasoning violates the carry-forward criterion by failing to acknowledge and integrate the new evidence from Call 3. CRITERION 3 VIOLATION - Competition: Score of 4/10 lacks evidence quality. Analysis states 'we lack details on their current evaluation status' but provides no direct quote from the call about Optimizely. The recent call summary makes no mention of Optimizely at all, yet the analysis claims it was mentioned. This is unsupported. CRITERION 4 VIOLATION - Metrics next step uses vague language: 'What threshold would make this a clear win?' is too open-ended. Should specify concrete metrics GrowthBook needs prospect to commit to (e.g., 'Are you targeting X experiments/month?' or 'What % reduction in time-to-insight would justify the switch?'). CRITERION 4 VIOLATION - Decision Criteria next step is vague: 'Are these weighted equally in your evaluation' is a discussion prompt, not a specific action. Should ask: 'Send me your formal evaluation scorecard by [date]' or 'Schedule 30-min call to review weighted criteria.' CRITERION 4 VIOLATION - Champion next step is vague: 'walk me through who you've already socialized this with' is exploratory discussion, not a concrete action. Should specify: 'List the 3-5 people whose sign-off you need and share their concerns by [date]' or 'Introduce me to your VP Engineering on next call so I can address their data migration concerns directly.'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-13_31666386560_001",
+  "timestamp": "2026-08-13T04:19:19.079135"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_008",
+  "timestamp": "2026-08-13T04:30:09.810668",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 1 (Pain Regression) and Criterion 2 (Carry-forward Rule)",
+  "was_appropriate": false,
+  "suggested_change": "Add explicit criterion: 'If recent call summary is corrupted or unparseable ([Summary failed], incomplete sentences), flag as DATA_QUALITY_ISSUE and maintain all cumulative Identified/Partial scores without modification. Do not attempt regression analysis or retrospective reinterpretation of prior call evidence when current call data is unavailable.'"
+}

@@ -1,0 +1,21 @@
+{
+  "company": "Unity",
+  "deal_id": "49689180024",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward consistency broken. Recent call summary is corrupted/incomplete ([Summary failed] and cuts off mid-sentence at 'Dani'). Analysis claims 'no new information in this call, prior evidence stands' for all 7 components, but cannot verify this claim because the recent call content is unreadable. The analysis must either: (1) acknowledge the call summary is incomplete and reassess based on what IS readable, or (2) explicitly state that the call produced no usable content and defer all scores to cumulative state with clear documentation of why. Additionally, CRITERION 4 VIOLATION - Multiple next steps use vague language ('Confirm urgency' for Identified Pain is too vague; 'Map complete decision process' lacks specificity on what 'map' means). Metrics next step should ask specific questions about hours/quarter/cost, not just reference prior wording. CRITERION 5 VIOLATION - Claim that 'no individual has demonstrated internal advocacy' for Champion at 1/10 is correct, but the analysis should note that after 3 calls with no champion emergence, this is a legitimate red flag (not a carry-forward error) and warrants escalation language in deal health. Finally, no ICP assessment is provided; Unity's scale, data stack maturity, and experimentation posture must be confirmed or flagged as unknown before claiming 'strong technical engagement' supports the deal.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-13_31666386560_008",
+  "timestamp": "2026-08-13T04:33:15.561366"
+}

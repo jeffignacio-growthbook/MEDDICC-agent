@@ -1,0 +1,21 @@
+{
+  "company": "Skyscanner",
+  "deal_id": "55660576681",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 13,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Competition component: Score regressed from 3/10 (cumulative state) to 1/10 without documented reason. The analysis states 'Previous score of 3/10 revised to 1/10' but provides no call evidence justifying the downgrade. Call 14 produced no substantive content (fragmented transcript acknowledged), so regression cannot be based on new information. Either maintain 3/10 with note 'No new competition information in Call 14 - maintaining previous score of 3/10' OR provide explicit evidence from prior calls (1-13) showing why Dr. Jekyll reference alone warrants 1/10 instead of 3/10. CRITERION 4 VIOLATION - Champion component (Partial, 5/10): Next steps use vague language 'Can we schedule a prep session' without a specific action verb and concrete question structure. Should be: '[contact TBD or specific name]: Ask directly on next call: Who is presenting the GrowthBook POC results to leadership, and what is their timeline for that presentation?' CRITERION 4 VIOLATION - Competition component (Unknown, 1/10): Next steps exceed appropriate scope - the decision tree format ('If Dr. Jekyll is internal... If external...') is strategic guidance, not a concrete next step. Should be single actionable item: '[contact TBD]: Ask directly: Is Dr. Jekyll an internal tool you built or an external vendor you are evaluating?' CRITERION 5 VIOLATION - Decision Process component claims 'operational by October 31' as confirmed when evidence only states it as a target/expectation. Revise language to 'target operational start by October 31' or confirm this was explicitly committed by the prospect in prior calls.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-13_31666386560_003",
+  "timestamp": "2026-08-13T04:32:12.007845"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_014",
+  "timestamp": "2026-08-13T04:36:53.250383",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 2 (Decision Criteria scoring) and Criterion 1 (Competition evidence)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2: 'Decision score must be internally consistent across all sections and any revision must cite specific new call evidence.' Criterion 1: 'Competition evidence must explicitly confirm which competitors from the defined set (LaunchDarkly, Statsig, EPPO, Datadog, Optimizely, homegrown) are actually in evaluation; absence of mention \u2260 confirmation of non-evaluation.'"
+}

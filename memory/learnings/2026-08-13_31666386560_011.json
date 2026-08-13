@@ -1,0 +1,21 @@
+{
+  "company": "Ryanair",
+  "deal_id": "59387794836",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Decision Criteria (D): Score revised from 5/10 to 4/10 without explicit justification. The analysis states 'Decision Criteria revised from 5/10 to 4/10' but then maintains the score at 5/10 in the Status section. This is internally inconsistent. Clarify: is the score 4/10 or 5/10, and if revised downward, explicitly document the reason based on new call evidence. CRITERION 4 VIOLATION - Decision Criteria next step uses vague verb 'integrate with specific payment systems' without concrete action. Rephrase to: 'Ask Paul Sheridan on Tuesday 2pm call: Does GrowthBook need to integrate directly with your payment processing systems, or can it work through your existing data warehouse?' CRITERION 1 VIOLATION - Competition evidence mentions LaunchDarkly and Optimizely but does not confirm these are in GrowthBook's competitive set per the rubric (LaunchDarkly, Statsig, EPPO, Datadog, Optimizely, homegrown). While LaunchDarkly and Optimizely are valid competitors, the evidence should explicitly confirm Ryanair is NOT evaluating Statsig, EPPO, or Datadog before claiming competition coverage is adequate at 5/10. Add next step clarifying which alternatives are actually being considered.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-13_31666386560_011",
+  "timestamp": "2026-08-13T04:36:53.249933"
+}
