@@ -90,6 +90,16 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
 
     at_risk.sort(key=lambda x: (x["overall_score"],
                                  -(x["deal_value"] or 0)))
+
+    if not at_risk:
+        return {
+            "deals_at_risk": [],
+            "total_at_risk": 0,
+            "message": ("No deals currently flagged as at-risk. "
+                       "Note: Recently created deals may not have "
+                       "MEDDICC analysis yet — those run nightly.")
+        }
+
     return {"deals_at_risk": at_risk[:10],
             "total_at_risk": len(at_risk)}
 

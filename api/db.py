@@ -42,14 +42,17 @@ def load_thread(sb: Client, thread_ts: str) -> list:
     return []
 
 def save_thread(sb: Client, thread_ts: str, channel: str,
-                history: list, question: str, answer: str):
+                history: list, question: str, answer: str,
+                tool_results: dict = None):
     """
     Append Q&A to thread history. Expire after 24h.
     Keeps rolling window of last 3 Q&A pairs.
+    Stores tool_results between question and answer for follow-up context.
     """
     history = history[-6:]  # keep rolling window
     history += [
-        {"role": "user",      "content": question},
+        {"role": "user", "content": question},
+        {"role": "tool_data", "content": json.dumps(tool_results or {}, default=str)[:2000]},
         {"role": "assistant", "content": answer},
     ]
     now = datetime.now(timezone.utc)
