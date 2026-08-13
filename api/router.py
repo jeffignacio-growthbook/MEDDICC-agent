@@ -174,6 +174,24 @@ join_tables(
 )
 Then filter the joined rows in memory for low scores.
 
+RANKING QUERIES: For 'strongest/weakest/highest/lowest'
+questions about scores, ALWAYS:
+1. Query analyses first with score threshold filter
+   (not all 1800 deals)
+2. Get the top 10-20 by score using limit parameter
+3. Then look up company names for just those deal_ids
+Never fetch all active deals first — analyses table
+has scores, use it as the primary filter.
+
+Example for 'strongest decision process':
+Step 1: filter_table(analyses, columns=[deal_id,
+  decision_process_score], filters=[], limit=20,
+  order_by='decision_process_score DESC')
+Step 2: filter_table(deals, columns=[deal_id,
+  company_name, deal_value, owner_email, stage],
+  filters=[['in_', 'deal_id', <step_1_ids>]])
+Step 3: synthesize
+
 ANSWER FORMATTING (for final {{"answer": "..."}} only):
 When you have enough data to answer, format for Slack:
 - Use bullet points (•) not markdown tables (| col | col |)
