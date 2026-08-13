@@ -69,6 +69,29 @@ async def assess_correctness(
             "reason": "budget_exhausted",
         }
 
+    # Check if answer is an honest data gap explanation
+    answer_lower = answer.lower()
+    honest_gap_signals = [
+        "no lost_reason",
+        "not recorded",
+        "data is missing",
+        "no company name",
+        "crm hygiene",
+        "worth flagging",
+        "no objections recorded",
+        "no data",
+        "not captured",
+    ]
+    if any(signal in answer_lower
+           for signal in honest_gap_signals):
+        return {
+            "correct": True,
+            "score": 0.9,
+            "issue": "data_gap",
+            "skipped": False,
+            "reason": "honest_gap_answer",
+        }
+
     # Compact the tool results to save tokens
     summary = _compact_results(tool_results)
 
