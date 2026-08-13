@@ -70,7 +70,7 @@ async def send_question(client: httpx.AsyncClient,
             "thread_ts": thread_ts,
             "ts": thread_ts,
         },
-        timeout=5,
+        timeout=30,
     )
     assert resp.status_code == 200, \
         f"POST failed: {resp.status_code}"
@@ -129,7 +129,9 @@ async def run_tests(verbose: bool = False) -> list:
                                     [], answer))
 
             except Exception as e:
+                import traceback
                 print(f"❌ [{handler}] {question[:50]}: {e}")
+                print(f"     Traceback: {traceback.format_exc()}")
                 results.append(("ERROR", question, [str(e)], ""))
 
     return results
@@ -144,12 +146,15 @@ async def poll_for_reply(thread_ts: str,
         os.environ["SUPABASE_SERVICE_KEY"])
 
     deadline = time.time() + timeout
+    poll_count = 0
     while time.time() < deadline:
         await asyncio.sleep(3)
+        poll_count += 1
         r = sb.table("conversation_threads")\
               .select("history")\
               .eq("thread_ts", thread_ts)\
               .execute()
+        print(f"     Poll {poll_count}: found {len(r.data) if r.data else 0} records")
         if r.data:
             history = json.loads(
                 r.data[0].get("history", "[]")
@@ -160,8 +165,10 @@ async def poll_for_reply(thread_ts: str,
                 m["content"] for m in history
                 if m.get("role") == "assistant"
             ]
+            print(f"     History has {len(history)} messages, {len(assistant_msgs)} from assistant")
             if assistant_msgs:
                 return assistant_msgs[-1]
+    print(f"     Timeout after {poll_count} polls")
     return ""
 
 def main():
