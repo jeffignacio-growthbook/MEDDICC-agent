@@ -275,6 +275,41 @@ def get_meeting_set_stages(hubspot):
         return MEETING_SET_STAGES
 
 
+def fetch_owner_emails(hubspot):
+    """
+    Fetch all HubSpot owners and return mapping of owner_id -> email.
+    Returns dict like {"12345": "rep@company.com", ...}
+    """
+    owner_map = {}
+    try:
+        endpoint = "/crm/v3/owners"
+        params = {"limit": 100}
+
+        while True:
+            response = hubspot._get(endpoint, params=params)
+            results = response.get('results', [])
+
+            for owner in results:
+                owner_id = str(owner.get('id', ''))
+                email = owner.get('email', '')
+                if owner_id and email:
+                    owner_map[owner_id] = email
+
+            # Check for pagination
+            paging = response.get('paging', {})
+            next_link = paging.get('next', {}).get('after')
+            if not next_link:
+                break
+            params['after'] = next_link
+
+        print(f"   Fetched {len(owner_map)} owners")
+        return owner_map
+
+    except Exception as e:
+        print(f"⚠️  Could not fetch owners: {e}")
+        return {}
+
+
 def main():
     parser = argparse.ArgumentParser(description="ETL HubSpot deals to memory/Supabase")
     parser.add_argument(
@@ -314,11 +349,15 @@ def main():
 
     # Initialize HubSpot client (skip if using CSV mode)
     hubspot = None
+    owner_emails = {}
     if not args.file:
         print("\n1. Connecting to HubSpot API...")
         try:
             from hubspot_deals import get_hubspot_deals_client
             hubspot = get_hubspot_deals_client()
+            # Fetch owner emails for mapping owner_id -> email
+            print("\n1b. Fetching owner emails...")
+            owner_emails = fetch_owner_emails(hubspot)
         except Exception as e:
             print(f"❌ Failed to initialize HubSpot client: {e}")
             print("\nMake sure HUBSPOT_API_KEY environment variable is set.")
@@ -509,6 +548,8 @@ def main():
         close_date = props.get('closedate', '')
         create_date = props.get('createdate', '')
         owner_id = props.get('hubspot_owner_id', '')
+        # Look up owner email from mapping
+        owner = owner_emails.get(str(owner_id), '') if owner_id else ''
 
         if not deal_id:
             continue
@@ -576,7 +617,7 @@ def main():
             'stage': stage,
             'arr': arr,
             'close_date': close_date,
-            'owner_id': owner_id,
+            'owner': owner,  # Owner email (looked up from owner_id)
             'last_modified': datetime.now().isoformat(),
         }
 
