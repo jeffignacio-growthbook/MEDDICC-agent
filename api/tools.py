@@ -59,17 +59,22 @@ async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by
         else:
             processed_filters.append((op, col, val))
 
-    rows = select_all(sb, table, columns=",".join(cols) if cols else "*", filters=processed_filters)
+    # Use PostgREST order() for efficient top-N queries
     if order_by:
         col, *dir_ = order_by.split()
-        rev = "DESC" in (dir_[0].upper() if dir_ else "")
-        rows.sort(
-            key=lambda x: (
-                x.get(col) is None,
-                str(x.get(col)) if x.get(col) is not None else ""
-            ),
-            reverse=rev)
-    return {"rows": rows[:limit], "total_found": len(rows), "table": table, "truncated": len(rows) > limit}
+        direction = 'desc' if 'desc' in (dir_[0].lower() if dir_ else '') else 'asc'
+
+        # Build query with order before limit for efficiency
+        q = sb.table(table).select(",".join(cols) if cols else "*")
+        for f in processed_filters:
+            q = getattr(q, f[0])(*f[1:])
+        q = q.order(col, desc=(direction == 'desc'))
+        rows = q.limit(limit).execute().data or []
+        return {"rows": rows, "total_found": len(rows), "table": table, "truncated": False}
+    else:
+        # No ordering - use paginated select_all
+        rows = select_all(sb, table, columns=",".join(cols) if cols else "*", filters=processed_filters)
+        return {"rows": rows[:limit], "total_found": len(rows), "table": table, "truncated": len(rows) > limit}
 
 async def join_tables(sb, primary_table, primary_key, joined_table, foreign_key,
                       primary_filters=None, joined_columns=None, limit=50):
