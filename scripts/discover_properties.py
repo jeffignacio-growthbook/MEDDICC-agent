@@ -34,8 +34,7 @@ HUBSPOT_TO_SUPABASE = {
     "closed_lost_reason": ("deals", "lost_reason"),
     "hs_deal_id": ("deals", "deal_id"),
     "hs_object_id": ("deals", "deal_id"),
-    "deal_currency_code": ("deals", "currency"),
-    "dealtype": ("deals", "deal_type"),
+    # NOTE: currency and deal_type don't exist in Supabase deals table - removed
 }
 
 COMPUTED_COLUMNS = [
@@ -61,6 +60,55 @@ COMPUTED_COLUMNS = [
      "description": "MEDDICC Identified Pain component score 0-10 from call analysis.", "source": "computed"},
     {"supabase_table": "analyses", "supabase_column": "competition_score", "data_type": "number",
      "description": "MEDDICC Competition component score 0-10 from call analysis.", "source": "computed"},
+    {"supabase_table": "analyses", "supabase_column": "deal_id", "data_type": "text",
+     "description": "Deal ID — join key to deals table.", "source": "computed"},
+]
+
+# Supabase-only tables (ETL-generated, not HubSpot properties)
+SUPABASE_ONLY_TABLES = [
+    {"source": "computed", "supabase_table": "objections", "supabase_column": "category", "data_type": "enumeration",
+     "description": "Objection category extracted from calls", "is_queryable": True, "hubspot_name": None,
+     "enum_values": [{"value": "budget", "label": "Budget"}, {"value": "technical", "label": "Technical"},
+         {"value": "timing", "label": "Timing"}, {"value": "product_gap", "label": "Product Gap"},
+         {"value": "switching_cost", "label": "Switching Cost"}, {"value": "trust", "label": "Trust"},
+         {"value": "internal_politics", "label": "Internal Politics"}, {"value": "other", "label": "Other"}]},
+    {"source": "computed", "supabase_table": "objections", "supabase_column": "verbatim_quote", "data_type": "text",
+     "description": "Close paraphrase of what the prospect said", "is_queryable": True, "hubspot_name": None},
+    {"source": "computed", "supabase_table": "objections", "supabase_column": "rep_response", "data_type": "text",
+     "description": "How the rep addressed it. NULL = unaddressed", "is_queryable": True, "hubspot_name": None},
+    {"source": "computed", "supabase_table": "objections", "supabase_column": "stage_when_raised", "data_type": "text",
+     "description": "Pipeline stage when this objection occurred", "is_queryable": True, "hubspot_name": None},
+    {"source": "computed", "supabase_table": "objections", "supabase_column": "company_name", "data_type": "text",
+     "description": "Company that raised the objection", "is_queryable": True, "hubspot_name": None},
+    {"source": "computed", "supabase_table": "objections", "supabase_column": "deal_id", "data_type": "text",
+     "description": "Deal ID — join to deals table", "is_queryable": True, "hubspot_name": None},
+    {"source": "computed", "supabase_table": "feature_gaps", "supabase_column": "category", "data_type": "enumeration",
+     "description": "Feature gap category", "is_queryable": True, "hubspot_name": None,
+     "enum_values": [{"value": "platform_capability", "label": "Platform Capability"},
+         {"value": "integration", "label": "Integration"}, {"value": "reporting", "label": "Reporting"},
+         {"value": "permissions_security", "label": "Permissions/Security"},
+         {"value": "pricing_packaging", "label": "Pricing/Packaging"}, {"value": "other", "label": "Other"}]},
+    {"source": "computed", "supabase_table": "feature_gaps", "supabase_column": "severity", "data_type": "enumeration",
+     "description": "How much this gap affects the deal", "is_queryable": True, "hubspot_name": None,
+     "enum_values": [{"value": "blocker", "label": "Blocker"}, {"value": "nice_to_have", "label": "Nice to Have"},
+         {"value": "workaround_exists", "label": "Workaround Exists"}]},
+    {"source": "computed", "supabase_table": "feature_gaps", "supabase_column": "competitor_mentioned", "data_type": "text",
+     "description": "Competitor named when gap was raised. NULL if none.", "is_queryable": True, "hubspot_name": None},
+    {"source": "computed", "supabase_table": "feature_gaps", "supabase_column": "feature_description", "data_type": "text",
+     "description": "Description of the missing feature", "is_queryable": True, "hubspot_name": None},
+    {"source": "computed", "supabase_table": "feature_gaps", "supabase_column": "company_name", "data_type": "text",
+     "description": "Company that raised the feature gap", "is_queryable": True, "hubspot_name": None},
+    {"source": "computed", "supabase_table": "feature_gaps", "supabase_column": "deal_id", "data_type": "text",
+     "description": "Deal ID — join to deals table", "is_queryable": True, "hubspot_name": None},
+    {"source": "computed", "supabase_table": "win_loss_narratives", "supabase_column": "outcome", "data_type": "enumeration",
+     "description": "Deal outcome", "is_queryable": True, "hubspot_name": None,
+     "enum_values": [{"value": "won", "label": "Won"}, {"value": "lost", "label": "Lost"}]},
+    {"source": "computed", "supabase_table": "win_loss_narratives", "supabase_column": "company_name", "data_type": "text",
+     "description": "Company name for the closed deal", "is_queryable": True, "hubspot_name": None},
+    {"source": "computed", "supabase_table": "win_loss_narratives", "supabase_column": "stated_reason", "data_type": "text",
+     "description": "Rep-entered close reason from CRM", "is_queryable": True, "hubspot_name": None},
+    {"source": "computed", "supabase_table": "win_loss_narratives", "supabase_column": "competitor_mentioned", "data_type": "text",
+     "description": "Competitor mentioned in the win/loss narrative", "is_queryable": True, "hubspot_name": None},
 ]
 
 def fetch_all_properties():
@@ -117,6 +165,9 @@ def main():
     for c in COMPUTED_COLUMNS:
         c["last_refreshed"] = datetime.utcnow().isoformat()
         entries.append(c)
+    for t in SUPABASE_ONLY_TABLES:
+        t["last_refreshed"] = datetime.utcnow().isoformat()
+        entries.append(t)
     queryable = [e for e in entries if e.get("is_queryable")]
     print(f"\nQueryable in Supabase: {len(queryable)}")
     print(f"HubSpot-only (not yet in ETL): {len(entries) - len(queryable)}")
