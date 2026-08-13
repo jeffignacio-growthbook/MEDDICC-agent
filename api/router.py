@@ -107,7 +107,10 @@ async def route_question(question: str, user_id: str,
     )
     try:
         intent = json.loads(intent_resp.content[0].text)
-    except Exception:
+    except Exception as e:
+        # Log the actual error for debugging
+        print(f"❌ Intent classification failed: {e}")
+        print(f"   Raw response: {intent_resp.content[0].text[:500]}")
         log_unanswered(sb, question, user_id, "", "", "ambiguous")
         return {"answer": (
             "Sorry, I couldn't understand that question. "
