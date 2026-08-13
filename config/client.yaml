@@ -398,3 +398,27 @@ etl:
 # 6. Add custom deal_properties you want to include in analysis
 #
 # See README.md for detailed setup instructions.
+
+# Phase G: CRO Slack Agent configuration
+admin:
+  slack_user_ids:
+    - UXXXXXXXXX    # Jeff — replace with real Slack user ID
+    - UYYYYYYYYY    # Ryan — replace with real Slack user ID
+  # Get your Slack user ID: click your name → Profile →
+  # More (⋯) → Copy member ID
+
+quota_roles:
+  - key: ae
+    name: Account Executive
+    metric: new_arr
+    team_name: AE Team
+  - key: am
+    name: Account Manager
+    metric: expansion_arr
+    team_name: AM Team
+
+cro_agent:
+  default_time_window: current_quarter
+  # Options: 'current_quarter' | 'current_week' | 'last_30_days'
+  slow_threshold_seconds: 10
+  # Responses expected to take longer than this get an acknowledgment
