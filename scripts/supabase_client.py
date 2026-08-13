@@ -68,7 +68,17 @@ def select_all(sb, table, columns='*', filters=None, page_size=1000):
     while True:
         q = sb.table(table).select(columns)
         for f in (filters or []):
-            q = getattr(q, f[0])(*f[1:])
+            op = f[0]
+            if op == "__not_null__":
+                q = q.not_.is_(f[1], "null")
+            elif op == "is_":
+                q = q.is_(f[1], f[2])
+            elif op == "ilike":
+                q = q.ilike(f[1], f[2])
+            elif op == "in_":
+                q = q.in_(f[1], f[2])
+            else:
+                q = getattr(q, op)(f[1], f[2])
         batch = (q.range(page*page_size,
                  (page+1)*page_size - 1).execute().data
                  or [])

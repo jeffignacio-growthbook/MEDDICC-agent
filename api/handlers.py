@@ -106,23 +106,77 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
 
 async def query_win_loss(params: dict, sb) -> dict:
     """
-    Win/loss summaries for the period from win_loss_narratives table.
-    Returns wins and losses with stated reasons and key factors.
+    Comprehensive win/loss analysis combining:
+    - win_loss_narratives (weekly AI narratives)
+    - Recent closed-lost/won deals with lost_reason
+    - MEDDICC scores at time of close
+
+    Answers: 'why did we lose?', 'what did we win?',
+    'win/loss summary', 'why are we losing?'
     """
     tw = params["time_window"]
-    rows = select_all(sb, "win_loss_narratives",
+
+    # 1. Check for AI-generated narratives first
+    narratives = select_all(sb, "win_loss_narratives",
         columns="company_name,outcome,stated_reason,"
                 "competitor_mentioned,key_factors,"
                 "narrative,generated_at",
         filters=[("gte", "generated_at", tw["start"])])
 
-    wins  = [r for r in rows if r["outcome"] == "won"]
-    losses= [r for r in rows if r["outcome"] == "lost"]
+    # 2. Get recent closed deals regardless
+    closed_deals = select_all(sb, "deals",
+        columns="deal_id,company_name,deal_value,"
+                "deal_status,close_date,lost_reason,"
+                "owner_email,segment",
+        filters=[
+            ("in_", "deal_status", ["won", "lost"]),
+            ("gte", "close_date", tw["start"]),
+            ("lte", "close_date", tw["end"]),
+        ])
+    closed_deals.sort(
+        key=lambda x: x.get("close_date") or "",
+        reverse=True)
 
-    return {"wins": wins, "losses": losses,
-            "period": tw["label"],
-            "win_count": len(wins),
-            "loss_count": len(losses)}
+    # 3. Get MEDDICC scores for closed deals
+    deal_ids = [d["deal_id"] for d in closed_deals[:20]]
+    analyses = []
+    if deal_ids:
+        analyses = select_all(sb, "analyses",
+            columns="deal_id,overall_score,champion_score,"
+                    "economic_buyer_score,competition_score,"
+                    "pain_score,analyzed_at",
+            filters=[("in_", "deal_id", deal_ids)])
+        # Get latest analysis per deal
+        latest = {}
+        for a in sorted(analyses,
+                        key=lambda x: x.get("analyzed_at",""),
+                        reverse=True):
+            if a["deal_id"] not in latest:
+                latest[a["deal_id"]] = a
+        analyses = list(latest.values())
+
+    wins  = [d for d in closed_deals
+             if d.get("deal_status") == "won"]
+    losses = [d for d in closed_deals
+              if d.get("deal_status") == "lost"]
+
+    return {
+        "narratives":    narratives,
+        "wins":          wins,
+        "losses":        losses,
+        "win_count":     len(wins),
+        "loss_count":    len(losses),
+        "analyses":      analyses,
+        "period":        tw["label"],
+        "has_narratives": len(narratives) > 0,
+        "data_quality_note": (
+            "Lost reasons are blank for most deals — "
+            "recommend making lost_reason a required field "
+            "in HubSpot when marking deals Closed Lost."
+        ) if losses and not any(
+            d.get("lost_reason") for d in losses
+        ) else None,
+    }
 
 
 async def query_objections(params: dict, sb) -> dict:
