@@ -333,3 +333,30 @@ async def set_target(params: dict, sb) -> dict:
 
     return {"set": True, "entity": entity,
             "period": period, "value": value_float}
+
+
+async def query_new_deals(params: dict, sb) -> dict:
+    """
+    Deals created within the time window, from the
+    deals table directly. Answers 'which deals were
+    created this week/quarter/period?'
+    """
+    tw = params["time_window"]
+    rows = select_all(sb, "deals",
+        columns="deal_id,company_name,deal_value,stage,"
+                "owner_email,create_date,forecast_category,"
+                "highest_stage_order_reached,pipeline_id",
+        filters=[
+            ("gte", "create_date", tw["start"]),
+            ("lte", "create_date", tw["end"]),
+        ])
+    # Sort by value descending
+    rows.sort(key=lambda x: x.get("deal_value") or 0,
+              reverse=True)
+    return {
+        "new_deals": rows,
+        "count": len(rows),
+        "total_value": sum(
+            r.get("deal_value") or 0 for r in rows),
+        "period": tw["label"],
+    }

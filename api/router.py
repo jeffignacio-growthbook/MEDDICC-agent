@@ -15,6 +15,7 @@ these handler types. Reply with JSON only.
 
 Handlers:
   query_waterfall       - pipeline movement, new/won/lost this week/quarter
+  query_new_deals       - which deals were created, added to pipeline, or started in a time window
   query_arr             - ARR by customer, total ARR
   query_deals_at_risk   - weak MEDDICC scores, deals at risk, champion gaps
   query_win_loss        - why deals were won/lost, narratives
