@@ -152,6 +152,28 @@ always query the analyses table FIRST to get matching deal_ids, then look
 up those specific deals. Never fetch all deals and then filter on analyses
 — it hits the token budget.
 
+EFFICIENCY: For questions that need data from two
+tables filtered together (e.g. deals in a specific
+stage WITH a specific score), use join_tables in ONE
+call rather than filter_table twice then aggregate.
+
+Example for 'deals in Technical Evaluation with low
+economic buyer score':
+join_tables(
+  primary_table='deals',
+  primary_key='deal_id',
+  joined_table='analyses',
+  foreign_key='deal_id',
+  primary_filters=[
+    ['eq', 'stage', 'presentationscheduled'],
+    ['eq', 'deal_status', 'active']
+  ],
+  joined_columns=['economic_buyer_score',
+                  'overall_score', 'component_details'],
+  limit=50
+)
+Then filter the joined rows in memory for low scores.
+
 ANSWER FORMATTING (for final {{"answer": "..."}} only):
 When you have enough data to answer, format for Slack:
 - Use bullet points (•) not markdown tables (| col | col |)
@@ -235,7 +257,7 @@ async def dynamic_query_loop(question, history, params,
                     f"{f'Context: {hint}' if hint else ''}"}
     ]
     accumulated_data = {}
-    TOKEN_BUDGET = 15000  # ~$0.15 at Sonnet pricing
+    TOKEN_BUDGET = 20000  # ~$0.20 at Sonnet pricing - complex joins need headroom
     tokens_used = 0
     MAX_ITERATIONS = 5
     EVAL_PROMPT = """Score this answer 0-1:

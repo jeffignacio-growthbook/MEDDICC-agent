@@ -126,7 +126,8 @@ async def aggregate_results(data, group_by, aggregations):
         result.append(entry)
     result.sort(key=lambda x: x.get(f"{list(aggregations.keys())[0]}_sum",
         x.get(f"{list(aggregations.keys())[0]}_count", 0)) or 0, reverse=True)
-    return {"grouped": result, "group_count": len(result)}
+    return {"rows": result, "group_count": len(result),
+            "grouped": result}  # keep "grouped" for backward compat
 
 async def compare_periods(sb, table, column, agg, period_a, period_b, date_column="create_date"):
     async def get_val(period):
