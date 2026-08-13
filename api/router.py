@@ -201,13 +201,25 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
         if tokens_used > TOKEN_BUDGET:
             partial = _summarize_accumulated(accumulated_data)
+            print(f"[LOOP] fallback to unanswerable after "
+                  f"{iteration+1} iterations, tokens={tokens_used}")
             return (f"Hit query budget with partial data: {partial}. "
                    f"Try a more specific question.")
 
         raw = resp.content[0].text.strip()
+
+        # DEBUG: Log raw response
+        print(f"[LOOP iter={iteration}] raw response: {raw[:200]}")
+
         parsed = _extract_json(raw)
 
+        # DEBUG: Log parsed result
+        print(f"[LOOP iter={iteration}] parsed={parsed is not None} "
+              f"tool={parsed.get('tool') if parsed else 'none'} "
+              f"has_answer={'answer' in (parsed or {})}")
+
         if not parsed:
+            print(f"[LOOP] JSON parse failed, raw={raw[:300]}")
             return (f"I couldn't parse my own response as JSON. "
                    f"This question may be too complex for dynamic querying. "
                    f"Raw response: {raw[:200]}")
@@ -259,11 +271,17 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         else:
             result = await tool_fn(sb, **tool_params)
 
+        # DEBUG: Log tool execution result
+        print(f"[TOOL] {tool_name} rows={len(result.get('rows',[]))} "
+              f"error={result.get('error','none')}")
+
         accumulated_data[f"step_{iteration}"] = result
         messages.append({"role": "assistant", "content": raw})
         messages.append({"role": "user",
             "content": f"Tool result: {json.dumps(result, default=str)[:3000]}"})
 
+    print(f"[LOOP] fallback to unanswerable after "
+          f"{MAX_ITERATIONS} iterations, tokens={tokens_used}")
     return ("I couldn't fully answer this question within the allowed steps. "
             "The data exists but requires a more complex analysis. "
             "Try breaking it into simpler questions.")
