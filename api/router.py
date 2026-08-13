@@ -327,6 +327,11 @@ async def route_question(question: str, user_id: str,
     params["time_window"] = resolve_time_window(
         params.get("time_window", {}))
 
+    # DEBUG: Log intent classification
+    print(f"[INTENT] handler={handler_name} "
+          f"confidence={intent.get('confidence')} "
+          f"params={json.dumps(params, default=str)[:200]}")
+
     # 2. Auth check for write commands
     if handler_name == "set_target" and not is_admin(user_id):
         return {"answer": (
@@ -352,14 +357,22 @@ async def route_question(question: str, user_id: str,
 
     tool_results = await handler_fn(params, sb)
 
+    # DEBUG: Log handler results
+    print(f"[HANDLER] result keys={list(tool_results.keys())} "
+          f"rows={len(tool_results.get('rows',[]))}")
+
     # 4.5. Dynamic query path for novel questions
-    if (handler_name == "dynamic_query" or
+    dynamic_path = (handler_name == "dynamic_query" or
         (not tool_results.get("rows") and
          not tool_results.get("waterfall") and
          not tool_results.get("arr_by_customer") and
          intent.get("confidence", 0) >= 0.6 and
-         handler_name not in ("unanswerable", "set_target"))):
+         handler_name not in ("unanswerable", "set_target")))
 
+    # DEBUG: Log routing decision
+    print(f"[ROUTING] dynamic_path={dynamic_path}")
+
+    if dynamic_path:
         answer = await dynamic_query_loop(
             question=question,
             history=history,
