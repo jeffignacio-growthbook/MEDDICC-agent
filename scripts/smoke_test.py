@@ -52,6 +52,11 @@ TESTS = [
         "query_arr",
         ["$", "ARR"],
     ),
+    (
+        "why did we lose our last three deals?",
+        "query_win_loss",
+        ["lost", "data"],
+    ),
 ]
 
 captured_replies = {}  # thread_ts → answer text
