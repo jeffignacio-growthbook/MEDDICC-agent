@@ -611,8 +611,8 @@ def main():
         deal_dict = {
             'deal_id': deal_id,
             'deal_name': deal_name,
-            'company_name': company_name,
-            'company_slug': slug,
+            'company_name': company_name or None,  # None = don't overwrite; '' would clear existing data
+            'company_slug': slug if company_name else None,
             'pipeline': pipeline,
             'stage': stage,
             'arr': arr,
