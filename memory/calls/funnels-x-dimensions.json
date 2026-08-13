@@ -1,0 +1,19 @@
+{
+  "company": "Funnels x dimensions",
+  "slug": "funnels-x-dimensions",
+  "last_etl_date": "2026-08-13T03:42:39.056682",
+  "calls": [
+    {
+      "id": "01KZVEHEYGVZ8VA5R5ZKRY7H9D",
+      "source": "fireflies",
+      "title": "Funnels x dimensions x slices",
+      "date": "2026-08-12",
+      "duration_minutes": 46.130001068115234,
+      "summary": "The meeting addressed the implementation of funnel metrics designed to track stepwise conversion rates and their integration as ephemeral metrics within parent funnel metrics. Discussions included the differentiation between dimensions and slices, where dimensions split the denominator population, while slices split the numerator, affecting data presentation across various surfaces. The UI and UX challenges highlighted the suboptimal current display of funnel steps and the preference for drill-down analysis over dashboards. Filtering methods for data exploration were explored, indicating limitations in funnel step filtering and suggesting AI chat as a possible solution for complex queries. Finally, the engineering team set the integration of funnel metrics and slices as a priority for the upcoming 5.1 release, with further tweaks to UI elements and feedback on design integration in progress.",
+      "organizer": "gabe@growthbook.io",
+      "participants": 5,
+      "keywords": "Funnel metrics, Dimensions, Slices, Experiment analysis, Drill down UI, Data segmentation",
+      "action_items": "*, *, L, i, l, i, a, *, *,  ,  , \n, C, o, m, p, l, e, t, e,  , e, n, g, i, n, e, e, r, i, n, g,  , w, o, r, k,  , o, n,  , f, u, n, n, e, l,  , s, l, i, c, e,  , f, u, n, c, t, i, o, n, a, l, i, t, y,  , (, 3, 5, :, 0, 0, ),  ,  , \n, \n, *, *, K, a, r, i,  , K, a, y, *, *,  ,  , \n, P, r, o, v, i, d, e,  , f, o, r, m, a, t, t, i, n, g,  , f, i, x, e, s,  , n, o, t, e, s,  , f, o, r,  , n, u, m, e, r, a, t, o, r, /, d, e, n, o, m, i, n, a, t, o, r,  , U, I,  , t, e, x, t,  , s, t, y, l, e, s,  , (, 4, 1, :, 3, 0, ),  ,  , \n, L, e, a, d,  , d, e, s, i, g, n,  , f, e, e, d, b, a, c, k,  , a, n, d,  , f, i, n, a, l, i, z, e,  , U, X,  , a, p, p, r, o, a, c, h,  , f, o, r,  , f, u, n, n, e, l,  , x,  , s, l, i, c, e,  , d, r, i, l, l,  , d, o, w, n,  , (, 4, 4, :, 0, 3, ),  ,  , \n, \n, *, *, L, u, k, e,  , S, o, n, n, e, t, *, *,  ,  , \n, S, u, p, p, o, r, t,  , t, r, i, a, g, e,  , o, f,  , l, o, w,  , f, r, i, c, t, i, o, n,  , U, I,  , i, m, p, r, o, v, e, m, e, n, t, s,  , i, n, c, l, u, d, i, n, g,  , f, o, r, m, a, t, t, i, n, g,  , f, i, x, e, s,  , (, 4, 2, :, 5, 9, ),  ,  , \n, F, a, c, i, l, i, t, a, t, e,  , d, e, s, i, g, n,  , d, e, c, i, s, i, o, n,  , o, n,  , f, u, n, n, e, l, -, s, l, i, c, e,  , U, I,  , p, l, a, c, e, m, e, n, t,  , a, n, d,  , d, r, i, l, l,  , d, o, w, n,  , (, 4, 4, :, 0, 3, ),  ,  , \n, \n, *, *, A, d, r, i, e, l, *, *,  ,  , \n, C, o, n, t, i, n, u, e,  , w, r, a, p, p, i, n, g,  , u, p,  , i, m, p, l, e, m, e, n, t, a, t, i, o, n,  , a, n, d,  , s, u, p, p, o, r, t,  , f, o, r,  , f, u, n, n, e, l,  , m, e, t, r, i, c, s,  , (, 4, 3, :, 4, 3, )"
+    }
+  ]
+}
