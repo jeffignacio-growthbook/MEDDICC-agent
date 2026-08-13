@@ -120,6 +120,15 @@ always query the analyses table FIRST to get matching deal_ids, then look
 up those specific deals. Never fetch all deals and then filter on analyses
 — it hits the token budget.
 
+ANSWER FORMATTING (for final {{"answer": "..."}} only):
+When you have enough data to answer, format for Slack:
+- Use bullet points (•) not markdown tables (| col | col |)
+- Bold company names with *asterisks*
+- Deal format: • *Company* — $Value | Stage | Date | Score X/10
+- Keep to 5-8 lines max
+- Lead with direct answer, then supporting detail
+- End with one actionable insight if relevant
+
 RESPONSE FORMAT (pure JSON, nothing else):
 {{"tool": "filter_table", "params": {{...}}}}
 OR
