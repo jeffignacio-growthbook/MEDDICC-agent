@@ -37,6 +37,10 @@ async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by
     max_limit = 50 if table == "analyses" else 200
     limit = min(limit or 50, max_limit)
     cols = _validate_columns(table, columns or [])
+    # If column validation found nothing valid, use safe defaults
+    if not cols:
+        cols = ["deal_id", "company_name", "deal_value",
+                "deal_status", "close_date"]
     valid_filters = _validate_filters(table, [tuple(f) for f in (filters or [])])
     invalid_ops = [(op,col,val) for op,col,val in valid_filters if op not in VALID_OPS]
     if invalid_ops:
