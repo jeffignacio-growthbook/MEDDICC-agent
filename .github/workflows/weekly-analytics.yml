@@ -75,3 +75,15 @@ jobs:
         run: |
           python scripts/enrichment/extract_feature_gaps.py \
             --limit 50 --yes
+
+      - name: Weekly learning report
+        if: github.event_name == 'schedule'
+        # Only on scheduled runs, not manual triggers
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ZAP_REPLY_URL: ${{ secrets.ZAP_REPLY_URL }}
+          SLACK_REPORT_CHANNEL: ${{ secrets.SLACK_REPORT_CHANNEL }}
+        run: |
+          python scripts/weekly_learning_report.py --slack
+        continue-on-error: true
