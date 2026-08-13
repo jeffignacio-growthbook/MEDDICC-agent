@@ -6,9 +6,15 @@ generates answers with Sonnet, verifies numbers with Haiku.
 
 import json
 import os
+import logging
 import anthropic
 from api.db import get_supabase, log_unanswered, is_admin
 from api import handlers
+
+# Configure logging for Railway (stderr is better captured than stdout)
+logging.basicConfig(level=logging.INFO, format='%(message)s')
+logger = logging.getLogger("cro_agent")
+logger.info("[STARTUP] Phase H dynamic query loop v2 loaded")
 
 INTENT_PROMPT = """Classify this Slack question into one of
 these handler types. Reply with JSON only.
@@ -201,25 +207,25 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
         if tokens_used > TOKEN_BUDGET:
             partial = _summarize_accumulated(accumulated_data)
-            print(f"[LOOP] fallback to unanswerable after "
-                  f"{iteration+1} iterations, tokens={tokens_used}")
+            logger.info(f"[LOOP] fallback to unanswerable after "
+                        f"{iteration+1} iterations, tokens={tokens_used}")
             return (f"Hit query budget with partial data: {partial}. "
                    f"Try a more specific question.")
 
         raw = resp.content[0].text.strip()
 
         # DEBUG: Log raw response
-        print(f"[LOOP iter={iteration}] raw response: {raw[:200]}")
+        logger.info(f"[LOOP iter={iteration}] raw response: {raw[:200]}")
 
         parsed = _extract_json(raw)
 
         # DEBUG: Log parsed result
-        print(f"[LOOP iter={iteration}] parsed={parsed is not None} "
-              f"tool={parsed.get('tool') if parsed else 'none'} "
-              f"has_answer={'answer' in (parsed or {})}")
+        logger.info(f"[LOOP iter={iteration}] parsed={parsed is not None} "
+                    f"tool={parsed.get('tool') if parsed else 'none'} "
+                    f"has_answer={'answer' in (parsed or {})}")
 
         if not parsed:
-            print(f"[LOOP] JSON parse failed, raw={raw[:300]}")
+            logger.info(f"[LOOP] JSON parse failed, raw={raw[:300]}")
             return (f"I couldn't parse my own response as JSON. "
                    f"This question may be too complex for dynamic querying. "
                    f"Raw response: {raw[:200]}")
@@ -272,16 +278,16 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             result = await tool_fn(sb, **tool_params)
 
         # DEBUG: Log tool execution result
-        print(f"[TOOL] {tool_name} rows={len(result.get('rows',[]))} "
-              f"error={result.get('error','none')}")
+        logger.info(f"[TOOL] {tool_name} rows={len(result.get('rows',[]))} "
+                    f"error={result.get('error','none')}")
 
         accumulated_data[f"step_{iteration}"] = result
         messages.append({"role": "assistant", "content": raw})
         messages.append({"role": "user",
             "content": f"Tool result: {json.dumps(result, default=str)[:3000]}"})
 
-    print(f"[LOOP] fallback to unanswerable after "
-          f"{MAX_ITERATIONS} iterations, tokens={tokens_used}")
+    logger.info(f"[LOOP] fallback to unanswerable after "
+                f"{MAX_ITERATIONS} iterations, tokens={tokens_used}")
     return ("I couldn't fully answer this question within the allowed steps. "
             "The data exists but requires a more complex analysis. "
             "Try breaking it into simpler questions.")
@@ -346,9 +352,9 @@ async def route_question(question: str, user_id: str,
         params.get("time_window", {}))
 
     # DEBUG: Log intent classification
-    print(f"[INTENT] handler={handler_name} "
-          f"confidence={intent.get('confidence')} "
-          f"params={json.dumps(params, default=str)[:200]}")
+    logger.info(f"[INTENT] handler={handler_name} "
+                f"confidence={intent.get('confidence')} "
+                f"params={json.dumps(params, default=str)[:200]}")
 
     # 2. Auth check for write commands
     if handler_name == "set_target" and not is_admin(user_id):
@@ -376,8 +382,8 @@ async def route_question(question: str, user_id: str,
     tool_results = await handler_fn(params, sb)
 
     # DEBUG: Log handler results
-    print(f"[HANDLER] result keys={list(tool_results.keys())} "
-          f"rows={len(tool_results.get('rows',[]))}")
+    logger.info(f"[HANDLER] result keys={list(tool_results.keys())} "
+                f"rows={len(tool_results.get('rows',[]))}")
 
     # 4.5. Dynamic query path for novel questions
     dynamic_path = (handler_name == "dynamic_query" or
@@ -388,7 +394,7 @@ async def route_question(question: str, user_id: str,
          handler_name not in ("unanswerable", "set_target")))
 
     # DEBUG: Log routing decision
-    print(f"[ROUTING] dynamic_path={dynamic_path}")
+    logger.info(f"[ROUTING] dynamic_path={dynamic_path}")
 
     if dynamic_path:
         answer = await dynamic_query_loop(
