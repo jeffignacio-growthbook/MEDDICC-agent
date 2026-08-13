@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_001",
+  "timestamp": "2026-08-13T04:18:12.722864",
+  "company": "Oda",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 5 (Signal assessment)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Explicitly define 'documented reason' as either (a) explicit contradiction in recent call, or (b) agent annotation. Without either, score must carry forward with explicit note. Criterion 5: Define 'positive signals' as only facts directly stated or clearly demonstrated in recent call summary; interpretation inferences must be labeled as inferences, not claims."
+}

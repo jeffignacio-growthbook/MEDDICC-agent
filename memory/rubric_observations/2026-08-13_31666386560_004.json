@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_004",
+  "timestamp": "2026-08-13T04:21:41.308620",
+  "company": "InPost",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 3 (Competition Evidence Quality), Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2: 'Score changes require explicit evidence not already in cumulative state; maintain prior score if new data is implicit in existing assessment.' Criterion 3: 'Competition score requires prospect explicitly mentioning evaluation of named alternatives; positioning by the prospect's current/target vendor alone does not count as competition evidence.' Criterion 4: 'Next steps must specify [who/role] and [specific question], not generic action verbs like identify/cultivate.'"
+}

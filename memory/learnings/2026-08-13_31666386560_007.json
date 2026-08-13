@@ -1,0 +1,21 @@
+{
+  "company": "Taskrabbit",
+  "deal_id": "60652001696",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 7,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Decision Process: Score dropped from 8/10 to 5/10 due to timeline discrepancy (August 25 decision vs October 2026 close), but analysis does not establish whether this is a carry-forward regression requiring documented reason or a new call discovery. The recent call summary contains no mention of timeline discussion, yet the analysis treats the October 2026 HubSpot date as newly discovered evidence contradicting prior calls. If October 2026 was not discussed in the recent call, the analysis cannot use it to revise the score downward\u2014it must maintain the prior 8/10 and note 'No new timeline information in this call - maintaining previous assessment of August 25 decision target. HubSpot discrepancy noted but unconfirmed in call.' If the October date was discussed in the recent call, the call summary must reflect that discussion with specific quotes. CRITERION 3 VIOLATION - Decision Process next step uses vague language: 'Walk me through...' without a concrete action verb. Rewrite as: 'Schedule call with Danielle by [specific date]. Ask: \"Our records show August 25 decision and September 1 POC completion targets. Your HubSpot record shows October 2026 close. Which timeline is current\u2014has the decision been delayed?\"' CRITERION 1 MINOR - Evidence sections should explicitly state when no new information exists in recent call versus when information is being carried forward. Current format conflates discovered evidence with maintained evidence.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-13_31666386560_007",
+  "timestamp": "2026-08-13T04:30:39.911724"
+}

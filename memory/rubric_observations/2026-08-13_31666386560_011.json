@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_011",
+  "timestamp": "2026-08-13T04:33:15.561818",
+  "company": "Unity",
+  "criterion_fired": "CRITERION 2 (Carry-forward consistency) and CRITERION 4 (Next steps specificity) and CRITERION 5 (Champion emergence escalation)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: (1) On corrupted/incomplete call summaries, agent must flag data quality issue explicitly and reassess only readable portions rather than claiming 'no new information'; (2) Next steps must pass specificity check\u2014'Confirm X' requires measurable outcome or question; generic verbs like 'Map' must include concrete action (e.g., 'Map: list names, titles, and stated priorities of 3+ decision stakeholders'); (3) After N consecutive calls with no champion signal, flag as deal health risk and recommend escalation language in summary; (4) ICP validation mandatory before claiming 'strong engagement'\u2014add explicit ICP check to pre-carry-forward checklist."
+}

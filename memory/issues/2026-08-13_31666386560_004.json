@@ -1,0 +1,21 @@
+{
+  "company": "Stone",
+  "deal_id": "53500422798",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 4,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Champion regression violation (Criterion 2): Cumulative state shows Champion at 4/10 (Partial) with evidence 'Pilot group of PMs identified as early adopters using GrowthBook; Christian Liebenow, Newton Calegari, and Logan Bates mentioned in calls but specific champion advocacy not explicitly stated.' Analysis downgrades this to 2/10 (Unknown) with statement 'no evidence exists of any individual actively selling GrowthBook internally' and 'Participation in calls without demonstrated internal advocacy scores 2/10, not 4/10.' This is a regression from Partial to Unknown without documented reason from the recent call. The recent call transcript is corrupted and provides no new information to contradict the cumulative state. Per Criterion 2, when no new information exists, maintain 4/10 with note: 'No new information in this call (transcript corrupted) \u2014 maintaining previous Champion assessment of 4/10 based on PM pilot group and team engagement.' If analysis intends to lower the score, it must explicitly document what call evidence contradicts the prior 4/10 assessment.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-13_31666386560_004",
+  "timestamp": "2026-08-13T04:39:40.356625"
+}
