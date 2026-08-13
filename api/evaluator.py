@@ -25,23 +25,25 @@ def evaluate_result(result: dict, handler_name: str) -> str:
     # Handlers that return structured fields (not rows)
     # Check the primary key field is populated
     STRUCTURED_HANDLERS = {
-        "query_deal":      "deal",
-        "query_rubric":    "description",
-        "query_win_loss":  "wins",
-        "generate_win_loss": "narrative",
-        "set_target":      "set",
-        "query_arr":       "arr_by_customer",
+        "query_deal":      ["deal"],
+        "query_rubric":    ["description", "rubric_overview"],  # score-specific or general
+        "query_win_loss":  ["wins"],
+        "generate_win_loss": ["narrative"],
+        "set_target":      ["set"],
+        "query_arr":       ["arr_by_customer"],
     }
     if handler_name in STRUCTURED_HANDLERS:
-        primary_key = STRUCTURED_HANDLERS[handler_name]
-        primary_val = result.get(primary_key)
-        if primary_val is None:
-            return "empty"
-        if isinstance(primary_val, list) and len(primary_val) == 0:
-            return "empty"
-        if isinstance(primary_val, dict) and not primary_val:
-            return "empty"
-        return "good"
+        primary_keys = STRUCTURED_HANDLERS[handler_name]
+        # Check if ANY of the expected keys exist and have data
+        for key in primary_keys:
+            primary_val = result.get(key)
+            if primary_val is not None:
+                if isinstance(primary_val, list) and len(primary_val) == 0:
+                    continue  # empty list, try next key
+                if isinstance(primary_val, dict) and not primary_val:
+                    continue  # empty dict, try next key
+                return "good"  # found valid data
+        return "empty"
 
     # Row-based handlers
     rows = result.get("rows", [])
