@@ -21,6 +21,30 @@ def get_supabase() -> Client:
         )
     return _sb
 
+
+def unpack_jsonb(value, default=None):
+    """
+    Safely unpack a Supabase JSONB column that may be
+    returned as a string, dict, list, or None.
+    Prevents AttributeError crashes from iterating
+    unparsed JSON strings.
+
+    Usage:
+        data = unpack_jsonb(row.get("component_details"), {})
+        items = unpack_jsonb(row.get("key_factors"), [])
+    """
+    if value is None:
+        return default if default is not None else {}
+    if isinstance(value, (dict, list)):
+        return value
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except (json.JSONDecodeError, ValueError):
+            return default if default is not None else {}
+    return default if default is not None else {}
+
+
 def load_thread(sb: Client, thread_ts: str) -> list:
     """
     Load last 3 Q&A pairs (6 messages) for this thread.
@@ -32,10 +56,7 @@ def load_thread(sb: Client, thread_ts: str) -> list:
               .eq("thread_ts", thread_ts)\
               .execute()
         if r.data:
-            hist = r.data[0].get("history", [])
-            # Parse JSON string to list if needed
-            if isinstance(hist, str):
-                hist = json.loads(hist)
+            hist = unpack_jsonb(r.data[0].get("history"), [])
             return hist[-6:]  # last 3 Q&A pairs (6 messages)
     except Exception:
         pass

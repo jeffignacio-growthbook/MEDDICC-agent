@@ -284,7 +284,8 @@ async def query_deal(params: dict, sb) -> dict:
     else:
         # Fall back to rubric bands
         from api.rubric import get_band, get_next_steps
-        component_details = latest.get("component_details") or {}
+        from api.db import unpack_jsonb
+        component_details = unpack_jsonb(latest.get("component_details"), {})
         for component, data in component_details.items():
             if isinstance(data, dict):
                 score = data.get("score", 0)
