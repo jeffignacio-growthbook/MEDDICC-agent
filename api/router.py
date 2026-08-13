@@ -14,7 +14,7 @@ from api import handlers
 # Configure logging for Railway (stderr is better captured than stdout)
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger("cro_agent")
-logger.info("[STARTUP] Phase H dynamic query loop v2 loaded")
+logger.info("[STARTUP] Phase G.2 robust router with evaluation loop loaded")
 
 INTENT_PROMPT = """Classify this Slack question into one of
 these handler types. Reply with JSON only.
@@ -83,6 +83,25 @@ Tool results: {tool_results}
 Reply with the verified answer only — no commentary.
 If the answer is already fully supported, repeat it
 unchanged."""
+
+SYNTHESIS_SYSTEM_PROMPT = """You answer RevOps questions
+for a B2B SaaS CRO in Slack.
+
+FORMATTING (Slack-native):
+- Never use markdown tables. Use bullet lists.
+- Bold with *asterisks*, not **double**
+- Deal format: • *Company* — $Value | Stage | Close | Score
+- 5-8 lines max. Lead with the direct answer.
+- End with one actionable insight when relevant.
+- Never invent numbers. Use $ and K/M suffixes.
+
+When data includes band_description and next_steps,
+format coaching as:
+  *[Component]: [Score]/10 — [band_description]*
+  Next step: [next_steps]
+
+When data includes deal_specific_next_steps, reference
+those directly rather than generic rubric guidance."""
 
 DYNAMIC_SYSTEM_PROMPT = """CRITICAL: Respond with ONLY a JSON object. No prose,
 no explanation, no markdown. Your entire response must
@@ -174,7 +193,8 @@ def _summarize_accumulated(data: dict) -> str:
     return "; ".join(parts) if parts else "no data found"
 
 async def dynamic_query_loop(question, history, params,
-                              sb, client) -> str:
+                              sb, client,
+                              hint: str = "") -> str:
     """
     Multi-turn tool-calling loop for novel questions.
     Agent calls tools until it has enough data to answer.
@@ -185,11 +205,17 @@ async def dynamic_query_loop(question, history, params,
 
     schema = get_schema_context(sb)
     system = DYNAMIC_SYSTEM_PROMPT.format(schema_context=schema)
+
+    # Build question with optional hint
+    question_with_hint = question
+    if hint:
+        question_with_hint = f"{question}\nContext: {hint}"
+
     messages = [
         *[{"role": m["role"], "content": m["content"]}
           for m in history[-4:]
           if m["role"] in ("user", "assistant")],
-        {"role": "user", "content": question}
+        {"role": "user", "content": question_with_hint}
     ]
     accumulated_data = {}
     TOKEN_BUDGET = 15000  # ~$0.15 at Sonnet pricing
@@ -305,184 +331,177 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 async def route_question(question: str, user_id: str,
                           history: list, sb) -> dict:
     """
-    Full routing pipeline:
-    1. Classify intent with Haiku
-    2. Resolve time window
-    3. Check admin auth for write commands
-    4. Mark slow queries for ack
-    5. Dispatch to handler
-    6. Generate answer with Sonnet
-    7. Verify numbers with Haiku
-    8. Return result with answer and needs_ack flag
+    Robust question routing with inner evaluation loop.
+
+    Flow:
+      1. Classify intent (Haiku, cheap)
+      2. Auth check for write commands
+      3. Try precomputed handler
+      4. Evaluate result quality
+      5. Dynamic fallback if needed
+      6. Honest "no data" if both fail
+      7. Synthesize answer (Sonnet)
+      8. Verify numbers against tool results (Haiku)
     """
     from datetime import date
     from api.time_resolver import resolve_time_window, current_quarter_label
+    from api.evaluator import evaluate_result, extract_missing_hint
 
-    client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
     today  = date.today().isoformat()
     cq     = current_quarter_label()
 
-    # 1. Classify intent
+    # ── 1. Classify ──────────────────────────────────
     intent_resp = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=300,
+        system="Respond with valid JSON only. No markdown, "
+               "no backticks, no explanation.",
         messages=[{"role": "user", "content":
             INTENT_PROMPT.format(
                 today=today,
                 current_quarter=cq,
-                history=json.dumps(history[-4:]),
+                history=json.dumps(
+                    [m for m in history[-4:]
+                     if m.get("role") in ("user","assistant")]),
                 question=question,
             )
         }]
     )
     try:
-        # Strip markdown code fences if present
-        raw_text = intent_resp.content[0].text.strip()
-        if raw_text.startswith("```json"):
-            raw_text = raw_text[7:]  # Remove ```json
-        if raw_text.startswith("```"):
-            raw_text = raw_text[3:]  # Remove ```
-        if raw_text.endswith("```"):
-            raw_text = raw_text[:-3]  # Remove trailing ```
-        intent = json.loads(raw_text.strip())
-    except Exception as e:
-        # Log the actual error for debugging
-        print(f"❌ Intent classification failed: {e}")
-        print(f"   Raw response: {intent_resp.content[0].text[:500]}")
-        log_unanswered(sb, question, user_id, "", "", "ambiguous")
-        return {"answer": (
-            "Sorry, I couldn't understand that question. "
-            "Try asking about pipeline, coverage, deal risk, "
-            "objections, or feature gaps."
-        )}
+        intent = _extract_json(intent_resp.content[0].text)
+    except Exception:
+        _log_unanswered(sb, question, user_id, "ambiguous")
+        return {"answer":
+            "I couldn't understand that question. Try asking "
+            "about pipeline, deals, coverage, objections, "
+            "or feature gaps."}
 
     handler_name = intent.get("handler", "unanswerable")
     params = intent.get("params", {})
     params["time_window"] = resolve_time_window(
         params.get("time_window", {}))
+    confidence = intent.get("confidence", 0.5)
 
-    # DEBUG: Log intent classification
-    logger.info(f"[INTENT] handler={handler_name} "
-                f"confidence={intent.get('confidence')} "
-                f"params={json.dumps(params, default=str)[:200]}")
+    print(f"[INTENT] handler={handler_name} "
+          f"confidence={confidence:.2f}", flush=True)
 
-    # 2. Auth check for write commands
-    if handler_name == "set_target" and not is_admin(user_id):
-        return {"answer": (
-            "Only admins can update targets. "
-            "Ask Jeff or Ryan to set this."
-        )}
+    # ── 2. Auth check ─────────────────────────────────
+    if handler_name == "set_target":
+        if not is_admin(user_id):
+            return {"answer":
+                "Only admins can update targets. "
+                "Ask Jeff or Ryan."}
 
-    # 3. Mark slow queries for ack
-    is_slow = handler_name in ("generate_win_loss", "dynamic_query") \
-              or params.get("is_slow", False)
+    # ── 3. Try precomputed handler ────────────────────
+    tool_results = {}
+    result_quality = "empty"
+    is_slow = handler_name == "generate_win_loss"
 
-    # 4. Dynamic query path — check BEFORE handler dispatch
-    if handler_name == "dynamic_query":
-        logger.info(f"[ROUTING] dynamic_query handler (direct route)")
-        answer = await dynamic_query_loop(
+    if handler_name == "unanswerable":
+        result_quality = "unanswerable"
+
+    elif handler_name != "dynamic_query":
+        handler_fn = getattr(handlers, handler_name, None)
+        if handler_fn:
+            try:
+                tool_results = await handler_fn(params, sb)
+                result_quality = evaluate_result(
+                    tool_results, handler_name)
+                print(f"[HANDLER] {handler_name} → "
+                      f"{result_quality}", flush=True)
+            except Exception as e:
+                import traceback
+                print(f"[HANDLER ERROR] {handler_name}: {e}",
+                      flush=True)
+                print(traceback.format_exc(), flush=True)
+                result_quality = "error"
+
+    # ── 4. Dynamic fallback ───────────────────────────
+    if result_quality in ("empty", "error") \
+       and confidence >= 0.5 \
+       and handler_name not in ("unanswerable", "set_target"):
+
+        print(f"[ROUTING] dynamic fallback "
+              f"(quality={result_quality})", flush=True)
+        hint = extract_missing_hint(tool_results, handler_name)
+        dynamic_answer = await dynamic_query_loop(
             question=question,
             history=history,
             params=params,
             sb=sb,
             client=client,
+            hint=hint,
         )
-        return {"answer": answer, "needs_ack": is_slow,
-                "tool_results": {"dynamic_query": True}}
+        if dynamic_answer and \
+           "don't have data" not in dynamic_answer.lower() and \
+           "couldn't" not in dynamic_answer.lower():
+            return {"answer": dynamic_answer,
+                    "needs_ack": is_slow}
 
-    # 5. Precomputed handler dispatch
-    handler_fn = getattr(handlers, handler_name, None)
-    if not handler_fn or handler_name == "unanswerable":
-        reason = intent.get("unanswerable_reason", "out_of_scope")
-        log_unanswered(sb, question, user_id, "", "", reason)
-        return {"answer": (
+    # Handle direct dynamic_query intent
+    if handler_name == "dynamic_query":
+        print(f"[ROUTING] dynamic_query (direct)", flush=True)
+        dynamic_answer = await dynamic_query_loop(
+            question=question,
+            history=history,
+            params=params,
+            sb=sb,
+            client=client,
+            hint="",
+        )
+        return {"answer": dynamic_answer, "needs_ack": is_slow}
+
+    # ── 5. Honest "no data" ───────────────────────────
+    if result_quality in ("empty", "error", "unanswerable"):
+        reason = intent.get("unanswerable_reason",
+                            "no_data")
+        _log_unanswered(sb, question, user_id, reason)
+        return {"answer":
             "I don't have data to answer that yet. "
             "I've logged the question — it may be something "
-            "we can add to the data layer."
-        )}
+            "we can add to the data layer."}
 
-    tool_results = await handler_fn(params, sb)
-
-    # DEBUG: Log handler results
-    logger.info(f"[HANDLER] result keys={list(tool_results.keys())} "
-                f"rows={len(tool_results.get('rows',[]))}")
-
-    # 6. Dynamic fallback if precomputed returns empty
-    # Exclude handlers that return structured data without "rows"
-    ROWLESS_HANDLERS = {
-        "query_deal", "query_rubric", "query_win_loss",
-        "generate_win_loss", "set_target"
-    }
-    dynamic_fallback = (handler_name not in ROWLESS_HANDLERS and
-                        not tool_results.get("rows") and
-                        not tool_results.get("waterfall") and
-                        not tool_results.get("arr_by_customer") and
-                        intent.get("confidence", 0) >= 0.6)
-
-    # DEBUG: Log routing decision
-    logger.info(f"[ROUTING] dynamic_fallback={dynamic_fallback}")
-
-    if dynamic_fallback:
-        logger.info(f"[ROUTING] empty precomputed result, falling back to dynamic")
-        answer = await dynamic_query_loop(
-            question=question,
-            history=history,
-            params=params,
-            sb=sb,
-            client=client,
-        )
-        return {"answer": answer, "needs_ack": is_slow,
-                "tool_results": {"dynamic_query": True}}
-
-    # 7. Generate answer with Sonnet (precomputed path)
+    # ── 6. Synthesize ─────────────────────────────────
     answer_resp = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=600,
-        system=(
-            "You answer RevOps questions for a B2B SaaS CRO in Slack.\n\n"
-            "FORMATTING RULES — follow these strictly:\n"
-            "- Never use markdown tables (| col | col |). Slack "
-            "renders them poorly. Use bulleted lists instead.\n"
-            "- For deal lists, use this format:\n"
-            "  • *Company* — $Value | Stage | Close Date | Score X/10\n"
-            "- Bold company names with *asterisks*\n"
-            "- Use bullet points (•) not dashes for lists\n"
-            "- Keep answers to 5-8 lines max — Slack is not a report\n"
-            "- Lead with the direct answer, then supporting detail\n"
-            "- End with one actionable insight if relevant\n"
-            "- Never invent numbers. Use $ and K/M suffixes.\n\n"
-            "COACHING GUIDANCE:\n"
-            "- If next_steps_source = 'deal_analysis': Reference the "
-            "deal-specific analysis for tailored coaching.\n"
-            "- If next_steps_source = 'rubric_fallback': Use the band "
-            "descriptions and generic next steps from the rubric.\n"
-            "- If band/next_steps fields present in component_details, "
-            "include them in your answer."
-        ),
+        system=SYNTHESIS_SYSTEM_PROMPT,
         messages=[
             *[{"role": m["role"], "content": m["content"]}
-              for m in history[-4:]],
-            {"role": "user", "content":
-                f"Question: {question}\n\n"
-                f"Data:\n{json.dumps(tool_results, indent=2)}"
-            }
+              for m in history[-4:]
+              if m.get("role") in ("user", "assistant")],
+            {"role": "user",
+             "content": f"Question: {question}\n\n"
+                        f"Data:\n"
+                        f"{json.dumps(tool_results, indent=2, default=str)[:3000]}"}
         ]
     )
     raw_answer = answer_resp.content[0].text.strip()
 
-    # 8. Verify numbers against tool results
+    # ── 7. Verify ─────────────────────────────────────
     verify_resp = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=600,
+        system="Respond with only the verified answer text. "
+               "No JSON, no explanation.",
         messages=[{"role": "user", "content":
             VERIFY_PROMPT.format(
                 question=question,
                 answer=raw_answer,
-                tool_results=json.dumps(tool_results),
+                tool_results=json.dumps(
+                    tool_results, default=str)[:2000],
             )
         }]
     )
-    verified_answer = verify_resp.content[0].text.strip()
+    verified = verify_resp.content[0].text.strip()
 
-    result["answer"] = verified_answer
-    return result
+    return {"answer": verified, "needs_ack": is_slow}
+
+
+# Helper to keep route_question() clean
+def _log_unanswered(sb, question, user_id, reason):
+    try:
+        log_unanswered(sb, question, user_id, "", "", reason)
+    except Exception:
+        pass
