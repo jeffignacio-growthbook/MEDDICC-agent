@@ -364,11 +364,23 @@ async def route_question(question: str, user_id: str,
         )}
 
     # 3. Mark slow queries for ack
-    is_slow = handler_name in ("generate_win_loss",) \
+    is_slow = handler_name in ("generate_win_loss", "dynamic_query") \
               or params.get("is_slow", False)
-    result = {"needs_ack": is_slow}
 
-    # 4. Dispatch to handler
+    # 4. Dynamic query path — check BEFORE handler dispatch
+    if handler_name == "dynamic_query":
+        logger.info(f"[ROUTING] dynamic_query handler (direct route)")
+        answer = await dynamic_query_loop(
+            question=question,
+            history=history,
+            params=params,
+            sb=sb,
+            client=client,
+        )
+        return {"answer": answer, "needs_ack": is_slow,
+                "tool_results": {"dynamic_query": True}}
+
+    # 5. Precomputed handler dispatch
     handler_fn = getattr(handlers, handler_name, None)
     if not handler_fn or handler_name == "unanswerable":
         reason = intent.get("unanswerable_reason", "out_of_scope")
@@ -385,18 +397,18 @@ async def route_question(question: str, user_id: str,
     logger.info(f"[HANDLER] result keys={list(tool_results.keys())} "
                 f"rows={len(tool_results.get('rows',[]))}")
 
-    # 4.5. Dynamic query path for novel questions
-    dynamic_path = (handler_name == "dynamic_query" or
-        (not tool_results.get("rows") and
-         not tool_results.get("waterfall") and
-         not tool_results.get("arr_by_customer") and
-         intent.get("confidence", 0) >= 0.6 and
-         handler_name not in ("unanswerable", "set_target")))
+    # 6. Dynamic fallback if precomputed returns empty
+    dynamic_fallback = (not tool_results.get("rows") and
+                        not tool_results.get("waterfall") and
+                        not tool_results.get("arr_by_customer") and
+                        intent.get("confidence", 0) >= 0.6 and
+                        handler_name not in ("unanswerable", "set_target"))
 
     # DEBUG: Log routing decision
-    logger.info(f"[ROUTING] dynamic_path={dynamic_path}")
+    logger.info(f"[ROUTING] dynamic_fallback={dynamic_fallback}")
 
-    if dynamic_path:
+    if dynamic_fallback:
+        logger.info(f"[ROUTING] empty precomputed result, falling back to dynamic")
         answer = await dynamic_query_loop(
             question=question,
             history=history,
@@ -404,11 +416,10 @@ async def route_question(question: str, user_id: str,
             sb=sb,
             client=client,
         )
-        result["answer"] = answer
-        result["tool_results"] = {"dynamic_query": True}
-        return result
+        return {"answer": answer, "needs_ack": is_slow,
+                "tool_results": {"dynamic_query": True}}
 
-    # 5. Generate answer with Sonnet
+    # 7. Generate answer with Sonnet (precomputed path)
     answer_resp = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=600,
@@ -429,7 +440,7 @@ async def route_question(question: str, user_id: str,
     )
     raw_answer = answer_resp.content[0].text.strip()
 
-    # 6. Verify numbers against tool results
+    # 8. Verify numbers against tool results
     verify_resp = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=600,
