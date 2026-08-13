@@ -408,11 +408,16 @@ async def route_question(question: str, user_id: str,
                 f"rows={len(tool_results.get('rows',[]))}")
 
     # 6. Dynamic fallback if precomputed returns empty
-    dynamic_fallback = (not tool_results.get("rows") and
+    # Exclude handlers that return structured data without "rows"
+    ROWLESS_HANDLERS = {
+        "query_deal", "query_rubric", "query_win_loss",
+        "generate_win_loss", "set_target"
+    }
+    dynamic_fallback = (handler_name not in ROWLESS_HANDLERS and
+                        not tool_results.get("rows") and
                         not tool_results.get("waterfall") and
                         not tool_results.get("arr_by_customer") and
-                        intent.get("confidence", 0) >= 0.6 and
-                        handler_name not in ("unanswerable", "set_target"))
+                        intent.get("confidence", 0) >= 0.6)
 
     # DEBUG: Log routing decision
     logger.info(f"[ROUTING] dynamic_fallback={dynamic_fallback}")
