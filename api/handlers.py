@@ -447,3 +447,31 @@ async def query_new_deals(params: dict, sb) -> dict:
             r.get("deal_value") or 0 for r in rows),
         "period": tw["label"],
     }
+
+
+async def query_won_deals(params: dict, sb) -> dict:
+    """
+    Deals that closed as won in the time window.
+    Answers: 'what did we win?', 'show me our wins',
+             'which deals closed won this quarter?'
+    """
+    tw = params["time_window"]
+    rows = select_all(sb, "deals",
+        columns="deal_id,company_name,deal_value,stage,"
+                "owner_email,close_date,forecast_category,"
+                "new_arr,expansion_arr",
+        filters=[
+            ("eq",  "deal_status", "won"),
+            ("gte", "close_date",  tw["start"]),
+            ("lte", "close_date",  tw["end"]),
+        ])
+    rows.sort(
+        key=lambda x: x.get("deal_value") or 0,
+        reverse=True)
+    return {
+        "rows": rows,
+        "count": len(rows),
+        "total_value": sum(
+            r.get("deal_value") or 0 for r in rows),
+        "period": tw["label"],
+    }
