@@ -45,10 +45,15 @@ def unpack_jsonb(value, default=None):
     return default if default is not None else {}
 
 
+# Valid Anthropic message roles
+VALID_ROLES = {"user", "assistant"}
+
+
 def load_thread(sb: Client, thread_ts: str) -> list:
     """
     Load last 3 Q&A pairs (6 messages) for this thread.
     Returns empty list if thread not found or expired.
+    Filters out invalid roles (e.g., tool_data from old implementation).
     """
     try:
         r = sb.table("conversation_threads")\
@@ -57,6 +62,9 @@ def load_thread(sb: Client, thread_ts: str) -> list:
               .execute()
         if r.data:
             hist = unpack_jsonb(r.data[0].get("history"), [])
+            # Filter to only valid Anthropic message roles
+            hist = [m for m in hist
+                    if m.get("role") in VALID_ROLES]
             return hist[-6:]  # last 3 Q&A pairs (6 messages)
     except Exception:
         pass
