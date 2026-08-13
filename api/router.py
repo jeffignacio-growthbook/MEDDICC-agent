@@ -25,6 +25,10 @@ Handlers:
   query_deal            - deep dive on a specific company's deal
   generate_win_loss     - full narrative for a specific closed deal (slow)
   set_target            - admin: set quota or target (requires auth)
+  dynamic_query         - question requires combining data from multiple tables
+                          or filters not covered by the precomputed handlers
+                          above. Use when no other handler fits but the data
+                          likely exists in Supabase.
   unanswerable          - question cannot be answered with available data
 
 Required JSON:
@@ -72,6 +76,105 @@ Tool results: {tool_results}
 Reply with the verified answer only — no commentary.
 If the answer is already fully supported, repeat it
 unchanged."""
+
+DYNAMIC_SYSTEM_PROMPT = """You answer RevOps questions for a
+B2B SaaS CRO using query tools. You have access to tools
+that read Supabase tables.
+
+{schema_context}
+
+TOOLS YOU CAN CALL (return JSON with "tool" and "params"):
+  filter_table(table, columns, filters, limit, order_by)
+  join_tables(primary_table, primary_key, joined_table,
+              foreign_key, primary_filters, joined_columns, limit)
+  aggregate_results(data, group_by, aggregations)
+  compare_periods(table, column, agg, period_a, period_b,
+                  date_column)
+
+RULES:
+- Only use column names that appear in the schema above
+- Filters: [["operator", "column", "value"], ...]
+  operators: eq neq gt gte lt lte like ilike is_ in_
+- Maximum 5 tool calls per question
+- If data genuinely doesn't exist, say so plainly
+- Never invent numbers
+
+To call a tool, respond with JSON:
+{{"tool": "filter_table", "params": {{...}}}}
+When you have enough data to answer, respond with:
+{{"answer": "your answer here"}}
+"""
+
+async def dynamic_query_loop(question, history, params,
+                              sb, client) -> str:
+    """
+    Multi-turn tool-calling loop for novel questions.
+    Agent calls tools until it has enough data to answer.
+    Capped at 5 iterations to prevent runaway cost.
+    """
+    from api.schema_context import get_schema_context
+    from api import tools as T
+
+    schema = get_schema_context(sb)
+    system = DYNAMIC_SYSTEM_PROMPT.format(schema_context=schema)
+    messages = [
+        *[{"role": m["role"], "content": m["content"]}
+          for m in history[-4:]
+          if m["role"] in ("user", "assistant")],
+        {"role": "user", "content": question}
+    ]
+    accumulated_data = {}
+
+    for iteration in range(5):
+        resp = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=800,
+            system=system,
+            messages=messages,
+        )
+        raw = resp.content[0].text.strip()
+        try:
+            parsed = json.loads(raw)
+        except Exception:
+            return raw
+
+        if "answer" in parsed:
+            return parsed["answer"]
+
+        tool_name = parsed.get("tool", "")
+        tool_params = parsed.get("params", {})
+
+        tool_fn = {
+            "filter_table": T.filter_table,
+            "join_tables": T.join_tables,
+            "aggregate_results": T.aggregate_results,
+            "compare_periods": T.compare_periods,
+        }.get(tool_name)
+
+        if not tool_fn:
+            return (f"I tried to use an unknown tool ({tool_name}). "
+                    f"I can't answer this question with available data.")
+
+        if tool_name == "aggregate_results":
+            data_key = tool_params.pop("data_key",
+                                       list(accumulated_data)[-1]
+                                       if accumulated_data else "")
+            tool_params["data"] = accumulated_data.get(
+                data_key, {}).get("rows", [])
+            result = await tool_fn(**tool_params)
+        elif tool_name == "compare_periods":
+            result = await tool_fn(sb, **tool_params)
+        else:
+            result = await tool_fn(sb, **tool_params)
+
+        accumulated_data[f"step_{iteration}"] = result
+        messages.append({"role": "assistant", "content": raw})
+        messages.append({"role": "user",
+            "content": f"Tool result: {json.dumps(result, default=str)[:3000]}"})
+
+    return ("I couldn't fully answer this question within the allowed steps. "
+            "The data exists but requires a more complex analysis. "
+            "Try breaking it into simpler questions.")
 
 async def route_question(question: str, user_id: str,
                           history: list, sb) -> dict:
@@ -156,6 +259,25 @@ async def route_question(question: str, user_id: str,
         )}
 
     tool_results = await handler_fn(params, sb)
+
+    # 4.5. Dynamic query path for novel questions
+    if (handler_name == "dynamic_query" or
+        (not tool_results.get("rows") and
+         not tool_results.get("waterfall") and
+         not tool_results.get("arr_by_customer") and
+         intent.get("confidence", 0) >= 0.6 and
+         handler_name not in ("unanswerable", "set_target"))):
+
+        answer = await dynamic_query_loop(
+            question=question,
+            history=history,
+            params=params,
+            sb=sb,
+            client=client,
+        )
+        result["answer"] = answer
+        result["tool_results"] = {"dynamic_query": True}
+        return result
 
     # 5. Generate answer with Sonnet
     answer_resp = client.messages.create(

@@ -103,3 +103,16 @@ async def process_and_reply(text: str, user_id: str,
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+@app.post("/admin/refresh-schema")
+async def refresh_schema(request: Request):
+    """Refresh the schema context cache. Call after
+    running discover_properties.py with new properties."""
+    from api.schema_context import invalidate_cache
+    payload = await request.json()
+    # Require a shared secret to prevent abuse
+    if payload.get("secret") != os.environ.get("ADMIN_SECRET"):
+        return JSONResponse({"error": "unauthorized"}, status_code=401)
+    invalidate_cache()
+    return JSONResponse({"ok": True,
+                          "message": "Schema cache cleared"})
