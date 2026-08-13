@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_009",
+  "timestamp": "2026-08-13T04:30:39.912208",
+  "company": "Taskrabbit",
+  "criterion_fired": "CRITERION 2 (Decision Process) and CRITERION 3 (Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 should require: 'If timeline or close date changed from prior call, call summary must contain direct quote from customer. If no timeline discussion in recent call, state \"No new timeline information\" and maintain prior score. If data source is system (HubSpot) not call, label as unconfirmed.' Criterion 3 should require: 'Next step must include concrete action verb, specific date, and sample question with exact wording to confirm discrepancies.'"
+}

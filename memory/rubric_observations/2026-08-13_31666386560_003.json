@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_003",
+  "timestamp": "2026-08-13T04:21:01.647477",
+  "company": "Deel",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 4 (Next steps specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2: Add explicit rule: 'Silence or absence of new information does NOT constitute contradiction. Maintain prior level and document as \"No new evidence in [Call N]\u2014score held at X/10.\" Only adjust score if call contains explicit contradictory evidence.' Criterion 4: Revise to require action-specific language with owner and date: 'Next steps must name the person, specify the deliverable, include target date, and state the success condition (e.g., \"Send Dmitry business case template by [date]; request he share with [stakeholder name] and confirm receipt by [date].\")'"
+}

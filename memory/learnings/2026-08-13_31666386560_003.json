@@ -1,0 +1,21 @@
+{
+  "company": "InPost",
+  "deal_id": "60069831015",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward Consistency: Identified Pain regressed from 4/10 (cumulative state) to 6/10 (new analysis) without documented reason for the increase. The analysis states 'Call 2: No new decision process information - maintained at 5/10' for Decision Process but fails to apply the same carry-forward discipline to Identified Pain. The new evidence cited ('Migrating from Firebase to GrowthBook...') was already implicit in cumulative state's 'current tool inadequacies.' The score increase from 4 to 6 lacks justification. CRITERION 3 VIOLATION - Competition Evidence Quality: The analysis states 'Call 1: GrowthBook mentioned as competitive alternative with warehouse-native analytics' but this is backwards - the cumulative state clarifies this was GrowthBook's own positioning, not competitor positioning. The recent call summary says 'Migrating from Firebase to GrowthBook' which confirms Firebase as incumbent but does NOT identify whether LaunchDarkly, Statsig, EPPO, Datadog Experiments, Optimizely, or homegrown tools are being evaluated. The next step asks about these competitors but the current 6/10 score lacks evidence they've been discussed. Score should remain at 4/10 or lower until prospect explicitly mentions evaluating named competitors. CRITERION 4 VIOLATION - Actionable Next Steps: The Champion section next step reads 'Identify and cultivate a champion: Who internally is most excited...' - this uses vague language ('identify and cultivate') rather than a specific action. A stronger next step would be '[contact TBD]: Schedule 1:1 call this week and ask: Which team member has championed the migration from Firebase internally?'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-13_31666386560_003",
+  "timestamp": "2026-08-13T04:21:41.308179"
+}

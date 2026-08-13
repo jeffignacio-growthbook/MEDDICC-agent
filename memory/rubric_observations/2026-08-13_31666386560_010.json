@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_010",
+  "timestamp": "2026-08-13T04:32:12.008323",
+  "company": "Skyscanner",
+  "criterion_fired": "Criterion 2 (Competition), Criterion 4 (Champion & Competition), Criterion 5 (Decision Process)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Clarify whether score regression requires call-by-call evidence or if 'no new information' is valid justification for maintaining prior score. Criterion 4: Distinguish between 'next steps for agent' (conversation planning) vs. 'next steps for prospect' (concrete commitments); current rubric conflates these. Criterion 5: Explicitly define confidence threshold\u2014'target' language requires explicit prospect commitment OR documented assumption, not inference from context."
+}

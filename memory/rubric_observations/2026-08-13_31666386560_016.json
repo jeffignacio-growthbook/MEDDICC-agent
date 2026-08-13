@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_016",
+  "timestamp": "2026-08-13T04:42:16.466259",
+  "company": "shiftkey",
+  "criterion_fired": "Champion (C) score increase without sufficient evidence",
+  "was_appropriate": true,
+  "suggested_change": "Champion scoring should explicitly distinguish between tactical project coordination (scheduling, communication channels) and strategic internal selling (presenting business cases to economic buyers, building organizational support). Score increases require evidence of latter, not former."
+}

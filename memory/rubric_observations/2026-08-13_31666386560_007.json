@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-13_31666386560_007",
+  "timestamp": "2026-08-13T04:29:28.543493",
+  "company": "Aircall",
+  "criterion_fired": "Criterion 2 (Economic Buyer), Criterion 2 (Decision Process), Criterion 3 (Champion), Criterion 4 (Metrics), Criterion 5 (ICP Fit), Criterion 3 (Competitor)",
+  "was_appropriate": true,
+  "suggested_change": "Add CLAUDE.md instruction: 'Every score change must include explicit reasoning connecting new evidence to the score delta. Scores imply confidence levels\u2014next steps must be logically consistent with the score assigned. All timing references must use concrete dates or relative anchors (e.g., \"by EOW\"), not event-dependent vagueness. ICP fit assessment is mandatory before moving to Metrics scoring. Competitive alternatives (including homegrown) must be explicitly named when identified.'"
+}
