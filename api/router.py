@@ -106,7 +106,15 @@ async def route_question(question: str, user_id: str,
         }]
     )
     try:
-        intent = json.loads(intent_resp.content[0].text)
+        # Strip markdown code fences if present
+        raw_text = intent_resp.content[0].text.strip()
+        if raw_text.startswith("```json"):
+            raw_text = raw_text[7:]  # Remove ```json
+        if raw_text.startswith("```"):
+            raw_text = raw_text[3:]  # Remove ```
+        if raw_text.endswith("```"):
+            raw_text = raw_text[:-3]  # Remove trailing ```
+        intent = json.loads(raw_text.strip())
     except Exception as e:
         # Log the actual error for debugging
         print(f"❌ Intent classification failed: {e}")
