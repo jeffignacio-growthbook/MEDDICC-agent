@@ -135,6 +135,10 @@ RULES:
 - If data genuinely doesn't exist, say so plainly
 - Never invent numbers
 
+DATES: Always use the exact time_window dates provided
+in the question context. Never compute your own fiscal
+quarters — the resolved start/end dates are always given.
+
 QUERY EFFICIENCY:
 When filtering on analysis scores (champion_score, overall_score, etc.),
 always query the analyses table FIRST to get matching deal_ids, then look
@@ -207,16 +211,21 @@ async def dynamic_query_loop(question, history, params,
     schema = get_schema_context(sb)
     system = DYNAMIC_SYSTEM_PROMPT.format(schema_context=schema)
 
-    # Build question with optional hint
-    question_with_hint = question
-    if hint:
-        question_with_hint = f"{question}\nContext: {hint}"
+    # Build question with time window and optional hint
+    history_messages = [
+        {"role": m["role"], "content": m["content"]}
+        for m in history[-4:]
+        if m["role"] in ("user", "assistant")
+    ]
 
     messages = [
-        *[{"role": m["role"], "content": m["content"]}
-          for m in history[-4:]
-          if m["role"] in ("user", "assistant")],
-        {"role": "user", "content": question_with_hint}
+        *history_messages,
+        {"role": "user",
+         "content": f"Question: {question}\n\n"
+                    f"Time context: {params['time_window']['label']} "
+                    f"= {params['time_window']['start']} to "
+                    f"{params['time_window']['end']}\n\n"
+                    f"{f'Context: {hint}' if hint else ''}"}
     ]
     accumulated_data = {}
     TOKEN_BUDGET = 15000  # ~$0.15 at Sonnet pricing
