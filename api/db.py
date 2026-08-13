@@ -33,6 +33,9 @@ def load_thread(sb: Client, thread_ts: str) -> list:
               .execute()
         if r.data:
             hist = r.data[0].get("history", [])
+            # Parse JSON string to list if needed
+            if isinstance(hist, str):
+                hist = json.loads(hist)
             return hist[-6:]  # last 3 Q&A pairs (6 messages)
     except Exception:
         pass
