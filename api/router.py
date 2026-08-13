@@ -209,9 +209,8 @@ OR
 
 def _extract_json(text: str) -> dict | None:
     """Extract first JSON object from text, even if wrapped in prose or markdown."""
-    import re
     text = text.strip()
-    # Try direct parse first
+    # Try direct parse first (handles newlines in values)
     try:
         return json.loads(text)
     except Exception:
@@ -226,13 +225,16 @@ def _extract_json(text: str) -> dict | None:
                 return json.loads(block)
             except Exception:
                 continue
-    # Find outermost { ... } in prose
-    matches = re.findall(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)?\}', text, re.DOTALL)
-    for m in sorted(matches, key=len, reverse=True):
-        try:
-            return json.loads(m)
-        except Exception:
-            continue
+    # Find outermost { } — use a proper JSON decoder
+    # that handles nested quotes, not regex
+    for start in range(len(text)):
+        if text[start] == '{':
+            for end in range(len(text), start, -1):
+                if text[end-1] == '}':
+                    try:
+                        return json.loads(text[start:end])
+                    except Exception:
+                        continue
     return None
 
 def _summarize_accumulated(data: dict) -> str:
