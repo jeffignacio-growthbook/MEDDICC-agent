@@ -94,6 +94,9 @@ TOOLS YOU CAN CALL:
   join_tables(primary_table, primary_key, joined_table,
               foreign_key, primary_filters, joined_columns, limit)
   aggregate_results(data, group_by, aggregations)
+    - aggregations MUST be a dict, not a list
+    - CORRECT: {{"deal_value": "sum", "deal_id": "count"}}
+    - WRONG: [{{"column": "deal_value", "agg": "sum"}}]
   compare_periods(table, column, agg, period_a, period_b,
                   date_column)
 
@@ -104,6 +107,12 @@ RULES:
 - Maximum 5 tool calls per question
 - If data genuinely doesn't exist, say so plainly
 - Never invent numbers
+
+QUERY EFFICIENCY:
+When filtering on analysis scores (champion_score, overall_score, etc.),
+always query the analyses table FIRST to get matching deal_ids, then look
+up those specific deals. Never fetch all deals and then filter on analyses
+— it hits the token budget.
 
 RESPONSE FORMAT (pure JSON, nothing else):
 {{"tool": "filter_table", "params": {{...}}}}

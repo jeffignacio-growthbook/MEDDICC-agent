@@ -33,7 +33,9 @@ VALID_OPS = {"eq", "neq", "gt", "gte", "lt", "lte", "like", "ilike", "is_", "in_
 
 async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by=None):
     _init_valid_columns(sb)
-    limit = min(limit or 50, 200)
+    # Analyses table has large JSONB - limit to 50 rows max
+    max_limit = 50 if table == "analyses" else 200
+    limit = min(limit or 50, max_limit)
     cols = _validate_columns(table, columns or [])
     valid_filters = _validate_filters(table, [tuple(f) for f in (filters or [])])
     invalid_ops = [(op,col,val) for op,col,val in valid_filters if op not in VALID_OPS]
@@ -66,6 +68,20 @@ async def join_tables(sb, primary_table, primary_key, joined_table, foreign_key,
     return {"rows": primary_rows, "total_found": len(primary_rows)}
 
 async def aggregate_results(data, group_by, aggregations):
+    # Validate and convert aggregations format
+    if isinstance(aggregations, list):
+        # Convert common list format to dict
+        converted = {}
+        for item in aggregations:
+            if isinstance(item, dict):
+                col = item.get("column") or item.get("col", "")
+                agg = item.get("agg") or item.get("aggregation", "count")
+                if col:
+                    converted[col] = agg
+        aggregations = converted
+    if not isinstance(aggregations, dict) or not aggregations:
+        return {"error": "aggregations must be a non-empty dict like {'column': 'sum'}"}
+
     groups = defaultdict(list)
     for row in data:
         groups[row.get(group_by, "unknown")].append(row)
