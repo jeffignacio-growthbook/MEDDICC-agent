@@ -77,13 +77,19 @@ Reply with the verified answer only — no commentary.
 If the answer is already fully supported, repeat it
 unchanged."""
 
-DYNAMIC_SYSTEM_PROMPT = """You answer RevOps questions for a
-B2B SaaS CRO using query tools. You have access to tools
-that read Supabase tables.
+DYNAMIC_SYSTEM_PROMPT = """CRITICAL: Respond with ONLY a JSON object. No prose,
+no explanation, no markdown. Your entire response must
+be valid JSON starting with {{ and ending with }}.
+Either a tool call: {{"tool": "...", "params": {{...}}}}
+Or your final answer: {{"answer": "..."}}
+Nothing else.
+
+You answer RevOps questions for a B2B SaaS CRO using query tools.
+You have access to tools that read Supabase tables.
 
 {schema_context}
 
-TOOLS YOU CAN CALL (return JSON with "tool" and "params"):
+TOOLS YOU CAN CALL:
   filter_table(table, columns, filters, limit, order_by)
   join_tables(primary_table, primary_key, joined_table,
               foreign_key, primary_filters, joined_columns, limit)
@@ -99,18 +105,55 @@ RULES:
 - If data genuinely doesn't exist, say so plainly
 - Never invent numbers
 
-To call a tool, respond with JSON:
+RESPONSE FORMAT (pure JSON, nothing else):
 {{"tool": "filter_table", "params": {{...}}}}
-When you have enough data to answer, respond with:
+OR
 {{"answer": "your answer here"}}
 """
+
+def _extract_json(text: str) -> dict | None:
+    """Extract first JSON object from text, even if wrapped in prose or markdown."""
+    import re
+    text = text.strip()
+    # Try direct parse first
+    try:
+        return json.loads(text)
+    except Exception:
+        pass
+    # Strip markdown fences
+    if "```" in text:
+        for block in text.split("```"):
+            block = block.strip()
+            if block.startswith("json"):
+                block = block[4:].strip()
+            try:
+                return json.loads(block)
+            except Exception:
+                continue
+    # Find outermost { ... } in prose
+    matches = re.findall(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)?\}', text, re.DOTALL)
+    for m in sorted(matches, key=len, reverse=True):
+        try:
+            return json.loads(m)
+        except Exception:
+            continue
+    return None
+
+def _summarize_accumulated(data: dict) -> str:
+    """Summarize accumulated tool results for budget overflow message."""
+    parts = []
+    for key, result in data.items():
+        rows = result.get("rows", [])
+        if rows:
+            parts.append(f"{len(rows)} rows from {result.get('table', key)}")
+    return "; ".join(parts) if parts else "no data found"
 
 async def dynamic_query_loop(question, history, params,
                               sb, client) -> str:
     """
     Multi-turn tool-calling loop for novel questions.
     Agent calls tools until it has enough data to answer.
-    Capped at 5 iterations to prevent runaway cost.
+    Capped at 5 iterations and $0.08 token budget.
     """
     from api.schema_context import get_schema_context
     from api import tools as T
@@ -124,21 +167,61 @@ async def dynamic_query_loop(question, history, params,
         {"role": "user", "content": question}
     ]
     accumulated_data = {}
+    TOKEN_BUDGET = 15000  # ~$0.15 at Sonnet pricing
+    tokens_used = 0
+    MAX_ITERATIONS = 5
+    EVAL_PROMPT = """Score this answer 0-1:
+  1.0 = fully answers with specific data
+  0.7 = partially answers, some specifics
+  0.4 = answers adjacent question
+  0.0 = no substantive data
 
-    for iteration in range(5):
+Question: {question}
+Answer: {answer}
+
+Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
+
+    for iteration in range(MAX_ITERATIONS):
         resp = client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=800,
             system=system,
             messages=messages,
         )
+        tokens_used += resp.usage.input_tokens + resp.usage.output_tokens
+
+        if tokens_used > TOKEN_BUDGET:
+            partial = _summarize_accumulated(accumulated_data)
+            return (f"Hit query budget with partial data: {partial}. "
+                   f"Try a more specific question.")
+
         raw = resp.content[0].text.strip()
-        try:
-            parsed = json.loads(raw)
-        except Exception:
-            return raw
+        parsed = _extract_json(raw)
+
+        if not parsed:
+            return (f"I couldn't parse my own response as JSON. "
+                   f"This question may be too complex for dynamic querying. "
+                   f"Raw response: {raw[:200]}")
 
         if "answer" in parsed:
+            # Evaluate answer quality with Haiku
+            try:
+                eval_resp = client.messages.create(
+                    model="claude-haiku-4-5-20251001",
+                    max_tokens=100,
+                    messages=[{"role": "user", "content":
+                        EVAL_PROMPT.format(question=question, answer=parsed["answer"])
+                    }]
+                )
+                eval_result = _extract_json(eval_resp.content[0].text)
+                score = eval_result.get("score", 0.5) if eval_result else 0.5
+                if score < 0.7 and iteration < MAX_ITERATIONS - 1:
+                    missing = eval_result.get("missing", "more specifics") if eval_result else "more specifics"
+                    messages.append({"role": "user",
+                        "content": f"Score: {score:.1f}/1. Missing: {missing}. Improve with more specific data."})
+                    continue
+            except Exception:
+                pass
             return parsed["answer"]
 
         tool_name = parsed.get("tool", "")
