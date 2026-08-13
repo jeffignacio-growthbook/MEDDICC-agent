@@ -19,7 +19,7 @@ def get_schema_context(sb):
         by_table.setdefault(r["supabase_table"], []).append(r)
     lines = ["QUERYABLE SUPABASE TABLES AND COLUMNS:", "(Use these exact column names in query tool calls)", ""]
     table_descriptions = {
-        "deals": "Active and closed deals. One row per deal.",
+        "deals": "Active and closed deals. One row per deal. Note: stage column contains HubSpot stage IDs (e.g. 'presentationscheduled' = Technical Evaluation, 'qualifiedtobuy' = Scoping, 'appointmentscheduled' = Discovery). Never filter on display names.",
         "analyses": "Nightly MEDDICC scores per deal. Latest row = most recent analysis.",
         "objections": "Objections raised in sales calls, extracted by AI. One row per objection instance.",
         "feature_gaps": "Feature gaps mentioned in sales calls. One row per gap instance.",
@@ -68,6 +68,8 @@ QUERYABLE TABLES (data dictionary not yet populated — run discover_properties.
   deals: company_name, deal_value, stage, deal_status, owner_email,
          create_date, close_date, segment, forecast_category,
          sao, new_arr, expansion_arr, lost_reason, pipeline_id
+         Note: stage column contains HubSpot stage IDs (e.g. 'presentationscheduled' = Technical Evaluation,
+         'qualifiedtobuy' = Scoping, 'appointmentscheduled' = Discovery). Never filter on display names.
   analyses: deal_id, overall_score, champion_score, economic_buyer_score,
             decision_criteria_score, decision_process_score, pain_score,
             competition_score, component_details (JSONB), analyzed_at, status
