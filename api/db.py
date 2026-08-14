@@ -145,9 +145,7 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
         "channel_id":  channel,
         "history":     json.dumps(history),
         "last_active": now.isoformat(),
-        "expires_at":  (now.replace(
-            hour=(now.hour + 24) % 24
-        )).isoformat(),
+        "expires_at":  (now + timedelta(hours=24)).isoformat(),
     }, on_conflict="thread_ts").execute()
 
 def get_api_history(history: list) -> list:
