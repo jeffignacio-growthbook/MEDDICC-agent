@@ -93,6 +93,29 @@ Respond with JSON:
 }}"""
 
 
+def _extract_json(text: str) -> dict | None:
+    """
+    Extract a JSON object from Claude's response, even if it
+    ignored the "no markdown" instruction and wrapped it in a
+    ```json fence.
+    """
+    text = text.strip()
+    try:
+        return json.loads(text)
+    except Exception:
+        pass
+    if "```" in text:
+        for block in text.split("```"):
+            block = block.strip()
+            if block.startswith("json"):
+                block = block[4:].strip()
+            try:
+                return json.loads(block)
+            except Exception:
+                continue
+    return None
+
+
 def cluster_failures(sb, days: int = 7) -> list[dict]:
     """
     Read unanswered_queries from the last N days and
@@ -166,11 +189,10 @@ def generate_handler(questions: list, schema_context: str,
     )
     if tracker:
         tracker.record(resp, GENERATOR_MODEL, "handler_generator")
-    try:
-        return json.loads(resp.content[0].text)
-    except Exception as e:
-        print(f"  Generation failed: {e}")
-        return None
+    parsed = _extract_json(resp.content[0].text)
+    if parsed is None:
+        print(f"  Generation failed: could not parse JSON from response")
+    return parsed
 
 
 def validate_handler_code(code: str) -> tuple:
@@ -250,10 +272,8 @@ def validate_answer_quality(questions: list, result: dict,
     )
     if tracker:
         tracker.record(resp, VALIDATION_MODEL, "handler_validation")
-    try:
-        return json.loads(resp.content[0].text)
-    except Exception:
-        return {"score": 0.5, "ready_for_pr": False}
+    parsed = _extract_json(resp.content[0].text)
+    return parsed if parsed is not None else {"score": 0.5, "ready_for_pr": False}
 
 
 def create_github_pr(handler_name: str, handler_code: str,
