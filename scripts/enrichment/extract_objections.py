@@ -247,6 +247,10 @@ def main():
             objections = json.loads(text.strip())
 
             for obj in objections:
+                if not deal_id:
+                    print(f"Skipping enrichment record with no deal_id: "
+                          f"{company}", flush=True)
+                    continue
                 sb.table('objections').insert({
                     'deal_id': deal_id,
                     'company_name': company,

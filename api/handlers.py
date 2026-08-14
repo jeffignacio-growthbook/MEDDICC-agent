@@ -591,16 +591,27 @@ async def query_competitive_intel(params: dict, sb) -> dict:
         COMPETITION_VOCAB["build_vs_buy"] +
         COMPETITION_VOCAB["competitors"])
 
+    # Internal calls (e.g. GrowthBook dogfooding/demo calls) get
+    # ingested by the same enrichment pipeline — exclude them so
+    # they don't read as external competitive signal.
+    INTERNAL_COMPANIES = {"growthbook", "growth book"}
+
     # 1. Competitor mentions in feature_gaps (most structured data)
     comp_gaps = [r for r in select_all(sb, "feature_gaps",
         columns="company_name,competitor_mentioned,"
                 "feature_description,severity,category")
         if r.get("competitor_mentioned")]
+    comp_gaps = [r for r in comp_gaps
+                 if (r.get("company_name") or "").lower()
+                 not in INTERNAL_COMPANIES]
 
     # 2. Objections whose verbatim quote matches the vocabulary
     all_objections = select_all(sb, "objections",
         columns="company_name,category,verbatim_quote,"
                 "rep_response,stage_when_raised")
+    all_objections = [r for r in all_objections
+                      if (r.get("company_name") or "").lower()
+                      not in INTERNAL_COMPANIES]
     matching_objections = []
     for obj in all_objections:
         quote = (obj.get("verbatim_quote") or "").lower()
@@ -620,6 +631,9 @@ async def query_competitive_intel(params: dict, sb) -> dict:
         ])).lower()
         if any(term.lower() in text for term in vocab):
             matching_narratives.append(n)
+    matching_narratives = [r for r in matching_narratives
+                           if (r.get("company_name") or "").lower()
+                           not in INTERNAL_COMPANIES]
 
     # 4. Deals with a low MEDDICC competition score, for context
     low_comp_deals = select_all(sb, "analyses",
