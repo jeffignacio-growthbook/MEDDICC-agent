@@ -567,6 +567,11 @@ COMPETITION_VOCAB = {
         "alternative", "instead of", "rather than",
         "competitive", "competitor",
     ],
+    "deployment_preference": [
+        "self-host", "self-hosted", "on-prem",
+        "on-premise", "on premise", "our infrastructure",
+        "our cloud", "data sovereignty",
+    ],
 }
 
 
@@ -635,6 +640,17 @@ async def query_competitive_intel(params: dict, sb) -> dict:
                            if (r.get("company_name") or "").lower()
                            not in INTERNAL_COMPANIES]
 
+    # Self-hosting / on-prem mentions are a GrowthBook deployment
+    # option, not a build-vs-buy competitive signal — surface them
+    # separately so they don't get counted as competitive objections.
+    self_host_signals = [
+        obj for obj in all_objections
+        if any(t.lower() in
+               (obj.get("verbatim_quote") or "").lower()
+               for t in
+               COMPETITION_VOCAB["deployment_preference"])
+    ]
+
     # 4. Deals with a low MEDDICC competition score, for context
     low_comp_deals = select_all(sb, "analyses",
         columns="deal_id,company_name,competition_score,"
@@ -654,6 +670,11 @@ async def query_competitive_intel(params: dict, sb) -> dict:
         "narrative_mentions": matching_narratives,
         "low_competition_score_deals": low_comp_deals[:10],
         "search_vocab_used": vocab[:5],
+        "self_host_signals": self_host_signals,
+        "self_host_note": (
+            "Self-hosting mentions are GrowthBook deployment "
+            "discussions, not build-vs-buy objections."
+        ) if self_host_signals else None,
         "period": tw["label"],
     }
 
