@@ -31,6 +31,7 @@ def evaluate_result(result: dict, handler_name: str) -> str:
         "generate_win_loss": ["narrative"],
         "set_target":      ["set"],
         "query_arr":       ["arr_by_customer"],
+        "query_competitive_intel": ["competitor_counts"],
     }
     if handler_name in STRUCTURED_HANDLERS:
         primary_keys = STRUCTURED_HANDLERS[handler_name]
