@@ -547,6 +547,103 @@ async def query_new_deals(params: dict, sb) -> dict:
     }
 
 
+# Vocabulary for build-vs-buy / DIY competition detection.
+# Covers how prospects describe in-house alternatives.
+COMPETITION_VOCAB = {
+    "build_vs_buy": [
+        "build", "built", "building", "in-house", "inhouse",
+        "homegrown", "home-grown", "internal", "internally",
+        "ourselves", "own platform", "own tool", "own solution",
+        "DIY", "do it ourselves", "do it yourself",
+        "vibe cod", "custom", "proprietary",
+    ],
+    "competitors": [
+        "Statsig", "LaunchDarkly", "Optimizely", "Amplitude",
+        "VWO", "Adobe Target", "Split.io", "Eppo",
+        "Dr. Jekyll", "WISE", "Flagsmith", "Unleash",
+    ],
+    "evaluation": [
+        "evaluating", "comparing", "looking at", "considering",
+        "alternative", "instead of", "rather than",
+        "competitive", "competitor",
+    ],
+}
+
+
+async def query_competitive_intel(params: dict, sb) -> dict:
+    """
+    Search for competitive signals across all enrichment sources:
+    objections, feature_gaps, win_loss_narratives, and MEDDICC
+    competition scores in analyses.
+
+    Handles questions like:
+    - "have we come across DIY/build-it-yourself alternatives?"
+    - "which companies mentioned building their own platform?"
+    - "what competitors keep coming up?"
+    - "where is Statsig showing up?"
+    """
+    tw = params["time_window"]
+    search_term = params.get("search_term", "")
+
+    # Build search vocabulary: a specific term (e.g. "Statsig", "DIY")
+    # or the full build-vs-buy/competitor vocabulary
+    vocab = [search_term] if search_term else (
+        COMPETITION_VOCAB["build_vs_buy"] +
+        COMPETITION_VOCAB["competitors"])
+
+    # 1. Competitor mentions in feature_gaps (most structured data)
+    comp_gaps = [r for r in select_all(sb, "feature_gaps",
+        columns="company_name,competitor_mentioned,"
+                "feature_description,severity,category")
+        if r.get("competitor_mentioned")]
+
+    # 2. Objections whose verbatim quote matches the vocabulary
+    all_objections = select_all(sb, "objections",
+        columns="company_name,category,verbatim_quote,"
+                "rep_response,stage_when_raised")
+    matching_objections = []
+    for obj in all_objections:
+        quote = (obj.get("verbatim_quote") or "").lower()
+        if any(term.lower() in quote for term in vocab):
+            matching_objections.append(obj)
+
+    # 3. Win/loss narratives that mention the vocabulary
+    narratives = select_all(sb, "win_loss_narratives",
+        columns="company_name,outcome,stated_reason,"
+                "competitor_mentioned,narrative")
+    matching_narratives = []
+    for n in narratives:
+        text = " ".join(filter(None, [
+            n.get("stated_reason", ""),
+            n.get("narrative", ""),
+            n.get("competitor_mentioned", ""),
+        ])).lower()
+        if any(term.lower() in text for term in vocab):
+            matching_narratives.append(n)
+
+    # 4. Deals with a low MEDDICC competition score, for context
+    low_comp_deals = select_all(sb, "analyses",
+        columns="deal_id,company_name,competition_score,"
+                "component_details,analyzed_at",
+        filters=[("lte", "competition_score", 4)])
+    low_comp_deals.sort(
+        key=lambda x: x.get("analyzed_at", ""), reverse=True)
+
+    competitor_counts = Counter(
+        r["competitor_mentioned"] for r in comp_gaps
+        if r.get("competitor_mentioned"))
+
+    return {
+        "competitor_mentions_in_gaps": comp_gaps[:20],
+        "competitor_counts": dict(competitor_counts.most_common(10)),
+        "build_vs_buy_objections": matching_objections,
+        "narrative_mentions": matching_narratives,
+        "low_competition_score_deals": low_comp_deals[:10],
+        "search_vocab_used": vocab[:5],
+        "period": tw["label"],
+    }
+
+
 async def query_won_deals(params: dict, sb) -> dict:
     """
     Deals that closed as won in the time window.

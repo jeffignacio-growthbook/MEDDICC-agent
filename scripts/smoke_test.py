@@ -57,6 +57,11 @@ TESTS = [
         "query_win_loss",
         ["lost", "data"],
     ),
+    (
+        "what competitors keep coming up in our calls?",
+        "query_competitive_intel",
+        ["competitor", "Statsig"],
+    ),
 ]
 
 captured_replies = {}  # thread_ts → answer text
