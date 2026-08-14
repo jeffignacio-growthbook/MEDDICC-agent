@@ -1,7 +1,7 @@
 {
   "company": "Ashley / Alyssa",
   "slug": "ashley-alyssa",
-  "last_etl_date": "2026-08-05T15:57:31.333761",
+  "last_etl_date": "2026-08-14T03:37:25.067436",
   "calls": [
     {
       "id": "01KVZXPP67CY4E9GGRHWV3A5YR",
@@ -26,6 +26,18 @@
       "participants": 2,
       "keywords": "governance blog, visual editor, onboarding wizard, branding strategy, YouTube series, conference CFPs",
       "action_items": "**Alyssa Nicoll**  \nShare governance blog post with Ashley (01:08)  \nStar key Slack contacts (01:48)  \nFollow up on Mintlify migration status (03:51)  \nPing engineering for anti wizard feedback (05:29)  \nCreate branding video assets and guidelines (06:08)  \nCompile conference list for CFPs (08:37)  \nPair with Luke for technical blog post (12:56)  \nDocument PostHog onboarding findings (15:51)  \nPrepare webinar run-throughs with developers (18:30)  \nCreate Visual Editor redesign examples (22:41)  \nOutline YouTube GrowthBook setup class (24:29)  \nCoordinate video collaboration with Hampus (28:42)  \n\n**Ashley Stirrup**  \nSuggest direct calls with engineering for feedback (05:57)  \nDiscuss branding agency with Chris (11:47)  \nReview governance blog post (13:53)"
+    },
+    {
+      "id": "01KZS1REJNEVXP14YJD8N94C5G",
+      "source": "fireflies",
+      "title": "Ashley / Alyssa 1:1",
+      "date": "2026-08-13",
+      "duration_minutes": 39,
+      "summary": "The meeting addressed the need for improved community engagement, highlighting the questioning of GitHub as a participation layer and the request for usage data. Engineering community events were proposed to occur quarterly instead of monthly to focus on key highlights. Slack integration was discussed as a value-add for live chats and micro communities, though not suited for a full documentation hub, prompting consideration of platforms like Discourse. GitHub discussions were identified as a central hub for hosting RFCs, roadmaps, and customer learnings but currently exhibit low activity, necessitating a strategy to boost engagement through product leads and Slack. Ongoing work includes docs migration and community discovery scheduled quarterly, while ensuring prioritization of urgent tasks to manage resources effectively.",
+      "organizer": "alyssa@growthbook.io",
+      "participants": 2,
+      "keywords": "GitHub Discussions, Slack Community, Customer Interviews, Developer Engagement, Community Amplification, Feedback Gathering",
+      "action_items": "*, *, A, l, y, s, s, a,  , N, i, c, o, l, l, *, *, \n, C, r, e, a, t, e,  , N, o, t, i, o, n,  , t, i, c, k, e, t,  , f, o, r,  , E, d, d, i, e,  , A, g, u, i, l, a, r,  , i, n, t, e, r, v, i, e, w,  , s, e, r, i, e, s,  , (, 0, 3, :, 0, 5, ),  ,  , \n, P, r, e, p, a, r, e,  , d, a, t, a,  , a, n, a, l, y, s, i, s,  , o, n,  , G, i, t, H, u, b,  , p, a, r, t, i, c, i, p, a, t, i, o, n,  , l, a, y, e, r,  , (, 0, 5, :, 5, 1, ),  ,  , \n, C, o, o, r, d, i, n, a, t, e,  , w, i, t, h,  , A, u, g, u, s, t,  , a, n, d,  , L, i, n, d, s, e, y,  , f, o, r,  , K, a, p, p, a,  , S, l, a, c, k,  , i, n, t, e, g, r, a, t, i, o, n,  , (, 0, 7, :, 0, 2, ),  ,  , \n, I, n, v, e, s, t, i, g, a, t, e,  , S, l, a, c, k,  , a, s,  , c, o, m, m, u, n, i, t, y,  , h, u, b,  , v, e, r, s, u, s,  , a, l, t, e, r, n, a, t, i, v, e, s,  , (, 1, 1, :, 1, 4, ),  ,  , \n, C, r, e, a, t, e,  , t, i, c, k, e, t, s,  , f, o, r,  , s, m, a, l, l, e, r,  , f, o, c, u, s, e, d,  , S, l, a, c, k,  , c, h, a, n, n, e, l, s,  , (, 1, 2, :, 1, 8, ),  ,  , \n, E, x, p, l, o, r, e,  , a, u, t, o, m, a, t, i, o, n,  , f, o, r,  , G, i, t, H, u, b,  , D, i, s, c, u, s, s, i, o, n, s,  , c, o, n, t, e, n, t,  , (, 2, 0, :, 0, 2, ),  ,  , \n, C, o, o, r, d, i, n, a, t, e,  , w, i, t, h,  , J, e, r, e, m, y,  , a, n, d,  , G, r, a, h, a, m,  , o, n,  , G, i, t, H, u, b,  , D, i, s, c, u, s, s, i, o, n, s,  , i, n, v, e, s, t, m, e, n, t,  , (, 2, 1, :, 1, 8, ),  ,  , \n, M, o, n, i, t, o, r,  , a, m, p, l, i, f, i, c, a, t, i, o, n,  , c, h, a, n, n, e, l, s,  , f, o, r,  , n, o, n, -, e, n, g, i, n, e, e, r,  , p, e, r, s, o, n, a, s,  , (, 2, 6, :, 3, 2, ),  ,  , \n, R, e, c, o, r, d,  , a, n, d,  , f, i, n, a, l, i, z, e,  , p, r, e, s, e, n, t, a, t, i, o, n,  , d, e, c, k,  , f, o, r,  , E, l, i, s, e,  , (, 2, 7, :, 0, 6, ),  ,  , \n, C, o, n, t, i, n, u, e,  , d, o, c, u, m, e, n, t, a, t, i, o, n,  , m, i, g, r, a, t, i, o, n,  , w, i, t, h,  , S, c, o, t, t,  , (, 2, 7, :, 2, 3, ),  ,  , \n, S, e, l, e, c, t,  , a, n, d,  , p, l, a, n,  , p, a, r, t, i, c, i, p, a, t, i, o, n,  , i, n,  , q, u, a, r, t, e, r, l, y,  , C, F, P,  , e, v, e, n, t, s,  , (, 2, 8, :, 3, 2, ),  ,  , \n, R, e, v, i, e, w,  , a, n, d,  , f, i, n, a, l, i, z, e,  , 5, ., 0,  , l, a, u, n, c, h,  , v, i, d, e, o,  , s, h, o, r, t, s, ,,  , s, e, n, d,  , t, o,  , A, s, h, l, e, y,  , (, 2, 8, :, 5, 2, ),  ,  , \n, \n, *, *, A, s, h, l, e, y,  , S, t, i, r, r, u, p, *, *,  ,  , \n, R, e, v, i, e, w,  , A, l, y, s, s, a, ’, s,  , r, e, c, o, r, d, e, d,  , p, r, e, s, e, n, t, a, t, i, o, n,  , a, n, d,  , p, r, o, v, i, d, e,  , f, e, e, d, b, a, c, k,  , (, 2, 7, :, 0, 6, ),  ,  , \n, M, a, i, n, t, a, i, n,  , c, o, m, m, u, n, i, c, a, t, i, o, n,  , w, i, t, h,  , A, l, y, s, s, a,  , o, n,  , u, r, g, e, n, c, y,  , a, n, d,  , f, o, l, l, o, w, -, u, p,  , m, e, e, t, i, n, g,  , (, 2, 7, :, 4, 2, ),  ,  , \n, P, r, o, v, i, d, e,  , f, e, e, d, b, a, c, k,  , o, n,  , v, i, d, e, o,  , s, h, o, r, t, s,  , d, r, a, f, t,  , f, r, o, m,  , A, l, y, s, s, a,  , (, 2, 8, :, 5, 7, )"
     }
   ]
 }
