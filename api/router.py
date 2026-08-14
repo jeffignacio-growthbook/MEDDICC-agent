@@ -8,13 +8,43 @@ import json
 import os
 import logging
 import anthropic
-from api.db import get_supabase, log_unanswered, is_admin
+from api.db import get_supabase, log_unanswered, is_admin, get_prior_entities, get_api_history
 from api import handlers
 
 # Configure logging for Railway (stderr is better captured than stdout)
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger("cro_agent")
 logger.info("[STARTUP] Phase G.2 robust router with evaluation loop loaded")
+
+FOLLOWUP_PRONOUNS = [
+    "which of those", "which of them", "which of these",
+    "of those", "of them", "of these",
+    "those deals", "them deals",
+    "are those", "are they", "are them",
+    "do those", "do they",
+    "from those", "from them",
+    "for those", "for them",
+]
+
+def has_followup_pronoun(question: str) -> bool:
+    """Detect if question references prior answer entities."""
+    q = question.lower()
+    return any(p in q for p in FOLLOWUP_PRONOUNS)
+
+def build_entity_hint(entities: dict) -> str:
+    """Build a context hint for the intent classifier."""
+    if not entities:
+        return ""
+    names = entities.get("company_names", [])[:10]
+    ids   = entities.get("deal_ids", [])[:10]
+    parts = []
+    if names:
+        parts.append(f"companies: {', '.join(names)}")
+    if ids and not names:
+        parts.append(f"deal_ids: {', '.join(str(i) for i in ids)}")
+    return (f"\nThe user is asking a follow-up about "
+            f"these specific entities from the prior answer: "
+            f"{'; '.join(parts)}")
 
 INTENT_PROMPT = """Classify this Slack question into one of
 these handler types. Reply with JSON only.
@@ -32,6 +62,10 @@ Handlers:
   query_deal            - deep dive on a specific company's deal
   query_rubric          - general scoring questions like "what does a 6 mean for champion?"
   generate_win_loss     - full narrative for a specific closed deal (slow)
+  query_competitive_intel - competitive intelligence: which companies mentioned
+                          DIY/build-it-themselves, named competitors showing up
+                          in calls, build-vs-buy signals, what alternatives
+                          prospects are evaluating
   set_target            - admin: set quota or target (requires auth)
   dynamic_query         - question requires combining data from multiple tables
                           or filters not covered by the precomputed handlers
@@ -55,6 +89,7 @@ Required JSON:
     "target_value": "<number or null>",
     "entity_name": "<rep/team name for set_target or null>",
     "period_label": "Q3_FY2027 or null",
+    "search_term": "<specific competitor/term for query_competitive_intel or null>",
     "is_slow": false
   }},
   "unanswerable_reason": "no_data|out_of_scope|ambiguous|null",
@@ -421,6 +456,22 @@ async def route_question(question: str, user_id: str,
     today  = date.today().isoformat()
     cq     = current_quarter_label()
 
+    # ── 0. Pronoun resolution ────────────────────────
+    prior_entities = {}
+    entity_params  = {}
+
+    if has_followup_pronoun(question):
+        prior_entities = get_prior_entities(history)
+        if prior_entities:
+            entity_params = {
+                "deal_ids":      prior_entities.get("deal_ids", []),
+                "company_names": prior_entities.get(
+                    "company_names", []),
+            }
+            logger.info(f"[CONTEXT] pronoun detected, "
+                        f"resolved {len(entity_params['deal_ids'])} "
+                        f"deal_ids from prior turn")
+
     # ── 1. Classify ──────────────────────────────────
     intent_resp = client.messages.create(
         model="claude-haiku-4-5-20251001",
@@ -431,11 +482,9 @@ async def route_question(question: str, user_id: str,
             INTENT_PROMPT.format(
                 today=today,
                 current_quarter=cq,
-                history=json.dumps(
-                    [m for m in history[-4:]
-                     if m.get("role") in ("user","assistant")]),
+                history=json.dumps(get_api_history(history)[-4:]),
                 question=question,
-            )
+            ) + build_entity_hint(prior_entities)
         }]
     )
     try:
@@ -451,6 +500,12 @@ async def route_question(question: str, user_id: str,
     params = intent.get("params", {})
     params["time_window"] = resolve_time_window(
         params.get("time_window", {}))
+
+    # Inject prior entity context for pronoun follow-ups
+    if entity_params:
+        params["deal_ids"]      = entity_params["deal_ids"]
+        params["company_names"] = entity_params["company_names"]
+
     confidence = intent.get("confidence", 0.5)
 
     print(f"[INTENT] handler={handler_name} "
@@ -507,7 +562,8 @@ async def route_question(question: str, user_id: str,
            "don't have data" not in dynamic_answer.lower() and \
            "couldn't" not in dynamic_answer.lower():
             return {"answer": dynamic_answer,
-                    "needs_ack": is_slow}
+                    "needs_ack": is_slow,
+                    "tool_results": {}}
 
     # Handle direct dynamic_query intent
     if handler_name == "dynamic_query":
@@ -520,7 +576,8 @@ async def route_question(question: str, user_id: str,
             client=client,
             hint="",
         )
-        return {"answer": dynamic_answer, "needs_ack": is_slow}
+        return {"answer": dynamic_answer, "needs_ack": is_slow,
+                "tool_results": {}}
 
     # ── 5. Honest "no data" ───────────────────────────
     if result_quality in ("empty", "error", "unanswerable"):
@@ -662,7 +719,8 @@ async def route_question(question: str, user_id: str,
     _log_learning(sb, question, handler_name,
                  assessment, retry_count)
 
-    return {"answer": verified, "needs_ack": is_slow}
+    return {"answer": verified, "needs_ack": is_slow,
+            "tool_results": tool_results}
 
 
 # Helper to keep route_question() clean

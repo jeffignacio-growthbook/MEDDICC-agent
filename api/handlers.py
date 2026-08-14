@@ -49,13 +49,45 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
     Joins analyses with active deals to find at-risk opportunities.
     """
     tw = params["time_window"]
+    deal_ids = params.get("deal_ids", [])
 
-    # Latest analysis per deal in the active pipeline
+    # Filter analyses to specific deals if context provided
+    analyses_filters = [("gte", "analyzed_at", tw["start"])]
+    if deal_ids:
+        analyses_filters.append(
+            ("in_", "deal_id", deal_ids))
+
     analyses = select_all(sb, "analyses",
         columns="deal_id,company_name,overall_score,"
                 "champion_score,economic_buyer_score,"
                 "component_details,analyzed_at",
-        filters=[("gte", "analyzed_at", tw["start"])])
+        filters=analyses_filters)
+
+    # If entity-filtered, skip the active-deals join
+    # (user already knows which deals these are)
+    if deal_ids:
+        at_risk = []
+        for a in analyses:
+            score = a.get("overall_score", 0) or 0
+            champ = a.get("champion_score", 0) or 0
+            if score < 40 or champ < 4:
+                at_risk.append({
+                    "company": a["company_name"],
+                    "overall_score": score,
+                    "champion_score": champ,
+                    "risk_flags": [
+                        f for f, v in [
+                            ("low overall MEDDICC", score < 40),
+                            ("champion gap", champ < 4),
+                            ("no economic buyer",
+                             (a.get("economic_buyer_score")
+                              or 0) < 4),
+                        ] if v
+                    ]
+                })
+        return {"deals_at_risk": at_risk,
+                "total_at_risk": len(at_risk),
+                "filtered_to_context": True}
 
     deals = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,"
@@ -115,6 +147,7 @@ async def query_win_loss(params: dict, sb) -> dict:
     'win/loss summary', 'why are we losing?'
     """
     tw = params["time_window"]
+    deal_ids = params.get("deal_ids", [])
 
     # 1. Check for AI-generated narratives first
     narratives = select_all(sb, "win_loss_narratives",
@@ -124,15 +157,20 @@ async def query_win_loss(params: dict, sb) -> dict:
         filters=[("gte", "generated_at", tw["start"])])
 
     # 2. Get recent closed deals regardless
+    # Base filters for closed deals
+    deal_filters = [
+        ("in_", "deal_status", ["won", "lost"]),
+        ("gte", "close_date", tw["start"]),
+        ("lte", "close_date", tw["end"]),
+    ]
+    if deal_ids:
+        deal_filters.append(("in_", "deal_id", deal_ids))
+
     closed_deals = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,"
                 "deal_status,close_date,lost_reason,"
                 "owner_email,segment",
-        filters=[
-            ("in_", "deal_status", ["won", "lost"]),
-            ("gte", "close_date", tw["start"]),
-            ("lte", "close_date", tw["end"]),
-        ])
+        filters=deal_filters)
     closed_deals.sort(
         key=lambda x: x.get("close_date") or "",
         reverse=True)
@@ -287,6 +325,12 @@ async def query_deal(params: dict, sb) -> dict:
     Returns deal info, latest MEDDICC analysis, and objections.
     """
     company = params.get("company", "")
+
+    # If no explicit company but entity context has one,
+    # use the first company from context
+    if not company and params.get("company_names"):
+        company = params["company_names"][0]
+
     if not company:
         return {"error": "Company name required"}
 
@@ -499,6 +543,103 @@ async def query_new_deals(params: dict, sb) -> dict:
         "count": len(rows),
         "total_value": sum(
             r.get("deal_value") or 0 for r in rows),
+        "period": tw["label"],
+    }
+
+
+# Vocabulary for build-vs-buy / DIY competition detection.
+# Covers how prospects describe in-house alternatives.
+COMPETITION_VOCAB = {
+    "build_vs_buy": [
+        "build", "built", "building", "in-house", "inhouse",
+        "homegrown", "home-grown", "internal", "internally",
+        "ourselves", "own platform", "own tool", "own solution",
+        "DIY", "do it ourselves", "do it yourself",
+        "vibe cod", "custom", "proprietary",
+    ],
+    "competitors": [
+        "Statsig", "LaunchDarkly", "Optimizely", "Amplitude",
+        "VWO", "Adobe Target", "Split.io", "Eppo",
+        "Dr. Jekyll", "WISE", "Flagsmith", "Unleash",
+    ],
+    "evaluation": [
+        "evaluating", "comparing", "looking at", "considering",
+        "alternative", "instead of", "rather than",
+        "competitive", "competitor",
+    ],
+}
+
+
+async def query_competitive_intel(params: dict, sb) -> dict:
+    """
+    Search for competitive signals across all enrichment sources:
+    objections, feature_gaps, win_loss_narratives, and MEDDICC
+    competition scores in analyses.
+
+    Handles questions like:
+    - "have we come across DIY/build-it-yourself alternatives?"
+    - "which companies mentioned building their own platform?"
+    - "what competitors keep coming up?"
+    - "where is Statsig showing up?"
+    """
+    tw = params["time_window"]
+    search_term = params.get("search_term", "")
+
+    # Build search vocabulary: a specific term (e.g. "Statsig", "DIY")
+    # or the full build-vs-buy/competitor vocabulary
+    vocab = [search_term] if search_term else (
+        COMPETITION_VOCAB["build_vs_buy"] +
+        COMPETITION_VOCAB["competitors"])
+
+    # 1. Competitor mentions in feature_gaps (most structured data)
+    comp_gaps = [r for r in select_all(sb, "feature_gaps",
+        columns="company_name,competitor_mentioned,"
+                "feature_description,severity,category")
+        if r.get("competitor_mentioned")]
+
+    # 2. Objections whose verbatim quote matches the vocabulary
+    all_objections = select_all(sb, "objections",
+        columns="company_name,category,verbatim_quote,"
+                "rep_response,stage_when_raised")
+    matching_objections = []
+    for obj in all_objections:
+        quote = (obj.get("verbatim_quote") or "").lower()
+        if any(term.lower() in quote for term in vocab):
+            matching_objections.append(obj)
+
+    # 3. Win/loss narratives that mention the vocabulary
+    narratives = select_all(sb, "win_loss_narratives",
+        columns="company_name,outcome,stated_reason,"
+                "competitor_mentioned,narrative")
+    matching_narratives = []
+    for n in narratives:
+        text = " ".join(filter(None, [
+            n.get("stated_reason", ""),
+            n.get("narrative", ""),
+            n.get("competitor_mentioned", ""),
+        ])).lower()
+        if any(term.lower() in text for term in vocab):
+            matching_narratives.append(n)
+
+    # 4. Deals with a low MEDDICC competition score, for context
+    low_comp_deals = select_all(sb, "analyses",
+        columns="deal_id,company_name,competition_score,"
+                "component_details,analyzed_at",
+        filters=[("lte", "competition_score", 4)])
+    low_comp_deals.sort(
+        key=lambda x: x.get("analyzed_at", ""), reverse=True)
+
+    competitor_counts = Counter(
+        r["competitor_mentioned"] for r in comp_gaps
+        if r.get("competitor_mentioned"))
+
+    return {
+        "competitor_mentions_in_gaps": comp_gaps[:20],
+        "competitor_counts": dict(competitor_counts.most_common(10)),
+        "build_vs_buy_objections": matching_objections,
+        "narrative_mentions": matching_narratives,
+        "low_competition_score_deals": low_comp_deals[:10],
+        "search_vocab_used": vocab[:5],
         "period": tw["label"],
     }
 
