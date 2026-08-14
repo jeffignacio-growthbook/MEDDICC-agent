@@ -1,6 +1,6 @@
 {
-  "last_etl_date": "2026-08-13T03:28:19.401057",
-  "total_deals": 158,
+  "last_etl_date": "2026-08-14T03:25:15.075750",
+  "total_deals": 160,
   "excluded_closed_stages": [
     "closedwon",
     "closedlost",
@@ -26,8 +26,8 @@
       "stage": "",
       "arr": null,
       "close_date": null,
-      "owner_id": "87079750",
-      "last_modified": "2026-08-13T03:27:09.243036"
+      "owner": "dan@growthbook.io",
+      "last_modified": "2026-08-14T03:24:05.250988"
     },
     "9093743432": {
       "deal_id": "9093743432",
@@ -38,8 +38,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "1000",
       "close_date": "2023-12-31T20:13:01.971Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:09.895339"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:06.266142"
     },
     "11023288135": {
       "deal_id": "11023288135",
@@ -50,8 +50,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "1000",
       "close_date": "2023-12-31T20:13:01.971Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:10.302440"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:06.676980"
     },
     "11023961379": {
       "deal_id": "11023961379",
@@ -62,8 +62,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "5000",
       "close_date": "2023-12-31T20:13:01.971Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:10.708363"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:07.087242"
     },
     "11023961439": {
       "deal_id": "11023961439",
@@ -74,8 +74,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "3000",
       "close_date": "2023-12-31T20:13:01.971Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:11.116284"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:07.483094"
     },
     "11024003429": {
       "deal_id": "11024003429",
@@ -86,9 +86,8 @@
       "stage": "decisionmakerboughtin",
       "arr": null,
       "close_date": "2023-12-31T20:13:01.971Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:11.548348",
-      "last_analyzed": "2026-08-13T04:18:12.020841"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:07.902204"
     },
     "11029888047": {
       "deal_id": "11029888047",
@@ -99,8 +98,8 @@
       "stage": "decisionmakerboughtin",
       "arr": null,
       "close_date": "2023-12-31T20:13:01.971Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:11.984702"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:08.338285"
     },
     "33774339943": {
       "deal_id": "33774339943",
@@ -111,8 +110,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "20000",
       "close_date": "2025-05-21T17:49:58.727Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:12.508248"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:08.766274"
     },
     "28294219184": {
       "deal_id": "28294219184",
@@ -123,8 +122,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "40000",
       "close_date": "2025-05-31T17:41:58.789Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:27:12.963902"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:24:09.183021"
     },
     "36325681303": {
       "deal_id": "36325681303",
@@ -135,8 +134,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "60000",
       "close_date": "2025-07-24T22:00:37.158Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:13.473816"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:09.656504"
     },
     "58135909154": {
       "deal_id": "58135909154",
@@ -147,8 +146,8 @@
       "stage": "appointmentscheduled",
       "arr": "75000",
       "close_date": "2026-04-30T15:49:31.995Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:13.888737"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:10.069022"
     },
     "59418415718": {
       "deal_id": "59418415718",
@@ -159,8 +158,8 @@
       "stage": "qualifiedtobuy",
       "arr": "30100",
       "close_date": "2026-06-30T13:09:33.353Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:27:14.325014"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:24:10.497991"
     },
     "59342236338": {
       "deal_id": "59342236338",
@@ -171,8 +170,8 @@
       "stage": "appointmentscheduled",
       "arr": "0",
       "close_date": "2026-07-18T02:23:19.034Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:14.785621"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:10.916689"
     },
     "60036027012": {
       "deal_id": "60036027012",
@@ -183,8 +182,8 @@
       "stage": "appointmentscheduled",
       "arr": "15000",
       "close_date": "2026-08-03T18:10:04.203Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:15.222097"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:11.330944"
     },
     "60056558933": {
       "deal_id": "60056558933",
@@ -195,8 +194,8 @@
       "stage": "appointmentscheduled",
       "arr": "25000",
       "close_date": "2026-08-04T19:05:49.385Z",
-      "owner_id": "87079750",
-      "last_modified": "2026-08-13T03:27:15.669965"
+      "owner": "dan@growthbook.io",
+      "last_modified": "2026-08-14T03:24:11.726078"
     },
     "62875661161": {
       "deal_id": "62875661161",
@@ -207,8 +206,8 @@
       "stage": "appointmentscheduled",
       "arr": "3000",
       "close_date": "2026-08-06T15:12:28.583Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:16.114942"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:12.126082"
     },
     "59860100786": {
       "deal_id": "59860100786",
@@ -219,9 +218,8 @@
       "stage": "24682892",
       "arr": "20000",
       "close_date": "2026-08-21T21:02:40.506Z",
-      "owner_id": "87079750",
-      "last_modified": "2026-08-13T03:27:16.607076",
-      "last_analyzed": "2026-08-13T04:16:09.821611"
+      "owner": "dan@growthbook.io",
+      "last_modified": "2026-08-14T03:24:12.519700"
     },
     "60715077158": {
       "deal_id": "60715077158",
@@ -232,9 +230,8 @@
       "stage": "appointmentscheduled",
       "arr": null,
       "close_date": "2026-08-27T18:58:43.694Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:17.059755",
-      "last_analyzed": "2026-08-13T04:15:16.803865"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:12.925110"
     },
     "60868340629": {
       "deal_id": "60868340629",
@@ -245,8 +242,8 @@
       "stage": "presentationscheduled",
       "arr": "45000",
       "close_date": "2026-08-28T19:10:43.714Z",
-      "owner_id": "87079750",
-      "last_modified": "2026-08-13T03:27:17.772652"
+      "owner": "dan@growthbook.io",
+      "last_modified": "2026-08-14T03:24:13.337070"
     },
     "62725080086": {
       "deal_id": "62725080086",
@@ -257,8 +254,8 @@
       "stage": "presentationscheduled",
       "arr": "40000",
       "close_date": "2026-08-31T09:17:53.617Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:18.291786"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:13.736928"
     },
     "58630730677": {
       "deal_id": "58630730677",
@@ -269,8 +266,8 @@
       "stage": "24682892",
       "arr": "40000",
       "close_date": "2026-08-31T12:59:37.740Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:27:18.719475"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:24:14.184073"
     },
     "62921497713": {
       "deal_id": "62921497713",
@@ -281,8 +278,8 @@
       "stage": "24682892",
       "arr": "100000",
       "close_date": "2026-08-31T20:05:51.804Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:19.539414"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:14.968890"
     },
     "60217095483": {
       "deal_id": "60217095483",
@@ -293,8 +290,8 @@
       "stage": "presentationscheduled",
       "arr": "120000",
       "close_date": "2026-09-04T21:03:06.335Z",
-      "owner_id": "87079750",
-      "last_modified": "2026-08-13T03:27:19.972611"
+      "owner": "dan@growthbook.io",
+      "last_modified": "2026-08-14T03:24:15.384717"
     },
     "61475205473": {
       "deal_id": "61475205473",
@@ -305,9 +302,8 @@
       "stage": "24682892",
       "arr": "45000",
       "close_date": "2026-09-11T19:51:07.549Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:20.396387",
-      "last_analyzed": "2026-08-13T04:16:08.192522"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:15.797713"
     },
     "61076825943": {
       "deal_id": "61076825943",
@@ -318,9 +314,8 @@
       "stage": "appointmentscheduled",
       "arr": "0",
       "close_date": "2026-09-11T20:43:20.568Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:20.896057",
-      "last_analyzed": "2026-08-13T04:16:39.616945"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:16.207976"
     },
     "62121618183": {
       "deal_id": "62121618183",
@@ -331,9 +326,8 @@
       "stage": "24682892",
       "arr": "95000",
       "close_date": "2026-09-16T15:32:24.727Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:21.332125",
-      "last_analyzed": "2026-08-13T04:17:00.567362"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:16.600017"
     },
     "63578787480": {
       "deal_id": "63578787480",
@@ -344,9 +338,8 @@
       "stage": "qualifiedtobuy",
       "arr": "70000",
       "close_date": "2026-09-18T21:01:14.521Z",
-      "owner_id": "87079750",
-      "last_modified": "2026-08-13T03:27:21.771882",
-      "last_analyzed": "2026-08-13T04:19:18.545741"
+      "owner": "dan@growthbook.io",
+      "last_modified": "2026-08-14T03:24:17.011040"
     },
     "61582382687": {
       "deal_id": "61582382687",
@@ -357,8 +350,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000",
       "close_date": "2026-09-22T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:22.207307"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:17.406915"
     },
     "61615709775": {
       "deal_id": "61615709775",
@@ -369,8 +362,8 @@
       "stage": "43449439",
       "arr": "65000",
       "close_date": "2026-09-23T00:00:00Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:22.653033"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:17.821751"
     },
     "58169341204": {
       "deal_id": "58169341204",
@@ -381,8 +374,8 @@
       "stage": "appointmentscheduled",
       "arr": "75000",
       "close_date": "2026-09-23T08:12:47.650Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:23.067619"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:18.237410"
     },
     "61045491056": {
       "deal_id": "61045491056",
@@ -393,9 +386,8 @@
       "stage": "presentationscheduled",
       "arr": "63750",
       "close_date": "2026-09-23T16:56:22.896Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:23.581029",
-      "last_analyzed": "2026-08-13T04:18:50.213606"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:18.635853"
     },
     "61626028439": {
       "deal_id": "61626028439",
@@ -406,8 +398,8 @@
       "stage": "appointmentscheduled",
       "arr": null,
       "close_date": "2026-09-24T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:24.077539"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:19.034769"
     },
     "61841688666": {
       "deal_id": "61841688666",
@@ -418,8 +410,8 @@
       "stage": "appointmentscheduled",
       "arr": "80000",
       "close_date": "2026-09-28T00:00:00Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:24.502999"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:19.423075"
     },
     "62402578522": {
       "deal_id": "62402578522",
@@ -430,9 +422,8 @@
       "stage": "appointmentscheduled",
       "arr": "175000",
       "close_date": "2026-09-28T15:13:58.578Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:24.903521",
-      "last_analyzed": "2026-08-13T04:21:01.071523"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:19.828785"
     },
     "60053279602": {
       "deal_id": "60053279602",
@@ -443,8 +434,8 @@
       "stage": "presentationscheduled",
       "arr": "75000",
       "close_date": "2026-09-30T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:25.342246"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:20.248540"
     },
     "62485423801": {
       "deal_id": "62485423801",
@@ -455,8 +446,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000",
       "close_date": "2026-09-30T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:25.748591"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:20.643524"
     },
     "62620904729": {
       "deal_id": "62620904729",
@@ -467,8 +458,8 @@
       "stage": "presentationscheduled",
       "arr": "50000",
       "close_date": "2026-09-30T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:26.184816"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:21.063116"
     },
     "60069831015": {
       "deal_id": "60069831015",
@@ -479,9 +470,8 @@
       "stage": "qualifiedtobuy",
       "arr": "142174",
       "close_date": "2026-09-30T11:59:11.588Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:26.599674",
-      "last_analyzed": "2026-08-13T04:21:40.534228"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:21.450737"
     },
     "58029773373": {
       "deal_id": "58029773373",
@@ -492,8 +482,8 @@
       "stage": "appointmentscheduled",
       "arr": null,
       "close_date": "2026-09-30T13:24:08.702Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:27:26.994525"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:24:21.852795"
     },
     "54956375177": {
       "deal_id": "54956375177",
@@ -504,8 +494,8 @@
       "stage": "24682892",
       "arr": "100000",
       "close_date": "2026-09-30T15:59:07.702Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:27.397073"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:22.255709"
     },
     "59369997485": {
       "deal_id": "59369997485",
@@ -516,9 +506,8 @@
       "stage": "appointmentscheduled",
       "arr": "150000.0",
       "close_date": "2026-09-30T16:21:17.183Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:27.805589",
-      "last_analyzed": "2026-08-13T04:19:52.470946"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:22.665009"
     },
     "61176368035": {
       "deal_id": "61176368035",
@@ -529,9 +518,8 @@
       "stage": "24682892",
       "arr": "200000",
       "close_date": "2026-09-30T16:59:15.888Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:27:28.183748",
-      "last_analyzed": "2026-08-13T04:20:28.452682"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:24:23.071129"
     },
     "60257621387": {
       "deal_id": "60257621387",
@@ -542,9 +530,8 @@
       "stage": "presentationscheduled",
       "arr": "250000",
       "close_date": "2026-09-30T17:15:10.969Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:28.587986",
-      "last_analyzed": "2026-08-13T04:23:07.036980"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:23.451736"
     },
     "60786197152": {
       "deal_id": "60786197152",
@@ -555,9 +542,8 @@
       "stage": "appointmentscheduled",
       "arr": "10000",
       "close_date": "2026-09-30T17:55:29.318Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:27:28.994968",
-      "last_analyzed": "2026-08-13T04:22:30.346206"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:24:24.111041"
     },
     "47879623775": {
       "deal_id": "47879623775",
@@ -568,9 +554,8 @@
       "stage": "appointmentscheduled",
       "arr": "150000",
       "close_date": "2026-09-30T19:24:03.040Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:29.404045",
-      "last_analyzed": "2026-08-13T04:23:18.250226"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:24.556880"
     },
     "62355039834": {
       "deal_id": "62355039834",
@@ -581,8 +566,8 @@
       "stage": "appointmentscheduled",
       "arr": "150000",
       "close_date": "2026-10-05T00:00:00Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:29.839856"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:24.975884"
     },
     "62360994147": {
       "deal_id": "62360994147",
@@ -593,9 +578,8 @@
       "stage": "appointmentscheduled",
       "arr": "100000",
       "close_date": "2026-10-05T00:00:00Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:30.296980",
-      "last_analyzed": "2026-08-13T04:24:01.741641"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:25.388706"
     },
     "63222360840": {
       "deal_id": "63222360840",
@@ -604,10 +588,10 @@
       "company_slug": "angel",
       "pipeline": "default",
       "stage": "24682892",
-      "arr": "100000",
+      "arr": "50000",
       "close_date": "2026-10-16T18:55:03.885Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:27:30.930155"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:24:26.008475"
     },
     "63051341647": {
       "deal_id": "63051341647",
@@ -618,8 +602,8 @@
       "stage": "appointmentscheduled",
       "arr": "0",
       "close_date": "2026-10-21T00:00:00Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:31.368690"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:26.391542"
     },
     "60275604099": {
       "deal_id": "60275604099",
@@ -630,8 +614,8 @@
       "stage": "presentationscheduled",
       "arr": "200000",
       "close_date": "2026-10-21T14:19:59.405Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:31.769410"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:26.793891"
     },
     "63065867572": {
       "deal_id": "63065867572",
@@ -642,8 +626,8 @@
       "stage": "appointmentscheduled",
       "arr": "0",
       "close_date": "2026-10-22T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:32.166812"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:27.220976"
     },
     "58939926620": {
       "deal_id": "58939926620",
@@ -654,9 +638,8 @@
       "stage": "presentationscheduled",
       "arr": "220000.0",
       "close_date": "2026-10-23T21:03:26.227Z",
-      "owner_id": "87079750",
-      "last_modified": "2026-08-13T03:27:32.565873",
-      "last_analyzed": "2026-08-13T04:23:57.860985"
+      "owner": "dan@growthbook.io",
+      "last_modified": "2026-08-14T03:24:27.687847"
     },
     "63165080439": {
       "deal_id": "63165080439",
@@ -667,8 +650,8 @@
       "stage": "appointmentscheduled",
       "arr": "15000",
       "close_date": "2026-10-25T00:00:00Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:32.999115"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:28.086663"
     },
     "63182567432": {
       "deal_id": "63182567432",
@@ -679,8 +662,8 @@
       "stage": "appointmentscheduled",
       "arr": "75000",
       "close_date": "2026-10-25T00:00:00Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:33.437670"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:28.485583"
     },
     "54646610299": {
       "deal_id": "54646610299",
@@ -691,8 +674,8 @@
       "stage": "appointmentscheduled",
       "arr": "35000",
       "close_date": "2026-10-26T14:39:23.851Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:33.857562"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:28.873743"
     },
     "62296851044": {
       "deal_id": "62296851044",
@@ -703,8 +686,8 @@
       "stage": "appointmentscheduled",
       "arr": "150000",
       "close_date": "2026-10-26T15:58:55.475Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:34.258317"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:29.323331"
     },
     "51560286629": {
       "deal_id": "51560286629",
@@ -715,8 +698,8 @@
       "stage": "appointmentscheduled",
       "arr": "10000",
       "close_date": "2026-10-26T16:16:19.495Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:34.671638"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:29.716624"
     },
     "39350410660": {
       "deal_id": "39350410660",
@@ -727,8 +710,8 @@
       "stage": "appointmentscheduled",
       "arr": "51408.45",
       "close_date": "2026-10-26T16:16:31.653Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:35.134610"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:30.109427"
     },
     "60615627143": {
       "deal_id": "60615627143",
@@ -739,8 +722,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000",
       "close_date": "2026-10-26T16:17:30.533Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:35.613625"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:30.510973"
     },
     "60423886694": {
       "deal_id": "60423886694",
@@ -751,8 +734,8 @@
       "stage": "appointmentscheduled",
       "arr": "125000",
       "close_date": "2026-10-26T16:17:36.149Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:36.019437"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:30.917258"
     },
     "9092472450": {
       "deal_id": "9092472450",
@@ -763,8 +746,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "10000",
       "close_date": "2026-10-26T17:30:25.778Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:36.434272"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:31.371603"
     },
     "59019110029": {
       "deal_id": "59019110029",
@@ -775,9 +758,8 @@
       "stage": "qualifiedtobuy",
       "arr": "75000.0",
       "close_date": "2026-10-26T17:31:22.244Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:36.847564",
-      "last_analyzed": "2026-08-13T04:25:41.863874"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:31.783976"
     },
     "51293158260": {
       "deal_id": "51293158260",
@@ -788,8 +770,8 @@
       "stage": "appointmentscheduled",
       "arr": "45000",
       "close_date": "2026-10-26T17:33:51.358Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:37.262544"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:32.183219"
     },
     "57531453253": {
       "deal_id": "57531453253",
@@ -800,8 +782,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000.0",
       "close_date": "2026-10-26T17:35:03.040Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:37.710555"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:32.574589"
     },
     "57531932257": {
       "deal_id": "57531932257",
@@ -812,8 +794,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000",
       "close_date": "2026-10-26T17:35:47.144Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:38.123875"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:33.034162"
     },
     "58135849096": {
       "deal_id": "58135849096",
@@ -824,8 +806,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000.0",
       "close_date": "2026-10-26T17:36:52.797Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:38.598074"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:33.438964"
     },
     "60837964868": {
       "deal_id": "60837964868",
@@ -836,9 +818,8 @@
       "stage": "appointmentscheduled",
       "arr": "200000",
       "close_date": "2026-10-26T19:43:11.060Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:39.024104",
-      "last_analyzed": "2026-08-13T04:25:47.274582"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:33.819050"
     },
     "61149585726": {
       "deal_id": "61149585726",
@@ -849,9 +830,8 @@
       "stage": "qualifiedtobuy",
       "arr": "75000",
       "close_date": "2026-10-26T19:48:25.182Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:39.424262",
-      "last_analyzed": "2026-08-13T04:26:54.878809"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:34.635176"
     },
     "60964814258": {
       "deal_id": "60964814258",
@@ -862,9 +842,8 @@
       "stage": "appointmentscheduled",
       "arr": "150000",
       "close_date": "2026-10-26T19:52:47.990Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:39.874919",
-      "last_analyzed": "2026-08-13T04:26:23.885088"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:35.034895"
     },
     "54599396690": {
       "deal_id": "54599396690",
@@ -875,8 +854,8 @@
       "stage": "presentationscheduled",
       "arr": "1500",
       "close_date": "2026-10-26T21:07:35.875Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:40.280554"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:35.446740"
     },
     "55478324562": {
       "deal_id": "55478324562",
@@ -887,8 +866,8 @@
       "stage": "presentationscheduled",
       "arr": "25000",
       "close_date": "2026-10-26T21:07:40.584Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:40.677232"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:35.853281"
     },
     "56685250888": {
       "deal_id": "56685250888",
@@ -899,9 +878,8 @@
       "stage": "presentationscheduled",
       "arr": "50000",
       "close_date": "2026-10-26T21:08:18.750Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:41.076491",
-      "last_analyzed": "2026-08-13T04:27:29.989624"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:36.247294"
     },
     "58867845224": {
       "deal_id": "58867845224",
@@ -912,8 +890,8 @@
       "stage": "qualifiedtobuy",
       "arr": "75000",
       "close_date": "2026-10-26T21:08:24.328Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:41.483888"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:36.678023"
     },
     "57553904779": {
       "deal_id": "57553904779",
@@ -924,9 +902,8 @@
       "stage": "qualifiedtobuy",
       "arr": "70000",
       "close_date": "2026-10-26T21:08:29.743Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:41.876357",
-      "last_analyzed": "2026-08-13T04:29:27.950785"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:37.070846"
     },
     "63316026654": {
       "deal_id": "63316026654",
@@ -937,8 +914,8 @@
       "stage": "qualifiedtobuy",
       "arr": "150000",
       "close_date": "2026-10-29T00:00:00Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:42.328883"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:37.453100"
     },
     "53466496122": {
       "deal_id": "53466496122",
@@ -949,9 +926,8 @@
       "stage": "24682892",
       "arr": "70000.0",
       "close_date": "2026-10-30T01:31:59.542Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:42.762728",
-      "last_analyzed": "2026-08-13T04:27:32.120777"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:37.847580"
     },
     "60665391542": {
       "deal_id": "60665391542",
@@ -962,9 +938,8 @@
       "stage": "qualifiedtobuy",
       "arr": "300000",
       "close_date": "2026-10-30T12:41:06.401Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:43.232039",
-      "last_analyzed": "2026-08-13T04:30:09.154358"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:38.335294"
     },
     "58956770692": {
       "deal_id": "58956770692",
@@ -972,11 +947,11 @@
       "company_name": "Reliance Industries Limited",
       "company_slug": "reliance-industries-limited",
       "pipeline": "default",
-      "stage": "qualifiedtobuy",
-      "arr": "150000",
+      "stage": "24682892",
+      "arr": "60000",
       "close_date": "2026-10-30T14:09:42.510Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:43.727498"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:38.732960"
     },
     "62635592329": {
       "deal_id": "62635592329",
@@ -987,8 +962,8 @@
       "stage": "presentationscheduled",
       "arr": "30000",
       "close_date": "2026-10-30T14:21:14.275Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:27:44.162049"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:24:39.130109"
     },
     "61437846967": {
       "deal_id": "61437846967",
@@ -999,8 +974,8 @@
       "stage": "qualifiedtobuy",
       "arr": "200000",
       "close_date": "2026-10-30T14:40:10.567Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:44.604640"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:39.540071"
     },
     "63220208693": {
       "deal_id": "63220208693",
@@ -1011,8 +986,8 @@
       "stage": "appointmentscheduled",
       "arr": "100000",
       "close_date": "2026-10-30T15:36:55.594Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:45.018658"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:39.929856"
     },
     "60652001696": {
       "deal_id": "60652001696",
@@ -1023,9 +998,8 @@
       "stage": "presentationscheduled",
       "arr": "175000",
       "close_date": "2026-10-30T15:49:00.145Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:45.430600",
-      "last_analyzed": "2026-08-13T04:30:39.381476"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:40.327378"
     },
     "55660576681": {
       "deal_id": "55660576681",
@@ -1036,9 +1010,8 @@
       "stage": "presentationscheduled",
       "arr": "125000",
       "close_date": "2026-10-30T17:11:25.834Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:45.814464",
-      "last_analyzed": "2026-08-13T04:32:10.953610"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:40.727024"
     },
     "63120688011": {
       "deal_id": "63120688011",
@@ -1049,8 +1022,8 @@
       "stage": "appointmentscheduled",
       "arr": "250000",
       "close_date": "2026-10-30T18:42:45.983Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:46.225504"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:41.136356"
     },
     "63433850647": {
       "deal_id": "63433850647",
@@ -1061,8 +1034,8 @@
       "stage": "appointmentscheduled",
       "arr": "100000",
       "close_date": "2026-10-30T19:37:42.199Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:46.616182"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:41.524761"
     },
     "63562515584": {
       "deal_id": "63562515584",
@@ -1073,8 +1046,8 @@
       "stage": "appointmentscheduled",
       "arr": "40000",
       "close_date": "2026-10-30T20:05:36.994Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:47.027775"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:41.942643"
     },
     "61631402640": {
       "deal_id": "61631402640",
@@ -1085,8 +1058,8 @@
       "stage": "appointmentscheduled",
       "arr": "25000",
       "close_date": "2026-10-30T21:18:09.368Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:47.433640"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:42.347005"
     },
     "62622458398": {
       "deal_id": "62622458398",
@@ -1097,9 +1070,8 @@
       "stage": "appointmentscheduled",
       "arr": "250000",
       "close_date": "2026-10-30T21:41:16.729Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:47.875348",
-      "last_analyzed": "2026-08-13T04:30:48.466940"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:42.751391"
     },
     "60644372558": {
       "deal_id": "60644372558",
@@ -1110,8 +1082,8 @@
       "stage": "appointmentscheduled",
       "arr": "75000",
       "close_date": "2026-10-31T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:48.296771"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:43.146755"
     },
     "61625300846": {
       "deal_id": "61625300846",
@@ -1122,8 +1094,8 @@
       "stage": "qualifiedtobuy",
       "arr": "50000",
       "close_date": "2026-10-31T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:48.794525"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:43.548349"
     },
     "62452805994": {
       "deal_id": "62452805994",
@@ -1134,8 +1106,8 @@
       "stage": "appointmentscheduled",
       "arr": "95000",
       "close_date": "2026-10-31T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:49.198612"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:43.947722"
     },
     "59171632668": {
       "deal_id": "59171632668",
@@ -1146,8 +1118,8 @@
       "stage": "24682892",
       "arr": "50000.0",
       "close_date": "2026-10-31T01:31:19.497Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:49.601749"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:44.342236"
     },
     "56258367868": {
       "deal_id": "56258367868",
@@ -1158,8 +1130,8 @@
       "stage": "24682892",
       "arr": "90000",
       "close_date": "2026-10-31T01:31:56.559Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:50.002358"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:44.739330"
     },
     "49689180024": {
       "deal_id": "49689180024",
@@ -1170,9 +1142,20 @@
       "stage": "presentationscheduled",
       "arr": "50000.0",
       "close_date": "2026-10-31T01:32:14.958Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:50.456769",
-      "last_analyzed": "2026-08-13T04:33:14.819116"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:45.143478"
+    },
+    "60667714821": {
+      "deal_id": "60667714821",
+      "deal_name": "Crunchyroll - Sony BU Expansion",
+      "company_name": "Crunchyroll",
+      "company_slug": "crunchyroll",
+      "pipeline": "default",
+      "stage": "presentationscheduled",
+      "arr": "300000",
+      "close_date": "2026-10-31T04:00:00Z",
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:24:45.558800"
     },
     "63618932383": {
       "deal_id": "63618932383",
@@ -1183,8 +1166,8 @@
       "stage": "appointmentscheduled",
       "arr": "0",
       "close_date": "2026-10-31T11:35:18.555Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:51.177647"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:46.212884"
     },
     "63327879453": {
       "deal_id": "63327879453",
@@ -1195,8 +1178,8 @@
       "stage": "appointmentscheduled",
       "arr": "100000",
       "close_date": "2026-10-31T11:44:20.406Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:51.609031"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:46.623340"
     },
     "62160567676": {
       "deal_id": "62160567676",
@@ -1207,9 +1190,8 @@
       "stage": "qualifiedtobuy",
       "arr": "250000",
       "close_date": "2026-10-31T13:10:31.344Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:52.043834",
-      "last_analyzed": "2026-08-13T04:34:17.879684"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:47.021679"
     },
     "62756829850": {
       "deal_id": "62756829850",
@@ -1220,8 +1202,8 @@
       "stage": "qualifiedtobuy",
       "arr": "200000",
       "close_date": "2026-10-31T16:54:10.398Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:52.479008"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:47.576600"
     },
     "62741857928": {
       "deal_id": "62741857928",
@@ -1232,8 +1214,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000",
       "close_date": "2026-10-31T20:05:05.362Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:27:52.925732"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:24:47.976031"
     },
     "58134855076": {
       "deal_id": "58134855076",
@@ -1244,9 +1226,8 @@
       "stage": "presentationscheduled",
       "arr": "75000.0",
       "close_date": "2026-10-31T20:47:44.921Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:27:53.353513",
-      "last_analyzed": "2026-08-13T04:34:53.969491"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:24:48.391589"
     },
     "60785721693": {
       "deal_id": "60785721693",
@@ -1257,9 +1238,8 @@
       "stage": "qualifiedtobuy",
       "arr": "250000",
       "close_date": "2026-10-31T20:51:31.934Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:53.795534",
-      "last_analyzed": "2026-08-13T04:34:54.949936"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:48.795088"
     },
     "63527836680": {
       "deal_id": "63527836680",
@@ -1270,8 +1250,8 @@
       "stage": "appointmentscheduled",
       "arr": "100000",
       "close_date": "2026-11-04T00:00:00Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:54.251543"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:49.214330"
     },
     "63535729507": {
       "deal_id": "63535729507",
@@ -1282,8 +1262,8 @@
       "stage": "appointmentscheduled",
       "arr": "0",
       "close_date": "2026-11-04T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:54.659516"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:49.604007"
     },
     "63549963371": {
       "deal_id": "63549963371",
@@ -1294,8 +1274,8 @@
       "stage": "appointmentscheduled",
       "arr": "150000",
       "close_date": "2026-11-05T00:00:00Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:55.084909"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:50.000763"
     },
     "59458798354": {
       "deal_id": "59458798354",
@@ -1306,8 +1286,8 @@
       "stage": "qualifiedtobuy",
       "arr": "75000.0",
       "close_date": "2026-11-12T20:44:00.514Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:55.486112"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:50.417846"
     },
     "60178287462": {
       "deal_id": "60178287462",
@@ -1318,20 +1298,8 @@
       "stage": "appointmentscheduled",
       "arr": "30000",
       "close_date": "2026-11-19T14:44:17.326Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:55.883421"
-    },
-    "60667714821": {
-      "deal_id": "60667714821",
-      "deal_name": "Crunchyroll - Sony BU Expansion",
-      "company_name": "Crunchyroll",
-      "company_slug": "crunchyroll",
-      "pipeline": "default",
-      "stage": "presentationscheduled",
-      "arr": "300000",
-      "close_date": "2026-11-30T05:00:00Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:27:56.274957"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:50.810538"
     },
     "59387794836": {
       "deal_id": "59387794836",
@@ -1342,9 +1310,8 @@
       "stage": "presentationscheduled",
       "arr": "225000.0",
       "close_date": "2026-11-30T14:04:56.007Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:56.720466",
-      "last_analyzed": "2026-08-13T04:36:52.711034"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:51.226043"
     },
     "60419710634": {
       "deal_id": "60419710634",
@@ -1355,9 +1322,20 @@
       "stage": "appointmentscheduled",
       "arr": "200000",
       "close_date": "2026-11-30T15:48:49.214Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:27:57.227774",
-      "last_analyzed": "2026-08-13T04:36:24.437980"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:24:51.636283"
+    },
+    "63064855552": {
+      "deal_id": "63064855552",
+      "deal_name": "Boldin - Demo Request",
+      "company_name": "Boldin",
+      "company_slug": "boldin",
+      "pipeline": "default",
+      "stage": "presentationscheduled",
+      "arr": "50000",
+      "close_date": "2026-11-30T21:17:25.778Z",
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:52.232509"
     },
     "43491034751": {
       "deal_id": "43491034751",
@@ -1368,8 +1346,8 @@
       "stage": "presentationscheduled",
       "arr": "150000",
       "close_date": "2026-11-30T22:08:29.794Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:57.683172"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:52.637353"
     },
     "60036684928": {
       "deal_id": "60036684928",
@@ -1380,8 +1358,8 @@
       "stage": "qualifiedtobuy",
       "arr": "50000",
       "close_date": "2026-12-01T02:32:20.324Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:27:58.160164"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:53.027713"
     },
     "60173271471": {
       "deal_id": "60173271471",
@@ -1392,8 +1370,8 @@
       "stage": "qualifiedtobuy",
       "arr": "50000",
       "close_date": "2026-12-02T15:58:08.979Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:27:58.595617"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:53.446843"
     },
     "62395520059": {
       "deal_id": "62395520059",
@@ -1404,8 +1382,8 @@
       "stage": "appointmentscheduled",
       "arr": "125000",
       "close_date": "2026-12-09T20:45:56.343Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:59.028895"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:53.842417"
     },
     "58373987402": {
       "deal_id": "58373987402",
@@ -1416,8 +1394,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000.0",
       "close_date": "2026-12-09T20:46:27.415Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:59.438457"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:54.254097"
     },
     "61474132833": {
       "deal_id": "61474132833",
@@ -1428,8 +1406,8 @@
       "stage": "appointmentscheduled",
       "arr": "200000",
       "close_date": "2026-12-15T11:09:57.487Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:27:59.876088"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:55.404072"
     },
     "59369345948": {
       "deal_id": "59369345948",
@@ -1440,9 +1418,8 @@
       "stage": "appointmentscheduled",
       "arr": "0",
       "close_date": "2026-12-16T10:39:36.330Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:28:00.305906",
-      "last_analyzed": "2026-08-13T04:37:35.236447"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:55.881713"
     },
     "60853753009": {
       "deal_id": "60853753009",
@@ -1453,8 +1430,8 @@
       "stage": "qualifiedtobuy",
       "arr": "120000",
       "close_date": "2026-12-16T16:41:29.311Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:28:00.712503"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:56.270094"
     },
     "60840137793": {
       "deal_id": "60840137793",
@@ -1465,8 +1442,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000",
       "close_date": "2026-12-16T17:18:39.558Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:28:01.114315"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:56.666488"
     },
     "58659164971": {
       "deal_id": "58659164971",
@@ -1477,8 +1454,8 @@
       "stage": "qualifiedtobuy",
       "arr": "75000.0",
       "close_date": "2026-12-16T20:45:41.631Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:28:01.519492"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:57.058189"
     },
     "59173115702": {
       "deal_id": "59173115702",
@@ -1489,8 +1466,8 @@
       "stage": "presentationscheduled",
       "arr": "100000.0",
       "close_date": "2026-12-16T22:18:24.150Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:28:01.942310"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:24:57.463313"
     },
     "45092496128": {
       "deal_id": "45092496128",
@@ -1501,8 +1478,8 @@
       "stage": "presentationscheduled",
       "arr": "25000",
       "close_date": "2026-12-18T02:30:40.358Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:28:02.387065"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:24:57.859738"
     },
     "60182251329": {
       "deal_id": "60182251329",
@@ -1513,9 +1490,8 @@
       "stage": "qualifiedtobuy",
       "arr": "300000",
       "close_date": "2026-12-31T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:28:02.800578",
-      "last_analyzed": "2026-08-13T04:37:58.430669"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:58.262872"
     },
     "60860413064": {
       "deal_id": "60860413064",
@@ -1526,8 +1502,8 @@
       "stage": "appointmentscheduled",
       "arr": "55000",
       "close_date": "2026-12-31T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:28:03.472745"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:58.839661"
     },
     "62678252395": {
       "deal_id": "62678252395",
@@ -1538,8 +1514,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000",
       "close_date": "2026-12-31T00:00:00Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:28:03.899971"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:24:59.639293"
     },
     "62135862588": {
       "deal_id": "62135862588",
@@ -1550,8 +1526,8 @@
       "stage": "appointmentscheduled",
       "arr": "20000",
       "close_date": "2026-12-31T12:29:55.750Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:28:04.327870"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:25:00.096322"
     },
     "62852783774": {
       "deal_id": "62852783774",
@@ -1562,8 +1538,8 @@
       "stage": "appointmentscheduled",
       "arr": "200000",
       "close_date": "2026-12-31T13:10:59.321Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:28:04.763206"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:25:00.664192"
     },
     "60355556645": {
       "deal_id": "60355556645",
@@ -1574,8 +1550,20 @@
       "stage": "appointmentscheduled",
       "arr": "150000",
       "close_date": "2026-12-31T15:12:37.570Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:28:05.199186"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:25:01.077351"
+    },
+    "63834925459": {
+      "deal_id": "63834925459",
+      "deal_name": "Condé Nast - 55+ Seats",
+      "company_name": "Condé Nast",
+      "company_slug": "cond-nast",
+      "pipeline": "default",
+      "stage": "qualifiedtobuy",
+      "arr": "33750",
+      "close_date": "2026-12-31T16:13:04.607Z",
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:25:01.468329"
     },
     "60694377392": {
       "deal_id": "60694377392",
@@ -1586,8 +1574,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000",
       "close_date": "2026-12-31T23:03:41.972Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:28:05.652249"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:25:01.877615"
     },
     "58798224498": {
       "deal_id": "58798224498",
@@ -1598,9 +1586,8 @@
       "stage": "appointmentscheduled",
       "arr": "350000.0",
       "close_date": "2027-01-01T01:49:27.678Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:28:06.089771",
-      "last_analyzed": "2026-08-13T04:37:30.826863"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:25:02.293315"
     },
     "62111798456": {
       "deal_id": "62111798456",
@@ -1611,8 +1598,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000",
       "close_date": "2027-01-22T17:37:25.534Z",
-      "owner_id": "90300126",
-      "last_modified": "2026-08-13T03:28:06.498895"
+      "owner": "scott.keller@growthbook.io",
+      "last_modified": "2026-08-14T03:25:02.731711"
     },
     "59021351952": {
       "deal_id": "59021351952",
@@ -1623,8 +1610,8 @@
       "stage": "appointmentscheduled",
       "arr": "100000.0",
       "close_date": "2027-01-25T16:15:30.370Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:06.916296"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:03.241031"
     },
     "54442852124": {
       "deal_id": "54442852124",
@@ -1635,8 +1622,8 @@
       "stage": "appointmentscheduled",
       "arr": "300000",
       "close_date": "2027-01-25T18:07:02.894Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:07.340442"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:03.656391"
     },
     "62622489357": {
       "deal_id": "62622489357",
@@ -1647,8 +1634,8 @@
       "stage": "appointmentscheduled",
       "arr": "250000",
       "close_date": "2027-01-25T18:17:25.288Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:07.748299"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:04.050822"
     },
     "55475383924": {
       "deal_id": "55475383924",
@@ -1659,8 +1646,8 @@
       "stage": "presentationscheduled",
       "arr": "150000",
       "close_date": "2027-01-25T18:17:26.249Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:08.166465"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:04.497666"
     },
     "61507488889": {
       "deal_id": "61507488889",
@@ -1671,9 +1658,8 @@
       "stage": "appointmentscheduled",
       "arr": "150000",
       "close_date": "2027-01-25T19:14:50.064Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:08.584659",
-      "last_analyzed": "2026-08-13T04:39:28.917189"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:04.911021"
     },
     "62447700618": {
       "deal_id": "62447700618",
@@ -1684,8 +1670,8 @@
       "stage": "appointmentscheduled",
       "arr": "150000",
       "close_date": "2027-01-25T19:42:47.097Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:09.010060"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:05.307353"
     },
     "62985360945": {
       "deal_id": "62985360945",
@@ -1696,8 +1682,8 @@
       "stage": "appointmentscheduled",
       "arr": "200000",
       "close_date": "2027-01-25T21:06:51.605Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:09.440339"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:05.705085"
     },
     "59680315298": {
       "deal_id": "59680315298",
@@ -1708,8 +1694,8 @@
       "stage": "appointmentscheduled",
       "arr": "150000",
       "close_date": "2027-01-25T22:09:39.264Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:09.909332"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:06.133153"
     },
     "53500422798": {
       "deal_id": "53500422798",
@@ -1720,9 +1706,8 @@
       "stage": "qualifiedtobuy",
       "arr": "250000",
       "close_date": "2027-01-25T22:51:02.485Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:10.327919",
-      "last_analyzed": "2026-08-13T04:39:39.850425"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:06.593365"
     },
     "56162812495": {
       "deal_id": "56162812495",
@@ -1733,9 +1718,8 @@
       "stage": "appointmentscheduled",
       "arr": "25000",
       "close_date": "2027-01-25T22:57:45.533Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:10.764327",
-      "last_analyzed": "2026-08-13T04:38:35.030356"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:06.984339"
     },
     "9087197490": {
       "deal_id": "9087197490",
@@ -1746,8 +1730,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "15000",
       "close_date": "2027-01-25T22:58:02.999Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:11.396497"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:07.707956"
     },
     "14545547901": {
       "deal_id": "14545547901",
@@ -1758,8 +1742,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "27500",
       "close_date": "2027-01-25T22:58:12.385Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:11.809334"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:08.104975"
     },
     "59245644951": {
       "deal_id": "59245644951",
@@ -1770,9 +1754,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000.0",
       "close_date": "2027-01-25T22:58:21.310Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:12.211811",
-      "last_analyzed": "2026-08-13T04:40:14.363968"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:08.520007"
     },
     "51050838887": {
       "deal_id": "51050838887",
@@ -1783,8 +1766,8 @@
       "stage": "appointmentscheduled",
       "arr": "0",
       "close_date": "2027-01-25T22:58:29.781Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:12.665850"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:08.911613"
     },
     "9092495692": {
       "deal_id": "9092495692",
@@ -1795,8 +1778,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "10000",
       "close_date": "2027-01-25T22:58:57.964Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:13.082050"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:09.291798"
     },
     "9092495281": {
       "deal_id": "9092495281",
@@ -1807,8 +1790,8 @@
       "stage": "decisionmakerboughtin",
       "arr": "15000",
       "close_date": "2027-01-25T22:59:22.531Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:13.532039"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:09.666157"
     },
     "57100375199": {
       "deal_id": "57100375199",
@@ -1819,8 +1802,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000",
       "close_date": "2027-01-25T22:59:42.768Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:13.950439"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:10.077144"
     },
     "61626656091": {
       "deal_id": "61626656091",
@@ -1831,8 +1814,8 @@
       "stage": "appointmentscheduled",
       "arr": "175000",
       "close_date": "2027-01-26T00:35:25.211Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:14.344294"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:10.472504"
     },
     "50347229229": {
       "deal_id": "50347229229",
@@ -1843,8 +1826,8 @@
       "stage": "qualifiedtobuy",
       "arr": "500000",
       "close_date": "2027-01-29T14:50:18.643Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:14.745618"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:10.877851"
     },
     "54074159735": {
       "deal_id": "54074159735",
@@ -1855,8 +1838,8 @@
       "stage": "qualifiedtobuy",
       "arr": "5000",
       "close_date": "2027-01-29T21:42:11.686Z",
-      "owner_id": "84883357",
-      "last_modified": "2026-08-13T03:28:15.418113"
+      "owner": "christian@growthbook.io",
+      "last_modified": "2026-08-14T03:25:11.467642"
     },
     "61024408734": {
       "deal_id": "61024408734",
@@ -1867,8 +1850,8 @@
       "stage": "appointmentscheduled",
       "arr": "50000",
       "close_date": "2027-01-31T00:00:00Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:28:15.858534"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:25:11.842750"
     },
     "54169480766": {
       "deal_id": "54169480766",
@@ -1879,8 +1862,8 @@
       "stage": "qualifiedtobuy",
       "arr": "150000",
       "close_date": "2027-02-01T02:27:53.148Z",
-      "owner_id": "82957388",
-      "last_modified": "2026-08-13T03:28:16.304693"
+      "owner": "jake@growthbook.io",
+      "last_modified": "2026-08-14T03:25:12.620941"
     },
     "58966766773": {
       "deal_id": "58966766773",
@@ -1891,8 +1874,8 @@
       "stage": "qualifiedtobuy",
       "arr": "30000.0",
       "close_date": "2027-02-10T22:18:03.733Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:28:16.848424"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:25:13.019065"
     },
     "58370143006": {
       "deal_id": "58370143006",
@@ -1903,8 +1886,8 @@
       "stage": "24682892",
       "arr": "35000.0",
       "close_date": "2027-02-17T20:49:21.667Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:28:17.433986"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:25:13.414508"
     },
     "58897463067": {
       "deal_id": "58897463067",
@@ -1915,9 +1898,8 @@
       "stage": "presentationscheduled",
       "arr": "52000.0",
       "close_date": "2027-03-23T12:41:27.627Z",
-      "owner_id": "88723214",
-      "last_modified": "2026-08-13T03:28:17.997076",
-      "last_analyzed": "2026-08-13T04:41:08.076327"
+      "owner": "james.shannon@growthbook.io",
+      "last_modified": "2026-08-14T03:25:13.858245"
     },
     "59812480590": {
       "deal_id": "59812480590",
@@ -1928,8 +1910,8 @@
       "stage": "appointmentscheduled",
       "arr": "37250",
       "close_date": "2027-04-15T13:38:01.007Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:28:18.420066"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:25:14.260260"
     },
     "60355159912": {
       "deal_id": "60355159912",
@@ -1940,9 +1922,8 @@
       "stage": "appointmentscheduled",
       "arr": "129750",
       "close_date": "2027-04-30T16:16:49.299Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:28:18.968325",
-      "last_analyzed": "2026-08-13T04:42:15.842422"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:25:14.674030"
     },
     "58208197272": {
       "deal_id": "58208197272",
@@ -1953,8 +1934,8 @@
       "stage": "24682892",
       "arr": "130000.0",
       "close_date": "2027-05-19T12:23:26.710Z",
-      "owner_id": "88723213",
-      "last_modified": "2026-08-13T03:28:19.400999"
+      "owner": "cary@growthbook.io",
+      "last_modified": "2026-08-14T03:25:15.075672"
     }
   }
 }
