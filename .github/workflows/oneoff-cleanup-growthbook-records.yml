@@ -1,0 +1,73 @@
+name: One-off Cleanup - GrowthBook Internal Records
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Delete internal GrowthBook records, verify clean
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          cat <<'EOF' > /tmp/cleanup.py
+          import os
+          from supabase import create_client
+
+          sb = create_client(
+              os.environ["SUPABASE_URL"],
+              os.environ["SUPABASE_SERVICE_KEY"])
+
+          def before_counts(table):
+              r = sb.table(table).select("id", count="exact") \
+                    .ilike("company_name", "%growthbook%").execute()
+              return r.count
+
+          print("Before delete:")
+          print(f"  feature_gaps (growthbook, any deal_id): {before_counts('feature_gaps')}")
+          print(f"  objections   (growthbook, any deal_id): {before_counts('objections')}")
+
+          fg_del = sb.table("feature_gaps").delete() \
+              .ilike("company_name", "%growthbook%") \
+              .is_("deal_id", "null").execute()
+          print(f"\nDeleted from feature_gaps: {len(fg_del.data)} row(s)")
+
+          obj_del = sb.table("objections").delete() \
+              .ilike("company_name", "%growthbook%") \
+              .is_("deal_id", "null").execute()
+          print(f"Deleted from objections: {len(obj_del.data)} row(s)")
+
+          fg_count = sb.table("feature_gaps").select("id", count="exact") \
+              .ilike("company_name", "%growthbook%").execute().count
+          obj_count = sb.table("objections").select("id", count="exact") \
+              .ilike("company_name", "%growthbook%").execute().count
+
+          print(f"\nVerify clean:")
+          print(f"  feature_gaps count (growthbook): {fg_count}")
+          print(f"  objections count (growthbook): {obj_count}")
+
+          if fg_count == 0 and obj_count == 0:
+              print("\n✓ Both counts are 0 — clean")
+          else:
+              print("\n✗ Non-zero count remaining — records with a "
+                    "non-NULL deal_id still reference growthbook "
+                    "and were intentionally left alone")
+          EOF
+          python3 /tmp/cleanup.py
