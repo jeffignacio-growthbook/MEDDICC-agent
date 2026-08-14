@@ -62,6 +62,10 @@ Handlers:
   query_deal            - deep dive on a specific company's deal
   query_rubric          - general scoring questions like "what does a 6 mean for champion?"
   generate_win_loss     - full narrative for a specific closed deal (slow)
+  query_competitive_intel - competitive intelligence: which companies mentioned
+                          DIY/build-it-themselves, named competitors showing up
+                          in calls, build-vs-buy signals, what alternatives
+                          prospects are evaluating
   set_target            - admin: set quota or target (requires auth)
   dynamic_query         - question requires combining data from multiple tables
                           or filters not covered by the precomputed handlers
@@ -85,6 +89,7 @@ Required JSON:
     "target_value": "<number or null>",
     "entity_name": "<rep/team name for set_target or null>",
     "period_label": "Q3_FY2027 or null",
+    "search_term": "<specific competitor/term for query_competitive_intel or null>",
     "is_slow": false
   }},
   "unanswerable_reason": "no_data|out_of_scope|ambiguous|null",
