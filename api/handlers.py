@@ -49,13 +49,45 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
     Joins analyses with active deals to find at-risk opportunities.
     """
     tw = params["time_window"]
+    deal_ids = params.get("deal_ids", [])
 
-    # Latest analysis per deal in the active pipeline
+    # Filter analyses to specific deals if context provided
+    analyses_filters = [("gte", "analyzed_at", tw["start"])]
+    if deal_ids:
+        analyses_filters.append(
+            ("in_", "deal_id", deal_ids))
+
     analyses = select_all(sb, "analyses",
         columns="deal_id,company_name,overall_score,"
                 "champion_score,economic_buyer_score,"
                 "component_details,analyzed_at",
-        filters=[("gte", "analyzed_at", tw["start"])])
+        filters=analyses_filters)
+
+    # If entity-filtered, skip the active-deals join
+    # (user already knows which deals these are)
+    if deal_ids:
+        at_risk = []
+        for a in analyses:
+            score = a.get("overall_score", 0) or 0
+            champ = a.get("champion_score", 0) or 0
+            if score < 40 or champ < 4:
+                at_risk.append({
+                    "company": a["company_name"],
+                    "overall_score": score,
+                    "champion_score": champ,
+                    "risk_flags": [
+                        f for f, v in [
+                            ("low overall MEDDICC", score < 40),
+                            ("champion gap", champ < 4),
+                            ("no economic buyer",
+                             (a.get("economic_buyer_score")
+                              or 0) < 4),
+                        ] if v
+                    ]
+                })
+        return {"deals_at_risk": at_risk,
+                "total_at_risk": len(at_risk),
+                "filtered_to_context": True}
 
     deals = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,"
@@ -115,6 +147,7 @@ async def query_win_loss(params: dict, sb) -> dict:
     'win/loss summary', 'why are we losing?'
     """
     tw = params["time_window"]
+    deal_ids = params.get("deal_ids", [])
 
     # 1. Check for AI-generated narratives first
     narratives = select_all(sb, "win_loss_narratives",
@@ -124,15 +157,20 @@ async def query_win_loss(params: dict, sb) -> dict:
         filters=[("gte", "generated_at", tw["start"])])
 
     # 2. Get recent closed deals regardless
+    # Base filters for closed deals
+    deal_filters = [
+        ("in_", "deal_status", ["won", "lost"]),
+        ("gte", "close_date", tw["start"]),
+        ("lte", "close_date", tw["end"]),
+    ]
+    if deal_ids:
+        deal_filters.append(("in_", "deal_id", deal_ids))
+
     closed_deals = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,"
                 "deal_status,close_date,lost_reason,"
                 "owner_email,segment",
-        filters=[
-            ("in_", "deal_status", ["won", "lost"]),
-            ("gte", "close_date", tw["start"]),
-            ("lte", "close_date", tw["end"]),
-        ])
+        filters=deal_filters)
     closed_deals.sort(
         key=lambda x: x.get("close_date") or "",
         reverse=True)
@@ -287,6 +325,12 @@ async def query_deal(params: dict, sb) -> dict:
     Returns deal info, latest MEDDICC analysis, and objections.
     """
     company = params.get("company", "")
+
+    # If no explicit company but entity context has one,
+    # use the first company from context
+    if not company and params.get("company_names"):
+        company = params["company_names"][0]
+
     if not company:
         return {"error": "Company name required"}
 
