@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_020",
+  "timestamp": "2026-08-14T04:41:26.940265",
+  "company": "shiftkey",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 3 (Evidence Quality for ICP), Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 should explicitly require: 'If recent call introduces materially new negative signals, analyst must either adjust score with rationale OR explicitly state why score persists despite worsening conditions.' Criterion 3 should add: 'Confirm ICP fit against deal value; flag as risk if production usage or team scale insufficient.' Criterion 4 should require: 'Next steps must include specific recipient, concrete question, and proposed timeline (e.g., 'Ask X by [date]: [specific question]?')'"
+}

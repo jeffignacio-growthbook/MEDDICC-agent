@@ -1,0 +1,21 @@
+{
+  "company": "KBX",
+  "deal_id": "59019110029",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 4 violation: Next steps for Economic Buyer, Champion, and Competition components use vague language without specific actions. Economic Buyer next step says 'Call Christian by August 8th and ask' but the question about introducing to budget owner is vague. Champion next step says 'send champion enablement materials' and 'commit to presenting' but lacks specificity on what exact materials and how to confirm. Competition next step says 'map the complete competitive landscape' which is vague verb usage. Rewrite all three as: Economic Buyer - 'Call Christian Liebenow by August 8th: Request his title/role and ask specifically \"Who holds final sign-off on software budget over $50K? Can you arrange a 15-min call with them by August 15th?\"' Champion - 'Email Christian by August 7th: Send one-page business case template with request \"Present this to your VP Engineering by August 15th and confirm their key concerns in writing.\"' Competition - 'Call Christian by August 8th: Ask \"What other vendors have you demo'd or are considering? Specifically: Statsig, EPPO, or Optimizely?\"'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_003",
+  "timestamp": "2026-08-14T04:22:33.588161"
+}

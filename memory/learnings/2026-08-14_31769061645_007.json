@@ -1,0 +1,21 @@
+{
+  "company": "Livesport",
+  "deal_id": "62160567676",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward consistency: Economic Buyer regressed from score 1/10 (unknown) in cumulative state to 3/10 (partial) in new analysis without documented reason explaining why lack of named EB now counts as 'partial' progress. The analysis states 'Leadership review is confirmed' but this is process confirmation, not EB identification. Under Criterion 2, if no specific budget authority owner is named in the new call, the score should remain 1/10 (unknown) or improve only if new evidence of a named person emerges. CRITERION 4 VIOLATION - Champion below 7/10 (score 2/10) but next steps use vague language: 'make sure that person can clearly articulate how GrowthBook's unified mobile/web experimentation and predictable pricing solves your \u20ac500K Optimizely problem' is exploratory/discuss-further phrasing rather than a specific action with concrete question. Should be: '[Primary contact TBD]: Ask who is presenting at Tuesday's procurement session and request their name/title, then ask them directly: What specific talking points are you planning to use with leadership about GrowthBook vs Optimizely?' CRITERION 3 VIOLATION - Competition assessment mentions 'Airship and Extreme Push' are 'mobile engagement platforms for push notifications/messaging, not experimentation platforms' but this is seller interpretation, not prospect-stated evidence. The recent call says they are 'evaluating Optimizely alongside Airship and Extreme Push' - the analysis should either flag this as scope confusion requiring clarification OR accept that Livesport may have a broader evaluation scope. The rubric requires evidence from prospect only; seller classification of non-GrowthBook competitors as out-of-scope doesn't meet this standard. CRITERION 1 VIOLATION - Metrics score improved from 7/10 to 8/10 without new call evidence justifying upgrade. The new call adds 'revenue uplift from mobile experimentation' as a target metric, but this is vague/seller-stated ROI language ('seeking...potential revenue uplift'), not prospect-quantified impact. Score should remain 7/10 or evidence should explicitly separate prospect-quantified metrics (cost gap \u20ac60K vs \u20ac500K) from vague targets (revenue uplift).",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_007",
+  "timestamp": "2026-08-14T04:31:28.999721"
+}

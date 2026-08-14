@@ -1,0 +1,21 @@
+{
+  "company": "TickPick",
+  "deal_id": "61149585726",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 3 VIOLATION - Evidence Quality: Multiple components lack sufficient evidence quality for their assigned scores. Metrics (8/10) and Identified Pain (8/10) are supported only by generic paraphrases without specific quotes from actual call dialogue. The recent call summary is incomplete ('Summary failed') and does not substantiate the carried-forward evidence claims. CRITERION 2 VIOLATION - Carry-forward Consistency: The analysis repeatedly states 'no new information in recent call (summary failed to capture substantive dialogue)' while maintaining previous scores. This is contradictory - if the summary failed, the carry-forward claim cannot be verified. The analysis should either (a) acknowledge the summary is incomplete and lower confidence, or (b) provide verifiable evidence from prior calls. CRITERION 4 VIOLATION - Actionable Next Steps: Multiple next steps use vague verbs prohibited by the rubric: 'Validate' (Decision Criteria), 'Confirm' (Decision Criteria, Decision Process), 'Map' (Decision Process), 'Quantify' (Identified Pain), 'Enable' (Champion) are all directional but lack concrete questions or specific actions. Examples that fail: 'Validate on next call if there are any additional criteria' should be replaced with a specific question like 'Ask Christian: Are there security compliance requirements beyond what we've discussed?' CRITERION 1 VIOLATION - Complete Coverage: While all components have status and score, the recent call summary being incomplete ('Summary failed') undermines the validity of the carry-forward claims. The analysis should either re-score based on incomplete information or explicitly state scores are unverified pending a proper call summary. SPECIFIC COMPONENT ISSUES: (1) Metrics 8/10 - evidence is paraphrase-only from cumulative state, no direct quotes from calls. (2) Economic Buyer 4/10 - correctly partial, but next steps need concrete questions like 'Is Matt Ellis the final budget authority or does someone above him need approval?' (3) Champion 4/10 - evidence of 'support' is too weak for 4/10; this should be lower (2-3/10) unless internal selling is documented. (4) Competition 1/10 - correct unknown status, but needs immediate clarification on next call.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_005",
+  "timestamp": "2026-08-14T04:24:31.425381"
+}

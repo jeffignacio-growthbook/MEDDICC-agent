@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_001",
+  "timestamp": "2026-08-14T04:14:29.243436",
+  "company": "Oda",
+  "criterion_fired": "CRITERION 2 (Carry-forward Consistency), CRITERION 4 (Actionable Next Steps), CRITERION 3 (Evidence Quality), CRITERION 1 (Evidence Documentation)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit CLAUDE.md rule: 'Score changes require new evidence from current call; historical context alone does not justify score increases. Evidence must be direct quotes or detailed paraphrases, not inference. Next steps must include specific qualifying questions with named stakeholder and decision point, not generic action verbs.'"
+}

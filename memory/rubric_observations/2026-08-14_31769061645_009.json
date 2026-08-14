@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_009",
+  "timestamp": "2026-08-14T04:24:31.425903",
+  "company": "TickPick",
+  "criterion_fired": "CRITERION 2 & 3 (Carry-forward Consistency, Evidence Quality)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) When call summary fails, explicitly allow re-scoring with reduced confidence rather than contradicting carry-forward logic. (2) Define 'concrete action verbs'\u2014provide whitelist (Ask, Probe, Determine, Clarify) vs. blacklist (Validate, Confirm) with context. (3) Separate 'evidence from transcript' from 'evidence from carry-forward'\u2014allow paraphrase-only carry-forward if source calls exist and are documented, but flag confidence downgrade."
+}

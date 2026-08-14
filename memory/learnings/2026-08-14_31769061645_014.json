@@ -1,0 +1,21 @@
+{
+  "company": "shiftkey",
+  "deal_id": "60355159912",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 10,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward Consistency: Champion component regressed from 4/10 (cumulative) to 4/10 (current) with new negative signals introduced (reduced meeting cadence, Clark Finley requesting cancellation, 'limited agenda items', 'only one feature flag in use') that paint a picture of DECREASED engagement and momentum loss. The analysis correctly identifies these as disengagement signals but fails to acknowledge or justify why Champion score should remain at 4/10 when the recent call introduces materially NEW evidence of WORSENING conditions. The recent call shows: (1) Meeting frequency reduction from weekly to biweekly/monthly, (2) Explicit meeting cancellation request from Clark Finley, (3) Reliance on Slack instead of formal engagement, (4) Minimal active production work ('only one feature flag in use'). These are regression indicators that should lower the Champion score OR be explicitly analyzed as 'signals of decreased Champion effectiveness despite maintained score.' Current analysis states 'DECREASED engagement' but does not reconcile this against the 4/10 score carried forward. Either: (a) Score should decrease to 2-3/10 reflecting loss of internal momentum, OR (b) Analysis must explicitly state 'Maintaining 4/10 despite disengagement signals because [reason].' CRITERION 4 VIOLATION \u2014 Actionable Next Steps: The Champion next step uses imprecise language: 'Introduce me to the technical lead from mobile dev team or C Squad who will own the implementation rollout so I can understand blockers to internal adoption across your 2000 teams.' This is too vague\u2014no specific question or concrete action. Should be: 'Ask Chris Sanders by [date]: Which specific person from mobile dev or C Squad is accountable for the June 30th migration timeline, and can you schedule a 30-minute call with them this week so we can identify technical blockers?' CRITERION 3 VIOLATION \u2014 Evidence Quality for ICP: The analysis does not confirm or address whether ShiftKey meets GrowthBook ICP. Cumulative state mentions '~2000 teams' and 'modern data stack' (Snowflake), which are positive ICP signals, but the current analysis never explicitly validates this. The recent call data (only one feature flag in production, reduced engagement, team size unknown) raises ICP concerns that go unaddressed. Must confirm: Do they have sufficient scale, data maturity, and experimentation velocity to justify $129,750 ARR? This must be validated or flagged as unknown.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_014",
+  "timestamp": "2026-08-14T04:41:26.939799"
+}

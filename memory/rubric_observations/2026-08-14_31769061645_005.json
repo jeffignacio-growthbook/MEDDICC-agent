@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_005",
+  "timestamp": "2026-08-14T04:18:23.338739",
+  "company": "InPost",
+  "criterion_fired": "Criterion 2, 3, and 4",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Explicitly define the canonical competitive set and clarify treatment of incumbents vs. alternatives. Criterion 3: Specify minimum evidence threshold for each score level (e.g., 3/10 requires documented internal advocacy, not just strategic discussion). Criterion 4: Define 'actionable' as requiring WHO/WHEN/HOW for seller tasks, but allow WHEN='within 2 weeks of call' and WHO='TBD pending discovery' if specific contact method is specified."
+}

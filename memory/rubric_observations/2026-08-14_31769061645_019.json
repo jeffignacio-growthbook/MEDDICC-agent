@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_019",
+  "timestamp": "2026-08-14T04:39:58.574666",
+  "company": "Hublo",
+  "criterion_fired": "Criterion 4 - Actionable Next Steps",
+  "was_appropriate": true,
+  "suggested_change": "Next steps must include at least one quantitative baseline question per component (e.g., 'How many experiments per quarter today?' for Metrics, 'What's your deployment cycle time?' for Decision Criteria) rather than open-ended exploratory asks."
+}

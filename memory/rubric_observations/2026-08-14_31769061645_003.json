@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_003",
+  "timestamp": "2026-08-14T04:17:15.704004",
+  "company": "Rula",
+  "criterion_fired": "Criterion 2 (Decision Process), Criterion 3 (Competition), Criterion 4 (Champion)",
+  "was_appropriate": false,
+  "suggested_change": "Criteria 2 and 3 should explicitly state: 'When score is based on cumulative evidence from prior calls with no new contradictory data in current call, agent MUST include explicit note: [Component name] - No new information in [current call] changes previous assessment from [prior calls] at [score]/10. Maintain status.' Criterion 4 (Champion) should require: 'Next step must contain specific action verb (Call/Email/Message, not Schedule) and concrete question, not exploratory phrasing.'"
+}

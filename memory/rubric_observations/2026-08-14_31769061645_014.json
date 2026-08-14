@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_014",
+  "timestamp": "2026-08-14T04:31:34.122904",
+  "company": "Unity",
+  "criterion_fired": "CRITERION 3 (ICP fit assessment) and CRITERION 5 (Red flag/disqualification logic)",
+  "was_appropriate": false,
+  "suggested_change": "Refine criterion to require explicit contrast: 'ICP fit must cite prospect-stated capability or constraint (e.g., \"we run on warehouse X\") rather than inferred alignment with seller product features.' For multi-call contexts (cumulative_calls > 0), require explicit carry-forward statement format: 'Component X: maintaining X/10 from call N because [no new evidence | evidence confirms | evidence conflicts].'"
+}

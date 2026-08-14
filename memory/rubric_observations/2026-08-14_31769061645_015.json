@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_015",
+  "timestamp": "2026-08-14T04:34:36.686891",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 3 (Evidence Quality)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'Score increases >2 points require evidence-quality upgrade (e.g., seller-discovered to prospect-stated); absent that, cap score at prior level + 1. Prospect-stated pain required for any score \u22655/10; below 5/10, default conservative until explicit dissatisfaction articulated.'"
+}

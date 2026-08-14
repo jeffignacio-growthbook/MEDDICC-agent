@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_018",
+  "timestamp": "2026-08-14T04:39:18.538341",
+  "company": "Stone",
+  "criterion_fired": "Criterion 1 (Evidence specificity), Criterion 3 (Evidence citation), Criterion 4 (Actionable next steps), Criterion 2 (Data quality notation)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit guidance: 'For scores >5/10, include direct quotes or the actual paraphrased content, not 'paraphrased from context.' For corrupted calls, prefix each component with 'No new evidence\u2014maintaining X/10 from [date]' before scoring. For next steps, use concrete question templates: Ask [name]: [specific what/when/who question]? not generic action verbs.'"
+}

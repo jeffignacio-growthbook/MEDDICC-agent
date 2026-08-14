@@ -1,0 +1,21 @@
+{
+  "company": "Notion",
+  "deal_id": "60257621387",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Complete Coverage: M-Metrics component lacks evidence quality. Score 4/10 stated but evidence section contains only paraphrased summaries ('focus on exposure forwarding', 'concerns about high costs') with no direct quotes or specific statements from prospects. CRITERION 3 FAILURE - Evidence Quality: Score above 5/10 (Decision Criteria 5/10, Decision Process 5/10, Identified Pain 4/10) lack direct quotes or detailed paraphrases. All evidence is paraphrased without attribution to specific speakers or call timestamps. CRITERION 4 FAILURE - Actionable Next Steps: Multiple components below 7/10 have next steps using prohibited vague language: 'Ask...what would success look like' (vague), 'Probe for urgency' (vague verb), 'Test for championing behavior' (vague). Next steps must specify exact questions with concrete deliverables, not open-ended probing. Example of FAIL: 'Ask primary contact: \"We've been deep in technical implementation. Taking a step back - what was the original trigger...\"' uses vague probing rather than concrete action. CRITERION 5 FAILURE - Unsupported Claims: Analysis states 'This is not scoreable as \"At Risk\" vs \"Strong\" without valid current data' while also claiming 'Historical indicators suggest SETUP PHASE, not qualified opportunity' - these are contradictory unsupported assessments. Cannot simultaneously state insufficient data AND make stage determinations. CARRY-FORWARD EXCEPTION NOTE: With 3+ calls in cumulative state, carry-forward rules DO apply. However, the analysis appropriately maintains scores and notes no new information due to corrupted recent transcript - this aspect is COMPLIANT. DATA INTEGRITY: The corrupted recent call is acknowledged, which is appropriate, but this renders the entire analysis unable to validate criterion 2 (carry-forward consistency) for the most recent interaction. The analysis should have explicitly stated 'No evaluation of recent call available due to data corruption - assessment frozen at historical state from [date of last valid call]' in a banner at top.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_004",
+  "timestamp": "2026-08-14T04:20:52.826732"
+}

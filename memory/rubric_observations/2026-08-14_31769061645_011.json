@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_011",
+  "timestamp": "2026-08-14T04:28:04.698082",
+  "company": "Zalando",
+  "criterion_fired": "CRITERION 4 (Next Steps Specificity) and CRITERION 2 (Carry-Forward Consistency)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4: Next steps must include format [Contact: Name, Method: email/call/other, Date: specific, Question: specific, Decision Gate: what triggers escalation/stage change]. Criterion 2: When transcript corruption or missing calls exist, state cumulative_calls_context explicitly and flag any stage/score assignments unsupported by call count."
+}

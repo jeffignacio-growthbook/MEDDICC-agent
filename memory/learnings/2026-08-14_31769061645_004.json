@@ -1,0 +1,21 @@
+{
+  "company": "OpenTable",
+  "deal_id": "58939926620",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 8,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 4 violation: Multiple components below 7/10 lack actionable next steps with specific questions. Metrics (0/10) next steps use vague language ('Establish quantifiable success criteria') without concrete questions until the third step. Economic Buyer (3/10) next steps are acceptable. Champion (5/10) next steps lack specificity in the first step ('Confirm champion authority') - should ask a direct question about reporting structure and budget influence. Criterion 3 violation: Champion score of 5/10 lacks direct evidence of internal selling behavior. Analysis states 'Call 9 did not provide additional evidence' and acknowledges 'lacks specifics of him building a business case or actively selling internally' - this contradicts the 5/10 score which implies moderate champion capability. Score should be 3/10 or lower given lack of documented internal advocacy. Carry-forward documentation: While analysis notes 'maintained at X/10' for unchanged components, it should explicitly state 'No new information in Call 9 - maintaining previous assessment of X/10' for each component to fully satisfy Criterion 2's requirement for carry-forward consistency notation.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_004",
+  "timestamp": "2026-08-14T04:22:58.673263"
+}

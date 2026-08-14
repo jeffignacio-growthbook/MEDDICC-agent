@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_016",
+  "timestamp": "2026-08-14T04:36:36.768378",
+  "company": "Decathlon",
+  "criterion_fired": "Criterion 4 (actionable next steps) and Criterion 3 (ICP assessment confidence)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 3: For first calls, when core ICP gates (e.g., visitor volume) are unconfirmed, use 'Cannot Assess' rather than 'High Risk'. Criterion 4: Specify that next steps must include concrete, measurable questions (e.g., 'How many experiments per month?' not 'What are your metrics?') and avoid hedging language that signals low confidence."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_004",
+  "timestamp": "2026-08-14T04:17:45.340976",
+  "company": "Deel",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should allow implicit carry-forward statements ('maintained at X/10 - no new information') without requiring the exception clause on every single component. Criterion 4 should clarify: next steps must include either a specific confirmed date, '[contact TBD]', or 'pending confirmation' \u2014 but placeholder phrases like '[specific date this week]' should not be flagged as violations if no actual date was confirmed during the call."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_006",
+  "timestamp": "2026-08-14T04:20:52.827137",
+  "company": "Notion",
+  "criterion_fired": "Criterion 5 (Unsupported Claims) and Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 5: Clarify that stage determination from historical data is acceptable if explicitly labeled 'historical-based' and separated from current-call assertions. Criterion 4: Replace subjective 'vague language' detection with: 'Next steps must include: (a) exact question text in quotes, OR (b) specific output/document name, OR (c) measurable follow-up metric. Phrases like \"probe for\", \"ask what\", \"test for\" without these are insufficient.'"
+}

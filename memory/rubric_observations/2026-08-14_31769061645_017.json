@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_017",
+  "timestamp": "2026-08-14T04:39:09.186045",
+  "company": "Route",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency)",
+  "was_appropriate": true,
+  "suggested_change": "When prior evidence supports a score and current call provides no new information on that metric, maintain the prior score and explicitly note 'No new call data\u2014maintaining prior score of X/10' rather than allowing undocumented regression."
+}

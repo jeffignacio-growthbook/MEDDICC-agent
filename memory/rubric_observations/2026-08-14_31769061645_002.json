@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_002",
+  "timestamp": "2026-08-14T04:14:31.035604",
+  "company": "BESTSELLER",
+  "criterion_fired": "CRITERION 4: Actionable Next Steps & CRITERION 3: ICP Fit Evaluation",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 is appropriate but needs explicit examples of prohibited patterns (e.g., 'Schedule X' vs. 'Call [Contact] to confirm Y'). Criterion 3 should require explicit statement: 'Confirm ICP fit: [Signal 1], [Signal 2], [Signal 3]' as a required output line."
+}

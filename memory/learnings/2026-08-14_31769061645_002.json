@@ -1,0 +1,21 @@
+{
+  "company": "BESTSELLER",
+  "deal_id": "61475205473",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 4 VIOLATION \u2014 Actionable next steps use prohibited vague verbs throughout. METRICS: 'ask: What does success look like' is acceptable, but the phrasing 'Schedule follow-up call' violates the specificity requirement. ECONOMIC BUYER: 'Send email to [Contact TBD] this week asking' is acceptable structure but lacks concrete action verb beyond 'asking'. DECISION CRITERIA: 'Schedule technical validation call' and 'confirm' are too vague \u2014 needs specific question format like the rubric examples. DECISION PROCESS: 'Send email asking' is vague verb usage. CHAMPION: 'Ask [Contact TBD] on next call by Friday' lacks a specific action \u2014 should be 'Call [Contact TBD]' or 'Schedule call with [Contact TBD]'. COMPETITION: 'Ask [Contact TBD] on next call by end of week' is vague. All next steps must follow the PASS format: '[Contact/Name]: Specific verb (Call/Email/Confirm) + concrete question or action.' Additionally, CRITERION 3 issue: ICP fit not explicitly evaluated. No statement confirming BESTSELLER meets ICP criteria (scale signals, modern data stack, experimentation priority). The analysis shows modern data stack (Snowflake, BigQuery, Sanity, Shopify) and experimentation priority, but this must be stated explicitly in the analysis for ICP validation.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_002",
+  "timestamp": "2026-08-14T04:14:31.035108"
+}

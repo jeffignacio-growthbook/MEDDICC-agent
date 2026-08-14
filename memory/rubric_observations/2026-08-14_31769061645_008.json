@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_008",
+  "timestamp": "2026-08-14T04:22:58.673743",
+  "company": "OpenTable",
+  "criterion_fired": "Criterion 3 (Champion evidence) and Criterion 4 (Actionable next steps)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'If a component scores below 6/10, evidence must directly support that score. If Call N provides no new evidence, score should not increase from previous call. Carry-forward must explicitly state: No new information - maintaining X/10 assessment.'"
+}

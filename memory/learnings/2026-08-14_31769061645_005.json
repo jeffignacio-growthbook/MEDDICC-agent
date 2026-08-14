@@ -1,0 +1,21 @@
+{
+  "company": "Zalando",
+  "deal_id": "60665391542",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward consistency broken: Cumulative state shows 1 call reviewed, but analysis cites 'Call 1' and 'Call 2 transcript corrupted' creating inconsistency. Clarify actual call count. CRITERION 4 VIOLATION - Multiple next steps use vague verbs without specific actions: 'On next call with Nils or Christian, ask...' repeated across all components is generic. Must specify: concrete day/method of outreach (e.g., 'Email Nils by Thursday to schedule Friday call'), specific follow-up question with expected answer, and decision gate (e.g., 'If EB not identified, escalate to procurement contacts'). Current format 'ask: [question]' is insufficient - needs 'Contact: Name, Action: Specific outreach method and date, Question: [specific], Gate: [what happens if no answer]'. CRITERION 5 VIOLATION - October 2026 close date described as 'appears in HubSpot but has not been confirmed by the prospect' - this is correctly flagged as unsupported, but the deal stage 'Qualified to Buy' with $300K ARR should be reconciled against single substantive call. If only 1 real call occurred, justify how 'Qualified to Buy' stage was assigned. CRITERION 1 VIOLATION - All components have status and score, but Evidence column for Decision Process and Champion states only 'No [X] identified in Call 1. Call 2 transcript corrupted - no new information available.' This is acceptable placeholder text, but given cumulative_calls_context=1, the carry-forward exception applies and scores are correct for early stage. However, clarify whether corrupted Call 2 actually occurred or is a data error. ICP FIT - Analysis does not explicitly assess ICP. Zalando is enterprise-scale (reasonable indicator), has hybrid data stack with Octopus + third-party tools (positive signal), and is evaluating modern platforms. No explicit ICP concern flagged. Add ICP assessment: 'Zalando appears to fit ICP: enterprise scale, product-focused (fashion e-commerce), modern experimentation infrastructure (Octopus + third-party), warehouse integration concerns suggest data-native approach.' COMPETITOR SECTION - Next steps ask about 'LaunchDarkly, Statsig, EPPO, others' - valid set. No failure here.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_005",
+  "timestamp": "2026-08-14T04:28:04.697653"
+}

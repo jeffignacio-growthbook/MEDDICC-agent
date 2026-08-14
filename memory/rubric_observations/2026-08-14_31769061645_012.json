@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-14_31769061645_012",
+  "timestamp": "2026-08-14T04:31:08.163723",
+  "company": "Square",
+  "criterion_fired": "CRITERION 3 (Evidence Quality), CRITERION 4 (Actionable Next Steps), CRITERION 5 (Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 5 wording should explicitly state: 'Next steps must reference only statements made or explicitly confirmed by prospect, not seller inference about limitations.' Criterion 4 should require: 'Each next-step question must contain a specific metric, technical term, or decision framework\u2014no generic verbs like assess/evaluate without operationalization.'"
+}

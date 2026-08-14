@@ -1,0 +1,21 @@
+{
+  "company": "InPost",
+  "deal_id": "60069831015",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 4 FAILURE - Actionable next steps use vague verbs without specific actions across multiple components. Examples: Metrics next step says 'Schedule 30-minute metrics alignment call' without specifying WHO will schedule (seller action required), WHEN specifically (only 'end of next week'), or HOW to contact. Economic Buyer next step says 'Send calendar invite' and 'Follow up with LinkedIn research' without specifying the exact question to ask or research criteria. Decision Criteria next step says 'Deliver written decision criteria validation document' without specifying WHO receives it or WHEN. Decision Process next step says 'Book 20-minute process mapping call' without specifying WHO books it or HOW contact will be reached. Identified Pain next step says 'Conduct 30-minute pain quantification call' without specifying HOW to schedule or specific dates. Champion next step says 'Call [contact TBD]' without a concrete action plan beyond asking questions. Competition next step says 'During next scheduled call...on [date TBD]' - the date is intentionally vague. CRITERION 3 FAILURE - Champion score improved from 1/10 to 3/10, but evidence does not support a score above 2/10. The quoted evidence ('self-serve experimentation after initial engineering input' and 'strategic support structure') shows someone discussing implementation strategy, not advocating internally or mobilizing stakeholders. No evidence of internal selling behavior, stakeholder communication, or champion activities. A 3/10 score requires stronger evidence of championing actions. CRITERION 2 FAILURE - Competition maintained at 5/10 but evidence only mentions Firebase. The rubric requires competitors be mapped to: LaunchDarkly, Statsig, EPPO, Datadog Experiments, Optimizely, or homegrown/internal tools. Firebase is not in this competitive set and should not drive the score. Score should remain 4/10 with note that Firebase is incumbent (not a competitive alternative) and no actual competitors have been identified yet.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_003",
+  "timestamp": "2026-08-14T04:18:23.338263"
+}

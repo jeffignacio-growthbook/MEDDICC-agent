@@ -1,0 +1,21 @@
+{
+  "company": "Stone",
+  "deal_id": "53500422798",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 4,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Metrics component lacks sufficient evidence. Score of 5/10 is present but evidence is entirely paraphrased without direct quotes. For a score above 5/10, direct quotes or detailed paraphrases are required per rubric. Current evidence states only 'paraphrased from cumulative context' without actual quote content. CRITERION 3 FAILURE - All evidence citations use generic 'paraphrased from cumulative context' without providing the actual paraphrased content or quotes. This violates the requirement that evidence must be from the call or cumulative state with specificity. The analysis cannot be verified because the actual evidence is not presented. CRITERION 4 FAILURE - Champion component (4/10, Partial status) lacks actionable next steps with specific concrete questions. The next step provided ('directly qualify champion status by asking') uses vague language ('are you the person', 'what can I provide') without a specific, concrete question format required by rubric. Rewrite as: 'Ask Christian Liebenow: Are you building the business case and securing stakeholder buy-in, or is someone else leading internal advocacy? If it's you, what materials do you need from us this week to present to your Economic Buyer?' CRITERION 4 FAILURE - Decision Process component (5/10, Partial status) next steps lack specific concrete questions. Current next step uses vague language ('request written timeline if available') without a specific question. Rewrite as: 'Ask Christian Liebenow: When exactly does the PM group pilot start and end? What are the three specific success criteria to move to production rollout? Who must approve at each phase\u2014security, procurement, leadership?' CRITERION 2 FAILURE - Data quality note acknowledges corrupted recent call but analysis proceeds with carry-forward scoring without explicitly stating for each component whether prior scores are being maintained due to lack of new evidence. For a call with only greeting fragments legible, analysis must explicitly note 'No new evidence in recent call - maintaining prior score of X/10 based on cumulative calls' for EACH component. This is missing across all components.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_012",
+  "timestamp": "2026-08-14T04:39:18.537876"
+}

@@ -1,0 +1,21 @@
+{
+  "company": "Route",
+  "deal_id": "59245644951",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "FAIL: Criterion 2 (Carry-forward consistency) \u2014 Metrics scored 6/10 in new analysis but 7/10 in cumulative state with no documented reason for regression. Analysis states 'No new information in this call, prior evidence stands' but then downgrades score from 7 to 6. Must either maintain 7/10 with explicit note 'No new metrics information \u2014 maintaining previous score of 7/10' OR provide specific evidence from recent call explaining the downgrade (e.g., 'New call reveals lack of quantified targets, downgrading from 7 to 6'). Current treatment violates carry-forward rule by regressing without documented justification.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_011",
+  "timestamp": "2026-08-14T04:39:09.185518"
+}

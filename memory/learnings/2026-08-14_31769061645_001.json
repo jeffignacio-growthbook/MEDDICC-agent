@@ -1,0 +1,21 @@
+{
+  "company": "Oda",
+  "deal_id": "11024003429",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward Consistency: Metrics component scored 5/10 in analysis but evidence does not support increase from cumulative 4/10. Analysis states 'Score increased from 4/10 to 5/10 based on Call 3 revealing the operational scale (50 experiments)' but 50 experiments is historical context (since 2021), not forward-looking metrics for the deal. Call 3 provides no NEW quantifiable business outcomes tied to GrowthBook renewal/expansion. The analysis correctly identifies that 'No forward-looking quantifiable business outcomes tied to selecting GrowthBook specifically' are missing, which contradicts the score increase. Metrics should remain at 4/10 with note 'No new forward-looking metrics in Call 3 \u2014 maintaining previous assessment of 4/10.' | CRITERION 4 VIOLATION - Actionable Next Steps: Multiple components (Economic Buyer, Decision Process, Competition) lack specific questions. Examples: Economic Buyer next step asks 'confirm April 30 close timeline' but does not ask specific qualifying question (e.g., 'Is April 30 still achievable given your approval process, or do we need to adjust?'). Decision Process next step says 'Map full decision process' which is vague action language. Should specify: 'Ask CTO: How many approval steps between now and April 30? Who must sign? What's the timeline for legal review?' Competition next step lacks specificity - 'Have you considered building this internally?' is open-ended; should be 'Are you currently evaluating LaunchDarkly, Statsig, EPPO, or building internally as alternatives to GrowthBook renewal?' | CRITERION 3 VIOLATION - Evidence Quality: Identified Pain scored 5/10 but primary evidence is inference ('Call 3 showing team engagement') not direct quote. Analysis states 'The specific pain point driving this deal isn't clear' yet scores 5/10. This is contradictory. If pain is unclear, score should be 3/10 maximum. Score of 5/10 requires explicit pain statement from prospect. Call 3 mentions they 'plan to leverage new features' suggesting current limitations, but this is not articulated as pain. Score should be 3/10 with evidence: 'Call 3 implies feature gaps but no explicit pain statement provided; Identified Pain remains at prior 3/10 score.' | CRITERION 1 VIOLATION - Evidence Documentation: Champion component (2/10) describes 'user enthusiasm' from Call 3 but provides no specific quote or detailed paraphrase supporting the 2/10 score. The evidence states 'Call 3: \"The team detailed their significant advancements\" and \"plan to leverage new features\" suggests user enthusiasm' - this is inference, not evidence of champion behavior. Champion requires active internal selling (not just user satisfaction). Analysis correctly notes 'no evidence of active internal championing' so 2/10 score is unsupported. Score should remain at 1/10: 'No champion identified; Call 3 shows user enthusiasm but no evidence of internal selling.'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-14_31769061645_001",
+  "timestamp": "2026-08-14T04:14:29.242788"
+}
