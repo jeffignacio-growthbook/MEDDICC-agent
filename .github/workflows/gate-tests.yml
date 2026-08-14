@@ -1,0 +1,77 @@
+name: Pre-Merge Gate Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to test'
+        required: true
+        default: 'main'
+
+permissions:
+  contents: read
+
+jobs:
+  gate-tests:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "TEST 1 — Competitive intel handler against real data"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        continue-on-error: true
+        run: |
+          cat <<'EOF' > /tmp/test1.py
+          import asyncio, sys, json
+          sys.path.insert(0, '.')
+          from api.db import get_supabase
+          from api import handlers
+          from api.time_resolver import resolve_time_window
+          sb = get_supabase()
+          tw = resolve_time_window({'period': 'current_quarter'})
+          async def t():
+              r = await handlers.query_competitive_intel(
+                  {'time_window': tw}, sb)
+              print('Competitor counts:', r['competitor_counts'])
+              print('Build-vs-buy objections:',
+                    len(r['build_vs_buy_objections']))
+              for o in r['build_vs_buy_objections'][:3]:
+                  print(' ', o.get('company_name'),
+                        '|', o.get('verbatim_quote','')[:60])
+              print('Low comp score deals:',
+                    len(r['low_competition_score_deals']))
+          asyncio.run(t())
+          EOF
+          python3 /tmp/test1.py
+
+      - name: "TEST 2 — Handler generator dry run"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        continue-on-error: true
+        run: |
+          python scripts/handler_generator.py --dry-run --days 30
+
+      - name: "TEST 3 — Full smoke test (8 questions)"
+        env:
+          RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        continue-on-error: true
+        run: |
+          python scripts/smoke_test.py --verbose
