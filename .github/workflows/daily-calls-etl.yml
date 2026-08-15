@@ -9,6 +9,8 @@ on:
 env:
   FIREFLIES_API_KEY: ${{ secrets.FIREFLIES_API_KEY }}
   APOLLO_API_KEY: ${{ secrets.APOLLO_API_KEY }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
 
 permissions:
   contents: write  # Allow committing and pushing
@@ -39,6 +41,24 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           python scripts/etl_calls.py --mode incremental
+        continue-on-error: false
+
+      - name: Backfill Fireflies participants
+        run: |
+          cd $GITHUB_WORKSPACE
+          python scripts/enrichment/fireflies_participants.py --only-new --yes
+        continue-on-error: false
+
+      - name: Backfill Apollo participants
+        run: |
+          cd $GITHUB_WORKSPACE
+          python scripts/enrichment/apollo_participants.py --only-new --yes
+        continue-on-error: false
+
+      - name: Resolve calls to deals
+        run: |
+          cd $GITHUB_WORKSPACE
+          python scripts/enrichment/resolve_calls.py --only-unresolved --yes
         continue-on-error: false
 
       - name: Commit updated call cache
