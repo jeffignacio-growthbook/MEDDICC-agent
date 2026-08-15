@@ -1,51 +1,27 @@
 #!/usr/bin/env python3
 """
-Extract sales intelligence from internal sales-team calls
-(forecast reviews, pipeline discussions, deal strategy,
-win/loss debriefs) — the INTENT_SALES_REVIEW profile.
+Extract structured sales signals from resolved calls in the calls table.
+Runs against calls not yet in the enrichment_scans ledger.
 
-These calls carry real sales intelligence but no prospect
-objections, so they are deliberately routed away from the
-objection/feature-gap extractors and into three signal
-tables instead.
+Reads call_intent, is_internal, and deal_id from the calls table
+instead of re-deriving via slugify.
 
 Usage:
-  # As a library, from the enrichment ETL:
-  from scripts.enrichment.extract_sales_signals import (
-      extract_signals)
-  extract_signals(sb, client, call_data, company,
-                  deal_id, call_id, slug)
-
-  # Standalone, over calls classified as sales_review:
+  python scripts/enrichment/extract_sales_signals.py
   python scripts/enrichment/extract_sales_signals.py --dry-run
-  python scripts/enrichment/extract_sales_signals.py \
-    --limit 50 --yes
-
-Unlike the objection/gap extractors, this one deliberately
-scans internal calls — including cache files whose company
-slug does not resolve to a deal, which is where forecast and
-pipeline calls live. Rows whose deal cannot be resolved are
-still written; deal_id is nullable here because the signal is
-about the conversation, not a single deal record.
-
-Requires migration 022 (deal_risks, competitive_signals,
-pipeline_signals tables).
+  python scripts/enrichment/extract_sales_signals.py --limit 50 --yes
 """
 
 import os
-import sys
 import json
 import argparse
 from pathlib import Path
 from datetime import datetime
 
 REPO_ROOT = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(REPO_ROOT))
-sys.path.insert(0, str(REPO_ROOT / 'scripts'))
-
 JOB_NAME = 'sales_signals'
 
-SALES_SIGNAL_PROMPT = """Read this internal sales team
+PROMPT = """Read this internal sales team
 call and extract sales intelligence signals.
 
 This is a {call_type} call (forecast review, pipeline
@@ -81,34 +57,6 @@ Return JSON:
 }}
 Empty arrays if nothing found. No prose outside JSON."""
 
-VALID_PIPELINE_SIGNAL_TYPES = {
-    "commit_risk", "upside", "slip", "pull_in",
-}
-
-
-def _parse_json_object(text: str) -> dict | None:
-    """
-    Parse a JSON object from the model response, tolerating a
-    markdown fence the model was told not to emit.
-    """
-    text = (text or "").strip()
-    try:
-        return json.loads(text)
-    except Exception:
-        pass
-    if "```" in text:
-        for block in text.split("```"):
-            block = block.strip()
-            if block.startswith("json"):
-                block = block[4:].strip()
-            try:
-                parsed = json.loads(block)
-                if isinstance(parsed, dict):
-                    return parsed
-            except Exception:
-                continue
-    return None
-
 
 def _stamp(sb, call_id, job, slug, n):
     """Record scan completion in enrichment_scans ledger."""
@@ -121,117 +69,10 @@ def _stamp(sb, call_id, job, slug, n):
     }, on_conflict='call_id,job').execute()
 
 
-def extract_signals(sb, client, call_data: dict, company: str,
-                    deal_id, call_id: str, slug: str) -> dict:
-    """
-    Extract and persist sales signals for one internal call.
-
-    Args:
-        sb: supabase client
-        client: anthropic.Anthropic() instance
-        call_data: dict carrying at least 'summary' (and
-                   optionally 'title')
-        company: resolved company name for the call
-        deal_id: resolved deal id, or None
-        call_id: call identifier
-        slug: company slug
-
-    Returns:
-        {"deal_risks": n, "competitive_signals": n,
-         "pipeline_signals": n, "total": n}
-    """
-    counts = {"deal_risks": 0, "competitive_signals": 0,
-              "pipeline_signals": 0, "total": 0}
-
-    summary = call_data.get("summary") or ""
-    if len(summary) < 100:
-        return counts
-
-    call_type = call_data.get("title") or "internal sales"
-
-    prompt = SALES_SIGNAL_PROMPT.format(
-        call_type=call_type[:80],
-        call_summary=summary[:4000],
-    )
-
-    resp = client.messages.create(
-        model='claude-haiku-4-5-20251001',
-        max_tokens=1000,
-        system="Respond with valid JSON only.",
-        messages=[{'role': 'user', 'content': prompt}],
-    )
-
-    parsed = _parse_json_object(resp.content[0].text)
-    if not parsed:
-        print(f"  ✗ {company}: could not parse signal JSON")
-        return counts
-
-    now = datetime.utcnow().isoformat()
-
-    for risk in (parsed.get("deal_risks") or []):
-        if not isinstance(risk, dict):
-            continue
-        description = (risk.get("risk_description") or "").strip()
-        if not description:
-            continue
-        sb.table('deal_risks').insert({
-            'call_id': call_id,
-            'company_name': risk.get("company_name") or company,
-            'deal_id': deal_id,
-            'risk_description': description,
-            'rep_name': risk.get("rep_name"),
-            'source_company': company,
-            'extracted_at': now,
-        }).execute()
-        counts["deal_risks"] += 1
-
-    for sig in (parsed.get("competitive_signals") or []):
-        if not isinstance(sig, dict):
-            continue
-        competitor = (sig.get("competitor_name") or "").strip()
-        if not competitor:
-            continue
-        sb.table('competitive_signals').insert({
-            'call_id': call_id,
-            'competitor_name': competitor,
-            'context': sig.get("context"),
-            'deal_company': sig.get("deal_company"),
-            'deal_id': deal_id,
-            'source_company': company,
-            'extracted_at': now,
-        }).execute()
-        counts["competitive_signals"] += 1
-
-    for sig in (parsed.get("pipeline_signals") or []):
-        if not isinstance(sig, dict):
-            continue
-        signal_type = (sig.get("signal_type") or "").strip().lower()
-        if signal_type not in VALID_PIPELINE_SIGNAL_TYPES:
-            signal_type = "commit_risk"
-        description = (sig.get("description") or "").strip()
-        if not description:
-            continue
-        sb.table('pipeline_signals').insert({
-            'call_id': call_id,
-            'signal_type': signal_type,
-            'company_name': sig.get("company_name") or company,
-            'deal_id': deal_id,
-            'description': description,
-            'source_company': company,
-            'extracted_at': now,
-        }).execute()
-        counts["pipeline_signals"] += 1
-
-    counts["total"] = (counts["deal_risks"]
-                       + counts["competitive_signals"]
-                       + counts["pipeline_signals"])
-    return counts
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--limit', type=int, default=50,
-                        help='Max calls to scan')
+                        help='Max calls to scan (across all files)')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--yes', action='store_true')
     args = parser.parse_args()
@@ -244,90 +85,82 @@ def main():
         return
 
     from supabase import create_client
+    import sys
+    sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+    sys.path.insert(0, str(REPO_ROOT))
     from supabase_client import select_all
-    from utils import slugify
-    from scripts.enrichment.call_intent_classifier import (
-        classify_call, ENRICHMENT_PROFILE,
-    )
+    from scripts.enrichment.call_intent_classifier import ENRICHMENT_PROFILE
 
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-    scanned_ledger = {r['call_id'] for r in select_all(
+    # 1. Load scan ledger once
+    scanned = {r['call_id'] for r in select_all(
         sb, 'enrichment_scans', columns='call_id,job',
         filters=[('eq', 'job', JOB_NAME)])}
 
-    deals = select_all(sb, 'deals', columns='deal_id,company_name')
-    by_slug = {}
-    for d in deals:
-        by_slug.setdefault(slugify(d.get('company_name') or ''),
-                           []).append(d)
+    # 2. Query calls table for unscanned calls with resolved metadata
+    # Filter: non-internal calls with intent that should be scanned for objections
+    all_calls = select_all(sb, 'calls',
+        columns='call_id,company_name,deal_id,title,summary,call_date,call_intent,is_internal,intent_confidence')
 
-    cache_dir = REPO_ROOT / 'memory' / 'calls'
-    if not cache_dir.exists():
-        print(f"⚠️  Cache directory not found: {cache_dir}")
-        return
-
-    # Unlike the objection/gap extractors this scans ALL cache
-    # files — internal calls are the point of this job.
-    to_process = []
-    for cache_file in sorted(cache_dir.glob('*.json')):
-        try:
-            data = json.load(open(cache_file))
-        except Exception:
+    # Filter to qualifying calls:
+    # - Not already scanned
+    # - Not internal calls
+    # - Has call_intent (resolved)
+    # - Intent suggests sales signal extraction is appropriate
+    candidate_calls = []
+    for call in all_calls:
+        call_id = call.get('call_id')
+        if not call_id or call_id in scanned:
             continue
 
-        cache_company = (data.get('company')
-                         or cache_file.stem.replace('-', ' ').title())
-        slug = slugify(cache_company)
-        cands = by_slug.get(slug, [])
-        deal_id = cands[0]['deal_id'] if len(cands) == 1 else None
+        # Skip internal calls (already filtered by resolution)
+        if call.get('is_internal'):
+            continue
 
-        for call in data.get('calls', []):
-            call_id = str(call.get('id') or '')
-            if not call_id or call_id in scanned_ledger:
-                continue
+        # Check if this intent type should extract objections
+        intent = call.get('call_intent')
+        if intent and intent in ENRICHMENT_PROFILE:
+            profile = ENRICHMENT_PROFILE[intent]
+            if profile.get('extract_sales_signals'):
+                candidate_calls.append(call)
 
-            summary = (call.get('formatted_summary')
-                       or call.get('summary', ''))
-            classification = classify_call({
-                'title':        call.get('title', ''),
-                'summary':      summary,
-                'participants': call.get('participants', []),
-                'company':      cache_company,
-                'tags':         call.get('tags', []),
-            }, client=None, use_llm=False)
+    print(f"Found {len(candidate_calls)} unscanned non-internal calls eligible for sales signal extraction")
+    print(f"  ({len(all_calls)} total calls, {len(scanned)} already scanned, {len([c for c in all_calls if c.get('is_internal')])} internal)")
 
-            profile = ENRICHMENT_PROFILE[classification["intent"]]
-            if not profile["extract_sales_signals"]:
-                continue
+    # Apply limit
+    to_process = []
+    for call in candidate_calls[:args.limit]:
+        call_id = call.get('call_id')
+        summary = call.get('summary', '')
 
-            to_process.append({
-                'call_id': call_id,
-                'slug': slug or 'internal',
-                'company': cache_company,
-                'title': call.get('title', ''),
-                'summary': summary,
-                'deal_id': deal_id,
-                'reason': classification['reason'],
-            })
-            if len(to_process) >= args.limit:
-                break
-        if len(to_process) >= args.limit:
-            break
+        to_process.append({
+            'call_id': call_id,
+            'company': call.get('company_name') or 'Unknown',
+            'title': call.get('title', '') or '',
+            'summary': summary,
+            'call_date': call.get('call_date', ''),
+            'deal_id': call.get('deal_id'),  # Already resolved!
+            'call_intent': call.get('call_intent'),
+            'intent_confidence': call.get('intent_confidence'),
+        })
 
     if not to_process:
-        print("No unscanned sales_review calls found.")
+        print("No unscanned calls found.")
         return
 
-    est_cost = len(to_process) * 0.004
-    print(f"{len(to_process)} sales_review calls to scan, "
+    est_cost = len(to_process) * 0.02  # Haiku, small prompt
+    print(f"{len(to_process)} calls to scan, "
           f"estimated cost: ${est_cost:.2f}")
 
     if args.dry_run:
         print("\n--dry-run: First 15 calls:")
         for i, c in enumerate(to_process[:15], 1):
-            print(f"  {i:2d}. {c['company'][:25]:25s} | "
-                  f"{c['title'][:35]:35s} | {c['reason']}")
+            print(f"  {i:2d}. {c['company']:30s} | "
+                  f"call:{c['call_id'][:20]} | "
+                  f"date:{c['call_date'] or 'unknown':10s} | "
+                  f"intent:{c.get('call_intent', 'NULL'):12s} | "
+                  f"deal_id:{c['deal_id'] or 'NULL'}")
         return
 
     if len(to_process) >= 20 and not args.yes:
@@ -337,31 +170,92 @@ def main():
 
     import anthropic
     client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
+    from token_tracker import TokenTracker
+    tracker = TokenTracker(REPO_ROOT / 'memory')
 
-    scanned, totals = 0, {"deal_risks": 0,
-                          "competitive_signals": 0,
-                          "pipeline_signals": 0}
-    for c in to_process:
-        try:
-            counts = extract_signals(
-                sb, client, c, c['company'], c['deal_id'],
-                c['call_id'], c['slug'])
-            for k in totals:
-                totals[k] += counts[k]
-            _stamp(sb, c['call_id'], JOB_NAME, c['slug'],
-                   counts["total"])
+    written, scanned = 0, 0
+    deal_id_resolved = 0
+    companies = set()
+
+    for call_data in to_process:
+        call_id = call_data['call_id']
+        company = call_data['company']
+        summary = call_data['summary']
+        call_date = call_data['call_date']
+        deal_id = call_data['deal_id']
+        call_intent = call_data['call_intent']
+
+        if len(summary) < 100:
+            # Stamp scanned anyway — nothing to extract
+            _stamp(sb, call_id, JOB_NAME, company or 'unknown', 0)
             scanned += 1
-            print(f"  ✓ {c['company']}: {counts['total']} signal(s) "
-                  f"({counts['deal_risks']} risk, "
-                  f"{counts['competitive_signals']} comp, "
-                  f"{counts['pipeline_signals']} pipeline)")
-        except Exception as e:
-            print(f"  ✗ {c['company']} ({c['call_id'][:20]}): {e}")
+            continue
 
-    print(f"\n✓ Scanned {scanned} calls")
-    print(f"  Deal risks: {totals['deal_risks']}")
-    print(f"  Competitive signals: {totals['competitive_signals']}")
-    print(f"  Pipeline signals: {totals['pipeline_signals']}")
+        # Intent already determined and filtered in query above,
+        # but double-check profile allows sales signal extraction
+        profile = ENRICHMENT_PROFILE.get(call_intent, {})
+        if not profile.get("extract_sales_signals"):
+            print(f"  ↷ {company}: "
+                  f"{call_intent} call — "
+                  f"skipping sales signal extraction")
+            _stamp(sb, call_id, JOB_NAME, company or 'unknown', 0)
+            scanned += 1
+            continue
+
+        prompt = PROMPT.format(call_summary=summary[:4000])
+
+        try:
+            resp = client.messages.create(
+                model='claude-haiku-4-5-20251001',
+                max_tokens=500,
+                messages=[{'role': 'user', 'content': prompt}]
+            )
+            tracker.record(resp, 'claude-haiku-4-5-20251001',
+                           'sales_signal_extraction', company)
+
+            # Parse JSON response (strip markdown code fences if present)
+            text = resp.content[0].text.strip()
+            if text.startswith('```'):
+                # Remove markdown code fences
+                text = text.split('\n', 1)[1]  # Remove first line (```json)
+                text = text.rsplit('\n', 1)[0]  # Remove last line (```)
+            signals = json.loads(text.strip())
+
+            for signal in signals:
+                if not deal_id:
+                    print(f"Skipping enrichment record with no deal_id: "
+                          f"{company}", flush=True)
+                    continue
+                sb.table('sales_signals').insert({
+                    'deal_id': deal_id,
+                    'company_name': company,
+                    'call_id': call_id,
+                    'signal_type': signal.get('signal_type', ''),
+                    'indicator': signal.get('indicator', ''),
+                    'verbatim_evidence': signal.get('verbatim_evidence', ''),
+                    'strength': signal.get('strength', 'weak'),
+                    'extracted_at': datetime.utcnow().isoformat(),
+                }).execute()
+                written += 1
+
+            _stamp(sb, call_id, JOB_NAME, company or 'unknown', len(signals))
+            scanned += 1
+            companies.add(company or 'unknown')
+            if deal_id:
+                deal_id_resolved += 1
+            print(f"  ✓ {company}: {len(signals)} signal(s)")
+
+        except Exception as e:
+            print(f"  ✗ {company} ({call_id[:20]}): {e}")
+
+    summary_stats = tracker.save()
+    tracker.print_summary(summary_stats, scanned)
+
+    pct_resolved = (deal_id_resolved / scanned * 100) if scanned > 0 else 0
+    print(f"\n✓ Scanned {scanned} calls, {written} signals written")
+    print(f"  Deal ID resolved: {deal_id_resolved} ({pct_resolved:.1f}%)")
+    print(f"  Deal ID NULL: {scanned - deal_id_resolved} ({100-pct_resolved:.1f}%)")
+    print(f"  Distinct companies: {len(companies)}")
 
 
 if __name__ == '__main__':

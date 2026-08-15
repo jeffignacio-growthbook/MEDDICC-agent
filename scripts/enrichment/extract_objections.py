@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Extract structured objections from call transcripts in memory/calls/*.json.
+Extract structured objections from resolved calls in the calls table.
 Runs against calls not yet in the enrichment_scans ledger.
+
+Reads call_intent, is_internal, and deal_id from the calls table
+instead of re-deriving via slugify.
 
 Usage:
   python scripts/enrichment/extract_objections.py
@@ -81,10 +84,7 @@ def main():
     sys.path.insert(0, str(REPO_ROOT / 'scripts'))
     sys.path.insert(0, str(REPO_ROOT))
     from supabase_client import select_all
-    from utils import slugify
-    from scripts.enrichment.call_intent_classifier import (
-        classify_call, ENRICHMENT_PROFILE,
-    )
+    from scripts.enrichment.call_intent_classifier import ENRICHMENT_PROFILE
 
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -93,119 +93,52 @@ def main():
         sb, 'enrichment_scans', columns='call_id,job',
         filters=[('eq', 'job', JOB_NAME)])}
 
-    # 2. Load deal map once (company-anchored resolution)
-    deals = select_all(sb, 'deals',
-        columns='deal_id,company_name,create_date,close_date')
-    by_slug = {}
-    for d in deals:
-        by_slug.setdefault(slugify(d.get('company_name') or ''),
-                           []).append(d)
+    # 2. Query calls table for unscanned calls with resolved metadata
+    # Filter: non-internal calls with intent that should be scanned for objections
+    all_calls = select_all(sb, 'calls',
+        columns='call_id,company_name,deal_id,title,summary,call_date,call_intent,is_internal,intent_confidence')
 
-    def resolve_deal_id(slug, call_date):
-        """Best-effort deal_id resolution: one deal total, or one deal live on call_date."""
-        cands = by_slug.get(slug, [])
-        if len(cands) == 1:
-            return cands[0]['deal_id']
-        if call_date:
-            live = [d for d in cands
-                    if (d.get('create_date') or '') <= call_date
-                    and (not d.get('close_date')
-                         or d['close_date'] >= call_date)]
-            if len(live) == 1:
-                return live[0]['deal_id']
-        return None
-
-    # 3. Pre-filter to known-deal companies only
-    cache_dir = REPO_ROOT / 'memory' / 'calls'
-    if not cache_dir.exists():
-        print(f"⚠️  Cache directory not found: {cache_dir}")
-        return
-
-    known_slugs = set(by_slug.keys())
-    all_cache_files = list(cache_dir.glob('*.json'))
-
-    # Filter to cache files whose company slug matches a known deal
-    cache_files = []
-    for f in sorted(all_cache_files):
-        try:
-            data = json.load(open(f))
-            company = data.get('company') or f.stem.replace('-', ' ').title()
-            if slugify(company) in known_slugs:
-                cache_files.append(f)
-        except:
+    # Filter to qualifying calls:
+    # - Not already scanned
+    # - Not internal calls
+    # - Has call_intent (resolved)
+    # - Intent suggests objection extraction is appropriate
+    candidate_calls = []
+    for call in all_calls:
+        call_id = call.get('call_id')
+        if not call_id or call_id in scanned:
             continue
 
-    print(f"{len(known_slugs)} companies have deals; scanning {len(cache_files)} matching cache files")
-    print(f"  (skipped {len(all_cache_files) - len(cache_files)} with no associated deal).")
-
-    # Count total qualifying calls (in matched cache files, not yet scanned)
-    total_qualifying_calls = 0
-    for f in cache_files:
-        try:
-            data = json.load(open(f))
-            # Same guard as the processing loop below — a company whose
-            # slug is empty (too short, or only "GrowthBook") is skipped
-            # there, so it must not be counted here either.
-            cache_company = data.get('company') or f.stem.replace('-', ' ').title()
-            if not slugify(cache_company):
-                continue
-            for call in data.get('calls', []):
-                call_id = str(call.get('id') or '')
-                if call_id and call_id not in scanned:
-                    total_qualifying_calls += 1
-        except:
+        # Skip internal calls (already filtered by resolution)
+        if call.get('is_internal'):
             continue
 
-    print(f"  Total qualifying calls remaining (in deal-matched cache files, unscanned): {total_qualifying_calls}")
+        # Check if this intent type should extract objections
+        intent = call.get('call_intent')
+        if intent and intent in ENRICHMENT_PROFILE:
+            profile = ENRICHMENT_PROFILE[intent]
+            if profile.get('extract_objections'):
+                candidate_calls.append(call)
 
+    print(f"Found {len(candidate_calls)} unscanned non-internal calls eligible for objection extraction")
+    print(f"  ({len(all_calls)} total calls, {len(scanned)} already scanned, {len([c for c in all_calls if c.get('is_internal')])} internal)")
+
+    # Apply limit
     to_process = []
-    for cache_file in cache_files:
-        try:
-            data = json.load(open(cache_file))
-        except Exception as e:
-            print(f"⚠️  Could not read {cache_file}: {e}")
-            continue
+    for call in candidate_calls[:args.limit]:
+        call_id = call.get('call_id')
+        summary = call.get('summary', '')
 
-        # Normalize slug using utils.slugify to match deal slugs
-        cache_company = data.get('company') or cache_file.stem.replace('-', ' ').title()
-        normalized_slug = slugify(cache_company)
-        if not normalized_slug:
-            continue  # Skip if slug is too short or invalid
-
-        # Prefer deal's real company_name over cache file's 'company' field
-        matched_deals = by_slug.get(normalized_slug, [])
-        company = (matched_deals[0]['company_name'] if matched_deals
-                   else cache_company)
-
-        for call in data.get('calls', []):
-            call_id = str(call.get('id') or '')
-            if not call_id or call_id in scanned:
-                continue
-
-            summary = call.get('formatted_summary') or call.get('summary', '')
-            call_date = (call.get('date') or '')[:10]
-
-            to_process.append({
-                'call_id': call_id,
-                'slug': normalized_slug,
-                'company': company,
-                'title': call.get('title', '') or '',
-                'summary': summary,
-                'call_date': call_date,
-                # Cache stores a participant count, not a roster —
-                # pass an empty list so the classifier treats the
-                # emails as unknown rather than as an internal-only
-                # roster.
-                'participants': [],
-                'tags': call.get('tags', []) or [],
-                'deal_id': resolve_deal_id(normalized_slug, call_date),
-            })
-
-            if len(to_process) >= args.limit:
-                break
-
-        if len(to_process) >= args.limit:
-            break
+        to_process.append({
+            'call_id': call_id,
+            'company': call.get('company_name') or 'Unknown',
+            'title': call.get('title', '') or '',
+            'summary': summary,
+            'call_date': call.get('call_date', ''),
+            'deal_id': call.get('deal_id'),  # Already resolved!
+            'call_intent': call.get('call_intent'),
+            'intent_confidence': call.get('intent_confidence'),
+        })
 
     if not to_process:
         print("No unscanned calls found.")
@@ -221,6 +154,7 @@ def main():
             print(f"  {i:2d}. {c['company']:30s} | "
                   f"call:{c['call_id'][:20]} | "
                   f"date:{c['call_date'] or 'unknown':10s} | "
+                  f"intent:{c.get('call_intent', 'NULL'):12s} | "
                   f"deal_id:{c['deal_id'] or 'NULL'}")
         return
 
@@ -241,39 +175,25 @@ def main():
     for call_data in to_process:
         call_id = call_data['call_id']
         company = call_data['company']
-        slug = call_data['slug']
         summary = call_data['summary']
         call_date = call_data['call_date']
         deal_id = call_data['deal_id']
+        call_intent = call_data['call_intent']
 
         if len(summary) < 100:
             # Stamp scanned anyway — nothing to extract
-            _stamp(sb, call_id, JOB_NAME, slug, 0)
+            _stamp(sb, call_id, JOB_NAME, company or 'unknown', 0)
             scanned += 1
             continue
 
-        # Route by call intent — only prospect calls carry
-        # objections. Sales-review calls go to the sales signal
-        # extractor instead; operational calls are skipped.
-        classification = classify_call(
-            call_data={
-                "title":        call_data.get("title", ""),
-                "summary":      summary,
-                "participants": call_data.get("participants", []),
-                "company":      company,
-                "tags":         call_data.get("tags", []),
-            },
-            client=client,
-            use_llm=True,
-        )
-        profile = ENRICHMENT_PROFILE[classification["intent"]]
-
-        if not profile["extract_objections"]:
+        # Intent already determined and filtered in query above,
+        # but double-check profile allows objection extraction
+        profile = ENRICHMENT_PROFILE.get(call_intent, {})
+        if not profile.get("extract_objections"):
             print(f"  ↷ {company}: "
-                  f"{classification['intent']} call — "
-                  f"skipping objection extraction "
-                  f"({classification['reason']})")
-            _stamp(sb, call_id, JOB_NAME, slug, 0)
+                  f"{call_intent} call — "
+                  f"skipping objection extraction")
+            _stamp(sb, call_id, JOB_NAME, company or 'unknown', 0)
             scanned += 1
             continue
 
@@ -313,9 +233,9 @@ def main():
                 }).execute()
                 written += 1
 
-            _stamp(sb, call_id, JOB_NAME, slug, len(objections))
+            _stamp(sb, call_id, JOB_NAME, company or 'unknown', len(objections))
             scanned += 1
-            companies.add(slug)
+            companies.add(company or 'unknown')
             if deal_id:
                 deal_id_resolved += 1
             print(f"  ✓ {company}: {len(objections)} objection(s)")
