@@ -19,11 +19,15 @@ logger.info("[STARTUP] Phase G.2 robust router with evaluation loop loaded")
 FOLLOWUP_PRONOUNS = [
     "which of those", "which of them", "which of these",
     "of those", "of them", "of these",
-    "those deals", "them deals",
+    "those deals", "them deals", "these deals",
     "are those", "are they", "are them",
     "do those", "do they",
     "from those", "from them",
-    "for those", "for them",
+    "for those", "for them", "for these",
+    "those", "these", "them", "they", "it",
+    "that deal", "that one", "this deal",
+    "the ones", "the same", "same deals",
+    "any of those", "any of these",
 ]
 
 def has_followup_pronoun(question: str) -> bool:
