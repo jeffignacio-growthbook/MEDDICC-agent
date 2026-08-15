@@ -1,0 +1,102 @@
+name: "One-off: verify Phase E.2"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: phase-e2-schema-evolution
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "TEST A — category_gap_detector dry run (30 days)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        continue-on-error: true
+        run: |
+          python scripts/enrichment/category_gap_detector.py \
+            --dry-run --days 30
+
+      - name: "TEST B — true routing impact on deal-matched calls"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        continue-on-error: true
+        run: |
+          cat <<'PYEOF' > /tmp/routing_impact.py
+          import os, sys, json, glob
+          from collections import Counter
+          sys.path.insert(0, '.'); sys.path.insert(0, 'scripts')
+          from supabase import create_client
+          from supabase_client import select_all
+          from utils import slugify
+          from scripts.enrichment.call_intent_classifier import (
+              classify_call, ENRICHMENT_PROFILE)
+
+          sb = create_client(os.environ['SUPABASE_URL'],
+                             os.environ['SUPABASE_SERVICE_KEY'])
+          deals = select_all(sb, 'deals', columns='company_name')
+          known = {slugify(d.get('company_name') or '') for d in deals}
+          known.discard('')
+
+          intents = Counter(); skipped = []; n = 0
+          for f in sorted(glob.glob('memory/calls/*.json')):
+              try: d = json.load(open(f))
+              except: continue
+              company = d.get('company') or ''
+              slug = slugify(company)
+              # exactly the ETL pre-filter: slug must match a deal
+              if not slug or slug not in known:
+                  continue
+              for call in d.get('calls', []):
+                  summary = (call.get('formatted_summary')
+                             or call.get('summary', ''))
+                  if len(summary) < 100:
+                      continue
+                  r = classify_call({
+                      "title": call.get('title', '') or '',
+                      "summary": summary,
+                      "participants": [],
+                      "company": company,
+                      "tags": call.get('tags', []) or [],
+                  }, client=None, use_llm=True)
+                  intents[r['intent']] += 1; n += 1
+                  if not ENRICHMENT_PROFILE[r['intent']]['extract_objections']:
+                      skipped.append((company, call.get('title','')[:40],
+                                      r['intent'], r['reason']))
+
+          print(f"Deal-matched calls with real summaries: {n}")
+          print("Routing outcome:", dict(intents))
+          pct = (len(skipped)/n*100) if n else 0
+          print(f"\nNewly SKIPPED for objection extraction: "
+                f"{len(skipped)} ({pct:.2f}%)")
+          for c,t,i,reason in skipped[:25]:
+              print(f"   {c[:24]:24s} | {t:40s} | {i} | {reason}")
+          PYEOF
+          python3 /tmp/routing_impact.py
+
+      - name: "TEST C — extract_objections dry run (ETL wiring)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        continue-on-error: true
+        run: |
+          python scripts/enrichment/extract_objections.py --dry-run
