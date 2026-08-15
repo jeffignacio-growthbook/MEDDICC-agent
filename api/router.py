@@ -76,10 +76,29 @@ def should_use_entity_scope(question: str, prior_entities: dict) -> bool:
 
     Returns True when:
     - prior_entities has deal_ids
+    - entities are not stale (< 30 minutes old)
     - question does not contain a NEW_DISCOVERY_SIGNAL
     """
+    from datetime import datetime, timezone, timedelta
+
     if not prior_entities or not prior_entities.get("deal_ids"):
         return False
+
+    # Check staleness: entities older than 30 minutes force rediscovery
+    if prior_entities.get("resolved_at"):
+        try:
+            resolved_at = datetime.fromisoformat(
+                prior_entities["resolved_at"].replace("Z", "+00:00"))
+            age = datetime.now(timezone.utc) - resolved_at
+            if age > timedelta(minutes=30):
+                logger.info(f"[ENTITY_SCOPE] entities stale "
+                           f"({age.total_seconds():.0f}s old), "
+                           f"forcing rediscovery")
+                return False
+        except Exception as e:
+            logger.warning(f"[ENTITY_SCOPE] failed to parse "
+                          f"resolved_at: {e}")
+
     q_lower = question.lower()
     if any(sig in q_lower for sig in NEW_DISCOVERY_SIGNALS):
         return False

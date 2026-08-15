@@ -133,6 +133,8 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
     # Store entity context as separate entry if entities found
     if entities.get("deal_ids") or entities.get(
             "company_names"):
+        # Add timestamp for staleness checking
+        entities["resolved_at"] = datetime.now(timezone.utc).isoformat()
         history.append({
             "role": ENTITY_ROLE,
             "content": json.dumps(entities),
