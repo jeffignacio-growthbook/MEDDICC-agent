@@ -52,7 +52,7 @@ jobs:
           print(f"\n=== competitive_signals: {len(rows)} ===")
           for r in rows[:15]:
               print(f"  {(r['competitor_name'] or '?')[:20]:20s} | "
-                    f"{(r['context') or ''][:80]}")
+                    f"{(r['context'] or '')[:80]}")
           rows = select_all(sb, 'pipeline_signals',
               columns='signal_type,company_name,description')
           print(f"\n=== pipeline_signals: {len(rows)} ===")
