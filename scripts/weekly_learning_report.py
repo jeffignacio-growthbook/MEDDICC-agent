@@ -36,6 +36,9 @@ def main():
     parser.add_argument("--create-pr", action="store_true",
         help="Create GitHub PRs for handlers that pass "
              "testing and quality checks (implies --generate-handlers)")
+    parser.add_argument("--check-schema-gaps", action="store_true",
+        help="Check the enrichment schema for missing "
+             "categories (read-only, never re-enriches)")
     args = parser.parse_args()
 
     SUPABASE_URL = os.environ.get("SUPABASE_URL")
@@ -101,6 +104,39 @@ def main():
 
     if args.generate_handlers or args.create_pr:
         _generate_handlers(sb, args)
+
+    # Schema gap detection
+    if args.check_schema_gaps:
+        print("\nChecking enrichment schema gaps...")
+        from scripts.enrichment.category_gap_detector import (
+            get_existing_categories,
+            get_unanswered_questions,
+            detect_implied_categories,
+            cluster_other_category,
+            build_report,
+            generate_pr_content,
+            create_category_pr,
+        )
+        existing = get_existing_categories(sb)
+        questions = get_unanswered_questions(sb, args.days)
+        implied = detect_implied_categories(questions)
+        clusters = cluster_other_category(sb)
+        gap_report = build_report(existing, implied,
+                                  clusters, args.days)
+        print(gap_report)
+        if args.slack:
+            _post_to_slack(gap_report)
+
+        # Proposals only ever become a PR — never an applied
+        # prompt change, and never a re-enrichment run.
+        if args.create_pr:
+            pr_content = generate_pr_content(implied, clusters)
+            if pr_content:
+                create_category_pr(
+                    pr_content,
+                    f"{len(implied) + len(clusters)} candidate(s)")
+            else:
+                print("No new categories to propose")
 
 
 def _generate_handlers(sb, args):
