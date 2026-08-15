@@ -297,9 +297,32 @@ def _summarize_accumulated(data: dict) -> str:
             parts.append(f"{len(rows)} rows from {result.get('table', key)}")
     return "; ".join(parts) if parts else "no data found"
 
+def _extract_rows_from_accumulated(accumulated_data: dict) -> dict:
+    """
+    Extract rows from accumulated_data for entity context.
+
+    accumulated_data has shape: {"step_0": {...}, "step_1": {...}}
+    Each step contains: {"rows": [...], "table": "...", "error": ...}
+
+    Returns dict with "rows" key for extract_entity_context().
+    """
+    if not accumulated_data:
+        return {}
+
+    # Iterate through steps in reverse order (most recent first)
+    step_keys = sorted(accumulated_data.keys(), reverse=True)
+    for step_key in step_keys:
+        step_data = accumulated_data.get(step_key, {})
+        rows = step_data.get("rows", [])
+        if rows:
+            return {"rows": rows, "table": step_data.get("table", "unknown")}
+
+    # No rows found - return empty dict
+    return {}
+
 async def dynamic_query_loop(question, history, params,
                               sb, client,
-                              hint: str = "") -> str:
+                              hint: str = "") -> dict:
     """
     Multi-turn tool-calling loop for novel questions.
     Agent calls tools until it has enough data to answer.
@@ -355,8 +378,10 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             partial = _summarize_accumulated(accumulated_data)
             logger.info(f"[LOOP] fallback to unanswerable after "
                         f"{iteration+1} iterations, tokens={tokens_used}")
-            return (f"Hit query budget with partial data: {partial}. "
-                   f"Try a more specific question.")
+            tool_results = _extract_rows_from_accumulated(accumulated_data)
+            answer = (f"Hit query budget with partial data: {partial}. "
+                     f"Try a more specific question.")
+            return {"answer": answer, "tool_results": tool_results}
 
         raw = resp.content[0].text.strip()
 
@@ -380,7 +405,9 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 'tool' not in stripped[:20].lower()):
                 # Treat as direct prose answer
                 logger.info(f"[LOOP iter={iteration}] prose answer detected")
-                return stripped
+                # Extract rows from accumulated data for entity context
+                tool_results = _extract_rows_from_accumulated(accumulated_data)
+                return {"answer": stripped, "tool_results": tool_results}
             # Otherwise log parse failure as before
             logger.info(f"[LOOP] JSON parse failed, raw={raw[:300]}")
             continue
@@ -404,7 +431,9 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     continue
             except Exception:
                 pass
-            return parsed["answer"]
+            # Extract rows from accumulated data for entity context
+            tool_results = _extract_rows_from_accumulated(accumulated_data)
+            return {"answer": parsed["answer"], "tool_results": tool_results}
 
         tool_name = parsed.get("tool", "")
         tool_params = parsed.get("params", {})
@@ -417,8 +446,10 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         }.get(tool_name)
 
         if not tool_fn:
-            return (f"I tried to use an unknown tool ({tool_name}). "
-                    f"I can't answer this question with available data.")
+            tool_results = _extract_rows_from_accumulated(accumulated_data)
+            answer = (f"I tried to use an unknown tool ({tool_name}). "
+                     f"I can't answer this question with available data.")
+            return {"answer": answer, "tool_results": tool_results}
 
         if tool_name == "aggregate_results":
             data = tool_params.get("data", [])
@@ -445,9 +476,11 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
     logger.info(f"[LOOP] fallback to unanswerable after "
                 f"{MAX_ITERATIONS} iterations, tokens={tokens_used}")
-    return ("I couldn't fully answer this question within the allowed steps. "
-            "The data exists but requires a more complex analysis. "
-            "Try breaking it into simpler questions.")
+    tool_results = _extract_rows_from_accumulated(accumulated_data)
+    answer = ("I couldn't fully answer this question within the allowed steps. "
+             "The data exists but requires a more complex analysis. "
+             "Try breaking it into simpler questions.")
+    return {"answer": answer, "tool_results": tool_results}
 
 async def route_question(question: str, user_id: str,
                           history: list, sb) -> dict:
@@ -566,7 +599,7 @@ async def route_question(question: str, user_id: str,
         print(f"[ROUTING] dynamic fallback "
               f"(quality={result_quality})", flush=True)
         hint = extract_missing_hint(tool_results, handler_name)
-        dynamic_answer = await dynamic_query_loop(
+        dynamic_result = await dynamic_query_loop(
             question=question,
             history=history,
             params=params,
@@ -574,17 +607,19 @@ async def route_question(question: str, user_id: str,
             client=client,
             hint=hint,
         )
+        dynamic_answer = dynamic_result.get("answer", "")
+        dynamic_tool_results = dynamic_result.get("tool_results", {})
         if dynamic_answer and \
            "don't have data" not in dynamic_answer.lower() and \
            "couldn't" not in dynamic_answer.lower():
             return {"answer": dynamic_answer,
                     "needs_ack": is_slow,
-                    "tool_results": {}}
+                    "tool_results": dynamic_tool_results}
 
     # Handle direct dynamic_query intent
     if handler_name == "dynamic_query":
         print(f"[ROUTING] dynamic_query (direct)", flush=True)
-        dynamic_answer = await dynamic_query_loop(
+        dynamic_result = await dynamic_query_loop(
             question=question,
             history=history,
             params=params,
@@ -592,8 +627,9 @@ async def route_question(question: str, user_id: str,
             client=client,
             hint="",
         )
-        return {"answer": dynamic_answer, "needs_ack": is_slow,
-                "tool_results": {}}
+        return {"answer": dynamic_result.get("answer", ""),
+                "needs_ack": is_slow,
+                "tool_results": dynamic_result.get("tool_results", {})}
 
     # ── 5. Honest "no data" ───────────────────────────
     if result_quality in ("empty", "error", "unanswerable"):
