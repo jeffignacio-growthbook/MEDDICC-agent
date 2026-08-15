@@ -354,9 +354,9 @@ class HubSpotDealsClient:
                     to_companies = result.get('to', [])
 
                     if to_companies:
-                        # Take first associated company
-                        company_id = to_companies[0].get('id')
-                        deal_to_company[from_deal_id] = company_id
+                        # Take first associated company (HubSpot v4 API uses 'toObjectId')
+                        company_id = to_companies[0].get('toObjectId')
+                        deal_to_company[from_deal_id] = str(company_id) if company_id else None
                     else:
                         deal_to_company[from_deal_id] = None
 

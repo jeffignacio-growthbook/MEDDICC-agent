@@ -408,12 +408,14 @@ def main():
                     company_id = deal.get('company_id')
                     company_name = deal.get('company_name', '')
                     employee_count = deal.get('company_numberofemployees', '')
+                    domain = deal.get('company_domain', '')
 
                     deal_to_company[deal_id] = company_id
                     if company_id:
                         company_properties[company_id] = {
                             'name': company_name,
-                            'numberofemployees': employee_count
+                            'numberofemployees': employee_count,
+                            'domain': domain
                         }
 
                 print(f"\n  CSV Mode: {len(all_deals_api)} deals loaded with pre-joined company data")
@@ -433,33 +435,6 @@ def main():
             except Exception as e:
                 print(f"❌ Failed to fetch deals: {e}")
                 return
-
-            # Batch fetch company associations and employee counts for segmentation
-            print("\n3. Batch fetching company associations and employee counts...")
-            deal_ids = [d.get('id') for d in all_deals_api if d.get('id')]
-            print(f"   Fetching company associations for {len(deal_ids)} deals...")
-
-            # Step 1: Batch get company IDs for all deals
-            deal_to_company = hubspot.batch_get_deal_company_associations(deal_ids)
-            companies_found = sum(1 for cid in deal_to_company.values() if cid)
-            print(f"   Found {companies_found}/{len(deal_ids)} deals with company associations")
-
-            # Step 2: Get unique company IDs
-            unique_company_ids = list(set(cid for cid in deal_to_company.values() if cid))
-            print(f"   Fetching employee counts for {len(unique_company_ids)} unique companies...")
-
-            # Step 3: Batch fetch company properties
-            company_properties = hubspot.batch_get_companies(
-                unique_company_ids,
-                properties=['name', 'numberofemployees']
-            )
-            print(f"   Retrieved properties for {len(company_properties)} companies")
-
-            # API call estimate
-            assoc_calls = (len(deal_ids) + 99) // 100
-            company_calls = (len(unique_company_ids) + 99) // 100
-            print(f"   API calls: {assoc_calls} association batches + {company_calls} company batches = {assoc_calls + company_calls} total")
-            print(f"   (vs {len(deal_ids) * 2} individual calls = {100 - int(100 * (assoc_calls + company_calls) / (len(deal_ids) * 2))}% reduction)")
     else:  # history mode
         meeting_set_stages = []
         closed_stages = []
@@ -506,9 +481,39 @@ def main():
                 print("   Try exporting from HubSpot and using --file instead")
                 return
 
+    # Batch fetch company associations for all modes (except CSV mode which already has it)
+    # This runs for both active and analytics API modes
+    if not args.file:
+        batch_step = "\n4" if args.mode == 'active' else "\n3"
+        print(f"{batch_step}. Batch fetching company associations and employee counts...")
+        deal_ids = [d.get('id') for d in all_deals_api if d.get('id')]
+        print(f"   Fetching company associations for {len(deal_ids)} deals...")
+
+        # Step 1: Batch get company IDs for all deals
+        deal_to_company = hubspot.batch_get_deal_company_associations(deal_ids)
+        companies_found = sum(1 for cid in deal_to_company.values() if cid)
+        print(f"   Found {companies_found}/{len(deal_ids)} deals with company associations")
+
+        # Step 2: Get unique company IDs
+        unique_company_ids = list(set(cid for cid in deal_to_company.values() if cid))
+        print(f"   Fetching properties for {len(unique_company_ids)} unique companies...")
+
+        # Step 3: Batch fetch company properties (including domain)
+        company_properties = hubspot.batch_get_companies(
+            unique_company_ids,
+            properties=['name', 'numberofemployees', 'domain']
+        )
+        print(f"   Retrieved properties for {len(company_properties)} companies")
+
+        # API call estimate
+        assoc_calls = (len(deal_ids) + 99) // 100
+        company_calls = (len(unique_company_ids) + 99) // 100
+        print(f"   API calls: {assoc_calls} association batches + {company_calls} company batches = {assoc_calls + company_calls} total")
+        print(f"   (vs {len(deal_ids) * 2} individual calls = {100 - int(100 * (assoc_calls + company_calls) / (len(deal_ids) * 2))}% reduction)")
+
     # Process deals
-    print_step = "\n5" if args.mode == 'analytics' else "\n4"
-    print(f"{print_step}. Processing deals and fetching company info...")
+    print_step = "\n5" if args.mode == 'analytics' else "\n5"
+    print(f"{print_step}. Processing deals and writing to Supabase...")
     deals = {}
     skipped = {
         'renewal_pipeline': 0,
@@ -577,35 +582,47 @@ def main():
             pass
         # history mode: include everything, no filters
 
-        # Get company - use batch data in analytics mode, individual calls otherwise
-        if args.mode == 'analytics':
-            # Use pre-fetched batch data
-            company_id = deal_to_company.get(deal_id)
-            company_props = company_properties.get(company_id, {}) if company_id else {}
-            company_name = company_props.get('name', '') if company_id else ''
+        # Get company - use pre-fetched batch data (available in both active and analytics modes now)
+        company_id = deal_to_company.get(deal_id)
+        company_props = company_properties.get(company_id, {}) if company_id else {}
+        company_name = company_props.get('name', '') if company_id else ''
+        company_domain = company_props.get('domain', '') if company_id else ''
 
-            # Don't skip deals without companies - they'll get segment='Unknown'
-            # and we'll track the reason in segment_reason field
-
-        else:
-            # Active/history mode: individual API calls
-            try:
-                company_obj = hubspot.get_deal_company(deal_id)
-                if not company_obj:
-                    skipped['no_company'] += 1
-                    continue
-
-                company_name = company_obj.get('properties', {}).get('name', '')
-                if not company_name.strip():
-                    skipped['no_company'] += 1
-                    continue
-
-            except Exception as e:
-                skipped['no_company'] += 1
-                continue
+        # Don't skip deals without companies in analytics mode
+        # In active mode, we used to skip these, but now we include them for consistency
+        # They'll get segment='Unknown' and we track the reason in segment_reason field
 
         # Generate slug (handle missing company name)
         slug = slugify(company_name) if company_name else 'unknown'
+
+        # Compute segmentation from company employee count (needed for deal_dict)
+        from utils import (is_won_stage, is_lost_stage, get_stage_order,
+                         get_pipeline_config, compute_deal_value, load_client_config,
+                         get_segment)
+
+        company_employee_count = None
+        segment = 'Unknown'
+        segment_reason = None
+
+        if not company_id:
+            # No company association at all
+            segment_reason = 'no_company'
+        elif company_id:
+            emp_raw = company_props.get('numberofemployees')
+            try:
+                if emp_raw and emp_raw != '':
+                    # Handle decimal strings from CSV (e.g., "8521.0")
+                    company_employee_count = int(float(emp_raw))
+            except (ValueError, TypeError):
+                pass
+
+            if company_employee_count is None:
+                # Has company but no employee count
+                segment_reason = 'no_employee_count'
+
+        # Get segment from employee count
+        config = load_client_config()
+        segment, expected_cycle_days = get_segment(company_employee_count, config)
 
         # Build deal object with mode-specific fields
         deal_dict = {
@@ -613,6 +630,11 @@ def main():
             'deal_name': deal_name,
             'company_name': company_name or None,  # None = don't overwrite; '' would clear existing data
             'company_slug': slug if company_name else None,
+            'company_id': company_id,  # Now populated in all modes via batch fetch
+            'company_domain': company_domain or None,  # Domain from HubSpot companies
+            'company_employee_count': company_employee_count,
+            'segment': segment,
+            'segment_reason': segment_reason,  # Diagnostic: 'no_company' or 'no_employee_count'
             'pipeline': pipeline,
             'stage': stage,
             'arr': arr,
@@ -634,10 +656,6 @@ def main():
 
         # Add analytics-specific fields
         if args.mode == 'analytics':
-            from utils import (is_won_stage, is_lost_stage, get_stage_order,
-                             get_pipeline_config, compute_deal_value, load_client_config,
-                             get_segment)
-
             # Determine deal_status using pipeline config
             if is_won_stage(stage):
                 deal_status = 'won'
@@ -647,32 +665,7 @@ def main():
                 deal_status = 'active'
 
             # Compute deal value using NULL-safe ARR component sum
-            config = load_client_config()
             deal_value = compute_deal_value(props, config)
-
-            # Compute segmentation from company employee count
-            company_employee_count = None
-            segment = 'Unknown'
-            segment_reason = None
-
-            if not company_id:
-                # No company association at all
-                segment_reason = 'no_company'
-            elif company_id:
-                emp_raw = company_props.get('numberofemployees')
-                try:
-                    if emp_raw and emp_raw != '':
-                        # Handle decimal strings from CSV (e.g., "8521.0")
-                        company_employee_count = int(float(emp_raw))
-                except (ValueError, TypeError):
-                    pass
-
-                if company_employee_count is None:
-                    # Has company but no employee count
-                    segment_reason = 'no_employee_count'
-
-            # Get segment from employee count
-            segment, expected_cycle_days = get_segment(company_employee_count, config)
 
             # Parse ARR components (NULL-safe)
             def safe_numeric(val):
@@ -709,12 +702,6 @@ def main():
             deal_dict['prior_arr'] = prior_arr
             deal_dict['sao'] = sao
             deal_dict['forecast_category'] = forecast_category
-
-            # Segmentation fields
-            deal_dict['company_id'] = company_id
-            deal_dict['company_employee_count'] = company_employee_count
-            deal_dict['segment'] = segment
-            deal_dict['segment_reason'] = segment_reason  # Diagnostic: 'no_company' or 'no_employee_count'
 
             # Get current stage order
             current_order = get_stage_order(stage) or 0

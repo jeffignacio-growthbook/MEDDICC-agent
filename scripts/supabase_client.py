@@ -156,6 +156,8 @@ class SupabaseWriter:
         # Segmentation fields (migration 013)
         if 'company_id' in deal:
             row['company_id'] = deal.get('company_id')
+        if 'company_domain' in deal:
+            row['company_domain'] = deal.get('company_domain')  # Domain from HubSpot
         if 'company_employee_count' in deal:
             row['company_employee_count'] = _safe_int(deal['company_employee_count'])
         if 'segment' in deal:

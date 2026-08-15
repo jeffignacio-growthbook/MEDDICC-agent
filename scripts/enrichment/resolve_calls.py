@@ -52,17 +52,17 @@ def get_deal_domains(sb):
     from supabase_client import select_all
 
     deals = select_all(sb, "deals",
-        columns="deal_id,deal_name,company_name,"
-                "company_id")
+        columns="deal_id,company_name,company_id,company_slug,company_domain")
 
-    # Build domain map - try to get domain from company_name
-    # (e.g., "Acme Corp" → "acme.com" is not reliable without
-    # external enrichment, so we'll use what we have)
+    # Build domain map from company_domain (added in migration 024)
     domain_map = {}
     for d in deals:
-        # For now, we don't have company_domain in deals table
-        # This will be enhanced when company enrichment is added
-        pass
+        domain = d.get("company_domain")
+        if domain:
+            # Multiple deals can have same domain (different contacts at same company)
+            # Use the most recent deal for that domain
+            if domain not in domain_map:
+                domain_map[domain] = d
 
     return domain_map, deals
 
@@ -74,7 +74,7 @@ def get_company_slug_map(sb):
     from scripts.utils import slugify
 
     deals = select_all(sb, "deals",
-        columns="deal_id,deal_name,company_name,company_id")
+        columns="deal_id,company_name,company_id,company_slug")
 
     slug_map = {}
     for d in deals:
@@ -111,7 +111,7 @@ def resolve_by_slug(company_slug, slug_map):
     # If multiple deals for same company, pick most recent
     # This is imperfect but better than nothing
     deals_sorted = sorted(deals,
-        key=lambda d: d.get("deal_name", ""),
+        key=lambda d: d.get("deal_id", ""),
         reverse=True)
     return deals_sorted[0] if deals_sorted else None
 
@@ -239,7 +239,7 @@ def main():
             stats["needs_review"] += 1
 
         if args.dry_run:
-            deal_str = deal.get("deal_name", "")[:20] if deal else "NONE"
+            deal_str = deal.get("company_name", "")[:20] if deal else "NONE"
             print(f"  {call['call_id'][:20]:20} | "
                   f"int={str(is_internal):5} | "
                   f"deal={deal_str:20} | "
@@ -251,7 +251,7 @@ def main():
         sb.table("calls").update({
             "is_internal":       is_internal,
             "deal_id":           deal.get("deal_id") if deal else None,
-            "deal_name":         deal.get("deal_name") if deal else None,
+            "deal_name":         deal.get("company_name") if deal else None,
             "company_id":        deal.get("company_id") if deal else None,
             "call_intent":       intent,
             "intent_confidence": classification["confidence"],
