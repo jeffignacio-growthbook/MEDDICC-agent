@@ -139,6 +139,12 @@ def main():
     for f in cache_files:
         try:
             data = json.load(open(f))
+            # Same guard as the processing loop below — a company whose
+            # slug is empty (too short, or only "GrowthBook") is skipped
+            # there, so it must not be counted here either.
+            cache_company = data.get('company') or f.stem.replace('-', ' ').title()
+            if not slugify(cache_company):
+                continue
             for call in data.get('calls', []):
                 call_id = str(call.get('id') or '')
                 if call_id and call_id not in scanned:
