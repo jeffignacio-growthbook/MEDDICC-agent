@@ -79,8 +79,12 @@ def main():
     from supabase import create_client
     import sys
     sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+    sys.path.insert(0, str(REPO_ROOT))
     from supabase_client import select_all
     from utils import slugify
+    from scripts.enrichment.call_intent_classifier import (
+        classify_call, ENRICHMENT_PROFILE,
+    )
 
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -185,8 +189,15 @@ def main():
                 'call_id': call_id,
                 'slug': normalized_slug,
                 'company': company,
+                'title': call.get('title', '') or '',
                 'summary': summary,
                 'call_date': call_date,
+                # Cache stores a participant count, not a roster —
+                # pass an empty list so the classifier treats the
+                # emails as unknown rather than as an internal-only
+                # roster.
+                'participants': [],
+                'tags': call.get('tags', []) or [],
                 'deal_id': resolve_deal_id(normalized_slug, call_date),
             })
 
@@ -237,6 +248,31 @@ def main():
 
         if len(summary) < 100:
             # Stamp scanned anyway — nothing to extract
+            _stamp(sb, call_id, JOB_NAME, slug, 0)
+            scanned += 1
+            continue
+
+        # Route by call intent — only prospect calls carry
+        # objections. Sales-review calls go to the sales signal
+        # extractor instead; operational calls are skipped.
+        classification = classify_call(
+            call_data={
+                "title":        call_data.get("title", ""),
+                "summary":      summary,
+                "participants": call_data.get("participants", []),
+                "company":      company,
+                "tags":         call_data.get("tags", []),
+            },
+            client=client,
+            use_llm=True,
+        )
+        profile = ENRICHMENT_PROFILE[classification["intent"]]
+
+        if not profile["extract_objections"]:
+            print(f"  ↷ {company}: "
+                  f"{classification['intent']} call — "
+                  f"skipping objection extraction "
+                  f"({classification['reason']})")
             _stamp(sb, call_id, JOB_NAME, slug, 0)
             scanned += 1
             continue

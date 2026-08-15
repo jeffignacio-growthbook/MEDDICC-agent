@@ -92,3 +92,18 @@ jobs:
           python scripts/weekly_learning_report.py \
             --slack --generate-handlers --create-pr
         continue-on-error: true
+
+      - name: Check enrichment schema gaps
+        if: github.event_name == 'schedule'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ZAP_REPLY_URL: ${{ secrets.ZAP_REPLY_URL }}
+          SLACK_REPORT_CHANNEL: ${{ secrets.SLACK_REPORT_CHANNEL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
+        run: |
+          python scripts/weekly_learning_report.py \
+            --check-schema-gaps --slack --days 7
+        continue-on-error: true
