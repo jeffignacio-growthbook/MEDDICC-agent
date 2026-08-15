@@ -30,7 +30,15 @@ Call summary:
 
 For each objection found, return an object with:
   category: one of switching_cost, budget, timing, technical,
-            internal_politics, product_gap, trust, other
+            internal_politics, product_gap, trust,
+            build_vs_buy, other
+    build_vs_buy: prospect suggests building internally,
+      using AI/vibe coding to build it themselves, engineering
+      it in-house, or any "we could just build this" instinct —
+      including AI-assisted development comments like
+      "our engineers could use Cursor/Claude to build this",
+      "we could vibe code this", or skepticism about paying
+      for something buildable
   verbatim_quote: the closest thing to what they actually
                   said (paraphrase tightly, don't invent)
   rep_response: how the rep addressed it, in one sentence,
