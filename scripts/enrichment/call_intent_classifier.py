@@ -42,7 +42,12 @@ INTENT_PROSPECT     = "prospect"
 INTENT_SALES_REVIEW = "sales_review"
 INTENT_SKIP         = "skip"
 
-INTERNAL_DOMAIN = "growthbook.io"
+INTERNAL_DOMAIN = "growthbook.io"  # keep for email checks
+# Company *names* never carry the domain suffix — the cache stores
+# "GrowthBook", "GrowthBook AI", "EA + GrowthBook". Matching those
+# against the domain string reads them as external, so name checks
+# use these tokens instead.
+INTERNAL_COMPANY_TOKENS = ("growthbook", "growth book")
 
 # Keywords that strongly signal sales review intent
 SALES_REVIEW_KEYWORDS = [
@@ -98,6 +103,28 @@ Respond with JSON only:
   "confidence": 0.0-1.0,
   "reason": "one sentence explanation"
 }}"""
+
+
+def _is_internal_company(company: str) -> bool:
+    """
+    True when a company name refers to GrowthBook and nothing else.
+
+    Cache company names pair both sides of the call — "Acorns +
+    GrowthBook", "GrowthBook <> ECCO" — so a bare substring test for
+    "growthbook" marks every prospect internal. slugify() strips the
+    GrowthBook half and returns '' only when nothing else remains
+    ("GrowthBook", "GrowthBook AI", "EA + GrowthBook"), which is
+    exactly the internal set.
+    """
+    if not company:
+        return False
+    try:
+        from utils import slugify
+    except ImportError:
+        # Standalone use without scripts/ on sys.path — fall back to a
+        # whole-name match, correct for the bare internal names.
+        return company.strip().lower() in INTERNAL_COMPANY_TOKENS
+    return not slugify(company)
 
 
 def _participant_emails(participants) -> list:
@@ -195,7 +222,7 @@ def classify_call(call_data: dict,
     # The call cache only carries a participant *count*, so this
     # is the path virtually every real enrichment call takes.
     if not emails_known and company and \
-       INTERNAL_DOMAIN.lower() not in company.lower():
+       not _is_internal_company(company):
         return {
             "intent": INTENT_PROSPECT,
             "confidence": 0.7,
