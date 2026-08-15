@@ -1,0 +1,53 @@
+name: One-off Check - build_vs_buy Category Counts
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check category breakdown of recent objections
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          cat <<'EOF' > /tmp/check.py
+          import sys
+          from collections import Counter
+          sys.path.insert(0, '.')
+          sys.path.insert(0, 'scripts')
+          from api.db import get_supabase
+          from supabase_client import select_all
+
+          sb = get_supabase()
+          rows = select_all(sb, "objections",
+              columns="category,company_name,verbatim_quote,extracted_at")
+
+          by_cat = Counter(r["category"] for r in rows)
+          print(f"Total objections in table: {len(rows)}")
+          print("\nCategory breakdown:")
+          for cat, n in by_cat.most_common():
+              print(f"  {cat}: {n}")
+
+          bvb = [r for r in rows if r["category"] == "build_vs_buy"]
+          print(f"\nbuild_vs_buy objections: {len(bvb)}")
+          for r in bvb[:10]:
+              print(f"  {r['company_name']} | {(r.get('verbatim_quote') or '')[:80]}")
+          EOF
+          python3 /tmp/check.py
