@@ -157,11 +157,23 @@ def main():
 
             # Upsert into calls table — participant data only.
             # Company/deal resolution happens in Task 3.
+
+            # Handle date - could be string or Unix timestamp
+            call_date = t.get("date")
+            if isinstance(call_date, int):
+                # Unix timestamp - convert to ISO date
+                from datetime import datetime
+                call_date = datetime.fromtimestamp(
+                    call_date / 1000).strftime("%Y-%m-%d")
+            elif isinstance(call_date, str):
+                call_date = call_date[:10] if call_date else None
+            else:
+                call_date = None
+
             sb.table("calls").upsert({
                 "call_id":            call_id,
                 "title":              t.get("title"),
-                "call_date":          (t.get("date") or "")[:10]
-                                      or None,
+                "call_date":          call_date,
                 "participant_emails": emails,
                 "participant_domains": domains,
                 "participant_count":  len(emails),

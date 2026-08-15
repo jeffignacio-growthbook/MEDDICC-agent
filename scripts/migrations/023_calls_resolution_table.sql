@@ -16,6 +16,13 @@
 -- ============================================================
 
 -- Preserve existing scan-tracking table
+-- First drop indexes that would conflict
+DROP INDEX IF EXISTS idx_calls_company_slug;
+DROP INDEX IF EXISTS idx_calls_call_date;
+DROP INDEX IF EXISTS idx_calls_deal_id;
+DROP INDEX IF EXISTS idx_calls_intent;
+DROP INDEX IF EXISTS idx_calls_needs_review;
+
 ALTER TABLE IF EXISTS calls RENAME TO calls_scan_ledger;
 
 -- The new resolved calls table
