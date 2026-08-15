@@ -30,6 +30,25 @@ FOLLOWUP_PRONOUNS = [
     "any of those", "any of these",
 ]
 
+NEW_DISCOVERY_SIGNALS = [
+    # Phrasing that means "ignore known entities, find a NEW set"
+    # Should NOT trigger entity-scoped bypass even if entities exist in thread
+    "instead", "other deals", "different", "besides",
+    "not in", "excluding", "new list", "all deals",
+    "everything", "start over",
+]
+
+# Maps question keywords to bulk handler names for entity-scoped queries
+ENTITY_SCOPE_KEYWORD_MAP = [
+    (["at risk", "risk"],                "query_deals_at_risk"),
+    (["meddicc", "score", "champion",
+      "economic buyer", "decision"],     "query_rubric_scores_bulk"),
+    (["objection"],                      "query_objections"),
+    (["stage", "where are they"],        "query_deal_stages_bulk"),
+    (["owner", "who owns"],              "query_deal_owners_bulk"),
+    (["value", "arr", "worth"],          "query_deal_values_bulk"),
+]
+
 def has_followup_pronoun(question: str) -> bool:
     """Detect if question references prior answer entities."""
     q = question.lower()
@@ -49,6 +68,57 @@ def build_entity_hint(entities: dict) -> str:
     return (f"\nThe user is asking a follow-up about "
             f"these specific entities from the prior answer: "
             f"{'; '.join(parts)}")
+
+def should_use_entity_scope(question: str, prior_entities: dict) -> bool:
+    """
+    Decide whether to bypass discovery and query directly
+    against known entities from the thread.
+
+    Returns True when:
+    - prior_entities has deal_ids
+    - question does not contain a NEW_DISCOVERY_SIGNAL
+    """
+    if not prior_entities or not prior_entities.get("deal_ids"):
+        return False
+    q_lower = question.lower()
+    if any(sig in q_lower for sig in NEW_DISCOVERY_SIGNALS):
+        return False
+    return True
+
+async def route_entity_scoped_question(
+        question: str, prior_entities: dict, sb) -> dict | None:
+    """
+    Try to answer a question directly against known deal_ids
+    without running dynamic_query_loop discovery.
+
+    Returns the answer dict if a matching bulk handler exists,
+    or None if no handler matches (caller should fall through
+    to normal routing).
+    """
+    from api.evaluator import evaluate_result
+    from api import handlers
+
+    q_lower = question.lower()
+    deal_ids = prior_entities["deal_ids"]
+
+    for keywords, handler_name in ENTITY_SCOPE_KEYWORD_MAP:
+        if any(kw in q_lower for kw in keywords):
+            handler_fn = getattr(handlers, handler_name, None)
+            if not handler_fn:
+                continue
+
+            result = await handler_fn({"deal_ids": deal_ids}, sb)
+            evaluation = evaluate_result(result, handler_name)
+
+            if evaluation != "empty":
+                answer = await synthesize_answer(
+                    question, result, handler_name)
+                return {
+                    "answer": answer,
+                    "tool_results": result,
+                    "needs_ack": False,
+                }
+    return None
 
 INTENT_PROMPT = """Classify this Slack question into one of
 these handler types. Reply with JSON only.
@@ -509,8 +579,23 @@ async def route_question(question: str, user_id: str,
     today  = date.today().isoformat()
     cq     = current_quarter_label()
 
-    # ── 0. Pronoun resolution ────────────────────────
-    prior_entities = {}
+    # ── -1. Entity-scope check (structural bypass) ───
+    # Check if thread has known entities BEFORE pronoun matching
+    prior_entities = get_prior_entities(history)
+    if should_use_entity_scope(question, prior_entities):
+        logger.info(f"[ENTITY_SCOPE] using "
+                    f"{len(prior_entities['deal_ids'])} "
+                    f"known deal_ids, bypassing discovery")
+        result = await route_entity_scoped_question(
+            question, prior_entities, sb)
+        if result is not None:
+            return result
+        # No matching bulk handler, fall through to normal routing
+        logger.info("[ENTITY_SCOPE] no matching bulk handler, "
+                    "falling through to normal routing")
+
+    # ── 0. Pronoun resolution (fallback path) ────────
+    # This now serves as backup when entity-scope didn't match
     entity_params  = {}
 
     if has_followup_pronoun(question):

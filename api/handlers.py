@@ -705,3 +705,45 @@ async def query_won_deals(params: dict, sb) -> dict:
             r.get("deal_value") or 0 for r in rows),
         "period": tw["label"],
     }
+
+async def query_rubric_scores_bulk(params: dict, sb) -> dict:
+    """MEDDICC scores for a known set of deal_ids.
+    Used by entity-scoped follow-up questions like
+    'what are the meddicc scores for these deals?'"""
+    deal_ids = params["deal_ids"]
+    rows = select_all(sb, "analyses",
+        columns="deal_id,company_name,overall_score,"
+                "champion_score,economic_buyer_score,"
+                "decision_criteria_score,"
+                "decision_process_score,competition_score,"
+                "pain_score,analyzed_at",
+        filters=[("in", "deal_id", deal_ids)])
+    return {"scores": rows, "deal_count": len(deal_ids),
+            "scored_count": len(rows)}
+
+async def query_deal_stages_bulk(params: dict, sb) -> dict:
+    """Current stage for a known set of deal_ids."""
+    deal_ids = params["deal_ids"]
+    rows = select_all(sb, "deals",
+        columns="deal_id,company_name,stage,"
+                "highest_stage_order_reached,close_date",
+        filters=[("in", "deal_id", deal_ids)])
+    return {"stages": rows}
+
+async def query_deal_owners_bulk(params: dict, sb) -> dict:
+    """Owner for a known set of deal_ids."""
+    deal_ids = params["deal_ids"]
+    rows = select_all(sb, "deals",
+        columns="deal_id,company_name,owner_email",
+        filters=[("in", "deal_id", deal_ids)])
+    return {"owners": rows}
+
+async def query_deal_values_bulk(params: dict, sb) -> dict:
+    """ARR/value for a known set of deal_ids."""
+    deal_ids = params["deal_ids"]
+    rows = select_all(sb, "deals",
+        columns="deal_id,company_name,deal_value,"
+                "arr_usd,new_arr,expansion_arr",
+        filters=[("in", "deal_id", deal_ids)])
+    total = sum(r.get("arr_usd") or 0 for r in rows)
+    return {"values": rows, "total_arr": total}

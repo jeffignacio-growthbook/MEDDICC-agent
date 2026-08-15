@@ -32,6 +32,10 @@ def evaluate_result(result: dict, handler_name: str) -> str:
         "set_target":      ["set"],
         "query_arr":       ["arr_by_customer"],
         "query_competitive_intel": ["competitor_counts"],
+        "query_rubric_scores_bulk": ["scores"],
+        "query_deal_stages_bulk":   ["stages"],
+        "query_deal_owners_bulk":   ["owners"],
+        "query_deal_values_bulk":   ["values"],
     }
     if handler_name in STRUCTURED_HANDLERS:
         primary_keys = STRUCTURED_HANDLERS[handler_name]
