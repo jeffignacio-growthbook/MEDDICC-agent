@@ -1,0 +1,19 @@
+{
+  "company": "remy@growthbook.io",
+  "slug": "remy-growthbook-io",
+  "last_etl_date": "2026-08-15T02:33:18.396015",
+  "calls": [
+    {
+      "id": "01M00DW6MNB086XR70TDJGV00R",
+      "source": "fireflies",
+      "title": "remy@growthbook.io - Fri, 14 Aug 2026 17:22:30 CEST - Untitled",
+      "date": "2026-08-14",
+      "duration_minutes": 11.420000076293945,
+      "summary": "The discussion emphasized various aspects of data integration, highlighting connections through BigQuery or JSON keys, and the addition of custom metrics and dimensions like user attributes. Key features included an AI assistant that aids in metric and experiment creation, providing non-technical guidance and transparency through accessible SQL queries. Additionally, the management of features and experiments was reviewed, noting the importance of feature flags linked to specific target personas. Insights into experiments were also shared, revealing a purchase conversion improvement of 11.8%, although revenue impact remains uncertain, all summarized in a cumulative impact dashboard showcasing win percentages and ongoing test data.",
+      "organizer": "remy@growthbook.io",
+      "participants": 1,
+      "keywords": "Growthbook, data source integration, metrics analysis, experiment feature flagging, AI assistant, experiment results",
+      "action_items": "\n, *, *, R, é, m, y,  , M, a, r, i, n, *, *, \n, P, r, o, v, i, d, e,  , d, o, c, u, m, e, n, t, a, t, i, o, n,  , f, r, o, m,  , G, r, o, w, t, h, b, o, o, k,  , w, e, b, s, i, t, e,  , t, o,  , a, s, s, i, s, t,  , u, s, e, r, s,  , i, n,  , u, n, d, e, r, s, t, a, n, d, i, n, g,  , a, n, d,  , u, t, i, l, i, z, i, n, g,  , t, h, e,  , p, l, a, t, f, o, r, m,  , (, 1, 1, :, 2, 5, ), \n, O, p, e, n,  , G, r, o, w, t, h, b, o, o, k,  , S, l, a, c, k,  , c, h, a, n, n, e, l,  , f, o, r,  , d, i, r, e, c, t,  , c, o, m, m, u, n, i, c, a, t, i, o, n,  , t, o,  , f, a, c, i, l, i, t, a, t, e,  , o, n, g, o, i, n, g,  , s, u, p, p, o, r, t,  , a, n, d,  , c, o, l, l, a, b, o, r, a, t, i, o, n,  , (, 1, 1, :, 2, 5, ), \n, F, o, l, l, o, w,  , u, p,  , w, i, t, h,  , s, p, e, c, i, f, i, c,  , u, n, i, t,  , d, i, m, e, n, s, i, o, n,  , e, x, p, e, r, i, m, e, n, t, a, t, i, o, n,  , e, x, a, m, p, l, e, s,  , t, o,  , c, l, a, r, i, f, y,  , e, x, p, e, r, i, m, e, n, t,  , s, e, t, u, p,  , a, n, d,  , m, e, t, r, i, c,  , t, r, a, c, k, i, n, g,  , (, 0, 8, :, 3, 0, ), \n"
+    }
+  ]
+}

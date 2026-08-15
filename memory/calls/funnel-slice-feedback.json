@@ -1,0 +1,19 @@
+{
+  "company": "Funnel Slice Feedback",
+  "slug": "funnel-slice-feedback",
+  "last_etl_date": "2026-08-15T02:33:18.394125",
+  "calls": [
+    {
+      "id": "01M00ZM74RR8183TTGD19FHX1X",
+      "source": "fireflies",
+      "title": "Funnel Slice Feedback",
+      "date": "2026-08-14",
+      "duration_minutes": 20.959999084472656,
+      "summary": "The meeting addressed various aspects of UI design and filtering related to funnel metrics. Key discussions included the need for multi-select filtering that defaults to showing all slices, allowing users to easily deselect or search. The importance of displaying a parent funnel metric instead of individual steps was emphasized to prevent data loss when filters hide steps. A consistent representation between overview and detailed views was deemed essential, with a proposal to show the full funnel separately for clarity. Participants noted user expectations for a top-down funnel display, underscoring the full funnel as a key metric and steps as additional details. It was concluded that enhancements should maintain consistency when drilling down into metrics, and Gabe was tasked with updating the design based on the discussion.",
+      "organizer": "gabe@growthbook.io",
+      "participants": 2,
+      "keywords": "funnel slice, multi-select filter, parent metric, drill down, slice breakdown, UX consistency",
+      "action_items": "*, *, G, a, b, e,  , M, e, l, e, a, n, *, *,  ,  , \n, I, n, c, o, r, p, o, r, a, t, e,  , m, u, l, t, i, -, s, e, l, e, c, t,  , f, i, l, t, e, r,  , w, i, t, h,  , s, e, a, r, c, h,  , (, 0, 4, :, 4, 8, ),  ,  , \n, E, x, p, l, o, r, e,  , p, a, r, e, n, t,  , f, u, n, n, e, l,  , s, l, i, c, e,  , d, i, s, p, l, a, y,  , (, 1, 2, :, 5, 0, ),  ,  , \n, P, r, o, v, i, d, e,  , u, p, d, a, t, e,  , a, f, t, e, r,  , c, h, a, n, g, e, s,  , (, 1, 8, :, 4, 1, )"
+    }
+  ]
+}

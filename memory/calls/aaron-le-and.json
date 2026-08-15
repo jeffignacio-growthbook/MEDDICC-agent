@@ -1,0 +1,22 @@
+{
+  "company": "Aaron Le and",
+  "slug": "aaron-le-and",
+  "last_etl_date": "2026-08-15T02:33:18.394558",
+  "calls": [
+    {
+      "id": "01KZXX7KBAQRZMRQ99DYPESKSP",
+      "source": "fireflies",
+      "title": "Aaron Le and Ashley Stirrup",
+      "date": "2026-08-14",
+      "duration_minutes": 12.34000015258789,
+      "summary": "The team discussed automating personalized outreach by utilizing intent signals and account scoring to focus on high-value leads. They will integrate data from rio.dev, HubSpot, and Clay for targeted outreach and chose HubSpot and Apollo as core platforms for CRM and email automation. A trigger system will be initiated based on activity scores and user status to streamline outreach. Additionally, the sales process emphasizes nurturing leads with soft CTAs to avoid overwhelming the sales team. The integration involves careful planning to mitigate API challenges and overlaps. Lastly, project planning includes drafting a proposal for the automation approach, keeping in mind the need for dedicated resources for content creation.",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "keywords": "lead routing, personalized outreach, rio.dev, Apollo CRM, Clay integration, automated workflows",
+      "action_items": "\n, *, *, A, a, r, o, n,  , L, e, *, *, \n, P, r, e, p, a, r, e,  , a, n, d,  , s, e, n, d,  , a,  , d, e, t, a, i, l, e, d,  , p, r, o, p, o, s, a, l,  , o, u, t, l, i, n, i, n, g,  , t, h, e,  , w, o, r, k, f, l, o, w,  , a, u, t, o, m, a, t, i, o, n,  , p, l, a, n,  , a, n, d,  , i, n, t, e, g, r, a, t, i, o, n,  , a, p, p, r, o, a, c, h,  , f, o, r,  , p, e, r, s, o, n, a, l, i, z, e, d,  , o, u, t, r, e, a, c, h,  , u, s, i, n, g,  , R, i, o, ,,  , C, l, a, y, ,,  , H, u, b, S, p, o, t, ,,  , a, n, d,  , A, p, o, l, l, o,  , (, 0, 9, :, 1, 9, ), \n, C, o, o, r, d, i, n, a, t, e,  , w, i, t, h,  , J, a, c, k,  , r, e, g, a, r, d, i, n, g,  , t, h, e,  , p, r, o, p, o, s, a, l,  , a, n, d,  , d, e, t, e, r, m, i, n, e,  , w, h, e, t, h, e, r,  , t, o,  , c, o, l, l, a, b, o, r, a, t, e,  , w, i, t, h,  , A, s, h, l, e, y,  , d, i, r, e, c, t, l, y,  , o, r,  , i, n, c, l, u, d, e,  , J, a, c, k,  , i, n,  , f, o, l, l, o, w, -, u, p,  , d, i, s, c, u, s, s, i, o, n, s,  , (, 0, 9, :, 1, 9, ), \n, \n, *, *, A, s, h, l, e, y,  , S, t, i, r, r, u, p, *, *, \n, R, e, v, i, e, w,  , A, a, r, o, n, ’, s,  , p, r, o, p, o, s, a, l,  , o, n, c, e,  , r, e, c, e, i, v, e, d,  , a, n, d,  , a, r, r, a, n, g, e,  , a,  , f, o, l, l, o, w, -, u, p,  , m, e, e, t, i, n, g,  , w, i, t, h,  , A, a, r, o, n,  , a, n, d,  , J, a, c, k,  , t, o,  , d, i, s, c, u, s, s,  , n, e, x, t,  , s, t, e, p, s,  , a, n, d,  , f, i, n, a, l, i, z, e,  , p, r, o, j, e, c, t,  , s, c, o, p, e,  , (, 1, 1, :, 0, 8, ), \n, C, o, n, t, i, n, u, e,  , d, e, v, e, l, o, p, i, n, g,  , e, m, a, i, l,  , c, o, p, y,  , a, n, d,  , o, u, t, r, e, a, c, h,  , c, o, n, t, e, n, t, ,,  , p, o, t, e, n, t, i, a, l, l, y,  , l, e, v, e, r, a, g, i, n, g,  , c, o, n, t, r, a, c, t, o, r,  , s, u, p, p, o, r, t,  , f, o, r,  , e, m, a, i, l,  , w, r, i, t, i, n, g,  , a, n, d,  , c, a, m, p, a, i, g, n,  , c, a, d, e, n, c, e, s,  , (, 0, 6, :, 1, 4, ), \n",
+      "participant_domains": [
+        "deadwater.ai"
+      ]
+    }
+  ]
+}

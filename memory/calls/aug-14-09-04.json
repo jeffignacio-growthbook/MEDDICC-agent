@@ -1,0 +1,19 @@
+{
+  "company": "Aug 14, 09:04",
+  "slug": "aug-14-09-04",
+  "last_etl_date": "2026-08-15T02:33:18.396685",
+  "calls": [
+    {
+      "id": "01M005Z89D1F6AWDP2JSQJERHY",
+      "source": "fireflies",
+      "title": "Aug 14, 09:04 AM",
+      "date": "2026-08-14",
+      "duration_minutes": 0.7900000214576721,
+      "summary": "",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "keywords": "",
+      "action_items": ""
+    }
+  ]
+}

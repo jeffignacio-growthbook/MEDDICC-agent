@@ -1,7 +1,7 @@
 {
   "company": "Jake Brent weekly",
   "slug": "jake-brent-weekly",
-  "last_etl_date": "2026-08-08T17:33:40.675591",
+  "last_etl_date": "2026-08-15T02:33:18.396281",
   "calls": [
     {
       "id": "01KGJHE61ETNKTTC8SB5JGSAJ2",
@@ -110,6 +110,21 @@
       "participants": 2,
       "keywords": "quarterly sales, paternity leave coverage, sales pipeline, Notion deal, static replacement, case studies",
       "action_items": "\n, *, *, J, a, k, e,  , H, e, i, e, r, *, *, \n, C, o, n, t, i, n, u, e,  , e, n, g, a, g, i, n, g,  , t, h, e,  , s, k, e, p, t, i, c,  , w, i, t, h, i, n,  , N, o, t, i, o, n,  , t, o,  , b, u, i, l, d,  , i, n, t, e, r, n, a, l,  , a, d, v, o, c, a, c, y,  , f, o, r,  , G, r, o, w, t, h, b, o, o, k,  , (, 0, 7, :, 0, 5, ), \n, C, h, e, c, k,  , w, i, t, h,  , C, a, r, r, i, e,  , r, e, g, a, r, d, i, n, g,  , A, n, t, h, r, o, p, i, c, ’, s,  , w, i, l, l, i, n, g, n, e, s, s,  , t, o,  , s, e, r, v, e,  , a, s,  , a,  , c, o, n, t, r, o, l, l, e, d,  , p, h, o, n, e,  , r, e, f, e, r, e, n, c, e,  , f, o, r,  , N, o, t, i, o, n,  , s, a, l, e, s,  , e, f, f, o, r, t, s,  , (, 0, 8, :, 2, 4, ), \n, P, r, e, p, a, r, e,  , t, o,  , d, i, s, c, u, s, s,  , N, o, t, i, o, n,  , d, e, a, l,  , s, t, r, a, t, e, g, y,  , a, n, d,  , n, e, x, t,  , s, t, e, p, s,  , w, i, t, h,  , B, r, e, n, t,  , n, e, x, t,  , w, e, e, k, ,,  , i, n, c, l, u, d, i, n, g,  , o, u, t, l, i, n, i, n, g,  , p, a, s, t,  , e, f, f, o, r, t, s,  , a, n, d,  , f, u, t, u, r, e,  , p, l, a, n, s,  , (, 1, 1, :, 4, 8, ), \n, \n, *, *, B, r, e, n, t,  , H, o, l, l, o, w, a, y, *, *, \n, S, u, p, p, o, r, t,  , J, a, k, e,  , b, y,  , p, r, o, v, i, d, i, n, g,  , a,  , s, e, c, o, n, d,  , s, e, t,  , o, f,  , e, y, e, s,  , o, n,  , t, h, e,  , N, o, t, i, o, n,  , d, e, a, l,  , s, t, r, a, t, e, g, y,  , d, u, r, i, n, g,  , n, e, x, t,  , w, e, e, k, ’, s,  , m, e, e, t, i, n, g,  , (, 1, 1, :, 4, 8, ), \n, L, e, v, e, r, a, g, e,  , p, e, r, s, o, n, a, l,  , e, x, p, e, r, i, e, n, c, e,  , t, o,  , h, e, l, p,  , i, d, e, n, t, i, f, y,  , a, n, d,  , c, o, n, v, e, r, t,  , i, n, t, e, r, n, a, l,  , s, t, a, t, i, c,  , c, h, a, m, p, i, o, n, s,  , a, t,  , N, o, t, i, o, n,  , t, o,  , a, d, v, o, c, a, t, e, s,  , f, o, r,  , G, r, o, w, t, h, b, o, o, k,  , (, 0, 6, :, 5, 1, ), \n",
+      "participant_domains": [
+        "saassalesadvisors.com"
+      ]
+    },
+    {
+      "id": "01KZS6J86SQ5GTNT1R4FNR97NT",
+      "source": "fireflies",
+      "title": "Jake Brent weekly catchup",
+      "date": "2026-08-14",
+      "duration_minutes": 14,
+      "summary": "The discussion centered on advancing negotiations with Reliance Industries, targeting a platform fee of approximately $75K for an initial five-person team, while preparing for potential upsell to multiple teams, which could expand the overall deal size to over $350K. Jake Heier emphasized maintaining pricing despite discount pressures, while Brent Holloway highlighted the need to understand the client's current spending with Statsig. The product's competitive positioning against Statsig was also addressed, with ongoing user engagement being mixed. Insights gathered from 13 active PoC users will aid future customer interactions. The meeting concluded with plans for a follow-up call to discuss client feedback and support capabilities, with a critical focus on ensuring a smooth transition away from Statsig by year-end.",
+      "organizer": "jake@growthbook.io",
+      "participants": 2,
+      "keywords": "Notion, Statsig, Proof of Concept, AI roadmap, negotiation, champions",
+      "action_items": "\n, *, *, J, a, k, e,  , H, e, i, e, r, *, *, \n, S, h, a, r, e,  , t, h, e,  , c, l, i, e, n, t,  , f, e, e, d, b, a, c, k,  , d, o, c, u, m, e, n, t,  , o, n,  , P, o, C,  , g, a, p, s,  , a, n, d,  , c, o, m, p, a, r, i, s, o, n,  , w, i, t, h,  , S, t, a, t, s, i, g,  , t, o,  , B, r, e, n, t,  , f, o, r,  , r, e, v, i, e, w,  , a, n, d,  , s, t, r, a, t, e, g, i, c,  , a, d, v, i, c, e,  , (, 1, 3, :, 3, 3, ), \n, P, r, e, p, a, r, e,  , f, o, r,  , t, h, e,  , s, c, h, e, d, u, l, e, d,  , f, o, l, l, o, w, -, u, p,  , c, a, l, l,  , n, e, x, t,  , W, e, d, n, e, s, d, a, y,  , w, i, t, h,  , G, r, a, h, a, m,  , a, n, d,  , L, o, g, a, n,  , t, o,  , d, i, s, c, u, s, s,  , c, l, i, e, n, t,  , f, e, e, d, b, a, c, k,  , a, n, d,  , r, e, s, p, o, n, d,  , w, i, t, h,  , e, f, f, e, c, t, i, v, e,  , s, o, l, u, t, i, o, n, s,  , a, n, d,  , w, o, r, k, a, r, o, u, n, d, s,  , (, 0, 4, :, 2, 5, ), \n, C, o, n, t, i, n, u, e,  , p, r, o, a, c, t, i, v, e,  , e, n, g, a, g, e, m, e, n, t,  , w, i, t, h,  , p, o, t, e, n, t, i, a, l,  , c, l, i, e, n, t,  , c, h, a, m, p, i, o, n, s,  , w, i, t, h, i, n,  , t, h, e,  , a, c, c, o, u, n, t, ,,  , p, r, o, v, i, d, i, n, g,  , m, a, t, e, r, i, a, l, s,  , a, n, d,  , s, u, p, p, o, r, t,  , t, o,  , m, a, i, n, t, a, i, n, /, i, n, c, r, e, a, s, e,  , t, h, e, i, r,  , a, d, v, o, c, a, c, y,  , (, 1, 1, :, 2, 3, ), \n, \n, *, *, B, r, e, n, t,  , H, o, l, l, o, w, a, y, *, *, \n, R, e, v, i, e, w,  , t, h, e,  , c, l, i, e, n, t,  , f, e, e, d, b, a, c, k,  , d, o, c, u, m, e, n, t,  , o, n, c, e,  , r, e, c, e, i, v, e, d,  , f, r, o, m,  , J, a, k, e,  , a, n, d,  , p, r, o, v, i, d, e,  , s, t, r, a, t, e, g, i, c,  , i, n, p, u, t,  , p, r, i, o, r,  , t, o,  , n, e, x, t,  , w, e, e, k, ’, s,  , r, e, v, i, e, w,  , c, a, l, l,  , (, 1, 3, :, 3, 7, ), \n",
       "participant_domains": [
         "saassalesadvisors.com"
       ]
