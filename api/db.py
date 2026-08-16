@@ -152,14 +152,24 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
     else:
         logger.info(f"[SAVE_THREAD] empty tool_results (handler={handler_name})")
 
+    # Check extraction success BEFORE modifying history
+    has_entities = bool(entities.get("deal_ids") or entities.get("company_names"))
+    has_tool_data = bool(tool_results) and any(
+        isinstance(v, list) and v for v in tool_results.values())
+
+    # LOUD negative-case warning: tool_results had data but extraction got ZERO entities
+    if has_tool_data and not has_entities:
+        logger.warning(f"[ENTITY] save_thread stored ZERO entities "
+                      f"for handler={handler_name} despite non-empty tool_results "
+                      f"— keys: {list(tool_results.keys())}")
+
     history += [
         {"role": "user", "content": question},
         {"role": "assistant", "content": answer},
     ]
 
     # Store entity context as separate entry if entities found
-    if entities.get("deal_ids") or entities.get(
-            "company_names"):
+    if has_entities:
         # Add timestamp for staleness checking
         entities["resolved_at"] = datetime.now(timezone.utc).isoformat()
         logger.info(f"[SAVE_THREAD] saving entity_context: "
@@ -171,14 +181,7 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
             "turn": len(history),
         })
     else:
-        # LOUD negative-case warning: surfaces regressions immediately
-        if tool_results and any(isinstance(v, list) and v for v in tool_results.values()):
-            # tool_results has data but we extracted ZERO entities
-            logger.warning(f"[ENTITY] save_thread stored ZERO entities "
-                          f"for handler={handler_name} despite non-empty tool_results "
-                          f"— tool_results keys: {list(tool_results.keys())}")
-        else:
-            logger.info(f"[SAVE_THREAD] no entities to save (handler={handler_name})")
+        logger.info(f"[SAVE_THREAD] no entities to save (handler={handler_name})")
 
     now = datetime.now(timezone.utc)
     sb.table("conversation_threads").upsert({
