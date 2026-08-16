@@ -61,19 +61,31 @@ def extract_entity_context(tool_results: dict) -> dict:
     Returns a dict with deal_ids and company_names lists.
     Empty lists if no entities found.
     """
+    import logging
+    logger = logging.getLogger(__name__)
+
     entities = {"deal_ids": [], "company_names": []}
+
+    logger.info(f"[ENTITY_EXTRACT] tool_results keys: {list(tool_results.keys())}")
 
     # Row-based handlers (query_new_deals, filter_table, etc.)
     rows = tool_results.get("rows", [])
 
-    # Structured handlers return named keys
+    # Structured handlers return named keys - check ALL list-valued keys
+    # instead of hardcoded subset (fixes waterfall, scores, stages, etc.)
     if not rows:
-        for key in ("new_deals", "losses", "wins",
-                    "deals_at_risk", "arr_by_customer"):
-            candidate = tool_results.get(key, [])
-            if isinstance(candidate, list) and candidate:
-                rows = candidate
-                break
+        for key, value in tool_results.items():
+            if isinstance(value, list) and value:
+                # Found a list - check if it contains dicts with entity fields
+                first_item = value[0] if value else None
+                if isinstance(first_item, dict) and \
+                   (first_item.get("deal_id") or first_item.get("company_name")):
+                    rows = value
+                    logger.info(f"[ENTITY_EXTRACT] using '{key}' list with {len(rows)} items")
+                    break
+
+    if not rows:
+        logger.info(f"[ENTITY_EXTRACT] no entity-bearing lists found")
 
     for r in rows[:20]:  # cap at 20 entities
         if isinstance(r, dict):
@@ -94,6 +106,8 @@ def extract_entity_context(tool_results: dict) -> dict:
             entities["company_names"].append(
                 deal["company_name"])
 
+    logger.info(f"[ENTITY_EXTRACT] extracted {len(entities['deal_ids'])} deal_ids, "
+                f"{len(entities['company_names'])} company_names")
     return entities
 
 
@@ -118,12 +132,18 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
                 history: list, question: str, answer: str,
                 tool_results: dict = None):
     """Append Q&A + optional entity context to thread."""
+    import logging
+    logger = logging.getLogger(__name__)
+
     history = history[-6:]  # rolling window
 
     # Extract entities from tool results if provided
     entities = {}
     if tool_results:
+        logger.info(f"[SAVE_THREAD] extracting entities from tool_results")
         entities = extract_entity_context(tool_results)
+    else:
+        logger.info(f"[SAVE_THREAD] no tool_results provided, skipping entity extraction")
 
     history += [
         {"role": "user", "content": question},
@@ -135,11 +155,16 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
             "company_names"):
         # Add timestamp for staleness checking
         entities["resolved_at"] = datetime.now(timezone.utc).isoformat()
+        logger.info(f"[SAVE_THREAD] saving entity_context: "
+                   f"{len(entities.get('deal_ids', []))} deal_ids, "
+                   f"{len(entities.get('company_names', []))} company_names")
         history.append({
             "role": ENTITY_ROLE,
             "content": json.dumps(entities),
             "turn": len(history),
         })
+    else:
+        logger.info(f"[SAVE_THREAD] no entities to save")
 
     now = datetime.now(timezone.utc)
     sb.table("conversation_threads").upsert({
