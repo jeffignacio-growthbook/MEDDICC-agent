@@ -412,7 +412,10 @@ def _extract_rows_from_accumulated(accumulated_data: dict) -> dict:
 
     Returns dict with "rows" key for extract_entity_context().
     """
+    logger.info(f"[EXTRACT] accumulated_data keys={list(accumulated_data.keys())}")
+
     if not accumulated_data:
+        logger.info(f"[EXTRACT] empty accumulated_data, returning empty dict")
         return {}
 
     # Iterate through steps in reverse order (most recent first)
@@ -420,10 +423,13 @@ def _extract_rows_from_accumulated(accumulated_data: dict) -> dict:
     for step_key in step_keys:
         step_data = accumulated_data.get(step_key, {})
         rows = step_data.get("rows", [])
+        logger.info(f"[EXTRACT] {step_key}: {len(rows)} rows")
         if rows:
+            logger.info(f"[EXTRACT] returning {len(rows)} rows from {step_key}")
             return {"rows": rows, "table": step_data.get("table", "unknown")}
 
     # No rows found - return empty dict
+    logger.info(f"[EXTRACT] no rows found in any step, returning empty dict")
     return {}
 
 async def dynamic_query_loop(question, history, params,
@@ -538,7 +544,9 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             except Exception:
                 pass
             # Extract rows from accumulated data for entity context
+            logger.info(f"[ANSWER] extracting entity context from accumulated_data with keys: {list(accumulated_data.keys())}")
             tool_results = _extract_rows_from_accumulated(accumulated_data)
+            logger.info(f"[ANSWER] extracted tool_results with {len(tool_results.get('rows',[]))} rows")
             return {"answer": parsed["answer"], "tool_results": tool_results}
 
         tool_name = parsed.get("tool", "")
@@ -576,6 +584,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     f"error={result.get('error','none')}")
 
         accumulated_data[f"step_{iteration}"] = result
+        logger.info(f"[STORE] saved step_{iteration} with {len(result.get('rows',[]))} rows, "
+                    f"accumulated_data now has keys: {list(accumulated_data.keys())}")
         messages.append({"role": "assistant", "content": raw})
         messages.append({"role": "user",
             "content": f"Tool result: {json.dumps(result, default=str)[:3000]}"})
