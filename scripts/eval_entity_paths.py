@@ -17,6 +17,7 @@ import asyncio
 from pathlib import Path
 from unittest.mock import Mock, AsyncMock, patch, MagicMock
 import json
+from datetime import datetime, timezone
 
 # Add api to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -434,6 +435,77 @@ class EntityPathEvals:
             self.assert_true(entity_save_logged,
                            "Entity context saved with 2 deal_ids from cache")
 
+    async def test_entity_scope_bypass_completes(self):
+        """Entity-scope path completes without UnboundLocalError.
+
+        When Step -1 (entity-scope bypass) succeeds, intent_resp is never
+        assigned. This test ensures route_question() handles that gracefully.
+
+        Regression test for: UnboundLocalError on intent_resp.usage.input_tokens
+        """
+        print("\n[ENTITY-SCOPE] Bypass completes without crash")
+
+        sb = MockSupabase()
+
+        # Simulate Turn 1: populate entity_context
+        history = [
+            {"role": "user", "content": "show me pipeline"},
+            {"role": "assistant", "content": "Here are the deals"},
+            {"role": "entity_context", "content": json.dumps({
+                "deal_ids": ["D1", "D2", "D3"],
+                "company_names": ["Acme Corp", "Globex Inc"],
+                "resolved_at": datetime.now(timezone.utc).isoformat()
+            })}
+        ]
+
+        # Mock entity-scope routing to return matching results
+        mock_entity_results = {
+            "rows": [
+                {"deal_id": "D1", "company_name": "Acme Corp", "at_risk": True},
+                {"deal_id": "D2", "company_name": "Globex Inc", "at_risk": True}
+            ]
+        }
+
+        # Mock Anthropic client for synthesis/verify (not intent)
+        with patch('api.router.anthropic.Anthropic') as MockClient, \
+             patch('api.router.route_entity_scoped_question',
+                   return_value=(mock_entity_results, "query_deals_at_risk")):
+
+            mock_client = MockClient.return_value
+
+            # Entity-scope bypasses intent, goes straight to synthesis
+            mock_synth = Mock()
+            mock_synth.content = [Mock(text="Acme Corp and Globex Inc are both at risk")]
+            mock_synth.usage = Mock(input_tokens=100, output_tokens=50)
+
+            mock_verify = Mock()
+            mock_verify.content = [Mock(text="Acme Corp and Globex Inc are both at risk")]
+            mock_verify.usage = Mock(input_tokens=50, output_tokens=25)
+
+            mock_assess = Mock()
+            mock_assess.content = [Mock(text='{"correct": true, "score": 0.95}')]
+            mock_assess.usage = Mock(input_tokens=50, output_tokens=20)
+
+            # Synthesis, verify, and assess (but NOT intent)
+            mock_client.messages.create = Mock(side_effect=[mock_synth, mock_verify, mock_assess])
+
+            try:
+                result = await route_question(
+                    question="which are at risk?",  # Pronoun + entity context triggers bypass
+                    user_id="U123",
+                    history=history,
+                    sb=sb,
+                    thread_ts="test_entity_scope"
+                )
+
+                self.assert_true("answer" in result,
+                               "Entity-scope path completes without UnboundLocalError")
+                self.assert_true(len(result.get("answer", "")) > 0,
+                               "Entity-scope path returns answer")
+
+            except UnboundLocalError as e:
+                self.assert_true(False, f"UnboundLocalError on entity-scope path: {e}")
+
     async def run_all(self):
         """Run all tests and report results."""
         print("=" * 70)
@@ -448,6 +520,7 @@ class EntityPathEvals:
         await self.test_empty_paths_pass_empty_dict()
         await self.test_g7_cache_payload_strip_verification()
         await self.test_g7_entity_extraction_from_cache()
+        await self.test_entity_scope_bypass_completes()
 
         print("\n" + "=" * 70)
         print(f"Results: {self.passed} passed, {self.failed} failed")

@@ -629,6 +629,7 @@ async def route_question(question: str, user_id: str,
     handler_name = ""
     result_quality = "empty"
     is_slow = False
+    intent_resp = None  # Only assigned in normal routing path
 
     if should_use_entity_scope(question, prior_entities):
         logger.info(f"[ENTITY_SCOPE] using "
@@ -845,9 +846,11 @@ async def route_question(question: str, user_id: str,
 
     MAX_RETRIES = 2
     retry_count = 0
-    tokens_used = (intent_resp.usage.input_tokens +
-                   intent_resp.usage.output_tokens +
-                   answer_resp.usage.input_tokens +
+    tokens_used = 0
+    if intent_resp is not None:
+        tokens_used += (intent_resp.usage.input_tokens +
+                       intent_resp.usage.output_tokens)
+    tokens_used += (answer_resp.usage.input_tokens +
                    answer_resp.usage.output_tokens +
                    verify_resp.usage.input_tokens +
                    verify_resp.usage.output_tokens)
