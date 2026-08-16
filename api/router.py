@@ -105,38 +105,51 @@ def should_use_entity_scope(question: str, prior_entities: dict) -> bool:
     return True
 
 async def route_entity_scoped_question(
-        question: str, prior_entities: dict, sb) -> dict | None:
+        question: str, prior_entities: dict, sb) -> tuple[dict, str] | None:
     """
-    Try to answer a question directly against known deal_ids
-    without running dynamic_query_loop discovery.
+    Try to match question to a bulk handler and execute it against
+    known deal_ids without running dynamic_query_loop discovery.
 
-    Returns the answer dict if a matching bulk handler exists,
-    or None if no handler matches (caller should fall through
-    to normal routing).
+    Returns (tool_results, handler_name) if a matching handler exists
+    and returns non-empty results, or None if no handler matches.
+    Caller runs normal synthesis (Step 6) on the tool_results.
     """
     from api.evaluator import evaluate_result
     from api import handlers
+    from api.time_resolver import resolve_time_window
 
     q_lower = question.lower()
     deal_ids = prior_entities["deal_ids"]
+
+    # All handlers (both pre-G.6 and new bulk handlers) need time_window
+    # Pre-G.6 handlers require it; new bulk handlers ignore it
+    default_tw = resolve_time_window({"period": "current_quarter"})
 
     for keywords, handler_name in ENTITY_SCOPE_KEYWORD_MAP:
         if any(kw in q_lower for kw in keywords):
             handler_fn = getattr(handlers, handler_name, None)
             if not handler_fn:
+                logger.warning(f"[ENTITY_SCOPE] handler {handler_name} "
+                              f"not found in handlers module")
                 continue
 
-            result = await handler_fn({"deal_ids": deal_ids}, sb)
-            evaluation = evaluate_result(result, handler_name)
+            try:
+                result = await handler_fn(
+                    {"deal_ids": deal_ids, "time_window": default_tw}, sb)
+                evaluation = evaluate_result(result, handler_name)
 
-            if evaluation != "empty":
-                answer = await synthesize_answer(
-                    question, result, handler_name)
-                return {
-                    "answer": answer,
-                    "tool_results": result,
-                    "needs_ack": False,
-                }
+                if evaluation != "empty":
+                    logger.info(f"[ENTITY_SCOPE] matched keyword "
+                               f"'{keywords[0]}' → {handler_name} "
+                               f"(quality={evaluation})")
+                    return (result, handler_name)
+            except Exception as e:
+                logger.error(f"[ENTITY_SCOPE] handler {handler_name} "
+                            f"raised: {e}")
+                import traceback
+                logger.error(traceback.format_exc())
+                continue  # Try next keyword match
+
     return None
 
 INTENT_PROMPT = """Classify this Slack question into one of
@@ -601,153 +614,164 @@ async def route_question(question: str, user_id: str,
     # ── -1. Entity-scope check (structural bypass) ───
     # Check if thread has known entities BEFORE pronoun matching
     prior_entities = get_prior_entities(history)
+    skip_normal_routing = False
+    tool_results = {}
+    handler_name = ""
+    result_quality = "empty"
+    is_slow = False
+
     if should_use_entity_scope(question, prior_entities):
         logger.info(f"[ENTITY_SCOPE] using "
                     f"{len(prior_entities['deal_ids'])} "
                     f"known deal_ids, bypassing discovery")
-        result = await route_entity_scoped_question(
+        entity_match = await route_entity_scoped_question(
             question, prior_entities, sb)
-        if result is not None:
-            return result
-        # No matching bulk handler, fall through to normal routing
-        logger.info("[ENTITY_SCOPE] no matching bulk handler, "
-                    "falling through to normal routing")
+        if entity_match is not None:
+            tool_results, handler_name = entity_match
+            result_quality = "good"
+            skip_normal_routing = True
+            # Skip to synthesis with these tool_results
+        else:
+            # No matching bulk handler, fall through to normal routing
+            logger.info("[ENTITY_SCOPE] no matching bulk handler, "
+                        "falling through to normal routing")
 
     # ── 0. Pronoun resolution (fallback path) ────────
     # This now serves as backup when entity-scope didn't match
-    entity_params  = {}
+    if not skip_normal_routing:
+        entity_params  = {}
 
-    if has_followup_pronoun(question):
-        prior_entities = get_prior_entities(history)
-        if prior_entities:
-            entity_params = {
-                "deal_ids":      prior_entities.get("deal_ids", []),
-                "company_names": prior_entities.get(
-                    "company_names", []),
-            }
-            logger.info(f"[CONTEXT] pronoun detected, "
-                        f"resolved {len(entity_params['deal_ids'])} "
-                        f"deal_ids from prior turn")
+        if has_followup_pronoun(question):
+            prior_entities = get_prior_entities(history)
+            if prior_entities:
+                entity_params = {
+                    "deal_ids":      prior_entities.get("deal_ids", []),
+                    "company_names": prior_entities.get(
+                        "company_names", []),
+                }
+                logger.info(f"[CONTEXT] pronoun detected, "
+                            f"resolved {len(entity_params['deal_ids'])} "
+                            f"deal_ids from prior turn")
 
-    # ── 1. Classify ──────────────────────────────────
-    intent_resp = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=300,
-        system="Respond with valid JSON only. No markdown, "
-               "no backticks, no explanation.",
-        messages=[{"role": "user", "content":
-            INTENT_PROMPT.format(
-                today=today,
-                current_quarter=cq,
-                history=json.dumps(get_api_history(history)[-4:]),
-                question=question,
-            ) + build_entity_hint(prior_entities)
-        }]
-    )
-    try:
-        intent = _extract_json(intent_resp.content[0].text)
-    except Exception:
-        _log_unanswered(sb, question, user_id, "ambiguous")
-        return {"answer":
-            "I couldn't understand that question. Try asking "
-            "about pipeline, deals, coverage, objections, "
-            "or feature gaps."}
-
-    handler_name = intent.get("handler", "unanswerable")
-    params = intent.get("params", {})
-    params["time_window"] = resolve_time_window(
-        params.get("time_window", {}))
-
-    # Inject prior entity context for pronoun follow-ups
-    if entity_params:
-        params["deal_ids"]      = entity_params["deal_ids"]
-        params["company_names"] = entity_params["company_names"]
-
-    confidence = intent.get("confidence", 0.5)
-
-    print(f"[INTENT] handler={handler_name} "
-          f"confidence={confidence:.2f}", flush=True)
-
-    # ── 2. Auth check ─────────────────────────────────
-    if handler_name == "set_target":
-        if not is_admin(user_id):
+            # ── 1. Classify ──────────────────────────────────
+        intent_resp = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=300,
+            system="Respond with valid JSON only. No markdown, "
+                   "no backticks, no explanation.",
+            messages=[{"role": "user", "content":
+                INTENT_PROMPT.format(
+                    today=today,
+                    current_quarter=cq,
+                    history=json.dumps(get_api_history(history)[-4:]),
+                    question=question,
+                ) + build_entity_hint(prior_entities)
+            }]
+        )
+        try:
+            intent = _extract_json(intent_resp.content[0].text)
+        except Exception:
+            _log_unanswered(sb, question, user_id, "ambiguous")
             return {"answer":
-                "Only admins can update targets. "
-                "Ask Jeff or Ryan."}
+                "I couldn't understand that question. Try asking "
+                "about pipeline, deals, coverage, objections, "
+                "or feature gaps."}
 
-    # ── 3. Try precomputed handler ────────────────────
-    tool_results = {}
-    result_quality = "empty"
-    is_slow = handler_name == "generate_win_loss"
+        handler_name = intent.get("handler", "unanswerable")
+        params = intent.get("params", {})
+        params["time_window"] = resolve_time_window(
+            params.get("time_window", {}))
 
-    if handler_name == "unanswerable":
-        result_quality = "unanswerable"
+        # Inject prior entity context for pronoun follow-ups
+        if entity_params:
+            params["deal_ids"]      = entity_params["deal_ids"]
+            params["company_names"] = entity_params["company_names"]
 
-    elif handler_name != "dynamic_query":
-        handler_fn = getattr(handlers, handler_name, None)
-        if handler_fn:
-            try:
-                tool_results = await handler_fn(params, sb)
-                result_quality = evaluate_result(
-                    tool_results, handler_name)
-                print(f"[HANDLER] {handler_name} → "
-                      f"{result_quality}", flush=True)
-            except Exception as e:
-                import traceback
-                print(f"[HANDLER ERROR] {handler_name}: {e}",
-                      flush=True)
-                print(traceback.format_exc(), flush=True)
-                result_quality = "error"
+        confidence = intent.get("confidence", 0.5)
 
-    # ── 4. Dynamic fallback ───────────────────────────
-    if result_quality in ("empty", "error") \
-       and confidence >= 0.5 \
-       and handler_name not in ("unanswerable", "set_target"):
+        print(f"[INTENT] handler={handler_name} "
+              f"confidence={confidence:.2f}", flush=True)
 
-        print(f"[ROUTING] dynamic fallback "
-              f"(quality={result_quality})", flush=True)
-        hint = extract_missing_hint(tool_results, handler_name)
-        dynamic_result = await dynamic_query_loop(
-            question=question,
-            history=history,
-            params=params,
-            sb=sb,
-            client=client,
-            hint=hint,
-        )
-        dynamic_answer = dynamic_result.get("answer", "")
-        dynamic_tool_results = dynamic_result.get("tool_results", {})
-        if dynamic_answer and \
-           "don't have data" not in dynamic_answer.lower() and \
-           "couldn't" not in dynamic_answer.lower():
-            return {"answer": dynamic_answer,
+        # ── 2. Auth check ─────────────────────────────────
+        if handler_name == "set_target":
+            if not is_admin(user_id):
+                return {"answer":
+                    "Only admins can update targets. "
+                    "Ask Jeff or Ryan."}
+
+        # ── 3. Try precomputed handler ────────────────────
+        tool_results = {}
+        result_quality = "empty"
+        is_slow = handler_name == "generate_win_loss"
+
+        if handler_name == "unanswerable":
+            result_quality = "unanswerable"
+
+        elif handler_name != "dynamic_query":
+            handler_fn = getattr(handlers, handler_name, None)
+            if handler_fn:
+                try:
+                    tool_results = await handler_fn(params, sb)
+                    result_quality = evaluate_result(
+                        tool_results, handler_name)
+                    print(f"[HANDLER] {handler_name} → "
+                          f"{result_quality}", flush=True)
+                except Exception as e:
+                    import traceback
+                    print(f"[HANDLER ERROR] {handler_name}: {e}",
+                          flush=True)
+                    print(traceback.format_exc(), flush=True)
+                    result_quality = "error"
+
+        # ── 4. Dynamic fallback ───────────────────────────
+        if result_quality in ("empty", "error") \
+           and confidence >= 0.5 \
+           and handler_name not in ("unanswerable", "set_target"):
+
+            print(f"[ROUTING] dynamic fallback "
+                  f"(quality={result_quality})", flush=True)
+            hint = extract_missing_hint(tool_results, handler_name)
+            dynamic_result = await dynamic_query_loop(
+                question=question,
+                history=history,
+                params=params,
+                sb=sb,
+                client=client,
+                hint=hint,
+            )
+            dynamic_answer = dynamic_result.get("answer", "")
+            dynamic_tool_results = dynamic_result.get("tool_results", {})
+            if dynamic_answer and \
+               "don't have data" not in dynamic_answer.lower() and \
+               "couldn't" not in dynamic_answer.lower():
+                return {"answer": dynamic_answer,
+                        "needs_ack": is_slow,
+                        "tool_results": dynamic_tool_results}
+
+        # Handle direct dynamic_query intent
+        if handler_name == "dynamic_query":
+            print(f"[ROUTING] dynamic_query (direct)", flush=True)
+            dynamic_result = await dynamic_query_loop(
+                question=question,
+                history=history,
+                params=params,
+                sb=sb,
+                client=client,
+                hint="",
+            )
+            return {"answer": dynamic_result.get("answer", ""),
                     "needs_ack": is_slow,
-                    "tool_results": dynamic_tool_results}
+                    "tool_results": dynamic_result.get("tool_results", {})}
 
-    # Handle direct dynamic_query intent
-    if handler_name == "dynamic_query":
-        print(f"[ROUTING] dynamic_query (direct)", flush=True)
-        dynamic_result = await dynamic_query_loop(
-            question=question,
-            history=history,
-            params=params,
-            sb=sb,
-            client=client,
-            hint="",
-        )
-        return {"answer": dynamic_result.get("answer", ""),
-                "needs_ack": is_slow,
-                "tool_results": dynamic_result.get("tool_results", {})}
-
-    # ── 5. Honest "no data" ───────────────────────────
-    if result_quality in ("empty", "error", "unanswerable"):
-        reason = intent.get("unanswerable_reason",
-                            "no_data")
-        _log_unanswered(sb, question, user_id, reason)
-        return {"answer":
-            "I don't have data to answer that yet. "
-            "I've logged the question — it may be something "
-            "we can add to the data layer."}
+        # ── 5. Honest "no data" ───────────────────────────
+        if result_quality in ("empty", "error", "unanswerable"):
+            reason = intent.get("unanswerable_reason",
+                                "no_data")
+            _log_unanswered(sb, question, user_id, reason)
+            return {"answer":
+                "I don't have data to answer that yet. "
+                "I've logged the question — it may be something "
+                "we can add to the data layer."}
 
     # ── 6. Synthesize ─────────────────────────────────
     answer_resp = client.messages.create(
