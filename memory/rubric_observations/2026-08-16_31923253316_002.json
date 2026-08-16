@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-16_31923253316_002",
+  "timestamp": "2026-08-16T03:05:26.986911",
+  "company": "Oda",
+  "criterion_fired": "Champion, Competition, Metrics, Identified Pain, ICP Assessment",
+  "was_appropriate": false,
+  "suggested_change": "Rubric needs explicit guidance: (1) minimum evidence threshold per score level (e.g., 1/10 requires 'checked but absent' statement); (2) ban evidence-shifting between iterations without explicit reasoning; (3) distinguish outcome measurement from ROI calculation as separate gaps; (4) require actionable next-step verbs ('ask X about Y metric'); (5) clarify ICP PLG signal criteria to exclude enterprise SaaS with CTO/budget approval process."
+}

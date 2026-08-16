@@ -1,0 +1,21 @@
+{
+  "company": "InPost",
+  "deal_id": "60069831015",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Incomplete evidence for high scores. Metrics scored 5/10 with no evidence of prospect-stated quantified outcomes (all quotes are seller-positioned descriptions, not metrics stated by InPost). Decision Criteria scored 8/10 but evidence includes only technical requirements, not evaluation criteria, scorecard, or approval process. CRITERION 4 FAILURE - Vague next steps throughout. Metrics next step uses 'confirm' without specific action verb. Decision Process next step is 'map out' (vague). Identified Pain next step uses 'confirm urgency' (vague verb). Champion next step uses 'propose' and 'discuss' (vague). Competition next step uses 'ask' (vague). All next steps must contain specific actions: e.g., 'Ask [contact]: What is your current experiment volume metric?' not 'Confirm in writing'. CRITERION 2 FAILURE - Carry-forward inconsistency. Identified Pain increased from 4/10 to 6/10 based on Call 2 evidence ('migrating from Firebase', 'overlap prevention', 'attribute-based targeting') but rubric requires maintain-or-document-contradiction protocol. The analysis states 'Call 2 added specific pain points' but these are technical features InPost needs, not stated business pain metrics. Original 4/10 was correct for unknown pain; revision to 6/10 lacks prospect-originated pain statement. CRITERION 3 FAILURE - Evidence quality for Identified Pain. Score 6/10 lacks prospect-stated pain. Quotes describe InPost's technical needs and Firebase limitations, not InPost-stated business impact or pain urgency. No quote showing InPost articulated why Firebase is broken or what business cost exists. CRITERION 5 FAILURE - Unsupported ICP claim. Analysis states 'Strong technical fit' in overall assessment but ICP Fit is marked Unverified with critical gaps (user volume, experimentation scale not confirmed). Cannot claim 'strong fit' when scale signals missing. Also, 'Firebase usage suggests existing experimentation capability' is an inference, not evidence of scale or strategic priority.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-16_31923253316_003",
+  "timestamp": "2026-08-16T03:09:40.947210"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-16_31923253316_013",
+  "timestamp": "2026-08-16T03:26:01.217864",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 1 (Complete Coverage), Criterion 5 (No Unsupported Claims)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1 should require 'evidence of champion engagement or documented absence (e.g., explicit statement Paul is not involved)' rather than proving non-engagement. Criterion 5 should clarify: if analysis notes both 'reinforces timeline' AND 'no new approval process details,' this is valid additive insight\u2014don't penalize for maintaining prior scores when some factors confirm but others remain unchanged."
+}

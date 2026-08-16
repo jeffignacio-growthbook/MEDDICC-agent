@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-16_31923253316_008",
+  "timestamp": "2026-08-16T03:17:33.662361",
+  "company": "Chaos",
+  "criterion_fired": "Criterion 2 (carry-forward consistency)",
+  "was_appropriate": true,
+  "suggested_change": "Score regression requires explicit contradicting evidence in current call data, not absence of new positive evidence. Absence of new information = maintain prior score with notation."
+}

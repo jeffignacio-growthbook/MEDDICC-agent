@@ -1,0 +1,21 @@
+{
+  "company": "TickPick",
+  "deal_id": "61149585726",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Incomplete Evidence for Scores Above 5/10: Metrics (8/10) and Identified Pain (8/10) and Decision Criteria (9/10) lack direct quotes or specific paraphrases from the recent call. The analysis states 'maintained from cumulative state - no new information in this call' but provides only paraphrased cumulative evidence, not call-specific validation. For scores above 5/10, evidence must be either from the recent call or explicitly tied to cumulative calls with specific quotes. CRITERION 4 FAILURE - Vague Next Steps: Multiple next steps use unsupported action verbs: (1) Champion: 'Schedule time with Christian Liebenow to co-create ROI business case' lacks specific action and concrete question - this is too vague. (2) Decision Process: 'Ask Matt Ellis directly' - no concrete question provided, only '[contact TBD]' placeholder exists but the action itself ('Walk me through...') is acceptable. Rewrite Champion next step 3 with specific question format matching other examples. CRITERION 2 FAILURE - Carry-Forward Issue for Recent Call Context: Recent call summary shows only greeting exchange with no substantive content ('[Summary failed]'). The analysis maintains all prior scores without acknowledging that zero new information exists from this specific call. Must explicitly state for each component: 'No substantive information in recent call - maintaining [score] based on cumulative state from 2 prior calls.' CRITERION 5 FAILURE - Unsupported Claim: Champion described as 'engaged and providing ongoing support' but next step asks 'What's your level of conviction that GrowthBook is the right solution?' - this contradicts the characterization and suggests engagement is uncertain. Evidence states support is for 'experimentation efforts,' not for 'GrowthBook internally.' Reframe Champion status as 'Engaged in experimentation discussions but not yet identified as GrowthBook advocate.' ARR DISCREPANCY: While flagged correctly as critical, the analysis should route this through deal qualification gates - if $5-6K is accurate, confirm whether TickPick meets minimum deal size before proceeding with full MEDDICC.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-16_31923253316_005",
+  "timestamp": "2026-08-16T03:16:13.023755"
+}

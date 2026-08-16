@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-16_31923253316_012",
+  "timestamp": "2026-08-16T03:25:03.128865",
+  "company": "Livesport",
+  "criterion_fired": "Criterion 1 (Evidence quality), Criterion 2 (Carry-forward consistency), Criterion 3 (Unsupported claims), Criterion 4 (Actionable specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Criteria are appropriate; add mandatory instruction to CLAUDE.md: 'Evidence must include direct quote or explicit call summary phrase; paraphrase + inference = score ceiling; carry-forward decisions require one-sentence explicit rationale; next steps must include contact name/TBD, specific question, and decision criteria sought.'"
+}

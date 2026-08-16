@@ -1,0 +1,21 @@
+{
+  "company": "ECCO",
+  "deal_id": "61045491056",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 0,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 4 FAILURE: Next steps lack specificity and use vague language. Examples of violations: (1) Metrics next step uses 'ask on next call' without specific contact name, action, or concrete question format - should specify '[contact TBD]: Ask specific metric questions by [date]' with exact phrasing. (2) Economic Buyer next step says 'Ask on next call' without naming contact or specifying action - should be '[contact TBD]: Identify economic buyer by [date] - ask \"Who owns the budget...\"' (3) Decision Process next step uses 'ask on next call' without contact specification. (4) Identified Pain next step uses 'ask on next call' without concrete phrasing. (5) Champion next step uses 'ask on next call' without contact or specific date. While '[contact TBD]' is acceptable per rubric, the current phrasing 'ask on next call' is too vague and does not meet the standard of 'contact name, specific action, and concrete question.' CRITERION 3 PARTIAL ISSUE: ICP assessment claims 'Enterprise tier discussion suggests company scale aligns with ICP' but this is seller interpretation, not prospect-stated scale. No prospect statement of 100K+ monthly visitors exists. Should be flagged as gap, not fit signal. CRITERION 2 EXCEPTION: This is first call (cumulative calls = 0), so carry-forward rules do not apply. Low scores on first call are acceptable. All components correctly scored based on call content only.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-16_31923253316_001",
+  "timestamp": "2026-08-16T03:05:26.985694"
+}

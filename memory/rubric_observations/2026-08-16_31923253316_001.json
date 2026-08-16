@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-16_31923253316_001",
+  "timestamp": "2026-08-16T03:05:26.986120",
+  "company": "ECCO",
+  "criterion_fired": "CRITERION 4: Next Steps Specificity",
+  "was_appropriate": true,
+  "suggested_change": "Criterion is well-formed and correctly identified the gap. No change needed to rubric language\u2014issue is that agent instructions lack concrete template/examples for compliant next-step phrasing."
+}

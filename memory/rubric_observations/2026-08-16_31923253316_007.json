@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-16_31923253316_007",
+  "timestamp": "2026-08-16T03:16:13.024120",
+  "company": "TickPick",
+  "criterion_fired": "Criterion 2 (Carry-Forward Issue) and Criterion 1 (Evidence Validation) and Criterion 5 (Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'When recent call has no substantive content, state \"No new information in [date] call - maintaining X score from cumulative state\" for each MEDDICC component. For carry-forward scores, distinguish between evidence sources (prior calls vs. recent call) and flag contradictions between champion characterization and next-step probing questions.'"
+}

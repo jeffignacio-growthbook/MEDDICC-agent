@@ -1,0 +1,21 @@
+{
+  "company": "Chaos",
+  "deal_id": "56685250888",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Champion score regression from 4/10 to 2/10 without documented reason violating Criterion 2 (carry-forward consistency). Historical state shows 'partial' status with score 4/10 and explicit note that Jake 'appears to be driving the initiative.' Recent analysis downgrades to 2/10 with claim 'no new information demonstrates internal selling' \u2014 but this is a single call context where carry-forward rules apply only when call explicitly contradicts prior assessment. The analysis acknowledges 'no new information' rather than contradicting evidence, making the regression unjustified. Analysis states 'To upgrade this score, we need evidence of Jake: (1) presenting internally to leadership, (2) building ROI justification, or (3) bringing other decision-makers into the conversation' \u2014 but the cumulative context never claimed Jake had done these things. The score should remain 4/10 with explicit note: 'No new Champion evidence in this call \u2014 maintaining previous score of 4/10. Jake continues to engage on technical topics but still no evidence of internal selling or stakeholder mobilization.' Additionally, Economic Buyer next step uses vague language 'I want to make sure we're aligned with the right stakeholders' which should be rewritten to specific action.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-16_31923253316_006",
+  "timestamp": "2026-08-16T03:17:33.661959"
+}

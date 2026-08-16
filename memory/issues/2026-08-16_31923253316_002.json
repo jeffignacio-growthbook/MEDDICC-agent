@@ -1,0 +1,21 @@
+{
+  "company": "Notion",
+  "deal_id": "60257621387",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 4 (Actionable Next Steps) violation: Multiple next steps use vague verbs prohibited by the rubric. Examples: (1) M - Metrics: 'Follow-up: How are you measuring experimentation velocity today versus your target state?' uses vague phrasing without specific action; (2) D - Decision Criteria: 'Follow-up: Beyond technical fit, what are the top 3 factors...' is exploratory without concrete action; (3) I - Identified Pain: 'Follow-up: What's the business impact if you don't solve this in the next 6 months?' lacks specificity; (4) C - Champion: 'Look for evidence of action' is not a concrete next step with specific action and contact. All next steps must follow the pattern: '[Contact Name]: Specific action - exact question to ask' or '[contact TBD]: specific action with concrete question.' Revise all next steps to eliminate exploratory language ('How are', 'What are', 'Look for') and replace with concrete actions (e.g., 'Ask [contact]: specific question' or 'Schedule [action] by [date]'). Additionally, Criterion 3 (Evidence Quality): I - Identified Pain section claims 'no evidence exists of buyer articulating WHY they're evaluating GrowthBook' but the cumulative state explicitly provides evidence: 'Team expressed concerns about potential high costs related to event forwarding; manual adjustments and additional time required for exposure forwarding causing delays.' This evidence should not be dismissed as 'seller-observed' without justification. Either accept this as partial pain identification (score 2-3/10) or justify why cost/delay concerns don't qualify as articulated pain. Current treatment contradicts available cumulative evidence.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-16_31923253316_002",
+  "timestamp": "2026-08-16T03:13:04.873745"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-16_31923253316_006",
+  "timestamp": "2026-08-16T03:13:04.874157",
+  "company": "Notion",
+  "criterion_fired": "Criterion 3 (Evidence Quality) & Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Reconcile conflict: Either (A) accept exploratory follow-ups like 'How are you measuring...' as valid Criterion 4 actions when they directly address gaps identified in Criterion 3, or (B) revise Criterion 3 to only penalize missing pain when no exploratory questions exist to surface it. Current rubric requires concrete steps but forbids the investigative steps needed to gather evidence."
+}

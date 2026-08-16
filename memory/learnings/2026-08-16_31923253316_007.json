@@ -1,0 +1,21 @@
+{
+  "company": "Aircall",
+  "deal_id": "57553904779",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 5,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Economic Buyer (EB) score regression: cumulative state shows EB score of 4/10 with Christian Liebenow as key decision-maker, but current analysis raises EB score to 5/10 and identifies Christopher Howard as budget authority. While Christopher Howard's explicit budget concerns strengthen EB understanding, the analysis fails to acknowledge this is new information from the recent call that changes the EB picture. The analysis should explicitly note: 'Recent call introduced Christopher Howard as the true Economic Buyer with explicit budget authority concerns ($100K fee exceeds discretionary budget by double). Previous cumulative assessment focused on Christian Liebenow; this call clarifies the EB is Christopher Howard at score 5/10 due to confirmed budget control but incomplete approval process visibility.' Additionally, Competition score dropped from 3/10 to 1/10 without explanation. The analysis states 'Cannot score higher without explicit confirmation' but cumulative state already noted Nestor's mention of 'clarity in pricing compared to competitors' at 3/10. Current analysis should maintain 3/10 and note 'No new competitive intelligence in recent call - maintaining previous score of 3/10 based on Nestor's reference to unnamed competitors.' Finally, Champion status should be clearer: evidence shows Christian and Nestor are engaged but no internal selling documented. Current 4/10 matches cumulative 4/10, but analysis should explicitly state 'No new internal advocacy evidence in recent call - maintaining previous score of 4/10.'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-16_31923253316_007",
+  "timestamp": "2026-08-16T03:19:01.197697"
+}

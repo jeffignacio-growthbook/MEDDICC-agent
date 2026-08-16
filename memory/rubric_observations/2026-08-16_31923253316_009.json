@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-16_31923253316_009",
+  "timestamp": "2026-08-16T03:19:01.198206",
+  "company": "Aircall",
+  "criterion_fired": "Economic Buyer (EB) assessment accuracy",
+  "was_appropriate": true,
+  "suggested_change": "EB score changes must include explicit before/after comparison with cumulative state and document which call data triggered the change; if maintaining previous score, explicitly state 'no new EB intelligence' rather than leaving reconciliation implicit"
+}

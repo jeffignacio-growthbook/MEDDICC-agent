@@ -1,0 +1,21 @@
+{
+  "company": "Ryanair",
+  "deal_id": "59387794836",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward Consistency: Metrics score regressed from 6/10 (cumulative state) to 4/10 (current analysis) without documented reason for regression. The analysis states 'no business outcome metrics' but cumulative state already noted this limitation at 6/10. If metrics haven't improved, score should remain 6/10 with notation 'No new metrics information in this call - maintaining previous score of 6/10.' CRITERION 1 VIOLATION - Complete Coverage: Champion component lacks evidence quality. Score of 4/10 claims 'no evidence he's actively selling GrowthBook internally' but provides no direct quote or paraphrase from Call 2 demonstrating this absence. Current evidence ('This initiative, led by Paul Sheridan' and 'Dedicated support has been arranged') does not constitute evidence of non-championing behavior. CRITERION 4 VIOLATION - Actionable Next Steps: Multiple next steps use vague verbs despite acceptable contact identification. Examples: 'Ask Paul Sheridan directly' for Champion uses 'raising... internally' and 'heard from other stakeholders' - these are exploration verbs without concrete questions. Should be: 'Ask Paul Sheridan: Specifically, who in engineering leadership have you mentioned GrowthBook to, and what were their initial reactions?' CRITERION 5 VIOLATION - No Unsupported Claims: Decision Process analysis claims 'Call 2 reinforces that contract renewals are on the horizon and mentions proactive planning aligned with project milestones' but then states 'adds no new stakeholder mapping or approval process details' - this is contradictory. Either new information exists (warranting score change from 6/10) or it doesn't (maintain 6/10). Overall Deal Health states 'no champion actively selling internally' but this is an inference not grounded in explicit evidence from Call 2 demonstrating lack of internal selling activity.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-16_31923253316_004",
+  "timestamp": "2026-08-16T03:26:01.217463"
+}

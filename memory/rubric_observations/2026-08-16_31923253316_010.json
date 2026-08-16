@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-16_31923253316_010",
+  "timestamp": "2026-08-16T03:19:48.564026",
+  "company": "Zalando",
+  "criterion_fired": "Criteria 1, 2, 3, 4, 5 (multiple violations)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Criterion 2 exception\u2014state explicitly whether carry-forward language is acceptable when only 1 call exists; (2) Criterion 3\u2014define score thresholds (is 'no named competitors' = 2/10 or 4/10?); (3) Criterion 4\u2014confirm whether '[contact TBD]' or reasonable inference (Christian from call 1) is preferred when transcript incomplete; (4) Criterion 5\u2014specify ICP validation scope (must analyst explicitly state pass/fail, or is absence of contradictory data acceptable?). Current rubric creates conflicting signals about what constitutes acceptable output."
+}

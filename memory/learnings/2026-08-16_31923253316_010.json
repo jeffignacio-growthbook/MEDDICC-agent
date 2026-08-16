@@ -1,0 +1,21 @@
+{
+  "company": "Stone",
+  "deal_id": "53500422798",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 4,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward Consistency: The recent call contains only greetings with no substantive content ('Are you good?' / 'Good to see you'). The analysis correctly maintains all previous scores, but this is a special case: when a call provides zero new information (only pleasantries), the analysis should explicitly note this rather than implying scores are maintained due to lack of new information in a substantive call. Add a note: 'Recent call (Call 5) contained only greetings with no substantive discussion \u2014 all scores maintained from Call 4 cumulative state.' CRITERION 4 VIOLATION - Actionable Next Steps: Multiple next steps use vague verbs without specific concrete actions. Examples: (1) Metrics next step says 'Ask Christian Liebenow on next scheduled call' \u2014 no specific call date provided; (2) Decision Criteria next step asks a question but does not specify a deadline or method to confirm the answer ('formal business criteria'); (3) Decision Process asks for 'exact calendar dates' but lacks a deadline for when this information must be obtained; (4) Champion next step asks 'Can you share the internal presentation' but doesn't specify how/when to follow up if Christian doesn't have it; (5) Competition next step 'If yes, what are the key differentiators' is conditional and doesn't establish a hard next step if no alternatives are being evaluated. CRITERION 5 VIOLATION - Unsupported Claims: Champion is scored 4/10 with status 'Partial' based on 'Pilot group of PMs mentioned as early adopters using GrowthBook, suggesting internal advocates emerging.' This infers internal advocates exist without evidence that any PM has actually advocated internally. The evidence only shows PMs will pilot the tool, not that they are championing it. This must either be downgraded to Unknown (1-2/10) or evidence must explicitly show a PM actively selling internally. ICP CONCERN - Not explicitly flagged: No ICP validation in the analysis. While the deal has positive signals (data infrastructure rebuild, modern stack with Kafka/Databricks, experimentation focus), there is no explicit confirmation that Stone has 100K+ users or product-led growth motion. The analysis should either confirm ICP fit with supporting evidence or note this as a gap.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-16_31923253316_010",
+  "timestamp": "2026-08-16T03:28:52.933228"
+}

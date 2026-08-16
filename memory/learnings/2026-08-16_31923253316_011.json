@@ -1,0 +1,21 @@
+{
+  "company": "Route",
+  "deal_id": "59245644951",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward Consistency: The cumulative state shows calls_reviewed: 1, meaning only one call exists in the historical context. Per Criterion 2 exception, carry-forward rules do NOT apply on a first call. However, this analysis treats a SECOND call (recent call summary provided) as if carry-forward logic should apply. The analysis states 'Metrics maintained at 7/10 \u2014 no new quantified information in this call, prior evidence stands' and similar language for Decision Criteria, Identified Pain, and Competition. This is correct reasoning. HOWEVER, the analysis contradicts itself by scoring Decision Process at 4/10 and stating 'maintained at 4/10' when the cumulative state shows Decision Process scored 4/10 from Call 1. The recent call adds 'impending contract renewal' language, which is new information. The score should either stay 4/10 with explicit note that renewal date is still undefined, OR increase slightly if 'impending' signals urgency. The current analysis maintains 4/10 correctly but the next steps demand asking 'when exactly' the renewal is, which is appropriate. MAIN ISSUE: Criterion 4 violation - Economic Buyer (score 1/10, Unknown status) and Champion (score 1/10, Unknown status) have next steps, but the next steps for Champion use vague language: 'Are you willing to build the internal business case' lacks a concrete action verb. Better: 'Request that [contact TBD] draft a one-page business case by [date] outlining ROI vs. Amplitude.' Also, Decision Process next step 'Walk me through the steps from now until signature' is vague. Better: 'Request written timeline showing renewal date, approval stakeholders (names/titles), and signature target date.' Criterion 3 violation - Competitor section scores 7/10 but states 'Unknown if Route is evaluating other tools (Statsig, LaunchDarkly, etc.)' \u2014 a gap at 7/10 is acceptable only if competing tools are explicitly ruled in/out. The next step correctly asks this. No evidence that Route is evaluating GrowthBook's true competitive set yet. Criterion 1: All components present with status and score. Evidence quality acceptable. Overall: Pass on structure, fail on actionable next steps precision (vague verbs remain) and carry-forward internal consistency narrative.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-16_31923253316_011",
+  "timestamp": "2026-08-16T03:29:45.608611"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-16_31923253316_004",
+  "timestamp": "2026-08-16T03:09:40.947605",
+  "company": "InPost",
+  "criterion_fired": "Criterion 1 (Evidence Quality), Criterion 3 (Identified Pain Evidence), Criterion 4 (Next Steps Specificity), Criterion 5 (ICP Fit Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 3 wording: 'Identified Pain must include at least one direct prospect quote stating business impact, urgency, or quantified cost; technical feature descriptions or seller-inferred needs do not qualify.' Criterion 4 wording: 'Next steps must begin with a specific action verb (Ask, Request, Propose with confirmation method, Schedule, Send) and include named contact and exact question/deliverable; vague verbs (Confirm, Map, Discuss, Propose without closure) are not acceptable.'"
+}

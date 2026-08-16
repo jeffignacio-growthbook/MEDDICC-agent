@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-16_31923253316_011",
+  "timestamp": "2026-08-16T03:23:49.624187",
+  "company": "Unity",
+  "criterion_fired": "Criterion 1 (Pain Identification), Criterion 2 (Carry-forward Consistency), Criterion 4 (Next Steps Specificity), Criterion 5 (ICP Assessment Logic)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Require explicit 'No new information' or score justification statement for all components when cumulative_calls_context > 1. Criterion 4: Template next steps as '[Contact/Name]: Ask [date]: [specific question]' rather than vague actions. Criterion 5: Distinguish role-absence from ICP-mismatch; role-not-yet-identified \u2260 disqualifier without explicit evidence of non-fit on core criteria (scale, technical sophistication, experimentation capability)."
+}
