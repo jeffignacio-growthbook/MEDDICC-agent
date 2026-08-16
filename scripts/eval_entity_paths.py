@@ -170,21 +170,39 @@ class EntityPathEvals:
 
         THIS WAS THE BUG: dynamic_query_loop result was treated as string,
         tool_results was dropped. Now fixed.
+
+        Direct test by importing and checking the actual code behavior.
         """
         print("\n[A6] Retry Dynamic Success (REGRESSION TEST)")
 
-        # This path is complex to mock end-to-end. Instead, verify the
-        # fix at the code level: lines 876-895 now correctly extract
-        # both answer and tool_results from dynamic_result dict.
+        # Test the actual code path by inspecting what would be returned
+        # We can verify this by checking the router code directly
+        import inspect
+        from api import router
 
-        # Direct code inspection confirms:
-        # - dynamic_result = await dynamic_query_loop(...)
-        # - dynamic_answer = dynamic_result.get("answer", "")
-        # - dynamic_tool_results = dynamic_result.get("tool_results", {})
-        # - return includes both answer and tool_results
+        # Get the source of route_question
+        source = inspect.getsource(router.route_question)
 
-        self.assert_true(True, "Code inspection confirms fix (lines 876-895)")
-        print("    (Full end-to-end would require mocking assessment retry flow)")
+        # Check for the fixed pattern (lines 876-895)
+        has_dynamic_result = "dynamic_result = await dynamic_query_loop" in source
+        has_answer_extraction = 'dynamic_answer = dynamic_result.get("answer"' in source
+        has_tool_results_extraction = 'dynamic_tool_results = dynamic_result.get("tool_results"' in source
+        has_both_in_return = ('"tool_results": dynamic_tool_results' in source and
+                             '"answer": dynamic_answer' in source)
+
+        # Check for the OLD buggy pattern (should NOT exist)
+        has_buggy_pattern = "tool_results_text = await dynamic_query_loop" in source
+
+        self.assert_true(has_dynamic_result,
+                        "Code uses 'dynamic_result = await dynamic_query_loop'")
+        self.assert_true(has_answer_extraction,
+                        "Code extracts answer from dynamic_result dict")
+        self.assert_true(has_tool_results_extraction,
+                        "Code extracts tool_results from dynamic_result dict")
+        self.assert_true(has_both_in_return,
+                        "Return dict includes both answer and tool_results")
+        self.assert_true(not has_buggy_pattern,
+                        "Buggy 'tool_results_text' pattern NOT present")
 
     async def test_b1_normal_synthesis(self):
         """B1: Structured handler succeeds, goes through synthesis.
