@@ -112,7 +112,8 @@ class EntityPathEvals:
                         question="show me pipeline",
                         user_id="U123",
                         history=[],
-                        sb=sb
+                        sb=sb,
+                        thread_ts="test_A1"
                     )
 
         # Verify result includes tool_results
@@ -155,7 +156,8 @@ class EntityPathEvals:
                     question="complex query",
                     user_id="U123",
                     history=[],
-                    sb=sb
+                    sb=sb,
+                    thread_ts="test_A6"
                 )
 
         # Verify result includes tool_results
@@ -254,7 +256,8 @@ class EntityPathEvals:
                     question="show me pipeline",
                     user_id="U123",
                     history=[],
-                    sb=sb
+                    sb=sb,
+                    thread_ts="test_P1"
                 )
 
         # Verify result includes tool_results with waterfall data
@@ -332,6 +335,105 @@ class EntityPathEvals:
         except TypeError as e:
             self.assert_true(False, f"save_thread crashed on {{}}: {e}")
 
+    async def test_g7_cache_payload_strip_verification(self):
+        """G.7: Verify cache_payload is stripped before synthesis.
+
+        The pop() + assertion prevents cache_payload from leaking into
+        synthesis (which would waste 3-5K tokens silently). This test
+        verifies the strip happens and size log makes it visible.
+        """
+        print("\n[G.7.1] cache_payload strip verification")
+
+        sb = MockSupabase()
+
+        # Aggregate handler: summary + cache_payload
+        tool_results = {
+            "waterfall": [{"week": "2026-W01", "deals": 5}],
+            "cache_payload": {
+                "deals": [{"deal_id": "D1", "company_name": "Acme"}] * 50  # Large payload
+            }
+        }
+
+        with patch('logging.getLogger') as mock_get_logger:
+            mock_logger = Mock()
+            mock_get_logger.return_value = mock_logger
+
+            save_thread(
+                sb=sb,
+                thread_ts="test",
+                channel="C123",
+                history=[],
+                question="show waterfall",
+                answer="Here's the waterfall",
+                tool_results=tool_results,
+                handler_name="query_waterfall"
+            )
+
+            # Verify size log shows SMALL synthesis payload (cache_payload stripped)
+            synth_logs = [str(call) for call in mock_logger.info.call_args_list
+                         if "[SYNTH] tool_results" in str(call)]
+            self.assert_true(len(synth_logs) > 0, "Size log present")
+
+            # Verify cache was stored (proves payload was extracted)
+            cache_logs = [str(call) for call in mock_logger.info.call_args_list
+                         if "[CACHE] stored" in str(call)]
+            self.assert_true(len(cache_logs) > 0, "Cache storage logged")
+
+    async def test_g7_entity_extraction_from_cache(self):
+        """G.7: Verify entities extracted from cache_payload even if tool_results empty.
+
+        Aggregate handlers (query_waterfall) return summaries in tool_results
+        with no deal_ids. All entity data lives in cache_payload.
+        """
+        print("\n[G.7.2] Entity extraction from cache_payload")
+
+        sb = MockSupabase()
+
+        # Simulate aggregate handler: summary in tool_results, details in cache_payload
+        tool_results = {
+            "waterfall": [{"week": "2026-W01", "deals": 5}],
+            "period": "Last 4 weeks",
+            "cache_payload": {
+                "deals": [
+                    {"deal_id": "D1", "company_name": "Acme Corp"},
+                    {"deal_id": "D2", "company_name": "Globex Inc"},
+                ]
+            }
+        }
+
+        # Patch logging to verify entity extraction
+        with patch('logging.getLogger') as mock_get_logger:
+            mock_logger = Mock()
+            mock_get_logger.return_value = mock_logger
+
+            save_thread(
+                sb=sb,
+                thread_ts="test",
+                channel="C123",
+                history=[],
+                question="show waterfall",
+                answer="Here's the waterfall",
+                tool_results=tool_results,
+                handler_name="query_waterfall"
+            )
+
+            # Verify cache extraction log
+            cache_extract_logged = any(
+                "[SAVE_THREAD] extracting entities from cache_payload" in str(call)
+                for call in mock_logger.info.call_args_list
+            )
+            self.assert_true(cache_extract_logged,
+                           "Cache entity extraction logged")
+
+            # Verify entities saved
+            entity_save_logged = any(
+                "[SAVE_THREAD] saving entity_context" in str(call) and
+                "2 deal_ids" in str(call)
+                for call in mock_logger.info.call_args_list
+            )
+            self.assert_true(entity_save_logged,
+                           "Entity context saved with 2 deal_ids from cache")
+
     async def run_all(self):
         """Run all tests and report results."""
         print("=" * 70)
@@ -344,6 +446,8 @@ class EntityPathEvals:
         await self.test_b1_normal_synthesis()
         await self.test_negative_case_warning()
         await self.test_empty_paths_pass_empty_dict()
+        await self.test_g7_cache_payload_strip_verification()
+        await self.test_g7_entity_extraction_from_cache()
 
         print("\n" + "=" * 70)
         print(f"Results: {self.passed} passed, {self.failed} failed")

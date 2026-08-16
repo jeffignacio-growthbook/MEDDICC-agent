@@ -88,6 +88,7 @@ async def process_and_reply(text: str, user_id: str,
         user_id=user_id,
         history=history,
         sb=sb,
+        thread_ts=thread_ts,
     )
 
     if result.get("needs_ack"):

@@ -599,7 +599,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
     return {"answer": answer, "tool_results": tool_results}
 
 async def route_question(question: str, user_id: str,
-                          history: list, sb) -> dict:
+                          history: list, sb, thread_ts: str = "") -> dict:
     """
     Robust question routing with inner evaluation loop.
 
@@ -645,6 +645,19 @@ async def route_question(question: str, user_id: str,
             # No matching bulk handler, fall through to normal routing
             logger.info("[ENTITY_SCOPE] no matching bulk handler, "
                         "falling through to normal routing")
+
+    # ── G.7 cache fallback — only when no usable entity IDs ──
+    # Prefer entity_context (live re-query) over stale cache
+    if not skip_normal_routing and has_followup_pronoun(question):
+        from api.db import load_result_cache
+        cached = load_result_cache(sb, thread_ts) if thread_ts else None
+        if cached:
+            logger.info("[CACHE] answering follow-up from cached payload "
+                       "(no entity IDs available)")
+            tool_results = cached
+            handler_name = "cached_result"
+            result_quality = "good"
+            skip_normal_routing = True
 
     # ── 0. Pronoun resolution (fallback path) ────────
     # This now serves as backup when entity-scope didn't match

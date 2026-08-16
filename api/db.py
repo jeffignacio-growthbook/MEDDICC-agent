@@ -51,6 +51,17 @@ VALID_ROLES = {"user", "assistant"}
 # Entity context role - stored in history but never sent to Anthropic
 ENTITY_ROLE = "entity_context"
 
+# Result cache reference role - stored in history but never sent to Anthropic
+CACHE_ROLE = "result_cache_ref"
+
+# TTL for cached result payloads (matches G.6 entity staleness guard)
+CACHE_TTL_MINUTES = 30
+
+# Handlers that legitimately never carry entities (follow-ups meaningless)
+# Keep this list SMALL - handlers that COULD support follow-ups should get
+# cache_payload instead of a whitelist entry
+AGGREGATE_HANDLERS = {"query_rubric"}
+
 
 def extract_entity_context(tool_results: dict) -> dict:
     """
@@ -111,6 +122,104 @@ def extract_entity_context(tool_results: dict) -> dict:
     return entities
 
 
+# ══════════════════════════════════════════════════════════════
+# RESULT CACHE LAYER (G.7)
+# ══════════════════════════════════════════════════════════════
+
+def make_result_key(thread_ts: str, handler_name: str, question: str) -> str:
+    """
+    Deterministic key so the same question in the same thread
+    overwrites rather than accumulating rows.
+
+    Uses SHA256 hash to keep keys compact while avoiding collisions.
+    """
+    import hashlib
+    raw = f"{thread_ts}:{handler_name}:{question}"
+    digest = hashlib.sha256(raw.encode()).hexdigest()[:16]
+    return f"rc_{digest}"
+
+
+def save_result_cache(sb: Client, thread_ts: str, handler_name: str,
+                      question: str, payload: dict) -> str | None:
+    """
+    Store a full result payload for later retrieval.
+    Returns the result_key, or None if nothing worth caching.
+
+    Only caches when payload actually contains row data —
+    don't fill the table with empty aggregates.
+
+    IMPORTANT: Uses timedelta for expiry, NOT modular arithmetic.
+    Prior bug: now.replace(hour=(now.hour+24)%24) is no-op at hour 23.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    # Count rows across all list-valued keys
+    row_count = 0
+    for v in payload.values():
+        if isinstance(v, list):
+            row_count += len(v)
+
+    if row_count == 0:
+        return None
+
+    key = make_result_key(thread_ts, handler_name, question)
+    # CORRECT expiry computation using timedelta
+    expires = datetime.now(timezone.utc) + timedelta(minutes=CACHE_TTL_MINUTES)
+
+    sb.table("result_cache").upsert({
+        "result_key":   key,
+        "thread_ts":    thread_ts,
+        "handler_name": handler_name,
+        "question":     question[:500],  # Truncate long questions
+        "payload":      json.dumps(payload),  # JSONB storage
+        "row_count":    row_count,
+        "expires_at":   expires.isoformat(),
+    }, on_conflict="result_key").execute()
+
+    logger.info(f"[CACHE] stored {row_count} rows under {key} "
+                f"(handler={handler_name}, ttl={CACHE_TTL_MINUTES}m)")
+    return key
+
+
+def load_result_cache(sb: Client, thread_ts: str) -> dict | None:
+    """
+    Retrieve the most recent non-expired cached payload for a thread.
+    Returns the payload dict, or None.
+
+    Uses unpack_jsonb() because JSONB columns can come back as str or dict.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    try:
+        now_iso = datetime.now(timezone.utc).isoformat()
+
+        # Query for non-expired cache entries in this thread
+        result = sb.table("result_cache")\
+            .select("result_key,handler_name,question,payload,row_count,created_at,expires_at")\
+            .eq("thread_ts", thread_ts)\
+            .gt("expires_at", now_iso)\
+            .order("created_at", desc=True)\
+            .limit(1)\
+            .execute()
+
+        if not result.data:
+            logger.info(f"[CACHE] no live cache for thread {thread_ts}")
+            return None
+
+        hit = result.data[0]
+        logger.info(f"[CACHE] hit {hit['result_key']} — "
+                   f"{hit['row_count']} rows from handler={hit['handler_name']}")
+
+        # unpack_jsonb handles both string and dict JSONB returns
+        return unpack_jsonb(hit.get("payload"))
+
+    except Exception as e:
+        logger.error(f"[CACHE] load failed: {e}")
+        return None
+
+
 def load_thread(sb: Client, thread_ts: str) -> list:
     """Load last 3 Q&A pairs. Filters out entity_context
     role — those are for local use only, not Anthropic."""
@@ -144,12 +253,46 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
 
     history = history[-6:]  # rolling window
 
-    # Extract entities from tool results
+    # ═══════════════════════════════════════════════════════════════
+    # CRITICAL: Strip cache_payload BEFORE any synthesis-facing use
+    # ═══════════════════════════════════════════════════════════════
+    # Failure mode is SILENT AND EXPENSIVE: if cache_payload leaks into
+    # synthesis, full deal rows go into the prompt (3-5K wasted tokens).
+    # Nothing in current logging would catch it. Assert + size log required.
+
+    cache_payload = tool_results.pop("cache_payload", None)
+
+    # LOAD-BEARING ASSERTION: verify strip succeeded
+    assert "cache_payload" not in tool_results, \
+        "cache_payload leaked into synthesis path"
+
+    # Size log: makes leaks VISIBLE in Railway without needing a test
+    synth_size = len(json.dumps(tool_results, default=str))
+    logger.info(f"[SYNTH] tool_results ~{synth_size} chars (handler={handler_name})")
+    if synth_size > 20000:
+        logger.warning(f"[SYNTH] oversized synthesis payload {synth_size} chars "
+                      f"for handler={handler_name} — check for cache_payload leak "
+                      f"or unbounded rows")
+
+    # Extract entities from BOTH synthesis dict AND cache_payload
+    # (aggregate handlers now yield deal_ids via cache_payload)
     entities = {}
     if tool_results:
         logger.info(f"[SAVE_THREAD] extracting entities from tool_results")
         entities = extract_entity_context(tool_results)
-    else:
+
+    if cache_payload:
+        logger.info(f"[SAVE_THREAD] extracting entities from cache_payload")
+        cache_entities = extract_entity_context(cache_payload)
+        # Merge cache entities into main entity dict
+        for deal_id in cache_entities.get("deal_ids", []):
+            if deal_id not in entities.get("deal_ids", []):
+                entities.setdefault("deal_ids", []).append(deal_id)
+        for company_name in cache_entities.get("company_names", []):
+            if company_name not in entities.get("company_names", []):
+                entities.setdefault("company_names", []).append(company_name)
+
+    if not tool_results and not cache_payload:
         logger.info(f"[SAVE_THREAD] empty tool_results (handler={handler_name})")
 
     # Check extraction success BEFORE modifying history
@@ -158,7 +301,9 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
         isinstance(v, list) and v for v in tool_results.values())
 
     # LOUD negative-case warning: tool_results had data but extraction got ZERO entities
-    if has_tool_data and not has_entities:
+    # Exclude handlers that legitimately never carry entities
+    if (handler_name not in AGGREGATE_HANDLERS
+        and has_tool_data and not has_entities):
         logger.warning(f"[ENTITY] save_thread stored ZERO entities "
                       f"for handler={handler_name} despite non-empty tool_results "
                       f"— keys: {list(tool_results.keys())}")
@@ -182,6 +327,17 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
         })
     else:
         logger.info(f"[SAVE_THREAD] no entities to save (handler={handler_name})")
+
+    # Store result cache payload if one exists
+    if cache_payload:
+        result_key = save_result_cache(sb, thread_ts, handler_name, question, cache_payload)
+        if result_key:
+            # Append cache reference to history (filtered from API calls like ENTITY_ROLE)
+            history.append({
+                "role": CACHE_ROLE,
+                "content": result_key,
+                "turn": len(history),
+            })
 
     now = datetime.now(timezone.utc)
     sb.table("conversation_threads").upsert({

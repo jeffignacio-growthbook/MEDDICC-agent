@@ -19,16 +19,35 @@ async def query_waterfall(params: dict, sb) -> dict:
     """
     Week-over-week pipeline movement from waterfall_weekly table.
     Returns new pipeline, won, lost, net change for the time window.
+
+    G.7: Now includes cache_payload with deal-level rows so follow-ups
+    can work despite the shown answer being an aggregate with no deal_ids.
     """
     tw = params["time_window"]
-    rows = select_all(sb, "waterfall_weekly",
+
+    # Weekly rollups for synthesis/display
+    weekly = select_all(sb, "waterfall_weekly",
         columns="week_ending,pipeline_id,new_pipeline_value,"
                 "won_value,lost_value,net_change,"
                 "pulled_in_value,pushed_out_value,"
                 "deals_qualified_count",
         filters=[("gte", "week_ending", tw["start"]),
                  ("lte", "week_ending", tw["end"])])
-    return {"waterfall": rows, "period": tw["label"]}
+
+    # Deal-level rows that feed the rollup — retained for follow-ups
+    deals = select_all(sb, "deals",
+        columns="deal_id,company_name,deal_value,arr_usd,"
+                "stage,close_date,owner_email,segment,deal_status",
+        filters=[("gte", "close_date", tw["start"]),
+                 ("lte", "close_date", tw["end"])])
+
+    return {
+        "waterfall": weekly,          # Shown / synthesized
+        "period":    tw["label"],     # Shown / synthesized
+        "cache_payload": {            # Retained, NOT shown
+            "deals": deals
+        }
+    }
 
 
 async def query_arr(params: dict, sb) -> dict:
