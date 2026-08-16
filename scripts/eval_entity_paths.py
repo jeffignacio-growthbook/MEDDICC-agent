@@ -506,6 +506,66 @@ class EntityPathEvals:
             except UnboundLocalError as e:
                 self.assert_true(False, f"UnboundLocalError on entity-scope path: {e}")
 
+    async def test_query_deals_at_risk_field_shape(self):
+        """query_deals_at_risk returns dicts with deal_id AND company_name.
+
+        Structural test to catch field-shape drift. The handler was returning
+        "company" (not "company_name") and no "deal_id", causing entity
+        extraction to silently reject its output.
+
+        Regression test for: extract_entity_context got ZERO entities from
+        query_deals_at_risk despite non-empty results.
+        """
+        print("\n[FIELD-SHAPE] query_deals_at_risk has deal_id + company_name")
+
+        from api.handlers import query_deals_at_risk
+
+        # Mock select_all to return analyses with at-risk deals
+        mock_analyses = [
+            {
+                "deal_id": "D1",
+                "company_name": "Acme Corp",
+                "overall_score": 30,
+                "champion_score": 2,
+                "economic_buyer_score": 3,
+                "analyzed_at": "2026-06-01"
+            },
+            {
+                "deal_id": "D2",
+                "company_name": "Widget Inc",
+                "overall_score": 50,
+                "champion_score": 1,
+                "economic_buyer_score": 5,
+                "analyzed_at": "2026-06-02"
+            }
+        ]
+
+        with patch('api.handlers.select_all', return_value=mock_analyses):
+            sb = Mock()
+            params = {
+                "deal_ids": ["D1", "D2"],
+                "time_window": {"start": "2026-01-01", "end": "2026-12-31", "label": "2026"}
+            }
+
+            result = await query_deals_at_risk(params, sb)
+
+            # Verify output structure
+            self.assert_true("deals_at_risk" in result,
+                           "Result has deals_at_risk key")
+
+            deals = result.get("deals_at_risk", [])
+            self.assert_true(len(deals) > 0,
+                           "Result has at least one at-risk deal")
+
+            if len(deals) > 0:
+                first_deal = deals[0]
+                self.assert_true("deal_id" in first_deal,
+                               "First deal has deal_id field")
+                self.assert_true("company_name" in first_deal,
+                               "First deal has company_name field")
+                self.assert_true("company" not in first_deal,
+                               "First deal does NOT have old 'company' field")
+
     async def run_all(self):
         """Run all tests and report results."""
         print("=" * 70)
@@ -521,6 +581,7 @@ class EntityPathEvals:
         await self.test_g7_cache_payload_strip_verification()
         await self.test_g7_entity_extraction_from_cache()
         await self.test_entity_scope_bypass_completes()
+        await self.test_query_deals_at_risk_field_shape()
 
         print("\n" + "=" * 70)
         print(f"Results: {self.passed} passed, {self.failed} failed")

@@ -91,7 +91,8 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
             champ = a.get("champion_score", 0) or 0
             if score < 40 or champ < 4:
                 at_risk.append({
-                    "company": a["company_name"],
+                    "deal_id": a["deal_id"],
+                    "company_name": a["company_name"],
                     "overall_score": score,
                     "champion_score": champ,
                     "risk_flags": [
@@ -126,7 +127,8 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
 
         if score < 40 or champ < 4:
             at_risk.append({
-                "company":       a["company_name"],
+                "deal_id":       a["deal_id"],
+                "company_name":  a["company_name"],
                 "overall_score": score,
                 "champion_score": champ,
                 "deal_value":    d.get("deal_value"),
