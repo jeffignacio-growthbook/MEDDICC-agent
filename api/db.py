@@ -130,20 +130,27 @@ def load_thread(sb: Client, thread_ts: str) -> list:
 
 def save_thread(sb: Client, thread_ts: str, channel: str,
                 history: list, question: str, answer: str,
-                tool_results: dict = None):
-    """Append Q&A + optional entity context to thread."""
+                tool_results: dict, handler_name: str = "unknown"):
+    """Append Q&A + optional entity context to thread.
+
+    Args:
+        tool_results: REQUIRED - must pass {} explicitly for paths with no data.
+                     Making this required (no default) turns silent omissions
+                     into immediate TypeErrors.
+        handler_name: Handler that produced this answer, for negative-case logging.
+    """
     import logging
     logger = logging.getLogger(__name__)
 
     history = history[-6:]  # rolling window
 
-    # Extract entities from tool results if provided
+    # Extract entities from tool results
     entities = {}
     if tool_results:
         logger.info(f"[SAVE_THREAD] extracting entities from tool_results")
         entities = extract_entity_context(tool_results)
     else:
-        logger.info(f"[SAVE_THREAD] no tool_results provided, skipping entity extraction")
+        logger.info(f"[SAVE_THREAD] empty tool_results (handler={handler_name})")
 
     history += [
         {"role": "user", "content": question},
@@ -164,7 +171,14 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
             "turn": len(history),
         })
     else:
-        logger.info(f"[SAVE_THREAD] no entities to save")
+        # LOUD negative-case warning: surfaces regressions immediately
+        if tool_results and any(isinstance(v, list) and v for v in tool_results.values()):
+            # tool_results has data but we extracted ZERO entities
+            logger.warning(f"[ENTITY] save_thread stored ZERO entities "
+                          f"for handler={handler_name} despite non-empty tool_results "
+                          f"— tool_results keys: {list(tool_results.keys())}")
+        else:
+            logger.info(f"[SAVE_THREAD] no entities to save (handler={handler_name})")
 
     now = datetime.now(timezone.utc)
     sb.table("conversation_threads").upsert({

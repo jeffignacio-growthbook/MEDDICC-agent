@@ -685,7 +685,9 @@ async def route_question(question: str, user_id: str,
             return {"answer":
                 "I couldn't understand that question. Try asking "
                 "about pipeline, deals, coverage, objections, "
-                "or feature gaps."}
+                "or feature gaps.",
+                "handler_name": "parse_failure",
+                "tool_results": {}}
 
         handler_name = intent.get("handler", "unanswerable")
         params = intent.get("params", {})
@@ -707,7 +709,9 @@ async def route_question(question: str, user_id: str,
             if not is_admin(user_id):
                 return {"answer":
                     "Only admins can update targets. "
-                    "Ask Jeff or Ryan."}
+                    "Ask Jeff or Ryan.",
+                    "handler_name": "set_target",
+                    "tool_results": {}}
 
         # ── 3. Try precomputed handler ────────────────────
         tool_results = {}
@@ -756,7 +760,8 @@ async def route_question(question: str, user_id: str,
                "couldn't" not in dynamic_answer.lower():
                 return {"answer": dynamic_answer,
                         "needs_ack": is_slow,
-                        "tool_results": dynamic_tool_results}
+                        "tool_results": dynamic_tool_results,
+                        "handler_name": f"{handler_name}_dynamic_fallback"}
 
         # Handle direct dynamic_query intent
         if handler_name == "dynamic_query":
@@ -771,7 +776,8 @@ async def route_question(question: str, user_id: str,
             )
             return {"answer": dynamic_result.get("answer", ""),
                     "needs_ack": is_slow,
-                    "tool_results": dynamic_result.get("tool_results", {})}
+                    "tool_results": dynamic_result.get("tool_results", {}),
+                    "handler_name": "dynamic_query"}
 
         # ── 5. Honest "no data" ───────────────────────────
         if result_quality in ("empty", "error", "unanswerable"):
@@ -781,7 +787,9 @@ async def route_question(question: str, user_id: str,
             return {"answer":
                 "I don't have data to answer that yet. "
                 "I've logged the question — it may be something "
-                "we can add to the data layer."}
+                "we can add to the data layer.",
+                "handler_name": handler_name,
+                "tool_results": {}}
 
     # ── 6. Synthesize ─────────────────────────────────
     answer_resp = client.messages.create(
@@ -873,7 +881,7 @@ async def route_question(question: str, user_id: str,
         # If no suggested handler or it failed, try dynamic
         if not tool_results or not tool_results.get("rows",
             tool_results.get("deal")):
-            tool_results_text = await dynamic_query_loop(
+            dynamic_result = await dynamic_query_loop(
                 question=question,
                 history=history,
                 params=params,
@@ -881,15 +889,19 @@ async def route_question(question: str, user_id: str,
                 client=client,
                 hint=retry_context,
             )
-            # dynamic_query_loop returns a string answer directly
-            if tool_results_text and \
-               "don't have data" not in tool_results_text.lower() and \
-               "couldn't" not in tool_results_text.lower():
+            # dynamic_query_loop returns {"answer": str, "tool_results": dict}
+            dynamic_answer = dynamic_result.get("answer", "")
+            dynamic_tool_results = dynamic_result.get("tool_results", {})
+            if dynamic_answer and \
+               "don't have data" not in dynamic_answer.lower() and \
+               "couldn't" not in dynamic_answer.lower():
                 # Log the learning note before returning
                 _log_learning(sb, question, handler_name,
                              assessment, retry_count)
-                return {"answer": tool_results_text,
-                        "needs_ack": is_slow}
+                return {"answer": dynamic_answer,
+                        "needs_ack": is_slow,
+                        "tool_results": dynamic_tool_results,
+                        "handler_name": f"{handler_name}_retry_dynamic"}
             break
 
         # Re-synthesize with the new tool results
@@ -914,7 +926,8 @@ async def route_question(question: str, user_id: str,
                  assessment, retry_count)
 
     return {"answer": verified, "needs_ack": is_slow,
-            "tool_results": tool_results}
+            "tool_results": tool_results,
+            "handler_name": handler_name}
 
 
 # Helper to keep route_question() clean
