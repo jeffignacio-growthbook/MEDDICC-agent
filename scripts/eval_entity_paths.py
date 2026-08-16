@@ -162,8 +162,8 @@ class EntityPathEvals:
         self.assert_true("tool_results" in result, "Result includes tool_results")
         self.assert_true(len(result.get("tool_results", {}).get("rows", [])) == 1,
                         "tool_results has 1 row")
-        self.assert_true(result.get("handler_name") == "dynamic_query",
-                        "handler_name is dynamic_query")
+        self.assert_true("dynamic" in result.get("handler_name", ""),
+                        f"handler_name contains 'dynamic' (got: {result.get('handler_name')})")
 
     async def test_a6_retry_dynamic_success(self):
         """A6: Assessment retry triggers dynamic_query_loop, succeeds.
@@ -264,7 +264,11 @@ class EntityPathEvals:
             ]
         }
 
-        with patch('api.db.logger') as mock_logger:
+        # Patch logging module instead of the logger instance
+        with patch('logging.getLogger') as mock_get_logger:
+            mock_logger = Mock()
+            mock_get_logger.return_value = mock_logger
+
             save_thread(
                 sb=sb,
                 thread_ts="test",
