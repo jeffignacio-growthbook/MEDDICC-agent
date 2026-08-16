@@ -18,9 +18,12 @@ Zapier Zap 2 (out):
 import os
 import json
 import asyncio
+import logging
 from fastapi import FastAPI, Request, BackgroundTasks
 from fastapi.responses import JSONResponse
 import httpx
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="CRO Agent")
 
@@ -41,6 +44,12 @@ async def receive_question(request: Request,
     user_id   = payload.get("user_id", "")
     channel   = payload.get("channel_id", "")
     thread_ts = payload.get("thread_ts") or payload.get("ts", "")
+
+    # Guard: warn if both thread_ts and ts are empty
+    if not thread_ts:
+        logger.warning("[THREAD] empty thread_ts AND empty ts "
+                      "— entity context and cache will not be "
+                      "retrievable on follow-ups")
 
     if not text or text.startswith("bot:"):
         # Ignore empty messages and bot's own replies
