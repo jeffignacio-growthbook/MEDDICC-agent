@@ -68,14 +68,20 @@ Turn 1 (initial query):
 [HANDLER] query_waterfall → partial
 [SYNTH] tool_results ~800 chars (handler=query_waterfall)
 [SAVE_THREAD] extracting entities from cache_payload
+[ENTITY_EXTRACT] extracted N deal_ids, M company_names
+[SAVE_THREAD] saving entity_context: N deal_ids, M company_names
 [CACHE] stored 247 rows under rc_abc123... (handler=query_waterfall, ttl=30m)
 ```
 
-Turn 2 (follow-up with cache hit):
+**CRITICAL:** No `[ENTITY] save_thread stored ZERO entities` warning — entity extraction from cache_payload must succeed.
+
+Turn 2 (follow-up via entity path):
 ```
-[CACHE] hit rc_abc123... — 247 rows from handler=query_waterfall
-[ROUTING] answering follow-up from cached payload (no entity IDs available)
+[ENTITY_SCOPE] using N known deal_ids, bypassing discovery
+[HANDLER] filter_table → good (filtered N rows by at_risk=true)
 ```
+
+**NOT cache hit** — cache is the fallback for when entity extraction genuinely fails. If you see `[CACHE] hit` on Turn 2, entity extraction from cache_payload didn't work (Task 4 step 2 wired wrong).
 
 ### 3. Live Slack Test
 
@@ -85,13 +91,19 @@ User: show me current pipeline
 Bot: [waterfall summary]
 
 User: which of those are at risk?
-Bot: [filters cached deals by at_risk=true]
+Bot: [filters to specific companies at risk]
 ```
 
-**Verify:**
-- Turn 2 uses cache (check Railway logs for `[CACHE] hit`)
-- No fresh query_waterfall handler call on Turn 2
-- Answer references specific deals from Turn 1
+**Verify Turn 1:**
+- `[SAVE_THREAD] extracting entities from cache_payload` logged
+- `[ENTITY_EXTRACT] extracted N deal_ids` (N > 0)
+- **No** `[ENTITY] save_thread stored ZERO entities` warning
+- `[CACHE] stored N rows under rc_...` logged
+
+**Verify Turn 2:**
+- `[ENTITY_SCOPE] using N known deal_ids` — **NOT** `[CACHE] hit`
+- Answer references specific companies from Turn 1 waterfall
+- No fresh query_waterfall call (uses filter_table on entity_scope)
 
 ### 4. Monitor for Issues
 
@@ -155,6 +167,8 @@ Schedule in Railway:
 
 - [x] Migration 025 applied successfully
 - [x] Eval harness passes (20/20 tests)
-- [ ] Live Slack test shows cache hit on Turn 2
+- [x] Red/green validation: Both G.7 tests proven to fail when code broken
+- [ ] Live Slack test Turn 1: entity extraction from cache_payload succeeds (N > 0 deal_ids)
+- [ ] Live Slack test Turn 2: uses entity path (NOT cache hit)
 - [ ] No oversized synthesis warnings in Railway logs
-- [ ] Cache hit rate >20% after 48 hours of production use
+- [ ] Cache fallback only triggers when entity extraction genuinely fails (rare edge case)
