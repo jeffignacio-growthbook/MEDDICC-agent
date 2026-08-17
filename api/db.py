@@ -63,63 +63,179 @@ CACHE_TTL_MINUTES = 30
 AGGREGATE_HANDLERS = {"query_rubric"}
 
 
-def extract_entity_context(tool_results: dict) -> dict:
+def extract_entity_context(tool_results: dict, sb=None) -> dict:
     """
-    Extract structured entities (deal_ids, company_names)
-    from a handler's tool results for use in follow-up
-    pronoun resolution.
+    Schema-driven entity extraction using entity_registry.
 
-    Returns a dict with deal_ids and company_names lists.
-    Empty lists if no entities found.
+    Queries entity_registry to discover all registered entity types,
+    then scans tool_results for any registered ID columns. Extracts
+    both entity IDs and their human-readable labels.
+
+    Automatically supports new entity types (campaign, account, ticket)
+    without code changes — just register them in entity_registry.
+
+    Returns legacy shape {"deal_ids": [...], "company_names": [...]}
+    for backward compatibility with existing handlers, routing, and
+    stored thread history.
+
+    Args:
+        tool_results: Handler output dict containing entity data
+        sb: Optional Supabase client (for testing); defaults to singleton
     """
     import logging
     logger = logging.getLogger(__name__)
 
-    entities = {"deal_ids": [], "company_names": []}
+    # Load entity registry (schema-driven)
+    if sb is None:
+        sb = get_supabase()
+    try:
+        registry_result = sb.table("entity_registry").select("*").execute()
+    except Exception as e:
+        logger.error(f"[ENTITY_EXTRACT] failed to load entity_registry: {e}")
+        return {"deal_ids": [], "company_names": []}
 
+    if not registry_result.data:
+        logger.warning("[ENTITY_EXTRACT] entity_registry is empty - no entity types registered")
+        return {"deal_ids": [], "company_names": []}
+
+    # Build registry lookup: {id_column: {entity_type, entity_label_column, table}}
+    registry = {}
+    for entry in registry_result.data:
+        id_col = entry["id_column"]
+        registry[id_col] = {
+            "entity_type": entry["entity_type"],
+            "entity_label_column": entry["entity_label_column"],
+            "table": entry["supabase_table"]
+        }
+
+    logger.info(f"[ENTITY_EXTRACT] registry loaded: {list(registry.keys())}")
     logger.info(f"[ENTITY_EXTRACT] tool_results keys: {list(tool_results.keys())}")
 
-    # Row-based handlers (query_new_deals, filter_table, etc.)
+    # Extract entities: {entity_type: {"ids": [...], "labels": [...]}}
+    entities = {}
+
+    # 1. Scan list-valued keys for rows containing registered entity ID columns
     rows = tool_results.get("rows", [])
 
-    # Structured handlers return named keys - check ALL list-valued keys
-    # instead of hardcoded subset (fixes waterfall, scores, stages, etc.)
     if not rows:
+        # Check other list-valued keys (handles structured handlers like waterfall)
         for key, value in tool_results.items():
             if isinstance(value, list) and value:
-                # Found a list - check if it contains dicts with entity fields
                 first_item = value[0] if value else None
-                if isinstance(first_item, dict) and \
-                   (first_item.get("deal_id") or first_item.get("company_name")):
-                    rows = value
-                    logger.info(f"[ENTITY_EXTRACT] using '{key}' list with {len(rows)} items")
+                if isinstance(first_item, dict):
+                    # Check if this list contains any registered entity ID column
+                    for id_col in registry.keys():
+                        if id_col in first_item:
+                            rows = value
+                            logger.info(f"[ENTITY_EXTRACT] using '{key}' list with {len(rows)} items")
+                            break
+                if rows:
                     break
 
     if not rows:
         logger.info(f"[ENTITY_EXTRACT] no entity-bearing lists found")
 
-    for r in rows[:20]:  # cap at 20 entities
-        if isinstance(r, dict):
-            if r.get("deal_id"):
-                entities["deal_ids"].append(r["deal_id"])
-            if r.get("company_name"):
-                entities["company_names"].append(
-                    r["company_name"])
+    # 2. Extract entities from rows (cap at 20 per type)
+    if rows:
+        for r in rows[:20]:
+            if isinstance(r, dict):
+                for id_col, meta in registry.items():
+                    entity_id = r.get(id_col)
+                    if entity_id:
+                        entity_type = meta["entity_type"]
+                        label_col = meta["entity_label_column"]
+                        label = r.get(label_col, "")
 
-    # Also check nested deal structures
-    deal = tool_results.get("deal", {})
-    if isinstance(deal, dict) and deal.get("deal_id"):
-        if deal["deal_id"] not in entities["deal_ids"]:
-            entities["deal_ids"].append(deal["deal_id"])
-        if (deal.get("company_name") and
-                deal["company_name"] not in
-                entities["company_names"]):
-            entities["company_names"].append(
-                deal["company_name"])
+                        if entity_type not in entities:
+                            entities[entity_type] = {"ids": [], "labels": []}
 
-    logger.info(f"[ENTITY_EXTRACT] extracted {len(entities['deal_ids'])} deal_ids, "
-                f"{len(entities['company_names'])} company_names")
-    return entities
+                        entities[entity_type]["ids"].append(entity_id)
+                        if label:
+                            entities[entity_type]["labels"].append(label)
+
+    # 3. Nested single-entity special case (registry-driven)
+    # Handles returns like {"deal": {"deal_id": "...", "company_name": "..."}}
+    # from query_deal_deep_dive and similar single-entity handlers
+    for id_col, meta in registry.items():
+        entity_type = meta["entity_type"]
+        nested = tool_results.get(entity_type, {})
+        if isinstance(nested, dict):
+            entity_id = nested.get(id_col)
+            if entity_id:
+                if entity_type not in entities:
+                    entities[entity_type] = {"ids": [], "labels": []}
+
+                # Avoid duplicates
+                if entity_id not in entities[entity_type]["ids"]:
+                    entities[entity_type]["ids"].append(entity_id)
+                    logger.info(f"[ENTITY_EXTRACT] found nested {entity_type}: {id_col}={entity_id}")
+
+                    label_col = meta["entity_label_column"]
+                    label = nested.get(label_col, "")
+                    if label and label not in entities[entity_type]["labels"]:
+                        entities[entity_type]["labels"].append(label)
+
+    logger.info(f"[ENTITY_EXTRACT] schema-driven extraction: {entities}")
+
+    # Convert to legacy shape for backward compatibility
+    return _to_legacy_entity_shape(entities)
+
+
+def _to_legacy_entity_shape(entities: dict) -> dict:
+    """
+    Convert schema-driven entity dict to legacy shape for backward compatibility.
+
+    The legacy shape {"deal_ids": [...], "company_names": [...]} is required by:
+    - save_thread() storage (db.py:325)
+    - get_prior_entities() retrieval (db.py:363)
+    - router.py entity_params construction (672-674, 713-714)
+    - All bulk query handlers (handlers.py:71, 171, 352, 734, 747, 756, 764)
+
+    Args:
+        entities: Schema-driven format from entity_registry scan:
+            {
+                "deal": {"ids": ["D1", "D2"], "labels": ["Acme", "Globex"]},
+                "company": {"ids": ["C1"], "labels": ["Acme"]},
+                "call": {"ids": ["call_123"], "labels": ["Discovery call"]},
+                ...
+            }
+
+    Returns:
+        Legacy format:
+            {
+                "deal_ids": ["D1", "D2"],
+                "company_names": ["Acme", "Globex"]
+            }
+
+    Mapping:
+    - deal_ids: IDs from "deal" entity type
+    - company_names: Labels from "deal" entity type (company_name field)
+
+    Note: Other entity types (company, call, campaign, etc.) are extracted
+    but not included in legacy output. They'll be added to the shape in
+    Phase G.8 Task 5 when handlers consume them.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    deal_data = entities.get("deal", {"ids": [], "labels": []})
+
+    legacy = {
+        "deal_ids": deal_data["ids"],
+        "company_names": deal_data["labels"]
+    }
+
+    # Log if non-deal entities were extracted (informational)
+    other_types = [et for et in entities.keys() if et != "deal"]
+    if other_types:
+        logger.info(f"[ENTITY_EXTRACT] extracted {other_types} entities "
+                   f"(not included in legacy shape)")
+
+    logger.info(f"[ENTITY_EXTRACT] legacy shape: "
+                f"{len(legacy['deal_ids'])} deal_ids, "
+                f"{len(legacy['company_names'])} company_names")
+
+    return legacy
 
 
 # ══════════════════════════════════════════════════════════════
@@ -279,11 +395,11 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
     entities = {}
     if tool_results:
         logger.info(f"[SAVE_THREAD] extracting entities from tool_results")
-        entities = extract_entity_context(tool_results)
+        entities = extract_entity_context(tool_results, sb)
 
     if cache_payload:
         logger.info(f"[SAVE_THREAD] extracting entities from cache_payload")
-        cache_entities = extract_entity_context(cache_payload)
+        cache_entities = extract_entity_context(cache_payload, sb)
         # Merge cache entities into main entity dict
         for deal_id in cache_entities.get("deal_ids", []):
             if deal_id not in entities.get("deal_ids", []):
