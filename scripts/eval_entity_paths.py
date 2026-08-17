@@ -48,7 +48,36 @@ class MockSupabase:
             return mock_result
         mock_table.upsert.side_effect = capture_upsert
 
-        # Return empty history initially
+        # Return entity_registry data for schema-driven extraction
+        if name == "entity_registry":
+            mock_result = Mock()
+            mock_result.data = [
+                {
+                    "supabase_table": "deals",
+                    "id_column": "deal_id",
+                    "entity_type": "deal",
+                    "entity_label_column": "company_name",
+                    "description": "Deal entity"
+                },
+                {
+                    "supabase_table": "deals",
+                    "id_column": "company_id",
+                    "entity_type": "company",
+                    "entity_label_column": "company_name",
+                    "description": "Company entity"
+                },
+                {
+                    "supabase_table": "calls",
+                    "id_column": "call_id",
+                    "entity_type": "call",
+                    "entity_label_column": "title",
+                    "description": "Call/transcript entity"
+                }
+            ]
+            mock_table.execute = Mock(return_value=mock_result)
+            return mock_table
+
+        # Return empty history initially for other tables
         mock_result = Mock()
         mock_result.data = []
         mock_table.execute = Mock(return_value=mock_result)
