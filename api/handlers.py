@@ -82,6 +82,18 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
                 "component_details,analyzed_at",
         filters=analyses_filters)
 
+    # Deduplicate: keep only the most recent analysis per deal_id
+    # (analyses table has historical snapshots from nightly runs)
+    from collections import defaultdict
+    latest_analyses = {}
+    for a in analyses:
+        deal_id = a["deal_id"]
+        analyzed_at = a.get("analyzed_at", "")
+        if deal_id not in latest_analyses or analyzed_at > latest_analyses[deal_id].get("analyzed_at", ""):
+            latest_analyses[deal_id] = a
+
+    analyses = list(latest_analyses.values())
+
     # If entity-filtered, skip the active-deals join
     # (user already knows which deals these are)
     if deal_ids:

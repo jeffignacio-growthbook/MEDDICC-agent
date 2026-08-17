@@ -135,9 +135,11 @@ def extract_entity_context(tool_results: dict, sb=None) -> dict:
     if not rows:
         logger.info(f"[ENTITY_EXTRACT] no entity-bearing lists found")
 
-    # 2. Extract entities from rows (cap at 20 per type)
+    # 2. Extract entities from rows
+    # IMPORTANT: Process ALL rows first, dedupe, THEN cap at 20
+    # (not rows[:20] before dedup - that misses duplicates beyond row 20)
     if rows:
-        for r in rows[:20]:
+        for r in rows:
             if isinstance(r, dict):
                 for id_col, meta in registry.items():
                     entity_id = r.get(id_col)
@@ -152,6 +154,16 @@ def extract_entity_context(tool_results: dict, sb=None) -> dict:
                         entities[entity_type]["ids"].append(entity_id)
                         if label:
                             entities[entity_type]["labels"].append(label)
+
+        # Deduplicate IDs and labels, preserving order
+        for entity_type in entities:
+            # Use dict.fromkeys() to preserve order while deduping
+            entities[entity_type]["ids"] = list(dict.fromkeys(entities[entity_type]["ids"]))
+            entities[entity_type]["labels"] = list(dict.fromkeys(entities[entity_type]["labels"]))
+
+            # Cap at 20 AFTER dedup
+            entities[entity_type]["ids"] = entities[entity_type]["ids"][:20]
+            entities[entity_type]["labels"] = entities[entity_type]["labels"][:20]
 
     # 3. Nested single-entity special case (registry-driven)
     # Handles returns like {"deal": {"deal_id": "...", "company_name": "..."}}
