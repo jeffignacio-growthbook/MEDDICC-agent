@@ -163,8 +163,8 @@ async def query_waterfall(params: dict, sb) -> dict:
         filters=[("gte", "close_date", tw["start"]),
                  ("lte", "close_date", tw["end"])])
 
-    # === SYNTHESIS HINT: Question-aware emphasis ===
-    # Detect question framing to guide synthesis emphasis
+    # === REPORT SHAPE: Question-aware emphasis ===
+    # Detect question framing to select appropriate report shape
     # Use more specific patterns to avoid overlap
     movement_keywords = ["change", "moved", "movement", "trend",
                         "how did", "what happened", "new pipeline",
@@ -175,24 +175,19 @@ async def query_waterfall(params: dict, sb) -> dict:
     is_movement_question = any(kw in question for kw in movement_keywords)
     is_snapshot_question = any(kw in question for kw in snapshot_keywords)
 
-    # Prioritize movement if both match (e.g., "how did pipeline change")
+    # Prioritize movement (trend shape) if both match
     if is_movement_question:
-        synthesis_hint = ("This question asks about pipeline MOVEMENT/CHANGE. "
-                         "Lead with waterfall analysis (new/won/lost), treat "
-                         "pipeline_summary as supporting context.")
+        report_shape = "trend"
     elif is_snapshot_question:
-        synthesis_hint = ("This question asks about CURRENT/OPEN pipeline. "
-                         "Lead with pipeline_summary (total → by-stage → needs-attention), "
-                         "treat waterfall as a brief closing footnote.")
+        report_shape = "snapshot"
     else:
-        synthesis_hint = ("Balance pipeline_summary and waterfall based on "
-                         "what seems most relevant to the question.")
+        report_shape = "snapshot"  # Default to snapshot
 
     return {
         "pipeline_summary": pipeline_summary,  # Current state
         "waterfall": weekly,                   # Movement
         "period": tw["label"],
-        "synthesis_hint": synthesis_hint,      # Question-aware guidance
+        "report_shape": report_shape,          # Declared shape for synthesis
         "cache_payload": {                     # Retained, NOT shown
             "deals": deals
         }

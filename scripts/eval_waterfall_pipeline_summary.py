@@ -205,8 +205,8 @@ def test_pipeline_summary():
     print(f"  ✓ Size constraint met ({summary_size} < 2,000)")
     print()
 
-    # Test 3: Synthesis hint adapts to question framing
-    print("[TEST 3] Synthesis hint adapts to question framing")
+    # Test 3: Report shape adapts to question framing
+    print("[TEST 3] Report shape adapts to question framing")
 
     # Snapshot question
     params_snapshot = {
@@ -215,15 +215,15 @@ def test_pipeline_summary():
     }
 
     result_snapshot = asyncio.run(query_waterfall(params_snapshot, sb))
-    hint_snapshot = result_snapshot.get("synthesis_hint", "")
+    shape_snapshot = result_snapshot.get("report_shape", "")
 
     print(f"  Question: 'show me current open pipeline'")
-    print(f"  Hint: {hint_snapshot[:80]}...")
+    print(f"  Report shape: {shape_snapshot}")
 
-    assert "CURRENT" in hint_snapshot or "pipeline_summary" in hint_snapshot, \
-        f"Snapshot hint should emphasize current state: {hint_snapshot}"
+    assert shape_snapshot == "snapshot", \
+        f"Snapshot question should use 'snapshot' shape, got: {shape_snapshot}"
 
-    print(f"  ✓ Snapshot question → emphasizes pipeline_summary")
+    print(f"  ✓ Snapshot question → snapshot shape")
 
     # Movement question
     params_movement = {
@@ -232,15 +232,15 @@ def test_pipeline_summary():
     }
 
     result_movement = asyncio.run(query_waterfall(params_movement, sb))
-    hint_movement = result_movement.get("synthesis_hint", "")
+    shape_movement = result_movement.get("report_shape", "")
 
     print(f"  Question: 'how did pipeline change this week'")
-    print(f"  Hint: {hint_movement[:80]}...")
+    print(f"  Report shape: {shape_movement}")
 
-    assert "MOVEMENT" in hint_movement or "waterfall" in hint_movement, \
-        f"Movement hint should emphasize waterfall: {hint_movement}"
+    assert shape_movement == "trend", \
+        f"Movement question should use 'trend' shape, got: {shape_movement}"
 
-    print(f"  ✓ Movement question → emphasizes waterfall")
+    print(f"  ✓ Movement question → trend shape")
     print()
 
     # Test 4: Both pieces always computed

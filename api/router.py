@@ -334,8 +334,65 @@ Reply with the verified answer only — no commentary.
 If the answer is already fully supported, repeat it
 unchanged."""
 
+# ══════════════════════════════════════════════════════════════
+# REPORT SHAPES — Reusable structure declarations
+# ══════════════════════════════════════════════════════════════
+# Handlers can optionally declare which shape(s) their data fits.
+# Synthesis adapts emphasis based on shape + question framing.
+
+REPORT_SHAPES = {
+    "snapshot": {
+        "order": ["headline_number", "breakdown", "flags", "bottom_line"],
+        "description": ("point-in-time state — a total, a breakdown by category, "
+                       "what needs attention")
+    },
+    "trend": {
+        "order": ["headline_change", "detail_by_period", "context", "bottom_line"],
+        "description": ("movement over time — what changed, by how much, "
+                       "is that good or bad")
+    },
+    "risk_alert": {
+        "order": ["count_at_risk", "named_examples", "common_pattern", "bottom_line"],
+        "description": ("a filtered list of concerning items — lead with how many, "
+                       "name a few, note the pattern")
+    },
+    "comparison": {
+        "order": ["headline_comparison", "breakdown_by_entity", "outliers", "bottom_line"],
+        "description": ("ranking or comparing across reps/segments/deals — "
+                       "who's ahead, who's behind, why")
+    },
+}
+
 SYNTHESIS_SYSTEM_PROMPT = """You answer RevOps questions
 for a B2B SaaS CRO in Slack.
+
+VOICE — You are reporting as a VP of RevOps briefing a CRO or CEO.
+Write the way that role writes:
+
+- Lead with the number that matters most. State it first, then support it.
+  Never bury the headline under context.
+- Flag risk explicitly. A concerning number sitting quietly inside a list
+  is a failure to communicate it — call it out.
+- Close with one sentence of judgment: are we on track, and why. Not a
+  restatement of the data — an actual read on it.
+- Be concise. A VP's Slack update is scannable in 15 seconds, not a
+  report to read end to end.
+
+Example — a snapshot-shaped answer done well:
+
+📊 *Current Pipeline — $14.4M across 144 deals*
+
+*By Stage:*
+• Discovery — 20 deals, $2.0M
+• Scoping — 30 deals, $3.5M
+• Technical Evaluation — 40 deals, $5.0M
+• Negotiating — 25 deals, $2.9M
+
+⚠️ *Needs Attention:* 12 deals missing ARR (incl. Company A, Company B...);
+8 deals flagged at-risk (weak champion or economic buyer signals).
+
+Bottom line: pipeline is healthy in volume but ARR hygiene is lagging — get
+the 12 unvalued deals updated before they skew the forecast.
 
 REASONING AGAINST DATA:
 When answering, reason about the question against the data
@@ -1096,9 +1153,22 @@ async def route_question(question: str, user_id: str,
             # approximate cost: tokens × $3/1M
         )
 
-        print(f"[ASSESS] score={assessment.get('score', 0):.2f} "
+        tone_score = assessment.get('tone_score', 0.0)
+        tone_issue = assessment.get('tone_issue')
+
+        logger.info(f"[ASSESS] score={assessment.get('score', 0):.2f} "
               f"issue={assessment.get('issue')} "
-              f"retry={retry_count}", flush=True)
+              f"tone_score={tone_score:.2f} "
+              f"tone_issue={tone_issue or 'none'} "
+              f"retry={retry_count}")
+
+        # TONE RETRY DECISION: Log only, no retry (Phase G.9 Task 4 option a)
+        # Low tone_score should NOT trigger retry — that path re-runs data
+        # gathering, which is the wrong tool for a phrasing problem.
+        # Establish the metric first, look at it after a week of real traffic,
+        # decide if re-synthesis is warranted.
+        # A separate cheap re-synthesis-only retry (same data, rewrite) could
+        # be added later if the data shows it's needed.
 
         if assessment.get("correct", True) or \
            not should_retry(assessment, retry_count):

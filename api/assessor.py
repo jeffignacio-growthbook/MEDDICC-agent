@@ -13,7 +13,7 @@ Handler used: {handler_used}
 Data queried: {tool_results_summary}
 Answer given: {answer}
 
-Assess:
+Assess DATA CORRECTNESS:
 1. Did the answer address the actual question asked?
    (e.g. "what deals did we win?" should return won deals,
    not waterfall aggregate totals)
@@ -23,6 +23,11 @@ Assess:
    incomplete or potentially misleading?
 4. Did the answer acknowledge its own limitations when
    the data was insufficient?
+
+Also assess TONE, separately from data correctness:
+- Does the answer lead with the headline number/finding?
+- Is risk or bad news stated plainly, not buried in a list?
+- Does it close with a one-sentence judgment, not just a data restatement?
 
 Respond with JSON only:
 {{
@@ -38,7 +43,10 @@ Respond with JSON only:
     "format_only"         - correct data, poor presentation
   "suggested_handler": null or handler name to try instead,
   "suggested_params": null or parameter adjustments,
-  "learning_note": null or one-line note for routing improvement
+  "learning_note": null or one-line note for routing improvement,
+  "tone_score": 0.0-1.0,
+  "tone_issue": null or one of: "buried_headline", "no_bottom_line",
+                "risk_not_flagged", "too_verbose"
 }}"""
 
 
