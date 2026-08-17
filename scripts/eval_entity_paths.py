@@ -549,27 +549,64 @@ class EntityPathEvals:
 
         from api.handlers import query_deals_at_risk
 
-        # Mock select_all to return analyses with at-risk deals
+        # Phase G.10: Mock both analyses AND deals (stage-aware risk needs stage data)
         mock_analyses = [
             {
                 "deal_id": "D1",
                 "company_name": "Acme Corp",
                 "overall_score": 30,
-                "champion_score": 2,
+                "champion_score": 2,  # Below Discovery requirement (4)
                 "economic_buyer_score": 3,
+                "pain_score": 6,
+                "metrics_score": 0,
+                "decision_criteria_score": 0,
+                "decision_process_score": 0,
+                "competition_score": 0,
                 "analyzed_at": "2026-06-01"
             },
             {
                 "deal_id": "D2",
                 "company_name": "Widget Inc",
                 "overall_score": 50,
-                "champion_score": 1,
+                "champion_score": 1,  # Below Discovery requirement (4)
                 "economic_buyer_score": 5,
+                "pain_score": 6,
+                "metrics_score": 0,
+                "decision_criteria_score": 0,
+                "decision_process_score": 0,
+                "competition_score": 0,
                 "analyzed_at": "2026-06-02"
             }
         ]
 
-        with patch('api.handlers.select_all', return_value=mock_analyses):
+        mock_deals = [
+            {
+                "deal_id": "D1",
+                "company_name": "Acme Corp",
+                "deal_value": 50000,
+                "deal_status": "active",
+                "stage": "appointmentscheduled"  # Discovery
+            },
+            {
+                "deal_id": "D2",
+                "company_name": "Widget Inc",
+                "deal_value": 75000,
+                "deal_status": "active",
+                "stage": "appointmentscheduled"  # Discovery
+            }
+        ]
+
+        # Mock select_all to return analyses on first call, deals on second
+        mock_call_count = [0]
+        def mock_select_all(sb, table, **kwargs):
+            mock_call_count[0] += 1
+            if table == "analyses":
+                return mock_analyses
+            elif table == "deals":
+                return mock_deals
+            return []
+
+        with patch('api.handlers.select_all', side_effect=mock_select_all):
             sb = Mock()
             params = {
                 "deal_ids": ["D1", "D2"],

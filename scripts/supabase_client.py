@@ -75,7 +75,8 @@ def select_all(sb, table, columns='*', filters=None, page_size=1000):
                 q = q.is_(f[1], f[2])
             elif op == "ilike":
                 q = q.ilike(f[1], f[2])
-            elif op == "in_":
+            elif op == "in_" or op == "in":
+                # Fix A1: "in" is reserved keyword, always use "in_" method
                 q = q.in_(f[1], f[2])
             else:
                 q = getattr(q, op)(f[1], f[2])

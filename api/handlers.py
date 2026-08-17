@@ -209,8 +209,16 @@ async def query_arr(params: dict, sb) -> dict:
 async def query_deals_at_risk(params: dict, sb) -> dict:
     """
     Deals with weak MEDDICC scores or champion gaps.
-    Joins analyses with active deals to find at-risk opportunities.
+
+    PHASE G.10: Stage-aware risk determination.
+    A deal is "at risk" if ANY component required at its CURRENT STAGE
+    is below the threshold to advance. Components not yet required are
+    excluded from risk determination.
+
+    Uses stage_progression requirements from config/client.yaml.
     """
+    from api.stage_requirements import get_requirements_for_stage
+
     tw = params["time_window"]
     deal_ids = params.get("deal_ids", [])
 
@@ -220,15 +228,17 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
         analyses_filters.append(
             ("in_", "deal_id", deal_ids))
 
+    # Fetch ALL component scores (not just champion/eb)
     analyses = select_all(sb, "analyses",
         columns="deal_id,company_name,overall_score,"
                 "champion_score,economic_buyer_score,"
-                "component_details,analyzed_at",
+                "metrics_score,decision_criteria_score,"
+                "decision_process_score,pain_score,"
+                "competition_score,analyzed_at",
         filters=analyses_filters)
 
     # Deduplicate: keep only the most recent analysis per deal_id
     # (analyses table has historical snapshots from nightly runs)
-    from collections import defaultdict
     latest_analyses = {}
     for a in analyses:
         deal_id = a["deal_id"]
@@ -238,63 +248,80 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
 
     analyses = list(latest_analyses.values())
 
-    # If entity-filtered, skip the active-deals join
-    # (user already knows which deals these are)
+    # Fetch deal stage data for stage-aware requirements
     if deal_ids:
-        at_risk = []
-        for a in analyses:
-            score = a.get("overall_score", 0) or 0
-            champ = a.get("champion_score", 0) or 0
-            if score < 40 or champ < 4:
-                at_risk.append({
-                    "deal_id": a["deal_id"],
-                    "company_name": a["company_name"],
-                    "overall_score": score,
-                    "champion_score": champ,
-                    "risk_flags": [
-                        f for f, v in [
-                            ("low overall MEDDICC", score < 40),
-                            ("champion gap", champ < 4),
-                            ("no economic buyer",
-                             (a.get("economic_buyer_score")
-                              or 0) < 4),
-                        ] if v
-                    ]
-                })
-        return {"deals_at_risk": at_risk,
-                "total_at_risk": len(at_risk),
-                "filtered_to_context": True}
-
-    deals = select_all(sb, "deals",
-        columns="deal_id,company_name,deal_value,"
-                "deal_status,stage",
-        filters=[("eq", "deal_status", "active")])
+        # Entity-filtered: only fetch stages for these deals
+        deals = select_all(sb, "deals",
+            columns="deal_id,company_name,deal_value,"
+                    "deal_status,stage",
+            filters=[("in_", "deal_id", deal_ids)])
+    else:
+        # Full query: only active deals
+        deals = select_all(sb, "deals",
+            columns="deal_id,company_name,deal_value,"
+                    "deal_status,stage",
+            filters=[("eq", "deal_status", "active")])
 
     deal_map = {d["deal_id"]: d for d in deals}
     at_risk = []
+
+    # Component name mapping
+    component_fields = {
+        "pain": "pain_score",
+        "champion": "champion_score",
+        "metrics": "metrics_score",
+        "economic_buyer": "economic_buyer_score",
+        "decision_criteria": "decision_criteria_score",
+        "decision_process": "decision_process_score",
+        "competition": "competition_score",
+    }
 
     for a in analyses:
         d = deal_map.get(a["deal_id"])
         if not d:
             continue
-        score = a.get("overall_score", 0) or 0
-        champ = a.get("champion_score", 0) or 0
-        eb = a.get("economic_buyer_score", 0) or 0
 
-        if score < 40 or champ < 4:
+        stage_id = d.get("stage")
+        if not stage_id:
+            continue
+
+        # Get requirements for this deal's current stage
+        requirements = get_requirements_for_stage(stage_id)
+
+        # No requirements = terminal/excluded stage, never at-risk
+        if not requirements:
+            continue
+
+        # Check each required component
+        risk_flags = []
+        for component, required_threshold in requirements.items():
+            field_name = component_fields.get(component)
+            if not field_name:
+                continue
+
+            actual_score = a.get(field_name, 0) or 0
+
+            if actual_score < required_threshold:
+                # Stage-aware risk message
+                from api.stage_requirements import _get_stage_by_id
+                stage_info = _get_stage_by_id(stage_id)
+                stage_name = stage_info["name"] if stage_info else "current stage"
+
+                risk_flags.append(
+                    f"{component.replace('_', ' ').title()} {actual_score}/10 "
+                    f"(need {required_threshold}+ to advance from {stage_name})"
+                )
+
+        # Only flag if there are actual risk flags
+        if risk_flags:
             at_risk.append({
                 "deal_id":       a["deal_id"],
                 "company_name":  a["company_name"],
-                "overall_score": score,
-                "champion_score": champ,
+                "overall_score": a.get("overall_score", 0) or 0,
+                "champion_score": a.get("champion_score", 0) or 0,
                 "deal_value":    d.get("deal_value"),
-                "risk_flags": [
-                    f for f, v in [
-                        ("low overall MEDDICC", score < 40),
-                        ("champion gap", champ < 4),
-                        ("no economic buyer", eb < 4),
-                    ] if v
-                ]
+                "stage":         stage_id,
+                "risk_flags":    risk_flags
             })
 
     at_risk.sort(key=lambda x: (x["overall_score"],
@@ -900,11 +927,19 @@ async def query_rubric_scores_bulk(params: dict, sb) -> dict:
 
 async def query_deal_stages_bulk(params: dict, sb) -> dict:
     """Current stage for a known set of deal_ids."""
-    deal_ids = params["deal_ids"]
+    # Fix A2: Handle both entity-scope path (has deal_ids) and
+    # direct intent path (may not have deal_ids)
+    deal_ids = params.get("deal_ids", [])
+    if not deal_ids:
+        return {
+            "stages": [],
+            "error": "No deal IDs provided. This handler requires a list of specific deals."
+        }
+
     rows = select_all(sb, "deals",
         columns="deal_id,company_name,stage,"
                 "highest_stage_order_reached,close_date",
-        filters=[("in", "deal_id", deal_ids)])
+        filters=[("in_", "deal_id", deal_ids)])
     return {"stages": rows}
 
 async def query_deal_owners_bulk(params: dict, sb) -> dict:
