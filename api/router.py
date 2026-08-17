@@ -677,12 +677,28 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         # Near-duplicate: same (tool, table, columns, filters), ignoring limit
         is_duplicate = False
         if tool_name in ["filter_table", "join_tables"]:
-            tool_signature = (
-                tool_name,
-                tool_params.get("table"),
-                str(sorted(tool_params.get("columns", "").split(","))),
-                str(sorted(tool_params.get("filters", []), key=str))
-            )
+            # Normalize columns (can be list or comma-separated string)
+            cols = tool_params.get("columns") or []
+            if isinstance(cols, str):
+                cols = [c.strip() for c in cols.split(",") if c.strip()]
+            cols_key = str(sorted(cols))
+
+            # Normalize filters (can be list or None)
+            filters = tool_params.get("filters") or []
+            if not isinstance(filters, list):
+                filters = []
+            filters_key = str(sorted(filters, key=str))
+
+            # Normalize table names (handle both filter_table and join_tables)
+            if tool_name == "filter_table":
+                table_key = str(tool_params.get("table", ""))
+            else:  # join_tables
+                # Include both primary and joined table
+                primary = tool_params.get("primary_table", "")
+                joined = tool_params.get("joined_table", "")
+                table_key = f"{primary}+{joined}"
+
+            tool_signature = (tool_name, table_key, cols_key, filters_key)
 
             for prev_sig, prev_iter in executed_tools:
                 if prev_sig == tool_signature:
