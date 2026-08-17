@@ -540,9 +540,14 @@ async def dynamic_query_loop(question, history, params,
     Capped at 5 iterations and $0.08 token budget.
     """
     from api.schema_context import get_schema_context
+    from api.table_classifier import classify_relevant_tables
     from api import tools as T
 
-    schema = get_schema_context(sb)
+    # Hybrid schema: classify relevant tables for full descriptions
+    relevant_tables = classify_relevant_tables(question, client)
+    logger.info(f"[SCHEMA] Relevant tables for full descriptions: {relevant_tables}")
+
+    schema = get_schema_context(sb, tables_with_descriptions=relevant_tables)
     system = DYNAMIC_SYSTEM_PROMPT.format(schema_context=schema)
 
     # Build question with time window and optional hint
@@ -562,6 +567,7 @@ async def dynamic_query_loop(question, history, params,
                     f"{f'Context: {hint}' if hint else ''}"}
     ]
     accumulated_data = {}
+    executed_tools = []  # Track tool calls to detect near-duplicates
     TOKEN_BUDGET = 20000  # ~$0.20 at Sonnet pricing - complex joins need headroom
     tokens_used = 0
     MAX_ITERATIONS = 5
@@ -577,6 +583,21 @@ Answer: {answer}
 Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
     for iteration in range(MAX_ITERATIONS):
+        # Predictive budget check BEFORE making call
+        # Estimate: current system + messages + 800 output
+        estimated_input = len(system) // 4 + sum(len(str(m.get('content', ''))) // 4 for m in messages)
+        estimated_call_tokens = estimated_input + 800
+        projected_total = tokens_used + estimated_call_tokens
+
+        if projected_total > TOKEN_BUDGET:
+            partial = _summarize_accumulated(accumulated_data)
+            logger.info(f"[LOOP] declining iteration {iteration} - would exceed budget "
+                       f"(used={tokens_used}, projected={projected_total}, budget={TOKEN_BUDGET})")
+            tool_results = _extract_rows_from_accumulated(accumulated_data)
+            answer = (f"Hit query budget with partial data: {partial}. "
+                     f"Try a more specific question.")
+            return {"answer": answer, "tool_results": tool_results}
+
         resp = client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=800,
@@ -585,6 +606,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         )
         tokens_used += resp.usage.input_tokens + resp.usage.output_tokens
 
+        # Post-call verification (should never trigger if prediction is accurate)
         if tokens_used > TOKEN_BUDGET:
             partial = _summarize_accumulated(accumulated_data)
             logger.info(f"[LOOP] fallback to unanswerable after "
@@ -650,6 +672,34 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
         tool_name = parsed.get("tool", "")
         tool_params = parsed.get("params", {})
+
+        # Check for near-duplicate tool calls
+        # Near-duplicate: same (tool, table, columns, filters), ignoring limit
+        is_duplicate = False
+        if tool_name in ["filter_table", "join_tables"]:
+            tool_signature = (
+                tool_name,
+                tool_params.get("table"),
+                str(sorted(tool_params.get("columns", "").split(","))),
+                str(sorted(tool_params.get("filters", []), key=str))
+            )
+
+            for prev_sig, prev_iter in executed_tools:
+                if prev_sig == tool_signature:
+                    logger.info(f"[LOOP iter={iteration}] duplicate tool call detected "
+                               f"(same as iteration {prev_iter}), skipping execution")
+                    messages.append({"role": "assistant", "content": raw})
+                    messages.append({"role": "user",
+                        "content": f"You already queried this in iteration {prev_iter}. "
+                                  f"Use the existing data from step_{prev_iter}."})
+                    is_duplicate = True
+                    break
+
+            if not is_duplicate:
+                executed_tools.append((tool_signature, iteration))
+
+        if is_duplicate:
+            continue  # Skip to next iteration
 
         tool_fn = {
             "filter_table": T.filter_table,
