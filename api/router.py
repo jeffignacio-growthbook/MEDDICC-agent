@@ -39,14 +39,34 @@ NEW_DISCOVERY_SIGNALS = [
 ]
 
 # Maps question keywords to bulk handler names for entity-scoped queries
-ENTITY_SCOPE_KEYWORD_MAP = [
-    (["at risk", "risk"],                "query_deals_at_risk"),
-    (["meddicc", "score", "champion",
-      "economic buyer", "decision"],     "query_rubric_scores_bulk"),
-    (["objection"],                      "query_objections"),
-    (["stage", "where are they"],        "query_deal_stages_bulk"),
-    (["owner", "who owns"],              "query_deal_owners_bulk"),
-    (["value", "arr", "worth"],          "query_deal_values_bulk"),
+# Handler descriptions - single source of truth for both INTENT_PROMPT and entity-scope classification
+HANDLER_DESCRIPTIONS = {
+    "query_waterfall": "pipeline movement, new/won/lost this week/quarter",
+    "query_new_deals": "which deals were created, added to pipeline, or started in a time window",
+    "query_won_deals": "which deals did we ALREADY win/close (past tense), retrospective wins/bookings. NOT future close dates.",
+    "query_arr": "ARR by customer, total ARR",
+    "query_deals_at_risk": "weak MEDDICC scores, deals at risk, champion gaps",
+    "query_win_loss": "why deals were won/lost, narratives",
+    "query_objections": "objections by category/stage/trend",
+    "query_feature_gaps": "feature gaps by severity/competitor",
+    "query_coverage": "pipeline coverage vs target, quota attainment",
+    "query_deal": "deep dive on a specific company's deal",
+    "query_rubric": "general scoring questions like \"what does a 6 mean for champion?\"",
+    "generate_win_loss": "full narrative for a specific closed deal (slow)",
+    "query_competitive_intel": "competitive intelligence: which companies mentioned DIY/build-it-themselves, named competitors showing up in calls, build-vs-buy signals, what alternatives prospects are evaluating",
+    "set_target": "admin: set quota or target (requires auth)",
+    "dynamic_query": "question requires combining data from multiple tables or filters not covered by the precomputed handlers above. Use when no other handler fits but the data likely exists in Supabase.",
+    "unanswerable": "question cannot be answered with available data",
+}
+
+# Bulk handlers that can operate on entity scopes (deal_ids from prior context)
+ENTITY_SCOPE_BULK_HANDLERS = [
+    "query_deals_at_risk",
+    "query_rubric_scores_bulk",
+    "query_objections",
+    "query_deal_stages_bulk",
+    "query_deal_owners_bulk",
+    "query_deal_values_bulk",
 ]
 
 def has_followup_pronoun(question: str) -> bool:
@@ -104,10 +124,95 @@ def should_use_entity_scope(question: str, prior_entities: dict) -> bool:
         return False
     return True
 
-async def route_entity_scoped_question(
-        question: str, prior_entities: dict, sb) -> tuple[dict, str] | None:
+def classify_entity_scope_handler(question: str, entity_context: str, client) -> str | None:
     """
-    Try to match question to a bulk handler and execute it against
+    Use Haiku to classify which bulk handler should handle this entity-scoped question.
+
+    Args:
+        question: User question
+        entity_context: Description of prior entities (e.g., "3 deals from prior answer")
+        client: Anthropic client
+
+    Returns:
+        Handler name from ENTITY_SCOPE_BULK_HANDLERS, or None if no match
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    # Build handler summary for entity-scope bulk handlers only
+    bulk_handlers_text = "\n".join([
+        f"  {name:25s} - {HANDLER_DESCRIPTIONS[name]}"
+        for name in ENTITY_SCOPE_BULK_HANDLERS
+    ])
+
+    prompt = f"""You have prior context about specific deals from a previous answer.
+The user is asking a follow-up question about those deals.
+
+{entity_context}
+
+Question: {question}
+
+Which bulk handler should answer this question?
+
+Available handlers:
+{bulk_handlers_text}
+
+Reply with ONLY the handler name, or "none" if the question doesn't match any handler.
+No explanation, no JSON."""
+
+    try:
+        response = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=50,
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        handler_name = response.content[0].text.strip()
+
+        # Validate it's a known bulk handler
+        if handler_name in ENTITY_SCOPE_BULK_HANDLERS:
+            logger.info(f"[ENTITY_SCOPE] classified '{question[:50]}...' → {handler_name}")
+            return handler_name
+        elif handler_name.lower() == "none":
+            logger.info(f"[ENTITY_SCOPE] no bulk handler matched question")
+            return None
+        else:
+            logger.warning(f"[ENTITY_SCOPE] Haiku returned unknown handler: {handler_name}")
+            return None
+
+    except Exception as e:
+        logger.error(f"[ENTITY_SCOPE] classification failed: {e}")
+        return None
+
+
+def log_entity_scope_pattern(question: str, handler_name: str,
+                             entity_count: int, quality_score: str, sb) -> None:
+    """
+    Log successful entity-scope routing pattern for analysis and handler generation.
+
+    Task G.8.4: Track which questions route successfully to build pattern library.
+    """
+    try:
+        # Convert quality evaluation to numeric score
+        quality_map = {"good": 0.9, "partial": 0.7, "empty": 0.0}
+        score = quality_map.get(quality_score, 0.5)
+
+        sb.table("entity_scope_patterns").insert({
+            "question": question,
+            "handler_name": handler_name,
+            "entity_count": entity_count,
+            "quality_score": score
+        }).execute()
+    except Exception as e:
+        # Don't fail the request if pattern logging fails
+        import logging
+        logging.getLogger(__name__).warning(
+            f"[ENTITY_SCOPE] Failed to log pattern: {e}")
+
+async def route_entity_scoped_question(
+        question: str, prior_entities: dict, sb, client) -> tuple[dict, str] | None:
+    """
+    Use LLM classification to match question to a bulk handler and execute it against
     known deal_ids without running dynamic_query_loop discovery.
 
     Returns (tool_results, handler_name) if a matching handler exists
@@ -117,67 +222,61 @@ async def route_entity_scoped_question(
     from api.evaluator import evaluate_result
     from api import handlers
     from api.time_resolver import resolve_time_window
+    import logging
+    logger = logging.getLogger(__name__)
 
-    q_lower = question.lower()
     deal_ids = prior_entities["deal_ids"]
+    entity_context = f"Prior context: {len(deal_ids)} deals from previous answer"
 
     # All handlers (both pre-G.6 and new bulk handlers) need time_window
     # Pre-G.6 handlers require it; new bulk handlers ignore it
     default_tw = resolve_time_window({"period": "current_quarter"})
 
-    for keywords, handler_name in ENTITY_SCOPE_KEYWORD_MAP:
-        if any(kw in q_lower for kw in keywords):
-            handler_fn = getattr(handlers, handler_name, None)
-            if not handler_fn:
-                logger.warning(f"[ENTITY_SCOPE] handler {handler_name} "
-                              f"not found in handlers module")
-                continue
+    # Classify which handler to use (LLM-based, replaces keyword matching)
+    handler_name = classify_entity_scope_handler(question, entity_context, client)
 
-            try:
-                result = await handler_fn(
-                    {"deal_ids": deal_ids, "time_window": default_tw}, sb)
-                evaluation = evaluate_result(result, handler_name)
+    if not handler_name:
+        return None
 
-                if evaluation != "empty":
-                    logger.info(f"[ENTITY_SCOPE] matched keyword "
-                               f"'{keywords[0]}' → {handler_name} "
-                               f"(quality={evaluation})")
-                    return (result, handler_name)
-            except Exception as e:
-                logger.error(f"[ENTITY_SCOPE] handler {handler_name} "
-                            f"raised: {e}")
-                import traceback
-                logger.error(traceback.format_exc())
-                continue  # Try next keyword match
+    # Execute the classified handler
+    handler_fn = getattr(handlers, handler_name, None)
+    if not handler_fn:
+        logger.warning(f"[ENTITY_SCOPE] handler {handler_name} not found in handlers module")
+        return None
 
-    return None
+    try:
+        result = await handler_fn(
+            {"deal_ids": deal_ids, "time_window": default_tw}, sb)
+        evaluation = evaluate_result(result, handler_name)
 
-INTENT_PROMPT = """Classify this Slack question into one of
+        if evaluation != "empty":
+            logger.info(f"[ENTITY_SCOPE] {handler_name} (quality={evaluation})")
+            # Task G.8.4: Log successful pattern for analysis
+            log_entity_scope_pattern(
+                question, handler_name, len(deal_ids), evaluation, sb)
+            return (result, handler_name)
+        else:
+            logger.info(f"[ENTITY_SCOPE] {handler_name} returned empty")
+            return None
+
+    except Exception as e:
+        logger.error(f"[ENTITY_SCOPE] handler {handler_name} raised: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return None
+
+def build_intent_prompt(today: str, current_quarter: str, history: str, question: str) -> str:
+    """Build INTENT_PROMPT from HANDLER_DESCRIPTIONS (single source of truth)."""
+    handlers_text = "\n".join([
+        f"  {name:25s} - {desc}"
+        for name, desc in HANDLER_DESCRIPTIONS.items()
+    ])
+
+    return f"""Classify this Slack question into one of
 these handler types. Reply with JSON only.
 
 Handlers:
-  query_waterfall       - pipeline movement, new/won/lost this week/quarter
-  query_new_deals       - which deals were created, added to pipeline, or started in a time window
-  query_won_deals       - which deals did we ALREADY win/close (past tense), retrospective wins/bookings. NOT future close dates.
-  query_arr             - ARR by customer, total ARR
-  query_deals_at_risk   - weak MEDDICC scores, deals at risk, champion gaps
-  query_win_loss        - why deals were won/lost, narratives
-  query_objections      - objections by category/stage/trend
-  query_feature_gaps    - feature gaps by severity/competitor
-  query_coverage        - pipeline coverage vs target, quota attainment
-  query_deal            - deep dive on a specific company's deal
-  query_rubric          - general scoring questions like "what does a 6 mean for champion?"
-  generate_win_loss     - full narrative for a specific closed deal (slow)
-  query_competitive_intel - competitive intelligence: which companies mentioned
-                          DIY/build-it-themselves, named competitors showing up
-                          in calls, build-vs-buy signals, what alternatives
-                          prospects are evaluating
-  set_target            - admin: set quota or target (requires auth)
-  dynamic_query         - question requires combining data from multiple tables
-                          or filters not covered by the precomputed handlers
-                          above. Use when no other handler fits but the data
-                          likely exists in Supabase.
-  unanswerable          - question cannot be answered with available data
+{handlers_text}
 
 Required JSON:
 {{
@@ -636,7 +735,7 @@ async def route_question(question: str, user_id: str,
                     f"{len(prior_entities['deal_ids'])} "
                     f"known deal_ids, bypassing discovery")
         entity_match = await route_entity_scoped_question(
-            question, prior_entities, sb)
+            question, prior_entities, sb, client)
         if entity_match is not None:
             tool_results, handler_name = entity_match
             result_quality = "good"
@@ -684,7 +783,7 @@ async def route_question(question: str, user_id: str,
             system="Respond with valid JSON only. No markdown, "
                    "no backticks, no explanation.",
             messages=[{"role": "user", "content":
-                INTENT_PROMPT.format(
+                build_intent_prompt(
                     today=today,
                     current_quarter=cq,
                     history=json.dumps(get_api_history(history)[-4:]),
