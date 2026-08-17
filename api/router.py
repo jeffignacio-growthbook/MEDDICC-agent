@@ -502,32 +502,88 @@ def _summarize_accumulated(data: dict) -> str:
             parts.append(f"{len(rows)} rows from {result.get('table', key)}")
     return "; ".join(parts) if parts else "no data found"
 
-def _extract_rows_from_accumulated(accumulated_data: dict) -> dict:
+def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_extraction", sb=None) -> dict:
     """
-    Extract rows from accumulated_data for entity context.
+    Extract rows from accumulated_data for entity context or synthesis.
 
-    accumulated_data has shape: {"step_0": {...}, "step_1": {...}}
-    Each step contains: {"rows": [...], "table": "...", "error": ...}
+    Args:
+        accumulated_data: {"step_0": {...}, "step_1": {...}}
+        mode: "entity_extraction" or "synthesis"
+        sb: Supabase client (required for entity_extraction mode)
 
     Returns dict with "rows" key for extract_entity_context().
+
+    Modes:
+    - "entity_extraction": Prefer steps with entity ID columns (from entity_registry)
+    - "synthesis": Return last step with data (for aggregates/rollups)
     """
-    logger.info(f"[EXTRACT] accumulated_data keys={list(accumulated_data.keys())}")
+    logger.info(f"[EXTRACT] mode={mode}, accumulated_data keys={list(accumulated_data.keys())}")
 
     if not accumulated_data:
         logger.info(f"[EXTRACT] empty accumulated_data, returning empty dict")
         return {}
 
-    # Iterate through steps in reverse order (most recent first)
+    if mode == "synthesis":
+        # Synthesis mode: return last step with data (current behavior)
+        step_keys = sorted(accumulated_data.keys(), reverse=True)
+        for step_key in step_keys:
+            step_data = accumulated_data.get(step_key, {})
+            rows = step_data.get("rows", [])
+            if rows:
+                logger.info(f"[EXTRACT] synthesis mode: returning {len(rows)} rows from {step_key}")
+                return {"rows": rows, "table": step_data.get("table", "unknown")}
+        return {}
+
+    # Entity extraction mode: prefer entity-bearing steps
+    # Load entity registry to know which columns are entity IDs
+    entity_id_columns = set()
+    if sb:
+        try:
+            result = sb.table("entity_registry").select("id_column").execute()
+            entity_id_columns = {row["id_column"] for row in result.data}
+            logger.info(f"[EXTRACT] entity ID columns from registry: {entity_id_columns}")
+        except Exception as e:
+            logger.warning(f"[EXTRACT] failed to load entity_registry: {e}")
+
+    # Scan steps in reverse order, looking for entity-bearing rows
     step_keys = sorted(accumulated_data.keys(), reverse=True)
+    entity_bearing_steps = []
+
     for step_key in step_keys:
         step_data = accumulated_data.get(step_key, {})
         rows = step_data.get("rows", [])
-        logger.info(f"[EXTRACT] {step_key}: {len(rows)} rows")
+
+        if not rows:
+            continue
+
+        # Check if rows contain any registered entity ID columns
+        if rows and isinstance(rows, list) and len(rows) > 0:
+            first_row = rows[0]
+            if isinstance(first_row, dict):
+                row_columns = set(first_row.keys())
+                matching_entities = row_columns & entity_id_columns
+
+                if matching_entities:
+                    entity_bearing_steps.append((step_key, step_data, matching_entities))
+                    logger.info(f"[EXTRACT] {step_key}: {len(rows)} rows with entities {matching_entities}")
+                else:
+                    logger.info(f"[EXTRACT] {step_key}: {len(rows)} rows, no entity columns")
+
+    # Return most recent entity-bearing step
+    if entity_bearing_steps:
+        step_key, step_data, entities = entity_bearing_steps[0]  # Already sorted reverse
+        rows = step_data.get("rows", [])
+        logger.info(f"[EXTRACT] returning {len(rows)} rows from {step_key} (has entities: {entities})")
+        return {"rows": rows, "table": step_data.get("table", "unknown")}
+
+    # Fallback: no entity-bearing steps found, return last step with data
+    for step_key in step_keys:
+        step_data = accumulated_data.get(step_key, {})
+        rows = step_data.get("rows", [])
         if rows:
-            logger.info(f"[EXTRACT] returning {len(rows)} rows from {step_key}")
+            logger.info(f"[EXTRACT] fallback: returning {len(rows)} rows from {step_key} (no entities found)")
             return {"rows": rows, "table": step_data.get("table", "unknown")}
 
-    # No rows found - return empty dict
     logger.info(f"[EXTRACT] no rows found in any step, returning empty dict")
     return {}
 
@@ -593,7 +649,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             partial = _summarize_accumulated(accumulated_data)
             logger.info(f"[LOOP] declining iteration {iteration} - would exceed budget "
                        f"(used={tokens_used}, projected={projected_total}, budget={TOKEN_BUDGET})")
-            tool_results = _extract_rows_from_accumulated(accumulated_data)
+            tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
             answer = (f"Hit query budget with partial data: {partial}. "
                      f"Try a more specific question.")
             return {"answer": answer, "tool_results": tool_results}
@@ -611,7 +667,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             partial = _summarize_accumulated(accumulated_data)
             logger.info(f"[LOOP] fallback to unanswerable after "
                         f"{iteration+1} iterations, tokens={tokens_used}")
-            tool_results = _extract_rows_from_accumulated(accumulated_data)
+            tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
             answer = (f"Hit query budget with partial data: {partial}. "
                      f"Try a more specific question.")
             return {"answer": answer, "tool_results": tool_results}
@@ -639,7 +695,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 # Treat as direct prose answer
                 logger.info(f"[LOOP iter={iteration}] prose answer detected")
                 # Extract rows from accumulated data for entity context
-                tool_results = _extract_rows_from_accumulated(accumulated_data)
+                tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
                 return {"answer": stripped, "tool_results": tool_results}
             # Otherwise log parse failure as before
             logger.info(f"[LOOP] JSON parse failed, raw={raw[:300]}")
@@ -666,7 +722,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 pass
             # Extract rows from accumulated data for entity context
             logger.info(f"[ANSWER] extracting entity context from accumulated_data with keys: {list(accumulated_data.keys())}")
-            tool_results = _extract_rows_from_accumulated(accumulated_data)
+            tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
             logger.info(f"[ANSWER] extracted tool_results with {len(tool_results.get('rows',[]))} rows")
             return {"answer": parsed["answer"], "tool_results": tool_results}
 
@@ -725,7 +781,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         }.get(tool_name)
 
         if not tool_fn:
-            tool_results = _extract_rows_from_accumulated(accumulated_data)
+            tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
             answer = (f"I tried to use an unknown tool ({tool_name}). "
                      f"I can't answer this question with available data.")
             return {"answer": answer, "tool_results": tool_results}
@@ -757,7 +813,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
     logger.info(f"[LOOP] fallback to unanswerable after "
                 f"{MAX_ITERATIONS} iterations, tokens={tokens_used}")
-    tool_results = _extract_rows_from_accumulated(accumulated_data)
+    tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
     answer = ("I couldn't fully answer this question within the allowed steps. "
              "The data exists but requires a more complex analysis. "
              "Try breaking it into simpler questions.")
