@@ -55,6 +55,10 @@ HANDLER_DESCRIPTIONS = {
     "generate_win_loss": "full narrative for a specific closed deal (slow)",
     "query_competitive_intel": "competitive intelligence: which companies mentioned DIY/build-it-themselves, named competitors showing up in calls, build-vs-buy signals, what alternatives prospects are evaluating",
     "set_target": "admin: set quota or target (requires auth)",
+    "query_rubric_scores_bulk": "MEDDICC component scores for a known set of deals",
+    "query_deal_stages_bulk": "current stage for a known set of deals",
+    "query_deal_owners_bulk": "owner/rep for a known set of deals",
+    "query_deal_values_bulk": "ARR/deal value for a known set of deals",
     "dynamic_query": "question requires combining data from multiple tables or filters not covered by the precomputed handlers above. Use when no other handler fits but the data likely exists in Supabase.",
     "unanswerable": "question cannot be answered with available data",
 }
@@ -140,10 +144,15 @@ def classify_entity_scope_handler(question: str, entity_context: str, client) ->
     logger = logging.getLogger(__name__)
 
     # Build handler summary for entity-scope bulk handlers only
-    bulk_handlers_text = "\n".join([
-        f"  {name:25s} - {HANDLER_DESCRIPTIONS[name]}"
-        for name in ENTITY_SCOPE_BULK_HANDLERS
-    ])
+    bulk_handlers_lines = []
+    for name in ENTITY_SCOPE_BULK_HANDLERS:
+        desc = HANDLER_DESCRIPTIONS.get(name)
+        if not desc:
+            logger.warning(f"[CLASSIFIER] no description for handler {name} — omitting from classifier prompt")
+            continue
+        bulk_handlers_lines.append(f"  {name:25s} - {desc}")
+
+    bulk_handlers_text = "\n".join(bulk_handlers_lines)
 
     prompt = f"""You have prior context about specific deals from a previous answer.
 The user is asking a follow-up question about those deals.
