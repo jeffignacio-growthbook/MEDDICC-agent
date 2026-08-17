@@ -17,15 +17,137 @@ from supabase_client import select_all
 
 async def query_waterfall(params: dict, sb) -> dict:
     """
-    Week-over-week pipeline movement from waterfall_weekly table.
-    Returns new pipeline, won, lost, net change for the time window.
+    Pipeline snapshot + movement in ONE handler with question-aware emphasis.
 
-    G.7: Now includes cache_payload with deal-level rows so follow-ups
-    can work despite the shown answer being an aggregate with no deal_ids.
+    Returns both:
+    - pipeline_summary: current state (total, by-stage, needs-attention)
+    - waterfall: weekly movement (new/won/lost)
+
+    Synthesis adapts based on question framing:
+    - "show me pipeline" → lead with snapshot
+    - "how did pipeline change" → lead with movement
+
+    G.7: Includes cache_payload with deal-level rows for follow-ups.
     """
-    tw = params["time_window"]
+    import yaml
+    from pathlib import Path
 
-    # Weekly rollups for synthesis/display
+    tw = params["time_window"]
+    question = params.get("question", "").lower()
+
+    # Load stage config from client.yaml
+    config_path = Path(__file__).parent.parent / "config" / "client.yaml"
+    config = yaml.safe_load(open(config_path))
+
+    # Build stage lookup: {stage_id: {name, order, exclude_from_analysis}}
+    stage_lookup = {}
+    excluded_stage_ids = set()
+
+    for pipeline in config["pipeline"]["pipelines"]:
+        if pipeline.get("analyze") is False:
+            continue  # Skip renewal pipelines
+        for stage in pipeline["stages"]:
+            stage_id = stage["id"]
+            stage_lookup[stage_id] = {
+                "name": stage["name"],
+                "order": stage["order"],
+                "exclude_from_analysis": stage.get("exclude_from_analysis", False)
+            }
+            if stage.get("exclude_from_analysis"):
+                excluded_stage_ids.add(stage_id)
+
+    # === PIPELINE SUMMARY: Current state ===
+    # Query active deals
+    active_deals = select_all(sb, "deals",
+        columns="deal_id,company_name,arr_usd,stage,deal_status",
+        filters=[("eq", "deal_status", "active")])
+
+    # Filter out excluded stages
+    included_deals = [d for d in active_deals
+                      if d.get("stage") not in excluded_stage_ids]
+
+    # Total open pipeline
+    total_open_arr = sum(d.get("arr_usd") or 0 for d in included_deals)
+    total_open_count = len(included_deals)
+
+    # By-stage breakdown
+    from collections import defaultdict
+    stage_stats = defaultdict(lambda: {"count": 0, "arr": 0})
+
+    for d in included_deals:
+        stage_id = d.get("stage")
+        if stage_id in stage_lookup:
+            stage_stats[stage_id]["count"] += 1
+            stage_stats[stage_id]["arr"] += d.get("arr_usd") or 0
+
+    # Sort by stage order
+    by_stage = []
+    for stage_id in sorted(stage_stats.keys(),
+                          key=lambda sid: stage_lookup.get(sid, {}).get("order", 999)):
+        stage_info = stage_lookup.get(stage_id, {})
+        stats = stage_stats[stage_id]
+        by_stage.append({
+            "stage_name": stage_info.get("name", stage_id),
+            "count": stats["count"],
+            "arr": stats["arr"]
+        })
+
+    # Needs attention: deals with no ARR
+    no_arr_deals = [d for d in included_deals if not d.get("arr_usd")]
+    no_arr_count = len(no_arr_deals)
+    no_arr_list = [d["company_name"] for d in no_arr_deals[:5]]
+
+    # Needs attention: at-risk deals (reuse query_deals_at_risk threshold)
+    # Threshold: overall_score < 40 or champion_score < 4
+    analyses = select_all(sb, "analyses",
+        columns="deal_id,company_name,overall_score,"
+                "champion_score,analyzed_at",
+        filters=[])
+
+    # Deduplicate: keep most recent analysis per deal_id
+    latest_analyses = {}
+    for a in analyses:
+        deal_id = a["deal_id"]
+        analyzed_at = a.get("analyzed_at", "")
+        if deal_id not in latest_analyses or analyzed_at > latest_analyses[deal_id].get("analyzed_at", ""):
+            latest_analyses[deal_id] = a
+
+    # Build active deal_id set for filtering
+    active_deal_ids = {d["deal_id"] for d in included_deals}
+
+    at_risk_deals = []
+    for a in latest_analyses.values():
+        if a["deal_id"] not in active_deal_ids:
+            continue  # Only active deals
+        score = a.get("overall_score", 0) or 0
+        champ = a.get("champion_score", 0) or 0
+        if score < 40 or champ < 4:
+            risk_reason = []
+            if score < 40:
+                risk_reason.append(f"low MEDDICC ({score})")
+            if champ < 4:
+                risk_reason.append(f"champion gap ({champ})")
+            at_risk_deals.append({
+                "company": a["company_name"],
+                "risk": " + ".join(risk_reason)
+            })
+
+    at_risk_count = len(at_risk_deals)
+    at_risk_list = at_risk_deals[:5]
+
+    pipeline_summary = {
+        "total_open_arr": total_open_arr,
+        "total_open_count": total_open_count,
+        "by_stage": by_stage,
+        "needs_attention": {
+            "no_arr_count": no_arr_count,
+            "no_arr_deals": no_arr_list,
+            "at_risk_count": at_risk_count,
+            "at_risk_deals": at_risk_list
+        }
+    }
+
+    # === WATERFALL: Weekly movement (unchanged) ===
     weekly = select_all(sb, "waterfall_weekly",
         columns="week_ending,pipeline_id,new_pipeline_value,"
                 "won_value,lost_value,net_change,"
@@ -34,17 +156,44 @@ async def query_waterfall(params: dict, sb) -> dict:
         filters=[("gte", "week_ending", tw["start"]),
                  ("lte", "week_ending", tw["end"])])
 
-    # Deal-level rows that feed the rollup — retained for follow-ups
+    # Deal-level rows for follow-ups (cache_payload)
     deals = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,arr_usd,"
                 "stage,close_date,owner_email,segment,deal_status",
         filters=[("gte", "close_date", tw["start"]),
                  ("lte", "close_date", tw["end"])])
 
+    # === SYNTHESIS HINT: Question-aware emphasis ===
+    # Detect question framing to guide synthesis emphasis
+    # Use more specific patterns to avoid overlap
+    movement_keywords = ["change", "moved", "movement", "trend",
+                        "how did", "what happened", "new pipeline",
+                        "won this", "lost this"]
+    snapshot_keywords = ["current", "open", "show me", "what's in",
+                        "what deals", "snapshot", "how much"]
+
+    is_movement_question = any(kw in question for kw in movement_keywords)
+    is_snapshot_question = any(kw in question for kw in snapshot_keywords)
+
+    # Prioritize movement if both match (e.g., "how did pipeline change")
+    if is_movement_question:
+        synthesis_hint = ("This question asks about pipeline MOVEMENT/CHANGE. "
+                         "Lead with waterfall analysis (new/won/lost), treat "
+                         "pipeline_summary as supporting context.")
+    elif is_snapshot_question:
+        synthesis_hint = ("This question asks about CURRENT/OPEN pipeline. "
+                         "Lead with pipeline_summary (total → by-stage → needs-attention), "
+                         "treat waterfall as a brief closing footnote.")
+    else:
+        synthesis_hint = ("Balance pipeline_summary and waterfall based on "
+                         "what seems most relevant to the question.")
+
     return {
-        "waterfall": weekly,          # Shown / synthesized
-        "period":    tw["label"],     # Shown / synthesized
-        "cache_payload": {            # Retained, NOT shown
+        "pipeline_summary": pipeline_summary,  # Current state
+        "waterfall": weekly,                   # Movement
+        "period": tw["label"],
+        "synthesis_hint": synthesis_hint,      # Question-aware guidance
+        "cache_payload": {                     # Retained, NOT shown
             "deals": deals
         }
     }
