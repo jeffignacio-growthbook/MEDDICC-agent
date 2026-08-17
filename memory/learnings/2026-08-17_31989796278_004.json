@@ -1,0 +1,21 @@
+{
+  "company": "InPost",
+  "deal_id": "60069831015",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward Consistency: Decision_Criteria scored 8/10 but the analysis states 'No new information in this call contradicts prior evidence' and 'Reinforced mobile-focused A/B testing requirements' \u2014 this is carry-forward maintenance, not new evidence. The recent call summary must be checked for actual new information. The call summary provided does mention 'attribute-based targeting' and 'Postgres and Databricks' integration which align with prior state, but the analysis should explicitly confirm whether the recent call added any new decision criteria or merely reinforced existing ones. The phrasing 'Reinforced mobile-focused A/B testing requirements, warehouse integration needs, and attribute-based targeting' suggests these may be new mentions in the recent call (attribute-based targeting preventing overlap was discussed), but the analysis does not clearly delineate what is new vs. carried forward.\n\nCRITERION 4 VIOLATION - Actionable Next Steps for Decision_Process (4/10): Next step reads 'Let's map out the decision process from POC to signed contract' \u2014 this uses 'map out' which is vague. The next step should ask a specific concrete question like 'What is your formal approval gate process after POC completion, who signs off at each stage, and what is the specific timeline for each milestone?' instead of the general 'Let's map out' language.\n\nCRITERION 4 VIOLATION - Actionable Next Steps for Identified_Pain (4/10): Next step asks 'What specific Firebase limitations are blocking features' but does not reference a specific contact name or '[contact TBD]' placeholder. The analysis states 'No contacts currently associated in HubSpot' and 'Ask the primary contact' but never identifies who that contact is. This violates the requirement that every next step include a contact name or explicit '[contact TBD]' placeholder.\n\nCRITERION 4 VIOLATION - Actionable Next Steps for Champion (2/10): Next step says 'Identify primary contact by name and title, then ask' \u2014 but 'identify' is a precondition, not an actionable next step with a contact. The next step should either use '[contact TBD]: Confirm your role and internal selling capability in next call' or name a specific person. As written, this conflates identification with the next step itself.\n\nCRITERION 5 VIOLATION - ICP Fit: The analysis claims 'technical fit is strong' in Overall Deal Health, but provides no ICP assessment. The call summary does not reveal company size, data infrastructure scale, or modern data stack maturity. No scale signals (100K+ users, warehouse presence, product-led growth, stated experimentation priority) are explicitly present in the materials provided. This should either be flagged as unknown ICP fit or explicitly confirmed against GrowthBook ICP criteria (modern data stack, scale, experimentation priority).",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-17_31989796278_004",
+  "timestamp": "2026-08-17T03:09:15.589296"
+}

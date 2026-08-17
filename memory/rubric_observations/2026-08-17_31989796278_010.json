@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-17_31989796278_010",
+  "timestamp": "2026-08-17T03:17:27.623983",
+  "company": "Zalando",
+  "criterion_fired": "CRITERION 1 - EVIDENCE QUALITY FAILURE; CRITERION 4 - NEXT STEPS DEFICIENCY",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 1 should explicitly state: 'Scores 5/10+ require direct prospect quote or quantified outcome from call transcript; summaries alone are insufficient.' Criterion 4 should require: 'Next steps must name a contact (or state how to identify them) and include a specific question with concrete outcome (e.g., decision deadline, stakeholder role, must-have criteria)\u2014vague discovery language rejected.'"
+}

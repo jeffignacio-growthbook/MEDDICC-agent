@@ -1,0 +1,21 @@
+{
+  "company": "Oda",
+  "deal_id": "11024003429",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward consistency failure: Champion and Competition components regressed from their historical 'unknown' status without documenting a reason. The analysis states 'maintained at 1/10 \u2014 no new information in this call' for both components, which is correct carry-forward logic, but this creates a consistency problem: the cumulative state shows calls_reviewed = 2, meaning these are NOT first-call exceptions. However, the analysis does not explicitly acknowledge or justify why Champion and Competition remain Unknown after 2 calls. CRITERION 4 VIOLATION - Actionable next steps for Champion component use vague language: 'You've been deeply involved in our conversations. Are you building an internal business case for GrowthBook? If so, what information would help you get buy-in from the CTO and other stakeholders?' This is framed as a question rather than a concrete action. Should be: '[contact TBD or name of most engaged technical lead]: Request in next call: \"Are you building an internal business case for GrowthBook? Confirm what documentation (ROI model, customer references, technical specs) we should provide to support your internal advocacy.\"' CRITERION 3 VIOLATION - Evidence quality for Identified Pain: The analysis claims 'Recent call mentions desire to accelerate experimentation cycles' but the call summary does not explicitly state this as Oda's articulated pain. The call summary says 'plan to leverage new features from Growth Book to accelerate experimentation cycles' - this is future-focused positioning, not a stated pain. Score of 3/10 is appropriate, but evidence should acknowledge this is inferred from context, not explicitly stated. CRITERION 5 VIOLATION - Unsupported claim on customer status: The analysis states 'Recent call mentions use of Growth Book for running approximately 50 active experiments since 2021' and questions whether they are existing customer or new buyer. This fundamental ambiguity should have triggered immediate clarification as a BLOCKER, which it does in next steps. However, the Competition section stating '[they are] already using GrowthBook (unclear if this is trial, POC, or existing deployment)' contradicts the decision-stage context that positions this as a new $50K deal. If they were already a customer, this would be a renewal/expansion context, not a new deal. This must be resolved before any further analysis. CRITERION 1 VIOLATION - Incomplete evidence linkage: The ICP Fit Assessment flags 'Monthly visitor volume: 100K+ threshold not confirmed' but the analysis never explicitly states whether this is a DISQUALIFIER or merely an unknown. The rubric requires explicit ICP pass/fail determination, not 'Needs Validation' status. Current state leaves ICP fit ambiguous.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-17_31989796278_001",
+  "timestamp": "2026-08-17T03:05:46.386867"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-17_31989796278_008",
+  "timestamp": "2026-08-17T03:13:03.742776",
+  "company": "KBX",
+  "criterion_fired": "Criterion 1 (Evidence Quality), Criterion 4 (Next Steps Specificity), Criterion 5 (ICP Consistency)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 1: 'Evidence must include direct call quote or specific detail (e.g., vendor name, dollar amount, timeline); generic summaries score max 5/10.' Criterion 4: 'Next steps must specify [Contact Name], [Action], [Deadline]; vague exploratory questions alone do not qualify.' Criterion 5: 'If explicit ICP disqualifier identified, component scores in that domain must be recalibrated downward or disqualifier must be explicitly refuted with new evidence.'"
+}

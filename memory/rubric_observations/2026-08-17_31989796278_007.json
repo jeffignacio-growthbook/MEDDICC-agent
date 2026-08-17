@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-17_31989796278_007",
+  "timestamp": "2026-08-17T03:11:30.291582",
+  "company": "Notion",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 4 (Actionable Next Steps), Criterion 5 (Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Add to Criterion 2: 'If cumulative score is maintained due to corrupted new data, explicitly state: \"Score maintained from [previous calls] - Call N data unusable.\" Do not reference the corrupted call as evidence.' Add to Criterion 4: 'Each action item under 7/10 must include [specific contact name or role], specific verb (Ask/Confirm/Email), deadline, and exact question structure. Vague verbs like establish/schedule without question content score as incomplete.' Add to Criterion 5: 'Claims citing corrupted call data are unsupported. Separate cumulative validation (prior calls) from current validation (this call only).'"
+}

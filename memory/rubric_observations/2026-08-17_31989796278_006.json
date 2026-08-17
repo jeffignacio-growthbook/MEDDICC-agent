@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-17_31989796278_006",
+  "timestamp": "2026-08-17T03:09:15.589720",
+  "company": "InPost",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 4 (Actionable Next Steps), Criterion 5 (ICP Fit)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 should require explicit tagging of 'NEW' vs. 'REINFORCED' for each decision criterion. Criterion 4 should mandate '[contact TBD]' or named contact in every next step, and prohibit vague verbs like 'map out'. Criterion 5 should state: 'Flag ICP fit as UNKNOWN if company size, data infrastructure scale, or experimentation maturity are unstated; do not default to strong fit.'"
+}

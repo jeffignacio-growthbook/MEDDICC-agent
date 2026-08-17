@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-17_31989796278_009",
+  "timestamp": "2026-08-17T03:15:15.204213",
+  "company": "TickPick",
+  "criterion_fired": "CRITERION 4 (Actionable Next Steps) and CRITERION 5 (No Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 should explicitly require format: '[Contact Name]: [Specific action verb: Ask/Confirm/Request] on [timeframe]: \"[Exact question without hedging]\"' and list forbidden vague verbs (Map, Walk through, Test, Understand, Propose). Criterion 5 should clarify that evidence statements must be extractable from call transcript, not inferred from deal context or previous stages."
+}

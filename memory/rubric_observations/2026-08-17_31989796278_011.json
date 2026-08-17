@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-17_31989796278_011",
+  "timestamp": "2026-08-17T03:18:21.228564",
+  "company": "Skyscanner",
+  "criterion_fired": "Criterion 2 and Criterion 5 (conflicting standards)",
+  "was_appropriate": false,
+  "suggested_change": "Standardize regression handling: either require explicit justification for all status downgrades (Criterion 2 style) OR accept inferred status from timeline/process statements (Criterion 5 style). Currently mixing both creates false failures."
+}

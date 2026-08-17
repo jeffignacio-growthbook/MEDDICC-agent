@@ -1,0 +1,21 @@
+{
+  "company": "Rula",
+  "deal_id": "63578787480",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Decision Process: Score increased from 8/10 to 9/10 with evidence \"Aiming for adoption decisions within weeks\" and \"Immediate next steps involve pricing discussions and expanding user access.\" However, \"expanding user access\" is a buyer action, not evidence of decision process advancement. The recent call summary does not explicitly state \"adoption decisions within weeks\" \u2014 this phrase appears only in the analysis narrative, not in the provided call summary. Cannot verify this quote against source material. CRITERION 2 VIOLATION - Decision Process score increased without documented justification. If new information supports the increase, it must be explicitly quoted from the recent call summary. The call summary mentions \"aiming for adoption decisions within weeks\" is not present in the provided source material. CRITERION 4 FAILURE - Champion next step uses vague language: 'Ask Pallabi: \"Who on your team is most excited about GrowthBook...\"' This is acceptable contact identification, but the action itself (\"Ask\") is too vague. Should specify: \"Schedule 15-minute call with Pallabi to identify internal champion by [date] and ask: 'Who is most excited about GrowthBook and willing to build the internal business case? Can they introduce us to [Economic Buyer]?'\" CRITERION 5 FAILURE - Decision Process claims \"adoption decisions within weeks\" appears in recent call summary but is not present in the provided source material. The source only states the team \"aiming for adoption decisions within weeks\" which is a target, not confirmation. Analysis conflates aspiration with confirmation. Metrics, Economic Buyer, Champion, and Competition assessments are acceptable; Decision Criteria and Identified Pain are acceptable.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-17_31989796278_003",
+  "timestamp": "2026-08-17T03:08:20.369732"
+}

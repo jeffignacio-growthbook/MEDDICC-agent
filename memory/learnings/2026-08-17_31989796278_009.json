@@ -1,0 +1,21 @@
+{
+  "company": "Livesport",
+  "deal_id": "62160567676",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "FAIL - Criterion 2 (Carry-forward consistency): Metrics score increased from 7/10 to 8/10 with justification, but this violates carry-forward rules. The new evidence (\u20ac60K current spend, \u20ac500K Optimizely cost) was available in Call 1 context but not explicitly stated there. The upgrade is based on 'new numerical specificity' from Call 2, but Call 1 already mentioned 'Engineering overhead and costs reduction, faster app experimentation cycles' \u2014 the financial quantification doesn't constitute new pain discovery, only detail. Score should remain 7/10 with note: 'Call 2 provides numerical detail (\u20ac60K/\u20ac500K) supporting previously identified cost pain; no new pain categories identified - maintaining 7/10.' | FAIL - Criterion 4 (Actionable next steps): Multiple next steps violate the vague verb rule. Example: Decision Criteria next step asks 'Are you scoring vendors on the same criteria, or are those tools being evaluated for different use cases' \u2014 this is an exploratory/discuss question, not a concrete action. Rewrite as: '[Procurement contact TBD]: On Tuesday, ask: \"Are Airship and Extreme Push being evaluated to replace GrowthBook for mobile push, or are you looking for one platform to handle both push notifications AND A/B testing? We need to confirm if our experimentation capabilities address your actual RFP requirements.\"' | FAIL - Criterion 5 (No unsupported claims): Decision Process rated 6/10 with 'Timeline and key milestones identified' \u2014 but timeline contains a critical contradiction that undermines confidence. The analysis notes 'Target signing: January 1st (NOTE: This conflicts with close date of Oct 2026 in HubSpot)' but doesn't resolve this or flag it as requiring clarification before scoring. A conflicting timeline should lower the score or explicitly state which is correct. Revise to 4/10 or clarify the contradiction as a next step. | PASS - Criterion 1: All components have status, score, and evidence. | PASS - Criterion 3: Evidence quality is strong; Optimizely competitor is in GrowthBook's competitive set; metrics are prospect-originated (\u20ac60K spend, \u20ac500K cost). | ACCEPT - Criterion 5 ICP fit: Company has scale signals (100M impressions), modern data stack indicators (Firebase, data analytics), and experimentation is stated priority \u2014 passes ICP check despite Airship/Extreme Push use-case risk.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-17_31989796278_009",
+  "timestamp": "2026-08-17T03:21:38.873003"
+}

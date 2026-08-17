@@ -1,0 +1,21 @@
+{
+  "company": "BESTSELLER",
+  "deal_id": "61475205473",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward inconsistency on Competition component. Cumulative state shows score 4/10 with evidence 'Transitioning from Salesforce Commerce Cloud to Shopify and Sanity; evaluating Growth Book for testing capabilities'. Analysis regressed Competition to 3/10 without documented reason explaining the score decrease. The evidence presented does not justify a regression from 4 to 3. Either maintain 4/10 with explicit note 'No new competitive information in Call 2 - maintaining previous score of 4/10' OR document what new information caused the downward revision. CRITERION 4 VIOLATION - Champion component (1/10, Unknown status) lacks actionable next step with specific contact and concrete question. Current next step 'On next call, ask: Who internally owns the success...' uses '[contact TBD]' implicitly but fails to name a specific contact or date. Rewrite as: '[contact TBD]: By [specific date], confirm the name and title of the internal owner driving this experimentation initiative, and ask: \"What internal obstacles are you navigating to get budget approval?\"' CRITERION 3 VIOLATION - Metrics evidence on Call 2 states 'Discussed integration architecture but no new quantifiable business outcomes mentioned' - this is absence of evidence, correctly scored at 5/10. However, the next step asks for 'specific target' and '5x more experiments' as examples, which are seller-proposed metrics, not prospect-originated. Rephrase next step to ask prospect for their own success metrics: 'What would success look like for your brands\u2014how many experiments per quarter today, and what's your 12-month goal?'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-17_31989796278_002",
+  "timestamp": "2026-08-17T03:05:40.183270"
+}

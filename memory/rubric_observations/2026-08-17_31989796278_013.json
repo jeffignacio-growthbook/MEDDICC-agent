@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-17_31989796278_013",
+  "timestamp": "2026-08-17T03:26:20.363602",
+  "company": "Route",
+  "criterion_fired": "CRITERION 2 (Metrics), CRITERION 3 (Decision Process), CRITERION 4 (Champion)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'When carry-forwarding scores between calls, explicitly document whether new evidence justifies a change or if score remains stable. Score increases require citation of novel information from the current call. Next steps must use direct imperatives (e.g., \"Request that X build Y\") rather than questions or conditional phrasing (e.g., \"Would you be willing to...\"). Quantifiable asks must include specific metrics targets (e.g., \"A/B tests per month\") rather than open-ended questions.'"
+}

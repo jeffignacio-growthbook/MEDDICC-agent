@@ -1,0 +1,21 @@
+{
+  "company": "Notion",
+  "deal_id": "60257621387",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward Consistency: Metrics score decreased from 3/10 (cumulative state) to 2/10 (current analysis) without documented reason or new contradictory evidence from the call. The analysis states 'Call 4 data was corrupted; all scores and evidence maintained from calls 1-3' yet the score was changed. Either maintain the 3/10 score with explicit note of no new information, or provide specific evidence from the call that justifies the regression. CRITERION 4 VIOLATION - Actionable Next Steps: Multiple components below 7/10 have vague action verbs. Examples: (1) Metrics: 'Schedule call by end of week to establish quantifiable success criteria' - uses vague 'establish' without specific question structure. Should be: 'Ask [contact TBD] in next call: \"If this POC succeeds, how many more experiments per quarter would you run? What's the engineering time savings target?\"' (2) Identified Pain: 'Schedule 20-minute discovery call this week to ask' - vague framing. Should be: '[contact TBD]: Ask directly in next call: \"What's the revenue or efficiency impact if you don't implement this experimentation platform by Q4?\"' (3) Competition: 'Ask POC lead in next Slack message: \"What are you using for experimentation and feature flags today?\"' - acceptable question but missing 'Email POC lead by end of week asking' is weak. Make it: '[contact TBD]: Confirm in Slack by Thursday: \"Are you currently using Statsig, LaunchDarkly, or another vendor for experimentation?\"' CRITERION 5 VIOLATION - Unsupported Claims: The analysis claims 'Snowflake confirmed (positive signal)' in ICP assessment but the recent call summary provided shows '[Summary failed]' with Mattel Barbie content that has nothing to do with Notion. The analysis is maintaining Snowflake from cumulative state but applying it as current confirmation without noting the corrupted call 4 data. This overstates the current validation. ADDITIONAL: The recent call summary is corrupted/mislabeled (references Mattel Barbie, Seattle hub) and is completely unrelated to Notion. The analysis correctly notes corruption but then cites 'no new information in this call' - however, a corrupted call should be explicitly flagged in the required_changes as unusable for validation purposes. The analysis should not reference call 4 evidence at all if it's corrupted.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-17_31989796278_005",
+  "timestamp": "2026-08-17T03:11:30.290656"
+}

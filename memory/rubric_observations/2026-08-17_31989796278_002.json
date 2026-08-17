@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-17_31989796278_002",
+  "timestamp": "2026-08-17T03:05:40.183677",
+  "company": "BESTSELLER",
+  "criterion_fired": "CRITERION 2 (Competition carry-forward), CRITERION 4 (Champion actionability), CRITERION 3 (Metrics origin)",
+  "was_appropriate": true,
+  "suggested_change": "All three criteria are appropriate. Suggest adding to CLAUDE.md: (1) explicit rule: 'If a component score does not change between calls, state explicitly: \"No new information\u2014maintaining [X]/10\"'; (2) Champion next-steps template requiring [contact name] and [target date], not placeholders; (3) Metrics framing rule: 'Always ask prospect for their own success definition first; only use seller examples if prospect offers none.'"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-17_31989796278_005",
+  "timestamp": "2026-08-17T03:08:20.370191",
+  "company": "Rula",
+  "criterion_fired": "Criterion 5 (Decision Process)",
+  "was_appropriate": true,
+  "suggested_change": "Decision Process evidence must be directly quoted from the recent call summary, not inferred from analysis narrative. Distinguish between stated goals ('aiming for') and confirmed outcomes ('will'). Vague next steps like 'Ask' must include date, duration, and specific qualifier (e.g., 'Schedule 15-min call by [date] to identify champion')."
+}

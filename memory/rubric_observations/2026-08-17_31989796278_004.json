@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-17_31989796278_004",
+  "timestamp": "2026-08-17T03:07:57.221322",
+  "company": "Deel",
+  "criterion_fired": "Criterion 2 & 3 (conflicting)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should read: 'Competition score must either be maintained from prior state with explicit note 'No new data this call' OR show regression with specific evidence from THIS call justifying the change.' Criterion 3 should clarify: 'Evidence must match the scope of available data in THIS call only; do not reference cumulative claims unless they are explicitly cited in the current analysis output.'"
+}

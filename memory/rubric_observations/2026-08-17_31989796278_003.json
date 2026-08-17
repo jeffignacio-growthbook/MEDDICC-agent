@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-17_31989796278_003",
+  "timestamp": "2026-08-17T03:05:46.387312",
+  "company": "Oda",
+  "criterion_fired": "Criterion 1, 2, 3, 4, 5 (multiple)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Clarify whether ICP Fit requires binary pass/fail or allows 'Needs Validation' status with explicit blockers. Criterion 2: Define acceptable carry-forward thresholds (how many consecutive unknown calls before escalation required?). Criterion 5: Establish explicit precedence\u2014if customer status is ambiguous, require blockers before scoring Competition/Champion; do not penalize for unresolved data conflicts in subsequent scoring."
+}
