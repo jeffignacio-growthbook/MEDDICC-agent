@@ -12,11 +12,14 @@ Tests five handlers with mocked Supabase responses:
 
 import sys
 import asyncio
+from pathlib import Path
 from datetime import date, timedelta
 from unittest.mock import patch, MagicMock
 
-sys.path.insert(0, '/Users/jeffignacio/MEDDICC-agent/api')
-sys.path.insert(0, '/Users/jeffignacio/MEDDICC-agent/scripts')
+# Add api/ to path so handlers imports correctly
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "api"))
+# Add scripts/ to path for supabase_client and sdr_utils
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from handlers import (
     query_rep_pipeline,

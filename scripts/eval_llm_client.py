@@ -42,12 +42,12 @@ def make_openai_response(text="test response",
 
 def test_anthropic_complete_returns_llm_response():
     mock_sdk_resp = make_anthropic_response("hello from claude")
-    with patch("anthropic.Anthropic") as MockAnthropicClass:
-        mock_instance = MockAnthropicClass.return_value
-        mock_instance.messages.create.return_value = mock_sdk_resp
+    mock_instance = MagicMock()
+    mock_instance.messages.create.return_value = mock_sdk_resp
+
+    with patch.object(LLMClient, "_init_sdk", return_value=mock_instance):
         client = LLMClient(model="claude-haiku-4-5-20251001",
                            provider="anthropic")
-        client._sdk = mock_instance
         response = client.complete(
             messages=[{"role": "user", "content": "hi"}],
             system="You are helpful.",
@@ -64,11 +64,11 @@ def test_anthropic_complete_returns_llm_response():
 
 def test_openai_complete_returns_llm_response():
     mock_sdk_resp = make_openai_response("hello from gpt")
-    with patch("openai.OpenAI") as MockOpenAIClass:
-        mock_instance = MockOpenAIClass.return_value
-        mock_instance.chat.completions.create.return_value = mock_sdk_resp
+    mock_instance = MagicMock()
+    mock_instance.chat.completions.create.return_value = mock_sdk_resp
+
+    with patch.object(LLMClient, "_init_sdk", return_value=mock_instance):
         client = LLMClient(model="gpt-4o", provider="openai")
-        client._sdk = mock_instance
         response = client.complete(
             messages=[{"role": "user", "content": "hi"}],
             system="You are helpful.",
@@ -96,16 +96,18 @@ def test_stop_reason_normalization():
     for provider, raw, expected in cases:
         if provider == "anthropic":
             mock_resp = make_anthropic_response(stop_reason=raw)
-            client = LLMClient(model="claude-haiku-4-5-20251001",
-                               provider="anthropic")
-            with patch.object(client._sdk.messages, "create",
-                              return_value=mock_resp):
+            mock_instance = MagicMock()
+            mock_instance.messages.create.return_value = mock_resp
+            with patch.object(LLMClient, "_init_sdk", return_value=mock_instance):
+                client = LLMClient(model="claude-haiku-4-5-20251001",
+                                   provider="anthropic")
                 resp = client.complete([{"role": "user", "content": "x"}])
         else:
             mock_resp = make_openai_response(finish_reason=raw)
-            client = LLMClient(model="gpt-4o", provider="openai")
-            with patch.object(client._sdk.chat.completions, "create",
-                              return_value=mock_resp):
+            mock_instance = MagicMock()
+            mock_instance.chat.completions.create.return_value = mock_resp
+            with patch.object(LLMClient, "_init_sdk", return_value=mock_instance):
+                client = LLMClient(model="gpt-4o", provider="openai")
                 resp = client.complete([{"role": "user", "content": "x"}])
         assert resp.stop_reason == expected, \
             f"{provider} '{raw}' → expected '{expected}', got '{resp.stop_reason}'"
@@ -115,43 +117,49 @@ def test_stop_reason_normalization():
 def test_system_prompt_anthropic():
     """System passed as top-level kwarg to Anthropic messages.create."""
     mock_resp = make_anthropic_response()
-    client = LLMClient(model="claude-haiku-4-5-20251001", provider="anthropic")
     captured = {}
     def capture_create(**kwargs):
         captured.update(kwargs)
         return mock_resp
-    client._sdk.messages.create = capture_create
-    client.complete(
-        messages=[{"role": "user", "content": "hi"}],
-        system="System prompt here",
-    )
-    assert captured.get("system") == "System prompt here", \
-        "System must be top-level kwarg for Anthropic"
-    assert not any(
-        m.get("role") == "system" for m in captured.get("messages", [])
-    ), "System must NOT be prepended as a message for Anthropic"
+
+    mock_instance = MagicMock()
+    mock_instance.messages.create = capture_create
+    with patch.object(LLMClient, "_init_sdk", return_value=mock_instance):
+        client = LLMClient(model="claude-haiku-4-5-20251001", provider="anthropic")
+        client.complete(
+            messages=[{"role": "user", "content": "hi"}],
+            system="System prompt here",
+        )
+        assert captured.get("system") == "System prompt here", \
+            "System must be top-level kwarg for Anthropic"
+        assert not any(
+            m.get("role") == "system" for m in captured.get("messages", [])
+        ), "System must NOT be prepended as a message for Anthropic"
     print("  ✓ Anthropic: system passed as top-level kwarg")
 
 
 def test_system_prompt_openai():
     """System prepended as first message for OpenAI."""
     mock_resp = make_openai_response()
-    client = LLMClient(model="gpt-4o", provider="openai")
     captured = {}
     def capture_create(**kwargs):
         captured.update(kwargs)
         return mock_resp
-    client._sdk.chat.completions.create = capture_create
-    client.complete(
-        messages=[{"role": "user", "content": "hi"}],
-        system="System prompt here",
-    )
-    msgs = captured.get("messages", [])
-    assert msgs[0]["role"] == "system", \
-        "System must be first message for OpenAI"
-    assert msgs[0]["content"] == "System prompt here"
-    assert "system" not in captured, \
-        "System must NOT be a top-level kwarg for OpenAI"
+
+    mock_instance = MagicMock()
+    mock_instance.chat.completions.create = capture_create
+    with patch.object(LLMClient, "_init_sdk", return_value=mock_instance):
+        client = LLMClient(model="gpt-4o", provider="openai")
+        client.complete(
+            messages=[{"role": "user", "content": "hi"}],
+            system="System prompt here",
+        )
+        msgs = captured.get("messages", [])
+        assert msgs[0]["role"] == "system", \
+            "System must be first message for OpenAI"
+        assert msgs[0]["content"] == "System prompt here"
+        assert "system" not in captured, \
+            "System must NOT be a top-level kwarg for OpenAI"
     print("  ✓ OpenAI: system prepended as first message")
 
 
@@ -196,35 +204,39 @@ def test_content_block_list_normalized_for_openai():
     This is the meddicc_agent multi-turn scenario.
     """
     mock_raw = make_openai_response("response")
-    client = LLMClient(model="gpt-4o", provider="openai")
     captured = {}
     def capture_create(**kwargs):
         captured.update(kwargs)
         return mock_raw
-    client._sdk.chat.completions.create = capture_create
 
-    # Simulate Anthropic content blocks in an assistant message
-    mock_block = MagicMock()
-    mock_block.text = "previous assistant response"
-    anthropic_content = [mock_block]
+    mock_instance = MagicMock()
+    mock_instance.chat.completions.create = capture_create
+    with patch.object(LLMClient, "_init_sdk", return_value=mock_instance):
+        client = LLMClient(model="gpt-4o", provider="openai")
 
-    client.complete(messages=[
-        {"role": "user",      "content": "first question"},
-        {"role": "assistant", "content": anthropic_content},  # blocks!
-        {"role": "user",      "content": "follow-up"},
-    ])
+        # Simulate Anthropic content blocks in an assistant message
+        mock_block = MagicMock()
+        mock_block.text = "previous assistant response"
+        anthropic_content = [mock_block]
 
-    msgs = captured.get("messages", [])
-    assistant_msgs = [m for m in msgs if m["role"] == "assistant"]
-    assert len(assistant_msgs) == 1
-    assert isinstance(assistant_msgs[0]["content"], str), \
-        "Content blocks must be flattened to str for OpenAI"
-    assert assistant_msgs[0]["content"] == "previous assistant response"
+        client.complete(messages=[
+            {"role": "user",      "content": "first question"},
+            {"role": "assistant", "content": anthropic_content},  # blocks!
+            {"role": "user",      "content": "follow-up"},
+        ])
+
+        msgs = captured.get("messages", [])
+        assistant_msgs = [m for m in msgs if m["role"] == "assistant"]
+        assert len(assistant_msgs) == 1
+        assert isinstance(assistant_msgs[0]["content"], str), \
+            "Content blocks must be flattened to str for OpenAI"
+        assert assistant_msgs[0]["content"] == "previous assistant response"
     print("  ✓ OpenAI: Anthropic content blocks flattened to string")
 
 
 def test_fireworks_uses_custom_base_url():
     """Fireworks adapter initializes OpenAI client with Fireworks URL."""
+    # Capture the actual OpenAI() call by patching at import time
     with patch("openai.OpenAI") as MockOpenAI:
         LLMClient(
             model="accounts/fireworks/models/deepseek-v3",
