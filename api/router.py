@@ -95,6 +95,173 @@ def build_entity_hint(entities: dict) -> str:
             f"these specific entities from the prior answer: "
             f"{'; '.join(parts)}")
 
+def get_user_persona(sb, user_id: str) -> dict:
+    """
+    Lookup user persona for voice adaptation.
+
+    Args:
+        sb: Supabase client
+        user_id: Slack user ID
+
+    Returns:
+        Dict with persona, detail_level, wants_context
+        Defaults to operational/standard if not found
+    """
+    if not user_id:
+        return {
+            "persona": "operational",
+            "detail_level": "standard",
+            "wants_context": True
+        }
+
+    try:
+        result = sb.table('user_personas').select('*').eq(
+            'slack_user_id', user_id
+        ).execute()
+
+        if result.data and len(result.data) > 0:
+            row = result.data[0]
+            return {
+                "persona": row.get("persona", "operational"),
+                "detail_level": row.get("preferred_detail_level", "standard"),
+                "wants_context": row.get("wants_metrics_context", True)
+            }
+    except Exception as e:
+        logger.warning(f"[PERSONA] Failed to lookup user {user_id}: {e}")
+
+    # Default fallback
+    return {
+        "persona": "operational",
+        "detail_level": "standard",
+        "wants_context": True
+    }
+
+
+def build_persona_voice_instructions(persona_info: dict) -> str:
+    """
+    Build voice instructions based on user persona.
+
+    Args:
+        persona_info: Dict with persona, detail_level, wants_context
+
+    Returns:
+        Additional voice instructions to prepend to synthesis prompt
+    """
+    persona = persona_info.get("persona", "operational")
+    detail = persona_info.get("detail_level", "standard")
+    wants_context = persona_info.get("wants_context", True)
+
+    voice_map = {
+        "executive": {
+            "brief": (
+                "EXECUTIVE VOICE (brief):\n"
+                "- One number, one risk, one judgment. 3 lines max.\n"
+                "- No stage breakdowns unless critical to the risk.\n"
+                "- Bottom line first: are we on track?\n\n"
+            ),
+            "standard": (
+                "EXECUTIVE VOICE (standard):\n"
+                "- Lead with the headline number and what it means.\n"
+                "- One level of breakdown (by stage OR by risk, not both).\n"
+                "- Close with clear judgment: on track / needs attention / red flag.\n\n"
+            ),
+            "detailed": (
+                "EXECUTIVE VOICE (detailed):\n"
+                "- Headline → breakdown → risk callout → judgment.\n"
+                "- Include stage distribution when relevant to the question.\n"
+                "- Flag specific deals by name when they matter.\n\n"
+            )
+        },
+        "sales_leadership": {
+            "brief": (
+                "SALES LEADERSHIP VOICE (brief):\n"
+                "- The number, the gap to target, next action. 4-5 lines.\n"
+                "- Flag at-risk deals by name.\n\n"
+            ),
+            "standard": (
+                "SALES LEADERSHIP VOICE (standard):\n"
+                "- Current state → target gap → specific risks.\n"
+                "- Name deals and reps when relevant.\n"
+                "- End with one coaching-oriented insight.\n\n"
+            ),
+            "detailed": (
+                "SALES LEADERSHIP VOICE (detailed):\n"
+                "- Full breakdown: by stage, by rep, by risk.\n"
+                "- Call out specific deals with owner and next step.\n"
+                "- Include MEDDICC scores when available.\n\n"
+            )
+        },
+        "operational": {
+            "brief": (
+                "OPERATIONAL VOICE (brief):\n"
+                "- Key metric → comparison (vs target, vs last period).\n"
+                "- Data quality flag if present. 3-4 lines.\n\n"
+            ),
+            "standard": (
+                "OPERATIONAL VOICE (standard):\n"
+                "- Metric → breakdown → trend/comparison.\n"
+                "- Flag data quality issues explicitly.\n"
+                "- Include methodology note when relevant (e.g., 'ARR calculated as...').\n\n"
+            ),
+            "detailed": (
+                "OPERATIONAL VOICE (detailed):\n"
+                "- Full data: totals, breakdowns, trends, data gaps.\n"
+                "- Show calculations and assumptions.\n"
+                "- Include 'how this was computed' for complex metrics.\n\n"
+            )
+        },
+        "ic": {
+            "brief": (
+                "IC VOICE (brief):\n"
+                "- Direct answer to the question. No fluff.\n"
+                "- Specific deals/companies by name. 2-3 lines.\n\n"
+            ),
+            "standard": (
+                "IC VOICE (standard):\n"
+                "- Answer → relevant details → next step.\n"
+                "- Use bullet lists for clarity.\n"
+                "- Focus on actionable info (close dates, next steps, scores).\n\n"
+            ),
+            "detailed": (
+                "IC VOICE (detailed):\n"
+                "- Full context: deals, scores, call highlights, next steps.\n"
+                "- Include MEDDICC component breakdowns.\n"
+                "- Show timeline and stage progression.\n\n"
+            )
+        },
+        "other": {
+            "brief": (
+                "CONCISE VOICE:\n"
+                "- Answer the question directly. 2-3 lines.\n\n"
+            ),
+            "standard": (
+                "STANDARD VOICE:\n"
+                "- Answer → supporting details → insight.\n"
+                "- Use bullet format for clarity.\n\n"
+            ),
+            "detailed": (
+                "DETAILED VOICE:\n"
+                "- Comprehensive answer with full breakdowns.\n"
+                "- Include all relevant context.\n\n"
+            )
+        }
+    }
+
+    # Get voice instructions for this persona and detail level
+    voice_instruction = voice_map.get(persona, voice_map["other"]).get(
+        detail, voice_map["other"]["standard"]
+    )
+
+    # Add context preference
+    if not wants_context:
+        voice_instruction += (
+            "USER PREFERENCE: Skip 'why this matters' framing. "
+            "Just report the numbers.\n\n"
+        )
+
+    return voice_instruction
+
+
 def stated_entity_count(question: str) -> int | None:
     """
     Extract explicit count the user states about a referenced entity set.
@@ -972,13 +1139,14 @@ async def route_question(question: str, user_id: str,
     Robust question routing with inner evaluation loop.
 
     Flow:
+      0. Lookup user persona (voice adaptation)
       1. Classify intent (Haiku, cheap)
       2. Auth check for write commands
       3. Try precomputed handler
       4. Evaluate result quality
       5. Dynamic fallback if needed
       6. Honest "no data" if both fail
-      7. Synthesize answer (Sonnet)
+      7. Synthesize answer (Sonnet, persona-aware)
       8. Verify numbers against tool results (Haiku)
     """
     from datetime import date
@@ -988,6 +1156,9 @@ async def route_question(question: str, user_id: str,
     client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
     today  = date.today().isoformat()
     cq     = current_quarter_label()
+
+    # ── 0. Persona lookup for voice adaptation ──────────
+    persona_info = get_user_persona(sb, user_id)
 
     # ── -1. Entity-scope check (structural bypass) ───
     # Check if thread has known entities BEFORE pronoun matching
@@ -1173,11 +1344,14 @@ async def route_question(question: str, user_id: str,
                 "handler_name": handler_name,
                 "tool_results": {}}
 
-    # ── 6. Synthesize ─────────────────────────────────
+    # ── 6. Synthesize (persona-aware voice) ───────────
+    persona_voice = build_persona_voice_instructions(persona_info)
+    synthesis_prompt = persona_voice + SYNTHESIS_SYSTEM_PROMPT
+
     answer_resp = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=600,
-        system=SYNTHESIS_SYSTEM_PROMPT,
+        system=synthesis_prompt,
         messages=[
             *[{"role": m["role"], "content": m["content"]}
               for m in history[-4:]
@@ -1301,11 +1475,11 @@ async def route_question(question: str, user_id: str,
                         "handler_name": f"{handler_name}_retry_dynamic"}
             break
 
-        # Re-synthesize with the new tool results
+        # Re-synthesize with the new tool results (persona-aware)
         answer_resp = client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=600,
-            system=SYNTHESIS_SYSTEM_PROMPT,
+            system=synthesis_prompt,  # Uses persona voice from step 6
             messages=[
                 *[{"role": m["role"], "content": m["content"]}
                   for m in history[-4:]
