@@ -78,23 +78,36 @@ async def process_and_reply(text: str, user_id: str,
     """
     Full question processing pipeline:
     1. Load conversation history (thread context)
-    2. Classify intent → handler
-    3. Check if slow → send ack first
-    4. Execute handler
-    5. Verify answer numbers against tool results
-    6. Send reply via Zap 2
-    7. Update conversation history
-    8. Log unanswerable questions
+    2. Look up user persona by slack_user_id
+    3. If unknown, send DM registration form
+    4. Classify intent → handler
+    5. Check if slow → send ack first
+    6. Execute handler
+    7. Verify answer numbers against tool results
+    8. Send reply via Zap 2
+    9. Update conversation history
+    10. Log unanswerable questions
     """
     from api.router import route_question
-    from api.db import get_supabase, load_thread, save_thread
+    from api.db import get_supabase, load_thread, save_thread, get_user_persona
 
     sb = get_supabase()
     history = load_thread(sb, thread_ts)
 
+    # NEW: Persona lookup
+    persona = get_user_persona(sb, user_id)
+
+    # NEW: If unknown user, send DM registration form
+    # (For now, just allow "other" — can tighten later)
+    if not persona:
+        logger.warning(f"[PERSONA] Unknown user {user_id} — treating as 'other'")
+        # Future: send_dm_via_zap(user_id) for self-registration
+        # For now: allow access with generic voice
+
     result = await route_question(
         question=text,
         user_id=user_id,
+        persona=persona,  # NEW: pass persona through
         history=history,
         sb=sb,
         thread_ts=thread_ts,

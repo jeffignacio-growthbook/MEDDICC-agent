@@ -889,7 +889,9 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
     return {"answer": answer, "tool_results": tool_results}
 
 async def route_question(question: str, user_id: str,
-                          history: list, sb, thread_ts: str = "") -> dict:
+                          persona: dict = None,
+                          history: list = None, sb = None,
+                          thread_ts: str = "") -> dict:
     """
     Robust question routing with inner evaluation loop.
 
@@ -910,6 +912,12 @@ async def route_question(question: str, user_id: str,
     client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
     today  = date.today().isoformat()
     cq     = current_quarter_label()
+
+    # Log persona
+    if persona:
+        logger.info(f"[PERSONA] {persona.get('name')} ({persona.get('role')}) — {persona.get('email')}")
+    else:
+        logger.warning(f"[PERSONA] Unknown user {user_id} (no persona)")
 
     # ── -1. Entity-scope check (structural bypass) ───
     # Check if thread has known entities BEFORE pronoun matching
@@ -1099,7 +1107,7 @@ async def route_question(question: str, user_id: str,
     answer_resp = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=600,
-        system=SYNTHESIS_SYSTEM_PROMPT,
+        system=build_synthesis_prompt(persona),
         messages=[
             *[{"role": m["role"], "content": m["content"]}
               for m in history[-4:]
@@ -1227,7 +1235,7 @@ async def route_question(question: str, user_id: str,
         answer_resp = client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=600,
-            system=SYNTHESIS_SYSTEM_PROMPT,
+            system=build_synthesis_prompt(persona),
             messages=[
                 *[{"role": m["role"], "content": m["content"]}
                   for m in history[-4:]
@@ -1279,3 +1287,91 @@ def _log_learning(sb, question, handler, assessment,
         }).execute()
     except Exception as e:
         print(f"[LEARNING] log failed: {e}", flush=True)
+
+# ============================================================================
+# PERSONA-AWARE VOICE BLOCKS
+# ============================================================================
+
+_VOICE_BASE = """You are a CRO's revenue intelligence agent.
+Answer questions using ONLY the data from tool_results below.
+Never invent numbers. If data doesn't exist, say so plainly."""
+
+_VOICE_BLOCKS = {
+    "executive": """
+You're answering for {name_or_role} (executive level).
+- Lead with the strategic implication, then the number
+- Frame metrics as "we" not "the team" — they own the outcome
+- Include year-over-year context when relevant
+- Skip tactical detail unless asked — executives want signal, not noise
+- Use confidence qualifiers when data has gaps ("based on available data...")
+
+Example: "Pipeline is up 23% since last quarter to $2.1M — puts us on track 
+for the $8M annual target assuming Q4 conversion holds at 28%."
+""",
+
+    "sales_leadership": """
+You're answering for {name_or_role} (sales leadership).
+- Start with team performance against target
+- Include rep-level breakdown when relevant to the question
+- Highlight both wins and gaps — they need to coach both
+- Assume they know the process — skip basics like "MEDDICC means..."
+- Use manager framing: "Your team closed...", "Jennifer's pipeline..."
+
+Example: "Team is at 78% of Q3 quota with 6 weeks left. Jennifer and 
+Scott are on track (95%+), but Jake H needs 3 more deals to hit his number."
+""",
+
+    "operational": """
+You're answering for {name_or_role} (RevOps/Ops).
+- Include data quality notes when relevant ("12 deals missing close dates")
+- Explain calculation methodology if non-obvious
+- Flag edge cases or exceptions in the data
+- Use precise terminology — "weighted forecast" not "pipeline guess"
+- Okay to include caveats: "Note: this excludes renewal pipeline"
+
+Example: "Weighted forecast is $1.2M (85% × commit + 65% × most_likely). 
+Note: 3 deals in commit stage have no MEDDICC scores yet — may be over-forecasted."
+""",
+
+    "ic": """
+You're answering for {name_or_role} (IC / individual contributor).
+- Get straight to the number — no preamble
+- Include your own deals first if the question is about "my" or "I"
+- Use plain language, not executive jargon
+- One-sentence answers when possible
+- Offer next steps only if directly relevant
+
+Example: "You have 4 deals in proposal stage, total value $240K. Acme Corp 
+is your strongest (champion score 8/10), but TechStart needs an economic buyer."
+""",
+
+    "other": """
+You're answering for a revenue team member.
+- Be clear and direct
+- Include brief context for metrics that might not be familiar
+- Use "the team" framing rather than "we" unless role is known
+- One paragraph maximum unless the question asks for detail
+
+Example: "The sales team closed 12 deals this quarter for $890K in new ARR. 
+That's 89% of the quarterly target."
+"""
+}
+
+def build_synthesis_prompt(persona: dict) -> str:
+    """Build persona-aware synthesis system prompt."""
+    role_group = (persona or {}).get("role_group", "other")
+    block = _VOICE_BLOCKS.get(role_group, _VOICE_BLOCKS["other"])
+    
+    name = (persona or {}).get("name", "")
+    title = (persona or {}).get("title", "")
+    
+    if name:
+        name_or_role = name
+    elif title:
+        name_or_role = f"a {title}"
+    else:
+        name_or_role = "a revenue team member"
+    
+    block = block.replace("{name_or_role}", name_or_role)
+    return _VOICE_BASE + "\n" + block
+
