@@ -18,6 +18,7 @@ Usage:
 """
 
 import os
+import sys
 import re
 import json
 import argparse
@@ -25,6 +26,9 @@ from datetime import datetime
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+
+from llm_client import LLMClient
 
 
 def main():
@@ -102,8 +106,7 @@ def main():
             return
 
     # Generate narratives
-    import anthropic
-    client = anthropic.Anthropic(api_key=ANTHROPIC_KEY) \
+    client = LLMClient.from_config("generator") \
         if not args.dry_run else None
 
     written = 0
@@ -179,14 +182,13 @@ Return ONLY the JSON object, no markdown formatting,
 no code fences, no preamble or explanation."""
 
         try:
-            resp = client.messages.create(
-                model='claude-sonnet-4-5-20250929',
-                max_tokens=600,
-                messages=[{'role': 'user', 'content': prompt}]
+            resp = client.complete(
+                messages=[{'role': 'user', 'content': prompt}],
+                max_tokens=600
             )
-            tracker.record(resp, 'claude-sonnet-4-5-20250929',
+            tracker.record(resp, client.model,
                            'win_loss', company_name)
-            raw = resp.content[0].text.strip()
+            raw = resp.text.strip()
             if raw.startswith('```'):
                 raw = re.sub(r'^```[a-z]*\n?', '', raw)
                 raw = re.sub(r'\n?```$', '', raw)

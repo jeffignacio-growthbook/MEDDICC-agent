@@ -34,6 +34,8 @@ REPO_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / 'scripts'))
 
+from llm_client import LLMClient
+
 # Questions that imply objection/gap category queries
 OBJECTION_SIGNALS = [
     "objection", "pushback", "hesitation", "concern",
@@ -185,20 +187,19 @@ Return [] if no clear patterns emerge (random noise).
         for r in other_gaps[:20]
     ]
 
-    resp = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=500,
-        system="Respond with valid JSON only.",
+    resp = client.complete(
         messages=[{"role": "user", "content":
             CLUSTER_PROMPT.format(
                 objections=json.dumps(obj_sample, indent=2),
                 gaps=json.dumps(gap_sample, indent=2),
             )
-        }]
+        }],
+        system="Respond with valid JSON only.",
+        max_tokens=500
     )
 
     try:
-        text = resp.content[0].text.strip()
+        text = resp.text.strip()
         if "```" in text:
             text = text.split("```")[1]
             if text.startswith("json"):

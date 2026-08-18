@@ -41,6 +41,7 @@ sys.path.insert(0, str(REPO_ROOT / 'scripts'))
 
 # Import timezone utilities
 from sdr_utils import utc_to_reporting_date
+from llm_client import LLMClient
 
 
 def slugify(company_name: str) -> str:
@@ -404,8 +405,7 @@ def summarize_apollo_transcript(transcript_text: str, title: str) -> str:
     if len(transcript_text) < 1500:
         return transcript_text
 
-    from anthropic import Anthropic
-    client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
+    client = LLMClient.from_config("enrichment")
 
     system = (
         "Summarize this sales call for MEDDICC analysis. "
@@ -419,16 +419,15 @@ def summarize_apollo_transcript(transcript_text: str, title: str) -> str:
     )
 
     try:
-        resp = client.messages.create(
-            model='claude-haiku-4-5-20251001',
-            max_tokens=800,
-            system=system,
+        resp = client.complete(
             messages=[{
                 'role': 'user',
                 'content': f'Title: {title}\n\nTranscript:\n{transcript_text[:8000]}'
-            }]
+            }],
+            system=system,
+            max_tokens=800
         )
-        return resp.content[0].text
+        return resp.text
     except Exception as e:
         print(f'     ⚠️  Haiku summarization failed: {e}')
         return transcript_text[:2500] + '\n\n[Truncated]'

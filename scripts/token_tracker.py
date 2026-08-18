@@ -24,13 +24,20 @@ class TokenTracker:
     def record(self, response, model: str, role: str,
                company: str = '') -> float:
         """
-        Pass the raw Anthropic response object.
+        Pass LLMResponse or raw Anthropic response object.
         Extracts usage, calculates cost, appends to session records.
         Returns cost in USD.
         Thread-safe for concurrent calls.
         """
-        input_tokens  = response.usage.input_tokens
-        output_tokens = response.usage.output_tokens
+        # Handle both LLMResponse and legacy Anthropic responses
+        if hasattr(response, 'input_tokens'):
+            # LLMResponse (new)
+            input_tokens  = response.input_tokens
+            output_tokens = response.output_tokens
+        else:
+            # Legacy Anthropic response
+            input_tokens  = response.usage.input_tokens
+            output_tokens = response.usage.output_tokens
         cost = self._cost(model, input_tokens, output_tokens)
 
         with self._lock:

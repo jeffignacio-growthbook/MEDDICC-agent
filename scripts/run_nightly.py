@@ -31,6 +31,7 @@ from context_builder import build_cumulative_meddicc
 from meddicc_agent import run_agent
 from github_memory import get_memory_manager
 from token_tracker import TokenTracker
+from llm_client import LLMClient
 
 # Repo root for config files
 REPO_ROOT = Path(__file__).parent.parent
@@ -461,14 +462,12 @@ def main():
     # Test Sonnet API connectivity
     print("\nTesting Sonnet API connectivity...")
     try:
-        from anthropic import Anthropic
-        test_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-        test_resp = test_client.messages.create(
-            model="claude-sonnet-4-5-20250929",
-            max_tokens=10,
-            messages=[{"role": "user", "content": "ping"}]
+        test_client = LLMClient.from_config("generator")
+        test_resp = test_client.complete(
+            messages=[{"role": "user", "content": "ping"}],
+            max_tokens=10
         )
-        print(f"   ✓ Sonnet API OK: {test_resp.content[0].text}")
+        print(f"   ✓ Sonnet API OK: {test_resp.text}")
     except Exception as test_error:
         print(f"   ❌ Sonnet API FAILED: {type(test_error).__name__}: {test_error}")
         print("   Nightly run cannot proceed without Sonnet — exiting")
@@ -988,15 +987,14 @@ Generate a COMPLETE rewritten CLAUDE.md that:
 
 Output ONLY the new CLAUDE.md content, no additional commentary."""
 
-    client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    client = LLMClient.from_config("generator")
 
-    response = client.messages.create(
-        model='claude-sonnet-4-5-20250929',
-        max_tokens=8000,
-        messages=[{"role": "user", "content": synthesis_prompt}]
+    response = client.complete(
+        messages=[{"role": "user", "content": synthesis_prompt}],
+        max_tokens=8000
     )
 
-    new_claude_md = response.content[0].text
+    new_claude_md = response.text
 
     # Generate rewrite changelog
     changelog = f"""# 30-Day MEDDICC Agent Synthesis - {today}
@@ -1079,8 +1077,7 @@ def create_rubric_update_pr(memory: any, prs_created: list) -> None:
     rubric_path = Path(__file__).parent.parent / 'prompts' / 'evaluator_rubric.md'
     current_rubric = rubric_path.read_text()
 
-    # Synthesize with Haiku
-    client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    # Synthesize with classifier client (Haiku)
 
     synthesis_prompt = f"""You are reviewing observations about an AI evaluator rubric
 used to score MEDDICC sales call analyses.
@@ -1104,13 +1101,14 @@ Return ONLY the complete revised rubric as markdown.
 Do not include explanations outside the rubric itself.
 Add a ## Revision Notes section at the bottom explaining what changed."""
 
-    response = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=2000,
-        messages=[{"role": "user", "content": synthesis_prompt}]
+    client = LLMClient.from_config("classifier")
+
+    response = client.complete(
+        messages=[{"role": "user", "content": synthesis_prompt}],
+        max_tokens=2000
     )
 
-    new_rubric = response.content[0].text
+    new_rubric = response.text
 
     # Write to file and create PR
     rubric_path.write_text(new_rubric)

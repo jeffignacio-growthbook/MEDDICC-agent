@@ -13,12 +13,16 @@ Usage:
 """
 
 import os
+import sys
 import json
 import argparse
 from pathlib import Path
 from datetime import datetime
 
 REPO_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+
+from llm_client import LLMClient
 JOB_NAME = 'sales_signals'
 
 PROMPT = """Read this internal sales team
@@ -168,8 +172,7 @@ def main():
             print("Aborted.")
             return
 
-    import anthropic
-    client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
+    client = LLMClient.from_config("enrichment")
     from token_tracker import TokenTracker
     tracker = TokenTracker(REPO_ROOT / 'memory')
 
@@ -205,16 +208,15 @@ def main():
         prompt = PROMPT.format(call_summary=summary[:4000])
 
         try:
-            resp = client.messages.create(
-                model='claude-haiku-4-5-20251001',
-                max_tokens=500,
-                messages=[{'role': 'user', 'content': prompt}]
+            resp = client.complete(
+                messages=[{'role': 'user', 'content': prompt}],
+                max_tokens=500
             )
-            tracker.record(resp, 'claude-haiku-4-5-20251001',
+            tracker.record(resp, client.model,
                            'sales_signal_extraction', company)
 
             # Parse JSON response (strip markdown code fences if present)
-            text = resp.content[0].text.strip()
+            text = resp.text.strip()
             if text.startswith('```'):
                 # Remove markdown code fences
                 text = text.split('\n', 1)[1]  # Remove first line (```json)

@@ -7,7 +7,10 @@ generates answers with Sonnet, verifies numbers with Haiku.
 import json
 import os
 import logging
-import anthropic
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from llm_client import LLMClient
 from api.db import get_supabase, log_unanswered, is_admin, get_prior_entities, get_api_history
 from api import handlers
 
@@ -215,13 +218,12 @@ Reply with ONLY the handler name, or "none" if the question doesn't match any ha
 No explanation, no JSON."""
 
     try:
-        response = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=50,
-            messages=[{"role": "user", "content": prompt}]
+        response = client.complete(
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=50
         )
 
-        handler_name = response.content[0].text.strip()
+        handler_name = response.text.strip()
 
         # Validate it's a known bulk handler
         if handler_name in ENTITY_SCOPE_BULK_HANDLERS:
@@ -735,7 +737,7 @@ async def dynamic_query_loop(question, history, params,
     from api import tools as T
 
     # Hybrid schema: classify relevant tables for full descriptions
-    relevant_tables = classify_relevant_tables(question, client)
+    relevant_tables = classify_relevant_tables(question, classifier_client)
     logger.info(f"[SCHEMA] Relevant tables for full descriptions: {relevant_tables}")
 
     schema = get_schema_context(sb, tables_with_descriptions=relevant_tables)
@@ -792,13 +794,12 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                      f"Try a more specific question.")
             return {"answer": answer, "tool_results": tool_results}
 
-        resp = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=800,
-            system=system,
+        resp = client.complete(
             messages=messages,
+            system=system,
+            max_tokens=800,
         )
-        tokens_used += resp.usage.input_tokens + resp.usage.output_tokens
+        tokens_used += resp.input_tokens + resp.output_tokens
 
         # Post-call verification (should never trigger if prediction is accurate)
         if tokens_used > TOKEN_BUDGET:
@@ -810,7 +811,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                      f"Try a more specific question.")
             return {"answer": answer, "tool_results": tool_results}
 
-        raw = resp.content[0].text.strip()
+        raw = resp.text.strip()
 
         # DEBUG: Log raw response
         logger.info(f"[LOOP iter={iteration}] raw response: {raw[:200]}")
@@ -842,14 +843,13 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         if "answer" in parsed:
             # Evaluate answer quality with Haiku
             try:
-                eval_resp = client.messages.create(
-                    model="claude-haiku-4-5-20251001",
-                    max_tokens=100,
+                eval_resp = client.complete(
                     messages=[{"role": "user", "content":
                         EVAL_PROMPT.format(question=question, answer=parsed["answer"])
-                    }]
+                    }],
+                    max_tokens=100
                 )
-                eval_result = _extract_json(eval_resp.content[0].text)
+                eval_result = _extract_json(eval_resp.text)
                 score = eval_result.get("score", 0.5) if eval_result else 0.5
                 if score < 0.7 and iteration < MAX_ITERATIONS - 1:
                     missing = eval_result.get("missing", "more specifics") if eval_result else "more specifics"
@@ -978,7 +978,9 @@ async def route_question(question: str, user_id: str,
     from api.time_resolver import resolve_time_window, current_quarter_label
     from api.evaluator import evaluate_result, extract_missing_hint
 
-    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    # Classifier and synthesis use different models
+    classifier_client = LLMClient.from_config(role="classifier")
+    generator_client = LLMClient.from_config(role="generator")
     today  = date.today().isoformat()
     cq     = current_quarter_label()
 
@@ -1010,7 +1012,7 @@ async def route_question(question: str, user_id: str,
                     f"{len(prior_entities['deal_ids'])} "
                     f"known deal_ids, bypassing discovery")
         entity_match = await route_entity_scoped_question(
-            question, prior_entities, sb, client)
+            question, prior_entities, sb, classifier_client)
         if entity_match is not None:
             tool_results, handler_name = entity_match
             result_quality = "good"
@@ -1052,11 +1054,7 @@ async def route_question(question: str, user_id: str,
                             f"deal_ids from prior turn")
 
             # ── 1. Classify ──────────────────────────────────
-        intent_resp = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=300,
-            system="Respond with valid JSON only. No markdown, "
-                   "no backticks, no explanation.",
+        intent_resp = classifier_client.complete(
             messages=[{"role": "user", "content":
                 build_intent_prompt(
                     today=today,
@@ -1065,10 +1063,13 @@ async def route_question(question: str, user_id: str,
                     question=question,
                     roster_text=roster_text,
                 ) + build_entity_hint(prior_entities)
-            }]
+            }],
+            system="Respond with valid JSON only. No markdown, "
+                   "no backticks, no explanation.",
+            max_tokens=300
         )
         try:
-            intent = _extract_json(intent_resp.content[0].text)
+            intent = _extract_json(intent_resp.text)
         except Exception:
             _log_unanswered(sb, question, user_id, "ambiguous")
             return {"answer":
@@ -1139,7 +1140,7 @@ async def route_question(question: str, user_id: str,
                 history=history,
                 params=params,
                 sb=sb,
-                client=client,
+                client=generator_client,
                 hint=hint,
                 roster_text=roster_text,
             )
@@ -1161,7 +1162,7 @@ async def route_question(question: str, user_id: str,
                 history=history,
                 params=params,
                 sb=sb,
-                client=client,
+                client=generator_client,
                 hint="",
                 roster_text=roster_text,
             )
@@ -1183,10 +1184,7 @@ async def route_question(question: str, user_id: str,
                 "tool_results": {}}
 
     # ── 6. Synthesize ─────────────────────────────────
-    answer_resp = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=600,
-        system=build_synthesis_prompt(persona),
+    answer_resp = generator_client.complete(
         messages=[
             *[{"role": m["role"], "content": m["content"]}
               for m in history[-4:]
@@ -1195,16 +1193,14 @@ async def route_question(question: str, user_id: str,
              "content": f"Question: {question}\n\n"
                         f"Data:\n"
                         f"{json.dumps(tool_results, indent=2, default=str)[:3000]}"}
-        ]
+        ],
+        system=build_synthesis_prompt(persona),
+        max_tokens=600
     )
-    raw_answer = answer_resp.content[0].text.strip()
+    raw_answer = answer_resp.text.strip()
 
     # ── 7. Verify ─────────────────────────────────────
-    verify_resp = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=600,
-        system="Respond with only the verified answer text. "
-               "No JSON, no explanation.",
+    verify_resp = classifier_client.complete(
         messages=[{"role": "user", "content":
             VERIFY_PROMPT.format(
                 question=question,
@@ -1212,9 +1208,12 @@ async def route_question(question: str, user_id: str,
                 tool_results=json.dumps(
                     tool_results, default=str)[:2000],
             )
-        }]
+        }],
+        system="Respond with only the verified answer text. "
+               "No JSON, no explanation.",
+        max_tokens=600
     )
-    verified = verify_resp.content[0].text.strip()
+    verified = verify_resp.text.strip()
 
     # ── 8. Correctness assessment + retry loop ───────────
     from api.assessor import (assess_correctness,
@@ -1292,7 +1291,7 @@ async def route_question(question: str, user_id: str,
                 history=history,
                 params=params,
                 sb=sb,
-                client=client,
+                client=generator_client,
                 hint=retry_context,
                 roster_text=roster_text,
             )
@@ -1312,10 +1311,7 @@ async def route_question(question: str, user_id: str,
             break
 
         # Re-synthesize with the new tool results
-        answer_resp = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=600,
-            system=build_synthesis_prompt(persona),
+        answer_resp = generator_client.complete(
             messages=[
                 *[{"role": m["role"], "content": m["content"]}
                   for m in history[-4:]
@@ -1324,9 +1320,11 @@ async def route_question(question: str, user_id: str,
                  "content": f"Question: {question}\n\n"
                             f"Context: {retry_context}\n\n"
                             f"Data:\n{json.dumps(tool_results, indent=2, default=str)[:3000]}"}
-            ]
+            ],
+            system=build_synthesis_prompt(persona),
+            max_tokens=600
         )
-        verified = answer_resp.content[0].text.strip()
+        verified = answer_resp.text.strip()
 
     # ── 9. Log learning note (win or lose) ────────────────
     _log_learning(sb, question, handler_name,

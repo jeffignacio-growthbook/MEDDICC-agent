@@ -5,10 +5,15 @@ Generates MEDDICC analyses using Claude Sonnet 4.5 with iterative refinement
 via Claude Haiku evaluator and reflection gate.
 """
 import os
+import sys
 import json
 from pathlib import Path
 from typing import Dict, Optional
 from anthropic import Anthropic
+
+# Add scripts directory to path for LLMClient
+sys.path.insert(0, str(Path(__file__).parent))
+from llm_client import LLMClient
 
 
 def load_claude_md() -> str:
@@ -103,7 +108,7 @@ def generate(
     deal_context: dict,
     previous_feedback: Optional[str],
     claude_md: str,
-    client: Anthropic,
+    client: LLMClient,
     tracker=None,
     company: str = ''
 ) -> str:
@@ -121,33 +126,27 @@ def generate(
 
     # Inner tool loop (though MEDDICC generation shouldn't need tools)
     while True:
-        response = client.messages.create(
-            model='claude-sonnet-4-5-20250929',  # Latest Sonnet 4.5
-            system=claude_md,
+        response = client.complete(
             messages=messages,
+            system=claude_md,
             max_tokens=4000
         )
 
         if tracker:
             tracker.record(response,
-                          model="claude-sonnet-4-5-20250929",
+                          model=client.model,
                           role="generator",
                           company=company)
 
         # Check stop reason
         if response.stop_reason == 'end_turn':
-            # Extract text from response
-            text_content = ""
-            for block in response.content:
-                if block.type == 'text':
-                    text_content += block.text
-
-            return text_content
+            # LLMResponse.text already contains the extracted text
+            return response.text
 
         elif response.stop_reason == 'tool_use':
             # Handle tool calls (shouldn't happen for MEDDICC, but just in case)
-            # Add assistant message
-            messages.append({"role": "assistant", "content": response.content})
+            # Add assistant message (provider-agnostic)
+            messages.append(response.as_assistant_message())
 
             # Add tool results
             tool_results = []
@@ -180,7 +179,7 @@ def evaluate(
     call_summary: str,
     cumulative_state: dict,
     rubric: str,
-    client: Anthropic,
+    client: LLMClient,
     tracker=None,
     company: str = ''
 ) -> dict:
@@ -189,8 +188,7 @@ def evaluate(
 
     Returns evaluation result with pass/fail and feedback.
     """
-    # Use Claude Haiku for cost-effective evaluation
-    anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    # Use the provided evaluator client (Haiku)
 
     cumulative_json = json.dumps(cumulative_state, indent=2)
 
@@ -218,21 +216,20 @@ Evaluate this analysis against the rubric.
 
 CRITICAL: Return ONLY a valid JSON object. Do NOT include any explanatory text, markdown formatting, or commentary. Start your response with {{ and end with }}. The JSON must be valid and parseable."""
 
-    response = anthropic_client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=4000,
+    response = client.complete(
+        messages=[{"role": "user", "content": evaluation_prompt}],
         system=rubric + "\n\nIMPORTANT: You must return ONLY valid JSON. No explanations, no markdown, no text outside the JSON object.",
-        messages=[{"role": "user", "content": evaluation_prompt}]
+        max_tokens=4000
     )
 
     if tracker:
         tracker.record(response,
-                      model="claude-haiku-4-5-20251001",
+                      model=client.model,
                       role="evaluator",
                       company=company)
 
     # Extract JSON from response
-    content = response.content[0].text
+    content = response.text
 
     try:
         # Handle markdown code blocks
@@ -290,8 +287,8 @@ def reflect(
 
     Returns reflection result with outcome and root_cause.
     """
-    # Use Claude Haiku for reflection
-    anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    # Use classifier client (Haiku) for reflection
+    client = LLMClient.from_config("classifier")
 
     system_prompt = """You are a reflection gate for a MEDDICC analysis agent.
 Decide whether this execution should generate a learning entry.
@@ -339,20 +336,19 @@ Return ONLY valid JSON:
 Should this generate a learning entry? Return ONLY valid JSON."""
 
     try:
-        response = anthropic_client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=500,
+        response = client.complete(
+            messages=[{"role": "user", "content": user_message}],
             system=system_prompt,
-            messages=[{"role": "user", "content": user_message}]
+            max_tokens=500
         )
 
         if tracker:
             tracker.record(response,
-                          model="claude-haiku-4-5-20251001",
+                          model=client.model,
                           role="reflection",
                           company=company)
 
-        content = response.content[0].text
+        content = response.text
 
         # Extract JSON
         if "```json" in content:
@@ -406,7 +402,9 @@ def run_agent(
 
     Returns final analysis with evaluation metadata.
     """
-    client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    # Create role-specific clients
+    generator_client = LLMClient.from_config("generator")
+    evaluator_client = LLMClient.from_config("evaluator")
 
     # Load prompts if not provided
     if claude_md is None:
@@ -430,7 +428,7 @@ def run_agent(
             deal_context,
             previous_feedback,
             claude_md,
-            client,
+            generator_client,
             tracker,
             company
         )
@@ -441,7 +439,7 @@ def run_agent(
             call_summary,
             cumulative_state,
             rubric,
-            client,
+            evaluator_client,
             tracker,
             company
         )

@@ -36,7 +36,13 @@ NOTE ON REAL CACHE DATA:
   count never masquerades as a roster.
 """
 
+import sys
+from pathlib import Path
 import json
+
+# Add parent directory to path for LLMClient
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from llm_client import LLMClient
 
 INTENT_PROSPECT     = "prospect"
 INTENT_SALES_REVIEW = "sales_review"
@@ -281,19 +287,18 @@ def classify_call(call_data: dict,
                 for p in participants[:5]
                 if isinstance(p, dict)
             ]
-            resp = client.messages.create(
-                model="claude-haiku-4-5-20251001",
-                max_tokens=150,
-                system="Respond with valid JSON only.",
+            resp = client.complete(
                 messages=[{"role": "user", "content":
                     CLASSIFICATION_PROMPT.format(
                         title=title[:100],
                         participants=", ".join(participant_list),
                         summary_excerpt=summary[:300],
                     )
-                }]
+                }],
+                system="Respond with valid JSON only.",
+                max_tokens=150
             )
-            text = resp.content[0].text.strip()
+            text = resp.text.strip()
             if "```" in text:
                 text = text.split("```")[1]
                 if text.startswith("json"):

@@ -4,9 +4,15 @@ Context Builder for MEDDICC Agent
 Builds cumulative MEDDICC state from historical call summaries using Claude Haiku.
 """
 import os
+import sys
 import json
+from pathlib import Path
 from typing import List, Dict
 from anthropic import Anthropic
+
+# Add scripts directory to path for LLMClient
+sys.path.insert(0, str(Path(__file__).parent))
+from llm_client import LLMClient
 
 
 def build_cumulative_meddicc(call_summaries: List[str], company: str, tracker=None) -> dict:
@@ -20,8 +26,8 @@ def build_cumulative_meddicc(call_summaries: List[str], company: str, tracker=No
     Returns:
         Structured MEDDICC state object with status, evidence, and scores
     """
-    # Use Claude Haiku for cost-effective structured extraction
-    client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    # Use context_builder client (Haiku) for cost-effective structured extraction
+    client = LLMClient.from_config("context_builder")
 
     # Build prompt
     system_prompt = """You are a MEDDICC sales methodology analyzer.
@@ -92,21 +98,20 @@ CRITICAL: Return ONLY a valid JSON object. Do NOT include any explanatory text, 
     print(f"   Context builder tokens: {max_tokens} ({len(call_summaries)} calls × {tokens_per_call} + {base_tokens} base)")
 
     # Call Claude Haiku for structured extraction
-    response = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=max_tokens,
+    response = client.complete(
+        messages=[{"role": "user", "content": user_message}],
         system=system_prompt + "\n\nIMPORTANT: Return ONLY valid JSON. No explanations, no markdown, no text outside the JSON object.",
-        messages=[{"role": "user", "content": user_message}]
+        max_tokens=max_tokens
     )
 
     if tracker:
         tracker.record(response,
-                      model="claude-haiku-4-5-20251001",
+                      model=client.model,
                       role="context_builder",
                       company=company)
 
     # Extract JSON from response
-    content = response.content[0].text
+    content = response.text
 
     # Try to parse JSON
     try:

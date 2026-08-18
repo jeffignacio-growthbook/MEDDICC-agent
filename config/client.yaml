@@ -338,20 +338,59 @@ deal_health:
 # ============================================================================
 # Control costs and performance
 
+# ==========================================================================
+# MODEL SELECTION
+# Changing name/provider here is all that's needed to switch providers.
+# No code changes required.
+#
+# Supported providers:
+#   anthropic  — Claude models (default)
+#   openai     — GPT models via api.openai.com (needs OPENAI_API_KEY)
+#   fireworks  — Any model via fireworks.ai (needs FIREWORKS_API_KEY)
+#
+# Fireworks model strings use the format:
+#   "accounts/fireworks/models/deepseek-v3"
+#   "accounts/fireworks/models/kimi-k2"
+# ==========================================================================
 models:
   context_builder:
     name: "claude-haiku-4-5-20251001"
-    base_tokens: 2000
-    tokens_per_call: 500  # Additional tokens per historical call
-    max_tokens_cap: 16000
+    provider: "anthropic"
+    max_tokens: 16000
 
   generator:
-    name: "claude-sonnet-4-5-20250929"
+    name: "claude-sonnet-4-6"
+    provider: "anthropic"
     max_tokens: 8000
+    # Fireworks DeepSeek V3 (94% cheaper output, validate quality first):
+    #   name: "accounts/fireworks/models/deepseek-v3"
+    #   provider: "fireworks"
+    # OpenAI GPT-4o:
+    #   name: "gpt-4o"
+    #   provider: "openai"
 
   evaluator:
-    name: "claude-sonnet-4-5-20250929"
+    name: "claude-haiku-4-5-20251001"
+    provider: "anthropic"
     max_tokens: 4000
+
+  classifier:
+    name: "claude-haiku-4-5-20251001"
+    provider: "anthropic"
+    max_tokens: 500
+
+  assessor:
+    name: "claude-haiku-4-5-20251001"
+    provider: "anthropic"
+    max_tokens: 200
+
+  enrichment:
+    name: "claude-haiku-4-5-20251001"
+    provider: "anthropic"
+    max_tokens: 2000
+    # Budget alternative for enrichment (85% cheaper input):
+    #   name: "accounts/fireworks/models/kimi-k2"
+    #   provider: "fireworks"
 
 # ============================================================================
 # CALL INTELLIGENCE PLATFORM
