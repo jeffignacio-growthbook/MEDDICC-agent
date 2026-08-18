@@ -297,3 +297,264 @@ def api_date_filters(
             "min": start_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "max": end_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
         }
+
+
+# ── Data handling utilities ───────────────────────────────────────
+
+def safe_get(obj, *keys, default=None):
+    """Safe deep access into nested dicts/lists. Never raises.
+
+    safe_get(resp, 'data', 'buckets', 0, 'key') returns default
+    if any key is missing, wrong type, or out of range.
+
+    Examples:
+        safe_get({"a": {"b": 1}}, "a", "b")     -> 1
+        safe_get({"a": {"b": 1}}, "a", "c")     -> None
+        safe_get({"a": [1, 2]}, "a", 0)          -> 1
+        safe_get(None, "a")                       -> None
+        safe_get({"a": 1}, "a", "b")             -> None (int not subscriptable)
+    """
+    current = obj
+    for key in keys:
+        try:
+            if current is None:
+                return default
+            if isinstance(key, int):
+                # List/tuple index access
+                current = current[key]
+            else:
+                # Dict key access
+                current = current[key]
+        except (KeyError, IndexError, TypeError, AttributeError):
+            return default
+    return current
+
+
+def to_float(val, default: float = 0.0) -> float:
+    """Coerce any scalar to float. Never raises.
+
+    Apollo percent_ fields return decimal strings ('0.331'), ints,
+    or floats depending on the field. Returns default on None, '',
+    or unparseable input.
+
+    Examples:
+        to_float("0.331")  -> 0.331
+        to_float(42)       -> 42.0
+        to_float(None)     -> 0.0
+        to_float("")       -> 0.0
+        to_float("n/a")    -> 0.0
+    """
+    if val is None or val == "":
+        return default
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return default
+
+
+def to_int(val, default: int = 0) -> int:
+    """Coerce any scalar to int. Never raises.
+
+    Examples:
+        to_int("42")    -> 42
+        to_int(3.7)     -> 3  (truncates, does not round)
+        to_int(None)    -> 0
+        to_int("")      -> 0
+    """
+    if val is None or val == "":
+        return default
+    try:
+        return int(float(val))  # Handle "3.7" strings
+    except (ValueError, TypeError):
+        return default
+
+
+def rate_or_gap(numerator, denominator) -> dict:
+    """Compute a rate, or return a data_gap flag if denominator is zero.
+
+    This is the canonical rate computation function. Use everywhere
+    a rate is calculated. Never divides by zero. Never returns NaN.
+
+    Returns:
+        {"value": float, "data_gap": False}  — normal case
+        {"value": None,  "data_gap": True}   — zero/None denominator
+
+    Examples:
+        rate_or_gap(10, 100)  -> {"value": 0.1,  "data_gap": False}
+        rate_or_gap(0, 100)   -> {"value": 0.0,  "data_gap": False}
+        rate_or_gap(10, 0)    -> {"value": None,  "data_gap": True}
+        rate_or_gap(10, None) -> {"value": None,  "data_gap": True}
+        rate_or_gap(None, 0)  -> {"value": None,  "data_gap": True}
+    """
+    if denominator is None or denominator == 0:
+        return {"value": None, "data_gap": True}
+    if numerator is None:
+        return {"value": None, "data_gap": True}
+    try:
+        return {"value": float(numerator) / float(denominator), "data_gap": False}
+    except (ValueError, TypeError, ZeroDivisionError):
+        return {"value": None, "data_gap": True}
+
+
+def flatten_buckets(response: dict, metric_key: str) -> list:
+    """Extract Apollo Analytics response buckets into a flat list.
+
+    Apollo analytics response shape:
+        {"table_response": {"buckets": [
+            {"key": "user_123",
+             "metrics": {"num_phone_calls": {"value": 42},
+                         "connect_rate":    {"value": 0.23}}}
+        ]}}
+
+    Returns: [{"key": "user_123", "num_phone_calls": 42,
+               "connect_rate": 0.23}, ...]
+    Returns [] on missing or malformed response without raising.
+
+    Args:
+        response: Raw Apollo analytics API response dict.
+        metric_key: Not used for filtering — all metrics in each
+                    bucket are extracted. Parameter reserved for
+                    future filtering.
+    """
+    if not response:
+        return []
+
+    buckets = safe_get(response, "table_response", "buckets", default=[])
+    if not buckets:
+        return []
+
+    result = []
+    for bucket in buckets:
+        if not isinstance(bucket, dict):
+            continue
+
+        row = {"key": bucket.get("key")}
+        metrics = bucket.get("metrics", {})
+        if not isinstance(metrics, dict):
+            continue
+
+        for metric_name, metric_obj in metrics.items():
+            if isinstance(metric_obj, dict) and "value" in metric_obj:
+                row[metric_name] = metric_obj["value"]
+
+        result.append(row)
+
+    return result
+
+
+def parse_iso(ts_str, default=None):
+    """Parse an ISO 8601 string to an aware UTC datetime.
+
+    Handles Z suffix, +00:00, and naive strings (assumed UTC).
+    Returns default on None, empty string, or unparseable input.
+
+    Examples:
+        parse_iso("2026-03-31T23:00:00Z")       -> datetime(..., tzinfo=UTC)
+        parse_iso("2026-03-31T23:00:00+00:00")  -> datetime(..., tzinfo=UTC)
+        parse_iso(None)                          -> None
+        parse_iso("")                            -> None
+        parse_iso("not a date")                 -> None
+    """
+    if not ts_str or ts_str == "":
+        return default
+
+    try:
+        ts_clean = ts_str.replace('Z', '+00:00')
+        dt = datetime.fromisoformat(ts_clean)
+        # If naive, assume UTC
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=_tz.utc)
+        return dt
+    except (ValueError, AttributeError):
+        return default
+
+
+def normalize_disposition(raw: str, tool: str) -> str:
+    """Normalize tool-specific call dispositions to a standard set.
+
+    Standard values:
+        connected       — answered, real conversation
+        voicemail       — left a voicemail
+        no_answer       — rang, not answered, no voicemail
+        busy            — line busy
+        bad_number      — wrong/disconnected number
+        meeting_booked  — connected and meeting booked as outcome
+        unknown         — unrecognized or missing
+
+    Tool-specific normalization (case-insensitive substring match):
+
+    Apollo ('apollo'):
+        "connected", "interested"    -> connected
+        "demo scheduled"             -> meeting_booked
+        "left voicemail", "voicemail" -> voicemail
+        "no answer", "not available" -> no_answer
+        "wrong number", "bad data"   -> bad_number
+
+    Salesloft ('salesloft'):
+        "connected"                  -> connected
+        "demo scheduled"             -> meeting_booked
+        "voicemail", "left message"  -> voicemail
+        "no answer"                  -> no_answer
+        "wrong number"               -> bad_number
+
+    Aircall ('aircall'):
+        disposition from recording.status field:
+        "answered"                   -> connected
+        "voicemail"                  -> voicemail
+        "missed", "no-answer"        -> no_answer
+        "busy"                       -> busy
+        "failed"                     -> unknown
+
+    Returns 'unknown' for unrecognized values, never raises.
+    """
+    if not raw:
+        return "unknown"
+
+    raw_lower = str(raw).lower()
+    tool_lower = str(tool).lower()
+
+    # Apollo normalization
+    if tool_lower == "apollo":
+        if "connected" in raw_lower or "interested" in raw_lower:
+            return "connected"
+        if "demo scheduled" in raw_lower or "meeting" in raw_lower:
+            return "meeting_booked"
+        if "voicemail" in raw_lower or "left voicemail" in raw_lower:
+            return "voicemail"
+        if "no answer" in raw_lower or "not available" in raw_lower:
+            return "no_answer"
+        if "wrong number" in raw_lower or "bad data" in raw_lower:
+            return "bad_number"
+
+    # Salesloft normalization
+    elif tool_lower == "salesloft":
+        if "connected" in raw_lower:
+            return "connected"
+        if "demo scheduled" in raw_lower or "meeting" in raw_lower:
+            return "meeting_booked"
+        if "voicemail" in raw_lower or "left message" in raw_lower:
+            return "voicemail"
+        if "no answer" in raw_lower:
+            return "no_answer"
+        if "wrong number" in raw_lower:
+            return "bad_number"
+
+    # Aircall normalization
+    elif tool_lower == "aircall":
+        if "answered" in raw_lower:
+            return "connected"
+        if "voicemail" in raw_lower:
+            return "voicemail"
+        if "missed" in raw_lower or "no-answer" in raw_lower or "no answer" in raw_lower:
+            return "no_answer"
+        if "busy" in raw_lower:
+            return "busy"
+        if "failed" in raw_lower:
+            return "unknown"
+
+    return "unknown"
+
+
+def connected_from_disposition(disposition: str) -> bool:
+    """True when disposition indicates a real conversation occurred."""
+    return disposition in ("connected", "meeting_booked")
