@@ -1,0 +1,21 @@
+{
+  "company": "BESTSELLER",
+  "deal_id": "60785721693",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Carry-forward consistency error on Decision Process (D). Cumulative state shows score 5/10; analysis raises to 6/10 citing Call 2 evidence ('pilot is actively structured with defined feedback loop'). However, the recent call summary does NOT substantiate this upgrade. The summary states 'plans for a pilot focused on Sanity integration and feedback-driven refinements' \u2014 this is the same level of process clarity as Call 1 ('plans to formalize partnership'). No new decision process milestones, approval gates, or stakeholder involvement are documented in Call 2 to justify the upgrade from 5 to 6. Either revert Decision Process to 5/10 with note 'No new process clarity in Call 2 \u2014 maintaining 5/10' OR provide explicit evidence from the recent call that demonstrates progression in decision process clarity beyond what was stated in Call 1.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_32093664435_009",
+  "timestamp": "2026-08-18T03:17:05.980548"
+}

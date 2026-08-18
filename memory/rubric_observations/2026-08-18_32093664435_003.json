@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_003",
+  "timestamp": "2026-08-18T03:03:42.561563",
+  "company": "Deel",
+  "criterion_fired": "Criterion 4 (Actionable next steps)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'Actionable next steps must include: (1) specific action verb + recipient + deadline in brackets, (2) exact question or deliverable expected, (3) for Partial/Low components, a commitment mechanism (e.g., \"send email requesting case study review by [date]\") that demonstrates prospect engagement intent, not just agent intent.'"
+}

@@ -1,0 +1,21 @@
+{
+  "company": "Oda",
+  "deal_id": "11024003429",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 4 VIOLATION - Actionable Next Steps: Multiple next steps use vague verbs without specific actions. Examples: (1) Metrics component: 'Schedule follow-up call to ask' lacks specificity on WHO initiates and WHEN exactly. (2) Economic Buyer component: 'Request direct meeting' is vague; needs 'Email the CTO by [date] with specific agenda items.' (3) Decision Process component: 'On next call, ask' lacks concrete timing and who owns scheduling. (4) Identified Pain component: 'Schedule 1:1' uses vague verb; should specify 'Send calendar invite to [contact] by Thursday with these three questions.' (5) Champion component: 'Schedule 1:1 call to ask' is vague without concrete date/owner. CRITERION 3 VIOLATION - Evidence Quality for Identified Pain (score 4/10): The analysis states Call 3 shows 'accelerate experimentation cycles' and 'foster a culture of continuous learning' are 'improvement goals, not urgent pain.' However, a score of 4/10 requires at least minimal evidence of articulated pain. The evidence provided does not support the score\u2014the call references improvement aspirations, not business impact or cost of current state. Score should be 2/10 unless prior calls documented specific pain (which cumulative state does not clearly show). CRITERION 2 VIOLATION - Carry-Forward Consistency: The analysis maintains scores without explicit statements confirming 'No new information' for unchanged components. For example, Economic Buyer states 'maintained at 6/10 \u2014 no new information' but this phrasing is inconsistent with Criterion 2's requirement to explicitly note 'maintaining previous score' language. While the intent is correct, the phrasing 'maintained at 6/10' is weaker than required. CRITERION 4 VIOLATION - Champion and Competition (both Unknown, score 1/10): These components lack next steps with specific actionable details. Champion next step bundles two questions ('Which team member' AND 'what specific business outcomes') in one call, reducing clarity. Competition next step should be split: one call to identify current tooling, separate follow-up to map competitive evaluation. Additionally, none of the next steps specify 'by end of [specific day]'\u2014all use relative timing like 'This week' or 'Next week,' which violates the 'concrete' timing requirement in Criterion 4.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_32093664435_002",
+  "timestamp": "2026-08-18T03:00:24.743447"
+}

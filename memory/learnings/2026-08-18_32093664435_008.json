@@ -1,0 +1,21 @@
+{
+  "company": "Livesport",
+  "deal_id": "62160567676",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 2 violation: Metrics score decreased from 5/10 to 4/10 without documented justification. The analysis states 'Score increased from 5/10 to 4/10' which is contradictory. If score decreased, explain why recent call contradicts previous assessment. Criterion 3 violation: Competition score at 4/10 lacks sufficient evidence for that level. Airship and Extreme Push are correctly identified as non-competitors, but analysis provides no quote or evidence that prospect is actively evaluating direct competitors (LaunchDarkly, Statsig, EPPO). At 4/10, evidence should show prospect explicitly considering at least one valid competitor; current evidence only shows Optimizely incumbent. Should be 2/10 (Optimizely known, no evidence of direct competitor evaluation). Criterion 4 violation: Decision Process component is Partial (6/10) with next steps, but Champion component is Partial (4/10) with weak next steps that use generic language ('what internal discussions have you had', 'what concerns have come up') - these are exploratory probes, not specific actionable questions like the Metrics component provides. Rephrase Champion next steps to ask specific qualifying questions about internal advocacy (e.g., 'Has [person name] discussed this with finance or engineering leadership yet?' or 'Who will champion this internally when we're not in the room?').",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_32093664435_008",
+  "timestamp": "2026-08-18T03:16:02.316832"
+}

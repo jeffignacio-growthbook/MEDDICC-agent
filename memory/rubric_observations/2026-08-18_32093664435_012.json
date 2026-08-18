@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_012",
+  "timestamp": "2026-08-18T03:17:05.981117",
+  "company": "BESTSELLER",
+  "criterion_fired": "CRITERION 2 - Carry-forward consistency error on Decision Process (D)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'When updating cumulative scores across calls, only increment if the recent call introduces NEW milestones, approvals, or stakeholder involvement. Plan reiteration without new process clarity does not justify score upgrade.'"
+}

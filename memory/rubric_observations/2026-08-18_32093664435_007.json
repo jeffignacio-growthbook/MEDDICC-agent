@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_007",
+  "timestamp": "2026-08-18T03:11:24.064512",
+  "company": "Aircall",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 5 (No Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 5 should explicitly state: 'Champion score requires documented internal selling behavior (e.g., evidence of pitching to peers, building business case, or influencing others). Passive participation or facilitation without advocacy does not qualify; default to Contact (2/10) unless explicit selling evidence exists.'"
+}

@@ -1,0 +1,21 @@
+{
+  "company": "TickPick",
+  "deal_id": "61149585726",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Competition component lacks proper evidence structure. Score of 1/10 is present but the evidence statement 'No other solutions or competitors mentioned in the call summaries' does not constitute evidence of the status being Unknown. Per rubric, Unknown status requires explicit statement that none exists OR acknowledgment that the topic was not raised. The current phrasing is ambiguous. CRITERION 4 FAILURE - Next step for Competition (Christian Liebenow) uses a question format but lacks a specific action verb and concrete deliverable. 'Directly ask about competitive landscape' is not sufficiently specific. Should be: 'Ask Christian on [date]: List all feature flagging or experimentation tools currently in use or evaluation (LaunchDarkly, Statsig, EPPO, Datadog, Optimizely, or internal tools).' CRITERION 3 FAILURE - Decision Criteria evidence includes 'Enterprise plan for increased request limits for anticipated mobile growth' but cumulative state shows no explicit quote or paraphrase from the prospect stating this is a decision criterion. This appears to be seller-inferred rather than prospect-stated. The rubric requires value metrics and decision criteria to be stated by prospect. CRITERION 2 - CARRY-FORWARD CONSISTENCY: The recent call summary is incomplete ([Summary failed]) and contains only greeting dialogue with no substantive content. The analysis maintains all cumulative scores without noting that the recent call provided no new information. Per rubric exception, when a call exists but contains no relevant content, this should be explicitly documented as 'No substantive discussion in recent call - maintaining all previous scores based on cumulative state from 2 prior calls.' This was not done. CRITERION 5 - Unsupported Claim: 'Overall Deal Health' section states ARR in HubSpot is $75,000 but calls discussed $5-6K annual budget, describing this as 'unexplained discrepancy.' However, this discrepancy is not documented in the MEDDICC components themselves (particularly Economic Buyer or Metrics). If there is a 12x variance between stated budget and system record, this must be reflected in Economic Buyer score and next steps, not buried in summary. CRITERION 4 - Partial/Unknown components below 7/10: Champion (4/10) and Economic Buyer (4/10) and Competition (1/10) and Decision Process (5/10) all have next steps, but Decision Process next steps are vague ('Establish formal timeline and decision process' uses 'make sure we're aligned'). Recommend: 'Ask [contact TBD]: Confirm written approval workflow, all required signatories, and target decision date by [specific date].'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_32093664435_004",
+  "timestamp": "2026-08-18T03:09:35.970030"
+}

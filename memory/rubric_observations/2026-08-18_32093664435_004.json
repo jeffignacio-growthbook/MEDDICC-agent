@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_004",
+  "timestamp": "2026-08-18T03:04:19.596570",
+  "company": "InPost",
+  "criterion_fired": "Criterion 4 (Metrics next steps specificity) and Criterion 2 (Carry-forward state mapping)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 4 should require 'specific closed-ended questions or measurable objectives' not 'vague verbs like document'. Criterion 2 should clarify: 'Carry-forward evidence must explicitly reference call sequence (e.g., \"Call 1 identified X; Call 2 did not add Y, maintaining assessment at Z/10\") when cumulative context exists, with evidence tied to most recent call unless cumulative synthesis is required.'"
+}

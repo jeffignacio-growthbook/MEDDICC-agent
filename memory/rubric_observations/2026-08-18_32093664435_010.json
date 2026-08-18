@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_010",
+  "timestamp": "2026-08-18T03:14:30.448176",
+  "company": "Unity",
+  "criterion_fired": "Criterion 2 (Competition), Criterion 3 (Metrics), Criterion 4 (Economic Buyer/Champion), Criterion 5 (ICP fit)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 3 should explicitly require: 'Metrics must include direct prospect quotes or confirmed paraphrases; generic seller observations score 0/10.' Criterion 4 should require: 'Next steps must name specific person, ask topic, and target date or score 0/10.' Criterion 5 should add: 'ICP fit assessment mandatory; if data insufficient, explicitly flag and score 1/10 with investigation task.'"
+}

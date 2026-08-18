@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_017",
+  "timestamp": "2026-08-18T03:23:08.345221",
+  "company": "Hublo",
+  "criterion_fired": "Criterion 4 (Next Steps specificity) and Criterion 5 (Champion/ICP overconfidence)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 5 should explicitly state: 'Do not assign Champion score or ICP confidence above 0-2/10 if data warehouse scale, experimentation maturity, or decision-maker identity remain unconfirmed; flag as open questions instead.'"
+}

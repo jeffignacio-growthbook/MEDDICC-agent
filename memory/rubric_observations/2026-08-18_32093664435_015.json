@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_015",
+  "timestamp": "2026-08-18T03:20:46.582554",
+  "company": "UPS",
+  "criterion_fired": "Criterion 3 (ICP Fit), Criterion 5 (Economic Buyer)",
+  "was_appropriate": true,
+  "suggested_change": "Clarify in rubric: 'ICP Fit and Economic Buyer claims must be grounded in prospect-stated signals. Seller strategy context and analyst inferences (e.g., \"likely VP-level\") do not qualify as evidence. If no explicit prospect signal exists, state \"unknown\" rather than making assumption.'"
+}

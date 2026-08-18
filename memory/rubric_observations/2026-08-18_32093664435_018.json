@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_018",
+  "timestamp": "2026-08-18T03:24:23.890208",
+  "company": "Route",
+  "criterion_fired": "Multiple (Evidence Quality, Actionable Next Steps, Carry-Forward Consistency, Unsupported Claims, Competitor Mapping)",
+  "was_appropriate": false,
+  "suggested_change": "Rubric should distinguish between 'incomplete data' (which warrants lower scores with transparent notes) and 'poor analysis' (which warrants failure). The agent correctly flagged what was missing; penalizing it for scoring 7/10 when the note says 'still missing' inverts the intent. Reframe: 'Scores 5-7 are acceptable if the analysis transparently states what data gaps exist and why. Scores 8+ require near-complete evidence. All next steps must use [contact TBD] if name unavailable\u2014this is a valid format requirement.' The Amplitude renewal evidence observation is valid feedback (revise note), but not a failure\u2014revisions across iterations are normal."
+}

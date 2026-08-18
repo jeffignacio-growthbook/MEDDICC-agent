@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_016",
+  "timestamp": "2026-08-18T03:22:37.966690",
+  "company": "Stone",
+  "criterion_fired": "Criterion 2 (Component State Carry-Forward)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify exception: 'Carry-forward rules DO NOT apply only when analyzing first call of engagement (iteration 1) OR when cumulative call context is demonstrably zero. For call N where N>1, carry-forward applies unless recent call transcript explicitly contradicts prior evidence.' Current 'only one call exists' is ambiguous at call 4/4."
+}

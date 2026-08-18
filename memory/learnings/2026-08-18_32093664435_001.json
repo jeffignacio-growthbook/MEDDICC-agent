@@ -1,0 +1,21 @@
+{
+  "company": "Goodnotes",
+  "deal_id": "59860100786",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 0,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 4 VIOLATION \u2014 Actionable next steps fail across all components. Multiple next steps use prohibited vague verbs: (1) Metrics: 'Walk me through your current experimentation workflow' is vague exploration language; (2) Economic Buyer: 'Can you share your procurement process' lacks specific action verb; (3) Decision Criteria: 'Can you share your complete requirements list' is open-ended data gathering, not a specific question; (4) Decision Process: 'Walk me through your decision timeline' is exploration, not a concrete ask; (5) Identified Pain: 'Help me understand the urgent problem' is discussion-focused, not action-oriented; (6) Champion: 'Observe on next call: Does Dan demonstrate knowledge' is not a next step with contact and action\u2014it's a passive observation. CORRECTED EXAMPLES: Metrics: 'Ask Dan on Thursday call: How many experiments are you running per quarter today, and what's your target?' Decision Criteria: 'Ask Dan by Friday: List your top 3 must-have integrations and technical requirements.' Decision Process: 'Confirm with Dan by EOW: Who approves this beyond you and Vaida?' Pain: 'Ask Dan directly: What problem with your current experimentation approach triggered this evaluation now?' Champion: 'Ask Dan on next call: Have you discussed GrowthBook with your VP Engineering, and if so, what was their reaction?' All next steps must contain (1) specific contact name (or '[contact TBD]' only if no contacts identified), (2) concrete deadline or timing, (3) specific question or action with no exploration language. Additionally, CRITERION 1 issue: ICP Assessment section is outside standard MEDDICC structure and creates confusion about whether ICP is a seventh component requiring its own score/evidence/next steps or contextual information. Clarify whether ICP belongs as a formal MEDDICC element or as deal context.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_32093664435_001",
+  "timestamp": "2026-08-18T02:59:45.995237"
+}

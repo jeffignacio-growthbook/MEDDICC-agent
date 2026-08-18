@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_005",
+  "timestamp": "2026-08-18T03:08:33.657012",
+  "company": "KBX",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency)",
+  "was_appropriate": false,
+  "suggested_change": "Carry-forward scores require explicit notation only when substantive new information exists that could affect scoring. Acknowledge call gaps with single statement (e.g., 'Call 4 was introductory only; prior scores maintained') rather than per-component notation."
+}

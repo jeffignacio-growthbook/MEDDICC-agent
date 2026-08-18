@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_006",
+  "timestamp": "2026-08-18T03:09:35.970646",
+  "company": "TickPick",
+  "criterion_fired": "Criteria 1, 2, 3, 4, 5 (Evidence structure, carry-forward consistency, prospect-attribution, specificity, discrepancy escalation)",
+  "was_appropriate": false,
+  "suggested_change": "Rubric needs: (1) explicit definition of Unknown status ('explicit statement of non-existence OR acknowledgment topic not raised'); (2) carry-forward rule when recent call has no substantive content; (3) clear prospect-attribution requirement for decision criteria with example of acceptable vs. rejected inferences; (4) action verb specificity standard for next steps (concrete date/contact/deliverable required); (5) escalation rule: budget variance >10x must surface in Economic Buyer score and component next steps, not summary only."
+}

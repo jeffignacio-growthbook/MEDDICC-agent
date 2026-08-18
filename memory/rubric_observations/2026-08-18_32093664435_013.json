@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_013",
+  "timestamp": "2026-08-18T03:17:07.561800",
+  "company": "Square",
+  "criterion_fired": "CRITERION 3 (Decision Criteria evidence quality) and CRITERION 4 (actionable next steps)",
+  "was_appropriate": true,
+  "suggested_change": "CRITERION 3: Require explicit resolution statement: 'If ambiguity exists between customer requirement and vendor limitation, classify as validation need (not disqualifier) and state which party owns confirmation.' CRITERION 4: Define actionable as containing subject + verb + timeline, e.g. 'Schedule call with [name] by [date] to ask [question]' rather than 'Confirm by end of week'."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_008",
+  "timestamp": "2026-08-18T03:12:55.782274",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 4 - Actionable Next Steps",
+  "was_appropriate": false,
+  "suggested_change": "Accept next steps as 'actionable' if they include (a) specific contact name, (b) concrete action verb (not 'discuss'), and (c) exact question. Remove requirement for 'target date/timeline' unless the transcript itself contains scheduling signals. Rationale: agents cannot invent meeting dates from call data; this creates an impossible standard."
+}

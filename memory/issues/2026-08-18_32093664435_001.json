@@ -1,0 +1,21 @@
+{
+  "company": "InPost",
+  "deal_id": "60069831015",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CARRY-FORWARD VIOLATION \u2014 Competition component. Cumulative state shows 1 call reviewed with Competition scored 3/10 and evidence: 'Growthbook mentioned as competitive comparison with warehouse-native analytics and lightweight SDKs; no other competitors or evaluation status discussed.' Recent call summary (Call 2) does NOT mention any competitors at all \u2014 only Firebase migration interest and technical requirements. The generated analysis correctly maintains Competition at 3/10 but the evidence has been rewritten to reference only Firebase (incumbent tool) without acknowledging the cumulative context. The analysis should explicitly state: 'No new competitive information in Call 2 \u2014 maintaining previous assessment of 3/10. Firebase identified as incumbent being replaced, but still no evidence of evaluation against LaunchDarkly, Statsig, EPPO, or homegrown alternatives.' SECOND ISSUE \u2014 Criterion 4 violation on Metrics next steps: 'Schedule 30-minute discovery call with InPost's Product or Engineering Lead by January 15, 2025 to document...' uses vague verb structure ('to document') instead of specific action. Should be: 'Ask InPost's Product Lead [contact name TBD]: How many experiments are you running today vs. your target? What is your current experimentation cost and what budget constraints exist? What specific business outcomes would validate GrowthBook success?' THIRD ISSUE \u2014 Criterion 2 carry-forward: Cumulative_calls_context shows 1 call reviewed, but generated analysis references Call 1 and Call 2 as separate entities with distinct evidence. This creates ambiguity about whether a second call has occurred. The cumulative state indicates only 1 call was reviewed; if a second call has occurred, calls_reviewed should be updated to 2. If Call 2 is the recent call summary provided, the analysis should clarify this mapping.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_32093664435_001",
+  "timestamp": "2026-08-18T03:04:19.596008"
+}

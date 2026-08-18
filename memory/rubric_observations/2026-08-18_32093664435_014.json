@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_014",
+  "timestamp": "2026-08-18T03:19:10.298274",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 3 (Evidence Quality), Criterion 4 (Actionable Next Steps), Criterion 5 (Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Criteria are appropriate. Add CLAUDE.md rules: (1) When cumulative context exists and recent call is silent on a named contact, maintain prior score with 'no change' note rather than regress; (2) Define score thresholds: 5/10 requires specific quote or detailed paraphrase, not 'potential/emerging' language; (3) Next steps require agent + explicit action verb + deadline, not passive constructions; (4) Pain ownership must be directly attributed to named contact in call data, not inferred from their other responsibilities."
+}

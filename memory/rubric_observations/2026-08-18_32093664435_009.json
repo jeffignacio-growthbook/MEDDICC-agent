@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_009",
+  "timestamp": "2026-08-18T03:14:17.274080",
+  "company": "Skyscanner",
+  "criterion_fired": "Criterion 2 (carry-forward consistency), Criterion 4 (next steps specificity), Criterion 5 (internal contradiction)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'When revising a score from prior state, always quote the prior evidence AND provide new evidence that contradicts it. If no new call data exists, maintain prior score with note \"no new information.\" Never downgrade without explicit justification against the prior state documentation.'"
+}

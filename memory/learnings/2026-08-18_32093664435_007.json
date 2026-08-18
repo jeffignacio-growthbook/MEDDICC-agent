@@ -1,0 +1,21 @@
+{
+  "company": "Unity",
+  "deal_id": "49689180024",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION - Competition component: Analysis states 'maintaining 3/10 score as cumulative context suggests competitive alternatives may have been discussed but not documented' without evidence from recent call or cumulative state. The cumulative state shows status 'partial' with evidence only that 'GrowthBook is mentioned as an integration strategy being evaluated' - this does NOT suggest competitors were discussed. Score of 3/10 cannot be justified. Either reduce to 1/10 (Unknown, no competitors identified) or provide actual evidence of competitor discussion. CRITERION 4 VIOLATION - Economic Buyer and Champion components both score 1/10 with next steps that say 'Ask Sarel Matza or Logan Bates' - but no specific actionable question is provided. 'Who on your team owns the budget' is vague. Needs: 'Ask Sarel Matza by [date]: Which department/team owns the $50K budget, and does that person need to be in our next call?' CRITERION 3 VIOLATION - Metrics component claims score 4/10 but evidence is generic ('Discussion of configuration management efficiency') without specific quotes or paraphrases showing these are prospect-stated metrics vs. seller interpretation. Need direct evidence Unity stated these as their metrics. CRITERION 5 VIOLATION - ICP fit assessment missing. No statement about whether Unity qualifies: company size not stated, data stack not mentioned, scale signals absent. Must explicitly address ICP fit (pass or flag concern) before deal can be considered healthy.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_32093664435_007",
+  "timestamp": "2026-08-18T03:14:30.447633"
+}

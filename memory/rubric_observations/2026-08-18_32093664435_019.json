@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_32093664435_019",
+  "timestamp": "2026-08-18T03:24:44.554811",
+  "company": "shiftkey",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 5 (Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'Decision Process score must reflect engagement cadence changes. A shift from weekly to biweekly/monthly meetings, cancellation of recurring syncs, or deferred reviews indicates reduced decision velocity and should lower the score unless accompanied by direct customer evidence (quote or explicit statement) that urgency/interest remains unchanged despite reduced meeting frequency.'"
+}
