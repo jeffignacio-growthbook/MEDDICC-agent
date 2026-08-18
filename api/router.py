@@ -295,7 +295,7 @@ Required JSON:
   "handler": "<handler_name>",
   "params": {{
     "time_window": {{
-      "period": "current_quarter|current_week|last_N_days|specific",
+      "period": "current_quarter|current_month|previous_month|current_week|last_N_days|specific",
       "start": "YYYY-MM-DD or null",
       "end":   "YYYY-MM-DD or null"
     }},

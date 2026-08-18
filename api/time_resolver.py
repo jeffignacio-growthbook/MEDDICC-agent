@@ -60,6 +60,27 @@ def resolve_time_window(tw: dict) -> dict:
         s, e, label = get_fiscal_quarter(today, cfg_wrap)
         return {"start": s.isoformat(), "end": e.isoformat(),
                 "label": label}
+    elif period == "current_month":
+        from calendar import monthrange
+        first = date(today.year, today.month, 1)
+        last_day = monthrange(today.year, today.month)[1]
+        last = date(today.year, today.month, last_day)
+        return {
+            "start": first.isoformat(),
+            "end":   last.isoformat(),
+            "label": today.strftime("%B %Y")  # e.g. "August 2026"
+        }
+    elif period == "previous_month":
+        from dateutil.relativedelta import relativedelta
+        first = (today.replace(day=1) - relativedelta(months=1))
+        from calendar import monthrange
+        last_day = monthrange(first.year, first.month)[1]
+        last = date(first.year, first.month, last_day)
+        return {
+            "start": first.isoformat(),
+            "end":   last.isoformat(),
+            "label": first.strftime("%B %Y")
+        }
     elif period == "current_week":
         monday = today - timedelta(days=today.weekday())
         return {"start": monday.isoformat(),
