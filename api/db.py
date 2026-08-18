@@ -503,6 +503,65 @@ def get_prior_entities(history: list) -> dict:
     return {}
 
 
+def get_user_persona(sb: Client, user_id: str,
+                     slack_email: str = None) -> dict | None:
+    """
+    Look up user persona by Slack user_id first.
+    If not found and slack_email provided, look up by email
+    and lazily bind the slack_user_id to that row.
+
+    Returns None only when genuinely unknown (not in HubSpot users).
+
+    Args:
+        sb: Supabase client
+        user_id: Slack user ID (U12345ABC format)
+        slack_email: User's email from Slack (optional, for lazy binding)
+
+    Returns:
+        Persona dict with: email, name, role, role_group, slack_user_id
+        or None if user not found
+    """
+    from datetime import datetime, timezone
+
+    # Step 1: Look up by slack_user_id (fast path for known users)
+    try:
+        result = (sb.table("user_personas")
+                    .select("*")
+                    .eq("slack_user_id", user_id)
+                    .execute())
+
+        if result.data:
+            return result.data[0]
+    except Exception:
+        pass
+
+    # Step 2: If email known, look up by email and bind slack_user_id
+    if slack_email:
+        slack_email = slack_email.strip().lower()
+        try:
+            result = (sb.table("user_personas")
+                        .select("*")
+                        .eq("email", slack_email)
+                        .execute())
+
+            if result.data:
+                # Bind the Slack ID to this persona row (lazy binding)
+                sb.table("user_personas").update({
+                    "slack_user_id": user_id,
+                    "last_seen_at": datetime.now(timezone.utc).isoformat()
+                }).eq("email", slack_email).execute()
+
+                # Return persona with updated slack_user_id
+                persona = result.data[0]
+                persona["slack_user_id"] = user_id
+                return persona
+        except Exception:
+            pass
+
+    # Not found - user will need to self-register via DM
+    return None
+
+
 def log_unanswered(sb: Client, question: str, user_id: str,
                     channel: str, thread_ts: str,
                     reason: str):
