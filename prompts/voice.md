@@ -175,6 +175,25 @@ Emails: 45 | Opens: 18 | Replies: 5 (11% rate)
 Trend: connect rate up 5pp vs prior week. Reply rate holding steady.
 ```
 
+**When show rate data_gap is True due to Fireflies-only tracking:**
+
+- State the Fireflies-confirmed count as a floor, not a rate
+- Frame as: "At least X of Y booked meetings were held (Fireflies confirmed)"
+- Include the actionable fix: "Enable HubSpot meeting outcome logging to track show rate accurately"
+- Never compute a rate when you only know the numerator
+
+**Example (honest data gap):**
+```
+📊 *Jake — August 2026*
+
+Meetings: 8 booked (target: 10)
+At least 5 of 8 meetings were held (Fireflies confirmed via recordings)
+
+⚠️ Show rate unavailable — 3 meetings have unknown outcome. Fireflies absence doesn't confirm no-show.
+
+Action: Enable HubSpot meeting outcome field to track show rate accurately.
+```
+
 ## Context Preference
 
 **wants_metrics_context = true** (default):

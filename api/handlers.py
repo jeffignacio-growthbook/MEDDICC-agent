@@ -13,6 +13,7 @@ from collections import Counter
 # Add scripts to path for supabase_client
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from supabase_client import select_all
+from sdr_utils import rate_or_gap
 
 
 async def query_waterfall(params: dict, sb) -> dict:
@@ -1096,13 +1097,104 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
     total_voicemails = sum(m.get("voicemails") or 0 for m in metrics_rows)
     total_emails = sum(m.get("emails_sent") or 0 for m in metrics_rows)
 
+    # Query meetings data
+    meetings_rows = select_all(sb, "meetings",
+        columns="scheduled_at,held,held_confidence,title",
+        filters=[
+            ("eq", "owner_email", sdr_email),
+            ("gte", "scheduled_at", tw["start"]),
+            ("lte", "scheduled_at", tw["end"])
+        ]
+    )
+
+    # Meetings breakdown: Fireflies can confirm held but not no-shows
+    booked = len(meetings_rows)
+    fireflies_confirmed = sum(1 for m in meetings_rows
+                              if m.get("held") is True
+                              and m.get("held_confidence") == "fireflies_match")
+    hs_confirmed = sum(1 for m in meetings_rows
+                       if m.get("held_confidence") == "hs_outcome")
+    unknown_outcome = sum(1 for m in meetings_rows if m.get("held") is None)
+
+    # Query rep targets for current quarter
+    # Determine which quarter the time window is in
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+    from utils import get_fiscal_quarter
+    import yaml
+
+    # Load fiscal config
+    config_path = Path(__file__).parent.parent / "config" / "client.yaml"
+    config = yaml.safe_load(open(config_path))
+    cfg_wrap = {"fiscal": config.get("fiscal", {})}
+
+    # Get the fiscal quarter for the start of the time window
+    from datetime import date
+    start_date = date.fromisoformat(tw["start"])
+    _, _, quarter_label = get_fiscal_quarter(start_date, cfg_wrap)
+    quarter_period = quarter_label.replace(" ", "_")  # e.g. "Q3_FY2027"
+
+    # Query targets for this quarter
+    target_rows = select_all(sb, "rep_targets",
+        columns="metric,target_value",
+        filters=[
+            ("eq", "entity_email", sdr_email),
+            ("eq", "period", quarter_period)
+        ]
+    )
+
+    # Build target dict
+    targets_raw = {t.get("metric"): t.get("target_value") for t in target_rows}
+
+    # Prorate monthly targets if time window is monthly
+    period_type = params.get("time_window", {}).get("period", "")
+    is_monthly = period_type in ["current_month", "previous_month"]
+
+    if is_monthly and targets_raw:
+        # Monthly target = quarterly target / 3
+        target_booked = int(targets_raw.get("meetings_booked", 0) / 3) if "meetings_booked" in targets_raw else None
+        target_held = int(targets_raw.get("meetings_held", 0) / 3) if "meetings_held" in targets_raw else None
+        target_sqls = int(targets_raw.get("sqls_created", 0) / 3) if "sqls_created" in targets_raw else None
+    else:
+        # Use full quarterly targets
+        target_booked = targets_raw.get("meetings_booked")
+        target_held = targets_raw.get("meetings_held")
+        target_sqls = targets_raw.get("sqls_created")
+
     return {
         "sdr_email": sdr_email,
         "metrics": metrics_rows,
+        "meetings": meetings_rows,
         "summary": {
             "total_calls": total_calls,
             "total_voicemails": total_voicemails,
             "total_emails": total_emails
+        },
+        "meetings_data": {
+            "booked": booked,
+            "booked_target": target_booked,
+            "booked_vs_target": rate_or_gap(booked, target_booked),
+            "fireflies_confirmed_held": fireflies_confirmed,
+            "hs_confirmed_held": hs_confirmed,
+            "unknown_outcome": unknown_outcome,
+            "show_rate": {
+                "value": None,
+                "data_gap": True,
+                "reason": (
+                    f"{fireflies_confirmed} meetings confirmed held via Fireflies. "
+                    f"{unknown_outcome} meetings have unknown outcome — Fireflies "
+                    f"absence doesn't confirm no-show. Show rate requires HubSpot "
+                    f"outcome field to be populated."
+                )
+            }
+        },
+        "targets": {
+            "meetings_booked": target_booked,
+            "meetings_held": target_held,
+            "sqls_created": target_sqls,
+            "period": quarter_period,
+            "prorated_monthly": is_monthly
         },
         "period": tw["label"]
     }
@@ -1144,10 +1236,53 @@ async def query_sdr_leaderboard(params: dict, sb) -> dict:
         by_user[user_key]["voicemails"] += row.get("voicemails") or 0
         by_user[user_key]["emails_sent"] += row.get("emails_sent") or 0
 
+    # Get all SDR users to map tool_user_id to email
+    all_sdr_users = select_all(sb, "sdr_users",
+        columns="tool,tool_user_id,user_email"
+    )
+
+    # Build tool_user_id → email mapping
+    user_email_map = {
+        f"{u.get('tool')}:{u.get('tool_user_id')}": u.get('user_email')
+        for u in all_sdr_users
+    }
+
+    # Get meetings data for all SDRs
+    meetings_rows = select_all(sb, "meetings",
+        columns="owner_email,held",
+        filters=[
+            ("gte", "scheduled_at", tw["start"]),
+            ("lte", "scheduled_at", tw["end"])
+        ]
+    )
+
+    # Aggregate meetings by owner
+    meetings_by_owner = {}
+    for m in meetings_rows:
+        owner = m.get("owner_email")
+        if not owner:
+            continue
+        if owner not in meetings_by_owner:
+            meetings_by_owner[owner] = {"booked": 0, "held": 0}
+        meetings_by_owner[owner]["booked"] += 1
+        if m.get("held") is True:
+            meetings_by_owner[owner]["held"] += 1
+
+    # Add meetings data to leaderboard
+    for user_key, user_data in by_user.items():
+        owner_email = user_email_map.get(user_key)
+
+        if owner_email and owner_email in meetings_by_owner:
+            user_data["meetings_booked"] = meetings_by_owner[owner_email]["booked"]
+            user_data["meetings_held"] = meetings_by_owner[owner_email]["held"]
+        else:
+            user_data["meetings_booked"] = 0
+            user_data["meetings_held"] = 0
+
     # Convert to list and sort by total activity
     leaderboard = sorted(
         by_user.values(),
-        key=lambda x: x["calls_made"] + x["emails_sent"],
+        key=lambda x: x["calls_made"] + x["emails_sent"] + x.get("meetings_booked", 0),
         reverse=True
     )
 
@@ -1157,6 +1292,8 @@ async def query_sdr_leaderboard(params: dict, sb) -> dict:
         "team_summary": {
             "total_calls": sum(u["calls_made"] for u in leaderboard),
             "total_voicemails": sum(u["voicemails"] for u in leaderboard),
-            "total_emails": sum(u["emails_sent"] for u in leaderboard)
+            "total_emails": sum(u["emails_sent"] for u in leaderboard),
+            "total_meetings_booked": sum(u.get("meetings_booked", 0) for u in leaderboard),
+            "total_meetings_held": sum(u.get("meetings_held", 0) for u in leaderboard)
         }
     }
