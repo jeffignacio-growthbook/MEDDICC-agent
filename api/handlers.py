@@ -1791,7 +1791,10 @@ async def query_stale_deals(params: dict, sb) -> dict:
         
         if activity_date:
             try:
+                # Parse activity date and make it timezone-aware for comparison
                 activity_dt = datetime.fromisoformat(activity_date.replace('Z', '+00:00'))
+                if activity_dt.tzinfo is None:
+                    activity_dt = activity_dt.replace(tzinfo=timezone.utc)
                 days_since_activity = (datetime.now(timezone.utc) - activity_dt).days
                 is_stale = activity_date < stale_cutoff
             except:
