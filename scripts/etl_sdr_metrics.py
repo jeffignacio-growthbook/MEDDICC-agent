@@ -16,6 +16,7 @@ Date handling:
 """
 
 import sys
+import time
 import argparse
 from datetime import date, timedelta
 from pathlib import Path
