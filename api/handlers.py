@@ -13,7 +13,7 @@ from collections import Counter
 # Add scripts to path for supabase_client
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from supabase_client import select_all
-from sdr_utils import rate_or_gap
+from sdr_utils import rate_or_gap, today_in_reporting_tz
 
 
 async def query_waterfall(params: dict, sb) -> dict:
@@ -1302,4 +1302,709 @@ async def query_sdr_leaderboard(params: dict, sb) -> dict:
             "total_meetings_booked": sum(u.get("meetings_booked", 0) for u in leaderboard),
             "total_meetings_held": sum(u.get("meetings_held", 0) for u in leaderboard)
         }
+    }
+
+
+# ============================================================================
+# AE-FOCUSED HANDLERS
+# ============================================================================
+
+async def query_rep_pipeline(params: dict, sb) -> dict:
+    """
+    All active deals for a specific AE, sorted by deal value descending.
+    Used for: "show me Christian's pipeline", "what deals does Cary own?"
+    
+    params:
+      owner_email: str  — exact email from user_personas roster
+      time_window: dict — optional, filters by close_date if provided
+    """
+    owner_email = params.get("owner_email")
+    tw = params.get("time_window")
+    
+    if not owner_email:
+        return {
+            "error": "owner_email required — use the team roster to resolve a rep name to their email"
+        }
+    
+    # Build filters for deals
+    filters = [
+        ("eq", "owner_email", owner_email),
+        ("eq", "deal_status", "active")
+    ]
+    
+    # Add time window filter if provided
+    if tw:
+        filters.append(("gte", "close_date", tw["start"]))
+        filters.append(("lte", "close_date", tw["end"]))
+    
+    # Get active deals for this rep
+    deals_rows = select_all(sb, "deals",
+        columns="deal_id,company_name,deal_value,stage,close_date,forecast_category",
+        filters=filters
+    )
+    
+    # Get latest analysis for each deal (left join)
+    analyses_map = {}
+    if deals_rows:
+        deal_ids = [d["deal_id"] for d in deals_rows]
+        # Get latest analysis per deal
+        for deal_id in deal_ids:
+            analyses = select_all(sb, "analyses",
+                columns="deal_id,overall_score,champion_score",
+                filters=[("eq", "deal_id", deal_id)]
+            )
+            if analyses:
+                # Sort by analyzed_at (implicit - latest insert = latest)
+                analyses_map[deal_id] = analyses[-1]
+    
+    # Enrich deals with analysis data
+    enriched_deals = []
+    total_pipeline = 0
+    no_value_count = 0
+    
+    for deal in deals_rows:
+        deal_id = deal["deal_id"]
+        analysis = analyses_map.get(deal_id, {})
+        
+        deal_value = deal.get("deal_value")
+        if deal_value is not None:
+            total_pipeline += deal_value
+        else:
+            no_value_count += 1
+        
+        enriched_deals.append({
+            "company_name": deal.get("company_name"),
+            "deal_value": deal_value,
+            "stage": deal.get("stage"),
+            "close_date": deal.get("close_date"),
+            "overall_score": analysis.get("overall_score"),
+            "champion_score": analysis.get("champion_score"),
+            "forecast_category": deal.get("forecast_category")
+        })
+    
+    # Sort by deal_value descending, nulls last
+    enriched_deals.sort(key=lambda x: (x["deal_value"] is None, -(x["deal_value"] or 0)))
+    
+    # Get persona name if available
+    persona_rows = select_all(sb, "user_personas",
+        columns="name,display_name",
+        filters=[("eq", "email", owner_email)]
+    )
+    persona_name = None
+    if persona_rows:
+        persona_name = persona_rows[0].get("display_name") or persona_rows[0].get("name")
+    
+    avg_deal_value = total_pipeline / len([d for d in enriched_deals if d["deal_value"] is not None]) if enriched_deals and any(d["deal_value"] is not None for d in enriched_deals) else None
+    
+    return {
+        "owner_email": owner_email,
+        "owner_name": persona_name,
+        "period": tw["label"] if tw else "all active",
+        "deals": enriched_deals,
+        "summary": {
+            "total_deals": len(enriched_deals),
+            "total_pipeline": total_pipeline,
+            "avg_deal_value": avg_deal_value,
+            "no_value_count": no_value_count
+        },
+        "data_gap": False
+    }
+
+
+async def query_rep_attainment(params: dict, sb) -> dict:
+    """
+    Quota attainment for one or all AEs this period.
+    Used for: "who's on track to hit quota?", "show me Q3 attainment by rep",
+              "which reps are above 50% to quota?", "who is furthest from their number?"
+    
+    params:
+      owner_email: str or None  — if None, returns all reps
+      time_window: dict         — determines which quarter to pull targets for
+    """
+    owner_email = params.get("owner_email")
+    tw = params["time_window"]
+    
+    import yaml
+    from pathlib import Path
+    
+    # Load fiscal config to build period label
+    config_path = Path(__file__).parent.parent / "config" / "client.yaml"
+    config = yaml.safe_load(open(config_path))
+    cfg_wrap = {"fiscal": config.get("fiscal", {})}
+    
+    # Get fiscal quarter label from time window start date
+    from datetime import date
+    sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+    from utils import get_fiscal_quarter
+    
+    start_date = date.fromisoformat(tw["start"])
+    _, _, quarter_label = get_fiscal_quarter(start_date, cfg_wrap)
+    period = quarter_label.replace(" ", "_")  # e.g. "Q3_FY2027"
+    
+    # Load rep targets for this period
+    target_filters = [
+        ("eq", "period", period),
+        ("eq", "level", "rep"),
+        ("eq", "role", "ae")
+    ]
+    
+    target_rows = select_all(sb, "rep_targets",
+        columns="entity_email,target_value,metric",
+        filters=target_filters
+    )
+    
+    # Build target map
+    targets_by_email = {}
+    for t in target_rows:
+        if t.get("metric") == "arr_won":  # or appropriate metric name
+            targets_by_email[t["entity_email"]] = t["target_value"]
+    
+    # If no targets found, return data gap
+    if not targets_by_email:
+        return {
+            "period": period,
+            "reps": [],
+            "team_summary": {
+                "total_won": 0,
+                "total_target": 0,
+                "team_attainment": {"value": None, "data_gap": True},
+                "reps_above_50pct": 0,
+                "reps_above_100pct": 0
+            },
+            "note": "AE quotas not set — run seed_rep_targets.py or ask Ryan to set quotas for this period"
+        }
+    
+    # Load won deals in time window
+    won_filters = [
+        ("eq", "deal_status", "won"),
+        ("gte", "close_date", tw["start"]),
+        ("lte", "close_date", tw["end"])
+    ]
+    
+    won_rows = select_all(sb, "deals",
+        columns="owner_email,deal_value",
+        filters=won_filters
+    )
+    
+    # Group won deals by owner
+    won_by_email = {}
+    for deal in won_rows:
+        owner = deal.get("owner_email")
+        value = deal.get("deal_value") or 0
+        if owner:
+            won_by_email[owner] = won_by_email.get(owner, 0) + value
+    
+    # Get all unique rep emails (union of targets and won)
+    all_rep_emails = set(targets_by_email.keys()) | set(won_by_email.keys())
+    
+    # Filter to specific rep if requested
+    if owner_email:
+        all_rep_emails = {owner_email} if owner_email in all_rep_emails else set()
+    
+    # Load persona names
+    persona_map = {}
+    if all_rep_emails:
+        persona_rows = select_all(sb, "user_personas",
+            columns="email,display_name,name",
+            filters=[]
+        )
+        for p in persona_rows:
+            email = p.get("email")
+            persona_map[email] = p.get("display_name") or p.get("name")
+    
+    # Build rep attainment list
+    reps = []
+    total_won = 0
+    total_target = 0
+    reps_above_50 = 0
+    reps_above_100 = 0
+    
+    for email in all_rep_emails:
+        target = targets_by_email.get(email)
+        won = won_by_email.get(email, 0)
+        
+        attainment = rate_or_gap(won, target)
+        attainment_pct = attainment.get("value")
+        
+        # Count won deals for this rep
+        deals_won = len([d for d in won_rows if d.get("owner_email") == email])
+        
+        reps.append({
+            "owner_email": email,
+            "name": persona_map.get(email),
+            "target": target,
+            "won_arr": won,
+            "attainment": attainment,
+            "attainment_pct": attainment_pct,
+            "deals_won": deals_won,
+            "data_gap": target is None
+        })
+        
+        total_won += won
+        if target:
+            total_target += target
+        
+        if attainment_pct and attainment_pct >= 50:
+            reps_above_50 += 1
+        if attainment_pct and attainment_pct >= 100:
+            reps_above_100 += 1
+    
+    # Sort by attainment ascending (lowest first)
+    reps.sort(key=lambda x: (x["attainment_pct"] is None, x["attainment_pct"] or 0))
+    
+    team_attainment = rate_or_gap(total_won, total_target)
+    
+    return {
+        "period": period,
+        "reps": reps,
+        "team_summary": {
+            "total_won": total_won,
+            "total_target": total_target,
+            "team_attainment": team_attainment,
+            "reps_above_50pct": reps_above_50,
+            "reps_above_100pct": reps_above_100
+        }
+    }
+
+
+async def query_deal_health(params: dict, sb) -> dict:
+    """
+    MEDDICC health filter across a rep's deals or the full team.
+    Used for: "show me Christian's weakest deals",
+              "which deals have no champion identified?",
+              "which deals closing this month have a score below 5?",
+              "show me deals where pain is identified but metrics aren't"
+    
+    params:
+      owner_email: str or None    — filter to one rep, or None for team
+      score_threshold: int        — overall_score below this (default 5)
+      component: str or None      — filter on a specific component
+                                    e.g. "champion", "economic_buyer"
+      component_threshold: int    — component score below this (default 4)
+      time_window: dict or None   — filter close_date if provided
+    """
+    owner_email = params.get("owner_email")
+    score_threshold = params.get("score_threshold", 5)
+    component = params.get("component")
+    component_threshold = params.get("component_threshold", 4)
+    tw = params.get("time_window")
+    
+    # Valid components
+    valid_components = [
+        "champion", "economic_buyer", "metrics", "decision_criteria",
+        "decision_process", "pain", "competition"
+    ]
+    
+    if component and component not in valid_components:
+        component = None
+    
+    # Get all analyses with overall_score below threshold
+    analyses_filters = [
+        ("lt", "overall_score", score_threshold)
+    ]
+    
+    # Add component filter if specified
+    if component:
+        component_col = f"{component}_score"
+        analyses_filters.append(("lt", component_col, component_threshold))
+    
+    analyses_rows = select_all(sb, "analyses",
+        columns=f"deal_id,overall_score,champion_score,economic_buyer_score,metrics_score,decision_criteria_score,decision_process_score,pain_score,competition_score",
+        filters=analyses_filters
+    )
+    
+    if not analyses_rows:
+        return {
+            "filter_applied": {
+                "owner": owner_email or "all reps",
+                "score_threshold": score_threshold,
+                "component": component,
+                "close_window": tw["label"] if tw else None
+            },
+            "deals": [],
+            "summary": {
+                "total_at_risk": 0,
+                "total_pipeline_at_risk": 0,
+                "avg_score": None
+            }
+        }
+    
+    # Get deal IDs from analyses
+    deal_ids = [a["deal_id"] for a in analyses_rows]
+    
+    # Get corresponding deals
+    deals_filters = [
+        ("eq", "deal_status", "active"),
+        ("in", "deal_id", ",".join(deal_ids))
+    ]
+    
+    if owner_email:
+        deals_filters.append(("eq", "owner_email", owner_email))
+    
+    if tw:
+        deals_filters.append(("gte", "close_date", tw["start"]))
+        deals_filters.append(("lte", "close_date", tw["end"]))
+    
+    deals_rows = select_all(sb, "deals",
+        columns="deal_id,company_name,owner_email,close_date,deal_value",
+        filters=deals_filters
+    )
+    
+    # Join analyses to deals
+    analyses_map = {a["deal_id"]: a for a in analyses_rows}
+    
+    enriched_deals = []
+    total_pipeline_at_risk = 0
+    scores = []
+    
+    for deal in deals_rows:
+        deal_id = deal["deal_id"]
+        analysis = analyses_map.get(deal_id)
+        
+        if not analysis:
+            continue
+        
+        # Find weakest component
+        component_scores = {
+            "champion": analysis.get("champion_score"),
+            "economic_buyer": analysis.get("economic_buyer_score"),
+            "metrics": analysis.get("metrics_score"),
+            "decision_criteria": analysis.get("decision_criteria_score"),
+            "decision_process": analysis.get("decision_process_score"),
+            "pain": analysis.get("pain_score"),
+            "competition": analysis.get("competition_score")
+        }
+        
+        valid_scores = {k: v for k, v in component_scores.items() if v is not None}
+        weakest_component = min(valid_scores, key=valid_scores.get) if valid_scores else None
+        weakest_score = valid_scores.get(weakest_component) if weakest_component else None
+        
+        enriched_deals.append({
+            "company_name": deal.get("company_name"),
+            "owner_email": deal.get("owner_email"),
+            "overall_score": analysis.get("overall_score"),
+            "champion_score": analysis.get("champion_score"),
+            "economic_buyer_score": analysis.get("economic_buyer_score"),
+            "close_date": deal.get("close_date"),
+            "deal_value": deal.get("deal_value"),
+            "weakest_component": weakest_component,
+            "weakest_score": weakest_score
+        })
+        
+        if deal.get("deal_value"):
+            total_pipeline_at_risk += deal["deal_value"]
+        
+        scores.append(analysis.get("overall_score"))
+    
+    # Sort by overall_score ascending, then close_date ascending
+    enriched_deals.sort(key=lambda x: (x["overall_score"], x["close_date"] or "9999-99-99"))
+    
+    avg_score = sum(scores) / len(scores) if scores else None
+    
+    return {
+        "filter_applied": {
+            "owner": owner_email or "all reps",
+            "score_threshold": score_threshold,
+            "component": component,
+            "close_window": tw["label"] if tw else None
+        },
+        "deals": enriched_deals,
+        "summary": {
+            "total_at_risk": len(enriched_deals),
+            "total_pipeline_at_risk": total_pipeline_at_risk,
+            "avg_score": avg_score
+        }
+    }
+
+
+async def query_stale_deals(params: dict, sb) -> dict:
+    """
+    Deals with no stage movement or past close date.
+    Used for: "which deals have been in the same stage for 30+ days?",
+              "show me deals stuck in Technical Evaluation",
+              "which of Cary's deals haven't moved?",
+              "show me deals past their close date"
+    
+    params:
+      owner_email: str or None
+      stage: str or None          — filter to a specific stage name
+      stale_days: int             — deals in same stage longer than this (default 21)
+      time_window: dict or None
+    """
+    owner_email = params.get("owner_email")
+    stage = params.get("stage")
+    stale_days = params.get("stale_days", 21)
+    tw = params.get("time_window")
+    
+    import yaml
+    from datetime import date, timedelta
+    
+    # Load config for reporting timezone
+    config_path = Path(__file__).parent.parent / "config" / "client.yaml"
+    config = yaml.safe_load(open(config_path))
+    
+    today = today_in_reporting_tz(config)
+    stale_cutoff = (today - timedelta(days=stale_days)).isoformat()
+    
+    # Get active deals
+    filters = [("eq", "deal_status", "active")]
+    
+    if owner_email:
+        filters.append(("eq", "owner_email", owner_email))
+    
+    if stage:
+        filters.append(("eq", "stage", stage))
+    
+    if tw:
+        filters.append(("gte", "close_date", tw["start"]))
+        filters.append(("lte", "close_date", tw["end"]))
+    
+    deals_rows = select_all(sb, "deals",
+        columns="deal_id,company_name,owner_email,stage,close_date,deal_value,last_analyzed,updated_at",
+        filters=filters
+    )
+    
+    # Get latest analysis for each deal
+    analyses_map = {}
+    if deals_rows:
+        deal_ids = [d["deal_id"] for d in deals_rows]
+        for deal_id in deal_ids:
+            analyses = select_all(sb, "analyses",
+                columns="deal_id,overall_score",
+                filters=[("eq", "deal_id", deal_id)]
+            )
+            if analyses:
+                analyses_map[deal_id] = analyses[-1]
+    
+    # Filter stale and past-close deals
+    stale_deals = []
+    past_close_count = 0
+    stale_count = 0
+    total_stale_pipeline = 0
+    
+    for deal in deals_rows:
+        # Use last_analyzed or updated_at as activity proxy
+        activity_date = deal.get("last_analyzed") or deal.get("updated_at")
+        is_stale = False
+        is_past_close = False
+        days_since_activity = None
+        
+        if activity_date:
+            try:
+                activity_dt = datetime.fromisoformat(activity_date.replace('Z', '+00:00'))
+                days_since_activity = (datetime.now(timezone.utc) - activity_dt).days
+                is_stale = activity_date < stale_cutoff
+            except:
+                pass
+        
+        close_date = deal.get("close_date")
+        if close_date:
+            try:
+                close_dt = date.fromisoformat(close_date)
+                is_past_close = close_dt < today
+            except:
+                pass
+        
+        if is_stale or is_past_close:
+            analysis = analyses_map.get(deal["deal_id"], {})
+            
+            stale_deals.append({
+                "company_name": deal.get("company_name"),
+                "owner_email": deal.get("owner_email"),
+                "stage": deal.get("stage"),
+                "close_date": close_date,
+                "deal_value": deal.get("deal_value"),
+                "days_since_activity": days_since_activity,
+                "is_past_close_date": is_past_close,
+                "overall_score": analysis.get("overall_score")
+            })
+            
+            if is_past_close:
+                past_close_count += 1
+            if is_stale:
+                stale_count += 1
+            
+            if deal.get("deal_value"):
+                total_stale_pipeline += deal["deal_value"]
+    
+    return {
+        "stale_deals": stale_deals,
+        "past_close_date_count": past_close_count,
+        "stale_count": stale_count,
+        "total_stale_pipeline": total_stale_pipeline,
+        "stale_threshold_days": stale_days
+    }
+
+
+async def query_team_leaderboard(params: dict, sb) -> dict:
+    """
+    Full AE team ranking across pipeline, attainment, and deal quality.
+    Used for: "show me the team leaderboard", "rank the AEs by pipeline",
+              "who's carrying the team?", "who has the most pipeline closing this quarter?"
+    
+    params:
+      time_window: dict
+      sort_by: str — "pipeline" | "attainment" | "meddicc_score" | "deals_won"
+                     default: "pipeline"
+      limit: int   — default 10
+    """
+    tw = params["time_window"]
+    sort_by = params.get("sort_by", "pipeline")
+    limit = params.get("limit", 10)
+    
+    import yaml
+    from datetime import date
+    
+    # Load fiscal config
+    config_path = Path(__file__).parent.parent / "config" / "client.yaml"
+    config = yaml.safe_load(open(config_path))
+    cfg_wrap = {"fiscal": config.get("fiscal", {})}
+    
+    # Get period label
+    sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+    from utils import get_fiscal_quarter
+    
+    start_date = date.fromisoformat(tw["start"])
+    _, _, quarter_label = get_fiscal_quarter(start_date, cfg_wrap)
+    period = quarter_label.replace(" ", "_")
+    
+    # Get all active deals (grouped by owner)
+    active_deals = select_all(sb, "deals",
+        columns="owner_email,deal_value",
+        filters=[("eq", "deal_status", "active")]
+    )
+    
+    # Get won deals in time window (grouped by owner)
+    won_deals = select_all(sb, "deals",
+        columns="owner_email,deal_value",
+        filters=[
+            ("eq", "deal_status", "won"),
+            ("gte", "close_date", tw["start"]),
+            ("lte", "close_date", tw["end"])
+        ]
+    )
+    
+    # Get targets for this period
+    targets = select_all(sb, "rep_targets",
+        columns="entity_email,target_value,metric",
+        filters=[
+            ("eq", "period", period),
+            ("eq", "level", "rep"),
+            ("eq", "role", "ae")
+        ]
+    )
+    
+    # Get all personas
+    personas = select_all(sb, "user_personas",
+        columns="email,display_name,name",
+        filters=[]
+    )
+    
+    # Build rep aggregations
+    rep_data = {}
+    
+    # Active pipeline
+    for deal in active_deals:
+        owner = deal.get("owner_email")
+        if not owner:
+            continue
+        if owner not in rep_data:
+            rep_data[owner] = {}
+        if "active_pipeline" not in rep_data[owner]:
+            rep_data[owner]["active_pipeline"] = 0
+            rep_data[owner]["active_deals"] = 0
+        if deal.get("deal_value"):
+            rep_data[owner]["active_pipeline"] += deal["deal_value"]
+        rep_data[owner]["active_deals"] += 1
+    
+    # Won ARR
+    for deal in won_deals:
+        owner = deal.get("owner_email")
+        if not owner:
+            continue
+        if owner not in rep_data:
+            rep_data[owner] = {}
+        if "won_arr" not in rep_data[owner]:
+            rep_data[owner]["won_arr"] = 0
+        if deal.get("deal_value"):
+            rep_data[owner]["won_arr"] += deal["deal_value"]
+    
+    # Quotas
+    targets_map = {}
+    for t in targets:
+        if t.get("metric") == "arr_won":
+            targets_map[t["entity_email"]] = t["target_value"]
+    
+    for email, quota in targets_map.items():
+        if email not in rep_data:
+            rep_data[email] = {}
+        rep_data[email]["quota"] = quota
+    
+    # Personas
+    persona_map = {}
+    for p in personas:
+        email = p.get("email")
+        persona_map[email] = p.get("display_name") or p.get("name")
+    
+    # Build leaderboard
+    leaderboard = []
+    team_total_pipeline = 0
+    team_won_arr = 0
+    data_gaps = []
+    
+    for email, data in rep_data.items():
+        active_pipeline = data.get("active_pipeline")
+        active_deals = data.get("active_deals")
+        won_arr = data.get("won_arr")
+        quota = data.get("quota")
+        
+        # Calculate attainment if quota exists
+        attainment = None
+        if quota and won_arr is not None:
+            attainment = rate_or_gap(won_arr, quota)
+        elif won_arr is not None and quota is None:
+            attainment = None  # No quota set
+        
+        leaderboard.append({
+            "owner_email": email,
+            "name": persona_map.get(email),
+            "active_pipeline": active_pipeline,
+            "active_deals": active_deals,
+            "won_arr": won_arr,
+            "quota": quota,
+            "attainment": attainment,
+            "avg_meddicc_score": None,  # TODO: aggregate from rep_performance if exists
+            "deals_analyzed": None
+        })
+        
+        if active_pipeline:
+            team_total_pipeline += active_pipeline
+        if won_arr:
+            team_won_arr += won_arr
+    
+    # Check for data gaps
+    if not targets_map:
+        data_gaps.append("quotas not set")
+    
+    # Sort leaderboard
+    sort_keys = {
+        "pipeline": lambda x: (x["active_pipeline"] is None, -(x["active_pipeline"] or 0)),
+        "attainment": lambda x: (x["attainment"] is None, -(x["attainment"].get("value") if x["attainment"] else 0)),
+        "meddicc_score": lambda x: (x["avg_meddicc_score"] is None, -(x["avg_meddicc_score"] or 0)),
+        "deals_won": lambda x: (x["won_arr"] is None, -(x["won_arr"] or 0))
+    }
+    
+    leaderboard.sort(key=sort_keys.get(sort_by, sort_keys["pipeline"]))
+    
+    # Add rank
+    for i, rep in enumerate(leaderboard[:limit], 1):
+        rep["rank"] = i
+    
+    return {
+        "period": period,
+        "sort_by": sort_by,
+        "leaderboard": leaderboard[:limit],
+        "team_total_pipeline": team_total_pipeline,
+        "team_won_arr": team_won_arr,
+        "data_gaps": data_gaps
     }

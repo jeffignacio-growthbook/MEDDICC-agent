@@ -27,7 +27,8 @@ def test_handler_descriptions_complete():
     # Filter out imports and utility functions
     KNOWN_NON_HANDLERS = {
         "Counter", "Path", "datetime", "timezone", "select_all",
-        "timedelta", "date", "defaultdict", "get_supabase"
+        "timedelta", "date", "defaultdict", "get_supabase",
+        "rate_or_gap", "today_in_reporting_tz"
     }
 
     all_names = [name for name in dir(handlers) if not name.startswith('_')]

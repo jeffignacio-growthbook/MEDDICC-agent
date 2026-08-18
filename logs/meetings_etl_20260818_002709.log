@@ -1,0 +1,25 @@
+
+================================================================================
+MEETINGS ETL
+================================================================================
+Date range: 2026-05-20 to 2026-08-18
+Mode: LIVE
+
+Fetching HubSpot meetings...
+  Date range: 2026-05-20 to 2026-08-18
+  Owners: 1 SDR(s)
+  Found 67 meetings in date range
+
+Matching to Fireflies transcripts...
+
+================================================================================
+SUMMARY
+================================================================================
+Total meetings:        67
+Fireflies matches:     43  (64.2%)
+HubSpot outcome known: 0  (0.0%)
+Unknown outcome:       24  (35.8%)
+
+Writing to meetings table...
+
+✓ 67 meetings written to Supabase

@@ -65,6 +65,43 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
 'what are Jake's metrics for August', 'how many dials did Jake make this week'""",
     "query_sdr_leaderboard": "SDR/BDR team activity overview — calls and voicemails across all SDRs. Use for team-wide SDR activity or comparing SDR performance.",
     "query_sdr_pipeline_sourced": "Pipeline sourced by SDRs/BDRs — deals attributed to an SDR via the configured attribution field or current ownership. Use when asking about SDR-sourced pipeline, BDR contribution, or meetings that converted to opportunities.",
+    "query_rep_pipeline": (
+        "Active pipeline for a specific AE — all their open deals with "
+        "value, stage, close date, and MEDDICC score. Use when asking about "
+        "a rep's deals, pipeline, or book of business. Examples: "
+        "'show me Christian's pipeline', 'what deals does Cary own?', "
+        "'show me Scott's deals closing this quarter'"
+    ),
+    "query_rep_attainment": (
+        "Quota attainment for one or all AEs — won revenue vs target. "
+        "Use when asking who is on track, above/below quota, or how the "
+        "team is tracking to number. Examples: 'who is on track to hit quota?', "
+        "'show me Q3 attainment by rep', 'who is furthest from their number?', "
+        "'which reps are above 50% to quota?'"
+    ),
+    "query_deal_health": (
+        "MEDDICC health filter — deals with weak scores, missing components, "
+        "or specific qualification gaps. Use when asking about risky deals, "
+        "deals with no champion, or deals missing a specific MEDDICC component. "
+        "Examples: 'show me Christian's weakest deals', "
+        "'which deals have no economic buyer?', "
+        "'show me deals closing this month with a score below 5', "
+        "'show me deals where pain is identified but metrics are not'"
+    ),
+    "query_stale_deals": (
+        "Deals with no recent activity or past their close date. Use when "
+        "asking about stuck deals, deals that haven't moved, or deals past "
+        "close date. Examples: 'which deals have been stuck for 30 days?', "
+        "'show me deals past their close date', "
+        "'which of Cary's deals haven't moved?', "
+        "'show me deals stuck in Technical Evaluation'"
+    ),
+    "query_team_leaderboard": (
+        "Full AE team ranking across pipeline, attainment, MEDDICC quality, "
+        "and deals won. Use for team-wide comparison questions. Examples: "
+        "'show me the team leaderboard', 'who is carrying the team?', "
+        "'rank the AEs by pipeline', 'who has the most pipeline this quarter?'"
+    ),
     "dynamic_query": "question requires combining data from multiple tables or filters not covered by the precomputed handlers above. Use when no other handler fits but the data likely exists in Supabase.",
     "unanswerable": "question cannot be answered with available data",
 }
@@ -77,6 +114,8 @@ ENTITY_SCOPE_BULK_HANDLERS = [
     "query_deal_stages_bulk",
     "query_deal_owners_bulk",
     "query_deal_values_bulk",
+    "query_team_leaderboard",
+    "query_rep_attainment",
 ]
 
 def has_followup_pronoun(question: str) -> bool:
