@@ -960,3 +960,206 @@ async def query_deal_values_bulk(params: dict, sb) -> dict:
         filters=[("in", "deal_id", deal_ids)])
     total = sum(r.get("arr_usd") or 0 for r in rows)
     return {"values": rows, "total_arr": total}
+
+
+async def query_sdr_metrics(params: dict, sb) -> dict:
+    """
+    SDR team metrics: calls, emails, connects for time window.
+
+    Returns aggregated metrics across all SDR users and tools,
+    with breakdowns by tool and top performers.
+    """
+    tw = params["time_window"]
+
+    # Query metrics for date range
+    rows = select_all(sb, "sdr_metrics",
+        columns="tool,user_name,metric_date,calls_made,connected_calls,"
+                "connect_rate,emails_sent,emails_opened,emails_replied,"
+                "open_rate,reply_rate,data_gap",
+        filters=[
+            ("gte", "metric_date", tw["start"]),
+            ("lte", "metric_date", tw["end"])
+        ])
+
+    if not rows:
+        return {
+            "message": f"No SDR metrics found for {tw['label']}",
+            "data_gap": True
+        }
+
+    # Aggregate by tool
+    from collections import defaultdict
+    tool_stats = defaultdict(lambda: {
+        "calls": 0, "connects": 0, "emails": 0,
+        "opens": 0, "replies": 0, "users": set()
+    })
+
+    # Track top performers
+    user_stats = defaultdict(lambda: {
+        "calls": 0, "connects": 0, "emails": 0,
+        "replies": 0, "tools": set()
+    })
+
+    for row in rows:
+        tool = row.get("tool")
+        user = row.get("user_name")
+
+        # Aggregate by tool
+        tool_stats[tool]["calls"] += row.get("calls_made") or 0
+        tool_stats[tool]["connects"] += row.get("connected_calls") or 0
+        tool_stats[tool]["emails"] += row.get("emails_sent") or 0
+        tool_stats[tool]["opens"] += row.get("emails_opened") or 0
+        tool_stats[tool]["replies"] += row.get("emails_replied") or 0
+        tool_stats[tool]["users"].add(user)
+
+        # Aggregate by user
+        user_stats[user]["calls"] += row.get("calls_made") or 0
+        user_stats[user]["connects"] += row.get("connected_calls") or 0
+        user_stats[user]["emails"] += row.get("emails_sent") or 0
+        user_stats[user]["replies"] += row.get("emails_replied") or 0
+        user_stats[user]["tools"].add(tool)
+
+    # Calculate totals
+    total_calls = sum(s["calls"] for s in tool_stats.values())
+    total_connects = sum(s["connects"] for s in tool_stats.values())
+    total_emails = sum(s["emails"] for s in tool_stats.values())
+    total_replies = sum(s["replies"] for s in tool_stats.values())
+
+    # Format tool breakdowns
+    by_tool = []
+    for tool, stats in tool_stats.items():
+        connect_rate = (stats["connects"] / stats["calls"] * 100
+                       if stats["calls"] > 0 else None)
+        reply_rate = (stats["replies"] / stats["emails"] * 100
+                     if stats["emails"] > 0 else None)
+
+        by_tool.append({
+            "tool": tool,
+            "calls": stats["calls"],
+            "connects": stats["connects"],
+            "connect_rate": connect_rate,
+            "emails": stats["emails"],
+            "replies": stats["replies"],
+            "reply_rate": reply_rate,
+            "active_users": len(stats["users"])
+        })
+
+    # Top performers by calls
+    top_callers = sorted(
+        [{"user": u, "calls": s["calls"], "connects": s["connects"]}
+         for u, s in user_stats.items()],
+        key=lambda x: x["calls"],
+        reverse=True
+    )[:5]
+
+    # Top performers by emails
+    top_emailers = sorted(
+        [{"user": u, "emails": s["emails"], "replies": s["replies"]}
+         for u, s in user_stats.items()],
+        key=lambda x: x["emails"],
+        reverse=True
+    )[:5]
+
+    return {
+        "time_window": tw,
+        "totals": {
+            "calls": total_calls,
+            "connects": total_connects,
+            "connect_rate": (total_connects / total_calls * 100
+                           if total_calls > 0 else None),
+            "emails": total_emails,
+            "replies": total_replies,
+            "reply_rate": (total_replies / total_emails * 100
+                         if total_emails > 0 else None)
+        },
+        "by_tool": by_tool,
+        "top_callers": top_callers,
+        "top_emailers": top_emailers,
+        "data_gap": False
+    }
+
+
+async def query_sdr_user(params: dict, sb) -> dict:
+    """
+    Individual SDR user metrics across all tools.
+
+    Requires user_name or tool_user_id in params.
+    Returns daily activity trend and aggregate stats.
+    """
+    tw = params["time_window"]
+    user_name = params.get("user_name")
+    tool_user_id = params.get("tool_user_id")
+
+    if not user_name and not tool_user_id:
+        return {
+            "error": "user_name or tool_user_id required",
+            "data_gap": True
+        }
+
+    # Build filters
+    filters = [
+        ("gte", "metric_date", tw["start"]),
+        ("lte", "metric_date", tw["end"])
+    ]
+
+    if user_name:
+        filters.append(("ilike", "user_name", f"%{user_name}%"))
+    elif tool_user_id:
+        filters.append(("eq", "tool_user_id", tool_user_id))
+
+    # Query user metrics
+    rows = select_all(sb, "sdr_metrics",
+        columns="tool,user_name,metric_date,calls_made,connected_calls,"
+                "connect_rate,voicemails,no_answers,emails_sent,"
+                "emails_opened,emails_replied,open_rate,reply_rate,"
+                "avg_duration_seconds",
+        filters=filters)
+
+    if not rows:
+        return {
+            "message": f"No metrics found for user",
+            "data_gap": True
+        }
+
+    # Aggregate across tools
+    total_calls = sum(r.get("calls_made") or 0 for r in rows)
+    total_connects = sum(r.get("connected_calls") or 0 for r in rows)
+    total_voicemails = sum(r.get("voicemails") or 0 for r in rows)
+    total_no_answers = sum(r.get("no_answers") or 0 for r in rows)
+    total_emails = sum(r.get("emails_sent") or 0 for r in rows)
+    total_opens = sum(r.get("emails_opened") or 0 for r in rows)
+    total_replies = sum(r.get("emails_replied") or 0 for r in rows)
+
+    # Daily trend (last 14 days or less)
+    daily_trend = []
+    for row in sorted(rows, key=lambda r: r.get("metric_date", ""))[-14:]:
+        daily_trend.append({
+            "date": row.get("metric_date"),
+            "tool": row.get("tool"),
+            "calls": row.get("calls_made"),
+            "connects": row.get("connected_calls"),
+            "emails": row.get("emails_sent"),
+            "replies": row.get("emails_replied")
+        })
+
+    return {
+        "user_name": rows[0].get("user_name"),
+        "time_window": tw,
+        "totals": {
+            "calls": total_calls,
+            "connects": total_connects,
+            "connect_rate": (total_connects / total_calls * 100
+                           if total_calls > 0 else None),
+            "voicemails": total_voicemails,
+            "no_answers": total_no_answers,
+            "emails": total_emails,
+            "opens": total_opens,
+            "replies": total_replies,
+            "open_rate": (total_opens / total_emails * 100
+                        if total_emails > 0 else None),
+            "reply_rate": (total_replies / total_emails * 100
+                         if total_emails > 0 else None)
+        },
+        "daily_trend": daily_trend,
+        "data_gap": False
+    }

@@ -59,6 +59,8 @@ HANDLER_DESCRIPTIONS = {
     "query_deal_stages_bulk": "current stage for a known set of deals",
     "query_deal_owners_bulk": "owner/rep for a known set of deals",
     "query_deal_values_bulk": "ARR/deal value for a known set of deals",
+    "query_sdr_metrics": "SDR team activity metrics: calls, connects, emails, reply rates across all SDRs and tools (Apollo, Salesloft, Aircall)",
+    "query_sdr_user": "individual SDR performance: calls, emails, connect/reply rates for a specific user",
     "dynamic_query": "question requires combining data from multiple tables or filters not covered by the precomputed handlers above. Use when no other handler fits but the data likely exists in Supabase.",
     "unanswerable": "question cannot be answered with available data",
 }
