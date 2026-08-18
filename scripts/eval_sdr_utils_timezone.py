@@ -234,6 +234,43 @@ def test_timezone_utilities():
     print(f"  ✓ Returns UTC window with fiscal quarter label")
     print()
 
+    # ── Test 11: ETL timezone regression - Gong ISO ──
+    print("[TEST 11] ETL timezone regression - Gong ISO string")
+    print()
+
+    # Simulate Gong API response with ISO string
+    gong_started = "2026-03-31T23:00:00Z"
+    gong_dt_utc = datetime.fromisoformat(gong_started.replace('Z', '+00:00'))
+    if gong_dt_utc.tzinfo is None:
+        gong_dt_utc = gong_dt_utc.replace(tzinfo=_tz.utc)
+
+    gong_date_eastern = utc_to_reporting_date(gong_dt_utc, eastern_cfg)
+    assert gong_date_eastern == date(2026, 3, 31), f"Expected date(2026, 3, 31), got {gong_date_eastern}"
+
+    print(f"  Gong ISO: {gong_started}")
+    print(f"  Eastern date: {gong_date_eastern}")
+    print(f"  ✓ Gong ISO string produces correct reporting TZ date")
+    print()
+
+    # ── Test 12: ETL timezone regression - Fireflies ms timestamp ──
+    print("[TEST 12] ETL timezone regression - Fireflies ms timestamp")
+    print()
+
+    # Simulate Fireflies API response with millisecond timestamp
+    # March 31, 2026 11 PM UTC
+    fireflies_iso = "2026-03-31T23:00:00Z"
+    fireflies_dt_base = datetime.fromisoformat(fireflies_iso.replace('Z', '+00:00'))
+    fireflies_ms = int(fireflies_dt_base.timestamp() * 1000)
+    fireflies_dt_utc = datetime.fromtimestamp(fireflies_ms / 1000, tz=_tz.utc)
+
+    fireflies_date_eastern = utc_to_reporting_date(fireflies_dt_utc, eastern_cfg)
+    assert fireflies_date_eastern == date(2026, 3, 31), f"Expected date(2026, 3, 31), got {fireflies_date_eastern}"
+
+    print(f"  Fireflies ms: {fireflies_ms}")
+    print(f"  Eastern date: {fireflies_date_eastern}")
+    print(f"  ✓ Fireflies ms timestamp produces correct reporting TZ date")
+    print()
+
     # ── Final summary ──
     print("=" * 80)
     print("Results: All tests passed!")
@@ -247,6 +284,7 @@ def test_timezone_utilities():
     print("- reporting_day_window() produces correct UTC boundaries")
     print("- api_date_filters() supports all three output formats (iso, iso_str, epoch)")
     print("- quarter_window_utc() computes fiscal quarters in reporting TZ")
+    print("- ETL timestamp parsing produces correct reporting TZ dates")
     print("- All edge cases handled gracefully (None, empty string, bad TZ)")
 
 

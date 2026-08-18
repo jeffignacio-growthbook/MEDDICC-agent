@@ -28,7 +28,7 @@ import argparse
 import re
 import yaml
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone as _stdlib_tz
 
 # Add revops-metrics to path for API clients
 REPO_ROOT = Path(__file__).parent.parent
@@ -38,6 +38,9 @@ if REVOPS_METRICS.exists():
 
 # Add local adapters to path
 sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+
+# Import timezone utilities
+from sdr_utils import utc_to_reporting_date
 
 
 def slugify(company_name: str) -> str:
@@ -205,17 +208,24 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
                     started_str = call.get('started')
                     if not started_str:
                         continue
-                    call_date = datetime.fromisoformat(started_str.replace('Z', '+00:00')).replace(tzinfo=None)
+                    call_date_utc = datetime.fromisoformat(started_str.replace('Z', '+00:00'))
+                    if call_date_utc.tzinfo is None:
+                        call_date_utc = call_date_utc.replace(tzinfo=_stdlib_tz.utc)
                     duration_minutes = round((call.get('duration') or 0) / 60, 1)
                 else:
                     call_date_ms = call.get('date')
                     if not call_date_ms:
                         continue
-                    call_date = datetime.fromtimestamp(call_date_ms / 1000).replace(tzinfo=None)
+                    call_date_utc = datetime.fromtimestamp(call_date_ms / 1000, tz=_stdlib_tz.utc)
                     duration_minutes = call.get('duration', 0)
 
+                # Convert to reporting timezone date for comparison and storage
+                call_date = utc_to_reporting_date(call_date_utc)
+                if call_date is None:
+                    continue
+
                 # Skip if before cutoff
-                if call_date.date() <= since_date.date():
+                if call_date <= since_date.date():
                     continue
 
                 # Extract company and add to dict
@@ -238,7 +248,7 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
                         "id": call.get('id'),
                         "source": "gong",
                         "title": title,
-                        "date": call_date.strftime('%Y-%m-%d'),
+                        "date": call_date.isoformat(),
                         "duration_minutes": duration_minutes,
                         "summary": summary,
                         "organizer": call.get('host', ''),
@@ -256,7 +266,7 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
                         "id": call.get('id'),
                         "source": "fireflies",
                         "title": title,
-                        "date": call_date.strftime('%Y-%m-%d'),
+                        "date": call_date.isoformat(),
                         "duration_minutes": duration_minutes,
                         "summary": summary_dict.get('short_summary', ''),
                         "organizer": call.get('organizer_email', ''),
@@ -307,12 +317,17 @@ def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total
             continue
 
         try:
-            convo_date = datetime.fromisoformat(start_time.replace('Z', '')).replace(tzinfo=None)
+            convo_date_utc = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+            if convo_date_utc.tzinfo is None:
+                convo_date_utc = convo_date_utc.replace(tzinfo=_stdlib_tz.utc)
+            convo_date = utc_to_reporting_date(convo_date_utc)
+            if convo_date is None:
+                continue
         except:
             continue
 
         # Skip if before cutoff or not completed
-        if convo_date.date() <= since_date.date():
+        if convo_date <= since_date.date():
             continue
         if convo.get('state') not in ['completed', 'insights_generated']:
             continue
@@ -362,7 +377,11 @@ def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total
                 }
 
             start_time = convo.get('start_time', '')
-            call_date = datetime.fromisoformat(start_time.replace('Z', '+00:00')).strftime('%Y-%m-%d')
+            start_time_utc = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+            if start_time_utc.tzinfo is None:
+                start_time_utc = start_time_utc.replace(tzinfo=_stdlib_tz.utc)
+            call_date_reporting = utc_to_reporting_date(start_time_utc)
+            call_date = call_date_reporting.isoformat() if call_date_reporting else ''
 
             calls_by_company[slug]["calls"].append({
                 "id": convo_id,
