@@ -359,11 +359,11 @@ models:
     max_tokens: 16000
 
   generator:
-    name: "accounts/fireworks/models/deepseek-v4-pro"
-    provider: "fireworks"
-    max_tokens: 12000
-    fallback_to_anthropic: true
-    parallel_workers: 8  # How many deals to process in parallel
+    name: "claude-sonnet-4-6"
+    provider: "anthropic"
+    max_tokens: 8000
+    fallback_to_anthropic: false
+    parallel_workers: 3  # How many deals to process in parallel
                          # Anthropic: keep at 3 (rate limit ~50 req/min)
                          # Fireworks: 8-15 is safe (rate limit ~600 req/min)
                          # OpenAI: 5-8 depending on tier
