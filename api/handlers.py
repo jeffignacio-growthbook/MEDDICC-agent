@@ -959,3 +959,204 @@ async def query_deal_values_bulk(params: dict, sb) -> dict:
         filters=[("in", "deal_id", deal_ids)])
     total = sum(r.get("arr_usd") or 0 for r in rows)
     return {"values": rows, "total_arr": total}
+
+# ============================================================================
+# SDR METRICS HANDLERS
+# ============================================================================
+
+async def query_sdr_pipeline_sourced(params: dict, sb) -> dict:
+    """
+    Pipeline attributed to SDRs/BDRs via configured attribution field.
+
+    Uses sdr_owner_email field populated from HubSpot's attribution field
+    (configured in client.yaml sdr_tools.pipeline_attribution.sdr_field).
+
+    For GrowthBook: uses 'bdr_owner' field to track deals sourced by BDRs,
+    even after handoff to AEs.
+    """
+    import yaml
+    from pathlib import Path
+
+    config_path = Path(__file__).parent.parent / "config" / "client.yaml"
+    config = yaml.safe_load(open(config_path))
+
+    tw = params["time_window"]
+    sdr_email = params.get("sdr_email")  # Optional: filter to specific SDR
+
+    # Get attribution method from config
+    attribution_config = config.get("sdr_tools", {}).get("pipeline_attribution", {})
+    attribution_method = attribution_config.get("method", "current_owner")
+    sdr_field = attribution_config.get("sdr_field", "")
+
+    # Build filters based on attribution method
+    filters = [
+        ("eq", "deal_status", "active"),  # Only active deals
+    ]
+
+    if attribution_method == "sdr_field" and sdr_field:
+        # Use dedicated SDR attribution field (captures post-handoff deals)
+        filters.append(("not.is", "sdr_owner_email", "null"))
+        if sdr_email:
+            filters.append(("eq", "sdr_owner_email", sdr_email))
+    else:
+        # Fall back to current owner (pre-handoff only)
+        if sdr_email:
+            filters.append(("eq", "owner_email", sdr_email))
+        # Note: This will miss deals that have been handed off from SDR to AE
+
+    # Query deals table
+    rows = select_all(sb, "deals",
+        columns="deal_id,company_name,deal_value,stage,owner_email,sdr_owner_email,create_date",
+        filters=filters
+    )
+
+    # Group by SDR email
+    by_sdr = {}
+    for row in rows:
+        sdr = row.get("sdr_owner_email") if attribution_method == "sdr_field" else row.get("owner_email")
+        if not sdr:
+            continue
+        if sdr not in by_sdr:
+            by_sdr[sdr] = {
+                "sdr_email": sdr,
+                "deals": [],
+                "total_pipeline": 0,
+                "deal_count": 0
+            }
+        by_sdr[sdr]["deals"].append(row)
+        by_sdr[sdr]["total_pipeline"] += row.get("deal_value") or 0
+        by_sdr[sdr]["deal_count"] += 1
+
+    # Convert to list and sort by pipeline value
+    sdr_summary = sorted(by_sdr.values(), key=lambda x: x["total_pipeline"], reverse=True)
+
+    return {
+        "sdr_pipeline": sdr_summary,
+        "attribution_method": attribution_method,
+        "attribution_field": sdr_field if attribution_method == "sdr_field" else "current_owner",
+        "total_sdr_pipeline": sum(s["total_pipeline"] for s in sdr_summary),
+        "total_sdr_deals": sum(s["deal_count"] for s in sdr_summary),
+        "period": tw["label"],
+        "note": (
+            "Post-handoff deals included via SDR attribution field"
+            if attribution_method == "sdr_field"
+            else "Only includes deals currently owned by SDRs (pre-handoff)"
+        )
+    }
+
+
+async def query_sdr_metrics(params: dict, sb) -> dict:
+    """
+    SDR activity metrics for individual rep.
+
+    Returns call volume, voicemails, connect rate (if available),
+    email activity from sdr_metrics table.
+    """
+    sdr_email = params.get("sdr_email")
+    tw = params["time_window"]
+
+    if not sdr_email:
+        return {
+            "error": "No SDR email provided",
+            "note": "This handler requires a specific SDR email address"
+        }
+
+    # Get user's tool_user_id from sdr_users table
+    user_rows = select_all(sb, "sdr_users",
+        columns="tool,tool_user_id,user_name,user_email",
+        filters=[("eq", "user_email", sdr_email)]
+    )
+
+    if not user_rows:
+        return {
+            "error": f"No SDR metrics found for {sdr_email}",
+            "note": "User may not be in sdr_users table or email doesn't match"
+        }
+
+    # Get metrics for this user across all tools
+    metrics_rows = []
+    for user in user_rows:
+        tool = user.get("tool")
+        tool_user_id = user.get("tool_user_id")
+
+        tool_metrics = select_all(sb, "sdr_metrics",
+            columns="tool,metric_date,calls_made,connected_calls,connect_rate,voicemails,"
+                   "emails_sent,emails_opened,emails_replied,open_rate,reply_rate,data_gap",
+            filters=[
+                ("eq", "tool", tool),
+                ("eq", "tool_user_id", tool_user_id),
+                ("gte", "metric_date", tw["start"]),
+                ("lte", "metric_date", tw["end"])
+            ]
+        )
+        metrics_rows.extend(tool_metrics)
+
+    # Aggregate across date range
+    total_calls = sum(m.get("calls_made") or 0 for m in metrics_rows)
+    total_voicemails = sum(m.get("voicemails") or 0 for m in metrics_rows)
+    total_emails = sum(m.get("emails_sent") or 0 for m in metrics_rows)
+
+    return {
+        "sdr_email": sdr_email,
+        "metrics": metrics_rows,
+        "summary": {
+            "total_calls": total_calls,
+            "total_voicemails": total_voicemails,
+            "total_emails": total_emails
+        },
+        "period": tw["label"]
+    }
+
+
+async def query_sdr_leaderboard(params: dict, sb) -> dict:
+    """
+    Team-wide SDR activity overview.
+
+    Returns aggregated call and email metrics for all SDRs,
+    sorted by activity level.
+    """
+    tw = params["time_window"]
+
+    # Get all SDR metrics for time window
+    metrics_rows = select_all(sb, "sdr_metrics",
+        columns="tool,tool_user_id,user_name,metric_date,"
+               "calls_made,connected_calls,voicemails,"
+               "emails_sent,emails_opened,emails_replied",
+        filters=[
+            ("gte", "metric_date", tw["start"]),
+            ("lte", "metric_date", tw["end"])
+        ]
+    )
+
+    # Group by user (tool + tool_user_id)
+    by_user = {}
+    for row in metrics_rows:
+        user_key = f"{row.get('tool')}:{row.get('tool_user_id')}"
+        if user_key not in by_user:
+            by_user[user_key] = {
+                "user_name": row.get("user_name"),
+                "tool": row.get("tool"),
+                "calls_made": 0,
+                "voicemails": 0,
+                "emails_sent": 0
+            }
+        by_user[user_key]["calls_made"] += row.get("calls_made") or 0
+        by_user[user_key]["voicemails"] += row.get("voicemails") or 0
+        by_user[user_key]["emails_sent"] += row.get("emails_sent") or 0
+
+    # Convert to list and sort by total activity
+    leaderboard = sorted(
+        by_user.values(),
+        key=lambda x: x["calls_made"] + x["emails_sent"],
+        reverse=True
+    )
+
+    return {
+        "leaderboard": leaderboard,
+        "period": tw["label"],
+        "team_summary": {
+            "total_calls": sum(u["calls_made"] for u in leaderboard),
+            "total_voicemails": sum(u["voicemails"] for u in leaderboard),
+            "total_emails": sum(u["emails_sent"] for u in leaderboard)
+        }
+    }

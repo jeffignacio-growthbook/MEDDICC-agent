@@ -394,6 +394,18 @@ sdr_tools:
   aircall:
     enabled: false
 
+  # Pipeline attribution configuration
+  # Determines which HubSpot field to use for tracking SDR-sourced deals
+  pipeline_attribution:
+    method: "sdr_field"           # sdr_field | current_owner
+    sdr_field: "bdr_owner"        # HubSpot internal property name
+                                  # Common values by team:
+                                  #   "bdr_owner"     (GrowthBook)
+                                  #   "sdr_owner"
+                                  #   "sourced_by"
+                                  #   "original_owner"
+                                  # If blank or absent: falls back to current_owner
+
 # ============================================================================
 # ETL CONFIGURATION
 # ============================================================================

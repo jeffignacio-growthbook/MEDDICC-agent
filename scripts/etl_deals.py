@@ -556,6 +556,17 @@ def main():
         # Look up owner email from mapping
         owner = owner_emails.get(str(owner_id), '') if owner_id else ''
 
+        # SDR/BDR attribution field - may be email or owner_id
+        bdr_owner_value = props.get('bdr_owner', '')
+        sdr_owner_email = None
+        if bdr_owner_value:
+            # Check if it's already an email (contains @)
+            if '@' in str(bdr_owner_value):
+                sdr_owner_email = bdr_owner_value
+            else:
+                # Try looking it up as an owner_id
+                sdr_owner_email = owner_emails.get(str(bdr_owner_value), '')
+
         if not deal_id:
             continue
 
@@ -640,6 +651,7 @@ def main():
             'arr': arr,
             'close_date': close_date,
             'owner': owner,  # Owner email (looked up from owner_id)
+            'sdr_owner_email': sdr_owner_email or None,  # SDR/BDR who sourced the deal
             'last_modified': datetime.now().isoformat(),
         }
 

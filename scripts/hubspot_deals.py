@@ -127,7 +127,8 @@ class HubSpotDealsClient:
                 'hubspot_owner_id',
                 'dealtype',
                 'createdate',
-                'last_meddicc_analysis_date'
+                'last_meddicc_analysis_date',
+                'bdr_owner'  # SDR attribution field
             ],
             'sorts': [
                 {'propertyName': 'closedate', 'direction': 'ASCENDING'}  # Earliest close date first
@@ -182,7 +183,8 @@ class HubSpotDealsClient:
                 'expansion_revenue',
                 'prior_arr',
                 'sao',
-                'hs_manual_forecast_category'
+                'hs_manual_forecast_category',
+                'bdr_owner'  # SDR attribution field
             ],
             'sorts': [
                 {'propertyName': 'hs_lastmodifieddate', 'direction': 'DESCENDING'}
