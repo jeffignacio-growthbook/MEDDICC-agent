@@ -148,30 +148,26 @@ def generate(
             # Add assistant message (provider-agnostic)
             messages.append(response.as_assistant_message())
 
-            # Add tool results
+            # Add tool results - access raw.content for Anthropic content blocks
             tool_results = []
-            for block in response.content:
-                if block.type == 'tool_use':
-                    # Reject tool use for MEDDICC
-                    tool_results.append({
-                        "type": "tool_result",
-                        "tool_use_id": block.id,
-                        "content": "Tool use not supported for MEDDICC analysis. Please generate the analysis directly."
-                    })
+            if hasattr(response.raw, 'content'):
+                for block in response.raw.content:
+                    if hasattr(block, 'type') and block.type == 'tool_use':
+                        # Reject tool use for MEDDICC
+                        tool_results.append({
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": "Tool use not supported for MEDDICC analysis. Please generate the analysis directly."
+                        })
 
             messages.append({"role": "user", "content": tool_results})
 
         else:
-            # Max tokens or other stop reason
-            text_content = ""
-            for block in response.content:
-                if block.type == 'text':
-                    text_content += block.text
-
-            if not text_content:
+            # Max tokens or other stop reason - use response.text directly
+            if not response.text:
                 return "[Generation error: no text content returned]"
 
-            return text_content
+            return response.text
 
 
 def evaluate(
@@ -451,7 +447,15 @@ def run_agent(
 
         # Extract feedback for next iteration
         previous_feedback = evaluation.get('required_changes')
-        print(f"  ✗ Failed iteration {iteration}: {len(evaluation.get('iteration_failures', []))} issues")
+        failures = evaluation.get('iteration_failures', [])
+        print(f"  ✗ Failed iteration {iteration}: {len(failures)} issues")
+
+        # Debug: show rejection details
+        print(f"     Quality score: {evaluation.get('quality_score', 'N/A')}/100")
+        if failures:
+            print(f"     Failed criteria: {', '.join(failures)}")
+        if evaluation.get('required_changes'):
+            print(f"     Changes needed: {evaluation.get('required_changes', '')[:200]}")
 
     # Run reflection gate to decide if this should generate a learning
     passed = evaluation['pass'] if evaluation else False
