@@ -439,6 +439,17 @@ Nothing else.
 You answer RevOps questions for a B2B SaaS CRO using query tools.
 You have access to tools that read Supabase tables.
 
+**Team roster (for name-to-email matching):**
+{roster_text}
+
+When user asks about "Jake" or "Jennifer" or any first name, match by name
+to email in the roster above. Use the email in your WHERE clause, not the name.
+
+Example:
+  Question: "how is Jake tracking this month"
+  → WHERE owner_email = 'jake.stangl@growthbook.io'
+  (don't do: WHERE owner_name ilike '%jake%')
+
 {schema_context}
 
 TOOLS YOU CAN CALL:
@@ -658,7 +669,8 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
 
 async def dynamic_query_loop(question, history, params,
                               sb, client,
-                              hint: str = "") -> dict:
+                              hint: str = "",
+                              roster_text: str = "") -> dict:
     """
     Multi-turn tool-calling loop for novel questions.
     Agent calls tools until it has enough data to answer.
@@ -673,7 +685,10 @@ async def dynamic_query_loop(question, history, params,
     logger.info(f"[SCHEMA] Relevant tables for full descriptions: {relevant_tables}")
 
     schema = get_schema_context(sb, tables_with_descriptions=relevant_tables)
-    system = DYNAMIC_SYSTEM_PROMPT.format(schema_context=schema)
+    system = DYNAMIC_SYSTEM_PROMPT.format(
+        schema_context=schema,
+        roster_text=roster_text
+    )
 
     # Build question with time window and optional hint
     history_messages = [
@@ -919,6 +934,13 @@ async def route_question(question: str, user_id: str,
     else:
         logger.warning(f"[PERSONA] Unknown user {user_id} (no persona)")
 
+    # Load team roster for name disambiguation in dynamic queries
+    team_roster = sb.table("user_personas").select("name,email,role").execute()
+    roster_text = "\n".join([
+        f"- {r['name']} — {r['email']} ({r['role']})"
+        for r in (team_roster.data or [])
+    ])
+
     # ── -1. Entity-scope check (structural bypass) ───
     # Check if thread has known entities BEFORE pronoun matching
     prior_entities = get_prior_entities(history)
@@ -1064,6 +1086,7 @@ async def route_question(question: str, user_id: str,
                 sb=sb,
                 client=client,
                 hint=hint,
+                roster_text=roster_text,
             )
             dynamic_answer = dynamic_result.get("answer", "")
             dynamic_tool_results = dynamic_result.get("tool_results", {})
@@ -1085,6 +1108,7 @@ async def route_question(question: str, user_id: str,
                 sb=sb,
                 client=client,
                 hint="",
+                roster_text=roster_text,
             )
             return {"answer": dynamic_result.get("answer", ""),
                     "needs_ack": is_slow,
@@ -1215,6 +1239,7 @@ async def route_question(question: str, user_id: str,
                 sb=sb,
                 client=client,
                 hint=retry_context,
+                roster_text=roster_text,
             )
             # dynamic_query_loop returns {"answer": str, "tool_results": dict}
             dynamic_answer = dynamic_result.get("answer", "")
