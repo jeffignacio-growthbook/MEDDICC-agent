@@ -35,6 +35,8 @@ REPO_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
+from llm_client import LLMClient
+
 
 def load_config():
     """Read client config for internal domains and
@@ -154,12 +156,10 @@ def main():
     from scripts.enrichment.call_intent_classifier import (
         classify_call, INTENT_PROSPECT, INTENT_SALES_REVIEW,
         INTENT_SKIP)
-    import anthropic
-
     sb = create_client(
         os.environ["SUPABASE_URL"],
         os.environ["SUPABASE_SERVICE_KEY"])
-    client = anthropic.Anthropic()
+    client = LLMClient.from_config("enrichment")
 
     domain_map, _ = get_deal_domains(sb)
     slug_map = get_company_slug_map(sb)

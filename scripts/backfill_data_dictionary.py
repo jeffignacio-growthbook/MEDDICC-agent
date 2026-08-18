@@ -19,6 +19,9 @@ from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent))
+
+from llm_client import LLMClient
 
 # Queryable tables the dynamic loop should see
 QUERYABLE_TABLES = [
@@ -112,10 +115,9 @@ def generate_descriptions_batch(columns, api_key, batch_size=40):
         api_key: Anthropic API key
         batch_size: Number of columns per API call (default 40)
     """
-    from anthropic import Anthropic
     import time
 
-    client = Anthropic(api_key=api_key)
+    client = LLMClient.from_config("generator")
 
     all_descriptions = {}
 
@@ -165,15 +167,14 @@ Context:
 - deals_snapshot: LARGE time-series table (~61k rows) with weekly deal state snapshots - MUST filter by snapshot_date"""
 
         try:
-            response = client.messages.create(
-                model="claude-haiku-4-5-20251001",
-                max_tokens=4000,
-                messages=[{"role": "user", "content": prompt}]
+            response = client.complete(
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=4000
             )
 
             import json
             # Extract JSON from response
-            text = response.content[0].text.strip()
+            text = response.text.strip()
 
             # Remove markdown code fences if present
             if text.startswith("```"):

@@ -146,7 +146,7 @@ def _generate_handlers(sb, args):
     GitHub PRs for human review (--create-pr) or are just printed.
     Capped at 3 clusters per run to avoid PR noise.
     """
-    import anthropic
+    from llm_client import LLMClient
     from handler_generator import (
         cluster_failures, generate_handler, validate_handler_code,
         test_handler, validate_answer_quality, create_github_pr,
@@ -167,7 +167,7 @@ def _generate_handlers(sb, args):
         print("No clusters met the 3+ failure threshold this week.")
         return
 
-    client = anthropic.Anthropic()
+    client = LLMClient.from_config("generator")
     tracker = TokenTracker(REPO_ROOT / "memory", job="handler_generator")
     schema = get_schema_context(sb)
     created_prs = []

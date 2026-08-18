@@ -146,7 +146,7 @@ def cluster_other_category(sb) -> list:
     if not other_objections and not other_gaps:
         return []
 
-    client = anthropic.Anthropic()
+    client = LLMClient.from_config("enrichment")
 
     CLUSTER_PROMPT = """These are sales call objections and
 feature gaps that were filed under "other" because no

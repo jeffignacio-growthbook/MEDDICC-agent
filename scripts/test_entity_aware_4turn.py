@@ -10,13 +10,14 @@ import asyncio
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent))
+
+from llm_client import LLMClient
 
 async def test_4turn():
     """Test entity-aware extraction in multi-turn conversation."""
     from api.router import dynamic_query_loop, logger
     from api.db import get_supabase
-    import anthropic
-    import os
     import logging
 
     # Show info logs
@@ -28,7 +29,7 @@ async def test_4turn():
     print()
 
     sb = get_supabase()
-    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    client = LLMClient.from_config("generator")
 
     # Turn 1: Entity discovery query
     print("[TURN 1] Entity discovery: appointmentscheduled deals with high champion score")

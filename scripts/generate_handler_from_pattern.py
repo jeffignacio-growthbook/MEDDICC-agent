@@ -29,6 +29,9 @@ from collections import Counter
 
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT))
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+from llm_client import LLMClient
 
 GENERATOR_MODEL = "claude-sonnet-4-5-20250929"
 VALIDATION_MODEL = "claude-haiku-4-5-20251001"
@@ -160,10 +163,7 @@ def find_handler_candidates(sb, min_freq=MIN_FREQUENCY, min_quality=MIN_QUALITY)
 
 def generate_handler(pattern_data: dict, schema_context: str, client) -> dict | None:
     """Use Claude Sonnet to generate handler from pattern."""
-    resp = client.messages.create(
-        model=GENERATOR_MODEL,
-        max_tokens=2000,
-        system="Respond with valid JSON only. No markdown fences.",
+    resp = client.complete(
         messages=[{"role": "user", "content":
             HANDLER_GENERATION_PROMPT.format(
                 question=pattern_data["question"],
@@ -172,10 +172,12 @@ def generate_handler(pattern_data: dict, schema_context: str, client) -> dict | 
                 current_handler=pattern_data["current_handler"],
                 schema_context=schema_context
             )
-        }]
+        }],
+        system="Respond with valid JSON only. No markdown fences.",
+        max_tokens=2000
     )
 
-    parsed = _extract_json(resp.content[0].text)
+    parsed = _extract_json(resp.text)
     if parsed is None:
         print(f"  Generation failed: could not parse JSON")
     return parsed
@@ -259,20 +261,21 @@ def validate_answer_quality(pattern_data: dict, result: dict, client) -> dict:
     """
     result_sample = json.dumps(result, default=str)[:1000]
 
-    resp = client.messages.create(
-        model=VALIDATION_MODEL,
-        max_tokens=200,
-        system="Respond with valid JSON only.",
+    # Use classifier client for validation (Haiku)
+    validation_client = LLMClient.from_config("classifier")
+    resp = validation_client.complete(
         messages=[{"role": "user", "content":
             VALIDATION_PROMPT.format(
                 question=pattern_data["question"],
                 frequency=pattern_data["frequency"],
                 result_sample=result_sample
             )
-        }]
+        }],
+        system="Respond with valid JSON only.",
+        max_tokens=200
     )
 
-    parsed = _extract_json(resp.content[0].text)
+    parsed = _extract_json(resp.text)
     return parsed if parsed else {"score": 0.5, "ready_for_pr": False}
 
 
@@ -381,7 +384,7 @@ async def main():
     args = parser.parse_args()
 
     sb = get_supabase()
-    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    client = LLMClient.from_config("generator")
     schema = get_schema_context(sb)
 
     print(f"\n{'='*80}")
