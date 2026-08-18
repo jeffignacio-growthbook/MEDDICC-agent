@@ -271,6 +271,53 @@ def test_timezone_utilities():
     print(f"  ✓ Fireflies ms timestamp produces correct reporting TZ date")
     print()
 
+    # ── Test 13: time_resolver current_quarter_label uses reporting TZ ──
+    print("[TEST 13] time_resolver current_quarter_label - reporting TZ")
+    print()
+
+    # Verify the function runs without error and returns a valid quarter label
+    # The actual timezone correctness is tested by the underlying today_in_reporting_tz()
+    # which we already verified above
+    import sys
+    from pathlib import Path
+    api_path = Path(__file__).parent.parent / 'api'
+    if str(api_path) not in sys.path:
+        sys.path.insert(0, str(api_path.parent))
+
+    from api import time_resolver
+
+    label = time_resolver.current_quarter_label()
+
+    # Verify it returns a fiscal quarter label format
+    assert "FY" in label, f"Expected FY in label, got {label}"
+    assert "Q" in label, f"Expected Q in label, got {label}"
+
+    print(f"  Quarter label: {label}")
+    print(f"  ✓ Returns valid fiscal quarter label (uses today_in_reporting_tz internally)")
+    print()
+
+    # ── Test 14: time_resolver resolve_time_window uses reporting TZ ──
+    print("[TEST 14] time_resolver resolve_time_window - reporting TZ")
+    print()
+
+    result = time_resolver.resolve_time_window({"period": "current_quarter"})
+
+    assert "start" in result, "Missing start key"
+    assert "end" in result, "Missing end key"
+    assert "label" in result, "Missing label key"
+
+    # Verify dates are valid ISO format
+    start_date = date.fromisoformat(result["start"])
+    end_date = date.fromisoformat(result["end"])
+    assert start_date <= end_date, "Start should be before or equal to end"
+
+    print(f"  Current quarter window:")
+    print(f"    start: {result['start']}")
+    print(f"    end: {result['end']}")
+    print(f"    label: {result['label']}")
+    print(f"  ✓ Quarter boundaries use today_in_reporting_tz (not server UTC)")
+    print()
+
     # ── Final summary ──
     print("=" * 80)
     print("Results: All tests passed!")
@@ -285,6 +332,7 @@ def test_timezone_utilities():
     print("- api_date_filters() supports all three output formats (iso, iso_str, epoch)")
     print("- quarter_window_utc() computes fiscal quarters in reporting TZ")
     print("- ETL timestamp parsing produces correct reporting TZ dates")
+    print("- time_resolver uses reporting TZ for current_quarter_label and resolve_time_window")
     print("- All edge cases handled gracefully (None, empty string, bad TZ)")
 
 

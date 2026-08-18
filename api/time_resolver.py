@@ -21,11 +21,13 @@ def current_quarter_label() -> str:
     Uses utils.get_fiscal_quarter from scripts/.
     """
     sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
-    from utils import get_fiscal_quarter
+    from utils import get_fiscal_quarter, load_client_config
+    from sdr_utils import today_in_reporting_tz
 
     cfg = _fiscal_config()
+    cfg_full = load_client_config()
     _, _, label = get_fiscal_quarter(
-        date.today(), {"fiscal": cfg})
+        today_in_reporting_tz(cfg_full), {"fiscal": cfg})
     return label.replace(" ", "_")
 
 def resolve_time_window(tw: dict) -> dict:
@@ -50,9 +52,10 @@ def resolve_time_window(tw: dict) -> dict:
       }
     """
     sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
-    from utils import get_fiscal_quarter
+    from utils import get_fiscal_quarter, load_client_config
+    from sdr_utils import today_in_reporting_tz
 
-    today = date.today()
+    today = today_in_reporting_tz(load_client_config())
     period = tw.get("period", "current_quarter")
     cfg_wrap = {"fiscal": _fiscal_config()}
 
