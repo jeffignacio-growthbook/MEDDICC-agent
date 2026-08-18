@@ -32,6 +32,7 @@ from meddicc_agent import run_agent
 from github_memory import get_memory_manager
 from token_tracker import TokenTracker
 from llm_client import LLMClient
+from utils import load_client_config
 
 # Repo root for config files
 REPO_ROOT = Path(__file__).parent.parent
@@ -611,9 +612,23 @@ def main():
     # Process deals in parallel
     print(f"\n4. Processing deals...")
 
-    MAX_WORKERS = 3  # Conservative — respects Anthropic rate limits
-    estimated_minutes = (len(active_deals) / MAX_WORKERS) * 2.5  # ~2.5 min avg per deal
-    print(f"   Estimated runtime: {estimated_minutes:.0f} min ({MAX_WORKERS} workers × {len(active_deals)} deals)")
+    # Load parallelism config from generator settings
+    _config = load_client_config()
+    MAX_WORKERS = (
+        _config.get("models", {})
+               .get("generator", {})
+               .get("parallel_workers", 3)
+    )
+    provider = _config.get("models", {}).get("generator", {}).get("provider", "anthropic")
+    print(f"   Parallelism: {MAX_WORKERS} workers ({provider} provider)")
+
+    # Provider-aware time estimate
+    secs_per_deal = {"anthropic": 150, "fireworks": 60, "openai": 90}
+    est_secs_per_deal = secs_per_deal.get(provider, 150)
+    estimated_minutes = (len(active_deals) / MAX_WORKERS) * (est_secs_per_deal / 60)
+    print(f"   Estimated runtime: {estimated_minutes:.0f} min "
+          f"({MAX_WORKERS} workers × {len(active_deals)} deals × "
+          f"~{est_secs_per_deal}s/deal)")
 
     learnings = []
     errors = []
