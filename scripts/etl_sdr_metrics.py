@@ -193,8 +193,15 @@ def fetch_apollo(since: date, until: date, config: dict, dry_run: bool) -> int:
     if dry_run:
         for m in metrics[:3]:  # Show first 3
             print(f"\n  User: {m['user_name']}")
-            print(f"    Calls: {m['calls_made']}, Connects: {m['connected_calls']}")
-            print(f"    Connect rate: {m['connect_rate']}")
+            print(f"    Calls: {m['calls_made']}, Voicemails: {m['voicemails']}")
+            connect_rate = m['connect_rate']
+            if connect_rate.get('data_gap'):
+                print(f"    Connect rate: {connect_rate['reason']}")
+            else:
+                print(f"    Connect rate: {connect_rate['value']}")
+            print(f"    Dispositions: {m['dispositions']}")
+            if m.get('logging_gap'):
+                print(f"    ⚠️  Logging gap: {m['logging_gap']} (reps not logging outcomes)")
         return len(metrics)
 
     supabase = SupabaseWriter().client

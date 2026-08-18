@@ -1,17 +1,19 @@
 """
 Apollo Dialer Adapter
 
-Fetches SDR call metrics from Apollo.io.
-Note: Apollo Analytics API requires premium plan tier.
-This adapter falls back to calls API when Analytics is unavailable.
+Fetches SDR call metrics from Apollo.io phone_calls API.
 
-Returns standardized metrics:
-- calls_made
-- connected_calls
-- connect_rate
-- voicemails
-- no_answers
-- bad_numbers
+What Apollo Provides:
+- calls_made: Reliable (count of call records)
+- voicemails: Reliable (voicemail_dropped boolean field)
+- dispositions: Partial (phone_call_outcome_id often null, ~30%+ unknown)
+
+What Apollo Does NOT Provide:
+- connect_rate: No reliable answered/connected signal in API response
+  (duration is often 0, terminal_call_status doesn't indicate answered)
+- For connect rate, use Salesloft or Aircall adapters
+
+Returns standardized metrics with data_gap flags where data is unavailable.
 """
 
 import os
@@ -35,16 +37,20 @@ from sdr_utils import (
 )
 
 
+# Apollo Analytics API does not exist or requires unavailable tier
+# Use phone_calls API with client-side aggregation
+ANALYTICS_FIRST = False
+
+
 class ApolloDialerAdapter:
     """
     Apollo.io call metrics adapter.
 
-    Supports two modes:
-    1. Analytics API (premium tier) - aggregated metrics by user
-    2. Calls API (fallback) - individual call records, aggregated client-side
-
     Authentication: X-Api-Key header
     API docs: https://apolloio.github.io/apollo-api-docs/
+
+    Note: Apollo's phone_calls API has significant data gaps.
+    Connect rate is not calculable. Dispositions are often missing.
     """
 
     def __init__(self):
@@ -61,7 +67,8 @@ class ApolloDialerAdapter:
             'Content-Type': 'application/json',
             'Cache-Control': 'no-cache'
         }
-        self.base_url = 'https://api.apollo.io/v1'
+        # Correct base URL includes /api/ prefix
+        self.base_url = 'https://api.apollo.io/api/v1'
 
     def get_metrics(
         self,
@@ -84,96 +91,12 @@ class ApolloDialerAdapter:
                 - user_id: Apollo user ID
                 - user_name: User display name
                 - calls_made: Total calls
-                - connected_calls: Calls with connected disposition
-                - connect_rate: {"value": float, "data_gap": bool}
-                - voicemails: Count
-                - no_answers: Count
-                - bad_numbers: Count
+                - voicemails: Count (from voicemail_dropped field)
+                - connect_rate: {"value": None, "data_gap": True, "reason": "..."}
+                - dispositions: {"connected": N, "no_answer": N, "unknown": N}
+                - logging_gap: True if >30% of calls have unknown disposition
         """
-        # Try Analytics API first (premium feature)
-        try:
-            return self._get_analytics_metrics(since, until, user_ids, config)
-        except Exception as e:
-            print(f"Apollo Analytics API unavailable (premium tier): {e}")
-            print("Falling back to calls API aggregation...")
-            return self._get_calls_metrics(since, until, user_ids, config)
-
-    def _get_analytics_metrics(
-        self,
-        since: date,
-        until: date,
-        user_ids: Optional[List[str]],
-        config: dict
-    ) -> List[Dict]:
-        """
-        Fetch metrics from Apollo Analytics API (premium tier).
-
-        Endpoint: POST /v1/analytics/table_view
-        Returns pre-aggregated metrics by user.
-        """
-        # Convert reporting TZ dates to UTC filters
-        filters = api_date_filters(since, until, config, tool="iso")
-
-        # Build request body
-        request_body = {
-            "group_by_field": "user_id",
-            "analytics_name": "users_analytics",
-            "start_date": filters["min"],
-            "end_date": filters["max"],
-            "metric_fields": [
-                "num_phone_calls",
-                "percent_connected_calls",
-                "num_connected_calls",
-                "num_voicemails",
-                "num_no_answers"
-            ]
-        }
-
-        # Filter by specific users if provided
-        if user_ids:
-            request_body["filter"] = {"user_ids": user_ids}
-
-        response = requests.post(
-            f'{self.base_url}/analytics/table_view',
-            headers=self.headers,
-            json=request_body,
-            timeout=30
-        )
-
-        # Check for permissions/plan tier issues
-        if response.status_code == 403:
-            raise ValueError("Analytics API requires premium plan tier")
-
-        response.raise_for_status()
-        data = response.json()
-
-        # Extract buckets using sdr_utils helper
-        buckets = flatten_buckets(data, "num_phone_calls")
-
-        if not buckets:
-            raise ValueError("Empty analytics response (may need premium tier)")
-
-        # Transform to standard metrics format
-        results = []
-        for bucket in buckets:
-            user_id = safe_get(bucket, "key")
-
-            # Apollo Analytics returns percent_ fields as decimals (0.23 = 23%)
-            calls_made = to_int(safe_get(bucket, "num_phone_calls"))
-            connected_calls = to_int(safe_get(bucket, "num_connected_calls"))
-
-            results.append({
-                "user_id": user_id,
-                "user_name": safe_get(bucket, "name", default=f"User {user_id}"),
-                "calls_made": calls_made,
-                "connected_calls": connected_calls,
-                "connect_rate": rate_or_gap(connected_calls, calls_made),
-                "voicemails": to_int(safe_get(bucket, "num_voicemails")),
-                "no_answers": to_int(safe_get(bucket, "num_no_answers")),
-                "bad_numbers": to_int(safe_get(bucket, "num_bad_numbers"))
-            })
-
-        return results
+        return self._get_calls_metrics(since, until, user_ids, config)
 
     def _get_calls_metrics(
         self,
@@ -185,17 +108,22 @@ class ApolloDialerAdapter:
         """
         Fetch individual call records and aggregate client-side.
 
-        Endpoint: GET /v1/calls
-        Fallback when Analytics API is unavailable.
+        Endpoint: GET /api/v1/phone_calls/search
+        Apollo returns call records with:
+        - user_id (who made the call)
+        - start_time (ISO timestamp)
+        - voicemail_dropped (boolean)
+        - phone_call_outcome_id (often null)
+        - terminal_call_status (cancelled, completed, etc.)
+        - duration (often 0, unreliable)
         """
         # Convert reporting TZ dates to UTC filters
         filters = api_date_filters(since, until, config, tool="iso")
 
         # Fetch all calls for date range
+        # Note: Apollo phone_calls/search max per_page is 50 (422 error if higher)
         params = {
-            "created_at_min": filters["min"],
-            "created_at_max": filters["max"],
-            "per_page": 200  # Max allowed
+            "per_page": 50  # Apollo max allowed
         }
 
         all_calls = []
@@ -205,7 +133,7 @@ class ApolloDialerAdapter:
             params["page"] = page
 
             response = requests.get(
-                f'{self.base_url}/calls',
+                f'{self.base_url}/phone_calls/search',
                 headers=self.headers,
                 params=params,
                 timeout=30
@@ -213,7 +141,7 @@ class ApolloDialerAdapter:
             response.raise_for_status()
 
             data = response.json()
-            calls = safe_get(data, "calls", default=[])
+            calls = safe_get(data, "phone_calls", default=[])
 
             if not calls:
                 break
@@ -224,10 +152,27 @@ class ApolloDialerAdapter:
             pagination = safe_get(data, "pagination", default={})
             total_pages = to_int(safe_get(pagination, "total_pages"))
 
-            if page >= total_pages:
+            if page >= total_pages or len(calls) < 50:
                 break
 
             page += 1
+
+        # Filter by date range (Apollo doesn't support date params on phone_calls/search)
+        date_filtered_calls = []
+        for call in all_calls:
+            start_time_str = safe_get(call, "start_time")
+            if not start_time_str:
+                continue
+
+            try:
+                # Parse ISO timestamp
+                call_date = datetime.fromisoformat(start_time_str.replace('Z', '+00:00')).date()
+                if since <= call_date <= until:
+                    date_filtered_calls.append(call)
+            except (ValueError, AttributeError):
+                continue
+
+        all_calls = date_filtered_calls
 
         # Filter by user_ids if specified
         if user_ids:
@@ -245,39 +190,131 @@ class ApolloDialerAdapter:
                 continue
 
             if user_id not in user_metrics:
+                # Get caller name from call record
+                caller_name = safe_get(call, "caller_name", default=f"User {user_id}")
+
                 user_metrics[user_id] = {
                     "user_id": user_id,
-                    "user_name": safe_get(call, "user", "name", default=f"User {user_id}"),
+                    "user_name": caller_name,
                     "calls_made": 0,
-                    "connected_calls": 0,
                     "voicemails": 0,
-                    "no_answers": 0,
-                    "bad_numbers": 0
+                    "dispositions": {
+                        "connected": 0,
+                        "voicemail": 0,
+                        "no_answer": 0,
+                        "busy": 0,
+                        "bad_number": 0,
+                        "unknown": 0
+                    }
                 }
 
             # Increment call count
             user_metrics[user_id]["calls_made"] += 1
 
-            # Normalize disposition and categorize
-            raw_disposition = safe_get(call, "disposition")
-            disposition = normalize_disposition(raw_disposition, "apollo")
-
-            if connected_from_disposition(disposition):
-                user_metrics[user_id]["connected_calls"] += 1
-            elif disposition == "voicemail":
+            # Voicemail detection: Use voicemail_dropped field (reliable)
+            voicemail_dropped = safe_get(call, "voicemail_dropped")
+            if voicemail_dropped is True:
                 user_metrics[user_id]["voicemails"] += 1
-            elif disposition == "no_answer":
-                user_metrics[user_id]["no_answers"] += 1
-            elif disposition == "bad_number":
-                user_metrics[user_id]["bad_numbers"] += 1
+                user_metrics[user_id]["dispositions"]["voicemail"] += 1
+                continue  # Don't double-count as unknown
 
-        # Calculate connect rates
+            # Disposition categorization: Use phone_call_outcome_id
+            # Note: This field is often null. We normalize what we can.
+            outcome_id = safe_get(call, "phone_call_outcome_id")
+            terminal_status = safe_get(call, "terminal_call_status")
+
+            # Normalize disposition using sdr_utils helper
+            # Apollo doesn't provide disposition text, only IDs
+            # We can't reliably determine "connected" vs other outcomes
+            disposition = normalize_disposition(outcome_id, "apollo")
+
+            if disposition == "unknown":
+                # Try terminal_call_status as fallback
+                if terminal_status == "busy":
+                    user_metrics[user_id]["dispositions"]["busy"] += 1
+                elif terminal_status in ["no-answer", "failed"]:
+                    user_metrics[user_id]["dispositions"]["no_answer"] += 1
+                else:
+                    user_metrics[user_id]["dispositions"]["unknown"] += 1
+            else:
+                # Use normalized disposition
+                user_metrics[user_id]["dispositions"][disposition] += 1
+
+        # Build results with summary metrics
         results = []
         for metrics in user_metrics.values():
-            metrics["connect_rate"] = rate_or_gap(
-                metrics["connected_calls"],
-                metrics["calls_made"]
-            )
-            results.append(metrics)
+            # Calculate logging gap: >30% unknown = poor logging
+            total_calls = metrics["calls_made"]
+            unknown_calls = metrics["dispositions"]["unknown"]
+            logging_gap = (unknown_calls / total_calls) > 0.30 if total_calls > 0 else False
+
+            # Connect rate: Apollo does NOT provide a reliable connected signal
+            # Do not fabricate using duration or recording presence
+            connect_rate = {
+                "value": None,
+                "data_gap": True,
+                "reason": "Apollo calls API does not expose a reliable answered/connected signal. Use Salesloft or Aircall for connect rate."
+            }
+
+            results.append({
+                "user_id": metrics["user_id"],
+                "user_name": metrics["user_name"],
+                "calls_made": metrics["calls_made"],
+                "voicemails": metrics["voicemails"],
+                "connect_rate": connect_rate,
+                "dispositions": metrics["dispositions"],
+                "logging_gap": logging_gap
+            })
 
         return results
+
+    def get_call_summary(
+        self,
+        since: date,
+        until: date,
+        config: dict = None
+    ) -> Dict:
+        """
+        Get team-level call summary for date range.
+
+        Returns only what Apollo actually provides reliably:
+        - Total calls made
+        - Total voicemails dropped
+        - Disposition breakdown (with unknown bucket)
+        - Connect rate: ALWAYS data_gap=True (Apollo doesn't provide this)
+        """
+        metrics = self.get_metrics(since, until, user_ids=None, config=config)
+
+        total_calls = sum(m["calls_made"] for m in metrics)
+        total_voicemails = sum(m["voicemails"] for m in metrics)
+
+        # Aggregate dispositions
+        disposition_summary = {
+            "connected": 0,
+            "voicemail": 0,
+            "no_answer": 0,
+            "busy": 0,
+            "bad_number": 0,
+            "unknown": 0
+        }
+
+        for m in metrics:
+            for key, count in m["dispositions"].items():
+                disposition_summary[key] += count
+
+        # Check logging gap across all users
+        unknown_pct = disposition_summary["unknown"] / total_calls if total_calls > 0 else 0
+        logging_gap = unknown_pct > 0.30
+
+        return {
+            "calls_made": total_calls,
+            "voicemails": total_voicemails,
+            "connect_rate": {
+                "value": None,
+                "data_gap": True,
+                "reason": "Apollo calls API does not expose a reliable answered/connected signal. Use Salesloft or Aircall for connect rate."
+            },
+            "dispositions": disposition_summary,
+            "logging_gap": logging_gap,
+            "logging_gap_pct": round(unknown_pct * 100, 1) if total_calls > 0 else 0
+        }

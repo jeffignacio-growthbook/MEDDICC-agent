@@ -316,6 +316,36 @@ call_tools:
   primary: "fireflies"
 
 # ============================================================================
+# SDR TOOLS (OPTIONAL)
+# ============================================================================
+# Configure which SDR activity tools to sync for call/email metrics
+# Used by scripts/etl_sdr_metrics.py and api/handlers.py
+
+sdr_tools:
+  # Apollo.io dialer - LIMITED metrics only
+  # ✅ Provides: calls_made, voicemails (voicemail_dropped field)
+  # ❌ Does NOT provide: connect_rate (no answered/connected signal in API)
+  # ⚠️  Dispositions often missing (phone_call_outcome_id is null ~30%+ of records)
+  # For full SDR metrics (connect rate, talk time), use Salesloft or Aircall
+  apollo:
+    enabled: true  # Enabled for dry-run testing
+
+  # Salesloft sequencer - FULL metrics (calls + emails)
+  # ✅ Provides: calls_made, connected_calls, connect_rate, voicemails,
+  #             emails_sent, email_opens, email_replies, open/reply rates
+  # Best for teams using Salesloft Cadence for both email and call outreach
+  salesloft:
+    enabled: false
+
+  # Aircall dialer - FULL call metrics only
+  # ✅ Provides: calls_made, connected_calls, connect_rate, voicemails,
+  #             dispositions, talk_time
+  # ❌ Does NOT provide: email metrics
+  # Best for teams using Aircall as standalone dialer
+  aircall:
+    enabled: false
+
+# ============================================================================
 # ETL CONFIGURATION
 # ============================================================================
 # Settings for nightly deal and call ingestion
