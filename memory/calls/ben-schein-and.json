@@ -1,0 +1,22 @@
+{
+  "company": "Ben Schein and",
+  "slug": "ben-schein-and",
+  "last_etl_date": "2026-08-18T02:36:37.772119",
+  "calls": [
+    {
+      "id": "01M03DT6QHV6YN1MEE5TFT8XFH",
+      "source": "fireflies",
+      "title": "Ben Schein and Ashley Stirrup + Dan Wathne",
+      "date": "2026-08-17",
+      "duration_minutes": 30.3700008392334,
+      "summary": "Clover faces significant challenges in expediting its product launch cycle while maintaining thorough testing and validation due to the critical nature of its payment processing. The lengthy testing process, extending up to six months despite early code completion, is driven by a cautious approach to minimize risks. New leadership emphasizes speed, creating tension with product teams who value disciplined experimentation. The existing manual feature flagging system is outdated, complicating rollouts across 350,000 merchants. GrowthBook was discussed as a potential solution for modernizing Clover's experimentation and feature flagging processes, which Ben Schein and his colleague Ana are positioned to champion internally. Overall, Clover seeks to navigate cultural and operational complexities while improving both speed and safety in product development.",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
+      "keywords": "feature flagging, experimentation, product testing, time to market, internal tooling, AI-powered analysis",
+      "action_items": "\n, *, *, B, e, n,  , S, c, h, e, i, n, *, *, \n, S, h, a, r, e,  , a, v, a, i, l, a, b, i, l, i, t, y,  , f, o, r,  , t, h, e,  , n, e, x, t,  , c, o, u, p, l, e,  , o, f,  , w, e, e, k, s,  , t, o,  , s, c, h, e, d, u, l, e,  , a,  , d, e, m, o,  , w, i, t, h,  , G, r, o, w, t, h, B, o, o, k, ,,  , i, n, c, l, u, d, i, n, g,  , b, r, i, n, g, i, n, g,  , i, n,  , k, e, y,  , c, o, l, l, e, a, g, u, e, s,  , s, u, c, h,  , a, s,  , t, h, e,  , d, e, s, i, g, n,  , l, e, a, d,  , A, n, a,  , (, 2, 7, :, 1, 0, ), \n, \n, *, *, D, a, n,  , W, a, t, h, n, e, *, *, \n, F, o, l, l, o, w,  , u, p,  , w, i, t, h,  , B, e, n,  , S, c, h, e, i, n,  , t, o,  , s, c, h, e, d, u, l, e,  , a,  , G, r, o, w, t, h, B, o, o, k,  , d, e, m, o,  , d, u, r, i, n, g,  , D, a, n,  , W, a, t, h, n, e, ’, s,  , u, p, c, o, m, i, n, g,  , t, r, a, v, e, l, s, ,,  , e, n, s, u, r, i, n, g,  , c, o, n, t, i, n, u, i, t, y,  , d, e, s, p, i, t, e,  , r, e, m, o, t, e,  , s, t, a, t, u, s,  , (, 2, 8, :, 0, 7, ), \n",
+      "participant_domains": [
+        "clover.com"
+      ]
+    }
+  ]
+}

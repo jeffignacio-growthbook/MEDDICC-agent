@@ -1,0 +1,19 @@
+{
+  "company": "Meet",
+  "slug": "meet",
+  "last_etl_date": "2026-08-18T02:36:37.769886",
+  "calls": [
+    {
+      "id": "01M08M81EM52VFVAJJK4WCHZNB",
+      "source": "fireflies",
+      "title": "Meet",
+      "date": "2026-08-17",
+      "duration_minutes": 1,
+      "summary": "",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "keywords": "",
+      "action_items": ""
+    }
+  ]
+}

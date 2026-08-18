@@ -1,7 +1,7 @@
 {
   "company": "Design Sync",
   "slug": "design-sync",
-  "last_etl_date": "2026-08-13T03:42:39.061342",
+  "last_etl_date": "2026-08-18T02:36:37.770073",
   "calls": [
     {
       "id": "01KZVCR674TK3ARKVTWS0G38BP",
@@ -14,6 +14,18 @@
       "participants": 3,
       "keywords": "Experiment Design, Metrics Management, Analysis Settings, UI Redesign, Screenshots UI, Decision Framework",
       "action_items": "\n, *, *, G, a, b, e,  , M, e, l, e, a, n, *, *, \n, L, e, a, d,  , r, e, d, e, s, i, g, n,  , e, f, f, o, r, t, s,  , f, o, r,  , t, h, e,  , a, n, a, l, y, s, i, s,  , s, e, t, t, i, n, g, s,  , c, o, n, t, a, i, n, e, r,  , f, o, c, u, s, i, n, g,  , o, n,  , b, e, t, t, e, r,  , m, e, t, r, i, c,  , p, r, i, o, r, i, t, i, z, a, t, i, o, n,  , a, n, d,  , u, s, a, b, i, l, i, t, y,  , (, 3, 1, :, 4, 8, ), \n, P, r, o, v, i, d, e,  , l, i, n, k, s,  , t, o,  , f, i, n, i, s, h, e, d,  , s, t, y, l, e,  , g, u, i, d, e, s,  , f, o, r,  , r, e, v, i, e, w,  , b, y,  , K, a, r, i,  , K, a, y,  , (, 3, 2, :, 1, 7, ), \n, \n, *, *, J, o, h, n, n, y,  , M, a, r, t, i, n, e, z, *, *, \n, W, o, r, k,  , o, n,  , U, I,  , i, m, p, r, o, v, e, m, e, n, t, s,  , f, o, r,  , t, h, e,  , s, c, r, e, e, n, s, h, o, t, s,  , s, e, c, t, i, o, n, ,,  , i, n, c, l, u, d, i, n, g,  , b, e, t, t, e, r,  , t, h, u, m, b, n, a, i, l,  , p, l, a, c, e, m, e, n, t, ,,  , n, a, v, i, g, a, t, i, o, n, ,,  , a, n, d,  , i, m, a, g, e,  , s, c, a, l, i, n, g,  , (, 3, 1, :, 4, 0, ), \n, \n, *, *, K, a, r, i,  , K, a, y, *, *, \n, A, d, d,  , d, i, s, c, u, s, s, e, d,  , d, e, s, i, g, n,  , t, a, s, k, s,  , a, n, d,  , p, r, o, g, r, e, s, s,  , t, o,  , t, h, e,  , N, o, t, i, o, n,  , t, r, a, c, k, e, r,  , f, o, r,  , t, e, a, m,  , v, i, s, i, b, i, l, i, t, y,  , a, n, d,  , f, o, l, l, o, w, -, u, p,  , (, 3, 3, :, 2, 8, ), \n, R, e, v, i, e, w,  , s, t, y, l, e,  , g, u, i, d, e, s,  , s, h, a, r, e, d,  , b, y,  , G, a, b, e,  , t, o,  , e, n, s, u, r, e,  , c, o, n, s, i, s, t, e, n, c, y,  , w, i, t, h,  , p, r, o, p, o, s, e, d,  , U, I,  , c, h, a, n, g, e, s,  , (, 3, 2, :, 1, 7, ), \n, M, a, i, n, t, a, i, n,  , c, o, m, m, u, n, i, c, a, t, i, o, n,  , w, i, t, h,  , e, n, g, i, n, e, e, r, i, n, g,  , t, e, a, m, s,  , t, o,  , e, n, s, u, r, e,  , u, p, d, a, t, e, s,  , o, n,  , U, I,  , c, h, a, n, g, e, s,  , a, r, e,  , c, o, o, r, d, i, n, a, t, e, d,  , a, n, d,  , n, o, t,  , i, m, p, l, e, m, e, n, t, e, d,  , w, i, t, h, o, u, t,  , d, e, s, i, g, n,  , i, n, p, u, t,  , (, 3, 2, :, 1, 7, ), \n"
+    },
+    {
+      "id": "01M088GXRH8PSK4CQ4CBK148A1",
+      "source": "fireflies",
+      "title": "Design Sync",
+      "date": "2026-08-17",
+      "duration_minutes": 11.489999771118164,
+      "summary": "During the meeting, it was highlighted that Michael encountered unexpected and bizarre news today. There's a plan in place to delve into the future of design, with Graham expressing his willingness to discuss and clarify the reasons behind the recent changes. Due to the need for further insights, the meeting was postponed for 15 minutes while Gabe prepares to chat with Graham for updates.",
+      "organizer": "gabe@growthbook.io",
+      "participants": 2,
+      "keywords": "design future, team communication, sudden news, meeting postponement, internal discussion, stakeholder engagement",
+      "action_items": "*, *, G, a, b, e,  , M, e, l, e, a, n, *, *,  ,  , \n, C, o, n, t, a, c, t,  , G, r, a, h, a, m,  , f, o, r,  , i, n, s, i, g, h, t, s,  , o, n,  , d, e, s, i, g, n,  , d, i, r, e, c, t, i, o, n,  , (, 0, 0, :, 5, 2, ),  ,  , \n, P, o, s, t, p, o, n, e,  , m, e, e, t, i, n, g,  , b, y,  , 1, 5,  , m, i, n, u, t, e, s,  , (, 0, 1, :, 2, 5, ),  ,  , \n, \n, *, *, J, o, h, n, n, y,  , M, a, r, t, i, n, e, z, *, *,  ,  , \n, A, w, a, i, t,  , u, p, d, a, t, e,  , f, r, o, m,  , G, a, b, e,  , a, f, t, e, r,  , c, o, n, v, e, r, s, a, t, i, o, n,  , w, i, t, h,  , G, r, a, h, a, m,  , (, 0, 1, :, 3, 4, )"
     }
   ]
 }
