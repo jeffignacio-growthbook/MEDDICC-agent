@@ -19,6 +19,7 @@ Returns standardized metrics with data_gap flags where data is unavailable.
 import os
 import requests
 import sys
+import time
 from datetime import date, datetime
 from typing import Dict, List, Optional
 from pathlib import Path
@@ -132,13 +133,41 @@ class ApolloDialerAdapter:
         while True:
             params["page"] = page
 
-            response = requests.get(
-                f'{self.base_url}/phone_calls/search',
-                headers=self.headers,
-                params=params,
-                timeout=30
-            )
-            response.raise_for_status()
+            # Retry logic for rate limiting
+            max_retries = 3
+            retry_count = 0
+
+            while retry_count < max_retries:
+                try:
+                    response = requests.get(
+                        f'{self.base_url}/phone_calls/search',
+                        headers=self.headers,
+                        params=params,
+                        timeout=30
+                    )
+
+                    # Handle rate limiting (429)
+                    if response.status_code == 429:
+                        retry_count += 1
+                        if retry_count >= max_retries:
+                            response.raise_for_status()
+
+                        # Exponential backoff: 2s, 4s, 8s
+                        wait_time = 2 ** retry_count
+                        print(f"  Rate limited on page {page}, waiting {wait_time}s...")
+                        time.sleep(wait_time)
+                        continue
+
+                    response.raise_for_status()
+                    break
+
+                except requests.exceptions.HTTPError as e:
+                    if retry_count >= max_retries - 1:
+                        raise
+                    retry_count += 1
+                    wait_time = 2 ** retry_count
+                    print(f"  Error on page {page}, retrying in {wait_time}s...")
+                    time.sleep(wait_time)
 
             data = response.json()
             calls = safe_get(data, "phone_calls", default=[])
@@ -155,6 +184,8 @@ class ApolloDialerAdapter:
             if page >= total_pages or len(calls) < 50:
                 break
 
+            # Rate limiting: small delay between pages
+            time.sleep(0.5)
             page += 1
 
         # Filter by date range (Apollo doesn't support date params on phone_calls/search)
