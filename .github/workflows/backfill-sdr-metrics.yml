@@ -1,0 +1,35 @@
+name: SDR Metrics Backfill
+
+on:
+  workflow_dispatch:
+    inputs:
+      months:
+        description: 'Months to backfill (default: 6)'
+        required: false
+        default: '6'
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 110   # Under 120-minute limit with 10-minute buffer
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run SDR metrics backfill
+        env:
+          APOLLO_API_KEY: ${{ secrets.APOLLO_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python scripts/etl_sdr_metrics.py \
+            --backfill \
+            --backfill-months ${{ github.event.inputs.months }}

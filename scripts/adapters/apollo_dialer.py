@@ -63,6 +63,7 @@ class ApolloDialerAdapter:
                 'APOLLO_API_KEY environment variable required for Apollo adapter'
             )
 
+        self.source = 'apollo'
         self.headers = {
             'X-Api-Key': api_key,
             'Content-Type': 'application/json',
@@ -98,6 +99,106 @@ class ApolloDialerAdapter:
                 - logging_gap: True if >30% of calls have unknown disposition
         """
         return self._get_calls_metrics(since, until, user_ids, config)
+
+    def get_call_records(
+        self,
+        since: datetime,
+        until: datetime,
+        user_ids: Optional[List[str]] = None
+    ) -> List[Dict]:
+        """
+        Fetch raw call records (for backfill aggregation).
+
+        Args:
+            since: Start datetime (UTC)
+            until: End datetime (UTC)
+            user_ids: Optional list of Apollo user IDs to filter
+
+        Returns:
+            List of raw call record dicts with fields:
+                - user_id: Apollo user ID
+                - caller_name: User display name
+                - start_time: ISO timestamp
+                - voicemail_dropped: Boolean
+        """
+        params = {"per_page": 50}  # Apollo max allowed
+        all_calls = []
+        page = 1
+
+        while True:
+            params["page"] = page
+
+            # Retry logic for rate limiting
+            max_retries = 3
+            retry_count = 0
+
+            while retry_count < max_retries:
+                try:
+                    response = requests.get(
+                        f'{self.base_url}/phone_calls/search',
+                        headers=self.headers,
+                        params=params,
+                        timeout=30
+                    )
+
+                    if response.status_code == 429:
+                        retry_count += 1
+                        if retry_count >= max_retries:
+                            raise Exception("Rate limit exceeded")
+                        wait_time = 2 ** retry_count
+                        print(f"  Rate limited on page {page}, waiting {wait_time}s...")
+                        time.sleep(wait_time)
+                        continue
+
+                    response.raise_for_status()
+                    break
+
+                except requests.exceptions.HTTPError as e:
+                    if retry_count >= max_retries - 1:
+                        raise
+                    retry_count += 1
+                    wait_time = 2 ** retry_count
+                    time.sleep(wait_time)
+
+            data = response.json()
+            calls = safe_get(data, "phone_calls", default=[])
+
+            if not calls:
+                break
+
+            all_calls.extend(calls)
+
+            pagination = safe_get(data, "pagination", default={})
+            total_pages = to_int(safe_get(pagination, "total_pages"))
+
+            if page >= total_pages or len(calls) < 50:
+                break
+
+            time.sleep(0.5)
+            page += 1
+
+        # Filter by date range
+        date_filtered = []
+        for call in all_calls:
+            start_time_str = safe_get(call, "start_time")
+            if not start_time_str:
+                continue
+
+            try:
+                call_dt = datetime.fromisoformat(start_time_str.replace('Z', '+00:00'))
+                if since <= call_dt <= until:
+                    date_filtered.append(call)
+            except (ValueError, AttributeError):
+                continue
+
+        # Filter by user_ids if specified
+        if user_ids:
+            date_filtered = [
+                c for c in date_filtered
+                if safe_get(c, "user_id") in user_ids
+            ]
+
+        return date_filtered
 
     def _get_calls_metrics(
         self,

@@ -59,6 +59,18 @@ def parse_args():
         action='store_true',
         help='Print metrics without writing to database'
     )
+    parser.add_argument(
+        '--backfill',
+        action='store_true',
+        help='Fetch full historical data from earliest available. '
+             'Resumes from etl_checkpoints if interrupted.'
+    )
+    parser.add_argument(
+        '--backfill-months',
+        type=int,
+        default=6,
+        help='How many months to backfill (default: 6)'
+    )
 
     return parser.parse_args()
 
@@ -340,10 +352,190 @@ def fetch_aircall(since: date, until: date, config: dict, dry_run: bool) -> int:
     return len(metrics)
 
 
+def write_daily_summaries(records: List[Dict], supabase, tool: str, config: dict) -> None:
+    """
+    Aggregate individual call/activity records into daily sdr_metrics rows.
+
+    Groups by (tool_user_id, metric_date) and computes:
+      - calls_made: total records for that day
+      - voicemails: records where voicemail_dropped=True
+      - connected_calls: always 0 for Apollo (no reliable signal)
+      - data_gap: True (connect rate unavailable from Apollo calls API)
+
+    Upserts to sdr_metrics on (tool, tool_user_id, metric_date).
+
+    Args:
+        records: List of individual call/activity records from adapter
+        supabase: Supabase client
+        tool: Tool name (apollo, salesloft, aircall)
+        config: Client configuration for timezone handling
+    """
+    from collections import defaultdict
+    from sdr_utils import utc_to_reporting_date
+
+    daily = defaultdict(lambda: {
+        "calls_made": 0,
+        "voicemails": 0,
+        "connected_calls": 0,
+        "data_gap": True,
+        "user_name": None
+    })
+
+    for record in records:
+        # Convert UTC timestamp to reporting timezone date
+        # Apollo uses "start_time", normalize for other tools
+        timestamp_field = record.get("start_time") or record.get("called_at")
+        if not timestamp_field:
+            continue
+
+        try:
+            # Parse ISO timestamp to datetime
+            from datetime import datetime as dt
+            call_dt = dt.fromisoformat(timestamp_field.replace('Z', '+00:00'))
+            # Convert to reporting timezone date
+            call_date = utc_to_reporting_date(call_dt, config)
+        except (ValueError, AttributeError):
+            continue
+
+        if not call_date:
+            continue
+
+        # Apollo uses "user_id", normalize for other tools
+        tool_user_id = record.get("user_id") or record.get("tool_user_id")
+        if not tool_user_id:
+            continue
+
+        key = (tool_user_id, call_date.isoformat())
+        daily[key]["calls_made"] += 1
+
+        # Apollo uses "caller_name", normalize for other tools
+        user_name = record.get("caller_name") or record.get("user_name")
+        daily[key]["user_name"] = user_name or daily[key]["user_name"]
+
+        if record.get("voicemail_dropped"):
+            daily[key]["voicemails"] += 1
+
+    # Write aggregated daily summaries
+    for (tool_user_id, metric_date), metrics in daily.items():
+        supabase.table("sdr_metrics").upsert({
+            "tool": tool,
+            "tool_user_id": tool_user_id,
+            "user_name": metrics["user_name"],
+            "metric_date": metric_date,
+            "calls_made": metrics["calls_made"],
+            "voicemails": metrics["voicemails"],
+            "connected_calls": metrics["connected_calls"],
+            "data_gap": metrics["data_gap"],
+            "etl_run_at": "now()"
+        }, on_conflict="tool,tool_user_id,metric_date").execute()
+
+
+def run_backfill(tool: str, config: dict, months: int = 6) -> None:
+    """
+    Fetch historical data month by month, oldest first.
+    Saves checkpoint after each successful month.
+    Safe to interrupt and resume.
+
+    Args:
+        tool: Tool name (apollo only for now)
+        config: Client configuration
+        months: Number of months to backfill
+    """
+    from dateutil.relativedelta import relativedelta
+    import time
+
+    print(f"\n{'='*80}")
+    print(f"BACKFILL MODE: {tool.upper()} - {months} months")
+    print(f"{'='*80}\n")
+
+    if tool != 'apollo':
+        print(f"⚠️  Backfill only implemented for Apollo (calls API)")
+        print(f"   Skipping {tool}")
+        return
+
+    supabase = SupabaseWriter().client
+    adapter = ApolloDialerAdapter()
+
+    today = today_in_reporting_tz(config)
+
+    # Find earliest month not yet in sdr_metrics
+    checkpoint = get_checkpoint(supabase, tool)
+    if checkpoint:
+        start_month = checkpoint.replace(day=1)
+        print(f"Resuming from checkpoint: {checkpoint}")
+    else:
+        start_month = (today - relativedelta(months=months)).replace(day=1)
+        print(f"Starting fresh from: {start_month}")
+
+    current = start_month
+    while current <= today.replace(day=1):
+        month_end = (current + relativedelta(months=1)) - timedelta(days=1)
+
+        # Check if this month already has data
+        existing = (supabase.table("sdr_metrics")
+                      .select("id", count="exact")
+                      .eq("tool", tool)
+                      .gte("metric_date", current.isoformat())
+                      .lte("metric_date", month_end.isoformat())
+                      .execute())
+
+        if existing.count > 0:
+            print(f"  {current.strftime('%B %Y')}: already have "
+                  f"{existing.count} rows, skipping")
+            current += relativedelta(months=1)
+            continue
+
+        print(f"  Fetching {current.strftime('%B %Y')}...")
+
+        try:
+            from datetime import datetime, time, timezone as tz
+
+            # Fetch call records for this month using calls API
+            records = adapter.get_call_records(
+                since=datetime.combine(current, time.min, tzinfo=tz.utc),
+                until=datetime.combine(month_end, time(23,59,59), tzinfo=tz.utc)
+            )
+
+            # Write daily summaries for this month
+            write_daily_summaries(records, supabase, tool, config)
+
+            # Save checkpoint
+            save_checkpoint(supabase, tool, month_end)
+
+            print(f"    ✓ {len(records)} calls written")
+
+            # Respect rate limits between months (2-second pause)
+            time.sleep(2)
+
+        except Exception as e:
+            if 'rate limit' in str(e).lower() or 'too many requests' in str(e).lower():
+                print(f"\n⚠️  Rate limit hit after {current.strftime('%B %Y')}.")
+                print(f"   Checkpoint saved. Run again in 1 hour to continue.")
+                return
+            else:
+                print(f"    ✗ Error: {e}")
+                import traceback
+                traceback.print_exc()
+                # Continue with next month on error
+
+        current += relativedelta(months=1)
+
+    print(f"\n✓ Backfill complete through {month_end}")
+
+
 def main():
     """Main ETL orchestration with incremental checkpoint support."""
     args = parse_args()
     config = load_client_config()
+
+    # Handle backfill mode
+    if args.backfill:
+        tools_config = config.get('sdr_tools', {})
+        if tools_config.get('apollo', {}).get('enabled', False):
+            run_backfill('apollo', config, args.backfill_months)
+        else:
+            print("⚠️  Apollo not enabled in config/client.yaml")
+        return
 
     # Parse date range in reporting timezone
     until = (
