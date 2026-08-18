@@ -529,3 +529,26 @@ team:
       name: "Jeff Ignacio"
       role: "VP Revenue Operations"
       title: "VP RevOps"
+
+# ============================================================================
+# PERSONA CONFIG OVERRIDES
+# ============================================================================
+# Manual role assignments that override HubSpot inference
+# Used by seed_user_personas_from_hubspot.py
+
+config_overrides:
+  graham@growthbook.io:
+    role: "ceo"
+    title: "Co-founder & CEO"
+  jeremy@growthbook.io:
+    role: "cto"
+    title: "Co-founder & CTO"
+  ryan.mcgurk@growthbook.io:
+    role: "cro"
+    title: "Chief Revenue Officer"
+  jeff.ignacio@growthbook.io:
+    role: "vp_revops"
+    title: "VP of Revenue Operations"
+  jake.stangl@growthbook.io:
+    role: "sdr"
+    title: "Sales Development Representative"

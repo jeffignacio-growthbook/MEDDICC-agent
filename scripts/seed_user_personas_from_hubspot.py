@@ -30,17 +30,19 @@ DEAL_COUNT_THRESHOLDS = {
 }
 
 # Config overrides - emails that map to specific roles
+# NOTE: This is the fallback. Prefer loading from config/client.yaml config_overrides section.
 ROLE_OVERRIDES = {
-    'jeff.ignacio@growthbook.io': ('vp_revops', 'VP Revenue Operations'),
+    'graham@growthbook.io': ('ceo', 'Co-founder & CEO'),
+    'jeremy@growthbook.io': ('cto', 'Co-founder & CTO'),
     'ryan.mcgurk@growthbook.io': ('cro', 'Chief Revenue Officer'),
-    'graham@growthbook.io': ('ceo', 'CEO'),  # superAdmin in HubSpot
-    'jake.stangl@growthbook.io': ('sdr', 'Sales Development Representative'),  # SDR with deals
-    # Add other known executives here
+    'jeff.ignacio@growthbook.io': ('vp_revops', 'VP of Revenue Operations'),
+    'jake.stangl@growthbook.io': ('sdr', 'Sales Development Representative'),
 }
 
 # Role to role_group mapping
 ROLE_TO_GROUP = {
     'ceo': 'executive',
+    'cto': 'executive',
     'cro': 'executive',
     'vp_sales': 'sales_leadership',
     'vp_revops': 'operational',
