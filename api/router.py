@@ -59,7 +59,10 @@ HANDLER_DESCRIPTIONS = {
     "query_deal_stages_bulk": "current stage for a known set of deals",
     "query_deal_owners_bulk": "owner/rep for a known set of deals",
     "query_deal_values_bulk": "ARR/deal value for a known set of deals",
-    "query_sdr_metrics": "SDR/BDR activity metrics for an individual rep — calls made, voicemails, call volume. Use when asking about a specific SDR's activity, call counts, or outbound effort.",
+    "query_sdr_metrics": """SDR/BDR activity metrics for an individual rep — calls made, voicemails, call volume.
+Use when asking about a specific SDR's activity, call counts, or outbound effort.
+Examples: 'how is Jake tracking this month', 'show me Jake's calls',
+'what are Jake's metrics for August', 'how many dials did Jake make this week'""",
     "query_sdr_leaderboard": "SDR/BDR team activity overview — calls and voicemails across all SDRs. Use for team-wide SDR activity or comparing SDR performance.",
     "query_sdr_pipeline_sourced": "Pipeline sourced by SDRs/BDRs — deals attributed to an SDR via the configured attribution field or current ownership. Use when asking about SDR-sourced pipeline, BDR contribution, or meetings that converted to opportunities.",
     "dynamic_query": "question requires combining data from multiple tables or filters not covered by the precomputed handlers above. Use when no other handler fits but the data likely exists in Supabase.",
