@@ -38,8 +38,8 @@ def parse_args():
     parser.add_argument(
         '--since',
         type=str,
-        required=True,
-        help='Start date (YYYY-MM-DD or "Nd" for N days ago)'
+        default='2d',
+        help='Start date (YYYY-MM-DD or "Nd" for N days ago). Default: 2d'
     )
     parser.add_argument(
         '--until',
@@ -179,14 +179,80 @@ def upsert_metrics(
         upsert_user(supabase, tool, metric['user_id'], metric['user_name'])
 
 
+def get_checkpoint(supabase, tool: str) -> Optional[date]:
+    """
+    Get last successful ETL date for a tool.
+
+    Args:
+        supabase: Supabase client
+        tool: Tool name (apollo, salesloft, aircall)
+
+    Returns:
+        Last success date or None if never run
+    """
+    try:
+        result = supabase.table('etl_checkpoints').select('last_success_date').eq('tool', tool).execute()
+        if result.data and len(result.data) > 0:
+            last_date_str = result.data[0]['last_success_date']
+            if last_date_str:
+                return date.fromisoformat(last_date_str)
+    except Exception:
+        pass
+    return None
+
+
+def save_checkpoint(supabase, tool: str, success_date: date) -> None:
+    """
+    Save successful ETL checkpoint for a tool.
+
+    Args:
+        supabase: Supabase client
+        tool: Tool name (apollo, salesloft, aircall)
+        success_date: Date successfully processed
+    """
+    checkpoint_data = {
+        'tool': tool,
+        'last_run_at': 'now()',
+        'last_success_date': success_date.isoformat()
+    }
+
+    supabase.table('etl_checkpoints').upsert(
+        checkpoint_data,
+        on_conflict='tool'
+    ).execute()
+
+
 def fetch_apollo(since: date, until: date, config: dict, dry_run: bool) -> int:
-    """Fetch Apollo metrics."""
+    """Fetch Apollo metrics with rate limit handling."""
     print(f"\n{'='*80}")
     print("APOLLO DIALER METRICS")
     print(f"{'='*80}\n")
 
     adapter = ApolloDialerAdapter()
-    metrics = adapter.get_metrics(since, until, user_ids=None, config=config)
+
+    try:
+        metrics = adapter.get_metrics(since, until, user_ids=None, config=config)
+    except Exception as e:
+        # Check if rate limit error
+        if '429' in str(e) or 'Too Many Requests' in str(e):
+            print(f"\n⚠️  Apollo rate limit hit: {e}")
+            print(f"  Apollo's rate limit resets hourly.")
+            print(f"  The daily GitHub Actions job will retry tomorrow.")
+            print(f"  For manual runs, wait 1 hour and try again with --since 1d")
+
+            if not dry_run:
+                # Save checkpoint for what we attempted
+                # Next run will pick up from last successful date
+                supabase = SupabaseWriter().client
+                last_checkpoint = get_checkpoint(supabase, 'apollo')
+                if last_checkpoint:
+                    print(f"  Last successful run: {last_checkpoint}")
+                    print(f"  Next run will continue from there")
+
+            return 0  # Graceful exit - no users processed
+        else:
+            # Not a rate limit error, re-raise
+            raise
 
     print(f"  Fetched metrics for {len(metrics)} users")
 
@@ -210,7 +276,11 @@ def fetch_apollo(since: date, until: date, config: dict, dry_run: bool) -> int:
     # Store as metrics for the end date
     upsert_metrics(supabase, 'apollo', metrics, until)
 
+    # Save successful checkpoint
+    save_checkpoint(supabase, 'apollo', until)
+
     print(f"  ✓ Wrote metrics to sdr_metrics table")
+    print(f"  ✓ Checkpoint saved: {until}")
     return len(metrics)
 
 
@@ -271,17 +341,39 @@ def fetch_aircall(since: date, until: date, config: dict, dry_run: bool) -> int:
 
 
 def main():
-    """Main ETL orchestration."""
+    """Main ETL orchestration with incremental checkpoint support."""
     args = parse_args()
     config = load_client_config()
 
     # Parse date range in reporting timezone
-    since = parse_date_arg(args.since, config)
     until = (
         parse_date_arg(args.until, config)
         if args.until
         else today_in_reporting_tz(config)
     )
+
+    # Determine since date: use checkpoint if available, otherwise use --since arg
+    since = parse_date_arg(args.since, config)
+
+    # Check for checkpoint to enable incremental ETL
+    if not args.dry_run:
+        try:
+            supabase = SupabaseWriter().client
+            # Check each enabled tool's checkpoint
+            tools_config = config.get('sdr_tools', {})
+            if tools_config.get('apollo', {}).get('enabled', False):
+                apollo_checkpoint = get_checkpoint(supabase, 'apollo')
+                if apollo_checkpoint:
+                    # Use checkpoint + 1 day to avoid re-processing same day
+                    checkpoint_since = apollo_checkpoint + timedelta(days=1)
+                    if checkpoint_since > since:
+                        print(f"  Using Apollo checkpoint: {apollo_checkpoint}")
+                        print(f"  Fetching from {checkpoint_since} instead of {since}")
+                        since = checkpoint_since
+        except Exception as e:
+            # If checkpoint check fails, use the provided --since arg
+            print(f"  ⚠️  Checkpoint check failed: {e}")
+            print(f"  Using --since arg: {since}")
 
     print(f"\nSDR Metrics ETL")
     print(f"Date range: {since} to {until} (reporting TZ)")
