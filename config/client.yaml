@@ -13,6 +13,12 @@ organization:
   internal_domains:
     - "growthbook.io"
 
+# Controls how timestamps are converted to dates for metric reporting.
+# Set this to wherever your sales leadership reviews numbers.
+# Default (if omitted): organization.timezone. Fallback: UTC.
+reporting:
+  timezone: "America/New_York"   # IANA timezone name
+
 fiscal:
   fy_start_month: 2  # FY starts Feb 1; Q2 FY2027 = May 1 - Jul 31 2026
 
