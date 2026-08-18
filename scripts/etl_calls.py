@@ -539,6 +539,90 @@ def process_fireflies_csv(csv_path: Path, calls_by_company: dict):
             print(f"   [{i}/{len(rows)}] Processed")
 
 
+def deduplicate_calls_prefer_fireflies(calls: list, slug: str) -> list:
+    """
+    When multiple calls exist for the same deal on the same date,
+    prefer Fireflies over Apollo.
+
+    Fireflies has full AI summaries. Apollo frequently returns empty
+    or corrupted summaries ([Summary failed]) due to plan limitations.
+
+    Deduplication key: (deal_id, call_date)
+    Source priority: fireflies > gong > apollo > unknown
+    """
+    SOURCE_PRIORITY = {
+        "fireflies": 0,   # highest priority
+        "gong":      1,
+        "apollo":    2,
+        "unknown":   3,   # lowest priority
+    }
+
+    # Group by (deal_id, call_date)
+    seen: dict = {}
+    for call in calls:
+        # Use 'id' as deal_id for now since calls don't have explicit deal_id
+        # The cache is per-company, so same-date calls for same company are deduplicated
+        call_date = (call.get('date') or "")[:10]  # YYYY-MM-DD only
+        source    = (call.get('source') or "unknown").lower()
+
+        # Use title + date as key (same company, same title, same date = duplicate)
+        title = (call.get('title') or "").lower()
+        key = (title, call_date)
+
+        if key not in seen:
+            seen[key] = call
+        else:
+            existing_source = (seen[key].get('source') or "unknown").lower()
+            existing_priority = SOURCE_PRIORITY.get(existing_source, 99)
+            new_priority      = SOURCE_PRIORITY.get(source, 99)
+
+            if new_priority < existing_priority:
+                # New call has higher priority source — prefer it
+                print(
+                    f"     🔄 Preferring {source} over {existing_source} "
+                    f"for {slug} on {call_date}"
+                )
+                seen[key] = call
+            elif new_priority == existing_priority:
+                # Same source — keep the one with longer summary
+                existing_summary = seen[key].get('summary') or ""
+                new_summary      = call.get('summary') or ""
+                if len(new_summary) > len(existing_summary):
+                    seen[key] = call
+
+    result = list(seen.values())
+
+    # Log the deduplication impact
+    removed = len(calls) - len(result)
+    if removed > 0:
+        print(
+            f"     ✂️  Deduplication removed {removed} calls "
+            f"(Fireflies preferred over Apollo where both existed)"
+        )
+
+    return result
+
+
+def validate_call_summary(call: dict) -> dict:
+    """
+    Flag calls with empty or corrupted summaries.
+    Adds a 'summary_quality' field: 'good' | 'empty' | 'corrupted'
+    Does NOT drop the call — just marks it so context_builder can
+    handle it appropriately.
+    """
+    summary = call.get("summary") or ""
+
+    # Check for corruption BEFORE checking length
+    if summary.startswith("[Summary failed]"):
+        call["summary_quality"] = "corrupted"
+    elif not summary or len(summary.strip()) < 50:
+        call["summary_quality"] = "empty"
+    else:
+        call["summary_quality"] = "good"
+
+    return call
+
+
 def write_cache(slug: str, company: str, calls: list, cache_dir: Path):
     """Write cache file, merging with existing data if present."""
     path = cache_dir / f'{slug}.json'
@@ -558,8 +642,16 @@ def write_cache(slug: str, company: str, calls: list, cache_dir: Path):
     for call in calls:
         existing_by_id[call['id']] = call
 
-    merged = sorted(existing_by_id.values(),
-                    key=lambda c: c.get('date', ''))
+    # Deduplicate by (title, date) with Fireflies preference
+    merged_by_id = list(existing_by_id.values())
+    deduplicated = deduplicate_calls_prefer_fireflies(merged_by_id, slug)
+
+    # Validate summary quality
+    for call in deduplicated:
+        validate_call_summary(call)
+
+    # Sort by date
+    merged = sorted(deduplicated, key=lambda c: c.get('date', ''))
 
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, 'w', encoding='utf-8') as f:
