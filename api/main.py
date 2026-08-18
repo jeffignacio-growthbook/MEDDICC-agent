@@ -158,3 +158,127 @@ async def refresh_schema(request: Request):
     invalidate_cache()
     return JSONResponse({"ok": True,
                           "message": "Schema cache cleared"})
+
+@app.post("/slack/dm-intake")
+async def dm_intake(request: Request):
+    """
+    User persona registration via DM intake.
+
+    Zapier triggers on DM to bot with keywords like:
+    - "register me as executive"
+    - "I'm a sales rep"
+    - "my role is sales operations"
+
+    Uses Haiku to parse persona intent and registers user.
+    """
+    import anthropic
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+    from supabase_client import SupabaseWriter
+
+    payload = await request.json()
+
+    # Authenticate (same as /slack/question)
+    if SLACK_RELAY_SECRET:
+        provided_secret = (
+            request.headers.get("X-Relay-Secret") or
+            payload.get("secret") or
+            ""
+        )
+        if not hmac.compare_digest(SLACK_RELAY_SECRET, provided_secret):
+            logger.warning("[AUTH] /slack/dm-intake rejected: invalid secret")
+            return JSONResponse({"error": "unauthorized"}, status_code=401)
+
+    text = (payload.get("text") or "").strip()
+    user_id = payload.get("user_id", "")
+    channel = payload.get("channel_id", "")
+    thread_ts = payload.get("thread_ts") or payload.get("ts", "")
+
+    if not text or not user_id:
+        return JSONResponse({"error": "missing text or user_id"}, status_code=400)
+
+    # Use Haiku to parse persona intent
+    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+
+    prompt = f"""Parse this user's persona registration intent.
+
+Message: "{text}"
+
+Extract:
+1. Persona (executive | sales_leadership | operational | ic | other)
+2. Preferred detail level (brief | standard | detailed)
+3. Wants metrics context? (true | false)
+
+Rules:
+- executive: CEO, CRO, VP, Head of, C-level
+- sales_leadership: Director of Sales, Sales Manager, Team Lead
+- operational: Operations, Analyst, RevOps, Sales Ops
+- ic: AE, SDR, BDR, Individual Contributor
+- other: anything else
+
+Return ONLY valid JSON:
+{{
+  "persona": "executive",
+  "detail_level": "brief",
+  "wants_context": true
+}}"""
+
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=200,
+        temperature=0,
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    try:
+        result = json.loads(response.content[0].text.strip())
+        persona = result.get("persona", "other")
+        detail_level = result.get("detail_level", "standard")
+        wants_context = result.get("wants_context", True)
+    except:
+        # Fallback if parsing fails
+        persona = "other"
+        detail_level = "standard"
+        wants_context = True
+
+    # Write to database
+    supabase = SupabaseWriter().client
+
+    user_data = {
+        "slack_user_id": user_id,
+        "persona": persona,
+        "preferred_detail_level": detail_level,
+        "wants_metrics_context": wants_context,
+        "source": "dm_intake",
+        "updated_at": "now()"
+    }
+
+    try:
+        supabase.table('user_personas').upsert(
+            user_data,
+            on_conflict='slack_user_id'
+        ).execute()
+
+        # Send confirmation via Zapier
+        confirmation = (
+            f"✓ Registered you as **{persona}** "
+            f"(detail: {detail_level}, context: {'on' if wants_context else 'off'})\n\n"
+            f"I'll adapt my responses to your role. You can update this anytime by "
+            f"sending me another DM like this one."
+        )
+
+        if ZAP_REPLY_URL:
+            async with httpx.AsyncClient(timeout=10) as client:
+                await client.post(ZAP_REPLY_URL, json={
+                    "channel_id": channel,
+                    "thread_ts": thread_ts,
+                    "text": confirmation
+                })
+
+        return JSONResponse({"ok": True, "persona": persona})
+
+    except Exception as e:
+        logger.error(f"[DM_INTAKE] Failed to register user: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
