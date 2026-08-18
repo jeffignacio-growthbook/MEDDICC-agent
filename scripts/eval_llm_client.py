@@ -3,6 +3,7 @@
 Eval: LLMClient unified adapter
 Tests provider normalization, response shape, and multi-turn correctness.
 """
+import os
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -272,19 +273,111 @@ def test_from_config_reads_provider():
     with patch("openai.OpenAI") as MockOpenAI, \
          patch("anthropic.Anthropic") as MockAnthropic:
 
-        client_fw = LLMClient.from_config("generator", config_fireworks)
+        client_fw = LLMClient.from_config("generator", config_fireworks,
+                                          validate=False)
         assert client_fw.provider == "fireworks"
         assert client_fw.model == "accounts/fireworks/models/deepseek-v3"
         MockOpenAI.assert_called_once()
 
         MockOpenAI.reset_mock()
 
-        client_an = LLMClient.from_config("generator", config_anthropic)
+        client_an = LLMClient.from_config("generator", config_anthropic,
+                                          validate=False)
         assert client_an.provider == "anthropic"
         assert client_an.model == "claude-sonnet-4-6"
         MockAnthropic.assert_called()
 
     print("  ✓ from_config() instantiates correct provider from config")
+
+
+def test_validate_raises_on_missing_key():
+    """validate() raises ValueError when API key is missing."""
+    with patch("openai.OpenAI"):
+        client = LLMClient(model="gpt-4o", provider="openai")
+
+    # Clear the OpenAI key to simulate missing credential
+    original = os.environ.get("OPENAI_API_KEY")
+    if "OPENAI_API_KEY" in os.environ:
+        del os.environ["OPENAI_API_KEY"]
+
+    try:
+        client.validate()
+        assert False, "validate() should have raised ValueError"
+    except ValueError as e:
+        assert "OPENAI_API_KEY" in str(e)
+    finally:
+        # Restore
+        if original:
+            os.environ["OPENAI_API_KEY"] = original
+
+    print("  ✓ validate() raises ValueError when API key missing")
+
+
+def test_fallback_to_anthropic_on_provider_failure():
+    """Fallback to Anthropic when primary provider fails."""
+    config = {
+        "models": {
+            "generator": {
+                "name": "gpt-4o",
+                "provider": "openai",
+                "fallback_to_anthropic": True,
+            }
+        }
+    }
+
+    # Mock OpenAI to fail
+    mock_openai = MagicMock()
+    mock_openai.chat.completions.create.side_effect = Exception("OpenAI API error")
+
+    # Mock Anthropic to succeed
+    mock_anthropic_resp = make_anthropic_response("fallback response")
+    mock_anthropic = MagicMock()
+    mock_anthropic.messages.create.return_value = mock_anthropic_resp
+
+    with patch("openai.OpenAI", return_value=mock_openai), \
+         patch("anthropic.Anthropic", return_value=mock_anthropic):
+
+        client = LLMClient.from_config("generator", config, validate=False)
+
+        # Should have fallback client
+        assert client._fallback_client is not None
+        assert client._fallback_client.provider == "anthropic"
+
+        # complete() should fall back on OpenAI failure
+        response = client.complete([{"role": "user", "content": "test"}])
+
+        assert response.text == "fallback response"
+        assert response._provider == "anthropic"
+
+    print("  ✓ Fallback to Anthropic on provider failure")
+
+
+def test_validate_false_skips_key_check():
+    """validate=False skips API key validation in from_config()."""
+    config = {
+        "models": {
+            "generator": {
+                "name": "gpt-4o",
+                "provider": "openai",
+            }
+        }
+    }
+
+    # Clear OpenAI key
+    original = os.environ.get("OPENAI_API_KEY")
+    if "OPENAI_API_KEY" in os.environ:
+        del os.environ["OPENAI_API_KEY"]
+
+    try:
+        with patch("openai.OpenAI"):
+            # Should not raise even with missing key
+            client = LLMClient.from_config("generator", config, validate=False)
+            assert client.provider == "openai"
+    finally:
+        if original:
+            os.environ["OPENAI_API_KEY"] = original
+
+    print("  ✓ validate=False skips API key check")
 
 
 if __name__ == "__main__":
@@ -302,6 +395,9 @@ if __name__ == "__main__":
         test_content_block_list_normalized_for_openai,
         test_fireworks_uses_custom_base_url,
         test_from_config_reads_provider,
+        test_validate_raises_on_missing_key,
+        test_fallback_to_anthropic_on_provider_failure,
+        test_validate_false_skips_key_check,
     ]
     passed = failed = 0
     for t in tests:

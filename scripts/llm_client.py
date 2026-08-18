@@ -114,6 +114,7 @@ class LLMClient:
         self.model    = model
         self.provider = provider
         self._sdk     = self._init_sdk(api_key)
+        self._fallback_client = None
 
     def _init_sdk(self, api_key: str = None):
         key = api_key or os.environ.get(
@@ -142,17 +143,40 @@ class LLMClient:
                 f"Valid options: anthropic | openai | fireworks"
             )
 
+    def validate(self):
+        """
+        Validate that the API key is set for this provider.
+
+        Raises ValueError if the required environment variable is missing.
+        Call this at startup to fail fast rather than at first API call.
+        """
+        env_key = self._ENV_KEYS.get(self.provider)
+        if not env_key:
+            raise ValueError(f"Unknown provider: {self.provider!r}")
+
+        api_key = os.environ.get(env_key, "")
+        if not api_key:
+            raise ValueError(
+                f"API key not set: {env_key} is required for provider '{self.provider}'"
+            )
+
     @classmethod
     def from_config(cls, role: str,
-                    config: dict = None) -> "LLMClient":
+                    config: dict = None,
+                    validate: bool = True) -> "LLMClient":
         """
         Instantiate from config/client.yaml models block.
 
         Reads models.<role>.name and models.<role>.provider.
         Falls back to _ROLE_DEFAULTS when keys are absent.
 
-        role: 'generator' | 'evaluator' | 'context_builder' |
-              'classifier' | 'assessor' | 'enrichment'
+        Parameters
+        ----------
+        role     : 'generator' | 'evaluator' | 'context_builder' |
+                   'classifier' | 'assessor' | 'enrichment'
+        config   : Optional config dict (defaults to loading client.yaml)
+        validate : If True (default), validates API key is set at startup.
+                   Set to False only for testing/mocking scenarios.
         """
         if config is None:
             import sys
@@ -171,7 +195,28 @@ class LLMClient:
         model    = role_cfg.get("name",     default_model)
         provider = role_cfg.get("provider", default_provider)
 
-        return cls(model=model, provider=provider)
+        client = cls(model=model, provider=provider)
+
+        # Validate API key if requested
+        if validate:
+            client.validate()
+
+        # Configure Anthropic fallback if enabled
+        fallback_enabled = role_cfg.get("fallback_to_anthropic", False)
+        if fallback_enabled and provider != "anthropic":
+            logger.info(
+                f"[LLM] Anthropic fallback enabled for {role} ({provider})"
+            )
+            fallback_model, _ = cls._ROLE_DEFAULTS.get(
+                role, ("claude-haiku-4-5-20251001", "anthropic")
+            )
+            client._fallback_client = cls(
+                model=fallback_model, provider="anthropic"
+            )
+            if validate:
+                client._fallback_client.validate()
+
+        return client
 
     def complete(
         self,
@@ -193,10 +238,24 @@ class LLMClient:
         Returns
         -------
         LLMResponse — provider-agnostic, always has .text and .stop_reason.
+
+        If the primary provider fails and fallback_to_anthropic is enabled,
+        automatically retries with Anthropic.
         """
-        if self.provider == "anthropic":
-            return self._complete_anthropic(messages, system, max_tokens)
-        return self._complete_openai(messages, system, max_tokens)
+        try:
+            if self.provider == "anthropic":
+                return self._complete_anthropic(messages, system, max_tokens)
+            return self._complete_openai(messages, system, max_tokens)
+        except Exception as e:
+            if self._fallback_client:
+                logger.warning(
+                    f"[LLM] {self.provider} failed ({e}), "
+                    f"falling back to Anthropic"
+                )
+                return self._fallback_client.complete(
+                    messages, system, max_tokens
+                )
+            raise
 
     # ── Anthropic ──────────────────────────────────────────────────────
 
@@ -283,3 +342,94 @@ class LLMClient:
             raw=resp,
             _provider=self.provider,
         )
+
+    # ── Connection testing ─────────────────────────────────────────────
+
+    def test_connection(self) -> dict:
+        """
+        Test provider connection with a minimal API call.
+
+        Returns dict with:
+            success: bool
+            provider: str
+            model: str
+            response_text: str (if successful)
+            error: str (if failed)
+
+        Useful for validating credentials and provider availability
+        before running expensive operations.
+        """
+        try:
+            response = self.complete(
+                messages=[{"role": "user", "content": "ping"}],
+                max_tokens=1
+            )
+            return {
+                "success": True,
+                "provider": self.provider,
+                "model": self.model,
+                "response_text": response.text,
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "provider": self.provider,
+                "model": self.model,
+                "error": str(e),
+            }
+
+
+# ── CLI entry point ────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Test LLM provider connection"
+    )
+    parser.add_argument(
+        "--provider",
+        choices=["anthropic", "openai", "fireworks"],
+        default="anthropic",
+        help="Provider to test"
+    )
+    parser.add_argument(
+        "--model",
+        help="Model to use (defaults to provider default)"
+    )
+    args = parser.parse_args()
+
+    # Select default model for provider
+    model_defaults = {
+        "anthropic": "claude-haiku-4-5-20251001",
+        "openai": "gpt-4o-mini",
+        "fireworks": "accounts/fireworks/models/deepseek-v3",
+    }
+    model = args.model or model_defaults.get(args.provider)
+
+    print(f"Testing {args.provider} connection...")
+    print(f"Model: {model}")
+    print()
+
+    client = LLMClient(model=model, provider=args.provider)
+
+    # Validate API key first
+    try:
+        client.validate()
+        print("✓ API key found")
+    except ValueError as e:
+        print(f"✗ API key validation failed: {e}")
+        import sys
+        sys.exit(1)
+
+    # Test connection
+    result = client.test_connection()
+
+    if result["success"]:
+        print("✓ Connection successful")
+        print(f"Response: {result['response_text']}")
+    else:
+        print("✗ Connection failed")
+        print(f"Error: {result['error']}")
+        import sys
+        sys.exit(1)
