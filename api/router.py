@@ -1335,7 +1335,16 @@ def _log_learning(sb, question, handler, assessment,
 
 _VOICE_BASE = """You are a CRO's revenue intelligence agent.
 Answer questions using ONLY the data from tool_results below.
-Never invent numbers. If data doesn't exist, say so plainly."""
+Never invent numbers. If data doesn't exist, say so plainly.
+
+CRITICAL SLACK FORMATTING:
+- Bold: *single asterisks* only. Never **double**.
+- No markdown tables. Use bullet lists: • metric: *value*
+- No ## headers. Use *bold label* on its own line.
+- Null/missing values: write _not available_ not **null** or None
+- Data gaps: write _(data gap — explanation)_ in italics
+- Never write variable names or code syntax (held = null → "unknown outcome")
+"""
 
 _VOICE_BLOCKS = {
     "executive": """

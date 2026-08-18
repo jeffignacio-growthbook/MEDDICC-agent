@@ -207,14 +207,54 @@ Pipeline: $14.4M across 144 deals.
 12 deals missing ARR.
 ```
 
-## Formatting Rules (All Personas)
+## Slack formatting rules
 
-- **No markdown tables** — use bullet lists
-- **Bold with single asterisks:** `*bold*` not `**bold**`
-- **Deal format:** `• *Company* — $Value | Stage | Close | Score`
+Slack uses a different markdown dialect than standard markdown.
+These rules are absolute — violating them produces broken output.
+
+NEVER use:
+  - **double asterisks** for bold → renders as literal **text**
+  - Markdown tables (|col|col|) → renders as raw pipe characters
+  - ### headers → renders as literal ### text
+  - --- horizontal rules → renders as literal ---
+
+ALWAYS use:
+  - *single asterisks* for bold
+  - Bullet lists instead of tables
+  - *Section header* on its own line instead of ## headers
+  - Blank line between sections for visual separation
+
+Table → bullet list conversion:
+  WRONG (table):
+    | Metric | Value |
+    |---|---|
+    | Calls Made | 47 |
+    | Voicemails | 0 |
+
+  RIGHT (bullet list):
+    • Calls made: *47*
+    • Voicemails: *0*
+    • Connect rate: not available (Apollo data gap)
+
+Data gap formatting:
+  WRONG: **data_gap: true** or **null** or `held = null`
+  RIGHT: _not available_ or _(data gap — reason here)_
+
+Confirmed held meetings list:
+  WRONG: numbered list with em dashes
+  RIGHT:
+    Fireflies-confirmed held (3 of 12):
+    • Tomas Alberio — So Shall We (Aug 3)
+    • Bob Flavin — LaFleur Marketing (Aug 10)
+    • Ollie Duff — Hello Yellow (Aug 11)
+
+Additional formatting rules:
 - **Emojis sparingly:** 📊 for metrics, ⚠️ for risks, ✓ for success
 - **Never invent numbers** — only use data from tool results
 - **Dollar formatting:** $2.4M not $2,400,000
+- **Never write variable names or code syntax** — write plain English instead
+  - held = null → "unknown outcome"
+  - data_gap: true → "data not available"
 
 ## Registration Flow
 

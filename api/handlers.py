@@ -1162,33 +1162,36 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
         target_held = targets_raw.get("meetings_held")
         target_sqls = targets_raw.get("sqls_created")
 
+    # Build list-friendly summary structures for bullet point rendering
+    calls_summary = [
+        {"label": "Calls made", "value": str(total_calls) if total_calls > 0 else None,
+         "gap_reason": "No call data" if total_calls == 0 else None},
+        {"label": "Connect rate", "value": None,
+         "gap_reason": "Apollo calls API does not expose answered status"},
+        {"label": "Voicemails", "value": str(total_voicemails) if total_voicemails > 0 else "0"}
+    ]
+
+    meetings_summary = [
+        {"label": "Meetings booked", "value": str(booked), "target": str(target_booked) if target_booked else None},
+        {"label": "Confirmed held (Fireflies)", "value": str(fireflies_confirmed)},
+        {"label": "Unknown outcome", "value": str(unknown_outcome),
+         "note": "could be held, no-show, or cancelled"}
+    ]
+
+    # Show rate data gap message
+    show_rate_gap_message = (
+        f"{fireflies_confirmed} meetings confirmed held via Fireflies. "
+        f"{unknown_outcome} meetings have unknown outcome — Fireflies "
+        f"absence doesn't confirm no-show. Show rate requires HubSpot "
+        f"outcome field to be populated."
+    )
+
     return {
         "sdr_email": sdr_email,
-        "metrics": metrics_rows,
-        "meetings": meetings_rows,
-        "summary": {
-            "total_calls": total_calls,
-            "total_voicemails": total_voicemails,
-            "total_emails": total_emails
-        },
-        "meetings_data": {
-            "booked": booked,
-            "booked_target": target_booked,
-            "booked_vs_target": rate_or_gap(booked, target_booked),
-            "fireflies_confirmed_held": fireflies_confirmed,
-            "hs_confirmed_held": hs_confirmed,
-            "unknown_outcome": unknown_outcome,
-            "show_rate": {
-                "value": None,
-                "data_gap": True,
-                "reason": (
-                    f"{fireflies_confirmed} meetings confirmed held via Fireflies. "
-                    f"{unknown_outcome} meetings have unknown outcome — Fireflies "
-                    f"absence doesn't confirm no-show. Show rate requires HubSpot "
-                    f"outcome field to be populated."
-                )
-            }
-        },
+        "period": tw["label"],
+        "calls_summary": calls_summary,
+        "meetings_summary": meetings_summary,
+        "show_rate_gap": show_rate_gap_message,
         "targets": {
             "meetings_booked": target_booked,
             "meetings_held": target_held,
@@ -1196,7 +1199,10 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
             "period": quarter_period,
             "prorated_monthly": is_monthly
         },
-        "period": tw["label"]
+        "raw_data": {
+            "metrics": metrics_rows,
+            "meetings": meetings_rows
+        }
     }
 
 
