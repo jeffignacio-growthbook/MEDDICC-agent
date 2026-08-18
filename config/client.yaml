@@ -470,3 +470,62 @@ cro_agent:
   # Options: 'current_quarter' | 'current_week' | 'last_30_days'
   slow_threshold_seconds: 10
   # Responses expected to take longer than this get an acknowledgment
+
+# ============================================================================
+# TEAM ROSTER
+# ============================================================================
+# Team members for persona-aware voice routing
+# Get Slack user IDs: Click profile → ⋮ → Copy member ID
+
+team:
+  members:
+    # SDRs/BDRs
+    - slack_user_id: "U_JAKE_STANGL"  # PLACEHOLDER - get real ID from Slack
+      email: "jake.stangl@growthbook.io"
+      name: "Jake Stangl"
+      role: "SDR"
+      title: "Sales Development Representative"
+
+    # Account Executives
+    - slack_user_id: "U_JAKE_H"  # PLACEHOLDER
+      email: "jake@growthbook.io"
+      name: "Jake H"
+      role: "Account Executive"
+      title: "AE"
+
+    - slack_user_id: "U_CARY"  # PLACEHOLDER
+      email: "cary@growthbook.io"
+      name: "Cary"
+      role: "Account Executive"
+
+    - slack_user_id: "U_CHRISTIAN"  # PLACEHOLDER
+      email: "christian@growthbook.io"
+      name: "Christian"
+      role: "Account Executive"
+
+    - slack_user_id: "U_SCOTT_KELLER"  # PLACEHOLDER
+      email: "scott.keller@growthbook.io"
+      name: "Scott Keller"
+      role: "Account Executive"
+
+    - slack_user_id: "U_JAMES_SHANNON"  # PLACEHOLDER
+      email: "james.shannon@growthbook.io"
+      name: "James Shannon"
+      role: "Account Executive"
+
+    - slack_user_id: "U_JENNIFER"  # PLACEHOLDER
+      email: "jennifer@growthbook.io"
+      name: "Jennifer"
+      role: "Account Executive"
+
+    - slack_user_id: "U_DAN"  # PLACEHOLDER
+      email: "dan@growthbook.io"
+      name: "Dan"
+      role: "Account Executive"
+
+    # RevOps
+    - slack_user_id: "U0AAMMUPSA2"  # Jeff (from admin.slack_user_ids)
+      email: "jeff.ignacio@growthbook.io"
+      name: "Jeff Ignacio"
+      role: "VP Revenue Operations"
+      title: "VP RevOps"

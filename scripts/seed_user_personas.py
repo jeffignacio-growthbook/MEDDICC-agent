@@ -83,13 +83,13 @@ def main():
     args = parse_args()
     config = load_client_config()
 
-    # Get team roster from config
+    # Get team roster from config (try members first, then roster for backwards compat)
     team = config.get("team", {})
-    roster = team.get("roster", [])
+    roster = team.get("members", []) or team.get("roster", [])
 
     if not roster:
         print("⚠️  No team roster found in config/client.yaml")
-        print("Add a team.roster section with Slack user IDs and roles")
+        print("Add a team.members section with Slack user IDs and roles")
         return
 
     print(f"\nSeeding user personas from config")
