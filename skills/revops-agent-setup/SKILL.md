@@ -61,12 +61,19 @@ To get it: app.fireflies.ai → Integrations → API → copy the key"
 Ask: "Paste your Fireflies API key (or SKIP):"
 Store as: FIREFLIES_API_KEY
 
-## Step 3 — Apollo API Key
+## Step 3 — Apollo API Keys
 
 Tell the user:
-"Apollo is used for video call recordings.
-Note: this is the meeting recorder, not the sales intelligence tool.
-To get it: your Apollo workspace → Settings → API"
+"Apollo is used for TWO things in this setup:
+1. Apollo Conversation Intelligence (meeting recorder) — for call transcripts
+2. Apollo.io (sales intelligence tool) — for SDR call/email metrics
+
+If you use Apollo for BOTH, you can use the same key.
+If you only use Apollo for meetings, skip the SDR step later.
+
+To get your Apollo API key:
+- Apollo Conversation Intelligence: workspace → Settings → API
+- Apollo.io sales intelligence: app.apollo.io → Settings → API
 
 Ask: "Paste your Apollo API key (or SKIP):"
 Store as: APOLLO_API_KEY
@@ -102,19 +109,47 @@ Validate: must start with https:// and end with .supabase.co
 Ask: "Paste your Supabase service_role key:"
 Validate: starts with eyJ
 
-## Step 6 — GitHub repository
+## Step 6 — SDR tools credentials (optional)
+
+Tell the user:
+"These are for SDR activity metrics (calls, emails, connects).
+Skip any tools you don't use.
+
+### Salesloft (skip if not used)
+
+To get it: Salesloft → Settings → API
+You need a Bearer token with access to calls and activities."
+
+Ask: "Paste your Salesloft API key (or SKIP):"
+Store as: SALESLOFT_API_KEY
+
+### Aircall (skip if not used)
+
+Tell the user:
+"To get your Aircall credentials:
+1. Aircall Dashboard → Integrations → API Keys
+2. You need: API ID and API Token (both required)"
+
+Ask: "Paste your Aircall API ID (or SKIP):"
+Store as: AIRCALL_API_ID
+
+If they provided an API ID, ask:
+"Paste your Aircall API Token:"
+Store as: AIRCALL_API_TOKEN
+
+## Step 7 — GitHub repository
 
 Ask: "Enter your GitHub repo (owner/repo-name):"
 Example: acme/AI_for_revops_lecture_6
 
-## Step 7 — Zapier catch hook URL
+## Step 8 — Zapier catch hook URL
 
 Tell the user:
 "This is the Zap 2 catch hook URL — skip if not set up yet."
 
 Ask: "Paste your Zapier catch hook URL (or SKIP):"
 
-## Step 8 — Generate outputs
+## Step 9 — Generate outputs
 
 Write a .env file to the repo root with all collected values.
 
@@ -122,15 +157,26 @@ Then print the GitHub Secrets checklist:
 
 GitHub Secrets — Environment: Agent
 
+Core credentials:
 □ ANTHROPIC_API_KEY
-□ FIREFLIES_API_KEY         (blank if using Gong)
-□ GONG_ACCESS_KEY           (blank if using Fireflies)
-□ GONG_ACCESS_KEY_SECRET    (blank if using Fireflies)
-□ APOLLO_API_KEY            (blank if skipped)
 □ HUBSPOT_API_KEY
 □ SUPABASE_URL
 □ SUPABASE_SERVICE_KEY
-□ ZAP_RESPONSE_URL          (blank if skipped)
+
+Call intelligence (choose one):
+□ FIREFLIES_API_KEY         (blank if using Gong)
+□ GONG_ACCESS_KEY           (blank if using Fireflies)
+□ GONG_ACCESS_KEY_SECRET    (blank if using Fireflies)
+
+SDR tools (optional, blank if not used):
+□ APOLLO_API_KEY            (for dialer metrics + call recordings)
+□ SALESLOFT_API_KEY         (for sequencer metrics)
+□ AIRCALL_API_ID            (for dialer metrics)
+□ AIRCALL_API_TOKEN         (for dialer metrics)
+
+Zapier integration:
+□ ZAP_RESPONSE_URL          (blank if not set up yet)
+□ SLACK_RELAY_SECRET        (blank if not set up yet)
 
 Fastest way to add them:
   gh secret set --env Agent --env-file .env

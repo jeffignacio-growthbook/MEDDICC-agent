@@ -107,10 +107,26 @@ whatever the student needs.
 | `scripts/token_tracker.py` | Per-role cost tracking |
 | `scripts/setup_supabase.py` | One-time DB migration runner |
 | `scripts/discover_stages.py` | HubSpot stage ID discovery |
-| `config/client.yaml` | Stage IDs, pipeline names, thresholds |
+| `config/client.yaml` | Stage IDs, pipeline names, thresholds, team roster, reporting TZ, SDR tools |
 | `config/context.yaml` | Competitors, objections, feature gaps |
 | `prompts/CLAUDE.md` | Generator system prompt — per client |
 | `prompts/evaluator_rubric.md` | Evaluation criteria |
+| `prompts/voice.md` | Persona-aware voice rules documentation |
+| **SDR Metrics** | |
+| `scripts/sdr_utils.py` | Timezone and data utilities for SDR adapters |
+| `scripts/etl_sdr_metrics.py` | SDR metrics ETL (Apollo, Salesloft, Aircall) |
+| `scripts/adapters/apollo_dialer.py` | Apollo call metrics adapter |
+| `scripts/adapters/salesloft_sequencer.py` | Salesloft email/call metrics adapter |
+| `scripts/adapters/aircall_dialer.py` | Aircall call metrics adapter |
+| `scripts/seed_user_personas.py` | Seed user personas from team roster |
+| `scripts/migrations/012_add_sdr_metrics.sql` | SDR metrics tables (sdr_metrics, sdr_users) |
+| `scripts/migrations/013_add_user_personas.sql` | User personas table |
+| **CRO Slack Agent** | |
+| `api/main.py` | FastAPI entry point, /slack/question, /slack/dm-intake |
+| `api/router.py` | Intent classification, persona lookup, synthesis |
+| `api/handlers.py` | Query handlers (pipeline, SDR metrics, win/loss, etc.) |
+| `api/time_resolver.py` | Fiscal quarter calculation (reporting TZ aware) |
+| `api/db.py` | Supabase client, thread context, entity cache |
 
 ---
 
@@ -147,7 +163,8 @@ check _extract_scores_from_analysis() in hubspot_deals.py.
 ## What is built vs pending
 
 ### Built and running
-- [x] Nightly agent
+
+**Nightly MEDDICC Agent:**
 - [x] Generator/evaluator/reflection loop
 - [x] Context builder with carry-forward rule
 - [x] Call cache and deal index
@@ -157,12 +174,34 @@ check _extract_scores_from_analysis() in hubspot_deals.py.
 - [x] Token cost tracker
 - [x] ETL for deals and calls
 
-### Not in this repo (see revops-cro-agent)
-- [ ] Railway FastAPI service
-- [ ] Zapier integration
-- [ ] CRO Slack query handlers
+**CRO Slack Agent (api/ directory):**
+- [x] Railway FastAPI service
+- [x] Zapier integration
+- [x] Pipeline query handlers (waterfall, at-risk, win/loss, etc.)
+- [x] SDR metrics handlers (team/user activity tracking)
+- [x] Persona-aware voice routing (executive/sales/operational/IC)
+- [x] User persona registration via DM intake
+- [x] Dynamic query tool for complex questions
+
+**SDR Metrics Layer:**
+- [x] Apollo dialer adapter (Analytics API + calls fallback)
+- [x] Salesloft sequencer adapter (email + call metrics)
+- [x] Aircall dialer adapter (outbound call metrics)
+- [x] Timezone-aware ETL (scripts/etl_sdr_metrics.py)
+- [x] Supabase tables (sdr_metrics, sdr_users)
+- [x] Seed script for team roster personas
+
+**Timezone Infrastructure:**
+- [x] Reporting timezone configuration (config/client.yaml)
+- [x] Timezone utilities (scripts/sdr_utils.py)
+- [x] UTC → reporting TZ conversion for all ETLs
+- [x] API date filter formatting (iso, iso_str, epoch)
+
+### Pending features
 - [ ] Objection vault extraction
 - [ ] Daily brief email
+- [ ] Multi-quarter trend analysis
+- [ ] Automated coaching recommendations
 
 ---
 

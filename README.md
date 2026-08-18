@@ -97,6 +97,104 @@ and collect the right credentials.
 
 ---
 
+## CRO Slack Agent (optional)
+
+Query your pipeline data via Slack using natural language.
+
+**Deployment:** Railway FastAPI service + Zapier integration
+**Location:** `api/` directory
+
+### Features
+
+- **Pipeline snapshots:** "show me pipeline", "what deals are at risk"
+- **Win/loss analysis:** "why did we lose Acme?", "Q2 win rate"
+- **Deal deep-dives:** "tell me about the Acme deal"
+- **Competitive intel:** "which deals mentioned LaunchDarkly?"
+- **SDR metrics:** "team call metrics this week", "Sarah's connect rate"
+- **Persona-aware responses:** Adapts voice for executive/sales/operational/IC users
+
+### Setup
+
+1. Deploy `api/` to Railway
+2. Set up Zapier triggers:
+   - Zap 1: Slack message → POST /slack/question
+   - Zap 2: Catch hook → Slack reply
+3. Seed user personas: `python scripts/seed_user_personas.py`
+4. Query from Slack: "@agent show me pipeline"
+
+See `api/router.py` for all available handlers.
+
+---
+
+## SDR Metrics (optional)
+
+Track SDR activity across Apollo, Salesloft, and Aircall.
+
+**Enables:** Call/email metrics, connect/reply rates, persona-aware coaching
+
+### Setup
+
+1. Add SDR tool credentials to GitHub Secrets:
+   - `APOLLO_API_KEY` (for dialer metrics)
+   - `SALESLOFT_API_KEY` (for sequencer metrics)
+   - `AIRCALL_API_ID` + `AIRCALL_API_TOKEN` (for dialer metrics)
+
+2. Enable tools in `config/client.yaml`:
+```yaml
+sdr_tools:
+  apollo:
+    enabled: true
+  salesloft:
+    enabled: true
+  aircall:
+    enabled: false
+```
+
+3. Run migration: `python scripts/setup_supabase.py` (runs migration 012)
+
+4. Run ETL: `python scripts/etl_sdr_metrics.py --since 7d`
+
+5. Query from Slack: "@agent team call metrics this week"
+
+### What gets tracked
+
+- **Calls:** made, connected, connect rate, voicemails, no answers
+- **Emails** (Salesloft): sent, opened, replied, open/reply rates
+- **By user:** Individual and team rollups
+- **Timezone-aware:** All dates in your reporting timezone
+
+---
+
+## Timezone-Aware Reporting
+
+All metrics use your configured reporting timezone, not server UTC.
+
+**Why this matters:** A call at 11 PM UTC on March 31 is:
+- March 31 in Eastern time (7 PM ET)
+- April 1 in India time (4:30 AM IST)
+
+Without timezone awareness, Q1 vs Q2 attribution breaks.
+
+### Configuration
+
+Set in `config/client.yaml`:
+```yaml
+reporting:
+  timezone: "America/New_York"  # IANA timezone name
+```
+
+**Supported timezones:** Any valid IANA name (America/New_York, America/Los_Angeles, Europe/London, Asia/Kolkata, etc.)
+
+### What uses reporting timezone
+
+- `scripts/etl_calls.py` — Call date attribution
+- `scripts/etl_deals.py` — Deal snapshot dates
+- `scripts/etl_sdr_metrics.py` — SDR activity dates
+- `api/handlers.py` — Pipeline queries ("this week", "this quarter")
+- `api/time_resolver.py` — "today" calculations
+
+---
+
 ## Costs
 
 | Scenario | Cost |

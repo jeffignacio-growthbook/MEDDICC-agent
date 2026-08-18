@@ -76,14 +76,79 @@ Parse it and identify stages to EXCLUDE:
 
 Show proposed exclusion list and confirm.
 
-## Phase 6 — Learning preferences
+## Phase 6 — Team roster and operational settings
+
+### Team Roster
+
+Ask: "Let's build your team roster for persona-aware responses.
+For each person who will use the agent, I need:
+1. Slack user ID (format: U12345ABC)
+2. Name
+3. Role/Title
+4. Email (optional)
+
+Paste the list or provide one at a time."
+
+Parse responses into this format for config/client.yaml:
+```yaml
+team:
+  roster:
+    - slack_user_id: U12345ABC
+      name: John Smith
+      role: CRO
+      email: john@company.com
+    - slack_user_id: U67890DEF
+      name: Sarah Chen
+      role: Director of Sales
+      email: sarah@company.com
+```
+
+### Reporting Timezone
+
+Ask: "What timezone should metrics be reported in?
+This affects when 'today' starts/ends for pipeline snapshots.
+(e.g., America/New_York, America/Los_Angeles, Europe/London)"
+
+Validate it's a valid IANA timezone name.
+
+Store as:
+```yaml
+reporting:
+  timezone: "America/New_York"
+```
+
+### SDR Tools (optional)
+
+Ask: "Do you use any of these SDR tools for call/email metrics?
+- Apollo.io (dialer)
+- Salesloft (sequencer)
+- Aircall (dialer)
+
+Answer 'none' to skip."
+
+For each tool they use, collect:
+- Enabled: yes/no
+- User IDs to track (or 'all')
+
+Store as:
+```yaml
+sdr_tools:
+  apollo:
+    enabled: true
+  salesloft:
+    enabled: true
+  aircall:
+    enabled: false
+```
+
+## Phase 7 — Learning preferences
 
 1. "How many companies must show a pattern before it becomes
    a permanent instruction? (default: 2)"
 2. "Any instructions that should never be auto-removed?"
 3. "Who reviews the learning PRs?"
 
-## Phase 7 — Generate and deploy config files
+## Phase 8 — Generate and deploy config files
 
 Read all four reference files before generating anything.
 
