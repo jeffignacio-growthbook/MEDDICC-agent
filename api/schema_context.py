@@ -2,7 +2,22 @@
 import json, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+
+# Import field_semantics for canonical stage descriptions
+try:
+    from field_semantics import STAGE_MAP
+except ImportError:
+    from api.field_semantics import STAGE_MAP
+
 _cached_context = None
+
+def _stage_prose() -> str:
+    """
+    Generate stage ID prose from field_semantics (single source of truth).
+    Returns a string like: 'presentationscheduled' = Technical Evaluation, 'qualifiedtobuy' = Scoping, ...
+    """
+    parts = [f"'{sid}' = {info['label']}" for sid, info in STAGE_MAP.items() if info.get('bucket') in ['discovery', 'scoping', 'proposal']]
+    return ", ".join(parts[:3])  # Show first 3 for brevity
 
 def get_schema_context(sb, tables_with_descriptions=None):
     """
@@ -51,8 +66,12 @@ def _build_schema_context(sb, tables_with_descriptions):
         tables_with_full_desc = set(tables_with_descriptions)
 
     lines = ["QUERYABLE SUPABASE TABLES AND COLUMNS:", "(Use these exact column names in query tool calls)", ""]
+
+    # Generate stage description from field_semantics (canonical source)
+    stage_note = f"Note: stage column contains HubSpot stage IDs (e.g. {_stage_prose()}). Never filter on display names."
+
     table_descriptions = {
-        "deals": "Active and closed deals. One row per deal. Note: stage column contains HubSpot stage IDs (e.g. 'presentationscheduled' = Technical Evaluation, 'qualifiedtobuy' = Scoping, 'appointmentscheduled' = Discovery). Never filter on display names.",
+        "deals": f"Active and closed deals. One row per deal. {stage_note}",
         "analyses": "Nightly MEDDICC scores per deal. Latest row = most recent analysis.",
         "objections": "Objections raised in sales calls, extracted by AI. One row per objection instance.",
         "feature_gaps": "Feature gaps mentioned in sales calls. One row per gap instance.",
@@ -105,13 +124,15 @@ def invalidate_cache():
     _cached_context = None
 
 def _minimal_fallback_context():
-    return """
+    # Generate stage note from field_semantics
+    stage_note = f"Note: stage column contains HubSpot stage IDs (e.g. {_stage_prose()}). Never filter on display names."
+
+    return f"""
 QUERYABLE TABLES (data dictionary not yet populated — run discover_properties.py):
   deals: company_name, deal_value, stage, deal_status, owner_email,
          create_date, close_date, segment, forecast_category,
          sao, new_arr, expansion_arr, lost_reason, pipeline_id
-         Note: stage column contains HubSpot stage IDs (e.g. 'presentationscheduled' = Technical Evaluation,
-         'qualifiedtobuy' = Scoping, 'appointmentscheduled' = Discovery). Never filter on display names.
+         {stage_note}
   analyses: deal_id, overall_score, champion_score, economic_buyer_score,
             decision_criteria_score, decision_process_score, pain_score,
             competition_score, component_details (JSONB), analyzed_at, status
