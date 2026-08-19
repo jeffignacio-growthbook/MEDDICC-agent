@@ -49,7 +49,7 @@ class RateLimiter:
 
 
 class PropertyHistoryFetcher:
-    """Fetches dealstage property history from HubSpot."""
+    """Fetches dealstage and hs_manual_forecast_category property history from HubSpot."""
 
     def __init__(self, cache_file: str = 'property_history_cache.json'):
         self.api_key = os.environ.get('HUBSPOT_API_KEY')
@@ -88,11 +88,12 @@ class PropertyHistoryFetcher:
 
     def fetch_deal_history(self, deal_id: str, force: bool = False) -> Optional[Dict]:
         """
-        Fetch dealstage property history for a single deal.
+        Fetch dealstage and forecast_category property history for a single deal.
 
         Returns dict with:
             - deal_id: str
-            - history: List[Dict] with timestamp and value for each change
+            - history: List[Dict] with dealstage timestamp/value (legacy name)
+            - forecast_category_history: List[Dict] with forecast_category timestamp/value
             - fetched_at: str ISO timestamp
             - source: 'cache' or 'api'
         """
@@ -109,8 +110,8 @@ class PropertyHistoryFetcher:
         # Fetch from HubSpot API
         url = f"{self.base_url}/{deal_id}"
         params = {
-            'properties': 'dealstage',
-            'propertiesWithHistory': 'dealstage'
+            'properties': 'dealstage,hs_manual_forecast_category',
+            'propertiesWithHistory': 'dealstage,hs_manual_forecast_category'
         }
         headers = {
             'Authorization': f'Bearer {self.api_key}',
@@ -123,11 +124,22 @@ class PropertyHistoryFetcher:
 
             data = response.json()
 
-            # Extract property history
-            history = []
+            # Extract dealstage property history
+            dealstage_history = []
             if 'propertiesWithHistory' in data and 'dealstage' in data['propertiesWithHistory']:
                 for entry in data['propertiesWithHistory']['dealstage']:
-                    history.append({
+                    dealstage_history.append({
+                        'timestamp': entry.get('timestamp'),
+                        'value': entry.get('value'),
+                        'source_type': entry.get('sourceType'),
+                        'source_id': entry.get('sourceId')
+                    })
+
+            # Extract forecast_category property history
+            forecast_category_history = []
+            if 'propertiesWithHistory' in data and 'hs_manual_forecast_category' in data['propertiesWithHistory']:
+                for entry in data['propertiesWithHistory']['hs_manual_forecast_category']:
+                    forecast_category_history.append({
                         'timestamp': entry.get('timestamp'),
                         'value': entry.get('value'),
                         'source_type': entry.get('sourceType'),
@@ -136,7 +148,8 @@ class PropertyHistoryFetcher:
 
             result = {
                 'deal_id': deal_id,
-                'history': history,
+                'history': dealstage_history,  # Keep legacy name for backward compat
+                'forecast_category_history': forecast_category_history,
                 'fetched_at': datetime.now().isoformat(),
                 'source': 'api'
             }
