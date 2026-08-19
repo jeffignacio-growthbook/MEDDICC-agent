@@ -46,7 +46,7 @@ def classify_relevant_tables(question: str, client) -> List[str]:
     Returns list of table names, or all tables if classification fails.
     """
     try:
-        resp = client.messages.create(
+        resp = client.complete(
             model="claude-haiku-4-5-20251001",
             max_tokens=100,
             temperature=0,
@@ -54,7 +54,7 @@ def classify_relevant_tables(question: str, client) -> List[str]:
                 CLASSIFICATION_PROMPT.format(question=question)}]
         )
 
-        text = resp.content[0].text.strip()
+        text = resp.text.strip()
 
         # Remove markdown fences if present
         if text.startswith("```"):

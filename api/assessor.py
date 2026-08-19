@@ -114,7 +114,7 @@ async def assess_correctness(
     summary = _compact_results(tool_results)
 
     try:
-        resp = client.messages.create(
+        resp = client.complete(
             model="claude-haiku-4-5-20251001",
             max_tokens=200,
             system="Respond with valid JSON only. No markdown.",
@@ -128,7 +128,7 @@ async def assess_correctness(
             }]
         )
         from api.router import _extract_json
-        result = _extract_json(resp.content[0].text)
+        result = _extract_json(resp.text)
         if not result:
             return {"correct": True, "score": 0.5,
                     "issue": None}

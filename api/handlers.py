@@ -2038,6 +2038,11 @@ async def query_pre_call_brief(params: dict, sb) -> dict:
       company: str       — company name
       owner_email: str   — optional, for persona-aware framing
     """
+    try:
+        from .coaching_thresholds import COACHING_THRESHOLDS
+    except ImportError:
+        from coaching_thresholds import COACHING_THRESHOLDS
+
     # 1. Resolve the deal
     company = params.get("company") or (params.get("company_names") or [""])[0]
     if not company:
@@ -2077,13 +2082,13 @@ async def query_pre_call_brief(params: dict, sb) -> dict:
         latest_analysis = passed_analyses[0]
         reliable_score = True
 
-        # Staleness: flag if score is >21 days old
+        # Staleness: flag if score is older than threshold
         from datetime import datetime, timezone
         analyzed_at_str = latest_analysis.get("analyzed_at", "")
         if analyzed_at_str:
             analyzed_at = datetime.fromisoformat(analyzed_at_str.replace('Z', '+00:00'))
             score_age_days = (datetime.now(timezone.utc) - analyzed_at).days
-            score_is_stale = score_age_days > 21
+            score_is_stale = score_age_days > COACHING_THRESHOLDS["stale_analysis_days"]
         else:
             score_age_days = None
             score_is_stale = False
@@ -2249,6 +2254,8 @@ async def query_pre_call_brief(params: dict, sb) -> dict:
     return {
         "company_name": company_name,
         "deal": {
+            "deal_id": deal_id,  # Required for entity extraction
+            "company_name": company_name,  # Required for entity extraction
             "stage": deal.get("stage"),
             "arr_usd": deal.get("arr_usd"),
             "close_date": deal.get("close_date"),
@@ -2296,11 +2303,16 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
       focus: str         — 'champion' | 'economic_buyer' | 'stale'
                            | 'objections' | 'all' (default: 'all')
     """
+    try:
+        from .coaching_thresholds import COACHING_THRESHOLDS
+    except ImportError:
+        from coaching_thresholds import COACHING_THRESHOLDS
+
     owner_email = params.get("owner_email")
     focus = params.get("focus", "all")
     from datetime import date, timedelta
     today = today_in_reporting_tz()
-    stale_threshold = (today - timedelta(days=21)).isoformat()
+    stale_threshold = (today - timedelta(days=COACHING_THRESHOLDS["stale_call_days"])).isoformat()
 
     # Load active deals
     deal_filters = [("eq", "deal_status", "active")]
@@ -2364,7 +2376,7 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
         # Check each coaching priority
         if focus in ("all", "economic_buyer"):
             eb = analysis.get("economic_buyer_score")
-            if eb is not None and eb <= 3:
+            if eb is not None and eb <= COACHING_THRESHOLDS["weak_component_max"]:
                 flags.append({
                     "type": "missing_economic_buyer",
                     "detail": f"Economic buyer score {eb}/10 — not yet identified",
@@ -2373,7 +2385,7 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
 
         if focus in ("all", "champion"):
             ch = analysis.get("champion_score")
-            if ch is not None and ch <= 3:
+            if ch is not None and ch <= COACHING_THRESHOLDS["weak_component_max"]:
                 flags.append({
                     "type": "weak_champion",
                     "detail": f"Champion score {ch}/10 — no internal advocate confirmed",
@@ -2386,7 +2398,7 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
                 flags.append({
                     "type": "no_recent_activity",
                     "detail": f"Last call {days_since} days ago ({last_call})",
-                    "urgency": "high" if days_since > 30 else "medium",
+                    "urgency": "high" if days_since > COACHING_THRESHOLDS["critical_stale_days"] else "medium",
                 })
             elif not last_call:
                 flags.append({
@@ -2405,7 +2417,7 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
 
         # Strong score but stuck — potential coaching on closing
         overall = analysis.get("overall_score")
-        if overall and overall >= 40:
+        if overall and overall >= COACHING_THRESHOLDS["strong_score_min"]:
             stage = deal.get("stage", "")
             if last_call and last_call < stale_threshold:
                 flags.append({
@@ -2439,18 +2451,60 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
         for p in priorities:
             owner = p.get("owner_email", "unknown")
             by_owner.setdefault(owner, []).append(p)
+
+        # Cap deals per owner (top 5) and total deals (25)
+        MAX_PER_OWNER = 5
+        MAX_TOTAL = 25
+
+        capped_by_owner = {}
+        total_shown = 0
+        truncated = False
+
+        # Sort owners by total urgency (high count first, then deal count)
+        sorted_owners = sorted(
+            by_owner.items(),
+            key=lambda x: (
+                -sum(1 for d in x[1] if d["highest_urgency"] == "high"),
+                -len(x[1])
+            )
+        )
+
+        for owner, deals in sorted_owners:
+            if total_shown >= MAX_TOTAL:
+                truncated = True
+                break
+
+            # Take top N deals for this owner
+            capped_deals = deals[:MAX_PER_OWNER]
+            remaining_budget = MAX_TOTAL - total_shown
+
+            if len(capped_deals) > remaining_budget:
+                capped_deals = capped_deals[:remaining_budget]
+                truncated = True
+
+            capped_by_owner[owner] = capped_deals
+            total_shown += len(capped_deals)
+
         return {
-            "by_owner": by_owner,
+            "by_owner": capped_by_owner,
             "total_deals_needing_attention": len(priorities),
+            "deals_shown": total_shown,
             "high_urgency_count": sum(1 for p in priorities if p["highest_urgency"] == "high"),
+            "truncated": truncated,
             "focus": focus,
         }
 
+    # Single owner mode - cap to 25 deals
+    MAX_DEALS = 25
+    truncated = len(priorities) > MAX_DEALS
+
     return {
         "owner_email": owner_email,
-        "priorities": priorities,
+        "priorities": priorities[:MAX_DEALS],
         "total": len(priorities),
+        "deals_shown": min(len(priorities), MAX_DEALS),
         "high_urgency": sum(1 for p in priorities if p["highest_urgency"] == "high"),
+        "truncated": truncated,
         "focus": focus,
     }
 
