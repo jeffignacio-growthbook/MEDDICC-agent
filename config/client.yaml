@@ -413,6 +413,24 @@ call_tools:
   primary: "fireflies"
 
 # ============================================================================
+# CALL SOURCES (Source-Agnostic Factory)
+# ============================================================================
+# Configure active conversation intelligence sources and deduplication priority.
+# Used by get_call_sources() factory to instantiate adapters in priority order.
+#
+# Priority list determines which source wins when multiple sources return calls
+# for the same deal/date. First source in list = highest priority.
+#
+# GrowthBook: [fireflies, apollo] preserves existing deduplicate_calls_prefer_fireflies
+# behavior where Fireflies summaries (full AI summaries) are preferred over Apollo's
+# weaker summaries (video meetings platform, not conversation intelligence recorder).
+
+call_sources:
+  primary: fireflies      # Main conversation intelligence source
+  dialer: apollo          # Secondary source (video meetings)
+  priority: [fireflies, apollo]  # Dedup order: Fireflies wins over Apollo
+
+# ============================================================================
 # SDR TOOLS (OPTIONAL)
 # ============================================================================
 # Configure which SDR activity tools to sync for call/email metrics
