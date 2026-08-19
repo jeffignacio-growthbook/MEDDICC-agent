@@ -29,6 +29,16 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
+# Add api path for field_semantics import
+REPO_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(REPO_ROOT / 'api'))
+
+# Import field_semantics for canonical stage logic
+try:
+    from field_semantics import is_won, is_lost
+except ImportError:
+    from api.field_semantics import is_won, is_lost
+
 # Add scripts to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -91,12 +101,12 @@ class SnapshotBackfiller:
         return self.stage_map[stage_id]['order']
 
     def is_won_stage(self, stage_id: str) -> bool:
-        """Check if stage is a won stage."""
-        return stage_id == 'closedwon'
+        """Check if stage is a won stage. Uses field_semantics (handles aliases)."""
+        return is_won(stage_id)
 
     def is_lost_stage(self, stage_id: str) -> bool:
-        """Check if stage is a lost stage."""
-        return stage_id in ('closedlost', '68509551')  # closedlost or Disqualified
+        """Check if stage is a lost stage. Uses field_semantics (handles all aliases)."""
+        return is_lost(stage_id)
 
     def get_deal_status(self, stage_id: str) -> str:
         """Compute deal_status from stage_id."""

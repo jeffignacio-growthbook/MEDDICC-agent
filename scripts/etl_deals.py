@@ -20,32 +20,58 @@ import re
 REPO_ROOT = Path(__file__).parent.parent
 DEALS_DIR = REPO_ROOT / 'memory' / 'deals'
 sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+sys.path.insert(0, str(REPO_ROOT / 'api'))
 
 from utils import slugify
+# Import field_semantics for canonical stage logic
+try:
+    from field_semantics import is_won, is_lost, STAGE_MAP
+except ImportError:
+    from api.field_semantics import is_won, is_lost, STAGE_MAP
+
+def _get_won_stage_ids():
+    """Get all stage IDs (including aliases) that mean closed won."""
+    won_ids = []
+    for stage_id, info in STAGE_MAP.items():
+        if info.get('bucket') == 'closed_won':
+            won_ids.append(stage_id)
+            won_ids.extend(info.get('aliases', []))
+    return won_ids
+
+def _get_lost_stage_ids():
+    """Get all stage IDs (including aliases) that mean closed lost."""
+    lost_ids = []
+    for stage_id, info in STAGE_MAP.items():
+        if info.get('bucket') == 'closed_lost':
+            lost_ids.append(stage_id)
+            lost_ids.extend(info.get('aliases', []))
+    return lost_ids
 
 DEALS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Exclude Renewal Pipeline (both by name and ID)
 EXCLUDED_PIPELINES = ['renewal', '866608541']
 
-# Exclude Disqualified stage
-DISQUALIFIED_STAGES = ['68509551']
+# Disqualified stages now discovered from HubSpot metadata (no hardcoded fallback)
+# See field_semantics.yaml for stage aliases
 
 # Exclude Meeting Set stages (always filter these out in active mode)
 # '79653122' = Meeting Set (numeric ID)
 # NOTE: 'appointmentscheduled' is Discovery stage, NOT Meeting Set - do not exclude
 MEETING_SET_STAGES = ['79653122']
 
-# Closed stage IDs for history mode deal_status tagging
-CLOSED_WON_STAGES = ['closedwon', '1297321623']
-CLOSED_LOST_STAGES = ['closedlost', '1297321624']
+# NOTE: Closed stage logic now sourced from field_semantics (handles aliases automatically)
+# CLOSED_WON_STAGES and CLOSED_LOST_STAGES removed - use is_won/is_lost instead
 
 
 def get_deal_status(stage: str) -> str:
-    """Determine deal status for history mode."""
-    if stage in CLOSED_WON_STAGES:
+    """
+    Determine deal status for history mode.
+    Uses field_semantics for canonical stage logic (handles numeric aliases).
+    """
+    if is_won(stage):
         return 'won'
-    if stage in CLOSED_LOST_STAGES:
+    if is_lost(stage):
         return 'lost'
     return 'active'
 
@@ -130,8 +156,8 @@ def _excluded_stages_from_pipeline_config(config: dict) -> dict:
     return {
         'meeting_set': meeting_set,
         'disqualified': disqualified,
-        'closed_won': closed_won or CLOSED_WON_STAGES,
-        'closed_lost': closed_lost or CLOSED_LOST_STAGES,
+        'closed_won': closed_won or _get_won_stage_ids(),
+        'closed_lost': closed_lost or _get_lost_stage_ids(),
         'excluded_pipelines': excluded_pipelines or EXCLUDED_PIPELINES,
     }
 
@@ -170,8 +196,8 @@ def _excluded_stages_from_legacy_config(config: dict) -> dict:
     return {
         'meeting_set': get_ids('meeting_set'),
         'disqualified': get_ids('disqualified'),
-        'closed_won': get_ids('closed_won') or CLOSED_WON_STAGES,
-        'closed_lost': get_ids('closed_lost') or CLOSED_LOST_STAGES,
+        'closed_won': get_ids('closed_won') or _get_won_stage_ids(),
+        'closed_lost': get_ids('closed_lost') or _get_lost_stage_ids(),
         'excluded_pipelines': excluded_pipelines or EXCLUDED_PIPELINES,
     }
 
@@ -205,9 +231,9 @@ def get_excluded_stages() -> dict:
             print("     Then configure your stage IDs in client.yaml")
             return {
                 'meeting_set': MEETING_SET_STAGES,
-                'disqualified': DISQUALIFIED_STAGES,
-                'closed_won': CLOSED_WON_STAGES,
-                'closed_lost': CLOSED_LOST_STAGES,
+                'disqualified': [],  # Discovered from HubSpot; no hardcoded fallback
+                'closed_won': _get_won_stage_ids(),
+                'closed_lost': _get_lost_stage_ids(),
                 'excluded_pipelines': EXCLUDED_PIPELINES,
             }
 
@@ -228,9 +254,9 @@ def get_excluded_stages() -> dict:
         # No config - use defaults
         return {
             'meeting_set': MEETING_SET_STAGES,
-            'disqualified': DISQUALIFIED_STAGES,
-            'closed_won': CLOSED_WON_STAGES,
-            'closed_lost': CLOSED_LOST_STAGES,
+            'disqualified': [],  # Discovered from HubSpot; no hardcoded fallback
+            'closed_won': _get_won_stage_ids(),
+            'closed_lost': _get_lost_stage_ids(),
             'excluded_pipelines': EXCLUDED_PIPELINES,
         }
 
@@ -238,9 +264,9 @@ def get_excluded_stages() -> dict:
         print(f"  ⚠️  Could not load client.yaml: {e}")
         return {
             'meeting_set': MEETING_SET_STAGES,
-            'disqualified': DISQUALIFIED_STAGES,
-            'closed_won': CLOSED_WON_STAGES,
-            'closed_lost': CLOSED_LOST_STAGES,
+            'disqualified': [],  # Discovered from HubSpot; no hardcoded fallback
+            'closed_won': _get_won_stage_ids(),
+            'closed_lost': _get_lost_stage_ids(),
             'excluded_pipelines': EXCLUDED_PIPELINES,
         }
 

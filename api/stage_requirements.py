@@ -8,6 +8,12 @@ import yaml
 from pathlib import Path
 from typing import Dict, Optional
 
+# Import field_semantics for canonical stage transitions
+try:
+    from field_semantics import stage_transition
+except ImportError:
+    from api.field_semantics import stage_transition
+
 # Cache the config to avoid repeated file reads
 _config_cache = None
 
@@ -68,17 +74,10 @@ def get_requirements_for_stage(stage_id: str) -> Dict[str, int]:
     if stage.get("exclude_from_analysis") or stage.get("is_won") or stage.get("is_lost"):
         return {}
 
-    # Map stage IDs to progression keys
-    stage_to_progression = {
-        "appointmentscheduled": "discovery_to_scoping",  # Discovery
-        "qualifiedtobuy": "scoping_to_proposal",  # Scoping
-        "presentationscheduled": "proposal_to_negotiating",  # Tech Eval
-        "24682892": "negotiating_to_closed_won",  # Negotiating
-    }
-
-    progression_key = stage_to_progression.get(stage_id)
+    # Get progression key from field_semantics (canonical source)
+    progression_key = stage_transition(stage_id)
     if not progression_key:
-        # Stage not in requirements table (e.g., Review, Awaiting Signature)
+        # Stage has no defined transition (e.g., Review, Awaiting Signature)
         # Default: no specific requirements
         return {}
 

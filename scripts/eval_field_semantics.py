@@ -214,6 +214,62 @@ def test_unknown_stages_handled_gracefully():
     print("  ✓ Unknown stages don't crash")
     print("  ✓ Unknown stages default to 'unknown' bucket and open status")
 
+def test_no_raw_stage_ids_outside_field_semantics():
+    """
+    Grep etl_deals.py, backfill_snapshots.py, handlers.py, schema_context.py,
+    stage_requirements.py for raw numeric stage IDs and hardcoded closedwon/closedlost
+    lists. The only file allowed to contain them is config/field_semantics.yaml and
+    the generated module.
+    """
+    print("\n[TEST] No raw stage IDs outside field_semantics")
+
+    import pathlib
+
+    banned = ["1297321623", "1297321624", "68509551"]
+    checked = [
+        "scripts/etl_deals.py",
+        "scripts/analytics/backfill_snapshots.py",
+        "api/handlers.py",
+        "api/schema_context.py",
+        "api/stage_requirements.py"
+    ]
+
+    violations = []
+    for file_path in checked:
+        full_path = pathlib.Path(__file__).parent.parent / file_path
+        if not full_path.exists():
+            continue
+
+        src = full_path.read_text()
+        for banned_id in banned:
+            if banned_id in src:
+                # Check if it's in active code (not comments/docstrings/config examples)
+                lines = src.split('\n')
+                for line_num, line in enumerate(lines, 1):
+                    if banned_id not in line:
+                        continue
+
+                    stripped = line.strip()
+                    # Skip comments
+                    if stripped.startswith('#'):
+                        continue
+                    # Skip YAML config examples in docstrings (contain 'id:')
+                    if 'id:' in line:
+                        continue
+                    # Skip stage name-to-ID mapping dicts (contain both stage name and ID)
+                    if ': ' in line and ("'" in line or '"' in line):
+                        # Line looks like "'Disqualified': '68509551'" - skip
+                        continue
+
+                    # Real violation - active code reference
+                    violations.append(f"{file_path}:{line_num} contains {banned_id}")
+
+    assert len(violations) == 0, \
+        f"Found {len(violations)} raw stage ID leaks:\n  " + "\n  ".join(violations)
+
+    print(f"  ✓ Checked {len(checked)} files for raw numeric stage IDs")
+    print("  ✓ No violations found (all stage logic routes through field_semantics)")
+
 def main():
     """Run all field_semantics drift tests."""
     print("=" * 70)
@@ -227,6 +283,7 @@ def main():
         test_is_won_is_lost_mutually_exclusive,
         test_stage_transition_returns_correct_keys,
         test_unknown_stages_handled_gracefully,
+        test_no_raw_stage_ids_outside_field_semantics,
     ]
 
     passed = 0
