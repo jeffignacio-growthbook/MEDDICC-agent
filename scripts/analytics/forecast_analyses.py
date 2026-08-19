@@ -36,15 +36,22 @@ def _load_config() -> Dict:
         raise FileNotFoundError(f"Config not found: {config_path}")
 
     with open(config_path) as f:
-        config = yaml.safe_load(f)
+        full_config = yaml.safe_load(f)
 
-    return config.get('forecast_analysis', {
+    # Merge forecast_analysis and proposal_engine configs
+    forecast_config = full_config.get('forecast_analysis', {
         'trailing_quarters_window': 9,
         'anchor_week': None,
         'claimed_commit_accuracy': 0.90,
         'basis': 'count',
         'segmentation_keys': ['motion']
     })
+
+    # Add min_evidence_count from proposal_engine
+    proposal_config = full_config.get('proposal_engine', {})
+    forecast_config['min_evidence_count'] = proposal_config.get('min_evidence_count', 30)
+
+    return forecast_config
 
 
 def _get_complete_quarters(sb) -> List[str]:
@@ -182,6 +189,7 @@ def query_week3_conversion(
         }
 
     per_quarter = {}
+    min_evidence = config.get('min_evidence_count', 30)
 
     for quarter in complete_quarters:
         # Get week 3 snapshot (all deals in week 3)
@@ -191,6 +199,17 @@ def query_week3_conversion(
 
         week3_pipeline_count = len(week3_result.data)
         week3_pipeline_value = sum(r.get('deal_value', 0) or 0 for r in week3_result.data)
+
+        # CRITICAL: Return NULL if sample size below evidence threshold
+        # A coverage target computed from 15 deals is worse than no answer
+        if week3_pipeline_count < min_evidence:
+            return {
+                'error': f'Insufficient week-3 pipeline data in quarter {quarter}',
+                'week3_pipeline_count': week3_pipeline_count,
+                'min_evidence_required': min_evidence,
+                'quarters_analyzed': 0,
+                'coverage_note': f'Week-3 snapshot has only {week3_pipeline_count} deals (need {min_evidence}+). Run full backfill.'
+            }
 
         # Get deals closed won in this quarter
         # Note: We need to check which deals from week 3 ended up closing won
