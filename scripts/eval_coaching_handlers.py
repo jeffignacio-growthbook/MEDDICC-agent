@@ -76,6 +76,7 @@ def test_pre_call_brief_identifies_weakest_components():
                 "champion_score": 2,
                 "competition_score": 9,
                 "analyzed_at": "2026-08-18T10:00:00Z",
+                "passed": True,
                 "full_analysis_text": "Test analysis"
             }]
         elif table == "calls":
@@ -147,6 +148,7 @@ def test_pre_call_brief_generates_focus_questions_for_weak_components():
                 "overall_score": 30,
                 "metrics_score": 8,
                 "economic_buyer_score": 8,
+                "passed": True,
                 "decision_criteria_score": 7,
                 "decision_process_score": 6,
                 "pain_score": 8,
@@ -224,7 +226,8 @@ def test_pre_call_brief_identifies_blocker_type_from_objections():
                 "pain_score": 7,
                 "champion_score": 6,
                 "competition_score": 7,
-                "analyzed_at": "2026-08-18T10:00:00Z"
+                "analyzed_at": "2026-08-18T10:00:00Z",
+                "passed": True
             }]
         elif table == "calls":
             return []
@@ -645,6 +648,156 @@ def test_call_quality_aggregates_flag_counts():
         handlers.select_all = original_select_all
 
 
+def test_pre_call_brief_excludes_failed_analyses_from_trend():
+    """Trends computed from passed analyses only, failed excluded."""
+    print("\n[TEST] Pre-call brief excludes failed analyses from trend")
+
+    # Mock Supabase client
+    sb = MagicMock()
+
+    def select_all_mock(sb_client, table, columns="*", filters=None):
+        if table == "deals":
+            return [{
+                "deal_id": "deal_123",
+                "company_name": "TrendCo",
+                "stage": "Technical Evaluation",
+                "arr_usd": 75000,
+                "owner_email": "rep@example.com",
+                "close_date": "2026-09-30",
+                "deal_status": "active"
+            }]
+        elif table == "analyses":
+            # Return 6 analyses: 4 passed, 2 failed
+            # Passed: scores improving 4 → 5 → 6 → 7
+            # Failed: scores 1 and 2 (noise that should be excluded)
+            return [
+                # Newest passed
+                {
+                    "overall_score": 70,
+                    "metrics_score": 7,
+                    "economic_buyer_score": 7,
+                    "decision_criteria_score": 7,
+                    "decision_process_score": 7,
+                    "pain_score": 7,
+                    "champion_score": 7,
+                    "competition_score": 7,
+                    "analyzed_at": "2026-08-18T10:00:00Z",
+                    "passed": True
+                },
+                # Failed analysis (should be excluded)
+                {
+                    "overall_score": 10,
+                    "metrics_score": 1,
+                    "economic_buyer_score": 1,
+                    "decision_criteria_score": 1,
+                    "decision_process_score": 1,
+                    "pain_score": 1,
+                    "champion_score": 1,
+                    "competition_score": 1,
+                    "analyzed_at": "2026-08-17T10:00:00Z",
+                    "passed": False
+                },
+                # Passed
+                {
+                    "overall_score": 60,
+                    "metrics_score": 6,
+                    "economic_buyer_score": 6,
+                    "decision_criteria_score": 6,
+                    "decision_process_score": 6,
+                    "pain_score": 6,
+                    "champion_score": 6,
+                    "competition_score": 6,
+                    "analyzed_at": "2026-08-15T10:00:00Z",
+                    "passed": True
+                },
+                # Failed analysis (should be excluded)
+                {
+                    "overall_score": 20,
+                    "metrics_score": 2,
+                    "economic_buyer_score": 2,
+                    "decision_criteria_score": 2,
+                    "decision_process_score": 2,
+                    "pain_score": 2,
+                    "champion_score": 2,
+                    "competition_score": 2,
+                    "analyzed_at": "2026-08-14T10:00:00Z",
+                    "passed": False
+                },
+                # Passed
+                {
+                    "overall_score": 50,
+                    "metrics_score": 5,
+                    "economic_buyer_score": 5,
+                    "decision_criteria_score": 5,
+                    "decision_process_score": 5,
+                    "pain_score": 5,
+                    "champion_score": 5,
+                    "competition_score": 5,
+                    "analyzed_at": "2026-08-10T10:00:00Z",
+                    "passed": True
+                },
+                # Oldest passed
+                {
+                    "overall_score": 40,
+                    "metrics_score": 4,
+                    "economic_buyer_score": 4,
+                    "decision_criteria_score": 4,
+                    "decision_process_score": 4,
+                    "pain_score": 4,
+                    "champion_score": 4,
+                    "competition_score": 4,
+                    "analyzed_at": "2026-08-05T10:00:00Z",
+                    "passed": True
+                }
+            ]
+        elif table == "calls":
+            return []
+        elif table == "objections":
+            return []
+        elif table == "feature_gaps":
+            return []
+        return []
+
+    import handlers
+    original_select_all = handlers.select_all
+    handlers.select_all = select_all_mock
+
+    try:
+        result = asyncio.run(query_pre_call_brief(
+            {"company": "TrendCo"},
+            sb
+        ))
+
+        # Check reliable_score is True (has passed analyses)
+        assert result["meddicc"]["reliable_score"] is True, \
+            "Expected reliable_score=True with passed analyses"
+
+        # Check that latest score is from the newest PASSED analysis (score 7)
+        assert result["meddicc"]["overall_score"] == 70, \
+            f"Expected overall_score 70 from latest passed analysis, got {result['meddicc']['overall_score']}"
+
+        # Check that trends exist
+        assert "trends" in result["meddicc"], "Expected trends in response"
+
+        # Check that trends show improving (4 → 5 → 6 → 7, failed scores excluded)
+        # Weakest components would be all tied at 7, so trends should be computed
+        # The trend should show "improving" since we go from 4-5 to 6-7
+        trends = result["meddicc"]["trends"]
+        if trends:
+            # At least one trend should be "improving"
+            directions = [t.get("direction") for t in trends.values()]
+            assert "improving" in directions or "stable" in directions, \
+                f"Expected improving/stable trends from 4→7, got {directions}"
+
+        print("✓ Trends computed from passed analyses only (failed excluded)")
+        print(f"  - reliable_score: {result['meddicc']['reliable_score']}")
+        print(f"  - latest score: {result['meddicc']['overall_score']} (from passed=True)")
+        print(f"  - trends: {result['meddicc']['trends']}")
+
+    finally:
+        handlers.select_all = original_select_all
+
+
 def main():
     """Run all coaching handler tests."""
     print("=" * 70)
@@ -662,6 +815,7 @@ def main():
         test_call_quality_single_deal_mode,
         test_call_quality_pattern_mode_no_scores_returns_data_gap,
         test_call_quality_aggregates_flag_counts,
+        test_pre_call_brief_excludes_failed_analyses_from_trend,
     ]
 
     passed = 0

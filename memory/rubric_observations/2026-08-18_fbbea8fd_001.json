@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_fbbea8fd_001",
+  "timestamp": "2026-08-18T15:16:38.001233",
+  "company": "Chaos",
+  "criterion_fired": "Competition (C) and Champion (C) evidence quality; Economic Buyer (E) next step feasibility",
+  "was_appropriate": true,
+  "suggested_change": "For each MEDDICC component, require: (1) direct evidence (quote/action) vs. inference clarity, (2) discovery next steps must include explicit 'confirm whether' language, (3) next step dates must be compared against deal close date for feasibility flagging"
+}

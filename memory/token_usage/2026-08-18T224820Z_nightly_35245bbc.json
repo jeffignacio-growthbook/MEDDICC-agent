@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-08-18T22:48:20.852605+00:00",
+  "job": "nightly",
+  "run_id": "35245bbc",
+  "summary": {
+    "total_cost_usd": 0.010939,
+    "total_input_tokens": 10700,
+    "total_output_tokens": 3629,
+    "total_calls": 4,
+    "by_model": {
+      "claude-haiku-4-5-20251001": {
+        "input_tokens": 6474,
+        "output_tokens": 893,
+        "cost_usd": 0.010939,
+        "calls": 3
+      },
+      "accounts/fireworks/models/deepseek-v4-pro": {
+        "input_tokens": 4226,
+        "output_tokens": 2736,
+        "cost_usd": 0.0,
+        "calls": 1
+      }
+    },
+    "by_role": {
+      "context_builder": {
+        "input_tokens": 1919,
+        "output_tokens": 759,
+        "cost_usd": 0.005714
+      },
+      "generator": {
+        "input_tokens": 4226,
+        "output_tokens": 2736,
+        "cost_usd": 0.0
+      },
+      "evaluator": {
+        "input_tokens": 4077,
+        "output_tokens": 26,
+        "cost_usd": 0.004207
+      },
+      "reflection": {
+        "input_tokens": 478,
+        "output_tokens": 108,
+        "cost_usd": 0.001018
+      }
+    }
+  },
+  "records": [
+    {
+      "timestamp": "2026-08-18T15:47:36.870436",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Taskrabbit",
+      "input_tokens": 1919,
+      "output_tokens": 759,
+      "cost_usd": 0.005714
+    },
+    {
+      "timestamp": "2026-08-18T15:48:17.038446",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Taskrabbit",
+      "input_tokens": 4226,
+      "output_tokens": 2736,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T15:48:17.788428",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Taskrabbit",
+      "input_tokens": 4077,
+      "output_tokens": 26,
+      "cost_usd": 0.004207
+    },
+    {
+      "timestamp": "2026-08-18T15:48:19.001374",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Taskrabbit",
+      "input_tokens": 478,
+      "output_tokens": 108,
+      "cost_usd": 0.001018
+    }
+  ]
+}

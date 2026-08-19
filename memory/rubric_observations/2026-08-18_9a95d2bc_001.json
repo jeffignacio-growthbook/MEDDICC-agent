@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_9a95d2bc_001",
+  "timestamp": "2026-08-18T15:11:39.249443",
+  "company": "Chaos",
+  "criterion_fired": "Criterion 1, 2, 3, 4",
+  "was_appropriate": false,
+  "suggested_change": "Separate 'evidence quality' (verbatim vs. paraphrased) from 'score appropriateness' (7/10 justified by available data); clarify whether next steps must be complete sentences or actionable intent is sufficient; define minimum specificity for follow-up questions relative to call data granularity."
+}

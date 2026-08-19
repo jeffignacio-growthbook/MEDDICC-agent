@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-08-18T22:02:23.097645+00:00",
+  "job": "nightly",
+  "run_id": "6666c399",
+  "summary": {
+    "total_cost_usd": 0.003296,
+    "total_input_tokens": 4749,
+    "total_output_tokens": 4515,
+    "total_calls": 2,
+    "by_model": {
+      "claude-haiku-4-5-20251001": {
+        "input_tokens": 721,
+        "output_tokens": 515,
+        "cost_usd": 0.003296,
+        "calls": 1
+      },
+      "accounts/fireworks/models/deepseek-v4-pro": {
+        "input_tokens": 4028,
+        "output_tokens": 4000,
+        "cost_usd": 0.0,
+        "calls": 1
+      }
+    },
+    "by_role": {
+      "context_builder": {
+        "input_tokens": 721,
+        "output_tokens": 515,
+        "cost_usd": 0.003296
+      },
+      "generator": {
+        "input_tokens": 4028,
+        "output_tokens": 4000,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  "records": [
+    {
+      "timestamp": "2026-08-18T15:01:20.670038",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Chaos",
+      "input_tokens": 721,
+      "output_tokens": 515,
+      "cost_usd": 0.003296
+    },
+    {
+      "timestamp": "2026-08-18T15:02:23.089291",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Chaos",
+      "input_tokens": 4028,
+      "output_tokens": 4000,
+      "cost_usd": 0.0
+    }
+  ]
+}

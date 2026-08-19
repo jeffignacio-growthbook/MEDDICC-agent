@@ -1,0 +1,121 @@
+{
+  "timestamp": "2026-08-18T21:57:46.803936+00:00",
+  "job": "nightly",
+  "run_id": "19175edd",
+  "summary": {
+    "total_cost_usd": 0.029123,
+    "total_input_tokens": 29721,
+    "total_output_tokens": 10780,
+    "total_calls": 8,
+    "by_model": {
+      "claude-haiku-4-5-20251001": {
+        "input_tokens": 15738,
+        "output_tokens": 2677,
+        "cost_usd": 0.029123,
+        "calls": 5
+      },
+      "accounts/fireworks/models/deepseek-v4-pro": {
+        "input_tokens": 13983,
+        "output_tokens": 8103,
+        "cost_usd": 0.0,
+        "calls": 3
+      }
+    },
+    "by_role": {
+      "context_builder": {
+        "input_tokens": 2281,
+        "output_tokens": 896,
+        "cost_usd": 0.006761
+      },
+      "generator": {
+        "input_tokens": 13983,
+        "output_tokens": 8103,
+        "cost_usd": 0.0
+      },
+      "evaluator": {
+        "input_tokens": 12606,
+        "output_tokens": 1635,
+        "cost_usd": 0.020781
+      },
+      "reflection": {
+        "input_tokens": 851,
+        "output_tokens": 146,
+        "cost_usd": 0.001581
+      }
+    }
+  },
+  "records": [
+    {
+      "timestamp": "2026-08-18T14:55:04.644184",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Skyscanner",
+      "input_tokens": 2281,
+      "output_tokens": 896,
+      "cost_usd": 0.006761
+    },
+    {
+      "timestamp": "2026-08-18T14:55:38.477260",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Skyscanner",
+      "input_tokens": 4292,
+      "output_tokens": 2036,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T14:55:45.942344",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Skyscanner",
+      "input_tokens": 3800,
+      "output_tokens": 467,
+      "cost_usd": 0.006135
+    },
+    {
+      "timestamp": "2026-08-18T14:56:38.554451",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Skyscanner",
+      "input_tokens": 4723,
+      "output_tokens": 3296,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T14:56:50.039132",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Skyscanner",
+      "input_tokens": 4191,
+      "output_tokens": 774,
+      "cost_usd": 0.008061
+    },
+    {
+      "timestamp": "2026-08-18T14:57:34.483462",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Skyscanner",
+      "input_tokens": 4968,
+      "output_tokens": 2771,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T14:57:40.601954",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Skyscanner",
+      "input_tokens": 4615,
+      "output_tokens": 394,
+      "cost_usd": 0.006585
+    },
+    {
+      "timestamp": "2026-08-18T14:57:42.600313",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Skyscanner",
+      "input_tokens": 851,
+      "output_tokens": 146,
+      "cost_usd": 0.001581
+    }
+  ]
+}

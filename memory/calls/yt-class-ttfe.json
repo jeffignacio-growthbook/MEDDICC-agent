@@ -1,0 +1,20 @@
+{
+  "company": "YT Class TTFE",
+  "slug": "yt-class-ttfe",
+  "last_etl_date": "2026-08-18T16:55:06.173121",
+  "calls": [
+    {
+      "id": "01M05ZD8JRGSMC19QFRZSN6F2G",
+      "source": "fireflies",
+      "title": "YT Class TTFE AA + AB Mini Series",
+      "date": "2026-08-18",
+      "duration_minutes": 32.27000045776367,
+      "summary": null,
+      "organizer": "alyssa@growthbook.io",
+      "participants": 2,
+      "keywords": "Experimentation, Feature Flags, Visual Editor, GrowthBook, YouTube Miniseries, Layoffs",
+      "action_items": "*, *, A, l, y, s, s, a,  , N, i, c, o, l, l, *, *,  ,  , \n, V, e, r, i, f, y,  , t, a, r, g, e, t,  , a, u, d, i, e, n, c, e,  , w, i, t, h,  , A, s, h, l, e, y,  , (, 0, 6, :, 2, 3, ),  ,  , \n, F, o, l, l, o, w,  , u, p,  , w, i, t, h,  , A, s, h, l, e, y,  , o, n,  , V, i, s, u, a, l,  , E, d, i, t, o, r,  , (, 1, 2, :, 2, 0, ),  ,  , \n, A, d, d,  , b, u, l, l, e, t,  , p, o, i, n, t, s,  , t, o,  , v, i, d, e, o,  , o, u, t, l, i, n, e,  , (, 1, 9, :, 0, 2, ),  ,  , \n, S, l, a, c, k,  , H, a, m, p, u, s,  , r, e, g, u, l, a, r, l, y,  , f, o, r,  , f, e, e, d, b, a, c, k,  , (, 3, 0, :, 3, 3, ),  ,  , \n, \n, *, *, H, a, m, p, u, s,  , P, o, p, p, i, u, s, *, *,  ,  , \n, R, e, v, i, e, w,  , v, i, d, e, o,  , o, u, t, l, i, n, e,  , d, o, c, u, m, e, n, t,  , (, 1, 9, :, 4, 7, ),  ,  , \n, C, o, n, t, r, i, b, u, t, e,  , c, o, v, e, r, a, g, e,  , i, d, e, a, s,  , f, o, r,  , m, i, n, i, -, s, e, r, i, e, s,  , (, 2, 0, :, 0, 4, ),  ,  , \n, P, r, o, v, i, d, e,  , i, n, p, u, t,  , o, n,  , a, v, a, i, l, a, b, i, l, i, t, y,  , s, c, h, e, d, u, l, e,  , (, 2, 4, :, 0, 8, )",
+      "summary_quality": "empty"
+    }
+  ]
+}

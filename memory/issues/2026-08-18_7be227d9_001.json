@@ -1,0 +1,21 @@
+{
+  "company": "Chaos",
+  "deal_id": "56685250888",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Decision Process section is incomplete. The next steps text cuts off mid-sentence after 'Who from engineering, data, and leadership' without completing the action or question. This violates complete coverage requirement. CRITERION 4 FAILURE - Decision Process (5/10) next steps are incomplete and truncated, making them unactionable. CRITERION 2 VIOLATION - Metrics upgraded from 6/10 to 7/10 based on call summary that does not explicitly mention BigQuery cost efficiency or precomputed metrics in the source material provided. The cumulative state shows 'traffic around 1 million visits' but new analysis claims 'BigQuery cost efficiency' as primary metric without direct evidence in the recent call summary. CRITERION 3 FAILURE - Evidence for Metrics score of 7/10 includes paraphrased claims ('need for efficient query costs in BigQuery was discussed') that do not appear verbatim in the recent call summary provided. The call summary mentions 'efficient query costs in BigQuery was discussed' but this is generic; no specific cost reduction target, current bill amount, or savings percentage stated by prospect. CRITERION 4 FAILURE - Economic Buyer (1/10) next step uses generic action 'introduce me to them this week' without specific concrete question beyond the standard 'who holds budget' inquiry. Needs a more specific follow-up question tied to the Enterprise upgrade decision. Decision Criteria (7/10) next steps are acceptable but could be more specific. Champion status remains Partial/4 from cumulative state with no new assessment or next steps provided in this analysis.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_7be227d9_001",
+  "timestamp": "2026-08-18T15:11:39.247096"
+}

@@ -1,0 +1,21 @@
+{
+  "company": "Chaos",
+  "deal_id": "56685250888",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Competition (C) component incomplete. Status is 'Unknown' with score 1/10, but evidence states 'No competing solutions mentioned in the call' without explicitly confirming that none exist or requesting discovery. Next steps are missing entirely for this component. Add: '[contact TBD] or Jake Wallace: By [specific date], confirm what other feature flag or experimentation platforms Chaos evaluated before selecting GrowthBook, and whether they are still in evaluation or have been ruled out.' Champion (C) component lacks evidence of internal selling behavior. Current evidence shows Jake is 'actively discussing technical details' and 'appears committed' but no quotes or paraphrases demonstrate actual internal advocacy, business case building, or stakeholder engagement. Revise evidence to either: (a) add specific quotes showing internal selling, or (b) downgrade score and status to reflect that this is technical engagement only, not champion-level advocacy. Economic Buyer (E) remains Unknown at 1/10 with no next step progress metric\u2014next step references 'if no response by October 20, escalate' but October 20 has already passed relative to the October 26 close date. Verify timeline feasibility or note that urgency requires immediate escalation.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_08d339af_001",
+  "timestamp": "2026-08-18T15:16:37.998891"
+}

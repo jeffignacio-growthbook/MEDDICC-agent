@@ -1,0 +1,20 @@
+{
+  "company": "Quick Sync",
+  "slug": "quick-sync",
+  "last_etl_date": "2026-08-18T16:55:06.281778",
+  "calls": [
+    {
+      "id": "01KY0DKNW0M0NREMRETGA3J9T9",
+      "source": "fireflies",
+      "title": "Quick Sync",
+      "date": "2026-07-20",
+      "duration_minutes": 8.210000038146973,
+      "summary": "",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 2,
+      "keywords": "",
+      "action_items": "",
+      "summary_quality": "empty"
+    }
+  ]
+}

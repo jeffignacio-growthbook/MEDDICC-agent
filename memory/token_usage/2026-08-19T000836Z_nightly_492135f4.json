@@ -1,0 +1,121 @@
+{
+  "timestamp": "2026-08-19T00:08:36.728568+00:00",
+  "job": "nightly",
+  "run_id": "492135f4",
+  "summary": {
+    "total_cost_usd": 0.170691,
+    "total_input_tokens": 28445,
+    "total_output_tokens": 8576,
+    "total_calls": 8,
+    "by_model": {
+      "claude-haiku-4-5-20251001": {
+        "input_tokens": 13882,
+        "output_tokens": 1552,
+        "cost_usd": 0.021642,
+        "calls": 5
+      },
+      "claude-sonnet-4-6": {
+        "input_tokens": 14563,
+        "output_tokens": 7024,
+        "cost_usd": 0.149049,
+        "calls": 3
+      }
+    },
+    "by_role": {
+      "context_builder": {
+        "input_tokens": 788,
+        "output_tokens": 528,
+        "cost_usd": 0.003428
+      },
+      "generator": {
+        "input_tokens": 14563,
+        "output_tokens": 7024,
+        "cost_usd": 0.149049
+      },
+      "evaluator": {
+        "input_tokens": 12616,
+        "output_tokens": 916,
+        "cost_usd": 0.017196
+      },
+      "reflection": {
+        "input_tokens": 478,
+        "output_tokens": 108,
+        "cost_usd": 0.001018
+      }
+    }
+  },
+  "records": [
+    {
+      "timestamp": "2026-08-18T17:03:05.032729",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Stone",
+      "input_tokens": 788,
+      "output_tokens": 528,
+      "cost_usd": 0.003428
+    },
+    {
+      "timestamp": "2026-08-18T17:03:56.344580",
+      "model": "claude-sonnet-4-6",
+      "role": "generator",
+      "company": "Stone",
+      "input_tokens": 4550,
+      "output_tokens": 2386,
+      "cost_usd": 0.04944
+    },
+    {
+      "timestamp": "2026-08-18T17:04:05.452334",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Stone",
+      "input_tokens": 4250,
+      "output_tokens": 584,
+      "cost_usd": 0.00717
+    },
+    {
+      "timestamp": "2026-08-18T17:05:01.371963",
+      "model": "claude-sonnet-4-6",
+      "role": "generator",
+      "company": "Stone",
+      "input_tokens": 5147,
+      "output_tokens": 2513,
+      "cost_usd": 0.053136
+    },
+    {
+      "timestamp": "2026-08-18T17:05:06.630081",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Stone",
+      "input_tokens": 4377,
+      "output_tokens": 306,
+      "cost_usd": 0.005907
+    },
+    {
+      "timestamp": "2026-08-18T17:05:51.550039",
+      "model": "claude-sonnet-4-6",
+      "role": "generator",
+      "company": "Stone",
+      "input_tokens": 4866,
+      "output_tokens": 2125,
+      "cost_usd": 0.046473
+    },
+    {
+      "timestamp": "2026-08-18T17:05:52.363462",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Stone",
+      "input_tokens": 3989,
+      "output_tokens": 26,
+      "cost_usd": 0.004119
+    },
+    {
+      "timestamp": "2026-08-18T17:05:53.608637",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Stone",
+      "input_tokens": 478,
+      "output_tokens": 108,
+      "cost_usd": 0.001018
+    }
+  ]
+}

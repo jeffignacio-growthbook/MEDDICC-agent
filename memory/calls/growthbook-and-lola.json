@@ -1,0 +1,23 @@
+{
+  "company": "GrowthBook and Lola",
+  "slug": "growthbook-and-lola",
+  "last_etl_date": "2026-08-18T16:55:06.296994",
+  "calls": [
+    {
+      "id": "01KX47A673YQWHFMKCP8M127XV",
+      "source": "fireflies",
+      "title": "GrowthBook and Lola Blankets",
+      "date": "2026-07-09",
+      "duration_minutes": 1,
+      "summary": "",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 4,
+      "keywords": "",
+      "action_items": "",
+      "participant_domains": [
+        "lolablankets.com"
+      ],
+      "summary_quality": "empty"
+    }
+  ]
+}

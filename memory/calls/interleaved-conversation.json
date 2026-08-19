@@ -1,0 +1,20 @@
+{
+  "company": "Interleaved Conversation",
+  "slug": "interleaved-conversation",
+  "last_etl_date": "2026-08-18T16:55:06.174990",
+  "calls": [
+    {
+      "id": "01M0B0EFZHB2P9FE1P9ZP97RYX",
+      "source": "fireflies",
+      "title": "Interleaved Conversation",
+      "date": "2026-08-18",
+      "duration_minutes": 31.469999313354492,
+      "summary": "The discussion centered around the interleaved ranking algorithm, a powerful tool for comparing ranking systems in recommendation and search contexts. This method enhances algorithm evaluation by combining ranked lists from two algorithms, allowing for faster and more sensitive comparisons that minimize interference effects typical in A/B testing. Luke Sonnet emphasized its significance for platforms like TaskRabbit, where item availability affects rankings. Moreover, the team explored technical implementations, noting the necessary changes to the SDK for optimal performance. Complexities in click and conversion attribution were acknowledged, especially when dealing with multiple queries or rankings, which require robust tracking systems. Ultimately, the meeting highlighted interleaved ranking's potential to speed up testing, improve decision-making efficiency, and the challenges in implementation due to attribution complexity.",
+      "organizer": "luke@growthbook.io",
+      "participants": 2,
+      "keywords": "interleaved ranking, team draft algorithm, marketplace interference, SDK integration, attribution challenges, A/B testing alternative",
+      "action_items": "\n, *, *, A, d, r, i, e, l,  , V, i, e, i, r, a, *, *, \n, E, v, a, l, u, a, t, e,  , p, r, i, o, r, i, t, y,  , l, e, v, e, l,  , f, o, r,  , i, m, p, l, e, m, e, n, t, i, n, g,  , i, n, t, e, r, l, e, a, v, e, d,  , r, a, n, k, i, n, g,  , s, u, p, p, o, r, t,  , i, n,  , G, r, o, w, t, h, B, o, o, k,  , S, D, K,  , a, n, d,  , t, r, a, c, k, i, n, g,  , s, y, s, t, e, m, s,  , (, 2, 9, :, 2, 5, ), \n, D, i, s, c, u, s, s,  , w, i, t, h,  , R, o, b, o, t,  , (, A, I,  , a, s, s, i, s, t, a, n, t, ),  , a, n, d,  , e, n, g, i, n, e, e, r, i, n, g,  , a, b, o, u, t,  , p, l, u, g, i, n,  , a, p, p, r, o, a, c, h,  , f, o, r,  , i, n, t, e, r, l, e, a, v, i, n, g,  , f, e, a, t, u, r, e,  , t, o,  , m, a, n, a, g, e,  , S, D, K,  , s, i, z, e,  , a, n, d,  , c, o, m, p, l, e, x, i, t, y,  , (, 2, 9, :, 3, 3, ), \n, \n, *, *, L, u, k, e,  , S, o, n, n, e, t, *, *, \n, C, o, m, p, l, e, t, e,  , s, p, i, k, e,  , r, e, s, e, a, r, c, h,  , o, n,  , i, n, t, e, r, l, e, a, v, e, d,  , r, a, n, k, i, n, g,  , i, m, p, a, c, t,  , a, n, d,  , i, n, t, e, g, r, a, t, i, o, n,  , c, o, m, p, l, e, x, i, t, y,  , t, o,  , d, e, t, e, r, m, i, n, e,  , i, m, p, l, e, m, e, n, t, a, t, i, o, n,  , f, e, a, s, i, b, i, l, i, t, y,  , (, 2, 9, :, 3, 3, ), \n, I, n, v, e, s, t, i, g, a, t, e,  , a, n, d,  , r, e, f, i, n, e,  , S, D, K,  , d, e, s, i, g, n, ,,  , e, s, p, e, c, i, a, l, l, y,  , a, r, o, u, n, d,  , m, e, t, a, d, a, t, a,  , h, a, n, d, l, i, n, g,  , a, n, d,  , e, v, e, n, t,  , l, o, g, g, i, n, g,  , f, o, r,  , i, n, t, e, r, l, e, a, v, i, n, g,  , e, x, p, e, r, i, m, e, n, t, s,  , (, 2, 7, :, 0, 7, ), \n, F, o, l, l, o, w,  , u, p,  , o, n,  , d, i, a, l, o, g, u, e,  , w, i, t, h,  , R, o, b, o, t,  , r, e, g, a, r, d, i, n, g,  , m, o, v, i, n, g,  , d, a, t, a,  , b, e, t, w, e, e, n,  , e, x, p, o, s, u, r, e,  , a, n, d,  , c, l, i, c, k,  , e, v, e, n, t, s,  , a, n, d,  , l, o, o, k, u, p, s,  , f, o, r,  , m, a, p, p, i, n, g,  , i, t, e, m,  , c, l, i, c, k, s,  , t, o,  , r, a, n, k, e, r, s,  , (, 2, 8, :, 0, 5, ), \n",
+      "summary_quality": "good"
+    }
+  ]
+}

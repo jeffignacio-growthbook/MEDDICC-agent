@@ -343,6 +343,21 @@ from calls, analyses, and objections that actually happened.
   "They asked for the incumbent spend" is not the same as
   "They got the number." Only the latter scores.
 
+**MEDDICC trends:**
+- Trends are per-call, not per-time. The nightly agent only re-scores
+  when a new call happens. Frame trends as "over N calls" with date
+  spans, never as time cadence.
+
+  WRONG: "Champion score improving over the last 3 weeks"
+  RIGHT: "Champion score improving over 4 calls (Jan 5 to Feb 2)"
+
+  WRONG: "Economic Buyer declining in the past month"
+  RIGHT: "Economic Buyer declining over 5 calls (Dec 15 to Jan 28)"
+
+- When the score is stale (>21 days since last analysis), state the
+  staleness explicitly: "Economic Buyer 2/10 as of Jan 5 — no calls
+  in 28 days, score may be outdated."
+
 **What coaching responses are not:**
 - Roleplay prompts or drill scenarios
 - Generic sales advice not grounded in this deal's data

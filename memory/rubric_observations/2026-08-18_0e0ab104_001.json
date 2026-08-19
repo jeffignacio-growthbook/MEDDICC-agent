@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_0e0ab104_001",
+  "timestamp": "2026-08-18T16:59:30.996538",
+  "company": "Stone",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency)",
+  "was_appropriate": true,
+  "suggested_change": "When revising a component score from a prior iteration: (1) If revision is due to correcting false evidence from prior call analysis, document the correction and justify whether score should hold or change based on remaining valid evidence from that call; (2) If revision is due to new call evidence, explicitly cite the new call data driving the change; (3) Never retroactively downgrade without attributing to one of these two categories with supporting quotes."
+}

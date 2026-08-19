@@ -1,0 +1,20 @@
+{
+  "company": "Product Analytics Feedback",
+  "slug": "product-analytics-feedback",
+  "last_etl_date": "2026-08-18T16:55:06.178030",
+  "calls": [
+    {
+      "id": "01KZVBET60AWKEAJHMW9XN9XM7",
+      "source": "fireflies",
+      "title": "Product Analytics Feedback Analysis",
+      "date": "2026-08-18",
+      "duration_minutes": 18.489999771118164,
+      "summary": "The discussion revolved around data integration and the configuration of fact tables, where users select data without duplication. There was confusion regarding the necessity of fact tables, especially among newer product analytics users. Suggestions for a more intuitive UI were made to automate schema creation and improve guidance. Product analytics is mainly utilized by Product Managers (PMs), with dashboards serving as a key tool, while data scientists create curated views for mostly non-technical end users. Feedback highlighted gaps in dashboard functionalities, such as a disjointed funnel creation experience and requests for additional visualization types, including pie charts. The SQL Explorer's role as a secondary tool was scrutinized, and next steps include investigating user comprehension of fact tables and assessing missing features.",
+      "organizer": "alyssa@growthbook.io",
+      "participants": 5,
+      "keywords": "fact tables, product analytics, dashboards, user experience, data querying, visualization",
+      "action_items": "*, *, M, i, c, h, a, e, l,  , K, n, o, w, l, t, o, n, *, *,  ,  , \n, E, x, p, l, o, r, e,  , r, e, u, s, a, b, l, e,  , c, u, r, a, t, e, d,  , d, a, t, a,  , s, e, t, s,  , (, 1, 2, :, 2, 9, ),  ,  , \n, \n, *, *, A, l, y, s, s, a,  , N, i, c, o, l, l, *, *,  ,  , \n, C, o, n, t, i, n, u, e,  , g, a, t, h, e, r, i, n, g,  , u, s, e, r,  , f, e, e, d, b, a, c, k,  , (, 1, 4, :, 1, 2, ),  ,  , \n, M, e, e, t,  , w, i, t, h,  , p, r, o, d, u, c, t,  , m, a, n, a, g, e, r, s,  , (, 1, 6, :, 3, 8, ),  ,  , \n, \n, *, *, J, e, r, e, m, y,  , D, o, r, n, *, *,  ,  , \n, I, n, v, e, s, t, i, g, a, t, e,  , u, s, e, r,  , u, n, d, e, r, s, t, a, n, d, i, n, g,  , o, f,  , f, a, c, t,  , t, a, b, l, e, s,  , (, 1, 4, :, 1, 2, ),  ,  , \n, A, s, s, e, s, s,  , a, u, t, o, m, a, t, i, o, n,  , f, e, a, s, i, b, i, l, i, t, y,  , (, 1, 4, :, 1, 2, ),  ,  , \n, \n, *, *, E, l, y, s, e,  , F, o, x, *, *,  ,  , \n, C, o, m, p, i, l, e,  , u, s, e, r,  , f, e, e, d, b, a, c, k,  , o, n,  , v, i, s, u, a, l, i, z, a, t, i, o, n,  , f, l, e, x, i, b, i, l, i, t, y,  , (, 1, 6, :, 0, 6, )",
+      "summary_quality": "good"
+    }
+  ]
+}

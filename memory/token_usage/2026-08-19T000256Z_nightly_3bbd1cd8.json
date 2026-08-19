@@ -1,0 +1,121 @@
+{
+  "timestamp": "2026-08-19T00:02:56.058493+00:00",
+  "job": "nightly",
+  "run_id": "3bbd1cd8",
+  "summary": {
+    "total_cost_usd": 0.157614,
+    "total_input_tokens": 27059,
+    "total_output_tokens": 8079,
+    "total_calls": 8,
+    "by_model": {
+      "claude-haiku-4-5-20251001": {
+        "input_tokens": 12909,
+        "output_tokens": 1893,
+        "cost_usd": 0.022374,
+        "calls": 5
+      },
+      "claude-sonnet-4-6": {
+        "input_tokens": 14150,
+        "output_tokens": 6186,
+        "cost_usd": 0.13524,
+        "calls": 3
+      }
+    },
+    "by_role": {
+      "context_builder": {
+        "input_tokens": 740,
+        "output_tokens": 576,
+        "cost_usd": 0.00362
+      },
+      "generator": {
+        "input_tokens": 14150,
+        "output_tokens": 6186,
+        "cost_usd": 0.13524
+      },
+      "evaluator": {
+        "input_tokens": 11691,
+        "output_tokens": 1207,
+        "cost_usd": 0.017726
+      },
+      "reflection": {
+        "input_tokens": 478,
+        "output_tokens": 110,
+        "cost_usd": 0.001028
+      }
+    }
+  },
+  "records": [
+    {
+      "timestamp": "2026-08-18T17:00:24.762853",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Zalando",
+      "input_tokens": 740,
+      "output_tokens": 576,
+      "cost_usd": 0.00362
+    },
+    {
+      "timestamp": "2026-08-18T17:01:14.242942",
+      "model": "claude-sonnet-4-6",
+      "role": "generator",
+      "company": "Zalando",
+      "input_tokens": 4523,
+      "output_tokens": 2199,
+      "cost_usd": 0.046554
+    },
+    {
+      "timestamp": "2026-08-18T17:01:22.126182",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Zalando",
+      "input_tokens": 4034,
+      "output_tokens": 502,
+      "cost_usd": 0.006544
+    },
+    {
+      "timestamp": "2026-08-18T17:02:03.696624",
+      "model": "claude-sonnet-4-6",
+      "role": "generator",
+      "company": "Zalando",
+      "input_tokens": 5038,
+      "output_tokens": 2069,
+      "cost_usd": 0.046149
+    },
+    {
+      "timestamp": "2026-08-18T17:02:12.809808",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Zalando",
+      "input_tokens": 3904,
+      "output_tokens": 679,
+      "cost_usd": 0.007299
+    },
+    {
+      "timestamp": "2026-08-18T17:02:51.830059",
+      "model": "claude-sonnet-4-6",
+      "role": "generator",
+      "company": "Zalando",
+      "input_tokens": 4589,
+      "output_tokens": 1918,
+      "cost_usd": 0.042537
+    },
+    {
+      "timestamp": "2026-08-18T17:02:52.751928",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Zalando",
+      "input_tokens": 3753,
+      "output_tokens": 26,
+      "cost_usd": 0.003883
+    },
+    {
+      "timestamp": "2026-08-18T17:02:54.039538",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Zalando",
+      "input_tokens": 478,
+      "output_tokens": 110,
+      "cost_usd": 0.001028
+    }
+  ]
+}

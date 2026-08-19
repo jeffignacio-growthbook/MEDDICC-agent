@@ -1,0 +1,23 @@
+{
+  "company": "Skyscanner/GrowthBook catch-up",
+  "slug": "skyscanner-growthbook-catch-up",
+  "last_etl_date": "2026-08-18T16:55:06.282624",
+  "calls": [
+    {
+      "id": "01KXV8NTEMCG1450JKYM16P54A",
+      "source": "fireflies",
+      "title": "Skyscanner/GrowthBook catch-up",
+      "date": "2026-07-20",
+      "duration_minutes": 28.579999923706055,
+      "summary": "The team established a structured evaluation plan with three distinct phases to ensure the readiness of Q4 content experimentation. The first phase focuses on development environment testing using historical data between GrowthBook and Dr. Jekyll, while the second phase is for production testing to validate data flow. The third phase involves live A/B testing in production. A dual evaluation approach addresses immediate content experiments along with long-term platform use, combining short-term revenue impact with strategic expansion. Six cross-functional teams will participate to ensure diverse feedback. Success criteria are being developed to align internal stakeholders for a timely transition to production by the end of September, facilitating Q4 experimentation.",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "keywords": "Experimentation, Proof of Concept, Bayesian Statistics, Feature Flags, Segmentation, Evaluation Plan",
+      "action_items": "\n, *, *, D, a, v, i, d,  , G, r, e, g, o, r, y, *, *, \n, D, e, v, e, l, o, p,  , a, n, d,  , f, i, n, a, l, i, z, e,  , t, h, e,  , e, v, a, l, u, a, t, i, o, n,  , p, l, a, n,  , a, n, d,  , s, u, c, c, e, s, s,  , f, r, a, m, e, w, o, r, k,  , w, i, t, h,  , n, e, w,  , P, M,  , M, e, g, a, n,  , a, n, d,  , s, h, a, r, e,  , d, r, a, f, t,  , d, u, r, i, n, g,  , u, p, c, o, m, i, n, g,  , w, e, e, k, l, y,  , c, a, l, l, s,  , (, 0, 5, :, 2, 4, ), \n, C, o, o, r, d, i, n, a, t, e,  , w, i, t, h,  , p, r, o, c, u, r, e, m, e, n, t,  , t, e, a, m,  , t, o,  , b, e,  , i, n, v, o, l, v, e, d,  , i, n,  , w, e, e, k, l, y,  , u, p, d, a, t, e, s,  , a, b, o, u, t,  , P, o, C,  , p, r, o, g, r, e, s, s,  , a, n, d,  , c, o, m, m, e, r, c, i, a, l,  , c, o, n, s, i, d, e, r, a, t, i, o, n, s,  , (, 2, 5, :, 0, 3, ), \n, P, u, l, l,  , c, o, r, e,  , S, k, y, s, c, a, n, n, e, r,  , t, e, a, m,  , i, n, t, o,  , w, e, e, k, l, y,  , c, h, e, c, k, -, i, n, s,  , w, i, t, h,  , G, r, o, w, t, h, B, o, o, k,  , s, t, a, r, t, i, n, g,  , n, e, x, t,  , w, e, e, k, ,,  , p, r, e, f, e, r, a, b, l, y,  , o, n,  , W, e, d, n, e, s, d, a, y, s,  , a, r, o, u, n, d,  , 4, :, 3, 0,  , G, M, T,  , (, 2, 6, :, 1, 0, ), \n, \n, *, *, C, h, r, i, s, t, i, a, n,  , L, i, e, b, e, n, o, w, *, *, \n, S, h, a, r, e,  , s, c, r, e, e, n,  , a, n, d,  , l, e, a, d,  , d, i, s, c, u, s, s, i, o, n,  , o, n,  , S, k, y, s, c, a, n, n, e, r, ’, s,  , P, o, C,  , g, o, a, l, s, ,,  , r, o, a, d, m, a, p, ,,  , a, n, d,  , s, u, c, c, e, s, s,  , c, r, i, t, e, r, i, a,  , d, u, r, i, n, g,  , m, e, e, t, i, n, g, s,  , (, 0, 0, :, 0, 0, ), \n, S, e, n, d,  , c, a, l, e, n, d, a, r,  , i, n, v, i, t, e,  , f, o, r,  , w, e, e, k, l, y,  , c, h, e, c, k, -, i, n,  , m, e, e, t, i, n, g, s,  , a, n, d,  , b, e,  , f, l, e, x, i, b, l, e,  , o, n,  , s, c, h, e, d, u, l, i, n, g,  , a, s,  , n, e, e, d, e, d,  , (, 2, 6, :, 4, 4, ), \n, E, x, t, e, n, d,  , e, n, t, e, r, p, r, i, s, e,  , c, l, o, u, d,  , t, r, i, a, l,  , a, n, d,  , p, r, o, v, i, d, e,  , a, d, m, i, n,  , a, c, c, e, s, s,  , f, o, r,  , S, k, y, s, c, a, n, n, e, r,  , u, s, e, r, s,  , (, 2, 6, :, 5, 5, ), \n, \n, *, *, S, h, r, i, d, a, r,  , S, u, r, i, y, a,  , M, o, o, r, t, h, y, *, *, \n, S, e, r, v, e,  , a, s,  , G, r, o, w, t, h, B, o, o, k,  , a, d, m, i, n,  , t, o,  , g, r, a, n, t,  , u, s, e, r,  , a, c, c, e, s, s,  , d, u, r, i, n, g,  , t, r, i, a, l,  , p, h, a, s, e,  , (, 2, 7, :, 2, 4, ), \n, \n, *, *, L, o, g, a, n, *, *, \n, P, r, o, v, i, d, e,  , d, e, t, a, i, l, e, d,  , e, x, p, l, a, n, a, t, i, o, n,  , o, f,  , m, e, t, r, i, c, s,  , a, t, t, a, c, h, m, e, n, t,  , a, n, d,  , i, m, p, o, r, t,  , p, r, o, c, e, s, s,  , w, i, t, h, i, n,  , G, r, o, w, t, h, B, o, o, k,  , f, o, r,  , e, x, p, e, r, i, m, e, n, t, s,  , (, 2, 0, :, 0, 3, ), \n, S, u, p, p, o, r, t,  , d, i, s, c, u, s, s, i, o, n,  , a, n, d,  , c, l, a, r, i, f, y,  , G, r, o, w, t, h, B, o, o, k,  , f, e, a, t, u, r, e, s,  , o, n,  , p, r, e, -, l, a, u, n, c, h,  , c, h, e, c, k, l, i, s, t,  , a, n, d,  , w, o, r, k, f, l, o, w,  , p, a, r, i, t, y,  , (, 1, 7, :, 2, 2, ), \n",
+      "participant_domains": [
+        "skyscanner.net"
+      ],
+      "summary_quality": "good"
+    }
+  ]
+}

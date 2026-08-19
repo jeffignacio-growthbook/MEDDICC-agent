@@ -1,0 +1,23 @@
+{
+  "company": "Hello Yellow &",
+  "slug": "hello-yellow",
+  "last_etl_date": "2026-08-18T16:55:06.187000",
+  "calls": [
+    {
+      "id": "01M05NYYVKXX8HF516GT6D4BWW",
+      "source": "fireflies",
+      "title": "Hello Yellow & GrowthBook Commercial Discussion",
+      "date": "2026-08-18",
+      "duration_minutes": 19.09000015258789,
+      "summary": "The company has decided to bring all CRO management in-house to enhance control and improve technological use, replacing a white-label agency. This transition aims to streamline client management and optimize service quality. However, the onboarding process is presenting technical hurdles, notably related to edge worker setups, which require familiarization with name server changes. Ongoing discussions with clients, particularly Innovated Lease Australia, are planned to address these issues. Additionally, the meeting reviewed Growth Book platform pricing, with tiered options presented to accommodate different client needs. Concerns were raised about financial risks associated with client commitments, prompting a phased onboarding strategy. Internal discussions are ongoing about centralized account management versus client-owned accounts, balancing costs and management ease.",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "keywords": "CRO, GrowthBook, Enterprise License, Edge Worker Setup, Pricing Model, Client Onboarding",
+      "action_items": "\n, *, *, O, l, l, i, e,  , D, u, f, f, *, *, \n, D, i, s, c, u, s, s,  , G, r, o, w, t, h, B, o, o, k,  , s, e, t, u, p,  , s, t, r, a, t, e, g, y,  , i, n, t, e, r, n, a, l, l, y,  , w, i, t, h,  , c, o, -, f, o, u, n, d, e, r,  , R, y, a, n,  , a, n, d,  , d, e, c, i, d, e,  , o, n,  , a,  , s, t, a, g, e, d,  , o, n, b, o, a, r, d, i, n, g,  , a, p, p, r, o, a, c, h, ,,  , a, d, d, r, e, s, s, i, n, g,  , e, n, t, e, r, p, r, i, s, e,  , v, e, r, s, u, s,  , p, r, o,  , a, c, c, o, u, n, t,  , u, s, a, g, e,  , (, 1, 4, :, 4, 8, ), \n, F, o, l, l, o, w,  , u, p,  , w, i, t, h,  , I, n, n, o, v, a, t, e, d,  , L, e, a, s, e,  , A, u, s, t, r, a, l, i, a,  , o, n,  , t, h, e, i, r,  , i, n, t, e, r, n, a, l,  , d, e, c, i, s, i, o, n,  , a, f, t, e, r,  , t, h, e,  , T, h, u, r, s, d, a, y,  , m, e, e, t, i, n, g,  , r, e, g, a, r, d, i, n, g,  , t, e, c, h, n, i, c, a, l,  , r, e, a, d, i, n, e, s, s,  , f, o, r,  , G, r, o, w, t, h, B, o, o, k,  , e, d, g, e,  , w, o, r, k, e, r,  , s, e, t, u, p,  , (, 1, 6, :, 4, 9, ), \n, \n, *, *, J, a, m, e, s,  , S, h, a, n, n, o, n, *, *, \n, S, h, a, r, e,  , G, r, o, w, t, h, B, o, o, k,  , p, r, i, c, i, n, g,  , d, e, c, k,  , a, n, d,  , p, o, t, e, n, t, i, a, l,  , a, c, c, o, u, n, t,  , s, t, r, u, c, t, u, r, e,  , o, p, t, i, o, n, s,  , v, i, a,  , e, m, a, i, l,  , f, o, r,  , H, e, l, l, o,  , Y, e, l, l, o, w, ’, s,  , i, n, t, e, r, n, a, l,  , r, e, v, i, e, w,  , (, 1, 4, :, 4, 7, ), \n, B, e,  , a, v, a, i, l, a, b, l, e,  , f, o, r,  , f, o, l, l, o, w, -, u, p,  , d, i, s, c, u, s, s, i, o, n, s,  , o, n,  , p, r, i, c, i, n, g,  , a, n, d,  , o, n, b, o, a, r, d, i, n, g,  , a, f, t, e, r,  , O, l, l, i, e,  , r, e, t, u, r, n, s,  , f, r, o, m,  , G, r, e, e, c, e,  , (, 1, 7, :, 3, 0, ), \n",
+      "participant_domains": [
+        "helloyellow.uk"
+      ],
+      "summary_quality": "good"
+    }
+  ]
+}

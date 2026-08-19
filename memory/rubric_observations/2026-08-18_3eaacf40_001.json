@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_3eaacf40_001",
+  "timestamp": "2026-08-18T17:33:34.257679",
+  "company": "mountain",
+  "criterion_fired": "Criterion 4: Actionable Next Steps",
+  "was_appropriate": false,
+  "suggested_change": "Split into two criteria: '4a. Next steps name specific person/role and concrete action verb (schedule/propose/confirm)' and '4b. Success metric is observable (e.g., calendar invite, verbal confirmation, decision date)' with explicit pass/fail examples to prevent iterative scope creep."
+}

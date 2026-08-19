@@ -1,0 +1,121 @@
+{
+  "timestamp": "2026-08-18T22:16:38.006945+00:00",
+  "job": "nightly",
+  "run_id": "21d71ee6",
+  "summary": {
+    "total_cost_usd": 0.023412,
+    "total_input_tokens": 26091,
+    "total_output_tokens": 12502,
+    "total_calls": 8,
+    "by_model": {
+      "claude-haiku-4-5-20251001": {
+        "input_tokens": 13042,
+        "output_tokens": 2074,
+        "cost_usd": 0.023412,
+        "calls": 5
+      },
+      "accounts/fireworks/models/deepseek-v4-pro": {
+        "input_tokens": 13049,
+        "output_tokens": 10428,
+        "cost_usd": 0.0,
+        "calls": 3
+      }
+    },
+    "by_role": {
+      "context_builder": {
+        "input_tokens": 721,
+        "output_tokens": 514,
+        "cost_usd": 0.003291
+      },
+      "generator": {
+        "input_tokens": 13049,
+        "output_tokens": 10428,
+        "cost_usd": 0.0
+      },
+      "evaluator": {
+        "input_tokens": 11576,
+        "output_tokens": 1354,
+        "cost_usd": 0.018346
+      },
+      "reflection": {
+        "input_tokens": 745,
+        "output_tokens": 206,
+        "cost_usd": 0.001775
+      }
+    }
+  },
+  "records": [
+    {
+      "timestamp": "2026-08-18T15:13:30.612796",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Chaos",
+      "input_tokens": 721,
+      "output_tokens": 514,
+      "cost_usd": 0.003291
+    },
+    {
+      "timestamp": "2026-08-18T15:14:12.231210",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Chaos",
+      "input_tokens": 4028,
+      "output_tokens": 2885,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T15:14:20.485245",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Chaos",
+      "input_tokens": 3733,
+      "output_tokens": 560,
+      "cost_usd": 0.006533
+    },
+    {
+      "timestamp": "2026-08-18T15:15:14.748893",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Chaos",
+      "input_tokens": 4533,
+      "output_tokens": 3543,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T15:15:22.255583",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Chaos",
+      "input_tokens": 3999,
+      "output_tokens": 503,
+      "cost_usd": 0.006514
+    },
+    {
+      "timestamp": "2026-08-18T15:16:26.271188",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Chaos",
+      "input_tokens": 4488,
+      "output_tokens": 4000,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T15:16:31.092027",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Chaos",
+      "input_tokens": 3844,
+      "output_tokens": 291,
+      "cost_usd": 0.005299
+    },
+    {
+      "timestamp": "2026-08-18T15:16:34.164588",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Chaos",
+      "input_tokens": 745,
+      "output_tokens": 206,
+      "cost_usd": 0.001775
+    }
+  ]
+}

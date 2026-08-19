@@ -1,0 +1,21 @@
+{
+  "company": "Ingka Ikea",
+  "deal_id": "50347229229",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Champion: Revised from 4/10 to 2/10 without documented contradictory evidence from recent call. The cumulative state shows calls_reviewed=1, making this the second call. The recent call summary contains no explicit statement contradicting Jelmer's prior engagement or internal advocacy behavior. Absence of new champion evidence in recent call does not constitute contradictory evidence requiring a score reduction. Maintain Champion at 4/10 with notation: 'No new information on champion behavior in this call \u2014 maintaining 4/10.' CRITERION 4 VIOLATION \u2014 Champion next step uses conditional phrasing without concrete commitment: 'Test Jelmer's champion potential \u2014 send business case one-pager by Friday, request distribution confirmation by following Wednesday' lacks specificity on the ask itself. Revise to: 'Jelmer \u2014 send business case one-pager by [date] with explicit request: \"Please share this with your procurement team and leadership and confirm by [date] whether you distributed it.\" Goal: measure whether Jelmer actively distributes internally.' CRITERION 3 VIOLATION \u2014 ICP Fit Assessment missing. Analysis does not include explicit ICP fit statement. Add: 'ICP Fit: [Status based on scale signal (16.5M MAU), modern data infrastructure (BigQuery mentioned), and stated experimentation priority (1,500-2,000 annual experiments target)].'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_ab90dbef_001",
+  "timestamp": "2026-08-18T17:51:50.089011"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_10778066_001",
+  "timestamp": "2026-08-18T15:24:43.966067",
+  "company": "Stone",
+  "criterion_fired": "Criterion 4 (Next Steps Specificity) + Criterion 3 (Call Summary Completeness) + Criterion 1 (Actionable Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 4 should distinguish between 'placeholder syntax [date]' (acceptable for template output) and 'vague verbs' (unacceptable). Criterion 3 should explicitly allow carry-forward when call data is corrupted/incomplete, with a flag that next steps require validation in next iteration. Criterion 1 should accept 'ask for champion identifier' as valid intermediate step (not require full conversion mechanism in same call)."
+}

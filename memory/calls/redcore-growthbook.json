@@ -1,0 +1,39 @@
+{
+  "company": "RedCore + GrowthBook",
+  "slug": "redcore-growthbook",
+  "last_etl_date": "2026-08-18T16:55:06.272847",
+  "calls": [
+    {
+      "id": "01KY2MN5HF2MQY4WTS9W8BSGGK",
+      "source": "fireflies",
+      "title": "RedCore + GrowthBook",
+      "date": "2026-07-23",
+      "duration_minutes": 4.059999942779541,
+      "summary": "",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "keywords": "",
+      "action_items": "",
+      "participant_domains": [
+        "redcore.group"
+      ],
+      "summary_quality": "empty"
+    },
+    {
+      "id": "01KYD9EVWWEFXQ60XMKWGQ2SB9",
+      "source": "fireflies",
+      "title": "RedCore + GrowthBook",
+      "date": "2026-07-27",
+      "duration_minutes": 4.860000133514404,
+      "summary": "",
+      "organizer": "christian@growthbook.io",
+      "participants": 3,
+      "keywords": "",
+      "action_items": "",
+      "participant_domains": [
+        "redcore.group"
+      ],
+      "summary_quality": "empty"
+    }
+  ]
+}

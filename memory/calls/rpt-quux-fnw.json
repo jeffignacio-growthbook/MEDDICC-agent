@@ -1,0 +1,20 @@
+{
+  "company": "rpt-quux-fnw",
+  "slug": "rpt-quux-fnw",
+  "last_etl_date": "2026-08-18T16:55:06.277520",
+  "calls": [
+    {
+      "id": "01KY5C5YEG95JN59PMTWEB8RY6",
+      "source": "fireflies",
+      "title": "rpt-quux-fnw",
+      "date": "2026-07-22",
+      "duration_minutes": 1,
+      "summary": "",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "keywords": "",
+      "action_items": "",
+      "summary_quality": "empty"
+    }
+  ]
+}

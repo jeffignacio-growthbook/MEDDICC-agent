@@ -1,0 +1,20 @@
+{
+  "company": "Scott | Andy",
+  "slug": "scott-andy",
+  "last_etl_date": "2026-08-18T16:55:06.172301",
+  "calls": [
+    {
+      "id": "01M0B7C4VW2TVS0WQVY9RYDSEQ",
+      "source": "fireflies",
+      "title": "Scott | Andy - Meet:Greet",
+      "date": "2026-08-18",
+      "duration_minutes": 31,
+      "summary": "Scott Keller discussed his move to Growth Book, seeking a healthier team culture and greater autonomy after negative experiences at previous companies marked by micromanagement. He praised Growth Book's leadership for fostering trust and support, which he believes are crucial for preventing burnout. Andy Marshall echoed these sentiments, noting that tech companies often prioritize processes over people, leading to high employee turnover despite initial gains. This conversation highlighted Scott's previous success in sales at Flock Safety, achieving significant quotas before facing territory cuts and privacy concerns. Additionally, they talked about the impact of AI tools like Claude on improving sales operations and onboarding efficiency, emphasizing the importance of a strong company culture and innovative products to attract talent. Personal stories underscored the significance of work-life balance. They concluded by planning further collaboration on account management strategies.",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "keywords": "Growth Book, startup culture, work-life balance, boating, Flock Safety, AI integration",
+      "action_items": "\n, *, *, S, c, o, t, t,  , K, e, l, l, e, r, *, *, \n, B, e,  , a, v, a, i, l, a, b, l, e,  , f, o, r,  , f, o, l, l, o, w, -, u, p,  , m, e, e, t, i, n, g, s,  , w, i, t, h,  , A, n, d, y,  , f, o, r,  , d, e, t, a, i, l, e, d,  , d, i, s, c, u, s, s, i, o, n, s,  , o, n,  , a, c, c, o, u, n, t,  , m, a, n, a, g, e, m, e, n, t,  , a, n, d,  , o, p, e, r, a, t, i, o, n, a, l,  , s, t, r, a, t, e, g, i, e, s,  , a, t,  , G, r, o, w, t, h,  , B, o, o, k,  , (, 2, 9, :, 5, 8, ), \n, \n, *, *, A, n, d, y,  , M, a, r, s, h, a, l, l, *, *, \n, S, c, h, e, d, u, l, e,  , a, d, d, i, t, i, o, n, a, l,  , m, e, e, t, i, n, g, s,  , w, i, t, h,  , S, c, o, t, t,  , n, e, x, t,  , w, e, e, k,  , t, o,  , d, i, v, e,  , i, n, t, o,  , G, r, o, w, t, h,  , B, o, o, k, ', s,  , a, c, c, o, u, n, t,  , m, a, n, a, g, e, m, e, n, t,  , a, n, d,  , o, p, e, r, a, t, i, o, n, a, l,  , d, e, t, a, i, l, s,  , (, 2, 9, :, 5, 8, ), \n",
+      "summary_quality": "good"
+    }
+  ]
+}

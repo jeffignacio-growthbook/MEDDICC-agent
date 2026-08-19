@@ -1,0 +1,20 @@
+{
+  "company": "Christian & Kris",
+  "slug": "christian-kris",
+  "last_etl_date": "2026-08-18T16:55:06.271719",
+  "calls": [
+    {
+      "id": "01KYDY20V7Q8SJWTM9M2X1VZCE",
+      "source": "fireflies",
+      "title": "Christian & Kris",
+      "date": "2026-07-27",
+      "duration_minutes": 4.460000038146973,
+      "summary": "",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "keywords": "",
+      "action_items": "",
+      "summary_quality": "empty"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "company": "InPost & GrowthBook",
+  "slug": "inpost-growthbook",
+  "last_etl_date": "2026-08-18T16:55:06.271198",
+  "calls": [
+    {
+      "id": "01KYF3N1Y970VYR4T4AACAAC8C",
+      "source": "fireflies",
+      "title": "InPost & GrowthBook Demo",
+      "date": "2026-07-28",
+      "duration_minutes": 62.52000045776367,
+      "summary": "The team discussed the need for a robust experimentation platform tailored for mobile applications, emphasizing mobile-focused A/B testing that evaluates backend recommendation models and frontend UI changes. They expressed interest in migrating from Firebase to GrowthBook for enhanced feature flag management and experimentation capabilities. Preventing experiment overlap and introducing attribute-based targeting were also key discussion points. Furthermore, the integration of data warehouses like Postgres and Databricks was highlighted, with a need for upfront setup of multiple metrics for efficient analysis. The GrowthBook SDK is designed for local evaluation and tracking, facilitating self-serve experimentation after initial engineering input. Finally, the strategic support structure and vision for scalable experimentation across industries were outlined.",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 17,
+      "keywords": "Feature Flags, Experimentation, Mobile Testing, Data Integration, GrowthBook, AI Assistant",
+      "action_items": "\n, *, *, A, n, i, t, a,  , K, r, a, s, i, ń, s, k, a, *, *, \n, D, i, s, c, u, s, s,  , G, r, o, w, t, h, B, o, o, k,  , p, r, o, p, o, s, a, l,  , i, n, t, e, r, n, a, l, l, y,  , a, n, d,  , p, r, o, v, i, d, e,  , f, e, e, d, b, a, c, k,  , b, y,  , e, n, d,  , o, f,  , t, h, e,  , w, e, e, k,  , (, 5, 9, :, 2, 4, ), \n, A, r, r, a, n, g, e,  , i, n, t, e, r, n, a, l,  , c, o, n, t, a, c, t,  , a, f, t, e, r,  , d, e, p, a, r, t, u, r, e,  , o, n,  , h, o, l, i, d, a, y,  , o, r,  , d, e, l, e, g, a, t, e,  , c, o, m, m, u, n, i, c, a, t, i, o, n,  , (, 5, 9, :, 3, 8, ), \n, \n, *, *, J, a, m, e, s,  , S, h, a, n, n, o, n, *, *, \n, S, h, a, r, e,  , m, e, e, t, i, n, g,  , r, e, c, o, r, d, i, n, g,  , a, n, d,  , t, r, a, n, s, c, r, i, p, t,  , w, i, t, h,  , I, n, P, o, s, t,  , t, e, a, m,  , (, 0, 1, :, 0, 8, ), \n, P, r, o, v, i, d, e,  , d, o, c, u, m, e, n, t, a, t, i, o, n,  , o, n,  , f, e, a, t, u, r, e,  , n, a, m, e, s, p, a, c, e, s,  , t, o,  , p, r, e, v, e, n, t,  , e, x, p, e, r, i, m, e, n, t,  , o, v, e, r, l, a, p,  , (, 2, 8, :, 2, 5, ), \n, S, u, p, p, o, r, t,  , I, n, P, o, s, t, ’, s,  , d, a, t, a,  , t, e, a, m,  , w, i, t, h,  , s, e, t, t, i, n, g,  , u, p,  , d, a, t, a,  , m, o, d, e, l, s,  , a, n, d,  , m, e, t, r, i, c, s,  , i, n,  , P, o, s, t, g, r, e, s, /, d, a, t, a, b, r, i, c, k, s,  , d, u, r, i, n, g,  , t, r, i, a, l,  , p, h, a, s, e,  , (, 5, 2, :, 2, 0, ), \n, P, r, o, v, i, d, e,  , f, r, e, e,  , t, r, i, a, l,  , a, c, c, e, s, s,  , t, o,  , G, r, o, w, t, h, B, o, o, k,  , a, n, d,  , a, s, s, i, s, t,  , w, i, t, h,  , i, m, p, l, e, m, e, n, t, a, t, i, o, n,  , a, n, d,  , o, n, b, o, a, r, d, i, n, g,  , i, f,  , I, n, P, o, s, t,  , d, e, c, i, d, e, s,  , t, o,  , p, r, o, c, e, e, d,  , (, 5, 8, :, 5, 0, ), \n, \n, *, *, U, n, a, s, s, i, g, n, e, d, *, *, \n, E, v, a, l, u, a, t, e,  , G, r, o, w, t, h, B, o, o, k, ’, s,  , f, i, t,  , d, u, r, i, n, g,  , t, r, i, a, l,  , p, e, r, i, o, d,  , u, s, i, n, g,  , d, e, m, o,  , a, n, d,  , s, h, a, r, e, d,  , m, a, t, e, r, i, a, l, s, ;,  , d, i, s, c, u, s, s,  , i, n, t, e, r, n, a, l, l, y,  , a, m, o, n, g,  , p, r, o, d, u, c, t, ,,  , e, n, g, i, n, e, e, r, i, n, g, ,,  , d, a, t, a, ,,  , a, n, d,  , m, a, r, k, e, t, i, n, g,  , t, e, a, m, s,  , (, 5, 5, :, 0, 0, ), \n",
+      "participant_domains": [
+        "inpost.pl"
+      ],
+      "summary_quality": "good"
+    }
+  ]
+}

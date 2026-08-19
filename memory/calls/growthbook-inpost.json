@@ -1,0 +1,23 @@
+{
+  "company": "GrowthBook & InPost",
+  "slug": "growthbook-inpost",
+  "last_etl_date": "2026-08-18T16:55:06.274634",
+  "calls": [
+    {
+      "id": "01KY4KKQRJRVANX4ESE7F34AED",
+      "source": "fireflies",
+      "title": "GrowthBook & InPost Catch Up",
+      "date": "2026-07-24",
+      "duration_minutes": 41.36000061035156,
+      "summary": "The team discussed the implementation of an experimentation platform, detailing technical and staffing needs such as a typical SDK setup time of 1-2 weeks, primarily requiring mobile engineers and backend only if specific experiments are planned. Data integration complexities were highlighted, emphasizing collaboration between engineering and data teams to ensure experiment event data pipelines function through PostgreSQL or Databricks. Pricing strategies were confirmed as tiered based on experiment volume, independent of user counts, with flexibility for upgrades. A proof of concept trial was proposed to secure stakeholder commitment, including a demo to familiarize relevant teams. Overall, a competitive edge was noted with Growthbook’s warehouse-native analytics and lightweight SDKs, aimed at addressing current tool inadequacies.",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "keywords": "GrowthBook, feature flags, A/B testing, implementation, pricing model, self-hosting",
+      "action_items": "\n, *, *, A, n, i, t, a,  , K, r, a, s, i, ń, s, k, a, *, *, \n, R, e, v, i, e, w,  , u, p, d, a, t, e, d,  , p, r, i, c, i, n, g,  , f, r, o, m,  , J, a, m, e, s,  , a, n, d,  , v, a, l, i, d, a, t, e,  , a, g, a, i, n, s, t,  , e, x, p, e, c, t, e, d,  , s, c, a, l, e,  , a, n, d,  , b, u, d, g, e, t, s,  , (, 3, 9, :, 4, 5, ), \n, C, o, o, r, d, i, n, a, t, e,  , a, n, d,  , n, o, t, i, f, y,  , r, e, l, e, v, a, n, t,  , s, t, a, k, e, h, o, l, d, e, r, s,  , a, b, o, u, t,  , s, c, h, e, d, u, l, i, n, g,  , t, h, e,  , G, r, o, w, t, h, B, o, o, k,  , p, r, o, d, u, c, t,  , d, e, m, o, n, s, t, r, a, t, i, o, n,  , (, 3, 8, :, 1, 0, ), \n, C, o, n, f, i, r, m,  , a, n, y,  , f, o, r, m, a, l,  , p, r, o, c, u, r, e, m, e, n, t,  , t, h, r, e, s, h, o, l, d, s,  , o, r,  , p, r, o, c, e, s, s, e, s,  , r, e, g, a, r, d, i, n, g,  , b, u, d, g, e, t, i, n, g,  , f, o, r,  , t, h, e,  , t, o, o, l,  , (, 0, 7, :, 2, 2, ), \n, \n, *, *, J, a, m, e, s,  , S, h, a, n, n, o, n, *, *, \n, S, e, n, d,  , d, e, t, a, i, l, e, d,  , a, n, s, w, e, r, s,  , t, o,  , t, h, e,  , t, e, c, h, n, i, c, a, l,  , a, n, d,  , c, o, m, m, e, r, c, i, a, l,  , q, u, e, s, t, i, o, n, s,  , s, u, b, m, i, t, t, e, d,  , b, y,  , I, n, P, o, s, t,  , t, e, a, m,  , (, 2, 3, :, 4, 0, ), \n, P, r, o, v, i, d, e,  , u, p, d, a, t, e, d, ,,  , s, c, a, l, e, -, a, d, j, u, s, t, e, d,  , p, r, i, c, i, n, g,  , r, e, f, l, e, c, t, i, n, g,  , I, n, P, o, s, t, ’, s,  , l, a, r, g, e,  , u, s, e, r,  , b, a, s, e,  , a, n, d,  , e, x, p, e, r, i, m, e, n, t,  , v, o, l, u, m, e,  , (, 3, 9, :, 4, 5, ), \n, O, r, g, a, n, i, z, e,  , a, n, d,  , s, c, h, e, d, u, l, e,  , t, h, e,  , p, r, o, d, u, c, t,  , d, e, m, o, n, s, t, r, a, t, i, o, n,  , s, e, s, s, i, o, n,  , w, i, t, h,  , I, n, P, o, s, t,  , s, t, a, k, e, h, o, l, d, e, r, s,  , (, 3, 7, :, 0, 0, ), \n, R, e, c, o, r, d,  , t, h, e,  , d, e, m, o, n, s, t, r, a, t, i, o, n,  , m, e, e, t, i, n, g,  , a, s,  , r, e, q, u, e, s, t, e, d,  , (, 3, 9, :, 3, 0, ), \n, \n, *, *, M, i, c, h, a, l,  , M, a, ń, k, o, *, *, \n, A, s, s, i, s, t,  , A, n, i, t, a,  , i, n,  , c, o, n, f, i, r, m, i, n, g,  , t, e, c, h, n, i, c, a, l,  , i, m, p, l, e, m, e, n, t, a, t, i, o, n,  , n, e, e, d, s, ,,  , e, s, p, e, c, i, a, l, l, y,  , i, n, v, o, l, v, i, n, g,  , m, o, b, i, l, e,  , e, n, g, i, n, e, e, r, s,  , a, n, d,  , b, a, c, k, e, n, d,  , i, n, v, o, l, v, e, m, e, n, t,  , i, f,  , a, n, y,  , (, 1, 6, :, 0, 0, ), \n, D, i, s, c, u, s, s,  , i, n, t, e, r, n, a, l,  , a, l, i, g, n, m, e, n, t,  , o, n,  , d, e, c, i, s, i, o, n, -, m, a, k, i, n, g,  , a, n, d,  , d, e, c, i, s, i, o, n,  , m, a, k, e, r, s,  , f, o, r,  , e, x, p, e, r, i, m, e, n, t, a, t, i, o, n,  , v, e, r, s, u, s,  , f, e, a, t, u, r, e,  , f, l, a, g, s,  , a, d, o, p, t, i, o, n,  , (, 3, 5, :, 3, 0, ), \n, C, o, o, r, d, i, n, a, t, e,  , w, i, t, h,  , M, i, c, h, a, e, l,  , B, i, a, v, a, s,  , t, o,  , p, a, r, t, i, c, i, p, a, t, e,  , i, n,  , u, p, c, o, m, i, n, g,  , m, e, e, t, i, n, g, s,  , a, n, d,  , d, e, m, o, n, s, t, r, a, t, i, o, n, s,  , (, 3, 8, :, 4, 0, ), \n",
+      "participant_domains": [
+        "inpost.pl"
+      ],
+      "summary_quality": "good"
+    }
+  ]
+}

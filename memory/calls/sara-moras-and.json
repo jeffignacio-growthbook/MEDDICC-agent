@@ -1,0 +1,24 @@
+{
+  "company": "Sara Moras and",
+  "slug": "sara-moras-and",
+  "last_etl_date": "2026-08-18T16:55:06.186656",
+  "calls": [
+    {
+      "id": "01KZRGNNATF7H3DTAWJ84RX0GS",
+      "source": "fireflies",
+      "title": "Sara Moras and Chris Sanders",
+      "date": "2026-08-18",
+      "duration_minutes": 39.2599983215332,
+      "summary": "The session detailed the ongoing setup of the Proof of Concept (POC) across multiple streams, with active leadership from Jean and Sara Cruz. The team confirmed the use of Growth Book’s cloud instance for scalability, though there are unclear processes regarding user account distribution. Hugo Soares reported ongoing experiments since June, but faced metric collection issues, particularly concerning purchase conversion rates due to missing purchase event data. Chris Sanders elaborated on tracking exposure events linked to experiments, and it was emphasized that additional training sessions are needed for better data analysis. Despite some technical and communication challenges, team members demonstrated competence in configuring SDKs and frameworks while committing to improved collaboration.",
+      "organizer": "chris@growthbook.io",
+      "participants": 4,
+      "keywords": "Growth Book, experimentation, proof of concept, POC, metrics collection, AA test, data warehouse",
+      "action_items": "\n, *, *, S, a, r, a,  , M, o, r, a, s, *, *, \n, S, c, h, e, d, u, l, e,  , t, h, e,  , G, r, o, w, t, h,  , B, o, o, k,  , e, x, p, e, r, i, m, e, n, t, a, t, i, o, n,  , s, e, s, s, i, o, n,  , f, o, r,  , r, e, l, e, v, a, n, t,  , t, e, a, m,  , m, e, m, b, e, r, s,  , i, n, c, l, u, d, i, n, g,  , d, e, v, e, l, o, p, e, r, s, ,,  , p, r, o, d, u, c, t,  , m, a, n, a, g, e, r, s, ,,  , a, n, d,  , d, a, t, a,  , s, c, i, e, n, t, i, s, t, s, ,,  , c, o, o, r, d, i, n, a, t, i, n, g,  , w, i, t, h,  , C, h, r, i, s,  , S, a, n, d, e, r, s,  , (, 2, 8, :, 2, 4, ), \n, \n, *, *, T, h, i, a, g, o,  , C, u, n, h, a, *, *, \n, P, r, o, v, i, d, e,  , s, u, p, p, o, r, t,  , o, r,  , c, o, n, t, a, c, t,  , a, s, s, i, s, t, a, n, c, e,  , a, s,  , n, e, e, d, e, d,  , a, f, t, e, r,  , l, e, a, v, i, n, g,  , t, h, e,  , c, a, l, l,  , d, u, e,  , t, o,  , a, n, o, t, h, e, r,  , m, e, e, t, i, n, g,  , (, 3, 0, :, 2, 7, ), \n, \n, *, *, C, h, r, i, s,  , S, a, n, d, e, r, s, *, *, \n, I, n, v, e, s, t, i, g, a, t, e,  , a, n, d,  , r, e, s, o, l, v, e,  , a, c, c, e, s, s,  , i, s, s, u, e, s,  , o, n,  , t, h, e,  , M, i, c, r, o, s, o, f, t,  , T, e, a, m, s,  , G, r, o, w, t, h,  , B, o, o, k,  , c, h, a, n, n, e, l,  , a, n, d,  , c, o, o, r, d, i, n, a, t, e,  , S, l, a, c, k,  , i, n, t, e, g, r, a, t, i, o, n,  , a, n, d,  , s, u, p, p, o, r, t,  , a, c, c, e, s, s,  , f, o, r,  , t, h, e,  , t, e, a, m,  , (, 2, 7, :, 3, 1, ), \n, S, e, n, d,  , s, c, h, e, d, u, l, i, n, g,  , l, i, n, k,  , t, o,  , S, a, r, a,  , M, o, r, a, s,  , t, o,  , o, r, g, a, n, i, z, e,  , t, h, e,  , u, p, c, o, m, i, n, g,  , G, r, o, w, t, h,  , B, o, o, k,  , e, x, p, e, r, i, m, e, n, t, a, t, i, o, n,  , s, e, s, s, i, o, n,  , (, 3, 7, :, 0, 0, ), \n, \n, *, *, H, u, g, o,  , S, o, a, r, e, s, *, *, \n, E, x, p, l, o, r, e,  , d, o, c, u, m, e, n, t, a, t, i, o, n,  , f, o, r,  , a, d, v, a, n, c, e, d,  , G, r, o, w, t, h,  , B, o, o, k,  , i, n, t, e, g, r, a, t, i, o, n, s,  , s, u, c, h,  , a, s,  , M, C, P,  , s, e, r, v, e, r, ,,  , C, L, I, ,,  , a, n, d,  , w, e, b, h, o, o, k, s,  , t, o,  , e, n, h, a, n, c, e,  , u, s, a, g, e,  , (, 3, 6, :, 1, 8, ), \n, C, o, n, t, i, n, u, e,  , i, n, v, e, s, t, i, g, a, t, i, n, g,  , m, i, s, s, i, n, g,  , p, u, r, c, h, a, s, e,  , e, v, e, n, t, s,  , d, a, t, a,  , i, n,  , t, h, e,  , m, a, n, a, g, e, d,  , w, a, r, e, h, o, u, s, e,  , a, n, d,  , v, e, r, i, f, y,  , c, o, r, r, e, c, t,  , m, e, t, r, i, c,  , q, u, e, r, y, i, n, g,  , t, o,  , r, e, s, o, l, v, e,  , d, a, t, a,  , i, s, s, u, e, s,  , (, 2, 3, :, 1, 9, ), \n",
+      "participant_domains": [
+        "mc.pt",
+        "parceiro.mc.pt"
+      ],
+      "summary_quality": "good"
+    }
+  ]
+}

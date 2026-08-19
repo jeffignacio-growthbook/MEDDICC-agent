@@ -1,0 +1,21 @@
+{
+  "company": "Stone",
+  "deal_id": "53500422798",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 4,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 4 violation: Next steps contain vague verbs without specific actions. Examples: 'Schedule a technical validation call with Newton Calegari by [specific date]' uses placeholder '[specific date]' instead of concrete date. 'Confirm GrowthBook's warehouse\u2011native approach integrates' is vague\u2014needs specific technical question or test criteria. 'Ask Newton Calegari by [date]: \"Name the most engaged PM in your pilot...\" and request they present results' lacks specificity on how to convert pilot participant to internal champion (no concrete internal selling behavior requested). Criterion 3 violation: Recent call summary is incomplete ('b' fragment), yet analysis claims 'maintained at [score]' for all components citing 'no new information in this call.' This is internally inconsistent\u2014if the call data is corrupted/incomplete, the analysis should flag this rather than claim carry-forward validity. Criterion 1 violation: All components have status and score, but Economic Buyer (score 1/10, Unknown) and Champion (score 4/10, Partial) lack actionable next steps that meet specificity requirements. Economic Buyer next step is: 'Schedule a 15\u2011minute call...Ask: \"For a $250K/year investment, who holds final budget approval...\"'\u2014acceptable structure but needs concrete date. Champion next step asks to 'Name the most engaged PM' but provides no follow-up mechanism to convert that person into an active internal advocate (evidence of internal selling). Criterion 2: Carry-forward is applied despite cumulative_calls_context not being explicitly stated; analysis states '4 calls_reviewed' but the recent call summary is corrupted, making carry-forward claims unverifiable.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_a142caa3_001",
+  "timestamp": "2026-08-18T15:24:43.963650"
+}

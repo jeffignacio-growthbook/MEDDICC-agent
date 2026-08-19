@@ -2055,15 +2055,40 @@ async def query_pre_call_brief(params: dict, sb) -> dict:
     deal_id = deal["deal_id"]
     company_name = deal["company_name"]
 
-    # 2. Latest MEDDICC analysis
+    # 2. Latest MEDDICC analysis — PASSED ONLY for trend integrity
     analyses = select_all(sb, "analyses",
         columns="overall_score,metrics_score,economic_buyer_score,"
                 "decision_criteria_score,decision_process_score,"
                 "pain_score,champion_score,competition_score,"
-                "analyzed_at,full_analysis_text",
+                "analyzed_at,passed,full_analysis_text",
         filters=[("eq", "deal_id", deal_id)])
-    analyses.sort(key=lambda x: x.get("analyzed_at", ""), reverse=True)
-    latest_analysis = analyses[0] if analyses else {}
+
+    # Trends and latest score must use passed analyses only
+    passed_analyses = [a for a in analyses if a.get("passed")]
+    passed_analyses.sort(key=lambda x: x.get("analyzed_at", ""), reverse=True)
+
+    # If no passed analysis exists, the deal has never been reliably scored
+    if not passed_analyses:
+        latest_analysis = {}
+        reliable_score = False
+        score_age_days = None
+        score_is_stale = False
+    else:
+        latest_analysis = passed_analyses[0]
+        reliable_score = True
+
+        # Staleness: flag if score is >21 days old
+        from datetime import datetime, timezone
+        analyzed_at_str = latest_analysis.get("analyzed_at", "")
+        if analyzed_at_str:
+            analyzed_at = datetime.fromisoformat(analyzed_at_str.replace('Z', '+00:00'))
+            score_age_days = (datetime.now(timezone.utc) - analyzed_at).days
+            score_is_stale = score_age_days > 21
+        else:
+            score_age_days = None
+            score_is_stale = False
+
+    recent_analyses = passed_analyses[:6]
 
     # 3. Identify weakest MEDDICC components
     COMPONENTS = {
@@ -2083,6 +2108,45 @@ async def query_pre_call_brief(params: dict, sb) -> dict:
     sorted_scores = sorted(scores.items(), key=lambda x: x[1])
     weakest = sorted_scores[:3] if sorted_scores else []
 
+    # Helper: compute trend across recent passed analyses (per-call framing)
+    def _compute_trend(component_field: str) -> dict:
+        """
+        Compute trend for a MEDDICC component across recent passed analyses.
+        Returns: {"direction": "improving"/"declining"/"stable", "span": "over 3 calls (Jan 5 - Feb 10)"}
+        """
+        values = [a.get(component_field) for a in recent_analyses if a.get(component_field) is not None]
+        if len(values) < 2:
+            return {"direction": "insufficient_data", "span": None}
+
+        # Compute trend: compare first half vs second half average
+        mid = len(values) // 2
+        recent_avg = sum(values[:mid]) / mid if mid > 0 else values[0]
+        older_avg = sum(values[mid:]) / len(values[mid:]) if len(values[mid:]) > 0 else values[-1]
+
+        if recent_avg > older_avg + 0.5:
+            direction = "improving"
+        elif recent_avg < older_avg - 0.5:
+            direction = "declining"
+        else:
+            direction = "stable"
+
+        # Date span from oldest to newest analysis
+        dates = [a.get("analyzed_at", "")[:10] for a in recent_analyses if a.get("analyzed_at")]
+        if len(dates) >= 2:
+            span = f"over {len(recent_analyses)} calls ({dates[-1]} to {dates[0]})"
+        else:
+            span = f"over {len(recent_analyses)} calls"
+
+        return {"direction": direction, "span": span}
+
+    # Compute trends for weakest components
+    trends = {}
+    if reliable_score:
+        for component_label, _ in weakest[:3]:
+            field_name = [k for k, v in COMPONENTS.items() if v == component_label]
+            if field_name:
+                trends[component_label] = _compute_trend(field_name[0])
+
     # 4. Last 2 call summaries
     calls = select_all(sb, "calls",
         columns="call_id,call_date,source,summary,title",
@@ -2099,11 +2163,16 @@ async def query_pre_call_brief(params: dict, sb) -> dict:
         if c.get("summary") and not c["summary"].startswith("[Summary failed]")
     ]
 
-    # 5. Open objections for this deal
+    # 5. Open objections for this deal (open = no rep_response)
     objections = select_all(sb, "objections",
         columns="category,verbatim_quote,rep_response,stage_when_raised",
         filters=[("eq", "company_name", company_name)])
     open_objections = [o for o in objections if not o.get("rep_response")]
+
+    # Recurring objection categories (open objections only)
+    from collections import Counter
+    open_categories = [o.get("category") for o in open_objections if o.get("category")]
+    recurring_objections = [cat for cat, count in Counter(open_categories).items() if count >= 2]
 
     # 6. Feature gaps for this deal
     gaps = select_all(sb, "feature_gaps",
@@ -2188,14 +2257,19 @@ async def query_pre_call_brief(params: dict, sb) -> dict:
         "meddicc": {
             "overall_score": latest_analysis.get("overall_score"),
             "analyzed_at": (latest_analysis.get("analyzed_at") or "")[:10],
+            "reliable_score": reliable_score,
+            "score_age_days": score_age_days,
+            "score_is_stale": score_is_stale,
             "scores": scores,
             "weakest_components": [
                 {"component": label, "score": score}
                 for label, score in weakest
             ],
+            "trends": trends,
         },
         "recent_calls": recent_calls,
         "open_objections": open_objections,
+        "recurring_objections": recurring_objections,
         "blocker_type": blocker_type,
         "blockers_logged": blockers,
         "focus_questions": focus_questions,

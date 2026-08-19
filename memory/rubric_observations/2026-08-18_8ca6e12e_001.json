@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_8ca6e12e_001",
+  "timestamp": "2026-08-18T17:51:50.091135",
+  "company": "Ingka Ikea",
+  "criterion_fired": "Criterion 2 (Champion assessment) and Criterion 3 (ICP Fit)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit rule: 'Do not revise Champion/Stakeholder scores downward without documented contradictory evidence from the current call. Absence of information is not contradiction.' Also add: 'Criterion 3 requires explicit ICP Fit statement synthesizing company signals (scale, infrastructure, use case alignment) before next steps are defined.'"
+}

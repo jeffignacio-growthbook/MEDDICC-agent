@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_47368016_001",
+  "timestamp": "2026-08-18T17:34:59.024783",
+  "company": "ASI",
+  "criterion_fired": "Criterion 2, 3, 4, 5 (multiple)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Clarify carry-forward rule\u2014absence of contradictory evidence should explicitly permit score maintenance without mandatory notation. Criterion 3: Define ICP disqualifier threshold explicitly (e.g., 'feature-flag-only use case is a hard disqualifier') rather than requiring flagging as 'risk' when data is missing. Criterion 4: Permit relative deadlines and '[contact TBD]' patterns systematically across all iterations, not just first call. Criterion 5: Accept seller-authored call summaries as evidence source if dated; require named prospect OR date attribution, not both."
+}

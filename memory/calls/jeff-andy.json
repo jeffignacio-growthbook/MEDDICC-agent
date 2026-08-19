@@ -1,0 +1,20 @@
+{
+  "company": "Jeff | Andy",
+  "slug": "jeff-andy",
+  "last_etl_date": "2026-08-18T16:55:06.174767",
+  "calls": [
+    {
+      "id": "01M0AQ71N3GPDP8N6YV9PRRHHZ",
+      "source": "fireflies",
+      "title": "Jeff | Andy - Intros",
+      "date": "2026-08-18",
+      "duration_minutes": 31.809999465942383,
+      "summary": "Andy Marshall and Jeff Ignacio introduced themselves, outlining their extensive backgrounds and roles in revenue operations. The discussion highlighted the recently established renewal process, showing a strong growth rate with a Gross Revenue Retention (GRR) of 91% and Net Revenue Retention (NRR) of 111%. HubSpot is central for tracking renewals, though it involves manual deal creation with a notable demand for automation. An AI agent is being developed in Slack for sales queries, reflecting a push towards enhancing technology use. The meeting also identified challenges in becoming proactive about renewals and the need for better visibility into customer usage signals. Several next steps were established, including sharing the HubSpot dashboard and confirming book divisions between team members.",
+      "organizer": "andy.marshall@growthbook.io",
+      "participants": 2,
+      "keywords": "renewal process, HubSpot CRM, revenue operations, sales automation, AI integration, account expansion",
+      "action_items": "*, *, A, n, d, y,  , M, a, r, s, h, a, l, l, *, *,  ,  , \n, C, o, n, n, e, c, t,  , G, o, o, g, l, e,  , c, a, l, e, n, d, a, r,  , a, n, d,  , i, n, b, o, x,  , t, o,  , H, u, b, S, p, o, t,  , C, R, M,  , (, 0, 9, :, 5, 0, ),  ,  , \n, E, n, g, a, g, e,  , w, i, t, h,  , C, a, r, r, i, e,  , f, o, r,  , S, a, l, e, s,  , N, a, v, i, g, a, t, o, r,  , a, c, c, e, s, s,  , (, 3, 0, :, 2, 0, ),  ,  , \n, \n, *, *, J, e, f, f,  , I, g, n, a, c, i, o, *, *,  ,  , \n, S, h, a, r, e,  , H, u, b, S, p, o, t,  , f, i, l, t, e, r, e, d,  , v, i, e, w,  , f, o, r,  , r, e, n, e, w, a, l, s,  , (, 2, 0, :, 4, 0, ),  ,  , \n, C, h, e, c, k,  , A, n, d, y,  , M, a, r, s, h, a, l, l, ’, s,  , a, c, c, e, s, s,  , t, o,  , S, a, l, e, s,  , N, a, v, i, g, a, t, o, r,  , a, n, d,  , A, p, o, l, l, o,  , (, 3, 0, :, 2, 0, ),  ,  , \n, C, o, o, r, d, i, n, a, t, e,  , w, i, t, h,  , R, y, a, n,  , o, n,  , b, o, o, k,  , o, f,  , b, u, s, i, n, e, s, s,  , d, i, v, i, s, i, o, n,  , (, 3, 0, :, 3, 5, ),  ,  , \n, O, f, f, e, r,  , A, p, o, l, l, o,  , t, o, o, l,  , w, a, l, k, t, h, r, o, u, g, h,  , t, o,  , A, n, d, y,  , M, a, r, s, h, a, l, l,  , (, 3, 0, :, 2, 0, )",
+      "summary_quality": "good"
+    }
+  ]
+}

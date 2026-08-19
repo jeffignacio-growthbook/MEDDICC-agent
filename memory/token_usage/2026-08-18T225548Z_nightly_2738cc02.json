@@ -1,0 +1,107 @@
+{
+  "timestamp": "2026-08-18T22:55:48.334238+00:00",
+  "job": "nightly",
+  "run_id": "2738cc02",
+  "summary": {
+    "total_cost_usd": 0.015358,
+    "total_input_tokens": 22641,
+    "total_output_tokens": 10279,
+    "total_calls": 7,
+    "by_model": {
+      "accounts/fireworks/models/deepseek-v4-pro": {
+        "input_tokens": 12288,
+        "output_tokens": 9278,
+        "cost_usd": 0.0,
+        "calls": 3
+      },
+      "claude-haiku-4-5-20251001": {
+        "input_tokens": 10353,
+        "output_tokens": 1001,
+        "cost_usd": 0.015358,
+        "calls": 4
+      }
+    },
+    "by_role": {
+      "generator": {
+        "input_tokens": 12288,
+        "output_tokens": 9278,
+        "cost_usd": 0.0
+      },
+      "evaluator": {
+        "input_tokens": 9875,
+        "output_tokens": 889,
+        "cost_usd": 0.01432
+      },
+      "reflection": {
+        "input_tokens": 478,
+        "output_tokens": 112,
+        "cost_usd": 0.001038
+      }
+    }
+  },
+  "records": [
+    {
+      "timestamp": "2026-08-18T15:53:53.026068",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Airalo",
+      "input_tokens": 3830,
+      "output_tokens": 3142,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T15:53:58.825826",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Airalo",
+      "input_tokens": 3250,
+      "output_tokens": 375,
+      "cost_usd": 0.005125
+    },
+    {
+      "timestamp": "2026-08-18T15:54:41.674165",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Airalo",
+      "input_tokens": 4186,
+      "output_tokens": 2719,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T15:54:49.242150",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Airalo",
+      "input_tokens": 3041,
+      "output_tokens": 488,
+      "cost_usd": 0.005481
+    },
+    {
+      "timestamp": "2026-08-18T15:55:43.822251",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Airalo",
+      "input_tokens": 4272,
+      "output_tokens": 3417,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T15:55:44.614988",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Airalo",
+      "input_tokens": 3584,
+      "output_tokens": 26,
+      "cost_usd": 0.003714
+    },
+    {
+      "timestamp": "2026-08-18T15:55:46.269085",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Airalo",
+      "input_tokens": 478,
+      "output_tokens": 112,
+      "cost_usd": 0.001038
+    }
+  ]
+}

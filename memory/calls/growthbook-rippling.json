@@ -1,0 +1,23 @@
+{
+  "company": "GrowthBook <> Rippling",
+  "slug": "growthbook-rippling",
+  "last_etl_date": "2026-08-18T16:55:06.172808",
+  "calls": [
+    {
+      "id": "01M0646X368X9DD7ZPQTSYEXTC",
+      "source": "fireflies",
+      "title": "GrowthBook <> Rippling",
+      "date": "2026-08-18",
+      "duration_minutes": 86,
+      "summary": "The meeting detailed Rippling's capabilities in automating expense management, emphasizing receipt scanning, approval workflows, and compliance tracking tailored to company policies. Features include customizable spending rules restricting alcohol and capping daily food expenses, alongside integrated corporate card and travel booking functionalities that enforce company-wide policies. Rippling’s bill payment system enhances vendor management with automatic 1099 filing and visibility throughout the payment lifecycle. Jennifer raised concerns regarding the flat $11 per employee monthly fee relative to low usage rates compared to competitors like Expensify. Onboarding support was also discussed, showcasing Rippling's intent to provide a seamless transition from existing systems.",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 4,
+      "keywords": "expense management, bill payment, corporate cards, policy engine, travel booking, reimbursement automation",
+      "action_items": "\n, *, *, P, u, j, a,  , N, e, g, i, *, *, \n, S, e, n, d,  , J, e, n, n, i, f, e, r,  , f, o, l, l, o, w, -, u, p,  , i, n, f, o, r, m, a, t, i, o, n,  , a, n, d,  , p, r, o, d, u, c, t,  , l, i, t, e, r, a, t, u, r, e,  , r, e, g, a, r, d, i, n, g,  , R, i, p, p, l, i, n, g,  , S, p, e, n, d,  , a, n, d,  , b, i, l, l,  , p, a, y, m, e, n, t,  , m, o, d, u, l, e, s,  , (, 0, 1, :, 1, 5, :, 5, 0, ), \n, C, o, n, f, i, r, m,  , w, i, t, h,  , t, e, a, m,  , a, n, d,  , e, m, a, i, l,  , J, e, n, n, i, f, e, r,  , a, b, o, u, t,  , i, t, e, m, i, z, e, d,  , r, e, c, e, i, p, t,  , d, e, t, e, c, t, i, o, n,  , c, a, p, a, b, i, l, i, t, i, e, s,  , (, 0, 1, :, 1, 5, :, 4, 0, ), \n, S, u, b, m, i, t,  , i, n, t, e, r, n, a, l,  , p, r, i, c, i, n, g,  , d, i, s, c, o, u, n, t,  , r, e, q, u, e, s, t,  , r, e, g, a, r, d, i, n, g,  , $, 1, 1, /, u, s, e, r,  , f, e, e,  , t, o,  , f, i, n, a, n, c, e,  , t, e, a, m,  , a, n, d,  , p, r, o, p, o, s, e,  , o, p, t, i, o, n, s,  , a, l, i, g, n, e, d,  , t, o,  , J, e, n, n, i, f, e, r, ’, s,  , r, e, q, u, e, s, t,  , (, 0, 1, :, 0, 8, :, 5, 0, ), \n, S, c, h, e, d, u, l, e,  , f, o, l, l, o, w, -, u, p,  , c, a, l, l,  , w, i, t, h,  , J, e, n, n, i, f, e, r,  , o, n,  , A, u, g, u, s, t,  , 3, 1,  , a, t,  , 1, 1, :, 0, 0,  , A, M,  , P, T,  , /,  , 2, :, 0, 0,  , P, M,  , E, S, T,  , t, o,  , d, i, s, c, u, s, s,  , p, r, i, c, i, n, g,  , a, n, d,  , n, e, x, t,  , s, t, e, p, s,  , (, 0, 1, :, 1, 4, :, 3, 0, ), \n, \n, *, *, J, e, n, n, i, f, e, r,  , P, h, a, m, -, L, e, *, *, \n, R, e, v, i, e, w,  , a, d, d, i, t, i, o, n, a, l,  , m, a, t, e, r, i, a, l, s,  , f, r, o, m,  , R, i, p, p, l, i, n, g,  , a, n, d,  , d, i, s, c, u, s, s,  , i, n, t, e, r, n, a, l, l, y,  , w, i, t, h,  , f, i, n, a, n, c, e,  , a, n, d,  , m, a, n, a, g, e, m, e, n, t,  , t, e, a, m, s,  , (, 0, 1, :, 1, 5, :, 3, 0, ), \n, E, x, p, l, o, r, e,  , a, n, d,  , g, a, t, h, e, r,  , m, o, r, e,  , i, n, f, o, r, m, a, t, i, o, n,  , o, n,  , E, x, p, e, n, s, i, f, y,  , a, p, p,  , i, n, t, e, g, r, a, t, i, o, n,  , w, i, t, h, i, n,  , R, i, p, p, l, i, n, g,  , a, n, d,  , i, t, s,  , p, r, i, c, i, n, g,  , (, 0, 1, :, 0, 1, :, 2, 0, ), \n, P, r, e, p, a, r, e,  , f, o, r,  , f, o, l, l, o, w, -, u, p,  , m, e, e, t, i, n, g,  , a, t,  , e, n, d,  , o, f,  , A, u, g, u, s, t,  , a, n, d,  , e, v, a, l, u, a, t, e,  , p, r, i, c, i, n, g,  , o, f, f, e, r, s,  , (, 0, 1, :, 1, 4, :, 5, 0, ), \n",
+      "participant_domains": [
+        "rippling.com"
+      ],
+      "summary_quality": "good"
+    }
+  ]
+}

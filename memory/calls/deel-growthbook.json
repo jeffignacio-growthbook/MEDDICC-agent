@@ -1,0 +1,23 @@
+{
+  "company": "Deel + GrowthBook",
+  "slug": "deel-growthbook",
+  "last_etl_date": "2026-08-18T16:55:06.294493",
+  "calls": [
+    {
+      "id": "01KX3VYVE69RJ2ATCWYVFKHFHK",
+      "source": "fireflies",
+      "title": "Deel + GrowthBook",
+      "date": "2026-07-14",
+      "duration_minutes": 36.93000030517578,
+      "summary": "The discussion centered on adopting GrowthBook to replace Amplitude for unified analytics and improved experimentation performance. Dmitry emphasized the need to consolidate event data in Snowflake and improve self-service capabilities, as current performance issues with Amplitude's SDK hinder mobile app functionality. The meeting outlined expectations for doubling the volume of experiments while addressing funnel analytics, which will enhance revenue attribution. Pricing considerations for GrowthBook's enterprise model were reviewed, detailing a substantial annual fee and user costs while suggesting a preference for self-hosting. Technical integration with existing systems like Walker S and the necessary infrastructure were also discussed, setting the stage for a decision by the end of the quarter.",
+      "organizer": "christian@growthbook.io",
+      "participants": 3,
+      "keywords": "feature flags, experimentation, self-hosted, pricing model, performance, funnels",
+      "action_items": "\n, *, *, D, m, i, t, r, y,  , C, h, r, i, s, t, i, e, *, *, \n, F, i, n, a, l, i, z, e,  , a, n, d,  , s, e, n, d,  , p, r, o, p, o, s, a, l,  , t, o,  , l, e, a, d, e, r, s, h, i, p,  , f, o, r,  , G, r, o, w, t, h,  , B, o, o, k,  , a, d, o, p, t, i, o, n,  , b, y,  , e, n, d,  , o, f,  , w, e, e, k, ;,  , g, a, t, h, e, r,  , l, e, a, d, e, r, s, h, i, p,  , f, e, e, d, b, a, c, k,  , (, 3, 4, :, 3, 1, ), \n, E, v, a, l, u, a, t, e,  , G, r, o, w, t, h,  , B, o, o, k,  , e, n, t, e, r, p, r, i, s, e,  , s, e, l, f, -, h, o, s, t, e, d,  , t, r, i, a, l,  , f, o, r,  , P, r, o, o, f,  , o, f,  , C, o, n, c, e, p, t,  , (, P, O, C, ),  , (, 2, 7, :, 1, 5, ), \n, \n, *, *, C, h, r, i, s, t, i, a, n,  , L, i, e, b, e, n, o, w, *, *, \n, P, r, o, v, i, d, e,  , D, m, i, t, r, y,  , w, i, t, h,  , G, r, o, w, t, h,  , B, o, o, k,  , p, r, i, c, i, n, g,  , c, o, m, p, a, r, i, s, o, n,  , d, o, c, u, m, e, n, t,  , v, e, r, s, u, s,  , c, o, m, p, e, t, i, t, o, r, s,  , (, 2, 3, :, 3, 4, ), \n, P, r, o, v, i, s, i, o, n,  , G, r, o, w, t, h,  , B, o, o, k,  , e, n, t, e, r, p, r, i, s, e,  , s, e, l, f, -, h, o, s, t, e, d,  , l, i, c, e, n, s, e,  , k, e, y,  , a, n, d,  , s, e, n, d,  , t, o,  , D, m, i, t, r, y,  , (, 2, 7, :, 3, 5, ), \n, I, n, i, t, i, a, t, e,  , S, l, a, c, k,  , c, h, a, n, n, e, l,  , f, o, r,  , o, n, g, o, i, n, g,  , c, o, m, m, u, n, i, c, a, t, i, o, n,  , w, i, t, h,  , D, m, i, t, r, y,  , a, n, d,  , t, e, a, m,  , (, 3, 4, :, 0, 4, ), \n, S, c, h, e, d, u, l, e,  , f, o, l, l, o, w, -, u, p,  , m, e, e, t, i, n, g,  , w, i, t, h,  , D, m, i, t, r, y,  , f, o, r,  , M, o, n, d, a, y, ,,  , 2, 7, t, h,  , t, o,  , d, i, s, c, u, s, s,  , l, e, a, d, e, r, s, h, i, p,  , f, e, e, d, b, a, c, k,  , a, n, d,  , n, e, x, t,  , s, t, e, p, s,  , (, 3, 5, :, 3, 5, ), \n, \n, *, *, L, o, g, a, n,  , B, a, t, e, s, *, *, \n, S, h, a, r, e,  , d, o, c, u, m, e, n, t, a, t, i, o, n,  , o, n,  , G, r, o, w, t, h,  , B, o, o, k, ’, s,  , i, d, e, n, t, i, t, y,  , r, e, s, o, l, u, t, i, o, n,  , a, n, d,  , f, a, l, l, b, a, c, k,  , a, t, t, r, i, b, u, t, e, s,  , f, e, a, t, u, r, e,  , w, i, t, h,  , D, m, i, t, r, y,  , (, 2, 5, :, 2, 3, ), \n, S, u, p, p, o, r, t,  , D, m, i, t, r, y, ’, s,  , t, e, c, h, n, i, c, a, l,  , i, n, q, u, i, r, i, e, s,  , a, n, d,  , a, d, v, o, c, a, t, e,  , f, o, r,  , a, n, y,  , a, d, d, i, t, i, o, n, a, l,  , r, e, q, u, e, s, t, e, d,  , G, r, o, w, t, h,  , B, o, o, k,  , f, e, a, t, u, r, e, s,  , (, 2, 6, :, 1, 4, ), \n",
+      "participant_domains": [
+        "deel.com"
+      ],
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "company": "Fixter + Growthbook's",
+  "slug": "fixter-growthbook-s",
+  "last_etl_date": "2026-08-18T16:55:06.278078",
+  "calls": [
+    {
+      "id": "01KY0DPRW8G73B4DC4SHXK17PS",
+      "source": "fireflies",
+      "title": "Fixter + Growthbook's Visual Editor",
+      "date": "2026-07-22",
+      "duration_minutes": 17.729999542236328,
+      "summary": "The discussion highlighted several key areas, including experiment testing where a strikethrough feature was briefly tested and an HTML editing issue was resolved by reverting to previous changes. There were also concerns about A/B testing conflicts, with the Cameloon platform affecting HTML and styling. Challenges with pseudo-elements, particularly centering issues, were examined. The meeting covered selector issues, with a specific failure noted and a demonstration of manual element selection for bulleted lists. Furthermore, site performance was critiqued due to loading delays, with temporary fixes suggested. Finally, action items were assigned, with Fiona responsible for updating Christian and James for follow-up communication.",
+      "organizer": "alyssa@growthbook.io",
+      "participants": 5,
+      "keywords": "strikethrough, A/B testing, visual editor, pseudo-elements, HTML editing, promo display",
+      "action_items": "\n, *, *, F, i, o, n, a,  , N, e, m, a, t, b, a, k, h, s, h, *, *, \n, T, e, s, t,  , t, h, e,  , s, t, r, i, k, e, t, h, r, o, u, g, h,  , f, e, a, t, u, r, e,  , o, n,  , a,  , n, o, n, -, t, e, s, t,  , p, a, g, e,  , u, s, i, n, g,  , t, h, e,  , C, M, S,  , t, o,  , v, e, r, i, f, y,  , f, u, n, c, t, i, o, n, a, l, i, t, y,  , o, u, t, s, i, d, e,  , o, f,  , p, r, o, m, o,  , c, o, n, t, e, x, t, s,  , (, 0, 4, :, 2, 3, ), \n, T, r, y,  , t, h, e,  , l, i, v, e,  , p, s, e, u, d, o, -, e, l, e, m, e, n, t,  , f, i, x,  , i, m, p, l, e, m, e, n, t, e, d,  , b, y,  , G, r, a, h, a, m,  , t, o,  , a, d, d, r, e, s, s,  , s, t, y, l, i, n, g,  , i, s, s, u, e, s,  , w, i, t, h,  , b, u, l, l, e, t, s,  , a, n, d,  , o, t, h, e, r,  , p, s, e, u, d, o, -, e, l, e, m, e, n, t, s,  , (, 0, 7, :, 1, 5, ), \n, P, r, o, v, i, d, e,  , C, h, r, i, s, t, i, a, n,  , w, i, t, h,  , a,  , f, i, n, a, l,  , u, p, d, a, t, e,  , o, n,  , t, h, e,  , c, u, r, r, e, n, t,  , s, t, a, t, u, s,  , o, f,  , t, h, e,  , s, t, r, i, k, e, t, h, r, o, u, g, h,  , f, e, a, t, u, r, e,  , a, n, d,  , r, e, l, a, t, e, d,  , f, i, x, e, s,  , (, 1, 6, :, 2, 4, ), \n, \n, *, *, G, r, a, h, a, m,  , M, c, N, i, c, o, l, l, *, *, \n, A, d, d,  , t, h, e,  , a, b, i, l, i, t, y,  , t, o,  , a, p, p, l, y,  , s, t, r, i, k, e, t, h, r, o, u, g, h,  , f, o, r, m, a, t, t, i, n, g,  , w, i, t, h, i, n,  , t, h, e,  , s, y, s, t, e, m, ’, s,  , v, i, s, u, a, l,  , e, d, i, t, o, r,  , t, o,  , s, u, p, p, o, r, t,  , t, e, s, t, i, n, g,  , a, n, d,  , p, r, o, m, o,  , n, e, e, d, s,  , (, 0, 4, :, 3, 9, ), \n, D, e, m, o, n, s, t, r, a, t, e,  , a, n, d,  , e, x, p, l, a, i, n,  , t, h, e,  , u, s, e,  , o, f,  , a, d, v, a, n, c, e, d,  , s, e, l, e, c, t, o, r, s,  , f, o, r,  , t, a, r, g, e, t, i, n, g,  , p, s, e, u, d, o, -, e, l, e, m, e, n, t, s,  , i, n,  , s, t, y, l, i, n, g, ,,  , t, o,  , i, m, p, r, o, v, e,  , e, d, i, t, o, r,  , p, r, e, c, i, s, i, o, n,  , (, 1, 0, :, 2, 6, ), \n, F, o, l, l, o, w,  , u, p,  , o, n,  , i, s, s, u, e, s,  , r, e, l, a, t, e, d,  , t, o,  , a, b, s, o, l, u, t, e,  , p, o, s, i, t, i, o, n, i, n, g,  , c, o, n, f, l, i, c, t, s,  , b, e, t, w, e, e, n,  , C, S, S,  , p, s, e, u, d, o, -, e, l, e, m, e, n, t, s,  , a, n, d,  , t, h, e,  , v, i, s, u, a, l,  , e, d, i, t, o, r, ’, s,  , p, o, s, i, t, i, o, n, i, n, g,  , s, y, s, t, e, m,  , (, 1, 4, :, 5, 6, ), \n, \n, *, *, J, a, m, e, s,  , S, h, a, n, n, o, n, *, *, \n, F, o, l, l, o, w,  , u, p,  , w, i, t, h,  , F, i, o, n, a,  , v, i, a,  , e, m, a, i, l,  , t, o,  , c, o, o, r, d, i, n, a, t, e,  , u, p, d, a, t, e, s,  , a, n, d,  , n, e, x, t,  , s, t, e, p, s,  , r, e, g, a, r, d, i, n, g,  , t, h, e,  , s, t, r, i, k, e, t, h, r, o, u, g, h,  , f, e, a, t, u, r, e,  , a, n, d,  , e, d, i, t, o, r,  , f, i, x, e, s,  , (, 1, 6, :, 3, 3, ), \n",
+      "participant_domains": [
+        "fixter.co.uk"
+      ],
+      "summary_quality": "good"
+    }
+  ]
+}

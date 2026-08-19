@@ -1,0 +1,21 @@
+{
+  "company": "mountain",
+  "deal_id": "60868340629",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 6,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 4 (Actionable Next Steps) \u2014 FAIL: Economic Buyer next step lacks measurable outcome specificity. Current text: 'named individual confirmed as budget authority with a specific requirement or approval step identified before contract date' is vague. Required revision: specify the exact question outcome (e.g., 'Kirsa names [role/person] AND confirms [specific approval gate: CFO sign-off, budget committee review, etc.]'). Decision Process next step uses vague verb 'confirm' without concrete action: revise from 'confirm: Can we schedule...' to 'Schedule: Propose formal trial review meeting by August 25 with [Kirsa and Nick, plus [contact TBD] for final sign-off]: measured by booked calendar invite with all stakeholders attending.' Champion next step 'identification of all stakeholders' is incomplete without follow-up action; add: 'If stakeholders identified, then ask [name TBD] by August 25: [specific business case question \u2014 e.g., \"What would convince your [role] that GrowthBook reduces analysis time by 75%?\"]' to close Champion gap. Current format meets template but outcome metrics are not actionable enough for deal progression tracking.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-18_794b488e_001",
+  "timestamp": "2026-08-18T17:33:34.255117"
+}

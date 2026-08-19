@@ -1,0 +1,23 @@
+{
+  "company": "GrowthBook and Optym",
+  "slug": "growthbook-and-optym",
+  "last_etl_date": "2026-08-18T16:55:06.276614",
+  "calls": [
+    {
+      "id": "01KY5VSQRF8ESCGM4B73XKNTQN",
+      "source": "fireflies",
+      "title": "GrowthBook and Optym ",
+      "date": "2026-07-22",
+      "duration_minutes": 1,
+      "summary": "",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 3,
+      "keywords": "",
+      "action_items": "",
+      "participant_domains": [
+        "optym.com"
+      ],
+      "summary_quality": "empty"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "company": "bzo-wvfk-nah",
+  "slug": "bzo-wvfk-nah",
+  "last_etl_date": "2026-08-18T16:55:06.282173",
+  "calls": [
+    {
+      "id": "01KY0DWXE6F0H9H1NMH8GAN6J8",
+      "source": "fireflies",
+      "title": "bzo-wvfk-nah",
+      "date": "2026-07-20",
+      "duration_minutes": 1,
+      "summary": "",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "keywords": "",
+      "action_items": "",
+      "summary_quality": "empty"
+    }
+  ]
+}

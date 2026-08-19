@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-18_e7658d8f_001",
+  "timestamp": "2026-08-18T15:52:33.894212",
+  "company": "Chaos",
+  "criterion_fired": "CHAMPION (Criterion 2) and DECISION PROCESS (Criterion 4)",
+  "was_appropriate": false,
+  "suggested_change": "Add explicit carry-forward rules: 'If prior cumulative score > current call score, flag as regression and require explicit contradiction statement (e.g., \"Previous claim of internal advocacy was not validated\"). Regression without new contradictory evidence = analysis error, not legitimate downgrade.'"
+}

@@ -1,0 +1,23 @@
+{
+  "company": "GB x Condé",
+  "slug": "gb-x-cond",
+  "last_etl_date": "2026-08-18T16:55:06.272955",
+  "calls": [
+    {
+      "id": "01KYHW97QPV3K30ZCM5WTZRQ94",
+      "source": "fireflies",
+      "title": "GB x Condé - renewal discussion",
+      "date": "2026-07-27",
+      "duration_minutes": 1,
+      "summary": "",
+      "organizer": "cary@growthbook.io",
+      "participants": 3,
+      "keywords": "",
+      "action_items": "",
+      "participant_domains": [
+        "condenast.com"
+      ],
+      "summary_quality": "empty"
+    }
+  ]
+}

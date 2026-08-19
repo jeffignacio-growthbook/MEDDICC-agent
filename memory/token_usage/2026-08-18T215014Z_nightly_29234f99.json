@@ -1,0 +1,202 @@
+{
+  "timestamp": "2026-08-18T21:50:14.359764+00:00",
+  "job": "nightly",
+  "run_id": "29234f99",
+  "summary": {
+    "total_cost_usd": 0.026899,
+    "total_input_tokens": 38390,
+    "total_output_tokens": 9708,
+    "total_calls": 17,
+    "by_model": {
+      "claude-haiku-4-5-20251001": {
+        "input_tokens": 18394,
+        "output_tokens": 1701,
+        "cost_usd": 0.026899,
+        "calls": 12
+      },
+      "accounts/fireworks/models/deepseek-v4-pro": {
+        "input_tokens": 19996,
+        "output_tokens": 8007,
+        "cost_usd": 0.0,
+        "calls": 5
+      }
+    },
+    "by_role": {
+      "context_builder": {
+        "input_tokens": 1617,
+        "output_tokens": 1054,
+        "cost_usd": 0.006887
+      },
+      "generator": {
+        "input_tokens": 19996,
+        "output_tokens": 8007,
+        "cost_usd": 0.0
+      },
+      "evaluator": {
+        "input_tokens": 14387,
+        "output_tokens": 130,
+        "cost_usd": 0.015037
+      },
+      "reflection": {
+        "input_tokens": 2390,
+        "output_tokens": 517,
+        "cost_usd": 0.004975
+      }
+    }
+  },
+  "records": [
+    {
+      "timestamp": "2026-08-18T14:49:46.660833",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "Harper",
+      "input_tokens": 740,
+      "output_tokens": 518,
+      "cost_usd": 0.00333
+    },
+    {
+      "timestamp": "2026-08-18T14:49:48.084404",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "context_builder",
+      "company": "ASAPP",
+      "input_tokens": 877,
+      "output_tokens": 536,
+      "cost_usd": 0.003557
+    },
+    {
+      "timestamp": "2026-08-18T14:50:06.353183",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Purple",
+      "input_tokens": 3747,
+      "output_tokens": 1409,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T14:50:06.604944",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Whatnot",
+      "input_tokens": 5023,
+      "output_tokens": 1464,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T14:50:07.163278",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Purple",
+      "input_tokens": 2577,
+      "output_tokens": 26,
+      "cost_usd": 0.002707
+    },
+    {
+      "timestamp": "2026-08-18T14:50:07.375024",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Whatnot",
+      "input_tokens": 3954,
+      "output_tokens": 26,
+      "cost_usd": 0.004084
+    },
+    {
+      "timestamp": "2026-08-18T14:50:08.341680",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Purple",
+      "input_tokens": 478,
+      "output_tokens": 103,
+      "cost_usd": 0.000993
+    },
+    {
+      "timestamp": "2026-08-18T14:50:08.427808",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Whatnot",
+      "input_tokens": 478,
+      "output_tokens": 99,
+      "cost_usd": 0.000973
+    },
+    {
+      "timestamp": "2026-08-18T14:50:10.550618",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "USIM",
+      "input_tokens": 3747,
+      "output_tokens": 1758,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T14:50:10.823686",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Comcast",
+      "input_tokens": 3735,
+      "output_tokens": 1677,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T14:50:11.393794",
+      "model": "accounts/fireworks/models/deepseek-v4-pro",
+      "role": "generator",
+      "company": "Taxfix",
+      "input_tokens": 3744,
+      "output_tokens": 1699,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2026-08-18T14:50:11.555533",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "USIM",
+      "input_tokens": 2668,
+      "output_tokens": 26,
+      "cost_usd": 0.002798
+    },
+    {
+      "timestamp": "2026-08-18T14:50:11.579943",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Comcast",
+      "input_tokens": 2534,
+      "output_tokens": 26,
+      "cost_usd": 0.002664
+    },
+    {
+      "timestamp": "2026-08-18T14:50:12.327935",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "evaluator",
+      "company": "Taxfix",
+      "input_tokens": 2654,
+      "output_tokens": 26,
+      "cost_usd": 0.002784
+    },
+    {
+      "timestamp": "2026-08-18T14:50:12.669128",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "USIM",
+      "input_tokens": 478,
+      "output_tokens": 108,
+      "cost_usd": 0.001018
+    },
+    {
+      "timestamp": "2026-08-18T14:50:12.735360",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Comcast",
+      "input_tokens": 478,
+      "output_tokens": 104,
+      "cost_usd": 0.000998
+    },
+    {
+      "timestamp": "2026-08-18T14:50:13.442333",
+      "model": "claude-haiku-4-5-20251001",
+      "role": "reflection",
+      "company": "Taxfix",
+      "input_tokens": 478,
+      "output_tokens": 103,
+      "cost_usd": 0.000993
+    }
+  ]
+}
