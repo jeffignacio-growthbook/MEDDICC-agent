@@ -24,8 +24,6 @@ from typing import List, Dict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import agent components
-from fireflies_client import get_fireflies_client
-from apollo_client import get_apollo_client
 from hubspot_deals import get_hubspot_deals_client
 from context_builder import build_cumulative_meddicc
 from meddicc_agent import run_agent
@@ -291,14 +289,14 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer,
 
         all_summaries = []
         for call in all_calls_sorted:
+            # Calls from cache already have formatted summaries from ETL
             if 'formatted_summary' in call and call['formatted_summary']:
                 summary = call['formatted_summary']
             elif 'summary' in call and call['summary']:
                 summary = call['summary']
-            elif call.get('source') == 'fireflies':
-                summary = fireflies.format_summary_for_meddicc(call) if fireflies else ''
             else:
-                summary = apollo.format_conversation_for_meddicc(call) if apollo else ''
+                # No summary in cache - skip this call
+                continue
 
             if summary and summary.strip():
                 all_summaries.append((call.get('date', ''), summary))
@@ -532,22 +530,8 @@ def main():
     # Initialize clients
     print("\n1. Initializing API clients...")
 
-    # Load call tools config
-    client_config_path = REPO_ROOT / 'config' / 'client.yaml'
-    call_tools = {}
-    if client_config_path.exists():
-        with open(client_config_path) as f:
-            call_tools = yaml.safe_load(f).get('call_tools', {})
-
-    primary_tool = call_tools.get('primary', 'fireflies')
-    secondary_tool = call_tools.get('secondary', None)
-
-    fireflies = get_fireflies_client() if primary_tool == 'fireflies' \
-                or secondary_tool == 'fireflies' else None
-    apollo = get_apollo_client() if primary_tool == 'apollo' \
-             or secondary_tool == 'apollo' else None
-
-    print(f"Call tools: primary={primary_tool}, secondary={secondary_tool}")
+    # Nightly reads calls from cache (memory/calls/*.json), which already
+    # contains summaries from the ETL. No need to instantiate CI adapters.
 
     hubspot = get_hubspot_deals_client()
     memory = get_memory_manager()

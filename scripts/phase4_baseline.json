@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-08-19T06:49:23.623500",
+  "rows": [
+    {
+      "source": "apollo",
+      "call_count": 212,
+      "deals_with_calls": 100,
+      "failed_summaries": 0,
+      "empty_summaries": 60
+    },
+    {
+      "source": "fireflies",
+      "call_count": 788,
+      "deals_with_calls": 221,
+      "failed_summaries": 0,
+      "empty_summaries": 101
+    }
+  ]
+}

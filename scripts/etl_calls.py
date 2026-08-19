@@ -173,12 +173,20 @@ def get_call_adapter():
 
 
 def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: dict):
-    """Fetch new calls from configured call intelligence platform (Gong or Fireflies)."""
-    try:
-        adapter = get_call_adapter()
-        adapter_type = type(adapter).__name__
-    except Exception as e:
-        print(f"   ⚠️  Could not load call adapter: {e}")
+    """
+    Fetch new calls from configured call intelligence sources.
+
+    Uses source-agnostic factory to get all configured adapters,
+    fetches from each, deduplicates by source priority, and builds
+    call cache. No type-checks, no adapter_type branches.
+    """
+    # Get all configured call sources in priority order
+    from adapters import get_call_sources
+
+    adapters = get_call_sources()
+
+    if not adapters:
+        print("   ⚠️  No call source adapters available")
         return
 
     # Load internal domains from config for participant filtering
@@ -192,115 +200,95 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
         except Exception as e:
             print(f"   ⚠️  Could not load internal_domains from config: {e}")
 
-    platform_name = "Gong" if adapter_type == "GongAdapter" else "Fireflies"
-    print(f"\n🎙️  Fetching new {platform_name} calls since {since_date.strftime('%Y-%m-%d')}")
+    print(f"\n🎙️  Fetching new calls from {len(adapters)} source(s) since {since_date.strftime('%Y-%m-%d')}")
 
-    # Fetch calls in batches
-    skip = 0
-    limit = 50
+    # Fetch from all sources
+    all_calls = []  # list of NormalizedCall objects
+    MAX_FETCH = 1000  # safety limit per source
+
+    for adapter in adapters:
+        source_name = adapter.source_name
+        print(f"   📡 Fetching from {source_name}...")
+
+        skip = 0
+        limit = 50
+        source_calls = 0
+
+        while True:
+            try:
+                batch = adapter.fetch_recent(limit=limit, skip=skip, since=since_date)
+
+                if not batch:
+                    break
+
+                all_calls.extend(batch)
+                source_calls += len(batch)
+
+                if len(batch) < limit:
+                    break
+
+                skip += limit
+                if skip > MAX_FETCH:
+                    print(f"      Hit MAX_FETCH limit ({MAX_FETCH}), stopping")
+                    break
+
+            except Exception as e:
+                print(f"      ✗ Error fetching from {source_name}: {e}")
+                break
+
+        print(f"      Found {source_calls} calls from {source_name}")
+
+    print(f"   Total fetched: {len(all_calls)} calls")
+
+    # Deduplicate by source priority
+    deduped = deduplicate_calls_by_source_priority(all_calls)
+    print(f"   After dedup: {len(deduped)} calls")
+
+    # Convert NormalizedCall objects to cache format
     total_new = 0
 
-    while True:
+    for normalized_call in deduped:
+        # Parse call_date to date object
         try:
-            # Fireflies uses get_transcripts(), Gong uses get_calls()
-            if adapter_type == "GongAdapter":
-                batch = adapter.get_calls(limit=limit, skip=skip)
-            else:
-                batch = adapter.get_transcripts(limit=limit, skip=skip)
+            call_date = datetime.fromisoformat(normalized_call.call_date).date()
+        except:
+            continue
 
-            if not batch:
-                break
+        # Skip if before cutoff
+        if call_date <= since_date.date():
+            continue
 
-            for call in batch:
-                # Parse date (Gong uses 'started' ISO string, Fireflies uses 'date' ms timestamp)
-                if adapter_type == "GongAdapter":
-                    started_str = call.get('started')
-                    if not started_str:
-                        continue
-                    call_date_utc = datetime.fromisoformat(started_str.replace('Z', '+00:00'))
-                    if call_date_utc.tzinfo is None:
-                        call_date_utc = call_date_utc.replace(tzinfo=_stdlib_tz.utc)
-                    duration_minutes = round((call.get('duration') or 0) / 60, 1)
-                else:
-                    call_date_ms = call.get('date')
-                    if not call_date_ms:
-                        continue
-                    call_date_utc = datetime.fromtimestamp(call_date_ms / 1000, tz=_stdlib_tz.utc)
-                    duration_minutes = call.get('duration', 0)
+        # Extract company from title
+        company = extract_company_from_title(normalized_call.title)
+        slug = slugify(company)
 
-                # Convert to reporting timezone date for comparison and storage
-                call_date = utc_to_reporting_date(call_date_utc)
-                if call_date is None:
-                    continue
+        if slug not in calls_by_company:
+            calls_by_company[slug] = {
+                "company": company,
+                "slug": slug,
+                "calls": []
+            }
 
-                # Skip if before cutoff
-                if call_date <= since_date.date():
-                    continue
+        # Build cache-format call dict from NormalizedCall
+        call_dict = {
+            "id": normalized_call.source_call_id,
+            "source": normalized_call.source,
+            "title": normalized_call.title,
+            "date": normalized_call.call_date,
+            "duration_minutes": normalized_call.duration_minutes,
+            "summary": normalized_call.summary,
+            "organizer": normalized_call.participant_emails[0] if normalized_call.participant_emails else '',
+            "participants": normalized_call.participant_count,
+        }
 
-                # Extract company and add to dict
-                title = call.get('title', '')
-                company = extract_company_from_title(title)
-                slug = slugify(company)
+        # Add source-specific fields if available
+        # (keywords/action_items for fireflies, participant_domains for fireflies)
+        # These are in the summary text now, so we don't need separate fields
 
-                if slug not in calls_by_company:
-                    calls_by_company[slug] = {
-                        "company": company,
-                        "slug": slug,
-                        "calls": []
-                    }
+        calls_by_company[slug]["calls"].append(call_dict)
+        total_new += 1
 
-                # Build call dict (different fields for Gong vs Fireflies)
-                if adapter_type == "GongAdapter":
-                    # Use Gong's format_summary_for_meddicc for structured summary
-                    summary = adapter.format_summary_for_meddicc(call)
-                    calls_by_company[slug]["calls"].append({
-                        "id": call.get('id'),
-                        "source": "gong",
-                        "title": title,
-                        "date": call_date.isoformat(),
-                        "duration_minutes": duration_minutes,
-                        "summary": summary,
-                        "organizer": call.get('host', ''),
-                        "participants": len(call.get('parties', []) or [])
-                    })
-                else:
-                    # Fireflies format
-                    summary_dict = call.get('summary', {}) or {}
-
-                    # Extract external participant domains
-                    meeting_attendees = call.get('meeting_attendees', [])
-                    participant_domains = get_external_domains(meeting_attendees, internal_domains)
-
-                    call_dict = {
-                        "id": call.get('id'),
-                        "source": "fireflies",
-                        "title": title,
-                        "date": call_date.isoformat(),
-                        "duration_minutes": duration_minutes,
-                        "summary": summary_dict.get('short_summary', ''),
-                        "organizer": call.get('organizer_email', ''),
-                        "participants": len(call.get('participants', []) or []),
-                        "keywords": ', '.join(summary_dict.get('keywords', []) or []),
-                        "action_items": ', '.join(summary_dict.get('action_items', []) or [])
-                    }
-
-                    # Add participant_domains if any external domains found
-                    if participant_domains:
-                        call_dict["participant_domains"] = participant_domains
-
-                    calls_by_company[slug]["calls"].append(call_dict)
-
-                total_new += 1
-
-            if len(batch) < limit:
-                break
-            skip += limit
-
-        except Exception as e:
-            print(f"   ✗ Error fetching {platform_name} calls: {e}")
-            break
-
-    print(f"   Found {total_new} new {platform_name} calls")
+    print(f"   Added {total_new} new calls to cache")
 
 
 def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total_summarized: list):
@@ -649,6 +637,84 @@ def deduplicate_calls_prefer_fireflies(calls: list, slug: str) -> list:
         print(
             f"     ✂️  Deduplication removed {removed} calls "
             f"(Fireflies preferred over Apollo where both existed)"
+        )
+
+    return result
+
+
+def deduplicate_calls_by_source_priority(calls: list, priority: list = None) -> list:
+    """
+    Deduplicate calls by (title, date), preferring sources higher in priority list.
+
+    Args:
+        calls: List of NormalizedCall objects
+        priority: List of source names in priority order, e.g. ['fireflies', 'apollo'].
+                  If None, reads from config/client.yaml call_sources.priority.
+                  Defaults to ['fireflies', 'gong', 'apollo', 'unknown'] if not in config.
+
+    Returns:
+        Deduplicated list of NormalizedCall objects.
+
+    Priority list determines which source wins when multiple sources return calls
+    for the same deal on the same date. First in list = highest priority.
+
+    Example:
+        priority=['fireflies', 'apollo'] means Fireflies summaries preferred
+        over Apollo's when both exist for same call.
+    """
+    # Get priority from config if not provided
+    if priority is None:
+        from adapters import get_source_priority
+        priority = get_source_priority()
+
+    # Default priority if not in config
+    if not priority:
+        priority = ['fireflies', 'gong', 'apollo', 'unknown']
+
+    # Build priority map: source_name -> priority_rank (lower = higher priority)
+    priority_map = {source: idx for idx, source in enumerate(priority)}
+
+    # Group by (title, date)
+    seen = {}
+
+    for call in calls:
+        # Dedup key: lowercase title + date
+        title_lower = (call.title or "").lower()
+        call_date = call.call_date  # ISO YYYY-MM-DD
+        key = (title_lower, call_date)
+
+        if key not in seen:
+            seen[key] = call
+        else:
+            # Check priority
+            existing_source = seen[key].source
+            new_source = call.source
+
+            existing_priority = priority_map.get(existing_source, 999)
+            new_priority = priority_map.get(new_source, 999)
+
+            if new_priority < existing_priority:
+                # New call has higher priority source
+                print(
+                    f"     🔄 Dedup: Preferring {new_source} over {existing_source} "
+                    f"for '{call.title[:30]}...' on {call_date}"
+                )
+                seen[key] = call
+            elif new_priority == existing_priority:
+                # Same source — keep the one with longer summary
+                existing_summary = seen[key].summary or ""
+                new_summary = call.summary or ""
+                if len(new_summary) > len(existing_summary):
+                    seen[key] = call
+
+    result = list(seen.values())
+
+    # Log deduplication impact
+    removed = len(calls) - len(result)
+    if removed > 0:
+        print(
+            f"     ✂️  Deduplication removed {removed} calls "
+            f"(priority: {' > '.join(priority[:3])})"
         )
 
     return result

@@ -429,10 +429,124 @@ def test_factory_skips_unavailable_source_without_crashing():
     print(f"  Factory handles all error cases without crashing")
 
 
+def test_no_adapter_type_string_checks_remain():
+    """
+    Verify no adapter_type string checks remain in ETL or nightly.
+
+    Phase 4 removed all `adapter_type == "GongAdapter"` branches.
+    This test guards against regressions.
+    """
+    print("\n[TEST] No adapter_type string checks remain in ETL")
+
+    import pathlib
+
+    files_to_check = [
+        "scripts/etl_calls.py",
+        "scripts/run_nightly.py"
+    ]
+
+    violations = []
+
+    for file_path in files_to_check:
+        path = pathlib.Path(file_path)
+        if not path.exists():
+            continue
+
+        src = path.read_text()
+
+        # Check for adapter_type checks
+        if 'adapter_type ==' in src:
+            violations.append(f"{file_path}: found 'adapter_type ==' check")
+        if '== "GongAdapter"' in src:
+            violations.append(f"{file_path}: found '== \"GongAdapter\"' check")
+        if 'type(adapter).__name__' in src:
+            violations.append(f"{file_path}: found 'type(adapter).__name__' check")
+
+    if violations:
+        raise AssertionError(
+            f"Found {len(violations)} adapter type-check violations:\n" +
+            "\n".join(f"  - {v}" for v in violations)
+        )
+
+    print(f"  ✓ No adapter type checks found in {len(files_to_check)} files")
+    print(f"    Checked: {', '.join(files_to_check)}")
+
+
+def test_dedup_priority_from_config():
+    """
+    Verify dedup priority comes from config, not hardcoded.
+
+    priority=['gong','fireflies'] makes Gong win over Fireflies.
+    Default priority is ['fireflies', 'gong', 'apollo', 'unknown'].
+    """
+    print("\n[TEST] Dedup priority driven from config")
+
+    import os
+    from adapters.call_source import NormalizedCall
+    from etl_calls import deduplicate_calls_by_source_priority
+
+    # Create duplicate calls (same title, same date, different sources)
+    call_gong = NormalizedCall(
+        source='gong',
+        source_call_id='gong-1',
+        title='Discovery Call - Acme Corp',
+        call_date='2026-08-15',
+        summary='Gong summary (200 chars)' + 'x' * 180,
+        duration_minutes=30,
+        participant_emails=['user@acme.com'],
+        participant_count=1
+    )
+
+    call_fireflies = NormalizedCall(
+        source='fireflies',
+        source_call_id='ff-1',
+        title='Discovery Call - Acme Corp',  # Same title
+        call_date='2026-08-15',  # Same date
+        summary='Fireflies summary (100 chars)' + 'x' * 75,
+        duration_minutes=30,
+        participant_emails=['user@acme.com'],
+        participant_count=1
+    )
+
+    # Test 1: Default priority (fireflies > gong)
+    calls = [call_gong, call_fireflies]
+    deduped = deduplicate_calls_by_source_priority(calls)
+
+    assert len(deduped) == 1, f"Expected 1 call after dedup, got {len(deduped)}"
+    assert deduped[0].source == 'fireflies', \
+        f"Default priority should prefer fireflies, got {deduped[0].source}"
+    print(f"  ✓ Default priority: fireflies wins over gong")
+
+    # Test 2: Custom priority (gong > fireflies)
+    deduped = deduplicate_calls_by_source_priority(calls, priority=['gong', 'fireflies'])
+
+    assert len(deduped) == 1
+    assert deduped[0].source == 'gong', \
+        f"Custom priority=['gong', 'fireflies'] should prefer gong, got {deduped[0].source}"
+    print(f"  ✓ Custom priority: gong wins when specified first")
+
+
+def test_dedup_prefer_fireflies_alias_still_works():
+    """
+    Verify deduplicate_calls_prefer_fireflies still exists for backwards compat.
+
+    Phase 4c kept the old function as a deprecated alias for one release.
+    """
+    print("\n[TEST] deduplicate_calls_prefer_fireflies alias exists")
+
+    from etl_calls import deduplicate_calls_prefer_fireflies
+
+    # Just verify the function exists and is callable
+    assert callable(deduplicate_calls_prefer_fireflies), \
+        "deduplicate_calls_prefer_fireflies should exist for backwards compat"
+
+    print(f"  ✓ Deprecated alias exists (backwards compat)")
+
+
 def main():
     """Run all call adapter drift tests."""
     print("=" * 70)
-    print("CALL ADAPTER ABSTRACTION TESTS (Phase 3)")
+    print("CALL ADAPTER ABSTRACTION TESTS (Phase 4)")
     print("=" * 70)
 
     tests = [
@@ -443,6 +557,9 @@ def main():
         test_apollo_adapter_never_returns_summary_failed,
         test_factory_returns_adapters_in_priority_order,
         test_factory_skips_unavailable_source_without_crashing,
+        test_no_adapter_type_string_checks_remain,
+        test_dedup_priority_from_config,
+        test_dedup_prefer_fireflies_alias_still_works,
     ]
 
     passed = 0
