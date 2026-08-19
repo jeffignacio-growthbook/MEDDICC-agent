@@ -15,6 +15,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from supabase_client import select_all
 from sdr_utils import rate_or_gap, today_in_reporting_tz
 
+# Import field semantics (single source of truth for stage meanings)
+try:
+    from field_semantics import stage_bucket, stage_label, is_won, is_lost, is_open
+except ImportError:
+    from api.field_semantics import stage_bucket, stage_label, is_won, is_lost, is_open
+
 
 async def query_waterfall(params: dict, sb) -> dict:
     """
@@ -2186,24 +2192,9 @@ async def query_pre_call_brief(params: dict, sb) -> dict:
     blockers = [g for g in gaps if g.get("severity") == "blocker"]
 
     # 7. Generate stage-aware focus questions based on weak components
-    # Stage normalization: map HubSpot stages to discovery/scoping/proposal buckets
-    def _stage_bucket(stage_name: str) -> str:
-        """Normalize HubSpot stage to discovery/scoping/proposal."""
-        if not stage_name:
-            return "discovery"
-        stage_lower = stage_name.lower()
-        if any(k in stage_lower for k in ["discovery", "qualification", "initial", "intro"]):
-            return "discovery"
-        elif any(k in stage_lower for k in ["scoping", "technical", "evaluation", "demo", "pilot"]):
-            return "scoping"
-        elif any(k in stage_lower for k in ["proposal", "negotiat", "closing", "contracting", "final"]):
-            return "proposal"
-        else:
-            # Default to scoping for unknown stages
-            return "scoping"
-
+    # Use canonical stage bucket from field_semantics (single source of truth)
     current_stage = deal.get("stage", "")
-    stage_bucket = _stage_bucket(current_stage)
+    current_bucket = stage_bucket(current_stage)
 
     # Stage-aware questions: different questions for same component at different stages
     STAGE_COMPONENT_QUESTIONS = {
@@ -2322,7 +2313,7 @@ async def query_pre_call_brief(params: dict, sb) -> dict:
 
     # Select questions based on stage bucket
     focus_questions = []
-    stage_questions = STAGE_COMPONENT_QUESTIONS.get(stage_bucket, STAGE_COMPONENT_QUESTIONS["scoping"])
+    stage_questions = STAGE_COMPONENT_QUESTIONS.get(current_bucket, STAGE_COMPONENT_QUESTIONS["scoping"])
     for component_label, _ in weakest[:3]:
         qs = stage_questions.get(component_label, [])
         if qs:
@@ -2360,7 +2351,7 @@ async def query_pre_call_brief(params: dict, sb) -> dict:
         },
         "stage_context": {
             "current_stage": current_stage,
-            "stage_bucket": stage_bucket,
+            "stage_bucket": current_bucket,
         },
         "meddicc": {
             "overall_score": latest_analysis.get("overall_score"),

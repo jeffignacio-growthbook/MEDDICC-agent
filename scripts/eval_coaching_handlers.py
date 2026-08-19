@@ -1184,7 +1184,7 @@ def test_pre_call_brief_uses_stage_appropriate_questions():
             return [{
                 "deal_id": "deal_proposal",
                 "company_name": "ProposalCo",
-                "stage": "Proposal / Negotiating",  # Late stage
+                "stage": "presentationscheduled",  # Proposal stage (Tech Eval)
                 "arr_usd": 75000,
                 "owner_email": "rep@example.com",
                 "close_date": "2026-09-15",
@@ -1218,7 +1218,7 @@ def test_pre_call_brief_uses_stage_appropriate_questions():
             return [{
                 "deal_id": "deal_discovery",
                 "company_name": "DiscoveryCo",
-                "stage": "Discovery",  # Early stage
+                "stage": "appointmentscheduled",  # Discovery stage
                 "arr_usd": 60000,
                 "owner_email": "rep@example.com",
                 "close_date": "2026-10-15",
@@ -1416,6 +1416,118 @@ def test_pre_call_brief_shows_component_trends():
         handlers.select_all = original_select_all
 
 
+def test_handlers_use_canonical_stage_bucket():
+    """
+    query_pre_call_brief stage_context.stage_bucket for a 'presentationscheduled'
+    deal returns 'proposal', sourced from field_semantics, not an inline map.
+    """
+    print("\n[TEST] Handlers use canonical stage_bucket from field_semantics")
+
+    from unittest.mock import MagicMock
+    sb = MagicMock()
+
+    def select_all_mock(sb_client, table, columns="*", filters=None):
+        if table == "deals":
+            return [{
+                "deal_id": "deal_tech_eval",
+                "company_name": "TechEvalCo",
+                "stage": "presentationscheduled",  # Canonical stage ID
+                "arr_usd": 60000,
+                "owner_email": "rep@example.com",
+                "close_date": "2026-10-15",
+                "deal_status": "active"
+            }]
+        elif table == "analyses":
+            return [{
+                "deal_id": "deal_tech_eval",
+                "overall_score": 45,
+                "metrics_score": 6,
+                "economic_buyer_score": 6,
+                "decision_criteria_score": 6,
+                "decision_process_score": 6,
+                "pain_score": 7,
+                "champion_score": 4,
+                "competition_score": 6,
+                "analyzed_at": "2026-08-18T10:00:00Z",
+                "passed": True
+            }]
+        elif table == "calls":
+            return []
+        elif table == "objections":
+            return []
+        elif table == "feature_gaps":
+            return []
+        return []
+
+    import handlers
+    original_select_all = handlers.select_all
+    handlers.select_all = select_all_mock
+
+    try:
+        result = asyncio.run(query_pre_call_brief(
+            {"company": "TechEvalCo"},
+            sb
+        ))
+
+        # Verify stage_context exists and uses canonical bucket
+        stage_context = result.get("stage_context")
+        assert stage_context is not None, \
+            "Result should include stage_context"
+
+        assert stage_context["current_stage"] == "presentationscheduled", \
+            "Should preserve actual stage ID"
+
+        assert stage_context["stage_bucket"] == "proposal", \
+            f"presentationscheduled should resolve to 'proposal' bucket via field_semantics, got '{stage_context['stage_bucket']}'"
+
+        print("  ✓ presentationscheduled → proposal bucket (from field_semantics)")
+
+        # Also verify numeric alias resolution
+        # Test with closedwon numeric alias
+        def select_all_alias_mock(sb_client, table, columns="*", filters=None):
+            if table == "deals":
+                return [{
+                    "deal_id": "deal_won",
+                    "company_name": "WonCo",
+                    "stage": "1297321623",  # Numeric alias for closedwon
+                    "arr_usd": 80000,
+                    "owner_email": "rep@example.com",
+                    "close_date": "2026-09-01",
+                    "deal_status": "won"
+                }]
+            elif table == "analyses":
+                return [{
+                    "deal_id": "deal_won",
+                    "overall_score": 65,
+                    "metrics_score": 9,
+                    "economic_buyer_score": 9,
+                    "decision_criteria_score": 9,
+                    "decision_process_score": 9,
+                    "pain_score": 9,
+                    "champion_score": 10,
+                    "competition_score": 10,
+                    "analyzed_at": "2026-08-10T10:00:00Z",
+                    "passed": True
+                }]
+            return []
+
+        handlers.select_all = select_all_alias_mock
+
+        result_alias = asyncio.run(query_pre_call_brief(
+            {"company": "WonCo"},
+            sb
+        ))
+
+        stage_context_alias = result_alias.get("stage_context")
+        assert stage_context_alias["stage_bucket"] == "closed_won", \
+            f"Numeric alias '1297321623' should resolve to 'closed_won' bucket, got '{stage_context_alias['stage_bucket']}'"
+
+        print("  ✓ 1297321623 (closedwon alias) → closed_won bucket")
+
+    finally:
+        handlers.select_all = original_select_all
+
+
 def main():
     """Run all coaching handler tests."""
     print("=" * 70)
@@ -1441,6 +1553,7 @@ def main():
         test_handlers_share_gap_thresholds,
         test_pre_call_brief_uses_stage_appropriate_questions,
         test_pre_call_brief_shows_component_trends,
+        test_handlers_use_canonical_stage_bucket,
     ]
 
     passed = 0

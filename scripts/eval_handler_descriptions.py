@@ -28,7 +28,9 @@ def test_handler_descriptions_complete():
     KNOWN_NON_HANDLERS = {
         "Counter", "Path", "datetime", "timezone", "select_all",
         "timedelta", "date", "defaultdict", "get_supabase",
-        "rate_or_gap", "today_in_reporting_tz"
+        "rate_or_gap", "today_in_reporting_tz",
+        # field_semantics helper functions (not handlers)
+        "stage_bucket", "stage_label", "is_won", "is_lost", "is_open"
     }
 
     all_names = [name for name in dir(handlers) if not name.startswith('_')]
