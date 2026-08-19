@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Meetings ETL — HubSpot meetings with Fireflies-based held inference.
+Meetings ETL — HubSpot meetings with call recording-based held inference.
 
-Fetches scheduled meetings from HubSpot, matches them to Fireflies transcripts
-to determine which meetings were actually held, and writes to the meetings table.
+Fetches scheduled meetings from HubSpot, matches them to call recordings
+(from any source: Fireflies, Gong, Apollo) to determine which meetings
+were actually held, and writes to the meetings table.
 
 Usage:
   python etl_meetings.py --since 90d
@@ -44,7 +45,7 @@ _owner_cache = {}
 def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description='Fetch HubSpot meetings and match to Fireflies calls'
+        description='Fetch HubSpot meetings and match to call recordings'
     )
     parser.add_argument(
         '--since',
@@ -178,9 +179,12 @@ def fetch_hubspot_meetings(
     return date_filtered
 
 
-def match_fireflies(meeting: Dict, owner_email: str, sb) -> Dict | None:
+def match_call_recording(meeting: Dict, owner_email: str, sb) -> Dict | None:
     """
-    Try to find a Fireflies transcript matching this meeting.
+    Try to find a call recording matching this meeting.
+
+    Works with any conversation intelligence source (Fireflies, Gong, Apollo).
+    A call from ANY recorder confirms a meeting was held.
 
     Match strategy (in order):
     1. Date match: calls.call_date within ±1 day of meeting scheduled_at
@@ -289,7 +293,7 @@ def match_fireflies(meeting: Dict, owner_email: str, sb) -> Dict | None:
             return best_match
 
     except Exception as e:
-        print(f"  Warning: Fireflies match error: {e}")
+        print(f"  Warning: Call recording match error: {e}")
 
     return None
 
@@ -335,7 +339,7 @@ def extract_company_from_title(title: str) -> str | None:
 
 def determine_held_status(
     meeting: Dict,
-    fireflies_match: Dict | None,
+    call_match: Dict | None,
     hs_outcome: str | None
 ) -> tuple:
     """
@@ -346,7 +350,7 @@ def determine_held_status(
     Rules:
     - hs_outcome in ('COMPLETED', 'held') → True, 'hs_outcome'
     - hs_outcome in ('NO_SHOW', 'cancelled') → False, 'hs_outcome'
-    - fireflies_match found → True, 'fireflies_match'
+    - call_match found → True, 'call_recording_match'
     - meeting is in future → None, None
     - meeting is past + no signal → None, None (unknown, not assumed no-show)
     """
@@ -358,9 +362,9 @@ def determine_held_status(
         elif outcome_lower in ('no_show', 'no-show', 'cancelled', 'canceled'):
             return (False, 'hs_outcome')
 
-    # Check Fireflies match
-    if fireflies_match:
-        return (True, 'fireflies_match')
+    # Check call recording match
+    if call_match:
+        return (True, 'call_recording_match')
 
     # No signal: unknown
     # Conservative: don't assume no-show for past meetings without evidence
@@ -405,14 +409,14 @@ def main():
         print("\n✓ No meetings found in date range")
         return
 
-    # Match to Fireflies and determine held status
-    print(f"\nMatching to Fireflies transcripts...")
+    # Match to call recordings and determine held status
+    print(f"\nMatching to call recordings...")
 
     # Initialize Supabase for matching (needed even in dry-run)
     sb = SupabaseWriter().client
 
     enriched_meetings = []
-    fireflies_matches = 0
+    call_matches = 0
     hs_outcome_known = 0
     unknown_outcome = 0
 
@@ -426,17 +430,17 @@ def main():
 
         owner_email = resolve_owner_email(owner_id)
 
-        # Match to Fireflies if database available
-        fireflies_match = None
+        # Match to call recording if database available
+        call_match = None
         if sb and owner_email:
-            fireflies_match = match_fireflies(meeting, owner_email, sb)
+            call_match = match_call_recording(meeting, owner_email, sb)
 
         # Determine held status
-        held, confidence = determine_held_status(meeting, fireflies_match, hs_outcome)
+        held, confidence = determine_held_status(meeting, call_match, hs_outcome)
 
         # Track stats
-        if confidence == 'fireflies_match':
-            fireflies_matches += 1
+        if confidence == 'call_recording_match':
+            call_matches += 1
         elif confidence == 'hs_outcome':
             hs_outcome_known += 1
         else:
@@ -453,14 +457,14 @@ def main():
             'hs_meeting_outcome': hs_outcome,
             'held': held,
             'held_confidence': confidence,
-            'fireflies_call_id': fireflies_match.get('call_id') if fireflies_match else None,
-            'company_name': fireflies_match.get('company_name') if fireflies_match else None,
+            'call_recording_id': call_match.get('call_id') if call_match else None,
+            'company_name': call_match.get('company_name') if call_match else None,
         }
 
         enriched_meetings.append(enriched)
 
         if args.dry_run and i <= 10:
-            match_symbol = "✓" if fireflies_match else "✗"
+            match_symbol = "✓" if call_match else "✗"
             held_symbol = "HELD" if held else ("NO-SHOW" if held is False else "UNKNOWN")
             print(f"  {match_symbol} {start_time[:10]} | {title[:40]:40} | {held_symbol}")
 
@@ -469,7 +473,7 @@ def main():
     print("SUMMARY")
     print(f"{'='*80}")
     print(f"Total meetings:        {len(enriched_meetings)}")
-    print(f"Fireflies matches:     {fireflies_matches}  ({fireflies_matches/len(enriched_meetings)*100:.1f}%)")
+    print(f"Call recording matches: {call_matches}  ({call_matches/len(enriched_meetings)*100:.1f}%)")
     print(f"HubSpot outcome known: {hs_outcome_known}  ({hs_outcome_known/len(enriched_meetings)*100:.1f}%)")
     print(f"Unknown outcome:       {unknown_outcome}  ({unknown_outcome/len(enriched_meetings)*100:.1f}%)")
 

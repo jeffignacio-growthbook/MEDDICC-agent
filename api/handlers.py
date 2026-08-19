@@ -1113,11 +1113,11 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
         ]
     )
 
-    # Meetings breakdown: Fireflies can confirm held but not no-shows
+    # Meetings breakdown: Call recordings can confirm held but not no-shows
     booked = len(meetings_rows)
-    fireflies_confirmed = sum(1 for m in meetings_rows
+    call_recording_confirmed = sum(1 for m in meetings_rows
                               if m.get("held") is True
-                              and m.get("held_confidence") == "fireflies_match")
+                              and m.get("held_confidence") == "call_recording_match")
     hs_confirmed = sum(1 for m in meetings_rows
                        if m.get("held_confidence") == "hs_outcome")
     unknown_outcome = sum(1 for m in meetings_rows if m.get("held") is None)
@@ -1179,16 +1179,16 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
 
     meetings_summary = [
         {"label": "Meetings booked", "value": str(booked), "target": str(target_booked) if target_booked else None},
-        {"label": "Confirmed held (Fireflies)", "value": str(fireflies_confirmed)},
+        {"label": "Confirmed held (recording)", "value": str(call_recording_confirmed)},
         {"label": "Unknown outcome", "value": str(unknown_outcome),
          "note": "could be held, no-show, or cancelled"}
     ]
 
     # Show rate data gap message
     show_rate_gap_message = (
-        f"{fireflies_confirmed} meetings confirmed held via Fireflies. "
-        f"{unknown_outcome} meetings have unknown outcome — Fireflies "
-        f"absence doesn't confirm no-show. Show rate requires HubSpot "
+        f"{call_recording_confirmed} meetings confirmed held via call recording. "
+        f"{unknown_outcome} meetings have unknown outcome — absence of recording "
+        f"doesn't confirm no-show. Show rate requires HubSpot "
         f"outcome field to be populated."
     )
 
@@ -2495,7 +2495,7 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
             elif not last_call:
                 flags.append({
                     "type": "no_calls_recorded",
-                    "detail": "No calls in Fireflies — deal may be dark",
+                    "detail": "No call recordings found — deal may be dark",
                     "urgency": "medium",
                 })
 

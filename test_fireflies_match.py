@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test Fireflies matching logic."""
+"""Test call recording matching logic."""
 
 from pathlib import Path
 from dotenv import load_dotenv
@@ -22,7 +22,7 @@ test_meeting = {
 
 # Import extraction function
 sys.path.insert(0, str(Path.cwd() / 'scripts'))
-from etl_meetings import extract_company_from_title, match_fireflies
+from etl_meetings import extract_company_from_title, match_call_recording
 
 owner_email = 'jake.stangl@growthbook.io'
 
@@ -34,8 +34,8 @@ print(f"  Date: {test_meeting['properties']['hs_meeting_start_time'][:10]}")
 company = extract_company_from_title(test_meeting['properties']['hs_meeting_title'])
 print(f"\nExtracted company: '{company}'")
 
-# Test Fireflies match
-match = match_fireflies(test_meeting, owner_email, sb)
+# Test call recording match
+match = match_call_recording(test_meeting, owner_email, sb)
 
 if match:
     print(f"\n✓ Match found:")
