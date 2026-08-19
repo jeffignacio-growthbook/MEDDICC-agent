@@ -1,0 +1,58 @@
+# Field semantics — the single source of truth for what fields MEAN.
+# Client-specific. Frontera overrides this file; no code changes.
+#
+# stage_map: HubSpot stage IDs → canonical meaning + pipeline bucket.
+#   The bucket (discovery|scoping|proposal|closed) is what handlers
+#   reason about. The stage_id is what lives in the deals.stage column.
+
+stage_map:
+  appointmentscheduled:
+    label: "Discovery"
+    bucket: "discovery"
+    transition: "discovery_to_scoping"
+  qualifiedtobuy:
+    label: "Scoping"
+    bucket: "scoping"
+    transition: "scoping_to_proposal"
+  presentationscheduled:
+    label: "Technical Evaluation"
+    bucket: "proposal"
+    transition: "proposal_to_negotiating"
+  decisionmakerboughtin:
+    label: "Review"
+    bucket: "proposal"
+    transition: null
+  contractsent:
+    label: "Contract Sent"
+    bucket: "proposal"
+    transition: null
+  closedwon:
+    label: "Closed Won"
+    bucket: "closed_won"
+    transition: null
+    aliases: ["1297321623"]        # raw numeric IDs that also mean this
+  closedlost:
+    label: "Closed Lost"
+    bucket: "closed_lost"
+    transition: null
+    aliases: ["1297321624", "68509551"]   # includes Disqualified
+
+# Which buckets count as won / lost / open — derived, but stated once.
+outcome_buckets:
+  won: ["closed_won"]
+  lost: ["closed_lost"]
+  open: ["discovery", "scoping", "proposal"]
+
+# Field units and meanings the handlers depend on. Extend as needed.
+field_units:
+  arr_usd: "US dollars, annual recurring"
+  deal_value: "US dollars, total contract value"
+  duration_minutes: "minutes"
+  champion_score: "0-10 MEDDICC component"
+  economic_buyer_score: "0-10 MEDDICC component"
+  metrics_score: "0-10 MEDDICC component"
+  decision_criteria_score: "0-10 MEDDICC component"
+  decision_process_score: "0-10 MEDDICC component"
+  identify_pain_score: "0-10 MEDDICC component"
+  compelling_event_score: "0-10 MEDDICC component"
+  overall_score: "0-70 MEDDICC total"
