@@ -216,16 +216,19 @@ def test_unknown_stages_handled_gracefully():
 
 def test_no_raw_stage_ids_outside_field_semantics():
     """
-    Grep etl_deals.py, backfill_snapshots.py, handlers.py, schema_context.py,
-    stage_requirements.py for raw numeric stage IDs and hardcoded closedwon/closedlost
-    lists. The only file allowed to contain them is config/field_semantics.yaml and
-    the generated module.
+    Grep production files for raw numeric stage IDs and hardcoded stage mappings.
+    The only files allowed to contain them are:
+    - config/field_semantics.yaml (source of truth)
+    - api/field_semantics.py (generated module)
+    - scripts/generate_field_semantics.py (generator)
+    - scripts/reconcile_*.py, scripts/verify_*.py (reconciliation artifacts)
     """
     print("\n[TEST] No raw stage IDs outside field_semantics")
 
     import pathlib
 
-    banned = ["1297321623", "1297321624", "68509551"]
+    # Extended list: all known numeric stage IDs
+    banned = ["1297321623", "1297321624", "68509551", "79653122", "24682892", "43449439"]
     checked = [
         "scripts/etl_deals.py",
         "scripts/analytics/backfill_snapshots.py",

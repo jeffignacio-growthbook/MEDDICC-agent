@@ -2,17 +2,20 @@
 AUTO-GENERATED from config/field_semantics.yaml by scripts/generate_field_semantics.py.
 DO NOT EDIT BY HAND. Regenerate after changing the yaml.
 
-Generated: 2026-08-19 04:10:02 UTC
+Generated: 2026-08-19 05:34:55 UTC
 """
 
-STAGE_MAP = {'appointmentscheduled': {'label': 'Discovery', 'bucket': 'discovery', 'transition': 'discovery_to_scoping'}, 'qualifiedtobuy': {'label': 'Scoping', 'bucket': 'scoping', 'transition': 'scoping_to_proposal'}, 'presentationscheduled': {'label': 'Technical Evaluation', 'bucket': 'proposal', 'transition': 'proposal_to_negotiating'}, 'decisionmakerboughtin': {'label': 'Review', 'bucket': 'proposal', 'transition': None}, 'contractsent': {'label': 'Contract Sent', 'bucket': 'proposal', 'transition': None}, 'closedwon': {'label': 'Closed Won', 'bucket': 'closed_won', 'transition': None, 'aliases': ['1297321623']}, 'closedlost': {'label': 'Closed Lost', 'bucket': 'closed_lost', 'transition': None, 'aliases': ['1297321624', '68509551']}}
+STAGE_MAP = {'appointmentscheduled': {'label': 'Discovery', 'bucket': 'discovery', 'transition': 'discovery_to_scoping'}, 'qualifiedtobuy': {'label': 'Scoping', 'bucket': 'scoping', 'transition': 'scoping_to_proposal'}, 'presentationscheduled': {'label': 'Technical Evaluation', 'bucket': 'proposal', 'transition': 'proposal_to_negotiating'}, 'decisionmakerboughtin': {'label': 'Review', 'bucket': 'proposal', 'transition': None}, 'contractsent': {'label': 'Contract Sent', 'bucket': 'proposal', 'transition': None}, 'closedwon': {'label': 'Closed Won', 'bucket': 'closed_won', 'transition': None, 'aliases': ['1297321623']}, 'closedlost': {'label': 'Closed Lost', 'bucket': 'closed_lost', 'transition': None, 'aliases': ['1297321624', '68509551'], 'alias_labels': ['Disqualified']}, 79653122: {'label': 'Meeting Set', 'bucket': 'discovery', 'transition': None}, 24682892: {'label': 'Negotiating', 'bucket': 'proposal', 'transition': None}, 43449439: {'label': 'Awaiting Signature', 'bucket': 'proposal', 'transition': None}}
 
 OUTCOME_BUCKETS = {'won': ['closed_won'], 'lost': ['closed_lost'], 'open': ['discovery', 'scoping', 'proposal']}
 
 FIELD_UNITS = {'arr_usd': 'US dollars, annual recurring', 'deal_value': 'US dollars, total contract value', 'duration_minutes': 'minutes', 'champion_score': '0-10 MEDDICC component', 'economic_buyer_score': '0-10 MEDDICC component', 'metrics_score': '0-10 MEDDICC component', 'decision_criteria_score': '0-10 MEDDICC component', 'decision_process_score': '0-10 MEDDICC component', 'identify_pain_score': '0-10 MEDDICC component', 'compelling_event_score': '0-10 MEDDICC component', 'overall_score': '0-70 MEDDICC total'}
 
 # Reverse lookup: alias -> canonical stage_id
-_ALIAS_TO_CANONICAL = {'appointmentscheduled': 'appointmentscheduled', 'qualifiedtobuy': 'qualifiedtobuy', 'presentationscheduled': 'presentationscheduled', 'decisionmakerboughtin': 'decisionmakerboughtin', 'contractsent': 'contractsent', 'closedwon': 'closedwon', '1297321623': 'closedwon', 'closedlost': 'closedlost', '1297321624': 'closedlost', '68509551': 'closedlost'}
+_ALIAS_TO_CANONICAL = {'appointmentscheduled': 'appointmentscheduled', 'qualifiedtobuy': 'qualifiedtobuy', 'presentationscheduled': 'presentationscheduled', 'decisionmakerboughtin': 'decisionmakerboughtin', 'contractsent': 'contractsent', 'closedwon': 'closedwon', '1297321623': 'closedwon', 'closedlost': 'closedlost', '1297321624': 'closedlost', '68509551': 'closedlost', 79653122: 79653122, 24682892: 24682892, 43449439: 43449439}
+
+# Reverse lookup: display label -> stage_id (for CSV imports with display names)
+_LABEL_TO_STAGE_ID = {'Discovery': 'appointmentscheduled', 'Scoping': 'qualifiedtobuy', 'Technical Evaluation': 'presentationscheduled', 'Review': 'decisionmakerboughtin', 'Contract Sent': 'contractsent', 'Closed Won': 'closedwon', 'Closed Lost': 'closedlost', 'Disqualified': 'closedlost', 'Meeting Set': 79653122, 'Negotiating': 24682892, 'Awaiting Signature': 43449439}
 
 def canonical_stage(stage_id: str) -> str:
     """
@@ -128,3 +131,20 @@ def stage_transition(stage_id: str) -> str | None:
     if not stage_info:
         return None
     return stage_info.get('transition')
+
+def label_to_stage_id(display_label: str) -> str:
+    """
+    Convert a display label to its stage ID.
+    Used for CSV imports that return display names instead of stage IDs.
+
+    Returns the input unchanged if not found (allowing passthrough for already-canonical IDs).
+
+    Examples:
+        label_to_stage_id('Closed Won') -> 'closedwon'
+        label_to_stage_id('Disqualified') -> '68509551'
+        label_to_stage_id('Discovery') -> 'appointmentscheduled'
+        label_to_stage_id('appointmentscheduled') -> 'appointmentscheduled'  # passthrough
+    """
+    if not display_label:
+        return display_label
+    return _LABEL_TO_STAGE_ID.get(display_label, display_label)

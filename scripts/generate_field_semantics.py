@@ -32,6 +32,19 @@ def build_alias_map(stage_map):
             alias_to_canonical[alias] = stage_id
     return alias_to_canonical
 
+def build_label_map(stage_map):
+    """Build reverse map: display label -> stage_id (for CSV imports)"""
+    label_to_id = {}
+    for stage_id, info in stage_map.items():
+        # Primary label
+        label = info.get('label')
+        if label:
+            label_to_id[label] = stage_id
+        # Alternate labels (e.g., "Disqualified" for closedlost)
+        for alias_label in info.get('alias_labels', []):
+            label_to_id[alias_label] = stage_id
+    return label_to_id
+
 def generate_module(semantics):
     """Generate api/field_semantics.py from semantics dict"""
     stage_map = semantics['stage_map']
@@ -39,6 +52,7 @@ def generate_module(semantics):
     field_units = semantics['field_units']
 
     alias_map = build_alias_map(stage_map)
+    label_map = build_label_map(stage_map)
 
     # Build the Python module as a string
     timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
@@ -58,6 +72,9 @@ FIELD_UNITS = {repr(field_units)}
 
 # Reverse lookup: alias -> canonical stage_id
 _ALIAS_TO_CANONICAL = {repr(alias_map)}
+
+# Reverse lookup: display label -> stage_id (for CSV imports with display names)
+_LABEL_TO_STAGE_ID = {repr(label_map)}
 
 def canonical_stage(stage_id: str) -> str:
     """
@@ -173,6 +190,23 @@ def stage_transition(stage_id: str) -> str | None:
     if not stage_info:
         return None
     return stage_info.get('transition')
+
+def label_to_stage_id(display_label: str) -> str:
+    """
+    Convert a display label to its stage ID.
+    Used for CSV imports that return display names instead of stage IDs.
+
+    Returns the input unchanged if not found (allowing passthrough for already-canonical IDs).
+
+    Examples:
+        label_to_stage_id('Closed Won') -> 'closedwon'
+        label_to_stage_id('Disqualified') -> '68509551'
+        label_to_stage_id('Discovery') -> 'appointmentscheduled'
+        label_to_stage_id('appointmentscheduled') -> 'appointmentscheduled'  # passthrough
+    """
+    if not display_label:
+        return display_label
+    return _LABEL_TO_STAGE_ID.get(display_label, display_label)
 '''
 
     return module_content

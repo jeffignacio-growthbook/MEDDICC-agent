@@ -60,7 +60,7 @@ def get_requirements_for_stage(stage_id: str) -> Dict[str, int]:
     - discovery_to_scoping: from appointmentscheduled (Discovery)
     - scoping_to_proposal: from qualifiedtobuy (Scoping)
     - proposal_to_negotiating: from presentationscheduled (Tech Eval)
-    - negotiating_to_closed_won: from 24682892 (Negotiating)
+    - negotiating_to_closed_won: from Negotiating stage
     """
     config = _load_config()
     stage_prog = config.get("stage_progression", {})

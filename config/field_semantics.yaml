@@ -36,6 +36,20 @@ stage_map:
     bucket: "closed_lost"
     transition: null
     aliases: ["1297321624", "68509551"]   # includes Disqualified
+    alias_labels: ["Disqualified"]  # alternate display names
+  # Historical/deprecated stages (may appear in CSV exports or old data)
+  79653122:
+    label: "Meeting Set"
+    bucket: "discovery"
+    transition: null
+  24682892:
+    label: "Negotiating"
+    bucket: "proposal"
+    transition: null
+  43449439:
+    label: "Awaiting Signature"
+    bucket: "proposal"
+    transition: null
 
 # Which buckets count as won / lost / open — derived, but stated once.
 outcome_buckets:

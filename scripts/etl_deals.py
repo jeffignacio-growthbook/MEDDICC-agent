@@ -25,9 +25,9 @@ sys.path.insert(0, str(REPO_ROOT / 'api'))
 from utils import slugify
 # Import field_semantics for canonical stage logic
 try:
-    from field_semantics import is_won, is_lost, STAGE_MAP
+    from field_semantics import is_won, is_lost, STAGE_MAP, label_to_stage_id
 except ImportError:
-    from api.field_semantics import is_won, is_lost, STAGE_MAP
+    from api.field_semantics import is_won, is_lost, STAGE_MAP, label_to_stage_id
 
 def _get_won_stage_ids():
     """Get all stage IDs (including aliases) that mean closed won."""
@@ -55,14 +55,15 @@ EXCLUDED_PIPELINES = ['renewal', '866608541']
 # Disqualified stages now discovered from HubSpot metadata (no hardcoded fallback)
 # See field_semantics.yaml for stage aliases
 
-# Exclude Meeting Set stages (always filter these out in active mode)
-# '79653122' = Meeting Set (numeric ID)
-# NOTE: 'appointmentscheduled' is Discovery stage, NOT Meeting Set - do not exclude
-MEETING_SET_STAGES = ['79653122']
-
 # NOTE: Closed stage logic now sourced from field_semantics (handles aliases automatically)
 # CLOSED_WON_STAGES and CLOSED_LOST_STAGES removed - use is_won/is_lost instead
+# _get_meeting_set_stage_ids() removed - use _get_meeting_set_stage_ids() instead
 
+def _get_meeting_set_stage_ids():
+    """Get all stage IDs that mean 'Meeting Set' (sourced from field_semantics)."""
+    # 'Meeting Set' is stage ID 79653122, defined in field_semantics.yaml
+    meeting_set_id = label_to_stage_id('Meeting Set')
+    return [meeting_set_id] if meeting_set_id != 'Meeting Set' else []
 
 def get_deal_status(stage: str) -> str:
     """
@@ -230,7 +231,7 @@ def get_excluded_stages() -> dict:
             print("     Run: python scripts/discover_stages.py")
             print("     Then configure your stage IDs in client.yaml")
             return {
-                'meeting_set': MEETING_SET_STAGES,
+                'meeting_set': _get_meeting_set_stage_ids(),
                 'disqualified': [],  # Discovered from HubSpot; no hardcoded fallback
                 'closed_won': _get_won_stage_ids(),
                 'closed_lost': _get_lost_stage_ids(),
@@ -253,7 +254,7 @@ def get_excluded_stages() -> dict:
 
         # No config - use defaults
         return {
-            'meeting_set': MEETING_SET_STAGES,
+            'meeting_set': _get_meeting_set_stage_ids(),
             'disqualified': [],  # Discovered from HubSpot; no hardcoded fallback
             'closed_won': _get_won_stage_ids(),
             'closed_lost': _get_lost_stage_ids(),
@@ -263,7 +264,7 @@ def get_excluded_stages() -> dict:
     except Exception as e:
         print(f"  ⚠️  Could not load client.yaml: {e}")
         return {
-            'meeting_set': MEETING_SET_STAGES,
+            'meeting_set': _get_meeting_set_stage_ids(),
             'disqualified': [],  # Discovered from HubSpot; no hardcoded fallback
             'closed_won': _get_won_stage_ids(),
             'closed_lost': _get_lost_stage_ids(),
@@ -277,7 +278,7 @@ def get_meeting_set_stages(hubspot):
     Returns list of stage IDs.
     """
     # Start with hardcoded Meeting Set stages
-    meeting_set_stages = list(MEETING_SET_STAGES)
+    meeting_set_stages = list(_get_meeting_set_stage_ids())
 
     try:
         endpoint = "/crm/v3/pipelines/deals"
@@ -298,7 +299,7 @@ def get_meeting_set_stages(hubspot):
 
     except Exception as e:
         print(f"⚠️  Could not fetch stages: {e}")
-        return MEETING_SET_STAGES
+        return _get_meeting_set_stage_ids()
 
 
 def fetch_owner_emails(hubspot):
@@ -561,19 +562,8 @@ def main():
         stage = props.get('dealstage') or ''
 
         # Normalize display names to stage IDs (HubSpot CSV exports return display names)
-        STAGE_NAME_TO_ID = {
-            'Closed lost': 'closedlost',
-            'Closed won': 'closedwon',
-            'Disqualified': '68509551',
-            'Meeting Set': '79653122',
-            'Discovery': 'appointmentscheduled',
-            'Scoping': 'qualifiedtobuy',
-            'Technical Evaluation': 'presentationscheduled',
-            'Review': 'decisionmakerboughtin',
-            'Negotiating': '24682892',
-            'Awaiting Signature': '43449439'
-        }
-        stage = STAGE_NAME_TO_ID.get(stage, stage)
+        # Uses field_semantics.label_to_stage_id() for centralized mapping
+        stage = label_to_stage_id(stage)
 
         arr = props.get('incremental_arr') or props.get('amount', '0')
         close_date = props.get('closedate', '')
