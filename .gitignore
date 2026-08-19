@@ -45,9 +45,8 @@ test_*.md
 # Data files (historical ETL artifacts)
 data/*.csv
 
-# Never commit test scripts with inline creds or env files
-scripts/test_*.py
-scripts/test_*.sh
-scripts/verify_*.py
+# Never commit env files with credentials
+# Note: API keys are blocked by pre-commit hook (pattern matching)
+# regardless of filename. Use environment variables, never inline credentials.
 .env
 .env.*
