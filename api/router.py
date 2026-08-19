@@ -1262,7 +1262,7 @@ async def route_question(question: str, user_id: str,
             handler_used=handler_name,
             tool_results=tool_results,
             answer=verified,
-            client=client,
+            client=classifier_client,
             budget_used=tokens_used * 0.000003,
             # approximate cost: tokens × $3/1M
         )
