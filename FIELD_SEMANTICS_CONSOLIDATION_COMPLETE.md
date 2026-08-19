@@ -118,12 +118,12 @@ DISQUALIFIED_STAGES = ['68509551']  # Bug: not in CLOSED_LOST_STAGES!
 
 ---
 
-### Phase 5: Write-Back Path and Isolation (Committed)
+### Phase 5: Harness Boundary Isolation (Committed)
 
 **Created:**
-- `scripts/migrations/027_add_proposal_lifecycle.sql` - Extend data_dictionary with proposal states
+- `scripts/migrations/034_add_proposal_lifecycle.sql` - Extend data_dictionary with proposal states (renumbered from 027)
 - `PHASE5_ARCHITECTURE.md` - Document two consumption models
-- **Phase 5d isolation test** - Critical boundary guard
+- **Phase 5d isolation test** - Critical boundary guard (COMPLETE)
 
 **Test Added:**
 ```python
@@ -132,6 +132,12 @@ test_harness_boundary_isolation()
 # Checks: api/handlers.py, api/field_semantics.py, scripts/etl_deals.py, scripts/analytics/backfill_snapshots.py
 # Greps for: select_all(*, 'data_dictionary'), .table('data_dictionary'), FROM data_dictionary
 ```
+
+**Status:**
+- ✅ Phase 5d isolation test: COMPLETE and passing
+- ✅ Migration 034: Created and committed (proposal lifecycle schema)
+- ⏸️ Proposal workflow implementation: Deferred to post-Frontera improvement loop
+- ⏸️ Relevance surfacing: Deferred to post-Frontera improvement loop
 
 **Harness Boundary Established:**
 
@@ -222,6 +228,17 @@ test_harness_boundary_isolation()
 - Added test for numeric alias resolution
 
 **All 19 tests pass** ✅
+
+### Migration Tests (scripts/eval_migrations.py)
+
+- 3 migration validation tests ensuring clean Frontera deployment
+- Verifies no duplicate migration numbers
+- Checks dependency order respected
+- Validates migration sequence
+
+**All 3 tests pass** ✅
+
+**Note:** Migration 034_add_proposal_lifecycle.sql initially had a number collision with 027_entity_scope_patterns. Renumbered to 034 along with 5 other collisions (012, 013, 014, 015, 016 pairs). See `scripts/migrations/MIGRATION_ORDER.md` for complete renumbering map and dependency analysis.
 
 ---
 
