@@ -27,8 +27,16 @@ import json
 import argparse
 import re
 import yaml
+import logging
 from pathlib import Path
 from datetime import datetime, timedelta, timezone as _stdlib_tz
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Add revops-metrics to path for API clients
 REPO_ROOT = Path(__file__).parent.parent
@@ -347,10 +355,28 @@ def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total
             detail = client.get_conversation(convo_id)
             transcript_list = detail.get('transcript', [])
 
+            # DIAGNOSTIC: Log transcript structure
+            logger.debug(
+                f"[APOLLO] convo_id={convo_id} "
+                f"transcript_list type={type(transcript_list)} "
+                f"len={len(transcript_list) if transcript_list else 0} "
+                f"first_entry={str(transcript_list[0])[:100] if transcript_list else 'empty'}"
+            )
+
+            # DIAGNOSTIC: Log sample entry structure
+            if transcript_list:
+                sample = transcript_list[0]
+                logger.debug(
+                    f"[APOLLO] sample entry keys={list(sample.keys()) if isinstance(sample, dict) else type(sample)}"
+                )
+
             # Build transcript text
+            # Apollo format: participant_name + spoken_sentence (not speaker + words)
             transcript_text = '\n'.join(
-                f"[{entry.get('speaker', 'Unknown')}]: {entry.get('words', '')}"
+                f"[{entry.get('participant_name', entry.get('speaker', 'Unknown'))}]: "
+                f"{entry.get('spoken_sentence', entry.get('words', entry.get('text', entry.get('content', ''))))}"
                 for entry in transcript_list
+                if isinstance(entry, dict)
             )
 
             if not transcript_text or len(transcript_text) < 50:
@@ -366,8 +392,9 @@ def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total
                 summary = summarize_apollo_transcript(transcript_text, title)
                 total_summarized[0] += 1
             except Exception as e:
-                print(f"      ✗ Error: {e}")
-                summary = f"[Summary failed] {transcript_text[:200]}"
+                # summarize_apollo_transcript handles its own errors, but just in case
+                logger.error(f"[APOLLO] Unexpected error summarizing {title[:30]}: {e}")
+                summary = f"[Summarization error — raw transcript]\n{transcript_text[:2500]}"
 
             # Add to company dict
             if slug not in calls_by_company:
@@ -401,9 +428,31 @@ def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total
 
 
 def summarize_apollo_transcript(transcript_text: str, title: str) -> str:
-    """Summarize Apollo transcript using Claude Haiku."""
-    if len(transcript_text) < 1500:
-        return transcript_text
+    """
+    Summarize Apollo transcript using Claude Haiku.
+
+    Handles two input formats:
+    1. Full transcript text (preferred) — structured speaker/sentence entries
+    2. Speaker fragments (fallback) — when Apollo doesn't provide full transcript
+       e.g. "[logan]: David.\n[David Gregory]: Hey, Christian."
+
+    For very short transcripts (< 1500 chars), returns the text as-is
+    rather than summarizing — it's already short enough for the context builder.
+
+    Never returns [Summary failed] — always returns usable content.
+    """
+    # Strip [Summary failed] prefix if present from a prior failed attempt
+    clean_text = transcript_text
+    if clean_text.startswith("[Summary failed]"):
+        clean_text = clean_text[len("[Summary failed]"):].strip()
+        logger.info(f"[APOLLO] Stripped [Summary failed] prefix from {title[:30]}")
+
+    if not clean_text or len(clean_text) < 100:
+        return f"[Insufficient transcript data — {len(clean_text)} chars]"
+
+    if len(clean_text) < 1500:
+        logger.debug(f"[APOLLO] Short transcript ({len(clean_text)} chars), returning as-is")
+        return clean_text  # Short enough, return as-is
 
     client = LLMClient.from_config("enrichment")
 
@@ -422,15 +471,17 @@ def summarize_apollo_transcript(transcript_text: str, title: str) -> str:
         resp = client.complete(
             messages=[{
                 'role': 'user',
-                'content': f'Title: {title}\n\nTranscript:\n{transcript_text[:8000]}'
+                'content': f'Title: {title}\n\nTranscript:\n{clean_text[:8000]}'
             }],
             system=system,
             max_tokens=800
         )
         return resp.text
     except Exception as e:
-        print(f'     ⚠️  Haiku summarization failed: {e}')
-        return transcript_text[:2500] + '\n\n[Truncated]'
+        logger.warning(f'[APOLLO] Haiku summarization failed for {title[:30]}: {e}')
+        # Return raw transcript truncated — better than [Summary failed]
+        # The context builder can work with raw transcript fragments
+        return f"[Auto-summary failed — raw transcript]\n{clean_text[:2500]}"
 
 
 def process_apollo_csv(csv_path: Path, calls_by_company: dict, total_summarized: list):
