@@ -2478,12 +2478,20 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
             capped_deals = deals[:MAX_PER_OWNER]
             remaining_budget = MAX_TOTAL - total_shown
 
+            # Mark as truncated if we capped this owner's deals
+            if len(deals) > MAX_PER_OWNER:
+                truncated = True
+
             if len(capped_deals) > remaining_budget:
                 capped_deals = capped_deals[:remaining_budget]
                 truncated = True
 
             capped_by_owner[owner] = capped_deals
             total_shown += len(capped_deals)
+
+        # Final check: if we showed fewer deals than exist, mark as truncated
+        if total_shown < len(priorities):
+            truncated = True
 
         return {
             "by_owner": capped_by_owner,
