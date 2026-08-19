@@ -41,6 +41,23 @@ forecast:
   # historical close rates once you have enough data.
 
 # ============================================================================
+# FORECAST ANALYSIS
+# ============================================================================
+# Empirical forecast calibration — measures actual commit hit rate and
+# week-3 conversion against claimed accuracy. Analyses propose methodology
+# changes when measured reality differs from config.
+
+forecast_analysis:
+  trailing_quarters_window: 9      # Trailing window for week-3 conversion
+  anchor_week: null                # null = use measured value from category churn
+                                   # When set: pins to specific week (1-13)
+                                   # Empirically measured anchor replaces
+                                   # instinctive hardcoded week-8 default
+  claimed_commit_accuracy: 0.90    # Claimed commit hit rate for calibration
+  basis: count                     # count | dollar — reporting basis
+  segmentation_keys: [motion]      # Segment analyses by motion (newbiz/expansion)
+
+# ============================================================================
 # PROPOSAL ENGINE
 # ============================================================================
 # Self-tuning analysis gate. Analyses can propose methodology changes
