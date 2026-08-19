@@ -1249,12 +1249,12 @@ async def route_question(question: str, user_id: str,
     retry_count = 0
     tokens_used = 0
     if intent_resp is not None:
-        tokens_used += (intent_resp.usage.input_tokens +
-                       intent_resp.usage.output_tokens)
-    tokens_used += (answer_resp.usage.input_tokens +
-                   answer_resp.usage.output_tokens +
-                   verify_resp.usage.input_tokens +
-                   verify_resp.usage.output_tokens)
+        tokens_used += (intent_resp.input_tokens +
+                       intent_resp.output_tokens)
+    tokens_used += (answer_resp.input_tokens +
+                   answer_resp.output_tokens +
+                   verify_resp.input_tokens +
+                   verify_resp.output_tokens)
 
     while retry_count <= MAX_RETRIES:
         assessment = await assess_correctness(
