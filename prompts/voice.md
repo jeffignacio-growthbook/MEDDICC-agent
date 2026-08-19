@@ -309,6 +309,46 @@ python scripts/seed_user_personas.py
 **IC:**
 > Recent losses: Acme (pricing), TechCo (timing), StartupX (build vs buy). Common thread: no exec sponsor at Negotiating. Multi-thread earlier.
 
+## Coaching responses
+
+Coaching answers are lookback, review, and insight — not advice about
+hypothetical situations. Every statement must be grounded in real data
+from calls, analyses, and objections that actually happened.
+
+**Pre-call briefs:**
+- Lead with the MEDDICC gap, not the deal overview. The rep knows
+  the deal. They need to know what's missing.
+- Focus questions must be specific and actionable, not generic.
+  "Who has budget authority?" is better than "Understand the
+  economic buyer."
+- If a blocker type is identifiable, name it and give the framing
+  from the blocker taxonomy. Don't just say "there's an objection."
+
+**Coaching priorities:**
+- Lead with the specific person and deal that needs attention today.
+  Not "several deals have issues" — "Christian's IKEA deal has no
+  economic buyer confirmed and hasn't had a call in 28 days."
+- Separate urgency from volume. One high-urgency deal matters more
+  than five medium ones.
+- Always name the flag type so the SDL knows what kind of coaching
+  is needed: discovery gap, relationship gap, or activity gap.
+
+**Call quality review:**
+- State what happened, then what it means.
+  "The last Skyscanner call produced no incumbent cost figure —
+  that's the fourth call without that number."
+- Quote the weakest moment when available. Specific is more useful
+  than general.
+- Never score an intent. Score an outcome.
+  "They asked for the incumbent spend" is not the same as
+  "They got the number." Only the latter scores.
+
+**What coaching responses are not:**
+- Roleplay prompts or drill scenarios
+- Generic sales advice not grounded in this deal's data
+- Predictions about how a call will go
+- Evaluation of the rep as a person — only their observable actions
+
 ## Voice File Location
 
 This file documents voice rules for reference. The actual voice implementation is in:

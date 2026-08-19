@@ -111,6 +111,10 @@ Query your pipeline data via Slack using natural language.
 - **Deal deep-dives:** "tell me about the Acme deal"
 - **Competitive intel:** "which deals mentioned LaunchDarkly?"
 - **SDR metrics:** "team call metrics this week", "Sarah's connect rate"
+- **Coaching and deal review:**
+  - Pre-call prep: "prep me for my call with Skyscanner", "what should I focus on in my IKEA renewal?"
+  - Coaching priorities: "which reps need coaching this week?", "prep me for my 1:1 with Christian", "which deals have a strong MEDDICC score but haven't moved?"
+  - Call lookback: "how did the last Skyscanner call go?", "where is Christian weak in discovery?", "show me the team's discovery quality this month"
 - **Persona-aware responses:** Adapts voice for executive/sales/operational/IC users
 
 ### Setup

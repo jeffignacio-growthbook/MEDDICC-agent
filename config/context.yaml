@@ -213,3 +213,79 @@ learning:
     - "competitive_mentions"
     - "objection_patterns"
     - "value_metric_claims"
+
+# ==========================================================================
+# COACHING FRAMEWORKS
+# These are the standards the agent uses when assessing call quality,
+# writing pre-call briefs, and identifying coaching priorities.
+# Drawn from the team's gb-drill skills and real GrowthBook call patterns.
+# ==========================================================================
+
+coaching_frameworks:
+
+  discovery_five_numbers:
+    description: >
+      The five numbers that turn a discovery conversation into a business case.
+      A call that gets three of five is competent. Four is good. Five is rare.
+      These appear in every GrowthBook call that converted.
+    numbers:
+      - name: "volume"
+        description: "How many experiments per month or year. Not 'a lot'."
+      - name: "win_rate"
+        description: "What proportion produce a shippable result."
+      - name: "value_per_win"
+        description: "Revenue or conversion impact of a typical winner."
+      - name: "incumbent_cost"
+        description: "Annual spend and pricing model. Model matters as much as number."
+      - name: "the_clock"
+        description: "Contract renewal, licence expiry, budget cycle, launch date. Deals without a date don't move."
+
+  blocker_taxonomy:
+    description: >
+      Every stalled deal is one of four blocker types. The response differs
+      for each. Misclassifying is the most expensive error — solving a
+      technical problem for someone whose blocker is cultural wastes weeks.
+    types:
+      technical:
+        signals: ["Missing capability", "Integration failure", "Wrong result"]
+        right_response: "Diagnose properly, don't guess, propose structured review"
+      resourcing:
+        signals: ["No engineers", "No capacity", "Competing priorities"]
+        right_response: "Reduce the ask. Narrow the scope. Make adoption smaller."
+      cultural:
+        signals: ["Leadership sceptical", "Cautious stakeholders", "Tests judged too small"]
+        right_response: "Arm the champion with artefacts. Accept this is largely outside our control."
+      commercial:
+        signals: ["Budget", "Procurement", "Competitor pricing"]
+        right_response: "Establish value precisely, then hand to the AE. Not the SE's to negotiate."
+
+  discovery_quality_rubric:
+    strong_call_signals:
+      - "At least three of the five discovery numbers obtained"
+      - "The clock is identified and external, not aspirational"
+      - "Who signs and what the approval threshold is"
+      - "A vague answer got followed up at least once, visibly"
+      - "Rep asked something the prospect had to think about"
+    weak_call_signals:
+      - "Every answer accepted at face value"
+      - "No number obtained — adjectives instead of quantities"
+      - "Rep talked more than the prospect"
+      - "Features described before needs established"
+      - "Call ended with 'I'll send materials' and no commitment"
+      - "Pitched before understanding"
+
+  ownership_calibration:
+    description: >
+      Two failure modes in difficult conversations, both cost money.
+    over_apologising: >
+      Accepting fault for something that isn't ours. Feels like de-escalation.
+      Actually concedes a fault, invites a credit request, and undermines
+      platform credibility for the rest of the relationship.
+    under_owning: >
+      'Your test is set up wrong.' Even when true, said too early it reads
+      as deflection.
+    calibrated_position: >
+      Own the process, not the outcome, until you know. 'I don't want to
+      guess at the cause. Let's walk through the setup together and I'll
+      bring our data science team if we need them. If it's something on
+      our side I'll tell you straight.'

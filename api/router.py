@@ -105,6 +105,30 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "'show me the team leaderboard', 'who is carrying the team?', "
         "'rank the AEs by pipeline', 'who has the most pipeline this quarter?'"
     ),
+    "query_pre_call_brief": (
+        "Pre-call intelligence brief for a specific deal — current MEDDICC "
+        "scores with weakest components, last call summaries, open objections, "
+        "and focus questions based on what's missing. Use when someone asks to "
+        "be prepped for a call, wants a brief before a meeting, or asks what to "
+        "focus on in an upcoming call. Examples: 'prep me for my Skyscanner call', "
+        "'quick brief on the Stone deal', 'what should I focus on with IKEA?'"
+    ),
+    "query_coaching_priorities": (
+        "Which deals and reps need coaching attention — missing economic buyer, "
+        "weak champion, no recent call activity, unaddressed objections, or strong "
+        "MEDDICC score with no movement. Use for 1:1 prep, coaching reviews, or "
+        "pipeline health checks. Examples: 'which reps need coaching this week?', "
+        "'prep me for my 1:1 with Christian', 'show me deals with no champion', "
+        "'which of James's deals haven't had a call in 3 weeks?'"
+    ),
+    "query_call_quality": (
+        "Review what happened on a specific call or assess discovery quality "
+        "patterns across a rep or the team. Not roleplay — looks back at real "
+        "call summaries and scores them against discovery rubric. Examples: "
+        "'how did the last Skyscanner call go?', 'where is Christian weak in "
+        "discovery?', 'show me the team's discovery quality this month', "
+        "'what happened on James's Stone call?'"
+    ),
     "dynamic_query": "question requires combining data from multiple tables or filters not covered by the precomputed handlers above. Use when no other handler fits but the data likely exists in Supabase.",
     "unanswerable": "question cannot be answered with available data",
 }
@@ -119,6 +143,7 @@ ENTITY_SCOPE_BULK_HANDLERS = [
     "query_deal_values_bulk",
     "query_team_leaderboard",
     "query_rep_attainment",
+    "query_coaching_priorities",
 ]
 
 def has_followup_pronoun(question: str) -> bool:

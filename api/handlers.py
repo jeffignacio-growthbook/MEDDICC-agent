@@ -2011,3 +2011,524 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
         "team_won_arr": team_won_arr,
         "data_gaps": data_gaps
     }
+
+
+# ==========================================================================
+# COACHING HANDLERS
+# Pre-call brief, coaching priorities, and call quality review
+# ==========================================================================
+
+async def query_pre_call_brief(params: dict, sb) -> dict:
+    """
+    Pre-call intelligence brief for a specific deal.
+
+    Answers: "prep me for my call with Skyscanner"
+             "quick brief on the Stone deal before I jump on"
+             "what should I focus on in my IKEA renewal?"
+
+    Returns:
+    - Current MEDDICC scores with weakest components flagged
+    - Last 2 call summaries
+    - Open objections from this deal with best responses from context.yaml
+    - Feature gaps logged for this deal
+    - 3-5 specific questions to ask based on what's missing in MEDDICC
+    - Blocker type if identifiable from the data
+
+    params:
+      company: str       — company name
+      owner_email: str   — optional, for persona-aware framing
+    """
+    # 1. Resolve the deal
+    company = params.get("company") or (params.get("company_names") or [""])[0]
+    if not company:
+        return {"error": "Company name required — e.g. 'prep me for Skyscanner'"}
+
+    deals = select_all(sb, "deals",
+        columns="deal_id,company_name,stage,deal_value,arr_usd,"
+                "owner_email,close_date,deal_status",
+        filters=[("eq", "deal_status", "active")])
+    deal = next((d for d in deals
+                 if company.lower() in (d.get("company_name") or "").lower()), None)
+    if not deal:
+        return {"error": f"No active deal found for '{company}'"}
+
+    deal_id = deal["deal_id"]
+    company_name = deal["company_name"]
+
+    # 2. Latest MEDDICC analysis
+    analyses = select_all(sb, "analyses",
+        columns="overall_score,metrics_score,economic_buyer_score,"
+                "decision_criteria_score,decision_process_score,"
+                "pain_score,champion_score,competition_score,"
+                "analyzed_at,full_analysis_text",
+        filters=[("eq", "deal_id", deal_id)])
+    analyses.sort(key=lambda x: x.get("analyzed_at", ""), reverse=True)
+    latest_analysis = analyses[0] if analyses else {}
+
+    # 3. Identify weakest MEDDICC components
+    COMPONENTS = {
+        "metrics_score": "Metrics",
+        "economic_buyer_score": "Economic Buyer",
+        "decision_criteria_score": "Decision Criteria",
+        "decision_process_score": "Decision Process",
+        "pain_score": "Pain",
+        "champion_score": "Champion",
+        "competition_score": "Competition",
+    }
+    scores = {
+        label: latest_analysis.get(field)
+        for field, label in COMPONENTS.items()
+        if latest_analysis.get(field) is not None
+    }
+    sorted_scores = sorted(scores.items(), key=lambda x: x[1])
+    weakest = sorted_scores[:3] if sorted_scores else []
+
+    # 4. Last 2 call summaries
+    calls = select_all(sb, "calls",
+        columns="call_id,call_date,source,summary,title",
+        filters=[("eq", "deal_id", deal_id)])
+    calls.sort(key=lambda c: c.get("call_date", ""), reverse=True)
+    recent_calls = [
+        {
+            "date": c.get("call_date", "")[:10],
+            "title": c.get("title", ""),
+            "source": c.get("source", ""),
+            "summary": (c.get("summary") or "")[:600],
+        }
+        for c in calls[:2]
+        if c.get("summary") and not c["summary"].startswith("[Summary failed]")
+    ]
+
+    # 5. Open objections for this deal
+    objections = select_all(sb, "objections",
+        columns="category,verbatim_quote,rep_response,stage_when_raised",
+        filters=[("eq", "company_name", company_name)])
+    open_objections = [o for o in objections if not o.get("rep_response")]
+
+    # 6. Feature gaps for this deal
+    gaps = select_all(sb, "feature_gaps",
+        columns="feature_description,severity,category,competitor_mentioned",
+        filters=[("eq", "deal_id", deal_id)])
+    blockers = [g for g in gaps if g.get("severity") == "blocker"]
+
+    # 7. Generate focus questions based on weak components
+    # Map weak MEDDICC components → discovery questions from context
+    COMPONENT_QUESTIONS = {
+        "Economic Buyer": [
+            "Who has final budget authority for this decision?",
+            "What's the approval threshold above which procurement gets involved?",
+            "Has the economic buyer been briefed on GrowthBook yet?",
+        ],
+        "Champion": [
+            "Who internally is advocating for this? Are they in a position to influence the decision?",
+            "What would make this person look good by championing us?",
+            "Do they have access to the economic buyer?",
+        ],
+        "Decision Process": [
+            "What does the approval process look like from here to signed contract?",
+            "What would cause this to stall — security review, legal, procurement?",
+            "Is there a specific event or deadline driving the timeline?",
+        ],
+        "Metrics": [
+            "How many experiments are you running per month right now?",
+            "What's a typical winning experiment worth in revenue terms?",
+            "What does your current setup cost annually, all in?",
+        ],
+        "Decision Criteria": [
+            "What would a successful evaluation look like for your team?",
+            "What are the must-haves versus nice-to-haves?",
+            "What would make you choose not to move forward?",
+        ],
+        "Pain": [
+            "What's the cost of staying with your current setup for another year?",
+            "What happens if you don't solve this problem?",
+            "Who else feels this pain most acutely?",
+        ],
+        "Competition": [
+            "Are you evaluating other options in parallel?",
+            "What does [competitor] offer that you're drawn to?",
+            "What would have to be true for you to choose them over us?",
+        ],
+    }
+
+    focus_questions = []
+    for component_label, _ in weakest[:3]:
+        qs = COMPONENT_QUESTIONS.get(component_label, [])
+        if qs:
+            focus_questions.append({
+                "weak_component": component_label,
+                "questions": qs[:2],
+            })
+
+    # 8. Identify blocker type if inferable
+    blocker_type = None
+    if open_objections:
+        # Map objection categories to blocker taxonomy
+        BLOCKER_MAP = {
+            "technical": "technical",
+            "product_gap": "technical",
+            "switching_cost": "resourcing",
+            "internal_politics": "cultural",
+            "budget": "commercial",
+            "timing": "resourcing",
+        }
+        obj_categories = [o.get("category", "") for o in open_objections]
+        mapped = [BLOCKER_MAP.get(c) for c in obj_categories if BLOCKER_MAP.get(c)]
+        if mapped:
+            blocker_type = max(set(mapped), key=mapped.count)
+
+    return {
+        "company_name": company_name,
+        "deal": {
+            "stage": deal.get("stage"),
+            "arr_usd": deal.get("arr_usd"),
+            "close_date": deal.get("close_date"),
+            "owner_email": deal.get("owner_email"),
+        },
+        "meddicc": {
+            "overall_score": latest_analysis.get("overall_score"),
+            "analyzed_at": (latest_analysis.get("analyzed_at") or "")[:10],
+            "scores": scores,
+            "weakest_components": [
+                {"component": label, "score": score}
+                for label, score in weakest
+            ],
+        },
+        "recent_calls": recent_calls,
+        "open_objections": open_objections,
+        "blocker_type": blocker_type,
+        "blockers_logged": blockers,
+        "focus_questions": focus_questions,
+        "data_gap": not latest_analysis,
+    }
+
+
+async def query_coaching_priorities(params: dict, sb) -> dict:
+    """
+    Which deals and reps need coaching attention right now.
+
+    Answers: "which reps need coaching this week?"
+             "prep me for my 1:1 with Christian"
+             "show me deals where discovery is incomplete"
+             "which deals have a missing economic buyer?"
+             "which of James's deals haven't had activity in 3 weeks?"
+
+    Returns a prioritized list of deals needing attention with
+    the specific reason for each, grouped by rep when no rep filter.
+
+    params:
+      owner_email: str   — filter to one rep (for 1:1 prep)
+      time_window: dict  — for staleness calculation
+      focus: str         — 'champion' | 'economic_buyer' | 'stale'
+                           | 'objections' | 'all' (default: 'all')
+    """
+    owner_email = params.get("owner_email")
+    focus = params.get("focus", "all")
+    from datetime import date, timedelta
+    today = today_in_reporting_tz()
+    stale_threshold = (today - timedelta(days=21)).isoformat()
+
+    # Load active deals
+    deal_filters = [("eq", "deal_status", "active")]
+    if owner_email:
+        deal_filters.append(("eq", "owner_email", owner_email))
+
+    deals = select_all(sb, "deals",
+        columns="deal_id,company_name,owner_email,stage,"
+                "deal_value,arr_usd,close_date",
+        filters=deal_filters)
+
+    if not deals:
+        return {
+            "priorities": [],
+            "data_gap": True,
+            "note": f"No active deals found{f' for {owner_email}' if owner_email else ''}",
+        }
+
+    deal_ids = [d["deal_id"] for d in deals]
+    deal_map = {d["deal_id"]: d for d in deals}
+
+    # Latest analysis per deal
+    all_analyses = select_all(sb, "analyses",
+        columns="deal_id,overall_score,champion_score,"
+                "economic_buyer_score,decision_process_score,"
+                "pain_score,analyzed_at,passed")
+    # Keep only latest per deal
+    latest_by_deal = {}
+    for a in sorted(all_analyses, key=lambda x: x.get("analyzed_at", "")):
+        latest_by_deal[a["deal_id"]] = a
+
+    # Latest call date per deal
+    all_calls = select_all(sb, "calls",
+        columns="deal_id,call_date")
+    latest_call_by_deal = {}
+    for c in all_calls:
+        did = c.get("deal_id")
+        cd = c.get("call_date", "")
+        if did and (did not in latest_call_by_deal or cd > latest_call_by_deal[did]):
+            latest_call_by_deal[did] = cd
+
+    # Open objections per deal
+    all_objections = select_all(sb, "objections",
+        columns="company_name,category,rep_response")
+    open_obj_by_company = {}
+    for o in all_objections:
+        if not o.get("rep_response"):
+            cn = o.get("company_name", "")
+            open_obj_by_company.setdefault(cn, []).append(o.get("category", ""))
+
+    # Build priority list
+    priorities = []
+    for deal in deals:
+        deal_id = deal["deal_id"]
+        analysis = latest_by_deal.get(deal_id, {})
+        last_call = latest_call_by_deal.get(deal_id, "")
+        open_objs = open_obj_by_company.get(deal["company_name"], [])
+
+        flags = []
+
+        # Check each coaching priority
+        if focus in ("all", "economic_buyer"):
+            eb = analysis.get("economic_buyer_score")
+            if eb is not None and eb <= 3:
+                flags.append({
+                    "type": "missing_economic_buyer",
+                    "detail": f"Economic buyer score {eb}/10 — not yet identified",
+                    "urgency": "high" if (deal.get("close_date") or "") > today.isoformat() else "medium",
+                })
+
+        if focus in ("all", "champion"):
+            ch = analysis.get("champion_score")
+            if ch is not None and ch <= 3:
+                flags.append({
+                    "type": "weak_champion",
+                    "detail": f"Champion score {ch}/10 — no internal advocate confirmed",
+                    "urgency": "high",
+                })
+
+        if focus in ("all", "stale"):
+            if last_call and last_call < stale_threshold:
+                days_since = (today - date.fromisoformat(last_call)).days
+                flags.append({
+                    "type": "no_recent_activity",
+                    "detail": f"Last call {days_since} days ago ({last_call})",
+                    "urgency": "high" if days_since > 30 else "medium",
+                })
+            elif not last_call:
+                flags.append({
+                    "type": "no_calls_recorded",
+                    "detail": "No calls in Fireflies — deal may be dark",
+                    "urgency": "medium",
+                })
+
+        if focus in ("all", "objections"):
+            if open_objs:
+                flags.append({
+                    "type": "unaddressed_objections",
+                    "detail": f"{len(open_objs)} open objection(s): {', '.join(set(open_objs))}",
+                    "urgency": "medium",
+                })
+
+        # Strong score but stuck — potential coaching on closing
+        overall = analysis.get("overall_score")
+        if overall and overall >= 40:
+            stage = deal.get("stage", "")
+            if last_call and last_call < stale_threshold:
+                flags.append({
+                    "type": "strong_score_no_movement",
+                    "detail": f"MEDDICC score {overall}/70 but no call in {(today - date.fromisoformat(last_call)).days} days — deal may be stalling",
+                    "urgency": "high",
+                })
+
+        if flags:
+            priorities.append({
+                "company_name": deal["company_name"],
+                "owner_email": deal.get("owner_email"),
+                "stage": deal.get("stage"),
+                "arr_usd": deal.get("arr_usd"),
+                "close_date": deal.get("close_date"),
+                "overall_score": analysis.get("overall_score"),
+                "flags": flags,
+                "flag_count": len(flags),
+                "highest_urgency": "high" if any(f["urgency"] == "high" for f in flags) else "medium",
+            })
+
+    # Sort: high urgency first, then by ARR
+    priorities.sort(key=lambda x: (
+        0 if x["highest_urgency"] == "high" else 1,
+        -(x.get("arr_usd") or 0)
+    ))
+
+    # Group by owner if no specific rep requested
+    if not owner_email:
+        by_owner = {}
+        for p in priorities:
+            owner = p.get("owner_email", "unknown")
+            by_owner.setdefault(owner, []).append(p)
+        return {
+            "by_owner": by_owner,
+            "total_deals_needing_attention": len(priorities),
+            "high_urgency_count": sum(1 for p in priorities if p["highest_urgency"] == "high"),
+            "focus": focus,
+        }
+
+    return {
+        "owner_email": owner_email,
+        "priorities": priorities,
+        "total": len(priorities),
+        "high_urgency": sum(1 for p in priorities if p["highest_urgency"] == "high"),
+        "focus": focus,
+    }
+
+
+async def query_call_quality(params: dict, sb) -> dict:
+    """
+    Review what happened on a specific call and how good the discovery was.
+
+    Answers: "how did the last Skyscanner call go?"
+             "what happened on Christian's call with Stone?"
+             "show me the quality of James's calls this month"
+             "where is the team weak in discovery?"
+
+    Two modes:
+    - Single call review: company + optional date
+    - Rep/team pattern: owner_email + time_window (no company)
+
+    params:
+      company: str         — specific company (single call mode)
+      owner_email: str     — filter by rep
+      time_window: dict    — for pattern mode
+    """
+    company = params.get("company") or (params.get("company_names") or [""])[0]
+    owner_email = params.get("owner_email")
+    tw = params.get("time_window", {})
+
+    # Mode 1: Single call review for a specific company
+    if company:
+        # Find the deal
+        deals = select_all(sb, "deals",
+            columns="deal_id,company_name,owner_email,stage")
+        deal = next((d for d in deals
+                     if company.lower() in
+                        (d.get("company_name") or "").lower()), None)
+        if not deal:
+            return {"error": f"No deal found for '{company}'"}
+
+        # Get recent calls with summaries
+        calls = select_all(sb, "calls",
+            columns="call_id,call_date,title,source,summary",
+            filters=[("eq", "deal_id", deal["deal_id"])])
+        calls.sort(key=lambda c: c.get("call_date", ""), reverse=True)
+        recent = [c for c in calls[:3] if c.get("summary")]
+
+        if not recent:
+            return {
+                "company_name": deal["company_name"],
+                "data_gap": True,
+                "note": "No call summaries found for this deal",
+            }
+
+        # Check for existing call quality scores
+        quality_rows = select_all(sb, "call_quality",
+            columns="call_date,overall_quality_score,quantification_score,"
+                    "decision_process_score,numbers_obtained,numbers_missing,"
+                    "blocker_type,strongest_moment,weakest_moment,pattern_flags",
+            filters=[("eq", "deal_id", deal["deal_id"])])
+        quality_rows.sort(key=lambda x: x.get("call_date", ""), reverse=True)
+
+        # Get objections raised on this deal
+        objections = select_all(sb, "objections",
+            columns="category,verbatim_quote,rep_response,stage_when_raised",
+            filters=[("eq", "company_name", deal["company_name"])])
+
+        latest_call = recent[0]
+        latest_quality = quality_rows[0] if quality_rows else {}
+
+        return {
+            "company_name": deal["company_name"],
+            "owner_email": deal.get("owner_email"),
+            "stage": deal.get("stage"),
+            "latest_call": {
+                "date": latest_call.get("call_date"),
+                "title": latest_call.get("title"),
+                "source": latest_call.get("source"),
+                "summary": (latest_call.get("summary") or "")[:800],
+            },
+            "quality_score": latest_quality,
+            "objections_raised": objections,
+            "call_history_count": len(calls),
+            "recent_call_count": len(recent),
+        }
+
+    # Mode 2: Rep or team discovery pattern
+    filters = []
+    if owner_email:
+        filters.append(("eq", "owner_email", owner_email))
+    if tw.get("start"):
+        filters.append(("gte", "call_date", tw["start"]))
+    if tw.get("end"):
+        filters.append(("lte", "call_date", tw["end"]))
+
+    quality_rows = select_all(sb, "call_quality",
+        columns="owner_email,call_date,overall_quality_score,"
+                "quantification_score,decision_process_score,"
+                "numbers_missing,pattern_flags,blocker_type",
+        filters=filters)
+
+    if not quality_rows:
+        return {
+            "data_gap": True,
+            "note": (
+                "No call quality scores found. The call quality assessment "
+                "runs as part of the enrichment pipeline — scores accumulate "
+                "as new calls are processed."
+            ),
+            "owner_email": owner_email,
+            "period": tw.get("label", ""),
+        }
+
+    # Aggregate patterns
+    all_flags = []
+    for row in quality_rows:
+        flags = row.get("pattern_flags") or []
+        if isinstance(flags, list):
+            all_flags.extend(flags)
+
+    flag_counts = Counter(all_flags)
+    avg_score = (
+        sum(r.get("overall_quality_score") or 0 for r in quality_rows) /
+        max(len(quality_rows), 1)
+    )
+
+    # What discovery numbers are most commonly missing?
+    missing_counts = Counter()
+    for row in quality_rows:
+        missing = row.get("numbers_missing") or []
+        if isinstance(missing, list):
+            for m in missing:
+                missing_counts[m] += 1
+
+    return {
+        "owner_email": owner_email or "all reps",
+        "period": tw.get("label", ""),
+        "calls_assessed": len(quality_rows),
+        "avg_quality_score": round(avg_score, 1),
+        "most_common_gaps": dict(flag_counts.most_common(5)),
+        "discovery_numbers_most_missed": dict(missing_counts.most_common(5)),
+        "by_rep": (
+            None if owner_email else
+            {
+                owner: {
+                    "calls": len([r for r in quality_rows if r.get("owner_email") == owner]),
+                    "avg_score": round(
+                        sum(r.get("overall_quality_score") or 0
+                            for r in quality_rows
+                            if r.get("owner_email") == owner) /
+                        max(len([r for r in quality_rows if r.get("owner_email") == owner]), 1),
+                        1
+                    ),
+                }
+                for owner in set(r.get("owner_email") for r in quality_rows if r.get("owner_email"))
+            }
+        ),
+    }
