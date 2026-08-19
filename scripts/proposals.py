@@ -10,31 +10,27 @@ from typing import Optional
 from pathlib import Path
 
 
+# Default evidence bar gates
+_DEFAULT_GATES = {
+    'enabled': True,
+    'min_evidence_count': 30,
+    'min_quarters_of_history': 4,
+    'min_effect_size_pct': 10,
+    'suppress_duplicate_days': 30,
+    'max_open_proposals': 10
+}
+
+
 def _load_config():
     """Load proposal engine config from client.yaml."""
     config_path = Path('config/client.yaml')
     if not config_path.exists():
-        # Return defaults if config doesn't exist
-        return {
-            'enabled': True,
-            'min_evidence_count': 30,
-            'min_quarters_of_history': 4,
-            'min_effect_size_pct': 10,
-            'suppress_duplicate_days': 30,
-            'max_open_proposals': 10
-        }
+        return _DEFAULT_GATES.copy()
 
     with open(config_path) as f:
         config = yaml.safe_load(f)
 
-    return config.get('proposal_engine', {
-        'enabled': True,
-        'min_evidence_count': 30,
-        'min_quarters_of_history': 4,
-        'min_effect_size_pct': 10,
-        'suppress_duplicate_days': 30,
-        'max_open_proposals': 10
-    })
+    return config.get('proposal_engine', _DEFAULT_GATES.copy())
 
 
 def propose(sb, *, entity_type, entity_key, current_value, proposed_value,
