@@ -22,7 +22,7 @@ def test_assessor_uses_llmclient_complete():
     """
     print("\n[TEST] Assessor uses LLMClient.complete() and returns real score")
 
-    from api.assessor import assess_correctness
+    from assessor import assess_correctness
 
     # Mock LLMClient that returns a valid assessment
     mock_client = MagicMock()
@@ -62,7 +62,7 @@ def test_assessor_returns_fallback_only_on_real_exception():
     """
     print("\n[TEST] Assessor fallback only triggers on exception")
 
-    from api.assessor import assess_correctness
+    from assessor import assess_correctness
 
     # Test 1: .complete() raises → fallback score 0.5
     mock_client_error = MagicMock()
@@ -110,7 +110,7 @@ def test_table_classifier_uses_complete():
     """
     print("\n[TEST] table_classifier uses LLMClient.complete()")
 
-    from api.table_classifier import classify_relevant_tables
+    from table_classifier import classify_relevant_tables
 
     # Mock LLMClient that returns a valid table list
     mock_client = MagicMock()

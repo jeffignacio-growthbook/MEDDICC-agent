@@ -4,6 +4,38 @@ Checks whether synthesized answers addressed the right question
 with the right data, and provides retry guidance when needed.
 """
 
+import json
+
+def _extract_json(text: str) -> dict | None:
+    """Extract first JSON object from text, even if wrapped in prose or markdown."""
+    text = text.strip()
+    # Try direct parse first (handles newlines in values)
+    try:
+        return json.loads(text)
+    except Exception:
+        pass
+    # Strip markdown fences
+    if "```" in text:
+        for block in text.split("```"):
+            block = block.strip()
+            if block.startswith("json"):
+                block = block[4:].strip()
+            try:
+                return json.loads(block)
+            except Exception:
+                continue
+    # Find outermost { } — use a proper JSON decoder
+    # that handles nested quotes, not regex
+    for start in range(len(text)):
+        if text[start] == '{':
+            for end in range(len(text), start, -1):
+                if text[end-1] == '}':
+                    try:
+                        return json.loads(text[start:end])
+                    except Exception:
+                        continue
+    return None
+
 CORRECTNESS_PROMPT = """You are checking whether an AI
 assistant's answer correctly addressed a question using the
 data it queried.
@@ -127,7 +159,6 @@ async def assess_correctness(
                 )
             }]
         )
-        from api.router import _extract_json
         result = _extract_json(resp.text)
         if not result:
             return {"correct": True, "score": 0.5,

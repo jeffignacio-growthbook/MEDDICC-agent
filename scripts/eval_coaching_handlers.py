@@ -1164,17 +1164,27 @@ def test_handlers_share_gap_thresholds():
 
 
 def test_pre_call_brief_uses_stage_appropriate_questions():
-    """Proposal-stage deal with weak champion generates closing-focused questions."""
+    """A weak champion in Proposal stage yields closing/committee-focused
+    questions, NOT discovery-stage advocacy questions. Same weak component,
+    different questions by stage."""
     print("\n[TEST] Pre-call brief uses stage-appropriate questions")
 
     sb = MagicMock()
 
-    def select_all_mock(sb_client, table, columns="*", filters=None):
+    # Helper to extract all question strings from focus_questions
+    def _all_focus_questions(result):
+        all_qs = []
+        for fq in result.get("focus_questions", []):
+            all_qs.extend(fq.get("questions", []))
+        return all_qs
+
+    # Test 1: Proposal stage with weak champion
+    def select_all_mock_proposal(sb_client, table, columns="*", filters=None):
         if table == "deals":
             return [{
                 "deal_id": "deal_proposal",
                 "company_name": "ProposalCo",
-                "stage": "Proposal",  # Late stage
+                "stage": "Proposal / Negotiating",  # Late stage
                 "arr_usd": 75000,
                 "owner_email": "rep@example.com",
                 "close_date": "2026-09-15",
@@ -1189,8 +1199,42 @@ def test_pre_call_brief_uses_stage_appropriate_questions():
                 "decision_criteria_score": 7,
                 "decision_process_score": 7,
                 "pain_score": 8,
-                "champion_score": 3,  # Weak champion at late stage
+                "champion_score": 2,  # Weak champion at late stage
                 "competition_score": 7,
+                "analyzed_at": "2026-08-18T10:00:00Z",
+                "passed": True
+            }]
+        elif table == "calls":
+            return []
+        elif table == "objections":
+            return []
+        elif table == "feature_gaps":
+            return []
+        return []
+
+    # Test 2: Discovery stage with weak champion (for comparison)
+    def select_all_mock_discovery(sb_client, table, columns="*", filters=None):
+        if table == "deals":
+            return [{
+                "deal_id": "deal_discovery",
+                "company_name": "DiscoveryCo",
+                "stage": "Discovery",  # Early stage
+                "arr_usd": 60000,
+                "owner_email": "rep@example.com",
+                "close_date": "2026-10-15",
+                "deal_status": "active"
+            }]
+        elif table == "analyses":
+            return [{
+                "deal_id": "deal_discovery",
+                "overall_score": 35,
+                "metrics_score": 6,
+                "economic_buyer_score": 5,
+                "decision_criteria_score": 5,
+                "decision_process_score": 5,
+                "pain_score": 6,
+                "champion_score": 2,  # Same weak champion score
+                "competition_score": 6,
                 "analyzed_at": "2026-08-18T10:00:00Z",
                 "passed": True
             }]
@@ -1204,38 +1248,60 @@ def test_pre_call_brief_uses_stage_appropriate_questions():
 
     import handlers
     original_select_all = handlers.select_all
-    handlers.select_all = select_all_mock
 
     try:
-        result = asyncio.run(query_pre_call_brief(
+        # Test Proposal stage
+        handlers.select_all = select_all_mock_proposal
+        proposal_result = asyncio.run(query_pre_call_brief(
             {"company": "ProposalCo"},
             sb
         ))
 
-        # Verify champion is in weakest components
-        weakest = result["meddicc"]["weakest_components"]
-        champion_weak = any(w["component"] == "Champion" for w in weakest)
-        assert champion_weak, "Champion should be flagged as weak"
+        # Verify stage context
+        assert proposal_result.get("stage_context", {}).get("stage_bucket") == "proposal", \
+            "Should identify Proposal stage as 'proposal' bucket"
 
-        # Verify focus questions exist for champion
-        focus_questions = result.get("focus_questions", [])
-        champion_questions = [
-            q for q in focus_questions
-            if q.get("weak_component") == "Champion"
-        ]
+        proposal_qs = _all_focus_questions(proposal_result)
+        proposal_qs_lower = [q.lower() for q in proposal_qs]
 
-        assert len(champion_questions) > 0, \
-            "Should have focus questions for weak champion"
+        # Proposal-stage champion questions are about enabling the champion
+        # to present internally, not about identifying an advocate
+        assert any("present" in q or "committee" in q or "leadership" in q
+                   for q in proposal_qs_lower), \
+            f"Proposal stage should ask about presenting to committee/leadership, got: {proposal_qs[:3]}"
 
-        # Current implementation uses generic questions regardless of stage
-        # This test documents current behavior - if stage-aware questions
-        # are implemented, update this assertion to verify closing-focused
-        # questions appear at Proposal stage
-        questions_text = str(champion_questions)
-        print(f"  Champion questions at Proposal stage: {champion_questions[0]['questions'][:1]}")
-        print("  ℹ️  Note: Stage-aware question adaptation not yet implemented")
-        print("     Current: Generic champion questions for all stages")
-        print("     Future: Proposal stage should emphasize exec access, not initial advocacy")
+        # Must NOT ask the discovery-stage identification question
+        assert not any("who internally is most invested" in q
+                       for q in proposal_qs_lower), \
+            "Proposal stage should NOT ask discovery questions about identifying advocates"
+
+        # Test Discovery stage (different questions for same weak component)
+        handlers.select_all = select_all_mock_discovery
+        discovery_result = asyncio.run(query_pre_call_brief(
+            {"company": "DiscoveryCo"},
+            sb
+        ))
+
+        # Verify stage context
+        assert discovery_result.get("stage_context", {}).get("stage_bucket") == "discovery", \
+            "Should identify Discovery stage as 'discovery' bucket"
+
+        discovery_qs = _all_focus_questions(discovery_result)
+        discovery_qs_lower = [q.lower() for q in discovery_qs]
+
+        # Discovery-stage champion questions are about identifying advocates
+        assert any("who internally" in q or "most invested" in q or "skin in the game" in q
+                   for q in discovery_qs_lower), \
+            f"Discovery stage should ask about identifying advocates, got: {discovery_qs[:3]}"
+
+        # Must NOT ask proposal-stage committee questions
+        assert not any("present" in q and "committee" in q
+                       for q in discovery_qs_lower), \
+            "Discovery stage should NOT ask about presenting to committees"
+
+        print("✓ Stage-appropriate questions:")
+        print(f"  Proposal: {proposal_qs[0][:60]}...")
+        print(f"  Discovery: {discovery_qs[0][:60]}...")
 
     finally:
         handlers.select_all = original_select_all
