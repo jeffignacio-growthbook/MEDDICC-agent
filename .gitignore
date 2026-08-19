@@ -44,3 +44,10 @@ test_*.md
 
 # Data files (historical ETL artifacts)
 data/*.csv
+
+# Never commit test scripts with inline creds or env files
+scripts/test_*.py
+scripts/test_*.sh
+scripts/verify_*.py
+.env
+.env.*
