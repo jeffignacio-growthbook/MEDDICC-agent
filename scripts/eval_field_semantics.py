@@ -270,6 +270,102 @@ def test_no_raw_stage_ids_outside_field_semantics():
     print(f"  ✓ Checked {len(checked)} files for raw numeric stage IDs")
     print("  ✓ No violations found (all stage logic routes through field_semantics)")
 
+def test_harness_boundary_isolation():
+    """
+    PHASE 5d ISOLATION TEST - Critical guard for harness boundary.
+
+    Enforces that handlers and field_semantics NEVER read data_dictionary at runtime.
+    This prevents the harness from going soft and ensures client porting remains
+    a simple yaml swap with zero code changes.
+
+    Violations would allow:
+    - Handlers dynamically reading field definitions instead of using generated field_semantics
+    - Stage logic drifting back to runtime lookups instead of compile-time yaml
+    - Client-specific logic leaking into handler code
+
+    This test locks the boundary: handlers consume ONLY the generated field_semantics.py,
+    never the proposal source (data_dictionary).
+    """
+    print("\n[TEST] Harness boundary isolation (Phase 5d)")
+
+    import pathlib
+    import re
+
+    # Files in the harness boundary that MUST NOT read data_dictionary
+    # NOTE: schema_context.py is EXCLUDED - it's part of the dynamic query path
+    # and legitimately reads data_dictionary to build schema descriptions
+    harness_files = [
+        "api/handlers.py",          # Handler functions (must consume only field_semantics)
+        "api/field_semantics.py",   # Generated stage logic (never reads proposals)
+        "scripts/etl_deals.py",     # ETL (writes to Supabase, no runtime proposals)
+        "scripts/analytics/backfill_snapshots.py",  # Backfill (no runtime proposals)
+    ]
+
+    violations = []
+
+    for file_path in harness_files:
+        full_path = pathlib.Path(__file__).parent.parent / file_path
+        if not full_path.exists():
+            continue
+
+        src = full_path.read_text()
+        lines = src.split('\n')
+
+        for line_num, line in enumerate(lines, 1):
+            # Check for data_dictionary table access
+            # Pattern: select_all(client, 'data_dictionary', ...)
+            # Pattern: .table('data_dictionary')
+            # Pattern: from data_dictionary
+
+            if 'data_dictionary' in line.lower():
+                stripped = line.strip()
+
+                # Skip comments
+                if stripped.startswith('#'):
+                    continue
+
+                # Skip docstrings/comments explaining what data_dictionary is
+                if '#' in line and line.index('#') < line.lower().index('data_dictionary'):
+                    continue
+
+                # Detect actual code references
+                # Pattern 1: select_all(sb, 'data_dictionary', ...)
+                if re.search(r"select_(all|one)\s*\([^)]*['\"]data_dictionary['\"]", line):
+                    violations.append(
+                        f"{file_path}:{line_num} - select_all/one('data_dictionary') "
+                        f"(handlers must not read data_dictionary at runtime)"
+                    )
+
+                # Pattern 2: .table('data_dictionary')
+                if re.search(r"\.table\s*\(\s*['\"]data_dictionary['\"]", line):
+                    violations.append(
+                        f"{file_path}:{line_num} - .table('data_dictionary') "
+                        f"(handlers must not read data_dictionary at runtime)"
+                    )
+
+                # Pattern 3: FROM data_dictionary (SQL)
+                if re.search(r"FROM\s+data_dictionary", line, re.IGNORECASE):
+                    violations.append(
+                        f"{file_path}:{line_num} - FROM data_dictionary in SQL "
+                        f"(handlers must not read data_dictionary at runtime)"
+                    )
+
+    if violations:
+        msg = (
+            f"\n❌ HARNESS BOUNDARY VIOLATED\n\n"
+            f"Found {len(violations)} violations of the isolation rule:\n"
+            f"Handlers and field_semantics MUST NOT read data_dictionary at runtime.\n\n"
+            f"Violations:\n  " + "\n  ".join(violations) + "\n\n"
+            f"The dynamic query path (api/router.py, api/tools.py) can read data_dictionary.\n"
+            f"But the handler harness consumes ONLY generated field_semantics.py.\n"
+            f"This keeps client porting a simple yaml swap.\n"
+        )
+        raise AssertionError(msg)
+
+    print(f"  ✓ Checked {len(harness_files)} harness files")
+    print("  ✓ No data_dictionary access detected")
+    print("  ✓ Harness boundary is isolated (handlers consume only generated field_semantics)")
+
 def main():
     """Run all field_semantics drift tests."""
     print("=" * 70)
@@ -284,6 +380,7 @@ def main():
         test_stage_transition_returns_correct_keys,
         test_unknown_stages_handled_gracefully,
         test_no_raw_stage_ids_outside_field_semantics,
+        test_harness_boundary_isolation,  # Phase 5d - critical boundary guard
     ]
 
     passed = 0
