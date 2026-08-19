@@ -1,0 +1,224 @@
+# COACHING CLIENT CONFIG — GrowthBook-specific.
+# This is what changes per client. For a new client (e.g. Frontera),
+# copy this file's structure, replace every value.
+
+client_name: "GrowthBook"
+
+company:
+  name: "GrowthBook"
+  product: "Feature flagging and experimentation platform that lets product and engineering teams control feature rollouts and run A/B tests without needing to ship new code for every change or experiment"
+  positioning: "Warehouse-native, open-source experimentation with predictable pricing"
+  icp:
+    company_size: "100K+ monthly visitors (traffic-based threshold)"
+    industry: "Technical/behavioral fit (no specific vertical)"
+    stage: "Product-Led Growth companies with modern data infrastructure"
+    buyer_role: "VP/Director of Growth, Experimentation, or Product (Experimentation Leader)"
+    buyer_pain: "Need to scale experimentation, challenges with metric definitions and rigor, need to democratize experimentation for self-service"
+
+competitors:
+  - name: "LaunchDarkly"
+    type: direct
+    prospect_language:
+      - "We're already using LaunchDarkly"
+      - "Evaluating LaunchDarkly vs you"
+    differentiation: "GrowthBook offers true warehouse-native experimentation with statistical rigor, while LaunchDarkly treats A/B testing as afterthought with expensive vendor lock-in pricing"
+    win_condition: "When experimentation rigor, predictable pricing, and warehouse-native architecture matter (80% win rate)"
+    loss_condition: "When enterprise release governance is the top priority over experimentation"
+    aliases:
+      - "LD"
+      - "Launch Darkly"
+
+  - name: "Statsig"
+    type: direct
+    prospect_language:
+      - "We're looking at Statsig"
+      - "Statsig seems simpler"
+    differentiation: "Platform flexibility, world-class feature flags, and cost-effective pricing at scale vs Statsig's all-in-one suite that doesn't scale with advanced needs"
+    win_condition: "When teams need advanced experimentation capabilities and platform flexibility"
+    loss_condition: "When simplicity is prioritized over advanced capabilities"
+    aliases:
+      - "Statsig"
+
+  - name: "EPPO"
+    type: direct
+    prospect_language:
+      - "We're using EPPO"
+      - "EPPO has strong stats"
+      - "Datadog Experiments"
+    differentiation: "Open-source, self-hosting option, and predictable pricing without platform lock-in vs EPPO's observability bundling and less comprehensive feature flagging"
+    win_condition: "When teams want statistical rigor plus comprehensive feature flagging without vendor lock-in"
+    loss_condition: "When they're already committed to Datadog observability suite"
+    aliases:
+      - "Eppo"
+      - "Datadog Experiments"
+      - "Datadog"
+
+  - name: "Optimizely"
+    type: direct
+    prospect_language:
+      - "We're using Optimizely"
+      - "Optimizely is expensive"
+    differentiation: "Product/engineering focus with predictable pricing vs Optimizely's marketing-first approach and high cost"
+    win_condition: "When buyer is technical/product team, not marketing"
+    loss_condition: "When marketing team owns the decision and needs visual builder"
+    aliases:
+      - "Optimizely"
+
+  - name: "Homegrown"
+    type: internal_tool
+    prospect_language:
+      - "We built our own"
+      - "Engineering already has a solution"
+      - "We have an internal tool"
+    differentiation: "Statistical rigor, maintained SDKs, and proven experimentation capabilities vs high engineering maintenance cost and lack of statistical rigor"
+    win_condition: "When showing hidden costs of maintenance and lack of rigor"
+    loss_condition: "When engineering team is defensive about their tool"
+    aliases:
+      - "Internal tool"
+      - "Custom built"
+      - "In-house"
+
+discovery_numbers:
+  # fills the seed's discovery_five_numbers_structure slots with
+  # GrowthBook's actual definitions
+  volume: "Experiments run per month/year"
+  win_rate: "Proportion of experiments that ship a winning result"
+  value_per_win: "Revenue or conversion impact of a typical winner"
+  incumbent_cost: "Annual spend on LaunchDarkly/Optimizely/etc, and pricing model"
+  the_clock: "Contract renewal date, licence expiry, or budget cycle"
+
+objection_categories:
+  switching_cost:
+    label: "Switching Cost"
+    signals:
+      - "We're already using"
+      - "We've already invested in"
+      - "We already have a homegrown solution"
+      - "Engineering can build this"
+    best_responses:
+      - "Show migration path is incremental"
+      - "Highlight cost savings over time"
+      - "Reference displacement wins like ShiftKey and StackBlitz"
+      - "For homegrown: show hidden maintenance costs and lack of statistical rigor"
+    typical_stage: "Discovery / Scoping"
+
+  technical:
+    label: "Technical Complexity"
+    signals:
+      - "We're not ready for warehouse-native"
+      - "Our data warehouse isn't mature enough"
+      - "This seems complex to implement"
+    best_responses:
+      - "Show setup is simpler than expected"
+      - "Offer managed cloud as starting point"
+      - "Provide warehouse-native migration path"
+    typical_stage: "Discovery / Technical Evaluation"
+
+  product_gap:
+    label: "Product Gap"
+    signals:
+      - "We need [specific feature] you don't have"
+      - "LaunchDarkly has more mature"
+      - "Does it support"
+    best_responses:
+      - "Check roadmap"
+      - "Identify workarounds"
+      - "Understand if must-have vs nice-to-have"
+    typical_stage: "Scoping / Proposal"
+
+  budget:
+    label: "Budget / ROI"
+    signals:
+      - "Other tools seem cheaper"
+      - "What's the ROI"
+      - "Too expensive"
+      - "Outside our budget"
+    best_responses:
+      - "Show total cost of ownership"
+      - "Demonstrate ROI through experimentation velocity gains"
+      - "Emphasize predictable pricing vs vendor lock-in risks"
+    typical_stage: "Proposal / Negotiating"
+
+  timing:
+    label: "Timing / Priority"
+    signals:
+      - "We'll evaluate next quarter"
+      - "Not a priority right now"
+      - "We're not ready yet"
+    best_responses:
+      - "Understand real blocker"
+      - "Identify what would make it urgent"
+      - "Offer pilot to build momentum"
+    typical_stage: "Discovery / Qualification"
+
+  internal_politics:
+    label: "Internal Politics"
+    signals:
+      - "Need to convince [other team]"
+      - "Data team owns this"
+      - "Engineering won't approve"
+    best_responses:
+      - "Map out all stakeholders"
+      - "Offer separate demo for each team"
+      - "Understand decision-making process"
+    typical_stage: "Scoping / Proposal"
+
+feature_gaps:
+  # To be learned from call analysis
+  # Agent will populate this section as patterns emerge
+
+value_metrics:
+  - metric: "Experimentation velocity"
+    typical_claim: "Run 5x more experiments"
+    measurement: "Number of experiments per quarter"
+    proof_point: "Comparison page claims 5x more experiments at 1/2 the cost"
+
+  - metric: "Cost reduction"
+    typical_claim: "1/2 the cost of competitors"
+    measurement: "Total platform cost vs LaunchDarkly/Optimizely"
+    proof_point: "Predictable pricing without event-based limits"
+
+  # Additional metrics to be learned from call analysis:
+  # - Engineering time saved
+  # - Faster time to ship features
+  # - Reduction in failed releases
+
+good_discovery:
+  questions_to_ask:
+    - "What's your current experimentation setup?"
+    - "What challenges are you facing with metric definitions?"
+    - "How many experiments do you run per quarter?"
+    - "Who owns experimentation - Product, Growth, or Engineering?"
+    - "What's your data warehouse setup? (Snowflake, BigQuery, Redshift, Postgres)"
+    - "What does your modern data stack look like? (Segment, Amplitude, etc.)"
+
+  signals_of_strong_call:
+    - "Commitment to moving to warehouse native solution"
+    - "Goal to scale experimentation"
+    - "Challenges with metric definitions"
+    - "Challenges with rigor"
+    - "Need to democratize / achieve self-service so experimentation scales"
+    - "Focused on Product experimentation (not just Marketing use cases)"
+    - "100K+ monthly visitors mentioned"
+    - "Modern tech stack in place (Segment, Amplitude)"
+
+  signals_of_weak_call:
+    - "Marketing-only use case"
+    - "No clear experimentation leader identified"
+    - "Low traffic volume (under 100K monthly visitors)"
+    - "No data warehouse infrastructure"
+    - "Only interested in feature flags, not experimentation"
+
+learning:
+  min_evidence_companies: 2
+  protected_instructions: []
+  track_failure_patterns: true
+  learning_categories:
+    - "evidence_quality"
+    - "score_calibration"
+    - "false_gap_detection"
+    - "stage_alignment"
+    - "action_specificity"
+    - "competitive_mentions"
+    - "objection_patterns"
+    - "value_metric_claims"
