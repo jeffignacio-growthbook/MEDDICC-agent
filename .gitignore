@@ -50,3 +50,6 @@ data/*.csv
 # regardless of filename. Use environment variables, never inline credentials.
 .env
 .env.*
+
+# Client-specific forbidden names list (local only, never tracked)
+.forbidden_names

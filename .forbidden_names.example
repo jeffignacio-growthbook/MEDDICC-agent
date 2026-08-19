@@ -1,0 +1,11 @@
+# Forbidden client-specific names (local configuration)
+#
+# This file demonstrates the pattern for .forbidden_names (gitignored).
+# Copy this to .forbidden_names and add actual client names (one per line).
+#
+# Purpose: Block client-specific naming from being committed.
+# The pre-commit hook reads .forbidden_names and blocks any matches.
+#
+# Example (do not use real names in this tracked file):
+# exampleclient
+# anotherclient
