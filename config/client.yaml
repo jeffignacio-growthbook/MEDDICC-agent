@@ -41,6 +41,21 @@ forecast:
   # historical close rates once you have enough data.
 
 # ============================================================================
+# PROPOSAL ENGINE
+# ============================================================================
+# Self-tuning analysis gate. Analyses can propose methodology changes
+# (e.g., anchor week, coverage target) but proposals never auto-apply.
+# All proposals require explicit admin approval before taking effect.
+
+proposal_engine:
+  enabled: true
+  min_evidence_count: 30          # sample size floor before proposing
+  min_quarters_of_history: 4      # analyses needing quarter cohorts
+  min_effect_size_pct: 10         # suppress sub-10% recommendations
+  suppress_duplicate_days: 30     # don't re-propose same entity within N days
+  max_open_proposals: 10          # stop-the-noise cap
+
+# ============================================================================
 # SEGMENTATION CONFIGURATION
 # ============================================================================
 # Company-size based segmentation for pipeline generation and in-quarter
