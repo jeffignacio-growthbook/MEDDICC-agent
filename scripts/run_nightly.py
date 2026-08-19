@@ -83,11 +83,56 @@ def _extract_component_details(cumulative_state: dict) -> dict:
     return details
 
 
-def get_calls_for_company(company_name: str, since_date, memory) -> tuple:
+def get_calls_for_company(company_name: str, since_date, memory, deal_id: str = None) -> tuple:
     """
-    Load calls from cache only. No live API calls.
-    ETL job handles cache freshness separately.
+    Load calls from Supabase by deal_id.
+    Falls back to JSON cache if deal_id not provided (legacy mode).
     """
+    # New path: Query Supabase by deal_id
+    if deal_id:
+        try:
+            from supabase_client import SupabaseWriter
+            writer = SupabaseWriter()
+            sb = writer.client
+
+            # Query calls for this deal
+            query = sb.table('calls').select('*').eq('deal_id', str(deal_id))
+
+            # Apply since_date filter if provided
+            if since_date:
+                query = query.gte('call_date', since_date.strftime('%Y-%m-%d'))
+
+            result = query.order('call_date', desc=False).execute()
+
+            if not result.data:
+                print(f'   📭 No calls in Supabase for deal {deal_id}')
+                return [], [], 0
+
+            # Convert Supabase format to expected format
+            calls = []
+            for row in result.data:
+                call = {
+                    'id': row.get('call_id'),
+                    'date': row.get('call_date'),
+                    'source': row.get('source', '').lower(),
+                    'summary': row.get('summary', ''),
+                    'formatted_summary': row.get('summary', ''),  # Use same summary
+                    'title': row.get('title', ''),
+                    'duration': row.get('duration_seconds', 0) // 60 if row.get('duration_seconds') else 0,
+                }
+                calls.append(call)
+
+            print(f'   📊 Supabase: {len(calls)} calls for deal {deal_id}')
+
+            ff = [c for c in calls if c.get('source') == 'fireflies']
+            ap = [c for c in calls if c.get('source') == 'apollo']
+            return ff, ap, len(calls)
+
+        except Exception as e:
+            print(f'   ⚠️  Supabase query failed: {e}')
+            print(f'   Falling back to JSON cache...')
+
+    # Legacy path: JSON cache by slug
     slug = slugify(company_name)
     if not slug:
         return [], [], 0
@@ -231,9 +276,9 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer,
             except:
                 since_date = None
 
-        # Get calls from cache only (ETL handles freshness)
+        # Get calls from Supabase (with JSON cache fallback)
         fireflies_calls, apollo_calls, new_count = get_calls_for_company(
-            company_name, since_date, memory
+            company_name, since_date, memory, deal_id=deal_id
         )
 
         total_calls = len(fireflies_calls) + len(apollo_calls)
@@ -279,8 +324,9 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer,
                     'reason': 'no calls found'
                 }
 
-        # GUARD 4: Most recent call already analyzed
-        if since_date:
+        # GUARD 4: Most recent call already analyzed (skip in TEST_MODE for quality comparison)
+        test_mode = os.getenv('TEST_MODE', 'false').lower() == 'true'
+        if since_date and not test_mode:
             last_call_date = get_most_recent_call_date(fireflies_calls, apollo_calls)
             if last_call_date and last_call_date <= since_date:
                 return {
