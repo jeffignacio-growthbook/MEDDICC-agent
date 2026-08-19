@@ -1,7 +1,7 @@
 """
 Gong API Adapter
 
-Implements the same interface as fireflies_client.py but reads from Gong API.
+Implements the CallSourceAdapter interface for Gong API.
 Used by etl_calls.py when config/client.yaml sets call_tools.primary = gong.
 
 Gong provides richer structured data than Fireflies:
@@ -21,14 +21,18 @@ import requests
 from datetime import datetime
 from typing import List, Optional, Dict
 
+from adapters.call_source import CallSourceAdapter, NormalizedCall
 
-class GongAdapter:
+
+class GongAdapter(CallSourceAdapter):
     """
     Gong call intelligence adapter.
 
     Authentication: Basic auth with Access Key + Secret (base64 encoded)
     API docs: https://gong.app.gong.io/settings/api/documentation
     """
+
+    source_name = "gong"
 
     # API access level for this client
     # basic: metadata only (title, date, duration, participants)
@@ -470,3 +474,114 @@ class GongAdapter:
                 })
 
         return results
+
+    # ─────────────────────────────────────────────────────────────────
+    # CallSourceAdapter Interface Methods
+    # ─────────────────────────────────────────────────────────────────
+
+    def fetch_recent(self, limit: int = 50, skip: int = 0,
+                     since: Optional[datetime] = None) -> List[NormalizedCall]:
+        """
+        Return recent calls as list[NormalizedCall]. Paginated.
+
+        Maps to existing get_calls() method, then normalizes results.
+        Note: Gong API doesn't support skip parameter natively; this
+        implementation fetches `limit` recent calls and normalizes them.
+        """
+        # Use existing get_calls method
+        calls = self.get_calls(limit=limit, skip=skip)
+
+        # Filter by date if specified (in-memory)
+        if since:
+            calls = [
+                c for c in calls
+                if self._parse_gong_date(c.get('started', '')) >= since
+            ]
+
+        # Normalize each call
+        return [self._normalize(c) for c in calls]
+
+    def fetch_by_company(self, company_name: str, max_results: int = 100,
+                         since: Optional[datetime] = None) -> List[NormalizedCall]:
+        """
+        Return calls for a company as list[NormalizedCall].
+
+        Maps to existing search_by_company() method.
+        """
+        # Use existing search_by_company
+        calls = self.search_by_company(
+            company_name=company_name,
+            since_date=since
+        )
+
+        # Limit results
+        calls = calls[:max_results]
+
+        # Normalize each call
+        return [self._normalize(c) for c in calls]
+
+    def test_connection(self) -> bool:
+        """
+        True if credentials work and Gong is reachable.
+
+        Tests by fetching 1 call.
+        """
+        try:
+            result = self.get_calls(limit=1, skip=0)
+            return result is not None
+        except Exception:
+            return False
+
+    def supports_transcripts(self) -> bool:
+        """
+        Gong is a recorder. Transcripts available if ACCESS_LEVEL='rich'.
+        """
+        return self.ACCESS_LEVEL == 'rich'
+
+    def _normalize(self, call: Dict) -> NormalizedCall:
+        """
+        Convert a Gong call dict to NormalizedCall.
+
+        Uses the existing format_summary_for_meddicc method to produce
+        the rich summary text.
+        """
+        # Parse date
+        started = call.get('started', '')
+        call_date = str(started)[:10] if started else 'unknown'
+
+        # Get participant emails from parties
+        parties = call.get('parties', [])
+        participant_emails = []
+        for p in parties:
+            email = p.get('emailAddress', '')
+            if email:
+                participant_emails.append(email)
+
+        # Get summary using existing formatter
+        summary = self.format_summary_for_meddicc(call)
+
+        # Check summary quality
+        brief = call.get('brief', '')
+        has_content = bool(brief and len(brief) > 50)
+
+        return NormalizedCall(
+            source=self.source_name,
+            source_call_id=str(call.get('id', '')),
+            title=call.get('title', 'Untitled'),
+            call_date=call_date,
+            summary=summary,
+            duration_minutes=round((call.get('duration', 0) or 0) / 60, 0),
+            participant_emails=participant_emails,
+            participant_count=len(participant_emails),
+            raw_transcript=None,  # Transcripts fetched separately via get_transcript()
+            summary_quality='good' if has_content else 'empty'
+        )
+
+    def _parse_gong_date(self, date_str: str) -> datetime:
+        """Parse Gong ISO date string to datetime."""
+        if not date_str:
+            return datetime.min
+        try:
+            return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+        except:
+            return datetime.min
