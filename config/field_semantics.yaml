@@ -1,5 +1,5 @@
 # Field semantics — the single source of truth for what fields MEAN.
-# Client-specific. Frontera overrides this file; no code changes.
+# Client-specific. Template deployments override this file; no code changes.
 #
 # stage_map: HubSpot stage IDs → canonical meaning + pipeline bucket.
 #   The bucket (discovery|scoping|proposal|closed) is what handlers

@@ -1,9 +1,9 @@
-# Port Checklist: GrowthBook → Template → Frontera
+# Port Checklist: GrowthBook → Template
 
 This document tracks template-level artifacts that must carry over when
 porting GrowthBook's MEDDICC agent harness into the reusable template.
 
-**Port path:** GrowthBook (client-specific) → Template (harness only) → Frontera (new client)
+**Port path:** GrowthBook (client-specific) → Template (harness only) → template (new client)
 
 ## Template-Level Artifacts (Must Carry Over)
 
@@ -30,7 +30,7 @@ Client-specific VALUES get blanked/placeholdered, but STRUCTURE travels.
 - ✅ `scripts/migrations/001-035_*.sql` - Renumbered migration sequence (collision-free)
 - ✅ `scripts/eval_migrations.py` - No-duplicate-number test
 - ✅ Migration runner (`scripts/setup_supabase.py` uses sorted glob)
-- **Action:** Template ships with 001-035, Frontera starts new migrations at 036+
+- **Action:** Template ships with 001-035, template starts new migrations at 036+
 
 ### CI Adapter Abstraction (Conversation Intelligence)
 - ✅ `scripts/call_source.py` - Abstract interface (CallSourceAdapter, NormalizedCall)
@@ -65,7 +65,7 @@ Client-specific VALUES get blanked/placeholdered, but STRUCTURE travels.
 ## Client-Level Artifacts (Must Be Blanked/Placeholdered)
 
 These contain GrowthBook-specific values that must NOT travel to template.
-Template ships with placeholder structure; Frontera fills with their values.
+Template ships with placeholder structure; template fills with their values.
 
 ### Coaching Client Config
 - `config/coaching_client.yaml` contents:
@@ -80,7 +80,7 @@ Template ships with placeholder structure; Frontera fills with their values.
 - `config/field_semantics.yaml` stage_map:
   - GrowthBook's HubSpot stage IDs (appointmentscheduled, qualifiedtobuy, etc.) → blanked
   - Template ships with STRUCTURE + example/placeholder stage names
-  - Frontera runs `scripts/discover_stages.py` against their HubSpot to populate
+  - template runs `scripts/discover_stages.py` against their HubSpot to populate
 
 ### Operational Config
 - `config/client.yaml` contents:
@@ -132,4 +132,4 @@ Add to template deployment docs (create `docs/DEPLOYMENT.md` if missing):
 - **Landed this session (2026-08-19):** All items marked ✅ above
 - **Next session additions:** Add new template-level artifacts as they land
 - **Port readiness gate:** All harness tests passing + client placeholders verified empty
-- **Frontera onboarding:** Follow deployment docs above after forking template
+- **template onboarding:** Follow deployment docs above after forking template

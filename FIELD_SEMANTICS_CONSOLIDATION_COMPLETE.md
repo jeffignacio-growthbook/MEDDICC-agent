@@ -2,7 +2,7 @@
 
 **Status:** ✅ All 5 phases complete and committed independently
 
-**Objective Achieved:** Client porting (GrowthBook → Frontera) is now a **yaml swap with zero code changes**.
+**Objective Achieved:** Client porting (GrowthBook → template) is now a **yaml swap with zero code changes**.
 
 ---
 
@@ -136,8 +136,8 @@ test_harness_boundary_isolation()
 **Status:**
 - ✅ Phase 5d isolation test: COMPLETE and passing
 - ✅ Migration 034: Created and committed (proposal lifecycle schema)
-- ⏸️ Proposal workflow implementation: Deferred to post-Frontera improvement loop
-- ⏸️ Relevance surfacing: Deferred to post-Frontera improvement loop
+- ⏸️ Proposal workflow implementation: Deferred to post-template improvement loop
+- ⏸️ Relevance surfacing: Deferred to post-template improvement loop
 
 **Harness Boundary Established:**
 
@@ -231,7 +231,7 @@ test_harness_boundary_isolation()
 
 ### Migration Tests (scripts/eval_migrations.py)
 
-- 3 migration validation tests ensuring clean Frontera deployment
+- 3 migration validation tests ensuring clean template deployment
 - Verifies no duplicate migration numbers
 - Checks dependency order respected
 - Validates migration sequence
@@ -242,7 +242,7 @@ test_harness_boundary_isolation()
 
 ---
 
-## Client Porting: GrowthBook → Frontera
+## Client Porting: GrowthBook → template
 
 ### Before Consolidation (Multi-File Hunt)
 
@@ -261,12 +261,12 @@ test_harness_boundary_isolation()
 
 1. Edit `config/field_semantics.yaml`:
    ```yaml
-   # Replace GrowthBook stage IDs with Frontera stage IDs
+   # Replace GrowthBook stage IDs with template stage IDs
    discovery_call:
      label: "Discovery Call"
      bucket: "discovery"
      transition: "discovery_to_scoping"
-     aliases: ["frontera_stage_001"]
+     aliases: ["template_stage_001"]
    ```
 
 2. Regenerate:
@@ -282,7 +282,7 @@ test_harness_boundary_isolation()
 4. Deploy:
    ```bash
    git add config/field_semantics.yaml api/field_semantics.py
-   git commit -m "Port to Frontera: update stage definitions"
+   git commit -m "Port to template: update stage definitions"
    git push
    ```
 
@@ -413,6 +413,6 @@ The field semantics consolidation achieved its primary objective: **client porti
 
 The harness boundary is locked via Phase 5d isolation test, ensuring handlers will never drift back to reading runtime proposals. The dual-consumption architecture (static handlers + dynamic queries) balances optimization with flexibility.
 
-All 5 phases committed independently with full test verification. The foundation is ready for Frontera porting and future client deployments.
+All 5 phases committed independently with full test verification. The foundation is ready for template porting and future client deployments.
 
 **✅ CONSOLIDATION COMPLETE**

@@ -25,7 +25,7 @@ def test_no_duplicate_migration_numbers():
     - etc.
 
     On GrowthBook these were applied in the right order by hand.
-    On Frontera they would apply in undefined order, breaking dependencies.
+    On template they would apply in undefined order, breaking dependencies.
     """
     print("\n[TEST] No duplicate migration numbers")
 

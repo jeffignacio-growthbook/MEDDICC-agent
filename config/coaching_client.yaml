@@ -1,5 +1,5 @@
 # COACHING CLIENT CONFIG — GrowthBook-specific.
-# This is what changes per client. For a new client (e.g. Frontera),
+# This is what changes per client. For a new client (template-based),
 # copy this file's structure, replace every value.
 
 client_name: "GrowthBook"

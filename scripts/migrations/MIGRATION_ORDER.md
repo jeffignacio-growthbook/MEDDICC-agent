@@ -5,7 +5,7 @@
 Migration number collisions existed in the GrowthBook repo:
 - Five numbers were used twice (012, 013, 014, 015, 016, 027)
 - GrowthBook's live DB is fine (applied by hand in correct order)
-- Fresh Frontera DB would have undefined ordering due to filename sort
+- Fresh template DB would have undefined ordering due to filename sort
 
 This document establishes the **canonical linear order** for all migrations.
 
@@ -113,13 +113,13 @@ Applied as 016_create_meetings_table → Now numbered 033
 Applied as 027_add_proposal_lifecycle → Now numbered 034
 ```
 
-GrowthBook's migration state remains valid. The renumbering fixes Frontera's fresh database setup.
+GrowthBook's migration state remains valid. The renumbering fixes template's fresh database setup.
 
 ---
 
-## Frontera Fresh Database Setup
+## template Fresh Database Setup
 
-For a fresh Frontera deployment, apply migrations in numeric order (001 → 034):
+For a fresh template deployment, apply migrations in numeric order (001 → 034):
 
 ```bash
 for migration in scripts/migrations/*.sql; do

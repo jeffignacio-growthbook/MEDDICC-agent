@@ -24,7 +24,7 @@ The consolidation creates two distinct consumption paths:
 - Changes require regeneration and deployment
 
 **Why:**
-- Client porting is a simple yaml swap (GrowthBook → Frontera)
+- Client porting is a simple yaml swap (GrowthBook → template)
 - No runtime field definition lookups
 - Stage logic is compile-time constant
 - Enables aggressive optimization and testing
@@ -183,7 +183,7 @@ Not all field definitions affect the handler harness. Only definitions consumed 
 
 ### Workflow: Agent Proposes Stage Change
 
-1. **Proposal:** Agent notices Frontera uses different stage IDs
+1. **Proposal:** Agent notices template uses different stage IDs
    ```sql
    INSERT INTO data_dictionary (
      source, hubspot_name, supabase_column,
@@ -261,7 +261,7 @@ When a new field definition becomes `active`, the system should check if it affe
 1. **Handlers NEVER read data_dictionary at runtime** (enforced by Phase 5d test)
 2. **Dynamic path queries ONLY `active` or `accepted` proposals** (draft/rejected invisible)
 3. **If `affects_handlers = true`, change requires regeneration** (no runtime stage logic)
-4. **Client porting is a yaml swap** (GrowthBook → Frontera changes only yaml, not code)
+4. **Client porting is a yaml swap** (GrowthBook → template changes only yaml, not code)
 
 ---
 
