@@ -237,7 +237,9 @@ def backfill_from_property_history(sb, cache, dry_run=False):
     print("PER-QUARTER COVERAGE")
     print("=" * 70)
 
-    for quarter in sorted(stats['by_quarter'].keys()):
+    # Sort all quarters (including unknown)
+    all_quarters = sorted([q for q in stats['by_quarter'].keys() if q is not None])
+    for quarter in all_quarters:
         q_stats = stats['by_quarter'][quarter]
         total = q_stats['total']
         populated = q_stats['populated']
