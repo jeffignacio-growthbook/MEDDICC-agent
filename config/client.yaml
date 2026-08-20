@@ -129,7 +129,21 @@ pipeline:
     # NULL-safe sum: blank components treated as 0.
     # This is GrowthBook's Incremental ARR without the
     # NULL-out hazard of the HubSpot calculated field.
-    # NEVER use the amount field for GrowthBook reporting.
+    # Verified: incremental_arr == new_revenue + expansion_revenue for all
+    # 1,523 deals where HubSpot populates it (zero disagreements).
+
+    # When EVERY component is blank/null, Incremental ARR is unknown rather
+    # than zero, so fall back to amount. Do NOT fall back when a component is
+    # present and zero — that is a real value. Without this, 13 default-pipeline
+    # deals carrying $920K read as $0.
+    fallback: "amount"
+
+    # Renewal deals are Incremental ARR + Renewal ARR: incremental_arr holds
+    # only the expansion on top of the renewed base, so renewals without
+    # expansion compute to 0 without this. renewal_revenue is HubSpot's
+    # "Renewal ARR" — the portion of ACV/ARR renewing existing contracted ARR.
+    renewal_components: ["renewal_revenue"]
+    renewal_pipeline_ids: ["866608541"]
   qualified_stage_order: 1  # Stages with order >= this are "qualified" (entered pipeline)
   win_rate_qualified_field: "sao"  # Win rate denominator = deals where SAO is true
 

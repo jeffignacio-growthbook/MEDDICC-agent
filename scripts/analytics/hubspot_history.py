@@ -48,8 +48,32 @@ class RateLimiter:
         self.last_call = time.time()
 
 
+# Properties whose history we reconstruct point-in-time. dealstage drives
+# the inclusion rule; amount and closedate are needed because using today's
+# values as a proxy was the second cause of the prior backfill's failure.
+# amount alone is the WRONG value field for GrowthBook: the value is
+# Incremental ARR (new_revenue + expansion_revenue), falling back to amount
+# only when every component is blank, plus Renewal ARR (renewal_revenue) for
+# renewal deals. All of those need point-in-time history, not just amount.
+TRACKED_PROPERTIES = ('dealstage', 'hs_manual_forecast_category',
+                      'new_revenue', 'expansion_revenue', 'renewal_revenue',
+                      'amount', 'closedate')
+
+# Cache records are keyed by property. 'history' stays the dealstage key for
+# backward compatibility with point_in_time and backfill_snapshots.
+HISTORY_KEYS = {
+    'dealstage': 'history',
+    'hs_manual_forecast_category': 'forecast_category_history',
+    'new_revenue': 'new_revenue_history',
+    'expansion_revenue': 'expansion_revenue_history',
+    'renewal_revenue': 'renewal_revenue_history',
+    'amount': 'amount_history',
+    'closedate': 'closedate_history',
+}
+
+
 class PropertyHistoryFetcher:
-    """Fetches dealstage and hs_manual_forecast_category property history from HubSpot."""
+    """Fetches point-in-time property history for TRACKED_PROPERTIES."""
 
     def __init__(self, cache_file: str = 'property_history_cache.json'):
         self.api_key = os.environ.get('HUBSPOT_API_KEY')
@@ -97,21 +121,26 @@ class PropertyHistoryFetcher:
             - fetched_at: str ISO timestamp
             - source: 'cache' or 'api'
         """
-        # Check cache first unless forced
+        # Check cache first unless forced. A record fetched before a property
+        # was added to TRACKED_PROPERTIES is a MISS, not a hit — otherwise the
+        # cache silently serves records with no amount/closedate history and
+        # the backfill falls back to proxies again.
         if not force and deal_id in self.cache['deals']:
-            self.cache['stats']['cached'] += 1
             cached = self.cache['deals'][deal_id]
-            cached['source'] = 'cache'
-            return cached
+            if all(k in cached for k in HISTORY_KEYS.values()):
+                self.cache['stats']['cached'] += 1
+                cached['source'] = 'cache'
+                return cached
 
         # Respect rate limits
         self.rate_limiter.wait()
 
         # Fetch from HubSpot API
         url = f"{self.base_url}/{deal_id}"
+        props = ','.join(TRACKED_PROPERTIES)
         params = {
-            'properties': 'dealstage,hs_manual_forecast_category',
-            'propertiesWithHistory': 'dealstage,hs_manual_forecast_category'
+            'properties': props,
+            'propertiesWithHistory': props
         }
         headers = {
             'Authorization': f'Bearer {self.api_key}',
@@ -123,36 +152,27 @@ class PropertyHistoryFetcher:
             response.raise_for_status()
 
             data = response.json()
-
-            # Extract dealstage property history
-            dealstage_history = []
-            if 'propertiesWithHistory' in data and 'dealstage' in data['propertiesWithHistory']:
-                for entry in data['propertiesWithHistory']['dealstage']:
-                    dealstage_history.append({
-                        'timestamp': entry.get('timestamp'),
-                        'value': entry.get('value'),
-                        'source_type': entry.get('sourceType'),
-                        'source_id': entry.get('sourceId')
-                    })
-
-            # Extract forecast_category property history
-            forecast_category_history = []
-            if 'propertiesWithHistory' in data and 'hs_manual_forecast_category' in data['propertiesWithHistory']:
-                for entry in data['propertiesWithHistory']['hs_manual_forecast_category']:
-                    forecast_category_history.append({
-                        'timestamp': entry.get('timestamp'),
-                        'value': entry.get('value'),
-                        'source_type': entry.get('sourceType'),
-                        'source_id': entry.get('sourceId')
-                    })
+            with_history = data.get('propertiesWithHistory') or {}
 
             result = {
                 'deal_id': deal_id,
-                'history': dealstage_history,  # Keep legacy name for backward compat
-                'forecast_category_history': forecast_category_history,
                 'fetched_at': datetime.now().isoformat(),
-                'source': 'api'
+                'source': 'api',
+                # Recorded so a later addition to TRACKED_PROPERTIES
+                # invalidates this record instead of being served stale.
+                'properties_fetched': list(TRACKED_PROPERTIES),
             }
+
+            for prop, key in HISTORY_KEYS.items():
+                entries = []
+                for entry in with_history.get(prop) or []:
+                    entries.append({
+                        'timestamp': entry.get('timestamp'),
+                        'value': entry.get('value'),
+                        'source_type': entry.get('sourceType'),
+                        'source_id': entry.get('sourceId')
+                    })
+                result[key] = entries
 
             # Cache the result
             self.cache['deals'][deal_id] = result

@@ -1,7 +1,15 @@
 name: Fetch HubSpot Property History
 
 on:
-  workflow_dispatch:  # Manual trigger only
+  workflow_dispatch:
+    inputs:
+      force_refetch:
+        description: 'Re-fetch every deal, ignoring any cache'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
 
 jobs:
   fetch-history:
@@ -10,15 +18,27 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      # Cheap guards first: if these fail, do not spend 6 minutes of HubSpot
+      # API calls to find out.
+      - name: "Pre-flight — offline test suite"
+        run: |
+          set -e
+          PYTHONPATH=scripts:api:. python3 scripts/eval_reconstruction.py
+          PYTHONPATH=scripts:api:. python3 scripts/eval_field_semantics.py
+          PYTHONPATH=scripts:api:. python3 scripts/eval_migrations.py
+          PYTHONPATH=scripts:api:. python3 scripts/eval_deal_value.py
+          PYTHONPATH=scripts:api:. python3 scripts/analytics/diagnose_population_cap.py
+          PYTHONPATH=scripts:api:. python3 scripts/analytics/compare_inclusion_rules.py
 
       - name: Fetch property history from HubSpot
         env:
@@ -26,43 +46,52 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
-          echo "========================================================================"
-          echo "Fetching HubSpot property history for all deals"
-          echo "========================================================================"
+          echo "Tracked properties (point-in-time reconstruction needs all of them):"
+          python3 -c "import sys; sys.path.insert(0,'scripts/analytics'); \
+            from hubspot_history import TRACKED_PROPERTIES; \
+            print('  ' + ', '.join(TRACKED_PROPERTIES))"
           echo ""
-          echo "This will:"
-          echo "  - Fetch dealstage property history for all deals"
-          echo "  - Rate limit: 5 calls/sec (conservative)"
-          echo "  - Cache results to property_history_cache.json"
-          echo "  - Estimated time: ~6 minutes for 1,792 deals"
-          echo ""
+          FORCE=""
+          if [ "${{ inputs.force_refetch }}" = "true" ]; then FORCE="--force"; fi
+          python3 scripts/analytics/hubspot_history.py --all --rate-limit 5 $FORCE
 
-          python scripts/analytics/hubspot_history.py --all --rate-limit 5
+      - name: "Cache summary"
+        run: |
+          ls -lh property_history_cache.json
+          python3 - <<'EOF'
+          import json, collections
+          c = json.load(open('property_history_cache.json'))
+          deals = c['deals']
+          print(f"deals: {len(deals)}")
+          keys = ('history', 'amount_history', 'closedate_history',
+                  'new_revenue_history', 'expansion_revenue_history',
+                  'renewal_revenue_history', 'forecast_category_history')
+          for k in keys:
+              have = sum(1 for d in deals.values() if d.get(k))
+              ent = sum(len(d.get(k) or []) for d in deals.values())
+              print(f"  {k:<28} deals with entries: {have:>5}   total entries: {ent:>7}")
+          lens = collections.Counter(len(d.get('history') or []) for d in deals.values())
+          print(f"  dealstage history length: max {max(lens)}  "
+                f"deals with 0 entries: {lens.get(0, 0)}")
+          print(f"  errors: {len(c.get('errors', []))}")
+          EOF
 
-          echo ""
-          echo "========================================================================"
-          echo "Fetch complete - verifying cache"
-          echo "========================================================================"
+      # CONDITION 1 — every stage id in history must classify, or the
+      # reconstruction gate would raise mid-backfill. Non-zero exit fails
+      # the job on purpose.
+      - name: "CONDITION 1 — historical stage ID coverage (gate)"
+        run: |
+          set -o pipefail
+          PYTHONPATH=scripts:api:. python3 \
+            scripts/analytics/discover_historical_stages.py \
+            2>&1 | tee stage_discovery_report.txt
 
-          # Show cache stats
-          python scripts/analytics/hubspot_history.py --resume
-
-      - name: Upload property history cache
+      - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: property-history-cache
-          path: property_history_cache.json
+          name: property-history-and-reports
+          path: |
+            property_history_cache.json
+            stage_discovery_report.txt
           retention-days: 7
-
-      - name: Show cache summary
-        run: |
-          echo ""
-          echo "========================================================================"
-          echo "Property history cache uploaded as artifact"
-          echo "========================================================================"
-          echo ""
-          echo "Download the artifact from the Actions tab and place it in the"
-          echo "repository root as 'property_history_cache.json' to run validation"
-          echo "and dry-run backfill locally."
-          echo ""
-          ls -lh property_history_cache.json

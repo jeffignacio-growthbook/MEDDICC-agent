@@ -182,6 +182,10 @@ class HubSpotDealsClient:
                 'new_revenue',
                 'expansion_revenue',
                 'prior_arr',
+                # HubSpot "Renewal ARR": the portion of ACV/ARR renewing
+                # existing contracted ARR. Renewal deals are Incremental ARR
+                # + Renewal ARR, so without this they compute to 0.
+                'renewal_revenue',
                 'sao',
                 'hs_manual_forecast_category',
                 'bdr_owner'  # SDR attribution field

@@ -105,19 +105,56 @@ def get_value_properties(config: Optional[Dict] = None) -> list:
             config = {}
 
     vf = config.get('pipeline', {}).get('value_field', 'amount')
-    if isinstance(vf, dict):
-        return list(vf.get('components', []))
-    return [vf]
+    if not isinstance(vf, dict):
+        return [vf]
+
+    # The fallback and renewal components are part of the value, so the ETL
+    # must fetch them too. Omitting renewal_revenue is why renewal deals
+    # computed to 0.
+    props = list(vf.get('components', []))
+    extras = ([vf['fallback']] if vf.get('fallback') else [])
+    extras += list(vf.get('renewal_components', []))
+    for extra in extras:
+        if extra not in props:
+            props.append(extra)
+    return props
 
 
-def compute_deal_value(properties: dict, config: Optional[Dict] = None) -> float:
+def _numeric_or_none(raw) -> Optional[float]:
+    """Parse a HubSpot numeric property. Blank/None/'null' -> None, not 0."""
+    if raw in (None, '', 'null'):
+        return None
+    try:
+        clean = str(raw).replace('$', '').replace(',', '').strip()
+        return float(clean) if clean else None
+    except (ValueError, TypeError):
+        return None
+
+
+def compute_deal_value(properties: dict, config: Optional[Dict] = None,
+                       pipeline_id: Optional[str] = None) -> float:
     """
-    NULL-safe deal value from a HubSpot properties dict.
-    Blanks/None/'' -> 0. Works for both config shapes.
+    GrowthBook deal value from a HubSpot properties dict.
+
+    Incremental ARR (new_revenue + expansion_revenue) is the value, with two
+    rules the plain NULL-safe sum got wrong:
+
+    1. If EVERY component is blank/null, Incremental ARR is unknown rather
+       than zero, so fall back to `amount`. A component that is present and
+       zero is a real value and does NOT trigger the fallback.
+    2. Renewal-pipeline deals are Incremental ARR + Renewal ARR
+       (`renewal_revenue`). incremental_arr carries only the expansion above
+       the renewed base, so a renewal without expansion computes to 0 without
+       this. Renewals fall back to `amount` only when Incremental ARR AND
+       Renewal ARR are both blank -- falling back while also adding Renewal
+       ARR would double-count, since `amount` equals the renewed base for 89%
+       of renewals carrying both.
 
     Args:
         properties: HubSpot deal properties dict
         config: Optional full config dict (loaded if not provided)
+        pipeline_id: Deal's pipeline. Required to apply the renewal rule;
+            without it a renewal deal is valued as new business.
 
     Returns:
         float: Computed deal value
@@ -133,21 +170,37 @@ def compute_deal_value(properties: dict, config: Optional[Dict] = None) -> float
             config = {}
 
     vf = config.get('pipeline', {}).get('value_field', 'amount')
-    names = (vf.get('components', []) if isinstance(vf, dict) else [vf])
+    if not isinstance(vf, dict):
+        return _numeric_or_none(properties.get(vf)) or 0.0
 
-    total = 0.0
-    for n in names:
-        raw = properties.get(n)
-        try:
-            # Strip $ and , from value strings, handle None/empty/null
-            if raw not in (None, '', 'null'):
-                clean = str(raw).replace('$', '').replace(',', '').strip()
-                if clean:
-                    total += float(clean)
-        except (ValueError, TypeError):
-            pass
+    def summed(names):
+        """(total, any_component_present). All-blank -> (0.0, False)."""
+        total, present = 0.0, False
+        for n in names:
+            v = _numeric_or_none(properties.get(n))
+            if v is not None:
+                total += v
+                present = True
+        return total, present
 
-    return total
+    incremental, incremental_present = summed(vf.get('components', []))
+
+    renewal_ids = [str(p) for p in vf.get('renewal_pipeline_ids', [])]
+    is_renewal = pipeline_id is not None and str(pipeline_id) in renewal_ids
+
+    if is_renewal:
+        renewal, renewal_present = summed(vf.get('renewal_components', []))
+    else:
+        renewal, renewal_present = 0.0, False
+
+    if incremental_present or renewal_present:
+        return incremental + renewal
+
+    # Nothing populated: Incremental ARR is unknown, not zero.
+    fallback = vf.get('fallback')
+    if fallback:
+        return _numeric_or_none(properties.get(fallback)) or 0.0
+    return 0.0
 
 
 def is_won_stage(stage_id: str, pipeline_config: Optional[Dict] = None) -> bool:

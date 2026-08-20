@@ -692,8 +692,10 @@ def main():
             else:
                 deal_status = 'active'
 
-            # Compute deal value using NULL-safe ARR component sum
-            deal_value = compute_deal_value(props, config)
+            # Incremental ARR, falling back to amount when every component
+            # is blank, plus Renewal ARR for renewal-pipeline deals.
+            # pipeline_id is required or renewals are valued as new business.
+            deal_value = compute_deal_value(props, config, pipeline_id=pipeline)
 
             # Parse ARR components (NULL-safe)
             def safe_numeric(val):
