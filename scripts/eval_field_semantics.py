@@ -100,7 +100,20 @@ def test_stage_bucket_covers_all_stages():
         assert bucket in ['discovery', 'scoping', 'proposal', 'closed_won', 'closed_lost'], \
             f"Stage '{stage_id}' returned invalid bucket '{bucket}'"
 
-    print(f"  ✓ All {len(STAGE_MAP)} stages return valid buckets:")
+    # Blind spot this test previously had: it iterated STAGE_MAP keys, and
+    # yaml parses a bare numeric key as an int. HubSpot sends stage ids as
+    # strings, so 79653122, 24682892 and 43449439 resolved to 'unknown' in
+    # production while this test passed on the int form. Assert both.
+    for stage_id in STAGE_MAP.keys():
+        as_string = str(stage_id)
+        bucket = stage_bucket(as_string)
+        assert bucket != 'unknown', (
+            f"Stage '{as_string}' returns 'unknown' when looked up as a string. "
+            f"Quote the key in config/field_semantics.yaml — yaml parses a bare "
+            f"numeric key as an int, but HubSpot sends stage ids as strings."
+        )
+
+    print(f"  ✓ All {len(STAGE_MAP)} stages return valid buckets (int and str keys):")
     for sid, info in STAGE_MAP.items():
         bucket = stage_bucket(sid)
         print(f"    {sid:25} -> {bucket}")

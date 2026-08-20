@@ -15,8 +15,55 @@ Confidence labels reflect history coverage:
 - 'pre_history': Deal existed but no field history before this date (null, not guessed)
 - 'no_history': No field history available for this deal at all
 """
+import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'api'))
+
+from field_semantics import OUTCOME_BUCKETS, stage_bucket
+
+
+class UnclassifiableStageError(ValueError):
+    """
+    Raised when a stage id has no classification in field_semantics.
+
+    Reconstruction must never guess at a stage it cannot classify. The
+    graceful path (field_semantics.is_open treats an unknown stage as open)
+    is correct for the CRO agent, which degrades rather than crashes on a
+    live query. It is wrong here: reaching back to 2023 means meeting stage
+    ids that have since been retired, and failing open silently promotes
+    them into the open-pipeline denominator, producing plausible wrong
+    numbers instead of an error.
+    """
+
+
+def is_terminal_stage(stage_id: Optional[str]) -> bool:
+    """
+    Strict terminal (won/lost) test for point-in-time reconstruction.
+
+    Returns False for None: that is the 'pre_history' case, where the deal
+    existed but history does not reach back to this date. The caller
+    distinguishes it via the confidence label; it is not a stage value.
+
+    Raises:
+        UnclassifiableStageError: the stage id is not in field_semantics.
+            Add it to config/field_semantics.yaml with its correct bucket
+            and regenerate, or mark it excluded — never let it default.
+    """
+    if stage_id is None:
+        return False
+
+    bucket = stage_bucket(stage_id)
+    if bucket == 'unknown':
+        raise UnclassifiableStageError(
+            f"Stage id {stage_id!r} has no classification in "
+            f"config/field_semantics.yaml. Reconstruction refuses to treat "
+            f"it as open. Add it with its correct bucket and re-run "
+            f"scripts/generate_field_semantics.py, or mark it excluded."
+        )
+    return bucket in OUTCOME_BUCKETS['won'] or bucket in OUTCOME_BUCKETS['lost']
 
 
 def get_stage_at_date(
@@ -132,7 +179,7 @@ def is_deal_open_at_date(
     deal_create_date: datetime,
     deal_stage_at_date: Optional[str],
     snapshot_date: datetime,
-    is_terminal_stage_func
+    is_terminal_stage_func=is_terminal_stage
 ) -> bool:
     """
     Inclusion rule for pipeline snapshots (shared by Method 1 and Method 2).
@@ -145,7 +192,9 @@ def is_deal_open_at_date(
         deal_create_date: Date deal was created
         deal_stage_at_date: Stage of deal at snapshot_date (or None if no history)
         snapshot_date: Snapshot date
-        is_terminal_stage_func: Function(stage_id) -> bool (checks if stage is won/lost)
+        is_terminal_stage_func: Function(stage_id) -> bool (checks if stage is
+            won/lost). Defaults to the strict is_terminal_stage above, which
+            raises on a stage id field_semantics cannot classify.
 
     Returns:
         True if deal should be in snapshot, False otherwise

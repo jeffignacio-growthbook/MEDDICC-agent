@@ -468,6 +468,69 @@ def test_no_duplicate_reconstruction_implementations():
     print("  eval_reconstruction.py: thin wrapper (delegates to get_stage_at_date)")
 
 
+def test_unmapped_stage_raises_not_defaults_open():
+    """An unrecognized stage ID must raise, not silently read as non-terminal.
+    Failing open over-includes and produces plausible wrong numbers."""
+    from point_in_time import (
+        UnclassifiableStageError, is_terminal_stage, is_deal_open_at_date
+    )
+
+    # A stage id retired before the reconstruction window. field_semantics
+    # cannot classify it, so reconstruction must refuse it outright.
+    retired = '10024681'
+
+    try:
+        is_terminal_stage(retired)
+        raise AssertionError(
+            f"is_terminal_stage({retired!r}) returned instead of raising. "
+            f"An unclassifiable stage read as non-terminal silently promotes "
+            f"the deal into the open-pipeline denominator."
+        )
+    except UnclassifiableStageError as e:
+        assert retired in str(e), "error must name the offending stage id"
+        assert 'field_semantics' in str(e), "error must point at the fix"
+
+    # The inclusion rule defaults to the strict test, so it raises too rather
+    # than counting the deal as open.
+    try:
+        is_deal_open_at_date(
+            datetime.fromisoformat('2023-01-01T00:00:00'),
+            retired,
+            datetime.fromisoformat('2026-03-01T00:00:00'),
+        )
+        raise AssertionError(
+            "is_deal_open_at_date defaulted to open for an unclassifiable stage"
+        )
+    except UnclassifiableStageError:
+        pass
+
+    # None is NOT unclassifiable: it is the pre_history case, where the deal
+    # existed but history does not reach this date. It must not raise.
+    assert is_terminal_stage(None) is False, \
+        "None means 'no history at this date', not 'unknown stage'"
+    assert is_deal_open_at_date(
+        datetime.fromisoformat('2023-01-01T00:00:00'),
+        None,
+        datetime.fromisoformat('2026-03-01T00:00:00'),
+    ) is True, "a deal with no history at D is open, not an error"
+
+    # Every stage id in the current export must classify without raising.
+    for stage_id in ('appointmentscheduled', 'qualifiedtobuy',
+                     'presentationscheduled', 'decisionmakerboughtin',
+                     'closedwon', 'closedlost', '79653122', '24682892',
+                     '43449439', '68509551', '1297321618', '1297321619',
+                     '1297321620', '1297321622', '1297321623', '1297321624'):
+        is_terminal_stage(stage_id)  # must not raise
+
+    assert is_terminal_stage('closedwon') is True
+    assert is_terminal_stage('68509551') is True, "Disqualified is lost"
+    assert is_terminal_stage('1297321624') is True, "Closed Lost (Renewal)"
+    assert is_terminal_stage('79653122') is False, "Meeting Set is open"
+
+    print("✓ test_unmapped_stage_raises_not_defaults_open passed")
+    print("  unmapped stage ids raise; None stays 'pre_history', not an error")
+
+
 def run_all_tests():
     """Run all reconstruction regression tests."""
     print("=" * 80)
@@ -489,6 +552,8 @@ def run_all_tests():
         # Field reconstruction (deal_value, close_date)
         test_deal_value_point_in_time_reconstruction,
         test_close_date_point_in_time_reconstruction,
+        # Stage classification gate
+        test_unmapped_stage_raises_not_defaults_open,
     ]
 
     for test in tests:

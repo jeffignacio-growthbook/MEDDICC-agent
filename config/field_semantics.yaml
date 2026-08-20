@@ -26,6 +26,7 @@ stage_map:
     label: "Contract Sent"
     bucket: "proposal"
     transition: null
+    aliases: ["1297321622"]       # Renewal pipeline Contract Sent
   closedwon:
     label: "Closed Won"
     bucket: "closed_won"
@@ -38,16 +39,32 @@ stage_map:
     aliases: ["1297321624", "68509551"]   # includes Disqualified
     alias_labels: ["Disqualified"]  # alternate display names
   # Historical/deprecated stages (may appear in CSV exports or old data)
-  79653122:
+  "79653122":
     label: "Meeting Set"
     bucket: "discovery"
     transition: null
-  24682892:
+  "24682892":
     label: "Negotiating"
     bucket: "proposal"
     transition: null
-  43449439:
+  "43449439":
     label: "Awaiting Signature"
+    bucket: "proposal"
+    transition: null
+
+  # Renewal pipeline (866608541). Excluded from new-business pipeline
+  # analysis via pipelines.excluded, but must classify: an unmapped stage
+  # is now a hard failure in reconstruction, not a silent "open".
+  "1297321618":
+    label: "Upcoming Renewal"
+    bucket: "discovery"
+    transition: null
+  "1297321619":
+    label: "Renewal Engaged"
+    bucket: "scoping"
+    transition: null
+  "1297321620":
+    label: "Pricing Presented"
     bucket: "proposal"
     transition: null
 

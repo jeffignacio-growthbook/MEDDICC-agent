@@ -1,127 +1,199 @@
 """
-Discover all historical stage IDs across full deal population.
+Discover every stage ID that appears in HubSpot dealstage property history.
 
-Scans property history for dealstage across all deals to identify
-stage IDs that appear in history but aren't in config/client.yaml.
+Reconstruction refuses to classify a stage field_semantics does not know
+(point_in_time.UnclassifiableStageError), so this must run and come back
+clean BEFORE any backfill. Historical reconstruction reaches back to 2023;
+the current deal export only proves that today's stage IDs resolve.
 
-Phase D Task 1 - runs after stage name/ID corruption fix.
+Previously this script read deals.stage — the CURRENT stage of each deal —
+despite its docstring claiming otherwise. It could not see a retired stage
+that appears only in history, which is exactly the case that matters.
+
+Inputs:
+  - property_history_cache.json   (required; build with hubspot_history.py --all)
+  - deals.stage from Supabase     (optional; adds the current-stage cross-check)
+
+Exit code is non-zero if any stage ID cannot be classified, so this can gate
+a backfill in CI.
+
+Usage:
+    python scripts/analytics/discover_historical_stages.py
+    python scripts/analytics/discover_historical_stages.py --cache-file path.json
 """
+import argparse
+import json
 import os
 import sys
 import yaml
+from collections import defaultdict
 from pathlib import Path
-from collections import Counter
 
-# Add scripts to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+REPO_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+sys.path.insert(0, str(REPO_ROOT / 'api'))
 
-from supabase import create_client
-from supabase_client import select_all
+from field_semantics import STAGE_MAP, stage_bucket, stage_label
 
 
-def load_configured_stage_ids():
-    """Get all stage IDs from config/client.yaml."""
-    config_path = Path(__file__).parent.parent.parent / 'config/client.yaml'
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
+NULL_VALUE = '<null>'   # a cleared dealstage, not a stage id
 
-    stage_ids = set()
+
+def load_client_yaml_stage_ids():
+    """Stage IDs configured in config/client.yaml pipelines."""
+    config = yaml.safe_load((REPO_ROOT / 'config/client.yaml').read_text())
+    ids = set()
     for pipeline in config['pipeline']['pipelines']:
         for stage in pipeline['stages']:
-            stage_ids.add(stage['id'])
+            ids.add(str(stage['id']))
+    return ids
 
-    return stage_ids
+
+def load_field_semantics_stage_ids():
+    """Stage IDs field_semantics can classify, including aliases."""
+    ids = set()
+    for stage_id, info in STAGE_MAP.items():
+        ids.add(str(stage_id))
+        for alias in info.get('aliases', []):
+            ids.add(str(alias))
+    return ids
 
 
-def get_all_current_stage_ids():
-    """Get all stage IDs currently in use in the deals table."""
-    url = os.environ['SUPABASE_URL']
-    key = os.environ['SUPABASE_SERVICE_KEY']
+def scan_history(cache_path):
+    """
+    Every distinct dealstage value in property history, with occurrence
+    counts and the timestamp range it was seen over.
+    """
+    cache = json.loads(cache_path.read_text())
+    seen = defaultdict(lambda: {'entries': 0, 'deals': set(),
+                                'first': None, 'last': None})
+    for deal_id, record in cache['deals'].items():
+        for entry in record.get('history') or []:
+            value = entry.get('value')
+            ts = entry.get('timestamp')
+            key = str(value) if value is not None else NULL_VALUE
+            s = seen[key]
+            s['entries'] += 1
+            s['deals'].add(deal_id)
+            if ts and (s['first'] is None or ts < s['first']):
+                s['first'] = ts
+            if ts and (s['last'] is None or ts > s['last']):
+                s['last'] = ts
+    return cache, seen
+
+
+def get_current_stage_ids():
+    """Current stage IDs from the deals table. None if no credentials."""
+    url = os.environ.get('SUPABASE_URL')
+    key = os.environ.get('SUPABASE_SERVICE_KEY')
+    if not url or not key:
+        return None
+    from supabase import create_client
+    from supabase_client import select_all
     client = create_client(url, key)
-
-    all_deals = select_all(client, 'deals', columns='stage')
-    current_stages = set(d['stage'] for d in all_deals if d.get('stage'))
-
-    return current_stages
+    rows = select_all(client, 'deals', columns='stage')
+    return {str(r['stage']) for r in rows if r.get('stage')}
 
 
 def main():
-    print("=" * 70)
-    print("TASK 1: Historical Stage ID Discovery")
-    print("=" * 70)
-    print()
+    parser = argparse.ArgumentParser(
+        description='Discover stage IDs in HubSpot dealstage property history')
+    parser.add_argument('--cache-file', default='property_history_cache.json',
+                        help='Path to property history cache')
+    args = parser.parse_args()
 
-    # Load configured stages from client.yaml
-    print("1. Loading configured stage IDs from config/client.yaml...")
-    configured = load_configured_stage_ids()
-    print(f"   Found {len(configured)} configured stage IDs")
-    print()
+    print("=" * 74)
+    print("HISTORICAL STAGE ID DISCOVERY")
+    print("=" * 74)
 
-    # Get current stages from database
-    print("2. Loading current stage IDs from Supabase...")
-    current = get_all_current_stage_ids()
-    print(f"   Found {len(current)} unique stage IDs in deals table")
-    print()
+    cache_path = Path(args.cache_file)
+    if not cache_path.exists():
+        print(f"\n✗ Property history cache not found: {cache_path}")
+        print("  Build it first:  python scripts/analytics/hubspot_history.py --all")
+        print("  Cannot verify historical stage coverage without it.")
+        return 2
 
-    # Find unmapped stages (in database but not in config)
-    print("3. Identifying unmapped stage IDs...")
-    unmapped = current - configured
+    configured = load_client_yaml_stage_ids()
+    classifiable = load_field_semantics_stage_ids()
+    cache, seen = scan_history(cache_path)
 
-    if unmapped:
-        print(f"   Found {len(unmapped)} unmapped stage IDs:")
-        for stage_id in sorted(unmapped):
-            # Count how many deals have this stage
-            url = os.environ['SUPABASE_URL']
-            key = os.environ['SUPABASE_SERVICE_KEY']
-            client = create_client(url, key)
-            deals = select_all(client, 'deals', columns='deal_id',
-                             filters=[('stage', 'eq', stage_id)])
-            count = len(deals)
-            print(f"     - {stage_id}: {count} deals")
+    print(f"\nHistory cache: {len(cache['deals'])} deals, "
+          f"{sum(v['entries'] for v in seen.values())} dealstage entries")
+    print(f"config/client.yaml:          {len(configured)} stage IDs")
+    print(f"config/field_semantics.yaml: {len(classifiable)} stage IDs (incl. aliases)")
+
+    print(f"\n{'stage_id':<22} {'bucket':<12} {'entries':>8} {'deals':>6} "
+          f"{'first seen':<12} {'in cfg':<7} {'classifiable'}")
+    print("-" * 96)
+    unclassifiable, not_in_client_yaml, null_valued = [], [], None
+    for stage_id in sorted(seen, key=lambda k: -seen[k]['entries']):
+        s = seen[stage_id]
+        # A null history value is not a stage to map — the property was
+        # cleared. Reported separately; mapping it would be nonsense.
+        if stage_id == NULL_VALUE:
+            null_valued = s
+            continue
+        bucket = stage_bucket(stage_id)
+        ok = stage_id in classifiable and bucket != 'unknown'
+        in_cfg = stage_id in configured
+        if not ok:
+            unclassifiable.append((stage_id, s))
+        if not in_cfg:
+            not_in_client_yaml.append(stage_id)
+        print(f"{stage_id:<22} {bucket:<12} {s['entries']:>8} {len(s['deals']):>6} "
+              f"{(s['first'] or '')[:10]:<12} {'yes' if in_cfg else 'NO':<7} "
+              f"{'yes' if ok else 'NO'}")
+
+    current = get_current_stage_ids()
+    if current is None:
+        print("\n(No Supabase credentials — skipped the current-stage cross-check.)")
     else:
-        print("   ✓ No unmapped stage IDs found")
-    print()
+        history_only = set(seen) - current - {'<null>'}
+        print(f"\nCurrent deals.stage values: {len(current)}")
+        print(f"Appear ONLY in history, never as a current stage: "
+              f"{len(history_only)}")
+        for stage_id in sorted(history_only):
+            print(f"  {stage_id}  ({stage_label(stage_id)})")
+        for stage_id in sorted(current - set(seen)):
+            print(f"  ⚠ current stage absent from history: {stage_id}")
 
-    # Verify expected stages are now configured
-    print("4. Verifying Phase C additions are in config...")
-    expected_in_config = ['24682892', '43449439']  # Added after Phase C
-    for stage_id in expected_in_config:
-        if stage_id in configured:
-            print(f"   ✓ {stage_id} is configured")
-        else:
-            print(f"   ⚠️  {stage_id} is MISSING from config")
-    print()
+    print("\n" + "=" * 74)
+    print("SUMMARY")
+    print("=" * 74)
+    print(f"Distinct stage IDs in history: "
+          f"{len(seen) - (1 if null_valued else 0)}")
+    print(f"Not in config/client.yaml:     {len(not_in_client_yaml)}")
+    print(f"UNCLASSIFIABLE:                {len(unclassifiable)}")
 
-    # Report on configured stages
-    print("5. All configured stage IDs:")
-    for stage_id in sorted(configured):
-        in_use = "✓" if stage_id in current else " "
-        print(f"   {in_use} {stage_id}")
-    print()
+    if null_valued:
+        print(f"\n⚠ {null_valued['entries']} history entries across "
+              f"{len(null_valued['deals'])} deals have a NULL dealstage.")
+        print("  Not a mapping gap — the property was cleared. But note that")
+        print("  get_stage_at_date cannot currently distinguish 'last entry at or")
+        print("  before D had a null value' from 'no entry at or before D': both")
+        print("  return (None, 'pre_history'). Worth resolving before these rows")
+        print("  are labelled.")
 
-    # Summary
-    print("=" * 70)
-    print("SUMMARY:")
-    print("-" * 70)
-    print(f"Configured stages: {len(configured)}")
-    print(f"Current stages in DB: {len(current)}")
-    print(f"Unmapped stages: {len(unmapped)}")
+    if not unclassifiable:
+        print("\n✓ Every stage ID in history classifies. Reconstruction can proceed.")
+        return 0
 
-    if unmapped:
+    print("\n✗ BACKFILL BLOCKED — these stage IDs cannot be classified.")
+    print("  Reconstruction raises on them rather than reading them as open.")
+    print("  Add each to config/field_semantics.yaml, then re-run")
+    print("  scripts/generate_field_semantics.py:\n")
+    for stage_id, s in unclassifiable:
+        print(f'  "{stage_id}":')
+        print(f'    label: "TODO"        # {s["entries"]} entries across '
+              f'{len(s["deals"])} deals')
+        print(f'    bucket: "TODO"       # discovery|scoping|proposal|'
+              f'closed_won|closed_lost')
+        print(f'    transition: null     # seen {(s["first"] or "?")[:10]} '
+              f'to {(s["last"] or "?")[:10]}')
         print()
-        print("NEXT STEP: Create config/stage_id_mapping.yaml with:")
-        print()
-        for stage_id in sorted(unmapped):
-            print(f"  - legacy_stage_id: \"{stage_id}\"")
-            print(f"    status: unknown  # Needs manual review")
-            print(f"    maps_to_stage_id: null  # TBD")
-            print(f"    notes: \"Found in {count} deals\"")
-            print()
-    else:
-        print()
-        print("✓ All stage IDs are configured - no mapping file needed")
-
-    return 0 if not unmapped else 1
+    print("  Quote every numeric key — yaml parses a bare number as an int,")
+    print("  but HubSpot sends stage ids as strings, so the lookup would miss.")
+    return 1
 
 
 if __name__ == '__main__':
