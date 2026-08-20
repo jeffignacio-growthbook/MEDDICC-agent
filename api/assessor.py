@@ -146,8 +146,11 @@ async def assess_correctness(
     summary = _compact_results(tool_results)
 
     try:
+        # NOTE: complete() does NOT take a `model` kwarg — the model is fixed
+        # on the client at construction (LLMClient.from_config(role="assessor")).
+        # Passing model= here raised TypeError, which the except below swallowed
+        # into a constant 0.50 score, silently disabling the quality gate.
         resp = client.complete(
-            model="claude-haiku-4-5-20251001",
             max_tokens=200,
             system="Respond with valid JSON only. No markdown.",
             messages=[{"role": "user", "content":

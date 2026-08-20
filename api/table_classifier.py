@@ -46,10 +46,12 @@ def classify_relevant_tables(question: str, client) -> List[str]:
     Returns list of table names, or all tables if classification fails.
     """
     try:
+        # NOTE: complete() takes only messages / system / max_tokens. The model
+        # is fixed on the client at construction; `temperature` is not supported
+        # at all. Passing either raised TypeError, which the except below
+        # swallowed into an all-tables fallback (a silent classification failure).
         resp = client.complete(
-            model="claude-haiku-4-5-20251001",
             max_tokens=100,
-            temperature=0,
             messages=[{"role": "user", "content":
                 CLASSIFICATION_PROMPT.format(question=question)}]
         )

@@ -748,10 +748,47 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
     logger.info(f"[EXTRACT] no rows found in any step, returning empty dict")
     return {}
 
+async def _run_precomputed_handler(handler_fn, handler_name, params, sb):
+    """
+    Execute a precomputed handler and classify its result quality.
+
+    Returns (tool_results, result_quality).
+
+    Logs the concrete failure, not just the routing bucket:
+      - a handler that RAISES logs the exception + traceback, then → 'error'
+      - a handler that RETURNS {"error": ...} or empty logs the reason
+        alongside the quality bucket.
+
+    Before this, query_rep_pipeline returning
+    {"error": "owner_email required ..."} logged only
+    "[HANDLER] query_rep_pipeline → error" — the real cause was invisible,
+    and it took a downstream crash in the fallback path to surface it.
+    """
+    from api.evaluator import evaluate_result
+
+    try:
+        tool_results = await handler_fn(params, sb)
+    except Exception as e:
+        import traceback
+        print(f"[HANDLER ERROR] {handler_name}: {e}", flush=True)
+        print(traceback.format_exc(), flush=True)
+        return {}, "error"
+
+    result_quality = evaluate_result(tool_results, handler_name)
+
+    reason = ""
+    if result_quality in ("error", "empty") and isinstance(tool_results, dict):
+        reason = tool_results.get("error") or ""
+    suffix = f" ({reason})" if reason else ""
+    print(f"[HANDLER] {handler_name} → {result_quality}{suffix}", flush=True)
+    return tool_results, result_quality
+
+
 async def dynamic_query_loop(question, history, params,
                               sb, client,
                               hint: str = "",
-                              roster_text: str = "") -> dict:
+                              roster_text: str = "",
+                              classifier_client=None) -> dict:
     """
     Multi-turn tool-calling loop for novel questions.
     Agent calls tools until it has enough data to answer.
@@ -761,8 +798,14 @@ async def dynamic_query_loop(question, history, params,
     from api.table_classifier import classify_relevant_tables
     from api import tools as T
 
-    # Hybrid schema: classify relevant tables for full descriptions
-    relevant_tables = classify_relevant_tables(question, classifier_client)
+    # Hybrid schema: classify relevant tables for full descriptions.
+    # Table classification is a cheap Haiku task, so use the dedicated
+    # classifier client when the caller supplies one; fall back to the
+    # generator client passed in as `client` so this can never NameError.
+    # (Before the LLMClient refactor this referenced a `classifier_client`
+    # that no longer existed in this scope — a hard crash in the fallback path.)
+    relevant_tables = classify_relevant_tables(
+        question, classifier_client or client)
     logger.info(f"[SCHEMA] Relevant tables for full descriptions: {relevant_tables}")
 
     schema = get_schema_context(sb, tables_with_descriptions=relevant_tables)
@@ -1139,18 +1182,9 @@ async def route_question(question: str, user_id: str,
         elif handler_name != "dynamic_query":
             handler_fn = getattr(handlers, handler_name, None)
             if handler_fn:
-                try:
-                    tool_results = await handler_fn(params, sb)
-                    result_quality = evaluate_result(
-                        tool_results, handler_name)
-                    print(f"[HANDLER] {handler_name} → "
-                          f"{result_quality}", flush=True)
-                except Exception as e:
-                    import traceback
-                    print(f"[HANDLER ERROR] {handler_name}: {e}",
-                          flush=True)
-                    print(traceback.format_exc(), flush=True)
-                    result_quality = "error"
+                tool_results, result_quality = \
+                    await _run_precomputed_handler(
+                        handler_fn, handler_name, params, sb)
 
         # ── 4. Dynamic fallback ───────────────────────────
         if result_quality in ("empty", "error") \
@@ -1168,6 +1202,7 @@ async def route_question(question: str, user_id: str,
                 client=generator_client,
                 hint=hint,
                 roster_text=roster_text,
+                classifier_client=classifier_client,
             )
             dynamic_answer = dynamic_result.get("answer", "")
             dynamic_tool_results = dynamic_result.get("tool_results", {})
@@ -1190,6 +1225,7 @@ async def route_question(question: str, user_id: str,
                 client=generator_client,
                 hint="",
                 roster_text=roster_text,
+                classifier_client=classifier_client,
             )
             return {"answer": dynamic_result.get("answer", ""),
                     "needs_ack": is_slow,
@@ -1319,6 +1355,7 @@ async def route_question(question: str, user_id: str,
                 client=generator_client,
                 hint=retry_context,
                 roster_text=roster_text,
+                classifier_client=classifier_client,
             )
             # dynamic_query_loop returns {"answer": str, "tool_results": dict}
             dynamic_answer = dynamic_result.get("answer", "")
