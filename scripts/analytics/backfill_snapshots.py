@@ -27,6 +27,16 @@ pre_history rows, FY2027 Q2 (the newest, with the most recently-created
 deals) the most. This was measured; a confident prediction that older
 quarters would fail the coverage gate was wrong for exactly this reason.
 
+NO_HISTORY IS 2 DISTINCT DEALS, NOT 13. A no_history deal (no dealstage
+history in HubSpot at all) is written as a null-stage row in EVERY week it
+was created before, so a per-quarter count of no_history ROWS is ~13-19,
+while the DISTINCT deals behind them are just 2: Inditex (29591984407, a
+renewal imported with no stage transitions) and Newton Growth (61167803975,
+created too recently to have transitioned). "13 unresolvable deals" and "2
+deals appearing 13 times" imply very different data quality — it is the
+latter. The identify_no_history_deals probe reports DISTINCT deals at one
+date; the per-quarter table reports ROW instances.
+
 WEEKLY SAMPLING drops a fast-mover's intermediate stages: a deal that moves
 through four stages in four days appears in the weekly grid as though it
 jumped straight to its final stage. Inherent to weekly sampling, not a bug;
