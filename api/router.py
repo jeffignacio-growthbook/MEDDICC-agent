@@ -45,6 +45,19 @@ NEW_DISCOVERY_SIGNALS = [
 # Handler descriptions - single source of truth for both INTENT_PROMPT and entity-scope classification
 HANDLER_DESCRIPTIONS = {
     "query_waterfall": "pipeline movement, new/won/lost this week/quarter",
+    "query_pipeline_movement": (
+        "Historical pipeline movement, stage composition over time, "
+        "deal-level stage changes, and the coverage curve by week — read "
+        "from the reconstructed weekly deals_snapshot series (FY2026 Q3 "
+        "onward). COUNT-based only (no dollar figures). Set params.view: "
+        "'movement' for week-over-week counts in/out by stage, 'composition' "
+        "for the stage-by-week grid, 'deal_changes' for which deals moved/"
+        "advanced/regressed/left, 'curve' for deal count by week-of-quarter. "
+        "Examples: 'how has pipeline moved over the last four weeks?' "
+        "(movement), 'what's the stage breakdown this quarter versus last?' "
+        "(composition), 'which deals moved stage since last week?' "
+        "(deal_changes), 'show me the coverage curve for FY2027 Q2' (curve)"
+    ),
     "query_new_deals": "which deals were created, added to pipeline, or started in a time window",
     "query_won_deals": "which deals did we ALREADY win/close (past tense), retrospective wins/bookings. NOT future close dates.",
     "query_arr": "ARR by customer, total ARR",
@@ -388,6 +401,9 @@ Required JSON:
     "entity_name": "<rep/team name for set_target or null>",
     "period_label": "Q3_FY2027 or null",
     "search_term": "<specific competitor/term for query_competitive_intel or null>",
+    "view": "<for query_pipeline_movement: movement|composition|deal_changes|curve, else null>",
+    "fiscal_quarter": "<for query_pipeline_movement: 'FY2027 Q2' style label, or null for current>",
+    "weeks": "<for query_pipeline_movement composition: integer count of recent weeks, or null>",
     "is_slow": false
   }},
   "unanswerable_reason": "no_data|out_of_scope|ambiguous|null",

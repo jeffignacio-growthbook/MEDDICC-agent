@@ -2655,3 +2655,431 @@ async def query_call_quality(params: dict, sb) -> dict:
             }
         ),
     }
+
+
+# ============================================================================
+# query_pipeline_movement — reads deals_snapshot directly (COUNTS ONLY)
+# ============================================================================
+# Makes the reconstructed historical substrate (24,160 deals_snapshot rows,
+# FY2026 Q3–FY2027 Q2 backfilled + FY2027 Q3 forward) reachable from Slack.
+#
+# Scope discipline (see PIPELINE_MOVEMENT_HANDLER_SPEC.md):
+#   * reads deals_snapshot ONLY — never calls forecast_analyses.py, which is
+#     known-broken (the 7-site null-coalescing ledger + numerator/scope/
+#     close-date bugs).
+#   * COUNTS ONLY. deal_value is not even selected, so nothing can sum or
+#     average it. Dollar movement is blocked until the ledger is worked off.
+#   * scoping is applied AT READ TIME via the shared point_in_time functions
+#     (the row set is deliberately written unscoped so GRR/NRR can read
+#     renewals) and the scope used is reported in the output.
+#   * null-stage rows are COUNTED as stage 'unknown', never dropped —
+#     dropping them understates population, the defect this substrate fixes.
+#   * the two weekday grids (backfilled=Monday vs forward=cron weekday) are
+#     never silently mixed.
+
+_PM_SNAPSHOT_COLUMNS = (
+    "deal_id,snapshot_date,pipeline_id,stage_id,stage_order,"
+    "close_date,owner_email,deal_status,snapshot_source,"
+    "backfill_confidence,fiscal_quarter,week_of_quarter"
+)
+# deal_value is intentionally absent from the column list above. Counts only.
+
+_PM_CONFIDENCE_KEYS = ("exact", "pre_history", "no_history")
+_PM_VIEWS = ("movement", "composition", "deal_changes", "curve")
+
+
+def _pm_load_scoping():
+    """Import the SHARED analytics-scoping functions (not reimplemented)."""
+    analytics_dir = str(Path(__file__).parent.parent / "scripts" / "analytics")
+    if analytics_dir not in sys.path:
+        sys.path.insert(0, analytics_dir)
+    # scripts/ is already on sys.path (top of this module), so the shared
+    # module is importable as analytics.point_in_time — same path
+    # eval_reconstruction.py uses.
+    from analytics.point_in_time import (
+        load_scope_config, is_deal_in_analytics_scope,
+    )
+    return load_scope_config, is_deal_in_analytics_scope
+
+
+def _pm_current_quarter_label():
+    """Current fiscal quarter in the stored column's format ('FY2027 Q3')."""
+    from utils import get_fiscal_quarter
+    _, _, label = get_fiscal_quarter()
+    return label
+
+
+def _pm_stage_name(stage_id, stage_cfg):
+    if stage_id is None or not str(stage_id).strip():
+        return "unknown"
+    cfg = stage_cfg.get(str(stage_id))
+    if cfg:
+        return cfg["name"]
+    # Unmapped stage at read time: degrade (label by id / field_semantics),
+    # do not raise. Reconstruction raises on unclassifiable stages; a live
+    # Slack handler degrades gracefully instead.
+    try:
+        return stage_label(str(stage_id))
+    except Exception:
+        return str(stage_id)
+
+
+def _pm_stage_order(row, stage_cfg):
+    so = row.get("stage_order")
+    if so is not None:
+        return so
+    cfg = stage_cfg.get(str(row.get("stage_id")))
+    return cfg["order"] if cfg else 9_999  # unknown sorts last
+
+
+def _pm_in_scope(row, excluded_pipelines, stage_cfg, is_in_scope):
+    """Read-time analytics scope.
+
+    Delegates the stage judgement to the shared is_deal_in_analytics_scope;
+    adds only the two deviations the spec mandates:
+      - null-stage rows COUNT (returned as 'unknown'), rather than being
+        dropped for lacking a stage;
+      - Closed Won / Closed Lost are dropped explicitly (the shared function
+        keeps them because their order is >= qualified; the spec lists them
+        as excluded).
+    """
+    pid = row.get("pipeline_id")
+    if pid is not None and str(pid) in excluded_pipelines:
+        return False  # renewal / partner / marketing pipelines
+    stage_id = row.get("stage_id")
+    if stage_id is None or not str(stage_id).strip():
+        return True   # null stage → counted downstream as 'unknown'
+    try:
+        if is_won(str(stage_id)) or is_lost(str(stage_id)):
+            return False  # Closed Won / Closed Lost / Disqualified
+    except Exception:
+        pass
+    return is_in_scope(str(stage_id), pid, excluded_pipelines, stage_cfg)
+
+
+def _pm_confidence_mix(rows):
+    mix = {k: 0 for k in _PM_CONFIDENCE_KEYS}
+    for r in rows:
+        c = r.get("backfill_confidence")
+        if c in mix:
+            mix[c] += 1
+        else:
+            mix["other"] = mix.get("other", 0) + 1
+    return mix
+
+
+def _pm_latest_row_per_deal(rows):
+    """Collapse to one row per deal for a single snapshot date (PK is
+    (deal_id, snapshot_date), so this is normally 1:1; guard duplicates)."""
+    out = {}
+    for r in rows:
+        out[r["deal_id"]] = r
+    return out
+
+
+def _pm_by_date(scoped):
+    by_date = {}
+    for r in scoped:
+        by_date.setdefault(r["snapshot_date"], []).append(r)
+    return by_date
+
+
+def _pm_stage_sets(date_rows, stage_cfg):
+    """stage_name -> set(deal_id) and deal_id -> stage_name for one date."""
+    stage_to_deals = {}
+    deal_to_stage = {}
+    for r in date_rows:
+        name = _pm_stage_name(r.get("stage_id"), stage_cfg)
+        stage_to_deals.setdefault(name, set()).add(r["deal_id"])
+        deal_to_stage[r["deal_id"]] = name
+    return stage_to_deals, deal_to_stage
+
+
+def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps):
+    if len(all_dates) < 2:
+        data_gaps.append(
+            "movement needs two snapshot dates; found "
+            f"{len(all_dates)} in this grid — returning null, not a zero"
+        )
+        return None, [], {"prior": None, "current": None, "net": None}, {}
+    prior_date, current_date = all_dates[-2], all_dates[-1]
+    prior_rows = list(_pm_latest_row_per_deal(by_date[prior_date]).values())
+    current_rows = list(_pm_latest_row_per_deal(by_date[current_date]).values())
+
+    prior_sets, _ = _pm_stage_sets(prior_rows, stage_cfg)
+    current_sets, _ = _pm_stage_sets(current_rows, stage_cfg)
+
+    stage_names = set(prior_sets) | set(current_sets)
+
+    def _order(name):
+        # order a stage name for display using stage_cfg
+        for sid, cfg in stage_cfg.items():
+            if cfg["name"] == name:
+                return cfg["order"]
+        return 9_999  # 'unknown' and unmapped sort last
+
+    by_stage = []
+    for name in sorted(stage_names, key=_order):
+        p = prior_sets.get(name, set())
+        c = current_sets.get(name, set())
+        by_stage.append({
+            "stage": name,
+            "prior": len(p),
+            "current": len(c),
+            "net": len(c) - len(p),
+            "entered": len(c - p),
+            "exited": len(p - c),
+        })
+    totals = {
+        "prior": len(prior_rows),
+        "current": len(current_rows),
+        "net": len(current_rows) - len(prior_rows),
+    }
+    confidence = _pm_confidence_mix(current_rows)
+    return [prior_date, current_date], by_stage, totals, confidence
+
+
+def _pm_view_composition(by_date, all_dates, stage_cfg, weeks):
+    dates = all_dates[-weeks:]
+    grid = []
+    for d in dates:
+        rows = list(_pm_latest_row_per_deal(by_date[d]).values())
+        counts = {}
+        for r in rows:
+            name = _pm_stage_name(r.get("stage_id"), stage_cfg)
+            counts[name] = counts.get(name, 0) + 1
+        week_of_quarter = rows[0].get("week_of_quarter") if rows else None
+        grid.append({
+            "snapshot_date": d,
+            "week_of_quarter": week_of_quarter,
+            "by_stage": counts,
+            "total": len(rows),
+            "confidence": _pm_confidence_mix(rows),
+        })
+    return dates, grid
+
+
+def _pm_view_deal_changes(by_date, all_dates, stage_cfg, data_gaps):
+    if len(all_dates) < 2:
+        data_gaps.append(
+            "deal_changes needs two snapshot dates; found "
+            f"{len(all_dates)} in this grid — returning null, not a zero"
+        )
+        return None, []
+    prior_date, current_date = all_dates[-2], all_dates[-1]
+    prior_rows = _pm_latest_row_per_deal(by_date[prior_date])
+    current_rows = _pm_latest_row_per_deal(by_date[current_date])
+
+    changes = []
+    all_ids = set(prior_rows) | set(current_rows)
+    for deal_id in all_ids:
+        pr = prior_rows.get(deal_id)
+        cr = current_rows.get(deal_id)
+        prior_stage = _pm_stage_name(pr.get("stage_id"), stage_cfg) if pr else None
+        current_stage = _pm_stage_name(cr.get("stage_id"), stage_cfg) if cr else None
+
+        if pr and not cr:
+            direction = "left"
+        elif cr and not pr:
+            direction = "entered"
+        elif prior_stage == current_stage:
+            continue  # unchanged — only report movement
+        else:
+            po = _pm_stage_order(pr, stage_cfg)
+            co = _pm_stage_order(cr, stage_cfg)
+            if co > po:
+                direction = "advanced"
+            elif co < po:
+                direction = "regressed"
+            else:
+                direction = "moved"
+        changes.append({
+            "deal_id": deal_id,
+            "owner_email": (cr or pr).get("owner_email"),
+            "prior_stage": prior_stage,
+            "current_stage": current_stage,
+            "direction": direction,
+        })
+
+    order = {"advanced": 0, "regressed": 1, "moved": 2, "entered": 3, "left": 4}
+    changes.sort(key=lambda x: (order.get(x["direction"], 9), x["deal_id"]))
+    return [prior_date, current_date], changes
+
+
+def _pm_view_curve(by_date, all_dates, stage_cfg):
+    curve = []
+    for d in all_dates:
+        rows = list(_pm_latest_row_per_deal(by_date[d]).values())
+        curve.append({
+            "week_of_quarter": rows[0].get("week_of_quarter") if rows else None,
+            "snapshot_date": d,
+            "count": len(rows),
+            "confidence": _pm_confidence_mix(rows),
+        })
+    curve.sort(key=lambda x: (x["week_of_quarter"] is None, x["week_of_quarter"]))
+    return curve
+
+
+async def query_pipeline_movement(params: dict, sb) -> dict:
+    """
+    Pipeline movement / composition / deal-level changes / coverage curve,
+    read from deals_snapshot. COUNTS ONLY — never dollars (see module header).
+
+    params:
+      view          : 'movement' | 'composition' | 'deal_changes' | 'curve'
+                      (default 'movement')
+      fiscal_quarter: e.g. 'FY2027 Q2' (default: current fiscal quarter)
+      weeks         : how many recent weeks for 'composition' (default 4)
+      pipeline_id   : optional single-pipeline filter (default: config scope —
+                      renewals and non-qualified stages excluded)
+      owner_email   : optional rep filter (also accepts rep_email)
+      deal_ids      : optional explicit deal set for 'deal_changes'
+    """
+    load_scope_config, is_in_scope = _pm_load_scoping()
+    excluded_pipelines, stage_cfg = load_scope_config()
+
+    view = (params.get("view") or "movement").strip()
+    if view not in _PM_VIEWS:
+        view = "movement"
+
+    fiscal_quarter = params.get("fiscal_quarter")
+    if not fiscal_quarter:
+        try:
+            fiscal_quarter = _pm_current_quarter_label()
+        except Exception as e:
+            return {
+                "view": view, "basis": "count",
+                "error": f"could not resolve current fiscal quarter ({e}); "
+                         "pass fiscal_quarter explicitly",
+            }
+
+    try:
+        weeks = int(params.get("weeks")) if params.get("weeks") is not None else 4
+    except (TypeError, ValueError):
+        weeks = 4
+    weeks = max(1, min(weeks, 13))
+
+    owner_email = params.get("owner_email") or params.get("rep_email")
+    pipeline_id = params.get("pipeline_id")
+    deal_ids = params.get("deal_ids")
+
+    scope_out = {
+        "pipeline": (str(pipeline_id) if pipeline_id
+                     else "default (renewals & non-qualified stages excluded)"),
+        "excluded_stages": ["Meeting Set", "Disqualified",
+                            "Closed Won", "Closed Lost"],
+        "excluded_pipelines": sorted(excluded_pipelines),
+    }
+
+    # ── load snapshot rows for the quarter ──
+    filters = [("eq", "fiscal_quarter", fiscal_quarter)]
+    if owner_email:
+        filters.append(("eq", "owner_email", owner_email))
+    if pipeline_id:
+        filters.append(("eq", "pipeline_id", str(pipeline_id)))
+    rows = select_all(sb, "deals_snapshot",
+                      columns=_PM_SNAPSHOT_COLUMNS, filters=filters)
+
+    if deal_ids:
+        wanted = {str(d) for d in deal_ids}
+        rows = [r for r in rows if str(r.get("deal_id")) in wanted]
+
+    base = {
+        "view": view,
+        "fiscal_quarter": fiscal_quarter,
+        "scope": scope_out,
+        "basis": "count",  # explicit — never 'dollar' until the ledger clears
+    }
+
+    if not rows:
+        gap = f"no snapshot rows for {fiscal_quarter}"
+        if owner_email:
+            gap += f" (owner {owner_email})"
+        return {**base, "snapshot_dates": [], "result": None,
+                "data_gaps": [gap]}
+
+    # ── grid handling: never silently mix weekday grids ──
+    data_gaps = []
+    sources = {}
+    for r in rows:
+        src = r.get("snapshot_source") or "unknown"
+        sources.setdefault(src, set()).add(r.get("snapshot_date"))
+    chosen_source = max(sources, key=lambda s: len(sources[s]))
+    if len(sources) > 1:
+        ignored = {s: sorted(d for d in sources[s])
+                   for s in sources if s != chosen_source}
+        data_gaps.append(
+            f"multiple snapshot grids present; used source '{chosen_source}' "
+            f"and did not mix in {ignored} (different weekday grids)"
+        )
+    grid_rows = [r for r in rows
+                 if (r.get("snapshot_source") or "unknown") == chosen_source]
+
+    # ── apply analytics scope at read time (null-stage rows counted) ──
+    scoped = [r for r in grid_rows
+              if _pm_in_scope(r, excluded_pipelines, stage_cfg, is_in_scope)]
+    by_date = _pm_by_date(scoped)
+    all_dates = sorted(by_date.keys())
+
+    base["snapshot_source"] = chosen_source
+
+    if not all_dates:
+        data_gaps.append(
+            f"no in-scope rows for {fiscal_quarter} on the '{chosen_source}' grid"
+        )
+        return {**base, "snapshot_dates": [], "result": None,
+                "data_gaps": data_gaps}
+
+    # ── dispatch ──
+    if view == "movement":
+        snap_dates, by_stage, totals, confidence = _pm_view_movement(
+            by_date, all_dates, stage_cfg, data_gaps)
+        return {
+            **base,
+            "snapshot_dates": snap_dates or [],
+            "by_stage": by_stage,
+            "totals": totals,
+            "confidence": confidence,
+            "data_gaps": data_gaps,
+        }
+
+    if view == "composition":
+        dates, grid = _pm_view_composition(
+            by_date, all_dates, stage_cfg, weeks)
+        return {
+            **base,
+            "snapshot_dates": dates,
+            "weeks": grid,
+            "data_gaps": data_gaps,
+        }
+
+    if view == "deal_changes":
+        snap_dates, changes = _pm_view_deal_changes(
+            by_date, all_dates, stage_cfg, data_gaps)
+        summary = {}
+        for c in changes:
+            summary[c["direction"]] = summary.get(c["direction"], 0) + 1
+        return {
+            **base,
+            "snapshot_dates": snap_dates or [],
+            "changes": changes,
+            "summary": summary,
+            "data_gaps": data_gaps,
+        }
+
+    # view == "curve"
+    curve = _pm_view_curve(by_date, all_dates, stage_cfg)
+    present_weeks = {c["week_of_quarter"] for c in curve
+                     if c["week_of_quarter"] is not None}
+    missing = [w for w in range(1, 14) if w not in present_weeks]
+    if missing:
+        data_gaps.append(
+            f"no snapshot for week_of_quarter {missing} — reported as absent, "
+            "not zero-filled"
+        )
+    return {
+        **base,
+        "snapshot_dates": all_dates,
+        "curve": curve,
+        "data_gaps": data_gaps,
+    }
