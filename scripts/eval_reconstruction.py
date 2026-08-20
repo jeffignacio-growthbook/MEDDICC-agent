@@ -748,6 +748,18 @@ def test_scoping_is_not_applied_to_writes():
          "write. That drops renewal rows GRR/NRR depends on. Scope on read, "
          "never on write.")
 
+    # The write gate compares written rows against a "genuinely open" set. Both
+    # sides must apply the SAME missing-stage exclusion, or a blank-stage deal
+    # counts as open, is never written, and depresses coverage for a reason
+    # that is not a write fault.
+    src = (REPO_ROOT / 'scripts/analytics/snapshot_deals.py').read_text()
+    comparator = src.split('genuinely_open = []')[1].split('genuinely_open_ids')[0]
+    assert "str(d.get('stage') or '').strip()" in comparator, (
+        "the coverage comparator does not exclude missing-stage deals, but the "
+        "write path does. The gate would report a data-quality problem as a "
+        "write fault."
+    )
+
     print("✓ test_scoping_is_not_applied_to_writes passed")
 
 

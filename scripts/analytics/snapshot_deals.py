@@ -243,6 +243,16 @@ def main():
             if not create_date:
                 continue
 
+            # Exclude missing-stage deals here too. The write path skips them
+            # because they cannot be placed in a pipeline; if the comparator
+            # still counted them as open, every such deal would permanently
+            # depress coverage for a reason that is NOT a write fault — and
+            # enough of them would eventually breach the 95% floor and report a
+            # data-quality problem as a pagination bug. Observed: 277 open vs
+            # 276 captured on 2026-08-20, a gap of exactly one blank-stage deal.
+            if not str(d.get('stage') or '').strip():
+                continue
+
             create_dt = datetime.fromisoformat(create_date).date()
             try:
                 if not is_deal_open_at_date(create_dt, d.get('stage'),
