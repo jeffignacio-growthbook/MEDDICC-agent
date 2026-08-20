@@ -10,6 +10,17 @@ Strictly backward-looking: a history entry after the snapshot date must
 never be selected. No history before the snapshot date means null, never
 forward-fill, never a default.
 
+BEFORE ADDING A FILTER THAT NARROWS A SHARED WRITE PATH, ask what else reads
+the table for a different purpose. deals_snapshot looked like it served
+pipeline-conversion analysis alone, so scoping the write to the analytics
+population looked free. It is not: config/client.yaml marks the renewal
+pipeline `analyze: false  # MEDDICC agent skips; analytics INCLUDES for
+GRR/NRR`, and that one comment is the only thing recording that GRR/NRR reads
+the same rows. Scoping the write would have dropped 221 of 376 rows and broken
+a consumer nobody was thinking about, unrecoverably without a refetch. Scope
+on read, never on write — and check the consumers before narrowing anything
+shared.
+
 Confidence labels reflect history coverage:
 - 'exact': Field history exists and covers this date (change at or before it)
 - 'cleared': An entry at or before this date exists but its value is null —

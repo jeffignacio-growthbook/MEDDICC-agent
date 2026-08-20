@@ -263,20 +263,6 @@ def main():
         if not all_passed and (coverage_pct < min_coverage or coverage_pct > max_coverage):
             print(f"    Missing: {len(missing)}  Extra: {len(extra)}")
 
-    # The assertion above runs on the UNSCOPED population, which is what gets
-    # written. Report the analytics-scoped subset too: that is the population
-    # the conversion analyses actually consume, and it is a different
-    # denominator for min_snapshot_coverage_pct.
-    excluded_pipelines, stage_cfg = load_scope_config()
-    in_scope = [d for d in qualified_deals
-                if is_deal_in_analytics_scope(d.get('stage'),
-                                              d.get('pipeline_id'),
-                                              excluded_pipelines, stage_cfg)]
-    print(f"\n  Analytics scope (default pipeline, qualified non-excluded "
-          f"stages): {len(in_scope)} of {len(qualified_deals)} written rows")
-    print(f"    The assertion below is on the written population, not this "
-          f"subset. Conversion analyses read the subset.")
-
     # Overall coverage
     overall_coverage = (total_captured / total_genuinely_open * 100) if total_genuinely_open > 0 else 0
     print(f"  {'─' * 60}")
@@ -300,6 +286,24 @@ def main():
         raise AssertionError(error_msg)
 
     print(f"\n  ✓ Coverage assertion passed ({min_coverage}% - {max_coverage}%)")
+    print(f"    Population: every written row, UNSCOPED. This gate guards "
+          f"write mechanics.")
+
+    # Reported AFTER the assertion, deliberately. The scoped subset is a
+    # DIFFERENT population under a DIFFERENT gate
+    # (min_scoped_snapshot_coverage_pct), and computing it anywhere inside the
+    # write-gate path invites someone to wire the two together. Two gates, two
+    # populations; see the comment block in config/client.yaml.
+    excluded_pipelines, stage_cfg = load_scope_config()
+    in_scope = [d for d in qualified_deals
+                if is_deal_in_analytics_scope(d.get('stage'),
+                                              d.get('pipeline_id'),
+                                              excluded_pipelines, stage_cfg)]
+    print(f"\n  Analytics-scoped subset: {len(in_scope)} of "
+          f"{len(qualified_deals)} written rows")
+    print(f"    Default pipeline, qualified non-excluded stages. This is what "
+          f"the conversion analyses read, and the denominator for")
+    print(f"    min_scoped_snapshot_coverage_pct. NOT gated here.")
 
 
 if __name__ == '__main__':

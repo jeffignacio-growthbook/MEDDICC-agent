@@ -742,6 +742,66 @@ def test_scoping_is_not_applied_to_writes():
     print("✓ test_scoping_is_not_applied_to_writes passed")
 
 
+def test_two_coverage_gates_measure_different_populations():
+    """The write gate and the snapshot gate are not interchangeable.
+
+    write gate    (min/max_write_coverage_pct) UNSCOPED — every written row.
+                  Guards write mechanics: pagination, row caps, an inclusion
+                  rule that drops deals. A property of the whole write.
+    snapshot gate (min_scoped_snapshot_coverage_pct) SCOPED — the analytics
+                  subset the conversion analyses actually read. Guards whether
+                  a quarter is usable.
+
+    On 2026-08-19 the scoped subset was 164 of 415 written rows, so a gate
+    passing on one population says nothing about the other.
+    """
+    import yaml as _yaml
+
+    cfg = _yaml.safe_load((REPO_ROOT / 'config/client.yaml').read_text())
+    fa = cfg['forecast_analysis']
+
+    assert 'min_scoped_snapshot_coverage_pct' in fa, \
+        "the scoped snapshot gate is missing from forecast_analysis"
+
+    # The old name did not say which population it measured and had no
+    # consumer. A stale reference must fail loudly, not read a default.
+    assert 'min_snapshot_coverage_pct' not in fa, \
+        ("min_snapshot_coverage_pct is back in config. It is ambiguous about "
+         "population — use min_scoped_snapshot_coverage_pct.")
+
+    for gate in ('min_write_coverage_pct', 'max_write_coverage_pct'):
+        assert gate in fa, f"{gate} is missing from forecast_analysis"
+
+    # No code may read the ambiguous old name.
+    offenders = []
+    for path in REPO_ROOT.glob('**/*.py'):
+        if '__pycache__' in str(path) or path.name == 'eval_reconstruction.py':
+            continue
+        if 'min_snapshot_coverage_pct' in path.read_text():
+            offenders.append(str(path.relative_to(REPO_ROOT)))
+    assert not offenders, (
+        f"{offenders} read min_snapshot_coverage_pct. That key is gone; use "
+        f"min_scoped_snapshot_coverage_pct and measure it on the scoped "
+        f"population via is_deal_in_analytics_scope."
+    )
+
+    # The write gate must NOT be measured on a scoped population.
+    src = (REPO_ROOT / 'scripts/analytics/snapshot_deals.py').read_text()
+    assert 'min_write_coverage_pct' in src, \
+        "snapshot_deals no longer reads the write gate"
+    assert_block = src.split('min_write_coverage_pct')[1]
+    assert 'is_deal_in_analytics_scope(' not in \
+        assert_block.split('COVERAGE ASSERTION FAILED')[0], \
+        ("the write gate is being measured on a scoped population. It guards "
+         "write mechanics across every written row — scoping it would hide a "
+         "pagination fault in the rows it stopped counting.")
+
+    print("✓ test_two_coverage_gates_measure_different_populations passed")
+    print(f"  write gate: {fa['min_write_coverage_pct']}-"
+          f"{fa['max_write_coverage_pct']}% unscoped;  snapshot gate: "
+          f"{fa['min_scoped_snapshot_coverage_pct']}% scoped")
+
+
 def run_all_tests():
     """Run all reconstruction regression tests."""
     print("=" * 80)
@@ -770,6 +830,7 @@ def run_all_tests():
         test_retired_stage_is_acknowledged_but_still_raises,
         test_both_writers_use_the_shared_inclusion_rule,
         test_scoping_is_not_applied_to_writes,
+        test_two_coverage_gates_measure_different_populations,
     ]
 
     for test in tests:

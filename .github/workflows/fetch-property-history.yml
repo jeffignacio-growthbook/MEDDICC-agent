@@ -7,6 +7,10 @@ on:
         description: 'Re-fetch every deal, ignoring any cache'
         required: false
         default: 'false'
+      skip_fetch:
+        description: 'Skip the ~9 min HubSpot fetch; run only Supabase-side checks'
+        required: false
+        default: 'false'
 
 permissions:
   contents: read
@@ -41,6 +45,7 @@ jobs:
           PYTHONPATH=scripts:api:. python3 scripts/analytics/compare_inclusion_rules.py
 
       - name: Fetch property history from HubSpot
+        if: ${{ inputs.skip_fetch != 'true' }}
         env:
           HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -56,6 +61,7 @@ jobs:
           python3 scripts/analytics/hubspot_history.py --all --rate-limit 5 $FORCE
 
       - name: "Cache summary"
+        if: ${{ inputs.skip_fetch != 'true' }}
         run: |
           ls -lh property_history_cache.json
           python3 - <<'EOF'
@@ -79,6 +85,7 @@ jobs:
       # Diagnostic, and deliberately BEFORE the gate so it still runs when
       # the gate fails — which is exactly when its output is needed.
       - name: "Identify any unmapped stage IDs"
+        if: ${{ inputs.skip_fetch != 'true' }}
         env:
           HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
         run: |
@@ -91,6 +98,7 @@ jobs:
       # reconstruction gate would raise mid-backfill. Non-zero exit fails
       # the job on purpose.
       - name: "CONDITION 1 — historical stage ID coverage (gate)"
+        if: ${{ inputs.skip_fetch != 'true' }}
         run: |
           set -o pipefail
           PYTHONPATH=scripts:api:. python3 \
@@ -102,6 +110,7 @@ jobs:
       # reconstructed, so a disagreement is attributable to the rule rather
       # than to the proxy.
       - name: "CONDITION 2 — both arms point-in-time, FY2027 Q3 weeks 1-3"
+        if: ${{ inputs.skip_fetch != 'true' }}
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
@@ -110,6 +119,16 @@ jobs:
           PYTHONPATH=scripts:api:. python3 \
             scripts/analytics/compare_inclusion_rules_pit.py \
             2>&1 | tee pit_comparison_report.txt
+
+      - name: "Snapshot coverage survey (Supabase only, no fetch needed)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          set -o pipefail
+          PYTHONPATH=scripts:api:. python3 \
+            scripts/analytics/survey_snapshot_coverage.py \
+            2>&1 | tee snapshot_coverage_survey.txt
 
       - name: Upload artifacts
         if: always()
@@ -121,4 +140,5 @@ jobs:
             stage_discovery_report.txt
             unmapped_stage_report.txt
             pit_comparison_report.txt
+            snapshot_coverage_survey.txt
           retention-days: 7

@@ -56,12 +56,41 @@ forecast_analysis:
   claimed_commit_accuracy: 0.90    # Claimed commit hit rate for calibration
   basis: count                     # count | dollar — reporting basis
   segmentation_keys: [motion]      # Segment analyses by motion (newbiz/expansion)
-  min_write_coverage_pct: 95       # Weekly snapshot must capture ≥95% of genuinely open deals
+  # TWO COVERAGE GATES, TWO DIFFERENT POPULATIONS. Deliberately.
+  # They are not interchangeable and must never be compared to each other.
+  #
+  #   write gate    POPULATION: every row written, UNSCOPED — all pipelines,
+  #                 all stages, including renewals, Meeting Set and
+  #                 Disqualified. Guards write mechanics: pagination faults,
+  #                 row caps, an inclusion rule that silently drops deals.
+  #                 That is a property of the whole write, so it is measured
+  #                 on the whole write.
+  #
+  #   snapshot gate POPULATION: the analytics-scoped subset only — default
+  #                 pipeline, qualified non-excluded stages. Guards whether a
+  #                 quarter is USABLE for conversion analysis. The analyses
+  #                 read the scoped subset, so a percentage against the
+  #                 unscoped total says nothing about whether what they read
+  #                 is complete. On 2026-08-19 that was 164 of 415 rows: an
+  #                 80% unscoped pass could sit on a badly incomplete scoped
+  #                 population.
+  #
+  # Use point_in_time.is_deal_in_analytics_scope to build the scoped
+  # population. Do not reimplement the filter.
+  min_write_coverage_pct: 95       # UNSCOPED. Weekly snapshot must capture ≥95%
+                                   # of genuinely open deals across all pipelines.
                                    # Fails loudly if coverage drops (catches row-cap bugs)
-  max_write_coverage_pct: 105      # Weekly snapshot must not capture >105% (catches inclusion bugs)
-                                   # Overcapture means closed deals in open pipeline snapshot
-  min_snapshot_coverage_pct: 80    # Historical snapshots must have ≥80% coverage for analysis
-                                   # Quarters below this return null (invalid denominators)
+  max_write_coverage_pct: 105      # UNSCOPED. Must not capture >105% (catches
+                                   # inclusion bugs — closed deals in an open snapshot)
+  # Renamed from min_snapshot_coverage_pct. The old name did not say which
+  # population it measured and had no consumer at all, so the first consumer
+  # would have picked whichever population was to hand. Renaming makes a stale
+  # reference fail loudly instead of silently reading a default.
+  min_scoped_snapshot_coverage_pct: 80
+                                   # SCOPED. Historical snapshots must reach ≥80%
+                                   # of the analytics-scoped population for a
+                                   # quarter to be usable. Quarters below this
+                                   # return null (invalid denominators)
 
 # ============================================================================
 # PROPOSAL ENGINE
