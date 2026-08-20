@@ -46,6 +46,13 @@ from point_in_time import (UnclassifiableStageError, get_field_at_date,
 FISCAL_QUARTER = 'FY2027 Q3'
 WEEKS = 3
 
+# The same three week anchors the proxy comparison used, so the close-only
+# series is directly comparable against its 16 -> 2 -> 1. Method 1's own
+# written dates are added to these, not substituted for them: it turns out
+# Method 1 has written only ONE date for this quarter, so relying on its dates
+# alone silently collapses a three-week comparison to one week.
+WEEK_ANCHORS = ['2026-08-04', '2026-08-11', '2026-08-18']
+
 
 def load_scoping():
     """Config-driven scoping, shared by both arms."""
@@ -158,7 +165,7 @@ def main():
         dates = [d.strip() for d in args.dates.split(',') if d.strip()]
     else:
         method1 = method1_dates_and_rows()
-        dates = sorted(method1)[:WEEKS]
+        dates = sorted(set(WEEK_ANCHORS) | set(method1))
 
     print("=" * 100)
     print(f"CONDITION 2 — BOTH ARMS POINT-IN-TIME, {FISCAL_QUARTER} WEEKS 1-{WEEKS}")
@@ -169,8 +176,17 @@ def main():
     if not dates:
         print(f"\n✗ No {FISCAL_QUARTER} prospective snapshot dates found.")
         return 2
-    print(f"Dates: {', '.join(dates)}"
-          + ("  (from Method 1's written rows)" if method1 else "  (supplied)"))
+    print(f"Dates: {', '.join(dates)}")
+    if method1:
+        print(f"  week anchors: {', '.join(WEEK_ANCHORS)}")
+        print(f"  Method 1 wrote {len(method1)} date(s) for {FISCAL_QUARTER}: "
+              f"{', '.join(sorted(method1))}")
+        if len(method1) < WEEKS:
+            print(f"  ⚠ Method 1 has fewer than {WEEKS} dates for this quarter, "
+                  f"so the premise that")
+            print(f"    weeks 1-{WEEKS} were captured does not hold. The week "
+                  f"anchors above are")
+            print(f"    used so the comparison still spans {WEEKS} weeks.")
 
     def pit(deal_id, D):
         """Point-in-time stage and close_date, plus their confidence."""
@@ -237,9 +253,19 @@ def main():
 
         if method1 and ds in method1:
             m1 = method1[ds]
-            print(f"  Method 1 actually wrote {len(m1)} rows; "
-                  f"close_date arm agrees on {len(by_close & m1)}, "
-                  f"terminal arm on {len(by_term & m1)}")
+            # Method 1 applies no scoping: it writes every pipeline and every
+            # stage, including Meeting Set, Disqualified and renewals. So the
+            # gap below is mostly scope, not disagreement, and this is NOT a
+            # coverage figure.
+            in_scope = set(detail)
+            print(f"  Method 1 wrote {len(m1)} rows for this date. Of those, "
+                  f"{len(m1 & in_scope)} are in analytics scope;")
+            print(f"    {len(m1 - in_scope)} are out of scope (other pipelines, "
+                  f"Meeting Set, Disqualified) — Method 1 does not scope,")
+            print(f"    so this gap is scope, not rule disagreement, and is not "
+                  f"a coverage measure.")
+            print(f"    Within scope: close_date arm agrees on "
+                  f"{len(by_close & m1)}, terminal arm on {len(by_term & m1)}.")
 
         for label, ids in (("CLOSE-ONLY — genuine disagreement if non-empty",
                             close_only),
