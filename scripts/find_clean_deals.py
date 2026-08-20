@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 """Find deals with clean Fireflies data for model comparison."""
 
+import os
 import psycopg2
 
-# PostgreSQL connection
-conn = psycopg2.connect(
-    host="aws-1-us-west-2.pooler.supabase.com",
-    port=5432,
-    database="postgres",
-    user="postgres.htgvkqycrwesdysustxd",
-    password="ShoheiOhtani145928!"
-)
+# PostgreSQL connection. Credentials come from the environment — never
+# hardcode a DB password in source; a committed credential stays live until
+# rotated. Set SUPABASE_DB_URL (a postgresql:// connection string).
+db_url = os.environ["SUPABASE_DB_URL"]
+conn = psycopg2.connect(db_url)
 
 query = """
 -- Deals where the ABSOLUTE most recent call (any source) is Fireflies

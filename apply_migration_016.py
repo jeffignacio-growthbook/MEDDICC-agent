@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Apply migration 016 using direct PostgreSQL connection."""
 
+import os
 import psycopg2
 from pathlib import Path
 
-# Connection string from user
-# Password: ShoheiOhtani145928!
-conn_string = "postgresql://postgres.htgvkqycrwesdysustxd:ShoheiOhtani145928!@aws-1-us-west-2.pooler.supabase.com:5432/postgres"
+# Connection string comes from the environment — never hardcode a DB password
+# in source; a committed credential stays live until rotated. Set
+# SUPABASE_DB_URL (a postgresql:// connection string).
+conn_string = os.environ["SUPABASE_DB_URL"]
 
 # Read migration
 migration_sql = Path('scripts/migrations/016_create_meetings_table.sql').read_text()

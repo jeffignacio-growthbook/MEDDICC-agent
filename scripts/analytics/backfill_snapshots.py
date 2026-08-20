@@ -241,8 +241,16 @@ class SnapshotBackfiller:
                 'fiscal_quarter': fq_label,             # NOT NULL (migration 038)
                 'week_of_quarter': week,
                 'backfill_confidence': r['stage_confidence'],
-                'value_confidence': r['value_confidence'],
-                'close_date_confidence': close_conf,
+                # value_confidence and close_date_confidence have no columns
+                # (migration 017 added backfill_confidence, has_property_history,
+                # interpolation_method, data_quality_notes — not these two).
+                # Rather than add columns via a migration with no CI apply path,
+                # fold them into the existing data_quality_notes TEXT column, in
+                # a stable "key=value; key=value" format a later migration can
+                # parse into first-class columns if ever wanted.
+                'data_quality_notes': (
+                    f"value_confidence={r['value_confidence']}; "
+                    f"close_date_confidence={close_conf}"),
                 'has_property_history': r['stage_confidence'] != 'no_history',
             })
             tally['rows'] += 1
@@ -375,6 +383,43 @@ class SnapshotBackfiller:
         rows = select_all(self.client, 'deals_snapshot', columns='deal_id')
         return len(rows)
 
+    def validate_emitted_columns(self, sample_date=None):
+        """Every column the writer emits must exist in deals_snapshot.
+
+        A schema gate that runs BEFORE the collision check. The prior write
+        emitted value_confidence / close_date_confidence, which no migration
+        creates; the insert would have failed on the missing column, but the
+        collision-abort stopped first and masked it — an abort hid a
+        downstream failure. This validates the write's column set against the
+        live table up front, so a schema mismatch fails here at zero cost
+        rather than being discovered by a partial write.
+
+        Column existence is probed by selecting each emitted column with
+        limit 0: PostgREST answers 42703 for a column that does not exist.
+        """
+        from datetime import date as _date
+        d = sample_date or _date(2026, 5, 4)
+        rows, _, _ = self.build_rows_for_date(d)
+        if not rows:
+            # No sample row to derive columns from; derive from a bare shape.
+            emitted = ['deal_id', 'snapshot_date', 'pipeline_id', 'stage_id',
+                       'stage_order', 'deal_value', 'close_date', 'owner_email',
+                       'deal_status', 'snapshot_source', 'fiscal_quarter',
+                       'week_of_quarter', 'backfill_confidence',
+                       'data_quality_notes', 'has_property_history']
+        else:
+            emitted = sorted(rows[0].keys())
+        missing = []
+        for col in emitted:
+            try:
+                self.client.table('deals_snapshot').select(col).limit(0).execute()
+            except Exception as e:
+                if '42703' in str(e) or 'does not exist' in str(e):
+                    missing.append(col)
+                else:
+                    raise
+        return emitted, missing
+
 
 def _scoped_coverage(rows, config):
     """Per the Phase 3 definition: denominator scoped by pipeline, numerator
@@ -416,6 +461,19 @@ def main():
 
     b = SnapshotBackfiller(property_history_cache=args.cache_file)
     gate = b.config['forecast_analysis'].get('min_scoped_snapshot_coverage_pct', 80)
+
+    # SCHEMA GATE — before the collision check, so a column mismatch fails at
+    # zero cost rather than being discovered by a partial write (and rather
+    # than being masked by an earlier abort, as happened before).
+    emitted, missing = b.validate_emitted_columns()
+    print(f"Schema gate: {len(emitted)} emitted columns checked against "
+          f"deals_snapshot")
+    if missing:
+        print(f"✗ ABORT: writer emits column(s) not in deals_snapshot: {missing}")
+        print("  Add them via migration, or fold into an existing column, "
+              "before writing.")
+        return 3
+    print("    ✓ every emitted column exists in the table\n")
 
     # COLLISION PRE-CHECK — before any write. Upsert overwrites silently, so a
     # before/after count reveals an overwrite only after it happened. Zero

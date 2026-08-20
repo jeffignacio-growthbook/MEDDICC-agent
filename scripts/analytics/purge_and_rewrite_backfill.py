@@ -147,6 +147,17 @@ def main():
 
     b = SnapshotBackfiller(property_history_cache=args.cache_file)
 
+    # SCHEMA GATE — before any delete or write. A column the writer emits but
+    # the table lacks would fail the eventual write; catch it before purging
+    # anything, so we never delete rows and then fail to write replacements.
+    emitted, missing = b.validate_emitted_columns()
+    print(f"\nSchema gate: {len(emitted)} emitted columns checked against "
+          f"deals_snapshot")
+    if missing:
+        print(f"✗ ABORT: writer emits column(s) not in deals_snapshot: {missing}")
+        raise SystemExit(3)
+    print("    ✓ every emitted column exists in the table")
+
     # Baseline across ALL quarters, so protected sources can be checked after.
     print("\nBaseline — all deals_snapshot rows by (fiscal_quarter, source):")
     baseline = count_by_source(b.client)
