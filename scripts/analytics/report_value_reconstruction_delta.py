@@ -50,6 +50,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cache-file', default='property_history_cache.json')
     parser.add_argument('--dates', default=None)
+    parser.add_argument('--include-excluded-pipelines', action='store_true',
+                        help='Also report deals in pipelines.excluded '
+                             '(renewals), which the analytics scope hides. '
+                             'GRR/NRR reads these rows, so the renewal value '
+                             'correction belongs on the record too.')
     args = parser.parse_args()
 
     cache_path = Path(args.cache_file)
@@ -84,6 +89,9 @@ def main():
     print("=" * 96)
     print(f"\nCache: {len(stage_history)} deals   deals table: {len(deals)}")
     print(f"Value rule components: {', '.join(value_props)}")
+    print(f"Population: analytics scope"
+          + ("  +  excluded pipelines (renewals) for GRR/NRR"
+             if args.include_excluded_pipelines else "  (renewals excluded)"))
 
     summary = []
     for ds in dates:
@@ -109,8 +117,13 @@ def main():
                     continue
             except UnclassifiableStageError:
                 continue
-            if not is_deal_in_analytics_scope(stage, d.get('pipeline_id'),
-                                             excluded_pipelines, stage_cfg):
+            in_scope = is_deal_in_analytics_scope(
+                stage, d.get('pipeline_id'), excluded_pipelines, stage_cfg)
+            # Renewals are out of analytics scope but GRR/NRR reads them, so
+            # --include-excluded-pipelines widens the population rather than
+            # letting the report repeat the scoping miss it is meant to fix.
+            if not in_scope and not (args.include_excluded_pipelines
+                                     and str(d.get('pipeline_id')) in excluded_pipelines):
                 continue
 
             n_scope += 1

@@ -142,6 +142,7 @@ jobs:
           set -o pipefail
           PYTHONPATH=scripts:api:. python3 \
             scripts/analytics/report_value_reconstruction_delta.py \
+            --include-excluded-pipelines \
             2>&1 | tee value_delta_report.txt
 
       - name: Upload artifacts

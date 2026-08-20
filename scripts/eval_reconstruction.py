@@ -939,6 +939,69 @@ def test_value_properties_are_all_tracked_in_history():
     print(f"  tracked: {', '.join(get_value_properties())}, closedate")
 
 
+def test_dollar_weighted_paths_never_coalesce_null_value_to_zero():
+    """A deal with no value history as of D returns None, not 0.0. Any
+    analysis that coalesces that to zero re-fabricates the number Phase 2b
+    removed — moving the fabrication downstream rather than eliminating it.
+
+    The exposure already exists: 7 dollar-weighted sites across
+    compute_waterfall.py and forecast_analyses.py read deals_snapshot and
+    coalesce deal_value to 0. Fixing them is analysis correctness, which the
+    METHOD_2 prompt scopes out of the substrate pass, so this is a RATCHET:
+    the known set is frozen in config/null_value_coalescing_ledger.yaml, a NEW
+    coalescing site in a snapshot-reading dollar path fails the test, and a
+    ledger entry that is gone (fixed) is reported for removal.
+    """
+    import re
+    import yaml as _yaml
+
+    VALUE_COALESCE = re.compile(
+        r"(deal_value|arr_usd|open_value|closed_won_value|pipeline_value)"
+        r"[^\n]*?(\bor 0(\.0)?\b|,\s*0\)|fillna\(0\)|COALESCE\([^)]*,\s*0\))",
+        re.IGNORECASE)
+
+    # Live set: analytics files that READ deals_snapshot and coalesce a value
+    # field to 0. A file that does not touch the snapshot table is out of
+    # scope — its nulls are a different (current-table) question.
+    live = {}
+    for path in sorted((REPO_ROOT / 'scripts/analytics').glob('*.py')):
+        src = path.read_text()
+        if 'deals_snapshot' not in src:
+            continue
+        hits = sorted({line.strip() for line in src.splitlines()
+                       if 'deal_value' in line and VALUE_COALESCE.search(line.strip())})
+        if hits:
+            live[path.name] = hits
+
+    ledger_path = REPO_ROOT / 'config/null_value_coalescing_ledger.yaml'
+    ledger = (_yaml.safe_load(ledger_path.read_text()) or {}).get(
+        'known_coalescing_sites', {}) or {}
+
+    live_set = {(f, s) for f, ss in live.items() for s in ss}
+    known_set = {(f, s) for f, ss in ledger.items() for s in (ss or [])}
+
+    new = sorted(live_set - known_set)
+    fixed = sorted(known_set - live_set)
+
+    if fixed:
+        print(f"  ✓ {len(fixed)} ledgered coalescing site(s) are gone — remove "
+              f"from the ledger:")
+        for f, s in fixed:
+            print(f"      {f}: {s}")
+
+    assert not new, (
+        "New dollar-weighted null-coalescing site(s) reading deals_snapshot:\n"
+        + "\n".join(f"    {f}: {s}" for f, s in new)
+        + "\n  A null deal_value here becomes a silent 0 in a dollar total, "
+          "re-fabricating what Phase 2b removed. Null-propagate — exclude and "
+          "count the unknown-value deal — or, if this is genuinely unavoidable, "
+          "add it to config/null_value_coalescing_ledger.yaml with a reason.")
+
+    print("✓ test_dollar_weighted_paths_never_coalesce_null_value_to_zero passed")
+    print(f"  {len(known_set)} known site(s) frozen; no new ones. "
+          f"Fix is null-propagation, deferred to the analysis-correctness pass.")
+
+
 def run_all_tests():
     """Run all reconstruction regression tests."""
     print("=" * 80)
@@ -972,6 +1035,7 @@ def run_all_tests():
         test_unknown_value_is_null_not_zero,
         test_point_in_time_value_beats_the_proxy,
         test_value_properties_are_all_tracked_in_history,
+        test_dollar_weighted_paths_never_coalesce_null_value_to_zero,
     ]
 
     for test in tests:

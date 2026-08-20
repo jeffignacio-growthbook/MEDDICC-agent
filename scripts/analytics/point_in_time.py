@@ -21,6 +21,17 @@ a consumer nobody was thinking about, unrecoverably without a refetch. Scope
 on read, never on write — and check the consumers before narrowing anything
 shared.
 
+This is not only about writes. The Phase 2b value-delta report scoped itself
+to the analytics population — locally the right call, it is what the
+conversion analyses read — and thereby hid the larger of the two value
+corrections, because renewals are excluded from that scope and the renewal
+value fix was the bigger one. Second time the same instinct went wrong: scope
+to "what the conversion analyses read" is correct for a conversion analysis
+and wrong for anything measuring the whole table. So the rule generalizes
+past writes: before scoping ANY view — write, report, or check — ask who else
+reads this for a different purpose, and whether your scope answers their
+question or silently drops it.
+
 WHAT VALIDATES THE INCLUSION RULE, AND WHAT DOES NOT. Both Method 1 and
 Method 2 call is_deal_open_at_date, which is the point — they cannot drift.
 The cost is that the Method 1 / Method 2 cross-validation (Phase 3b) cannot

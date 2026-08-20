@@ -1,0 +1,33 @@
+# Dollar-weighted analysis sites that coalesce a null deal_value to 0 while
+# reading deals_snapshot — the table Phase 2b now writes genuine nulls into.
+#
+# WHY THIS IS A LEDGER, NOT A FIX. A deal with no value history as of date D
+# reconstructs to None, not a proxied current value (Phase 2b). These sites
+# turn that None back into 0.0 inside a dollar sum, which re-fabricates the
+# number Phase 2b removed — moving the fabrication downstream rather than
+# eliminating it. 1-3 such deals per snapshot date is small enough that a
+# zero-fill would not show as an obvious anomaly, which makes it MORE
+# dangerous, not less: a conversion rate whose dollar denominator silently
+# drops a few unknown-value deals looks fine and is wrong.
+#
+# HOW TO FIX (when analyses are addressed — the METHOD_2 prompt scopes
+# analysis correctness OUT of the substrate pass, so not now): null-propagate.
+# A deal with unknown value is excluded from BOTH numerator and denominator
+# and the exclusion is COUNTED, and if the null count is material the result
+# returns null the way the min_evidence gate already does for sample size.
+# Not zero-filled into a total.
+#
+# This ledger freezes the KNOWN exposure. The test fails if a NEW coalescing
+# site appears in a snapshot-reading dollar path, and reports a ledger entry
+# that is gone (fixed) so it can be removed. Ratchet: down, never up.
+
+known_coalescing_sites:
+  compute_waterfall.py:
+    - "n_value = float(n.get('deal_value') or 0) if n else 0.0"
+    - "p_value = float(p.get('deal_value') or 0) if p else 0.0"
+    - "pipeline_waterfalls[pipeline_id]['beginning_value'] += float(p.get('deal_value') or 0)"
+    - "pipeline_waterfalls[pipeline_id]['ending_value'] += float(n.get('deal_value') or 0)"
+    - "value = float((n or p).get('deal_value') or 0)"
+  forecast_analyses.py:
+    - "closed_won_value += last_snap.get('deal_value', 0) or 0"
+    - "week3_pipeline_value = sum(r.get('deal_value', 0) or 0 for r in week3_result.data)"
