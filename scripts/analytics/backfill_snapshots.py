@@ -383,42 +383,58 @@ class SnapshotBackfiller:
         rows = select_all(self.client, 'deals_snapshot', columns='deal_id')
         return len(rows)
 
-    def validate_emitted_columns(self, sample_date=None):
-        """Every column the writer emits must exist in deals_snapshot.
+    SCHEMA_PROBE_DEAL_ID = '__schema_gate_probe__'
 
-        A schema gate that runs BEFORE the collision check. The prior write
-        emitted value_confidence / close_date_confidence, which no migration
-        creates; the insert would have failed on the missing column, but the
-        collision-abort stopped first and masked it — an abort hid a
-        downstream failure. This validates the write's column set against the
-        live table up front, so a schema mismatch fails here at zero cost
-        rather than being discovered by a partial write.
+    def validate_writable(self, sample_date=None):
+        """Prove a representative row actually WRITES before any purge.
 
-        Column existence is probed by selecting each emitted column with
-        limit 0: PostgREST answers 42703 for a column that does not exist.
+        The weaker predecessor only checked column existence (select ... limit
+        0), so it passed while the write still failed on the backfill_confidence
+        CHECK constraint — a gate validating the wrong thing, after the purge
+        had already run. This inserts one probe row per backfill_confidence
+        value the writer emits (exact / pre_history / no_history) with the full
+        emitted column set, then deletes them. A missing column (42703), a
+        constraint violation (23514, e.g. the confidence vocabulary), or a type
+        error surfaces HERE, at zero cost, rather than after rows are deleted.
+
+        Returns (ok, error_message). Probe rows use a sentinel deal_id and are
+        always cleaned up, even on failure.
         """
         from datetime import date as _date
         d = sample_date or _date(2026, 5, 4)
         rows, _, _ = self.build_rows_for_date(d)
-        if not rows:
-            # No sample row to derive columns from; derive from a bare shape.
-            emitted = ['deal_id', 'snapshot_date', 'pipeline_id', 'stage_id',
-                       'stage_order', 'deal_value', 'close_date', 'owner_email',
-                       'deal_status', 'snapshot_source', 'fiscal_quarter',
-                       'week_of_quarter', 'backfill_confidence',
-                       'data_quality_notes', 'has_property_history']
-        else:
-            emitted = sorted(rows[0].keys())
-        missing = []
-        for col in emitted:
+        template = dict(rows[0]) if rows else {
+            'deal_id': None, 'snapshot_date': d.isoformat(),
+            'pipeline_id': 'default', 'stage_id': None, 'stage_order': None,
+            'deal_value': None, 'close_date': None, 'owner_email': None,
+            'deal_status': 'active', 'snapshot_source': 'backfilled',
+            'fiscal_quarter': 'FY2027 Q2', 'week_of_quarter': 1,
+            'backfill_confidence': 'exact', 'data_quality_notes': 'probe',
+            'has_property_history': False}
+
+        # One probe row per confidence value the reconstruction can emit,
+        # distinct snapshot_date so all coexist under the PK.
+        probes = []
+        for i, conf in enumerate(('exact', 'pre_history', 'no_history')):
+            p = dict(template)
+            p['deal_id'] = self.SCHEMA_PROBE_DEAL_ID
+            p['snapshot_date'] = f"1970-01-0{i + 1}"
+            p['backfill_confidence'] = conf
+            probes.append(p)
+
+        ok, err = True, None
+        try:
+            self.client.table('deals_snapshot').upsert(
+                probes, on_conflict='deal_id,snapshot_date').execute()
+        except Exception as e:
+            ok, err = False, str(e)
+        finally:
             try:
-                self.client.table('deals_snapshot').select(col).limit(0).execute()
-            except Exception as e:
-                if '42703' in str(e) or 'does not exist' in str(e):
-                    missing.append(col)
-                else:
-                    raise
-        return emitted, missing
+                self.client.table('deals_snapshot').delete()\
+                    .eq('deal_id', self.SCHEMA_PROBE_DEAL_ID).execute()
+            except Exception:
+                pass
+        return ok, err
 
 
 def _scoped_coverage(rows, config):
@@ -462,18 +478,18 @@ def main():
     b = SnapshotBackfiller(property_history_cache=args.cache_file)
     gate = b.config['forecast_analysis'].get('min_scoped_snapshot_coverage_pct', 80)
 
-    # SCHEMA GATE — before the collision check, so a column mismatch fails at
-    # zero cost rather than being discovered by a partial write (and rather
-    # than being masked by an earlier abort, as happened before).
-    emitted, missing = b.validate_emitted_columns()
-    print(f"Schema gate: {len(emitted)} emitted columns checked against "
-          f"deals_snapshot")
-    if missing:
-        print(f"✗ ABORT: writer emits column(s) not in deals_snapshot: {missing}")
-        print("  Add them via migration, or fold into an existing column, "
-              "before writing.")
+    # SCHEMA GATE — a real insert-and-rollback of representative rows, before
+    # the collision check. Catches missing columns AND constraint violations
+    # (e.g. the backfill_confidence CHECK) at zero cost, rather than after a
+    # partial or post-purge write.
+    ok, err = b.validate_writable()
+    if not ok:
+        print(f"✗ ABORT: a representative row does not write to deals_snapshot:\n"
+              f"    {err}")
+        print("  Fix the schema (column or constraint) before writing.")
         return 3
-    print("    ✓ every emitted column exists in the table\n")
+    print("Schema gate: representative rows (exact/pre_history/no_history) "
+          "insert and roll back cleanly\n")
 
     # COLLISION PRE-CHECK — before any write. Upsert overwrites silently, so a
     # before/after count reveals an overwrite only after it happened. Zero

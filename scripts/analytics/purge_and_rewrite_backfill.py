@@ -100,7 +100,21 @@ def backup(client, quarters, path):
     rows = select_all(client, 'deals_snapshot', columns='*',
                       filters=[('in_', 'fiscal_quarter', quarters),
                                ('eq', 'snapshot_source', BACKFILLED)])
+    # Nothing to preserve (e.g. a re-run after the quarters were already
+    # purged): do NOT write an empty file over a prior good backup.
+    if not rows:
+        print("\nNothing to back up — target quarters already hold 0 "
+              "'backfilled' rows. Existing backup left untouched.")
+        return 0
+    # Never overwrite an existing backup; a re-run must not clobber the
+    # rollback from an earlier run. Write to the first free numbered sibling.
     path = Path(path)
+    if path.exists():
+        stem, suffix = path.stem, path.suffix
+        n = 1
+        while (path.parent / f"{stem}_{n}{suffix}").exists():
+            n += 1
+        path = path.parent / f"{stem}_{n}{suffix}"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(rows, indent=1, default=str))
     # Verify durability: re-read from disk and confirm the count matches.
@@ -147,16 +161,21 @@ def main():
 
     b = SnapshotBackfiller(property_history_cache=args.cache_file)
 
-    # SCHEMA GATE — before any delete or write. A column the writer emits but
-    # the table lacks would fail the eventual write; catch it before purging
-    # anything, so we never delete rows and then fail to write replacements.
-    emitted, missing = b.validate_emitted_columns()
-    print(f"\nSchema gate: {len(emitted)} emitted columns checked against "
-          f"deals_snapshot")
-    if missing:
-        print(f"✗ ABORT: writer emits column(s) not in deals_snapshot: {missing}")
+    # SCHEMA GATE — a real insert-and-rollback of representative rows, before
+    # any delete. This is the fix for the incident where the purge ran and the
+    # write then failed on the backfill_confidence CHECK, leaving the quarters
+    # empty: a column-existence probe passed but the values did not satisfy the
+    # constraint. Now a missing column OR a constraint violation aborts BEFORE
+    # a single row is deleted, so a purge never happens without a provable
+    # ability to write the replacements.
+    ok, err = b.validate_writable()
+    if not ok:
+        print(f"\n✗ ABORT: a representative row does not write to deals_snapshot:\n"
+              f"    {err}")
+        print("  Fix the schema (column or constraint) before purging anything.")
         raise SystemExit(3)
-    print("    ✓ every emitted column exists in the table")
+    print("\nSchema gate: representative rows (exact/pre_history/no_history) "
+          "insert and roll back cleanly")
 
     # Baseline across ALL quarters, so protected sources can be checked after.
     print("\nBaseline — all deals_snapshot rows by (fiscal_quarter, source):")
