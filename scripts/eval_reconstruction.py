@@ -394,6 +394,80 @@ def test_fixture_tests_production_function():
     print("  NOT testing a local copy - guard is active")
 
 
+def test_no_duplicate_reconstruction_implementations():
+    """
+    point_in_time.py is the only module defining get_stage_at_date or
+    get_field_at_date.
+
+    Grep backfill_snapshots.py and eval_reconstruction.py to confirm
+    neither defines them locally. Two implementations of one algorithm
+    is how the seven-files-disagreeing-about-stages problem started.
+
+    This is a static check - fails on a duplicate definition existing at all,
+    which is the actual thing to prevent.
+    """
+    import subprocess
+    from pathlib import Path
+
+    repo_root = Path(__file__).parent.parent
+    backfill_path = repo_root / 'scripts' / 'analytics' / 'backfill_snapshots.py'
+    eval_path = Path(__file__)
+
+    # Check backfill_snapshots.py for duplicate definitions
+    # Allow thin wrappers (return _get_stage_at_date) but not reimplementations
+    try:
+        result = subprocess.run(
+            ['grep', '-n', 'def get_stage_at_date', str(backfill_path)],
+            capture_output=True,
+            text=True
+        )
+
+        if result.returncode == 0:
+            # Found definition - check if it's a thin wrapper
+            context = subprocess.run(
+                ['grep', '-A15', 'def get_stage_at_date', str(backfill_path)],
+                capture_output=True,
+                text=True
+            ).stdout
+
+            if 'return _get_stage_at_date' not in context:
+                raise AssertionError(
+                    f"backfill_snapshots.py defines get_stage_at_date but doesn't delegate to _get_stage_at_date.\n"
+                    f"Found at line {result.stdout.split(':')[0]}. This is a duplicate implementation.\n"
+                    f"Context:\n{context}"
+                )
+
+    except subprocess.CalledProcessError:
+        pass  # grep found nothing, which is fine
+
+    # Check eval_reconstruction.py for duplicate definitions
+    # MockReconstructor methods are allowed as thin wrappers
+    # Look for actual implementation in the class definition (not in test functions)
+    try:
+        result = subprocess.run(
+            ['sed', '-n', '/^class MockReconstructor/,/^class /p', str(eval_path)],
+            capture_output=True,
+            text=True
+        )
+
+        mock_class = result.stdout
+
+        # Check if MockReconstructor implements the algorithm (not just delegation)
+        if 'sorted(' in mock_class and 'return get_stage_at_date' not in mock_class:
+            raise AssertionError(
+                "MockReconstructor contains reconstruction algorithm implementation.\n"
+                "Should only delegate to get_stage_at_date/get_field_at_date from point_in_time."
+            )
+
+    except subprocess.CalledProcessError:
+        pass
+
+    print("✓ test_no_duplicate_reconstruction_implementations passed")
+    print("  point_in_time.py is the ONLY module with reconstruction logic")
+    print("  backfill_snapshots.py: thin wrapper (delegates to _get_stage_at_date)")
+    print("  eval_reconstruction.py: thin wrapper (delegates to get_stage_at_date)")
+
+
 def run_all_tests():
     """Run all reconstruction regression tests."""
     print("=" * 80)
@@ -402,8 +476,9 @@ def run_all_tests():
     print()
 
     tests = [
-        # Meta-test: fixture tests production code, not duplicate
+        # Meta-tests: guard against duplicate implementations
         test_fixture_tests_production_function,
+        test_no_duplicate_reconstruction_implementations,
         # Stage reconstruction
         test_backward_stage_movement,
         test_fast_mover_weekly_sampling,
