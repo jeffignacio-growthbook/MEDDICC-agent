@@ -68,6 +68,41 @@ stage_map:
     bucket: "proposal"
     transition: null
 
+# Stage IDs that appear in HubSpot property history but no longer exist in
+# any pipeline, active or archived — hard-deleted, so no label is recoverable
+# from the API. Listed explicitly rather than left unmapped, so the discovery
+# gate can distinguish "acknowledged and unreachable" from "new and unknown".
+#
+# Reconstruction still RAISES on these (point_in_time.is_terminal_stage does
+# not consult this list). That is deliberate: they are provably unreachable,
+# so encountering one means an assumption broke, and a loud failure beats a
+# silent bucket. Verified unreachable by discover_historical_stages on every
+# run: a lookup returns the last history entry at or before the date, and
+# neither id is ever a deal's final entry, so neither can be returned.
+retired_stages:
+  "24682891":
+    last_seen: "2023-04-14"
+    first_seen: "2022-06-03"
+    entries: 15
+    deals: 14
+    reason: >
+      Hard-deleted custom stage from the pre-2023 default pipeline. Numerically
+      adjacent to 24682892 (Negotiating), so created alongside it. Was the
+      first history entry for 13 of 14 deals, and led to Negotiating, Review or
+      Scoping. Bucket left unassigned: the transition evidence is ambiguous
+      between an early and a mid stage, and a wrong bucket would stop erroring
+      and start lying.
+  "43746397":
+    last_seen: "2022-11-21"
+    first_seen: "2022-11-21"
+    entries: 3
+    deals: 3
+    reason: >
+      Hard-deleted custom stage. Always preceded by 24682891 or Closed Won and
+      always followed by Review. Three entries on a single day across three
+      deals, which reads like a one-off pipeline edit rather than a stage deals
+      genuinely worked through.
+
 # Which buckets count as won / lost / open — derived, but stated once.
 outcome_buckets:
   won: ["closed_won"]

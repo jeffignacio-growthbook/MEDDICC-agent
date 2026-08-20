@@ -637,6 +637,40 @@ def test_unmapped_stage_raises_not_defaults_open():
     print("  unmapped stage ids raise; None stays 'pre_history', not an error")
 
 
+def test_retired_stage_is_acknowledged_but_still_raises():
+    """An acknowledged retired stage is NOT a classified stage.
+
+    retired_stages exists so the discovery gate can tell a known,
+    provably-unreachable id apart from a new unknown one. It must not become
+    a back door that lets reconstruction read an unclassified stage as open —
+    that is the exact failure the gate was built to prevent.
+    """
+    from field_semantics import RETIRED_STAGES, is_retired_stage
+    from point_in_time import UnclassifiableStageError, is_terminal_stage
+
+    assert RETIRED_STAGES, "expected acknowledged retired stages in config"
+
+    for stage_id in RETIRED_STAGES:
+        assert is_retired_stage(stage_id), f"{stage_id} should read as retired"
+        try:
+            is_terminal_stage(stage_id)
+            raise AssertionError(
+                f"is_terminal_stage({stage_id!r}) returned instead of raising. "
+                f"Being listed in retired_stages must not make an unclassified "
+                f"stage readable as open."
+            )
+        except UnclassifiableStageError:
+            pass
+
+    # And retired is not a blanket amnesty: an id not on the list is still
+    # plainly unknown, not retired.
+    assert not is_retired_stage('99999999')
+    assert not is_retired_stage(None)
+
+    print("✓ test_retired_stage_is_acknowledged_but_still_raises passed")
+    print(f"  {len(RETIRED_STAGES)} retired ids acknowledged, all still raise")
+
+
 def run_all_tests():
     """Run all reconstruction regression tests."""
     print("=" * 80)
@@ -662,6 +696,7 @@ def run_all_tests():
         test_close_date_point_in_time_reconstruction,
         # Stage classification gate
         test_unmapped_stage_raises_not_defaults_open,
+        test_retired_stage_is_acknowledged_but_still_raises,
     ]
 
     for test in tests:

@@ -33,7 +33,8 @@ REPO_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(REPO_ROOT / 'scripts'))
 sys.path.insert(0, str(REPO_ROOT / 'api'))
 
-from field_semantics import STAGE_MAP, stage_bucket, stage_label
+from field_semantics import (RETIRED_STAGES, STAGE_MAP, is_retired_stage,
+                             stage_bucket, stage_label)
 
 
 NULL_VALUE = '<null>'   # a cleared dealstage, not a stage id
@@ -67,7 +68,15 @@ def scan_history(cache_path):
     cache = json.loads(cache_path.read_text())
     seen = defaultdict(lambda: {'entries': 0, 'deals': set(),
                                 'first': None, 'last': None})
+    # Stage ids that are the LAST history entry for some deal. A lookup
+    # returns the last entry at or before the date, so an id absent from this
+    # set can never be returned for any date — it is unreachable.
+    terminal_values = set()
     for deal_id, record in cache['deals'].items():
+        hist = sorted((record.get('history') or []),
+                      key=lambda e: e.get('timestamp') or '')
+        if hist and hist[-1].get('value') is not None:
+            terminal_values.add(str(hist[-1]['value']))
         for entry in record.get('history') or []:
             value = entry.get('value')
             ts = entry.get('timestamp')
@@ -79,7 +88,7 @@ def scan_history(cache_path):
                 s['first'] = ts
             if ts and (s['last'] is None or ts > s['last']):
                 s['last'] = ts
-    return cache, seen
+    return cache, seen, terminal_values
 
 
 def get_current_stage_ids():
@@ -115,7 +124,7 @@ def main():
 
     configured = load_client_yaml_stage_ids()
     classifiable = load_field_semantics_stage_ids()
-    cache, seen = scan_history(cache_path)
+    cache, seen, terminal_values = scan_history(cache_path)
 
     print(f"\nHistory cache: {len(cache['deals'])} deals, "
           f"{sum(v['entries'] for v in seen.values())} dealstage entries")
@@ -126,6 +135,7 @@ def main():
           f"{'first seen':<12} {'in cfg':<7} {'classifiable'}")
     print("-" * 96)
     unclassifiable, not_in_client_yaml, null_valued = [], [], None
+    retired_found = []
     for stage_id in sorted(seen, key=lambda k: -seen[k]['entries']):
         s = seen[stage_id]
         # A null history value is not a stage to map — the property was
@@ -137,12 +147,15 @@ def main():
         ok = stage_id in classifiable and bucket != 'unknown'
         in_cfg = stage_id in configured
         if not ok:
-            unclassifiable.append((stage_id, s))
+            if is_retired_stage(stage_id):
+                retired_found.append((stage_id, s))
+            else:
+                unclassifiable.append((stage_id, s))
         if not in_cfg:
             not_in_client_yaml.append(stage_id)
         print(f"{stage_id:<22} {bucket:<12} {s['entries']:>8} {len(s['deals']):>6} "
               f"{(s['first'] or '')[:10]:<12} {'yes' if in_cfg else 'NO':<7} "
-              f"{'yes' if ok else 'NO'}")
+              f"{'yes' if ok else ('retired' if is_retired_stage(stage_id) else 'NO')}")
 
     current = get_current_stage_ids()
     if current is None:
@@ -174,8 +187,34 @@ def main():
         print("  return (None, 'pre_history'). Worth resolving before these rows")
         print("  are labelled.")
 
+    reachable_retired = []
+    if retired_found:
+        print(f"\n  {len(retired_found)} acknowledged retired stage ID(s) "
+              f"(config/field_semantics.yaml retired_stages):")
+        for stage_id, s in retired_found:
+            meta = RETIRED_STAGES.get(stage_id, {})
+            reach = stage_id in terminal_values
+            if reach:
+                reachable_retired.append(stage_id)
+            print(f"    {stage_id}  last seen {(s['last'] or '?')[:10]}  "
+                  f"(recorded {meta.get('last_seen', '?')})  "
+                  f"{'REACHABLE — see below' if reach else 'unreachable'}")
+        print("    Deliberately unclassified. Reconstruction still raises on")
+        print("    them; they are listed so this gate can tell them apart from")
+        print("    a genuinely new unknown stage.")
+
+    if reachable_retired:
+        print(f"\n✗ BACKFILL BLOCKED — retired stage ID(s) {reachable_retired} "
+              f"are a deal's FINAL history entry.")
+        print("  The unreachability assumption that justified leaving them")
+        print("  unclassified no longer holds: a point-in-time lookup returns")
+        print("  the last entry at or before the date, so these CAN now be")
+        print("  returned and reconstruction will raise. Assign a real bucket.")
+        return 1
+
     if not unclassifiable:
-        print("\n✓ Every stage ID in history classifies. Reconstruction can proceed.")
+        print("\n✓ Every stage ID in history classifies, or is acknowledged")
+        print("  retired and provably unreachable. Reconstruction can proceed.")
         return 0
 
     print("\n✗ BACKFILL BLOCKED — these stage IDs cannot be classified.")

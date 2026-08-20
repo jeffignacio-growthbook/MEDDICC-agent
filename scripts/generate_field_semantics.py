@@ -50,6 +50,7 @@ def generate_module(semantics):
     stage_map = semantics['stage_map']
     outcome_buckets = semantics['outcome_buckets']
     field_units = semantics['field_units']
+    retired_stages = semantics.get('retired_stages', {})
 
     alias_map = build_alias_map(stage_map)
     label_map = build_label_map(stage_map)
@@ -69,6 +70,10 @@ STAGE_MAP = {repr(stage_map)}
 OUTCOME_BUCKETS = {repr(outcome_buckets)}
 
 FIELD_UNITS = {repr(field_units)}
+
+# Hard-deleted stage ids seen only in property history. Acknowledged, but
+# deliberately NOT classified — see config/field_semantics.yaml.
+RETIRED_STAGES = {repr(retired_stages)}
 
 # Reverse lookup: alias -> canonical stage_id
 _ALIAS_TO_CANONICAL = {repr(alias_map)}
@@ -190,6 +195,18 @@ def stage_transition(stage_id: str) -> str | None:
     if not stage_info:
         return None
     return stage_info.get('transition')
+
+def is_retired_stage(stage_id: str) -> bool:
+    \"\"\"
+    True if this id is an acknowledged hard-deleted stage.
+
+    Acknowledged is not classified: reconstruction still raises on these.
+    This exists so the discovery gate can tell "known and unreachable" apart
+    from "new and unknown", which is a genuine blocker.
+    \"\"\"
+    if not stage_id:
+        return False
+    return str(stage_id) in RETIRED_STAGES
 
 def label_to_stage_id(display_label: str) -> str:
     """
