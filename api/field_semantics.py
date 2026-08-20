@@ -2,10 +2,10 @@
 AUTO-GENERATED from config/field_semantics.yaml by scripts/generate_field_semantics.py.
 DO NOT EDIT BY HAND. Regenerate after changing the yaml.
 
-Generated: 2026-08-20 15:39:07 UTC
+Generated: 2026-08-20 15:58:26 UTC
 """
 
-STAGE_MAP = {'appointmentscheduled': {'label': 'Discovery', 'bucket': 'discovery', 'transition': 'discovery_to_scoping'}, 'qualifiedtobuy': {'label': 'Scoping', 'bucket': 'scoping', 'transition': 'scoping_to_proposal'}, 'presentationscheduled': {'label': 'Technical Evaluation', 'bucket': 'proposal', 'transition': 'proposal_to_negotiating'}, 'decisionmakerboughtin': {'label': 'Review', 'bucket': 'proposal', 'transition': None}, 'contractsent': {'label': 'Contract Sent', 'bucket': 'proposal', 'transition': None, 'aliases': ['1297321622']}, 'closedwon': {'label': 'Closed Won', 'bucket': 'closed_won', 'transition': None, 'aliases': ['1297321623']}, 'closedlost': {'label': 'Closed Lost', 'bucket': 'closed_lost', 'transition': None, 'aliases': ['1297321624', '68509551'], 'alias_labels': ['Disqualified']}, '79653122': {'label': 'Meeting Set', 'bucket': 'discovery', 'transition': None}, '24682892': {'label': 'Negotiating', 'bucket': 'proposal', 'transition': None}, '43449439': {'label': 'Awaiting Signature', 'bucket': 'proposal', 'transition': None}, '1297321618': {'label': 'Upcoming Renewal', 'bucket': 'discovery', 'transition': None}, '1297321619': {'label': 'Renewal Engaged', 'bucket': 'scoping', 'transition': None}, '1297321620': {'label': 'Pricing Presented', 'bucket': 'proposal', 'transition': None}}
+STAGE_MAP = {'appointmentscheduled': {'label': 'Discovery', 'bucket': 'discovery', 'transition': 'discovery_to_scoping'}, 'qualifiedtobuy': {'label': 'Scoping', 'bucket': 'scoping', 'transition': 'scoping_to_proposal'}, 'presentationscheduled': {'label': 'Technical Evaluation', 'bucket': 'proposal', 'transition': 'proposal_to_negotiating'}, 'decisionmakerboughtin': {'label': 'Review', 'bucket': 'proposal', 'transition': None}, 'contractsent': {'label': 'Contract Sent', 'bucket': 'proposal', 'transition': None, 'historical': True}, 'closedwon': {'label': 'Closed Won', 'bucket': 'closed_won', 'transition': None, 'aliases': ['1297321623']}, 'closedlost': {'label': 'Closed Lost', 'bucket': 'closed_lost', 'transition': None, 'aliases': ['1297321624', '68509551'], 'alias_labels': ['Disqualified']}, '79653122': {'label': 'Meeting Set', 'bucket': 'discovery', 'transition': None}, '24682892': {'label': 'Negotiating', 'bucket': 'proposal', 'transition': None}, '43449439': {'label': 'Awaiting Signature', 'bucket': 'proposal', 'transition': None}, '1297321618': {'label': 'Upcoming Renewal', 'bucket': 'discovery', 'transition': None}, '1297321619': {'label': 'Renewal Engaged', 'bucket': 'scoping', 'transition': None}, '1297321620': {'label': 'Pricing Presented', 'bucket': 'proposal', 'transition': None}, '1297321622': {'label': 'Contract Sent (Renewal)', 'bucket': 'proposal', 'transition': None}}
 
 OUTCOME_BUCKETS = {'won': ['closed_won'], 'lost': ['closed_lost'], 'open': ['discovery', 'scoping', 'proposal']}
 
@@ -16,10 +16,10 @@ FIELD_UNITS = {'arr_usd': 'US dollars, annual recurring', 'deal_value': 'US doll
 RETIRED_STAGES = {'24682891': {'last_seen': '2023-04-14', 'first_seen': '2022-06-03', 'entries': 15, 'deals': 14, 'reason': 'Hard-deleted custom stage from the pre-2023 default pipeline. Numerically adjacent to 24682892 (Negotiating), so created alongside it. Was the first history entry for 13 of 14 deals, and led to Negotiating, Review or Scoping. Bucket left unassigned: the transition evidence is ambiguous between an early and a mid stage, and a wrong bucket would stop erroring and start lying.\n'}, '43746397': {'last_seen': '2022-11-21', 'first_seen': '2022-11-21', 'entries': 3, 'deals': 3, 'reason': 'Hard-deleted custom stage. Always preceded by 24682891 or Closed Won and always followed by Review. Three entries on a single day across three deals, which reads like a one-off pipeline edit rather than a stage deals genuinely worked through.\n'}}
 
 # Reverse lookup: alias -> canonical stage_id
-_ALIAS_TO_CANONICAL = {'appointmentscheduled': 'appointmentscheduled', 'qualifiedtobuy': 'qualifiedtobuy', 'presentationscheduled': 'presentationscheduled', 'decisionmakerboughtin': 'decisionmakerboughtin', 'contractsent': 'contractsent', '1297321622': 'contractsent', 'closedwon': 'closedwon', '1297321623': 'closedwon', 'closedlost': 'closedlost', '1297321624': 'closedlost', '68509551': 'closedlost', '79653122': '79653122', '24682892': '24682892', '43449439': '43449439', '1297321618': '1297321618', '1297321619': '1297321619', '1297321620': '1297321620'}
+_ALIAS_TO_CANONICAL = {'appointmentscheduled': 'appointmentscheduled', 'qualifiedtobuy': 'qualifiedtobuy', 'presentationscheduled': 'presentationscheduled', 'decisionmakerboughtin': 'decisionmakerboughtin', 'contractsent': 'contractsent', 'closedwon': 'closedwon', '1297321623': 'closedwon', 'closedlost': 'closedlost', '1297321624': 'closedlost', '68509551': 'closedlost', '79653122': '79653122', '24682892': '24682892', '43449439': '43449439', '1297321618': '1297321618', '1297321619': '1297321619', '1297321620': '1297321620', '1297321622': '1297321622'}
 
 # Reverse lookup: display label -> stage_id (for CSV imports with display names)
-_LABEL_TO_STAGE_ID = {'Discovery': 'appointmentscheduled', 'Scoping': 'qualifiedtobuy', 'Technical Evaluation': 'presentationscheduled', 'Review': 'decisionmakerboughtin', 'Contract Sent': 'contractsent', 'Closed Won': 'closedwon', 'Closed Lost': 'closedlost', 'Disqualified': 'closedlost', 'Meeting Set': '79653122', 'Negotiating': '24682892', 'Awaiting Signature': '43449439', 'Upcoming Renewal': '1297321618', 'Renewal Engaged': '1297321619', 'Pricing Presented': '1297321620'}
+_LABEL_TO_STAGE_ID = {'Discovery': 'appointmentscheduled', 'Scoping': 'qualifiedtobuy', 'Technical Evaluation': 'presentationscheduled', 'Review': 'decisionmakerboughtin', 'Contract Sent': 'contractsent', 'Closed Won': 'closedwon', 'Closed Lost': 'closedlost', 'Disqualified': 'closedlost', 'Meeting Set': '79653122', 'Negotiating': '24682892', 'Awaiting Signature': '43449439', 'Upcoming Renewal': '1297321618', 'Renewal Engaged': '1297321619', 'Pricing Presented': '1297321620', 'Contract Sent (Renewal)': '1297321622'}
 
 def canonical_stage(stage_id: str) -> str:
     """
@@ -135,6 +135,20 @@ def stage_transition(stage_id: str) -> str | None:
     if not stage_info:
         return None
     return stage_info.get('transition')
+
+def is_historical_stage(stage_id: str) -> bool:
+    """
+    True if this stage is classified but is not a stage in any live pipeline.
+
+    Such a stage must stay classified so reconstruction can read the history
+    that contains it, while being legitimately absent from client.yaml. This
+    is a third category, separate from retired_stages (which cannot be
+    classified at all).
+    """
+    if not stage_id:
+        return False
+    info = STAGE_MAP.get(canonical_stage(stage_id))
+    return bool(info and info.get('historical'))
 
 def is_retired_stage(stage_id: str) -> bool:
     """

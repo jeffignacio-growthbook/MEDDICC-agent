@@ -26,7 +26,13 @@ stage_map:
     label: "Contract Sent"
     bucket: "proposal"
     transition: null
-    aliases: ["1297321622"]       # Renewal pipeline Contract Sent
+    # Not a stage in any live pipeline: client.yaml lists 16 stage ids and the
+    # HubSpot pipelines API resolves exactly those 16. It still appears in 2022
+    # property history, so it must stay CLASSIFIED for reconstruction to read
+    # that history. Distinct from retired_stages, which is for ids that cannot
+    # be classified at all. Marked so the config-agreement test does not read
+    # its absence from client.yaml as drift.
+    historical: true
   closedwon:
     label: "Closed Won"
     bucket: "closed_won"
@@ -65,6 +71,15 @@ stage_map:
     transition: null
   "1297321620":
     label: "Pricing Presented"
+    bucket: "proposal"
+    transition: null
+  # Live renewal stage. Deliberately its own entry rather than an alias of
+  # contractsent: they share a bucket but not liveness, and an alias would
+  # make this inherit historical: true and read as drift-exempt when it is
+  # actually a current pipeline stage. Label is suffixed so it does not
+  # collide with contractsent in the label -> stage_id reverse map.
+  "1297321622":
+    label: "Contract Sent (Renewal)"
     bucket: "proposal"
     transition: null
 

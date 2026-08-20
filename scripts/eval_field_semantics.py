@@ -227,6 +227,90 @@ def test_unknown_stages_handled_gracefully():
     print("  ✓ Unknown stages don't crash")
     print("  ✓ Unknown stages default to 'unknown' bucket and open status")
 
+def test_client_yaml_and_field_semantics_agree():
+    """The two configs must not drift apart on which stages exist.
+
+    client.yaml defines the live pipelines; field_semantics defines what each
+    stage MEANS. A stage in one and not the other is drift, and drift is the
+    risk — not any particular missing stage. Every stage id falls in exactly
+    one of three categories:
+
+      live        in client.yaml AND classified by field_semantics
+      historical  classified, `historical: true`, absent from client.yaml
+                  (still in old property history, so it must stay classified)
+      retired     in retired_stages, unclassifiable, provably unreachable
+
+    Anything else is drift and fails here.
+    """
+    print("\n[TEST] client.yaml and field_semantics agree on stages")
+
+    import yaml as _yaml
+    from pathlib import Path as _Path
+    from field_semantics import (RETIRED_STAGES, STAGE_MAP, canonical_stage,
+                                 is_historical_stage, stage_bucket)
+
+    REPO = _Path(__file__).parent.parent
+    client = _yaml.safe_load((REPO / 'config/client.yaml').read_text())
+
+    client_ids = set()
+    for pipeline in client['pipeline']['pipelines']:
+        for stage in pipeline['stages']:
+            client_ids.add(str(stage['id']))
+
+    semantics_ids = set()
+    for stage_id, info in STAGE_MAP.items():
+        semantics_ids.add(str(stage_id))
+        for alias in info.get('aliases', []):
+            semantics_ids.add(str(alias))
+
+    retired_ids = {str(s) for s in RETIRED_STAGES}
+
+    # 1. Every live stage must be classified, or the terminal-stage inclusion
+    #    rule cannot decide whether a deal is open.
+    unclassified_live = sorted(
+        s for s in client_ids if stage_bucket(s) == 'unknown')
+    assert not unclassified_live, (
+        f"client.yaml stage(s) {unclassified_live} have no classification in "
+        f"field_semantics.yaml. The terminal-stage inclusion rule raises on "
+        f"these, so a backfill would stop mid-run."
+    )
+
+    # 2. Nothing may be both live and retired.
+    both = sorted(client_ids & retired_ids)
+    assert not both, (
+        f"stage(s) {both} are in client.yaml AND retired_stages. Retired means "
+        f"hard-deleted and unreachable; a live pipeline stage is neither."
+    )
+
+    # 3. Anything field_semantics knows but client.yaml does not must be
+    #    explicitly marked historical. Unmarked means drift.
+    unexplained = sorted(
+        s for s in semantics_ids - client_ids
+        if not is_historical_stage(s) and s not in retired_ids)
+    assert not unexplained, (
+        f"stage(s) {unexplained} are classified in field_semantics.yaml but "
+        f"absent from client.yaml, and not marked `historical: true`. Either "
+        f"add them to the pipeline config, or mark them historical if they "
+        f"only appear in old property history."
+    )
+
+    # 4. A historical stage that IS live contradicts itself — the flag would
+    #    exempt a current stage from the drift check. This is what an alias
+    #    silently caused for the renewal Contract Sent.
+    live_but_historical = sorted(s for s in client_ids if is_historical_stage(s))
+    assert not live_but_historical, (
+        f"stage(s) {live_but_historical} are in client.yaml but marked "
+        f"`historical: true`. A live stage must not be drift-exempt. Give it "
+        f"its own stage_map entry instead of aliasing it to a historical one."
+    )
+
+    live = sorted(client_ids)
+    historical = sorted(s for s in semantics_ids if is_historical_stage(s))
+    print(f"  ✓ live: {len(live)}  historical: {historical}  "
+          f"retired: {sorted(retired_ids)}")
+    print("  ✓ no unexplained divergence between the two configs")
+
+
 def test_config_numeric_keys_are_strings():
     """Bare numeric YAML keys parse as ints; HubSpot sends strings. Any
     config key that is a numeric identifier must be quoted. Tests that
@@ -463,6 +547,7 @@ def main():
         test_is_won_is_lost_mutually_exclusive,
         test_stage_transition_returns_correct_keys,
         test_unknown_stages_handled_gracefully,
+        test_client_yaml_and_field_semantics_agree,
         test_config_numeric_keys_are_strings,
         test_no_raw_stage_ids_outside_field_semantics,
         test_harness_boundary_isolation,  # Phase 5d - critical boundary guard

@@ -196,6 +196,20 @@ def stage_transition(stage_id: str) -> str | None:
         return None
     return stage_info.get('transition')
 
+def is_historical_stage(stage_id: str) -> bool:
+    \"\"\"
+    True if this stage is classified but is not a stage in any live pipeline.
+
+    Such a stage must stay classified so reconstruction can read the history
+    that contains it, while being legitimately absent from client.yaml. This
+    is a third category, separate from retired_stages (which cannot be
+    classified at all).
+    \"\"\"
+    if not stage_id:
+        return False
+    info = STAGE_MAP.get(canonical_stage(stage_id))
+    return bool(info and info.get('historical'))
+
 def is_retired_stage(stage_id: str) -> bool:
     \"\"\"
     True if this id is an acknowledged hard-deleted stage.
