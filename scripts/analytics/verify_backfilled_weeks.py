@@ -37,50 +37,62 @@ for week_label, snapshot_date in backfilled_dates:
     print(f"{week_label} ({snapshot_date})")
     print(f"{'='*80}")
     
-    # Get snapshot for this date
+    # Get snapshot for this date (with close_date for point-in-time comparison)
     snapshot = select_all(sb, 'deals_snapshot',
-                          columns='deal_id, pipeline_id',
+                          columns='deal_id, pipeline_id, close_date',
                           filters=[('eq', 'snapshot_date', snapshot_date)])
-    
+
+    # Build point-in-time close_date lookup from snapshot
+    snapshot_close_dates = {s['deal_id']: s.get('close_date') for s in snapshot}
+
     # Get pipelines
     pipelines = set(d.get('pipeline_id') for d in deals if d.get('pipeline_id'))
-    
+
     all_pass = True
-    
+
     for pipeline_id in sorted(pipelines, key=lambda x: (x != 'default', x)):
         # Snapshot count
         snapshot_pipeline = [s for s in snapshot if s.get('pipeline_id') == pipeline_id]
         snapshot_count = len(snapshot_pipeline)
-        
-        # Genuinely open count
+
+        # Genuinely open count (using point-in-time close_date from snapshot)
         genuinely_open = []
         for d in deals:
             if d.get('pipeline_id') != pipeline_id:
                 continue
-            
+
             create_date = d.get('create_date')
             if not create_date:
                 continue
-            
+
             create_dt = datetime.fromisoformat(create_date).date()
             if create_dt > snapshot_dt:
                 continue
-            
-            close_date = d.get('close_date')
+
+            # Use point-in-time close_date from snapshot if available, else from deals table
+            deal_id = d['deal_id']
+            close_date = snapshot_close_dates.get(deal_id) or d.get('close_date')
+
             if close_date:
                 close_dt = datetime.fromisoformat(close_date).date()
                 if close_dt < snapshot_dt:
                     continue
-            
+
             genuinely_open.append(d)
-        
+
         genuinely_open_count = len(genuinely_open)
         coverage_pct = (snapshot_count / genuinely_open_count * 100) if genuinely_open_count > 0 else 0
-        
-        status = "✓ PASS" if coverage_pct >= 95 else "✗ FAIL"
+
+        # Check both floor (95%) and ceiling (105%)
         if coverage_pct < 95:
+            status = "✗ UNDER"
             all_pass = False
-        
+        elif coverage_pct > 105:
+            status = "✗ OVER"
+            all_pass = False
+        else:
+            status = "✓ PASS"
+
         print(f"  {pipeline_id:<20} Open: {genuinely_open_count:>4}  Captured: {snapshot_count:>4}  "
               f"Coverage: {coverage_pct:>5.1f}%  {status}")
     
@@ -91,7 +103,9 @@ print(f"\n{'='*80}")
 print("VERDICT")
 print(f"{'='*80}")
 
-print(f"\nAll backfilled weeks checked against 95% coverage threshold")
-print(f"If all weeks passed, backfill reconstruction is reliable")
+print(f"\nAll backfilled weeks checked against 95% - 105% coverage band")
+print(f"  < 95% (UNDERCAPTURE): Systematic exclusion bug (like 291-row cap)")
+print(f"  > 105% (OVERCAPTURE): Inclusion-rule bug (closed deals in open snapshot)")
+print(f"\nIf all weeks passed (95-105%), backfill reconstruction is reliable")
 print(f"If any failed, backfill has same class of problem as historical snapshots")
 

@@ -149,29 +149,40 @@ def main():
     # Coverage assertion: Verify we captured expected deals (all pipelines)
     import yaml
     config_path = REPO_ROOT / 'config' / 'client.yaml'
-    min_coverage = 95  # Default threshold
+    min_coverage = 95   # Default floor
+    max_coverage = 105  # Default ceiling
 
     if config_path.exists():
         with open(config_path) as f:
             config = yaml.safe_load(f)
             forecast_config = config.get('forecast_analysis', {})
             min_coverage = forecast_config.get('min_write_coverage_pct', 95)
+            max_coverage = forecast_config.get('max_write_coverage_pct', 105)
 
     # Get all unique pipelines
     all_pipelines = set(d.get('pipeline_id') for d in deals if d.get('pipeline_id'))
 
-    print(f"\nCoverage check (all pipelines):")
+    print(f"\nCoverage check (all pipelines, point-in-time):")
 
     all_passed = True
+    failures = []
     total_genuinely_open = 0
     total_captured = 0
+
+    # First, fetch today's snapshot to get point-in-time close_date
+    todays_snapshot = select_all(
+        sb, 'deals_snapshot',
+        'deal_id, pipeline_id, close_date',
+        filters=[('eq', 'snapshot_date', today)]
+    )
+    snapshot_close_dates = {s['deal_id']: s.get('close_date') for s in todays_snapshot}
 
     for pipeline_id in sorted(all_pipelines, key=lambda x: (x != 'default', x)):
         # Count qualified deals in this pipeline
         qualified_pipeline = [d for d in qualified_deals if d.get('pipeline_id') == pipeline_id]
         qualified_pipeline_ids = set(d['deal_id'] for d in qualified_pipeline)
 
-        # Genuinely open in this pipeline
+        # Genuinely open in this pipeline (using point-in-time close_date from snapshot)
         genuinely_open = []
         for d in deals:
             if d.get('pipeline_id') != pipeline_id:
@@ -185,7 +196,10 @@ def main():
             if create_dt > today_date:
                 continue
 
-            close_date = d.get('close_date')
+            # Use close_date from snapshot (point-in-time) if available, else from deals table
+            deal_id = d['deal_id']
+            close_date = snapshot_close_dates.get(deal_id) or d.get('close_date')
+
             if close_date:
                 close_dt = datetime.fromisoformat(close_date).date()
                 if close_dt < today_date:
@@ -206,12 +220,22 @@ def main():
         total_genuinely_open += genuinely_open_count
         total_captured += qualified_count
 
-        status = "✓" if coverage_pct >= min_coverage else "✗"
+        # Check both floor and ceiling
+        if coverage_pct < min_coverage:
+            status = "✗ UNDER"
+            all_passed = False
+            failures.append((pipeline_id, coverage_pct, 'undercapture', len(missing), len(extra)))
+        elif coverage_pct > max_coverage:
+            status = "✗ OVER"
+            all_passed = False
+            failures.append((pipeline_id, coverage_pct, 'overcapture', len(missing), len(extra)))
+        else:
+            status = "✓"
+
         print(f"  {pipeline_id:<20} Open: {genuinely_open_count:>4}  Captured: {qualified_count:>4}  "
               f"Coverage: {coverage_pct:>5.1f}%  {status}")
 
-        if coverage_pct < min_coverage:
-            all_passed = False
+        if not all_passed and (coverage_pct < min_coverage or coverage_pct > max_coverage):
             print(f"    Missing: {len(missing)}  Extra: {len(extra)}")
 
     # Overall coverage
@@ -221,16 +245,22 @@ def main():
           f"Coverage: {overall_coverage:>5.1f}%")
 
     if not all_passed:
-        error_msg = (
-            f"\n✗ COVERAGE ASSERTION FAILED\n"
-            f"  One or more pipelines below {min_coverage}% threshold\n"
-            f"  This indicates a systematic exclusion bug (like the 291-row cap)\n"
-            f"  Fix before deploying to production"
-        )
+        error_msg = f"\n✗ COVERAGE ASSERTION FAILED\n"
+        error_msg += f"  Valid range: {min_coverage}% - {max_coverage}%\n\n"
+
+        for pipeline_id, cov_pct, failure_type, missing, extra in failures:
+            if failure_type == 'undercapture':
+                error_msg += f"  {pipeline_id}: {cov_pct:.1f}% < {min_coverage}% (UNDERCAPTURE)\n"
+                error_msg += f"    Missing {missing} deals - systematic exclusion bug (like 291-row cap)\n"
+            else:
+                error_msg += f"  {pipeline_id}: {cov_pct:.1f}% > {max_coverage}% (OVERCAPTURE)\n"
+                error_msg += f"    Extra {extra} deals - inclusion-rule bug (closed deals in open snapshot)\n"
+
+        error_msg += f"\n  Fix before deploying to production"
         print(error_msg)
         raise AssertionError(error_msg)
 
-    print(f"\n  ✓ Coverage assertion passed (all pipelines >= {min_coverage}%)")
+    print(f"\n  ✓ Coverage assertion passed ({min_coverage}% - {max_coverage}%)")
 
 
 if __name__ == '__main__':
