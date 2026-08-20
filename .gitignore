@@ -54,3 +54,4 @@ data/*.csv
 # Client-specific forbidden names list (local only, never tracked)
 .forbidden_names
 property_history_cache.json
+*_cache.json
