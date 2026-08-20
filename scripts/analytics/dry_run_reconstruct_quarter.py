@@ -51,10 +51,8 @@ sys.path.insert(0, str(REPO_ROOT / 'scripts' / 'analytics'))
 sys.path.insert(0, str(REPO_ROOT / 'api'))
 
 import yaml
-from point_in_time import (UnclassifiableStageError, get_field_at_date,
-                           get_stage_at_date, is_deal_in_analytics_scope,
-                           is_deal_open_at_date, is_terminal_stage,
-                           load_scope_config)
+from point_in_time import (is_deal_in_analytics_scope, load_scope_config,
+                           reconstruct_open_rows)
 from utils import get_fiscal_quarter, get_value_properties, compute_deal_value
 # Single source of truth for the per-property cache shape — importing rather
 # than re-declaring, so a new tracked property cannot exist in the fetcher and
@@ -143,69 +141,36 @@ def method1_rows(cross_val_date):
 
 def reconstruct_week(D, deals, stage_history, field_history, config,
                      value_props, excl_pipelines, stage_cfg):
-    """Corrected population for one date. Returns (rows, tally)."""
-    Ddt = datetime.combine(D, datetime.min.time())
+    """Coverage tally for one date. Population + value reconstruction come from
+    the shared point_in_time.reconstruct_open_rows — this function only scopes
+    and counts, so it cannot diverge from the writer on who is in the snapshot."""
+    open_rows, raised = reconstruct_open_rows(
+        deals, stage_history, field_history, D, config, value_props,
+        compute_deal_value)
     rows, tally = [], Counter()
-    raised = []
-    for deal_id, d in deals.items():
-        if d['create'] > D:
-            continue
-        # is_deal_open_at_date compares create to snapshot directly, so both
-        # must be the same type; the real callers pass datetimes.
-        create_dt = datetime.combine(d['create'], datetime.min.time())
-        stage, s_conf, _ = get_stage_at_date(stage_history, deal_id, Ddt)
-        try:
-            if not is_deal_open_at_date(create_dt, stage, Ddt,
-                                        is_terminal_stage):
-                continue
-        except UnclassifiableStageError:
-            raised.append(deal_id)
-            continue
-
-        # Point-in-time value: None (not 0.0) when nothing resolves.
-        pit_props, confs = {}, []
-        for prop in value_props:
-            v, c = get_field_at_date(field_history[prop], deal_id, Ddt)
-            pit_props[prop] = v
-            confs.append(c)
-        if 'exact' in confs:
-            value = compute_deal_value(pit_props, config, d['pipeline'])
-            v_conf = 'exact'
-        else:
-            value = None
-            v_conf = 'pre_history' if 'pre_history' in confs else 'no_history'
-
-        # Coverage denominator is scoped by PIPELINE — known from the deals
-        # table whatever the stage history shows. Numerator (usable) also
-        # requires a known, qualified stage. This is the fix for a circular
-        # gate: if scope required a non-null stage, only 'exact' deals could
-        # ever be scoped and usable% would be ~100% by construction. Scoping
-        # the denominator by pipeline lets pre_history/no_history deals in a
-        # non-excluded pipeline sit in the denominator and DEPRESS coverage —
-        # which is the whole point, and what makes an older quarter fail.
-        pipeline_in_scope = d['pipeline'] not in excl_pipelines
-        usable = is_deal_in_analytics_scope(stage, d['pipeline'],
+    for r in open_rows:
+        stage = r['stage_id']
+        s_conf = r['stage_confidence']
+        pipeline = r['pipeline']
+        # Denominator scoped by PIPELINE (known from the deals table whatever
+        # the stage shows); numerator also needs a known, qualified stage.
+        # Certainty excludes, ignorance counts against us: a KNOWN excluded
+        # stage leaves the denominator; an UNKNOWN stage in a non-excluded
+        # pipeline stays in and, being unusable, depresses coverage.
+        pipeline_in_scope = pipeline not in excl_pipelines
+        usable = is_deal_in_analytics_scope(stage, pipeline,
                                             excl_pipelines, stage_cfg)
-        # Denominator = deals that WOULD be in the analytics population if we
-        # knew their stage. A KNOWN excluded stage (Meeting Set, Disqualified,
-        # below qualified order) is certainly out — do not count it. An UNKNOWN
-        # stage (pre_history / no_history) in a non-excluded pipeline cannot be
-        # ruled in or out, so it counts and, being unusable, depresses
-        # coverage. That asymmetry is deliberate: certainty excludes, ignorance
-        # counts against us.
         in_denom = pipeline_in_scope and (usable or stage is None)
-        rows.append({'deal_id': deal_id, 'snapshot_date': D.isoformat(),
-                     'stage_id': stage, 'stage_confidence': s_conf,
-                     'deal_value': value, 'value_confidence': v_conf,
+        rows.append({**r, 'snapshot_date': D.isoformat(),
                      'in_denom': in_denom, 'usable': usable})
         tally['open'] += 1
         tally[f'stage_{s_conf}'] += 1
-        tally[f'value_{v_conf}'] += 1
+        tally[f"value_{r['value_confidence']}"] += 1
         if in_denom:
-            tally['scopable_open'] += 1        # denominator
+            tally['scopable_open'] += 1
             tally[f'scopable_stage_{s_conf}'] += 1
             if usable:
-                tally['usable'] += 1           # numerator
+                tally['usable'] += 1
     return rows, tally, raised
 
 

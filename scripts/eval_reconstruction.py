@@ -691,8 +691,13 @@ def test_both_writers_use_the_shared_inclusion_rule():
     m2 = (REPO_ROOT / 'scripts/analytics/backfill_snapshots.py').read_text()
 
     for name, src in (('snapshot_deals.py', m1), ('backfill_snapshots.py', m2)):
-        assert 'is_deal_open_at_date' in src, \
-            f"{name} does not call the shared inclusion rule"
+        # The shared rule may be reached directly (snapshot_deals, a same-day
+        # capture) or transitively through reconstruct_open_rows, which
+        # encapsulates it for the historical writer. Either is the shared rule;
+        # a local reimplementation is what this forbids.
+        assert ('is_deal_open_at_date' in src
+                or 'reconstruct_open_rows' in src), \
+            f"{name} does not reach the shared inclusion rule"
         assert 'from point_in_time import' in src, \
             f"{name} does not import from point_in_time"
         # The close_date inclusion test both writers used before. Its return
@@ -1002,6 +1007,48 @@ def test_dollar_weighted_paths_never_coalesce_null_value_to_zero():
           f"Fix is null-propagation, deferred to the analysis-correctness pass.")
 
 
+def test_no_duplicate_population_selection():
+    """Population selection lives ONLY in point_in_time.reconstruct_open_rows.
+
+    Both the Phase 3 dry-run and the Phase 4 writer must CALL it, not
+    reimplement it. Two implementations of who-is-in-a-snapshot is the drift
+    pattern that produced the seven-files-disagreeing-on-stages problem and
+    the duplicate-reconstruction-function problem earlier in this workstream.
+    And neither may carry the property_history.keys() population that WAS the
+    ~291 cap.
+    """
+    writer = (REPO_ROOT / 'scripts/analytics/backfill_snapshots.py').read_text()
+    dry = (REPO_ROOT / 'scripts/analytics/dry_run_reconstruct_quarter.py').read_text()
+    pit = (REPO_ROOT / 'scripts/analytics/point_in_time.py').read_text()
+
+    assert pit.count('def reconstruct_open_rows(') == 1, \
+        "reconstruct_open_rows must be defined once, in point_in_time.py"
+
+    for name, src in (('backfill_snapshots.py', writer),
+                      ('dry_run_reconstruct_quarter.py', dry)):
+        assert src.count('def reconstruct_open_rows(') == 0, \
+            f"{name} redefines reconstruct_open_rows instead of importing it"
+        assert 'reconstruct_open_rows(' in src, \
+            f"{name} does not call the shared population function"
+        # The ~291-cap population: iterating history keys and (in the writer)
+        # dropping null-stage deals. Match the code idiom (self.…keys()), not
+        # the prose in a docstring that explains the fix.
+        assert 'self.property_history.keys()' not in src, \
+            (f"{name} iterates self.property_history.keys() — the ~291-cap "
+             f"population. Drive from the deals table via reconstruct_open_rows.")
+
+    # The value None-not-0.0 rule is shared too, not re-inlined.
+    assert pit.count('def reconstruct_value_at_date(') == 1
+    for name, src in (('backfill_snapshots.py', writer),
+                      ('dry_run_reconstruct_quarter.py', dry)):
+        assert src.count('def reconstruct_value_at_date(') == 0, \
+            f"{name} redefines reconstruct_value_at_date"
+
+    print("✓ test_no_duplicate_population_selection passed")
+    print("  population + value reconstruction live only in point_in_time; "
+          "both callers import them")
+
+
 def run_all_tests():
     """Run all reconstruction regression tests."""
     print("=" * 80)
@@ -1029,6 +1076,7 @@ def run_all_tests():
         test_unmapped_stage_raises_not_defaults_open,
         test_retired_stage_is_acknowledged_but_still_raises,
         test_both_writers_use_the_shared_inclusion_rule,
+        test_no_duplicate_population_selection,
         test_scoping_is_not_applied_to_writes,
         test_two_coverage_gates_measure_different_populations,
         # Phase 2b — point-in-time value and close_date

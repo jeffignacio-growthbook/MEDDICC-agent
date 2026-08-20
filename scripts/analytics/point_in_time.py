@@ -368,3 +368,95 @@ def is_deal_in_analytics_scope(
     if cfg is None or cfg['excluded']:
         return False
     return cfg['order'] >= cfg['qualified_stage_order']
+
+
+def _as_datetime(d):
+    """Normalize a date or datetime to a midnight datetime.
+
+    is_deal_open_at_date and get_stage_at_date compare against each other and
+    against ISO timestamps, so create and snapshot must be the same type. A
+    caller passing a date for one and a datetime for the other was a real bug
+    caught by a fixture; normalizing here removes the footgun for every caller.
+    """
+    if isinstance(d, datetime):
+        return d
+    return datetime(d.year, d.month, d.day)
+
+
+def reconstruct_value_at_date(field_history, deal_id, snapshot_date,
+                              value_properties, config, pipeline_id,
+                              compute_value_fn):
+    """Point-in-time deal value via the GrowthBook rule. Returns (value, conf).
+
+    value is None — never 0.0 — when NO component resolved at this date.
+    compute_value_fn (utils.compute_deal_value) on an all-blank property dict
+    returns 0.0 through the amount fallback, and writing that would swap a
+    proxy for a fabrication indistinguishable from a real zero. A component
+    present and zero stays a real 0.0. compute_value_fn is injected so this
+    module needs no import of utils.
+
+    Shared by the dry-run and the Phase 4 writer so the None-not-0.0 rule —
+    a documented cause of the prior attempt's failure — lives in one place.
+    """
+    Ddt = _as_datetime(snapshot_date)
+    pit_props, confs = {}, []
+    for prop in value_properties:
+        v, c = get_field_at_date(field_history[prop], deal_id, Ddt)
+        pit_props[prop] = v
+        confs.append(c)
+    if 'exact' in confs:
+        return compute_value_fn(pit_props, config, pipeline_id), 'exact'
+    return None, ('pre_history' if 'pre_history' in confs else 'no_history')
+
+
+def reconstruct_open_rows(deals, stage_history, field_history, snapshot_date,
+                          config, value_properties, compute_value_fn):
+    """Population + per-deal reconstruction for one date.
+
+    THE single source of truth for which deals are in a snapshot and what
+    their reconstructed stage and value are. Both the Phase 3 dry-run and the
+    Phase 4 writer call this; neither reimplements population selection, so
+    the two cannot diverge. Coverage tallying and DB-column shaping are the
+    caller's job — this fixes the inclusion rule and the value rule.
+
+    Population is driven from `deals` (the deals table), NOT from
+    stage_history.keys(). A deal created on or before D that is not terminal
+    at D is IN; a deal with no stage history at D is a null-stage row, not a
+    drop. That is the Phase 2a fix — iterating history keys and dropping
+    null-stage deals was the ~291 cap.
+
+    Args:
+        deals: {deal_id: {'create': date|datetime, 'pipeline': str, ...}}
+        stage_history, field_history: per point_in_time cache shape
+        snapshot_date: date or datetime
+        value_properties, config, compute_value_fn: for value reconstruction
+
+    Returns:
+        (rows, unclassifiable_deal_ids)
+        rows: [{deal_id, pipeline, stage_id, stage_confidence,
+                deal_value, value_confidence}]  (ascending deal_id — stable
+                ordering so a batched, resumable write is deterministic)
+        unclassifiable: deal_ids whose stage@D field_semantics cannot classify;
+                the caller decides whether that is fatal.
+    """
+    Ddt = _as_datetime(snapshot_date)
+    rows, unclassifiable = [], []
+    for deal_id in sorted(deals):
+        d = deals[deal_id]
+        create = _as_datetime(d['create'])
+        if create > Ddt:
+            continue
+        stage, s_conf, _ = get_stage_at_date(stage_history, deal_id, Ddt)
+        try:
+            if not is_deal_open_at_date(create, stage, Ddt, is_terminal_stage):
+                continue
+        except UnclassifiableStageError:
+            unclassifiable.append(deal_id)
+            continue
+        value, v_conf = reconstruct_value_at_date(
+            field_history, deal_id, Ddt, value_properties, config,
+            d.get('pipeline'), compute_value_fn)
+        rows.append({'deal_id': deal_id, 'pipeline': d.get('pipeline'),
+                     'stage_id': stage, 'stage_confidence': s_conf,
+                     'deal_value': value, 'value_confidence': v_conf})
+    return rows, unclassifiable

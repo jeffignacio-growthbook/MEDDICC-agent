@@ -1,112 +1,106 @@
 """
-Historical Snapshot Backfill Script
-Phase D Task 4 - Generate 52 weeks of historical deal snapshots
+Historical Snapshot Backfill — Method 2, Phase 4.
 
-Uses HubSpot property history to create weekly snapshots showing:
-- Stage progression over time
-- Deal status (active/won/lost) at each snapshot date
-- Confidence scoring for data quality
+Reconstructs weekly pipeline snapshots for elapsed quarters from HubSpot
+property history and writes them to deals_snapshot.
 
-deal_value and close_date are reconstructed point-in-time from property
-history, not proxied from today's values. Proxying them was one of the two
-documented causes of the prior attempt's failure: it made backfilled
-arr_change read as 0, because a deal cannot change its own value
-retroactively when every week is stamped with today's number.
+POPULATION comes from point_in_time.reconstruct_open_rows — the SAME function
+the Phase 3 dry-run calls. Neither reimplements population selection, so the
+writer and the dry-run cannot diverge on who is in a snapshot. Driving the
+population from the deals table (not property_history.keys()) and writing a
+null-stage row instead of dropping it is the Phase 2a fix: iterating history
+keys and dropping null-stage deals was the ~291 cap.
 
-deal_value goes through utils.compute_deal_value on point-in-time component
-values, so the GrowthBook value rule -- Incremental ARR, amount fallback,
-plus Renewal ARR for renewals -- is applied once and not reimplemented here.
+VALUE and CLOSE_DATE are reconstructed point-in-time (Phase 2b). deal_value is
+None, never 0.0, when no component resolved at the date — writing a 0 would
+swap a proxy for a fabrication.
 
-If NO value component resolves at a date, deal_value is None, not 0.0. An
-all-blank component set means the value is UNKNOWN at that date, and
-compute_deal_value would otherwise return 0.0 through the fallback path,
-which is a fabricated number wearing the same clothes as the proxy it
-replaced.
+WEEKLY SAMPLING drops a fast-mover's intermediate stages: a deal that moves
+through four stages in four days appears in the weekly grid as though it
+jumped straight to its final stage. Inherent to weekly sampling, not a bug;
+stage-to-stage conversion computed from this grid undercounts fast deals.
 
-Requires:
-- Property history cache from hubspot_history.py
-- Migration 017 (backfill confidence fields)
+The write is BATCHED, RESUMABLE and IDEMPOTENT: a durable checkpoint records
+each (quarter, week) done, restart skips them, and the upsert key
+(deal_id, snapshot_date) makes re-running a completed date a no-op. Ordering
+is deterministic (quarters in order, weeks in order, deal_id ascending) so a
+resumed run reproduces the same sequence.
+
+Requires: property history cache (hubspot_history.py --all), migration 038
+(NOT NULL fiscal_quarter).
 
 Usage:
-    python scripts/analytics/backfill_snapshots.py --dry-run  # Validation report only
-    python scripts/analytics/backfill_snapshots.py            # Real backfill
+    python scripts/analytics/backfill_snapshots.py --report-only   # numbers, no write
+    python scripts/analytics/backfill_snapshots.py                 # write
+    python scripts/analytics/backfill_snapshots.py --quarters "FY2026 Q3,FY2026 Q4"
 """
 import os
 import sys
 import json
 import yaml
 import argparse
-from pathlib import Path
 from collections import Counter
-from datetime import datetime, timedelta
+from pathlib import Path
+from datetime import datetime, date, timedelta
 from typing import Dict, List, Optional, Tuple
 
-# Add api path for field_semantics import
 REPO_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(REPO_ROOT / 'api'))
 
-# Import field_semantics for canonical stage logic
 try:
     from field_semantics import is_won, is_lost
 except ImportError:
     from api.field_semantics import is_won, is_lost
 
-# Add scripts to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent))
 
 from supabase import create_client
 from supabase_client import select_all
 
-# Import shared point-in-time reconstruction logic
-from point_in_time import get_stage_at_date as _get_stage_at_date
-from point_in_time import get_field_at_date as _get_field_at_date
-from point_in_time import is_deal_open_at_date, is_terminal_stage
+# Shared reconstruction — population, value, close_date live in one module.
+from point_in_time import (get_field_at_date as _get_field_at_date,
+                           reconstruct_open_rows)
 from hubspot_history import HISTORY_KEYS
-from utils import compute_deal_value, get_value_properties
+from utils import compute_deal_value, get_value_properties, get_fiscal_quarter
+
+# Elapsed quarters this backfill targets, per the Method 2 spec.
+DEFAULT_QUARTERS = ['FY2026 Q3', 'FY2026 Q4', 'FY2027 Q1', 'FY2027 Q2']
 
 
 class SnapshotBackfiller:
-    """Generates historical snapshots from property history."""
+    """Reconstructs historical snapshots from property history."""
 
     def __init__(self, property_history_cache: str = 'property_history_cache.json'):
-        # Load Supabase connection
         self.supabase_url = os.environ['SUPABASE_URL']
         self.supabase_key = os.environ['SUPABASE_SERVICE_KEY']
         self.client = create_client(self.supabase_url, self.supabase_key)
 
-        # Load pipeline config
-        config_path = Path(__file__).parent.parent.parent / 'config/client.yaml'
+        config_path = REPO_ROOT / 'config/client.yaml'
         with open(config_path) as f:
             config = yaml.safe_load(f)
         self.config = config
 
-        # Build stage lookup
         self.stage_map = {}
         for pipeline in config['pipeline']['pipelines']:
             for stage in pipeline['stages']:
-                self.stage_map[stage['id']] = {
-                    'name': stage['name'],
-                    'order': stage['order'],
+                self.stage_map[str(stage['id'])] = {
+                    'name': stage['name'], 'order': stage['order'],
                     'pipeline_id': pipeline['id'],
-                    'pipeline_name': pipeline['name']
+                    'pipeline_name': pipeline['name'],
                 }
 
-        # Load property history
         cache_path = Path(property_history_cache)
         if not cache_path.exists():
             raise FileNotFoundError(
                 f"Property history cache not found: {property_history_cache}\n"
-                f"Run hubspot_history.py first to fetch property history"
+                f"Run hubspot_history.py --all first"
             )
-
         with open(cache_path) as f:
             cache = json.load(f)
         self.property_history = cache['deals']
 
         # Per-property history, shaped for point_in_time.get_field_at_date.
-        # A record fetched before a property joined TRACKED_PROPERTIES has no
-        # key for it, which reads as no_history rather than crashing.
         self.field_history = {}
         for prop, key in HISTORY_KEYS.items():
             self.field_history[prop] = {
@@ -122,375 +116,312 @@ class SnapshotBackfiller:
                 f"history cache. Add them to hubspot_history.TRACKED_PROPERTIES "
                 f"and re-fetch, or deal_value falls back to a proxy again."
             )
-
         print(f"Loaded property history for {len(self.property_history)} deals")
 
-        # Load current deal data for mismatch detection and ARR values
+        # Population comes from the deals table — create_date and pipeline_id
+        # are what the shared inclusion rule needs. create_date is REQUIRED:
+        # without it a deal cannot be placed in time and is excluded (counted).
         all_deals = select_all(
             self.client, 'deals',
-            columns='deal_id,stage,company_name,deal_value,close_date,owner_email,pipeline_id'
-        )
+            columns='deal_id,stage,company_name,close_date,owner_email,'
+                    'pipeline_id,create_date')
         self.current_deals = {d['deal_id']: d for d in all_deals}
-        print(f"Loaded current data for {len(self.current_deals)} deals")
+
+        self.population = {}
+        self.no_create_date = []
+        for d in all_deals:
+            cd = self._parse_date(d.get('create_date'))
+            if cd is None:
+                self.no_create_date.append(d['deal_id'])
+                continue
+            self.population[str(d['deal_id'])] = {
+                'create': cd, 'pipeline': str(d.get('pipeline_id') or 'default')}
+        print(f"Population with create_date: {len(self.population)} "
+              f"(excluded, no create_date: {len(self.no_create_date)})")
+
+    @staticmethod
+    def _parse_date(raw):
+        if raw in (None, '', 'null'):
+            return None
+        s = str(raw).strip()
+        if s.lstrip('-').isdigit():
+            try:
+                return datetime.utcfromtimestamp(int(s) / 1000).date()
+            except (ValueError, OSError, OverflowError):
+                return None
+        try:
+            return datetime.fromisoformat(s.replace('Z', '+00:00')).date()
+        except ValueError:
+            return None
 
     def get_stage_order(self, stage_id: str) -> Optional[int]:
-        """Get stage order, returns None if unmapped."""
-        if not stage_id or stage_id not in self.stage_map:
+        if not stage_id or str(stage_id) not in self.stage_map:
             return None
-        return self.stage_map[stage_id]['order']
-
-    def is_won_stage(self, stage_id: str) -> bool:
-        """Check if stage is a won stage. Uses field_semantics (handles aliases)."""
-        return is_won(stage_id)
-
-    def is_lost_stage(self, stage_id: str) -> bool:
-        """Check if stage is a lost stage. Uses field_semantics (handles all aliases)."""
-        return is_lost(stage_id)
+        return self.stage_map[str(stage_id)]['order']
 
     def get_deal_status(self, stage_id: str) -> str:
-        """Compute deal_status from stage_id."""
-        if self.is_won_stage(stage_id):
+        if is_won(stage_id):
             return 'won'
-        elif self.is_lost_stage(stage_id):
+        if is_lost(stage_id):
             return 'lost'
-        else:
-            return 'active'
-
-    def get_value_at_date(self, deal_id, snapshot_date, pipeline_id):
-        """
-        Point-in-time deal value, via the shared GrowthBook value rule.
-
-        Returns (value, confidence):
-            value      float, or None when NO component resolved at this date
-            confidence 'exact'       at least one component resolved
-                       'pre_history' the deal predates its value history
-                       'no_history'  no value history for this deal at all
-
-        None, not 0.0, when nothing resolves. compute_deal_value on an
-        all-blank property dict returns 0.0 through the amount fallback, and
-        writing that would replace a proxy with a fabrication.
-        """
-        pit_props, confidences = {}, []
-        for prop in self.value_properties:
-            value, conf = _get_field_at_date(
-                self.field_history[prop], deal_id, snapshot_date)
-            pit_props[prop] = value
-            confidences.append(conf)
-
-        if 'exact' not in confidences:
-            # Nothing resolved: the value is unknown at this date, not zero.
-            return None, ('pre_history' if 'pre_history' in confidences
-                          else 'no_history')
-
-        return compute_deal_value(pit_props, self.config, pipeline_id), 'exact'
+        return 'active'
 
     def get_close_date_at_date(self, deal_id, snapshot_date):
-        """
-        Point-in-time close_date. Returns (value, confidence).
-
-        close_date is a forecast that moves, so today's value says nothing
-        about what was forecast at an earlier date. Reconstructing it is what
-        makes the historical series comparable week to week.
-        """
+        """Point-in-time close_date (a forecast that moves). None if unknown."""
         raw, conf = _get_field_at_date(
             self.field_history['closedate'], deal_id, snapshot_date)
         if raw in (None, '', 'null'):
             return None, conf
         return str(raw)[:10], conf
 
-    def is_open_at_date(self, deal_create_date, stage_at_date, snapshot_date):
+    def quarter_weeks(self, quarter_label: str) -> List[date]:
+        """Weekly Monday snapshot dates whose fiscal quarter is quarter_label.
+
+        Labelled via get_fiscal_quarter rather than hardcoding the fiscal
+        layout, so the calendar cannot be got wrong here.
         """
-        Inclusion rule, delegated to the shared implementation so Method 1 and
-        Method 2 cannot diverge. Terminal-stage, not close_date: a close_date
-        that has slipped past D does not make an open deal closed.
+        start = date(2022, 1, 3)  # a Monday, before all history
+        weeks = []
+        for i in range(0, 320):
+            d = start + timedelta(weeks=i)
+            _, _, label = get_fiscal_quarter(d, self.config)
+            if label == quarter_label:
+                weeks.append(d)
+        return weeks
+
+    def week_of_quarter(self, snapshot_date: date) -> Tuple[str, int]:
+        """(fiscal_quarter_label, week 1..13) for a date. Both NOT NULL."""
+        q_start, _, label = get_fiscal_quarter(snapshot_date, self.config)
+        week = ((snapshot_date - q_start).days // 7) + 1
+        return label, max(1, min(week, 13))
+
+    def build_rows_for_date(self, snapshot_date: date) -> Tuple[List[Dict], List[str], Counter]:
+        """Reconstruct all snapshot rows for one date via the shared function.
+
+        Returns (db_rows, unclassifiable_deal_ids, tally). Row shaping (stage
+        order, status, fiscal_quarter, week) is here; population and value are
+        the shared function's.
         """
-        return is_deal_open_at_date(
-            deal_create_date, stage_at_date, snapshot_date, is_terminal_stage)
+        open_rows, unclassifiable = reconstruct_open_rows(
+            self.population, self.property_history, self.field_history,
+            snapshot_date, self.config, self.value_properties,
+            compute_deal_value)
 
-    def get_stage_at_date(self, deal_id: str, snapshot_date: datetime) -> Tuple[Optional[str], str, bool]:
+        fq_label, week = self.week_of_quarter(snapshot_date)
+        Ddt = datetime(snapshot_date.year, snapshot_date.month, snapshot_date.day)
+        db_rows, tally = [], Counter()
+        for r in open_rows:
+            deal_id = r['deal_id']
+            stage_id = r['stage_id']
+            close_date, close_conf = self.get_close_date_at_date(deal_id, Ddt)
+            current = self.current_deals.get(deal_id, {})
+            db_rows.append({
+                'deal_id': deal_id,
+                'snapshot_date': snapshot_date.isoformat(),
+                'pipeline_id': r['pipeline'],
+                'stage_id': stage_id,
+                'stage_order': self.get_stage_order(stage_id),
+                'deal_value': r['deal_value'],          # point-in-time, None if unknown
+                'close_date': close_date,               # point-in-time
+                'owner_email': current.get('owner_email'),   # current: no owner history
+                'deal_status': self.get_deal_status(stage_id),
+                'snapshot_source': 'backfilled',
+                'fiscal_quarter': fq_label,             # NOT NULL (migration 038)
+                'week_of_quarter': week,
+                'backfill_confidence': r['stage_confidence'],
+                'value_confidence': r['value_confidence'],
+                'close_date_confidence': close_conf,
+                'has_property_history': r['stage_confidence'] != 'no_history',
+            })
+            tally['rows'] += 1
+            tally[f"stage_{r['stage_confidence']}"] += 1
+            tally[f"value_{r['value_confidence']}"] += 1
+        return db_rows, unclassifiable, tally
+
+    def backfill_quarters(self, quarters: List[str], report_only: bool,
+                          batch_size: int = 1000,
+                          checkpoint_path: str = 'backfill_checkpoint.json',
+                          out_path: str = 'backfill_reconstruction.json') -> Dict:
+        """Reconstruct and (unless report_only) write the given quarters.
+
+        Resumable via a durable checkpoint of completed dates; idempotent via
+        the (deal_id, snapshot_date) upsert key. Deterministic ordering means
+        a resumed run reproduces the same sequence.
         """
-        Get stage ID for a deal at a specific snapshot date.
+        ckpt = self._load_checkpoint(checkpoint_path) if not report_only else {'done': []}
+        done = set(tuple(x) for x in ckpt.get('done', []))
 
-        Thin wrapper around shared point_in_time.get_stage_at_date.
-        Delegates to single source of truth for reconstruction logic.
+        summary, all_rows, total_unclassifiable = [], [], []
+        skipped_done = 0
+        for quarter in quarters:
+            weeks = self.quarter_weeks(quarter)
+            if not weeks:
+                print(f"  ⚠ {quarter}: no weeks resolved for this label")
+                continue
+            for D in weeks:
+                key = (quarter, D.isoformat())
+                if key in done:
+                    skipped_done += 1
+                    continue
+                rows, unclassifiable, tally = self.build_rows_for_date(D)
+                total_unclassifiable.extend(unclassifiable)
+                # Scoped coverage computed here from the rows already built,
+                # so main() never re-reconstructs a date just to score it.
+                usable, denom = _scoped_coverage(rows, self.config)
+                tally['usable'], tally['denom'] = usable, denom
 
-        Returns:
-            (stage_id, confidence, has_history)
-            - stage_id: The stage at snapshot_date (or None)
-            - confidence: 'exact', 'pre_history', 'no_history'
-            - has_history: True if property history exists
-        """
-        return _get_stage_at_date(self.property_history, deal_id, snapshot_date)
-
-    def generate_snapshot_dates(self, weeks: int = 52) -> List[datetime]:
-        """
-        Generate weekly snapshot dates for the past N weeks.
-
-        Returns dates in ascending order (oldest first).
-        """
-        today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-
-        # Start from 52 weeks ago, weekly snapshots up to today
-        dates = []
-        for week_offset in range(weeks, -1, -1):  # 52 weeks ago to now
-            snapshot_date = today - timedelta(weeks=week_offset)
-            dates.append(snapshot_date)
-
-        return dates
-
-    def build_snapshot(self, deal_id: str, snapshot_date: datetime) -> Optional[Dict]:
-        """
-        Build a single snapshot for a deal at a specific date.
-
-        Returns snapshot dict or None if deal didn't exist at that date.
-        """
-        stage_id, confidence, has_history = self.get_stage_at_date(deal_id, snapshot_date)
-
-        if stage_id is None:
-            # Deal didn't exist at this snapshot date
-            return None
-
-        stage_order = self.get_stage_order(stage_id)
-        deal_status = self.get_deal_status(stage_id)
-
-        # Get pipeline_id from stage_map (uses pipeline['id'] not pipeline['name'])
-        stage_info = self.stage_map.get(stage_id, {})
-        pipeline_id = stage_info.get('pipeline_id', 'default')
-
-        # owner_email has no property history tracked, so it stays current.
-        # Flagged rather than silent: an owner reassignment makes historical
-        # owner attribution wrong, which matters for per-rep analysis.
-        current = self.current_deals.get(deal_id, {})
-
-        deal_value, value_confidence = self.get_value_at_date(
-            deal_id, snapshot_date, pipeline_id)
-        close_date, close_confidence = self.get_close_date_at_date(
-            deal_id, snapshot_date)
-
-        snapshot = {
-            'deal_id': deal_id,
-            'snapshot_date': snapshot_date.date().isoformat(),
-            'pipeline_id': pipeline_id,
-            'stage_id': stage_id,
-            'stage_order': stage_order,
-            'deal_value': deal_value,        # point-in-time, None if unknown
-            'close_date': close_date,        # point-in-time
-            'owner_email': current.get('owner_email'),   # current, see above
-            'deal_status': deal_status,
-            'snapshot_source': 'backfilled',
-            'backfill_confidence': confidence,
-            'value_confidence': value_confidence,
-            'close_date_confidence': close_confidence,
-            'has_property_history': has_history
-        }
-
-        return snapshot
-
-    def backfill_all_snapshots(self, dry_run: bool = False) -> Dict:
-        """
-        Generate all historical snapshots for all deals.
-
-        Returns summary statistics.
-        """
-        snapshot_dates = self.generate_snapshot_dates(weeks=52)
-
-        # Find earliest prospective snapshot date — never backfill
-        # on or after this date
-        prospective = select_all(self.client, 'deals_snapshot',
-            columns='snapshot_date',
-            filters=[('eq', 'snapshot_source', 'prospective')])
-        if prospective:
-            earliest_prospective = min(r['snapshot_date'] for r in prospective)
-            earliest_prospective_dt = datetime.fromisoformat(earliest_prospective)
-            print(f"Earliest prospective snapshot: {earliest_prospective}")
-            print(f"Backfill will stop before this date")
-            print()
-        else:
-            earliest_prospective_dt = None
-
-        # Filter out dates >= earliest prospective
-        if earliest_prospective_dt:
-            snapshot_dates = [d for d in snapshot_dates if d < earliest_prospective_dt]
-
-        deal_ids = list(self.property_history.keys())
-
-        print(f"Generating snapshots for {len(deal_ids)} deals")
-        print(f"Snapshot dates: {len(snapshot_dates)} weeks (oldest: {snapshot_dates[0].date()})")
-        print()
-
-        stats = {
-            'total_deals': len(deal_ids),
-            'total_snapshot_dates': len(snapshot_dates),
-            'snapshots_generated': 0,
-            'snapshots_skipped': 0,
-            'mismatched_deals': 0,
-            # Counter, not a fixed dict: the old keys were the retired
-            # interpolated/inferred labels, so any current label
-            # ('pre_history', 'cleared', 'no_history') would KeyError here
-            # mid-backfill.
-            'by_confidence': Counter(),
-            'by_status': {
-                'active': 0,
-                'won': 0,
-                'lost': 0
-            },
-            'mismatch_examples': []
-        }
-
-        snapshots_to_insert = []
-
-        for deal_id in deal_ids:
-            deal_snapshots = []
-
-            # Build all snapshots for this deal
-            for snapshot_date in snapshot_dates:
-                snapshot = self.build_snapshot(deal_id, snapshot_date)
-
-                if snapshot:
-                    deal_snapshots.append(snapshot)
+                if not report_only:
+                    self._write_batch(rows, batch_size)
+                    done.add(key)
+                    ckpt['done'] = sorted(done)
+                    self._save_checkpoint(checkpoint_path, ckpt)
                 else:
-                    stats['snapshots_skipped'] += 1
+                    all_rows.extend(rows)
 
-            # Check for history replay mismatch
-            if deal_snapshots:
-                final_snapshot = deal_snapshots[-1]  # Last snapshot (most recent)
-                final_stage = final_snapshot['stage_id']
-                current_deal = self.current_deals.get(deal_id)
-                current_stage = current_deal.get('stage') if current_deal else None
-                company_name = current_deal.get('company_name', 'Unknown') if current_deal else 'Unknown'
+                summary.append((quarter, D, tally))
 
-                if current_stage and final_stage != current_stage:
-                    # MISMATCH: History replay doesn't match current stage
-                    stats['mismatched_deals'] += 1
+        if report_only:
+            Path(out_path).write_text(json.dumps(all_rows, indent=1, default=str))
 
-                    # Mark ALL snapshots for this deal as excluded_mismatch
-                    for snap in deal_snapshots:
-                        snap['backfill_confidence'] = 'excluded_mismatch'
+        return {'summary': summary, 'unclassifiable': total_unclassifiable,
+                'skipped_done': skipped_done, 'report_only': report_only,
+                'out_path': out_path}
 
-                    # Print mismatch clearly
-                    print(f"  MISMATCH: {company_name} | final_stage={final_stage} current_stage={current_stage} — excluded from win-rate analysis")
-
-                    # Track example for report (first 10)
-                    if len(stats['mismatch_examples']) < 10:
-                        stats['mismatch_examples'].append({
-                            'company_name': company_name,
-                            'deal_id': deal_id,
-                            'final_replay_stage': final_stage,
-                            'current_actual_stage': current_stage
-                        })
-
-                # Add to insert list and update stats
-                for snap in deal_snapshots:
-                    stats['snapshots_generated'] += 1
-                    stats['by_confidence'][snap['backfill_confidence']] += 1
-                    stats['by_status'][snap['deal_status']] += 1
-                    snapshots_to_insert.append(snap)
-
-            # Progress update every 50 deals
-            if (deal_ids.index(deal_id) + 1) % 50 == 0:
-                progress = deal_ids.index(deal_id) + 1
-                print(f"  Processed {progress}/{len(deal_ids)} deals...")
-
-        print()
-        print(f"Generated {len(snapshots_to_insert)} snapshots")
-        print()
-
-        if dry_run:
-            print("DRY RUN - No data written to database")
-            print()
-            print("Sample snapshots (first 5):")
-            for snap in snapshots_to_insert[:5]:
-                print(f"  Deal {snap['deal_id']} @ {snap['snapshot_date']}: "
-                      f"{snap['stage_id']} ({snap['deal_status']}) - "
-                      f"confidence: {snap['backfill_confidence']}")
-        else:
-            print("Writing snapshots to Supabase...")
-            self._insert_snapshots(snapshots_to_insert)
-            print(f"✓ Inserted {len(snapshots_to_insert)} snapshots")
-
-        return stats
-
-    def _insert_snapshots(self, snapshots: List[Dict]):
-        """Insert snapshots into Supabase in batches."""
-        batch_size = 500
-        total = len(snapshots)
-
-        for i in range(0, total, batch_size):
-            batch = snapshots[i:i + batch_size]
+    def _write_batch(self, rows: List[Dict], batch_size: int):
+        for i in range(0, len(rows), batch_size):
+            batch = rows[i:i + batch_size]
             self.client.table('deals_snapshot').upsert(
-                batch,
-                on_conflict='deal_id,snapshot_date'
-            ).execute()
+                batch, on_conflict='deal_id,snapshot_date').execute()
 
-            if (i + batch_size) % 5000 == 0 or (i + batch_size) >= total:
-                progress = min(i + batch_size, total)
-                print(f"  Inserted {progress}/{total} snapshots...")
+    @staticmethod
+    def _load_checkpoint(path):
+        p = Path(path)
+        if p.exists():
+            ckpt = json.loads(p.read_text())
+            print(f"Resuming: {len(ckpt.get('done', []))} (quarter, week) "
+                  f"already done in {path}")
+            return ckpt
+        return {'done': []}
+
+    @staticmethod
+    def _save_checkpoint(path, ckpt):
+        Path(path).write_text(json.dumps(ckpt, indent=1))
+
+    def snapshot_row_count(self) -> int:
+        """Current deals_snapshot row count, for before/after backup."""
+        rows = select_all(self.client, 'deals_snapshot', columns='deal_id')
+        return len(rows)
+
+
+def _scoped_coverage(rows, config):
+    """Per the Phase 3 definition: denominator scoped by pipeline, numerator
+    also requires a known qualified stage; unknown-stage deals in a
+    non-excluded pipeline count against coverage."""
+    from point_in_time import load_scope_config, is_deal_in_analytics_scope
+    excl, stage_cfg = load_scope_config(config)
+    denom = usable = 0
+    for r in rows:
+        stage = r['stage_id']
+        if r['pipeline_id'] in excl:
+            continue
+        is_usable = is_deal_in_analytics_scope(stage, r['pipeline_id'], excl, stage_cfg)
+        if is_usable or stage is None:
+            denom += 1
+            if is_usable:
+                usable += 1
+    return usable, denom
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Backfill historical deal snapshots')
-    parser.add_argument('--dry-run', action='store_true',
-                       help='Generate validation report without writing to database')
-    parser.add_argument('--cache-file', default='property_history_cache.json',
-                       help='Path to property history cache file')
-
+    parser = argparse.ArgumentParser(description='Reconstruct historical snapshots')
+    parser.add_argument('--report-only', action='store_true',
+                        help='Compute per-quarter coverage and row counts, '
+                             'write nothing to deals_snapshot')
+    parser.add_argument('--quarters', default=','.join(DEFAULT_QUARTERS),
+                        help='Comma-separated fiscal-quarter labels')
+    parser.add_argument('--cache-file', default='property_history_cache.json')
+    parser.add_argument('--batch-size', type=int, default=1000)
+    parser.add_argument('--checkpoint', default='backfill_checkpoint.json')
     args = parser.parse_args()
 
-    print("=" * 70)
-    if args.dry_run:
-        print("HISTORICAL SNAPSHOT BACKFILL - DRY RUN")
+    quarters = [q.strip() for q in args.quarters.split(',') if q.strip()]
+    print("=" * 92)
+    print("METHOD 2 PHASE 4 — HISTORICAL RECONSTRUCTION"
+          + ("  (REPORT ONLY, no write)" if args.report_only else "  (WRITING)"))
+    print("=" * 92)
+    print(f"Quarters: {quarters}\n")
+
+    b = SnapshotBackfiller(property_history_cache=args.cache_file)
+    gate = b.config['forecast_analysis'].get('min_scoped_snapshot_coverage_pct', 80)
+
+    before = None
+    if not args.report_only:
+        before = b.snapshot_row_count()
+        print(f"deals_snapshot rows before: {before}\n")
+
+    result = b.backfill_quarters(quarters, args.report_only,
+                                 batch_size=args.batch_size,
+                                 checkpoint_path=args.checkpoint)
+
+    # Per-quarter aggregation.
+    print(f"\n{'quarter':<12} {'week':<12} {'rows':>6} {'exact':>7} {'pre_h':>6} "
+          f"{'no_h':>6} {'usable%':>8} {'gate':>6}")
+    print("-" * 92)
+    per_quarter = {}
+    for quarter, D, tally in result['summary']:
+        usable, denom = tally.get('usable', 0), tally.get('denom', 0)
+        pct = (usable / denom * 100) if denom else 0.0
+        verdict = 'PASS' if pct >= gate else 'FAIL'
+        q = per_quarter.setdefault(quarter, {'rows': 0, 'week_pass': 0,
+                                             'week_total': 0, 'min_pct': 999,
+                                             'exact': 0, 'pre': 0, 'no': 0})
+        q['rows'] += tally['rows']
+        q['week_total'] += 1
+        q['week_pass'] += (verdict == 'PASS')
+        q['min_pct'] = min(q['min_pct'], pct)
+        q['exact'] += tally.get('stage_exact', 0)
+        q['pre'] += tally.get('stage_pre_history', 0)
+        q['no'] += tally.get('stage_no_history', 0)
+        print(f"{quarter:<12} {D.isoformat():<12} {tally['rows']:>6} "
+              f"{tally.get('stage_exact', 0):>7} {tally.get('stage_pre_history', 0):>6} "
+              f"{tally.get('stage_no_history', 0):>6} {pct:>7.1f}% {verdict:>6}")
+
+    print("\n" + "=" * 92)
+    print("PER-QUARTER SUMMARY (coverage gate: "
+          f"{gate}% scoped)")
+    print("=" * 92)
+    print(f"{'quarter':<12} {'rows':>7} {'weeks pass':>12} {'min week %':>12} "
+          f"{'stage exact/pre/no':>22}")
+    for quarter in quarters:
+        if quarter not in per_quarter:
+            continue
+        q = per_quarter[quarter]
+        verdict = 'PASS' if q['week_pass'] == q['week_total'] else 'FAIL'
+        weeks_str = f"{q['week_pass']}/{q['week_total']}"
+        conf_str = f"{q['exact']}/{q['pre']}/{q['no']}"
+        print(f"{quarter:<12} {q['rows']:>7} {weeks_str:>12} "
+              f"{q['min_pct']:>11.1f}% {conf_str:>22}  {verdict}")
+
+    if result['unclassifiable']:
+        u = sorted(set(result['unclassifiable']))
+        print(f"\n✗ {len(u)} deal(s) raised on an unclassifiable stage: {u[:10]}")
+        print("  Resolve in field_semantics before writing.")
+
+    if args.report_only:
+        print(f"\nReport only — nothing written. Reconstruction in "
+              f"{result['out_path']}.")
+        print("Quarters failing the gate are EXCLUDED from conversion analysis, "
+              "not a threshold to revisit.")
     else:
-        print("HISTORICAL SNAPSHOT BACKFILL")
-    print("=" * 70)
-    print()
+        after = b.snapshot_row_count()
+        print(f"\ndeals_snapshot rows: {before} -> {after}  (+{after - before})")
+        print(f"Resumed-skipped dates: {result['skipped_done']}")
 
-    # Create backfiller
-    backfiller = SnapshotBackfiller(property_history_cache=args.cache_file)
-
-    # Run backfill
-    stats = backfiller.backfill_all_snapshots(dry_run=args.dry_run)
-
-    # Print summary
-    print()
-    print("=" * 70)
-    print("BACKFILL SUMMARY")
-    print("=" * 70)
-    print(f"Total deals: {stats['total_deals']}")
-    print(f"Snapshot dates: {stats['total_snapshot_dates']} weeks")
-    print(f"Snapshots generated: {stats['snapshots_generated']}")
-    print(f"Snapshots skipped: {stats['snapshots_skipped']}")
-    print()
-    print("By confidence level:")
-    for level, count in stats['by_confidence'].items():
-        pct = count / stats['snapshots_generated'] * 100 if stats['snapshots_generated'] > 0 else 0
-        print(f"  {level}: {count} ({pct:.1f}%)")
-    print()
-    print("By deal status:")
-    for status, count in stats['by_status'].items():
-        pct = count / stats['snapshots_generated'] * 100 if stats['snapshots_generated'] > 0 else 0
-        print(f"  {status}: {count} ({pct:.1f}%)")
-    print()
-
-    # Report on mismatches
-    if stats['mismatched_deals'] > 0:
-        print("=" * 70)
-        print("HISTORY REPLAY MISMATCHES (excluded from win-rate)")
-        print("=" * 70)
-        print(f"Deals with mismatches: {stats['mismatched_deals']}")
-        print()
-        print("First 10 examples:")
-        print()
-        for ex in stats['mismatch_examples']:
-            print(f"  {ex['company_name']}")
-            print(f"    Deal ID: {ex['deal_id']}")
-            print(f"    Final replay stage: {ex['final_replay_stage']}")
-            print(f"    Current actual stage: {ex['current_actual_stage']}")
-            print()
-        print("These deals are flagged as 'excluded_mismatch' and should be")
-        print("excluded from win-rate and conversion analysis.")
-        print("=" * 70)
-
-    return 0
+    print("\nDOLLAR-BASIS CAVEAT: forecast_analyses still zero-fills null "
+          "deal_value (ledger).")
+    print("No dollar-basis conversion number until that is worked off; "
+          "basis: count is unaffected.")
+    return 1 if result['unclassifiable'] else 0
 
 
 if __name__ == '__main__':

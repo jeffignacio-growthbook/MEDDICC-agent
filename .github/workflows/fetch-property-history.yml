@@ -158,6 +158,17 @@ jobs:
             --out dry_run_reconstruction.json \
             2>&1 | tee dry_run_report.txt
 
+      - name: "PHASE 4 — report-only reconstruction across elapsed quarters (writes nothing)"
+        if: ${{ always() }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          set -o pipefail
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 \
+            scripts/analytics/backfill_snapshots.py --report-only \
+            2>&1 | tee phase4_report_only.txt
+
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
