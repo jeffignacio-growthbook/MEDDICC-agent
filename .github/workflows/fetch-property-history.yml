@@ -145,6 +145,19 @@ jobs:
             --include-excluded-pipelines \
             2>&1 | tee value_delta_report.txt
 
+      - name: "PHASE 3 — dry-run reconstruct one quarter (writes nothing)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          set -o pipefail
+          PYTHONPATH=scripts:api:. python3 \
+            scripts/analytics/dry_run_reconstruct_quarter.py \
+            --quarter "FY2027 Q2" \
+            --cross-validate-date 2026-08-19 \
+            --out dry_run_reconstruction.json \
+            2>&1 | tee dry_run_report.txt
+
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -157,4 +170,6 @@ jobs:
             pit_comparison_report.txt
             snapshot_coverage_survey.txt
             value_delta_report.txt
+            dry_run_report.txt
+            dry_run_reconstruction.json
           retention-days: 7
