@@ -1,0 +1,43 @@
+name: Demo query_pipeline_movement
+
+# Live demonstration of the query_pipeline_movement handler against the real
+# deals_snapshot table. The dev container cannot reach Supabase, so live
+# numbers for the four views (and the routing check) are produced here.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Cheap guard: the offline handler tests must pass before we touch the DB.
+      - name: "Pre-flight — pipeline-movement offline tests"
+        run: |
+          set -e
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_pipeline_movement.py
+
+      - name: "Live demo — four views + routing"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          PYTHONPATH=scripts:api:scripts/analytics:. \
+            python3 scripts/analytics/demo_pipeline_movement.py
