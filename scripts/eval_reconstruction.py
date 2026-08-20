@@ -793,12 +793,46 @@ def test_two_coverage_gates_measure_different_populations():
     for gate in ('min_write_coverage_pct', 'max_write_coverage_pct'):
         assert gate in fa, f"{gate} is missing from forecast_analysis"
 
-    # No code may read the ambiguous old name.
+    # No code may READ the ambiguous old name. A mention in a docstring or
+    # comment is documentation of the finding, not a read — several files
+    # legitimately explain why the key was renamed. Strip both before looking,
+    # or this guard fires on its own paper trail.
+    import ast as _ast
+    import io as _io
+    import tokenize as _tokenize
+
+    def code_only(source):
+        """Source with comments and docstrings removed."""
+        try:
+            tree = _ast.parse(source)
+        except SyntaxError:
+            return source
+        docstrings = set()
+        for node in _ast.walk(tree):
+            if isinstance(node, (_ast.Module, _ast.ClassDef,
+                                 _ast.FunctionDef, _ast.AsyncFunctionDef)):
+                doc = _ast.get_docstring(node, clean=False)
+                if doc:
+                    docstrings.add(doc)
+        out = []
+        try:
+            for tok in _tokenize.generate_tokens(_io.StringIO(source).readline):
+                if tok.type == _tokenize.COMMENT:
+                    continue
+                if tok.type == _tokenize.STRING:
+                    literal = tok.string.strip('rbuf')
+                    if any(d in literal for d in docstrings):
+                        continue
+                out.append(tok.string)
+        except (_tokenize.TokenError, IndentationError):
+            return source
+        return "\n".join(out)
+
     offenders = []
     for path in REPO_ROOT.glob('**/*.py'):
         if '__pycache__' in str(path) or path.name == 'eval_reconstruction.py':
             continue
-        if 'min_snapshot_coverage_pct' in path.read_text():
+        if 'min_snapshot_coverage_pct' in code_only(path.read_text()):
             offenders.append(str(path.relative_to(REPO_ROOT)))
     assert not offenders, (
         f"{offenders} read min_snapshot_coverage_pct. That key is gone; use "
@@ -821,6 +855,88 @@ def test_two_coverage_gates_measure_different_populations():
     print(f"  write gate: {fa['min_write_coverage_pct']}-"
           f"{fa['max_write_coverage_pct']}% unscoped;  snapshot gate: "
           f"{fa['min_scoped_snapshot_coverage_pct']}% scoped")
+
+
+def test_unknown_value_is_null_not_zero():
+    """No value component resolving at D means UNKNOWN, never 0.0.
+
+    compute_deal_value on an all-blank property dict returns 0.0 through the
+    amount fallback. Writing that would swap a proxy for a fabrication and be
+    indistinguishable downstream from a genuine zero-value deal.
+    """
+    sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+    from utils import compute_deal_value
+
+    # The hazard, stated directly: all-blank in, 0.0 out.
+    assert compute_deal_value({}, None, 'default') == 0.0, \
+        ("compute_deal_value no longer returns 0.0 for all-blank input; the "
+         "reason reconstruction must special-case unknown may have changed.")
+
+    # A component present and zero is a REAL zero and must survive as 0.0.
+    real_zero = compute_deal_value(
+        {'new_revenue': '0', 'expansion_revenue': None}, None, 'default')
+    assert real_zero == 0.0, f"expected a real 0.0, got {real_zero}"
+
+    print("✓ test_unknown_value_is_null_not_zero passed")
+    print("  all-blank -> 0.0 from the value rule, so reconstruction must "
+          "return None instead")
+
+
+def test_point_in_time_value_beats_the_proxy():
+    """A deal whose value changed must reconstruct differently per date.
+
+    Under the proxy every week carried today's number, so arr_change was 0 by
+    construction — a deal cannot change its own value retroactively when every
+    week is stamped identically.
+    """
+    from point_in_time import get_field_at_date
+
+    # new_revenue rises 10k -> 50k; the old proxy would stamp 50k on both dates.
+    history = {'d1': {'history': [
+        {'timestamp': '2026-01-01T00:00:00Z', 'value': '10000'},
+        {'timestamp': '2026-06-01T00:00:00Z', 'value': '50000'},
+    ]}}
+
+    early, c1 = get_field_at_date(
+        history, 'd1', datetime.fromisoformat('2026-03-01T00:00:00'))
+    late, c2 = get_field_at_date(
+        history, 'd1', datetime.fromisoformat('2026-08-01T00:00:00'))
+
+    assert early == '10000' and c1 == 'exact', f"got {early!r}/{c1}"
+    assert late == '50000' and c2 == 'exact', f"got {late!r}/{c2}"
+    assert early != late, \
+        "point-in-time value did not change across dates — the proxy is back"
+
+    # Before any history: unknown, never forward-filled from the first entry.
+    pre, c3 = get_field_at_date(
+        history, 'd1', datetime.fromisoformat('2025-06-01T00:00:00'))
+    assert pre is None and c3 == 'pre_history', f"got {pre!r}/{c3}"
+
+    print("✓ test_point_in_time_value_beats_the_proxy passed")
+
+
+def test_value_properties_are_all_tracked_in_history():
+    """Every property the value rule reads must have tracked history.
+
+    A value component the fetcher never requests reads as blank forever, which
+    silently forces the amount fallback. That is how renewal_revenue stayed
+    invisible and 206 renewals valued at nothing.
+    """
+    sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+    sys.path.insert(0, str(REPO_ROOT / 'scripts' / 'analytics'))
+    from utils import get_value_properties
+    from hubspot_history import HISTORY_KEYS, TRACKED_PROPERTIES
+
+    for prop in get_value_properties():
+        assert prop in HISTORY_KEYS, \
+            (f"value property {prop!r} has no history key, so it would read as "
+             f"blank at every date and force the amount fallback")
+        assert prop in TRACKED_PROPERTIES, \
+            f"value property {prop!r} is not fetched from HubSpot"
+
+    assert 'closedate' in HISTORY_KEYS, "close_date history is not tracked"
+    print("✓ test_value_properties_are_all_tracked_in_history passed")
+    print(f"  tracked: {', '.join(get_value_properties())}, closedate")
 
 
 def run_all_tests():
@@ -852,6 +968,10 @@ def run_all_tests():
         test_both_writers_use_the_shared_inclusion_rule,
         test_scoping_is_not_applied_to_writes,
         test_two_coverage_gates_measure_different_populations,
+        # Phase 2b — point-in-time value and close_date
+        test_unknown_value_is_null_not_zero,
+        test_point_in_time_value_beats_the_proxy,
+        test_value_properties_are_all_tracked_in_history,
     ]
 
     for test in tests:

@@ -44,6 +44,10 @@ jobs:
           PYTHONPATH=scripts:api:. python3 scripts/analytics/diagnose_population_cap.py
           PYTHONPATH=scripts:api:. python3 scripts/analytics/compare_inclusion_rules.py
 
+      - name: Config reader audit (ratchet)
+        run: |
+          python3 scripts/analytics/audit_config_readers.py
+
       - name: Fetch property history from HubSpot
         if: ${{ inputs.skip_fetch != 'true' }}
         env:
@@ -130,6 +134,16 @@ jobs:
             scripts/analytics/survey_snapshot_coverage.py \
             2>&1 | tee snapshot_coverage_survey.txt
 
+      - name: "PHASE 2b — deal_value proxy vs point-in-time"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          set -o pipefail
+          PYTHONPATH=scripts:api:. python3 \
+            scripts/analytics/report_value_reconstruction_delta.py \
+            2>&1 | tee value_delta_report.txt
+
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -141,4 +155,5 @@ jobs:
             unmapped_stage_report.txt
             pit_comparison_report.txt
             snapshot_coverage_survey.txt
+            value_delta_report.txt
           retention-days: 7

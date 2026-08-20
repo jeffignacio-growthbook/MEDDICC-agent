@@ -26,8 +26,10 @@ from typing import Dict, List, Optional
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import requests
-from supabase import create_client
-from supabase_client import select_all
+
+# supabase is imported lazily inside get_all_deal_ids. TRACKED_PROPERTIES and
+# HISTORY_KEYS are the contract for what the cache contains, and the offline
+# test suite needs to read them without a database client installed.
 
 
 class RateLimiter:
@@ -241,6 +243,9 @@ class PropertyHistoryFetcher:
 
 def get_all_deal_ids() -> List[str]:
     """Get all deal IDs from Supabase."""
+    from supabase import create_client
+    from supabase_client import select_all
+
     url = os.environ['SUPABASE_URL']
     key = os.environ['SUPABASE_SERVICE_KEY']
     client = create_client(url, key)

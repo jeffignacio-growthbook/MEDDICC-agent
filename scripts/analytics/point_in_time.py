@@ -21,6 +21,45 @@ a consumer nobody was thinking about, unrecoverably without a refetch. Scope
 on read, never on write — and check the consumers before narrowing anything
 shared.
 
+WHAT VALIDATES THE INCLUSION RULE, AND WHAT DOES NOT. Both Method 1 and
+Method 2 call is_deal_open_at_date, which is the point — they cannot drift.
+The cost is that the Method 1 / Method 2 cross-validation (Phase 3b) cannot
+validate the rule: a bug in the shared function moves both arms identically
+and the comparison reads as agreement. Phase 3b tests RECONSTRUCTION
+FIDELITY — whether replaying property history reproduces what a live snapshot
+captured — which genuinely exercises the history replay, the population
+logic and the field reconstruction against a known-good same-day capture.
+That is worth having. It is not rule validation.
+
+The rule's evidence is the deal-level point-in-time comparison in
+compare_inclusion_rules_pit.py, and it stays that: across four FY2027 Q3
+dates it recovered 13-15 deals per week whose stage said open while their
+close_date had slipped up to 962 days past, and surfaced exactly one genuine
+disagreement — 53897831319, Closed Lost carrying a future close_date, which
+the terminal test classifies correctly. That is inspectable deal by deal,
+which is stronger than a percentage, but it is a different KIND of evidence.
+Do not let a green Phase 3b silently upgrade it.
+
+Method 1's own coverage assertion is likewise not rule validation: it
+snapshots today, so its comparator has no earlier source of truth and is
+self-consistent by construction. It catches write mechanics — pagination,
+row caps, a rule that drops deals — not a wrong rule.
+
+TYPES AT BOUNDARIES ARE NOT WHAT THEY LOOK LIKE. Three bugs this workstream
+shared one shape: a value crossed a boundary in a form the code did not
+anticipate, and nothing failed until it silently did the wrong thing.
+- YAML parses a bare numeric key as an int. HubSpot sends stage ids as
+  strings, so `79653122:` in config never matched and three stages read as
+  bucket 'unknown' in production. Quote numeric keys.
+- A GitHub workflow_dispatch input is the STRING 'false', which is truthy.
+  `if: !inputs.skip_fetch` skips everything. Compare against 'true'/'false'
+  explicitly.
+- A missing stage arrived as '' where the code expected None, so the same
+  fact took two paths: None read as open, '' raised and halted 421 writes.
+Any truthiness or identity check on a value crossing a config, CLI or API
+boundary is suspect. Normalise the type at the boundary, and test the form
+production actually sends rather than the form the config happens to hold.
+
 Confidence labels reflect history coverage:
 - 'exact': Field history exists and covers this date (change at or before it)
 - 'cleared': An entry at or before this date exists but its value is null —

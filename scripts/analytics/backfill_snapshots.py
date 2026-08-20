@@ -7,10 +7,21 @@ Uses HubSpot property history to create weekly snapshots showing:
 - Deal status (active/won/lost) at each snapshot date
 - Confidence scoring for data quality
 
-IMPORTANT: deal_value and close_date use today's values as a proxy for
-historical ARR. This means backfilled arr_change will read as 0 (deals
-can't change their own value retroactively in this model), but won_value
-and lost_value will reflect the deal's actual ARR at close.
+deal_value and close_date are reconstructed point-in-time from property
+history, not proxied from today's values. Proxying them was one of the two
+documented causes of the prior attempt's failure: it made backfilled
+arr_change read as 0, because a deal cannot change its own value
+retroactively when every week is stamped with today's number.
+
+deal_value goes through utils.compute_deal_value on point-in-time component
+values, so the GrowthBook value rule -- Incremental ARR, amount fallback,
+plus Renewal ARR for renewals -- is applied once and not reimplemented here.
+
+If NO value component resolves at a date, deal_value is None, not 0.0. An
+all-blank component set means the value is UNKNOWN at that date, and
+compute_deal_value would otherwise return 0.0 through the fallback path,
+which is a fabricated number wearing the same clothes as the proxy it
+replaced.
 
 Requires:
 - Property history cache from hubspot_history.py
@@ -51,6 +62,8 @@ from supabase_client import select_all
 from point_in_time import get_stage_at_date as _get_stage_at_date
 from point_in_time import get_field_at_date as _get_field_at_date
 from point_in_time import is_deal_open_at_date, is_terminal_stage
+from hubspot_history import HISTORY_KEYS
+from utils import compute_deal_value, get_value_properties
 
 
 class SnapshotBackfiller:
@@ -91,6 +104,25 @@ class SnapshotBackfiller:
             cache = json.load(f)
         self.property_history = cache['deals']
 
+        # Per-property history, shaped for point_in_time.get_field_at_date.
+        # A record fetched before a property joined TRACKED_PROPERTIES has no
+        # key for it, which reads as no_history rather than crashing.
+        self.field_history = {}
+        for prop, key in HISTORY_KEYS.items():
+            self.field_history[prop] = {
+                deal_id: {'history': rec.get(key) or []}
+                for deal_id, rec in cache['deals'].items()
+            }
+
+        self.value_properties = get_value_properties(config)
+        missing = [p for p in self.value_properties if p not in HISTORY_KEYS]
+        if missing:
+            raise ValueError(
+                f"Value properties {missing} are not tracked in the property "
+                f"history cache. Add them to hubspot_history.TRACKED_PROPERTIES "
+                f"and re-fetch, or deal_value falls back to a proxy again."
+            )
+
         print(f"Loaded property history for {len(self.property_history)} deals")
 
         # Load current deal data for mismatch detection and ARR values
@@ -123,6 +155,48 @@ class SnapshotBackfiller:
             return 'lost'
         else:
             return 'active'
+
+    def get_value_at_date(self, deal_id, snapshot_date, pipeline_id):
+        """
+        Point-in-time deal value, via the shared GrowthBook value rule.
+
+        Returns (value, confidence):
+            value      float, or None when NO component resolved at this date
+            confidence 'exact'       at least one component resolved
+                       'pre_history' the deal predates its value history
+                       'no_history'  no value history for this deal at all
+
+        None, not 0.0, when nothing resolves. compute_deal_value on an
+        all-blank property dict returns 0.0 through the amount fallback, and
+        writing that would replace a proxy with a fabrication.
+        """
+        pit_props, confidences = {}, []
+        for prop in self.value_properties:
+            value, conf = _get_field_at_date(
+                self.field_history[prop], deal_id, snapshot_date)
+            pit_props[prop] = value
+            confidences.append(conf)
+
+        if 'exact' not in confidences:
+            # Nothing resolved: the value is unknown at this date, not zero.
+            return None, ('pre_history' if 'pre_history' in confidences
+                          else 'no_history')
+
+        return compute_deal_value(pit_props, self.config, pipeline_id), 'exact'
+
+    def get_close_date_at_date(self, deal_id, snapshot_date):
+        """
+        Point-in-time close_date. Returns (value, confidence).
+
+        close_date is a forecast that moves, so today's value says nothing
+        about what was forecast at an earlier date. Reconstructing it is what
+        makes the historical series comparable week to week.
+        """
+        raw, conf = _get_field_at_date(
+            self.field_history['closedate'], deal_id, snapshot_date)
+        if raw in (None, '', 'null'):
+            return None, conf
+        return str(raw)[:10], conf
 
     def is_open_at_date(self, deal_create_date, stage_at_date, snapshot_date):
         """
@@ -183,8 +257,15 @@ class SnapshotBackfiller:
         stage_info = self.stage_map.get(stage_id, {})
         pipeline_id = stage_info.get('pipeline_id', 'default')
 
-        # Pull current deal values (today's ARR as proxy for historical ARR)
+        # owner_email has no property history tracked, so it stays current.
+        # Flagged rather than silent: an owner reassignment makes historical
+        # owner attribution wrong, which matters for per-rep analysis.
         current = self.current_deals.get(deal_id, {})
+
+        deal_value, value_confidence = self.get_value_at_date(
+            deal_id, snapshot_date, pipeline_id)
+        close_date, close_confidence = self.get_close_date_at_date(
+            deal_id, snapshot_date)
 
         snapshot = {
             'deal_id': deal_id,
@@ -192,12 +273,14 @@ class SnapshotBackfiller:
             'pipeline_id': pipeline_id,
             'stage_id': stage_id,
             'stage_order': stage_order,
-            'deal_value': current.get('deal_value'),      # Today's ARR
-            'close_date': current.get('close_date'),      # Today's close date
-            'owner_email': current.get('owner_email'),
+            'deal_value': deal_value,        # point-in-time, None if unknown
+            'close_date': close_date,        # point-in-time
+            'owner_email': current.get('owner_email'),   # current, see above
             'deal_status': deal_status,
             'snapshot_source': 'backfilled',
             'backfill_confidence': confidence,
+            'value_confidence': value_confidence,
+            'close_date_confidence': close_confidence,
             'has_property_history': has_history
         }
 

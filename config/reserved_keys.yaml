@@ -1,0 +1,45 @@
+# Config keys observed with no reader, recorded as a ratchet
+# baseline by scripts/analytics/audit_config_readers.py.
+#
+# UNAUDITED means: observed unread, NOT investigated, NOT blessed
+# as intentional. Each is either a knob that silently does
+# nothing, or a reader that was never wired. Working the list
+# down is real work; the ledger exists so the count cannot grow
+# while nobody is looking.
+#
+# To remove an entry: wire a reader, or delete the config key.
+# Do not add entries to silence the check.
+# Baseline: 31 of 130 knob keys.
+
+unaudited_unread:
+  - call_sources.dialer
+  - config_overrides
+  - cro_agent.default_time_window
+  - cro_agent.slow_threshold_seconds
+  - deal_health
+  - deal_health.at_risk.champion_score_below
+  - deal_health.at_risk.components_below_5_count
+  - deal_health.at_risk.critical_components_below_5
+  - deal_health.strong
+  - deal_health.strong.minimum_champion_score
+  - deal_health.strong.minimum_components_above_6
+  - etl
+  - etl.active_deals_refresh
+  - etl.call_lookback_days
+  - etl.deal_properties
+  - forecast.category_weights.CLOSED
+  - forecast.category_weights.MOST_LIKELY
+  - organization.crm
+  - organization.sales_methodology
+  - pipeline.win_rate_qualified_field
+  - pipelines.included
+  - quality_thresholds
+  - quality_thresholds.evaluation_mode
+  - quality_thresholds.evidence.maximum_hedging_words
+  - quality_thresholds.evidence.minimum_quotes_for_high_score
+  - quality_thresholds.minimum_quality_score
+  - quality_thresholds.score_ranges
+  - quality_thresholds.score_ranges.strong_identified
+  - quota_roles
+  - segmentation.field
+  - stage_progression.negotiating_to_closed_won
