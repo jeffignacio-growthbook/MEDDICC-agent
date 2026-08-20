@@ -11,6 +11,10 @@ on:
         description: 'Skip the ~9 min HubSpot fetch; run only Supabase-side checks'
         required: false
         default: 'false'
+      phase4_write:
+        description: 'Phase 4: WRITE the reconstruction to deals_snapshot (default is report-only). Collision pre-check aborts the job if the target quarters already hold rows.'
+        required: false
+        default: 'false'
 
 permissions:
   contents: read
@@ -159,7 +163,7 @@ jobs:
             2>&1 | tee dry_run_report.txt
 
       - name: "PHASE 4 — report-only reconstruction across elapsed quarters (writes nothing)"
-        if: ${{ always() }}
+        if: ${{ always() && inputs.phase4_write != 'true' }}
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
@@ -168,6 +172,17 @@ jobs:
           PYTHONPATH=scripts:api:scripts/analytics:. python3 \
             scripts/analytics/backfill_snapshots.py --report-only \
             2>&1 | tee phase4_report_only.txt
+
+      - name: "PHASE 4 — WRITE reconstruction to deals_snapshot (collision pre-check aborts on any existing rows)"
+        if: ${{ success() && inputs.phase4_write == 'true' }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          set -o pipefail
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 \
+            scripts/analytics/backfill_snapshots.py \
+            2>&1 | tee phase4_write.txt
 
       - name: Upload artifacts
         if: always()
@@ -183,4 +198,8 @@ jobs:
             value_delta_report.txt
             dry_run_report.txt
             dry_run_reconstruction.json
+            phase4_report_only.txt
+            phase4_write.txt
+            backfill_checkpoint.json
+            backfill_reconstruction.json
           retention-days: 7

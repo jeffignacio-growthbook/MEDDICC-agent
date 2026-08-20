@@ -15,6 +15,18 @@ VALUE and CLOSE_DATE are reconstructed point-in-time (Phase 2b). deal_value is
 None, never 0.0, when no component resolved at the date — writing a 0 would
 swap a proxy for a fabrication.
 
+PRE_HISTORY TRACKS DEAL-CREATION RECENCY, NOT QUARTER AGE. The natural
+assumption is that older quarters have thinner history and lower coverage.
+They do not: the property-history cache reaches back to 2022 and all four
+target quarters sit inside it, so a stage lookup at any target date finds a
+covering entry for almost every deal. pre_history appears only for a deal
+created shortly BEFORE the snapshot date, whose stage history has not yet
+begun — a function of how recently the deal was created relative to D, not of
+how old the quarter is. FY2026 Q3 (the oldest target) carries the FEWEST
+pre_history rows, FY2027 Q2 (the newest, with the most recently-created
+deals) the most. This was measured; a confident prediction that older
+quarters would fail the coverage gate was wrong for exactly this reason.
+
 WEEKLY SAMPLING drops a fast-mover's intermediate stages: a deal that moves
 through four stages in four days appears in the weekly grid as though it
 jumped straight to its final stage. Inherent to weekly sampling, not a bug;
@@ -307,6 +319,57 @@ class SnapshotBackfiller:
     def _save_checkpoint(path, ckpt):
         Path(path).write_text(json.dumps(ckpt, indent=1))
 
+    def collision_check(self, quarters: List[str]) -> List[Dict]:
+        """Existing deals_snapshot rows in the target quarters, by source.
+
+        Upsert overwrites silently, so a before/after count reveals an
+        overwrite only after it happened. This runs BEFORE any write: zero
+        rows means the write is purely additive; anything returned is a
+        collision to report and stop on, never overwrite blind.
+        """
+        existing = select_all(
+            self.client, 'deals_snapshot',
+            columns='fiscal_quarter,snapshot_source',
+            filters=[('in_', 'fiscal_quarter', quarters)])
+        from collections import Counter as _C
+        counts = _C((r.get('fiscal_quarter'), r.get('snapshot_source'))
+                    for r in existing)
+        return [{'fiscal_quarter': fq, 'snapshot_source': src, 'count': n}
+                for (fq, src), n in sorted(counts.items(), key=lambda x: str(x[0]))]
+
+    def identify_no_history_deals(self, snapshot_date: date) -> List[Dict]:
+        """Deals that reconstruct with NO stage history at all at a date.
+
+        These become permanent null-stage rows in the substrate. Worth
+        understanding before they surface as anomalies: which deals, and what
+        their current stage / create pattern looks like.
+        """
+        from point_in_time import get_stage_at_date, is_deal_open_at_date, \
+            is_terminal_stage
+        Ddt = datetime(snapshot_date.year, snapshot_date.month, snapshot_date.day)
+        out = []
+        for deal_id, d in self.population.items():
+            create = datetime(d['create'].year, d['create'].month, d['create'].day)
+            if create > Ddt:
+                continue
+            stage, conf, _ = get_stage_at_date(self.property_history, deal_id, Ddt)
+            if conf != 'no_history':
+                continue
+            try:
+                if not is_deal_open_at_date(create, stage, Ddt, is_terminal_stage):
+                    continue
+            except Exception:
+                continue
+            cur = self.current_deals.get(deal_id, {})
+            hist = self.property_history.get(deal_id, {})
+            out.append({'deal_id': deal_id,
+                        'company_name': cur.get('company_name'),
+                        'current_stage': cur.get('stage'),
+                        'pipeline_id': d['pipeline'],
+                        'create_date': d['create'].isoformat(),
+                        'dealstage_history_entries': len(hist.get('history') or [])})
+        return out
+
     def snapshot_row_count(self) -> int:
         """Current deals_snapshot row count, for before/after backup."""
         rows = select_all(self.client, 'deals_snapshot', columns='deal_id')
@@ -353,6 +416,42 @@ def main():
 
     b = SnapshotBackfiller(property_history_cache=args.cache_file)
     gate = b.config['forecast_analysis'].get('min_scoped_snapshot_coverage_pct', 80)
+
+    # COLLISION PRE-CHECK — before any write. Upsert overwrites silently, so a
+    # before/after count reveals an overwrite only after it happened. Zero
+    # existing rows in the target quarters confirms the write is purely
+    # additive; anything present is a collision to report and stop on.
+    collisions = b.collision_check(quarters)
+    print("Collision pre-check (existing deals_snapshot rows in target quarters):")
+    if collisions:
+        for c in collisions:
+            print(f"    {c['fiscal_quarter']:<12} {str(c['snapshot_source']):<24} "
+                  f"{c['count']:>7}")
+        if not args.report_only:
+            print("\n✗ ABORT: target quarters already contain rows. Upsert would "
+                  "overwrite them.\n  Stopping before any write — report these and "
+                  "decide explicitly (purge, or exclude the quarter).")
+            return 2
+        print("  (report-only: not aborting, but a real write would stop here)")
+    else:
+        print("    none — write is purely additive.")
+    print()
+
+    # NO_HISTORY population: deals that reconstruct with no stage history at
+    # all become permanent null-stage rows. Identify them once (newest target
+    # week captures every such deal created by then) so they are understood
+    # before surfacing as anomalies later.
+    probe_weeks = b.quarter_weeks(quarters[-1])
+    if probe_weeks:
+        nh = b.identify_no_history_deals(probe_weeks[-1])
+        print(f"NO_HISTORY deals at {probe_weeks[-1]} (permanent null-stage rows): "
+              f"{len(nh)}")
+        for d in nh:
+            print(f"    {d['deal_id']:<14} {str(d['company_name'])[:26]:<26} "
+                  f"cur_stage={str(d['current_stage']):<14} "
+                  f"created={d['create_date']}  hist_entries="
+                  f"{d['dealstage_history_entries']}")
+        print()
 
     before = None
     if not args.report_only:
