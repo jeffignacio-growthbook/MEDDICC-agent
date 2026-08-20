@@ -69,7 +69,15 @@ def is_terminal_stage(stage_id: Optional[str]) -> bool:
             Add it to config/field_semantics.yaml with its correct bucket
             and regenerate, or mark it excluded — never let it default.
     """
-    if stage_id is None:
+    # A MISSING stage is not an UNCLASSIFIABLE stage. None means "history does
+    # not reach this date" (pre_history/cleared); an empty or whitespace value
+    # means the field is simply unset. Both are absence of a stage, so both
+    # read as non-terminal and neither raises — raising on one and not the
+    # other made the same fact behave two different ways, and halted a whole
+    # nightly snapshot over a single deal with a blank stage.
+    # The raise below is for a non-empty id that field_semantics does not know,
+    # which is the retired-stage hazard this gate exists for.
+    if stage_id is None or not str(stage_id).strip():
         return False
 
     bucket = stage_bucket(stage_id)

@@ -610,6 +610,15 @@ def test_unmapped_stage_raises_not_defaults_open():
     except UnclassifiableStageError:
         pass
 
+    # A MISSING stage is not an UNCLASSIFIABLE stage. Raising on one form of
+    # absence and not the other made the same fact behave two ways, and halted
+    # a whole nightly snapshot over one deal with a blank stage (61167803975).
+    for blank in ('', '   ', '\t'):
+        assert is_terminal_stage(blank) is False, (
+            f"is_terminal_stage({blank!r}) must read as 'no stage known', not "
+            f"raise. An unset field is absence, not an unrecognized id."
+        )
+
     # None is NOT unclassifiable: it is the pre_history case, where the deal
     # existed but history does not reach this date. It must not raise.
     assert is_terminal_stage(None) is False, \

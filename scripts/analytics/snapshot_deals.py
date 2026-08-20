@@ -109,28 +109,49 @@ def main():
     # The rule itself is shared with Method 2 so the two cannot diverge.
     qualified_deals = []
     unclassifiable = []
+    missing_stage = []
     for d in deals:
         create_date = d.get('create_date')
         if not create_date:
             continue  # Skip deals without create_date
+
+        # A deal with no stage cannot be placed in a pipeline, so it is
+        # excluded and reported rather than written with a blank stage_id.
+        # Reported, not fatal: one deal with an unset field is a data-quality
+        # blip, and halting the nightly over it would be worse than a visible
+        # exclusion. If it ever becomes systemic the coverage gate catches it,
+        # because the excluded rows move the captured count.
+        if not str(d.get('stage') or '').strip():
+            missing_stage.append(d.get('deal_id'))
+            continue
 
         create_dt = datetime.fromisoformat(create_date).date()
         try:
             if not is_deal_open_at_date(create_dt, d.get('stage'), today_date,
                                         is_terminal_stage):
                 continue
-        except UnclassifiableStageError as e:
-            # Never silently include a stage we cannot classify.
+        except UnclassifiableStageError:
+            # A non-empty stage field_semantics does not know. This IS fatal:
+            # it is the retired-stage hazard, and reading it as open would
+            # silently inflate the open-pipeline denominator.
             unclassifiable.append((d.get('deal_id'), d.get('stage')))
             continue
 
         qualified_deals.append(d)
 
+    if missing_stage:
+        print(f"\n⚠ {len(missing_stage)} deal(s) have no stage set and are "
+              f"excluded from the snapshot:")
+        for deal_id in missing_stage[:10]:
+            print(f"    {deal_id}")
+        print("    Not fatal — they cannot be placed in a pipeline. Worth "
+              "fixing in HubSpot.")
+
     if unclassifiable:
         print(f"\n✗ {len(unclassifiable)} deal(s) carry a stage "
               f"field_semantics cannot classify:")
         for deal_id, stage in unclassifiable[:10]:
-            print(f"    {deal_id}  stage={stage}")
+            print(f"    {deal_id}  stage={stage!r}")
         raise AssertionError(
             "Unclassifiable stage(s) in the deals table. Add them to "
             "config/field_semantics.yaml and regenerate before snapshotting."
