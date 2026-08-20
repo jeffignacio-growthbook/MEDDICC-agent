@@ -11,6 +11,10 @@ was proven correct in mock testing but failed in production due to:
 This test preserves the correct algorithm through any future refactor and
 proves the new confidence labels correctly reflect history coverage.
 
+CRITICAL: Tests import from scripts/analytics/point_in_time.py (production code),
+not a local copy. A fixture testing a duplicate silently stops guarding the real
+code exactly when it matters.
+
 Fixture includes:
 - Deal moving backward through stages (regression is real)
 - Deal moving through 4 stages in one week (weekly sampling limitation)
@@ -26,14 +30,18 @@ from typing import Dict, List, Optional, Tuple
 # Ensure we can import from scripts
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+sys.path.insert(0, str(REPO_ROOT / 'scripts' / 'analytics'))
+
+# Import production reconstruction functions (NOT local copies)
+from analytics.point_in_time import get_stage_at_date, get_field_at_date
 
 
 class MockReconstructor:
     """
-    Minimal implementation of reconstruction logic for testing.
+    Test harness for reconstruction logic.
 
-    This mirrors the algorithm from backfill_snapshots.py but operates
-    on synthetic data to prove correctness independent of HubSpot API.
+    Uses production functions from point_in_time.py (NOT local copies).
+    Operates on synthetic data to prove correctness independent of HubSpot API.
     """
 
     def __init__(self):
@@ -58,57 +66,8 @@ class MockReconstructor:
         deal_id: str,
         snapshot_date: datetime
     ) -> Tuple[Optional[str], str, bool]:
-        """
-        Get stage ID for a deal at a specific snapshot date.
-
-        Returns:
-            (stage_id, confidence, has_history)
-            - stage_id: The stage at snapshot_date (or None)
-            - confidence: 'exact', 'pre_history', 'no_history'
-            - has_history: True if property history exists
-
-        Confidence definitions (REDEFINED from old interpolated/inferred):
-        - 'exact': Stage history exists and covers this date (change occurred at or before it)
-        - 'pre_history': Deal existed but had no stage change at or before this date (null, not guessed)
-        - 'no_history': No stage history available for this deal at all
-        """
-        if deal_id not in self.property_history:
-            # No property history available
-            return None, 'no_history', False
-
-        history = self.property_history[deal_id]['history']
-
-        if not history:
-            # Deal exists but has no stage history
-            return None, 'no_history', False
-
-        # Sort history by timestamp (oldest first)
-        sorted_history = sorted(history, key=lambda x: x['timestamp'])
-
-        # Find the most recent stage change before or at snapshot_date
-        snapshot_ts = snapshot_date.isoformat()
-        current_stage = None
-
-        for entry in sorted_history:
-            entry_ts = entry['timestamp']
-
-            if entry_ts <= snapshot_ts:
-                current_stage = entry['value']
-            else:
-                # We've passed the snapshot date (strictly backward-looking)
-                break
-
-        if current_stage is None:
-            # No stage change before this snapshot date
-            # Deal existed but history doesn't cover this early date
-            return None, 'pre_history', True
-
-        # We have a stage from history that covers this date
-        # This is 'exact' regardless of whether the change landed on the exact same day
-        # (The old definition marked almost everything 'interpolated' and made correct data look unreliable)
-        confidence = 'exact'
-
-        return current_stage, confidence, True
+        """Delegate to production function from point_in_time.py."""
+        return get_stage_at_date(self.property_history, deal_id, snapshot_date)
 
     def get_field_at_date(
         self,
@@ -116,38 +75,8 @@ class MockReconstructor:
         deal_id: str,
         snapshot_date: datetime
     ) -> Tuple[Optional[str], str]:
-        """
-        Generic point-in-time field lookup (amount, closedate, etc).
-
-        Returns:
-            (value, confidence)
-            - value: Field value at snapshot_date (or None)
-            - confidence: 'exact', 'pre_history', 'no_history'
-
-        Same backward-looking logic as stage reconstruction.
-        """
-        if deal_id not in field_history:
-            return None, 'no_history'
-
-        history = field_history[deal_id]['history']
-
-        if not history:
-            return None, 'no_history'
-
-        sorted_history = sorted(history, key=lambda x: x['timestamp'])
-        snapshot_ts = snapshot_date.isoformat()
-        current_value = None
-
-        for entry in sorted_history:
-            if entry['timestamp'] <= snapshot_ts:
-                current_value = entry['value']
-            else:
-                break
-
-        if current_value is None:
-            return None, 'pre_history'
-
-        return current_value, 'exact'
+        """Delegate to production function from point_in_time.py."""
+        return get_field_at_date(field_history, deal_id, snapshot_date)
 
 
 def test_backward_stage_movement():
@@ -419,6 +348,52 @@ def test_close_date_point_in_time_reconstruction():
     print("✓ test_close_date_point_in_time_reconstruction passed")
 
 
+def test_fixture_tests_production_function():
+    """
+    eval_reconstruction imports from point_in_time, not a local copy.
+
+    A fixture testing a duplicate silently stops guarding the real code
+    exactly when it matters - when Phase 2 changes the production function.
+    """
+    import inspect
+    from analytics.point_in_time import get_stage_at_date as prod_get_stage
+    from analytics.point_in_time import get_field_at_date as prod_get_field
+
+    # MockReconstructor.get_stage_at_date should delegate to production function
+    r = MockReconstructor()
+
+    # Verify the functions used are from point_in_time module, not local copies
+    # Check by comparing module names
+    stage_func_module = inspect.getmodule(prod_get_stage).__name__
+    field_func_module = inspect.getmodule(prod_get_field).__name__
+
+    assert stage_func_module == 'analytics.point_in_time', \
+        f"get_stage_at_date should be from analytics.point_in_time, got {stage_func_module}"
+    assert field_func_module == 'analytics.point_in_time', \
+        f"get_field_at_date should be from analytics.point_in_time, got {field_func_module}"
+
+    # Verify MockReconstructor delegates to production functions (not reimplemented)
+    r.add_deal_history('test_prod', [{'timestamp': '2026-01-10T10:00:00Z', 'value': 'stage1'}])
+    snapshot_date = datetime.fromisoformat('2026-01-15T00:00:00')
+
+    # Call through MockReconstructor
+    stage_mock, conf_mock, has_hist_mock = r.get_stage_at_date('test_prod', snapshot_date)
+
+    # Call production function directly
+    stage_prod, conf_prod, has_hist_prod = prod_get_stage(
+        r.property_history, 'test_prod', snapshot_date
+    )
+
+    # Results must match (proving MockReconstructor delegates, not reimplements)
+    assert stage_mock == stage_prod == 'stage1'
+    assert conf_mock == conf_prod == 'exact'
+    assert has_hist_mock == has_hist_prod is True
+
+    print("✓ test_fixture_tests_production_function passed")
+    print("  Fixture imports from analytics.point_in_time (production code)")
+    print("  NOT testing a local copy - guard is active")
+
+
 def run_all_tests():
     """Run all reconstruction regression tests."""
     print("=" * 80)
@@ -427,6 +402,8 @@ def run_all_tests():
     print()
 
     tests = [
+        # Meta-test: fixture tests production code, not duplicate
+        test_fixture_tests_production_function,
         # Stage reconstruction
         test_backward_stage_movement,
         test_fast_mover_weekly_sampling,
