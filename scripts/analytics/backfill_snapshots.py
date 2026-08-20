@@ -50,6 +50,7 @@ from supabase_client import select_all
 # Import shared point-in-time reconstruction logic
 from point_in_time import get_stage_at_date as _get_stage_at_date
 from point_in_time import get_field_at_date as _get_field_at_date
+from point_in_time import is_deal_open_at_date, is_terminal_stage
 
 
 class SnapshotBackfiller:
@@ -122,6 +123,15 @@ class SnapshotBackfiller:
             return 'lost'
         else:
             return 'active'
+
+    def is_open_at_date(self, deal_create_date, stage_at_date, snapshot_date):
+        """
+        Inclusion rule, delegated to the shared implementation so Method 1 and
+        Method 2 cannot diverge. Terminal-stage, not close_date: a close_date
+        that has slipped past D does not make an open deal closed.
+        """
+        return is_deal_open_at_date(
+            deal_create_date, stage_at_date, snapshot_date, is_terminal_stage)
 
     def get_stage_at_date(self, deal_id: str, snapshot_date: datetime) -> Tuple[Optional[str], str, bool]:
         """

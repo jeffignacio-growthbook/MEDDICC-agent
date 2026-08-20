@@ -8,10 +8,22 @@ INVARIANTS:
 
 2. Inclusion rule: A deal belongs in the snapshot for date D if:
    - created_date <= D, AND
-   - (close_date IS NULL OR close_date >= D)
+   - the deal had not reached a terminal (won/lost) stage as of D
 
-   Deals drop out of snapshots after they close. Historical snapshots
-   capture the open pipeline as of that date, not all deals ever.
+   Shared with Method 2 via point_in_time.is_deal_open_at_date so the two
+   cannot diverge. This replaced a close_date test. close_date is a forecast
+   that slips, and an open deal whose close_date has passed is still open.
+   Measured on FY2027 Q3 with both arms reconstructed point-in-time, the
+   close_date test dropped 13-15 in-scope deals per week sitting in Review,
+   Discovery or Scoping with close dates up to 962 days past, while the two
+   rules disagreed the other way on exactly one deal across all four dates -
+   a Closed Lost deal carrying a future close_date, which the terminal test
+   judges correctly.
+
+3. Scoping is NOT applied here. Every pipeline and stage is written on
+   purpose: the renewal pipeline is `analyze: false` for the MEDDICC agent
+   but analytics INCLUDES it for GRR/NRR, so scoping the writes would destroy
+   those rows. Scope on read, never on write.
 
 Idempotent — running twice same day upserts, not duplicates.
 Must be run AFTER etl_deals.py --mode analytics so the deals table is current.
@@ -88,25 +100,41 @@ def main():
 
     # Filter to deals that belong in today's snapshot per inclusion rule
     from datetime import datetime
+    sys.path.insert(0, str(REPO_ROOT / 'scripts' / 'analytics'))
+    from point_in_time import (UnclassifiableStageError, is_deal_open_at_date,
+                               is_deal_in_analytics_scope, is_terminal_stage,
+                               load_scope_config)
+
+    # Method 1 snapshots today, so the current stage IS the stage as of D.
+    # The rule itself is shared with Method 2 so the two cannot diverge.
     qualified_deals = []
+    unclassifiable = []
     for d in deals:
-        # Must be created before or on snapshot date
         create_date = d.get('create_date')
         if not create_date:
             continue  # Skip deals without create_date
 
         create_dt = datetime.fromisoformat(create_date).date()
-        if create_dt > today_date:
-            continue  # Deal created after snapshot date
-
-        # Must be open on snapshot date (not closed before it)
-        close_date = d.get('close_date')
-        if close_date:
-            close_dt = datetime.fromisoformat(close_date).date()
-            if close_dt < today_date:
-                continue  # Deal closed before snapshot date
+        try:
+            if not is_deal_open_at_date(create_dt, d.get('stage'), today_date,
+                                        is_terminal_stage):
+                continue
+        except UnclassifiableStageError as e:
+            # Never silently include a stage we cannot classify.
+            unclassifiable.append((d.get('deal_id'), d.get('stage')))
+            continue
 
         qualified_deals.append(d)
+
+    if unclassifiable:
+        print(f"\n✗ {len(unclassifiable)} deal(s) carry a stage "
+              f"field_semantics cannot classify:")
+        for deal_id, stage in unclassifiable[:10]:
+            print(f"    {deal_id}  stage={stage}")
+        raise AssertionError(
+            "Unclassifiable stage(s) in the deals table. Add them to "
+            "config/field_semantics.yaml and regenerate before snapshotting."
+        )
 
     print(f"Qualified deals for snapshot: {len(qualified_deals):,} / {len(deals):,}")
 
@@ -169,20 +197,22 @@ def main():
     total_genuinely_open = 0
     total_captured = 0
 
-    # First, fetch today's snapshot to get point-in-time close_date
-    todays_snapshot = select_all(
-        sb, 'deals_snapshot',
-        'deal_id, pipeline_id, close_date',
-        filters=[('eq', 'snapshot_date', today)]
-    )
-    snapshot_close_dates = {s['deal_id']: s.get('close_date') for s in todays_snapshot}
-
     for pipeline_id in sorted(all_pipelines, key=lambda x: (x != 'default', x)):
         # Count qualified deals in this pipeline
         qualified_pipeline = [d for d in qualified_deals if d.get('pipeline_id') == pipeline_id]
         qualified_pipeline_ids = set(d['deal_id'] for d in qualified_pipeline)
 
-        # Genuinely open in this pipeline (using point-in-time close_date from snapshot)
+        # Genuinely open in this pipeline, on the same terminal-stage
+        # definition the inclusion rule uses. Keeping the old close_date
+        # comparator here would fail the assertion by construction: the
+        # terminal rule selects the past-due open deals the close_date test
+        # drops, so it would read as ~109% overcapture rather than agreement.
+        #
+        # Note this comparator is self-consistent, not independent: Method 1
+        # snapshots today, so there is no earlier source of truth to check
+        # against. It catches write and pagination faults, not rule faults.
+        # Rule faults are what the point-in-time cross-check on reconstructed
+        # history is for.
         genuinely_open = []
         for d in deals:
             if d.get('pipeline_id') != pipeline_id:
@@ -193,17 +223,12 @@ def main():
                 continue
 
             create_dt = datetime.fromisoformat(create_date).date()
-            if create_dt > today_date:
-                continue
-
-            # Use close_date from snapshot (point-in-time) if available, else from deals table
-            deal_id = d['deal_id']
-            close_date = snapshot_close_dates.get(deal_id) or d.get('close_date')
-
-            if close_date:
-                close_dt = datetime.fromisoformat(close_date).date()
-                if close_dt < today_date:
+            try:
+                if not is_deal_open_at_date(create_dt, d.get('stage'),
+                                            today_date, is_terminal_stage):
                     continue
+            except UnclassifiableStageError:
+                continue
 
             genuinely_open.append(d)
 
@@ -237,6 +262,20 @@ def main():
 
         if not all_passed and (coverage_pct < min_coverage or coverage_pct > max_coverage):
             print(f"    Missing: {len(missing)}  Extra: {len(extra)}")
+
+    # The assertion above runs on the UNSCOPED population, which is what gets
+    # written. Report the analytics-scoped subset too: that is the population
+    # the conversion analyses actually consume, and it is a different
+    # denominator for min_snapshot_coverage_pct.
+    excluded_pipelines, stage_cfg = load_scope_config()
+    in_scope = [d for d in qualified_deals
+                if is_deal_in_analytics_scope(d.get('stage'),
+                                              d.get('pipeline_id'),
+                                              excluded_pipelines, stage_cfg)]
+    print(f"\n  Analytics scope (default pipeline, qualified non-excluded "
+          f"stages): {len(in_scope)} of {len(qualified_deals)} written rows")
+    print(f"    The assertion below is on the written population, not this "
+          f"subset. Conversion analyses read the subset.")
 
     # Overall coverage
     overall_coverage = (total_captured / total_genuinely_open * 100) if total_genuinely_open > 0 else 0

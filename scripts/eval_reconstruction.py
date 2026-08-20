@@ -671,6 +671,77 @@ def test_retired_stage_is_acknowledged_but_still_raises():
     print(f"  {len(RETIRED_STAGES)} retired ids acknowledged, all still raise")
 
 
+def test_both_writers_use_the_shared_inclusion_rule():
+    """Method 1 and Method 2 must call the shared rule, not reimplement it.
+
+    The whole point of extracting is_deal_open_at_date is that the two cannot
+    drift. A local copy in either writer defeats that silently — the copy
+    keeps working, it just stops agreeing.
+    """
+    m1 = (REPO_ROOT / 'scripts/analytics/snapshot_deals.py').read_text()
+    m2 = (REPO_ROOT / 'scripts/analytics/backfill_snapshots.py').read_text()
+
+    for name, src in (('snapshot_deals.py', m1), ('backfill_snapshots.py', m2)):
+        assert 'is_deal_open_at_date' in src, \
+            f"{name} does not call the shared inclusion rule"
+        assert 'from point_in_time import' in src, \
+            f"{name} does not import from point_in_time"
+        # The close_date inclusion test both writers used before. Its return
+        # is what made an open past-due deal look closed.
+        assert 'close_dt < today_date' not in src, \
+            f"{name} still has the close_date inclusion test"
+        assert 'close_dt < snapshot_dt' not in src, \
+            f"{name} still has the close_date inclusion test"
+
+    print("✓ test_both_writers_use_the_shared_inclusion_rule passed")
+
+
+def test_scoping_is_not_applied_to_writes():
+    """Scoping must gate analysis, never what gets written.
+
+    The renewal pipeline is `analyze: false` for the MEDDICC agent but
+    analytics INCLUDES it for GRR/NRR. Scoping the write path would drop
+    renewals, Meeting Set and Disqualified out of deals_snapshot entirely and
+    destroy the rows GRR/NRR reads. A scoped write is unrecoverable without a
+    refetch, so this is a data-loss guard, not a style preference.
+    """
+    from point_in_time import (is_deal_in_analytics_scope, is_terminal_stage,
+                               load_scope_config)
+
+    excluded_pipelines, stage_cfg = load_scope_config()
+
+    # A renewal deal is out of analytics scope...
+    assert not is_deal_in_analytics_scope(
+        '1297321618', '866608541', excluded_pipelines, stage_cfg), \
+        "an open renewal stage should be out of analytics scope"
+    # ...but it is still OPEN, so the inclusion rule keeps it, and it gets
+    # written. Scope and openness are different questions.
+    assert not is_terminal_stage('1297321618'), \
+        "an open renewal stage must still read as open for the write path"
+
+    # Meeting Set: out of scope, still open, still written.
+    assert not is_deal_in_analytics_scope(
+        '79653122', 'default', excluded_pipelines, stage_cfg)
+    assert not is_terminal_stage('79653122')
+
+    # A None stage cannot be scoped either way — the caller must count it
+    # rather than assume, so this is False and not an exception.
+    assert not is_deal_in_analytics_scope(
+        None, 'default', excluded_pipelines, stage_cfg)
+
+    # And the write path must not CALL scoping. Checking for the bare name
+    # would also match the import, which is legitimate — the same module
+    # scopes later, for reporting, after the rows are written.
+    src = (REPO_ROOT / 'scripts/analytics/snapshot_deals.py').read_text()
+    selection = src.split('qualified_deals = []')[1].split('# Upsert')[0]
+    assert 'is_deal_in_analytics_scope(' not in selection, \
+        ("snapshot_deals calls analytics scoping while selecting rows to "
+         "write. That drops renewal rows GRR/NRR depends on. Scope on read, "
+         "never on write.")
+
+    print("✓ test_scoping_is_not_applied_to_writes passed")
+
+
 def run_all_tests():
     """Run all reconstruction regression tests."""
     print("=" * 80)
@@ -697,6 +768,8 @@ def run_all_tests():
         # Stage classification gate
         test_unmapped_stage_raises_not_defaults_open,
         test_retired_stage_is_acknowledged_but_still_raises,
+        test_both_writers_use_the_shared_inclusion_rule,
+        test_scoping_is_not_applied_to_writes,
     ]
 
     for test in tests:

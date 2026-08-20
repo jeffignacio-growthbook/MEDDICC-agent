@@ -237,3 +237,65 @@ def is_deal_open_at_date(
 
     # Deal is in terminal stage, not open
     return False
+
+
+def load_scope_config(config=None):
+    """
+    Analytics scoping from config/client.yaml, shared so no caller reinvents it.
+
+    Returns (excluded_pipeline_ids, {stage_id: {...}}).
+    """
+    if config is None:
+        import yaml
+        config_path = Path(__file__).parent.parent.parent / 'config' / 'client.yaml'
+        config = yaml.safe_load(config_path.read_text())
+
+    excluded_pipelines = {str(p['id'])
+                          for p in config.get('pipelines', {}).get('excluded', [])}
+    default_qso = config['pipeline'].get('qualified_stage_order', 1)
+    stages = {}
+    for pipeline in config['pipeline']['pipelines']:
+        qso = pipeline.get('qualified_stage_order', default_qso)
+        for stage in pipeline['stages']:
+            stages[str(stage['id'])] = {
+                'name': stage['name'],
+                'order': stage['order'],
+                'excluded': bool(stage.get('exclude_from_analysis')),
+                'qualified_stage_order': qso,
+            }
+    return excluded_pipelines, stages
+
+
+def is_deal_in_analytics_scope(
+    stage_at_date: Optional[str],
+    pipeline_id: Optional[str],
+    excluded_pipelines=None,
+    stage_cfg=None,
+) -> bool:
+    """
+    Whether a deal belongs in a pipeline-conversion population at some date.
+
+    Scoping is NOT the inclusion rule and must never gate what gets WRITTEN.
+    Method 1 writes every pipeline and stage on purpose: the renewal pipeline
+    carries `analyze: false  # MEDDICC agent skips; analytics INCLUDES for
+    GRR/NRR`, so dropping renewals from deals_snapshot would destroy the rows
+    GRR/NRR reads. Scope on the way out, never on the way in.
+
+    Excluded by: a pipeline in pipelines.excluded; a stage flagged
+    exclude_from_analysis (Meeting Set, Disqualified); a stage below its
+    pipeline's qualified_stage_order.
+
+    A None stage cannot be scoped — there is no stage to judge — so it returns
+    False and the caller should count it rather than assume either way.
+    """
+    if excluded_pipelines is None or stage_cfg is None:
+        excluded_pipelines, stage_cfg = load_scope_config()
+
+    if pipeline_id is not None and str(pipeline_id) in excluded_pipelines:
+        return False
+    if stage_at_date is None:
+        return False
+    cfg = stage_cfg.get(str(stage_at_date))
+    if cfg is None or cfg['excluded']:
+        return False
+    return cfg['order'] >= cfg['qualified_stage_order']
