@@ -56,6 +56,10 @@ forecast_analysis:
   claimed_commit_accuracy: 0.90    # Claimed commit hit rate for calibration
   basis: count                     # count | dollar — reporting basis
   segmentation_keys: [motion]      # Segment analyses by motion (newbiz/expansion)
+  min_write_coverage_pct: 95       # Weekly snapshot must capture ≥95% of genuinely open deals
+                                   # Fails loudly if coverage drops (catches row-cap bugs)
+  min_snapshot_coverage_pct: 80    # Historical snapshots must have ≥80% coverage for analysis
+                                   # Quarters below this return null (invalid denominators)
 
 # ============================================================================
 # PROPOSAL ENGINE

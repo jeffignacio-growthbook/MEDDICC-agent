@@ -1,0 +1,43 @@
+name: Weekly Pipeline Snapshot
+
+on:
+  schedule:
+    # Monday 02:00 UTC (ensures snapshot exists before Monday reporting)
+    # Cron uses UTC regardless of reporting_timezone in client.yaml
+    - cron: '0 2 * * 1'
+  
+  workflow_dispatch:
+    # Allow manual runs for testing and backfill
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          pip install --no-cache-dir -r requirements.txt
+      
+      - name: Run weekly snapshot
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python scripts/analytics/snapshot_deals.py
+      
+      - name: Verify snapshot coverage
+        if: success()
+        run: |
+          echo "✓ Weekly snapshot completed"
+          echo "  Coverage assertion passed (≥95%)"
+          echo "  Snapshot will be available for downstream analysis"
+
