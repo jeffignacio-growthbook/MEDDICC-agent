@@ -15,6 +15,10 @@ on:
         description: 'Phase 4: WRITE the reconstruction to deals_snapshot (default is report-only). Collision pre-check aborts the job if the target quarters already hold rows.'
         required: false
         default: 'false'
+      phase4_purge_write:
+        description: "Phase 4 legacy-row handling: 'investigate' (report existing backfilled rows, no delete) or 'true' (back up, purge scoped to snapshot_source=backfilled in target quarters, then write). Destructive only when 'true'."
+        required: false
+        default: 'false'
 
 permissions:
   contents: read
@@ -184,6 +188,22 @@ jobs:
             scripts/analytics/backfill_snapshots.py \
             2>&1 | tee phase4_write.txt
 
+      - name: "PHASE 4 — investigate / purge+rewrite legacy backfilled rows"
+        if: ${{ success() && (inputs.phase4_purge_write == 'true' || inputs.phase4_purge_write == 'investigate') }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          set -o pipefail
+          CONFIRM=""
+          if [ "${{ inputs.phase4_purge_write }}" = "true" ]; then
+            CONFIRM="--confirm-purge"
+          fi
+          echo "phase4_purge_write=${{ inputs.phase4_purge_write }}  confirm='$CONFIRM'"
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 \
+            scripts/analytics/purge_and_rewrite_backfill.py $CONFIRM \
+            2>&1 | tee phase4_purge_write.txt
+
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -200,6 +220,8 @@ jobs:
             dry_run_reconstruction.json
             phase4_report_only.txt
             phase4_write.txt
+            phase4_purge_write.txt
             backfill_checkpoint.json
             backfill_reconstruction.json
+            data/backups/deals_snapshot_backfilled_prepurge.json
           retention-days: 7
