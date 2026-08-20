@@ -76,6 +76,17 @@ jobs:
           print(f"  errors: {len(c.get('errors', []))}")
           EOF
 
+      # Diagnostic, and deliberately BEFORE the gate so it still runs when
+      # the gate fails — which is exactly when its output is needed.
+      - name: "Identify any unmapped stage IDs"
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          set -o pipefail
+          PYTHONPATH=scripts:api:. python3 \
+            scripts/analytics/identify_unmapped_stages.py \
+            2>&1 | tee unmapped_stage_report.txt
+
       # CONDITION 1 — every stage id in history must classify, or the
       # reconstruction gate would raise mid-backfill. Non-zero exit fails
       # the job on purpose.
@@ -94,4 +105,5 @@ jobs:
           path: |
             property_history_cache.json
             stage_discovery_report.txt
+            unmapped_stage_report.txt
           retention-days: 7
