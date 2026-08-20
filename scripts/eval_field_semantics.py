@@ -227,6 +227,74 @@ def test_unknown_stages_handled_gracefully():
     print("  ✓ Unknown stages don't crash")
     print("  ✓ Unknown stages default to 'unknown' bucket and open status")
 
+def test_config_numeric_keys_are_strings():
+    """Bare numeric YAML keys parse as ints; HubSpot sends strings. Any
+    config key that is a numeric identifier must be quoted. Tests that
+    iterate config keys cannot catch this — they exercise the int form
+    production never sends."""
+    print("\n[TEST] Config numeric keys and id values are strings")
+
+    import glob
+    import yaml as _yaml
+    from pathlib import Path as _Path
+
+    REPO = _Path(__file__).parent.parent
+
+    # Scan the configs this codebase reads at runtime. .github/workflows is
+    # excluded on purpose: `on:` is parsed as boolean True by yaml 1.1, but
+    # GitHub parses those files, not us.
+    patterns = ['config/**/*.yaml', 'config/**/*.yml', 'prompts/**/*.yaml']
+    files = sorted({f for pat in patterns
+                    for f in glob.glob(str(REPO / pat), recursive=True)})
+    assert files, "found no config files to scan — check the glob patterns"
+
+    bad_keys, bad_values = [], []
+
+    ID_FIELD = ('id', 'ids', 'stage_id', 'pipeline_id', 'owner_id', 'user_id',
+                'deal_id', 'slack_id', 'hubspot_id', 'portal_id')
+
+    def walk(node, path, parent_key=None):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                # A mapping key that did not parse as a string was unquoted.
+                # If it looks like an identifier, the runtime lookup (which
+                # passes a string) will miss it and fall through to a default.
+                if not isinstance(k, str):
+                    bad_keys.append((path, k, type(k).__name__))
+                walk(v, f"{path}.{k}", parent_key=str(k))
+        elif isinstance(node, list):
+            for i, v in enumerate(node):
+                walk(v, f"{path}[{i}]", parent_key=parent_key)
+        else:
+            # Same bug class in value position: an unquoted numeric id
+            # compared against a string id will never match.
+            if (parent_key in ID_FIELD
+                    and isinstance(node, (int, float))
+                    and not isinstance(node, bool)):
+                bad_values.append((path, node, type(node).__name__))
+
+    for f in files:
+        walk(_yaml.safe_load(_Path(f).read_text()), _Path(f).name)
+
+    assert not bad_keys, (
+        "Unquoted numeric YAML key(s) — quote them:\n" +
+        "\n".join(f"    {p}  key={k!r} ({t})" for p, k, t in bad_keys) +
+        "\n  yaml parses a bare number as an int, but HubSpot sends stage and "
+        "pipeline ids as strings, so the lookup misses and silently returns a "
+        "default. This is how stage_bucket() returned 'unknown' in production "
+        "for Meeting Set, Negotiating and Awaiting Signature."
+    )
+
+    assert not bad_values, (
+        "Unquoted numeric identifier value(s) — quote them:\n" +
+        "\n".join(f"    {p} = {v!r} ({t})" for p, v, t in bad_values) +
+        "\n  compared against a string id at runtime, these never match."
+    )
+
+    print(f"  ✓ {len(files)} config files scanned")
+    print("  ✓ no unquoted numeric keys, no unquoted numeric id values")
+
+
 def test_no_raw_stage_ids_outside_field_semantics():
     """
     Grep production files for raw numeric stage IDs and hardcoded stage mappings.
@@ -395,6 +463,7 @@ def main():
         test_is_won_is_lost_mutually_exclusive,
         test_stage_transition_returns_correct_keys,
         test_unknown_stages_handled_gracefully,
+        test_config_numeric_keys_are_strings,
         test_no_raw_stage_ids_outside_field_semantics,
         test_harness_boundary_isolation,  # Phase 5d - critical boundary guard
     ]

@@ -206,6 +206,9 @@ def test_pre_history_returns_null():
         f"Before first history entry, stage must be None (not guessed), got {stage}"
     assert conf == 'pre_history', \
         f"Should be 'pre_history', got {conf}"
+    assert conf != 'cleared', \
+        "No entry at or before D is 'pre_history' — the deal was never staged. " \
+        "'cleared' means an entry exists but its value is null."
     assert has_history is True, \
         "Deal has history, just not covering this early date"
 
@@ -216,6 +219,109 @@ def test_pre_history_returns_null():
     assert conf == 'exact'
 
     print("✓ test_pre_history_returns_null passed")
+
+
+def test_cleared_stage_distinct_from_pre_history():
+    """
+    A stage actively cleared to null is 'cleared', not 'pre_history'.
+
+    Both return a null stage and both read as open, but they are different
+    facts: 'cleared' means the deal WAS staged and then unstaged, while
+    'pre_history' means it was never staged at or before this date. Merging
+    them hides the distinction and makes the scale of clearing invisible.
+    """
+    r = MockReconstructor()
+
+    # Staged in January, then the stage is cleared in June.
+    r.add_deal_history('deal_006', [
+        {'timestamp': '2026-01-10T10:00:00Z', 'value': 'qualifiedtobuy'},
+        {'timestamp': '2026-06-01T10:00:00Z', 'value': None},
+    ])
+
+    # Before the clear: a real point-in-time read.
+    stage, conf, has_history = r.get_stage_at_date(
+        'deal_006', datetime.fromisoformat('2026-03-01T00:00:00'))
+    assert stage == 'qualifiedtobuy'
+    assert conf == 'exact'
+
+    # After the clear: null stage, but labelled 'cleared', not 'pre_history'.
+    stage, conf, has_history = r.get_stage_at_date(
+        'deal_006', datetime.fromisoformat('2026-07-01T00:00:00'))
+    assert stage is None, "a cleared stage is null, never a carried-forward guess"
+    assert conf == 'cleared', \
+        f"An entry at or before D with a null value is 'cleared', got {conf}"
+    assert has_history is True
+
+    # Before ANY entry: pre_history, so the two are genuinely distinguishable
+    # on the same deal.
+    stage, conf, _ = r.get_stage_at_date(
+        'deal_006', datetime.fromisoformat('2026-01-01T00:00:00'))
+    assert stage is None
+    assert conf == 'pre_history', \
+        f"Before the first entry it is 'pre_history', got {conf}"
+
+    # A later real value wins: clearing is not terminal.
+    r.add_deal_history('deal_007', [
+        {'timestamp': '2026-01-10T10:00:00Z', 'value': None},
+        {'timestamp': '2026-02-10T10:00:00Z', 'value': 'closedwon'},
+    ])
+    stage, conf, _ = r.get_stage_at_date(
+        'deal_007', datetime.fromisoformat('2026-03-01T00:00:00'))
+    assert stage == 'closedwon' and conf == 'exact', \
+        "a null entry followed by a real one must resolve to the real value"
+
+    # Both null cases still read as open — the inclusion rule is unchanged
+    # for now; only the labels are separable.
+    from point_in_time import is_terminal_stage
+    assert is_terminal_stage(None) is False, \
+        "cleared and pre_history both read as open until we decide otherwise"
+
+    print("✓ test_cleared_stage_distinct_from_pre_history passed")
+
+
+def test_cleared_field_distinct_from_pre_history():
+    """
+    Same distinction for deal_value and close_date, not just stage.
+
+    A cleared amount and an amount whose history starts later are different
+    facts and must not share a label.
+    """
+    r = MockReconstructor()
+
+    r.add_amount_history('deal_008', [
+        {'timestamp': '2026-01-10T10:00:00Z', 'value': '50000'},
+        {'timestamp': '2026-06-01T10:00:00Z', 'value': None},
+    ])
+
+    value, conf = r.get_field_at_date(
+        r.amount_history, 'deal_008',
+        datetime.fromisoformat('2026-03-01T00:00:00'))
+    assert value == '50000' and conf == 'exact'
+
+    value, conf = r.get_field_at_date(
+        r.amount_history, 'deal_008',
+        datetime.fromisoformat('2026-07-01T00:00:00'))
+    assert value is None, "a cleared amount is null, never carried forward"
+    assert conf == 'cleared', f"expected 'cleared', got {conf}"
+
+    value, conf = r.get_field_at_date(
+        r.amount_history, 'deal_008',
+        datetime.fromisoformat('2026-01-01T00:00:00'))
+    assert value is None and conf == 'pre_history', \
+        f"before the first entry it is 'pre_history', got {conf}"
+
+    # close_date carries the same distinction.
+    r.add_closedate_history('deal_009', [
+        {'timestamp': '2026-01-10T10:00:00Z', 'value': '2026-09-30'},
+        {'timestamp': '2026-06-01T10:00:00Z', 'value': None},
+    ])
+    value, conf = r.get_field_at_date(
+        r.closedate_history, 'deal_009',
+        datetime.fromisoformat('2026-07-01T00:00:00'))
+    assert value is None and conf == 'cleared', \
+        f"a cleared close_date is 'cleared', got {conf}"
+
+    print("✓ test_cleared_field_distinct_from_pre_history passed")
 
 
 def test_no_history_at_all():
@@ -548,6 +654,8 @@ def run_all_tests():
         test_midnight_boundary_handling,
         test_pre_history_returns_null,
         test_no_history_at_all,
+        test_cleared_stage_distinct_from_pre_history,
+        test_cleared_field_distinct_from_pre_history,
         test_confidence_labels_reflect_history_coverage,
         # Field reconstruction (deal_value, close_date)
         test_deal_value_point_in_time_reconstruction,

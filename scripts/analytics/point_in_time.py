@@ -12,7 +12,13 @@ forward-fill, never a default.
 
 Confidence labels reflect history coverage:
 - 'exact': Field history exists and covers this date (change at or before it)
-- 'pre_history': Deal existed but no field history before this date (null, not guessed)
+- 'cleared': An entry at or before this date exists but its value is null —
+  the field was actively cleared. Distinct from 'pre_history': the deal WAS
+  staged and then unstaged, versus never staged at all. Both read as open,
+  but they are different facts and the inclusion rule may want to separate
+  them later, so they are recorded separately rather than merged.
+- 'pre_history': Deal existed but no field history at or before this date
+  (null, not guessed)
 - 'no_history': No field history available for this deal at all
 """
 import sys
@@ -82,12 +88,14 @@ def get_stage_at_date(
     Returns:
         (stage_id, confidence, has_history)
         - stage_id: The stage at snapshot_date (or None)
-        - confidence: 'exact', 'pre_history', 'no_history'
+        - confidence: 'exact', 'cleared', 'pre_history', 'no_history'
         - has_history: True if property history exists
 
     Confidence definitions:
     - 'exact': Stage history exists and covers this date (change occurred at or before it)
-    - 'pre_history': Deal existed but had no stage change at or before this date (null, not guessed)
+    - 'cleared': An entry at or before this date exists but carries a null value —
+      the stage was actively cleared. Not the same fact as 'pre_history'.
+    - 'pre_history': Deal existed but had no stage entry at or before this date (null, not guessed)
     - 'no_history': No stage history available for this deal at all
     """
     if deal_id not in property_history:
@@ -107,18 +115,28 @@ def get_stage_at_date(
     # Strictly backward-looking: entries after snapshot_date are never selected
     snapshot_ts = snapshot_date.isoformat()
     current_stage = None
+    # Whether any entry at all fell at or before the snapshot date. Without
+    # this, a cleared stage (entry present, value null) is indistinguishable
+    # from history that starts later — both leave current_stage as None.
+    entry_covers_date = False
 
     for entry in sorted_history:
         entry_ts = entry['timestamp']
 
         if entry_ts <= snapshot_ts:
             current_stage = entry['value']
+            entry_covers_date = True
         else:
             # We've passed the snapshot date (strictly backward-looking)
             break
 
     if current_stage is None:
-        # No stage change before this snapshot date
+        if entry_covers_date:
+            # An entry covers this date but its value is null: the stage was
+            # actively cleared. Reads as open, same as pre_history, but it is
+            # a different fact and is labelled as one.
+            return None, 'cleared', True
+        # No stage entry at or before this snapshot date
         # Deal existed but history doesn't cover this early date
         return None, 'pre_history', True
 
@@ -146,9 +164,10 @@ def get_field_at_date(
     Returns:
         (value, confidence)
         - value: Field value at snapshot_date (or None)
-        - confidence: 'exact', 'pre_history', 'no_history'
+        - confidence: 'exact', 'cleared', 'pre_history', 'no_history'
 
-    Same backward-looking logic as stage reconstruction.
+    Same backward-looking logic as stage reconstruction, including the
+    cleared-versus-never-set distinction.
     """
     if deal_id not in field_history:
         return None, 'no_history'
@@ -161,16 +180,18 @@ def get_field_at_date(
     sorted_history = sorted(history, key=lambda x: x['timestamp'])
     snapshot_ts = snapshot_date.isoformat()
     current_value = None
+    entry_covers_date = False
 
     for entry in sorted_history:
         if entry['timestamp'] <= snapshot_ts:
             current_value = entry['value']
+            entry_covers_date = True
         else:
             # Strictly backward-looking
             break
 
     if current_value is None:
-        return None, 'pre_history'
+        return None, ('cleared' if entry_covers_date else 'pre_history')
 
     return current_value, 'exact'
 

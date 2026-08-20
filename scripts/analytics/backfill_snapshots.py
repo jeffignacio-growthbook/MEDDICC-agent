@@ -26,6 +26,7 @@ import json
 import yaml
 import argparse
 from pathlib import Path
+from collections import Counter
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
@@ -230,13 +231,11 @@ class SnapshotBackfiller:
             'snapshots_generated': 0,
             'snapshots_skipped': 0,
             'mismatched_deals': 0,
-            'by_confidence': {
-                'exact': 0,
-                'interpolated': 0,
-                'inferred': 0,
-                'unknown': 0,
-                'excluded_mismatch': 0
-            },
+            # Counter, not a fixed dict: the old keys were the retired
+            # interpolated/inferred labels, so any current label
+            # ('pre_history', 'cleared', 'no_history') would KeyError here
+            # mid-backfill.
+            'by_confidence': Counter(),
             'by_status': {
                 'active': 0,
                 'won': 0,
