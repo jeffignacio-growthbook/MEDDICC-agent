@@ -217,6 +217,27 @@ def main():
     print("\nFinal rows by (fiscal_quarter, source):")
     for (fq, src), n in final.items():
         print(f"    {str(fq):<12} {str(src):<26} {n:>7}")
+    # NO_HISTORY population: deals that reconstruct with no stage history at
+    # all become permanent null-stage rows in the substrate. Identify them so
+    # they are understood before surfacing as anomalies. Probed at the newest
+    # target week, which captures every such deal created by then.
+    from datetime import date as _date
+    probe_weeks = b.quarter_weeks(quarters[-1])
+    if probe_weeks:
+        nh = b.identify_no_history_deals(probe_weeks[-1])
+        print(f"\nNO_HISTORY deals at {probe_weeks[-1]} (permanent null-stage "
+              f"rows): {len(nh)}")
+        print(f"  {'deal_id':<14} {'company':<26} {'current_stage':<16} "
+              f"{'created':<12} hist_entries")
+        for d in nh:
+            print(f"  {d['deal_id']:<14} {str(d['company_name'])[:26]:<26} "
+                  f"{str(d['current_stage']):<16} {d['create_date']:<12} "
+                  f"{d['dealstage_history_entries']}")
+        print("  hist_entries=0 means HubSpot has no dealstage history for the "
+              "deal at all —")
+        print("  typically an import or an API-created deal that never "
+              "transitioned stage.")
+
     if result['unclassifiable']:
         print(f"\n✗ {len(set(result['unclassifiable']))} unclassifiable-stage deals")
         return 1
