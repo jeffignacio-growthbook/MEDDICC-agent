@@ -57,7 +57,7 @@ def investigate(client, config, quarters):
     rows = select_all(
         client, 'deals_snapshot',
         columns='deal_id,snapshot_date,fiscal_quarter,stage_id,deal_value,'
-                'backfill_confidence,value_confidence,snapshot_source',
+                'backfill_confidence,has_property_history,snapshot_source',
         filters=[('in_', 'fiscal_quarter', quarters),
                  ('eq', 'snapshot_source', BACKFILLED)])
     print(f"\nInvestigating {len(rows)} 'backfilled' rows across {quarters}\n")
@@ -92,7 +92,7 @@ def investigate(client, config, quarters):
     for r in rows[:10]:
         print(f"    {r['deal_id']:<14} {r['snapshot_date']}  q={r['fiscal_quarter']:<11} "
               f"stage={str(r['stage_id']):<16} value={str(r['deal_value']):<12} "
-              f"conf={r.get('backfill_confidence')}/{r.get('value_confidence')}")
+              f"conf={r.get('backfill_confidence')}  has_hist={r.get('has_property_history')}")
     return len(rows)
 
 
