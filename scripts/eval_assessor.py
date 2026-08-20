@@ -9,9 +9,14 @@ from pathlib import Path
 
 # Add paths
 sys.path.insert(0, str(Path(__file__).parent.parent / "api"))
+sys.path.insert(0, str(Path(__file__).parent))
 
 import asyncio
-from unittest.mock import MagicMock, AsyncMock
+# StrictFakeLLMClient enforces complete()'s real signature. A plain MagicMock
+# accepts model=/temperature= and any other kwarg, so it would have passed
+# even while production was broken — which is exactly what happened for two
+# days. See scripts/llm_fake.py.
+from llm_fake import StrictFakeLLMClient
 
 
 def test_assessor_uses_llmclient_complete():
@@ -24,11 +29,12 @@ def test_assessor_uses_llmclient_complete():
 
     from assessor import assess_correctness
 
-    # Mock LLMClient that returns a valid assessment
-    mock_client = MagicMock()
-    mock_response = MagicMock()
-    mock_response.text = '{"correct": true, "score": 0.9, "issue": null, "tone_score": 0.85}'
-    mock_client.complete = MagicMock(return_value=mock_response)
+    # Strict fake enforces complete()'s real signature — if the assessor ever
+    # re-adds model=/temperature=, this raises TypeError → 0.50 fallback →
+    # the score assertion below fails (a MagicMock would have hidden it).
+    mock_client = StrictFakeLLMClient(
+        '{"correct": true, "score": 0.9, "issue": null, "tone_score": 0.85}'
+    )
 
     # Run the assessor
     result = asyncio.run(assess_correctness(
@@ -41,7 +47,7 @@ def test_assessor_uses_llmclient_complete():
     ))
 
     # Verify .complete() was called (not .messages.create)
-    assert mock_client.complete.called, \
+    assert mock_client.called, \
         "Assessor must call .complete() on LLMClient"
 
     # Verify it returned the real score from the LLM, not the 0.5 fallback
@@ -65,8 +71,7 @@ def test_assessor_returns_fallback_only_on_real_exception():
     from assessor import assess_correctness
 
     # Test 1: .complete() raises → fallback score 0.5
-    mock_client_error = MagicMock()
-    mock_client_error.complete = MagicMock(side_effect=Exception("LLM error"))
+    mock_client_error = StrictFakeLLMClient(raises=Exception("LLM error"))
 
     result_error = asyncio.run(assess_correctness(
         question="test",
@@ -82,10 +87,9 @@ def test_assessor_returns_fallback_only_on_real_exception():
     print("  ✓ Exception → fallback score 0.5")
 
     # Test 2: .complete() succeeds → real score
-    mock_client_success = MagicMock()
-    mock_response = MagicMock()
-    mock_response.text = '{"correct": true, "score": 0.75, "issue": null}'
-    mock_client_success.complete = MagicMock(return_value=mock_response)
+    mock_client_success = StrictFakeLLMClient(
+        '{"correct": true, "score": 0.75, "issue": null}'
+    )
 
     result_success = asyncio.run(assess_correctness(
         question="test",
@@ -112,11 +116,9 @@ def test_table_classifier_uses_complete():
 
     from table_classifier import classify_relevant_tables
 
-    # Mock LLMClient that returns a valid table list
-    mock_client = MagicMock()
-    mock_response = MagicMock()
-    mock_response.text = '["deals", "analyses", "calls"]'
-    mock_client.complete = MagicMock(return_value=mock_response)
+    # Strict fake: catches a re-added model=/temperature= on table_classifier,
+    # which previously fell back silently to "all tables".
+    mock_client = StrictFakeLLMClient('["deals", "analyses", "calls"]')
 
     # Run classifier
     result = classify_relevant_tables(
@@ -125,7 +127,7 @@ def test_table_classifier_uses_complete():
     )
 
     # Verify .complete() was called
-    assert mock_client.complete.called, \
+    assert mock_client.called, \
         "table_classifier must call .complete() on LLMClient"
 
     # Verify it parsed the table list correctly

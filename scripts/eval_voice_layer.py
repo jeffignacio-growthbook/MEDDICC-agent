@@ -102,38 +102,29 @@ def test_voice_layer():
     from api.assessor import assess_correctness
     import anthropic
 
-    # Mock Anthropic client that returns known response
-    class MockAnthropicClient:
-        def __init__(self, response_json):
-            self.response_json = response_json
+    # Strict fake stands in for LLMClient. The old mock exposed only
+    # .messages.create — the PRE-migration interface — so once the assessor
+    # moved to .complete() it hit AttributeError → the swallowed 0.50 fallback,
+    # and this test's tone assertions became meaningless (the fallback dict has
+    # no tone_score at all). The strict fake mirrors complete()'s real
+    # signature and returns the bad-tone verdict, so the test exercises the
+    # real code path.
+    import sys as _sys
+    from pathlib import Path as _Path
+    _sys.path.insert(0, str(_Path(__file__).parent))
+    from llm_fake import StrictFakeLLMClient
+    import json as _json
 
-        def messages_create(self, **kwargs):
-            class Response:
-                def __init__(self, text):
-                    self.content = [type('obj', (object,), {'text': text})]
-            return Response(self.response_json)
-
-        class messages:
-            @staticmethod
-            def create(**kwargs):
-                # Return low tone score for bad answer
-                import json
-                return type('obj', (object,), {
-                    'content': [type('obj', (object,), {
-                        'text': json.dumps({
-                            "correct": True,
-                            "score": 0.8,
-                            "issue": None,
-                            "tone_score": 0.3,  # Low tone score
-                            "tone_issue": "buried_headline",
-                            "suggested_handler": None,
-                            "suggested_params": None,
-                            "learning_note": None
-                        })
-                    })]
-                })()
-
-    client = MockAnthropicClient("{}")
+    client = StrictFakeLLMClient(_json.dumps({
+        "correct": True,
+        "score": 0.8,
+        "issue": None,
+        "tone_score": 0.3,          # low tone score (buried headline)
+        "tone_issue": "buried_headline",
+        "suggested_handler": None,
+        "suggested_params": None,
+        "learning_note": None,
+    }))
 
     bad_tone_answer = """
     Here's what I found in the data:
@@ -180,28 +171,17 @@ def test_voice_layer():
     Bottom line: healthy mix but Company B carries 57% of total value —
     watch that concentration risk."""
 
-    # Mock client that returns HIGH tone score for good answer
-    class MockGoodToneClient:
-        class messages:
-            @staticmethod
-            def create(**kwargs):
-                import json
-                return type('obj', (object,), {
-                    'content': [type('obj', (object,), {
-                        'text': json.dumps({
-                            "correct": True,
-                            "score": 0.9,
-                            "issue": None,
-                            "tone_score": 0.9,  # High tone score
-                            "tone_issue": None,
-                            "suggested_handler": None,
-                            "suggested_params": None,
-                            "learning_note": None
-                        })
-                    })]
-                })()
-
-    good_client = MockGoodToneClient()
+    # Strict fake returning the good-tone verdict (high tone score).
+    good_client = StrictFakeLLMClient(_json.dumps({
+        "correct": True,
+        "score": 0.9,
+        "issue": None,
+        "tone_score": 0.9,          # high tone score
+        "tone_issue": None,
+        "suggested_handler": None,
+        "suggested_params": None,
+        "learning_note": None,
+    }))
 
     good_assessment = asyncio.run(assess_correctness(
         question="What are our top deals?",

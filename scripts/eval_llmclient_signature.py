@@ -45,31 +45,12 @@ if "supabase" not in sys.modules:
     sys.modules["supabase"] = _fake_supabase
 
 from llm_client import LLMClient  # noqa: E402
+from llm_fake import StrictFakeLLMClient  # noqa: E402
 
-
-# ── A strict fake that enforces the REAL signature ──────────────────────
-
-class _StrictFakeClient:
-    """
-    Mimics LLMClient.complete()'s exact signature: (messages, system=None,
-    max_tokens=1000). Passing any other kwarg (model=, temperature=, ...)
-    raises TypeError — exactly what the real client did in production.
-
-    A plain MagicMock would silently accept the bad kwarg and hide the bug;
-    that is why the previous tests passed while production was broken.
-    """
-
-    def __init__(self, text: str):
-        self._text = text
-        self.calls = []
-
-    def complete(self, messages, system=None, max_tokens=1000):
-        self.calls.append(
-            {"messages": messages, "system": system, "max_tokens": max_tokens}
-        )
-        return types.SimpleNamespace(
-            text=self._text, input_tokens=10, output_tokens=5
-        )
+# Shared strict fake (scripts/llm_fake.py). Enforces complete()'s real
+# signature so a reintroduced model=/temperature= fails the test instead of
+# passing against a lenient MagicMock. Aliased for local readability.
+_StrictFakeClient = StrictFakeLLMClient
 
 
 # ── Test 1: static call-site audit ──────────────────────────────────────
