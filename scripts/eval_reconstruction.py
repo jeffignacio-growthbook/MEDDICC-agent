@@ -61,6 +61,12 @@ class MockReconstructor:
         """Add closedate (close_date) history for a deal."""
         self.closedate_history[deal_id] = {'history': history}
 
+    def add_category_history(self, deal_id: str, history: List[Dict]):
+        """Add hs_manual_forecast_category history for a deal."""
+        if not hasattr(self, 'category_history'):
+            self.category_history = {}
+        self.category_history[deal_id] = {'history': history}
+
     def get_stage_at_date(
         self,
         deal_id: str,
@@ -452,6 +458,79 @@ def test_close_date_point_in_time_reconstruction():
             f"On {date_str}, expected confidence='{expected_conf}', got '{conf}'"
 
     print("✓ test_close_date_point_in_time_reconstruction passed")
+
+
+# ── forecast_category point-in-time reconstruction (unlock calibration) ──
+
+def test_category_reconstruction_never_uses_future_value():
+    """A category change dated after the snapshot must never be selected.
+
+    Lookahead here would make commit calibration look better than reality — the
+    exact metric being measured. A deal moving PIPELINE -> BEST_CASE -> COMMIT
+    must read as its as-of-date category, never the later, better one.
+    """
+    r = MockReconstructor()
+    r.add_category_history('deal_cat1', [
+        {'timestamp': '2026-02-10T10:00:00Z', 'value': 'PIPELINE'},
+        {'timestamp': '2026-03-01T14:00:00Z', 'value': 'BEST_CASE'},
+        {'timestamp': '2026-03-20T09:00:00Z', 'value': 'COMMIT'},
+    ])
+    cases = [
+        ('2026-02-15T00:00:00', 'PIPELINE', 'exact'),   # after 1st, before 2nd
+        ('2026-03-10T00:00:00', 'BEST_CASE', 'exact'),  # NOT the future COMMIT
+        ('2026-03-25T00:00:00', 'COMMIT', 'exact'),     # after the upgrade
+    ]
+    for date_str, expected, expected_conf in cases:
+        d = datetime.fromisoformat(date_str)
+        val, conf = r.get_field_at_date(r.category_history, 'deal_cat1', d)
+        assert val == expected, f"On {date_str} expected {expected}, got {val}"
+        assert conf == expected_conf, \
+            f"On {date_str} expected '{expected_conf}', got '{conf}'"
+    print("✓ test_category_reconstruction_never_uses_future_value passed")
+
+
+def test_category_downgrade_is_honored():
+    """COMMIT -> PIPELINE is a real and important transition (a downgrade). The
+    backward-looking rule is direction-agnostic; a downgrade must reconstruct as
+    faithfully as an upgrade."""
+    r = MockReconstructor()
+    r.add_category_history('deal_cat2', [
+        {'timestamp': '2026-02-05T10:00:00Z', 'value': 'COMMIT'},
+        {'timestamp': '2026-02-25T11:00:00Z', 'value': 'PIPELINE'},  # downgrade
+    ])
+    cases = [
+        ('2026-02-10T00:00:00', 'COMMIT', 'exact'),
+        ('2026-03-01T00:00:00', 'PIPELINE', 'exact'),  # downgrade honored
+    ]
+    for date_str, expected, expected_conf in cases:
+        d = datetime.fromisoformat(date_str)
+        val, conf = r.get_field_at_date(r.category_history, 'deal_cat2', d)
+        assert val == expected, f"On {date_str} expected {expected}, got {val}"
+        assert conf == expected_conf
+    print("✓ test_category_downgrade_is_honored passed")
+
+
+def test_no_history_before_date_yields_null_not_default():
+    """No category entry at or before D means NULL, never PIPELINE or any other
+    default. Two distinct null reasons must be preserved: history that begins
+    AFTER the date is 'pre_history'; a deal with no category history at all is
+    'no_history'. Neither may be coerced to a category."""
+    r = MockReconstructor()
+    # History begins 2026-03-01 — a 2026-02-15 snapshot predates it.
+    r.add_category_history('deal_cat3', [
+        {'timestamp': '2026-03-01T10:00:00Z', 'value': 'COMMIT'},
+    ])
+    val, conf = r.get_field_at_date(
+        r.category_history, 'deal_cat3', datetime.fromisoformat('2026-02-15T00:00:00'))
+    assert val is None, f"pre-history must be NULL, got {val}"
+    assert conf == 'pre_history', f"expected 'pre_history', got '{conf}'"
+
+    # A deal absent from category history entirely.
+    val2, conf2 = r.get_field_at_date(
+        r.category_history, 'deal_absent', datetime.fromisoformat('2026-03-15T00:00:00'))
+    assert val2 is None, f"no-history must be NULL, got {val2}"
+    assert conf2 == 'no_history', f"expected 'no_history', got '{conf2}'"
+    print("✓ test_no_history_before_date_yields_null_not_default passed")
 
 
 def test_fixture_tests_production_function():
@@ -1147,6 +1226,10 @@ def run_all_tests():
         # Field reconstruction (deal_value, close_date)
         test_deal_value_point_in_time_reconstruction,
         test_close_date_point_in_time_reconstruction,
+        # forecast_category point-in-time (unlock commit calibration)
+        test_category_reconstruction_never_uses_future_value,
+        test_category_downgrade_is_honored,
+        test_no_history_before_date_yields_null_not_default,
         # Stage classification gate
         test_unmapped_stage_raises_not_defaults_open,
         test_retired_stage_is_acknowledged_but_still_raises,

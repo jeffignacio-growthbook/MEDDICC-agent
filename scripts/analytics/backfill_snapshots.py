@@ -196,6 +196,21 @@ class SnapshotBackfiller:
             return None, conf
         return str(raw)[:10], conf
 
+    def get_forecast_category_at_date(self, deal_id, snapshot_date):
+        """Point-in-time forecast_category (hs_manual_forecast_category), via the
+        SAME strictly-backward-looking rule as stage/value/close_date — the most
+        recent history entry with timestamp <= snapshot_date, never forward-fill,
+        never a default. None (with 'pre_history'/'no_history'/'cleared') when
+        there is no entry at or before the date. A downgrade (COMMIT -> PIPELINE)
+        reconstructs like any other change — the rule is direction-agnostic.
+        """
+        raw, conf = _get_field_at_date(
+            self.field_history['hs_manual_forecast_category'],
+            deal_id, snapshot_date)
+        if raw in (None, '', 'null'):
+            return None, conf
+        return str(raw), conf
+
     def quarter_weeks(self, quarter_label: str) -> List[date]:
         """Weekly Monday snapshot dates whose fiscal quarter is quarter_label.
 
@@ -243,6 +258,7 @@ class SnapshotBackfiller:
             deal_id = r['deal_id']
             stage_id = r['stage_id']
             close_date, close_conf = self.get_close_date_at_date(deal_id, Ddt)
+            category, cat_conf = self.get_forecast_category_at_date(deal_id, Ddt)
             current = self.current_deals.get(deal_id, {})
             db_rows.append({
                 'deal_id': deal_id,
@@ -252,27 +268,31 @@ class SnapshotBackfiller:
                 'stage_order': self.get_stage_order(stage_id),
                 'deal_value': r['deal_value'],          # point-in-time, None if unknown
                 'close_date': close_date,               # point-in-time
+                'forecast_category': category,          # point-in-time, None if unknown
                 'owner_email': current.get('owner_email'),   # current: no owner history
                 'deal_status': self.get_deal_status(stage_id),
                 'snapshot_source': 'backfilled',
                 'fiscal_quarter': fq_label,             # NOT NULL (migration 038)
                 'week_of_quarter': week,
                 'backfill_confidence': r['stage_confidence'],
-                # value_confidence and close_date_confidence have no columns
-                # (migration 017 added backfill_confidence, has_property_history,
-                # interpolation_method, data_quality_notes — not these two).
-                # Rather than add columns via a migration with no CI apply path,
-                # fold them into the existing data_quality_notes TEXT column, in
-                # a stable "key=value; key=value" format a later migration can
-                # parse into first-class columns if ever wanted.
+                # value_confidence, close_date_confidence and category_confidence
+                # have no columns (migration 017 added backfill_confidence,
+                # has_property_history, interpolation_method, data_quality_notes
+                # — not these three). Rather than add columns via a migration
+                # with no CI apply path, fold them into the existing
+                # data_quality_notes TEXT column, in a stable "key=value;
+                # key=value" format a later migration can parse into first-class
+                # columns if ever wanted.
                 'data_quality_notes': (
                     f"value_confidence={r['value_confidence']}; "
-                    f"close_date_confidence={close_conf}"),
+                    f"close_date_confidence={close_conf}; "
+                    f"category_confidence={cat_conf}"),
                 'has_property_history': r['stage_confidence'] != 'no_history',
             })
             tally['rows'] += 1
             tally[f"stage_{r['stage_confidence']}"] += 1
             tally[f"value_{r['value_confidence']}"] += 1
+            tally[f"category_{cat_conf}"] += 1
         return db_rows, unclassifiable, tally
 
     def backfill_quarters(self, quarters: List[str], report_only: bool,
