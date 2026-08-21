@@ -1,0 +1,79 @@
+name: Reconstruct forecast_category
+
+# Reconstruct deals_snapshot.forecast_category point-in-time (Method 2 field
+# machinery, reusing point_in_time.get_field_at_date) to unlock commit
+# calibration and category churn. Dry-run by default; a real write requires
+# mode=execute (Phase 3). The dev container cannot reach HubSpot or Supabase,
+# so this runs in CI.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "'dry_run' (report only, no write) or 'execute' (Phase 3 write)"
+        required: false
+        default: 'dry_run'
+
+permissions:
+  contents: read
+
+jobs:
+  reconstruct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Cheap guards first — do not spend HubSpot API time if these fail.
+      - name: "Pre-flight — offline test suites"
+        run: |
+          set -e
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_reconstruction.py
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_forecast_correctness.py
+
+      - name: Fetch property history from HubSpot
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python3 scripts/analytics/hubspot_history.py --all --rate-limit 5
+          ls -lh property_history_cache.json
+
+      - name: "Confirm cache carries category history back far enough"
+        run: |
+          python3 -c "
+          import json
+          c = json.load(open('property_history_cache.json'))
+          deals = c['deals']
+          earliest = 'zzzz'
+          with_cat = 0
+          for d in deals.values():
+              h = d.get('forecast_category_history') or []
+              if h:
+                  with_cat += 1
+                  for e in h:
+                      ts = e.get('timestamp','')
+                      if ts and ts < earliest: earliest = ts
+          pct = with_cat/len(deals)*100 if deals else 0
+          print(f'deals in cache: {len(deals)}; with category history: {with_cat} ({pct:.0f}%)')
+          print(f'earliest category history ts: {earliest}')
+          assert earliest <= '2025-08-01', f'category history does not reach FY2026 Q3: {earliest}'
+          print('category history reaches the earliest target quarter: OK')
+          "
+
+      - name: "Reconstruct (dry_run or execute)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          if [ "${{ inputs.mode }}" = "execute" ]; then
+            PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/reconstruct_forecast_category.py --execute
+          else
+            PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/reconstruct_forecast_category.py --dry-run
+          fi
