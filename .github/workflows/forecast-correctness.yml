@@ -29,6 +29,7 @@ jobs:
         run: |
           set -e
           PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/test_forecast_analyses.py
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_forecast_correctness.py
           PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_reconstruction.py
       - name: "Forecast correctness (diagnose | run)"
         env:
@@ -39,4 +40,6 @@ jobs:
             PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/forecast_analyses.py all
           else
             PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/forecast_correctness_check.py
+            echo ""
+            PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/waterfall_gate_check.py
           fi
