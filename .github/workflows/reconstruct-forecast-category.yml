@@ -101,5 +101,5 @@ jobs:
           # commit calibration stays below the gate. Calibration anchors on that
           # measured week and returns null-with-reason for thin quarters. Gates
           # unchanged.
-          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/forecast_analyses.py churn
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/forecast_analyses.py outcome
           PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/forecast_analyses.py calibration

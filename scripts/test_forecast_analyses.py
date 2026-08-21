@@ -21,7 +21,7 @@ from analytics.forecast_analyses import (
     _get_complete_quarters,
     _classify_deal_outcome,
     query_week3_conversion,
-    query_category_churn,
+    query_commit_outcome_by_week,
     query_commit_calibration
 )
 
@@ -166,45 +166,39 @@ def test_commit_calibration_classifies_slip_separately_from_loss():
     print("  ✓ Three-way classification working: Won/Slipped/Lost are distinct")
 
 
-def test_category_churn_curve_covers_all_weeks_with_data():
+def test_commit_outcome_by_week_structure():
     """
-    Category churn curve must report on all weeks 1-13 that have data.
-
-    Should not skip weeks or collapse ranges.
+    query_commit_outcome_by_week returns a per-commit-week outcome table
+    (n/won/lost/slipped/win_rate) plus a volume curve — NOT a tag-retention
+    curve. It must reach _classify_deal_outcome, never compare forecast_category
+    across snapshots.
     """
-    print("\n[TEST] Category churn curve covers all weeks with data")
+    print("\n[TEST] commit outcome-by-week structure (not retention)")
 
-    # Patch _get_complete_quarters to return test data
-    with patch('analytics.forecast_analyses._get_complete_quarters') as mock_get_quarters:
+    with patch('analytics.forecast_analyses._get_complete_quarters') as mock_get_quarters, \
+         patch('analytics.forecast_analyses._load_config') as mock_config, \
+         patch('analytics.forecast_analyses._quarter_window_iso') as mock_win, \
+         patch('supabase_client.select_all') as mock_select_all:
         mock_get_quarters.return_value = ['FY2027 Q1']
+        mock_config.return_value = {'min_evidence_count': 30}
+        mock_win.return_value = ('2026-02-01', '2026-04-30')
+        mock_select_all.return_value = []  # deals table load
 
         sb = Mock()
+        mock_response = Mock(); mock_response.data = []
+        mock_chain = Mock()
+        mock_chain.eq = Mock(return_value=mock_chain)
+        mock_chain.execute = Mock(return_value=mock_response)
+        sb.table = Mock(return_value=Mock(select=Mock(return_value=mock_chain)))
 
-        # Mock COMMIT deals for various weeks - simplified to avoid complex chaining
-        # The key test is that the function attempts to query all 13 weeks
-        # We'll verify structure rather than full execution
-        with patch('analytics.forecast_analyses._load_config') as mock_config:
-            mock_config.return_value = {'min_evidence_count': 30}
+        result = query_commit_outcome_by_week(sb)
 
-            # Set up minimal mock to allow function to execute
-            mock_response = Mock()
-            mock_response.data = []
-
-            mock_chain = Mock()
-            mock_chain.eq = Mock(return_value=mock_chain)
-            mock_chain.in_ = Mock(return_value=mock_chain)
-            mock_chain.execute = Mock(return_value=mock_response)
-
-            sb.table = Mock(return_value=Mock(select=Mock(return_value=mock_chain)))
-
-            result = query_category_churn(sb)
-
-            # Should have churn_curve structure
-            if 'churn_curve' not in result:
-                raise AssertionError("Missing churn_curve in result")
-
-    print(f"  ✓ Churn curve structure present")
-    print(f"  ✓ Function queries weeks 1-13 structure verified")
+    for key in ('by_week', 'volume_by_week', 'per_quarter'):
+        if key not in result:
+            raise AssertionError(f"Missing {key} in result")
+    if 'churn_curve' in result or 'retention_rate' in str(result):
+        raise AssertionError("Result still exposes tag-retention shape")
+    print("  ✓ outcome-by-week structure present; no retention curve")
 
 
 def test_analyses_return_null_on_thin_data_never_fabricate():
@@ -233,20 +227,20 @@ def test_analyses_return_null_on_thin_data_never_fabricate():
 
     print("  ✓ Week-3 conversion returns null on thin data")
 
-    # Test category churn with empty data
+    # Test commit outcome-by-week with empty data
     with patch('analytics.forecast_analyses._get_complete_quarters') as mock_quarters:
         mock_quarters.return_value = []
 
         sb = Mock()
-        churn_result = query_category_churn(sb)
+        outcome_result = query_commit_outcome_by_week(sb)
 
-        if 'error' not in churn_result:
-            if churn_result.get('empirical_anchor_week') and len(churn_result.get('churn_curve', {})) == 0:
+        if 'error' not in outcome_result:
+            if outcome_result.get('by_week'):
                 raise AssertionError(
-                    "Category churn fabricated anchor week with no curve data"
+                    "Commit outcome-by-week fabricated a table with no quarters"
                 )
 
-    print("  ✓ Category churn returns null on thin data")
+    print("  ✓ Commit outcome-by-week returns null on thin data")
 
     # Test commit calibration with no quarters
     with patch('analytics.forecast_analyses._get_complete_quarters') as mock_quarters:
@@ -277,7 +271,7 @@ def main():
         test_week3_conversion_excludes_incomplete_quarters,
         test_week3_conversion_returns_null_not_zero_on_insufficient_history,
         test_commit_calibration_classifies_slip_separately_from_loss,
-        test_category_churn_curve_covers_all_weeks_with_data,
+        test_commit_outcome_by_week_structure,
         test_analyses_return_null_on_thin_data_never_fabricate,
     ]
 

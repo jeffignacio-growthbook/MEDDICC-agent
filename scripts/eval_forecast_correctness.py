@@ -235,6 +235,82 @@ def test_category_note_upsert_preserves_other_confidences():
     print("  ✓ other confidences preserved; category token replaced, never stacked")
 
 
+# ── Commit outcome-by-week (replaces tag-retention "churn") ────────────
+
+def test_commit_won_inside_quarter_counts_as_won_not_lost_tag():
+    """A deal tagged COMMIT in week 3 that closes won in week 7 is WON. Under
+    the old retention metric it read as a failure because the won stage left the
+    open snapshot — the defect this replaces."""
+    print("\n[TEST] committed deal that closes won in-quarter is WON")
+    q_start, q_end = '2026-02-01', '2026-04-30'
+    deals_by_id = {'w': {'stage': 'closedwon', 'close_date': '2026-03-15'}}
+    assert fa._classify_deal_outcome('w', q_start, q_end, deals_by_id) == 'WON'
+    print("  ✓ terminal won inside the committed quarter → WON (not a lost tag)")
+
+
+def test_commit_won_in_later_quarter_is_slipped():
+    """A deal committed in Q1 that closes won in Q2 missed the quarter it was
+    committed for — SLIPPED, not WON."""
+    print("\n[TEST] committed deal that wins in a LATER quarter is SLIPPED")
+    q_start, q_end = '2026-02-01', '2026-04-30'   # FY2027 Q1
+    deals_by_id = {'late': {'stage': 'closedwon', 'close_date': '2026-05-20'}}  # Q2
+    out = fa._classify_deal_outcome('late', q_start, q_end, deals_by_id)
+    assert out == 'SLIPPED', f"won-in-later-quarter must be SLIPPED, got {out}"
+    print("  ✓ won in a later quarter → SLIPPED (missed the committed quarter)")
+
+
+def test_outcome_read_from_deals_not_tag_survival():
+    """Static check: query_commit_outcome_by_week classifies via
+    _classify_deal_outcome against the deals table, and never resurrects the
+    tag-retention comparison (a second snapshot read of forecast_category at
+    week 13)."""
+    print("\n[TEST] outcome read from deals, not tag survival (static)")
+    import inspect
+    src = inspect.getsource(fa.query_commit_outcome_by_week)
+    assert '_classify_deal_outcome(' in src, \
+        "must classify terminal outcome via the shared classifier"
+    for banned in ("'retention'", 'retention_rate', 'commit_end',
+                   "week_of_quarter', 13", 'churn_curve'):
+        assert banned not in src, \
+            f"tag-retention idiom {banned!r} reintroduced — must measure outcome"
+    print("  ✓ classifies via deals; no tag-retention comparison")
+
+
+def _outcome_fake_sb(week_to_ids):
+    """sb whose deals_snapshot COMMIT query returns configured deal_ids by
+    week_of_quarter; nothing else is read through it."""
+    from unittest.mock import Mock
+
+    def _chain():
+        c = Mock(); f = {}
+        c.select = Mock(return_value=c)
+        def _eq(k, v): f[k] = v; return c
+        c.eq = Mock(side_effect=_eq)
+        c.execute = Mock(side_effect=lambda: types.SimpleNamespace(
+            data=[{'deal_id': d} for d in week_to_ids.get(f.get('week_of_quarter'), [])]))
+        return c
+    sb = Mock(); sb.table = Mock(side_effect=lambda name: _chain())
+    return sb
+
+
+def test_thin_week_returns_null_not_a_rate():
+    """A commit-week cohort below min_evidence_count returns win_rate null with
+    a reason — counts still shown, never a fabricated rate."""
+    print("\n[TEST] thin commit-week returns null win_rate with a reason")
+    from unittest.mock import patch
+    ids = [f'd{i}' for i in range(10)]                     # 10 < gate 30
+    deals = [_deal(d, 'closedwon', '2026-03-15') for d in ids]
+    with patch.object(fa, '_get_complete_quarters', return_value=['FY2027 Q1']), \
+         patch.object(fa, '_load_config', return_value={'min_evidence_count': 30}), \
+         patch.object(fa, '_quarter_window_iso', return_value=('2026-02-01', '2026-04-30')), \
+         patch.object(supabase_client, 'select_all', return_value=deals):
+        result = fa.query_commit_outcome_by_week(_outcome_fake_sb({5: ids}))
+    wk5 = result['by_week'][5]
+    assert wk5['n_committed'] == 10 and wk5['won'] == 10, wk5
+    assert wk5['win_rate'] is None and 'min_evidence' in wk5['reason'], wk5
+    print("  ✓ 10 committed, all won, but < gate → win_rate null with reason")
+
+
 def main():
     print("=" * 70)
     print("FORECAST CORRECTNESS TESTS")
@@ -248,6 +324,10 @@ def main():
         test_waterfall_qualification_is_point_in_time_not_current_stage,
         test_update_touches_only_category_columns,
         test_category_note_upsert_preserves_other_confidences,
+        test_commit_won_inside_quarter_counts_as_won_not_lost_tag,
+        test_commit_won_in_later_quarter_is_slipped,
+        test_outcome_read_from_deals_not_tag_survival,
+        test_thin_week_returns_null_not_a_rate,
     ]
     passed = failed = 0
     for t in tests:

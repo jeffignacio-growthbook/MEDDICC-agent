@@ -5,7 +5,7 @@ calibration and category churn.
 
 The historical backfill (Method 2) wrote stage_id, deal_value and close_date
 point-in-time but never forecast_category, so query_commit_calibration and
-query_category_churn return null. The category history IS already in the
+query_commit_outcome_by_week return null. The category history IS already in the
 property-history cache (hubspot_history maps hs_manual_forecast_category ->
 forecast_category_history); this consumes it through the SAME backward-looking
 rule used for every other field (point_in_time.get_field_at_date) — no second

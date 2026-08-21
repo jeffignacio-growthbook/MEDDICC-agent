@@ -356,23 +356,34 @@ def query_week3_conversion(
     }
 
 
-def query_category_churn(sb=None) -> Dict:
+def query_commit_outcome_by_week(sb=None) -> Dict:
     """
-    Measure forecast category stability by week.
+    Of deals tagged COMMIT at each week_of_quarter, what ACTUALLY happened to
+    them — Won / Lost / Slipped from TERMINAL outcome, not tag survival.
 
-    For each week_of_quarter (1-13), of deals tagged COMMIT that week,
-    what fraction were still COMMIT at quarter end.
+    Replaces the former "category churn" retention metric, which measured
+    whether a COMMIT tag was STILL present at week 13. That was wrong: a deal
+    tagged COMMIT that CLOSES WON leaves the open backfilled snapshot (terminal
+    stages are excluded), so under retention it read as the tag "failing to
+    survive" — penalising the exact outcome it should reward, and penalising
+    early weeks hardest (a week-1 commit has twelve weeks to win and vanish).
+    The monotonic 38%→100% climb and the tautological 100% at week 13 were
+    artifacts of that.
 
-    Returns:
-        {
-            'churn_curve': {week: {'commit_start': int, 'commit_end': int, 'retention_rate': float}},
-            'empirical_anchor_week': int,  # Week where churn drops and stabilizes
-            'by_owner': {...},  # Same structure, segmented by owner
-            'quarters_analyzed': int,
-            'coverage_note': str
-        }
+    Correct measure: cohort membership is point-in-time (deals tagged COMMIT at
+    (quarter, week) from deals_snapshot — already right); the OUTCOME comes from
+    _classify_deal_outcome against the `deals` terminal state (the same source
+    commit calibration uses — no second classifier). Won requires the close_date
+    to land inside the committed quarter; a deal committed in Q1 that closes won
+    in Q2 is SLIPPED (it missed the quarter it was committed for), never Won.
 
-    The empirical anchor week replaces the instinctive week-8 hardcode.
+    Reports, pooled across complete quarters, per commit-week: n_committed
+    (volume), classified, won, lost, slipped, and win_rate = won/classified —
+    GATED: a week whose classified cohort is below min_evidence_count returns
+    win_rate null with a reason (counts still shown). Volume is always reported;
+    it distinguishes a conservative commit culture (few early commits, high
+    win rate) from an optimistic one (many early commits that fall out). Per
+    quarter is included, gated the same way.
     """
     if sb is None:
         sb = create_client(
@@ -380,90 +391,83 @@ def query_category_churn(sb=None) -> Dict:
             os.environ['SUPABASE_SERVICE_KEY']
         )
 
-    complete_quarters = _get_complete_quarters(sb)
+    config = _load_config()
+    min_evidence = config.get('min_evidence_count', 30)
 
+    complete_quarters = _get_complete_quarters(sb)
     if not complete_quarters:
         return {
             'error': 'No complete quarters available',
             'coverage_note': 'Insufficient historical data'
         }
 
-    # Aggregate across all complete quarters
-    churn_by_week = defaultdict(lambda: {'commit_start': 0, 'commit_end': 0})
+    # Terminal outcome source (OUTCOME-READ, defect 5): the backfilled snapshot
+    # has no won/lost rows, so the outcome of a committed deal must be read from
+    # the deal's terminal state, never from tag survival across snapshots.
+    from supabase_client import select_all
+    deals_rows = select_all(sb, 'deals', columns='deal_id,stage,close_date')
+    deals_by_id = {str(d['deal_id']): d for d in deals_rows}
+
+    def _blank():
+        return {'n_committed': 0, 'won': 0, 'lost': 0, 'slipped': 0,
+                'unclassified': 0}
+
+    pooled_by_week = defaultdict(_blank)
+    per_quarter_week = defaultdict(lambda: defaultdict(_blank))
 
     for quarter in complete_quarters:
-        for week in range(1, 14):  # Weeks 1-13
-            # Get deals tagged COMMIT in this week
-            week_result = sb.table('deals_snapshot').select(
-                'deal_id'
-            ).eq('fiscal_quarter', quarter).eq(
-                'week_of_quarter', week
-            ).eq('forecast_category', 'COMMIT').execute()
+        q_start_iso, q_end_iso = _quarter_window_iso(sb, quarter)
+        for week in range(1, 14):
+            res = sb.table('deals_snapshot').select('deal_id').eq(
+                'fiscal_quarter', quarter).eq(
+                'week_of_quarter', week).eq(
+                'forecast_category', 'COMMIT').execute()
+            for r in res.data:
+                did = r['deal_id']
+                outcome = _classify_deal_outcome(
+                    did, q_start_iso, q_end_iso, deals_by_id)
+                for agg in (pooled_by_week[week], per_quarter_week[quarter][week]):
+                    agg['n_committed'] += 1
+                    if outcome == 'WON':
+                        agg['won'] += 1
+                    elif outcome == 'LOST':
+                        agg['lost'] += 1
+                    elif outcome == 'SLIPPED':
+                        agg['slipped'] += 1
+                    else:  # deal absent from deals table — cannot classify
+                        agg['unclassified'] += 1
 
-            commit_start = len(week_result.data)
-            churn_by_week[week]['commit_start'] += commit_start
-
-            if commit_start == 0:
-                continue
-
-            deal_ids = [r['deal_id'] for r in week_result.data]
-
-            # Check how many were still COMMIT at week 13 (quarter end)
-            end_result = sb.table('deals_snapshot').select(
-                'deal_id, forecast_category'
-            ).eq('fiscal_quarter', quarter).eq(
-                'week_of_quarter', 13
-            ).in_('deal_id', deal_ids).execute()
-
-            # Count still COMMIT
-            commit_end = sum(
-                1 for r in end_result.data
-                if r.get('forecast_category') == 'COMMIT'
-            )
-
-            churn_by_week[week]['commit_end'] += commit_end
-
-    # Calculate retention rates
-    churn_curve = {}
-    for week, stats in churn_by_week.items():
-        if stats['commit_start'] > 0:
-            retention_rate = stats['commit_end'] / stats['commit_start']
-        else:
-            retention_rate = None
-
-        churn_curve[week] = {
-            'commit_start': stats['commit_start'],
-            'commit_end': stats['commit_end'],
-            'retention_rate': retention_rate,
-            'churn_rate': (1 - retention_rate) if retention_rate else None
+    def _finish(agg):
+        classified = agg['won'] + agg['lost'] + agg['slipped']
+        gated = classified >= min_evidence
+        return {
+            'n_committed': agg['n_committed'],
+            'classified': classified,
+            'unclassified': agg['unclassified'],
+            'won': agg['won'], 'lost': agg['lost'], 'slipped': agg['slipped'],
+            'win_rate': (agg['won'] / classified) if gated and classified else None,
+            'reason': (None if gated
+                       else f'{classified} classified < min_evidence {min_evidence}'),
         }
 
-    # Find empirical anchor week (where retention stabilizes)
-    # Simple heuristic: first week where retention >= 0.80 and stays stable
-    anchor_week = None
-    for week in sorted(churn_curve.keys()):
-        rate = churn_curve[week]['retention_rate']
-        if rate and rate >= 0.80:
-            # Check if next 2 weeks also stable
-            next_weeks_stable = True
-            for w in range(week + 1, min(week + 3, 14)):
-                if w in churn_curve:
-                    next_rate = churn_curve[w]['retention_rate']
-                    if not next_rate or abs(next_rate - rate) > 0.10:
-                        next_weeks_stable = False
-                        break
-
-            if next_weeks_stable:
-                anchor_week = week
-                break
+    by_week = {w: _finish(pooled_by_week[w]) for w in sorted(pooled_by_week)}
+    per_quarter = {
+        q: {w: _finish(per_quarter_week[q][w]) for w in sorted(per_quarter_week[q])}
+        for q in per_quarter_week
+    }
+    volume_by_week = {w: by_week[w]['n_committed'] for w in by_week}
 
     return {
-        'churn_curve': churn_curve,
-        'empirical_anchor_week': anchor_week,
+        'by_week': by_week,
+        'per_quarter': per_quarter,
+        'volume_by_week': volume_by_week,
         'quarters_analyzed': len(complete_quarters),
+        'min_evidence_count': min_evidence,
         'coverage_note': f'{len(complete_quarters)} complete quarters at 85% coverage',
         'complete_quarters': complete_quarters,
-        'note': 'Empirical anchor replaces instinctive week-8 hardcode'
+        'note': ('Outcome is terminal (deals table), not tag survival. '
+                 'Won requires close_date inside the committed quarter; '
+                 'won-in-a-later-quarter is slipped.'),
     }
 
 
@@ -506,17 +510,23 @@ def query_commit_calibration(
 
     config = _load_config()
 
-    # Determine anchor week
+    # Determine anchor week. The former churn-retention anchor was an artifact
+    # (see query_commit_outcome_by_week); anchor now = the EARLIEST commit-week
+    # whose pooled cohort clears min_evidence_count — the earliest week we can
+    # compute a rate at, a statistical-validity criterion, not a tuned target.
     if anchor_week is None:
         anchor_week = config.get('anchor_week')
         if anchor_week is None:
-            # Use measured value from category churn
-            churn_data = query_category_churn(sb)
-            anchor_week = churn_data.get('empirical_anchor_week')
+            obw = query_commit_outcome_by_week(sb)
+            gate_weeks = [w for w, s in sorted(obw.get('by_week', {}).items())
+                          if s.get('win_rate') is not None]
+            anchor_week = gate_weeks[0] if gate_weeks else None
             if anchor_week is None:
                 return {
-                    'error': 'Cannot determine anchor week — insufficient data for category churn analysis',
-                    'coverage_note': 'Run query_category_churn first to establish empirical anchor'
+                    'error': 'No commit-week cohort clears min_evidence_count — '
+                             'cannot compute a calibrated hit rate',
+                    'coverage_note': 'See query_commit_outcome_by_week for the '
+                                     'per-week volumes and null reasons',
                 }
 
     complete_quarters = _get_complete_quarters(sb)
@@ -633,7 +643,8 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description='Run forecast analyses')
-    parser.add_argument('analysis', choices=['week3', 'churn', 'calibration', 'all'])
+    parser.add_argument('analysis',
+                        choices=['week3', 'outcome', 'calibration', 'all'])
     args = parser.parse_args()
 
     sb = create_client(
@@ -676,25 +687,30 @@ def main():
                     print(f"  {quarter} / {pid}: {rate_s}  "
                           f"({s['closed_won_count']}/{s['week3_scoped_denominator']})")
 
-    if args.analysis in ['churn', 'all']:
+    if args.analysis in ['outcome', 'all']:
         print("\n" + "=" * 70)
-        print("CATEGORY CHURN CURVE")
+        print("COMMIT OUTCOME BY WEEK (terminal outcome, not tag retention)")
         print("=" * 70)
-        result = query_category_churn(sb)
+        result = query_commit_outcome_by_week(sb)
 
         if 'error' in result:
             print(f"\n⚠️  {result['error']}")
         else:
-            print(f"\nEmpirical anchor week: {result.get('empirical_anchor_week', 'N/A')}")
-            print(f"Quarters analyzed: {result['quarters_analyzed']}")
-            print(f"\n{result.get('coverage_note', '')}")
-
-            print("\nChurn curve by week:")
-            for week in sorted(result['churn_curve'].keys()):
-                stats = result['churn_curve'][week]
-                retention = stats['retention_rate']
-                if retention:
-                    print(f"  Week {week:2d}: {retention:.1%} retention ({stats['commit_end']}/{stats['commit_start']} still COMMIT)")
+            print(f"\nQuarters analyzed: {result['quarters_analyzed']}  "
+                  f"(min_evidence_count={result.get('min_evidence_count')})")
+            print(f"{result.get('coverage_note', '')}")
+            print("\nPooled across quarters, by commit-week:")
+            print(f"  {'wk':>2}  {'n':>3}  {'won':>3} {'lost':>4} {'slip':>4}  win_rate")
+            for week in sorted(result['by_week'].keys()):
+                s = result['by_week'][week]
+                wr = (f"{s['win_rate']:.1%}" if s['win_rate'] is not None
+                      else f"null ({s['reason']})")
+                print(f"  {week:>2}  {s['n_committed']:>3}  {s['won']:>3} "
+                      f"{s['lost']:>4} {s['slipped']:>4}  {wr}")
+            print("\nVolume curve (deals tagged COMMIT at each week): "
+                  + " ".join(f"w{w}:{n}" for w, n in
+                             sorted(result['volume_by_week'].items())))
+            print(f"\n{result.get('note', '')}")
 
     if args.analysis in ['calibration', 'all']:
         print("\n" + "=" * 70)
