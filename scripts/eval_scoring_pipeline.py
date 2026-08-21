@@ -93,10 +93,11 @@ def test_scoring_calls_use_temperature_zero():
         ("reflect() left un-pinned (not scoring path)",
          "temperature=0" not in ref),
     ]
-    # And the client actually forwards temperature to the API.
+    # And the client actually forwards temperature to the API. anthropic 1.x
+    # dropped the named `temperature` kwarg, so it must go via extra_body.
     llm = (REPO / "scripts" / "llm_client.py").read_text()
-    results.append(("llm_client forwards temperature to Anthropic",
-                    'kwargs["temperature"] = temperature' in llm))
+    results.append(("llm_client forwards temperature via extra_body (SDK 1.x)",
+                    'extra_body' in llm and '["temperature"] = temperature' in llm))
     return results
 
 

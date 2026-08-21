@@ -272,7 +272,14 @@ class LLMClient:
         if system:
             kwargs["system"] = system
         if temperature is not None:
-            kwargs["temperature"] = temperature
+            # anthropic-python 1.x dropped `temperature` from the typed
+            # messages.create() signature (sampling params were removed from
+            # the top-level API on Opus 4.7+/5/Fable, and the SDK stopped
+            # exposing them as named kwargs). Sonnet 4.6 / Haiku 4.5 — the
+            # models used on the scoring path — still honour temperature, but
+            # it must go through the extra_body passthrough now, not a kwarg
+            # (a kwarg raises TypeError: unexpected keyword argument).
+            kwargs.setdefault("extra_body", {})["temperature"] = temperature
 
         resp = self._sdk.messages.create(**kwargs)
 
