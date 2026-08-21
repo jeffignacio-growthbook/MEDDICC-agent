@@ -246,66 +246,104 @@ def query_week3_conversion(
     per_quarter = {}
     min_evidence = config.get('min_evidence_count', 30)
 
+    # Shared scope (defect 2): numerator and denominator draw from the SAME
+    # pipeline population, and conversion is computed PER PIPELINE (new business
+    # and renewal are different motions — pooling describes neither). Sourced
+    # from the shared rule, never reimplemented.
+    from analytics.point_in_time import (
+        load_scope_config, is_deal_in_analytics_scope)
+    from supabase_client import select_all
+    excl_pipelines, stage_cfg = load_scope_config()
+
+    def _qualified_in_own_pipeline(stage_id, pipeline_id):
+        # The shared stage rule (qualified order, not an excluded stage),
+        # with the pooled pipeline-exclusion NEUTRALISED (empty set) so each
+        # pipeline is scored on its own stages. A null stage is not qualified
+        # and so is not in a starting-pipeline denominator.
+        if stage_id is None or not str(stage_id).strip():
+            return False
+        return is_deal_in_analytics_scope(
+            str(stage_id), pipeline_id, set(), stage_cfg)
+
     for quarter in complete_quarters:
-        # Get week 3 snapshot (all deals in week 3)
-        week3_result = sb.table('deals_snapshot').select(
-            'deal_id, deal_value'
-        ).eq('fiscal_quarter', quarter).eq('week_of_quarter', 3).execute()
+        # Week-3 snapshot. DENOMINATOR (defect 3): deals open (the snapshot is
+        # already terminal-stage-excluded) AND qualified in analytics scope at
+        # the week-3 snapshot. NO close-date filter — the whole qualified open
+        # pipeline competes for the quarter.
+        week3_rows = select_all(
+            sb, 'deals_snapshot',
+            columns='deal_id,stage_id,pipeline_id,deal_value',
+            filters=[('eq', 'fiscal_quarter', quarter),
+                     ('eq', 'week_of_quarter', 3)])
 
-        week3_pipeline_count = len(week3_result.data)
-        week3_pipeline_value = sum(r.get('deal_value', 0) or 0 for r in week3_result.data)
+        denom_by_pipeline = defaultdict(int)
+        for r in week3_rows:
+            if _qualified_in_own_pipeline(r.get('stage_id'), r.get('pipeline_id')):
+                denom_by_pipeline[str(r.get('pipeline_id'))] += 1
 
-        # CRITICAL: Return NULL if sample size below evidence threshold
-        # A coverage target computed from 15 deals is worse than no answer
-        if week3_pipeline_count < min_evidence:
-            return {
-                'error': f'Insufficient week-3 pipeline data in quarter {quarter}',
-                'week3_pipeline_count': week3_pipeline_count,
-                'min_evidence_required': min_evidence,
-                'quarters_analyzed': 0,
-                'coverage_note': f'Week-3 snapshot has only {week3_pipeline_count} deals (need {min_evidence}+). Run full backfill.'
-            }
-
-        # NUMERATOR (defect 1): deals that TRANSITIONED to won DURING the
-        # quarter, counted by terminal won stage with an in-quarter close_date
-        # — never "won as of quarter end" (which cumulatively re-counted every
-        # deal ever won). Independent of the week-3 membership: a deal created
-        # and closed mid-quarter counts in the numerator without being in the
-        # week-3 denominator (the intentional asymmetry, defect 3).
+        # NUMERATOR (defect 1): in-quarter terminal wins, per pipeline.
         q_start_iso, q_end_iso = _quarter_window_iso(sb, quarter)
         won_by_pipeline = _in_quarter_won_by_pipeline(sb, q_start_iso, q_end_iso)
-        closed_won_count = sum(won_by_pipeline.values())  # Phase 1: pooled
 
-        # Dollar basis deferred to Phase 4 (null-propagation over the ledger);
-        # basis stays 'count' meanwhile.
-        rate_count = closed_won_count / week3_pipeline_count if week3_pipeline_count > 0 else 0
+        # Per-pipeline conversion. min_evidence gate applied PER PIPELINE:
+        # a pipeline whose scoped week-3 denominator is below the threshold
+        # returns null with a reason (gate unchanged, applied at the right
+        # granularity for a per-pipeline number).
+        pipelines = {}
+        for pid in sorted(set(denom_by_pipeline) | set(won_by_pipeline)):
+            denom = denom_by_pipeline.get(pid, 0)
+            won = won_by_pipeline.get(pid, 0)
+            if denom < min_evidence:
+                pipelines[pid] = {
+                    'rate_count': None,
+                    'closed_won_count': won,
+                    'week3_scoped_denominator': denom,
+                    'reason': f'denominator {denom} < min_evidence {min_evidence}',
+                }
+            else:
+                pipelines[pid] = {
+                    'rate_count': won / denom,
+                    'closed_won_count': won,
+                    'week3_scoped_denominator': denom,
+                }
 
         per_quarter[quarter] = {
-            'rate_count': rate_count,
-            'closed_won_count': closed_won_count,
-            'closed_won_by_pipeline': won_by_pipeline,
-            'week3_pipeline_count': week3_pipeline_count,
+            'by_pipeline': pipelines,
             'quarter_window': [q_start_iso, q_end_iso],
         }
 
-    # Calculate trailing average
+    # Trailing average per pipeline (each motion has its own conversion).
     basis = config.get('basis', 'count')
     rate_key = f'rate_{basis}'
-
-    rates = [q[rate_key] for q in per_quarter.values() if rate_key in q]
-    trailing_average = sum(rates) / len(rates) if rates else None
-
-    # Implied coverage target (1 / rate)
-    implied_coverage = (1 / trailing_average) if trailing_average and trailing_average > 0 else None
+    trailing_by_pipeline = {}
+    all_pids = sorted({pid for q in per_quarter.values()
+                       for pid in q['by_pipeline']})
+    for pid in all_pids:
+        rates = [q['by_pipeline'][pid][rate_key]
+                 for q in per_quarter.values()
+                 if pid in q['by_pipeline']
+                 and q['by_pipeline'][pid].get(rate_key) is not None]
+        avg = sum(rates) / len(rates) if rates else None
+        trailing_by_pipeline[pid] = {
+            'trailing_average': avg,
+            'implied_coverage_target': (1 / avg) if avg and avg > 0 else None,
+            'quarters_with_rate': len(rates),
+        }
 
     return {
         'per_quarter': per_quarter,
-        'trailing_average': trailing_average,
-        'implied_coverage_target': implied_coverage,
+        'trailing_by_pipeline': trailing_by_pipeline,
         'basis': basis,
         'quarters_analyzed': len(complete_quarters),
+        'scope': {
+            'source': 'point_in_time.is_deal_in_analytics_scope / load_scope_config',
+            'per_pipeline': True,
+            'excluded_stages': 'Meeting Set, Disqualified, Closed Won, Closed Lost',
+            'close_date_filter': 'none (whole qualified open pipeline)',
+            'pooled_excluded_pipelines_in_default_view': sorted(excl_pipelines),
+        },
         'coverage_note': f'{len(complete_quarters)} complete quarters available (85% category coverage)',
-        'complete_quarters': complete_quarters
+        'complete_quarters': complete_quarters,
     }
 
 
@@ -580,13 +618,28 @@ def main():
         else:
             print(f"\nQuarters analyzed: {result['quarters_analyzed']}")
             print(f"Basis: {result['basis']}")
-            print(f"Trailing average: {result['trailing_average']:.1%}" if result['trailing_average'] else "N/A")
-            print(f"Implied coverage target: {result['implied_coverage_target']:.2f}x" if result['implied_coverage_target'] else "N/A")
-            print(f"\n{result.get('coverage_note', '')}")
+            print(f"Scope: {result['scope']}")
 
-            print("\nPer-quarter breakdown:")
-            for quarter, stats in result.get('per_quarter', {}).items():
-                print(f"  {quarter}: {stats['rate_count']:.1%} ({stats['closed_won_count']}/{stats['week3_pipeline_count']})")
+            print("\nTrailing average by pipeline:")
+            for pid, t in result.get('trailing_by_pipeline', {}).items():
+                avg = t['trailing_average']
+                cov = t['implied_coverage_target']
+                avg_s = f"{avg:.1%}" if avg is not None else "N/A"
+                cov_s = f"{cov:.2f}x" if cov is not None else "N/A"
+                print(f"  {pid}: {avg_s}  implied coverage {cov_s}  "
+                      f"({t['quarters_with_rate']} quarters)")
+
+            print("\nPer-quarter / per-pipeline conversion "
+                  "(won / scoped week-3 denominator):")
+            for quarter, qd in result.get('per_quarter', {}).items():
+                for pid, s in qd['by_pipeline'].items():
+                    rate = s.get('rate_count')
+                    if rate is None:
+                        rate_s = f"null ({s.get('reason', 'n/a')})"
+                    else:
+                        rate_s = f"{rate:.1%}"
+                    print(f"  {quarter} / {pid}: {rate_s}  "
+                          f"({s['closed_won_count']}/{s['week3_scoped_denominator']})")
 
     if args.analysis in ['churn', 'all']:
         print("\n" + "=" * 70)

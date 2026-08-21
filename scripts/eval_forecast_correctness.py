@@ -55,12 +55,66 @@ def test_numerator_counts_in_quarter_transitions_not_terminal_status():
     print("  ✓ each won deal counts only in its close-date quarter (no cumulation)")
 
 
+# ── Phase 2 — shared scope + per-pipeline ──────────────────────────────
+
+def _make_select_all(week3_rows, deals_rows):
+    def _fake(sb, table, columns="*", filters=None, page_size=1000):
+        if table == "deals_snapshot":
+            return list(week3_rows)   # only the week-3 query reaches here
+        if table == "deals":
+            return list(deals_rows)
+        return []
+    return _fake
+
+
+def test_numerator_and_denominator_share_scope():
+    """Both sides apply the same pipeline+stage scope from the shared rule, and
+    conversion is computed per pipeline. Meeting Set / null-stage deals are not
+    in the denominator; default and renewal are separate."""
+    print("\n[TEST] numerator & denominator share scope; per-pipeline")
+    from unittest.mock import Mock
+    # week-3 snapshot: 2 qualified default (Discovery/Scoping), 1 Meeting Set
+    # (excluded), 1 null-stage (not qualified), 1 qualified renewal.
+    week3 = [
+        {"deal_id": "d1", "stage_id": "appointmentscheduled", "pipeline_id": "default", "deal_value": 1},
+        {"deal_id": "d2", "stage_id": "qualifiedtobuy", "pipeline_id": "default", "deal_value": 1},
+        {"deal_id": "m1", "stage_id": "79653122", "pipeline_id": "default", "deal_value": 1},  # Meeting Set
+        {"deal_id": "n1", "stage_id": None, "pipeline_id": "default", "deal_value": 1},         # null stage
+        {"deal_id": "r1", "stage_id": "1297321618", "pipeline_id": "866608541", "deal_value": 1},  # renewal
+    ]
+    deals = [
+        {"deal_id": "w1", "stage": "closedwon", "close_date": "2026-03-01", "pipeline_id": "default"},
+        {"deal_id": "wr", "stage": "1297321623", "close_date": "2026-03-05", "pipeline_id": "866608541"},  # renewal won
+    ]
+    with patch.object(fa, "_get_complete_quarters",
+                      return_value=["FY2026 Q4", "FY2027 Q1"]), \
+         patch.object(fa, "_quarter_window_iso",
+                      return_value=("2026-02-01", "2026-04-30")), \
+         patch.object(supabase_client, "select_all",
+                      _make_select_all(week3, deals)):
+        result = fa.query_week3_conversion(Mock())
+
+    q = result["per_quarter"]["FY2027 Q1"]["by_pipeline"]
+    assert q["default"]["week3_scoped_denominator"] == 2, \
+        f"default denom should exclude Meeting Set + null-stage, got {q['default']}"
+    assert q["866608541"]["week3_scoped_denominator"] == 1, \
+        f"renewal denom should be its own, got {q.get('866608541')}"
+    # per-pipeline numerator attribution (renewal won stage is a renewal win)
+    assert q["default"]["closed_won_count"] == 1
+    assert q["866608541"]["closed_won_count"] == 1
+    assert result["scope"]["per_pipeline"] is True
+    assert "none" in result["scope"]["close_date_filter"]
+    print("  ✓ denom excludes Meeting Set/null; default vs renewal separate; "
+          "scope reported")
+
+
 def main():
     print("=" * 70)
     print("FORECAST CORRECTNESS TESTS")
     print("=" * 70)
     tests = [
         test_numerator_counts_in_quarter_transitions_not_terminal_status,
+        test_numerator_and_denominator_share_scope,
     ]
     passed = failed = 0
     for t in tests:
