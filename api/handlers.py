@@ -918,19 +918,56 @@ async def query_won_deals(params: dict, sb) -> dict:
     }
 
 async def query_rubric_scores_bulk(params: dict, sb) -> dict:
-    """MEDDICC scores for a known set of deal_ids.
-    Used by entity-scoped follow-up questions like
-    'what are the meddicc scores for these deals?'"""
-    deal_ids = params["deal_ids"]
+    """MEDDICC scores for a set of deals.
+
+    Two entry paths:
+      * entity-scoped follow-up ("what are the MEDDICC scores for these deals?")
+        passes deal_ids from prior thread context;
+      * a direct question naming a company ("score the LiveSport deal on
+        MEDDICC") passes `company` — we resolve it to its deal(s) here.
+
+    Resolving the company in-handler answers the question in one call. Before
+    this, a company-named question routed here had no deal_ids, raised
+    KeyError('deal_ids'), fell through to the dynamic loop, and burned the query
+    budget — surfacing a "Hit query budget with partial data" message even
+    though the deal and its scores were right there. Never raises on a missing
+    key now; returns a clear error instead.
+    """
+    deal_ids = list(params.get("deal_ids") or [])
+    resolved_from_company = False
+    if not deal_ids and params.get("company"):
+        company = str(params["company"]).strip()
+        matches = select_all(sb, "deals", columns="deal_id,company_name",
+            filters=[("ilike", "company_name", f"%{company}%")])
+        deal_ids = [d["deal_id"] for d in matches]
+        resolved_from_company = True
+
+    if not deal_ids:
+        return {"scores": [], "deal_count": 0, "scored_count": 0,
+                "error": "No deal IDs provided and no company to resolve. "
+                         "Name a deal (e.g. 'score the Acme deal on MEDDICC') "
+                         "or ask about a specific set of deals."}
+
     rows = select_all(sb, "analyses",
-        columns="deal_id,company_name,overall_score,"
+        columns="deal_id,company_name,overall_score,metrics_score,"
                 "champion_score,economic_buyer_score,"
                 "decision_criteria_score,"
                 "decision_process_score,competition_score,"
                 "pain_score,analyzed_at",
-        filters=[("in", "deal_id", deal_ids)])
-    return {"scores": rows, "deal_count": len(deal_ids),
-            "scored_count": len(rows)}
+        filters=[("in_", "deal_id", deal_ids)])
+
+    # Keep the latest analysis per deal — the current MEDDICC state — rather
+    # than every historical scoring row (LiveSport had 5).
+    latest = {}
+    for a in rows:
+        did = a.get("deal_id")
+        if (did not in latest or
+                str(a.get("analyzed_at") or "") > str(latest[did].get("analyzed_at") or "")):
+            latest[did] = a
+    scores = list(latest.values())
+    return {"scores": scores, "deal_count": len(deal_ids),
+            "scored_count": len(scores),
+            "resolved_from_company": resolved_from_company}
 
 async def query_deal_stages_bulk(params: dict, sb) -> dict:
     """Current stage for a known set of deal_ids."""
@@ -951,19 +988,27 @@ async def query_deal_stages_bulk(params: dict, sb) -> dict:
 
 async def query_deal_owners_bulk(params: dict, sb) -> dict:
     """Owner for a known set of deal_ids."""
-    deal_ids = params["deal_ids"]
+    deal_ids = params.get("deal_ids") or []
+    if not deal_ids:
+        return {"owners": [],
+                "error": "No deal IDs provided. This handler requires a "
+                         "specific set of deals."}
     rows = select_all(sb, "deals",
         columns="deal_id,company_name,owner_email",
-        filters=[("in", "deal_id", deal_ids)])
+        filters=[("in_", "deal_id", deal_ids)])
     return {"owners": rows}
 
 async def query_deal_values_bulk(params: dict, sb) -> dict:
     """ARR/value for a known set of deal_ids."""
-    deal_ids = params["deal_ids"]
+    deal_ids = params.get("deal_ids") or []
+    if not deal_ids:
+        return {"values": [], "total_arr": 0,
+                "error": "No deal IDs provided. This handler requires a "
+                         "specific set of deals."}
     rows = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,"
                 "arr_usd,new_arr,expansion_arr",
-        filters=[("in", "deal_id", deal_ids)])
+        filters=[("in_", "deal_id", deal_ids)])
     total = sum(r.get("arr_usd") or 0 for r in rows)
     return {"values": rows, "total_arr": total}
 
