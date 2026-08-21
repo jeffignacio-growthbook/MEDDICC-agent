@@ -80,3 +80,26 @@ jobs:
           else
             PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/reconstruct_forecast_category.py --dry-run
           fi
+
+      - name: "Upload before-state backup (durable, execute only)"
+        if: ${{ inputs.mode == 'execute' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: forecast-category-backup
+          path: forecast_category_backup.json
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: "Phase 4 — run the unblocked analyses (execute only)"
+        if: ${{ inputs.mode == 'execute' }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          # Category churn aggregates COMMIT across quarters; it may yield a
+          # usable retention curve + empirical anchor even where per-quarter
+          # commit calibration stays below the gate. Calibration anchors on that
+          # measured week and returns null-with-reason for thin quarters. Gates
+          # unchanged.
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/forecast_analyses.py churn
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/forecast_analyses.py calibration

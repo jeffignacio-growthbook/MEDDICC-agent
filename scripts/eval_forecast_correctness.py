@@ -200,6 +200,41 @@ def test_waterfall_qualification_is_point_in_time_not_current_stage():
     print("  ✓ membership follows the qualified_date event, not current stage")
 
 
+# ── Phase 3 — forecast_category write touches only the category columns ──
+
+def test_update_touches_only_category_columns():
+    """The forecast_category write updates forecast_category and its confidence
+    note ONLY. stage_id, deal_value, close_date and every other column are never
+    in the update payload. Locks the invariant the prompt requires."""
+    print("\n[TEST] forecast_category write touches only the two category columns")
+    from reconstruct_forecast_category import _update_payload, UPDATE_COLUMNS
+    assert set(UPDATE_COLUMNS) == {'forecast_category', 'data_quality_notes'}, \
+        f"UPDATE_COLUMNS drifted: {UPDATE_COLUMNS}"
+    payload = _update_payload('COMMIT', 'value_confidence=exact; '
+                              'close_date_confidence=exact; category_confidence=exact')
+    assert set(payload.keys()) == set(UPDATE_COLUMNS), \
+        f"update payload touches columns beyond the two allowed: {set(payload)}"
+    for forbidden in ('stage_id', 'deal_value', 'close_date', 'stage_order',
+                      'deal_status', 'pipeline_id'):
+        assert forbidden not in payload, f"payload must never carry {forbidden}"
+    print("  ✓ payload = {forecast_category, data_quality_notes}; nothing else")
+
+
+def test_category_note_upsert_preserves_other_confidences():
+    """Appending category_confidence must preserve value/close_date confidences
+    and be idempotent (a re-run replaces, never stacks, the category token)."""
+    print("\n[TEST] category note upsert preserves the other confidences")
+    from reconstruct_forecast_category import _upsert_category_note
+    base = "value_confidence=exact; close_date_confidence=cleared"
+    once = _upsert_category_note(base, 'pre_history')
+    assert 'value_confidence=exact' in once and 'close_date_confidence=cleared' in once
+    assert once.count('category_confidence=') == 1 and 'category_confidence=pre_history' in once
+    twice = _upsert_category_note(once, 'exact')  # idempotent replace
+    assert twice.count('category_confidence=') == 1 and 'category_confidence=exact' in twice
+    assert 'value_confidence=exact' in twice, "must not drop the other tokens"
+    print("  ✓ other confidences preserved; category token replaced, never stacked")
+
+
 def main():
     print("=" * 70)
     print("FORECAST CORRECTNESS TESTS")
@@ -211,6 +246,8 @@ def main():
         test_null_value_excluded_from_both_sides_and_counted,
         test_dollar_basis_returns_null_above_null_threshold,
         test_waterfall_qualification_is_point_in_time_not_current_stage,
+        test_update_touches_only_category_columns,
+        test_category_note_upsert_preserves_other_confidences,
     ]
     passed = failed = 0
     for t in tests:

@@ -89,6 +89,152 @@ def _upsert_category_note(existing_note: str, cat_conf: str) -> str:
     return token
 
 
+def _update_payload(category, note):
+    """The exact column set an UPDATE may touch — forecast_category and the
+    confidence note, nothing else. Factored so a test can assert the invariant."""
+    return {'forecast_category': category, 'data_quality_notes': note}
+
+
+PROBE_DEAL_ID = '__category_write_probe__'
+
+
+def _writable_probe(sb):
+    """Insert-and-rollback probe: prove forecast_category + data_quality_notes
+    actually accept a write before touching real rows. A missing column, type
+    error or constraint surfaces HERE, at zero cost. The probe row uses a
+    sentinel deal_id and is always deleted, even on failure. Returns (ok, err)."""
+    probe = {
+        'deal_id': PROBE_DEAL_ID, 'snapshot_date': '1970-01-01',
+        'pipeline_id': 'default', 'stage_id': None, 'stage_order': None,
+        'deal_value': None, 'close_date': None, 'owner_email': None,
+        'deal_status': 'active', 'snapshot_source': 'backfilled',
+        'fiscal_quarter': 'PROBE', 'week_of_quarter': 1,
+        'forecast_category': 'COMMIT',
+        'data_quality_notes': 'category_confidence=exact',
+    }
+    ok, err = True, None
+    try:
+        sb.table('deals_snapshot').upsert(
+            probe, on_conflict='deal_id,snapshot_date').execute()
+        # read it back and confirm the two columns took the values
+        r = sb.table('deals_snapshot').select(
+            'forecast_category,data_quality_notes').eq(
+            'deal_id', PROBE_DEAL_ID).execute()
+        got = (r.data or [{}])[0]
+        if got.get('forecast_category') != 'COMMIT':
+            ok, err = False, f"probe read-back mismatch: {got}"
+    except Exception as e:
+        ok, err = False, str(e)
+    finally:
+        try:
+            sb.table('deals_snapshot').delete().eq(
+                'deal_id', PROBE_DEAL_ID).execute()
+        except Exception:
+            pass
+    return ok, err
+
+
+def _count_by_source(sb, source):
+    rows = select_all(sb, 'deals_snapshot', columns='deal_id',
+                      filters=[('eq', 'snapshot_source', source)])
+    return len(rows)
+
+
+def execute(sb, field_history):
+    """Phase 3 write. Populate forecast_category (raw point-in-time value) for
+    RESOLVED backfilled rows, plus its confidence note. Touches ONLY the two
+    category columns via per-row .update() (never an upsert of the whole row,
+    never an insert). prospective rows (Method 1's) are excluded by the load
+    filter and counted before/after as a guard. Backup of the before-state is
+    written and re-read/count-matched before any write. Idempotent: a row
+    already carrying the reconstructed value is skipped, so a re-run is a no-op
+    and a partial run resumes cleanly. Gates unchanged — this only fills a
+    wrongly-null column; it does not decide whether any analysis clears them."""
+    print("=" * 72)
+    print("FORECAST_CATEGORY RECONSTRUCTION — EXECUTE (writing)")
+    print("=" * 72)
+
+    ok, err = _writable_probe(sb)
+    if not ok:
+        raise SystemExit(f"ABORT: schema/writable probe failed: {err}")
+    print("✓ schema/writable probe passed (forecast_category + data_quality_notes)")
+
+    prospective_before = _count_by_source(sb, 'prospective')
+    print(f"prospective rows before: {prospective_before} (must be unchanged)")
+
+    rows = load_backfilled_rows(sb)
+    rows.sort(key=lambda r: (str(r['deal_id']), str(r['snapshot_date'])))  # stable
+
+    to_write, skip_done, anomalies = [], 0, []
+    dist = Counter()
+    for r in rows:
+        cat, conf = _reconstruct(field_history, r['deal_id'], r['snapshot_date'])
+        if cat is None:
+            continue  # leave genuinely-null rows null (pre_history / no_history)
+        cur = r.get('forecast_category')
+        if cur == cat:
+            skip_done += 1  # already written — idempotent no-op
+            continue
+        if cur is not None:
+            # a non-null value that disagrees with the reconstruction is NOT
+            # ours to overwrite — record and skip rather than clobber.
+            anomalies.append((r['deal_id'], r['snapshot_date'], cur, cat))
+            continue
+        note = _upsert_category_note(r.get('data_quality_notes'), conf)
+        to_write.append({'deal_id': r['deal_id'],
+                         'snapshot_date': r['snapshot_date'],
+                         'category': cat, 'note': note,
+                         'note_before': r.get('data_quality_notes')})
+        dist[cat] += 1
+
+    print(f"resolved rows to write: {len(to_write)}  "
+          f"already-correct (skipped): {skip_done}  anomalies: {len(anomalies)}")
+    if anomalies:
+        print("  ⚠️ non-null forecast_category disagreeing with reconstruction "
+              "(left untouched):")
+        for a in anomalies[:10]:
+            print(f"      {a}")
+
+    # Backup the before-state, re-read and count-match BEFORE any write.
+    backup = [{'deal_id': w['deal_id'], 'snapshot_date': w['snapshot_date'],
+               'forecast_category_before': None,  # backfilled column is null pre-write
+               'data_quality_notes_before': w['note_before']}
+              for w in to_write]
+    with open(BACKUP_FILE, 'w') as f:
+        json.dump({'rows': backup, 'count': len(backup)}, f)
+    with open(BACKUP_FILE) as f:
+        reread = json.load(f)
+    assert reread['count'] == len(to_write) == len(reread['rows']), \
+        "backup count mismatch — refusing to write"
+    print(f"✓ backup written and count-matched: {BACKUP_FILE} "
+          f"({len(backup)} rows)")
+
+    if not to_write:
+        print("nothing to write (idempotent no-op).")
+    else:
+        written = 0
+        for w in to_write:
+            sb.table('deals_snapshot').update(
+                _update_payload(w['category'], w['note'])).eq(
+                'deal_id', w['deal_id']).eq(
+                'snapshot_date', w['snapshot_date']).execute()
+            written += 1
+            if written % 500 == 0:
+                print(f"  written {written}/{len(to_write)}")
+        print(f"✓ wrote {written} rows (forecast_category + note only)")
+
+    prospective_after = _count_by_source(sb, 'prospective')
+    print(f"prospective rows after: {prospective_after}")
+    assert prospective_after == prospective_before, \
+        f"prospective rows changed {prospective_before}->{prospective_after}!"
+    print("✓ prospective rows untouched")
+
+    print("\ncategory distribution WRITTEN this run:")
+    for k, v in sorted(dist.items(), key=lambda kv: -kv[1]):
+        print(f"   {k}: {v}")
+    return 0
+
+
 def load_backfilled_rows(sb):
     """Existing backfilled snapshot rows we may update. prospective rows are
     Method 1's and excluded here (protected)."""
@@ -209,9 +355,7 @@ def main():
           f"from {args.cache_file}")
 
     if args.execute:
-        print("--execute is implemented in Phase 3; refusing to write in the "
-              "dry-run phase.")
-        return 2
+        return execute(sb, field_history)
     report(sb, field_history)
     return 0
 
