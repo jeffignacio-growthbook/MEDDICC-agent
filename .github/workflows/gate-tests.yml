@@ -42,15 +42,6 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_intent_param_contract.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_meddicc_score_presentation.py
 
-      - name: "DIAGNOSTIC — LiveSport stored row + corrected synthesis (temp)"
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        continue-on-error: true
-        run: |
-          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/diagnose_livesport_score.py
-
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
