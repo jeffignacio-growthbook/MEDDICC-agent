@@ -50,6 +50,10 @@ jobs:
       - name: Fetch property history from HubSpot
         env:
           HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          # hubspot_history.py --all reads the deal id list from Supabase, then
+          # fetches each deal's property history from HubSpot — needs both.
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
           python3 scripts/analytics/hubspot_history.py --all --rate-limit 5
           ls -lh property_history_cache.json
