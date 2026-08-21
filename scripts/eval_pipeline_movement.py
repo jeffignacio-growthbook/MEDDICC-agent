@@ -327,39 +327,6 @@ def test_stage_deals_view_lists_deals_in_a_stage():
     print("  ✓ stage_deals returns the filtered deal list; unknown stage → data_gap")
 
 
-def test_stage_copied_source_caveats_movement():
-    """backfill_current_quarter stamps the current stage on every week, so
-    stage exits are structurally zero. The movement/deal_changes views must
-    say so — otherwise a structural zero reads as a real 'nothing moved'."""
-    print("\n[TEST] stage-copied source caveated on movement/deal_changes")
-    # Same stage per deal across both weeks (as backfill_current_quarter does),
-    # plus one deal that entered on the second date.
-    rows = [
-        _row("a", "2026-08-10", "appointmentscheduled", order=1,
-             source="backfill_current_quarter", fq="FY2027 Q3", woq=1),
-        _row("b", "2026-08-10", "qualifiedtobuy", order=2,
-             source="backfill_current_quarter", fq="FY2027 Q3", woq=1),
-        _row("a", "2026-08-17", "appointmentscheduled", order=1,
-             source="backfill_current_quarter", fq="FY2027 Q3", woq=2),
-        _row("b", "2026-08-17", "qualifiedtobuy", order=2,
-             source="backfill_current_quarter", fq="FY2027 Q3", woq=2),
-        _row("c", "2026-08-17", "appointmentscheduled", order=1,
-             source="backfill_current_quarter", fq="FY2027 Q3", woq=2),  # entered
-    ]
-    mv = _run(rows, {"view": "movement", "fiscal_quarter": "FY2027 Q3"})
-    # structural: every stage shows 0 exits
-    assert all(s["exited"] == 0 for s in mv["by_stage"]), \
-        "stage-copied source yields structurally zero exits"
-    assert any("point-in-time" in g or "stamps each deal" in g
-               for g in mv["data_gaps"]), \
-        f"movement must caveat the stage-copied source, got {mv['data_gaps']}"
-    # composition (a pure count) is valid on the same source → no such caveat
-    comp = _run(rows, {"view": "composition", "fiscal_quarter": "FY2027 Q3"})
-    assert not any("stamps each deal" in g for g in comp["data_gaps"]), \
-        "composition is a valid point-in-time count; should not carry the caveat"
-    print("  ✓ movement caveats stage-copied source; composition does not")
-
-
 def main():
     print("=" * 70)
     print("PIPELINE MOVEMENT HANDLER TESTS")
@@ -375,7 +342,6 @@ def main():
         test_views_emit_entity_bearing_rows_for_thread_context,
         test_movement_by_stage_carries_drillable_deal_ids,
         test_stage_deals_view_lists_deals_in_a_stage,
-        test_stage_copied_source_caveats_movement,
     ]
     passed = failed = 0
     for t in tests:

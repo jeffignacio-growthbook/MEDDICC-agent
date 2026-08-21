@@ -2687,15 +2687,6 @@ _PM_SNAPSHOT_COLUMNS = (
 _PM_CONFIDENCE_KEYS = ("exact", "pre_history", "no_history")
 _PM_VIEWS = ("movement", "composition", "deal_changes", "curve", "stage_deals")
 
-# Snapshot sources that stamp each deal's CURRENT stage onto every week rather
-# than reconstructing stage point-in-time (see backfill_current_quarter.py:
-# "using current deals table state"). For these, a deal's stage is identical
-# across consecutive weeks by construction, so within-quarter stage transitions
-# (moves/exits) cannot be observed — only entered/left (membership) is real.
-# Movement / deal_changes views must caveat this or a structural zero reads as
-# a real "nothing moved" finding.
-_PM_STAGE_COPIED_SOURCES = frozenset({"backfill_current_quarter"})
-
 
 def _pm_load_scoping():
     """Import the SHARED analytics-scoping functions (not reimplemented)."""
@@ -3064,18 +3055,6 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     all_dates = sorted(by_date.keys())
 
     base["snapshot_source"] = chosen_source
-
-    # Caveat sources that copy the current stage onto every week: their
-    # within-quarter stage transitions are structurally ~zero, not a real
-    # "nothing moved". Only movement / deal_changes infer transitions.
-    if chosen_source in _PM_STAGE_COPIED_SOURCES and view in ("movement", "deal_changes"):
-        data_gaps.append(
-            f"source '{chosen_source}' stamps each deal's CURRENT stage on "
-            "every week (not a point-in-time stage reconstruction), so "
-            "within-quarter stage moves/exits are not observable here — exits "
-            "will read as ~0 and only entered/left (membership) is real. Use a "
-            "'backfilled' quarter for true stage movement."
-        )
 
     if not all_dates:
         data_gaps.append(
