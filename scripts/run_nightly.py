@@ -301,8 +301,11 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer,
             if summary and summary.strip():
                 all_summaries.append((call.get('date', ''), summary))
 
-        # Sort by date ascending, extract just summaries
+        # Sort by date ascending, keep (date, summary) pairs so the full call
+        # set can be handed to the generator oldest → newest as the ONLY
+        # scoring evidence (FIX_MEDDICC_SCORING_PIPELINE Part 1).
         all_summaries.sort(key=lambda x: x[0])
+        dated_summaries = list(all_summaries)
         all_summaries = [s for _, s in all_summaries]
 
         # GUARD 1: No calls found
@@ -368,9 +371,38 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer,
                 'reason': f'most recent call summary too short ({len(recent_call_summary)} chars)'
             }
 
-        # Run MEDDICC agent
+        # Build the FULL call evidence (oldest → newest) — the generator scores
+        # from every call, not just the most recent one (Part 1). The old split
+        # (last call + Haiku-summarised prior scores) made the score a function
+        # of the previous run's output, which is what made it drift ±6 on frozen
+        # evidence. cumulative_state is still built above, but now it is passed
+        # for CHANGE DETECTION only and is excluded from scoring in the prompt.
+        CALL_EVIDENCE_CHAR_BUDGET = 120_000  # ~30k tokens; full sets fit easily
+        blocks, truncated_calls = [], 0
+        # newest → oldest while accumulating, so truncation drops OLDEST first,
+        # then reverse to present oldest → newest.
+        used = 0
+        kept = []
+        for dt, summ in reversed(dated_summaries):
+            block = f"## Call — {dt or 'unknown date'}\n\n{summ}"
+            if used + len(block) > CALL_EVIDENCE_CHAR_BUDGET and kept:
+                truncated_calls += 1
+                continue
+            used += len(block)
+            kept.append(block)
+        kept.reverse()
+        all_calls_text = "\n\n---\n\n".join(kept)
+        if truncated_calls:
+            all_calls_text = (
+                f"[NOTE: {truncated_calls} oldest call(s) omitted to fit the "
+                f"context budget; scoring is from the {len(kept)} most recent "
+                f"of {len(dated_summaries)} calls.]\n\n" + all_calls_text)
+            print(f"   ⚠️  {company_name}: truncated {truncated_calls} oldest "
+                  f"call(s) from scoring evidence (budget)")
+
+        # Run MEDDICC agent — score fresh from ALL calls
         result = run_agent(
-            call_summary=recent_call_summary,
+            call_summary=all_calls_text,
             cumulative_state=cumulative_state,
             deal_context=deal_context,
             tracker=tracker,

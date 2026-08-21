@@ -223,6 +223,7 @@ class LLMClient:
         messages:   list[dict],
         system:     Optional[str] = None,
         max_tokens: int = 1000,
+        temperature: Optional[float] = None,
     ) -> LLMResponse:
         """
         Send a chat completion request.
@@ -244,8 +245,10 @@ class LLMClient:
         """
         try:
             if self.provider == "anthropic":
-                return self._complete_anthropic(messages, system, max_tokens)
-            return self._complete_openai(messages, system, max_tokens)
+                return self._complete_anthropic(messages, system, max_tokens,
+                                                 temperature)
+            return self._complete_openai(messages, system, max_tokens,
+                                         temperature)
         except Exception as e:
             if self._fallback_client:
                 logger.warning(
@@ -253,13 +256,14 @@ class LLMClient:
                     f"falling back to Anthropic"
                 )
                 return self._fallback_client.complete(
-                    messages, system, max_tokens
+                    messages, system, max_tokens, temperature
                 )
             raise
 
     # ── Anthropic ──────────────────────────────────────────────────────
 
-    def _complete_anthropic(self, messages, system, max_tokens) -> LLMResponse:
+    def _complete_anthropic(self, messages, system, max_tokens,
+                            temperature=None) -> LLMResponse:
         kwargs: dict = {
             "model":      self.model,
             "max_tokens": max_tokens,
@@ -267,6 +271,8 @@ class LLMClient:
         }
         if system:
             kwargs["system"] = system
+        if temperature is not None:
+            kwargs["temperature"] = temperature
 
         resp = self._sdk.messages.create(**kwargs)
 
@@ -295,7 +301,8 @@ class LLMClient:
 
     # ── OpenAI / Fireworks ─────────────────────────────────────────────
 
-    def _complete_openai(self, messages, system, max_tokens) -> LLMResponse:
+    def _complete_openai(self, messages, system, max_tokens,
+                         temperature=None) -> LLMResponse:
         oai_messages: list[dict] = []
 
         if system:
@@ -314,11 +321,14 @@ class LLMClient:
             else:
                 oai_messages.append({"role": msg["role"], "content": content})
 
-        resp = self._sdk.chat.completions.create(
-            model=self.model,
-            messages=oai_messages,
-            max_tokens=max_tokens,
-        )
+        oai_kwargs: dict = {
+            "model": self.model,
+            "messages": oai_messages,
+            "max_tokens": max_tokens,
+        }
+        if temperature is not None:
+            oai_kwargs["temperature"] = temperature
+        resp = self._sdk.chat.completions.create(**oai_kwargs)
 
         choice = resp.choices[0]
         text   = choice.message.content or ""

@@ -57,20 +57,33 @@ def build_initial_messages(
     except (ValueError, TypeError):
         arr_formatted = str(arr_value)
 
+    # Stage is deliberately EXCLUDED (Part 3): it is stale often enough to
+    # corrupt the score, and the score must stay independent of stage so the
+    # stage-vs-score hygiene comparison isn't circular.
     deal_info = f"""**Company**: {company_props.get('name', 'Unknown')}
-**Stage**: {deal_props.get('dealstage', 'Unknown')}
 **ARR**: ${arr_formatted}
 **Close Date**: {deal_props.get('closedate', 'Unknown')}
 **Contacts**: {len(contacts)} contacts associated"""
 
-    # Build user message
-    user_content = f"""# Recent Call Summary
+    # Build user message.
+    # The score is a pure function of the call evidence + deal facts. ALL calls
+    # (oldest → newest) are the evidence; the prior state is passed for change
+    # description ONLY and must not move the score.
+    user_content = f"""# All Calls for This Deal (oldest → newest)
+
+SCORE EVERY MEDDICC COMPONENT ONLY FROM THE EVIDENCE IN THESE CALLS, plus the
+deal facts below. Read all of them before scoring.
 
 {call_summary}
 
 ---
 
-# Cumulative MEDDICC State (from all previous calls)
+# Prior MEDDICC State (previous run) — CONTEXT FOR CHANGE ONLY
+
+This is last night's output. It is provided ONLY so you can describe what has
+changed since then. It MUST NOT influence the scores. Score each component
+fresh from the calls above as if you had never seen this. Do not anchor to,
+average with, or defer to these numbers.
 
 ```json
 {cumulative_json}
@@ -129,7 +142,8 @@ def generate(
         response = client.complete(
             messages=messages,
             system=claude_md,
-            max_tokens=4000
+            max_tokens=4000,
+            temperature=0,  # scoring must be deterministic, not a sample
         )
 
         if tracker:
@@ -215,7 +229,9 @@ CRITICAL: Return ONLY a valid JSON object. Do NOT include any explanatory text, 
     response = client.complete(
         messages=[{"role": "user", "content": evaluation_prompt}],
         system=rubric + "\n\nIMPORTANT: You must return ONLY valid JSON. No explanations, no markdown, no text outside the JSON object.",
-        max_tokens=4000
+        max_tokens=4000,
+        temperature=0,  # evaluator gates `passed` and drives regeneration —
+                        # its variance would leak back into the score
     )
 
     if tracker:
