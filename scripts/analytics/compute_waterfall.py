@@ -181,7 +181,7 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
     Args:
         sb: Supabase client
         config: Client configuration
-        qual_map: Deal qualification data (highest_stage_order_reached, qualified_date)
+        qual_map: {deal_id: {'qualified_date': ...}} — point-in-time membership
         threshold: Qualification stage_order threshold
         prev_date: Previous snapshot date (str)
         new_date: New snapshot date (str)
