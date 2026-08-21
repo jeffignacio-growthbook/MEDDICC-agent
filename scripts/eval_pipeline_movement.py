@@ -19,7 +19,7 @@ import types
 import inspect
 import asyncio
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import patch, AsyncMock
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "api"))
@@ -43,16 +43,15 @@ from handlers import query_pipeline_movement  # noqa: E402
 
 def _row(deal_id, date, stage_id, *, pipeline_id="default", order=None,
          source="backfilled", confidence="exact", owner="ae@co.com",
-         fq="FY2027 Q2", woq=1):
+         fq="FY2027 Q2", woq=1, close_date=None):
     return {
         "deal_id": str(deal_id),
         "snapshot_date": date,
         "pipeline_id": pipeline_id,
         "stage_id": stage_id,
         "stage_order": order,
-        "close_date": None,
+        "close_date": close_date,
         "owner_email": owner,
-        "deal_status": "active",
         "snapshot_source": source,
         "backfill_confidence": confidence,
         "fiscal_quarter": fq,
@@ -60,21 +59,36 @@ def _row(deal_id, date, stage_id, *, pipeline_id="default", order=None,
     }
 
 
-def _make_select_all(rows):
-    """Fake select_all that honors the eq filters the handler passes."""
-    def _fake(sb, table, columns="*", filters=None, page_size=1000):
-        assert table == "deals_snapshot", f"unexpected table {table}"
-        out = list(rows)
+def _make_select_all(rows, companies=None):
+    """Fake select_all honoring eq/neq/in_ filters, for both tables the handler
+    now reads: 'deals_snapshot' (the rows) and 'deals' (deal_id→company_name)."""
+    companies = companies or {}
+
+    def _apply(out, filters):
         for f in (filters or []):
-            if f[0] == "eq":
-                col, val = f[1], f[2]
-                out = [r for r in out if str(r.get(col)) == str(val)]
+            op = f[0]
+            if op == "eq":
+                out = [r for r in out if str(r.get(f[1])) == str(f[2])]
+            elif op == "neq":
+                out = [r for r in out if str(r.get(f[1])) != str(f[2])]
+            elif op in ("in_", "in"):
+                vals = {str(v) for v in f[2]}
+                out = [r for r in out if str(r.get(f[1])) in vals]
         return out
+
+    def _fake(sb, table, columns="*", filters=None, page_size=1000):
+        if table == "deals_snapshot":
+            return _apply(list(rows), filters)
+        if table == "deals":
+            drows = [{"deal_id": k, "company_name": v}
+                     for k, v in companies.items()]
+            return _apply(drows, filters)
+        raise AssertionError(f"unexpected table {table}")
     return _fake
 
 
-def _run(rows, params):
-    with patch.object(handlers, "select_all", _make_select_all(rows)):
+def _run(rows, params, companies=None):
+    with patch.object(handlers, "select_all", _make_select_all(rows, companies)):
         return asyncio.run(query_pipeline_movement(params, sb=object()))
 
 
@@ -327,6 +341,124 @@ def test_stage_deals_view_lists_deals_in_a_stage():
     print("  ✓ stage_deals returns the filtered deal list; unknown stage → data_gap")
 
 
+def test_new_deals_not_counted_as_stage_movement():
+    """A deal absent from the prior snapshot is new_to_pipeline, never
+    'entered' a stage. Reporting creation as movement overstates activity."""
+    print("\n[TEST] new deals are new_to_pipeline, not stage movement")
+    rows = [
+        _row("d1", "2026-07-20", "appointmentscheduled", order=1),
+        _row("d1", "2026-07-27", "appointmentscheduled", order=1),  # unchanged
+        _row("d2", "2026-07-27", "appointmentscheduled", order=1),  # NEW deal
+    ]
+    dc = _run(rows, {"view": "deal_changes", "fiscal_quarter": "FY2027 Q2"})
+    dirs = {c["deal_id"]: c["direction"] for c in dc["changes"]}
+    assert dirs.get("d2") == "new_to_pipeline", dirs
+    assert "entered" not in dc["summary"], f"old label leaked: {dc['summary']}"
+    assert dc["summary"].get("new_to_pipeline") == 1
+
+    mv = _run(rows, {"view": "movement", "fiscal_quarter": "FY2027 Q2"})
+    disc = next(s for s in mv["by_stage"] if s["stage"] == "Discovery")
+    assert disc["new_to_pipeline"] == 1, disc
+    assert disc["entered_from_other_stage"] == 0, disc
+    assert mv["summary"]["new_to_pipeline"] == 1
+    assert mv["summary"]["moved_between_stages"] == 0
+    print("  ✓ a new deal is new_to_pipeline; not counted as a stage entry")
+
+
+def test_deal_changes_include_company_name():
+    """Individual deals carry company_name, not just deal_id — both in the
+    output and in the entity payload for drill-down."""
+    print("\n[TEST] deal_changes carry company_name (output + entity payload)")
+    rows = [
+        _row("d1", "2026-07-20", "appointmentscheduled", order=1),
+        _row("d1", "2026-07-27", "qualifiedtobuy", order=2),  # advanced
+    ]
+    dc = _run(rows, {"view": "deal_changes", "fiscal_quarter": "FY2027 Q2"},
+              companies={"d1": "Acme Corp"})
+    assert dc["changes"][0]["company_name"] == "Acme Corp", dc["changes"]
+    assert dc["rows"][0]["company_name"] == "Acme Corp", dc["rows"]
+    print("  ✓ company_name present in changes and in the entity rows")
+
+
+def test_scope_statement_present_and_explicit():
+    """The response states the close-date treatment and excluded stages, so a
+    count can be reconciled against a CRM board view."""
+    print("\n[TEST] scope statement present and explicit")
+    rows = [_row("d1", "2026-07-20", "appointmentscheduled", order=1),
+            _row("d1", "2026-07-27", "appointmentscheduled", order=1)]
+    mv = _run(rows, {"view": "movement", "fiscal_quarter": "FY2027 Q2"})
+    stmt = mv["scope_statement"]
+    assert "no close-date filter" in stmt.lower(), stmt
+    assert "Closed Won" in stmt and "renewal" in stmt.lower(), stmt
+    assert mv["scope"]["close_date_scope"] == "all"
+    print("  ✓ scope statement names close-date treatment + exclusions")
+
+
+def test_close_date_scope_param_filters_when_requested():
+    """close_date_scope='current_quarter' restricts to deals closing in the
+    quarter; default 'all' does not. Default behavior is unchanged."""
+    print("\n[TEST] close_date_scope filters only when requested")
+    rows = [
+        _row("d1", "2026-07-20", "appointmentscheduled", order=1, close_date="2026-06-15"),
+        _row("d1", "2026-07-27", "appointmentscheduled", order=1, close_date="2026-06-15"),
+        _row("d2", "2026-07-20", "qualifiedtobuy", order=2, close_date="2026-09-30"),
+        _row("d2", "2026-07-27", "qualifiedtobuy", order=2, close_date="2026-09-30"),
+    ]
+    mv_all = _run(rows, {"view": "movement", "fiscal_quarter": "FY2027 Q2"})
+    assert mv_all["totals"]["current"] == 2, mv_all["totals"]
+
+    mv_q = _run(rows, {"view": "movement", "fiscal_quarter": "FY2027 Q2",
+                       "close_date_scope": "current_quarter"})
+    # FY2027 Q2 = May–Jul 2026; only d1 (close 2026-06-15) is in-quarter.
+    assert mv_q["totals"]["current"] == 1, mv_q["totals"]
+    assert mv_q["scope"]["close_date_scope"] == "current_quarter"
+    print("  ✓ current_quarter keeps only in-quarter closers; default keeps all")
+
+
+def test_retry_path_executes_without_unbound_locals():
+    """(Issue 1) The should_be_dynamic retry path runs end to end. It was
+    unreachable while the assessor was inert, and referenced `params` where it
+    wasn't bound on the skip-normal-routing path (UnboundLocalError)."""
+    print("\n[TEST] should_be_dynamic retry path runs without UnboundLocalError")
+    import api.router as router
+    import api.db as db
+    import api.assessor as assessor
+    from llm_fake import StrictFakeLLMClient
+
+    # A skip-normal-routing path (cache fallback) — this is where `params` was
+    # never bound. Cache returns a truthy payload WITHOUT a 'rows'/'deal' key so
+    # the retry's dynamic branch is taken (dynamic_query_loop(params=params)).
+    fake_llm = StrictFakeLLMClient("synthesized answer text")
+
+    async def fake_assess(**kwargs):
+        return {"correct": False, "score": 0.30, "issue": "should_be_dynamic",
+                "suggested_handler": None, "tone_score": 0.85}
+
+    class _SB:
+        def table(self, *a, **k): return self
+        def select(self, *a, **k): return self
+        def execute(self, *a, **k):
+            return type("R", (), {"data": []})()
+
+    with patch.object(router.LLMClient, "from_config", return_value=fake_llm), \
+         patch.object(router, "get_prior_entities", lambda *a, **k: {}), \
+         patch.object(db, "load_result_cache", lambda *a, **k: {"cached_marker": 1}), \
+         patch.object(assessor, "assess_correctness", fake_assess), \
+         patch.object(router, "dynamic_query_loop",
+                      AsyncMock(return_value={"answer": "real dynamic answer",
+                                              "tool_results": {"rows": [{"deal_id": "1"}]}})):
+        result = asyncio.run(router.route_question(
+            question="which of those moved stage?",
+            user_id="U1",
+            persona={},
+            history=[],
+            sb=_SB(),
+            thread_ts="t1",
+        ))
+    assert isinstance(result, dict) and result.get("answer"), result
+    print("  ✓ retry path reached dynamic_query_loop with params bound; returned")
+
+
 def main():
     print("=" * 70)
     print("PIPELINE MOVEMENT HANDLER TESTS")
@@ -342,6 +474,11 @@ def main():
         test_views_emit_entity_bearing_rows_for_thread_context,
         test_movement_by_stage_carries_drillable_deal_ids,
         test_stage_deals_view_lists_deals_in_a_stage,
+        test_new_deals_not_counted_as_stage_movement,
+        test_deal_changes_include_company_name,
+        test_scope_statement_present_and_explicit,
+        test_close_date_scope_param_filters_when_requested,
+        test_retry_path_executes_without_unbound_locals,
     ]
     passed = failed = 0
     for t in tests:

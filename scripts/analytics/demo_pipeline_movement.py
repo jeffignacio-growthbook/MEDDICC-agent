@@ -48,8 +48,8 @@ def run_views(sb):
     mv = asyncio.run(query_pipeline_movement(
         {"view": "movement", "fiscal_quarter": Q}, sb))
     _show(f"VIEW 1 — movement ({Q}, last two snapshots)", mv,
-          keys=["snapshot_source", "snapshot_dates", "totals",
-                "confidence", "by_stage", "data_gaps"])
+          keys=["snapshot_source", "snapshot_dates", "totals", "summary",
+                "confidence", "by_stage", "scope_statement", "data_gaps"])
     # Drill-down fix: movement now carries entity-bearing rows + per-stage ids
     print(f"entity rows for thread context: {len(mv.get('rows', []))} "
           f"(each carries deal_id) — was 0 before the fix")
@@ -82,13 +82,47 @@ def run_views(sb):
     cv = asyncio.run(query_pipeline_movement(
         {"view": "curve", "fiscal_quarter": Q}, sb))
     _show(f"VIEW 4 — curve ({Q}, count by week-of-quarter)", cv,
-          keys=["snapshot_source", "curve", "data_gaps"])
+          keys=["snapshot_source", "curve", "query_stats", "data_gaps"])
+
+    # Issue 5 — curve efficiency: before/after rows+pages actually scanned.
+    from supabase_client import select_all
+    old_cols = ("deal_id,snapshot_date,pipeline_id,stage_id,stage_order,"
+                "close_date,owner_email,deal_status,snapshot_source,"
+                "backfill_confidence,fiscal_quarter,week_of_quarter")
+    before = select_all(sb, "deals_snapshot", columns=old_cols,
+                        filters=[("eq", "fiscal_quarter", Q)])
+    print("\n" + "=" * 72)
+    print(f"CURVE EFFICIENCY ({Q})")
+    print("=" * 72)
+    print(f"  BEFORE: full 12 cols, all pipelines — rows={len(before)}, "
+          f"pages={(len(before)//1000)+1}")
+    print(f"  AFTER : slim 10 cols, renewal excluded server-side — "
+          f"rows={cv['query_stats']['rows_loaded']}, "
+          f"pages={cv['query_stats']['pages_loaded']}")
+
+    # Issue 2/3 — deal_changes on FY2027 Q3: new deals must show as
+    # new_to_pipeline WITH company names, not as stage entries.
+    dcq3 = asyncio.run(query_pipeline_movement(
+        {"view": "deal_changes", "fiscal_quarter": "FY2027 Q3"}, sb))
+    _show("VIEW 3b — deal_changes (FY2027 Q3, Aug 10 → Aug 17)", dcq3,
+          keys=["snapshot_source", "snapshot_dates", "summary", "data_gaps"])
+    newbies = [c for c in dcq3.get("changes", [])
+               if c["direction"] == "new_to_pipeline"]
+    print(f"  new_to_pipeline deals ({len(newbies)}) — named, not stage entries:")
+    for c in newbies[:8]:
+        print(f"    {c['deal_id']}  {c.get('company_name')!r}  "
+              f"owner={c['owner_email']}  prior_stage={c['prior_stage']} "
+              f"current_stage={c['current_stage']}")
+    left = [c for c in dcq3.get("changes", []) if c["direction"] == "left_pipeline"]
+    if left:
+        print(f"  left_pipeline sample (with reason): "
+              f"{json.dumps(left[:3], default=str)}")
 
     # Bonus: the current quarter has TWO grids — show the grid guard firing.
     cur = asyncio.run(query_pipeline_movement(
         {"view": "movement", "fiscal_quarter": "FY2027 Q3"}, sb))
-    _show("GRID GUARD — current quarter (FY2027 Q3, mixed sources)", cur,
-          keys=["snapshot_source", "snapshot_dates", "totals", "data_gaps"])
+    _show("GRID GUARD — current quarter (FY2027 Q3, two point-in-time grids)", cur,
+          keys=["snapshot_source", "snapshot_dates", "totals", "summary", "data_gaps"])
 
 
 def run_routing():

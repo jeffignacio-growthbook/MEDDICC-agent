@@ -2678,9 +2678,12 @@ async def query_call_quality(params: dict, sb) -> dict:
 #     never silently mixed.
 
 _PM_SNAPSHOT_COLUMNS = (
+    # Only the columns the views actually use — deal_status and fiscal_quarter
+    # (the latter is the filter, never read back) were dropped to shrink the
+    # per-row payload the curve/composition views page through (Issue 5).
     "deal_id,snapshot_date,pipeline_id,stage_id,stage_order,"
-    "close_date,owner_email,deal_status,snapshot_source,"
-    "backfill_confidence,fiscal_quarter,week_of_quarter"
+    "close_date,owner_email,snapshot_source,"
+    "backfill_confidence,week_of_quarter"
 )
 # deal_value is intentionally absent from the column list above. Counts only.
 
@@ -2795,24 +2798,49 @@ def _pm_stage_sets(date_rows, stage_cfg):
     return stage_to_deals, deal_to_stage
 
 
-def _pm_deal_rows(date_rows, stage_cfg, limit=200):
+def _pm_company_map(sb, deal_ids):
+    """{deal_id: company_name} from the deals table for the given ids.
+
+    deals_snapshot has no name column, so individual deals would otherwise be
+    reported by opaque deal_id (Issue 2). Minimal join — only deal_id +
+    company_name — chunked to keep the in_ filter URL bounded.
+    """
+    ids = sorted({str(d) for d in deal_ids if d is not None})
+    out = {}
+    for i in range(0, len(ids), 100):
+        chunk = ids[i:i + 100]
+        try:
+            drows = select_all(sb, "deals", columns="deal_id,company_name",
+                               filters=[("in_", "deal_id", chunk)])
+        except Exception:
+            drows = []
+        for r in drows:
+            out[str(r["deal_id"])] = r.get("company_name")
+    return out
+
+
+def _pm_deal_rows(date_rows, stage_cfg, company_map=None, limit=200):
     """Entity-bearing rows for one snapshot date, so extract_entity_context
-    can save deal_ids for follow-up questions. Carries stage so a drill-down
-    ('which of those are in Discovery?') has the context it needs.
+    can save deal_ids AND company_names for follow-up questions. Carries stage
+    so a drill-down ('which of those are in Discovery?') has the context it
+    needs, and company_name so deals are named, not shown as bare ids.
 
     Still COUNTS-ONLY: deal_value is neither selected nor emitted here.
     """
+    company_map = company_map or {}
     rows = []
     for r in _pm_latest_row_per_deal(date_rows).values():
+        did = r["deal_id"]
         rows.append({
-            "deal_id": r["deal_id"],
+            "deal_id": did,
+            "company_name": company_map.get(str(did)),
             "stage": _pm_stage_name(r.get("stage_id"), stage_cfg),
             "owner_email": r.get("owner_email"),
             "close_date": r.get("close_date"),
             "week_of_quarter": r.get("week_of_quarter"),
             "backfill_confidence": r.get("backfill_confidence"),
         })
-    rows.sort(key=lambda x: (x["stage"], x["deal_id"]))
+    rows.sort(key=lambda x: (x["stage"], str(x["deal_id"])))
     return rows[:limit]
 
 
@@ -2822,13 +2850,18 @@ def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps):
             "movement needs two snapshot dates; found "
             f"{len(all_dates)} in this grid — returning null, not a zero"
         )
-        return None, [], {"prior": None, "current": None, "net": None}, {}
+        return None, [], {"prior": None, "current": None, "net": None}, {}, {}
     prior_date, current_date = all_dates[-2], all_dates[-1]
     prior_rows = list(_pm_latest_row_per_deal(by_date[prior_date]).values())
     current_rows = list(_pm_latest_row_per_deal(by_date[current_date]).values())
 
     prior_sets, _ = _pm_stage_sets(prior_rows, stage_cfg)
     current_sets, _ = _pm_stage_sets(current_rows, stage_cfg)
+
+    prior_all = {r["deal_id"] for r in prior_rows}
+    current_all = {r["deal_id"] for r in current_rows}
+    new_ids = current_all - prior_all         # absent in prior → new to pipeline
+    left_ids = prior_all - current_all        # present in prior, gone in current
 
     stage_names = set(prior_sets) | set(current_sets)
 
@@ -2843,27 +2876,48 @@ def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps):
     for name in sorted(stage_names, key=_order):
         p = prior_sets.get(name, set())
         c = current_sets.get(name, set())
+        entered = c - p
+        # A deal in this stage now that wasn't here before is either new to the
+        # pipeline entirely (absent in prior) or moved in from another stage.
+        # Reporting a newly-created deal as "entered a stage" overstates
+        # movement (Issue 3), so split them.
+        entered_new = entered & new_ids
+        entered_moved = entered - new_ids
         by_stage.append({
             "stage": name,
             "prior": len(p),
             "current": len(c),
             "net": len(c) - len(p),
-            "entered": len(c - p),
+            "entered": len(entered),                 # total, back-compat
+            "entered_from_other_stage": len(entered_moved),
+            "new_to_pipeline": len(entered_new),
             "exited": len(p - c),
-            # deal IDs so the counts are drillable and the thread-context
-            # layer (extract_entity_context) can save entities for follow-ups
-            # like "which deals are in Discovery?".
             "deal_ids": sorted(c),
-            "entered_ids": sorted(c - p),
+            "entered_from_other_stage_ids": sorted(entered_moved),
+            "new_to_pipeline_ids": sorted(entered_new),
             "exited_ids": sorted(p - c),
         })
+
+    # Moved between stages = present in both snapshots but changed stage.
+    _, prior_stage_of = _pm_stage_sets(prior_rows, stage_cfg)
+    _, current_stage_of = _pm_stage_sets(current_rows, stage_cfg)
+    moved_between = {d for d in (prior_all & current_all)
+                     if prior_stage_of.get(d) != current_stage_of.get(d)}
+
     totals = {
         "prior": len(prior_rows),
         "current": len(current_rows),
         "net": len(current_rows) - len(prior_rows),
     }
+    # Deal-level, mutually exclusive tallies so nothing double-counts: a new
+    # deal is in `new_to_pipeline`, not in `moved_between_stages`.
+    summary = {
+        "new_to_pipeline": len(new_ids),
+        "left_pipeline": len(left_ids),
+        "moved_between_stages": len(moved_between),
+    }
     confidence = _pm_confidence_mix(current_rows)
-    return [prior_date, current_date], by_stage, totals, confidence
+    return [prior_date, current_date], by_stage, totals, confidence, summary
 
 
 def _pm_view_composition(by_date, all_dates, stage_cfg, weeks):
@@ -2886,13 +2940,37 @@ def _pm_view_composition(by_date, all_dates, stage_cfg, weeks):
     return dates, grid
 
 
-def _pm_view_deal_changes(by_date, all_dates, stage_cfg, data_gaps):
+def _pm_left_reason(deal_id, unscoped_current):
+    """Why a deal that was in the scoped pipeline last snapshot is gone now.
+
+    A deal absent from the CURRENT scoped snapshot either closed (won/lost),
+    dropped to an excluded stage (Meeting Set / Disqualified), or is simply
+    gone from the snapshot. We can distinguish the first two by looking at the
+    UNSCOPED current-date row (which still carries closed/excluded stages).
+    """
+    stage_id = unscoped_current.get(deal_id)
+    if stage_id is None:
+        return "gone_from_snapshot"
+    try:
+        if is_won(str(stage_id)):
+            return "closed_won"
+        if is_lost(str(stage_id)):
+            return "closed_lost"
+    except Exception:
+        pass
+    return "moved_to_excluded_stage"
+
+
+def _pm_view_deal_changes(by_date, all_dates, stage_cfg, data_gaps,
+                          company_map=None, unscoped_current=None):
     if len(all_dates) < 2:
         data_gaps.append(
             "deal_changes needs two snapshot dates; found "
             f"{len(all_dates)} in this grid — returning null, not a zero"
         )
         return None, []
+    company_map = company_map or {}
+    unscoped_current = unscoped_current or {}
     prior_date, current_date = all_dates[-2], all_dates[-1]
     prior_rows = _pm_latest_row_per_deal(by_date[prior_date])
     current_rows = _pm_latest_row_per_deal(by_date[current_date])
@@ -2905,10 +2983,14 @@ def _pm_view_deal_changes(by_date, all_dates, stage_cfg, data_gaps):
         prior_stage = _pm_stage_name(pr.get("stage_id"), stage_cfg) if pr else None
         current_stage = _pm_stage_name(cr.get("stage_id"), stage_cfg) if cr else None
 
+        reason = None
         if pr and not cr:
-            direction = "left"
+            # Absent now — this is leaving the pipeline, NOT a stage move.
+            direction = "left_pipeline"
+            reason = _pm_left_reason(deal_id, unscoped_current)
         elif cr and not pr:
-            direction = "entered"
+            # Absent in prior — a newly-created deal, NOT a stage entry (Issue 3).
+            direction = "new_to_pipeline"
         elif prior_stage == current_stage:
             continue  # unchanged — only report movement
         else:
@@ -2920,16 +3002,21 @@ def _pm_view_deal_changes(by_date, all_dates, stage_cfg, data_gaps):
                 direction = "regressed"
             else:
                 direction = "moved"
-        changes.append({
+        item = {
             "deal_id": deal_id,
+            "company_name": company_map.get(str(deal_id)),
             "owner_email": (cr or pr).get("owner_email"),
             "prior_stage": prior_stage,
             "current_stage": current_stage,
             "direction": direction,
-        })
+        }
+        if reason:
+            item["reason"] = reason
+        changes.append(item)
 
-    order = {"advanced": 0, "regressed": 1, "moved": 2, "entered": 3, "left": 4}
-    changes.sort(key=lambda x: (order.get(x["direction"], 9), x["deal_id"]))
+    order = {"advanced": 0, "regressed": 1, "moved": 2,
+             "new_to_pipeline": 3, "left_pipeline": 4}
+    changes.sort(key=lambda x: (order.get(x["direction"], 9), str(x["deal_id"])))
     return [prior_date, current_date], changes
 
 
@@ -2963,8 +3050,12 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
       deal_ids      : optional explicit deal set for 'deal_changes'
       stage         : for 'stage_deals' — the stage name (e.g. 'Discovery') or
                       a deal_id to list at the latest snapshot
+      close_date_scope : 'all' (default) | 'current_quarter'. Default counts
+                      all open deals (correct for coverage); 'current_quarter'
+                      restricts to deals closing in the quarter, for
+                      reconciliation against a CRM board — never the default.
 
-    Every view also returns a `rows` list of {deal_id, stage, owner_email, ...}
+    Every view also returns a `rows` list of {deal_id, company_name, stage, ...}
     from the latest snapshot so the thread-context layer can save entities for
     follow-up drill-downs. Counts only — deal_value is never selected/emitted.
     """
@@ -2995,13 +3086,31 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     owner_email = params.get("owner_email") or params.get("rep_email")
     pipeline_id = params.get("pipeline_id")
     deal_ids = params.get("deal_ids")
+    close_date_scope = (params.get("close_date_scope") or "all").strip().lower()
+    if close_date_scope not in ("all", "current_quarter"):
+        close_date_scope = "all"
 
+    # Explicit, prominent scope statement so a count can be reconciled against
+    # a CRM board view (Issue 4). The default counts ALL open deals with no
+    # close-date filter — correct for coverage math — which is usually the gap
+    # against a board filtered to "close date this quarter".
+    close_stmt = ("all open deals as of each snapshot, with NO close-date "
+                  "filter" if close_date_scope == "all"
+                  else f"only deals whose close date falls in {fiscal_quarter}")
+    scope_statement = (
+        f"Counting {close_stmt}. Excludes Meeting Set, Disqualified, "
+        f"Closed Won, Closed Lost; the renewal pipeline is out of analytics "
+        f"scope. A CRM board filtered by close date or including renewals "
+        f"will not match."
+    )
     scope_out = {
         "pipeline": (str(pipeline_id) if pipeline_id
                      else "default (renewals & non-qualified stages excluded)"),
         "excluded_stages": ["Meeting Set", "Disqualified",
                             "Closed Won", "Closed Lost"],
         "excluded_pipelines": sorted(excluded_pipelines),
+        "close_date_scope": close_date_scope,
+        "statement": scope_statement,
     }
 
     # ── load snapshot rows for the quarter ──
@@ -3010,8 +3119,18 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         filters.append(("eq", "owner_email", owner_email))
     if pipeline_id:
         filters.append(("eq", "pipeline_id", str(pipeline_id)))
+    else:
+        # Default scope always drops the excluded (renewal) pipelines. Push
+        # that server-side so those rows are never paged in the first place —
+        # a real reduction in rows/pages the curve & composition views scan
+        # (Issue 5). Null-stage rows live in the default pipeline, so a `neq`
+        # on the renewal id keeps them.
+        for pid in sorted(excluded_pipelines):
+            filters.append(("neq", "pipeline_id", str(pid)))
     rows = select_all(sb, "deals_snapshot",
                       columns=_PM_SNAPSHOT_COLUMNS, filters=filters)
+    loaded_row_count = len(rows)
+    loaded_pages = (loaded_row_count // 1000) + 1
 
     if deal_ids:
         wanted = {str(d) for d in deal_ids}
@@ -3021,7 +3140,11 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         "view": view,
         "fiscal_quarter": fiscal_quarter,
         "scope": scope_out,
+        # Surfaced at top level too, so a synthesis layer naturally includes it.
+        "scope_statement": scope_statement,
         "basis": "count",  # explicit — never 'dollar' until the ledger clears
+        "query_stats": {"rows_loaded": loaded_row_count,
+                        "pages_loaded": loaded_pages},
     }
 
     if not rows:
@@ -3051,6 +3174,25 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     # ── apply analytics scope at read time (null-stage rows counted) ──
     scoped = [r for r in grid_rows
               if _pm_in_scope(r, excluded_pipelines, stage_cfg, is_in_scope)]
+
+    # Optional close-date scope (Issue 4). Default 'all' leaves the coverage
+    # denominator unfiltered; 'current_quarter' restricts to deals whose
+    # point-in-time close_date falls in the queried quarter, for reconciliation
+    # against a CRM board — it never changes the default.
+    if close_date_scope == "current_quarter" and scoped:
+        from utils import get_fiscal_quarter
+        any_date = datetime.fromisoformat(
+            min(r["snapshot_date"] for r in scoped)).date()
+        q_start, q_end, _ = get_fiscal_quarter(any_date)
+        lo, hi = q_start.isoformat(), q_end.isoformat()
+        before_n = len(scoped)
+        scoped = [r for r in scoped
+                  if r.get("close_date") and lo <= r["close_date"][:10] <= hi]
+        data_gaps.append(
+            f"close_date_scope=current_quarter: kept {len(scoped)} of "
+            f"{before_n} in-scope deal-rows whose close date is in "
+            f"{fiscal_quarter}")
+
     by_date = _pm_by_date(scoped)
     all_dates = sorted(by_date.keys())
 
@@ -3063,12 +3205,23 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         return {**base, "snapshot_dates": [], "result": None,
                 "data_gaps": data_gaps}
 
+    # Company names for the deals we'll name individually (Issue 2). Union of
+    # the latest snapshot and the prior snapshot (deal_changes compares both).
+    name_ids = {r["deal_id"] for r in by_date[all_dates[-1]]}
+    if len(all_dates) >= 2:
+        name_ids |= {r["deal_id"] for r in by_date[all_dates[-2]]}
+    company_map = _pm_company_map(sb, name_ids)
+
+    # Unscoped current-date stages (pre-scope) so deal_changes can say WHY a
+    # deal left the scoped pipeline (closed vs dropped to an excluded stage).
+    unscoped_current = {r["deal_id"]: r.get("stage_id")
+                        for r in grid_rows
+                        if r.get("snapshot_date") == all_dates[-1]}
+
     # Entity-bearing rows from the latest snapshot, attached to every view so
-    # extract_entity_context saves deal_ids and follow-ups ("which of those are
-    # in Discovery?") have thread context. Without this the movement view
-    # returned pure counts, save_thread stored zero entities, and the drill-down
-    # fell through to query_deal_stages_bulk with no deal IDs.
-    latest_rows = _pm_deal_rows(by_date[all_dates[-1]], stage_cfg)
+    # extract_entity_context saves deal_ids AND company_names and follow-ups
+    # ("which of those are in Discovery?") have thread context.
+    latest_rows = _pm_deal_rows(by_date[all_dates[-1]], stage_cfg, company_map)
 
     # ── stage-filtered deal list (direct drill-down) ──
     if view == "stage_deals":
@@ -3097,13 +3250,14 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
 
     # ── dispatch ──
     if view == "movement":
-        snap_dates, by_stage, totals, confidence = _pm_view_movement(
+        snap_dates, by_stage, totals, confidence, summary = _pm_view_movement(
             by_date, all_dates, stage_cfg, data_gaps)
         return {
             **base,
             "snapshot_dates": snap_dates or [],
             "by_stage": by_stage,
             "totals": totals,
+            "summary": summary,   # new_to_pipeline / left_pipeline / moved (deal-level)
             "confidence": confidence,
             "rows": latest_rows,
             "data_gaps": data_gaps,
@@ -3122,7 +3276,8 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
 
     if view == "deal_changes":
         snap_dates, changes = _pm_view_deal_changes(
-            by_date, all_dates, stage_cfg, data_gaps)
+            by_date, all_dates, stage_cfg, data_gaps,
+            company_map=company_map, unscoped_current=unscoped_current)
         summary = {}
         for c in changes:
             summary[c["direction"]] = summary.get(c["direction"], 0) + 1
@@ -3130,6 +3285,7 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         # entity rows are the changed deals rather than the whole snapshot.
         change_rows = [{
             "deal_id": c["deal_id"],
+            "company_name": c.get("company_name"),
             "stage": c["current_stage"],
             "owner_email": c["owner_email"],
             "direction": c["direction"],

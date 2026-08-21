@@ -407,6 +407,7 @@ Required JSON:
     "fiscal_quarter": "<for query_pipeline_movement: 'FY2027 Q2' style label, or null for current>",
     "weeks": "<for query_pipeline_movement composition: integer count of recent weeks, or null>",
     "stage": "<for query_pipeline_movement stage_deals: stage name like 'Discovery', else null>",
+    "close_date_scope": "<for query_pipeline_movement: 'current_quarter' to reconcile against a CRM board filtered by close date, else null (default all)>",
     "is_slow": false
   }},
   "unanswerable_reason": "no_data|out_of_scope|ambiguous|null",
@@ -1093,6 +1094,12 @@ async def route_question(question: str, user_id: str,
     result_quality = "empty"
     is_slow = False
     intent_resp = None  # Only assigned in normal routing path
+    # Only fully populated in normal routing; the entity-scope and cache-
+    # fallback paths skip classification, so without this default the retry
+    # path (dynamic_query_loop(params=params)) hits UnboundLocalError — and a
+    # bare {} would then KeyError on params['time_window'] inside the loop.
+    # Seed a resolved current-quarter window so the retry path runs end to end.
+    params = {"time_window": resolve_time_window({})}
 
     if should_use_entity_scope(question, prior_entities):
         logger.info(f"[ENTITY_SCOPE] using "
