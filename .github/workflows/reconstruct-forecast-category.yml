@@ -42,7 +42,10 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
-          python3 scripts/analytics/hubspot_history.py --all --rate-limit 5
+          # --include-snapshot-deals: also fetch history for since-closed deals
+          # that appear only in deals_snapshot, so historical rows do not
+          # reconstruct to no_history purely for lack of a fetch.
+          python3 scripts/analytics/hubspot_history.py --all --include-snapshot-deals --rate-limit 5
           ls -lh property_history_cache.json
 
       - name: "Confirm cache carries category history back far enough"

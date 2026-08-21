@@ -241,8 +241,17 @@ class PropertyHistoryFetcher:
         return self.cache['stats'].copy()
 
 
-def get_all_deal_ids() -> List[str]:
-    """Get all deal IDs from Supabase."""
+def get_all_deal_ids(include_snapshot_deals: bool = False) -> List[str]:
+    """Get all deal IDs from Supabase.
+
+    By default this is the CURRENT deals table only. That misses deals which
+    have since closed and dropped out of `deals` but still appear in historical
+    deals_snapshot rows — reconstructing those rows against a cache built from
+    current deals only yields 'no_history' for a deal whose history simply was
+    never fetched. include_snapshot_deals unions in every distinct deal_id from
+    deals_snapshot so a point-in-time reconstruction can resolve them. Opt-in so
+    the nightly fetch's default footprint is unchanged.
+    """
     from supabase import create_client
     from supabase_client import select_all
 
@@ -250,14 +259,26 @@ def get_all_deal_ids() -> List[str]:
     key = os.environ['SUPABASE_SERVICE_KEY']
     client = create_client(url, key)
 
-    deals = select_all(client, 'deals', columns='deal_id')
-    return [d['deal_id'] for d in deals]
+    ids = {d['deal_id'] for d in select_all(client, 'deals', columns='deal_id')}
+    n_current = len(ids)
+    if include_snapshot_deals:
+        snap = select_all(client, 'deals_snapshot', columns='deal_id')
+        ids.update(d['deal_id'] for d in snap)
+        print(f"  deal id sources: current deals={n_current}, "
+              f"union with deals_snapshot={len(ids)} "
+              f"(+{len(ids) - n_current} snapshot-only)")
+    return sorted(ids)
 
 
 def main():
     parser = argparse.ArgumentParser(description='Fetch HubSpot dealstage property history')
     parser.add_argument('--deals', help='Comma-separated deal IDs to fetch')
     parser.add_argument('--all', action='store_true', help='Fetch for all deals in Supabase')
+    parser.add_argument('--include-snapshot-deals', action='store_true',
+                       help='With --all, also fetch history for deals that appear '
+                            'only in deals_snapshot (since-closed deals). Needed to '
+                            'reconstruct historical rows for deals no longer in the '
+                            'current deals table.')
     parser.add_argument('--resume', action='store_true', help='Resume from cache')
     parser.add_argument('--force', action='store_true', help='Force re-fetch even if cached')
     parser.add_argument('--cache-file', default='property_history_cache.json',
@@ -284,7 +305,7 @@ def main():
 
     elif args.all:
         print("Fetching all deals from Supabase...")
-        deal_ids = get_all_deal_ids()
+        deal_ids = get_all_deal_ids(include_snapshot_deals=args.include_snapshot_deals)
         print(f"Found {len(deal_ids)} deals")
 
     elif args.deals:
