@@ -118,88 +118,51 @@ def test_commit_calibration_classifies_slip_separately_from_loss():
     """
     print("\n[TEST] Commit calibration classifies slip separately from loss")
 
-    sb = Mock()
+    # Terminal outcome now comes from the deals table (OUTCOME-READ), not the
+    # last snapshot row — the backfilled snapshot has no won/lost rows, so a
+    # snapshot-based classifier would call every deal SLIPPED. Committed quarter
+    # window: FY2027 Q2 = 2026-05-01 .. 2026-07-31.
+    q_start, q_end = '2026-05-01', '2026-07-31'
+    deals_by_id = {
+        # open stage, close pushed to next quarter → SLIPPED (not LOST)
+        'test_deal_123': {'stage': 'presentationscheduled',
+                          'close_date': '2026-08-15', 'owner_email': 'a@x.com'},
+        # terminally lost, closed within quarter → LOST
+        'test_deal_456': {'stage': 'closedlost',
+                          'close_date': '2026-07-20', 'owner_email': 'a@x.com'},
+        # terminally won, closed within quarter → WON
+        'test_deal_789': {'stage': 'closedwon',
+                          'close_date': '2026-07-25', 'owner_email': 'b@x.com'},
+        # terminally won but closed AFTER quarter end → SLIPPED (did not win in-qtr)
+        'test_deal_late': {'stage': 'closedwon',
+                           'close_date': '2026-08-05', 'owner_email': 'b@x.com'},
+    }
 
-    # Test case: deal still open at quarter end = SLIPPED
-    mock_response_slipped = Mock()
-    mock_response_slipped.data = [
-        {
-            'snapshot_date': '2026-07-31',  # Last day of Q2
-            'deal_status': 'open',  # Still open
-            'stage_id': 'presentationscheduled',
-            'forecast_category': 'COMMIT',
-            'close_date': '2026-08-15'  # Pushed to next quarter
-        }
-    ]
-
-    # Set up mock chain for slipped deal
-    mock_table = Mock()
-    mock_select = Mock()
-    mock_eq1 = Mock()
-    mock_eq2 = Mock()
-    mock_order = Mock()
-
-    sb.table.return_value = mock_table
-    mock_table.select.return_value = mock_select
-    mock_select.eq.return_value = mock_eq1
-    mock_eq1.eq.return_value = mock_eq2
-    mock_eq2.order.return_value = mock_order
-    mock_order.execute.return_value = mock_response_slipped
-
-    outcome = _classify_deal_outcome('test_deal_123', 'FY2027 Q2', sb)
-
+    outcome = _classify_deal_outcome('test_deal_123', q_start, q_end, deals_by_id)
     if outcome != 'SLIPPED':
         raise AssertionError(
             f"Expected 'SLIPPED' for deal open past quarter end, got '{outcome}'\n"
             f"A deal still open with pushed close date is SLIPPED, not LOST.\n"
             f"This is the exact error Kellogg critiques — slip and loss must be separate."
         )
-
     print("  ✓ Deal open past quarter end correctly classified as SLIPPED")
 
-    # Test case: deal closed lost = LOST
-    mock_response_lost = Mock()
-    mock_response_lost.data = [
-        {
-            'snapshot_date': '2026-07-20',
-            'deal_status': 'lost',
-            'stage_id': 'closedlost',
-            'forecast_category': None,
-            'close_date': '2026-07-20'
-        }
-    ]
-    mock_order.execute.return_value = mock_response_lost
-
-    outcome_lost = _classify_deal_outcome('test_deal_456', 'FY2027 Q2', sb)
-
+    outcome_lost = _classify_deal_outcome('test_deal_456', q_start, q_end, deals_by_id)
     if outcome_lost != 'LOST':
-        raise AssertionError(
-            f"Expected 'LOST' for closed lost deal, got '{outcome_lost}'"
-        )
-
+        raise AssertionError(f"Expected 'LOST' for closed lost deal, got '{outcome_lost}'")
     print("  ✓ Closed lost deal correctly classified as LOST")
 
-    # Test case: deal closed won = WON
-    mock_response_won = Mock()
-    mock_response_won.data = [
-        {
-            'snapshot_date': '2026-07-25',
-            'deal_status': 'won',
-            'stage_id': 'closedwon',
-            'forecast_category': None,
-            'close_date': '2026-07-25'
-        }
-    ]
-    mock_order.execute.return_value = mock_response_won
-
-    outcome_won = _classify_deal_outcome('test_deal_789', 'FY2027 Q2', sb)
-
+    outcome_won = _classify_deal_outcome('test_deal_789', q_start, q_end, deals_by_id)
     if outcome_won != 'WON':
-        raise AssertionError(
-            f"Expected 'WON' for closed won deal, got '{outcome_won}'"
-        )
-
+        raise AssertionError(f"Expected 'WON' for closed won deal, got '{outcome_won}'")
     print("  ✓ Closed won deal correctly classified as WON")
+
+    # A win that lands after quarter end did NOT win in the committed quarter.
+    outcome_late = _classify_deal_outcome('test_deal_late', q_start, q_end, deals_by_id)
+    if outcome_late != 'SLIPPED':
+        raise AssertionError(
+            f"Expected 'SLIPPED' for a win closing after quarter end, got '{outcome_late}'")
+    print("  ✓ Won-but-closed-after-quarter correctly classified as SLIPPED (not WON)")
     print("  ✓ Three-way classification working: Won/Slipped/Lost are distinct")
 
 

@@ -90,50 +90,52 @@ def _get_complete_quarters(sb) -> List[str]:
 
 def _classify_deal_outcome(
     deal_id: str,
-    committed_quarter: str,
-    sb
+    q_start_iso: str,
+    q_end_iso: str,
+    deals_by_id: Dict[str, Dict],
 ) -> Optional[str]:
     """
-    Classify a deal that was COMMIT in a given quarter.
+    Classify a deal that was COMMIT at the anchor week: Won / Slipped / Lost.
 
     Returns:
-        'WON' — closed won in the committed quarter
-        'SLIPPED' — still open past quarter end OR close date pushed out
-        'LOST' — closed lost before/during quarter end
-        None — insufficient data to classify
+        'WON' — terminally won AND close_date within the committed quarter
+        'LOST' — terminally lost AND closed on/before quarter end
+        'SLIPPED' — still open past quarter end, or a close_date pushed beyond
+                    it (this includes a won/lost deal whose close_date falls
+                    OUTSIDE the committed quarter — it did not resolve in-quarter)
+        None — deal not found in the deals table
+
+    OUTCOME-READ (defect 5): the outcome comes from the TERMINAL state in the
+    current `deals` table (is_won / is_lost + close_date), NOT the last snapshot
+    row. The Method-2 backfilled quarters hold only OPEN snapshot rows (terminal
+    stages are excluded), so a deal that won would read 'active' in its last
+    in-quarter snapshot and be misclassified SLIPPED — the same open-rows
+    artifact the week-3 numerator fix addressed, which would fabricate a ~0%
+    hit rate with everything slipped. The COMMIT-at-anchor cohort IS point-in-
+    time (from the snapshot); the outcome has no point-in-time equivalent.
 
     CRITICAL: Slipped vs Lost must be separate. A deal open past quarter end
     with a pushed close date is SLIPPED, never LOST. This is the exact error
     Kellogg critiques.
     """
-    # Get quarter end date from fiscal calendar
-    # Parse committed_quarter (e.g., 'FY2027 Q1')
-    # For now, we'll need to get the last snapshot in that quarter
-
-    # Get all snapshots for this deal in this quarter
-    result = sb.table('deals_snapshot').select(
-        'snapshot_date, deal_status, stage_id, forecast_category, close_date'
-    ).eq('deal_id', deal_id).eq('fiscal_quarter', committed_quarter).order(
-        'snapshot_date', desc=True
-    ).execute()
-
-    if not result.data:
+    from field_semantics import is_won, is_lost
+    d = deals_by_id.get(str(deal_id))
+    if not d:
         return None
-
-    # Get the last snapshot in the quarter
-    last_snap = result.data[0]
-
-    # Check final status/stage
-    status = (last_snap.get('deal_status') or '').lower()
-    stage_id = (last_snap.get('stage_id') or '').lower()
-
-    if 'won' in status or 'closedwon' in stage_id:
+    stage = d.get('stage')
+    close = str(d.get('close_date'))[:10] if d.get('close_date') else None
+    try:
+        won = is_won(str(stage)) if stage else False
+        lost = is_lost(str(stage)) if stage else False
+    except Exception:
+        won = lost = False
+    in_quarter = bool(close and q_start_iso <= close <= q_end_iso)
+    if won and in_quarter:
         return 'WON'
-    elif 'lost' in status or 'closedlost' in stage_id:
+    if lost and close and close <= q_end_iso:
         return 'LOST'
-    else:
-        # Deal was still open at quarter end = SLIPPED
-        return 'SLIPPED'
+    # open, or resolved outside the committed quarter → slipped
+    return 'SLIPPED'
 
 
 def _quarter_window_iso(sb, quarter: str) -> Tuple[Optional[str], Optional[str]]:
@@ -525,78 +527,104 @@ def query_commit_calibration(
             'coverage_note': 'Insufficient historical data'
         }
 
-    # Track outcomes across all quarters
-    total_won = 0
-    total_slipped = 0
-    total_lost = 0
+    min_evidence = config.get('min_evidence_count', 30)
+
+    # Terminal outcome comes from the current deals table (OUTCOME-READ, defect
+    # 5): the backfilled snapshot has no won/lost rows, so outcome must be read
+    # from the deal's terminal state, not a snapshot row. Load once; owner_email
+    # drives the by-rep slice (deals_snapshot has no owner column — the earlier
+    # deal_owner select was a latent bug, surfaced once churn produced an anchor).
+    from supabase_client import select_all
+    deals_rows = select_all(sb, 'deals',
+                            columns='deal_id,stage,close_date,owner_email')
+    deals_by_id = {str(d['deal_id']): d for d in deals_rows}
+
+    # Track outcomes across all quarters, plus per-quarter and per-rep slices.
+    total_won = total_slipped = total_lost = 0
     by_quarter = {}
+    by_rep = defaultdict(lambda: {'won': 0, 'slipped': 0, 'lost': 0})
 
     for quarter in complete_quarters:
-        # Get deals tagged COMMIT at anchor week
+        # COMMIT cohort at the anchor week (point-in-time, from the snapshot).
         anchor_result = sb.table('deals_snapshot').select(
-            'deal_id, deal_owner, deal_value'
+            'deal_id'
         ).eq('fiscal_quarter', quarter).eq(
             'week_of_quarter', anchor_week
         ).eq('forecast_category', 'COMMIT').execute()
-
         deal_ids = [r['deal_id'] for r in anchor_result.data]
-
         if not deal_ids:
             continue
 
-        # Classify each deal
-        won = 0
-        slipped = 0
-        lost = 0
-
+        q_start_iso, q_end_iso = _quarter_window_iso(sb, quarter)
+        won = slipped = lost = 0
         for deal_id in deal_ids:
-            outcome = _classify_deal_outcome(deal_id, quarter, sb)
+            outcome = _classify_deal_outcome(
+                deal_id, q_start_iso, q_end_iso, deals_by_id)
+            owner = (deals_by_id.get(str(deal_id)) or {}).get(
+                'owner_email') or 'unknown'
             if outcome == 'WON':
-                won += 1
+                won += 1; by_rep[owner]['won'] += 1
             elif outcome == 'SLIPPED':
-                slipped += 1
+                slipped += 1; by_rep[owner]['slipped'] += 1
             elif outcome == 'LOST':
-                lost += 1
+                lost += 1; by_rep[owner]['lost'] += 1
 
         total_won += won
         total_slipped += slipped
         total_lost += lost
-
+        q_total = won + slipped + lost
+        # Per-quarter gate: below min_evidence returns null-with-reason, never a
+        # fabricated rate (gate unchanged).
         by_quarter[quarter] = {
-            'won': won,
-            'slipped': slipped,
-            'lost': lost,
-            'total_commit': len(deal_ids)
+            'won': won, 'slipped': slipped, 'lost': lost,
+            'total_commit': len(deal_ids), 'classified': q_total,
+            'hit_rate': (won / q_total) if q_total >= min_evidence else None,
+            'reason': (None if q_total >= min_evidence
+                       else f'{q_total} classified < min_evidence {min_evidence}'),
         }
 
-    # Calculate hit rate
+    # Pooled hit rate across quarters at the anchor week. Same gate, applied to
+    # the pooled cohort.
     total_outcomes = total_won + total_slipped + total_lost
-    actual_hit_rate = total_won / total_outcomes if total_outcomes > 0 else None
-
+    pooled_ok = total_outcomes >= min_evidence
+    actual_hit_rate = (total_won / total_outcomes) if (pooled_ok and total_outcomes) else None
     claimed_hit_rate = config.get('claimed_commit_accuracy', 0.90)
-    calibration_delta = (actual_hit_rate - claimed_hit_rate) if actual_hit_rate else None
+    calibration_delta = (actual_hit_rate - claimed_hit_rate) if actual_hit_rate is not None else None
+
+    # by-rep hit rate, gated per rep too.
+    by_rep_out = {}
+    for owner, c in by_rep.items():
+        n = c['won'] + c['slipped'] + c['lost']
+        by_rep_out[owner] = {
+            **c, 'classified': n,
+            'hit_rate': (c['won'] / n) if n >= min_evidence else None,
+            'reason': (None if n >= min_evidence
+                       else f'{n} classified < min_evidence {min_evidence}'),
+        }
 
     return {
         'actual_hit_rate': actual_hit_rate,
         'claimed_hit_rate': claimed_hit_rate,
         'calibration_delta': calibration_delta,
+        'pooled_below_gate': (not pooled_ok),
+        'pooled_reason': (None if pooled_ok
+                          else f'{total_outcomes} classified < min_evidence {min_evidence}'),
         'breakdown': {
-            'won': total_won,
-            'slipped': total_slipped,
-            'lost': total_lost,
-            'total': total_outcomes
+            'won': total_won, 'slipped': total_slipped,
+            'lost': total_lost, 'total': total_outcomes,
         },
         'kellogg_benchmark': {
-            'won': 0.33,
-            'lost': 0.33,
-            'slipped': 0.33,
+            'won': 0.33, 'lost': 0.33, 'slipped': 0.33,
             'note': "Kellogg's heuristic for two-horse market orientation, not a target"
         },
         'by_quarter': by_quarter,
+        'by_rep': by_rep_out,
         'quarters_analyzed': len(complete_quarters),
         'anchor_week': anchor_week,
+        'min_evidence_count': min_evidence,
         'coverage_note': f'{len(complete_quarters)} complete quarters at 85% coverage',
-        'note': 'Limited historical depth — 2 quarters vs ideal 4+'
+        'note': ('Outcome is terminal (deals table), not a snapshot row; the '
+                 'COMMIT cohort is point-in-time at the anchor week.'),
     }
 
 
@@ -677,23 +705,54 @@ def main():
         if 'error' in result:
             print(f"\n⚠️  {result['error']}")
         else:
-            print(f"\nAnchor week: {result['anchor_week']}")
+            print(f"\nAnchor week: {result['anchor_week']}  "
+                  f"(min_evidence_count={result.get('min_evidence_count')})")
             print(f"Quarters analyzed: {result['quarters_analyzed']}")
-            print(f"\nActual hit rate: {result['actual_hit_rate']:.1%}" if result['actual_hit_rate'] else "N/A")
+
+            if result.get('pooled_below_gate'):
+                print(f"\nPooled hit rate: null ({result.get('pooled_reason')})")
+            else:
+                hr = result['actual_hit_rate']
+                print(f"\nPooled actual hit rate: {hr:.1%}"
+                      if hr is not None else "\nPooled actual hit rate: N/A")
             print(f"Claimed hit rate: {result['claimed_hit_rate']:.1%}")
-            print(f"Delta: {result['calibration_delta']:+.1%}" if result['calibration_delta'] else "N/A")
+            if result.get('calibration_delta') is not None:
+                print(f"Delta vs claim: {result['calibration_delta']:+.1%}")
 
             breakdown = result['breakdown']
-            print(f"\nOutcome breakdown:")
-            print(f"  Won: {breakdown['won']} ({breakdown['won']/breakdown['total']:.1%})" if breakdown['total'] > 0 else "N/A")
-            print(f"  Slipped: {breakdown['slipped']} ({breakdown['slipped']/breakdown['total']:.1%})" if breakdown['total'] > 0 else "N/A")
-            print(f"  Lost: {breakdown['lost']} ({breakdown['lost']/breakdown['total']:.1%})" if breakdown['total'] > 0 else "N/A")
+            t = breakdown['total']
+            print(f"\nPooled outcome breakdown (n={t}):")
+            if t > 0:
+                print(f"  Won: {breakdown['won']} ({breakdown['won']/t:.1%})")
+                print(f"  Slipped: {breakdown['slipped']} ({breakdown['slipped']/t:.1%})")
+                print(f"  Lost: {breakdown['lost']} ({breakdown['lost']/t:.1%})")
+
+            print("\nBy quarter (gated per quarter):")
+            for q, qd in result.get('by_quarter', {}).items():
+                if qd['hit_rate'] is None:
+                    print(f"  {q}: null ({qd['reason']})  "
+                          f"[W{qd['won']}/S{qd['slipped']}/L{qd['lost']}, "
+                          f"n={qd['classified']}]")
+                else:
+                    print(f"  {q}: {qd['hit_rate']:.1%}  "
+                          f"[W{qd['won']}/S{qd['slipped']}/L{qd['lost']}, "
+                          f"n={qd['classified']}]")
+
+            print("\nBy rep (gated per rep):")
+            for rep, rd in sorted(result.get('by_rep', {}).items(),
+                                  key=lambda kv: -(kv[1]['classified'])):
+                if rd['hit_rate'] is None:
+                    print(f"  {rep}: null ({rd['reason']})  "
+                          f"[W{rd['won']}/S{rd['slipped']}/L{rd['lost']}]")
+                else:
+                    print(f"  {rep}: {rd['hit_rate']:.1%}  "
+                          f"[W{rd['won']}/S{rd['slipped']}/L{rd['lost']}, "
+                          f"n={rd['classified']}]")
 
             bench = result['kellogg_benchmark']
             print(f"\nKellogg's benchmark (orientation only):")
             print(f"  {bench['won']:.0%} won / {bench['lost']:.0%} lost / {bench['slipped']:.0%} slipped")
             print(f"  {bench['note']}")
-
             print(f"\n{result.get('note', '')}")
 
 
