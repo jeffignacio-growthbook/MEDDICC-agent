@@ -1,0 +1,51 @@
+name: Why do committed deals slip?
+
+# Runs the slip diagnosis (analyses 1-4) against the real deals_snapshot /
+# deals / analyses / calls tables. Analyses 1-3 are Supabase-only; analysis 4
+# (calls) also needs ANTHROPIC_API_KEY for the qualitative extraction. The dev
+# container cannot reach Supabase, so this runs in CI. Read-only, no writes.
+
+on:
+  workflow_dispatch:
+    inputs:
+      include_calls:
+        description: "Run analysis 4 (calls, needs ANTHROPIC_API_KEY)"
+        required: false
+        default: 'true'
+
+permissions:
+  contents: read
+
+jobs:
+  slip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Offline tests"
+        run: |
+          set -e
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_slip_diagnosis.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_reconstruction.py
+
+      - name: "Analyses 1-3 (close-date movement, stall stage, MEDDICC)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/analytics/slip_diagnosis.py
+
+      - name: "Analysis 4 (what the calls say)"
+        if: ${{ inputs.include_calls == 'true' }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/analytics/slip_calls.py
