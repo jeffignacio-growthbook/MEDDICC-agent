@@ -44,9 +44,13 @@ def test_handler_descriptions_complete():
     handler_set = set(handler_funcs)
     description_set = set(HANDLER_DESCRIPTIONS.keys())
 
-    # Exclude meta-handlers that aren't real handler functions
+    # Exclude meta-handlers that aren't real handler functions (routed in
+    # router.py, no api.handlers function): dynamic fallback, the no-data
+    # sentinel, and the orientation intents (greeting/help, acknowledgment).
     description_set.discard("dynamic_query")
     description_set.discard("unanswerable")
+    description_set.discard("query_help")
+    description_set.discard("acknowledgment")
 
     print(f"[TEST 1] All handlers have descriptions")
     print(f"  Handlers in api.handlers: {len(handler_set)}")

@@ -29,6 +29,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: "TEST 0 — Offline: greeting/help handler + handler descriptions"
+        run: |
+          set -e
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_help_handler.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_handler_descriptions.py
+
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
