@@ -129,6 +129,54 @@ def _classify_deal_outcome(
         return 'SLIPPED'
 
 
+def _quarter_window_iso(sb, quarter: str) -> Tuple[Optional[str], Optional[str]]:
+    """(q_start_iso, q_end_iso) for a fiscal-quarter label, from the fiscal
+    calendar applied to any snapshot date in the quarter."""
+    from utils import get_fiscal_quarter
+    from datetime import date as _date
+    r = sb.table('deals_snapshot').select('snapshot_date').eq(
+        'fiscal_quarter', quarter).limit(1).execute()
+    if not r.data:
+        return None, None
+    d = _date.fromisoformat(r.data[0]['snapshot_date'])
+    q_start, q_end, _ = get_fiscal_quarter(d)
+    return q_start.isoformat(), q_end.isoformat()
+
+
+def _in_quarter_won_by_pipeline(sb, q_start_iso: str, q_end_iso: str) -> Dict[str, int]:
+    """
+    Per-pipeline count of deals that TRANSITIONED to won during the quarter —
+    i.e. terminally won (deals.is_won(stage)) with a close_date inside the
+    quarter window (defect 1).
+
+    Why terminal outcome, not a snapshot read: the Method-2 backfilled quarters
+    (the complete ones the analysis reads) contain ONLY open rows — get_deal_status
+    marks 'won' only for won stages, which the open-row reconstruction excludes.
+    So deals_snapshot has zero won rows in those quarters (verified: 0 per
+    quarter), and an in-quarter win is only observable as a terminal won stage
+    with an in-quarter close_date. Counting close-date-in-quarter counts the
+    transition INTO won during the quarter, never cumulative won-as-of-a-date
+    (the bug: every deal ever won appeared in every later quarter).
+    """
+    from supabase_client import select_all
+    from field_semantics import is_won
+    deals = select_all(sb, 'deals',
+                       columns='deal_id,stage,close_date,pipeline_id')
+    by_pipe: Dict[str, int] = defaultdict(int)
+    for d in deals:
+        stage, close_date = d.get('stage'), d.get('close_date')
+        if not stage or not close_date:
+            continue
+        try:
+            if not is_won(str(stage)):
+                continue
+        except Exception:
+            continue
+        if q_start_iso <= str(close_date)[:10] <= q_end_iso:
+            by_pipe[str(d.get('pipeline_id'))] += 1
+    return dict(by_pipe)
+
+
 def query_week3_conversion(
     sb=None,
     trailing_quarters: Optional[int] = None
@@ -211,45 +259,26 @@ def query_week3_conversion(
                 'coverage_note': f'Week-3 snapshot has only {week3_pipeline_count} deals (need {min_evidence}+). Run full backfill.'
             }
 
-        # Get deals closed won in this quarter
-        # Note: We need to check which deals from week 3 ended up closing won
-        week3_deal_ids = {r['deal_id'] for r in week3_result.data}
+        # NUMERATOR (defect 1): deals that TRANSITIONED to won DURING the
+        # quarter, counted by terminal won stage with an in-quarter close_date
+        # — never "won as of quarter end" (which cumulatively re-counted every
+        # deal ever won). Independent of the week-3 membership: a deal created
+        # and closed mid-quarter counts in the numerator without being in the
+        # week-3 denominator (the intentional asymmetry, defect 3).
+        q_start_iso, q_end_iso = _quarter_window_iso(sb, quarter)
+        won_by_pipeline = _in_quarter_won_by_pipeline(sb, q_start_iso, q_end_iso)
+        closed_won_count = sum(won_by_pipeline.values())  # Phase 1: pooled
 
-        # Get all deals that closed won (final snapshot in quarter shows won)
-        won_result = sb.table('deals_snapshot').select(
-            'deal_id, deal_value, snapshot_date, deal_status, stage_id'
-        ).eq('fiscal_quarter', quarter).in_('deal_id', list(week3_deal_ids)).execute()
-
-        # Find deals that ended in won status
-        won_deals = defaultdict(list)
-        for row in won_result.data:
-            won_deals[row['deal_id']].append(row)
-
-        # Check final status per deal
-        closed_won_count = 0
-        closed_won_value = 0
-
-        for deal_id, snapshots in won_deals.items():
-            # Get last snapshot
-            last_snap = max(snapshots, key=lambda x: x['snapshot_date'])
-            status = (last_snap.get('deal_status') or '').lower()
-            stage_id = (last_snap.get('stage_id') or '').lower()
-
-            if 'won' in status or 'closedwon' in stage_id:
-                closed_won_count += 1
-                closed_won_value += last_snap.get('deal_value', 0) or 0
-
-        # Calculate rate
+        # Dollar basis deferred to Phase 4 (null-propagation over the ledger);
+        # basis stays 'count' meanwhile.
         rate_count = closed_won_count / week3_pipeline_count if week3_pipeline_count > 0 else 0
-        rate_value = closed_won_value / week3_pipeline_value if week3_pipeline_value > 0 else 0
 
         per_quarter[quarter] = {
             'rate_count': rate_count,
-            'rate_value': rate_value,
             'closed_won_count': closed_won_count,
-            'closed_won_value': closed_won_value,
+            'closed_won_by_pipeline': won_by_pipeline,
             'week3_pipeline_count': week3_pipeline_count,
-            'week3_pipeline_value': week3_pipeline_value
+            'quarter_window': [q_start_iso, q_end_iso],
         }
 
     # Calculate trailing average
