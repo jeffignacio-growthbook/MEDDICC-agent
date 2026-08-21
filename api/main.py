@@ -44,6 +44,15 @@ async def receive_question(request: Request,
     user_id   = payload.get("user_id", "")
     channel   = payload.get("channel_id", "")
     thread_ts = payload.get("thread_ts") or payload.get("ts", "")
+    # Sender's email, if the Zapier Slack trigger includes it. This is what
+    # makes persona binding self-heal: get_user_persona binds a seeded
+    # (email-keyed) row to this slack_user_id on first contact. Without it,
+    # every user stays "Unknown" forever because the binding path never fires.
+    # Accept the handful of keys a Zapier Slack trigger might use.
+    user_email = (payload.get("user_email")
+                  or payload.get("email")
+                  or payload.get("user_profile_email")
+                  or "")
 
     # Guard: warn if both thread_ts and ts are empty
     if not thread_ts:
@@ -56,7 +65,7 @@ async def receive_question(request: Request,
         return JSONResponse({"ok": True})
 
     background.add_task(
-        process_and_reply, text, user_id, channel, thread_ts
+        process_and_reply, text, user_id, channel, thread_ts, user_email
     )
     return JSONResponse({"ok": True, "ack": "received"})
 
@@ -74,7 +83,8 @@ async def send_to_zap(channel: str, thread_ts: str,
         })
 
 async def process_and_reply(text: str, user_id: str,
-                             channel: str, thread_ts: str):
+                             channel: str, thread_ts: str,
+                             user_email: str = ""):
     """
     Full question processing pipeline:
     1. Load conversation history (thread context)
@@ -94,13 +104,17 @@ async def process_and_reply(text: str, user_id: str,
     sb = get_supabase()
     history = load_thread(sb, thread_ts)
 
-    # NEW: Persona lookup
-    persona = get_user_persona(sb, user_id)
+    # NEW: Persona lookup. Pass the sender's email so a seeded (email-keyed)
+    # persona binds to this slack_user_id on first contact — the lazy-binding
+    # path in get_user_persona is otherwise dead (no email ever reaches it).
+    persona = get_user_persona(sb, user_id, slack_email=user_email or None)
 
     # NEW: If unknown user, send DM registration form
     # (For now, just allow "other" — can tighten later)
     if not persona:
-        logger.warning(f"[PERSONA] Unknown user {user_id} — treating as 'other'")
+        logger.warning(f"[PERSONA] Unknown user {user_id} "
+                       f"(email={user_email or 'not provided by payload'}) "
+                       f"— treating as 'other'")
         # Future: send_dm_via_zap(user_id) for self-registration
         # For now: allow access with generic voice
 

@@ -1,0 +1,44 @@
+name: Seed user personas
+
+# Seeds user_personas from config/client.yaml (team roster + admins) so the
+# CRO Slack agent stops treating everyone as 'other' and can resolve a rep's
+# name to their email. The dev container cannot reach Supabase, so this runs
+# in CI where the Supabase secrets exist.
+#
+# Default is a dry run (prints the rows, writes nothing). Set write=true to
+# upsert. Idempotent — upsert on email.
+
+on:
+  workflow_dispatch:
+    inputs:
+      write:
+        description: "Actually upsert to Supabase (else dry run)"
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Seed personas from config"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          if [ "${{ inputs.write }}" = "true" ]; then
+            PYTHONPATH=.:scripts python3 scripts/seed_personas_from_config.py --write
+          else
+            PYTHONPATH=.:scripts python3 scripts/seed_personas_from_config.py
+          fi

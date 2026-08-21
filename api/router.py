@@ -557,7 +557,6 @@ Required JSON:
     "weeks": "<for query_pipeline_movement composition: integer count of recent weeks, or null>",
     "stage": "<for query_pipeline_movement stage_deals: stage name like 'Discovery', else null>",
     "close_date_scope": "<for query_pipeline_movement: 'current_quarter' to reconcile against a CRM board filtered by close date, else null (default all)>",
-    "is_slow": false,
     "help_category": "<for query_help ONLY: greeting|capability|prompt_seeking|recovery, else null>"
   }},
   "unanswerable_reason": "no_data|out_of_scope|ambiguous|null",
