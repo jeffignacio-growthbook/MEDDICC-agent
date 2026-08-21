@@ -91,6 +91,12 @@ forecast_analysis:
                                    # of the analytics-scoped population for a
                                    # quarter to be usable. Quarters below this
                                    # return null (invalid denominators)
+  max_null_value_pct: 5
+                                   # Dollar basis only. When null-value deals
+                                   # exceed this fraction of the population, a
+                                   # dollar-weighted result is null with a reason
+                                   # (null-propagation, not zero-fill). The count
+                                   # basis is unaffected.
 
 # ============================================================================
 # PROPOSAL ENGINE

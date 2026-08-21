@@ -139,6 +139,39 @@ def test_denominator_has_no_close_date_filter():
     print("  ✓ every qualified deal counts; close_date never collapses the denom")
 
 
+# ── Phase 4 — null propagation (defect 4) ──────────────────────────────
+
+def test_null_value_excluded_from_both_sides_and_counted():
+    """A deal with unknown value is excluded from the sum and the exclusion is
+    counted — never coalesced to 0.0. (Excluded from both sides of a ratio:
+    the sum uses only real values.)"""
+    print("\n[TEST] null value excluded from the sum and counted, not zero-filled")
+    from null_propagation import null_propagate
+    r = null_propagate([100.0, 200.0, None, None, 300.0], max_null_pct=50)
+    assert r["sum"] == 600.0, f"nulls must be excluded, not 0-filled; got {r['sum']}"
+    assert r["null_count"] == 2 and r["valued_count"] == 3 and r["total"] == 5
+    # A zero-fill would have produced sum 600 too but total-as-5-with-2-zeros;
+    # the distinguishing fact is null_count is surfaced, not swallowed.
+    assert r["dollar"] == 600.0  # below 50% threshold → trustworthy
+    print("  ✓ sum excludes the 2 unknowns and counts them (no 0-fill)")
+
+
+def test_dollar_basis_returns_null_above_null_threshold():
+    """When null-value deals exceed max_null_value_pct, dollar basis returns
+    null with a reason. Count basis (valued_count) is unaffected."""
+    print("\n[TEST] dollar basis returns null above the null threshold")
+    from null_propagation import null_propagate
+    # 5 nulls of 100 = exactly 5% → NOT above 5 → still trustworthy.
+    lo = null_propagate([1.0] * 95 + [None] * 5, max_null_pct=5)
+    assert lo["basis_null"] is False and lo["dollar"] == 95.0, lo
+    # 10% > 5% → dollar basis null with reason.
+    hi = null_propagate([1.0] * 90 + [None] * 10, max_null_pct=5)
+    assert hi["basis_null"] is True, hi
+    assert hi["dollar"] is None and hi["reason"], hi
+    assert hi["valued_count"] == 90, "count basis unaffected"
+    print("  ✓ >5% null → dollar null with reason; count basis intact")
+
+
 def main():
     print("=" * 70)
     print("FORECAST CORRECTNESS TESTS")
@@ -147,6 +180,8 @@ def main():
         test_numerator_counts_in_quarter_transitions_not_terminal_status,
         test_numerator_and_denominator_share_scope,
         test_denominator_has_no_close_date_filter,
+        test_null_value_excluded_from_both_sides_and_counted,
+        test_dollar_basis_returns_null_above_null_threshold,
     ]
     passed = failed = 0
     for t in tests:

@@ -159,6 +159,22 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
     """
     from utils import get_fiscal_quarter
     from supabase_client import select_all
+    import sys as _sys
+    _sys.path.insert(0, str(Path(__file__).parent))  # analytics/ for null_propagation
+    from null_propagation import null_propagate
+
+    # Null-propagation threshold (defect 4). A deal whose deal_value is None is
+    # EXCLUDED from every dollar sum and COUNTED — never coalesced to 0.0, which
+    # would re-fabricate the number Phase 2b removed.
+    max_null_pct = float(config.get('forecast_analysis', {})
+                         .get('max_null_value_pct', 5))
+
+    def _deal_value(row):
+        """deal_value as float, or None when unknown — NEVER 0-coalesced."""
+        if not row:
+            return None
+        v = row.get('deal_value')
+        return float(v) if v is not None else None
 
     # Load both snapshots (paginated)
     def load_snapshot(snap_date: str) -> dict:
@@ -193,22 +209,34 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
         'net_change': 0.0,
         'deals_created_count': 0,
         'deals_qualified_count': 0,
+        'null_value_excluded_count': 0,   # deals dropped from dollar sums (unknown value)
         'details': [],
     })
 
-    # Calculate beginning and ending values (qualified pipeline only)
-    # Uses current highest_stage_order_reached (high-water mark) to filter
+    # Beginning/ending values (qualified pipeline only), null-propagated:
+    # collect per-pipeline value lists (None for unknown), then exclude-and-
+    # count via null_propagate rather than coalescing null -> 0.
+    from collections import defaultdict as _dd
+    begin_values, end_values = _dd(list), _dd(list)
     for deal_id, p in prev_snap.items():
         if (p.get('deal_status') == 'active' and
             (qual_map.get(deal_id, {}).get('highest_stage_order_reached') or 0) >= threshold):
-            pipeline_id = p.get('pipeline_id', 'default')
-            pipeline_waterfalls[pipeline_id]['beginning_value'] += float(p.get('deal_value') or 0)
-
+            begin_values[p.get('pipeline_id', 'default')].append(_deal_value(p))
     for deal_id, n in new_snap.items():
         if (n.get('deal_status') == 'active' and
             (qual_map.get(deal_id, {}).get('highest_stage_order_reached') or 0) >= threshold):
-            pipeline_id = n.get('pipeline_id', 'default')
-            pipeline_waterfalls[pipeline_id]['ending_value'] += float(n.get('deal_value') or 0)
+            end_values[n.get('pipeline_id', 'default')].append(_deal_value(n))
+
+    for pid, vals in begin_values.items():
+        npr = null_propagate(vals, max_null_pct)
+        pipeline_waterfalls[pid]['beginning_value'] = npr['sum']  # excludes nulls, never 0-filled
+        pipeline_waterfalls[pid]['beginning_null_excluded'] = npr['null_count']
+        pipeline_waterfalls[pid]['beginning_dollar_basis_null'] = npr['basis_null']
+    for pid, vals in end_values.items():
+        npr = null_propagate(vals, max_null_pct)
+        pipeline_waterfalls[pid]['ending_value'] = npr['sum']
+        pipeline_waterfalls[pid]['ending_null_excluded'] = npr['null_count']
+        pipeline_waterfalls[pid]['ending_dollar_basis_null'] = npr['basis_null']
 
     all_deal_ids = set(new_snap) | set(prev_snap)
 
@@ -223,7 +251,13 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
 
         pipeline_id = (n or p).get('pipeline_id', 'default')
         wf = pipeline_waterfalls[pipeline_id]
-        value = float((n or p).get('deal_value') or 0)
+        # None when value is unknown — NEVER 0-coalesced. A dollar category adds
+        # `value` only when known; an unknown-value deal is counted (count basis)
+        # and tallied into null_value_excluded_count (dollar basis).
+        value = _deal_value(n or p)
+        value_known = value is not None
+        if not value_known:
+            wf['null_value_excluded_count'] += 1
 
         # Check if deal was newly qualified this week using qualified_date
         qualified_date_str = qual_info.get('qualified_date')
@@ -239,7 +273,8 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
 
         if n and not p:
             # New deal created this week AND already qualified
-            wf['new_pipeline_value'] += value
+            if value_known:
+                wf['new_pipeline_value'] += value
             wf['deals_created_count'] += 1
             wf['details'].append({
                 'deal_id': deal_id,
@@ -250,7 +285,8 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
             })
         elif newly_qualified_this_week and p:
             # Deal existed before and crossed qualification threshold this week
-            wf['newly_qualified_value'] += value
+            if value_known:
+                wf['newly_qualified_value'] += value
             wf['deals_qualified_count'] += 1
             wf['details'].append({
                 'deal_id': deal_id,
@@ -316,10 +352,12 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
                 # not counted as stage movement — they haven't entered
                 # the qualified pipeline yet.
 
-            # Check ARR change
-            n_value = float(n.get('deal_value') or 0) if n else 0.0
-            p_value = float(p.get('deal_value') or 0) if p else 0.0
-            if n_value != p_value:
+            # Check ARR change — null-propagated: an unknown value on either
+            # side is not a fabricated 0, so we do not manufacture an arr_change
+            # from it. Only a real change between two KNOWN values counts.
+            n_value = _deal_value(n)
+            p_value = _deal_value(p)
+            if n_value is not None and p_value is not None and n_value != p_value:
                 changes.append('arr_change')
 
             # Apply value to highest precedence category
@@ -330,21 +368,24 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
                     primary_change = category
                     break
 
-            # Update waterfall values
-            if primary_change == 'won':
-                wf['won_value'] += value
-            elif primary_change == 'lost':
-                wf['lost_value'] += value
-            elif primary_change == 'pulled_in':
-                wf['pulled_in_value'] += value
-            elif primary_change == 'pushed_out':
-                wf['pushed_out_value'] += value
-            elif primary_change == 'moved_forward':
-                wf['moved_forward_value'] += value
-            elif primary_change == 'moved_backward':
-                wf['moved_backward_value'] += value
-            elif primary_change == 'arr_change':
-                wf['arr_change_value'] += value
+            # Update waterfall values — dollar categories only when the value
+            # is known; an unknown-value deal is already counted in
+            # null_value_excluded_count and must not become a fabricated 0.
+            if value_known:
+                if primary_change == 'won':
+                    wf['won_value'] += value
+                elif primary_change == 'lost':
+                    wf['lost_value'] += value
+                elif primary_change == 'pulled_in':
+                    wf['pulled_in_value'] += value
+                elif primary_change == 'pushed_out':
+                    wf['pushed_out_value'] += value
+                elif primary_change == 'moved_forward':
+                    wf['moved_forward_value'] += value
+                elif primary_change == 'moved_backward':
+                    wf['moved_backward_value'] += value
+                elif primary_change == 'arr_change':
+                    wf['arr_change_value'] += value
 
             # Add to details with all relevant metadata
             if changes:
@@ -374,6 +415,23 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
                 wf['details'].append(detail)
 
     for pipeline_id, wf in pipeline_waterfalls.items():
+        # Surface the null-value exclusion in details (schema-safe: no new
+        # column). A material fraction means the dollar figures understate the
+        # pipeline because unknown-value deals were excluded, not zero-filled.
+        excluded = wf.get('null_value_excluded_count', 0)
+        begin_excl = wf.get('beginning_null_excluded', 0)
+        end_excl = wf.get('ending_null_excluded', 0)
+        if excluded or begin_excl or end_excl:
+            wf['details'].insert(0, {
+                'change_type': 'null_value_excluded_summary',
+                'movement_null_value_excluded': excluded,
+                'beginning_null_value_excluded': begin_excl,
+                'ending_null_value_excluded': end_excl,
+                'beginning_dollar_basis_null': wf.get('beginning_dollar_basis_null', False),
+                'ending_dollar_basis_null': wf.get('ending_dollar_basis_null', False),
+                'note': 'unknown-value deals excluded from dollar sums (not 0-filled); counts unaffected',
+            })
+
         wf['net_change'] = (
             wf['new_pipeline_value']
             + wf['newly_qualified_value']

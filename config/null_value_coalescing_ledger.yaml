@@ -21,13 +21,16 @@
 # site appears in a snapshot-reading dollar path, and reports a ledger entry
 # that is gone (fixed) so it can be removed. Ratchet: down, never up.
 
-known_coalescing_sites:
-  compute_waterfall.py:
-    - "n_value = float(n.get('deal_value') or 0) if n else 0.0"
-    - "p_value = float(p.get('deal_value') or 0) if p else 0.0"
-    - "pipeline_waterfalls[pipeline_id]['beginning_value'] += float(p.get('deal_value') or 0)"
-    - "pipeline_waterfalls[pipeline_id]['ending_value'] += float(n.get('deal_value') or 0)"
-    - "value = float((n or p).get('deal_value') or 0)"
-  forecast_analyses.py:
-    - "closed_won_value += last_snap.get('deal_value', 0) or 0"
-    - "week3_pipeline_value = sum(r.get('deal_value', 0) or 0 for r in week3_result.data)"
+# PRUNED — all 7 sites fixed in the analysis-correctness pass (Phase 4):
+#   * forecast_analyses.py (2): removed. query_week3_conversion is now
+#     count-basis — the two dollar sums (closed_won_value, week3_pipeline_value)
+#     no longer exist.
+#   * compute_waterfall.py (5): null-propagated. deal_value is read via
+#     _deal_value() (float or None, never 0-coalesced); unknown-value deals are
+#     EXCLUDED from every dollar sum and COUNTED (null_value_excluded_count),
+#     via scripts/analytics/null_propagation.null_propagate. Above
+#     forecast_analysis.max_null_value_pct the dollar basis is flagged null.
+#
+# The ledger is now empty. The ratchet test still fails if a NEW dollar-
+# weighted null-coalescing site appears in a snapshot-reading path.
+known_coalescing_sites: {}

@@ -1003,8 +1003,9 @@ def test_dollar_weighted_paths_never_coalesce_null_value_to_zero():
           "add it to config/null_value_coalescing_ledger.yaml with a reason.")
 
     print("✓ test_dollar_weighted_paths_never_coalesce_null_value_to_zero passed")
-    print(f"  {len(known_set)} known site(s) frozen; no new ones. "
-          f"Fix is null-propagation, deferred to the analysis-correctness pass.")
+    print(f"  {len(known_set)} known site(s) in the ledger; {len(live_set)} live. "
+          f"All original sites were null-propagated in the analysis-correctness "
+          f"pass (ledger pruned to empty); the ratchet now guards against NEW ones.")
 
 
 def test_no_duplicate_population_selection():
