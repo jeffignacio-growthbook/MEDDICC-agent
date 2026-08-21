@@ -172,6 +172,34 @@ def test_dollar_basis_returns_null_above_null_threshold():
     print("  ✓ >5% null → dollar null with reason; count basis intact")
 
 
+# ── Phase 5 — stage exclusions are point-in-time (defect 5) ────────────
+
+def test_waterfall_qualification_is_point_in_time_not_current_stage():
+    """The waterfall's qualified-pipeline membership is gated on qualified_date
+    (the immutable event of first crossing the threshold), NOT on the current
+    high-water-mark stage. A deal that qualifies AFTER a snapshot date must not
+    count as in that earlier week's pipeline; one that qualified on/before it
+    must."""
+    print("\n[TEST] waterfall qualification is point-in-time (defect 5)")
+    from analytics.compute_waterfall import _qualified_as_of
+    qual_map = {
+        "early":  {"qualified_date": "2026-03-01"},  # qualified in the past
+        "future": {"qualified_date": "2026-09-01"},  # qualifies later
+        "never":  {"qualified_date": None},          # never qualified
+        "sameday": {"qualified_date": "2026-06-15"},  # boundary
+    }
+    as_of = "2026-06-15"
+    assert _qualified_as_of(qual_map, "early", as_of) is True
+    assert _qualified_as_of(qual_map, "future", as_of) is False, \
+        "a deal that qualifies later must NOT count in an earlier week"
+    assert _qualified_as_of(qual_map, "never", as_of) is False
+    assert _qualified_as_of(qual_map, "sameday", as_of) is True, \
+        "qualified exactly on the snapshot date counts (<=)"
+    assert _qualified_as_of(qual_map, "missing", as_of) is False, \
+        "a deal absent from qual_map is not qualified (no current-stage guess)"
+    print("  ✓ membership follows the qualified_date event, not current stage")
+
+
 def main():
     print("=" * 70)
     print("FORECAST CORRECTNESS TESTS")
@@ -182,6 +210,7 @@ def main():
         test_denominator_has_no_close_date_filter,
         test_null_value_excluded_from_both_sides_and_counted,
         test_dollar_basis_returns_null_above_null_threshold,
+        test_waterfall_qualification_is_point_in_time_not_current_stage,
     ]
     passed = failed = 0
     for t in tests:

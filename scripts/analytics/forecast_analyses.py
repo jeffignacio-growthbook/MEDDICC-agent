@@ -167,6 +167,13 @@ def _in_quarter_won_by_pipeline(sb, q_start_iso: str, q_end_iso: str) -> Dict[st
     """
     from supabase_client import select_all
     from field_semantics import is_won
+    # OUTCOME-READ (defect 5): this reads `stage` from the current `deals` table
+    # to determine the TERMINAL WON OUTCOME (is_won) and attribute it to a
+    # pipeline — an outcome/event, NOT a point-in-time stage exclusion. The
+    # backfilled complete quarters hold zero won rows in deals_snapshot, so a
+    # won transition has no point-in-time snapshot equivalent; close_date bounds
+    # it to the quarter. Stage EXCLUSIONS (the denominator scope) read the
+    # snapshot's point-in-time stage_id, never this table.
     deals = select_all(sb, 'deals',
                        columns='deal_id,stage,close_date,pipeline_id')
     by_pipe: Dict[str, int] = defaultdict(int)

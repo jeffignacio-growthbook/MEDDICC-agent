@@ -5,7 +5,10 @@ Uses the two most recent snapshot dates (not "exactly 7 days
 prior" — uses nearest prior to survive missed crons).
 Writes to waterfall_weekly table.
 
-IMPORTANT: This tracks QUALIFIED pipeline only (highest_stage_order_reached >= 2).
+IMPORTANT: This tracks the QUALIFIED pipeline only. Membership is point-in-time
+(defect 5): a deal counts for a week only once its qualified_date — the immutable
+event when it first crossed the threshold — has occurred on or before that week's
+snapshot date. It is NOT gated on the current-state highest_stage_order_reached.
 Meeting Set stage deals (order 0-1) are excluded from beginning/ending values
 and all waterfall movements to match HubSpot's qualified pipeline definition.
 
@@ -22,6 +25,26 @@ from datetime import date
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.parent
+
+
+def _qualified_as_of(qual_map, deal_id, as_of_iso):
+    """Point-in-time qualified-pipeline membership (defect 5).
+
+    A deal is in the qualified pipeline as of a date only once its
+    qualified_date (the immutable event when it first crossed the qualification
+    threshold — seeded from HubSpot dealstage history) has occurred on or
+    before that date. Uses the event timestamp, NEVER the current-state
+    highest_stage_order_reached, which is the stage the deal has reached BY NOW
+    and would count a not-yet-qualified deal as already in an earlier week's
+    pipeline.
+    """
+    qd = (qual_map.get(deal_id) or {}).get('qualified_date')
+    if not qd:
+        return False
+    try:
+        return date.fromisoformat(qd) <= date.fromisoformat(as_of_iso)
+    except (ValueError, TypeError):
+        return False
 
 
 def main():
@@ -46,23 +69,30 @@ def main():
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
     config = load_client_config()
 
-    # Load qualification threshold and current qualification status
+    # Load qualification threshold (documented; the point-in-time gate below
+    # derives from qualified_date, which is set exactly when this threshold is
+    # first crossed, so it need not be re-applied per week).
     pipeline_cfg = config.get('pipelines', {}).get('default', {})
     threshold = pipeline_cfg.get('qualified_stage_order', 2)
 
-    print(f"Using qualification threshold: stage_order >= {threshold}")
+    print(f"Qualification threshold (config): stage_order >= {threshold}; "
+          f"membership is point-in-time via qualified_date")
 
-    # Load current qualification status for all deals (high-water mark)
+    # Point-in-time qualified-pipeline membership (defect 5). qualified_date is
+    # the IMMUTABLE event timestamp of when a deal first crossed the
+    # qualification threshold (seed_qualification_history replays dealstage
+    # history) — an event fact, like a won deal's close_date, NOT current state.
+    # We deliberately do NOT read highest_stage_order_reached: that is the stage
+    # the deal has reached BY NOW, and gating a historical week on it would
+    # count a not-yet-qualified deal as already in that week's pipeline. Stage
+    # exclusions come from the point-in-time snapshot; membership from the event.
     qual_rows = select_all(sb, 'deals',
-                          columns='deal_id, highest_stage_order_reached, qualified_date')
+                          columns='deal_id, qualified_date')
     qual_map = {
-        row['deal_id']: {
-            'highest_stage_order_reached': row.get('highest_stage_order_reached', 0),
-            'qualified_date': row.get('qualified_date')
-        }
+        row['deal_id']: {'qualified_date': row.get('qualified_date')}
         for row in qual_rows
     }
-    print(f"Loaded qualification data for {len(qual_map)} deals")
+    print(f"Loaded qualification (event) data for {len(qual_map)} deals")
 
     if args.backfill:
         # Backfill mode: get all snapshot dates and compute waterfalls for all pairs
@@ -220,11 +250,11 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
     begin_values, end_values = _dd(list), _dd(list)
     for deal_id, p in prev_snap.items():
         if (p.get('deal_status') == 'active' and
-            (qual_map.get(deal_id, {}).get('highest_stage_order_reached') or 0) >= threshold):
+            _qualified_as_of(qual_map, deal_id, prev_date)):
             begin_values[p.get('pipeline_id', 'default')].append(_deal_value(p))
     for deal_id, n in new_snap.items():
         if (n.get('deal_status') == 'active' and
-            (qual_map.get(deal_id, {}).get('highest_stage_order_reached') or 0) >= threshold):
+            _qualified_as_of(qual_map, deal_id, new_date)):
             end_values[n.get('pipeline_id', 'default')].append(_deal_value(n))
 
     for pid, vals in begin_values.items():
@@ -244,9 +274,10 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
         n = new_snap.get(deal_id)
         p = prev_snap.get(deal_id)
 
-        # Skip deals that never reached qualification threshold
+        # Skip deals not yet in the qualified pipeline as of this week (defect
+        # 5: point-in-time via qualified_date, not the current high-water mark).
         qual_info = qual_map.get(deal_id, {})
-        if (qual_info.get('highest_stage_order_reached') or 0) < threshold:
+        if not _qualified_as_of(qual_map, deal_id, new_date):
             continue
 
         pipeline_id = (n or p).get('pipeline_id', 'default')

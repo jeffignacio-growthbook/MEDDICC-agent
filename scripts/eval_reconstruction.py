@@ -1050,6 +1050,80 @@ def test_no_duplicate_population_selection():
           "both callers import them")
 
 
+def test_analyses_never_read_current_deals_for_stage():
+    """Stage exclusions must be point-in-time (defect 5).
+
+    An analysis decides whether a deal is IN SCOPE for a given week from the
+    stage the deal held AS OF that week — the point-in-time stage_id in
+    deals_snapshot. Reading a stage field from the current `deals` table
+    (stage / stage_id / stage_order / highest_stage_order_reached) is a leak:
+    it scopes a historical week by the stage the deal has reached BY NOW, so a
+    not-yet-qualified deal counts as already in an earlier week's pipeline and a
+    since-regressed deal drops out of a week it belonged to.
+
+    The one legitimate current-`deals` read of a stage field is TERMINAL
+    OUTCOME determination — a won transition has no point-in-time snapshot
+    equivalent (the backfilled complete quarters hold zero won rows). That read
+    must be explicitly marked `OUTCOME-READ`; every other current-`deals` stage
+    read fails this guard. Event timestamps (qualified_date, close_date) are not
+    stage fields and are allowed — they are immutable facts, like a won deal's
+    close_date.
+    """
+    import re
+
+    STAGE_FIELDS = ('highest_stage_order_reached', 'stage_id',
+                    'stage_order', 'stage')
+    # A read of the current `deals` table (NOT deals_snapshot). Match both
+    # access idioms and capture the column list that follows.
+    READ_PATTERNS = [
+        re.compile(r"select_all\(\s*sb\s*,\s*['\"]deals['\"]\s*,"
+                   r"\s*columns\s*=\s*['\"]([^'\"]*)['\"]"),
+        re.compile(r"\.table\(\s*['\"]deals['\"]\s*\)\s*\.select\(\s*"
+                   r"['\"]([^'\"]*)['\"]"),
+    ]
+
+    files = ['scripts/analytics/forecast_analyses.py',
+             'scripts/analytics/compute_waterfall.py']
+
+    violations = []
+    outcome_reads = []
+    for rel in files:
+        src = (REPO_ROOT / rel).read_text()
+        lines = src.splitlines()
+        # deals_snapshot is the point-in-time table; guarding it is the goal,
+        # not forbidding it. Confirm each analysis file actually reads it.
+        assert 'deals_snapshot' in src, \
+            f"{rel} does not read the point-in-time snapshot table at all"
+
+        for pat in READ_PATTERNS:
+            for m in pat.finditer(src):
+                cols = [c.strip() for c in m.group(1).split(',')]
+                stage_cols = [c for c in cols if c in STAGE_FIELDS]
+                if not stage_cols:
+                    continue  # event/value/id columns only — fine
+                # Is this read marked as a terminal-outcome read? Look at the
+                # ~8 source lines preceding the match for the OUTCOME-READ mark.
+                start_line = src[:m.start()].count('\n')
+                window = '\n'.join(lines[max(0, start_line - 8):start_line + 1])
+                if 'OUTCOME-READ' in window:
+                    outcome_reads.append((rel, stage_cols))
+                else:
+                    violations.append((rel, m.group(1), stage_cols))
+
+    assert not violations, (
+        "Analysis reads a STAGE field from the current `deals` table without an "
+        "OUTCOME-READ marker — a point-in-time leak (defect 5). Scope from the "
+        "snapshot's stage_id instead, or (for a terminal outcome only) mark the "
+        "read OUTCOME-READ:\n"
+        + "\n".join(f"    {f}: columns='{c}' -> {s}" for f, c, s in violations))
+
+    print("✓ test_analyses_never_read_current_deals_for_stage passed")
+    print(f"  {len(files)} analysis file(s) scope stages from deals_snapshot; "
+          f"{len(outcome_reads)} marked terminal-outcome read(s):")
+    for f, s in outcome_reads:
+        print(f"      {f}: OUTCOME-READ {s}")
+
+
 def run_all_tests():
     """Run all reconstruction regression tests."""
     print("=" * 80)
@@ -1085,6 +1159,8 @@ def run_all_tests():
         test_point_in_time_value_beats_the_proxy,
         test_value_properties_are_all_tracked_in_history,
         test_dollar_weighted_paths_never_coalesce_null_value_to_zero,
+        # Defect 5 — stage exclusions must be point-in-time, never current state
+        test_analyses_never_read_current_deals_for_stage,
     ]
 
     for test in tests:
