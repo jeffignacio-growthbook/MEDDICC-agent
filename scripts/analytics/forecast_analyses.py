@@ -60,13 +60,20 @@ def _get_complete_quarters(sb) -> List[str]:
 
     A quarter is complete if it has snapshots for all weeks 1-13.
     """
-    result = sb.table('deals_snapshot').select(
-        'fiscal_quarter, week_of_quarter'
-    ).not_.is_('fiscal_quarter', 'null').execute()
+    # MUST paginate: deals_snapshot has 24k+ rows and PostgREST silently caps
+    # an unpaginated .execute() at 1,000. The old direct call saw only the
+    # first 1,000 rows, never observed all 13 weeks of any quarter, and so
+    # reported "no complete quarters" — dead-ending every analysis. select_all
+    # pages through the whole table.
+    from supabase_client import select_all
+    rows = select_all(
+        sb, 'deals_snapshot',
+        columns='fiscal_quarter,week_of_quarter',
+        filters=[('__not_null__', 'fiscal_quarter')])
 
     # Group by quarter, collect unique weeks
     quarters = defaultdict(set)
-    for row in result.data:
+    for row in rows:
         quarter = row.get('fiscal_quarter')
         week = row.get('week_of_quarter')
         if quarter and week:
