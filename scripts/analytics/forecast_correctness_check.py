@@ -148,6 +148,25 @@ def main():
                 num_terminal += 1
                 num_terminal_by_pipe[t["pipeline_id"]] += 1
 
+        # D. terminal_close_UNRESTRICTED: every deal terminally won with
+        #    close_date in the quarter window, per pipeline, WITHOUT requiring
+        #    it to appear in a snapshot (the spec's asymmetry: a mid-quarter-
+        #    created deal that closes in-quarter counts in the numerator even
+        #    though it was never in the week-3 denominator).
+        num_unrestricted_by_pipe = defaultdict(int)
+        for did, t in terminal.items():
+            if not t["won"] or not t["close_date"]:
+                continue
+            pid = t["pipeline_id"]
+            if pid is not None and str(pid) in excl:
+                pid_key = f"{pid} (renewal/excluded)"
+            else:
+                pid_key = pid
+            cd = t["close_date"][:10]
+            if q_start.isoformat() <= cd <= q_end.isoformat():
+                num_unrestricted_by_pipe[pid_key] += 1
+        num_unrestricted = sum(num_unrestricted_by_pipe.values())
+
         print("=" * 78)
         print(f"{q}   window {q_start}..{q_end}   sources={dict(src_ct)}")
         print(f"  won rows present in deals_snapshot for quarter: {won_rows}")
@@ -156,8 +175,10 @@ def main():
         print(f"  NUMERATOR candidates:")
         print(f"    A buggy_current (won in last in-qtr snapshot): {num_buggy}")
         print(f"    B snapshot_transition (won transition in-qtr): {num_transition}")
-        print(f"    C terminal_close (deals.is_won & close in qtr): {num_terminal}"
+        print(f"    C terminal_close, appeared-in-snapshot: {num_terminal}"
               f"  by_pipeline={dict(num_terminal_by_pipe)}")
+        print(f"    D terminal_close, UNRESTRICTED (all deals): {num_unrestricted}"
+              f"  by_pipeline={dict(num_unrestricted_by_pipe)}")
         print()
 
     print("Compare candidate C (and B) against known-correct 31 / 40 / 48.")
