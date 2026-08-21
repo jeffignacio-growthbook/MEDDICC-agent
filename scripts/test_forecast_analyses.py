@@ -34,39 +34,19 @@ def test_week3_conversion_excludes_incomplete_quarters():
     """
     print("\n[TEST] Week-3 conversion excludes incomplete quarters")
 
-    # Test _get_complete_quarters directly with mocked Supabase response
-    with patch('analytics.forecast_analyses.create_client') as mock_create:
-        sb = Mock()
-        mock_create.return_value = sb
+    # _get_complete_quarters now paginates via supabase_client.select_all
+    # (the old unpaginated .execute() silently capped at 1,000 rows and saw no
+    # complete quarter). Mock that seam; the assertion is unchanged.
+    rows = [
+        {'fiscal_quarter': 'FY2027 Q1', 'week_of_quarter': w}
+        for w in range(1, 11)  # Only 10 weeks
+    ] + [
+        {'fiscal_quarter': 'FY2027 Q2', 'week_of_quarter': w}
+        for w in range(1, 14)  # Complete 13 weeks
+    ]
 
-        # Mock data: Q1 has only 10 weeks, Q2 has 13 weeks
-        mock_response = Mock()
-        mock_response.data = [
-            {'fiscal_quarter': 'FY2027 Q1', 'week_of_quarter': w}
-            for w in range(1, 11)  # Only 10 weeks
-        ] + [
-            {'fiscal_quarter': 'FY2027 Q2', 'week_of_quarter': w}
-            for w in range(1, 14)  # Complete 13 weeks
-        ]
-
-        # Set up the mock chain properly
-        # The chain is: sb.table().select().not_().is_().execute()
-        mock_execute = Mock(return_value=mock_response)
-        mock_is = Mock()
-        mock_is.execute = mock_execute
-
-        mock_not = Mock()
-        mock_not.is_ = Mock(return_value=mock_is)
-
-        mock_select = Mock()
-        mock_select.not_ = mock_not  # not_ is a property, not a method
-
-        mock_table = Mock()
-        mock_table.select = Mock(return_value=mock_select)
-
-        sb.table = Mock(return_value=mock_table)
-
-        complete = _get_complete_quarters(sb)
+    with patch('supabase_client.select_all', return_value=rows):
+        complete = _get_complete_quarters(Mock())
 
         # Should only include Q2, not Q1
         if 'FY2027 Q1' in complete:
