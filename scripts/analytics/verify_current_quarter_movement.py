@@ -75,31 +75,52 @@ def _analyze(label, by_date):
 
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--expect-retired", action="store_true",
+                    help="Post-retirement assertion: FY2027 Q3 'backfilled' "
+                         "transitions must be > 0 and the stopgap source gone. "
+                         "Exit non-zero if not — so the caveat is only removed "
+                         "once the loop is genuinely closed.")
+    args = ap.parse_args()
     sb = _sb()
-    q3 = _analyze(
-        "FY2027 Q3 — backfill_current_quarter (hypothesis: structural 0)",
-        _load(sb, "FY2027 Q3", "backfill_current_quarter"))
+
+    stopgap = _load(sb, "FY2027 Q3", "backfill_current_quarter")
+    stopgap_rows = sum(len(v) for v in stopgap.values())
+    stopgap_tx = _analyze(
+        "FY2027 Q3 — backfill_current_quarter (stopgap; structural 0 by "
+        f"construction) — rows now: {stopgap_rows}",
+        stopgap) if stopgap else None
+
+    q3b = _analyze(
+        "FY2027 Q3 — backfilled (point-in-time reconstruction; expect "
+        "real transitions after retirement)",
+        _load(sb, "FY2027 Q3", "backfilled"))
     q2 = _analyze(
-        "FY2027 Q2 — backfilled (point-in-time; expect real transitions)",
+        "FY2027 Q2 — backfilled (baseline; known real transitions)",
         _load(sb, "FY2027 Q2", "backfilled"))
 
     print("\n" + "=" * 72)
     print("VERDICT")
     print("=" * 72)
-    if q3 is not None and q2 is not None:
-        if q3 == 0 and q2 > 0:
-            print("  CONFIRMED: current-quarter series shows ZERO stage "
-                  "transitions by construction (stage copied from live deals), "
-                  f"while the backfilled series shows {q2} real transitions. "
-                  "The zero-exits observation is a data-source artifact, not a "
-                  "handler bug. The handler now caveats this source.")
-        elif q3 and q3 > 0:
-            print(f"  NOT structural: current-quarter series has {q3} real "
-                  "stage transitions — investigate the handler math instead.")
-        else:
-            print(f"  INCONCLUSIVE: q3_transitions={q3}, q2_transitions={q2}")
+    print(f"  FY2027 Q3 stopgap rows remaining: {stopgap_rows}")
+    print(f"  FY2027 Q3 backfilled transitions: {q3b}")
+    print(f"  FY2027 Q2 backfilled transitions: {q2} (baseline)")
+
+    if args.expect_retired:
+        if stopgap_rows == 0 and q3b and q3b > 0:
+            print("\n  LOOP CLOSED: the stopgap is gone and the reconstructed "
+                  f"FY2027 Q3 now shows {q3b} real stage transitions where the "
+                  "copied-stage series showed 0/696. Same quarter, same handler, "
+                  "correct data, real movement. The caveat can be removed.")
+            return 0
+        print("\n  ✗ NOT yet closed: caveat must stay. "
+              f"(stopgap_rows={stopgap_rows}, q3_backfilled_transitions={q3b})")
+        return 1
+
     print("\nDONE.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

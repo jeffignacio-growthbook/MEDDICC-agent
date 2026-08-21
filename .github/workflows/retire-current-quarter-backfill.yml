@@ -87,6 +87,15 @@ jobs:
           PYTHONPATH=scripts:api:scripts/analytics:. python3 \
             scripts/analytics/retire_current_quarter_backfill.py $CONFIRM $QARG
 
+      - name: "Post-write: confirm FY2027 Q3 movement is now non-zero"
+        if: ${{ inputs.mode == 'execute' }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 \
+            scripts/analytics/verify_current_quarter_movement.py --expect-retired
+
       - name: Upload backup + checkpoint artifacts
         if: ${{ inputs.mode == 'execute' }}
         uses: actions/upload-artifact@v4
