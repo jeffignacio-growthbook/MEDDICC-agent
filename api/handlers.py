@@ -22,6 +22,77 @@ except ImportError:
     from api.field_semantics import stage_bucket, stage_label, is_won, is_lost, is_open
 
 
+def _resolve_tw(params: dict) -> dict:
+    """Return a resolved time window, defaulting to the current quarter.
+
+    The router always injects params['time_window'], but a handler must never
+    KeyError on a missing param: a raise drops the whole request to the dynamic
+    loop, which burns the query budget and returns nothing useful (the most
+    common user-visible failure in this system). Guarding here keeps every
+    time-scoped handler answerable even when called directly or under test.
+    """
+    tw = params.get("time_window")
+    if tw:
+        return tw
+    try:
+        from api.time_resolver import resolve_time_window
+    except ImportError:
+        from time_resolver import resolve_time_window
+    return resolve_time_window({})
+
+
+def _resolve_owner_email(params: dict, sb):
+    """Resolve a rep to an owner_email, accepting an email OR a person's name.
+
+    The classifier is asked to turn a first name into an email via the roster,
+    but that resolution silently fails when the roster is empty (personas not
+    seeded) or the name is partial — the handler then gets a name where it
+    wanted an ID, errors, and drops to the budget-burning dynamic loop. This
+    resolves in-handler against user_personas so a rep's first name, full name,
+    or email all work.
+
+    Returns (email_or_None, note_or_None). `note` explains a name→email
+    resolution or a miss, for transparency in the handler's output.
+    """
+    # 1. An email supplied under any of the known keys wins outright.
+    for key in ("owner_email", "rep_email", "sdr_email", "email"):
+        v = params.get(key)
+        if v and "@" in str(v):
+            return str(v).strip().lower(), None
+
+    # 2. Otherwise gather any name-ish candidate the classifier may have passed.
+    candidates = []
+    for key in ("owner_email", "rep_email", "sdr_email", "email",
+                "rep_name", "owner_name", "sdr_name", "name",
+                "rep", "owner", "sdr"):
+        v = params.get(key)
+        if v and "@" not in str(v):
+            candidates.append(str(v).strip())
+    if not candidates:
+        return None, None
+
+    try:
+        personas = select_all(sb, "user_personas",
+                              columns="email,name,display_name")
+    except Exception:
+        personas = []
+
+    for cand in candidates:
+        cl = cand.lower().strip()
+        if not cl:
+            continue
+        for p in personas:
+            for nm in (p.get("name"), p.get("display_name")):
+                nml = str(nm or "").lower().strip()
+                if not nml:
+                    continue
+                first = nml.split()[0] if nml.split() else nml
+                if cl == nml or cl == first or cl in nml:
+                    if p.get("email"):
+                        return p["email"], f"resolved '{cand}' to {p['email']}"
+    return None, f"could not resolve '{candidates[0]}' to a known rep"
+
+
 async def query_waterfall(params: dict, sb) -> dict:
     """
     Pipeline snapshot + movement in ONE handler with question-aware emphasis.
@@ -39,7 +110,7 @@ async def query_waterfall(params: dict, sb) -> dict:
     import yaml
     from pathlib import Path
 
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     question = params.get("question", "").lower()
 
     # Load stage config from client.yaml
@@ -226,7 +297,7 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
     """
     from api.stage_requirements import get_requirements_for_stage
 
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     deal_ids = params.get("deal_ids", [])
 
     # Filter analyses to specific deals if context provided
@@ -357,7 +428,7 @@ async def query_win_loss(params: dict, sb) -> dict:
     Answers: 'why did we lose?', 'what did we win?',
     'win/loss summary', 'why are we losing?'
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     deal_ids = params.get("deal_ids", [])
 
     # 1. Check for AI-generated narratives first
@@ -433,7 +504,7 @@ async def query_objections(params: dict, sb) -> dict:
     Top objections by category for the period from objections table.
     Returns counts by category, total, and unaddressed percentage.
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     rows = select_all(sb, "objections",
         columns="category,stage_when_raised,"
                 "rep_response,company_name,extracted_at",
@@ -457,7 +528,7 @@ async def query_feature_gaps(params: dict, sb) -> dict:
     Feature gaps by severity and competitor from feature_gaps table.
     Returns total, blockers, counts by category, and top competitors.
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     rows = select_all(sb, "feature_gaps",
         columns="category,severity,competitor_mentioned,"
                 "feature_description,company_name,extracted_at",
@@ -483,7 +554,7 @@ async def query_coverage(params: dict, sb) -> dict:
     Pipeline coverage vs quota targets from rep_targets and deals tables.
     Returns coverage % for each target (company/team/rep level).
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     period_label = tw.get("label", "").replace(" ", "_")
 
     targets = select_all(sb, "rep_targets",
@@ -737,7 +808,7 @@ async def query_new_deals(params: dict, sb) -> dict:
     deals table directly. Answers 'which deals were
     created this week/quarter/period?'
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     rows = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,stage,"
                 "owner_email,create_date,forecast_category,"
@@ -798,7 +869,7 @@ async def query_competitive_intel(params: dict, sb) -> dict:
     - "what competitors keep coming up?"
     - "where is Statsig showing up?"
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     search_term = params.get("search_term", "")
 
     # Build search vocabulary: a specific term (e.g. "Statsig", "DIY")
@@ -896,7 +967,7 @@ async def query_won_deals(params: dict, sb) -> dict:
     Answers: 'what did we win?', 'show me our wins',
              'which deals closed won this quarter?'
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     rows = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,stage,"
                 "owner_email,close_date,forecast_category,"
@@ -1032,7 +1103,7 @@ async def query_sdr_pipeline_sourced(params: dict, sb) -> dict:
     config_path = Path(__file__).parent.parent / "config" / "client.yaml"
     config = yaml.safe_load(open(config_path))
 
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     sdr_email = params.get("sdr_email")  # Optional: filter to specific SDR
 
     # Get attribution method from config
@@ -1046,8 +1117,13 @@ async def query_sdr_pipeline_sourced(params: dict, sb) -> dict:
     ]
 
     if attribution_method == "sdr_field" and sdr_field:
-        # Use dedicated SDR attribution field (captures post-handoff deals)
-        filters.append(("not.is", "sdr_owner_email", "null"))
+        # Use dedicated SDR attribution field (captures post-handoff deals).
+        # select_all's "not null" operator is "__not_null__" (→ .not_.is_(col,
+        # "null")). The old "not.is" op was not one select_all understands —
+        # getattr(q, "not.is") raised AttributeError against Supabase too,
+        # dropping this handler into the budget-burning dynamic loop whenever
+        # sdr_field attribution was configured.
+        filters.append(("__not_null__", "sdr_owner_email"))
         if sdr_email:
             filters.append(("eq", "sdr_owner_email", sdr_email))
     else:
@@ -1105,7 +1181,7 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
     email activity from sdr_metrics table.
     """
     sdr_email = params.get("sdr_email")
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
 
     if not sdr_email:
         return {
@@ -1264,7 +1340,7 @@ async def query_sdr_leaderboard(params: dict, sb) -> dict:
     Returns aggregated call and email metrics for all SDRs,
     sorted by activity level.
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
 
     # Get all SDR metrics for time window
     metrics_rows = select_all(sb, "sdr_metrics",
@@ -1369,14 +1445,28 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
       owner_email: str  — exact email from user_personas roster
       time_window: dict — optional, filters by close_date if provided
     """
-    owner_email = params.get("owner_email")
     tw = params.get("time_window")
-    
+
+    # Accept an email OR a rep name (first / full / display). The classifier is
+    # supposed to resolve names to emails via the roster, but that fails
+    # silently when personas aren't seeded or the name is partial — which is
+    # exactly what dropped "show me Christian's pipeline" into the dynamic loop
+    # and burned the query budget. Resolve in-handler so a name always works.
+    owner_email, resolved_note = _resolve_owner_email(params, sb)
+
     if not owner_email:
         return {
-            "error": "owner_email required — use the team roster to resolve a rep name to their email"
+            "error": "Couldn't resolve that to a rep. Name a rep by first name, "
+                     "full name, or email (e.g. \"show me Christian's pipeline\"). "
+                     "If the name is right, that person may not be in the "
+                     "user_personas roster yet.",
+            "resolution_note": resolved_note,
+            "deals": [],
+            "summary": {"total_deals": 0, "total_pipeline": 0,
+                        "avg_deal_value": None, "no_value_count": 0},
+            "data_gap": True,
         }
-    
+
     # Build filters for deals
     filters = [
         ("eq", "owner_email", owner_email),
@@ -1450,6 +1540,7 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
     return {
         "owner_email": owner_email,
         "owner_name": persona_name,
+        "resolution_note": resolved_note,
         "period": tw["label"] if tw else "all active",
         "deals": enriched_deals,
         "summary": {
@@ -1472,12 +1563,13 @@ async def query_rep_attainment(params: dict, sb) -> dict:
       owner_email: str or None  — if None, returns all reps
       time_window: dict         — determines which quarter to pull targets for
     """
-    owner_email = params.get("owner_email")
-    tw = params["time_window"]
-    
+    # A rep name resolves to owner_email; None means "all reps" (valid here).
+    owner_email, _rep_note = _resolve_owner_email(params, sb)
+    tw = _resolve_tw(params)
+
     import yaml
     from pathlib import Path
-    
+
     # Load fiscal config to build period label
     config_path = Path(__file__).parent.parent / "config" / "client.yaml"
     config = yaml.safe_load(open(config_path))
@@ -1634,7 +1726,8 @@ async def query_deal_health(params: dict, sb) -> dict:
       component_threshold: int    — component score below this (default 4)
       time_window: dict or None   — filter close_date if provided
     """
-    owner_email = params.get("owner_email")
+    # A rep name resolves to owner_email; None means "all reps" (valid here).
+    owner_email, _rep_note = _resolve_owner_email(params, sb)
     score_threshold = params.get("score_threshold", 5)
     component = params.get("component")
     component_threshold = params.get("component_threshold", 4)
@@ -1782,7 +1875,8 @@ async def query_stale_deals(params: dict, sb) -> dict:
       stale_days: int             — deals in same stage longer than this (default 21)
       time_window: dict or None
     """
-    owner_email = params.get("owner_email")
+    # A rep name resolves to owner_email; None means "all reps" (valid here).
+    owner_email, _rep_note = _resolve_owner_email(params, sb)
     stage = params.get("stage")
     stale_days = params.get("stale_days", 21)
     tw = params.get("time_window")
@@ -1902,7 +1996,7 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
                      default: "pipeline"
       limit: int   — default 10
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     sort_by = params.get("sort_by", "pipeline")
     limit = params.get("limit", 10)
     
@@ -2340,7 +2434,8 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
     except ImportError:
         from coaching_thresholds import COACHING_THRESHOLDS
 
-    owner_email = params.get("owner_email")
+    # A rep name resolves to owner_email; None means "all reps" (valid here).
+    owner_email, _rep_note = _resolve_owner_email(params, sb)
     focus = params.get("focus", "all")
     from datetime import date, timedelta
     today = today_in_reporting_tz()

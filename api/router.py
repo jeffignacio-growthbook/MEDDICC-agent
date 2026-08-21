@@ -931,7 +931,14 @@ async def _run_precomputed_handler(handler_fn, handler_name, params, sb):
     """
     Execute a precomputed handler and classify its result quality.
 
-    Returns (tool_results, result_quality).
+    Returns (tool_results, result_quality, failure_reason).
+
+    `failure_reason` is a SHORT technical string naming why the handler did not
+    produce a usable answer — an exception repr on a raise, or the handler's own
+    error/"no data" message otherwise. It is carried into the dynamic fallback
+    so the fallback message can say what fell through (see PART 1 of
+    FIX_DYNAMIC_FALLBACK_PATTERN). It is technical, for the log — never shown
+    verbatim to the user.
 
     Logs the concrete failure, not just the routing bucket:
       - a handler that RAISES logs the exception + traceback, then → 'error'
@@ -951,27 +958,43 @@ async def _run_precomputed_handler(handler_fn, handler_name, params, sb):
         import traceback
         print(f"[HANDLER ERROR] {handler_name}: {e}", flush=True)
         print(traceback.format_exc(), flush=True)
-        return {}, "error"
+        return {}, "error", f"{type(e).__name__}: {e}"
 
     result_quality = evaluate_result(tool_results, handler_name)
 
     reason = ""
     if result_quality in ("error", "empty") and isinstance(tool_results, dict):
         reason = tool_results.get("error") or ""
+    if not reason and result_quality in ("error", "empty"):
+        reason = f"handler returned {result_quality} result"
     suffix = f" ({reason})" if reason else ""
     print(f"[HANDLER] {handler_name} → {result_quality}{suffix}", flush=True)
-    return tool_results, result_quality
+    return tool_results, result_quality, reason
 
 
 async def dynamic_query_loop(question, history, params,
                               sb, client,
                               hint: str = "",
                               roster_text: str = "",
-                              classifier_client=None) -> dict:
+                              classifier_client=None,
+                              origin_handler: str = "",
+                              origin_reason: str = "") -> dict:
     """
     Multi-turn tool-calling loop for novel questions.
     Agent calls tools until it has enough data to answer.
-    Capped at 5 iterations and $0.08 token budget.
+    Capped at 5 iterations and a token budget.
+
+    Returns {"answer": str, "tool_results": dict, "answered": bool}.
+      - answered=True  → the loop produced a real, data-backed answer.
+      - answered=False → the loop gave up (budget / repetition / exhausted).
+        `answer` is then a PLAIN diagnostic naming what fell through; the
+        technical detail is in the [FALLBACK] log line, not the reply. The
+        caller decides whether to surface it. Sniffing the answer text for
+        "couldn't" is no longer how the caller tells these apart.
+
+    `origin_handler` / `origin_reason` name the precomputed handler that fell
+    through to here and why (PART 1). Empty when the loop was entered directly
+    (a `dynamic_query` intent), i.e. this IS the primary path, not a fallback.
     """
     from api.schema_context import get_schema_context
     from api.table_classifier import classify_relevant_tables
@@ -1014,6 +1037,97 @@ async def dynamic_query_loop(question, history, params,
     TOKEN_BUDGET = 20000  # ~$0.20 at Sonnet pricing - complex joins need headroom
     tokens_used = 0
     MAX_ITERATIONS = 5
+    # PART 2b: repetition / no-progress detection. A duplicate tool call, a
+    # parse failure, or a tool that returns zero new rows are all "no progress".
+    # Two in a row means the loop is stuck — end it and answer from what exists,
+    # rather than spend the rest of the budget rediscovering nothing.
+    no_progress_streak = 0
+
+    # Friendlier names for the handful of handlers that most often fall through,
+    # so the user-facing diagnostic says what was being attempted in plain terms
+    # (no handler identifiers, no "KeyError"). Technical detail stays in the log.
+    _FRIENDLY_HANDLER = {
+        "query_rep_pipeline": "looking up a rep's pipeline",
+        "query_rubric_scores_bulk": "pulling MEDDICC scores for a named deal",
+        "query_deal_stages_bulk": "looking up deal stages",
+        "query_deal_owners_bulk": "looking up deal owners",
+        "query_deal_values_bulk": "looking up deal values",
+        "query_deal": "opening a specific deal",
+        "query_deal_health": "checking deal health for a rep",
+        "query_stale_deals": "finding a rep's stale deals",
+        "query_sdr_metrics": "pulling an SDR's activity metrics",
+    }
+
+    def _fallback_log(reason_tag):
+        """Greppable structured line for every give-up (PART 1)."""
+        logger.info(
+            f"[FALLBACK] handler={origin_handler or 'dynamic_query'} "
+            f"reason={origin_reason or reason_tag} "
+            f"question={question!r}"
+        )
+
+    def _diagnostic_answer(tail):
+        """PLAIN user-facing sentence — names what fell through, no jargon."""
+        if origin_handler:
+            what = _FRIENDLY_HANDLER.get(
+                origin_handler, "answering that the usual way")
+            lead = (f"I couldn't answer that through the usual path — "
+                    f"{what} didn't return what it needed")
+        else:
+            lead = "I searched the data directly for this"
+        return (f"{lead}, and the fallback search {tail}. "
+                f"Try naming a specific deal or rep, or narrowing the "
+                f"question to a shorter time range.")
+
+    def _give_up(reason_tag, tail):
+        """Return an answered=False result with a plain diagnostic + log."""
+        _fallback_log(reason_tag)
+        return {
+            "answer": _diagnostic_answer(tail),
+            "tool_results": _extract_rows_from_accumulated(
+                accumulated_data, sb=sb),
+            "answered": False,
+        }
+
+    def _finalize_from_data(reason_tag):
+        """PART 2b: stop looping and answer from data already gathered.
+
+        One forced synthesis call (no further tools) if there is data and a
+        little budget left; otherwise a plain diagnostic. Either way the loop
+        ends here instead of burning the rest of the budget."""
+        tr = _extract_rows_from_accumulated(accumulated_data, sb=sb)
+        has_rows = bool(tr.get("rows"))
+        # No data at all → nothing to synthesise from.
+        if not has_rows:
+            return _give_up(reason_tag, "ran out of room before it found anything")
+        # No budget for one more call → answer with what we can describe.
+        est = len(system) // 4 + sum(
+            len(str(m.get('content', ''))) // 4 for m in messages) + 600
+        if tokens_used + est > TOKEN_BUDGET:
+            _fallback_log(reason_tag)
+            return {"answer": _diagnostic_answer(
+                        "gathered partial data but ran out of budget to "
+                        "assemble it"),
+                    "tool_results": tr, "answered": False}
+        try:
+            synth = client.complete(
+                messages=messages + [{"role": "user", "content":
+                    "Stop calling tools. Using ONLY the data already gathered "
+                    f"above, answer this question now: {question}\n"
+                    'Respond as {"answer": "..."}. If the gathered data genuinely '
+                    'cannot answer it, still respond as {"answer": "..."} and say '
+                    "plainly what is missing."}],
+                system=system, max_tokens=600)
+            parsed2 = _extract_json(synth.text)
+            if parsed2 and parsed2.get("answer"):
+                logger.info(f"[LOOP] finalized from gathered data "
+                            f"(reason={reason_tag})")
+                return {"answer": parsed2["answer"],
+                        "tool_results": tr, "answered": True}
+        except Exception:
+            pass
+        return _give_up(reason_tag, "could not turn the partial data into an answer")
+
     EVAL_PROMPT = """Score this answer 0-1:
   1.0 = fully answers with specific data
   0.7 = partially answers, some specifics
@@ -1035,11 +1149,10 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         if projected_total > TOKEN_BUDGET:
             partial = _summarize_accumulated(accumulated_data)
             logger.info(f"[LOOP] declining iteration {iteration} - would exceed budget "
-                       f"(used={tokens_used}, projected={projected_total}, budget={TOKEN_BUDGET})")
-            tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-            answer = (f"Hit query budget with partial data: {partial}. "
-                     f"Try a more specific question.")
-            return {"answer": answer, "tool_results": tool_results}
+                       f"(used={tokens_used}, projected={projected_total}, budget={TOKEN_BUDGET}, "
+                       f"partial={partial})")
+            return _give_up("budget_exhausted",
+                            "ran out of budget before it could finish")
 
         resp = client.complete(
             messages=messages,
@@ -1051,12 +1164,11 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         # Post-call verification (should never trigger if prediction is accurate)
         if tokens_used > TOKEN_BUDGET:
             partial = _summarize_accumulated(accumulated_data)
-            logger.info(f"[LOOP] fallback to unanswerable after "
-                        f"{iteration+1} iterations, tokens={tokens_used}")
-            tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-            answer = (f"Hit query budget with partial data: {partial}. "
-                     f"Try a more specific question.")
-            return {"answer": answer, "tool_results": tool_results}
+            logger.info(f"[LOOP] budget exceeded after "
+                        f"{iteration+1} iterations, tokens={tokens_used}, "
+                        f"partial={partial}")
+            return _give_up("budget_exhausted",
+                            "ran out of budget before it could finish")
 
         raw = resp.text.strip()
 
@@ -1082,9 +1194,15 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 logger.info(f"[LOOP iter={iteration}] prose answer detected")
                 # Extract rows from accumulated data for entity context
                 tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-                return {"answer": stripped, "tool_results": tool_results}
+                return {"answer": stripped, "tool_results": tool_results,
+                        "answered": True}
             # Otherwise log parse failure as before
             logger.info(f"[LOOP] JSON parse failed, raw={raw[:300]}")
+            # PART 2b: a parse failure is no forward progress. Two in a row and
+            # we stop, rather than keep spending the budget on malformed calls.
+            no_progress_streak += 1
+            if no_progress_streak >= 2:
+                return _finalize_from_data("no_progress")
             continue
 
         if "answer" in parsed:
@@ -1109,7 +1227,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             logger.info(f"[ANSWER] extracting entity context from accumulated_data with keys: {list(accumulated_data.keys())}")
             tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
             logger.info(f"[ANSWER] extracted tool_results with {len(tool_results.get('rows',[]))} rows")
-            return {"answer": parsed["answer"], "tool_results": tool_results}
+            return {"answer": parsed["answer"], "tool_results": tool_results,
+                    "answered": True}
 
         tool_name = parsed.get("tool", "")
         tool_params = parsed.get("params", {})
@@ -1144,11 +1263,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             for prev_sig, prev_iter in executed_tools:
                 if prev_sig == tool_signature:
                     logger.info(f"[LOOP iter={iteration}] duplicate tool call detected "
-                               f"(same as iteration {prev_iter}), skipping execution")
-                    messages.append({"role": "assistant", "content": raw})
-                    messages.append({"role": "user",
-                        "content": f"You already queried this in iteration {prev_iter}. "
-                                  f"Use the existing data from step_{prev_iter}."})
+                               f"(same as iteration {prev_iter})")
                     is_duplicate = True
                     break
 
@@ -1156,7 +1271,23 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 executed_tools.append((tool_signature, iteration))
 
         if is_duplicate:
-            continue  # Skip to next iteration
+            # PART 2b: a duplicate is a stall signal, not something to nudge
+            # past. The model already has this data. First duplicate: tell it
+            # to use what it has and let it try once more. Second no-progress
+            # step (another duplicate, a parse fail, or a zero-row tool call):
+            # stop and answer from what exists — do NOT keep spending budget
+            # re-emitting a query whose result is already in hand.
+            no_progress_streak += 1
+            if no_progress_streak >= 2:
+                return _finalize_from_data("duplicate_tool_call")
+            messages.append({"role": "assistant", "content": raw})
+            messages.append({"role": "user",
+                "content": f"You already queried this in iteration {prev_iter}. "
+                          f"Do not repeat it. Using the data already in "
+                          f"step_{prev_iter}, either answer now as "
+                          '{"answer": "..."} or make ONE different query that '
+                          "adds missing data."})
+            continue  # one chance to recover; next stall ends the loop
 
         tool_fn = {
             "filter_table": T.filter_table,
@@ -1166,10 +1297,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         }.get(tool_name)
 
         if not tool_fn:
-            tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-            answer = (f"I tried to use an unknown tool ({tool_name}). "
-                     f"I can't answer this question with available data.")
-            return {"answer": answer, "tool_results": tool_results}
+            logger.info(f"[LOOP iter={iteration}] unknown tool requested: {tool_name!r}")
+            return _finalize_from_data(f"unknown_tool:{tool_name}")
 
         if tool_name == "aggregate_results":
             data = tool_params.get("data", [])
@@ -1190,19 +1319,36 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     f"error={result.get('error','none')}")
 
         accumulated_data[f"step_{iteration}"] = result
-        logger.info(f"[STORE] saved step_{iteration} with {len(result.get('rows',[]))} rows, "
+        row_count = len(result.get("rows", []))
+        logger.info(f"[STORE] saved step_{iteration} with {row_count} rows, "
                     f"accumulated_data now has keys: {list(accumulated_data.keys())}")
-        messages.append({"role": "assistant", "content": raw})
-        messages.append({"role": "user",
-            "content": f"Tool result: {json.dumps(result, default=str)[:3000]}"})
 
-    logger.info(f"[LOOP] fallback to unanswerable after "
+        # PART 2b: a tool call that returns zero rows is no forward progress.
+        # Two no-progress steps in a row end the loop.
+        if row_count == 0:
+            no_progress_streak += 1
+            if no_progress_streak >= 2:
+                return _finalize_from_data("no_new_data")
+        else:
+            no_progress_streak = 0
+
+        messages.append({"role": "assistant", "content": raw})
+        # PART 2a: after every tool result, ask the model DIRECTLY whether the
+        # question can now be answered. `has_answer` was never true because
+        # nothing ever made "answer now if you can" an explicit instruction —
+        # the model kept calling tools. Make the stop criterion explicit so the
+        # loop ends the moment the data is sufficient.
+        messages.append({"role": "user",
+            "content": f"Tool result: {json.dumps(result, default=str)[:3000]}\n\n"
+                       f"Can you now answer the question "
+                       f"\"{question}\" from the data gathered so far? "
+                       'If yes, respond with {"answer": "..."} now. '
+                       "Only call another tool if essential data is still "
+                       "missing — do not re-run a query you have already run."})
+
+    logger.info(f"[LOOP] iterations exhausted after "
                 f"{MAX_ITERATIONS} iterations, tokens={tokens_used}")
-    tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-    answer = ("I couldn't fully answer this question within the allowed steps. "
-             "The data exists but requires a more complex analysis. "
-             "Try breaking it into simpler questions.")
-    return {"answer": answer, "tool_results": tool_results}
+    return _finalize_from_data("iterations_exhausted")
 
 async def route_question(question: str, user_id: str,
                           persona: dict = None,
@@ -1382,6 +1528,7 @@ async def route_question(question: str, user_id: str,
         # ── 3. Try precomputed handler ────────────────────
         tool_results = {}
         result_quality = "empty"
+        handler_failure_reason = ""  # PART 1: carried into the fallback
         is_slow = handler_name == "generate_win_loss"
 
         if handler_name == "unanswerable":
@@ -1390,7 +1537,7 @@ async def route_question(question: str, user_id: str,
         elif handler_name != "dynamic_query":
             handler_fn = getattr(handlers, handler_name, None)
             if handler_fn:
-                tool_results, result_quality = \
+                tool_results, result_quality, handler_failure_reason = \
                     await _run_precomputed_handler(
                         handler_fn, handler_name, params, sb)
 
@@ -1411,12 +1558,22 @@ async def route_question(question: str, user_id: str,
                 hint=hint,
                 roster_text=roster_text,
                 classifier_client=classifier_client,
+                origin_handler=handler_name,          # PART 1
+                origin_reason=handler_failure_reason,  # PART 1
             )
             dynamic_answer = dynamic_result.get("answer", "")
             dynamic_tool_results = dynamic_result.get("tool_results", {})
-            if dynamic_answer and \
-               "don't have data" not in dynamic_answer.lower() and \
-               "couldn't" not in dynamic_answer.lower():
+            # PART 1/2: trust the loop's explicit `answered` flag rather than
+            # sniffing the text for "couldn't". A real answer is returned as
+            # before; a give-up surfaces the DIAGNOSTIC message (which names
+            # what fell through) instead of the generic "no data" reply below.
+            if dynamic_result.get("answered"):
+                return {"answer": dynamic_answer,
+                        "needs_ack": is_slow,
+                        "tool_results": dynamic_tool_results,
+                        "handler_name": f"{handler_name}_dynamic_fallback"}
+            if dynamic_answer:
+                _log_unanswered(sb, question, user_id, "fallback_exhausted")
                 return {"answer": dynamic_answer,
                         "needs_ack": is_slow,
                         "tool_results": dynamic_tool_results,
@@ -1565,12 +1722,10 @@ async def route_question(question: str, user_id: str,
                 roster_text=roster_text,
                 classifier_client=classifier_client,
             )
-            # dynamic_query_loop returns {"answer": str, "tool_results": dict}
+            # dynamic_query_loop returns {"answer", "tool_results", "answered"}
             dynamic_answer = dynamic_result.get("answer", "")
             dynamic_tool_results = dynamic_result.get("tool_results", {})
-            if dynamic_answer and \
-               "don't have data" not in dynamic_answer.lower() and \
-               "couldn't" not in dynamic_answer.lower():
+            if dynamic_result.get("answered"):
                 # Log the learning note before returning
                 _log_learning(sb, question, handler_name,
                              assessment, retry_count)
