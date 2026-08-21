@@ -78,10 +78,13 @@ def analyze_slip_calls(sb, llm=None, sample_size: int = SAMPLE_SIZE,
     cohort = cohort or build_slip_cohort(sb)
     me = cohort['min_evidence']
     slipped = [m for m in cohort['members'] if m['outcome'] == 'SLIPPED']
-    if len(slipped) < me:
-        return {'n_slipped': len(slipped),
-                'reason': f'{len(slipped)} slipped < min_evidence {me} — '
-                          f'too thin to sample calls against'}
+    if not slipped:
+        return {'n_slipped': 0, 'reason': 'no slipped deals in cohort'}
+    # This analysis is QUALITATIVE — a sample read of call summaries, reported as
+    # "of N sampled" counts, never a rate. So it runs whenever there are slipped
+    # deals, flagged below_evidence_bar when the cohort is under the gate; the
+    # min_evidence gate guards inferential rates, not a sampled signal read.
+    below_bar = len(slipped) < me
 
     # Deterministic sample (stable ordering, no RNG).
     slipped = sorted(slipped, key=lambda m: (str(m['deal_id']), m['quarter']))
@@ -127,6 +130,7 @@ def analyze_slip_calls(sb, llm=None, sample_size: int = SAMPLE_SIZE,
     from collections import Counter
     return {
         'n_slipped_cohort': len(slipped),
+        'below_evidence_bar': below_bar,
         'sampled': len(sample),
         'sampled_with_calls': with_calls,
         'counts_over_sampled_with_calls': {

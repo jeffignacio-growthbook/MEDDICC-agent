@@ -68,14 +68,19 @@ def test_close_date_pushed_vs_lapsed_split():
     print("  ✓ 2 pushed (judgment) vs 2 lapsed (hygiene); days-past distributed")
 
 
-def test_close_date_gate_below_min_evidence():
-    print("\n[TEST] close-date analysis nulls below min_evidence")
-    members = [_member("s1", "SLIPPED", "neg", "2026-03-01", "2026-04-30",
-                       ["2026-04-10"])]
+def test_close_date_below_bar_is_descriptive_not_null():
+    """Below the evidence bar, analysis 1 still reports the split (a descriptive
+    count, not a rate), flagged below_evidence_bar with a note. Only an empty
+    cohort returns a bare reason."""
+    print("\n[TEST] close-date below bar: descriptive split, flagged (not nulled)")
+    members = [_member(f"s{i}", "SLIPPED", "neg", "2026-03-01", "2026-04-30",
+                       ["2026-04-10", "2026-04-10"]) for i in range(4)]
     r = sd.analyze_close_date_movement(_cohort(members, min_evidence=30))
-    assert "reason" in r and r["n_slipped"] == 1, r
-    assert "repeatedly_pushed" not in r
-    print("  ✓ 1 slipped < 30 → null with reason, no fabricated split")
+    assert r["below_evidence_bar"] is True and "note" in r, r
+    assert r["never_moved_date_passed"] == 4 and "repeatedly_pushed" in r, r
+    empty = sd.analyze_close_date_movement(_cohort([], min_evidence=30))
+    assert empty["n_slipped"] == 0 and "reason" in empty, empty
+    print("  ✓ split shown + below_evidence_bar flag; empty cohort → reason")
 
 
 def test_stall_stage_commit_distribution_won_vs_slipped():
@@ -200,14 +205,31 @@ def test_slip_calls_extraction_and_scope():
     print("  ✓ signals extracted; WON deal's call excluded; reasons aggregated")
 
 
-def test_slip_calls_gate_below_min_evidence():
-    print("\n[TEST] analysis 4 nulls when slipped cohort is below min_evidence")
+def test_slip_calls_below_bar_still_samples_flagged():
+    """Analysis 4 is qualitative — below the bar it still samples and reports
+    'of N sampled' counts, flagged below_evidence_bar. Only an empty slipped
+    cohort skips entirely."""
+    print("\n[TEST] analysis 4 below bar: samples + flags (empty cohort skips)")
     import slip_calls as sc
-    cohort = _cohort([_member("s0", "SLIPPED", "neg", "2026-03-01",
-                              "2026-04-30", ["2026-04-10"])], min_evidence=30)
-    r = sc.analyze_slip_calls(sb=None, llm=_FakeLLM(["{}"]), cohort=cohort)
-    assert "reason" in r and "counts_over_sampled_with_calls" not in r, r
-    print("  ✓ 1 slipped < 30 → null with reason, no LLM sampling")
+    members = [_member(f"s{i}", "SLIPPED", "neg", "2026-03-01", "2026-04-30",
+                       ["2026-04-10"]) for i in range(2)]
+    calls = [{"deal_id": "s0", "call_date": "2026-03-10",
+              "formatted_summary": "MAP agreed"},
+             {"deal_id": "s1", "call_date": "2026-03-11",
+              "formatted_summary": "date slipped, budget"}]
+    scripted = [
+        '{"mutual_action_plan": true, "close_process_identified": false, "date_move_reason": "none"}',
+        '{"mutual_action_plan": false, "close_process_identified": false, "date_move_reason": "budget"}',
+    ]
+    with patch.object(sc, "select_all", return_value=calls):
+        r = sc.analyze_slip_calls(sb=None, llm=_FakeLLM(scripted),
+                                  cohort=_cohort(members, min_evidence=30))
+    assert r["below_evidence_bar"] is True and r["sampled"] == 2, r
+    assert r["counts_over_sampled_with_calls"]["mutual_action_plan"] == 1, r
+    empty = sc.analyze_slip_calls(sb=None, llm=_FakeLLM(["{}"]),
+                                  cohort=_cohort([], min_evidence=30))
+    assert "reason" in empty and "counts_over_sampled_with_calls" not in empty, empty
+    print("  ✓ below bar still samples with flag; empty slipped cohort → reason")
 
 
 def test_slip_calls_parse_tolerant():
@@ -228,13 +250,13 @@ def main():
     print("=" * 70)
     tests = [
         test_close_date_pushed_vs_lapsed_split,
-        test_close_date_gate_below_min_evidence,
+        test_close_date_below_bar_is_descriptive_not_null,
         test_stall_stage_commit_distribution_won_vs_slipped,
         test_meddicc_gap_and_backward_looking_selection,
         test_meddicc_gate_below_min_evidence,
         test_lost_excluded_from_slip_analyses,
         test_slip_calls_extraction_and_scope,
-        test_slip_calls_gate_below_min_evidence,
+        test_slip_calls_below_bar_still_samples_flagged,
         test_slip_calls_parse_tolerant,
     ]
     passed = failed = 0
