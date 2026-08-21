@@ -203,9 +203,16 @@ class SnapshotBackfiller:
         layout, so the calendar cannot be got wrong here.
         """
         start = date(2022, 1, 3)  # a Monday, before all history
+        # Optional upper bound: reconstruct only Mondays on/before through_date.
+        # A completed quarter needs no bound; a PARTIAL current quarter must not
+        # reconstruct weeks that have not elapsed (nor weeks a live source like
+        # Method 1 already owns). Unset by default → existing callers unchanged.
+        through = getattr(self, 'through_date', None)
         weeks = []
         for i in range(0, 320):
             d = start + timedelta(weeks=i)
+            if through is not None and d > through:
+                continue
             _, _, label = get_fiscal_quarter(d, self.config)
             if label == quarter_label:
                 weeks.append(d)

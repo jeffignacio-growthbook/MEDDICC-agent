@@ -1,0 +1,94 @@
+name: Retire backfill_current_quarter
+
+# Reconstruct the current quarter's elapsed weeks point-in-time (Method 2
+# machinery, bounded to weeks before Method 1's first live write), purge the
+# backfill_current_quarter stopgap rows, and let Method 1 own everything
+# forward. Dry-run by default; a real write requires mode=execute.
+#
+# The dev container cannot reach HubSpot or Supabase, so this runs in CI.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "'dry_run' (numbers only, no write) or 'execute' (backup, purge stopgap, write reconstruction)"
+        required: false
+        default: 'dry_run'
+      quarter:
+        description: "Fiscal quarter label, or blank for current (e.g. 'FY2027 Q3')"
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  retire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Cheap guards first — do not spend HubSpot API time if these fail.
+      - name: "Pre-flight — offline test suites"
+        run: |
+          set -e
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_pipeline_movement.py
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_reconstruction.py
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_migrations.py
+
+      - name: Fetch property history from HubSpot
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          python3 scripts/analytics/hubspot_history.py --all --rate-limit 5
+          ls -lh property_history_cache.json
+
+      - name: "Confirm cache covers the current quarter's elapsed dates"
+        run: |
+          python3 -c "
+          import json, collections
+          c = json.load(open('property_history_cache.json'))
+          deals = c['deals']
+          # latest dealstage-history timestamp across all deals
+          latest = ''
+          for d in deals.values():
+              for e in (d.get('history') or []):
+                  ts = e.get('timestamp','')
+                  if ts > latest: latest = ts
+          print(f'deals in cache: {len(deals)}; latest dealstage history ts: {latest}')
+          assert latest >= '2026-08-17', f'cache does not reach the elapsed Q3 Mondays: {latest}'
+          print('cache reaches the current quarter elapsed weeks: OK')
+          "
+
+      - name: "Retire stopgap (dry-run or execute)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          CONFIRM=""
+          if [ "${{ inputs.mode }}" = "execute" ]; then CONFIRM="--confirm"; fi
+          QARG=""
+          if [ -n "${{ inputs.quarter }}" ]; then QARG="--quarter=${{ inputs.quarter }}"; fi
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 \
+            scripts/analytics/retire_current_quarter_backfill.py $CONFIRM $QARG
+
+      - name: Upload backup + checkpoint artifacts
+        if: ${{ inputs.mode == 'execute' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: retire-current-quarter-artifacts
+          path: |
+            data/backups/deals_snapshot_current_quarter_stopgap_prepurge*.json
+            retire_cq_checkpoint.json
+          if-no-files-found: ignore
