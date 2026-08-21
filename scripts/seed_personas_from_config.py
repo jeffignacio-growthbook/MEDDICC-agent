@@ -123,14 +123,61 @@ def build_personas(config: dict) -> list[dict]:
     return list(by_email.values())
 
 
+# Columns we upsert. slack_user_id / name / display_name / title use COALESCE
+# on conflict so a re-run never wipes a value that's already there (e.g. a
+# Slack ID a user self-bound, or a name we don't have in config).
+_COLS = ["email", "name", "display_name", "role", "role_group",
+         "persona", "title", "slack_user_id", "source"]
+_COALESCE = {"name", "display_name", "title", "slack_user_id"}
+
+
+def _sql_lit(v):
+    if v is None:
+        return "NULL"
+    return "'" + str(v).replace("'", "''") + "'"
+
+
+def emit_sql(personas: list[dict]) -> str:
+    rows = []
+    for p in sorted(personas, key=lambda x: x["email"]):
+        vals = []
+        for c in _COLS:
+            v = p.get(c)
+            if c == "persona" and v is None:
+                v = p.get("role_group")  # persona mirrors role_group
+            vals.append(_sql_lit(v))
+        rows.append("  (" + ", ".join(vals) + ")")
+    set_clause = ",\n".join(
+        (f"  {c} = COALESCE(EXCLUDED.{c}, user_personas.{c})"
+         if c in _COALESCE else f"  {c} = EXCLUDED.{c}")
+        for c in _COLS if c != "email")
+    return (
+        "INSERT INTO user_personas\n"
+        f"  ({', '.join(_COLS)})\nVALUES\n"
+        + ",\n".join(rows)
+        + "\nON CONFLICT (email) DO UPDATE SET\n"
+        + set_clause
+        + ",\n  updated_at = now();"
+    )
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--write", action="store_true",
                     help="Upsert to Supabase (default: dry run / print only)")
+    ap.add_argument("--sql", action="store_true",
+                    help="Print an idempotent INSERT ... ON CONFLICT and exit")
     args = ap.parse_args()
 
     config = yaml.safe_load(open(REPO / "config" / "client.yaml"))
     personas = build_personas(config)
+    # persona mirrors role_group (its original voice-routing meaning).
+    for p in personas:
+        p.setdefault("persona", p.get("role_group"))
+
+    if args.sql:
+        print(emit_sql(personas))
+        return
 
     print(f"\n{'WRITE' if args.write else 'DRY RUN'} — "
           f"{len(personas)} personas from config/client.yaml\n")
@@ -155,9 +202,13 @@ def main():
     sb = SupabaseWriter().client
     ok = 0
     for p in personas:
+        # Drop None-valued keys so an upsert never overwrites an existing
+        # slack_user_id / name / title with NULL (a user may already have
+        # self-bound). email/role/role_group are always present.
+        row = {k: v for k, v in p.items() if v is not None}
         try:
             sb.table("user_personas").upsert(
-                p, on_conflict="email").execute()
+                row, on_conflict="email").execute()
             ok += 1
         except Exception as e:
             print(f"  ✗ {p['email']}: {e}")
