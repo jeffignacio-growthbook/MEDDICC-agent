@@ -631,7 +631,7 @@ class HubSpotDealsClient:
                 "type": "number",
                 "fieldType": "number",
                 "groupName": "dealinformation",
-                "description": "Overall MEDDICC qualification score (0-100)"
+                "description": "Overall MEDDICC qualification score (0-70, sum of 7 components)"
             },
             {
                 "name": "meddicc_status",

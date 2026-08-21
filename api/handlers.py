@@ -22,6 +22,26 @@ except ImportError:
     from api.field_semantics import stage_bucket, stage_label, is_won, is_lost, is_open
 
 
+# overall_score is the SUM of the 7 MEDDICC components (0-10 each) — max 70,
+# NOT 100. See hubspot_deals._extract_scores_from_analysis. Anything that
+# surfaces overall_score to the synthesis layer should carry this denominator
+# so the model never has to guess the scale (it guessed /100 for LiveSport,
+# turning a 38/70 = 54% deal into a "38/100, relatively weak" one).
+MEDDICC_OVERALL_MAX = 70
+MEDDICC_COMPONENT_MAX = 10
+
+
+def _labeled_overall(score):
+    """Return overall_score with its denominator and percentage, or None."""
+    try:
+        s = int(score)
+    except (TypeError, ValueError):
+        return None
+    return {"score": s, "max": MEDDICC_OVERALL_MAX,
+            "pct": round(s / MEDDICC_OVERALL_MAX * 100),
+            "display": f"{s}/{MEDDICC_OVERALL_MAX}"}
+
+
 def _resolve_tw(params: dict) -> dict:
     """Return a resolved time window, defaulting to the current quarter.
 
@@ -1036,9 +1056,17 @@ async def query_rubric_scores_bulk(params: dict, sb) -> dict:
                 str(a.get("analyzed_at") or "") > str(latest[did].get("analyzed_at") or "")):
             latest[did] = a
     scores = list(latest.values())
+    # Label every score with its denominator so synthesis can't guess the
+    # scale. overall_score is the SUM of the 7 components (max 70), not /100.
+    for s in scores:
+        s["overall"] = _labeled_overall(s.get("overall_score"))
     return {"scores": scores, "deal_count": len(deal_ids),
             "scored_count": len(scores),
-            "resolved_from_company": resolved_from_company}
+            "resolved_from_company": resolved_from_company,
+            "scale": {"overall_max": MEDDICC_OVERALL_MAX,
+                      "component_max": MEDDICC_COMPONENT_MAX,
+                      "note": "overall_score is the sum of 7 components (0-70); "
+                              "each component is 0-10"}}
 
 async def query_deal_stages_bulk(params: dict, sb) -> dict:
     """Current stage for a known set of deal_ids."""

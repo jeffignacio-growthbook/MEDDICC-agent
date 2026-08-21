@@ -1868,6 +1868,51 @@ That's 89% of the quarterly target."
 """
 }
 
+# Friendly display names for the rubric component keys. Anything not listed
+# falls back to title-casing the key, so a new component added to rubric.py
+# still appears — the guard is driven by rubric.py, never a hand-kept list.
+_MEDDICC_DISPLAY = {
+    "metrics": "Metrics",
+    "economic_buyer": "Economic Buyer",
+    "decision_criteria": "Decision Criteria",
+    "decision_process": "Decision Process",
+    "identify_pain": "Pain",
+    "champion": "Champion",
+    "competition": "Competition",
+}
+
+
+def _meddicc_guard() -> str:
+    """MEDDICC schema guard for synthesis, built FROM rubric.py so it can never
+    drift from the components the system actually scores. Stops the model from
+    inventing MEDDPICC components (it added a 'Paper Process — data gap' row for
+    LiveSport) and from guessing the overall-score scale (it rendered 38/70 as
+    38/100)."""
+    try:
+        from api.rubric import RUBRIC
+    except ImportError:
+        from rubric import RUBRIC
+    names = [_MEDDICC_DISPLAY.get(k, k.replace("_", " ").title())
+             for k in RUBRIC.keys()]
+    n = len(names)
+    return f"""
+MEDDICC SCORING — FIXED SCHEMA (do not deviate):
+This client uses MEDDICC with EXACTLY these {n} components, each scored 0-10:
+  {", ".join(names)}.
+- These are the ONLY components. Do NOT add, rename, split, or infer components
+  from a methodology's letters. There is no Paper Process, Implicated Pain, or
+  any other component beyond the {n} above — if the data does not contain one of
+  these {n}, it simply is not part of the answer.
+- Never emit a "data gap" row for a component this client does not track. A
+  component absent from the schema is absent from the answer entirely.
+- overall_score is the SUM of the {n} components. Its scale is 0-{n * 10}
+  (NOT 0-100). Report it as "X/{n * 10}". Never rescale to 100 or invent a
+  denominator. When the data carries a labelled score (e.g. an `overall`
+  object with `display`/`max`), use that denominator verbatim.
+- Component scores are out of 10; report them as "X/10".
+"""
+
+
 def build_synthesis_prompt(persona: dict) -> str:
     """Build persona-aware synthesis system prompt."""
     role_group = (persona or {}).get("role_group", "other")
@@ -1884,5 +1929,5 @@ def build_synthesis_prompt(persona: dict) -> str:
         name_or_role = "a revenue team member"
     
     block = block.replace("{name_or_role}", name_or_role)
-    return _VOICE_BASE + "\n" + block
+    return _VOICE_BASE + "\n" + block + "\n" + _meddicc_guard()
 
