@@ -108,6 +108,37 @@ def test_numerator_and_denominator_share_scope():
           "scope reported")
 
 
+# ── Phase 3 — denominator rule (no close-date filter) ──────────────────
+
+def test_denominator_has_no_close_date_filter():
+    """The week-3 denominator is all open in-scope pipeline. A close-date
+    filter collapsed it 213 -> 19 and produced 110% conversion. Deals with
+    far-future or null close dates must still count."""
+    print("\n[TEST] denominator has no close-date filter")
+    from unittest.mock import Mock
+    week3 = [
+        {"deal_id": f"d{i}", "stage_id": "appointmentscheduled",
+         "pipeline_id": "default", "deal_value": 1, "close_date": cd}
+        for i, cd in enumerate(
+            ["2026-03-01", "2027-01-01", None, "2099-12-31", "2026-04-30",
+             "2026-11-15", "2028-06-01"])
+    ]
+    with patch.object(fa, "_get_complete_quarters",
+                      return_value=["FY2026 Q4", "FY2027 Q1"]), \
+         patch.object(fa, "_quarter_window_iso",
+                      return_value=("2026-02-01", "2026-04-30")), \
+         patch.object(supabase_client, "select_all",
+                      _make_select_all(week3, [])):
+        result = fa.query_week3_conversion(Mock())
+    denom = (result["per_quarter"]["FY2027 Q1"]["by_pipeline"]
+             ["default"]["week3_scoped_denominator"])
+    assert denom == 7, (
+        f"all 7 qualified deals must count regardless of close_date "
+        f"(far-future/null included); got {denom}")
+    assert "none" in result["scope"]["close_date_filter"]
+    print("  ✓ every qualified deal counts; close_date never collapses the denom")
+
+
 def main():
     print("=" * 70)
     print("FORECAST CORRECTNESS TESTS")
@@ -115,6 +146,7 @@ def main():
     tests = [
         test_numerator_counts_in_quarter_transitions_not_terminal_status,
         test_numerator_and_denominator_share_scope,
+        test_denominator_has_no_close_date_filter,
     ]
     passed = failed = 0
     for t in tests:
