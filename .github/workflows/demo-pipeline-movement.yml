@@ -33,7 +33,7 @@ jobs:
           set -e
           PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_pipeline_movement.py
 
-      - name: "Live demo — four views + routing"
+      - name: "Live demo — views + routing + drill-down rows"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
@@ -41,3 +41,11 @@ jobs:
         run: |
           PYTHONPATH=scripts:api:scripts/analytics:. \
             python3 scripts/analytics/demo_pipeline_movement.py
+
+      - name: "Verify zero-exits hypothesis (current-quarter grid)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=scripts:api:scripts/analytics:. \
+            python3 scripts/analytics/verify_current_quarter_movement.py

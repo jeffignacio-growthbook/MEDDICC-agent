@@ -50,6 +50,20 @@ def run_views(sb):
     _show(f"VIEW 1 — movement ({Q}, last two snapshots)", mv,
           keys=["snapshot_source", "snapshot_dates", "totals",
                 "confidence", "by_stage", "data_gaps"])
+    # Drill-down fix: movement now carries entity-bearing rows + per-stage ids
+    print(f"entity rows for thread context: {len(mv.get('rows', []))} "
+          f"(each carries deal_id) — was 0 before the fix")
+    disc = next((s for s in mv.get("by_stage", []) if s["stage"] == "Discovery"), None)
+    if disc:
+        print(f"by_stage['Discovery'].deal_ids: {len(disc.get('deal_ids', []))} ids "
+              f"(count={disc['current']})")
+
+    # Direct drill-down: "which deals are in Discovery?"
+    sd = asyncio.run(query_pipeline_movement(
+        {"view": "stage_deals", "fiscal_quarter": Q, "stage": "Discovery"}, sb))
+    _show(f"VIEW 1b — stage_deals ({Q}, stage=Discovery)", sd,
+          keys=["snapshot_source", "snapshot_dates", "stage", "count", "data_gaps"])
+    print(f"sample rows: {json.dumps(sd.get('rows', [])[:3], default=str)}")
 
     comp = asyncio.run(query_pipeline_movement(
         {"view": "composition", "fiscal_quarter": Q, "weeks": 4}, sb))

@@ -2685,7 +2685,16 @@ _PM_SNAPSHOT_COLUMNS = (
 # deal_value is intentionally absent from the column list above. Counts only.
 
 _PM_CONFIDENCE_KEYS = ("exact", "pre_history", "no_history")
-_PM_VIEWS = ("movement", "composition", "deal_changes", "curve")
+_PM_VIEWS = ("movement", "composition", "deal_changes", "curve", "stage_deals")
+
+# Snapshot sources that stamp each deal's CURRENT stage onto every week rather
+# than reconstructing stage point-in-time (see backfill_current_quarter.py:
+# "using current deals table state"). For these, a deal's stage is identical
+# across consecutive weeks by construction, so within-quarter stage transitions
+# (moves/exits) cannot be observed — only entered/left (membership) is real.
+# Movement / deal_changes views must caveat this or a structural zero reads as
+# a real "nothing moved" finding.
+_PM_STAGE_COPIED_SOURCES = frozenset({"backfill_current_quarter"})
 
 
 def _pm_load_scoping():
@@ -2795,6 +2804,27 @@ def _pm_stage_sets(date_rows, stage_cfg):
     return stage_to_deals, deal_to_stage
 
 
+def _pm_deal_rows(date_rows, stage_cfg, limit=200):
+    """Entity-bearing rows for one snapshot date, so extract_entity_context
+    can save deal_ids for follow-up questions. Carries stage so a drill-down
+    ('which of those are in Discovery?') has the context it needs.
+
+    Still COUNTS-ONLY: deal_value is neither selected nor emitted here.
+    """
+    rows = []
+    for r in _pm_latest_row_per_deal(date_rows).values():
+        rows.append({
+            "deal_id": r["deal_id"],
+            "stage": _pm_stage_name(r.get("stage_id"), stage_cfg),
+            "owner_email": r.get("owner_email"),
+            "close_date": r.get("close_date"),
+            "week_of_quarter": r.get("week_of_quarter"),
+            "backfill_confidence": r.get("backfill_confidence"),
+        })
+    rows.sort(key=lambda x: (x["stage"], x["deal_id"]))
+    return rows[:limit]
+
+
 def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps):
     if len(all_dates) < 2:
         data_gaps.append(
@@ -2829,6 +2859,12 @@ def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps):
             "net": len(c) - len(p),
             "entered": len(c - p),
             "exited": len(p - c),
+            # deal IDs so the counts are drillable and the thread-context
+            # layer (extract_entity_context) can save entities for follow-ups
+            # like "which deals are in Discovery?".
+            "deal_ids": sorted(c),
+            "entered_ids": sorted(c - p),
+            "exited_ids": sorted(p - c),
         })
     totals = {
         "prior": len(prior_rows),
@@ -2926,14 +2962,20 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     read from deals_snapshot. COUNTS ONLY — never dollars (see module header).
 
     params:
-      view          : 'movement' | 'composition' | 'deal_changes' | 'curve'
-                      (default 'movement')
+      view          : 'movement' | 'composition' | 'deal_changes' | 'curve' |
+                      'stage_deals' (default 'movement')
       fiscal_quarter: e.g. 'FY2027 Q2' (default: current fiscal quarter)
       weeks         : how many recent weeks for 'composition' (default 4)
       pipeline_id   : optional single-pipeline filter (default: config scope —
                       renewals and non-qualified stages excluded)
       owner_email   : optional rep filter (also accepts rep_email)
       deal_ids      : optional explicit deal set for 'deal_changes'
+      stage         : for 'stage_deals' — the stage name (e.g. 'Discovery') or
+                      a deal_id to list at the latest snapshot
+
+    Every view also returns a `rows` list of {deal_id, stage, owner_email, ...}
+    from the latest snapshot so the thread-context layer can save entities for
+    follow-up drill-downs. Counts only — deal_value is never selected/emitted.
     """
     load_scope_config, is_in_scope = _pm_load_scoping()
     excluded_pipelines, stage_cfg = load_scope_config()
@@ -3023,12 +3065,56 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
 
     base["snapshot_source"] = chosen_source
 
+    # Caveat sources that copy the current stage onto every week: their
+    # within-quarter stage transitions are structurally ~zero, not a real
+    # "nothing moved". Only movement / deal_changes infer transitions.
+    if chosen_source in _PM_STAGE_COPIED_SOURCES and view in ("movement", "deal_changes"):
+        data_gaps.append(
+            f"source '{chosen_source}' stamps each deal's CURRENT stage on "
+            "every week (not a point-in-time stage reconstruction), so "
+            "within-quarter stage moves/exits are not observable here — exits "
+            "will read as ~0 and only entered/left (membership) is real. Use a "
+            "'backfilled' quarter for true stage movement."
+        )
+
     if not all_dates:
         data_gaps.append(
             f"no in-scope rows for {fiscal_quarter} on the '{chosen_source}' grid"
         )
         return {**base, "snapshot_dates": [], "result": None,
                 "data_gaps": data_gaps}
+
+    # Entity-bearing rows from the latest snapshot, attached to every view so
+    # extract_entity_context saves deal_ids and follow-ups ("which of those are
+    # in Discovery?") have thread context. Without this the movement view
+    # returned pure counts, save_thread stored zero entities, and the drill-down
+    # fell through to query_deal_stages_bulk with no deal IDs.
+    latest_rows = _pm_deal_rows(by_date[all_dates[-1]], stage_cfg)
+
+    # ── stage-filtered deal list (direct drill-down) ──
+    if view == "stage_deals":
+        want = (params.get("stage") or "").strip().lower()
+        if not want:
+            data_gaps.append("stage_deals needs a 'stage' param (e.g. 'Discovery')")
+            return {**base, "snapshot_dates": [all_dates[-1]],
+                    "stage": None, "rows": [], "count": None,
+                    "data_gaps": data_gaps}
+        matched = [r for r in latest_rows
+                   if r["stage"].lower() == want or str(r["deal_id"]) == want]
+        if not matched:
+            data_gaps.append(
+                f"no in-scope deals in stage {params.get('stage')!r} at "
+                f"{all_dates[-1]} (stages present: "
+                f"{sorted({r['stage'] for r in latest_rows})})"
+            )
+        return {
+            **base,
+            "snapshot_dates": [all_dates[-1]],
+            "stage": params.get("stage"),
+            "rows": matched,
+            "count": len(matched),
+            "data_gaps": data_gaps,
+        }
 
     # ── dispatch ──
     if view == "movement":
@@ -3040,6 +3126,7 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
             "by_stage": by_stage,
             "totals": totals,
             "confidence": confidence,
+            "rows": latest_rows,
             "data_gaps": data_gaps,
         }
 
@@ -3050,6 +3137,7 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
             **base,
             "snapshot_dates": dates,
             "weeks": grid,
+            "rows": latest_rows,
             "data_gaps": data_gaps,
         }
 
@@ -3059,11 +3147,20 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         summary = {}
         for c in changes:
             summary[c["direction"]] = summary.get(c["direction"], 0) + 1
+        # For deal_changes the drillable set is the deals that MOVED, so the
+        # entity rows are the changed deals rather than the whole snapshot.
+        change_rows = [{
+            "deal_id": c["deal_id"],
+            "stage": c["current_stage"],
+            "owner_email": c["owner_email"],
+            "direction": c["direction"],
+        } for c in changes]
         return {
             **base,
             "snapshot_dates": snap_dates or [],
             "changes": changes,
             "summary": summary,
+            "rows": change_rows,
             "data_gaps": data_gaps,
         }
 
@@ -3081,5 +3178,6 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         **base,
         "snapshot_dates": all_dates,
         "curve": curve,
+        "rows": latest_rows,
         "data_gaps": data_gaps,
     }

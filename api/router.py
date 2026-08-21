@@ -52,11 +52,13 @@ HANDLER_DESCRIPTIONS = {
         "onward). COUNT-based only (no dollar figures). Set params.view: "
         "'movement' for week-over-week counts in/out by stage, 'composition' "
         "for the stage-by-week grid, 'deal_changes' for which deals moved/"
-        "advanced/regressed/left, 'curve' for deal count by week-of-quarter. "
-        "Examples: 'how has pipeline moved over the last four weeks?' "
-        "(movement), 'what's the stage breakdown this quarter versus last?' "
-        "(composition), 'which deals moved stage since last week?' "
-        "(deal_changes), 'show me the coverage curve for FY2027 Q2' (curve)"
+        "advanced/regressed/left, 'curve' for deal count by week-of-quarter, "
+        "'stage_deals' to list the deals currently in a named stage (set "
+        "params.stage). Examples: 'how has pipeline moved over the last four "
+        "weeks?' (movement), 'what's the stage breakdown this quarter versus "
+        "last?' (composition), 'which deals moved stage since last week?' "
+        "(deal_changes), 'show me the coverage curve for FY2027 Q2' (curve), "
+        "'which deals are in Discovery?' (stage_deals, stage='Discovery')"
     ),
     "query_new_deals": "which deals were created, added to pipeline, or started in a time window",
     "query_won_deals": "which deals did we ALREADY win/close (past tense), retrospective wins/bookings. NOT future close dates.",
@@ -401,9 +403,10 @@ Required JSON:
     "entity_name": "<rep/team name for set_target or null>",
     "period_label": "Q3_FY2027 or null",
     "search_term": "<specific competitor/term for query_competitive_intel or null>",
-    "view": "<for query_pipeline_movement: movement|composition|deal_changes|curve, else null>",
+    "view": "<for query_pipeline_movement: movement|composition|deal_changes|curve|stage_deals, else null>",
     "fiscal_quarter": "<for query_pipeline_movement: 'FY2027 Q2' style label, or null for current>",
     "weeks": "<for query_pipeline_movement composition: integer count of recent weeks, or null>",
+    "stage": "<for query_pipeline_movement stage_deals: stage name like 'Discovery', else null>",
     "is_slow": false
   }},
   "unanswerable_reason": "no_data|out_of_scope|ambiguous|null",
