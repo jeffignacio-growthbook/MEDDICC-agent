@@ -1,0 +1,42 @@
+name: Forecast correctness pass
+
+# Runs the forecast_analyses correctness diagnostic / final run against the
+# real deals_snapshot + deals tables. The dev container cannot reach Supabase.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "'diagnose' (candidate-numerator diagnostic) or 'run' (final forecast_analyses output)"
+        required: false
+        default: 'diagnose'
+
+permissions:
+  contents: read
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: "Offline tests (forecast + reconstruction)"
+        run: |
+          set -e
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/test_forecast_analyses.py
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_reconstruction.py
+      - name: "Forecast correctness (diagnose | run)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          if [ "${{ inputs.mode }}" = "run" ]; then
+            PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/forecast_analyses.py all
+          else
+            PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/analytics/forecast_correctness_check.py
+          fi
