@@ -53,7 +53,6 @@ from point_in_time import get_field_at_date
 CACHE_FILE = 'property_history_cache.json'
 CATEGORY_HISTORY_KEY = 'forecast_category_history'   # hubspot_history HISTORY_KEYS
 BACKUP_FILE = 'forecast_category_backup.json'
-MID_QUARTER_WEEK = 7                                 # go/no-go probe week (of 13)
 UPDATE_COLUMNS = ('forecast_category', 'data_quality_notes')  # nothing else
 
 
@@ -101,11 +100,19 @@ def load_backfilled_rows(sb):
 
 
 def report(sb, field_history):
+    # "Commit-like" = the top forecast tier(s). HubSpot's raw enum carries
+    # MOST_LIKELY between COMMIT and BEST_CASE, which the prompt's category list
+    # did not mention — so probe both a strict COMMIT definition and a
+    # COMMIT+MOST_LIKELY one, and report the vocabulary actually seen.
+    COMMIT_ONLY = {'COMMIT'}
+    COMMIT_LIKE = {'COMMIT', 'MOST_LIKELY'}
+
     rows = load_backfilled_rows(sb)
     by_q = defaultdict(lambda: {
         'total': 0, 'resolved': 0, 'null_no_history': 0,
-        'null_pre_history': 0, 'null_cleared': 0,
-        'dist': Counter(), 'commit_deals_midweek': set()})
+        'null_pre_history': 0, 'null_cleared': 0, 'dist': Counter(),
+        # distinct deals per week under each definition
+        'commit_by_week': defaultdict(set), 'commitlike_by_week': defaultdict(set)})
 
     for r in rows:
         q = r.get('fiscal_quarter') or 'UNKNOWN'
@@ -115,19 +122,33 @@ def report(sb, field_history):
         if cat is not None:
             b['resolved'] += 1
             b['dist'][cat] += 1
-            if (r.get('week_of_quarter') == MID_QUARTER_WEEK
-                    and cat == 'COMMIT'):
-                b['commit_deals_midweek'].add(r['deal_id'])
+            wk = r.get('week_of_quarter')
+            if cat in COMMIT_ONLY:
+                b['commit_by_week'][wk].add(r['deal_id'])
+            if cat in COMMIT_LIKE:
+                b['commitlike_by_week'][wk].add(r['deal_id'])
         else:
             b['dist']['NULL'] += 1
             b[f'null_{conf}'] = b.get(f'null_{conf}', 0) + 1
 
+    me = _min_evidence()
     print("=" * 72)
     print("FORECAST_CATEGORY RECONSTRUCTION — DRY RUN (no writes)")
     print("=" * 72)
     print(f"backfilled rows considered: {len(rows)}")
-    print(f"mid-quarter go/no-go week: {MID_QUARTER_WEEK} of 13")
-    print(f"min_evidence_count (config): {_min_evidence()}")
+    print(f"min_evidence_count (config): {me}")
+    print("NOTE: HubSpot's raw enum includes MOST_LIKELY (a tier the prompt's "
+          "list omitted). COMMIT-only and COMMIT+MOST_LIKELY are both reported; "
+          "the client's 'Commit' definition decides which the answer uses.")
+
+    def _peak(week_sets):
+        # (peak_week, peak_distinct_count) across weeks 1-13
+        best_wk, best_n = None, 0
+        for wk in range(1, 14):
+            n = len(week_sets.get(wk, ()))
+            if n > best_n:
+                best_wk, best_n = wk, n
+        return best_wk, best_n
 
     go_nogo = {}
     for q in sorted(by_q):
@@ -141,20 +162,30 @@ def report(sb, field_history):
         dist = "  ".join(f"{k}={v}" for k, v in sorted(
             b['dist'].items(), key=lambda kv: -kv[1]))
         print(f"   distribution: {dist}")
-        n_commit = len(b['commit_deals_midweek'])
-        go_nogo[q] = n_commit
-        print(f"   >>> distinct COMMIT deals at week {MID_QUARTER_WEEK}: "
-              f"{n_commit}")
+        # distinct COMMIT deals per week — the anchor may be any week, so show all
+        wk_line = " ".join(
+            f"w{wk}:{len(b['commit_by_week'].get(wk, ()))}" for wk in range(1, 14))
+        print(f"   COMMIT distinct/week: {wk_line}")
+        cpw, cpn = _peak(b['commit_by_week'])
+        lpw, lpn = _peak(b['commitlike_by_week'])
+        go_nogo[q] = {'commit_peak_wk': cpw, 'commit_peak_n': cpn,
+                      'like_peak_wk': lpw, 'like_peak_n': lpn}
+        print(f"   >>> peak COMMIT: {cpn} (week {cpw})   "
+              f"peak COMMIT+MOST_LIKELY: {lpn} (week {lpw})")
 
     print("\n" + "=" * 72)
-    print("GO / NO-GO — distinct COMMIT deals at the mid-quarter week")
-    print("(the direct input to commit calibration; must clear "
-          f"min_evidence_count={_min_evidence()} to yield a rate)")
+    print("GO / NO-GO — peak distinct top-tier deals in a single week")
+    print("(commit calibration anchors on the empirically-measured week, not a "
+          f"fixed midpoint; a quarter must reach min_evidence_count={me} in the "
+          "anchor week to yield a rate. Gate unchanged.)")
     print("=" * 72)
-    me = _min_evidence()
     for q in sorted(go_nogo):
-        verdict = "GO" if go_nogo[q] >= me else f"below gate -> null"
-        print(f"   {q}: {go_nogo[q]:>4d}   {verdict}")
+        g = go_nogo[q]
+        cv = "GO" if g['commit_peak_n'] >= me else "below gate -> null"
+        lv = "GO" if g['like_peak_n'] >= me else "below gate -> null"
+        print(f"   {q}:  COMMIT peak {g['commit_peak_n']:>4d} (w{g['commit_peak_wk']}) "
+              f"{cv:<20s} | COMMIT+MOST_LIKELY peak {g['like_peak_n']:>4d} "
+              f"(w{g['like_peak_wk']}) {lv}")
 
 
 def _min_evidence():
