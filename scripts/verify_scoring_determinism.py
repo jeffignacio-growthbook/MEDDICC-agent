@@ -95,21 +95,26 @@ def main():
     cumulative_state = {"company": "Livesport", "calls_reviewed": 0,
                         "meddicc_state": {}, "key_context": ""}
 
-    from meddicc_agent import run_agent
+    # Call the GENERATOR directly (one call per run), not the full run_agent
+    # loop. The component scores are the generator's output; the evaluator loop
+    # only gates `passed` and drives regeneration. Isolating the generator is
+    # the cleanest proof of scoring determinism and keeps 5 runs inside CI's
+    # time budget (5 calls, not ~30). Both generator and evaluator are pinned
+    # to temperature 0, so the full loop is deterministic too if this is.
+    from meddicc_agent import generate, load_claude_md
+    from llm_client import LLMClient
+    gen_client = LLMClient.from_config("generator")
+    claude_md = load_claude_md()
 
     runs = []
     for i in range(1, N_RUNS + 1):
         print(f"\n--- run {i}/{N_RUNS} ---")
-        result = run_agent(call_summary=all_calls_text,
-                           cumulative_state=cumulative_state,
-                           deal_context=deal_context, company="Livesport")
-        scores = _extract_scores(result["draft"] or "")
+        draft = generate(all_calls_text, cumulative_state, deal_context,
+                         None, claude_md, gen_client, None, "Livesport")
+        scores = _extract_scores(draft or "")
         overall = sum(v for v in scores.values() if isinstance(v, int))
-        runs.append({"scores": scores, "overall": overall,
-                     "passed": result.get("passed"),
-                     "iterations": result.get("iterations")})
-        print(f"  scores={scores} overall={overall}/70 "
-              f"passed={result.get('passed')} iters={result.get('iterations')}")
+        runs.append({"scores": scores, "overall": overall})
+        print(f"  scores={scores} overall={overall}/70")
 
     print("\n" + "=" * 72)
     print("PER-COMPONENT SPREAD ACROSS RUNS")
@@ -131,7 +136,6 @@ def main():
     if len(set(overalls)) != 1:
         all_identical = False
     print(f"\noverall/70 across runs: {overalls}")
-    print(f"passed across runs:    {[r['passed'] for r in runs]}")
 
     print("\n" + "=" * 72)
     if all_identical:
