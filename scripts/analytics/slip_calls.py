@@ -8,15 +8,16 @@ from rep optimism only in the conversation, not the numbers.
 
 Reuses the slip cohort from slip_diagnosis (no second cohort definition). For a
 SAMPLE of committed-and-slipped deals it reads the already-stored call summaries
-(calls.formatted_summary — no live Fireflies dependency) and extracts, per deal,
-three signals via the shared LLM client:
+(calls.summary, joined by deal_id — no live Fireflies dependency) and extracts,
+per deal, three signals via the shared LLM client:
   * was a mutual action plan discussed?
   * was a specific close process (procurement / legal / security) identified?
   * what reason was given when the date moved?
 
-Counts over the sample (not rates — the sample is explicitly small). Gated: if
-the slipped cohort is below min_evidence_count the analysis returns null with a
-reason rather than reading tea leaves from a handful of calls.
+Qualitative: counts over the sample, reported as "of N sampled", never a rate.
+It runs whenever there are slipped deals, flagged below_evidence_bar when the
+cohort is under the gate (the min_evidence gate guards inferential rates, not a
+sampled signal read); only an empty slipped cohort returns a bare reason.
 """
 import os
 import sys
@@ -92,11 +93,11 @@ def analyze_slip_calls(sb, llm=None, sample_size: int = SAMPLE_SIZE,
     sample_ids = {str(m['deal_id']) for m in sample}
 
     calls = select_all(sb, 'calls',
-                       columns='deal_id,call_date,formatted_summary')
+                       columns='deal_id,call_date,summary')
     summaries_by_deal = {}
     for c in calls:
         did = str(c['deal_id'])
-        if did in sample_ids and (c.get('formatted_summary') or '').strip():
+        if did in sample_ids and (c.get('summary') or '').strip():
             summaries_by_deal.setdefault(did, []).append(c)
 
     if llm is None:
@@ -113,7 +114,7 @@ def analyze_slip_calls(sb, llm=None, sample_size: int = SAMPLE_SIZE,
             per_deal.append({'deal_id': did, 'calls': 0})
             continue
         with_calls += 1
-        blob = "\n\n---\n\n".join((c.get('formatted_summary') or '') for c in rows)
+        blob = "\n\n---\n\n".join((c.get('summary') or '') for c in rows)
         resp = llm.complete(
             messages=[{"role": "user", "content": build_extraction_prompt(blob)}],
             system=EXTRACT_SYSTEM, max_tokens=200)

@@ -184,10 +184,10 @@ def test_slip_calls_extraction_and_scope():
     # calls: slipped deals have summaries; the WON deal also has one that must
     # NOT be pulled (scope = sampled slipped only).
     calls = [
-        {"deal_id": "s0", "call_date": "2026-03-10", "formatted_summary": "MAP agreed; procurement path clear"},
-        {"deal_id": "s1", "call_date": "2026-03-11", "formatted_summary": "date pushed to next quarter"},
-        {"deal_id": "s2", "call_date": "2026-03-12", "formatted_summary": "no plan discussed"},
-        {"deal_id": "w0", "call_date": "2026-03-13", "formatted_summary": "should not be read"},
+        {"deal_id": "s0", "call_date": "2026-03-10", "summary": "MAP agreed; procurement path clear"},
+        {"deal_id": "s1", "call_date": "2026-03-11", "summary": "date pushed to next quarter"},
+        {"deal_id": "s2", "call_date": "2026-03-12", "summary": "no plan discussed"},
+        {"deal_id": "w0", "call_date": "2026-03-13", "summary": "should not be read"},
     ]
     scripted = [
         '{"mutual_action_plan": true, "close_process_identified": true, "date_move_reason": "none"}',
@@ -214,9 +214,9 @@ def test_slip_calls_below_bar_still_samples_flagged():
     members = [_member(f"s{i}", "SLIPPED", "neg", "2026-03-01", "2026-04-30",
                        ["2026-04-10"]) for i in range(2)]
     calls = [{"deal_id": "s0", "call_date": "2026-03-10",
-              "formatted_summary": "MAP agreed"},
+              "summary": "MAP agreed"},
              {"deal_id": "s1", "call_date": "2026-03-11",
-              "formatted_summary": "date slipped, budget"}]
+              "summary": "date slipped, budget"}]
     scripted = [
         '{"mutual_action_plan": true, "close_process_identified": false, "date_move_reason": "none"}',
         '{"mutual_action_plan": false, "close_process_identified": false, "date_move_reason": "budget"}',
