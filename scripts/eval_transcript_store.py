@@ -35,30 +35,86 @@ def test_calls_queries_never_select_transcript():
     return cases
 
 
+def _utt(key, name, sec, text):
+    return {"key": key, "name": name, "sec": sec, "text": text,
+            "q": text.strip().endswith("?")}
+
+
 def test_transcript_null_never_empty_string():
-    """No text → NULL transcript, 'unavailable' quality, a reason, char_count 0.
-    Real text → stored, 'full', char_count=len. Never an empty string."""
+    """No utterances → NULL transcript, 'unavailable' quality, a reason,
+    char_count 0. Real utterances → assembled text stored, 'full'. Never ''."""
     from transcript_store import build_transcript_row, FULL, UNAVAILABLE
     cases = []
 
-    for label, text in (("empty string", ""), ("whitespace", "   \n  "),
-                        ("None", None)):
-        r = build_transcript_row("fireflies", "c1", text, error=None)
+    for label, utts in (("no utterances", []),
+                        ("only-blank utterances", [_utt("A", "A", 1.0, "   ")])):
+        r = build_transcript_row("fireflies", "c1", utts, error=None)
         ok = (r["transcript"] is None and r["transcript_quality"] == UNAVAILABLE
-              and r["unavailable_reason"] and r["char_count"] == 0)
+              and r["unavailable_reason"] and r["char_count"] == 0
+              and r["talk_time_seconds"] == {} and r["sentence_count"] == 0)
         cases.append((f"{label} → NULL + unavailable + reason (never '')", ok))
 
-    r = build_transcript_row("fireflies", "c2", "[A]: hello\n[B]: hi there")
-    cases.append(("real text → stored, full, char_count=len, no reason",
-                  r["transcript"] == "[A]: hello\n[B]: hi there"
+    r = build_transcript_row("fireflies", "c2",
+                             [_utt("A", "Ann", 1.0, "hello"), _utt("B", "Bob", 1.0, "hi there")])
+    cases.append(("real utterances → assembled text, full, char_count=len",
+                  r["transcript"] == "[Ann]: hello\n[Bob]: hi there"
                   and r["transcript_quality"] == FULL
                   and r["char_count"] == len(r["transcript"])
                   and r["unavailable_reason"] is None))
 
-    # A supplied error is preserved as the unavailable reason.
-    r = build_transcript_row("apollo", "c3", "", error="ReadTimeout: boom")
+    r = build_transcript_row("apollo", "c3", [], error="ReadTimeout: boom")
     cases.append(("fetch error preserved as unavailable_reason",
                   r["transcript"] is None and "ReadTimeout" in r["unavailable_reason"]))
+    return cases
+
+
+def test_metrics_from_utterances():
+    """Unit normalization (FF seconds, Apollo ms), per-speaker talk time +
+    question count keyed on the stable id, and the backchannel monologue rule."""
+    from transcript_store import (_fireflies_utterances, _apollo_utterances,
+                                   compute_metrics, longest_monologue)
+    cases = []
+
+    # Fireflies: seconds. 5.2 - 4.24 = 0.96s.
+    ff = _fireflies_utterances([
+        {"speaker_name": "Ann", "text": "How are you?", "start_time": "4.24", "end_time": "5.2"}])
+    cases.append(("fireflies duration in seconds (0.96)", abs(ff[0]["sec"] - 0.96) < 0.01))
+    cases.append(("fireflies keyed on name", ff[0]["key"] == "Ann"))
+    cases.append(("question mark → q True", ff[0]["q"] is True))
+
+    # Apollo: ms → seconds. 43610 - 43050 = 560ms = 0.56s. Keyed on participant_id.
+    ap = _apollo_utterances({"transcript": [
+        {"participant_id": "p1", "participant_name": "Bob",
+         "spoken_sentence": "Good.", "start_time": "43050.0", "end_time": "43610.0"}]})
+    cases.append(("apollo ms→seconds (0.56)", abs(ap[0]["sec"] - 0.56) < 0.01))
+    cases.append(("apollo keyed on participant_id, name alongside",
+                  ap[0]["key"] == "p1" and ap[0]["name"] == "Bob"))
+
+    # Per-speaker talk time + question count.
+    utts = [_utt("rep", "Rep", 3.0, "What's your timeline?"),
+            _utt("rep", "Rep", 2.0, "And your budget?"),
+            _utt("cust", "Cust", 5.0, "About Q3.")]
+    m = compute_metrics(utts)
+    cases.append(("talk time per speaker", m["talk_time_seconds"] == {"rep": 5.0, "cust": 5.0}))
+    cases.append(("question count per speaker (rep 2, cust 0)",
+                  m["question_count"] == {"rep": 2}))
+    cases.append(("speakers name lookup", m["speakers"] == {"rep": "Rep", "cust": "Cust"}))
+    cases.append(("total speech seconds", m["total_speech_seconds"] == 10.0))
+    cases.append(("sentence_count", m["sentence_count"] == 3))
+
+    # Monologue: A 10s, B "mm-hmm" 1s (backchannel <3s), A 10s → run A = 20s.
+    # Then B 5s (>=3s) breaks it; A 2s after. Longest = 20s, speaker A.
+    mono = [_utt("A", "A", 10.0, "..."), _utt("B", "B", 1.0, "mm-hmm"),
+            _utt("A", "A", 10.0, "..."), _utt("B", "B", 5.0, "Actually, wait —"),
+            _utt("A", "A", 2.0, "ok")]
+    sec, key = longest_monologue(mono)
+    cases.append(("backchannel <3s does not break the run (A=20s)", sec == 20.0 and key == "A"))
+
+    # Two backchannels summing >=3s DO break: A 10s, B 2s, B 2s (sum 4>=3).
+    mono2 = [_utt("A", "A", 10.0, "..."), _utt("B", "B", 2.0, "right"),
+             _utt("B", "B", 2.0, "sure")]
+    sec2, key2 = longest_monologue(mono2)
+    cases.append(("interruptions summing ≥3s break the run (A=10s)", sec2 == 10.0 and key2 == "A"))
     return cases
 
 
@@ -91,6 +147,7 @@ def run():
         ("calls queries never select transcript", test_calls_queries_never_select_transcript),
         ("transcript NULL never empty string", test_transcript_null_never_empty_string),
         ("apollo transcript assembled not fragments", test_apollo_transcript_is_assembled_not_fragments),
+        ("metrics: units, per-speaker talk/questions, backchannel monologue", test_metrics_from_utterances),
     ):
         print(f"\n[{title}]")
         for label, ok in fn():

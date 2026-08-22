@@ -73,7 +73,7 @@ def _calls_for_source(client, source):
 
 def backfill(dry_run=True, only_source=None, limit=None, batch=25):
     from supabase_client import SupabaseWriter
-    from transcript_store import fetch_transcript, build_transcript_row, UNAVAILABLE
+    from transcript_store import fetch_utterances, build_transcript_row, UNAVAILABLE
 
     writer = SupabaseWriter()
     client = writer.client
@@ -103,8 +103,8 @@ def backfill(dry_run=True, only_source=None, limit=None, batch=25):
         pending = []
         for i, c in enumerate(todo, 1):
             cid = str(c["call_id"])
-            text, err = fetch_transcript(source, cid, clients)
-            row = build_transcript_row(source, cid, text, error=err)
+            utts, err = fetch_utterances(source, cid, clients)
+            row = build_transcript_row(source, cid, utts, error=err)
             stats["attempted"] += 1
             if row["transcript_quality"] == UNAVAILABLE:
                 stats["unavailable"] += 1
