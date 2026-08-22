@@ -47,16 +47,6 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_score_correction.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_scoring_bands.py
 
-      - name: "PROBE — transcript availability + retention (temp, no writes)"
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          FIREFLIES_API_KEY: ${{ secrets.FIREFLIES_API_KEY }}
-          APOLLO_API_KEY: ${{ secrets.APOLLO_API_KEY }}
-        continue-on-error: true
-        run: |
-          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/probe_transcripts.py
-
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
