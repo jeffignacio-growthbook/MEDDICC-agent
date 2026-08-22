@@ -365,6 +365,20 @@ stage_progression:
     # paper_process: 7
 
 # ============================================================================
+# STAGE-vs-SCORE HYGIENE (Part 5)
+# ============================================================================
+# Compares a deal's MEDDICC qualification against its CRM stage, using the
+# stage_progression gates above as the bar — NOT a separately tuned number.
+# A deal's "qualified stage" is the furthest stage whose entry gates its
+# component scores clear. If that is far from its recorded stage, the CRM is
+# out of sync with the qualification.
+#   stage_gap_margin: how many stages of divergence to flag (>= this).
+#     1 = flag any deal whose supported stage differs from its recorded stage
+#     by a full stage or more. Set from the gates, not tuned to any one deal.
+stage_score_hygiene:
+  stage_gap_margin: 1
+
+# ============================================================================
 # ANALYSIS QUALITY THRESHOLDS
 # ============================================================================
 # Evaluator pass/fail criteria

@@ -140,9 +140,16 @@ def get_component_risk_level(stage_id: str, component: str, score: int) -> Optio
 
     required_threshold = requirements[component]
 
-    # Score is below requirement
-    if score < required_threshold:
+    # Band comparison, not integer: a 5-vs-6 gap is noise the generator can't
+    # reproduce run-to-run (both yellow), so an integer threshold is compared at
+    # band precision — gate 6 means "yellow-or-better", gate 7 "green-or-better".
+    try:
+        from rubric import band_meets
+    except ImportError:
+        from api.rubric import band_meets
+
+    if not band_meets(component, score, required_threshold):
         return "at_risk"
 
-    # Score meets or exceeds requirement
+    # Score's band meets or exceeds the gate's band
     return None

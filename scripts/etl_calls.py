@@ -881,6 +881,28 @@ def main():
                     n = sb.bulk_upsert_calls(calls, data['company'])
                     total += n
             print(f"  ✓ Supabase: {total} calls upserted")
+
+            # Go-forward transcript persist (STORE_AND_BACKFILL_TRANSCRIPTS):
+            # store each newly-ingested call's transcript alongside the call.
+            # The calls upsert above committed first, so the FK parent exists.
+            # Fully guarded — a transcript fetch/store failure must NOT fail the
+            # calls ETL, which is the primary artifact.
+            try:
+                from transcript_store import fetch_transcript, build_transcript_row
+                clients, rows = {}, []
+                for slug, data in calls_by_company.items():
+                    for c in data.get('calls', []):
+                        cid, src = str(c.get('id') or ''), c.get('source') or ''
+                        if not cid or not src:
+                            continue
+                        text, err = fetch_transcript(src, cid, clients)
+                        rows.append(build_transcript_row(src, cid, text, error=err))
+                stored = sb.bulk_upsert_transcripts(rows)
+                have = sum(1 for r in rows if r.get('transcript'))
+                print(f"  ✓ Supabase: {stored} transcripts upserted "
+                      f"({have} with text, {stored - have} unavailable)")
+            except Exception as te:
+                print(f"  ⚠️  Transcript persist failed (calls unaffected): {te}")
         except Exception as e:
             print(f"  ⚠️  Supabase write failed: {e}")
     else:
