@@ -174,7 +174,7 @@ def main():
             continue
         a = latest.get(did)
         if not a:
-            buckets["unscored"].append(d.get("company_name") or did)
+            buckets["unscored"].append((d.get("company_name") or did, did))
             continue
         scores = {comp: a.get(col) for col, comp in _SCORE_COLS.items()}
         reading, q, gap = classify(actual_order, scores, ladder, margin)
@@ -209,6 +209,35 @@ def main():
     print(f"\n[ALIGNED] ({len(buckets['aligned'])})  "
           f"[UNSCORED — no passed analysis] ({len(buckets['unscored'])})  "
           f"[OFF-LADDER — not classified] ({len(buckets['off_ladder'])})")
+
+    # COVERAGE: why are on-ladder deals unscored? The hygiene check only sees
+    # deals with a PASSED analysis, so a large unscored count means the check
+    # runs on a small sample. Split the cause so it's actionable, not just a
+    # number: evaluator gating (has analyses, none passed) vs. never analysed
+    # with calls present (nightly not reaching them) vs. no calls to score.
+    analyzed_ids = {a.get("deal_id") for a in analyses}
+    passed_ids = set(latest.keys())
+    try:
+        call_rows = select_all(sb, "calls", columns="deal_id")
+        call_ids = {c.get("deal_id") for c in call_rows}
+    except Exception:
+        call_ids = set()
+    cause = {"has_analyses_none_passed": 0, "never_analysed_has_calls": 0,
+             "never_analysed_no_calls": 0}
+    for _company, did in buckets["unscored"]:
+        if did in analyzed_ids and did not in passed_ids:
+            cause["has_analyses_none_passed"] += 1   # evaluator gating
+        elif did in call_ids:
+            cause["never_analysed_has_calls"] += 1    # nightly not reaching / guard
+        else:
+            cause["never_analysed_no_calls"] += 1     # nothing to score
+    print("\n[COVERAGE — why on-ladder deals are unscored]")
+    print(f"  evaluator gated (analysed, none passed): {cause['has_analyses_none_passed']}")
+    print(f"  never analysed but has calls (nightly gap): {cause['never_analysed_has_calls']}")
+    print(f"  never analysed, no calls (nothing to score): {cause['never_analysed_no_calls']}")
+    print("  NOTE: the hygiene classification above runs only on the "
+          f"{total_classified} on-ladder deals with a passed analysis — a "
+          "sample of the book, not the whole book.")
 
     # LiveSport worked example
     print("\n" + "-" * 76)
