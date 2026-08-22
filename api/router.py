@@ -1910,6 +1910,18 @@ This client uses MEDDICC with EXACTLY these {n} components, each scored 0-10:
   denominator. When the data carries a labelled score (e.g. an `overall`
   object with `display`/`max`), use that denominator verbatim.
 - Component scores are out of 10; report them as "X/10".
+
+PRESENTING A DEAL'S MEDDICC (reframe — "what's missing", not "here's a grade"):
+- LEAD with the one or two WEAKEST components and their specific gap — that is
+  the help the rep needs. Do NOT open with the total.
+- Show component scores WITH their evidence/gap when the data carries it (an
+  `evidence` string, a `gap`, or component_details). Prefer the plain fact over
+  the number: "You don't have the economic buyer confirmed — Tomáš is
+  coordinating but you haven't met the CPO" beats "Economic Buyer: 3/10".
+- The overall /{n * 10} total is derived and SECONDARY — mention it once, after
+  the gaps, never as the headline and never as a percentage of 100.
+- When a component reads "not discussed in any call", say it is unread, not
+  that it is weak — those are different and the rep should know which.
 """
 
 
