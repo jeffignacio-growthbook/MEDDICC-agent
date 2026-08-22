@@ -228,27 +228,6 @@ When cumulative_calls_context is 0, most components will be Unknown or Partial. 
 
 ## Output Format
 
-**Evidence contract — every component, no exceptions.** A bare score is not
-enough; each component must show the evidence it was scored from, so a wrong
-score is debuggable (missed a call? misread a mention? misapplied the band?).
-
-**Order of operations (do not reorder):** decide and write the **Score** FIRST,
-from the calls. THEN write the Evidence and Gap as descriptions of that
-already-decided score. Writing the Gap must NEVER change the number above it —
-the Gap explains what a higher score would have required; it does not re-open
-the scoring. (Naming the gap for a borderline component and then nudging its
-score is how the number stops being a pure function of the evidence.)
-
-- **Evidence from calls** must be a direct quote or a specific fact from a
-  call, WITH the call date in parentheses — e.g. `"Optimizely is €400–500K/yr"
-  (Jul 30 call)`. Not a restatement of the score.
-- If NO call supports a component, do not invent evidence. Write exactly
-  `not discussed in any call` and score it low. A low score WITH evidence and a
-  low score with NO evidence are different findings — the reader needs to know
-  which, to decide whether to argue the score or go get the data.
-- **Gap** states what is missing to reach the next band, in the rubric's own
-  band language. If the component was not discussed, the gap is that absence.
-
 Generate a markdown MEDDICC analysis with this structure:
 
 ```markdown
@@ -268,9 +247,7 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [What quantifiable business outcomes does the buyer care about? Experimentation velocity, cost reduction, engineering time saved, etc.]
 
-**Evidence from calls**: [Direct quote or specific fact WITH the call date, e.g. "…" (Jul 30 call). If no call supports this component, write exactly: not discussed in any call]
-
-**Gap**: [What is missing to reach the next band, in the rubric's band language. If not discussed in any call, say so.]
+**Evidence from calls**: [Specific quotes or details]
 
 **Next steps**: [What question to ask on next call if incomplete]
 
@@ -280,9 +257,7 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [Who has budget authority and makes the final decision?]
 
-**Evidence from calls**: [Direct quote or specific fact WITH the call date, e.g. "…" (Jul 30 call). If no call supports this component, write exactly: not discussed in any call]
-
-**Gap**: [What is missing to reach the next band, in the rubric's band language. If not discussed in any call, say so.]
+**Evidence from calls**: [Specific quotes or details]
 
 **Next steps**: [What question to ask on next call if incomplete]
 
@@ -292,9 +267,7 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [What are the formal evaluation criteria? Must integrate with Snowflake? Need statistical rigor? Budget constraints?]
 
-**Evidence from calls**: [Direct quote or specific fact WITH the call date, e.g. "…" (Jul 30 call). If no call supports this component, write exactly: not discussed in any call]
-
-**Gap**: [What is missing to reach the next band, in the rubric's band language. If not discussed in any call, say so.]
+**Evidence from calls**: [Specific quotes or details]
 
 **Next steps**: [What question to ask on next call if incomplete]
 
@@ -304,9 +277,7 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [What is the timeline? Who are all the stakeholders? What is the approval process?]
 
-**Evidence from calls**: [Direct quote or specific fact WITH the call date, e.g. "…" (Jul 30 call). If no call supports this component, write exactly: not discussed in any call]
-
-**Gap**: [What is missing to reach the next band, in the rubric's band language. If not discussed in any call, say so.]
+**Evidence from calls**: [Specific quotes or details]
 
 **Next steps**: [What question to ask on next call if incomplete]
 
@@ -316,9 +287,7 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [What specific pain are they trying to solve? Is it urgent?]
 
-**Evidence from calls**: [Direct quote or specific fact WITH the call date, e.g. "…" (Jul 30 call). If no call supports this component, write exactly: not discussed in any call]
-
-**Gap**: [What is missing to reach the next band, in the rubric's band language. If not discussed in any call, say so.]
+**Evidence from calls**: [Specific quotes or details]
 
 **Next steps**: [What question to ask on next call if incomplete]
 
@@ -328,9 +297,7 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [Who is actively selling internally on our behalf?]
 
-**Evidence from calls**: [Direct quote or specific fact WITH the call date, e.g. "…" (Jul 30 call). If no call supports this component, write exactly: not discussed in any call]
-
-**Gap**: [What is missing to reach the next band, in the rubric's band language. If not discussed in any call, say so.]
+**Evidence from calls**: [Specific quotes or details]
 
 **Next steps**: [What question to ask on next call if incomplete]
 
@@ -340,9 +307,7 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [What other solutions are they evaluating? Current tools? Build vs buy?]
 
-**Evidence from calls**: [Direct quote or specific fact WITH the call date, e.g. "…" (Jul 30 call). If no call supports this component, write exactly: not discussed in any call]
-
-**Gap**: [What is missing to reach the next band, in the rubric's band language. If not discussed in any call, say so.]
+**Evidence from calls**: [Specific quotes or details]
 
 **Next steps**: [What question to ask on next call if incomplete]
 

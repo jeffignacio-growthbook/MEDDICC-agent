@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 """
-Eval: evidence contract (Part 4) + score-reframe (Part 6) of
+Eval: evidence surfacing (Part 4) + score reframe (Part 6) of
 FIX_MEDDICC_SCORING_PIPELINE.
 
-Part 4 — every component in the generator's output must carry the evidence it
-was scored from (a dated quote/fact), or an explicit "not discussed in any
-call", plus a Gap. A bare number invites an argument nobody can settle; the
-evidence line is the debugging surface.
+IMPORTANT design note (why this isn't the literal Part 4 spec):
+Part 4 asked for a per-component evidence+Gap contract IN THE GENERATOR OUTPUT.
+Adding Gap/dated-evidence directives to the generator prompt was implemented,
+and the mandatory determinism re-run (Part 1's gate) caught that it reintroduced
+non-determinism in the one genuinely-borderline component, champion (spread 2,
+then 3, across two wordings; the other six components stayed spread 0). Naming a
+band gap for a borderline component tips its score at temperature 0. Per the
+task's own rule — determinism first, and "less variance" ≠ deterministic — the
+generator-side change was reverted.
 
-Part 6 — the Slack synthesis reframes a deal's MEDDICC as "what's missing", not
-a grade: lead with the weakest components and their gaps, total is secondary,
-never /100, and "not discussed" reads as unread, not weak.
-
-Offline: asserts the prompts carry the contract. (Whether the generator obeys
-it is checked live by the nightly + the determinism harness.)
+Resolution: the generator keeps its pre-existing, deterministic per-component
+"Evidence from calls" field; the evidence/gap presentation moves to the
+SYNTHESIS layer (build_synthesis_prompt), where it is actually consumed and
+cannot perturb a score. This eval enforces that split, and guards against a
+regression that would put a score-perturbing Gap directive back in the
+generator prompt.
 """
 import sys
 import types
@@ -30,52 +35,49 @@ if "supabase" not in sys.modules:
     sys.modules["supabase"] = _f
 
 
-def test_generator_prompt_requires_evidence_and_gap():
-    """prompts/CLAUDE.md mandates dated evidence, explicit not-discussed, and a
-    Gap line for every one of the 7 components (Part 4)."""
+def test_generator_keeps_evidence_but_stays_deterministic():
+    """The generator prompt carries per-component evidence (7 components) but
+    must NOT carry a score-perturbing Gap directive — that broke champion
+    determinism and was reverted."""
     md = (REPO / "prompts" / "CLAUDE.md").read_text()
-    lower = md.lower()
     return [
-        ("evidence must carry the call date",
-         "with the call date" in lower),
-        ("explicit no-evidence sentinel present",
-         "not discussed in any call" in lower),
-        ("distinguishes low-with-evidence from no-evidence",
-         "different" in lower and "evidence" in lower),
-        ("a Gap line for every component (7)",
-         md.count("**Gap**:") >= 7),
-        ("gap uses the rubric's band language",
-         "band language" in lower),
+        ("per-component 'Evidence from calls' present (>=7)",
+         md.count("**Evidence from calls**") >= 7),
+        ("no generator-side **Gap** directive (determinism regression guard)",
+         "**Gap**:" not in md),
+        ("no generator-side dated-evidence directive (regression guard)",
+         "WITH the call date" not in md),
     ]
 
 
-def test_synthesis_reframes_score_as_gaps():
-    """build_synthesis_prompt leads with weakest components + gaps, keeps the
-    total secondary, and treats 'not discussed' as unread (Part 6)."""
+def test_synthesis_surfaces_evidence_and_gaps():
+    """The evidence/gap contract lives at the synthesis layer now: lead with
+    weakest components + gaps, show evidence, total secondary, and read
+    no-evidence as unread not weak (Parts 4 goal + 6)."""
     from api.router import build_synthesis_prompt
     p = build_synthesis_prompt({"role_group": "sales_leadership", "name": "Ryan"})
     pl = p.lower()
     return [
         ("leads with the weakest components", "weakest" in pl),
-        ("leads with gaps, not a grade", "gap" in pl),
-        ("total is secondary, after the gaps", "secondary" in pl),
-        ("never a percentage of 100", "never as a percentage of 100" in pl
-         or "not 0-100" in pl),
-        ("'not discussed' reads as unread, not weak",
-         "unread" in pl and "not discussed in any call" in pl),
+        ("surfaces the gap, not just a grade", "gap" in pl),
+        ("shows component evidence", "evidence" in pl),
+        ("total is secondary", "secondary" in pl),
+        ("never a percentage of 100",
+         "never as a percentage of 100" in pl or "not 0-100" in pl),
+        ("no-evidence reads as unread, not weak", "unread" in pl),
     ]
 
 
 def run():
     print("=" * 72)
-    print("EVIDENCE CONTRACT (Part 4) + SCORE REFRAME (Part 6)")
+    print("EVIDENCE SURFACING (Part 4, synthesis-layer) + REFRAME (Part 6)")
     print("=" * 72)
     passed = failed = 0
     for title, fn in (
-        ("PART 4 — generator output carries evidence + gap per component",
-         test_generator_prompt_requires_evidence_and_gap),
-        ("PART 6 — synthesis reframes score as what's-missing",
-         test_synthesis_reframes_score_as_gaps),
+        ("generator keeps evidence, stays deterministic (no Gap directive)",
+         test_generator_keeps_evidence_but_stays_deterministic),
+        ("synthesis surfaces evidence + gaps, total secondary",
+         test_synthesis_surfaces_evidence_and_gaps),
     ):
         print(f"\n[{title}]")
         for label, ok in fn():

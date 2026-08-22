@@ -1920,8 +1920,10 @@ PRESENTING A DEAL'S MEDDICC (reframe — "what's missing", not "here's a grade")
   coordinating but you haven't met the CPO" beats "Economic Buyer: 3/10".
 - The overall /{n * 10} total is derived and SECONDARY — mention it once, after
   the gaps, never as the headline and never as a percentage of 100.
-- When a component reads "not discussed in any call", say it is unread, not
-  that it is weak — those are different and the rep should know which.
+- When a component has NO supporting evidence in the calls (the evidence field
+  is empty or says nothing was found), say it is UNREAD — we don't have the
+  data — not that it is weak. Those are different, and the rep should know
+  whether to argue the score or go get the missing information.
 """
 
 
