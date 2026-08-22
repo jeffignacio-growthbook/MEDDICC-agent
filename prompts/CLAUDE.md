@@ -230,7 +230,14 @@ When cumulative_calls_context is 0, most components will be Unknown or Partial. 
 
 **Evidence contract — every component, no exceptions.** A bare score is not
 enough; each component must show the evidence it was scored from, so a wrong
-score is debuggable (missed a call? misread a mention? misapplied the band?):
+score is debuggable (missed a call? misread a mention? misapplied the band?).
+
+**Order of operations (do not reorder):** decide and write the **Score** FIRST,
+from the calls. THEN write the Evidence and Gap as descriptions of that
+already-decided score. Writing the Gap must NEVER change the number above it —
+the Gap explains what a higher score would have required; it does not re-open
+the scoring. (Naming the gap for a borderline component and then nudging its
+score is how the number stops being a pure function of the evidence.)
 
 - **Evidence from calls** must be a direct quote or a specific fact from a
   call, WITH the call date in parentheses — e.g. `"Optimizely is €400–500K/yr"
