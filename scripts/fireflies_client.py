@@ -61,6 +61,42 @@ class FirefliesClient:
         result = self._query(query, {"limit": limit, "skip": skip})
         return result.get("data", {}).get("transcripts") or []
 
+    def get_transcript_sentences(self, transcript_id: str) -> List[dict]:
+        """Fetch the speaker-attributed sentences for ONE transcript.
+
+        The list query (get_transcripts) deliberately omits sentences — it only
+        pulls the AI summary. This is the per-id fetch that retrieves the actual
+        conversation text (STORE_AND_BACKFILL_TRANSCRIPTS). Returns a list of
+        {'speaker_name', 'text'} in order, or [] when the plan/retention does not
+        return sentences for this id.
+        """
+        query = """
+        query Transcript($transcriptId: String!) {
+            transcript(id: $transcriptId) {
+                sentences {
+                    speaker_name
+                    text
+                }
+            }
+        }
+        """
+        result = self._query(query, {"transcriptId": transcript_id})
+        transcript = (result.get("data") or {}).get("transcript") or {}
+        return transcript.get("sentences") or []
+
+    @staticmethod
+    def assemble_transcript(sentences: List[dict]) -> str:
+        """Join Fireflies sentences into readable speaker-attributed lines.
+        Same shape the Apollo adapter produces, so a consumer never has to know
+        which source a transcript came from."""
+        lines = []
+        for s in sentences:
+            speaker = (s.get("speaker_name") or "Unknown").strip()
+            text = (s.get("text") or "").strip()
+            if text:
+                lines.append(f"[{speaker}]: {text}")
+        return "\n".join(lines)
+
     def get_meeting_attendees(self, transcript_id: str) -> List[dict]:
         """Get meeting attendees for a specific transcript."""
         query = """
