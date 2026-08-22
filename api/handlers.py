@@ -1068,6 +1068,100 @@ async def query_rubric_scores_bulk(params: dict, sb) -> dict:
                       "note": "overall_score is the sum of 7 components (0-70); "
                               "each component is 0-10"}}
 
+_MEDDICC_COMPONENT_KEYS = {
+    "metrics": "metrics", "metric": "metrics",
+    "economic_buyer": "economic_buyer", "economic buyer": "economic_buyer",
+    "eb": "economic_buyer",
+    "decision_criteria": "decision_criteria", "decision criteria": "decision_criteria",
+    "criteria": "decision_criteria",
+    "decision_process": "decision_process", "decision process": "decision_process",
+    "process": "decision_process",
+    "pain": "pain", "identified_pain": "pain", "identify_pain": "pain",
+    "champion": "champion",
+    "competition": "competition", "competitor": "competition",
+}
+
+
+async def submit_score_correction(params: dict, sb) -> dict:
+    """Capture a rep's disagreement with a MEDDICC component score (Part 7).
+
+    A REVIEW QUEUE, not a live edit: this writes to score_corrections and does
+    NOT change any score. The agent proposes, a human disposes — same discipline
+    as the proposals table. Purpose: a rep who can push back stops treating the
+    tool as an accusation, and we accumulate labelled examples of where the
+    generator is wrong.
+
+    Never raises on a missing param — returns a clear error dict instead.
+    """
+    raw_component = str(params.get("component") or "").strip().lower()
+    component = _MEDDICC_COMPONENT_KEYS.get(raw_component)
+    proposed = params.get("proposed_score")
+    reason = str(params.get("correction_reason") or params.get("reason") or "").strip()
+
+    if not component:
+        return {"logged": False,
+                "error": "Name the MEDDICC component you're correcting (metrics, "
+                         "economic buyer, decision criteria, decision process, "
+                         "pain, champion, or competition)."}
+    try:
+        proposed_score = int(proposed)
+    except (TypeError, ValueError):
+        return {"logged": False, "component": component,
+                "error": "Give the score you think it should be, 0-10 "
+                         "(e.g. 'champion should be 7')."}
+    if not (0 <= proposed_score <= 10):
+        return {"logged": False, "component": component,
+                "error": "Proposed score must be between 0 and 10."}
+    if not reason:
+        return {"logged": False, "component": component,
+                "error": "Add a one-line reason — the evidence for the higher/lower "
+                         "score is what makes the correction useful."}
+
+    # Resolve the deal (by company name) and the current score, if we can.
+    company = (params.get("company")
+               or (params.get("company_names") or [None])[0])
+    deal_id = None
+    company_name = company
+    current_score = None
+    if company:
+        matches = select_all(sb, "deals", columns="deal_id,company_name",
+            filters=[("ilike", "company_name", f"%{str(company).strip()}%")])
+        if matches:
+            deal_id = matches[0]["deal_id"]
+            company_name = matches[0].get("company_name") or company
+            rows = select_all(sb, "analyses",
+                columns=f"deal_id,{component}_score,analyzed_at,passed",
+                filters=[("eq", "deal_id", deal_id)])
+            passed = [r for r in rows if r.get("passed")]
+            passed.sort(key=lambda r: str(r.get("analyzed_at") or ""), reverse=True)
+            if passed:
+                current_score = passed[0].get(f"{component}_score")
+
+    row = {
+        "deal_id": deal_id, "company_name": company_name,
+        "component": component, "current_score": current_score,
+        "proposed_score": proposed_score, "reason": reason,
+        "submitted_by": params.get("submitted_by"), "status": "proposed",
+    }
+    try:
+        sb.table("score_corrections").insert(
+            {k: v for k, v in row.items() if v is not None}).execute()
+    except Exception as e:
+        return {"logged": False, "component": component,
+                "error": f"Couldn't log the correction: {e}"}
+
+    return {
+        "logged": True,
+        "correction": {"component": component, "current_score": current_score,
+                       "proposed_score": proposed_score,
+                       "company_name": company_name, "reason": reason},
+        "note": ("Logged to the review queue. This does NOT change the score "
+                 "automatically — a human reviews corrections before anything "
+                 "is adjusted. Thanks for the pushback; it's how the scoring "
+                 "gets better."),
+    }
+
+
 async def query_deal_stages_bulk(params: dict, sb) -> dict:
     """Current stage for a known set of deal_ids."""
     # Fix A2: Handle both entity-scope path (has deal_ids) and

@@ -74,6 +74,15 @@ HANDLER_DESCRIPTIONS = {
     "query_competitive_intel": "competitive intelligence: which companies mentioned DIY/build-it-themselves, named competitors showing up in calls, build-vs-buy signals, what alternatives prospects are evaluating",
     "set_target": "admin: set quota or target (requires auth)",
     "query_rubric_scores_bulk": "MEDDICC component scores for a known set of deals",
+    "submit_score_correction": (
+        "The user DISAGREES with a MEDDICC component score and is proposing a "
+        "correction — e.g. 'champion should be 7 for LiveSport, Tomáš is "
+        "presenting to the CPO', 'that competition score is too low', 'EB is "
+        "wrong on Acme, it should be 8'. Capture it: set params.component (the "
+        "MEDDICC component), params.proposed_score (0-10), params.correction_reason "
+        "(their justification), and params.company if named. This logs to a "
+        "review queue — it does NOT change the score."
+    ),
     "query_deal_stages_bulk": "current stage for a known set of deals",
     "query_deal_owners_bulk": "owner/rep for a known set of deals",
     "query_deal_values_bulk": "ARR/deal value for a known set of deals",
@@ -557,6 +566,9 @@ Required JSON:
     "weeks": "<for query_pipeline_movement composition: integer count of recent weeks, or null>",
     "stage": "<for query_pipeline_movement stage_deals: stage name like 'Discovery', else null>",
     "close_date_scope": "<for query_pipeline_movement: 'current_quarter' to reconcile against a CRM board filtered by close date, else null (default all)>",
+    "component": "<for query_rubric / submit_score_correction: a MEDDICC component (champion, economic_buyer, metrics, decision_criteria, decision_process, pain, competition), else null>",
+    "proposed_score": "<for submit_score_correction ONLY: the 0-10 score the user says it should be, else null>",
+    "correction_reason": "<for submit_score_correction ONLY: the user's justification for the corrected score, else null>",
     "help_category": "<for query_help ONLY: greeting|capability|prompt_seeking|recovery, else null>"
   }},
   "unanswerable_reason": "no_data|out_of_scope|ambiguous|null",
@@ -1486,6 +1498,10 @@ async def route_question(question: str, user_id: str,
         if entity_params:
             params["deal_ids"]      = entity_params["deal_ids"]
             params["company_names"] = entity_params["company_names"]
+
+        # A score correction must record who submitted it (review queue, Part 7).
+        if handler_name == "submit_score_correction":
+            params["submitted_by"] = user_id
 
         confidence = intent.get("confidence", 0.5)
 

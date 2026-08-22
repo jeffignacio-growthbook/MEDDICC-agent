@@ -76,7 +76,7 @@ def _iter_handlers():
             continue
         if name.startswith("_"):
             continue
-        if name.split("_")[0] in ("query", "generate", "set"):
+        if name.split("_")[0] in ("query", "generate", "set", "submit"):
             yield name, fn
 
 

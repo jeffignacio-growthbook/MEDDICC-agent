@@ -44,6 +44,7 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_scoring_pipeline.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_stage_score_hygiene.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_evidence_contract.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_score_correction.py
 
       - name: "DETERMINISM re-check — generator prompt changed by Part 4 (temp step)"
         env:
