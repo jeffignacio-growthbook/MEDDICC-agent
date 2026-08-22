@@ -158,14 +158,22 @@ def main():
         columns="deal_id," + ",".join(_SCORE_COLS) + ",overall_score,analyzed_at,passed")
     latest = _latest_passed(analyses)
 
+    ladder_orders = {o for o, _id, _n in ladder}
     buckets = {"score_ahead_of_stage": [], "stage_ahead_of_score": [],
-               "aligned": [], "unscored": []}
+               "aligned": [], "unscored": [], "off_ladder": []}
     for d in deals:
         did = d.get("deal_id")
         st = _get_stage_by_id(d.get("stage") or "")
         actual_order = st["order"] if st else None
+        # Only deals sitting on an analyzable rung can be compared. A deal on
+        # Meeting Set (order 0, excluded), a renewal-pipeline stage, or a
+        # terminal stage has no rung to compare against — classifying it would
+        # floor `qualified` at the lowest rung and manufacture a false gap.
+        if actual_order not in ladder_orders:
+            buckets["off_ladder"].append(d.get("company_name") or did)
+            continue
         a = latest.get(did)
-        if not a or actual_order is None:
+        if not a:
             buckets["unscored"].append(d.get("company_name") or did)
             continue
         scores = {comp: a.get(col) for col, comp in _SCORE_COLS.items()}
@@ -185,8 +193,10 @@ def main():
 
     total_classified = sum(len(buckets[k]) for k in
                            ("score_ahead_of_stage", "stage_ahead_of_score", "aligned"))
-    print(f"\nactive deals: {len(deals)}  |  scored (passed): {total_classified}  |  "
-          f"unscored: {len(buckets['unscored'])}\n")
+    print(f"\nactive deals: {len(deals)}  |  on-ladder scored (passed): {total_classified}  |  "
+          f"on-ladder unscored: {len(buckets['unscored'])}  |  "
+          f"off-ladder (Meeting Set / renewal / terminal, not classified): "
+          f"{len(buckets['off_ladder'])}\n")
 
     print(f"[SCORE AHEAD OF STAGE — CRM stale, deal further along] "
           f"({len(buckets['score_ahead_of_stage'])})")
@@ -197,7 +207,8 @@ def main():
     for r in sorted(buckets["stage_ahead_of_score"], key=lambda x: (x["gap"] or 0)):
         print(_fmt(r))
     print(f"\n[ALIGNED] ({len(buckets['aligned'])})  "
-          f"[UNSCORED — no passed analysis] ({len(buckets['unscored'])})")
+          f"[UNSCORED — no passed analysis] ({len(buckets['unscored'])})  "
+          f"[OFF-LADDER — not classified] ({len(buckets['off_ladder'])})")
 
     # LiveSport worked example
     print("\n" + "-" * 76)
