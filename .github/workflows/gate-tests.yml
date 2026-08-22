@@ -15,7 +15,7 @@ jobs:
   gate-tests:
     runs-on: ubuntu-latest
     environment: Agent
-    timeout-minutes: 45
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -45,15 +45,18 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_stage_score_hygiene.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_evidence_contract.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_score_correction.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_scoring_bands.py
 
-      - name: "CHARACTERIZE scoring determinism across deals (temp step)"
+      - name: "PREVIEW — band-based stage hygiene on live data (temp, stale scores)"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         continue-on-error: true
         run: |
-          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/characterize_scoring_determinism.py
+          echo "PREVIEW ONLY — scores below were produced under the OLD sampling"
+          echo "pipeline; the real re-count waits for one clean nightly. This just"
+          echo "proves the band-gate classifier runs end-to-end on live data."
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/analytics/stage_score_hygiene.py
 
       - name: "TEST 1 — Competitive intel handler against real data"
         env:

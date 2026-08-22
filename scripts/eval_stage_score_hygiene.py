@@ -16,6 +16,7 @@ for p in ("", "scripts", "api", "scripts/analytics"):
 
 # stage_requirements / analytics import field_semantics + yaml only; no network.
 from analytics.stage_score_hygiene import classify, qualified_order, _ladder
+from rubric import band_meets, band_label
 
 
 def run():
@@ -54,21 +55,37 @@ def run():
     check("weak scores at latest stage → stage_ahead_of_score",
           reading == "stage_ahead_of_score" and gap <= -1)
 
-    # 3. LiveSport (real deterministic scores) sitting in Scoping.
-    #    EB 5 and champion 5 fall below the Scoping→Proposal gate (both need 6),
-    #    so it does NOT qualify beyond Scoping — it is ALIGNED, not "ahead".
-    #    This is what falls out; it is not tuned to a desired answer.
-    reading, q, gap = classify(scoping, LIVESPORT, ladder)
-    check("LiveSport @ Scoping with EB5/champ5 → aligned (honest result)",
-          reading == "aligned" and gap == 0)
-    check("LiveSport qualified stage == its actual stage (Scoping)",
-          q == scoping)
+    # 3. Gates are compared at BAND precision, not integer. This is the anti-
+    #    flip property that motivated the change: a component oscillating 5↔6
+    #    (both YELLOW) must give the SAME meets-result against a gate of 6, so a
+    #    deal does not flip in and out of "qualified" on ±1 sampling noise.
+    check("5 and 6 both clear a gate of 6 (both yellow — no ±1 flip)",
+          band_meets("economic_buyer", 5, 6) and band_meets("economic_buyer", 6, 6))
+    check("a gate of 7 needs green: 6 fails, 7 clears (real boundary kept)",
+          (not band_meets("decision_process", 6, 7))
+          and band_meets("decision_process", 7, 7))
+    check("all-red scores never clear a yellow-floor gate",
+          not band_meets("champion", 2, 4))
 
-    # 4. Sanity: strong scores qualify well past the earliest rung.
+    # 4. LiveSport (real deterministic scores) sitting in Scoping. HONEST
+    #    FALLOUT of band gates: EB 5 and champion 5 are both YELLOW, and the
+    #    Scoping→Proposal gate (metrics6/eb6/champ6/dc5) is a yellow-floor gate
+    #    once banded — so LiveSport now CLEARS it and qualifies beyond Scoping.
+    #    Under the old integer gates a 5 failed a "need 6"; banding says a 5 and
+    #    a 6 are the same measurement, so the deal reads as score-ahead-of-stage
+    #    (CRM behind), not aligned. Not tuned — this is what the band mapping
+    #    produces, and it is a directional change worth reporting.
+    reading, q, gap = classify(scoping, LIVESPORT, ladder)
+    check("LiveSport @ Scoping now qualifies past Scoping under band gates",
+          q > scoping)
+    check("LiveSport reads as score_ahead_of_stage (was aligned under ints)",
+          reading == "score_ahead_of_stage" and gap >= 1)
+
+    # 5. Sanity: strong scores qualify well past the earliest rung.
     check("strong scores qualify beyond the earliest rung",
           qualified_order(STRONG, ladder) > lo)
-    # 5. Sanity: weak scores never clear even the first gate.
-    check("weak scores stay on the lowest rung",
+    # 6. Sanity: all-red scores never clear even the first gate.
+    check("all-red scores stay on the lowest rung",
           qualified_order(WEAK, ladder) == lo)
 
     print("\n" + "=" * 72)

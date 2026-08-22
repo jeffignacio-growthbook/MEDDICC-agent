@@ -390,24 +390,32 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
         if not requirements:
             continue
 
-        # Check each required component
+        # Check each required component. Band comparison, not integer: a 5-vs-6
+        # gap is noise the generator can't reproduce (both yellow), so a
+        # component is only "at risk" when its BAND is below the gate's band —
+        # gate 6 → needs yellow-or-better, gate 7 → green-or-better.
+        from api.rubric import band_meets, band_label, get_band
         risk_flags = []
         for component, required_threshold in requirements.items():
             field_name = component_fields.get(component)
             if not field_name:
                 continue
 
-            actual_score = a.get(field_name, 0) or 0
+            actual_score = a.get(field_name)
 
-            if actual_score < required_threshold:
-                # Stage-aware risk message
+            if not band_meets(component, actual_score, required_threshold):
+                # Stage-aware risk message, in band language (the integer is
+                # internal — surfacing "5/10" invites arguing the number
+                # instead of the gap).
                 from api.stage_requirements import _get_stage_by_id
                 stage_info = _get_stage_by_id(stage_id)
                 stage_name = stage_info["name"] if stage_info else "current stage"
+                lbl = band_label(component, actual_score)
+                need_band = get_band(component, required_threshold)
 
                 risk_flags.append(
-                    f"{component.replace('_', ' ').title()} {actual_score}/10 "
-                    f"(need {required_threshold}+ to advance from {stage_name})"
+                    f"{component.replace('_', ' ').title()} is {lbl['text']} "
+                    f"(needs {need_band}-or-better to advance from {stage_name})"
                 )
 
         # Only flag if there are actual risk flags
@@ -416,7 +424,7 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
                 "deal_id":       a["deal_id"],
                 "company_name":  a["company_name"],
                 "overall_score": a.get("overall_score", 0) or 0,
-                "champion_score": a.get("champion_score", 0) or 0,
+                "champion_band": band_label("champion", a.get("champion_score"))["text"],
                 "deal_value":    d.get("deal_value"),
                 "stage":         stage_id,
                 "risk_flags":    risk_flags
@@ -677,20 +685,34 @@ async def query_deal(params: dict, sb) -> dict:
         "objections": objections,
     }
 
+    # Band is the surfaced signal (the 0-10 integer is internal precision the
+    # generator can't reproduce run-to-run). Attach bands to every component
+    # regardless of which next-steps path we take, and lift a compact
+    # {component: band-text} map to the top level so synthesis leads with bands.
+    from api.rubric import band_label
+    from api.db import unpack_jsonb
+    component_details = unpack_jsonb(latest.get("component_details"), {})
+    meddicc_bands = {}
+    for component, data in component_details.items():
+        if isinstance(data, dict):
+            lbl = band_label(component, data.get("score"))
+            data["band"] = lbl["band"]
+            data["band_label"] = lbl["text"]
+            data["borderline"] = lbl["borderline"]
+            meddicc_bands[component] = lbl["text"]
+    if meddicc_bands:
+        result["meddicc_bands"] = meddicc_bands
+
     if output_file.exists():
         content = output_file.read_text()[:3000]
         result["deal_specific_next_steps"] = content
         result["next_steps_source"] = "deal_analysis"
     else:
-        # Fall back to rubric bands
-        from api.rubric import get_band, get_next_steps
-        from api.db import unpack_jsonb
-        component_details = unpack_jsonb(latest.get("component_details"), {})
+        # Fall back to rubric next-steps coaching (bands already attached).
+        from api.rubric import get_next_steps
         for component, data in component_details.items():
             if isinstance(data, dict):
-                score = data.get("score", 0)
-                data["band"] = get_band(component, score)
-                data["next_steps"] = get_next_steps(component, score)
+                data["next_steps"] = get_next_steps(component, data.get("score", 0))
         result["next_steps_source"] = "rubric_fallback"
 
     return result
@@ -1057,16 +1079,28 @@ async def query_rubric_scores_bulk(params: dict, sb) -> dict:
             latest[did] = a
     scores = list(latest.values())
     # Label every score with its denominator so synthesis can't guess the
-    # scale. overall_score is the SUM of the 7 components (max 70), not /100.
+    # scale, AND attach the per-component band — the band is what we surface,
+    # the 0-10 integer is internal (the generator reproduces a component's band
+    # run-to-run but not its exact integer). Synthesis leads with bands.
+    from api.rubric import meddicc_bands as _meddicc_bands
+    _cols = {"metrics": "metrics_score", "economic_buyer": "economic_buyer_score",
+             "decision_criteria": "decision_criteria_score",
+             "decision_process": "decision_process_score", "pain": "pain_score",
+             "champion": "champion_score", "competition": "competition_score"}
     for s in scores:
         s["overall"] = _labeled_overall(s.get("overall_score"))
+        s["bands"] = {c: lbl["text"] for c, lbl in
+                      _meddicc_bands({c: s.get(col) for c, col in _cols.items()}).items()}
     return {"scores": scores, "deal_count": len(deal_ids),
             "scored_count": len(scores),
             "resolved_from_company": resolved_from_company,
             "scale": {"overall_max": MEDDICC_OVERALL_MAX,
                       "component_max": MEDDICC_COMPONENT_MAX,
-                      "note": "overall_score is the sum of 7 components (0-70); "
-                              "each component is 0-10"}}
+                      "note": "Surface the per-component BAND (red/yellow/green "
+                              "in `bands`), not the raw /10 — the integer is "
+                              "internal precision the generator can't reproduce "
+                              "run-to-run. overall_score is the sum of 7 "
+                              "components (0-70), secondary to the bands."}}
 
 _MEDDICC_COMPONENT_KEYS = {
     "metrics": "metrics", "metric": "metrics",
@@ -2622,13 +2656,15 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
 
         flags = []
 
-        # Check each coaching priority
+        # Check each coaching priority. Surface the BAND, not the /10 (the
+        # integer is internal precision the generator can't reproduce).
+        from api.rubric import band_label
         if focus in ("all", "economic_buyer"):
             eb = analysis.get("economic_buyer_score")
             if eb is not None and eb <= COACHING_THRESHOLDS["weak_component_max"]:
                 flags.append({
                     "type": "missing_economic_buyer",
-                    "detail": f"Economic buyer score {eb}/10 — not yet identified",
+                    "detail": f"Economic buyer is {band_label('economic_buyer', eb)['text']} — not yet identified",
                     "urgency": "high" if (deal.get("close_date") or "") > today.isoformat() else "medium",
                 })
 
@@ -2637,7 +2673,7 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
             if ch is not None and ch <= COACHING_THRESHOLDS["weak_component_max"]:
                 flags.append({
                     "type": "weak_champion",
-                    "detail": f"Champion score {ch}/10 — no internal advocate confirmed",
+                    "detail": f"Champion is {band_label('champion', ch)['text']} — no internal advocate confirmed",
                     "urgency": "high",
                 })
 

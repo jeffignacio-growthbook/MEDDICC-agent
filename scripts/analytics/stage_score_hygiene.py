@@ -18,9 +18,13 @@ CRM stage:
 
 THRESHOLDS ARE NOT TUNED. The bar is the stage_progression gates already in
 config/client.yaml — the minimum component scores the sales process itself
-requires to advance between stages (same 0-10 space as rubric.py's bands; the
-final gate, all components >= 8, sits in rubric's green band). A deal's
-"qualified stage" is the furthest stage whose entry gates its scores clear.
+requires to advance between stages. The comparison is done at BAND precision
+(rubric.py bands): an integer gate of 6 means "yellow-or-better", 7 means
+"green-or-better", because a 5-vs-6 integer gap is noise the generator cannot
+reproduce run-to-run. This keeps the comparison from flipping a deal in and out
+of "qualified" on ±1 sampling noise; only a score genuinely on a band boundary
+can flip it, which is the real finding, not an artefact. A deal's "qualified
+stage" is the furthest stage whose entry gates its scores clear.
 The only knob is stage_score_hygiene.stage_gap_margin (config), the number of
 stages of divergence to flag. We report what falls out.
 
@@ -75,8 +79,18 @@ def _ladder():
 
 
 def _meets(gate: dict, scores: dict) -> bool:
-    """Does the deal clear every component threshold in this gate?"""
-    return all((scores.get(comp) or 0) >= thr for comp, thr in gate.items())
+    """Does the deal clear every component threshold in this gate, at BAND
+    precision? An integer gate of 6 vs a score of 5 is a distinction the
+    generator can't hold run-to-run (both yellow); comparing at band precision
+    (gate 6 → "yellow-or-better", gate 7 → "green-or-better") keeps the
+    stage-vs-score comparison from flipping on ±1 noise. Only a score genuinely
+    on a band boundary can flip the result — and that is the real finding, not
+    an artefact."""
+    try:
+        from rubric import band_meets
+    except ImportError:
+        from api.rubric import band_meets
+    return all(band_meets(comp, scores.get(comp), thr) for comp, thr in gate.items())
 
 
 def qualified_order(scores: dict, ladder=None):
