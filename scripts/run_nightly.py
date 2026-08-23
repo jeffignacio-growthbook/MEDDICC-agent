@@ -207,6 +207,30 @@ def get_most_recent_call_date(fireflies_calls: list, apollo_calls: list) -> date
     return max(dates) if dates else None
 
 
+def get_effective_since_date(deal: dict):
+    """Incremental cutoff for a deal: calls on/before this date are treated as
+    already analyzed and skipped. Returns None to force a full re-score from the
+    deal's entire call history.
+
+    None is returned when:
+      - the deal was never analyzed (no last_analyzed), or
+      - last_analyzed is unparseable, or
+      - FORCE_REANALYZE is set — the operational lever for re-scoring already
+        analyzed deals when the scoring pipeline itself changes (e.g. the
+        iteration-1 score pin). Without it the incremental guard keeps serving
+        the old scores until each deal happens to receive a new call.
+    """
+    if os.getenv('FORCE_REANALYZE', 'false').lower() == 'true':
+        return None
+    since_date_str = deal.get('last_analyzed')
+    if not since_date_str:
+        return None
+    try:
+        return datetime.fromisoformat(since_date_str)
+    except Exception:
+        return None
+
+
 def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer) -> dict:
     """
     Process one deal — context builder → generator → evaluator → reflection → write outputs.
@@ -264,14 +288,9 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer) -> dict
             'contacts': []
         }
 
-        # Use last analysis date from deal index to skip deals with no new calls
-        since_date_str = deal.get('last_analyzed')
-        since_date = None
-        if since_date_str:
-            try:
-                since_date = datetime.fromisoformat(since_date_str)
-            except:
-                since_date = None
+        # Use last analysis date from deal index to skip deals with no new
+        # calls (FORCE_REANALYZE=true zeroes this to force a full re-score).
+        since_date = get_effective_since_date(deal)
 
         # Get calls from Supabase (with JSON cache fallback)
         fireflies_calls, apollo_calls, new_count = get_calls_for_company(
