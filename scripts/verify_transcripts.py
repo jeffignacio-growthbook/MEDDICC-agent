@@ -56,8 +56,24 @@ def main():
     print("STORED TRANSCRIPT SPOT-CHECK")
     print("=" * 78)
 
-    total = len(select_all(sb, "call_transcripts", columns="call_id"))
-    print(f"total call_transcripts rows: {total}")
+    # Per-source × quality tally — the real state of the backfill, from the DB
+    # (not logs). 'full' = has text (done); 'unavailable' = no row-text yet.
+    from collections import Counter
+    allrows = select_all(sb, "call_transcripts", columns="source,transcript_quality")
+    tally = Counter((r.get("source"), r.get("transcript_quality")) for r in allrows)
+    calls = Counter(c.get("source") for c in
+                    select_all(sb, "calls", columns="source") if c.get("source"))
+    print(f"total call_transcripts rows: {len(allrows)}")
+    print(f"{'source':12} {'full':>7} {'unavail':>8} {'stored':>7} {'/calls':>8} {'coverage':>9}")
+    for src in sorted({s for s, _ in tally}):
+        full = tally.get((src, "full"), 0)
+        un = sum(n for (s, q), n in tally.items() if s == src and q != "full")
+        stored = full + un
+        ncalls = calls.get(src, 0)
+        cov = f"{100*full/ncalls:.0f}%" if ncalls else "—"
+        print(f"{str(src):12} {full:>7} {un:>8} {stored:>7} {ncalls:>8} {cov:>9}")
+    print("  (coverage = full-text rows ÷ calls of that source; unavailable rows "
+          "re-attempt on the\n   next backfill pass — they are not 'done')")
 
     print("\n--- known Apollo calls (field-probe cross-check) ---")
     known = select_all(sb, "call_transcripts", columns=_COLS,

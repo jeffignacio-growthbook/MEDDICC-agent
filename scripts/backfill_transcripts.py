@@ -35,6 +35,14 @@ REPO = Path(__file__).resolve().parent.parent
 for p in ("", "scripts", "api"):
     sys.path.insert(0, str(REPO / p) if p else str(REPO))
 
+# Line-buffer stdout so incremental progress survives a kill (CI block-buffers
+# stdout by default; a SIGTERM'd run otherwise flushes nothing — a long backfill
+# then looks like it did nothing even though batched writes persisted).
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+except Exception:
+    pass
+
 
 def _sources():
     """Configured source priority (fireflies, apollo), from client.yaml."""
