@@ -59,11 +59,10 @@ def main():
 
     # A deal scored yesterday would be re-scored tonight only if it has calls;
     # show the coverage leaders so we can eyeball that they are real deals.
-    top = sorted(((per_deal[str(d)], deals[d].get("company_name"), d)
-                  for d in with_calls), reverse=True)[:15]
+    top = sorted(((per_deal[str(d)], d) for d in with_calls), reverse=True)[:15]
     print("\nTop active deals by call count (would score):")
-    for n, name, did in top:
-        print(f"  {n:4d} calls  {did}  {name}")
+    for n, did in top:
+        print(f"  {n:4d} calls  {did}  {deals[did].get('company_name') or '(no name)'}")
 
     if without:
         print(f"\nFirst 15 active deals with NO calls (would skip):")
