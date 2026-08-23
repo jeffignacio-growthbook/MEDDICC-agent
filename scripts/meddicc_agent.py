@@ -184,6 +184,50 @@ def generate(
             return response.text
 
 
+def _salvage_evaluation(content: str, err: str) -> dict:
+    """Recover a usable evaluation from malformed evaluator JSON.
+
+    The evaluator (Haiku) sometimes emits a long `required_changes` string with
+    unescaped double quotes, which breaks json.loads. `pass` is a bare boolean
+    (never quote-broken) so it recovers cleanly; `required_changes` is captured
+    tolerantly — everything from its opening quote to the last quote before the
+    closing brace/comma, embedded quotes and all — so the REAL critique is fed
+    back to the generator instead of a generic 'parse error' placeholder.
+    """
+    import re
+    passed = False
+    m = re.search(r'"pass"\s*:\s*(true|false)', content, re.IGNORECASE)
+    if m:
+        passed = m.group(1).lower() == "true"
+
+    required = None
+    m = re.search(r'"required_changes"\s*:\s*"(.*)"\s*[,}]', content, re.DOTALL)
+    if m:
+        required = m.group(1).strip()
+
+    def _list(key):
+        mm = re.search(rf'"{key}"\s*:\s*\[(.*?)\]', content, re.DOTALL)
+        if not mm:
+            return []
+        return [x.strip().strip('"\'') for x in mm.group(1).split(",") if x.strip()]
+
+    return {
+        "pass": passed,
+        # Never leave this empty on a fail — the loop needs real feedback.
+        "required_changes": required or (
+            "Evaluator JSON was unparseable and no critique could be salvaged; "
+            "regenerate for clarity and valid structure."),
+        "iteration_failures": _list("iteration_failures") or (
+            [] if passed else ["evaluator_json_salvaged"]),
+        "components_weak": _list("components_weak"),
+        "components_strong": _list("components_strong"),
+        "proposed_instruction": None,
+        "salvaged": True,          # marker so callers/telemetry can see it
+        "parse_error": err,
+        "raw_content": content[:4000],
+    }
+
+
 def evaluate(
     draft: str,
     call_summary: str,
@@ -228,7 +272,12 @@ CRITICAL: Return ONLY a valid JSON object. Do NOT include any explanatory text, 
 
     response = client.complete(
         messages=[{"role": "user", "content": evaluation_prompt}],
-        system=rubric + "\n\nIMPORTANT: You must return ONLY valid JSON. No explanations, no markdown, no text outside the JSON object.",
+        system=rubric + "\n\nIMPORTANT: You must return ONLY valid JSON. No "
+               "explanations, no markdown, no text outside the JSON object. "
+               "Inside \"required_changes\", do NOT use the double-quote "
+               "character — quote any phrase with single quotes ' instead — "
+               "and keep it under ~1500 characters. Unescaped double quotes "
+               "are the #1 cause of invalid evaluator JSON.",
         max_tokens=4000,
         temperature=0,  # evaluator gates `passed` and drives regeneration —
                         # its variance would leak back into the score
@@ -269,20 +318,15 @@ CRITICAL: Return ONLY a valid JSON object. Do NOT include any explanatory text, 
         return evaluation
 
     except json.JSONDecodeError as e:
-        print(f"Failed to parse evaluator JSON: {e}")
-        print(f"Response: {content}")
-
-        # Return failure on parse error
-        return {
-            "pass": False,
-            "required_changes": f"Evaluator parse error: {str(e)}",
-            "iteration_failures": ["evaluator_parse_error"],
-            "components_weak": [],
-            "components_strong": [],
-            "proposed_instruction": "Fix evaluator JSON output format",
-            "error": str(e),
-            "raw_content": content
-        }
+        # SALVAGE rather than discard. The evaluator's own verbose critiques
+        # break json.loads (unescaped double quotes inside required_changes,
+        # ~2KB in). The old path replaced the real critique with a generic
+        # "Evaluator parse error" string — so the regeneration loop ran on
+        # meaningless feedback, defeating the coaching gate it exists to serve
+        # (and, worse, still perturbed scores). Recover pass + the actual
+        # critique text with tolerant regex so the loop gets the real feedback.
+        print(f"⚠️  Evaluator JSON invalid ({e}); salvaging pass + required_changes")
+        return _salvage_evaluation(content, str(e))
 
 
 def reflect(
