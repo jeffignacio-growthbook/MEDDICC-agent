@@ -29,6 +29,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: "TEMP — linkage diagnostic (read-only)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/diag_linkage.py
+
       - name: "TEST 0 — Offline: greeting/help handler + handler descriptions"
         run: |
           set -e
