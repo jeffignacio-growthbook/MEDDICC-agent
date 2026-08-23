@@ -1,0 +1,21 @@
+{
+  "company": "Zoro",
+  "deal_id": "61437846967",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 4 VIOLATION \u2014 Champion component (score 1/10, Unknown status) lacks actionable next steps with specific contact and concrete question. Current next step uses vague language: 'establish the name and title' is procedural, not a specific question to ask. Rewrite as: '[Contact TBD]: In next POC check-in call, ask: \"Who on your team is driving the internal business case for moving off LaunchDarkly, and are they the right person for us to align with on technical requirements?\"' \u2014 this is already present in the critical next steps section but NOT in the Champion component's own next steps field. The Champion section must include its own actionable next step with a specific question, not just a procedural instruction. CRITERION 3 VIOLATION \u2014 Competition score of 6/10 lacks sufficient evidence to justify that score. The analysis states 'No additional competitors surfaced' and only names LaunchDarkly (incumbent) and Datadog (unclear if competitor or partner). For a 6/10 score, evidence should clarify competitive positioning or document prospect's evaluation against named alternatives. Current evidence is insufficient \u2014 either lower the score to 3/10 (Unknown/Partial) or add evidence of explicit competitive evaluation. CRITERION 2 VIOLATION \u2014 Cumulative state shows 3 calls reviewed, but analysis references 4 calls (Call 4 dated August 17). The cumulative_calls_context must be updated to reflect 4 calls, not 3, to properly apply carry-forward rules.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_011",
+  "timestamp": "2026-08-23T16:25:13.128075"
+}

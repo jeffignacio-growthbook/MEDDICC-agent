@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_022",
+  "timestamp": "2026-08-23T16:33:58.726109",
+  "company": "Square",
+  "criterion_fired": "Criterion 1 (Champion evidence explicitness) and Criterion 4 (actionable next steps concreteness)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 1 should require: 'Evidence section must explicitly state absence of evidence with negation phrase (e.g., \"No evidence of...\") before scoring Partial or Unknown.' Criterion 4 should require: 'Next step must include verbatim question or specific tool/person name, not generic action like \"map\" or \"ask about.\"'"
+}

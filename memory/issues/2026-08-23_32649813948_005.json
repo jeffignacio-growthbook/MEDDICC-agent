@@ -1,0 +1,21 @@
+{
+  "company": "Jusbrasil Test",
+  "deal_id": "60423886694",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Decision Criteria: Score increased from 9/10 (cumulative state) to 8/10 (new analysis) without documented reason for regression. The analysis states 'Decision Criteria maintained at 5/10' for Decision Process but does not address the score change for Decision Criteria itself. CRITERION 4 VIOLATION \u2014 Decision Criteria (8/10): No next steps provided. Per rubric, components below 7/10 require next steps; this component is at 8/10 but the analysis states 'None required at this score level.' However, the analysis then recommends 'Confirm in writing (via follow-up email) that GrowthBook's enterprise tier satisfies all must-have criteria' \u2014 this is a next step that should be formally documented with contact name and specific action. CRITERION 4 VIOLATION \u2014 Identified Pain (8/10): Analysis states 'None required at this score level' but then recommends ensuring pain is 'explicitly linked to business impact' in the next proposal \u2014 this is a next step that should be formally documented. CRITERION 3 VIOLATION \u2014 Competition (1/10): Analysis correctly identifies competition as unknown but the cumulative state shows 'partial' status with score 3/10. The new analysis downgrades this to 'unknown' with score 1/10 without explaining why the prior 'partial' assessment (legacy tool mentioned) is being abandoned. This appears to be a regression without documented reason.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_005",
+  "timestamp": "2026-08-23T16:15:03.533723"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_025",
+  "timestamp": "2026-08-23T16:39:00.256291",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 2, Criterion 3, Criterion 4",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Criterion 2 must explicitly state whether prior scores should be maintained if no new contradictory evidence emerges, vs. must be re-justified each iteration; (2) Criterion 3 must define the exact score threshold at which buyer-stated metrics are mandatory, not aspirational; (3) Criterion 4 must specify whether 'next scheduled call' is acceptable for timing or requires calendar-specific dates."
+}

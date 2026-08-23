@@ -1,0 +1,21 @@
+{
+  "company": "Trade Me",
+  "deal_id": "54956375177",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 5,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward consistency error on Economic Buyer. Cumulative state scores EB at 8/10 with evidence 'CTO identified as having budget authority and approval for trial' and 'Brian Wang demonstrated clear budget/approval authority.' The new analysis downgrades to 5/10 and explicitly states 'the CTO has never appeared on a call, has not been named, and has not confirmed budget authority directly.' This is a material regression without documented reason in the recent calls. The May 20 call does not contradict the CTO's budget authority \u2014 it simply does not mention the CTO. Per Criterion 2, unchanged components must maintain their previous assessment and explicitly note 'No new EB information in this call - maintaining previous score of 8/10.' The analysis instead treats the absence of new information as evidence of regression, which violates carry-forward rules. CRITERION 4 VIOLATION \u2014 Next step for Decision Criteria (score 6/10) uses vague language: 'Can you share or walk us through any formal evaluation scorecard or RFP criteria Trade Me is using for the full platform decision?' This is 'explore' / 'discuss' phrasing without a specific action. Should be: 'Ask Brian Wang by [date]: Confirm the formal evaluation scorecard Trade Me is using \u2014 specifically, what are the weighted criteria (technical, commercial, timeline) and what is the budget ceiling for the annual contract?' CRITERION 3 VIOLATION \u2014 Competition score of 3/10 is correct, but the evidence quality assessment is incomplete. The analysis correctly identifies that Optimizely and LaunchDarkly were mentioned by Logan Bates (GrowthBook), not by Trade Me stakeholders. However, the analysis does not explicitly state whether this disqualifies the competitor mention entirely or whether it should be treated as 'no competitive evaluation confirmed.' Per Criterion 3, competitors must be mentioned by the prospect to count as evidence. The current treatment is correct (3/10, no active evaluation), but the reasoning should be more explicit: 'No Trade Me stakeholder has named a competitor as under active evaluation. Optimizely and LaunchDarkly were mentioned by GrowthBook as methodology reference points only. No competitive evaluation confirmed.' CRITERION 1 \u2014 All components have status, score, and evidence. This criterion passes.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_004",
+  "timestamp": "2026-08-23T16:05:13.741699"
+}

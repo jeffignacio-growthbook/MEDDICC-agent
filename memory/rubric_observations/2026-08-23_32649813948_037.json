@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_037",
+  "timestamp": "2026-08-23T17:02:16.858116",
+  "company": "TRR Trygghetsr\u00e5det",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) + Criterion 3 (Evidence Quality) conflict",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: carry-forward scores should only be downgraded if NEW contradictory evidence emerges, not due to absence of new confirmation. Separate 'absence of evidence' (which justifies lower initial scores) from 'regression without justification' (which requires explicit new negative data)."
+}

@@ -1,0 +1,21 @@
+{
+  "company": "The Wellness Company",
+  "deal_id": "60036684928",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward Inconsistency on Decision Criteria: Cumulative state scored Decision Criteria at 6/10 based on 'need for faster test deployment, direct control, parallel account concerns, training/onboarding.' The new analysis downgrades this to 5/10 and explicitly states 'no formal evaluation scorecard, budget ceiling, or explicit must-have vs. nice-to-have framework was shared.' This is a regression without documented reason. The analysis must either: (a) maintain 6/10 and note 'Call 2 adds technical detail (Shopify, GA4, dual-instance governance) but does not contradict prior assessment \u2014 maintaining 6/10,' or (b) if downgrading to 5/10, explicitly state why the prior 6/10 was incorrect and what new information contradicts it. CRITERION 4 VIOLATION \u2014 Actionable Next Steps on Identified Pain: The next step reads 'Ask Virginia Johnson or Miguel Jurado Arenales: What's the cost of staying with the agency setup \u2014 in dollars, in speed, or in missed opportunities?' This uses the vague verb 'ask' without a specific action or concrete question structure. Rewrite as: 'Call Virginia Johnson by [date]: Ask specifically \u2014 How much are you currently spending with the agency annually, and how many days does a typical test cycle take from concept to launch? Use these numbers to quantify the ROI of in-house ownership.' CRITERION 3 VIOLATION \u2014 Evidence Quality on Competition: The analysis flags VWO as 'outside GrowthBook's standard competitive set' and states this signals 'potential ICP misalignment.' However, the rubric requires that competitors be mapped to the standard set (LaunchDarkly, Statsig, EPPO, Datadog, Optimizely, homegrown) OR explicitly noted as a non-standard competitor without claiming ICP misalignment. The analysis correctly identifies VWO as non-standard but then uses this to infer buyer frame (CRO/marketing vs. product experimentation) without evidence from the call that the buyer is marketing-only. The call explicitly mentions 'full-website changes' and 'page-level A/B tests' \u2014 both consistent with product experimentation. Revise to: 'VWO identified as alternative platform under consideration. VWO is not in GrowthBook's standard competitive set (LaunchDarkly, Statsig, EPPO, Datadog, Optimizely, homegrown). No evidence yet that buyer frame is marketing-only; testing scope includes full-site and page-level A/B tests, consistent with product experimentation. Clarify in next call whether VWO is being evaluated for CRO/marketing use case or broader product experimentation.'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_013",
+  "timestamp": "2026-08-23T16:39:12.831765"
+}

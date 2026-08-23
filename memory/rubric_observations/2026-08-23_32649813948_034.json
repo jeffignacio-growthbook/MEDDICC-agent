@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_034",
+  "timestamp": "2026-08-23T16:56:55.283545",
+  "company": "Catena Media",
+  "criterion_fired": "Criterion 2 (multiple violations: Carry-forward Consistency, Identified Pain, Champion)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Scores should only regress if NEW contradictory evidence emerges, not if prior context is re-evaluated; (2) Distinguish 'Unknown' (no data) from 'Partial' (weak signal) with explicit behavioral thresholds; (3) Define 'carry-forward consistency' scope\u2014what constitutes legitimate re-assessment vs. regression?"
+}

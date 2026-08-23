@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_029",
+  "timestamp": "2026-08-23T16:50:53.920982",
+  "company": "Perplexity AI",
+  "criterion_fired": "CRITERION 1, 2, 3, 4",
+  "was_appropriate": true,
+  "suggested_change": "Strengthen CLAUDE.md with: (1) evidence must be direct quote/paraphrase, never absence statement; (2) document reason if score regresses from prior call; (3) distinguish 'budget involvement' from 'budget authority'; (4) every sub-7/10 component requires named next step with specific verb+target (not 'explore/discuss')."
+}

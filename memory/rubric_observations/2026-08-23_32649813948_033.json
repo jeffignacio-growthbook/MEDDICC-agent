@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_033",
+  "timestamp": "2026-08-23T16:56:13.696332",
+  "company": "Route",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 needs explicit rules: 'If new call reinforces prior evidence, carry forward score with notation. If new call contradicts or adds material gap evidence, downgrade with quoted evidence.' Criterion 4 should define 'specificity': current 'ask' verb is vague; require [contact name/role]: [concrete open-ended question with 2\u20133 decision-relevant options or quantifiable target]."
+}

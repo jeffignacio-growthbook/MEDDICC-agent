@@ -1,0 +1,21 @@
+{
+  "company": "Picnic Technologies",
+  "deal_id": "60217095483",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 7,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Champion regression from 6/10 to 4/10 lacks documented reason. The analysis states 'no evidence exists of any contact conducting independent internal selling behavior' but the cumulative state already reflected this uncertainty at 6/10 ('no single primary internal advocate explicitly confirmed'). The revision to 4/10 appears to apply a stricter interpretation of 'championing behavior' retroactively without explaining why the prior 6/10 assessment was incorrect or what new information triggered the downgrade. Per carry-forward rules, if Champion was 6/10 in cumulative state and no new contradictory evidence appears in recent calls, the score should remain 6/10 with a note like 'No new champion activity documented in recent calls \u2014 maintaining previous assessment of 6/10.' If a downgrade is warranted, the analysis must explicitly state: 'Prior assessment at 6/10 was based on [X]; recent calls reveal [Y], which contradicts that assessment.' No such explanation is provided. CRITERION 4 VIOLATION \u2014 Metrics (2/10) and Economic Buyer (2/10) lack actionable next steps with specific questions. The next steps provided are generic and do not meet the standard of 'concrete question.' Example: 'Ask directly on next call: When you think about what success looks like...' is vague on timing ('on next call' is undefined) and lacks a named contact or scheduled date. Per rubric, next steps must include contact name, specific action, and concrete question. Acceptable format: '[Stefan]: Ask on Thursday's call: [specific question]' or '[contact TBD]: Confirm [specific detail] by [date].' The current next steps use '[Stefan or Jip]' (ambiguous contact assignment) and 'on next call' (no scheduled date). CRITERION 3 VIOLATION \u2014 Identified Pain score of 8/10 with carry-forward note explaining regression from 9/10 is acceptable, but the justification ('no explicit hard deadline or stated business consequence tied to a specific date') is not supported by evidence in the calls. The July 29 call documents a POC experiment failure but does not reduce urgency \u2014 it increases it. The analysis conflates 'execution risk' with 'reduced urgency,' which are distinct. If the score is 8/10, the reason should be grounded in what IS missing (e.g., 'no stated business deadline'), not in what happened in the POC. Reframe: 'Identified Pain remains at 8/10 (down from prior 9/10) because while pain is well-documented and multi-dimensional, no prospect has stated an explicit deadline or business consequence (e.g., revenue impact, planning cycle dependency) that would elevate urgency to 9/10. The July 29 POC failure introduces execution risk but does not change the underlying pain urgency.' CRITERION 1 VIOLATION \u2014 Competition status is 'Unknown' with score 1/10, but the ICP Fit Confirmation section states 'Picnic fits GrowthBook's ICP' without evidence that this was evaluated against the cumulative state. The rubric requires that ICP fit be confirmed or flagged as a concern; the analysis does this correctly but buries it in the Competition section rather than surfacing it as a separate assessment. This is a structural issue, not a scoring error, but it creates ambiguity about whether ICP fit is 'Identified' or 'Unknown.' Clarify: Move ICP fit assessment to a separate line item or explicitly state in Competition section: 'ICP Fit: PASS \u2014 Picnic demonstrates modern data stack (Snowflake), experimentation as organizational priority, and scale signals consistent with GrowthBook ICP.'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_001",
+  "timestamp": "2026-08-23T15:56:24.770918"
+}

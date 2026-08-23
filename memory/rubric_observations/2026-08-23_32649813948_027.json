@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_027",
+  "timestamp": "2026-08-23T16:43:34.578452",
+  "company": "Dassault Syst\u00e8mes",
+  "criterion_fired": "Criteria 1, 2, 4, 5",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Specify whether score-evidence alignment applies directionally (e.g., 'scores below 5/10 do not require direct quotes; scores above 5/10 do'). Criterion 2: Require explicit documentation of score changes with supporting evidence. Criterion 4: Clarify whether '[Contact TBD]' requires committed action verb or if conditional phrasing ('ask at X') satisfies the requirement. Criterion 5: Define 'urgency' operationally\u2014either require prospect statement or adjust scoring scale to reflect absence of urgency as a lower band."
+}

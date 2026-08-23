@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_030",
+  "timestamp": "2026-08-23T16:53:23.571699",
+  "company": "Electronic Arts",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: 'Scores may be downgraded from prior state only if (a) recent calls contain explicit contradictory evidence, OR (b) the scoring rationale in prior state was demonstrably flawed. If identical evidence gaps existed in both prior and current calls, the current score must either match prior or include documented re-evaluation of prior scoring logic.'"
+}

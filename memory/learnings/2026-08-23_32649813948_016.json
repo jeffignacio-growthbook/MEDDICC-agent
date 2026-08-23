@@ -1,0 +1,21 @@
+{
+  "company": "Perplexity AI",
+  "deal_id": "54442852124",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Metrics component: Score of 1/10 is stated but the evidence section does not provide a direct quote or paraphrase from the call. The analysis states 'No prospect-stated quantifiable outcomes exist' but then provides only seller-stated product capabilities (customizable metrics, automated health checks) as evidence. Per rubric: 'FAIL if score present but no evidence given.' The evidence must be a direct quote or paraphrase from Alexis or the call, not a restatement of the absence of metrics. CRITERION 2 FAILURE \u2014 Metrics component: Prior cumulative state scored Metrics at 4/10 (Partial) with evidence 'Users can customize metrics and run various analysis methods with automated health checks for monitoring mentioned.' Current analysis downgrades to 1/10 (Unknown) without documented reason for regression. The rubric requires: 'FAIL if component regresses without documented reason.' The analysis must either maintain 4/10 with explicit note of 'No new prospect-stated metrics in this call \u2014 maintaining previous score' OR provide explicit evidence from the call that contradicts the prior assessment. CRITERION 3 FAILURE \u2014 Economic Buyer component: Evidence states 'Alexis demonstrated budget authority by directing the conversation toward pricing models and cost comparison analysis' but the analysis itself immediately contradicts this by noting 'This is the call note's characterization \u2014 the underlying behavior (steering toward pricing) implies budget relevance but does not confirm authority.' Directing a pricing conversation is not evidence of budget authority per the rubric: 'FAIL if Economic Buyer confirmed without explicit budget authority.' Score of 2/10 is appropriate but evidence must be reframed to reflect 'budget involvement implied' not 'budget authority demonstrated.' CRITERION 4 FAILURE \u2014 Decision Process component: Status is Unknown with score 1/10 but no next step is provided. Rubric requires: 'Every component below 7/10 needs at least one next step.' The analysis provides next steps for M, E, D (criteria), I, and C (champion) but omits a next step for D (process). CRITERION 4 FAILURE \u2014 Identified Pain component: Next step uses vague verb 'Has that started to affect' without a specific action. Rubric requires: 'FAIL if next steps use vague verbs (explore, discuss, follow up) without a specific action.' Reframe as: 'Ask Alexis: What specific experiment or feature launch has been delayed or blocked by EPPO's current limitations in the past 6 months?'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_016",
+  "timestamp": "2026-08-23T16:50:53.920401"
+}

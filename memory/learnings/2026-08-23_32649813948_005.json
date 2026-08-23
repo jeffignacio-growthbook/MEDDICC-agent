@@ -1,0 +1,21 @@
+{
+  "company": "Notion",
+  "deal_id": "60257621387",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 4 (Actionable Next Steps) \u2014 Multiple components below 7/10 lack sufficiently specific next steps. Metrics (4/10): next step asks a good question but lacks a concrete contact name or call date. Economic Buyer (5/10): next step is appropriately specific ('Ask Jeff or Parul directly') but should name a specific call date or deadline. Decision Process (5/10): next step is specific and actionable ('Before the July 4th POC restart') \u2014 PASS. Champion (6/10): next step is appropriately specific with contact name and concrete questions \u2014 PASS. However, Metrics and Economic Buyer next steps need tightening: add explicit contact names (Jeff or Parul) and target dates (e.g., 'on the June 30 SF onsite' or 'by June 28'). Additionally, Criterion 2 (Carry-forward Consistency) \u2014 Metrics score revision from 9/10 to 4/10 is explained as a 'scoring correction' rather than a regression caused by new call content, which is acceptable under the exception for single-call context. However, the analysis should explicitly state whether cumulative_calls_context > 1 to confirm this exception applies. The analysis treats this as a reframing of prior evidence rather than new contradictory information, which is defensible but borderline. Champion revision from 9/10 to 6/10 is similarly explained as a 'carry-forward correction' based on re-applying scoring standards (enthusiasm \u2260 championing), not new call content \u2014 this is acceptable. Ensure next steps for Metrics and Economic Buyer include specific contact names and target dates to meet Criterion 4 fully.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_005",
+  "timestamp": "2026-08-23T16:05:22.752446"
+}

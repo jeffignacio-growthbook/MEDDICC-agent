@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_021",
+  "timestamp": "2026-08-23T16:31:08.253498",
+  "company": "Livesport",
+  "criterion_fired": "CRITERION 3 - Competition section contains non-approved competitors",
+  "was_appropriate": false,
+  "suggested_change": "Split into two rules: (1) FAIL if competitor is scored/weighted without being on approved list; (2) PASS if competitor is mentioned only to explain scope exclusion. Current rule conflates mentioning with endorsement."
+}

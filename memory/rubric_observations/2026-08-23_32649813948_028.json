@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_028",
+  "timestamp": "2026-08-23T16:47:11.101892",
+  "company": "JobLeads",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 3 (Evidence Quality), Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 needs clarification: score drift is only a violation if new negative evidence appears that contradicts prior assessment; absence of information is not regression. Criterion 3: Competition score must be anchored to active vendor evaluation count, not incumbent history alone (5/10 for 0 named competitors in eval, 7/10 for 1\u20132 named, 9/10 for 3+). Criterion 4: 'Actionable' must specify question concreteness\u2014if a next step is a open-ended inquiry rather than a specific champion/stakeholder/timeline request, score lower."
+}

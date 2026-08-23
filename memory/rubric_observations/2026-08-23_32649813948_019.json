@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_019",
+  "timestamp": "2026-08-23T16:26:25.016988",
+  "company": "Skyscanner",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 2 (Economic Buyer), Criterion 4 (Next Steps), Criterion 5 (Champion)",
+  "was_appropriate": true,
+  "suggested_change": "Add CLAUDE.md section: (1) Score-justification rule: 'Score must never contradict evidence statement; if metrics are unquantified, cap at 5/10.' (2) Carry-forward rule: 'If no new data in recent calls, add explicit statement: \"No new [component] information in calls [dates] \u2014 maintaining score of X/10.\"' (3) Next-step specificity: 'Next steps must name contact, specify concrete question (not open-ended), and include fallback if contact unavailable.' (4) Evidence bar for Champion: 'Operational coordination \u2260 advocacy; require explicit internal selling or business case building for 8/10.'"
+}

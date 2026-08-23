@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_024",
+  "timestamp": "2026-08-23T16:35:34.376150",
+  "company": "Forty Eight Point One",
+  "criterion_fired": "Criterion 1 (Metrics evidence), Criterion 3 (ICP fit), Criterion 4 (actionable next steps), Criterion 5 (timeline confirmation)",
+  "was_appropriate": true,
+  "suggested_change": "Criteria are appropriate; instruction should explicitly require: (1) Evidence statements must confirm what was or was NOT stated in the call, not just absence; (2) Next steps must include contact role and specific metric/decision targets, not open-ended questions; (3) ICP assessment must state scale signal gaps if data is missing; (4) Timelines must distinguish between prospect-confirmed vs. internal deadlines."
+}

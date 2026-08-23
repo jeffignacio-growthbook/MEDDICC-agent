@@ -1,0 +1,21 @@
+{
+  "company": "Livesport",
+  "deal_id": "62160567676",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 3 FAILURE \u2014 Competition section contains non-approved competitors. Airship and Extreme Push are not on the approved competitive list (LaunchDarkly, Statsig, EPPO, Datadog Experiments, Optimizely, homegrown/internal). The analysis correctly flags this as a scope risk, but then scores Competition at 5/10 without resolving whether these competitors should be included in the assessment at all. The rubric requires: 'FAIL if competitor not in this list: LaunchDarkly, Statsig, EPPO, Datadog Experiments, Optimizely, or homegrown/internal tools.' Airship and Extreme Push violate this rule. REQUIRED FIX: Either (1) remove Airship and Extreme Push from the Competition assessment and rescore based only on Optimizely and Firebase, or (2) explicitly document in the analysis that these are out-of-scope competitors and adjust the score to reflect that only Optimizely is a valid competitive threat. Current score of 5/10 is not justified given the presence of non-approved competitors without explicit disqualification language.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_010",
+  "timestamp": "2026-08-23T16:31:08.252881"
+}

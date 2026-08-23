@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_010",
+  "timestamp": "2026-08-23T16:12:58.395714",
+  "company": "OpenTable",
+  "criterion_fired": "Criterion 2 (Carry-Forward Consistency), Criterion 3 (Evidence Quality), Criterion 4 (Decision Process)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should clarify: 'Score revisions require explicit justification tied to new call data OR correction of prior state error\u2014state which applies.' Criterion 3 should state: 'Components at or below 7/10 require documented next steps; if missing, flag as required addition.' Criterion 4 should specify expected outcomes with concrete deadlines, not just 'actionable' language."
+}

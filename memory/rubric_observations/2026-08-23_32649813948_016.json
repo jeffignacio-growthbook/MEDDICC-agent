@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_016",
+  "timestamp": "2026-08-23T16:21:34.047895",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 2 (Champion scoring), Criterion 3 (ICP assessment), Criterion 4 (Decision Process specificity)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Define 'champion behavior' explicitly to exclude engagement signals; clarify upgrade threshold. Criterion 3: Separate 'ICP fit' (yes/no) from 'contact title confirmation' (required for next steps); do not conflate. Criterion 4: Require follow-up action specification only where ambiguity affects execution, not for discovery questions."
+}

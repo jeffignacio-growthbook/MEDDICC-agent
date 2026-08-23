@@ -1,0 +1,21 @@
+{
+  "company": "JobLeads",
+  "deal_id": "59173115702",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward Consistency: Decision Criteria score was revised from 8/10 (cumulative state) to 6/10 without sufficient justification. The analysis states 'security, compliance, data residency, and SSO requirements have not been discussed' but this is a gap that existed in Call 1 as well. Call 2 adds positive signals (leadership support, Optimizely lapsed, SQL connectivity confirmed) but does not contradict prior evidence. The revision rationale conflates 'incomplete criteria' with 'regression,' which are different. If security/compliance were always missing, the score should have been 6/10 from Call 1, not 8/10. Either: (a) restore Decision Criteria to 8/10 with note 'No new information contradicts prior assessment; security/compliance gap noted for next steps,' or (b) explicitly document that Call 1's 8/10 was an error and explain why Call 2 revealed the true gap. CRITERION 4 VIOLATION \u2014 Actionable Next Steps: Decision Criteria next step uses 'Does your security team require a formal review' which is acceptable, but the phrasing 'Who in your organization owns data residency and SSO requirements?' is vague and does not constitute a concrete action. Revise to: 'Ask Edd Saunders before POC kickoff: \"What is your security team's standard review process for new tools, and who specifically should we engage \u2014 is there a CISO or security lead we need to involve? Also, does your company require data residency in a specific region or SSO via Okta/Azure AD?\"' CRITERION 3 VIOLATION \u2014 Evidence Quality: Competition score of 7/10 is supported only by Optimizely being named as lapsed incumbent. No evidence that GrowthBook is being actively evaluated against other vendors in the competitive set (LaunchDarkly, Statsig, EPPO, Datadog Experiments). The next step asks 'are you evaluating any other platforms alongside GrowthBook' \u2014 this is appropriate, but the 7/10 score should be 5/10 or lower until confirmed that no other vendors are in active evaluation. Revise Competition score to 5/10 with evidence: 'Optimizely is the named incumbent with lapsed contract; no other vendors mentioned as active evaluations; competitive positioning against vendor lock-in risk noted but no named alternatives discussed.'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_015",
+  "timestamp": "2026-08-23T16:47:11.101249"
+}

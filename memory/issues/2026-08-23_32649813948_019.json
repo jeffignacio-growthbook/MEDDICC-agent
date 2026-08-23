@@ -1,0 +1,21 @@
+{
+  "company": "Ingka Ikea",
+  "deal_id": "50347229229",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 4,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 (Complete Coverage): PASS \u2014 all components have status, score, and evidence. CRITERION 2 (Carry-forward Consistency): FAIL \u2014 Champion component regressed from 8/10 to 2/10 without documented reason in the analysis text itself. The analysis states 'Prior score of 8/10 significantly overstated champion strength' but does not explain what NEW evidence from April 23 call contradicts the prior assessment. April 23 call attendees are unknown, so no new champion evidence can be drawn from it. The regression appears to be a reinterpretation of prior calls (Feb 11 group call evidence), not a carry-forward violation per se, but the analysis fails to explicitly state 'No new champion information in April 23 call (attendees unknown) \u2014 revising prior assessment based on re-evaluation of Feb 11 evidence.' This ambiguity violates the carry-forward rule requiring explicit documentation of why a component regresses. CRITERION 3 (Evidence Quality): FAIL \u2014 Economic Buyer score of 3/10 lacks actionable evidence. The analysis states 'no named Economic Buyer with confirmed spending authority has emerged' but then scores 3/10 'because the approval structure itself has been described.' This is circular reasoning. A 3/10 score requires at least one named contact with partial authority signals; here there are zero named contacts with any budget authority. Score should be 1\u20132/10, not 3/10. CRITERION 4 (Actionable Next Steps): FAIL \u2014 Champion component (2/10) has a next step asking Cecilia to 'share how GrowthBook is being positioned internally' and 'advocate for us' \u2014 but the analysis itself concluded Cecilia is NOT a champion and has shown no internal selling behavior. Asking a non-champion to advocate is not actionable; the next step should instead be 'identify who IS advocating internally' or 'ask Cecilia to name the internal champion.' CRITERION 5 (No Unsupported Claims): FAIL \u2014 Decision Criteria score of 7/10 claims 'no formal written scorecard or RFP criteria document has been referenced' as the reason for not scoring higher, but then the next step asks 'Has your team formalized these into a scoring framework or RFP criteria?' This implies the criteria are not yet formalized, which contradicts a 7/10 score. A 7/10 should require 'criteria identified and partially formalized'; here criteria are stated but explicitly not formalized. Score should be 6/10 to align with evidence. GrowthBook-specific: PASS \u2014 no warehouse-native requirement flagged as concern despite BigQuery mention; analysis notes 'IKEA planned to implement a custom BigQuery instance' but does not confirm whether GrowthBook's warehouse-native architecture is a fit or concern. This is a minor gap but not a hard fail. SUMMARY: Three criterion violations: (1) Champion regression not explicitly documented as re-evaluation vs. new evidence; (2) Economic Buyer score inflated (3/10 vs. 1\u20132/10 warranted); (3) Decision Criteria score misaligned with evidence (7/10 vs. 6/10); (4) Champion next step asks non-champion to advocate (not actionable).",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_019",
+  "timestamp": "2026-08-23T17:00:02.704310"
+}
