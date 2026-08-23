@@ -1,0 +1,56 @@
+name: Backfill Call Transcripts
+
+# One-time (re-runnable) backfill of call transcripts into call_transcripts
+# (STORE_AND_BACKFILL_TRANSCRIPTS, Phase 4). Resumable + idempotent — the table
+# is the checkpoint, so a timeout or failure mid-run is safe to re-dispatch; it
+# skips call_ids already stored. Requires migration 041 applied.
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to run from'
+        required: true
+        default: 'claude/git-pull-origin-main-6r028h'
+      dry_run:
+        description: 'Report per-source counts without writing'
+        required: false
+        default: 'false'
+      source:
+        description: 'Only this source (fireflies|apollo), blank = all'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run transcript backfill
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          FIREFLIES_API_KEY: ${{ secrets.FIREFLIES_API_KEY }}
+          APOLLO_API_KEY: ${{ secrets.APOLLO_API_KEY }}
+        run: |
+          ARGS=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          if [ -n "${{ inputs.source }}" ]; then ARGS="$ARGS --source ${{ inputs.source }}"; fi
+          echo "Running: backfill_transcripts.py $ARGS"
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/backfill_transcripts.py $ARGS

@@ -37,6 +37,16 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_slip_diagnosis.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_query_deal_stages_bulk.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_rubric_scores_bulk.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_handlers_no_raise.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_fallback_message.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_intent_param_contract.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_meddicc_score_presentation.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_scoring_pipeline.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_stage_score_hygiene.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_evidence_contract.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_score_correction.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_scoring_bands.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_transcript_store.py
 
       - name: "TEST 1 — Competitive intel handler against real data"
         env:

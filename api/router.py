@@ -74,6 +74,15 @@ HANDLER_DESCRIPTIONS = {
     "query_competitive_intel": "competitive intelligence: which companies mentioned DIY/build-it-themselves, named competitors showing up in calls, build-vs-buy signals, what alternatives prospects are evaluating",
     "set_target": "admin: set quota or target (requires auth)",
     "query_rubric_scores_bulk": "MEDDICC component scores for a known set of deals",
+    "submit_score_correction": (
+        "The user DISAGREES with a MEDDICC component score and is proposing a "
+        "correction — e.g. 'champion should be 7 for LiveSport, Tomáš is "
+        "presenting to the CPO', 'that competition score is too low', 'EB is "
+        "wrong on Acme, it should be 8'. Capture it: set params.component (the "
+        "MEDDICC component), params.proposed_score (0-10), params.correction_reason "
+        "(their justification), and params.company if named. This logs to a "
+        "review queue — it does NOT change the score."
+    ),
     "query_deal_stages_bulk": "current stage for a known set of deals",
     "query_deal_owners_bulk": "owner/rep for a known set of deals",
     "query_deal_values_bulk": "ARR/deal value for a known set of deals",
@@ -557,7 +566,9 @@ Required JSON:
     "weeks": "<for query_pipeline_movement composition: integer count of recent weeks, or null>",
     "stage": "<for query_pipeline_movement stage_deals: stage name like 'Discovery', else null>",
     "close_date_scope": "<for query_pipeline_movement: 'current_quarter' to reconcile against a CRM board filtered by close date, else null (default all)>",
-    "is_slow": false,
+    "component": "<for query_rubric / submit_score_correction: a MEDDICC component (champion, economic_buyer, metrics, decision_criteria, decision_process, pain, competition), else null>",
+    "proposed_score": "<for submit_score_correction ONLY: the 0-10 score the user says it should be, else null>",
+    "correction_reason": "<for submit_score_correction ONLY: the user's justification for the corrected score, else null>",
     "help_category": "<for query_help ONLY: greeting|capability|prompt_seeking|recovery, else null>"
   }},
   "unanswerable_reason": "no_data|out_of_scope|ambiguous|null",
@@ -681,9 +692,11 @@ FORMATTING (Slack-native):
 - End with one actionable insight when relevant.
 - Never invent numbers. Use $ and K/M suffixes.
 
-When data includes band_description and next_steps,
-format coaching as:
-  *[Component]: [Score]/10 — [band_description]*
+When data includes bands / band_description and next_steps,
+format coaching with the BAND, not the /10 integer (the integer is
+internal precision that moves run-to-run; surface what's stable):
+  *[Component]: [band]* — [band_description]
+  (if flagged borderline, say e.g. "yellow, near the green boundary")
   Next step: [next_steps]
 
 When data includes deal_specific_next_steps, reference
@@ -792,7 +805,7 @@ ANSWER FORMATTING (for final {{"answer": "..."}} only):
 When you have enough data to answer, format for Slack:
 - Use bullet points (•) not markdown tables (| col | col |)
 - Bold company names with *asterisks*
-- Deal format: • *Company* — $Value | Stage | Date | Score X/10
+- Deal format: • *Company* — $Value | Stage | Date (MEDDICC as a band/gap if relevant, never "X/10")
 - Keep to 5-8 lines max
 - Lead with direct answer, then supporting detail
 - End with one actionable insight if relevant
@@ -931,7 +944,14 @@ async def _run_precomputed_handler(handler_fn, handler_name, params, sb):
     """
     Execute a precomputed handler and classify its result quality.
 
-    Returns (tool_results, result_quality).
+    Returns (tool_results, result_quality, failure_reason).
+
+    `failure_reason` is a SHORT technical string naming why the handler did not
+    produce a usable answer — an exception repr on a raise, or the handler's own
+    error/"no data" message otherwise. It is carried into the dynamic fallback
+    so the fallback message can say what fell through (see PART 1 of
+    FIX_DYNAMIC_FALLBACK_PATTERN). It is technical, for the log — never shown
+    verbatim to the user.
 
     Logs the concrete failure, not just the routing bucket:
       - a handler that RAISES logs the exception + traceback, then → 'error'
@@ -951,27 +971,43 @@ async def _run_precomputed_handler(handler_fn, handler_name, params, sb):
         import traceback
         print(f"[HANDLER ERROR] {handler_name}: {e}", flush=True)
         print(traceback.format_exc(), flush=True)
-        return {}, "error"
+        return {}, "error", f"{type(e).__name__}: {e}"
 
     result_quality = evaluate_result(tool_results, handler_name)
 
     reason = ""
     if result_quality in ("error", "empty") and isinstance(tool_results, dict):
         reason = tool_results.get("error") or ""
+    if not reason and result_quality in ("error", "empty"):
+        reason = f"handler returned {result_quality} result"
     suffix = f" ({reason})" if reason else ""
     print(f"[HANDLER] {handler_name} → {result_quality}{suffix}", flush=True)
-    return tool_results, result_quality
+    return tool_results, result_quality, reason
 
 
 async def dynamic_query_loop(question, history, params,
                               sb, client,
                               hint: str = "",
                               roster_text: str = "",
-                              classifier_client=None) -> dict:
+                              classifier_client=None,
+                              origin_handler: str = "",
+                              origin_reason: str = "") -> dict:
     """
     Multi-turn tool-calling loop for novel questions.
     Agent calls tools until it has enough data to answer.
-    Capped at 5 iterations and $0.08 token budget.
+    Capped at 5 iterations and a token budget.
+
+    Returns {"answer": str, "tool_results": dict, "answered": bool}.
+      - answered=True  → the loop produced a real, data-backed answer.
+      - answered=False → the loop gave up (budget / repetition / exhausted).
+        `answer` is then a PLAIN diagnostic naming what fell through; the
+        technical detail is in the [FALLBACK] log line, not the reply. The
+        caller decides whether to surface it. Sniffing the answer text for
+        "couldn't" is no longer how the caller tells these apart.
+
+    `origin_handler` / `origin_reason` name the precomputed handler that fell
+    through to here and why (PART 1). Empty when the loop was entered directly
+    (a `dynamic_query` intent), i.e. this IS the primary path, not a fallback.
     """
     from api.schema_context import get_schema_context
     from api.table_classifier import classify_relevant_tables
@@ -1014,6 +1050,97 @@ async def dynamic_query_loop(question, history, params,
     TOKEN_BUDGET = 20000  # ~$0.20 at Sonnet pricing - complex joins need headroom
     tokens_used = 0
     MAX_ITERATIONS = 5
+    # PART 2b: repetition / no-progress detection. A duplicate tool call, a
+    # parse failure, or a tool that returns zero new rows are all "no progress".
+    # Two in a row means the loop is stuck — end it and answer from what exists,
+    # rather than spend the rest of the budget rediscovering nothing.
+    no_progress_streak = 0
+
+    # Friendlier names for the handful of handlers that most often fall through,
+    # so the user-facing diagnostic says what was being attempted in plain terms
+    # (no handler identifiers, no "KeyError"). Technical detail stays in the log.
+    _FRIENDLY_HANDLER = {
+        "query_rep_pipeline": "looking up a rep's pipeline",
+        "query_rubric_scores_bulk": "pulling MEDDICC scores for a named deal",
+        "query_deal_stages_bulk": "looking up deal stages",
+        "query_deal_owners_bulk": "looking up deal owners",
+        "query_deal_values_bulk": "looking up deal values",
+        "query_deal": "opening a specific deal",
+        "query_deal_health": "checking deal health for a rep",
+        "query_stale_deals": "finding a rep's stale deals",
+        "query_sdr_metrics": "pulling an SDR's activity metrics",
+    }
+
+    def _fallback_log(reason_tag):
+        """Greppable structured line for every give-up (PART 1)."""
+        logger.info(
+            f"[FALLBACK] handler={origin_handler or 'dynamic_query'} "
+            f"reason={origin_reason or reason_tag} "
+            f"question={question!r}"
+        )
+
+    def _diagnostic_answer(tail):
+        """PLAIN user-facing sentence — names what fell through, no jargon."""
+        if origin_handler:
+            what = _FRIENDLY_HANDLER.get(
+                origin_handler, "answering that the usual way")
+            lead = (f"I couldn't answer that through the usual path — "
+                    f"{what} didn't return what it needed")
+        else:
+            lead = "I searched the data directly for this"
+        return (f"{lead}, and the fallback search {tail}. "
+                f"Try naming a specific deal or rep, or narrowing the "
+                f"question to a shorter time range.")
+
+    def _give_up(reason_tag, tail):
+        """Return an answered=False result with a plain diagnostic + log."""
+        _fallback_log(reason_tag)
+        return {
+            "answer": _diagnostic_answer(tail),
+            "tool_results": _extract_rows_from_accumulated(
+                accumulated_data, sb=sb),
+            "answered": False,
+        }
+
+    def _finalize_from_data(reason_tag):
+        """PART 2b: stop looping and answer from data already gathered.
+
+        One forced synthesis call (no further tools) if there is data and a
+        little budget left; otherwise a plain diagnostic. Either way the loop
+        ends here instead of burning the rest of the budget."""
+        tr = _extract_rows_from_accumulated(accumulated_data, sb=sb)
+        has_rows = bool(tr.get("rows"))
+        # No data at all → nothing to synthesise from.
+        if not has_rows:
+            return _give_up(reason_tag, "ran out of room before it found anything")
+        # No budget for one more call → answer with what we can describe.
+        est = len(system) // 4 + sum(
+            len(str(m.get('content', ''))) // 4 for m in messages) + 600
+        if tokens_used + est > TOKEN_BUDGET:
+            _fallback_log(reason_tag)
+            return {"answer": _diagnostic_answer(
+                        "gathered partial data but ran out of budget to "
+                        "assemble it"),
+                    "tool_results": tr, "answered": False}
+        try:
+            synth = client.complete(
+                messages=messages + [{"role": "user", "content":
+                    "Stop calling tools. Using ONLY the data already gathered "
+                    f"above, answer this question now: {question}\n"
+                    'Respond as {"answer": "..."}. If the gathered data genuinely '
+                    'cannot answer it, still respond as {"answer": "..."} and say '
+                    "plainly what is missing."}],
+                system=system, max_tokens=600)
+            parsed2 = _extract_json(synth.text)
+            if parsed2 and parsed2.get("answer"):
+                logger.info(f"[LOOP] finalized from gathered data "
+                            f"(reason={reason_tag})")
+                return {"answer": parsed2["answer"],
+                        "tool_results": tr, "answered": True}
+        except Exception:
+            pass
+        return _give_up(reason_tag, "could not turn the partial data into an answer")
+
     EVAL_PROMPT = """Score this answer 0-1:
   1.0 = fully answers with specific data
   0.7 = partially answers, some specifics
@@ -1035,11 +1162,10 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         if projected_total > TOKEN_BUDGET:
             partial = _summarize_accumulated(accumulated_data)
             logger.info(f"[LOOP] declining iteration {iteration} - would exceed budget "
-                       f"(used={tokens_used}, projected={projected_total}, budget={TOKEN_BUDGET})")
-            tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-            answer = (f"Hit query budget with partial data: {partial}. "
-                     f"Try a more specific question.")
-            return {"answer": answer, "tool_results": tool_results}
+                       f"(used={tokens_used}, projected={projected_total}, budget={TOKEN_BUDGET}, "
+                       f"partial={partial})")
+            return _give_up("budget_exhausted",
+                            "ran out of budget before it could finish")
 
         resp = client.complete(
             messages=messages,
@@ -1051,12 +1177,11 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         # Post-call verification (should never trigger if prediction is accurate)
         if tokens_used > TOKEN_BUDGET:
             partial = _summarize_accumulated(accumulated_data)
-            logger.info(f"[LOOP] fallback to unanswerable after "
-                        f"{iteration+1} iterations, tokens={tokens_used}")
-            tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-            answer = (f"Hit query budget with partial data: {partial}. "
-                     f"Try a more specific question.")
-            return {"answer": answer, "tool_results": tool_results}
+            logger.info(f"[LOOP] budget exceeded after "
+                        f"{iteration+1} iterations, tokens={tokens_used}, "
+                        f"partial={partial}")
+            return _give_up("budget_exhausted",
+                            "ran out of budget before it could finish")
 
         raw = resp.text.strip()
 
@@ -1082,9 +1207,15 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 logger.info(f"[LOOP iter={iteration}] prose answer detected")
                 # Extract rows from accumulated data for entity context
                 tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-                return {"answer": stripped, "tool_results": tool_results}
+                return {"answer": stripped, "tool_results": tool_results,
+                        "answered": True}
             # Otherwise log parse failure as before
             logger.info(f"[LOOP] JSON parse failed, raw={raw[:300]}")
+            # PART 2b: a parse failure is no forward progress. Two in a row and
+            # we stop, rather than keep spending the budget on malformed calls.
+            no_progress_streak += 1
+            if no_progress_streak >= 2:
+                return _finalize_from_data("no_progress")
             continue
 
         if "answer" in parsed:
@@ -1109,7 +1240,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             logger.info(f"[ANSWER] extracting entity context from accumulated_data with keys: {list(accumulated_data.keys())}")
             tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
             logger.info(f"[ANSWER] extracted tool_results with {len(tool_results.get('rows',[]))} rows")
-            return {"answer": parsed["answer"], "tool_results": tool_results}
+            return {"answer": parsed["answer"], "tool_results": tool_results,
+                    "answered": True}
 
         tool_name = parsed.get("tool", "")
         tool_params = parsed.get("params", {})
@@ -1144,11 +1276,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             for prev_sig, prev_iter in executed_tools:
                 if prev_sig == tool_signature:
                     logger.info(f"[LOOP iter={iteration}] duplicate tool call detected "
-                               f"(same as iteration {prev_iter}), skipping execution")
-                    messages.append({"role": "assistant", "content": raw})
-                    messages.append({"role": "user",
-                        "content": f"You already queried this in iteration {prev_iter}. "
-                                  f"Use the existing data from step_{prev_iter}."})
+                               f"(same as iteration {prev_iter})")
                     is_duplicate = True
                     break
 
@@ -1156,7 +1284,23 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 executed_tools.append((tool_signature, iteration))
 
         if is_duplicate:
-            continue  # Skip to next iteration
+            # PART 2b: a duplicate is a stall signal, not something to nudge
+            # past. The model already has this data. First duplicate: tell it
+            # to use what it has and let it try once more. Second no-progress
+            # step (another duplicate, a parse fail, or a zero-row tool call):
+            # stop and answer from what exists — do NOT keep spending budget
+            # re-emitting a query whose result is already in hand.
+            no_progress_streak += 1
+            if no_progress_streak >= 2:
+                return _finalize_from_data("duplicate_tool_call")
+            messages.append({"role": "assistant", "content": raw})
+            messages.append({"role": "user",
+                "content": f"You already queried this in iteration {prev_iter}. "
+                          f"Do not repeat it. Using the data already in "
+                          f"step_{prev_iter}, either answer now as "
+                          '{"answer": "..."} or make ONE different query that '
+                          "adds missing data."})
+            continue  # one chance to recover; next stall ends the loop
 
         tool_fn = {
             "filter_table": T.filter_table,
@@ -1166,10 +1310,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         }.get(tool_name)
 
         if not tool_fn:
-            tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-            answer = (f"I tried to use an unknown tool ({tool_name}). "
-                     f"I can't answer this question with available data.")
-            return {"answer": answer, "tool_results": tool_results}
+            logger.info(f"[LOOP iter={iteration}] unknown tool requested: {tool_name!r}")
+            return _finalize_from_data(f"unknown_tool:{tool_name}")
 
         if tool_name == "aggregate_results":
             data = tool_params.get("data", [])
@@ -1190,19 +1332,36 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     f"error={result.get('error','none')}")
 
         accumulated_data[f"step_{iteration}"] = result
-        logger.info(f"[STORE] saved step_{iteration} with {len(result.get('rows',[]))} rows, "
+        row_count = len(result.get("rows", []))
+        logger.info(f"[STORE] saved step_{iteration} with {row_count} rows, "
                     f"accumulated_data now has keys: {list(accumulated_data.keys())}")
-        messages.append({"role": "assistant", "content": raw})
-        messages.append({"role": "user",
-            "content": f"Tool result: {json.dumps(result, default=str)[:3000]}"})
 
-    logger.info(f"[LOOP] fallback to unanswerable after "
+        # PART 2b: a tool call that returns zero rows is no forward progress.
+        # Two no-progress steps in a row end the loop.
+        if row_count == 0:
+            no_progress_streak += 1
+            if no_progress_streak >= 2:
+                return _finalize_from_data("no_new_data")
+        else:
+            no_progress_streak = 0
+
+        messages.append({"role": "assistant", "content": raw})
+        # PART 2a: after every tool result, ask the model DIRECTLY whether the
+        # question can now be answered. `has_answer` was never true because
+        # nothing ever made "answer now if you can" an explicit instruction —
+        # the model kept calling tools. Make the stop criterion explicit so the
+        # loop ends the moment the data is sufficient.
+        messages.append({"role": "user",
+            "content": f"Tool result: {json.dumps(result, default=str)[:3000]}\n\n"
+                       f"Can you now answer the question "
+                       f"\"{question}\" from the data gathered so far? "
+                       'If yes, respond with {"answer": "..."} now. '
+                       "Only call another tool if essential data is still "
+                       "missing — do not re-run a query you have already run."})
+
+    logger.info(f"[LOOP] iterations exhausted after "
                 f"{MAX_ITERATIONS} iterations, tokens={tokens_used}")
-    tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-    answer = ("I couldn't fully answer this question within the allowed steps. "
-             "The data exists but requires a more complex analysis. "
-             "Try breaking it into simpler questions.")
-    return {"answer": answer, "tool_results": tool_results}
+    return _finalize_from_data("iterations_exhausted")
 
 async def route_question(question: str, user_id: str,
                           persona: dict = None,
@@ -1342,6 +1501,10 @@ async def route_question(question: str, user_id: str,
             params["deal_ids"]      = entity_params["deal_ids"]
             params["company_names"] = entity_params["company_names"]
 
+        # A score correction must record who submitted it (review queue, Part 7).
+        if handler_name == "submit_score_correction":
+            params["submitted_by"] = user_id
+
         confidence = intent.get("confidence", 0.5)
 
         print(f"[INTENT] handler={handler_name} "
@@ -1382,6 +1545,7 @@ async def route_question(question: str, user_id: str,
         # ── 3. Try precomputed handler ────────────────────
         tool_results = {}
         result_quality = "empty"
+        handler_failure_reason = ""  # PART 1: carried into the fallback
         is_slow = handler_name == "generate_win_loss"
 
         if handler_name == "unanswerable":
@@ -1390,7 +1554,7 @@ async def route_question(question: str, user_id: str,
         elif handler_name != "dynamic_query":
             handler_fn = getattr(handlers, handler_name, None)
             if handler_fn:
-                tool_results, result_quality = \
+                tool_results, result_quality, handler_failure_reason = \
                     await _run_precomputed_handler(
                         handler_fn, handler_name, params, sb)
 
@@ -1411,12 +1575,22 @@ async def route_question(question: str, user_id: str,
                 hint=hint,
                 roster_text=roster_text,
                 classifier_client=classifier_client,
+                origin_handler=handler_name,          # PART 1
+                origin_reason=handler_failure_reason,  # PART 1
             )
             dynamic_answer = dynamic_result.get("answer", "")
             dynamic_tool_results = dynamic_result.get("tool_results", {})
-            if dynamic_answer and \
-               "don't have data" not in dynamic_answer.lower() and \
-               "couldn't" not in dynamic_answer.lower():
+            # PART 1/2: trust the loop's explicit `answered` flag rather than
+            # sniffing the text for "couldn't". A real answer is returned as
+            # before; a give-up surfaces the DIAGNOSTIC message (which names
+            # what fell through) instead of the generic "no data" reply below.
+            if dynamic_result.get("answered"):
+                return {"answer": dynamic_answer,
+                        "needs_ack": is_slow,
+                        "tool_results": dynamic_tool_results,
+                        "handler_name": f"{handler_name}_dynamic_fallback"}
+            if dynamic_answer:
+                _log_unanswered(sb, question, user_id, "fallback_exhausted")
                 return {"answer": dynamic_answer,
                         "needs_ack": is_slow,
                         "tool_results": dynamic_tool_results,
@@ -1565,12 +1739,10 @@ async def route_question(question: str, user_id: str,
                 roster_text=roster_text,
                 classifier_client=classifier_client,
             )
-            # dynamic_query_loop returns {"answer": str, "tool_results": dict}
+            # dynamic_query_loop returns {"answer", "tool_results", "answered"}
             dynamic_answer = dynamic_result.get("answer", "")
             dynamic_tool_results = dynamic_result.get("tool_results", {})
-            if dynamic_answer and \
-               "don't have data" not in dynamic_answer.lower() and \
-               "couldn't" not in dynamic_answer.lower():
+            if dynamic_result.get("answered"):
                 # Log the learning note before returning
                 _log_learning(sb, question, handler_name,
                              assessment, retry_count)
@@ -1698,8 +1870,8 @@ You're answering for {name_or_role} (IC / individual contributor).
 - One-sentence answers when possible
 - Offer next steps only if directly relevant
 
-Example: "You have 4 deals in proposal stage, total value $240K. Acme Corp 
-is your strongest (champion score 8/10), but TechStart needs an economic buyer."
+Example: "You have 4 deals in proposal stage, total value $240K. Acme Corp
+is your strongest (champion is green), but TechStart needs an economic buyer."
 """,
 
     "other": """
@@ -1713,6 +1885,82 @@ Example: "The sales team closed 12 deals this quarter for $890K in new ARR.
 That's 89% of the quarterly target."
 """
 }
+
+# Friendly display names for the rubric component keys. Anything not listed
+# falls back to title-casing the key, so a new component added to rubric.py
+# still appears — the guard is driven by rubric.py, never a hand-kept list.
+_MEDDICC_DISPLAY = {
+    "metrics": "Metrics",
+    "economic_buyer": "Economic Buyer",
+    "decision_criteria": "Decision Criteria",
+    "decision_process": "Decision Process",
+    "identify_pain": "Pain",
+    "champion": "Champion",
+    "competition": "Competition",
+}
+
+
+def _meddicc_guard() -> str:
+    """MEDDICC schema guard for synthesis, built FROM rubric.py so it can never
+    drift from the components the system actually scores. Stops the model from
+    inventing MEDDPICC components (it added a 'Paper Process — data gap' row for
+    LiveSport) and from guessing the overall-score scale (it rendered 38/70 as
+    38/100)."""
+    try:
+        from api.rubric import RUBRIC
+    except ImportError:
+        from rubric import RUBRIC
+    names = [_MEDDICC_DISPLAY.get(k, k.replace("_", " ").title())
+             for k in RUBRIC.keys()]
+    n = len(names)
+    return f"""
+MEDDICC SCORING — FIXED SCHEMA (do not deviate):
+This client uses MEDDICC with EXACTLY these {n} components, each scored 0-10:
+  {", ".join(names)}.
+- These are the ONLY components. Do NOT add, rename, split, or infer components
+  from a methodology's letters. There is no Paper Process, Implicated Pain, or
+  any other component beyond the {n} above — if the data does not contain one of
+  these {n}, it simply is not part of the answer.
+- Never emit a "data gap" row for a component this client does not track. A
+  component absent from the schema is absent from the answer entirely.
+- overall_score is the SUM of the {n} components. Its scale is 0-{n * 10}
+  (NOT 0-100). Never rescale to 100 or invent a denominator. When the data
+  carries a labelled score (e.g. an `overall` object with `display`/`max`),
+  use that denominator verbatim.
+
+BANDS ARE THE SIGNAL — NOT the 0-10 integer:
+- Surface each component as its BAND — red / yellow / green — never as "X/10".
+  The 0-10 integer is finer precision than the analysis can reproduce
+  run-to-run (the same deal re-scored moves ±1 on most components, always on a
+  band line), so a "5/10" claims a resolution we do not have and invites the
+  rep to argue the number instead of the deal. "Champion: yellow" is the honest
+  statement of what we know.
+- The data carries the bands for you: a `bands` map, or `band`/`band_label` on
+  each component. Use those exact bands — do NOT recompute a band from a raw
+  integer, and do NOT print the integer.
+- When a band is flagged borderline (`borderline: true`, or the band text says
+  "near the … boundary"), SAY SO: "Champion: yellow, near the green boundary."
+  A deal genuinely on a band line is unstable run-to-run; showing that is
+  information, not noise to hide.
+
+PRESENTING A DEAL'S MEDDICC (reframe — "what's missing", not "here's a grade"):
+- LEAD with the one or two WEAKEST components (lowest band) and their specific
+  gap — that is the help the rep needs. Do NOT open with the total.
+- Show each component's band WITH its evidence/gap when the data carries it (an
+  `evidence` string, a `gap`, or component_details). Prefer the plain fact over
+  the label: "You don't have the economic buyer confirmed — Tomáš is
+  coordinating but you haven't met the CPO" beats "Economic Buyer: red".
+- The overall is SECONDARY and coarse: describe it as a band distribution
+  ("three green, three yellow, one red"), and if you cite the /{n * 10} total at
+  all, do it once after the gaps as an approximate trend figure — never as the
+  headline and never as a percentage of 100.
+- When a component has NO supporting evidence in the calls (the band is
+  "unread", or the evidence field is empty / says nothing was found), say it is
+  UNREAD — we don't have the data — not that it is weak. Those are different,
+  and the rep should know whether to argue the read or go get the missing
+  information.
+"""
+
 
 def build_synthesis_prompt(persona: dict) -> str:
     """Build persona-aware synthesis system prompt."""
@@ -1730,5 +1978,5 @@ def build_synthesis_prompt(persona: dict) -> str:
         name_or_role = "a revenue team member"
     
     block = block.replace("{name_or_role}", name_or_role)
-    return _VOICE_BASE + "\n" + block
+    return _VOICE_BASE + "\n" + block + "\n" + _meddicc_guard()
 

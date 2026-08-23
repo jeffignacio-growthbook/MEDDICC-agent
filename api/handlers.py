@@ -22,6 +22,97 @@ except ImportError:
     from api.field_semantics import stage_bucket, stage_label, is_won, is_lost, is_open
 
 
+# overall_score is the SUM of the 7 MEDDICC components (0-10 each) — max 70,
+# NOT 100. See hubspot_deals._extract_scores_from_analysis. Anything that
+# surfaces overall_score to the synthesis layer should carry this denominator
+# so the model never has to guess the scale (it guessed /100 for LiveSport,
+# turning a 38/70 = 54% deal into a "38/100, relatively weak" one).
+MEDDICC_OVERALL_MAX = 70
+MEDDICC_COMPONENT_MAX = 10
+
+
+def _labeled_overall(score):
+    """Return overall_score with its denominator and percentage, or None."""
+    try:
+        s = int(score)
+    except (TypeError, ValueError):
+        return None
+    return {"score": s, "max": MEDDICC_OVERALL_MAX,
+            "pct": round(s / MEDDICC_OVERALL_MAX * 100),
+            "display": f"{s}/{MEDDICC_OVERALL_MAX}"}
+
+
+def _resolve_tw(params: dict) -> dict:
+    """Return a resolved time window, defaulting to the current quarter.
+
+    The router always injects params['time_window'], but a handler must never
+    KeyError on a missing param: a raise drops the whole request to the dynamic
+    loop, which burns the query budget and returns nothing useful (the most
+    common user-visible failure in this system). Guarding here keeps every
+    time-scoped handler answerable even when called directly or under test.
+    """
+    tw = params.get("time_window")
+    if tw:
+        return tw
+    try:
+        from api.time_resolver import resolve_time_window
+    except ImportError:
+        from time_resolver import resolve_time_window
+    return resolve_time_window({})
+
+
+def _resolve_owner_email(params: dict, sb):
+    """Resolve a rep to an owner_email, accepting an email OR a person's name.
+
+    The classifier is asked to turn a first name into an email via the roster,
+    but that resolution silently fails when the roster is empty (personas not
+    seeded) or the name is partial — the handler then gets a name where it
+    wanted an ID, errors, and drops to the budget-burning dynamic loop. This
+    resolves in-handler against user_personas so a rep's first name, full name,
+    or email all work.
+
+    Returns (email_or_None, note_or_None). `note` explains a name→email
+    resolution or a miss, for transparency in the handler's output.
+    """
+    # 1. An email supplied under any of the known keys wins outright.
+    for key in ("owner_email", "rep_email", "sdr_email", "email"):
+        v = params.get(key)
+        if v and "@" in str(v):
+            return str(v).strip().lower(), None
+
+    # 2. Otherwise gather any name-ish candidate the classifier may have passed.
+    candidates = []
+    for key in ("owner_email", "rep_email", "sdr_email", "email",
+                "rep_name", "owner_name", "sdr_name", "name",
+                "rep", "owner", "sdr"):
+        v = params.get(key)
+        if v and "@" not in str(v):
+            candidates.append(str(v).strip())
+    if not candidates:
+        return None, None
+
+    try:
+        personas = select_all(sb, "user_personas",
+                              columns="email,name,display_name")
+    except Exception:
+        personas = []
+
+    for cand in candidates:
+        cl = cand.lower().strip()
+        if not cl:
+            continue
+        for p in personas:
+            for nm in (p.get("name"), p.get("display_name")):
+                nml = str(nm or "").lower().strip()
+                if not nml:
+                    continue
+                first = nml.split()[0] if nml.split() else nml
+                if cl == nml or cl == first or cl in nml:
+                    if p.get("email"):
+                        return p["email"], f"resolved '{cand}' to {p['email']}"
+    return None, f"could not resolve '{candidates[0]}' to a known rep"
+
+
 async def query_waterfall(params: dict, sb) -> dict:
     """
     Pipeline snapshot + movement in ONE handler with question-aware emphasis.
@@ -39,7 +130,7 @@ async def query_waterfall(params: dict, sb) -> dict:
     import yaml
     from pathlib import Path
 
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     question = params.get("question", "").lower()
 
     # Load stage config from client.yaml
@@ -226,7 +317,7 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
     """
     from api.stage_requirements import get_requirements_for_stage
 
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     deal_ids = params.get("deal_ids", [])
 
     # Filter analyses to specific deals if context provided
@@ -299,24 +390,32 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
         if not requirements:
             continue
 
-        # Check each required component
+        # Check each required component. Band comparison, not integer: a 5-vs-6
+        # gap is noise the generator can't reproduce (both yellow), so a
+        # component is only "at risk" when its BAND is below the gate's band —
+        # gate 6 → needs yellow-or-better, gate 7 → green-or-better.
+        from api.rubric import band_meets, band_label, get_band
         risk_flags = []
         for component, required_threshold in requirements.items():
             field_name = component_fields.get(component)
             if not field_name:
                 continue
 
-            actual_score = a.get(field_name, 0) or 0
+            actual_score = a.get(field_name)
 
-            if actual_score < required_threshold:
-                # Stage-aware risk message
+            if not band_meets(component, actual_score, required_threshold):
+                # Stage-aware risk message, in band language (the integer is
+                # internal — surfacing "5/10" invites arguing the number
+                # instead of the gap).
                 from api.stage_requirements import _get_stage_by_id
                 stage_info = _get_stage_by_id(stage_id)
                 stage_name = stage_info["name"] if stage_info else "current stage"
+                lbl = band_label(component, actual_score)
+                need_band = get_band(component, required_threshold)
 
                 risk_flags.append(
-                    f"{component.replace('_', ' ').title()} {actual_score}/10 "
-                    f"(need {required_threshold}+ to advance from {stage_name})"
+                    f"{component.replace('_', ' ').title()} is {lbl['text']} "
+                    f"(needs {need_band}-or-better to advance from {stage_name})"
                 )
 
         # Only flag if there are actual risk flags
@@ -325,7 +424,7 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
                 "deal_id":       a["deal_id"],
                 "company_name":  a["company_name"],
                 "overall_score": a.get("overall_score", 0) or 0,
-                "champion_score": a.get("champion_score", 0) or 0,
+                "champion_band": band_label("champion", a.get("champion_score"))["text"],
                 "deal_value":    d.get("deal_value"),
                 "stage":         stage_id,
                 "risk_flags":    risk_flags
@@ -357,7 +456,7 @@ async def query_win_loss(params: dict, sb) -> dict:
     Answers: 'why did we lose?', 'what did we win?',
     'win/loss summary', 'why are we losing?'
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     deal_ids = params.get("deal_ids", [])
 
     # 1. Check for AI-generated narratives first
@@ -433,7 +532,7 @@ async def query_objections(params: dict, sb) -> dict:
     Top objections by category for the period from objections table.
     Returns counts by category, total, and unaddressed percentage.
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     rows = select_all(sb, "objections",
         columns="category,stage_when_raised,"
                 "rep_response,company_name,extracted_at",
@@ -457,7 +556,7 @@ async def query_feature_gaps(params: dict, sb) -> dict:
     Feature gaps by severity and competitor from feature_gaps table.
     Returns total, blockers, counts by category, and top competitors.
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     rows = select_all(sb, "feature_gaps",
         columns="category,severity,competitor_mentioned,"
                 "feature_description,company_name,extracted_at",
@@ -483,7 +582,7 @@ async def query_coverage(params: dict, sb) -> dict:
     Pipeline coverage vs quota targets from rep_targets and deals tables.
     Returns coverage % for each target (company/team/rep level).
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     period_label = tw.get("label", "").replace(" ", "_")
 
     targets = select_all(sb, "rep_targets",
@@ -586,20 +685,34 @@ async def query_deal(params: dict, sb) -> dict:
         "objections": objections,
     }
 
+    # Band is the surfaced signal (the 0-10 integer is internal precision the
+    # generator can't reproduce run-to-run). Attach bands to every component
+    # regardless of which next-steps path we take, and lift a compact
+    # {component: band-text} map to the top level so synthesis leads with bands.
+    from api.rubric import band_label
+    from api.db import unpack_jsonb
+    component_details = unpack_jsonb(latest.get("component_details"), {})
+    meddicc_bands = {}
+    for component, data in component_details.items():
+        if isinstance(data, dict):
+            lbl = band_label(component, data.get("score"))
+            data["band"] = lbl["band"]
+            data["band_label"] = lbl["text"]
+            data["borderline"] = lbl["borderline"]
+            meddicc_bands[component] = lbl["text"]
+    if meddicc_bands:
+        result["meddicc_bands"] = meddicc_bands
+
     if output_file.exists():
         content = output_file.read_text()[:3000]
         result["deal_specific_next_steps"] = content
         result["next_steps_source"] = "deal_analysis"
     else:
-        # Fall back to rubric bands
-        from api.rubric import get_band, get_next_steps
-        from api.db import unpack_jsonb
-        component_details = unpack_jsonb(latest.get("component_details"), {})
+        # Fall back to rubric next-steps coaching (bands already attached).
+        from api.rubric import get_next_steps
         for component, data in component_details.items():
             if isinstance(data, dict):
-                score = data.get("score", 0)
-                data["band"] = get_band(component, score)
-                data["next_steps"] = get_next_steps(component, score)
+                data["next_steps"] = get_next_steps(component, data.get("score", 0))
         result["next_steps_source"] = "rubric_fallback"
 
     return result
@@ -737,7 +850,7 @@ async def query_new_deals(params: dict, sb) -> dict:
     deals table directly. Answers 'which deals were
     created this week/quarter/period?'
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     rows = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,stage,"
                 "owner_email,create_date,forecast_category,"
@@ -798,7 +911,7 @@ async def query_competitive_intel(params: dict, sb) -> dict:
     - "what competitors keep coming up?"
     - "where is Statsig showing up?"
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     search_term = params.get("search_term", "")
 
     # Build search vocabulary: a specific term (e.g. "Statsig", "DIY")
@@ -896,7 +1009,7 @@ async def query_won_deals(params: dict, sb) -> dict:
     Answers: 'what did we win?', 'show me our wins',
              'which deals closed won this quarter?'
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     rows = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,stage,"
                 "owner_email,close_date,forecast_category,"
@@ -965,9 +1078,123 @@ async def query_rubric_scores_bulk(params: dict, sb) -> dict:
                 str(a.get("analyzed_at") or "") > str(latest[did].get("analyzed_at") or "")):
             latest[did] = a
     scores = list(latest.values())
+    # Label every score with its denominator so synthesis can't guess the
+    # scale, AND attach the per-component band — the band is what we surface,
+    # the 0-10 integer is internal (the generator reproduces a component's band
+    # run-to-run but not its exact integer). Synthesis leads with bands.
+    from api.rubric import meddicc_bands as _meddicc_bands
+    _cols = {"metrics": "metrics_score", "economic_buyer": "economic_buyer_score",
+             "decision_criteria": "decision_criteria_score",
+             "decision_process": "decision_process_score", "pain": "pain_score",
+             "champion": "champion_score", "competition": "competition_score"}
+    for s in scores:
+        s["overall"] = _labeled_overall(s.get("overall_score"))
+        s["bands"] = {c: lbl["text"] for c, lbl in
+                      _meddicc_bands({c: s.get(col) for c, col in _cols.items()}).items()}
     return {"scores": scores, "deal_count": len(deal_ids),
             "scored_count": len(scores),
-            "resolved_from_company": resolved_from_company}
+            "resolved_from_company": resolved_from_company,
+            "scale": {"overall_max": MEDDICC_OVERALL_MAX,
+                      "component_max": MEDDICC_COMPONENT_MAX,
+                      "note": "Surface the per-component BAND (red/yellow/green "
+                              "in `bands`), not the raw /10 — the integer is "
+                              "internal precision the generator can't reproduce "
+                              "run-to-run. overall_score is the sum of 7 "
+                              "components (0-70), secondary to the bands."}}
+
+_MEDDICC_COMPONENT_KEYS = {
+    "metrics": "metrics", "metric": "metrics",
+    "economic_buyer": "economic_buyer", "economic buyer": "economic_buyer",
+    "eb": "economic_buyer",
+    "decision_criteria": "decision_criteria", "decision criteria": "decision_criteria",
+    "criteria": "decision_criteria",
+    "decision_process": "decision_process", "decision process": "decision_process",
+    "process": "decision_process",
+    "pain": "pain", "identified_pain": "pain", "identify_pain": "pain",
+    "champion": "champion",
+    "competition": "competition", "competitor": "competition",
+}
+
+
+async def submit_score_correction(params: dict, sb) -> dict:
+    """Capture a rep's disagreement with a MEDDICC component score (Part 7).
+
+    A REVIEW QUEUE, not a live edit: this writes to score_corrections and does
+    NOT change any score. The agent proposes, a human disposes — same discipline
+    as the proposals table. Purpose: a rep who can push back stops treating the
+    tool as an accusation, and we accumulate labelled examples of where the
+    generator is wrong.
+
+    Never raises on a missing param — returns a clear error dict instead.
+    """
+    raw_component = str(params.get("component") or "").strip().lower()
+    component = _MEDDICC_COMPONENT_KEYS.get(raw_component)
+    proposed = params.get("proposed_score")
+    reason = str(params.get("correction_reason") or params.get("reason") or "").strip()
+
+    if not component:
+        return {"logged": False,
+                "error": "Name the MEDDICC component you're correcting (metrics, "
+                         "economic buyer, decision criteria, decision process, "
+                         "pain, champion, or competition)."}
+    try:
+        proposed_score = int(proposed)
+    except (TypeError, ValueError):
+        return {"logged": False, "component": component,
+                "error": "Give the score you think it should be, 0-10 "
+                         "(e.g. 'champion should be 7')."}
+    if not (0 <= proposed_score <= 10):
+        return {"logged": False, "component": component,
+                "error": "Proposed score must be between 0 and 10."}
+    if not reason:
+        return {"logged": False, "component": component,
+                "error": "Add a one-line reason — the evidence for the higher/lower "
+                         "score is what makes the correction useful."}
+
+    # Resolve the deal (by company name) and the current score, if we can.
+    company = (params.get("company")
+               or (params.get("company_names") or [None])[0])
+    deal_id = None
+    company_name = company
+    current_score = None
+    if company:
+        matches = select_all(sb, "deals", columns="deal_id,company_name",
+            filters=[("ilike", "company_name", f"%{str(company).strip()}%")])
+        if matches:
+            deal_id = matches[0]["deal_id"]
+            company_name = matches[0].get("company_name") or company
+            rows = select_all(sb, "analyses",
+                columns=f"deal_id,{component}_score,analyzed_at,passed",
+                filters=[("eq", "deal_id", deal_id)])
+            passed = [r for r in rows if r.get("passed")]
+            passed.sort(key=lambda r: str(r.get("analyzed_at") or ""), reverse=True)
+            if passed:
+                current_score = passed[0].get(f"{component}_score")
+
+    row = {
+        "deal_id": deal_id, "company_name": company_name,
+        "component": component, "current_score": current_score,
+        "proposed_score": proposed_score, "reason": reason,
+        "submitted_by": params.get("submitted_by"), "status": "proposed",
+    }
+    try:
+        sb.table("score_corrections").insert(
+            {k: v for k, v in row.items() if v is not None}).execute()
+    except Exception as e:
+        return {"logged": False, "component": component,
+                "error": f"Couldn't log the correction: {e}"}
+
+    return {
+        "logged": True,
+        "correction": {"component": component, "current_score": current_score,
+                       "proposed_score": proposed_score,
+                       "company_name": company_name, "reason": reason},
+        "note": ("Logged to the review queue. This does NOT change the score "
+                 "automatically — a human reviews corrections before anything "
+                 "is adjusted. Thanks for the pushback; it's how the scoring "
+                 "gets better."),
+    }
+
 
 async def query_deal_stages_bulk(params: dict, sb) -> dict:
     """Current stage for a known set of deal_ids."""
@@ -1032,7 +1259,7 @@ async def query_sdr_pipeline_sourced(params: dict, sb) -> dict:
     config_path = Path(__file__).parent.parent / "config" / "client.yaml"
     config = yaml.safe_load(open(config_path))
 
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     sdr_email = params.get("sdr_email")  # Optional: filter to specific SDR
 
     # Get attribution method from config
@@ -1046,8 +1273,13 @@ async def query_sdr_pipeline_sourced(params: dict, sb) -> dict:
     ]
 
     if attribution_method == "sdr_field" and sdr_field:
-        # Use dedicated SDR attribution field (captures post-handoff deals)
-        filters.append(("not.is", "sdr_owner_email", "null"))
+        # Use dedicated SDR attribution field (captures post-handoff deals).
+        # select_all's "not null" operator is "__not_null__" (→ .not_.is_(col,
+        # "null")). The old "not.is" op was not one select_all understands —
+        # getattr(q, "not.is") raised AttributeError against Supabase too,
+        # dropping this handler into the budget-burning dynamic loop whenever
+        # sdr_field attribution was configured.
+        filters.append(("__not_null__", "sdr_owner_email"))
         if sdr_email:
             filters.append(("eq", "sdr_owner_email", sdr_email))
     else:
@@ -1105,7 +1337,7 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
     email activity from sdr_metrics table.
     """
     sdr_email = params.get("sdr_email")
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
 
     if not sdr_email:
         return {
@@ -1264,7 +1496,7 @@ async def query_sdr_leaderboard(params: dict, sb) -> dict:
     Returns aggregated call and email metrics for all SDRs,
     sorted by activity level.
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
 
     # Get all SDR metrics for time window
     metrics_rows = select_all(sb, "sdr_metrics",
@@ -1369,14 +1601,28 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
       owner_email: str  — exact email from user_personas roster
       time_window: dict — optional, filters by close_date if provided
     """
-    owner_email = params.get("owner_email")
     tw = params.get("time_window")
-    
+
+    # Accept an email OR a rep name (first / full / display). The classifier is
+    # supposed to resolve names to emails via the roster, but that fails
+    # silently when personas aren't seeded or the name is partial — which is
+    # exactly what dropped "show me Christian's pipeline" into the dynamic loop
+    # and burned the query budget. Resolve in-handler so a name always works.
+    owner_email, resolved_note = _resolve_owner_email(params, sb)
+
     if not owner_email:
         return {
-            "error": "owner_email required — use the team roster to resolve a rep name to their email"
+            "error": "Couldn't resolve that to a rep. Name a rep by first name, "
+                     "full name, or email (e.g. \"show me Christian's pipeline\"). "
+                     "If the name is right, that person may not be in the "
+                     "user_personas roster yet.",
+            "resolution_note": resolved_note,
+            "deals": [],
+            "summary": {"total_deals": 0, "total_pipeline": 0,
+                        "avg_deal_value": None, "no_value_count": 0},
+            "data_gap": True,
         }
-    
+
     # Build filters for deals
     filters = [
         ("eq", "owner_email", owner_email),
@@ -1450,6 +1696,7 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
     return {
         "owner_email": owner_email,
         "owner_name": persona_name,
+        "resolution_note": resolved_note,
         "period": tw["label"] if tw else "all active",
         "deals": enriched_deals,
         "summary": {
@@ -1472,12 +1719,13 @@ async def query_rep_attainment(params: dict, sb) -> dict:
       owner_email: str or None  — if None, returns all reps
       time_window: dict         — determines which quarter to pull targets for
     """
-    owner_email = params.get("owner_email")
-    tw = params["time_window"]
-    
+    # A rep name resolves to owner_email; None means "all reps" (valid here).
+    owner_email, _rep_note = _resolve_owner_email(params, sb)
+    tw = _resolve_tw(params)
+
     import yaml
     from pathlib import Path
-    
+
     # Load fiscal config to build period label
     config_path = Path(__file__).parent.parent / "config" / "client.yaml"
     config = yaml.safe_load(open(config_path))
@@ -1634,7 +1882,8 @@ async def query_deal_health(params: dict, sb) -> dict:
       component_threshold: int    — component score below this (default 4)
       time_window: dict or None   — filter close_date if provided
     """
-    owner_email = params.get("owner_email")
+    # A rep name resolves to owner_email; None means "all reps" (valid here).
+    owner_email, _rep_note = _resolve_owner_email(params, sb)
     score_threshold = params.get("score_threshold", 5)
     component = params.get("component")
     component_threshold = params.get("component_threshold", 4)
@@ -1782,7 +2031,8 @@ async def query_stale_deals(params: dict, sb) -> dict:
       stale_days: int             — deals in same stage longer than this (default 21)
       time_window: dict or None
     """
-    owner_email = params.get("owner_email")
+    # A rep name resolves to owner_email; None means "all reps" (valid here).
+    owner_email, _rep_note = _resolve_owner_email(params, sb)
     stage = params.get("stage")
     stale_days = params.get("stale_days", 21)
     tw = params.get("time_window")
@@ -1902,7 +2152,7 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
                      default: "pipeline"
       limit: int   — default 10
     """
-    tw = params["time_window"]
+    tw = _resolve_tw(params)
     sort_by = params.get("sort_by", "pipeline")
     limit = params.get("limit", 10)
     
@@ -2340,7 +2590,8 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
     except ImportError:
         from coaching_thresholds import COACHING_THRESHOLDS
 
-    owner_email = params.get("owner_email")
+    # A rep name resolves to owner_email; None means "all reps" (valid here).
+    owner_email, _rep_note = _resolve_owner_email(params, sb)
     focus = params.get("focus", "all")
     from datetime import date, timedelta
     today = today_in_reporting_tz()
@@ -2405,13 +2656,15 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
 
         flags = []
 
-        # Check each coaching priority
+        # Check each coaching priority. Surface the BAND, not the /10 (the
+        # integer is internal precision the generator can't reproduce).
+        from api.rubric import band_label
         if focus in ("all", "economic_buyer"):
             eb = analysis.get("economic_buyer_score")
             if eb is not None and eb <= COACHING_THRESHOLDS["weak_component_max"]:
                 flags.append({
                     "type": "missing_economic_buyer",
-                    "detail": f"Economic buyer score {eb}/10 — not yet identified",
+                    "detail": f"Economic buyer is {band_label('economic_buyer', eb)['text']} — not yet identified",
                     "urgency": "high" if (deal.get("close_date") or "") > today.isoformat() else "medium",
                 })
 
@@ -2420,7 +2673,7 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
             if ch is not None and ch <= COACHING_THRESHOLDS["weak_component_max"]:
                 flags.append({
                     "type": "weak_champion",
-                    "detail": f"Champion score {ch}/10 — no internal advocate confirmed",
+                    "detail": f"Champion is {band_label('champion', ch)['text']} — no internal advocate confirmed",
                     "urgency": "high",
                 })
 
