@@ -31,6 +31,21 @@ def _active_deals():
     return {k: v for k, v in deals.items() if isinstance(v, dict) and v.get("deal_id")}
 
 
+def _load_internal_domains():
+    """Client's own domains (so a participant domain that IS the client isn't
+    treated as a deal match), mirroring resolve_calls.py."""
+    try:
+        import yaml
+        cfg = yaml.safe_load(open(REPO / "config" / "client.yaml"))
+        org = cfg.get("organization", {}) or {}
+        doms = [d.lower() for d in (org.get("internal_domains") or [])]
+        if not doms and org.get("name"):
+            doms = [f"{org['name'].lower().replace(' ', '')}.io"]
+        return set(doms)
+    except Exception:
+        return set()
+
+
 def _select(sb, table, base_cols, optional_cols, filters=None):
     """select_all, but drop optional columns the table may not have (the
     calls schema has grown over migrations; is_internal/call_intent are newer)."""
@@ -58,10 +73,14 @@ def main():
     active = _active_deals()
     active_slugs = {(v.get("company_slug") or "").lower() for v in active.values()
                     if v.get("company_slug")}
+    internal_domains = _load_internal_domains()
+    active_domains = {(v.get("company_domain") or "").lower() for v in active.values()
+                      if v.get("company_domain")} - internal_domains - {""}
     print("=" * 74)
     print(f"CALL LINKAGE — why deal_id is NULL, and the active-coverage upside")
     print("=" * 74)
-    print(f"active deals: {len(active)}  ({len(active_slugs)} distinct slugs)")
+    print(f"active deals: {len(active)}  ({len(active_slugs)} slugs, "
+          f"{len(active_domains)} domains)  internal domains: {sorted(internal_domains)}")
 
     # All deal slugs (active + historical) to tell "matches a non-active deal"
     # from "matches nothing".
@@ -73,23 +92,31 @@ def main():
 
     rows, opt = _select(sb, "calls",
                         base_cols=["call_id", "company_slug", "deal_id"],
-                        optional_cols=["is_internal", "call_intent", "needs_review"],
+                        optional_cols=["is_internal", "call_intent", "needs_review",
+                                       "participant_domains"],
                         filters=[("is_", "deal_id", None)])
     print(f"\nNULL-deal_id calls: {len(rows)}")
 
     has_internal = "is_internal" in opt
+    has_domains = "participant_domains" in opt
     buckets = Counter()
     intents = Counter()
+    active_by_domain = 0     # orphans a DOMAIN match would link to an active deal
     for r in rows:
         slug = (r.get("company_slug") or "").lower()
+        ext = [(d or "").lower() for d in (r.get("participant_domains") or [])
+               if (d or "").lower() not in internal_domains]
+        domain_hits_active = any(d in active_domains for d in ext)
+        if domain_hits_active:
+            active_by_domain += 1
         if has_internal and r.get("is_internal"):
             buckets["internal (correctly unlinked)"] += 1
-        elif slug and slug in active_slugs:
+        elif (slug and slug in active_slugs) or domain_hits_active:
             buckets["→ matches an ACTIVE deal (recoverable coverage)"] += 1
         elif slug and slug in all_slugs:
             buckets["matches a non-active deal (won't help nightly)"] += 1
         else:
-            buckets["no deal-slug match (internal/generic title)"] += 1
+            buckets["no deal-slug/domain match (internal/generic title)"] += 1
         if "call_intent" in opt:
             intents[r.get("call_intent") or "(unset)"] += 1
 
@@ -103,30 +130,20 @@ def main():
             print(f"  {n:5d}  {label}")
 
     recover_calls = buckets["→ matches an ACTIVE deal (recoverable coverage)"]
-    recover_deals = _deals_touched(rows, active_slugs)
     print("\n" + "=" * 74)
     print(f"UPSIDE of re-running resolve_calls.py (--only-unresolved):")
-    print(f"  {recover_calls} NULL calls carry an active-deal slug, spanning "
-          f"{recover_deals} distinct active deals")
-    print(f"  → those {recover_deals} deals could gain calls they currently lack, "
-          f"lifting coverage above the 96/{len(active)} measured now.")
+    print(f"  {recover_calls} NULL calls would link to an ACTIVE deal "
+          f"(by slug or email-domain; {active_by_domain} via domain)")
+    print(f"  → coverage would rise above the 96/{len(active)} measured now only by "
+          f"these; 0 means re-resolving does not help the nightly.")
     print("=" * 74)
     if not has_internal:
         print("NOTE: calls has no is_internal column, so internal meetings can't be "
-              "separated here;\n'no deal-slug match' includes them.")
+              "separated here.")
+    if not has_domains:
+        print("NOTE: calls has no participant_domains column — domain-match upside "
+              "not evaluated (slug only).")
     return 0
-
-
-def _deals_touched(rows, active_slugs):
-    """Distinct active-deal slugs among the NULL calls (a call count overstates
-    coverage gain — many calls share a deal). This is the real added-deal upper
-    bound; the mapping slug→deal_id is 1:1 within active_slugs by construction."""
-    seen = set()
-    for r in rows:
-        slug = (r.get("company_slug") or "").lower()
-        if slug in active_slugs:
-            seen.add(slug)
-    return len(seen)
 
 
 if __name__ == "__main__":
