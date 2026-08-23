@@ -207,8 +207,7 @@ def get_most_recent_call_date(fireflies_calls: list, apollo_calls: list) -> date
     return max(dates) if dates else None
 
 
-def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer,
-                        fireflies, apollo) -> dict:
+def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer) -> dict:
     """
     Process one deal — context builder → generator → evaluator → reflection → write outputs.
     Thread-safe function for parallel execution.
@@ -709,7 +708,7 @@ def main():
         futures = {
             executor.submit(
                 process_single_deal,
-                deal, memory, tracker, hubspot, sb_writer, fireflies, apollo
+                deal, memory, tracker, hubspot, sb_writer
             ): deal
             for deal in active_deals
         }
