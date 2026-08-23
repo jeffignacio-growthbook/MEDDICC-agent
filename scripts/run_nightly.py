@@ -808,30 +808,43 @@ def main():
         print("\n7. Saving token usage...")
         try:
             usage_summary = tracker.save()
+            # Cost-per-deal must divide by deals actually analyzed, not by the
+            # reflection-gated learnings count (which inflated it ~2x).
             tracker.print_summary(usage_summary,
-                                  deals_processed=len(learnings))
+                                  deals_processed=deals_processed)
         except Exception as e:
             print(f"   ⚠️  Token tracker save failed: {e}")
 
-    # Print summary
+    # Print summary — computed from `results` (every analyzed deal), NOT from
+    # `learnings`. Learnings are only emitted by the reflection gate, which
+    # returns no_learning for a clean pass-on-iteration-1; so `learnings` skews
+    # to failures and multi-iteration deals. Dividing pass rate / avg iterations
+    # / cost-per-deal by len(learnings) printed a near-guaranteed "0/N passed"
+    # and "3.0 iterations" — a false zero that reads as "nothing passed" when
+    # most deals in fact passed. Same swallowed-signal class as the nightly
+    # crash: use the real denominator.
+    analyzed = [r for r in results if r.get('status') == 'analyzed']
     print("\n" + "=" * 80)
     print("RUN SUMMARY")
     print("=" * 80)
-    print(f"Deals processed: {len(learnings)}")
+    print(f"Deals analyzed: {len(analyzed)}")
     print(f"Deals skipped: {skipped}")
     print(f"Errors: {len(errors)}")
 
-    if learnings:
-        passed_count = sum(1 for l in learnings if l['loop_performance']['passed'])
-        print(f"Passed evaluations: {passed_count}/{len(learnings)} ({passed_count/len(learnings)*100:.1f}%)")
+    if analyzed:
+        passed_count = sum(1 for r in analyzed if r.get('passed'))
+        print(f"Passed evaluations: {passed_count}/{len(analyzed)} "
+              f"({passed_count/len(analyzed)*100:.1f}%)")
 
-        avg_iterations = sum(l['loop_performance']['iterations_to_pass'] for l in learnings) / len(learnings)
+        avg_iterations = sum(r.get('iterations', 1) for r in analyzed) / len(analyzed)
         print(f"Average iterations: {avg_iterations:.1f}")
+        print(f"Learning entries: {len(learnings)} "
+              f"(reflection-gated; not the deal count)")
 
     if errors:
         print("\nErrors encountered:")
         for err in errors[:5]:  # Show first 5
-            print(f"  - {err['deal_name']}: {err['error']}")
+            print(f"  - {err.get('company', err.get('deal_id', '?'))}: {err['error']}")
 
     # Save deal index
     if deal_index:
