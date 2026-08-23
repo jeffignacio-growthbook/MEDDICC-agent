@@ -29,6 +29,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: "TEMP — pinned-pipeline characterization (LiveSport, full loop x5)"
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PIN_RUNS: "5"
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/characterize_pinned_pipeline.py
+
       - name: "TEST 0 — Offline: greeting/help handler + handler descriptions"
         run: |
           set -e
@@ -48,6 +58,7 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_scoring_bands.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_transcript_store.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_evaluator_json_salvage.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_score_pinning.py
 
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
