@@ -29,15 +29,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: "TEMP — pinned-pipeline characterization (LiveSport, full loop x5)"
+      - name: "TEMP — iteration-1 determinism characterization (LiveSport, single-pass x15)"
         continue-on-error: true
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          PIN_RUNS: "5"
+          PRIMARY_RUNS: "15"
+          SECONDARY_DEALS: "0"
         run: |
-          PYTHONPATH=.:scripts:api python3 scripts/characterize_pinned_pipeline.py
+          PYTHONPATH=.:scripts:api python3 scripts/characterize_scoring_determinism.py
 
       - name: "TEST 0 — Offline: greeting/help handler + handler descriptions"
         run: |

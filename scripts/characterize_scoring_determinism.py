@@ -38,12 +38,11 @@ _SCORE_COLS = {v + "_score": v for v in COMPONENT_MAP.values()}
 
 
 def _extract_scores(text):
-    out = {}
-    for comp, key in COMPONENT_MAP.items():
-        m = re.search(rf"{re.escape(comp)}.*?\*{{0,2}}Score\*{{0,2}}:\s*(\d+)/10",
-                      text, re.DOTALL | re.IGNORECASE)
-        out[key] = int(m.group(1)) if m else None
-    return out
+    # Use the shared, format-tolerant extractor (Score\D*?(\d+)\s*/\s*10) so a
+    # markdown variation like '**Score:**' is not misread as a parse miss and
+    # mistaken for score nondeterminism. Same function the pin + downstream use.
+    from meddicc_agent import _extract_component_scores
+    return _extract_component_scores(text or "")
 
 
 def _calls_for(sb, deal_id):
