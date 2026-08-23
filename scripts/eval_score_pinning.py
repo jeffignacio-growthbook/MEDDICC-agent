@@ -89,6 +89,23 @@ def run():
     check("metrics still pinned (8)",
           _extract_component_scores(fixed2)["metrics"] == 8)
 
+    # Format tolerance: the model varies markdown between iterations. Extraction
+    # AND rewrite must handle **Score**:, **Score:**, and 'Score: N / 10'. This
+    # is the economic_buyer bug the acceptance gate caught: the brittle pattern
+    # matched the iteration-1 draft but silently no-op'd the rewrite on an
+    # iteration-3 draft that used '**Score:**'.
+    variants = (
+        "### E - Economic Buyer\n**Score:** 5/10\n"      # colon inside bold
+        "### C - Champion\n**Score**: 5/10\n"            # colon outside bold
+        "### C - Competition\nScore: 7 / 10\n")          # spaces around slash
+    ev = _extract_component_scores(variants)
+    print("\n[format tolerance: **Score:** / **Score**: / spaced slash]")
+    check("**Score:** parsed (economic_buyer 5)", ev["economic_buyer"] == 5)
+    check("'Score: 7 / 10' parsed (competition 7)", ev["competition"] == 7)
+    fixed3, mism3 = _pin_score_lines(variants, {"economic_buyer": 3})
+    check("rewrite works on **Score:** (econ 5 → 3, no mismatch)",
+          _extract_component_scores(fixed3)["economic_buyer"] == 3 and mism3 == [])
+
     # Regeneration prompt must list the locked values and forbid changing them.
     msgs = build_initial_messages("calls", {"company": "Acme"}, {"company": {"properties": {"name": "Acme"}}},
                                   previous_feedback="Champion should be 2, not 5.",

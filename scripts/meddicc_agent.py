@@ -48,29 +48,37 @@ _PIN_COMPONENTS = [
 ]
 
 
+# Tolerant of markdown format variation between iterations: **Score**: 5/10,
+# **Score:** 5/10, Score: 5 / 10, etc. \D*? absorbs any asterisks/colon/space
+# between "Score" and the number. MUST match hubspot_deals._extract_scores_from_
+# analysis so the pinned value equals the value every downstream consumer reads.
+_SCORE_RE = r'Score\D*?(\d+)\s*/\s*10'
+
+
 def _extract_component_scores(md: str) -> dict:
     """Parse each component's 'Score: N/10' from the analysis markdown."""
     import re
     out = {}
     for label, key in _PIN_COMPONENTS:
-        m = re.search(rf'{re.escape(label)}.*?\*{{0,2}}Score\*{{0,2}}:\s*(\d+)/10',
-                      md, re.DOTALL | re.IGNORECASE)
+        m = re.search(rf'{re.escape(label)}.*?{_SCORE_RE}', md, re.DOTALL | re.IGNORECASE)
         out[key] = int(m.group(1)) if m else None
     return out
 
 
 def _pin_score_lines(md: str, pinned: dict):
-    """Rewrite each component's 'Score: N/10' line to the pinned iteration-1
-    value. Returns (new_md, mismatches) — mismatches is the list of components
-    that could NOT be set to the pinned value (a drift the caller must catch,
-    so a two-provenance artifact can never be stored silently)."""
+    """Rewrite each component's Score to the pinned iteration-1 value. Returns
+    (new_md, mismatches) — mismatches lists components that could NOT be set to
+    the pinned value (a drift the caller must catch, so a two-provenance artifact
+    can never be stored silently)."""
     import re
     new_md = md
     for label, key in _PIN_COMPONENTS:
         target = pinned.get(key)
         if target is None:
             continue
-        pat = rf'({re.escape(label)}.*?\*{{0,2}}Score\*{{0,2}}:\s*)(\d+)(/10)'
+        # Capture everything up to the number, the number, then the '/10' tail
+        # (spaces allowed), and replace only the number.
+        pat = rf'({re.escape(label)}.*?Score\D*?)(\d+)(\s*/\s*10)'
         new_md = re.subn(
             pat, lambda m, t=target: f"{m.group(1)}{t}{m.group(3)}",
             new_md, count=1, flags=re.DOTALL | re.IGNORECASE)[0]

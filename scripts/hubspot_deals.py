@@ -475,8 +475,12 @@ class HubSpotDealsClient:
         }
 
         for component, score_key in COMPONENT_MAP.items():
-            # Match "Component:\nScore: N/10" or "Component:\n**Score**: N/10" pattern (multiline)
-            pattern = rf'{re.escape(component)}.*?\*{{0,2}}Score\*{{0,2}}:\s*(\d+)/10'
+            # Match the component's "Score: N/10", tolerant of markdown format
+            # variation: **Score**: 5/10, **Score:** 5/10, Score: 5 / 10, etc.
+            # (\D*? from "Score" to the first digit absorbs any mix of asterisks,
+            # colon, and spaces — the brittle \*{0,2}Score\*{0,2}: form silently
+            # missed "**Score:**", which mis-pinned economic_buyer.)
+            pattern = rf'{re.escape(component)}.*?Score\D*?(\d+)\s*/\s*10'
             match = re.search(pattern, analysis_content, re.DOTALL | re.IGNORECASE)
             if match:
                 score = int(match.group(1))

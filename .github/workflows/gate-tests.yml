@@ -15,7 +15,7 @@ jobs:
   gate-tests:
     runs-on: ubuntu-latest
     environment: Agent
-    timeout-minutes: 20
+    timeout-minutes: 30   # TEMP: 5x full-loop characterization needs headroom; revert to 20
 
     steps:
       - uses: actions/checkout@v4
