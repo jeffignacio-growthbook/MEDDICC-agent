@@ -21,8 +21,11 @@ for p in ("", "scripts", "api"):
 
 
 def _active_deals():
+    """Deals live under the index's "deals" key ({deal_id: {...}}); the rest of
+    the top level is ETL metadata. Fall back to a flat {deal_id: {...}} shape."""
     idx = json.load(open(REPO / "memory" / "deals" / "index.json"))
-    return {k: v for k, v in idx.items() if isinstance(v, dict) and v.get("deal_id")}
+    deals = idx.get("deals") if isinstance(idx.get("deals"), dict) else idx
+    return {k: v for k, v in deals.items() if isinstance(v, dict) and v.get("deal_id")}
 
 
 def main():
