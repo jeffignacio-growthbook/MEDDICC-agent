@@ -34,11 +34,66 @@ def load_evaluator_rubric() -> str:
         return f.read()
 
 
+# Component label (as it appears in the generated markdown) → score key.
+# Mirrors hubspot_deals._extract_scores_from_analysis so the values pinned here
+# are exactly the values every downstream consumer parses back out of the draft.
+_PIN_COMPONENTS = [
+    ("Metrics", "metrics"),
+    ("Economic Buyer", "economic_buyer"),
+    ("Decision Criteria", "decision_criteria"),
+    ("Decision Process", "decision_process"),
+    ("Identified Pain", "pain"),
+    ("Champion", "champion"),
+    ("Competition", "competition"),
+]
+
+
+# Tolerant of markdown format variation between iterations: **Score**: 5/10,
+# **Score:** 5/10, Score: 5 / 10, etc. \D*? absorbs any asterisks/colon/space
+# between "Score" and the number. MUST match hubspot_deals._extract_scores_from_
+# analysis so the pinned value equals the value every downstream consumer reads.
+_SCORE_RE = r'Score\D*?(\d+)\s*/\s*10'
+
+
+def _extract_component_scores(md: str) -> dict:
+    """Parse each component's 'Score: N/10' from the analysis markdown."""
+    import re
+    out = {}
+    for label, key in _PIN_COMPONENTS:
+        m = re.search(rf'{re.escape(label)}.*?{_SCORE_RE}', md, re.DOTALL | re.IGNORECASE)
+        out[key] = int(m.group(1)) if m else None
+    return out
+
+
+def _pin_score_lines(md: str, pinned: dict):
+    """Rewrite each component's Score to the pinned iteration-1 value. Returns
+    (new_md, mismatches) — mismatches lists components that could NOT be set to
+    the pinned value (a drift the caller must catch, so a two-provenance artifact
+    can never be stored silently)."""
+    import re
+    new_md = md
+    for label, key in _PIN_COMPONENTS:
+        target = pinned.get(key)
+        if target is None:
+            continue
+        # Capture everything up to the number, the number, then the '/10' tail
+        # (spaces allowed), and replace only the number.
+        pat = rf'({re.escape(label)}.*?Score\D*?)(\d+)(\s*/\s*10)'
+        new_md = re.subn(
+            pat, lambda m, t=target: f"{m.group(1)}{t}{m.group(3)}",
+            new_md, count=1, flags=re.DOTALL | re.IGNORECASE)[0]
+    after = _extract_component_scores(new_md)
+    mismatches = [key for _label, key in _PIN_COMPONENTS
+                  if pinned.get(key) is not None and after.get(key) != pinned.get(key)]
+    return new_md, mismatches
+
+
 def build_initial_messages(
     call_summary: str,
     cumulative_state: dict,
     deal_context: dict,
-    previous_feedback: Optional[str] = None
+    previous_feedback: Optional[str] = None,
+    pinned_scores: Optional[dict] = None
 ) -> list:
     """Build initial messages for generator."""
 
@@ -112,6 +167,38 @@ The previous analysis failed evaluation. You must fix these issues:
 
 Regenerate the analysis addressing all the feedback above."""
 
+    # Score-of-record is pinned to iteration 1 (FIX_MEDDICC_SCORING_PIPELINE):
+    # regeneration exists to improve the WRITE-UP, never to re-derive numbers.
+    # The evaluator only sees the draft (not independent evidence) and its
+    # feedback is prescriptive about scores — obeying it made a temperature-0
+    # score a function of the evaluator's objections, and moved components
+    # across band boundaries (metrics 6→7, champion 5→2) between iterations.
+    # So the locked values are listed explicitly and stated LAST, overriding any
+    # score argument in the feedback above; the evidence must justify THESE
+    # numbers, not argue for different ones. (Mirrors the Part-4 "score first,
+    # then write the explanation" rule, now enforced across iterations too.)
+    if pinned_scores:
+        locked = "\n".join(
+            f"- {label}: {pinned_scores[key]}/10"
+            for label, key in _PIN_COMPONENTS if pinned_scores.get(key) is not None)
+        user_content += f"""
+
+---
+
+# COMPONENT SCORES ARE FINAL — DO NOT CHANGE ANY NUMBER
+
+These scores were decided on the first pass and are LOCKED. Reproduce every
+Score line EXACTLY as below — do not raise or lower any of them, even if the
+evaluator feedback argues otherwise:
+
+{locked}
+
+Your ONLY job now is to make the Evidence and Next Steps for each component
+specific, actionable, and CONSISTENT WITH ITS LOCKED SCORE. If the feedback
+says a score "should" be different, do NOT change the number — instead make the
+evidence for the locked number clearer. The explanation serves the score; the
+score never moves to match the explanation."""
+
     return [{"role": "user", "content": user_content}]
 
 
@@ -123,7 +210,8 @@ def generate(
     claude_md: str,
     client: LLMClient,
     tracker=None,
-    company: str = ''
+    company: str = '',
+    pinned_scores: Optional[dict] = None
 ) -> str:
     """
     Generate MEDDICC analysis using Claude Sonnet 4.6.
@@ -134,7 +222,8 @@ def generate(
         call_summary,
         cumulative_state,
         deal_context,
-        previous_feedback
+        previous_feedback,
+        pinned_scores
     )
 
     # Inner tool loop (though MEDDICC generation shouldn't need tools)
@@ -473,11 +562,13 @@ def run_agent(
     previous_feedback = None
     draft = None
     evaluation = None
+    pinned_scores = None   # locked to iteration 1's component scores (below)
 
     for iteration in range(1, max_iterations + 1):
         print(f"  Iteration {iteration}/{max_iterations}...")
 
-        # Generate analysis
+        # Generate analysis. From iteration 2 on, pinned_scores carries the
+        # iteration-1 numbers so regeneration refines prose without moving them.
         draft = generate(
             call_summary,
             cumulative_state,
@@ -486,8 +577,19 @@ def run_agent(
             claude_md,
             generator_client,
             tracker,
-            company
+            company,
+            pinned_scores
         )
+
+        # Lock the score-of-record to iteration 1 — the only regime the
+        # determinism work characterised. Later iterations may improve the
+        # write-up but must not move these numbers.
+        if iteration == 1:
+            pinned_scores = _extract_component_scores(draft)
+            missing = [k for _l, k in _PIN_COMPONENTS if pinned_scores.get(k) is None]
+            if missing:
+                print(f"  ⚠️  pin: iteration-1 score not found for {missing} "
+                      "(those components won't be pinned)")
 
         # Evaluate analysis
         evaluation = evaluate(
@@ -517,6 +619,23 @@ def run_agent(
         if evaluation.get('required_changes'):
             print(f"     Changes needed: {evaluation.get('required_changes', '')[:200]}")
 
+    # Hard guarantee: if we regenerated, the stored draft's Score lines must
+    # equal iteration 1's, whatever the model wrote. The prompt asks it to keep
+    # them; this enforces it so an LLM drift can't silently ship a two-provenance
+    # artifact (iteration-3 narrative under iteration-1 numbers that don't match).
+    scores_pinned = False
+    pin_mismatches = []
+    if iteration > 1 and pinned_scores and any(v is not None for v in pinned_scores.values()):
+        draft, pin_mismatches = _pin_score_lines(draft, pinned_scores)
+        scores_pinned = True
+        if pin_mismatches:
+            # Could not force these components to the pinned value — surface it
+            # loudly rather than store a contradictory artifact.
+            print(f"  ⚠️  pin: FAILED to lock {pin_mismatches} to iteration-1 "
+                  "values; stored draft may not match the pinned scores")
+        else:
+            print(f"  ✓ scores pinned to iteration 1 across {iteration} iterations")
+
     # Run reflection gate to decide if this should generate a learning
     passed = evaluation['pass'] if evaluation else False
     reflection = reflect(evaluation, iteration, passed, tracker, company)
@@ -527,6 +646,9 @@ def run_agent(
         'evaluation': evaluation,
         'iterations': iteration,
         'passed': passed,
+        'pinned_scores': pinned_scores,
+        'scores_pinned': scores_pinned,
+        'pin_mismatches': pin_mismatches,
         'outcome': reflection['outcome'],
         'root_cause': reflection['root_cause'],
         'rubric_observation': reflection.get('rubric_observation', {}),
