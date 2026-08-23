@@ -48,17 +48,21 @@ def _sources():
     return ["fireflies", "apollo"]
 
 
-def _existing_transcript_ids(client):
+def _done_transcript_ids(client):
+    """call_ids that are DONE = have real text stored. An 'unavailable' row is
+    NOT done — it may be a transient failure (rate limit) recorded as a row, so
+    a re-run must re-attempt it. 'Done' = quality != 'unavailable'."""
     from supabase_client import select_all
     try:
-        rows = select_all(client, "call_transcripts", columns="call_id")
+        rows = select_all(client, "call_transcripts",
+                          columns="call_id,transcript_quality")
     except Exception as e:
-        # Table not applied yet (migration 041) — treat as none stored so a
-        # dry-run still reports. A real write would then fail loudly at upsert.
+        # Table not applied yet — treat as none done so a dry-run still reports.
         print(f"  ⚠️  could not read call_transcripts ({type(e).__name__}) — "
-              "assuming empty (is migration 041 applied?)")
+              "assuming none done (is migration 041/042 applied?)")
         return set()
-    return {r["call_id"] for r in rows if r.get("call_id")}
+    return {r["call_id"] for r in rows
+            if r.get("call_id") and r.get("transcript_quality") != "unavailable"}
 
 
 def _calls_for_source(client, source):
@@ -77,9 +81,13 @@ def backfill(dry_run=True, only_source=None, limit=None, batch=25):
 
     writer = SupabaseWriter()
     client = writer.client
-    already = _existing_transcript_ids(client)
+    already = _done_transcript_ids(client)
     clients = {}
     sources = [s for s in _sources() if (only_source is None or s == only_source)]
+    # Fireflies rate-limits a fast sequential sweep; throttle it. Apollo did 553
+    # clean with no throttle. Override via TRANSCRIPT_THROTTLE_SECONDS.
+    throttle = {"fireflies": float(os.getenv("TRANSCRIPT_THROTTLE_SECONDS", "1.0")),
+                "apollo": 0.0, "gong": 0.0}
 
     print("=" * 78)
     print(f"TRANSCRIPT BACKFILL — {'DRY RUN (no writes)' if dry_run else 'WRITING'}")
@@ -93,33 +101,41 @@ def backfill(dry_run=True, only_source=None, limit=None, batch=25):
         todo = [c for c in calls if str(c["call_id"]) not in already]
         if limit:
             todo = todo[:limit]
-        stats = {"calls": len(calls), "already": len(calls) - len(
-                    [c for c in calls if str(c["call_id"]) not in already]),
+        stats = {"calls": len(calls), "already": len(calls) - len(todo),
                  "attempted": 0, "with_text": 0, "unavailable": 0,
-                 "written": 0, "chars": [], "reasons": Counter()}
-        print(f"\n[{source}] {len(calls)} calls, {stats['already']} already stored, "
-              f"{len(todo)} to process")
+                 "deferred": 0, "written": 0, "chars": [], "reasons": Counter()}
+        print(f"\n[{source}] {len(calls)} calls, {stats['already']} done, "
+              f"{len(todo)} to process  (throttle={throttle.get(source, 0.0)}s)")
 
         pending = []
         for i, c in enumerate(todo, 1):
             cid = str(c["call_id"])
-            utts, err = fetch_utterances(source, cid, clients)
-            row = build_transcript_row(source, cid, utts, error=err)
+            utts, err = fetch_utterances(source, cid, clients,
+                                         throttle=throttle.get(source, 0.0))
             stats["attempted"] += 1
-            if row["transcript_quality"] == UNAVAILABLE:
-                stats["unavailable"] += 1
-                stats["reasons"][(row["unavailable_reason"] or "")[:48]] += 1
+            if err:
+                # Transient fetch failure (e.g. rate limit that outlasted the
+                # backoff). Do NOT write a row — leaving the call absent means a
+                # later run RE-ATTEMPTS it, instead of recording a false
+                # 'unavailable' that resume would skip forever.
+                stats["deferred"] += 1
+                stats["reasons"][("defer: " + err)[:48]] += 1
             else:
-                stats["with_text"] += 1
-                stats["chars"].append(row["char_count"])
-            pending.append(row)
+                row = build_transcript_row(source, cid, utts, error=None)
+                if row["transcript_quality"] == UNAVAILABLE:
+                    stats["unavailable"] += 1   # genuine no-content
+                    stats["reasons"][(row["unavailable_reason"] or "")[:48]] += 1
+                else:
+                    stats["with_text"] += 1
+                    stats["chars"].append(row["char_count"])
+                pending.append(row)
 
             if not dry_run and len(pending) >= batch:
                 stats["written"] += writer.bulk_upsert_transcripts(pending)
                 pending = []
             if i % 25 == 0 or i == len(todo):
                 print(f"    {i}/{len(todo)}  text={stats['with_text']} "
-                      f"unavailable={stats['unavailable']}"
+                      f"no_content={stats['unavailable']} deferred={stats['deferred']}"
                       + ("" if dry_run else f" written={stats['written']}"))
 
         if not dry_run and pending:
@@ -130,23 +146,28 @@ def backfill(dry_run=True, only_source=None, limit=None, batch=25):
         if chars:
             total_kb = sum(chars) / 1024
             print(f"  → text {stats['with_text']}/{stats['attempted']}  "
-                  f"unavailable {stats['unavailable']}  "
+                  f"no_content {stats['unavailable']}  deferred {stats['deferred']}  "
                   f"chars: min={chars[0]} median={int(statistics.median(chars))} "
                   f"max={chars[-1]}  est_store={total_kb:.0f}KB")
         else:
-            print(f"  → text 0/{stats['attempted']}")
-        for reason, n in stats["reasons"].most_common(5):
-            print(f"     unavailable×{n}: {reason}")
+            print(f"  → text 0/{stats['attempted']}  deferred {stats['deferred']}")
+        for reason, n in stats["reasons"].most_common(6):
+            print(f"     ×{n}: {reason}")
         grand[source] = stats
 
     print("\n" + "=" * 78)
     verb = "WOULD WRITE" if dry_run else "WROTE"
     for source, s in grand.items():
         n = s["with_text"] + s["unavailable"] if dry_run else s["written"]
+        tail = (f"  |  {s['deferred']} DEFERRED (transient — re-run to retry)"
+                if s["deferred"] else "")
         print(f"  {source:10} {verb} {n} rows "
-              f"({s['with_text']} with text, {s['unavailable']} unavailable)")
+              f"({s['with_text']} with text, {s['unavailable']} no-content){tail}")
     if dry_run:
         print("\nDRY RUN — nothing written. Re-run without --dry-run to backfill.")
+    elif any(s["deferred"] for s in grand.values()):
+        print("\nSome calls DEFERRED (transient failures, no row written) — "
+              "re-run to retry them; done rows are skipped.")
     print("=" * 78)
     return grand
 

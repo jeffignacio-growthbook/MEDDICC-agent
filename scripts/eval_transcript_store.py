@@ -138,6 +138,31 @@ def test_apollo_transcript_is_assembled_not_fragments():
     return cases
 
 
+def test_rate_limit_is_retryable_not_recorded():
+    """A rate-limit is a transient error the fetch layer RAISES (so it retries
+    with backoff) and the backfill DEFERS (writes no row), rather than recording
+    a false 'unavailable' that resume would skip. Guards the Fireflies-sweep bug."""
+    import transcript_store as ts
+    cases = []
+    cases.append(("detects 'Too many requests'",
+                  ts._is_rate_limit("Too many requests. Please retry")))
+    cases.append(("detects '429'", ts._is_rate_limit("HTTP 429")))
+    cases.append(("plain 'not found' is not a rate limit",
+                  not ts._is_rate_limit("transcript not found")))
+
+    # A fetcher that rate-limits → fetch_utterances returns an ERROR (so the
+    # backfill defers), never utterances. retries=1 keeps the test instant.
+    ts._FETCHERS["_faketest"] = lambda cid, clients: (_ for _ in ()).throw(
+        ts.RateLimited("fireflies: Too many requests"))
+    try:
+        utts, err = ts.fetch_utterances("_faketest", "c1", {}, retries=1)
+    finally:
+        ts._FETCHERS.pop("_faketest", None)
+    cases.append(("rate-limited fetch returns an error, not empty-success",
+                  utts == [] and err and "RateLimited" in err))
+    return cases
+
+
 def run():
     print("=" * 72)
     print("TRANSCRIPT STORE — split intact, NULL≠'', Apollo assembled (Phase 5)")
@@ -148,6 +173,7 @@ def run():
         ("transcript NULL never empty string", test_transcript_null_never_empty_string),
         ("apollo transcript assembled not fragments", test_apollo_transcript_is_assembled_not_fragments),
         ("metrics: units, per-speaker talk/questions, backchannel monologue", test_metrics_from_utterances),
+        ("rate-limit is retryable + deferred, not recorded", test_rate_limit_is_retryable_not_recorded),
     ):
         print(f"\n[{title}]")
         for label, ok in fn():

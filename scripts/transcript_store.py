@@ -71,6 +71,16 @@ def _apollo_utterances(conversation):
 
 # ── per-source fetch → utterances ────────────────────────────────────────────
 
+class RateLimited(Exception):
+    """A transient rate-limit. fetch_utterances retries these with a LONG
+    backoff, as opposed to a permanent GraphQL error (returned, not raised)."""
+
+
+def _is_rate_limit(text):
+    t = (text or "").lower()
+    return "too many request" in t or "rate limit" in t or "429" in t
+
+
 def _fetch_fireflies(call_id, clients):
     client = clients.get("fireflies")
     if client is None:
@@ -81,6 +91,12 @@ def _fetch_fireflies(call_id, clients):
     res = client._query(q, {"id": call_id})
     if res.get("errors"):
         msg = "; ".join(e.get("message", "")[:80] for e in res["errors"])
+        # Fireflies returns rate-limit as a GraphQL error in the response BODY,
+        # not an HTTP error — raise so fetch_utterances backs off and retries
+        # instead of recording a false 'unavailable'. Other GraphQL errors are
+        # permanent for this id → return them.
+        if _is_rate_limit(msg):
+            raise RateLimited(f"fireflies: {msg[:100]}")
         return [], f"fireflies GraphQL: {msg[:140]}"
     sents = ((res.get("data") or {}).get("transcript") or {}).get("sentences") or []
     return _fireflies_utterances(sents), None
@@ -115,17 +131,27 @@ def _fetch_gong(call_id, clients):
 _FETCHERS = {"fireflies": _fetch_fireflies, "apollo": _fetch_apollo, "gong": _fetch_gong}
 
 
-def fetch_utterances(source, call_id, clients, retries=3, backoff=2.0):
+def fetch_utterances(source, call_id, clients, retries=6, backoff=2.0, throttle=0.0):
     """Fetch normalised utterances for one call. Returns (utterances, error).
-    Retries transient failures with exponential backoff; after the cap returns
-    ([], reason) so the caller records 'unavailable' and keeps going."""
+
+    `throttle` sleeps before each call to stay under a source's request rate
+    (Fireflies rate-limits a fast sequential sweep). A rate-limit backs off
+    LONG (15s, 30s, 60s, …) and uses the full retry budget, since the limit is
+    a burst window that only clears with real wait; other exceptions use the
+    short backoff. After the cap, returns ([], reason)."""
     fetcher = _FETCHERS.get((source or "").lower())
     if fetcher is None:
         return [], f"no transcript fetcher for source '{source}'"
     last = None
     for attempt in range(retries):
+        if throttle:
+            time.sleep(throttle)
         try:
             return fetcher(call_id, clients)
+        except RateLimited as e:
+            last = f"RateLimited: {str(e)[:140]}"
+            if attempt < retries - 1:
+                time.sleep(min(120.0, 15.0 * (2 ** attempt)))
         except Exception as e:
             last = f"{type(e).__name__}: {str(e)[:140]}"
             if attempt < retries - 1:
