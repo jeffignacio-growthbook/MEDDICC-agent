@@ -1,0 +1,21 @@
+{
+  "company": "Ryanair",
+  "deal_id": "59387794836",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Champion score regressed from 4/10 (cumulative state) to 2/10 (current analysis) without documented reason. The analysis states 'Champion maintained at 2/10' but the cumulative state shows Champion at 4/10 with evidence 'Leadership transition from Pat Lee to Liam noted for handling key accounts, suggesting Liam may serve as internal advocate.' The current analysis downgrades this to 2/10 and removes the internal advocate language, claiming 'no evidence exists...that Liam is actively selling GrowthBook internally.' This is a regression without explicit justification. Either: (1) explain why the prior 4/10 assessment was incorrect, or (2) maintain the 4/10 score and note that Call 3 provided no new information to change it. CRITERION 4 VIOLATION \u2014 Next step for Economic Buyer uses vague phrasing: 'Ask Liam on the next scheduled call' lacks a specific contact method, timing, or concrete action verb beyond 'ask.' Acceptable format: 'Email Liam by [DATE]: [SPECIFIC QUESTION]' or 'Schedule call with Liam for [DATE] to confirm: [SPECIFIC QUESTION].' Current phrasing 'on the next scheduled call' is indefinite. CRITERION 4 VIOLATION \u2014 Next step for Decision Criteria uses vague verb 'evaluate' in context: 'When your team evaluates whether GrowthBook is the right fit' is seller-framed, not a concrete action. Reframe as: 'Ask Liam by [DATE]: What are the two or three must-haves your team needs to see before recommending GrowthBook to leadership?' CRITERION 3 VIOLATION \u2014 Metrics score 6/10 lacks direct evidence of buyer-stated value. Analysis correctly notes 'These are seller-framed targets, not buyer-stated success metrics' but then scores 6/10. Per rubric, scores above 5/10 require direct quotes or paraphrases of prospect-originated metrics. The evidence provided ('consolidation of experimentation platforms anticipated to enhance management efficiency') is paraphrased seller language, not prospect articulation. Score should be 4/10 or 5/10 with explicit note that no buyer-stated metrics exist yet.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_012",
+  "timestamp": "2026-08-23T16:39:00.255703"
+}

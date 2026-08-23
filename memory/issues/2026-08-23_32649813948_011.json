@@ -1,0 +1,23 @@
+{
+  "company": "Air Space Intelligence",
+  "deal_id": "62725080086",
+  "outcome": "bug",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [
+    "evaluator_parse_error"
+  ],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Evaluator parse error: Expecting ',' delimiter: line 3 column 2078 (char 2096)",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": "Fix evaluator JSON output format",
+  "id": "2026-08-23_32649813948_011",
+  "timestamp": "2026-08-23T16:38:23.891541"
+}

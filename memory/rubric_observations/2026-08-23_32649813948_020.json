@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_020",
+  "timestamp": "2026-08-23T16:29:42.100275",
+  "company": "Box",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'When re-scoring prior metrics in new analyses, explicitly state whether evidentiary standards have changed. If tightening standards (e.g., requiring direct quotes vs. inference), document this as a methodology shift and reconcile prior scores or explain why they were overstated. Do not present retroactive standard changes as regressions without justification.'"
+}

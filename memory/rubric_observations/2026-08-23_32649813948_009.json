@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_009",
+  "timestamp": "2026-08-23T16:11:25.131459",
+  "company": "Rula",
+  "criterion_fired": "Criterion 2 (Carry-forward Regression), Criterion 3 (Evidence Quality), Criterion 4 (Vague Next Steps), Criterion 5 (Unsupported Claims)",
+  "was_appropriate": true,
+  "suggested_change": "Add CLAUDE.md instruction: 'When scores regress between iterations, explicitly document the reason (new evidence, changed interpretation standard, or corrected prior error). If interpretation standard changes, state it. Carry-forward scores only if evidence set is materially unchanged. All next steps require [contact]: action by [YYYY-MM-DD] format with specific question.'"
+}

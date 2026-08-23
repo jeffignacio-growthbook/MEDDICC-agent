@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_011",
+  "timestamp": "2026-08-23T16:13:33.464912",
+  "company": "P\u00daBLICO_DEV",
+  "criterion_fired": "Criterion 1 (Champion evidence statement), Criterion 2 (carry-forward consistency), Criterion 3 (Metrics score calibration), Criterion 4 (Decision Criteria/Process specificity), Criterion 5 (ICP fit assessment and competitor mapping)",
+  "was_appropriate": false,
+  "suggested_change": "Revise rubric to require: (1) explicit evidence statements for all scores; (2) carry-forward justification when scores change; (3) calibration rules mapping absence-of-data to score ranges (e.g., no quantified outcomes \u2192 2-3/10, not 4/10); (4) next-steps template with contact owner, specific ask, and date; (5) mandatory ICP checklist and explicit competitor confirmation against defined set."
+}

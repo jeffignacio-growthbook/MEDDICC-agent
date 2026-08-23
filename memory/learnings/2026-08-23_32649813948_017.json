@@ -1,0 +1,21 @@
+{
+  "company": "Genius Sports",
+  "deal_id": "59680315298",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward Consistency: Metrics regressed from 8/10 to 6/10 without documented contradiction in the July 8 call. The analysis states 'The July 8 call added no new metrics evidence' and 'Downgrade reflects the evidence standard: business outcomes are named but not quantified by the prospect.' However, this same standard applied to the prior state (which scored 8/10) should have flagged the regression as unjustified. The prior cumulative state scored Metrics at 8/10 with evidence of 'Focus on ad revenue, e-commerce, and fan engagement' \u2014 the same evidence cited in the new analysis. The July 8 call does not contradict this; it merely adds technical detail. A one-point downgrade (8\u21927) for lack of quantification would be defensible, but a two-point drop (8\u21926) requires explicit evidence that the prospect contradicted or walked back prior statements. None is present. DECISION CRITERIA also regressed from 8/10 to 6/10 on similar grounds \u2014 the prior state cited 'open-source design, privacy features, scalability, low-latency, seat-based pricing' as identified criteria; the new analysis downgrades to 'mentioned but not confirmed as a structured evaluation framework.' This is a reinterpretation of the same evidence, not new contradictory information. The July 8 call added governance requirements (RBAC, audit logs), which is additive, not contradictory. Both regressions violate Criterion 2 unless the analysis explicitly documents that the prospect walked back or contradicted prior statements. CHAMPION also dropped from 8/10 to 7/10 with the justification that 'Gregory channels input through Andrew King,' but this evidence was present in the June 26 call and already known in the prior state. The analysis acknowledges this ('This is not a regression based on the July 8 call's silence \u2014 it is a one-point adjustment based on the June 26 evidence') but this retroactive reweighting of prior evidence is not a valid carry-forward exception. If the June 26 evidence warranted a 7/10, the prior state should have scored 7/10, not 8/10. Reweighting prior evidence in a new analysis without new contradictory information violates consistency. REQUIRED FIX: Either (1) restore Metrics, Decision Criteria, and Champion to their prior scores and explicitly note 'No new contradictory information in July 8 call \u2014 maintaining prior assessment,' OR (2) provide explicit evidence from the July 8 call or prospect statements that contradicts the prior scoring and justifies the downgrade. If reweighting prior evidence, acknowledge this as a prior analysis error, not a carry-forward adjustment.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_017",
+  "timestamp": "2026-08-23T16:54:03.256864"
+}

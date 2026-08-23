@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_008",
+  "timestamp": "2026-08-23T16:09:41.261820",
+  "company": "InPost",
+  "criterion_fired": "Criterion 2 (Decision Process regression) and Criterion 5 (data availability)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Add explicit rule\u2014'Score may decrease only if new contradicting evidence surfaces; maintain prior score + note \"No new data\" if information is stable.' Criterion 5: Clarify\u2014'If call summaries lack attendee names, analysis must state \"Source: [summary/recording] does not include names\" rather than implying agent negligence. Vagueness penalty only applies when agent had access to data and ignored it.'"
+}

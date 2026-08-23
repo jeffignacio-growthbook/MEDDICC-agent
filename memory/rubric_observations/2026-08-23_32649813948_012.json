@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_012",
+  "timestamp": "2026-08-23T16:15:03.534358",
+  "company": "Jusbrasil Test",
+  "criterion_fired": "CRITERION 2, CRITERION 3, CRITERION 4",
+  "was_appropriate": false,
+  "suggested_change": "Clarify whether score changes require explicit justification only when moving down, and whether next steps are mandatory documentation (formal list) or can be narrative recommendations. Current rubric treats them as both, creating impossible compliance scenarios."
+}

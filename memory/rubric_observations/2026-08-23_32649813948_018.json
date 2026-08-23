@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_018",
+  "timestamp": "2026-08-23T16:25:13.128634",
+  "company": "Zoro",
+  "criterion_fired": "Criterion 4 (Champion actionable next steps) and Criterion 3 (Competition evidence sufficiency)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4: 'Champion component must include a specific question to ask [Contact Name], not procedural instructions like \"establish the name.\" Example: \"Ask [Contact]: Who is driving the internal business case for switching?\"' Criterion 3: 'Competition score must be supported by evidence of explicit evaluation against named alternatives; Unknown/Partial (3/10) if only incumbent named.'"
+}

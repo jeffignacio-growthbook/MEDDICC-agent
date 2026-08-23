@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_003",
+  "timestamp": "2026-08-23T15:57:58.090388",
+  "company": "mountain",
+  "criterion_fired": "Metrics (Criterion 1), Metrics Regression (Criterion 2), Decision Criteria (Criterion 4), Champion (Criterion 5)",
+  "was_appropriate": true,
+  "suggested_change": "Rubric is appropriate. Instruction gap: CLAUDE.md should explicitly state: (1) when downgrading a prior component score, document which statement in the recent call contradicts the prior evidence; if no contradiction exists, explain why reinterpretation of existing evidence is justified; (2) next-step questions must be logically aligned with the component score\u2014do not ask Champion-building questions if Champion score is 2/10; instead ask questions to identify the actual Champion."
+}

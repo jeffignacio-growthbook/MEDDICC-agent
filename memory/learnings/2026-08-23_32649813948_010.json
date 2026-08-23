@@ -1,0 +1,21 @@
+{
+  "company": "Taskrabbit",
+  "deal_id": "60652001696",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 5,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Champion (C) component: Score of 4/10 lacks sufficient evidence to justify the score. The analysis states 'No evidence of internal selling behavior has been documented' and 'No named individual has been observed actively advocating for GrowthBook over Statsig internally,' which contradicts a 4/10 score. A 4/10 implies some partial evidence of championing; the documented evidence supports Unknown status (0-2/10) instead. Either: (1) lower the score to 0-2/10 to match the stated lack of evidence, or (2) provide specific evidence of internal advocacy behavior (e.g., a quote showing a named contact committing to build a business case, recruit stakeholders, or share insider information). Current state is internally inconsistent. Additionally, the next step for Champion uses vague language ('Ask her directly') without a specific concrete question or action \u2014 revise to: '[Danielle]: Schedule 15-min call by Aug 18. Ask: \"Who on your team is most invested in GrowthBook winning, and can I schedule 20 minutes with them before Aug 20 to ensure they have the roadmap commitments and competitive positioning needed to advocate internally?\"' to meet actionability standard.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_010",
+  "timestamp": "2026-08-23T16:24:37.208552"
+}

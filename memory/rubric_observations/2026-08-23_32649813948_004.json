@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_004",
+  "timestamp": "2026-08-23T15:59:44.913132",
+  "company": "Yoto",
+  "criterion_fired": "CRITERION 3 (Competition mapping) and CRITERION 4 (Next steps specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 3 should explicitly state: 'Competitors must be confirmed or marked Unknown; unconfirmed competitor names cannot receive a score above 0.' Criterion 4 should require: 'Next steps must include both a specific question AND the business action it enables (e.g., competitive comparison, champion validation).'"
+}

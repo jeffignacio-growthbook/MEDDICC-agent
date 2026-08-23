@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_035",
+  "timestamp": "2026-08-23T17:00:02.704918",
+  "company": "Ingka Ikea",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 3 (Evidence Quality), Criterion 4 (Actionable Next Steps), Criterion 5 (No Unsupported Claims)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Require explicit statement of 'No new evidence in [call date]\u2014revising based on [prior calls]' only if score drops >3 points; below that, treat as normal recalibration. Criterion 3: Define score bands by named contacts (1\u20132: zero contacts, 3\u20134: unnamed authority signals, 5+: named partial authority). Criterion 4: Validate next step target role matches or exceeds current score; flag if asking non-champion to champion. Criterion 5: Require score to reflect actual formalization level (1\u20133: stated only, 4\u20136: partially formalized, 7\u201310: documented/formal)."
+}

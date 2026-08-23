@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_026",
+  "timestamp": "2026-08-23T16:39:12.832344",
+  "company": "The Wellness Company",
+  "criterion_fired": "CRITERION 2 (Carry-forward Inconsistency) and CRITERION 3 (Evidence Quality on Competition)",
+  "was_appropriate": false,
+  "suggested_change": "CRITERION 2: Allow score regressions if accompanied by explicit reasoning (e.g., 'Prior 6/10 assumed X; new data reveals X was unsupported'). Require carry-forward *reasoning*, not carry-forward *scores*. CRITERION 3: Separate 'competitor mapping' (is it in standard set?) from 'buyer frame inference' (what use case does the evidence support?). Non-standard competitor identification alone does not warrant ICP misalignment claim without direct contradictory evidence from the call."
+}

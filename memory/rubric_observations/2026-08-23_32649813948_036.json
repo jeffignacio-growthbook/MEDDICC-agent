@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_036",
+  "timestamp": "2026-08-23T17:00:07.208431",
+  "company": "CFI Global",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency), Criterion 3 (Decision Criteria Scoring), Criterion 4 (Next Steps Specificity)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Add explicit rule\u2014'Downgrades between iterations require direct contradictions from the most recent call, not retrospective reinterpretation of prior calls. Timeline slips or reduced urgency are noted separately in Next Steps, not reflected in component scores.' Criterion 3: Clarify\u2014'9/10 requires prospect-stated formalization OR seller confirmation that formalization is a blocker. Without evidence of prospect need, 8/10 is appropriate for detailed but undocumented criteria.' Criterion 4: Consolidate guidance\u2014'[contact TBD] placeholders are acceptable only when paired with 1\u20132 distinct, role-specific actions per contact; avoid repeating the same placeholder across multiple components without ownership differentiation.'"
+}

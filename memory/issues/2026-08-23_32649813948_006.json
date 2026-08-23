@@ -1,0 +1,21 @@
+{
+  "company": "Neuroth",
+  "deal_id": "58135849096",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE - Metrics: Score 2/10 but evidence states 'No prospect-stated quantifiable outcome exists in the transcript' \u2014 this is contradictory. If no metrics exist, score should be 0-1/10, not 2/10. CRITERION 2 FAILURE - Carry-forward regression without documented reason: Cumulative state shows Metrics 4/10, Decision Criteria 5/10, Decision Process 5/10, Identified Pain 1/10, Champion 4/10. New analysis downgrades Metrics to 2/10, Decision Criteria to 3/10, Decision Process to 3/10, and Champion to 2/10 without explaining what new information caused these regressions. The call summary provided is identical to the source material already in cumulative state \u2014 no new call occurred. Analysis must either maintain previous scores with explicit 'no new information' statements or document what changed. CRITERION 3 FAILURE - Identified Pain: Score 3/10 but evidence is only directional ('guesswork to data-driven'). Per rubric, scores above 5/10 require direct quotes; conversely, a 3/10 score with only vague paraphrasing is acceptable, but the analysis should clarify whether this represents genuine pain or just stated direction. The evidence 'no specific incident, failed decision, or quantified business cost was cited' supports a lower score (1-2/10) than 3/10. CRITERION 4 FAILURE - Champion next step: 'Send the GrowthBook ROI one-pager and a Deutsche Telekom reference case by end of this week (March 28). On the next call, ask: Will you share this with your team head before the security review completes?' \u2014 The action 'send materials' is seller-owned, not buyer-owned. The question is vague ('Will you share') without a concrete commitment request. Should be: '[Contact: Clemens Bauer] By March 28, send ROI one-pager and Deutsche Telekom case. On next call, ask: Can you commit to sharing this with your team head by [specific date] and scheduling a 30-minute call with them before the security review completes?' CRITERION 5 FAILURE - Champion claim: Analysis states 'no documented internal selling action' yet scores 2/10 instead of 1/10. Per rubric, enthusiasm without buyer-owned internal action = 1-2/10, but the analysis contradicts itself by acknowledging lack of internal selling while not scoring at the floor. Clarify: is Clemens a 1/10 (no internal action) or 2/10 (minimal action)? Additionally, the statement 'no confirmed meeting with team head arranged by Clemens' should trigger a next step asking Clemens to arrange this meeting, not just asking about it on a future call.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_006",
+  "timestamp": "2026-08-23T16:17:47.057658"
+}

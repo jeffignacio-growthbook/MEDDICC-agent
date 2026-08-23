@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_002",
+  "timestamp": "2026-08-23T15:56:41.577495",
+  "company": "Airalo",
+  "criterion_fired": "Criterion 2 (Champion carry-forward consistency), Criterion 4 (Champion next steps specificity), Criterion 1 (Economic Buyer evidence quality)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 should explicitly require: 'If prior score is downgraded, state whether this is a correction due to new contradicting evidence or a reinterpretation of the rubric. Reinterpretations must be flagged as rubric clarifications, not carry-forward logic.' Criterion 4 should include template language: 'Next steps must name a contact (or state '[TBD]'), specify the deliverable, and set a concrete date.' Criterion 1 should state: 'A 3/10 requires at least one paraphrase or direct quote from call transcripts indicating budget authority exists; vague references to 'executive sign-off' score 1/10.'"
+}

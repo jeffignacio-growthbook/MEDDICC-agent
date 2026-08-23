@@ -1,0 +1,21 @@
+{
+  "company": "TRR Trygghetsr\u00e5det",
+  "deal_id": "58370143006",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward Consistency: Metrics regressed from 4/10 (Partial) in cumulative state to 1/10 (Unknown) without documented reason. The analysis states 'No quantifiable business outcomes were stated by the prospect' but the cumulative state already captured this same gap at 4/10 with evidence of TRR's focus on website redesign and proactive outreach model. The regression is unjustified. CRITERION 3 VIOLATION \u2014 Evidence Quality: Decision Process score reduced from 7/10 (Identified) to 5/10 (Partial) without clear justification. The cumulative state documented 'Internal decision on A/B testing tool purchase is set for Monday, with follow-up discussions scheduled for next Friday' \u2014 this is a concrete timeline. Call 2 extends the timeline to end of May but does not contradict the existence of a decision process. The score reduction lacks supporting evidence. CRITERION 4 VIOLATION \u2014 Actionable Next Steps: Metrics component (1/10) has a next step that uses vague language: 'propose this question in the follow-up call scheduled for next Friday' is not a specific action. Should be: 'Ask [contact TBD] directly on Friday's call: [specific question]'. Decision Process next step similarly lacks specificity: 'address in Friday follow-up' is not actionable. CRITERION 1 VIOLATION \u2014 Complete Coverage: Identified Pain evidence states 'no data on lost conversions, experiment backlog, or business impact has been stated' but this is a seller interpretation, not evidence from the call. The call summaries do not explicitly state these metrics are absent; the analysis is inferring absence. This weakens the evidence quality for the 6/10 score.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_020",
+  "timestamp": "2026-08-23T17:02:16.857513"
+}

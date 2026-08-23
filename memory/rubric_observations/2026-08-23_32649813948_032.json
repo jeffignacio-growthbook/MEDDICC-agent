@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_032",
+  "timestamp": "2026-08-23T16:54:39.599667",
+  "company": "Stone",
+  "criterion_fired": "Criterion 2 (Decision Process consistency) and Criterion 4 (component differentiation)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'Score changes must be justified when contradicting prior state. If new information materializes the decision process (e.g., concrete trial commitment), document whether score increases or explain why it does not. Next steps must be tailored to each MEDDICC component's stakeholder and information gap, not repeated verbatim across sections.'"
+}

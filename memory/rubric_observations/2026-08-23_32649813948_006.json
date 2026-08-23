@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_006",
+  "timestamp": "2026-08-23T16:05:22.753020",
+  "company": "Notion",
+  "criterion_fired": "Criterion 4 (Actionable Next Steps) and Criterion 2 (Carry-forward Consistency)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 4 should explicitly require next steps to include both contact name AND target date/deadline when both are knowable from call data; Criterion 2 should clarify when score revisions are acceptable (single-call reframes) vs. when they signal regression (new contradictory information across cumulative calls)."
+}

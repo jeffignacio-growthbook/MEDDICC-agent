@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_014",
+  "timestamp": "2026-08-23T16:19:32.527335",
+  "company": "Chaos",
+  "criterion_fired": "CRITERION 2 (Carry-forward violation) and CRITERION 3 (Decision Criteria evidence mismatch)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'When analyzing a new call in a multi-call deal: (1) If new call adds complementary evidence, incorporate it into prior scores without retroactive downgrade. (2) If new call contradicts prior analysis, explicitly flag the prior assessment as incorrect and state the corrected score with both calls as evidence. (3) Never downgrade scores using phrases like \"re-reading both calls\" without stating which specific new call content triggered the change.'"
+}

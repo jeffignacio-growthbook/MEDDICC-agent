@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_013",
+  "timestamp": "2026-08-23T16:17:47.058261",
+  "company": "Neuroth",
+  "criterion_fired": "Criterion 1, 3, 5 (scoring logic); Criterion 4 (next-step ownership definition)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Criterion 1 \u2014 if no quantifiable outcome exists, define minimum score floor (0 or 1); (2) Criterion 3 \u2014 specify whether 3/10 requires directional evidence or only vague paraphrasing; (3) Criterion 4 \u2014 explicitly separate seller-owned prep actions from buyer-owned commitments in next-step structure; (4) Criterion 5 \u2014 define internal-action threshold: does 2/10 require documented action or only lack of contradiction?"
+}

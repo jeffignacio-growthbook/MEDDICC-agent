@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32649813948_017",
+  "timestamp": "2026-08-23T16:24:37.209124",
+  "company": "Taskrabbit",
+  "criterion_fired": "Champion (C) component scoring consistency and next-step actionability",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'MEDDICC scores must be justified by named evidence in transcript. If no evidence of behavior X exists, score \u22642/10. Next steps must include: specific contact name, concrete question or ask, and measurable deadline (date/time frame). Avoid vague directives like \"ask directly\" without context.'"
+}

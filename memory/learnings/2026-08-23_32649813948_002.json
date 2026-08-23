@@ -1,0 +1,21 @@
+{
+  "company": "mountain",
+  "deal_id": "60868340629",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 6,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Metrics component: Score of 4/10 provided but evidence is insufficient. The analysis states 'No buyer has stated a target experiment velocity, a success threshold for the trial, or a quantified business outcome' and 'buyer ownership of that number is unconfirmed.' Per rubric: 'FAIL if score above 5/10 lacks a direct quote or paraphrase' \u2014 this applies inversely: a score of 4/10 with ambiguous attribution and no buyer confirmation of the metric as their own pain does not meet the evidence standard. The three-week delay is described as 'plausible this originated as buyer-stated pain' but explicitly unconfirmed. Reframe: either score this 2-3/10 (vague mention, seller-described) with evidence that the buyer has NOT confirmed this as their metric, OR provide a direct buyer quote confirming the three-week delay as their stated pain. CRITERION 2 FAILURE \u2014 Metrics regression: Prior state scored 8/10. Analysis acknowledges 'The prior 8/10 appears to have conflated platform capabilities with buyer-confirmed metrics' and 'This is a reinterpretation of evidence that was always present in the record \u2014 not a new contradiction.' This is a carry-forward violation. The rubric requires: 'Identified or Partial components must remain at that level unless the recent call contradicts them.' The recent call (July 30) does NOT contradict the prior 8/10; the prior 8/10 was simply unsupported by the evidence. The analysis must either: (a) maintain 8/10 and explicitly note what buyer-stated metrics justify it, OR (b) document in the analysis that the prior 8/10 was an error in the cumulative state and explain why the reinterpretation is justified by new information in the recent call. As written, the analysis downgrades without documenting a contradiction in the recent call. CRITERION 4 FAILURE \u2014 Decision Criteria next steps: 'Ask Kirsa: Of the requirements we've been working through \u2014 BigQuery integration, security setup, self-service for PMs \u2014 which one is the absolute must-have for this to move forward?' This uses 'which one is the absolute must-have' which is vague and exploratory. Reframe to a concrete, specific question: 'Ask Kirsa: If BigQuery integration works but we cannot support workload identity federation, would that block the deal, or is there a fallback you'd accept?' CRITERION 4 FAILURE \u2014 Identified Pain next steps: 'Ask Kirsa: What happens to your team if the trial doesn't work out and you stay on your current setup?' This is exploratory and vague. Reframe: 'Ask Kirsa: Is there a product launch or business deadline tied to improving experiment turnaround time? For example, do you need faster analysis by Q3 to support a specific roadmap initiative?' CRITERION 5 FAILURE \u2014 Champion claim: Analysis states 'Kirsa has committed to internal actions (finalizing seat allocation, coordinating with legal/finance), which is the basis for a 2/10 rather than 1/10' and 'These are operational coordination tasks, not internal selling.' This is correct and well-grounded. However, the next step then asks 'Have you had a chance to share where the trial is heading with your VP or leadership team?' \u2014 this assumes Kirsa is the Champion when the score of 2/10 explicitly states she has not demonstrated internal selling. The next step should instead ask: 'Who on your team is the strongest advocate for moving forward with GrowthBook? Is that you, or is there someone else we should be engaging more directly?' to identify the actual Champion rather than assume Kirsa fills that role.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_002",
+  "timestamp": "2026-08-23T15:57:58.089788"
+}

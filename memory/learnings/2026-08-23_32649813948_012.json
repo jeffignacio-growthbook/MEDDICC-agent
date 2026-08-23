@@ -1,0 +1,21 @@
+{
+  "company": "Skyscanner",
+  "deal_id": "55660576681",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 16,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Metrics component: Score is 7/10 but the analysis states 'no baseline conversion rate, no specific revenue figure, and no defined success threshold for the POC have been articulated.' This contradicts a 7/10 score. A score of 7/10 requires clear, quantified evidence. The prospect-stated 'millions in incremental revenue' is vague and unquantified. The 27-day analysis bottleneck is operational context, not a success metric. Revise Metrics score to 5/10 (Partial, unquantified value) OR provide specific, quantified POC success criteria that justify 7/10. CRITERION 2 FAILURE \u2014 Economic Buyer: Cumulative state shows score of 6/10. Recent calls (Aug 4, Aug 7) contain no new EB information. Analysis maintains 6/10 but does NOT explicitly state 'No new EB information in recent calls \u2014 maintaining previous score of 6/10.' This violates carry-forward consistency documentation requirement. Add explicit carry-forward statement. CRITERION 4 FAILURE \u2014 Metrics next step uses vague language: 'What does success look like for the POC in measurable terms' is exploratory/open-ended, not a specific action with a concrete question. Revise to: 'Ask Megan Crothers: Confirm the POC success criteria \u2014 specifically, what reduction in analysis time (from current 27 days) or experiment velocity threshold would trigger advancement to production?' CRITERION 4 FAILURE \u2014 Economic Buyer next step: '[Daniel from Procurement]: Confirm on next Tuesday cadence call: Who holds final sign-off authority for a $125K commitment, and what is the approval process timeline?' \u2014 This is acceptable per rubric (contact TBD placeholder allowed), but the analysis should note Daniel has not yet appeared on a recorded call, creating execution risk. Add: 'If Daniel is absent again, escalate to Gareth with same question.' CRITERION 5 FAILURE \u2014 Champion score 8/10 claims 'both champions are engaged and taking buyer-owned actions' but evidence shows Megan is coordinating (operational role) and Gareth is asking questions (evaluation behavior). Neither has demonstrated internal advocacy or business case building. Score should be 7/10 with note: 'Champions engaged in evaluation but no evidence yet of internal selling or business case advocacy.' Revise score and evidence accordingly.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_012",
+  "timestamp": "2026-08-23T16:26:25.016402"
+}

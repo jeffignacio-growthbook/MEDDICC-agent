@@ -1,0 +1,21 @@
+{
+  "company": "Square",
+  "deal_id": "58134855076",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Champion component missing explicit 'no evidence' statement. Score is 5/10 (Partial) but the evidence section states 'no new champion information in the July 20 call' without explicitly confirming whether evidence of internal selling behavior exists or does not exist from prior calls. The analysis must state: 'No evidence of internal selling behavior (e.g., building business case, securing VP approval) \u2014 Champion is passive coordinator only.' CRITERION 4 FAILURE \u2014 Champion (5/10, Partial status) lacks actionable next step. The next step provided ('Ask the primary technical contact directly...') is vague and uses 'building the case' without a specific, concrete question. Revise to: '[contact TBD]: Confirm on next POC check-in: \"Who internally is presenting the POC results to leadership and building the business case for consolidation \u2014 is that you, or should we schedule time with that person?\"' CRITERION 4 FAILURE \u2014 Competition (1/10, Unknown status) next step uses vague language ('map against GrowthBook's known competitive set') without a concrete action. Revise to: '[contact TBD]: Ask technical lead on next call: \"Which specific tools are you consolidating away from \u2014 LaunchDarkly, Statsig, EPPO, Datadog, Optimizely, or internal builds? What were the top 3 limitations that drove the decision to move?\"' CRITERION 2 CLARIFICATION \u2014 Cumulative state shows 'calls_reviewed: 2' but analysis references three calls (March 16, July 9, July 20). Update cumulative_calls_context to 3 to reflect accurate carry-forward baseline.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32649813948_013",
+  "timestamp": "2026-08-23T16:33:58.725511"
+}
