@@ -29,28 +29,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: "TEMP item1 — run#37 pass count + coverage reconciliation (read-only)"
-        continue-on-error: true
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: |
-          PYTHONPATH=.:scripts:api python3 scripts/diag_run37_report.py
-
-      - name: "TEMP item2 — stage-vs-score hygiene recount (read-only)"
-        continue-on-error: true
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: |
-          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/analytics/stage_score_hygiene.py
-
-      - name: "TEMP item3 — evaluator-loop score variance (instrumented)"
+      - name: "TEMP item3 — evaluator-loop score variance (instrumented, line-buffered)"
         continue-on-error: true
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          VARIANCE_MAX_DEALS: "2"
         run: |
           PYTHONPATH=.:scripts:api python3 scripts/diag_iteration_variance.py
 

@@ -75,32 +75,44 @@ def main():
               f"{str(r.get('company_name'))[:26]}")
 
     # ── ITEM 2 helper: coverage reconciliation ───────────────────────────────
-    active = _active_deals()
+    # Two "active" universes exist and must be reconciled honestly:
+    #   • deals table, deal_status='active'  → the raw active count (this is the
+    #     ~422 figure; it INCLUDES off-ladder stages: Meeting Set / renewal /
+    #     terminal, which are not analyzable opportunities).
+    #   • nightly index.json                 → the deals the nightly actually
+    #     iterates (~166); ≈ the analyzable pipeline.
+    index = _active_deals()
+    deals_active = select_all(sb, "deals", columns="deal_id,stage,deal_status",
+                              filters=[("eq", "deal_status", "active")])
     call_rows = select_all(sb, "calls", columns="deal_id")
     call_ids = {str(c.get("deal_id")) for c in call_rows
                 if c.get("deal_id") not in (None, "", "None")}
-    active_with_calls = [d for d in active if d in call_ids]
+    idx_with_calls = [d for d in index if d in call_ids]
     scored_today_ids = set(latest.keys())
-    active_scored_today = [d for d in active if d in scored_today_ids]
-    active_passed_today = [d for d in active
-                           if d in {str(r["deal_id"]) for r in passed}]
+    idx_scored_today = [d for d in index if d in scored_today_ids]
+    idx_passed_today = [d for d in index if d in {str(r["deal_id"]) for r in passed}]
 
     print("\n" + "=" * 76)
-    print("ITEM 2 (coverage reconciliation) — ONE honest active-coverage number")
+    print("ITEM 2 (coverage reconciliation) — reconciling 96/166 with the 422 figure")
     print("=" * 76)
-    print(f"  active deals (current index):        {len(active)}")
-    print(f"  …with >=1 call in Supabase:          {len(active_with_calls)} "
-          f"({100*len(active_with_calls)//max(1,len(active))}% of active)")
-    print(f"  …scored in run #37 (analysis today): {len(active_scored_today)}")
-    print(f"  …passed the evaluator today:         {len(active_passed_today)}")
+    print(f"  deals table, deal_status='active':   {len(deals_active)}  "
+          f"(RAW active — includes off-ladder: Meeting Set / renewal / terminal)")
+    print(f"  nightly index (what the nightly runs): {len(index)}  "
+          f"(≈ the analyzable pipeline)")
+    print(f"    …of the index, with >=1 call:        {len(idx_with_calls)} "
+          f"({100*len(idx_with_calls)//max(1,len(index))}%)")
+    print(f"    …scored in run #37:                  {len(idx_scored_today)}")
+    print(f"    …passed the evaluator today:         {len(idx_passed_today)}")
     print()
-    print("  Reconciliation vs the older 357-unscored / 422 figure:")
-    print("  - 422 was a PRIOR deal universe (pre-ETL-refresh snapshot); the")
-    print("    active set is now {} deals, a different denominator.".format(len(active)))
-    print("  - '85% unscored of 422' and 'coverage of 166 active' are not the")
-    print("    same population. The honest current number is active-deal")
-    print("    coverage: {}/{} active deals are scoreable (have calls)."
-          .format(len(active_with_calls), len(active)))
+    print("  The 357-unscored/422 figure counted the RAW active set (422),")
+    print("  most of which is off-ladder (renewals/terminal/meeting-set) and was")
+    print("  never an analyzable opportunity. The honest coverage number is over")
+    print("  the analyzable pipeline the nightly targets: {}/{} have calls, {} were"
+          .format(len(idx_with_calls), len(index), len(idx_scored_today)))
+    print("  scored in run #37, {} passed the evaluator.".format(len(idx_passed_today)))
+    print("  (Gap to watch: index {} vs raw-active {} — confirm the index isn't"
+          .format(len(index), len(deals_active)))
+    print("   silently dropping analyzable opportunities.)")
     print("=" * 76)
     return 0
 

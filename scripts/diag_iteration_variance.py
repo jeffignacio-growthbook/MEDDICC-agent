@@ -29,6 +29,14 @@ REPO = Path(__file__).resolve().parent.parent
 for p in ("", "scripts", "api"):
     sys.path.insert(0, str(REPO / p) if p else str(REPO))
 
+# Line-buffer stdout so per-deal output survives a kill — CI block-buffers
+# stdout, and this step makes slow LLM calls that can outlast a job timeout;
+# without this a killed run flushes nothing (backfill lesson).
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+except Exception:
+    pass
+
 TODAY = os.getenv("RUN_DATE", "2026-08-23")
 MAX_DEALS = int(os.getenv("VARIANCE_MAX_DEALS", "3"))
 LIVESPORT = "62160567676"
