@@ -57,20 +57,21 @@ def _sources():
 
 
 def _done_transcript_ids(client):
-    """call_ids that are DONE = have real text stored. An 'unavailable' row is
-    NOT done — it may be a transient failure (rate limit) recorded as a row, so
-    a re-run must re-attempt it. 'Done' = quality != 'unavailable'."""
+    """call_ids that are DONE (resume skips them): rows with text, or TERMINAL
+    empties (old calls that will never have a transcript). A RETRY/pending empty
+    is re-attempted. is_done() in transcript_store is the shared authority."""
     from supabase_client import select_all
+    from transcript_store import is_done
     try:
         rows = select_all(client, "call_transcripts",
-                          columns="call_id,transcript_quality")
+                          columns="call_id,transcript_quality,unavailable_reason")
     except Exception as e:
         # Table not applied yet — treat as none done so a dry-run still reports.
         print(f"  ⚠️  could not read call_transcripts ({type(e).__name__}) — "
               "assuming none done (is migration 041/042 applied?)")
         return set()
-    return {r["call_id"] for r in rows
-            if r.get("call_id") and r.get("transcript_quality") != "unavailable"}
+    return {r["call_id"] for r in rows if r.get("call_id")
+            and is_done(r.get("transcript_quality"), r.get("unavailable_reason"))}
 
 
 def _calls_for_source(client, source):
@@ -129,7 +130,8 @@ def backfill(dry_run=True, only_source=None, limit=None, batch=25):
                 stats["deferred"] += 1
                 stats["reasons"][("defer: " + err)[:48]] += 1
             else:
-                row = build_transcript_row(source, cid, utts, error=None)
+                row = build_transcript_row(source, cid, utts, error=None,
+                                           call_date=c.get("call_date"))
                 if row["transcript_quality"] == UNAVAILABLE:
                     stats["unavailable"] += 1   # genuine no-content
                     stats["reasons"][(row["unavailable_reason"] or "")[:48]] += 1

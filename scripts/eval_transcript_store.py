@@ -163,6 +163,38 @@ def test_rate_limit_is_retryable_not_recorded():
     return cases
 
 
+def test_terminal_vs_retryable_empty():
+    """An empty result on an OLD call is terminal (resume stops re-attempting);
+    on a RECENT call it's pending/retry; a transient error is retry. is_done()
+    encodes the distinction so a genuinely-empty old call isn't re-fetched every
+    pass forever."""
+    from datetime import date
+    from transcript_store import build_transcript_row, is_done, UNAVAILABLE, FULL
+    cases = []
+
+    old = build_transcript_row("fireflies", "c1", [], call_date="2020-01-01")
+    cases.append(("empty + old call → terminal reason",
+                  old["unavailable_reason"].startswith("terminal:")))
+    cases.append(("terminal empty is DONE (not re-attempted)",
+                  is_done(UNAVAILABLE, old["unavailable_reason"]) is True))
+
+    recent = build_transcript_row("fireflies", "c2", [], call_date=date.today().isoformat())
+    cases.append(("empty + recent call → retry reason",
+                  recent["unavailable_reason"].startswith("retry:")))
+    cases.append(("recent/pending empty is NOT done (re-attempted)",
+                  is_done(UNAVAILABLE, recent["unavailable_reason"]) is False))
+
+    err = build_transcript_row("apollo", "c3", [], error="RateLimited: boom")
+    cases.append(("transient error → retry reason, not done",
+                  err["unavailable_reason"].startswith("retry:")
+                  and is_done(UNAVAILABLE, err["unavailable_reason"]) is False))
+
+    cases.append(("full row is done", is_done(FULL, None) is True))
+    cases.append(("legacy unavailable reason (no prefix) → re-attempted",
+                  is_done(UNAVAILABLE, "no transcript text returned") is False))
+    return cases
+
+
 def run():
     print("=" * 72)
     print("TRANSCRIPT STORE — split intact, NULL≠'', Apollo assembled (Phase 5)")
@@ -174,6 +206,7 @@ def run():
         ("apollo transcript assembled not fragments", test_apollo_transcript_is_assembled_not_fragments),
         ("metrics: units, per-speaker talk/questions, backchannel monologue", test_metrics_from_utterances),
         ("rate-limit is retryable + deferred, not recorded", test_rate_limit_is_retryable_not_recorded),
+        ("terminal vs retryable empty (resume stops re-fetching old empties)", test_terminal_vs_retryable_empty),
     ):
         print(f"\n[{title}]")
         for label, ok in fn():

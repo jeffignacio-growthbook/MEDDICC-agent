@@ -11,13 +11,26 @@ normalised utterances we compute talk time, question rate, and longest
 monologue in the SAME pass that assembles the text, because the stored
 transcript has no timestamps and recomputing later would mean re-fetching.
 """
+import os
 import time
 from collections import defaultdict
+from datetime import date
 
 FULL = "full"
 PARTIAL = "partial"
 FRAGMENTS_ONLY = "fragments_only"
 UNAVAILABLE = "unavailable"
+
+# An empty result (fetch succeeded, no sentences) on a call older than this is
+# TERMINAL — a transcript will never appear (silent/failed recording), so resume
+# must stop re-attempting it (else every future pass burns an API call on it).
+# On a RECENT call the same emptiness is PENDING — the transcript may still be
+# generating — so resume keeps retrying it. Recorders finalise within minutes to
+# hours; 3 days is a safe cutoff. unavailable_reason carries the distinction as a
+# "terminal:" / "retry:" prefix, read by is_done() — no extra column needed.
+STILL_PROCESSING_DAYS = int(os.getenv("TRANSCRIPT_STILL_PROCESSING_DAYS", "3"))
+TERMINAL = "terminal:"
+RETRY = "retry:"
 
 # A monologue is consecutive speech by one speaker. Interjections from other
 # speakers totalling under this many seconds between the speaker's utterances
@@ -228,16 +241,42 @@ _EMPTY_METRICS = {
 }
 
 
-def build_transcript_row(source, call_id, utterances, error=None):
+def _empty_reason(call_date):
+    """Classify an empty result as TERMINAL (old call — no transcript will ever
+    appear) or RETRY (recent call — may still be processing), by call age."""
+    try:
+        age = (date.today() - date.fromisoformat(str(call_date)[:10])).days
+    except Exception:
+        age = None
+    if age is not None and age > STILL_PROCESSING_DAYS:
+        return f"{TERMINAL} no transcript ({age}d-old call, none will appear)"
+    return f"{RETRY} no transcript yet (recent call, may still be processing)"
+
+
+def is_done(quality, reason):
+    """A call_transcripts row is DONE (resume should NOT re-attempt it) when it
+    has text, or when it is a TERMINAL empty. A RETRY/pending empty, or an
+    absent row, is re-attempted. Single authority shared by the backfill's
+    resume set and the tests."""
+    if quality != UNAVAILABLE:
+        return True
+    return bool(reason) and reason.startswith(TERMINAL)
+
+
+def build_transcript_row(source, call_id, utterances, error=None, call_date=None):
     """Shape one call_transcripts row from normalised utterances: assembled
     text + metrics, or an honest 'unavailable' row. Enforces NULL-never-empty
-    and the unavailable_reason invariant the schema also checks."""
+    and the unavailable_reason invariant the schema also checks. The empty-row
+    reason is TERMINAL vs RETRY by call age (see STILL_PROCESSING_DAYS) so a
+    genuinely-empty old call stops being re-fetched every pass."""
     text = assemble_text(utterances or [])
     base = {"call_id": str(call_id), "source": source}
     if text.strip():
         return {**base, "transcript": text, "transcript_quality": FULL,
                 "unavailable_reason": None, "char_count": len(text),
                 **compute_metrics(utterances)}
-    reason = error or "no transcript text returned (still processing or no content)"
+    # A transient fetch error is always retryable; a clean-but-empty result is
+    # terminal-or-pending by age.
+    reason = f"{RETRY} {error}" if error else _empty_reason(call_date)
     return {**base, "transcript": None, "transcript_quality": UNAVAILABLE,
             "unavailable_reason": reason, "char_count": 0, **_EMPTY_METRICS}

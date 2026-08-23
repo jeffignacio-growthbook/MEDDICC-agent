@@ -889,18 +889,25 @@ def main():
             # calls ETL, which is the primary artifact.
             try:
                 from transcript_store import fetch_utterances, build_transcript_row
-                clients, rows = {}, []
+                clients, rows, deferred = {}, [], 0
                 for slug, data in calls_by_company.items():
                     for c in data.get('calls', []):
                         cid, src = str(c.get('id') or ''), c.get('source') or ''
                         if not cid or not src:
                             continue
                         utts, err = fetch_utterances(src, cid, clients)
-                        rows.append(build_transcript_row(src, cid, utts, error=err))
+                        if err:
+                            # Transient fetch failure — don't write a row; the
+                            # call is left absent so the next nightly re-attempts
+                            # it (same discipline as the backfill).
+                            deferred += 1
+                            continue
+                        rows.append(build_transcript_row(src, cid, utts, error=None,
+                                                         call_date=c.get('date')))
                 stored = sb.bulk_upsert_transcripts(rows)
                 have = sum(1 for r in rows if r.get('transcript'))
                 print(f"  ✓ Supabase: {stored} transcripts upserted "
-                      f"({have} with text, {stored - have} unavailable)")
+                      f"({have} with text, {stored - have} unavailable, {deferred} deferred)")
             except Exception as te:
                 print(f"  ⚠️  Transcript persist failed (calls unaffected): {te}")
         except Exception as e:
