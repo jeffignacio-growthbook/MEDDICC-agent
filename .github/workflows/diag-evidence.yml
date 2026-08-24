@@ -1,0 +1,24 @@
+name: Diag Component Evidence
+
+on:
+  workflow_dispatch:
+
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: Agent
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - name: Component evidence diagnostic
+        run: |
+          cd $GITHUB_WORKSPACE
+          PYTHONPATH=.:scripts:api python3 scripts/diag_component_evidence.py
