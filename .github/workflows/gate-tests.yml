@@ -7,6 +7,10 @@ on:
         description: 'Branch to test'
         required: true
         default: 'main'
+      run_smoke:
+        description: 'Run TEST 3, the live 8-question smoke test against Railway (posts to Slack). Off by default; turn on only when validating a deploy.'
+        required: false
+        default: 'false'
 
 permissions:
   contents: read
@@ -93,11 +97,19 @@ jobs:
         run: |
           python scripts/handler_generator.py --dry-run --days 30
 
+      # Opt-in: this is the only test that hits the live Railway service and
+      # posts to Slack (via the Deal Intelligence Zap). Off by default so
+      # routine gate dispatches don't post; set run_smoke=true when validating
+      # a deploy. Channel comes from the SMOKE_TEST_CHANNEL repo var (a real
+      # sandbox channel) — the script's default is an inert sandbox marker, so
+      # an unset var still cannot land in a production channel.
       - name: "TEST 3 — Full smoke test (8 questions)"
+        if: ${{ inputs.run_smoke == 'true' }}
         env:
           RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SMOKE_TEST_CHANNEL: ${{ vars.SMOKE_TEST_CHANNEL || 'sandbox-smoke-test' }}
         continue-on-error: true
         run: |
           python scripts/smoke_test.py --verbose
