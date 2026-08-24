@@ -91,11 +91,11 @@ def _progressive(rows):
 def _latest_batch(sb, deal_id):
     """Latest analyses row (batch score of record) for a deal."""
     from supabase_client import select_all
-    cols = "deal_id,created_at,overall_score,status,passed," + ",".join(_SCORE_COLS)
+    cols = "deal_id,analyzed_at,overall_score,status,passed," + ",".join(_SCORE_COLS)
     rows = select_all(sb, "analyses", columns=cols, filters=[("eq", "deal_id", str(deal_id))])
     if not rows:
         return None
-    rows.sort(key=lambda r: (r.get("created_at") or ""))
+    rows.sort(key=lambda r: (r.get("analyzed_at") or ""))
     return rows[-1]
 
 
