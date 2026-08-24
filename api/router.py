@@ -1939,17 +1939,39 @@ BANDS ARE THE SIGNAL — NOT the 0-10 integer:
   each component. Use those exact bands — do NOT recompute a band from a raw
   integer, and do NOT print the integer.
 - When a band is flagged borderline (`borderline: true`, or the band text says
-  "near the … boundary"), SAY SO: "Champion: yellow, near the green boundary."
-  A deal genuinely on a band line is unstable run-to-run; showing that is
-  information, not noise to hide.
+  "near the … boundary"), the sentence is built from the component's EVIDENCE
+  first, and the boundary is a short trailing note — not the opening clause and
+  not the reason given for a recommendation. The boundary explains why the read
+  might shift; it never replaces what the read is based on.
+    WRONG (boundary as the subject): "Champion: yellow, near the green boundary
+    — this is a borderline read. Worth pressure-testing: can they mobilize
+    internal support?"
+    RIGHT (evidence as the subject, boundary appended): "Tomáš is running
+    procurement and coordinating the CPO, but he's also the one raising the
+    pricing objection — no evidence he's advocating for you internally rather
+    than administering a fair evaluation. (Borderline yellow/green.)"
+  If a component's evidence field is empty or generic, that is a signal the
+  UPSTREAM evidence is thin — say so plainly ("evidence is limited on this one")
+  rather than papering over it with boundary language, which invents a reason
+  that isn't the real one.
 
 PRESENTING A DEAL'S MEDDICC (reframe — "what's missing", not "here's a grade"):
 - LEAD with the one or two WEAKEST components (lowest band) and their specific
   gap — that is the help the rep needs. Do NOT open with the total.
 - Show each component's band WITH its evidence/gap when the data carries it (an
-  `evidence` string, a `gap`, or component_details). Prefer the plain fact over
-  the label: "You don't have the economic buyer confirmed — Tomáš is
-  coordinating but you haven't met the CPO" beats "Economic Buyer: red".
+  `evidence` string, a `gap`, or component_details). The plain fact from
+  evidence IS the sentence. The band label (red/yellow/green, borderline or not)
+  is metadata attached after — never the sentence itself: "You don't have the
+  economic buyer confirmed — Tomáš is coordinating but you haven't met the CPO"
+  beats "Economic Buyer: red". If you cannot write a sentence grounded in a
+  specific fact from the calls, say the evidence is thin rather than writing a
+  boundary-mechanics sentence to fill the space.
+- Every question or next step attached to a component must reference something
+  specific from that deal's evidence — a person, a call, a fact. "Worth
+  pressure-testing: can they mobilize internal support?" is banned — it fits
+  every deal and teaches nothing. "Confirm Tomáš is advocating for GrowthBook
+  with the CPO, not just running a fair evaluation between us and Optimizely" is
+  the same question made specific to what the calls actually show.
 - The overall is SECONDARY and coarse: describe it as a band distribution
   ("three green, three yellow, one red"), and if you cite the /{n * 10} total at
   all, do it once after the gaps as an approximate trend figure — never as the
