@@ -46,6 +46,69 @@ def _looks_truncated(text: str) -> bool:
     # list item; anything else is a bare word with no closing punctuation.
     return True
 
+
+# Confidence floor for the correctness assessor. PROVISIONAL — this value is a
+# guess. Before this, the assessor score gated nothing: a 0.00 confabulation and
+# a 0.50 truncation both shipped. Below the floor we send an honest miss instead.
+# It is config (env-overridable, ASSESS_CORRECTNESS_FLOOR) precisely so it can be
+# retuned from the [ASSESS] score distribution after ~1 week of real traffic —
+# check whether 0.30 catches the bad answers and lets the good ones through
+# before trusting it. No retry is attached (see incident analysis: neither the
+# confab nor the truncation would have been fixed by re-synthesizing the same
+# data).
+_DEFAULT_ASSESS_FLOOR = 0.30
+try:
+    ASSESS_CORRECTNESS_FLOOR = float(os.getenv("ASSESS_CORRECTNESS_FLOOR",
+                                               _DEFAULT_ASSESS_FLOOR))
+except (TypeError, ValueError):
+    ASSESS_CORRECTNESS_FLOOR = _DEFAULT_ASSESS_FLOOR
+
+
+def _result_summary(tool_results: dict) -> str:
+    """Factual, count-only description of what a handler returned — for the
+    honest-miss message. States ONLY what the system has (row counts / empty),
+    never a guessed cause for the miss."""
+    if not tool_results:
+        return "no data came back"
+    for key in ("scores", "rows", "deals", "narratives", "analyses",
+                "objections", "results"):
+        v = tool_results.get(key)
+        if isinstance(v, list):
+            return (f"{len(v)} row{'s' if len(v) != 1 else ''} came back"
+                    if v else "no matching rows came back")
+    if tool_results.get("deal"):
+        return "one deal record came back"
+    return ("no matching data came back"
+            if not any(v for v in tool_results.values())
+            else "some data came back")
+
+
+def _below_floor(assessment: dict, floor: float = None) -> bool:
+    """Pure predicate: should this assessed answer be blocked as low-confidence?
+    Blocks only a real, low score. EXEMPT: skipped assessments (budget/honest-gap
+    short-circuits) and data_gap issues (an acknowledged gap is an honest
+    answer). Kept separate from route_question so it is unit-testable."""
+    floor = ASSESS_CORRECTNESS_FLOOR if floor is None else floor
+    a = assessment or {}
+    if a.get("skipped") or a.get("issue") == "data_gap":
+        return False
+    score = a.get("score", 0.5)
+    return isinstance(score, (int, float)) and score < floor
+
+
+def _honest_miss(handler_name: str, tool_results: dict) -> str:
+    """The below-floor reply. Only facts the system actually has: which handler
+    ran and what came back. No speculation about WHY — that is what the
+    confabulated answer did, and it was worse than saying nothing."""
+    return (
+        "I couldn't answer that reliably — my own check on the drafted answer "
+        "came back below the confidence floor, so I'm not going to send it. "
+        f"(I routed to `{handler_name}` and {_result_summary(tool_results)}.) "
+        "A confident wrong answer is worse than telling you I missed. If you "
+        "name the specific deal or company, I'll pull its MEDDICC scorecard "
+        "directly."
+    )
+
 FOLLOWUP_PRONOUNS = [
     "which of those", "which of them", "which of these",
     "of those", "of them", "of these",
@@ -1832,6 +1895,21 @@ async def route_question(question: str, user_id: str,
             max_tokens=SYNTH_MAX_TOKENS
         )
         verified = answer_resp.text.strip()
+
+    # ── 8b. Confidence floor (PROVISIONAL — see ASSESS_CORRECTNESS_FLOOR) ──
+    # The assessor score gated nothing before this: it only chose a retry path
+    # for routing-shaped issues, and the final answer shipped regardless of
+    # score. Below the floor, send an honest miss instead of a confident wrong
+    # answer. Data-gap answers are EXEMPT — the assessor's HONEST_GAP_SIGNALS
+    # path scores them ~0.9 and an acknowledged gap is an honest answer — and so
+    # are skipped assessments (budget/gap short-circuits, score 0.5-0.9).
+    if _below_floor(assessment):
+        logger.info(f"[ASSESS] below floor {ASSESS_CORRECTNESS_FLOOR:.2f}: "
+                    f"score={(assessment or {}).get('score')} "
+                    f"handler={handler_name} — sending honest miss instead "
+                    f"of the drafted answer")
+        verified = _honest_miss(handler_name, tool_results)
+        handler_name = f"{handler_name}_below_floor"
 
     # ── 9. Log learning note (win or lose) ────────────────
     _log_learning(sb, question, handler_name,
