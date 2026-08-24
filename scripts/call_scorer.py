@@ -39,7 +39,7 @@ COMPONENTS = [
 COMPONENT_KEYS = [k for _, k in COMPONENTS]
 
 # Bump when the prompt/rubric changes so a re-backfill can find stale rows.
-SCORER_VERSION = "phase1-percall-v4-cumulative"
+SCORER_VERSION = "phase1-percall-v5-cumulative"
 
 COMPONENT_LABELS = {k: label for label, k in COMPONENTS}
 
@@ -76,11 +76,20 @@ The seven components (use these exact keys):
 Return a JSON array of the component keys THIS call changes, and NOTHING else.
 Example: ["economic_buyer", "decision_process"]
 
-Be strict. MOST calls change only ONE to FOUR components. If this call only
-repeats or lightly touches something already established — without adding new
-evidence that moves the score — DO NOT include it; it will carry forward
-unchanged. A narrow call (a pricing negotiation) changes very few. An empty array
-[] is valid. Do not consider the deal's pipeline stage.
+Select a component if this call adds ANY new SPECIFIC evidence to it — even
+incrementally. Several components ACCRETE across calls: decision_criteria (each
+call may add a new requirement), decision_process (new stakeholder, new timeline
+detail), metrics (a new number), competition (a new competitor or comparison).
+Do NOT skip such a component just because an earlier call already touched it — if
+this call adds a new specific, SELECT it so its cumulative score can climb. A
+technical deep-dive typically advances decision_criteria and competition; a
+commercial/pricing call typically advances metrics, economic_buyer, and
+competition.
+
+Still be honest: if this call merely REPEATS what is already established, adding no
+new specific, do not select it — it carries forward unchanged. A truly narrow call
+changes few components; a broad discovery or technical call may change many. An
+empty array [] is valid. Do not consider the deal's pipeline stage.
 """
 
 SCORE_SYSTEM_PROMPT = """\
