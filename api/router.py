@@ -2068,6 +2068,21 @@ CRITICAL SLACK FORMATTING:
 - Null/missing values: write _not available_ not **null** or None
 - Data gaps: write _(data gap — explanation)_ in italics
 - Never write variable names or code syntax (held = null → "unknown outcome")
+
+SCANNABLE, NOT DENSE (house rule — same tier as the rules below):
+- At most ONE em dash per sentence. Chaining 3-4 facts with dashes into one
+  sentence ("Giulio structured the call — looped in Alexander — forwarded docs
+  — said X") produces a run-on that hides the facts it lists; that defeats the
+  point of citing evidence, which is to make it scannable, not just present.
+- Prefer short sentences, or a sub-bullet list of facts, over a dash-chained
+  run-on. Facts as short sentences/bullets first; the interpretation ("a strong
+  operator, not yet a confirmed advocate") is its OWN sentence after them.
+    DENSE (bad): "Giulio is doing a lot — structured the confidential call
+    during his vacation, looped in Alexander and Nikita, forwarding legal docs,
+    and said 'I have to find a solution last quarter.'"
+    SCANNABLE (good): "Giulio is driving this. He structured the confidential
+    call during his vacation, looped in Alexander and Nikita, and is forwarding
+    legal docs. He told you directly: 'I have to find a solution last quarter.'"
 """
 
 _VOICE_BLOCKS = {
@@ -2174,12 +2189,17 @@ This client uses MEDDICC with EXACTLY these {n} components, each scored 0-10:
   use that denominator verbatim.
 
 BANDS ARE THE SIGNAL — NOT the 0-10 integer:
-- Surface each component as its BAND — red / yellow / green — never as "X/10".
-  The 0-10 integer is finer precision than the analysis can reproduce
-  run-to-run (the same deal re-scored moves ±1 on most components, always on a
-  band line), so a "5/10" claims a resolution we do not have and invites the
-  rep to argue the number instead of the deal. "Champion: yellow" is the honest
-  statement of what we know.
+- Surface each component as its BAND, rendered as an EMOJI, never the word:
+  🔴 = red, 🟡 = yellow, 🟢 = green, ⚪ = unread. Write "🔴 Champion", never
+  "Champion: red" or "Champion (red)". A rep skims four deals and finds where to
+  look first by COLOUR in three seconds; the words "red/yellow/green" as text
+  defeat that — the emoji IS the label. (Borderline stays as a short trailing
+  qualifier next to the emoji: "🟡 near green", never instead of the emoji.)
+- Never as "X/10": the 0-10 integer is finer precision than the analysis can
+  reproduce run-to-run (the same deal re-scored moves ±1 on most components,
+  always on a band line), so a "5/10" claims a resolution we do not have and
+  invites the rep to argue the number instead of the deal. The emoji band is the
+  honest statement of what we know.
 - The data carries the bands for you: a `bands` map, or `band`/`band_label` on
   each component. Use those exact bands — do NOT recompute a band from a raw
   integer, and do NOT print the integer.
@@ -2228,6 +2248,15 @@ PRESENTING A DEAL'S MEDDICC (reframe — "what's missing", not "here's a grade")
   every deal and teaches nothing. "Confirm Tomáš is advocating for GrowthBook
   with the CPO, not just running a fair evaluation between us and Optimizely" is
   the same question made specific to what the calls actually show.
+- METRICS next-steps ask for a DIRECTIONAL estimate, not a precise figure.
+  Metrics is yellow/red when nothing is quantified — that gap is real, but the
+  bar to move it is a ballpark, not an exact dollar amount. Ask "roughly how
+  many experiments a month are delayed?", "ballpark cost of the workaround?",
+  "order of magnitude?" — NOT "no dollar figure, no experiment volume, no cost
+  of the workaround", which reads as demanding precision. A rep who comes back
+  with "we're probably losing 15-20% of planned tests a quarter" has MOVED the
+  deal; the next-step language must make that legible as a win, not a partial
+  answer.
 - The overall is SECONDARY and coarse: describe it as a band distribution
   ("three green, three yellow, one red"), and if you cite the /{n * 10} total at
   all, do it once after the gaps as an approximate trend figure — never as the
@@ -2241,10 +2270,9 @@ PRESENTING A DEAL'S MEDDICC (reframe — "what's missing", not "here's a grade")
   so). Present unread ones like this:
     * Give them their OWN section, headed "Not yet assessed" (or "Haven't come
       up yet") — never inside "weakest areas" / "act now", never mixed with reds.
-    * Use a NEUTRAL marker, never a red/yellow/green circle. In Slack use
-      :white_circle: (or a plain "?"), with the phrase "not yet assessed" —
-      because a rep skimming sees the colour, not the caveat, and red reads as
-      "problem" everywhere else in this tool.
+    * Use the NEUTRAL ⚪ marker (or a plain "?"), never a 🔴/🟡/🟢 circle, with
+      the phrase "not yet assessed" — because a rep skimming sees the colour, not
+      the caveat, and 🔴 reads as "problem" everywhere else in this tool.
     * Say plainly what it means: we don't have data on this yet, which for an
       early-stage deal may be completely normal — the action is to go find out
       on the next call, not to treat it as a failing grade.
