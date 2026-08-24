@@ -20,9 +20,9 @@ on:
         required: false
         default: 'false'
       scoring_mode:
-        description: 'batch (generate/evaluate) or progressive (roll up call_scores). Cutover flag; default batch.'
+        description: 'progressive (roll up call_scores) or batch (legacy generate/evaluate). Default progressive; set batch to fall back to the old scorer.'
         required: false
-        default: 'batch'
+        default: 'progressive'
 
 env:
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -38,7 +38,7 @@ env:
   TEST_MODE: ${{ github.event.inputs.test_mode || 'false' }}
   TEST_DEAL_ID: ${{ github.event.inputs.test_deal_id || '' }}
   FORCE_REANALYZE: ${{ github.event.inputs.force_reanalyze || 'false' }}
-  SCORING_MODE: ${{ github.event.inputs.scoring_mode || 'batch' }}
+  SCORING_MODE: ${{ github.event.inputs.scoring_mode || 'progressive' }}
 
 jobs:
   run-meddicc-agent:
