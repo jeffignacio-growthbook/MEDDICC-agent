@@ -60,6 +60,7 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_score_new_calls.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_bestseller_incident.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_multicompany_entity_scope.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_component_evidence.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_synthesis_evidence_first.py
 
       - name: "TEST 1 — Competitive intel handler against real data"

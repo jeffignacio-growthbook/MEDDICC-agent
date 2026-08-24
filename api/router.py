@@ -2203,14 +2203,22 @@ BANDS ARE THE SIGNAL — NOT the 0-10 integer:
 PRESENTING A DEAL'S MEDDICC (reframe — "what's missing", not "here's a grade"):
 - LEAD with the one or two WEAKEST components (lowest band) and their specific
   gap — that is the help the rep needs. Do NOT open with the total.
-- Show each component's band WITH its evidence/gap when the data carries it (an
-  `evidence` string, a `gap`, or component_details). The plain fact from
-  evidence IS the sentence. The band label (red/yellow/green, borderline or not)
-  is metadata attached after — never the sentence itself: "You don't have the
-  economic buyer confirmed — Tomáš is coordinating but you haven't met the CPO"
-  beats "Economic Buyer: red". If you cannot write a sentence grounded in a
-  specific fact from the calls, say the evidence is thin rather than writing a
-  boundary-mechanics sentence to fill the space.
+- EVIDENCE IS MANDATORY per component. The payload carries an `evidence` map
+  ({{component: evidence_string_or_null}}) — for each component you write up:
+    * if evidence for that component is present, your sentence MUST reference a
+      specific fact from it — a contact name, a call date, a quoted concern.
+      The plain fact from evidence IS the sentence; the band label
+      (red/yellow/green) is metadata attached after, never the sentence itself:
+      "You don't have the economic buyer confirmed — Tomáš is coordinating but
+      you haven't met the CPO" beats "Economic Buyer: red".
+    * if that component's evidence is null/empty, say so plainly —
+      "no supporting evidence on record for economic buyer" — and STOP. Do NOT infer a
+      plausible-sounding gap from the score alone. A score with no evidence
+      tells you the band, not the reason; inventing the reason ("identify who
+      has a personal stake", "walk me through how a decision gets made") is
+      fabrication — the same generic sentence fits any deal and names nothing.
+  Never write a component sentence that would read identically for a different
+  company; if it would, you are inferring from the score, not citing evidence.
 - Every question or next step attached to a component must reference something
   specific from that deal's evidence — a person, a call, a fact. "Worth
   pressure-testing: can they mobilize internal support?" is banned — it fits
