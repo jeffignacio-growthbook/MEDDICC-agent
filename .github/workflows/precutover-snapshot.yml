@@ -1,0 +1,68 @@
+name: Pre-Cutover Snapshot
+
+# Captures the current scoring baseline (MEDDICC scores + stage-vs-score
+# hygiene buckets + pipeline shape) BEFORE the first progressive roll-up
+# nightly. Run this once, manually, right before flipping scoring_mode to
+# progressive — Phase 5c compares the post-cutover numbers against it.
+
+on:
+  workflow_dispatch:
+
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+  HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: Agent
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Capture pre-cutover snapshot
+        run: |
+          cd $GITHUB_WORKSPACE
+          python scripts/snapshot_precutover.py
+
+      - name: Commit snapshot
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add memory/snapshots/
+          if git diff --staged --quiet; then
+            echo "No snapshot changes to commit"
+          else
+            git commit -m "Capture pre-cutover scoring snapshot [skip ci]"
+            git pull --rebase origin main || {
+              git rebase --abort
+              git pull origin main --no-rebase -X ours
+            }
+            git push
+          fi
+
+      - name: Upload snapshot artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: precutover-snapshot-${{ github.run_number }}
+          path: memory/snapshots/*
+          retention-days: 90
