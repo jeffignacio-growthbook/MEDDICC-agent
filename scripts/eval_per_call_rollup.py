@@ -139,10 +139,22 @@ def test_to_score_row():
     check("null deal_id preserved", row2["deal_id"], None)
 
 
+def test_gate():
+    print("_parse_advanced (pass-1 selection)")
+    check("array w/ dup+bogus", cs._parse_advanced('["pain","metrics","bogus","pain"]'), ["pain", "metrics"])
+    check("fenced", cs._parse_advanced('```json\n["champion"]\n```'), ["champion"])
+    check("prose-wrapped array", cs._parse_advanced('advances: ["competition","decision_process"] .'),
+          ["competition", "decision_process"])
+    check("empty array", cs._parse_advanced("[]"), [])
+    check("garbage -> []", cs._parse_advanced("no json here"), [])
+    check("object not array -> []", cs._parse_advanced('{"pain": 5}'), [])
+
+
 def run():
     test_parse()
     test_rollup()
     test_to_score_row()
+    test_gate()
     if FAILS:
         print(f"\nFAIL — {len(FAILS)} check(s): {', '.join(FAILS)}")
         return 1

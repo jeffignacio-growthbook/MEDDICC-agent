@@ -115,7 +115,9 @@ def main():
         this = {k: result["components"][k]["score"] for k in cs.COMPONENT_KEYS}
         columns.append((label, source, chars, this))
         rolled = cs.roll_up(scored)
+        adv = ",".join(result.get("advanced", [])) or "(none)"
         print(f"[{i}/{len(calls)}] {label}  source={source} ({chars} chars)  "
+              f"advanced={adv}  "
               f"this-call total={sum(v for v in this.values() if v is not None)}  "
               f"cumulative/70={cs.rollup_total(rolled)}")
 
