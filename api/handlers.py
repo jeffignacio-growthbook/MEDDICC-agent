@@ -1048,18 +1048,47 @@ async def query_rubric_scores_bulk(params: dict, sb) -> dict:
     """
     deal_ids = list(params.get("deal_ids") or [])
     resolved_from_company = False
-    if not deal_ids and params.get("company"):
-        company = str(params["company"]).strip()
-        matches = select_all(sb, "deals", columns="deal_id,company_name",
-            filters=[("ilike", "company_name", f"%{company}%")])
-        deal_ids = [d["deal_id"] for d in matches]
+    # A CRO routinely asks about several companies in one question
+    # ("Ecco, Zalando, Natera, and DEUNA"). Accept a LIST — companies /
+    # company_names — as well as the single `company`. Resolve each via ilike
+    # and UNION the deal_ids. No cap: if fifteen are named, answer about fifteen.
+    companies = []
+    for v in (params.get("companies"), params.get("company_names")):
+        if isinstance(v, str):
+            companies.append(v)
+        elif isinstance(v, (list, tuple)):
+            companies.extend(v)
+    if params.get("company"):
+        companies.append(params["company"])
+    # de-dup company strings, preserve order
+    seen_c, deduped = set(), []
+    for c in companies:
+        c = str(c).strip()
+        if c and c.lower() not in seen_c:
+            seen_c.add(c.lower())
+            deduped.append(c)
+    companies = deduped
+
+    resolved_companies = []
+    if not deal_ids and companies:
         resolved_from_company = True
+        seen_ids = set()
+        for c in companies:
+            matches = select_all(sb, "deals", columns="deal_id,company_name",
+                filters=[("ilike", "company_name", f"%{c}%")])
+            if matches:
+                resolved_companies.append(c)
+            for d in matches:
+                if d["deal_id"] not in seen_ids:
+                    seen_ids.add(d["deal_id"])
+                    deal_ids.append(d["deal_id"])
 
     if not deal_ids:
         return {"scores": [], "deal_count": 0, "scored_count": 0,
+                "queried_deal_ids": [], "queried_companies": companies,
                 "error": "No deal IDs provided and no company to resolve. "
-                         "Name a deal (e.g. 'score the Acme deal on MEDDICC') "
-                         "or ask about a specific set of deals."}
+                         "Name a deal (e.g. 'score the Acme deal on MEDDICC'), "
+                         "one or more companies, or a specific set of deals."}
 
     rows = select_all(sb, "analyses",
         columns="deal_id,company_name,overall_score,metrics_score,"
@@ -1091,9 +1120,19 @@ async def query_rubric_scores_bulk(params: dict, sb) -> dict:
         s["overall"] = _labeled_overall(s.get("overall_score"))
         s["bands"] = {c: lbl["text"] for c, lbl in
                       _meddicc_bands({c: s.get(col) for c, col in _cols.items()}).items()}
+    # Deals we looked up but that have no analysis row yet — so synthesis can say
+    # truthfully "these N were scored, these M haven't been analyzed" instead of
+    # inventing a reason (the entity-scope path was confabulating "not scored
+    # yet" / "no call activity logged" here).
+    scored_ids = {s.get("deal_id") for s in scores}
+    unscored_deal_ids = [d for d in deal_ids if d not in scored_ids]
     return {"scores": scores, "deal_count": len(deal_ids),
             "scored_count": len(scores),
             "resolved_from_company": resolved_from_company,
+            "queried_deal_ids": deal_ids,
+            "queried_companies": companies,
+            "resolved_companies": resolved_companies,
+            "unscored_deal_ids": unscored_deal_ids,
             "scale": {"overall_max": MEDDICC_OVERALL_MAX,
                       "component_max": MEDDICC_COMPONENT_MAX,
                       "note": "Surface the per-component BAND (red/yellow/green "
