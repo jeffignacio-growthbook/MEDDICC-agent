@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_006",
+  "timestamp": "2026-08-24T00:08:36.531938",
+  "company": "Livesport",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency), Criterion 3 (Decision Process scoring logic), Criterion 4 (Champion next step actionability)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: (1) 'When a competitor or stakeholder appears in prior calls, flag it as carry-forward; do not treat it as new information unless context has materially changed.' (2) 'Scoring must be internally consistent: if a process step is described as opaque/black box, score must align (5-6 range for high risk, 7+ requires concrete mitigants).' (3) 'Next steps must include: owner name, deadline, and specific ask with measurable outcome (e.g., \"schedule call\", \"get intro\", not \"explore\")'"
+}

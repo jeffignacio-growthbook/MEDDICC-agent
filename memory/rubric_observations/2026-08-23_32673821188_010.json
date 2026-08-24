@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_010",
+  "timestamp": "2026-08-23T23:48:53.044803",
+  "company": "Rula",
+  "criterion_fired": "Criterion 2 (Decision Process), Criterion 3 (Metrics), Criterion 4 (Champion), Criterion 1 (Metrics next step)",
+  "was_appropriate": true,
+  "suggested_change": "Formalize in CLAUDE.md: (1) Score revisions require explicit delta reasoning ('No new info' OR 'Call X revealed...'); (2) Unknown statuses with low scores must pair vague next steps with concrete actions; (3) Metric scores \u22654 require direct quote/paraphrase; (4) [contact TBD] placeholders must name role type after iteration 2+, e.g., '[analytics lead]' instead of generic '[contact]'."
+}

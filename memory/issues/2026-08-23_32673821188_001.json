@@ -1,0 +1,21 @@
+{
+  "company": "MVF Global",
+  "deal_id": "61615709775",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "FAIL Criterion 4 (Actionable Next Steps): All three critical next steps use '[Contact TBD]' as placeholder, which is acceptable per rubric exception for early-stage deals. However, the next steps for Decision Criteria and Decision Process both use vague language: 'ask' without specifying WHO will ask or WHEN. Rewrite as: '[Primary contact name TBD]: By 2026-08-11, ask during call: \"Of the criteria we discussed \u2014 Snowflake, statistical rigor, visual editor, cost \u2014 how are you ranking these? Is there a written evaluation checklist?\"' Similarly for Decision Process: '[Primary contact name TBD]: By 2026-08-11, ask: \"Walk us through approval sequence \u2014 who reviews contract, who gives legal sign-off, who makes final call?\"' Current phrasing 'On the next call, ask' lacks specificity on contact and concrete deadline. FAIL Criterion 2 (Carry-forward Consistency): Decision Criteria score increased from 9/10 (cumulative) to 8/10 (current) without documented reason. Analysis states 'Call 3 introduced no new decision criteria' and 'one point of incompleteness' but this contradicts the prior 9/10 score. Either maintain 9/10 with note 'No new criteria in Call 3 \u2014 maintaining previous score' OR explicitly document what new information caused the 1-point regression. Current analysis is internally inconsistent. FAIL Criterion 1 (Complete Coverage): Champion status marked as 'Partial' but score is 1/10. Per rubric, Partial status requires evidence of some progress toward identification. Score of 1/10 with language 'No named individual has been identified' and 'no champion can be confirmed' contradicts Partial status. Should be 'Unknown' status with 1/10 score, or provide evidence of partial progress (e.g., 'CRO team identified as user group, but no individual advocate named yet') to justify Partial. Current classification is contradictory.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32673821188_001",
+  "timestamp": "2026-08-23T23:39:07.405895"
+}

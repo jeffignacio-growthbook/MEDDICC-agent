@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_017",
+  "timestamp": "2026-08-24T00:29:35.012001",
+  "company": "Genius Sports",
+  "criterion_fired": "Criterion 2 (carry-forward regression), Criterion 3 (evidence threshold consistency), Criterion 4 (next steps specificity), Criterion 5 (champion downgrade contradiction)",
+  "was_appropriate": false,
+  "suggested_change": "Define explicit rules: (1) Carry-forward scores require documented contradiction to downgrade, not absence of new confirmation; (2) Evidence thresholds (e.g., quantification requirement for Metrics) must be defined at rubric setup, not applied retroactively; (3) Next steps must specify concrete questions in scoring criteria, not as agent implementation detail; (4) Score changes require citation of new contradicting evidence, not restatement of known constraints."
+}

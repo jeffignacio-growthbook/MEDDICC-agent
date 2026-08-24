@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_009",
+  "timestamp": "2026-08-24T00:15:15.644538",
+  "company": "Air Space Intelligence",
+  "criterion_fired": "Metrics (Criterion 1), Competition (Criterion 3), Decision Process & Champion (Criterion 4), Identified Pain (Criterion 4)",
+  "was_appropriate": true,
+  "suggested_change": "Criteria are appropriate but CLAUDE.md needs explicit rules: (1) Score Unknown (1\u20132/10) if prospect never states outcome metric, do not infer; (2) Next steps must include contact name or '[contact TBD]: [specific ask within timeframe]' format; (3) Define when partial credit (3\u20134/10) applies vs. unknown when ambiguity exists."
+}

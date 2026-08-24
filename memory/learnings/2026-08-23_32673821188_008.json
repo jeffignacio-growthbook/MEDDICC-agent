@@ -1,0 +1,21 @@
+{
+  "company": "InPost",
+  "deal_id": "60069831015",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "1. Decision Criteria: Score regressed from 8/10 to 5/10 without documented reason in the call itself. The analysis re-interprets prior evidence rather than citing new contradictory information from the recent call (2026-07-28). Per Criterion 2, if no new call information contradicts the prior assessment, the score should be maintained at 8/10 with a note 'No new decision criteria information in this call - maintaining previous score of 8/10.' If you believe the prior 8/10 was miscalibrated, that is a separate calibration issue, not a carry-forward violation. Revise: either restore 8/10 with carry-forward language, or provide explicit contradictory evidence from the 2026-07-28 call that justifies the downgrade. 2. Metrics: Score is 4/10 but the next step asks 'What specific business outcome or KPI would prove GrowthBook's ROI' \u2014 this is a vague exploration question. Per Criterion 4, replace with a concrete action: '[contact TBD]: Ask on next call: \"When you scale from 1-2 experiments to 50, what metric will you measure success by \u2014 experiment velocity per quarter, time-to-insight, or engineering hours freed up?\"' 3. Economic Buyer next step: 'Can we get 30 minutes on their calendar this week?' is too vague and assumes immediate availability. Revise to: '[contact TBD]: Ask on next call: \"Who signs off on $145K+ tool purchases \u2014 can you introduce us by [specific date]?\"' 4. Decision Process next step uses 'stay on track for your internal timeline' which is vague. Revise to: '[contact TBD]: Ask on next call: \"What is the exact go/no-go decision date after the POC ends?\"' 5. Champion next step: 'would they be willing to join a call' is vague. Revise to: '[contact TBD]: Ask on next call: \"Who owns the GrowthBook evaluation internally \u2014 can you name them and ask if they can join our next technical sync?\"' 6. Overall Deal Health section states 'no named contacts exist in HubSpot' but this is metadata, not evidence from calls. Criterion 3 requires evidence from calls only. Remove HubSpot reference or ground it in call evidence (e.g., 'no individual has been named across any call').",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32673821188_008",
+  "timestamp": "2026-08-23T23:47:44.828069"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_018",
+  "timestamp": "2026-08-23T23:58:14.913156",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 4 (Champion specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'When re-analyzing a component, maintain the prior assessment level unless the recent call contains explicit new information that contradicts the prior evidence. Reinterpreting scoring calibration is not grounds for regression. For Champion (Criterion 4), next steps must include: specific person name, specific action, and concrete deadline (not conditional language like 'would you be willing').' "
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_024",
+  "timestamp": "2026-08-24T00:39:02.405335",
+  "company": "Hublo",
+  "criterion_fired": "Champion scoring consistency",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'When call data does not contradict prior assessment, carry forward previous score with notation. Downgrades require documented contradictory evidence from current call, cited explicitly in the analysis body before any justification section.'"
+}

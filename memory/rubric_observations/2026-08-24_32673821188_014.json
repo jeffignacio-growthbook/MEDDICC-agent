@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_014",
+  "timestamp": "2026-08-24T00:22:52.288095",
+  "company": "JobLeads",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency)",
+  "was_appropriate": true,
+  "suggested_change": "When a stakeholder score regresses between iterations, explicitly distinguish: (1) new contradicting evidence = justified regression with citation, (2) absence of new supporting evidence = maintain or slightly lower prior score with notation 'No new activity observed; prior assessment stands pending confirmation', (3) timeline or context change = document the specific change driving re-evaluation."
+}

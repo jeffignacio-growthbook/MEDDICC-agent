@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_012",
+  "timestamp": "2026-08-23T23:51:46.179713",
+  "company": "P\u00daBLICO_DEV",
+  "criterion_fired": "Criterion 2 (Pain Assessment) and Criterion 4 (Decision Process)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2: Add explicit instruction 'If no new information contradicts a prior pain assessment across multiple calls, maintain the prior score with notation \"No change\u2014prior assessment remains valid.\" Only regress if call data actively weakens the signal (e.g., prospect deprioritizes, states lower urgency than previously implied, or identifies workaround).' Criterion 4: Require format '[Contact Name]: [Specific Action] by [Date]'\u2014vague language like 'by end of trial' without named owner and concrete date is non-compliant."
+}

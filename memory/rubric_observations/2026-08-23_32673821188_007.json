@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_007",
+  "timestamp": "2026-08-23T23:44:38.526928",
+  "company": "Trade Me",
+  "criterion_fired": "CRITERION 1-5 (Economic Buyer, Regression Tracking, Competition, Champion, Decision Process)",
+  "was_appropriate": true,
+  "suggested_change": "Rubric is sound; failures are instruction-level. CLAUDE.md needs: (1) explicit rule that scores below 6/10 require minimum N evidence points or explicit 'Unknown' acknowledgment, (2) regression template requiring explicit carry-forward state + reason, (3) evidence vs. absence distinction for competitor signals, (4) actionable next steps must include concrete dates and specific question text (not placeholders), (5) all claims must cite exact transcript location or be flagged as inference."
+}

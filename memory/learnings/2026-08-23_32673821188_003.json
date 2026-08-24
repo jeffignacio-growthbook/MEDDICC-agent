@@ -1,0 +1,21 @@
+{
+  "company": "Airalo",
+  "deal_id": "62121618183",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Economic Buyer: Prior cumulative state scored 4/10 with evidence 'James mentioned as point of contact...no explicit confirmation of budget authority'. Current analysis scores 3/10 and states 'Score maintained at 3/10 consistent with the evidence across all three calls' \u2014 but this is a regression from 4/10 without documented reason. The analysis must either: (a) maintain 4/10 and explicitly note 'No new EB information in Call 3 \u2014 maintaining previous score of 4/10', OR (b) if regressing to 3/10, explain the specific evidence from Call 3 that justified the downgrade. Currently the regression is unsupported. CRITERION 4 VIOLATION \u2014 Champion: Score is 2/10 (below 7/10) but next steps use vague language: 'Ask James directly...Are you actively building internal support' lacks a specific, concrete action. Rewrite as: '[James \u2014 next call]: Confirm internal advocacy: Ask directly \u2014 Have you presented GrowthBook to [executive name] yet, or will you do so before contract? If not, who will?' CRITERION 4 VIOLATION \u2014 Metrics: Next step uses 'ask James' without specifying contact method or timeline. Rewrite as: '[James \u2014 call this week]: Confirm current experiment baseline: How many experiments per month is the product team running today, and what is the primary bottleneck \u2014 tooling, analyst bandwidth, or prioritization?' CRITERION 3 VIOLATION \u2014 Decision Criteria: Score is 8/10 but prior cumulative state was 9/10. Analysis states 'Call 3 added migration scope detail...No new gaps introduced' \u2014 this should maintain 9/10, not regress to 8/10. If regressing, explain why. Otherwise maintain 9/10.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32673821188_003",
+  "timestamp": "2026-08-23T23:37:50.949098"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_005",
+  "timestamp": "2026-08-23T23:39:29.934507",
+  "company": "Yoto",
+  "criterion_fired": "Criterion 3 (Evidence Quality) and Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 3: 'Unverified competitors must be scored as Unknown/0 or explicitly flagged as unconfirmed; no partial scores on unvalidated competitive claims.' Criterion 4: 'Next steps must name the stakeholder, reference specific problem or objection from the call, and request a concrete action (e.g., ask X by Y method); avoid abstract phrases like \"resonate\" or \"align.\"'"
+}

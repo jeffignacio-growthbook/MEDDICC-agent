@@ -1,0 +1,21 @@
+{
+  "company": "Livesport",
+  "deal_id": "62160567676",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward inconsistency on Competition score. Cumulative state shows Competition at 7/10 with evidence limited to Optimizely, Firebase, Airship, Extreme Push. New analysis upgrades to 8/10 and adds Confidence as a 'new entrant' with detailed competitive risk assessment. However, Confidence was already mentioned in Call 4 (the most recent call in cumulative context), so this is not new information \u2014 it should have been in the previous assessment. The upgrade from 7/10 to 8/10 is justified by the Confidence detail, but the analysis must explicitly note: 'Confidence was introduced in Call 4 (most recent call in cumulative state); previous assessment did not capture this competitor detail. Upgrading from 7/10 to 8/10 to reflect complete competitive landscape.' CRITERION 4 VIOLATION \u2014 Champion next step uses vague language. Current text: 'Ask Tom\u00e1\u0161 on the next call: \"Who on your team is most excited about what unified experimentation could unlock...\"' This is exploratory, not actionable. Rewrite as: 'Contact Tom\u00e1\u0161 by [date]: Request direct introduction to BI team lead with specific ask: \"Schedule 30-minute technical validation call this week to walk through SQL metrics setup and warehouse integration.\"' CRITERION 3 VIOLATION \u2014 Decision Process score of 7/10 lacks justification for why it is not 8/10 or higher. The analysis states 'the CPO approval step remains a black box' but then scores 7/10 instead of lower. Clarify: if CPO is truly opaque (no name, no date, no criteria), the score should reflect that risk more sharply (5-6/10 range) OR the justification for 7/10 must explain why the known timeline and process steps (presentation, 14-day review, CPO gate) warrant a mid-range score despite the CPO opacity. Current reasoning is contradictory.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32673821188_003",
+  "timestamp": "2026-08-24T00:08:36.531356"
+}

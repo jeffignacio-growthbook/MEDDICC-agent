@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_010",
+  "timestamp": "2026-08-24T00:16:16.277012",
+  "company": "Ryanair",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 4 (Next steps specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Add CLAUDE.md section: 'When a component score decreases from prior call, explicitly state the contradiction found in new data. If no contradiction exists, maintain prior score with note: [Component]: [Prior Score]/10 maintained\u2014no new information contradicts prior assessment.'"
+}

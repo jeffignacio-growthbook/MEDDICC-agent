@@ -1,0 +1,21 @@
+{
+  "company": "JobLeads",
+  "deal_id": "59173115702",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Champion score regression requires explicit justification. Cumulative state shows Champion at 8/10 (Identified) with Edd Saunders as 'centralized experimentation leadership' who 'will lead the power user model adoption'. Current analysis downgrades Champion to 2/10 (Partial) citing 'no evidence of internal selling'. Per Criterion 2 (Carry-forward consistency), this regression must be documented with a specific reason from the recent calls that contradicts the prior assessment. The analysis notes 'Leadership support referenced...but no specifics on who' from Call 2, but this is insufficient to justify dropping from 8/10 to 2/10. Either: (1) provide explicit evidence from Call 2 that contradicts Edd's champion status (e.g., he stated he is NOT advocating internally), or (2) maintain Champion at 7/10 minimum and note 'No new champion activity observed in Call 2, but prior identification of Edd as implementation lead and power user champion remains valid; awaiting evidence of internal advocacy to confirm full champion status.' Additionally, Decision Process score dropped from 5/10 to 4/10 with justification tied to Optimizely lapse creating 'timeline ambiguity'. This is a valid regression with documented reason, so it passes. All other components maintain or improve scores with clear evidence. Metrics, Decision Criteria, and Identified Pain all meet Criterion 3 (evidence quality). Next steps for all sub-7/10 components meet Criterion 4 (actionable, specific contact names or [contact TBD] placeholder, concrete questions). ICP fit confirmed (25M sessions, modern data stack signals, experimentation priority). No unsupported claims detected. Competitor mapping valid (Optimizely confirmed as prior incumbent). Fix: Resolve Champion regression with explicit contradicting evidence or maintain prior score with carry-forward notation.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32673821188_008",
+  "timestamp": "2026-08-24T00:22:52.287466"
+}

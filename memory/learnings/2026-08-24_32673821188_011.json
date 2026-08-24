@@ -1,0 +1,21 @@
+{
+  "company": "Hublo",
+  "deal_id": "58897463067",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Champion score regression from 4/10 to 2/10 requires explicit documented reason in the analysis itself, not post-hoc justification. The analysis states 'prior 4/10 was inflated' but does not show what changed between the cumulative state and Call 3 to warrant the downgrade. Call 3 evidence (pricing discussion, migration plan request) actually suggests continued engagement. If no contradictory evidence exists, carry-forward rules require maintaining 4/10 and noting 'No new champion information in Call 3 \u2014 maintaining previous score of 4/10.' The current 2/10 appears to retroactively redefine the rubric rather than apply it to new call data. Correct by either: (1) restoring 4/10 with explicit note that Call 3 added no contradictory evidence, or (2) providing specific Call 3 evidence that contradicts prior champion assessment and justifies the downgrade within the analysis body, not in a separate justification paragraph.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32673821188_011",
+  "timestamp": "2026-08-24T00:39:02.404693"
+}

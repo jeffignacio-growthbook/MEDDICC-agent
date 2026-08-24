@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_003",
+  "timestamp": "2026-08-23T23:37:50.949664",
+  "company": "Airalo",
+  "criterion_fired": "Criterion 2 (Economic Buyer), Criterion 3 (Decision Criteria), Criterion 4 (Champion & Metrics)",
+  "was_appropriate": true,
+  "suggested_change": "Add instruction: 'When cumulative score remains stable with no new contradictory evidence, explicitly state [Score maintained at X/10 \u2014 no new information in this call]. When score regresses, document the specific evidence from the current call that justified the change. When score improves, cite new evidence. Never regress without explanation.'"
+}

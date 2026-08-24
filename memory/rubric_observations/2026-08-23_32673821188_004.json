@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_004",
+  "timestamp": "2026-08-23T23:39:07.406483",
+  "company": "MVF Global",
+  "criterion_fired": "Criterion 1 (Complete Coverage), Criterion 2 (Carry-forward Consistency), Criterion 4 (Actionable Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Define mutually exclusive status options\u2014'Unknown' (no progress toward identification, 1-3/10), 'Partial' (named user group or department with 4-7/10), 'Identified' (named individual with 8-10/10). Criterion 2: Require explicit rationale in rubric when scores decline between calls ('No new data' vs. 'Previous assessment was too generous'). Criterion 4: Clarify that '[Contact TBD]' satisfies specificity only if paired with concrete deadline and WHAT question to ask; 'on next call, ask' alone is insufficient."
+}

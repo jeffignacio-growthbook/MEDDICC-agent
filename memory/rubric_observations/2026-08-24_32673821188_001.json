@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_001",
+  "timestamp": "2026-08-24T00:01:56.049886",
+  "company": "Zoro",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 2 (Decision Criteria), Criterion 4 (Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Add CLAUDE.md rules: (1) Score regression requires documented contradiction; maintain scores with carry-forward notes if no new conflicting data; (2) All next steps must follow '[Named Contact or TBD]: [Action Verb] + [Specific Question]' format with date/context; (3) Ambiguities flagged but unresolved should explicitly state what evidence would resolve them."
+}

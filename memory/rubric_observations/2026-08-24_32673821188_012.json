@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_012",
+  "timestamp": "2026-08-24T00:19:21.977026",
+  "company": "Square Enix, Inc.",
+  "criterion_fired": "CRITERION 4 - Actionable next steps",
+  "was_appropriate": true,
+  "suggested_change": "Next steps must include either [identified contact name] or explicit instruction to resolve '[contact TBD]' on immediate next call; conversational prompts must be specific asks (e.g., 'ask X' or 'propose Y and request Z') rather than open-ended questions like 'Would it make sense to...'"
+}

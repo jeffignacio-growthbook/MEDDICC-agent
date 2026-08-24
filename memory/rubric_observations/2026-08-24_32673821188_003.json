@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_003",
+  "timestamp": "2026-08-24T00:03:28.799951",
+  "company": "Skyscanner",
+  "criterion_fired": "Champion score regressed without contradictory evidence; Economic Buyer score undershoots available signals",
+  "was_appropriate": true,
+  "suggested_change": "Criterion should require: 'Score change must be justified by new contradictory evidence in current calls, not absence of confirmation. Maintain prior score if no new negative data contradicts it.'"
+}

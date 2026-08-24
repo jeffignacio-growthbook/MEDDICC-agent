@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_001",
+  "timestamp": "2026-08-23T23:35:28.442276",
+  "company": "mountain",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 5 (No unsupported claims)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'Do not revise prior-iteration scores without naming the specific call quote that contradicts prior evidence. If new data is absent, preserve prior score and note: \"Carry-forward from [prior iteration]; no contradictory evidence in recent calls.\" Score justification must directly reference the criterion threshold it claims to meet.'"
+}

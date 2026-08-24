@@ -1,0 +1,21 @@
+{
+  "company": "Taskrabbit",
+  "deal_id": "60652001696",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 5,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Champion score downgrade from 5/10 to 3/10 lacks documented reason from recent call. Rubric Criterion 2 (Carry-forward consistency) requires that if a component regresses, the analysis must document the specific call evidence that contradicts prior assessment. The Aug 11 call is a product demo with no champion-specific content. The analysis states 'score of 3/10 reflects a fresh read' but does not cite a call statement that actively contradicts Sean's prior 5/10 status. Either: (1) restore score to 5/10 with note 'No new champion information in Aug 11 call \u2014 maintaining previous assessment of 3/10 based on lack of documented internal advocacy across all six calls,' OR (2) cite a specific Aug 11 statement that downgrades Sean's champion status. Additionally, Decision Criteria score dropped from 9/10 to 8/10 without explicit justification tied to recent call content \u2014 clarify whether this is a fresh reassessment or a carry-forward with noted gap. Metrics status changed from 'identified' to 'partial' \u2014 confirm this reflects actual call evidence or revert to 'identified' per cumulative state.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32673821188_001",
+  "timestamp": "2026-08-24T00:02:15.158871"
+}

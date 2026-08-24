@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_022",
+  "timestamp": "2026-08-24T00:36:26.127809",
+  "company": "TRR Trygghetsr\u00e5det",
+  "criterion_fired": "Criterion 2 (Decision Process), Criterion 3 (Metrics), Criterion 4 (Competitive Alternatives), Criterion 1 (Identified Pain)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 must explicitly distinguish 'timeline slip' (no score penalty) from 'process structure unknown' (score penalty). Criterion 3 must set quantitative floor: state constraints on volume = 4-5/10 baseline, not 3/10. Criterion 4 must define 'actionable next step' as question specific to proven competitor set, not generic discovery. Criterion 1 must require explicit statement in evidence section of 'urgency absent' or 'urgency quantified as X,' not inference."
+}

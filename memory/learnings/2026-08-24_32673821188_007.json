@@ -1,0 +1,21 @@
+{
+  "company": "Square Enix, Inc.",
+  "deal_id": "58373987402",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "1. CRITERION 1 - Metrics: Score reduced from 6/10 to 5/10 in analysis but evidence quality issue remains. No direct quote showing prospect stated a specific improvement target (e.g., 'lift CTR from 5% to 7%'). Score of 5/10 is appropriate but next step is vague: 'ask' without specific contact or concrete phrasing. Revise to: '[contact TBD]: Ask on next call: What revenue impact would a 1-2 point CTR improvement deliver, and what's your year-one experimentation target?' 2. CRITERION 2 - Carry-forward consistency: Identified Pain regressed from 7/10 to 5/10. Analysis justifies this (early exploration, unconfirmed 400 experiments, no urgency stated), which is acceptable, but the justification should explicitly state 'Call 2 evidence contradicts prior urgency assessment' rather than implying prior score was inflated. Wording is acceptable as-is. 3. CRITERION 4 - Actionable next steps: Economic Buyer next step uses '[contact TBD]' placeholder, which is acceptable per rubric exception for early-stage deals with no identified contacts. However, Champion next step ('Would it make sense for us to put together a comparison document...') is too open-ended. Revise to: '[contact TBD]: Propose creating GrowthBook vs. Adobe Target one-pager and ask: Who internally should we send this to, and would you be willing to champion this evaluation with your team?' 4. CRITERION 3 - Evidence quality: Competition score of 6/10 is supported but prior cumulative state showed 8/10. Analysis explains regression (Adobe demo pending, no competitive depth), which is valid. However, note that 'Adobe Target' is not in the standard competitive set (LaunchDarkly, Statsig, EPPO, Datadog, Optimizely, homegrown). Adobe Target is a valid competitor for experimentation but should be flagged as outside primary set. This does not fail the criterion but should be noted. 5. CRITERION 5 - No unsupported claims: ICP fit check\u2014Square Enix has 27 websites with up to 27M monthly traffic (strong scale signal) and is actively pursuing A/B testing (experimentation priority evident). ICP fit is solid. No disqualifiers present. Analysis passes this criterion.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32673821188_007",
+  "timestamp": "2026-08-24T00:19:21.976392"
+}

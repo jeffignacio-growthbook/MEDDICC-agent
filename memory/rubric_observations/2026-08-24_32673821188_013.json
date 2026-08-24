@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_013",
+  "timestamp": "2026-08-24T00:20:23.412894",
+  "company": "Dassault Syst\u00e8mes",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 4 (Next Steps Specificity)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: 'Scores regress only if current call explicitly contradicts prior assessment (not merely silent on prior topics). Silence = carry-forward + note \"uncontradicted.\"' Criterion 4: 'Next steps must include [contact name or TBD], concrete action verb (Schedule/Email/Call), and deadline. Vague verbs (ask, discuss) insufficient without these three elements.'"
+}

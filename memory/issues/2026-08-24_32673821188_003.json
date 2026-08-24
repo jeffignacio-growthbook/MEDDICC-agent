@@ -1,0 +1,21 @@
+{
+  "company": "ASAPP",
+  "deal_id": "62756829850",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 2 (Carry-forward consistency): Metrics, Decision Criteria, Decision Process, Identified Pain, and Champion all show unexplained score reductions from cumulative state without documented contradictions. Criterion 2 requires: 'Identified or Partial components must remain at that level unless the recent call contradicts them.' The analysis notes 'Per evaluator guidance, this score is revised to X/10' but the evaluator rubric does NOT authorize downward revision of scores based on 'locked scores' \u2014 it requires carry-forward consistency or documented contradictions. Metrics dropped 5\u21924, Decision Criteria 7\u21925, Decision Process 7\u21924, Identified Pain 8\u21926, Champion 3\u21921 without call evidence contradicting prior assessments. Call 2 actually reinforces prior findings ('plan to scale to dozens' confirms pain; NDA gate confirms decision process exists). These reversions violate Criterion 2. Criterion 4 (Actionable next steps): All next steps for components below 7/10 use '[contact TBD]' placeholder, which is acceptable per rubric exception for early-stage deals. However, the 'Identify and name the primary contact' critical next step uses vague language: 'Send a message in the Slack channel today' lacks a specific action verb and concrete question. Rewrite as: '[contact TBD]: Confirm primary contact name and title in Slack by EOD \u2014 ask: Who should we address POC coordination and next steps to?' Criterion 3 (Evidence quality): ICP Fit section claims 'warehouse-native architecture fit' but no specific warehouse type (Snowflake/BigQuery/Redshift) is named \u2014 only 'data warehouses' mentioned generically. Per rubric: 'FAIL if warehouse-native requirement not noted when Snowflake/BigQuery/Redshift mentioned.' The analysis should flag this as unknown, not implied. Fix: Change 'Implied' to 'Unknown \u2014 warehouse type not specified' in ICP table.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32673821188_003",
+  "timestamp": "2026-08-24T00:08:05.871357"
+}

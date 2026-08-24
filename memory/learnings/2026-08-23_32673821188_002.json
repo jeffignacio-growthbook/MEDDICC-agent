@@ -1,0 +1,21 @@
+{
+  "company": "Picnic Technologies",
+  "deal_id": "60217095483",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 7,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Metrics component: Score revised from 5/10 to 4/10 without explicit justification for downward revision in the analysis text itself. The note states 'This is revised to 4/10 because...' but this appears as a post-hoc explanation rather than integrated evidence. The analysis must show within the Evidence section why the score dropped, not just state it. CRITERION 2 FAILURE \u2014 Champion component: Score dropped from 8/10 to 4/10. The analysis acknowledges this is a 'downward revision' and provides reasoning ('no internal selling behavior documented'), but this contradicts carry-forward rules. If cumulative state showed 8/10 based on prior calls, and recent calls (July 20, July 29) contain no new contradictory evidence of Stefan actively selling internally, the score should remain 8/10 with explicit note: 'No new champion activity documented in recent calls \u2014 maintaining 8/10 based on prior relationship and multi-call attendance.' The revision is justified only if a recent call explicitly contradicts prior champion status (e.g., Stefan says 'I am not presenting this to leadership'). The analysis does not show such contradiction. CRITERION 4 FAILURE \u2014 Metrics next step uses vague language: 'target this question in the next weekly check-in before August 8' lacks specificity on who will ask and when. Should be: 'Stefan or Danilo: Ask in next weekly check-in (scheduled [date]): What is your current experiment run rate...' CRITERION 4 FAILURE \u2014 Champion next step: 'Ask Stefan directly in the next check-in' lacks scheduled date/time. Should specify: 'Stefan: Ask in next weekly check-in (scheduled [date]): Are you presenting the business case to leadership...' CRITERION 5 FAILURE \u2014 Decision Criteria score of 7/10 claims 'Xavi confirmed several of these features already exist in GrowthBook' but this is seller-confirmed, not prospect-confirmed. The evidence should clarify whether Xavi (prospect) confirmed fit or whether GrowthBook confirmed features. Reword to: 'Xavi confirmed GrowthBook has front-end targeting, rule engines, centralized attributes, and campaign managers; however, no formal evaluation scorecard or weighting has been shared.' CRITERION 3 FAILURE \u2014 Competition section: Evidence states 'No competitors were explicitly mentioned' but this is absence of evidence, not evidence of absence. The next step asks the right question but the status should remain Unknown (correct) with score 1/10 (correct), but the Evidence section should note: 'Picnic has not mentioned evaluating alternatives, internal tools, or competing vendors across seven calls. This gap must be closed before business case finalization.' Current phrasing is too passive.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32673821188_002",
+  "timestamp": "2026-08-23T23:36:39.388753"
+}

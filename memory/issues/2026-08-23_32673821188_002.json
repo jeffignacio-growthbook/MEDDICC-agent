@@ -1,0 +1,21 @@
+{
+  "company": "OpenTable",
+  "deal_id": "58939926620",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 7,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Metrics component missing explicit statement on evidence availability. Score 4/10 is present but analysis states 'no quantifiable outcomes...were stated' without explicitly confirming this absence satisfies the 'evidence or explicit statement that none exists' requirement. Rewrite Metrics evidence section to explicitly state: 'No prospect-stated success metrics, ROI targets, or improvement benchmarks exist in any call. This absence is documented and intentional.' CRITERION 3 FAILURE \u2014 Champion score downgraded from 9/10 (cumulative) to 4/10 in Call 8 analysis without sufficient evidence of regression. Analysis claims 'Federico transitioned from active internal selling (Calls 1\u20135) to coordination role (Calls 6\u20138)' but provides no direct quotes from Calls 6\u20138 showing loss of advocacy. Calls 6\u20138 summaries do not include Federico statements proving he stopped selling internally. If no new information exists in Calls 6\u20138, carry-forward rule requires maintaining 9/10 with note 'No new champion information in Calls 6\u20138; maintaining prior score.' If regression is claimed, provide specific evidence (quote or paraphrase) from recent calls proving Federico no longer advocates. CRITERION 4 FAILURE \u2014 Champion next step #3 uses vague language: 'Listen specifically for ownership language...Absence of ownership language is a red flag' is exploratory, not actionable. Rewrite as: 'Ask Forrest Rice: Who on your team owns resolving the top 2\u20133 POC blockers, and what's their timeline for each?' CRITERION 5 FAILURE \u2014 Decision Criteria score changed from 8/10 to 7/10 based on SSO ambiguity in Call 8, but analysis does not explain why SSO introduction constitutes a regression rather than new information. If SSO was not mentioned in prior calls, adding it is new information, not a carry-forward violation. Clarify: Is SSO a new requirement that changes the criteria set, or was it always part of criteria and only now surfaced as 'optional but may be required'? If new, explain why this downgrades confidence rather than simply adding a criterion. If pre-existing, maintain 8/10 and note SSO clarification as a next step.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32673821188_002",
+  "timestamp": "2026-08-23T23:51:00.320119"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_006",
+  "timestamp": "2026-08-23T23:42:25.924077",
+  "company": "Deel",
+  "criterion_fired": "CRITERION 2 (Economic Buyer carry-forward inconsistency)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion is appropriate; instruction gap is that CLAUDE.md should explicitly require: 'For first engagement call, state: \"First [Company] call \u2014 carry-forward rules do not apply. Scoring based solely on [call date] evidence.\" in the EB section before scoring.'"
+}

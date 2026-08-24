@@ -1,0 +1,21 @@
+{
+  "company": "CFI Global",
+  "deal_id": "61024408734",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "FAIL: Metrics score downgraded from 8/10 to 5/10 without explicit justification for the regression. Rubric Criterion 2 (Carry-forward consistency) requires that when a component regresses, the analysis must document the reason. The analysis states 'The prior cumulative score of 8/10 was carried forward from Calls 1\u20133 without sufficient grounding' \u2014 but this is a retroactive critique of prior analysis, not a documented reason for downgrade in THIS analysis. If the prior 8/10 was incorrect, that should have been flagged then. If Call 4 contradicts the prior evidence, that contradiction must be explicitly named (e.g., 'Call 4 revealed no new quantified metrics, contradicting the prior assessment'). As written, the downgrade appears to rewrite history rather than respond to new information. FAIL: Champion score of 1/10 is correct, but the framing 'At this stage of evaluation...the absence of a named champion is expected rather than alarming' contradicts the rubric requirement that components below 7/10 need actionable next steps. The next steps provided are appropriate, but the preamble minimizes the risk when the score itself (1/10) should drive urgency. FAIL: Decision Process score of 5/10 is justified by the timeline slip, but the analysis does not explicitly state whether this is a carry-forward violation or a legitimate response to new Call 4 data. The prior cumulative state showed Decision Process at 9/10 with a clear July-September timeline. Call 4 explicitly contradicts this ('Decision shifted to Q4 or early Q1'). The analysis correctly identifies this as 'a documented contradiction, not a carry-forward error' \u2014 this is good \u2014 but should have stated upfront: 'Prior score of 9/10 is no longer valid due to explicit timeline reversal in Call 4; revised to 5/10 because revised process is now only partially known.' PASS: All components have status, score, and evidence. PASS: Evidence quality is strong with direct quotes. PASS: Next steps are specific and actionable with named actions and questions. PASS: No unsupported claims about champion advocacy or EB budget authority. PASS: ICP fit not claimed; no disqualifiers noted.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32673821188_010",
+  "timestamp": "2026-08-24T00:35:43.172867"
+}

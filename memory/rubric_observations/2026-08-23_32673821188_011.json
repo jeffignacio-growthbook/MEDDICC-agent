@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_011",
+  "timestamp": "2026-08-23T23:51:00.320719",
+  "company": "OpenTable",
+  "criterion_fired": "Criterion 3 (Champion), Criterion 5 (Decision Criteria)",
+  "was_appropriate": false,
+  "suggested_change": "Add explicit rules: (1) Score carry-forward rule: 'If no new champion statements exist in current call, maintain prior score; only downgrade if direct evidence of advocacy loss or role change is present in call transcript.' (2) Decision Criteria evolution rule: 'Score downgrades only when requirements are *removed* or *contradicted*, not when clarified or newly surfaced. New optional criteria = contextual note, not score regression.' (3) Metrics evidence rule: 'Explicit absence statement must appear in analysis verbatim; 'no metrics stated' alone does not satisfy criterion without confirmation phrase.'"
+}

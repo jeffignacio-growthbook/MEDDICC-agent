@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_019",
+  "timestamp": "2026-08-24T00:32:11.394499",
+  "company": "Catena Media",
+  "criterion_fired": "Criterion 2 (Carry-forward logic) + Criterion 3 (Urgency consistency) + Criterion 1 (Evidence thresholds)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Carry-forward means maintain prior score ONLY if explicitly documented as 'no new call data'; if new call data exists, re-evaluate from scratch with new evidence. (2) Scores 2-5 on 1-10 scale require proportional evidence, not threshold minimums. (3) 'Partial' Decision Criteria (4/10) is valid with mixed evidence; remove requirement for 'substantive' threshold."
+}

@@ -1,0 +1,21 @@
+{
+  "company": "Trade Me",
+  "deal_id": "54956375177",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 5,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Economic Buyer component is incomplete. Score revised to 4/10 but no evidence provided to support the new score. The analysis states 'An unnamed CTO was referenced in February as having approved the POC trial. That is the only signal of executive budget authority across six calls' \u2014 this is a single data point, not sufficient evidence for a 4/10 score. Either provide additional evidence from the calls to justify 4/10, or acknowledge that the score should be lower (e.g., 2/10 Unknown). CRITERION 2 FAILURE \u2014 Economic Buyer regressed from 8/10 (cumulative state) to 4/10 without explicit carry-forward analysis. The analysis correctly identifies that the prior 8/10 was unsupported, but does not state 'Revising from 8/10 to 4/10 because cumulative state was inflated and contradicted by call evidence' \u2014 it should explicitly acknowledge the regression reason. CRITERION 3 FAILURE \u2014 Competition score of 3/10 lacks evidence quality. The analysis correctly identifies that Optimizely and LaunchDarkly were mentioned by GrowthBook rep, not the prospect. However, it then concludes 'No active head-to-head evaluation has been mentioned' without confirming whether GrowthBook is the sole vendor under consideration. The next step asks 'are you evaluating any other platforms alongside GrowthBook' \u2014 this confirms the evidence gap. A 3/10 score requires at least one concrete signal; absence of mention is not evidence. CRITERION 4 FAILURE \u2014 Champion component (5/10 Partial) lacks actionable next steps with specific contact names and concrete questions. Next steps say 'Schedule a 30-minute call with Brian Wang by [specific date]' \u2014 [specific date] is a placeholder, not a concrete date. Also, 'Ask Brian: Who else internally needs to be convinced' is vague. Rewrite as: 'Schedule 30-minute call with Brian Wang by [end of week]: Ask specifically, What internal stakeholders beyond you and the CTO need to approve this decision, and can we schedule time with them before [date]?' CRITERION 5 FAILURE \u2014 Decision Process section claims 'Brian Wang explicitly stated this was an investigation phase following a successful POC, indicating serious progression toward a buying decision' \u2014 but the May 20 call summary does not contain this quote. The May 20 summary states 'Brian Wang appeared to lead the Trade Me group' and discusses pain points, but does not include the quoted statement. Remove unsupported claim or provide exact quote from call transcript.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32673821188_006",
+  "timestamp": "2026-08-23T23:44:38.526343"
+}

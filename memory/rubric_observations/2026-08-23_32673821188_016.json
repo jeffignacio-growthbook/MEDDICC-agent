@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_016",
+  "timestamp": "2026-08-23T23:56:59.875250",
+  "company": "Chaos",
+  "criterion_fired": "Criterion 2 (Decision Criteria), Criterion 3 (Competition), Criterion 4 (Identified Pain), Criterion 1 (Metrics)",
+  "was_appropriate": false,
+  "suggested_change": "Rewrite rubric to define: (1) regression tolerance\u2014explicitly allow score maintenance if no contradictory evidence, not just absence of positive evidence; (2) competition scoring\u2014require 1/10 for unnamed/vague competitors, not 4/10; (3) next-step completeness\u2014define 'specific, concrete question' with examples; (4) evidence completeness\u2014separate 'score justification' from 'evidence narrative' to prevent circular logic on quantified metrics."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_008",
+  "timestamp": "2026-08-23T23:45:20.705874",
+  "company": "Notion",
+  "criterion_fired": "Criterion 2 (carry-forward regression), Criterion 3 (champion evidence), Criterion 4 (next steps specificity)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2 should require: 'Score regression only if call transcript contains new negative information contradicting prior assessment; silence/absence of new positive data alone does not justify downgrade. Notation: \"No new information\u2014maintaining [prior score].\"' Criterion 3 should require: 'Champion score reflects only on-call or documented evidence of internal advocacy; absence of new advocacy mentions does not reduce score unless prior calls showed active advocacy that has now stopped.' Criterion 4 should require: 'Next steps must include: [Contact name]: [Specific question] by [date]; avoid vague directives like \"ask directly\" without question structure.'"
+}

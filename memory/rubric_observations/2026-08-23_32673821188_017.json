@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_017",
+  "timestamp": "2026-08-23T23:57:36.593826",
+  "company": "Taxfix",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) \u2014 Decision Criteria, Decision Process, Champion",
+  "was_appropriate": false,
+  "suggested_change": "Carry-forward rule: Score drops only if prospect contradicts prior information. If no new information exists, carry forward prior score with explicit note 'unvalidated.' Absence of evidence \u2260 evidence of regression. Example: 'Champion authority 8/10 (February); internal advocacy unvalidated (no April evidence) \u2014 maintain 8/10 with caveat' rather than dropping to 2/10."
+}

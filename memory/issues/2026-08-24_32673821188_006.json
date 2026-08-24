@@ -1,0 +1,21 @@
+{
+  "company": "Dassault Syst\u00e8mes",
+  "deal_id": "60853753009",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward consistency broken. Decision Criteria and Identified Pain both regressed from 8/10 and 7/10 (cumulative state) to 5/10 in this analysis, with justification that 'locked score per final scoring instruction' overrides carry-forward rules. This is invalid. The rubric states carry-forward rules apply unless recent call contradicts prior assessment. The July 9 call does NOT contradict the eight technical criteria (warehouse-native, BigQuery, SSO, Drupal, SDKs, all-in-one, self-hosting, privacy) or the four pain points (personalized journeys, BigQuery costs, marketer/developer balance, segmented targeting). The July 9 call simply does not mention them \u2014 which is not contradiction. Per Criterion 2, unchanged components must maintain prior scores with explicit note 'No new information \u2014 maintaining previous assessment.' Decision Criteria should remain 8/10 with note that June criteria stand uncontradicted. Identified Pain should remain 7/10 with same reasoning. CRITERION 4 VIOLATION \u2014 Next steps for Decision Criteria and Identified Pain use vague language: 'ask' without specific contact action verb. Example: 'ask the prospect directly: When your team sits down...' lacks concrete action (e.g., 'Schedule call with [contact TBD] by Sept 5 to ask'). Rewrite as: '[contact TBD]: Schedule evaluation framework discussion by Sept 5 \u2014 ask: When your team evaluates GrowthBook versus alternatives, what are the two or three must-haves?' CRITERION 1 \u2014 All components present with status and score; evidence provided for all. CRITERION 3 \u2014 Evidence quality acceptable; Optimizely confirmed in competitive set; no seller-stated ROI claimed. CRITERION 5 \u2014 No unsupported claims; ICP fit not explicitly confirmed but not disqualified (BigQuery, personalization, experimentation signals present; no explicit disqualifiers). Fix: Restore Decision Criteria to 8/10 and Identified Pain to 7/10 with carry-forward notes, and rewrite next steps with concrete action verbs and contact/deadline specificity.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32673821188_006",
+  "timestamp": "2026-08-24T00:20:23.412270"
+}

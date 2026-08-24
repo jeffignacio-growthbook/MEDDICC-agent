@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_018",
+  "timestamp": "2026-08-24T00:31:16.609578",
+  "company": "Stone",
+  "criterion_fired": "Criterion 1, 2, 3, 4 (carry-forward regression pattern)",
+  "was_appropriate": true,
+  "suggested_change": "Add instruction: 'When a cumulative MEDDICC score exists from prior calls, maintain that score unless the new call provides explicit contradicting evidence. Document any score change as: [Prior score: X/10 based on Y. New score: Z/10 because new call shows Z (contradiction).] If no contradiction, state: Maintaining X/10\u2014no contradicting evidence in this call.'"
+}

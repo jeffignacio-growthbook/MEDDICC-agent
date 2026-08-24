@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_021",
+  "timestamp": "2026-08-24T00:35:43.173516",
+  "company": "CFI Global",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and implicit urgency framing for low scores",
+  "was_appropriate": true,
+  "suggested_change": "Add rule: 'When a component score drops >2 points from prior cumulative, explicitly state whether cause is (a) prior analysis error flagged now, (b) new contradictory evidence from current call, or (c) incomplete prior grounding. For scores below 7/10, lead with risk level before contextual framing.'"
+}

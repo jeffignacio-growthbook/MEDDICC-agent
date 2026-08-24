@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_015",
+  "timestamp": "2026-08-24T00:27:05.720694",
+  "company": "Perplexity AI",
+  "criterion_fired": "Criterion 2 (Decision Criteria), Criterion 3 (Economic Buyer), Criterion 4 (Identified Pain), Criterion 1 (Metrics)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Explicitly define whether score downgrades are allowed mid-call and require documented evidence of prior assessment error, or if new buyer-stated criteria create additive scoring layers without regression. Criterion 3: Remove ambiguity between 'demonstrated' (agent interpretation) and 'confirmed' (buyer statement)\u2014require only buyer-explicit signals. Criterion 4: Replace 'surface' and exploratory framing with required concrete next-step question templates. Criterion 1: Define scoring floor (1/10 = Unknown vs. 3/10 = Minimal); clarify evidence density threshold per score level."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_009",
+  "timestamp": "2026-08-23T23:47:44.828636",
+  "company": "InPost",
+  "criterion_fired": "Criterion 2 (Decision Criteria), Criterion 3 (Economic Buyer), Criterion 4 (Metrics)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: (1) Score carry-forward rule: 'If no new contradictory evidence appears in the current call, maintain prior score and explicitly state this.' (2) Next steps must be concrete and contact-specific, never vague exploration. Format: '[contact name/TBD]: Ask on next call: [specific question with measurable outcome].' (3) Deal health assessment must cite only call evidence, never CRM metadata\u2014ground all claims in transcript or customer statements."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_004",
+  "timestamp": "2026-08-24T00:06:27.703600",
+  "company": "Box",
+  "criterion_fired": "Criterion 2 (Decision Criteria), Criterion 3 (Metrics), Criterion 4 (Champion Next Step), Criterion 5 (ICP Fit)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Define 'regression' explicitly\u2014reinterpretation of existing evidence without new contradictory call data should not trigger downgrade; require new contradictory statement from prospect to justify score reduction. Criterion 3: Establish quantitative rubric\u2014Unknown/1\u20132 when zero prospect-stated metrics exist, Partial/5 only when prospect hints at value but doesn't quantify, Identified/8+ only when prospect explicitly states outcome targets. Criterion 4: Require actionable next step (owner + deadline + specific ask), not observations. Criterion 5: Distinguish 'prospect-confirmed fit' from 'seller positioning + ICP alignment'; score 'Confirmed' only when prospect validates fit explicitly, otherwise score 'Likely' or 'Aligned'."
+}

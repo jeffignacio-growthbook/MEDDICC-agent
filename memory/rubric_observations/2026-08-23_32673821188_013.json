@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_013",
+  "timestamp": "2026-08-23T23:52:49.983915",
+  "company": "Jusbrasil Test",
+  "criterion_fired": "Criterion 2: Carry-forward consistency",
+  "was_appropriate": false,
+  "suggested_change": "Clarify whether score changes are permitted when the same call transcript is analyzed with greater depth/detail in a fresh iteration, or whether 'new information' must come exclusively from temporally later calls. Current wording creates a logical trap: if detailed re-analysis of the same call is forbidden, it prevents the agent from correcting analysis errors; if it is allowed, the criterion cannot distinguish between legitimate deeper analysis and arbitrary reinterpretation."
+}

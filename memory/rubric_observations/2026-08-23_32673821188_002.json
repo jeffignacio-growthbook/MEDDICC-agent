@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_002",
+  "timestamp": "2026-08-23T23:36:39.389351",
+  "company": "Picnic Technologies",
+  "criterion_fired": "Criterion 1 (Metrics), Criterion 2 (Champion), Criterion 4 (Next Steps), Criterion 5 (Decision Criteria), Criterion 3 (Competition)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: (1) Score revisions require explicit contradictory evidence in recent calls, not absence of reinforcing evidence; (2) Next steps must include actor name, question text, and scheduled date/time; (3) Prospect-confirmed vs. seller-confirmed distinctions must be explicit; (4) Absence of evidence should be flagged as a gap, not treated as neutral status."
+}

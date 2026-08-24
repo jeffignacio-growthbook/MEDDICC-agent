@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_005",
+  "timestamp": "2026-08-24T00:08:05.871954",
+  "company": "ASAPP",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 3 (Evidence quality)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Clarify whether 'locked scores' can be revised downward if agent re-evaluates with same data, or only with contradicting new call evidence. Criterion 3: Replace 'FAIL if warehouse-native requirement not noted' with 'Mark as Unknown if warehouse type unspecified in calls' to avoid penalizing missing customer data."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_020",
+  "timestamp": "2026-08-24T00:32:26.163701",
+  "company": "Route",
+  "criterion_fired": "Criterion 2: Carry-forward state integrity",
+  "was_appropriate": true,
+  "suggested_change": "Clarify: 'Scores must not regress between iterations unless new call data explicitly contradicts the prior assessment. Re-calibration of scoring standards mid-analysis is only valid if the agent documents (a) which standard changed and (b) why the old evidence no longer meets that standard. Unexplained downgrades = violation.'"
+}

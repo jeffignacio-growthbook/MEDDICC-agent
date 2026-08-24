@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_008",
+  "timestamp": "2026-08-24T00:12:12.406614",
+  "company": "BESTSELLER",
+  "criterion_fired": "Criterion 2 (Economic Buyer), Criterion 3 (Competition), Criterion 4 (Next Steps)",
+  "was_appropriate": true,
+  "suggested_change": "Rubric criteria are appropriate; gaps are in CLAUDE.md execution instructions around: (1) documenting score regressions with explicit contradicting evidence, (2) aligning confidence scores to evidence quality (unknown \u2260 1/10), (3) requiring specific, measurable next steps with owners and dates, (4) explicitly noting carry-forward corrections vs. new information."
+}

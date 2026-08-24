@@ -1,0 +1,21 @@
+{
+  "company": "Air Space Intelligence",
+  "deal_id": "62725080086",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Metrics score 5/10 lacks direct evidence of prospect-stated outcome metrics. The analysis correctly notes that $67,500 is a cost input, not a value metric, but then scores 5/10 without a quote or paraphrase showing the prospect articulated any success measure (e.g., 'deployment frequency', 'compliance incidents reduced'). Either score must drop to 1-2/10 (Unknown) or evidence must be added showing prospect stated a measurable outcome. CRITERION 3 FAILURE \u2014 Competition scored 6/10 but the 'cheaper competitors' phrase is unattributed and unconfirmed. The analysis acknowledges ambiguity but scores anyway. Either provide a direct quote from Call 2 or score Competition as Partial (3-4/10) pending clarification. CRITERION 4 FAILURE \u2014 Decision Process (4/10) and Champion (1/10) lack actionable next steps with specific contact names or '[contact TBD]' placeholders. Current next steps say 'Ask the primary contact (name unknown)' \u2014 this violates the requirement for contact name or '[contact TBD]' format. Rewrite as '[contact TBD]: Confirm security and legal review owner names and request introductions within 2 business days.' CRITERION 4 FAILURE \u2014 Identified Pain next step uses 'What happens if...' framing but does not ask a concrete question about urgency trigger or consequence. Rewrite as '[contact TBD]: Confirm compliance deadline or contract renewal date driving September timeline \u2014 what is the cost of staying fragmented past that date?'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32673821188_005",
+  "timestamp": "2026-08-24T00:15:15.643916"
+}

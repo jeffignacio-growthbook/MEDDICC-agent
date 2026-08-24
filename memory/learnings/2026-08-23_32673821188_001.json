@@ -1,0 +1,21 @@
+{
+  "company": "mountain",
+  "deal_id": "60868340629",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 6,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 2 (Carry-forward consistency): Metrics score revised from 8/10 to 6/10 without documented reason. The analysis states 'retroactive re-scoring is not permitted' yet performs exactly that. Either maintain 8/10 with explicit note 'No new contradictory information in recent calls' OR provide a specific call quote showing the prospect contradicted prior 8/10 evidence. Criterion 4 (Actionable next steps): Champion next step uses vague verb 'Can you confirm their availability' \u2014 replace with specific action like 'Schedule a 30-minute call with [contact name] by August 25 to review trial results and align on business case requirements.' Criterion 5 (No unsupported claims): Decision Process score 7/10 claims timeline is 'clear' but legal/finance approvers are 'prospect-reported only; no named approver confirmed' \u2014 this contradicts the 7/10 justification. If approvers are unconfirmed, score should reflect that uncertainty (5/10 or lower). Clarify: is the 7/10 for timeline clarity alone, or for approval chain? If timeline only, explicitly state 'Score reflects timeline clarity (August 27 trial end, September 1 contract target) but does not include approval chain confirmation.'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-23_32673821188_001",
+  "timestamp": "2026-08-23T23:35:28.441683"
+}

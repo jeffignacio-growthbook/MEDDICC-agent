@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_007",
+  "timestamp": "2026-08-24T00:11:19.852045",
+  "company": "Square",
+  "criterion_fired": "CRITERION 2 (Carry-forward Consistency)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: 'Score changes between iterations must document whether the change reflects (a) new information from latest call, (b) correction of prior analysis error, or (c) new evidence. All three are acceptable if explicitly labeled. Prior analyst error corrections should be noted as such to distinguish from evidentiary updates.'"
+}

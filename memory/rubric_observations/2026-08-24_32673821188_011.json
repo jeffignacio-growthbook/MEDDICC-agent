@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32673821188_011",
+  "timestamp": "2026-08-24T00:16:16.278469",
+  "company": "The Wellness Company",
+  "criterion_fired": "Criterion 2, 3, 4, 5 (multiple violations)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) When score regression requires explicit top-level flag vs. narrative explanation; (2) Define 'concrete action verb' minimum specificity threshold; (3) Recalibrate Metrics scoring scale\u2014if a named metric exists, establish floor at 4/10 rather than 3/10; (4) Clarify Champion scoring: does strategic participation + testing = 4\u20135/10 baseline, or does only documented business case justify that range?; (5) Add explicit competitor-matching rule: unknown competitors must map to closest known competitor or receive max 2/10 penalty note."
+}

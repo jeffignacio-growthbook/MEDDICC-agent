@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-23_32673821188_014",
+  "timestamp": "2026-08-23T23:54:06.774274",
+  "company": "Neuroth",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) + Criterion 3 (Evidence quality)",
+  "was_appropriate": false,
+  "suggested_change": "Split criterion 2 into two paths: (a) Major regression = cite new call data that contradicts old state, OR (b) re-evaluation of existing data = explicitly flag as reanalysis and accept score change if evidence interpretation improved. Criterion 3 should allow score-evidence mismatch ONLY if explicitly documented as 'reanalysis of call X' vs. 'new signal from call Y'."
+}
