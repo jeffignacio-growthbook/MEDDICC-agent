@@ -77,11 +77,17 @@ def _load(sb):
             tx[r["call_id"]] = r
 
     done = set()
-    for chunk in _chunked(all_ids, 300):
-        for r in select_all(sb, "call_scores", columns="call_id,scorer_version",
-                            filters=[("in_", "call_id", chunk)]):
-            if r.get("scorer_version") == cs.SCORER_VERSION:
-                done.add(r["call_id"])
+    try:
+        for chunk in _chunked(all_ids, 300):
+            for r in select_all(sb, "call_scores", columns="call_id,scorer_version",
+                                filters=[("in_", "call_id", chunk)]):
+                if r.get("scorer_version") == cs.SCORER_VERSION:
+                    done.add(r["call_id"])
+    except Exception as e:
+        # call_scores may not exist yet (migration 043 not applied). Dry-run does
+        # not need it; a live run will fail at upsert, which is the correct signal
+        # that the migration must be applied first.
+        print(f"  (call_scores not queryable yet: {e}; treating as none-scored)")
     return by_deal, tx, done
 
 
