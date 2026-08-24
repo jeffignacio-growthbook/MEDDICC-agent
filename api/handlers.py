@@ -1095,7 +1095,7 @@ async def query_rubric_scores_bulk(params: dict, sb) -> dict:
                 "champion_score,economic_buyer_score,"
                 "decision_criteria_score,"
                 "decision_process_score,competition_score,"
-                "pain_score,analyzed_at",
+                "pain_score,analyzed_at,component_details",
         filters=[("in_", "deal_id", deal_ids)])
 
     # Keep the latest analysis per deal — the current MEDDICC state — rather
@@ -1116,10 +1116,28 @@ async def query_rubric_scores_bulk(params: dict, sb) -> dict:
              "decision_criteria": "decision_criteria_score",
              "decision_process": "decision_process_score", "pain": "pain_score",
              "champion": "champion_score", "competition": "competition_score"}
+    import json as _json
     for s in scores:
         s["overall"] = _labeled_overall(s.get("overall_score"))
         s["bands"] = {c: lbl["text"] for c, lbl in
                       _meddicc_bands({c: s.get(col) for c, col in _cols.items()}).items()}
+        # Per-component EVIDENCE — the fact behind the score. Without it,
+        # synthesis fills the gap with generic template language ("identify who
+        # has a personal stake") that names nothing about the deal. Pull it from
+        # analyses.component_details ({component: {score, evidence}}); expose a
+        # clean {component: evidence_string_or_None} map, and drop the raw blob.
+        cd = s.pop("component_details", None)
+        if isinstance(cd, str):
+            try:
+                cd = _json.loads(cd)
+            except Exception:
+                cd = None
+        cd = cd or {}
+        s["evidence"] = {}
+        for c in _cols:
+            cell = cd.get(c) if isinstance(cd.get(c), dict) else {}
+            ev = (cell.get("evidence") or "").strip()
+            s["evidence"][c] = ev or None
     # Deals we looked up but that have no analysis row yet — so synthesis can say
     # truthfully "these N were scored, these M haven't been analyzed" instead of
     # inventing a reason (the entity-scope path was confabulating "not scored
