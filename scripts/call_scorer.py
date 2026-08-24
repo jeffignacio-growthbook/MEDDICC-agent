@@ -39,23 +39,30 @@ COMPONENTS = [
 COMPONENT_KEYS = [k for _, k in COMPONENTS]
 
 # Bump when the prompt/rubric changes so a re-backfill can find stale rows.
-SCORER_VERSION = "phase1-percall-v3-twopass"
+SCORER_VERSION = "phase1-percall-v4-cumulative"
 
 COMPONENT_LABELS = {k: label for label, k in COMPONENTS}
 
-# Two passes. Prompt-level "return null when a call says nothing" does NOT make a
-# model abstain — handed a rich transcript and a seven-field form, it fills every
-# field (empirically: null never fired on Livesport across two prompt revisions).
-# So abstention is its own step: PASS 1 SELECTS the components this call
-# materially advances (a selection task, which models DO abstain on); PASS 2
-# scores ONLY those. Everything unselected is null by construction, not by the
-# model's willingness to say null.
+# Two passes, cumulative-context. Prompt-level "return null" does NOT make a model
+# abstain — handed a rich transcript and a seven-field form it fills every field
+# (empirically: null never fired across two prompt revisions). So abstention is its
+# own step: PASS 1 SELECTS which components THIS call changes versus what earlier
+# calls already established; PASS 2 scores only those, as the CUMULATIVE
+# understanding through this call. Components the call leaves unchanged are omitted
+# and carry forward at the roll-up. This reproduces a human's carry-forward reading
+# (a later shallow mention cannot lower a deep earlier score; a component can climb
+# across calls to a level no single call reaches in isolation) while keeping the
+# spec's schema, most-recent-non-null roll-up, and downward regression intact.
+#
+# The one deviation from spec §1 ("you have no prior calls"): the scorer is shown
+# the ROLLED SCORES so far — not the raw prior transcripts. That is a lightweight
+# state carry, not the batch scorer's whole-history pass.
 
 GATE_SYSTEM_PROMPT = """\
-You are given ONE sales call (transcript or summary) and nothing else. Your only
-job is to decide which of the seven MEDDICC components THIS call MATERIALLY
-ADVANCES — i.e. this call adds specific, new, substantive evidence about the
-component, not just a passing mention or a restatement.
+You are given ONE sales call plus the MEDDICC picture established by EARLIER calls
+on this deal. Your only job: decide which components THIS call CHANGES — adds new
+substantive evidence that would RAISE a component, or shows a genuine setback that
+would LOWER it, or establishes a component that had nothing before.
 
 The seven components (use these exact keys):
   metrics             — quantified business impact / value metrics
@@ -66,27 +73,33 @@ The seven components (use these exact keys):
   champion            — a person taking internal action to advance the deal
   competition         — competitors, incumbent tools, evaluation status
 
-Return a JSON array of the component keys this call materially advances, and
-NOTHING else. Example: ["pain", "metrics", "competition"]
+Return a JSON array of the component keys THIS call changes, and NOTHING else.
+Example: ["economic_buyer", "decision_process"]
 
-Be strict. MOST calls advance only ONE to FOUR components. A narrow call (a
-pricing negotiation, a technical deep-dive) advances very few. If the call only
-mentions a component in passing, or merely repeats something without adding new
-evidence, DO NOT include it. An empty array [] is valid if the call advances
-nothing. Do not consider the deal's pipeline stage.
+Be strict. MOST calls change only ONE to FOUR components. If this call only
+repeats or lightly touches something already established — without adding new
+evidence that moves the score — DO NOT include it; it will carry forward
+unchanged. A narrow call (a pricing negotiation) changes very few. An empty array
+[] is valid. Do not consider the deal's pipeline stage.
 """
 
 SCORE_SYSTEM_PROMPT = """\
-You are given ONE sales call and a specific list of MEDDICC components that this
-call materially advances. Score ONLY those components, 0-10, each with evidence
-(a direct quote or specific fact FROM THIS CALL). Judge only what THIS call
-establishes — you have no prior calls.
+You are given ONE sales call, the MEDDICC picture from EARLIER calls, and a list of
+components THIS call changes. For each, give the CUMULATIVE score 0-10 — the deal's
+standing on that component through this call, i.e. everything established so far
+PLUS what this call adds — with evidence (a quote or specific fact from THIS call
+that justifies the change).
 
-Return a JSON object whose keys are exactly the components you were asked to
-score, each {"score": <1-10 integer>, "evidence": "<quote/fact from this call>"}.
-No other keys, no prose, no markdown fences.
+Return a JSON object whose keys are exactly the components you were asked to score,
+each {"score": <1-10 integer>, "evidence": "<quote/fact from this call>"}. No other
+keys, no prose, no markdown fences.
 
 RULES
+- The score is cumulative, not "this call in isolation." A call that adds the final
+  piece of a criteria list can reach 8 even though it only stated one new criterion.
+- Only LOWER a component below its earlier value if THIS call shows a real setback
+  (e.g. the champion left, a requirement was dropped). Absent that, a component you
+  were asked to score should not fall below what earlier calls established.
 - Default to the LOWER score on ambiguity. Enthusiasm without specifics = 1/10.
 - Score Champion and Economic Buyer on what the buyer DOES, not how they FELT.
   A contact who sounds excited but owns no internal next step is Champion 1-2.
@@ -111,22 +124,43 @@ def _company_header(deal_context):
     return ""
 
 
-def build_gate_messages(call_text, deal_context=None):
+def _format_prior_state(prior_state):
+    """Readable summary of the rolled-so-far scores for the prompt. prior_state is
+    a roll_up() result ({key:{score,evidence,call_id,call_date}}) or None."""
+    if not prior_state:
+        return "No earlier calls — this is the first call on the deal; nothing is established yet."
+    lines = []
+    for label, key in COMPONENTS:
+        cell = prior_state.get(key) or {}
+        sc = cell.get("score")
+        if sc is None:
+            lines.append(f"- {label}: not yet established")
+        else:
+            ev = (cell.get("evidence") or "").strip().replace("\n", " ")
+            if len(ev) > 200:
+                ev = ev[:200] + "…"
+            lines.append(f"- {label}: {sc}/10 — {ev}" if ev else f"- {label}: {sc}/10")
+    return "MEDDICC established by earlier calls:\n" + "\n".join(lines)
+
+
+def build_gate_messages(call_text, deal_context=None, prior_state=None):
     return [{
         "role": "user",
         "content": (
-            f"{_company_header(deal_context)}Which MEDDICC components does this call "
-            f"materially advance? Return the JSON array only.\n\n=== CALL ===\n{call_text}"
+            f"{_company_header(deal_context)}{_format_prior_state(prior_state)}\n\n"
+            f"Which MEDDICC components does THIS call change versus the above? "
+            f"Return the JSON array only.\n\n=== CALL ===\n{call_text}"
         ),
     }]
 
 
-def build_score_messages(call_text, components, deal_context=None):
+def build_score_messages(call_text, components, deal_context=None, prior_state=None):
     keys = ", ".join(components)
     return [{
         "role": "user",
         "content": (
-            f"{_company_header(deal_context)}Score ONLY these components for this call: "
+            f"{_company_header(deal_context)}{_format_prior_state(prior_state)}\n\n"
+            f"Score ONLY these components as the cumulative standing through this call: "
             f"{keys}. Return the JSON object with exactly those keys.\n\n=== CALL ===\n{call_text}"
         ),
     }]
@@ -242,14 +276,19 @@ def _extract_json_value(text, open_ch="{", close_ch="}"):
     return None
 
 
-def score_call(call_text, deal_context=None, client=None):
-    """Score one call in two passes (see the GATE/SCORE prompts above):
-      1. SELECT the components this call materially advances.
-      2. SCORE only those; everything else is null by construction.
+def score_call(call_text, deal_context=None, prior_state=None, client=None):
+    """Score one call in two passes against the deal's rolled state so far:
+      1. SELECT the components THIS call changes vs prior_state.
+      2. SCORE only those, as the CUMULATIVE standing through this call.
+
+    prior_state is a roll_up() result ({key:{score,evidence,call_id,call_date}}) or
+    None for the first call. Returns a DELTA: only changed components are non-null,
+    so the result feeds call_scores / roll_up unchanged (most-recent-non-null over
+    the deltas replays the fold).
 
     Returns:
         {"components": {key: {"score": int|None, "evidence": str|None}},
-         "advanced": [keys selected in pass 1],
+         "advanced": [keys changed by this call],
          "model": str, "input_tokens": int, "output_tokens": int}
     Raises ValueError on empty input (a call with no text cannot be scored —
     that is an 'unavailable' condition the caller handles, not a null score)."""
@@ -263,9 +302,9 @@ def score_call(call_text, deal_context=None, client=None):
     tok_in = tok_out = 0
     model = None
 
-    # PASS 1 — selection (abstention happens here, not in the scoring pass).
+    # PASS 1 — selection: which components does this call change vs prior_state.
     gate = client.complete(
-        messages=build_gate_messages(call_text, deal_context),
+        messages=build_gate_messages(call_text, deal_context, prior_state),
         system=GATE_SYSTEM_PROMPT,
         max_tokens=200,
         temperature=0,
@@ -275,10 +314,10 @@ def score_call(call_text, deal_context=None, client=None):
     model = getattr(gate, "model", None)
     advanced = _parse_advanced(gate.text)
 
-    # PASS 2 — score only the selected components.
+    # PASS 2 — cumulative score for only the changed components.
     if advanced:
         score = client.complete(
-            messages=build_score_messages(call_text, advanced, deal_context),
+            messages=build_score_messages(call_text, advanced, deal_context, prior_state),
             system=SCORE_SYSTEM_PROMPT,
             max_tokens=1200,
             temperature=0,

@@ -99,16 +99,18 @@ def main():
     if not calls:
         print("No calls found for Livesport — cannot run Phase 1."); return 2
 
-    scored = []          # running list for roll_up
-    columns = []         # (label, text_source, chars, per_component this-call scores)
+    scored = []          # running list of per-call deltas for roll_up
+    columns = []         # (label, text_source, chars, per_component this-call delta)
     tok_in = tok_out = 0
+    rolled = None        # running rolled state, fed back in as prior_state
     for i, call in enumerate(calls, 1):
         text, source, chars = _text_for(call, tx)
         label = f"{call['call_date']}"
         if text is None:
             print(f"[{i}/{len(calls)}] {label}: no transcript or summary — skipped")
             continue
-        result = cs.score_call(text, {"company": COMPANY}, client=client)
+        # Cumulative-context: each call sees the rolled state so far as prior_state.
+        result = cs.score_call(text, {"company": COMPANY}, prior_state=rolled, client=client)
         tok_in += result["input_tokens"]; tok_out += result["output_tokens"]
         scored.append({"call_id": call["call_id"], "call_date": call["call_date"],
                        "components": result["components"]})
