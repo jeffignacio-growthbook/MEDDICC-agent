@@ -1,0 +1,3017 @@
+{
+  "counts": {
+    "score_ahead_of_stage": 3,
+    "stage_ahead_of_score": 39,
+    "aligned": 53,
+    "unscored": 79,
+    "off_ladder": 248
+  },
+  "deals": [
+    {
+      "deal_id": "60355159912",
+      "company": "shiftkey",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 4,
+      "qualified_stage": "Negotiating",
+      "gap": 3,
+      "reading": "score_ahead_of_stage",
+      "overall": 46,
+      "scores": {
+        "metrics": 7,
+        "economic_buyer": 4,
+        "decision_criteria": 8,
+        "decision_process": 8,
+        "pain": 8,
+        "champion": 4,
+        "competition": 7
+      }
+    },
+    {
+      "deal_id": "60652001696",
+      "company": "Taskrabbit",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 4,
+      "qualified_stage": "Negotiating",
+      "gap": 1,
+      "reading": "score_ahead_of_stage",
+      "overall": 55,
+      "scores": {
+        "metrics": 8,
+        "economic_buyer": 5,
+        "decision_criteria": 8,
+        "decision_process": 9,
+        "pain": 9,
+        "champion": 8,
+        "competition": 8
+      }
+    },
+    {
+      "deal_id": "57553904779",
+      "company": "Aircall",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 3,
+      "qualified_stage": "Technical Evaluation",
+      "gap": 1,
+      "reading": "score_ahead_of_stage",
+      "overall": 40,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 6,
+        "decision_criteria": 8,
+        "decision_process": 5,
+        "pain": 8,
+        "champion": 5,
+        "competition": 4
+      }
+    },
+    {
+      "deal_id": "63527836680",
+      "company": "Zurich Insurance",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 10,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 1,
+        "pain": 2,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "61076825943",
+      "company": "USIM",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 7,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 1,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "62135862588",
+      "company": "MedPage Today",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 19,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 4,
+        "decision_process": 3,
+        "pain": 3,
+        "champion": 1,
+        "competition": 6
+      }
+    },
+    {
+      "deal_id": "61507488889",
+      "company": "Superhuman",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 26,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 5,
+        "decision_process": 3,
+        "pain": 6,
+        "champion": 1,
+        "competition": 6
+      }
+    },
+    {
+      "deal_id": "62622458398",
+      "company": "Box",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 13,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 2,
+        "pain": 3,
+        "champion": 1,
+        "competition": 3
+      }
+    },
+    {
+      "deal_id": "60964814258",
+      "company": "MedCof",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 8,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 1,
+        "pain": 1,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "62360994147",
+      "company": "On3",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 12,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 2,
+        "pain": 3,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "62452805994",
+      "company": "RE/MAX Holdings,",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 17,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 4,
+        "decision_process": 2,
+        "pain": 4,
+        "champion": 1,
+        "competition": 3
+      }
+    },
+    {
+      "deal_id": "63578787480",
+      "company": "Rula",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 2,
+      "qualified_stage": "Scoping",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 40,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 8,
+        "decision_process": 7,
+        "pain": 8,
+        "champion": 5,
+        "competition": 7
+      }
+    },
+    {
+      "deal_id": "62875661161",
+      "company": "NPG Digital GmbH",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 15,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 4,
+        "pain": 4,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "60840137793",
+      "company": "Zurich Insurance Group Ltd",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 15,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 1,
+        "pain": 4,
+        "champion": 1,
+        "competition": 4
+      }
+    },
+    {
+      "deal_id": "54223739569",
+      "company": "PepsiCo",
+      "stage": "Renewal Engaged",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 7,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 1,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "63437263422",
+      "company": "Coverflex",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 16,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 2,
+        "pain": 4,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "63549963371",
+      "company": "\u0410\u0422 \u00ab\u041e\u0422\u041f \u0411\u0410\u041d\u041a\u00bb (OTP Bank)",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 22,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 2,
+        "decision_criteria": 3,
+        "decision_process": 3,
+        "pain": 4,
+        "champion": 1,
+        "competition": 5
+      }
+    },
+    {
+      "deal_id": "58135849096",
+      "company": "Neuroth",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 18,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 4,
+        "decision_process": 4,
+        "pain": 4,
+        "champion": 2,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "60786197152",
+      "company": "1800Flowers",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 8,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 2,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "63165080439",
+      "company": "Mekari",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 20,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 4,
+        "decision_process": 3,
+        "pain": 6,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "47879623775",
+      "company": "Whatnot",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 7,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 1,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "63562515584",
+      "company": "LaFleur Marketing",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 10,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 2,
+        "pain": 2,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "63051341647",
+      "company": "Vio",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 17,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 1,
+        "pain": 5,
+        "champion": 1,
+        "competition": 5
+      }
+    },
+    {
+      "deal_id": "62355039834",
+      "company": "Visible",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 32,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 4,
+        "decision_criteria": 6,
+        "decision_process": 3,
+        "pain": 7,
+        "champion": 2,
+        "competition": 6
+      }
+    },
+    {
+      "deal_id": "60056558933",
+      "company": "18Birdies",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 16,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 2,
+        "pain": 3,
+        "champion": 1,
+        "competition": 5
+      }
+    },
+    {
+      "deal_id": "62111798456",
+      "company": "Fabric Analytics",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 18,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 2,
+        "pain": 6,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "62622489357",
+      "company": "JPMorganChase",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 9,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 1,
+        "pain": 2,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "62852783774",
+      "company": "BlaBlaCar",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 14,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 4,
+        "decision_process": 3,
+        "pain": 3,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "59021351952",
+      "company": "Signet Jewelers Ltd.",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 18,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 2,
+        "pain": 6,
+        "champion": 2,
+        "competition": 2
+      }
+    },
+    {
+      "deal_id": "62395520059",
+      "company": "DocPlanner",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 16,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 2,
+        "pain": 4,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "58373987402",
+      "company": "Square Enix, Inc.",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 32,
+      "scores": {
+        "metrics": 6,
+        "economic_buyer": 1,
+        "decision_criteria": 6,
+        "decision_process": 4,
+        "pain": 6,
+        "champion": 1,
+        "competition": 8
+      }
+    },
+    {
+      "deal_id": "60178287462",
+      "company": "Getaway Group",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 19,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 5,
+        "champion": 1,
+        "competition": 6
+      }
+    },
+    {
+      "deal_id": "59369997485",
+      "company": "Purple",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 0,
+      "scores": {
+        "metrics": 0,
+        "economic_buyer": 0,
+        "decision_criteria": 0,
+        "decision_process": 0,
+        "pain": 0,
+        "champion": 0,
+        "competition": 0
+      }
+    },
+    {
+      "deal_id": "59245644951",
+      "company": "Route",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 33,
+      "scores": {
+        "metrics": 7,
+        "economic_buyer": 1,
+        "decision_criteria": 8,
+        "decision_process": 3,
+        "pain": 8,
+        "champion": 1,
+        "competition": 5
+      }
+    },
+    {
+      "deal_id": "56162812495",
+      "company": "WorkAxle",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 2,
+      "scores": {
+        "metrics": 0,
+        "economic_buyer": 0,
+        "decision_criteria": 0,
+        "decision_process": 2,
+        "pain": 0,
+        "champion": 0,
+        "competition": 0
+      }
+    },
+    {
+      "deal_id": "60419710634",
+      "company": "Square",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 29,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 5,
+        "decision_process": 4,
+        "pain": 7,
+        "champion": 2,
+        "competition": 6
+      }
+    },
+    {
+      "deal_id": "60715077158",
+      "company": "Douglas",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 17,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 1,
+        "pain": 3,
+        "champion": 2,
+        "competition": 3
+      }
+    },
+    {
+      "deal_id": "62447700618",
+      "company": "United Wheels",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 8,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 2,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "61841688666",
+      "company": "TRT",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 14,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 3,
+        "pain": 3,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "62485423801",
+      "company": "March Networks",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 19,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 4,
+        "decision_process": 2,
+        "pain": 4,
+        "champion": 1,
+        "competition": 6
+      }
+    },
+    {
+      "deal_id": "63220208693",
+      "company": "A24 Films",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 10,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 2,
+        "pain": 2,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "61631402640",
+      "company": "Aditya Birla Fashion and Retail Limited",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 11,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 1,
+        "pain": 3,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "63120688011",
+      "company": "Fanatics Live",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 8,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 2,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "60423886694",
+      "company": "Jusbrasil Test",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 27,
+      "scores": {
+        "metrics": 6,
+        "economic_buyer": 1,
+        "decision_criteria": 7,
+        "decision_process": 4,
+        "pain": 5,
+        "champion": 1,
+        "competition": 3
+      }
+    },
+    {
+      "deal_id": "62741857928",
+      "company": "World Vision USA",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 27,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 5,
+        "decision_process": 4,
+        "pain": 6,
+        "champion": 1,
+        "competition": 6
+      }
+    },
+    {
+      "deal_id": "62678252395",
+      "company": "Expedia Group",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 9,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 3,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "62402578522",
+      "company": "Deel",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 34,
+      "scores": {
+        "metrics": 5,
+        "economic_buyer": 1,
+        "decision_criteria": 6,
+        "decision_process": 5,
+        "pain": 8,
+        "champion": 2,
+        "competition": 7
+      }
+    },
+    {
+      "deal_id": "60036027012",
+      "company": "Tesoro XP, Inc.",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 12,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 1,
+        "pain": 3,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "59369345948",
+      "company": "Decathlon",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 18,
+      "scores": {
+        "metrics": 3,
+        "economic_buyer": 1,
+        "decision_criteria": 4,
+        "decision_process": 1,
+        "pain": 5,
+        "champion": 2,
+        "competition": 2
+      }
+    },
+    {
+      "deal_id": "54442852124",
+      "company": "Perplexity AI",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 8,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 2,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "60837964868",
+      "company": "Carrefour",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 17,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 2,
+        "decision_criteria": 3,
+        "decision_process": 2,
+        "pain": 3,
+        "champion": 2,
+        "competition": 4
+      }
+    },
+    {
+      "deal_id": "61582382687",
+      "company": "Lola Blankets",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 0,
+      "scores": {
+        "metrics": 0,
+        "economic_buyer": 0,
+        "decision_criteria": 0,
+        "decision_process": 0,
+        "pain": 0,
+        "champion": 0,
+        "competition": 0
+      }
+    },
+    {
+      "deal_id": "61626656091",
+      "company": "Sword Health Inc",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 13,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 1,
+        "pain": 3,
+        "champion": 1,
+        "competition": 2
+      }
+    },
+    {
+      "deal_id": "60860413064",
+      "company": "BUFF",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 0,
+      "scores": {
+        "metrics": 0,
+        "economic_buyer": 0,
+        "decision_criteria": 0,
+        "decision_process": 0,
+        "pain": 0,
+        "champion": 0,
+        "competition": 0
+      }
+    },
+    {
+      "deal_id": "58798224498",
+      "company": "Comcast",
+      "stage": "Discovery",
+      "actual_order": 1,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 0,
+      "scores": {
+        "metrics": 0,
+        "economic_buyer": 0,
+        "decision_criteria": 0,
+        "decision_process": 0,
+        "pain": 0,
+        "champion": 0,
+        "competition": 0
+      }
+    },
+    {
+      "deal_id": "55660576681",
+      "company": "Skyscanner",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 3,
+      "qualified_stage": "Technical Evaluation",
+      "gap": 0,
+      "reading": "aligned",
+      "overall": 43,
+      "scores": {
+        "metrics": 8,
+        "economic_buyer": 4,
+        "decision_criteria": 8,
+        "decision_process": 9,
+        "pain": 8,
+        "champion": 5,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "58966766773",
+      "company": "Alasans",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 24,
+      "scores": {
+        "metrics": 7,
+        "economic_buyer": 1,
+        "decision_criteria": 4,
+        "decision_process": 3,
+        "pain": 7,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "56685250888",
+      "company": "Chaos",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 2,
+      "qualified_stage": "Scoping",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 33,
+      "scores": {
+        "metrics": 7,
+        "economic_buyer": 1,
+        "decision_criteria": 8,
+        "decision_process": 4,
+        "pain": 8,
+        "champion": 4,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "59387794836",
+      "company": "Ryanair",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 2,
+      "qualified_stage": "Scoping",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 32,
+      "scores": {
+        "metrics": 6,
+        "economic_buyer": 1,
+        "decision_criteria": 5,
+        "decision_process": 4,
+        "pain": 8,
+        "champion": 5,
+        "competition": 3
+      }
+    },
+    {
+      "deal_id": "58134855076",
+      "company": "Square",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 2,
+      "qualified_stage": "Scoping",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 29,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 5,
+        "decision_process": 3,
+        "pain": 6,
+        "champion": 4,
+        "competition": 6
+      }
+    },
+    {
+      "deal_id": "61149585726",
+      "company": "TickPick",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 22,
+      "scores": {
+        "metrics": 6,
+        "economic_buyer": 1,
+        "decision_criteria": 6,
+        "decision_process": 1,
+        "pain": 6,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "60182251329",
+      "company": "UPS",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 14,
+      "scores": {
+        "metrics": 5,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 4,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "60785721693",
+      "company": "BESTSELLER",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 28,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 7,
+        "decision_process": 5,
+        "pain": 7,
+        "champion": 1,
+        "competition": 3
+      }
+    },
+    {
+      "deal_id": "61437846967",
+      "company": "Zoro",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 23,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 8,
+        "decision_process": 3,
+        "pain": 5,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "60665391542",
+      "company": "Zalando",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 28,
+      "scores": {
+        "metrics": 5,
+        "economic_buyer": 1,
+        "decision_criteria": 6,
+        "decision_process": 1,
+        "pain": 8,
+        "champion": 3,
+        "competition": 4
+      }
+    },
+    {
+      "deal_id": "62756829850",
+      "company": "ASAPP",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 32,
+      "scores": {
+        "metrics": 5,
+        "economic_buyer": 1,
+        "decision_criteria": 8,
+        "decision_process": 7,
+        "pain": 7,
+        "champion": 2,
+        "competition": 2
+      }
+    },
+    {
+      "deal_id": "63316026654",
+      "company": "Ziff Davis",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 8,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 2,
+        "pain": 1,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "59458798354",
+      "company": "Forty Eight Point One",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 12,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 2,
+        "pain": 3,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "62160567676",
+      "company": "Livesport",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 44,
+      "scores": {
+        "metrics": 8,
+        "economic_buyer": 3,
+        "decision_criteria": 8,
+        "decision_process": 6,
+        "pain": 9,
+        "champion": 3,
+        "competition": 7
+      }
+    },
+    {
+      "deal_id": "60173271471",
+      "company": "Stay Partners",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 11,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 1,
+        "pain": 3,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "58659164971",
+      "company": "DasWeltAuto",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 20,
+      "scores": {
+        "metrics": 3,
+        "economic_buyer": 2,
+        "decision_criteria": 4,
+        "decision_process": 4,
+        "pain": 5,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "60069831015",
+      "company": "InPost",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 11,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 1,
+        "pain": 2,
+        "champion": 1,
+        "competition": 2
+      }
+    },
+    {
+      "deal_id": "53500422798",
+      "company": "Stone",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 37,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 8,
+        "decision_process": 7,
+        "pain": 9,
+        "champion": 2,
+        "competition": 6
+      }
+    },
+    {
+      "deal_id": "59019110029",
+      "company": "KBX",
+      "stage": "Scoping",
+      "actual_order": 2,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 39,
+      "scores": {
+        "metrics": 8,
+        "economic_buyer": 1,
+        "decision_criteria": 9,
+        "decision_process": 8,
+        "pain": 8,
+        "champion": 1,
+        "competition": 4
+      }
+    },
+    {
+      "deal_id": "59173115702",
+      "company": "JobLeads",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 2,
+      "qualified_stage": "Scoping",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 44,
+      "scores": {
+        "metrics": 8,
+        "economic_buyer": 1,
+        "decision_criteria": 7,
+        "decision_process": 5,
+        "pain": 9,
+        "champion": 7,
+        "competition": 7
+      }
+    },
+    {
+      "deal_id": "49689180024",
+      "company": "Unity",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 2,
+      "qualified_stage": "Scoping",
+      "gap": -1,
+      "reading": "stage_ahead_of_score",
+      "overall": 31,
+      "scores": {
+        "metrics": 4,
+        "economic_buyer": 1,
+        "decision_criteria": 8,
+        "decision_process": 4,
+        "pain": 8,
+        "champion": 5,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "58897463067",
+      "company": "Hublo",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -2,
+      "reading": "stage_ahead_of_score",
+      "overall": 43,
+      "scores": {
+        "metrics": 8,
+        "economic_buyer": 1,
+        "decision_criteria": 9,
+        "decision_process": 7,
+        "pain": 9,
+        "champion": 2,
+        "competition": 7
+      }
+    },
+    {
+      "deal_id": "60053279602",
+      "company": "Natera",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -2,
+      "reading": "stage_ahead_of_score",
+      "overall": 11,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 2,
+        "pain": 3,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "61045491056",
+      "company": "ECCO",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -2,
+      "reading": "stage_ahead_of_score",
+      "overall": 11,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 2,
+        "pain": 2,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "58939926620",
+      "company": "OpenTable",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -2,
+      "reading": "stage_ahead_of_score",
+      "overall": 25,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 3,
+        "decision_criteria": 5,
+        "decision_process": 8,
+        "pain": 6,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "60257621387",
+      "company": "Notion",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -2,
+      "reading": "stage_ahead_of_score",
+      "overall": 21,
+      "scores": {
+        "metrics": 3,
+        "economic_buyer": 1,
+        "decision_criteria": 5,
+        "decision_process": 6,
+        "pain": 4,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "60275604099",
+      "company": "dentsu",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -2,
+      "reading": "stage_ahead_of_score",
+      "overall": 12,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 2,
+        "decision_criteria": 2,
+        "decision_process": 2,
+        "pain": 2,
+        "champion": 2,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "62725080086",
+      "company": "ASI",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -2,
+      "reading": "stage_ahead_of_score",
+      "overall": 14,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 2,
+        "pain": 4,
+        "champion": 2,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "54599396690",
+      "company": "Harper",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -2,
+      "reading": "stage_ahead_of_score",
+      "overall": 10,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 1,
+        "pain": 2,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "61176368035",
+      "company": "ClickHouse",
+      "stage": "Technical Evaluation",
+      "actual_order": 3,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -2,
+      "reading": "stage_ahead_of_score",
+      "overall": 11,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 4,
+        "champion": 2,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "62121618183",
+      "company": "Airalo",
+      "stage": "Negotiating",
+      "actual_order": 4,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -3,
+      "reading": "stage_ahead_of_score",
+      "overall": 15,
+      "scores": {
+        "metrics": 2,
+        "economic_buyer": 0,
+        "decision_criteria": 6,
+        "decision_process": 1,
+        "pain": 5,
+        "champion": 1,
+        "competition": 0
+      }
+    },
+    {
+      "deal_id": "58956770692",
+      "company": "Reliance Industries Limited",
+      "stage": "Negotiating",
+      "actual_order": 4,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -3,
+      "reading": "stage_ahead_of_score",
+      "overall": 9,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 1,
+        "pain": 2,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "56258367868",
+      "company": "Derive",
+      "stage": "Negotiating",
+      "actual_order": 4,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -3,
+      "reading": "stage_ahead_of_score",
+      "overall": 10,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 2,
+        "decision_process": 1,
+        "pain": 2,
+        "champion": 1,
+        "competition": 2
+      }
+    },
+    {
+      "deal_id": "53466496122",
+      "company": "Taxfix",
+      "stage": "Negotiating",
+      "actual_order": 4,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -3,
+      "reading": "stage_ahead_of_score",
+      "overall": 7,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 1,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "54956375177",
+      "company": "Trade Me",
+      "stage": "Negotiating",
+      "actual_order": 4,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -3,
+      "reading": "stage_ahead_of_score",
+      "overall": 9,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 1,
+        "decision_process": 1,
+        "pain": 2,
+        "champion": 2,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "63222360840",
+      "company": "Angel",
+      "stage": "Negotiating",
+      "actual_order": 4,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -3,
+      "reading": "stage_ahead_of_score",
+      "overall": 16,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 2,
+        "decision_criteria": 2,
+        "decision_process": 2,
+        "pain": 4,
+        "champion": 3,
+        "competition": 2
+      }
+    },
+    {
+      "deal_id": "61475205473",
+      "company": "BESTSELLER",
+      "stage": "Negotiating",
+      "actual_order": 4,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -3,
+      "reading": "stage_ahead_of_score",
+      "overall": 30,
+      "scores": {
+        "metrics": 5,
+        "economic_buyer": 1,
+        "decision_criteria": 6,
+        "decision_process": 5,
+        "pain": 8,
+        "champion": 1,
+        "competition": 4
+      }
+    },
+    {
+      "deal_id": "59860100786",
+      "company": "Goodnotes",
+      "stage": "Negotiating",
+      "actual_order": 4,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -3,
+      "reading": "stage_ahead_of_score",
+      "overall": 13,
+      "scores": {
+        "metrics": 1,
+        "economic_buyer": 1,
+        "decision_criteria": 3,
+        "decision_process": 5,
+        "pain": 1,
+        "champion": 1,
+        "competition": 1
+      }
+    },
+    {
+      "deal_id": "61615709775",
+      "company": "MVF Global",
+      "stage": "Awaiting Signature",
+      "actual_order": 5,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -4,
+      "reading": "stage_ahead_of_score",
+      "overall": 42,
+      "scores": {
+        "metrics": 9,
+        "economic_buyer": 1,
+        "decision_criteria": 8,
+        "decision_process": 6,
+        "pain": 9,
+        "champion": 2,
+        "competition": 7
+      }
+    },
+    {
+      "deal_id": "11024003429",
+      "company": "Oda",
+      "stage": "Review",
+      "actual_order": 8,
+      "qualified_order": 1,
+      "qualified_stage": "Discovery",
+      "gap": -7,
+      "reading": "stage_ahead_of_score",
+      "overall": 38,
+      "scores": {
+        "metrics": 6,
+        "economic_buyer": 6,
+        "decision_criteria": 8,
+        "decision_process": 7,
+        "pain": 6,
+        "champion": 3,
+        "competition": 2
+      }
+    }
+  ],
+  "pipeline_by_stage": {
+    "Meeting Set": {
+      "count": 111,
+      "value": 1617540.0
+    },
+    "Scoping": {
+      "count": 26,
+      "value": 3545924.0
+    },
+    "Upcoming Renewal": {
+      "count": 136,
+      "value": 963755.0
+    },
+    "Technical Evaluation": {
+      "count": 27,
+      "value": 2943250.0
+    },
+    "Discovery": {
+      "count": 83,
+      "value": 6894408.45
+    },
+    "Renewal Engaged": {
+      "count": 8,
+      "value": 215000.0
+    },
+    "Negotiating": {
+      "count": 13,
+      "value": 935000.0
+    },
+    "": {
+      "count": 1,
+      "value": 0.0
+    },
+    "Pricing Presented": {
+      "count": 1,
+      "value": 0.0
+    },
+    "Review": {
+      "count": 14,
+      "value": 207500.0
+    },
+    "Awaiting Signature": {
+      "count": 2,
+      "value": 95000.0
+    }
+  },
+  "margin": 1,
+  "ladder": [
+    {
+      "order": 1,
+      "id": "appointmentscheduled",
+      "name": "Discovery"
+    },
+    {
+      "order": 2,
+      "id": "qualifiedtobuy",
+      "name": "Scoping"
+    },
+    {
+      "order": 3,
+      "id": "presentationscheduled",
+      "name": "Technical Evaluation"
+    },
+    {
+      "order": 4,
+      "id": "24682892",
+      "name": "Negotiating"
+    },
+    {
+      "order": 5,
+      "id": "43449439",
+      "name": "Awaiting Signature"
+    },
+    {
+      "order": 8,
+      "id": "decisionmakerboughtin",
+      "name": "Review"
+    }
+  ],
+  "hubspot_scores": {
+    "11024003429": {
+      "meddicc_score": "28",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "5",
+      "meddicc_economic_buyer_score": "6",
+      "meddicc_decision_criteria_score": "7",
+      "meddicc_decision_process_score": "5",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "1"
+    },
+    "60036027012": {
+      "meddicc_score": "12",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "60056558933": {
+      "meddicc_score": "16",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62875661161": {
+      "meddicc_score": "15",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "61045491056": {
+      "meddicc_score": "11",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "61475205473": {
+      "meddicc_score": "30",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "5",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "6",
+      "meddicc_decision_process_score": "5",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "4"
+    },
+    "61076825943": {
+      "meddicc_score": "7",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62121618183": {
+      "meddicc_score": "41",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "4",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "7",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "3",
+      "meddicc_competition_score": "7"
+    },
+    "61582382687": {
+      "meddicc_score": "0",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "61615709775": {
+      "meddicc_score": "43",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "9",
+      "meddicc_economic_buyer_score": "4",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "5",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "3",
+      "meddicc_competition_score": "7"
+    },
+    "61841688666": {
+      "meddicc_score": "14",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62402578522": {
+      "meddicc_score": "30",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "5",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "9",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "4",
+      "meddicc_competition_score": "7"
+    },
+    "60053279602": {
+      "meddicc_score": "11",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62485423801": {
+      "meddicc_score": "19",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "54956375177": {
+      "meddicc_score": "39",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "8",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "9",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "8",
+      "meddicc_competition_score": "5"
+    },
+    "59369997485": {
+      "meddicc_score": "0",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "61176368035": {
+      "meddicc_score": "11",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "60257621387": {
+      "meddicc_score": "44",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "9",
+      "meddicc_economic_buyer_score": "8",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "8",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "9",
+      "meddicc_competition_score": "9"
+    },
+    "60786197152": {
+      "meddicc_score": "8",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "47879623775": {
+      "meddicc_score": "7",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62355039834": {
+      "meddicc_score": "32",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62360994147": {
+      "meddicc_score": "12",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "60069831015": {
+      "meddicc_score": "34",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "6",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "8",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "4"
+    },
+    "63222360840": {
+      "meddicc_score": "16",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": null,
+      "meddicc_economic_buyer_score": "2",
+      "meddicc_decision_criteria_score": null,
+      "meddicc_decision_process_score": null,
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "3",
+      "meddicc_competition_score": null
+    },
+    "63051341647": {
+      "meddicc_score": "17",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "60275604099": {
+      "meddicc_score": "12",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "63578787480": {
+      "meddicc_score": "33",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "5",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "7",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "4",
+      "meddicc_competition_score": "8"
+    },
+    "58939926620": {
+      "meddicc_score": "34",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "1",
+      "meddicc_economic_buyer_score": "8",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "9",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "9",
+      "meddicc_competition_score": "8"
+    },
+    "63165080439": {
+      "meddicc_score": "20",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "60423886694": {
+      "meddicc_score": "27",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "5",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "3"
+    },
+    "58135849096": {
+      "meddicc_score": "18",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "4",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "5",
+      "meddicc_decision_process_score": "5",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "7",
+      "meddicc_competition_score": "1"
+    },
+    "60837964868": {
+      "meddicc_score": "17",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "61149585726": {
+      "meddicc_score": "19",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "3",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "1"
+    },
+    "60964814258": {
+      "meddicc_score": "8",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "54599396690": {
+      "meddicc_score": "10",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "56685250888": {
+      "meddicc_score": "25",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "6",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "6",
+      "meddicc_decision_process_score": "5",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "1"
+    },
+    "57553904779": {
+      "meddicc_score": "39",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "5",
+      "meddicc_economic_buyer_score": "4",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "5",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "3",
+      "meddicc_competition_score": "3"
+    },
+    "63316026654": {
+      "meddicc_score": "8",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": null,
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": null,
+      "meddicc_decision_process_score": null,
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": null
+    },
+    "53466496122": {
+      "meddicc_score": "28",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "6",
+      "meddicc_economic_buyer_score": "5",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "8",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "8",
+      "meddicc_competition_score": "7"
+    },
+    "60665391542": {
+      "meddicc_score": "17",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "7",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "3",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "2"
+    },
+    "58956770692": {
+      "meddicc_score": "9",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "63220208693": {
+      "meddicc_score": "10",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "60652001696": {
+      "meddicc_score": "46",
+      "meddicc_status": "green",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "5",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "9",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "4",
+      "meddicc_competition_score": "8"
+    },
+    "61437846967": {
+      "meddicc_score": "33",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "4",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "8",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "6"
+    },
+    "55660576681": {
+      "meddicc_score": "48",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "6",
+      "meddicc_economic_buyer_score": "6",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "9",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "8",
+      "meddicc_competition_score": "7"
+    },
+    "63120688011": {
+      "meddicc_score": "8",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "63562515584": {
+      "meddicc_score": "10",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "61631402640": {
+      "meddicc_score": "11",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62622458398": {
+      "meddicc_score": "27",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "5",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "4",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "4",
+      "meddicc_competition_score": "7"
+    },
+    "62452805994": {
+      "meddicc_score": "17",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "56258367868": {
+      "meddicc_score": "10",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "49689180024": {
+      "meddicc_score": "30",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "4",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "4",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "3"
+    },
+    "62160567676": {
+      "meddicc_score": "48",
+      "meddicc_status": "green",
+      "meddicc_metrics_score": "9",
+      "meddicc_economic_buyer_score": "5",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "8",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "4",
+      "meddicc_competition_score": "8"
+    },
+    "62756829850": {
+      "meddicc_score": "21",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "5",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "6",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "1"
+    },
+    "63437263422": {
+      "meddicc_score": "16",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "54223739569": {
+      "meddicc_score": "7",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": null,
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": null,
+      "meddicc_decision_process_score": null,
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": null
+    },
+    "62741857928": {
+      "meddicc_score": "27",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "58134855076": {
+      "meddicc_score": "28",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "8",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "4",
+      "meddicc_competition_score": "1"
+    },
+    "60785721693": {
+      "meddicc_score": "32",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "5",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "8",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "7",
+      "meddicc_competition_score": "3"
+    },
+    "63527836680": {
+      "meddicc_score": "10",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "63549963371": {
+      "meddicc_score": "22",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "59458798354": {
+      "meddicc_score": "12",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62852783774": {
+      "meddicc_score": "14",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "60178287462": {
+      "meddicc_score": "19",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62725080086": {
+      "meddicc_score": "34",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "5",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "7"
+    },
+    "59387794836": {
+      "meddicc_score": "27",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "6",
+      "meddicc_decision_process_score": "8",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "5",
+      "meddicc_competition_score": "4"
+    },
+    "60419710634": {
+      "meddicc_score": "29",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "60173271471": {
+      "meddicc_score": "11",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62395520059": {
+      "meddicc_score": "16",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "58373987402": {
+      "meddicc_score": "35",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "6",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "6",
+      "meddicc_decision_process_score": "5",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "8"
+    },
+    "59369345948": {
+      "meddicc_score": "18",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "60840137793": {
+      "meddicc_score": "15",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "58659164971": {
+      "meddicc_score": "18",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "3",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "4",
+      "meddicc_decision_process_score": "4",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "1"
+    },
+    "59173115702": {
+      "meddicc_score": "44",
+      "meddicc_status": "green",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "7",
+      "meddicc_decision_process_score": "6",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "8",
+      "meddicc_competition_score": "1"
+    },
+    "60715077158": {
+      "meddicc_score": "17",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "60182251329": {
+      "meddicc_score": "14",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "60860413064": {
+      "meddicc_score": "0",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62678252395": {
+      "meddicc_score": "9",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62135862588": {
+      "meddicc_score": "19",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "58798224498": {
+      "meddicc_score": "0",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62111798456": {
+      "meddicc_score": "18",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "59021351952": {
+      "meddicc_score": "16",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "54442852124": {
+      "meddicc_score": "22",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "5",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "6",
+      "meddicc_decision_process_score": "1",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "1"
+    },
+    "62622489357": {
+      "meddicc_score": "9",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "61507488889": {
+      "meddicc_score": "26",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "62447700618": {
+      "meddicc_score": "8",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "53500422798": {
+      "meddicc_score": "38",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "6",
+      "meddicc_decision_criteria_score": "9",
+      "meddicc_decision_process_score": "8",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "9",
+      "meddicc_competition_score": "8"
+    },
+    "56162812495": {
+      "meddicc_score": "2",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "59245644951": {
+      "meddicc_score": "23",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "6",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "4",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "1"
+    },
+    "61626656091": {
+      "meddicc_score": "13",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "58966766773": {
+      "meddicc_score": "24",
+      "meddicc_status": "red",
+      "meddicc_metrics_score": "0",
+      "meddicc_economic_buyer_score": "0",
+      "meddicc_decision_criteria_score": "0",
+      "meddicc_decision_process_score": "0",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "0",
+      "meddicc_competition_score": "0"
+    },
+    "58897463067": {
+      "meddicc_score": "34",
+      "meddicc_status": "yellow",
+      "meddicc_metrics_score": "8",
+      "meddicc_economic_buyer_score": "1",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "5",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "1",
+      "meddicc_competition_score": "4"
+    },
+    "60355159912": {
+      "meddicc_score": "46",
+      "meddicc_status": "green",
+      "meddicc_metrics_score": "7",
+      "meddicc_economic_buyer_score": "4",
+      "meddicc_decision_criteria_score": "8",
+      "meddicc_decision_process_score": "8",
+      "meddicc_pain_score": null,
+      "meddicc_champion_score": "4",
+      "meddicc_competition_score": "7"
+    }
+  },
+  "captured_at": "2026-08-24T14:40:53.669389+00:00",
+  "source": "analyses(latest passed) + deals(active)"
+}
