@@ -3,7 +3,7 @@ import sys, json
 from pathlib import Path
 from collections import defaultdict
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
-from supabase_client import select_all
+from supabase_client import select_all, _coerce_in_values
 
 _VALID_COLUMNS = {}
 
@@ -58,6 +58,12 @@ async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by
                 # needs .not_.is_() not a chained attr
                 processed_filters.append(
                     ("__not_null__", col, None))
+        elif op in ("in_", "in"):
+            # The dynamic tool's filters come from an LLM: an in_ value may
+            # arrive as a bare or comma-joined string. Coerce to a list here so
+            # the order_by path's direct .in_() (line ~72) can never char-iterate
+            # a string into in.(6,0,7,8,...). (Live Bestseller incident.)
+            processed_filters.append(("in_", col, _coerce_in_values(val)))
         else:
             processed_filters.append((op, col, val))
 
