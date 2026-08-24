@@ -29,6 +29,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: "TEMP — Phase 2 determinism (score one call 5x)"
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PHASE2_RUNS: "5"
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/phase2_determinism.py
+
       - name: "TEST 0 — Offline: greeting/help handler + handler descriptions"
         run: |
           set -e
