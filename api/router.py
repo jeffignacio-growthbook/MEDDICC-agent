@@ -19,6 +19,33 @@ logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger("cro_agent")
 logger.info("[STARTUP] Phase G.2 robust router with evaluation loop loaded")
 
+# Synthesis output ceiling. 600 truncated multi-deal MEDDICC answers mid-sentence
+# (a two-deal scorecard is 2 deals x 7 components + narrative + next steps — well
+# over 600 tokens). A CRO routinely asks about several deals at once, so size for
+# that; the retry ceiling is the truncation-guard's second attempt.
+SYNTH_MAX_TOKENS = 2000
+SYNTH_MAX_TOKENS_RETRY = 3000
+
+_TERMINAL_ENDINGS = ".!?)\"'`]}…"
+
+
+def _looks_truncated(text: str) -> bool:
+    """Heuristic: did a synthesized answer get cut off (max_tokens ceiling)?
+    A complete answer ends on terminal punctuation or a closing bracket/quote.
+    One that ends on a word, an em/en dash, a comma, a colon, or a bullet
+    marker was clipped mid-thought. Empty/whitespace is treated as not
+    truncated (that is a different failure the empty-result path handles)."""
+    # Strip trailing markdown emphasis/quote so "**...strong.**" reads as "."
+    t = (text or "").rstrip().rstrip("*_`> ").rstrip()
+    if not t:
+        return False
+    last = t[-1]
+    if last in _TERMINAL_ENDINGS:
+        return False
+    # A trailing dash/comma/colon/semicolon/bullet is an unfinished clause or
+    # list item; anything else is a bare word with no closing punctuation.
+    return True
+
 FOLLOWUP_PRONOUNS = [
     "which of those", "which of them", "which of these",
     "of those", "of them", "of these",
@@ -73,7 +100,17 @@ HANDLER_DESCRIPTIONS = {
     "generate_win_loss": "full narrative for a specific closed deal (slow)",
     "query_competitive_intel": "competitive intelligence: which companies mentioned DIY/build-it-themselves, named competitors showing up in calls, build-vs-buy signals, what alternatives prospects are evaluating",
     "set_target": "admin: set quota or target (requires auth)",
-    "query_rubric_scores_bulk": "MEDDICC component scores for a known set of deals",
+    "query_rubric_scores_bulk": (
+        "MEDDICC component scores for a NAMED company or a known set of deals — "
+        "the scorecard for specific deal(s), including which components are weak "
+        "and what the AE should do next. ALWAYS use this when the question names "
+        "a company or deal and asks to score it / assess its MEDDICC / highlight "
+        "weaknesses / recommend next steps — even when it also asks about "
+        "weaknesses, gaps, or next steps (those do NOT make it a query_deal_health "
+        "scan). Resolves a company name to its deal(s) automatically. Examples: "
+        "'score Bestseller on MEDDICC, highlight weaknesses and next steps', "
+        "'score the LiveSport deal on MEDDICC', 'how does Acme look on MEDDICC?'"
+    ),
     "submit_score_correction": (
         "The user DISAGREES with a MEDDICC component score and is proposing a "
         "correction — e.g. 'champion should be 7 for LiveSport, Tomáš is "
@@ -107,9 +144,12 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "'which reps are above 50% to quota?'"
     ),
     "query_deal_health": (
-        "MEDDICC health filter — deals with weak scores, missing components, "
-        "or specific qualification gaps. Use when asking about risky deals, "
-        "deals with no champion, or deals missing a specific MEDDICC component. "
+        "MEDDICC health filter — an UNNAMED threshold scan ACROSS THE BOOK (or a "
+        "rep's book) for the SET of deals with weak scores, missing components, "
+        "or specific qualification gaps. Use ONLY when NO single company or deal "
+        "is named — the question asks which deals (plural) are weak/risky/missing "
+        "something. If the question names a company, use query_rubric_scores_bulk "
+        "instead, EVEN when it asks about weaknesses or next steps. "
         "Examples: 'show me Christian's weakest deals', "
         "'which deals have no economic buyer?', "
         "'show me deals closing this month with a score below 5', "
@@ -1638,7 +1678,7 @@ async def route_question(question: str, user_id: str,
                         f"{json.dumps(tool_results, indent=2, default=str)[:3000]}"}
         ],
         system=build_synthesis_prompt(persona),
-        max_tokens=600
+        max_tokens=SYNTH_MAX_TOKENS
     )
     raw_answer = answer_resp.text.strip()
 
@@ -1654,9 +1694,34 @@ async def route_question(question: str, user_id: str,
         }],
         system="Respond with only the verified answer text. "
                "No JSON, no explanation.",
-        max_tokens=600
+        max_tokens=SYNTH_MAX_TOKENS
     )
     verified = verify_resp.text.strip()
+    # Truncation guard: a multi-deal answer that hit the ceiling (or that the
+    # verify pass clipped) ends mid-sentence. Shipping a sentence that stops
+    # mid-word is worse than a complete one — re-synthesize once at a higher
+    # ceiling and keep whichever is complete. (Live Bestseller two-deal incident.)
+    if _looks_truncated(raw_answer) or _looks_truncated(verified):
+        try:
+            retry_resp = generator_client.complete(
+                messages=[
+                    {"role": "user",
+                     "content": f"Question: {question}\n\n"
+                                f"Data:\n"
+                                f"{json.dumps(tool_results, indent=2, default=str)[:3000]}\n\n"
+                                "Answer completely — do not cut off mid-sentence "
+                                "or mid-list. Be concise enough to finish."}
+                ],
+                system=build_synthesis_prompt(persona),
+                max_tokens=SYNTH_MAX_TOKENS_RETRY,
+            )
+            cand = retry_resp.text.strip()
+            if cand and not _looks_truncated(cand):
+                verified = cand
+            elif len(cand) > len(verified):
+                verified = cand
+        except Exception as e:
+            logger.warning(f"[SYNTH] truncation-retry failed: {e}")
 
     # ── 8. Correctness assessment + retry loop ───────────
     from api.assessor import (assess_correctness,
@@ -1764,7 +1829,7 @@ async def route_question(question: str, user_id: str,
                             f"Data:\n{json.dumps(tool_results, indent=2, default=str)[:3000]}"}
             ],
             system=build_synthesis_prompt(persona),
-            max_tokens=600
+            max_tokens=SYNTH_MAX_TOKENS
         )
         verified = answer_resp.text.strip()
 
@@ -1815,6 +1880,19 @@ def _log_learning(sb, question, handler, assessment,
 _VOICE_BASE = """You are a CRO's revenue intelligence agent.
 Answer questions using ONLY the data from tool_results below.
 Never invent numbers. If data doesn't exist, say so plainly.
+
+EMPTY / NO RESULTS (do not confabulate):
+- When the data is empty — no rows, an empty list, no matching deal — say
+  exactly that: what you looked for and that you found nothing. Example:
+  "I searched active deals matching 'Bestseller' and found no MEDDICC scores
+  for it."
+- Do NOT invent explanations for why it is empty. You do NOT know whether the
+  deal doesn't exist, is below a threshold, is named differently in the CRM, or
+  a query failed — listing those as possibilities is speculation, and stating
+  guesses as if they were findings is worse than a short "nothing came back."
+- If a name was expected to match and didn't, the honest move is to say the
+  lookup returned nothing and ask the user to confirm the exact name — not to
+  theorize about the cause.
 
 CRITICAL SLACK FORMATTING:
 - Bold: *single asterisks* only. Never **double**.
