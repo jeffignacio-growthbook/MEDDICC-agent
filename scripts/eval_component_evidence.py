@@ -204,7 +204,7 @@ def test_guard_separates_unread_structurally():
     check("guard gives unread its own section",
           "not yet assessed" in p or "haven't come up yet" in p)
     check("guard mandates a neutral marker, not a colour circle",
-          ":white_circle:" in p and "never a red/yellow/green circle" in p)
+          "⚪" in p and "never a 🔴/🟡/🟢 circle" in p)
     check("guard says a 0 must not sort unread to the top",
           "sort the unread one to the top" in p or "sort them to the top" in p)
 
