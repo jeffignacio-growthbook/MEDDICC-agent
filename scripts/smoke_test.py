@@ -18,6 +18,11 @@ RAILWAY_URL = os.environ.get("RAILWAY_URL", "")
 TIMEOUT = 90  # seconds per question
 ZAP_REPLY_URL = os.environ.get("ZAP_REPLY_URL", "")
 
+# The channel_id the agent echoes back to the Zap IS the Slack routing target,
+# so this must never be a real channel. Default to an obvious sandbox marker;
+# set SMOKE_TEST_CHANNEL (workflow var/secret) to the real sandbox channel.
+SMOKE_TEST_CHANNEL = os.environ.get("SMOKE_TEST_CHANNEL", "sandbox-smoke-test")
+
 # Each test: (question, handler_hint, required_content)
 # required_content: strings that MUST appear in the answer
 # (case-insensitive). Empty list = just check non-empty.
@@ -76,7 +81,7 @@ async def send_question(client: httpx.AsyncClient,
         json={
             "text": question,
             "user_id": "smoke_test",
-            "channel_id": "smoke_test_channel",
+            "channel_id": SMOKE_TEST_CHANNEL,
             "thread_ts": thread_ts,
             "ts": thread_ts,
         },
