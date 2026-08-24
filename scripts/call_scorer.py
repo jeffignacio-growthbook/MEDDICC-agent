@@ -39,7 +39,7 @@ COMPONENTS = [
 COMPONENT_KEYS = [k for _, k in COMPONENTS]
 
 # Bump when the prompt/rubric changes so a re-backfill can find stale rows.
-SCORER_VERSION = "phase1-percall-v1"
+SCORER_VERSION = "phase1-percall-v2"
 
 SINGLE_CALL_SYSTEM_PROMPT = """\
 You score a SINGLE sales call against the seven MEDDICC components. You are given
@@ -52,12 +52,22 @@ Return a JSON object and nothing else, with exactly these seven keys:
 Each value is an object: {"score": <0-10 integer or null>, "evidence": <string or null>}.
 
 RULES
-- If this call says NOTHING about a component, return {"score": null, "evidence": null}.
-  Null is the common and correct case — a technical call establishes nothing about
-  procurement. NEVER return 0 to mean "not discussed"; 0 is not a valid score here.
-  Use null. Do not guess.
+- Score a component ONLY if THIS call MATERIALLY ADVANCES it — i.e. this call adds
+  specific new evidence about it. If the call is silent on a component, OR only
+  references it in passing without adding substantive evidence beyond a mention,
+  return {"score": null, "evidence": null}. A passing mention is not an advance.
+- NULL IS THE COMMON CASE. Most calls advance only ONE to FOUR of the seven
+  components; the rest are null. A narrow call — a pricing negotiation, a technical
+  deep-dive — legitimately establishes almost nothing about the others. If you find
+  yourself scoring five, six, or seven components, you are over-scoring: re-check
+  which ones this call ACTUALLY advanced with new evidence, and null the rest.
+- Do NOT re-score a component this call merely confirms or repeats from a presumed
+  earlier discussion. You have no prior calls; score only what THIS call newly
+  establishes. Old evidence surviving is the roll-up's job, not yours — when in
+  doubt, null.
+- NEVER return 0 to mean "not discussed"; 0 is not a valid score. Use null. Do not guess.
 - Every non-null score MUST carry evidence: a direct quote or a specific fact FROM
-  THIS CALL. No evidence from this call → the score is null.
+  THIS CALL. No specific evidence from this call → the score is null.
 - Default to the LOWER score on ambiguity. Enthusiasm without specifics = 1/10.
 - Score Champion and Economic Buyer on what the buyer DOES, not how they FELT.
   A contact who sounds excited but owns no internal next step is Champion 1-2, not higher.
