@@ -1,0 +1,73 @@
+name: Backfill call_scores (progressive scoring Phase 3)
+
+on:
+  workflow_dispatch:
+    inputs:
+      model_role:
+        description: 'LLMClient role for scoring (generator=Sonnet, assessor=Haiku)'
+        required: false
+        default: 'generator'
+      dry_run:
+        description: 'Dry run (coverage + cost only, no scoring, no writes)'
+        required: false
+        default: 'false'
+      limit:
+        description: 'Max deals to score (0 = all)'
+        required: false
+        default: '0'
+      deal_ids:
+        description: 'Comma-separated deal IDs to score (blank = all)'
+        required: false
+        default: ''
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install psycopg2-binary
+
+      # DDL (CREATE TABLE) needs a direct Postgres connection, not PostgREST.
+      # Apply migration 043 idempotently when SUPABASE_DB_URL is available; if it
+      # is not, print the SQL for manual application and let the backfill fail
+      # loudly (its upsert will report the missing table).
+      - name: Ensure call_scores table (migration 043)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, sys
+          sql = pathlib.Path("scripts/migrations/043_add_call_scores.sql").read_text()
+          url = os.getenv("SUPABASE_DB_URL")
+          if not url:
+              print("SUPABASE_DB_URL not set — cannot apply DDL from CI.")
+              print("Paste this into the Supabase SQL editor, then re-run this workflow:\n")
+              print(sql)
+              sys.exit(0)
+          import psycopg2
+          conn = psycopg2.connect(url); conn.autocommit = True
+          with conn.cursor() as cur:
+              cur.execute(sql)
+              cur.execute("SELECT pg_notify('pgrst','reload schema');")
+          print("✓ migration 043 applied (idempotent); PostgREST schema reload notified")
+          PY
+
+      - name: Backfill
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SCORING_MODEL_ROLE: ${{ github.event.inputs.model_role || 'generator' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '0' }}
+          BACKFILL_LIMIT: ${{ github.event.inputs.limit || '0' }}
+          BACKFILL_DEAL_IDS: ${{ github.event.inputs.deal_ids || '' }}
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/backfill_call_scores.py
