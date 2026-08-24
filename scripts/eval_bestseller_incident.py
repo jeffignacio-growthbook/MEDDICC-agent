@@ -183,9 +183,57 @@ def test_empty_results_prompt_forbids_confabulation():
           or "do not confabulate" in p)
 
 
+# ── defect 5: the assessor floor actually gates (block, no retry) ───────────
+def test_assessor_floor_blocks_low_confidence():
+    """Below the confidence floor, an honest miss ships instead of the drafted
+    answer. Before this the score gated nothing — 0.00 and 0.50 both shipped."""
+    from api.router import (_below_floor, _honest_miss, _result_summary,
+                            ASSESS_CORRECTNESS_FLOOR)
+
+    # the two live incidents: 0.00 confab (issue None) and 0.50 truncation
+    check("0.00/issue=None is below floor (blocked)",
+          _below_floor({"score": 0.0, "issue": None}))
+    check("0.50/issue=None is below the 0.30-ish floor? (only if floor>0.5)",
+          _below_floor({"score": 0.50, "issue": None}) == (0.50 < ASSESS_CORRECTNESS_FLOOR))
+    check("a healthy 0.85 answer is NOT blocked",
+          not _below_floor({"score": 0.85, "issue": None}))
+    check("floor default is provisional 0.30", abs(ASSESS_CORRECTNESS_FLOOR - 0.30) < 1e-9)
+
+    # data_gap answers must clear the floor even at a low score — an acknowledged
+    # gap is honest, not broken. Guards against a future assessor change silently
+    # blocking legitimate gap answers.
+    check("legitimate data_gap clears the floor (not blocked)",
+          not _below_floor({"score": 0.0, "issue": "data_gap"}))
+    check("honest-gap skipped assessment clears the floor",
+          not _below_floor({"score": 0.9, "issue": "data_gap", "skipped": True}))
+    check("budget-skipped assessment clears the floor",
+          not _below_floor({"score": 0.5, "skipped": True}))
+
+    # env-overridable (config, not a hardcoded constant)
+    check("floor is config-overridable via env",
+          _below_floor({"score": 0.4, "issue": None}, floor=0.5)
+          and not _below_floor({"score": 0.4, "issue": None}, floor=0.3))
+
+    # the honest-miss message is fact-only — no speculative causes
+    msg = _honest_miss("query_deal_health", {"deals": [], "summary": "x"}).lower()
+    check("honest miss admits it couldn't answer reliably",
+          "couldn't answer" in msg or "could not answer" in msg)
+    check("honest miss states what came back (facts only)",
+          "no matching rows came back" in msg)
+    SPECULATION = ["might not exist", "might be", "may be", "could be",
+                   "possibly", "perhaps", "named differently", "below a",
+                   "below the score", "threshold"]
+    check("honest miss contains NO speculative cause",
+          not any(s in msg for s in SPECULATION))
+    check("_result_summary reports empty list as no matching rows",
+          _result_summary({"scores": []}) == "no matching rows came back")
+    check("_result_summary counts rows factually",
+          _result_summary({"scores": [1, 2]}) == "2 rows came back")
+
+
 def run():
     print("=" * 72)
-    print("BESTSELLER INCIDENT — in_ coercion / routing / truncation / empty")
+    print("BESTSELLER INCIDENT — in_ coercion / routing / truncation / empty / floor")
     print("=" * 72)
     for title, fn in (
         ("defect 1 — deal_id filters never iterate a string",
@@ -196,6 +244,8 @@ def run():
          test_multi_deal_synthesis_not_truncated),
         ("defect 3 — empty results not confabulated",
          test_empty_results_prompt_forbids_confabulation),
+        ("defect 5 — assessor floor blocks low-confidence (no retry)",
+         test_assessor_floor_blocks_low_confidence),
     ):
         print(f"\n[{title}]")
         fn()
