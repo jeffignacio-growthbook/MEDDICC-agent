@@ -1119,8 +1119,6 @@ async def query_rubric_scores_bulk(params: dict, sb) -> dict:
     import json as _json
     for s in scores:
         s["overall"] = _labeled_overall(s.get("overall_score"))
-        s["bands"] = {c: lbl["text"] for c, lbl in
-                      _meddicc_bands({c: s.get(col) for c, col in _cols.items()}).items()}
         # Per-component EVIDENCE — the fact behind the score. Without it,
         # synthesis fills the gap with generic template language ("identify who
         # has a personal stake") that names nothing about the deal. Pull it from
@@ -1138,6 +1136,23 @@ async def query_rubric_scores_bulk(params: dict, sb) -> dict:
             cell = cd.get(c) if isinstance(cd.get(c), dict) else {}
             ev = (cell.get("evidence") or "").strip()
             s["evidence"][c] = ev or None
+
+        # UNREAD vs RED. A component at 0 with NO evidence was never discussed —
+        # "not yet assessed", not "clearly absent". A component at 0 WITH
+        # evidence ("no champion identified on the call") is a real red. The band
+        # (red=0-3) can't tell them apart, so a rep skimming sees red and reads
+        # "problem". Route the never-discussed ones through the band function as
+        # None so they render as the distinct `unread` band, and mark status so
+        # synthesis can list them separately and not sort them to the top by a 0.
+        band_input, s["status"] = {}, {}
+        for c, col in _cols.items():
+            sc = s.get(col)
+            unread = (sc in (0, None)) and not s["evidence"][c]
+            band_input[c] = None if unread else sc
+            s["status"][c] = "unread" if unread else "assessed"
+        s["bands"] = {c: lbl["text"] for c, lbl in
+                      _meddicc_bands(band_input).items()}
+        s["unread_components"] = [c for c in _cols if s["status"][c] == "unread"]
     # Deals we looked up but that have no analysis row yet — so synthesis can say
     # truthfully "these N were scored, these M haven't been analyzed" instead of
     # inventing a reason (the entity-scope path was confabulating "not scored
