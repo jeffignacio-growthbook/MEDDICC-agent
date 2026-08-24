@@ -51,6 +51,7 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_score_pinning.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_force_reanalyze.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_per_call_rollup.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_rollup_render.py
 
       - name: "TEST 1 — Competitive intel handler against real data"
         env:

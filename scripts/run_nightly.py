@@ -270,6 +270,31 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer) -> dict
                 'reason': 'invalid company slug'
             }
 
+        # SCORING_MODE=progressive (Phase 5 cutover, flag-gated): the deal score
+        # of record is the roll-up of per-call scores (call_scores), not a fresh
+        # batch generate/evaluate. Model-free; writes through the same HubSpot +
+        # Supabase path via a synthesized draft. Default 'batch' leaves the
+        # existing path untouched until the flag is flipped.
+        if os.getenv('SCORING_MODE', 'batch').lower() == 'progressive':
+            import rollup_deal_scores as rd
+            sb = sb_writer.client if sb_writer else None
+            if sb is None:
+                try:
+                    from supabase_client import SupabaseWriter
+                    sb = SupabaseWriter().client
+                except Exception as e:
+                    return {'deal_id': deal_id, 'company': company_name,
+                            'status': 'skipped', 'reason': f'no supabase for rollup: {e}'}
+            output_dir = Path(__file__).parent.parent / "output"
+            res = rd.write_rollup(deal, sb, hubspot, sb_writer, output_dir)
+            if res is None:
+                return {'deal_id': deal_id, 'company': company_name,
+                        'status': 'skipped', 'reason': 'no scored calls to roll up'}
+            deal['last_analyzed'] = datetime.now().isoformat()
+            print(f"   ✓ {company_name}: progressive roll-up "
+                  f"{res['overall_score']}/70 from {res['calls']} calls")
+            return res
+
         # Build deal_context dict for agent
         deal_context = {
             'deal': {
