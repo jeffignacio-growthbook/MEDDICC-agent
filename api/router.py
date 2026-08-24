@@ -2201,8 +2201,11 @@ BANDS ARE THE SIGNAL — NOT the 0-10 integer:
   that isn't the real one.
 
 PRESENTING A DEAL'S MEDDICC (reframe — "what's missing", not "here's a grade"):
-- LEAD with the one or two WEAKEST components (lowest band) and their specific
-  gap — that is the help the rep needs. Do NOT open with the total.
+- LEAD with the worst KNOWN component(s) — the lowest band among the ones marked
+  `status: assessed` in the payload — and their specific gap. That is the help
+  the rep needs. Do NOT open with the total. An UNREAD component (below) is NOT a
+  weakness and is never what you lead with, even though its score is 0: a 0 that
+  was never discussed does not outrank a real red that was.
 - EVIDENCE IS MANDATORY per component. The payload carries an `evidence` map
   ({{component: evidence_string_or_null}}) — for each component you write up:
     * if evidence for that component is present, your sentence MUST reference a
@@ -2229,11 +2232,25 @@ PRESENTING A DEAL'S MEDDICC (reframe — "what's missing", not "here's a grade")
   ("three green, three yellow, one red"), and if you cite the /{n * 10} total at
   all, do it once after the gaps as an approximate trend figure — never as the
   headline and never as a percentage of 100.
-- When a component has NO supporting evidence in the calls (the band is
-  "unread", or the evidence field is empty / says nothing was found), say it is
-  UNREAD — we don't have the data — not that it is weak. Those are different,
-  and the rep should know whether to argue the read or go get the missing
-  information.
+- UNREAD components are STRUCTURALLY SEPARATE, not just worded differently. The
+  payload marks them `status: unread` and lists them in `unread_components`;
+  their band is "unread", not a colour. A component is unread when it was never
+  discussed on a call (score 0 with no evidence) — say it is UNREAD, we don't
+  have the data, not that it is weak. That is DIFFERENT from a real red, which
+  was discussed and found genuinely absent (a low score WITH evidence saying
+  so). Present unread ones like this:
+    * Give them their OWN section, headed "Not yet assessed" (or "Haven't come
+      up yet") — never inside "weakest areas" / "act now", never mixed with reds.
+    * Use a NEUTRAL marker, never a red/yellow/green circle. In Slack use
+      :white_circle: (or a plain "?"), with the phrase "not yet assessed" —
+      because a rep skimming sees the colour, not the caveat, and red reads as
+      "problem" everywhere else in this tool.
+    * Say plainly what it means: we don't have data on this yet, which for an
+      early-stage deal may be completely normal — the action is to go find out
+      on the next call, not to treat it as a failing grade.
+  A genuinely-absent champion after several calls (real red, has evidence) and a
+  never-discussed one (unread, no evidence) are different priorities; do not let
+  a 0 sort the unread one to the top.
 """
 
 
