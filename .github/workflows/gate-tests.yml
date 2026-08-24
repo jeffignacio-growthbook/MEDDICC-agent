@@ -29,6 +29,15 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: "TEMP — Phase 1 per-call cumulative scoring (Livesport)"
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/phase1_livesport_cumulative.py
+
       - name: "TEST 0 — Offline: greeting/help handler + handler descriptions"
         run: |
           set -e
@@ -50,6 +59,7 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_evaluator_json_salvage.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_score_pinning.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_force_reanalyze.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_per_call_rollup.py
 
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
