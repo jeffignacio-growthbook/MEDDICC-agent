@@ -31,6 +31,17 @@ def _validate_filters(table, filters):
 
 VALID_OPS = {"eq", "neq", "gt", "gte", "lt", "lte", "like", "ilike", "is_", "in_"}
 
+# Columns that are huge free-text/JSONB blobs. The dynamic fallback feeds its
+# rows straight into synthesis, and 40 rows of full_analysis_text was a 180KB
+# synthesis payload. Never let the fallback select these — the scores and bands
+# it needs live in the numeric columns. (Cost isn't the concern; a 180KB dump
+# blows the synthesis context and produces a truncated or failed answer.)
+HEAVY_COLUMNS = {
+    "full_analysis_text", "analysis_text", "raw_transcript", "transcript",
+    "draft",
+}
+
+
 async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by=None):
     _init_valid_columns(sb)
     # Analyses table has large JSONB - limit to 50 rows max
@@ -41,6 +52,8 @@ async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by
     if not cols:
         cols = ["deal_id", "company_name", "deal_value",
                 "deal_status", "close_date"]
+    # Strip heavy text blobs — the fallback dumps rows into synthesis (see above).
+    cols = [c for c in cols if c not in HEAVY_COLUMNS] or ["deal_id", "company_name"]
     valid_filters = _validate_filters(table, [tuple(f) for f in (filters or [])])
     invalid_ops = [(op,col,val) for op,col,val in valid_filters if op not in VALID_OPS]
     if invalid_ops:

@@ -6,6 +6,7 @@ generates answers with Sonnet, verifies numbers with Haiku.
 
 import json
 import os
+import re
 import logging
 import sys
 from pathlib import Path
@@ -23,8 +24,13 @@ logger.info("[STARTUP] Phase G.2 robust router with evaluation loop loaded")
 # (a two-deal scorecard is 2 deals x 7 components + narrative + next steps — well
 # over 600 tokens). A CRO routinely asks about several deals at once, so size for
 # that; the retry ceiling is the truncation-guard's second attempt.
-SYNTH_MAX_TOKENS = 2000
-SYNTH_MAX_TOKENS_RETRY = 3000
+SYNTH_MAX_TOKENS = 4000
+SYNTH_MAX_TOKENS_RETRY = 8000
+# How much of the tool_results JSON reaches synthesis. 3000 chars truncated a
+# multi-deal payload before the model saw the later deals (a CRO asks about
+# several at once). Cost is not the constraint here — a complete answer over
+# many deals beats a truncated one — so this is sized for the many-deal case.
+SYNTH_PAYLOAD_CHARS = 20000
 
 _TERMINAL_ENDINGS = ".!?)\"'`]}…"
 
@@ -442,6 +448,51 @@ def build_entity_hint(entities: dict) -> str:
             f"these specific entities from the prior answer: "
             f"{'; '.join(parts)}")
 
+_DEAL_ID_RE = re.compile(r"\b\d{8,}\b")
+
+
+def extract_explicit_deal_ids(question: str) -> list:
+    """Deal IDs the user pasted into THIS message (8+ digit runs). These are an
+    explicit entity in the current turn and must override any thread context."""
+    return _DEAL_ID_RE.findall(question or "")
+
+
+def message_names_known_company(question: str, sb) -> bool:
+    """Does the current message name a company that exists in the deals table?
+    A named company in THIS message is an explicit entity and overrides
+    thread-cached entities (bug: 'Ecco and Zalando' scoped to a cached Natera).
+    Whole-word, case-insensitive; best-effort (False if the lookup fails)."""
+    q = question or ""
+    if not q.strip():
+        return False
+    try:
+        from supabase_client import select_all
+        rows = select_all(sb, "deals", columns="company_name")
+    except Exception as e:
+        logger.warning(f"[ENTITY_SCOPE] company-name check failed: {e}")
+        return False
+    for r in rows:
+        name = (r.get("company_name") or "").strip()
+        if len(name) < 3:
+            continue
+        # Deals are stored as "Ecco - Paid POC" / "Zalando (Outbound)"; the user
+        # types the brand ("Ecco"). Match the leading brand token as well as the
+        # full name. A whole-word match keeps it from firing on substrings.
+        candidates = {name}
+        short = re.split(r"\s[-–—(:,/]|\s{2,}", name, maxsplit=1)[0].strip()
+        if len(short) >= 3:
+            candidates.add(short)
+        # First word too, for "Natera Expansion" when the user types "Natera".
+        # len>=4 keeps common short words ("New", "The") from matching.
+        first_word = name.split()[0] if name.split() else ""
+        if len(first_word) >= 4:
+            candidates.add(first_word)
+        for cand in candidates:
+            if re.search(r"(?<!\w)" + re.escape(cand) + r"(?!\w)", q, re.IGNORECASE):
+                return True
+    return False
+
+
 def should_use_entity_scope(question: str, prior_entities: dict) -> bool:
     """
     Decide whether to bypass discovery and query directly
@@ -455,6 +506,14 @@ def should_use_entity_scope(question: str, prior_entities: dict) -> bool:
     from datetime import datetime, timezone, timedelta
 
     if not prior_entities or not prior_entities.get("deal_ids"):
+        return False
+
+    # Entities named in the CURRENT message always win over thread context.
+    # Explicit deal IDs pasted into this message are unambiguous — never scope
+    # to the thread's cached deals when the user just told us which deals.
+    if extract_explicit_deal_ids(question):
+        logger.info("[ENTITY_SCOPE] current message pasted explicit deal IDs — "
+                    "using them, not thread context")
         return False
 
     # Check staleness: entities older than 30 minutes force rediscovery
@@ -655,7 +714,8 @@ Required JSON:
       "start": "YYYY-MM-DD or null",
       "end":   "YYYY-MM-DD or null"
     }},
-    "company": "<company name or null>",
+    "company": "<single company name, or null>",
+    "companies": "<list of company names when the question names MORE THAN ONE (e.g. 'score Ecco, Zalando and Natera') — [\"Ecco\", \"Zalando\", \"Natera\"]; else null. Put every named company here; do not drop any, and there is no limit.>",
     "rep_email": "<email or null>",
     "sdr_email": "<SDR/BDR email for query_sdr_metrics or null>",
     "role": "ae|am|null",
@@ -1522,7 +1582,19 @@ async def route_question(question: str, user_id: str,
     # Seed a resolved current-quarter window so the retry path runs end to end.
     params = {"time_window": resolve_time_window({})}
 
-    if should_use_entity_scope(question, prior_entities):
+    # Entities named in the CURRENT message win over thread context. Explicit
+    # pasted deal IDs, or a company named in this message, mean the user told us
+    # the subject THIS turn — never scope to the thread's cached deals then.
+    explicit_deal_ids = extract_explicit_deal_ids(question)
+    msg_names_company = message_names_known_company(question, sb)
+    msg_has_own_entities = bool(explicit_deal_ids) or msg_names_company
+    if msg_has_own_entities:
+        logger.info(f"[ENTITY_SCOPE] current message names its own entities "
+                    f"(explicit_ids={len(explicit_deal_ids)}, "
+                    f"company={msg_names_company}) — thread context will NOT "
+                    f"override it")
+
+    if should_use_entity_scope(question, prior_entities) and not msg_has_own_entities:
         logger.info(f"[ENTITY_SCOPE] using "
                     f"{len(prior_entities['deal_ids'])} "
                     f"known deal_ids, bypassing discovery")
@@ -1539,8 +1611,10 @@ async def route_question(question: str, user_id: str,
                         "falling through to normal routing")
 
     # ── G.7 cache fallback — only when no usable entity IDs ──
-    # Prefer entity_context (live re-query) over stale cache
-    if not skip_normal_routing and has_followup_pronoun(question):
+    # Prefer entity_context (live re-query) over stale cache. But a message that
+    # names its own entities is not a "use the cached answer" follow-up.
+    if (not skip_normal_routing and has_followup_pronoun(question)
+            and not msg_has_own_entities):
         from api.db import load_result_cache
         cached = load_result_cache(sb, thread_ts) if thread_ts else None
         if cached:
@@ -1556,7 +1630,7 @@ async def route_question(question: str, user_id: str,
     if not skip_normal_routing:
         entity_params  = {}
 
-        if has_followup_pronoun(question):
+        if has_followup_pronoun(question) and not msg_has_own_entities:
             prior_entities = get_prior_entities(history)
             if prior_entities:
                 entity_params = {
@@ -1599,10 +1673,19 @@ async def route_question(question: str, user_id: str,
         params["time_window"] = resolve_time_window(
             params.get("time_window", {}))
 
-        # Inject prior entity context for pronoun follow-ups
-        if entity_params:
+        # Inject prior entity context for pronoun follow-ups — but ONLY when the
+        # current message named no entities of its own (entity_params is already
+        # gated on msg_has_own_entities above; this is the belt to that braces).
+        if entity_params and not msg_has_own_entities:
             params["deal_ids"]      = entity_params["deal_ids"]
             params["company_names"] = entity_params["company_names"]
+
+        # Explicit deal IDs pasted into THIS message always win — over the
+        # classifier's extraction and over any thread context.
+        if explicit_deal_ids:
+            params["deal_ids"] = explicit_deal_ids
+            logger.info(f"[CONTEXT] using {len(explicit_deal_ids)} explicit "
+                        f"deal IDs from the current message")
 
         # A score correction must record who submitted it (review queue, Part 7).
         if handler_name == "submit_score_correction":
@@ -1738,7 +1821,7 @@ async def route_question(question: str, user_id: str,
             {"role": "user",
              "content": f"Question: {question}\n\n"
                         f"Data:\n"
-                        f"{json.dumps(tool_results, indent=2, default=str)[:3000]}"}
+                        f"{json.dumps(tool_results, indent=2, default=str)[:SYNTH_PAYLOAD_CHARS]}"}
         ],
         system=build_synthesis_prompt(persona),
         max_tokens=SYNTH_MAX_TOKENS
@@ -1752,7 +1835,7 @@ async def route_question(question: str, user_id: str,
                 question=question,
                 answer=raw_answer,
                 tool_results=json.dumps(
-                    tool_results, default=str)[:2000],
+                    tool_results, default=str)[:SYNTH_PAYLOAD_CHARS],
             )
         }],
         system="Respond with only the verified answer text. "
@@ -1771,7 +1854,7 @@ async def route_question(question: str, user_id: str,
                     {"role": "user",
                      "content": f"Question: {question}\n\n"
                                 f"Data:\n"
-                                f"{json.dumps(tool_results, indent=2, default=str)[:3000]}\n\n"
+                                f"{json.dumps(tool_results, indent=2, default=str)[:SYNTH_PAYLOAD_CHARS]}\n\n"
                                 "Answer completely — do not cut off mid-sentence "
                                 "or mid-list. Be concise enough to finish."}
                 ],
@@ -1889,7 +1972,7 @@ async def route_question(question: str, user_id: str,
                 {"role": "user",
                  "content": f"Question: {question}\n\n"
                             f"Context: {retry_context}\n\n"
-                            f"Data:\n{json.dumps(tool_results, indent=2, default=str)[:3000]}"}
+                            f"Data:\n{json.dumps(tool_results, indent=2, default=str)[:SYNTH_PAYLOAD_CHARS]}"}
             ],
             system=build_synthesis_prompt(persona),
             max_tokens=SYNTH_MAX_TOKENS
@@ -1959,18 +2042,24 @@ _VOICE_BASE = """You are a CRO's revenue intelligence agent.
 Answer questions using ONLY the data from tool_results below.
 Never invent numbers. If data doesn't exist, say so plainly.
 
-EMPTY / NO RESULTS (do not confabulate):
-- When the data is empty — no rows, an empty list, no matching deal — say
-  exactly that: what you looked for and that you found nothing. Example:
-  "I searched active deals matching 'Bestseller' and found no MEDDICC scores
-  for it."
-- Do NOT invent explanations for why it is empty. You do NOT know whether the
-  deal doesn't exist, is below a threshold, is named differently in the CRM, or
-  a query failed — listing those as possibilities is speculation, and stating
-  guesses as if they were findings is worse than a short "nothing came back."
-- If a name was expected to match and didn't, the honest move is to say the
-  lookup returned nothing and ask the user to confirm the exact name — not to
-  theorize about the cause.
+EMPTY / NO RESULTS (do not confabulate) — applies to EVERY handler:
+- When the data is empty — no rows, an empty list, no matching deal, or a
+  scored_count of 0 — say exactly that: what you looked for and that you found
+  nothing. The payload tells you what was looked up: use `queried_companies`,
+  `queried_deal_ids`, `resolved_companies`, and `unscored_deal_ids` when present.
+  Example: "I looked up Ecco, Zalando, Natera and DEUNA — DEUNA didn't match any
+  deal, and the other three have no MEDDICC analysis on record yet."
+- "Resolved the deal but it has no scores" is DIFFERENT from "the deal doesn't
+  exist" — say which one the payload actually shows (deal_count > 0 with
+  scored_count 0 means the deal exists but hasn't been analyzed; a name in
+  `queried_companies` absent from `resolved_companies` means the NAME matched
+  nothing). Report the fact, not a guess.
+- Do NOT invent explanations for why it is empty. You do NOT know whether a deal
+  is below a threshold, is named differently, has no call activity, or a query
+  failed unless the payload says so — listing those as possibilities is
+  speculation, and stating guesses as findings is worse than "nothing came back."
+- If a name was expected to match and didn't, say the lookup returned nothing and
+  ask the user to confirm the exact name — do not theorize about the cause.
 
 CRITICAL SLACK FORMATTING:
 - Bold: *single asterisks* only. Never **double**.
