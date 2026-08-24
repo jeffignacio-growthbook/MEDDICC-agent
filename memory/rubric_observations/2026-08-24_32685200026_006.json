@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_006",
+  "timestamp": "2026-08-24T03:17:16.297153",
+  "company": "Deel",
+  "criterion_fired": "Criterion 2 (Decision Process) and Criterion 3 (Champion)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should explicitly state: 'Score Decision Process on ONLY current call evidence unless prior calls explicitly reference documented milestones that the prospect reaffirmed in current calls.' Criterion 3 should define: 'Champion commitment = explicit agreement to take a specific action by a date; aspirational language (intends, plans, will) without timeline = 0 points until confirmed actionable.'"
+}

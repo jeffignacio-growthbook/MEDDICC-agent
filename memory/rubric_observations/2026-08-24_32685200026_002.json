@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_002",
+  "timestamp": "2026-08-24T03:11:12.691977",
+  "company": "Picnic Technologies",
+  "criterion_fired": "Criterion 1 (Champion Status), Criterion 3 (Competition), Criterion 4 (Champion Next Step)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 1: Add explicit requirement: 'If cumulative Champion score is based on prior calls, generated analysis must either justify carry-forward with carry-forward language OR explicitly state methodology shift before downgrading.' Criterion 3: Clarify that 'named competitive threat' includes incumbent/homegrown if it appears in the named list; state threat name explicitly. Criterion 4: Require next steps to include: specific owner, specific date/deadline, and measurable confirmation method (e.g., 'Ask X by DATE: specific question that yields yes/no or named person')."
+}

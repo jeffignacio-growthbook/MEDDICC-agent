@@ -1,0 +1,21 @@
+{
+  "company": "ASAPP",
+  "deal_id": "62756829850",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CARRY-FORWARD VIOLATION \u2014 Decision Criteria regressed from 8/10 (Identified) to 5/10 (Partial) without documented reason. Cumulative state scored DC at 8/10 with evidence of self-hosted, warehouse-native, and compliance fit. New analysis downgrades to 5/10 claiming criteria were 'presented as product capabilities' rather than prospect requirements \u2014 but this reinterpretation contradicts the prior assessment. Either maintain 8/10 with note 'No new DC information in Call 2; maintaining prior score' OR provide explicit evidence from Call 2 that contradicts the prior assessment. IDENTIFIED PAIN VIOLATION \u2014 Cumulative state scored 7/10 (Identified) with evidence 'Current process runs under 10 experiments simultaneously with manual analysis; needs unified, repeatable, and scalable experimentation platform.' New analysis downgrades to 5/10 (Partial) claiming pain is 'implied rather than stated' \u2014 but the prior call clearly documented the workflow limitation as a stated need. Maintain 7/10 or provide Call 2 evidence that contradicts the prior assessment. DECISION PROCESS \u2014 Score dropped from 6/10 to 4/10; new analysis cites 'production delayed by data wiring' as evidence of slippage, but this is a technical delay, not a process regression. Clarify whether the POC timeline itself has been formally extended or if this is just a temporary technical blocker. If timeline unchanged, maintain 6/10. DECISION CRITERIA next step uses vague language 'are those hard requirements or nice-to-haves' \u2014 replace with specific action: '[Contact TBD]: Confirm by [date] whether self-hosting, warehouse-native querying, and compliance isolation are evaluation blockers or differentiators.'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_013",
+  "timestamp": "2026-08-24T03:42:16.358552"
+}

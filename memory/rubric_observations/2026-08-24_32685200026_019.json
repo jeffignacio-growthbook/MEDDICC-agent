@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_019",
+  "timestamp": "2026-08-24T03:38:32.792465",
+  "company": "Skyscanner",
+  "criterion_fired": "Criterion 1 (Economic Buyer), Criterion 3 (Competition), Criterion 4 (Economic Buyer next step)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Score 0-3/10 when budget authority is unconfirmed; only 6+/10 if explicit approval language exists. Criterion 3: Restrict to external market competitors; internal tool incumbents do not count\u2014score reflects unknown external landscape, not identified internal tools. Criterion 4: Next steps must be concrete asks (specific question to specific stakeholder by date), not exploratory probes."
+}

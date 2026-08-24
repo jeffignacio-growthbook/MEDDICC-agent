@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_014",
+  "timestamp": "2026-08-24T03:31:24.047122",
+  "company": "Chaos",
+  "criterion_fired": "Criteria 2, 3, 4, 5 all violated due to rubric ambiguity",
+  "was_appropriate": false,
+  "suggested_change": "Rubric needs explicit rules: (1) Score consistency policy \u2014 when does new call data justify regression vs. maintain-with-note? (2) Pain scoring \u2014 clarify whether pending experiments strengthen or weaken urgency. (3) Decision Criteria \u2014 define 'vague language' threshold and require operationalized questions upfront. (4) Deal Health \u2014 define commercial anchor criteria for post-onboarding deals (ARR + stage mapping) to prevent contradictions."
+}

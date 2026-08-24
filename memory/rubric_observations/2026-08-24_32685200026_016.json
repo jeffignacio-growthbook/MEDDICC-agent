@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_016",
+  "timestamp": "2026-08-24T03:33:32.849206",
+  "company": "Zalando",
+  "criterion_fired": "Criterion 2 (carry-forward regression), Criterion 3 (champion score), Criterion 4 (next steps clarity)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2: 'If cumulative state exists and new call is same call, maintain prior scores and note source. If new call is different, cite specific contradictory statements; otherwise maintain prior assessment.' Criterion 3: 'Champion \u22654/10 if external engagement with concrete commitments (architecture review, diagram presentation) present, even without internal advocacy evidence.' Criterion 4: 'Next steps must be specific, time-bound, and named (e.g., \"Ask [contact] by [date]: [specific question]\"), not open-ended exploratory language.'"
+}

@@ -1,0 +1,21 @@
+{
+  "company": "Ingka Ikea",
+  "deal_id": "50347229229",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 4,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Champion score regressed from 8/10 (cumulative state) to 2/10 (current analysis) without documented reason in the call material. The April 23 call summary is silent on champion behavior. The analysis acknowledges this silence but then applies a 'locked scoring' rationale that contradicts the carry-forward rule: 'Score maintained at 2/10 per locked scoring' is not a valid reason to regress a previously Identified component. Either (a) the April 23 call contains evidence that contradicts prior champion behavior (e.g., Cecilia or Jelmer explicitly stated they will NOT advocate internally), or (b) the score must remain at 8/10 with explicit note: 'No new champion information in April 23 call \u2014 maintaining previous score of 8/10 based on Cecilia's team coordination and Jelmer's financial engagement.' The current analysis cannot have it both ways. CRITERION 4 VIOLATION \u2014 Next step for Champion uses vague verb 'test' without specific action: 'Test Champion Commitment and Advance to POC \u2014 Ask Cecilia...' should be 'Confirm Champion Commitment by [date]: Ask Cecilia directly in next call...' with concrete question. CRITERION 3 VIOLATION \u2014 Competition section states 'two competitive proposals at approximately $871,000 annually' is 'ambiguous' and 'not confirmed,' then scores 4/10. If the evidence is ambiguous, the score should be lower (2-3/10) or the analysis must resolve the ambiguity before scoring. Current framing leaves the competitive landscape unclear. Resolve: (1) Restore Champion to 8/10 with carry-forward note, or document explicit contradictory evidence from April 23 call justifying regression; (2) Rewrite Champion next step to use concrete action verb and specific date; (3) Either lower Competition score to 2/10 (ambiguous evidence) or add a call-out that the $871K figure must be clarified before next pricing discussion.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_024",
+  "timestamp": "2026-08-24T04:10:17.056207"
+}

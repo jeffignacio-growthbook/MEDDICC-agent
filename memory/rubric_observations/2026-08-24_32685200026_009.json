@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_009",
+  "timestamp": "2026-08-24T03:22:34.997853",
+  "company": "InPost",
+  "criterion_fired": "Criterion 2 (Decision Process carry-forward logic) and Criterion 4 (next-step specificity)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2: Clarify when 'fresh reassessment' is permissible (e.g., contradictory new evidence) vs. when carry-forward applies. Criterion 4: Define 'concrete action' baseline\u2014contact TBD + question phrasing may be evaluator assumption, not agent instruction gap. Consider whether 'vague verb' penalty should apply only when contact AND metric are both missing, not separately."
+}

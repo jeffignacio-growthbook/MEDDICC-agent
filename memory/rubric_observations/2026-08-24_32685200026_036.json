@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_036",
+  "timestamp": "2026-08-24T04:06:44.040308",
+  "company": "Route",
+  "criterion_fired": "Criterion 1, 2, 3, 4",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Allow 'Unknown\u2014participant identity not disclosed' as valid state. Criterion 2: Only require explicit score-change notation when evidence materially changed; document 'Score stable at 6/10 based on consistent evidence' as compliant. Criterion 3: Accept 'improvement target not yet articulated' as valid reason for 4/10 (low but not vague). Criterion 4: Distinguish between 'vague' (unacceptable) and 'open-ended discovery questions' (acceptable if aligned to MEDDICC stage)."
+}

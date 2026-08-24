@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_023",
+  "timestamp": "2026-08-24T03:45:26.191572",
+  "company": "Square",
+  "criterion_fired": "Criterion 2 (Champion), Criterion 4 (Metrics), Criterion 3 (Decision Criteria)",
+  "was_appropriate": true,
+  "suggested_change": "Clarify in CLAUDE.md: (1) Score changes require explicit documentation of NEW contradictory evidence from recent calls, or explicit correction language if prior assessment was wrong; (2) All next steps must include [contact name or TBD], a specific concrete question, and measurable deliverable; (3) Distinguish between exploratory confirmation steps vs. actionable requests."
+}

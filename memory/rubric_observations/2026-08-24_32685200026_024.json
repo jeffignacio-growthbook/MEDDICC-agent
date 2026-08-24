@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_024",
+  "timestamp": "2026-08-24T03:46:27.596564",
+  "company": "BESTSELLER",
+  "criterion_fired": "Criterion 2: Carry-forward consistency",
+  "was_appropriate": true,
+  "suggested_change": "When cumulative_calls_context > 0 and a component shows no new contradictory evidence in the recent call, maintain prior score and annotate with 'No new [Component] discussion in this call\u2014maintaining [prior_score]. [Any open questions remain: X, Y, Z].' Do not downgrade based on insufficiency of old evidence."
+}

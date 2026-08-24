@@ -1,0 +1,21 @@
+{
+  "company": "Ryanair",
+  "deal_id": "59387794836",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward regression without documented reason. Cumulative state shows Metrics at 8/10 (Identified) and Decision Process at 8/10 (Identified); new analysis downgrades both to 5/10 and 4/10 (Partial) respectively without explaining why the same evidence now warrants lower scores. Metrics: cumulative cites '$220K deal, 100 experiments/flags, consolidation for efficiency' as Identified; new analysis claims 'no prospect-stated quantifiable outcomes' and downgrades to 5/10 \u2014 but the same evidence exists in both. If the issue is lack of velocity targets, that must be stated as the reason for downgrade, not presented as new discovery. Decision Process: cumulative scores 8/10 citing 'trial setup, cloud-hosted trial, post-fraud evaluation, mid-May follow-up, August-September renewal deadline'; new analysis downgrades to 4/10 claiming 'no formal approval steps' \u2014 but approval steps were never part of the original 8/10 score, so this is a moving target, not a regression. CRITERION 4 VIOLATION \u2014 Next steps for Metrics, Decision Criteria, Decision Process, and Identified Pain all use vague verbs ('ask Liam directly', 'request that Liam send', 'confirm') without a specific action verb tied to a concrete deliverable. Example: 'ask Liam directly: [question]' is not actionable \u2014 it should be 'Schedule a 30-minute call with Liam on [date] and ask: [question], then document his answer in HubSpot by [date].' Current next steps lack dates, owners, and concrete follow-up actions beyond the call itself. CRITERION 3 VIOLATION \u2014 Competition score of 6/10 lacks evidence quality. LaunchDarkly and Optimizely are named, but no buyer-stated reason for dissatisfaction is documented. The analysis states 'no detail has been captured on why the prospect is dissatisfied' \u2014 this is an admission that the 6/10 score is not supported by evidence. A 6/10 requires direct evidence of competitive pressure; 'they have contracts expiring' is not competitive differentiation. Score should be 3/10 or lower with a next step to uncover dissatisfaction reasons. CRITERION 1 VIOLATION \u2014 Champion status is Partial with score 2/10, which is internally inconsistent. A 2/10 score indicates Unknown status, not Partial. Partial should be 4-6/10 range. Either upgrade to Unknown/1-3 or provide evidence that elevates to 4+/10.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_009",
+  "timestamp": "2026-08-24T03:51:03.135222"
+}

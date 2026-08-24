@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_012",
+  "timestamp": "2026-08-24T03:26:56.491792",
+  "company": "P\u00daBLICO_DEV",
+  "criterion_fired": "Criterion 2 (Metrics and Pain regressions)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: 'Score changes between iterations are acceptable only if (a) new call data contradicts prior assessment, or (b) agent corrects a prior error. Carry-forward scores from prior iteration when no new information is present, but do not penalize re-evaluation of ambiguous evidence.'"
+}

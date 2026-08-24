@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_029",
+  "timestamp": "2026-08-24T03:54:25.970735",
+  "company": "Square Enix, Inc.",
+  "criterion_fired": "CARRY-FORWARD VIOLATION (all 6 instances)",
+  "was_appropriate": false,
+  "suggested_change": "Scores should reflect cumulative evidence at call N, not penalize legitimate updates. Change criterion: 'If new call data clarifies, expands, or corrects prior scoring, update score with explicit reasoning linking to new evidence. Regression only violations if new evidence contradicts prior evidence without acknowledgment.' The current rubric treats carry-forward as immutable snapshot rather than cumulative state\u2014this is a rubric design flaw, not an agent instruction gap."
+}

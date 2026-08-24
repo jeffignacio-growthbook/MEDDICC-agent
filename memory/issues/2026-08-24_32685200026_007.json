@@ -1,0 +1,21 @@
+{
+  "company": "Taskrabbit",
+  "deal_id": "60652001696",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 5,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Metrics component: Score 7/10 provided but evidence does not support a score above 5/10. No prospect-stated numeric target exists (e.g., 'run X experiments per quarter' or 'reduce cost per experiment by Y%'). Call 6 metric governance evidence is about data integrity controls, not quantified business outcomes. The analysis acknowledges 'absence of a prospect-stated numeric goal' yet scores 7/10 \u2014 this is contradictory. Correct to 5/10 or provide a direct quote showing a numeric metric target. CRITERION 2 FAILURE \u2014 Metrics: Prior cumulative state scored 8/10 based on 'focus on lowering experiment costs and maintaining high test frequency.' Current analysis downgrades to 7/10 without documented reason for regression. Analysis states 'prior 8/10 reflected same evidence without accounting for this gap' \u2014 this is a post-hoc justification, not a documented change in the call. If no new contradictory evidence exists, maintain 8/10 and note 'No new metrics information in Call 6 \u2014 maintaining previous score.' If you believe 8/10 was incorrect, state that explicitly. CRITERION 4 FAILURE \u2014 Economic Buyer next step uses vague language: 'request a 20-minute intro call' lacks specificity. Rewrite as: 'Ask Danielle by Aug 18: [specific question about who else must approve].' CRITERION 4 FAILURE \u2014 Champion next step: 'Contact Sean directly before Aug 15 and ask' \u2014 no specific action verb. Rewrite as: 'Call Sean by Aug 14 and ask: [exact question].' CRITERION 5 FAILURE \u2014 Champion status: Analysis claims 'no individual has been observed actively selling internally' yet scores 3/10. A 3/10 suggests minimal engagement; the evidence supports Unknown (0/10) or Partial with no evidence of internal advocacy. Clarify: is this Partial (some engagement but no internal selling) or Unknown (no data)? Current framing is inconsistent with score.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_007",
+  "timestamp": "2026-08-24T03:36:39.591716"
+}

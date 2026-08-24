@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_025",
+  "timestamp": "2026-08-24T03:49:22.927129",
+  "company": "Air Space Intelligence",
+  "criterion_fired": "Criterion 2 (Metrics), Criterion 4 (Metrics next step), Criterion 3 (Competition), Criterion 1 (Decision Process)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: (1) 'Carry-forward scores only if new call data contradicts or replaces prior evidence; otherwise maintain prior score with note [e.g., 'No new outcome metrics in Call 2\u2014maintaining 8/10']. (2) All next-step actions must include specific contact name or explicit '[contact TBD]' placeholder. (3) Competition claims require direct quote or removal. (4) Decision process owners must be named or marked '[contact TBD]' if unknown.'"
+}

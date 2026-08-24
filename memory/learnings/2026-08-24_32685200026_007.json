@@ -1,0 +1,21 @@
+{
+  "company": "Rula",
+  "deal_id": "63578787480",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Champion score regression requires documented reason. Prior analysis scored Champion at 4/10 citing 'new leadership,' 'security team,' and 'analytics/engineering teams' as engaged stakeholders. Current analysis scores 1/10 with rationale that 'engaged stakeholder groups are not the same as a champion.' This is a valid distinction, but per Criterion 2 (carry-forward consistency), a regression from 4/10 to 1/10 requires explicit documentation of what changed in Call 3 to justify the downgrade. The analysis notes 'Per locked scores, this analysis reflects 1/10' but does not explain what new information in Call 3 contradicted the prior 4/10 assessment. Either: (a) document the specific contradiction in Call 3 that forced the downgrade, or (b) maintain the 4/10 score and clarify that no new information in Call 3 changes the prior assessment. Decision Criteria also regressed from 8/10 to 7/10 with similar reasoning ('no formal evaluation scorecard') \u2014 this also needs explicit justification tied to Call 3 content, not just a note that 'the lower score reflects' a missing artifact. Identified Pain regressed from 8/10 to 7/10 for lack of quantification \u2014 again, this needs a statement like 'Call 3 did not provide quantified business impact' rather than a general note about what is missing. Without these explicit carry-forward justifications, the analysis violates Criterion 2.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_007",
+  "timestamp": "2026-08-24T03:23:54.212299"
+}

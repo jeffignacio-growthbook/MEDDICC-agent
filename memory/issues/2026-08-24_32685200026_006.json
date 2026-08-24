@@ -1,0 +1,21 @@
+{
+  "company": "Chaos",
+  "deal_id": "56685250888",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Criterion 2 violation: Metrics regressed from 6/10 (cumulative) to 5/10 without documented reason. Analysis states 'no quantified targets have been stated' but cumulative state scored 6/10 with same evidence. Either maintain 6/10 with note 'No new metrics information in July call - maintaining previous score' OR explicitly document what changed. Criterion 3 violation: Identified Pain scored 6/10 but cumulative was 8/10 \u2014 regression unexplained. July call adds 'paid campaign tests pending' and 'holding off until data stable' which should strengthen urgency, not weaken overall pain score. Maintain 8/10 or explain the downgrade. Criterion 4 violation: Decision Criteria next step uses vague language 'what stabilized data setup means concretely' \u2014 rephrase as specific question: 'Is stabilized data setup defined by [specific date], [number of clean runs], or [metric threshold]? Which applies?' Criterion 5 violation: Overall Deal Health claims 'commercially unanchored' but deal is post-onboarding with $50K ARR and active experiments running \u2014 this contradicts 'at risk' assessment. Clarify: is this a renewal/expansion deal (lower risk) or new enterprise upgrade (higher risk)? The stage and ARR suggest established relationship, not early-stage risk.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_006",
+  "timestamp": "2026-08-24T03:31:24.046503"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_008",
+  "timestamp": "2026-08-24T03:19:48.038418",
+  "company": "Notion",
+  "criterion_fired": "Criterion 2 (carry-forward regression), Criterion 3 (metrics scoring), Criterion 4 (next steps concreteness)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: (A) For score regressions: require agent to cite specific contradictory statement from recent calls or explicitly state 'No new contradictory information\u2014maintaining prior score.' (B) For Metrics scoring: map thresholds (3\u20134 = infrastructure only, 6+ = at least one quantified business outcome). (C) For next steps: require format [Action] + [Owner] + [Date/Trigger]\u2014reject exploratory language without commitment."
+}

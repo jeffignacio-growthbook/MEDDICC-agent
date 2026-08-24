@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_035",
+  "timestamp": "2026-08-24T04:04:42.222131",
+  "company": "Stone",
+  "criterion_fired": "Criterion 2 (Carry-forward regression) and Criterion 5 (Champion score contradiction)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'When cumulative state exists, any score change requires explicit documentation: (1) what new information contradicts prior evidence, or (2) explicit acknowledgment that no new contradiction exists and prior score is maintained. Do not regress scores based on absence of new evidence.'"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_001",
+  "timestamp": "2026-08-24T03:09:59.618851",
+  "company": "mountain",
+  "criterion_fired": "CRITERION 2 (Carry-forward regression) and CRITERION 4 (Next steps specificity)",
+  "was_appropriate": true,
+  "suggested_change": "CRITERION 2 should clarify: 'Score must not decrease from prior call unless the current call contains explicit contradictory evidence (not mere absence of reinforcement). Document carry-forward decisions with 'No new X in this call \u2014 maintaining prior score based on [specific prior evidence].' CRITERION 4 should require: 'Next steps must name the stakeholder, specify the verb (Ask/Confirm/Schedule), include a deadline, and state the exact question or confirmation needed.'"
+}

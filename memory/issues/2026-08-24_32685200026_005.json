@@ -1,0 +1,21 @@
+{
+  "company": "TickPick",
+  "deal_id": "61149585726",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward regression without documented reason. Cumulative state shows Metrics at 8/10 (identified) and Identified Pain at 8/10 (identified). New analysis downgrades both to 4/10 and 5/10 respectively, claiming evidence is 'seller-framed' and 'inferred' rather than prospect-stated. However, the cumulative state already acknowledged this framing in Call 1 and scored it 8/10. The new analysis must either: (a) maintain the 8/10 scores with explicit note 'No new information contradicting previous assessment \u2014 maintaining Metrics 8/10 and Pain 8/10 from Call 1', OR (b) if downgrading, provide explicit evidence from Call 2 that contradicts the Call 1 assessment. Currently the downgrade appears to apply a stricter standard retroactively without new contradictory evidence. CRITERION 3 VIOLATION \u2014 Decision Criteria scored 5/10 but cumulative state shows 9/10 (identified). New analysis claims criteria are 'inferred from product fit discussion, not stated by prospect' \u2014 but cumulative state already documented this same evidence and scored it 9/10. Must maintain 9/10 with carry-forward note, or provide Call 2 evidence that contradicts Call 1 findings. CRITERION 4 VIOLATION \u2014 Metrics (4/10), Decision Criteria (5/10), Identified Pain (5/10), and Decision Process (2/10) all below 7/10 but next steps use vague language: 'Ask directly' without specific contact, specific day/method, or concrete question phrasing. Example: '[Contact TBD] Ask directly \u2014 What does success look like...' lacks specificity. Should be: '[Contact TBD]: In next call, ask: What does success look like for your experimentation program 12 months from now? Are there specific numbers \u2014 experiments per quarter, time-to-insight, cost per test?' CRITERION 1 \u2014 All components have status and score; evidence present. This passes. CRITERION 5 \u2014 No unsupported claims detected. This passes. Recommendation: Resolve carry-forward violations by either maintaining prior scores with explicit notes or providing Call 2 contradictions; sharpen next steps with specific questions and contact/timing details.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_005",
+  "timestamp": "2026-08-24T03:29:56.958851"
+}

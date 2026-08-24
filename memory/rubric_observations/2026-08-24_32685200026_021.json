@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_021",
+  "timestamp": "2026-08-24T03:42:16.359174",
+  "company": "ASAPP",
+  "criterion_fired": "CARRY-FORWARD VIOLATION, IDENTIFIED PAIN VIOLATION, DECISION PROCESS",
+  "was_appropriate": true,
+  "suggested_change": "Add instruction: 'When call N analysis diverges from cumulative state, explicitly document whether new evidence contradicts prior assessment or prior assessment remains valid. Score regressions require call-specific contradictory evidence; absence of new information = maintain prior score with note.'"
+}

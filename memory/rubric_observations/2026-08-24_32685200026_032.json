@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_032",
+  "timestamp": "2026-08-24T04:00:42.318985",
+  "company": "Perplexity AI",
+  "criterion_fired": "Criterion 2 (Carry-forward regression), Criterion 4 (Next steps specificity), Criterion 3 (Champion evidence standard)",
+  "was_appropriate": true,
+  "suggested_change": "Criterion 2: Add explicit rule\u2014'If cumulative state exists and new call is identical, state explicitly: \"First call only\u2014lower scores reflect call content alone\" or cite what new information justifies each downgrade.' Criterion 4: Require named stakeholder + specific question + decision timeline in all next steps. Criterion 3: Define champion as internal advocacy (e.g., 'presented to peers', 'building business case'); external vendor engagement alone = 1/10 Unknown unless internal action confirmed."
+}

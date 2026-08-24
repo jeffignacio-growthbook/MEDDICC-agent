@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_004",
+  "timestamp": "2026-08-24T03:13:46.332643",
+  "company": "MVF Global",
+  "criterion_fired": "Criterion 4 (Actionable Next Steps) and Criterion 2 (Carry-forward Consistency)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'Score regressions across iterations require either (a) explicit contradictory evidence from the current call, or (b) acknowledgment of prior assessment error. Do not downgrade based on reinterpretation alone. For next steps: always specify a contact name or use '[contact TBD]' with a concrete follow-up question; avoid 'ask on next call' without naming the target.'"
+}

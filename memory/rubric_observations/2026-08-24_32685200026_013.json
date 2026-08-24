@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_013",
+  "timestamp": "2026-08-24T03:29:56.959504",
+  "company": "TickPick",
+  "criterion_fired": "Criterion 2, 3, 4",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 & 3 need explicit guidance: 'Maintain prior MEDDICC scores unless new evidence from current call directly contradicts prior findings. Carry-forward with note required. Downgrade only if Call N evidence contradicts Call N-1, not if applying stricter evidentiary standard.' Criterion 4 should specify: 'Next steps require: (1) named contact or role, (2) timing (next call/within X days), (3) 2+ specific questions with prospect language, not generic prompts.'"
+}

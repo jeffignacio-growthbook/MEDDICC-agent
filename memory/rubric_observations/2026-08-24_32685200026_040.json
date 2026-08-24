@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_040",
+  "timestamp": "2026-08-24T04:11:20.701875",
+  "company": "TRR Trygghetsr\u00e5det",
+  "criterion_fired": "CRITERION 2 (carry-forward regression), CRITERION 3 (pain quantification threshold), CRITERION 4 (action verb specificity)",
+  "was_appropriate": false,
+  "suggested_change": "Define explicit score thresholds per status level (e.g., 'Identified = 7\u201310, requires explicit internal articulation OR quantified metric'; 'Partial = 4\u20136, directional evidence acceptable if documented as such'). Clarify carry-forward rules: require explicit reconciliation only when score changes >2 points or status changes; minor downgrades need only factual justification, not prior-assessment callout. For Criterion 4, replace '[contact TBD]' placeholder exception with: 'next steps must include concrete action verb (email, call, send, request) + specific question or deliverable; TBD contact is acceptable only if prior contact attempt or identifiable role stated.'"
+}

@@ -1,0 +1,21 @@
+{
+  "company": "Taxfix",
+  "deal_id": "53466496122",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Decision Process: Score downgraded from 8/10 to 3/10 without explicit documented reason in the analysis text itself. The analysis states 'Downgrading from 8/10 to 3/10 \u2014 POC target missed' but this is a carry-forward regression. Per rubric, regressions require 'documented reason.' The April call shows zero POC progress, which IS a reason, but the analysis must explicitly state: 'Previous score of 8/10 was based on structured April POC plan. April 13 call shows zero progress reported and no new timeline \u2014 this contradicts the prior identified status and justifies downgrade to 3/10.' Current text implies the reason but does not state it clearly enough for carry-forward validation. CRITERION 4 VIOLATION \u2014 Metrics next step uses vague language: 'ask Anna Barnett on the next call' lacks specificity on WHEN and HOW contact will occur. Should be: 'Email Anna Barnett by [date] to schedule call, then ask during that call:' or 'Schedule call with Anna Barnett for [specific day/time window].' CRITERION 4 VIOLATION \u2014 Economic Buyer next step is acceptable but could be more specific on timing. Current: 'On the next call' \u2014 should specify 'within 5 business days' or 'by end of week.' CRITERION 3 VIOLATION \u2014 Identified Pain score of 7/10 is justified, but analysis states 'no urgency deadline or quantified business cost' \u2014 this is correct reasoning. However, the evidence section should explicitly note that EPPO acquisition is a forcing function with unknown timeline. Add: 'No stated deadline for migration off EPPO platform.' CRITERION 1 \u2014 All components present with status and score. Evidence provided for all. This passes. CRITERION 5 \u2014 Champion described as 'no evidence of internal selling' \u2014 this is accurate and properly grounded. Passes. Competition mapped to EPPO (incumbent) and Firebase (workaround) \u2014 both valid. Passes. ICP fit: Taxfix shows modern data stack (Snowflake, Firebase, experimentation focus) \u2014 passes ICP check. No disqualifiers present.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_009",
+  "timestamp": "2026-08-24T03:32:20.618727"
+}

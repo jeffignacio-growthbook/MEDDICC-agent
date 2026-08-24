@@ -1,0 +1,21 @@
+{
+  "company": "Picnic Technologies",
+  "deal_id": "60217095483",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 7,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Champion status contradicts cumulative state. Cumulative state scores Champion at 7/10 with 'identified' status based on Stefan's prior relationship and multi-call attendance. Generated analysis downgrades Champion to 4/10 'Partial' claiming 'no documented evidence of Stefan independently driving the business case' and 'champion status was never confirmed above the level of engaged attendee.' This is a regression without documented reason. The generated analysis acknowledges Stefan's consistent attendance and prior relationship but redefines 'champion' to require independent internal selling action not present in call records. If the definition of champion has changed, this must be explicitly stated as a methodology shift, not presented as new evidence. CRITERION 4 FAILURE \u2014 Champion next step uses vague language: 'Confirm directly \u2014 Stefan, are you personally driving the business case presentation to leadership' lacks a specific concrete action. Better: 'Ask Stefan by August 5: Who owns the business case presentation to your VP or finance team, and can you name that person so we can ensure they have the analysis they need before mid-August?' CRITERION 3 FAILURE \u2014 Competition section claims 'homegrown/internal tools are a named competitive threat' per framework, but the rubric requires competitors to be from the named list (LaunchDarkly, Statsig, EPPO, Datadog, Optimizely, homegrown). The analysis correctly identifies homegrown as the incumbent but then states 'Primary competitive risk: staying with the homegrown approach' without explicitly confirming this is the competitive threat being tracked. Clarify: 'Competitive threat is homegrown/internal tools (spreadsheets, CSV exports, warehouse pulls) \u2014 the incumbent solution Picnic will revert to if POC fails.' CRITERION 2 PASS \u2014 Metrics, Economic Buyer, Decision Criteria, Decision Process, Identified Pain, and Competition all maintain or justify their cumulative scores with explicit carry-forward language where appropriate. CRITERION 5 PASS \u2014 No unsupported claims. ICP fit confirmed: modern data stack (Snowflake), experimentation priority, multi-departmental engagement. Deal health assessment ('At Risk') is grounded in documented gaps (EB unknown, business case behind schedule, failed experiment).",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_002",
+  "timestamp": "2026-08-24T03:11:12.691380"
+}

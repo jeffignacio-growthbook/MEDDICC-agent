@@ -1,0 +1,21 @@
+{
+  "company": "Signet Jewelers Ltd.",
+  "deal_id": "59021351952",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 0,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "Champion section (score 3/10) lacks specific evidence of internal selling behavior or commitment. The analysis states Craig 'asked insightful questions' and showed 'enthusiasm' but provides no verbatim questions, no internal stakeholders named, and no committed next steps from Craig. Score of 3/10 requires either: (1) direct quote of a champion question, (2) evidence Craig will loop in internal stakeholders, or (3) explicit acknowledgment that 'no internal selling behavior observed yet \u2014 scoring reflects engaged evaluator, not champion.' Current phrasing 'qualifies as an engaged evaluator \u2014 not yet a champion' contradicts the 3/10 score, which implies partial champion status. Recommend: lower Champion to 1/10 (Unknown) with note 'Craig is engaged evaluator; champion status unconfirmed pending evidence of internal selling,' OR raise score only if next call captures specific internal actions Craig commits to. All other components meet rubric standards: complete coverage, evidence quality appropriate to first call, actionable next steps with contact name and specific questions, no unsupported claims. ICP fit acceptable (mature experimentation program, data-driven organization, multi-team structure). Competitor reference unidentified but acceptable for first call with note to clarify on next call.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_020",
+  "timestamp": "2026-08-24T03:59:05.406288"
+}

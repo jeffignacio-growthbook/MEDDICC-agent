@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_018",
+  "timestamp": "2026-08-24T03:37:09.916267",
+  "company": "Zoro",
+  "criterion_fired": "Criterion 2 (Carry-forward consistency) and Criterion 1 (Complete coverage)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify: (1) Carry-forward scores require explicit contradictory evidence from new call data to regress; absence of fresh confirmation \u2260 regression. (2) Define when a 'first call' vs. 'cumulative call 4' scoring mode applies\u2014if cumulative, prior evidence stands unless overridden. (3) For vague next steps (Criterion 4), specify whether '[TBD]' placeholders are acceptable or require concrete dates/names in the call itself."
+}

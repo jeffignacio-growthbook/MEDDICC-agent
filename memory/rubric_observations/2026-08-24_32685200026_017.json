@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_017",
+  "timestamp": "2026-08-24T03:36:39.592375",
+  "company": "Taskrabbit",
+  "criterion_fired": "Criterion 1 (Metrics scoring), Criterion 4 (Next step specificity), Criterion 5 (Champion status interpretation)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: Define minimum evidence for 7/10 (prospect-stated numeric target required vs. inferred from context). Criterion 4: Add template for next-step specificity\u2014require [actor], [deadline], [exact question]. Criterion 5: Define Champion 3/10 threshold explicitly\u2014does it require observed internal conversation, or is lack of evidence sufficient to justify 3/10 vs 0/10?"
+}

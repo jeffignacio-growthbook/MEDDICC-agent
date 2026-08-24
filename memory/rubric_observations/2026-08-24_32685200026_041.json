@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_041",
+  "timestamp": "2026-08-24T04:13:29.555726",
+  "company": "Hublo",
+  "criterion_fired": "CRITERION 2 (carry-forward regression), CRITERION 4 (vague next steps), CRITERION 3 (unsupported claim)",
+  "was_appropriate": true,
+  "suggested_change": "Add CLAUDE.md rule: 'If no new data contradicts prior assessment, maintain prior score and note data source. If downgrading, cite new contradictory evidence. For next steps, always specify contact, question, and deadline. For scoring, require direct quote or observable fact; if unavailable, lower score or mark 'claimed but unverified.'"
+}

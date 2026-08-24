@@ -1,0 +1,21 @@
+{
+  "company": "Zoro",
+  "deal_id": "61437846967",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "FAIL Criterion 1 (Complete coverage): Metrics score downgraded from 8/10 to 5/10 without justification for the regression. Cumulative state shows 8/10 with clear evidence of tracking success rates, financial impacts, and data accuracy validation. Recent call (Aug 17) confirms POC testing these exact capabilities. Analysis claims 'breadth of features discussed is not the same as confirmed business metrics' but this contradicts the cumulative evidence and represents a carry-forward violation. FAIL Criterion 2 (Carry-forward consistency): Metrics regressed 8\u21925 without documented reason. Economic Buyer regressed 4\u21921 without documented reason. Champion remained 1/10 (acceptable on first call, but cumulative state shows 3 prior calls reviewed\u2014this is not a first-call scenario). Analysis must maintain prior scores or explicitly document what new information contradicts them. FAIL Criterion 4 (Actionable next steps): Multiple next steps use vague language: 'Ask...what does success look like in numbers' is acceptable, but 'On the next POC check-in call' lacks specificity (no date, no contact name even as [TBD]). Decision Process next step 'Confirm by end of August' is vague\u2014should specify 'Ask [contact TBD] by Friday Aug 23' with concrete question. FAIL Criterion 5 (No unsupported claims): Analysis states 'POC testing confirms the prospect has articulated what success looks like' but provides no evidence of prospect-stated targets. This is an unsupported claim. Reframe as 'POC scope confirms capabilities are being validated but prospect-stated business targets remain unknown.' PASS Criterion 3 (Evidence quality): Competitors correctly mapped (LaunchDarkly, Datadog). Datadog ambiguity correctly flagged. PASS overall structure and tone. FIX: (1) Restore Metrics to 8/10 or document specific new contradictory evidence from Aug 17 call. (2) Restore Economic Buyer to 4/10 or document why June 26 'executive follow-up' reference no longer applies. (3) Add specific dates/contact placeholders to all next steps. (4) Remove unsupported claim about 'prospect articulated success'\u2014replace with 'prospect has not yet stated quantified targets.' (5) Acknowledge this is call 4 of 4, not first call, so carry-forward rules apply fully.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_008",
+  "timestamp": "2026-08-24T03:37:09.915654"
+}

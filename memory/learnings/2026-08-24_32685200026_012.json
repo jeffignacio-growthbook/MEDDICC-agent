@@ -1,0 +1,21 @@
+{
+  "company": "Box",
+  "deal_id": "62622458398",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Decision Criteria: Prior cumulative state scored 8/10 (Identified) with eight specific technical criteria. Current analysis downgrades to 5/10 (Partial) claiming 'criteria reflect GrowthBook demo positioning rather than prospect-stated requirements.' This is a regression without documented reason in the recent calls. Call 2 (Aug 4) mentions 'multi-stack testing needs' and 'integration depth' but does NOT contradict the eight criteria from Call 1. The analysis must either: (a) maintain 8/10 and explicitly note 'No contradictory information in Call 2 \u2014 maintaining previous score of 8/10,' OR (b) if downgrading, cite specific evidence from Call 2 that contradicts or invalidates the eight prior criteria. As written, the downgrade appears to reflect analyst judgment rather than new call evidence. CRITERION 3 VIOLATION \u2014 Champion: Score 2/10 claims 'no evidence Dani has taken buyer-owned internal action' and 'no business case built.' However, Call 1 explicitly states 'competitive info shared to support Dani's consolidation pitch' \u2014 this IS a buyer-owned action (Dani is building a pitch). The score should reflect this confirmed action. Current 2/10 undersells the evidence. CRITERION 4 VIOLATION \u2014 Metrics next step uses 'help us build the right business case' which is vague seller language. Rewrite as: 'Ask Dani by [date]: How many experiments per quarter today, what's your target, and what's the cost in engineering hours of the current Adobe + GCP manual workflow?' CRITERION 4 VIOLATION \u2014 Decision Process next step lacks specificity. 'Walk me through' is too open-ended. Rewrite as: 'Ask Dani: Name the three people in the internal review, what evaluation criteria they use, and the approval steps between shortlisting and contract signature.' CRITERION 1 VIOLATION \u2014 Metrics evidence states 'no prospect-stated metrics' but Call 2 explicitly mentions Box is 'aiming to improve MQLs/SQLs' \u2014 this IS prospect-stated, even if not quantified. Acknowledge this in evidence.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_012",
+  "timestamp": "2026-08-24T03:40:56.289193"
+}

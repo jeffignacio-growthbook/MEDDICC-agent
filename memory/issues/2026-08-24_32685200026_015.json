@@ -1,0 +1,21 @@
+{
+  "company": "CFI Global",
+  "deal_id": "61024408734",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "1. CRITERION 1 (Complete Coverage): All components have status and score. PASS. 2. CRITERION 2 (Carry-forward Consistency): FAIL \u2014 Decision Process scored 5/10 in this analysis but prior cumulative state scored it 9/10. The analysis correctly identifies that Call 4 contradicts the prior timeline (Q3 go-live \u2192 Q4/Q1), but the explanation acknowledges this is a material change in prospect behavior, not a carry-forward error. However, the score drop from 9 to 5 is justified by the timeline shift. This is acceptable. PASS on re-review. 3. CRITERION 3 (Evidence Quality): Metrics scored 5/10 \u2014 evidence includes directional statements ('1\u20131.5% CLV improvement') but no quantified baselines or targets. This is correctly scored as Partial. PASS. Economic Buyer scored 2/10 \u2014 no name or title provided; evidence is sound. PASS. Decision Criteria scored 7/10 \u2014 detailed technical requirements listed with specific quotes. PASS. Decision Process scored 5/10 \u2014 timeline shift documented with explicit quotes from Call 4. PASS. Identified Pain scored 5/10 \u2014 pain stated but urgency undermined by deferral; evidence is sound. PASS. Champion scored 1/10 \u2014 no named contact; evidence is sound. PASS. Competition scored 3/10 \u2014 no competitor names disclosed; evidence is sound. PASS. 4. CRITERION 4 (Actionable Next Steps): Metrics next step asks specific question about CLV baseline and experiment velocity \u2014 PASS. Economic Buyer next step asks for name and title of approver \u2014 PASS. Decision Criteria next step asks for formal scorecard \u2014 PASS. Decision Process next step asks for stakeholder map and approval sequence \u2014 PASS. Identified Pain next step asks cost-of-delay question \u2014 PASS. Champion next step asks to identify and name internal advocate \u2014 PASS. Competition next step asks for competitor names \u2014 PASS. All next steps avoid vague verbs (explore, discuss, follow up) and include specific questions. PASS. 5. CRITERION 5 (No Unsupported Claims): Champion is correctly marked Unknown with score 1/10 \u2014 no claim of advocacy without evidence. PASS. Economic Buyer is Partial with score 2/10 \u2014 no claim of confirmed budget authority. PASS. Decision Process timeline is explicitly contradicted by Call 4 evidence \u2014 analysis correctly downgrades from 9/10 to 5/10 with documented reason. PASS. ICP fit: Company has 100K+ users (implied by 'portals and trading apps' serving clients), modern data stack (Databricks, data warehouse), and experimentation as stated priority. PASS. No unsupported claims detected. PASS. 6. GROWTHBOOK-SPECIFIC CHECKS: No competitor names mentioned in calls \u2014 correctly scored Competition at 3/10. PASS. Warehouse-native requirement noted (Databricks, self-hosted). PASS. No marketing-only use case claimed. PASS. No traffic volume disqualifier mentioned. PASS. Overall: All criteria PASS except one minor note \u2014 the analysis correctly identifies that no named contacts exist in HubSpot, which is a critical gap, but this is properly flagged in Champion (1/10) and Economic Buyer (2/10) sections. The analysis is sound and actionable.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_015",
+  "timestamp": "2026-08-24T04:10:33.960154"
+}

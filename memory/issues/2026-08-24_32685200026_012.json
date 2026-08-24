@@ -1,0 +1,21 @@
+{
+  "company": "Electronic Arts",
+  "deal_id": "62985360945",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Metrics: Score 5/10 stated but evidence section does NOT provide a direct quote or paraphrase from any call. The evidence lists directional intent ('Aim to speed deployments', 'improve DORA metrics') but per Criterion 3, scores above 5/10 require direct evidence; scores AT 5/10 require at least a paraphrase grounded in the call. The current evidence is too generic. CRITERION 4 FAILURE \u2014 Multiple components below 7/10 lack actionable next steps with specific questions: (1) Economic Buyer 2/10 has next steps but they use '[Contact TBD]' without a concrete action verb beyond 'ask' \u2014 the second next step 'Is there a specific person...' is vague. Rewrite as: '[Contact TBD]: Confirm by [date] the name and title of the person who owns the technology budget and has final sign-off on the $200K+ decision.' (2) Champion 1/10 next steps are acceptable. (3) Decision Process 4/10 next steps are acceptable. CRITERION 5 FAILURE \u2014 Champion described as 'technically engaged evaluator' in Overall Deal Health without evidence of internal selling behavior. The rubric states: 'FAIL if Champion described as advocating internally without evidence of internal selling behavior.' Rewrite Champion evidence to acknowledge: 'No evidence of internal advocacy or business case building documented.' CRITERION 2 CARRY-FORWARD \u2014 Metrics downgraded from 8/10 to 5/10 with justification provided (acceptable). Economic Buyer downgraded from 5/10 to 2/10 in cumulative state but analysis says 'maintained at 2/10' \u2014 this is contradictory. Clarify: was EB 5/10 or 2/10 in prior state? Decision Criteria downgraded from 9/10 to 7/10 with justification (acceptable). Decision Process downgraded from 7/10 to 4/10 with justification (acceptable). Identified Pain downgraded from 9/10 to 7/10 with justification (acceptable). These revisions require explicit statement: 'Prior cumulative score was X; revised to Y because [reason].' Add this clarity to each downgrade.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_012",
+  "timestamp": "2026-08-24T04:03:34.494454"
+}

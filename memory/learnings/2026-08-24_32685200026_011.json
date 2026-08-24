@@ -1,0 +1,21 @@
+{
+  "company": "Skyscanner",
+  "deal_id": "55660576681",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 16,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 1 FAILURE \u2014 Economic Buyer component lacks explicit evidence of budget authority. Score is 5/10 but analysis states 'neither has explicitly confirmed they hold final budget sign-off authority' and 'Daniel has not attended any session.' This is a Partial status with insufficient evidence to support the score. Reframe as Unknown (0-3/10) or provide explicit quote showing budget approval authority. CRITERION 4 FAILURE \u2014 Economic Buyer next step uses vague language: 'what does his sign-off process look like' is exploratory, not a concrete action. Revise to: 'Ask Gareth Moger directly: \"Is Daniel the final approver for the $100K+ contract, and has he reviewed the pricing proposal we sent on [date]?\"' CRITERION 2 CARRY-FORWARD \u2014 Champion score dropped from 8/10 in cumulative state to 7/10 in this analysis without documented reason. Cumulative state notes Gareth 'drove detailed pricing interrogation' and 'committed to emailing user projections same-day.' Recent calls (Aug 4, Aug 7) show no regression in Gareth's engagement. Maintain 8/10 or explicitly note what changed. CRITERION 3 \u2014 Competition score is 5/10 but analysis claims 'Dr. Jekyll identified as incumbent' \u2014 this is not a GrowthBook competitor. Clarify: Dr. Jekyll and Wise are internal tools, not external market competitors. No LaunchDarkly, Statsig, EPPO, Datadog, or Optimizely mentioned. Score should reflect unknown external competitive landscape, not identified incumbents.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_011",
+  "timestamp": "2026-08-24T03:38:32.791805"
+}

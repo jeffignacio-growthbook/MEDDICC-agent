@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_033",
+  "timestamp": "2026-08-24T04:03:34.495118",
+  "company": "Electronic Arts",
+  "criterion_fired": "Criterion 1, 4, 5",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 1: explicitly define what 'direct quote,' 'paraphrase,' and 'directional intent' mean numerically (e.g., 5/10 requires statement from call mentioning goal explicitly; 7/10+ requires quantified intent or timeline). Criterion 4: standardize 'actionable next step' format with template [Actor]: [Specific action] by [deadline/event]. Criterion 5: clarify whether Champion must show *evidence* of internal advocacy in the call transcript, or whether *absence* of such evidence should be noted without failing the component."
+}

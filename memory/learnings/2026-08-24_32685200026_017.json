@@ -1,0 +1,21 @@
+{
+  "company": "Air Space Intelligence",
+  "deal_id": "62725080086",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Carry-forward regression without documented reason: Metrics scored 8/10 in cumulative state, downgraded to 6/10 in new analysis. The analysis states 'No prospect-stated metrics around experimentation velocity' but cumulative state explicitly documents '50 developers need multi-instance access; $67,500 total annual cost for 50 users ($30,000 base + $750 per user); decision and deployment aimed by September' \u2014 these are sizing metrics. The downgrade lacks justification. Either maintain 8/10 with note 'No new outcome metrics in Call 2 \u2014 maintaining previous score' OR explicitly state why sizing metrics no longer count. CRITERION 4 VIOLATION \u2014 Metrics next step uses vague verb 'measuring reduction' without concrete action. Rewrite as: 'Ask [contact TBD] on next call: What specific KPIs will you track post-deployment \u2014 incident reduction, deployment speed, or compliance audit hours saved? What is the current cost of running Unleash and Flipped separately?' CRITERION 3 VIOLATION \u2014 Competition section claims 'cheaper competitors' mentioned in Call 2 but provides no direct quote. Either add exact quote or remove claim. CRITERION 1 VIOLATION \u2014 Decision Process evidence incomplete: Call 2 states 'security and legal reviews running in parallel' but analysis does not capture who owns each review or what passes/fails them. Add explicit statement: 'No named owners for security or legal review tracks identified in either call.' All next steps for components below 7/10 must include specific contact name or '[contact TBD]' placeholder \u2014 currently some lack this. Rewrite Decision Process next step to include '[contact TBD]' explicitly.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_017",
+  "timestamp": "2026-08-24T03:49:22.926482"
+}

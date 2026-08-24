@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_011",
+  "timestamp": "2026-08-24T03:25:12.863792",
+  "company": "OpenTable",
+  "criterion_fired": "CRITERION 2 (Economic Buyer) and CRITERION 3 (Champion)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'If a score exists in cumulative state, default to carry-forward with notation \"No new information\" unless current call explicitly contradicts prior evidence. If redefining a criterion (e.g., champion requires sustained selling, not one proposal), state the new definition and rescore all cumulative evidence under it before assigning new score.'"
+}

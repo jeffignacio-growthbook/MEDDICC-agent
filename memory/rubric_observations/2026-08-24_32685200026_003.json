@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_003",
+  "timestamp": "2026-08-24T03:11:33.340623",
+  "company": "Airalo",
+  "criterion_fired": "Criterion 2 (Carry-forward Consistency) and Criterion 3 (Evidence Quality)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should explicitly define: 'Score regression requires contradictory evidence in new calls, not absence of incremental data. First-call absence of data is not a revision trigger.' Criterion 3 should clarify: 'Partial evidence (1-2 vendors identified, no comprehensive competitive map) = 4/10 minimum. Assign 6/10+ only when 3+ vendors are compared or customer explicitly prioritized one competitor.'"
+}

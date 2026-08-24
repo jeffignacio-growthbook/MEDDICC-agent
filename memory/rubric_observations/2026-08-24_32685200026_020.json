@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_020",
+  "timestamp": "2026-08-24T03:40:56.289849",
+  "company": "Box",
+  "criterion_fired": "CRITERION 2 (Decision Criteria) and CRITERION 1 (Metrics)",
+  "was_appropriate": true,
+  "suggested_change": "Add to CLAUDE.md: 'Do not regress a score unless new call data explicitly contradicts prior evidence. If prior calls show no contradictory info, state: \"No contradictory evidence in [Call N]\u2014maintaining prior score of X/10.\" Prospect-stated signals include any mention of business outcome (e.g., \"improve MQLs/SQLs\"), even if unquantified.'"
+}

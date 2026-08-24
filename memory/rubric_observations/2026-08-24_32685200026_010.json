@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_010",
+  "timestamp": "2026-08-24T03:23:54.212948",
+  "company": "Rula",
+  "criterion_fired": "Criterion 2 (carry-forward consistency)",
+  "was_appropriate": true,
+  "suggested_change": "When a score decreases from prior analysis: require explicit statement of either (a) new contradictory evidence in current call, or (b) absence of prior supporting evidence in current call. General notes about missing artifacts are insufficient without call-specific justification."
+}

@@ -1,0 +1,21 @@
+{
+  "company": "OpenTable",
+  "deal_id": "58939926620",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 7,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Economic Buyer: Score regressed from 8/10 (cumulative state) to 1/10 (new analysis) without documented reason. Cumulative state explicitly confirms 'CTO Sagar holds budget authority' and 'Strong budget authority present.' New analysis downgrades to 1/10 claiming 'no direct engagement' and 'second-hand signals.' This contradicts the cumulative evidence and violates carry-forward consistency. Either maintain 8/10 with note 'No new EB information in this call \u2014 maintaining previous score of 8/10' OR provide explicit evidence from recent calls that contradicts Sagar's budget authority. CRITERION 3 VIOLATION \u2014 Champion: Score locked at 1/10 but cumulative state documents score of 9/10 with strong evidence (Sagar's seed purchase proposal, Federico's 'full disclosure I'm sold', Justin Silverman's mandate). New analysis acknowledges these signals exist but redefines 'champion' to require 'sustained internal selling' not present in calls. This is a definitional shift, not a carry-forward violation, but the 1/10 score is unsupported by the evidence presented. If redefining champion criteria, explicitly state the new definition and score accordingly. CRITERION 4 VIOLATION \u2014 Metrics next step uses vague verb 'anchor' without specific action. Revise to: 'Ask Forrest Rice directly: What is your team's annual spend maintaining the internal tool in engineering hours and direct costs? What roadmap items would be unblocked if that capacity were freed?' CRITERION 4 VIOLATION \u2014 Economic Buyer next step lacks specificity. 'Include him briefly' is vague. Revise to: 'Ask Federico to add Sagar to the next call scheduled for [date]. Confirm with Sagar directly: What is the total contract value and payment schedule you approved, and who else needs to sign off on the dummy order form?'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_008",
+  "timestamp": "2026-08-24T03:25:12.863155"
+}

@@ -1,0 +1,21 @@
+{
+  "company": "Square Enix, Inc.",
+  "deal_id": "58373987402",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CARRY-FORWARD VIOLATION \u2014 Metrics regressed from 6/10 to 5/10 without documented reason. Cumulative state shows 6/10 with evidence of 5% CTR and 27-website portfolio; new analysis downgrades to 5/10 citing 'unconfirmed estimates' but the same evidence existed in cumulative state. If regression is intentional, analysis must explicitly state 'May 7 call revealed these figures are unconfirmed estimates, downgrading from 6/10.' | CARRY-FORWARD VIOLATION \u2014 Economic Buyer regressed from 1/10 to 5/10. Cumulative state correctly scored 1/10 (no EB identified). New analysis scores 5/10 claiming 'Japan reference implies a budget stakeholder exists' \u2014 but this is inference, not new evidence. Japan was mentioned in cumulative state too. Analysis must either maintain 1/10 with note 'No new EB information in May 7 call' OR provide direct quote from May 7 showing Japan stakeholder name/title. | CARRY-FORWARD VIOLATION \u2014 Decision Criteria regressed from 6/10 to 5/10. Cumulative state lists cost, functionality, Japan influence, GTM integration. May 7 call adds self-hosting, non-technical reporting, GA integration. This is expansion, not regression. Score should maintain or increase to 6-7/10 with note 'May 7 call added self-hosting and reporting criteria.' | CARRY-FORWARD VIOLATION \u2014 Identified Pain regressed from 6/10 to 5/10. Cumulative state: 'Inconsistent conversion tracking across digital channels; need for conversion rate optimization across 27 websites.' May 7 call adds no new pain evidence. Analysis must maintain 6/10 with note 'No new pain information in May 7 call \u2014 maintaining previous score.' | CARRY-FORWARD VIOLATION \u2014 Champion regressed from 1/10 to 5/10. Cumulative state correctly scored 1/10 (no champion identified). New analysis scores 5/10 claiming 'evaluation team is actively engaged' \u2014 but engagement \u2260 champion. Champion requires internal selling behavior. Analysis must either maintain 1/10 or provide evidence of internal advocacy from May 7 call. No such evidence exists. Maintain 1/10 with note 'No named contact or internal selling behavior identified.' | CARRY-FORWARD VIOLATION \u2014 Competition increased from 8/10 to 6/10. Cumulative state: Adobe Target identified, score 8/10. May 7 call confirms Adobe Target demo pending. No new information contradicts 8/10. Analysis must maintain 8/10 with note 'Adobe Target confirmed as active competitor; no new competitive intelligence in May 7 call.'",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_011",
+  "timestamp": "2026-08-24T03:54:25.970071"
+}

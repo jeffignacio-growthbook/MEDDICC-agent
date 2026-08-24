@@ -1,0 +1,21 @@
+{
+  "company": "Livesport",
+  "deal_id": "62160567676",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 3,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "FAIL \u2014 Criterion 4 (Actionable Next Steps). Economic Buyer section lacks a next step with specific action and concrete question. Current text says 'Ask Tom\u00e1\u0161 directly on the next call' but does not specify WHO will ask, WHEN, or provide the exact question format required. Rewrite as: 'James to ask Tom\u00e1\u0161 on next scheduled call: \"When you present to the CPO, will they be making the final budget call, or does it go to another approver above them? And is there any chance we could get 20 minutes with the CPO before the decision to address pricing questions directly?\"' FAIL \u2014 Criterion 2 (Carry-forward Consistency). Economic Buyer score dropped from 5/10 to 4/10 with justification that 'CPO is one step further up the chain than assumed.' However, the cumulative state already noted 'CPO involved in review' \u2014 Call 4 does not introduce new information that CPO is removed; it clarifies Tom\u00e1\u0161's role as coordinator. The score change requires explicit documentation of what NEW information in Call 4 contradicts the prior 5/10 assessment. The analysis states 'Call 4 does not contradict CPO involvement' but then downgrades anyway \u2014 this is inconsistent. Either maintain 5/10 with note 'No new EB information in Call 4 \u2014 maintaining prior score' OR provide explicit evidence from Call 4 that contradicts prior state. FAIL \u2014 Criterion 3 (Evidence Quality). Champion section scores 3/10 but lacks actionable evidence of why Tom\u00e1\u0161 cannot be a champion. The analysis states 'no evidence of Tom\u00e1\u0161 building an internal business case' \u2014 but absence of evidence is not evidence of absence on a first/early call. Reframe as: 'Tom\u00e1\u0161 is engaged but role is procurement coordination, not product advocacy. No product/engineering stakeholder identified yet who can build internal business case.' This is more precise. PASS \u2014 Criterion 1 (Complete Coverage). All seven MEDDICC components present with status, score, and evidence. PASS \u2014 Criterion 5 (No Unsupported Claims). Claims are grounded in call evidence. ICP fit is strong (130M users, BigQuery/GA4, 1,000+ experiments/year). PASS \u2014 Criterion 3 (Competitor Mapping). Optimizely, Firebase, Airship, Extreme Push, Confidence all mapped correctly to GrowthBook competitive set.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_014",
+  "timestamp": "2026-08-24T03:42:40.689282"
+}

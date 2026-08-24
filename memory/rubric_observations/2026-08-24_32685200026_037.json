@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_037",
+  "timestamp": "2026-08-24T04:07:03.786051",
+  "company": "Catena Media",
+  "criterion_fired": "Criterion 2 (carry-forward consistency), Criterion 3 (Decision Criteria evidence threshold), Criterion 4 (Decision Criteria specificity)",
+  "was_appropriate": false,
+  "suggested_change": "Criterion 2 should clarify: 'Downgrade a component only if recent call provides explicit NEW information (customer statement, changed context) that contradicts prior evidence\u2014not re-analysis of same evidence.' Criterion 3 needs explicit rule: 'Decision Criteria \u22655/10 requires documented confirmation from \u22652 stakeholders OR explicit org-wide policy; single stakeholder input = \u22643/10.' Criterion 4 should define 'specificity' as: contact-name + timeline + max 2 concrete questions (not open-ended asks like 'create scorecard')."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_007",
+  "timestamp": "2026-08-24T03:18:43.768048",
+  "company": "Trade Me",
+  "criterion_fired": "Criterion 1 (Economic Buyer), Criterion 4 (Decision Criteria & Process), Criterion 5 (Champion)",
+  "was_appropriate": true,
+  "suggested_change": "Add explicit instruction: 'When a score regresses from a prior cumulative state, document the specific call evidence that contradicts the prior assessment. If no contradictory evidence exists in recent calls, carry forward the prior score with a note: No new information contradicting prior assessment; maintaining [prior score].' Also tighten Criterion 4 next-step language to require specificity: next steps must include named stakeholder, explicit question or topic, and target date."
+}

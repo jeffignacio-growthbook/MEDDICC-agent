@@ -1,0 +1,8 @@
+{
+  "id": "2026-08-24_32685200026_028",
+  "timestamp": "2026-08-24T03:54:16.913797",
+  "company": "Dassault Syst\u00e8mes",
+  "criterion_fired": "Criterion 2 (Decision Criteria), Criterion 3 (Identified Pain), Criterion 4 (Next Steps)",
+  "was_appropriate": false,
+  "suggested_change": "Clarify carry-forward logic: 'Prior scores persist only if no contradictory evidence exists in new call. If new call contains no relevant data (not contradiction), re-score based on available evidence alone, with explicit note of data source change.' For Criterion 3, define score floor: 'Functional pain without urgency or stated consequence = 2\u20133/10; 5/10 requires either urgency signal OR explicit justification.' For Criterion 4, define 'actionable': '[TBD] actions must include channel, timing window (day), and escalation trigger with owner.'"
+}

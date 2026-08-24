@@ -1,0 +1,21 @@
+{
+  "company": "Route",
+  "deal_id": "59245644951",
+  "outcome": "prompt_issue",
+  "root_cause": "edge_case",
+  "confidence": 0.0,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 1,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Decision Criteria: Score regressed from 8/10 (cumulative state) to 6/10 without documented reason in the analysis itself. The analysis notes 'Score change note' but this appears as editorial commentary, not as part of the MEDDICC assessment. The rubric requires explicit notation within the component assessment (e.g., 'Previous score: 8/10. New score: 6/10 because...') when a component regresses. The evidence base (BigQuery, pricing, custom attributes, mutual exclusivity) has not materially changed between calls, so the regression must be explicitly justified in the component body, not in a separate note. CRITERION 4 VIOLATION \u2014 All components below 7/10 lack actionable next steps with specific questions. Metrics (4/10): Next step asks 'What does success look like...' which is vague. Should ask specific question like 'How many experiments per quarter is your target, and what conversion rate improvement would justify the investment?' Decision Process (3/10): Next step asks 'What is your Amplitude renewal date' \u2014 acceptable, but should also ask 'Who are the stakeholders involved in the renewal decision?' Identified Pain (6/10): Next step asks about cost but should ask 'Is the pricing issue blocking experiments today, or is it a future concern?' Champion (1/10): Next step is acceptable. Competition (5/10): Next step is acceptable. CRITERION 3 VIOLATION \u2014 Metrics score of 4/10 lacks sufficient evidence. The analysis states 'fewer than five concurrent experiments' is a 'current operational constraint' not a baseline for improvement, yet scores 4/10. If no improvement target exists, score should be 2/10 (vague mention). If 4/10 is justified, evidence must include a prospect-stated target or metric. Currently missing. CRITERION 1 VIOLATION \u2014 Champion component states 'Unknown' status but the analysis acknowledges 'Someone is attending these calls' \u2014 this is contradictory. Either identify that person by name/title or confirm truly unknown. The analysis cannot have it both ways.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_013",
+  "timestamp": "2026-08-24T04:06:44.039581"
+}

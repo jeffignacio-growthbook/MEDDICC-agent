@@ -1,0 +1,21 @@
+{
+  "company": "Square",
+  "deal_id": "58134855076",
+  "outcome": "candidate",
+  "root_cause": "instruction_gap",
+  "confidence": 0.8,
+  "loop_performance": {
+    "iterations_to_pass": 3,
+    "passed": false,
+    "budget_exhausted": true
+  },
+  "cumulative_calls_context": 2,
+  "iteration_1_failures": [],
+  "components_weak": [],
+  "components_strong": [],
+  "required_changes_injected": "CRITERION 2 VIOLATION \u2014 Champion component regressed from 4/10 (Partial, prior state) to 1/10 (Unknown) without documented reason in the call. The analysis states 'prior score of 4/10 was based on GrowthBook seller actions' and downgrades to 1/10, but this is a retroactive reinterpretation of prior evidence, not new contradictory information from the recent call. The July 9 call (which informed the prior 4/10 score) is the same call cited in the downgrade. If the prior assessment was incorrect, that should be noted as a correction, not a carry-forward violation. However, the analysis must either: (a) maintain 4/10 and note 'No new champion information in recent calls \u2014 maintaining previous score', or (b) explicitly state 'Prior assessment of 4/10 was incorrect because seller actions do not constitute buyer champion behavior; correcting to 1/10 based on reinterpretation of existing evidence.' CRITERION 4 VIOLATION \u2014 Metrics component (6/10) lacks a next step with specific action and concrete question. The next step provided ('What does success look like...') is vague and does not include a specific contact name or concrete deliverable. Rewrite as: '[contact TBD]: Ask on next POC check-in: \"What is your target experiment velocity in 12 months \u2014 number of experiments per quarter, faster release cycles, or cost savings from tool consolidation?\" Document the answer to quantify business outcomes.' CRITERION 3 VIOLATION \u2014 Decision Criteria scored 7/10 but analysis states 'no formal written scorecard or explicit weighting has been shared.' This is appropriate for 7/10, but the next step asks to confirm 'whether undocumented criteria exist' \u2014 this is exploratory, not actionable. Rewrite as: '[contact TBD]: Request a copy of the formal evaluation scorecard or criteria matrix by [date] to confirm all technical and business requirements are addressed in the POC scope.' All other components pass rubric checks.",
+  "resolution": "Failed after 3 iterations",
+  "proposed_instruction": null,
+  "id": "2026-08-24_32685200026_015",
+  "timestamp": "2026-08-24T03:45:26.190909"
+}
