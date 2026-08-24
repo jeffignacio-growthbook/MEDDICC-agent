@@ -19,12 +19,16 @@ on:
         description: 'Comma-separated deal IDs to score (blank = all)'
         required: false
         default: ''
+      resolve_first:
+        description: 'Run resolve_calls (deal<->call matching) before scoring'
+        required: false
+        default: 'true'
 
 jobs:
   backfill:
     runs-on: ubuntu-latest
     environment: Agent
-    timeout-minutes: 120
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -59,6 +63,20 @@ jobs:
               cur.execute("SELECT pg_notify('pgrst','reload schema');")
           print("✓ migration 043 applied (idempotent); PostgREST schema reload notified")
           PY
+
+      # Match calls to deals first, so a manual (out-of-band) backfill scores
+      # against current linkage instead of whatever the last daily ETL left.
+      # DML via the service key (no SUPABASE_DB_URL needed). continue-on-error so
+      # a resolve hiccup never blocks scoring the linkage that already exists.
+      - name: Resolve calls to deals (match before scoring)
+        if: ${{ github.event.inputs.resolve_first != 'false' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python scripts/enrichment/resolve_calls.py --only-unresolved --yes
 
       - name: Backfill
         env:
