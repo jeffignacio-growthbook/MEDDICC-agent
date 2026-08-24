@@ -61,6 +61,19 @@ jobs:
           python scripts/enrichment/resolve_calls.py --only-unresolved --yes
         continue-on-error: false
 
+      # Progressive scoring (PROGRESSIVE_SCORING_SPEC Phase 5b): score the new
+      # calls resolved above into call_scores so the roll-up is current each
+      # morning. Only new calls are scored (prior rolled state reused); a
+      # back-dated call triggers a per-deal re-fold. Non-fatal — a scoring hiccup
+      # must not fail the ETL; the backfill reconciles any gap.
+      - name: Score new calls (progressive)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          cd $GITHUB_WORKSPACE
+          python scripts/score_new_calls.py
+        continue-on-error: true
+
       - name: Commit updated call cache
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
