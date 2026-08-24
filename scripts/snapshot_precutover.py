@@ -41,8 +41,10 @@ from pathlib import Path
 sys.stdout.reconfigure(line_buffering=True)
 
 REPO = Path(__file__).resolve().parent.parent
-for p in ("scripts", "api", "scripts/analytics"):
-    sp = str(REPO / p)
+# "" is the repo root — required so `api.db` resolves as a package (the batch
+# scripts include it; the offline eval added it itself, which hid its absence).
+for p in ("", "scripts", "api", "scripts/analytics"):
+    sp = str(REPO / p) if p else str(REPO)
     if sp not in sys.path:
         sys.path.insert(0, sp)
 
