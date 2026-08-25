@@ -64,6 +64,20 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_synthesis_style.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_synthesis_evidence_first.py
 
+      - name: "TEST 0b — Offline: forecast analytics correctness (the 5 defects)"
+        run: |
+          set -e
+          # Behavioral (fixture-computed) coverage of the forecast analytics
+          # defects — in-quarter numerator, unfiltered denominator, shared scope,
+          # null-value propagation (util + in situ), point-in-time stage — plus
+          # the null-coalescing ratchet. These previously ran ONLY in the
+          # dispatch-only forecast-correctness workflow, so a regression that
+          # produced 196-vs-31 or 110% conversion wasn't caught on a normal PR.
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/test_forecast_analyses.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_forecast_correctness.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_reconstruction.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_waterfall_null_insitu.py
+
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
