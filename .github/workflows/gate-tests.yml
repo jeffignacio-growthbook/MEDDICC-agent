@@ -63,6 +63,7 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_component_evidence.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_synthesis_style.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_synthesis_evidence_first.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_requirements_complete.py
 
       - name: "TEST 0b — Offline: forecast analytics correctness (the 5 defects)"
         run: |
