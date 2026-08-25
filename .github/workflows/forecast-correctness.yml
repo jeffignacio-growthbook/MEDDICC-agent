@@ -31,6 +31,7 @@ jobs:
           PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/test_forecast_analyses.py
           PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_forecast_correctness.py
           PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_reconstruction.py
+          PYTHONPATH=scripts:api:scripts/analytics:. python3 scripts/eval_waterfall_null_insitu.py
       - name: "Forecast correctness (diagnose | run)"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
