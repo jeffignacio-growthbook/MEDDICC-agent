@@ -2,796 +2,816 @@
   "61167803975": {
     "slug": "newton-growth",
     "company_name": "Newton Growth",
-    "updated": "2026-08-26T03:06:55.597328"
+    "updated": "2026-08-27T12:26:59.478456"
   },
   "9093743432": {
     "slug": "insight-co",
     "company_name": "Insight Co.",
-    "updated": "2026-08-26T03:06:55.597338"
+    "updated": "2026-08-27T12:26:59.478466"
   },
   "11023288135": {
     "slug": "freecodecamp",
     "company_name": "freeCodeCamp",
-    "updated": "2026-08-26T03:06:55.597340"
+    "updated": "2026-08-27T12:26:59.478468"
   },
   "11023961379": {
     "slug": "hotelscombined",
     "company_name": "HotelsCombined",
-    "updated": "2026-08-26T03:06:55.597342"
+    "updated": "2026-08-27T12:26:59.478470"
   },
   "11023961439": {
     "slug": "los-angeles-times",
     "company_name": "los angeles times",
-    "updated": "2026-08-26T03:06:55.597343"
+    "updated": "2026-08-27T12:26:59.478471"
   },
   "11024003429": {
     "slug": "oda",
     "company_name": "Oda",
-    "updated": "2026-08-26T03:06:55.597344"
+    "updated": "2026-08-27T12:26:59.478472"
   },
   "11029888047": {
     "slug": "skillshare-inc",
     "company_name": "Skillshare, Inc",
-    "updated": "2026-08-26T03:06:55.597345"
+    "updated": "2026-08-27T12:26:59.478473"
   },
   "33774339943": {
     "slug": "secureticketpurchase",
     "company_name": "SecureTicketPurchase",
-    "updated": "2026-08-26T03:06:55.597347"
+    "updated": "2026-08-27T12:26:59.478475"
   },
   "28294219184": {
     "slug": "little-caesars",
     "company_name": "Little Caesars",
-    "updated": "2026-08-26T03:06:55.597348"
+    "updated": "2026-08-27T12:26:59.478476"
   },
   "36325681303": {
     "slug": "scale-ai",
     "company_name": "Scale AI",
-    "updated": "2026-08-26T03:06:55.597349"
+    "updated": "2026-08-27T12:26:59.478477"
   },
   "58135909154": {
     "slug": "axiscare",
     "company_name": "AxisCare",
-    "updated": "2026-08-26T03:06:55.597350"
+    "updated": "2026-08-27T12:26:59.478478"
   },
   "59418415718": {
     "slug": "quizlet",
     "company_name": "Quizlet",
-    "updated": "2026-08-26T03:06:55.597352"
+    "updated": "2026-08-27T12:26:59.478479"
   },
   "59342236338": {
     "slug": "user-testing-inc",
     "company_name": "User Testing Inc",
-    "updated": "2026-08-26T03:06:55.597353"
+    "updated": "2026-08-27T12:26:59.478480"
   },
   "60036027012": {
     "slug": "tesoro-xp-inc",
     "company_name": "Tesoro XP, Inc.",
-    "updated": "2026-08-26T03:06:55.597354"
+    "updated": "2026-08-27T12:26:59.478481"
   },
   "60056558933": {
     "slug": "18birdies",
     "company_name": "18Birdies",
-    "updated": "2026-08-26T03:06:55.597355"
+    "updated": "2026-08-27T12:26:59.478483"
   },
   "62875661161": {
     "slug": "npg-digital-gmbh",
     "company_name": "NPG Digital GmbH",
-    "updated": "2026-08-26T03:06:55.597356"
+    "updated": "2026-08-27T12:26:59.478485"
   },
   "60868340629": {
     "slug": "mountain",
     "company_name": "mountain",
-    "updated": "2026-08-26T03:06:55.597357"
+    "updated": "2026-08-27T12:26:59.478486"
   },
   "58630730677": {
     "slug": "philo",
     "company_name": "Philo",
-    "updated": "2026-08-26T03:06:55.597361"
+    "updated": "2026-08-27T12:26:59.478486"
   },
   "60217095483": {
     "slug": "picnic-technologies",
     "company_name": "Picnic Technologies",
-    "updated": "2026-08-26T03:06:55.597363"
+    "updated": "2026-08-27T12:26:59.478488"
   },
   "61045491056": {
     "slug": "ecco",
     "company_name": "ECCO",
-    "updated": "2026-08-26T03:06:55.597364"
+    "updated": "2026-08-27T12:26:59.478488"
   },
   "61076825943": {
     "slug": "usim",
     "company_name": "USIM",
-    "updated": "2026-08-26T03:06:55.597365"
+    "updated": "2026-08-27T12:26:59.478490"
+  },
+  "43948380965": {
+    "slug": "freie-presse",
+    "company_name": "Freie Presse",
+    "updated": "2026-08-27T12:26:59.478490"
   },
   "62121618183": {
     "slug": "airalo",
     "company_name": "Airalo",
-    "updated": "2026-08-26T03:06:55.597366"
-  },
-  "61582382687": {
-    "slug": "lola-blankets",
-    "company_name": "Lola Blankets",
-    "updated": "2026-08-26T03:06:55.597367"
+    "updated": "2026-08-27T12:26:59.478492"
   },
   "61615709775": {
     "slug": "mvf-global",
     "company_name": "MVF Global",
-    "updated": "2026-08-26T03:06:55.597368"
+    "updated": "2026-08-27T12:26:59.478493"
   },
   "58169341204": {
     "slug": "yoto",
     "company_name": "Yoto",
-    "updated": "2026-08-26T03:06:55.597369"
-  },
-  "61626028439": {
-    "slug": "convera",
-    "company_name": "Convera",
-    "updated": "2026-08-26T03:06:55.597370"
+    "updated": "2026-08-27T12:26:59.478494"
   },
   "61475205473": {
     "slug": "bestseller",
     "company_name": "BESTSELLER",
-    "updated": "2026-08-26T03:06:55.597371"
+    "updated": "2026-08-27T12:26:59.478495"
   },
   "61841688666": {
     "slug": "trt",
     "company_name": "TRT",
-    "updated": "2026-08-26T03:06:55.597372"
+    "updated": "2026-08-27T12:26:59.478496"
   },
   "62402578522": {
     "slug": "deel",
     "company_name": "Deel",
-    "updated": "2026-08-26T03:06:55.597373"
+    "updated": "2026-08-27T12:26:59.478497"
   },
   "60053279602": {
     "slug": "natera",
     "company_name": "Natera",
-    "updated": "2026-08-26T03:06:55.597374"
-  },
-  "62485423801": {
-    "slug": "march-networks",
-    "company_name": "March Networks",
-    "updated": "2026-08-26T03:06:55.597375"
+    "updated": "2026-08-27T12:26:59.478498"
   },
   "62620904729": {
     "slug": "deuna",
     "company_name": "DEUNA",
-    "updated": "2026-08-26T03:06:55.597379"
+    "updated": "2026-08-27T12:26:59.478499"
   },
   "58029773373": {
     "slug": "simpro",
     "company_name": "Simpro",
-    "updated": "2026-08-26T03:06:55.597380"
+    "updated": "2026-08-27T12:26:59.478500"
   },
   "54956375177": {
     "slug": "trade-me",
     "company_name": "Trade Me",
-    "updated": "2026-08-26T03:06:55.597381"
+    "updated": "2026-08-27T12:26:59.478501"
   },
   "59369997485": {
     "slug": "purple",
     "company_name": "Purple",
-    "updated": "2026-08-26T03:06:55.597382"
+    "updated": "2026-08-27T12:26:59.478502"
   },
   "61176368035": {
     "slug": "clickhouse",
     "company_name": "ClickHouse",
-    "updated": "2026-08-26T03:06:55.597383"
+    "updated": "2026-08-27T12:26:59.478503"
   },
   "60257621387": {
     "slug": "notion",
     "company_name": "Notion",
-    "updated": "2026-08-26T03:06:55.597384"
+    "updated": "2026-08-27T12:26:59.478504"
   },
   "60786197152": {
     "slug": "1800flowers",
     "company_name": "1800Flowers",
-    "updated": "2026-08-26T03:06:55.597385"
+    "updated": "2026-08-27T12:26:59.478505"
   },
   "47879623775": {
     "slug": "whatnot",
     "company_name": "Whatnot",
-    "updated": "2026-08-26T03:06:55.597386"
+    "updated": "2026-08-27T12:26:59.478506"
   },
   "62355039834": {
     "slug": "visible",
     "company_name": "Visible",
-    "updated": "2026-08-26T03:06:55.597387"
+    "updated": "2026-08-27T12:26:59.478507"
   },
   "62360994147": {
     "slug": "on3",
     "company_name": "On3",
-    "updated": "2026-08-26T03:06:55.597388"
+    "updated": "2026-08-27T12:26:59.478508"
   },
   "60069831015": {
     "slug": "inpost",
     "company_name": "InPost",
-    "updated": "2026-08-26T03:06:55.597389"
+    "updated": "2026-08-27T12:26:59.478509"
   },
   "63222360840": {
     "slug": "angel",
     "company_name": "Angel",
-    "updated": "2026-08-26T03:06:55.597390"
+    "updated": "2026-08-27T12:26:59.478510"
   },
   "63051341647": {
     "slug": "vio",
     "company_name": "Vio",
-    "updated": "2026-08-26T03:06:55.597392"
+    "updated": "2026-08-27T12:26:59.478511"
   },
   "60275604099": {
     "slug": "dentsu",
     "company_name": "dentsu",
-    "updated": "2026-08-26T03:06:55.597393"
+    "updated": "2026-08-27T12:26:59.478512"
   },
   "63065867572": {
     "slug": "boston-globe",
     "company_name": "The Boston Globe",
-    "updated": "2026-08-26T03:06:55.597394"
+    "updated": "2026-08-27T12:26:59.478513"
   },
   "63578787480": {
     "slug": "rula",
     "company_name": "Rula",
-    "updated": "2026-08-26T03:06:55.597395"
+    "updated": "2026-08-27T12:26:59.478514"
   },
   "58939926620": {
     "slug": "opentable",
     "company_name": "OpenTable",
-    "updated": "2026-08-26T03:06:55.597396"
+    "updated": "2026-08-27T12:26:59.478515"
   },
   "63165080439": {
     "slug": "mekari",
     "company_name": "Mekari",
-    "updated": "2026-08-26T03:06:55.597397"
+    "updated": "2026-08-27T12:26:59.478516"
   },
   "54646610299": {
     "slug": "paymob",
     "company_name": "Paymob",
-    "updated": "2026-08-26T03:06:55.597398"
+    "updated": "2026-08-27T12:26:59.478517"
   },
   "51560286629": {
     "slug": "artworkout-limited",
     "company_name": "ArtWorkout Limited",
-    "updated": "2026-08-26T03:06:55.597399"
+    "updated": "2026-08-27T12:26:59.478521"
   },
   "39350410660": {
     "slug": "flipp",
     "company_name": "Flipp",
-    "updated": "2026-08-26T03:06:55.597400"
+    "updated": "2026-08-27T12:26:59.478522"
   },
   "60615627143": {
     "slug": "pblicodev",
     "company_name": "PÚBLICO_DEV",
-    "updated": "2026-08-26T03:06:55.597401"
+    "updated": "2026-08-27T12:26:59.478523"
   },
   "60423886694": {
     "slug": "jusbrasil-test",
     "company_name": "Jusbrasil Test",
-    "updated": "2026-08-26T03:06:55.597402"
+    "updated": "2026-08-27T12:26:59.478524"
   },
   "9092472450": {
     "slug": "vanguard-group-inc",
     "company_name": "The Vanguard Group, Inc.",
-    "updated": "2026-08-26T03:06:55.597403"
+    "updated": "2026-08-27T12:26:59.478525"
   },
   "51293158260": {
     "slug": "mighty-digital",
     "company_name": "Mighty Digital",
-    "updated": "2026-08-26T03:06:55.597404"
+    "updated": "2026-08-27T12:26:59.478526"
   },
   "57531453253": {
     "slug": "amboss",
     "company_name": "AMBOSS",
-    "updated": "2026-08-26T03:06:55.597405"
+    "updated": "2026-08-27T12:26:59.478527"
   },
   "57531932257": {
     "slug": "hey-harper",
     "company_name": "Hey Harper",
-    "updated": "2026-08-26T03:06:55.597406"
+    "updated": "2026-08-27T12:26:59.478528"
   },
   "58135849096": {
     "slug": "neuroth",
     "company_name": "Neuroth",
-    "updated": "2026-08-26T03:06:55.597407"
+    "updated": "2026-08-27T12:26:59.478529"
   },
   "60837964868": {
     "slug": "carrefour",
     "company_name": "Carrefour",
-    "updated": "2026-08-26T03:06:55.597408"
+    "updated": "2026-08-27T12:26:59.478530"
   },
   "61149585726": {
     "slug": "tickpick",
     "company_name": "TickPick",
-    "updated": "2026-08-26T03:06:55.597409"
+    "updated": "2026-08-27T12:26:59.478531"
   },
   "60964814258": {
     "slug": "medcof",
     "company_name": "MedCof",
-    "updated": "2026-08-26T03:06:55.597410"
+    "updated": "2026-08-27T12:26:59.478532"
   },
   "54599396690": {
     "slug": "harper",
     "company_name": "Harper",
-    "updated": "2026-08-26T03:06:55.597411"
+    "updated": "2026-08-27T12:26:59.478533"
   },
   "56685250888": {
     "slug": "chaos",
     "company_name": "Chaos",
-    "updated": "2026-08-26T03:06:55.597412"
+    "updated": "2026-08-27T12:26:59.478534"
   },
   "57553904779": {
     "slug": "aircall",
     "company_name": "Aircall",
-    "updated": "2026-08-26T03:06:55.597413"
+    "updated": "2026-08-27T12:26:59.478535"
   },
   "63316026654": {
     "slug": "ziff-davis",
     "company_name": "Ziff Davis",
-    "updated": "2026-08-26T03:06:55.597414"
+    "updated": "2026-08-27T12:26:59.478536"
   },
   "53466496122": {
     "slug": "taxfix",
     "company_name": "Taxfix",
-    "updated": "2026-08-26T03:06:55.597415"
+    "updated": "2026-08-27T12:26:59.478537"
+  },
+  "64333729870": {
+    "slug": "plusgrade",
+    "company_name": "Plusgrade",
+    "updated": "2026-08-27T12:26:59.478541"
   },
   "58956770692": {
     "slug": "reliance-industries-limited",
     "company_name": "Reliance Industries Limited",
-    "updated": "2026-08-26T03:06:55.597416"
+    "updated": "2026-08-27T12:26:59.478542"
   },
   "62635592329": {
     "slug": "relive",
     "company_name": "Relive",
-    "updated": "2026-08-26T03:06:55.597419"
+    "updated": "2026-08-27T12:26:59.478543"
   },
   "63220208693": {
     "slug": "a24-films",
     "company_name": "A24 Films",
-    "updated": "2026-08-26T03:06:55.597426"
+    "updated": "2026-08-27T12:26:59.478544"
   },
   "60652001696": {
     "slug": "taskrabbit",
     "company_name": "Taskrabbit",
-    "updated": "2026-08-26T03:06:55.597427"
+    "updated": "2026-08-27T12:26:59.478545"
   },
   "61437846967": {
     "slug": "zoro",
     "company_name": "Zoro",
-    "updated": "2026-08-26T03:06:55.597428"
+    "updated": "2026-08-27T12:26:59.478546"
   },
   "55660576681": {
     "slug": "skyscanner",
     "company_name": "Skyscanner",
-    "updated": "2026-08-26T03:06:55.597429"
+    "updated": "2026-08-27T12:26:59.478547"
+  },
+  "61626028439": {
+    "slug": "convera",
+    "company_name": "Convera",
+    "updated": "2026-08-27T12:26:59.478548"
   },
   "63433850647": {
     "slug": "voyage-priv-fr",
     "company_name": "Voyage Privé FR",
-    "updated": "2026-08-26T03:06:55.597430"
+    "updated": "2026-08-27T12:26:59.478549"
   },
   "63562515584": {
     "slug": "lafleur-marketing",
     "company_name": "LaFleur Marketing",
-    "updated": "2026-08-26T03:06:55.597431"
+    "updated": "2026-08-27T12:26:59.478550"
   },
   "61631402640": {
     "slug": "aditya-birla-fashion-retail-limited",
     "company_name": "Aditya Birla Fashion and Retail Limited",
-    "updated": "2026-08-26T03:06:55.597432"
-  },
-  "62622458398": {
-    "slug": "box",
-    "company_name": "Box",
-    "updated": "2026-08-26T03:06:55.597433"
+    "updated": "2026-08-27T12:26:59.478550"
   },
   "60644372558": {
     "slug": "spotahome",
     "company_name": "Spotahome",
-    "updated": "2026-08-26T03:06:55.597434"
+    "updated": "2026-08-27T12:26:59.478551"
   },
   "61625300846": {
     "slug": "termgrid",
     "company_name": "Termgrid",
-    "updated": "2026-08-26T03:06:55.597435"
+    "updated": "2026-08-27T12:26:59.478552"
   },
   "62452805994": {
     "slug": "re-max-holdings",
     "company_name": "RE/MAX Holdings,",
-    "updated": "2026-08-26T03:06:55.597436"
+    "updated": "2026-08-27T12:26:59.478553"
   },
   "56258367868": {
     "slug": "derive",
     "company_name": "Derive",
-    "updated": "2026-08-26T03:06:55.597437"
+    "updated": "2026-08-27T12:26:59.478554"
   },
   "49689180024": {
     "slug": "unity",
     "company_name": "Unity",
-    "updated": "2026-08-26T03:06:55.597438"
+    "updated": "2026-08-27T12:26:59.478555"
   },
   "60667714821": {
     "slug": "crunchyroll",
     "company_name": "Crunchyroll",
-    "updated": "2026-08-26T03:06:55.597439"
-  },
-  "63676965456": {
-    "slug": "inmobi",
-    "company_name": "InMobi",
-    "updated": "2026-08-26T03:06:55.597440"
+    "updated": "2026-08-27T12:26:59.478556"
   },
   "63618932383": {
     "slug": "hungama",
     "company_name": "Hungama",
-    "updated": "2026-08-26T03:06:55.597441"
+    "updated": "2026-08-27T12:26:59.478557"
   },
   "63327879453": {
     "slug": "virgin-media-o2-uk-limited",
     "company_name": "Virgin Media O2 UK Limited",
-    "updated": "2026-08-26T03:06:55.597442"
+    "updated": "2026-08-27T12:26:59.478558"
   },
   "64175366986": {
     "slug": "guess-europe-sagl",
     "company_name": "GUESS Europe Sagl",
-    "updated": "2026-08-26T03:06:55.597444"
+    "updated": "2026-08-27T12:26:59.478559"
   },
   "62160567676": {
     "slug": "livesport",
     "company_name": "Livesport",
-    "updated": "2026-08-26T03:06:55.597446"
+    "updated": "2026-08-27T12:26:59.478560"
   },
   "62756829850": {
     "slug": "asapp",
     "company_name": "ASAPP",
-    "updated": "2026-08-26T03:06:55.597447"
+    "updated": "2026-08-27T12:26:59.478562"
   },
   "63437263422": {
     "slug": "coverflex",
     "company_name": "Coverflex",
-    "updated": "2026-08-26T03:06:55.597448"
-  },
-  "62741857928": {
-    "slug": "world-vision-usa",
-    "company_name": "World Vision USA",
-    "updated": "2026-08-26T03:06:55.597449"
+    "updated": "2026-08-27T12:26:59.478563"
   },
   "58134855076": {
     "slug": "square",
     "company_name": "Square",
-    "updated": "2026-08-26T03:06:55.597450"
+    "updated": "2026-08-27T12:26:59.478564"
   },
   "63527836680": {
     "slug": "zurich-insurance",
     "company_name": "Zurich Insurance",
-    "updated": "2026-08-26T03:06:55.597451"
+    "updated": "2026-08-27T12:26:59.478565"
   },
   "63535729507": {
     "slug": "hudu",
     "company_name": "Hudu",
-    "updated": "2026-08-26T03:06:55.597452"
+    "updated": "2026-08-27T12:26:59.478566"
   },
   "63549963371": {
     "slug": "otp-bank",
     "company_name": "АТ «ОТП БАНК» (OTP Bank)",
-    "updated": "2026-08-26T03:06:55.597453"
+    "updated": "2026-08-27T12:26:59.478567"
+  },
+  "63553360052": {
+    "slug": "hello-yellow",
+    "company_name": "Hello Yellow",
+    "updated": "2026-08-27T12:26:59.478568"
   },
   "59458798354": {
     "slug": "forty-eight-point-one",
     "company_name": "Forty Eight Point One",
-    "updated": "2026-08-26T03:06:55.597456"
+    "updated": "2026-08-27T12:26:59.478569"
   },
   "60785721693": {
     "slug": "bestseller",
     "company_name": "BESTSELLER",
-    "updated": "2026-08-26T03:06:55.597457"
+    "updated": "2026-08-27T12:26:59.478572"
   },
   "62852783774": {
     "slug": "blablacar",
     "company_name": "BlaBlaCar",
-    "updated": "2026-08-26T03:06:55.597458"
+    "updated": "2026-08-27T12:26:59.478573"
   },
   "60178287462": {
     "slug": "getaway-group",
     "company_name": "Getaway Group",
-    "updated": "2026-08-26T03:06:55.597459"
+    "updated": "2026-08-27T12:26:59.478574"
+  },
+  "64293475180": {
+    "slug": "national-company-telecommunications-information-security",
+    "company_name": "National Company of Telecommunications and Information Security",
+    "updated": "2026-08-27T12:26:59.478575"
+  },
+  "61582382687": {
+    "slug": "lola-blankets",
+    "company_name": "Lola Blankets",
+    "updated": "2026-08-27T12:26:59.478576"
   },
   "62725080086": {
     "slug": "air-space-intelligence",
     "company_name": "Air Space Intelligence",
-    "updated": "2026-08-26T03:06:55.597460"
+    "updated": "2026-08-27T12:26:59.478579"
   },
   "59387794836": {
     "slug": "ryanair",
     "company_name": "Ryanair",
-    "updated": "2026-08-26T03:06:55.597461"
+    "updated": "2026-08-27T12:26:59.478580"
   },
   "60419710634": {
     "slug": "square",
     "company_name": "Square",
-    "updated": "2026-08-26T03:06:55.597464"
+    "updated": "2026-08-27T12:26:59.478581"
   },
   "64058802499": {
     "slug": "clover",
     "company_name": "Clover",
-    "updated": "2026-08-26T03:06:55.597465"
+    "updated": "2026-08-27T12:26:59.478582"
   },
   "63064855552": {
     "slug": "boldin",
     "company_name": "Boldin",
-    "updated": "2026-08-26T03:06:55.597466"
+    "updated": "2026-08-27T12:26:59.478583"
   },
   "43491034751": {
     "slug": "automattic-inc",
     "company_name": "Automattic Inc.",
-    "updated": "2026-08-26T03:06:55.597467"
+    "updated": "2026-08-27T12:26:59.478584"
   },
   "60036684928": {
     "slug": "wellness-company",
     "company_name": "The Wellness Company",
-    "updated": "2026-08-26T03:06:55.597468"
+    "updated": "2026-08-27T12:26:59.478585"
   },
   "60173271471": {
     "slug": "stay-partners",
     "company_name": "Stay Partners",
-    "updated": "2026-08-26T03:06:55.597469"
+    "updated": "2026-08-27T12:26:59.478586"
   },
   "62395520059": {
     "slug": "docplanner",
     "company_name": "DocPlanner",
-    "updated": "2026-08-26T03:06:55.597470"
+    "updated": "2026-08-27T12:26:59.478587"
   },
   "58373987402": {
     "slug": "square-enix-inc",
     "company_name": "Square Enix, Inc.",
-    "updated": "2026-08-26T03:06:55.597471"
+    "updated": "2026-08-27T12:26:59.478588"
   },
   "61474132833": {
     "slug": "brussels-airlines",
     "company_name": "Brussels Airlines",
-    "updated": "2026-08-26T03:06:55.597472"
+    "updated": "2026-08-27T12:26:59.478589"
   },
   "59369345948": {
     "slug": "decathlon",
     "company_name": "Decathlon",
-    "updated": "2026-08-26T03:06:55.597473"
+    "updated": "2026-08-27T12:26:59.478590"
   },
   "60853753009": {
     "slug": "dassault-systmes",
     "company_name": "Dassault Systèmes",
-    "updated": "2026-08-26T03:06:55.597474"
+    "updated": "2026-08-27T12:26:59.478591"
   },
   "60840137793": {
     "slug": "zurich-insurance-group-ltd",
     "company_name": "Zurich Insurance Group Ltd",
-    "updated": "2026-08-26T03:06:55.597475"
+    "updated": "2026-08-27T12:26:59.478592"
   },
   "58659164971": {
     "slug": "dasweltauto",
     "company_name": "DasWeltAuto",
-    "updated": "2026-08-26T03:06:55.597476"
+    "updated": "2026-08-27T12:26:59.478593"
   },
   "59173115702": {
     "slug": "jobleads",
     "company_name": "JobLeads",
-    "updated": "2026-08-26T03:06:55.597477"
+    "updated": "2026-08-27T12:26:59.478594"
   },
   "45092496128": {
     "slug": "telkomsel",
     "company_name": "Telkomsel",
-    "updated": "2026-08-26T03:06:55.597478"
+    "updated": "2026-08-27T12:26:59.478595"
   },
   "60715077158": {
     "slug": "douglas",
     "company_name": "Douglas",
-    "updated": "2026-08-26T03:06:55.597479"
+    "updated": "2026-08-27T12:26:59.478596"
+  },
+  "62622458398": {
+    "slug": "box",
+    "company_name": "Box",
+    "updated": "2026-08-27T12:26:59.478597"
+  },
+  "62485423801": {
+    "slug": "march-networks",
+    "company_name": "March Networks",
+    "updated": "2026-08-27T12:26:59.478598"
   },
   "60665391542": {
     "slug": "zalando",
     "company_name": "Zalando",
-    "updated": "2026-08-26T03:06:55.597480"
+    "updated": "2026-08-27T12:26:59.478599"
   },
   "60182251329": {
     "slug": "ups",
     "company_name": "UPS",
-    "updated": "2026-08-26T03:06:55.597481"
+    "updated": "2026-08-27T12:26:59.478600"
   },
   "60860413064": {
     "slug": "buff",
     "company_name": "BUFF",
-    "updated": "2026-08-26T03:06:55.597484"
+    "updated": "2026-08-27T12:26:59.478601"
   },
   "62678252395": {
     "slug": "expedia-group",
     "company_name": "Expedia Group",
-    "updated": "2026-08-26T03:06:55.597486"
+    "updated": "2026-08-27T12:26:59.478602"
   },
   "64138895731": {
     "slug": "kape",
     "company_name": "KAPE",
-    "updated": "2026-08-26T03:06:55.597487"
+    "updated": "2026-08-27T12:26:59.478603"
   },
   "62135862588": {
     "slug": "medpage-today",
     "company_name": "MedPage Today",
-    "updated": "2026-08-26T03:06:55.597488"
+    "updated": "2026-08-27T12:26:59.478604"
   },
   "60355556645": {
     "slug": "plata-card-aka-difetch",
     "company_name": "Plata Card aka dif.etch",
-    "updated": "2026-08-26T03:06:55.597489"
+    "updated": "2026-08-27T12:26:59.478605"
   },
   "63834925459": {
     "slug": "cond-nast",
     "company_name": "Condé Nast",
-    "updated": "2026-08-26T03:06:55.597490"
+    "updated": "2026-08-27T12:26:59.478608"
+  },
+  "63676965456": {
+    "slug": "inmobi",
+    "company_name": "InMobi",
+    "updated": "2026-08-27T12:26:59.478609"
   },
   "63516446812": {
     "slug": "robinhood",
     "company_name": "Robinhood",
-    "updated": "2026-08-26T03:06:55.597491"
+    "updated": "2026-08-27T12:26:59.478612"
   },
   "60694377392": {
     "slug": "aras-corporation",
     "company_name": "Aras Corporation",
-    "updated": "2026-08-26T03:06:55.597492"
+    "updated": "2026-08-27T12:26:59.478613"
   },
   "58798224498": {
     "slug": "comcast",
     "company_name": "Comcast",
-    "updated": "2026-08-26T03:06:55.597493"
+    "updated": "2026-08-27T12:26:59.478614"
   },
   "62111798456": {
     "slug": "fabric-analytics",
     "company_name": "Fabric Analytics",
-    "updated": "2026-08-26T03:06:55.597494"
+    "updated": "2026-08-27T12:26:59.478615"
   },
   "59021351952": {
     "slug": "signet-jewelers-ltd",
     "company_name": "Signet Jewelers Ltd.",
-    "updated": "2026-08-26T03:06:55.597495"
+    "updated": "2026-08-27T12:26:59.478616"
   },
   "55478324562": {
     "slug": "zid",
     "company_name": "Zid ",
-    "updated": "2026-08-26T03:06:55.597496"
+    "updated": "2026-08-27T12:26:59.478617"
   },
   "54442852124": {
     "slug": "perplexity-ai",
     "company_name": "Perplexity AI",
-    "updated": "2026-08-26T03:06:55.597497"
+    "updated": "2026-08-27T12:26:59.478618"
   },
   "62622489357": {
     "slug": "jpmorganchase",
     "company_name": "JPMorganChase",
-    "updated": "2026-08-26T03:06:55.597498"
+    "updated": "2026-08-27T12:26:59.478619"
   },
   "55475383924": {
     "slug": "deepgram",
     "company_name": "Deepgram",
-    "updated": "2026-08-26T03:06:55.597501"
+    "updated": "2026-08-27T12:26:59.478620"
   },
   "61507488889": {
     "slug": "superhuman",
     "company_name": "Superhuman",
-    "updated": "2026-08-26T03:06:55.597502"
+    "updated": "2026-08-27T12:26:59.478621"
   },
   "62447700618": {
     "slug": "united-wheels",
     "company_name": "United Wheels",
-    "updated": "2026-08-26T03:06:55.597503"
+    "updated": "2026-08-27T12:26:59.478622"
   },
   "62985360945": {
     "slug": "electronic-arts",
     "company_name": "Electronic Arts",
-    "updated": "2026-08-26T03:06:55.597504"
+    "updated": "2026-08-27T12:26:59.478623"
   },
   "59680315298": {
     "slug": "genius-sports",
     "company_name": "Genius Sports",
-    "updated": "2026-08-26T03:06:55.597505"
+    "updated": "2026-08-27T12:26:59.478624"
   },
   "53500422798": {
     "slug": "stone",
     "company_name": "Stone",
-    "updated": "2026-08-26T03:06:55.597506"
+    "updated": "2026-08-27T12:26:59.478625"
   },
   "56162812495": {
     "slug": "workaxle",
     "company_name": "WorkAxle",
-    "updated": "2026-08-26T03:06:55.597507"
+    "updated": "2026-08-27T12:26:59.478626"
   },
   "59720089894": {
     "slug": "starttech-ventures",
     "company_name": "Starttech Ventures",
-    "updated": "2026-08-26T03:06:55.597508"
+    "updated": "2026-08-27T12:26:59.478627"
   },
   "9087197490": {
     "slug": "sirius-xm-radio-inc",
     "company_name": "Sirius XM Radio Inc",
-    "updated": "2026-08-26T03:06:55.597509"
+    "updated": "2026-08-27T12:26:59.478628"
   },
   "14545547901": {
     "slug": "samsung-electronics",
     "company_name": "Samsung Electronics",
-    "updated": "2026-08-26T03:06:55.597510"
+    "updated": "2026-08-27T12:26:59.478629"
   },
   "59245644951": {
     "slug": "route",
     "company_name": "Route",
-    "updated": "2026-08-26T03:06:55.597511"
+    "updated": "2026-08-27T12:26:59.478630"
   },
   "51050838887": {
     "slug": "rbi-retail-innovation",
     "company_name": "RBI Retail Innovation",
-    "updated": "2026-08-26T03:06:55.597512"
+    "updated": "2026-08-27T12:26:59.478631"
   },
   "9092495692": {
     "slug": "noom-inc",
     "company_name": "Noom, Inc.",
-    "updated": "2026-08-26T03:06:55.597513"
+    "updated": "2026-08-27T12:26:59.478632"
   },
   "9092495281": {
     "slug": "ebay-inc",
     "company_name": "eBay Inc.",
-    "updated": "2026-08-26T03:06:55.597514"
+    "updated": "2026-08-27T12:26:59.478633"
   },
   "57100375199": {
     "slug": "catena-media",
     "company_name": "Catena Media",
-    "updated": "2026-08-26T03:06:55.597515"
+    "updated": "2026-08-27T12:26:59.478634"
   },
   "61626656091": {
     "slug": "sword-health-inc",
     "company_name": "Sword Health Inc",
-    "updated": "2026-08-26T03:06:55.597516"
+    "updated": "2026-08-27T12:26:59.478637"
   },
   "50347229229": {
     "slug": "ingka-ikea",
     "company_name": "Ingka Ikea",
-    "updated": "2026-08-26T03:06:55.597517"
+    "updated": "2026-08-27T12:26:59.478638"
   },
   "54074159735": {
     "slug": "moneylion",
     "company_name": "MoneyLion",
-    "updated": "2026-08-26T03:06:55.597518"
+    "updated": "2026-08-27T12:26:59.478639"
   },
   "61024408734": {
     "slug": "cfi-global",
     "company_name": "CFI Global",
-    "updated": "2026-08-26T03:06:55.597519"
+    "updated": "2026-08-27T12:26:59.478640"
   },
   "54169480766": {
     "slug": "sap",
     "company_name": "SAP",
-    "updated": "2026-08-26T03:06:55.597520"
+    "updated": "2026-08-27T12:26:59.478641"
   },
   "58966766773": {
     "slug": "alasans",
     "company_name": "Alasans",
-    "updated": "2026-08-26T03:06:55.597521"
+    "updated": "2026-08-27T12:26:59.478642"
   },
   "58370143006": {
     "slug": "trr-trygghetsrdet",
     "company_name": "TRR Trygghetsrådet",
-    "updated": "2026-08-26T03:06:55.597522"
+    "updated": "2026-08-27T12:26:59.478643"
   },
   "58897463067": {
     "slug": "hublo",
     "company_name": "Hublo",
-    "updated": "2026-08-26T03:06:55.597523"
+    "updated": "2026-08-27T12:26:59.478646"
   },
   "59812480590": {
     "slug": "uzum",
     "company_name": "Uzum",
-    "updated": "2026-08-26T03:06:55.597524"
+    "updated": "2026-08-27T12:26:59.478647"
   },
   "60355159912": {
     "slug": "shiftkey",
     "company_name": "shiftkey",
-    "updated": "2026-08-26T03:06:55.597525"
+    "updated": "2026-08-27T12:26:59.478648"
+  },
+  "63436694904": {
+    "slug": "kaizen-gaming",
+    "company_name": "Kaizen Gaming",
+    "updated": "2026-08-27T12:26:59.478649"
   },
   "58208197272": {
     "slug": "cleo",
     "company_name": "Cleo",
-    "updated": "2026-08-26T03:06:55.597526"
+    "updated": "2026-08-27T12:26:59.478650"
   }
 }
