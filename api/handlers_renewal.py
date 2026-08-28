@@ -16,7 +16,7 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
     """
     Return customers due to renew (future tense, upcoming renewals) in a time window.
 
-    Filters for OPEN renewal pipeline deals (Upcoming Renewal, Renewal Engaged stages),
+    Filters for OPEN renewal pipeline deals (pipeline_id=866608541),
     NOT closed-won renewals. This handler exists because "due to renew" (forward-looking)
     was misinterpreted as "already renewed" (past tense) by the dynamic loop.
 
@@ -30,7 +30,8 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
                     "arr_usd": float,
                     "owner_email": str,
                     "segment": str,
-                    "stage": str
+                    "stage": str,
+                    "pipeline": str
                 },
                 ...
             ],
@@ -43,12 +44,10 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
     tw = _resolve_tw(params)
 
     try:
-        # Query for deals in renewal pipeline with open stages
-        # Using stage names from HubSpot export: "Upcoming Renewal (Renewal)" and "Renewal Engaged (Renewal)"
-        # The "(Renewal)" suffix indicates the pipeline
-
-        # First, try filtering by pipeline if the field exists
+        # Query for deals in renewal pipeline (866608541 from GrowthBook config)
+        # with close dates in the requested range and open status
         filters = [
+            ("eq", "pipeline", "866608541"),  # Renewal pipeline
             ("gte", "close_date", tw["start"]),
             ("lte", "close_date", tw["end"]),
             ("neq", "deal_status", "won"),  # Exclude already closed-won
@@ -58,26 +57,18 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
         rows = select_all(
             sb,
             "deals",
-            columns="deal_id,company_name,close_date,arr_usd,owner_email,segment,stage",
-            filters=filters,
-            order="close_date.asc"
+            columns="deal_id,company_name,close_date,arr_usd,owner_email,segment,stage,pipeline",
+            filters=filters
         )
 
-        # Post-filter for renewal stages (since we can't do LIKE in select_all filters)
-        renewal_rows = [
-            row for row in rows
-            if row.get("stage") and (
-                "Upcoming Renewal" in row["stage"] or
-                "Renewal Engaged" in row["stage"] or
-                "Renewal" in row.get("pipeline", "")
-            )
-        ]
+        # Sort by close_date in Python (select_all doesn't support ordering)
+        rows.sort(key=lambda r: r.get("close_date") or "")
 
         return {
-            "rows": renewal_rows,
-            "count": len(renewal_rows),
+            "rows": rows,
+            "count": len(rows),
             "time_window": tw,
-            "note": f"Found {len(renewal_rows)} upcoming renewals (open stages only, not closed-won)"
+            "note": f"Found {len(rows)} upcoming renewals in pipeline 866608541 (open stages only)"
         }
 
     except Exception as e:
