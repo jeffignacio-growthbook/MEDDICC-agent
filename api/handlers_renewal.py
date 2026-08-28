@@ -119,20 +119,53 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
             if renewal_value_field in row:
                 row.pop(renewal_value_field)
 
-        # Sort by close_date in Python (select_all doesn't support ordering)
-        rows.sort(key=lambda r: r.get("close_date") or "")
+        # BUCKET BY FISCAL QUARTER - don't let synthesis re-infer quarters
+        # Synthesis will use calendar quarters if we return flat rows.
+        # Pre-bucket here using config's fiscal calendar, return quarters dict.
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+        from utils import get_fiscal_quarter
+        from datetime import date as dt_date
 
-        # Calculate total renewal ARR
-        total_arr = sum(row.get("arr_usd") or 0 for row in rows)
+        quarters = {}  # {label: {"rows": [...], "start": ..., "end": ..., "total_arr": ...}}
+
+        for row in rows:
+            close_str = row.get("close_date")
+            if not close_str:
+                continue
+
+            # Determine fiscal quarter for this deal's close_date
+            close_date = dt_date.fromisoformat(close_str[:10])
+            q_start, q_end, q_label = get_fiscal_quarter(close_date, cfg)
+
+            if q_label not in quarters:
+                quarters[q_label] = {
+                    "rows": [],
+                    "start": q_start.isoformat(),
+                    "end": q_end.isoformat(),
+                    "total_arr": 0,
+                    "count": 0
+                }
+
+            quarters[q_label]["rows"].append(row)
+            quarters[q_label]["total_arr"] += (row.get("arr_usd") or 0)
+            quarters[q_label]["count"] += 1
+
+        # Sort quarters chronologically
+        sorted_quarters = dict(sorted(quarters.items(), key=lambda x: x[1]["start"]))
+
+        # Calculate overall totals
+        total_deals = sum(q["count"] for q in sorted_quarters.values())
+        total_arr = sum(q["total_arr"] for q in sorted_quarters.values())
 
         # Build note with missing value warning if applicable
-        note = f"Found {len(rows)} upcoming renewals in pipeline {renewal_pipeline_id} (open stages only)"
+        note = f"Found {total_deals} upcoming renewals in pipeline {renewal_pipeline_id} (open stages only)"
         if missing_count > 0:
             note += f". WARNING: {missing_count} deal(s) have renewal ARR in 'amount' field instead of 'renewal_revenue' - verify these values are correct (may be prior cycle value, expansion only, or placeholder)"
 
         return {
-            "rows": rows,
-            "count": len(rows),
+            "quarters": sorted_quarters,  # Pre-bucketed by fiscal quarter
+            "count": total_deals,
             "total_arr": total_arr,
             "missing_renewal_revenue_count": missing_count,
             "time_window": tw,
