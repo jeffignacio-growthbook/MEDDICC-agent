@@ -157,6 +157,13 @@ HANDLER_DESCRIPTIONS = {
         "'which deals are in Discovery?' (stage_deals, stage='Discovery')"
     ),
     "query_new_deals": "which deals were created, added to pipeline, or started in a time window",
+    "query_upcoming_renewals": (
+        "Customers/companies DUE TO RENEW (future tense, upcoming renewals) in a "
+        "time window. Open renewal pipeline — deals in 'Upcoming Renewal' or "
+        "'Renewal Engaged' stages, NOT closed-won renewals. Returns company, "
+        "close date, ARR, owner, segment. Examples: 'which customers are due to "
+        "renew in Q3?', 'show me Q4 renewals', 'who is up for renewal next month?'"
+    ),
     "query_won_deals": "which deals did we ALREADY win/close (past tense), retrospective wins/bookings. NOT future close dates.",
     "query_arr": "ARR by customer, total ARR",
     "query_deals_at_risk": "weak MEDDICC scores, deals at risk, champion gaps",

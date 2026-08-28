@@ -21,6 +21,12 @@ try:
 except ImportError:
     from api.field_semantics import stage_bucket, stage_label, is_won, is_lost, is_open
 
+# Import renewal handlers (separated for clarity)
+try:
+    from api.handlers_renewal import query_upcoming_renewals
+except ImportError:
+    from handlers_renewal import query_upcoming_renewals
+
 
 # overall_score is the SUM of the 7 MEDDICC components (0-10 each) — max 70,
 # NOT 100. See hubspot_deals._extract_scores_from_analysis. Anything that
