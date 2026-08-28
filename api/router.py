@@ -1050,7 +1050,7 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
                 return {"rows": rows, "table": step_data.get("table", "unknown")}
         return {}
 
-    # Entity extraction mode: prefer entity-bearing steps
+    # Entity extraction mode: merge all entity-bearing steps
     # Load entity registry to know which columns are entity IDs
     entity_id_columns = set()
     if sb:
@@ -1085,12 +1085,44 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
                 else:
                     logger.info(f"[EXTRACT] {step_key}: {len(rows)} rows, no entity columns")
 
-    # Return most recent entity-bearing step
+    # Merge all entity-bearing steps, deduplicating on entity ID
     if entity_bearing_steps:
-        step_key, step_data, entities = entity_bearing_steps[0]  # Already sorted reverse
-        rows = step_data.get("rows", [])
-        logger.info(f"[EXTRACT] returning {len(rows)} rows from {step_key} (has entities: {entities})")
-        return {"rows": rows, "table": step_data.get("table", "unknown")}
+        # Determine which entity ID column to use for deduplication
+        # Prefer deal_id, then company_id, then first available
+        all_entities = set()
+        for _, _, entities in entity_bearing_steps:
+            all_entities.update(entities)
+
+        dedup_key = None
+        for preferred in ["deal_id", "company_id", "call_id"]:
+            if preferred in all_entities:
+                dedup_key = preferred
+                break
+
+        if not dedup_key:
+            dedup_key = list(all_entities)[0] if all_entities else None
+
+        merged_rows = []
+        seen_ids = set()
+
+        for step_key, step_data, entities in entity_bearing_steps:
+            rows = step_data.get("rows", [])
+            for row in rows:
+                if dedup_key and dedup_key in row:
+                    row_id = row[dedup_key]
+                    if row_id not in seen_ids:
+                        seen_ids.add(row_id)
+                        merged_rows.append(row)
+                else:
+                    # Row doesn't have dedup key, include it
+                    merged_rows.append(row)
+
+        step_sources = ", ".join([sk for sk, _, _ in entity_bearing_steps])
+        logger.info(f"[EXTRACT] merged {len(merged_rows)} unique rows (deduplicated on {dedup_key}) from {len(entity_bearing_steps)} steps: {step_sources}")
+
+        # Use table name from most recent step
+        table_name = entity_bearing_steps[0][1].get("table", "unknown")
+        return {"rows": merged_rows, "table": table_name}
 
     # Fallback: no entity-bearing steps found, return last step with data
     for step_key in step_keys:
