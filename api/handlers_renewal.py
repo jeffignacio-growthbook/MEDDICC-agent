@@ -84,7 +84,7 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
             ("neq", "deal_status", "lost"),  # Exclude closed-lost
         ]
 
-        # Select renewal_revenue and arr_usd (fallback when renewal_revenue is NULL)
+        # Select renewal_revenue and arr_usd to detect missing values
         rows = select_all(
             sb,
             "deals",
@@ -92,13 +92,29 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
             filters=filters
         )
 
-        # Use renewal_revenue if populated, fall back to arr_usd (from amount) if NULL
-        # Matches compute_deal_value fallback pattern (config: pipeline.value_field.fallback)
+        # Use renewal_revenue if populated, mark missing values with flag
+        # Do NOT auto-fallback to arr_usd - amount may hold wrong value (prior cycle,
+        # expansion only, placeholder). Fallbacks substitute plausible-but-wrong numbers.
+        missing_count = 0
         for row in rows:
             rr = row.get(renewal_value_field)
             fallback = row.get("arr_usd", 0)
-            # Use renewal_revenue if present, otherwise fall back to arr_usd
-            row["arr_usd"] = rr if rr is not None else fallback
+
+            if rr is not None:
+                # renewal_revenue populated - use it
+                row["arr_usd"] = rr
+                row["value_source"] = "renewal_revenue"
+            elif fallback > 0:
+                # renewal_revenue NULL but amount has value - flag for review
+                row["arr_usd"] = fallback
+                row["value_source"] = "amount (renewal ARR not set)"
+                missing_count += 1
+            else:
+                # Both NULL - genuinely blank
+                row["arr_usd"] = 0
+                row["value_source"] = "not set"
+                missing_count += 1
+
             # Remove renewal_revenue from output (callers expect arr_usd)
             if renewal_value_field in row:
                 row.pop(renewal_value_field)
@@ -109,12 +125,18 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
         # Calculate total renewal ARR
         total_arr = sum(row.get("arr_usd") or 0 for row in rows)
 
+        # Build note with missing value warning if applicable
+        note = f"Found {len(rows)} upcoming renewals in pipeline {renewal_pipeline_id} (open stages only)"
+        if missing_count > 0:
+            note += f". WARNING: {missing_count} deal(s) have renewal ARR in 'amount' field instead of 'renewal_revenue' - verify these values are correct (may be prior cycle value, expansion only, or placeholder)"
+
         return {
             "rows": rows,
             "count": len(rows),
             "total_arr": total_arr,
+            "missing_renewal_revenue_count": missing_count,
             "time_window": tw,
-            "note": f"Found {len(rows)} upcoming renewals in pipeline {renewal_pipeline_id} (open stages only)"
+            "note": note
         }
 
     except Exception as e:
