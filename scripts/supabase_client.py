@@ -175,6 +175,8 @@ class SupabaseWriter:
             row['expansion_arr'] = _safe_numeric(deal['expansion_arr'])
         if 'prior_arr' in deal:
             row['prior_arr'] = _safe_numeric(deal['prior_arr'])
+        if 'renewal_revenue' in deal:
+            row['renewal_revenue'] = _safe_numeric(deal['renewal_revenue'])
         if 'sao' in deal:
             row['sao'] = deal.get('sao')  # Boolean, no conversion needed
         if 'forecast_category' in deal:
