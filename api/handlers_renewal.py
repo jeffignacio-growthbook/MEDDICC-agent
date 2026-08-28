@@ -84,19 +84,24 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
             ("neq", "deal_status", "lost"),  # Exclude closed-lost
         ]
 
-        # Select renewal_revenue instead of arr_usd for renewal deals
+        # Select renewal_revenue and arr_usd (fallback when renewal_revenue is NULL)
         rows = select_all(
             sb,
             "deals",
-            columns=f"deal_id,company_name,close_date,{renewal_value_field},owner_email,segment,stage,pipeline",
+            columns=f"deal_id,company_name,close_date,{renewal_value_field},arr_usd,owner_email,segment,stage,pipeline",
             filters=filters
         )
 
-        # Rename renewal_revenue to arr_usd for consistent interface
-        # (callers expect arr_usd, but renewal deals use renewal_revenue internally)
+        # Use renewal_revenue if populated, fall back to arr_usd (from amount) if NULL
+        # Matches compute_deal_value fallback pattern (config: pipeline.value_field.fallback)
         for row in rows:
+            rr = row.get(renewal_value_field)
+            fallback = row.get("arr_usd", 0)
+            # Use renewal_revenue if present, otherwise fall back to arr_usd
+            row["arr_usd"] = rr if rr is not None else fallback
+            # Remove renewal_revenue from output (callers expect arr_usd)
             if renewal_value_field in row:
-                row["arr_usd"] = row.pop(renewal_value_field)
+                row.pop(renewal_value_field)
 
         # Sort by close_date in Python (select_all doesn't support ordering)
         rows.sort(key=lambda r: r.get("close_date") or "")
