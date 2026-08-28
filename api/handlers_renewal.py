@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from supabase_client import select_all
 
 
-def query_upcoming_renewals(params: dict, sb) -> dict:
+async def query_upcoming_renewals(params: dict, sb) -> dict:
     """
     Return customers due to renew (future tense, upcoming renewals) in a time window.
 
