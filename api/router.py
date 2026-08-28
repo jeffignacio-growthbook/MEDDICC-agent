@@ -1206,7 +1206,32 @@ async def dynamic_query_loop(question, history, params,
     """
     from api.schema_context import get_schema_context
     from api.table_classifier import classify_relevant_tables
+    from api.time_resolver import resolve_time_window
     from api import tools as T
+    import re
+
+    # Pre-resolve any fiscal quarter references in the question
+    # so the loop gets concrete dates, not puzzles to reconstruct
+    quarter_refs = re.findall(r'\bQ([1-4])\b', question, re.IGNORECASE)
+    resolved_quarters = []
+    if quarter_refs:
+        for q_num in quarter_refs:
+            resolved_tw = resolve_time_window({"period": "fiscal_quarter", "fiscal_quarter": f"Q{q_num}"})
+            resolved_quarters.append(resolved_tw)
+            logger.info(f"[QUARTER_RESOLVE] Q{q_num} → {resolved_tw['start']} to {resolved_tw['end']} ({resolved_tw['label']})")
+
+        # If multiple quarters found (e.g., "Q3 and Q4"), note the full range
+        if len(resolved_quarters) > 1:
+            all_starts = [rq["start"] for rq in resolved_quarters]
+            all_ends = [rq["end"] for rq in resolved_quarters]
+            full_range_start = min(all_starts)
+            full_range_end = max(all_ends)
+            quarter_context = f"Fiscal quarters referenced: " + ", ".join([rq["label"] for rq in resolved_quarters])
+            quarter_context += f"\nFull date range: {full_range_start} to {full_range_end}"
+        else:
+            quarter_context = f"Fiscal quarter: {resolved_quarters[0]['label']} ({resolved_quarters[0]['start']} to {resolved_quarters[0]['end']})"
+    else:
+        quarter_context = ""
 
     # Hybrid schema: classify relevant tables for full descriptions.
     # Table classification is a cheap Haiku task, so use the dedicated
@@ -1238,6 +1263,7 @@ async def dynamic_query_loop(question, history, params,
                     f"Time context: {params['time_window']['label']} "
                     f"= {params['time_window']['start']} to "
                     f"{params['time_window']['end']}\n\n"
+                    f"{quarter_context}\n\n" if quarter_context else ""
                     f"{f'Context: {hint}' if hint else ''}"}
     ]
     accumulated_data = {}
