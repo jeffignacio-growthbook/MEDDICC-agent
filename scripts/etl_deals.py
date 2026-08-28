@@ -682,6 +682,19 @@ def main():
                 days = calculate_days_to_close(create_date, close_date)
                 deal_dict['days_to_close'] = days
 
+            # Parse renewal_revenue for renewal pipeline deals (same as analytics mode)
+            def safe_numeric(val):
+                if val in (None, '', 'null'):
+                    return None
+                try:
+                    return float(str(val).replace('$', '').replace(',', '').strip())
+                except (ValueError, TypeError):
+                    return None
+
+            renewal_revenue = safe_numeric(props.get('renewal_revenue'))
+            if renewal_revenue is not None:
+                deal_dict['renewal_revenue'] = renewal_revenue
+
         # Add analytics-specific fields
         if args.mode == 'analytics':
             # Determine deal_status using pipeline config
