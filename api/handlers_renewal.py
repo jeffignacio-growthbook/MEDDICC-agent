@@ -16,7 +16,7 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
     """
     Return customers due to renew (future tense, upcoming renewals) in a time window.
 
-    Filters for OPEN renewal pipeline deals (pipeline_id=866608541),
+    Filters for OPEN renewal pipeline deals (pipeline_id from config),
     NOT closed-won renewals. This handler exists because "due to renew" (forward-looking)
     was misinterpreted as "already renewed" (past tense) by the dynamic loop.
 
@@ -40,14 +40,30 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
         }
     """
     from api.handlers import _resolve_tw
+    import yaml
 
     tw = _resolve_tw(params)
 
+    # Load renewal pipeline ID from config (portable across deployments)
+    cfg_path = Path(__file__).parent.parent / "config" / "client.yaml"
+    cfg = yaml.safe_load(open(cfg_path))
+
+    # Get renewal pipeline ID from pipeline.value_field.renewal_pipeline_ids
+    renewal_pipeline_ids = cfg.get("pipeline", {}).get("value_field", {}).get("renewal_pipeline_ids", [])
+    if not renewal_pipeline_ids:
+        return {
+            "rows": [],
+            "count": 0,
+            "error": "No renewal pipeline configured in config/client.yaml",
+            "time_window": tw
+        }
+
+    renewal_pipeline_id = renewal_pipeline_ids[0]  # Use first renewal pipeline
+
     try:
-        # Query for deals in renewal pipeline (866608541 from GrowthBook config)
-        # with close dates in the requested range and open status
+        # Query for deals in renewal pipeline with close dates in range and open status
         filters = [
-            ("eq", "pipeline", "866608541"),  # Renewal pipeline
+            ("eq", "pipeline", renewal_pipeline_id),  # Renewal pipeline from config
             ("gte", "close_date", tw["start"]),
             ("lte", "close_date", tw["end"]),
             ("neq", "deal_status", "won"),  # Exclude already closed-won
@@ -68,7 +84,7 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
             "rows": rows,
             "count": len(rows),
             "time_window": tw,
-            "note": f"Found {len(rows)} upcoming renewals in pipeline 866608541 (open stages only)"
+            "note": f"Found {len(rows)} upcoming renewals in pipeline {renewal_pipeline_id} (open stages only)"
         }
 
     except Exception as e:
