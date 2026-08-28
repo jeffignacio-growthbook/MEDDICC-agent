@@ -44,21 +44,35 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
 
     tw = _resolve_tw(params)
 
-    # Load renewal pipeline ID from config (portable across deployments)
+    # Load renewal pipeline ID and value field from config (portable across deployments)
     cfg_path = Path(__file__).parent.parent / "config" / "client.yaml"
     cfg = yaml.safe_load(open(cfg_path))
 
-    # Get renewal pipeline ID from pipeline.value_field.renewal_pipeline_ids
-    renewal_pipeline_ids = cfg.get("pipeline", {}).get("value_field", {}).get("renewal_pipeline_ids", [])
+    vf_config = cfg.get("pipeline", {}).get("value_field", {})
+
+    # Get renewal pipeline ID from config
+    renewal_pipeline_ids = vf_config.get("renewal_pipeline_ids", [])
     if not renewal_pipeline_ids:
         return {
             "rows": [],
             "count": 0,
-            "error": "No renewal pipeline configured in config/client.yaml",
+            "error": "No renewal pipeline configured in config/client.yaml (pipeline.value_field.renewal_pipeline_ids)",
             "time_window": tw
         }
 
     renewal_pipeline_id = renewal_pipeline_ids[0]  # Use first renewal pipeline
+
+    # Get renewal value field from config
+    renewal_components = vf_config.get("renewal_components", [])
+    if not renewal_components:
+        return {
+            "rows": [],
+            "count": 0,
+            "error": "No renewal value field configured in config/client.yaml (pipeline.value_field.renewal_components)",
+            "time_window": tw
+        }
+
+    renewal_value_field = renewal_components[0]  # Use first renewal component (renewal_revenue)
 
     try:
         # Query for deals in renewal pipeline with close dates in range and open status
@@ -70,19 +84,30 @@ async def query_upcoming_renewals(params: dict, sb) -> dict:
             ("neq", "deal_status", "lost"),  # Exclude closed-lost
         ]
 
+        # Select renewal_revenue instead of arr_usd for renewal deals
         rows = select_all(
             sb,
             "deals",
-            columns="deal_id,company_name,close_date,arr_usd,owner_email,segment,stage,pipeline",
+            columns=f"deal_id,company_name,close_date,{renewal_value_field},owner_email,segment,stage,pipeline",
             filters=filters
         )
+
+        # Rename renewal_revenue to arr_usd for consistent interface
+        # (callers expect arr_usd, but renewal deals use renewal_revenue internally)
+        for row in rows:
+            if renewal_value_field in row:
+                row["arr_usd"] = row.pop(renewal_value_field)
 
         # Sort by close_date in Python (select_all doesn't support ordering)
         rows.sort(key=lambda r: r.get("close_date") or "")
 
+        # Calculate total renewal ARR
+        total_arr = sum(row.get("arr_usd") or 0 for row in rows)
+
         return {
             "rows": rows,
             "count": len(rows),
+            "total_arr": total_arr,
             "time_window": tw,
             "note": f"Found {len(rows)} upcoming renewals in pipeline {renewal_pipeline_id} (open stages only)"
         }
