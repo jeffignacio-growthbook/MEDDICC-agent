@@ -1287,7 +1287,7 @@ async def query_deal_stages_bulk(params: dict, sb) -> dict:
 
     rows = select_all(sb, "deals",
         columns="deal_id,company_name,stage,"
-                "highest_stage_order_reached,close_date",
+                "highest_stage_order_reached,close_date,segment",
         filters=[("in_", "deal_id", deal_ids)])
     return {"stages": rows}
 
@@ -1299,7 +1299,7 @@ async def query_deal_owners_bulk(params: dict, sb) -> dict:
                 "error": "No deal IDs provided. This handler requires a "
                          "specific set of deals."}
     rows = select_all(sb, "deals",
-        columns="deal_id,company_name,owner_email",
+        columns="deal_id,company_name,owner_email,segment",
         filters=[("in_", "deal_id", deal_ids)])
     return {"owners": rows}
 
@@ -1312,7 +1312,7 @@ async def query_deal_values_bulk(params: dict, sb) -> dict:
                          "specific set of deals."}
     rows = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,"
-                "arr_usd,new_arr,expansion_arr",
+                "arr_usd,new_arr,expansion_arr,segment",
         filters=[("in_", "deal_id", deal_ids)])
     total = sum(r.get("arr_usd") or 0 for r in rows)
     return {"values": rows, "total_arr": total}
