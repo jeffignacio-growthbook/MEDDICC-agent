@@ -62,14 +62,16 @@ nrr:
     reconciled_against: HubSpot retention report (closed deals only)
     reconciled_on: 2026-08-28
     tolerance: 0.005  # ±0.5pp acceptable variance
-    handler_output: 1.1106  # FAILS CHECK - 4.06pp over verified value
-    investigation: |
-      Handler uses incremental_arr column (backfilled from HubSpot).
-      4pp gap likely from:
-      - HubSpot report may exclude certain deal types
-      - Handler may include deals HubSpot filters out
-      - Different date range interpretation
-      Need to verify HubSpot report filters and recompute.
+    handler_output: 1.1182  # with all deals
+    handler_output_excluding_lion_studios: 1.0694  # RECONCILES (0.06pp variance)
+    exclusions:
+      q1_fy2027: ["Lion Studios (deal 47879809412) - $37.5K expansion excluded from report"]
+      q3_fy2027: ["x.ai - $300K renewal, excluded from report"]
+      q4_fy2027: ["Anthropic - $810K renewal + $500K expansion, excluded from report"]
+    note: |
+      Q1 reconciles when excluding Lion Studios.
+      Q3/Q4 verified values NOT COMPARABLE - report excludes x.ai and Anthropic
+      which handler includes. Only Q1 and Q2 are valid reconciliation points.
   coverage_caveat: |
     incremental_arr is ~93% populated (237 of 256 renewal deals).
     NULL incremental_arr means no expansion (treat as 0).
@@ -112,6 +114,24 @@ coverage:
   note: |
     Coverage = pipeline / remaining quota.
     Forward-looking metric, never historical.
+
+# Data quality alerts
+#
+data_quality:
+  q1_fy2027_hygiene_issue:
+    quarter: "Q1 FY2027 (Feb-Apr 2026)"
+    issue: "4 open renewal deals in closed historical quarter"
+    severity: high
+    detail: |
+      Quarter ended April 2026. As of August 2026 (4-6 months later),
+      4 renewal deals remain open:
+      - 3 with renewal_revenue ($28,313 total)
+      - 0 with expansion
+      These should have closed by now. Likely causes:
+      - Deals pushed to later quarters (update close_date)
+      - Deals churned but not marked lost (update stage)
+      - Deals renewed but not marked won (update stage)
+      Impact: Inflates assume-open-wins NRR for closed quarter.
 
 # Vocabulary cross-reference
 #
