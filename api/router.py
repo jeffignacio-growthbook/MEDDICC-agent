@@ -1918,7 +1918,9 @@ async def route_question(question: str, user_id: str,
 
     # Add non-blocking violations to tool_results for synthesis awareness
     if violations:
-        logger.warning(f"[PLAUSIBILITY] {len(violations)} non-blocking violations detected")
+        logger.warning(f"[PLAUSIBILITY] {len(violations)} non-blocking violations detected:")
+        for v in violations:
+            logger.warning(f"[PLAUSIBILITY]   {v.severity.upper()}: {v.message}")
         tool_results["_plausibility_warnings"] = format_violations_for_synthesis(violations)
 
     # ── 6.5. Cap rows for synthesis (keep full set for entity extraction) ──
@@ -2416,23 +2418,32 @@ PRESENTING A DEAL'S MEDDICC (reframe — "what's missing", not "here's a grade")
 
 def _cap_rows_for_synthesis(tool_results: dict, max_rows: int = 20) -> dict:
     """
-    Cap rows arrays for synthesis to prevent oversized payloads.
+    Cap rows and ID arrays for synthesis to prevent oversized payloads.
 
-    Synthesis needs counts and stage breakdowns, not all deals. Keep the full
-    rows list in the original tool_results for entity extraction.
+    Synthesis needs counts and stage breakdowns, not all deal IDs. Keep the full
+    lists in the original tool_results for entity extraction.
 
-    Returns a copy with rows capped and a note about truncation.
+    Returns a copy with arrays capped and notes about truncation.
     """
     import copy
     synthesis_copy = copy.deepcopy(tool_results)
 
+    # Arrays to cap (deal-level data synthesis doesn't need)
+    ARRAY_KEYS_TO_CAP = {
+        'rows', 'deal_ids', 'entered_from_other_stage_ids',
+        'new_to_pipeline_ids', 'exited_ids'
+    }
+
     def cap_at_level(obj: dict):
-        """Recursively cap 'rows' arrays."""
-        if 'rows' in obj and isinstance(obj['rows'], list):
-            original_count = len(obj['rows'])
-            if original_count > max_rows:
-                obj['rows'] = obj['rows'][:max_rows]
-                obj['_rows_truncated'] = f"Showing {max_rows} of {original_count} deals. Counts and breakdowns include all {original_count}."
+        """Recursively cap deal arrays."""
+        for key in ARRAY_KEYS_TO_CAP:
+            if key in obj and isinstance(obj[key], list):
+                original_count = len(obj[key])
+                if original_count > max_rows:
+                    obj[key] = obj[key][:max_rows]
+                    # Only add truncation note once per object
+                    if '_truncated' not in obj:
+                        obj['_truncated'] = f"Showing {max_rows} of {original_count} items. Counts include all {original_count}."
 
         # Recurse into nested dicts
         for value in obj.values():
