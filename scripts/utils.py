@@ -626,4 +626,42 @@ def build_semantic_context(config: Optional[Dict] = None) -> str:
     lines.append("  ✗ DO NOT filter on stage display names - use stage IDs from field_semantics")
     lines.append("")
 
+    # ========================================================================
+    # 7. VERIFIED METRICS
+    # ========================================================================
+    metrics_path = Path(__file__).parent.parent / 'config' / 'metrics.yaml'
+    if metrics_path.exists():
+        with open(metrics_path) as f:
+            metrics = yaml.safe_load(f)
+
+        lines.append("## Verified Metrics")
+        lines.append("")
+        lines.append("CRITICAL: These values are reconciled against source systems.")
+        lines.append("A computed result that diverges materially is likely wrong.")
+        lines.append("")
+
+        # Include key verified metrics
+        for metric_id in ['grr', 'nrr', 'churn']:
+            if metric_id in metrics:
+                m = metrics[metric_id]
+                label = m.get('label', metric_id.upper())
+                formula = m.get('formula', '')
+                verified = m.get('verified', {})
+
+                lines.append(f"**{label}**")
+                if formula:
+                    lines.append(f"  Formula: {formula}")
+
+                # Include verified value if present
+                for key, value in verified.items():
+                    if key not in ['reconciled_against', 'reconciled_on', 'tolerance', 'note']:
+                        if value is not None:
+                            lines.append(f"  {key}: {value}")
+
+                # Include tolerance if present
+                if 'tolerance' in verified:
+                    lines.append(f"  Tolerance: {verified['tolerance']}")
+
+                lines.append("")
+
     return "\n".join(lines)

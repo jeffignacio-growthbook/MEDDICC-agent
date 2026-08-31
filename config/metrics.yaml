@@ -1,0 +1,113 @@
+# Metric Registry
+#
+# Canonical definitions for all metrics computed by the agent.
+# Each metric includes:
+#   - formula: How it's computed
+#   - population: Which deals/records qualify
+#   - freshness: When to use snapshot vs live data
+#   - verified: Reconciled reference values
+#   - coverage_caveat: Data quality warnings
+#   - not_applicable_to: Where this metric doesn't apply
+
+grr:
+  label: Gross Revenue Retention
+  formula: SUM(IF(closed_won, renewal_revenue, 0)) / SUM(renewal_revenue)
+  population: renewal pipeline only
+  freshness: historical  # closed quarters are snapshot-definitive
+  verified:
+    q1_fy2027_closed_only: 0.7668
+    reconciled_against: HubSpot retention report (closed deals only)
+    reconciled_on: 2026-08-30
+    tolerance: 0.005  # ±0.5pp acceptable variance
+  coverage_caveat: |
+    renewal_revenue is ~83% populated in forward quarters.
+    Floor: 50% coverage required to report.
+    Q1 FY2027 closed deals: 100% coverage.
+  not_applicable_to:
+    - default pipeline
+    - new business pipeline
+  views:
+    closed_only:
+      description: Historical fact - hs_is_closed = true
+      denominator: closed deals only (won + lost)
+      use_when: closed quarters, historical analysis
+    assume_open_wins:
+      description: Forward-looking - counts open as won
+      denominator: all deals (won + lost + open)
+      use_when: current quarter forecasting
+
+churn:
+  label: Dollar Churn Rate
+  formula: 1 - GRR
+  population: renewal pipeline only
+  freshness: historical
+  verified:
+    q1_fy2027_closed_only: 0.2332  # 1 - 0.7668
+    reconciled_against: Derived from GRR
+    reconciled_on: 2026-08-30
+  not_applicable_to:
+    - default pipeline
+    - new business pipeline
+
+nrr:
+  label: Net Revenue Retention
+  formula: SUM(IF(NOT closed_lost, renewal_revenue + incremental_arr, 0)) / SUM(renewal_revenue)
+  population: renewal pipeline only
+  freshness: historical
+  verified:
+    q1_fy2027_closed_only: 1.1106
+    reconciled_against: HubSpot retention report (closed deals only)
+    reconciled_on: 2026-08-30
+    tolerance: 0.01  # ±1pp acceptable variance
+    note: 4.06pp variance from 107% reference still under investigation
+  coverage_caveat: |
+    incremental_arr is ~93% populated (237 of 256 renewal deals).
+    NULL incremental_arr means no expansion (treat as 0).
+  not_applicable_to:
+    - default pipeline
+    - new business pipeline
+  views:
+    closed_only:
+      description: Historical fact - hs_is_closed = true
+      denominator: closed deals only (won + lost)
+      numerator: won renewal_revenue + incremental_arr
+    assume_open_wins:
+      description: Forward-looking - counts open as won
+      denominator: all deals (won + lost + open)
+      numerator: (won + open) renewal_revenue + incremental_arr
+
+week3_conversion:
+  label: Week-3 Conversion Rate
+  formula: qualified_deals / deals_created_3_weeks_ago
+  population: new business pipeline only
+  freshness: current  # needs recent data for SDR tracking
+  verified:
+    august_2026: null  # not yet reconciled
+    reconciled_against: pending
+  not_applicable_to:
+    - renewal pipeline
+  note: |
+    Week-3 is a qualification velocity metric for new business.
+    Renewals don't "qualify" - they renew or churn.
+    Applying this to renewals returns garbage (e.g., 14.0%).
+
+coverage:
+  label: Pipeline Coverage
+  formula: SUM(open_pipeline) / remaining_quota
+  population: all pipelines
+  freshness: current  # updated daily for forecast accuracy
+  verified:
+    q3_fy2027: null  # not yet reconciled
+    reconciled_against: pending
+  note: |
+    Coverage = pipeline / remaining quota.
+    Forward-looking metric, never historical.
+
+# Vocabulary cross-reference
+#
+# "Due to renew" = renewal pipeline, open stages
+# "Qualified" = new business, stage_order >= qualified_stage_order
+# "At risk" = client-specific definition (e.g., MEDDICC score < 5)
+# "Won" = stage bucket in ['closed_won']
+# "Lost" = stage bucket in ['closed_lost']
+# "Open" = stage bucket in ['open', 'discovery', 'scoping', 'proposal', ...]
