@@ -473,39 +473,34 @@ def format_block_message(violations: List[PlausibilityViolation]) -> str:
                 quarter_display = quarter.replace('_', ' ').upper()
 
             lines.append(
-                f"I computed {metric} at {computed*100:.0f}% for {quarter_display}, "
-                f"but the verified figure is {verified*100:.0f}%. "
-                f"Something is wrong with the query, not the business. "
-                f"Not showing the number."
+                f"I'm not showing {metric} for {quarter_display} — the number I calculated "
+                f"doesn't match what we've verified, so I don't trust it. Flagged for Jeff to check."
             )
         elif v.check == 'rate_bounds':
             # Rate exceeded bounds
             field = v.context.get('field', 'rate')
             value = v.context.get('value', 0)
             lines.append(
-                f"Computed {field} at {value*100:.0f}%, which exceeds valid range. "
-                f"This indicates a query error, not actual performance. "
-                f"Not showing the number."
+                f"I'm not showing {field} — the result I got ({value*100:.0f}%) doesn't make sense. "
+                f"Flagged for Jeff to check."
             )
         elif v.check == 'subset_relationship':
             # Subset larger than superset
             subset = v.context.get('subset', 'subset')
             superset = v.context.get('superset', 'superset')
             lines.append(
-                f"Query returned {subset} count larger than {superset} count, "
-                f"which is structurally impossible. "
-                f"Something is wrong with the filters or joins. "
-                f"Not showing the number."
+                f"I'm not showing these numbers — {subset} count came back higher than {superset}, "
+                f"which shouldn't be possible. Flagged for Jeff to check."
             )
         else:
             # Generic critical violation
             lines.append(
-                f"Data quality check failed: {v.message}. "
-                f"Not showing the number until the cause is identified."
+                f"I'm not showing this number — something doesn't add up. "
+                f"Flagged for Jeff to check."
             )
 
     if not lines:
-        return "Cannot provide answer due to data quality issues."
+        return "I'm not showing this number — something doesn't add up. Flagged for Jeff to check."
 
     return "\n\n".join(lines)
 

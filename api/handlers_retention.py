@@ -152,12 +152,20 @@ def query_retention_metrics(supabase, config: Dict, time_window: Dict) -> Dict:
     total_deals = sum(len(data['all']) for data in by_quarter.values())
     quarters_covered = sorted(by_quarter.keys())
 
-    population_statement = (
-        f"{total_deals} renewal deals — renewal pipeline {renewal_pipeline_ids}, "
-        f"grouped by fiscal quarter. Quarters: {', '.join(quarters_covered)}. "
-        f"Denominator: renewal_revenue (excludes deals with NULL renewal_revenue). "
-        f"Coverage floor: {coverage_floor:.0f}%."
-    )
+    # Count deals missing renewal_revenue
+    all_deals_flat = []
+    for data in by_quarter.values():
+        all_deals_flat.extend(data['all'])
+
+    missing_amount = sum(1 for d in all_deals_flat
+                        if d.get('renewal_revenue') is None or d.get('renewal_revenue') == 0)
+
+    # Build plain-language statement
+    quarter_display = ', '.join(quarters_covered)
+    population_statement = f"{total_deals} renewals across {quarter_display}."
+
+    if missing_amount > 0:
+        population_statement += f" {missing_amount} don't have an amount recorded yet."
 
     return {
         "views": {
