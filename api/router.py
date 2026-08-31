@@ -1921,6 +1921,9 @@ async def route_question(question: str, user_id: str,
         logger.warning(f"[PLAUSIBILITY] {len(violations)} non-blocking violations detected")
         tool_results["_plausibility_warnings"] = format_violations_for_synthesis(violations)
 
+    # ── 6.5. Cap rows for synthesis (keep full set for entity extraction) ──
+    synthesis_results = _cap_rows_for_synthesis(tool_results)
+
     # ── 7. Synthesize ─────────────────────────────────
     answer_resp = generator_client.complete(
         messages=[
@@ -1930,7 +1933,7 @@ async def route_question(question: str, user_id: str,
             {"role": "user",
              "content": f"Question: {question}\n\n"
                         f"Data:\n"
-                        f"{json.dumps(tool_results, indent=2, default=str)[:SYNTH_PAYLOAD_CHARS]}"}
+                        f"{json.dumps(synthesis_results, indent=2, default=str)[:SYNTH_PAYLOAD_CHARS]}"}
         ],
         system=build_synthesis_prompt(persona),
         max_tokens=SYNTH_MAX_TOKENS
@@ -2411,11 +2414,44 @@ PRESENTING A DEAL'S MEDDICC (reframe — "what's missing", not "here's a grade")
 """
 
 
+def _cap_rows_for_synthesis(tool_results: dict, max_rows: int = 20) -> dict:
+    """
+    Cap rows arrays for synthesis to prevent oversized payloads.
+
+    Synthesis needs counts and stage breakdowns, not all deals. Keep the full
+    rows list in the original tool_results for entity extraction.
+
+    Returns a copy with rows capped and a note about truncation.
+    """
+    import copy
+    synthesis_copy = copy.deepcopy(tool_results)
+
+    def cap_at_level(obj: dict):
+        """Recursively cap 'rows' arrays."""
+        if 'rows' in obj and isinstance(obj['rows'], list):
+            original_count = len(obj['rows'])
+            if original_count > max_rows:
+                obj['rows'] = obj['rows'][:max_rows]
+                obj['_rows_truncated'] = f"Showing {max_rows} of {original_count} deals. Counts and breakdowns include all {original_count}."
+
+        # Recurse into nested dicts
+        for value in obj.values():
+            if isinstance(value, dict):
+                cap_at_level(value)
+            elif isinstance(value, list):
+                for item in value:
+                    if isinstance(item, dict):
+                        cap_at_level(item)
+
+    cap_at_level(synthesis_copy)
+    return synthesis_copy
+
+
 def build_synthesis_prompt(persona: dict) -> str:
     """Build persona-aware synthesis system prompt."""
     role_group = (persona or {}).get("role_group", "other")
     block = _VOICE_BLOCKS.get(role_group, _VOICE_BLOCKS["other"])
-    
+
     name = (persona or {}).get("name", "")
     title = (persona or {}).get("title", "")
     
