@@ -690,6 +690,12 @@ async def route_entity_scoped_question(
 
 def build_intent_prompt(today: str, current_quarter: str, history: str, question: str, roster_text: str = "") -> str:
     """Build INTENT_PROMPT from HANDLER_DESCRIPTIONS (single source of truth)."""
+    # Import semantic context builder
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent.parent / 'scripts'))
+    from utils import build_semantic_context
+
     handlers_text = "\n".join([
         f"  {name:25s} - {desc}"
         for name, desc in HANDLER_DESCRIPTIONS.items()
@@ -704,6 +710,9 @@ def build_intent_prompt(today: str, current_quarter: str, history: str, question
 When question mentions a first name (e.g. "Jake", "Jennifer"), look up their
 email in the roster above and use it in rep_email or sdr_email parameters.
 """
+
+    # Build semantic context (fiscal calendar, pipeline meanings, vocabulary)
+    semantic_context = build_semantic_context()
 
     return f"""Classify this Slack question into one of
 these handler types. Reply with JSON only.
@@ -754,10 +763,9 @@ Orientation vs. data questions (weigh the WHOLE message, not a prefix):
     → acknowledgment, NOT query_help. But "ok, what about Q2?" carries a
     real follow-up → route on that.
 
-For time windows, use the fiscal calendar:
-  FY starts February. Q1=Feb-Apr, Q2=May-Jul,
-  Q3=Aug-Oct, Q4=Nov-Jan.
-  Today is {today}. Current quarter: {current_quarter}.
+{semantic_context}
+
+Today is {today}. Current quarter: {current_quarter}.
 
 Conversation history (for follow-up context):
 {history}
@@ -892,6 +900,8 @@ Example:
   Question: "how is Jake tracking this month"
   → WHERE owner_email = 'jake.stangl@growthbook.io'
   (don't do: WHERE owner_name ilike '%jake%')
+
+{semantic_context}
 
 {schema_context}
 
@@ -1251,7 +1261,16 @@ async def dynamic_query_loop(question, history, params,
     logger.info(f"[SCHEMA] Relevant tables for full descriptions: {relevant_tables}")
 
     schema = get_schema_context(sb, tables_with_descriptions=relevant_tables)
+
+    # Build semantic context (fiscal calendar, pipeline meanings, vocabulary)
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent.parent / 'scripts'))
+    from utils import build_semantic_context
+    semantic_context = build_semantic_context()
+
     system = DYNAMIC_SYSTEM_PROMPT.format(
+        semantic_context=semantic_context,
         schema_context=schema,
         roster_text=roster_text
     )
