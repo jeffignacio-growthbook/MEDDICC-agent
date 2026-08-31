@@ -410,22 +410,38 @@ def format_violations_for_synthesis(violations: List[PlausibilityViolation]) -> 
     """
     Format violations for inclusion in synthesis prompt.
 
-    Returns a warning block to prepend to the answer.
+    Returns a warning block to prepend to the answer in plain language.
     """
     if not violations:
         return ""
 
-    lines = ["⚠️  PLAUSIBILITY CHECKS FLAGGED:"]
+    lines = ["⚠️  Data quality notes:"]
     lines.append("")
 
     for v in violations:
-        severity_marker = {
-            'warning': '⚠️ ',
-            'error': '❌',
-            'critical': '🚨'
-        }.get(v.severity, '⚠️ ')
+        # Convert technical message to plain language
+        if v.check == 'metric_registry_divergence':
+            ctx = v.context
+            metric = ctx.get('metric', 'metric').upper()
+            computed = ctx.get('computed', 0)
+            verified = ctx.get('verified', 0)
 
-        lines.append(f"{severity_marker} {v.message}")
+            # Plain language note
+            lines.append(
+                f"• {metric} came back {computed*100:.1f}% but we've verified it at "
+                f"{verified*100:.0f}%. Numbers are close but worth noting."
+            )
+        elif v.check == 'rate_bounds':
+            field = v.context.get('field', 'rate')
+            value = v.context.get('value', 0)
+            lines.append(f"• {field} result ({value*100:.0f}%) looks unusual.")
+        elif v.check == 'subset_relationship':
+            subset = v.context.get('subset', 'subset')
+            superset = v.context.get('superset', 'superset')
+            lines.append(f"• {subset} count higher than {superset} — worth double-checking.")
+        else:
+            # Generic warning in plain language
+            lines.append(f"• Data check flagged: worth verifying this result.")
 
     lines.append("")
     return "\n".join(lines)

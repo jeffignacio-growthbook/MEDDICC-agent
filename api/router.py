@@ -2178,6 +2178,11 @@ RECONCILIATION NOTES (when present in tool_results):
   We include Lion Studios expansion ($37.5K), the verified report excludes it.
   Both are valid views depending on treatment rules."
 
+OPERATOR METADATA (ignore in answers):
+- Keys prefixed with _ (like _metadata, _plausibility_warnings) are for operators
+- Never echo field names like "denominator_basis", "tolerance", "variance" to users
+- Users read about deals, amounts, quarters — not schema or calculation internals
+
 CRITICAL SLACK FORMATTING:
 - Bold: *single asterisks* only. Never **double**.
 - No markdown tables. Use bullet lists: • metric: *value*

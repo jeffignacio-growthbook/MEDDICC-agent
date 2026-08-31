@@ -178,11 +178,13 @@ def query_retention_metrics(supabase, config: Dict, time_window: Dict) -> Dict:
             "closed_only": closed_only,
             "assume_open_wins": assume_open_wins
         },
-        "denominator_basis": "renewal_revenue",
-        "coverage_floor_pct": coverage_floor,
-        "time_window": time_window,
         "population_statement": population_statement,
-        "freshness": freshness_metadata
+        "freshness": freshness_metadata,
+        "_metadata": {
+            "denominator_basis": "renewal_revenue",
+            "coverage_floor_pct": coverage_floor,
+            "time_window": time_window
+        }
     }
 
 
