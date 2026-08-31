@@ -148,6 +148,17 @@ def query_retention_metrics(supabase, config: Dict, time_window: Dict) -> Dict:
             view_name="assume_open_wins"
         )
 
+    # Build population statement
+    total_deals = sum(len(data['all']) for data in by_quarter.values())
+    quarters_covered = sorted(by_quarter.keys())
+
+    population_statement = (
+        f"{total_deals} renewal deals — renewal pipeline {renewal_pipeline_ids}, "
+        f"grouped by fiscal quarter. Quarters: {', '.join(quarters_covered)}. "
+        f"Denominator: renewal_revenue (excludes deals with NULL renewal_revenue). "
+        f"Coverage floor: {coverage_floor:.0f}%."
+    )
+
     return {
         "views": {
             "closed_only": closed_only,
@@ -155,7 +166,8 @@ def query_retention_metrics(supabase, config: Dict, time_window: Dict) -> Dict:
         },
         "denominator_basis": "renewal_revenue",
         "coverage_floor_pct": coverage_floor,
-        "time_window": time_window
+        "time_window": time_window,
+        "population_statement": population_statement
     }
 
 

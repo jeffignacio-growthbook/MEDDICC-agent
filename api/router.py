@@ -1896,7 +1896,32 @@ async def route_question(question: str, user_id: str,
                 "handler_name": handler_name,
                 "tool_results": {}}
 
-    # ── 6. Synthesize ─────────────────────────────────
+    # ── 6. Plausibility checks before synthesis ───────
+    from api.plausibility import run_all_checks, format_violations_for_synthesis
+
+    violations, should_block = run_all_checks(tool_results, handler_name)
+
+    if should_block:
+        # Critical plausibility violation - block synthesis
+        violation_summary = format_violations_for_synthesis(violations)
+        logger.error(f"[PLAUSIBILITY] Blocking synthesis due to critical violations: {len(violations)} violations")
+        return {
+            "answer": f"Cannot provide answer due to data quality issues:\n\n{violation_summary}",
+            "handler_name": handler_name,
+            "tool_results": tool_results,
+            "plausibility_violations": [
+                {"check": v.check, "severity": v.severity, "message": v.message}
+                for v in violations
+            ],
+            "blocked": True
+        }
+
+    # Add non-blocking violations to tool_results for synthesis awareness
+    if violations:
+        logger.warning(f"[PLAUSIBILITY] {len(violations)} non-blocking violations detected")
+        tool_results["_plausibility_warnings"] = format_violations_for_synthesis(violations)
+
+    # ── 7. Synthesize ─────────────────────────────────
     answer_resp = generator_client.complete(
         messages=[
             *[{"role": m["role"], "content": m["content"]}
@@ -1912,7 +1937,7 @@ async def route_question(question: str, user_id: str,
     )
     raw_answer = answer_resp.text.strip()
 
-    # ── 7. Verify ─────────────────────────────────────
+    # ── 8. Verify ─────────────────────────────────────
     verify_resp = classifier_client.complete(
         messages=[{"role": "user", "content":
             VERIFY_PROMPT.format(
