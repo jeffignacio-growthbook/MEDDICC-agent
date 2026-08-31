@@ -15,10 +15,11 @@ grr:
   population: renewal pipeline only
   freshness: historical  # closed quarters are snapshot-definitive
   verified:
-    q1_fy2027_closed_only: 0.7668
+    q1_fy2027_closed_only: 0.77
     reconciled_against: HubSpot retention report (closed deals only)
-    reconciled_on: 2026-08-30
+    reconciled_on: 2026-08-28
     tolerance: 0.005  # ±0.5pp acceptable variance
+    handler_output: 0.7668  # within tolerance (0.32pp variance)
   coverage_caveat: |
     renewal_revenue is ~83% populated in forward quarters.
     Floor: 50% coverage required to report.
@@ -42,9 +43,11 @@ churn:
   population: renewal pipeline only
   freshness: historical
   verified:
-    q1_fy2027_closed_only: 0.2332  # 1 - 0.7668
-    reconciled_against: Derived from GRR
-    reconciled_on: 2026-08-30
+    q1_fy2027_closed_only: 0.23  # 1 - 0.77
+    reconciled_against: Derived from verified GRR (HubSpot retention report)
+    reconciled_on: 2026-08-28
+    tolerance: 0.005  # ±0.5pp (inherited from GRR)
+    handler_output: 0.2332  # within tolerance
   not_applicable_to:
     - default pipeline
     - new business pipeline
@@ -55,11 +58,18 @@ nrr:
   population: renewal pipeline only
   freshness: historical
   verified:
-    q1_fy2027_closed_only: 1.1106
+    q1_fy2027_closed_only: 1.07
     reconciled_against: HubSpot retention report (closed deals only)
-    reconciled_on: 2026-08-30
-    tolerance: 0.01  # ±1pp acceptable variance
-    note: 4.06pp variance from 107% reference still under investigation
+    reconciled_on: 2026-08-28
+    tolerance: 0.005  # ±0.5pp acceptable variance
+    handler_output: 1.1106  # FAILS CHECK - 4.06pp over verified value
+    investigation: |
+      Handler uses incremental_arr column (backfilled from HubSpot).
+      4pp gap likely from:
+      - HubSpot report may exclude certain deal types
+      - Handler may include deals HubSpot filters out
+      - Different date range interpretation
+      Need to verify HubSpot report filters and recompute.
   coverage_caveat: |
     incremental_arr is ~93% populated (237 of 256 renewal deals).
     NULL incremental_arr means no expansion (treat as 0).
