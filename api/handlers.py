@@ -3220,13 +3220,20 @@ def _pm_deal_rows(date_rows, stage_cfg, company_map=None, limit=200):
     return rows[:limit]
 
 
-def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps, requested_days=None):
+def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps, requested_days=None, base=None):
     if len(all_dates) < 2:
         data_gaps.append(
             "movement needs two snapshot dates; found "
             f"{len(all_dates)} in this grid — returning null, not a zero"
         )
-        return None, [], {"prior": None, "current": None, "net": None}, {}, {}
+        return {
+            "snapshot_dates": None,
+            "by_stage": [],
+            "totals": {"prior": None, "current": None, "net": None},
+            "confidence": {},
+            "summary": {},
+            "current_position": None
+        }
 
     # Select snapshots based on requested_days
     from datetime import date, timedelta
@@ -3328,7 +3335,35 @@ def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps, requested_days=N
         "moved_between_stages": len(moved_between),
     }
     confidence = _pm_confidence_mix(current_rows)
-    return [prior_date, current_date], by_stage, totals, confidence, summary
+
+    # Check for off-grid current position
+    current_position = None
+    if base:
+        position_date = base.get("_current_position_date")
+        if position_date and position_date != current_date and position_date in by_date:
+            # Current position is on a different grid - report it separately
+            position_rows = list(_pm_latest_row_per_deal(by_date[position_date]).values())
+            by_stage_position = {}
+            for r in position_rows:
+                stage_name = _pm_stage_name(r.get("stage_id"), stage_cfg)
+                by_stage_position[stage_name] = by_stage_position.get(stage_name, 0) + 1
+
+            current_position = {
+                "snapshot_date": position_date,
+                "source": base.get("_current_position_source"),
+                "total": len(position_rows),
+                "by_stage": by_stage_position,
+                "note": "Mid-week position, not compared to weekly trend"
+            }
+
+    return {
+        "snapshot_dates": [prior_date, current_date],
+        "by_stage": by_stage,
+        "totals": totals,
+        "confidence": confidence,
+        "summary": summary,
+        "current_position": current_position
+    }
 
 
 def _pm_view_composition(by_date, all_dates, stage_cfg, weeks):
@@ -3571,22 +3606,46 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         return {**base, "snapshot_dates": [], "result": None,
                 "data_gaps": [gap]}
 
-    # ── grid handling: never silently mix weekday grids ──
+    # ── grid handling: report both trend and current position ──
     data_gaps = []
     sources = {}
     for r in rows:
         src = r.get("snapshot_source") or "unknown"
         sources.setdefault(src, set()).add(r.get("snapshot_date"))
-    chosen_source = max(sources, key=lambda s: len(sources[s]))
+
     if len(sources) > 1:
-        ignored = {s: sorted(d for d in sources[s])
-                   for s in sources if s != chosen_source}
-        data_gaps.append(
-            f"multiple snapshot grids present; used source '{chosen_source}' "
-            f"and did not mix in {ignored} (different weekday grids)"
-        )
+        # Multiple grids: pick trend grid (most snapshots) + current position (most recent)
+        # Trend grid = largest coherent set spanning the window (answers "how has it moved")
+        # Current position = most recent snapshot on any grid (stated as position, not compared)
+        trend_source = max(sources, key=lambda s: len(sources[s]))
+        all_dates_sorted = sorted(date for dates in sources.values() for date in dates)
+        current_date = all_dates_sorted[-1]
+        current_source = next(s for s, dates in sources.items() if current_date in dates)
+
+        if trend_source != current_source:
+            trend_dates = sorted(sources[trend_source])
+            data_gaps.append(
+                f"Weekly trend from {trend_source} grid ({len(trend_dates)} snapshots: "
+                f"{', '.join(trend_dates)}). Current position as of {current_date} "
+                f"is from {current_source} grid (different weekday, not compared to trend)."
+            )
+        chosen_source = trend_source
+        # Store current position info for movement view
+        base["_current_position_date"] = current_date
+        base["_current_position_source"] = current_source
+    else:
+        # Single grid: use it for both trend and current
+        chosen_source = list(sources.keys())[0]
+
     grid_rows = [r for r in rows
                  if (r.get("snapshot_source") or "unknown") == chosen_source]
+
+    # Include current position rows if on different grid
+    if base.get("_current_position_date") and base.get("_current_position_source") != chosen_source:
+        position_rows = [r for r in rows
+                        if r.get("snapshot_date") == base["_current_position_date"]
+                        and (r.get("snapshot_source") or "unknown") == base["_current_position_source"]]
+        grid_rows.extend(position_rows)
 
     # ── apply analytics scope at read time (null-stage rows counted) ──
     scoped = [r for r in grid_rows
@@ -3667,15 +3726,16 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
 
     # ── dispatch ──
     if view == "movement":
-        snap_dates, by_stage, totals, confidence, summary = _pm_view_movement(
-            by_date, all_dates, stage_cfg, data_gaps, requested_days)
+        result = _pm_view_movement(
+            by_date, all_dates, stage_cfg, data_gaps, requested_days, base)
         return {
             **base,
-            "snapshot_dates": snap_dates or [],
-            "by_stage": by_stage,
-            "totals": totals,
-            "summary": summary,   # new_to_pipeline / left_pipeline / moved (deal-level)
-            "confidence": confidence,
+            "snapshot_dates": result.get("snapshot_dates", []),
+            "by_stage": result.get("by_stage", []),
+            "totals": result.get("totals", {}),
+            "summary": result.get("summary", {}),
+            "confidence": result.get("confidence", {}),
+            "current_position": result.get("current_position"),  # Off-grid snapshot if present
             "rows": latest_rows,
             "data_gaps": data_gaps,
         }
