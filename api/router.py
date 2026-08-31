@@ -2170,6 +2170,14 @@ EMPTY / NO RESULTS (do not confabulate) — applies to EVERY handler:
 - If a name was expected to match and didn't, say the lookup returned nothing and
   ask the user to confirm the exact name — do not theorize about the cause.
 
+RECONCILIATION NOTES (when present in tool_results):
+- If tool_results includes freshness.quarters[...].reconciliation notes, surface them
+- Use plain language — no internal vocabulary (tolerance, variance, registry, handler)
+- When handler and verified values differ, state both views without picking a winner
+- Example: "GRR 76.7% (matches verified 77%)." or "NRR 111.8% vs verified 107%.
+  We include Lion Studios expansion ($37.5K), the verified report excludes it.
+  Both are valid views depending on treatment rules."
+
 CRITICAL SLACK FORMATTING:
 - Bold: *single asterisks* only. Never **double**.
 - No markdown tables. Use bullet lists: • metric: *value*

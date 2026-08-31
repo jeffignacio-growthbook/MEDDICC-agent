@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Optional
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # Add parent paths for imports
 REPO_ROOT = Path(__file__).parent.parent
@@ -167,6 +168,11 @@ def query_retention_metrics(supabase, config: Dict, time_window: Dict) -> Dict:
     if missing_amount > 0:
         population_statement += f" {missing_amount} don't have an amount recorded yet."
 
+    # Add freshness stamps and reconciliation notes
+    freshness_metadata = _add_freshness_and_reconciliation(
+        closed_only, assume_open_wins, config
+    )
+
     return {
         "views": {
             "closed_only": closed_only,
@@ -175,7 +181,8 @@ def query_retention_metrics(supabase, config: Dict, time_window: Dict) -> Dict:
         "denominator_basis": "renewal_revenue",
         "coverage_floor_pct": coverage_floor,
         "time_window": time_window,
-        "population_statement": population_statement
+        "population_statement": population_statement,
+        "freshness": freshness_metadata
     }
 
 
@@ -305,6 +312,210 @@ def _compute_view_metrics(
         "total_renewal_revenue": total_renewal_revenue,
         "won_renewal_revenue": won_renewal_revenue
     }
+
+
+def _add_freshness_and_reconciliation(
+    closed_only: Dict,
+    assume_open_wins: Dict,
+    config: Dict
+) -> Dict:
+    """
+    Add freshness stamps and reconciliation notes for retention metrics.
+
+    Returns:
+        {
+          "metric_type": "historical",  # from registry
+          "quarters": {
+            "FY2027 Q1": {
+              "is_closed": true,
+              "quarter_end": "2026-04-30",
+              "reconciliation": {
+                "grr": "Handler 76.68% matches verified 77% (0.32pp variance, within tolerance)",
+                "nrr": "Handler 111.82% vs verified 107%. Handler includes Lion Studios..."
+              }
+            }
+          },
+          "last_verified": "2026-08-28"
+        }
+    """
+    import yaml
+    from datetime import date
+
+    # Load metrics registry
+    metrics_path = REPO_ROOT / 'config' / 'metrics.yaml'
+    if not metrics_path.exists():
+        return {"metric_type": "historical", "quarters": {}}
+
+    with open(metrics_path) as f:
+        registry = yaml.safe_load(f)
+
+    grr_def = registry.get('grr', {})
+    nrr_def = registry.get('nrr', {})
+
+    last_verified = grr_def.get('verified', {}).get('reconciled_on', None)
+
+    quarters_metadata = {}
+
+    # Check each quarter
+    for quarter_label in closed_only.keys():
+        quarter_data = closed_only[quarter_label]
+
+        # Determine if quarter is closed (no open deals)
+        is_closed = quarter_data.get('status') in ['clean', 'reported_with_coverage']
+
+        # Get quarter end date
+        quarter_end = _get_quarter_end_date(quarter_label, config)
+
+        # Build reconciliation notes
+        reconciliation = {}
+
+        # Check GRR reconciliation
+        grr_value = quarter_data.get('grr')
+        if grr_value is not None:
+            grr_note = _build_reconciliation_note(
+                'grr', quarter_label, grr_value, grr_def.get('verified', {})
+            )
+            if grr_note:
+                reconciliation['grr'] = grr_note
+
+        # Check NRR reconciliation
+        nrr_value = quarter_data.get('nrr')
+        if nrr_value is not None:
+            nrr_note = _build_reconciliation_note(
+                'nrr', quarter_label, nrr_value, nrr_def.get('verified', {})
+            )
+            if nrr_note:
+                reconciliation['nrr'] = nrr_note
+
+        quarters_metadata[quarter_label] = {
+            "is_closed": is_closed,
+            "quarter_end": quarter_end,
+            "reconciliation": reconciliation
+        }
+
+    return {
+        "metric_type": "historical",
+        "quarters": quarters_metadata,
+        "last_verified": last_verified
+    }
+
+
+def _get_quarter_end_date(quarter_label: str, config: Dict) -> Optional[str]:
+    """
+    Get the end date for a fiscal quarter.
+
+    Args:
+        quarter_label: e.g., "FY2027 Q1"
+        config: Client config
+
+    Returns:
+        ISO date string for quarter end, e.g., "2026-04-30"
+    """
+    import re
+    from datetime import date
+    from dateutil.relativedelta import relativedelta
+
+    # Parse quarter label
+    match = re.search(r'FY(\d+) Q(\d+)', quarter_label)
+    if not match:
+        return None
+
+    fy = int(match.group(1))
+    q = int(match.group(2))
+
+    # Get fiscal year start month from config
+    fy_start_month = config.get('fiscal', {}).get('fy_start_month', 2)  # Default Feb
+
+    # Calculate quarter start
+    # Q1 starts in FY start month of (FY - 1)
+    # Q2 starts 3 months later, etc.
+    quarter_start_month = fy_start_month + (q - 1) * 3
+    quarter_start_year = fy - 1
+
+    # Handle month overflow
+    while quarter_start_month > 12:
+        quarter_start_month -= 12
+        quarter_start_year += 1
+
+    # Quarter end is start + 3 months - 1 day
+    quarter_start = date(quarter_start_year, quarter_start_month, 1)
+    quarter_end = quarter_start + relativedelta(months=3) - relativedelta(days=1)
+
+    return quarter_end.isoformat()
+
+
+def _build_reconciliation_note(
+    metric: str,
+    quarter_label: str,
+    handler_value: float,
+    verified_dict: Dict
+) -> Optional[str]:
+    """
+    Build a reconciliation note explaining differences between handler and verified values.
+
+    Returns None if no verified value exists or if values match exactly.
+    Returns a plain-language explanation if there's a discrepancy.
+    """
+    # Find verified value for this quarter
+    # Registry keys are like "q1_fy2027_closed_only"
+    import re
+
+    # Parse quarter label to match registry format
+    match = re.search(r'FY(\d+) Q(\d+)', quarter_label)
+    if not match:
+        return None
+
+    fy = match.group(1)
+    q = match.group(2).lower()
+    registry_key = f"q{q}_fy{fy}_closed_only"
+
+    verified_value = verified_dict.get(registry_key)
+    if verified_value is None:
+        return None
+
+    tolerance = verified_dict.get('tolerance', 0.005)
+    variance = abs(handler_value - verified_value)
+
+    # If values match exactly, no note needed
+    if variance == 0:
+        return None
+
+    # If within tolerance, brief note
+    if variance <= tolerance:
+        return (
+            f"Handler {handler_value*100:.1f}% matches verified {verified_value*100:.0f}% "
+            f"({variance*100:.2f}pp variance, within tolerance)"
+        )
+
+    # If outside tolerance, detailed note with reconciliation explanation
+    # Check for known reconciliation notes in registry
+    reconciliation_note = verified_dict.get('reconciliation_note', '')
+    report_exclusions = verified_dict.get('report_exclusions', '')
+
+    if reconciliation_note or report_exclusions:
+        # Use registry explanation
+        note_parts = [
+            f"Handler {handler_value*100:.1f}% vs verified {verified_value*100:.0f}%."
+        ]
+
+        if metric == 'nrr' and 'Lion Studios' in reconciliation_note:
+            note_parts.append(
+                "Handler includes Lion Studios ($37.5K expansion). Report excludes it. "
+                "Reason unknown. Both are valid views depending on treatment rules."
+            )
+        else:
+            # Generic explanation
+            note_parts.append(
+                "Different populations. See metrics.yaml for details."
+            )
+
+        return " ".join(note_parts)
+
+    # No registry explanation - just state the difference
+    return (
+        f"Handler {handler_value*100:.1f}% vs verified {verified_value*100:.0f}% "
+        f"({variance*100:.2f}pp variance)"
+    )
 
 
 def _get_fiscal_quarter_label(close_date_str: str, config: Dict) -> Optional[str]:
