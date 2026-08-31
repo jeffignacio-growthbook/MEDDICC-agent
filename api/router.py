@@ -2178,8 +2178,15 @@ RECONCILIATION NOTES (when present in tool_results):
   We include Lion Studios expansion ($37.5K), the verified report excludes it.
   Both are valid views depending on treatment rules."
 
+PLAUSIBILITY WARNINGS (ALWAYS surface when present):
+- If _plausibility_warnings exists in tool_results, include it in your answer
+- Place it after the main finding, before any detail
+- The warnings are already written in plain language — include them as-is
+- Example: "One thing to check: the stage counts don't add up to the total. Worth
+  a look before relying on the breakdown."
+
 OPERATOR METADATA (ignore in answers):
-- Keys prefixed with _ (like _metadata, _plausibility_warnings) are for operators
+- Keys prefixed with _ EXCEPT _plausibility_warnings are for operators only
 - Never echo field names like "denominator_basis", "tolerance", "variance" to users
 - Users read about deals, amounts, quarters — not schema or calculation internals
 
