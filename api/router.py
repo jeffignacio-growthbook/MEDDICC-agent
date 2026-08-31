@@ -2452,7 +2452,8 @@ def _cap_rows_for_synthesis(tool_results: dict, max_rows: int = 20) -> dict:
     # Arrays to cap (deal-level data synthesis doesn't need)
     ARRAY_KEYS_TO_CAP = {
         'rows', 'deal_ids', 'entered_from_other_stage_ids',
-        'new_to_pipeline_ids', 'exited_ids'
+        'new_to_pipeline_ids', 'exited_ids',
+        'stages', 'owners', 'values'  # Bulk handler arrays (entity-scoped queries)
     }
 
     def cap_at_level(obj: dict):
