@@ -102,17 +102,25 @@ def _below_floor(assessment: dict, floor: float = None) -> bool:
     return isinstance(score, (int, float)) and score < floor
 
 
-def _honest_miss(handler_name: str, tool_results: dict) -> str:
-    """The below-floor reply. Only facts the system actually has: which handler
-    ran and what came back. No speculation about WHY — that is what the
-    confabulated answer did, and it was worse than saying nothing."""
+def _honest_miss(question: str, entity_count: int) -> str:
+    """Plain-language below-floor reply. Technical details (handler name, score,
+    drafted answer) stay in the log. The message states only: what failed, and
+    what to try next. Context-aware for entity-scoped questions."""
+
+    # Entity-scoped question (follow-up about specific deals from thread)
+    if entity_count > 0:
+        plural = "deals" if entity_count != 1 else "deal"
+        pronoun = "those" if entity_count > 1 else "that"
+        return (
+            f"I couldn't work out the answer for {pronoun} {entity_count} {plural} — "
+            f"I found them but couldn't confirm what you asked about. "
+            f"Try naming one specifically and I'll pull its details."
+        )
+
+    # General fallback for discovery questions
     return (
-        "I couldn't answer that reliably — my own check on the drafted answer "
-        "came back below the confidence floor, so I'm not going to send it. "
-        f"(I routed to `{handler_name}` and {_result_summary(tool_results)}.) "
-        "A confident wrong answer is worse than telling you I missed. If you "
-        "name the specific deal or company, I'll pull its MEDDICC scorecard "
-        "directly."
+        "I couldn't answer that confidently. Try asking about a specific deal "
+        "or company, and I'll pull its details directly."
     )
 
 FOLLOWUP_PRONOUNS = [
@@ -2113,11 +2121,12 @@ async def route_question(question: str, user_id: str,
     # path scores them ~0.9 and an acknowledged gap is an honest answer — and so
     # are skipped assessments (budget/gap short-circuits, score 0.5-0.9).
     if _below_floor(assessment):
+        entity_count = len(prior_entities.get("deal_ids", []))
         logger.info(f"[ASSESS] below floor {ASSESS_CORRECTNESS_FLOOR:.2f}: "
                     f"score={(assessment or {}).get('score')} "
-                    f"handler={handler_name} — sending honest miss instead "
-                    f"of the drafted answer")
-        verified = _honest_miss(handler_name, tool_results)
+                    f"handler={handler_name} entity_count={entity_count} "
+                    f"result={_result_summary(tool_results)} — sending honest miss")
+        verified = _honest_miss(question, entity_count)
         handler_name = f"{handler_name}_below_floor"
 
     # ── 9. Log learning note (win or lose) ────────────────
