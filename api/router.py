@@ -640,11 +640,71 @@ def log_entity_scope_pattern(question: str, handler_name: str,
         logging.getLogger(__name__).warning(
             f"[ENTITY_SCOPE] Failed to log pattern: {e}")
 
+def resolve_named_set(question: str, named_sets: dict, client) -> tuple[list, str] | None:
+    """
+    Use classifier to match question to a named entity set.
+
+    The classifier sees the question and available set names, matches
+    "the 6 that left Negotiating" to "exited_Negotiating". String
+    matching breaks on variations like "dropped out" — let the LLM
+    handle the mapping.
+
+    Returns:
+        (resolved_ids, set_name) if match found, else None
+    """
+    if not named_sets:
+        return None
+
+    import logging
+    logger = logging.getLogger(__name__)
+
+    set_list = "\n".join([f"  - {name} ({len(ids)} deals)"
+                          for name, ids in named_sets.items()])
+
+    prompt = f"""The user is asking a follow-up question about a subset of deals.
+
+Available named sets from the previous answer:
+{set_list}
+
+Question: {question}
+
+Does this question refer to one of the named sets above? If so, output ONLY the set name (e.g., "exited_Negotiating"). If not, output "NONE".
+
+Examples:
+- "Where did the 6 that left Negotiating go?" → exited_Negotiating
+- "What about the ones that dropped out of Negotiating?" → exited_Negotiating
+- "Show me the new deals in Discovery" → new_to_pipeline_Discovery
+- "Which of those are enterprise?" → NONE (not a named set)"""
+
+    try:
+        resp = client.complete(
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=50
+        )
+        match = resp.text.strip()
+
+        if match == "NONE" or match not in named_sets:
+            logger.info(f"[NAMED_SET] no match (classifier returned: {match})")
+            return None
+
+        resolved_ids = named_sets[match]
+        logger.info(f"[NAMED_SET] resolved '{match}': {len(resolved_ids)} of {sum(len(ids) for ids in named_sets.values())} deals")
+        return (resolved_ids, match)
+
+    except Exception as e:
+        logger.error(f"[NAMED_SET] resolution failed: {e}")
+        return None
+
+
 async def route_entity_scoped_question(
         question: str, prior_entities: dict, sb, client) -> tuple[dict, str] | None:
     """
     Use LLM classification to match question to a bulk handler and execute it against
     known deal_ids without running dynamic_query_loop discovery.
+
+    If prior_entities contains named_sets, resolve the question to a specific set
+    (e.g., "the 6 that left Negotiating" → exited_Negotiating). Pass only those
+    IDs to the handler, not all prior IDs.
 
     Returns (tool_results, handler_name) if a matching handler exists
     and returns non-empty results, or None if no handler matches.
@@ -657,7 +717,17 @@ async def route_entity_scoped_question(
     logger = logging.getLogger(__name__)
 
     deal_ids = prior_entities["deal_ids"]
-    entity_context = f"Prior context: {len(deal_ids)} deals from previous answer"
+    named_sets = prior_entities.get("named_sets", {})
+    resolved_set_name = None
+
+    # Try to resolve to a named set
+    resolution = resolve_named_set(question, named_sets, client)
+    if resolution:
+        resolved_ids, resolved_set_name = resolution
+        deal_ids = resolved_ids  # Narrow to the specific set
+        entity_context = f"Prior context: {len(deal_ids)} deals from '{resolved_set_name}'"
+    else:
+        entity_context = f"Prior context: {len(deal_ids)} deals from previous answer"
 
     # All handlers (both pre-G.6 and new bulk handlers) need time_window
     # Pre-G.6 handlers require it; new bulk handlers ignore it
@@ -678,6 +748,12 @@ async def route_entity_scoped_question(
     try:
         result = await handler_fn(
             {"deal_ids": deal_ids, "time_window": default_tw}, sb)
+
+        # If we resolved to a named set, add it to result so synthesis can confirm
+        if resolved_set_name:
+            result["_resolved_set"] = resolved_set_name
+            result["_resolved_count"] = len(deal_ids)
+
         evaluation = evaluate_result(result, handler_name)
 
         if evaluation != "empty":
@@ -2195,6 +2271,14 @@ EMPTY / NO RESULTS (do not confabulate) — applies to EVERY handler:
   speculation, and stating guesses as findings is worse than "nothing came back."
 - If a name was expected to match and didn't, say the lookup returned nothing and
   ask the user to confirm the exact name — do not theorize about the cause.
+
+NAMED SETS (confirm when resolved):
+-- If _resolved_set is present in tool_results, the question was about a specific
+  subset from the previous answer (e.g., "the 6 that left Negotiating")
+-- ALWAYS confirm which set you're answering about in the opening line
+-- Format: "Of the 6 that left Negotiating: 4 closed won, 1 lost, 1 moved to Scoping."
+-- This confirms you understood which deals the question referred to
+-- If _resolved_set is absent, the question is about all remembered deals (no confirmation needed)
 
 RECONCILIATION NOTES (when present in tool_results):
 - If tool_results includes freshness.quarters[...].reconciliation notes, surface them

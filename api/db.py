@@ -189,8 +189,71 @@ def extract_entity_context(tool_results: dict, sb=None) -> dict:
 
     logger.info(f"[ENTITY_EXTRACT] schema-driven extraction: {entities}")
 
+    # Extract named sets from handler-provided groupings
+    named_sets = _extract_named_sets(tool_results)
+
     # Convert to legacy shape for backward compatibility
-    return _to_legacy_entity_shape(entities)
+    legacy = _to_legacy_entity_shape(entities)
+    if named_sets:
+        legacy["named_sets"] = named_sets
+        logger.info(f"[ENTITY_EXTRACT] named sets: {list(named_sets.keys())}")
+
+    return legacy
+
+
+def _extract_named_sets(tool_results: dict) -> dict:
+    """
+    Extract named entity sets from handler-provided groupings.
+
+    Handlers that produce distinguishable groups (pipeline movement's
+    exited_Negotiating, at-risk's stalled_ids, etc.) already have the
+    groupings and their meaning. Store them labelled so narrowing
+    follow-ups ("the 6 that left Negotiating") can resolve precisely.
+
+    Returns:
+        Named sets dict: {"exited_Negotiating": [1,2,3], ...}
+        Empty dict if no named sets found.
+
+    Examples from pipeline movement by_stage:
+        - exited_Negotiating: deals that left Negotiating stage
+        - entered_from_other_stage_Discovery: deals that moved into Discovery
+        - new_to_pipeline_Qualification: brand new deals in Qualification
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    named_sets = {}
+
+    # Pipeline movement by_stage arrays
+    by_stage = tool_results.get("by_stage", [])
+    for stage_entry in by_stage:
+        if not isinstance(stage_entry, dict):
+            continue
+
+        stage_name = stage_entry.get("stage", "")
+        if not stage_name:
+            continue
+
+        # Extract each named ID array the handler provides
+        # Name from what the handler knows, not from parsing questions
+        id_arrays = {
+            "exited": stage_entry.get("exited_ids", []),
+            "entered_from_other_stage": stage_entry.get("entered_from_other_stage_ids", []),
+            "new_to_pipeline": stage_entry.get("new_to_pipeline_ids", []),
+        }
+
+        for action, ids in id_arrays.items():
+            if ids:  # Only store non-empty sets
+                set_name = f"{action}_{stage_name}"
+                named_sets[set_name] = list(ids)  # Ensure it's a list, not set
+                logger.info(f"[NAMED_SET] {set_name}: {len(ids)} deals")
+
+    # Future: add other handler groupings here
+    # - at-risk: stalled_ids, no_activity_ids, missing_arr_ids
+    # - win/loss: closed_won_ids, closed_lost_ids by quarter
+    # - SDR: missed_quota_user_ids, top_performer_ids
+
+    return named_sets
 
 
 def _to_legacy_entity_shape(entities: dict) -> dict:
