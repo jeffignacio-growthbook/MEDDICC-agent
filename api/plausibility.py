@@ -184,22 +184,33 @@ def check_negative_counts(data: Dict) -> List[PlausibilityViolation]:
     """
     Check for negative counts or durations.
 
+    Targets actual counts and durations that can't be below zero.
+    Excludes signed fields (net change, delta, variance) which are negative by definition.
+
     Common violations:
     - Negative deal counts
     - Negative durations
-    - Negative dollar amounts (in most contexts)
     """
     violations = []
 
-    # Fields that should never be negative
-    count_fields = {'count', 'total', 'n', 'deals', 'rows', 'days', 'hours'}
+    # Fields that should never be negative (counts, durations)
+    count_fields = {'count', 'total', 'deals', 'rows', 'days', 'hours', 'minutes'}
+
+    # Signed fields that CAN be negative (changes, differences)
+    signed_fields = {'net', 'delta', 'change', 'diff', 'variance', 'movement', 'shift', 'swing'}
 
     def check_value(key: str, value: Any, path: str):
         if not isinstance(value, (int, float)):
             return
 
+        key_lower = key.lower()
+
+        # Skip signed fields (net, delta, change, etc.)
+        if any(sf in key_lower for sf in signed_fields):
+            return
+
         # Check if field name suggests it's a count
-        is_count_field = any(cf in key.lower() for cf in count_fields)
+        is_count_field = any(cf in key_lower for cf in count_fields)
 
         if is_count_field and value < 0:
             violations.append(PlausibilityViolation(
