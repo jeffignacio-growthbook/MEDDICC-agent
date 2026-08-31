@@ -3220,14 +3220,49 @@ def _pm_deal_rows(date_rows, stage_cfg, company_map=None, limit=200):
     return rows[:limit]
 
 
-def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps):
+def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps, requested_days=None):
     if len(all_dates) < 2:
         data_gaps.append(
             "movement needs two snapshot dates; found "
             f"{len(all_dates)} in this grid — returning null, not a zero"
         )
         return None, [], {"prior": None, "current": None, "net": None}, {}, {}
-    prior_date, current_date = all_dates[-2], all_dates[-1]
+
+    # Select snapshots based on requested_days
+    from datetime import date, timedelta
+
+    current_date = all_dates[-1]  # Always use latest
+
+    if requested_days:
+        # Find snapshot on or before (current - requested_days)
+        target_date = date.fromisoformat(current_date) - timedelta(days=requested_days)
+        target_str = target_date.isoformat()
+
+        # Find closest snapshot on or before target
+        valid_prior = [d for d in all_dates if d <= target_str]
+        if valid_prior:
+            prior_date = valid_prior[-1]  # Closest to target
+        else:
+            # No snapshot old enough — use oldest available
+            prior_date = all_dates[0]
+            actual_days = (date.fromisoformat(current_date) - date.fromisoformat(prior_date)).days
+            data_gaps.append(
+                f"Requested {requested_days}-day window, but oldest snapshot is "
+                f"{prior_date} ({actual_days} days). Comparing {actual_days} days "
+                f"instead of {requested_days}."
+            )
+    else:
+        # Default: use last two snapshots
+        prior_date = all_dates[-2]
+
+    # Check actual span
+    actual_days = (date.fromisoformat(current_date) - date.fromisoformat(prior_date)).days
+    if requested_days and abs(actual_days - requested_days) > 2:
+        # Significant mismatch — warn user
+        data_gaps.append(
+            f"Comparing snapshots from {prior_date} and {current_date} "
+            f"({actual_days} days). Requested {requested_days} days."
+        )
     prior_rows = list(_pm_latest_row_per_deal(by_date[prior_date]).values())
     current_rows = list(_pm_latest_row_per_deal(by_date[current_date]).values())
 
@@ -3466,6 +3501,12 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     if close_date_scope not in ("all", "current_quarter"):
         close_date_scope = "all"
 
+    # Parse time_window for movement view (select snapshots by date)
+    time_window = params.get("time_window", {})
+    requested_days = None
+    if time_window and time_window.get("type") == "relative_days":
+        requested_days = time_window.get("days", 0)
+
     # Explicit, prominent scope statement so a count can be reconciled against
     # a CRM board view (Issue 4). The default counts ALL open deals with no
     # close-date filter — correct for coverage math — which is usually the gap
@@ -3627,7 +3668,7 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     # ── dispatch ──
     if view == "movement":
         snap_dates, by_stage, totals, confidence, summary = _pm_view_movement(
-            by_date, all_dates, stage_cfg, data_gaps)
+            by_date, all_dates, stage_cfg, data_gaps, requested_days)
         return {
             **base,
             "snapshot_dates": snap_dates or [],
