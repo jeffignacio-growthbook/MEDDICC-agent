@@ -9,6 +9,40 @@
 #   - coverage_caveat: Data quality warnings
 #   - not_applicable_to: Where this metric doesn't apply
 
+# Reference Source Metadata
+#
+reference_source:
+  name: "HubSpot Custom Retention Report"
+  created_by: "Unknown"
+  last_verified: "2026-08-28"
+  known_exclusions:
+    - deal: "Lion Studios"
+      quarter: "Q1 FY2027"
+      impact: "$37.5K expansion excluded from Q1 NRR"
+      reason: "Unknown - exclusion deliberate (in report filters)"
+      handler_behavior: "Handler includes this deal"
+    - deal: "x.ai"
+      quarter: "Q3 FY2027"
+      impact: "$300K renewal excluded"
+      reason: "Unknown - exclusion deliberate"
+      handler_behavior: "Handler includes this deal"
+    - deal: "Anthropic"
+      quarter: "Q4 FY2027"
+      impact: "$810K renewal + $500K expansion excluded (40% of Q4 renewal ARR)"
+      reason: "Unknown - exclusion deliberate"
+      handler_behavior: "Handler includes this deal"
+      note: "Excluding largest renewal from Q4 retention calculation is significant"
+  reconciliation_scope:
+    valid_quarters: ["Q1 FY2027", "Q2 FY2027"]
+    invalid_quarters: ["Q3 FY2027", "Q4 FY2027"]
+    reason: "Q3/Q4 report population differs from handler population"
+  action_required: |
+    Determine WHY these deals were excluded from HubSpot report:
+    - Deliberate outlier exclusion? (if so, document rationale)
+    - Different treatment category? (if so, handler should match)
+    - Report error? (if so, report needs fixing)
+    Until exclusion rationale is known, unclear which view (handler vs report) is correct.
+
 grr:
   label: Gross Revenue Retention
   formula: SUM(IF(closed_won, renewal_revenue, 0)) / SUM(renewal_revenue)
@@ -20,6 +54,9 @@ grr:
     reconciled_on: 2026-08-28
     tolerance: 0.005  # ±0.5pp acceptable variance
     handler_output: 0.7668  # within tolerance (0.32pp variance)
+  q3_q4_note: |
+    No verified values for Q3/Q4 - report excludes x.ai and Anthropic.
+    See NRR metric for exclusion details.
   coverage_caveat: |
     renewal_revenue is ~83% populated in forward quarters.
     Floor: 50% coverage required to report.
@@ -63,15 +100,23 @@ nrr:
     reconciled_on: 2026-08-28
     tolerance: 0.005  # ±0.5pp acceptable variance
     handler_output: 1.1182  # with all deals
-    handler_output_excluding_lion_studios: 1.0694  # RECONCILES (0.06pp variance)
-    exclusions:
-      q1_fy2027: ["Lion Studios (deal 47879809412) - $37.5K expansion excluded from report"]
-      q3_fy2027: ["x.ai - $300K renewal, excluded from report"]
-      q4_fy2027: ["Anthropic - $810K renewal + $500K expansion, excluded from report"]
-    note: |
-      Q1 reconciles when excluding Lion Studios.
-      Q3/Q4 verified values NOT COMPARABLE - report excludes x.ai and Anthropic
-      which handler includes. Only Q1 and Q2 are valid reconciliation points.
+    handler_output_excluding_lion_studios: 1.0694  # reconciles to 0.06pp
+    reconciliation_note: |
+      Handler output 111.82% vs verified 107% = 4.82pp variance.
+      Excluding Lion Studios ($37.5K expansion): 106.94% = 0.06pp variance (reconciles).
+      Residual: $3.4K unaccounted ($37.5K exclusion vs $34.1K gap).
+      Note residual to prevent future drift absorption.
+    report_exclusions: |
+      HubSpot report excluded Lion Studios from Q1. Reason unknown.
+      Exclusion was deliberate (built into report filters).
+      Without understanding why, unclear whether handler (includes it) or
+      report (excludes it) provides the more useful retention view.
+    q3_q4_note: |
+      No verified values for Q3/Q4. HubSpot report excludes:
+      - Q3: x.ai ($300K renewal)
+      - Q4: Anthropic ($810K renewal + $500K expansion = 40% of Q4 renewal ARR)
+      Report and handler measure different populations.
+      Cannot reconcile until exclusion rationale is understood.
   coverage_caveat: |
     incremental_arr is ~93% populated (237 of 256 renewal deals).
     NULL incremental_arr means no expansion (treat as 0).
