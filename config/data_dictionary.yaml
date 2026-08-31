@@ -1676,9 +1676,10 @@ hubspot_only:
   hubspot: in_my_number
   label: In My Number
   type: enumeration
-- column: null
-  description: Incremental ARR
+- column: deals.incremental_arr
+  description: Incremental ARR (expansion above renewal base)
   hubspot: incremental_arr
+  is_queryable: true
   label: Incremental ARR
   type: number
 - column: null
@@ -1958,9 +1959,10 @@ hubspot_only:
   hubspot: qualified
   label: Qualified Deal
   type: enumeration
-- column: null
+- column: deals.renewal_revenue
   description: Portion of ACV/ARR representing renewal of existing contracted ARR.
   hubspot: renewal_revenue
+  is_queryable: true
   label: Renewal ARR
   type: number
 - column: null
