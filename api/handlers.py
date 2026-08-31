@@ -3614,10 +3614,22 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         sources.setdefault(src, set()).add(r.get("snapshot_date"))
 
     if len(sources) > 1:
-        # Multiple grids: pick trend grid (most snapshots) + current position (most recent)
-        # Trend grid = largest coherent set spanning the window (answers "how has it moved")
+        # Multiple grids: pick trend grid (best span) + current position (most recent)
+        # Trend grid = widest date span (answers "how has it moved")
         # Current position = most recent snapshot on any grid (stated as position, not compared)
-        trend_source = max(sources, key=lambda s: len(sources[s]))
+        from datetime import date as dt
+
+        def span_days(source):
+            """Days between earliest and latest snapshot in this source."""
+            dates = sorted(sources[source])
+            if len(dates) < 2:
+                return 0
+            earliest = dt.fromisoformat(dates[0])
+            latest = dt.fromisoformat(dates[-1])
+            return (latest - earliest).days
+
+        # Pick source with widest span (not most snapshots)
+        trend_source = max(sources, key=span_days)
         all_dates_sorted = sorted(date for dates in sources.values() for date in dates)
         current_date = all_dates_sorted[-1]
         current_source = next(s for s, dates in sources.items() if current_date in dates)

@@ -394,13 +394,14 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
     assert "cache_payload" not in tool_results, \
         "cache_payload leaked into synthesis path"
 
-    # Size log: makes leaks VISIBLE in Railway without needing a test
+    # Size log: measures UNCAPPED tool_results (for entity extraction)
+    # Synthesis receives capped version — see [CAP] log in router for actual synthesis size
     synth_size = len(json.dumps(tool_results, default=str))
-    logger.info(f"[SYNTH] tool_results ~{synth_size} chars (handler={handler_name})")
-    if synth_size > 20000:
-        logger.warning(f"[SYNTH] oversized synthesis payload {synth_size} chars "
+    logger.info(f"[SYNTH] tool_results (uncapped) ~{synth_size} chars (handler={handler_name})")
+    if synth_size > 50000:  # Raised threshold since this measures pre-cap
+        logger.warning(f"[SYNTH] very large tool_results {synth_size} chars "
                       f"for handler={handler_name} — check for cache_payload leak "
-                      f"or unbounded rows")
+                      f"(synthesis receives capped version, see [CAP] log)")
 
     # Extract entities from BOTH synthesis dict AND cache_payload
     # (aggregate handlers now yield deal_ids via cache_payload)
