@@ -1897,16 +1897,16 @@ async def route_question(question: str, user_id: str,
                 "tool_results": {}}
 
     # ── 6. Plausibility checks before synthesis ───────
-    from api.plausibility import run_all_checks, format_violations_for_synthesis
+    from api.plausibility import run_all_checks, format_violations_for_synthesis, format_block_message
 
     violations, should_block = run_all_checks(tool_results, handler_name)
 
     if should_block:
         # Critical plausibility violation - block synthesis
-        violation_summary = format_violations_for_synthesis(violations)
+        block_message = format_block_message(violations)
         logger.error(f"[PLAUSIBILITY] Blocking synthesis due to critical violations: {len(violations)} violations")
         return {
-            "answer": f"Cannot provide answer due to data quality issues:\n\n{violation_summary}",
+            "answer": block_message,
             "handler_name": handler_name,
             "tool_results": tool_results,
             "plausibility_violations": [

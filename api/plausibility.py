@@ -431,6 +431,85 @@ def format_violations_for_synthesis(violations: List[PlausibilityViolation]) -> 
     return "\n".join(lines)
 
 
+def format_block_message(violations: List[PlausibilityViolation]) -> str:
+    """
+    Format critical violations for blocked answer in plain language.
+
+    Returns honest, actionable explanation of what failed and where to look.
+    """
+    if not violations:
+        return "Cannot provide answer due to data quality issues."
+
+    critical = [v for v in violations if v.severity == 'critical']
+
+    if not critical:
+        # Shouldn't happen (block triggered without critical), but handle it
+        return "Cannot provide answer due to data quality issues."
+
+    lines = []
+
+    for v in critical:
+        if v.check == 'metric_registry_divergence':
+            # Make registry divergence human-readable
+            ctx = v.context
+            metric = ctx.get('metric', 'metric').upper()
+            quarter = ctx.get('quarter', 'quarter')
+            computed = ctx.get('computed', 0)
+            verified = ctx.get('verified', 0)
+
+            # Parse quarter for display
+            # e.g., "q1_fy2027_closed_only" -> "Q1 FY2027 (closed deals)"
+            import re
+            match = re.search(r'q(\d+).*fy(\d+)', quarter.lower())
+            if match:
+                q_num = match.group(1)
+                fy_year = match.group(2)
+                quarter_display = f"Q{q_num} FY{fy_year}"
+                if 'closed' in quarter.lower():
+                    quarter_display += " (closed deals)"
+                elif 'assume' in quarter.lower() or 'open' in quarter.lower():
+                    quarter_display += " (assume open wins)"
+            else:
+                quarter_display = quarter.replace('_', ' ').upper()
+
+            lines.append(
+                f"I computed {metric} at {computed*100:.0f}% for {quarter_display}, "
+                f"but the verified figure is {verified*100:.0f}%. "
+                f"Something is wrong with the query, not the business. "
+                f"Not showing the number."
+            )
+        elif v.check == 'rate_bounds':
+            # Rate exceeded bounds
+            field = v.context.get('field', 'rate')
+            value = v.context.get('value', 0)
+            lines.append(
+                f"Computed {field} at {value*100:.0f}%, which exceeds valid range. "
+                f"This indicates a query error, not actual performance. "
+                f"Not showing the number."
+            )
+        elif v.check == 'subset_relationship':
+            # Subset larger than superset
+            subset = v.context.get('subset', 'subset')
+            superset = v.context.get('superset', 'superset')
+            lines.append(
+                f"Query returned {subset} count larger than {superset} count, "
+                f"which is structurally impossible. "
+                f"Something is wrong with the filters or joins. "
+                f"Not showing the number."
+            )
+        else:
+            # Generic critical violation
+            lines.append(
+                f"Data quality check failed: {v.message}. "
+                f"Not showing the number until the cause is identified."
+            )
+
+    if not lines:
+        return "Cannot provide answer due to data quality issues."
+
+    return "\n\n".join(lines)
+
+
 # For testing
 if __name__ == "__main__":
     # Test with sample data
