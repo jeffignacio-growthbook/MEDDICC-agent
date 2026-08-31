@@ -1924,7 +1924,19 @@ async def route_question(question: str, user_id: str,
         tool_results["_plausibility_warnings"] = format_violations_for_synthesis(violations)
 
     # ── 6.5. Cap rows for synthesis (keep full set for entity extraction) ──
+    before_size = len(json.dumps(tool_results, default=str))
     synthesis_results = _cap_rows_for_synthesis(tool_results)
+    after_size = len(json.dumps(synthesis_results, default=str))
+
+    logger.info(f"[CAP] tool_results: {before_size:,} chars, synthesis_results: {after_size:,} chars "
+                f"(rows before: {len(tool_results.get('rows', []))}, after: {len(synthesis_results.get('rows', []))})")
+    if before_size > 20000 and after_size > 20000:
+        # Cap didn't reduce enough - diagnose which keys are large
+        logger.warning(f"[CAP] still oversized after cap — breakdown:")
+        for key in ['rows', 'by_stage', 'scope', 'summary']:
+            if key in synthesis_results:
+                key_size = len(json.dumps(synthesis_results[key], default=str))
+                logger.warning(f"[CAP]   {key}: {key_size:,} chars")
 
     # ── 7. Synthesize ─────────────────────────────────
     answer_resp = generator_client.complete(
