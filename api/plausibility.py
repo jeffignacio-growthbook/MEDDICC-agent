@@ -248,11 +248,6 @@ def check_metric_registry_divergence(data: Dict, handler_name: str = None) -> Li
         verified = metric_def.get('verified', {})
         tolerance = verified.get('tolerance', 0.005)  # Default ±0.5pp
 
-        # Look for this metric in the data
-        metric_value = _extract_metric_value(data, metric_id)
-        if metric_value is None:
-            continue
-
         # Check each verified quarter
         for quarter_key, verified_value in verified.items():
             if quarter_key in ['reconciled_against', 'reconciled_on', 'tolerance', 'handler_output',
@@ -264,12 +259,19 @@ def check_metric_registry_divergence(data: Dict, handler_name: str = None) -> Li
                 continue
 
             # Check if this quarter's data is in the response
-            if _contains_quarter(data, quarter_key):
-                variance = abs(metric_value - verified_value)
+            if not _contains_quarter(data, quarter_key):
+                continue
 
-                if variance > tolerance:
-                    severity = 'critical' if variance > (tolerance * 3) else 'warning'
-                    violations.append(PlausibilityViolation(
+            # Extract metric value for this specific quarter
+            metric_value = _extract_metric_value(data, metric_id, quarter_key)
+            if metric_value is None:
+                continue
+
+            variance = abs(metric_value - verified_value)
+
+            if variance > tolerance:
+                severity = 'critical' if variance > (tolerance * 3) else 'warning'
+                violations.append(PlausibilityViolation(
                         check='metric_registry_divergence',
                         severity=severity,
                         message=f"{metric_id.upper()} {quarter_key}: {metric_value:.4f} vs verified {verified_value:.4f} (±{tolerance:.3f} tolerance) → {variance:.4f} variance",
@@ -286,20 +288,57 @@ def check_metric_registry_divergence(data: Dict, handler_name: str = None) -> Li
     return violations
 
 
-def _extract_metric_value(data: Dict, metric_id: str) -> Optional[float]:
-    """Extract a metric value from nested data structure."""
+def _extract_metric_value(data: Dict, metric_id: str, quarter_key: str = None) -> Optional[float]:
+    """
+    Extract a metric value from nested data structure.
+
+    Args:
+        data: The data dictionary to search
+        metric_id: The metric to find (e.g., 'grr', 'nrr')
+        quarter_key: Optional quarter to match (e.g., 'q1_fy2027_closed_only')
+    """
+    import re
+
     # Try direct key
     if metric_id in data:
         val = data[metric_id]
         if isinstance(val, (int, float)):
             return float(val)
 
+    # If quarter_key provided, extract quarter and FY from it
+    target_quarter = None
+    target_fy = None
+    target_view = None
+
+    if quarter_key:
+        match = re.search(r'q(\d+).*fy(\d+)', quarter_key.lower())
+        if match:
+            target_quarter = match.group(1)
+            target_fy = match.group(2)
+        if 'closed_only' in quarter_key.lower():
+            target_view = 'closed_only'
+        elif 'assume' in quarter_key.lower() or 'open' in quarter_key.lower():
+            target_view = 'assume_open_wins'
+
     # Try nested in views
     if 'views' in data:
         for view_name, view_data in data['views'].items():
+            # If we have a target view, only check that one
+            if target_view and view_name != target_view:
+                continue
+
             if isinstance(view_data, dict):
                 for quarter, quarter_data in view_data.items():
-                    if isinstance(quarter_data, dict) and metric_id in quarter_data:
+                    # Check if this quarter matches our target
+                    if target_quarter and target_fy:
+                        quarter_lower = quarter.lower()
+                        if f"q{target_quarter}" in quarter_lower and target_fy in quarter_lower:
+                            if isinstance(quarter_data, dict) and metric_id in quarter_data:
+                                val = quarter_data[metric_id]
+                                if isinstance(val, (int, float)):
+                                    return float(val)
+                    # No target, return first match
+                    elif isinstance(quarter_data, dict) and metric_id in quarter_data:
                         val = quarter_data[metric_id]
                         if isinstance(val, (int, float)):
                             return float(val)
@@ -315,8 +354,27 @@ def _extract_metric_value(data: Dict, metric_id: str) -> Optional[float]:
 
 
 def _contains_quarter(data: Dict, quarter_label: str) -> bool:
-    """Check if data contains a specific quarter label."""
+    """
+    Check if data contains a specific quarter label.
+
+    Handles mapping between registry keys (q1_fy2027) and data keys (FY2027 Q1).
+    """
     quarter_str = str(quarter_label).lower()
+
+    # Extract quarter number and fiscal year from registry key
+    # e.g., "q1_fy2027_closed_only" -> "q1", "2027"
+    import re
+    match = re.search(r'q(\d+).*fy(\d+)', quarter_str)
+    if match:
+        q_num = match.group(1)
+        fy_year = match.group(2)
+        # Look for "FY2027 Q1" format in data
+        alt_format = f"fy{fy_year} q{q_num}"
+        data_str = str(data).lower()
+        if alt_format in data_str:
+            return True
+
+    # Fallback to simple string match
     data_str = str(data).lower()
     return quarter_str in data_str
 
