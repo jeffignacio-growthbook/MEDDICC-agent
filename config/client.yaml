@@ -719,3 +719,32 @@ config_overrides:
   jake.stangl@growthbook.io:
     role: "sdr"
     title: "Sales Development Representative"
+
+# ============================================================================
+# ROUTING CONFIGURATION (PROVISIONAL)
+# ============================================================================
+# Confidence thresholds for precomputed handler dispatch vs. dynamic loop.
+# Below floor, questions route to dynamic loop instead of low-confidence
+# precomputed handler match.
+#
+# PROVISIONAL: These are starting guesses. Tune against real routing logs.
+# If the floor keeps rejecting the same handler at 0.78, improve the handler
+# description rather than lowering the threshold.
+#
+# Env overrides: ROUTING_CONFIDENCE_FLOOR, ROUTING_CONFIDENCE_FLOOR_HELP
+
+routing:
+  confidence_floor: 0.80           # General threshold for data handlers
+  confidence_floor_help: 0.85      # Higher bar for orientation handlers
+                                   # (query_help, acknowledgment) because
+                                   # misroutes are total loss - help menu
+                                   # looks like an answer but isn't
+
+# Why handlers are optimizations, not prerequisites:
+# The dynamic loop with semantic layer can answer most questions. Precomputed
+# handlers speed up common questions, but below confidence floor, dynamic gets
+# first chance. If loop can't resolve, it returns honest gap - same as before.
+#
+# Risk: More dynamic loop traffic = more budget-exhausted answers if questions
+# are complex. Watch for questions that used to get fast handler at 0.75 and
+# now take 3 iterations. Fix: improve handler description, not lower threshold.

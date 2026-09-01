@@ -1874,7 +1874,41 @@ async def route_question(question: str, user_id: str,
         print(f"[INTENT] handler={handler_name} "
               f"confidence={confidence:.2f}", flush=True)
 
-        # ── 1b. Greeting / help / acknowledgment (orientation, no data) ──
+        # ── 1b. Confidence floor (PROVISIONAL) ──────────────────────────
+        # Below threshold, skip precomputed handler and route to dynamic loop.
+        # Precomputed handlers = optimization for common questions, not prerequisite.
+        # Config-driven thresholds (client.yaml routing.*) with env overrides.
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent.parent / 'scripts'))
+        from utils import load_client_config
+
+        config = load_client_config()
+        routing_cfg = config.get('routing', {})
+
+        # Env overrides
+        confidence_floor = float(os.getenv('ROUTING_CONFIDENCE_FLOOR',
+                                          routing_cfg.get('confidence_floor', 0.80)))
+        confidence_floor_help = float(os.getenv('ROUTING_CONFIDENCE_FLOOR_HELP',
+                                               routing_cfg.get('confidence_floor_help', 0.85)))
+
+        original_handler = handler_name  # Track what would have won for logging
+
+        # query_help/acknowledgment misroutes are total loss - require higher confidence
+        if handler_name in ("query_help", "acknowledgment"):
+            if confidence < confidence_floor_help:
+                logger.info(f"[ROUTING] confidence {confidence:.2f} < {confidence_floor_help:.2f} "
+                           f"for {original_handler} — routing to dynamic instead")
+                handler_name = "dynamic_query"
+
+        # General confidence floor for data handlers
+        elif handler_name not in ("unanswerable", "set_target", "dynamic_query"):
+            if confidence < confidence_floor:
+                logger.info(f"[ROUTING] confidence {confidence:.2f} < {confidence_floor:.2f} "
+                           f"for {original_handler} — routing to dynamic instead")
+                handler_name = "dynamic_query"
+
+        # ── 1c. Greeting / help / acknowledgment (orientation, no data) ──
         # Short-circuit BEFORE the data handler + synthesis path: these carry
         # no numbers to synthesize or verify. Persona- and thread-aware.
         if handler_name == "acknowledgment":
