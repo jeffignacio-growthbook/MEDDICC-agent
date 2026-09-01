@@ -796,7 +796,13 @@ email in the roster above and use it in rep_email or sdr_email parameters.
 """
 
     # Build semantic context (fiscal calendar, pipeline meanings, vocabulary)
-    semantic_context = build_semantic_context()
+    try:
+        semantic_context = build_semantic_context()
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"[SEMANTIC_CONTEXT] Failed to build: {e}")
+        semantic_context = ""  # Degrade gracefully - classifier still works without it
 
     return f"""Classify this Slack question into one of
 these handler types. Reply with JSON only.
@@ -1351,7 +1357,11 @@ async def dynamic_query_loop(question, history, params,
     from pathlib import Path
     sys.path.insert(0, str(Path(__file__).parent.parent / 'scripts'))
     from utils import build_semantic_context
-    semantic_context = build_semantic_context()
+    try:
+        semantic_context = build_semantic_context()
+    except Exception as e:
+        logger.info(f"[SEMANTIC_CONTEXT] Failed to build: {e}")
+        semantic_context = ""  # Degrade gracefully
 
     system = DYNAMIC_SYSTEM_PROMPT.format(
         semantic_context=semantic_context,
