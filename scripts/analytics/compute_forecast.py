@@ -37,11 +37,12 @@ def main():
     config = load_client_config()
 
     # Get historical conversion rates from registry
-    # (manually extracted — could be read from metrics.yaml if needed)
+    # Verified 2026-09-01, Q2 excluded (grid coverage issue)
+    # See config/metrics.yaml for full provenance
     conversion_rates = {
-        'trailing_avg': 0.135,
-        'range_low': 0.092,   # Q1 FY2027
-        'range_high': 0.244,  # Q2 FY2027 (outlier, cause TBD)
+        'trailing_avg': 0.099,  # Q3-Q1 average (Q2 excluded)
+        'range_low': 0.092,     # Q1 FY2027 (conservative)
+        'range_high': 0.105,    # Q3 FY2026 (aggressive)
     }
 
     category_weights = (config.get('forecast', {})
