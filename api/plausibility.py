@@ -171,6 +171,27 @@ def check_sum_consistency(data: Dict) -> List[PlausibilityViolation]:
                         }
                     ))
 
+        # Check by_stage breakdown sums to total_open_count
+        if 'by_stage' in obj and 'total_open_count' in obj:
+            by_stage = obj['by_stage']
+            total_count = obj['total_open_count']
+
+            if isinstance(by_stage, list) and isinstance(total_count, (int, float)):
+                stage_sum = sum(s.get('count', 0) for s in by_stage if isinstance(s, dict))
+
+                if stage_sum != total_count:
+                    violations.append(PlausibilityViolation(
+                        check='sum_consistency',
+                        severity='error',  # Structural mismatch, but non-blocking initially
+                        message=f"{path}by_stage counts ({stage_sum}) ≠ total_open_count ({total_count})",
+                        context={
+                            'by_stage_sum': stage_sum,
+                            'total_open_count': total_count,
+                            'missing_count': total_count - stage_sum,
+                            'by_stage_items': len(by_stage)
+                        }
+                    ))
+
         # Recurse
         for key, value in obj.items():
             if isinstance(value, dict):

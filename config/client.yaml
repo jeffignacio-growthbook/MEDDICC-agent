@@ -183,6 +183,11 @@ pipeline:
   win_rate_qualified_field: "sao"  # Win rate denominator = deals where SAO is true
 
   # Pipeline definitions with per-stage configuration
+  #
+  # PROVISIONAL: stage_probability values below are template starting guesses,
+  # not derived from historical conversion rates. Tune against actual stage→close
+  # analysis once you have 6+ months of clean pipeline data. Example divergence:
+  # Discovery configured at 0.10 vs 13.5% measured week-3 conversion.
   pipelines:
     - id: "default"
       name: "Sales Pipeline"

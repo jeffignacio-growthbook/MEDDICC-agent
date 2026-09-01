@@ -6,14 +6,21 @@ from this data using Sonnet.
 """
 
 import sys
+import logging
 from pathlib import Path
 from datetime import datetime, timezone
 from collections import Counter
+
+logger = logging.getLogger(__name__)
 
 # Add scripts to path for supabase_client
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from supabase_client import select_all
 from sdr_utils import rate_or_gap, today_in_reporting_tz
+
+# Import analytics scope filter (shared with snapshots)
+sys.path.insert(0, str(Path(__file__).parent.parent / "scripts" / "analytics"))
+from point_in_time import load_scope_config, is_deal_in_analytics_scope
 
 # Import field semantics (single source of truth for stage meanings)
 try:
@@ -143,32 +150,47 @@ async def query_waterfall(params: dict, sb) -> dict:
     config_path = Path(__file__).parent.parent / "config" / "client.yaml"
     config = yaml.safe_load(open(config_path))
 
-    # Build stage lookup: {stage_id: {name, order, exclude_from_analysis}}
-    stage_lookup = {}
-    excluded_stage_ids = set()
+    # Load shared scope filter (excludes renewals + below-qualified stages)
+    excluded_pipelines, stage_cfg = load_scope_config(config)
 
+    # Build stage lookup from ALL pipelines (for display names)
+    stage_lookup = {}
     for pipeline in config["pipeline"]["pipelines"]:
-        if pipeline.get("analyze") is False:
-            continue  # Skip renewal pipelines
         for stage in pipeline["stages"]:
             stage_id = stage["id"]
             stage_lookup[stage_id] = {
                 "name": stage["name"],
-                "order": stage["order"],
-                "exclude_from_analysis": stage.get("exclude_from_analysis", False)
+                "order": stage["order"]
             }
-            if stage.get("exclude_from_analysis"):
-                excluded_stage_ids.add(stage_id)
 
     # === PIPELINE SUMMARY: Current state ===
     # Query active deals
     active_deals = select_all(sb, "deals",
-        columns="deal_id,company_name,arr_usd,stage,deal_status",
+        columns="deal_id,company_name,arr_usd,stage,deal_status,pipeline_id",
         filters=[("eq", "deal_status", "active")])
 
-    # Filter out excluded stages
-    included_deals = [d for d in active_deals
-                      if d.get("stage") not in excluded_stage_ids]
+    # Track exclusions separately for reporting
+    before_count = len(active_deals)
+    after_pipeline_exclusion = [d for d in active_deals
+                                 if str(d.get("pipeline_id", "default")) not in excluded_pipelines]
+
+    # Apply full scope filter (pipeline + qualification gate)
+    included_deals = [
+        d for d in active_deals
+        if is_deal_in_analytics_scope(
+            d.get("stage"),
+            d.get("pipeline_id"),
+            excluded_pipelines,
+            stage_cfg
+        )
+    ]
+
+    # Log exclusion breakdown for verification
+    after_pipeline_count = len(after_pipeline_exclusion)
+    after_qualified_count = len(included_deals)
+    logger.info(f"[WATERFALL] Scope filter: {before_count} total → "
+                f"{after_pipeline_count} after renewal exclusion → "
+                f"{after_qualified_count} after qualification gate")
 
     # Total open pipeline
     total_open_arr = sum(d.get("arr_usd") or 0 for d in included_deals)
@@ -239,9 +261,19 @@ async def query_waterfall(params: dict, sb) -> dict:
     at_risk_count = len(at_risk_deals)
     at_risk_list = at_risk_deals[:5]
 
+    # Build population statement explaining exclusions
+    renewals_excluded = before_count - after_pipeline_count
+    prequalified_excluded = after_pipeline_count - after_qualified_count
+
+    population_statement = (
+        f"{total_open_count} qualified new-business deals. "
+        f"Excludes {renewals_excluded} renewals and {prequalified_excluded} pre-qualification (Meeting Set)."
+    )
+
     pipeline_summary = {
         "total_open_arr": total_open_arr,
         "total_open_count": total_open_count,
+        "population_statement": population_statement,
         "by_stage": by_stage,
         "needs_attention": {
             "no_arr_count": no_arr_count,
