@@ -63,6 +63,18 @@ def main():
         config.get('pipeline', {}).get('value_field', {}).get('renewal_pipeline_ids', [])
     )
 
+    # Load scope filter for historical conversion qualified check
+    from analytics.point_in_time import (
+        load_scope_config, is_deal_in_analytics_scope)
+    excl_pipelines, stage_cfg = load_scope_config(config)
+
+    def _qualified_in_own_pipeline(stage_id, pipeline_id):
+        """Check if deal is qualified (shared scope rule, per-pipeline)."""
+        if stage_id is None or not str(stage_id).strip():
+            return False
+        return is_deal_in_analytics_scope(
+            str(stage_id), pipeline_id, set(), stage_cfg)
+
     deals = select_all(
         sb, 'deals',
         columns=('deal_id, pipeline_id, stage, deal_value, '
@@ -126,13 +138,6 @@ def main():
         prob = prob_map.get((pipeline_id, stage_id), 0.0)
         g['stage_weighted'] += forecast_value * prob
 
-        # Historical conversion (count-based, so apply rate to each deal's value)
-        # Only for default pipeline — renewal has different motion
-        if pipeline_id not in renewal_pipeline_ids:
-            g['historical_conversion_low'] += forecast_value * conversion_rates['range_low']
-            g['historical_conversion_mid'] += forecast_value * conversion_rates['trailing_avg']
-            g['historical_conversion_high'] += forecast_value * conversion_rates['range_high']
-
         # Category-weighted
         cat = d.get('forecast_category')
 
@@ -158,6 +163,59 @@ def main():
         cb['count'] += 1
         cb['value'] += forecast_value
         cb['weighted'] += weighted_value
+
+    # Compute historical conversion from week-3 snapshots (Kellogg method)
+    # For each quarter, get week-3 snapshot count and apply conversion rates
+    print("\n" + "="*70)
+    print("Computing historical conversion from week-3 snapshots")
+    print("="*70)
+
+    for (pipeline_id, fq_label), g in groups.items():
+        # Only for default pipeline — renewal has different motion
+        if pipeline_id in renewal_pipeline_ids:
+            g['historical_conversion_low'] = 0.0
+            g['historical_conversion_mid'] = 0.0
+            g['historical_conversion_high'] = 0.0
+            continue
+
+        # Get week-3 snapshot for this quarter
+        week3_rows = select_all(
+            sb, 'deals_snapshot',
+            columns='deal_id,stage_id,pipeline_id,deal_value',
+            filters=[('eq', 'fiscal_quarter', fq_label),
+                     ('eq', 'week_of_quarter', 3)])
+
+        if not week3_rows:
+            # No week-3 snapshot yet — use current pipeline as fallback
+            # (happens for current quarter before week 3)
+            print(f"  ⚠️  {fq_label}: No week-3 snapshot, using current pipeline")
+            avg_deal_size = (g['open_value'] / g['open_count']
+                           if g['open_count'] > 0 else 0)
+            week3_count = g['open_count']
+        else:
+            # Filter to qualified deals in this pipeline
+            week3_qualified = [
+                r for r in week3_rows
+                if r.get('pipeline_id') == pipeline_id
+                and _qualified_in_own_pipeline(r.get('stage_id'), pipeline_id)
+            ]
+
+            week3_count = len(week3_qualified)
+            week3_value = sum(r.get('deal_value') or 0 for r in week3_qualified)
+            avg_deal_size = (week3_value / week3_count
+                           if week3_count > 0 else 0)
+
+            print(f"  ✓ {fq_label}: week-3 count={week3_count}, "
+                  f"avg_size=${avg_deal_size:,.0f}")
+
+        # Kellogg method: expected_wins = week3_count × conversion_rate
+        # forecast = expected_wins × avg_deal_size
+        g['historical_conversion_low'] = (week3_count * conversion_rates['range_low']
+                                         * avg_deal_size)
+        g['historical_conversion_mid'] = (week3_count * conversion_rates['trailing_avg']
+                                         * avg_deal_size)
+        g['historical_conversion_high'] = (week3_count * conversion_rates['range_high']
+                                          * avg_deal_size)
 
     today_iso = today.isoformat()
     written = 0
