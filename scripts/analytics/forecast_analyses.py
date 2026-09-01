@@ -266,13 +266,12 @@ def query_week3_conversion(
 
     def _qualified_in_own_pipeline(stage_id, pipeline_id):
         # The shared stage rule (qualified order, not an excluded stage),
-        # with the pooled pipeline-exclusion NEUTRALISED (empty set) so each
-        # pipeline is scored on its own stages. A null stage is not qualified
-        # and so is not in a starting-pipeline denominator.
+        # WITH pipeline exclusion applied (renewal pipeline excluded from
+        # new-business conversion analysis). A null stage is not qualified.
         if stage_id is None or not str(stage_id).strip():
             return False
         return is_deal_in_analytics_scope(
-            str(stage_id), pipeline_id, set(), stage_cfg)
+            str(stage_id), pipeline_id, excl_pipelines, stage_cfg)
 
     for quarter in complete_quarters:
         # Week-3 snapshot. DENOMINATOR (defect 3): deals open (the snapshot is
