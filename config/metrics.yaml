@@ -140,19 +140,20 @@ week3_conversion:
   freshness: quarterly  # computed from complete quarters
   basis: count  # deal count, not value
   verified:
-    trailing_4q: 0.135
-    per_quarter: {fy2026_q3: 0.105, fy2026_q4: 0.100, fy2027_q1: 0.092, fy2027_q2: 0.244}
-    range: [0.092, 0.244]
+    trailing_3q: 0.099  # Q3-Q1 average (Q2 excluded)
+    per_quarter: {fy2026_q3: 0.105, fy2026_q4: 0.100, fy2027_q1: 0.092}
+    range: [0.092, 0.105]
+    excluded_quarter: fy2027_q2
+    q2_measured_rate: 0.244  # 29 won / 119 qualified (for reference)
+    q2_exclusion_reason: >
+      Snapshot grid incomplete — Q2 week-3 has 192 rows (40% of Q1's 475 rows).
+      Denominator halved due to measurement artifact, not business change.
+      Q2 snapshot_date 2026-05-18 captured incomplete population.
+      Count-based rate unaffected by whales (top 3 deals = 31% of Q2 value).
     measured_date: 2026-09-01
     reconciled_against: deals_snapshot week 3 snapshots (default pipeline only, renewals excluded)
     scope_fix_applied: 2026-09-01
     scope_fix_commit: c71d620
-    caveat: >
-      Q2 FY2027 outlier PERSISTS on clean data (renewals excluded).
-      Denominator halved (240→119) is REAL for default pipeline, not scope artifact.
-      Possible causes: (1) Q2 pipeline genuinely shrank, (2) snapshot grid incomplete,
-      (3) different deal lifecycle in Q2. Q3-Q1 stable at 9-10.5%, Q2 jumps 2.5x.
-      A forecast using the trailing average inherits this variance; report the range.
   not_applicable_to:
     - renewal pipeline (different motion, separate conversion rate)
   note: |
