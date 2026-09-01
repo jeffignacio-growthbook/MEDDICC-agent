@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """
-Computes stage-weighted and category-weighted forecast for
-open pipeline, grouped by fiscal quarter. Reads current
-deals table state (not snapshots — forecast is a point-in-
-time view, not a diff).
+Computes stage-weighted, category-weighted, and historical
+conversion forecasts for open pipeline, grouped by fiscal
+quarter. Reads current deals table state (not snapshots —
+forecast is a point-in-time view, not a diff).
+
+Historical conversion method applies measured week-3 conversion
+rates (9.2% low, 13.5% mid, 24.4% high) to qualified pipeline.
+Stores full range per metrics.yaml caveat.
 
 Usage: python scripts/analytics/compute_forecast.py
 """
@@ -31,6 +35,14 @@ def main():
 
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
     config = load_client_config()
+
+    # Get historical conversion rates from registry
+    # (manually extracted — could be read from metrics.yaml if needed)
+    conversion_rates = {
+        'trailing_avg': 0.135,
+        'range_low': 0.092,   # Q1 FY2027
+        'range_high': 0.244,  # Q2 FY2027 (outlier, cause TBD)
+    }
 
     category_weights = (config.get('forecast', {})
                         .get('category_weights', {}))
@@ -69,6 +81,9 @@ def main():
     groups = defaultdict(lambda: {
         'open_value': 0.0, 'open_count': 0,
         'stage_weighted': 0.0, 'category_weighted': 0.0,
+        'historical_conversion_low': 0.0,
+        'historical_conversion_mid': 0.0,
+        'historical_conversion_high': 0.0,
         'category_breakdown': defaultdict(
             lambda: {'count': 0, 'value': 0.0, 'weighted': 0.0}),
         'uncategorized_value': 0.0,
@@ -111,6 +126,13 @@ def main():
         prob = prob_map.get((pipeline_id, stage_id), 0.0)
         g['stage_weighted'] += forecast_value * prob
 
+        # Historical conversion (count-based, so apply rate to each deal's value)
+        # Only for default pipeline — renewal has different motion
+        if pipeline_id not in renewal_pipeline_ids:
+            g['historical_conversion_low'] += forecast_value * conversion_rates['range_low']
+            g['historical_conversion_mid'] += forecast_value * conversion_rates['trailing_avg']
+            g['historical_conversion_high'] += forecast_value * conversion_rates['range_high']
+
         # Category-weighted
         cat = d.get('forecast_category')
 
@@ -152,6 +174,9 @@ def main():
             'open_deal_count': g['open_count'],
             'stage_weighted_forecast': g['stage_weighted'],
             'category_weighted_forecast': g['category_weighted'],
+            'historical_conversion_low': g['historical_conversion_low'],
+            'historical_conversion_mid': g['historical_conversion_mid'],
+            'historical_conversion_high': g['historical_conversion_high'],
             'category_breakdown': json.dumps(dict(g['category_breakdown'])),
             'uncategorized_value': g['uncategorized_value'],
         }
@@ -160,10 +185,17 @@ def main():
         ).execute()
         written += 1
 
+        # Show historical conversion range for default pipeline only
+        hist_conv_display = ""
+        if pipeline_id not in renewal_pipeline_ids:
+            hist_conv_display = (f"hist-conv=${g['historical_conversion_mid']:,.0f} "
+                               f"[${g['historical_conversion_low']:,.0f}-${g['historical_conversion_high']:,.0f}]  ")
+
         print(f"✓ {fq_label} / {pipeline_id}: "
               f"open=${g['open_value']:,.0f}  "
               f"stage-wtd=${g['stage_weighted']:,.0f}  "
               f"cat-wtd=${g['category_weighted']:,.0f}  "
+              f"{hist_conv_display}"
               f"uncategorized=${g['uncategorized_value']:,.0f}")
 
         if uncategorized_pct > 25:
