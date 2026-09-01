@@ -140,24 +140,16 @@ week3_conversion:
   freshness: quarterly  # computed from complete quarters
   basis: count  # deal count, not value
   verified:
-    september_2026:
-      measured_date: 2026-09-01
-      quarters_analyzed: [FY2026 Q3, FY2026 Q4, FY2027 Q1, FY2027 Q2]
-      trailing_average: 0.135  # 13.5% across 4 quarters
-      per_quarter:
-        FY2026_Q3: {rate: 0.105, won: 20, week3_pipeline: 190}
-        FY2026_Q4: {rate: 0.100, won: 21, week3_pipeline: 211}
-        FY2027_Q1: {rate: 0.092, won: 22, week3_pipeline: 240}
-        FY2027_Q2: {rate: 0.244, won: 29, week3_pipeline: 119}  # outlier
-      variance:
-        min: 0.092
-        max: 0.244
-        range: 0.152  # 165% of minimum
-      note: |
-        Q2 FY2027 (24.4%) is outlier — 2.5x higher than Q1 (9.2%).
-        Earlier quarters stable at 9-10.5%. Single trailing average
-        hides material quarterly variance.
+    trailing_4q: 0.135
+    per_quarter: {fy2026_q3: 0.105, fy2026_q4: 0.100, fy2027_q1: 0.092, fy2027_q2: 0.244}
+    range: [0.092, 0.244]
+    measured_date: 2026-09-01
     reconciled_against: deals_snapshot week 3 snapshots
+    caveat: >
+      Q2 FY2027 is an outlier — denominator halved (240→119) while wins rose.
+      Cause unconfirmed (snapshot coverage, scope filter change, or real pipeline shrinkage).
+      A forecast using the trailing average inherits this variance; report the range.
+      Run investigate_q2_denominator.py to diagnose before using in live forecast.
   not_applicable_to:
     - renewal pipeline (different motion, separate conversion rate)
   note: |
