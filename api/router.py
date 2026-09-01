@@ -293,7 +293,11 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "('hi, how's the Acme deal?') — route on the question. DO NOT use it "
         "for 'help me [do a real thing]' ('help me prep for Acme', 'help me "
         "understand this deal') — those are task requests (e.g. "
-        "query_pre_call_brief / query_deal)."
+        "query_pre_call_brief / query_deal). DO NOT use it for business "
+        "questions — a question containing a business metric (pipeline, "
+        "forecast, coverage, ARR, quota) and a time period (quarter, month, "
+        "week) is a real data question ('what do you forecast for the quarter?', "
+        "'how's pipeline this month?'), not orientation."
     ),
     "acknowledgment": (
         "A social acknowledgment or sign-off with no request behind it — "
