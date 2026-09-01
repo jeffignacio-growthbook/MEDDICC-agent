@@ -46,9 +46,15 @@ def main():
             prob_map[(p['id'], s['id'])] = s.get(
                 'stage_probability', 0.0)
 
+    # Get renewal pipeline IDs for incremental-only forecast logic
+    renewal_pipeline_ids = set(
+        config.get('pipeline', {}).get('value_field', {}).get('renewal_pipeline_ids', [])
+    )
+
     deals = select_all(
         sb, 'deals',
         columns=('deal_id, pipeline_id, stage, deal_value, '
+                 'new_arr, expansion_arr, '
                  'close_date, deal_status, forecast_category')
     )
 
@@ -66,6 +72,7 @@ def main():
         'category_breakdown': defaultdict(
             lambda: {'count': 0, 'value': 0.0, 'weighted': 0.0}),
         'uncategorized_value': 0.0,
+        'unknown_incremental_count': 0,  # Track renewals with no incremental data
     })
 
     for d in open_deals:
@@ -79,14 +86,30 @@ def main():
         key = (pipeline_id, fq_label)
         g = groups[key]
 
-        value = float(d.get('deal_value') or 0)
-        g['open_value'] += value
+        # Forecast basis is Incremental ARR, never renewal base
+        if pipeline_id in renewal_pipeline_ids:
+            # For renewals: only new_arr + expansion_arr (no renewal_revenue)
+            new_arr = d.get('new_arr')
+            expansion_arr = d.get('expansion_arr')
+
+            # If both are null, incremental is unknown (not zero) — exclude
+            if new_arr is None and expansion_arr is None:
+                g['unknown_incremental_count'] += 1
+                continue  # Skip this deal
+
+            # Coalesce each component to 0 if the other exists
+            forecast_value = float(new_arr or 0) + float(expansion_arr or 0)
+        else:
+            # For default pipeline: deal_value equals incremental
+            forecast_value = float(d.get('deal_value') or 0)
+
+        g['open_value'] += forecast_value
         g['open_count'] += 1
 
         # Stage-weighted
         stage_id = d.get('stage')
         prob = prob_map.get((pipeline_id, stage_id), 0.0)
-        g['stage_weighted'] += value * prob
+        g['stage_weighted'] += forecast_value * prob
 
         # Category-weighted
         cat = d.get('forecast_category')
@@ -105,13 +128,13 @@ def main():
             # Unrecognized non-null value (typo, new picklist value, etc.)
             weight = 0.0
             cat_label = cat
-            g['uncategorized_value'] += value
+            g['uncategorized_value'] += forecast_value
 
-        weighted_value = value * weight
+        weighted_value = forecast_value * weight
         g['category_weighted'] += weighted_value
         cb = g['category_breakdown'][cat_label]
         cb['count'] += 1
-        cb['value'] += value
+        cb['value'] += forecast_value
         cb['weighted'] += weighted_value
 
     today_iso = today.isoformat()
@@ -146,6 +169,10 @@ def main():
         if uncategorized_pct > 25:
             print(f"  ⚠️  DATA QUALITY: {uncategorized_pct:.1f}% of pipeline "
                   f"has NULL or unrecognized forecast_category")
+
+        if g['unknown_incremental_count'] > 0:
+            print(f"  ⚠️  {g['unknown_incremental_count']} renewal deals excluded "
+                  f"(both new_arr and expansion_arr NULL — incremental unknown, not zero)")
 
     print(f"\n✓ Wrote {written} forecast rows for {today_iso}")
 

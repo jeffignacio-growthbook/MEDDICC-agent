@@ -5,6 +5,24 @@
 #   The bucket (discovery|scoping|proposal|closed) is what handlers
 #   reason about. The stage_id is what lives in the deals.stage column.
 
+# ============================================================================
+# FORECAST SEMANTICS
+# ============================================================================
+# Forecast means Incremental ARR — new_arr + expansion_arr.
+#
+# Renewal base value (renewal_revenue) is NEVER included in forecast;
+# it belongs to GRR and NRR metrics. A renewal deal contributes to forecast
+# ONLY through its expansion component (expansion_arr).
+#
+# This prevents producing combined forecast numbers that include renewal base,
+# which would overstate what reps are actually forecasting. Reps forecast
+# Incremental ARR only; renewal base rolls to GRR automatically.
+#
+# Implication: forecast_weekly's renewal-pipeline stage_weighted_forecast
+# includes renewal base and should NOT be surfaced as forecast until
+# compute_forecast.py is fixed to use incremental components only.
+# ============================================================================
+
 stage_map:
   appointmentscheduled:
     label: "Discovery"
