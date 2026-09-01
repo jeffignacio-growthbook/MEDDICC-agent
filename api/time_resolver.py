@@ -53,6 +53,10 @@ def resolve_time_window(tw: dict) -> dict:
     sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
     from utils import get_fiscal_quarter
 
+    # Handle None from classifier (when time_window is explicitly null in JSON)
+    if tw is None:
+        tw = {}
+
     today = date.today()
     period = tw.get("period", "current_quarter")
     cfg_wrap = {"fiscal": _fiscal_config()}
