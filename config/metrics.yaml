@@ -144,12 +144,15 @@ week3_conversion:
     per_quarter: {fy2026_q3: 0.105, fy2026_q4: 0.100, fy2027_q1: 0.092, fy2027_q2: 0.244}
     range: [0.092, 0.244]
     measured_date: 2026-09-01
-    reconciled_against: deals_snapshot week 3 snapshots
+    reconciled_against: deals_snapshot week 3 snapshots (default pipeline only, renewals excluded)
+    scope_fix_applied: 2026-09-01
+    scope_fix_commit: c71d620
     caveat: >
-      Q2 FY2027 is an outlier — denominator halved (240→119) while wins rose.
-      Cause unconfirmed (snapshot coverage, scope filter change, or real pipeline shrinkage).
+      Q2 FY2027 outlier PERSISTS on clean data (renewals excluded).
+      Denominator halved (240→119) is REAL for default pipeline, not scope artifact.
+      Possible causes: (1) Q2 pipeline genuinely shrank, (2) snapshot grid incomplete,
+      (3) different deal lifecycle in Q2. Q3-Q1 stable at 9-10.5%, Q2 jumps 2.5x.
       A forecast using the trailing average inherits this variance; report the range.
-      Run investigate_q2_denominator.py to diagnose before using in live forecast.
   not_applicable_to:
     - renewal pipeline (different motion, separate conversion rate)
   note: |
