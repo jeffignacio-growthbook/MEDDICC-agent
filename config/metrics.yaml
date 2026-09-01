@@ -134,19 +134,46 @@ nrr:
       numerator: (won + open) renewal_revenue + incremental_arr
 
 week3_conversion:
-  label: Week-3 Conversion Rate
-  formula: qualified_deals / deals_created_3_weeks_ago
-  population: new business pipeline only
-  freshness: current  # needs recent data for SDR tracking
+  label: Week-3 Conversion-to-Close Rate
+  formula: in_quarter_wins / week3_open_qualified_pipeline
+  population: new business pipeline only (default)
+  freshness: quarterly  # computed from complete quarters
+  basis: count  # deal count, not value
   verified:
-    august_2026: null  # not yet reconciled
-    reconciled_against: pending
+    september_2026:
+      measured_date: 2026-09-01
+      quarters_analyzed: [FY2026 Q3, FY2026 Q4, FY2027 Q1, FY2027 Q2]
+      trailing_average: 0.135  # 13.5% across 4 quarters
+      per_quarter:
+        FY2026_Q3: {rate: 0.105, won: 20, week3_pipeline: 190}
+        FY2026_Q4: {rate: 0.100, won: 21, week3_pipeline: 211}
+        FY2027_Q1: {rate: 0.092, won: 22, week3_pipeline: 240}
+        FY2027_Q2: {rate: 0.244, won: 29, week3_pipeline: 119}  # outlier
+      variance:
+        min: 0.092
+        max: 0.244
+        range: 0.152  # 165% of minimum
+      note: |
+        Q2 FY2027 (24.4%) is outlier — 2.5x higher than Q1 (9.2%).
+        Earlier quarters stable at 9-10.5%. Single trailing average
+        hides material quarterly variance.
+    reconciled_against: deals_snapshot week 3 snapshots
   not_applicable_to:
-    - renewal pipeline
+    - renewal pipeline (different motion, separate conversion rate)
   note: |
-    Week-3 is a qualification velocity metric for new business.
-    Renewals don't "qualify" - they renew or churn.
-    Applying this to renewals returns garbage (e.g., 14.0%).
+    Forecasting metric (Kellogg method): of the qualified pipeline open at
+    week 3 of a quarter, what fraction closed won by quarter end.
+
+    Denominator: Week-3 snapshot, qualified deals, NO close-date filter
+    (whole qualified open pipeline competes for the quarter).
+
+    Numerator: In-quarter terminal wins (close_date in quarter).
+
+    Deliberate asymmetry: denominator unfiltered by close date. This is
+    correct — measuring what fraction of week-3 pipeline converts in-quarter.
+
+    NOT qualification velocity (qualified_deals / deals_created_3_weeks_ago).
+    Two different metrics sharing a name — this is conversion-to-close.
 
 coverage:
   label: Pipeline Coverage
