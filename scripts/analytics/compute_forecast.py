@@ -164,6 +164,25 @@ def main():
         cb['value'] += forecast_value
         cb['weighted'] += weighted_value
 
+    # Get won-deal average size for Kellogg method
+    # (won deals are 40% smaller than pipeline average — bias correction)
+    won_stages = ['closedwon', '1297321623']  # from field_semantics.yaml
+    all_won_deals = [
+        d for d in deals
+        if d.get('stage') in won_stages
+        and d.get('pipeline_id') not in renewal_pipeline_ids
+        and d.get('deal_value')
+        and d['deal_value'] > 0
+    ]
+
+    if all_won_deals:
+        won_deal_avg = sum(d['deal_value'] for d in all_won_deals) / len(all_won_deals)
+        print(f"\n✓ Won-deal average: ${won_deal_avg:,.0f} (n={len(all_won_deals)})")
+    else:
+        # Fallback to open pipeline average if no won deals exist yet
+        won_deal_avg = None
+        print(f"\n⚠️  No won deals found — will use week-3 pipeline avg as fallback")
+
     # Compute historical conversion from week-3 snapshots (Kellogg method)
     # For each quarter, get week-3 snapshot count and apply conversion rates
     print("\n" + "="*70)
@@ -189,9 +208,11 @@ def main():
             # No week-3 snapshot yet — use current pipeline as fallback
             # (happens for current quarter before week 3)
             print(f"  ⚠️  {fq_label}: No week-3 snapshot, using current pipeline")
-            avg_deal_size = (g['open_value'] / g['open_count']
-                           if g['open_count'] > 0 else 0)
             week3_count = g['open_count']
+            # Use won-deal average if available, else current pipeline avg
+            avg_deal_size = (won_deal_avg if won_deal_avg is not None
+                           else (g['open_value'] / g['open_count']
+                                 if g['open_count'] > 0 else 0))
         else:
             # Filter to qualified deals in this pipeline
             week3_qualified = [
@@ -201,15 +222,22 @@ def main():
             ]
 
             week3_count = len(week3_qualified)
-            week3_value = sum(r.get('deal_value') or 0 for r in week3_qualified)
-            avg_deal_size = (week3_value / week3_count
-                           if week3_count > 0 else 0)
 
-            print(f"  ✓ {fq_label}: week-3 count={week3_count}, "
-                  f"avg_size=${avg_deal_size:,.0f}")
+            # Use won-deal average (corrects -39.6% bias from using pipeline avg)
+            if won_deal_avg is not None:
+                avg_deal_size = won_deal_avg
+                print(f"  ✓ {fq_label}: week-3 count={week3_count}, "
+                      f"using won-deal avg=${avg_deal_size:,.0f} (bias-corrected)")
+            else:
+                # Fallback: week-3 pipeline average
+                week3_value = sum(r.get('deal_value') or 0 for r in week3_qualified)
+                avg_deal_size = (week3_value / week3_count
+                               if week3_count > 0 else 0)
+                print(f"  ⚠️  {fq_label}: week-3 count={week3_count}, "
+                      f"using week-3 avg=${avg_deal_size:,.0f} (no won-deal data)")
 
         # Kellogg method: expected_wins = week3_count × conversion_rate
-        # forecast = expected_wins × avg_deal_size
+        # forecast = expected_wins × won_deal_avg (not pipeline avg — corrects 40% bias)
         g['historical_conversion_low'] = (week3_count * conversion_rates['range_low']
                                          * avg_deal_size)
         g['historical_conversion_mid'] = (week3_count * conversion_rates['trailing_avg']
