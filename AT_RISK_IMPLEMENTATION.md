@@ -1,135 +1,147 @@
-# "At Risk" Semantic Fact Implementation
+# "At Risk" — Pending Definition
 
-## What Was Done
+## Status: BLOCKED on Ryan's Definition
 
-Implemented "at risk" as a semantic fact per Wave 1 findings (7x most-asked unanswered question).
+**Evidence**: 7x most-asked unanswered question in Wave 1 analysis
 
-### 1. Semantic Definition Added
+**Problem**: "At risk" is Ryan's term and means something specific to him. We have a handler but no authoritative definition of what it should check.
 
-**File**: `config/field_semantics.yaml`
+**Blocker**: Cannot finalize implementation without knowing what "at risk" means.
 
-Added `deal_states.at_risk` section defining three risk criteria:
-1. No activity in 30+ days
-2. Overall MEDDICC score below 40
-3. Champion gap (component score below stage-required threshold)
+---
 
-### 2. Handler Updated
+## What Exists Now
 
-**File**: `api/handlers.py`
+### Handler (Placeholder Logic)
 
-Updated `query_deals_at_risk()` to implement:
-- ✅ Overall score < 40 check (NEW)
-- ✅ Stage-aware component band checking (EXISTING)
-- ⚠️  30-day activity check (PENDING - requires schema)
+**File**: `api/handlers.py` → `query_deals_at_risk()`
 
-### 3. Risk Flags Enhanced
+**Current behavior**: Flags deals where any MEDDICC component required at the current stage is below threshold (stage-aware band checking).
 
-Deals now flagged if ANY condition is true:
-```
-Overall MEDDICC score is 35/70 (below 40 threshold)
-Champion is Red (needs Yellow-or-better to advance from Scoping)
-```
+**Problem**: This is placeholder logic, not a semantic fact. It might match what Ryan means, or it might not.
 
-## What Needs Verification
+### Config (Pending)
 
-### From Ryan (Definition Authority)
+**File**: `config/field_semantics.yaml` → `deal_states.at_risk`
 
-The user instruction was: "Get the definition from Ryan rather than choosing one — it's his term and it means something specific to him."
+**Current state**: Marked "PENDING DEFINITION FROM RYAN" with candidate criteria listed but not implemented.
 
-**Current definition** (field_semantics.yaml):
-```yaml
-at_risk:
-  description: >
-    A deal is "at risk" if ANY of these conditions are true:
-    1. No activity (calls, emails, meetings) in 30+ days
-    2. Overall MEDDICC score below 40 (out of 70)
-    3. Champion gap (champion score below stage-required threshold)
-```
+---
 
-**Questions for Ryan**:
-1. Is "below 40" the right overall_score threshold?
-2. Is 30 days the right activity window?
-3. Should other components besides champion trigger risk flags?
-4. Are there other risk indicators we're missing?
+## Why This Matters
 
-## What's Missing (Schema)
+This is the **first user-facing definition in the semantic layer**.
 
-### last_activity_date Field
+If the definition doesn't match what Ryan means by "at risk," every answer using it will be subtly wrong in a way nobody notices until it breaks trust.
 
-To implement the 30-day activity check, need:
+Examples of wrong answers:
+- User: "Show me at-risk deals"
+- Bot: [Lists deals with MEDDICC gaps]
+- Reality: Ryan considers "at risk" to mean "stalled for 30 days" (not MEDDICC scores)
+- Result: Bot is answering a different question than asked
 
-```sql
--- Migration: Add last_activity_date to deals table
-ALTER TABLE deals
-  ADD COLUMN IF NOT EXISTS last_activity_date DATE;
+---
 
-COMMENT ON COLUMN deals.last_activity_date IS
-  'Date of most recent activity (call, email, meeting) on this deal.
-   Updated by ETL from HubSpot engagement data.
-   Used for at-risk detection (30+ days without activity).';
+## Candidate Criteria (Unverified)
 
-CREATE INDEX IF NOT EXISTS idx_deals_last_activity
-  ON deals(last_activity_date)
-  WHERE deal_status = 'active';
-```
+Common sales risk indicators:
+1. No champion identified
+2. Overall MEDDICC score below threshold (what threshold?)
+3. No activity (calls/emails/meetings) in 30+ days
+4. Stalled in current stage for X days
+5. Close date slipped N times
+6. Something else specific to how Ryan thinks about risk
 
-Then update handler:
-```python
-# Check last_activity_date
-last_activity = d.get("last_activity_date")
-if last_activity:
-    from datetime import date, timedelta
-    days_since = (date.today() - date.fromisoformat(last_activity)).days
-    if days_since > 30:
-        risk_flags.append(f"No activity in {days_since} days (30+ day threshold)")
-```
+Can be one condition or a combination. Can be stage-specific.
 
-## Wave 1 Evidence
-
-From `WAVE_1_FINDINGS.md`:
-- **7x unanswered**: "Which of those are at risk?"
-- **4x entity patterns**: Entity-scoped version resolved correctly
-- **Fix**: Add semantic fact definition ✅ DONE
-
-## Testing
-
-After Ryan verification and schema update:
-
-1. Test overall_score < 40 detection:
-   ```
-   User: Show me at-risk deals
-   Bot: [Lists deals with overall_score < 40 OR component gaps]
-   ```
-
-2. Test entity-scoped narrowing:
-   ```
-   User: Show me pipeline
-   Bot: [Lists all deals]
-   User: Which of those are at risk?
-   Bot: [Filters to at-risk deals only]
-   ```
-
-3. Test 30-day activity (after schema):
-   ```sql
-   SELECT deal_id, company_name, last_activity_date,
-          CURRENT_DATE - last_activity_date AS days_since
-   FROM deals
-   WHERE deal_status = 'active'
-     AND CURRENT_DATE - last_activity_date > 30;
-   ```
-
-## Related Files
-
-- `config/field_semantics.yaml` — Semantic definition
-- `api/handlers.py` — Implementation (query_deals_at_risk)
-- `WAVE_1_FINDINGS.md` — Evidence analysis
-- `MIGRATION_047_REQUIRED.md` — Separate schema issue
+---
 
 ## Next Steps
 
-1. **Get Ryan's verification** of "at risk" definition
-2. **Apply migration 047** (forecast_weekly schema) — separate issue
-3. **Add last_activity_date field** to deals table
-4. **Update ETL** to populate last_activity_date from HubSpot engagements
-5. **Complete handler** with 30-day activity check
-6. **Test** all three risk criteria together
+### 1. Get Ryan's Definition
+
+See `FOR_RYAN_TWO_QUESTIONS.md` — bundles this with deal-size bias finding.
+
+Ask: "What makes a deal 'at risk' to you?"
+
+His answer becomes the semantic fact in `field_semantics.yaml`.
+
+### 2. Implement Definition
+
+Once we have Ryan's answer:
+
+**If activity-based** (no activity in X days):
+```sql
+ALTER TABLE deals ADD COLUMN last_activity_date DATE;
+```
+Update ETL to populate from HubSpot engagements.
+
+**If slippage-based** (close date slipped N times):
+```sql
+ALTER TABLE deals ADD COLUMN close_date_slips INTEGER DEFAULT 0;
+```
+Track in property history.
+
+**If MEDDICC threshold-based** (e.g., overall < 40):
+No schema change needed, just update handler logic.
+
+**If champion-based** (no champion identified):
+Check `champion_score` or add explicit `has_champion` boolean.
+
+### 3. Update Config
+
+Add to `config/field_semantics.yaml`:
+```yaml
+deal_states:
+  at_risk:
+    label: "At Risk"
+    description: >
+      [Ryan's definition verbatim]
+    criteria:
+      - [Condition 1]
+      - [Condition 2]
+    implementation: query_deals_at_risk
+    verified_by: Ryan
+    verified_date: 2026-09-XX
+```
+
+### 4. Update Handler
+
+Modify `api/handlers.py` → `query_deals_at_risk()` to implement Ryan's exact criteria.
+
+### 5. Test
+
+```
+User: Show me at-risk deals
+Bot: [Lists deals matching Ryan's definition]
+
+User: Show me pipeline
+Bot: [Lists all deals]
+User: Which of those are at risk?
+Bot: [Filters to at-risk subset]
+```
+
+---
+
+## Why We Can't Guess
+
+Initial implementation chose "overall MEDDICC score < 40" as the threshold. That was my number, not Ryan's.
+
+"At risk" is his vocabulary from years of sales leadership. It might mean:
+- "No champion and stalled" (compound condition)
+- "In Review for 2+ weeks" (stage-specific timing)
+- "Competitor mentioned and no POC scheduled" (competitive threat)
+- Something else entirely
+
+**We need his definition, not a best guess.**
+
+---
+
+## Timeline
+
+- **Now**: Ask Ryan (bundled with deal-size bias)
+- **Next**: Implement as semantic fact in config
+- **Then**: Update handler to match definition
+- **Finally**: Test with real questions
+
+Until Ryan defines it, the handler returns placeholder results (stage-aware MEDDICC gaps).

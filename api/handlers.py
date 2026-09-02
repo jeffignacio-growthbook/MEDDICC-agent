@@ -344,15 +344,21 @@ async def query_arr(params: dict, sb) -> dict:
 
 async def query_deals_at_risk(params: dict, sb) -> dict:
     """
-    Deals meeting "at risk" criteria per field_semantics.yaml deal_states.at_risk.
+    Deals meeting "at risk" criteria (PENDING DEFINITION FROM RYAN).
 
-    A deal is "at risk" if ANY of these conditions are true:
-    1. Overall MEDDICC score below 40 (out of 70)
-    2. Any MEDDICC component required at current stage is below threshold
-    3. TODO: No activity in 30+ days (requires last_activity_date field)
+    Current implementation: Stage-aware MEDDICC band checking.
+    A deal is flagged if any component required at its current stage
+    is below the threshold to advance.
 
-    Uses stage_progression requirements from config/client.yaml for stage-aware
-    component checking (condition #2).
+    PLACEHOLDER LOGIC until Ryan defines what "at risk" means to him.
+    Candidate criteria:
+    - Overall MEDDICC score below X?
+    - No activity in 30+ days?
+    - No champion identified?
+    - Stalled in stage?
+    - Close date slipped?
+
+    Uses stage_progression requirements from config/client.yaml.
     """
     from api.stage_requirements import get_requirements_for_stage
 
@@ -429,22 +435,13 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
         if not requirements:
             continue
 
-        # === RISK CONDITION 1: Overall score below 40 ===
-        # Per field_semantics.yaml deal_states.at_risk definition
-        overall_score = a.get("overall_score") or 0
-        risk_flags = []
-
-        if overall_score < 40:
-            risk_flags.append(
-                f"Overall MEDDICC score is {overall_score}/70 (below 40 threshold)"
-            )
-
-        # === RISK CONDITION 2: Stage-specific component gaps ===
+        # PLACEHOLDER: Stage-specific component gaps (until Ryan defines "at risk")
         # Check each required component. Band comparison, not integer: a 5-vs-6
         # gap is noise the generator can't reproduce (both yellow), so a
         # component is only "at risk" when its BAND is below the gate's band —
         # gate 6 → needs yellow-or-better, gate 7 → green-or-better.
         from api.rubric import band_meets, band_label, get_band
+        risk_flags = []
         for component, required_threshold in requirements.items():
             field_name = component_fields.get(component)
             if not field_name:
@@ -467,11 +464,7 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
                     f"(needs {need_band}-or-better to advance from {stage_name})"
                 )
 
-        # === RISK CONDITION 3: No activity in 30+ days ===
-        # TODO: Requires last_activity_date field in deals table
-        # When added, check: (today - last_activity_date) > 30 days
-
-        # Flag deal if ANY risk condition is true
+        # Flag deal if ANY risk condition is true (placeholder logic)
         if risk_flags:
             at_risk.append({
                 "deal_id":       a["deal_id"],

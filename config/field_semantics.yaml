@@ -151,20 +151,23 @@ outcome_buckets:
 deal_states:
   at_risk:
     label: "At Risk"
-    description: >
-      A deal is "at risk" if ANY of these conditions are true:
-      1. No activity (calls, emails, meetings) in 30+ days
-      2. Overall MEDDICC score below 40 (out of 70)
-      3. Champion gap (champion score below stage-required threshold)
+    # PENDING DEFINITION FROM RYAN
+    # "At risk" is Ryan's term and means something specific to him.
+    # Candidate criteria (UNVERIFIED):
+    # - No activity in 30+ days?
+    # - Overall MEDDICC score below threshold (what threshold)?
+    # - No champion identified?
+    # - Stalled in stage for X days?
+    # - Close date slipped N times?
+    #
+    # Handler query_deals_at_risk exists but implements placeholder logic
+    # (stage-aware MEDDICC band checking). Needs Ryan's definition to finalize.
+    #
+    # Evidence: 7x most-asked unanswered question in Wave 1 analysis.
+    # Entity-scoped version ("which of those are at risk?") works.
+    # Missing: semantic fact defining what "at risk" means.
 
-    implementation: query_deals_at_risk
-    # Handler currently uses stage-aware MEDDICC band checking.
-    # TODO: Add 30-day activity check (needs last_activity_date field).
-    # Definition verified with Ryan: 2026-09-01 (PENDING VERIFICATION)
-
-    # NOTE: This is Ryan's term and means something specific to him.
-    # The definition above is a starting point based on common sales
-    # risk indicators. Needs confirmation before treating as authoritative.
+    implementation: query_deals_at_risk  # Placeholder until definition confirmed
 
 # Field units and meanings the handlers depend on. Extend as needed.
 field_units:
