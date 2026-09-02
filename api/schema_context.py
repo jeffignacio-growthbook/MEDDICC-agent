@@ -49,6 +49,10 @@ def get_schema_context(sb, tables_with_descriptions=None, lightweight=False):
 
 def _build_schema_context(sb, tables_with_descriptions, lightweight=False):
     """Build schema context with optional selective descriptions."""
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"[SCHEMA_BUILD] lightweight={lightweight}, tables_with_descriptions={tables_with_descriptions}")
+
     from supabase_client import select_all
     rows = select_all(sb, "data_dictionary",
         columns="supabase_table,supabase_column,data_type,description,enum_values,hubspot_name,source",
@@ -104,6 +108,10 @@ TABLE RELATIONSHIPS:
   deals.company_name ≈ objections.company_name (fuzzy — prefer deal_id)
   deals.owner_email = rep identifier (maps to rep_targets.entity_email)
 """
+    # Track description decisions for debugging
+    described_count = 0
+    skipped_count = 0
+
     for table, cols in sorted(by_table.items()):
         desc = table_descriptions.get(table, "")
         lines.append(f"TABLE: {table}")
@@ -128,6 +136,7 @@ TABLE RELATIONSHIPS:
                     should_describe = True
 
             if should_describe:
+                described_count += 1
                 cdesc = (c.get("description") or "")[:80]
                 line = f"  {col} ({dtype}){hs_note}: {cdesc}"
                 if enum and dtype == "enumeration":
@@ -139,11 +148,14 @@ TABLE RELATIONSHIPS:
             else:
                 # Column name and type only (no description)
                 line = f"  {col} ({dtype}){hs_note}"
+                skipped_count += 1
 
             lines.append(line)
         lines.append("")
-    lines.append(join_notes)
-    return "\n".join(lines)
+
+    result = "\n".join(lines + [join_notes])
+    logger.info(f"[SCHEMA_BUILD] Built {len(result)} chars. Described: {described_count} cols, Skipped: {skipped_count} cols")
+    return result
 
 def invalidate_cache():
     global _cached_context

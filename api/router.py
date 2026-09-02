@@ -1029,6 +1029,9 @@ RULES:
 - Maximum 5 tool calls per question
 - If data genuinely doesn't exist, say so plainly
 - Never invent numbers
+- Fetch limits: Default is 200 rows, max 500. Fetching more rows does NOT
+  cost you context — large results are automatically aggregated into summaries
+  + samples. Ask for what you need; the aggregate handles size.
 
 DATES: Always use the exact time_window dates provided
 in the question context. Never compute your own fiscal
@@ -1196,6 +1199,7 @@ def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = N
     # Large results: aggregate + sample
     aggregates = {"row_count": row_count}
     null_counts = {}
+    zero_counts = {}
 
     # Identify column types from first row
     if rows:
@@ -1225,6 +1229,11 @@ def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = N
             null_count = row_count - len(vals)
             if null_count > 0:
                 null_counts[col] = null_count
+
+            # Count zeros (computed over full result, including nulls counted as non-zero)
+            zero_count = sum(1 for r in rows if r.get(col) == 0 or r.get(col) == 0.0)
+            if zero_count > 0:
+                zero_counts[col] = zero_count
 
             if vals:
                 aggregates[col] = {
@@ -1271,6 +1280,9 @@ def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = N
 
         if null_counts:
             aggregates["null_counts"] = null_counts
+
+        if zero_counts:
+            aggregates["zero_counts"] = zero_counts
 
     # Determine sample and sample_basis
     if order_by:

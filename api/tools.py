@@ -43,13 +43,13 @@ HEAVY_COLUMNS = {
 }
 
 
-async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by=None):
+async def filter_table(sb, table, columns=None, filters=None, limit=200, order_by=None):
     _init_valid_columns(sb)
     # Fetch ceiling (safety limit on database query size).
     # Aggregation happens before synthesis, so this is NOT the synthesis budget.
     # Large result sets get aggregated into summaries + samples in router.py.
     max_limit = 500
-    limit = min(limit or 50, max_limit)
+    limit = min(limit or 200, max_limit)
     cols, unavailable = _validate_columns(table, columns or [])
     # If column validation found nothing valid, use safe defaults
     if not cols:
