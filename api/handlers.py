@@ -3845,3 +3845,175 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         "rows": latest_rows,
         "data_gaps": data_gaps,
     }
+
+
+async def query_definition(params: dict, sb) -> dict:
+    """
+    Look up what a term means in the semantic layer (config).
+
+    Answers questions like:
+    - "What does at-risk mean to you?"
+    - "What counts as qualified?"
+    - "What's in the renewal pipeline?"
+    - "How do you define Scoping stage?"
+
+    Checks field_semantics.yaml, client.yaml, and metrics.yaml for definitions.
+    If found, returns the definition. If marked PENDING, says so.
+    If not found, indicates no definition exists.
+
+    This makes the semantic layer legible — users can ask what terms mean
+    and verify the agent is using the right definitions.
+    """
+    from utils import load_client_config
+    import yaml
+
+    config = load_client_config()
+    question = params.get("question", "").lower()
+
+    # Load field semantics
+    semantics_path = Path(__file__).parent.parent / "config" / "field_semantics.yaml"
+    try:
+        with open(semantics_path) as f:
+            field_semantics = yaml.safe_load(f)
+    except:
+        field_semantics = {}
+
+    # Load metrics
+    metrics_path = Path(__file__).parent.parent / "config" / "metrics.yaml"
+    try:
+        with open(metrics_path) as f:
+            metrics_config = yaml.safe_load(f)
+    except:
+        metrics_config = {}
+
+    definitions = []
+
+    # Check for deal state definitions (e.g., "at risk")
+    if "at risk" in question or "at-risk" in question:
+        deal_states = field_semantics.get("deal_states", {})
+        at_risk = deal_states.get("at_risk", {})
+        
+        if at_risk:
+            label = at_risk.get("label", "At Risk")
+            desc = at_risk.get("description", "")
+            
+            if "PENDING" in desc or not desc.strip():
+                definitions.append({
+                    "term": "at-risk",
+                    "status": "pending",
+                    "message": ("At-risk isn't defined yet. I'd need you to tell me what "
+                               "it means to you — no activity in 30 days, low MEDDICC score, "
+                               "champion gap, or something else."),
+                    "source": "field_semantics.yaml > deal_states.at_risk"
+                })
+            else:
+                definitions.append({
+                    "term": "at-risk",
+                    "status": "defined",
+                    "label": label,
+                    "definition": desc,
+                    "source": "field_semantics.yaml > deal_states.at_risk"
+                })
+
+    # Check for qualified definition
+    if "qualified" in question:
+        qualified_order = config.get("pipeline", {}).get("qualified_stage_order")
+        
+        if qualified_order is not None:
+            pipelines = config.get("pipeline", {}).get("pipelines", [])
+            qualified_stages = []
+            
+            for pipeline in pipelines:
+                for stage in pipeline.get("stages", []):
+                    if stage.get("order", 99) >= qualified_order:
+                        qualified_stages.append(stage.get("name"))
+            
+            definitions.append({
+                "term": "qualified",
+                "status": "defined",
+                "definition": (f"Deals that have reached stage order {qualified_order} or higher. "
+                             f"Qualified stages: {', '.join(qualified_stages)}"),
+                "source": "client.yaml > pipeline.qualified_stage_order"
+            })
+
+    # Check for renewal pipeline definition
+    if "renewal" in question and "pipeline" in question:
+        renewal_ids = config.get("pipeline", {}).get("value_field", {}).get("renewal_pipeline_ids", [])
+        pipelines = config.get("pipeline", {}).get("pipelines", [])
+        
+        renewal_pipeline = next((p for p in pipelines if p["id"] in renewal_ids), None)
+        
+        if renewal_pipeline:
+            definitions.append({
+                "term": "renewal pipeline",
+                "status": "defined",
+                "pipeline_id": renewal_pipeline["id"],
+                "pipeline_name": renewal_pipeline.get("name"),
+                "definition": f"Pipeline ID {renewal_pipeline['id']} tracking renewals of existing customers.",
+                "source": "client.yaml > pipeline.value_field.renewal_pipeline_ids"
+            })
+
+    # Check for stage definitions
+    stage_map = field_semantics.get("stage_map", {})
+    for stage_id, stage_info in stage_map.items():
+        stage_name = stage_info.get("label", "").lower()
+        
+        if stage_name and stage_name in question:
+            definitions.append({
+                "term": stage_name,
+                "status": "defined",
+                "label": stage_info.get("label"),
+                "bucket": stage_info.get("bucket"),
+                "definition": f"Stage '{stage_info.get('label')}' (ID: {stage_id}) in bucket '{stage_info.get('bucket')}'.",
+                "source": f"field_semantics.yaml > stage_map.{stage_id}",
+                "exclude_from_analysis": stage_info.get("exclude_from_analysis", False)
+            })
+            
+            # If it's Review, add the parking lot note
+            if stage_id == "decisionmakerboughtin":
+                definitions[-1]["note"] = ("Parking lot for stalled or dead deals that reps hope to revive. "
+                                          "Not a progression stage, excluded from forecast/conversion/pipeline.")
+
+    # Check for metric definitions
+    if metrics_config:
+        for metric_name, metric_def in metrics_config.items():
+            if metric_name.replace("_", " ").lower() in question:
+                definitions.append({
+                    "term": metric_name,
+                    "status": "defined",
+                    "label": metric_def.get("label", metric_name),
+                    "formula": metric_def.get("formula"),
+                    "definition": metric_def.get("description") or metric_def.get("label"),
+                    "source": f"metrics.yaml > {metric_name}"
+                })
+
+    # Check for forecast semantics
+    if "forecast" in question and ("mean" in question or "defin" in question or "what" in question):
+        # Check for FORECAST SEMANTICS comment in field_semantics.yaml
+        try:
+            with open(semantics_path) as f:
+                content = f.read()
+                if "FORECAST SEMANTICS" in content:
+                    definitions.append({
+                        "term": "forecast",
+                        "status": "defined",
+                        "definition": ("Forecast means Incremental ARR — new_arr + expansion_arr. "
+                                     "Renewal base value (renewal_revenue) is NEVER included in forecast; "
+                                     "it belongs to GRR and NRR metrics."),
+                        "source": "field_semantics.yaml > FORECAST SEMANTICS"
+                    })
+        except:
+            pass
+
+    if not definitions:
+        return {
+            "found": False,
+            "message": "No definition found in the semantic layer for the terms in your question.",
+            "suggestion": "Try asking about: at-risk, qualified, renewal pipeline, stage names, or specific metrics."
+        }
+
+    return {
+        "found": True,
+        "definitions": definitions,
+        "count": len(definitions)
+    }
