@@ -1839,6 +1839,7 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     """
     # A rep name resolves to owner_email; None means "all reps" (valid here).
     owner_email, _rep_note = _resolve_owner_email(params, sb)
+    logger.info(f"[REP_ATTAINMENT] resolved owner_email={owner_email!r}")
     tw = _resolve_tw(params)
 
     import yaml
@@ -1928,10 +1929,16 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     
     # Get all unique rep emails (union of targets and won)
     all_rep_emails = set(targets_by_email.keys()) | set(won_by_email.keys())
-    
+    logger.info(f"[REP_ATTAINMENT] all_rep_emails union: {len(all_rep_emails)} reps")
+    logger.info(f"[REP_ATTAINMENT] sample emails: {list(all_rep_emails)[:3] if all_rep_emails else 'none'}")
+
     # Filter to specific rep if requested
     if owner_email:
+        before_filter = len(all_rep_emails)
         all_rep_emails = {owner_email} if owner_email in all_rep_emails else set()
+        logger.info(f"[REP_ATTAINMENT] filtered to owner_email={owner_email!r}: {len(all_rep_emails)} reps (was {before_filter})")
+        if not all_rep_emails:
+            logger.warning(f"[REP_ATTAINMENT] owner_email {owner_email!r} NOT FOUND in union of targets/won")
     
     # Load persona names
     persona_map = {}
