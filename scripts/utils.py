@@ -629,35 +629,13 @@ def build_semantic_context(config: Optional[Dict] = None) -> str:
     # ========================================================================
     # 7. FIELD VALUE SEMANTICS
     # ========================================================================
-    lines.append("## Missing Value Detection")
-    lines.append("")
-    lines.append("**'No ARR recorded' is ambiguous across five columns:**")
-    lines.append("  - deal_value (incremental ARR)")
-    lines.append("  - arr_usd (total ARR)")
-    lines.append("  - new_arr, expansion_arr, renewal_revenue (components)")
-    lines.append("")
-    lines.append("deal_value is often populated with 0 or a computed fallback even when")
-    lines.append("component fields are null. Filtering on deal_value=is.null alone")
-    lines.append("returns zero rows and produces a confident wrong answer.")
-    lines.append("")
-    lines.append("**A deal has no ARR recorded when BOTH conditions hold:**")
-    lines.append("  1. Pipeline-appropriate field is null or zero:")
-    lines.append("     - New business: deal_value")
-    lines.append("     - Renewals: renewal_revenue")
-    lines.append("  2. Component fields are also empty/zero:")
-    lines.append("     - new_arr, expansion_arr, renewal_revenue all null/zero")
-    lines.append("")
-    lines.append("**Correct filter approaches:**")
-    lines.append("  - Check component fields: new_arr=is.null AND expansion_arr=is.null")
-    lines.append("  - Check zero values: deal_value=eq.0 OR deal_value=is.null")
-    lines.append("  - Aggregate first, then filter on computed flag")
-    lines.append("")
-    lines.append("**Zero-rows suspicion rule:**")
-    lines.append("When a 'which deals have X' question returns zero rows, question")
-    lines.append("the filter rather than asserting absence. Say what was checked:")
-    lines.append("'No deals had null deal_value. That may mean the field is defaulted")
-    lines.append("rather than that values are recorded — worth checking component fields.'")
-    lines.append("")
+    # MOVED TO DYNAMIC LOOP ONLY (lines 1510-1514 in router.py)
+    # This section was crowding the classifier (doubled semantic context from
+    # 650 to 1320 tokens). It's useful for the dynamic loop (which has full
+    # context), but noise for the classifier (which just needs to route).
+    #
+    # Missing Value Detection content now lives in DYNAMIC_SYSTEM_PROMPT where
+    # it applies to tool-calling queries, not classification.
 
     # ========================================================================
     # 8. VERIFIED METRICS

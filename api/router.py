@@ -1089,6 +1089,28 @@ When you have enough data to answer, format for Slack:
 - Lead with direct answer, then supporting detail
 - End with one actionable insight if relevant
 
+MISSING VALUE DETECTION:
+'No ARR recorded' is ambiguous across five columns: deal_value, arr_usd,
+new_arr, expansion_arr, renewal_revenue. deal_value is often populated
+with 0 or a computed fallback even when component fields are null.
+Filtering on deal_value=is.null alone returns zero rows and produces
+a confident wrong answer.
+
+A deal has no ARR recorded when BOTH conditions hold:
+1. Pipeline-appropriate field is null or zero (new business: deal_value,
+   renewals: renewal_revenue)
+2. Component fields are also empty/zero (new_arr, expansion_arr,
+   renewal_revenue all null/zero)
+
+Correct filter approaches:
+- Check component fields: [[\"is_\", \"new_arr\", \"null\"], [\"is_\", \"expansion_arr\", \"null\"]]
+- Check zero values: [[\"eq\", \"deal_value\", 0]] OR [[\"is_\", \"deal_value\", \"null\"]]
+- Aggregate first, then filter on computed flag
+
+Zero-rows suspicion: When a 'which deals have X' question returns zero
+rows, question the filter rather than asserting absence. The field may
+be defaulted rather than null.
+
 RESPONSE FORMAT (pure JSON, nothing else):
 {{"tool": "filter_table", "params": {{...}}}}
 OR
@@ -2112,7 +2134,9 @@ async def route_question(question: str, user_id: str,
                 handler_name = "dynamic_query"
 
         # General confidence floor for data handlers
-        elif handler_name not in ("unanswerable", "set_target", "dynamic_query"):
+        # unanswerable removed from exemption: 0.50 confidence means the classifier
+        # failed, not that the question is genuinely unanswerable. Route to dynamic loop.
+        elif handler_name not in ("set_target", "dynamic_query"):
             if confidence < confidence_floor:
                 logger.info(f"[ROUTING] confidence {confidence:.2f} < {confidence_floor:.2f} "
                            f"for {original_handler} — routing to dynamic instead")
