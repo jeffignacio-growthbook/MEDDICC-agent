@@ -142,6 +142,30 @@ outcome_buckets:
   lost: ["closed_lost"]
   open: ["discovery", "scoping", "proposal"]
 
+# ============================================================================
+# DEAL STATE DEFINITIONS
+# ============================================================================
+# Runtime business logic that defines deal states and risk conditions.
+# These are semantic facts — true regardless of who asks, needed at runtime.
+
+deal_states:
+  at_risk:
+    label: "At Risk"
+    description: >
+      A deal is "at risk" if ANY of these conditions are true:
+      1. No activity (calls, emails, meetings) in 30+ days
+      2. Overall MEDDICC score below 40 (out of 70)
+      3. Champion gap (champion score below stage-required threshold)
+
+    implementation: query_deals_at_risk
+    # Handler currently uses stage-aware MEDDICC band checking.
+    # TODO: Add 30-day activity check (needs last_activity_date field).
+    # Definition verified with Ryan: 2026-09-01 (PENDING VERIFICATION)
+
+    # NOTE: This is Ryan's term and means something specific to him.
+    # The definition above is a starting point based on common sales
+    # risk indicators. Needs confirmation before treating as authoritative.
+
 # Field units and meanings the handlers depend on. Extend as needed.
 field_units:
   arr_usd: "US dollars, annual recurring"
