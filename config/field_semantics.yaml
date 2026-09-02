@@ -76,6 +76,18 @@ stage_map:
     bucket: "proposal"
     transition: null
 
+  # Review (decisionmakerboughtin) is a parking lot for stalled or dead
+  # deals that reps hope to revive. It is not a progression stage and is
+  # excluded from forecast, conversion, and pipeline calculations via
+  # exclude_from_analysis: true in client.yaml. Treat as terminal for
+  # reconstruction purposes — a deal landing in Review is off the normal
+  # progression path.
+  "decisionmakerboughtin":
+    label: "Review"
+    bucket: "proposal"  # Nominal bucket, but excluded from analysis
+    transition: null
+    exclude_from_analysis: true
+
   # Renewal pipeline (866608541). Excluded from new-business pipeline
   # analysis via pipelines.excluded, but must classify: an unmapped stage
   # is now a hard failure in reconstruction, not a silent "open".

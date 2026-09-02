@@ -243,6 +243,7 @@ pipeline:
           name: "Review"
           order: 8
           stage_probability: 0.50
+          exclude_from_analysis: true  # Parking lot for stalled/dead deals, not progression
 
         - id: "68509551"
           name: "Disqualified"
