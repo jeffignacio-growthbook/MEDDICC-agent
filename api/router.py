@@ -1957,10 +1957,31 @@ async def route_question(question: str, user_id: str,
         handler_failure_reason = ""  # PART 1: carried into the fallback
         is_slow = handler_name == "generate_win_loss"
 
+        # ── 3b. Direct dynamic_query (before handler execution) ──
+        # dynamic_query means "use the loop" — don't try a handler first.
+        # Going through handler execution with result_quality="empty" pollutes
+        # the loop's context with "previous query returned no matching data."
+        if handler_name == "dynamic_query":
+            print(f"[ROUTING] dynamic_query (direct)", flush=True)
+            dynamic_result = await dynamic_query_loop(
+                question=question,
+                history=history,
+                params=params,
+                sb=sb,
+                client=generator_client,
+                hint="",
+                roster_text=roster_text,
+                classifier_client=classifier_client,
+            )
+            return {"answer": dynamic_result.get("answer", ""),
+                    "needs_ack": is_slow,
+                    "tool_results": dynamic_result.get("tool_results", {}),
+                    "handler_name": "dynamic_query"}
+
         if handler_name == "unanswerable":
             result_quality = "unanswerable"
 
-        elif handler_name != "dynamic_query":
+        else:
             handler_fn = getattr(handlers, handler_name, None)
             if handler_fn:
                 tool_results, result_quality, handler_failure_reason = \
@@ -2004,24 +2025,6 @@ async def route_question(question: str, user_id: str,
                         "needs_ack": is_slow,
                         "tool_results": dynamic_tool_results,
                         "handler_name": f"{handler_name}_dynamic_fallback"}
-
-        # Handle direct dynamic_query intent
-        if handler_name == "dynamic_query":
-            print(f"[ROUTING] dynamic_query (direct)", flush=True)
-            dynamic_result = await dynamic_query_loop(
-                question=question,
-                history=history,
-                params=params,
-                sb=sb,
-                client=generator_client,
-                hint="",
-                roster_text=roster_text,
-                classifier_client=classifier_client,
-            )
-            return {"answer": dynamic_result.get("answer", ""),
-                    "needs_ack": is_slow,
-                    "tool_results": dynamic_result.get("tool_results", {}),
-                    "handler_name": "dynamic_query"}
 
         # ── 5. Honest "no data" ───────────────────────────
         if result_quality in ("empty", "error", "unanswerable"):
