@@ -1850,8 +1850,30 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         # nothing ever made "answer now if you can" an explicit instruction —
         # the model kept calling tools. Make the stop criterion explicit so the
         # loop ends the moment the data is sufficient.
+
+        # Zero-rows suspicion check: when a "which deals" question returns nothing,
+        # question the filter rather than asserting absence. A zero-row result on
+        # enumeration questions is suspicious — the field may be defaulted.
+        suspicion_note = ""
+        if row_count == 0 and tool_name == "filter_table":
+            # Detect enumeration questions: "which", "show", "list", "what deals"
+            enum_patterns = ["which", "show", "list", "what deals", "what are the"]
+            if any(p in question.lower() for p in enum_patterns):
+                filters_used = tool_params.get("filters", [])
+                filter_desc = ", ".join([f"{f[1]}={f[0]}.{f[2]}" for f in filters_used if len(f) >= 3])
+                suspicion_note = (
+                    f"\n\n⚠️  SUSPICION: Zero rows on an enumeration question. "
+                    f"The filter ({filter_desc}) may be checking the wrong column or "
+                    f"the field may be defaulted rather than null. Consider: "
+                    f"(1) checking component fields instead of aggregate fields, "
+                    f"(2) checking for zero values not just nulls, or "
+                    f"(3) stating what was checked rather than asserting absence."
+                )
+                logger.info(f"[SUSPICION] Zero rows on enumeration question, "
+                           f"filters={filter_desc}")
+
         messages.append({"role": "user",
-            "content": f"Tool result: {json.dumps(result, default=str)[:3000]}\n\n"
+            "content": f"Tool result: {json.dumps(result, default=str)[:3000]}{suspicion_note}\n\n"
                        f"Can you now answer the question "
                        f"\"{question}\" from the data gathered so far? "
                        'If yes, respond with {"answer": "..."} now. '

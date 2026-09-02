@@ -249,6 +249,35 @@ field_units:
   overall_score: "0-70 MEDDICC total"
 
 # ============================================================================
+# MISSING VALUE SEMANTICS — WHAT "NO ARR RECORDED" MEANS
+# ============================================================================
+# "Which deals have no ARR recorded?" is ambiguous across five columns:
+# deal_value, arr_usd, new_arr, expansion_arr, renewal_revenue.
+#
+# deal_value is often populated with 0 or a computed fallback even when the
+# component fields are null, so filtering on deal_value=null returns zero rows
+# and produces a confident wrong answer ("every deal has ARR recorded").
+#
+# A deal has no ARR recorded when BOTH conditions hold:
+# 1. The pipeline-appropriate value field is null or zero:
+#    - New business: deal_value (incremental ARR)
+#    - Renewals: renewal_revenue (renewal base)
+# 2. The component fields are also empty or zero:
+#    - new_arr, expansion_arr, renewal_revenue all null/zero
+#
+# When asked "which deals have no ARR", check ALL value columns, not just one.
+# A zero-row result on this question is suspicious and should be questioned
+# rather than treated as conclusive — deal_value may be defaulted to 0.
+#
+# Correct filter approaches:
+# - Check component fields: new_arr=is.null AND expansion_arr=is.null AND renewal_revenue=is.null
+# - Check zero values: deal_value=eq.0 OR deal_value=is.null
+# - Aggregate first, then filter on computed "has_any_arr" flag
+#
+# Never filter on deal_value=is.null alone for "no ARR" questions.
+# ============================================================================
+
+# ============================================================================
 # FIELD FORMATS — EXACT FORMAT FOR FILTER CONSTRUCTION
 # ============================================================================
 # When constructing filters, use these exact formats. A mismatch returns 0 rows.
