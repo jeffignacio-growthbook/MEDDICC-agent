@@ -1163,7 +1163,13 @@ def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = N
 
     # Small results pass through whole
     if row_count <= sample_size:
-        return {**result, "row_count": row_count, "truncated": False}
+        return {
+            **result,
+            "row_count": row_count,
+            "truncated": False,
+            "complete": True,
+            "_note": f"COMPLETE RESULT: All {row_count} rows returned (no aggregation needed)."
+        }
 
     # Large results: aggregate + sample
     aggregates = {"row_count": row_count}
@@ -1267,6 +1273,12 @@ def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = N
         "sample": sample,
         "sample_basis": sample_basis,
         "truncated": True,
+        "complete": True,
+        "_note": (f"COMPLETE RESULT: All {row_count} rows were aggregated. "
+                 f"The 'sample' array contains {len(sample)} representative rows "
+                 f"for illustration, not a partial fetch. Use 'aggregates' for "
+                 f"totals and counts. Do not re-query to get 'the rest' — this "
+                 f"IS the full result, summarized."),
         "table": result.get("table", "unknown"),
     }
 
@@ -1774,23 +1786,30 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 executed_tools.append((tool_signature, iteration))
 
         if is_duplicate:
-            # PART 2b: a duplicate is a stall signal, not something to nudge
-            # past. The model already has this data. First duplicate: tell it
-            # to use what it has and let it try once more. Second no-progress
-            # step (another duplicate, a parse fail, or a zero-row tool call):
-            # stop and answer from what exists — do NOT keep spending budget
-            # re-emitting a query whose result is already in hand.
+            # SHORT-CIRCUIT: Duplicate detected means the data is already in hand.
+            # Do NOT execute the tool again. Instead, immediately remind the model
+            # it has this data and force it to answer or query something different.
+            # The previous code used `continue` which still wasted an iteration;
+            # this forces a model response with the existing data.
+            logger.info(f"[LOOP iter={iteration}] duplicate detected, "
+                       f"short-circuiting without tool execution")
             no_progress_streak += 1
             if no_progress_streak >= 2:
                 return _finalize_from_data("duplicate_tool_call")
+
+            # Don't execute the tool. Instead, inject the existing result and
+            # force the model to use it or query differently.
+            existing_result = accumulated_data.get(f"step_{prev_iter}", {})
             messages.append({"role": "assistant", "content": raw})
             messages.append({"role": "user",
-                "content": f"You already queried this in iteration {prev_iter}. "
-                          f"Do not repeat it. Using the data already in "
-                          f"step_{prev_iter}, either answer now as "
-                          '{"answer": "..."} or make ONE different query that '
-                          "adds missing data."})
-            continue  # one chance to recover; next stall ends the loop
+                "content": f"⚠️  DUPLICATE: You already queried this exact filter in "
+                          f"iteration {prev_iter}. The data is already in step_{prev_iter}. "
+                          f"Result summary: {existing_result.get('row_count', 0)} rows. "
+                          f"Do NOT repeat this query. Either:\n"
+                          f'1. Answer now using step_{prev_iter}: {{"answer": "..."}}\n'
+                          f"2. Query something DIFFERENT that adds new information\n\n"
+                          f"Repeating the same query wastes budget and doesn't help."})
+            continue  # Let model respond, but don't execute the duplicate tool
 
         tool_fn = {
             "filter_table": T.filter_table,

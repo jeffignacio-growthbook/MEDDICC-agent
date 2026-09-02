@@ -19,7 +19,8 @@ def test_small_result_passes_through():
     assert len(agg["rows"]) == 9, f"Expected 9 rows, got {len(agg['rows'])}"
     assert agg.get("truncated") == False, "Should not be truncated"
     assert agg["row_count"] == 9, f"Expected row_count=9, got {agg['row_count']}"
-    assert "sample" not in agg or len(agg["sample"]) == 9, "No separate sample for small result"
+    assert agg.get("complete") == True, "Should be marked as complete"
+    assert "_note" in agg and "COMPLETE RESULT" in agg["_note"], "Should have completeness note"
     print("✓ Small result passes through whole")
 
 
@@ -40,6 +41,10 @@ def test_large_result_aggregated_with_sample():
     assert len(agg["sample"]) == 20, f"Expected 20 sample rows, got {len(agg['sample'])}"
     assert len(agg["rows"]) == 20, f"Expected 20 rows (sample), got {len(agg['rows'])}"
     assert agg["truncated"] == True, "Should be truncated"
+    assert agg.get("complete") == True, "Should be marked as complete"
+    assert "_note" in agg and "COMPLETE RESULT" in agg["_note"], "Should have completeness note"
+    assert "_note" in agg and "All 138 rows were aggregated" in agg["_note"], \
+        "Note should mention full row count"
     assert "deal_value" in agg["aggregates"], "Should have deal_value aggregates"
     assert agg["aggregates"]["deal_value"]["sum"] == sum(i*1000 for i in range(138)), \
         "Sum should match all 138 rows"
