@@ -1426,7 +1426,8 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
         return {"rows": merged_rows, "table": table_name}
 
     # Fallback: no entity-bearing steps found, return last step with data
-    for step_key in step_keys:
+    all_step_keys = sorted(accumulated_data.keys(), reverse=True)
+    for step_key in all_step_keys:
         step_data = accumulated_data.get(step_key, {})
         rows = step_data.get("rows", [])
         if rows:
