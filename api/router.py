@@ -299,10 +299,10 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "Any question naming a business topic (pipeline, forecast, deals, ARR, "
         "quota, coverage, conversion) AND a time period (quarter, month, week, "
         "Q3, this month) is a DATA QUESTION, not orientation. Examples: "
-        "'what do you forecast for the quarter?' is query_forecast (data), "
-        "'how's pipeline this month?' is query_pipeline_movement (data), "
+        "'what do you forecast for the quarter?' is dynamic_query (data), "
+        "'how's pipeline this month?' is query_waterfall (data), "
         "'what can you tell me about deals?' is query_help (orientation). "
-        "Business metric + time period = data handler, always."
+        "Business metric + time period = data handler or dynamic_query, never query_help."
     ),
     "acknowledgment": (
         "A social acknowledgment or sign-off with no request behind it — "
