@@ -1873,7 +1873,7 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     # Build target map
     targets_by_email = {}
     for t in target_rows:
-        if t.get("metric") == "arr_won":  # or appropriate metric name
+        if t.get("metric") == "incremental_arr":  # new_arr + expansion_arr
             targets_by_email[t["entity_email"]] = t["target_value"]
     
     # If no targets found, return data gap

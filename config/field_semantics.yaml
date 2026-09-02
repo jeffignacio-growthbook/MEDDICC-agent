@@ -337,8 +337,14 @@ field_units:
 # ============================================================================
 # SALES TARGETS AND ATTAINMENT
 # ============================================================================
-# Targets are configured in config/targets.yaml, read through semantic assembly.
-# The agent receives assembled context; it never reads the file directly.
+# Source of truth: config/targets.yaml (edited by humans)
+# Query target: rep_targets table (seeded from config via scripts/seed_targets.py)
+#
+# The table is derived from config. After editing targets.yaml, run:
+#   python scripts/seed_targets.py
+#
+# Semantic context loads from config; handlers query the table.
+# This gives agents context and handlers efficient joins.
 #
 # Target basis: Incremental ARR (new_arr + expansion_arr)
 #   - Reps are measured on Incremental ARR, never renewal base
