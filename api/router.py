@@ -1304,17 +1304,19 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
         return {}
 
     if mode == "synthesis":
-        # Synthesis mode: return last step with data (current behavior)
-        step_keys = sorted(accumulated_data.keys(), reverse=True)
+        # Synthesis mode: return last step with data (aggregated results only)
+        # Filter out _raw keys — synthesis reads aggregates, not full populations
+        step_keys = sorted([k for k in accumulated_data.keys() if not k.endswith("_raw")], reverse=True)
         for step_key in step_keys:
             step_data = accumulated_data.get(step_key, {})
             rows = step_data.get("rows", [])
             if rows:
-                logger.info(f"[EXTRACT] synthesis mode: returning {len(rows)} rows from {step_key}")
+                logger.info(f"[EXTRACT] synthesis mode: returning {len(rows)} rows from {step_key} (aggregate)")
                 return {"rows": rows, "table": step_data.get("table", "unknown")}
         return {}
 
-    # Entity extraction mode: merge all entity-bearing steps
+    # Entity extraction mode: merge all entity-bearing steps from RAW results
+    # Use _raw keys to get full populations, not aggregated samples
     # Load entity registry to know which columns are entity IDs
     entity_id_columns = set()
     if sb:
@@ -1325,11 +1327,11 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
         except Exception as e:
             logger.warning(f"[EXTRACT] failed to load entity_registry: {e}")
 
-    # Scan steps in reverse order, looking for entity-bearing rows
-    step_keys = sorted(accumulated_data.keys(), reverse=True)
+    # Scan _raw steps in reverse order, looking for entity-bearing rows
+    raw_step_keys = sorted([k for k in accumulated_data.keys() if k.endswith("_raw")], reverse=True)
     entity_bearing_steps = []
 
-    for step_key in step_keys:
+    for step_key in raw_step_keys:
         step_data = accumulated_data.get(step_key, {})
         rows = step_data.get("rows", [])
 
@@ -1849,10 +1851,18 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                        f"aggregates + {len(aggregated.get('sample', []))}-row sample "
                        f"({aggregated.get('sample_basis', 'unknown basis')})")
 
-        accumulated_data[f"step_{iteration}"] = aggregated
+        # Store BOTH raw and aggregated results:
+        # - Raw result → entity extraction (preserves full populations)
+        # - Aggregated result → loop/synthesis (controlled context size)
+        # Neither should get the other's view.
+        accumulated_data[f"step_{iteration}_raw"] = result  # Full rows for extraction
+        accumulated_data[f"step_{iteration}"] = aggregated  # Aggregate for synthesis
+
         row_count = aggregated.get("row_count", len(aggregated.get("rows", [])))
-        logger.info(f"[STORE] saved step_{iteration} with {row_count} rows, "
-                    f"accumulated_data now has keys: {list(accumulated_data.keys())}")
+        sample_size = len(aggregated.get("rows", []))
+        logger.info(f"[STORE] saved step_{iteration}: {row_count} rows total "
+                    f"({sample_size} in aggregate, {len(result.get('rows', []))} in raw), "
+                    f"keys: {list(accumulated_data.keys())}")
 
         # PART 2b: a tool call that returns zero rows is no forward progress.
         # Two no-progress steps in a row end the loop.
