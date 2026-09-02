@@ -1385,15 +1385,19 @@ async def dynamic_query_loop(question, history, params,
         if m["role"] in ("user", "assistant")
     ]
 
+    # Build initial message content
+    content_parts = [
+        f"Question: {question}",
+        f"Time context: {params['time_window']['label']} = {params['time_window']['start']} to {params['time_window']['end']}",
+    ]
+    if quarter_context:
+        content_parts.append(quarter_context)
+    if hint:
+        content_parts.append(f"Context: {hint}")
+
     messages = [
         *history_messages,
-        {"role": "user",
-         "content": f"Question: {question}\n\n"
-                    f"Time context: {params['time_window']['label']} "
-                    f"= {params['time_window']['start']} to "
-                    f"{params['time_window']['end']}\n\n"
-                    f"{quarter_context}\n\n" if quarter_context else ""
-                    f"{f'Context: {hint}' if hint else ''}"}
+        {"role": "user", "content": "\n\n".join(content_parts)}
     ]
     accumulated_data = {}
     executed_tools = []  # Track tool calls to detect near-duplicates
