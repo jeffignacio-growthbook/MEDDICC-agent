@@ -10,6 +10,7 @@ import re
 import logging
 import sys
 from pathlib import Path
+from datetime import datetime
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from llm_client import LLMClient
 from api.db import get_supabase, log_unanswered, is_admin, get_prior_entities, get_api_history
@@ -1588,6 +1589,9 @@ async def dynamic_query_loop(question, history, params,
     ]
     accumulated_data = {}
     executed_tools = []  # Track tool calls to detect near-duplicates
+    queries_run = []  # Track all queries for fallback logging
+    had_answer_at_iteration = None  # Detect discarded_answer trigger
+
     # Raised from 20K to 40K after reducing per-turn cost via lightweight schema.
     # System prompt was 20K chars (5K tokens) — 3 turns = 15K before any work.
     # Lightweight mode reduces system to ~10K chars (2.5K tokens) — 3 turns = 7.5K.
@@ -1615,6 +1619,25 @@ async def dynamic_query_loop(question, history, params,
         "query_stale_deals": "finding a rep's stale deals",
         "query_sdr_metrics": "pulling an SDR's activity metrics",
     }
+
+    def _log_successful_query(question_text, queries, answer_text, tokens, handler, sb_client):
+        """Log successful query execution for handler roadmap building."""
+        try:
+            answer_excerpt = answer_text[:200] if answer_text else None
+            sb_client.table('fallback_log').insert({
+                'question': question_text,
+                'trigger': 'success',
+                'fast_path_attempted': handler,
+                'fast_path_failure': None,
+                'queries_run': queries,
+                'answered': True,
+                'answer_excerpt': answer_excerpt,
+                'tokens_used': tokens,
+                'latency_ms': None  # Not tracking latency yet
+            }).execute()
+            logger.info(f"[QUERY_LOG] Logged successful {handler} query with {len(queries)} operations")
+        except Exception as e:
+            logger.warning(f"[QUERY_LOG] Failed to log successful query: {e}")
 
     def _fallback_log(reason_tag):
         """Greppable structured line for every give-up (PART 1)."""
@@ -1785,7 +1808,16 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             # This created loops where complete answers were rejected, burning budget
             # on redundant iterations (e.g. iter=2 complete → iter=3 → iter=4 budget exhausted).
             logger.info(f"[ANSWER] has_answer=True at iteration {iteration}, returning immediately")
+
+            # Track that an answer was produced (for discarded_answer trigger detection)
+            had_answer_at_iteration = iteration
+
             tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
+
+            # Log successful dynamic query (adjustment #2: log fast path successes too)
+            _log_successful_query(question, queries_run, parsed["answer"], tokens_used,
+                                 origin_handler or "dynamic", sb)
+
             return {"answer": parsed["answer"], "tool_results": tool_results,
                     "answered": True}
 
@@ -1880,6 +1912,14 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         else:
             result = await tool_fn(sb, **tool_params)
 
+        # Track query for fallback logging
+        if "error" not in result:
+            queries_run.append({
+                "tool": tool_name,
+                "params": tool_params,
+                "rows_returned": len(result.get("rows", []))
+            })
+
         # DEBUG: Log tool execution result
         logger.info(f"[TOOL] {tool_name} rows={len(result.get('rows',[]))} "
                     f"error={result.get('error','none')}")
@@ -1953,6 +1993,26 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
     logger.info(f"[LOOP] iterations exhausted after "
                 f"{MAX_ITERATIONS} iterations, tokens={tokens_used}")
+
+    # Detect discarded_answer trigger: loop had answer but returned failure
+    # This is a control-flow bug where has_answer=True but we reached this point
+    if had_answer_at_iteration is not None:
+        logger.error(f"[DISCARDED_ANSWER] Loop had answer at iteration {had_answer_at_iteration} "
+                    f"but fell through to failure. This is a control-flow bug.")
+        # Log this as discarded_answer trigger for review
+        try:
+            sb.table('fallback_log').insert({
+                'question': question,
+                'trigger': 'discarded_answer',
+                'fast_path_attempted': origin_handler or 'dynamic',
+                'fast_path_failure': f'had_answer at iteration {had_answer_at_iteration} but returned failure',
+                'queries_run': queries_run,
+                'answered': False,
+                'tokens_used': tokens_used
+            }).execute()
+        except Exception:
+            pass
+
     return _finalize_from_data("iterations_exhausted")
 
 async def route_question(question: str, user_id: str,
