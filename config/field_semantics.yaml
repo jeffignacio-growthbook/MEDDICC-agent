@@ -249,6 +249,26 @@ field_units:
   overall_score: "0-70 MEDDICC total"
 
 # ============================================================================
+# FIELD FORMATS — EXACT FORMAT FOR FILTER CONSTRUCTION
+# ============================================================================
+# When constructing filters, use these exact formats. A mismatch returns 0 rows.
+#
+# fiscal_quarter format: "FYYYYQN" with space between year and quarter
+#   Correct:   fiscal_quarter = "FY2027 Q3"
+#   Incorrect: fiscal_quarter = "FY2027Q3" (no space, returns 0 rows)
+#
+#   Examples in forecast_weekly, waterfall_weekly, pipeline_generation_weekly:
+#   - "FY2027 Q3" (Aug 1 - Oct 31, 2026)
+#   - "FY2027 Q4" (Nov 1 - Jan 31, 2027)
+#   - "FY2028 Q1" (Feb 1 - Apr 30, 2027)
+#
+# date format: ISO 8601 "YYYY-MM-DD"
+#   Correct: close_date >= "2026-08-01"
+#
+# deal_status values: "active", "won", "lost" (lowercase)
+# ============================================================================
+
+# ============================================================================
 # SCOPE VOCABULARY — DISAMBIGUATE PIPELINE POPULATIONS
 # ============================================================================
 # The forecast answer conflated two different populations. An answer must
