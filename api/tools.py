@@ -45,8 +45,10 @@ HEAVY_COLUMNS = {
 
 async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by=None):
     _init_valid_columns(sb)
-    # Analyses table has large JSONB - limit to 50 rows max
-    max_limit = 50 if table == "analyses" else 200
+    # Hard cap at 50 rows to prevent synthesis context bloat.
+    # 100 rows was producing 27,969 chars — too large for synthesis.
+    # Entity extraction happens separately and preserves full populations.
+    max_limit = 50
     limit = min(limit or 50, max_limit)
     cols, unavailable = _validate_columns(table, columns or [])
     # If column validation found nothing valid, use safe defaults
@@ -60,7 +62,7 @@ async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by
     if invalid_ops:
         return {"error": f"Invalid operators: {invalid_ops}. Use one of: {sorted(VALID_OPS)}"}
 
-    # Before building filters, handle None values
+    # Before building filters, handle None values and format normalization
     processed_filters = []
     for f in valid_filters:
         op, col, val = f[0], f[1], f[2] if len(f) > 2 else None
@@ -79,7 +81,18 @@ async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by
             # a string into in.(6,0,7,8,...). (Live Bestseller incident.)
             processed_filters.append(("in_", col, _coerce_in_values(val)))
         else:
-            processed_filters.append((op, col, val))
+            # Normalize fiscal_quarter format: FY2027Q3 → FY2027 Q3
+            if col == "fiscal_quarter" and isinstance(val, str):
+                import re
+                # Match FY<year>Q<quarter> without space
+                if re.match(r'^FY\d{4}Q\d$', val):
+                    normalized = val[:6] + " " + val[6:]  # Insert space before Q
+                    print(f"[FILTER] Auto-corrected fiscal_quarter: '{val}' → '{normalized}'", flush=True)
+                    processed_filters.append((op, col, normalized))
+                else:
+                    processed_filters.append((op, col, val))
+            else:
+                processed_filters.append((op, col, val))
 
     # Use PostgREST order() for efficient top-N queries
     if order_by:
