@@ -1679,6 +1679,21 @@ Answer: {answer}
 Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
     for iteration in range(MAX_ITERATIONS):
+        # INSTRUMENTATION: Log context sizes to find what's accumulating
+        import json
+        sizes = {
+            "system": len(system),
+            "messages_total": sum(len(str(m.get('content', ''))) for m in messages),
+            "messages_count": len(messages),
+            "accumulated_data": len(json.dumps(accumulated_data, default=str)),
+            "accumulated_keys": list(accumulated_data.keys()),
+        }
+        logger.info(f"[LOOP iter={iteration}] context sizes: "
+                   f"system={sizes['system']}, "
+                   f"messages={sizes['messages_total']} ({sizes['messages_count']} msgs), "
+                   f"accumulated={sizes['accumulated_data']}, "
+                   f"keys={sizes['accumulated_keys']}")
+
         # Predictive budget check BEFORE making call
         # Estimate: current system + messages + 800 output
         estimated_input = len(system) // 4 + sum(len(str(m.get('content', ''))) // 4 for m in messages)
