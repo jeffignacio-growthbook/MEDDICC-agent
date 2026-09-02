@@ -1,0 +1,28 @@
+# Sales targets by quarter
+# Used to calculate gap to plan, attainment %, and required pipeline coverage
+
+targets:
+  fy2027_q3:
+    team_total: 1550000
+    basis: incremental_arr  # Reps are measured on Incremental ARR, never renewal base
+    reps:
+      jake.heier@growthbook.io:
+        target: 300000
+      christian.liebenow@growthbook.io:
+        target: 250000
+      james.shannon@growthbook.io:
+        target: 300000
+        note: corrected from 250000 after week 3
+      scott.keller@growthbook.io:
+        target: 300000
+      dan.wathne@growthbook.io:
+        target: 250000
+      marcel.geldner@growthbook.io:
+        target: 150000
+        ramp: true  # New AE on ramp quota (not full quota)
+    non_quota_roles:
+      - cary.rakin@growthbook.io
+      - andy.marshall@growthbook.io
+    non_quota_note: >
+      Account Managers. Incremental ARR retires to team total; no individual
+      quota by design. Not a data gap.

@@ -675,4 +675,73 @@ def build_semantic_context(config: Optional[Dict] = None) -> str:
 
                 lines.append("")
 
+    # ========================================================================
+    # 9. SALES TARGETS AND GAP TO PLAN
+    # ========================================================================
+    targets_path = Path(__file__).parent.parent / 'config' / 'targets.yaml'
+    if targets_path.exists():
+        with open(targets_path) as f:
+            targets_config = yaml.safe_load(f)
+
+        lines.append("## Sales Targets")
+        lines.append("")
+
+        # Get current fiscal quarter to show relevant target
+        today = date.today()
+        if today.month >= fy_start_month:
+            current_fy = today.year + 1
+        else:
+            current_fy = today.year
+
+        # Determine which quarter we're in
+        month_in_fy = (today.month - fy_start_month) % 12
+        current_q = (month_in_fy // 3) + 1
+
+        current_quarter_key = f"fy{current_fy}_q{current_q}"
+
+        targets = targets_config.get('targets', {})
+
+        # Show current quarter targets first
+        if current_quarter_key in targets:
+            qt = targets[current_quarter_key]
+            lines.append(f"**FY{current_fy} Q{current_q} Targets** (basis: {qt.get('basis', 'incremental_arr')})")
+            lines.append(f"  Team total: ${qt['team_total']:,}")
+            lines.append("")
+
+            # Rep targets
+            lines.append("  Individual quotas:")
+            reps = qt.get('reps', {})
+            for email, rep_data in reps.items():
+                target = rep_data['target'] if isinstance(rep_data, dict) else rep_data
+                note = ""
+                if isinstance(rep_data, dict):
+                    if rep_data.get('ramp'):
+                        note = " (ramp quota)"
+                    elif rep_data.get('note'):
+                        note = f" — {rep_data['note']}"
+                lines.append(f"    {email}: ${target:,}{note}")
+            lines.append("")
+
+            # Non-quota roles
+            if 'non_quota_roles' in qt:
+                lines.append("  Account Managers (no individual quota):")
+                for email in qt['non_quota_roles']:
+                    lines.append(f"    {email}")
+                lines.append("")
+                if 'non_quota_note' in qt:
+                    lines.append(f"  Note: {qt['non_quota_note']}")
+                    lines.append("")
+
+        lines.append("**Gap to Plan Frame:**")
+        lines.append("  Default frame for forecast/pipeline/attainment questions:")
+        lines.append("  ✓ 'Q3 forecast is $1.9M against $1.55M target — $350K headroom'")
+        lines.append("  ✗ 'Q3 forecast is $1.9M' (no context)")
+        lines.append("")
+
+        lines.append("**Required Pipeline:**")
+        lines.append("  Use measured conversion rate, not fixed multiples")
+        lines.append("  Formula: required_pipeline = target ÷ measured_conversion_rate")
+        lines.append("  (Coverage multiples like 2.5x are miscalibrated vs actual ~9.9%)")
+        lines.append("")
+
     return "\n".join(lines)

@@ -333,3 +333,36 @@ field_units:
 # without clarifying whether that's "Discovery deals overall" or "Discovery
 # deals closing in Q3".
 # ============================================================================
+
+# ============================================================================
+# SALES TARGETS AND ATTAINMENT
+# ============================================================================
+# Targets are configured in config/targets.yaml, read through semantic assembly.
+# The agent receives assembled context; it never reads the file directly.
+#
+# Target basis: Incremental ARR (new_arr + expansion_arr)
+#   - Reps are measured on Incremental ARR, never renewal base
+#   - Renewal revenue (renewal_revenue) belongs to GRR/NRR metrics
+#   - Attainment = (new_arr + expansion_arr) / target
+#
+# Team structure:
+#   - Team total is the sum of AE quotas
+#   - Account Managers (AMs) contribute revenue without a personal quota
+#   - AMs appear in revenue contribution but never in attainment %
+#   - A rep with no target is not a data gap if they are in non_quota_roles
+#
+# Gap to plan frame:
+#   - Default frame for forecast, pipeline, and attainment questions
+#   - Not: "Q3 forecast is $1.9M"
+#   - But: "Q3 forecast is $1.9M against a $1.55M target — $350K headroom"
+#
+# Required pipeline calculation:
+#   - Use measured conversion rate, not fixed coverage multiples
+#   - Required pipeline = target ÷ measured_conversion_rate
+#   - Example: $1.55M target ÷ 9.9% conversion = ~$15.7M required
+#   - Coverage multiples (2.5x, 2.0x in config) are miscalibrated vs ~9.9% actual
+#
+# Constraints:
+#   - Targets are facts the client provides, not values the agent derives
+#   - If a quarter has no target configured, say so rather than inferring
+# ============================================================================
