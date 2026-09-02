@@ -1646,6 +1646,19 @@ async def dynamic_query_loop(question, history, params,
             f"reason={origin_reason or reason_tag} "
             f"question={question!r}"
         )
+        # Write to fallback_log table for weekly review
+        try:
+            sb.table('fallback_log').insert({
+                'question': question,
+                'trigger': reason_tag,
+                'fast_path_attempted': origin_handler or 'dynamic',
+                'fast_path_failure': origin_reason or reason_tag,
+                'queries_run': queries_run,
+                'answered': False,
+                'tokens_used': tokens_used
+            }).execute()
+        except Exception as e:
+            logger.error(f"[FALLBACK] Failed to write fallback_log: {e}")
 
     def _diagnostic_answer(tail):
         """PLAIN user-facing sentence — names what fell through, no jargon."""
@@ -2566,6 +2579,21 @@ async def route_question(question: str, user_id: str,
                     f"result={_result_summary(tool_results)} — sending honest miss")
         verified = _honest_miss(question, entity_count)
         handler_name = f"{handler_name}_below_floor"
+
+        # Log to fallback_log for weekly review
+        try:
+            sb.table('fallback_log').insert({
+                'question': question,
+                'trigger': 'below_floor',
+                'fast_path_attempted': handler_name.replace('_below_floor', ''),
+                'fast_path_failure': f"assessment score {assessment.get('score', 0):.2f} below floor {ASSESS_CORRECTNESS_FLOOR:.2f}",
+                'queries_run': None,  # handlers don't track granular queries
+                'answered': False,
+                'answer_excerpt': verified[:200] if verified else None,
+                'tokens_used': tokens_used
+            }).execute()
+        except Exception as e:
+            logger.error(f"[FALLBACK] Failed to write below_floor log: {e}")
 
     # ── 9. Log learning note (win or lose) ────────────────
     _log_learning(sb, question, handler_name,
