@@ -1864,11 +1864,18 @@ async def query_rep_attainment(params: dict, sb) -> dict:
         ("eq", "level", "rep"),
         ("eq", "role", "ae")
     ]
-    
+
+    logger.info(f"[REP_TARGETS] computed period={period!r} from quarter resolution")
+    logger.info(f"[REP_TARGETS] url_filters=period={period} level=rep role=ae")
+
     target_rows = select_all(sb, "rep_targets",
         columns="entity_email,target_value,metric",
         filters=target_filters
     )
+
+    logger.info(f"[REP_TARGETS] row count: {len(target_rows) if target_rows else 0}")
+    if target_rows:
+        logger.info(f"[REP_TARGETS] sample row: {target_rows[0] if target_rows else None}")
     
     # Build target map
     targets_by_email = {}

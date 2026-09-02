@@ -6,9 +6,12 @@ quota targets, and unanswered query logs.
 
 import os
 import json
+import base64
+import logging
 from datetime import datetime, timezone, timedelta
 from supabase import create_client, Client
 
+logger = logging.getLogger("cro_agent")
 _sb = None
 
 def get_supabase() -> Client:
@@ -19,7 +22,26 @@ def get_supabase() -> Client:
             os.environ["SUPABASE_URL"],
             os.environ["SUPABASE_SERVICE_KEY"]
         )
+        # Log which role this key grants (diagnostic for RLS issues)
+        _log_supabase_role()
     return _sb
+
+
+def _log_supabase_role():
+    """Log the role claim from SUPABASE_SERVICE_KEY for RLS diagnostics."""
+    key = os.environ.get("SUPABASE_SERVICE_KEY", "")
+    try:
+        # JWT payload is the second part (header.payload.signature)
+        payload_b64 = key.split(".")[1]
+        # Add padding if needed
+        payload_b64 += "=" * (4 - len(payload_b64) % 4)
+        payload = json.loads(base64.b64decode(payload_b64))
+        role = payload.get("role", "unknown")
+        logger.info(f"[SUPABASE] connected as role={role}")
+        if role == "anon":
+            logger.warning("[SUPABASE] WARNING: Using anon key instead of service_role key - RLS will block queries")
+    except Exception as e:
+        logger.error(f"[SUPABASE] could not decode key role: {e}")
 
 
 def unpack_jsonb(value, default=None):
