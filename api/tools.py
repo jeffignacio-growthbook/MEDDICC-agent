@@ -45,10 +45,10 @@ HEAVY_COLUMNS = {
 
 async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by=None):
     _init_valid_columns(sb)
-    # Hard cap at 50 rows to prevent synthesis context bloat.
-    # 100 rows was producing 27,969 chars — too large for synthesis.
-    # Entity extraction happens separately and preserves full populations.
-    max_limit = 50
+    # Fetch ceiling (safety limit on database query size).
+    # Aggregation happens before synthesis, so this is NOT the synthesis budget.
+    # Large result sets get aggregated into summaries + samples in router.py.
+    max_limit = 500
     limit = min(limit or 50, max_limit)
     cols, unavailable = _validate_columns(table, columns or [])
     # If column validation found nothing valid, use safe defaults

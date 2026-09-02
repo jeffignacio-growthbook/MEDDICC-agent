@@ -1134,6 +1134,142 @@ def _summarize_accumulated(data: dict) -> str:
             parts.append(f"{len(rows)} rows from {result.get('table', key)}")
     return "; ".join(parts) if parts else "no data found"
 
+def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = None) -> dict:
+    """
+    Aggregate large result sets and sample for synthesis.
+
+    Small results (≤ sample_size) pass through whole. Large results get
+    aggregated + sampled + truncation flag.
+
+    Args:
+        result: Tool result with "rows" key
+        sample_size: Max rows for synthesis (default 20)
+        order_by: Column result was ordered by (determines sample basis)
+
+    Returns dict with:
+        - row_count: Total row count (always)
+        - aggregates: {sum/mean/min/max, counts by category, null counts}
+        - sample: Top N rows (when truncated)
+        - sample_basis: How sample was selected
+        - truncated: True when result > sample_size
+        - rows: All rows if ≤ sample_size, else sample
+        - table: Original table name
+    """
+    from datetime import date
+    import re
+
+    rows = result.get("rows", [])
+    row_count = len(rows)
+
+    # Small results pass through whole
+    if row_count <= sample_size:
+        return {**result, "row_count": row_count, "truncated": False}
+
+    # Large results: aggregate + sample
+    aggregates = {"row_count": row_count}
+    null_counts = {}
+
+    # Identify column types from first row
+    if rows:
+        sample_row = rows[0]
+        numeric_cols = []
+        text_cols = []
+        date_cols = []
+
+        for col, val in sample_row.items():
+            if val is None:
+                continue  # Can't infer type from None
+            if isinstance(val, (int, float)):
+                numeric_cols.append(col)
+            elif isinstance(val, str):
+                # Check if date-like (YYYY-MM-DD)
+                if re.match(r'^\d{4}-\d{2}-\d{2}', val):
+                    date_cols.append(col)
+                else:
+                    # Count distinct values to detect low-cardinality
+                    distinct = len(set(r.get(col) for r in rows if r.get(col) is not None))
+                    if distinct <= 20:  # Low cardinality threshold
+                        text_cols.append(col)
+
+        # Aggregate numeric columns
+        for col in numeric_cols:
+            vals = [r.get(col) for r in rows if r.get(col) is not None]
+            null_count = row_count - len(vals)
+            if null_count > 0:
+                null_counts[col] = null_count
+
+            if vals:
+                aggregates[col] = {
+                    "sum": round(sum(vals), 2),
+                    "mean": round(sum(vals) / len(vals), 2),
+                    "min": round(min(vals), 2),
+                    "max": round(max(vals), 2),
+                }
+
+        # Count by low-cardinality text columns
+        for col in text_cols:
+            counts = {}
+            null_count = 0
+            for r in rows:
+                val = r.get(col)
+                if val is None:
+                    null_count += 1
+                else:
+                    counts[val] = counts.get(val, 0) + 1
+
+            if null_count > 0:
+                null_counts[col] = null_count
+
+            if counts:
+                # Sort by count desc, keep top 10
+                sorted_counts = sorted(counts.items(), key=lambda x: x[1], reverse=True)
+                aggregates[f"{col}_counts"] = dict(sorted_counts[:10])
+
+        # Aggregate date columns
+        for col in date_cols:
+            vals = [r.get(col) for r in rows if r.get(col) is not None]
+            null_count = row_count - len(vals)
+            if null_count > 0:
+                null_counts[col] = null_count
+
+            if vals:
+                today_str = date.today().isoformat()
+                past_today = len([v for v in vals if v < today_str])
+                aggregates[col] = {
+                    "earliest": min(vals),
+                    "latest": max(vals),
+                    "past_today": past_today,
+                }
+
+        if null_counts:
+            aggregates["null_counts"] = null_counts
+
+    # Determine sample and sample_basis
+    if order_by:
+        # Parse order_by: "deal_value desc" → col="deal_value", direction="desc"
+        parts = order_by.split()
+        order_col = parts[0]
+        direction = parts[1].lower() if len(parts) > 1 else "asc"
+
+        if direction == "desc":
+            sample_basis = f"{sample_size} largest by {order_col}"
+        else:
+            sample_basis = f"{sample_size} smallest by {order_col}"
+    else:
+        sample_basis = f"first {sample_size} rows (no ordering specified)"
+
+    sample = rows[:sample_size]
+
+    return {
+        "rows": sample,
+        "row_count": row_count,
+        "aggregates": aggregates,
+        "sample": sample,
+        "sample_basis": sample_basis,
+        "truncated": True,
+        "table": result.get("table", "unknown"),
+    }
+
 def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_extraction", sb=None) -> dict:
     """
     Extract rows from accumulated_data for entity context or synthesis.
@@ -1685,8 +1821,17 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         logger.info(f"[TOOL] {tool_name} rows={len(result.get('rows',[]))} "
                     f"error={result.get('error','none')}")
 
-        accumulated_data[f"step_{iteration}"] = result
-        row_count = len(result.get("rows", []))
+        # Aggregate large results before storing for synthesis
+        order_by_param = tool_params.get("order_by") if tool_name == "filter_table" else None
+        aggregated = _aggregate_and_sample(result, sample_size=20, order_by=order_by_param)
+
+        if aggregated.get("truncated"):
+            logger.info(f"[AGGREGATE] {aggregated['row_count']} rows → "
+                       f"aggregates + {len(aggregated.get('sample', []))}-row sample "
+                       f"({aggregated.get('sample_basis', 'unknown basis')})")
+
+        accumulated_data[f"step_{iteration}"] = aggregated
+        row_count = aggregated.get("row_count", len(aggregated.get("rows", [])))
         logger.info(f"[STORE] saved step_{iteration} with {row_count} rows, "
                     f"accumulated_data now has keys: {list(accumulated_data.keys())}")
 
