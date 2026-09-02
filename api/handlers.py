@@ -1882,7 +1882,15 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     for t in target_rows:
         if t.get("metric") == "incremental_arr":  # new_arr + expansion_arr
             targets_by_email[t["entity_email"]] = t["target_value"]
-    
+
+    logger.info(f"[REP_TARGETS] targets_by_email after filter: {len(targets_by_email)} entries")
+    if targets_by_email:
+        logger.info(f"[REP_TARGETS] sample target: {list(targets_by_email.items())[0]}")
+    else:
+        logger.warning(f"[REP_TARGETS] targets_by_email is EMPTY after processing {len(target_rows)} rows")
+        if target_rows:
+            logger.warning(f"[REP_TARGETS] First row metric value: {target_rows[0].get('metric')!r}")
+
     # If no targets found, return data gap
     if not targets_by_email:
         return {
