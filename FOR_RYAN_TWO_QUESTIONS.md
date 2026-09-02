@@ -1,6 +1,6 @@
-# For Ryan — Two Questions
+# For Ryan — Three Questions
 
-One conversation, two questions that matter for the semantic layer.
+One conversation, three questions that matter for the semantic layer and forecast accuracy.
 
 ---
 
@@ -95,14 +95,71 @@ ORDER BY month DESC LIMIT 12;
 
 ---
 
+## Question 3: Is Scoping converting at 30% or 10%?
+
+### The Finding
+
+**Scoping stage** configured at 0.10 (10%), measures 0.338 (33.8%) pooled all-time.
+
+That's a **3x understatement** — deals in Scoping are worth three times what the forecast model says.
+
+```
+Quarter      Won  Lost  Total   Rate
+────────────────────────────────────
+FY2026 Q3     2     4     6    33.3%
+FY2026 Q4     3     6     9    33.3%
+FY2027 Q1     8    13    21    38.1%
+FY2027 Q2    12    22    34    35.3%  ← 48% of wins here
+FY2027 Q3     0     4     4     0.0%  ← recent drop
+────────────────────────────────────
+TOTAL        25    49    74    33.8%
+
+Variance: σ=0.158 (high), CV=0.563 (coefficient of variation)
+```
+
+### Why This Matters
+
+**If Scoping really converts at 30%+**: Forecast is systematically understating deals in that stage. Mid-quarter attention should shift earlier (Scoping matters more than model says).
+
+**If it's unstable**: The 33.8% pooled rate hides variance. Q2 FY2027 did the heavy lifting (12 of 25 wins), and most recent quarter is 0% (small n=4, but concerning).
+
+**Current impact**: 8 deals in Scoping in FY2027 Q3 pipeline, $920K value
+- At configured 0.10: $92K weighted
+- At measured 0.338: $311K weighted
+- Difference: **+$219K** if updated
+
+### What We Need
+
+**Your read**: Is Scoping conversion trending up, or was Q2 FY2027 an anomaly?
+
+Possible explanations:
+1. **Process change**: Scoping qualification got stricter → only strong deals advance → higher conversion
+2. **Segment mix**: More Enterprise deals (convert higher) in recent quarters
+3. **One strong quarter**: Q2 was 35.3% with 48% of wins; earlier quarters more like 33%; most recent 0%
+4. **Small sample**: Only 74 deals total, 25 wins — rates swing several points per deal
+
+### Recommendation
+
+**Don't update yet** — variance too high (σ=0.158), sample too small (n=74), and recent quarter dropped to 0%.
+
+But **worth monitoring**:
+- If next 2-3 quarters stay around 30-35% → update to measured rate
+- If it reverts to 15-20% → configured 10% was conservative but close enough
+- If it stays volatile → bigger question about Scoping qualification consistency
+
+**For now**: Note that deals in Scoping may be worth 3x model weight, watch mid-quarter pipeline composition.
+
+---
+
 ## Why Bundle These?
 
-Both are **semantic facts** — definitions that affect how the agent interprets and answers questions.
+All three are **semantic facts** — definitions that affect how the agent interprets and answers questions.
 
-"At risk" defines a deal state (which deals to flag).
-Deal size bias defines an adjustment (which average to use in forecasts).
+- "At risk" defines a deal state (which deals to flag)
+- Deal size bias defines an adjustment (which average to use in forecasts)
+- Scoping probability defines stage weighting (how much to value deals in that stage)
 
-Getting both right in one conversation sets the foundation for the semantic layer going forward.
+Getting all three right in one conversation sets the foundation for the semantic layer going forward.
 
 ---
 
@@ -113,8 +170,9 @@ After you provide answers:
 1. **config/field_semantics.yaml** — Add `deal_states.at_risk` with your definition
 2. **api/handlers.py** — Update `query_deals_at_risk()` to implement your criteria
 3. **config/metrics.yaml** — Document deal size bias cause and whether to track monthly
-4. If activity-based: **schema migration** to add `last_activity_date` to deals table
-5. If slippage-based: **schema migration** to add `close_date_history` JSONB to track changes
+4. **config/client.yaml** — Update Scoping stage_probability if you decide to (0.10 → measured rate)
+5. If activity-based: **schema migration** to add `last_activity_date` to deals table
+6. If slippage-based: **schema migration** to add `close_date_history` JSONB to track changes
 
 ---
 
