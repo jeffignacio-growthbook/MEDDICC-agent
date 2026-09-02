@@ -19,7 +19,7 @@ def _stage_prose() -> str:
     parts = [f"'{sid}' = {info['label']}" for sid, info in STAGE_MAP.items() if info.get('bucket') in ['discovery', 'scoping', 'proposal']]
     return ", ".join(parts[:3])  # Show first 3 for brevity
 
-def get_schema_context(sb, tables_with_descriptions=None):
+def get_schema_context(sb, tables_with_descriptions=None, lightweight=False):
     """
     Build schema context for dynamic query loop.
 
@@ -28,23 +28,26 @@ def get_schema_context(sb, tables_with_descriptions=None):
         tables_with_descriptions: List of table names that should get full descriptions.
                                  If None, all tables get full descriptions (legacy behavior).
                                  If list, other tables get column names only.
+        lightweight: If True, only include descriptions for core columns (identifiers,
+                    values, status) to reduce prompt size. Other columns get name+type only.
 
     Returns hybrid schema:
         - ALL tables' names + column names (~1,500 tokens)
         - Full descriptions ONLY for tables in tables_with_descriptions (~2,000 tokens)
+        - If lightweight=True, descriptions only for core columns (~500 tokens)
     """
-    # Don't cache when using selective descriptions
-    if tables_with_descriptions is not None:
-        return _build_schema_context(sb, tables_with_descriptions)
+    # Don't cache when using selective descriptions or lightweight mode
+    if tables_with_descriptions is not None or lightweight:
+        return _build_schema_context(sb, tables_with_descriptions, lightweight)
 
     # Legacy behavior: cache full schema
     global _cached_context
     if _cached_context:
         return _cached_context
-    _cached_context = _build_schema_context(sb, tables_with_descriptions=None)
+    _cached_context = _build_schema_context(sb, tables_with_descriptions=None, lightweight=False)
     return _cached_context
 
-def _build_schema_context(sb, tables_with_descriptions):
+def _build_schema_context(sb, tables_with_descriptions, lightweight=False):
     """Build schema context with optional selective descriptions."""
     from supabase_client import select_all
     rows = select_all(sb, "data_dictionary",
@@ -64,6 +67,20 @@ def _build_schema_context(sb, tables_with_descriptions):
     else:
         # Hybrid: only specified tables get full descriptions
         tables_with_full_desc = set(tables_with_descriptions)
+
+    # Core columns that always get descriptions (lightweight mode)
+    # Identifiers, values, status, dates — essentials for most queries
+    core_columns = {
+        "deal_id", "company_name", "owner_email", "owner_name",
+        "deal_value", "arr_usd", "new_arr", "expansion_arr", "renewal_revenue",
+        "deal_status", "stage", "pipeline_id",
+        "close_date", "created_at", "create_date",
+        "segment", "forecast_category",
+        # Analyses table cores
+        "overall_score", "champion_score", "economic_buyer_score",
+        "metrics_score", "decision_criteria_score", "decision_process_score",
+        "identify_pain_score", "compelling_event_score",
+    }
 
     lines = ["QUERYABLE SUPABASE TABLES AND COLUMNS:", "(Use these exact column names in query tool calls)", ""]
 
@@ -100,8 +117,17 @@ TABLE RELATIONSHIPS:
             enum, hs = c.get("enum_values"), c.get("hubspot_name") or ""
             hs_note = f" [HubSpot: {hs}]" if hs and hs != col else ""
 
-            # Full description only for relevant tables
+            # Determine if this column gets a description
+            should_describe = False
             if table in tables_with_full_desc:
+                if lightweight:
+                    # Lightweight mode: only core columns get descriptions
+                    should_describe = col in core_columns
+                else:
+                    # Full mode: all columns in relevant tables get descriptions
+                    should_describe = True
+
+            if should_describe:
                 cdesc = (c.get("description") or "")[:80]
                 line = f"  {col} ({dtype}){hs_note}: {cdesc}"
                 if enum and dtype == "enumeration":

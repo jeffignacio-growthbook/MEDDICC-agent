@@ -1531,7 +1531,10 @@ async def dynamic_query_loop(question, history, params,
         question, classifier_client or client)
     logger.info(f"[SCHEMA] Relevant tables for full descriptions: {relevant_tables}")
 
-    schema = get_schema_context(sb, tables_with_descriptions=relevant_tables)
+    # Lightweight mode: only core columns get descriptions to reduce prompt size
+    # 20K char system prompt was costing 5K tokens per turn. Lightweight mode
+    # includes only essential columns (identifiers, values, status, dates).
+    schema = get_schema_context(sb, tables_with_descriptions=relevant_tables, lightweight=True)
 
     # Build semantic context (fiscal calendar, pipeline meanings, vocabulary)
     import sys
@@ -1573,7 +1576,11 @@ async def dynamic_query_loop(question, history, params,
     ]
     accumulated_data = {}
     executed_tools = []  # Track tool calls to detect near-duplicates
-    TOKEN_BUDGET = 20000  # ~$0.20 at Sonnet pricing - complex joins need headroom
+    # Raised from 20K to 40K after reducing per-turn cost via lightweight schema.
+    # System prompt was 20K chars (5K tokens) — 3 turns = 15K before any work.
+    # Lightweight mode reduces system to ~10K chars (2.5K tokens) — 3 turns = 7.5K.
+    # Budget is now a backstop, not the primary constraint.
+    TOKEN_BUDGET = 40000
     tokens_used = 0
     MAX_ITERATIONS = 5
     # PART 2b: repetition / no-progress detection. A duplicate tool call, a
