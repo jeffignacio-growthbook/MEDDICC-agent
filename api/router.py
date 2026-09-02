@@ -1779,27 +1779,13 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             continue
 
         if "answer" in parsed:
-            # Evaluate answer quality with Haiku
-            try:
-                eval_resp = client.complete(
-                    messages=[{"role": "user", "content":
-                        EVAL_PROMPT.format(question=question, answer=parsed["answer"])
-                    }],
-                    max_tokens=100
-                )
-                eval_result = _extract_json(eval_resp.text)
-                score = eval_result.get("score", 0.5) if eval_result else 0.5
-                if score < 0.7 and iteration < MAX_ITERATIONS - 1:
-                    missing = eval_result.get("missing", "more specifics") if eval_result else "more specifics"
-                    messages.append({"role": "user",
-                        "content": f"Score: {score:.1f}/1. Missing: {missing}. Improve with more specific data."})
-                    continue
-            except Exception:
-                pass
-            # Extract rows from accumulated data for entity context
-            logger.info(f"[ANSWER] extracting entity context from accumulated_data with keys: {list(accumulated_data.keys())}")
+            # has_answer=True → return immediately
+            # The model decided it has enough data to answer. Trust that decision.
+            # Previous behavior: evaluated answer quality and continued if score < 0.7.
+            # This created loops where complete answers were rejected, burning budget
+            # on redundant iterations (e.g. iter=2 complete → iter=3 → iter=4 budget exhausted).
+            logger.info(f"[ANSWER] has_answer=True at iteration {iteration}, returning immediately")
             tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-            logger.info(f"[ANSWER] extracted tool_results with {len(tool_results.get('rows',[]))} rows")
             return {"answer": parsed["answer"], "tool_results": tool_results,
                     "answered": True}
 
