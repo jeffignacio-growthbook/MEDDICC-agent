@@ -2,7 +2,7 @@ name: Weekly Analytics
 
 on:
   schedule:
-    - cron: '0 3 * * 0'  # Sunday 3:00 AM UTC
+    - cron: '0 3 * * 1'  # Monday 3:00 AM UTC (matches weekly-snapshot.yml grid)
   workflow_dispatch:
 
 permissions:

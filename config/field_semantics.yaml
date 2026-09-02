@@ -23,6 +23,42 @@
 # compute_forecast.py is fixed to use incremental components only.
 # ============================================================================
 
+# ============================================================================
+# PRECOMPUTED TABLES — PREFER THESE OVER RAW AGGREGATION
+# ============================================================================
+# These tables hold reconciled, point-in-time values. Use them instead of
+# summing raw deals when they cover the metric being asked about.
+#
+# forecast_weekly:
+#   - Columns: fiscal_quarter, week_of_quarter, computed_at,
+#              stage_weighted_forecast, historical_conversion_low/mid/high
+#   - Contains: Quarter forecast by stage probability and historical conversion
+#   - Use for: "What do you forecast for Q3?" type questions
+#
+# waterfall_weekly:
+#   - Columns: fiscal_quarter, week_of_quarter, computed_at, deal_id,
+#              category (new_to_pipeline, pulled_in, pushed_out, etc.)
+#   - Contains: Pipeline movement categorization for waterfall charts
+#   - Use for: "What entered the pipeline?" "What slipped?" type questions
+#
+# pipeline_generation_weekly:
+#   - Columns: fiscal_quarter, week_of_quarter, computed_at, new_deal_count,
+#              new_deal_value, by_source, by_rep
+#   - Contains: New pipeline generation metrics
+#   - Use for: "How much pipeline did we generate?" type questions
+#
+# STALENESS GUARD (CRITICAL):
+# A precomputed value is only valid if recent. If computed_at is stale relative
+# to the question, STATE IT rather than silently serving an old number.
+# Example: "Last computed 21 days ago on 2026-08-10 — may not reflect recent changes."
+#
+# If stale, either:
+# - Return the precomputed value WITH the staleness caveat, OR
+# - Fall back to raw aggregation (slower but current)
+#
+# Never silently serve a 3-week-old forecast as if it's today's number.
+# ============================================================================
+
 stage_map:
   appointmentscheduled:
     label: "Discovery"
@@ -181,10 +217,27 @@ deal_states:
 
     implementation: query_deals_at_risk  # Placeholder until definition confirmed
 
+# ============================================================================
+# FIELD DISPLAY NAMES — USE IN SYNTHESIS, NOT COLUMN NAMES
+# ============================================================================
+# User-facing answers must use these display names, never raw column names.
+# A synthesis that says "deal_value" means nothing to a CRO who thinks in ARR.
+#
+# Field → Display Name mapping:
+field_display_names:
+  deal_value: "Incremental ARR"
+  arr_usd: "Total ARR"
+  new_arr: "New ARR"
+  expansion_arr: "Expansion ARR"
+  renewal_revenue: "Renewal ARR"
+  close_date: "Expected Close Date"
+  created_at: "Created Date"
+  stage_probability: "Win Probability"
+
 # Field units and meanings the handlers depend on. Extend as needed.
 field_units:
   arr_usd: "US dollars, annual recurring"
-  deal_value: "US dollars, total contract value"
+  deal_value: "US dollars, incremental ARR (new + expansion)"
   duration_minutes: "minutes"
   champion_score: "0-10 MEDDICC component"
   economic_buyer_score: "0-10 MEDDICC component"
@@ -194,3 +247,40 @@ field_units:
   identify_pain_score: "0-10 MEDDICC component"
   compelling_event_score: "0-10 MEDDICC component"
   overall_score: "0-70 MEDDICC total"
+
+# ============================================================================
+# SCOPE VOCABULARY — DISAMBIGUATE PIPELINE POPULATIONS
+# ============================================================================
+# The forecast answer conflated two different populations. An answer must
+# state which scope it means.
+#
+# Three distinct scopes:
+#
+# 1. OPEN PIPELINE
+#    - All active deals (deal_status = 'active')
+#    - Regardless of close date
+#    - Includes deals closing this quarter, next quarter, and beyond
+#    - Use case: "How much pipeline do we have overall?"
+#
+# 2. QUARTER PIPELINE
+#    - Deals with close_date inside a specific quarter
+#    - Example: FY2027 Q3 = Aug 1 - Oct 31, 2026
+#    - Subset of open pipeline scoped by close date
+#    - Use case: "What's in the Q3 pipeline?" "What do you forecast for Q3?"
+#
+# 3. QUALIFIED PIPELINE
+#    - At or above qualified_stage_order threshold
+#    - Excludes parking-lot stages (exclude_from_analysis: true)
+#    - Excludes renewal pipeline (if specified in config)
+#    - Can be combined with Quarter (qualified Q3 pipeline)
+#    - Use case: "How much qualified pipeline do we have?"
+#
+# Examples that are DIFFERENT QUESTIONS:
+# - "$16.1M open" = all active deals (answer #1)
+# - "$7.6M Q3" = deals closing in Q3 (answer #2)
+# - "$4.2M qualified Q3" = qualified deals closing in Q3 (answer #2 + #3)
+#
+# Handler logic MUST state which scope it used. Never say "$7.6M in Discovery"
+# without clarifying whether that's "Discovery deals overall" or "Discovery
+# deals closing in Q3".
+# ============================================================================

@@ -161,9 +161,8 @@ def extract_entity_context(tool_results: dict, sb=None) -> dict:
             entities[entity_type]["ids"] = list(dict.fromkeys(entities[entity_type]["ids"]))
             entities[entity_type]["labels"] = list(dict.fromkeys(entities[entity_type]["labels"]))
 
-            # Cap at 20 AFTER dedup
-            entities[entity_type]["ids"] = entities[entity_type]["ids"][:20]
-            entities[entity_type]["labels"] = entities[entity_type]["labels"][:20]
+            # NO CAP HERE - entity extraction preserves full population for follow-ups
+            # Capping happens in synthesis via _cap_rows_for_synthesis() in router.py
 
     # 3. Nested single-entity special case (registry-driven)
     # Handles returns like {"deal": {"deal_id": "...", "company_name": "..."}}
