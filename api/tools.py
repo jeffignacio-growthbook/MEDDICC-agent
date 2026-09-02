@@ -23,7 +23,8 @@ def _validate_columns(table, columns):
         (good if c in valid or not valid else bad).append(c)
     if bad:
         print(f"  ⚠️  Ignoring unknown columns for {table}: {bad}")
-    return good or list(valid)[:10]
+    # Return (good_columns, unavailable_columns) so caller can surface them
+    return good or list(valid)[:10], bad
 
 def _validate_filters(table, filters):
     valid = _VALID_COLUMNS.get(table, set())
@@ -47,7 +48,7 @@ async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by
     # Analyses table has large JSONB - limit to 50 rows max
     max_limit = 50 if table == "analyses" else 200
     limit = min(limit or 50, max_limit)
-    cols = _validate_columns(table, columns or [])
+    cols, unavailable = _validate_columns(table, columns or [])
     # If column validation found nothing valid, use safe defaults
     if not cols:
         cols = ["deal_id", "company_name", "deal_value",
@@ -91,11 +92,17 @@ async def filter_table(sb, table, columns=None, filters=None, limit=50, order_by
             q = getattr(q, f[0])(*f[1:])
         q = q.order(col, desc=(direction == 'desc'))
         rows = q.limit(limit).execute().data or []
-        return {"rows": rows, "total_found": len(rows), "table": table, "truncated": False}
+        result = {"rows": rows, "total_found": len(rows), "table": table, "truncated": False}
+        if unavailable:
+            result["unavailable_columns"] = unavailable
+        return result
     else:
         # No ordering - use paginated select_all
         rows = select_all(sb, table, columns=",".join(cols) if cols else "*", filters=processed_filters)
-        return {"rows": rows[:limit], "total_found": len(rows), "table": table, "truncated": len(rows) > limit}
+        result = {"rows": rows[:limit], "total_found": len(rows), "table": table, "truncated": len(rows) > limit}
+        if unavailable:
+            result["unavailable_columns"] = unavailable
+        return result
 
 async def join_tables(sb, primary_table, primary_key, joined_table, foreign_key,
                       primary_filters=None, joined_columns=None, limit=50):

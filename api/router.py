@@ -294,11 +294,15 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "('hi, how's the Acme deal?') — route on the question. DO NOT use it "
         "for 'help me [do a real thing]' ('help me prep for Acme', 'help me "
         "understand this deal') — those are task requests (e.g. "
-        "query_pre_call_brief / query_deal). DO NOT use it for business "
-        "questions — a question containing a business metric (pipeline, "
-        "forecast, coverage, ARR, quota) and a time period (quarter, month, "
-        "week) is a real data question ('what do you forecast for the quarter?', "
-        "'how's pipeline this month?'), not orientation."
+        "query_pre_call_brief / query_deal). "
+        "CRITICAL: DO NOT use query_help for questions about business metrics. "
+        "Any question naming a business topic (pipeline, forecast, deals, ARR, "
+        "quota, coverage, conversion) AND a time period (quarter, month, week, "
+        "Q3, this month) is a DATA QUESTION, not orientation. Examples: "
+        "'what do you forecast for the quarter?' is query_forecast (data), "
+        "'how's pipeline this month?' is query_pipeline_movement (data), "
+        "'what can you tell me about deals?' is query_help (orientation). "
+        "Business metric + time period = data handler, always."
     ),
     "acknowledgment": (
         "A social acknowledgment or sign-off with no request behind it — "
@@ -1904,6 +1908,7 @@ async def route_question(question: str, user_id: str,
             if confidence < confidence_floor_help:
                 logger.info(f"[ROUTING] confidence {confidence:.2f} < {confidence_floor_help:.2f} "
                            f"for {original_handler} — routing to dynamic instead")
+                _log_routing_rejection(sb, question, original_handler, confidence, confidence_floor_help)
                 handler_name = "dynamic_query"
 
         # General confidence floor for data handlers
@@ -1911,6 +1916,7 @@ async def route_question(question: str, user_id: str,
             if confidence < confidence_floor:
                 logger.info(f"[ROUTING] confidence {confidence:.2f} < {confidence_floor:.2f} "
                            f"for {original_handler} — routing to dynamic instead")
+                _log_routing_rejection(sb, question, original_handler, confidence, confidence_floor)
                 handler_name = "dynamic_query"
 
         # ── 1c. Greeting / help / acknowledgment (orientation, no data) ──
@@ -2293,6 +2299,25 @@ def _log_learning(sb, question, handler, assessment,
         }).execute()
     except Exception as e:
         print(f"[LEARNING] log failed: {e}", flush=True)
+
+
+def _log_routing_rejection(sb, question, rejected_handler, confidence, floor):
+    """
+    Log when a handler is rejected at the confidence floor.
+    Makes rejections queryable for weekly analysis without relying on Railway logs.
+    """
+    try:
+        sb.table("learning_log").insert({
+            "question": question,
+            "handler_used": rejected_handler,
+            "issue_type": "floor_rejection",
+            "suggested_fix": f"Rejected at confidence {confidence:.2f} < floor {floor:.2f}. "
+                           f"Review handler description if rejection is frequent.",
+            "retry_succeeded": False,
+            "retries_used": 0,
+        }).execute()
+    except Exception as e:
+        print(f"[LEARNING] routing rejection log failed: {e}", flush=True)
 
 # ============================================================================
 # PERSONA-AWARE VOICE BLOCKS
