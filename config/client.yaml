@@ -661,8 +661,8 @@ team:
 
     # Account Executives
     - slack_user_id: "U_JAKE_H"  # PLACEHOLDER
-      email: "jake@growthbook.io"
-      name: "Jake H"
+      email: "jake.heier@growthbook.io"
+      name: "Jake Heier"
       role: "Account Executive"
       title: "AE"
 
@@ -672,8 +672,8 @@ team:
       role: "Account Executive"
 
     - slack_user_id: "U_CHRISTIAN"  # PLACEHOLDER
-      email: "christian@growthbook.io"
-      name: "Christian"
+      email: "christian.liebenow@growthbook.io"
+      name: "Christian Liebenow"
       role: "Account Executive"
 
     - slack_user_id: "U_SCOTT_KELLER"  # PLACEHOLDER
@@ -692,9 +692,15 @@ team:
       role: "Account Executive"
 
     - slack_user_id: "U_DAN"  # PLACEHOLDER
-      email: "dan@growthbook.io"
-      name: "Dan"
+      email: "dan.wathne@growthbook.io"
+      name: "Dan Wathne"
       role: "Account Executive"
+
+    - slack_user_id: "U_MARCEL"  # PLACEHOLDER
+      email: "marcel.geldner@growthbook.io"
+      name: "Marcel Geldner"
+      role: "Account Executive"
+      title: "AE"
 
     # RevOps
     - slack_user_id: "U0AAMMUPSA2"  # Jeff (from admin.slack_user_ids)
