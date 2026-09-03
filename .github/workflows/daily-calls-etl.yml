@@ -11,6 +11,7 @@ env:
   APOLLO_API_KEY: ${{ secrets.APOLLO_API_KEY }}
   SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
   SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
 permissions:
   contents: write  # Allow committing and pushing
@@ -67,8 +68,6 @@ jobs:
       # back-dated call triggers a per-deal re-fold. Non-fatal — a scoring hiccup
       # must not fail the ETL; the backfill reconciles any gap.
       - name: Score new calls (progressive)
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           cd $GITHUB_WORKSPACE
           python scripts/score_new_calls.py
