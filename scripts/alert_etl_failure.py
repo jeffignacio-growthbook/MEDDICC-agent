@@ -1,13 +1,24 @@
 #!/usr/bin/env python3
 """
-Alert on ETL failure - sends Slack notification if ETL job fails twice in a row.
+Alert on ETL failure - sends Zapier webhook if ETL job fails twice in a row.
 
 Usage in GitHub Actions workflow:
   - name: Alert on failure
     if: failure()
+    env:
+      ZAPIER_ALERT_URL: ${{ secrets.ZAPIER_ALERT_URL }}
     run: python scripts/alert_etl_failure.py --job ${{ github.job }} --run-id ${{ github.run_id }}
 
-Requires SLACK_WEBHOOK_URL in GitHub Secrets.
+Requires ZAPIER_ALERT_URL in GitHub Secrets and Railway environment.
+
+Payload format matches agent responses with type discriminator:
+  {
+    "type": "etl_failure",
+    "job": "etl-calls",
+    "consecutive_failures": 2,
+    "run_url": "...",
+    "message": "..."
+  }
 """
 import os
 import sys
@@ -24,54 +35,39 @@ from db import get_supabase
 from supabase_client import select_all
 
 
-def send_slack_alert(job_name: str, run_id: str, failure_count: int):
-    """Send Slack alert about ETL failure."""
+def send_zapier_alert(job_name: str, run_id: str, failure_count: int):
+    """Send alert via Zapier webhook."""
     import requests
 
-    webhook_url = os.getenv('SLACK_WEBHOOK_URL')
-    if not webhook_url:
-        print("⚠️  SLACK_WEBHOOK_URL not set - cannot send alert")
+    zapier_url = os.getenv('ZAPIER_ALERT_URL')
+    if not zapier_url:
+        print("⚠️  ZAPIER_ALERT_URL not set - cannot send alert")
         return False
 
     repo_url = f"https://github.com/{os.getenv('GITHUB_REPOSITORY', 'unknown')}"
     run_url = f"{repo_url}/actions/runs/{run_id}"
 
-    message = {
-        "text": f"🚨 ETL Failure Alert: {job_name}",
-        "blocks": [
-            {
-                "type": "header",
-                "text": {
-                    "type": "plain_text",
-                    "text": f"🚨 ETL Failure: {job_name}"
-                }
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"*Job:* {job_name}\n*Consecutive failures:* {failure_count}\n*Run:* <{run_url}|View logs>"
-                }
-            },
-            {
-                "type": "context",
-                "elements": [
-                    {
-                        "type": "mrkdwn",
-                        "text": f"Failed at {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}"
-                    }
-                ]
-            }
-        ]
+    # Payload structure:
+    # Option 1: Reuse existing hook with type discriminator
+    # Option 2: Dedicated alert hook (simpler payload)
+    # Using Option 1 format - Zap can branch on type field
+    payload = {
+        "type": "etl_failure",
+        "job": job_name,
+        "consecutive_failures": failure_count,
+        "run_id": run_id,
+        "run_url": run_url,
+        "failed_at": datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC'),
+        "message": f"ETL job '{job_name}' failed {failure_count} times in a row"
     }
 
     try:
-        response = requests.post(webhook_url, json=message, timeout=10)
+        response = requests.post(zapier_url, json=payload, timeout=10)
         response.raise_for_status()
-        print(f"✓ Slack alert sent for {job_name}")
+        print(f"✓ Alert sent to Zapier for {job_name}")
         return True
     except Exception as e:
-        print(f"✗ Failed to send Slack alert: {e}")
+        print(f"✗ Failed to send Zapier alert: {e}")
         return False
 
 
@@ -132,7 +128,7 @@ def main():
     # Alert if threshold reached
     if consecutive >= args.threshold:
         print(f"Threshold reached ({consecutive} >= {args.threshold}) - sending alert")
-        send_slack_alert(args.job, args.run_id, consecutive)
+        send_zapier_alert(args.job, args.run_id, consecutive)
     else:
         print(f"Below threshold ({consecutive} < {args.threshold}) - no alert sent")
 

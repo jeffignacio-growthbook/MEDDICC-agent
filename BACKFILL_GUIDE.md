@@ -8,13 +8,30 @@
 
 ## Manual Steps Required
 
-### 1. Add Slack Webhook (for failure alerts)
+### 1. Add Zapier Alert Hook (for failure alerts)
 
+**Choose approach:**
+
+**Option A (Recommended):** Reuse existing agent hook with type discriminator
+- The existing hook at `https://hooks.zapier.com/hooks/catch/14467976/4tybyrx/` can route based on payload type
+- Alerts send `{"type": "etl_failure", ...}` vs agent answers `{"type": "answer", ...}` (or no type field)
+- Zap branches on `type` field to route to different channels
+
+**Option B:** Create dedicated alert hook
+- Separate hook for operational alerts (cleaner separation, different channel/urgency)
+- Need to create new Zap and grab URL
+
+**Add to GitHub Secrets:**
 GitHub repo → Settings → Secrets and variables → Actions → New repository secret:
-- Name: `SLACK_WEBHOOK_URL`
-- Value: Your Slack incoming webhook URL
+- Name: `ZAPIER_ALERT_URL`
+- Value: Your chosen Zapier webhook URL
 
-Future ETL failures will alert after 2 consecutive failures.
+**Add to Railway environment:**
+Railway → MEDDICC-agent service → Variables:
+- Name: `ZAPIER_ALERT_URL`
+- Value: Same Zapier webhook URL
+
+Future ETL failures will post JSON to Zapier after 2 consecutive failures.
 
 ### 2. Add HubSpot Owners Scope
 
