@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook <> Rippling",
   "slug": "growthbook-rippling",
-  "last_etl_date": "2026-08-18T16:55:06.172808",
+  "last_etl_date": "2026-09-03T06:04:10.803525",
   "calls": [
     {
       "id": "01M0646X368X9DD7ZPQTSYEXTC",
@@ -17,6 +17,17 @@
       "participant_domains": [
         "rippling.com"
       ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M17KC84CGZQKT9XFSYK5RFC8",
+      "source": "fireflies",
+      "title": "GrowthBook <> Rippling",
+      "date": "2026-08-31",
+      "duration_minutes": 26,
+      "summary": "# GrowthBook <> Rippling\nDate: 2026-08-31 | Duration: 26m\n\n## Summary\nJennifer Pham-Le is evaluating Rippling, Brex, and Expensify, with pricing as a major consideration. Expensify was cited at $5 per user, while Brex offers free reimbursements; Rippling currently charges $8 per user per month. Jennifer does not plan to use Rippling cards and mainly wants reimbursements processed through payroll. She values Rippling’s ability to group expenses by report, a feature Brex lacks, as well as its payroll and reporting integration. Prasanna emphasized that Rippling consolidates finance workflows and said discounted pricing could potentially approach $5 or become free if corporate-card spend supports it, subject to finance approval and contract timing. Jennifer also raised concern that competitors provide record access for up to seven years after engagement, while Rippling access apparently ends when the contract ends. Prasanna agreed to escalate data retention to the product team, review pricing with finance, and follow up. Rippling currently offers SSO access to third-party apps such as Expensify rather than a deeper direct integration. Jennifer has no urgent decision timeline and is awaiting updated pricing and product information.\n\n## Keywords\npricing negotiation, reimbursement platform, expense reporting, receipt storage, card spend integration, platform comparison\n\n## Action Items\n\n**Prasanna Venkatesh Jeyakumar**\nConsult with Rippling’s finance team to explore revised pricing options possibly matching $5/user/month or lower (09:16)\nInvestigate and seek internal approval regarding extending receipt storage accessibility beyond immediate cutoff after leaving Rippling (13:37)\nAssess opportunity for discounted or zero-cost pricing linked to potential card spend migration to Rippling (14:38)\nProvide Jennifer Pham-Le with updated pricing proposals and receipt storage information (15:54)\n\n**Jennifer Pham-Le**\nReach out to Rippling account manager to schedule or request a demo focused on Expensify integration within Rippling (11:26)\n",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

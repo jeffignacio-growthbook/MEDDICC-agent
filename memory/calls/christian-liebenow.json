@@ -1,7 +1,7 @@
 {
   "company": "Christian Liebenow",
   "slug": "christian-liebenow",
-  "last_etl_date": "2026-08-05T15:57:31.397434",
+  "last_etl_date": "2026-09-03T06:04:10.805907",
   "calls": [
     {
       "id": "01KJTG7BD5N1DV3EW32R9R2FYB",
@@ -13,7 +13,19 @@
       "organizer": "christian@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, feature flagging, experimentation, enterprise plan, self-hosted, SaaS",
-      "action_items": "\n**Nestor Pina**\nProvide availability and confirm internal participants for GrowthBook demo within 1-2 weeks (31:15)\nCoordinate with product, data, and security teams to assess GrowthBook features and deployment options before next meeting (24:19)\nEvaluate internal business case for investment in GrowthBook Enterprise expansion (27:29)\nGather detailed user count and licensing needs for all teams that may use GrowthBook (14:53)\n\n**Christian Liebenow**\nShare GrowthBook slides and information on plans, self-hosted vs SaaS options, and advanced enterprise features (00:50)\nArrange and conduct detailed demo session of feature flagging and experimentation capabilities tailored to Aircall’s use cases (21:33)\nClarify licensing structure regarding users with different permissions (viewer/editor) and pricing (13:14)\nProvide detailed comparison on costs and benefits of SaaS vs self-hosted models (28:20)\n"
+      "action_items": "\n**Nestor Pina**\nProvide availability and confirm internal participants for GrowthBook demo within 1-2 weeks (31:15)\nCoordinate with product, data, and security teams to assess GrowthBook features and deployment options before next meeting (24:19)\nEvaluate internal business case for investment in GrowthBook Enterprise expansion (27:29)\nGather detailed user count and licensing needs for all teams that may use GrowthBook (14:53)\n\n**Christian Liebenow**\nShare GrowthBook slides and information on plans, self-hosted vs SaaS options, and advanced enterprise features (00:50)\nArrange and conduct detailed demo session of feature flagging and experimentation capabilities tailored to Aircall’s use cases (21:33)\nClarify licensing structure regarding users with different permissions (viewer/editor) and pricing (13:14)\nProvide detailed comparison on costs and benefits of SaaS vs self-hosted models (28:20)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M14DW3VHRC1MXGSHNXCKMH3S",
+      "source": "fireflies",
+      "title": "30 min with Karen (Christian Liebenow)",
+      "date": "2026-08-31",
+      "duration_minutes": 25.510000228881836,
+      "summary": "# 30 min with Karen (Christian Liebenow)\nDate: 2026-08-31 | Duration: 25.510000228881836m\n\n## Summary\nThe discussion focused on improving GrowthBook’s sales process and helping prospects evaluate its value more easily. Christian Liebenow proposed a customizable Notion guide combining pricing, roadmap information, product philosophy, competitive positioning, customer stories, support details, and security resources. The group identified pricing confusion between the $480/year Pro option and $200k+ enterprise fees as a major friction point. Prospects typically compare GrowthBook with homegrown tools, EPO, Statsig, and open-source or Pro alternatives, and they usually want technical demonstrations. An updated 5–10 minute demo was identified as the main content gap, while existing videos, PDFs, and technical resources are underused. Customer stories, support quotes, product releases, API improvements, and trust-center links could strengthen differentiation. High-end dinners and podcasts have generated stronger opportunities than cold LinkedIn outreach, while email and social response rates remain low.\n\n## Keywords\nPricing model, technical demos, customer stories, outbound engagement, enterprise vs Pro, Notion content\n\n## Action Items\n\n**Christian Liebenow**\nPrepare a detailed, customizable Notion page template to help prospects evaluate GrowthBook, including competitive positioning, pricing philosophy, roadmap, and anonymized customer stories (03:31)\nInclude specific content on enterprise vs Pro plan distinctions and support benefits in sales materials (15:33)\nUtilize new or updated demo video content in prospect follow-ups once available (20:11)\nContinue to leverage high-value outbound engagement tactics such as dinners and podcast appearances (20:58)\n\n**Karen Henke**\nSupport creation and integration of a Notion-based sales evaluation page and explore use of Notion AI for personalized content delivery (06:27)\nAssist in collecting anonymized customer testimonials and positioning statements for inclusion in sales collateral (12:13)\nCoordinate the launch and communication of the new product updates area to help re-engage cold prospects (16:39)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

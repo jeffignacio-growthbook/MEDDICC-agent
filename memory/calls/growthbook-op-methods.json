@@ -1,0 +1,29 @@
+{
+  "company": "GrowthBook + Op Methods",
+  "slug": "growthbook-op-methods",
+  "last_etl_date": "2026-09-03T06:04:10.821318",
+  "calls": [
+    {
+      "id": "01M0AYBFNWDBQ4ZVSMYZKR2W71",
+      "source": "fireflies",
+      "title": "GrowthBook + Op Methods: MongoDB Data Review",
+      "date": "2026-08-19",
+      "duration_minutes": 43,
+      "summary": "# GrowthBook + Op Methods: MongoDB Data Review\nDate: 2026-08-19 | Duration: 43m\n\n## Summary\nThe meeting addressed the integration of MongoDB with HubSpot, establishing how new accounts trigger data flow while ensuring Apollo enriches details for better account insights. Participants discussed challenges related to license updates, which suffer from inaccuracies due to legacy data and manual entries, leading to around 554 accounts with unknown license plans. The group agreed to standardize terminology regarding license tiers and emphasized the necessity of manual cleanup, including cross-referencing with Stripe and contracts. Lead scoring automation through accurate customer tagging was a priority, with discussions on improving renewal automation as license expiration dates were deemed unreliable. Continuous communication improvement and ongoing data cleanup were highlighted as essential for effective sales and marketing operations.\n\n## Keywords\nMongoDB, HubSpot, license plan, Retool, lead scoring, customer lifecycle\n\n## Action Items\n\n**Cary Rakin**\nInvestigate and clean up Retool license plan data to automate proper assignment of starter/free plans (38:00)\nCross-reference unknown or untagged customers with Stripe payment data and Google Drive contracts to verify paying customer status (41:50)\nCoordinate with Chris Sanders about populating and cleaning license expiration dates and contract data in Retool and HubSpot (32:00)\nFollow up on Orb integration progress for payment and seat management and assess impact on data synchronization workflows (07:00)\n\n**Michael Funduc**\nBackfill license plan data on old Retool rows marked as unknown and synchronize with updated source data; coordinate with Chris Sanders to confirm data source paths (22:00)\n\n**Shawn Green**\nShare examples of pro, unknown, and unmarked accounts in Slack for GrowthBook team analysis (13:00)\nSend Slack invite to Cary Rakin for GrowthBook channel to improve communication and updates on build notes (40:30)\n\n**Team**\nDevelop simple HubSpot automation workflows to update lifecycle stages (Subscriber, Customer, Churned) based on license plan and expiration date once data is clean (38:50)\n\n**Chris Newton**\nProvide list of accounts with unknown or missing licenses to Cary Rakin for cross-checking with other data sources (41:40)\n",
+      "organizer": "graham@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M0QZV4BEHRRF5Z3JH44TD99R",
+      "source": "fireflies",
+      "title": "GrowthBook + Op Methods: Lead Score Strategy",
+      "date": "2026-08-25",
+      "duration_minutes": 31,
+      "summary": "# GrowthBook + Op Methods: Lead Score Strategy\nDate: 2026-08-25 | Duration: 31m\n\n## Summary\nThe meeting focused on improving the accuracy of the lead scoring model through addressing critical data inconsistencies and implementing data cleanup. The team identified issues with customer tagging and license plans, with Shawn Green and Graham working on reports and retroactive updates respectively. License plan expiration dates and renewal automation also require better validation, as noted by Chris and others. The preferred data source is the Growth Book system due to inaccuracies with Retool. The lead scoring strategy was refined to combine fit and engagement scores, prioritizing high fit/high engagement accounts for sales outreach. Web traffic data integration is vital as 25% of companies lack this data, affecting scoring. Operational coordination and timelines were discussed, emphasizing the importance of communication and ongoing updates.\n\n## Keywords\nLead Scoring, Customer Tagging, License Plan, Data Cleanup, Web Traffic Data, Marketing Nurture\n\n## Action Items\n\n**Ashley Stirrup**\nAsk Graham about the timeline for validation and cleanup of account tagging and license plan data (30:41)\nCoordinate with Clay hire to enhance data enrichment, including creation of a new data field for mobile app traffic (21:01)\n\n**Chris Newton**\nReview lead scoring dashboards and reports once shared by Shawn (18:38)\nAnalyze enterprise customer accounts in B and C tiers to assess scoring accuracy and identify misclassifications (17:39)\nIdentify companies without web traffic data but scoring well on other attributes for targeted enrichment (22:10)\n\n**Lyndsie Berens**\nSend over the list of accounts queued for data enrichment through Clay and review criteria to ensure accuracy before broad enrichment (24:11)\nKeep Shawn updated on Carrie's cleanup progress (29:04)\n\n**Shawn Green**\nShare cleaned and filtered account lists and lead scoring reports with Lyndsie and Chris to facilitate review and follow-up (18:38)\nRaise the B tier threshold from 35 to 50 points in the scoring model and monitor effects on account classification (25:36)\nFollow up with Carrie on cleanup task start and progress, maintaining communication flow to ensure timely completion (28:51)\nContinue refining lead scoring dashboards and run audits to support cleanup and segmentation efforts (06:09)\n\n**Carrie**\nPerform retroactive updates and cleanup in MongoDB/Growth Book for license plans and customer tagging to fix inconsistencies (05:09)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

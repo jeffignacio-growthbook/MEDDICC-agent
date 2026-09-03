@@ -1,0 +1,18 @@
+{
+  "company": "Notion Planning",
+  "slug": "notion-planning",
+  "last_etl_date": "2026-09-03T06:04:10.825456",
+  "calls": [
+    {
+      "id": "01M0JYJY64WE7W0WAJC4V241YR",
+      "source": "fireflies",
+      "title": "Notion Planning",
+      "date": "2026-08-21",
+      "duration_minutes": 61,
+      "summary": "# Notion Planning\nDate: 2026-08-21 | Duration: 61m\n\n## Summary\nThe team addressed critical product gaps such as experiment-project linkage and feature flag UX issues as key blockers, aiming to improve the user experience and rebuild client confidence with a small team. Workstreams were grouped around experiments, identifiers, and metrics for clearer execution. Missing capabilities compared to competitors like Statsig were recognized, prompting plans for improvements. A cohesive redesign of key product pages was prioritized, reducing complexity and clutter to improve usability. Additionally, the need for enhanced diagnostics and data transparency initiatives was emphasized, planning phased prototypes before full development. The timeline for key deliverables was set for the end of September, focusing on P0 priorities and regular client demos to maintain engagement.\n\n## Keywords\nfeature flagging, experiment linking, UX design, diagnostics, metrics creation, product roadmap\n\n## Action Items\n\n**Jeremy Dorn**\nLead engineering decisions and design collaboration for attribute and identifier management; coordinate with Michael Samper (00:54)\nCollaborate with Johnny Martinez and Nobu on fact table and metric creation project (00:55)\nSupport diagnostics work in parallel, involving Lilia for investigative expertise (00:56)\n\n**Johnny Martinez**\nTake lead on diagnostics design and prototype efforts; collaborate with Gabe Melean (00:28)\nWork with Dave to bucket quick UX wins related to experiment setups for rapid execution (00:24)\nPartner with Jeremy Dorn and Nobu on metrics-related design and engineering (00:55)\n\n**Luke Sonnet**\nSet up meeting for attribute and identifier management discussions including key stakeholders (00:30)\nProvide oversight and critique (“yelling from a distance”) in the fact table and metrics and feature linking design streams (00:55)\n\n**Bryce Fitzsimons**\nCo-lead feature flag and experiment linking design efforts with Gabe and Luke; focus on UI cleanup and directional design improvements (00:54)\nCollaborate with Adriel on feature table columns and detail page redesign (00:57)\n\n**Adriel Vieira**\nLead design system and UI consistency improvements, prioritizing tables and interactive elements; coordinate with Bryce on feature tables (00:56)\n\n**Gabe Melean**\nCollaborative design lead with Bryce on feature linking UX and diagnostics (00:27)\n\n**Unassigned**\nPrepare and demo selections of improvements and design mockups at the next review with Notion to confirm priorities and gather feedback (00:14)\n",
+      "organizer": "johnny@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

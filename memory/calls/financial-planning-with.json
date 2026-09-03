@@ -1,0 +1,18 @@
+{
+  "company": "Financial Planning with",
+  "slug": "financial-planning-with",
+  "last_etl_date": "2026-09-03T06:04:10.796330",
+  "calls": [
+    {
+      "id": "01M12PTK28WT1TTFAGZZGHNR0F",
+      "source": "fireflies",
+      "title": "Financial Planning with Mark",
+      "date": "2026-09-01",
+      "duration_minutes": 33.52000045776367,
+      "summary": "# Financial Planning with Mark\nDate: 2026-09-01 | Duration: 33.52000045776367m\n\n## Summary\nThe team is cleaning Q2 actuals to correct vendor, contractor, headcount, department, and general ledger classifications, especially in R&D and marketing. Issues include software charged to R&D, annual software costs expensed in one month, contractors recorded as headcount, and approximately $172,000 of unidentified vendor spend. Updates to forecasted hires and spending are due Friday, with the board packet targeted for Tuesday distribution before the Wednesday board meeting. Cleaned Q2 data will support a stronger Q3 forecasting model and improved runway projections. Cash forecasting also depends on Jeff Ignacio’s billing schedule and clearer billing terms, while AR visibility is limited by manual AE self-reporting and delays of up to 30 days. The team is considering process improvements, dedicated support, Dropbox e-signature, and HubSpot–QuickBooks Online integration to automate billing and improve collections.\n\n## Keywords\nheadcount, vendor classification, forecasting, billing schedule, accounts receivable, cash burn\n\n## Action Items\n\n**Ashley Stirrup**\nReview vendor list with her team to identify unknown vendors and flag them for follow-up (01:25)\nFollow up with Brian regarding Dropbox e-sign and other frictionless payment enhancements to improve customer payment experience (31:05)\n\n**Ryan McGurk**\nContinue aligning compensation data and send verified information to Jennifer to update the source of truth in Rippling (02:27)\n\n**Jeremy Dorn, Graham McNicoll, Ashley Stirrup, Ryan McGurk**\nReview Q2 financial packets and provide detailed notes on misclassified items, headcount, and vendors by today or tomorrow (14:37)\n\n**Jeremy Dorn**\nSend details via Slack to Ashley about marketing items misclassified under R&D, including software subscriptions like Software 3.0 and rio.dev (17:43)\n\n**Mark Beltran**\nCollect all feedback notes from departments, aggregate issues, and assign corrective actions to Fondo or internal team after the board meeting (12:16)\nInvestigate and clarify large unlabeled contractor/vendor spend (~$172,000) flagged by Ashley and coordinate with Jennifer for details (22:50)\nCoordinate with Jeff Ignacio to receive billing schedule details and share with the team to improve cash forecasting accuracy (19:45)\nEvaluate needs for potential resource (project contractor or dedicated hire) for finance system integration and Accounts Receivable process improvement (27:00)\n\n**Team**\nFocus on refining forecast updates with pragmatic revisions for the board deck due Tuesday morning after Labor Day (16:50)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

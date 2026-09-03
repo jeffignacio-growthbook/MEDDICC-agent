@@ -1,0 +1,18 @@
+{
+  "company": "Visual Editor Pricing",
+  "slug": "visual-editor-pricing",
+  "last_etl_date": "2026-09-03T06:04:10.807717",
+  "calls": [
+    {
+      "id": "01M1C6MV88HSEM5R90P9M29R8T",
+      "source": "fireflies",
+      "title": "Visual Editor Pricing and Experimentation Plans",
+      "date": "2026-08-31",
+      "duration_minutes": 33.84000015258789,
+      "summary": "# Visual Editor Pricing and Experimentation Plans\nDate: 2026-08-31 | Duration: 33.84000015258789m\n\n## Summary\nSam and Jordan evaluated GrowthBook for A/B testing, with the visual editor identified as the key licensing requirement. The editor is available in the cloud Pro plan for $40/month, while self-hosted access requires an enterprise plan starting around $4,000/month; a 20% YC discount applies to enterprise plans. The team discussed the tension between GrowthBook’s open-source, self-hosted model and its lack of piecemeal pricing for advanced features. A hybrid approach—using cloud Pro for the visual editor while retaining self-hosted operations—was considered as a potential short-term solution. GrowthBook supports customer data ownership through warehouse integrations including Snowflake, BigQuery, and Redshift, and it integrates natively with Mixpanel for exposure and conversion events. Scott demonstrated visual editing, AI-powered changes, Boolean and multi-arm experiments, traffic allocation, and variant creation. He will relay feedback to founders Graham and Jeremy and investigate hybrid pricing or future plans, while Sam and Jordan continue evaluating cloud Pro.\n\n## Keywords\nA/B testing, self-hosted, visual editor, GrowthBook pricing, Mixpanel integration, YC discount\n\n## Action Items\n\n**Scott Keller**\nSubmit feedback to GrowthBook founders Graham and Jeremy regarding customer interest in a self-hosted visual editor pricing plan similar to cloud pro (26:05)\nExplore internally if there could be a special pricing plan or product development pipeline item to support visual editor on self-hosted at a lower price point (32:32)\n\n**Sam**\nContinue internal evaluation of pro cloud plan with visual editor while maintaining current self-hosted setup (18:11)\n\n**Jordan**\nAssess technical integration needs for Mixpanel and GrowthBook experiment data flow based on native integration and experiment tracking best practices (28:04)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

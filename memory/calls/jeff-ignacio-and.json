@@ -1,0 +1,18 @@
+{
+  "company": "Jeff Ignacio and",
+  "slug": "jeff-ignacio-and",
+  "last_etl_date": "2026-09-03T06:04:10.829709",
+  "calls": [
+    {
+      "id": "01M08GQSNYE3DHJ4PZAQWBXXK9",
+      "source": "fireflies",
+      "title": "Jeff Ignacio and Brent Holloway @ Mastiff Software",
+      "date": "2026-08-19",
+      "duration_minutes": 31,
+      "summary": "# Jeff Ignacio and Brent Holloway @ Mastiff Software\nDate: 2026-08-19 | Duration: 31m\n\n## Summary\nThe team confirmed the launch of a champion tracking campaign aimed at enhancing engagement by identifying advocates within target accounts. Brent highlighted the campaign's strategic value, while preparations included participant scheduling and potential referrals. The assessment of Apollo's job change tracking revealed significant limitations, including a daily cap on alerts and data quality concerns, prompting discussions on alternative tools like User Gems and Clay. A custom report was built in HubSpot to extract customer contacts for job change analysis, but data quality challenges were noted. Overall, the team recognized the need for reliable, user-friendly tools to optimize outreach and data usability.\n\n## Keywords\nChampion tracking, Job changes, Apollo CRM, HubSpot reporting, Data enrichment, Customer contacts\n\n## Action Items\n\n**Brent Holloway**\nTake first pass analyzing exported HubSpot contact data using Air Scale to identify recent job changes for enterprise customers (27:32)\nRequest HubSpot export/report of all contacts associated with enterprise customers to run job change analysis (18:35)\nNotify Jeff of findings or issues with initial Air Scale job change detection for possible further refinement (31:10)\n\n**Jeff Ignacio**\nSupport Brent with Clay tool usage if needed and assist in setting up automated workflows for job change detection (31:15)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

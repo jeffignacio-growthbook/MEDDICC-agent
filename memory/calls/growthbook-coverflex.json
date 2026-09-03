@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook & Coverflex",
+  "slug": "growthbook-coverflex",
+  "last_etl_date": "2026-09-03T06:04:10.831690",
+  "calls": [
+    {
+      "id": "01M0853TR5QT1TKT8V711N6RNN",
+      "source": "fireflies",
+      "title": "GrowthBook & Coverflex Demo",
+      "date": "2026-08-19",
+      "duration_minutes": 61.310001373291016,
+      "summary": "# GrowthBook & Coverflex Demo\nDate: 2026-08-19 | Duration: 61.310001373291016m\n\n## Summary\nThe meeting outlined key points regarding GrowthBook's capabilities in supporting EU data residency and compliance with privacy regulations, as emphasized by James Shannon. The team highlighted the integration strategy with BigQuery for efficient event processing and the necessity for sticky bucketing as a requirement not met by the open-source version. Key experimentation goals were identified, targeting small businesses to enhance conversion rates from free to paid plans, with roles specified for engineers and PMs. A timeline for decision-making was set for mid-September. Technical architecture was described, showcasing the use of GrowthBook's SDKs across various platforms and efficient attribute management for targeting. The discussion included metrics analysis and the advantages of a seat-based pricing model.\n\n## Keywords\nExperimentation, BigQuery, Data Residency, Feature Flagging, Conversion Metrics, SDK Integration\n\n## Action Items\n\n**Daniel Francisco**\nPrepare example scenarios to confirm understanding of warehouse data joins and attribute usage in experiments (24:06)\nDiscuss internally if any technical concerns exist about Growth Book integration for final evaluation (57:05)\nCoordinate with team regarding feature flagging workflow alignment between configcat and Growth Book (42:10)\n\n**Rosario Marrazzo**\nCollect and compare pricing quotes for experimentation tools as part of business case preparation (57:05)\nArrange internal discussions about Growth Book feasibility and business case presentation to leadership (57:05)\nConfirm availability for commercial follow-up call on Tuesday or Wednesday and communicate back (59:33)\n\n**James Shannon**\nProvide detailed comparison document clarifying differences between Growth Book open source and cloud versions regarding sticky bucketing and feature limitations (59:01)\nShare commercial pricing and schedule a focused call with Coverflex for mid to late September to finalize business case and pricing discussion (58:23)\nAssist with technical deep dive about data modeling and metric building by involving Growth Book technical experts (07:50)\nSend webinar and documentation illustrating Growth Book’s AI and API capabilities with real customer case studies (32:40)\nProvide ongoing demo support and clarification on SDK setup, feature flagging, experiment creation, targeting, and data integration workflows (33:20)\n\n**Thiago Ferreira**\nCollaborate on experimenting with attributes and SDK integration, particularly for React and React Native environments (18:43)\nEngage with data team for modeling complex metric use cases using BigQuery (07:51)\nProvide feedback on SDK configuration and experiment targeting capabilities during evaluation (35:03)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "AI Automation Project",
+  "slug": "ai-automation-project",
+  "last_etl_date": "2026-09-03T06:04:10.800282",
+  "calls": [
+    {
+      "id": "01M1AY9CTBWX3PKX6FG3PR8RVW",
+      "source": "fireflies",
+      "title": "AI Automation Project",
+      "date": "2026-08-31",
+      "duration_minutes": 28.809999465942383,
+      "summary": "# AI Automation Project\nDate: 2026-08-31 | Duration: 28.809999465942383m\n\n## Summary\nThe team reviewed a prototype for an AI-supported experimentation workflow that checks hypotheses, suggests guardrails, calculates sample size, monitors experiments, manages Growth Book ramp-ups from 10% to 50%, and reports outcomes such as a 4% revenue increase. Priorities include stabilizing the Slack app, integrating AI chat with event-based alerts and other agents, standardizing experiment events, and improving ramp-up and approval APIs. Three core automation workflows were identified: submission checks, daily SRM data-quality checks, and experiment wrap-up analysis. Flexible data queries remain limited by missing endpoints and incomplete mappings between data concepts and Growth Book metrics; semantic layers and DBT are relevant but not immediate priorities. Slack capabilities are targeted for the 5.1/5.2 release cycle, followed by internal dogfooding. Growth Book’s differentiation will emphasize expert-verified skills, structured workflows, and experimental rigor. Luke will define priority analyses and address data gaps, while Graham advances code reviews, testing, and Slack delivery. Hiring will continue to support iteration.\n\n## Keywords\nAI Skills, Slack Integration, Experiment Automation, Ramp-ups, Data Analysis, Semantic Layer\n\n## Action Items\n\n**Graham McNicoll**\nContinue development of Slack app and split code into manageable pieces for review due to current engineering strikes (05:20)\nCoordinate testing of the Slack app once code is merged; prepare for private listing and beta testing stages (18:39)\nSet up a meeting for Luke Sonnet to meet with Ravi from Scott’s team regarding holdouts questions (27:10)\n\n**Luke Sonnet**\nLead integration of AI skills for experiment hypothesis evaluation, guardrail checks, and ramping logic focusing on Slack app as the main interface (00:40)\nWork on defining key metrics and analyses that the AI should support for trustworthy experiment validation; prioritize aligning with new endpoints and Slack integration (24:30)\nLobby for dedicated engineering resources to support ongoing AI skill enhancements and iteration with organizational support from Jeremy and leadership (25:15)\nSchedule further technical discussions with Jeremy about data querying strategies and experiment automation gaps (23:30)\n\n**Ashley Stirrup**\nAssist coordination and facilitate prioritization discussions around rollout features, Slack integration, and AI-driven experiment checks (00:00)\n\n**Scott Bailey**\nProvide input on open source vs proprietary skill strategy and deep data integrations with semantic layers for improved experiment analyses (12:00)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Updated invitation",
+  "slug": "updated-invitation",
+  "last_etl_date": "2026-09-03T06:04:10.797296",
+  "calls": [
+    {
+      "id": "01M14MTE506NF17D2MVTC9SWWB",
+      "source": "fireflies",
+      "title": "Updated invitation: SIE Feedback: Exp Creation Flow",
+      "date": "2026-09-01",
+      "duration_minutes": 30.110000610351562,
+      "summary": "# Updated invitation: SIE Feedback: Exp Creation Flow\nDate: 2026-09-01 | Duration: 30.110000610351562m\n\n## Summary\nThe discussion covered contextual bandit experiment design and workflow. Teams preferred an internal discussion before involving interested teams, with Ravi Nagaraju and Tom O'Connor included, while a separate conversation was suggested for a more advanced team. Experiment variations can directly edit text, JSON, boolean, and integer values without a linked feature flag. Values may enter a pending state for review, although organizations can disable approvals. Managed flags are controlled by the experiment and can only be edited directly after conversion to unmanaged. Scheduling remains experiment metadata, and draft experiments support multiple variations, including controls and treatments; running experiments must return to draft before changes. End behaviors include notification only, rolling out a winner to 100%, or shipping a selected variation or default value. Holdouts remain excluded from winner rollouts and require separate release handling. Luke Sonnet will compare GrowthBook, Statsig, and EPO, and Tom O'Connor expects another feature-flag session.\n\n## Keywords\nContextual bandits, Experiment variations, Managed feature flags, Sparse JSON patches, Experiment scheduling, Holdout populations\n\n## Action Items\n**Cris Dizon**\nSequence bandit meetings (01:16)\n\n**Luke Sonnet**\nSend behavior comparison documentation (21:50)\nContinue holdout behavior discussion (22:58)\n\n**Ravi Nagaraju**\nDiscuss feature concerns internally (26:04)\n\n**Tom O'Connor**\nSchedule feature-flag session (27:35)",
+      "organizer": "cris@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}

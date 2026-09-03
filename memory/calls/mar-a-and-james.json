@@ -1,0 +1,18 @@
+{
+  "company": "María and James",
+  "slug": "mar-a-and-james",
+  "last_etl_date": "2026-09-03T06:04:10.826142",
+  "calls": [
+    {
+      "id": "01M0DVJMJBC6NAWK0R84VG04PE",
+      "source": "fireflies",
+      "title": "María and James Shannon",
+      "date": "2026-08-21",
+      "duration_minutes": 34.06999969482422,
+      "summary": "# María and James Shannon\nDate: 2026-08-21 | Duration: 34.06999969482422m\n\n## Summary\nIn the meeting, the Guest Global team discussed significant challenges with their current experimentation tool, AB Tasty, noting issues like unreliable data, conflicting metrics, and poor currency handling, which hinder decision-making and confidence in test results. Product team leads, including María, Blasco, and Roberto, expressed interest in GrowthBook due to its comprehensive features, including feature flagging and direct integration with BigQuery. GrowthBook’s user-friendly interface and advanced capabilities align with their experimentation needs. Despite a recent contract renewal with AB Tasty, the team is exploring a switch to GrowthBook, planning a demo and commercial discussions after María's holiday to facilitate the evaluation process.\n\n## Keywords\nExperimentation, GrowthBook, AB Tasty limitations, Feature flags, Data reliability, Commercial proposal\n\n## Action Items\n\n**María Fernández**\nSend website traffic numbers, number of GrowthBook users, and expected experiment volume to James Shannon for proposal preparation (18:19)\n\n**James Shannon**\nPrepare and send a tailored commercial proposal based on the data provided by María Fernández (18:22)\nPropose demo times for a detailed GrowthBook walkthrough with Guess’s team including Blasco and Roberto (32:06)\nSchedule a follow-up commercial discussion with María Fernández for the week of September 14th after her return from holidays (31:20)\n\n**Roberto Blascorio**\nCoordinate scheduling a GrowthBook product demo with the Guess team during María Fernández's absence (31:29)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

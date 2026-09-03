@@ -1,0 +1,18 @@
+{
+  "company": "SpringDrive",
+  "slug": "springdrive",
+  "last_etl_date": "2026-09-03T06:04:10.826282",
+  "calls": [
+    {
+      "id": "01M0DDBC5FF6N4ATSF40M6HXN1",
+      "source": "fireflies",
+      "title": "SpringDrive - Podcast Messaging Review",
+      "date": "2026-08-20",
+      "duration_minutes": 30.829999923706055,
+      "summary": "# SpringDrive - Podcast Messaging Review\nDate: 2026-08-20 | Duration: 30.829999923706055m\n\n## Summary\nThe team focused on improving lead quality over quantity, advocating for 150 high-quality leads to boost conversion rates. They discussed refining outreach workflows involving tools like Smart Lead and A/B testing email content. Personalization strategies for targeting open source users and high potential accounts were outlined, with specific roles assigned for email writing and monitoring. Efforts to clean up CRM data were led by Carrie, addressing inaccuracies that affect automation and sales follow-ups. Additionally, a systematic approach for podcast guest qualification was introduced, emphasizing A/B testing discussions. Challenges in aligning sales and marketing efforts were acknowledged, noting the ineffective use of campaigns and the need for leadership support to facilitate these improvements.\n\n## Keywords\npodcast outreach, CRM data hygiene, email workflow, Stat Sig accounts, sales follow-up, contract management\n\n## Action Items\n\n**Lyndsie Berens**\nSend the proposed qualification question template to Jake for use in screening podcast invitees (06:37)\nPull out unassigned Stat Sig accounts, share with Ryan for assignment decisions, and communicate next steps regarding those accounts (06:59)\nContinue working with Carrie on cleaning and updating contract and account data in HubSpot, including contract end dates and customer tiers (17:17)\nSchedule 30-minute meeting with Scott to clarify remaining Omni OS questions and improve data/tool understanding (29:02)\n\n**Ashley Stirrup**\nCoordinate with Jeff, Tanner, and Jake on podcast scheduling and follow-up workflow integration (06:36)\nCollaborate with Karen and Lyndsie on development and monitoring of outreach email content for segmented campaigns (15:23)\nValidate and confirm outreach targeting criteria and segmentation strategy using Rio data and role-based personalization (11:20)\n\n**Unassigned**\nDetermine human monitoring and response process for LinkedIn connection requests and email outreach originating from Ashley’s account (14:54)\nAssess and potentially improve contract management integration to streamline contract data accuracy across HubSpot and other tools (18:48)\n",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook and Ecco",
+  "slug": "growthbook-and-ecco",
+  "last_etl_date": "2026-09-03T06:04:10.825983",
+  "calls": [
+    {
+      "id": "01M0J2XXEDSZYQ8NEY21FPZHMF",
+      "source": "fireflies",
+      "title": "GrowthBook and Ecco",
+      "date": "2026-08-21",
+      "duration_minutes": 18,
+      "summary": "# GrowthBook and Ecco\nDate: 2026-08-21 | Duration: 18m\n\n## Summary\nA plan was established to involve legal teams early in the project's proof of concept (PoC) to manage compliance while preventing delays. Emphasizing a dual-track approach, legal reviews will occur alongside production development. The project scope limits personal data usage, reducing potential legal issues. Legal’s role is advisory, allowing the team to accept manageable risks. Discussions were scheduled for next week to resolve compliance queries before Gc's vacation. Key decision-makers, including Carolina and Daniel, were identified for approvals, streamlining budget discussions and contract logistics. To support continuous momentum, Scott will lead discussions during Gc’s absence, ensuring that the team maintains focus on project completion.\n\n## Keywords\nlegal compliance, project management, solution architect, data protection, contract approval, technical handover\n\n## Action Items\n\n**Gc**\nForward legal documents with notes to Scott Keller and coordinate email introductions for legal and technical teams (12:30)\nProvide contact details of Ecco’s legal representatives and front-end developers Alex and Nikita for scheduling meetings (13:50)\nSchedule initial meetings with GrowthBook legal and solution architect midweek next week, ideally between Tuesday and Thursday (12:45)\n\n**Scott Keller**\nReview legal documents sent by Gc and prepare GrowthBook’s legal team for discussion (14:30)\nSchedule meetings with GrowthBook legal team and solution architect for Wednesday morning next week, allowing rescheduling if necessary (14:30)\nShare calendar links for easy scheduling with Ecco’s teams (12:20)\nMaintain open communication throughout Gc’s vacation and keep momentum on the project tasks (15:40)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

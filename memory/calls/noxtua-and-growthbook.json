@@ -1,0 +1,18 @@
+{
+  "company": "Noxtua and GrowthBook",
+  "slug": "noxtua-and-growthbook",
+  "last_etl_date": "2026-09-03T06:04:10.814394",
+  "calls": [
+    {
+      "id": "01M0TMH1PRFHTRN9RZPR932ZM5",
+      "source": "fireflies",
+      "title": "Noxtua and GrowthBook",
+      "date": "2026-08-27",
+      "duration_minutes": 20.389999389648438,
+      "summary": "# Noxtua and GrowthBook\nDate: 2026-08-27 | Duration: 20.389999389648438m\n\n## Summary\nThe meeting centered around improving customer engagement and sales strategies for enterprise prospects. The team discussed tailoring demos and pricing, particularly emphasizing a self-hosted solution to meet client needs. Notable contributions included identifying Helena as an internal champion for adoption and addressing pricing concerns for a prospect with approximately $600 million in revenue. James Shannon clarified product tier features, ensuring the prospect understands differences, while Marcel and Remy developed pricing strategies starting at higher initial points to facilitate negotiation. Strong interest was noted in product usability, particularly the visual editor, but gaps in data integration and the involvement of multiple teams were highlighted as critical points for advancing discussions. Discussions on competitive positioning and the prospect's motivations also shaped the strategy.\n\n## Keywords\nself-hosted, event-based pricing, Pro tier, dashboard features, customer engagement, enterprise negotiation\n\n## Action Items\n\n**Marcel Geldner**\nPrepare and send follow-up email to customer clarifying features and pricing (03:59)\nContinue follow-up on no-show customer and reengage via German message to Simon (08:16)\nLead tomorrow's high-level meeting with Code ID CTO focused on integration and pricing (16:50)\n\n**James Shannon**\nManage all communication with the current customer, including sending videos and recaps, and follow-up messages to Jake (03:55)\nPrepare product demo and further materials for upcoming Yoto and Milan meetings (15:59)\nRecap the last customer call highlighting benefits of Growth Book and plan to suggest involving engineering and data teams in next steps (13:55)\nEngage in dinner discussion tomorrow to strategize next steps and opportunity progress (05:46)\n\n**Rémy Marin**\nAssist with technical follow-ups and help clarify customer documentation questions if needed (04:13)\nSupport demo preparation and internal alignment ahead of upcoming meetings (16:10)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

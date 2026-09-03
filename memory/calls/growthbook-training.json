@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Training",
+  "slug": "growthbook-training",
+  "last_etl_date": "2026-09-03T06:04:10.815865",
+  "calls": [
+    {
+      "id": "01M0TMH1QDP0357VPH455H8M26",
+      "source": "fireflies",
+      "title": "GrowthBook Training: Positioning & Walkthrough",
+      "date": "2026-08-26",
+      "duration_minutes": 62.47999954223633,
+      "summary": "# GrowthBook Training: Positioning & Walkthrough\nDate: 2026-08-26 | Duration: 62.47999954223633m\n\n## Summary\nThe team agreed to reschedule their weekly catch-up to Friday afternoon to accommodate overlapping interviews, ensuring full participation. During the meeting, they discussed the recent affiliate webinar, which attracted 55 attendees primarily from newspaper companies like the New York Post and New York Times, emphasizing tailored messaging that aligns with sales targets. Graham McNicoll delivered training on GrowthBook's modular platform, highlighting its customizability and the unique feature flagging capabilities. Detailed discussion included transparent experiment analysis metrics that aid decision-making. The integration of AI to summarize experiments and track program health was also covered, along with plans for benchmarking customer performance against industry standards.\n\n## Keywords\nGrowthBook, feature flags, experimentation platform, customizable roles, AI analysis, experiment results\n\n## Action Items\n\n**Jake Stangl**\nStart working on the executive job change list as planned (01:15)\nPing Francesca to reschedule the overlapping meeting and confirm the interview schedule (02:29)\n\n**Graham McNicoll**\nShare demo slides and training recording with Chris Washburn and Andy Marshall if they cannot join live (06:07)\nProvide further explanations or follow-up sessions on GrowthBook advanced features upon request (01:01:00)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

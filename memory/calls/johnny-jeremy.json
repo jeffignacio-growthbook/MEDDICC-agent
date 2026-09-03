@@ -1,0 +1,18 @@
+{
+  "company": "Johnny / Jeremy",
+  "slug": "johnny-jeremy",
+  "last_etl_date": "2026-09-03T06:04:10.800135",
+  "calls": [
+    {
+      "id": "01M1CPHH6FV29WP3AG291HZSWM",
+      "source": "fireflies",
+      "title": "Johnny / Jeremy 1-on-1",
+      "date": "2026-08-31",
+      "duration_minutes": 1,
+      "summary": "# Johnny / Jeremy 1-on-1\nDate: 2026-08-31 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "johnny@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

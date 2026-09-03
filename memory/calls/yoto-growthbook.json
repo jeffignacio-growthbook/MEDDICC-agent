@@ -1,0 +1,18 @@
+{
+  "company": "Yoto & Growthbook",
+  "slug": "yoto-growthbook",
+  "last_etl_date": "2026-09-03T06:04:10.814232",
+  "calls": [
+    {
+      "id": "01M0SWGK42TCZDDXWBP8C3AGM1",
+      "source": "fireflies",
+      "title": "Yoto & Growthbook Demo",
+      "date": "2026-08-27",
+      "duration_minutes": 62.2400016784668,
+      "summary": "# Yoto & Growthbook Demo\nDate: 2026-08-27 | Duration: 62.2400016784668m\n\n## Summary\nThe discussion covered the challenges faced by the team with their current experimentation tools, which are disjointed and unstable, leading to only 1-2 experiments per month. With the contract expiring in January, there is an urgent need to explore alternatives. The engineering team expressed frustrations about integration issues and the user experience, while product leads aim to increase experiment velocity significantly. Growth Book was highlighted as a promising solution, offering a warehouse-native platform suitable for cross-platform experimentation and feature flagging. Its integrations with tools like BigQuery also ensure robust data management, while the system’s capability for family-level user attribution aligns with the company’s needs. A vendor demo is scheduled for next week to further assess Growth Book before making a recommendation to leadership.\n\n## Keywords\nexperimentation platform, data warehouse native, Snowplow integration, feature flagging, cross-platform testing, AI-assisted analytics\n\n## Action Items\n\n**James Shannon**\nSend meeting recording and AI-assisted transcript to Yoto team (05:08)\nProvide follow-up email with documentation and links post-demo (01:01:12)\nAwait feedback from Yoto team after their internal discussion and second demo (01:00:57)\n\n**Amelie Bruhat**\nCoordinate with James Shannon to update the team on feedback post second demo scheduled on June 2nd or September (01:00:57)\nGather feedback from engineering and product teams internally and determine if additional questions arise for follow-up with Growthbook (01:00:57)\n\n**Yoto Product and Engineering Leadership**\nReview Growthbook capabilities in upcoming demo next week and deliberate on product fit in line with internal evaluation process (59:00)\nEnsure VP Product and VP Engineering are informed of recommendations for final decision (59:49)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 18,
+      "summary_quality": "good"
+    }
+  ]
+}

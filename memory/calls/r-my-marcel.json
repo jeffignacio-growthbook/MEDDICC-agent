@@ -1,0 +1,18 @@
+{
+  "company": "Rémy / Marcel",
+  "slug": "r-my-marcel",
+  "last_etl_date": "2026-09-03T06:04:10.821781",
+  "calls": [
+    {
+      "id": "01M0W4V18DJV8SHF2SG0M2DB2J",
+      "source": "fireflies",
+      "title": "Rémy / Marcel",
+      "date": "2026-08-25",
+      "duration_minutes": 28.950000762939453,
+      "summary": "# Rémy / Marcel\nDate: 2026-08-25 | Duration: 28.950000762939453m\n\n## Summary\nThe discovery call focused on identifying the client’s needs regarding product development, emphasizing data-driven improvements, experimentation, and data warehouse integration. Rémy outlined the client’s current use of Optimizely and budget concerns. The discussion highlighted GrowthBook's strengths, including its capability to handle 3 billion daily feature flags and its compliance with European data regulations. The client expressed interest in AI solutions to expedite experimentation and increase subscription sign-ups. Concerns around technical integration included the importance of data security, where the architecture keeps data local and retains client control. Feedback indicated the client's preference for concrete examples and a discovery approach, leading to suggestions for improvement and preparation for the next call.\n\n## Keywords\nExperimentation, AI Integration, Data Warehouse, Open Source, Customer Success, Feature Flags\n\n## Action Items\n**Rémy Marin**  \nProvide feedback on sales pitch (14:45)\n\n**Marcel Geldner**  \nPrepare business case for AI integration (18:48)  \nRefine messaging for compliance and security (24:16)  \nAdjust sales slides with examples (24:32)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

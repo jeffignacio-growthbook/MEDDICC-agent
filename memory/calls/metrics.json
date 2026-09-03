@@ -1,0 +1,18 @@
+{
+  "company": "Metrics",
+  "slug": "metrics",
+  "last_etl_date": "2026-09-03T06:04:10.808083",
+  "calls": [
+    {
+      "id": "01M151149M2CVE5C0YZD3ZDZ2X",
+      "source": "fireflies",
+      "title": "Metrics",
+      "date": "2026-08-28",
+      "duration_minutes": 7,
+      "summary": "# Metrics\nDate: 2026-08-28 | Duration: 7m\n\n## Summary\nThe meeting discussed several important topics related to improving the user experience through advanced metric generation and assistant capabilities. It was agreed to generate metrics from fact tables using available data and to allow users to confirm or edit the metric setup. The in-app assistant is set to be triggered from any page and include metric creation skills while allowing for follow-up questions. A full-screen design approach was favored for better usability and adaptation to smaller screens. Johnny Martinez is responsible for sharing Figma and prototypes for design review by Nobu Ajito, with an incremental design iteration starting from structural bones and feedback integration. Additionally, Jeremy Dorn will provide documentation on decision logic covering field display, nudges, and edge cases.\n\n## Keywords\nAI metric assistant, Fact tables, Metric creation, Full-screen design, Metric detail page, Decision-tree logic\n\n## Action Items\n\n**Johnny Martinez**\nSend Figma and Claude prototype designs to the team for review and further use (03:27)\n\n**Nobu Ajito**\nReview the submitted Figma and Claude designs and begin the design implementation process focusing on structural elements first (03:57)\n\n**Jeremy Dorn**\nProduce and send a decision-tree logic Markdown file derived from the prototype context to assist with implementation decisions (05:58)\n",
+      "organizer": "johnny@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

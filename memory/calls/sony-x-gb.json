@@ -1,0 +1,18 @@
+{
+  "company": "Sony x GB",
+  "slug": "sony-x-gb",
+  "last_etl_date": "2026-09-03T06:04:10.827659",
+  "calls": [
+    {
+      "id": "01M09ASNHN937RAWHZ5S7HZ2C6",
+      "source": "fireflies",
+      "title": "Sony x GB: Program Management Features",
+      "date": "2026-08-20",
+      "duration_minutes": 54.06999969482422,
+      "summary": "# Sony x GB: Program Management Features\nDate: 2026-08-20 | Duration: 54.06999969482422m\n\n## Summary\nThe discussion centered around improving the experimentation framework within Sony Interactive Entertainment (SIE) by centralizing diverse testing tools like Univex, Growth Book, and Adobe. The team identified challenges in sharing insights due to fragmented knowledge and highlighted the need for standardized processes, such as naming conventions and scorecards, to enhance consistency. David Lutz pointed out that finding historical experiment data could take excessive time, emphasizing the urgency of improving knowledge management through AI capabilities. Technical integration challenges with tools like Adobe were also discussed, noting the limitations in data access that hinder centralized insights. The overarching goal is to create an effective, scalable approach to experimentation that allows for seamless data flow and better collaboration across teams.\n\n## Keywords\nExperimentation centralization, meta-analysis, learning library, experimentation scorecard, funnel experimentation, AI-driven insights\n\n## Action Items\n\n**Tom O'Connor**\nFlip access control switch to allow total Growth Book access with only selective obfuscation for disclosed projects to improve transparency and usability (45:43)\nCoordinate attendance and secure tickets for EXL conference attendees from SIE including Dave Lutz to facilitate networking and knowledge sharing (50:27)\n\n**David Lutz**\nContinue developing the abstraction layer API hub consolidating experiment data from Growth Book and other systems to enable vendor and internal tool integrations (33:36)\nProvide Growth Book and partners with a detailed list of challenges addressed by Sony’s experimentation and data tools to align feature development (52:06)\n\n**Cris Dizon**\nSend Tom O'Connor documentation on Growth Book’s Adobe Experience Platform integration capabilities and status to support integration efforts (16:12)\n\n**Graham McNicoll**\nCollaborate with Sony on Adobe Experience Platform integration trials and assist in building out those pipelines to enhance data connectivity (16:16)\nShare Growth Book’s learning library model and upcoming AI pattern-detection features with Sony team to demonstrate advanced meta-analysis capabilities (20:39)\nExplore experiment quality scoring interface customization options to address user-level or global prompt customization needs for better usability (25:54)\nWork with Sony on improvements and UX designs to minimize friction in tooling adoption and incorporate program leader feedback for smoother integration (32:34)\nAssist Sony with funnel visualization features and Sankey diagram implementation for journey-level experimentation to enable granular test designs (46:57)\n",
+      "organizer": "cris@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

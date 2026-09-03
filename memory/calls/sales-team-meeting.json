@@ -1,7 +1,7 @@
 {
   "company": "Sales Team Meeting",
   "slug": "sales-team-meeting",
-  "last_etl_date": "2026-08-18T16:55:06.277421",
+  "last_etl_date": "2026-09-03T06:04:10.827972",
   "calls": [
     {
       "id": "01KY5CBSV9S4VBJQ1VVXMM99YX",
@@ -18,6 +18,17 @@
         "revopsimpact.us"
       ],
       "summary_quality": "empty"
+    },
+    {
+      "id": "01M0FYE056E3ECG87FW0YH92K2",
+      "source": "fireflies",
+      "title": "Sales Team Meeting",
+      "date": "2026-08-20",
+      "duration_minutes": 1,
+      "summary": "# Sales Team Meeting\nDate: 2026-08-20 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
     }
   ]
 }

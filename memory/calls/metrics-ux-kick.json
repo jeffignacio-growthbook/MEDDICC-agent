@@ -1,0 +1,18 @@
+{
+  "company": "Metrics UX Kick",
+  "slug": "metrics-ux-kick",
+  "last_etl_date": "2026-09-03T06:04:10.815467",
+  "calls": [
+    {
+      "id": "01M0ZTHRKH8ASJ6DF5GZWH4TS6",
+      "source": "fireflies",
+      "title": "Metrics UX Kick Off",
+      "date": "2026-08-26",
+      "duration_minutes": 28,
+      "summary": "# Metrics UX Kick Off\nDate: 2026-08-26 | Duration: 28m\n\n## Summary\nThe discussion addressed multiple aspects of metrics onboarding, particularly the need for clearer data hierarchy where fact tables support metrics while data teams manage guardrails for product teams. The necessity for stronger guidance was emphasized, especially to prevent misconfigurations in advanced settings. Revising terminology and structuring the metrics creation flow was deemed essential, with comparisons made between modal and standalone-page designs. Validation processes such as maintaining SQL previews and incorporating inline result previews were highlighted. Finally, key participants like Johnny and Jeremy were assigned to develop UX concepts and clarify functionality, indicating a collaborative effort to enhance user experience.\n\n## Keywords\nMetrics UX, Fact tables, Data-source onboarding, Metric guardrails, SQL preview, Metric validation\n\n## Action Items\n**Johnny Martinez**\n- Design Metric configuration structures",
+      "organizer": "johnny@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

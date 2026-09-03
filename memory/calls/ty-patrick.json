@@ -1,0 +1,18 @@
+{
+  "company": "Ty + Patrick",
+  "slug": "ty-patrick",
+  "last_etl_date": "2026-09-03T06:04:10.816490",
+  "calls": [
+    {
+      "id": "01M0SRP9F33VT23WD5BQNQG3YY",
+      "source": "fireflies",
+      "title": "Ty + Patrick and Cris Dizon",
+      "date": "2026-08-26",
+      "duration_minutes": 30.420000076293945,
+      "summary": "# Ty + Patrick and Cris Dizon\nDate: 2026-08-26 | Duration: 30.420000076293945m\n\n## Summary\nThe meeting addressed key aspects of a new experimentation program, highlighting support offered by Cris Dizon in customer success, including training and enablement. The formation of an experimentation squad, led by Patrick Tsao, Paige Ruppel, and Tyler Fach, is underway, with roles and priorities still being refined. Tyler Fach emphasized the need for a measurement framework to enhance program metrics alignment. The existing feature flagging capabilities support the randomization required for experiments, while staged rollout processes and metric-based alerts ensure careful management. Standardizing approved core conversion metrics is vital to improve trust and simplify prioritization. A proposed program scorecard aims to track win rates and production releases, with a cautionary note on aggregate impact. Lastly, the importance of quality metrics beyond win rates was discussed alongside customizable checklist protocols and upcoming training coordination efforts.\n\n## Keywords\nExperimentation metrics, Feature flagging, Metric governance, Experiment quality, Randomised controlled trials, GrowthBook enablement\n\n## Action Items\n**Cris Dizon**\n- Send quasi-experimental documentation (10:52)\n- Send GrowthBook governance screenshots (13:07)\n- Send programme-level metrics list (14:35)\n- Confirm quality scoring timeline (27:49)\n- Plan experimentation training sessions (27:49)",
+      "organizer": "cris@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

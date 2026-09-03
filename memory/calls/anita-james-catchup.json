@@ -1,0 +1,18 @@
+{
+  "company": "Anita & James Catchup",
+  "slug": "anita-james-catchup",
+  "last_etl_date": "2026-09-03T06:04:10.831865",
+  "calls": [
+    {
+      "id": "01M0CHFSNY44CC2895KAM9SWHB",
+      "source": "fireflies",
+      "title": "InPost (Anita & James Catchup)",
+      "date": "2026-08-19",
+      "duration_minutes": 15.579999923706055,
+      "summary": "# InPost (Anita & James Catchup)\nDate: 2026-08-19 | Duration: 15.579999923706055m\n\n## Summary\nThe discussion centered on the preparation and execution of a Proof of Concept (POC) that includes legal approval, team readiness, and defining success criteria. Key points included the legal and procurement steps necessary for the POC to start, with Anita tasked to secure legal support and coordinate team involvement. A 45-day trial period was proposed, involving multiple teams to ensure comprehensive testing. James highlighted the importance of defining success criteria jointly once the contract is reviewed. The legal and procurement processes were expected to run in parallel, with a focus on the competitive evaluation of vendors following the POC. Participants discussed the swift setup of SDKs and the engagement of technical teams for a seamless implementation, ultimately aiming for a unified tool deployment across multiple product lines.\n\n## Keywords\nProof of Concept, Legal Review, Procurement Process, Implementation Timeline, Success Criteria, Contract Signing\n\n## Action Items\n\n**Anita Krasińska**\nCoordinate with legal to review the customer agreement, updated DPA, and other documents once provided, and seek estimation on review timelines (13:39)\nDiscuss with her team to finalize the length of the POC testing period and ensure dedicated resources are available to support testing success (03:14)\nIdentify the individual responsible on the procurement side and clarify procurement requirements and processes, including the need for at least three providers for contract comparison (08:57)\nCommunicate and finalize POC success criteria in collaboration with different InPost teams and GrowthBook (06:48)\nInform James if a call with data or engineering teams (e.g., Yan) is needed for technical implementation discussions (14:08)\n\n**James Shannon**\nPrepare and send legal documents including the customer agreement, updated DPA reflecting EU data residency, and POC order form with placeholders for success criteria (02:10)\nWork on a full POC plan detailing required personnel from data, engineering, and product teams, incorporating success criteria once available (09:29)\nBe available for technical discussions with InPost data and engineering teams to support implementation and clarify questions (06:36)\nFollow up on legal and procurement progress to synchronize next steps and ensure smooth contract and POC initiation (13:53)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

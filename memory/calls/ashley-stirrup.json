@@ -1,7 +1,7 @@
 {
   "company": "Ashley Stirrup",
   "slug": "ashley-stirrup",
-  "last_etl_date": "2026-08-05T15:57:31.369524",
+  "last_etl_date": "2026-09-03T06:04:10.831458",
   "calls": [
     {
       "id": "01KRJM8GNK1SPEE09WGQ21P2E2",
@@ -13,7 +13,19 @@
       "organizer": "ashley@growthbook.io",
       "participants": 2,
       "keywords": "Meta Compliance, Matillion, AI integration, AB testing, cybersecurity training, data integration market",
-      "action_items": "\n**Gwendal Vaz Nunes**\nSuggest catching up towards end of June to explore potential business opportunities after starting at new company (06:47)\nKeep updated on Ashley’s business progress and product offerings for future collaboration potential (06:07)\n\n**Ashley Stirrup**\nPlan for possible Europe trip to attend conferences and meet with European customers and partners (31:46)\nContinue building marketing and sales pipelines to expand company revenue and customer base (21:54)\nImplement pricing model changes shifting from per-user to event-based consumption pricing (30:26)\nAttend AI events such as upcoming Mr. AI event with CEO and sales team and engage with industry peers (31:47)\n"
+      "action_items": "\n**Gwendal Vaz Nunes**\nSuggest catching up towards end of June to explore potential business opportunities after starting at new company (06:47)\nKeep updated on Ashley’s business progress and product offerings for future collaboration potential (06:07)\n\n**Ashley Stirrup**\nPlan for possible Europe trip to attend conferences and meet with European customers and partners (31:46)\nContinue building marketing and sales pipelines to expand company revenue and customer base (21:54)\nImplement pricing model changes shifting from per-user to event-based consumption pricing (30:26)\nAttend AI events such as upcoming Mr. AI event with CEO and sales team and engage with industry peers (31:47)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M09K7RTGMVSC9XR3Z0YT2T23",
+      "source": "fireflies",
+      "title": "30 Minute Meeting fs (Ashley Stirrup)",
+      "date": "2026-08-19",
+      "duration_minutes": 25.709999084472656,
+      "summary": "# 30 Minute Meeting fs (Ashley Stirrup)\nDate: 2026-08-19 | Duration: 25.709999084472656m\n\n## Summary\nSpeero and Growth Book discussed potential collaboration to leverage their respective customer bases and marketing efforts. Jonny Longden and Ashley Stirrup emphasized mutual interest in joint account-based marketing strategies and exploring overlapping customers for growth. Event sponsorship and lead generation were highlighted as key avenues, including Speero's international events and Growth Book's eagerness to sponsor. Speero also proposed supporting Growth Book's clients with free consulting to enhance client success and tool adoption. Both companies shared insights on product strategies, with Speero focusing on automation and experimentation, while Growth Book emphasized AI integration. The conversation concluded with plans for co-creating marketing content and regular knowledge-sharing sessions to align efforts.\n\n## Keywords\nExperimentation agency, Feature flagging, Partnership development, Server-side testing, Client engagement, Event sponsorship\n\n## Action Items\n\n**Jonny Longden**\nProvide Growth Book with an updated list of clients using Growth Book and common accounts (20:18)\nSend Growth Book a general partnership approach document including acquisition, customer retention, and media engagement strategies (21:22)\nShare Speero’s conference prospectus and sponsorship investment details with Growth Book (15:11)\nSchedule and conduct a free “lunch and learn” presentation on experimentation philosophy for Growth Book and their clients (17:59)\nArrange for Growth Book to present during Speero’s upcoming weekly all-hands meeting (24:13)\n\n**Ashley Stirrup**\nShare draft partner directory page with Speero for review and edits, including links to case studies and vendor diagrams (20:18)\nCoordinate with Growth Book’s CRO to identify joint client opportunities and drive co-selling efforts with Speero (23:39)\nInvite Jonny to participate in the Growth Book podcast and determine podcast format to highlight his expertise and experimentation insights (22:56)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

@@ -1,0 +1,18 @@
+{
+  "company": "Lindsey Macleod and",
+  "slug": "lindsey-macleod-and",
+  "last_etl_date": "2026-09-03T06:04:10.822981",
+  "calls": [
+    {
+      "id": "01M0NR193MJYTWNYFRE30TCBQV",
+      "source": "fireflies",
+      "title": "Lindsey Macleod and Graham McNicoll",
+      "date": "2026-08-24",
+      "duration_minutes": null,
+      "summary": "# Lindsey Macleod and Graham McNicoll\nDate: 2026-08-24 | Duration: Unknown\n\n## Summary\nNo summary available",
+      "organizer": "graham@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Enregistrement de l’écran",
+  "slug": "enregistrement-de-l-e-cran",
+  "last_etl_date": "2026-09-03T06:04:10.799161",
+  "calls": [
+    {
+      "id": "01M1E1YYFX5WF022YJTDPQ7EGZ",
+      "source": "fireflies",
+      "title": "Enregistrement de l’écran 2026-08-31 à 17.41.53.mp4",
+      "date": "2026-09-01",
+      "duration_minutes": 34.54999923706055,
+      "summary": "# Enregistrement de l’écran 2026-08-31 à 17.41.53.mp4\nDate: 2026-09-01 | Duration: 34.54999923706055m\n\n## Summary\nThe platform combines feature flagging, experimentation, and product analytics in a data-warehouse-native solution. Queries run directly on the customer’s warehouse, with no PII or raw data leaving the system, and mobile, server, and client SDKs are supported. SDK setup includes API keys, host configuration, self-hosted endpoints, event tracking integrations, and targeting attributes such as browser, device type, beta status, and country. Data sources such as Snowflake require a read-only user, while fact tables and reusable metrics connect experiments to business metrics. Feature flags can be toggled by environment and managed through draft and publish states; server-side SDK hydration helps prevent flicker. Targeting supports rules, controlled rollouts, forced rules, experiments, approval workflows, role-based access control, and audit logs. Experiment results display revenue impact, conversion rates, win probabilities, and metric categories. CUPED and post-stratification reduce variance, with both frequentist and Bayesian testing available. Dashboards support date filtering and stakeholder sharing.\n\n## Keywords\nfeature flagging, experimentation, data warehouse native, SDK integration, CUPED, product analytics\n\n## Action Items\n**Remy**  \nPrepare architecture slide for demos (05:00)  \nProvide detailed integration documentation (12:40)  \nDevelop demo talk track for feature flag lifecycle (15:00)  \nPrepare PM-focused demo with experiment dashboards (23:20)  \nGather CUPEd and statistical training resources (29:00)  \n\n**Logan**  \nReview SDK connection and API key examples (07:00)  \nSet up event tracking toggle for experiments (09:00)  \nTest SQL queries in fact table UI (12:50)  \nCreate example user attributes for targeting (17:00)",
+      "organizer": "remy@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

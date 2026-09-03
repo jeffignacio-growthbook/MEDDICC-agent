@@ -1,0 +1,18 @@
+{
+  "company": "Juan Docal and",
+  "slug": "juan-docal-and",
+  "last_etl_date": "2026-09-03T06:04:10.832055",
+  "calls": [
+    {
+      "id": "01M0ABAN47TV13Q71SHFWTMBZP",
+      "source": "fireflies",
+      "title": "Juan Docal and James Shannon",
+      "date": "2026-08-19",
+      "duration_minutes": 30.549999237060547,
+      "summary": "# Juan Docal and James Shannon\nDate: 2026-08-19 | Duration: 30.549999237060547m\n\n## Summary\nKape discussed the evaluation of GrowthBook as an alternative to LaunchDarkly, primarily driven by the cost inefficiencies related to unused features in their existing contract. The current LaunchDarkly contract supports extensive data exports and active users but lacks alignment with Kape's needs for self-hosting and user-specific targeting across multiple platforms. GrowthBook is presented as a cost-effective solution, offering a self-hosted model and an open architecture designed for engineering and data teams. With AI-assisted insights and tight integration to product analytics, Migration from LaunchDarkly is planned within five months to avoid additional costs, with a focus on transitioning smoothly for its 80 users under the guidance of their COO.\n\n## Keywords\nfeature flagging, experimentation, self-hosting, data warehouse, cost optimization, migration planning\n\n## Action Items\n\n**Juan Docal**\nSend detailed usage numbers from LaunchDarkly to James via email to provide accurate data for mapping and quoting (27:06)\nInform James promptly if any internal decision changes regarding migration happen before the planned next meeting (29:03)\n\n**James Shannon**\nPrepare and send a rough indicative quote to Juan based on the LaunchDarkly usage data provided (27:42)\nSchedule and conduct a low-pressure follow-up meeting in approximately one month to discuss the migration plan and quote feedback (28:38)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

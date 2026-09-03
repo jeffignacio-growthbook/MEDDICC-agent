@@ -1,7 +1,7 @@
 {
   "company": "Leandro Baptista Lemos",
   "slug": "leandro-baptista-lemos",
-  "last_etl_date": "2026-08-18T16:55:06.176113",
+  "last_etl_date": "2026-09-03T06:04:10.830063",
   "calls": [
     {
       "id": "01M08HCA7SSYG22T1J9HWCQB3W",
@@ -17,6 +17,17 @@
       "participant_domains": [
         "wisepublishing.com"
       ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M08HFRPJVZZFMH5CRX16QS6R",
+      "source": "fireflies",
+      "title": "Leandro Baptista Lemos and Chris Sanders",
+      "date": "2026-08-19",
+      "duration_minutes": 56.91999816894531,
+      "summary": "# Leandro Baptista Lemos and Chris Sanders\nDate: 2026-08-19 | Duration: 56.91999816894531m\n\n## Summary\nThe team discussed the readiness of the experimental pipeline in GrowthBook, confirming data flow and user hashing mechanisms to prevent bias in experiment results. They reviewed traffic allocation practices and the importance of namespaces to avoid overlapping experiments. The concepts of sticky bucketing and user ID persistence were highlighted as essential for maintaining consistent user variant exposure. The meeting delved into how GrowthBook analyzes experiment data, emphasizing the integration of assignment events with analytics for accurate metric calculations. Statistical concepts such as Bayesian confidence intervals and options for Frequentist analysis were clarified to help interpret results. Finally, the conversation touched on linking experiments to feature flags and discussion of current implementation status focused on stabilizing user ID persistence and improving data integration.\n\n## Keywords\nGrowthBook, Experiment Bucketing, Namespaces, Feature Flags, Data Slicing, Bayesian Analysis\n\n## Action Items\n\n**Tariq Elmughrabi**\nInvestigate and implement stable user ID persistence (e.g., cookie or session) to maintain consistent variant exposure across user page refreshes (20:39)\n\n**Leandro Baptista Lemos**\nCoordinate with Jerry and data team to update the data source for pulling experiment data into Snowflake for accurate tracking and analysis (41:03)\n\n**Jerry**\nComplete updates to Snowflake data source to properly capture experiment assignments and fact tables (41:03)\n\n**Chris Sanders**\nProvide support and guidance on sticky bucketing implementation and user ID handling if requested (52:37)\n",
+      "organizer": "chris@growthbook.io",
+      "participants": 7,
       "summary_quality": "good"
     }
   ]

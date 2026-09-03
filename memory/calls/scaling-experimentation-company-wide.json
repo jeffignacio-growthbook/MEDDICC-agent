@@ -1,0 +1,18 @@
+{
+  "company": "Scaling Experimentation Company-Wide",
+  "slug": "scaling-experimentation-company-wide",
+  "last_etl_date": "2026-09-03T06:04:10.828157",
+  "calls": [
+    {
+      "id": "01KZXMMV5BZDSA8GZ02FR73541",
+      "source": "fireflies",
+      "title": "Scaling Experimentation Company-Wide",
+      "date": "2026-08-20",
+      "duration_minutes": 50,
+      "summary": "# Scaling Experimentation Company-Wide\nDate: 2026-08-20 | Duration: 50m\n\n## Summary\nThe Philadelphia Inquirer implemented a centralized experimentation program to enhance collaboration across departments, allowing any team member to propose experiments. A cross-functional team manages various phases efficiently, leading to nearly 100 AB tests impacting millions of readers. Centralized governance fosters transparency and effective risk management, while weekly meetings and agile workflows ensure continuous collaboration. Highlighted experiments showcased significant outcomes, such as an 11.8% increase in overall subscriptions through a dual offer paywall. The Inquirer uses structured experiment design, focusing on guardrails and tailored metrics, supported by Growth Book, which serves as the central platform for testing. Emphasizing a culture of learning from both successes and failures, the program encourages participation even from non-technical stakeholders.\n\n## Keywords\nExperimentation, A/B testing, centralized testing, user experience, subscription metrics, cross-department collaboration\n\n## Action Items\n\n**Nicole Henninger**\nManage and maintain the research repository for all experiment results and decisions (14:35)\nFacilitate weekly core team meetings and biweekly office hours focused on experimentation process improvements (25:20)\nContinue supporting hypothesis strengthening and stakeholder education on experimental design (28:26)\nOversee prioritization conversations amongst departments to align risk and audience impact (21:59)\nMonitor ongoing instrumentation and analytics setup for experiment tracking and dashboards (33:26)\nDecide on early experiment termination when negative unexpected effects occur to prevent confounding (44:48)\n\n**Alexandra Williams**\nAnalyze experimental data in detail including segment-level insights (mobile vs desktop, subscriber status) to uncover nuanced results (41:07)\nCollaborate with Nicole and product managers to select appropriate metrics for experiments and validate measurement alignment with decision goals (46:18)\nSupport post hoc metric additions and expanded analysis for clearer experiment interpretation (47:59)\nFilter and interpret data related to social media conversion tracking and other segmented analyses (23:18)\n\n**Ashley Stirrup**\nShare recordings and survey links post-meeting to attendees for feedback and continuous improvement (21:04)\nPromote biweekly Growth Book live demo sessions to interested participants for further learning (21:04)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

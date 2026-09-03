@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook + Brex",
+  "slug": "growthbook-brex",
+  "last_etl_date": "2026-09-03T06:04:10.813338",
+  "calls": [
+    {
+      "id": "01M0X9SJRW9BDRPP6SYM0S60KD",
+      "source": "fireflies",
+      "title": "Growthbook + Brex",
+      "date": "2026-08-27",
+      "duration_minutes": 36.06999969482422,
+      "summary": "# Growthbook + Brex\nDate: 2026-08-27 | Duration: 36.06999969482422m\n\n## Summary\nThe meeting clarified the reimbursement process for employees and admins, showcasing features like easy receipt submission via drag-and-drop, email, or mobile app, with AI assisting in data extraction for timely approvals. It also emphasized admin controls to set spend limits and approval workflows linked to events, ensuring budgetary compliance and easy reconciliation through integration with QuickBooks. Moreover, the discussion addressed international reimbursement functionalities supporting over 130 countries, and AI's role in policy enforcement, particularly with restricted items. Lastly, customer context indicated seasonal usage for conferences and retreats, while ongoing support for implementation was also highlighted.\n\n## Keywords\nreimbursements, Brex, QuickBooks, receipts, expense reports, international payments\n\n## Action Items\n\n**Sara Neaveill**\nConfirm if Brex’s AI flags expenses exceeding stipulated amounts or handles detailed line-item detection such as alcohol within grouped meal expenses (11:42)\nInvestigate possibilities or workarounds for creating consolidated reimbursement reports to group multiple expenses for events or trips, aligning with Growthbook’s preferred workflow (14:58)\nVerify if there are currency conversion fees specifically for reimbursements and confirm handling of foreign currency transactions within Brex (32:45)\nCheck with banking team about receiving international customer payments in foreign currencies such as Euro and related conversion or acceptance capabilities for Growthbook (33:30)\nProvide follow-up email including step-by-step company-wide reimbursement setup instructions and relevant documentation to Jennifer (34:04)\nArrange quarterly check-in calls to review Growthbook’s Brex reimbursement usage progress and address any new questions or issues (34:04)\n",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

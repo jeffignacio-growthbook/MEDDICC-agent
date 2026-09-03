@@ -1,0 +1,18 @@
+{
+  "company": "Speedro",
+  "slug": "speedro",
+  "last_etl_date": "2026-09-03T06:04:10.794638",
+  "calls": [
+    {
+      "id": "01M1HFPJVTV5S217N38TD5HTZF",
+      "source": "fireflies",
+      "title": "Speedro",
+      "date": "2026-09-02",
+      "duration_minutes": 24.25,
+      "summary": "# Speedro\nDate: 2026-09-02 | Duration: 24.25m\n\n## Summary\nSpeedro, formerly CXL Agency, is a fully remote experimentation consultancy with 15 years of experience and nearly 55 employees operating between Austin and Tallinn. Jonny Longden described its focus on helping clients progress from marketing-led A/B testing to product-owned experimentation, supported by program management, maturity consulting, and expertise in organizational and political challenges. Speedro serves retail, e-commerce, B2B SaaS, and product-oriented clients including RS Group, Typeform, Docker, Cisco, ADP, and Microsoft. The company is also developing AI-powered learning loops connected to server-side feature flagging and telemetry, with Growth Book viewed as important for combining experimentation data and AI context. Partnership goals include client acquisition, retained services, education, and experimentation maturity. The sales model combines inbound leads, long-term outbound relationship building, and social selling through research outreach and lunch-and-learn presentations. Both sides agreed to share presentation materials, identify overlapping opportunities such as Typeform and Microsoft, and pursue one or two pilot deals to create early momentum.\n\n## Keywords\nexperimentation, A/B testing, feature flags, product-led growth, AI learning loops, partnership\n\n## Action Items\n\n**Jonny Longden**\nSend the presentation deck ('lunch and learn' material) to Growthbook team for review and potential client use (18:04)\nConsult Speedro’s operations team to identify existing clients who represent good partnership opportunities for collaboration with Growthbook (22:02)\n\n**Ryan McGurk**\nFollow up with Jonny Longden and Ashley Stirrup to align on next steps and develop a game plan based on shared client opportunities (21:43)\n\n**Ashley Stirrup**\nSend the presentation deck to Ryan McGurk and coordinate follow-up communications (22:45)\n\n**Jonny Longden and Growthbook team**\nSchedule a follow-up meeting focusing on specific clients (e.g., Typeform, Muse, Microsoft) to explore partnership opportunities in detail (22:40)\n",
+      "organizer": "graham@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

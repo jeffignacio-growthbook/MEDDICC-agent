@@ -1,7 +1,7 @@
 {
   "company": "Greg / Christian",
   "slug": "greg-christian",
-  "last_etl_date": "2026-08-05T15:57:31.350121",
+  "last_etl_date": "2026-09-03T06:04:10.830372",
   "calls": [
     {
       "id": "01KW2E0G8WWMGDBTT6KHQ01XGC",
@@ -13,7 +13,30 @@
       "organizer": "christian@growthbook.io",
       "participants": 2,
       "keywords": "Growth Book, experimentation, FIFA microsites, onboarding, pilot testing, soccer fan engagement",
-      "action_items": "\n**Christian Liebenow**\nAdd Gregory Phipps to the Legends Slack channel and training calls to facilitate onboarding and collaboration (16:12)\nProvide Gregory Phipps with access to Legends’ environments without using existing license seats to enable pilot testing (16:45)\nFollow up with Gregory Phipps to coordinate an in-person meeting during his San Francisco trip, tentatively on Wednesday or Thursday morning the week of July 3 (20:46)\n\n**Gregory Phipps**\nApprove or request addition to Legends Slack channel and participate in onboarding and training sessions (16:33)\nConfirm travel plans and notify Christian about availability for meetings or experimentation team events (17:57)\nCoordinate with Christian for coffee or breakfast meeting during Christian’s San Francisco visit via text (20:28)\n"
+      "action_items": "\n**Christian Liebenow**\nAdd Gregory Phipps to the Legends Slack channel and training calls to facilitate onboarding and collaboration (16:12)\nProvide Gregory Phipps with access to Legends’ environments without using existing license seats to enable pilot testing (16:45)\nFollow up with Gregory Phipps to coordinate an in-person meeting during his San Francisco trip, tentatively on Wednesday or Thursday morning the week of July 3 (20:46)\n\n**Gregory Phipps**\nApprove or request addition to Legends Slack channel and participate in onboarding and training sessions (16:33)\nConfirm travel plans and notify Christian about availability for meetings or experimentation team events (17:57)\nCoordinate with Christian for coffee or breakfast meeting during Christian’s San Francisco visit via text (20:28)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01KZ9VSBRFSFAA92454CAT7VK3",
+      "source": "fireflies",
+      "title": "Greg / Christian",
+      "date": "2026-08-19",
+      "duration_minutes": 6,
+      "summary": "# Greg / Christian\nDate: 2026-08-19 | Duration: 6m\n\n## Summary\nThe meeting addressed cultural differences in work-life balance and PTO usage among international teams at Genius Sports. Gregory Phipps highlighted variations, noting that U.S. team members often forego vacation days, while Europeans typically take two weeks off, and Colombian teams have regular Mondays off. Christian Liebenow shared his experience of taking time off, reflecting a European attitude toward breaks. Additionally, the discussion included technical challenges, particularly related to Zoom usage, suggesting a need for better training and standardized meeting tools. Personal sharing among team members was emphasized as a way to foster connection, while managing note-taking tools carefully was deemed essential for maintaining accurate documentation.\n\n## Keywords\nVacation culture, PTO, international work culture, Genius Sports, Zoom update, Fireflies notetaker\n\n## Action Items\n\n**Christian Liebenow**\nDisable the Fireflies notetaker as requested before Gregory shares pending updates (05:40)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "6a9851720fa76d00182df64b",
+      "source": "apollo",
+      "title": "Greg / Christian",
+      "date": "2026-09-02",
+      "duration_minutes": 0,
+      "summary": "[Greg Phipps]: But basically. Let me kick this out. I kicked one out, but I have another one just joined.",
+      "host": "Christian Liebenow",
+      "participants": 1,
+      "summary_quality": "good"
     }
   ]
 }

@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook set up",
+  "slug": "growthbook-set-up",
+  "last_etl_date": "2026-09-03T06:04:10.825149",
+  "calls": [
+    {
+      "id": "01M0JSQ9FWGTV4N8PB14KGNPG1",
+      "source": "fireflies",
+      "title": "GrowthBook set up for Extra Space",
+      "date": "2026-08-21",
+      "duration_minutes": 17.56999969482422,
+      "summary": "# GrowthBook set up for Extra Space\nDate: 2026-08-21 | Duration: 17.56999969482422m\n\n## Summary\nThe team is set to unify experiment metrics within Growth Book, with a consolidated table that encompasses data from Optimizely and has a 48-hour data delay. This setup, spearheaded by Drupad, aims to ease access for non-technical users by embedding defined metrics in dashboards and reducing manual configuration. The latest API version, 5.0, supports full programmatic capabilities alongside personal access tokens to enhance automation. Initial efforts will utilize reusable templates to streamline experiment setups, particularly for rental conversions. Open communication was emphasized to facilitate smoother collaborations, especially regarding metric definitions and the implementation of new features necessitated by the rapid updates from Growth Book.\n\n## Keywords\nGrowthBook, Experiment Metrics, Data Source, Dashboard, API 5.0, Experiment Templates\n\n## Action Items\n\n**Drupad Khublani**\nDefine and set up the necessary metrics and dimensions in Growth Book to mirror current reporting (05:23)\nConfirm and maintain connection of Databricks and Claude to Growth Book to enable dashboard recreation and metric definition (06:35)\nCoordinate with developers or Palak to update metrics required for new tests or initiatives beyond rentals (11:36)\nExperiment with Growth Book dashboards and provide updates on progress (14:13)\n\n**Craig Kendall**\nAssist with sharing the meeting invite link and onboarding Drupad Khublani (00:14)\nCreate experiment templates in Growth Book after metrics are defined to streamline marketing test setup (12:14)\nSchedule a call with Drupad to ensure proper wiring of experiment templates (12:14)\n\n**Chris Sanders**\nProvide guidance and support on product analytics and dashboard setup as needed (15:29)\n",
+      "organizer": "chris@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

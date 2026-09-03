@@ -1,0 +1,18 @@
+{
+  "company": "Weekly Prep",
+  "slug": "weekly-prep",
+  "last_etl_date": "2026-09-03T06:04:10.821961",
+  "calls": [
+    {
+      "id": "01M0T2YTNR0H54DH9PGA0HCMNA",
+      "source": "fireflies",
+      "title": "Weekly Prep",
+      "date": "2026-08-24",
+      "duration_minutes": null,
+      "summary": "# Weekly Prep\nDate: 2026-08-24 | Duration: Unknown\n\n## Summary\nNo summary available",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

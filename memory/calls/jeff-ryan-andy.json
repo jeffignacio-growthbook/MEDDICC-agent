@@ -1,0 +1,18 @@
+{
+  "company": "Jeff/Ryan/Andy",
+  "slug": "jeff-ryan-andy",
+  "last_etl_date": "2026-09-03T06:04:10.808443",
+  "calls": [
+    {
+      "id": "01M1003N364PGCYG1R1H8XB1JZ",
+      "source": "fireflies",
+      "title": "Jeff/Ryan/Andy - Hubspot for Account Management",
+      "date": "2026-08-28",
+      "duration_minutes": 27.280000686645508,
+      "summary": "# Jeff/Ryan/Andy - Hubspot for Account Management\nDate: 2026-08-28 | Duration: 27.280000686645508m\n\n## Summary\nThe meeting covered personal investment strategies, notably Jeff's diversified portfolio generating significant annual income across various sectors. Jeff's consulting business has stabilized, allowing for consistent client engagement, while Andy is set to transition into managing 24 client accounts with assistance in data access and history context. The discussion highlighted the importance of automating manual processes, especially in renewal tracking, to minimize errors and improve data accuracy. A detailed review of Andy's deals was also done, with a focus on renewal ARR to enhance revenue tracking. Finally, both participants emphasized collaboration and knowledge sharing for a smooth transition, with set follow-up plans for further discussion and networking support.\n\n## Keywords\nInvestment strategies, account transfer, HubSpot CRM, deal management, client renewals, staffing agency\n\n## Action Items\n\n**Jeff Ignacio**\nUpload and transfer client accounts and deals into Andy Marshall’s name in HubSpot (07:30)\nClean up duplicates and disqualified deals while transferring records to Andy’s name (17:36)\n\n**Andy Marshall**\nAnalyze the newly assigned client accounts and deals in HubSpot, meet with sales reps to understand account histories, and prepare directional questions for follow-up next week (25:25)\nNotify Ryan and Jeff upon completion of data transfer to avoid duplicated administrative efforts (25:08)\nRequest introduction to marketing contacts at Render from Jeff for potential business engagement (20:15)\n",
+      "organizer": "jeff.ignacio@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

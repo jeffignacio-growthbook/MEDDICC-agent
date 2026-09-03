@@ -1,0 +1,18 @@
+{
+  "company": "Call with Mouna",
+  "slug": "call-with-mouna",
+  "last_etl_date": "2026-09-03T06:04:10.832193",
+  "calls": [
+    {
+      "id": "6a9749c4620c05000185cde9",
+      "source": "apollo",
+      "title": "Call with Mouna Chenfouri",
+      "date": "2026-09-01",
+      "duration_minutes": 3.0,
+      "summary": "# Call with Mouna Chenfouri\nDate: 2026-09-01 | Duration: 2.7m\n\n## Note\nNo transcript available. Meeting recorded but transcript extraction failed or is still processing.",
+      "organizer": "",
+      "participants": 0,
+      "summary_quality": "good"
+    }
+  ]
+}

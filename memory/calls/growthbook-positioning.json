@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook positioning &",
+  "slug": "growthbook-positioning",
+  "last_etl_date": "2026-09-03T06:04:10.827018",
+  "calls": [
+    {
+      "id": "01M05EJA99PSQ4YDW0G1YBV29G",
+      "source": "fireflies",
+      "title": "GrowthBook positioning & differentiators",
+      "date": "2026-08-20",
+      "duration_minutes": 62,
+      "summary": "# GrowthBook positioning & differentiators\nDate: 2026-08-20 | Duration: 62m\n\n## Summary\nThe team focused on identifying and refining three to four key differentiators for GrowthBook, emphasizing its developer-friendliness, open source nature, and warehouse-native architecture. Consensus was reached on important themes like flexibility, enterprise readiness, and innovation pace. Participants actively voted on differentiators, resulting in strong preferences for flexibility and AI-native capabilities. The discussion also highlighted the importance of deep customer partnerships and trust, along with a transparent pricing model that appeals to both enterprise clients and smaller users. AI was framed as a tool to enhance experimentation efficiency while retaining user control. Lastly, there was a commitment to create consistent messaging to support sales enablement and address both developer and non-technical user needs.\n\n## Keywords\nGrowthBook, differentiators, experimentation platform, developer-friendly, AI native, transparency, pricing flexibility\n\n## Action Items\n\n**Ashley Stirrup**\nLead follow-up working sessions with Elyse Fox and Scott Bailey to package and refine the elevator pitch and messaging pillars based on voting results and meeting insights (49:00)\n\n**Elyse Fox**\nOrganize further discussions to elaborate on voting results, incorporate additional points discussed (e.g., modularity, partnership, transparency), and help draft the messaging framework (49:00)\n\n**Scott Bailey**\nDraft an initial elevator pitch script incorporating the top differentiators for internal review; develop supporting messaging architecture (50:17)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    }
+  ]
+}

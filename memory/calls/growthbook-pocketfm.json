@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Pocketfm",
+  "slug": "growthbook-pocketfm",
+  "last_etl_date": "2026-09-03T06:04:10.798838",
+  "calls": [
+    {
+      "id": "01M1A2B3SY8GHNBMW927Z3V1R4",
+      "source": "fireflies",
+      "title": "Growthbook <> Pocketfm - Intro",
+      "date": "2026-09-01",
+      "duration_minutes": 46.2599983215332,
+      "summary": "# Growthbook <> Pocketfm - Intro\nDate: 2026-09-01 | Duration: 46.2599983215332m\n\n## Summary\nPocket FM is assessing whether to replace EPO with GrowthBook because its contract is nearing expiration, costs are a concern, and EPO requires duplicated experiments for combinations of locale and engagement cohorts. GrowthBook’s ability to manage multiple cohorts in one dashboard, define detailed metrics, connect to Databricks, and use activation and guardrail metrics addresses key evaluation needs. Its power calculator, Bayesian and Frequentist methods, sequential testing, and minimum detectable effect settings align with Pocket FM’s daily significance checks and fixed-duration experiments. GrowthBook also offers experiment templates, holdouts, targeting, traffic controls, custom reports, and an upcoming interleaving capability for recommendation-ranking tests. Pricing discussions covered approximately $1,000 per user annually, possible discounts, seat reduction, and alternative per-experiment proposals for Pocket FM’s expected 500–700 annual experiments. Historical data migration is free, while live experiments may require a phased transition. Leadership, product, analytics, data engineering, and finance will assess technical fit and cost before the September renewal deadline (02:00–44:34).\n\n## Keywords\nExperimentation Platform, GrowthBook, EPO, Statistical Testing, Pricing Model, Migration\n\n## Action Items\n\n**Naman Nandan**\nDiscuss internal team availability and coordinate scheduling a follow-up call including other team members for detailed GrowthBook review (43:05)\nShare feedback and decision inputs from leadership, analytics, data engineering, and finance teams about pricing and platform evaluation (43:05)\n\n**Dan Wathne**\nProvide GrowthBook pricing proposals with both per-seat and per-experiment pricing models, including scaling tiers for user counts and experiment numbers (38:10)\nShare rough ballpark pricing estimates swiftly to facilitate Pocket FM’s decision making before EPO contract expiry (43:00)\nOrganize follow-up demo and detailed product walkthrough with Pocket FM product team once scheduling is confirmed (43:00)\n\n**Logan Bates**\nSupport technical discussion on statistical testing options, cohort filtering, and experiment migration nuances with Pocket FM team (20:00)\nCollaborate on handling ongoing experiment migration and provide data science input on statistical differences during migration (40:30)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

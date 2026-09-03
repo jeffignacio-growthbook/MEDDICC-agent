@@ -1,7 +1,7 @@
 {
   "company": "Aaron Le and",
   "slug": "aaron-le-and",
-  "last_etl_date": "2026-08-15T02:33:18.394558",
+  "last_etl_date": "2026-09-03T06:04:10.799872",
   "calls": [
     {
       "id": "01KZXX7KBAQRZMRQ99DYPESKSP",
@@ -16,7 +16,19 @@
       "action_items": "\n, *, *, A, a, r, o, n,  , L, e, *, *, \n, P, r, e, p, a, r, e,  , a, n, d,  , s, e, n, d,  , a,  , d, e, t, a, i, l, e, d,  , p, r, o, p, o, s, a, l,  , o, u, t, l, i, n, i, n, g,  , t, h, e,  , w, o, r, k, f, l, o, w,  , a, u, t, o, m, a, t, i, o, n,  , p, l, a, n,  , a, n, d,  , i, n, t, e, g, r, a, t, i, o, n,  , a, p, p, r, o, a, c, h,  , f, o, r,  , p, e, r, s, o, n, a, l, i, z, e, d,  , o, u, t, r, e, a, c, h,  , u, s, i, n, g,  , R, i, o, ,,  , C, l, a, y, ,,  , H, u, b, S, p, o, t, ,,  , a, n, d,  , A, p, o, l, l, o,  , (, 0, 9, :, 1, 9, ), \n, C, o, o, r, d, i, n, a, t, e,  , w, i, t, h,  , J, a, c, k,  , r, e, g, a, r, d, i, n, g,  , t, h, e,  , p, r, o, p, o, s, a, l,  , a, n, d,  , d, e, t, e, r, m, i, n, e,  , w, h, e, t, h, e, r,  , t, o,  , c, o, l, l, a, b, o, r, a, t, e,  , w, i, t, h,  , A, s, h, l, e, y,  , d, i, r, e, c, t, l, y,  , o, r,  , i, n, c, l, u, d, e,  , J, a, c, k,  , i, n,  , f, o, l, l, o, w, -, u, p,  , d, i, s, c, u, s, s, i, o, n, s,  , (, 0, 9, :, 1, 9, ), \n, \n, *, *, A, s, h, l, e, y,  , S, t, i, r, r, u, p, *, *, \n, R, e, v, i, e, w,  , A, a, r, o, n, ’, s,  , p, r, o, p, o, s, a, l,  , o, n, c, e,  , r, e, c, e, i, v, e, d,  , a, n, d,  , a, r, r, a, n, g, e,  , a,  , f, o, l, l, o, w, -, u, p,  , m, e, e, t, i, n, g,  , w, i, t, h,  , A, a, r, o, n,  , a, n, d,  , J, a, c, k,  , t, o,  , d, i, s, c, u, s, s,  , n, e, x, t,  , s, t, e, p, s,  , a, n, d,  , f, i, n, a, l, i, z, e,  , p, r, o, j, e, c, t,  , s, c, o, p, e,  , (, 1, 1, :, 0, 8, ), \n, C, o, n, t, i, n, u, e,  , d, e, v, e, l, o, p, i, n, g,  , e, m, a, i, l,  , c, o, p, y,  , a, n, d,  , o, u, t, r, e, a, c, h,  , c, o, n, t, e, n, t, ,,  , p, o, t, e, n, t, i, a, l, l, y,  , l, e, v, e, r, a, g, i, n, g,  , c, o, n, t, r, a, c, t, o, r,  , s, u, p, p, o, r, t,  , f, o, r,  , e, m, a, i, l,  , w, r, i, t, i, n, g,  , a, n, d,  , c, a, m, p, a, i, g, n,  , c, a, d, e, n, c, e, s,  , (, 0, 6, :, 1, 4, ), \n",
       "participant_domains": [
         "deadwater.ai"
-      ]
+      ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M17WZY258G84QFND73YTKAJS",
+      "source": "fireflies",
+      "title": "Aaron Le and Ashley Stirrup",
+      "date": "2026-08-31",
+      "duration_minutes": 13.279999732971191,
+      "summary": "# Aaron Le and Ashley Stirrup\nDate: 2026-08-31 | Duration: 13.279999732971191m\n\n## Summary\nThe team refined company data enrichment by switching from Aviato to Semrush, which costs less than half and produced better results. The target segment was narrowed from around 4,000 companies to 309, focusing on companies with more than 249 employees and created after September 1st. Companies are automatically excluded once their web traffic data is known, keeping enrichment focused on unknown profiles and avoiding duplication. To improve lead scoring, the team planned web traffic, mobile traffic, and combined traffic fields in HubSpot. Aaron guided Ashley through creating a number field for mobile traffic and a calculated field that sums mobile and web traffic, with both grouped under Company information and positioned near existing web traffic properties. Aaron will validate the calculation, review Ashley’s existing tables, and take ownership of populating mobile traffic data. The team also agreed to use approximate traffic tiers rather than exact monthly refreshes to balance useful scoring insights with lower system load and cost.\n\n## Keywords\nHubSpot, data enrichment, web traffic, mobile traffic, Semrush, CRM integration\n\n## Action Items\n\n**Ashley Stirrup**\nShare the current data enrichment table with Aaron for review and possible enhancements (11:34)\n\n**Aaron Le**\nValidate newly created mobile traffic and combined traffic fields in HubSpot and assist with any calculation or data issues (11:01)\nReview Ashley’s enrichment table for refinements and prepare to proceed to the next phase of the project (11:26)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

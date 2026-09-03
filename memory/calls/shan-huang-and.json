@@ -1,0 +1,18 @@
+{
+  "company": "Shan Huang and",
+  "slug": "shan-huang-and",
+  "last_etl_date": "2026-09-03T06:04:10.796035",
+  "calls": [
+    {
+      "id": "01M1H6P6K4HEJH5HXD5QAA79V6",
+      "source": "fireflies",
+      "title": "Shan Huang and James Shannon + Ashley Stirrup",
+      "date": "2026-09-02",
+      "duration_minutes": 49.400001525878906,
+      "summary": "# Shan Huang and James Shannon + Ashley Stirrup\nDate: 2026-09-02 | Duration: 49.400001525878906m\n\n## Summary\nThe discussion examined how to expand experimentation beyond core games to the Supercell store website, user acquisition, and push notifications. The store requires experimentation suited to continuous deployment, while Facebook and Google’s black-box UA optimization creates demand for greater control and insight. Push notifications may use third-party tools because phone SDK constraints make fully in-house implementation difficult. LiveOps currently supports configurable in-game events, A/B tests, exposure tracking, and dashboards, while AI assistants such as Claude and GrowthBook’s AI tools could make analysis easier for product and LiveOps managers. GrowthBook offers Bayesian and frequentist methods, sequential testing, post-stratification, guardrail metrics, retroactive metric changes, dimension slicing, learning aggregation, and scaled-impact dashboards. Its SDKs, APIs, Databricks integration, open-source model, and self-hosting options support a hybrid architecture in which Supercell retains in-house experiment setup while using external analysis. Shan planned internal discussions and follow-up around September, with interest in AI demonstrations and deeper technical collaboration. Sources: 04:18, 07:12, 09:04, 14:00, 20:24, 30:29, 33:59, 37:00, 47:26.\n\n## Keywords\nA/B testing, GrowthBook, LiveOps, AI assistant, game experimentation, data warehouse\n\n## Action Items\n\n**Shan Huang**\nDiscuss GrowthBook analysis layer and platform options internally with Supercell stakeholders after upcoming planning sessions to evaluate potential adoption and integration (46:18)\n\n**James Shannon**\nSend meeting materials, including demo webinar link and slides, to Shan Huang for review to support internal evaluation (46:18)\nSchedule a follow-up call around the end of September with Shan Huang and potentially Supercell’s data engineers to review progress and explore integration possibilities (47:26)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

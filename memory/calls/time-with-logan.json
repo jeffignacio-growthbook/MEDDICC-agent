@@ -1,0 +1,18 @@
+{
+  "company": "time with logan",
+  "slug": "time-with-logan",
+  "last_etl_date": "2026-09-03T06:04:10.822107",
+  "calls": [
+    {
+      "id": "01M0TMVRH78HP14GNPVZFWJ8GB",
+      "source": "fireflies",
+      "title": "time with logan",
+      "date": "2026-08-24",
+      "duration_minutes": 15.489999771118164,
+      "summary": "# time with logan\nDate: 2026-08-24 | Duration: 15.489999771118164m\n\n## Summary\nThe team identified critical UI and usability improvements to streamline experiment setup, highlighting the need for an inline editable UI to reduce confusion and enhance workflows. They addressed the current UI's complexity, which oversimplifies advanced features, potentially limiting user adoption. The introduction of new analytics tools, echoing competitors like Datadog, aims to boost competitiveness and provides deeper insights into metrics and user behavior. An Insights tab was developed to clarify experiment impacts, reinforcing value during demos. The team also emphasized the importance of feedback loops from customers and onboarding, driving continuous evolution and necessitating a focus on technical enhancements, such as caching and batching, to refine the UI experience while managing performance issues.\n\n## Keywords\nexperiment parameters, UI design, JSON payload, inline editing, user journeys, alert thresholds\n\n## Action Items\n\n**Logan Bates**\nSupport design review feedback and provide UX input on large UI projects upon request to improve user experience (12:37)\n\n**Johnny Martinez**\nIncorporate a cache-and-flush mechanism for inline editable UI improvements to reduce reliance on modal dialogs and improve user workflow (06:10)\nExplore auto-populating experiment assignment UI fields with validation and toggleable advanced features to improve clarity and user control (04:45)\n\n**Gabe Melean**\nGather feedback from newly onboarded users regarding pain points and usability issues in experiment setup to inform UI improvements (12:51)\nContinue working on UI improvements around inline editing and save behavior to enhance user experience and reduce friction (08:11)\nPrepare competitive feature analysis and UI redesign mockups for presentation to leadership to build appetite for UI investment (08:30)\n",
+      "organizer": "johnny@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

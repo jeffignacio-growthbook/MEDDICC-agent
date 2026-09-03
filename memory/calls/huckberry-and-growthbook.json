@@ -1,0 +1,18 @@
+{
+  "company": "Huckberry and GrowthBook",
+  "slug": "huckberry-and-growthbook",
+  "last_etl_date": "2026-09-03T06:04:10.795229",
+  "calls": [
+    {
+      "id": "01M1H9WVP6EV719V9NSBZK238C",
+      "source": "fireflies",
+      "title": "Huckberry and GrowthBook",
+      "date": "2026-09-02",
+      "duration_minutes": 1,
+      "summary": "# Huckberry and GrowthBook\nDate: 2026-09-02 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

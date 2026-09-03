@@ -1,0 +1,18 @@
+{
+  "company": "RCCL + GrowthBook",
+  "slug": "rccl-growthbook",
+  "last_etl_date": "2026-09-03T06:04:10.825296",
+  "calls": [
+    {
+      "id": "01M0DSQXTDBJCGK4ZX25A172JT",
+      "source": "fireflies",
+      "title": "RCCL + GrowthBook",
+      "date": "2026-08-21",
+      "duration_minutes": 19,
+      "summary": "# RCCL + GrowthBook\nDate: 2026-08-21 | Duration: 19m\n\n## Summary\nThe team is currently migrating Silversea’s experimentation infrastructure from Google Tag Manager to Tealium, led by Ed Thomas. They are also developing an Adobe Target workspace to enhance experimentation. The participants aim to review overlaps with Growth Book and LaunchDarkly while managing account intricacies due to the agency switch to Omnicom. Additionally, insights were shared on Growth Book's Pro plan, which allows for 50 users and includes options for additional paid seats. Technical support is being emphasized, with a need for clear documentation and dedicated technical contacts from Silversea. The conversation also touched on the interest in advanced personalization techniques and major experimentation practices currently occurring using Adobe Target.\n\n## Keywords\nGrowth Book, Silversea, Adobe Target, experimentation, tag manager migration, feature flagging\n\n## Action Items\n\n**Ed Thomas**\nCoordinate with Silversea team to review their existing Growth Book setup and experiment migration status (12:06)\nFollow up with Growth Book regarding developer documentation and JavaScript SDK validation for Silversea migration (13:00)\nProvide Growth Book team with updated contact details for Silversea’s new agency and retained staff (15:03)\nReach out to Growth Book for additional info if needed after internal review and migration progress (18:50)\n\n**Logan Bates**\nShare all relevant SDKs and developer documentation to Ed and his team via Zoom chat and follow-up communications (13:14)\nOffer to set up a shared Slack channel or other communication for technical questions and developer support (13:31)\n\n**Christian Liebenow**\nIdentify and confirm Growth Book contacts in EMEA and account executives who can support Silversea under new agency Omnicom (14:07)\nMaintain communication with Ed Thomas for updated contact info and collaboration on Silversea migration and testing needs (15:03)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

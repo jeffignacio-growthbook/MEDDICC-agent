@@ -1,0 +1,18 @@
+{
+  "company": "Sara Cruz and",
+  "slug": "sara-cruz-and",
+  "last_etl_date": "2026-09-03T06:04:10.795814",
+  "calls": [
+    {
+      "id": "01M1H6SHYR59AS8ZTGD91GG2SZ",
+      "source": "fireflies",
+      "title": "Sara Cruz and Chris Sanders + Jake Heier",
+      "date": "2026-09-02",
+      "duration_minutes": 36.25,
+      "summary": "# Sara Cruz and Chris Sanders + Jake Heier\nDate: 2026-09-02 | Duration: 36.25m\n\n## Summary\nThe team planned a phased GrowthBook rollout to about 60 product and tech teams, potentially excluding around 30% because of legacy systems or high-risk products. Early adoption will focus on internal-facing, low-risk teams, beginning with a few pilots to identify training needs and technical blockers before scaling. Feature flagging is expected to spread faster than A/B testing, which requires greater stakeholder alignment and experimentation maturity. Onboarding will include a kickoff, technical implementation for SDKs, warehouses, user management, data pipelines, and access control, followed by conceptual and hands-on experimentation training. Sessions will be adapted to team readiness and ideally limited to 10–20 participants. Technical progress depends on resource availability, August holidays in Portugal, coordination with dev platform, data warehouse, compliance, and security teams, and varying data pipeline maturity. Product and tech stream leads will help identify suitable teams and champions. GrowthBook will also be embedded in AI workflows using Claude and MCP connectors, supporting a broader shift toward AI-enhanced product experimentation and maturity.\n\n## Keywords\nGrowthBook, experimentation, feature flagging, AI integration, product teams, technical implementation\n\n## Action Items\n\n**Carlos Manuel Martins Vieira**\nCoordinate with Dev platform, data warehouse, and compliance teams to clarify timelines and technical implementation details for GrowthBook integration (26:56)\nSchedule a coordination call for technical implementation once all relevant stakeholders are identified (29:35)\nContinue managing asynchronous technical questions and compliance inquiries related to GrowthBook setup (33:55)\n\n**Sara Cruz**\nCoordinate with other product leads to identify interested teams for GrowthBook experimentation training (21:59)\nSchedule and conduct an experimentation training session for her team within the next two weeks (30:11)\nDecide whether to include additional team members in experimentation sessions based on readiness (30:38)\nSpread awareness among product stream leads and manage initial rollout communication (33:16)\n\n**Nuno Salvaterra**\nSupport Sara in spreading GrowthBook adoption awareness among cross-team leads (33:16)\nFollow up with product stream leads to identify suitable teams and pilots for phased rollout (06:04)\n\n**Chris Sanders**\nProvide Sara and Nuno with Calendly links to schedule developer implementation and experimentation sessions (31:30)\nRespond to AI-related compliance and technical questions (29:36)\nSupport ongoing and advanced training sessions as teams progress in maturity and adoption (17:46)\n",
+      "organizer": "chris@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

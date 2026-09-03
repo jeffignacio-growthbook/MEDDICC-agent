@@ -1,0 +1,18 @@
+{
+  "company": "attributes <-> identifiers",
+  "slug": "attributes-identifiers",
+  "last_etl_date": "2026-09-03T06:04:10.819149",
+  "calls": [
+    {
+      "id": "01M0X2SDP9CT1WCQKYA10Y2A2Q",
+      "source": "fireflies",
+      "title": "attributes <-> identifiers",
+      "date": "2026-08-25",
+      "duration_minutes": 34.029998779296875,
+      "summary": "# attributes <-> identifiers\nDate: 2026-08-25 | Duration: 34.029998779296875m\n\n## Summary\nThe team discussed key improvements to onboarding and identifier management, including changing the default identifier from 'id' to 'device ID' to eliminate confusion and enhance data integrity. They emphasized requiring explicit selection of identifier types during data source creation to prevent mismatches, and introduced mechanisms for linking identifiers with data sources and attributes. The conversation also highlighted the importance of incremental onboarding, allowing users to gradually link identifiers during the setup process and ensuring better management of broken states. Additionally, they planned to implement stricter linkage requirements for new organizations while maintaining leniency for existing ones. This approach aims to promote smoother transitions, reduced errors in experiment targeting, and enhanced overall user experience.\n\n## Keywords\nonboarding, identifier linkage, data source, experiment assignment queue, attribute mapping, permission gating\n\n## Action Items\n\n**Luke Sonnet**\nDraft brief proposals for auto-linking identifiers and forced linkage on creation processes, considering project-scoped multi-identifier EAQs and onboarding improvements (32:16)\nContinue discussions about handling multiple unit types in EAQs and linkage enforcement policies (19:23)\n\n**Jeremy Dorn**\nReview and provide feedback on proposed changes for attribute-identifier linkage and onboarding workflows asynchronously (32:46)\nLead efforts to fix the default attribute naming issue (\"id\"), coordinating with SDK attribute plugin updates separately (31:57)\nImplement UI changes to enable inline linking of identifiers during experiment and feature rule creation, including addition of linkage prompts (18:06)\nMaintain permission gating for identifier and EAQ editing to minimize erroneous selections, ensuring admins manage setups (21:38)\n\n**Michael Samper**\nSupport drafting and reviewing proposals related to attribute and identifier linkage, onboarding flow improvements, and permission handling (32:46)\nProvide insight on handling deprecated data sources and its impact on linkage enforcement (10:39)\n",
+      "organizer": "msamper@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

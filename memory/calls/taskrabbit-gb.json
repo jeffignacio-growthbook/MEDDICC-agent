@@ -1,0 +1,18 @@
+{
+  "company": "Taskrabbit + GB",
+  "slug": "taskrabbit-gb",
+  "last_etl_date": "2026-09-03T06:04:10.816627",
+  "calls": [
+    {
+      "id": "01M0DSQXS6Q3JTH0JPDGBM84A8",
+      "source": "fireflies",
+      "title": "Taskrabbit + GB Visual Editor",
+      "date": "2026-08-26",
+      "duration_minutes": 24,
+      "summary": "# Taskrabbit + GB Visual Editor\nDate: 2026-08-26 | Duration: 24m\n\n## Summary\nThe meeting provided a comprehensive demonstration of Growthbook’s Visual Editor, highlighting its user-friendly features such as full experiment management through a Chrome extension, which blends AI suggestions with manual edits for flexible testing of webpage elements. Key integrations with Figma facilitate the import of design elements, enabling efficient visual updates and rapid prototyping. AI-powered image editing allows users to generate and swap images hosted on Growthbook’s CDN swiftly, speeding up creative iterations. The platform also emphasizes granular experiment targeting, including geo-targeting and user attribute targeting for localized marketing strategies. Additionally, CDN-level SDK integration is recommended to reduce page flicker during tests, while the Growthbook team’s quick responsiveness to user feedback fosters improved features and builds trust.\n\n## Keywords\nVisual Editor, A/B Testing, Homepage Redesign, Figma Integration, Client-Side Testing, Geographic Targeting\n\n## Action Items\n\n**Abby Suppan**\nCollaborate with Cara to finish evaluating Growthbook Visual Editor and leave comments/questions in the shared channel (22:28)\n\n**Cara**\nParticipate with Abby in evaluating the visual editor and documenting feedback or questions to share with Growthbook team (22:28)\n\n**Growthbook Team – Graham McNicoll, Logan Bates, Christian Liebenow**\nReview and address any feedback or issues reported by TaskRabbit team promptly and support Abby and Cara with further queries or clarifications during their evaluation process (22:55)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

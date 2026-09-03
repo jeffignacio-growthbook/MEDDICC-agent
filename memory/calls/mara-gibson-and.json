@@ -1,0 +1,18 @@
+{
+  "company": "Mara Gibson and",
+  "slug": "mara-gibson-and",
+  "last_etl_date": "2026-09-03T06:04:10.815620",
+  "calls": [
+    {
+      "id": "01M0XG53Z8GXD9DPSRPBB9564G",
+      "source": "fireflies",
+      "title": "Mara Gibson and Graham McNicoll",
+      "date": "2026-08-26",
+      "duration_minutes": 24,
+      "summary": "# Mara Gibson and Graham McNicoll\nDate: 2026-08-26 | Duration: 24m\n\n## Summary\nThe meeting discussed the customer's growing usage of Mongo Atlas, including a monthly expenditure of around $3,000 and the storage of approximately 600GB of data. Graham McNicoll expressed satisfaction with the platform's reliability, while the need for a signed Business Associate Agreement (BAA) was highlighted for compliance with health tech clients, despite minimal health data processing. The customer is actively exploring the deployment of resources in Europe for data residency compliance, driven by client demand, and faced challenges with Mongo's support channels, which Mara Gibson committed to improving. Data deletion requests occur monthly, managed manually without automated backup deletion. Next steps included initiating the BAA process and enhancing communication and support.\n\n## Keywords\nMongoDB Atlas, Business Associate Agreement, HIPAA compliance, European data residency, GDPR, billing, usage\n\n## Action Items\n\n**Mara Gibson**\nObtain signatory details and billing information from Graham McNicoll to initiate the Business Associate Agreement (BAA) process (07:36)\nProvide Graham McNicoll with detailed information on current MongoDB Atlas spend and billing details to ensure transparency and support account management (12:02)\nAlign Graham McNicoll’s team with a sales architect and a dedicated sales representative to advise on European deployment best practices and provide ongoing support (15:27)\nInvestigate and improve chat and support response times based on feedback from Graham McNicoll regarding difficulties in obtaining BAA support and general responsiveness (21:48)\nSchedule and facilitate a follow-up call including Graham McNicoll’s CTO to discuss European expansion, best practices for data residency, and technical details related to MongoDB Atlas deployment (23:29)\n\n**Graham McNicoll**\nProvide official signatory information for the BAA documentation to Mara Gibson to enable the agreement process (07:36)\nConfirm and share billing address details with Mara Gibson for BAA and billing purposes to ensure accurate documentation and compliance (08:07)\nCoordinate with the CTO to be included on communications and calls related to European expansion and technical discussions to ensure proper technical alignment and decision-making (16:43)\nConsider sharing a list of self-hosted customers’ usage of MongoDB Atlas with Mara Gibson for tracking, reporting, and support optimization purposes (18:16)\n",
+      "organizer": "graham@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

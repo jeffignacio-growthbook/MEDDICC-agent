@@ -1,0 +1,18 @@
+{
+  "company": "EU Data Discussion",
+  "slug": "eu-data-discussion",
+  "last_etl_date": "2026-09-03T06:04:10.828396",
+  "calls": [
+    {
+      "id": "01M0DFWD68K2AFCGNV29Q50EKP",
+      "source": "fireflies",
+      "title": "EU Data Discussion",
+      "date": "2026-08-20",
+      "duration_minutes": 25,
+      "summary": "# EU Data Discussion\nDate: 2026-08-20 | Duration: 25m\n\n## Summary\nThe discussion centered on the company's data residency setup, highlighting that while the app database is in the U.S., event data is stored in the EU to meet customer needs. The implications of this split architecture were examined, particularly regarding potential PII exposure and the complexities surrounding data handling. Legal documentation requires updates to address these changes, especially in light of European regulations like the Digital Operational Resilience Act (DORA), which emphasizes compliance in the fintech sector. Participants also touched on product controls for mitigating PII risks and the importance of clear and accurate messaging to customers regarding data storage locations. Future steps include refining internal documentation and monitoring regulatory developments to ensure ongoing compliance.\n\n## Keywords\nEU data residency, PII risk, managed warehouse, control plane, SQL Explorer, DORA compliance\n\n## Action Items\n\n**Rémy Marin**\nUpdate and finalize the architecture diagrams to reflect current and future EU data setups for clarity (00:15)\n\n**James Shannon**\nEngage legal team to assess and update Data Processing Agreements or contract language related to data residency and PII handling (00:33)\n\n**Ryan McGurk**\nResearch benchmarking data on U.S. companies operating in the EU to inform scaling and localization strategies (12:18)\n\n**Marcel Geldner**\nAssist in reviewing legal documents and compliance risks, especially regarding fintech requirements and DORA regulations (13:42)\n\n**Jeremy Dorn**\nProvide detailed explanations of current data architecture and security implications to legal and sales teams for customer communications (02:04)\nExplore potential product-level warnings or flagging mechanisms in SQL Explorer to alert users to PII-related risks (10:01)\n",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

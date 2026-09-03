@@ -1,0 +1,29 @@
+{
+  "company": "Time w/ Logan",
+  "slug": "time-w-logan",
+  "last_etl_date": "2026-09-03T06:04:10.822790",
+  "calls": [
+    {
+      "id": "01M0TJCDFVHBCPWV9SR9VSAKEK",
+      "source": "fireflies",
+      "title": "Time w/ Logan ",
+      "date": "2026-08-24",
+      "duration_minutes": null,
+      "summary": "# Time w/ Logan \nDate: 2026-08-24 | Duration: Unknown\n\n## Summary\nThe discussion centered around comparing GrowthBook and Statsig, emphasizing product inspiration and areas for improvement. GrowthBook, drawing from Statsig's polished UI and feature set, faces challenges in onboarding due to technical terminology and manual data setup. Key differences include how feature flags are linked to experiments, with Statsig offering more real-time data monitoring and metric alerts, while GrowthBook seeks to improve these aspects. Participants highlighted the need for clearer guidance and tooltips in the UI to aid non-technical users, as well as proposing enhancements like comments for better collaboration. Overall, the team discussed actionable roadmap priorities to streamline user experiences, automate setups, and enhance experiment analysis capabilities.\n\n## Keywords\nexperiment setup, feature flags, metrics alerts, user interface, data sources, onboarding\n\n## Action Items\n\n**Logan Bates**\nOffer walkthrough of Notion feedback using demo accounts and share access with the team (02:14)\nExplore UI mockup to simulate Statsig’s approach of hiding feature flag involvement while managing it internally (07:16)\nInvestigate and plan improvements for assignment source auto-selection during experiment creation (27:05)\nAssist in reviewing and potentially rebuilding experiment setup to reduce user confusion and simplify flows (29:25)\nWork on enhancing the health check and callout system to avoid frivolous alerts and improve user clarity (32:21)\nCollaborate on adding inline explanations and tooltips to improve accessibility for non-technical users (37:12)\nConsider adding inline power analysis calculation tied to experiment setup (39:30)\nSupport implementation of more prominent and actionable checklists for experiment setup (41:13)\n\n**Johnny Martinez**\nCoordinate with Gabe for further onboarding and mapping Notion feedback (02:37)\nReview experimental data validation issues and bring forward pain points experienced by users (10:13)\nFacilitate team discussions on UI improvements inspired by Statsig, including comments, annotations, and metrics alerts (14:22)\nProvide feedback to development on making diagnostic health checks collapsible or simpler (32:15)\nLead efforts on integrating better experiment explanations and user guidance throughout UI (37:12)\nPilot improvements informed by user feedback from Notion and Change.org about experiment setup flow (29:25)\n\n**Gabe Melean**\nEvaluate current setup requirements for data sources and assignment queries; flag pain points and offer insights from perspective of new onboarding user (23:09)\nSupport UI efforts to reduce confusion around experiment types and improve user experience (07:16)\n",
+      "organizer": "johnny@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M0NFGBZD8QQ03WT9NMP1SMWM",
+      "source": "fireflies",
+      "title": "Time w/ Logan",
+      "date": "2026-08-24",
+      "duration_minutes": 68,
+      "summary": "# Time w/ Logan\nDate: 2026-08-24 | Duration: 68m\n\n## Summary\nThe discussion revolved around enhancing user experience through UI simplification and better management of experiment features. Logan Bates and Gabe Melean emphasized the need for inline editing instead of modals, highlighting that distractions from current modal systems hamper user flow. The importance of progressive disclosure for user comprehension was raised, particularly regarding the insufficient in-UI help observed in Growth Book compared to Statsig. Additionally, the differentiation in UI quality was attributed to varying resource allocations, with Statsig benefiting from dedicated design teams. The meeting also explored the complexities of experiment setup, with suggestions to streamline processes. Feedback from Notion was a key driver for prioritizing UI improvements. Overall, there was an acknowledgment of the need for enhanced collaboration among team members and leadership to better align product development with user needs.\n\n## Keywords\nexperiment setup, UI design, feature flags, metric alerts, product analytics, onboarding\n\n## Action Items\n\n**Johnny Martinez**\nCollaborate on incorporating Notion’s feedback and oversee UI improvements for clearer experiment setup and diagnostics (02:09)\nCoordinate with Michael Knowlton regarding metric alert feature implementation similar to Statsig’s system (12:55)\nWork on UI callouts refinement to reduce frivolous warnings and improve user clarity (31:55)\n\n**Logan Bates**\nProvide ongoing support and demos relating to product feedback and comparisons with Statsig to assist onboarding and feature alignment (00:19)\nAssist in conceptualizing inline editable UI with client-side caching and batched saves for better UX (49:31)\nOffer to review and give feedback on design reviews of large UI projects within GrowthBook (56:24)\n\n**Gabe Melean**\nEvaluate feasibility and impact of inline UI editing to reduce modal dependencies (49:07)\nFacilitate UI and user experience feedback loop among team members and stakeholders for future releases, working closely with UI/UX engineers (50:31)\n",
+      "organizer": "johnny@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

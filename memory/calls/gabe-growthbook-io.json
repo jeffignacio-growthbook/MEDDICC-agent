@@ -1,0 +1,18 @@
+{
+  "company": "gabe@growthbook.io",
+  "slug": "gabe-growthbook-io",
+  "last_etl_date": "2026-09-03T06:04:10.818051",
+  "calls": [
+    {
+      "id": "01M0XFDQ4XT2R1P5GYR8QCECX4",
+      "source": "fireflies",
+      "title": "gabe@growthbook.io - Tue, 25 Aug 2026 15:07:31 PDT - Untitled",
+      "date": "2026-08-25",
+      "duration_minutes": 24.280000686645508,
+      "summary": "# gabe@growthbook.io - Tue, 25 Aug 2026 15:07:31 PDT - Untitled\nDate: 2026-08-25 | Duration: 24.280000686645508m\n\n## Summary\nThe meeting addressed key areas including the exposure of experiment types during creation to enhance user experience, with a proposal to avoid mixing types and allow type changes in draft mode. UI improvements included managing variants within a single modal and a more robust JSON editor to simplify URL redirects and linked changes. Approval processes were clarified to apply only to value changes, while ensuring clarity on draft versus live edits to avoid unnecessary context switching. Discussion also highlighted the need for a scalable UI solution for JSON blobs, with plans for tabbed navigation and an escape hatch for power users. Future steps involve building a mid-term prototype focusing on siloed experiment types and improving UI based on approval feedback.\n\n## Keywords\nExperiment Type, Variants, Approval Workflow, JSON Editing, URL Redirects, Feature Flags\n\n## Action Items\n**Gabe Melean**  \nFocus on developing near-term prototype consolidating experiment types (15:26)  \nIncorporate approval workflow into UI design (15:26)  \nAddress scalability and usability in JSON editing (21:57)  \nResearch and integrate approval workflow into UI (22:40)  \n\n**Bryce Fitzsimons**  \nProvide demos on approval system if requested (23:11)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

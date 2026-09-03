@@ -1,0 +1,18 @@
+{
+  "company": "Managed Feature Flag",
+  "slug": "managed-feature-flag",
+  "last_etl_date": "2026-09-03T06:04:10.803270",
+  "calls": [
+    {
+      "id": "01M1CF2ZCZ9YX52BAT80KA1SXC",
+      "source": "fireflies",
+      "title": "Managed Feature Flag Sync!",
+      "date": "2026-08-31",
+      "duration_minutes": 60.08000183105469,
+      "summary": "# Managed Feature Flag Sync!\nDate: 2026-08-31 | Duration: 60.08000183105469m\n\n## Summary\nThe team aligned on a holistic, pride-worthy demo for Sony, prioritizing the MVP happy path while preserving easy escape hatches and treating managed and non-managed flags consistently. Variation editing was redesigned with aligned layouts and grab handles, while the advanced section supports ID and description edits; changing an ID disables the flag. Linked changes were considered complex, so they may be hidden unless requested, with existing UI retained for the demo. The team discussed experiment type selection, keeping variation values inside cards for now, and improving readability later. Approval flows include confirmation, optional comments, approval, change requests, or denial, while detailed review should use a modal with summaries and JSON diffs. Timeline and comment history are out of scope initially. Environments will be managed at the experiment level, and linked-change integration is postponed. For the demo, the focus is value editing, basic flows, existing experiment usability, screenshots, and visual specifications.\n\n## Keywords\nfeature flags, experiment management, approval workflow, UI design, linked changes, environment controls\n\n## Action Items\n**Bryce Fitzsimons**  \nImplement demo-ready variation values interaction (03:20)  \nTry to enable smooth handling of existing experiments (20:44)  \nPort approval flow design to modal format (50:45)  \nFigure out and design environment management UI (51:06)  \nIncorporate feedback and screenshots/designs from Gabe (55:15)  \n\n**Gabe Melean**  \nDeliver requirements for approval modal (50:14)  \nContinue refining approval experience (28:10)  \nProvide screenshots and visual design references (55:45)  \n\n**Luke Sonnet**  \nSupport defining environment toggles and handling of existing experiments (50:30)  \nAlign on MVP scope to avoid overloading demo (54:00)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

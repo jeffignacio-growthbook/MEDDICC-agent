@@ -1,0 +1,18 @@
+{
+  "company": "Ryanair Meeting",
+  "slug": "ryanair-meeting",
+  "last_etl_date": "2026-09-03T06:04:10.810368",
+  "calls": [
+    {
+      "id": "01M14BKXGNH8FH98F6MXYBYQ6V",
+      "source": "fireflies",
+      "title": "Ryanair Meeting",
+      "date": "2026-08-28",
+      "duration_minutes": 47.5099983215332,
+      "summary": "# Ryanair Meeting\nDate: 2026-08-28 | Duration: 47.5099983215332m\n\n## Summary\nRyanair discussed the urgent need to replace its costly Optimized A/B testing platform, which limits its experimentation due to high expenses despite handling 200 million passengers annually with a 5% conversion rate. GrowthBook emerged as a strong alternative, featuring an AI-powered visual editor and the ability to run thousands of parallel tests, which addresses Ryanair's operational challenges. Integration complexities were acknowledged, particularly in accurately matching experiment exposure to bookings. A strategic plan was outlined for engaging stakeholders and addressing commercial considerations, including potential discounts on existing contracts to reduce switching costs. The meeting highlighted the cooperative relationship between Ryanair and GrowthBook, with both parties focused on a tailored solution that meets Ryanair's specific needs for flexibility, cost efficiency, and technical reliability.\n\n## Keywords\nA/B testing, experiment attribution, pricing experiments, data warehouse integration, feature flag migration, AI-powered analytics\n\n## Action Items\n\n**Marcin**\nBrief the manager on the meeting discussion and next steps, then email GrowthBook to schedule the demo (40:39)\nCoordinate internally with Ryanair backend and data teams to identify suitable participants for the technical demo (41:47)\n\n**Scott Keller**\nPropose demo times and send a meeting recap including migration and commercial offer details for buyout of Optimized and LaunchDarkly contracts (41:33)\n\n**GrowthBook Team**\nPrepare a demo focused on pricing experiments, booking attribution with deterministic user-session linkage, and integration with Ryanair’s data warehouse, involving Ryanair’s backend architects Paul Sheridan and Martin (30:50)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

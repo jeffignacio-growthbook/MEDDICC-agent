@@ -1,0 +1,18 @@
+{
+  "company": "SOC2 Sync-Up",
+  "slug": "soc2-sync-up",
+  "last_etl_date": "2026-09-03T06:04:10.808581",
+  "calls": [
+    {
+      "id": "01M1202TJMNRP07VRXG1BTNXN8",
+      "source": "fireflies",
+      "title": "SOC2 Sync-Up: Growthbook &  IA",
+      "date": "2026-08-28",
+      "duration_minutes": 42,
+      "summary": "# SOC2 Sync-Up: Growthbook &  IA\nDate: 2026-08-28 | Duration: 42m\n\n## Summary\nThe meeting focused on the SOC2 audit processes, discussing how the validity of reports extends to one year post-examination, regardless of whether the audit period lasts three or six months. Jennifer highlighted client concerns about report validity, and Thomas confirmed that extending the audit period aids client compliance maturity. They clarified that qualified opinions arise from multiple exceptions, but current evidence requests show no such risk. AWS services remain consistently included in the audit scope, ensuring continuity from the previous year. Additionally, adding availability controls could delay the audit timeline by one week, while transition between compliance platforms requires advance planning to maintain audit reliability and continuity, with a preference for established platforms like Vanta.\n\n## Keywords\nSOC2 report, audit period, qualified opinion, availability controls, AWS infrastructure, compliance platform transition\n\n## Action Items\n\n**Thomas Gilfix**\nCheck with the audit team on the current testing and evidence status and provide Jennifer an update by Monday or sooner (31:18)\n\n**Jennifer**\nContinue providing responses to the remaining six outstanding evidence requests to facilitate audit completion (31:45)\nDiscuss with the team the possibility of adding availability controls to the audit scope and update Thomas accordingly in the upcoming week (13:46)\nDecide on any changes to the audit period timing or compliance platform transition and communicate plans to Thomas (24:53)\n",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

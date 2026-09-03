@@ -1,0 +1,18 @@
+{
+  "company": "Jeremy + Michael | 1",
+  "slug": "jeremy-michael-1",
+  "last_etl_date": "2026-09-03T06:04:10.794946",
+  "calls": [
+    {
+      "id": "01M1CQ2X446NC5RGDWATRFA2CQ",
+      "source": "fireflies",
+      "title": "Jeremy + Michael | 1 - 1",
+      "date": "2026-09-02",
+      "duration_minutes": 37,
+      "summary": "# Jeremy + Michael | 1 - 1\nDate: 2026-09-02 | Duration: 37m\n\n## Summary\nThe team agreed to introduce a $150-per-month Pro plan with usage-based fees, a 30-seat cap, and limits of three or four projects to better cover Confluent costs and prevent large organizations from underpaying. Free users will be restricted to a managed warehouse, while Pro users can access all data sources; BigQuery and Snowflake will default to event forwarders, with experiment assignment queries locked to those routes for usage tracking. Existing free users with BigQuery connections will retain their current access, and selected Pro customers may receive a manually enabled exception when event forwarding is unsupported. The data-source UI will prioritize managed warehouses and show upgrade prompts with the $150 price. License-server controls, feature flags, and Terraform and UI changes will enforce plan limits. SQL Explorer and the schema browser are ready for production validation, while saved reports remain accessible. Sales will be briefed after validation, with legacy-user protections and downgrade role restrictions maintained.\n\n## Keywords\ndata source limits, event forwarder, Pro pricing, license server, upgrade modal, SQL Explorer\n\n## Action Items\n\n**Michael Knowlton**\nFocus on locking down data sources today and confirm with Guy who will handle this task (05:13)\nBegin sketching designs for the data source page after feedback from Jeremy and others (25:32)\n\n**Jeremy Dorn**\nSync with Guy regarding org limits integration and UI messaging updates (04:26)\nDiscuss new data source and plan changes with Ashley and Ryan for feedback (21:54)\nEnsure existing free BigQuery users are grandfathered correctly when upgrading to Pro (23:13)\nConsider adding locked flag on data source objects to manage feature restrictions going forward (23:35)\nReview and approve SQL Explorer changes as appropriate (25:59)\n",
+      "organizer": "michael@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

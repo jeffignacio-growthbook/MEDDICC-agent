@@ -1,0 +1,18 @@
+{
+  "company": "Noxtua & GrowthBook",
+  "slug": "noxtua-growthbook",
+  "last_etl_date": "2026-09-03T06:04:10.810527",
+  "calls": [
+    {
+      "id": "01M13GK1AEA384HX1DWD7XBJEY",
+      "source": "fireflies",
+      "title": "Noxtua & GrowthBook | First Meeting",
+      "date": "2026-08-28",
+      "duration_minutes": 38.04999923706055,
+      "summary": "# Noxtua & GrowthBook | First Meeting\nDate: 2026-08-28 | Duration: 38.04999923706055m\n\n## Summary\nThe discussion covered several critical topics regarding architecture, particularly the need for optimizing the release process through user-based signal testing. Participants emphasized the requirement for advanced configuration management, highlighting the necessity of hierarchies and targeting specific user segments beyond simple feature flags. The integration of observability tools like Logfire and OpenTelemetry was noted for tracking experiment failures and facilitating automated rollbacks. Additionally, GrowthBook was identified as a warehouse-native solution with support for various tracking tools, while questions surrounding client-side authentication were raised. The meeting also outlined enterprise features, such as self-hosting, data sovereignty, and pricing discussions, culminating in plans for a demo and proof of concept scheduled for Wednesday at 3 PM.\n\n## Keywords\nfeature flagging, configuration management, enterprise requirements, data sovereignty, Open Feature SDK, pricing negotiation\n\n## Action Items\n**Marcel Geldner**  \nShare slide deck after call (15:05)  \nProvide clearer pricing details (30:40)  \nSchedule demo for next Wednesday 3 pm (36:24)  \n\n**Simon Joecks**  \nSend invite for demo and confirm availability (36:14)  \n\n**Rémy Marin**  \nVerify Open Feature SDK compatibility (20:35)  \nClarify client-side authentication and security model (24:06)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

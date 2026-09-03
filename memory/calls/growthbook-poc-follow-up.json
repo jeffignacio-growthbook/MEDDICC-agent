@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook POC Follow-Up",
+  "slug": "growthbook-poc-follow-up",
+  "last_etl_date": "2026-09-03T06:04:10.795088",
+  "calls": [
+    {
+      "id": "01M1HDHN1W1PTR46S7M9F35SSR",
+      "source": "fireflies",
+      "title": "GrowthBook POC Follow-Up: Baton (Iuliia + Jerry)",
+      "date": "2026-09-02",
+      "duration_minutes": 20,
+      "summary": "# GrowthBook POC Follow-Up: Baton (Iuliia + Jerry)\nDate: 2026-09-02 | Duration: 20m\n\n## Summary\nRider and GrowthBook agreed that GrowthBook meets current requirements and recommended moving forward with an enterprise plan. Scott proposed a discounted $30,000 platform fee for 2023, compared with the normal $50,000 fee, with pricing based on 60 seats, an option to increase to 80, unlimited flags, and five included experiments. Additional experiments would use volume-based pricing. Jerry focused on budget overlap during the LaunchDarkly migration and avoiding backend-scaling charges; Scott explained that GrowthBook’s event-based model does not charge per server connection and agreed to confirm this in writing. GrowthBook’s event-based pricing rollout is planned for mid-September, while grandfathered plans remain unchanged unless customers opt in. The parties preferred a one-year contract, with net 30 or net 45 payment terms under consideration. Scott will provide an updated quote and order form, while Jerry will confirm payment terms and seek CEO approval. Final signing was targeted for the current week.\n\n## Keywords\nfeature flagging, pricing model, enterprise plan, event-based pricing, backend scaling, procurement\n\n## Action Items\n\n**Scott Keller**\nProvide an official updated quote including 80 seats, detailed pricing, backend scaling assurance, and explanation of event-based pricing after September (16:25)\nWalk through the pricing quote live with Iuliia to ensure understanding and avoid surprises (02:46)\nSend formal quote and order form with link to customer agreement for CEO Grant upon Jerry’s go-ahead (18:52)\nConfirm and provide written assurance regarding no backend connection cost impact and grandfathering of seat-based pricing if Baton later adopts event-based pricing (12:54)\n\n**Iuliia Kotlenko**\nReview and add up total projected costs including GrowthBook quote and LaunchDarkly spend during migration for CEO approval (02:31)\nConfirm payment terms feasibility (net 30 vs net 45) with Rider’s financial team and update Scott (16:05)\nPost budget and procurement details to Slack for CEO Grant’s review (18:52)\nProvide timeline updates and confirm if approval for GrowthBook move will occur this week (19:21)\n\n**Grant**\nReview bundled budget proposal on Slack and execute Docusign for GrowthBook contract following Jerry’s recommendation (18:52)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

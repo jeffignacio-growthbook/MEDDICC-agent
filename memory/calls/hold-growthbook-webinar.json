@@ -1,0 +1,18 @@
+{
+  "company": "[Hold] GrowthBook Webinar",
+  "slug": "hold-growthbook-webinar",
+  "last_etl_date": "2026-09-03T06:04:10.828534",
+  "calls": [
+    {
+      "id": "01KZYCRNX4DGEAE4Z6GFP0N8CR",
+      "source": "fireflies",
+      "title": "[Hold] GrowthBook Webinar",
+      "date": "2026-08-20",
+      "duration_minutes": 1,
+      "summary": "# [Hold] GrowthBook Webinar\nDate: 2026-08-20 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

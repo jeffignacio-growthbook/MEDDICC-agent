@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Reconnect with",
+  "slug": "growthbook-reconnect-with",
+  "last_etl_date": "2026-09-03T06:04:10.819004",
+  "calls": [
+    {
+      "id": "01M0JQSX5EMVZPHFEZ89MJEJS2",
+      "source": "fireflies",
+      "title": "GrowthBook Reconnect with Extra Space",
+      "date": "2026-08-25",
+      "duration_minutes": 46,
+      "summary": "# GrowthBook Reconnect with Extra Space\nDate: 2026-08-25 | Duration: 46m\n\n## Summary\nThe team discussed progress on fixing Visual Editor bugs, which are crucial for enterprise clients like Block and PepsiCo, while also highlighting stable advancements in experiment implementation. Testing is ongoing, with a focus on AI capabilities, including a new agent for test analysis, and plans for a learnings tab to grade experiments. Additional details covered included the mechanics of experiment bucketing using hash algorithms to ensure consistent user exposure, and the introduction of namespaces to avoid user overlap. The session also addressed data infrastructure related to experiment reporting and metric management, emphasizing the need for accurate data collection. Experiment results interpretation using Bayesian statistics was explained, alongside the role of feature flags in managing app behaviors based on experiments. The meeting concluded with plans for ongoing support and enablement sessions due to incomplete data connections.\n\n## Keywords\nVisual Editor, Experiment Bucketing, Feature Flags, AI Analysis, Metrics, Namespaces\n\n## Action Items\n\n**Chris Sanders**\nEnsure AI agent features are enabled for Extra Space if desired to assist with test analysis (05:16)\nDeliver recorded training session and enablement deck post-meeting to support asynchronous learning and reference (44:12)\n\n**Megan Loveland**\nInvestigate and provide screenshots or references for previously seen AI test analysis features to GrowthBook team for clarity and support (06:43)\nProgress data warehouse connection setup for experiment metrics and notify GrowthBook team when ready for further training and support (43:16)\n\n**Cary Rakin**\nShare documentation on AI agent and test analysis features with Extra Space to facilitate understanding and enablement (06:52)\n\n**Scott Keller**\nFollow up with Craig and Drupad about data connection status and assist as needed to resolve experiment analysis challenges (44:12)\n\n**All Extra Space attendees**\nUse Slack channel to communicate any further questions or schedule personalized training sessions tailored to needs such as Visual Editor deep dives or experiment-specific guidance (44:12)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

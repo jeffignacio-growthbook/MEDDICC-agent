@@ -1,7 +1,7 @@
 {
   "company": "BestSeller & GrowthBook",
   "slug": "bestseller-growthbook",
-  "last_etl_date": "2026-08-08T17:33:40.676257",
+  "last_etl_date": "2026-09-03T06:04:10.821566",
   "calls": [
     {
       "id": "01KZ6XTV5R8W78K6SEB4WYJJHW",
@@ -16,7 +16,19 @@
       "action_items": "\n, *, *, K, e, n, n, e, t, h,  , C, h, r, i, s, t, i, a, n, s, e, n, *, *, \n, S, e, n, d,  , m, o, n, t, h, l, y,  , t, r, a, f, f, i, c, ,,  , s, e, s, s, i, o, n,  , e, s, t, i, m, a, t, e, s, ,,  , a, n, d,  , i, n, d, e, x,  , d, a, t, a,  , f, o, r,  , a, l, l,  , b, r, a, n, d, s,  , t, o,  , s, u, p, p, o, r, t,  , p, r, i, c, i, n, g,  , a, n, d,  , t, i, e, r, i, n, g,  , a, n, a, l, y, s, e, s,  , (, 3, 0, :, 5, 7, ), \n, C, o, n, d, u, c, t,  , i, n, t, e, r, n, a, l,  , d, i, s, c, u, s, s, i, o, n, s,  , w, i, t, h,  , t, e, a, m, s,  , t, o,  , a, s, s, e, s, s,  , o, p, e, r, a, t, i, o, n, a, l,  , a, p, p, r, o, a, c, h, e, s,  , a, n, d,  , u, s, e,  , c, a, s, e, s,  , f, o, r,  , e, x, p, e, r, i, m, e, n, t, a, t, i, o, n,  , P, O, C,  , (, 3, 7, :, 3, 0, ), \n, C, o, n, f, i, r, m,  , i, n, t, e, r, n, a, l,  , b, u, d, g, e, t,  , a, p, p, r, o, v, a, l,  , a, n, d,  , d, e, c, i, s, i, o, n,  , p, r, o, c, e, s, s,  , f, o, r,  , P, O, C,  , c, o, m, m, i, t, m, e, n, t,  , (, 3, 8, :, 5, 0, ), \n, \n, *, *, J, a, m, e, s,  , S, h, a, n, n, o, n, *, *, \n, S, e, n, d,  , s, l, i, d, e,  , d, e, c, k, s, ,,  , m, e, e, t, i, n, g,  , t, r, a, n, s, c, r, i, p, t, ,,  , a, n, d,  , r, e, v, i, s, e, d,  , c, o, m, m, e, r, c, i, a, l,  , m, o, d, e, l,  , t, o,  , K, e, n, n, e, t, h,  , f, o, r,  , r, e, v, i, e, w,  , (, 3, 5, :, 0, 1, ), \n, S, c, h, e, d, u, l, e,  , f, o, l, l, o, w, -, u, p,  , m, e, e, t, i, n, g,  , w, i, t, h,  , K, e, n, n, e, t, h,  , d, u, r, i, n, g,  , t, h, e,  , w, e, e, k,  , o, f,  , J, u, n, e,  , 2, 4, t, h,  , t, o,  , 2, 8, t, h,  , t, o,  , r, e, v, i, e, w,  , p, r, o, g, r, e, s, s,  , a, n, d,  , n, e, x, t,  , s, t, e, p, s,  , (, 3, 9, :, 5, 4, ), \n, I, n, c, o, r, p, o, r, a, t, e,  , K, e, n, n, e, t, h, ’, s,  , f, e, e, d, b, a, c, k,  , o, n,  , b, r, a, n, d,  , t, i, e, r, s,  , a, n, d,  , p, r, i, c, i, n, g,  , t, o,  , a, d, j, u, s, t,  , c, o, m, m, e, r, c, i, a, l,  , m, o, d, e, l,  , a, c, c, o, r, d, i, n, g, l, y,  , b, e, f, o, r, e,  , P, O, C,  , s, t, a, r, t,  , (, 2, 7, :, 5, 0, ), \n",
       "participant_domains": [
         "bestseller.com"
-      ]
+      ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M0AHZR0EWSVTT01MMG2JYY73",
+      "source": "fireflies",
+      "title": "BestSeller & GrowthBook",
+      "date": "2026-08-25",
+      "duration_minutes": 31.770000457763672,
+      "summary": "# BestSeller & GrowthBook\nDate: 2026-08-25 | Duration: 31.770000457763672m\n\n## Summary\nThe team discussed building a flexible experimentation framework that would support simple brand-level tests and complex cross-brand experiments. Kenneth Christiansen outlined a two-tier approach involving brand teams for simple A/B testing and the central Horizon team for broader platform tests. James Shannon confirmed the feasibility of running multi-brand experiments through GrowthBook, ensuring centralized analysis via Snowflake. The importance of automating experiment creation via an existing front-end tool, Insanity, was also emphasized, allowing non-technical users to generate experiments easily. Following up on technical validation and cost considerations, the team agreed on a phased approach to validate API-driven experiment creation and outlined next steps for planning a proof of concept.\n\n## Keywords\nGrowthBook, Sanity CMS, experiment platform, A/B testing, API integration, proof of concept\n\n## Action Items\n\n**Kenneth Christiansen**\nReview and test usage of GrowthBook API for experiment ID creation and management with internal developer Jonathan to assess viability before POC (28:38)\nPrepare for follow-up meeting in approximately two weeks to update on progress and next steps (30:02)\n\n**James Shannon**\nFollow up by email with insights and support options regarding GrowthBook API use and best practices for experiment creation via Sanity integration (30:17)\nAssist in scoping potential collaboration on API integration prior to full POC if required (27:50)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

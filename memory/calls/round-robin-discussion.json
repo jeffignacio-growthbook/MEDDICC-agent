@@ -1,0 +1,18 @@
+{
+  "company": "Round Robin Discussion",
+  "slug": "round-robin-discussion",
+  "last_etl_date": "2026-09-03T06:04:10.800572",
+  "calls": [
+    {
+      "id": "01M17GJGA82WVCEVQ8GXATXPMY",
+      "source": "fireflies",
+      "title": "Round Robin Discussion",
+      "date": "2026-08-31",
+      "duration_minutes": 63.13999938964844,
+      "summary": "# Round Robin Discussion\nDate: 2026-08-31 | Duration: 63.13999938964844m\n\n## Summary\nThe team agreed to route Jake Stangl approximately 20–25% of SMB inbound leads for closing, allowing him to spend 75–80% of his time on outbound and campaign-driven meeting setting. OSS and Statsig were identified as the strongest meeting and pipeline sources, with OSS generating about 10–15 companies weekly for Jake and webinars producing episodic results. Jake makes roughly 50–60 calls daily, considers phone outreach his most effective channel, and is prioritizing warmer leads over cold outbound without intent signals. The team will improve campaign measurement by tagging meetings, logging LinkedIn, email, and call activity, and integrating Dripify data with HubSpot through webhooks and Zapier. Ryan, Brent, and AES team members will support Jake’s early closing efforts, while Jake uses skills assessments and Claude-based call evaluations. The Pro pricing rollout includes training on August 8 and website introduction on August 15, with the goal of encouraging Enterprise upgrades.\n\n## Keywords\nround robin, outbound campaigns, inbound leads, OSS campaign, Dripify integration, sales pipeline tracking\n\n## Action Items\n\n**Jake Stangl**\nBacklog and categorize meetings by campaign to support performance tracking and prioritization (14:55)\nTrack activities (LinkedIn, email, calls) and meeting sets with campaign attribution going forward (15:15)\nUpdate deal names in CRM to reflect campaigns for accurate reporting (01:01:25)\nProvide Ryan McGurk with meeting breakdown by inbound/outbound and campaigns for last 90 days (01:01:18)\nParticipate in scheduled session with Jeff Ignacio and Brent Holloway to set up Dripify webhook integration and data syncing (50:00)\n\n**Brent Holloway**\nAssist Jake with exporting Dripify data, linking it with HubSpot opportunity data, and setting up reporting (20:20)\nCoordinate with Jeff Ignacio and Jake to establish Dripify webhook integration into HubSpot (43:40)\nJoin follow-up sessions on SDR funnel reporting and pipeline analytics (49:48)\n\n**Jeff Ignacio**\nLead technical setup for integrating Dripify data with HubSpot using webhooks and automation tools like Zapier (43:40)\nFacilitate setup of tracking metrics for outreach, connections, meeting sets, and opportunity creation and enable reporting dashboards (46:00)\nSchedule and conduct joint technical session with Jake and Brent to configure tools and reporting systems (50:02)\n\n**Ryan McGurk**\nOversee prioritization discussions and advise on time allocation adjustments for Jake focusing on high-impact campaigns and closing deals (01:15)\nReview Jake's campaign meeting data and work on refining tracking/reporting frameworks (01:00:50)\nCoordinate support for initial round robin deal flows and provide coaching on deal qualification and closing (57:30)\n",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

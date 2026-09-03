@@ -1,0 +1,40 @@
+{
+  "company": "LaunchDarkly migration & GrowthBook experience",
+  "slug": "launchdarkly-migration-growthbook-experience",
+  "last_etl_date": "2026-09-03T06:04:10.816057",
+  "calls": [
+    {
+      "id": "01KZS6D2TKSQNCX8460MKGCKRB",
+      "source": "fireflies",
+      "title": "LaunchDarkly migration & GrowthBook experience - 1-800-Flowers",
+      "date": "2026-08-19",
+      "duration_minutes": 42,
+      "summary": "# LaunchDarkly migration & GrowthBook experience - 1-800-Flowers\nDate: 2026-08-19 | Duration: 42m\n\n## Summary\nThe meeting highlighted the successful migration from LaunchDarkly to GrowthBook, achieving 95% completion by late July. Joseph Treman emphasized challenges with feature flag functionality, noting GrowthBook's limitations on storing unused flag variations which required workflow adjustments. The integration of custom metrics pipelines was a core advantage, enhancing existing tracking systems. Future usage aims to empower non-technical stakeholders while maintaining control in experimentation workflows. However, data consistency issues in product analytics pose barriers to broad rollout until resolved. Ongoing collaboration with GrowthBook is essential for roadmap clarity and maximizing platform utilization, showcasing the need for deeper integration and feedback mechanisms.\n\n## Keywords\nMigration, Feature Flagging, Experimentation, Metrics Control, Iterative Testing, Product Analytics\n\n## Action Items\n\n**Joseph Treman**\nProvide feedback and identify any additional feature gaps between GrowthBook and LaunchDarkly, especially after further use and evaluation (11:03)\nCoordinate internally to identify PR team contact for approving quotes and public references from this call (30:20)\nContinue engaging with GrowthBook features and integrations when workload permits, aiming to maximize value for their team and CTO (31:27)\n\n**Elyse Fox**\nFollow up with Joseph regarding any discovered feature gaps and use of the new Learnings module for potential feedback (11:03)\nInitiate contact with GrowthBook’s customer success lead (Chris) to re-engage Joseph and offer support accommodating his current availability constraints (32:09)\nObtain and process internal approvals for potential PR use of Joseph’s quotes and meeting insights once contact information is confirmed (30:20)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M0B8NCD0YSGBT8J6CDSB1870",
+      "source": "fireflies",
+      "title": "LaunchDarkly migration & GrowthBook experience - Upstart",
+      "date": "2026-08-20",
+      "duration_minutes": 39,
+      "summary": "# LaunchDarkly migration & GrowthBook experience - Upstart\nDate: 2026-08-20 | Duration: 39m\n\n## Summary\nThe discussion centered on the complexities and challenges faced during the migration from LaunchDarkly to Growth Book, which took about a year. Key issues included the choice of cleaning legacy feature flags versus carrying them forward, leading to a split approach that increased technical debt. User experience differences created a learning curve, as engineers struggled to adapt when shifting from one platform to another. The switch was primarily driven by cost considerations and the capabilities of Growth Book, including self-hosting options that better aligned with data control needs. Furthermore, there are ongoing efforts to enhance the experimentation culture, which involve forming a dedicated team and addressing data quality for experiment analysis. Future plans include utilizing AI tools for improved experiment design and ongoing training resources to support teams.\n\n## Keywords\nGrowth Book, LaunchDarkly migration, experimentation platform, feature flags, stale flag cleanup, self-hosting\n\n## Action Items\n\n**Paige Ruppel**\nProvide exact timeline details regarding the full LaunchDarkly to Growth Book migration completion (15:48)\nContinue engaging with Growth Book resources and community for implementing advanced statistical methods and improve analytics event standardization (07:45)\n\n**Elyse Fox**\nSend Paige up-to-date documentation, blog posts, and API resources concerning Growth Book’s stale flag management and removal tooling improvements (14:20)\nRelay Paige’s feedback regarding SDK standardization and runtime observability to Growth Book technical team (18:40)\nFacilitate connection between Paige and Chris from customer success for training and experimentation outreach programs (25:10)\nShare information about Growth Book’s AI assistant and embedded best practice skills to support experiment design and analysis (28:15)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M08P8MEASNPE7KSYNEEFHR8Y",
+      "source": "fireflies",
+      "title": "LaunchDarkly migration & GrowthBook experience - ShiftKey",
+      "date": "2026-08-26",
+      "duration_minutes": 40,
+      "summary": "# LaunchDarkly migration & GrowthBook experience - ShiftKey\nDate: 2026-08-26 | Duration: 40m\n\n## Summary\nThe team successfully completed a swift migration from LaunchDarkly to Growth Book by the end of June, influenced by contract expiration and efforts to consolidate tools across business units. Although the initial focus was on feature flag parity, advanced experimentation capabilities are anticipated as maturity increases. Current practices involve manual, rule-based flagging, with ambitions to adopt automated rollouts and experimentation techniques in the future. The integration of a data warehouse is crucial for steering decisions and enhancing analytics, with ongoing needs for training and enablement identified. The organization operates separate Growth Book instances due to data privacy considerations, affecting their feature flag management and product metrics.\n\n## Keywords\nfeature flags, migration, experimentation, product analytics, platform consolidation, data warehouse\n\n## Action Items\n\n**Anthony Clayton**\nProvide introductions to product managers for deeper insights into use cases and experimentation needs (28:06)\nCoordinate with GrowthBook team for ongoing enablement and feedback sessions to explore GrowthBook features and roadmap (29:04)\n\n**Clark Finley**\nAssist with sharing feedback on migration challenges and post-migration adjustments, especially regarding import tool issues and feature flag setup (20:01)\nAssist with sharing feedback on migration challenges and post-migration adjustments, especially regarding import tool issues and feature flag setup (30:02)\n\n**Cary Rakin**\nArrange enablement sessions, roadmap presentation, and customer success engagements tailored for the ShiftKey SaaS team (15:09)\nFacilitate connection between ShiftKey teams and relevant GrowthBook customer success/onboarding contacts (Chris Sanders, Chris Gay Dizon) for smoother adoption (17:12)\n\n**Elyse Fox**\nFollow up via email with summary, share documented feedback, and coordinate next steps including PM introductions and enablement sessions (30:37)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Zapping",
+  "slug": "growthbook-zapping",
+  "last_etl_date": "2026-09-03T06:04:10.798691",
+  "calls": [
+    {
+      "id": "01M1A2B3VHB0JK8JTP0WC2DQB3",
+      "source": "fireflies",
+      "title": "Growthbook <> Zapping - Intro",
+      "date": "2026-09-01",
+      "duration_minutes": 39.400001525878906,
+      "summary": "# Growthbook <> Zapping - Intro\nDate: 2026-09-01 | Duration: 39.400001525878906m\n\n## Summary\nZapping’s newly formed growth team is focused on improving user experience, conversion, and post-acquisition retention for its subscription-based live TV streaming service across phones, TVs, and laptops. The company’s technology includes turbo mode for lower streaming latency and an image enhancement system supporting up to 4K streaming. Previous VWO experimentation was costly, limited mainly to web, difficult to scale, and lacked transparency into user-level data. With nearly 1 million monthly sessions and about 500,000 engaged interactions, Zapping needs experimentation across web, mobile, and TV. GrowthBook presented feature flagging, hypothesis-driven testing, SDKs for multiple platforms, warehouse and GA4 integrations, custom and guardrail metrics, activation rules, open-source transparency, and a Visual Editor for non-developers. Initial engineering support is needed for setup, after which the growth team can run tests more independently. GrowthBook recommended Pro at about $40 per user monthly, while Zapping plans to begin with Starter and evaluate usage before upgrading.\n\n## Keywords\nGrowthBook, experimentation, feature flagging, subscription streaming, data warehouse, cost management\n\n## Action Items\n\n**Pablo Mahuzier**\nCheck internal data warehouse usage and report back to Dan for integration assessment (13:26)\nProceed to create a GrowthBook account on Starter or Pro plan as the first exploratory step (34:30)\nShare any questions arising from initial GrowthBook trial with Dan or the GrowthBook community support channel (37:36)\n\n**Dan Wathne**\nSend follow-up resources and support/contact details to assist Zapping’s GrowthBook onboarding (37:06)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "Leap Strategies Projects",
   "slug": "leap-strategies-projects",
-  "last_etl_date": "2026-08-18T16:55:06.171934",
+  "last_etl_date": "2026-09-03T06:04:10.818733",
   "calls": [
     {
       "id": "01M06CGEHT3V0YX9VR4TQ6M9FG",
@@ -17,6 +17,17 @@
       "participant_domains": [
         "leapstrategies.ai"
       ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M0RD9GHX2ZP70Z0XEYKTR0R4",
+      "source": "fireflies",
+      "title": "Leap Strategies Projects Review",
+      "date": "2026-08-25",
+      "duration_minutes": 32.20000076293945,
+      "summary": "# Leap Strategies Projects Review\nDate: 2026-08-25 | Duration: 32.20000076293945m\n\n## Summary\nDuring the meeting, the team addressed the status of partner creative content, confirming three completed reviews but awaiting final approvals from contacts. YouTube strategy included automating playlist organization to enhance discoverability while prioritizing newer content, with decisions to remove low-view duplicates for better viewer experience. Upcoming featured video plans were outlined, focusing on a five-minute demo recording to boost engagement. Customer segmentation was defined around companies with specific employee and user thresholds, with plans to personalize content based on user signals. Additionally, content gaps were identified, particularly a need for comparison guides for product editions, along with expanding case studies. Operational needs like access to necessary tools were also discussed.\n\n## Keywords\nYouTube playlists, Conversionista Creatives, Rio Clay nurture, content segmentation, MCP server video, customer case studies\n\n## Action Items\n\n**Karen Henke**\nSend the signed weekly 20-hour contract to Jennifer to progress the engagement (01:38)\nIdentify and reach out to contacts for pending Conversionista Creatives and staged projects once contact info is clarified with Ashley (02:41)\nRemove duplicate videos with fewer views and unlist old or awkward visual editor videos as discussed (12:42)\nBuild and organize YouTube playlists according to the discussed structure and priorities, including best of experimentation and customer playlists (18:26)\nRequest access to Rio Clay and HubSpot to proceed with the nurture campaign work (21:11)\nCompile a content \"menu\" listing available assets and wishlist items, including addition comparisons for prospects (21:38)\nCoordinate with internal and external stakeholders to gather feedback on current content effectiveness and client engagement (29:58)\n\n**Ashley Stirrup**\nProvide Karen with access to or inform about contact points for Conversionista Creatives and staged projects (02:31)\nContinue sending Conversionista Creative content to contacts including Spiro who is currently on vacation (03:59)\nWork on the upcoming MCP server video to maintain trending content momentum (20:30)\nShare the Slack skill \"slash Rio account briefing\" with Karen for self-service customer data access (28:46)\nCollaborate with Alyssa on creating addition compare-and-contrast content (30:50)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

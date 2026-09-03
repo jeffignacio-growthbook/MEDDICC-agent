@@ -1,0 +1,18 @@
+{
+  "company": "AI Chat Consolidation",
+  "slug": "ai-chat-consolidation",
+  "last_etl_date": "2026-09-03T06:04:10.794497",
+  "calls": [
+    {
+      "id": "01M1HH1A1FXBMPFJ2BTMTNA63W",
+      "source": "fireflies",
+      "title": "AI Chat Consolidation",
+      "date": "2026-09-02",
+      "duration_minutes": 45,
+      "summary": "# AI Chat Consolidation\nDate: 2026-09-02 | Duration: 45m\n\n## Summary\nThe product direction is to consolidate the sidebar and product analytics agents so they share functionality, settings, history, capabilities, and chat context, while moving analytics chat to the top-level app scope for features, feature flags, and experimentation. Dashboards should render directly inside the unified agent, with an expansion prompt when the available space is too small. Generated dashboards and edits remain ephemeral until users explicitly select Create Dashboard or Update Dashboard, while earlier iterations should remain visible and usable; whether saves overwrite existing dashboards still needs clarification. The initial implementation will support fixed collapsed and expanded sidebar states, defer drag-to-resize, remove the handoff to the analytics page, and use a dedicated dashboard tool. Resource mentions will pass exact IDs for dashboards, features, experiments, and sessions. UX improvements, navigation changes, versioning details, and the broader page direction will follow core functionality, with Jeremy’s sign-off still needed.\n\n## Keywords\nAI chat consolidation, Sidebar assistant, Product Analytics, Dashboard previews, Conversation versioning, Resource mentions\n\n## Action Items\n**Nhat**\nMove dashboard feature into sidebar (38:17)\nRemove dashboard handoff process (38:17)\nRemove read-only restriction (38:17)\nReview dashboard integration (38:17)\nImplement collapsed sidebar state (39:54)\n\n**Johnny**\nReview assistant user experience (29:57)\nCreate shared design to-do list (29:57)\n\n**Omar**\nConsult Jeremy about AI chat page (43:14)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

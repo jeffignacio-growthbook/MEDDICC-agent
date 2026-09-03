@@ -1,0 +1,40 @@
+{
+  "company": "Sales Onboarding",
+  "slug": "sales-onboarding",
+  "last_etl_date": "2026-09-03T06:04:10.816300",
+  "calls": [
+    {
+      "id": "01M0TD2PTQP23YB9BKXP1TX4SA",
+      "source": "fireflies",
+      "title": "Sales Onboarding: Intro to Solutions Engineers & Product Demo w. Logan",
+      "date": "2026-08-25",
+      "duration_minutes": 67,
+      "summary": "# Sales Onboarding: Intro to Solutions Engineers & Product Demo w. Logan\nDate: 2026-08-25 | Duration: 67m\n\n## Summary\nThe team discussed the solutions engineering role with an emphasis on technical validation and standardized POCs lasting ideally 30 days. Logan Bates highlighted the need for standardization, addressing loose access and unstructured trials. POCs typically involve two to three use cases with clear success criteria, balancing customer engagement and internal resource protection. The execution timeline includes two weeks for setup and two for analysis. Success metrics indicate a 30-50% close rate following successful POCs. GrowthBook's strengths include its open-source model and self-hosting capabilities, offering flexibility and strong technical support. The meeting also covered feature flags for controlled rollouts and the need for regular sales and SE collaboration to enhance customer engagement.\n\n## Keywords\nfeature flags, proof of concept, experimentation, data warehouse, onboarding, customer support\n\n## Action Items\n\n**Logan Bates**\nStandardize the Proof of Concept (POC) process further and share POC templates with Account Executives (AEs) and Solutions Engineers (SEs) to improve consistency and success rates (02:42)\nAdd Kris Washburn and Andy Marshall to the demo environment to facilitate their product familiarization and enable effective demos (27:45)\nConsider establishing regular weekly sales Individual Contributor (IC) meetings, targeted for Thursdays, to encourage idea sharing, troubleshooting, and collaboration within the sales team (55:25)\nShare GitHub release notes and feature update pages with the sales team to support customer demos and enhance competitive positioning (22:40)\n\n**Kris Washburn and Logan Bates**\nExplore hosting lunch and learn sessions for internal training and collaboration to foster knowledge sharing and team innovation (55:48)\n\n**Andy Marshall and Logan Bates**\nEngage with the Anthropic team to explore customer-driven AI experimentation insights and potential joint thought leadership collaboration (52:11)\n\n**Unassigned**\nEnsure Sales and Solutions Engineering teams loop in engineers such as Luke, Jeremy, and Graham early during presales calls to maximize technical stakeholder engagement and support (14:58)\nAccount Executives to schedule weekly check-ins with customers during POCs to ensure alignment, progress tracking, and timely issue resolution (03:48)\n",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M0A2JH5SZV9NM1N6RQHZQY0M",
+      "source": "fireflies",
+      "title": "Sales Onboarding: Pitch Deck & Demo Session",
+      "date": "2026-08-25",
+      "duration_minutes": 68,
+      "summary": "# Sales Onboarding: Pitch Deck & Demo Session\nDate: 2026-08-25 | Duration: 68m\n\n## Summary\nGrowthBook discussed its open-source platform for feature flags and experimentation, highlighting its 3,200+ paying customers, including major enterprises like Salesforce and Anthropic. Key differentiators include a warehouse-native architecture that stores data securely, allowing for cost reduction and transparency through SQL query access. The platform's ease of use and flexibility were noted, although concerns from firms like Notion were acknowledged. The customer segments primarily involve Directors and Heads of Product and Engineering, with deals typically averaging between $150k and $300k, motivated by scalability and cost savings. The integration is SDK-based, supporting multiple environments, while the strategic positioning emphasizes Experimentation capabilities and white-glove enterprise support as competitive advantages.\n\n## Keywords\nGrowthBook, Feature Flags, Experimentation, Open Source, Warehouse-Native, Product Analytics\n\n## Action Items\n\n**Jake Heier**\nShare the pitch deck and Graham's recorded demo video with the team for training and reference (02:00)\nEnsure all attendees have access to the demo environment for practice following the session (13:00)\nShare outbounding deck containing key buyer personas and messaging strategies with the team (57:57)\n\n**Rémy Marin**\nFollow up with Logan regarding feature flag cleanup and lifecycle management questions (42:35)\n\n**Jake Heier and Kris Washburn**\nInvestigate regulatory impact of European data privacy laws on US companies doing business in Europe (12:07)\n\n**Andy Marshall and Jake Heier**\nConsider future additions or improvements in AI-assisted experiment result summaries and integration capabilities based on ongoing product evolution (35:00)\n",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M0D3EMV82EHQKZMXGJEA8HXS",
+      "source": "fireflies",
+      "title": "Sales Onboarding: Overview of Current Sales Process and Sales Tools",
+      "date": "2026-08-26",
+      "duration_minutes": 67,
+      "summary": "# Sales Onboarding: Overview of Current Sales Process and Sales Tools\nDate: 2026-08-26 | Duration: 67m\n\n## Summary\nThe meeting addressed key improvements in the sales process and forecasting framework, emphasizing standardized deal stages and qualification criteria to enhance sales tracking and accuracy. A balance of art and science in forecasting was discussed, outlining the timeliness of closed deals and necessary updates for pipeline management. Various tools were evaluated, including HubSpot as the primary CRM, along with Apollo for sales sequencing and Fireflies for transcription, aiming to reduce redundancy and improve data quality. Additionally, challenges in managing multinational accounts were highlighted, with plans to define clearer parent-child relationships for improved coordination. The team also emphasized the importance of training new reps on business conversations and consultative selling to better support customers.\n\n## Keywords\nHubSpot, Medic framework, sales forecasting, Apollo, multinational accounts, sales sequencing\n\n## Action Items\n\n**Jake Heier**\nShare the discovery question deck to support onboarding and reference for new sales reps (02:11)\nConduct an additional training session on Retool license creation and Vanta tool usage, bundled with the upcoming pricing training session (56:44)\nEnsure email integration setup between Apollo and HubSpot for automated lead creation and activity tracking (52:43)\n\n**Jeff Ignacio and Ryan McGurk**\nDefine and document outbound sales flow processes for new sales reps and refine forecasting and pipeline management best practices (21:31)\nCollaborate with Ashley and Chris to establish rules of engagement and account structures for multinational customers to prevent conflicts and clarify ownership (31:46)\nLead the team effort to standardize on a single conversational intelligence tool (Apollo or Fireflies) based on metadata richness and integration compatibility with Claude (43:44)\n\n**Jeff Ignacio**\nDesign and document the account structure project focusing on parent-child and multinational account management in Notion (32:14)\nImprove the Medic scoring agent to handle edited fields without overwriting and explore integration improvements between Fireflies and Apollo metadata in Claude (38:17)\n",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}

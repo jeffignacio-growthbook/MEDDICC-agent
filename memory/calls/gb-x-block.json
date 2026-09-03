@@ -1,0 +1,40 @@
+{
+  "company": "GB x Block",
+  "slug": "gb-x-block",
+  "last_etl_date": "2026-09-03T06:04:10.809529",
+  "calls": [
+    {
+      "id": "01M0X9VM1FXGVXSBTVQQW9JZKH",
+      "source": "fireflies",
+      "title": "GB x Block - Product Analytics Demo ",
+      "date": "2026-08-25",
+      "duration_minutes": 56,
+      "summary": "# GB x Block - Product Analytics Demo \nDate: 2026-08-25 | Duration: 56m\n\n## Summary\nThe meeting reviewed Growth Book's product analytics platform, emphasizing its ability to deliver real-time and historical analytics through integration with Snowflake. Key features include a unified metric library for consistent measurement, enhanced dashboard and funnel exploration tools for user flow tracking, and near real-time event forwarding to optimize feature rollout monitoring. The robust experimentation engine employs Bayesian and frequentist statistics, replacing legacy reporting tools with flexible dashboards. The integration of AI-driven automation aims to simplify workflows for feature flags and analytics management. Feedback from customers like Block highlighted needs for improved dashboard visuals, metric organization, and real-time alerting capabilities, leading to discussions about enhancing event forwarding and collaboration efforts.\n\n## Keywords\nfeature flags, product analytics, real-time analytics, experimentation, data warehouse, dashboarding\n\n## Action Items\n\n**Alyssa Ransbury**\nSend examples of custom report use cases to GrowthBook team for product comparison and feedback (52:30)\nCoordinate internally on Neighborhoods team’s real-time event forwarding requirements and potential solutions (47:56)\n\n**James Lee**\nProvide insights on existing dashboards and feature flag monitoring usage to GrowthBook (08:35)\n\n**Yasmine Dumouchel**\nShare sample custom reports with GrowthBook team to help evaluate feature parity and improvements in experiment dashboards (52:45)\n\n**Cary Rakin**\nFollow up with Alyssa and Block team offline regarding Neighborhoods team real-time analytics and event forwarding needs (54:30)\nCoordinate with GrowthBook product team on custom report deprecation plan and related enablement resources (53:45)\n\n**Jeremy Dorn**\nInvestigate AI capabilities related to webhook creation and report findings (31:00)\nContinue developing features for enhanced diagnostics filtering and session replay / user journey visualization (26:30)\nCollaborate with Block on design partnership for targeted real-time event forwarding (49:00)\n",
+      "organizer": "cary@growthbook.io",
+      "participants": 15,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M0TS974NHG76CZ48NDBAGS3S",
+      "source": "fireflies",
+      "title": "GB x Block - Product Analytics Demo",
+      "date": "2026-08-25",
+      "duration_minutes": 52.40999984741211,
+      "summary": "# GB x Block - Product Analytics Demo\nDate: 2026-08-25 | Duration: 52.40999984741211m\n\n## Summary\nThe meeting focused on Growthbook’s product analytics platform, emphasizing its warehouse-native architecture atop Snowflake, allowing real-time and historical data queries with full SQL transparency. Key features discussed included centralized metric definitions for experimentation and analytics, real-time event forwarding to address latency, and the integration of session replay and user journey exploration tools. The integration of feature flagging with robust control mechanisms ensures safe feature rollouts. Real-time analytics needs for quick monitoring were highlighted, showcasing Growthbook's event forwarder as a potential replacement for Amplitude. The roadmap includes enhanced session replay, user journey tools, and optimized query costs, alongside structured metric management and flexible dashboards to improve user experience.\n\n## Keywords\nProduct analytics, feature flags, experimentation, Snowflake, real-time analytics, dashboards\n\n## Action Items\n\n**Alyssa Ransbury**\nProvide examples of current custom reports used heavily by teams for experimentation deep dives to Growthbook team for comparison and feature alignment (48:02)\n\n**Cary Rakin**\nFollow up with Alyssa on neighborhoods team’s real-time event forwarding needs and explore acceleration opportunities with Growthbook engineering (50:28)\nCollect and send example customer reports from Yasmine to Growthbook product team for review ahead of deprecation planning (48:02)\n\n**Growthbook Team/Jeremy Dorn**\nShare design partnership proposals and examples regarding selective event forwarding post-feature flag rollout with Block team (45:19)\nContinue development of AI assistant integration for dashboards and feature flag management, including potential webhook automation (20:26)\nPrepare enablement materials and coordinate with Block teams before deprecating custom reports, ensuring smooth user transition (49:25)\n",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 16,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M14MZWX4YNAR6Z2CFTYXAXN6",
+      "source": "fireflies",
+      "title": "GB x Block - Sync ",
+      "date": "2026-08-28",
+      "duration_minutes": 30,
+      "summary": "# GB x Block - Sync \nDate: 2026-08-28 | Duration: 30m\n\n## Summary\nThe discussion centered on improving real-time analytics by leveraging a managed warehouse solution, with ClickHouse as the backend for real-time data. Concerns about self-hosted paths highlighted their burdensome nature, prompting a preference for cloud-only solutions. Participants noted the unworkability of the current event volume of 1.7 trillion events annually, emphasizing the need for dynamic sampling and an opt-in model for real-time data forwarding limited to select experiments. Financial pressures were discussed, revealing the necessity to reduce vendor costs. Lastly, the group acknowledged the ambition to increase experiment adoption significantly and the importance of consistent standardization and automation across different teams to facilitate a broader experimentation culture.\n\n## Keywords\nClickHouse, Event forwarding, Real-time analytics, Dynamic sampling, GrowthBook Proxy, Experimentation at scale\n\n## Action Items\n\n**Jeremy Dorn**\nScope controlled event forwarding to meet Block's requirements, confirm the technical solution fit, and provide a detailed implementation timeline (28:56)\n\n**Cary Rakin**\nAdd SDK controls for controlled event forwarding contractually to ensure alignment with Block's requirements (19:44)\nCoordinate follow-up discussions with Block and GrowthBook team to continue technical and commercial evaluation (28:03)\n\n**Ryan McGurk**\nFollow up with Block as the primary GrowthBook contact during Cary Rakin's absence to maintain momentum on the evaluation and implementation planning (29:46)\n\n**Alyssa Ransbury**\nEvaluate ClickHouse deployment options for self-hosted GrowthBook solutions and assess feasibility for Block's use case (10:01)\nDevelop internal processes for controlled event forwarding, including defining approved experiments or teams and sampling strategies (17:07)\nProvide feedback on GrowthBook's CLI and MCP tools as internal workflows for experimentation develop at Block (20:31)\nCoordinate enablement and education efforts for Cash App teams to support GrowthBook adoption and experimentation scaling (22:30)\n",
+      "organizer": "cary@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> RecargaPay",
+  "slug": "growthbook-recargapay",
+  "last_etl_date": "2026-09-03T06:04:10.794304",
+  "calls": [
+    {
+      "id": "01M1CMR00BCWB6QBQKZS160SRB",
+      "source": "fireflies",
+      "title": "Growthbook <> RecargaPay - Intro/Enterprise Contract Discussion",
+      "date": "2026-09-02",
+      "duration_minutes": 37.02000045776367,
+      "summary": "# Growthbook <> RecargaPay - Intro/Enterprise Contract Discussion\nDate: 2026-09-02 | Duration: 37.02000045776367m\n\n## Summary\nRecargapay is deciding whether to continue developing its internal experimentation platform or adopt GrowthBook’s self-hosted solution to centralize experiment and metric tracking. The evaluation reflects gaps in the current system, especially for metrics where users are randomized but offers or loans are measured. Red Magnos described repayment and conversion metrics that require beta-binomial analysis in Databricks notebooks because GrowthBook’s current ratio metrics, slicing, and statistical models may not provide sufficiently accurate confidence intervals. GrowthBook’s strengths include open-source extensibility, self-hosting, enterprise security, approval workflows, role-based access, SSO, data pipeline mode, dedicated engineering collaboration, and 24/7 support. Commercial discussions covered illustrative pricing of about $600–$750 per seat annually, a free tier limited to one project, and the need to finalize read-write and read-only users. Security documentation requires an NDA, while GrowthBook offered private Slack support, cost-comparison assistance, and Brazilian fintech references. A follow-up asynchronous session will address remaining technical questions.\n\n## Keywords\nExperimentation, self-hosted platform, data analytics, metric breakdowns, fintech compliance, open source extensibility\n\n## Action Items\n\n**Dan Wathne**\nSet up a private Slack channel with GrowthBook’s data scientists and engineering team to support RecargaPay’s asynchronous technical discussions (30:43)\nShare GrowthBook’s trust center security documentation and coordinate NDA process with RecargaPay to address fintech regulatory compliance needs (32:07)\nAwait detailed seat count and access requirements from RecargaPay to build a tailored pricing proposal for GrowthBook’s enterprise offering (31:19)\nProvide cost/benefit analysis comparing internal build versus adopting GrowthBook to assist RecargaPay’s decision-making process (34:38)\nFollow up on connecting RecargaPay with GrowthBook’s contact at Stone, a Brazilian fintech customer, for peer reference and insights (34:59)\n\n**Red Magnos**\nProvide detailed technical questions and clarifications asynchronously via Slack to support GrowthBook’s understanding of RecargaPay’s experimentation needs (27:10)\n\n**Alvaro Teijeiro**\nAnalyze internal requirements regarding the scale of read/write versus read-only seats to inform GrowthBook’s pricing and deployment planning (31:19)\nCoordinate internal security and compliance evaluation in parallel with GrowthBook to ensure adherence to fintech regulatory standards in Brazil (32:42)\nInform GrowthBook if RecargaPay requires contact with the Brazilian fintech Stone for reference and peer insights (35:35)\n\n**Jonathan Leibiusky**\nFacilitate the security documentation and compliance process between RecargaPay and GrowthBook to ensure smooth exchange and evaluation (32:38)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

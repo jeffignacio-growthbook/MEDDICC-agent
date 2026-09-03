@@ -1,0 +1,18 @@
+{
+  "company": "Tubi + GrowthBook",
+  "slug": "tubi-growthbook",
+  "last_etl_date": "2026-09-03T06:04:10.811607",
+  "calls": [
+    {
+      "id": "01M0X91M3ES7QKDNSF4T7SFM0R",
+      "source": "fireflies",
+      "title": "Tubi + GrowthBook",
+      "date": "2026-08-27",
+      "duration_minutes": 38.93000030517578,
+      "summary": "# Tubi + GrowthBook\nDate: 2026-08-27 | Duration: 38.93000030517578m\n\n## Summary\nTubi's team discussed extensive experimentation practices, highlighting over 300 client-side tests conducted on the video player, which aims to optimize key features like UI changes and adaptive bitrate algorithms. The player team emphasized the importance of validating changes due to ad revenue implications. They utilize vanilla A/B tests and switchback tests for managing ad-related constraints, while machine learning teams run complex experiments that may involve interleaved testing. Experiment metrics such as live TV time and custom QOS metrics are monitored, and advanced data analyses occur beyond Statsig using internal tools. The team expressed interest in automation through APIs and AI-assisted configurations, although they face challenges like slower support responses post-acquisition, and issues with metric reliability.\n\n## Keywords\nStatsig, experimentation, A/B testing, metrics, video player, Tubi, GrowthBook\n\n## Action Items\n\n**Heng**\nFacilitate an email or LinkedIn introduction to James, the vendor decision maker at Tubi, to the GrowthBook team (35:50)\n\n**Logan Bates**\nFollow up on connection with James and schedule a potential meeting to discuss experimentation platform needs and partnership opportunities (35:50)\n\n**GrowthBook team (Christian and Luke)**\nContinue development and refinement of automated metric analysis and programmatic experiment setup capabilities as discussed during the meeting (27:40)\n\n**Heng and team**\nContinue internal deep-dive analysis workflows using AI and data lake exports to support expanding metrics and experimentation needs (13:50)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Code ID &",
+  "slug": "code-id",
+  "last_etl_date": "2026-09-03T06:04:10.810665",
+  "calls": [
+    {
+      "id": "01M0YZA11C1PP8F39K3PW5Z6WH",
+      "source": "fireflies",
+      "title": "Code ID & GrowthBook | First Meeting",
+      "date": "2026-08-28",
+      "duration_minutes": 56.16999816894531,
+      "summary": "# Code ID & GrowthBook | First Meeting\nDate: 2026-08-28 | Duration: 56.16999816894531m\n\n## Summary\nThe discussion focused on the client's need for GrowthBook integration in their telco mobile app projects, emphasizing compliance and technical feasibility. Petticot ID, working with 150 engineers primarily using the AWS ecosystem, seeks GrowthBook's assistance for feature flagging that they cannot enable themselves. GrowthBook's team introduced their roles, emphasizing flexible integration and support for regulated industries. The client wishes to involve end customers in future discussions, while GrowthBook plans to provide informational resources and detailed comparisons between tiers. The pricing model includes base licenses and seat-based fees, with interest in developing local partnerships to enhance market presence. The meeting concluded with agreements on follow-up actions and ongoing collaboration.\n\n## Keywords\nFeature Flagging, A/B Testing, Self Hosting, Product Analytics, Telco Integration, Data Sovereignty\n\n## Action Items\n\n**Herru Purnomo**\nConfirm with telco clients the number of users to access GrowthBook platform and timeline for implementing GrowthBook in ongoing or re-engineered projects (44:32)\nAttempt to arrange a joint meeting including the client, GrowthBook sales, and technical team for a detailed demo and technical discussion (50:19)\n\n**Marcel Geldner**\nSend follow-up email with slide decks, feature comparisons (open source vs enterprise), and customer success stories (54:10)\nInternally discuss partnership and reseller policy options for Indonesia and provide feedback to Herru (52:07)\nSchedule a placeholder meeting for next week to discuss client feedback and potential next steps (53:26)\n\n**Rémy Marin**\nProvide link to feature comparison page showing differences between starter, pro, and enterprise tiers (48:28)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

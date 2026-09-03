@@ -1,7 +1,7 @@
 {
   "company": "Meet",
   "slug": "meet",
-  "last_etl_date": "2026-08-18T02:36:37.769886",
+  "last_etl_date": "2026-09-03T06:04:10.799634",
   "calls": [
     {
       "id": "01M08M81EM52VFVAJJK4WCHZNB",
@@ -13,7 +13,19 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 1,
       "keywords": "",
-      "action_items": ""
+      "action_items": "",
+      "summary_quality": "empty"
+    },
+    {
+      "id": "01M1CWRQYM2ESPKDD51SXMEDFD",
+      "source": "fireflies",
+      "title": "Meet",
+      "date": "2026-08-31",
+      "duration_minutes": 2,
+      "summary": "# Meet\nDate: 2026-08-31 | Duration: 2m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
     }
   ]
 }

@@ -1,0 +1,18 @@
+{
+  "company": "Continue differentiators work",
+  "slug": "continue-differentiators-work",
+  "last_etl_date": "2026-09-03T06:04:10.819290",
+  "calls": [
+    {
+      "id": "01M0TJJQ3FKA7CX50J61HJ659W",
+      "source": "fireflies",
+      "title": "Continue differentiators work",
+      "date": "2026-08-25",
+      "duration_minutes": 52,
+      "summary": "# Continue differentiators work\nDate: 2026-08-25 | Duration: 52m\n\n## Summary\nThe team discussed the need to refine and validate messaging for GrowthBook, aiming to translate key positioning into practical formats such as elevator pitches and sales materials. They identified the existing sales deck as a baseline that requires updates, particularly improving clarity on architectural aspects and emphasizing performance. A new deck structure was proposed, featuring essential elements like the GrowthBook overview and differentiators, supported by a clear architecture slide. Additionally, the mission statement is evolving to support customer experimentation, while AI's role in the experimentation lifecycle is to be highlighted through effective visual aids. The team also recognized the importance of standardizing templates and tools for sales pitches and set a timeline for further developments.\n\n## Keywords\nGrowthBook, positioning, sales deck, architecture slide, AI integration, experimentation culture\n\n## Action Items\n\n**Scott Bailey**\nCreate a polished new architecture slide that clearly shows GrowthBook’s integration with data warehouses and event flows (35:12)\nDevelop a dedicated AI capabilities slide reflecting AI-driven experimentation journey and toolsets (35:12)\nInvestigate and gather examples of how current sales reps are using architecture slides in presentations, including observation on usage (13:51)\nParticipate in a poll to identify sales team presentation tool preferences to aid standardization (41:23)\n\n**Elyse Fox**\nLocate and share Christian’s recent sales deck for review and inspiration (03:15)\nPolish language and design of differentiators slide using a 2x2 card layout format (36:28)\nCompile key points in bullet form for the architecture slide speaker notes (14:00)\nAssist in designing episode slides aligning with the mission and AI integration concepts (27:44)\nShare and refine AI-focused slides from prior training sessions for inclusion in the deck (29:56)\nFinalize polished slides for Thursday team presentation (38:30)\n\n**Ashley Stirrup**\nProvide clarity on messaging strategy’s next step involving creating compressed, concrete messaging fragments for marketing and sales use (01:59)\nDefine and communicate mission statement wording focusing on product builders running experiments, learning faster, and building experimentation culture (20:01)\nLead outlining of new deck structure prioritizing clear messaging of product capabilities and culture (08:19)\nCollaborate on design and messaging refinement, including prioritizing AI and optional architecture slide (28:06)\nSteer conversation on presentation template adoption and integration into sales process (39:46)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

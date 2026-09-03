@@ -1,0 +1,18 @@
+{
+  "company": "Centerfield + GrowthBook",
+  "slug": "centerfield-growthbook",
+  "last_etl_date": "2026-09-03T06:04:10.807886",
+  "calls": [
+    {
+      "id": "01M106MXJSDPAKHQF07Z4YYS74",
+      "source": "fireflies",
+      "title": "Centerfield + GrowthBook",
+      "date": "2026-08-28",
+      "duration_minutes": 49.65999984741211,
+      "summary": "# Centerfield + GrowthBook\nDate: 2026-08-28 | Duration: 49.65999984741211m\n\n## Summary\nThe discussion focused on the evaluation of GrowthBook as a potential replacement for Centerfield's current internal experimentation platform, which is limited in scope and scalability. Centerfield is looking for a solution that can support a broader range of use cases beyond call center lead generation. The platform's ability to handle server-side rendering and execute complex experiments was emphasized as a strong advantage. GrowthBook's multi-use case coverage, open-source nature, and rapid innovation driven by customer feedback were highlighted. The pricing structure was also discussed, including options ranging from free to $200,000 for enterprise solutions. The meeting concluded with plans for a trial usage period and a follow-up meeting to assess outcomes.\n\n## Keywords\nexperimentation, server-side testing, open source, feature flags, pricing model, data warehouse integration\n\n## Action Items\n\n**Neal Cabbage**\nExplore GrowthBook platform using existing enterprise account and invite team members to trial functionality (34:23)\nCoordinate with GrowthBook team to provision enterprise support features for trial account (36:39)\nSchedule a follow-up meeting with GrowthBook team after September 11th to review usage and address questions (47:13)\nGather feedback and questions from internal users after trial use to prepare for next demo/discussion (47:13)\n\n**GrowthBook Team**\nProvision enterprise trial account for Neal and send relevant documentation and support materials (36:39)\nProvide GA4-to-BigQuery integration guides and documentation for easier data onboarding (44:00)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

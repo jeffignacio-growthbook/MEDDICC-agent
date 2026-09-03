@@ -1,0 +1,18 @@
+{
+  "company": "Experiment-managed features",
+  "slug": "experiment-managed-features",
+  "last_etl_date": "2026-09-03T06:04:10.826842",
+  "calls": [
+    {
+      "id": "01M0E29KT19WYJE5RPBJC5J2VJ",
+      "source": "fireflies",
+      "title": "Experiment-managed features",
+      "date": "2026-08-20",
+      "duration_minutes": 39.34000015258789,
+      "summary": "# Experiment-managed features\nDate: 2026-08-20 | Duration: 39.34000015258789m\n\n## Summary\nThe discussion focused on the integration of managed feature flag systems, addressing enterprise customers' preferences for direct experiment evaluations without the need for full SDK usage. Key points included introducing a managed mode to simplify governance and value delivery while allowing editable values in draft mode. The approval process for features was assessed, highlighting the need for clearer UI/UX improvements and a proposal to streamline the feature flag interface. Considerations regarding organizational settings, such as default modes for new and existing organizations, were also made, aiming to simplify user transitions between manual and managed modes. Additionally, the need to make data type selections mutable and to enhance overall usability while balancing complexity and power user needs was emphasized.\n\n## Keywords\nfeature flags, experiment management, managed mode, approval flow, UI/UX design, linked changes\n\n## Action Items\n**Bryce Fitzsimons**  \nRemove implementation choice from modal (21:30)  \nEnable mutability of feature flag data types (24:30)  \nFix bug allowing removal of linked flags (29:45)  \nTighten UI/UX flow for managed feature flags (34:32)  \nPrepare improved approval flow designs (34:45)  \n\n**Gabe Melean**  \nReview approval flow and provide feedback (34:50)  \nConsider UI options for approval review (36:00)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "James Shannon",
+  "slug": "james-shannon",
+  "last_etl_date": "2026-09-03T06:04:10.797461",
+  "calls": [
+    {
+      "id": "01M19R09RN3Y60RHTC606Z10HX",
+      "source": "fireflies",
+      "title": "30 min with Karen (James Shannon)",
+      "date": "2026-09-01",
+      "duration_minutes": 35.83000183105469,
+      "summary": "# 30 min with Karen (James Shannon)\nDate: 2026-09-01 | Duration: 35.83000183105469m\n\n## Summary\nThe discussion covered GrowthBook’s EMEA sales strategy, led by Sales Director James Shannon, who targets technical buyers—especially product owners—through email and LinkedIn, while data teams remain difficult to convert because of entrenched workflows. More than 70% of inbound prospects research the product architecture before contact, making technical diagrams and visual assets important throughout the sales process. A major misconception is that GrowthBook processes user data; messaging instead emphasizes its warehouse-native architecture, with data remaining in the customer’s warehouse, an advantage for GDPR-conscious European buyers. Results dashboards, AI features, and the visual editor are strong content drivers, but materials for non-technical stakeholders and cross-functional teams remain limited. Confidence by Spotify creates pricing pressure despite GrowthBook’s feature parity, while support, SLAs, and roadmap influence could strengthen differentiation. James’s decks, case studies, mock implementation plans, call recordings, and competitive materials are valuable but under-shared. The discussion also highlighted AI workflow videos, stronger documentation, in-app Docs AI search, and call-analysis-driven content refinement.\n\n## Keywords\nwarehouse-native, GDPR, content audit, sales enablement, technical diagrams, AI workflow\n\n## Action Items\n\n**James Shannon**\nShare PDF versions of personal decks and customer case studies with Karen Henke (25:37)\nProvide access or share updates related to weekly sales and marketing playbooks and call library for Karen’s review (30:25)\n\n**Karen Henke**\nReview shared sales and marketing materials and call recordings once received to identify content gaps (30:25)\nRequest Ashley’s help to gain access to sales communication channels where weekly documents are shared (30:41)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

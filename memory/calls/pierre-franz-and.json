@@ -1,0 +1,18 @@
+{
+  "company": "Pierre Franz and",
+  "slug": "pierre-franz-and",
+  "last_etl_date": "2026-09-03T06:04:10.796185",
+  "calls": [
+    {
+      "id": "01M1BSZ40YV16FFB12W95PCTNM",
+      "source": "fireflies",
+      "title": "Pierre Franz and James Shannon",
+      "date": "2026-09-02",
+      "duration_minutes": 23.139999389648438,
+      "summary": "# Pierre Franz and James Shannon\nDate: 2026-09-02 | Duration: 23.139999389648438m\n\n## Summary\nThe team plans to begin GrowthBook implementation in mid-October, after the app release expected at the end of September or early October and completion of legal approvals, including the DPA and data protection review. Initial testing will focus on web components, including the web part of the app, while native app testing may be addressed later. The web SDK is considered straightforward, although Databricks and Data Lakehouse integration will require additional planning between Lucas’s development team and the data team. Formal investment controls reduced the initial user count from 20 to 10. Pricing is now $57,500 for 10 users, compared with a $15,000 quote last year, while the client typically allows only 10–15% annual increases. Pierre raised concerns about internal budget approval and requested updated pricing and potential flexibility. James said flexibility may improve if the contract is signed before the end of September and offered to send legal documents immediately. A Monday-afternoon follow-up will review budget and legal progress.\n\n## Keywords\ncontract, pricing, implementation timeline, user licensing, legal approval, budget constraints\n\n## Action Items\n\n**James Shannon**\nSend detailed current pricing and all legal documents (DPA, customer agreement) to Freie Presse for review (17:09)\nSchedule and conduct follow-up call with Freie Presse for initial budget and approval feedback Monday afternoon at 4pm (21:16)\n\n**Pierre, Tom, Lucas**\nReview pricing and contract documents internally, including legal and financial departments; evaluate budget feasibility (17:53)\n\n**Pierre and team**\nPrepare for follow-up discussion and provide feedback on budget and contract feasibility on Monday call (20:25)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

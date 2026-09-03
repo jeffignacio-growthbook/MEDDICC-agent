@@ -1,0 +1,18 @@
+{
+  "company": "Visual Editor for",
+  "slug": "visual-editor-for",
+  "last_etl_date": "2026-09-03T06:04:10.796606",
+  "calls": [
+    {
+      "id": "01M1F230DHJJ3VMGF0506SKZWK",
+      "source": "fireflies",
+      "title": "Visual Editor for Extra Space",
+      "date": "2026-09-01",
+      "duration_minutes": 26.68000030517578,
+      "summary": "# Visual Editor for Extra Space\nDate: 2026-09-01 | Duration: 26.68000030517578m\n\n## Summary\nThe team consistently reproduced a rebucketing bug in a React/Next.js development environment, enabling focused debugging. User variation assignments switched unexpectedly during navigation, particularly when moving from the search page back to the homepage or toggling specific links, while remaining stable on the homepage. Initial investigation examined Growth Book’s ID cookie, SDK attributes, ad blockers, and cookie errors; variation changes sometimes occurred without the ID changing, and disabling ad blocking improved stability. The team observed that the SDK appeared to receive a different hash ID after some route changes, although selector checks found no obvious issue. Growth Book Dev Tools helped monitor experiments, variations, and assignment IDs. The presence of Optimizely alongside Growth Book raised possible experiment conflicts, while dev-domain cookie policies and errors involving Facebook and Google Analytics added complexity. The team planned to involve the Growth Book SDK team, continue monitoring routing and cookie behavior, and provide follow-up updates after identifying the cause.\n\n## Keywords\nrebucketing bug, visual editor, GrowthBook SDK, cookie handling, AdBlock impact, route navigation\n\n## Action Items\n\n**Craig**\nReview SDK implementation and experiment setup to pinpoint causes for inconsistent user bucketing responsible for variation switching (03:03)\n\n**Nick**\nContinue testing variation switching behavior, particularly disabling/enabling AdBlock and changing navigation flows to gather more bug evidence (11:53)\n\n**GrowthBook SDK Team**\nInvestigate deeper into the SDK hash/id calculation during route changes and attribute assignment that cause rebucketing issues (24:08)\nAnalyze possible conflicts or overshadowing when multiple experiments or tools (e.g., Optimizely) are involved (18:52)\n\n**Team**\nUse provided dev environment URL for further reproducibility testing to isolate the bug effectively (05:13)\n\n**Chris**\nAssist with replicating the problem on different setups and verify if AdBlock or other extensions impact cookie or attribute handling causing rebucketing anomalies (07:26)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

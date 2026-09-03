@@ -1,0 +1,18 @@
+{
+  "company": "Pricing sync",
+  "slug": "pricing-sync",
+  "last_etl_date": "2026-09-03T06:04:10.825601",
+  "calls": [
+    {
+      "id": "01M0D466WG9S7ZDZ98GYE3GY8X",
+      "source": "fireflies",
+      "title": "Pricing sync",
+      "date": "2026-08-21",
+      "duration_minutes": 20.520000457763672,
+      "summary": "# Pricing sync\nDate: 2026-08-21 | Duration: 20.520000457763672m\n\n## Summary\nThe team discussed shifting to a usage-based pricing model for Pro customers at $150 per month, emphasizing data usage rather than feature flags. They outlined a transition plan allowing existing customers to retain old pricing during the switch. Technical updates are ongoing to support this model, including a move to an in-house event forwarding solution to reduce costs and expand support beyond current offerings. The communication strategy will involve direct emails to Pro and enterprise clients to ensure clarity, while also highlighting AI features and onboarding benefits to ease customer concerns. Lastly, the implementation timeline includes coordinated updates before product changes, with ongoing adjustments to customer communication drafts.\n\n## Keywords\npricing model, enterprise plan, usage-based pricing, event forwarder, AI token usage, customer communication\n\n## Action Items\n\n**Jeremy Dorn**\nSchedule and conduct a meeting with Michael Welsh by Monday to discuss and align on ORB billing system changes and enterprise pricing flexibility (18:22)\nLead the technical work with Michael Welsh on updating ORB billing system to support enterprise and usage-based pricing plans (11:27)\nPrepare and provide AI usage charge structure and insights on customer impact for upcoming rollout (14:21)\n\n**Elyse Fox**\nContinue auditing the website to identify and flag all pages with outdated pricing references for update (14:36)\nPrepare board presentation slides explaining pricing changes for internal and external communication (17:48)\n\n**Ashley Stirrup & Elyse Fox**\nDraft customer communication emails targeting Pro and enterprise customers about grandfathering existing users and rollout of new pricing model (08:16)\n\n**Ashley Stirrup & Jeremy Dorn**\nDraft updated pricing content for website and app, and make pricing updates live as early as feasible (18:43)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

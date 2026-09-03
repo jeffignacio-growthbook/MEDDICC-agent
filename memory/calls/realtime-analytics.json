@@ -1,0 +1,18 @@
+{
+  "company": "Realtime Analytics",
+  "slug": "realtime-analytics",
+  "last_etl_date": "2026-09-03T06:04:10.796471",
+  "calls": [
+    {
+      "id": "01M1F8ZMAZD9JHFE3XG4Y3ET1K",
+      "source": "fireflies",
+      "title": "Realtime Analytics",
+      "date": "2026-09-01",
+      "duration_minutes": 32,
+      "summary": "# Realtime Analytics\nDate: 2026-09-01 | Duration: 32m\n\n## Summary\nThe discussion examined real-time analytics designed to address customer warehouse lag of 2–24 hours, with a managed warehouse providing earlier visibility and preview flags for major experiment issues. Tracking plugins can bifurcate events so exposures reach both warehouses, while customers manually select warehouse metrics; advanced statistics may be excluded. ClickHouse already contains the required data, but integration must remain simple. A diagnostic feed was proposed to filter experiments, feature flags, specific user IDs, and post-exposure events, potentially with session-recording links and reusable feature-page surfaces. Real-time refreshes and opt-in historical queries were discussed, alongside possible seven-day retention and larger-window queries through customer warehouses. For sampling, the MVP may use organization-level manual rates, feature overrides, and automatic expiry for temporary increases, with scheduled sampling considered later. Customers must scrub sensitive data before transmission. A Block proposal was expected shortly, as its Amplitude contract ends in December; replacement economics target near $100K monthly. Notion also needs diagnostics visibility, and Jeremy will clarify dynamic sampling and gather customer feedback.\n\n## Keywords\nReal-time analytics, Dynamic sampling, Experiment diagnostics, Managed warehouse, ClickHouse, Feature flags\n\n## Action Items\n**Jeremy Dorn**\nFinalize dynamic sampling approach (30:15)\nFollow up with Block (30:15)\nSend proposal document (30:25)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

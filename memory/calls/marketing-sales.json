@@ -1,7 +1,7 @@
 {
-  "company": "Marketing <> Sales",
+  "company": "Marketing + Sales",
   "slug": "marketing-sales",
-  "last_etl_date": "2026-08-05T15:57:31.310296",
+  "last_etl_date": "2026-09-03T06:04:10.805604",
   "calls": [
     {
       "id": "6a5a7ce74ad51100144d0249",
@@ -11,7 +11,8 @@
       "duration_minutes": 55,
       "summary": "[Summary failed] [Lyndsie Berens]: If, if those are the four segments that we decide on to go to Ashley, I mean this is a conversation for me and you but we'd probably need more demand gen help just because if those t",
       "host": "Lyndsie Berens",
-      "participants": 5
+      "participants": 5,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KXGKB43WB1RQQ4G6DQZXHZMC",
@@ -23,7 +24,19 @@
       "organizer": "lyndsie@growthbook.io",
       "participants": 6,
       "keywords": "AI startups, Enterprise sales, ABM program, Marketing channels, Pipeline coverage, Competitive positioning",
-      "action_items": "\n**Lyndsie Berens**\nFinalize startup landing page and one-pager for testing outreach on selected startup accounts (17:09)\nComplete reporting with Chris to consolidate existing system data for analysis (17:09)\nContinue building ABM program focused on the fast-growing AI segment but hold off on full ABM for startups (17:09)\nShare lists of AI cohorts and fast-growing startups with Ryan to assist with cross-functional collaboration (16:40)\nCoordinate with Ashley on rep assignments post-events to improve lead follow-up process (28:52)\n\n**Ryan McGurk**\nFinalize segmentation slides and walk through with Ashley, Graham, and Jeremy before wider sharing (16:53)\nAssign top hot AI and tech inbound accounts immediately to AE team for outreach (36:07)\nCollaborate with Ashley later today to plan sales headcount hiring (29:49)\nExplore options for hybrid AE workload to allow focus on AI segment and maintain pipeline diversity (03:02)\nEvaluate potential competitor conversion programs (e.g., Optimizely migration landing page and offers) (24:38)\nMonitor Anthropic’s logo use and press relations to leverage marketing opportunities (33:11)\n\n**Ashley Stirrup**\nSupport Jake’s AI outreach efforts with marketing resources to improve traction (09:07)\nRevise AE outreach for small accounts, emphasizing quick self-selection toward Pro for smaller companies and enterprise demo slots for bigger ones (20:23)\nDevelop podcast strategy to interview AI startups for market intelligence and build brand engagement (15:58)\nReshare hot leads and lead scoring reports regularly to Ryan for timely assignment and follow-up (35:41)\nAssist in managing channel focus with marketing, prioritizing LinkedIn, Google Ads, events, and podcast monetization (25:18)\n\n**Scott Bailey**\nContinue prioritizing AI ecosystem product integrations (e.g., eval tools and observability) with roadmap alignment, including guides and tutorials (04:10)\n"
+      "action_items": "\n**Lyndsie Berens**\nFinalize startup landing page and one-pager for testing outreach on selected startup accounts (17:09)\nComplete reporting with Chris to consolidate existing system data for analysis (17:09)\nContinue building ABM program focused on the fast-growing AI segment but hold off on full ABM for startups (17:09)\nShare lists of AI cohorts and fast-growing startups with Ryan to assist with cross-functional collaboration (16:40)\nCoordinate with Ashley on rep assignments post-events to improve lead follow-up process (28:52)\n\n**Ryan McGurk**\nFinalize segmentation slides and walk through with Ashley, Graham, and Jeremy before wider sharing (16:53)\nAssign top hot AI and tech inbound accounts immediately to AE team for outreach (36:07)\nCollaborate with Ashley later today to plan sales headcount hiring (29:49)\nExplore options for hybrid AE workload to allow focus on AI segment and maintain pipeline diversity (03:02)\nEvaluate potential competitor conversion programs (e.g., Optimizely migration landing page and offers) (24:38)\nMonitor Anthropic’s logo use and press relations to leverage marketing opportunities (33:11)\n\n**Ashley Stirrup**\nSupport Jake’s AI outreach efforts with marketing resources to improve traction (09:07)\nRevise AE outreach for small accounts, emphasizing quick self-selection toward Pro for smaller companies and enterprise demo slots for bigger ones (20:23)\nDevelop podcast strategy to interview AI startups for market intelligence and build brand engagement (15:58)\nReshare hot leads and lead scoring reports regularly to Ryan for timely assignment and follow-up (35:41)\nAssist in managing channel focus with marketing, prioritizing LinkedIn, Google Ads, events, and podcast monetization (25:18)\n\n**Scott Bailey**\nContinue prioritizing AI ecosystem product integrations (e.g., eval tools and observability) with roadmap alignment, including guides and tutorials (04:10)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M17DRZA3MMP56SCS2H1J7Q0Q",
+      "source": "fireflies",
+      "title": "Marketing + Sales Sync",
+      "date": "2026-08-31",
+      "duration_minutes": 31,
+      "summary": "# Marketing + Sales Sync\nDate: 2026-08-31 | Duration: 31m\n\n## Summary\nThe team focused on improving coordination between sales and marketing through cleaner HubSpot data, clearer ownership, and better workflow alignment. OP Methods’ scope includes lifecycle cleanup, lead scoring, duplicate removal, customer tagging, workflows, and reporting integration, while Jeff’s work centers more on pipeline analysis and sales methodology. Leadership also considered a full-time RevOps or Marketing Ops hire to reduce fragmented consulting efforts. Jake will focus on SMB deals through a round-robin model, with coaching and data-driven prioritization. Inbound marketing generates most of his meetings, while cold outreach has produced limited responses, including some sequences with 0% reply rates. Warm campaign leads require next-day follow-up, after a delayed response to Philadelphia Inquirer webinar leads. Marketing-supported sequences should replace less effective custom sequences. Jake H.’s dinner registrations are performing strongly, but attendance will depend on registration volume because hotels can cost upwards of $600 per night. LinkedIn activity is being connected to HubSpot to improve visibility, accountability, coaching, and follow-up measurement. Lyndsie will organize a role-alignment call with Jeff and OP Methods.\n\n## Keywords\nHubSpot, OP Methods, lead scoring, sales and marketing alignment, SMB deals, outreach campaigns\n\n## Action Items\n\n**Lyndsie Berens**\nShare outreach and campaign response data with Ryan McGurk for review to support analysis and prioritization (16:09)\nSet up an alignment call with Jeff and OP Methods involving Ryan McGurk and Ashley Stirrup to clarify roles and responsibilities on HubSpot lifecycle and data management (20:31)\nConfirm whether Jake has connected LinkedIn outreach data with HubSpot to enable tracking of InMails and messages (17:43)\n\n**Ryan McGurk**\nJoin the alignment call with OP Methods, Jeff, Lyndsie Berens, and Ashley Stirrup to clarify scopes and workflows related to HubSpot lifecycle and data hygiene (03:48)\nReview the shared campaign and outreach data, then formulate a game plan with Jake to prioritize time and improve sequence usage for better engagement (16:11)\nEngage with the sales team to discuss dinner attendance incentives and expense management to optimize pipeline-building events (20:05)\n\n**Ashley Stirrup**\nSupport coordination of the upcoming alignment call with OP Methods and sales leadership to ensure smooth scheduling and agenda setting (04:42)\nMonitor and share feedback on Jake’s campaign follow-ups and sequence adoption to improve execution and engagement rates (11:15)\n",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
     }
   ]
 }

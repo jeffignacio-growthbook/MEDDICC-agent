@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook",
   "slug": "growthbook",
-  "last_etl_date": "2026-08-08T17:33:40.689327",
+  "last_etl_date": "2026-09-03T06:04:10.811022",
   "calls": [
     {
       "id": "01KGHY46Z2XRQ494JJYXYSJ57B",
@@ -13,7 +13,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 7,
       "keywords": "Growth Book, incremental load, Hive data modeling, user deduplication, experiment validation, query optimization",
-      "action_items": "\n**Koushik Roy**\nShare incremental load and baseline count queries with Luke for detailed review (36:16)\nProvide table schemas and sample data rows to Luke for feedback on data model optimization (38:55)\nCoordinate internally (with Sharath) and compile queries and schema documentation by next day for Luke’s analysis (39:04)\n\n**Luke Sonnet**\nReview shared incremental load and baseline queries, provide annotated feedback asynchronously to explain query logic and identify issues (36:54)\nAdvise on optimal fact table schema design, including examples or dummy schema relevant to PhonePe’s use case (38:43)\n\n**Sharath Babu**\nAssist Koushik in collating schema and queries for sharing (38:55)\n\n**Unassigned**\nIdentify PhonePe organization admin with Growth Book permissions for viewing and managing auto update schedules (25:19)\nGrant necessary access to Koushik to view and manage auto update schedules in Growth Book UI (25:05)\n"
+      "action_items": "\n**Koushik Roy**\nShare incremental load and baseline count queries with Luke for detailed review (36:16)\nProvide table schemas and sample data rows to Luke for feedback on data model optimization (38:55)\nCoordinate internally (with Sharath) and compile queries and schema documentation by next day for Luke’s analysis (39:04)\n\n**Luke Sonnet**\nReview shared incremental load and baseline queries, provide annotated feedback asynchronously to explain query logic and identify issues (36:54)\nAdvise on optimal fact table schema design, including examples or dummy schema relevant to PhonePe’s use case (38:43)\n\n**Sharath Babu**\nAssist Koushik in collating schema and queries for sharing (38:55)\n\n**Unassigned**\nIdentify PhonePe organization admin with Growth Book permissions for viewing and managing auto update schedules (25:19)\nGrant necessary access to Koushik to view and manage auto update schedules in Growth Book UI (25:05)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KHH0Q18VDTRGP6PEFR58JK1T",
@@ -25,7 +26,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 7,
       "keywords": "GrowthBook, ETL, Incremental Load, API Integration, Query Failure Alerting, Hive Data Model",
-      "action_items": "\n**Koushik Roy**\nVerify Trino query layer capacity to monitor query failures and integrate GrowthBook failure notifications with Hive (16:00)\nConnect with internal engineer Abhishek for version upgrade context and support (18:59)\nConfirm receipt and review API documentation for scheduling GrowthBook experiment updates post-ETL (08:48)\n\n**Luke Sonnet**\nEmail API documentation for GrowthBook experiment update triggers including authentication and endpoints (08:48)\nInvestigate adding GrowthBook event emissions for experiment update success/failure status to enable alerting, expected within the week (16:25)\nExplore options to improve visibility and tracking of failed queries or experiment updates in GrowthBook UI (15:20)\nProvide follow-up on PhonePe team members responsible for GrowthBook upgrades and version control (18:50)\n"
+      "action_items": "\n**Koushik Roy**\nVerify Trino query layer capacity to monitor query failures and integrate GrowthBook failure notifications with Hive (16:00)\nConnect with internal engineer Abhishek for version upgrade context and support (18:59)\nConfirm receipt and review API documentation for scheduling GrowthBook experiment updates post-ETL (08:48)\n\n**Luke Sonnet**\nEmail API documentation for GrowthBook experiment update triggers including authentication and endpoints (08:48)\nInvestigate adding GrowthBook event emissions for experiment update success/failure status to enable alerting, expected within the week (16:25)\nExplore options to improve visibility and tracking of failed queries or experiment updates in GrowthBook UI (15:20)\nProvide follow-up on PhonePe team members responsible for GrowthBook upgrades and version control (18:50)\n",
+      "summary_quality": "good"
     },
     {
       "id": "6998843ada48ca0019eccc69",
@@ -35,7 +37,8 @@
       "duration_minutes": 11,
       "summary": "[Summary failed] [Пользователь Zoom]: Hello. Christian.\n[Christian Liebenow]: Dimitri.\n[Пользователь Zoom]: Hello, nice to meet you. Sorry for the last time I was disturbed by another meeting.\n[Christian Liebenow]: Th",
       "host": "Christian Liebenow",
-      "participants": 2
+      "participants": 2,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KKCHVTF9QDT50FB8EFFDNAQG",
@@ -47,7 +50,8 @@
       "organizer": "ashley@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, LinkedIn Advertising, Content Strategy, Assessment Offers, Problem-Agitate-Solve, Enterprise Sales",
-      "action_items": "\n**Ashley Stirrup**\nWork on creating assessment/audit-style offers as free, value-add entry points for prospects (09:53)\nFollow up with Dave to discuss content strategy and apply the problem-agitate-solve framework with Graham (27:56)\nCoordinate on putting direct response copy around demos and product features with Dave and Matthew (33:50)\nEvaluate shifting volume of content to fewer, higher-quality videos or posts with stronger call-to-actions (33:46)\n\n**Matthew Hunt**\nProvide example content offers from other clients for inspiration (44:09)\nPrepare and send meeting notes asynchronously to Ashley and participants (44:17)\nCollaborate with Dave and Ashley to refine content messaging and coach Graham on producing targeted, demo-driven content (32:24)\nAdvise on LinkedIn campaign audience building and retargeting tactics suited to GrowthBook’s budget and objectives (04:37)\n\n**Chris Newton**\nSchedule some review meetings with Graham to collaboratively assess content early stages to accelerate feedback (29:35)\nSupport Ashley and Dave in overcoming content approval challenges and improving workflows for quicker turnarounds (30:41)\n\n**Unassigned**\nFollow up brainstorming session with Graham to establish next batch of content aligned with agreed strategic framework (27:14)\n"
+      "action_items": "\n**Ashley Stirrup**\nWork on creating assessment/audit-style offers as free, value-add entry points for prospects (09:53)\nFollow up with Dave to discuss content strategy and apply the problem-agitate-solve framework with Graham (27:56)\nCoordinate on putting direct response copy around demos and product features with Dave and Matthew (33:50)\nEvaluate shifting volume of content to fewer, higher-quality videos or posts with stronger call-to-actions (33:46)\n\n**Matthew Hunt**\nProvide example content offers from other clients for inspiration (44:09)\nPrepare and send meeting notes asynchronously to Ashley and participants (44:17)\nCollaborate with Dave and Ashley to refine content messaging and coach Graham on producing targeted, demo-driven content (32:24)\nAdvise on LinkedIn campaign audience building and retargeting tactics suited to GrowthBook’s budget and objectives (04:37)\n\n**Chris Newton**\nSchedule some review meetings with Graham to collaboratively assess content early stages to accelerate feedback (29:35)\nSupport Ashley and Dave in overcoming content approval challenges and improving workflows for quicker turnarounds (30:41)\n\n**Unassigned**\nFollow up brainstorming session with Graham to establish next batch of content aligned with agreed strategic framework (27:14)\n",
+      "summary_quality": "good"
     },
     {
       "id": "69cfe0cb4772270015869773",
@@ -57,7 +61,8 @@
       "duration_minutes": 26,
       "summary": "[Summary failed] [Logan Bates]: Endpoint to record the page time if you're able to do it like on your website. So have a timer kind of keep track of when a user is on the page. We do some automatic data collection. Me",
       "host": "Daniel Wathne",
-      "participants": 5
+      "participants": 5,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KST2CPHJV1S20GSSFM9WWYYM",
@@ -69,7 +74,8 @@
       "organizer": "cary@growthbook.io",
       "participants": 2,
       "keywords": "feature flags, RBAC, SDK, experiment lifecycle, saved groups, safe rollout",
-      "action_items": "\n**Ryan Scott Brown**\nCreate a Growthbook account using Crunchyroll email to expedite pilot access (39:23)\nCoordinate with Slack administrators to establish a pilot Slack channel including Growthbook and internal teams (39:07)\nIdentify and assemble engineers and power users to participate in the pilot and demo sessions (39:55)\nProvide feedback to Growthbook team on any gaps or missing features discovered during pilot exploration (15:00)\nEngage product and infrastructure teams with educational materials provided by Growthbook to facilitate adoption (41:00)\n\n**Cary Rakin**\nSet up and manage Slack channel for the pilot involving Growthbook and Crunchyroll teams (37:00)\nProvide pilot pricing details based on seat count and confirm budget alignment with Crunchyroll (38:05)\nSource and share educational and explainer materials for technical and product users regarding experimentation methods (25:04)\nFacilitate scheduling of demo and onboarding sessions with Ryan and his team for next week (39:40)\nCoordinate availability of professional services and ongoing enablement sessions for Crunchyroll (43:20)\n\n**Logan Bates**\nDeliver demo of RBAC, feature flags, and saved groups functionality during onboarding sessions (11:18)\nShare documentation and examples for SCIM integration and role provisioning with Ryan's team (14:48)\nProvide detailed explanation and support related to tracking callback and exposure forwarding in the Growthbook SDK (34:40)\nParticipate actively in pilot Slack channel and respond promptly to technical questions from Crunchyroll team (37:00)\nCollaborate with Cary on providing educational resources and professional services support for Crunchyroll (43:00)\n"
+      "action_items": "\n**Ryan Scott Brown**\nCreate a Growthbook account using Crunchyroll email to expedite pilot access (39:23)\nCoordinate with Slack administrators to establish a pilot Slack channel including Growthbook and internal teams (39:07)\nIdentify and assemble engineers and power users to participate in the pilot and demo sessions (39:55)\nProvide feedback to Growthbook team on any gaps or missing features discovered during pilot exploration (15:00)\nEngage product and infrastructure teams with educational materials provided by Growthbook to facilitate adoption (41:00)\n\n**Cary Rakin**\nSet up and manage Slack channel for the pilot involving Growthbook and Crunchyroll teams (37:00)\nProvide pilot pricing details based on seat count and confirm budget alignment with Crunchyroll (38:05)\nSource and share educational and explainer materials for technical and product users regarding experimentation methods (25:04)\nFacilitate scheduling of demo and onboarding sessions with Ryan and his team for next week (39:40)\nCoordinate availability of professional services and ongoing enablement sessions for Crunchyroll (43:20)\n\n**Logan Bates**\nDeliver demo of RBAC, feature flags, and saved groups functionality during onboarding sessions (11:18)\nShare documentation and examples for SCIM integration and role provisioning with Ryan's team (14:48)\nProvide detailed explanation and support related to tracking callback and exposure forwarding in the Growthbook SDK (34:40)\nParticipate actively in pilot Slack channel and respond promptly to technical questions from Crunchyroll team (37:00)\nCollaborate with Cary on providing educational resources and professional services support for Crunchyroll (43:00)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KT23QE0A6KPYBR7W360PDWVF",
@@ -81,7 +87,8 @@
       "organizer": "cary@growthbook.io",
       "participants": 1,
       "keywords": "Upstart, Growthbook, renewal pricing, air gap license, multi-year agreement, procurement process",
-      "action_items": "\n**Anna Chow**\nDiscuss proposed pricing increases and renewal options with internal Upstart team and procurement lead Aditya; provide feedback to Growthbook within one to two days (30:30)\n\n**Cary Rakin**\nVerify internal AWS partnership status and marketplace benefits relevant to Upstart with Growthbook team (12:49)\nShare presentation slides and renewal proposal materials with Anna Chow for internal distribution at Upstart (31:51)\nCoordinate with Upstart procurement lead Aditya to ensure alignment and support during renewal discussions (31:55)\nAdvocate internally within Growthbook to explore flexible pricing or alternatives based on Upstart’s feedback and budget constraints (30:45)\n"
+      "action_items": "\n**Anna Chow**\nDiscuss proposed pricing increases and renewal options with internal Upstart team and procurement lead Aditya; provide feedback to Growthbook within one to two days (30:30)\n\n**Cary Rakin**\nVerify internal AWS partnership status and marketplace benefits relevant to Upstart with Growthbook team (12:49)\nShare presentation slides and renewal proposal materials with Anna Chow for internal distribution at Upstart (31:51)\nCoordinate with Upstart procurement lead Aditya to ensure alignment and support during renewal discussions (31:55)\nAdvocate internally within Growthbook to explore flexible pricing or alternatives based on Upstart’s feedback and budget constraints (30:45)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KT29ZMF8W3HTN122NZH92M3Z",
@@ -93,7 +100,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 5,
       "keywords": "AI note taker, Zoom meeting, Fireflies, presentation update, meeting owner, call management",
-      "action_items": "\n**Graham McNicoll**\nLog into the Zoom meeting as the owner to remove the Fireflies AI note taker from the call to stop it from auto-joining and causing disruption (06:48)\n\n**Sarah**\nDisable or adjust the auto-join setting for the Fireflies AI note taker to prevent it from automatically joining future meetings and causing disruptions (05:05)\n\n**Cody Morrow**\nProceed with redoing the presentation as a timely update or improvement as discussed (05:43)\n"
+      "action_items": "\n**Graham McNicoll**\nLog into the Zoom meeting as the owner to remove the Fireflies AI note taker from the call to stop it from auto-joining and causing disruption (06:48)\n\n**Sarah**\nDisable or adjust the auto-join setting for the Fireflies AI note taker to prevent it from automatically joining future meetings and causing disruptions (05:05)\n\n**Cody Morrow**\nProceed with redoing the presentation as a timely update or improvement as discussed (05:43)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KSQE4KV0S586DRRWH10VQAYA",
@@ -105,7 +113,8 @@
       "organizer": "chris@growthbook.io",
       "participants": 19,
       "keywords": "Growthbook, Experimentation, Feature Flags, Snowflake, A/B Testing, Statistical Analysis",
-      "action_items": "\n**Pablo Torrecillas Monasterio**\nPablo Torrecillas Monasterio to send examples of A/B tests from Stradivarius to Growthbook team for review and enablement preparation (01:01:00)\n\n**Cary Rakin**\nCary Rakin to schedule and send calendar invite for next Growthbook enablement session at the same time next week (01:00:50)\n\n**Chris Sanders**\nChris Sanders to consult with Growthbook data science team for definitive advice on whether starting a new experiment phase is required when expanding traffic to new markets, and communicate response (46:30)\nChris Sanders to prepare next session focused on UI walkthrough, including experiment configuration and reviewing Stradivarius’s current experiment results (01:00:20)\n"
+      "action_items": "\n**Pablo Torrecillas Monasterio**\nPablo Torrecillas Monasterio to send examples of A/B tests from Stradivarius to Growthbook team for review and enablement preparation (01:01:00)\n\n**Cary Rakin**\nCary Rakin to schedule and send calendar invite for next Growthbook enablement session at the same time next week (01:00:50)\n\n**Chris Sanders**\nChris Sanders to consult with Growthbook data science team for definitive advice on whether starting a new experiment phase is required when expanding traffic to new markets, and communicate response (46:30)\nChris Sanders to prepare next session focused on UI walkthrough, including experiment configuration and reviewing Stradivarius’s current experiment results (01:00:20)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KT4FFMSZ4TZZWJDNB2BG1APZ",
@@ -117,7 +126,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 5,
       "keywords": "zero to one thinking, solo project management, product design, technical user engagement, San Francisco Bay area, CEO auto-join",
-      "action_items": "\n**Magda Romero**\nPresent and discuss projects demonstrating zero to one product development and independent project management without a product manager or TPM (04:20)\n\n**Kari Kay**\nCoordinate removal of the note taker once the CEO joins and facilitate smooth meeting progression (03:58)\n\n**Graham**\nEngage actively in the interview, including verifying participant details such as location (05:00)\n"
+      "action_items": "\n**Magda Romero**\nPresent and discuss projects demonstrating zero to one product development and independent project management without a product manager or TPM (04:20)\n\n**Kari Kay**\nCoordinate removal of the note taker once the CEO joins and facilitate smooth meeting progression (03:58)\n\n**Graham**\nEngage actively in the interview, including verifying participant details such as location (05:00)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KT9QWZA5DTSNESBKDFAA0A9N",
@@ -129,7 +139,8 @@
       "organizer": "chris@growthbook.io",
       "participants": 19,
       "keywords": "Feature flag, Experiment metrics, Add to cart, Traffic split, Experiment bucketing, Bayesian analysis",
-      "action_items": "\n**Pablo Torrecillas Monasterio**\nShare planning and detailed agenda for the next session including experiment creation steps and result analysis (01:04:33)\n\n**Marc Torrents Domenech**\nPrepare additional fact tables and metrics prior to the next session to support creating new experiments from scratch (01:01:10)\n\n**Dmitry Sopov**\nVerify whether user ID is being correctly set as attribute in SDK to ensure proper bucketing and revisit app group definitions (48:40)\n\n**Chris Sanders**\nProvide guidance on handling the fallback attribute in SDK to link pre-login anonymous sessions with identified user sessions for experiments (49:30)\nAdvise on uneven traffic splits use cases from data science team and share best practices for experiment design related to traffic allocation (58:20)\n\n**Entire Team**\nContinue running current A/B tests (e.g., iOS and web carousels) and monitor experiment data to assess statistical significance and decide when to stop tests (42:30)\n\n**Team**\nInvestigate missing country dimension data in experiment assignment query and ensure dimension data is sent from SDK events for slicing experiment results (33:50)\n"
+      "action_items": "\n**Pablo Torrecillas Monasterio**\nShare planning and detailed agenda for the next session including experiment creation steps and result analysis (01:04:33)\n\n**Marc Torrents Domenech**\nPrepare additional fact tables and metrics prior to the next session to support creating new experiments from scratch (01:01:10)\n\n**Dmitry Sopov**\nVerify whether user ID is being correctly set as attribute in SDK to ensure proper bucketing and revisit app group definitions (48:40)\n\n**Chris Sanders**\nProvide guidance on handling the fallback attribute in SDK to link pre-login anonymous sessions with identified user sessions for experiments (49:30)\nAdvise on uneven traffic splits use cases from data science team and share best practices for experiment design related to traffic allocation (58:20)\n\n**Entire Team**\nContinue running current A/B tests (e.g., iOS and web carousels) and monitor experiment data to assess statistical significance and decide when to stop tests (42:30)\n\n**Team**\nInvestigate missing country dimension data in experiment assignment query and ensure dimension data is sent from SDK events for slicing experiment results (33:50)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KTS1768FG0J5HCT8S2AB3QS5",
@@ -141,7 +152,8 @@
       "organizer": "chris@growthbook.io",
       "participants": 19,
       "keywords": "Experimentation, GrowthBook, AI integration, Feature flags, Sample ratio mismatch, Visual Editor",
-      "action_items": "\n**Chris Sanders**\nSend the recording links of all sessions to all meeting attendees to ensure access to the discussed content (01:00:04)\nFollow up on the availability of GrowthBook AI features and the Visual Editor rollout for the Stradivarius account and plan a demonstration session for these tools (30:36)\nInvestigate and clarify the status of AI integration on the learning page and provide guidance on its practical usage to the team (28:36)\n\n**Arnau Comas Codina**\nProvide a specific example related to applying feature flags in layered UI components to receive tailored guidance from Chris (54:29)\n\n**Pablo Torrecillas Monasterio**\nUse the GrowthBook team channel to raise additional doubts and propose topics for future sessions to enhance learning and support (59:37)\n"
+      "action_items": "\n**Chris Sanders**\nSend the recording links of all sessions to all meeting attendees to ensure access to the discussed content (01:00:04)\nFollow up on the availability of GrowthBook AI features and the Visual Editor rollout for the Stradivarius account and plan a demonstration session for these tools (30:36)\nInvestigate and clarify the status of AI integration on the learning page and provide guidance on its practical usage to the team (28:36)\n\n**Arnau Comas Codina**\nProvide a specific example related to applying feature flags in layered UI components to receive tailored guidance from Chris (54:29)\n\n**Pablo Torrecillas Monasterio**\nUse the GrowthBook team channel to raise additional doubts and propose topics for future sessions to enhance learning and support (59:37)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KVTKJYCQ3SS3ZMY6B64FA5RD",
@@ -153,7 +165,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 4,
       "keywords": "World Cup, note taker, meeting host, Portland, Seattle, introductions",
-      "action_items": "\n**Graham McNicoll**\nRemove the automatic note taker from the meeting as requested to streamline the call (05:36)\n\n**Kari Kay**\nFacilitate and prompt introductions of meeting participants once technical hosting issues are resolved (05:54)\n"
+      "action_items": "\n**Graham McNicoll**\nRemove the automatic note taker from the meeting as requested to streamline the call (05:36)\n\n**Kari Kay**\nFacilitate and prompt introductions of meeting participants once technical hosting issues are resolved (05:54)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KW5C1M1RNVZRBQNN7T6HABJR",
@@ -165,7 +178,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 4,
       "keywords": "UX Design, Payment Configuration, Rules-Based System, User Research, AI Impact, Product Iteration",
-      "action_items": "\n**Craig Morse**\nFollow up with GrowthBook team via email with additional project links and relevant personal product demos (01:00:30)\n\n**Kari Kay**\nProvide email contact to Craig Morse for sharing and reviewing additional materials post-meeting (01:00:40)\n"
+      "action_items": "\n**Craig Morse**\nFollow up with GrowthBook team via email with additional project links and relevant personal product demos (01:00:30)\n\n**Kari Kay**\nProvide email contact to Craig Morse for sharing and reviewing additional materials post-meeting (01:00:40)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KWFYFYAE8DER2YBR8WG8TRRG",
@@ -177,7 +191,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 4,
       "keywords": "Agentsync, onboarding, insurance software, UI/UX design, AI tools, workflow configurability",
-      "action_items": "\n**Gabe Melean**\nShare portfolio website link with Graham and Kari for visual reference post-meeting (05:50)\nProvide a link to the Lean Data case study and possibly other project materials for further review (49:56)\nRespond to any follow-up questions post-meeting via email (50:03)\n\n**Kari Kay - GrowthBook**\nFollow up with Gabe for additional project materials and details if needed after review (50:08)\n"
+      "action_items": "\n**Gabe Melean**\nShare portfolio website link with Graham and Kari for visual reference post-meeting (05:50)\nProvide a link to the Lean Data case study and possibly other project materials for further review (49:56)\nRespond to any follow-up questions post-meeting via email (50:03)\n\n**Kari Kay - GrowthBook**\nFollow up with Gabe for additional project materials and details if needed after review (50:08)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KYQC40KN89K62ZYYGZ6NGZAB",
@@ -193,7 +208,19 @@
       "participant_domains": [
         "newtongrowth.com",
         "opmethods.com"
-      ]
+      ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M0XTCFPQ1FHYF0DEZYJ0HKRW",
+      "source": "fireflies",
+      "title": "GrowthBook - Top Line Model Sync",
+      "date": "2026-08-28",
+      "duration_minutes": 45.9900016784668,
+      "summary": "# GrowthBook - Top Line Model Sync\nDate: 2026-08-28 | Duration: 45.9900016784668m\n\n## Summary\nDuring the meeting, the team focused on reconciling the top line revenue model to improve forecasting accuracy, particularly by differentiating Pro and Enterprise revenue sources. Mark Beltran and Charlie Campo emphasized the need to split Pro revenue into Stripe and Orb components as Pro customer accounts transition towards Orb. The transition to event-based pricing for Pro was discussed, indicating future model updates will be needed. Concerns were raised about discrepancies in ARR estimates, especially regarding a $2 million services deal with Anthropic. Additionally, significant issues around contraction and churn data were acknowledged, prompting a rollback of model logic to align with more accurate HubSpot data. The need for simplified reporting for stakeholder communication was also emphasized, alongside establishing clear processes for monthly data reviews and model improvements.\n\n## Keywords\ntop line model, ARR reconciliation, Enterprise segment, Pro segment, revenue waterfall, services revenue\n\n## Action Items\n\n**Charlie Campo**\nUpdate the top line waterfall model to separate Stripe Pro and Orb Pro distinctly and adjust for upcoming Enterprise inclusion in Orb billing (08:45)\nClean up contraction/churn logic in the model, removing incorrect January 2023 contraction entries and recalculate expansion and renewal revenues (30:20)\nProvide updated, corrected model outputs and send to Ashley Stirrup for review prior to next meeting (45:08)\nGenerate customer-level revenue tables for Q2 including new bookings, expansions, and renewals for comparison against Ryan's data (43:33)\nMaintain rolling updates of monthly topline data by the second business day using HubSpot raw data (26:41)\n\n**Ashley Stirrup**\nRequest Ryan for documentation/data on Q2 closed new bookings, expansions, and renewals to enable reconciliation with model data (41:50)\nAct as liaison between Ryan and Charlie to facilitate data sharing and alignment on revenue figures (42:35)\nLead preparation of a simple spreadsheet summarizing new MRR for Self-Serve (Pro) and Enterprise for FY27 Q2 to highlight variances and prompt investigations (34:27)\nCoordinate follow-up meeting around 1:00 PM Pacific on the next day to review model updates and data checks with Charlie and Mark (33:36)\n\n**Mark Beltran**\nReview the topline output tab and share updated versions with Charlie and Ashley for feedback (12:55)\nInitiate communication with Ryan to discuss discrepancies in Enterprise new ARR numbers and share refined customer-level reconciliations for validation (23:16)\nAssist in preparing simplified summary deliverables for Ryan with detailed expansions, churn, and renewal breakdowns (28:37)\nSchedule and lead follow-up discussion meeting focused on resolving data variances and updating models on an ongoing basis (33:36)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
     }
   ]
 }

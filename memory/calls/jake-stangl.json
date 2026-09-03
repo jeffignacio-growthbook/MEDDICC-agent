@@ -1,0 +1,18 @@
+{
+  "company": "Jake Stangl",
+  "slug": "jake-stangl",
+  "last_etl_date": "2026-09-03T06:04:10.809725",
+  "calls": [
+    {
+      "id": "01M0XTJ5SMJA6N05RXTQ5Q7AFT",
+      "source": "fireflies",
+      "title": "30 min with Karen (Jake Stangl)",
+      "date": "2026-08-28",
+      "duration_minutes": 31.110000610351562,
+      "summary": "# 30 min with Karen (Jake Stangl)\nDate: 2026-08-28 | Duration: 31.110000610351562m\n\n## Summary\nThe discussion centered on outbound sales strategies that emphasize targeted outreach to open source users and high priority accounts. Jake Stangl leads the sales effort, using a multi-channel approach combining calls, LinkedIn, and email. The aim is to schedule meetings with AEs and technical teams based on prospects' interests. Key product strengths highlighted include Growth Book’s all-in-one platform that consolidates feature flagging, experimentation, and analytics, appealing particularly to security-focused industries. Sales collateral needs were identified, including the creation of clearer one-pagers to explain product tiers. Market targeting focuses on companies with 1,000 to 10,000 employees, showing strong growth signals, while there’s a recognized gap in communicating AI features despite high interest. Outreach challenges include low response rates and the absence of free trials.\n\n## Keywords\nOutbound, Growth Book, experimentation platform, self-hosting, support offerings, LinkedIn outreach\n\n## Action Items\n\n**Jake Stangl**\nJake Stangl to send Karen Henke samples of successful messaging and outbound scripts to aid in developing outreach strategies (29:44)\n\n**Karen Henke**\nKaren Henke and her team to develop a clear one-pager comparing Growth Book editions (Pro vs. Enterprise), emphasizing support benefits, cloud vs. self-hosting options, and key differentiators to improve prospect understanding and positioning (21:31)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

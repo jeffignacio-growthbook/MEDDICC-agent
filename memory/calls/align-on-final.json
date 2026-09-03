@@ -1,0 +1,18 @@
+{
+  "company": "Align on final",
+  "slug": "align-on-final",
+  "last_etl_date": "2026-09-03T06:04:10.822641",
+  "calls": [
+    {
+      "id": "01M0D466WBBAM2EMNJ14QX2W02",
+      "source": "fireflies",
+      "title": "Align on final 5.1 launch theme & plan",
+      "date": "2026-08-24",
+      "duration_minutes": 30.700000762939453,
+      "summary": "# Align on final 5.1 launch theme & plan\nDate: 2026-08-24 | Duration: 30.700000762939453m\n\n## Summary\nThe team discussed product messaging and positioning, emphasizing the need to scale experimentation through a core message centered on volume, value, and culture. Key features aimed at enhancing experimentation speed, quality, and insights were identified, including contextual bandits and a Slack app. The participants recognized the importance of velocity as a primary theme, with culture serving as a foundational element to drive faster learning. AI and automation enhancements were highlighted as crucial for reducing friction in the experimentation process. Additionally, a communication strategy was developed to ensure that detailed release notes would be separated from the main blog post to maintain focus on core themes while still addressing additional features.\n\n## Keywords\nexperimentation, AI automation, product analytics, launch messaging, contextual bandits, culture\n\n## Action Items\n\n**Elyse Fox**\nRework the 5.1 launch messaging with a stronger focus on speed/velocity and culture as an enabler; circulate the revised version for feedback (29:20)\n\n**Jeremy Dorn**\nPrepare to finalize top features and confirm release scope including User Journeys and Slack app readiness (23:05)\n\n**Scott Bailey**\nAssist with articulating the narrative of feature integration along experimentation workflow stages for launch messaging (21:53)\n\n**Unassigned**\nUtilize office hours and release notes to cover all features in the 5.1 launch ecosystem, even if not fully included in the primary blog post (19:41)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Feature x Design",
+  "slug": "feature-x-design",
+  "last_etl_date": "2026-09-03T06:04:10.829839",
+  "calls": [
+    {
+      "id": "01M0BAMGDARM0HBPY72KKFWWPK",
+      "source": "fireflies",
+      "title": "Feature x Design kick off",
+      "date": "2026-08-19",
+      "duration_minutes": 33.75,
+      "summary": "# Feature x Design kick off\nDate: 2026-08-19 | Duration: 33.75m\n\n## Summary\nThe team acknowledged a significant design backlog due to no design input for nearly six months and also addressed the challenges following Kari's departure. Johnny and Gabe are supporting each other while identifying opportunities for improved collaboration between design and engineering. A siloed process has delayed feedback loops, exacerbated by resource shortages. The current workload is heavy, with 80% of work being unplanned, making it difficult to focus on key projects. Configs UX onboarding and managed features were recognized as top priorities, with significant emphasis placed on improving the onboarding process. There is also a proposal to revitalize regular syncs to enhance coordination, as no active Kanban system currently exists.\n\n## Keywords\ndesign collaboration, engineering workflow, backlog prioritization, product onboarding, feature flags, project management\n\n## Action Items\n**Johnny Martinez**  \nOrganize attendance in engineering standups (08:29)  \nPrioritize design tasks from 5.1 release and backlog (11:59)  \nMark priorities in 5.1 features list (22:46)  \n\n**Gabe Melean**  \nCollaborate with Guy on AI-assisted setup flow (12:46)  \nLearn about config feature (12:46)  \nParticipate in permissions design review (24:25)  \nBe prepared to shift priority to managed features redesign (29:54)  \n\n**Bryce Fitzsimons**  \nPotentially revive Kanban board or implement project tracking tools (22:08)  \nDemo config feature and onboarding complexity to designers (23:48)  \nCoordinate on managed features redesign with Gabe and Johnny (30:52)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

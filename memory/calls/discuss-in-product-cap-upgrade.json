@@ -1,0 +1,18 @@
+{
+  "company": "Discuss in-product cap/upgrade",
+  "slug": "discuss-in-product-cap-upgrade",
+  "last_etl_date": "2026-09-03T06:04:10.800428",
+  "calls": [
+    {
+      "id": "01M17J9MQ6A9J7HFVGCSS35BS9",
+      "source": "fireflies",
+      "title": "Discuss in-product cap/upgrade flow",
+      "date": "2026-08-31",
+      "duration_minutes": 31.219999313354492,
+      "summary": "# Discuss in-product cap/upgrade flow\nDate: 2026-08-31 | Duration: 31.219999313354492m\n\n## Summary\nThe team is defining Free and Pro limits, pricing, billing, and enforcement. Pro users will have up to three projects, while Free users can have three users; Pro includes five million monthly events with automatic billing of $50 per additional million, and Free includes two million events before event ingestion is blocked. Existing customers remain on legacy pricing, while new organizations receive the new limits through a switch-flip rollout. Event Forwarder compatibility creates exceptions for unsupported data sources, and Free is not yet fully integrated into Orb. In-app banners and modals will warn users about event and seat limits, while Orb alerts may support sales and marketing outreach. Free AI usage will have organization-wide weekly limits, whereas Pro overages will be billed automatically, but AI pricing remains undecided. A CDN tracking bug over-reported events threefold and required a backfill of 339,000 usage events. Michael is leading backend plans and Orb synchronization, Guy is handling in-app enforcement, and Kai is assigned notification logic. Sales training and nurture campaigns are being prepared, with Pendo under consideration.\n\n## Keywords\nUsage limits, pricing plans, event forwarder, AI usage, in-app messaging, upsell flow\n\n## Action Items\n\n**Michael Knowlton**\nShare current sandbox model and screenshots of new plan limits and upgrade modals with the team to aid understanding and training (05:00)\nConfirm enforcement policy regarding blocking or alerting users when they hit event limits, particularly for the Free plan restrictions (11:20)\nInvestigate technical capability to pause or block event acceptance upon exceeding usage limits and verify handling of managed warehouse events (23:30)\nProvide detailed answers regarding strictness of enforcement for event limits and AI usage limits to finalize policy and communication (29:35)\nContinue progressing on AI usage limits billing integration aiming for launch alignment, while recognizing some risk of delay (20:55)\n\n**Elyse Fox**\nReview shared limits documentation in detail and prepare sales training materials related to in-app limit messaging and upgrade flow (06:30)\nCollaborate with marketing to define upsell and nurture flows tied to Orb alerts triggered as usage thresholds are reached (10:20)\n\n**Ashley Stirrup**\nCoordinate with sales training team to incorporate limit and upgrade flow information and prepare related FAQs for effective communication (25:35)\nPrepare messaging flows regarding user and event limits enforcement, including blocking beyond user limits and billing explanations for clarity (22:00)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

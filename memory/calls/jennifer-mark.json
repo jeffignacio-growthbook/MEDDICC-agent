@@ -1,0 +1,18 @@
+{
+  "company": "Jennifer / Mark",
+  "slug": "jennifer-mark",
+  "last_etl_date": "2026-09-03T06:04:10.799441",
+  "calls": [
+    {
+      "id": "01M1D3F7R402HKTVP1YHAYB02F",
+      "source": "fireflies",
+      "title": "Jennifer / Mark",
+      "date": "2026-09-01",
+      "duration_minutes": 43.90999984741211,
+      "summary": "# Jennifer / Mark\nDate: 2026-09-01 | Duration: 43.90999984741211m\n\n## Summary\nThe team is improving enterprise billing and invoicing by addressing delays caused by inconsistent or incomplete data, late AES commission reports, and the lack of a consistent post-close invoicing process. Stripe is used to send invoices, while a manually maintained spreadsheet tracks invoice dates, payment status, customer details, closed but uninvoiced deals, and payments; Anthropic is among the recorded customers. Jennifer will add standardized payment-term, billing-frequency, and renewal-status fields with dropdowns and maintain the spreadsheet through end of Q2 July 31. HubSpot is the primary CRM source for closed deals and renewals, but it requires cleaning and validation because of discrepancies involving multi-year deals and auto-renewals. Mark will connect with Jeff, a sales operations contractor, to obtain clean monthly reports by the 10th day after month-end, with Ryan included for coordination. Mark will use the data to build a billing schedule and cash-collections forecast, while the team works toward a near-automated process that reduces manual effort and improves forecasting accuracy.\n\n## Keywords\nbilling forecast, invoice tracking, Stripe, HubSpot CRM, sales ops, renewal status\n\n## Action Items\n\n**Jennifer Pham-Le**\nAdd dropdown columns for payment terms, billing schedule, and renewal status (\"renewed,\" \"churned,\" \"in progress\") to the invoicing spreadsheet to standardize data entry and improve forecasting (22:00)\nContinue maintaining and enhancing the invoicing spreadsheet by incorporating new fields discussed during the meeting to support better billing and cash collections forecasting (42:20)\nIntroduce Mark Beltran to Jeff, the sales ops contractor, via Slack and add Ryan for visibility to facilitate ongoing data sharing and collaboration involving HubSpot data extraction (40:20)\n\n**Mark Beltran**\nReach out to Jeff for access to clean monthly and quarterly deal data from HubSpot to support forecasting and billing schedule purposes (39:10)\nUtilize the updated invoicing spreadsheet to build a billing and cash collections forecasting model based on the enhanced data fields (21:30)\n",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

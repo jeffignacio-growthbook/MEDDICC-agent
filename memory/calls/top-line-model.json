@@ -1,0 +1,18 @@
+{
+  "company": "Top Line Model",
+  "slug": "top-line-model",
+  "last_etl_date": "2026-09-03T06:04:10.808220",
+  "calls": [
+    {
+      "id": "01M12WFCC7T9Q6QYZWDQ5N7MMS",
+      "source": "fireflies",
+      "title": "Top Line Model Review",
+      "date": "2026-08-28",
+      "duration_minutes": 27.15999984741211,
+      "summary": "# Top Line Model Review\nDate: 2026-08-28 | Duration: 27.15999984741211m\n\n## Summary\nThe meeting focused on reconciling ARR figures, revealing manual data entry errors in HubSpot that caused discrepancies in renewal and expansion reporting. Charlie Campo's efforts cleaned data, raising new ARR from $1.81 million to $2.1 million. The team also discussed the need for a clear renewal policy, emphasizing the importance of tracking late renewals and customer success maturity to avoid revenue leakage. Additionally, limitations in billing and accounts receivable tracking were highlighted, with plans to explore integrating a billing module into the financial model. A budget variance analysis by department is also underway to improve financial oversight. The team agreed on follow-up actions to finalize the ARR report and clarify commission tracking.\n\n## Keywords\nARR, HubSpot, Renewals, Expansion, QuickBooks, Billing\n\n## Action Items\n\n**Charlie Campo**\nFix and update the top-line ARR file by removing additional confusing calculations and send updated version to team (18:44)\nShare the exact HubSpot report being used to extract the data for transparency and cross-checking (18:18)\nInvestigate whether QuickBooks or other systems have a billing invoice schedule or forward-looking invoice data (19:33)\nContinue reconciling deferred revenue entries from Fondo between May and January (16:44)\n\n**Ashley Stirrup**\nFollow up with Jeff to verify the correct HubSpot report for expansions vs. renewals to close gaps in tracking (10:26)\nFollow up with Jeff to verify the correct HubSpot report to ensure alignment and share updated reports once fixed (17:45)\nProvide a contractor and subscription list detailing actual payouts and plan expectations to inform financial reviews (23:20)\n\n**Mark Beltran**\nPrepare departmental budget variance analysis (BVA) to have a practical and shareable version by end of day Monday ahead of Tuesday review meeting (23:38)\nFollow up post-board meeting with Charlie to conceptualize and potentially build a billing module integrated with the financial model for improved forecasting and data consolidation (24:50)\n\n**Ryan & Jennifer**\nSupport efforts on accounts receivable tracking by providing spreadsheet detailing collected amounts versus closed contracts (24:25)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

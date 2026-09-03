@@ -1,0 +1,18 @@
+{
+  "company": "Screen Cloud and",
+  "slug": "screen-cloud-and",
+  "last_etl_date": "2026-09-03T06:04:10.799305",
+  "calls": [
+    {
+      "id": "01M14RVEKGSAF46HZNEH1BASWR",
+      "source": "fireflies",
+      "title": "Screen Cloud and GrowthBook",
+      "date": "2026-09-01",
+      "duration_minutes": 25.90999984741211,
+      "summary": "# Screen Cloud and GrowthBook\nDate: 2026-09-01 | Duration: 25.90999984741211m\n\n## Summary\nGrowthBook was favored over VWO because it offers a developer-friendly setup for server-side testing without flickering and uses seat-based pricing rather than traffic-based charges; VWO was quoted at $10,000–$15,000 per year. Its free tier includes seamless BigQuery integration, while pipeline mode can help control query costs. Potential Pro upgrades include a visual editor, sequential testing, CUPED, multi-armed bandits, sticky bucketing, power calculations, and funnel metrics, supporting faster, more reliable, and better-prioritized experiments. Holdouts could help demonstrate overall experimentation impact to leadership. Cloud hosting fits current security needs, and personal data is kept out of GrowthBook systems, although the US-hosted control plane may challenge strict EU data-residency requirements. The team is in an early experimentation stage, expects one to three initial users, and may later adopt feature flags, enterprise access controls, training, and dedicated support as the program grows.\n\n## Keywords\nAB testing, GrowthBook Pro features, sequential testing, multi-armed bandits, server-side experimentation, cloud vs self-hosted\n\n## Action Items\n\n**Nino Manninen**\nDiscuss internally with team members to identify who needs GrowthBook Pro seats and confirm readiness for upgrade (23:19)\nFollow up with team on exploration of GrowthBook Pro features especially sequential testing and funnel metrics to optimize test duration and analysis (13:40)\n\n**James Shannon**\nProvide ongoing support and remain available for questions as ScreenCloud considers upgrading to GrowthBook Pro (24:48)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

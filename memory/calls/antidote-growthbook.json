@@ -1,0 +1,18 @@
+{
+  "company": "Antidote + GrowthBook",
+  "slug": "antidote-growthbook",
+  "last_etl_date": "2026-09-03T06:04:10.794782",
+  "calls": [
+    {
+      "id": "01M1ENZ7D884RWWD7XC6FGG2N3",
+      "source": "fireflies",
+      "title": "Antidote + GrowthBook",
+      "date": "2026-09-02",
+      "duration_minutes": 42.88999938964844,
+      "summary": "# Antidote + GrowthBook\nDate: 2026-09-02 | Duration: 42.88999938964844m\n\n## Summary\nGrowthbook was presented as a strong fit for Antidote’s need for fast, simple A/B testing on landing pages with limited developer involvement. Its visual editor supports no-code copy, style, and layout changes, while developers can handle larger React-based or server-side changes. URL redirects, feature flags, granular traffic splits, targeting by URL and user attributes, and support for Shopify-backed checkout align with Antidote’s architecture. Server-side rendering, edge delivery, bootstrapping, proxy serving, and smaller SDK payloads can reduce flicker and latency. Growthbook also offers frequentist and Bayesian statistics, retroactive metric recalculation through warehouse queries, guardrail-based rollout decisions, funnels, dashboards, session replay in beta, and an AI assistant. Pricing includes a Pro plan at $40 per user monthly, a free self-hosted community edition for up to three users with limitations, and an Enterprise option with a $200,000 platform fee plus $1,250 per user annually. Growthbook highlighted its open-source model, flexibility, and startup support compared with VWO, Convert, Optimizely, and Statsig. Antidote planned additional review and a decision by mid to late September.\n\n## Keywords\nVisual Editor, Experimentation, URL Redirects, Product Analytics, Split Testing, Pricing Model\n\n## Action Items\n\n**Mike**\nShare the article comparing different growth/testing tools referenced during discussion for further evaluation (06:50)\nCoordinate with Kendra to provide feedback and questions after further demos and trial of Growthbook and competitors (41:00)\n\n**Kendra**\nParticipate in hands-on testing and experiments with Growthbook to assess ease-of-use and visual editor capabilities (40:30)\nWork with developers to explore flicker reduction options and integration related to Shopify headless setup (22:00)\n\n**Christian**\nProvide pricing details and potential customized enterprise terms for Antidote as a small startup (33:00)\nOffer access to Slack community and documentation resources for onboarding support (36:00)\nFollow up with Antidote after they complete evaluations of other tools (41:00)\n\n**Logan**\nAssist with technical questions and demo advanced experimentation use cases including feature flags and decision frameworks (00:00)\nSupport Antidote's testing of redirect use cases and user segmentation capabilities (00:00)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

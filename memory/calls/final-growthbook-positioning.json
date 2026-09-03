@@ -1,0 +1,18 @@
+{
+  "company": "Final GrowthBook positioning",
+  "slug": "final-growthbook-positioning",
+  "last_etl_date": "2026-09-03T06:04:10.812538",
+  "calls": [
+    {
+      "id": "01M0X91M6N81FA7ZQT1FQDQ82X",
+      "source": "fireflies",
+      "title": "Final GrowthBook positioning & differentiators",
+      "date": "2026-08-27",
+      "duration_minutes": 33.18000030517578,
+      "summary": "# Final GrowthBook positioning & differentiators\nDate: 2026-08-27 | Duration: 33.18000030517578m\n\n## Summary\nThe team reviewed and refined Growth Book's core messaging to position it as an all-in-one platform for feature flags, experimentation, and product analytics, consolidating differentiators into four key pillars. Emphasis was placed on experimentation as the core value, with discussions on the balance of messaging regarding AI integration and the company's identity. The group debated the current mission statement and proposed alternative phrasing to resonate better with customer needs. The sales deck was iterated for clarity and consistency, with plans for regional adaptations and logo updates. Finally, the conversation highlighted the company's competitive positioning as the 'most advanced' platform and the importance of incorporating team feedback to enhance messaging.\n\n## Keywords\nGrowthBook, experimentation, feature flags, AI integration, Warehouse Native, mission statement\n\n## Action Items\n\n**Elyse Fox**\nSlack the updated GrowthBook deck to Ashley Stirrup for review and further input (00:08)\n\n**Jeremy Dorn**\nProvide wordsmithing and text refinement for the differentiators section of the deck, focusing especially on the first differentiator box to improve clarity and impact (30:32)\n\n**Ashley Stirrup & Team**\nUpdate the logos in the GrowthBook deck to include European logos and ensure diverse global customer representation (16:29)\n\n**Team**\nTest the use of the term “agent first” in AI messaging for upcoming September events to evaluate its effectiveness and clarity (15:53)\n\n**Christian Liebenow**\nProvide feedback on the polished GrowthBook deck and prepare to present it to customers and prospects (29:39)\n\n**Group**\nRevise and simplify the language in the deck, especially for the first differentiator point, to enhance clarity and impact (30:23)\n\n**Ashley Stirrup and Jeremy Dorn**\nCoordinate the next group meeting to align on the final version of the deck after edits and refinements (30:32)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}

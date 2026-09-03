@@ -1,0 +1,18 @@
+{
+  "company": "Oneleet",
+  "slug": "oneleet",
+  "last_etl_date": "2026-09-03T06:04:10.818527",
+  "calls": [
+    {
+      "id": "01M0RSK7F6VZY3SCB1HBDJ8YQN",
+      "source": "fireflies",
+      "title": "Jennifer and Erik (Oneleet)",
+      "date": "2026-08-25",
+      "duration_minutes": 45,
+      "summary": "# Jennifer and Erik (Oneleet)\nDate: 2026-08-25 | Duration: 45m\n\n## Summary\nThe meeting addressed the company's rapid growth, aiming to expand from approximately 70 to near 100 employees, raising challenges in maintaining culture and communication as shared by Erik Vogelzang. The team is committed to a six-month observation period for SOC2 compliance, with considerations on potentially shifting to a year-long cycle in the future. Migration from Vanta poses complexities due to existing audit timelines, as current evidence review is ongoing with an imminent contract end. The platform offers advanced features like custom integrations and AI-driven risk management, contrasting with competitors by providing inclusive pricing without upsells. Customer support is multi-tiered, featuring expert compliance managers to ease workload and audit readiness, with a flexible compliance scheduling approach.\n\n## Keywords\ncompliance, audit, migration, SOC2, policy templates, security integrations\n\n## Action Items\n\n**Jennifer Pham-Le**\nFollow up with Insight auditors to confirm if they have all evidence from the Vanta platform and inquire if additional information is needed for audit completion (36:37)\nContact Vanta to inquire about the possibility of a contract extension to cover the audit review period beyond the August 31 contract end date (40:11)\nKeep Erik updated on any new responses from auditors and Vanta regarding audit status and migration feasibility (44:29)\nContinue discussions with Vanta during the upcoming call to clarify contract and audit status and implications for migration (43:06)\n\n**Erik Vogelzang**\nAssist GrowthBook with policy comparison and customization, including reviewing and trimming existing policies to better fit GrowthBook’s needs (31:10)\nProvide walkthrough or demo of Oneleet platform’s key features such as policy templates, Trust Center, device agent, integrations, and security tools upon GrowthBook’s request (21:43)\nBe available to support a potentially expedited migration and audit transition, including offering weekend support if necessary to meet deadlines (42:29)\nProvide ongoing guidance on compliance program management and audit process to GrowthBook as needed (44:29)\n",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

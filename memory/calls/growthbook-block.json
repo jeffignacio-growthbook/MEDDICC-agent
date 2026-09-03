@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook/Block",
+  "slug": "growthbook-block",
+  "last_etl_date": "2026-09-03T06:04:10.829404",
+  "calls": [
+    {
+      "id": "01M0DSPN2ZSYZJS8H0B89VYX3W",
+      "source": "fireflies",
+      "title": "Growthbook/Block - Roadmap & Questions",
+      "date": "2026-08-19",
+      "duration_minutes": 55,
+      "summary": "# Growthbook/Block - Roadmap & Questions\nDate: 2026-08-19 | Duration: 55m\n\n## Summary\nGrowth Book aims to democratize high-quality experimentation and feature flagging, providing a warehouse-native platform for over 3,000 companies. The vision includes replicating premium tools used by industry giants while empowering companies to leverage their own data. Significant focus has been placed on rapid feature development, with 50 major features released last year, driven by customer collaboration. The platform is enhancing AI-driven automation and product analytics, featuring capabilities like user journey visualization and session replay. Key improvements include automated guardrails for experiments and an upcoming Slack integration to streamline communication. Collaboration with customers, direct access to engineers, and proactive support are further priorities to maximize value and ensure efficient usage.\n\n## Keywords\nGrowth Book, Experimentation, AI Automation, Feature Flags, Product Analytics, Migration\n\n## Action Items\n\n**Alyssa Ransbury**\nReview Growth Book version 5.0 features including product analytics and learnings; confirm which Square teams rely on platform analytics (23:22)\nProvide feedback and decision on cloud-hosted versus self-hosted deployment options after reviewing detailed proposal including ingestion pricing (37:07)\n\n**Cary Rakin**\nSend detailed proposal outlining differences between cloud-hosted and self-hosted options and ingestion cost; schedule follow-up meetings with Alyssa Ransbury and relevant stakeholders (37:37)\nArrange regular sessions or weekly/biweekly reviews with Square teams to audit current experimentation setup and optimize usage based on new platform features (32:19)\n\n**Jeremy Dorn and Luke Sonnet**\nSupport Square teams with migration tools and scripts for metrics refactoring; provide demo of meta analysis and interpretation features; share documentation on Contentful integration (49:17)\n\n**Jeremy Dorn**\nProvide documentation and support regarding Slack app beta and session replay features, including pointers to interested Square teams (10:47)\n\n**Ryan McGurk**\nFacilitate further partnership discussions and design partnership opportunities to accelerate Growth Book roadmap aligned with Square needs, especially for large cohorts and automation integrations (43:39)\n",
+      "organizer": "cary@growthbook.io",
+      "participants": 12,
+      "summary_quality": "good"
+    }
+  ]
+}

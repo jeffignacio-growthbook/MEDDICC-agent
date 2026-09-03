@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook x Blibli",
+  "slug": "growthbook-x-blibli",
+  "last_etl_date": "2026-09-03T06:04:10.817871",
+  "calls": [
+    {
+      "id": "01M0RZYR68AB8T3ZNRMRR70H5N",
+      "source": "fireflies",
+      "title": "GrowthBook x Blibli CDN Discussion",
+      "date": "2026-08-26",
+      "duration_minutes": 22.760000228881836,
+      "summary": "# GrowthBook x Blibli CDN Discussion\nDate: 2026-08-26 | Duration: 22.760000228881836m\n\n## Summary\nThe discussion centered on the setup of a custom CDN, which adds a layer between the SDK and the GrowthBook origin and supports services like Cloudflare and Fastly. It was noted that the SDK's 'apiHost' configuration changes the endpoint to the custom CDN. The custom CDN helps in caching requests to reduce hits to GrowthBook, which can be optimized through configurable cache duration and background sync options. The default cache TTL of 60 seconds causes frequent requests, suggesting a need to increase it for efficiency. Settings related to cache and background sync are managed at the SDK level, with HTML and Java SDKs supporting these features, though mobile SDK requires an app update for changes. Recommendations include tuning cache settings before custom CDN deployment and managing cache purging to keep data fresh.\n\n## Keywords\ncustom CDN, SDK configuration, stale TTL, Cloudflare, GrowthBook origin, request optimization\n\n## Action Items\n**Kevin Prawira**  \nImplement SDK configuration changes (12:41)  \nSet up custom CDN pointing to GrowthBook origin (17:59)  \n\n**William Alexander Chewardy**  \nCoordinate SDK API host update to custom CDN (17:59)  \n\n**Daniel Lin - GrowthBook**  \nShare slide deck and support documentation via Slack (21:04)  \nProvide ongoing support on CDN and SDK configuration (21:04)",
+      "organizer": "daniel@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}
