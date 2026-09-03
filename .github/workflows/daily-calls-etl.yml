@@ -96,3 +96,12 @@ jobs:
           name: call-cache-${{ github.run_number }}
           path: memory/calls/*.json
           retention-days: 7
+
+      - name: Alert on failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python scripts/alert_etl_failure.py \
+            --job "${{ github.job }}" \
+            --run-id "${{ github.run_id }}"
