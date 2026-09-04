@@ -140,9 +140,18 @@ week3_conversion:
   freshness: quarterly  # computed from complete quarters
   basis: count  # deal count, not value
   verified:
-    trailing_3q: 0.099  # Q3-Q1 average (Q2 excluded)
-    per_quarter: {fy2026_q3: 0.105, fy2026_q4: 0.100, fy2027_q1: 0.092}
-    range: [0.092, 0.105]
+    trailing_3q: 0.130  # Q3-Q1 average (Q2 excluded) — UPDATED 2026-09-04
+    per_quarter: {fy2026_q3: 0.111, fy2026_q4: 0.125, fy2027_q1: 0.145}
+    range: [0.111, 0.145]
+    prior_value: 0.099
+    prior_per_quarter: {fy2026_q3: 0.105, fy2026_q4: 0.100, fy2027_q1: 0.092}
+    change_reason: >
+      Review stage (parking lot for dead deals) marked exclude_from_analysis
+      on 2026-09-03. Prior 9.9% included Review in week-3 denominator.
+      Current 13.0% excludes Review (164 of 475 Q1 deals) and Meeting Set
+      (234 deals, pre-qualification). Denominator dropped from ~640 to 169
+      across Q3-Q1, raising conversion from 9.9% to 13.0%. Both scopes are
+      correct for their definitions; registry now uses current scope.
     excluded_quarter: fy2027_q2
     q2_measured_rate: 0.244  # 29 won / 119 qualified (for reference)
     q2_exclusion_reason: >
@@ -150,10 +159,15 @@ week3_conversion:
       Denominator halved due to measurement artifact, not business change.
       Q2 snapshot_date 2026-05-18 captured incomplete population.
       Count-based rate unaffected by whales (top 3 deals = 31% of Q2 value).
-    measured_date: 2026-09-01
-    reconciled_against: deals_snapshot week 3 snapshots (default pipeline only, renewals excluded)
-    scope_fix_applied: 2026-09-01
-    scope_fix_commit: c71d620
+    measured_date: 2026-09-04
+    reconciled_against: >
+      deals_snapshot week 3 snapshots (default pipeline only, renewals excluded,
+      Review and Meeting Set excluded via is_deal_in_analytics_scope)
+    scope_definition: >
+      New-business qualified pipeline at week-3, unfiltered by close date,
+      scoped via is_deal_in_analytics_scope. Review (order 8, excluded) and
+      Meeting Set (order 0, below qualified_stage_order 1) are excluded.
+      Numerator: all in-quarter wins. Denominator: week-3 scoped snapshot.
   not_applicable_to:
     - renewal pipeline (different motion, separate conversion rate)
   note: |
