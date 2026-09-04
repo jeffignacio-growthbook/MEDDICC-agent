@@ -1,0 +1,35 @@
+Aug 9 Batch Analysis
+================================================================================
+
+Total deals in window: 506
+Christian's deals: 49
+Affected deals: 5
+
+IMPOSSIBLE_TIMELINE: 4
+  Quizlet (54010724204): 0 day cycle
+    2026-01-15 → 2026-01-15
+  LeoVegas (60897496484): 0 day cycle
+    2026-06-05 → 2026-06-05
+  Quizlet (56814175800): -41 day cycle
+    2026-02-23 → 2026-01-13
+  DoorDash (14217347447): 0 day cycle
+    2023-07-18 → 2023-07-18
+
+ZERO_ARR_WON: 1
+  7shifts (43420042259): Won deal with zero ARR
+    stage=1297321623, arr=0
+
+DUPLICATE_COMPANY: 6
+  LeoVegas (MULTIPLE): 3 deals for same company
+    62121987691, 52036256816, 60897496484
+  Quizlet (MULTIPLE): 2 deals for same company
+    54010724204, 56814175800
+  7shifts (MULTIPLE): 2 deals for same company
+    43420042259, 56848607650
+  Hey Harper (MULTIPLE): 3 deals for same company
+    57361765893, 57147721892, 57141617810
+  InvestEngine (MULTIPLE): 2 deals for same company
+    48298924905, 49684821593
+  higgsfield.ai (MULTIPLE): 2 deals for same company
+    50443358813, 63433718401
+

@@ -1,0 +1,41 @@
+Sept 3 Update Analysis
+================================================================================
+
+Deals updated 20:57-21:00: 773
+Data quality deals: 5
+Other deals: 768
+
+
+Data Quality Deals:
+  Quizlet (54010724204)
+    updated: 2026-09-03T20:58:53.61874+00:00
+  Bluesky (53696357034)
+    updated: 2026-09-03T20:58:45.50267+00:00
+  Bluesky (62122018837)
+    updated: 2026-09-03T20:58:47.767427+00:00
+  Quizlet (56814175800)
+    updated: 2026-09-03T20:58:53.511126+00:00
+  BESTSECRET (57553779546)
+    updated: 2026-09-03T20:58:46.490868+00:00
+
+Other Deals:
+  Apify (63222153531)
+  Tomorrow's Guides (63177625220)
+  Mutual of Omaha Mortgage (63807082167)
+  Trade Republic (63222887693)
+   (56849247760)
+  7shifts (32821623700)
+  Auctane (60347520429)
+  GC AI (64434503720)
+  Zapping (64473487707)
+  The New York Times (62115522605)
+  Chaos (56685250888)
+  Tubi (64432701550)
+  Sumeru Solutions (64594869564)
+  Caju (64517970608)
+  Bray Leino (64624038922)
+  AgencyAnalytics (56850138414)
+  Ryzon (59455712302)
+  Marfatech (63434060937)
+  ScreenCloud (64434935684)
+  Tovala (63918539874)
