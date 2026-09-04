@@ -135,21 +135,50 @@ nrr:
 
 week3_conversion:
   label: Week-3 Conversion-to-Close Rate
-  formula: in_quarter_wins / week3_open_qualified_pipeline
+  formula: cohort_wins / week3_snapshot_qualified
   population: new business pipeline only (default)
   freshness: quarterly  # computed from complete quarters
   basis: count  # deal count, not value
+  computation_spec:
+    denominator:
+      source: deals_snapshot table
+      snapshot_date: week_of_quarter = 3 (exactly)
+      scope_filter: is_deal_in_analytics_scope(stage_id, pipeline_id)
+      pipelines_included: pipeline_id = 'default' (renewals excluded)
+      stages_included: qualified stages only (stage_order >= qualified_stage_order AND NOT exclude_from_analysis)
+      note: Review (order 8, excluded) and Meeting Set (order 0, below qualified) are excluded
+    numerator:
+      cohort: deals FROM denominator set only (fixed at week 3)
+      won_definition: stage in ['closedwon', '1297321623'] per field_semantics.is_won()
+      deadline: close_date within fiscal quarter (by close_date, not stage transition)
+      critical: NEVER include deals created or qualified after week 3
+    population:
+      fiscal_quarters: [FY2026 Q3, FY2026 Q4, FY2027 Q1] (Q2 excluded - incomplete snapshot)
+      pipelines: default only (pipeline_id = 'default')
+      deal_types: new business only (renewals in pipeline 866608541 excluded)
+    method:
+      type: cohort_tracking
+      cohort_definition: deals in week-3 snapshot that pass is_deal_in_analytics_scope
+      numerator_constraint: subset of cohort_definition (never deals outside it)
+      outcome_source: current deals table (stage + close_date), not snapshot history
+      date_ranges_by_quarter:
+        FY2026 Q3: ["2025-11-01", "2026-01-31"]
+        FY2026 Q4: ["2026-02-01", "2026-04-30"]
+        FY2027 Q1: ["2026-05-01", "2026-07-31"]
   verified:
-    pooled: 0.130  # 22 won / 169 qualified across 3 quarters — PRIMARY RATE
-    trailing_3q: 0.127  # arithmetic mean of per-quarter rates (reference only)
-    per_quarter: {fy2026_q3: 0.111, fy2026_q4: 0.125, fy2027_q1: 0.145}
-    range: [0.111, 0.145]
-    recommended_rate: pooled  # better estimator with small quarter samples (45, 48, 76)
-    verification_basis: >
-      Numerator 22 wins (from week-3 snapshot cohort) and denominator 169 qualified
-      reconcile against known outcomes. Per-quarter rates in tight band (11-15%).
-      NOT verified by attainment coincidence (12.7% attainment vs 12.7% trailing
-      is coincidental - different units, different populations).
+    status: UNVERIFIED
+    reason: >
+      Five different values in one session (9.9% → 13.0% → 39.0% → 12.7% → 7.1%)
+      indicates computation not defined precisely enough. Official query_week3_conversion
+      function has same numerator bug (counts all in-quarter wins, not cohort wins).
+      FY2027 Q1 example: function reports 22 won / 76 = 28.9%, should be 11 won / 76 = 14.5%
+      (11 wins from week-3 cohort, 11 created after week-3).
+    bug_location: scripts/analytics/forecast_analyses.py line 292-294
+    bug_description: >
+      _in_quarter_won_by_pipeline() counts ALL wins with close_date in quarter,
+      not filtered to week-3 cohort. Numerator and denominator draw from different populations.
+    awaiting_computation: >
+      Spec now defined above. Compute ONCE against spec, compare to historical claims.
     prior_value: 0.099
     prior_per_quarter: {fy2026_q3: 0.105, fy2026_q4: 0.100, fy2027_q1: 0.092}
     change_reason: >
