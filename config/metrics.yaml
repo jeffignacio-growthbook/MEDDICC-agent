@@ -140,11 +140,16 @@ week3_conversion:
   freshness: quarterly  # computed from complete quarters
   basis: count  # deal count, not value
   verified:
-    trailing_3q: 0.127  # Q3-Q1 average (Q2 excluded) — VERIFIED 2026-09-04
+    pooled: 0.130  # 22 won / 169 qualified across 3 quarters — PRIMARY RATE
+    trailing_3q: 0.127  # arithmetic mean of per-quarter rates (reference only)
     per_quarter: {fy2026_q3: 0.111, fy2026_q4: 0.125, fy2027_q1: 0.145}
-    pooled: 0.130  # 22 won / 169 qualified across 3 quarters
     range: [0.111, 0.145]
-    computation_method: arithmetic_mean  # avg of per-quarter rates
+    recommended_rate: pooled  # better estimator with small quarter samples (45, 48, 76)
+    verification_basis: >
+      Numerator 22 wins (from week-3 snapshot cohort) and denominator 169 qualified
+      reconcile against known outcomes. Per-quarter rates in tight band (11-15%).
+      NOT verified by attainment coincidence (12.7% attainment vs 12.7% trailing
+      is coincidental - different units, different populations).
     prior_value: 0.099
     prior_per_quarter: {fy2026_q3: 0.105, fy2026_q4: 0.100, fy2027_q1: 0.092}
     change_reason: >

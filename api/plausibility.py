@@ -321,7 +321,7 @@ def check_metric_registry_divergence(data: Dict, handler_name: str = None) -> Li
     if 'week3_conversion' in registry:
         metric_def = registry['week3_conversion']
         verified = metric_def.get('verified', {})
-        verified_rate = verified.get('trailing_3q')
+        verified_rate = verified.get('pooled')  # Use pooled rate (better estimator)
 
         if verified_rate is not None:
             # Conversion rate has no tolerance in registry, use 0.02 (±2pp)
