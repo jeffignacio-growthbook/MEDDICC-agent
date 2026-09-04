@@ -824,6 +824,7 @@ Handlers:
 Required JSON:
 {{
   "handler": "<handler_name>",
+  "scope": "<prior_set|new_population|full_scope>",
   "params": {{
     "time_window": {{
       "period": "current_quarter|current_month|previous_month|current_week|last_N_days|specific",
@@ -862,6 +863,19 @@ Orientation vs. data questions (weigh the WHOLE message, not a prefix):
   - Bare social acknowledgments/sign-offs ("thanks", "ok", "cool", "bye")
     → acknowledgment, NOT query_help. But "ok, what about Q2?" carries a
     real follow-up → route on that.
+
+**Scope Decision (required on every question):**
+  - **prior_set**: Question refers to entities just discussed using pronouns
+    ("those", "them", "the N that...", "which of those"). Scope to the prior
+    answer's population.
+  - **new_population**: Question names a different subject not present in the
+    prior answer — a person ("Cary's expansions", "how is Christian tracking"),
+    a segment ("enterprise deals"), a deal type ("renewals"), or a time period
+    not in the prior scope. Discard prior entities and query the new population.
+  - **full_scope**: Question is about everything — no reference to prior answer,
+    no specific person/segment/type named. "What do you forecast", "which deals
+    have no ARR", "how's the quarter looking". Discard prior entities and use
+    full quarter/pipeline scope.
 
 {semantic_context}
 
@@ -923,6 +937,9 @@ Write the way that role writes:
 
 - Lead with the number that matters most. State it first, then support it.
   Never bury the headline under context.
+- **State the population.** Every answer must say what population it analyzed:
+  "Across the 38 deals from the MEDDICC analysis...", "Across all 128 Q3 deals...",
+  "Cary's 39 open deals...". An invisible scope is how a wrong answer reads as correct.
 - Flag risk explicitly. A concerning number sitting quietly inside a list
   is a failure to communicate it — call it out.
 - Close with one sentence of judgment: are we on track, and why. Not a
@@ -2252,12 +2269,37 @@ async def route_question(question: str, user_id: str,
         params["time_window"] = resolve_time_window(
             params.get("time_window", {}))
 
-        # Inject prior entity context for pronoun follow-ups — but ONLY when the
-        # current message named no entities of its own (entity_params is already
-        # gated on msg_has_own_entities above; this is the belt to that braces).
-        if entity_params and not msg_has_own_entities:
-            params["deal_ids"]      = entity_params["deal_ids"]
-            params["company_names"] = entity_params["company_names"]
+        # ── Scope Decision (explicit, not inherited) ────
+        # Classifier decides: prior_set, new_population, or full_scope
+        scope_decision = intent.get("scope", "full_scope")  # Default to full if missing
+        prior_count = len(prior_entities.get("deal_ids", []))
+
+        if scope_decision == "prior_set":
+            # Question refers to prior answer ("those", "them", "which of those")
+            if prior_count > 0:
+                params["deal_ids"] = prior_entities["deal_ids"]
+                params["company_names"] = prior_entities.get("company_names", [])
+                logger.info(f"[SCOPE] decision=prior_set ({prior_count} ids from prior answer)")
+            else:
+                logger.warning(f"[SCOPE] decision=prior_set but no prior entities available, using full scope")
+                scope_decision = "full_scope"
+
+        elif scope_decision == "new_population":
+            # Question names a different subject (person, segment, time period)
+            # Discard prior entities, let handler query the new population
+            if prior_count > 0:
+                logger.info(f"[SCOPE] decision=new_population (discarded {prior_count} prior ids)")
+            else:
+                logger.info(f"[SCOPE] decision=new_population (no prior ids to discard)")
+            # Don't inject prior entities - handler will query based on params
+
+        else:  # full_scope
+            # Question is about everything ("what do you forecast", "which deals have no ARR")
+            if prior_count > 0:
+                logger.info(f"[SCOPE] decision=full_scope (discarded {prior_count} prior ids)")
+            else:
+                logger.info(f"[SCOPE] decision=full_scope (no prior ids)")
+            # Don't inject prior entities
 
         # Explicit deal IDs pasted into THIS message always win — over the
         # classifier's extraction and over any thread context.
