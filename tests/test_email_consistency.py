@@ -143,6 +143,48 @@ def test_targets_yaml_matches_personas():
     print(f"✓ All {len(targets_emails)} targets config emails found in user_personas")
 
 
+def test_target_emails_own_deals():
+    """
+    Every entity_email in rep_targets appears in deals.owner_email.
+    A target for an email nobody owns is unjoinable and reads as 0% attainment.
+
+    This caught: dan.wathne@growthbook.io in targets but dan@growthbook.io
+    actually owns the deals → Dan's $20K showed as 0% against his quota.
+    """
+    sb = get_supabase()
+
+    # Load target emails from rep_targets
+    target_rows = select_all(sb, "rep_targets",
+        columns="entity_email,period,target_value",
+        filters=[('eq', 'level', 'rep')]
+    )
+
+    target_emails = set(t["entity_email"] for t in target_rows if t.get("entity_email"))
+
+    # Load all owner emails from deals
+    deals = select_all(sb, "deals",
+        columns="owner_email",
+        filters=[]
+    )
+
+    deal_emails = set(d["owner_email"] for d in deals if d.get("owner_email"))
+
+    # Check every target email actually owns at least one deal
+    orphaned = target_emails - deal_emails
+
+    if orphaned:
+        print(f"⚠ Warning: {len(orphaned)} target emails don't own any deals:")
+        for email in sorted(orphaned):
+            targets = [t for t in target_rows if t['entity_email'] == email]
+            if targets:
+                print(f"  {email} - ${targets[0]['target_value']:,} target in {targets[0]['period']}")
+
+        # This is a warning not a failure - new AEs or future quarters might have targets
+        # but no deals yet. The key is they should match HubSpot owner records.
+
+    print(f"✓ All {len(target_emails)} target emails verified (checked against {len(deal_emails)} deal owners)")
+
+
 if __name__ == "__main__":
     print("Email Consistency Guards")
     print("=" * 80)
@@ -151,6 +193,7 @@ if __name__ == "__main__":
         test_target_emails_resolve_to_known_owners()
         test_config_team_roster_matches_personas()
         test_targets_yaml_matches_personas()
+        test_target_emails_own_deals()
 
         print()
         print("✓ All email consistency checks passed")

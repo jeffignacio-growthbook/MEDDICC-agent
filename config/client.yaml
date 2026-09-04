@@ -660,9 +660,11 @@ team:
       title: "Sales Development Representative"
 
     # Account Executives
+    # NOTE: Emails match HubSpot owner records. Mixed convention (short vs full)
+    # is deliberate - these are the emails that actually own deals in HubSpot.
     - slack_user_id: "U_JAKE_H"  # PLACEHOLDER
-      email: "jake.heier@growthbook.io"
-      name: "Jake Heier"
+      email: "jake@growthbook.io"
+      name: "Jake H"
       role: "Account Executive"
       title: "AE"
 
@@ -672,8 +674,8 @@ team:
       role: "Account Executive"
 
     - slack_user_id: "U_CHRISTIAN"  # PLACEHOLDER
-      email: "christian.liebenow@growthbook.io"
-      name: "Christian Liebenow"
+      email: "christian@growthbook.io"
+      name: "Christian"
       role: "Account Executive"
 
     - slack_user_id: "U_SCOTT_KELLER"  # PLACEHOLDER
@@ -692,12 +694,12 @@ team:
       role: "Account Executive"
 
     - slack_user_id: "U_DAN"  # PLACEHOLDER
-      email: "dan.wathne@growthbook.io"
-      name: "Dan Wathne"
+      email: "dan@growthbook.io"
+      name: "Dan"
       role: "Account Executive"
 
     - slack_user_id: "U_MARCEL"  # PLACEHOLDER
-      email: "marcel.geldner@growthbook.io"
+      email: "marcel@growthbook.io"
       name: "Marcel Geldner"
       role: "Account Executive"
       title: "AE"
