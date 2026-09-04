@@ -1,0 +1,62 @@
+# Wave 6 — Monitoring Configuration
+# PROVISIONAL — tune after two weeks of observed firing rates
+
+monitoring:
+  enabled: true
+
+  # Data integrity alerts (RevOps-facing)
+  data_integrity:
+    # Forecast category coverage - process finding
+    forecast_category_coverage:
+      enabled: true
+      min_commit_share: 0.05  # Alert if <5% of pipeline is in COMMIT
+      min_deals: 50
+      channel: "operational"
+    # Value completeness
+    value_completeness:
+      enabled: true
+      max_null_share: 0.20  # Alert if >20% of active deals have no ARR
+      min_deals: 50
+      channel: "operational"
+
+    # Unscored deals in late stage
+    unscored_late_stage:
+      enabled: true
+      late_stages: ["Negotiating", "Proposal", "Technical Evaluation"]
+      max_unscored_count: 5
+      channel: "operational"
+
+    # Stale precomputed tables
+    stale_tables:
+      enabled: true
+      tables:
+        forecast_weekly:
+          max_age_days: 8
+          computed_at_column: "computed_at"
+        waterfall_weekly:
+          max_age_days: 8
+          computed_at_column: "week_ending"
+      channel: "operational"
+
+  # Correctness alerts (RevOps-facing)
+  correctness:
+    # Metric divergence from verified values
+    metric_divergence:
+      enabled: false  # Enable after canonical set has verified values
+      tolerance_pct: 5  # Alert if metric differs from verified by >5%
+      channel: "operational"
+
+    # Snapshot coverage gaps
+    snapshot_coverage:
+      enabled: false  # Enable after baseline established
+      min_row_share: 0.60  # Alert if snapshot has <60% of typical rows
+      channel: "operational"
+
+  # General settings
+  suppression_window_days: 7  # Don't re-alert on same finding for 7 days
+  evidence_bar_min_deals: 10  # Minimum population for meaningful alert
+
+  # Alert destinations (Zapier routes these)
+  channels:
+    business: "cro_alerts"
+    operational: "revops_alerts"
