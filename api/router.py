@@ -317,7 +317,15 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "capabilities. Not to be confused with 'ok what about Q2?' which "
         "carries a real follow-up question."
     ),
-    "unanswerable": "question cannot be answered with available data",
+    "unanswerable": (
+        "question cannot be answered with available data. Use ONLY when you "
+        "can name a specific table or column that is required but does NOT exist. "
+        "DO NOT use for complex questions — complexity is not a blocker if the "
+        "data exists. Examples: 'conversion rate by segment' is answerable "
+        "(deals_snapshot + deals.segment exist), 'win rate by competitor' is "
+        "unanswerable if no competitor field exists. If the data likely exists "
+        "but requires joins/aggregations, route to dynamic_query instead."
+    ),
 }
 
 # ══════════════════════════════════════════════════════════════
@@ -856,7 +864,7 @@ Required JSON:
     "correction_reason": "<for submit_score_correction ONLY: the user's justification for the corrected score, else null>",
     "help_category": "<for query_help ONLY: greeting|capability|prompt_seeking|recovery, else null>"
   }},
-  "unanswerable_reason": "no_data|out_of_scope|ambiguous|null",
+  "unanswerable_reason": "<REQUIRED for unanswerable: specific table or column that is missing, e.g. 'no competitor field in deals table', 'no pricing_tier dimension exists'. DO NOT use vague reasons like 'no_data' or 'complex query'. If you cannot name a specific missing table/column, route to dynamic_query instead. For other handlers: null>",
   "confidence": 0.0-1.0
 }}
 
@@ -2436,6 +2444,35 @@ async def route_question(question: str, user_id: str,
                     "handler_name": "dynamic_query"}
 
         if handler_name == "unanswerable":
+            # Require unanswerable to justify itself with specific missing table/column
+            unanswerable_reason = intent.get("unanswerable_reason", "")
+            vague_reasons = ["no_data", "out_of_scope", "ambiguous", "null", ""]
+
+            if (not unanswerable_reason or
+                unanswerable_reason in vague_reasons or
+                len(unanswerable_reason) < 20):
+                # Unjustified unanswerable - route to dynamic instead
+                logger.warning(f"[ROUTING] unanswerable without specific justification "
+                              f"(reason='{unanswerable_reason}') at confidence {confidence:.2f} "
+                              f"- routing to dynamic instead")
+
+                dynamic_result = await dynamic_query_loop(
+                    question=question,
+                    history=history,
+                    params=params,
+                    sb=sb,
+                    client=generator_client,
+                    hint="Classifier said unanswerable but couldn't name what's missing - try to answer",
+                    roster_text=roster_text,
+                    classifier_client=classifier_client,
+                )
+                return {"answer": dynamic_result.get("answer", ""),
+                        "needs_ack": is_slow,
+                        "tool_results": dynamic_result.get("tool_results", {}),
+                        "handler_name": "unanswerable_override_dynamic"}
+
+            # Justified unanswerable - specific table/column named as missing
+            logger.info(f"[ROUTING] unanswerable with justification: {unanswerable_reason}")
             result_quality = "unanswerable"
 
         else:
