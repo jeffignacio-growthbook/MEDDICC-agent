@@ -302,3 +302,226 @@ data_quality:
 # "Won" = stage bucket in ['closed_won']
 # "Lost" = stage bucket in ['closed_lost']
 # "Open" = stage bucket in ['open', 'discovery', 'scoping', 'proposal', ...]
+
+conversion_rate_prospective:
+  label: Prospective Conversion Rate (by Qualification Week)
+  description: >
+    In-quarter close rate for deals cohorted by the week-of-quarter in
+    which each deal FIRST reached a qualified stage (order >= 1) while in
+    deal_status='active'. Excludes deals that entered the system already
+    in a closed state (retroactive/backdated entries) — those deals never
+    passed through an 'active' state during any snapshot window and by
+    definition have no qualification-week to assign.
+
+  numerator:
+    definition: deals in the qualification-week bucket that closed won,
+      with close_date in the same quarter as qualification
+    constraint: numerator ⊂ denominator (cohort tracking, not independent counts)
+
+  denominator:
+    definition: all deals that FIRST reached a qualified stage
+      (order >= 1, not in excluded_stages) during that qualification week,
+      while deal_status='active', regardless of eventual outcome
+
+  qualification_week:
+    definition: week-of-quarter of first entry into any qualified stage,
+      derived from deals_snapshot (paginated — see scripts/utils/pagination.py)
+    source_table: deals_snapshot
+    key_columns: [deal_id, week_of_quarter, stage_id, pipeline_id, fiscal_quarter]
+
+  excluded_stages:
+    - id: "79653122"
+      name: "Meeting Set"
+    - id: "decisionmakerboughtin"
+      name: "Review"
+    - id: "68509551"
+      name: "Disqualified"
+
+  output_shape: >
+    A table of qualification_week -> in_quarter_close_rate, with n per
+    bucket. Report as a decay curve, not a single blended rate.
+
+  min_n_per_bucket: 10
+
+  verified_result:
+    value: 0.072  # 27 won / 376 qualified
+    numerator: 27
+    denominator: 376
+    quarters: [FY2026 Q3, FY2026 Q4, FY2027 Q1]
+    verified_date: 2026-09-04
+    computation_script: conversion_by_qualification_week_ALL_QUARTERS_FIXED.py
+
+  supersedes: query_week3_conversion()
+  
+  deprecated_method_note: >
+    Fixed calendar-week snapshot cohorting conflated "qualified by week N"
+    (cumulative) with "qualified in week N" (incremental), and separately
+    undercounted due to a PostgREST 1000-row pagination limit on multi-week
+    queries. Both issues resolved; retained for comparison only.
+
+  population: new business pipeline only (default)
+  
+  not_applicable_to:
+    - renewal pipeline
+
+total_wins_retrospective:
+  label: Total Closed-Won Deals (All Populations)
+  description: >
+    All closed-won deals in the population, regardless of whether they
+    were tracked prospectively through pipeline stages. Use this for
+    revenue/ARR reporting. Do NOT use this as the denominator base for
+    any snapshot-derived rate — it includes deals with no qualification
+    data.
+
+  verified_result:
+    total: 72
+    captured_in_prospective_cohorts: 27
+    missing_from_cohorts: 45
+    quarters: [FY2026 Q3, FY2026 Q4, FY2027 Q1]
+    verified_date: 2026-09-04
+
+  excluded_deal_populations:
+    retroactive_entry:
+      count: 22
+      pct_of_total_wins: 30.6  # 22/72 precisely
+      pct_of_missing: 48.9  # 22/45 precisely
+      definition: deals with deal_status='won' from creation, never
+        observed in deal_status='active' during any snapshot
+      characteristics:
+        - ALL have deal_status='won' (100%)
+        - Long cycles (14-90 days) but not in ANY snapshot
+        - Not in any pipeline (checked via pipeline migration analysis)
+      source_investigation:
+        fields_checked: [hs_object_source, hs_object_source_id, 
+          hs_object_source_label, hs_created_by_user_id, hs_created_by]
+        result: No systematic source found for GrowthBook
+        pattern: Scattered manual/backdated entries, not a single
+          integration or bulk import
+        note: Recompute this check per client; do not assume the same
+          conclusion transfers
+      disposition: not fixable via process change (GrowthBook) — accept
+        as permanent characteristic and report as a separate line item,
+        not folded into prospective conversion rate
+
+    data_quality_errors:
+      count: 8
+      pct_of_total_wins: 11.1  # 8/72 precisely
+      pct_of_missing: 17.8  # 8/45 precisely
+      definition: 0-day or negative create-to-close cycles
+      examples:
+        - "Quizlet: 0 day cycle (2026-01-15 → 2026-01-15)"
+        - "Make: -41 day cycle (closed before created)"
+        - "Bluesky: 0 day cycle (2026-01-12 → 2026-01-12)"
+      disposition: exclude from all rate calculations; flag for cleanup
+
+    fast_track_short_cycle:
+      count: 7
+      pct_of_total_wins: 9.7  # 7/72 precisely
+      pct_of_missing: 15.6  # 7/45 precisely
+      definition: deals under 14 day cycle that fall between weekly
+        snapshot intervals
+      examples:
+        - "InMobi: 12 day cycle"
+        - "Oda: 11 day cycle"
+        - "lendable: 2 day cycle"
+      disposition: accept as edge case; do not increase snapshot
+        frequency solely to capture this population unless volume grows
+
+    excluded_stages:
+      count: 5
+      pct_of_total_wins: 6.9  # 5/72 precisely
+      pct_of_missing: 11.1  # 5/45 precisely
+      definition: deals that were in excluded stages (Meeting Set,
+        Review, Disqualified) during weeks 1-13, then qualified and
+        closed after the quarter-end snapshot window
+      examples:
+        - "Deals in 'Meeting Set' stage during entire snapshot window"
+        - "Deals in 'Review' stage that later moved to qualified"
+      disposition: accept as limitation; these deals never appeared
+        in qualified stages during the measurement window
+
+    carry_over:
+      count: 3
+      pct_of_total_wins: 4.2  # 3/72 precisely
+      pct_of_missing: 6.7  # 3/45 precisely
+      definition: deal created in a prior quarter, closed in the
+        analyzed quarter, only present in prior quarter's snapshots
+      examples:
+        - "Fellow: Created 84 days before Q3 start"
+        - "Yeet!: Created 5 days before Q4 start"
+        - "Wellhub: Created 1 day before Q1 start"
+      disposition: fixable — implement cross-quarter snapshot lookup
+        when computing qualification_week for deals near a quarter boundary
+
+  recommended_reporting:
+    prospective_conversion: "27/376 = 7.2% (deals tracked in snapshots)"
+    total_wins: "72 (includes all categories above)"
+    retroactive_wins_separate_line: "22 (30.6% of total)"
+    note: "Do not blend retroactive wins into conversion rate denominator"
+
+known_infrastructure_notes:
+  pagination:
+    issue: PostgREST 1000-row limit
+    impact: >
+      All deals_snapshot queries spanning more than ~1000 rows (i.e. any
+      multi-week or multi-quarter query) MUST use
+      scripts/utils/pagination.py:fetch_all_rows_by_filters(). Direct
+      Supabase queries without pagination will silently truncate at 1000
+      rows with no error.
+    
+    original_impact: >
+      This caused a systemic undercount across every multi-week analysis
+      in the original GrowthBook build. Before fix:
+      - Q3 all-weeks: 3,017 actual rows, 1,000 fetched (67% missing)
+      - Q4 all-weeks: 5,382 actual rows, 1,000 fetched (81% missing)
+      - Q1 all-weeks: 5,697 actual rows, 1,000 fetched (82% missing)
+    
+    resolution: >
+      Pagination utility created with support for .eq(), .gte(), .lte(),
+      .gt(), .lt(), .in_(), .is_() filters. Verify this utility is
+      imported before writing any new cross-week query.
+    
+    verification: >
+      After pagination fix, Q1 analysis found 167 qualified deals (vs 70
+      before), 11 wins (vs 5 before). The "snapshot grid gap" was
+      actually a pagination bug - all weeks 1-13 exist for all quarters.
+
+  snapshot_grid_completeness:
+    status: COMPLETE
+    verified_quarters:
+      FY2026_Q3:
+        weeks: "1-13"
+        total_rows: 3017
+      FY2026_Q4:
+        weeks: "1-13"
+        total_rows: 5382
+      FY2027_Q1:
+        weeks: "1-13"
+        total_rows: 5697
+    
+    false_alarm: >
+      Initial claim that "Q3 has only weeks 1-2, Q4 missing weeks 1-3" was
+      due to pagination bug, not missing data. All snapshot weeks exist.
+    
+    documentation: >
+      See PAGINATION_BUG_INVESTIGATION_SUMMARY.md for complete investigation
+      record and FINAL_45_MISSING_WINS_ROOT_CAUSES.md for deal population
+      analysis.
+
+  deal_status_filtering:
+    snapshot_job_behavior: >
+      The snapshot job captures deals in their current deal_status at
+      snapshot time. Deals that were NEVER in deal_status='active' during
+      weeks 1-13 will not appear in any snapshot, even if they have long
+      create-to-close cycles.
+    
+    retroactive_entry_pattern: >
+      Deals entered with deal_status='won' from creation (backdated
+      timestamps) skip all snapshots because they never had an 'active'
+      state when snapshots ran. This is a data entry pattern, not a
+      snapshot job bug.
+    
+    implication: >
+      Prospective conversion tracking only works for deals that progress
+      through normal pipeline stages while active. Retroactive wins must
+      be tracked separately.
