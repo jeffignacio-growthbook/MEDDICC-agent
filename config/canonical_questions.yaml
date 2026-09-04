@@ -1,0 +1,230 @@
+# Wave 4 — Canonical Question Set
+# Onboarding and quarterly calibration questions
+#
+# Sources:
+# 1. fallback_log where trigger='success' (2 questions)
+# 2. unanswered_queries meaningful failures (filtered)
+# 3. The six exercised during debugging session (Sep 2-3, 2026)
+#
+# For each question:
+# - question: the exact question text
+# - shape: expected answer type (count, percentage, forecast, list, etc.)
+# - verified_value: known-true value from client reports (where available)
+# - source: where this question came from
+# - handler: expected handler to answer it (if known)
+
+questions:
+  # ============ From today's debugging session (Sep 2-3, 2026) ============
+
+  - id: q001
+    question: "What do you forecast for the quarter?"
+    shape: "forecast_breakdown"
+    description: "Forecast by category (New Business, Upsell/XSell, Renewal) with deal counts and values"
+    verified_value: null  # Dynamic - changes weekly
+    source: "debugging_session"
+    handler: "query_forecast"
+    notes: "Exercised Sep 2. Originally returned $733K, then $5.2M, then $1.59M over two days due to renewals value field change."
+
+  - id: q002
+    question: "How much expansion ARR is in the renewal pipeline for Q3 and Q4?"
+    shape: "renewal_breakdown"
+    description: "Renewal pipeline value by quarter, broken down by base renewal vs expansion"
+    verified_value: null  # Client needs to provide known value
+    source: "unanswered_queries"
+    handler: "query_renewals"
+    notes: "Failed Aug 28-31, Sep 2. Should aggregate renewal_revenue + expansion_arr from renewals."
+
+  - id: q003
+    question: "Which deals have no ARR recorded?"
+    shape: "list_with_count"
+    description: "List of active deals missing both new_arr and expansion_arr"
+    verified_value:
+      count: 127
+      note: "127 active deals with no ARR as of Sep 2, 2026"
+    source: "debugging_session"
+    handler: "dynamic"
+    notes: "Data completeness check. Alert threshold: >15% of active pipeline."
+
+  - id: q004
+    question: "How is Christian tracking?"
+    shape: "rep_attainment"
+    description: "Single rep attainment: won ARR, target, percentage, gap"
+    verified_value:
+      rep: "christian@growthbook.io"
+      won_arr: 0
+      target: 250000
+      attainment_pct: 0.0
+      gap: -250000
+      note: "Verified directly from deals table: no won deals Q3. $56K was stale agent output before email fix."
+    source: "debugging_session"
+    handler: "query_rep_attainment"
+    notes: "Exercised Sep 2. Initially failed due to christian@ vs christian.liebenow@ mismatch. Verified value corrected Sep 3 via direct query."
+
+  - id: q005
+    question: "What is team attainment for Q3?"
+    shape: "team_attainment"
+    description: "Team-level attainment: total won, total target, percentage, gap"
+    verified_value:
+      won_arr: 197400
+      target: 1550000
+      attainment_pct: 12.7
+      gap: -1352600
+      note: "12.7% team attainment, two-thirds through Q3"
+    source: "debugging_session"
+    handler: "query_rep_attainment"
+    notes: "Verified Sep 3. This is the number going to Ryan."
+
+  - id: q006
+    question: "How many deals are in COMMIT forecast category?"
+    shape: "count"
+    description: "Number of deals with forecast_category = 'COMMIT'"
+    verified_value:
+      count: 3
+      total_deals: 432
+      note: "Only 3 deals in COMMIT out of 432 - process finding"
+    source: "debugging_session"
+    handler: "dynamic"
+    notes: "Sep 2 finding. Forecast coverage issue - degraded quietly."
+
+  # ============ From successful fallback_log ============
+
+  - id: q007
+    question: "Which deals have no ARR recorded?"
+    shape: "list_with_count"
+    description: "Duplicate of q003 - from fallback_log"
+    verified_value:
+      count: 127
+    source: "fallback_log"
+    handler: "dynamic"
+    notes: "Fallback succeeded Sep 2. Same as q003."
+    duplicate_of: q003
+
+  # ============ From unanswered_queries (meaningful failures) ============
+
+  - id: q008
+    question: "Get a list of all customers due to renew in Q3 and then Q4"
+    shape: "renewal_list"
+    description: "List of renewal opportunities by quarter with company, value, close date"
+    verified_value: null
+    source: "unanswered_queries"
+    handler: "query_renewals"
+    notes: "Failed Aug 28-31, Sep 1. Needs renewal_revenue field and renewal flag detection."
+
+  - id: q009
+    question: "Which deals have a champion score above 6 and close in Q3?"
+    shape: "meddicc_filtered_list"
+    description: "Deals filtered by MEDDICC component score and close date"
+    verified_value: null
+    source: "unanswered_queries"
+    handler: "dynamic"
+    notes: "Failed Aug 13 with no_data. Requires analyses table join with deals."
+
+  - id: q010
+    question: "Why did we lose our last three deals?"
+    shape: "loss_analysis"
+    description: "Recent closed-lost deals with loss reasons"
+    verified_value: null
+    source: "unanswered_queries"
+    handler: "query_win_loss"
+    notes: "Failed Aug 13 with no_data. Needs close_lost_reason field or call analysis."
+
+  - id: q011
+    question: "What is our pipeline this quarter?"
+    shape: "pipeline_summary"
+    description: "Active pipeline value, deal count, by stage or segment"
+    verified_value: null
+    source: "unanswered_queries"
+    handler: "query_pipeline"
+    notes: "Failed Aug 13 as ambiguous (asked 5 times). Needs quarter resolution."
+
+  - id: q012
+    question: "Which of those are at risk?"
+    shape: "at_risk_list"
+    description: "Deals from previous context flagged as at-risk"
+    verified_value: null
+    source: "unanswered_queries"
+    handler: "query_deals_at_risk"
+    notes: "Failed Aug 13-16 as ambiguous. Requires thread context."
+
+  - id: q013
+    question: "Show me the Skyscanner deal"
+    shape: "single_deal"
+    description: "Full details for a single deal by company name"
+    verified_value: null
+    source: "unanswered_queries"
+    handler: "dynamic"
+    notes: "Failed Aug 13. Needs company name fuzzy matching."
+
+  - id: q014
+    question: "What does a 6 mean for champion?"
+    shape: "meddicc_definition"
+    description: "MEDDICC component score interpretation"
+    verified_value: null
+    source: "unanswered_queries"
+    handler: "out_of_scope"
+    notes: "Failed Aug 13. Should return rubric definition, not query data."
+
+  - id: q015
+    question: "Please analyze the following deals MEDPICC and recommend actions: Ecco, Zalando, Natera, and DEUNA"
+    shape: "meddicc_analysis_multi"
+    description: "MEDDICC scores + recommendations for multiple named deals"
+    verified_value: null
+    source: "unanswered_queries"
+    handler: "out_of_scope"
+    notes: "Failed Aug 24. Requires call analysis, not just CRO queries."
+
+  - id: q016
+    question: "Would you be able to calculate historical win rates by stage, sales cycle times, and then apply those learnings to the pipeline for a projected forecast?"
+    shape: "forecast_model"
+    description: "Historical conversion rates + cycle time applied to current pipeline"
+    verified_value: null
+    source: "unanswered_queries"
+    handler: "query_forecast"
+    notes: "Failed Sep 1 with no_data. Needs historical deals + close_date - create_date."
+
+  # ============ Additional coverage from today's findings ============
+
+  - id: q017
+    question: "What is the GRR for Q1 2027?"
+    shape: "retention_rate"
+    description: "Gross Revenue Retention percentage for a quarter"
+    verified_value:
+      grr_pct: 77
+      quarter: "Q1_FY2027"
+      note: "77% GRR from week-3 conversion analysis"
+    source: "debugging_session"
+    handler: "query_retention"
+    notes: "Sep 2 finding. Needs renewal base + churn tracking."
+
+  - id: q018
+    question: "What is the week-3 conversion rate?"
+    shape: "conversion_rate"
+    description: "Pipeline stage conversion rate at specific week"
+    verified_value:
+      conversion_pct: 9.9
+      week: 3
+      note: "9.9% conversion after excluding Q2 due to incomplete snapshots"
+    source: "debugging_session"
+    handler: "dynamic"
+    notes: "Sep 2 finding. Snapshot coverage issue - 192 rows vs typical 475."
+
+  - id: q019
+    question: "When was forecast_weekly last updated?"
+    shape: "metadata_check"
+    description: "Last refresh timestamp for precomputed table"
+    verified_value:
+      table: "forecast_weekly"
+      days_stale: 21
+      note: "21 days old when first read - precomputed table staleness"
+    source: "debugging_session"
+    handler: "dynamic"
+    notes: "Sep 2 finding. Alert when computed_at exceeds refresh interval."
+
+  - id: q020
+    question: "How many active deals are missing owner_email?"
+    shape: "count"
+    description: "Data completeness check for critical field"
+    verified_value: null
+    source: "debugging_session"
+    handler: "dynamic"
+    notes: "Sep 2 pattern. Similar to ARR completeness check."
