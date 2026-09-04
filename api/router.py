@@ -289,21 +289,26 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "what is this, help, /help), "
         "'prompt_seeking' (what should I ask you, give me examples, where do "
         "I start, I don't know what to ask, how do I use this), "
-        "'recovery' (that didn't work, that's not what I asked, I don't "
-        "understand, try again, what?). "
+        "'recovery' (ONLY for explicit error statements: 'that didn't work', "
+        "'that's not what I asked', 'try again', 'what?' as rejection). "
+        "DO NOT use recovery for clarifying questions about results "
+        "('shouldn't X be expressed as Y?', 'what does that mean?', 'can you "
+        "explain that?') — those are follow-up data questions. "
         "DO NOT use query_help when a greeting is followed by a real question "
         "('hi, how's the Acme deal?') — route on the question. DO NOT use it "
         "for 'help me [do a real thing]' ('help me prep for Acme', 'help me "
         "understand this deal') — those are task requests (e.g. "
         "query_pre_call_brief / query_deal). "
-        "CRITICAL: DO NOT use query_help for questions about business metrics. "
-        "Any question naming a business topic (pipeline, forecast, deals, ARR, "
-        "quota, coverage, conversion) AND a time period (quarter, month, week, "
-        "Q3, this month) is a DATA QUESTION, not orientation. Examples: "
+        "CRITICAL: DO NOT use query_help for questions ABOUT business metrics, "
+        "even as follow-ups. Any question naming a business topic (pipeline, "
+        "forecast, deals, ARR, quota, coverage, conversion) is a DATA QUESTION, "
+        "not orientation — this includes clarifying questions about how to "
+        "interpret or express those metrics. Examples: "
         "'what do you forecast for the quarter?' is dynamic_query (data), "
         "'how's pipeline this month?' is query_waterfall (data), "
+        "'shouldn't coverage be expressed as a multiple?' is dynamic_query (data), "
         "'what can you tell me about deals?' is query_help (orientation). "
-        "Business metric + time period = data handler or dynamic_query, never query_help."
+        "Business metric mentioned = data handler or dynamic_query, never query_help."
     ),
     "acknowledgment": (
         "A social acknowledgment or sign-off with no request behind it — "
@@ -2281,8 +2286,24 @@ async def route_question(question: str, user_id: str,
                 params["company_names"] = prior_entities.get("company_names", [])
                 logger.info(f"[SCOPE] decision=prior_set ({prior_count} ids from prior answer)")
             else:
-                logger.warning(f"[SCOPE] decision=prior_set but no prior entities available, using full scope")
-                scope_decision = "full_scope"
+                # No entities but question refers to prior answer - likely a clarifying
+                # question about format/interpretation. Pass prior answer text as context.
+                if history:
+                    api_history = get_api_history(history)
+                    if api_history and api_history[-1].get("role") == "assistant":
+                        prior_answer = api_history[-1].get("content", "")
+                        if prior_answer:
+                            params["prior_answer_context"] = prior_answer
+                            logger.info(f"[SCOPE] decision=prior_set but no entities - passing prior answer as context ({len(prior_answer)} chars)")
+                        else:
+                            logger.warning(f"[SCOPE] decision=prior_set but no entities or prior answer, using full scope")
+                            scope_decision = "full_scope"
+                    else:
+                        logger.warning(f"[SCOPE] decision=prior_set but no prior assistant message, using full scope")
+                        scope_decision = "full_scope"
+                else:
+                    logger.warning(f"[SCOPE] decision=prior_set but no history available, using full scope")
+                    scope_decision = "full_scope"
 
         elif scope_decision == "new_population":
             # Question names a different subject (person, segment, time period)
