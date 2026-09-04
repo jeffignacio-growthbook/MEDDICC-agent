@@ -33,6 +33,7 @@ QUARTERS = [
 ]
 
 MIN_EVIDENCE_COUNT = 30  # Minimum deals across 3 quarters for meaningful rate
+PIPELINE_ID = 'default'  # New business only, renewals excluded
 
 
 def main():
@@ -63,16 +64,20 @@ def main():
             print(f"  ⚠️  No snapshot data for {quarter_id} week {week_num}")
             continue
 
-        # Filter to scoped deals
+        # Filter to scoped deals in default pipeline only
         scoped_deal_ids = []
         for row in snapshot_resp.data:
+            # Check pipeline first
+            if str(row.get('pipeline_id')) != PIPELINE_ID:
+                continue
+
             if is_deal_in_analytics_scope(
                 stage_at_date=row.get('stage_id'),
                 pipeline_id=row.get('pipeline_id'),
                 excluded_pipelines=excluded_pipelines,
                 stage_cfg=stage_cfg
             ):
-                scoped_deal_ids.append(row['deal_id'])
+                scoped_deal_ids.append(str(row['deal_id']))
 
         print(f"  Week-3 scoped pipeline: {len(scoped_deal_ids)} deals")
 
@@ -91,6 +96,9 @@ def main():
             for d in deals_resp.data
         }
 
+        # Build cohort set for membership checking
+        cohort_set = set(scoped_deal_ids)
+
         # Track qualified deals per segment (denominator)
         for deal_id in scoped_deal_ids:
             segment = deal_segments.get(deal_id, 'unknown')
@@ -98,7 +106,12 @@ def main():
 
         # Track wins in-quarter from this cohort (numerator)
         for deal in deals_resp.data:
-            deal_id = deal['deal_id']
+            deal_id = str(deal['deal_id'])
+
+            # MUST be in cohort
+            if deal_id not in cohort_set:
+                continue
+
             segment = deal.get('segment', 'unknown')
             stage = deal.get('stage')
 

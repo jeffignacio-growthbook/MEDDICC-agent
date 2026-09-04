@@ -212,40 +212,41 @@ week3_conversion:
       Numerator: in-quarter wins of deals FROM week-3 snapshot only.
       Denominator: week-3 scoped snapshot.
   by_segment:
-    _status: INVALID
-    _reason: >
-      Computed 2026-09-04 with incorrect numerator methodology (counted all
-      in-quarter wins instead of wins from week-3 snapshot). Values below
-      are NOT VERIFIED and must be recomputed before use.
     enterprise:
-      value: null  # INVALID - recompute with correct numerator
+      value: 0.148
       n: 54
-      won: 15
+      won: 8
       quarters: [fy2026_q3, fy2026_q4, fy2027_q1]
-      per_quarter: null  # INVALID
-      note: "INVALID - computed with wrong methodology"
+      per_quarter: {fy2026_q3: 0.000, fy2026_q4: 0.267, fy2027_q1: 0.182}
+      note: "Highest conversion, sufficient evidence"
+      volatility: "High within-quarter variance (0% → 27% → 18%)"
     mid_market:
-      value: null  # INVALID - recompute with correct numerator
+      value: 0.050
       n: 60
-      won: 26
+      won: 3
       quarters: [fy2026_q3, fy2026_q4, fy2027_q1]
-      per_quarter: null  # INVALID
-      note: "INVALID - computed with wrong methodology"
+      per_quarter: {fy2026_q3: 0.176, fy2026_q4: 0.000, fy2027_q1: 0.000}
+      note: "Middle conversion, sufficient evidence"
+      volatility: "Critical - 18% → 0% → 0% suggests very thin per-quarter evidence"
     smb:
-      value: null  # INVALID - recompute with correct numerator
+      value: 0.024
       n: 41
-      won: 21
+      won: 1
       quarters: [fy2026_q3, fy2026_q4, fy2027_q1]
-      per_quarter: null  # INVALID
-      note: "INVALID - computed with wrong methodology"
+      per_quarter: {fy2026_q3: 0.000, fy2026_q4: 0.000, fy2027_q1: 0.048}
+      note: "Lowest conversion, sufficient evidence"
+      volatility: "Extreme - only 1 win across 3 quarters (41 deals)"
     unknown:
       value: null
       n: 14
+      won: 0
       reason: "Below min_evidence_count threshold (30)"
   segment_divergence:
-    finding: "PENDING - segment rates not yet verified"
-    implication: "Use blended 12.7% until segment rates are verified with correct methodology"
-    example: "$1M target → $7.9M qualified pipeline required (÷0.127)"
+    finding: "Material divergence — Enterprise 14.8% is 6.2x SMB 2.4%"
+    implication: "Blended 7.1% wrong for every segment. But volatility suggests evidence too thin for reliable segment-specific forecasting."
+    volatility_concern: "Mid-Market and SMB show 0% conversion in 5 of 6 segment-quarters. Pooled rates may average noise rather than signal."
+    recommendation: "Use blended 7.1% until more quarters accumulate. 3 quarters insufficient for stable segment rates."
+    example: "$1M target → Enterprise $6.8M (÷0.148), Mid-Market $20M (÷0.050), SMB $41.7M (÷0.024)"
   not_applicable_to:
     - renewal pipeline (different motion, separate conversion rate)
   note: |
