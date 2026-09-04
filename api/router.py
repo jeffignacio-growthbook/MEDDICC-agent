@@ -2069,11 +2069,72 @@ async def route_question(question: str, user_id: str,
         for r in (team_roster.data or [])
     ])
 
-    # ── -2. Wave 5a: Correction detection (before routing) ───
+    # ── -2. Wave 5a: Correction detection and proposal creation ───
+    from corrections import (
+        detect_correction,
+        ask_correction_scope,
+        extract_correction_facts,
+        create_correction_proposal
+    )
+
+    # Check if previous message was a correction scope question
+    # If so, current message should be "general" or "specific"
+    if history:
+        last_msg = history[-1] if len(history) > 0 else None
+        if last_msg and isinstance(last_msg, dict):
+            last_handler = last_msg.get('handler_name', '')
+            if last_handler == 'correction_scope_question':
+                # User is responding to scope question
+                user_response = question.lower().strip()
+
+                if 'general' in user_response:
+                    logger.info(f"[CORRECTION] User selected 'general' - creating proposal")
+
+                    # Get the original correction from 2 messages back
+                    original_correction = history[-2].get('content', '') if len(history) >= 2 else question
+                    prior_agent_response = history[-3].get('content', '') if len(history) >= 3 else ''
+
+                    # Extract facts and create proposal
+                    facts = extract_correction_facts(original_correction, prior_agent_response)
+                    proposal = create_correction_proposal(
+                        facts,
+                        thread_ts=thread_ts,
+                        user_id=user_id,
+                        handler_name='unknown'  # We don't know which handler produced the wrong answer
+                    )
+
+                    # Insert proposal
+                    try:
+                        result = sb.table('proposals').insert(proposal).execute()
+                        proposal_id = result.data[0]['id'] if result.data else None
+                        logger.info(f"[CORRECTION] Created proposal {proposal_id}")
+
+                        return {
+                            "answer": f"✓ Proposal created (ID: {proposal_id}). I've logged this correction for review. "
+                                     f"Once approved, it will apply to all future questions like this.",
+                            "handler_name": "correction_proposal_created",
+                            "tool_results": {"proposal_id": proposal_id}
+                        }
+                    except Exception as e:
+                        logger.error(f"[CORRECTION] Failed to create proposal: {e}")
+                        return {
+                            "answer": "I tried to create a proposal but encountered an error. "
+                                     "The correction was noted in logs.",
+                            "handler_name": "correction_proposal_failed",
+                            "tool_results": {"error": str(e)}
+                        }
+
+                elif 'specific' in user_response:
+                    logger.info(f"[CORRECTION] User selected 'specific' - one-off correction")
+                    return {
+                        "answer": "Got it — I'll just fix this answer. (One-off corrections aren't "
+                                 "saved as general rules.)",
+                        "handler_name": "correction_oneoff",
+                        "tool_results": {}
+                    }
+
     # If user is correcting the agent, ask if correction is general or specific.
     # Corrections don't route to handlers — they ask for scope clarification.
-    from corrections import detect_correction, ask_correction_scope
-
     if detect_correction(question):
         logger.info(f"[CORRECTION] Detected correction in question")
         scope_question = ask_correction_scope(question)
@@ -2081,7 +2142,7 @@ async def route_question(question: str, user_id: str,
             "answer": scope_question,
             "handler_name": "correction_scope_question",
             "tool_results": {},
-            "awaiting_correction_scope": True  # Signal to caller that next message should be "general" or "specific"
+            "awaiting_correction_scope": True
         }
 
     # ── -1. Entity-scope check (structural bypass) ───
