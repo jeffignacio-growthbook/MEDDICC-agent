@@ -140,18 +140,20 @@ week3_conversion:
   freshness: quarterly  # computed from complete quarters
   basis: count  # deal count, not value
   verified:
-    trailing_3q: 0.130  # Q3-Q1 average (Q2 excluded) — UPDATED 2026-09-04
-    per_quarter: {fy2026_q3: 0.111, fy2026_q4: 0.125, fy2027_q1: 0.145}
-    range: [0.111, 0.145]
+    trailing_3q: 0.390  # Q3-Q1 average (Q2 excluded) — CORRECTED 2026-09-04
+    per_quarter: {fy2026_q3: 0.444, fy2026_q4: 0.438, fy2027_q1: 0.289}
+    range: [0.289, 0.444]
+    computation_method: arithmetic_mean  # avg of per-quarter rates, not pooled
     prior_value: 0.099
     prior_per_quarter: {fy2026_q3: 0.105, fy2026_q4: 0.100, fy2027_q1: 0.092}
     change_reason: >
       Review stage (parking lot for dead deals) marked exclude_from_analysis
       on 2026-09-03. Prior 9.9% included Review in week-3 denominator.
-      Current 13.0% excludes Review (164 of 475 Q1 deals) and Meeting Set
+      Current 39.0% excludes Review (164 of 475 Q1 deals) and Meeting Set
       (234 deals, pre-qualification). Denominator dropped from ~640 to 169
-      across Q3-Q1, raising conversion from 9.9% to 13.0%. Both scopes are
+      across Q3-Q1, raising conversion from 9.9% to 39.0%. Both scopes are
       correct for their definitions; registry now uses current scope.
+      Rates: Q3 44.4% (20/45), Q4 43.8% (21/48), Q1 28.9% (22/76).
     excluded_quarter: fy2027_q2
     q2_measured_rate: 0.244  # 29 won / 119 qualified (for reference)
     q2_exclusion_reason: >
@@ -168,6 +170,36 @@ week3_conversion:
       scoped via is_deal_in_analytics_scope. Review (order 8, excluded) and
       Meeting Set (order 0, below qualified_stage_order 1) are excluded.
       Numerator: all in-quarter wins. Denominator: week-3 scoped snapshot.
+  by_segment:
+    enterprise:
+      value: 0.278
+      n: 54
+      won: 15
+      quarters: [fy2026_q3, fy2026_q4, fy2027_q1]
+      per_quarter: {fy2026_q3: 0.294, fy2026_q4: 0.267, fy2027_q1: 0.273}
+      note: "Lowest conversion, highest deal size — coverage-driven motion"
+    mid_market:
+      value: 0.433
+      n: 60
+      won: 26
+      quarters: [fy2026_q3, fy2026_q4, fy2027_q1]
+      per_quarter: {fy2026_q3: 0.353, fy2026_q4: 0.579, fy2027_q1: 0.375}
+      note: "Highest conversion at sufficient volume — 1.6x enterprise rate"
+    smb:
+      value: 0.512
+      n: 41
+      won: 21
+      quarters: [fy2026_q3, fy2026_q4, fy2027_q1]
+      per_quarter: {fy2026_q3: 0.900, fy2026_q4: 0.600, fy2027_q1: 0.286}
+      note: "High conversion but volatile quarter-to-quarter (90% → 60% → 29%)"
+    unknown:
+      value: null
+      n: 14
+      reason: "Below min_evidence_count threshold (30)"
+  segment_divergence:
+    finding: "Material divergence — Mid-Market converts at 1.6x Enterprise rate"
+    implication: "Blended 39.0% is wrong for every segment. Use segment rates for required pipeline."
+    example: "$1M target → Enterprise needs $3.6M (÷0.278), Mid-Market needs $2.3M (÷0.433)"
   not_applicable_to:
     - renewal pipeline (different motion, separate conversion rate)
   note: |
