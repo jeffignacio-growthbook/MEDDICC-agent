@@ -166,19 +166,24 @@ week3_conversion:
         FY2026 Q4: ["2026-02-01", "2026-04-30"]
         FY2027 Q1: ["2026-05-01", "2026-07-31"]
   verified:
-    status: UNVERIFIED
-    reason: >
-      Five different values in one session (9.9% → 13.0% → 39.0% → 12.7% → 7.1%)
-      indicates computation not defined precisely enough. Official query_week3_conversion
-      function has same numerator bug (counts all in-quarter wins, not cohort wins).
-      FY2027 Q1 example: function reports 22 won / 76 = 28.9%, should be 11 won / 76 = 14.5%
-      (11 wins from week-3 cohort, 11 created after week-3).
-    bug_location: scripts/analytics/forecast_analyses.py line 292-294
-    bug_description: >
-      _in_quarter_won_by_pipeline() counts ALL wins with close_date in quarter,
-      not filtered to week-3 cohort. Numerator and denominator draw from different populations.
-    awaiting_computation: >
-      Spec now defined above. Compute ONCE against spec, compare to historical claims.
+    pooled: 0.071  # 12 won / 169 qualified — VERIFIED 2026-09-04
+    trailing_3q: 0.072  # arithmetic mean of per-quarter rates
+    per_quarter: {fy2026_q3: 0.067, fy2026_q4: 0.083, fy2027_q1: 0.066}
+    range: [0.066, 0.083]
+    verified_against: computation_spec defined above
+    measured_date: 2026-09-04
+    computation_script: compute_week3_conversion_final.py
+    prior_values_invalid: >
+      All prior values (9.9%, 13.0%, 39.0%, 12.7%) computed against different
+      definitions. Official function reports 22 won / 169 = 13.0% for same data
+      because it counts deals created after week-3 (numerator bug lines 292-294).
+    verification_checks:
+      numerator_subset_of_denominator: true
+      all_wins_from_week3_cohort: true
+      no_post_week3_deals_in_numerator: true
+      cohort_size: 169
+      wins_from_cohort: 12
+      wins_outside_cohort: 0
     prior_value: 0.099
     prior_per_quarter: {fy2026_q3: 0.105, fy2026_q4: 0.100, fy2027_q1: 0.092}
     change_reason: >
