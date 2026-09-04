@@ -2069,6 +2069,21 @@ async def route_question(question: str, user_id: str,
         for r in (team_roster.data or [])
     ])
 
+    # ── -2. Wave 5a: Correction detection (before routing) ───
+    # If user is correcting the agent, ask if correction is general or specific.
+    # Corrections don't route to handlers — they ask for scope clarification.
+    from corrections import detect_correction, ask_correction_scope
+
+    if detect_correction(question):
+        logger.info(f"[CORRECTION] Detected correction in question")
+        scope_question = ask_correction_scope(question)
+        return {
+            "answer": scope_question,
+            "handler_name": "correction_scope_question",
+            "tool_results": {},
+            "awaiting_correction_scope": True  # Signal to caller that next message should be "general" or "specific"
+        }
+
     # ── -1. Entity-scope check (structural bypass) ───
     # Check if thread has known entities BEFORE pronoun matching
     prior_entities = get_prior_entities(history)
@@ -2599,6 +2614,25 @@ async def route_question(question: str, user_id: str,
     # ── 9. Log learning note (win or lose) ────────────────
     _log_learning(sb, question, handler_name,
                  assessment, retry_count)
+
+    # ── 10. Wave 5b: Persist answer for reconciliation ───
+    # Save every successful answer so "you told me $733K last week" is answerable
+    # and changing numbers can be reconciled.
+    try:
+        from memory import save_answer
+        save_answer(
+            sb,
+            question=question,
+            answer=verified,
+            handler_name=handler_name,
+            thread_ts=thread_ts,
+            asked_by=user_id,
+            tool_results=tool_results
+        )
+        logger.info(f"[MEMORY] Saved answer for {handler_name}")
+    except Exception as e:
+        logger.error(f"[MEMORY] Failed to save answer: {e}")
+        # Non-fatal - don't block answer delivery
 
     return {"answer": verified, "needs_ack": is_slow,
             "tool_results": tool_results,
