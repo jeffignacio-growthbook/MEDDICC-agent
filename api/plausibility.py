@@ -317,6 +317,43 @@ def check_metric_registry_divergence(data: Dict, handler_name: str = None) -> Li
                         }
                     ))
 
+    # Check conversion rate (week3_conversion)
+    if 'week3_conversion' in registry:
+        metric_def = registry['week3_conversion']
+        verified = metric_def.get('verified', {})
+        verified_rate = verified.get('trailing_3q')
+
+        if verified_rate is not None:
+            # Conversion rate has no tolerance in registry, use 0.02 (±2pp)
+            # 6.5% vs 9.9% = 3.4pp variance, should trigger
+            tolerance = 0.02
+
+            # Look for conversion rate in data (various field names possible)
+            conversion_fields = ['conversion', 'conversion_rate', 'week3_conversion',
+                                'close_rate', 'win_rate_qualified']
+
+            for field in conversion_fields:
+                computed_rate = _extract_metric_value(data, field)
+
+                if computed_rate is not None:
+                    variance = abs(computed_rate - verified_rate)
+
+                    if variance > tolerance:
+                        severity = 'critical' if variance > (tolerance * 2) else 'warning'
+                        violations.append(PlausibilityViolation(
+                            check='metric_registry_divergence',
+                            severity=severity,
+                            message=f"CONVERSION RATE: {computed_rate:.1%} vs verified {verified_rate:.1%} (±{tolerance:.1%} tolerance) → {variance:.1%} variance. DO NOT derive conversion from coverage - use verified rate from registry.",
+                            context={
+                                'metric': 'week3_conversion',
+                                'field': field,
+                                'computed': computed_rate,
+                                'verified': verified_rate,
+                                'tolerance': tolerance,
+                                'variance': variance
+                            }
+                        ))
+
     return violations
 
 

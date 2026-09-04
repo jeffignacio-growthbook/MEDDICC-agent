@@ -652,7 +652,7 @@ def build_semantic_context(config: Optional[Dict] = None) -> str:
         lines.append("")
 
         # Include key verified metrics
-        for metric_id in ['grr', 'nrr', 'churn']:
+        for metric_id in ['grr', 'nrr', 'churn', 'week3_conversion']:
             if metric_id in metrics:
                 m = metrics[metric_id]
                 label = m.get('label', metric_id.upper())
@@ -665,7 +665,9 @@ def build_semantic_context(config: Optional[Dict] = None) -> str:
 
                 # Include verified value if present
                 for key, value in verified.items():
-                    if key not in ['reconciled_against', 'reconciled_on', 'tolerance', 'note']:
+                    if key not in ['reconciled_against', 'reconciled_on', 'tolerance', 'note',
+                                   'excluded_quarter', 'q2_measured_rate', 'q2_exclusion_reason',
+                                   'measured_date', 'scope_fix_applied', 'scope_fix_commit']:
                         if value is not None:
                             lines.append(f"  {key}: {value}")
 
@@ -738,10 +740,16 @@ def build_semantic_context(config: Optional[Dict] = None) -> str:
         lines.append("  ✗ 'Q3 forecast is $1.9M' (no context)")
         lines.append("")
 
+        lines.append("**Conversion Rate vs Coverage:**")
+        lines.append("  CRITICAL: Conversion rate is MEASURED from outcomes, NEVER derived from coverage.")
+        lines.append("  ✓ Conversion rate comes from metrics registry: 9.9% (trailing 3Q average)")
+        lines.append("  ✗ DO NOT compute conversion by inverting coverage (e.g., 1/15.33 = 6.5%)")
+        lines.append("  ✗ Coverage is observed (pipeline ÷ quota), conversion is historical (won ÷ qualified)")
+        lines.append("")
         lines.append("**Required Pipeline:**")
-        lines.append("  Use measured conversion rate, not fixed multiples")
-        lines.append("  Formula: required_pipeline = target ÷ measured_conversion_rate")
-        lines.append("  (Coverage multiples like 2.5x are miscalibrated vs actual ~9.9%)")
+        lines.append("  Formula: required_pipeline = target ÷ verified_conversion_rate")
+        lines.append("  Example: At 9.9% conversion, $2.1M target needs $21.2M qualified pipeline")
+        lines.append("  DO NOT use coverage multiples (2.5x, 3x, etc.) - use verified conversion rate")
         lines.append("")
 
     return "\n".join(lines)
