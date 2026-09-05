@@ -153,7 +153,7 @@ week3_conversion:
       deadline: close_date within fiscal quarter (by close_date, not stage transition)
       critical: NEVER include deals created or qualified after week 3
     population:
-      fiscal_quarters: [FY2026 Q3, FY2026 Q4, FY2027 Q1] (Q2 excluded - incomplete snapshot)
+      fiscal_quarters: [FY2026 Q3, FY2026 Q4, FY2027 Q1]  # Q2 excluded - incomplete snapshot
       pipelines: default only (pipeline_id = 'default')
       deal_types: new business only (renewals in pipeline 866608541 excluded)
     method:
@@ -344,12 +344,25 @@ conversion_rate_prospective:
   min_n_per_bucket: 10
 
   verified_result:
-    value: 0.072  # 27 won / 376 qualified
+    value: 0.072  # 27 won / 376 qualified — VERIFIED with clean data 2026-09-04
     numerator: 27
     denominator: 376
     quarters: [FY2026 Q3, FY2026 Q4, FY2027 Q1]
     verified_date: 2026-09-04
-    computation_script: conversion_by_qualification_week_ALL_QUARTERS_FIXED.py
+    computation_script: conversion_by_qualification_week_FINAL_CLEAN.py
+    data_quality:
+      excluded_deals: 28
+      recovered_deals: 25
+      exclusion_table: data_quality_exclusions
+      cohort_overlap: 0
+      note: >
+        28 deals excluded (17 negative cycles + 11 zero-day won with data quality issues).
+        25 deals recovered (swapped create_date ↔ close_date, now have valid 14-359 day cycles).
+        CRITICAL: Zero overlap verified via verify_cohort_overlap.py — none of these 53
+        data quality deals were part of the 376-qualified cohort. The identical 7.2% before
+        and after data quality fixes is correct: fixes cleaned up retroactive/backdated deals
+        that were never qualified during weeks 1-13 snapshot windows, a separate population
+        from the prospective conversion cohort. See DATA_QUALITY_COMPLETE_SUMMARY.md.
 
   supersedes: query_week3_conversion()
   

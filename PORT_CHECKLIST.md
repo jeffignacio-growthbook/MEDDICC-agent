@@ -52,6 +52,14 @@ Client-specific VALUES get blanked/placeholdered, but STRUCTURE travels.
 - ✅ `api/handlers.py` - query_pre_call_brief wired to load_coaching_config()
 - **Action:** coaching_seed.yaml travels as-is; coaching_client.yaml → placeholder values
 
+### Data Quality & ETL Semantics
+
+Template-level artifacts that must carry over:
+- ✅ `scripts/utils/pagination.py` - fetch_all_rows_by_filters() with full filter support (.eq/.gte/.lte/.gt/.lt/.in_/.is_). STRUCTURE travels as-is; this is a general-purpose utility, no client-specific values.
+- ✅ conversion_rate_prospective metric definition pattern in `config/metrics.yaml` - qualification-week cohort methodology (numerator ⊂ denominator, not fixed calendar-week snapshot). STRUCTURE travels; specific stage IDs and verified percentages are client-specific values, blank/recompute per client.
+- ✅ data_quality_exclusions table pattern (migration structure) - travels as schema; contents are client-specific, start empty for new client.
+- **Action:** Template includes pagination utility, conversion metric structure, and data_quality_exclusions schema; new client computes their own conversion rates and exclusions.
+
 ### Harness Boundary Tests
 - ✅ Field semantics isolation (handlers never access data_dictionary)
 - ✅ No raw stage IDs outside field_semantics
@@ -125,11 +133,26 @@ Add to template deployment docs (create `docs/DEPLOYMENT.md` if missing):
    python scripts/eval_call_adapters.py
    ```
 
+5. **Pagination check:** Before trusting any multi-row Supabase query, verify row counts against the 1000-row PostgREST default or confirm fetch_all_rows_by_filters() is in use. Silent truncation produces no error.
+
+6. **ETL timestamp vs. source date field check:** Explicitly confirm which timestamp field means what wherever a snapshot/ETL layer sits between the source CRM and analysis. Never assume an ingestion timestamp (e.g. created_at) equals the source system's actual creation date (e.g. create_date) — verify against a native platform report.
+
+7. **Retroactive/backdated entry check:** Early in onboarding, reconcile total wins against wins captured by whatever prospective tracking mechanism exists. A gap likely means some deals were entered directly into a closed state — size and document it, don't assume infrastructure is broken.
+
+8. **Verify anomalies against an independent source** before building a hypothesis on top of them (e.g. cross-check a suspicious data spike against the CRM's own native reporting UI before writing analysis code to explain it).
+
+9. **Reconcile every subtotal to its total explicitly** — check for actual set overlap (INTERSECT) when combining categories, don't just trust that totals add up.
+
 ---
 
 ## Port Execution Notes
 
-- **Landed this session (2026-08-19):** All items marked ✅ above
+- **Landed 2026-08-19:** Field semantics, migration system, CI adapter abstraction, coaching seed/client split, harness boundary tests
+- **Landed 2026-09-04:** Conversion methodology + data quality findings added
+  - Pagination utility (fetch_all_rows_by_filters) for PostgREST 1000-row limit
+  - conversion_rate_prospective metric definition pattern (cohort tracking methodology)
+  - data_quality_exclusions table pattern
+  - 5 onboarding action items for ETL semantics verification
 - **Next session additions:** Add new template-level artifacts as they land
 - **Port readiness gate:** All harness tests passing + client placeholders verified empty
 - **template onboarding:** Follow deployment docs above after forking template
