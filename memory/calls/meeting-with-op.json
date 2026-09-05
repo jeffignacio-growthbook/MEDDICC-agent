@@ -1,0 +1,18 @@
+{
+  "company": "Meeting with Op",
+  "slug": "meeting-with-op",
+  "last_etl_date": "2026-09-05T05:59:01.757241",
+  "calls": [
+    {
+      "id": "01M1J1NB3404A45X6GNJGV0TE9",
+      "source": "fireflies",
+      "title": "Meeting with Op Methods & GrowthBook",
+      "date": "2026-09-04",
+      "duration_minutes": 30.8799991607666,
+      "summary": "# Meeting with Op Methods & GrowthBook\nDate: 2026-09-04 | Duration: 30.8799991607666m\n\n## Summary\nThe discussion focused on aligning sales and marketing workflows in HubSpot through clear lifecycle stages, better automation visibility, and coordinated ownership. Shawn and his team will use their HubSpot expertise to support end-to-end lifecycle management, while sales involvement will clarify rep activities and prevent conflicting processes. Lead scoring is developed but awaiting sales alignment, and BDR automation will help Jake S. prioritize higher-value leads while reducing manual outreach and improving meeting tracking. The team also plans to connect LinkedIn engagement with meetings, opportunities, and closed deals. Forecasting responsibilities, renewal notifications, price-increase alerts, and MongoDB license integration were identified for improvement. Ops Method is in month two of a three-month retainer, but the current 20 hours per month may not support the expanded sales scope. Weekly 30-minute meetings, office hours, and rep training will support communication, adoption, and the shift toward more outbound selling.\n\n## Keywords\nHubSpot, sales lifecycle, lead scoring, automation, BDR tracking, contract renewals\n\n## Action Items\n\n**Lyndsie Berens**\nCoordinate timing with Shawn Green to connect Notion after the meeting for mapping and testing purposes (01:00)\n\n**Shawn Green**\nShare audit deck, lifecycle stage mappings, and related documentation with Ryan McGurk to provide project context and support alignment (23:26)\nAdd Ryan McGurk to weekly alignment meetings and schedule the sales kickoff discussion for September 8 at 2:30pm Eastern, confirming that the calendar invite is sent (25:50)\nPrepare handoff documentation and create a Loom video demonstrating the lifecycle automation workflow and triggers to train the sales team effectively (15:40)\nInitiate conversations with Jake, the BDR, to understand his workload and identify opportunities for automation to improve lead prioritization and efficiency (14:10)\nDraft an updated project scope including expanded sales support hours and present it to Eric and Deb for review before the next meeting (28:20)\n\n**Ryan McGurk**\nParticipate actively in weekly meetings and breakout sessions related to sales operations and HubSpot usage; plan to walk Op Methods through daily use of HubSpot dashboards and reports (20:50)\nFacilitate connection with Account Executives for process walkthroughs on HubSpot daily usage to help Op Methods align with sales operations (24:10)\n",
+      "organizer": "jeff.ignacio@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

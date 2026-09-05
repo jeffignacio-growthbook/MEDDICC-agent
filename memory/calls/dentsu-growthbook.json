@@ -1,0 +1,18 @@
+{
+  "company": "Dentsu & GrowthBook",
+  "slug": "dentsu-growthbook",
+  "last_etl_date": "2026-09-05T05:59:01.763954",
+  "calls": [
+    {
+      "id": "01M1F0YSGGCRHAN1RGVGTYAN0Y",
+      "source": "fireflies",
+      "title": "Dentsu & GrowthBook Catch Up",
+      "date": "2026-09-04",
+      "duration_minutes": 27.610000610351562,
+      "summary": "# Dentsu & GrowthBook Catch Up\nDate: 2026-09-04 | Duration: 27.610000610351562m\n\n## Summary\nThe discussion established a dual partnership model for GrowthBook: smaller clients would use infrastructure managed by Simone’s team, while larger clients could self-host and receive introductions and support. Gaia Chiamonte and Pietro Manfredi are expected to lead commercial and contractual discussions, with setup and finalization targeted between the end of August and mid-October. Priority sectors include utilities, banking, automotive, and energy, with experimentation, CRO, cost reduction, privacy, and hosting flexibility central to the proposition. The team requested relevant industry case studies, particularly for utilities and automotive. James Shannon presented GrowthBook’s fully open API, revamped visual editor, CLI integrations, AI assistant, experiment analysis, and learning pages. Privacy requirements were largely cleared, RFP support continued, and Italian-language support for AI tools remained under review.\n\n## Keywords\nprivacy assessment, AI assistant, commercial partnership, experimentation, API integration, case studies\n\n## Action Items\n\n**Simone Mazzero**\nForward marketing materials and GrowthBook information to Remy and Marco for client presentations (25:40)\nInitiate introduction of James Shannon to Gaia Chiamonte and Pietro Manfredi for commercial negotiations (25:40)\nObtain and forward RFP documents to Remy as soon as available (25:50)\n\n**James Shannon**\nProvide sales deck and marketing materials showcasing AI capabilities and partnership benefits to Simone, Marco, and Remy (25:40)\nEngage with Gaia Chiamonte and Pietro Manfredi for contract and pricing discussions post introductions (11:50)\nShare link to GrowthBook agent skills and additional product information with Remy and team (19:25)\n\n**Rémy Marin**\nAssist with technical answers and RFP completion, including translating RFP from Italian to English (04:45)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

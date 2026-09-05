@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Caju",
+  "slug": "growthbook-caju",
+  "last_etl_date": "2026-09-05T05:59:01.757070",
+  "calls": [
+    {
+      "id": "01M1MBF0JFJFQZXZX2S0H3MWJ3",
+      "source": "fireflies",
+      "title": "Growthbook <> Caju - Intro",
+      "date": "2026-09-04",
+      "duration_minutes": 12,
+      "summary": "# Growthbook <> Caju - Intro\nDate: 2026-09-04 | Duration: 12m\n\n## Summary\nThe company plans to consolidate roughly 80–90% of its feature flags from Firebase, self-built solutions, and Growthbook into Growthbook Cloud to reduce complexity, maintenance overhead, and rollout challenges. Cloud deployment is preferred over on-premises because there is no urgent compliance or security requirement, while on-premises would add cost and complexity. The team recommended staying on its discounted legacy Pro plan because enterprise pricing could approach $30,000 per month, including a $10,000 platform fee, and current feature-flag needs are relatively simple. Advanced tiers were considered more valuable for analytics, experimentation, and integrations. Product analytics adoption will remain limited for now because tagging and Databricks meet current needs. Growthbook’s built-in dashboards, SQL reporting, and developing analytics capabilities may be evaluated later as a potential alternative to Amplitude. Dan emphasized transparent, pressure-free guidance, while Fernando supported a gradual “baby steps” approach and plans to revisit expansion as needs grow.\n\n## Keywords\nfeature flags, Growthbook Cloud, pricing model, A/B testing, product analytics, cost management\n\n## Action Items\n\n**Fernando Dias Belo**\nContinue migrating and consolidating feature flags into Growthbook Cloud platform, moving away from Firebase and custom implementations (02:50)\nMonitor usage of Growthbook Pro analytics and experimentation features to evaluate if they meet analytics needs before considering other platforms like Amplitude (09:00)\nReach out to Growthbook for guidance or support if future considerations arise regarding upgrading plans, deployment options (cloud vs. on-premises), or expanding usage (10:20)\n\n**Dan Wathne**\nProvide guidance and support regarding Growthbook pricing, feature options, and assist client in reassessing needs in future discussions (10:20)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

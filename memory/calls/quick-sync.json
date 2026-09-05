@@ -1,7 +1,7 @@
 {
   "company": "Quick Sync",
   "slug": "quick-sync",
-  "last_etl_date": "2026-08-18T16:55:06.281778",
+  "last_etl_date": "2026-09-05T05:59:01.757565",
   "calls": [
     {
       "id": "01KY0DKNW0M0NREMRETGA3J9T9",
@@ -15,6 +15,17 @@
       "keywords": "",
       "action_items": "",
       "summary_quality": "empty"
+    },
+    {
+      "id": "01M1HR5AX712HMP5WN3J57JP04",
+      "source": "fireflies",
+      "title": "Quick Sync - Live Demo Webinar",
+      "date": "2026-09-04",
+      "duration_minutes": 33,
+      "summary": "# Quick Sync - Live Demo Webinar\nDate: 2026-09-04 | Duration: 33m\n\n## Summary\nThe team agreed to expand demo delivery from Logan to Scott and Alyssa, using Logan’s certification process, recorded demos, scripts, webinars, and practice sessions to ensure consistency while allowing Logan to focus on enterprise deals. Demos generally run for 20–30 minutes followed by about five minutes of questions, using Demo Fly for standard presentations and live Postgres customer data for specialized use cases. The primary goals are education and sign-ups for Growth Book or sales demos, supported by follow-up emails and sales outreach. The team also discussed automated QR codes, direct links, and chat integrations to improve conversions and share documentation faster during webinars. Zoom remains the current platform, with a future platform upgrade anticipated. Conference participation will be handled cautiously to respect exclusivity rules, protect partner relationships, and prioritize high-impact opportunities. Lyndsie is developing a repository for speaking opportunities and CFP reminders, while the team continues to emphasize collaborative practice, quick support, and respectful event communication.\n\n## Keywords\nDemo Certification, Webinar, Sponsorship, Lightning Talk, Conference CFP, Demo Automation\n\n## Action Items\n\n**Logan Bates**\nShare demo certification materials and demo script with Scott Bailey and Alyssa Nicoll to prepare them for running demos (02:06)\nProvide ongoing demo support and be available for questions or quick calls to assist Scott Bailey and Alyssa Nicoll as they transition into running demos (10:56)\n\n**Lyndsie Berens**\nSend link to recorded demo webinar to Alyssa Nicoll and Scott Bailey so they can review a full demo session (02:46)\nAdd Scott Bailey and Alyssa Nicoll as panelists in the next recurring webinar to allow them to observe live demos before leading (05:09)\nCoordinate with Ashley Stirrup to verify and provide organizer contact details for the Circus conference to ensure proper outreach and communication (20:11)\nContinue updating and managing the master repository of conference CFPs and speaking session opportunities to streamline event participation planning (17:30)\n\n**Alyssa Nicoll**\nApply for a Lightning Talks slot at the Circus conference and follow up with organizers to offer longer talks if possible, ensuring transparency about Growth Book's role (15:51)\nSend Lightning Talk proposals to Scott Bailey for review before submitting to conference organizers to ensure alignment and quality (23:11)\n",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
     }
   ]
 }

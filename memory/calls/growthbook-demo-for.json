@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook Demo for",
   "slug": "growthbook-demo-for",
-  "last_etl_date": "2026-08-05T15:57:31.313960",
+  "last_etl_date": "2026-09-05T05:59:01.761445",
   "calls": [
     {
       "id": "69b2cdd1aadf6a00115df609",
@@ -11,29 +11,8 @@
       "duration_minutes": 30,
       "summary": "[Summary failed] [Jake Heier]: Hello.\n[Valentina Tarun Bhowal]: Hello, guys. Good evening.\n[Jake Heier]: How are you?\n[Valentina Tarun Bhowal]: Hey. I hope I'm audible. I see Nishant is already here. Hi, Jake.\n[Kal Si",
       "host": "Jake Heier",
-      "participants": 3
-    },
-    {
-      "id": "69b9578f1961fc000d60e018",
-      "source": "apollo",
-      "title": "GrowthBook Demo for oda.com",
-      "date": "2026-03-17",
-      "duration_minutes": 31,
-      "summary": "[Summary failed] [Fredrik]: Frederick. Hey Christian,\n[Christian Liebenow]: how are you?\n[Fredrik]: I'm good. Hi. See me as well. I haven't used Zoom since early Covid so I'm not sure.\n[Christian Liebenow]: Oh, okay.\n",
-      "host": "Christian Liebenow",
-      "participants": 3
-    },
-    {
-      "id": "01KKRVDFDP4W1E67ZDJGVWFC6Z",
-      "source": "fireflies",
-      "title": "GrowthBook Demo for Moonrail",
-      "date": "2026-03-17",
-      "duration_minutes": 71,
-      "summary": "The company discussed its growth strategy, emphasizing Dual.com, which targets the crypto casino sector with low House Edge games to enhance user acquisition and conversion. The legacy brand, csgoempire.com, continues to serve a steady user base but is seen as limited in growth potential. A crucial focus is on implementing web experimentation, led by VP of Data, Fraser Gray, and his small data team, aiming to employ feature flagging and variant testing. Conversion metrics from sign-up to first deposit were highlighted as key indicators of success, with the intent to use Bayesian methods for analysis. The team is evaluating GrowthBook for experimentation features, emphasizing self-hosted solutions for data control. A quick decision on this evaluation is anticipated by the end of March, with follow-up technical discussions planned.",
-      "organizer": "james.shannon@growthbook.io",
-      "participants": 2,
-      "keywords": "Moonrail, GrowthBook, Web Experimentation, Bayesian Statistics, Feature Flags, Self-hosted Enterprise",
-      "action_items": "\n**Fraser Gray**\nMeet with Statsig vendor on Thursday to gather commercial and technical information (01:01:06)\nCoordinate internal evaluation and potentially bring VP of engineering to GrowthBook follow-up call for integration discussion (01:07:47)\nConfirm availability for follow-up technical call with GrowthBook early next week, preferably after 1 PM UTC / 2 PM CET (01:06:01)\nDecide between GrowthBook and Statsig by end of March or early April (01:03:49)\n\n**James Shannon**\nProvide detailed follow-up on variant assignment and traffic split methodology after internal review (33:06)\nSchedule and organize follow-up technical call with GrowthBook solution engineer (ex-Statsig) for early next week to address technical and integration questions (01:05:58)\nPrepare pricing proposals for GrowthBook Pro and Enterprise self-hosted options including potential pricing negotiation based on Statsig’s quote (46:51)\nAssist Fraser with clarifying outlier treatment methods and Bayesian statistical interpretation in GrowthBook (45:01)\nShare additional documentation on SDK implementation and custom attribute usage for user targeting (39:32)\n"
+      "participants": 3,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KKV274DG7XMTJBH1ZXN7AS2A",
@@ -45,7 +24,21 @@
       "organizer": "christian@growthbook.io",
       "participants": 4,
       "keywords": "GrowthBook, self-hosting, A/B testing, enterprise pricing, feature flagging, Kubernetes",
-      "action_items": "\n**Fredrik Jørgensen**\nDiscuss GrowthBook proposal details with Oda CTO and respond to Christian by email ASAP (22:25)\nProvide exact figures on weekly active Oda customers for GrowthBook reference (28:14)\nCoordinate with Oda developers and data scientists to contribute feedback on GrowthBook product improvements (21:20)\n\n**Christian Liebenow**\nPrepare and send a detailed GrowthBook Enterprise pricing proposal for Oda emphasizing discounted, multi-year licensing (22:40)\nInvestigate technical details on MongoDB vendor recommendations and alternative database support for GrowthBook self-hosted setups and provide info to Oda (24:36)\nInclude possibility of a case study and press release collaboration with Oda as part of pricing negotiation (17:35)\nAim to finalize partnership agreement by end of April, aligned with GrowthBook’s quarter end (21:50)\n\n**Tor (Thor Høgås)**\nAssist Fredrik and Christian on technical questions regarding Kubernetes cluster splitting and state synchronization involving MongoDB (23:50)\n"
+      "action_items": "\n**Fredrik Jørgensen**\nDiscuss GrowthBook proposal details with Oda CTO and respond to Christian by email ASAP (22:25)\nProvide exact figures on weekly active Oda customers for GrowthBook reference (28:14)\nCoordinate with Oda developers and data scientists to contribute feedback on GrowthBook product improvements (21:20)\n\n**Christian Liebenow**\nPrepare and send a detailed GrowthBook Enterprise pricing proposal for Oda emphasizing discounted, multi-year licensing (22:40)\nInvestigate technical details on MongoDB vendor recommendations and alternative database support for GrowthBook self-hosted setups and provide info to Oda (24:36)\nInclude possibility of a case study and press release collaboration with Oda as part of pricing negotiation (17:35)\nAim to finalize partnership agreement by end of April, aligned with GrowthBook’s quarter end (21:50)\n\n**Tor (Thor Høgås)**\nAssist Fredrik and Christian on technical questions regarding Kubernetes cluster splitting and state synchronization involving MongoDB (23:50)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01KKRVDFDP4W1E67ZDJGVWFC6Z",
+      "source": "fireflies",
+      "title": "GrowthBook Demo for Moonrail",
+      "date": "2026-03-17",
+      "duration_minutes": 71,
+      "summary": "The company discussed its growth strategy, emphasizing Dual.com, which targets the crypto casino sector with low House Edge games to enhance user acquisition and conversion. The legacy brand, csgoempire.com, continues to serve a steady user base but is seen as limited in growth potential. A crucial focus is on implementing web experimentation, led by VP of Data, Fraser Gray, and his small data team, aiming to employ feature flagging and variant testing. Conversion metrics from sign-up to first deposit were highlighted as key indicators of success, with the intent to use Bayesian methods for analysis. The team is evaluating GrowthBook for experimentation features, emphasizing self-hosted solutions for data control. A quick decision on this evaluation is anticipated by the end of March, with follow-up technical discussions planned.",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "keywords": "Moonrail, GrowthBook, Web Experimentation, Bayesian Statistics, Feature Flags, Self-hosted Enterprise",
+      "action_items": "\n**Fraser Gray**\nMeet with Statsig vendor on Thursday to gather commercial and technical information (01:01:06)\nCoordinate internal evaluation and potentially bring VP of engineering to GrowthBook follow-up call for integration discussion (01:07:47)\nConfirm availability for follow-up technical call with GrowthBook early next week, preferably after 1 PM UTC / 2 PM CET (01:06:01)\nDecide between GrowthBook and Statsig by end of March or early April (01:03:49)\n\n**James Shannon**\nProvide detailed follow-up on variant assignment and traffic split methodology after internal review (33:06)\nSchedule and organize follow-up technical call with GrowthBook solution engineer (ex-Statsig) for early next week to address technical and integration questions (01:05:58)\nPrepare pricing proposals for GrowthBook Pro and Enterprise self-hosted options including potential pricing negotiation based on Statsig’s quote (46:51)\nAssist Fraser with clarifying outlier treatment methods and Bayesian statistical interpretation in GrowthBook (45:01)\nShare additional documentation on SDK implementation and custom attribute usage for user targeting (39:32)\n",
+      "summary_quality": "good"
     },
     {
       "id": "69ba7f33d50c2300195b8f67",
@@ -55,17 +48,8 @@
       "duration_minutes": 17,
       "summary": "[Summary failed] [Carvago Sro]: It. Hello. Hello.\n[James Shannon]: Hey, good morning. How are you?\n[Carvago Sro]: Yeah, fine. You?\n[James Shannon]: I'm good, I'm good. Thanks for. Thanks for taking some time to meet.\n",
       "host": "James Shannon",
-      "participants": 2
-    },
-    {
-      "id": "69ba780b697abb000d6eb20f",
-      "source": "apollo",
-      "title": "GrowthBook Demo for SMG Swiss Marketplace Group",
-      "date": "2026-03-18",
-      "duration_minutes": 32,
-      "summary": "[Summary failed] [Guilherme Rios]: Can't complain. How about you?\n[James Shannon]: Yeah, no, very good. It's my, my first meeting of the day. How about yourself? I guess you're, Are you in European time?\n[James Shanno",
-      "host": "James Shannon",
-      "participants": 8
+      "participants": 2,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KKV43NXM03TECHPVPJ6SR6FK",
@@ -77,7 +61,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 11,
       "keywords": "GrowthBook, experimentation, self-hosted, feature flags, pricing models, data warehouse",
-      "action_items": "\n**Lan Ha**\nCollect detailed questions from vertical teams regarding GrowthBook’s self-hosted and open-source versions and coordinate follow-up communication with GrowthBook (29:09)\n\n**James Shannon**\nProvide follow-up information and clarification about GrowthBook’s integration capabilities with Google Tag Manager and other analytics tools (21:57)\nShare additional details and documentation on enterprise features such as performance optimizations, governance, and advanced statistical methods via email (26:15)\nArrange further discussions or calls with technical experts to address SMG’s specific questions, as requested (27:57)\n"
+      "action_items": "\n**Lan Ha**\nCollect detailed questions from vertical teams regarding GrowthBook’s self-hosted and open-source versions and coordinate follow-up communication with GrowthBook (29:09)\n\n**James Shannon**\nProvide follow-up information and clarification about GrowthBook’s integration capabilities with Google Tag Manager and other analytics tools (21:57)\nShare additional details and documentation on enterprise features such as performance optimizations, governance, and advanced statistical methods via email (26:15)\nArrange further discussions or calls with technical experts to address SMG’s specific questions, as requested (27:57)\n",
+      "summary_quality": "good"
     },
     {
       "id": "69c10c6dee9f85000d0966e4",
@@ -87,7 +72,8 @@
       "duration_minutes": 32,
       "summary": "[Summary failed] [James Shannon]: London, Correct.\n[Amelie Bruhat]: Sorry, you're in London? No, I'm based in Edinburgh.\n[James Shannon]: Oh, you're in Edinburgh. Oh, lovely. That's where my brother lives.\n[Amelie Bru",
       "host": "James Shannon",
-      "participants": 2
+      "participants": 2,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KM835MMNGKC44Q1DXVQAF2CB",
@@ -99,7 +85,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "AB testing, feature flagging, open source, GrowthBook, conversion optimization, dashboard demo",
-      "action_items": "\n**Axel Guillaume**\nExplore GrowthBook documentation and start testing AB experiments on Arleti’s website (25:00)\nContact James Shannon to arrange a technical Q&A session involving Arleti’s developer team (25:50)\n\n**James Shannon**\nSend follow-up email containing GrowthBook documentation, pricing details, and demo resources to Axel (10:03)\nProvide case studies and supporting materials via email for Axel’s evaluation (15:32)\nCoordinate potential technical call with Axel’s developer team upon request (25:55)\n"
+      "action_items": "\n**Axel Guillaume**\nExplore GrowthBook documentation and start testing AB experiments on Arleti’s website (25:00)\nContact James Shannon to arrange a technical Q&A session involving Arleti’s developer team (25:50)\n\n**James Shannon**\nSend follow-up email containing GrowthBook documentation, pricing details, and demo resources to Axel (10:03)\nProvide case studies and supporting materials via email for Axel’s evaluation (15:32)\nCoordinate potential technical call with Axel’s developer team upon request (25:55)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KM5AZXN5KQBVWX8XV7B51ZHD",
@@ -111,7 +98,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "A/B testing, Magic Checkout, merchant isolation, API abstraction, self-hosted, experiment traffic allocation",
-      "action_items": "\n**Anurag Allamsetty**\nProvide technical POC for the next call to discuss integration and data warehouse architecture (37:45)\nShare internal requirements and ensure tech team availability for the upcoming technical discussion (40:20)\n\n**James Shannon**\nShare Fireflies meeting notes with Anurag Allamsetty promptly after the call (40:36)\nArrange and confirm participation of technical resource for Wednesday’s 10 AM UK time call, and send calendar invite to Razorpay (39:37)\nFollow up on querying timing/control capabilities within Growth Book and provide update to Razorpay (28:12)\nPrepare for technical deep dive call with Razorpay to discuss architecture, API abstraction, data isolation, and statistical engine capabilities (31:08)\n"
+      "action_items": "\n**Anurag Allamsetty**\nProvide technical POC for the next call to discuss integration and data warehouse architecture (37:45)\nShare internal requirements and ensure tech team availability for the upcoming technical discussion (40:20)\n\n**James Shannon**\nShare Fireflies meeting notes with Anurag Allamsetty promptly after the call (40:36)\nArrange and confirm participation of technical resource for Wednesday’s 10 AM UK time call, and send calendar invite to Razorpay (39:37)\nFollow up on querying timing/control capabilities within Growth Book and provide update to Razorpay (28:12)\nPrepare for technical deep dive call with Razorpay to discuss architecture, API abstraction, data isolation, and statistical engine capabilities (31:08)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KKY2D7RQP8RYEV4R82W8SZJJ",
@@ -123,7 +111,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
       "keywords": "A/B testing, feature flags, experimentation platform, marketing analytics, developer collaboration, GrowthBook",
-      "action_items": "\n**James Shannon**\nShare Google Ads integration documentation with Ncontracts team (24:20)\nProvide slides and details on product analytics for further evaluation (25:40)\nOffer free trial access and support for platform hands-on evaluation (30:50)\n\n**Diana Tsevan**\nEvaluate GrowthBook platform using free trial to determine fit for Ncontracts' long-term experimentation needs (31:00)\n\n**Matthew Langdon**\nCollaborate with Diana and engineering to assess the developer involvement required during GrowthBook setup (07:45)\n"
+      "action_items": "\n**James Shannon**\nShare Google Ads integration documentation with Ncontracts team (24:20)\nProvide slides and details on product analytics for further evaluation (25:40)\nOffer free trial access and support for platform hands-on evaluation (30:50)\n\n**Diana Tsevan**\nEvaluate GrowthBook platform using free trial to determine fit for Ncontracts' long-term experimentation needs (31:00)\n\n**Matthew Langdon**\nCollaborate with Diana and engineering to assess the developer involvement required during GrowthBook setup (07:45)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KMJQF7ZHJW5F0TYHZHJ333GT",
@@ -135,7 +124,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
       "keywords": "A/B Testing, Feature Flags, Experimentation Platform, BigQuery Integration, Conversion Rate Optimization, SDK Integration",
-      "action_items": "\n**Matt Berry**\nCoordinate internal alignment with Bill Germani for more technical Growth Book integration discussion (55:33)\nStart hands-on exploratory testing with Growth Book free version and provide feedback to James Shannon’s team (55:33)\n\n**James Shannon**\nSend follow-up email with meeting summary, next steps, and invite for technical call including Bill Germani (59:07)\nSchedule technical deep-dive session with Bill and technical stakeholders for next week Tuesday 11:30am Eastern time (56:55)\n"
+      "action_items": "\n**Matt Berry**\nCoordinate internal alignment with Bill Germani for more technical Growth Book integration discussion (55:33)\nStart hands-on exploratory testing with Growth Book free version and provide feedback to James Shannon’s team (55:33)\n\n**James Shannon**\nSend follow-up email with meeting summary, next steps, and invite for technical call including Bill Germani (59:07)\nSchedule technical deep-dive session with Bill and technical stakeholders for next week Tuesday 11:30am Eastern time (56:55)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KMMVQDG0R37B4FQ4SPHZYW6H",
@@ -147,7 +137,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, feature flagging, A/B testing, VWO, experimentation platform, checkout optimization",
-      "action_items": "\n**Joyce Brink**\nCoordinate with developer and ecommerce manager to attend a technical GrowthBook demo (29:16)\n\n**James Shannon**\nSend follow-up email with GrowthBook slides and pricing details (29:43)\nArrange follow-up technical demo for HelloTV’s developer and ecommerce manager (29:42)\nProvide information and support for HelloTV team to start free tier trial of GrowthBook (27:37)\nPrepare enterprise pricing discussion and tailor options based on HelloTV’s needs and budgets (28:25)\n"
+      "action_items": "\n**Joyce Brink**\nCoordinate with developer and ecommerce manager to attend a technical GrowthBook demo (29:16)\n\n**James Shannon**\nSend follow-up email with GrowthBook slides and pricing details (29:43)\nArrange follow-up technical demo for HelloTV’s developer and ecommerce manager (29:42)\nProvide information and support for HelloTV team to start free tier trial of GrowthBook (27:37)\nPrepare enterprise pricing discussion and tailor options based on HelloTV’s needs and budgets (28:25)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KMN85ZBY711YZ0781CPR3PFM",
@@ -159,7 +150,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
       "keywords": "Feature Flags, A/B Testing, GrowthBook, Enterprise Licensing, Redshift Integration, Experimentation Platform",
-      "action_items": "\n**James Shannon**\nFollow up with detailed information on integration with Argo Rollouts and GitLab CI by email (15:42)\nSend a one-page comparison document of GrowthBook versus Posthog and Unleash to Sergey Laada and team (42:29)\nSchedule a follow-up call for Wednesday or Thursday to discuss next steps and possibly involve GrowthBook’s technical team (44:43)\nPrepare and offer a proof of concept setup for GrowthBook integration and experimentation within Iute’s environment, including team support (40:53)\n\n**Sergey Laada**\nReview GrowthBook materials and consider licensing options, then communicate budget decision and next steps via email (39:50)\n"
+      "action_items": "\n**James Shannon**\nFollow up with detailed information on integration with Argo Rollouts and GitLab CI by email (15:42)\nSend a one-page comparison document of GrowthBook versus Posthog and Unleash to Sergey Laada and team (42:29)\nSchedule a follow-up call for Wednesday or Thursday to discuss next steps and possibly involve GrowthBook’s technical team (44:43)\nPrepare and offer a proof of concept setup for GrowthBook integration and experimentation within Iute’s environment, including team support (40:53)\n\n**Sergey Laada**\nReview GrowthBook materials and consider licensing options, then communicate budget decision and next steps via email (39:50)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KMQX8KMJJTSK4Q8ZA2XVB1YB",
@@ -171,7 +163,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, self-hosted, enterprise license, A/B testing, feature flagging, event analytics",
-      "action_items": "\n**Aleksei Pyzhik**\nSend email with Amplitude event scenarios and use cases in text form to GrowthBook team (30:24)\nProvide available time slots via email for scheduling a technical call demo with GrowthBook by end of current week (34:51)\n\n**James Shannon**\nArrange a technical demonstration showing GrowthBook’s dashboarding and analytics capabilities to replicate or complement Amplitude’s features (28:50)\nSend follow-up email summarizing meeting discussions, sharing pricing slides, and proposing Friday meeting options (34:33)\nPrepare to discuss scalability and budget alignment after technical demo to support Aleksei’s decision-making (29:50)\n"
+      "action_items": "\n**Aleksei Pyzhik**\nSend email with Amplitude event scenarios and use cases in text form to GrowthBook team (30:24)\nProvide available time slots via email for scheduling a technical call demo with GrowthBook by end of current week (34:51)\n\n**James Shannon**\nArrange a technical demonstration showing GrowthBook’s dashboarding and analytics capabilities to replicate or complement Amplitude’s features (28:50)\nSend follow-up email summarizing meeting discussions, sharing pricing slides, and proposing Friday meeting options (34:33)\nPrepare to discuss scalability and budget alignment after technical demo to support Aleksei’s decision-making (29:50)\n",
+      "summary_quality": "good"
     },
     {
       "id": "69cc33bfab7bd4002163524c",
@@ -181,7 +174,8 @@
       "duration_minutes": 35,
       "summary": "[Summary failed] [Daniel Wathne]: Recording in progress. Hello. Hey Cameron, how you doing?\n[Cameron Dechene]: Hey Dan, how's it going? Good.\n[Daniel Wathne]: Am I echoing to you?\n[Cameron Dechene]: No, you're. No, yo",
       "host": "Daniel Wathne",
-      "participants": 3
+      "participants": 3,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KMYXSH3R9N6H0DGFRKED7MH7",
@@ -193,7 +187,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 5,
       "keywords": "GrowthBook, A/B Testing, Self-Hosting, EU Compliance, Experimentation Platform, Conversion Optimization",
-      "action_items": "\n**James Shannon**\nSend follow-up notes and competitive analysis documentation comparing GrowthBook with Optimizely, LaunchDarkly, and STATSIG to KBRA (33:10)\nArrange a technical follow-up meeting to discuss EU data privacy, cookie consent, and compliance specifics with a GrowthBook technical team member (23:07)\nProvide benchmarks and business case examples to KBRA to assist internal justification for experimentation investment (12:43)\nExplore flexible pricing options and potentially offer a scaled-down Enterprise or Pro tier to suit KBRA’s size and needs (29:07)\n\n**Larry Latour**\nCoordinate internally across UX, marketing, and engineering teams to evaluate GrowthBook and other vendors on demos and proofs of concept within the next 1–2 months (33:08)\nEngage with KBRA’s legal team to clarify requirements and ensure compliance needs are met regarding data privacy and experimentation tracking (23:24)\n\n**Unassigned**\nClarify current data warehouse technology stack details within KBRA product team to ensure smooth GrowthBook integration (21:21)\n"
+      "action_items": "\n**James Shannon**\nSend follow-up notes and competitive analysis documentation comparing GrowthBook with Optimizely, LaunchDarkly, and STATSIG to KBRA (33:10)\nArrange a technical follow-up meeting to discuss EU data privacy, cookie consent, and compliance specifics with a GrowthBook technical team member (23:07)\nProvide benchmarks and business case examples to KBRA to assist internal justification for experimentation investment (12:43)\nExplore flexible pricing options and potentially offer a scaled-down Enterprise or Pro tier to suit KBRA’s size and needs (29:07)\n\n**Larry Latour**\nCoordinate internally across UX, marketing, and engineering teams to evaluate GrowthBook and other vendors on demos and proofs of concept within the next 1–2 months (33:08)\nEngage with KBRA’s legal team to clarify requirements and ensure compliance needs are met regarding data privacy and experimentation tracking (23:24)\n\n**Unassigned**\nClarify current data warehouse technology stack details within KBRA product team to ensure smooth GrowthBook integration (21:21)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KN1QC2CED1WGRJ0ZFEB9S6Y7",
@@ -205,7 +200,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "A/B testing, out clicks, conversion optimization, bot traffic, GrowthBook SDK, experiment implementation",
-      "action_items": "\n**Harriet Gribble**\nReview GrowthBook presentation slides and provide feedback or questions regarding the tool and its implementation (34:44)\nEvaluate internal resource availability and budget constraints to determine feasibility of adopting an experimentation program (15:47)\n\n**Ross Motley**\nIdentify and confirm a unique user or session identifier compatible with GrowthBook's deterministic hashing to enable accurate experiment tracking across GENIE Shopping's data systems (24:16)\nAssist the product team in aligning Google Analytics data and bot filtering logic with GrowthBook's experiment measurement requirements to ensure accurate conversion tracking (10:48)\n\n**James Shannon**\nShare GrowthBook presentation slides and additional product resources with the GENIE Shopping team to support their evaluation process (34:49)\nProvide ongoing support for any technical or commercial questions arising after GENIE Shopping reviews GrowthBook and other vendors (35:00)\n"
+      "action_items": "\n**Harriet Gribble**\nReview GrowthBook presentation slides and provide feedback or questions regarding the tool and its implementation (34:44)\nEvaluate internal resource availability and budget constraints to determine feasibility of adopting an experimentation program (15:47)\n\n**Ross Motley**\nIdentify and confirm a unique user or session identifier compatible with GrowthBook's deterministic hashing to enable accurate experiment tracking across GENIE Shopping's data systems (24:16)\nAssist the product team in aligning Google Analytics data and bot filtering logic with GrowthBook's experiment measurement requirements to ensure accurate conversion tracking (10:48)\n\n**James Shannon**\nShare GrowthBook presentation slides and additional product resources with the GENIE Shopping team to support their evaluation process (34:49)\nProvide ongoing support for any technical or commercial questions arising after GENIE Shopping reviews GrowthBook and other vendors (35:00)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KN3EPSPB84HQJS59W2CHE1CH",
@@ -217,7 +213,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 7,
       "keywords": "GrowthBook, A/B Testing, Feature Flags, Experimentation Platform, Visual Editor, Data Integration",
-      "action_items": "\n**Jamie**\nCoordinate additional GrowthBook demos for wider Ready Media team attendance to facilitate broader understanding and adoption (36:07)\nTest GrowthBook implementation on Ready Media's staging environment to validate integration before production rollout (41:43)\n\n**Nhu Nguyen**\nInvestigate Laravel PHP SDK integration for GrowthBook with Ready Media’s platform to ensure compatibility and smooth implementation (16:17)\nConfirm how visual editor changes are managed and incorporated on Ready Media’s website to clarify responsibilities and workflow (28:50)\n\n**Graham McNicoll**\nProvide follow-up email with onboarding documentation and demo sharing to support Ready Media’s trial and adoption process (42:33)\nAssist Ready Media team with Mixpanel and data source setup for experiment tracking to ensure accurate data integration and analysis (37:06)\n"
+      "action_items": "\n**Jamie**\nCoordinate additional GrowthBook demos for wider Ready Media team attendance to facilitate broader understanding and adoption (36:07)\nTest GrowthBook implementation on Ready Media's staging environment to validate integration before production rollout (41:43)\n\n**Nhu Nguyen**\nInvestigate Laravel PHP SDK integration for GrowthBook with Ready Media’s platform to ensure compatibility and smooth implementation (16:17)\nConfirm how visual editor changes are managed and incorporated on Ready Media’s website to clarify responsibilities and workflow (28:50)\n\n**Graham McNicoll**\nProvide follow-up email with onboarding documentation and demo sharing to support Ready Media’s trial and adoption process (42:33)\nAssist Ready Media team with Mixpanel and data source setup for experiment tracking to ensure accurate data integration and analysis (37:06)\n",
+      "summary_quality": "good"
     },
     {
       "id": "69d5235df5a910000d0f697c",
@@ -227,7 +224,8 @@
       "duration_minutes": 32,
       "summary": "[Summary failed] [Daniel Wathne]: What's up, Dan?\n[Logan Bates]: Hello.\n[Tom Gillan]: Hello.\n[Daniel Wathne]: You come to watch me flounder a demo?\n[Logan Bates]: All my struggle, this life.\n[Daniel Wathne]: Yes, Like",
       "host": "Daniel Wathne",
-      "participants": 3
+      "participants": 3,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KNEQ4BMT73RWT4J9H5VN6JQR",
@@ -239,7 +237,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, OLX, experimentation, feature flags, GDPR compliance, pricing tiers",
-      "action_items": "\n**Anshul Bansal**\nConsult internal security team regarding GrowthBook integration, privacy, and compliance matters (41:07)\nDiscuss with Android and iOS teams about wider GrowthBook adoption and assess interest for upcoming follow-up meeting (41:33)\nConfirm CTO availability and decision timeline for next evaluation meeting (42:14)\nEvaluate trial of GrowthBook Pro tier for POC, focusing on sticky bucketing and narrow data scope (45:54)\n\n**Sadaf Khan**\nAssess current use of starter SDK and clarify limitations, particularly regarding sticky bucketing, to inform CTO and web team (42:37)\n\n**James Shannon**\nProvide detailed pricing breakdown and feature comparison between Starter, Pro, and Enterprise plans (30:38)\nSchedule follow-up placeholder meeting for next week including OLX CTO and mobile teams to discuss ROI and implementation (42:14)\nOffer assistance with formal POC setup for Enterprise package if OLX pursues that route (43:22)\n"
+      "action_items": "\n**Anshul Bansal**\nConsult internal security team regarding GrowthBook integration, privacy, and compliance matters (41:07)\nDiscuss with Android and iOS teams about wider GrowthBook adoption and assess interest for upcoming follow-up meeting (41:33)\nConfirm CTO availability and decision timeline for next evaluation meeting (42:14)\nEvaluate trial of GrowthBook Pro tier for POC, focusing on sticky bucketing and narrow data scope (45:54)\n\n**Sadaf Khan**\nAssess current use of starter SDK and clarify limitations, particularly regarding sticky bucketing, to inform CTO and web team (42:37)\n\n**James Shannon**\nProvide detailed pricing breakdown and feature comparison between Starter, Pro, and Enterprise plans (30:38)\nSchedule follow-up placeholder meeting for next week including OLX CTO and mobile teams to discuss ROI and implementation (42:14)\nOffer assistance with formal POC setup for Enterprise package if OLX pursues that route (43:22)\n",
+      "summary_quality": "good"
     },
     {
       "id": "69d6748cf6cdc4001574f972",
@@ -249,7 +248,8 @@
       "duration_minutes": 0,
       "summary": "[Summary failed] [Jake Heier]: Doing very well. Awesome. Appreciate you taking some time. Are we waiting for anyone else on your side? Nope, Just me. Okay, awesome. Well, to introduce myself. Oh, sorry. I got multiple",
       "host": "Jake Heier",
-      "participants": 1
+      "participants": 1,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KNKF3NH2XQ9QXPM310RWCX77",
@@ -261,7 +261,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "A/B Testing, Feature Flags, BigCommerce, JavaScript SDK, Multi-arm Bandit, Data Warehouse Integration",
-      "action_items": "\n**Jaimin Gohel**\nShare the GrowthBook demo and discussion details with the internal client team to evaluate GrowthBook versus Firebase for their A/B testing needs (36:22)\nFollow up with GrowthBook for potential purchase engagement if the client approves GrowthBook as the preferred A/B testing solution (36:22)\n\n**James Shannon**\nProvide example or more detailed resources on multi-arm bandit testing to support client understanding and decision-making (31:47)\nCoordinate additional technical discussions with GrowthBook’s data science or engineering teams if requested by the client or partner team (00:28)\n"
+      "action_items": "\n**Jaimin Gohel**\nShare the GrowthBook demo and discussion details with the internal client team to evaluate GrowthBook versus Firebase for their A/B testing needs (36:22)\nFollow up with GrowthBook for potential purchase engagement if the client approves GrowthBook as the preferred A/B testing solution (36:22)\n\n**James Shannon**\nProvide example or more detailed resources on multi-arm bandit testing to support client understanding and decision-making (31:47)\nCoordinate additional technical discussions with GrowthBook’s data science or engineering teams if requested by the client or partner team (00:28)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KNKCE7FPPY51Z9B2PPFBHM5A",
@@ -273,7 +274,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, A/B testing, self-hosting, enterprise features, programmatic ads, data pipeline optimization",
-      "action_items": "\n**Mateusz Susik**\nConsult internally with technical and business stakeholders about GrowthBook enterprise integration and pricing considerations (42:50)\nIdentify and involve key backend technical lead for the follow-up technical call (38:00)\nConfirm availability for tentative follow-up call around 3–4pm local time next week (42:45)\n\n**James Shannon**\nProvide follow-up email summarizing meeting notes, GrowthBook roadmap deck, and pricing details within the hour (42:58)\nSchedule tentative technical follow-up meeting involving GrowthBook data science/engineering team and Cosmose’s backend lead (38:00)\nPrepare case studies and ROI analyses based on other customers’ experiences with GrowthBook enterprise features (35:00)\nClarify internally about AA testing feature availability and follow up on this specific query for Mateusz (25:35)\n"
+      "action_items": "\n**Mateusz Susik**\nConsult internally with technical and business stakeholders about GrowthBook enterprise integration and pricing considerations (42:50)\nIdentify and involve key backend technical lead for the follow-up technical call (38:00)\nConfirm availability for tentative follow-up call around 3–4pm local time next week (42:45)\n\n**James Shannon**\nProvide follow-up email summarizing meeting notes, GrowthBook roadmap deck, and pricing details within the hour (42:58)\nSchedule tentative technical follow-up meeting involving GrowthBook data science/engineering team and Cosmose’s backend lead (38:00)\nPrepare case studies and ROI analyses based on other customers’ experiences with GrowthBook enterprise features (35:00)\nClarify internally about AA testing feature availability and follow up on this specific query for Mateusz (25:35)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KNK1S510YF8TVJ44K98C9Q0V",
@@ -285,7 +287,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 2,
       "keywords": "Google Meet, connection issues, technical difficulties, meeting recording, laptop error, remote access",
-      "action_items": "\n**Graham McNicoll**\nSend the Google Meet link to Mehdi via email to enable him to join the meeting from his phone due to laptop connection issues (07:41)\n\n**Mehdi**\nJoin the Google Meet session using the link sent by Graham to continue participation despite laptop issues (07:41)\n"
+      "action_items": "\n**Graham McNicoll**\nSend the Google Meet link to Mehdi via email to enable him to join the meeting from his phone due to laptop connection issues (07:41)\n\n**Mehdi**\nJoin the Google Meet session using the link sent by Graham to continue participation despite laptop issues (07:41)\n",
+      "summary_quality": "good"
     },
     {
       "id": "69d944860982410015a82003",
@@ -295,7 +298,8 @@
       "duration_minutes": 27,
       "summary": "[Summary failed] [Jake Heier]: Hey, john,\n[John Rizzo]: How's it going?\n[Jake Heier]: Good. How are you? Good.\n[John Rizzo]: Duncan's gonna be here as well.\n[Jake Heier]: Awesome. Where are you calling in from?\n[John ",
       "host": "Jake Heier",
-      "participants": 3
+      "participants": 3,
+      "summary_quality": "corrupted"
     },
     {
       "id": "69d91aa0b1fd6e0021bd705a",
@@ -305,7 +309,8 @@
       "duration_minutes": 29,
       "summary": "[Summary failed] [Charlotte Dugue]: It. Sa.\n[Jake Heier]: Hey Charlotte, how are you?\n[Charlotte Dugue]: I don't think you can see me. Yeah.\n[Jake Heier]: Now there we go.\n[Charlotte Dugue]: How you been? Okay. Are yo",
       "host": "Jake Heier",
-      "participants": 2
+      "participants": 2,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KNQVTR8Z4AHW95TV9HB389R5",
@@ -317,7 +322,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, SSO, InfoSec, enterprise trial, AB testing, feature flagging",
-      "action_items": "\n**Vinay**\nReach out to GrowthBook team if and when InfoSec raises formal authorization or SSO issues during the evaluation process (31:33)\nKeep in touch with GrowthBook team for updates or support during ongoing evaluation of GrowthBook integration (34:31)\n\n**Jake Heier**\nProvide initial two-week enterprise trial offer with SSO enabled to Vinay for pilot testing of GrowthBook (15:45)\nCoordinate evaluation preparation call with Vinay to understand use cases and build a formal trial plan (15:48)\nOffer flexible trial extension depending on evaluation progress and internal hurdles faced by Reliance team (16:37)\nAssist Vinay with navigating InfoSec and vendor management processes as needed during GrowthBook evaluation and integration (27:15)\n\n**Graham McNicoll**\nWork with Vinay to explore alternative pricing options or trial adjustments based on Reliance's cost sensitivity and constraints (22:45)\nSupport unblocking integration and compliance issues with self-hosted environment and public endpoint discussions to ease InfoSec concerns (18:33)\nProvide ongoing hand-holding and technical support to ensure trial success and eventual enterprise adoption by Reliance (14:19)\n"
+      "action_items": "\n**Vinay**\nReach out to GrowthBook team if and when InfoSec raises formal authorization or SSO issues during the evaluation process (31:33)\nKeep in touch with GrowthBook team for updates or support during ongoing evaluation of GrowthBook integration (34:31)\n\n**Jake Heier**\nProvide initial two-week enterprise trial offer with SSO enabled to Vinay for pilot testing of GrowthBook (15:45)\nCoordinate evaluation preparation call with Vinay to understand use cases and build a formal trial plan (15:48)\nOffer flexible trial extension depending on evaluation progress and internal hurdles faced by Reliance team (16:37)\nAssist Vinay with navigating InfoSec and vendor management processes as needed during GrowthBook evaluation and integration (27:15)\n\n**Graham McNicoll**\nWork with Vinay to explore alternative pricing options or trial adjustments based on Reliance's cost sensitivity and constraints (22:45)\nSupport unblocking integration and compliance issues with self-hosted environment and public endpoint discussions to ease InfoSec concerns (18:33)\nProvide ongoing hand-holding and technical support to ensure trial success and eventual enterprise adoption by Reliance (14:19)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KNYT3V6TBSTCEH8PZM89SSQ6",
@@ -329,7 +335,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "Growth Book, Enterprise Plan, Experimentation, Pricing Model, Snowflake Optimization, Customer Support",
-      "action_items": "\n**John Melia**\nCoordinate with internal stakeholders Kaushik (Senior Director of Engineering and Product) and Teresa (Chief Revenue Officer) regarding Growth Book pricing and features overview to support decision-making (23:00)\nProvide timeline for decision-making on Growth Book Enterprise adoption following resolution of current experiment implementation issues (23:00)\nEngage with agency Spiro or other auditors for implementation audit and troubleshooting of current experimentation issues such as sample ratio mismatch and user overlap (07:45)\nJoin scheduled 20-minute ROI analysis session with Growth Book next Monday at 10:30am EST to build ROI framework and discuss pricing and support options (26:15)\n\n**James Shannon**\nSend detailed Growth Book Enterprise vs Pro feature comparison and pricing deck including ROI metrics to John Melia for internal presentation and evaluation (24:00)\nSchedule and prepare framework for 20-minute ROI and experiments capacity discussion session next week with Smalls team (24:30)\nFollow up on support coordination to help Smalls resolve current experiment implementation issues including sample ratio mismatch and user overlap (07:45)\nConsider involving US-based colleague to improve accessibility and communication for Smalls due to time zone differences (26:30)\nMaintain Slack communications for ongoing support, queries, and coordination with Smalls team (24:00)\n"
+      "action_items": "\n**John Melia**\nCoordinate with internal stakeholders Kaushik (Senior Director of Engineering and Product) and Teresa (Chief Revenue Officer) regarding Growth Book pricing and features overview to support decision-making (23:00)\nProvide timeline for decision-making on Growth Book Enterprise adoption following resolution of current experiment implementation issues (23:00)\nEngage with agency Spiro or other auditors for implementation audit and troubleshooting of current experimentation issues such as sample ratio mismatch and user overlap (07:45)\nJoin scheduled 20-minute ROI analysis session with Growth Book next Monday at 10:30am EST to build ROI framework and discuss pricing and support options (26:15)\n\n**James Shannon**\nSend detailed Growth Book Enterprise vs Pro feature comparison and pricing deck including ROI metrics to John Melia for internal presentation and evaluation (24:00)\nSchedule and prepare framework for 20-minute ROI and experiments capacity discussion session next week with Smalls team (24:30)\nFollow up on support coordination to help Smalls resolve current experiment implementation issues including sample ratio mismatch and user overlap (07:45)\nConsider involving US-based colleague to improve accessibility and communication for Smalls due to time zone differences (26:30)\nMaintain Slack communications for ongoing support, queries, and coordination with Smalls team (24:00)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KNRS1S6SJZG06DGZTDY6X4CY",
@@ -341,7 +348,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, A/B Testing, Feature Flags, Data Warehouse, SDK Integration, Visual Testing",
-      "action_items": "\n**Mandy Yip**\nFollow up internally with Panama Studios to clarify their detailed A/B testing requirements and potential broader implementation scope (22:01)\nReview and utilize the GrowthBook presentation deck sent by James to prepare client pitch (21:18)\n\n**James Shannon**\nSend the GrowthBook overview presentation deck to Mandy for client pitching purposes (21:18)\nProvide further support and answer any additional questions post-internal client discussions (22:01)\n\n**George Stevanovic**\nUse GrowthBook’s documentation for the Sanity integration and advise on implementation technicalities (20:33)\n"
+      "action_items": "\n**Mandy Yip**\nFollow up internally with Panama Studios to clarify their detailed A/B testing requirements and potential broader implementation scope (22:01)\nReview and utilize the GrowthBook presentation deck sent by James to prepare client pitch (21:18)\n\n**James Shannon**\nSend the GrowthBook overview presentation deck to Mandy for client pitching purposes (21:18)\nProvide further support and answer any additional questions post-internal client discussions (22:01)\n\n**George Stevanovic**\nUse GrowthBook’s documentation for the Sanity integration and advise on implementation technicalities (20:33)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KNY5GR7SCRADNGMEZKHEDZEQ",
@@ -353,7 +361,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "A/B testing, Growth Book, Convert, experimentation, pricing, e-commerce",
-      "action_items": "\n**Jakub Rejlek**\nInitiate Growth Book Pro account testing to evaluate product fit and performance (11:09)\nDiscuss Growth Book pricing and potential investment with Marketing Director for possible Enterprise plan approval (16:22)\nCommunicate with James Shannon when ready to upgrade or require additional pricing discussions (19:17)\n\n**James Shannon**\nProvide Jakub with a detailed pricing summary and clarify differences between Pro and Enterprise packages (13:10)\nOffer to set up a proof-of-concept Enterprise trial pending budget approval to facilitate evaluation at scale (17:54)\nAwait Jakub’s email for next steps or pricing negotiation and assist with onboarding as needed (19:17)\n"
+      "action_items": "\n**Jakub Rejlek**\nInitiate Growth Book Pro account testing to evaluate product fit and performance (11:09)\nDiscuss Growth Book pricing and potential investment with Marketing Director for possible Enterprise plan approval (16:22)\nCommunicate with James Shannon when ready to upgrade or require additional pricing discussions (19:17)\n\n**James Shannon**\nProvide Jakub with a detailed pricing summary and clarify differences between Pro and Enterprise packages (13:10)\nOffer to set up a proof-of-concept Enterprise trial pending budget approval to facilitate evaluation at scale (17:54)\nAwait Jakub’s email for next steps or pricing negotiation and assist with onboarding as needed (19:17)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KNP67Y108FF7XB65E4WH8ZX2",
@@ -365,7 +374,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, experimentation, feature flagging, Amplitude, LaunchDarkly, Snowflake",
-      "action_items": "\n**Gaëlle Nordström-Schüler**\nConfirm license type and details of current LaunchDarkly usage with head of engineering to clarify migration feasibility (28:25)\nCoordinate availability of product managers and developers for a detailed GrowthBook demo follow-up session (28:51)\n\n**James Shannon**\nSend follow-up email summarizing today’s GrowthBook demo call and outline next steps (28:35)\nSchedule and prepare a detailed GrowthBook demo for Gaëlle and other Hublot team members to explore product capabilities further (28:35)\n"
+      "action_items": "\n**Gaëlle Nordström-Schüler**\nConfirm license type and details of current LaunchDarkly usage with head of engineering to clarify migration feasibility (28:25)\nCoordinate availability of product managers and developers for a detailed GrowthBook demo follow-up session (28:51)\n\n**James Shannon**\nSend follow-up email summarizing today’s GrowthBook demo call and outline next steps (28:35)\nSchedule and prepare a detailed GrowthBook demo for Gaëlle and other Hublot team members to explore product capabilities further (28:35)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KP5F7RNJDHKDYAHVDRCJ8MEE",
@@ -377,7 +387,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, Enterprise Pricing, Hyper-Casual Games, Experiment-Based Pricing, SLA, Budget Approval",
-      "action_items": "\n**Maxim Knezevic**\nCoordinate a call with the Chief of Analysts to discuss budget approval and GrowthBook’s value (20:48)\nConfirm and share the company name \"No Name Team\" for upcoming communications (34:09)\nAttend follow-up pricing and contract discussion call on Friday at 13:00 UAE time (11:00 UK time) (31:07)\n\n**James Shannon**\nInvestigate and follow up with GrowthBook support regarding metrics/dimensions bug reported by Maxim (07:10)\nDiscuss pricing adjustment options with senior management to bridge the old pricing quote and new experiment-based pricing model, considering Maxim’s team size and experiment volume (19:50)\nPrepare and present a tailored pricing proposal incorporating dropped customizations and SLA features, minimizing unused support and training (24:50)\nSchedule and conduct a detailed pricing and contract meeting with Maxim and his budget approver on Friday at 13:00 UAE time (31:07)\n"
+      "action_items": "\n**Maxim Knezevic**\nCoordinate a call with the Chief of Analysts to discuss budget approval and GrowthBook’s value (20:48)\nConfirm and share the company name \"No Name Team\" for upcoming communications (34:09)\nAttend follow-up pricing and contract discussion call on Friday at 13:00 UAE time (11:00 UK time) (31:07)\n\n**James Shannon**\nInvestigate and follow up with GrowthBook support regarding metrics/dimensions bug reported by Maxim (07:10)\nDiscuss pricing adjustment options with senior management to bridge the old pricing quote and new experiment-based pricing model, considering Maxim’s team size and experiment volume (19:50)\nPrepare and present a tailored pricing proposal incorporating dropped customizations and SLA features, minimizing unused support and training (24:50)\nSchedule and conduct a detailed pricing and contract meeting with Maxim and his budget approver on Friday at 13:00 UAE time (31:07)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KP84QGJ0ADP9S1ZFDBHZ5311",
@@ -389,7 +400,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 5,
       "keywords": "GrowthBook, A/B Testing, Conversion Rate Optimization, Visual Editor, Data Warehouse, Experimentation Platform",
-      "action_items": "\n**James Shannon**\nSend the GrowthBook presentation deck and documentation to Infinite Locus team to support their evaluation and client discussions (24:41)\nProvide access or arrangements for a demo or trial of the GrowthBook Visual Editor to Infinite Locus for hands-on evaluation (18:59)\n\n**Ankur Bhatia**\nReview the GrowthBook materials sent by James and initiate internal discussions to assess client-specific A/B testing and integration needs (24:41)\n\n**Shivam Kohli**\nCoordinate follow-up communication with James Shannon to clarify specific integration details and A/B testing requirements for Infinite Locus’s current clients (24:41)\n"
+      "action_items": "\n**James Shannon**\nSend the GrowthBook presentation deck and documentation to Infinite Locus team to support their evaluation and client discussions (24:41)\nProvide access or arrangements for a demo or trial of the GrowthBook Visual Editor to Infinite Locus for hands-on evaluation (18:59)\n\n**Ankur Bhatia**\nReview the GrowthBook materials sent by James and initiate internal discussions to assess client-specific A/B testing and integration needs (24:41)\n\n**Shivam Kohli**\nCoordinate follow-up communication with James Shannon to clarify specific integration details and A/B testing requirements for Infinite Locus’s current clients (24:41)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KNP67Y15G28PJJQZYVVY629C",
@@ -401,7 +413,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
       "keywords": "GrowthBook, A/B testing, Adobe Target, self-hosting, conversion rate optimization, data warehouse",
-      "action_items": "\n**Kim FitzGerald**\nProvide updates on details and pricing offer from Japanese team regarding Adobe Target to James Shannon (44:56)\nCoordinate internal discussions and schedule follow-up calls with GrowthBook once Adobe details are known (46:03)\n\n**James Shannon**\nPrepare and deliver Adobe Target vs. GrowthBook comparison battlecard including pricing and feature overview for Square Enix (44:56)\nOrganize and conduct a detailed GrowthBook demo session with technical team for Square Enix team, to be scheduled for next week (46:56)\nFollow up with Kim FitzGerald after her weekly meeting with Japanese team to assess progress and next steps (45:58)\n"
+      "action_items": "\n**Kim FitzGerald**\nProvide updates on details and pricing offer from Japanese team regarding Adobe Target to James Shannon (44:56)\nCoordinate internal discussions and schedule follow-up calls with GrowthBook once Adobe details are known (46:03)\n\n**James Shannon**\nPrepare and deliver Adobe Target vs. GrowthBook comparison battlecard including pricing and feature overview for Square Enix (44:56)\nOrganize and conduct a detailed GrowthBook demo session with technical team for Square Enix team, to be scheduled for next week (46:56)\nFollow up with Kim FitzGerald after her weekly meeting with Japanese team to assess progress and next steps (45:58)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KP5230TEZCRKXRC71X2KW0N6",
@@ -413,7 +426,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 5,
       "keywords": "remote config, experiment analysis, BigQuery integration, feature flagging, A/B testing, enterprise support",
-      "action_items": "\n**Shrinath Satyarthi**\nProvide GrowthBook with exact numbers for experiments per month and team size to enable accurate pricing proposal (36:41)\nReview GrowthBook’s pricing proposal and ROI model once received to inform decision making (40:24)\nCompile an evaluation document comparing Firebase and GrowthBook using shared materials and meeting transcript for internal reporting (41:03)\n\n**James Shannon**\nSend a one-page comparison document between GrowthBook and Firebase to A1apps after the call (17:31)\nPrepare and send a detailed pricing proposal including ROI metrics based on A1apps’ experiment volume and user count (40:24)\nSchedule a technical demonstration with GrowthBook’s technical team for early next week (37:24)\nArrange a separate call with Shrinath to build a customized ROI model specific to A1apps using their data (39:00)\nProvide requested documentation including presentation slides and meeting transcript for A1apps’ internal evaluation and reporting (41:00)\n"
+      "action_items": "\n**Shrinath Satyarthi**\nProvide GrowthBook with exact numbers for experiments per month and team size to enable accurate pricing proposal (36:41)\nReview GrowthBook’s pricing proposal and ROI model once received to inform decision making (40:24)\nCompile an evaluation document comparing Firebase and GrowthBook using shared materials and meeting transcript for internal reporting (41:03)\n\n**James Shannon**\nSend a one-page comparison document between GrowthBook and Firebase to A1apps after the call (17:31)\nPrepare and send a detailed pricing proposal including ROI metrics based on A1apps’ experiment volume and user count (40:24)\nSchedule a technical demonstration with GrowthBook’s technical team for early next week (37:24)\nArrange a separate call with Shrinath to build a customized ROI model specific to A1apps using their data (39:00)\nProvide requested documentation including presentation slides and meeting transcript for A1apps’ internal evaluation and reporting (41:00)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KPAW83P9PK6TX8XK2EX7G79S",
@@ -425,7 +439,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, A/B testing, paywall, RevenueCat, Postgres, sticky bucketing",
-      "action_items": "\n**Lukasz Korona**\nExplore GrowthBook documentation in detail and begin integration of GrowthBook SDK into existing frontend and backend environments (21:10)\nSet up initial A/B tests focusing on paywall messaging and pricing on the web application (05:07)\n\n**James Shannon**\nProvide guidance on GrowthBook MCP server configuration URL and related documentation to Lukasz (20:15)\nExplore possibilities to offer limited consulting or analysis services tailored to smaller organizations/startups outside of enterprise contract (18:47)\n"
+      "action_items": "\n**Lukasz Korona**\nExplore GrowthBook documentation in detail and begin integration of GrowthBook SDK into existing frontend and backend environments (21:10)\nSet up initial A/B tests focusing on paywall messaging and pricing on the web application (05:07)\n\n**James Shannon**\nProvide guidance on GrowthBook MCP server configuration URL and related documentation to Lukasz (20:15)\nExplore possibilities to offer limited consulting or analysis services tailored to smaller organizations/startups outside of enterprise contract (18:47)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KMMQRECGJS78YKQ02BTY8KW3",
@@ -437,7 +452,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "TRR, GrowthBook, A/B Testing, GDPR Compliance, Self-Hosting, Experimentation Tooling",
-      "action_items": "\n**Ola Andersson**\nMake an internal decision by Monday on whether to purchase an A/B testing tool (12:23)\nPrepare and share a requirements list and decision criteria focused on price, GDPR compliance, data storage, and feature needs for tool evaluation (18:35)\nReview GrowthBook’s pricing and feature comparison materials to assess suitability (34:31)\nSchedule follow-up meeting with James Shannon for Friday next week to discuss evaluation progress and materials (36:59)\n\n**James Shannon**\nProvide Ola with side-by-side comparison documents between GrowthBook and competitors like Optimizely, Statsig, and LaunchDarkly (31:08)\nShare details on GrowthBook enterprise features including SSO, onboarding, training, and advanced statistics capabilities (25:28)\nExplain AI features and data privacy details including opt-out options to address client concerns (27:00)\nOutline GrowthBook pricing for cloud and self-hosted setups with no usage fees and custom onboarding (29:26)\nSend follow-up agenda and tailored comparison content ahead of the Friday call (37:01)\n"
+      "action_items": "\n**Ola Andersson**\nMake an internal decision by Monday on whether to purchase an A/B testing tool (12:23)\nPrepare and share a requirements list and decision criteria focused on price, GDPR compliance, data storage, and feature needs for tool evaluation (18:35)\nReview GrowthBook’s pricing and feature comparison materials to assess suitability (34:31)\nSchedule follow-up meeting with James Shannon for Friday next week to discuss evaluation progress and materials (36:59)\n\n**James Shannon**\nProvide Ola with side-by-side comparison documents between GrowthBook and competitors like Optimizely, Statsig, and LaunchDarkly (31:08)\nShare details on GrowthBook enterprise features including SSO, onboarding, training, and advanced statistics capabilities (25:28)\nExplain AI features and data privacy details including opt-out options to address client concerns (27:00)\nOutline GrowthBook pricing for cloud and self-hosted setups with no usage fees and custom onboarding (29:26)\nSend follow-up agenda and tailored comparison content ahead of the Friday call (37:01)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KPBF6M2MGH7DN417FFR8XYHZ",
@@ -449,7 +465,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
       "keywords": "GrowthBook, A/B Testing, Open Source, BigQuery, Feature Flags, Experimentation Culture",
-      "action_items": "\n**James Shannon**\nProvide detailed updated information on upcoming pricing changes and experiment limitations for open source and Pro tiers before next call (39:27)\nOrganize and lead a technical product demonstration covering setup, experiment creation, and deliver an enterprise pricing proposal (37:13)\n\n**Amin Ojani**\nConfirm calendar availability for the technical demonstration on Thursday at 16:00 local time (40:02)\nCoordinate internal review of GrowthBook’s fit and prioritization of use cases with his team (27:06)\n\n**Huijie Wang and Sara Brändström**\nPrepare any technical questions or specific evaluation criteria ahead of the next product demo call (41:26)\n"
+      "action_items": "\n**James Shannon**\nProvide detailed updated information on upcoming pricing changes and experiment limitations for open source and Pro tiers before next call (39:27)\nOrganize and lead a technical product demonstration covering setup, experiment creation, and deliver an enterprise pricing proposal (37:13)\n\n**Amin Ojani**\nConfirm calendar availability for the technical demonstration on Thursday at 16:00 local time (40:02)\nCoordinate internal review of GrowthBook’s fit and prioritization of use cases with his team (27:06)\n\n**Huijie Wang and Sara Brändström**\nPrepare any technical questions or specific evaluation criteria ahead of the next product demo call (41:26)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KPNHA85YKJBY9AZ8WVC7B3FP",
@@ -461,7 +478,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, Experimentation, Conversion Rate, Shopify Integration, Feature Flags, CRO",
-      "action_items": "\n**James Shannon**\nSend the presentation slides and Shopify SDK documentation to Miragio and Optifinix teams (30:27)\nProvide access to GrowthBook open source and assist with account creation and initial setup guidance (30:27)\nRespond to any follow-up technical or feature questions via email post-meeting (30:27)\n\n**Miragio Team**\nReview GrowthBook features, especially comparing to current CRO tool (convert.com) and determine feature needs per Himanshu’s input (12:56)\nEvaluate GrowthBook free/open source version by creating an account and starting implementation tests (29:31)\nCoordinate internally with brand head (budget holder) to decide on subscription plan option post-evaluation (10:31)\n\n**Kamal Sahni**\nAsk targeted questions regarding deep experiment integrations especially relating to Shopify custom checkout and session persistence (12:59)\nConsider integration of GrowthBook with existing Shopify setup and potential future BigQuery data warehouse (23:24)\nCommunicate experimental requirements and technical queries to GrowthBook and internal teams to decide on technical feasibility (12:56)\n\n**Himanshu Gaur**\nLead evaluation of GrowthBook capabilities for sustaining 50+ experiments annually and compare with convert.com functionalities (11:47)\nCoordinate decision-making process with Miragio CRO and brand leads regarding tool adoption and budget allocation (10:31)\n"
+      "action_items": "\n**James Shannon**\nSend the presentation slides and Shopify SDK documentation to Miragio and Optifinix teams (30:27)\nProvide access to GrowthBook open source and assist with account creation and initial setup guidance (30:27)\nRespond to any follow-up technical or feature questions via email post-meeting (30:27)\n\n**Miragio Team**\nReview GrowthBook features, especially comparing to current CRO tool (convert.com) and determine feature needs per Himanshu’s input (12:56)\nEvaluate GrowthBook free/open source version by creating an account and starting implementation tests (29:31)\nCoordinate internally with brand head (budget holder) to decide on subscription plan option post-evaluation (10:31)\n\n**Kamal Sahni**\nAsk targeted questions regarding deep experiment integrations especially relating to Shopify custom checkout and session persistence (12:59)\nConsider integration of GrowthBook with existing Shopify setup and potential future BigQuery data warehouse (23:24)\nCommunicate experimental requirements and technical queries to GrowthBook and internal teams to decide on technical feasibility (12:56)\n\n**Himanshu Gaur**\nLead evaluation of GrowthBook capabilities for sustaining 50+ experiments annually and compare with convert.com functionalities (11:47)\nCoordinate decision-making process with Miragio CRO and brand leads regarding tool adoption and budget allocation (10:31)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KPANGXBWEJNQSA1VRWB10H8Q",
@@ -473,7 +491,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "Experimentation, GrowthBook, Data Warehouse, Feature Flags, Product Analytics, BI Bottleneck",
-      "action_items": "\n**Edd Saunders**\nFollow up immediately after the call with the user acquisition lead Kuba and head of marketing Lars to discuss GrowthBook and gather their interest (43:05)\nDecide internally on plan and approval process for GrowthBook adoption and update James accordingly (44:44)\nDetermine if Kuba and head of marketing want to join the next GrowthBook analytics demo call and coordinate their attendance (45:50)\n\n**James Shannon**\nSchedule next call with GrowthBook’s technical team focusing on full product analytics demo, preferably on Friday afternoon (45:18)\nProvide post-call follow-up email with demo information and next steps to Edd Saunders (46:11)\nPrepare to present product analytics demo in detail with technical support within next 1-2 days (39:14)\n"
+      "action_items": "\n**Edd Saunders**\nFollow up immediately after the call with the user acquisition lead Kuba and head of marketing Lars to discuss GrowthBook and gather their interest (43:05)\nDecide internally on plan and approval process for GrowthBook adoption and update James accordingly (44:44)\nDetermine if Kuba and head of marketing want to join the next GrowthBook analytics demo call and coordinate their attendance (45:50)\n\n**James Shannon**\nSchedule next call with GrowthBook’s technical team focusing on full product analytics demo, preferably on Friday afternoon (45:18)\nProvide post-call follow-up email with demo information and next steps to Edd Saunders (46:11)\nPrepare to present product analytics demo in detail with technical support within next 1-2 days (39:14)\n",
+      "summary_quality": "good"
     },
     {
       "id": "69e93ffa0ea5f0001161aac3",
@@ -483,7 +502,8 @@
       "duration_minutes": 39,
       "summary": "[Summary failed] [Chris Link]: Hey, Scott.\n[Scott Keller]: Hey, Chris. How are you?\n[Chris Link]: I'm good. How are you doing?\n[Scott Keller]: Great, thanks. Hey, Sam. Hi, guys.\n[Chris Link]: Thanks for joining. Thank",
       "host": "Scott Keller",
-      "participants": 4
+      "participants": 4,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KPN87RGNJ1C9S4DDEZTWGW7D",
@@ -495,7 +515,8 @@
       "organizer": "christian@growthbook.io",
       "participants": 3,
       "keywords": "meeting recording, scheduling, meeting invite, technical issues, call coordination, participant communication",
-      "action_items": "\n**Christian Liebenow**\nSend a note to the participant who declined attendance to ask for a better meeting time and propose rescheduling (03:23)\n\n**Logan Bates**\nAccept the meeting invite and resolve any technical issues related to laptops and meeting invitations to avoid confusion (02:18)\n"
+      "action_items": "\n**Christian Liebenow**\nSend a note to the participant who declined attendance to ask for a better meeting time and propose rescheduling (03:23)\n\n**Logan Bates**\nAccept the meeting invite and resolve any technical issues related to laptops and meeting invitations to avoid confusion (02:18)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KP90W19ANHTVE54BAVSSW0HX",
@@ -507,7 +528,8 @@
       "organizer": "christian@growthbook.io",
       "participants": 2,
       "keywords": "A/B testing, nonprofit arts organizations, GrowthBook, Pricing tiers, Visual editor, Agency client onboarding",
-      "action_items": "\n**Yosaif Cohain**\nIdentify and engage clients to trial GrowthBook’s Pro plan for A/B testing, starting with the client currently using Mida, and evaluate their experience (17:30)\nCommunicate with GrowthBook on developing case studies if the client trials prove successful to support scaling and enterprise onboarding (22:54)\nMaintain email communication with Christian Liebenow for ongoing support, questions, and next steps regarding GrowthBook adoption (23:22)\n\n**Christian Liebenow**\nProvide joint demos to Yosaif’s clients interested in GrowthBook, particularly the client currently using Mida, to facilitate onboarding and adoption (18:53)\nSupport onboarding for non-technical users by emphasizing GrowthBook’s visual editor designed for simple experiment creation without developer involvement (20:16)\nProvide additional product and pricing details if Yosaif wishes to explore GrowthBook Enterprise plans as client base grows (15:40)\nMaintain email contact and offer potential Slack channel for ongoing client support and quicker communication (23:22)\n"
+      "action_items": "\n**Yosaif Cohain**\nIdentify and engage clients to trial GrowthBook’s Pro plan for A/B testing, starting with the client currently using Mida, and evaluate their experience (17:30)\nCommunicate with GrowthBook on developing case studies if the client trials prove successful to support scaling and enterprise onboarding (22:54)\nMaintain email communication with Christian Liebenow for ongoing support, questions, and next steps regarding GrowthBook adoption (23:22)\n\n**Christian Liebenow**\nProvide joint demos to Yosaif’s clients interested in GrowthBook, particularly the client currently using Mida, to facilitate onboarding and adoption (18:53)\nSupport onboarding for non-technical users by emphasizing GrowthBook’s visual editor designed for simple experiment creation without developer involvement (20:16)\nProvide additional product and pricing details if Yosaif wishes to explore GrowthBook Enterprise plans as client base grows (15:40)\nMaintain email contact and offer potential Slack channel for ongoing client support and quicker communication (23:22)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KP3XHCEGQ9WCZ4CTP9AB9HZZ",
@@ -519,7 +541,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, feature flagging, experimentation, product analytics, BigQuery integration, zero-to-one product",
-      "action_items": "\n**Isha Dhiman**\nShare GrowthBook presentation and documentation with Ninox's engineering and BI teams for technical assessment (21:20)\nGuide internal teams to review GrowthBook’s fit through documentation and website, and gather feedback for next steps (22:50)\nExperiment with GrowthBook’s starter/freemium tier to evaluate platform capabilities (23:04)\n\n**James Shannon**\nProvide presentation materials and highlight key documentation to Isha for internal evaluation (21:20)\nSupport onboarding by guiding Isha to relevant GrowthBook documentation sections, including AI help features for experimentation (23:50)\n"
+      "action_items": "\n**Isha Dhiman**\nShare GrowthBook presentation and documentation with Ninox's engineering and BI teams for technical assessment (21:20)\nGuide internal teams to review GrowthBook’s fit through documentation and website, and gather feedback for next steps (22:50)\nExperiment with GrowthBook’s starter/freemium tier to evaluate platform capabilities (23:04)\n\n**James Shannon**\nProvide presentation materials and highlight key documentation to Isha for internal evaluation (21:20)\nSupport onboarding by guiding Isha to relevant GrowthBook documentation sections, including AI help features for experimentation (23:50)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KPTEKXNX62JDJZ9Q6FYQV4BY",
@@ -531,7 +554,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "A/B testing, CRO, GrowthBook, Interaction Studio, self-hosting, product analytics",
-      "action_items": "\n**Madhurima Kashyap**\nConfirm availability for a follow-up technical walkthrough of GrowthBook next Thursday at the same time (28:55)\nShare internal research and considerations regarding cybersecurity and integration specifics to clarify constraints (27:22)\nCirculate GrowthBook’s product deck and comparison with other vendors internally for team review (30:52)\nIdentify and invite relevant CRM/CDP team members and technical stakeholders for the next demo session (29:32)\n\n**James Shannon**\nSchedule and send calendar invite for the technical demo next Thursday (29:22)\nProvide detailed vendor comparison documents tailored to competitors Royal Enfield is evaluating (Adobe Target, AB Smartly) (29:42)\nPrepare a demo focusing on ease of use, reporting capabilities, implementation process, and self-hosting solution addressing cybersecurity concerns (27:34)\nShare summary email and product presentation deck with Madhurima post-call (29:32)\n"
+      "action_items": "\n**Madhurima Kashyap**\nConfirm availability for a follow-up technical walkthrough of GrowthBook next Thursday at the same time (28:55)\nShare internal research and considerations regarding cybersecurity and integration specifics to clarify constraints (27:22)\nCirculate GrowthBook’s product deck and comparison with other vendors internally for team review (30:52)\nIdentify and invite relevant CRM/CDP team members and technical stakeholders for the next demo session (29:32)\n\n**James Shannon**\nSchedule and send calendar invite for the technical demo next Thursday (29:22)\nProvide detailed vendor comparison documents tailored to competitors Royal Enfield is evaluating (Adobe Target, AB Smartly) (29:42)\nPrepare a demo focusing on ease of use, reporting capabilities, implementation process, and self-hosting solution addressing cybersecurity concerns (27:34)\nShare summary email and product presentation deck with Madhurima post-call (29:32)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KPV1932YTATY4VWKW8RF4596",
@@ -543,7 +567,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
       "keywords": "GrowthBook, Enterprise Plan, CDN Usage Limit, Self-hosting, A/B Testing, User Seats",
-      "action_items": "\n**Joseph Lion**\nReview product documentation and self-hosting requirements before Monday’s follow-up meeting (21:45)\nProvide finalized numbers on expected monthly experiments and user seats to James for pricing preparation (17:45)\nConfirm with client stakeholders the preferred GrowthBook plan and readiness to move forward by Monday meeting (24:30)\n\n**James Shannon**\nVerify and confirm billing and over-usage policy regarding CDN usage on paid tiers (22:50)\nPrepare and provide enterprise pricing options based on number of users and experiments discussed (16:00)\nSchedule follow-up call for Monday 11:00 AM and be ready to discuss enterprise and self-hosted options (20:25)\n\n**Unassigned**\nPossibly involve a developer in Monday’s call for technical discussion on self-hosting (24:23)\n"
+      "action_items": "\n**Joseph Lion**\nReview product documentation and self-hosting requirements before Monday’s follow-up meeting (21:45)\nProvide finalized numbers on expected monthly experiments and user seats to James for pricing preparation (17:45)\nConfirm with client stakeholders the preferred GrowthBook plan and readiness to move forward by Monday meeting (24:30)\n\n**James Shannon**\nVerify and confirm billing and over-usage policy regarding CDN usage on paid tiers (22:50)\nPrepare and provide enterprise pricing options based on number of users and experiments discussed (16:00)\nSchedule follow-up call for Monday 11:00 AM and be ready to discuss enterprise and self-hosted options (20:25)\n\n**Unassigned**\nPossibly involve a developer in Monday’s call for technical discussion on self-hosting (24:23)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KPSNQZ9NRT5R4M66FQ2KM5G2",
@@ -555,7 +580,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, feature flags, A/B testing, visual editor, data integration, experimentation platform",
-      "action_items": "\n**Jamie**\nShare the development environment URL with Graham for demo purposes to facilitate technical setup and support (16:14)\nInitiate internal discussions with Nathan and Lauren to identify initial simple experiments such as CTA button position changes for the Instadox product (22:22)\nTrial the GrowthBook platform for one month to evaluate its fit and functionality within the team’s workflow (21:43)\n\n**Nathan**\nCollaborate with Jamie and Lauren to define specific experimentation goals and initial tests to optimize UI and feature rollouts (22:22)\n\n**Lauren**\nAssist Jamie and Nathan in selecting and prioritizing features or UI elements for experimentation to ensure effective test coverage (22:22)\n\n**Graham McNicoll**\nProvide ongoing technical support and respond to questions during the GrowthBook trial period to ensure smooth adoption and troubleshooting (34:43)\nShare documentation and resources for SDK installation and environment setup to facilitate quick onboarding and integration (25:11)\nContinue improving the visual editor tool and communicate updates as they become available to enhance user experience and functionality (16:05)\n"
+      "action_items": "\n**Jamie**\nShare the development environment URL with Graham for demo purposes to facilitate technical setup and support (16:14)\nInitiate internal discussions with Nathan and Lauren to identify initial simple experiments such as CTA button position changes for the Instadox product (22:22)\nTrial the GrowthBook platform for one month to evaluate its fit and functionality within the team’s workflow (21:43)\n\n**Nathan**\nCollaborate with Jamie and Lauren to define specific experimentation goals and initial tests to optimize UI and feature rollouts (22:22)\n\n**Lauren**\nAssist Jamie and Nathan in selecting and prioritizing features or UI elements for experimentation to ensure effective test coverage (22:22)\n\n**Graham McNicoll**\nProvide ongoing technical support and respond to questions during the GrowthBook trial period to ensure smooth adoption and troubleshooting (34:43)\nShare documentation and resources for SDK installation and environment setup to facilitate quick onboarding and integration (25:11)\nContinue improving the visual editor tool and communicate updates as they become available to enhance user experience and functionality (16:05)\n",
+      "summary_quality": "good"
     },
     {
       "id": "69efc120351151001919455a",
@@ -565,7 +591,8 @@
       "duration_minutes": 34,
       "summary": "[Summary failed] [Logan Bates]: Sam.\n[Jake Heier]: Hey Spencer, how are you? Pretty good, how are you doing well, thanks for joining.\n[Logan Bates]: Hey Cat, how's it going?\n[Jake Heier]: Good, how are you?\n[Katherine",
       "host": "Jake Heier",
-      "participants": 6
+      "participants": 6,
+      "summary_quality": "corrupted"
     },
     {
       "id": "69f0fb0c7a7f2500157dc6a6",
@@ -575,7 +602,8 @@
       "duration_minutes": 23,
       "summary": "[Summary failed] [Daniel Wathne]: Recording in progress. Hey Geneva, how you doing?\n[Srinivas Aripirala]: Sorry. Are you able to see me yet?\n[Daniel Wathne]: Yeah, yeah, yeah, I can see you. How are you? It's nice to ",
       "host": "Daniel Wathne",
-      "participants": 2
+      "participants": 2,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KQ57J25FG6HJ1JN0V111YAGA",
@@ -587,7 +615,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 5,
       "keywords": "GrowthBook, A/B testing, feature flags, UX design, frontend experimentation, data privacy",
-      "action_items": "\n**Liam Bailey**\nCoordinate internal stakeholders including Phil Jenkins, Anna, and John Dawes to join the follow-up GrowthBook demo scheduled for Wednesday 6th at 4 PM UK time (53:47)\n\n**Carl Dix**\nParticipate in the next GrowthBook demo focused on the visual editor and discuss experiment setup specifics from a UX/design perspective (53:47)\n\n**Scott Keller**\nSend calendar invite for the follow-up GrowthBook demo on Wednesday 6th at 4 PM UK time (56:56)\nPrepare and coordinate with the solution engineer to showcase GrowthBook’s visual editor and front-end UX-centric tools in the next session (28:40)\nProvide a recap of today's demo along with notes on visual editor capabilities to all attendees (56:06)\n\n**John Dawes**\nContinue refining identifier management strategy to ensure privacy-compliant, consistent user bucketing across devices and sessions in preparation for GrowthBook integration (26:23)\n\n**Phil Jenkins**\nParticipate in both current and follow-up sessions to evaluate UX designer use cases in GrowthBook experimentation (54:00)\n"
+      "action_items": "\n**Liam Bailey**\nCoordinate internal stakeholders including Phil Jenkins, Anna, and John Dawes to join the follow-up GrowthBook demo scheduled for Wednesday 6th at 4 PM UK time (53:47)\n\n**Carl Dix**\nParticipate in the next GrowthBook demo focused on the visual editor and discuss experiment setup specifics from a UX/design perspective (53:47)\n\n**Scott Keller**\nSend calendar invite for the follow-up GrowthBook demo on Wednesday 6th at 4 PM UK time (56:56)\nPrepare and coordinate with the solution engineer to showcase GrowthBook’s visual editor and front-end UX-centric tools in the next session (28:40)\nProvide a recap of today's demo along with notes on visual editor capabilities to all attendees (56:06)\n\n**John Dawes**\nContinue refining identifier management strategy to ensure privacy-compliant, consistent user bucketing across devices and sessions in preparation for GrowthBook integration (26:23)\n\n**Phil Jenkins**\nParticipate in both current and follow-up sessions to evaluate UX designer use cases in GrowthBook experimentation (54:00)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KPX05FBW4ME8WZMC11H3SNYK",
@@ -599,7 +628,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "A/B Testing, Server-Side Testing, Personalization, Shopify SDK, BigQuery Integration, AI-Powered Analytics",
-      "action_items": "\n**Jakob Halm**\nReview technical documentation on GrowthBook’s BigQuery and server-side integration once received (30:56)\nCoordinate with engineering team for a technical demo planned for May 19th and invite relevant participants (32:44)\n\n**James Shannon**\nSend Jakob a detailed email with technical documentation concerning GrowthBook’s Shopify, GTM, BigQuery, and Etracker integrations (30:59)\nSchedule a technical demo for Jakob’s engineering team on Tuesday, May 19th, and prepare for technical walkthrough (32:37)\nProvide case studies and documentation to Jakob about GrowthBook’s adoption by similar companies, including analytics and AI capabilities (14:06)\n"
+      "action_items": "\n**Jakob Halm**\nReview technical documentation on GrowthBook’s BigQuery and server-side integration once received (30:56)\nCoordinate with engineering team for a technical demo planned for May 19th and invite relevant participants (32:44)\n\n**James Shannon**\nSend Jakob a detailed email with technical documentation concerning GrowthBook’s Shopify, GTM, BigQuery, and Etracker integrations (30:59)\nSchedule a technical demo for Jakob’s engineering team on Tuesday, May 19th, and prepare for technical walkthrough (32:37)\nProvide case studies and documentation to Jakob about GrowthBook’s adoption by similar companies, including analytics and AI capabilities (14:06)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KQA6NBK5R88XCZZ12QDVRCPW",
@@ -611,7 +641,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, AB Testing, Firebase, Experimentation, ROI, Pricing Negotiation",
-      "action_items": "\n**Ravindra Kharat**\nReview GrowthBook’s capabilities and pricing presentation with management by next week (32:08)\nCoordinate with analytics and engineering teams to gather data and discuss internal ROI justification (33:00)\nSchedule and arrange a technical demo for A1 Apps’ technical team after management approval (29:14)\nProvide feedback and next steps to GrowthBook based on management’s input (29:31)\n\n**James Shannon**\nSend GrowthBook’s capabilities presentation, pricing proposal, and ROI model deck within the same day (29:31)\nOffer assistance to refine ROI model with A1 Apps’ internal data to strengthen business case (33:50)\nPrepare for and conduct technical demo with A1 Apps’ engineering team upon Ravindra’s confirmation (29:14)\nBe open to pricing negotiation based on A1 Apps’ startup budget constraints (27:55)\n"
+      "action_items": "\n**Ravindra Kharat**\nReview GrowthBook’s capabilities and pricing presentation with management by next week (32:08)\nCoordinate with analytics and engineering teams to gather data and discuss internal ROI justification (33:00)\nSchedule and arrange a technical demo for A1 Apps’ technical team after management approval (29:14)\nProvide feedback and next steps to GrowthBook based on management’s input (29:31)\n\n**James Shannon**\nSend GrowthBook’s capabilities presentation, pricing proposal, and ROI model deck within the same day (29:31)\nOffer assistance to refine ROI model with A1 Apps’ internal data to strengthen business case (33:50)\nPrepare for and conduct technical demo with A1 Apps’ engineering team upon Ravindra’s confirmation (29:14)\nBe open to pricing negotiation based on A1 Apps’ startup budget constraints (27:55)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KQCJR5YBYKV7BQ8YQ85CAVK8",
@@ -623,7 +654,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "A/B Testing, Feature Flags, Personalization, Server-Side Experimentation, AI Integration, Digital Transformation",
-      "action_items": "\n**Nisha Morris**\nProvide average order value and lifetime value data to support evaluation of experimentation impact (14:37)\nOrganize attendance for the upcoming demo, ensuring participation from marketing, engineering heads, and relevant managers, and confirm internal stakeholders’ availability (33:41)\nClarify the backend data warehouse technology used by Leica Digital to confirm GrowthBook integration feasibility (22:37)\nShare meeting follow-ups and ensure Yasswant’s email inclusion and involvement in ongoing communication (37:15)\n\n**James Shannon**\nSend detailed documentation package comparing GrowthBook with Adobe Target and Optimizely, including telco-specific use cases, feature flag capabilities, server-side experimentation details, and AI integration examples (18:00)\nSchedule and send calendar invites for the demo meeting planned for Wednesday next week, 11:30–12:30 UK time, accommodating stakeholders in India and Dubai (33:58)\n"
+      "action_items": "\n**Nisha Morris**\nProvide average order value and lifetime value data to support evaluation of experimentation impact (14:37)\nOrganize attendance for the upcoming demo, ensuring participation from marketing, engineering heads, and relevant managers, and confirm internal stakeholders’ availability (33:41)\nClarify the backend data warehouse technology used by Leica Digital to confirm GrowthBook integration feasibility (22:37)\nShare meeting follow-ups and ensure Yasswant’s email inclusion and involvement in ongoing communication (37:15)\n\n**James Shannon**\nSend detailed documentation package comparing GrowthBook with Adobe Target and Optimizely, including telco-specific use cases, feature flag capabilities, server-side experimentation details, and AI integration examples (18:00)\nSchedule and send calendar invites for the demo meeting planned for Wednesday next week, 11:30–12:30 UK time, accommodating stakeholders in India and Dubai (33:58)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KQA13C3NP4RE40JXDR7DC19C",
@@ -635,7 +667,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "Feature Flagging, GrowthBook, Integration, Audit Logs, Scalability, Compliance",
-      "action_items": "\n**James Shannon**\nSend GrowthBook documentation, demo videos, and relevant materials to Maulik Koshti by end of day (39:12)\nProvide documentation on lambda edge and microservices integration to Maulik Koshti (22:53)\nConfirm whether bulk feature flag promotion via API or scripts is possible and follow up with Maulik Koshti (33:48)\nClarify ISO 27001 compliance status and share the information with Maulik Koshti (36:17)\nSchedule a detailed technical demo with GrowthBook’s team for the week following the meeting at agreed time (14:00 or 16:00 CET) (39:10)\n\n**Maulik Koshti**\nReview the shared GrowthBook documentation and evaluate the platform’s features and architecture (39:12)\nParticipate in the scheduled technical demo session with GrowthBook’s team next week (38:17)\nProvide details on Ikano Bank’s decision process and timeline to assist GrowthBook’s preparation (37:06)\n"
+      "action_items": "\n**James Shannon**\nSend GrowthBook documentation, demo videos, and relevant materials to Maulik Koshti by end of day (39:12)\nProvide documentation on lambda edge and microservices integration to Maulik Koshti (22:53)\nConfirm whether bulk feature flag promotion via API or scripts is possible and follow up with Maulik Koshti (33:48)\nClarify ISO 27001 compliance status and share the information with Maulik Koshti (36:17)\nSchedule a detailed technical demo with GrowthBook’s team for the week following the meeting at agreed time (14:00 or 16:00 CET) (39:10)\n\n**Maulik Koshti**\nReview the shared GrowthBook documentation and evaluate the platform’s features and architecture (39:12)\nParticipate in the scheduled technical demo session with GrowthBook’s team next week (38:17)\nProvide details on Ikano Bank’s decision process and timeline to assist GrowthBook’s preparation (37:06)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KQMNY9QYDHB1T1TEEVR9M9D6",
@@ -647,7 +680,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, Feature Flagging, Experimentation Platform, Data Warehouse Integration, Bayesian Statistics, Enterprise Trial",
-      "action_items": "\n**Scott Keller**\nSend a follow-up email including the demo recording, documentation, AI assistant links, and additional resources to support Swipe's evaluation (45:09)\nRequest detailed information about Swipe's current technology stack and tools to assess integration feasibility with GrowthBook (42:46)\nArrange a further demo and deep dive session with additional product teams at Swipe after receiving internal feedback (45:09)\nProvide commercial pricing details and enterprise trial information tailored to Swipe's volume of experiments to support decision making (27:22)\n\n**Artem Kachalov**\nShare specifics of the current site feature flag manager and list of technical tools used at Swipe to aid integration planning (12:17)\nCollect internal feedback and requirements from different product teams during upcoming meetings this week to inform GrowthBook evaluation (43:13)\nIntroduce Scott Keller to other stakeholders and leadership at Swipe after further internal evaluation to facilitate deeper engagement (45:09)\n"
+      "action_items": "\n**Scott Keller**\nSend a follow-up email including the demo recording, documentation, AI assistant links, and additional resources to support Swipe's evaluation (45:09)\nRequest detailed information about Swipe's current technology stack and tools to assess integration feasibility with GrowthBook (42:46)\nArrange a further demo and deep dive session with additional product teams at Swipe after receiving internal feedback (45:09)\nProvide commercial pricing details and enterprise trial information tailored to Swipe's volume of experiments to support decision making (27:22)\n\n**Artem Kachalov**\nShare specifics of the current site feature flag manager and list of technical tools used at Swipe to aid integration planning (12:17)\nCollect internal feedback and requirements from different product teams during upcoming meetings this week to inform GrowthBook evaluation (43:13)\nIntroduce Scott Keller to other stakeholders and leadership at Swipe after further internal evaluation to facilitate deeper engagement (45:09)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KQCZ2P7TN19TJES8NG61GFFY",
@@ -659,7 +693,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 6,
       "keywords": "A/B Testing, Feature Flags, Statistical Significance, Experimentation, Growth Book, Data Warehouse Integration",
-      "action_items": "\n**Utpal Dey**\nSign up for Growth Book free trial to explore dashboard and product capabilities (30:30)\nEvaluate Growth Book Professional tier features and pricing for initial experimentation use (31:23)\n\n**James Shannon**\nProvide email support for any follow-up questions on tier differences and setup process (30:56)\n\n**BigHaat Team**\nReview internal experimentation requirements and prepare for next meeting to discuss Growth Book demo and implementation details (31:27)\n"
+      "action_items": "\n**Utpal Dey**\nSign up for Growth Book free trial to explore dashboard and product capabilities (30:30)\nEvaluate Growth Book Professional tier features and pricing for initial experimentation use (31:23)\n\n**James Shannon**\nProvide email support for any follow-up questions on tier differences and setup process (30:56)\n\n**BigHaat Team**\nReview internal experimentation requirements and prepare for next meeting to discuss Growth Book demo and implementation details (31:27)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KQEPK1AJX2V6D99SEATS762V",
@@ -671,7 +706,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, A/B Testing, Enterprise Plan, Holdout Groups, Pricing Model, Experimentation Scale",
-      "action_items": "\n**James Shannon**\nSend Fixer case study to AirHelp team immediately after this meeting to provide a relevant example of scaling experimentation (39:10)\nFollow up with an email explaining feature value simulation details for GrowthBook to clarify benefits of Enterprise features (17:28)\nCreate and share a tailored presentation including value-based pricing and case studies to support AirHelp's internal advocacy for upgrading to Enterprise plan (35:08)\nSchedule and conduct a 30-minute follow-up meeting on Thursday 7th between 11 am and 12 pm UK time to review presentation and pricing proposal with AirHelp team and additional stakeholders (37:34)\n\n**Pedro Duque**\nVerify participation of relevant stakeholders including CPO, CMO, and possibly CTO for approval process to ensure decision-making alignment (29:02)\nInvite relevant team members to join the follow-up call to maximize benefit and ensure comprehensive discussion (38:30)\nCollaborate internally to align different project expectations and revenue estimates influenced by GrowthBook experiments to inform pricing discussion (28:01)\n\n**Ahmed Teailab**\nConfirm availability for the follow-up call with James scheduled on Thursday 7th to ensure participation and continuity (38:25)\n"
+      "action_items": "\n**James Shannon**\nSend Fixer case study to AirHelp team immediately after this meeting to provide a relevant example of scaling experimentation (39:10)\nFollow up with an email explaining feature value simulation details for GrowthBook to clarify benefits of Enterprise features (17:28)\nCreate and share a tailored presentation including value-based pricing and case studies to support AirHelp's internal advocacy for upgrading to Enterprise plan (35:08)\nSchedule and conduct a 30-minute follow-up meeting on Thursday 7th between 11 am and 12 pm UK time to review presentation and pricing proposal with AirHelp team and additional stakeholders (37:34)\n\n**Pedro Duque**\nVerify participation of relevant stakeholders including CPO, CMO, and possibly CTO for approval process to ensure decision-making alignment (29:02)\nInvite relevant team members to join the follow-up call to maximize benefit and ensure comprehensive discussion (38:30)\nCollaborate internally to align different project expectations and revenue estimates influenced by GrowthBook experiments to inform pricing discussion (28:01)\n\n**Ahmed Teailab**\nConfirm availability for the follow-up call with James scheduled on Thursday 7th to ensure participation and continuity (38:25)\n",
+      "summary_quality": "good"
     },
     {
       "id": "69fb5d90cc6bab00219d4603",
@@ -681,7 +717,8 @@
       "duration_minutes": 25,
       "summary": "[Summary failed] [Daniel Wathne]: Recording in progress.\n[Vaida Maksims]: It. Hello, Dan.\n[Daniel Wathne]: Hi. How you doing?\n[Vaida Maksims]: How. Yeah, I'm good. How are you?\n[Daniel Wathne]: I'm good. Am I pronounc",
       "host": "Daniel Wathne",
-      "participants": 3
+      "participants": 3,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KQY82BCNBC05QRAWSAYZQK6R",
@@ -693,7 +730,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, A/B Testing, Warehouse-Native, BigQuery, Pricing Model, Experiment Transparency",
-      "action_items": "\n**James Shannon**\nShare meeting recording, slide decks, case studies, and pricing proposal with Shaun after the call (00:25)\nEmail available dates (May 18, 19, 26, 27) to Shaun for scheduling a follow-up demo session (38:47)\nProvide ideas and best practices for optimizing experiments across multiple platforms and environments (34:50)\n\n**Shaun Janssens**\nCoordinate with Yana to check her availability for follow-up demo and business discussion, then reply to James with available time slots (38:40)\n\n**Unassigned**\nFollow up with GrowthBook team regarding the demo focusing on usability for Winke and data analysis features (39:25)\n"
+      "action_items": "\n**James Shannon**\nShare meeting recording, slide decks, case studies, and pricing proposal with Shaun after the call (00:25)\nEmail available dates (May 18, 19, 26, 27) to Shaun for scheduling a follow-up demo session (38:47)\nProvide ideas and best practices for optimizing experiments across multiple platforms and environments (34:50)\n\n**Shaun Janssens**\nCoordinate with Yana to check her availability for follow-up demo and business discussion, then reply to James with available time slots (38:40)\n\n**Unassigned**\nFollow up with GrowthBook team regarding the demo focusing on usability for Winke and data analysis features (39:25)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KR1PERY40AJ6N9TF56SHCHA5",
@@ -705,7 +743,8 @@
       "organizer": "christian@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, A/B Testing, Warehouse Native, E-commerce, Server-side Rendering, Integration",
-      "action_items": "\n**Christian Liebenow**\nProvide ferasfa with documentation comparing GrowthBook Pro and Enterprise plans (21:42)\nInvestigate and share information about GrowthBook’s integration capabilities with Saudi e-commerce platforms Seller and Zit, including any existing client examples or relevant documentation (18:15)\nContinue availability for follow-up questions and arrange additional meetings as needed after sending documentation (21:42)\n\n**ferasfa**\nReview provided GrowthBook plan comparisons and documentation once received (21:35)\nConduct initial testing with GrowthBook Pro plan on select clients using Seller and Zit platforms to evaluate integration feasibility (18:15)\n"
+      "action_items": "\n**Christian Liebenow**\nProvide ferasfa with documentation comparing GrowthBook Pro and Enterprise plans (21:42)\nInvestigate and share information about GrowthBook’s integration capabilities with Saudi e-commerce platforms Seller and Zit, including any existing client examples or relevant documentation (18:15)\nContinue availability for follow-up questions and arrange additional meetings as needed after sending documentation (21:42)\n\n**ferasfa**\nReview provided GrowthBook plan comparisons and documentation once received (21:35)\nConduct initial testing with GrowthBook Pro plan on select clients using Seller and Zit platforms to evaluate integration feasibility (18:15)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KRHKE0BSDA8ARW5AXSEHJJSA",
@@ -717,7 +756,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 2,
       "keywords": "Dashboard, Experiment Results, Filtering, Product Page, Data Categorization, Performance Analysis",
-      "action_items": "\n**Unassigned**\nReview and refine the filtering capabilities of the dashboard for diverse experiment stages to enhance user analysis (04:17)\nDevelop a method to manually enter or tag data related to specific pages (like product pages) to better track experiment commonalities (04:17)\n"
+      "action_items": "\n**Unassigned**\nReview and refine the filtering capabilities of the dashboard for diverse experiment stages to enhance user analysis (04:17)\nDevelop a method to manually enter or tag data related to specific pages (like product pages) to better track experiment commonalities (04:17)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KRS9KN7C3D1TQVZVV9TQ0BEG",
@@ -729,7 +769,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, Self-Hosting, Enterprise License, Experimentation Framework, Pricing Discussion, Data Warehouse Integration",
-      "action_items": "\n**Scott Keller**\nSend Jeff Knight detailed legacy and new pricing breakdowns for both self-hosted enterprise and cloud-hosted plans (24:52)\nResearch and confirm cost differences and implications for self-hosted deployment pricing to clarify infrastructure and maintenance fees (30:09)\nSchedule a follow-up meeting with Jeff Knight, preferably Thursday afternoon after 3:30 PM Central Time, to discuss updated pricing and licensing options (33:24)\n\n**Jeff Knight**\nReview the pricing documents sent by GrowthBook and prepare feedback for the follow-up discussion (33:24)\n"
+      "action_items": "\n**Scott Keller**\nSend Jeff Knight detailed legacy and new pricing breakdowns for both self-hosted enterprise and cloud-hosted plans (24:52)\nResearch and confirm cost differences and implications for self-hosted deployment pricing to clarify infrastructure and maintenance fees (30:09)\nSchedule a follow-up meeting with Jeff Knight, preferably Thursday afternoon after 3:30 PM Central Time, to discuss updated pricing and licensing options (33:24)\n\n**Jeff Knight**\nReview the pricing documents sent by GrowthBook and prepare feedback for the follow-up discussion (33:24)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KRSC3H8KQ1DRPYDAD9SXBRE6",
@@ -741,7 +782,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 2,
       "keywords": "Growth Book, Feature Flag, Experimentation, A/B Testing, SDK Configuration, Product Analytics",
-      "action_items": "\n**Moise Diarra**\nTest and set up Growth Book free version by signing up at GrowthBook.io (27:26)\nReach out to Scott via email or Slack if technical questions arise during trial (30:11)\n\n**Scott Keller**\nSend Moise link to Growth Book users Slack community for peer support (30:41)\nProvide ongoing support and be available for questions via email (30:11)\n"
+      "action_items": "\n**Moise Diarra**\nTest and set up Growth Book free version by signing up at GrowthBook.io (27:26)\nReach out to Scott via email or Slack if technical questions arise during trial (30:11)\n\n**Scott Keller**\nSend Moise link to Growth Book users Slack community for peer support (30:41)\nProvide ongoing support and be available for questions via email (30:11)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KRR9DY53G0X48BY14PKWPSDK",
@@ -753,7 +795,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "Feature flags, Data warehouse integration, SDK initialization, iGaming industry, Pricing model, Experimentation platform",
-      "action_items": "\n**Marko Maric**\nConfirm current data warehouse type and integration requirements internally to ensure compatibility with GrowthBook (08:35)\nReview GrowthBook demo recording and slides sent by James to understand product capabilities and integration process (14:29)\nContact James with any follow-up questions or clarifications after internal evaluation of GrowthBook and data warehouse setup (14:37)\n\n**James Shannon**\nProvide demo recording and slides to Marko for internal review and evaluation (14:29)\nAwait follow-up from Marko after internal clarifications to continue discussion and potential integration planning (14:48)\n"
+      "action_items": "\n**Marko Maric**\nConfirm current data warehouse type and integration requirements internally to ensure compatibility with GrowthBook (08:35)\nReview GrowthBook demo recording and slides sent by James to understand product capabilities and integration process (14:29)\nContact James with any follow-up questions or clarifications after internal evaluation of GrowthBook and data warehouse setup (14:37)\n\n**James Shannon**\nProvide demo recording and slides to Marko for internal review and evaluation (14:29)\nAwait follow-up from Marko after internal clarifications to continue discussion and potential integration planning (14:48)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KRR9DY5317P8BSMRTJDSNZ8Q",
@@ -765,7 +808,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 7,
       "keywords": "feature flagging, A/B testing, BigQuery integration, Bayesian analysis, experiment scalability, data warehouse",
-      "action_items": "\n**James Shannon**\nSend pricing tiers based on experiment volume with monthly and annual contract options (39:43)\nProvide implementation plan detailing integration steps for BigQuery and SDK setup (49:34)\nShare relevant case study demonstrating high-volume experiment scaling and ROI (49:34)\nPrepare and offer a product demonstration including experiment creation, feature flag usage, and integration overview (18:05)\n\n**Getaway Group Team (Bastian Buch, Diana Araújo, Thomas Handorf)**\nReview received GrowthBook pricing, implementation documentation, and case study once delivered (49:40)\nConsider identifying 3-4 key metrics to define for BigQuery fact tables setup in preparation for GrowthBook integration (48:31)\nAssess potential pilot with playground brand for initial experimentation using GrowthBook SDK and data integration (48:31)\n"
+      "action_items": "\n**James Shannon**\nSend pricing tiers based on experiment volume with monthly and annual contract options (39:43)\nProvide implementation plan detailing integration steps for BigQuery and SDK setup (49:34)\nShare relevant case study demonstrating high-volume experiment scaling and ROI (49:34)\nPrepare and offer a product demonstration including experiment creation, feature flag usage, and integration overview (18:05)\n\n**Getaway Group Team (Bastian Buch, Diana Araújo, Thomas Handorf)**\nReview received GrowthBook pricing, implementation documentation, and case study once delivered (49:40)\nConsider identifying 3-4 key metrics to define for BigQuery fact tables setup in preparation for GrowthBook integration (48:31)\nAssess potential pilot with playground brand for initial experimentation using GrowthBook SDK and data integration (48:31)\n",
+      "summary_quality": "good"
     },
     {
       "id": "6a0ca4300b5d1a001880d65b",
@@ -775,7 +819,8 @@
       "duration_minutes": 40,
       "summary": "[Summary failed] [Daniel Wathne]: Learning in progress.\n[Fabian Hans]: Hello,\n[Daniel Wathne]: Can you hear. Hi, Fabian, can you hear me?\n[Fabian Hans]: I can hear you, yes. How are you?\n[Daniel Wathne]: I'm great. Ho",
       "host": "Daniel Wathne",
-      "participants": 2
+      "participants": 2,
+      "summary_quality": "corrupted"
     },
     {
       "id": "6a0c9ddfeffd820010c97d4e",
@@ -785,7 +830,8 @@
       "duration_minutes": 29,
       "summary": "[Summary failed] [Tenea Welsh]: Hello.\n[Jake Heier]: Hello. How's it going?\n[Tenea Welsh]: How's. Good, good. How are you doing?\n[Jake Heier]: Well, are we waiting on anyone else or should we get going?\n[Tenea Welsh]:",
       "host": "Jake Heier",
-      "participants": 3
+      "participants": 3,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KRXE0K5N1P1Q1066BRF9CK2W",
@@ -797,7 +843,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 3,
       "keywords": "Dynamic landing pages, Behavioral data, Experimentation platform, Feature flagging, Audience targeting, Pricing model",
-      "action_items": "\n**Scott Keller**\nSend a budgetary quote based on seat-based pricing model tailored for Capture Higher Ed’s team size and experiment volume (46:03)\nFollow up with a recap email including proposed next steps and scheduling options for a trial kick-off session (46:19)\nActivate and schedule a one-hour session to initiate the trial and demonstrate deeper functionalities as requested (37:13)\n\n**Robert Simora**\nReview the budgetary quote and next steps email upon receipt and communicate feedback or accept proposal (46:20)\nPrepare internal stakeholders with questions and experiment plans ahead of the trial kickoff (46:19)\n\n**Logan Bates**\nSupport Scott in extended demo and technical explanation as needed during and following this meeting, ensuring clarity on integration and features (19:29)\n"
+      "action_items": "\n**Scott Keller**\nSend a budgetary quote based on seat-based pricing model tailored for Capture Higher Ed’s team size and experiment volume (46:03)\nFollow up with a recap email including proposed next steps and scheduling options for a trial kick-off session (46:19)\nActivate and schedule a one-hour session to initiate the trial and demonstrate deeper functionalities as requested (37:13)\n\n**Robert Simora**\nReview the budgetary quote and next steps email upon receipt and communicate feedback or accept proposal (46:20)\nPrepare internal stakeholders with questions and experiment plans ahead of the trial kickoff (46:19)\n\n**Logan Bates**\nSupport Scott in extended demo and technical explanation as needed during and following this meeting, ensuring clarity on integration and features (19:29)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KRV5CEQZ52DEZ2RE5680EQ1R",
@@ -809,7 +856,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 4,
       "keywords": "AB testing, feature flagging, experimentation platform, open source, scalability, guardrail metrics",
-      "action_items": "\n**Scott Keller**\nSend detailed email with pricing tiers and options based on estimated experiment volume and usage (36:24)\nShare scheduling options for next week’s technical deep-dive and pricing discussion (37:50)\nPrepare responses on event counting and managed warehouse associated with enterprise pricing (38:38)\n\n**Danylo Rudiment**\nProvide more precise experiment volume estimates to Scott to assist in pricing determination (36:12)\nConfirm availability for follow-up deep-dive meeting next week (37:23)\n\n**Unassigned**\nSchedule and conduct a follow-up technical demo involving a solutions engineer tailored to Stay Partners’ specific use cases (09:02)\nPossibly set up a cloud trial for Stay Partners post pricing agreement (36:40)\n"
+      "action_items": "\n**Scott Keller**\nSend detailed email with pricing tiers and options based on estimated experiment volume and usage (36:24)\nShare scheduling options for next week’s technical deep-dive and pricing discussion (37:50)\nPrepare responses on event counting and managed warehouse associated with enterprise pricing (38:38)\n\n**Danylo Rudiment**\nProvide more precise experiment volume estimates to Scott to assist in pricing determination (36:12)\nConfirm availability for follow-up deep-dive meeting next week (37:23)\n\n**Unassigned**\nSchedule and conduct a follow-up technical demo involving a solutions engineer tailored to Stay Partners’ specific use cases (09:02)\nPossibly set up a cloud trial for Stay Partners post pricing agreement (36:40)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KRXA7BMRBWBDBHHGGZ5XPABW",
@@ -821,7 +869,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 5,
       "keywords": "GrowthBook, A/B Testing, Feature Flags, BigQuery, Mixpanel, Experimentation",
-      "action_items": "\n**Reint Jan Hoiting**\nEvaluate GrowthBook by starting hands-on testing to understand its capabilities and fit for DJ Studio's experimentation needs (28:00)\n\n**Fleur van der Laan**\nReview available product screenshots and online resources to visualize GrowthBook's user interface and dashboard features (22:00)\n\n**James Shannon**\nSend Fixer case study demonstrating email optimization and cloud code experimentation success to DJ Studio team (06:20)\nProvide detailed documentation and best practices for integrating GrowthBook with BigQuery fact tables to support DJ Studio's data architecture (16:30)\nShare timeline and details about upcoming EU server hosting availability to address DJ Studio's privacy and data residency concerns (13:30)\nFollow up with DJ Studio on clarifications about GrowthBook’s pricing model changes and support offerings to assist in their budgeting and planning (26:30)\nOffer onboarding and enterprise support options to DJ Studio as they scale their experimentation program with GrowthBook (27:00)\n"
+      "action_items": "\n**Reint Jan Hoiting**\nEvaluate GrowthBook by starting hands-on testing to understand its capabilities and fit for DJ Studio's experimentation needs (28:00)\n\n**Fleur van der Laan**\nReview available product screenshots and online resources to visualize GrowthBook's user interface and dashboard features (22:00)\n\n**James Shannon**\nSend Fixer case study demonstrating email optimization and cloud code experimentation success to DJ Studio team (06:20)\nProvide detailed documentation and best practices for integrating GrowthBook with BigQuery fact tables to support DJ Studio's data architecture (16:30)\nShare timeline and details about upcoming EU server hosting availability to address DJ Studio's privacy and data residency concerns (13:30)\nFollow up with DJ Studio on clarifications about GrowthBook’s pricing model changes and support offerings to assist in their budgeting and planning (26:30)\nOffer onboarding and enterprise support options to DJ Studio as they scale their experimentation program with GrowthBook (27:00)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KRWW7EEGQ9PCPY9AFWM8P9B2",
@@ -833,7 +882,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 10,
       "keywords": "GrowthBook, A/B Testing, Feature Flagging, Experimentation, Visual Editor, Data Warehouse",
-      "action_items": "\n**Arunesh Kumar**\nEvaluate GrowthBook starting with the free open source version for initial testing to assess suitability for company experimentation needs (30:42)\n\n**Jai Sankhla**\nSend detailed questions regarding GrowthBook integration and functionalities to James Shannon for follow-up (31:13)\n\n**Vishal Mattad**\nCompile and send additional queries about GrowthBook features and integrations to James Shannon via email for further clarification (31:06)\n\n**James Shannon**\nProvide a follow-up overview deck and respond to email questions regarding GrowthBook features and integration after the meeting (30:42)\n"
+      "action_items": "\n**Arunesh Kumar**\nEvaluate GrowthBook starting with the free open source version for initial testing to assess suitability for company experimentation needs (30:42)\n\n**Jai Sankhla**\nSend detailed questions regarding GrowthBook integration and functionalities to James Shannon for follow-up (31:13)\n\n**Vishal Mattad**\nCompile and send additional queries about GrowthBook features and integrations to James Shannon via email for further clarification (31:06)\n\n**James Shannon**\nProvide a follow-up overview deck and respond to email questions regarding GrowthBook features and integration after the meeting (30:42)\n",
+      "summary_quality": "good"
     },
     {
       "id": "6a0dfe80549f33002019819d",
@@ -843,7 +893,8 @@
       "duration_minutes": 34,
       "summary": "[Summary failed] [Erin Rizal]: Sa.\n[Jake Heier]: Hey, Aaron.\n[Erin Rizal]: Hi.\n[Jake Heier]: How are you?\n[Erin Rizal]: I'm good. How are you?\n[Jake Heier]: I'm doing well. Are you? It looks like your company is all o",
       "host": "Jake Heier",
-      "participants": 2
+      "participants": 2,
+      "summary_quality": "corrupted"
     },
     {
       "id": "6a0f5db0d3e1bb0010dc0d29",
@@ -853,7 +904,8 @@
       "duration_minutes": 31,
       "summary": "[Summary failed] [Daniel Wathne]: Hey Graham, good to see you.\n[Mark Nelson]: Good.\n[Daniel Wathne]: Got a nice little tan from Hawaii.\n[Webflow Demo]: That's just the colors.\n[Daniel Wathne]: Well, I was like, I got ",
       "host": "Daniel Wathne",
-      "participants": 4
+      "participants": 4,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KRJZDQAQBBCMFPKCMQFSWTVZ",
@@ -865,7 +917,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, Self-hosted Enterprise, Feature Flagging, A/B Testing, Data Warehouse Integration, Multivariate Testing",
-      "action_items": "\n**Scott Keller**\nSend ballpark pricing details for the self-hosted enterprise GrowthBook solution tailored to Operandis' expected experiment volume and user count (30:20)\nShare scheduling links to arrange a follow-up deep-dive demo session with GrowthBook's Solution Engineer to address Operandis' specific use cases and technical needs (31:45)\nSend a recap email summarizing the demo highlights, pricing information, and agreed next steps to the Operandis team (32:44)\n\n**Hunter Neeley**\nReview and evaluate the self-hosted enterprise GrowthBook offering and ballpark pricing once received from Scott Keller (32:44)\nDecide on scheduling a follow-up deep dive session with GrowthBook Solution Engineer to further customize platform setup for Operandis (32:44)\n"
+      "action_items": "\n**Scott Keller**\nSend ballpark pricing details for the self-hosted enterprise GrowthBook solution tailored to Operandis' expected experiment volume and user count (30:20)\nShare scheduling links to arrange a follow-up deep-dive demo session with GrowthBook's Solution Engineer to address Operandis' specific use cases and technical needs (31:45)\nSend a recap email summarizing the demo highlights, pricing information, and agreed next steps to the Operandis team (32:44)\n\n**Hunter Neeley**\nReview and evaluate the self-hosted enterprise GrowthBook offering and ballpark pricing once received from Scott Keller (32:44)\nDecide on scheduling a follow-up deep dive session with GrowthBook Solution Engineer to further customize platform setup for Operandis (32:44)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KRZY3A5NSNX6HMQDK6SZ5AT8",
@@ -877,7 +930,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 7,
       "keywords": "Experimentation, Feature Flagging, Data Warehouse, Power Analysis, Self-Service, Vendor Evaluation",
-      "action_items": "\n**Rebecca Hagan**\nOwn the vendor evaluation process and coordinate next steps internally for GrowthBook assessment at Natera (45:56)\n\n**Scott Keller**\nSend follow-up email with sales and marketing comparison materials against Optimizely and Statsig, including customer references and case studies (50:33)\nOffer free trial access to GrowthBook enterprise tools and assist with setup or proof of concept as Natera proceeds with evaluation (46:16)\n\n**Logan Bates & Luke Sonnet**\nSupport technical integration questions and provide insights on Heap integration, data warehouse connections, and self-hosting capabilities as required by Natera (05:17)\n"
+      "action_items": "\n**Rebecca Hagan**\nOwn the vendor evaluation process and coordinate next steps internally for GrowthBook assessment at Natera (45:56)\n\n**Scott Keller**\nSend follow-up email with sales and marketing comparison materials against Optimizely and Statsig, including customer references and case studies (50:33)\nOffer free trial access to GrowthBook enterprise tools and assist with setup or proof of concept as Natera proceeds with evaluation (46:16)\n\n**Logan Bates & Luke Sonnet**\nSupport technical integration questions and provide insights on Heap integration, data warehouse connections, and self-hosting capabilities as required by Natera (05:17)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KS4MKAYBD6HD10V6GRC2Z35Q",
@@ -889,7 +943,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 6,
       "keywords": "A/B Testing, GrowthBook, Data Warehouse, SDK Integration, Pricing Model, Snow Centre",
-      "action_items": "\n**Amy Stuart**\nConfirm Snow Centre client’s approval post-annual leave and communicate next steps for setting up GrowthBook tests (25:31)\nProvide Snow Centre’s booking journey site link to James Shannon for integration clarity (24:06)\n\n**James Shannon**\nSend GrowthBook pricing and partner deck to House Digital for internal review and client proposal support (19:40)\nProvide detailed documentation on GrowthBook SDK setup and split URL testing examples relevant to the Snow Centre use case (22:31)\n\n**Tom Walsh**\nLead internal technical evaluation of GrowthBook SDK integration within client’s PHP WordPress environment for the booking form test (09:24)\n"
+      "action_items": "\n**Amy Stuart**\nConfirm Snow Centre client’s approval post-annual leave and communicate next steps for setting up GrowthBook tests (25:31)\nProvide Snow Centre’s booking journey site link to James Shannon for integration clarity (24:06)\n\n**James Shannon**\nSend GrowthBook pricing and partner deck to House Digital for internal review and client proposal support (19:40)\nProvide detailed documentation on GrowthBook SDK setup and split URL testing examples relevant to the Snow Centre use case (22:31)\n\n**Tom Walsh**\nLead internal technical evaluation of GrowthBook SDK integration within client’s PHP WordPress environment for the booking form test (09:24)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KSCWG2SRXFQSGF15DJQHJGPQ",
@@ -901,7 +956,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 8,
       "keywords": "GrowthBook, Experimentation, Subscription Metrics, Snowflake Integration, AI Capabilities, Vendor Evaluation",
-      "action_items": "\n**Patrick Condliffe**\nShare GrowthBook technical specifications and demo materials with Who Gives a Crap's engineering and product teams to prepare for integration and evaluation (43:24)\nSchedule and facilitate a GrowthBook demo with key stakeholders within the next two weeks to accelerate the vendor evaluation process (41:16)\nFollow up with Chameleon vendor to schedule and coordinate their demo as part of the vendor evaluation process (44:18)\nNarrow down vendor choices from three to two after demos and organize proof of concepts (POCs) accordingly before final contract decision (44:18)\n\n**James Shannon**\nSend full detailed GrowthBook presentation deck including answers to Patrick’s technical and pricing questions, and highlight AI capabilities (04:02)\nProvide links and case study materials related to Khan Academy and Fixer AI to support benchmarking and illustrate GrowthBook’s subscription experimentation capabilities (30:04)\nAssist in scheduling the GrowthBook demo and create a Slack collaboration channel for ongoing communication after demo approval (44:18)\nProvide support for onboarding, AI capability training, and trial setup once the contract is finalized to ensure smooth implementation (38:22)\n"
+      "action_items": "\n**Patrick Condliffe**\nShare GrowthBook technical specifications and demo materials with Who Gives a Crap's engineering and product teams to prepare for integration and evaluation (43:24)\nSchedule and facilitate a GrowthBook demo with key stakeholders within the next two weeks to accelerate the vendor evaluation process (41:16)\nFollow up with Chameleon vendor to schedule and coordinate their demo as part of the vendor evaluation process (44:18)\nNarrow down vendor choices from three to two after demos and organize proof of concepts (POCs) accordingly before final contract decision (44:18)\n\n**James Shannon**\nSend full detailed GrowthBook presentation deck including answers to Patrick’s technical and pricing questions, and highlight AI capabilities (04:02)\nProvide links and case study materials related to Khan Academy and Fixer AI to support benchmarking and illustrate GrowthBook’s subscription experimentation capabilities (30:04)\nAssist in scheduling the GrowthBook demo and create a Slack collaboration channel for ongoing communication after demo approval (44:18)\nProvide support for onboarding, AI capability training, and trial setup once the contract is finalized to ensure smooth implementation (38:22)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KS81ZJNYMV9DBB53P4YJT4TB",
@@ -913,7 +969,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 6,
       "keywords": "feature flags, experimentation, rollout safety, multivariate tests, Amplitude integration, GDPR compliance",
-      "action_items": "\n**Scott Keller**\nSend pricing summary and contract details aligned with exposure event volume discussed (00:30)\nSchedule follow-up deeper demo with Journey team including tailored experiment examples and extended Q&A (00:26)\n\n**Print App Room / Journi Team**\nPrepare examples of experiment types Journey intends to run for the deep dive demo (00:26)\nReview and share GrowthBook pricing information with financial department (00:26)\nValidate exact exposure event volumes with technical team to refine contract needs (00:23)\n\n**Logan Bates**\nProvide technical clarifications around metrics creation, data integration, and lifecycle states during follow-up sessions as needed (00:00)\n"
+      "action_items": "\n**Scott Keller**\nSend pricing summary and contract details aligned with exposure event volume discussed (00:30)\nSchedule follow-up deeper demo with Journey team including tailored experiment examples and extended Q&A (00:26)\n\n**Print App Room / Journi Team**\nPrepare examples of experiment types Journey intends to run for the deep dive demo (00:26)\nReview and share GrowthBook pricing information with financial department (00:26)\nValidate exact exposure event volumes with technical team to refine contract needs (00:23)\n\n**Logan Bates**\nProvide technical clarifications around metrics creation, data integration, and lifecycle states during follow-up sessions as needed (00:00)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KR6S6C79DXH80Z26F5KDVCSK",
@@ -925,7 +982,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, Experimentation, Feature Flags, Crypto Exchange, Data Warehouse, Security",
-      "action_items": "\n**Deepankar Kapoor**\nForward GrowthBook information and slides to CTO for technical review (17:42)\nCoordinate with CTO to follow up with GrowthBook team regarding further technical evaluation (17:55)\n\n**James Shannon**\nSend introductory deck, pricing information, and case studies to Deepankar Kapoor for internal sharing at Exchange One (19:20)\n"
+      "action_items": "\n**Deepankar Kapoor**\nForward GrowthBook information and slides to CTO for technical review (17:42)\nCoordinate with CTO to follow up with GrowthBook team regarding further technical evaluation (17:55)\n\n**James Shannon**\nSend introductory deck, pricing information, and case studies to Deepankar Kapoor for internal sharing at Exchange One (19:20)\n",
+      "summary_quality": "good"
     },
     {
       "id": "6a18d86164719100189e1ef3",
@@ -935,7 +993,8 @@
       "duration_minutes": 19,
       "summary": "[Summary failed] [Jorge Bañuelos]: Progress. Hi, how are you?\n[Daniel Wathne]: Hey, Jorge. I'm doing well, how are you?\n[Jorge Bañuelos]: Doing well, thank you. Doing well. Pleasure to meet you.\n[Daniel Wathne]: Yeah,",
       "host": "Daniel Wathne",
-      "participants": 2
+      "participants": 2,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KSQMCTB7Q2JXQ61PEHF0HDY0",
@@ -947,7 +1006,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "web experimentation, visual editor, A/B testing, GrowthBook, Snowflake integration, startup marketing",
-      "action_items": "\n**Hannah Geiser**\nCoordinate with engineering to perform one-time setup of GrowthBook SDK on the Quadrant website (19:40)\nCollaborate with Snowflake administrator to configure data connections for receiving experiment event data (19:40)\nBegin running initial web experiments using GrowthBook visual editor to optimize website CTAs, images, and messaging (22:45)\n\n**James Shannon**\nProvide demo and final details of GrowthBook visual editor tool once fully released in approximately one month (23:37)\nSupport onboarding process and clarify pricing tiers, especially the self-serve professional tier allowing up to five experiments monthly (21:56)\n"
+      "action_items": "\n**Hannah Geiser**\nCoordinate with engineering to perform one-time setup of GrowthBook SDK on the Quadrant website (19:40)\nCollaborate with Snowflake administrator to configure data connections for receiving experiment event data (19:40)\nBegin running initial web experiments using GrowthBook visual editor to optimize website CTAs, images, and messaging (22:45)\n\n**James Shannon**\nProvide demo and final details of GrowthBook visual editor tool once fully released in approximately one month (23:37)\nSupport onboarding process and clarify pricing tiers, especially the self-serve professional tier allowing up to five experiments monthly (21:56)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KSQ4PZW764Z3D8XXC5Q28R8Z",
@@ -959,7 +1019,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 4,
       "keywords": "GrowthBook, A/B Testing, Self Hosting, Enterprise Plan, Data Warehouse, Experimentation Platform",
-      "action_items": "\n**Scott Keller**\nSend detailed price comparison between self-hosted and cloud options, including a one-page quote with platform fees and experiment pricing (24:55)\nSchedule a follow-up deep dive demo with GrowthBook Solutions Engineer Logan to discuss detailed implementation and use cases (27:32)\nCoordinate setup of a proof of concept trial and provide partner support with dedicated engineers (29:00)\n\n**Anton Hansson**\nReview pricing information and decide on proceeding with proof of concept based on implementation feasibility and Amazon cloud integration (24:55)\n\n**Mikkel Petersen**\nPrepare technical notes on Unisport’s Next.js server-side rendering and CloudFront caching to share with GrowthBook engineering for tailored implementation support (28:01)\n"
+      "action_items": "\n**Scott Keller**\nSend detailed price comparison between self-hosted and cloud options, including a one-page quote with platform fees and experiment pricing (24:55)\nSchedule a follow-up deep dive demo with GrowthBook Solutions Engineer Logan to discuss detailed implementation and use cases (27:32)\nCoordinate setup of a proof of concept trial and provide partner support with dedicated engineers (29:00)\n\n**Anton Hansson**\nReview pricing information and decide on proceeding with proof of concept based on implementation feasibility and Amazon cloud integration (24:55)\n\n**Mikkel Petersen**\nPrepare technical notes on Unisport’s Next.js server-side rendering and CloudFront caching to share with GrowthBook engineering for tailored implementation support (28:01)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KT478S30ZRX2T59H92VW5HCV",
@@ -971,7 +1032,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 3,
       "keywords": "Feature Flags, Experimentation, CDN Requests, Pricing Negotiation, Vendor Comparison, Streaming API",
-      "action_items": "\n**Scott Keller**\nProvide link and documentation on GrowthBook CDN request usage and streaming connection model to clarify technical details for Beamery (05:19)\nSend side-by-side pricing comparison between GrowthBook Pro and Enterprise plans to Beamery to aid in pricing evaluation (09:09)\nArrange Enterprise trial setup and prepare demonstration with GrowthBook engineer for 3 PM UK time the next day to address Beamery's technical and pricing questions (18:13)\nFollow up with detailed email covering discussed pricing details, answers to questions, and invite for next meeting to ensure clear communication and next steps (19:17)\nProvide Master Service Agreement (MSA) and any additional legal/procurement documents needed by Beamery for contract review (19:08)\n\n**Samuel Clarke**\nConfirm internal pricing and vendor evaluation results to present at Beamery engineering leadership meeting within next one to two weeks (15:42)\nDiscuss with Beamery head of product the exact required usage and necessity of experimentation features to clarify internal needs (14:01)\nCheck legal team timeline for contract review and procurement duration to ensure alignment with decision deadline (18:55)\n\n**Laurie Boyes**\nRequest detailed information on value additions of GrowthBook Enterprise versus cheaper competitors to support Beamery's evaluation process (19:33)\n"
+      "action_items": "\n**Scott Keller**\nProvide link and documentation on GrowthBook CDN request usage and streaming connection model to clarify technical details for Beamery (05:19)\nSend side-by-side pricing comparison between GrowthBook Pro and Enterprise plans to Beamery to aid in pricing evaluation (09:09)\nArrange Enterprise trial setup and prepare demonstration with GrowthBook engineer for 3 PM UK time the next day to address Beamery's technical and pricing questions (18:13)\nFollow up with detailed email covering discussed pricing details, answers to questions, and invite for next meeting to ensure clear communication and next steps (19:17)\nProvide Master Service Agreement (MSA) and any additional legal/procurement documents needed by Beamery for contract review (19:08)\n\n**Samuel Clarke**\nConfirm internal pricing and vendor evaluation results to present at Beamery engineering leadership meeting within next one to two weeks (15:42)\nDiscuss with Beamery head of product the exact required usage and necessity of experimentation features to clarify internal needs (14:01)\nCheck legal team timeline for contract review and procurement duration to ensure alignment with decision deadline (18:55)\n\n**Laurie Boyes**\nRequest detailed information on value additions of GrowthBook Enterprise versus cheaper competitors to support Beamery's evaluation process (19:33)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KT3JEPRDPQS8XV83CG4FBGXN",
@@ -983,7 +1045,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "Experimentation platform, GrowthBook, A/B testing, visual editor, data warehouse integration, pricing model",
-      "action_items": "\n**James Shannon**\nSend detailed pricing quotes for 10, 15, 20, and 30 experiments per month to Abhinav Jolly (27:30)\nShare the presentation deck and relevant case studies with the Testgorilla team (28:33)\nSchedule a follow-up call to discuss pricing feedback, tentatively set for Wednesday at 10:30 (28:33)\n\n**Abhinav Jolly**\nReview pricing quotes and presentation deck upon receipt (27:30)\nDiscuss pricing and experimentation platform options with the Head of Marketing (27:52)\nConfirm availability for the follow-up meeting on Wednesday at 10:30 (28:09)\n"
+      "action_items": "\n**James Shannon**\nSend detailed pricing quotes for 10, 15, 20, and 30 experiments per month to Abhinav Jolly (27:30)\nShare the presentation deck and relevant case studies with the Testgorilla team (28:33)\nSchedule a follow-up call to discuss pricing feedback, tentatively set for Wednesday at 10:30 (28:33)\n\n**Abhinav Jolly**\nReview pricing quotes and presentation deck upon receipt (27:30)\nDiscuss pricing and experimentation platform options with the Head of Marketing (27:52)\nConfirm availability for the follow-up meeting on Wednesday at 10:30 (28:09)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KT4261H7NMXDTYWC6YFMZXRK",
@@ -995,7 +1058,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, A/B testing, Google Tag Manager, performance marketing, feature flagging, data warehouse",
-      "action_items": "\n**Manuel Achenbach**\nPresent GrowthBook integration overview and implementation plan documents to Luminaza's development team for review (23:28)\nEvaluate GrowthBook’s suitability with developers and provide further feedback or next steps to James Shannon (23:28)\n\n**James Shannon**\nSend detailed GrowthBook integration architecture and full implementation guide to Manuel for developer reference (04:55)\nProvide documentation about using GrowthBook with Google Tag Manager (08:08)\nShare information on GrowthBook’s pricing tiers, features, and upcoming Visual Editor capabilities with Manuel (15:06)\n"
+      "action_items": "\n**Manuel Achenbach**\nPresent GrowthBook integration overview and implementation plan documents to Luminaza's development team for review (23:28)\nEvaluate GrowthBook’s suitability with developers and provide further feedback or next steps to James Shannon (23:28)\n\n**James Shannon**\nSend detailed GrowthBook integration architecture and full implementation guide to Manuel for developer reference (04:55)\nProvide documentation about using GrowthBook with Google Tag Manager (08:08)\nShare information on GrowthBook’s pricing tiers, features, and upcoming Visual Editor capabilities with Manuel (15:06)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KT8WN6JWFK7JGJ4EH5P7A60N",
@@ -1007,7 +1071,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "Feature flagging, A/B testing, JavaScript SDK, Self-hosting, Experiment segmentation, Pricing model",
-      "action_items": "\n**James Shannon**\nSend detailed email with pricing and product information to Nguyễn Tri Đông for internal review at Prep Edu (18:19)\n\n**Nguyễn Tri Đông**\nReview Growthbook pricing and documentation; discuss with internal team and decision-makers; follow up with Growthbook after the weekend for further communication (20:22)\n"
+      "action_items": "\n**James Shannon**\nSend detailed email with pricing and product information to Nguyễn Tri Đông for internal review at Prep Edu (18:19)\n\n**Nguyễn Tri Đông**\nReview Growthbook pricing and documentation; discuss with internal team and decision-makers; follow up with Growthbook after the weekend for further communication (20:22)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KT86KZGF1HRKPGG5673WMCCM",
@@ -1019,7 +1084,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 4,
       "keywords": "AB Testing, Feature Flagging, Deterministic Hashing, GrowthBook Demo, Self-hosted vs Cloud, AI-assisted Experimentation",
-      "action_items": "\n**Alice Zhou**\nShare the domain of Thinking Data AI platform with Graham to explore potential integration with GrowthBook (12:15)\nExplore GrowthBook free trial and test account for hands-on evaluation (25:16)\nInvestigate with development team whether to adopt self-hosted or cloud version of GrowthBook (39:53)\nReview differences between GrowthBook Pro and Enterprise plans to determine best fit for Solotopiax team (46:21)\nCoordinate further communication with GrowthBook team primarily via Microsoft Teams (45:32)\nFollow up on potential collaboration introduction between GrowthBook and Thinking Data AI for integrated event tracking (44:09)\n\n**Graham McNicoll**\nProvide GrowthBook demo account and assist Solotopiax with setting up trial access (25:29)\nSend recording of the meeting to Solotopiax for review and reference (46:53)\nCheck with GrowthBook team about WeChat communication and support options for Solotopiax (45:15)\nProvide license key for self-hosted enterprise features if Solotopiax selects that option (40:30)\n"
+      "action_items": "\n**Alice Zhou**\nShare the domain of Thinking Data AI platform with Graham to explore potential integration with GrowthBook (12:15)\nExplore GrowthBook free trial and test account for hands-on evaluation (25:16)\nInvestigate with development team whether to adopt self-hosted or cloud version of GrowthBook (39:53)\nReview differences between GrowthBook Pro and Enterprise plans to determine best fit for Solotopiax team (46:21)\nCoordinate further communication with GrowthBook team primarily via Microsoft Teams (45:32)\nFollow up on potential collaboration introduction between GrowthBook and Thinking Data AI for integrated event tracking (44:09)\n\n**Graham McNicoll**\nProvide GrowthBook demo account and assist Solotopiax with setting up trial access (25:29)\nSend recording of the meeting to Solotopiax for review and reference (46:53)\nCheck with GrowthBook team about WeChat communication and support options for Solotopiax (45:15)\nProvide license key for self-hosted enterprise features if Solotopiax selects that option (40:30)\n",
+      "summary_quality": "good"
     },
     {
       "id": "6a26b2279e86c80020ae2ca2",
@@ -1029,7 +1095,8 @@
       "duration_minutes": 0,
       "summary": "[Summary failed] [Yair Liberzon]: Hello, Scott. Hello. Is it Yair? Yes. How are you? I'm doing well, Yair. And yourself? I'm great. How are you? Yeah, I'm fantastic. I'm gonna remove the recorder for now. I.",
       "host": "Scott Keller",
-      "participants": 1
+      "participants": 1,
+      "summary_quality": "corrupted"
     },
     {
       "id": "01KTC8PJ3RV4HNWM226SJCRN4H",
@@ -1041,7 +1108,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, A/B Testing, Visual Editor, Wellis Health, BigQuery, Experiment Reporting",
-      "action_items": "\n**James Shannon**\nSend Eliel the GrowthBook implementation plan detailing integration steps and data setup (22:31)\nProvide all necessary documentation for GrowthBook usage and setup to Eliel (23:33)\n\n**Eliel Bendjuya**\nProceed with GrowthBook Pro plan after completion of Wellis platform migration in the next couple of weeks (23:33)\n"
+      "action_items": "\n**James Shannon**\nSend Eliel the GrowthBook implementation plan detailing integration steps and data setup (22:31)\nProvide all necessary documentation for GrowthBook usage and setup to Eliel (23:33)\n\n**Eliel Bendjuya**\nProceed with GrowthBook Pro plan after completion of Wellis platform migration in the next couple of weeks (23:33)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KTKEAQVZP2VEYFDZR2FNC309",
@@ -1053,7 +1121,8 @@
       "organizer": "jake.stangl@growthbook.io",
       "participants": 5,
       "keywords": "remote configuration, AB testing, segmentation, meta-analysis, UX improvement, feature flagging",
-      "action_items": "\n**Alok Rai**\nProvide user count information for pricing calculation to GrowthBook team (40:13)\nExplore GrowthBook demo environment and UX for feature testing; report observations back to GrowthBook (38:08)\n\n**James Shannon**\nSend follow-up email with meeting recap and answers to outstanding questions (41:17)\nInvite Alok to Slack channel for support during feature exploration trial (41:17)\nSet up two-week trial of Enterprise tier with all GrowthBook features enabled for Voodoo (39:35)\nPropose optional one-week check-in call during trial for Q&A (39:35)\n\n**Logan Bates**\nSupport Alok during demo environment usage and answer technical questions (38:30)\nAssist in technical discussions around data ingestion latency and integration options (17:44)\n"
+      "action_items": "\n**Alok Rai**\nProvide user count information for pricing calculation to GrowthBook team (40:13)\nExplore GrowthBook demo environment and UX for feature testing; report observations back to GrowthBook (38:08)\n\n**James Shannon**\nSend follow-up email with meeting recap and answers to outstanding questions (41:17)\nInvite Alok to Slack channel for support during feature exploration trial (41:17)\nSet up two-week trial of Enterprise tier with all GrowthBook features enabled for Voodoo (39:35)\nPropose optional one-week check-in call during trial for Q&A (39:35)\n\n**Logan Bates**\nSupport Alok during demo environment usage and answer technical questions (38:30)\nAssist in technical discussions around data ingestion latency and integration options (17:44)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KTK7ZWE52WNQRXEGAW055Q01",
@@ -1065,7 +1134,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "Feature Flags, Experimentation Platform, BigQuery Integration, SDK Implementation, Pricing Model, Visual Editor",
-      "action_items": "\n**Ole Gregersen**\nDiscuss GrowthBook further with internal developers after the new website launch to explore SDK integration possibilities (27:11)\nShare information about the Conversion Boost Danish optimization conference partnership opportunities with James Shannon to explore marketing collaboration (28:03)\nIntroduce GrowthBook solution to clients who have existing BigQuery data warehouse setups, emphasizing pricing advantages and implementation benefits (29:14)\n\n**James Shannon**\nSend detailed GrowthBook resource folder and implementation plan to Ole Gregersen immediately after the call to support evaluation and integration (02:47)\nProvide ongoing support and technical documentation to Ole’s developers to facilitate GrowthBook SDK implementation after their website launch (26:58)\nFollow up with Ole Gregersen after his summer holiday to continue engagement and arrange potential calls with client teams for GrowthBook adoption (31:20)\nAct as GrowthBook’s European marketing contact and manage collaboration requests for conference sponsorships and partnerships (27:40)\n"
+      "action_items": "\n**Ole Gregersen**\nDiscuss GrowthBook further with internal developers after the new website launch to explore SDK integration possibilities (27:11)\nShare information about the Conversion Boost Danish optimization conference partnership opportunities with James Shannon to explore marketing collaboration (28:03)\nIntroduce GrowthBook solution to clients who have existing BigQuery data warehouse setups, emphasizing pricing advantages and implementation benefits (29:14)\n\n**James Shannon**\nSend detailed GrowthBook resource folder and implementation plan to Ole Gregersen immediately after the call to support evaluation and integration (02:47)\nProvide ongoing support and technical documentation to Ole’s developers to facilitate GrowthBook SDK implementation after their website launch (26:58)\nFollow up with Ole Gregersen after his summer holiday to continue engagement and arrange potential calls with client teams for GrowthBook adoption (31:20)\nAct as GrowthBook’s European marketing contact and manage collaboration requests for conference sponsorships and partnerships (27:40)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KTS9Z3PD37SDWXK2138PAKAX",
@@ -1077,7 +1147,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "Introduction, Location, Participant background, Remote meeting, Apology, Greetings",
-      "action_items": "\n**Unassigned**\nSchedule a follow-up meeting to discuss potential collaboration opportunities in more detail (00:00)\n"
+      "action_items": "\n**Unassigned**\nSchedule a follow-up meeting to discuss potential collaboration opportunities in more detail (00:00)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KTS2XVAGFT0AM057PSB3S0AC",
@@ -1089,7 +1160,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "A/B testing, product analytics, traffic splitting, data warehouse integration, React SDK, GDPR compliance",
-      "action_items": "\n**Daniel Paul Emmanuel-Undie**\nExplore the GrowthBook free tier and set up an account to test the platform with his team (34:43)\nDiscuss GrowthBook’s potential and demo results internally to convince the team for adoption over Posthog (34:43)\nEvaluate scalability of GrowthBook for sister companies and future expanded user base (30:15)\n\n**James Shannon**\nSend Daniel a sales deck and an implementation guide for GrowthBook to support internal evaluation (35:24)\nProvide documentation links and highlight AI chatbot support on the GrowthBook website (36:24)\n"
+      "action_items": "\n**Daniel Paul Emmanuel-Undie**\nExplore the GrowthBook free tier and set up an account to test the platform with his team (34:43)\nDiscuss GrowthBook’s potential and demo results internally to convince the team for adoption over Posthog (34:43)\nEvaluate scalability of GrowthBook for sister companies and future expanded user base (30:15)\n\n**James Shannon**\nSend Daniel a sales deck and an implementation guide for GrowthBook to support internal evaluation (35:24)\nProvide documentation links and highlight AI chatbot support on the GrowthBook website (36:24)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KTRN5N4R1GPED85MD06VCC3K",
@@ -1101,7 +1173,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "A/B testing, GrowthBook, SDK integration, Databricks, Visual Editor, feature flags",
-      "action_items": "\n**Tal Binyamini**\nEvaluate GrowthBook’s A/B testing features and pricing with CEO and internal team, focusing on integration and experimentation suitability (46:53)\nCoordinate follow-up meeting with James Shannon to provide feedback and discuss next steps after vacation, tentatively Monday or Tuesday next week (48:54)\n\n**James Shannon**\nSend Tal detailed integration guides for SDK and metrics setup to support further technical evaluation (15:46)\nProvide enterprise trial license and instructions for Visual Editor access timed with Pic-time’s testing schedule next week (49:57)\nShare pricing details and flexible options via email for official review (46:53)\nSchedule follow-up call for early next week to continue discussion and support decision-making (49:43)\n"
+      "action_items": "\n**Tal Binyamini**\nEvaluate GrowthBook’s A/B testing features and pricing with CEO and internal team, focusing on integration and experimentation suitability (46:53)\nCoordinate follow-up meeting with James Shannon to provide feedback and discuss next steps after vacation, tentatively Monday or Tuesday next week (48:54)\n\n**James Shannon**\nSend Tal detailed integration guides for SDK and metrics setup to support further technical evaluation (15:46)\nProvide enterprise trial license and instructions for Visual Editor access timed with Pic-time’s testing schedule next week (49:57)\nShare pricing details and flexible options via email for official review (46:53)\nSchedule follow-up call for early next week to continue discussion and support decision-making (49:43)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KV3F1FSGVT80TJ8F08SV1GCX",
@@ -1113,7 +1186,8 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 4,
       "keywords": "GrowthBook, AB Testing, Vercel, Amplitude, Feature Flags, Experimentation",
-      "action_items": "\n**Scott Keller**\nSend a recap email to Holded including a detailed comparison of GrowthBook's pricing tiers and features to clarify options and support decision-making (14:15)\nPropose and schedule the next one-hour demo session with Holded stakeholders, suggesting 9 or 10 am EST to align with Barcelona afternoon availability (31:55)\nCoordinate with a GrowthBook solution engineer to prepare a custom, in-depth demonstration tailored to Holded’s data analyst and engineering stakeholders' needs (10:54)\n\n**Mireia Casadevall**\nCheck availability of Holded team members, including data analyst and possibly engineer, for the proposed one-hour demo session next week (32:28)\n"
+      "action_items": "\n**Scott Keller**\nSend a recap email to Holded including a detailed comparison of GrowthBook's pricing tiers and features to clarify options and support decision-making (14:15)\nPropose and schedule the next one-hour demo session with Holded stakeholders, suggesting 9 or 10 am EST to align with Barcelona afternoon availability (31:55)\nCoordinate with a GrowthBook solution engineer to prepare a custom, in-depth demonstration tailored to Holded’s data analyst and engineering stakeholders' needs (10:54)\n\n**Mireia Casadevall**\nCheck availability of Holded team members, including data analyst and possibly engineer, for the proposed one-hour demo session next week (32:28)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KTNJSS4G7NXBXV7N1MCEXK2Y",
@@ -1125,7 +1199,8 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
       "keywords": "A/B testing, feature flagging, Snowflake integration, experiment analytics, growthbook SDK, pricing discussion",
-      "action_items": "\n**James Shannon**\nSet up a Slack channel connecting Fern and GrowthBook engineers for support and questions during the trial period (38:54)\nProvide trial license access for Fern to test GrowthBook platform, ideally for one week (38:42)\nFollow up with Fern approximately one week after trial start to review experience and discuss pricing and commercial terms (40:34)\n\n**Fern Team (Niall, Jack, Andrew)**\nTest GrowthBook platform by running AA experiments and evaluate integration and feature fit with Fern’s existing systems (38:42)\n"
+      "action_items": "\n**James Shannon**\nSet up a Slack channel connecting Fern and GrowthBook engineers for support and questions during the trial period (38:54)\nProvide trial license access for Fern to test GrowthBook platform, ideally for one week (38:42)\nFollow up with Fern approximately one week after trial start to review experience and discuss pricing and commercial terms (40:34)\n\n**Fern Team (Niall, Jack, Andrew)**\nTest GrowthBook platform by running AA experiments and evaluate integration and feature fit with Fern’s existing systems (38:42)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KV8Y5464P1TBKB9D5NF0D7TG",
@@ -1137,7 +1212,8 @@
       "organizer": "dan@growthbook.io",
       "participants": 2,
       "keywords": "GrowthBook, AB Testing, Enterprise Plan, SSO, Data Warehouse, Cronos",
-      "action_items": "\n**Dan Wathne**\nSend a follow-up email explaining the importance and implications of Single Sign-On (SSO) for financial services to assist Emily's internal communication with her team and legal department (26:38)\nProvide a slide or document outlining the differences between GrowthBook Pro and Enterprise plans for Emily to share with product managers and legal stakeholders (22:53)\n\n**Emily Sit**\nReview internal requirements including SSO needs, budget constraints, and contract negotiation preferences, then communicate priorities back to Dan after receiving the follow-up email (26:38)\nProceed to subscribe or pilot the GrowthBook Pro plan for approximately six months focusing on product managers’ adoption and usage before potentially upgrading to the Enterprise plan (27:44)\n"
+      "action_items": "\n**Dan Wathne**\nSend a follow-up email explaining the importance and implications of Single Sign-On (SSO) for financial services to assist Emily's internal communication with her team and legal department (26:38)\nProvide a slide or document outlining the differences between GrowthBook Pro and Enterprise plans for Emily to share with product managers and legal stakeholders (22:53)\n\n**Emily Sit**\nReview internal requirements including SSO needs, budget constraints, and contract negotiation preferences, then communicate priorities back to Dan after receiving the follow-up email (26:38)\nProceed to subscribe or pilot the GrowthBook Pro plan for approximately six months focusing on product managers’ adoption and usage before potentially upgrading to the Enterprise plan (27:44)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KTXRHWX7TXVECPJ83G68SK63",
@@ -1149,7 +1225,19 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "feature toggling, experimentation, GrowthBook, brokerage technology, product teams, data warehouse integration",
-      "action_items": "\n**George Lakas**\nPrepare a detailed vendor comparison and evaluation list for the CTO and board, including GrowthBook's features and pricing information (10:22)\nProvide GrowthBook with estimated number of users and experiments planned for implementation to assist with pricing and planning (46:14)\nCoordinate internally with CTO and finance teams to secure budget approval and finalize procurement processes following the product demonstration (47:28)\nAttend the scheduled GrowthBook product demonstration on June 25 from 12-1pm Dubai time (09:00-10:00 UK time) (44:23)\n\n**James Shannon**\nSchedule and conduct a detailed GrowthBook product demonstration for CFI on June 25, including presentation of features, implementation plan, and case studies (44:23)\nSend follow-up materials after the meeting including presentation slides, implementation plan, and customer case studies to George Lakas (49:14)\nAssist George Lakas with completing the vendor comparison sheet for GrowthBook features and costs if requested to facilitate evaluation (48:56)\n"
+      "action_items": "\n**George Lakas**\nPrepare a detailed vendor comparison and evaluation list for the CTO and board, including GrowthBook's features and pricing information (10:22)\nProvide GrowthBook with estimated number of users and experiments planned for implementation to assist with pricing and planning (46:14)\nCoordinate internally with CTO and finance teams to secure budget approval and finalize procurement processes following the product demonstration (47:28)\nAttend the scheduled GrowthBook product demonstration on June 25 from 12-1pm Dubai time (09:00-10:00 UK time) (44:23)\n\n**James Shannon**\nSchedule and conduct a detailed GrowthBook product demonstration for CFI on June 25, including presentation of features, implementation plan, and case studies (44:23)\nSend follow-up materials after the meeting including presentation slides, implementation plan, and customer case studies to George Lakas (49:14)\nAssist George Lakas with completing the vendor comparison sheet for GrowthBook features and costs if requested to facilitate evaluation (48:56)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M1PEQXGWQ3ZX0ZJRDY82RESN",
+      "source": "fireflies",
+      "title": "GrowthBook Demo for CarGurus",
+      "date": "2026-09-04",
+      "duration_minutes": 65,
+      "summary": "# GrowthBook Demo for CarGurus\nDate: 2026-09-04 | Duration: 65m\n\n## Summary\nGrowthBook was presented as a warehouse-native experimentation and feature flag platform that connects read-only to Snowflake without third-party storage, PII exposure, pipeline changes, or additional storage costs. Pricing is per seat, and onboarding typically takes four to six weeks. The platform supports customizable metrics from Snowflake tables or views, precomputed attribution data, feature flags with boolean or JSON values, monitored ramp-ups, automatic rollback, namespaces, approval workflows, and Slack, Jira, and webhook integrations. Experiments can run without metrics, although GrowthBook will not display results without them, allowing teams to retain in-house analysis. Optional product analytics provides AI-assisted querying, dashboards, experiment interpretation, and ship/no-ship recommendations. Holdouts can be global or experiment-specific, while QA tools support variant overrides and automated testing. The team plans to select two of three vendors for a proof of concept next quarter, targeting a decision by mid-September, with updated GrowthBook pricing still required.\n\n## Keywords\nFeature Flags, Experimentation, Product Analytics, Snowflake Integration, Holdout Groups, Ramp Up\n\n## Action Items\n\n**Scott Keller**\nProvide a pricing quote to CarGurus before the rollout of the new volume-based pricing model, ensuring current renewals are grandfathered (01:03:33)\nVerify and follow up with CarGurus on the behavior of user membership during ramp-down phases in ramp-ups to clarify stability and assignment rules (32:08)\nConfirm the behavior and configuration options regarding releasing holdout groups after their usage periods, including time-window resets and impact on rollouts (54:22)\n\n**CarGurus team**\nReview GrowthBook documentation thoroughly and raise detailed technical questions to support evaluation during the proof of concept phase (49:10)\nDetermine the finalists for the proof of concept vendor selection, aiming to select two out of three candidates by mid-September (01:02:29)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
     }
   ]
 }

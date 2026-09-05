@@ -1,0 +1,18 @@
+{
+  "company": "Shree Tanna and",
+  "slug": "shree-tanna-and",
+  "last_etl_date": "2026-09-05T05:59:01.763787",
+  "calls": [
+    {
+      "id": "01M1P814QZ3HB4979GZ4FAZZT5",
+      "source": "fireflies",
+      "title": "Shree Tanna and Jake Stangl",
+      "date": "2026-09-04",
+      "duration_minutes": 36,
+      "summary": "# Shree Tanna and Jake Stangl\nDate: 2026-09-04 | Duration: 36m\n\n## Summary\nThe discussion covered the Times’ extensive experimentation across news, games, cooking, and athletics, alongside analytics and edge-case challenges. The Times moved from an internal platform to Statsig about 1.5 years ago, improving reporting and allocation, but unresolved issues remain around Fastly CDN layers, SDK edge cases, experiment design, and measurement. GrowthBook presented its open-source, warehouse-native platform, which supports BigQuery, Snowflake, local flag evaluation, lightweight SDKs, and customer-controlled data environments. Its feature flagging and experimentation modules support assignment, tracking, analysis, product analytics, and an AI-powered visual editor. GrowthBook also described Statsig migration tools, reusable SQL metric definitions, hybrid analysis, four-to-six-week migrations, dedicated support, and a one-hour enterprise SLA. Data science support is available for complex experiment designs and low-traffic models. A tailored demo was scheduled for Friday, October 14th, from 10:00 to 11:00, with additional follow-up communication planned.\n\n## Keywords\nexperimentation platform, feature flagging, data warehouse native, Statsig migration, SDK integration, experiment analysis\n\n## Action Items\n\n**Scott Keller**\nSend a meeting recap and summary of use cases discussed, including next steps for potential Growth Book trial or integration (33:41)\nSchedule a detailed product demo session with a Growth Book solutions engineer for Shree Tanna and Christina Branton on Friday morning during week of October 14th, preferably 10:00-11:00 AM (32:18)\nSend information and invite for the AI experimentation dinner event to Shree Tanna and Christina Branton at The New York Times (34:23)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

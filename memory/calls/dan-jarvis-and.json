@@ -1,0 +1,18 @@
+{
+  "company": "Dan Jarvis and",
+  "slug": "dan-jarvis-and",
+  "last_etl_date": "2026-09-05T05:59:01.757387",
+  "calls": [
+    {
+      "id": "01M1HGRAGCND7RGZZBNN3HF9D3",
+      "source": "fireflies",
+      "title": "Dan Jarvis and Jake Stangl",
+      "date": "2026-09-04",
+      "duration_minutes": 28.700000762939453,
+      "summary": "# Dan Jarvis and Jake Stangl\nDate: 2026-09-04 | Duration: 28.700000762939453m\n\n## Summary\nThe team evaluated Growth Book as a potential replacement or expansion beyond Flagsmith’s simple Boolean flags, focusing on advanced experimentation features such as holdouts, sticky bucketing, ramp schedules, and A/B testing. Holdouts require Enterprise, while sticky bucketing is associated with Pro or Enterprise plans. The team currently uses deterministic hashing and tenant-scoped identities, and is assessing whether Growth Book should manage bucketing internally or accept external assignments. Pricing was compared with approximately $250 per month for Flagsmith; Growth Book Pro was described as $40 per seat monthly, shifting to $150 per account for up to 5 million events. Self-hosting is preferred because of security, procurement, and the pending Citi acquisition. The trial will test integration, privacy compliance, Databricks callbacks, and experimentation workflows over roughly two to three weeks. Growth Book will provide license-key support and a dedicated Slack channel.\n\n## Keywords\nfeature flags, experimentation, holdout groups, self-hosted, enterprise trial, pricing models\n\n## Action Items\n\n**Dan Wathne**\nCoordinate with Jake Stangl to set up self-hosted Enterprise trial environment and send license key to Dan Jarvis by Tuesday, reliably via Noteshred, including secure password (18:09)\nCreate and manage Slack channel for client communication, invite client team and Growth Book solutions engineers for support (24:46)\nConfirm whether event callback streaming to Databricks is gated behind Pro or Enterprise and communicate back to Jessie Raye Bauer via Slack or email (26:39)\nWork with Jake Stangl to prepare an order form for potential contract post-trial and outline pricing options and incentives for September signing (21:51)\n\n**Jake Stangl**\nAssist Dan Wathne with trial setup and client communications (18:09)\n\n**Dan Jarvis**\nProvide input and feedback during the trial period; manage internal evaluation and reporting of Growth Book’s features against existing solutions (19:33)\nServe as license key holder and administrator for Growth Book license (25:31)\n\n**Jessie Raye Bauer**\nLead technical evaluation during trial; verify data privacy, platform compatibility, and experiment management capabilities including holdout analysis (20:51)\nFollow up on event callback streaming feature question and other technical inquiries through proposed Slack channel (26:39)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}
