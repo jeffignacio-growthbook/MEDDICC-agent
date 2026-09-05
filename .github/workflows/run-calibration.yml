@@ -1,0 +1,36 @@
+name: Wave 4 Calibration Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      report_only:
+        description: 'Report only (no updates to verified values)'
+        required: false
+        default: 'true'
+
+permissions:
+  contents: read
+
+jobs:
+  calibration:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Wave 4 Calibration
+        env:
+          RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python scripts/run_calibration.py

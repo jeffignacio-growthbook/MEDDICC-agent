@@ -18,11 +18,15 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 import requests
-from dotenv import load_dotenv
 
-# Load environment
-env_path = Path(__file__).parent.parent / '.env'
-load_dotenv(env_path)
+# Optional: load .env for local dev (GitHub Actions uses Secrets)
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).parent.parent / '.env'
+    if env_path.exists():
+        load_dotenv(env_path)
+except ImportError:
+    pass  # dotenv not installed, use os.environ only
 
 # Add paths
 sys.path.insert(0, str(Path(__file__).parent.parent / 'scripts'))
@@ -35,7 +39,8 @@ from db import get_supabase
 class CalibrationRunner:
     def __init__(self):
         self.sb = get_supabase()
-        self.api_url = os.getenv('RAILWAY_API_URL', 'http://localhost:8080')
+        # Use same variable name as smoke_test.py and gate-tests.yml
+        self.api_url = os.environ.get('RAILWAY_URL', 'http://localhost:8080')
         self.results = {
             'correct': [],
             'wrong': [],
