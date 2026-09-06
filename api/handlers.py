@@ -126,6 +126,200 @@ def _resolve_owner_email(params: dict, sb):
     return None, f"could not resolve '{candidates[0]}' to a known rep"
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# AT-RISK COMPUTATION - Single Source of Truth (Wave 4 Item 3)
+# ══════════════════════════════════════════════════════════════════════════════
+# This function consolidates two divergent at-risk implementations discovered
+# in Wave 4 calibration:
+#   - query_waterfall used inline simple threshold → 94 deals
+#   - query_deals_at_risk used stage-aware band checking → 33 deals (scoped)
+#
+# Stage-aware is now canonical (defined in config/field_semantics.yaml).
+# Quick check remains available for performance-sensitive contexts.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def compute_at_risk_deals(sb, deal_ids=None, use_stage_aware=True,
+                          time_window=None) -> list:
+    """
+    Single source of truth for at-risk deal identification.
+
+    Implements canonical at-risk logic from config/field_semantics.yaml.
+    All handlers computing at-risk status MUST call this function.
+
+    Args:
+        sb: Supabase client
+        deal_ids: Optional scope filter (for entity-scoped queries like
+                 "which of those are at-risk?"). If None, checks all active deals.
+        use_stage_aware: If True, use canonical stage-aware MEDDICC band checking
+                        (requires stage_progression requirements from client.yaml).
+                        If False, use quick check (overall_score < 40 OR
+                        champion_score < 4) for performance.
+        time_window: Optional time window dict with 'start' key for analyses filter.
+                    Defaults to last 90 days if not provided.
+
+    Returns:
+        List of dicts with at-risk deal details:
+        - deal_id, company_name, overall_score, champion_band, deal_value, stage
+        - risk_flags (stage-aware mode only): List of specific gaps
+        Sorted by overall_score (lowest first), then deal_value (highest first).
+
+    Example:
+        # Quick check for pipeline summary
+        at_risk = compute_at_risk_deals(sb, use_stage_aware=False)
+
+        # Stage-aware for drill-down
+        at_risk = compute_at_risk_deals(sb, deal_ids=[123, 456], use_stage_aware=True)
+
+    Note:
+        ORDER BY is explicit before deduplication to prevent non-determinism
+        if multiple analyses share the same timestamp.
+    """
+    from datetime import timedelta
+
+    # Import semantic layer functions
+    try:
+        from field_semantics import is_at_risk_quick
+    except ImportError:
+        from api.field_semantics import is_at_risk_quick
+
+    # 1. Query analyses with explicit ORDER BY for determinism
+    if time_window is None:
+        time_window = {
+            "start": (datetime.now(timezone.utc) - timedelta(days=90)).isoformat()
+        }
+
+    filters = [("gte", "analyzed_at", time_window["start"])]
+    if deal_ids:
+        filters.append(("in_", "deal_id", deal_ids))
+
+    analyses = select_all(sb, "analyses",
+        columns="deal_id,company_name,overall_score,champion_score,"
+                "economic_buyer_score,metrics_score,decision_criteria_score,"
+                "decision_process_score,pain_score,competition_score,analyzed_at",
+        filters=filters)
+
+    # CRITICAL: Sort BEFORE deduplication to ensure deterministic results
+    # If multiple analyses have identical analyzed_at timestamps, sort order
+    # determines which one wins. Without this, dict insertion order would be
+    # non-deterministic across query executions.
+    analyses.sort(key=lambda a: (a["deal_id"], a.get("analyzed_at", "")),
+                  reverse=True)
+
+    # 2. Deduplicate to latest analysis per deal_id
+    latest_analyses = {}
+    for a in analyses:
+        deal_id = a["deal_id"]
+        if deal_id not in latest_analyses:
+            latest_analyses[deal_id] = a
+
+    analyses = list(latest_analyses.values())
+
+    # 3. QUICK CHECK MODE (performance optimization)
+    if not use_stage_aware:
+        # Use semantic layer quick check function
+        at_risk = []
+        for a in analyses:
+            if is_at_risk_quick(a):
+                at_risk.append({
+                    "deal_id": a["deal_id"],
+                    "company_name": a["company_name"],
+                    "overall_score": a.get("overall_score", 0) or 0,
+                    "champion_score": a.get("champion_score", 0) or 0,
+                })
+        return at_risk
+
+    # 4. STAGE-AWARE MODE (canonical)
+    # Requires deal stage data for stage-specific requirements
+    if deal_ids:
+        deals = select_all(sb, "deals",
+            columns="deal_id,company_name,deal_value,deal_status,stage",
+            filters=[("in_", "deal_id", deal_ids)])
+    else:
+        deals = select_all(sb, "deals",
+            columns="deal_id,company_name,deal_value,deal_status,stage",
+            filters=[("eq", "deal_status", "active")])
+
+    deal_map = {d["deal_id"]: d for d in deals}
+    at_risk = []
+
+    # Import stage-aware requirements
+    try:
+        from api.stage_requirements import get_requirements_for_stage, _get_stage_by_id
+    except ImportError:
+        from stage_requirements import get_requirements_for_stage, _get_stage_by_id
+
+    try:
+        from api.rubric import band_meets, band_label, get_band
+    except ImportError:
+        from rubric import band_meets, band_label, get_band
+
+    # Component name mapping (MEDDICC field names → score columns)
+    component_fields = {
+        "pain": "pain_score",
+        "champion": "champion_score",
+        "metrics": "metrics_score",
+        "economic_buyer": "economic_buyer_score",
+        "decision_criteria": "decision_criteria_score",
+        "decision_process": "decision_process_score",
+        "competition": "competition_score",
+    }
+
+    # Check each analyzed deal against its stage requirements
+    for a in analyses:
+        d = deal_map.get(a["deal_id"])
+        if not d:
+            continue
+
+        stage_id = d.get("stage")
+        if not stage_id:
+            continue
+
+        # Get stage-specific MEDDICC requirements
+        requirements = get_requirements_for_stage(stage_id)
+        if not requirements:
+            # Terminal or excluded stages have no requirements (never at-risk)
+            continue
+
+        # Check each required component against threshold bands
+        risk_flags = []
+        for component, required_threshold in requirements.items():
+            field_name = component_fields.get(component)
+            if not field_name:
+                continue
+
+            actual_score = a.get(field_name)
+
+            # Band-aware comparison: is actual_score's band below required band?
+            if not band_meets(component, actual_score, required_threshold):
+                # Build human-readable risk message
+                stage_info = _get_stage_by_id(stage_id)
+                stage_name = stage_info["name"] if stage_info else "current stage"
+                lbl = band_label(component, actual_score)
+                need_band = get_band(component, required_threshold)
+
+                risk_flags.append(
+                    f"{component.replace('_', ' ').title()} is {lbl['text']} "
+                    f"(needs {need_band}-or-better to advance from {stage_name})"
+                )
+
+        # Flag deal if ANY required component is below threshold
+        if risk_flags:
+            at_risk.append({
+                "deal_id": a["deal_id"],
+                "company_name": a["company_name"],
+                "overall_score": a.get("overall_score", 0) or 0,
+                "champion_band": band_label("champion", a.get("champion_score"))["text"],
+                "deal_value": d.get("deal_value"),
+                "stage": stage_id,
+                "risk_flags": risk_flags
+            })
+
+    # Sort by overall_score (lowest first) then deal_value (highest first)
+    at_risk.sort(key=lambda x: (x["overall_score"], -(x["deal_value"] or 0)))
+
+    return at_risk
+
+
 async def query_waterfall(params: dict, sb) -> dict:
     """
     Pipeline snapshot + movement in ONE handler with question-aware emphasis.
@@ -223,43 +417,25 @@ async def query_waterfall(params: dict, sb) -> dict:
     no_arr_count = len(no_arr_deals)
     no_arr_list = [d["company_name"] for d in no_arr_deals[:5]]
 
-    # Needs attention: at-risk deals (reuse query_deals_at_risk threshold)
-    # Threshold: overall_score < 40 or champion_score < 4
-    analyses = select_all(sb, "analyses",
-        columns="deal_id,company_name,overall_score,"
-                "champion_score,analyzed_at",
-        filters=[])
+    # Needs attention: at-risk deals (use unified function - quick check mode)
+    # Quick check used here for performance (inline in waterfall summary)
+    # Canonical stage-aware logic available via query_deals_at_risk handler
+    active_deal_ids = [d["deal_id"] for d in included_deals]
+    at_risk_results = compute_at_risk_deals(
+        sb,
+        deal_ids=active_deal_ids,
+        use_stage_aware=False,  # Quick check for performance
+        time_window=None  # Default last 90 days
+    )
 
-    # Deduplicate: keep most recent analysis per deal_id
-    latest_analyses = {}
-    for a in analyses:
-        deal_id = a["deal_id"]
-        analyzed_at = a.get("analyzed_at", "")
-        if deal_id not in latest_analyses or analyzed_at > latest_analyses[deal_id].get("analyzed_at", ""):
-            latest_analyses[deal_id] = a
-
-    # Build active deal_id set for filtering
-    active_deal_ids = {d["deal_id"] for d in included_deals}
-
-    at_risk_deals = []
-    for a in latest_analyses.values():
-        if a["deal_id"] not in active_deal_ids:
-            continue  # Only active deals
-        score = a.get("overall_score", 0) or 0
-        champ = a.get("champion_score", 0) or 0
-        if score < 40 or champ < 4:
-            risk_reason = []
-            if score < 40:
-                risk_reason.append(f"low MEDDICC ({score})")
-            if champ < 4:
-                risk_reason.append(f"champion gap ({champ})")
-            at_risk_deals.append({
-                "company": a["company_name"],
-                "risk": " + ".join(risk_reason)
-            })
-
-    at_risk_count = len(at_risk_deals)
-    at_risk_list = at_risk_deals[:5]
+    at_risk_count = len(at_risk_results)
+    at_risk_list = [
+        {
+            "company": r["company_name"],
+            "risk": f"MEDDICC {r['overall_score']}/{MEDDICC_OVERALL_MAX}"
+        }
+        for r in at_risk_results[:5]
+    ]
 
     # Build population statement explaining exclusions
     renewals_excluded = before_count - after_pipeline_count
@@ -344,140 +520,27 @@ async def query_arr(params: dict, sb) -> dict:
 
 async def query_deals_at_risk(params: dict, sb) -> dict:
     """
-    Deals meeting "at risk" criteria (PENDING DEFINITION FROM RYAN).
+    Deals meeting canonical at-risk criteria (stage-aware MEDDICC band checking).
 
-    Current implementation: Stage-aware MEDDICC band checking.
-    A deal is flagged if any component required at its current stage
-    is below the threshold to advance.
+    A deal is flagged if ANY MEDDICC component required at its current stage
+    is below the threshold band needed to advance.
 
-    PLACEHOLDER LOGIC until Ryan defines what "at risk" means to him.
-    Candidate criteria:
-    - Overall MEDDICC score below X?
-    - No activity in 30+ days?
-    - No champion identified?
-    - Stalled in stage?
-    - Close date slipped?
-
+    Definition consolidated from field_semantics.yaml (Wave 4 Item 3).
     Uses stage_progression requirements from config/client.yaml.
-    """
-    from api.stage_requirements import get_requirements_for_stage
 
+    Supports entity-scoped queries: if deal_ids provided, checks only those deals.
+    Otherwise checks all active deals.
+    """
     tw = _resolve_tw(params)
     deal_ids = params.get("deal_ids", [])
 
-    # Filter analyses to specific deals if context provided
-    analyses_filters = [("gte", "analyzed_at", tw["start"])]
-    if deal_ids:
-        analyses_filters.append(
-            ("in_", "deal_id", deal_ids))
-
-    # Fetch ALL component scores (not just champion/eb)
-    analyses = select_all(sb, "analyses",
-        columns="deal_id,company_name,overall_score,"
-                "champion_score,economic_buyer_score,"
-                "metrics_score,decision_criteria_score,"
-                "decision_process_score,pain_score,"
-                "competition_score,analyzed_at",
-        filters=analyses_filters)
-
-    # Deduplicate: keep only the most recent analysis per deal_id
-    # (analyses table has historical snapshots from nightly runs)
-    latest_analyses = {}
-    for a in analyses:
-        deal_id = a["deal_id"]
-        analyzed_at = a.get("analyzed_at", "")
-        if deal_id not in latest_analyses or analyzed_at > latest_analyses[deal_id].get("analyzed_at", ""):
-            latest_analyses[deal_id] = a
-
-    analyses = list(latest_analyses.values())
-
-    # Fetch deal stage data for stage-aware requirements
-    if deal_ids:
-        # Entity-filtered: only fetch stages for these deals
-        deals = select_all(sb, "deals",
-            columns="deal_id,company_name,deal_value,"
-                    "deal_status,stage",
-            filters=[("in_", "deal_id", deal_ids)])
-    else:
-        # Full query: only active deals
-        deals = select_all(sb, "deals",
-            columns="deal_id,company_name,deal_value,"
-                    "deal_status,stage",
-            filters=[("eq", "deal_status", "active")])
-
-    deal_map = {d["deal_id"]: d for d in deals}
-    at_risk = []
-
-    # Component name mapping
-    component_fields = {
-        "pain": "pain_score",
-        "champion": "champion_score",
-        "metrics": "metrics_score",
-        "economic_buyer": "economic_buyer_score",
-        "decision_criteria": "decision_criteria_score",
-        "decision_process": "decision_process_score",
-        "competition": "competition_score",
-    }
-
-    for a in analyses:
-        d = deal_map.get(a["deal_id"])
-        if not d:
-            continue
-
-        stage_id = d.get("stage")
-        if not stage_id:
-            continue
-
-        # Get requirements for this deal's current stage
-        requirements = get_requirements_for_stage(stage_id)
-
-        # No requirements = terminal/excluded stage, never at-risk
-        if not requirements:
-            continue
-
-        # PLACEHOLDER: Stage-specific component gaps (until Ryan defines "at risk")
-        # Check each required component. Band comparison, not integer: a 5-vs-6
-        # gap is noise the generator can't reproduce (both yellow), so a
-        # component is only "at risk" when its BAND is below the gate's band —
-        # gate 6 → needs yellow-or-better, gate 7 → green-or-better.
-        from api.rubric import band_meets, band_label, get_band
-        risk_flags = []
-        for component, required_threshold in requirements.items():
-            field_name = component_fields.get(component)
-            if not field_name:
-                continue
-
-            actual_score = a.get(field_name)
-
-            if not band_meets(component, actual_score, required_threshold):
-                # Stage-aware risk message, in band language (the integer is
-                # internal — surfacing "5/10" invites arguing the number
-                # instead of the gap).
-                from api.stage_requirements import _get_stage_by_id
-                stage_info = _get_stage_by_id(stage_id)
-                stage_name = stage_info["name"] if stage_info else "current stage"
-                lbl = band_label(component, actual_score)
-                need_band = get_band(component, required_threshold)
-
-                risk_flags.append(
-                    f"{component.replace('_', ' ').title()} is {lbl['text']} "
-                    f"(needs {need_band}-or-better to advance from {stage_name})"
-                )
-
-        # Flag deal if ANY risk condition is true (placeholder logic)
-        if risk_flags:
-            at_risk.append({
-                "deal_id":       a["deal_id"],
-                "company_name":  a["company_name"],
-                "overall_score": a.get("overall_score", 0) or 0,
-                "champion_band": band_label("champion", a.get("champion_score"))["text"],
-                "deal_value":    d.get("deal_value"),
-                "stage":         stage_id,
-                "risk_flags":    risk_flags
-            })
-
-    at_risk.sort(key=lambda x: (x["overall_score"],
-                                 -(x["deal_value"] or 0)))
+    # Use unified at-risk function with canonical stage-aware mode
+    at_risk = compute_at_risk_deals(
+        sb,
+        deal_ids=deal_ids,
+        use_stage_aware=True,  # Canonical mode: stage-aware band checking
+        time_window=tw
+    )
 
     if not at_risk:
         return {
@@ -488,8 +551,10 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
                        "MEDDICC analysis yet — those run nightly.")
         }
 
-    return {"deals_at_risk": at_risk[:10],
-            "total_at_risk": len(at_risk)}
+    return {
+        "deals_at_risk": at_risk[:10],
+        "total_at_risk": len(at_risk)
+    }
 
 
 async def query_win_loss(params: dict, sb) -> dict:
