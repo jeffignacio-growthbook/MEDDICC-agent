@@ -1974,8 +1974,6 @@ async def query_pipeline(params: dict, sb) -> dict:
     if stage_filter or pipeline_filter:
         filtered_deals = []
         for deal in incremental_deals:
-        filtered_deals = []
-        for deal in deals_rows:
             # Stage filtering
             if stage_filter:
                 bucket = stage_bucket(deal.get("stage"))
