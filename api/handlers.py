@@ -44,6 +44,112 @@ MEDDICC_OVERALL_MAX = 70
 MEDDICC_COMPONENT_MAX = 10
 
 
+def compute_cycle_time(sb, since_date: str = None, until_date: str = None) -> dict:
+    """
+    Canonical sales cycle time calculation (Wave 4 structural fix for q016).
+
+    Single source of truth for cycle time methodology:
+    - ALL closed deals (won + lost), not just won
+    - Calculation: close_date - create_date (days)
+    - Aggregation: MEDIAN (not average) - robust to outliers
+    - Date filtering: Optional since/until for time windows
+
+    Args:
+        sb: Supabase client
+        since_date: Optional start date (YYYY-MM-DD) - filter close_date >= since
+        until_date: Optional end date (YYYY-MM-DD) - filter close_date <= until
+
+    Returns:
+        {
+            "median_days": float,
+            "p25_days": float,  # 25th percentile
+            "p75_days": float,  # 75th percentile
+            "min_days": int,
+            "max_days": int,
+            "sample_size": int,
+            "date_range": str,
+            "won_count": int,
+            "lost_count": int,
+        }
+
+    Example:
+        >>> compute_cycle_time(sb, since_date="2026-03-01")
+        {"median_days": 159, "p25_days": 89, "p75_days": 245, ...}
+    """
+    from statistics import median, quantiles
+
+    # Fetch all closed deals
+    filters = [("in_", "deal_status", ["won", "lost"])]
+
+    if since_date:
+        filters.append(("gte", "close_date", since_date))
+    if until_date:
+        filters.append(("lte", "close_date", until_date))
+
+    deals = select_all(
+        sb,
+        "deals",
+        columns="deal_id,create_date,close_date,deal_status",
+        filters=filters,
+    )
+
+    # Calculate cycle time for each deal
+    cycle_times = []
+    won_count = 0
+    lost_count = 0
+
+    for deal in deals:
+        close_date_str = deal.get("close_date")
+        create_date_str = deal.get("create_date")
+
+        if not close_date_str or not create_date_str:
+            continue  # Skip deals missing dates
+
+        try:
+            close_date = datetime.fromisoformat(close_date_str.replace("Z", "+00:00"))
+            create_date = datetime.fromisoformat(create_date_str.replace("Z", "+00:00"))
+            days = (close_date - create_date).days
+
+            if days >= 0:  # Sanity check
+                cycle_times.append(days)
+                if deal.get("deal_status") == "won":
+                    won_count += 1
+                else:
+                    lost_count += 1
+        except (ValueError, AttributeError):
+            continue  # Skip malformed dates
+
+    if not cycle_times:
+        return {
+            "median_days": None,
+            "p25_days": None,
+            "p75_days": None,
+            "min_days": None,
+            "max_days": None,
+            "sample_size": 0,
+            "date_range": f"{since_date or 'earliest'} to {until_date or 'latest'}",
+            "won_count": 0,
+            "lost_count": 0,
+            "error": "No closed deals with valid dates found in range",
+        }
+
+    # Calculate statistics
+    cycle_times.sort()
+    quartiles = quantiles(cycle_times, n=4) if len(cycle_times) >= 4 else [None, None, None]
+
+    return {
+        "median_days": median(cycle_times),
+        "p25_days": quartiles[0] if quartiles[0] else cycle_times[0],
+        "p75_days": quartiles[2] if quartiles[2] else cycle_times[-1],
+        "min_days": min(cycle_times),
+        "max_days": max(cycle_times),
+        "sample_size": len(cycle_times),
+        "date_range": f"{since_date or 'earliest'} to {until_date or 'latest'}",
+        "won_count": won_count,
+        "lost_count": lost_count,
+    }
+
+
 def _labeled_overall(score):
     """Return overall_score with its denominator and percentage, or None."""
     try:
@@ -1775,11 +1881,173 @@ async def query_sdr_leaderboard(params: dict, sb) -> dict:
 # AE-FOCUSED HANDLERS
 # ============================================================================
 
+async def query_cycle_time(params: dict, sb) -> dict:
+    """
+    Sales cycle time analysis - canonical calculation via compute_cycle_time().
+
+    STRUCTURAL FIX for q016 (Wave 4): Enforces correct methodology.
+
+    Used for: "What's our sales cycle?", "How long to close deals?",
+              "Average time from opportunity to close?"
+
+    params:
+      time_window: dict (optional) - date range for analysis
+
+    Returns: compute_cycle_time() output with median, p25, p75, sample size
+    """
+    tw = params.get("time_window")
+    since_date = tw["start"] if tw else None
+    until_date = tw["end"] if tw else None
+
+    result = compute_cycle_time(sb, since_date=since_date, until_date=until_date)
+
+    # Add contextual message
+    if result.get("error"):
+        result["message"] = result["error"]
+    else:
+        result["message"] = (
+            f"Median sales cycle: {result['median_days']:.0f} days "
+            f"(based on {result['sample_size']} closed deals: "
+            f"{result['won_count']} won, {result['lost_count']} lost)"
+        )
+
+    return result
+
+
+async def query_pipeline(params: dict, sb) -> dict:
+    """
+    Overall pipeline snapshot: all active deals with totals and breakdowns.
+
+    STRUCTURAL FIX for q011 (Wave 4): Default scope is ALL active deals.
+    No implicit filters. Only apply filters if explicitly requested in params.
+
+    Used for: "What is our pipeline?", "Show me the pipeline", "How much pipeline?"
+
+    params:
+      stage_filter: str (optional) - "discovery", "scoping", "proposal", "qualified"
+      pipeline_filter: str (optional) - "new_business", "renewal"
+      owner_email: str (optional) - specific rep email
+      time_window: dict (optional) - filters by close_date if provided
+
+    Returns:
+      total_deals: int
+      total_pipeline: float (sum of deal_value)
+      by_stage: dict (breakdown by stage)
+      by_owner: dict (breakdown by owner, top 10)
+      deals: list (top 20 by value)
+    """
+    from field_semantics import stage_bucket, stage_label, is_open
+
+    # CRITICAL: Default to NO filters (all active deals)
+    # This prevents q011 bug where "pipeline" was over-filtered to qualified+new_business
+    base_filters = [("eq", "deal_status", "active")]
+
+    # Only add optional filters if explicitly provided
+    tw = params.get("time_window")
+    if tw:
+        base_filters.append(("gte", "close_date", tw["start"]))
+        base_filters.append(("lte", "close_date", tw["end"]))
+
+    if params.get("owner_email"):
+        base_filters.append(("eq", "owner_email", params["owner_email"]))
+
+    # Stage filtering (only if requested)
+    stage_filter = params.get("stage_filter")  # e.g., "qualified", "discovery"
+    # Pipeline type filtering (only if requested)
+    pipeline_filter = params.get("pipeline_filter")  # e.g., "new_business", "renewal"
+
+    # Fetch all active deals
+    deals_rows = select_all(
+        sb, "deals",
+        columns="deal_id,company_name,deal_value,stage,close_date,owner_email,pipeline_id",
+        filters=base_filters
+    )
+
+    # Apply stage/pipeline filters in memory (if requested)
+    if stage_filter or pipeline_filter:
+        filtered_deals = []
+        for deal in deals_rows:
+            # Stage filtering
+            if stage_filter:
+                bucket = stage_bucket(deal.get("stage"))
+                if stage_filter == "qualified":
+                    # Qualified = scoping or later
+                    if bucket not in ["scoping", "proposal"]:
+                        continue
+                elif bucket != stage_filter:
+                    continue
+
+            # Pipeline filtering
+            if pipeline_filter:
+                pipeline_id = deal.get("pipeline_id", "")
+                if pipeline_filter == "new_business" and "renewal" in pipeline_id.lower():
+                    continue
+                if pipeline_filter == "renewal" and "renewal" not in pipeline_id.lower():
+                    continue
+
+            filtered_deals.append(deal)
+        deals_rows = filtered_deals
+
+    # Calculate totals
+    total_deals = len(deals_rows)
+    total_pipeline = sum(d.get("deal_value") or 0 for d in deals_rows)
+
+    # Breakdown by stage
+    by_stage = {}
+    for deal in deals_rows:
+        stage = deal.get("stage")
+        label = stage_label(stage)
+        if label not in by_stage:
+            by_stage[label] = {"count": 0, "value": 0}
+        by_stage[label]["count"] += 1
+        by_stage[label]["value"] += deal.get("deal_value") or 0
+
+    # Breakdown by owner (top 10)
+    by_owner = {}
+    for deal in deals_rows:
+        owner = deal.get("owner_email") or "unassigned"
+        if owner not in by_owner:
+            by_owner[owner] = {"count": 0, "value": 0}
+        by_owner[owner]["count"] += 1
+        by_owner[owner]["value"] += deal.get("deal_value") or 0
+
+    # Sort by value, take top 10
+    top_owners = sorted(by_owner.items(), key=lambda x: x[1]["value"], reverse=True)[:10]
+    by_owner = {email: stats for email, stats in top_owners}
+
+    # Top deals by value
+    sorted_deals = sorted(deals_rows, key=lambda d: d.get("deal_value") or 0, reverse=True)
+    top_deals = [
+        {
+            "company_name": d.get("company_name"),
+            "deal_value": d.get("deal_value"),
+            "stage": stage_label(d.get("stage")),
+            "close_date": d.get("close_date"),
+            "owner_email": d.get("owner_email"),
+        }
+        for d in sorted_deals[:20]
+    ]
+
+    return {
+        "total_deals": total_deals,
+        "total_pipeline": total_pipeline,
+        "by_stage": by_stage,
+        "by_owner": by_owner,
+        "deals": top_deals,
+        "filters_applied": {
+            "stage_filter": stage_filter,
+            "pipeline_filter": pipeline_filter,
+            "owner_email": params.get("owner_email"),
+            "time_window": tw is not None,
+        },
+    }
+
+
 async def query_rep_pipeline(params: dict, sb) -> dict:
     """
     All active deals for a specific AE, sorted by deal value descending.
     Used for: "show me Christian's pipeline", "what deals does Cary own?"
-    
+
     params:
       owner_email: str  — exact email from user_personas roster
       time_window: dict — optional, filters by close_date if provided

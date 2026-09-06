@@ -215,6 +215,21 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
 'what are Jake's metrics for August', 'how many dials did Jake make this week'""",
     "query_sdr_leaderboard": "SDR/BDR team activity overview — calls and voicemails across all SDRs. Use for team-wide SDR activity or comparing SDR performance.",
     "query_sdr_pipeline_sourced": "Pipeline sourced by SDRs/BDRs — deals attributed to an SDR via the configured attribution field or current ownership. Use when asking about SDR-sourced pipeline, BDR contribution, or meetings that converted to opportunities.",
+    "query_cycle_time": (
+        "Sales cycle time analysis — median days from create to close, "
+        "STRUCTURAL ENFORCEMENT: uses compute_cycle_time() with correct methodology "
+        "(close_date - create_date, all closed deals, median not average). "
+        "Use for questions about sales cycle, time to close, deal velocity. "
+        "Examples: 'What's our sales cycle?', 'How long does it take to close?', "
+        "'Average time from opportunity to close?'"
+    ),
+    "query_pipeline": (
+        "Overall pipeline snapshot — ALL active deals with totals and breakdowns. "
+        "STRUCTURAL ENFORCEMENT: defaults to ALL active deals (no filters). "
+        "Use for generic pipeline questions without a specific rep or filter. "
+        "Examples: 'What is our pipeline?', 'Show me the pipeline', "
+        "'How much pipeline do we have?', 'What's in our pipeline this quarter?'"
+    ),
     "query_rep_pipeline": (
         "Active pipeline for a specific AE — all their open deals with "
         "value, stage, close date, and MEDDICC score. Use when asking about "
@@ -1683,6 +1698,7 @@ async def dynamic_query_loop(question, history, params,
     # so the user-facing diagnostic says what was being attempted in plain terms
     # (no handler identifiers, no "KeyError"). Technical detail stays in the log.
     _FRIENDLY_HANDLER = {
+        "query_pipeline": "looking up overall pipeline",
         "query_rep_pipeline": "looking up a rep's pipeline",
         "query_rubric_scores_bulk": "pulling MEDDICC scores for a named deal",
         "query_deal_stages_bulk": "looking up deal stages",
