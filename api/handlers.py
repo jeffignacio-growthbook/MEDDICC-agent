@@ -1918,13 +1918,16 @@ async def query_pipeline(params: dict, sb) -> dict:
     """
     Pipeline snapshot: INCREMENTAL ARR only (expansion + new business).
 
-    BUSINESS DEFINITION: "Pipeline" = expansion_arr + new_arr.
-    Renewal base (renewal_revenue) is EXCLUDED and reported separately via query_upcoming_renewals.
+    BUSINESS DEFINITION (dollar-level split confirmed Sep 6, 2026):
+    - "Pipeline" = sum of (expansion_arr + new_arr) for each deal
+    - Renewal base (renewal_revenue) is EXCLUDED and reported separately
+    - For renewal deals WITH expansion: expansion_arr → pipeline, renewal_revenue → renewal ARR
+    - Same deal can contribute to BOTH reports (not double-counting - measuring different components)
 
-    Per field_semantics.yaml PIPELINE SEMANTICS:
-    - Pipeline = deals with expansion_arr > 0 OR new_arr > 0
-    - Renewal base ARR excluded (reported separately)
+    TIMELESS DESIGN:
     - Current state has NO relationship to close_date (no time filtering)
+    - Regardless of user asking "this quarter" or "Q3", returns ALL active incremental ARR
+    - Response must clarify: "Current Pipeline (Incremental ARR)" not "This Quarter's Pipeline"
 
     Used for: "What is our pipeline?", "Show me the pipeline", "How much pipeline?"
 
@@ -1934,19 +1937,19 @@ async def query_pipeline(params: dict, sb) -> dict:
       owner_email: str (optional) - specific rep email
 
     Returns:
-      total_deals: int (incremental ARR deals only)
-      total_pipeline: float (sum of expansion_arr + new_arr)
+      total_deals: int (deals with expansion_arr > 0 OR new_arr > 0)
+      total_pipeline: float (sum of expansion_arr + new_arr per deal, dollar-level)
       by_stage: dict (breakdown by stage)
       by_owner: dict (breakdown by owner, top 10)
-      deals: list (top 20 by value)
+      deals: list (top 20 by incremental value)
+      uncategorized_deals: dict (NEITHER-category data quality gap)
 
     Note:
-      Wave 4 fixes: Removed time_window filtering + added incremental ARR classification.
+      Wave 4 fixes: Removed time_window filtering, added dollar-level split, NEITHER surfacing.
     """
-    from field_semantics import stage_bucket, stage_label, is_open, is_incremental_pipeline
+    from field_semantics import stage_bucket, stage_label, is_open
 
     # CRITICAL: Default to NO filters (all active deals)
-    # This prevents q011 bug where "pipeline" was over-filtered to qualified+new_business
     # DO NOT filter by time_window/close_date - current state has no time scope
     base_filters = [("eq", "deal_status", "active")]
 
@@ -1966,9 +1969,28 @@ async def query_pipeline(params: dict, sb) -> dict:
         filters=base_filters
     )
 
-    # CRITICAL: Filter to INCREMENTAL ARR pipeline only (excludes renewal base)
-    # Per PIPELINE SEMANTICS: pipeline = expansion_arr + new_arr
-    incremental_deals = [d for d in deals_rows if is_incremental_pipeline(d)]
+    # CRITICAL: Dollar-level split logic (not deal-level bucketing)
+    # For each deal, calculate incremental_pipeline_value = expansion_arr + new_arr
+    incremental_deals = []
+    uncategorized_deals = []
+
+    for deal in deals_rows:
+        expansion_arr = deal.get("expansion_arr") or 0
+        new_arr = deal.get("new_arr") or 0
+        renewal_revenue = deal.get("renewal_revenue") or 0
+
+        # Calculate incremental value (dollar-level)
+        incremental_value = expansion_arr + new_arr
+
+        # Track NEITHER-category deals (no ARR classification at all)
+        if incremental_value == 0 and renewal_revenue == 0:
+            uncategorized_deals.append(deal)
+            continue
+
+        # Only include deals with incremental ARR > 0
+        if incremental_value > 0:
+            deal["_incremental_value"] = incremental_value
+            incremental_deals.append(deal)
 
     # Apply stage/pipeline filters in memory (if requested)
     if stage_filter or pipeline_filter:
@@ -1995,11 +2017,11 @@ async def query_pipeline(params: dict, sb) -> dict:
             filtered_deals.append(deal)
         incremental_deals = filtered_deals
 
-    # Calculate totals (incremental ARR only)
+    # Calculate totals (incremental ARR only, DOLLAR-LEVEL)
     total_deals = len(incremental_deals)
-    total_pipeline = sum(d.get("deal_value") or 0 for d in incremental_deals)
+    total_pipeline = sum(d.get("_incremental_value") or 0 for d in incremental_deals)
 
-    # Breakdown by stage
+    # Breakdown by stage (using incremental value, not deal_value)
     by_stage = {}
     for deal in incremental_deals:
         stage = deal.get("stage")
@@ -2007,26 +2029,29 @@ async def query_pipeline(params: dict, sb) -> dict:
         if label not in by_stage:
             by_stage[label] = {"count": 0, "value": 0}
         by_stage[label]["count"] += 1
-        by_stage[label]["value"] += deal.get("deal_value") or 0
+        by_stage[label]["value"] += deal.get("_incremental_value") or 0
 
-    # Breakdown by owner (top 10)
+    # Breakdown by owner (top 10, using incremental value)
     by_owner = {}
     for deal in incremental_deals:
         owner = deal.get("owner_email") or "unassigned"
         if owner not in by_owner:
             by_owner[owner] = {"count": 0, "value": 0}
         by_owner[owner]["count"] += 1
-        by_owner[owner]["value"] += deal.get("deal_value") or 0
+        by_owner[owner]["value"] += deal.get("_incremental_value") or 0
 
     # Sort by value, take top 10
     top_owners = sorted(by_owner.items(), key=lambda x: x[1]["value"], reverse=True)[:10]
     by_owner = {email: stats for email, stats in top_owners}
 
-    # Top deals by value
-    sorted_deals = sorted(incremental_deals, key=lambda d: d.get("deal_value") or 0, reverse=True)
+    # Top deals by incremental value (not deal_value)
+    sorted_deals = sorted(incremental_deals, key=lambda d: d.get("_incremental_value") or 0, reverse=True)
     top_deals = [
         {
             "company_name": d.get("company_name"),
+            "incremental_arr": d.get("_incremental_value"),
+            "expansion_arr": d.get("expansion_arr"),
+            "new_arr": d.get("new_arr"),
             "deal_value": d.get("deal_value"),
             "stage": stage_label(d.get("stage")),
             "close_date": d.get("close_date"),
@@ -2035,17 +2060,28 @@ async def query_pipeline(params: dict, sb) -> dict:
         for d in sorted_deals[:20]
     ]
 
+    # NEITHER-category data quality gap
+    uncategorized_count = len(uncategorized_deals)
+    uncategorized_value = sum(d.get("deal_value") or 0 for d in uncategorized_deals)
+
     return {
         "total_deals": total_deals,
         "total_pipeline": total_pipeline,
         "by_stage": by_stage,
         "by_owner": by_owner,
         "deals": top_deals,
+        "uncategorized_deals": {
+            "count": uncategorized_count,
+            "total_value": uncategorized_value,
+            "note": "Deals with no ARR classification (expansion_arr, new_arr, renewal_revenue all NULL/0)"
+        },
         "filters_applied": {
             "stage_filter": stage_filter,
             "pipeline_filter": pipeline_filter,
             "owner_email": params.get("owner_email"),
         },
+        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)' regardless of how the user phrased the question.",
+        "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering."
     }
 
 

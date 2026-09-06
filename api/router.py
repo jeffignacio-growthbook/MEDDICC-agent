@@ -2972,7 +2972,8 @@ TRUNCATION NOTES (ALWAYS surface when present):
 - Example: If _truncated says "Showing 20 of 142 items", write "142 deals" prominently
 
 OPERATOR METADATA (ignore in answers):
-- Keys prefixed with _ EXCEPT _plausibility_warnings and _truncated are for operators only
+- Keys prefixed with _ EXCEPT _plausibility_warnings, _truncated, and _synthesis_note are for operators only
+- _synthesis_note: ALWAYS follow the instructions in this field when present (e.g., timeless design guidance)
 - Never echo field names like "denominator_basis", "tolerance", "variance" to users
 - Users read about deals, amounts, quarters — not schema or calculation internals
 

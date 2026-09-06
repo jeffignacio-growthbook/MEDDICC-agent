@@ -24,28 +24,40 @@
 # ============================================================================
 
 # ============================================================================
-# PIPELINE SEMANTICS
+# PIPELINE SEMANTICS (Dollar-Level Split — Confirmed Sep 6, 2026)
 # ============================================================================
 # "Pipeline" means Incremental ARR — expansion_arr + new_arr.
 #
-# Renewal base (renewal_revenue) is EXCLUDED from pipeline reporting.
-# Renewals are reported separately as "Renewal ARR" via query_upcoming_renewals.
+# DOLLAR-LEVEL SPLIT (not deal-level bucketing):
+#   - For each deal, calculate: incremental_value = expansion_arr + new_arr
+#   - Pipeline total = sum of incremental_value across all deals
+#   - A renewal deal WITH expansion contributes BOTH:
+#     * expansion_arr → incremental pipeline
+#     * renewal_revenue → renewal ARR (reported separately)
+#   - Same deal can appear in BOTH reports (measuring different components)
 #
-# A deal contributes to PIPELINE if:
-#   - It's in the new business pipeline (pipeline_id != renewal_pipeline_ids), OR
-#   - It has expansion_arr > 0 OR new_arr > 0 (incremental ARR present)
+# TIMELESS DESIGN:
+#   - Pipeline is CURRENT STATE (all active incremental ARR)
+#   - NO relationship to close_date (no time filtering)
+#   - User asking "this quarter" or "Q3" still gets ALL active incremental ARR
+#   - Response must clarify: "Current Pipeline (Incremental ARR)"
 #
-# A deal contributes to RENEWAL ARR if:
-#   - It's in the renewal pipeline (pipeline_id in renewal_pipeline_ids), AND
-#   - It has renewal_revenue > 0
+# UNCATEGORIZED DEALS (NEITHER category):
+#   - Deals with ALL ARR fields NULL/0 (no classification)
+#   - Must be explicitly surfaced as data quality gap
+#   - Never silently excluded from reporting
 #
-# This distinction ensures "What is our pipeline?" returns Incremental ARR only,
-# matching how reps forecast and how bookings are measured. Renewal base ARR
-# belongs to retention metrics (GRR/NRR), not new bookings pipeline.
+# CLASSIFICATION CATEGORIES:
+#   - INCREMENTAL ONLY: expansion_arr > 0 OR new_arr > 0, renewal_revenue = 0
+#   - RENEWAL ONLY: renewal_revenue > 0, expansion_arr = 0 AND new_arr = 0
+#   - BOTH: renewal_revenue > 0 AND (expansion_arr > 0 OR new_arr > 0)
+#   - NEITHER: all ARR fields NULL/0 (uncategorized data quality gap)
 #
 # Helper functions (field_semantics.py):
-#   - is_incremental_pipeline(deal): True if deal contributes to pipeline
-#   - is_renewal_base(deal): True if deal contributes to renewal ARR
+#   - is_incremental_pipeline(deal): True if deal has expansion_arr > 0 OR new_arr > 0
+#   - is_renewal_base(deal): True if deal has renewal_revenue > 0
+#
+# Edge cases validated: scripts/audit_pipeline_classification.py
 # ============================================================================
 
 # ============================================================================

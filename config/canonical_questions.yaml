@@ -192,18 +192,20 @@ questions:
   - id: q011
     question: "What is our pipeline this quarter?"
     shape: "pipeline_summary"
-    description: "Incremental ARR pipeline value (expansion + new business only)"
+    description: "Incremental ARR pipeline value (expansion + new business only, dollar-level split)"
     verified_value:
-      total_arr: 20632465
-      deal_count: 306
+      total_arr: 18565953
+      deal_count: 180
       quarter: "Q3_FY2027"
-      note: "Incremental ARR pipeline as of Sep 6, 2026. Expansion + new business only. Excludes 148 renewal deals ($7.1M) which are reported separately via query_upcoming_renewals."
-      previous_incorrect_value: 24985788
-      previous_incorrect_count: 444
-      correction_reason: "Original verified value included renewal base ARR. Per business definition, 'pipeline' = incremental ARR only (expansion_arr + new_arr). Renewal base excluded and reported separately."
+      note: "Incremental ARR pipeline as of Sep 6, 2026. Dollar-level split: sum of expansion_arr + new_arr per deal. Excludes 100 renewal-only deals ($5.3M). 8 deals contribute to BOTH pipeline (expansion) and renewal ARR (base). 164 uncategorized deals ($1.2M) with no ARR classification must be surfaced as data quality gap."
+      previous_incorrect_value_v1: 24985788
+      previous_incorrect_count_v1: 444
+      previous_incorrect_value_v2: 20632465
+      previous_incorrect_count_v2: 306
+      correction_reason: "V1 included all active deals. V2 included incremental deals but summed deal_value (not dollar-split). FINAL: Dollar-level split per confirmed definition - for BOTH-category deals, only expansion_arr contributes to pipeline, not full deal_value."
     source: "unanswered_queries"
     handler: "query_pipeline"
-    notes: "Failed Aug 13 as ambiguous. Wave 4 fixes: routing (query_pipeline not query_waterfall), time_window removal, incremental ARR classification. Verified Sep 6 with correct business definition."
+    notes: "Failed Aug 13 as ambiguous. Wave 4 fixes: routing (query_pipeline not query_waterfall), time_window removal, incremental ARR classification, dollar-level split, NEITHER surfacing. Verified Sep 6 with Jeff's confirmed definitions."
 
   - id: q012
     question: "Which of those are at risk?"
