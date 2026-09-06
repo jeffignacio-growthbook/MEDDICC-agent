@@ -1921,13 +1921,15 @@ async def query_pipeline(params: dict, sb) -> dict:
     STRUCTURAL FIX for q011 (Wave 4): Default scope is ALL active deals.
     No implicit filters. Only apply filters if explicitly requested in params.
 
+    IMPORTANT: Current pipeline state has no relationship to close_date.
+    This handler NEVER filters by time_window - that's movement handler semantics.
+
     Used for: "What is our pipeline?", "Show me the pipeline", "How much pipeline?"
 
     params:
       stage_filter: str (optional) - "discovery", "scoping", "proposal", "qualified"
       pipeline_filter: str (optional) - "new_business", "renewal"
       owner_email: str (optional) - specific rep email
-      time_window: dict (optional) - filters by close_date if provided
 
     Returns:
       total_deals: int
@@ -1940,14 +1942,10 @@ async def query_pipeline(params: dict, sb) -> dict:
 
     # CRITICAL: Default to NO filters (all active deals)
     # This prevents q011 bug where "pipeline" was over-filtered to qualified+new_business
+    # DO NOT filter by time_window/close_date - current state has no time scope
     base_filters = [("eq", "deal_status", "active")]
 
     # Only add optional filters if explicitly provided
-    tw = params.get("time_window")
-    if tw:
-        base_filters.append(("gte", "close_date", tw["start"]))
-        base_filters.append(("lte", "close_date", tw["end"]))
-
     if params.get("owner_email"):
         base_filters.append(("eq", "owner_email", params["owner_email"]))
 
@@ -2038,7 +2036,6 @@ async def query_pipeline(params: dict, sb) -> dict:
             "stage_filter": stage_filter,
             "pipeline_filter": pipeline_filter,
             "owner_email": params.get("owner_email"),
-            "time_window": tw is not None,
         },
     }
 
@@ -2048,11 +2045,12 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
     All active deals for a specific AE, sorted by deal value descending.
     Used for: "show me Christian's pipeline", "what deals does Cary own?"
 
+    IMPORTANT: Rep pipeline is CURRENT STATE - never filters by close_date.
+    Same principle as query_pipeline: state has no time scope.
+
     params:
       owner_email: str  — exact email from user_personas roster
-      time_window: dict — optional, filters by close_date if provided
     """
-    tw = params.get("time_window")
 
     # Accept an email OR a rep name (first / full / display). The classifier is
     # supposed to resolve names to emails via the roster, but that fails
@@ -2074,16 +2072,11 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
             "data_gap": True,
         }
 
-    # Build filters for deals
+    # Build filters for deals (current state only - no time_window filtering)
     filters = [
         ("eq", "owner_email", owner_email),
         ("eq", "deal_status", "active")
     ]
-    
-    # Add time window filter if provided
-    if tw:
-        filters.append(("gte", "close_date", tw["start"]))
-        filters.append(("lte", "close_date", tw["end"]))
     
     # Get active deals for this rep
     deals_rows = select_all(sb, "deals",
