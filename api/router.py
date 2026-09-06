@@ -1060,6 +1060,22 @@ RULES:
 - Maximum 5 tool calls per question
 - If data genuinely doesn't exist, say so plainly
 - Never invent numbers
+
+DEFAULT SCOPING (CRITICAL - prevents over-filtering):
+For GENERIC pipeline questions like "What is our pipeline this quarter?":
+- Include ALL active deals (deal_status = 'active')
+- Do NOT add filters for:
+  * "qualified" (stage_order >= threshold)
+  * "new business" (pipeline != renewal)
+  * specific stages or owners
+- ONLY add filters when explicitly requested:
+  * "qualified pipeline" → add stage filter
+  * "new business pipeline" → add pipeline filter
+  * "Christian's pipeline" → add owner filter
+
+Generic "pipeline" means EVERYTHING active. Resist the urge to
+assume qualifiers. If the question doesn't say "qualified" or
+"new business", include all active deals regardless.
 - Fetch limits: Default is 200 rows, max 500. Fetching more rows does NOT
   cost you context — large results are automatically aggregated into summaries
   + samples. Ask for what you need; the aggregate handles size.
