@@ -93,21 +93,26 @@ questions:
     shape: "count"
     description: "Number of deals with forecast_category = 'COMMIT'"
     verified_value:
-      count: 2
+      count: 3
       total_deals: 444
-      commit_arr: 170000
-      commit_pct: 0.5
+      commit_arr: 265000
+      commit_pct: 1.0
       deals:
+        - name: "Airalo"
+          owner: "james.shannon@growthbook.io"
+          value: 95000
         - name: "Taxfix"
           owner: "jake@growthbook.io"
           value: 70000
         - name: "Trade Me"
           owner: "jake@growthbook.io"
           value: 100000
-      note: "Only 2 deals in COMMIT out of 444 ($170K of $25M pipeline, 0.5% vs 5% threshold) - process finding"
+      snapshot_date: "2026-09-06"
+      validation_status: "single-period, pending multi-period backtest"
+      note: "Updated Sep 6, 2026. Airalo entered COMMIT between Sep 5-6. Case-insensitive matching required."
     source: "debugging_session"
     handler: "dynamic"
-    notes: "Sep 2 finding, updated Sep 5 post case-sensitivity fix. Case-insensitive matching required (HubSpot stores as uppercase 'COMMIT')."
+    notes: "Sep 2 finding, updated Sep 5 post case-sensitivity fix, updated Sep 6 after Wave 4 calibration. Dynamic baseline - may change daily as forecast categories update."
 
   # ============ From successful fallback_log ============
 
@@ -131,14 +136,20 @@ questions:
     verified_value:
       q3_renewals:
         count: 33
-        arr_value: 1192517
+        base_renewal: ~1000000
+        expansion: 110000
+        total: ~1100000
       q4_renewals:
         count: 21
-        arr_value: 2273718
-      note: "Counted from deals table with renewal_revenue > 0 on Sep 5, 2026"
+        base_renewal: ~900000
+        expansion: 738755
+        total: ~1600000
+      snapshot_date: "2026-09-06"
+      validation_status: "single-period, pending multi-period backtest"
+      note: "Updated Sep 6, 2026. ARR values decreased from Sep 5 baseline due to renewal_revenue changes or deals moving."
     source: "unanswered_queries"
     handler: "query_renewals"
-    notes: "Failed Aug 28-31, Sep 1. Answered directly from database Sep 5."
+    notes: "Failed Aug 28-31, Sep 1. Answered directly from database Sep 5, updated Sep 6 after Wave 4 calibration. Dynamic baseline - renewal values change as deals close or move."
 
   - id: q009
     question: "Which deals have a champion score above 6 and close in Q3?"
@@ -159,22 +170,24 @@ questions:
     verified_value:
       count: 3
       deals:
+        - company_name: "Via"
+          close_date: "2026-09-06"
+          arr: null
+          loss_reason: null
+        - company_name: "Intelligent Lending Limited (Ocean Finance)"
+          close_date: "2026-09-06"
+          arr: null
+          loss_reason: null
         - company_name: "Creative CX"
           close_date: "2026-10-26"
           arr: 50000
           loss_reason: null
-        - company_name: "Huckberry"
-          close_date: "2026-09-02"
-          arr: 0
-          loss_reason: null
-        - company_name: "Hungama"
-          close_date: "2026-09-02"
-          arr: 0
-          loss_reason: null
-      note: "Last 3 closed-lost deals as of Sep 5, 2026. Loss reasons not populated in database."
+      snapshot_date: "2026-09-06"
+      validation_status: "single-period, pending multi-period backtest"
+      note: "Updated Sep 6, 2026. Losses change daily - verify current 'last 3' before calibration."
     source: "unanswered_queries"
     handler: "query_win_loss"
-    notes: "Failed Aug 13 with no_data. Answered directly Sep 5 - loss_reason field exists but is null."
+    notes: "Failed Aug 13 with no_data. Answered directly Sep 5, updated Sep 6 after Wave 4 calibration. Highly volatile baseline - two new losses appeared overnight."
 
   - id: q011
     question: "What is our pipeline this quarter?"
@@ -209,17 +222,19 @@ questions:
     description: "Full details for a single deal by company name"
     verified_value:
       exists: true
-      deal_id: 55660576681
+      deal_id: "55660576681"
       company_name: "Skyscanner"
-      stage: "Scoping"
+      stage: "Presentation Scheduled"
       arr: 125000
       owner: "christian@growthbook.io"
-      close_date: "2027-01-31"
+      close_date: "2026-10-30"
       status: "active"
-      note: "Found in deals table Sep 5, 2026"
+      snapshot_date: "2026-09-06"
+      validation_status: "single-period, pending multi-period backtest"
+      note: "Updated Sep 6, 2026. Deal moved to later stage, close date pulled in by 3 months."
     source: "unanswered_queries"
     handler: "dynamic"
-    notes: "Failed Aug 13. Answered directly Sep 5 - single active deal found."
+    notes: "Failed Aug 13. Answered directly Sep 5, updated Sep 6 after Wave 4 calibration. Deal progressed: Scoping → Presentation Scheduled."
 
   - id: q014
     question: "What does a 6 mean for champion?"
@@ -249,10 +264,12 @@ questions:
       won_count: 48
       closed_count: 461
       date_range: "2026-03-05 to 2026-09-05"
-      note: "10.4% win rate (48 won / 461 closed) over 6-month window. Median cycle time 159 days. Bug fix: original query only fetched active deals, missing all won/lost deals."
+      snapshot_date: "2026-09-06"
+      validation_status: "single-period, pending multi-period backtest"
+      note: "Overall metrics relatively stable. Stage-level breakdowns may vary daily. Last verified: Sep 6, 2026."
     source: "unanswered_queries"
     handler: "query_forecast"
-    notes: "Failed Sep 1 with no_data. Initial query Sep 5 returned 0% due to bug (only fetching active deals). Corrected query fetches all deal statuses - 10.4% win rate verified."
+    notes: "Failed Sep 1 with no_data. Initial query Sep 5 returned 0% due to bug (only fetching active deals). Corrected query fetches all deal statuses - 10.4% win rate verified. Sep 6: Overall metrics confirmed stable, stage-level data shifts daily."
 
   # ============ Additional coverage from today's findings ============
 
