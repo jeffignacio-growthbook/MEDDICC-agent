@@ -27,16 +27,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Test Railway API Directly
+      - name: Run Wave 4 Calibration (via Slack)
         env:
-          RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
-        run: |
-          python test_railway_api_direct.py
-
-      - name: Run Wave 4 Calibration
-        env:
-          RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          CALIBRATION_CHANNEL: ${{ vars.CALIBRATION_CHANNEL || 'C07PZ7ZDH0N' }}
         run: |
-          python scripts/run_calibration.py
+          python scripts/run_calibration_via_slack.py
