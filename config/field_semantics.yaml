@@ -199,23 +199,65 @@ outcome_buckets:
 deal_states:
   at_risk:
     label: "At Risk"
-    # PENDING DEFINITION FROM RYAN
-    # "At risk" is Ryan's term and means something specific to him.
-    # Candidate criteria (UNVERIFIED):
-    # - No activity in 30+ days?
-    # - Overall MEDDICC score below threshold (what threshold)?
-    # - No champion identified?
-    # - Stalled in stage for X days?
-    # - Close date slipped N times?
-    #
-    # Handler query_deals_at_risk exists but implements placeholder logic
-    # (stage-aware MEDDICC band checking). Needs Ryan's definition to finalize.
-    #
-    # Evidence: 7x most-asked unanswered question in Wave 1 analysis.
-    # Entity-scoped version ("which of those are at risk?") works.
-    # Missing: semantic fact defining what "at risk" means.
+    description: |
+      Deals with MEDDICC components below the threshold required to advance
+      from their current stage. Uses stage-aware band checking from
+      config/client.yaml stage_progression requirements.
 
-    implementation: query_deals_at_risk  # Placeholder until definition confirmed
+    # CANONICAL DEFINITION: Stage-aware MEDDICC band checking
+    # (Finalized after Wave 4 calibration investigation, Sep 2026)
+    #
+    # A deal is flagged at-risk when ANY MEDDICC component required at its
+    # current stage falls below the threshold band needed to advance.
+    #
+    # Example: A deal in Discovery (appointmentscheduled) needs:
+    #   - pain: 5 (yellow band)
+    #   - champion: 4 (red band)
+    # to advance to Scoping. If pain_score=3 (red) or champion_score=2 (red),
+    # the deal is at-risk because it lacks advancement readiness.
+    #
+    # Stage requirements are loaded from config/client.yaml → stage_progression.
+    # Band thresholds are defined in api/rubric.py MEDDICC_BANDS.
+    #
+    # TWO MODES:
+    # 1. Full stage-aware check (canonical, used for drill-downs):
+    #    - Load stage requirements from stage_progression
+    #    - Check each required component against band threshold
+    #    - Flag if ANY required component is below threshold band
+    #
+    # 2. Quick check (lightweight, used for pipeline summaries):
+    #    - overall_score < 40 OR champion_score < 4
+    #    - Faster but less precise (doesn't account for stage context)
+    #    - Use only when full stage-aware check would be too expensive
+    #
+    # DECISION: Stage-aware is canonical. Quick check is a performance
+    # optimization that may produce different counts (94 vs 70 vs 33 in
+    # Wave 4 testing depending on scope and mode).
+
+    canonical_mode: "stage_aware"  # stage_aware | quick_check
+    stage_aware:
+      source: "config/client.yaml → stage_progression"
+      logic: "ANY required component below threshold band"
+      band_source: "api/rubric.py → MEDDICC_BANDS"
+
+    quick_check:
+      # Lightweight fallback for expensive queries (e.g., inline in waterfall)
+      # NOT canonical - may produce different counts than stage-aware
+      rules:
+        - field: "overall_score"
+          operator: "lt"
+          threshold: 40
+        - field: "champion_score"
+          operator: "lt"
+          threshold: 4
+      logic: "OR"  # Flag if ANY rule matches
+
+    implementation: "is_at_risk"  # Generated function in field_semantics.py
+    note: |
+      Consolidated from two divergent implementations in Wave 4 remediation:
+      - query_waterfall used quick_check (simple threshold) → 94 deals
+      - query_deals_at_risk used stage_aware → 33 deals (scoped)
+      Stage-aware is now canonical. Quick check remains for performance when needed.
 
 # ============================================================================
 # FIELD DISPLAY NAMES — USE IN SYNTHESIS, NOT COLUMN NAMES
