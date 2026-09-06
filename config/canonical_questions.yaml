@@ -192,15 +192,18 @@ questions:
   - id: q011
     question: "What is our pipeline this quarter?"
     shape: "pipeline_summary"
-    description: "Active pipeline value, deal count, by stage or segment"
+    description: "Incremental ARR pipeline value (expansion + new business only)"
     verified_value:
-      total_arr: 24985788
-      deal_count: 444
+      total_arr: 20632465
+      deal_count: 306
       quarter: "Q3_FY2027"
-      note: "Active pipeline as of Sep 5, 2026. Total includes all active deals regardless of close date."
+      note: "Incremental ARR pipeline as of Sep 6, 2026. Expansion + new business only. Excludes 148 renewal deals ($7.1M) which are reported separately via query_upcoming_renewals."
+      previous_incorrect_value: 24985788
+      previous_incorrect_count: 444
+      correction_reason: "Original verified value included renewal base ARR. Per business definition, 'pipeline' = incremental ARR only (expansion_arr + new_arr). Renewal base excluded and reported separately."
     source: "unanswered_queries"
     handler: "query_pipeline"
-    notes: "Failed Aug 13 as ambiguous. Answered directly Sep 5 - $25M across 444 active deals."
+    notes: "Failed Aug 13 as ambiguous. Wave 4 fixes: routing (query_pipeline not query_waterfall), time_window removal, incremental ARR classification. Verified Sep 6 with correct business definition."
 
   - id: q012
     question: "Which of those are at risk?"

@@ -212,3 +212,89 @@ def is_at_risk_quick(analysis: dict) -> bool:
     overall = analysis.get("overall_score", 0) or 0
     champion = analysis.get("champion_score", 0) or 0
     return overall < 40 or champion < 4
+
+
+# ============================================================================
+# PIPELINE CLASSIFICATION — HAND-WRITTEN BUSINESS LOGIC
+# ============================================================================
+# These helpers implement the PIPELINE SEMANTICS from config/field_semantics.yaml.
+# They distinguish Incremental ARR (pipeline) from Renewal base ARR.
+#
+# DO NOT AUTO-GENERATE — these encode client-specific business definitions.
+# ============================================================================
+
+# Renewal pipeline ID from config/client.yaml
+_RENEWAL_PIPELINE_ID = "866608541"
+
+def is_incremental_pipeline(deal: dict) -> bool:
+    """
+    True if deal contributes to PIPELINE (Incremental ARR).
+
+    Pipeline means expansion_arr + new_arr (excludes renewal base).
+
+    A deal is in pipeline if:
+      - It's in new business pipeline (pipeline_id != renewal), OR
+      - It has expansion_arr > 0 OR new_arr > 0
+
+    Args:
+        deal: Dict with pipeline_id, expansion_arr, new_arr keys
+
+    Returns:
+        True if deal contributes to incremental ARR pipeline
+
+    Examples:
+        is_incremental_pipeline({"pipeline_id": "default", "new_arr": 100000}) -> True
+        is_incremental_pipeline({"pipeline_id": "866608541", "expansion_arr": 50000}) -> True (renewal + expansion)
+        is_incremental_pipeline({"pipeline_id": "866608541", "renewal_revenue": 200000}) -> False (pure renewal)
+
+    Note:
+        Per PIPELINE SEMANTICS in config/field_semantics.yaml:
+        "Pipeline" = Incremental ARR only. Renewal base excluded and reported separately.
+    """
+    if not deal:
+        return False
+
+    pipeline_id = deal.get("pipeline_id", "")
+    expansion_arr = deal.get("expansion_arr", 0) or 0
+    new_arr = deal.get("new_arr", 0) or 0
+
+    # New business pipeline always counts
+    if pipeline_id != _RENEWAL_PIPELINE_ID:
+        return True
+
+    # Renewal pipeline: only counts if has incremental ARR
+    return expansion_arr > 0 or new_arr > 0
+
+
+def is_renewal_base(deal: dict) -> bool:
+    """
+    True if deal contributes to RENEWAL ARR (renewal base, not expansion).
+
+    Renewal ARR is separate from pipeline and reported via query_upcoming_renewals.
+
+    A deal is renewal base if:
+      - It's in renewal pipeline (pipeline_id == renewal_pipeline_id), AND
+      - It has renewal_revenue > 0
+
+    Args:
+        deal: Dict with pipeline_id, renewal_revenue keys
+
+    Returns:
+        True if deal contributes to renewal base ARR
+
+    Examples:
+        is_renewal_base({"pipeline_id": "866608541", "renewal_revenue": 200000}) -> True
+        is_renewal_base({"pipeline_id": "default", "new_arr": 100000}) -> False
+        is_renewal_base({"pipeline_id": "866608541", "expansion_arr": 50000, "renewal_revenue": 0}) -> False
+
+    Note:
+        Renewal base is excluded from "pipeline" and reported separately.
+        See PIPELINE SEMANTICS in config/field_semantics.yaml.
+    """
+    if not deal:
+        return False
+
+    pipeline_id = deal.get("pipeline_id", "")
+    renewal_revenue = deal.get("renewal_revenue", 0) or 0
+
+    return pipeline_id == _RENEWAL_PIPELINE_ID and renewal_revenue > 0

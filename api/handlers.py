@@ -1916,29 +1916,34 @@ async def query_cycle_time(params: dict, sb) -> dict:
 
 async def query_pipeline(params: dict, sb) -> dict:
     """
-    Overall pipeline snapshot: all active deals with totals and breakdowns.
+    Pipeline snapshot: INCREMENTAL ARR only (expansion + new business).
 
-    STRUCTURAL FIX for q011 (Wave 4): Default scope is ALL active deals.
-    No implicit filters. Only apply filters if explicitly requested in params.
+    BUSINESS DEFINITION: "Pipeline" = expansion_arr + new_arr.
+    Renewal base (renewal_revenue) is EXCLUDED and reported separately via query_upcoming_renewals.
 
-    IMPORTANT: Current pipeline state has no relationship to close_date.
-    This handler NEVER filters by time_window - that's movement handler semantics.
+    Per field_semantics.yaml PIPELINE SEMANTICS:
+    - Pipeline = deals with expansion_arr > 0 OR new_arr > 0
+    - Renewal base ARR excluded (reported separately)
+    - Current state has NO relationship to close_date (no time filtering)
 
     Used for: "What is our pipeline?", "Show me the pipeline", "How much pipeline?"
 
     params:
       stage_filter: str (optional) - "discovery", "scoping", "proposal", "qualified"
-      pipeline_filter: str (optional) - "new_business", "renewal"
+      pipeline_filter: str (optional) - "new_business", "renewal" (filters BY pipeline type)
       owner_email: str (optional) - specific rep email
 
     Returns:
-      total_deals: int
-      total_pipeline: float (sum of deal_value)
+      total_deals: int (incremental ARR deals only)
+      total_pipeline: float (sum of expansion_arr + new_arr)
       by_stage: dict (breakdown by stage)
       by_owner: dict (breakdown by owner, top 10)
       deals: list (top 20 by value)
+
+    Note:
+      Wave 4 fixes: Removed time_window filtering + added incremental ARR classification.
     """
-    from field_semantics import stage_bucket, stage_label, is_open
+    from field_semantics import stage_bucket, stage_label, is_open, is_incremental_pipeline
 
     # CRITICAL: Default to NO filters (all active deals)
     # This prevents q011 bug where "pipeline" was over-filtered to qualified+new_business
@@ -1954,15 +1959,21 @@ async def query_pipeline(params: dict, sb) -> dict:
     # Pipeline type filtering (only if requested)
     pipeline_filter = params.get("pipeline_filter")  # e.g., "new_business", "renewal"
 
-    # Fetch all active deals
+    # Fetch all active deals with ARR breakdown fields
     deals_rows = select_all(
         sb, "deals",
-        columns="deal_id,company_name,deal_value,stage,close_date,owner_email,pipeline_id",
+        columns="deal_id,company_name,deal_value,stage,close_date,owner_email,pipeline_id,expansion_arr,new_arr,renewal_revenue",
         filters=base_filters
     )
 
+    # CRITICAL: Filter to INCREMENTAL ARR pipeline only (excludes renewal base)
+    # Per PIPELINE SEMANTICS: pipeline = expansion_arr + new_arr
+    incremental_deals = [d for d in deals_rows if is_incremental_pipeline(d)]
+
     # Apply stage/pipeline filters in memory (if requested)
     if stage_filter or pipeline_filter:
+        filtered_deals = []
+        for deal in incremental_deals:
         filtered_deals = []
         for deal in deals_rows:
             # Stage filtering
@@ -1984,15 +1995,15 @@ async def query_pipeline(params: dict, sb) -> dict:
                     continue
 
             filtered_deals.append(deal)
-        deals_rows = filtered_deals
+        incremental_deals = filtered_deals
 
-    # Calculate totals
-    total_deals = len(deals_rows)
-    total_pipeline = sum(d.get("deal_value") or 0 for d in deals_rows)
+    # Calculate totals (incremental ARR only)
+    total_deals = len(incremental_deals)
+    total_pipeline = sum(d.get("deal_value") or 0 for d in incremental_deals)
 
     # Breakdown by stage
     by_stage = {}
-    for deal in deals_rows:
+    for deal in incremental_deals:
         stage = deal.get("stage")
         label = stage_label(stage)
         if label not in by_stage:
@@ -2002,7 +2013,7 @@ async def query_pipeline(params: dict, sb) -> dict:
 
     # Breakdown by owner (top 10)
     by_owner = {}
-    for deal in deals_rows:
+    for deal in incremental_deals:
         owner = deal.get("owner_email") or "unassigned"
         if owner not in by_owner:
             by_owner[owner] = {"count": 0, "value": 0}
@@ -2014,7 +2025,7 @@ async def query_pipeline(params: dict, sb) -> dict:
     by_owner = {email: stats for email, stats in top_owners}
 
     # Top deals by value
-    sorted_deals = sorted(deals_rows, key=lambda d: d.get("deal_value") or 0, reverse=True)
+    sorted_deals = sorted(incremental_deals, key=lambda d: d.get("deal_value") or 0, reverse=True)
     top_deals = [
         {
             "company_name": d.get("company_name"),

@@ -24,6 +24,31 @@
 # ============================================================================
 
 # ============================================================================
+# PIPELINE SEMANTICS
+# ============================================================================
+# "Pipeline" means Incremental ARR — expansion_arr + new_arr.
+#
+# Renewal base (renewal_revenue) is EXCLUDED from pipeline reporting.
+# Renewals are reported separately as "Renewal ARR" via query_upcoming_renewals.
+#
+# A deal contributes to PIPELINE if:
+#   - It's in the new business pipeline (pipeline_id != renewal_pipeline_ids), OR
+#   - It has expansion_arr > 0 OR new_arr > 0 (incremental ARR present)
+#
+# A deal contributes to RENEWAL ARR if:
+#   - It's in the renewal pipeline (pipeline_id in renewal_pipeline_ids), AND
+#   - It has renewal_revenue > 0
+#
+# This distinction ensures "What is our pipeline?" returns Incremental ARR only,
+# matching how reps forecast and how bookings are measured. Renewal base ARR
+# belongs to retention metrics (GRR/NRR), not new bookings pipeline.
+#
+# Helper functions (field_semantics.py):
+#   - is_incremental_pipeline(deal): True if deal contributes to pipeline
+#   - is_renewal_base(deal): True if deal contributes to renewal ARR
+# ============================================================================
+
+# ============================================================================
 # PRECOMPUTED TABLES — PREFER THESE OVER RAW AGGREGATION
 # ============================================================================
 # These tables hold reconciled, point-in-time values. Use them instead of
