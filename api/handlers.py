@@ -2037,16 +2037,27 @@ async def query_pipeline(params: dict, sb) -> dict:
     current_quarter = current_quarter_label()
     quarterly_target = None
     coverage_ratio = None
+    coverage_caveat = None
 
     try:
+        # Query for team-level incremental_arr target (matches pipeline metric)
         target_response = sb.table("rep_targets").select("target_value").eq(
             "period", current_quarter
-        ).eq("level", "company").eq("metric", "total_arr").execute()
+        ).eq("level", "team").eq("metric", "incremental_arr").execute()
 
         if target_response.data:
             quarterly_target = target_response.data[0].get("target_value")
             if quarterly_target and quarterly_target > 0:
                 coverage_ratio = total_pipeline / quarterly_target
+
+                # If coverage > 10x, add caveat about timeless design
+                if coverage_ratio > 10:
+                    coverage_caveat = (
+                        "Coverage is high because pipeline includes ALL active deals "
+                        "regardless of close date (timeless design). Many deals close "
+                        "in future quarters. For deals closing THIS quarter specifically, "
+                        "filter by close_date."
+                    )
     except Exception as e:
         logger.warning(f"[PIPELINE] Failed to fetch quarterly target: {e}")
 
@@ -2101,6 +2112,7 @@ async def query_pipeline(params: dict, sb) -> dict:
         "total_pipeline": total_pipeline,
         "quarterly_target": quarterly_target,
         "coverage_ratio": coverage_ratio,
+        "coverage_caveat": coverage_caveat,
         "current_quarter": current_quarter,
         "zero_arr_deals": {
             "count": zero_arr_count,
@@ -2120,7 +2132,7 @@ async def query_pipeline(params: dict, sb) -> dict:
             "pipeline_filter": pipeline_filter,
             "owner_email": params.get("owner_email"),
         },
-        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. PROACTIVE FRAMING: Lead with coverage ratio if available. Offer to show next-quarter pipeline or upcoming renewals.",
+        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. COVERAGE RATIO: If coverage_caveat is present, ALWAYS include it immediately after stating the coverage ratio - never present high coverage without the caveat. PROACTIVE FRAMING: Offer to show deals closing this quarter specifically, or upcoming renewals.",
         "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering."
     }
 
