@@ -238,6 +238,40 @@ def label_to_stage_id(display_label: str) -> str:
     if not display_label:
         return display_label
     return _LABEL_TO_STAGE_ID.get(display_label, display_label)
+
+def is_at_risk_quick(analysis: dict) -> bool:
+    """
+    Quick at-risk check for pipeline summaries (performance mode).
+
+    Uses simple thresholds from field_semantics.yaml:
+    - overall_score < 40 OR champion_score < 4
+
+    This is NOT the canonical at-risk definition (that's stage-aware
+    band checking in api/handlers.py). Use this only for lightweight
+    checks where full stage-aware logic would be too expensive.
+
+    Args:
+        analysis: Dict with 'overall_score', 'champion_score' keys
+
+    Returns:
+        True if deal meets quick-check at-risk criteria
+
+    Examples:
+        is_at_risk_quick({{"overall_score": 35, "champion_score": 6}}) -> True (score < 40)
+        is_at_risk_quick({{"overall_score": 50, "champion_score": 3}}) -> True (champ < 4)
+        is_at_risk_quick({{"overall_score": 50, "champion_score": 7}}) -> False
+        is_at_risk_quick({{}}) -> False (missing data not at-risk)
+
+    Note:
+        Consolidated in Wave 4 remediation from duplicate implementations:
+        - query_waterfall used this logic inline
+        - query_deals_at_risk uses stage-aware (canonical)
+    """
+    if not analysis:
+        return False
+    overall = analysis.get("overall_score", 0) or 0
+    champion = analysis.get("champion_score", 0) or 0
+    return overall < 40 or champion < 4
 '''
 
     return module_content

@@ -2,7 +2,7 @@
 AUTO-GENERATED from config/field_semantics.yaml by scripts/generate_field_semantics.py.
 DO NOT EDIT BY HAND. Regenerate after changing the yaml.
 
-Generated: 2026-09-05 06:35:52 UTC
+Generated: 2026-09-06 05:14:42 UTC
 """
 
 STAGE_MAP = {'appointmentscheduled': {'label': 'Discovery', 'bucket': 'discovery', 'transition': 'discovery_to_scoping'}, 'qualifiedtobuy': {'label': 'Scoping', 'bucket': 'scoping', 'transition': 'scoping_to_proposal'}, 'presentationscheduled': {'label': 'Technical Evaluation', 'bucket': 'proposal', 'transition': 'proposal_to_negotiating'}, 'decisionmakerboughtin': {'label': 'Review', 'bucket': 'proposal', 'transition': None, 'exclude_from_analysis': True}, 'contractsent': {'label': 'Contract Sent', 'bucket': 'proposal', 'transition': None, 'historical': True}, 'closedwon': {'label': 'Closed Won', 'bucket': 'closed_won', 'transition': None, 'aliases': ['1297321623']}, 'closedlost': {'label': 'Closed Lost', 'bucket': 'closed_lost', 'transition': None, 'aliases': ['1297321624', '68509551'], 'alias_labels': ['Disqualified']}, '79653122': {'label': 'Meeting Set', 'bucket': 'discovery', 'transition': None}, '24682892': {'label': 'Negotiating', 'bucket': 'proposal', 'transition': None}, '43449439': {'label': 'Awaiting Signature', 'bucket': 'proposal', 'transition': None}, '1297321618': {'label': 'Upcoming Renewal', 'bucket': 'discovery', 'transition': None}, '1297321619': {'label': 'Renewal Engaged', 'bucket': 'scoping', 'transition': None}, '1297321620': {'label': 'Pricing Presented', 'bucket': 'proposal', 'transition': None}, '1297321622': {'label': 'Contract Sent (Renewal)', 'bucket': 'proposal', 'transition': None}}
@@ -178,3 +178,37 @@ def label_to_stage_id(display_label: str) -> str:
     if not display_label:
         return display_label
     return _LABEL_TO_STAGE_ID.get(display_label, display_label)
+
+def is_at_risk_quick(analysis: dict) -> bool:
+    """
+    Quick at-risk check for pipeline summaries (performance mode).
+
+    Uses simple thresholds from field_semantics.yaml:
+    - overall_score < 40 OR champion_score < 4
+
+    This is NOT the canonical at-risk definition (that's stage-aware
+    band checking in api/handlers.py). Use this only for lightweight
+    checks where full stage-aware logic would be too expensive.
+
+    Args:
+        analysis: Dict with 'overall_score', 'champion_score' keys
+
+    Returns:
+        True if deal meets quick-check at-risk criteria
+
+    Examples:
+        is_at_risk_quick({"overall_score": 35, "champion_score": 6}) -> True (score < 40)
+        is_at_risk_quick({"overall_score": 50, "champion_score": 3}) -> True (champ < 4)
+        is_at_risk_quick({"overall_score": 50, "champion_score": 7}) -> False
+        is_at_risk_quick({}) -> False (missing data not at-risk)
+
+    Note:
+        Consolidated in Wave 4 remediation from duplicate implementations:
+        - query_waterfall used this logic inline
+        - query_deals_at_risk uses stage-aware (canonical)
+    """
+    if not analysis:
+        return False
+    overall = analysis.get("overall_score", 0) or 0
+    champion = analysis.get("champion_score", 0) or 0
+    return overall < 40 or champion < 4
