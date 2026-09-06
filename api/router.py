@@ -149,7 +149,7 @@ NEW_DISCOVERY_SIGNALS = [
 # Maps question keywords to bulk handler names for entity-scoped queries
 # Handler descriptions - single source of truth for both INTENT_PROMPT and entity-scope classification
 HANDLER_DESCRIPTIONS = {
-    "query_waterfall": "pipeline movement, new/won/lost this week/quarter",
+    "query_waterfall": "pipeline CHANGE/MOVEMENT — new deals added, deals won, deals lost this week/quarter. Use for questions about what changed, moved, or flowed through. Do NOT use for current state (use query_pipeline instead).",
     "query_pipeline_movement": (
         "Historical pipeline movement, stage composition over time, "
         "deal-level stage changes, and the coverage curve by week — read "
@@ -219,16 +219,21 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "Sales cycle time analysis — median days from create to close, "
         "STRUCTURAL ENFORCEMENT: uses compute_cycle_time() with correct methodology "
         "(close_date - create_date, all closed deals, median not average). "
-        "Use for questions about sales cycle, time to close, deal velocity. "
+        "Use for questions about sales cycle, time to close, deal velocity, "
+        "how long deals take, average close time, days to close. "
         "Examples: 'What's our sales cycle?', 'How long does it take to close?', "
-        "'Average time from opportunity to close?'"
+        "'Average time from opportunity to close?', 'How long do deals take?', "
+        "'What's the typical time to close?', 'Cycle time by segment'"
     ),
     "query_pipeline": (
         "Overall pipeline snapshot — ALL active deals with totals and breakdowns. "
         "STRUCTURAL ENFORCEMENT: defaults to ALL active deals (no filters). "
-        "Use for generic pipeline questions without a specific rep or filter. "
+        "Use for CURRENT STATE questions about pipeline/funnel without movement. "
+        "Covers: pipeline, funnel, open deals, active deals, what's in the pipeline. "
+        "Do NOT use for 'pipeline movement' (use query_waterfall instead). "
         "Examples: 'What is our pipeline?', 'Show me the pipeline', "
-        "'How much pipeline do we have?', 'What's in our pipeline this quarter?'"
+        "'How much pipeline do we have?', 'What's in our pipeline this quarter?', "
+        "'How much open pipeline?', 'What's in the funnel?', 'Show me active deals'"
     ),
     "query_rep_pipeline": (
         "Active pipeline for a specific AE — all their open deals with "
