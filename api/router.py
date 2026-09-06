@@ -1080,6 +1080,23 @@ assume qualifiers. If the question doesn't say "qualified" or
   cost you context — large results are automatically aggregated into summaries
   + samples. Ask for what you need; the aggregate handles size.
 
+CYCLE TIME CALCULATION (sales cycle, time to close, days to close):
+For questions about "sales cycle time" or "time to close":
+- Use ALL closed deals (won + lost), not just won
+- Calculate: (close_date - create_date) in days for each deal
+- Report MEDIAN not average (median is robust to outliers)
+- Include date range in answer (e.g., "last 6 months", "since March")
+
+Example query:
+  filter_table('deals',
+               columns=['deal_id','create_date','close_date','deal_status'],
+               filters=[['gte','close_date','2026-03-01']],
+               limit=1000)
+Then calculate median of (close_date - create_date) across all rows.
+
+Do NOT use stage-specific durations, last_updated, or only won deals.
+Cycle time = deal creation to deal closure, all closed deals.
+
 DATES: Always use the exact time_window dates provided
 in the question context. Never compute your own fiscal
 quarters — the resolved start/end dates are always given.
