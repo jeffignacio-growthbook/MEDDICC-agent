@@ -195,17 +195,20 @@ questions:
     description: "Incremental ARR pipeline value (expansion + new business only, dollar-level split)"
     verified_value:
       total_arr: 18565953
-      deal_count: 180
+      deal_count: 306
       quarter: "Q3_FY2027"
-      note: "Incremental ARR pipeline as of Sep 6, 2026. Dollar-level split: sum of expansion_arr + new_arr per deal. Excludes 100 renewal-only deals ($5.3M). 8 deals contribute to BOTH pipeline (expansion) and renewal ARR (base). 164 uncategorized deals ($1.2M) with no ARR classification must be surfaced as data quality gap."
+      zero_arr_deals: 126
+      uncategorized_deals: 39
+      note: "Incremental ARR pipeline as of Sep 6, 2026. Deal count: 306 (using is_incremental_pipeline). Dollar total: $18.6M (sum of expansion_arr + new_arr per deal, dollar-level split). Data quality: 126 deals in pipeline with $0 incremental ARR recorded. 39 uncategorized deals with no ARR classification."
       previous_incorrect_value_v1: 24985788
       previous_incorrect_count_v1: 444
       previous_incorrect_value_v2: 20632465
       previous_incorrect_count_v2: 306
-      correction_reason: "V1 included all active deals. V2 included incremental deals but summed deal_value (not dollar-split). FINAL: Dollar-level split per confirmed definition - for BOTH-category deals, only expansion_arr contributes to pipeline, not full deal_value."
+      previous_incorrect_count_v3: 180
+      correction_reason: "V1 included all active deals. V2 included incremental deals but summed deal_value (not dollar-split). V3 filtered to incremental_value > 0, excluding 126 deals in pipeline with $0 ARR. FINAL: Deal count uses is_incremental_pipeline() (306 deals), dollar total uses sum of expansion_arr + new_arr ($18.6M)."
     source: "unanswered_queries"
     handler: "query_pipeline"
-    notes: "Failed Aug 13 as ambiguous. Wave 4 fixes: routing (query_pipeline not query_waterfall), time_window removal, incremental ARR classification, dollar-level split, NEITHER surfacing. Verified Sep 6 with Jeff's confirmed definitions."
+    notes: "Failed Aug 13 as ambiguous. Wave 4 fixes: routing (query_pipeline not query_waterfall), time_window removal, incremental ARR classification, dollar-level split, zero-ARR surfacing, NEITHER surfacing, coverage ratio, proactive framing. Verified Sep 6 with Jeff's confirmed definitions and reconciliation."
 
   - id: q012
     question: "Which of those are at risk?"

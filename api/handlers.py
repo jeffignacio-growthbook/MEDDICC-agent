@@ -1920,14 +1920,19 @@ async def query_pipeline(params: dict, sb) -> dict:
 
     BUSINESS DEFINITION (dollar-level split confirmed Sep 6, 2026):
     - "Pipeline" = sum of (expansion_arr + new_arr) for each deal
-    - Renewal base (renewal_revenue) is EXCLUDED and reported separately
-    - For renewal deals WITH expansion: expansion_arr → pipeline, renewal_revenue → renewal ARR
-    - Same deal can contribute to BOTH reports (not double-counting - measuring different components)
+    - DEAL COUNT: Use is_incremental_pipeline() (includes deals in pipeline even if ARR=0)
+    - DOLLAR TOTAL: Sum expansion_arr + new_arr per deal (dollar-level split)
+    - DATA QUALITY: Flag deals in pipeline with $0 incremental ARR as data quality gap
 
     TIMELESS DESIGN:
     - Current state has NO relationship to close_date (no time filtering)
     - Regardless of user asking "this quarter" or "Q3", returns ALL active incremental ARR
     - Response must clarify: "Current Pipeline (Incremental ARR)" not "This Quarter's Pipeline"
+
+    PROACTIVE FRAMING (VP of RevOps thinking):
+    - Pull quarterly target and compute coverage ratio
+    - Proactively offer next-quarter and renewal views
+    - Surface data quality gaps explicitly
 
     Used for: "What is our pipeline?", "Show me the pipeline", "How much pipeline?"
 
@@ -1937,17 +1942,21 @@ async def query_pipeline(params: dict, sb) -> dict:
       owner_email: str (optional) - specific rep email
 
     Returns:
-      total_deals: int (deals with expansion_arr > 0 OR new_arr > 0)
+      total_deals: int (deals matching is_incremental_pipeline, regardless of ARR value)
       total_pipeline: float (sum of expansion_arr + new_arr per deal, dollar-level)
+      coverage_ratio: float (pipeline / quarterly target)
+      quarterly_target: float (from rep_targets table)
+      zero_arr_deals: dict (deals in pipeline with $0 incremental ARR - data quality gap)
+      uncategorized_deals: dict (deals with NO pipeline classification - neither incremental nor renewal)
       by_stage: dict (breakdown by stage)
       by_owner: dict (breakdown by owner, top 10)
       deals: list (top 20 by incremental value)
-      uncategorized_deals: dict (NEITHER-category data quality gap)
 
     Note:
-      Wave 4 fixes: Removed time_window filtering, added dollar-level split, NEITHER surfacing.
+      Wave 4 fixes: Removed time_window filtering, dollar-level split, NEITHER surfacing, coverage ratio, proactive framing.
     """
-    from field_semantics import stage_bucket, stage_label, is_open
+    from field_semantics import stage_bucket, stage_label, is_open, is_incremental_pipeline
+    from time_resolver import current_quarter_label
 
     # CRITICAL: Default to NO filters (all active deals)
     # DO NOT filter by time_window/close_date - current state has no time scope
@@ -1969,10 +1978,11 @@ async def query_pipeline(params: dict, sb) -> dict:
         filters=base_filters
     )
 
-    # CRITICAL: Dollar-level split logic (not deal-level bucketing)
-    # For each deal, calculate incremental_pipeline_value = expansion_arr + new_arr
+    # CRITICAL: Use is_incremental_pipeline() for deal count (matches audit logic)
+    # Then calculate incremental_value per deal for dollar-level split
     incremental_deals = []
-    uncategorized_deals = []
+    zero_arr_deals = []  # Deals in pipeline but with $0 incremental ARR
+    uncategorized_deals = []  # Deals with NO classification (neither incremental nor renewal)
 
     for deal in deals_rows:
         expansion_arr = deal.get("expansion_arr") or 0
@@ -1982,15 +1992,17 @@ async def query_pipeline(params: dict, sb) -> dict:
         # Calculate incremental value (dollar-level)
         incremental_value = expansion_arr + new_arr
 
-        # Track NEITHER-category deals (no ARR classification at all)
-        if incremental_value == 0 and renewal_revenue == 0:
-            uncategorized_deals.append(deal)
-            continue
-
-        # Only include deals with incremental ARR > 0
-        if incremental_value > 0:
+        # Use is_incremental_pipeline() to determine if deal counts (matches audit)
+        if is_incremental_pipeline(deal):
             deal["_incremental_value"] = incremental_value
             incremental_deals.append(deal)
+
+            # Track deals in pipeline with $0 incremental ARR (data quality gap)
+            if incremental_value == 0:
+                zero_arr_deals.append(deal)
+        # Track NEITHER-category deals (no classification at all)
+        elif incremental_value == 0 and renewal_revenue == 0:
+            uncategorized_deals.append(deal)
 
     # Apply stage/pipeline filters in memory (if requested)
     if stage_filter or pipeline_filter:
@@ -2020,6 +2032,23 @@ async def query_pipeline(params: dict, sb) -> dict:
     # Calculate totals (incremental ARR only, DOLLAR-LEVEL)
     total_deals = len(incremental_deals)
     total_pipeline = sum(d.get("_incremental_value") or 0 for d in incremental_deals)
+
+    # Pull quarterly target for coverage ratio (VP of RevOps thinking)
+    current_quarter = current_quarter_label()
+    quarterly_target = None
+    coverage_ratio = None
+
+    try:
+        target_response = sb.table("rep_targets").select("target_value").eq(
+            "period", current_quarter
+        ).eq("level", "company").eq("metric", "total_arr").execute()
+
+        if target_response.data:
+            quarterly_target = target_response.data[0].get("target_value")
+            if quarterly_target and quarterly_target > 0:
+                coverage_ratio = total_pipeline / quarterly_target
+    except Exception as e:
+        logger.warning(f"[PIPELINE] Failed to fetch quarterly target: {e}")
 
     # Breakdown by stage (using incremental value, not deal_value)
     by_stage = {}
@@ -2060,27 +2089,38 @@ async def query_pipeline(params: dict, sb) -> dict:
         for d in sorted_deals[:20]
     ]
 
-    # NEITHER-category data quality gap
+    # Data quality gaps
+    zero_arr_count = len(zero_arr_deals)
+    zero_arr_value = sum(d.get("deal_value") or 0 for d in zero_arr_deals)
+
     uncategorized_count = len(uncategorized_deals)
     uncategorized_value = sum(d.get("deal_value") or 0 for d in uncategorized_deals)
 
     return {
         "total_deals": total_deals,
         "total_pipeline": total_pipeline,
-        "by_stage": by_stage,
-        "by_owner": by_owner,
-        "deals": top_deals,
+        "quarterly_target": quarterly_target,
+        "coverage_ratio": coverage_ratio,
+        "current_quarter": current_quarter,
+        "zero_arr_deals": {
+            "count": zero_arr_count,
+            "total_value": zero_arr_value,
+            "note": "Deals in pipeline with $0 incremental ARR recorded - data quality gap"
+        },
         "uncategorized_deals": {
             "count": uncategorized_count,
             "total_value": uncategorized_value,
             "note": "Deals with no ARR classification (expansion_arr, new_arr, renewal_revenue all NULL/0)"
         },
+        "by_stage": by_stage,
+        "by_owner": by_owner,
+        "deals": top_deals,
         "filters_applied": {
             "stage_filter": stage_filter,
             "pipeline_filter": pipeline_filter,
             "owner_email": params.get("owner_email"),
         },
-        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)' regardless of how the user phrased the question.",
+        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. PROACTIVE FRAMING: Lead with coverage ratio if available. Offer to show next-quarter pipeline or upcoming renewals.",
         "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering."
     }
 
