@@ -27,6 +27,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Test Railway API Directly
+        env:
+          RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
+        run: |
+          python test_railway_api_direct.py
+
       - name: Run Wave 4 Calibration
         env:
           RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
