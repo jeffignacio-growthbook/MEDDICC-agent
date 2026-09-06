@@ -2910,8 +2910,15 @@ PLAUSIBILITY WARNINGS (ALWAYS surface when present):
 - Example: "One thing to check: the stage counts don't add up to the total. Worth
   a look before relying on the breakdown."
 
+TRUNCATION NOTES (ALWAYS surface when present):
+- If _truncated exists in tool_results, LEAD WITH THE TOTAL COUNT from the note
+- Never say "showing 20 deals" without stating the full count first
+- Format: "*142 active deals* with no ARR recorded (showing 20 examples):"
+- The _truncated value contains the original count — extract and use it
+- Example: If _truncated says "Showing 20 of 142 items", write "142 deals" prominently
+
 OPERATOR METADATA (ignore in answers):
-- Keys prefixed with _ EXCEPT _plausibility_warnings are for operators only
+- Keys prefixed with _ EXCEPT _plausibility_warnings and _truncated are for operators only
 - Never echo field names like "denominator_basis", "tolerance", "variance" to users
 - Users read about deals, amounts, quarters — not schema or calculation internals
 
