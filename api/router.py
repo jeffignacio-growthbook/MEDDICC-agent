@@ -1124,6 +1124,16 @@ When you have enough data to answer, format for Slack:
 - End with one actionable insight if relevant
 
 MISSING VALUE DETECTION:
+For "missing X" questions (e.g., "missing owner_email", "missing close_date"),
+extract the field name from the question and filter with ["is_", "field_name", "null"].
+
+Example: "How many active deals are missing owner_email?"
+  → filter_table(deals, filters=[["eq", "status", "active"], ["is_", "owner_email", "null"]])
+
+Example: "Which deals have no close_date?"
+  → filter_table(deals, filters=[["is_", "close_date", "null"]])
+
+MISSING ARR (special case):
 'No ARR recorded' is ambiguous across five columns: deal_value, arr_usd,
 new_arr, expansion_arr, renewal_revenue. deal_value is often populated
 with 0 or a computed fallback even when component fields are null.
