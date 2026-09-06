@@ -1,0 +1,126 @@
+# Competing Handlers Registry
+#
+# Structured data for uncertainty gate (Part 1, item 1).
+# Lists handler pairs that can misroute similar questions.
+#
+# When intent classifier returns high confidence for both handlers in a pair,
+# the gate should ask clarifying questions rather than guessing.
+
+competing_pairs:
+  - pair_id: pipeline_vs_waterfall
+    handlers:
+      - query_pipeline
+      - query_waterfall
+
+    ambiguous_terms:
+      # Terms that appear in questions for BOTH handlers
+      - pipeline
+      - this quarter
+      - Q3
+      - current quarter
+      - funnel
+
+    disambiguation_signals:
+      # Signals that indicate query_waterfall (movement/change)
+      movement_verbs:
+        - changed
+        - moved
+        - added
+        - lost
+        - won
+        - new deals
+        - flowed
+        - inflow
+        - outflow
+
+      # Signals that indicate query_pipeline (state/snapshot)
+      state_verbs:
+        - is
+        - are
+        - have
+        - show me
+        - what's in
+        - how much
+        - total
+        - current
+        - snapshot
+
+    gate_behavior:
+      # When to trigger clarification
+      trigger_conditions:
+        - ambiguous_terms_present: true
+        - no_clear_signal_verbs: true
+        - confidence_both_above: 0.90
+
+      # What to ask user
+      clarification_question: |
+        Do you want to see:
+        (A) Current pipeline snapshot — all active deals right now
+        (B) Pipeline changes — what moved/changed this quarter
+
+      # How to map user response
+      option_a_routes_to: query_pipeline
+      option_b_routes_to: query_waterfall
+
+    test_cases:
+      # Cases where gate should trigger
+      - question: "What is our pipeline this quarter?"
+        expected_gate_action: ask_clarification
+        ambiguity_reason: "has 'pipeline' + 'this quarter' but no movement/state verbs"
+
+      - question: "Show me the funnel for Q3"
+        expected_gate_action: ask_clarification
+        ambiguity_reason: "has 'funnel' + time period, unclear if snapshot or changes"
+
+      # Cases where gate should NOT trigger (clear signals)
+      - question: "What changed in our pipeline this quarter?"
+        expected_gate_action: route_directly
+        expected_handler: query_waterfall
+        clear_signal: "movement verb 'changed'"
+
+      - question: "Show me our current pipeline"
+        expected_gate_action: route_directly
+        expected_handler: query_pipeline
+        clear_signal: "state verbs 'show me' + 'current'"
+
+      - question: "How many new deals were added this week?"
+        expected_gate_action: route_directly
+        expected_handler: query_waterfall
+        clear_signal: "movement phrase 'new deals were added'"
+
+      - question: "What is our total pipeline value?"
+        expected_gate_action: route_directly
+        expected_handler: query_pipeline
+        clear_signal: "state verb 'is' + 'total'"
+
+    historical_incidents:
+      - date: "2026-09-06"
+        question: "What is our pipeline this quarter?"
+        misrouted_to: query_waterfall
+        should_have_been: query_pipeline
+        impact: "Returned 162 qualified deals instead of 444 all active deals"
+        mitigation: "Tightened query_waterfall description, added explicit negative examples"
+        status: "mitigation_deployed"
+        notes: |
+          q011 calibration failure. Before fix, query_waterfall description included
+          'this week/quarter' which caused ambiguity. After fix, removed time period
+          from description and added "Do NOT use for 'What is our pipeline this quarter?'"
+
+          This mitigation reduces misroute frequency but does not eliminate the
+          fundamental ambiguity. Uncertainty gate (Part 1) provides defense-in-depth.
+
+metadata:
+  purpose: "Consumed by uncertainty gate to detect ambiguous routing scenarios"
+  format_version: "1.0"
+  last_updated: "2026-09-06"
+  uncertainty_gate_status: "scoped_not_implemented"
+
+  usage_notes: |
+    1. Gate reads this file during intent classification
+    2. If intent classifier returns handler from a competing pair:
+       - Check if ambiguous_terms present in question
+       - Check if clear disambiguation signals present
+       - If ambiguous AND both handlers have confidence > threshold:
+         -> Trigger clarification question
+    3. User response maps to specific handler via option_a/option_b_routes_to
+    4. Test cases validate gate behavior in automated tests
