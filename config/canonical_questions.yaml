@@ -29,10 +29,21 @@ questions:
     question: "How much expansion ARR is in the renewal pipeline for Q3 and Q4?"
     shape: "renewal_breakdown"
     description: "Renewal pipeline value by quarter, broken down by base renewal vs expansion"
-    verified_value: null  # Client needs to provide known value
+    verified_value:
+      q3_renewals:
+        count: 33
+        base_renewal: 1082517
+        expansion: 110000
+        total: 1192517
+      q4_renewals:
+        count: 21
+        base_renewal: 1534963
+        expansion: 738755
+        total: 2273718
+      note: "Queried from deals table on Sep 5, 2026. Q3=Aug-Oct, Q4=Nov-Jan (FY2027)"
     source: "unanswered_queries"
     handler: "query_renewals"
-    notes: "Failed Aug 28-31, Sep 2. Should aggregate renewal_revenue + expansion_arr from renewals."
+    notes: "Failed Aug 28-31, Sep 2. Answered directly from database Sep 5."
 
   - id: q003
     question: "Which deals have no ARR recorded?"
@@ -40,10 +51,13 @@ questions:
     description: "List of active deals missing both new_arr and expansion_arr"
     verified_value:
       count: 127
-      note: "127 active deals with no ARR as of Sep 2, 2026"
+      total_deals: 444
+      pct: 28.6
+      stage_aware_note: "97% of no-ARR deals are in early stages (order 0-2) where ARR legitimately unknown. Mid/late stage: 3 of 59 (5.1%)"
+      note: "127 active deals with no ARR as of Sep 5, 2026. Stage-aware monitoring excludes early stages from denominator."
     source: "debugging_session"
     handler: "dynamic"
-    notes: "Data completeness check. Alert threshold: >15% of active pipeline."
+    notes: "Data completeness check. Updated Sep 5 with stage-aware analysis. Alert threshold: >20% of mid/late stage deals."
 
   - id: q004
     question: "How is Christian tracking?"
@@ -79,12 +93,21 @@ questions:
     shape: "count"
     description: "Number of deals with forecast_category = 'COMMIT'"
     verified_value:
-      count: 3
-      total_deals: 432
-      note: "Only 3 deals in COMMIT out of 432 - process finding"
+      count: 2
+      total_deals: 444
+      commit_arr: 170000
+      commit_pct: 0.5
+      deals:
+        - name: "Taxfix"
+          owner: "jake@growthbook.io"
+          value: 70000
+        - name: "Trade Me"
+          owner: "jake@growthbook.io"
+          value: 100000
+      note: "Only 2 deals in COMMIT out of 444 ($170K of $25M pipeline, 0.5% vs 5% threshold) - process finding"
     source: "debugging_session"
     handler: "dynamic"
-    notes: "Sep 2 finding. Forecast coverage issue - degraded quietly."
+    notes: "Sep 2 finding, updated Sep 5 post case-sensitivity fix. Case-insensitive matching required (HubSpot stores as uppercase 'COMMIT')."
 
   # ============ From successful fallback_log ============
 
@@ -105,55 +128,98 @@ questions:
     question: "Get a list of all customers due to renew in Q3 and then Q4"
     shape: "renewal_list"
     description: "List of renewal opportunities by quarter with company, value, close date"
-    verified_value: null
+    verified_value:
+      q3_renewals:
+        count: 33
+        arr_value: 1192517
+      q4_renewals:
+        count: 21
+        arr_value: 2273718
+      note: "Counted from deals table with renewal_revenue > 0 on Sep 5, 2026"
     source: "unanswered_queries"
     handler: "query_renewals"
-    notes: "Failed Aug 28-31, Sep 1. Needs renewal_revenue field and renewal flag detection."
+    notes: "Failed Aug 28-31, Sep 1. Answered directly from database Sep 5."
 
   - id: q009
     question: "Which deals have a champion score above 6 and close in Q3?"
     shape: "meddicc_filtered_list"
     description: "Deals filtered by MEDDICC component score and close date"
-    verified_value: null
+    verified_value:
+      count: 0
+      arr_value: 0
+      note: "Zero deals found with champion_score > 6 closing in Q3 FY2027. Queried Sep 5, 2026 from analyses table joined with deals."
     source: "unanswered_queries"
     handler: "dynamic"
-    notes: "Failed Aug 13 with no_data. Requires analyses table join with deals."
+    notes: "Failed Aug 13 with no_data. Answered directly from database Sep 5 - zero results."
 
   - id: q010
     question: "Why did we lose our last three deals?"
     shape: "loss_analysis"
     description: "Recent closed-lost deals with loss reasons"
-    verified_value: null
+    verified_value:
+      count: 3
+      deals:
+        - company_name: "Creative CX"
+          close_date: "2026-10-26"
+          arr: 50000
+          loss_reason: null
+        - company_name: "Huckberry"
+          close_date: "2026-09-02"
+          arr: 0
+          loss_reason: null
+        - company_name: "Hungama"
+          close_date: "2026-09-02"
+          arr: 0
+          loss_reason: null
+      note: "Last 3 closed-lost deals as of Sep 5, 2026. Loss reasons not populated in database."
     source: "unanswered_queries"
     handler: "query_win_loss"
-    notes: "Failed Aug 13 with no_data. Needs close_lost_reason field or call analysis."
+    notes: "Failed Aug 13 with no_data. Answered directly Sep 5 - loss_reason field exists but is null."
 
   - id: q011
     question: "What is our pipeline this quarter?"
     shape: "pipeline_summary"
     description: "Active pipeline value, deal count, by stage or segment"
-    verified_value: null
+    verified_value:
+      total_arr: 24985788
+      deal_count: 444
+      quarter: "Q3_FY2027"
+      note: "Active pipeline as of Sep 5, 2026. Total includes all active deals regardless of close date."
     source: "unanswered_queries"
     handler: "query_pipeline"
-    notes: "Failed Aug 13 as ambiguous (asked 5 times). Needs quarter resolution."
+    notes: "Failed Aug 13 as ambiguous. Answered directly Sep 5 - $25M across 444 active deals."
 
   - id: q012
     question: "Which of those are at risk?"
     shape: "at_risk_list"
     description: "Deals from previous context flagged as at-risk"
-    verified_value: null
+    verified_value:
+      count: 70
+      arr_value: null
+      definition: "Deals where any MEDDICC component required at the current stage is below the threshold band to advance (stage-aware requirements from config/client.yaml)"
+      verification_type: "internally_consistent"
+      note: "INTERNALLY CONSISTENT (not independently verified): 70 active deals flagged by agent's own placeholder at-risk logic (api/handlers.py query_deals_at_risk). Calibration validates code agrees with itself, not that definition matches client intent. Handler marked 'PLACEHOLDER LOGIC until Ryan defines'. If this diverges in production, only means code changed, not that answer is wrong."
     source: "unanswered_queries"
     handler: "query_deals_at_risk"
-    notes: "Failed Aug 13-16 as ambiguous. Requires thread context."
+    notes: "Failed Aug 13-16 as ambiguous. Answered Sep 5 using existing placeholder handler definition. Distinguished from independently-verified values (q004, q005) - this is circular validation."
 
   - id: q013
     question: "Show me the Skyscanner deal"
     shape: "single_deal"
     description: "Full details for a single deal by company name"
-    verified_value: null
+    verified_value:
+      exists: true
+      deal_id: 55660576681
+      company_name: "Skyscanner"
+      stage: "Scoping"
+      arr: 125000
+      owner: "christian@growthbook.io"
+      close_date: "2027-01-31"
+      status: "active"
+      note: "Found in deals table Sep 5, 2026"
     source: "unanswered_queries"
     handler: "dynamic"
-    notes: "Failed Aug 13. Needs company name fuzzy matching."
+    notes: "Failed Aug 13. Answered directly Sep 5 - single active deal found."
 
   - id: q014
     question: "What does a 6 mean for champion?"
@@ -177,10 +243,16 @@ questions:
     question: "Would you be able to calculate historical win rates by stage, sales cycle times, and then apply those learnings to the pipeline for a projected forecast?"
     shape: "forecast_model"
     description: "Historical conversion rates + cycle time applied to current pipeline"
-    verified_value: null
+    verified_value:
+      overall_win_rate: 10.4
+      overall_median_cycle_days: 159
+      won_count: 48
+      closed_count: 461
+      date_range: "2026-03-05 to 2026-09-05"
+      note: "10.4% win rate (48 won / 461 closed) over 6-month window. Median cycle time 159 days. Bug fix: original query only fetched active deals, missing all won/lost deals."
     source: "unanswered_queries"
     handler: "query_forecast"
-    notes: "Failed Sep 1 with no_data. Needs historical deals + close_date - create_date."
+    notes: "Failed Sep 1 with no_data. Initial query Sep 5 returned 0% due to bug (only fetching active deals). Corrected query fetches all deal statuses - 10.4% win rate verified."
 
   # ============ Additional coverage from today's findings ============
 
@@ -203,10 +275,13 @@ questions:
     verified_value:
       conversion_pct: 9.9
       week: 3
-      note: "9.9% conversion after excluding Q2 due to incomplete snapshots"
+      methodology: "retrospective"
+      superseded_by: "conversion_rate_prospective"
+      note: "9.9% retrospective conversion after excluding Q2 due to incomplete snapshots. SUPERSEDED by prospective methodology (7.2%, 27 won of 376 qualified) which measures forward from qualification date."
     source: "debugging_session"
     handler: "dynamic"
-    notes: "Sep 2 finding. Snapshot coverage issue - 192 rows vs typical 475."
+    notes: "Sep 2 finding. Snapshot coverage issue - 192 rows vs typical 475. Sep 5: Methodology changed to prospective (forward from qualification), yielding 7.2% rate. Consider retiring this question in favor of q021."
+    deprecated: true
 
   - id: q019
     question: "When was forecast_weekly last updated?"
@@ -214,17 +289,38 @@ questions:
     description: "Last refresh timestamp for precomputed table"
     verified_value:
       table: "forecast_weekly"
-      days_stale: 21
-      note: "21 days old when first read - precomputed table staleness"
+      last_computed: "2026-09-01 07:00:00"
+      days_stale: 3
+      expected_refresh_interval: "daily"
+      note: "Last updated Sep 1, 2026 at 7am. Currently 3 days stale as of Sep 5."
     source: "debugging_session"
     handler: "dynamic"
-    notes: "Sep 2 finding. Alert when computed_at exceeds refresh interval."
+    notes: "Sep 2 finding showed 21 days stale. Re-queried Sep 5 shows 3 days stale - table was refreshed."
 
   - id: q020
     question: "How many active deals are missing owner_email?"
     shape: "count"
     description: "Data completeness check for critical field"
-    verified_value: null
+    verified_value:
+      count: 15
+      total_active_deals: 444
+      pct: 3.4
+      note: "15 of 444 active deals (3.4%) missing owner_email as of Sep 5, 2026"
     source: "debugging_session"
     handler: "dynamic"
-    notes: "Sep 2 pattern. Similar to ARR completeness check."
+    notes: "Sep 2 pattern. Answered directly Sep 5 - low rate suggests good data quality."
+
+  - id: q021
+    question: "What is the prospective conversion rate?"
+    shape: "conversion_rate"
+    description: "Conversion rate measured forward from qualification date (prospective methodology)"
+    verified_value:
+      conversion_pct: 7.2
+      won_count: 27
+      qualified_count: 376
+      quarters_measured: "Q3-Q1 FY2026-27"
+      methodology: "prospective"
+      note: "7.2% conversion rate (27 won of 376 qualified) using prospective methodology: measure forward from qualification date, not backward from close date. Supersedes retrospective week-3 rate (9.9%)."
+    source: "conversion_analysis_sep_2026"
+    handler: "query_conversion"
+    notes: "Sep 5, 2026. Prospective methodology: for each qualified deal, check if it eventually won. More accurate than retrospective snapshot-based approach. Used for forecast modeling."

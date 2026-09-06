@@ -1,0 +1,108 @@
+Found 328 deals closed on April 6, 2026
+
+======================================================================
+ANALYSIS 2: TIMESTAMP CLUSTERING
+======================================================================
+
+First close: 2026-04-06 22:04:06 UTC
+Last close:  2026-04-06 23:03:17 UTC
+Time span:   59.2 minutes
+             (1.0 hours)
+
+Distribution by hour (UTC):
+--------------------------------------------------
+22:00-22:59: 321 deals ████████████████████████████████████████████████████████████████
+23:00-23:59:   7 deals █
+
+Within first 5 minutes: 292/328 ( 89.0%)
+Within first hour:      328/328 (100.0%)
+Within first 4 hours:   328/328 (100.0%)
+
+⚠️  HIGHLY CLUSTERED - 100% within first hour
+    Suggests: Single bulk action (workflow/admin cleanup)
+
+======================================================================
+Fetching additional data from HubSpot...
+======================================================================
+
+Fetching 328 deals from HubSpot...
+  50/328 deals...
+  100/328 deals...
+  150/328 deals...
+  200/328 deals...
+  250/328 deals...
+  300/328 deals...
+Fetched 328 deals successfully
+
+Fetching owner emails...
+Fetched 7 owner emails
+
+======================================================================
+ANALYSIS 1: OWNER DISTRIBUTION
+======================================================================
+
+Owner Email                              Deal Count      % of Total
+----------------------------------------------------------------------
+unassigned                               145              44.2%
+owner_371635471                          136              41.5%
+owner_53912388                           23                7.0%
+owner_87079750                           14                4.3%
+owner_395850284                          3                 0.9%
+owner_82957388                           3                 0.9%
+owner_88723214                           3                 0.9%
+owner_1815082601                         1                 0.3%
+
+Total unique owners: 8
+✓ DISTRIBUTED - 8 owners
+    Suggests: Multiple people involved
+
+======================================================================
+ANALYSIS 3: ACTIVITY HISTORY (Sample of 20)
+======================================================================
+
+Deal ID         Name                           Notes    Activities   Status
+------------------------------------------------------------------------------------------
+44539290776     ThriftBooks - New Deal         4        0            Active
+42981688193     Crunchyroll - New Deal         0        0            Dormant
+28857299616     Prezzee - New Deal             14       0            Active
+45676858667     Elite Prospects- Demo Reques   3        0            Active
+22678530464     Tchibo - New Deal              4        0            Active
+39978384497     pens.com - New Deal            13       0            Active
+49684844624     Kaufland e-commerce Services   1        0            Dormant
+21955918909     PSQH, Inc. - New Deal          3        0            Active
+45202072866     nike- Demo Request             1        0            Dormant
+50242806572      - Demo Request                2        0            Active
+44717709869     VietCredit- Demo Request       1        0            Dormant
+45585056057     Anphonic- Demo Request         0        0            Dormant
+9086935211      Mux                            0        0            Dormant
+46334114708     GuzmanyGomez- Demo Request     6        0            Active
+51471383567     Sapiens- Demo Request          1        0            Dormant
+48524559161     Bax music- Demo Request        1        0            Dormant
+51534817636     Sonae MC- Demo Request         7        0            Active
+44792770316     VietCredit- Demo Request       1        0            Dormant
+33177842003     Will Bank - New Deal           4        0            Active
+41559854604     Sysco - New Deal               5        0            Active
+
+Active deals in sample:  11/20 (55%)
+Dormant deals in sample: 9/20 (45%)
+
+⚠️  MANY ACTIVE - Some deals with real activity were closed
+
+======================================================================
+SUMMARY FOR SALES LEADERSHIP CONVERSATION
+======================================================================
+
+Pattern: RAPID COORDINATED ACTION
+  - Timestamp: HIGHLY CLUSTERED
+  - Owners: DISTRIBUTED
+  - Activity: MANY ACTIVE
+
+Recommended question for sales leadership:
+  "Was there a directive to rapidly close deals on April 6?"
+
+Investigation approach:
+  1. Broad survey: Ask sales leadership about April 6 events
+  2. Check for external factors (market event, product issue)
+  3. Review 339 individual deal histories for common patterns
+
+Full results saved to: april_6_analysis.json

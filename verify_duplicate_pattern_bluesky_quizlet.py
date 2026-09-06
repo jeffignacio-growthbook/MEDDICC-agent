@@ -54,14 +54,24 @@ def main():
     print()
 
     # Step 1: Fetch full deal data for all 4
-    deal_ids = [d['deal_id'] for d in DUPLICATE_DEALS]
+    # Note: Search by company name and dates, not deal_id (IDs may have precision issues)
+    found_deals = {}
 
-    deals_resp = supabase.table('deals') \
-        .select('*') \
-        .in_('deal_id', deal_ids) \
-        .execute()
+    for deal_info in DUPLICATE_DEALS:
+        company = deal_info['company']
+        close_date = deal_info['close_date']
 
-    deals_by_id = {str(d['deal_id']): d for d in deals_resp.data}
+        result = supabase.table('deals') \
+            .select('*') \
+            .ilike('company_name', f'%{company}%') \
+            .eq('close_date', close_date) \
+            .execute()
+
+        if result.data:
+            deal = result.data[0]
+            found_deals[deal_info['deal_id']] = deal
+
+    deals_by_id = found_deals
 
     if len(deals_by_id) != 4:
         print(f"⚠️  Expected 4 deals, found {len(deals_by_id)}")
@@ -75,18 +85,12 @@ def main():
     print()
 
     metadata_fields = [
-        'hs_object_id',
-        'hs_created_by_user_id',
-        'hs_lastmodifieddate',
-        'hs_object_source',
-        'hs_object_source_id',
-        'hs_object_source_label',
-        'created_by',
-        'deal_source',
-        'createdate',
-        'closedate',
+        'deal_id',
+        'create_date',
+        'close_date',
         'owner_email',
-        'ownerid'
+        'created_at',
+        'updated_at'
     ]
 
     enriched_deals = []
@@ -124,30 +128,21 @@ def main():
     print("=" * 80)
     print()
 
-    # Pattern 1: Same creator
-    creators = defaultdict(list)
-    for deal in enriched_deals:
-        creator = deal['metadata'].get('hs_created_by_user_id') or deal['metadata'].get('created_by')
-        if creator:
-            creators[str(creator)].append(deal)
-
-    print("1. Creation User:")
+    # Pattern 1: Created_at timestamps (since no creator field)
+    print("1. Creation Timestamps (created_at):")
     print("-" * 60)
-    if creators:
-        for creator, deals_list in sorted(creators.items(), key=lambda x: -len(x[1])):
-            print(f"  User {creator}: {len(deals_list)} deals")
-            for d in deals_list:
-                print(f"    - {d['company']} ({d['deal_id']})")
 
-        max_by_user = max(len(deals_list) for deals_list in creators.values())
-        if max_by_user >= 3:
-            print()
-            print(f"  → {max_by_user}/4 deals by same user (PATTERN DETECTED)")
-        elif max_by_user == 2:
-            print()
-            print(f"  → Multiple users, no concentration")
+    created_ats = []
+    for deal in enriched_deals:
+        created_at = deal['metadata'].get('created_at')
+        if created_at:
+            created_ats.append((deal['company'], deal['deal_id'], created_at))
+
+    if created_ats:
+        for company, deal_id, ts in sorted(created_ats, key=lambda x: x[2]):
+            print(f"  {ts} - {company} ({deal_id})")
     else:
-        print("  No creator information available")
+        print("  No created_at timestamps available")
 
     print()
 
@@ -157,7 +152,8 @@ def main():
 
     creation_times = []
     for deal in enriched_deals:
-        create_datetime = deal['metadata'].get('createdate') or deal['create_date']
+        # Use create_date from metadata or deal_info
+        create_datetime = deal['metadata'].get('create_date') or deal['create_date']
         if create_datetime:
             try:
                 if 'T' in str(create_datetime):
@@ -232,26 +228,21 @@ def main():
 
     print()
 
-    # Pattern 4: Same source
-    print("4. Object Source:")
+    # Pattern 4: Updated_at (last modified)
+    print("4. Last Updated (updated_at):")
     print("-" * 60)
 
-    sources = defaultdict(list)
+    updated_ats = []
     for deal in enriched_deals:
-        source = deal['metadata'].get('hs_object_source') or deal['metadata'].get('deal_source')
-        if source:
-            sources[str(source)].append(deal)
+        updated_at = deal['metadata'].get('updated_at')
+        if updated_at:
+            updated_ats.append((deal['company'], deal['deal_id'], updated_at))
 
-    if sources:
-        for source, deals_list in sorted(sources.items(), key=lambda x: -len(x[1])):
-            print(f"  {source}: {len(deals_list)} deals")
-
-        max_by_source = max(len(deals_list) for deals_list in sources.values())
-        if max_by_source >= 3:
-            print()
-            print(f"  → {max_by_source}/4 deals from same source (PATTERN DETECTED)")
+    if updated_ats:
+        for company, deal_id, ts in sorted(updated_ats, key=lambda x: x[2]):
+            print(f"  {ts} - {company} ({deal_id})")
     else:
-        print("  No source information available")
+        print("  No updated_at timestamps available")
 
     print()
 
@@ -277,34 +268,19 @@ def main():
         '6023407620',  # knowunity.ai
     ]
 
+    # Query all 8 by company name patterns (since deal_ids have precision issues)
     all_deals_resp = supabase.table('deals') \
-        .select('deal_id, company_name, create_date, close_date, owner_email, hs_created_by_user_id') \
-        .in_('deal_id', ALL_DATA_QUALITY_IDS) \
+        .select('deal_id, company_name, create_date, close_date, owner_email') \
+        .in_('company_name', ['Make', 'Quizlet', 'BESTSECRET', 'Bluesky', 'LeoVegas', 'knowunity.ai']) \
         .execute()
 
-    all_creators = defaultdict(int)
     all_owners = defaultdict(int)
 
     for deal in all_deals_resp.data:
-        creator = deal.get('hs_created_by_user_id')
         owner = deal.get('owner_email')
 
-        if creator:
-            all_creators[str(creator)] += 1
         if owner:
             all_owners[str(owner)] += 1
-
-    if all_creators:
-        print("Creators across all 8 data quality errors:")
-        for creator, count in sorted(all_creators.items(), key=lambda x: -x[1]):
-            print(f"  User {creator}: {count} deals")
-
-        max_creator_count = max(all_creators.values())
-        if max_creator_count >= 5:
-            print()
-            print(f"  → {max_creator_count}/8 deals by same creator (SYSTEMATIC PATTERN)")
-
-    print()
 
     if all_owners:
         print("Owners across all 8 data quality errors:")
@@ -327,17 +303,11 @@ def main():
 
     patterns_found = []
 
-    if creators and max(len(d) for d in creators.values()) >= 3:
-        patterns_found.append("Same creator for 3+ deals")
-
     if creation_times and len({ct['date'] for ct in creation_times}) <= 2:
         patterns_found.append("Temporal clustering (≤2 dates)")
 
     if owners and max(len(d) for d in owners.values()) >= 3:
         patterns_found.append("Same owner for 3+ deals")
-
-    if sources and max(len(d) for d in sources.values()) >= 3:
-        patterns_found.append("Same source for 3+ deals")
 
     if patterns_found:
         print("⚠️  SYSTEMATIC PATTERN DETECTED")

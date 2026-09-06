@@ -1,0 +1,87 @@
+Wins in Aug 9 Migration - Recomputed
+================================================================================
+
+Total wins: 72
+Aug 9 migration: 72 (100.0%)
+Non-migration: 0
+
+Per Quarter:
+  FY2026 Q3: 21/21 migration wins
+  FY2026 Q4: 22/22 migration wins
+  FY2027 Q1: 29/29 migration wins
+
+ARR: $4,118,809 migration, $0 native
+
+Aug 9 Migration Wins:
+  FY2026 Q3    Anthropic                      $     810,000
+  FY2026 Q3    Apify                          $       4,800
+  FY2026 Q3    Bluesky                        $      25,000
+  FY2026 Q3    DKatalis                       $      40,000
+  FY2026 Q3    Dropbox                        $      95,041
+  FY2026 Q3    Fellow                         $       1,000
+  FY2026 Q3    Intergamma                     $      30,000
+  FY2026 Q3    Libertex Group                 $      61,746
+  FY2026 Q3    Make                           $      32,904
+  FY2026 Q3    Movable Ink                    $      35,000
+  FY2026 Q3    Neon                           $      93,000
+  FY2026 Q3    PepsiCo                        $      15,750
+  FY2026 Q3    Quizlet                        $      87,862
+  FY2026 Q3    Quizlet                        $      87,862
+  FY2026 Q3    TV 2                           $      35,000
+  FY2026 Q3    Trade Republic                 $      25,000
+  FY2026 Q3    Wellhub                        $      54,725
+  FY2026 Q3    Wikispecies                    $      35,000
+  FY2026 Q3    esh                            $      30,000
+  FY2026 Q3    lendable                       $      83,250
+  FY2026 Q3    rapportlabs                    $      11,780
+  FY2026 Q4    1800Flowers                    $      50,000
+  FY2026 Q4    BESTSECRET                     $       3,462
+  FY2026 Q4    Bauer Media                    $      45,000
+  FY2026 Q4    EQT                            $      20,000
+  FY2026 Q4    Gdn-Commerce                   $      30,000
+  FY2026 Q4    Genesis                        $      20,000
+  FY2026 Q4    Gifthealth                     $      18,000
+  FY2026 Q4    InMobi                         $      14,300
+  FY2026 Q4    LeoVegas                       $      32,500
+  FY2026 Q4    Marfatech                      $      25,000
+  FY2026 Q4    Monica Vinader                 $      10,000
+  FY2026 Q4    Oda                            $      50,000
+  FY2026 Q4    Pizza Express                  $      26,000
+  FY2026 Q4    Polymarket                     $      50,000
+  FY2026 Q4    SPORT24                        $       5,000
+  FY2026 Q4    Salesforce                     $      60,000
+  FY2026 Q4    Sentra                         $       3,000
+  FY2026 Q4    StackBlitz                     $      30,749
+  FY2026 Q4    Yeet!                          $      20,000
+  FY2026 Q4    bet365                         $      56,250
+  FY2026 Q4    foris                          $      33,750
+  FY2026 Q4    shiftkey                       $     129,750
+  FY2027 Q1    Anthropic                      $           0
+  FY2027 Q1    BESTSECRET                     $       7,125
+  FY2027 Q1    Bluesky                        $       5,000
+  FY2027 Q1    Cape                           $      65,000
+  FY2027 Q1    Capture Higher Ed              $      49,000
+  FY2027 Q1    Change.org                     $      87,500
+  FY2027 Q1    Extra Space Storage            $     137,850
+  FY2027 Q1    Funding Pips                   $      60,000
+  FY2027 Q1    InMobi                         $       3,560
+  FY2027 Q1    Legend                         $     150,000
+  FY2027 Q1    LeoVegas                       $      45,000
+  FY2027 Q1    LeoVegas                       $      16,250
+  FY2027 Q1    MC Sonae                       $      92,000
+  FY2027 Q1    Neko Health                    $      93,000
+  FY2027 Q1    Opendoor                       $     179,000
+  FY2027 Q1    Pic-Time                       $      40,000
+  FY2027 Q1    Plusgrade                      $      25,000
+  FY2027 Q1    Ruby Labs                      $      55,000
+  FY2027 Q1    Rune Org                       $      30,000
+  FY2027 Q1    SWAG                           $      41,850
+  FY2027 Q1    Schibsted                      $      33,742
+  FY2027 Q1    StarHub                        $      35,000
+  FY2027 Q1    University of Phoenix          $      40,000
+  FY2027 Q1    Wellhub                        $      14,626
+  FY2027 Q1    YAZIO                          $      20,160
+  FY2027 Q1    dm-drogerie markt              $     155,750
+  FY2027 Q1    knowunity.ai                   $       4,000
+  FY2027 Q1    lendable                       $      14,250
+  FY2027 Q1    x.ai                           $     191,664

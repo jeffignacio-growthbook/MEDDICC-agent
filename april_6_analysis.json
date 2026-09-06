@@ -1,0 +1,37 @@
+{
+  "analysis_date": "2026-09-05T09:43:18.935902",
+  "total_deals": 328,
+  "timestamp_clustering": {
+    "pattern": "HIGHLY CLUSTERED",
+    "span_minutes": 59.18901666666667,
+    "within_5min": 292,
+    "within_1hour": 328,
+    "pct_5min": 89.02439024390245,
+    "pct_1hour": 100.0,
+    "earliest": "2026-04-06T22:04:06.525000+00:00",
+    "latest": "2026-04-06T23:03:17.866000+00:00"
+  },
+  "owner_distribution": {
+    "pattern": "DISTRIBUTED",
+    "unique_owners": 8,
+    "unassigned_pct": 44.207317073170735,
+    "top_owner_pct": 44.207317073170735,
+    "counts": {
+      "unassigned": 145,
+      "owner_371635471": 136,
+      "owner_53912388": 23,
+      "owner_395850284": 3,
+      "owner_87079750": 14,
+      "owner_82957388": 3,
+      "owner_1815082601": 1,
+      "owner_88723214": 3
+    }
+  },
+  "activity_sample": {
+    "pattern": "MANY ACTIVE",
+    "active": 11,
+    "dormant": 9
+  },
+  "overall_pattern": "RAPID COORDINATED ACTION",
+  "recommended_question": "Was there a directive to rapidly close deals on April 6?"
+}

@@ -1,0 +1,27 @@
+Duplicate Deals Analysis
+================================================================================
+
+LeoVegas
+  Aug 9 deals: 7
+  Other deals: 0
+  Duplication score: 0/8
+  Recommendation: KEEP
+
+7shifts
+  Aug 9 deals: 9
+  Other deals: 0
+  Duplication score: 0/8
+  Recommendation: KEEP
+
+InvestEngine
+  Aug 9 deals: 2
+  Other deals: 0
+  Duplication score: 3/8
+  Recommendation: KEEP
+
+higgsfield.ai
+  Aug 9 deals: 2
+  Other deals: 0
+  Duplication score: 0/8
+  Recommendation: KEEP
+

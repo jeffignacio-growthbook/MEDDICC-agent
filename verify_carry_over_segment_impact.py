@@ -149,7 +149,8 @@ def main():
         added_wins = by_segment.get(segment, 0)
 
         if added_wins == 0:
-            print(f"{segment:15s} | {original['won']}/{original['qualified']} = {original['rate']:.1%} if original['rate'] else 'N/A':>7s} | (no change)         | -")
+            rate_str = f"{original['rate']:.1%}" if original['rate'] else "N/A"
+            print(f"{segment:15s} | {original['won']}/{original['qualified']} = {rate_str:>7s} | (no change)         | -")
             continue
 
         # Recompute with added wins

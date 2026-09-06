@@ -1,0 +1,6 @@
+Copper Source Markers Search
+================================================================================
+
+Total Aug 9 deals: 1000
+
+No source markers found - must use created_at proxy

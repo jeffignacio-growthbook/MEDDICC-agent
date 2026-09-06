@@ -1,0 +1,38 @@
+Reviewed Data Quality - 57 Deals
+================================================================================
+
+Original count: 57
+
+EXCLUDE: 20
+  Truly broken: 9
+  Suspicious zero-day: 11
+
+FIX: 15
+  Swapped dates: 15
+
+REVIEW: 4
+  Small zero-day: 4
+
+
+Swapped dates (fixable):
+  Haystack TV Inc: -359d → 359d
+  Opera: -345d → 345d
+  Asana: -335d → 335d
+  Fellow: -311d → 311d
+  BESTSECRET: -307d → 307d
+  Make: -300d → 300d
+  Asana: -236d → 236d
+  lendable: -223d → 223d
+  Refurbed Marketplace GmbH: -215d → 215d
+  TSH: -189d → 189d
+  Space Neobank: -184d → 184d
+  MasterClass: -158d → 158d
+  facile.it: -155d → 155d
+  lendable: -119d → 119d
+  Which?: -102d → 102d
+
+Small zero-day (review):
+  PepsiCo: $1,000
+  Paceline: $1,000
+  7shifts: $1,531
+  knowunity.ai: $4,000
