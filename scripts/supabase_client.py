@@ -237,8 +237,14 @@ class SupabaseWriter:
 
     def insert_analysis(self, deal_id: str, company_name: str,
                         result: dict, scores: dict,
-                        output_file: str, component_details: dict = None) -> None:
-        """Insert a new MEDDICC analysis row."""
+                        output_file: str, component_details: dict = None,
+                        stage_at_analysis: str = None) -> None:
+        """Insert a new MEDDICC analysis row.
+
+        Args:
+            stage_at_analysis: HubSpot stage ID or label at time of analysis
+                              (required for future stage-relative derivation)
+        """
         self.client.table('analyses').insert({
             'deal_id':                 str(deal_id),
             'company_name':            company_name,
@@ -269,6 +275,7 @@ class SupabaseWriter:
             'summary':                 scores.get('summary', ''),
             'output_file':             output_file,
             'component_details':       json.dumps(component_details) if component_details else None,
+            'stage_at_analysis':       stage_at_analysis,  # NEW: for future derivation
         }).execute()
 
     def bulk_upsert_calls(self, calls: list,

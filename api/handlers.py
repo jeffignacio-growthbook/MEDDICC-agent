@@ -46,78 +46,141 @@ MEDDICC_COMPONENT_MAX = 10
 
 def compute_cycle_time(sb, since_date: str = None, until_date: str = None) -> dict:
     """
-    Canonical sales cycle time calculation (Wave 4 structural fix for q016).
+    Canonical sales cycle time calculation (config-driven per config/metrics.yaml).
 
     Single source of truth for cycle time methodology:
-    - ALL closed deals (won + lost), not just won
-    - Calculation: close_date - create_date (days)
+    - Won deals only (not lost) - measures successful sales velocity
+    - NON-RENEWAL ONLY - excludes renewal pipeline (pipeline_id='866608541')
+      Renewal create_date != sales cycle start (often created at initial close)
+    - UNIVERSAL DATA INTEGRITY: Auto-excludes negative cycle time deals
+      (is_valid_cycle_deal() check - see DATA INTEGRITY RULES in config/field_semantics.yaml)
+    - Calculation: close_date - create_date (days), must be >= 0
     - Aggregation: MEDIAN (not average) - robust to outliers
-    - Date filtering: Optional since/until for time windows
+    - Window: Configurable (all_time or rolling N months)
+    - Fallback: If rolling window < min_sample_size, use all_time
+
+    Config parameters (from config/metrics.yaml):
+        window_mode: "all_time" or "rolling"
+        rolling_window_months: N (used when window_mode="rolling")
+        min_sample_size: minimum deals for reliable metric
+        fallback_to_all_time: bool - use all_time if rolling sample too small
 
     Args:
         sb: Supabase client
-        since_date: Optional start date (YYYY-MM-DD) - filter close_date >= since
-        until_date: Optional end date (YYYY-MM-DD) - filter close_date <= until
+        since_date: Optional override (YYYY-MM-DD) - filter close_date >= since
+        until_date: Optional override (YYYY-MM-DD) - filter close_date <= until
 
     Returns:
         {
             "median_days": float,
-            "p25_days": float,  # 25th percentile
-            "p75_days": float,  # 75th percentile
+            "p25_days": float,
+            "p75_days": float,
             "min_days": int,
             "max_days": int,
             "sample_size": int,
-            "date_range": str,
-            "won_count": int,
-            "lost_count": int,
+            "window": str,  # "all_time", "rolling_12_month", etc.
+            "config_note": str,  # If fallback triggered
         }
-
-    Example:
-        >>> compute_cycle_time(sb, since_date="2026-03-01")
-        {"median_days": 159, "p25_days": 89, "p75_days": 245, ...}
     """
     from statistics import median, quantiles
+    from pathlib import Path
+    import yaml
+    from datetime import timedelta, timezone
 
-    # Fetch all closed deals
-    filters = [("in_", "deal_status", ["won", "lost"])]
+    # Load config from metrics.yaml
+    config_path = Path(__file__).parent.parent / "config" / "metrics.yaml"
+    with open(config_path) as f:
+        metrics_config = yaml.safe_load(f)
 
-    if since_date:
-        filters.append(("gte", "close_date", since_date))
-    if until_date:
-        filters.append(("lte", "close_date", until_date))
+    cycle_config = metrics_config.get("cycle_time", {}).get("config", {})
+    window_mode = cycle_config.get("window_mode", "all_time")
+    rolling_window_months = cycle_config.get("rolling_window_months", 12)
+    min_sample_size = cycle_config.get("min_sample_size", 20)
+    fallback_enabled = cycle_config.get("fallback_to_all_time", True)
 
-    deals = select_all(
-        sb,
-        "deals",
-        columns="deal_id,create_date,close_date,deal_status",
-        filters=filters,
-    )
+    # Calculate date range based on config (unless overridden)
+    if since_date is None and window_mode == "rolling":
+        now = datetime.now(timezone.utc)
+        cutoff = now - timedelta(days=rolling_window_months * 30)
+        cutoff_date = cutoff  # Save datetime object for filtering
+        since_date = cutoff.strftime("%Y-%m-%d")
+        window_label = f"rolling_{rolling_window_months}_month"
+    elif since_date is None:
+        cutoff_date = None
+        window_label = "all_time"
+    else:
+        cutoff_date = datetime.fromisoformat(since_date).replace(tzinfo=timezone.utc)
+        window_label = "custom_range"
+
+    # Fetch ALL deals and filter in Python (select_all has filter bugs)
+    # Note: We filter by is_won(stage), not deal_status, as is_won is canonical
+    # CRITICAL: Exclude renewal pipeline deals - cycle_time measures new business/expansion only
+    from field_semantics import is_won
+
+    all_deals = sb.table("deals").select(
+        "deal_id,create_date,close_date,deal_status,stage,pipeline_id"
+    ).execute()
+
+    # Filter: won AND not renewal pipeline
+    RENEWAL_PIPELINE_ID = "866608541"
+    deals = [
+        d for d in all_deals.data
+        if is_won(d.get("stage")) and d.get("pipeline_id") != RENEWAL_PIPELINE_ID
+    ]
 
     # Calculate cycle time for each deal
     cycle_times = []
-    won_count = 0
-    lost_count = 0
+
+    # Import universal data integrity check
+    from field_semantics import is_valid_cycle_deal
 
     for deal in deals:
-        close_date_str = deal.get("close_date")
-        create_date_str = deal.get("create_date")
-
-        if not close_date_str or not create_date_str:
-            continue  # Skip deals missing dates
+        # UNIVERSAL DATA INTEGRITY CHECK:
+        # Exclude deals with negative cycle time (CRM migration artifacts, data entry errors)
+        # See field_semantics.is_valid_cycle_deal() and DATA INTEGRITY RULES in config/field_semantics.yaml
+        if not is_valid_cycle_deal(deal):
+            continue  # Auto-exclude: missing dates or negative cycle time
 
         try:
+            close_date_str = deal.get("close_date")
+            create_date_str = deal.get("create_date")
+
+            # Parse full timestamp (not date-only)
             close_date = datetime.fromisoformat(close_date_str.replace("Z", "+00:00"))
             create_date = datetime.fromisoformat(create_date_str.replace("Z", "+00:00"))
+
+            # Ensure timezone-aware
+            if close_date.tzinfo is None:
+                close_date = close_date.replace(tzinfo=timezone.utc)
+            if create_date.tzinfo is None:
+                create_date = create_date.replace(tzinfo=timezone.utc)
+
+            # Apply rolling window filter if configured
+            if cutoff_date and close_date < cutoff_date:
+                continue  # Outside window
+
+            # Apply custom until_date filter if specified
+            if until_date:
+                until_dt = datetime.fromisoformat(until_date).replace(tzinfo=timezone.utc)
+                if close_date > until_dt:
+                    continue
+
             days = (close_date - create_date).days
 
-            if days >= 0:  # Sanity check
-                cycle_times.append(days)
-                if deal.get("deal_status") == "won":
-                    won_count += 1
-                else:
-                    lost_count += 1
+            # Note: is_valid_cycle_deal() already checked days >= 0
+            cycle_times.append(days)
         except (ValueError, AttributeError):
-            continue  # Skip malformed dates
+            continue
+
+    # Check for fallback condition
+    config_note = None
+    if (window_mode == "rolling" and
+        len(cycle_times) < min_sample_size and
+        fallback_enabled and
+        since_date):
+        # Retry with all_time
+        config_note = f"Insufficient recent data ({len(cycle_times)} deals < {min_sample_size} threshold), using all-time window"
+        return compute_cycle_time(sb, since_date=None, until_date=until_date)
 
     if not cycle_times:
         return {
@@ -127,27 +190,28 @@ def compute_cycle_time(sb, since_date: str = None, until_date: str = None) -> di
             "min_days": None,
             "max_days": None,
             "sample_size": 0,
-            "date_range": f"{since_date or 'earliest'} to {until_date or 'latest'}",
-            "won_count": 0,
-            "lost_count": 0,
-            "error": "No closed deals with valid dates found in range",
+            "window": window_label,
+            "error": "No won deals with valid dates found in range",
         }
 
     # Calculate statistics
     cycle_times.sort()
     quartiles = quantiles(cycle_times, n=4) if len(cycle_times) >= 4 else [None, None, None]
 
-    return {
+    result = {
         "median_days": median(cycle_times),
         "p25_days": quartiles[0] if quartiles[0] else cycle_times[0],
         "p75_days": quartiles[2] if quartiles[2] else cycle_times[-1],
         "min_days": min(cycle_times),
         "max_days": max(cycle_times),
         "sample_size": len(cycle_times),
-        "date_range": f"{since_date or 'earliest'} to {until_date or 'latest'}",
-        "won_count": won_count,
-        "lost_count": lost_count,
+        "window": window_label,
     }
+
+    if config_note:
+        result["config_note"] = config_note
+
+    return result
 
 
 def _labeled_overall(score):
@@ -850,6 +914,9 @@ async def query_deal(params: dict, sb) -> dict:
     """
     Deep dive on a specific company's deal.
     Returns deal info, latest MEDDICC analysis, and objections.
+
+    Now includes stage-relative MEDDICC interpretation context from
+    coaching config (Task 2: wire query_deal to load_coaching_config).
     """
     company = params.get("company", "")
 
@@ -887,11 +954,19 @@ async def query_deal(params: dict, sb) -> dict:
         filters=[("eq", "company_name", deal["company_name"])])
 
     # Check for deal-specific analysis file
-    from pathlib import Path
-    import sys
-    REPO_ROOT = Path(__file__).parent.parent
-    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+    from pathlib import Path as PathLib
+    REPO_ROOT = PathLib(__file__).parent.parent
+    if str(REPO_ROOT / "scripts") not in sys.path:
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
     from utils import slugify
+
+    # Load coaching config for stage-relative MEDDICC interpretation
+    from coaching_config import load_coaching_config
+    coaching_config = load_coaching_config()
+
+    # Get stage bucket (discovery/scoping/proposal/closed_won/closed_lost)
+    current_stage = deal.get("stage", "")
+    current_bucket = stage_bucket(current_stage)
 
     company_slug = slugify(deal["company_name"])
     output_file = REPO_ROOT / "memory" / "analyses" / f"{company_slug}.md"
@@ -900,7 +975,16 @@ async def query_deal(params: dict, sb) -> dict:
         "deal": deal,
         "latest_analysis": latest,
         "objections": objections,
+        "stage_context": {
+            "current_stage": current_stage,
+            "stage_bucket": current_bucket,
+        },
     }
+
+    # Add stage-relative MEDDICC scoring expectations from coaching config
+    stage_scoring_expectations = coaching_config.get("stage_scoring_expectations", {})
+    if stage_scoring_expectations and current_bucket in stage_scoring_expectations:
+        result["stage_scoring_expectations"] = stage_scoring_expectations[current_bucket]
 
     # Band is the surfaced signal (the 0-10 integer is internal precision the
     # generator can't reproduce run-to-run). Attach bands to every component
@@ -1997,9 +2081,23 @@ async def query_pipeline(params: dict, sb) -> dict:
             deal["_incremental_value"] = incremental_value
             incremental_deals.append(deal)
 
-            # Track deals in pipeline with $0 incremental ARR (data quality gap)
-            if incremental_value == 0:
-                zero_arr_deals.append(deal)
+            # Track deals in pipeline with $0 incremental ARR (stage-based hygiene rules)
+            # Meeting Set: $0 incremental ARR is EXPECTED (too early to size), not flagged
+            # Renewal stages: Check renewal_revenue (not incremental ARR) - $0 renewal_revenue = issue
+            # Other stages: $0 incremental ARR = hygiene issue
+            stage = stage_label(deal.get("stage"))
+
+            if stage == "Meeting Set":
+                # Expected at this stage, don't flag
+                pass
+            elif stage in ["Upcoming Renewal", "Renewal Engaged"]:
+                # For renewal stages, check renewal_revenue instead of incremental ARR
+                if renewal_revenue == 0:
+                    zero_arr_deals.append(deal)
+            else:
+                # All other stages: $0 incremental ARR is a hygiene issue
+                if incremental_value == 0:
+                    zero_arr_deals.append(deal)
         # Track NEITHER-category deals (no classification at all)
         elif incremental_value == 0 and renewal_revenue == 0:
             uncategorized_deals.append(deal)
@@ -2134,7 +2232,7 @@ async def query_pipeline(params: dict, sb) -> dict:
         "zero_arr_deals": {
             "count": zero_arr_count,
             "total_value": zero_arr_value,
-            "note": "Deals in pipeline with $0 incremental ARR recorded - data quality gap"
+            "note": "Data quality hygiene issues (stage-based rules): Meeting Set excluded (expected $0 at this stage); renewal stages flagged for $0 renewal_revenue; other stages flagged for $0 incremental ARR"
         },
         "uncategorized_deals": {
             "count": uncategorized_count,
@@ -2149,7 +2247,7 @@ async def query_pipeline(params: dict, sb) -> dict:
             "pipeline_filter": pipeline_filter,
             "owner_email": params.get("owner_email"),
         },
-        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total ($18.6M) AND Q3-scoped (q3_scoped_pipeline). COVERAGE: Always computed against Q3-scoped figure, never against timeless total. Format: '$18.6M total pipeline (timeless); $X closing this quarter (Y.Yx coverage)'. STAGE BREAKDOWN: Show ALL stages from by_stage dict (typically 10 stages). Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals (306). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
+        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total ($18.6M) AND Q3-scoped (q3_scoped_pipeline). COVERAGE: Always computed against Q3-scoped figure, never against timeless total. Format: '$18.6M total pipeline (timeless); $X closing this quarter (Y.Yx coverage)'. STAGE BREAKDOWN: Show ALL stages from by_stage dict (typically 10 stages). Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals (306). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
         "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering. Coverage ratio scoped to deals closing in target quarter only."
     }
 

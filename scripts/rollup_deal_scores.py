@@ -179,7 +179,8 @@ def write_rollup(deal, sb, hubspot, sb_writer, output_dir):
             sb_writer.insert_analysis(deal_id=str(deal_id), company_name=company,
                                       result=build_result(analysis, len(rows)),
                                       scores=scores, output_file=str(output_file.name),
-                                      component_details=details)
+                                      component_details=details,
+                                      stage_at_analysis=deal.get('stage'))
         except Exception as e:
             print(f"   ⚠️  {company}: Supabase analysis write failed: {e}")
 

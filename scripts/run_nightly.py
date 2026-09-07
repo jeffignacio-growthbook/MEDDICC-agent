@@ -511,7 +511,8 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer) -> dict
                     result=result,
                     scores=scores,
                     output_file=str(output_file.name),
-                    component_details=component_details
+                    component_details=component_details,
+                    stage_at_analysis=deal.get('stage')
                 )
             except Exception as e:
                 print(f"   ⚠️  {company_name}: Supabase analysis write failed: {e}")

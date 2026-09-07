@@ -238,7 +238,8 @@ def main():
                 result=result,
                 scores=scores,
                 output_file='test_run',
-                component_details=component_details
+                component_details=component_details,
+                stage_at_analysis=None  # Test script doesn't load deal from index
             )
             print(f"✓ Supabase component_details written successfully")
         except Exception as e:

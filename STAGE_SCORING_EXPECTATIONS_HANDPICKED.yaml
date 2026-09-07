@@ -1,0 +1,316 @@
+# Stage-Relative MEDDICC Scoring Expectations
+# STATUS: HAND_PICKED (cannot derive empirically yet)
+#
+# PROVENANCE LABELING:
+# - Economic Buyer and Champion sections: Directly validated by Jeff's
+#   corrections during Deel/DocPlanner/Electronic Arts interpretation
+#   session (2026-09-07). Jeff explicitly corrected:
+#   * EB-red acceptable in Discovery (identification phase)
+#   * Champion-yellow = coordinator behavior, not genuine champion
+#
+# - Other components (Metrics, Decision Criteria, Decision Process, Pain,
+#   Competition): Domain-knowledge extrapolations using MEDDICC stage-
+#   progression logic. NOT independently validated by Jeff in this session.
+#   Flagged for Jeff's review before treating as equally confirmed.
+#
+# DERIVATION BLOCKER:
+# - analyses table lacks stage_at_analysis column
+# - For closed deals, deal.stage = 'Closed Won'/'Closed Lost' (current),
+#   not stage at analysis time
+# - Need to capture stage at analysis time OR infer from timeline
+# - Current sample: 45 analyses, 0 usable for stage-relative derivation
+#
+# RE-DERIVATION TRIGGER:
+# - Once analyses.stage_at_analysis column added, re-run derivation
+# - Need n≥5 per component × stage × band cell for statistical confidence
+# - Estimate: ~315 analyses with stage_at_analysis (5 × 63 cells)
+
+stage_scoring_expectations:
+
+  discovery:
+    # ========== JEFF-VALIDATED COMPONENTS ==========
+
+    Economic Buyer:
+      acceptable_bands: ["red", "yellow", "green"]
+      concerning_threshold: null  # All bands acceptable in Discovery
+      interpretation_notes: >
+        JEFF-VALIDATED (2026-09-07): Discovery focus is IDENTIFICATION.
+        EB-red means "not yet identified" which is expected early-stage.
+        Concern only if still red by Scoping. Correction applied during
+        Deel interpretation (EB red but deal qualified for Discovery stage).
+      derivation_status: HAND_PICKED
+      validated_by: "Jeff (2026-09-07 Deel/DocPlanner/EA session)"
+
+    Champion:
+      acceptable_bands: ["yellow", "green"]
+      concerning_threshold: "red"
+      interpretation_notes: >
+        JEFF-VALIDATED (2026-09-07): Should have engaged contact by Discovery.
+        Red means no internal advocate identified, concerning even early.
+        Yellow (helpful coordinator) is acceptable - champion behavior
+        distinction validated during multiple deal interpretations.
+      derivation_status: HAND_PICKED
+      validated_by: "Jeff (2026-09-07 Deel/DocPlanner/EA session)"
+
+    # ========== EXTRAPOLATED COMPONENTS (PENDING JEFF REVIEW) ==========
+
+    Metrics:
+      acceptable_bands: ["red", "yellow", "green"]
+      concerning_threshold: null
+      interpretation_notes: >
+        EXTRAPOLATED: Metrics can be partially quantified in Discovery.
+        Red acceptable if progressing toward quantification. Standard
+        MEDDICC progression logic, not specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Decision Criteria:
+      acceptable_bands: ["red", "yellow", "green"]
+      concerning_threshold: null
+      interpretation_notes: >
+        EXTRAPOLATED: Early discovery of requirements. Red acceptable as
+        criteria surface during Discovery conversations. Standard MEDDICC
+        logic, not specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Decision Process:
+      acceptable_bands: ["red", "yellow", "green"]
+      concerning_threshold: null
+      interpretation_notes: >
+        EXTRAPOLATED: Process mapping begins in Discovery. Red acceptable
+        as stakeholders and approvals being uncovered. Standard MEDDICC
+        logic, not specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Pain:
+      acceptable_bands: ["yellow", "green"]
+      concerning_threshold: "red"
+      interpretation_notes: >
+        EXTRAPOLATED: Pain should be articulated by Discovery. Red means
+        no business problem identified, questions deal viability. Standard
+        MEDDICC logic, not specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Competition:
+      acceptable_bands: ["red", "yellow", "green"]
+      concerning_threshold: null
+      interpretation_notes: >
+        EXTRAPOLATED: Competitive landscape surfaces during Discovery.
+        Red acceptable as alternatives explored. Standard MEDDICC logic,
+        not specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+  scoping:
+    # ========== JEFF-VALIDATED COMPONENTS ==========
+
+    Economic Buyer:
+      acceptable_bands: ["yellow", "green"]
+      concerning_threshold: "red"
+      interpretation_notes: >
+        JEFF-VALIDATED (2026-09-07): By Scoping, EB should be identified.
+        Red means structural gap in deal qualification. Yellow (identified
+        but not engaged) acceptable. Progression from Discovery logic
+        validated during session.
+      derivation_status: HAND_PICKED
+      validated_by: "Jeff (2026-09-07 Deel/DocPlanner/EA session)"
+
+    Champion:
+      acceptable_bands: ["green"]
+      concerning_threshold: "yellow"
+      interpretation_notes: >
+        JEFF-VALIDATED (2026-09-07): Champion should be actively helping
+        by Scoping. Yellow means coordinator (schedules meetings when asked)
+        not genuine champion (sells internally unprompted). Coordinator vs.
+        champion distinction validated during session.
+      derivation_status: HAND_PICKED
+      validated_by: "Jeff (2026-09-07 Deel/DocPlanner/EA session)"
+
+    # ========== EXTRAPOLATED COMPONENTS (PENDING JEFF REVIEW) ==========
+
+    Metrics:
+      acceptable_bands: ["yellow", "green"]
+      concerning_threshold: "red"
+      interpretation_notes: >
+        EXTRAPOLATED: Business case should be quantified by Scoping. Red
+        means no ROI articulated, questions whether evaluation is real.
+        Standard MEDDICC logic, not specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Decision Criteria:
+      acceptable_bands: ["yellow", "green"]
+      concerning_threshold: "red"
+      interpretation_notes: >
+        EXTRAPOLATED: Evaluation criteria should be documented by Scoping.
+        Red means prospect hasn't defined success, suggests premature stage.
+        Standard MEDDICC logic, not specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Decision Process:
+      acceptable_bands: ["yellow", "green"]
+      concerning_threshold: "red"
+      interpretation_notes: >
+        EXTRAPOLATED: Approval process should be partially mapped. Red
+        means key stakeholders unknown, timeline at risk. Standard MEDDICC
+        logic, not specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Pain:
+      acceptable_bands: ["green"]
+      concerning_threshold: "yellow"
+      interpretation_notes: >
+        EXTRAPOLATED: Pain must be urgent by Scoping. Yellow means
+        acknowledged but not urgent, questions deal velocity. Standard
+        MEDDICC logic, not specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Competition:
+      acceptable_bands: ["yellow", "green"]
+      concerning_threshold: "red"
+      interpretation_notes: >
+        EXTRAPOLATED: Competitive positioning should be clear by Scoping.
+        Red means haven't surfaced alternatives, suggests early-stage
+        conversation mispositioned. Standard MEDDICC logic, not
+        specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+  proposal:
+    # ========== JEFF-VALIDATED COMPONENTS ==========
+
+    Economic Buyer:
+      acceptable_bands: ["green"]
+      concerning_threshold: "yellow"
+      interpretation_notes: >
+        JEFF-VALIDATED (2026-09-07): EB must be engaged by Proposal.
+        Yellow or red is deal-killer — cannot close without confirmed
+        budget authority and access. Progression from Scoping logic
+        validated during session.
+      derivation_status: HAND_PICKED
+      validated_by: "Jeff (2026-09-07 Deel/DocPlanner/EA session)"
+
+    Champion:
+      acceptable_bands: ["green"]
+      concerning_threshold: "yellow"
+      interpretation_notes: >
+        JEFF-VALIDATED (2026-09-07): Champion must be actively selling
+        internally by Proposal. Yellow means coordinator not champion,
+        red means no internal advocate. Both are closing risks. Validated
+        during session.
+      derivation_status: HAND_PICKED
+      validated_by: "Jeff (2026-09-07 Deel/DocPlanner/EA session)"
+
+    # ========== EXTRAPOLATED COMPONENTS (PENDING JEFF REVIEW) ==========
+
+    Metrics:
+      acceptable_bands: ["green"]
+      concerning_threshold: "yellow"
+      interpretation_notes: >
+        EXTRAPOLATED: ROI must be documented and agreed by Proposal.
+        Yellow means partial quantification, red means no business case.
+        Both block close. Standard MEDDICC logic, not specifically
+        validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Decision Criteria:
+      acceptable_bands: ["green"]
+      concerning_threshold: "yellow"
+      interpretation_notes: >
+        EXTRAPOLATED: All criteria must be documented and scored by
+        Proposal. Yellow or red means evaluation incomplete, premature
+        to present contract. Standard MEDDICC logic, not specifically
+        validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Decision Process:
+      acceptable_bands: ["green"]
+      concerning_threshold: "yellow"
+      interpretation_notes: >
+        EXTRAPOLATED: Full process must be mapped by Proposal. Yellow or
+        red means stakeholders or approvals unknown, timeline will slip.
+        Standard MEDDICC logic, not specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Pain:
+      acceptable_bands: ["green"]
+      concerning_threshold: "yellow"
+      interpretation_notes: >
+        EXTRAPOLATED: Pain must be critical and urgent by Proposal. Yellow
+        or red means insufficient urgency to close, deal will stall.
+        Standard MEDDICC logic, not specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+    Competition:
+      acceptable_bands: ["green"]
+      concerning_threshold: "yellow"
+      interpretation_notes: >
+        EXTRAPOLATED: Positioning vs competitors must be clear and
+        favorable by Proposal. Yellow or red means competitive risk, may
+        lose on criteria or pricing. Standard MEDDICC logic, not
+        specifically validated by Jeff.
+      derivation_status: HAND_PICKED
+      validated_by: "Domain knowledge (PENDING JEFF REVIEW)"
+
+# ========================================================================
+# CHAMPION BEHAVIOR CRITERIA
+# ========================================================================
+
+champion_behavior_criteria:
+  # STATUS: HAND_PICKED (behavioral observation, not statistical)
+  #
+  # PROVENANCE: Directly validated by Jeff's correction during
+  # Deel/DocPlanner/EA interpretation (2026-09-07): "coordinator behavior
+  # doesn't warrant green/yellow, champion means someone selling internally
+  # unprompted."
+  #
+  # Not statistically derivable (qualitative behavior assessment), but
+  # governed by explicit criteria rather than LLM judgment.
+
+  genuine_champion:
+    signals:
+      - "Introduces you to EB or other stakeholders unprompted"
+      - "Shares internal political landscape proactively"
+      - "Asks for materials to present internally"
+      - "Defends solution against internal objections"
+      - "Guides on timing, process, or stakeholders proactively"
+      - "Risks political capital to advocate for purchase"
+    minimum_signals_for_green: 3
+    minimum_signals_for_yellow: 1
+    scoring_guidance: >
+      Green (7-10): Actively selling internally with multiple signals
+      Yellow (4-6): Engaged and helpful, but not selling (coordinator)
+      Red (0-3): No engaged internal advocate
+    validated_by: "Jeff (2026-09-07 Deel/DocPlanner/EA session)"
+
+  coordinator_behavior:
+    signals:
+      - "Schedules meetings when asked"
+      - "Answers questions when asked"
+      - "Responds to emails promptly"
+      - "Attends demos and technical sessions"
+      - "Facilitates but doesn't advocate"
+    interpretation: >
+      This is a helpful contact, not a champion. Coordinator behavior
+      places ceiling at yellow/red border (score 4-5). Do not score
+      above yellow without genuine champion signals.
+    validated_by: "Jeff (2026-09-07 Deel/DocPlanner/EA session)"
+
+  behavioral_scoring_rules:
+    red_to_yellow_threshold: "At least one coordinator signal (responsive contact)"
+    yellow_to_green_threshold: "At least three genuine champion signals (actively selling)"
+    interpretation_override: >
+      If evidence shows only coordinator behavior (schedules meetings,
+      answers questions) but no proactive selling, score MUST be yellow
+      or red regardless of how helpful the contact is.
+    validated_by: "Jeff (2026-09-07 Deel/DocPlanner/EA session)"
