@@ -1,11 +1,40 @@
 # Pending Work
 
-**Last Updated:** 2026-09-08
+**Last Updated:** 2026-09-08 (updated after waterfall segmentation completion)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
 
 ## ✅ Recently Completed
+
+### Region + Segment Waterfall Segmentation (2026-09-08)
+**Status:** ✅ COMPLETE - All 4 steps verified
+
+**Completed Work:**
+- [x] Schema changes: Added region and segment columns to waterfall_weekly
+- [x] Updated primary key to (week_ending, pipeline_id, region, segment)
+- [x] Created compute_waterfall_segmented.py with region/segment grouping
+- [x] Applied is_test_deal() hygiene filter (1 test deal filtered)
+- [x] Registered both columns in data_dictionary as queryable
+- [x] Full historical backfill: 934 segmented rows across 55 weeks
+- [x] Added synthesis prompt instruction for question-substitution flagging
+
+**Results:**
+- 55 weeks of segmented history (2025-08-11 to 2026-09-07)
+- Region distribution: NAM 218, EMEA 175, APAC 165, LATAM 145, UNKNOWN 128, ROW 103
+- Segment distribution: SMB 292, Enterprise 232, Mid-Market 228, Unknown 182
+- EMEA latest: Enterprise $2.2M, Mid-Market $1.1M, SMB $880K, Unknown $50K
+
+**Verification Passed:**
+1. ✓ EMEA pipeline query returns full waterfall (beginning/ending/won/lost/net change)
+2. ✓ Historical trend plausible: $1.7M (Aug 2025) → $4.2M (Sep 2026)
+3. ✓ Data dictionary registration confirmed for both columns
+
+**Commits:** b4f1765 (waterfall segmentation), 6aee7ae (synthesis pattern)
+
+**Documentation:** REGION_WATERFALL_GAP.md, REGION_DATA_DICTIONARY_FIX.md
+
+---
 
 ### Test Data Hygiene (2026-09-08)
 **Status:** ✅ COMPLETE
@@ -29,84 +58,9 @@ None currently.
 
 ## 📋 Backlog
 
-### High Priority
-
-#### 1. Region-Aware Waterfall Segmentation
-**Issue:** waterfall_weekly lacks region column, so regional pipeline questions get partial answers (new deals only) presented as if complete.
-
-**Impact:**
-- Regional pipeline reporting (EMEA, APAC, LATAM, etc.) currently incomplete
-- Executive dashboards need region-specific waterfall
-- Questions like "How has EMEA pipeline moved" get narrower answers without clear flagging
-
-**Work Required:**
-1. **Schema:** Add region column to waterfall_weekly table
-   ```sql
-   ALTER TABLE waterfall_weekly ADD COLUMN region TEXT;
-   CREATE INDEX idx_waterfall_weekly_region ON waterfall_weekly(region);
-   ```
-
-2. **Table Grain:** Change from `(week_ending, pipeline_id)` to `(week_ending, pipeline_id, region)`
-
-3. **Computation:** Update `scripts/analytics/compute_waterfall.py`
-   - Group by `(week_ending, pipeline_id, region)` instead of `(week_ending, pipeline_id)`
-   - Handle UNKNOWN region explicitly (don't drop it)
-
-4. **Data Dictionary:** Register waterfall_weekly.region as queryable
-   ```python
-   {
-       'supabase_table': 'waterfall_weekly',
-       'supabase_column': 'region',
-       'enum_values': ['NAM', 'EMEA', 'APAC', 'LATAM', 'ROW', 'UNKNOWN'],
-       'is_queryable': True
-   }
-   ```
-
-5. **Historical Backfill:** Run `compute_waterfall.py --backfill` to recompute all historical data with region segmentation
-
-**Complexity:** Medium (schema change + historical backfill + computation logic update)
-
-**Documentation:** REGION_WATERFALL_GAP.md
-
-**Related:** REGION_DATA_DICTIONARY_FIX.md (region classification implementation), config/regions.yaml (region mappings)
-
----
-
-### Medium Priority
-
-#### 2. Synthesis Question Substitution Pattern
-**Issue:** When LLM identifies it cannot fully answer the question and substitutes a narrower question, it doesn't flag this substitution to the user.
-
-**Example:**
-- User asks: "How has EMEA pipeline moved in the last 2 weeks"
-- LLM reasoning: "waterfall table doesn't have EMEA segmentation, let me look at new deals instead"
-- LLM answer: Shows "EMEA Pipeline Movement" header but only includes new deals created
-
-User sees "EMEA Pipeline Movement" and assumes full pipeline movement (beginning/ending/won/lost), but it's actually only showing new deals created.
-
-**Fix:**
-Make synthesis step explicitly flag when it substitutes a narrower/different question:
-
-```
-⚠️ Note: waterfall_weekly isn't region-segmented yet, so this shows
-new deal creation only, not full pipeline movement (beginning/ending/
-won/lost/net change). For full EMEA pipeline movement, I'd need
-region-aware waterfall data.
-```
-
-**Implementation Location:** `api/router.py` or wherever synthesis step formats final answers
-
-**Pattern:** Same "explicit honesty about data gaps" pattern as:
-- `no_signal_at_risk` (MEDDICC gaps surfaced explicitly)
-- `UNKNOWN` region (missing geography surfaced explicitly)
-
-**Documentation:** REGION_WATERFALL_GAP.md (section 2)
-
----
-
 ### Low Priority
 
-#### 3. Zero-Day Cycle Time Deals
+#### 1. Zero-Day Cycle Time Deals
 **Issue:** 4 deals with negative or zero cycle time (data quality artifacts)
 
 **Impact:** Low (already filtered by `is_valid_cycle_deal()` in handlers, but exist in raw data)
@@ -117,7 +71,7 @@ region-aware waterfall data.
 
 ---
 
-#### 4. Forecast Analysis Bugs (Status Unconfirmed)
+#### 2. Forecast Analysis Bugs (Status Unconfirmed)
 **Issue:** 2 old bugs mentioned in forecast_analyses.py
 
 **Work:** Confirm if still present, fix if needed
@@ -181,11 +135,11 @@ Without step 3, LLM query builder cannot see the column exists.
 
 ## 📊 Summary
 
-**Total Open Items:** 4
-- High Priority: 1 (waterfall region segmentation)
-- Medium Priority: 1 (synthesis question substitution)
+**Total Open Items:** 2
 - Low Priority: 2 (zero-day cycle times, forecast bugs)
 
-**Recently Completed:** 1 (test data hygiene)
+**Recently Completed:** 2
+- Waterfall region + segment segmentation (2026-09-08)
+- Test data hygiene (2026-09-08)
 
-**Next Recommended:** Waterfall region segmentation (highest impact, enables accurate regional reporting)
+**Major Milestone:** Region-segmented waterfall now live with 934 historical rows across 55 weeks, enabling accurate EMEA/APAC/LATAM/NAM pipeline reporting by company size segment.
