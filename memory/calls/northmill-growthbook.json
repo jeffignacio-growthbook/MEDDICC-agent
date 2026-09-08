@@ -1,0 +1,18 @@
+{
+  "company": "NorthMill & GrowthBook",
+  "slug": "northmill-growthbook",
+  "last_etl_date": "2026-09-08T06:08:32.634997",
+  "calls": [
+    {
+      "id": "01M1F11NCKJGJ4V7QC6K5FZV82",
+      "source": "fireflies",
+      "title": "NorthMill & GrowthBook Demo",
+      "date": "2026-09-07",
+      "duration_minutes": 28.5,
+      "summary": "# NorthMill & GrowthBook Demo\nDate: 2026-09-07 | Duration: 28.5m\n\n## Summary\nGrowthBook demonstrated approval workflows, feature flag management, release controls, and audit capabilities designed for regulated financial institutions. The platform supports environment-specific and multi-step approvals, role restrictions, four-eyes review, API and CLI gating, SDK integrations, multiple flag types, structured JSON, multi-project setups, targeting, scheduled releases, monitored ramp-ups, warehouse-based metrics, and automatic rollback. North Mill found the approval, audit, multi-environment, and API capabilities aligned with its B2C and planned B2B application structure. Commercial terms included a $75,000 annual license plus $750 per user seat, totaling $86,250 for 15 seats, with a 5% self-hosting reduction and possible flexibility for signing before the end of October. Sebastian Mysakowski considered GrowthBook more appealing for developers despite its higher price and planned to present the proposal to management. James Shannon offered to send tailored pricing and presentation materials. Technical validation was considered complete, with internal review and potential implementation as the next steps.\n\n## Keywords\nfeature flags, approval workflows, SDK setup, monitored rollout, pricing negotiation, cloud vs self-host\n\n## Action Items\n\n**Sebastian Mysakowski**\nPresent the GrowthBook demo and pricing details internally to North Mill management and provide feedback swiftly, ideally before the upcoming holidays (23:41)\nConfirm after internal management decision whether further testing of GrowthBook is required or if contract processing can begin (24:52)\n\n**James Shannon**\nSend presentation slides and detailed pricing information via email to Sebastian Mysakowski for internal distribution at North Mill (26:54)\nPrepare and share potential pricing adjustment options contingent on timing of commitment to facilitate negotiation (23:41)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

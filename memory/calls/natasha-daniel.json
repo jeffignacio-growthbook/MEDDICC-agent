@@ -1,0 +1,18 @@
+{
+  "company": "Natasha / Daniel",
+  "slug": "natasha-daniel",
+  "last_etl_date": "2026-09-08T06:08:32.634863",
+  "calls": [
+    {
+      "id": "01M1DBGEX55X5SQWBAPD6T3RB7",
+      "source": "fireflies",
+      "title": "Natasha / Daniel",
+      "date": "2026-09-07",
+      "duration_minutes": 54.709999084472656,
+      "summary": "# Natasha / Daniel\nDate: 2026-09-07 | Duration: 54.709999084472656m\n\n## Summary\nThe session explained how to configure GitHub access with SSH, including generating a key with ssh-keygen, setting private-key permissions with chmod 600, adding the key to the SSH agent, and resolving an access-confirmation issue through a password reset and screen sharing. The main repository was forked to a personal GitHub account, cloned through its SSH URL, and recloned after deleting the local folder to restore a clean copy. A descriptive local branch was created for a documentation fix. Patch files were discussed with git apply and git am, with Daniel preferring manual patch management. The workflow for pushing a branch to a personal fork and opening a pull request was demonstrated. GitHub pull requests can be used to review file differences, request engineer approval, and wait for automated tests before merging. Natasha will attempt a small bug fix independently using the documented process, and Daniel will share the current recording for review and future learning.\n\n## Keywords\nGit, SSH key, GitHub fork, branch management, AI documentation patching, pull request workflow\n\n## Action Items\n**Natasha Lee**  \nFollow SSH key and GitHub setup docs (02:00)  \nDelete local GrowthBook folder and re-clone repo (26:41)  \nAdd personal fork as remote in Git (32:29)  \nCreate and switch to new Git branch (33:43)  \nReview and apply AI-generated doc patches (39:00)  \nAttempt small bug fixes independently (50:57)  \n\n**Daniel Lin**  \nConsider recording improved walkthrough (52:48)  \nShare walkthrough recording with Natasha (52:53)",
+      "organizer": "daniel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

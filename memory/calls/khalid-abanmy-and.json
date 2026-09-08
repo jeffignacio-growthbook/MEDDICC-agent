@@ -1,0 +1,18 @@
+{
+  "company": "Khalid Abanmy and",
+  "slug": "khalid-abanmy-and",
+  "last_etl_date": "2026-09-08T06:08:32.634709",
+  "calls": [
+    {
+      "id": "01M1RNYHSBSW91AQ4M1V9KNAEF",
+      "source": "fireflies",
+      "title": "Khalid Abanmy and James Shannon",
+      "date": "2026-09-07",
+      "duration_minutes": 58.779998779296875,
+      "summary": "# Khalid Abanmy and James Shannon\nDate: 2026-09-07 | Duration: 58.779998779296875m\n\n## Summary\nThe team discussed a GrowthBook proof of concept planned before the end of 2027 to replace judgment-based product decisions with live, data-driven experimentation. GrowthBook SDKs would manage traffic splitting, variant assignment, and local rule caching, while experiment events could flow through the existing OpenTelemetry pipeline into ClickHouse. The team needs to assess SDK integration, data architecture, enterprise support, and self-hosting. GrowthBook offers a visual no-code editor, AI assistant, feature flags with gradual rollout and automatic rollback, and analysis showing lift, significance, and user-segment breakdowns. Metrics and SQL definitions are editable for transparent collaboration and retroactive analysis. The open-source version can be used immediately for SDK and ClickHouse testing, while a 30-day enterprise trial provides advanced features and support before an annual license. Documentation, Slack support, technical discussions, and commercial follow-up were offered.\n\n## Keywords\nGrowthBook, Self-hosting, Clickhouse, Experimentation, Feature Flagging, OpenTelemetry\n\n## Action Items\n\n**James Shannon**\nConfirm details of how Growth Book integrates with NTIS's existing OpenTelemetry pipeline after the call to ensure smooth data flow and event tracking (16:44)\nSend comprehensive documentation and integration information about Growth Book, including SDK setup, visual editor, API usage, and metrics configuration, to Khalid Saud and the NTIS team via email (56:07)\nExplore and clarify any API options for event tracking that could reduce the need for NTIS to duplicate SDK usage alongside their OpenTelemetry implementation (48:25)\n\n**Rémy Marin**\nProvide technical documentation links covering Growth Book SDK setup, visual editor, API usage, and metrics configuration to support NTIS's integration efforts (56:07)\nOffer to open a Slack channel for ongoing integration support and queries to facilitate communication between Growth Book and NTIS technical teams (56:15)\n\n**Khalid Saud**\nLead internal evaluation and proof of concept (PoC) of Growth Book at NTIS before the start of 2027 to assess suitability for product testing and release management (05:45)\nCoordinate communication on commercial discussions and decision-making regarding Growth Book adoption at NTIS (54:08)\n\n**Ahmad**\nFacilitate technical assessment of Growth Book SDK usage alongside NTIS's current OpenTelemetry systems to ensure compatibility and performance (47:31)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

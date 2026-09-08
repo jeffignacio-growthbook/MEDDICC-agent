@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook & Freie",
+  "slug": "growthbook-freie",
+  "last_etl_date": "2026-09-08T06:08:32.634498",
+  "calls": [
+    {
+      "id": "01M1SAHPEAZN47ENAEN1R68NQX",
+      "source": "fireflies",
+      "title": "GrowthBook & Freie Press Commercial Discussion",
+      "date": "2026-09-07",
+      "duration_minutes": 17.6200008392334,
+      "summary": "# GrowthBook & Freie Press Commercial Discussion\nDate: 2026-09-07 | Duration: 17.6200008392334m\n\n## Summary\nThe parties discussed a fixed €13,000 monthly fee for 10 user seats, which cannot change during the contract because the German publishing holding requires fixed budget figures. James proposed removing onboarding and training while retaining Slack support, and offered documentation plus data scientist assistance for implementation. Lucas identified API access as straightforward but said Databricks integration might require additional help. Ralf proposed funding one day for API testing and two to three days for data integration from unused budget, subject to pricing. Only 10 seats are approved, and a decision was expected by Wednesday, followed by legal and data protection reviews lasting two to three weeks; contract execution was expected within four weeks of agreement. The contract would run for 12 months, with only a small, impact-based price increase afterward. A successful pilot could support expansion to other subsidiaries.\n\n## Keywords\npricing negotiation, onboarding, data integration, contract signing, support days, budget constraints\n\n## Action Items\n\n**James Shannon**\nPrepare and send a revised proposal reflecting pricing adjustments including removal of onboarding and training services, and inclusion of additional contracted support days tailored to Freie Presse's needs (15:18)\nExplore pricing options for one to three days of additional direct support, focusing on data integration and API testing needs, and confirm details with Lucas Keller (11:19)\n\n**Pierre Franz**\nHandle contract formalities and signing once pricing agreement is reached, after Ralf leaves for holidays (15:38)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}
