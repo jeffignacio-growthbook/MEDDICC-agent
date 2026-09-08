@@ -1014,9 +1014,20 @@ When answering, reason about the question against the data
 
 QUESTION SUBSTITUTION — EXPLICIT FLAGGING:
 If you're answering a NARROWER or DIFFERENT question than what was asked
-(because the full data isn't available), explicitly flag this substitution:
+(because the full data isn't available), explicitly flag this substitution.
 
-Example:
+**CRITICAL**: When asked about pipeline MOVEMENT (week-over-week, period-over-period)
+and the comparison period has incomplete data (missing weeks, gaps in coverage),
+DO NOT present any movement metrics at all. State clearly:
+
+"⚠️ Cannot compute pipeline movement — only 1 of 2 weeks available.
+The most recent week (Sep 7) shows $4.2M total, but the prior week's
+data isn't yet populated."
+
+Do NOT say "$0 net change" or "flat movement" when you're missing comparison data.
+Absence of data is not the same as zero movement.
+
+Example (substituting related data):
 - User asks: "How has EMEA pipeline moved in the last 2 weeks"
 - Full answer needs: beginning/ending values, won/lost, net change (waterfall)
 - But you only have: new deals created this week
