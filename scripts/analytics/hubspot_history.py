@@ -21,6 +21,12 @@ import argparse
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional
+from dotenv import load_dotenv
+
+# Load environment variables from .env (repo root)
+# __file__ is scripts/analytics/hubspot_history.py, so parent.parent.parent gets to repo root
+env_path = Path(__file__).parent.parent.parent / ".env"
+load_dotenv(env_path)
 
 # Add scripts to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -59,7 +65,7 @@ class RateLimiter:
 # renewal deals. All of those need point-in-time history, not just amount.
 TRACKED_PROPERTIES = ('dealstage', 'hs_manual_forecast_category',
                       'new_revenue', 'expansion_revenue', 'renewal_revenue',
-                      'amount', 'closedate')
+                      'amount', 'closedate', 'notes_last_updated')
 
 # Cache records are keyed by property. 'history' stays the dealstage key for
 # backward compatibility with point_in_time and backfill_snapshots.
@@ -71,6 +77,7 @@ HISTORY_KEYS = {
     'renewal_revenue': 'renewal_revenue_history',
     'amount': 'amount_history',
     'closedate': 'closedate_history',
+    'notes_last_updated': 'notes_last_updated_history',
 }
 
 

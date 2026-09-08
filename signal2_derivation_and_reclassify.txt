@@ -1,0 +1,274 @@
+================================================================================
+SIGNAL 2 THRESHOLD DERIVATION
+================================================================================
+
+Fetching won deals...
+Total won deals: 325
+
+Computing time-in-stage for each deal...
+  Processed 20/325...
+  Processed 40/325...
+  Processed 60/325...
+  Processed 80/325...
+  Processed 100/325...
+  Processed 120/325...
+  Processed 140/325...
+  Processed 160/325...
+  Processed 180/325...
+  Processed 200/325...
+  Processed 220/325...
+  Processed 240/325...
+  Processed 260/325...
+  Processed 280/325...
+  Processed 300/325...
+  Processed 320/325...
+
+Completed time-in-stage computation
+
+================================================================================
+THRESHOLD DERIVATION PER CELL
+================================================================================
+
+Stage           Segment              n      P75 Fallback       
+----------------------------------------------------------------------
+discovery       Enterprise          18      463 Segment-specific
+discovery       Mid-Market          37      184 Segment-specific
+discovery       SMB                 27      454 Segment-specific
+scoping         Enterprise           3      N/A Insufficient   
+scoping         Mid-Market           6       23 Segment-specific
+scoping         SMB                  2      N/A Insufficient   
+proposal        Enterprise           0      N/A Insufficient   
+proposal        Mid-Market           4      N/A Insufficient   
+proposal        SMB                  4      N/A Insufficient   
+
+================================================================================
+STAGE-ONLY FALLBACKS
+================================================================================
+
+Stage                n      P75
+-----------------------------------
+discovery           82      382
+scoping             11       41
+proposal             8      105
+
+================================================================================
+CLASSIFYING ACTIVE DEALS WITH REAL THRESHOLDS
+================================================================================
+
+Classifying 444 active deals...
+  Processed 50/444...
+  Processed 100/444...
+  Processed 150/444...
+  Processed 200/444...
+  Processed 250/444...
+  Processed 300/444...
+  Processed 350/444...
+  Processed 400/444...
+
+================================================================================
+CLASSIFICATION RESULTS (REAL THRESHOLDS)
+================================================================================
+
+CRITICAL (Signal 2 + Signal 3): 22
+WARN (Signal 2 only): 7
+no_signal_at_risk: 14
+HEALTHY: 218
+no_signal_healthy: 183
+
+================================================================================
+COMPARISON: REAL vs PLACEHOLDER THRESHOLDS
+================================================================================
+
+Classification             Placeholder         Real         Diff
+-----------------------------------------------------------------
+critical                            48           22          -26
+warn                                24            7          -17
+no_signal_at_risk                   23           14           -9
+healthy                            175          218          +43
+no_signal_healthy                  174          183           +9
+
+================================================================================
+SPECIFIC DEAL RE-CHECK
+================================================================================
+
+Re-checking specific deals under REAL thresholds:
+
+Perplexity AI:
+  Stage: appointmentscheduled (SMB)
+  Time in stage: 207 days
+  Threshold: 454 days (segment_specific)
+  Signal 2 fires: False
+  Last activity: 12 days ago
+  Signal 3 fires: False
+  Classification: HEALTHY
+
+OpenTable:
+  Stage: presentationscheduled (Unknown)
+  Time in stage: 108 days
+  Threshold: 105 days (stage_only)
+  Signal 2 fires: True
+  Last activity: 3 days ago
+  Signal 3 fires: False
+  Classification: WARN
+
+Natera:
+  Stage: presentationscheduled (Enterprise)
+  Time in stage: 107 days
+  Threshold: 105 days (stage_only)
+  Signal 2 fires: True
+  Last activity: 3 days ago
+  Signal 3 fires: False
+  Classification: WARN
+
+Crunchyroll:
+  Stage: presentationscheduled (Enterprise)
+  Time in stage: 103 days
+  Threshold: 105 days (stage_only)
+  Signal 2 fires: False
+  Last activity: 9 days ago
+  Signal 3 fires: False
+  Classification: HEALTHY
+
+Samsung Electronics:
+  Stage: decisionmakerboughtin (Enterprise)
+  Time in stage: 997 days
+  Threshold: 105 days (stage_only)
+  Signal 2 fires: True
+  Last activity: 243 days ago
+  Signal 3 fires: True
+  Classification: CRITICAL
+
+Little Caesars:
+  Stage: decisionmakerboughtin (Enterprise)
+  Time in stage: 466 days
+  Threshold: 105 days (stage_only)
+  Signal 2 fires: True
+  Last activity: 684 days ago
+  Signal 3 fires: True
+  Classification: CRITICAL
+
+Deepgram:
+  Stage: presentationscheduled (SMB)
+  Time in stage: 214 days
+  Threshold: 105 days (stage_only)
+  Signal 2 fires: True
+  Last activity: 206 days ago
+  Signal 3 fires: True
+  Classification: CRITICAL
+
+
+================================================================================
+SAMPLE CRITICAL DEALS (Top 10 by time in stage)
+================================================================================
+
+Samsung Electronics
+  Stage: decisionmakerboughtin (Enterprise)
+  Time in stage: 997 days (threshold: 105 days)
+  Last activity: 243 days ago
+  Threshold type: stage_only
+
+SecureTicketPurchase
+  Stage: decisionmakerboughtin (SMB)
+  Time in stage: 483 days (threshold: 105 days)
+  Last activity: 59 days ago
+  Threshold type: stage_only
+
+Little Caesars
+  Stage: decisionmakerboughtin (Enterprise)
+  Time in stage: 466 days (threshold: 105 days)
+  Last activity: 684 days ago
+  Threshold type: stage_only
+
+Scale AI
+  Stage: decisionmakerboughtin (Mid-Market)
+  Time in stage: 409 days (threshold: 105 days)
+  Last activity: 499 days ago
+  Threshold type: stage_only
+
+Harper
+  Stage: presentationscheduled (SMB)
+  Time in stage: 219 days (threshold: 105 days)
+  Last activity: 181 days ago
+  Threshold type: stage_only
+
+Flipp
+  Stage: appointmentscheduled (Mid-Market)
+  Time in stage: 216 days (threshold: 184 days)
+  Last activity: 166 days ago
+  Threshold type: segment_specific
+
+Zid 
+  Stage: presentationscheduled (Mid-Market)
+  Time in stage: 215 days (threshold: 105 days)
+  Last activity: 48 days ago
+  Threshold type: stage_only
+
+Deepgram
+  Stage: presentationscheduled (SMB)
+  Time in stage: 214 days (threshold: 105 days)
+  Last activity: 206 days ago
+  Threshold type: stage_only
+
+MoneyLion
+  Stage: qualifiedtobuy (Mid-Market)
+  Time in stage: 212 days (threshold: 23 days)
+  Last activity: 48 days ago
+  Threshold type: segment_specific
+
+Stone
+  Stage: qualifiedtobuy (Enterprise)
+  Time in stage: 209 days (threshold: 41 days)
+  Last activity: 209 days ago
+  Threshold type: stage_only
+
+
+================================================================================
+SAMPLE WARN DEALS (Top 10 by time in stage)
+================================================================================
+
+OpenTable
+  Stage: presentationscheduled (Unknown)
+  Time in stage: 108 days (threshold: 105 days)
+  Last activity: 3 days ago
+  Threshold type: stage_only
+
+Natera
+  Stage: presentationscheduled (Enterprise)
+  Time in stage: 107 days (threshold: 105 days)
+  Last activity: 3 days ago
+  Threshold type: stage_only
+
+Stay Partners
+  Stage: qualifiedtobuy (Unknown)
+  Time in stage: 104 days (threshold: 41 days)
+  Last activity: 12 days ago
+  Threshold type: stage_only
+
+Zalando
+  Stage: qualifiedtobuy (Enterprise)
+  Time in stage: 103 days (threshold: 41 days)
+  Last activity: 3 days ago
+  Threshold type: stage_only
+
+DasWeltAuto
+  Stage: qualifiedtobuy (Mid-Market)
+  Time in stage: 98 days (threshold: 23 days)
+  Last activity: 7 days ago
+  Threshold type: segment_specific
+
+UPS
+  Stage: qualifiedtobuy (Enterprise)
+  Time in stage: 97 days (threshold: 41 days)
+  Last activity: 11 days ago
+  Threshold type: stage_only
+
+Livesport
+  Stage: qualifiedtobuy (Mid-Market)
+  Time in stage: 53 days (threshold: 23 days)
+  Last activity: 5 days ago
+  Threshold type: segment_specific
+
+
+================================================================================
+✅ SIGNAL 2 DERIVATION AND RE-CLASSIFICATION COMPLETE
+================================================================================

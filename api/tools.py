@@ -4,6 +4,7 @@ from pathlib import Path
 from collections import defaultdict
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from supabase_client import select_all, _coerce_in_values
+from field_semantics import is_test_deal
 
 _VALID_COLUMNS = {}
 
@@ -105,6 +106,14 @@ async def filter_table(sb, table, columns=None, filters=None, limit=200, order_b
             q = getattr(q, f[0])(*f[1:])
         q = q.order(col, desc=(direction == 'desc'))
         rows = q.limit(limit).execute().data or []
+
+        # Apply data hygiene filters for deals table
+        if table == "deals" and rows:
+            pre_filter_count = len(rows)
+            rows = [r for r in rows if not is_test_deal(r)]
+            if len(rows) < pre_filter_count:
+                print(f"[HYGIENE] Filtered {pre_filter_count - len(rows)} test deals from {table}", flush=True)
+
         result = {"rows": rows, "total_found": len(rows), "table": table, "truncated": False}
         if unavailable:
             result["unavailable_columns"] = unavailable
@@ -112,6 +121,14 @@ async def filter_table(sb, table, columns=None, filters=None, limit=200, order_b
     else:
         # No ordering - use paginated select_all
         rows = select_all(sb, table, columns=",".join(cols) if cols else "*", filters=processed_filters)
+
+        # Apply data hygiene filters for deals table
+        if table == "deals" and rows:
+            pre_filter_count = len(rows)
+            rows = [r for r in rows if not is_test_deal(r)]
+            if len(rows) < pre_filter_count:
+                print(f"[HYGIENE] Filtered {pre_filter_count - len(rows)} test deals from {table}", flush=True)
+
         result = {"rows": rows[:limit], "total_found": len(rows), "table": table, "truncated": len(rows) > limit}
         if unavailable:
             result["unavailable_columns"] = unavailable

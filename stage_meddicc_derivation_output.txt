@@ -1,0 +1,291 @@
+================================================================================
+DERIVE STAGE-RELATIVE MEDDICC EXPECTATIONS
+================================================================================
+
+Method: Same empirical approach as Signal 2 threshold derivation
+Question: Does component band at stage correlate with win/loss outcome?
+
+Fetching closed deals from Supabase...
+  Fetched 1000 total deals
+  After exclusions: 631 closed deals (won + lost)
+Fetching MEDDICC analyses...
+  Fetched 59 analyses
+  Passed analyses: 45
+
+Building stage × component × band outcome matrix...
+Analyzing predictiveness (min_sample=5)...
+
+================================================================================
+STAGE-RELATIVE MEDDICC COMPONENT EXPECTATIONS
+================================================================================
+
+================================================================================
+STAGE: DISCOVERY
+================================================================================
+
+Metrics:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Economic Buyer:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Decision Criteria:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Decision Process:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Pain:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Champion:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Competition:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+================================================================================
+STAGE: SCOPING
+================================================================================
+
+Metrics:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Economic Buyer:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Decision Criteria:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Decision Process:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Pain:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Champion:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Competition:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+================================================================================
+STAGE: PROPOSAL
+================================================================================
+
+Metrics:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Economic Buyer:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Decision Criteria:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Decision Process:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Pain:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Champion:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+Competition:
+  RED: No data
+  YELLOW: No data
+  GREEN: No data
+
+================================================================================
+GENERATED stage_scoring_expectations CONFIG
+================================================================================
+
+stage_scoring_expectations:
+  discovery:
+    Metrics:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Economic Buyer:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Decision Criteria:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Decision Process:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Pain:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Champion:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Competition:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+  scoping:
+    Metrics:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Economic Buyer:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Decision Criteria:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Decision Process:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Pain:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Champion:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Competition:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+  proposal:
+    Metrics:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Economic Buyer:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Decision Criteria:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Decision Process:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Pain:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Champion:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+    Competition:
+      acceptable_bands:
+      - green
+      concerning_threshold: null
+      interpretation_notes: null
+      derivation_status: DERIVED
+
+
+================================================================================
+SUMMARY
+================================================================================
+
+Total cells: 63
+Derived (n≥5): 26
+Hand-picked (n<5): 4
+Coverage: 41.3%
+
+⚠️  4 cells have insufficient data (n<5)
+These will be marked as HAND_PICKED pending re-derivation once n≥5
+
+Next steps:
+1. Review results for face validity
+2. Add stage_scoring_expectations to config/coaching_client.yaml
+3. Wire query_deal to load_coaching_config and pass stage context
+4. Monitor for inconsistent LLM interpretation before pursuing Option D

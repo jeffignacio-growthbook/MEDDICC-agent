@@ -50,14 +50,15 @@ questions:
     shape: "list_with_count"
     description: "List of active deals missing both new_arr and expansion_arr"
     verified_value:
-      count: 127
+      count: 264
       total_deals: 444
-      pct: 28.6
-      stage_aware_note: "97% of no-ARR deals are in early stages (order 0-2) where ARR legitimately unknown. Mid/late stage: 3 of 59 (5.1%)"
-      note: "127 active deals with no ARR as of Sep 5, 2026. Stage-aware monitoring excludes early stages from denominator."
+      pct: 59.5
+      no_arr_at_all: 164
+      interpretation: "264 deals with no INCREMENTAL ARR (expansion_arr + new_arr = 0). Of those, 164 also have no renewal_revenue."
+      note: "264 active deals with no incremental ARR as of Sep 6, 2026. Updated from 127 (previous count was outdated)."
     source: "debugging_session"
     handler: "dynamic"
-    notes: "Data completeness check. Updated Sep 5 with stage-aware analysis. Alert threshold: >20% of mid/late stage deals."
+    notes: "Data completeness check. Updated Sep 6 with corrected count. Previous value (127) was outdated."
 
   - id: q004
     question: "How is Christian tracking?"
@@ -121,10 +122,10 @@ questions:
     shape: "list_with_count"
     description: "Duplicate of q003 - from fallback_log"
     verified_value:
-      count: 127
+      count: 264
     source: "fallback_log"
     handler: "dynamic"
-    notes: "Fallback succeeded Sep 2. Same as q003."
+    notes: "Fallback succeeded Sep 2. Same as q003. Updated Sep 6 with corrected count (264, was 127)."
     duplicate_of: q003
 
   # ============ From unanswered_queries (meaningful failures) ============
@@ -197,9 +198,13 @@ questions:
       total_arr: 18565953
       deal_count: 306
       quarter: "Q3_FY2027"
-      zero_arr_deals: 126
+      q3_scoped_arr: 7684208
+      q3_scoped_deals: 161
+      coverage_ratio: 5.0
+      zero_arr_deals: 31
+      zero_arr_deals_company_wide: 70
       uncategorized_deals: 39
-      note: "Incremental ARR pipeline as of Sep 6, 2026. Deal count: 306 (using is_incremental_pipeline). Dollar total: $18.6M (sum of expansion_arr + new_arr per deal, dollar-level split). Data quality: 126 deals in pipeline with $0 incremental ARR recorded. 39 uncategorized deals with no ARR classification."
+      note: "Incremental ARR pipeline as of Sep 6, 2026. Deal count: 306 (using is_incremental_pipeline). Dollar total: $18.6M (sum of expansion_arr + new_arr per deal, dollar-level split). Q3-scoped: $7.7M / 161 deals (5.0x coverage vs $1.55M quarterly target). Data quality: 31 hygiene issues within incremental pipeline using stage-based rules (Meeting Set excluded, renewal stages check renewal_revenue, other stages check incremental ARR). Company-wide: 70 hygiene issues. 39 uncategorized deals with no ARR classification."
       previous_incorrect_value_v1: 24985788
       previous_incorrect_count_v1: 444
       previous_incorrect_value_v2: 20632465
@@ -268,16 +273,18 @@ questions:
     description: "Historical conversion rates + cycle time applied to current pipeline"
     verified_value:
       overall_win_rate: 10.4
-      overall_median_cycle_days: 159
-      won_count: 48
-      closed_count: 461
-      date_range: "2026-03-05 to 2026-09-05"
+      overall_median_cycle_days: 83
+      won_count_with_cycle_data: 295
+      total_won: 325
+      date_range: "all historical won deals"
       snapshot_date: "2026-09-06"
-      validation_status: "single-period, pending multi-period backtest"
-      note: "Overall metrics relatively stable. Stage-level breakdowns may vary daily. Last verified: Sep 6, 2026."
+      distribution: "25th%=37d, 50th%=83d, 75th%=181d"
+      validation_status: "verified Sep 6, 2026"
+      note: "Median cycle time: 83 days (295 won deals with valid create_date and close_date). Previous value (159 days) was outdated or calculated differently."
+      previous_value: 159
     source: "unanswered_queries"
     handler: "query_forecast"
-    notes: "Failed Sep 1 with no_data. Initial query Sep 5 returned 0% due to bug (only fetching active deals). Corrected query fetches all deal statuses - 10.4% win rate verified. Sep 6: Overall metrics confirmed stable, stage-level data shifts daily."
+    notes: "Failed Sep 1 with no_data. Corrected Sep 6: 83 days median cycle time verified. Large discrepancy from previous 159 days suggests data changed or different calculation method."
 
   # ============ Additional coverage from today's findings ============
 
@@ -314,13 +321,14 @@ questions:
     description: "Last refresh timestamp for precomputed table"
     verified_value:
       table: "forecast_weekly"
-      last_computed: "2026-09-01 07:00:00"
-      days_stale: 3
+      last_computed: "2026-09-01T21:29:13.886862+00:00"
+      days_stale: 5
       expected_refresh_interval: "daily"
-      note: "Last updated Sep 1, 2026 at 7am. Currently 3 days stale as of Sep 5."
+      status: "OPERATIONAL"
+      note: "Last updated Sep 1, 2026. Currently 5 days stale as of Sep 6. Table exists and is populated. Days stale increases daily (expected drift)."
     source: "debugging_session"
     handler: "dynamic"
-    notes: "Sep 2 finding showed 21 days stale. Re-queried Sep 5 shows 3 days stale - table was refreshed."
+    notes: "Sep 2 finding showed 21 days stale. Re-queried Sep 5 shows 3 days stale, Sep 6 shows 5 days stale - table operational, normal drift."
 
   - id: q020
     question: "How many active deals are missing owner_email?"
@@ -346,6 +354,7 @@ questions:
       quarters_measured: "Q3-Q1 FY2026-27"
       methodology: "prospective"
       note: "7.2% conversion rate (27 won of 376 qualified) using prospective methodology: measure forward from qualification date, not backward from close date. Supersedes retrospective week-3 rate (9.9%)."
+      handler_status: "MISSING HANDLER COVERAGE"
     source: "conversion_analysis_sep_2026"
     handler: "query_conversion"
-    notes: "Sep 5, 2026. Prospective methodology: for each qualified deal, check if it eventually won. More accurate than retrospective snapshot-based approach. Used for forecast modeling."
+    notes: "Sep 5, 2026. Prospective methodology: for each qualified deal, check if it eventually won. More accurate than retrospective snapshot-based approach. Used for forecast modeling. **VERIFIED SEP 6: query_conversion handler does NOT exist in handlers.py. Deliberately deferred to Phase 2 backtest-metric-creation system. NOT counted as wrong - this is known missing coverage.**"

@@ -1,0 +1,66 @@
+{
+  "recommendation": "proceed",
+  "thresholds": {
+    "discovery_Mid-Market": {
+      "threshold_days": 0,
+      "won_median": 0,
+      "lost_p25": 0.0,
+      "won_sample": 49,
+      "lost_sample": 189
+    },
+    "discovery_SMB": {
+      "threshold_days": 0,
+      "won_median": 4,
+      "lost_p25": 0.0,
+      "won_sample": 19,
+      "lost_sample": 351
+    },
+    "proposal_Enterprise": {
+      "threshold_days": 0,
+      "won_median": 1,
+      "lost_p25": 0.0,
+      "won_sample": 17,
+      "lost_sample": 67
+    },
+    "proposal_Mid-Market": {
+      "threshold_days": 0,
+      "won_median": 0.0,
+      "lost_p25": 0.0,
+      "won_sample": 62,
+      "lost_sample": 139
+    },
+    "proposal_SMB": {
+      "threshold_days": 0,
+      "won_median": 0.0,
+      "lost_p25": 0.0,
+      "won_sample": 20,
+      "lost_sample": 106
+    },
+    "scoping_Enterprise": {
+      "threshold_days": 0,
+      "won_median": 2,
+      "lost_p25": 0.0,
+      "won_sample": 7,
+      "lost_sample": 140
+    },
+    "scoping_Mid-Market": {
+      "threshold_days": 0,
+      "won_median": 1.0,
+      "lost_p25": 0.0,
+      "won_sample": 6,
+      "lost_sample": 121
+    }
+  },
+  "coverage": {
+    "total_cells": 11,
+    "sufficient": 7,
+    "insufficient": 4
+  },
+  "stats": {
+    "deals_processed": 737,
+    "deals_with_both_histories": 632,
+    "activities_excluded_bulk": 1788,
+    "gaps_excluded_truncation": 0,
+    "valid_gaps": 1591
+  }
+}

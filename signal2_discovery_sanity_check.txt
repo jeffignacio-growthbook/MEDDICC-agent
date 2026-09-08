@@ -1,0 +1,126 @@
+================================================================================
+SIGNAL 2 DISCOVERY THRESHOLD SANITY CHECK
+================================================================================
+
+Fetching won deals...
+Total won deals: 325
+
+================================================================================
+CHECK 1: RENEWAL CONTAMINATION
+================================================================================
+
+Renewal deals found: 99/325 (30.5%)
+Non-renewal deals: 226/325 (69.5%)
+
+⚠️  WARNING: 99 renewal deals found in won population
+   These should have been excluded from Signal 2 derivation
+
+   Sample renewal deals:
+     - Refurbed Marketplace GmbH: pipeline_id=866608541, renewal_revenue=9240.0
+     - 7shifts: pipeline_id=866608541, renewal_revenue=5562.5
+     - : pipeline_id=866608541, renewal_revenue=64000.0
+     - MasterClass: pipeline_id=866608541, renewal_revenue=30000.0
+     - Avaaz: pipeline_id=866608541, renewal_revenue=11250.0
+
+================================================================================
+CHECK 2: NEGATIVE CYCLE TIME
+================================================================================
+
+Deals with negative cycle time: 15/325 (4.6%)
+
+⚠️  WARNING: 15 deals with create_date > close_date
+   These should be excluded per universal data integrity rule
+
+   Sample negative cycle time deals:
+     - 7shifts: -1 days (create 2025-01-31, close 2025-01-30)
+     - Refurbed Marketplace GmbH: -580 days (create 2026-03-10, close 2024-08-07)
+     - Netthandelsgruppen: -658 days (create 2025-08-09, close 2023-10-21)
+     - Breeze Airways: -1 days (create 2025-01-31, close 2025-01-30)
+     - Quizlet: -388 days (create 2026-02-23, close 2025-01-31)
+
+================================================================================
+APPLYING FILTERS
+================================================================================
+
+Won deals after filters:
+  Original: 325
+  After renewal exclusion: 226
+  After negative cycle exclusion: 218
+  Removed: 107 deals
+
+================================================================================
+CHECK 3: DISCOVERY DISTRIBUTION ANALYSIS
+================================================================================
+
+Computing time-in-stage for clean won deals...
+  Processed 50/218...
+  Processed 100/218...
+  Processed 150/218...
+  Processed 200/218...
+
+Completed time-in-stage computation
+
+Enterprise Discovery (n=2):
+  Min: 0 days
+  P25: 0 days
+  Median: 0 days
+  P75: 0 days
+  Mean: 0 days
+  Max: 0 days
+
+  Outliers (>0 days): 0/2 (0.0%)
+
+Mid-Market Discovery (n=7):
+  Min: 0 days
+  P25: 0 days
+  Median: 3 days
+  P75: 19 days
+  Mean: 12 days
+  Max: 47 days
+
+  Outliers (>48 days): 0/7 (0.0%)
+
+SMB Discovery (n=5):
+  Min: 1 days
+  P25: 2 days
+  Median: 8 days
+  P75: 25 days
+  Mean: 33 days
+  Max: 128 days
+
+  Outliers (>60 days): 1/5 (20.0%)
+  P75 without outliers: 25 days (vs 25 with outliers)
+
+  Top outliers:
+    - YAZIO: 128 days
+
+================================================================================
+BEFORE vs AFTER FILTERING
+================================================================================
+
+Re-computing Discovery with UNFILTERED population...
+
+Segment           Before n   Before P75    After n    After P75       Diff
+---------------------------------------------------------------------------
+Enterprise              18          463          2            0       -463
+Mid-Market              37          184          7           19       -165
+SMB                     27          454          5           25       -429
+
+================================================================================
+RECOMMENDATION
+================================================================================
+
+⚠️  CONTAMINATION DETECTED
+   - 99 renewal deals not excluded
+   - 15 negative cycle time deals not excluded
+
+✅ FILTERS SHOULD BE APPLIED:
+   1. Exclude renewal pipeline (pipeline_id = 866608541)
+   2. Exclude deals with renewal_revenue > 0
+   3. Exclude deals with negative cycle time (create_date > close_date)
+
+   Re-run Signal 2 derivation with these filters applied.
+
+⚠️  OUTLIER-DRIVEN THRESHOLDS: SMB
+   These segments have >15% outliers influencing P75
+   Consider using median instead of P75, or capping extreme values

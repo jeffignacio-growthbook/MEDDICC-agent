@@ -1,0 +1,68 @@
+================================================================================
+FULL VALIDATION: notes_last_updated Property History Approach
+================================================================================
+
+Fetching all closed deals...
+Total closed deals: 737
+  Won: 121
+  Lost: 616
+
+================================================================================
+CHECK 1: REAL COVERAGE (not extrapolated)
+================================================================================
+
+Fetching property history for all 737 deals...
+This will take ~2.5 minutes with rate limiting (5 calls/sec)
+
+  Progress: 50/737 deals (6.8%) - ETA: 427s
+  Progress: 100/737 deals (13.6%) - ETA: 386s
+  Progress: 150/737 deals (20.4%) - ETA: 356s
+  Progress: 200/737 deals (27.1%) - ETA: 325s
+  Progress: 250/737 deals (33.9%) - ETA: 293s
+  Progress: 300/737 deals (40.7%) - ETA: 266s
+  Progress: 350/737 deals (47.5%) - ETA: 237s
+  Progress: 400/737 deals (54.3%) - ETA: 208s
+  Progress: 450/737 deals (61.1%) - ETA: 178s
+  Progress: 500/737 deals (67.8%) - ETA: 148s
+  Progress: 550/737 deals (74.6%) - ETA: 116s
+  Progress: 600/737 deals (81.4%) - ETA: 84s
+  Progress: 650/737 deals (88.2%) - ETA: 53s
+  Progress: 700/737 deals (95.0%) - ETA: 23s
+
+Fetch complete in 447.5s (1.6 deals/sec)
+
+RESULTS:
+
+API calls successful: 737/737
+API errors: 0
+
+Has current notes_last_updated: 632/737 (85.8%)
+Has notes_last_updated history: 632/737 (85.8%)
+Has dealstage history: 737/737 (100.0%)
+Has BOTH histories: 632/737 (85.8%)
+
+notes_last_updated changes per deal (n=632):
+  Min: 1
+  Median: 3.0
+  Mean: 5.8
+  Max: 20
+
+dealstage changes per deal (n=737):
+  Min: 1
+  Median: 2
+  Mean: 2.7
+  Max: 8
+
+✅ Coverage confirmed: 85.8% matches 86% from sample
+
+================================================================================
+CHECK 2: PROPERTY HISTORY RETENTION
+================================================================================
+
+Checking if property history spans full deal lifecycle or truncates...
+
+Traceback (most recent call last):
+  File "/Users/jeffignacio/MEDDICC-agent/scripts/validate_notes_last_updated_full.py", line 275, in <module>
+    days_after_creation = (earliest_change_ts - create_date).days
+                           ~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~
+TypeError: can't subtract offset-naive and offset-aware datetimes

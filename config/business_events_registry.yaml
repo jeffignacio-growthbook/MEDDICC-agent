@@ -1,0 +1,133 @@
+# Business Events Registry
+#
+# Dated events that create ERA or EVENT boundaries requiring explicit
+# segmentation before computing historical metrics.
+#
+# DO NOT blend populations across these boundaries - that's apples to oranges.
+
+pipeline_scheme_changes:
+  - date: "2023-01-01"
+    event: "Renewal pipeline introduced (pipeline_id='866608541')"
+    impact: "Deals before this date used different process, not comparable to current motion"
+    segmentation_rule: "Exclude pre-2023 deals from current-process metrics"
+    applies_to:
+      - cycle_time
+      - win_rate
+      - pipeline velocity
+
+bulk_cleanup_events:
+  - date: "2026-04"
+    event: "April 2026 mass cleanup"
+    pattern: "235 deals closed-lost in single month, 100% blank lost_reason"
+    segmentation_rule: "Exclude from win rate calculations - admin cleanup, not sales outcomes"
+    detection_pattern:
+      field: lost_reason
+      value: null
+      threshold: ">10 deals/month"
+    applies_to:
+      - win_rate
+      - loss_reason_analysis
+
+  - event_type: "recurring_bulk_cleanup"
+    description: "Ongoing admin cleanup operations"
+    pattern: ">10 deals/month with blank lost_reason"
+    months_detected:
+      - "2023-08"
+      - "2024-11"
+      - "2026-01"
+      - "2026-02"
+      - "2026-03"
+      - "2026-04"  # The big one
+      - "2026-05"
+      - "2026-06"
+      - "2026-07"
+      - "2026-08"
+    total_contamination: "478 deals"
+    segmentation_rule: "Exclude ALL bulk cleanup months from win rate/cycle time"
+    detection_logic: |
+      For each month in lost_deals:
+        count deals with (lost_reason IS NULL AND deal_status = 'lost')
+        if count > 10:
+          mark month as bulk_cleanup_event
+          exclude all deals in that month from organic metrics
+
+other_known_events:
+  - date: "~2025"  # Exact date unknown
+    event: "Ivan Gomez bulk event"
+    description: "Mass deal closure operation (mentioned in session context)"
+    pattern: "Similar to April 2026 - bulk closure with blank lost_reason"
+    status: "Needs investigation to determine exact date and scope"
+
+# Segmentation hierarchy (apply in this order):
+segmentation_hierarchy:
+  1_era:
+    name: "ERA"
+    definition: "Major process/system changes (pipeline scheme, CRM migration, etc.)"
+    rule: "NEVER blend across ERA boundaries - different business motion"
+    examples:
+      - "Pre-2023 vs 2023+ (renewal pipeline introduction)"
+
+  2_event:
+    name: "EVENT"
+    definition: "Bulk operations (cleanup, migration, admin actions)"
+    rule: "EXCLUDE event-driven outcomes - not organic sales results"
+    examples:
+      - "April 2026 bulk cleanup (235 deals)"
+      - "Recurring cleanup months (478 total deals)"
+
+  3_motion:
+    name: "MOTION"
+    definition: "Segmentation within clean cohort (segment, deal size, etc.)"
+    rule: "Segment if cycle times/win rates differ significantly across groups"
+    examples:
+      - "SMB vs Mid-Market vs Enterprise"
+      - "New business vs Expansion"
+
+# Usage in plausibility check:
+plausibility_gate_integration: |
+  Before computing any historical metric:
+
+  1. Check if population spans ERA boundary (pipeline_scheme_changes)
+     → If YES: Require explicit segmentation, compute separately for each ERA
+     → If NO: Proceed
+
+  2. Check if population includes EVENT contamination (bulk_cleanup_events)
+     → If YES: Exclude EVENT deals, compute only on organic cohort
+     → If NO: Proceed
+
+  3. Check if clean cohort has MOTION variance (multiple segments/deal types)
+     → If YES: Report variance, consider sub-segmentation
+     → If NO: Compute on unified cohort
+
+  Example for cycle_time:
+    - Query all won deals
+    - Filter: create_date >= '2023-01-01' (ERA boundary)
+    - Exclude: deals in bulk_cleanup_months (EVENT contamination)
+    - Result: Clean cohort (default, 2023+, organic, won)
+    - Compute: median(close_date - create_date) within clean cohort only
+
+# Detection patterns (for automated checks):
+automated_detection:
+  bulk_cleanup_pattern:
+    query: |
+      SELECT
+        DATE_TRUNC('month', close_date) as month,
+        COUNT(*) as blank_lost_reason_count
+      FROM deals
+      WHERE deal_status = 'lost'
+        AND lost_reason IS NULL
+      GROUP BY month
+      HAVING COUNT(*) > 10
+      ORDER BY month DESC
+    interpretation: "Each row is a potential bulk cleanup event"
+
+  era_boundary_check:
+    query: |
+      SELECT
+        MIN(create_date) as earliest_deal,
+        MAX(create_date) as latest_deal
+      FROM deals
+      WHERE <population_filter>
+    interpretation: |
+      If earliest_deal < '2023-01-01' AND latest_deal >= '2023-01-01':
+        Population spans ERA boundary → REQUIRE segmentation

@@ -130,6 +130,14 @@ When porting to production template system:
 
 3. **Monitor pattern:** Log all instances where synthesis drops/truncates data, not just the ones caught by users
 
+## Related Pattern
+
+**PROVENANCE_LOSS_ACROSS_SESSIONS.md** - Same root cause (prose flattening loses fidelity), different manifestation:
+- Synthesis-layer data loss: Handler dict → prose drops entries
+- Provenance loss: Session summary → prose loses source tags
+
+Both require preserving structured information through transformation (templates, explicit tagging, or post-generation verification).
+
 ## Next Steps (Post-Validation)
 
 - [ ] Audit all handlers for vulnerable structured outputs
@@ -137,6 +145,7 @@ When porting to production template system:
 - [ ] Consider template-based rendering for dict-shaped outputs
 - [ ] Add monitoring for synthesis-layer data loss
 - [ ] Update Wave 4 calibration to test this explicitly
+- [ ] Apply same principles to session summary format (see PROVENANCE_LOSS_ACROSS_SESSIONS.md)
 
 ## Impact
 

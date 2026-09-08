@@ -1,0 +1,267 @@
+================================================================================
+SIGNAL 3 ACTIVE PIPELINE ANALYSIS
+================================================================================
+
+Fetching active deals...
+Total active deals: 444
+
+================================================================================
+1. ACTUAL COVERAGE ON ACTIVE DEALS
+================================================================================
+
+Active deals with notes_last_updated: 247/444 (55.6%)
+Active deals WITHOUT notes_last_updated: 197/444 (44.4%)
+
+================================================================================
+2. SIGNAL 3 THRESHOLD COMPARISON (7 vs 14 DAYS)
+================================================================================
+
+Active deals with activity data: 247
+  Flagged at 7-day threshold: 176 (71.3%)
+  Flagged at 14-day threshold: 138 (55.9%)
+
+Reduction: 38 deals (21.6% fewer flags at 14 days)
+
+Deals flagged at 7 days but NOT at 14 days (38 deals):
+  (8-14 days since last activity)
+
+  : 9 days
+    Stage: 79653122, Segment: Unknown
+  Expedia Group: 9 days
+    Stage: appointmentscheduled, Segment: Enterprise
+  Crunchyroll: 9 days
+    Stage: presentationscheduled, Segment: Enterprise
+  Ryanair: 10 days
+    Stage: presentationscheduled, Segment: Enterprise
+  Jibble: 11 days
+    Stage: 79653122, Segment: SMB
+  : 11 days
+    Stage: appointmentscheduled, Segment: Unknown
+  JonnieByDesign: 11 days
+    Stage: 79653122, Segment: Unknown
+  UPS: 11 days
+    Stage: qualifiedtobuy, Segment: Enterprise
+  Neologix: 11 days
+    Stage: 79653122, Segment: Unknown
+  Hooglee: 11 days
+    Stage: 79653122, Segment: Unknown
+
+  ... and 28 more
+
+================================================================================
+3. SIGNAL 3 EVALUATION BREAKDOWN (14-Day Threshold)
+================================================================================
+
+Signal 3 evaluation on 444 active deals:
+  Fires (>14 days): 138 (31.1%)
+  Doesn't fire (≤14 days): 109 (24.5%)
+  No data (no history): 197 (44.4%)
+
+Of deals WITH activity data (247):
+  Fires: 138 (55.9%)
+  Doesn't fire: 109 (44.1%)
+
+================================================================================
+4. MODIFIED-AND CLASSIFICATION (Signal 2 + Signal 3)
+================================================================================
+
+Note: Signal 2 thresholds not yet derived.
+For this analysis, using placeholder Signal 2 logic:
+  - Discovery: >60 days in stage
+  - Scoping: >45 days in stage
+  - Proposal: >30 days in stage
+
+Classifying active deals...
+  Processed 50/444...
+  Processed 100/444...
+  Processed 150/444...
+  Processed 200/444...
+  Processed 250/444...
+  Processed 300/444...
+  Processed 350/444...
+  Processed 400/444...
+
+Classification results:
+  CRITICAL (Signal 2 + Signal 3): 48
+  WARN (Signal 2 only): 24
+  no_signal_at_risk (Signal 2, no S3 data): 23
+  HEALTHY: 175
+  no_signal_healthy (no S2 or S3 fire, no S3 data): 174
+
+================================================================================
+SAMPLE CRITICAL DEALS (Both Signals Fire)
+================================================================================
+
+Top 10 deals by time in stage:
+
+Samsung Electronics
+  Stage: decisionmakerboughtin (Enterprise)
+  Time in stage: 997 days
+  Last activity: 243 days ago
+  ⚠️  CRITICAL: Long in stage AND no recent activity
+
+SecureTicketPurchase
+  Stage: decisionmakerboughtin (SMB)
+  Time in stage: 483 days
+  Last activity: 59 days ago
+  ⚠️  CRITICAL: Long in stage AND no recent activity
+
+Little Caesars
+  Stage: decisionmakerboughtin (Enterprise)
+  Time in stage: 466 days
+  Last activity: 684 days ago
+  ⚠️  CRITICAL: Long in stage AND no recent activity
+
+Scale AI
+  Stage: decisionmakerboughtin (Mid-Market)
+  Time in stage: 409 days
+  Last activity: 499 days ago
+  ⚠️  CRITICAL: Long in stage AND no recent activity
+
+ArtWorkout Limited
+  Stage: appointmentscheduled (SMB)
+  Time in stage: 268 days
+  Last activity: 180 days ago
+  ⚠️  CRITICAL: Long in stage AND no recent activity
+
+Harper
+  Stage: presentationscheduled (SMB)
+  Time in stage: 219 days
+  Last activity: 181 days ago
+  ⚠️  CRITICAL: Long in stage AND no recent activity
+
+Flipp
+  Stage: appointmentscheduled (Mid-Market)
+  Time in stage: 216 days
+  Last activity: 166 days ago
+  ⚠️  CRITICAL: Long in stage AND no recent activity
+
+Mighty Digital
+  Stage: appointmentscheduled (SMB)
+  Time in stage: 215 days
+  Last activity: 88 days ago
+  ⚠️  CRITICAL: Long in stage AND no recent activity
+
+Zid 
+  Stage: presentationscheduled (Mid-Market)
+  Time in stage: 215 days
+  Last activity: 48 days ago
+  ⚠️  CRITICAL: Long in stage AND no recent activity
+
+Deepgram
+  Stage: presentationscheduled (SMB)
+  Time in stage: 214 days
+  Last activity: 206 days ago
+  ⚠️  CRITICAL: Long in stage AND no recent activity
+
+
+================================================================================
+SAMPLE WARN DEALS (Signal 2 Only)
+================================================================================
+
+Top 10 deals by time in stage:
+
+Perplexity AI
+  Stage: appointmentscheduled (SMB)
+  Time in stage: 207 days
+  Last activity: 12 days ago
+  ⚠️  WARN: Long in stage BUT recent activity
+
+OpenTable
+  Stage: presentationscheduled (Unknown)
+  Time in stage: 108 days
+  Last activity: 3 days ago
+  ⚠️  WARN: Long in stage BUT recent activity
+
+Natera
+  Stage: presentationscheduled (Enterprise)
+  Time in stage: 107 days
+  Last activity: 3 days ago
+  ⚠️  WARN: Long in stage BUT recent activity
+
+Ryanair
+  Stage: presentationscheduled (Enterprise)
+  Time in stage: 104 days
+  Last activity: 10 days ago
+  ⚠️  WARN: Long in stage BUT recent activity
+
+Stay Partners
+  Stage: qualifiedtobuy (Unknown)
+  Time in stage: 104 days
+  Last activity: 12 days ago
+  ⚠️  WARN: Long in stage BUT recent activity
+
+Zalando
+  Stage: qualifiedtobuy (Enterprise)
+  Time in stage: 103 days
+  Last activity: 3 days ago
+  ⚠️  WARN: Long in stage BUT recent activity
+
+Crunchyroll
+  Stage: presentationscheduled (Enterprise)
+  Time in stage: 103 days
+  Last activity: 9 days ago
+  ⚠️  WARN: Long in stage BUT recent activity
+
+
+  Stage: presentationscheduled (Unknown)
+  Time in stage: 102 days
+  Last activity: 11 days ago
+  ⚠️  WARN: Long in stage BUT recent activity
+
+DasWeltAuto
+  Stage: qualifiedtobuy (Mid-Market)
+  Time in stage: 98 days
+  Last activity: 7 days ago
+  ⚠️  WARN: Long in stage BUT recent activity
+
+UPS
+  Stage: qualifiedtobuy (Enterprise)
+  Time in stage: 97 days
+  Last activity: 11 days ago
+  ⚠️  WARN: Long in stage BUT recent activity
+
+
+================================================================================
+CRITICAL vs WARN COMPARISON
+================================================================================
+
+CRITICAL deals (n=48):
+  Average time in stage: 172 days
+  Average days since activity: 121 days
+
+WARN deals (n=24):
+  Average time in stage: 88 days
+  Average days since activity: 8 days
+
+Difference:
+  Time in stage: +84 days
+  Days since activity: +113 days
+
+✅ Adding Signal 3 separates:
+   - CRITICAL: Long in stage + disengaged (no activity)
+   - WARN: Long in stage + actively working (recent activity)
+
+================================================================================
+SUMMARY
+================================================================================
+
+1. Coverage: 55.6% of active deals have activity data
+   - Lower than closed deals (73.7%) - likely due to newer deals
+
+2. Threshold: 14 days flags 138 deals (55.9% of those with data)
+   - 7 days would flag 176 (38 more deals, +21.6%)
+
+3. Signal 3 evaluation:
+   - Fires: True/444 (0.2%)
+   - Doesn't fire: 109/444 (24.5%)
+   - No data: 197/444 (44.4%)
+
+4. Modified-AND classification:
+   - CRITICAL (both signals): 48
+   - WARN (Signal 2 only): 24
+   - no_signal_at_risk: 23
+
+✅ Signal 3 adds value:
+   - Separates disengaged deals (CRITICAL) from actively working deals (WARN)
+   - Even with 55.6% coverage, provides actionable distinction

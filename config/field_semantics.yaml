@@ -96,6 +96,52 @@
 # Never silently serve a 3-week-old forecast as if it's today's number.
 # ============================================================================
 
+# ============================================================================
+# DATA INTEGRITY RULES — UNIVERSAL (NOT CLIENT-SPECIFIC)
+# ============================================================================
+# These rules apply to EVERY client and are enforced automatically in
+# field_semantics.py. They catch data quality issues that corrupt metrics.
+#
+# RULE 1: NEGATIVE CYCLE TIME EXCLUSION
+#
+# ANY deal where (close_date - create_date) < 0 is AUTOMATICALLY excluded
+# from ALL metrics that use cycle time, win rate, or any create_date/close_date
+# based calculation.
+#
+# Rationale:
+#   - Negative cycle time is definitionally impossible
+#   - Always indicates CRM migration backfill, bulk import artifacts, or data entry error
+#   - Never represents a real sales cycle
+#
+# Detection pattern:
+#   - Deal created AFTER it closed (future create_date relative to close_date)
+#   - Example: create_date=2025-08-09, close_date=2023-10-21 → -658 days
+#
+# Applies to:
+#   - cycle_time (median days from create to close)
+#   - win_rate (won / (won + lost) where lost includes closed deals)
+#   - velocity_to_close (days in each stage)
+#   - conversion_rates (time-based funnel metrics)
+#   - ANY metric computing date diffs
+#
+# Implementation:
+#   - is_valid_cycle_deal(deal) in field_semantics.py checks this automatically
+#   - Every handler using create_date/close_date MUST call this check
+#   - Monitoring: negative_cycle_time_deals query flags new occurrences
+#
+# Template-portable:
+#   - This rule is DEFAULT, non-configurable
+#   - Applies to every client from day one
+#   - CRM migrations/backfills are common enough that this is baseline hygiene
+#
+# Example violations found:
+#   - deal_id=41609747117 (Netthandelsgruppen): create_date=2025-08-09, close_date=2023-10-21
+#   - Excluded from Q016 cycle_time calculation (23 won → 22 cycle time sample)
+#
+# IMPORTANT: This is not a per-client config value or a manual exclusion list.
+# It's a universal data integrity check that runs automatically on every query.
+# ============================================================================
+
 stage_map:
   appointmentscheduled:
     label: "Discovery"
@@ -297,6 +343,280 @@ deal_states:
       Stage-aware is now canonical. Quick check remains for performance when needed.
 
 # ============================================================================
+# AT-RISK DEAL IDENTIFICATION (Q012) — SIGNAL-BASED DETECTION
+# ============================================================================
+# Alternative at-risk definition using time/activity signals, independent of
+# MEDDICC scoring. Flags deals showing operational risk patterns (stalled,
+# disengaged) regardless of qualification scores.
+#
+# VERIFICATION TYPE: PARTIALLY DERIVED, PARTIALLY HAND-PICKED
+#
+# Signal 2 is DERIVED (stage × segment specific, P75 from historical won deals)
+# Signal 3 is HAND-PICKED (7-day global fallback, NOT empirically derived)
+#
+# This is NOT equally rigorous across signals. Signal 2 has empirical backing;
+# Signal 3 is an operational default chosen because data didn't support derivation.
+
+at_risk_definition:
+  verification_type: "partially_derived_partially_hand_picked"
+
+  signals:
+    signal_1_stakeholder_count:
+      status: "deferred"
+      reason: "Required fields not available (contact-to-deal associations)"
+
+    signal_2_time_in_stage:
+      status: "implemented"
+      derivation: "PARTIALLY_DERIVED"  # Most cells derived, 1 cell manual override
+      methodology: |
+        P75 of historical won deal time-in-stage per stage × segment cell.
+        Uses dealstage property history from clean won population (218 deals after
+        excluding 107 contaminated deals: 99 renewals + 15 negative cycle time).
+
+        Minimum sample size n≥5 per cell for segment-specific thresholds.
+
+        Exclusion filters (centralized in api/field_semantics.py):
+        1. is_valid_cycle_deal(): excludes negative cycle time (create_date > close_date)
+        2. is_renewal_deal(): excludes renewal pipeline (866608541) + renewal_revenue > 0
+
+        Clean derivation documented in SIGNAL2_CLEAN_DERIVATION_SUMMARY.md.
+
+      data_source: "property_history.dealstage"
+      coverage: "100% (all closed deals have dealstage history)"
+
+      threshold_type: "segment_specific_with_manual_override"
+      segmentation: "stage × segment (Enterprise/Mid-Market/SMB)"
+
+      fallback_hierarchy:
+        - "stage_x_segment"  # Primary: use segment-specific if n≥5
+        - "manual_override"  # Override: hand-set threshold for specific cell
+        - "stage_only"       # Fallback: aggregate across segments if needed
+        - "global"           # Last resort: single P75 across all stages
+
+      manual_overrides:
+        enterprise_discovery:
+          cell: "discovery × Enterprise"
+          threshold: 35  # days
+          status: "MANUAL_OVERRIDE"
+          replaces: "stage_only fallback (19 days)"
+
+          rationale: |
+            19-day stage-only fallback (derived from Mid-Market/SMB Discovery data, n=14)
+            flagged 73.9% of Enterprise Discovery deals (34/46) - implausibly high,
+            confirmed via sample review (see SIGNAL2_PRE_PRODUCTION_VALIDATION.md).
+
+            Sample flagged deals included actively worked deals at 28-37 days, suggesting
+            19 days does not reflect genuine Enterprise Discovery risk given the segment's
+            naturally longer evaluation cycle (more stakeholders, longer eval).
+
+            35 days set as temporary override pending sufficient Enterprise sample
+            (currently n=2 clean won deals, need n≥5 for real segment-specific derivation).
+
+            With 35-day override, flagging rate drops to 58.7% (27/46) - still high but
+            more moderate. Deals still flagged (>35 days) include genuinely stale deals
+            at 90-130 days with no recent activity.
+
+          impact:
+            before_override_flagging_rate: "73.9% (34/46 Enterprise Discovery deals)"
+            after_override_flagging_rate: "58.7% (27/46 Enterprise Discovery deals)"
+            deals_no_longer_flagged: 7
+            newly_healthy_deals: "20-35 day range (Zurich 28d, Robinhood 20d, etc.)"
+
+          re_derivation_trigger: |
+            Revisit once Enterprise Discovery clean won deal count reaches n≥5.
+
+            Current: n=2 (insufficient for segment-specific derivation)
+            Target: n≥5 (minimum sample size threshold)
+
+            Re-run scripts/derive_signal2_clean.py quarterly and check this cell's
+            sample size. When n≥5 reached, remove manual override and use derived
+            segment-specific threshold.
+
+          temporary_until: "Enterprise Discovery clean won deals n≥5"
+          set_by: "Jeff (domain knowledge validation, 2026-09-07)"
+          documented_in: "SIGNAL2_PRE_PRODUCTION_VALIDATION.md"
+
+      derived_thresholds:
+        discovery:
+          mid_market:
+            threshold: 19  # days
+            sample_size: 7
+            status: "segment_specific"
+          smb:
+            threshold: 25  # days
+            sample_size: 5
+            status: "segment_specific"
+            note: "Exactly at minimum n=5 threshold - re-derive quarterly"
+          enterprise:
+            threshold: 35  # days (MANUAL_OVERRIDE, not derived)
+            sample_size: 2
+            status: "MANUAL_OVERRIDE"
+            note: "Override replaces 19-day stage_only fallback, pending n≥5"
+
+        scoping:
+          mid_market:
+            threshold: 23  # days
+            sample_size: 5
+            status: "segment_specific"
+            note: "Exactly at minimum n=5 threshold - re-derive quarterly"
+          enterprise:
+            threshold: 23  # days (stage_only fallback)
+            sample_size: 2
+            status: "stage_only"
+          smb:
+            threshold: 23  # days (stage_only fallback)
+            sample_size: 2
+            status: "stage_only"
+
+        proposal:
+          all_segments:
+            threshold: 105  # days (stage_only, all cells n<5)
+            sample_size: 8
+            status: "stage_only"
+            note: "0 renewals in sample - clean threshold"
+
+      interpretation: |
+        Enterprise deals naturally sit longer than SMB deals. Segment-specific
+        thresholds reflect pace differences.
+
+        Discovery thresholds (19-35 days) align with 2-4 week evaluation cycles.
+        Enterprise Discovery uses 35-day override (vs 19-day derived fallback) to
+        account for longer stakeholder engagement typical of Enterprise segment.
+
+        Proposal threshold (105 days, ~3.5 months) reflects complex technical
+        evaluation + procurement cycles common in B2B deals.
+
+      contamination_impact: |
+        Before applying exclusion filters, Discovery thresholds were severely inflated
+        by renewal contamination:
+        - Enterprise Discovery: 463 days → 19 days (after exclusions)
+        - Mid-Market Discovery: 184 days → 19 days
+        - SMB Discovery: 454 days → 25 days
+
+        Renewal deals (30.5% of won population) inflated metrics by 20-24x.
+        Same contamination pattern identified in Q016 cycle time investigation.
+
+        Proposal stage uncontaminated (0 renewals out of 8 deals).
+
+      re_derivation_schedule: "quarterly"
+      re_derivation_triggers:
+        - "Sample sizes improve (especially thin cells at n=5)"
+        - "Enterprise Discovery reaches n≥5 (currently n=2)"
+        - "Exclusion rate changes significantly (currently 32.9%)"
+
+    signal_3_activity_recency:
+      status: "implemented"
+      derivation: "HAND_PICKED"
+      methodology: |
+        SIMPLE GLOBAL FALLBACK: Flag deals with no notes_last_updated activity
+        in the last 14 days.
+
+        NOT DERIVED from won/lost separation. Earlier investigation found this
+        data source doesn't support empirical threshold derivation:
+        - Insufficient coverage (46% after exclusions)
+        - Sample sizes too thin (3/9 cells viable)
+        - No consistent won/lost separation (backwards direction in 2/3 cells)
+
+        14 days confirmed against Jeff's operational intuition for GrowthBook's
+        actual sales cadence (10-14 day range felt right; 14 selected as the
+        specific value). This is domain knowledge validation, not empirical
+        derivation from won/lost separation.
+
+        Full investigation documented in SIGNAL3_DEFERRAL_FINAL.md.
+
+      threshold: 14  # days
+      threshold_type: "global"
+      segmentation: "none"
+
+      data_source: "property_history.notes_last_updated"
+      coverage: "54% (137/253 clean closed deals have activity data)"
+
+      limitations:
+        not_segment_specific: |
+          Single global 14-day cutoff. Will likely OVER-FLAG fast-moving SMB
+          deals (where 14 days may be normal pace) and UNDER-FLAG slower
+          Enterprise deals (where 14 days is trivial, 30+ days might be concern).
+
+          Same imbalance identified as a risk when Signal 2 was using global
+          proxy before segment-specific derivation. Signal 3 still has this
+          issue because data didn't support segment-specific thresholds.
+
+        not_stage_specific: |
+          14 days applies equally to Discovery, Scoping, and Proposal stages.
+          Different stages may have different natural engagement rhythms, but
+          insufficient data to derive stage-specific thresholds.
+
+        coverage_gap: |
+          33-36% of deals have ZERO activity history (not just "no activity
+          in 14 days" — literally never logged any notes_last_updated changes).
+
+          For these deals, Signal 3 cannot fire either way. They route to
+          no_signal_at_risk / no_signal_healthy split, evaluated on Signal 2
+          alone with manual-review flag per modified-AND design.
+
+          A 14-day threshold doesn't change the fact that some deals have no
+          data to check against it at all.
+
+      future_refinement_flag: true
+      future_refinement_note: |
+        Once more data accumulates or logging discipline improves, REVISIT
+        deriving a real threshold per the original methodology (won vs lost
+        recency separation, segment-specific) rather than leaving 14 days as
+        a permanent placeholder.
+
+        Current 14-day fallback is acceptable for operational alerting but
+        should not be treated as final. Re-evaluate when:
+        - Coverage improves to ≥50%
+        - Sample sizes increase (≥50% of cells with n≥5 per outcome)
+        - Discovery × SMB inversion pattern clarified (currently n=9/19)
+
+  logic: "modified_AND"
+
+  modified_AND_specification: |
+    CRITICAL classification when BOTH signals fire:
+    - Signal 2 fires: time_in_stage > segment-specific threshold
+    - Signal 3 fires: days_since_last_activity > 14
+
+    WARN classification when Signal 2 alone fires:
+    - Signal 2 fires BUT Signal 3 doesn't (recent activity, long stage time)
+    - Suggests deal is active but not progressing
+
+    NO_SIGNAL classification when Signal 3 cannot evaluate:
+    - Deal has NO activity history at all (not in property_history)
+    - Signal 2 still evaluates (stage timing independent of activity logging)
+    - Flag as "no_signal_at_risk" if Signal 2 fires
+    - Flag as "no_signal_healthy" if Signal 2 doesn't fire
+    - Both marked for manual review (coverage gap, not normal operation)
+
+    HEALTHY classification when neither signal fires:
+    - Deal progressing normally with recent engagement
+
+  classification_matrix:
+    signal_2_fires_signal_3_fires: "critical"
+    signal_2_fires_signal_3_no_fire: "warn"
+    signal_2_fires_signal_3_no_data: "no_signal_at_risk"
+    signal_2_no_fire_signal_3_fires: "healthy"  # Recent activity, normal pacing
+    signal_2_no_fire_signal_3_no_fire: "healthy"
+    signal_2_no_fire_signal_3_no_data: "no_signal_healthy"  # Manual review flag
+
+  implementation:
+    handler: "identify_at_risk_deals_q012"
+    signal_2_function: "get_time_in_stage_threshold(stage_bucket, segment)"
+    signal_3_function: "get_days_since_last_activity(deal_id)"
+    classification_function: "classify_deal_risk(signal_2_result, signal_3_result)"
+
+  monitoring:
+    daily_check: true
+    alert_on_new_critical: true
+    alert_on_prolonged_critical_days: 7
+    alert_on_count_increase_pct: 20
+
+  documentation:
+    full_spec: "Q012_IMPLEMENTATION_FINAL.md"
+    signal_3_deferral: "SIGNAL3_DEFERRAL_FINAL.md"
+    derivation_session: "SESSION_SUMMARY_2026-09-07.md"
+
+# ============================================================================
 # FIELD DISPLAY NAMES — USE IN SYNTHESIS, NOT COLUMN NAMES
 # ============================================================================
 # User-facing answers must use these display names, never raw column names.
@@ -412,6 +732,105 @@ field_units:
 # without clarifying whether that's "Discovery deals overall" or "Discovery
 # deals closing in Q3".
 # ============================================================================
+
+# ============================================================================
+# KNOWN HYGIENE RULES REGISTRY
+# ============================================================================
+# Registry of data hygiene rules used for metric validation and backtest refinement.
+# These rules filter contaminated data that corrupts metric calculations.
+#
+# Each rule specifies:
+#   - name: Short identifier for the hygiene rule
+#   - function: Function name in api/field_semantics.py that implements the rule
+#   - applies_to: Which metric types this rule applies to (for candidate iteration)
+#   - description: What the rule does and why it's necessary
+#   - rationale: Evidence or reasoning for why this hygiene check is needed
+#
+# Usage:
+#   - Backtest engine: Iterates through rules to refine candidate queries
+#   - Metric validation: Documents which hygiene rules were applied
+#   - Template deployment: Client-specific rules can be added here
+#
+# Template-portable:
+#   - is_valid_cycle_deal: Universal (applies to all clients)
+#   - is_renewal_base: Client-specific (renewal pipeline ID varies)
+# ============================================================================
+
+known_hygiene_rules:
+  - name: exclude_renewals
+    function: is_renewal_base
+    applies_to:
+      - cycle_time
+      - win_rate
+      - pipeline_generation
+      - new_business_metrics
+    description: >
+      Excludes renewal-pipeline deals from new-business metrics.
+      Renewal deals have fundamentally different sales cycles (existing customer
+      renewals vs. net-new acquisition) and contaminate new-business cycle time,
+      win rate, and velocity calculations.
+    rationale: >
+      Cycle time investigation (Q016) found renewal contamination inflated median
+      from 52 days (clean) to 116 days (contaminated). Renewals represented 30.5%
+      of won population and inflated metrics by ~2.2x.
+    implementation_note: >
+      is_renewal_base() checks: pipeline_id == renewal_pipeline_id AND renewal_revenue > 0.
+      Renewal pipeline ID is client-specific (866608541 for GrowthBook).
+
+  - name: exclude_invalid_cycle_time
+    function: is_valid_cycle_deal
+    applies_to:
+      - cycle_time
+      - win_rate
+      - velocity_to_close
+      - conversion_rates
+      - any_date_diff_calculation
+    description: >
+      Excludes deals with negative or impossible cycle time (create_date > close_date).
+      Negative cycle time is definitionally impossible and always indicates CRM
+      migration backfill, bulk import artifacts, or data entry error.
+    rationale: >
+      Universal data integrity rule. Cycle time investigation found deals with
+      create_date AFTER close_date (e.g., created 2025-08-09, closed 2023-10-21
+      → -658 days). Such deals never represent real sales cycles.
+    implementation_note: >
+      is_valid_cycle_deal() checks: both dates exist AND (close_date - create_date) >= 0.
+      This is UNIVERSAL (not client-specific) and applies to every deployment.
+
+  - name: exclude_stale_pipeline
+    function: is_fresh_pipeline_deal
+    applies_to:
+      - pipeline_value
+      - pipeline_generation
+      - active_pipeline_metrics
+      - velocity_metrics
+    description: >
+      Excludes deals that have been open for >180 days with no meaningful movement.
+      Stale deals contaminate pipeline health metrics and velocity calculations
+      by including abandoned/dormant opportunities that are unlikely to close.
+    rationale: >
+      Phase 2b validation (2026-09-07) found 4 stale deals (>180 days old) totaling
+      $155,000 (2.2% of active pipeline). These deals (Chaos, Hey Harper, Catena Media,
+      YourParkingSpace) have been open 187-238 days with no recent activity, indicating
+      stalled/abandoned opportunities.
+    evidence: >
+      Real hygiene gap discovered during Test 2 escalation validation. Stale pipeline
+      contamination is a common sales ops issue - deals that should be closed-lost but
+      remain in "open" stages indefinitely. This contamination affects:
+      - Pipeline value (inflated by dormant deals)
+      - Win rate (denominator includes unlikely-to-close deals)
+      - Velocity (stale deals drag down average time-in-stage)
+    implementation_note: >
+      is_fresh_pipeline_deal() checks: deal is active AND
+      (current_date - create_date) <= 180 days. The 180-day threshold is
+      CLIENT-SPECIFIC (based on GrowthBook's typical sales cycle). Other clients
+      may need different thresholds (e.g., enterprise: 270 days, SMB: 90 days).
+    status: "discovered_in_phase2b_validation"
+    discovered_date: "2026-09-07"
+    recommendation: >
+      Monitor stale pipeline as data quality issue. Consider workflow automation
+      to flag deals approaching 180 days for review/closure. This should also be
+      checked by snapshot_coverage or data_completeness monitoring triggers.
 
 # ============================================================================
 # SALES TARGETS AND ATTAINMENT

@@ -1,0 +1,117 @@
+================================================================================
+SIGNAL 1 SEGMENT MIX VERIFICATION
+================================================================================
+
+Checking if won/lost email-count separation is segment-independent...
+
+Total closed deals: 1000
+
+Analyzing participant data by segment...
+  Processed 100/1000 deals...
+  Processed 200/1000 deals...
+  Processed 300/1000 deals...
+  Processed 400/1000 deals...
+  Processed 500/1000 deals...
+  Processed 600/1000 deals...
+  Processed 700/1000 deals...
+  Processed 800/1000 deals...
+  Processed 900/1000 deals...
+  Processed 1000/1000 deals...
+
+Completed analysis: 216 deals with participant data
+
+================================================================================
+SEGMENT DISTRIBUTION
+================================================================================
+
+Segment distribution of deals WITH participant data:
+Segment            Won   Lost  Total    Won %
+--------------------------------------------------
+Enterprise           7     30     37    18.9%
+Mid-Market          13     61     74    17.6%
+SMB                  6     87     93     6.5%
+Unknown              0     12     12     0.0%
+--------------------------------------------------
+TOTAL               26    190    216
+
+================================================================================
+SEGMENT MIX BIAS CHECK
+================================================================================
+
+Won deals segment mix:
+  Enterprise: 26.9%
+  Mid-Market: 50.0%
+  SMB: 23.1%
+
+Lost deals segment mix:
+  Enterprise: 15.8%
+  Mid-Market: 32.1%
+  SMB: 45.8%
+
+Segment mix difference:
+  Enterprise: 11.1 percentage points
+  SMB: 22.7 percentage points
+
+⚠️  SIGNIFICANT SEGMENT MIX BIAS DETECTED (>15 percentage points)
+   Won/lost email-count separation may be explained by segment mix
+
+================================================================================
+WITHIN-SEGMENT SEPARATION TEST
+================================================================================
+
+Checking if multi-threading signal holds WITHIN each segment...
+
+Enterprise:
+  Won deals (n=7): median 3 emails
+  Lost deals (n=30): median 2 emails
+  Direction: ✅ Won > Lost (expected)
+
+Mid-Market:
+  Won deals (n=13): median 2 emails
+  Lost deals (n=61): median 3 emails
+  Direction: ❌ Won < Lost (inverted)
+
+SMB:
+  Won deals (n=6): median 4 emails
+  Lost deals (n=87): median 1 emails
+  Direction: ✅ Won > Lost (expected)
+
+Unknown:
+  ❌ Cannot test (missing won or lost deals with data)
+
+================================================================================
+NATURAL BASELINE: SEGMENT STAKEHOLDER COUNTS
+================================================================================
+
+Expected stakeholder counts by segment (all deals with data):
+
+Enterprise (n=37):
+  Median: 2 emails
+  Mean: 3.3 emails
+
+Mid-Market (n=74):
+  Median: 3 emails
+  Mean: 4.8 emails
+
+SMB (n=93):
+  Median: 1 emails
+  Mean: 3.3 emails
+
+Unknown (n=12):
+  Median: 2 emails
+  Mean: 5.2 emails
+
+================================================================================
+VERDICT
+================================================================================
+
+Within-segment test viability:
+  Segments with sufficient samples (n≥5 both outcomes): 3/3
+
+⚠️  MIXED: 2/3 segments show won > lost
+   Multi-threading signal not consistent across segments
+
+⚠️  ADDITIONAL CONCERN: Significant segment mix bias detected
+   Won deals skew toward high-stakeholder segments
+   Lost deals skew toward low-stakeholder segments
+   Aggregate finding may primarily reflect segment differences

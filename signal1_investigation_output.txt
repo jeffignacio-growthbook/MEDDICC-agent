@@ -1,0 +1,186 @@
+================================================================================
+SIGNAL 1 PROXY INVESTIGATION: Call Participant Count
+================================================================================
+
+Fetching closed deals...
+Total closed deals: 1000
+  Won: 152
+  Lost: 848
+
+================================================================================
+1. COVERAGE CHECK
+================================================================================
+
+Analyzing calls and participant data...
+  Processed 50/1000 deals...
+  Processed 100/1000 deals...
+  Processed 150/1000 deals...
+  Processed 200/1000 deals...
+  Processed 250/1000 deals...
+  Processed 300/1000 deals...
+  Processed 350/1000 deals...
+  Processed 400/1000 deals...
+  Processed 450/1000 deals...
+  Processed 500/1000 deals...
+  Processed 550/1000 deals...
+  Processed 600/1000 deals...
+  Processed 650/1000 deals...
+  Processed 700/1000 deals...
+  Processed 750/1000 deals...
+  Processed 800/1000 deals...
+  Processed 850/1000 deals...
+  Processed 900/1000 deals...
+  Processed 950/1000 deals...
+  Processed 1000/1000 deals...
+
+Completed analysis of 1000 closed deals
+
+Coverage Summary:
+  Deals with calls: 216/1000 (21.6%)
+  Deals with participant data: 216/1000 (21.6%)
+  Deals with external participants: 216/1000 (21.6%)
+
+Participant data population rate among deals WITH calls:
+  216/216 (100.0%)
+
+================================================================================
+2. EMAILS VS DOMAINS
+================================================================================
+
+Distinct external EMAILS per deal (n=216):
+  Median: 2
+  P25: 1
+  P75: 4
+  Max: 69
+
+Distinct external DOMAINS per deal (n=216):
+  Median: 1
+  P25: 1
+  P75: 1
+  Max: 17
+
+Deals with multiple emails from SINGLE domain:
+  92/216 (42.6%)
+  (Using domains would undercount stakeholder engagement for these deals)
+
+================================================================================
+3. INTERNAL DOMAIN FILTERING
+================================================================================
+
+Internal domains found in participant data:
+  growthbook.io: 212 deals
+
+Configured internal domain exclusion list:
+  growthbook.io
+  growthbook.com
+
+Top 20 most common domains (may reveal missing internal domains):
+  growthbook.io: 212 deals [INTERNAL]
+  resource.calendar.google.com: 12 deals 
+  gmail.com: 5 deals 
+  forhims.com: 2 deals 
+  newtongrowth.com: 2 deals 
+  alyssanicoll.com: 2 deals 
+  fireflies.ai: 2 deals 
+  phonepe.com: 2 deals 
+  sony.com: 2 deals 
+  inquirer.com: 2 deals 
+  tomorrows.co.uk: 1 deals 
+  mutualmortgage.com: 1 deals 
+  globewest.com.au: 1 deals 
+  suncountry.com: 1 deals 
+  life360.com: 1 deals 
+  auctane.com: 1 deals 
+  ryzon.net: 1 deals 
+  leovegas.com: 1 deals 
+  cantongrowthpartners.com: 1 deals 
+  nebenan.de: 1 deals 
+
+================================================================================
+4. WON/LOST SEPARATION TEST
+================================================================================
+
+External EMAIL counts:
+
+  Won deals (n=26):
+    Median: 3
+    P25: 1
+    Mean: 8.2
+
+  Lost deals (n=190):
+    Median: 2
+    P25: 1
+    Mean: 3.3
+
+External DOMAIN counts:
+
+  Won deals (n=26):
+    Median: 1
+    P25: 1
+    Mean: 1.2
+
+  Lost deals (n=190):
+    Median: 1
+    P25: 1
+    Mean: 1.3
+
+Direction check (EMAILS):
+  Won median: 3
+  Lost median: 2
+  ✅ EXPECTED DIRECTION: Won > Lost (multi-threaded wins)
+
+================================================================================
+5. SAMPLE SIZE VIABILITY (Stage × Segment)
+================================================================================
+
+Sample sizes per stage × segment cell:
+Stage           Segment            Won   Lost  Total Viable?   
+----------------------------------------------------------------------
+closed_lost     Enterprise           0     27     27 ❌         
+closed_lost     Mid-Market           0     56     56 ❌         
+closed_lost     SMB                  0     80     80 ❌         
+closed_lost     Unknown              0      9      9 ❌         
+closed_won      Enterprise           3      0      3 ❌         
+closed_won      Mid-Market           7      0      7 ❌         
+closed_won      SMB                  5      0      5 ❌         
+unknown         Enterprise           4      3      7 ❌         
+unknown         Mid-Market           6      5     11 ✅         
+unknown         SMB                  1      7      8 ❌         
+unknown         Unknown              0      3      3 ❌         
+
+Viable cells: 1/11 (9.1%)
+Threshold for production: ≥50% cells viable
+❌ INSUFFICIENT sample sizes (same issue as Signal 3)
+
+================================================================================
+SUMMARY & RECOMMENDATION
+================================================================================
+
+1. Coverage: 21.6% of closed deals have participant data
+   - Inherits same 21.6% calls coverage ceiling as Signal 3
+   - Among deals WITH calls, 100.0% have participant emails
+
+2. Metric choice:
+   - Distinct emails: median 2 per deal
+   - Distinct domains: median 1 per deal
+   - Recommendation: Use EMAILS (captures multi-person buying committees)
+
+3. Internal filtering:
+   - 1 internal domains found and excluded
+
+4. Won/Lost separation:
+   - ✅ Expected direction: Won deals have MORE stakeholders
+
+5. Sample sizes:
+   - 1/11 cells viable (9.1%)
+   - ❌ Insufficient (same thin-sample problem as Signal 3)
+
+================================================================================
+RECOMMENDATION:
+================================================================================
+
+❌ NOT VIABLE: Failed one or more checks
+   - Coverage too low (21.6% < 50% threshold)
+   - Sample sizes insufficient (9.1% < 50% threshold)
+
+DEFER Signal 1 (same outcome as Signal 3)

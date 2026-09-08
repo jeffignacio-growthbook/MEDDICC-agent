@@ -1,0 +1,28 @@
+{
+  "recommendation": "defer",
+  "thresholds": {
+    "discovery_SMB": {
+      "threshold_days": 11,
+      "won_median": 74.5,
+      "lost_p25": 11.0,
+      "won_sample": 6,
+      "lost_sample": 15
+    }
+  },
+  "coverage": {
+    "total_cells": 9,
+    "sufficient": 1,
+    "insufficient": 8
+  },
+  "stats": {
+    "deals_processed": 253,
+    "won_with_activity": 16,
+    "won_no_activity": 21,
+    "lost_with_activity": 63,
+    "lost_no_activity": 17,
+    "truncated_deals": 52
+  },
+  "exclusion_method": "deal_level",
+  "bulk_cleanup_deal_count": 750,
+  "metric_type": "recency"
+}

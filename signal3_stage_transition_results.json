@@ -1,0 +1,49 @@
+{
+  "recommendation": "defer",
+  "thresholds": {
+    "discovery_Mid-Market": {
+      "threshold_days": 0,
+      "won_median": 0,
+      "lost_p25": 0.0,
+      "won_sample": 9,
+      "lost_sample": 10
+    },
+    "discovery_SMB": {
+      "threshold_days": 2,
+      "won_median": 49,
+      "lost_p25": 2.0,
+      "won_sample": 9,
+      "lost_sample": 19
+    },
+    "proposal_Mid-Market": {
+      "threshold_days": 5,
+      "won_median": 0,
+      "lost_p25": 9.8,
+      "won_sample": 11,
+      "lost_sample": 6
+    }
+  },
+  "coverage": {
+    "total_cells": 9,
+    "sufficient": 3,
+    "insufficient": 6
+  },
+  "direction_check": {
+    "correct": 1,
+    "incorrect": 2,
+    "total": 3
+  },
+  "stats": {
+    "deals_processed": 253,
+    "won_with_activity": 37,
+    "won_no_activity": 21,
+    "lost_with_activity": 79,
+    "lost_no_activity": 17,
+    "negative_gaps_fixed": 114,
+    "stage_transition_not_found": 0
+  },
+  "exclusion_method": "deal_level",
+  "bulk_cleanup_deal_count": 750,
+  "metric_type": "recency",
+  "fix_applied": "stage_transition_date_for_negative_gaps"
+}

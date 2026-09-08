@@ -1,0 +1,13 @@
+Fetching all deals from Supabase...
+Traceback (most recent call last):
+  File "/Users/jeffignacio/MEDDICC-agent/scripts/analytics/hubspot_history.py", line 362, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/Users/jeffignacio/MEDDICC-agent/scripts/analytics/hubspot_history.py", line 314, in main
+    deal_ids = get_all_deal_ids(include_snapshot_deals=args.include_snapshot_deals)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jeffignacio/MEDDICC-agent/scripts/analytics/hubspot_history.py", line 264, in get_all_deal_ids
+    url = os.environ['SUPABASE_URL']
+          ~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'SUPABASE_URL'

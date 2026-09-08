@@ -1,0 +1,10 @@
+{
+  "segment_specific": {},
+  "stage_only_fallback": {},
+  "coverage": {
+    "total_cells": 7,
+    "cells_with_threshold": 0,
+    "deals_with_calls": 402,
+    "total_closed_deals": 1737
+  }
+}

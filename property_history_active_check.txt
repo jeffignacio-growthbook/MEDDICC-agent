@@ -1,0 +1,44 @@
+================================================================================
+PROPERTY_HISTORY ACTIVE DEALS DIAGNOSTIC
+================================================================================
+
+Step 1: Fetching active deals...
+Total active deals: 444
+
+Step 2: Fetching all deal_ids from property_history...
+  Fetched 1000 rows from property_history...
+  Fetched 2000 rows from property_history...
+  Fetched 3000 rows from property_history...
+  Fetched 4000 rows from property_history...
+  Fetched 5000 rows from property_history...
+Distinct deal_ids in property_history: 737
+
+Step 3: Checking overlap...
+Active deal_ids present in property_history: 0/444
+Active deal_ids NOT in property_history: 444/444
+
+================================================================================
+DIAGNOSIS: FETCH SCOPE ISSUE
+================================================================================
+
+✅ SIMPLE EXPLANATION:
+   Zero active deal_ids appear in property_history at all.
+   This confirms the fetch was scoped only to closed deals.
+
+RESOLUTION:
+   Re-run property_history fetch against active deal population.
+   Coverage should resolve to ~63% (similar to closed deals).
+
+NO LIVE DATA HYGIENE ISSUE - just need to expand fetch scope.
+
+================================================================================
+COMPARISON: CLOSED DEALS
+================================================================================
+
+Fetching closed deals for baseline comparison...
+Total closed deals: 1000
+Closed deal_ids in property_history: 737/1000
+Coverage: 73.7%
+
+✅ This confirms property_history fetch was scoped only to closed deals.
+   Closed deals present, active deals completely absent.
