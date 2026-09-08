@@ -298,3 +298,277 @@ def is_renewal_base(deal: dict) -> bool:
     renewal_revenue = deal.get("renewal_revenue", 0) or 0
 
     return pipeline_id == _RENEWAL_PIPELINE_ID and renewal_revenue > 0
+
+
+# ============================================================================
+# DATA INTEGRITY — UNIVERSAL RULES (NOT CLIENT-SPECIFIC)
+# ============================================================================
+# These rules apply to EVERY client and enforce baseline data hygiene.
+# See DATA INTEGRITY RULES in config/field_semantics.yaml for rationale.
+# ============================================================================
+
+def is_valid_cycle_deal(deal: dict) -> bool:
+    """
+    True if deal has valid cycle time data (create_date and close_date exist, cycle >= 0).
+
+    UNIVERSAL RULE: Negative cycle time is definitionally impossible and indicates
+    CRM migration backfill, bulk import artifacts, or data entry error.
+
+    A deal is valid for cycle time if:
+      - It has both create_date and close_date (not NULL)
+      - (close_date - create_date) >= 0 (non-negative cycle)
+
+    This check is MANDATORY for ALL metrics using create_date/close_date:
+      - cycle_time (median days from create to close)
+      - win_rate (when computing with closed deals)
+      - velocity_to_close (days in each stage)
+      - conversion_rates (time-based funnel metrics)
+
+    Args:
+        deal: Dict with create_date, close_date keys (ISO format strings or datetime objects)
+
+    Returns:
+        True if deal has valid cycle time data, False otherwise
+
+    Examples:
+        is_valid_cycle_deal({"create_date": "2023-01-01", "close_date": "2023-02-01"}) -> True
+        is_valid_cycle_deal({"create_date": "2025-08-09", "close_date": "2023-10-21"}) -> False (negative)
+        is_valid_cycle_deal({"create_date": None, "close_date": "2023-02-01"}) -> False (missing create)
+        is_valid_cycle_deal({"create_date": "2023-01-01", "close_date": None}) -> False (missing close)
+        is_valid_cycle_deal({}) -> False (missing both)
+
+    Template-portable:
+        This is a DEFAULT, non-configurable rule. Every client gets this automatically.
+        CRM migrations and backfills are common enough that this is baseline hygiene.
+
+    Monitoring:
+        Violations flagged by scripts/monitor_negative_cycle_times.py (Wave 6).
+
+    Note:
+        Deal exclusion example: deal_id=41609747117 (Netthandelsgruppen)
+        create_date=2025-08-09, close_date=2023-10-21 → -658 days → excluded
+    """
+    if not deal:
+        return False
+
+    create_date_str = deal.get("create_date")
+    close_date_str = deal.get("close_date")
+
+    # Must have both dates
+    if not create_date_str or not close_date_str:
+        return False
+
+    # Parse dates
+    try:
+        from datetime import datetime
+
+        # Handle both ISO string and datetime object
+        if isinstance(create_date_str, str):
+            create_date = datetime.fromisoformat(create_date_str.replace("Z", "+00:00"))
+        else:
+            create_date = create_date_str
+
+        if isinstance(close_date_str, str):
+            close_date = datetime.fromisoformat(close_date_str.replace("Z", "+00:00"))
+        else:
+            close_date = close_date_str
+
+        # Check for non-negative cycle time
+        cycle_days = (close_date - create_date).days
+        return cycle_days >= 0
+
+    except (ValueError, AttributeError, TypeError):
+        # Date parsing failed - exclude
+        return False
+
+
+def is_fresh_pipeline_deal(deal: dict, stale_threshold_days: int = 180) -> bool:
+    """
+    Check if a deal is "fresh" (not stale/abandoned).
+
+    A deal is considered stale if it has been open for more than stale_threshold_days
+    with no meaningful movement. Stale deals contaminate pipeline health metrics.
+
+    Args:
+        deal: Deal dict with stage and create_date
+        stale_threshold_days: Days threshold (default 180, client-specific)
+
+    Returns:
+        True if deal is fresh (< threshold days old)
+        False if deal is stale (>= threshold days old) or missing data
+
+    Discovered: Phase 2b validation (2026-09-07)
+    Evidence: 4 deals >180 days old ($155K, 2.2% of pipeline)
+    """
+    if not deal:
+        return False
+
+    # Must be an open deal
+    stage = deal.get("stage")
+    if not stage or not is_open(stage):
+        # Only filter open pipeline - closed deals are fine
+        return True
+
+    create_date_str = deal.get("create_date")
+    if not create_date_str:
+        # No create date - can't determine age, exclude to be safe
+        return False
+
+    # Calculate age
+    try:
+        from datetime import datetime
+
+        if isinstance(create_date_str, str):
+            create_date = datetime.fromisoformat(create_date_str.replace("Z", "+00:00"))
+        else:
+            create_date = create_date_str
+
+        now = datetime.now(create_date.tzinfo)
+        age_days = (now - create_date).days
+
+        return age_days <= stale_threshold_days
+
+    except (ValueError, AttributeError, TypeError):
+        # Date parsing failed - exclude to be safe
+        return False
+
+
+# ============================================================================
+# REGION CLASSIFICATION
+# ============================================================================
+# Maps company geography to sales regions (NAM, EMEA, APAC, LATAM, ROW).
+# Data source: HubSpot Company.country property (90.9% coverage)
+# See config/regions.yaml for full country mappings.
+# ============================================================================
+
+# Country -> Region mapping (generated from config/regions.yaml)
+_COUNTRY_TO_REGION = {
+    "Algeria": "EMEA",
+    "Argentina": "LATAM",
+    "Australia": "APAC",
+    "Austria": "EMEA",
+    "Bahrain": "EMEA",
+    "Bangladesh": "APAC",
+    "Belarus": "EMEA",
+    "Belgium": "EMEA",
+    "Bolivia": "LATAM",
+    "Brazil": "LATAM",
+    "Bulgaria": "EMEA",
+    "Canada": "NAM",
+    "Chile": "LATAM",
+    "China": "APAC",
+    "Colombia": "LATAM",
+    "Costa Rica": "LATAM",
+    "Croatia": "EMEA",
+    "Czech Republic": "EMEA",
+    "Denmark": "EMEA",
+    "Dominican Republic": "LATAM",
+    "Ecuador": "LATAM",
+    "Egypt": "EMEA",
+    "El Salvador": "LATAM",
+    "Estonia": "EMEA",
+    "Finland": "EMEA",
+    "France": "EMEA",
+    "Germany": "EMEA",
+    "Ghana": "EMEA",
+    "Greece": "EMEA",
+    "Guatemala": "LATAM",
+    "Honduras": "LATAM",
+    "Hong Kong": "APAC",
+    "Hungary": "EMEA",
+    "Iceland": "EMEA",
+    "India": "APAC",
+    "Indonesia": "APAC",
+    "Ireland": "EMEA",
+    "Israel": "EMEA",
+    "Italy": "EMEA",
+    "Japan": "APAC",
+    "Jordan": "EMEA",
+    "Kenya": "EMEA",
+    "Kuwait": "EMEA",
+    "Latvia": "EMEA",
+    "Lebanon": "EMEA",
+    "Lithuania": "EMEA",
+    "Luxembourg": "EMEA",
+    "Malaysia": "APAC",
+    "Malta": "EMEA",
+    "Mexico": "NAM",
+    "Moldova": "EMEA",
+    "Morocco": "EMEA",
+    "Netherlands": "EMEA",
+    "New Zealand": "APAC",
+    "Nicaragua": "LATAM",
+    "Nigeria": "EMEA",
+    "Norway": "EMEA",
+    "Oman": "EMEA",
+    "Pakistan": "APAC",
+    "Panama": "LATAM",
+    "Paraguay": "LATAM",
+    "Peru": "LATAM",
+    "Philippines": "APAC",
+    "Poland": "EMEA",
+    "Portugal": "EMEA",
+    "Puerto Rico": "LATAM",
+    "Qatar": "EMEA",
+    "Romania": "EMEA",
+    "Saudi Arabia": "EMEA",
+    "Serbia": "EMEA",
+    "Singapore": "APAC",
+    "Slovakia": "EMEA",
+    "Slovenia": "EMEA",
+    "South Africa": "EMEA",
+    "South Korea": "APAC",
+    "Spain": "EMEA",
+    "Sweden": "EMEA",
+    "Switzerland": "EMEA",
+    "Taiwan": "APAC",
+    "Thailand": "APAC",
+    "The Netherlands": "EMEA",
+    "Tunisia": "EMEA",
+    "Turkey": "EMEA",
+    "Ukraine": "EMEA",
+    "United Arab Emirates": "EMEA",
+    "United Kingdom": "EMEA",
+    "United States": "NAM",
+    "Uruguay": "LATAM",
+    "Venezuela": "LATAM",
+    "Vietnam": "APAC",
+}
+
+def get_region(deal: dict) -> str:
+    """
+    Get region for a deal using company geography.
+
+    Primary classification: Use company_country from HubSpot (90.9% coverage)
+    Fallback: Return UNKNOWN for deals with no geography (9.1%)
+
+    Args:
+        deal: Deal dict with company_country field
+
+    Returns:
+        "NAM" | "EMEA" | "APAC" | "LATAM" | "ROW" | "UNKNOWN"
+
+    Examples:
+        get_region({"company_country": "United Kingdom"}) -> "EMEA"
+        get_region({"company_country": "United States"}) -> "NAM"
+        get_region({"company_country": "India"}) -> "APAC"
+        get_region({"company_country": None}) -> "UNKNOWN"
+
+    Note:
+        UNKNOWN is returned explicitly for 172 deals (9.1%) with no Company.country.
+        These deals are NOT defaulted to NAM or ROW - they must be surfaced
+        explicitly in reporting (same pattern as no_signal_at_risk).
+
+        Region classification is based on REAL company geography from HubSpot,
+        not owner assumption. For 90.9% of deals, this is accurate.
+    """
+    company_country = deal.get('company_country')
+
+    # Explicit UNKNOWN handling - NOT defaulted to NAM/ROW
+    if not company_country:
+        return "UNKNOWN"
+
+    # Map country to region
+    region = _COUNTRY_TO_REGION.get(company_country, "ROW")
+
+    return region

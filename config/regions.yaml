@@ -1,0 +1,154 @@
+# Region Definitions
+#
+# Maps company countries to sales regions (NAM, EMEA, ROW).
+# Data source: HubSpot Company.country property (90.9% coverage as of 2026-09-08)
+#
+# Coverage: 1718/1890 deals (90.9%) have real geography from HubSpot
+# Fallback: For deals without geography, use owner-based proxy (Marcel/James = EMEA)
+
+region_definitions:
+  NAM:
+    label: "North America"
+    countries:
+      - "United States"
+      - "Canada"
+      - "Mexico"
+
+  EMEA:
+    label: "Europe, Middle East & Africa"
+    countries:
+      # Europe
+      - "United Kingdom"
+      - "Germany"
+      - "France"
+      - "Netherlands"
+      - "The Netherlands"  # HubSpot inconsistency - both exist
+      - "Sweden"
+      - "Norway"
+      - "Denmark"
+      - "Finland"
+      - "Iceland"
+      - "Switzerland"
+      - "Austria"
+      - "Belgium"
+      - "Spain"
+      - "Italy"
+      - "Portugal"
+      - "Poland"
+      - "Czech Republic"
+      - "Hungary"
+      - "Romania"
+      - "Bulgaria"
+      - "Greece"
+      - "Croatia"
+      - "Serbia"
+      - "Slovenia"
+      - "Slovakia"
+      - "Estonia"
+      - "Latvia"
+      - "Lithuania"
+      - "Ireland"
+      - "Luxembourg"
+      - "Malta"
+      # Eastern Europe
+      - "Ukraine"
+      - "Belarus"
+      - "Moldova"
+      # Middle East
+      - "Israel"
+      - "United Arab Emirates"
+      - "Saudi Arabia"
+      - "Qatar"
+      - "Kuwait"
+      - "Bahrain"
+      - "Oman"
+      - "Jordan"
+      - "Lebanon"
+      - "Turkey"
+      # Africa
+      - "South Africa"
+      - "Nigeria"
+      - "Kenya"
+      - "Egypt"
+      - "Morocco"
+      - "Ghana"
+      - "Tunisia"
+      - "Algeria"
+
+  APAC:
+    label: "Asia-Pacific"
+    countries:
+      - "Australia"
+      - "New Zealand"
+      - "Singapore"
+      - "Japan"
+      - "South Korea"
+      - "China"
+      - "Hong Kong"
+      - "Taiwan"
+      - "Malaysia"
+      - "Thailand"
+      - "Indonesia"
+      - "Philippines"
+      - "Vietnam"
+      - "India"
+      - "Pakistan"
+      - "Bangladesh"
+
+  LATAM:
+    label: "Latin America"
+    countries:
+      - "Brazil"
+      - "Argentina"
+      - "Chile"
+      - "Colombia"
+      - "Peru"
+      - "Venezuela"
+      - "Ecuador"
+      - "Bolivia"
+      - "Paraguay"
+      - "Uruguay"
+      - "Costa Rica"
+      - "Panama"
+      - "Guatemala"
+      - "Honduras"
+      - "El Salvador"
+      - "Nicaragua"
+      - "Dominican Republic"
+      - "Puerto Rico"
+
+  # Catch-all for unmapped countries
+  ROW:
+    label: "Rest of World"
+    note: "Countries not explicitly mapped to NAM/EMEA/APAC/LATAM"
+
+# Fallback classification when company_country is NULL
+fallback_classification:
+  method: "owner_proxy"
+  emea_owners:
+    - "marcel@growthbook.io"
+    - "james.shannon@growthbook.io"
+  nam_owners: "all others"
+  note: |
+    Used only for deals where company_country is NULL (9.1% of deals).
+    Cross-validation showed owner-based classification has 73% error rate,
+    so this is explicitly a fallback of last resort.
+
+# Data quality notes
+data_quality:
+  source: "HubSpot Company.country property"
+  enrichment_date: "2026-09-08"
+  coverage: "90.9% (1718/1890 deals)"
+  property_inconsistencies:
+    - "'Netherlands' vs 'The Netherlands' - both exist in HubSpot data"
+    - "Full country names (not ISO codes)"
+  missing_data: "172 deals (9.1%) have no company_country"
+
+# Recommended ongoing sync
+recommended_sync:
+  add_to_etl: "run_nightly.py or equivalent"
+  hubspot_property: "Company.country"
+  supabase_column: "deals.company_country"
+  rationale: |
+    Currently a one-time enrichment pull. Adding to nightly sync ensures
+    future deals get geography automatically without manual re-enrichment.
