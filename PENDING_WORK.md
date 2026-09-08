@@ -79,6 +79,46 @@ None currently.
 
 ## 📋 Backlog
 
+### High Priority
+
+#### 1. Waterfall net_change Formula Bug
+**Issue:** `compute_waterfall_segmented.py` incorrectly includes `moved_forward_value` and `moved_backward_value` in net_change calculation
+
+**Impact:** High - affects data integrity across all 56 weeks of waterfall data
+- Stage movements double-counted, causing reconciliation mismatches
+- `beginning_value + net_change ≠ ending_value`
+- Example: Aug 28 EMEA/Enterprise shows $97K mismatch
+- Synthesis may report "growth" when deals just re-ordered stages
+
+**Evidence:**
+- Aug 28 EMEA/Enterprise: Beginning $2.2M, Ending $2.2M, but net_change +$97K
+- Zero ARR changes between snapshots, yet moved_forward $142K - moved_backward $45K = $97K
+- Reconciliation: Expected ending $2.3M, actual $2.2M (mismatch = net_change)
+
+**Root cause:** Stage movements represent deals re-ordering within pipeline, not entering/leaving
+- Deal moving stage 3→4 is counted in BOTH beginning (at stage 3) and ending (at stage 4)
+- Adding moved_forward to net_change double-counts it
+
+**Correct formula:**
+```python
+net_change = new_pipeline + newly_qualified - won - lost
+# NOT including moved_forward/backward
+```
+
+**Work required:**
+1. Fix formula in `compute_waterfall_segmented.py` (lines 494-501)
+2. Fix formula in `compute_waterfall.py` (if still used)
+3. Recompute all historical data (56 weeks)
+4. Verify zero reconciliation mismatches after recompute
+
+**Complexity:** Low effort, high impact
+
+**Documentation:** WATERFALL_NET_CHANGE_BUG.md
+
+**Discovered:** 2026-09-08 via live Slack test + user scrutiny ("Don't accept 'likely an ARR update' - trace the actual deals")
+
+---
+
 ### Low Priority
 
 #### 1. Zero-Day Cycle Time Deals
@@ -156,7 +196,8 @@ Without step 3, LLM query builder cannot see the column exists.
 
 ## 📊 Summary
 
-**Total Open Items:** 2
+**Total Open Items:** 3
+- High Priority: 1 (waterfall net_change formula bug - data integrity)
 - Low Priority: 2 (zero-day cycle times, forecast bugs)
 
 **Recently Completed:** 2
