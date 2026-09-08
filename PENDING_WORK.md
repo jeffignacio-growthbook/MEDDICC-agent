@@ -8,7 +8,7 @@
 ## ✅ Recently Completed
 
 ### Region + Segment Waterfall Segmentation (2026-09-08)
-**Status:** ✅ COMPLETE - All 4 steps verified
+**Status:** ✅ PRODUCTION VERIFIED (with one caveat - see below)
 
 **Completed Work:**
 - [x] Schema changes: Added region and segment columns to waterfall_weekly
@@ -16,23 +16,44 @@
 - [x] Created compute_waterfall_segmented.py with region/segment grouping
 - [x] Applied is_test_deal() hygiene filter (1 test deal filtered)
 - [x] Registered both columns in data_dictionary as queryable
-- [x] Full historical backfill: 934 segmented rows across 55 weeks
+- [x] Full historical backfill: 56 weeks (2025-08-11 to 2026-09-08), gap closed
 - [x] Added synthesis prompt instruction for question-substitution flagging
+- [x] **Production deployment:** Updated weekly-analytics workflow to call segmented script
+- [x] **Manual workflow trigger:** Confirmed working in production (run 34272039649)
+- [x] **Gap closure:** Backfilled missing Aug 24/28 weeks (38 additional rows)
+
+**Production Verification Results:**
+- **Fix 1 (Workflow):** ✅ Manually triggered, waterfall step succeeded, Sep 8 data generated
+- **Fix 2 (Data):** ✅ 56 weeks complete, no gaps (Aug 2025 → Sep 2026), EMEA 2-week comparison working
+- **Fix 3 (Honesty):** ⚠️ **Deployed but not production-tested** - instruction in place but hasn't fired against incomplete data yet
+
+**Fix 3 Caveat:**
+The "absence of data ≠ zero movement" refusal behavior is correctly written and deployed in `api/router.py`, but unverified against a real trigger since the gap it was built for is now closed. The next time any comparison period has incomplete data (new region, newly-added segment, future sync gap), that's the real test. Worth checking then rather than assuming it works because the instruction reads correctly.
+
+**When to verify Fix 3:**
+- New region added to classification (no historical waterfall data yet)
+- New segment introduced mid-stream (Unknown → classified retroactively)
+- Future snapshot/waterfall sync gap (missed cron, infrastructure issue)
+- Check: Does synthesis refuse to present movement metrics, or does it present "$0 net change" with caveat?
 
 **Results:**
-- 55 weeks of segmented history (2025-08-11 to 2026-09-07)
+- 56 weeks of segmented history (2025-08-11 to 2026-09-08)
 - Region distribution: NAM 218, EMEA 175, APAC 165, LATAM 145, UNKNOWN 128, ROW 103
 - Segment distribution: SMB 292, Enterprise 232, Mid-Market 228, Unknown 182
-- EMEA latest: Enterprise $2.2M, Mid-Market $1.1M, SMB $880K, Unknown $50K
+- EMEA 2-week comparison: $4.35M (Aug 24) → $4.21M (Sep 8) = -$144K (-3.3%)
+- Aug 24/28 gap closed: 19 rows each (all regions × segments)
 
-**Verification Passed:**
-1. ✓ EMEA pipeline query returns full waterfall (beginning/ending/won/lost/net change)
-2. ✓ Historical trend plausible: $1.7M (Aug 2025) → $4.2M (Sep 2026)
-3. ✓ Data dictionary registration confirmed for both columns
+**Commits:**
+- b4f1765 (initial segmentation)
+- 6aee7ae (synthesis pattern)
+- 763c537 (production deployment fix)
+- 6136438 (verification documentation)
 
-**Commits:** b4f1765 (waterfall segmentation), 6aee7ae (synthesis pattern)
-
-**Documentation:** REGION_WATERFALL_GAP.md, REGION_DATA_DICTIONARY_FIX.md
+**Documentation:**
+- REGION_WATERFALL_GAP.md (original gap diagnosis)
+- REGION_DATA_DICTIONARY_FIX.md (data dictionary registration)
+- WATERFALL_SEGMENTATION_COMPLETE.md (initial completion proof)
+- WATERFALL_PRODUCTION_VERIFIED.md (production verification proof)
 
 ---
 
@@ -139,7 +160,7 @@ Without step 3, LLM query builder cannot see the column exists.
 - Low Priority: 2 (zero-day cycle times, forecast bugs)
 
 **Recently Completed:** 2
-- Waterfall region + segment segmentation (2026-09-08)
+- Waterfall region + segment segmentation (2026-09-08) - **PRODUCTION VERIFIED**
 - Test data hygiene (2026-09-08)
 
-**Major Milestone:** Region-segmented waterfall now live with 934 historical rows across 55 weeks, enabling accurate EMEA/APAC/LATAM/NAM pipeline reporting by company size segment.
+**Major Milestone:** Region-segmented waterfall production-verified with 972 historical rows across 56 weeks (Aug 2025 → Sep 2026), enabling accurate EMEA/APAC/LATAM/NAM pipeline reporting by company size segment. Workflow confirmed calling segmented script, historical gap closed, synthesis honesty rule deployed (pending production trigger test).
