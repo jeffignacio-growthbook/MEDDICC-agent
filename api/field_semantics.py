@@ -572,3 +572,82 @@ def get_region(deal: dict) -> str:
     region = _COUNTRY_TO_REGION.get(company_country, "ROW")
 
     return region
+
+
+def is_test_deal(deal: dict) -> bool:
+    """
+    True if deal appears to be test/demo data.
+
+    Patterns matched:
+    - Exact match: "Test", "Test Org"
+    - Contains: "-test", "test-" (lowercase with hyphen)
+    - Starts with: "test " (lowercase, space after)
+    - Contains: "Teste" (Portuguese test pattern)
+
+    Excludes legitimate companies:
+    - TestGorilla (assessment platform)
+    - User Testing Inc (UX research)
+    - Testbirds (QA platform)
+
+    Args:
+        deal: Deal dict with company_name field
+
+    Returns:
+        True if deal matches test patterns, False otherwise
+
+    Examples:
+        is_test_deal({"company_name": "Test Org"}) -> True
+        is_test_deal({"company_name": "sn-test"}) -> True
+        is_test_deal({"company_name": "FahadTest"}) -> False (ambiguous)
+        is_test_deal({"company_name": "SymplaTeste"}) -> True (Portuguese)
+        is_test_deal({"company_name": "TestGorilla"}) -> False (legitimate)
+        is_test_deal({"company_name": "User Testing Inc"}) -> False (legitimate)
+
+    Note:
+        This is a data hygiene rule (like is_valid_cycle_deal, is_fresh_pipeline_deal).
+        Test deals should be excluded from production reports and metrics.
+
+        Found 15 test deals in production HubSpot data (2026-09-08).
+        Long-term fix: Add is_test_deal boolean property in HubSpot at source.
+    """
+    company_name = deal.get('company_name')
+    if not company_name:
+        return False
+
+    company_name = company_name.strip()
+
+    # Normalize for matching
+    name_lower = company_name.lower()
+
+    # Legitimate companies with "Test" in name - do NOT flag
+    legitimate_test_companies = [
+        'testgorilla',
+        'user testing inc',
+        'testbirds',
+        'testim'
+    ]
+
+    if name_lower in legitimate_test_companies:
+        return False
+
+    # Exact matches
+    if name_lower in ['test', 'test org']:
+        return True
+
+    # Hyphenated test patterns (e.g., "sn-test", "zoopla-test")
+    if '-test' in name_lower or 'test-' in name_lower:
+        return True
+
+    # Starts with "test " (space after, e.g., "test company")
+    if name_lower.startswith('test '):
+        return True
+
+    # Ends with " test" (space before, e.g., "Jusbrasil Test", "Orkes Test")
+    if name_lower.endswith(' test'):
+        return True
+
+    # Portuguese test pattern (e.g., "SymplaTeste")
+    if 'teste' in name_lower:
+        return True
+
+    return False
