@@ -4,7 +4,6 @@ on:
   schedule:
     # Run monthly on the 1st at 9am UTC
     - cron: '0 9 1 * *'
-
   # Allow manual trigger
   workflow_dispatch:
 
