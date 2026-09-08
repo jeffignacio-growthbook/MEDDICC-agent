@@ -81,41 +81,40 @@ None currently.
 
 ### High Priority
 
-#### 1. Waterfall net_change Formula Bug
-**Issue:** `compute_waterfall_segmented.py` incorrectly includes `moved_forward_value` and `moved_backward_value` in net_change calculation
+#### 1. Waterfall Reconciliation Mismatches
+**Issue:** 46 of 56 historical weeks show reconciliation mismatches (82%)
 
-**Impact:** High - affects data integrity across all 56 weeks of waterfall data
-- Stage movements double-counted, causing reconciliation mismatches
-- `beginning_value + net_change ≠ ending_value`
-- Example: Aug 28 EMEA/Enterprise shows $97K mismatch
-- Synthesis may report "growth" when deals just re-ordered stages
+**Status:** PARTIALLY FIXED
+- ✅ moved_forward/backward bug: FIXED (Aug 28 EMEA/Enterprise now reconciles)
+- ✅ Point-in-time enrichment architecture: IMPLEMENTED for future data
+- ⚠️ Historical data reconciliation: NOT improved (backfill used current values, not historical)
 
-**Evidence:**
-- Aug 28 EMEA/Enterprise: Beginning $2.2M, Ending $2.2M, but net_change +$97K
-- Zero ARR changes between snapshots, yet moved_forward $142K - moved_backward $45K = $97K
-- Reconciliation: Expected ending $2.3M, actual $2.2M (mismatch = net_change)
+**Impact:** Medium - affects historical waterfall accuracy
+- Historical waterfalls (Aug 2025 - Sep 2026) remain imperfect
+- Future waterfalls (Sep 2026 onward) should reconcile perfectly with point-in-time enrichment
+- User's original example (Aug 28 EMEA/Enterprise) is fixed
 
-**Root cause:** Stage movements represent deals re-ordering within pipeline, not entering/leaving
-- Deal moving stage 3→4 is counted in BOTH beginning (at stage 3) and ending (at stage 4)
-- Adding moved_forward to net_change double-counts it
+**Root cause of remaining mismatches:**
+1. **Stale enrichment (unfixable for historical data):** Historical snapshots backfilled with current region/segment (Sep 2026 values), not historical values. Would need property_history to track region/segment changes.
+2. **Possible other causes:** May have additional bugs beyond enrichment (needs investigation)
 
-**Correct formula:**
-```python
-net_change = new_pipeline + newly_qualified - won - lost
-# NOT including moved_forward/backward
-```
+**What was fixed (2026-09-08):**
+1. Removed moved_forward/backward from net_change formula ✅
+2. Added region/segment columns to deals_snapshot (Migration 060) ✅
+3. Updated snapshot_deals.py to capture point-in-time enrichment ✅
+4. Updated compute_waterfall_segmented.py to use snapshot enrichment ✅
+5. Backfilled 27,298 historical snapshots (with current values) ✅
 
-**Work required:**
-1. Fix formula in `compute_waterfall_segmented.py` (lines 494-501)
-2. Fix formula in `compute_waterfall.py` (if still used)
-3. Recompute all historical data (56 weeks)
-4. Verify zero reconciliation mismatches after recompute
+**Work required to achieve zero mismatches:**
+- **Option A (Pragmatic):** Accept historical imperfection, verify new data reconciles, wait 56 weeks for accurate snapshots to roll in
+- **Option B (Investigative):** Check if remaining mismatches have other causes (ARR changes, pipeline moves, qualification timing)
+- **Option C (Architectural):** Add region/segment to property_history, reconstruct historical values, requires ETL changes
 
-**Complexity:** Low effort, high impact
+**Complexity:** High effort (Option B/C), or accept limitation (Option A)
 
-**Documentation:** WATERFALL_NET_CHANGE_BUG.md
+**Documentation:** WATERFALL_POINT_IN_TIME_FIX_STATUS.md, WATERFALL_RECONCILIATION_ANALYSIS.md
 
-**Discovered:** 2026-09-08 via live Slack test + user scrutiny ("Don't accept 'likely an ARR update' - trace the actual deals")
+**Next step:** Verify tomorrow's waterfall (with point-in-time snapshot) reconciles perfectly
 
 ---
 

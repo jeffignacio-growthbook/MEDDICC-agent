@@ -92,7 +92,8 @@ def main():
         sb, 'deals',
         'deal_id, pipeline_id, stage, deal_value, '
         'close_date, owner_email, deal_status, create_date, '
-        'highest_stage_order_reached, forecast_category'
+        'highest_stage_order_reached, forecast_category, '
+        'region, segment'
     )
     if not deals:
         print("No deals in Supabase — run etl_deals.py first")
@@ -179,6 +180,8 @@ def main():
             'forecast_category': d.get('forecast_category'),
             'fiscal_quarter': fiscal_quarter_label,
             'week_of_quarter': week_of_quarter,
+            'region': d.get('region'),
+            'segment': d.get('segment'),
         })
 
     # Upsert (idempotent on deal_id + snapshot_date PK)

@@ -466,8 +466,6 @@ def compute_waterfall_for_dates(sb, config, qual_map, threshold, prev_date, new_
         wf['net_change'] = (
             wf['new_pipeline_value']
             + wf['newly_qualified_value']
-            + wf['moved_forward_value']
-            - wf['moved_backward_value']
             - wf['won_value']
             - wf['lost_value']
         )

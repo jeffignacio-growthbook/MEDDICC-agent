@@ -79,19 +79,19 @@ def main():
     }
     print(f"Loaded qualification (event) data for {len(qual_map)} deals")
 
-    # NEW: Load deal enrichment data (region, segment, company_name)
-    print("\nLoading deal enrichment data (region, segment, company_name)...")
+    # NEW: Load deal enrichment data (company_name only - for test deal filter)
+    # Region and segment now come from point-in-time snapshot data
+    print("\nLoading deal enrichment data (company_name for test deal filter)...")
     enrichment_rows = select_all(sb, 'deals',
-                                 columns='deal_id, region, segment, company_name')
+                                 columns='deal_id, company_name')
     enrichment_map = {
         row['deal_id']: {
-            'region': row.get('region') or 'UNKNOWN',
-            'segment': row.get('segment') or 'Unknown',
             'company_name': row.get('company_name') or ''
         }
         for row in enrichment_rows
     }
     print(f"Loaded enrichment data for {len(enrichment_map)} deals")
+    print("Note: Region/segment now sourced from point-in-time snapshot data")
 
     # NEW: Import is_test_deal hygiene filter
     sys.path.insert(0, str(REPO_ROOT / 'api'))
@@ -263,9 +263,9 @@ def compute_waterfall_for_dates(sb, config, qual_map, enrichment_map, is_test_de
                 test_deals_filtered += 1
                 continue
 
-            # NEW: Group by region and segment
-            region = enrich.get('region', 'UNKNOWN')
-            segment = enrich.get('segment', 'Unknown')
+            # NEW: Group by region and segment (from point-in-time snapshot)
+            region = p.get('region') or 'UNKNOWN'
+            segment = p.get('segment') or 'Unknown'
             group_key = (p.get('pipeline_id', 'default'), region, segment)
             begin_values[group_key].append(_deal_value(p))
 
@@ -278,9 +278,9 @@ def compute_waterfall_for_dates(sb, config, qual_map, enrichment_map, is_test_de
             if is_test_deal_fn({'company_name': enrich.get('company_name')}):
                 continue
 
-            # NEW: Group by region and segment
-            region = enrich.get('region', 'UNKNOWN')
-            segment = enrich.get('segment', 'Unknown')
+            # NEW: Group by region and segment (from point-in-time snapshot)
+            region = n.get('region') or 'UNKNOWN'
+            segment = n.get('segment') or 'Unknown'
             group_key = (n.get('pipeline_id', 'default'), region, segment)
             end_values[group_key].append(_deal_value(n))
 
@@ -315,10 +315,11 @@ def compute_waterfall_for_dates(sb, config, qual_map, enrichment_map, is_test_de
         if is_test_deal_fn({'company_name': enrich.get('company_name')}):
             continue
 
-        # NEW: Get region and segment for grouping
-        region = enrich.get('region', 'UNKNOWN')
-        segment = enrich.get('segment', 'Unknown')
-        pipeline_id = (n or p).get('pipeline_id', 'default')
+        # NEW: Get region and segment for grouping (from point-in-time snapshot)
+        snapshot_record = n or p  # Use new if available, else prev
+        region = snapshot_record.get('region') or 'UNKNOWN'
+        segment = snapshot_record.get('segment') or 'Unknown'
+        pipeline_id = snapshot_record.get('pipeline_id', 'default')
         group_key = (pipeline_id, region, segment)
 
         wf = waterfall_groups[group_key]
@@ -494,8 +495,6 @@ def compute_waterfall_for_dates(sb, config, qual_map, enrichment_map, is_test_de
         wf['net_change'] = (
             wf['new_pipeline_value']
             + wf['newly_qualified_value']
-            + wf['moved_forward_value']
-            - wf['moved_backward_value']
             - wf['won_value']
             - wf['lost_value']
         )
