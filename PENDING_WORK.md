@@ -310,12 +310,15 @@ Without step 3, LLM query builder cannot see the column exists.
 
 ## 📊 Summary
 
-**Total Open Items:** 5
-- High Priority: 3 (aggregate_results empty data bug, snapshot ETL phantom exits, synthesis aggregation gap)
+**Total Open Items:** 4
+- High Priority: 2 (snapshot ETL phantom exits, synthesis aggregation gap)
 - Low Priority: 2 (zero-day cycle times, forecast bugs)
 
-**Recently Completed:** 2
+**Recently Completed:** 3
+- aggregate_results empty data bug (2026-09-09) - **IMPLEMENTED & VERIFIED** (Sept 6 impact: LOW)
 - Waterfall region + segment segmentation (2026-09-08) - **PRODUCTION VERIFIED**
 - Test data hygiene (2026-09-08)
 
-**Major Milestone:** Region-segmented waterfall production-verified with 972 historical rows across 56 weeks (Aug 2025 → Sep 2026), enabling accurate EMEA/APAC/LATAM/NAM pipeline reporting by company size segment. Workflow confirmed calling segmented script, historical gap closed, synthesis honesty rule deployed (pending production trigger test).
+**Major Milestones:**
+- Region-segmented waterfall production-verified with 972 historical rows across 56 weeks (Aug 2025 → Sep 2026), enabling accurate EMEA/APAC/LATAM/NAM pipeline reporting by company size segment.
+- aggregate_results 66.7% failure rate fixed with three-layer validation (prompt + tool + router), verified no real user harm (Sept 6 answer accurate despite internal failure).
