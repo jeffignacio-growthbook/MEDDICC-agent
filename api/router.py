@@ -1869,7 +1869,8 @@ async def dynamic_query_loop(question, history, params,
                 "• Do NOT anchor on subset or sample\n"
                 "• Break down by component before stating totals\n"
                 "• If a row/segment has $0 activity → say '$0' or 'flat' explicitly\n"
-                "• ONLY say 'pending' if the row is ACTUALLY MISSING (not just $0)\n\n"
+                "• ONLY say 'pending' if the row is ACTUALLY MISSING (not just $0)\n"
+                "• Use explicit dimension names (Mid-Market, NAM, etc.) not dollar refs\n\n"
                 'Respond as {"answer": "..."}. If the gathered data genuinely '
                 'cannot answer it, still respond as {"answer": "..."} and say '
                 "plainly what is missing."
@@ -2291,6 +2292,12 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 "\n\nExample: If Sep 7 has rows for all 4 segments showing $0:"
                 "\n  Correct: 'Sep 7: All segments flat ($0 movement)'"
                 "\n  Wrong: 'Sep 7: Enterprise flat, other segments pending' ← they're not pending!"
+                "\n\n⚠️  USE EXPLICIT DIMENSION NAMES:"
+                "\n• Use actual segment names (Enterprise, Mid-Market, SMB) not '$1.12M segment'"
+                "\n• Use actual region names (NAM, EMEA, APAC) not '$2.20M region'"
+                "\n• Use actual stage names from data, not generic 'pipeline stage'"
+                "\n\nCorrect: 'Mid-Market: $20K won, SMB: $100K lost'"
+                "\nWrong: '$20K won (closed out of $1.12M segment)' ← name the segment!"
             )
 
         messages.append({"role": "user",
