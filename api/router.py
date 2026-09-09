@@ -1867,10 +1867,12 @@ async def dynamic_query_loop(question, history, params,
                 "CRITICAL: If answering about activity over time/dimensions:\n"
                 "• State data from EVERY row/week/segment retrieved\n"
                 "• Do NOT anchor on subset or sample\n"
-                "• Break down by component before stating totals\n\n"
+                "• Break down by component before stating totals\n"
+                "• If a row/segment has $0 activity → say '$0' or 'flat' explicitly\n"
+                "• ONLY say 'pending' if the row is ACTUALLY MISSING (not just $0)\n\n"
                 'Respond as {"answer": "..."}. If the gathered data genuinely '
                 'cannot answer it, still respond as {"answer": "..."} and say '
-                "plainly what is missing (but do NOT claim 'partial' unless verified)."
+                "plainly what is missing."
             )
 
             synth = client.complete(
@@ -2282,7 +2284,13 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 "\n• If stating period total, break down by component first"
                 "\n\nCorrect: 'Aug 17: $75K lost, Aug 24: $0, Aug 28: $20K won + $100K lost'"
                 "\nWrong: 'Aug 28: -$20K' (dropping $100K from another segment)"
-                "\n\nIf you cannot verify completeness, do NOT claim 'partial' or 'pending'."
+                "\n\n⚠️  ZERO vs MISSING DATA:"
+                "\n• If a row/segment has $0 activity → say '$0' or 'flat' explicitly"
+                "\n• ONLY say 'pending' or 'partial' if the row is ACTUALLY MISSING from data"
+                "\n• Having a row with zeros is NOT 'pending' — it means zero activity occurred"
+                "\n\nExample: If Sep 7 has rows for all 4 segments showing $0:"
+                "\n  Correct: 'Sep 7: All segments flat ($0 movement)'"
+                "\n  Wrong: 'Sep 7: Enterprise flat, other segments pending' ← they're not pending!"
             )
 
         messages.append({"role": "user",
