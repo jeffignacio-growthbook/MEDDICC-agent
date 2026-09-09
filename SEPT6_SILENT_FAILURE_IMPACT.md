@@ -35,7 +35,8 @@ _(Aug 1, 2026 – Jan 31, 2027 | All deals currently open/active)_
 
 **Q3 (Aug–Oct 2026) — $110,000**
 • *Mistral* — $50,000 (closes Oct 31)
-• *K... (truncated)
+• *Khan Academy* — $40,000 (closes Oct 29)
+• *Boylesports* — $20,000 (closes Oct 28)
 ```
 
 ---
@@ -43,26 +44,44 @@ _(Aug 1, 2026 – Jan 31, 2027 | All deals currently open/active)_
 ## The Problem
 
 ### Data Mismatch
-- **Initial query:** 55 deals
-- **Recovery query:** 7 deals (12.7% of original)
-- **Answer based on:** Recovery query (7 deals)
+- **Initial query:** 55 deals (all Q3+Q4 renewals)
+- **Recovery query:** 7 deals (filtered subset)
+- **Answer based on:** 3 of those 7 deals with expansion ARR
 
-### Unknown: Is Answer Correct?
+### Deal Count Reconciliation ✅ VERIFIED
 
-**Two scenarios:**
+**Recovery query returned 7 deals:**
+- 3 with expansion ARR (incremental_arr > 0) = **$110K** ← ANSWER
+- 4 without expansion (incremental_arr = 0) = correctly excluded
 
-**Scenario A (Low Impact):**
-- Recovery query correctly filtered to just expansion deals (incremental_arr > 0)
-- Original 55 included renewals without expansion ($0 incremental_arr)
-- Answer of $110K Q3 expansion is accurate
-- No data loss, just inefficient querying
+**Q3 expansion deals in database:** Exactly 3 total
+- Mistral: $50K
+- Khan Academy: $40K
+- Boylesports: $20K
 
-**Scenario B (High Impact):**
-- Recovery query incorrectly over-filtered (missing deals)
-- Original 55 deals included more expansion opportunities
-- Answer of $110K Q3 expansion is INCOMPLETE
-- Real expansion ARR higher than reported
-- User made decisions based on understated pipeline
+**Verdict:** System correctly identified ALL Q3 expansion deals and calculated accurate total. The 7-vs-3 discrepancy is explained (4 pure renewals without expansion), not coincidental.
+
+### Answer Accuracy: VERIFIED CORRECT ✅
+
+**Verification performed (2026-09-09):**
+
+Ran database query for ALL Q3 expansion deals:
+```sql
+SELECT * FROM deals
+WHERE pipeline_id = '866608541'
+  AND close_date BETWEEN '2026-08-01' AND '2026-10-31'
+  AND deal_status = 'active'
+  AND incremental_arr > 0
+```
+
+**Result:** Exactly 3 deals found, totaling $110,000
+- Mistral: $50,000 (Oct 31)
+- Khan Academy: $40,000 (Oct 29)
+- Boylesports: $20,000 (Oct 28)
+
+**Delivered answer:** $110,000 (exact match)
+
+**Scenario A confirmed:** Recovery query correctly filtered to expansion deals. Original 55 included pure renewals without expansion. Answer is accurate, no data loss.
 
 ---
 
