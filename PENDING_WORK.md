@@ -81,40 +81,48 @@ None currently.
 
 ### High Priority
 
-#### 1. Waterfall Reconciliation Mismatches
-**Issue:** 46 of 56 historical weeks show reconciliation mismatches (82%)
+#### 1. Snapshot ETL Phantom Exits Bug
+**Issue:** Deals occasionally missing from single week's snapshot, causing "phantom exits" in waterfall
 
-**Status:** PARTIALLY FIXED
-- ✅ moved_forward/backward bug: FIXED (Aug 28 EMEA/Enterprise now reconciles)
-- ✅ Point-in-time enrichment architecture: IMPLEMENTED for future data
-- ⚠️ Historical data reconciliation: NOT improved (backfill used current values, not historical)
+**Status:** IDENTIFIED, NOT FIXED
 
-**Impact:** Medium - affects historical waterfall accuracy
-- Historical waterfalls (Aug 2025 - Sep 2026) remain imperfect
-- Future waterfalls (Sep 2026 onward) should reconcile perfectly with point-in-time enrichment
-- User's original example (Aug 28 EMEA/Enterprise) is fixed
+**Evidence:**
+- 952 of 954 group/week combinations reconcile perfectly (99.8% success rate)
+- 2 remaining mismatches traced to phantom exits:
+  - Deal 38816659085: Present in 2026-04-06 snapshot ($20K), missing from 2026-04-13, reappears in 2026-04-20 (ROW/SMB)
+  - Deal 59860100786: Present in 2026-05-18 snapshot ($40K), missing from 2026-05-25, eventually closes won in August (EMEA/Mid-Market)
 
-**Root cause of remaining mismatches:**
-1. **Stale enrichment (unfixable for historical data):** Historical snapshots backfilled with current region/segment (Sep 2026 values), not historical values. Would need property_history to track region/segment changes.
-2. **Possible other causes:** May have additional bugs beyond enrichment (needs investigation)
+**Impact:** Low frequency (0.2% of weeks affected), but creates unreconcilable gaps
+- Deals silently exit waterfall without triggering any movement category (not won, not lost, not ARR change)
+- Beginning + net_change ≠ ending for affected group/weeks
+- Reconciliation check correctly fails on affected weeks (working as designed)
+
+**Root cause:** Snapshot ETL (scripts/snapshot_deals.py) occasionally excludes active deals from snapshot
+- Deals don't match any exclusion criteria (not closed, not test deals, etc.)
+- Missing deals reappear in subsequent snapshots
+- Pattern suggests intermittent ETL bug, not systematic filter
 
 **What was fixed (2026-09-08):**
-1. Removed moved_forward/backward from net_change formula ✅
-2. Added region/segment columns to deals_snapshot (Migration 060) ✅
-3. Updated snapshot_deals.py to capture point-in-time enrichment ✅
-4. Updated compute_waterfall_segmented.py to use snapshot enrichment ✅
-5. Backfilled 27,298 historical snapshots (with current values) ✅
+1. ✅ Won/lost detection (hybrid function with property_history + close_date fallback)
+2. ✅ Net_change formula (removed moved_forward/moved_backward double-counting)
+3. ✅ Snapshot enrichment (region/segment backfilled to 85-95%)
+4. ✅ Precedence masking bug (removed precedence system, independent movement tracking)
+5. ✅ ARR delta calculation (fixed to track DELTA not VALUE, added newly_arr_bearing category)
 
-**Work required to achieve zero mismatches:**
-- **Option A (Pragmatic):** Accept historical imperfection, verify new data reconciles, wait 56 weeks for accurate snapshots to roll in
-- **Option B (Investigative):** Check if remaining mismatches have other causes (ARR changes, pipeline moves, qualification timing)
-- **Option C (Architectural):** Add region/segment to property_history, reconstruct historical values, requires ETL changes
+**Work required:**
+1. Audit snapshot_deals.py ETL logic for conditions that could intermittently exclude deals
+2. Check for race conditions, API pagination issues, or HubSpot API filters
+3. Add completeness check: compare deal_ids between consecutive snapshots, flag disappear-then-reappear patterns
+4. Once fixed, re-backfill affected weeks (2026-04-13, 2026-05-25, any others found)
 
-**Complexity:** High effort (Option B/C), or accept limitation (Option A)
+**Complexity:** Medium effort (requires ETL audit + HubSpot API investigation)
 
-**Documentation:** WATERFALL_POINT_IN_TIME_FIX_STATUS.md, WATERFALL_RECONCILIATION_ANALYSIS.md
+**Reconciliation check status:**
+- ✅ Check remains STRICT (correctly fails on phantom exits)
+- ✅ Outputs specific deal_ids causing mismatches
+- ✅ Failing check points at real, tracked bug (not silenced)
 
-**Next step:** Verify tomorrow's waterfall (with point-in-time snapshot) reconciles perfectly
+**Documentation:** (this session's investigation)
 
 ---
 
