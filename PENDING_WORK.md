@@ -77,62 +77,46 @@ None currently.
 
 ---
 
+## ✅ Recently Completed (Continued)
+
+### aggregate_results Empty Data Bug (2026-09-09)
+**Status:** ✅ COMPLETE - Implemented and verified
+
+**Issue:** LLM passes empty array instead of step reference, causing 66.7% failure rate on aggregate_results calls
+
+**Completed work:**
+- [x] Root cause analysis (prompt ambiguity: "list OR step reference")
+- [x] Pattern verification (only aggregate_results affected, no other tools)
+- [x] User impact verification (Sept 6 answer: $110K Q3 expansion - CORRECT despite bug)
+- [x] Three-layer fix implemented:
+  1. Prompt fix: Remove ambiguity, force step references (api/router.py:1120-1140)
+  2. Validation fix: Reject empty data, invalid refs, missing columns (api/tools.py:156-171)
+  3. Logging fix: Warn on resolution failures (api/router.py:2070-2118)
+- [x] Test suite: 13/13 validation tests passing
+- [x] Commits: a121c62
+
+**Impact assessment:**
+- Sept 6 query verified: Answer was accurate ($110K actual = $110K delivered)
+- Sept 9 query: Budget exhaustion (visible symptom, not silent failure)
+- No real user harm, but 66.7% failure rate unacceptable
+- **Verdict: LOW impact (verified), but HIGH priority fix (silent failure mode)**
+
+**Documentation:**
+- AGGREGATE_RESULTS_BUG_REPORT.md (full investigation)
+- AGGREGATE_RESULTS_FIX_IMPLEMENTATION.md (implementation guide)
+- SEPT6_SILENT_FAILURE_IMPACT.md (verified LOW impact)
+- FALLBACK_BUDGET_ERROR_ANALYSIS.md (original investigation)
+- test_aggregate_results_validation.py (13/13 passing)
+
+**Monitoring:** Watch fallback_log for 7 days to confirm 0% failure rate post-fix
+
+---
+
 ## 📋 Backlog
 
 ### High Priority
 
-#### 1. aggregate_results Empty Data Bug
-**Issue:** LLM passes empty array instead of step reference, causing 66.7% failure rate on aggregate_results calls
-
-**Status:** CONFIRMED (2026-09-09)
-
-**Evidence:**
-- 3 aggregate_results calls in last 30 days
-- 2 returned 0 rows (66.7% failure rate)
-- Pattern: LLM passes `data: []` instead of `data: "step_0"`
-- One failure showed `answered: True` despite empty aggregation (silent data loss)
-
-**Root cause:** Prompt ambiguity - says "list of dicts OR step reference"
-- LLM tries to pass data array
-- Can't include full data in JSON response
-- Defaults to empty array `[]`
-- aggregate_results correctly returns 0 rows for empty input (no validation)
-
-**Impact:** Silent failure - queries complete with missing data
-- Sept 9: Budget exhaustion (visible symptom of underlying bug)
-- Sept 6: Answered successfully despite empty aggregation (silent data loss)
-- Unknown how many other queries affected
-
-**Work required:**
-1. **Prompt fix:** Change "list of dicts OR step reference" to "ALWAYS use step reference"
-   - api/router.py:1120-1130 (aggregate_results tool description)
-   - Add emphasis in RULES section
-2. **Validation fix:** Add empty data check to aggregate_results
-   - api/tools.py:156-193
-   - Return error if data is empty
-   - Return error if group_by column not in data
-3. **Logging fix:** Warn when step reference resolves to empty
-   - api/router.py:2067-2075 (tool execution section)
-   - Log available steps vs requested step
-4. **Test cases:** Add to eval suite
-   - Test empty array → error
-   - Test valid step reference → success
-   - Test missing column → error
-
-**Complexity:** Low effort (prompt change + validation), high impact
-
-**Priority justification:**
-- 66.7% failure rate (nearly all aggregate_results calls fail)
-- Silent failure mode (no error, just missing data)
-- User trust issue ("answered: True" with incomplete data)
-- Already affecting production (2 failures in 4 days)
-- Easy fix with clear root cause
-
-**Documentation:** AGGREGATE_RESULTS_BUG_REPORT.md
-
----
-
-#### 2. Snapshot ETL Phantom Exits Bug
+#### 1. Snapshot ETL Phantom Exits Bug
 **Issue:** Deals occasionally missing from single week's snapshot, causing "phantom exits" in waterfall
 
 **Status:** IDENTIFIED, NOT FIXED
