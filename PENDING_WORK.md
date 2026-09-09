@@ -126,6 +126,77 @@ None currently.
 
 ---
 
+#### 2. Synthesis Aggregation Gap - Time-Range Queries
+**Issue:** When summarizing activity over multi-week periods, synthesis may anchor on most recent data rather than summing across full requested range
+
+**Status:** IDENTIFIED, NOT FIXED
+
+**Evidence:**
+- EMEA pipeline question (Sept 9, 2026): "How has EMEA pipeline moved in the last 2 weeks"
+- Retrieved data showed: Aug 28 ($20K won, $100K lost), Sep 7-8 ($0 activity)
+- LLM had ALL 20 rows with correct data
+- Reported: "$0 across all movements" (anchored on rows 13-20, the most recent Sep 7-8 data)
+- **Silently dropped $120K of activity from Aug 28**
+
+**Impact:** High - affects all time-range aggregation questions
+- No reconciliation check catches synthesis errors (underlying data was correct)
+- User receives wrong answer despite backend having right data
+- Similar to earlier stage-breakdown truncation bug (q003/q011)
+
+**Root Cause Analysis:**
+```
+Data retrieved (20 EMEA rows):
+  Rows 1-4:   Aug 17 (including $75K lost)
+  Rows 5-8:   Aug 24 ($0 activity)
+  Rows 9-12:  Aug 28 ($20K won, $100K lost) ← ACTIVITY HERE
+  Rows 13-16: Sep 7  ($0 activity)
+  Rows 17-20: Sep 8  ($0 activity)
+
+LLM synthesis pattern:
+  1. Scanned data, noticed rows 13-20 all show $0
+  2. Anchored on "recent weeks are flat" pattern
+  3. Reported "$0 across all movements" without explicit summation
+  4. Missed Aug 28 activity (rows 9-12)
+```
+
+**Why This Is Worse Than Data Bugs:**
+- Data layer (schema, computation, reconciliation) was correct
+- No reconciliation check can catch synthesis errors
+- Silent failure - numbers look plausible, just wrong
+- Will recur for every "how has X moved over N weeks" question
+
+**Work Required:**
+1. **Immediate fix - Synthesis instruction:**
+   - Add explicit instruction: "Before stating period totals, SUM all retrieved rows"
+   - Require per-week breakdown for time-range questions (not just period total)
+   - Pattern: "Week 1: $X, Week 2: $Y, Total: $Z" (prevents anchoring on recent)
+
+2. **Post-generation verification:**
+   - For aggregation questions, programmatically sum retrieved rows
+   - Compare stated total to programmatic sum
+   - Fail loudly if mismatch detected (like reconciliation check)
+
+3. **Test case:**
+   - Construct deliberate test: activity in EARLIER week, $0 in recent week
+   - Verify synthesis correctly reports full-period total, not just latest week
+   - Add to regression suite
+
+**Related Issues:**
+- Stage-breakdown truncation bug (q003/q011): synthesis dropped 3 of 10 stages, showed 287 of 306 deals
+- Fix there: instruct synthesis to verify sum-of-parts equals total
+- **Same pattern:** synthesis under-representing retrieved data instead of aggregating faithfully
+
+**Complexity:** Medium effort (prompt fix + verification pattern)
+
+**Files to modify:**
+- `api/router.py` - synthesis prompt for time-range questions
+- Add verification step after synthesis (check stated total vs actual sum)
+- Create test case in handlers test suite
+
+**Documentation:** investigate_synthesis_bug.py (this session)
+
+---
+
 ### Low Priority
 
 #### 1. Zero-Day Cycle Time Deals
@@ -203,8 +274,8 @@ Without step 3, LLM query builder cannot see the column exists.
 
 ## 📊 Summary
 
-**Total Open Items:** 3
-- High Priority: 1 (waterfall net_change formula bug - data integrity)
+**Total Open Items:** 4
+- High Priority: 2 (snapshot ETL phantom exits, synthesis aggregation gap)
 - Low Priority: 2 (zero-day cycle times, forecast bugs)
 
 **Recently Completed:** 2
