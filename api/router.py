@@ -1860,13 +1860,21 @@ async def dynamic_query_loop(question, history, params,
                         "assemble it"),
                     "tool_results": tr, "answered": False}
         try:
+            # Add aggregation instruction for finalization too
+            finalize_prompt = (
+                "Stop calling tools. Using ONLY the data already gathered above, "
+                f"answer this question now: {question}\n\n"
+                "CRITICAL: If answering about activity over time/dimensions:\n"
+                "• State data from EVERY row/week/segment retrieved\n"
+                "• Do NOT anchor on subset or sample\n"
+                "• Break down by component before stating totals\n\n"
+                'Respond as {"answer": "..."}. If the gathered data genuinely '
+                'cannot answer it, still respond as {"answer": "..."} and say '
+                "plainly what is missing (but do NOT claim 'partial' unless verified)."
+            )
+
             synth = client.complete(
-                messages=messages + [{"role": "user", "content":
-                    "Stop calling tools. Using ONLY the data already gathered "
-                    f"above, answer this question now: {question}\n"
-                    'Respond as {"answer": "..."}. If the gathered data genuinely '
-                    'cannot answer it, still respond as {"answer": "..."} and say '
-                    "plainly what is missing."}],
+                messages=messages + [{"role": "user", "content": finalize_prompt}],
                 system=system, max_tokens=600)
             parsed2 = _extract_json(synth.text)
             if parsed2 and parsed2.get("answer"):
@@ -1982,6 +1990,74 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             had_answer_at_iteration = iteration
 
             tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
+
+            # FIX: Verify synthesis aggregated all rows correctly
+            answer_text = parsed["answer"]
+            verification_issues = []
+
+            # Check 1: Verify numeric totals if question is about amounts
+            amount_keywords = ['how much', 'total', 'sum', '$', 'arr', 'pipeline', 'revenue']
+            is_amount_question = any(kw in question.lower() for kw in amount_keywords)
+
+            if is_amount_question:
+                import re
+                # Extract $ amounts from answer
+                stated_amounts = []
+                for match in re.finditer(r'\$?([\d,]+\.?\d*)\s*([KkMm])?', answer_text):
+                    try:
+                        val = float(match.group(1).replace(',', ''))
+                        mult = match.group(2)
+                        if mult and mult.lower() == 'k':
+                            val *= 1000
+                        elif mult and mult.lower() == 'm':
+                            val *= 1000000
+                        stated_amounts.append(val)
+                    except ValueError:
+                        pass
+
+                # Calculate actual totals from data
+                actual_totals = {}
+                for key, data in accumulated_data.items():
+                    if key.startswith("step_") and not key.endswith("_raw"):
+                        rows = data.get("rows", [])
+                        for col in ['won_value', 'lost_value', 'net_change', 'deal_value']:
+                            if rows and col in rows[0]:
+                                actual_totals[col] = sum(r.get(col, 0) or 0 for r in rows)
+
+                # Log for monitoring (don't fail, just warn)
+                if actual_totals and not stated_amounts:
+                    verification_issues.append("no_amounts_stated")
+                    logger.warning(f"[SYNTHESIS_VERIFY] Amount question but no $ stated. "
+                                 f"Actual totals: {actual_totals}")
+
+            # Check 2: Detect unverified completeness claims
+            completeness_claims = ['partial', 'pending', 'incomplete', 'remaining.*pending']
+            has_claim = any(re.search(claim, answer_text.lower()) for claim in completeness_claims)
+
+            if has_claim:
+                # Check if claim is justified by missing dimensions
+                all_rows = []
+                for key, data in accumulated_data.items():
+                    if key.startswith("step_") and not key.endswith("_raw"):
+                        all_rows.extend(data.get("rows", []))
+
+                if all_rows and isinstance(all_rows[0], dict):
+                    # Count unique values per dimension
+                    for dim in ['segment', 'region', 'week_ending']:
+                        if dim in all_rows[0]:
+                            unique_vals = set(r.get(dim) for r in all_rows if r.get(dim))
+                            # Check if we have expected count (4 segments, 5 regions, etc.)
+                            expected_counts = {'segment': 4, 'region': 5}
+                            expected = expected_counts.get(dim, 0)
+                            if expected > 0 and len(unique_vals) >= expected:
+                                verification_issues.append(f"false_{dim}_partial_claim")
+                                logger.warning(
+                                    f"[SYNTHESIS_VERIFY] Answer claims 'partial/pending' but "
+                                    f"{dim} has all {len(unique_vals)} expected values")
+
+            if verification_issues:
+                logger.warning(f"[SYNTHESIS_VERIFY] Issues detected: {verification_issues}")
+                # Don't block the answer, just log for monitoring
 
             # Log successful dynamic query (adjustment #2: log fast path successes too)
             _log_successful_query(question, queries_run, parsed["answer"], tokens_used,
@@ -2195,8 +2271,23 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 logger.info(f"[SUSPICION] Zero rows on enumeration question, "
                            f"filters={filter_desc}")
 
+        # FIX: Synthesis Aggregation Gap - Explicit instruction to aggregate ALL rows
+        aggregation_instruction = ""
+        if iteration > 0 or row_count > 0:  # Have data to aggregate
+            aggregation_instruction = (
+                "\n\n⚠️  CRITICAL AGGREGATION RULE:"
+                "\nWhen answering questions about activity over time or by dimension:"
+                "\n• Report data from EVERY row/week/segment in retrieved results"
+                "\n• NEVER anchor on subset (recent week only, one segment only)"
+                "\n• If stating period total, break down by component first"
+                "\n\nCorrect: 'Aug 17: $75K lost, Aug 24: $0, Aug 28: $20K won + $100K lost'"
+                "\nWrong: 'Aug 28: -$20K' (dropping $100K from another segment)"
+                "\n\nIf you cannot verify completeness, do NOT claim 'partial' or 'pending'."
+            )
+
         messages.append({"role": "user",
-            "content": f"Tool result: {json.dumps(result, default=str)[:3000]}{suspicion_note}\n\n"
+            "content": f"Tool result: {json.dumps(result, default=str)[:3000]}{suspicion_note}"
+                       f"{aggregation_instruction}\n\n"
                        f"Can you now answer the question "
                        f"\"{question}\" from the data gathered so far? "
                        'If yes, respond with {"answer": "..."} now. '
