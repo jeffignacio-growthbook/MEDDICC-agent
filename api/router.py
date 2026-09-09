@@ -1881,6 +1881,30 @@ async def dynamic_query_loop(question, history, params,
                 system=system, max_tokens=600)
             parsed2 = _extract_json(synth.text)
             if parsed2 and parsed2.get("answer"):
+                # MANDATORY GATE: Dimension coverage verification (finalization path)
+                from api.dimension_verification import verify_dimension_coverage, format_verification_error
+
+                verification = verify_dimension_coverage(
+                    question=question,
+                    queries_run=queries_run,
+                    accumulated_data=accumulated_data
+                )
+
+                if not verification["verified"]:
+                    missing_filters = verification["missing_filters"]
+                    logger.error(
+                        f"[DIMENSION_VERIFY] Finalized answer failed verification: "
+                        f"Question mentioned {missing_filters} but never filtered for it. "
+                        f"Cannot retry (budget exhausted). Returning diagnostic error."
+                    )
+
+                    # Cannot retry (already at finalization), return error
+                    return {
+                        "answer": format_verification_error(missing_filters, verification["required_query"]),
+                        "tool_results": tr,
+                        "answered": False
+                    }
+
                 logger.info(f"[LOOP] finalized from gathered data "
                             f"(reason={reason_tag})")
                 return {"answer": parsed2["answer"],
@@ -1968,6 +1992,33 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 'tool' not in stripped[:20].lower()):
                 # Treat as direct prose answer
                 logger.info(f"[LOOP iter={iteration}] prose answer detected")
+
+                # MANDATORY GATE: Dimension coverage verification (prose path)
+                from api.dimension_verification import verify_dimension_coverage
+
+                verification = verify_dimension_coverage(
+                    question=question,
+                    queries_run=queries_run,
+                    accumulated_data=accumulated_data
+                )
+
+                if not verification["verified"]:
+                    missing_filters = verification["missing_filters"]
+                    logger.warning(
+                        f"[DIMENSION_VERIFY] Prose answer failed verification: "
+                        f"Question mentioned {missing_filters} but never filtered for it. "
+                        f"Forcing required query."
+                    )
+
+                    # Force retry with explicit instruction
+                    retry_instruction = (
+                        f"\n\n⚠️ VERIFICATION FAILED: Question asked about "
+                        f"{', '.join(f'{v} ({d})' for d, v in missing_filters)} "
+                        f"but query never filtered for it. Call filter_table with correct filter."
+                    )
+                    messages.append({"role": "user", "content": retry_instruction})
+                    continue  # Force another iteration
+
                 # Extract rows from accumulated data for entity context
                 tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
                 return {"answer": stripped, "tool_results": tool_results,
@@ -2061,6 +2112,47 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             if verification_issues:
                 logger.warning(f"[SYNTHESIS_VERIFY] Issues detected: {verification_issues}")
                 # Don't block the answer, just log for monitoring
+
+            # MANDATORY GATE: Dimension coverage verification
+            # Check if question mentioned dimension values that were never filtered for
+            from api.dimension_verification import verify_dimension_coverage, format_verification_error
+
+            verification = verify_dimension_coverage(
+                question=question,
+                queries_run=queries_run,
+                accumulated_data=accumulated_data
+            )
+
+            if not verification["verified"]:
+                missing_filters = verification["missing_filters"]
+                required_query = verification["required_query"]
+
+                logger.warning(
+                    f"[DIMENSION_VERIFY] Failed: Question mentioned "
+                    f"{missing_filters} but never filtered for it. "
+                    f"Forcing required query."
+                )
+
+                # FORCE ONE MORE ITERATION with explicit filter
+                # Add instruction to next message
+                retry_instruction = (
+                    f"\n\n⚠️ VERIFICATION FAILED: Question asked about "
+                    f"{', '.join(f'{v} ({d})' for d, v in missing_filters)} "
+                    f"but your query never filtered by {', '.join(d for d, v in missing_filters)}.\n\n"
+                    f"You MUST call filter_table again with explicit filter:\n"
+                    f"  table: {required_query['table']}\n"
+                    f"  filters: {required_query['filters']}\n\n"
+                    f"Do NOT answer from unfiltered data. Call the tool with the correct filter now."
+                )
+
+                messages.append({
+                    "role": "user",
+                    "content": retry_instruction
+                })
+
+                # Continue loop (don't return yet)
+                logger.info(f"[DIMENSION_VERIFY] Forcing retry iteration with required filters")
+                continue  # Go back to top of loop for one more iteration
 
             # Log successful dynamic query (adjustment #2: log fast path successes too)
             _log_successful_query(question, queries_run, parsed["answer"], tokens_used,
