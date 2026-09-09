@@ -1,0 +1,18 @@
+{
+  "company": "Cindy Vega and",
+  "slug": "cindy-vega-and",
+  "last_etl_date": "2026-09-09T06:13:44.375895",
+  "calls": [
+    {
+      "id": "01M1D5VCMX9YYD3YANMVCQ72X6",
+      "source": "fireflies",
+      "title": "Cindy Vega and Chris Sanders",
+      "date": "2026-09-08",
+      "duration_minutes": 41.380001068115234,
+      "summary": "# Cindy Vega and Chris Sanders\nDate: 2026-09-08 | Duration: 41.380001068115234m\n\n## Summary\nThe team reviewed Growthbook’s experimentation and feature flag capabilities, including deterministic hashing for consistent user bucketing across backend, frontend, mobile, and web SDKs, careful traffic-split management, namespaces, and deployment plans that identify rebucketing and bias risks. Growthbook uses assignment events and fact tables for analysis, supports slicing by user attributes and metric dimensions, and allows metrics and dimensions to be changed when the required data is available. Feature flags deliver experiment variants through targeting rules, support audience segmentation, and can force winning variants into full rollout. Results can be analyzed with Bayesian or Frequentist models, health metrics, confidence intervals, guardrails, detailed query views, and power calculators. The visual editor enables no-code web experiments, with AI-assisted changes, while mobile experimentation remains code-dependent. Slack was recommended for support, and onboarding materials will be shared as a PDF or PowerPoint.\n\n## Keywords\nGrowthbook, feature flags, experimentation, visual editor, deterministic hashing, metrics slicing\n\n## Action Items\n\n**Chris Sanders**\nSend a summarized presentation deck (PowerPoint or PDF) covering Growthbook onboarding and experimentation overview to Cindy Vega (39:12)\nProvide support via Slack channel and coordinate escalation to data scientists for any advanced statistical inquiries from the team as needed (38:31)\n\n**Cindy Vega**\nReceive Growthbook overview deck from Chris Sanders (39:12)\n\n**Jenny Yang**\nExplore Growthbook Visual Editor plugin further and prepare any follow-up questions as internal experimentation use matures (37:58)\n",
+      "organizer": "chris@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

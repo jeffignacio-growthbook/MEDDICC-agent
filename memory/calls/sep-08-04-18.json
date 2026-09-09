@@ -1,0 +1,18 @@
+{
+  "company": "Sep 08, 04:18",
+  "slug": "sep-08-04-18",
+  "last_etl_date": "2026-09-09T06:13:44.374256",
+  "calls": [
+    {
+      "id": "01M21AQX9XVF02W1TZZ9QA87MB",
+      "source": "fireflies",
+      "title": "Sep 08, 04:18 PM",
+      "date": "2026-09-08",
+      "duration_minutes": null,
+      "summary": "# Sep 08, 04:18 PM\nDate: 2026-09-08 | Duration: Unknown\n\n## Summary\nThe team selected GrowthBook as Natera’s preferred experimentation platform because of its predictable user-based pricing, unlimited experiments and feature flags, flexibility, and balance between engineering capabilities and usability for marketing and product teams. Statsig was viewed as inflexible and opaque, while Optimizely was considered too focused on web applications. GrowthBook can deploy a cloud POC within 1–2 weeks, followed by testing over approximately four weeks, beginning with 20 users and customizable admin roles. The initial use case will test notification variants and measure click-throughs and downstream actions, including blood-draw scheduling. Heap currently captures some events, but gaps remain in tracking final outcomes. The teams are evaluating GrowthBook’s managed warehouse or existing data infrastructure, with the long-term data source still undecided. QA approval is required before launch but will not delay setup. GrowthBook will create a Slack workspace, provide SDK guidance, manage trial conversion and provisioning, and offer async support.\n\n## Keywords\nGrowthBook, experimentation, POC, data warehouse, SDK integration, pricing model\n\n## Action Items\n\n**Scott Keller**\nCompile meeting track including openers and enter Copilot mode for live transcript capture to ensure accurate meeting documentation (00:15)\nSet up a shared Slack workspace for GrowthBook and Natera collaboration and invite respective teams to facilitate ongoing communication and async support (34:50)\nAssist Natera with SDK integration, managed warehouse usage, and provide onboarding materials including the skills library to reduce engineering friction (34:04)\nProvide ongoing support via Slack for technical questions and coordination during POC execution to ensure smooth collaboration and issue resolution (35:00)\n\n**Cameron**\nInitiate the GrowthBook trial activation on app.growthbook.io and designate admin roles for the POC to begin hands-on evaluation (35:16)\n\n**Natera internal team**\nDecide internally on data management strategy regarding whether to use Natera's data warehouse or GrowthBook's managed warehouse as a temporary solution for the POC (33:39)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "PMM + DevRel",
+  "slug": "pmm-devrel",
+  "last_etl_date": "2026-09-09T06:13:44.377815",
+  "calls": [
+    {
+      "id": "01M1MYRR9MT3KDFHRQ23NRPFYK",
+      "source": "fireflies",
+      "title": "PMM + DevRel + Ashley prioritization sync",
+      "date": "2026-09-08",
+      "duration_minutes": 32.88999938964844,
+      "summary": "# PMM + DevRel + Ashley prioritization sync\nDate: 2026-09-08 | Duration: 32.88999938964844m\n\n## Summary\nThe discussion identified four product marketing priorities: product launches, sales enablement, product adoption, and pricing, with pricing work described as often difficult to control. Customer enablement and adoption were emphasized through increased product usage, expansion within existing customers, interviews, and testimonials. Pricing concerns included event-based pricing, lowering the user cap from 50 to 30, event forwarder compatibility issues raised by Jeremy and Dan, scattered pricing information, updates to battle cards and comparison pages, and possible customer backlash. DevRel priorities included scaling engagement, product adoption, enablement, and internal enablement, supported by seeded GitHub discussions, documentation improvements, AI onboarding, and direct community interactions. The MCP server was proposed as a primary adoption vehicle, with usage potentially tracked through documentation page hits and telemetry. Initiative cards will support MCP adoption and a testimonial pipeline, using interviews, quotes, and webinar signups as metrics. Scott will draft the MCP usage initiative, Elyse will draft the testimonial pipeline, and collaboration with Alyssa will support cross-team tactics. The group stressed concise initiatives, measurable goals, finite timelines, and a limited number of concrete monthly priorities.\n\n## Keywords\nMCP Server, Product Adoption, Sales Enablement, Customer Testimonials, Pricing Strategy, Community Engagement\n\n## Action Items\n**Alyssa Nicoll**  \nProvide copied list of DevRel priorities (16:05)  \nCollaborate with Scott Bailey and Elyse Fox on initiatives (29:00)  \n\n**Ashley Stirrup**  \nFollow up with Jerry, Carrie, and Jake (26:53)  \n\n**Scott Bailey**  \nDraft initiative card for MCP usage (22:37)  \nCoordinate with Alyssa Nicoll on tactic ownership (28:58)  \n\n**Elyse Fox**  \nDraft initiative card for testimonial pipeline (28:37)  \nShare sales and customer success workflow book with Scott Bailey (30:15)",
+      "organizer": "alyssa@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

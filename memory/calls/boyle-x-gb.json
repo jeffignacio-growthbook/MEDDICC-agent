@@ -1,0 +1,18 @@
+{
+  "company": "Boyle x GB",
+  "slug": "boyle-x-gb",
+  "last_etl_date": "2026-09-09T06:13:44.380539",
+  "calls": [
+    {
+      "id": "01M1PPXTJRQ9EX90FRBYTN2EJ4",
+      "source": "fireflies",
+      "title": "Boyle x GB: Data Warehouse Support",
+      "date": "2026-09-08",
+      "duration_minutes": 41.970001220703125,
+      "summary": "# Boyle x GB: Data Warehouse Support\nDate: 2026-09-08 | Duration: 41.970001220703125m\n\n## Summary\nTwo .NET A/B tests are configured and working in lower environments through GrowthBook, including 50% feature allocation, but production exposure tracking and analysis remain pending. The main unresolved decision is where experiment data should be stored and analyzed. BigQuery is supported, already receives replicated GA4 data, and is analyzed by the BI team through Tableau; GrowthBook is connected to BigQuery and displaying metrics. GA4 coverage may represent only about 60% of activity because collection depends on GDPR cookie consent, so direct warehouse logging may be considered. Existing experience metrics are available once exposure events can be queried. Duplicate exposure events are occurring across page views or requests, including when content was not served; Pravin Nair will review the C# SDK implementation with Niall Mulholland. GrowthBook supports targeted customer identifier lists, although payload size can limit large audiences. Winning variants can be rolled out through force rules or exposed to 100% of traffic while application release work is pending. Questions can continue through email or Slack.\n\n## Keywords\nGrowthBook, A/B experimentation, BigQuery, GA4, Oracle, Exposure events\n\n## Action Items\n**Pravin Nair**\n- Review C# SDK implementation (26:13)\n\n**Emma McDonnell**\n- Confirm BoyleSports data source (30:07)\n- Add colleagues to Slack channel (40:11)\n\n**Chris Sanders**\n- Investigate duplicate exposure events (32:16)",
+      "organizer": "cris@growthbook.io",
+      "participants": 14,
+      "summary_quality": "good"
+    }
+  ]
+}

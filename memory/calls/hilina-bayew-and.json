@@ -1,0 +1,18 @@
+{
+  "company": "Hilina Bayew and",
+  "slug": "hilina-bayew-and",
+  "last_etl_date": "2026-09-09T06:13:44.380819",
+  "calls": [
+    {
+      "id": "01M1V8B770A0TBSSGYB7PVWDC8",
+      "source": "fireflies",
+      "title": "Hilina Bayew and James Shannon",
+      "date": "2026-09-08",
+      "duration_minutes": 44.34000015258789,
+      "summary": "# Hilina Bayew and James Shannon\nDate: 2026-09-08 | Duration: 44.34000015258789m\n\n## Summary\nThe team reviewed a GrowthBook implementation using front-end SDKs for local experiment evaluation, customizable targeting attributes, cached variants, multivariate rules, and optional webhooks or streaming. Experiment events—including experiment ID, variant ID, user ID, and timestamp—would flow through Google Analytics into Snowflake, where metrics such as LTV are stored. GrowthBook would use read-only Snowflake access for statistical analysis, with BI support needed to configure fact tables and metric definitions. Anonymous hashed identifiers, cookies, and fallback attributes would support privacy-conscious tracking across user states. Proxy, Edge SDK, and server-side options were discussed to reduce flicker and performance impact. The platform supports Visual Editor and code-based experiments, feature flags, gradual rollouts, guardrails, automated rollback, approval workflows, and UI or API controls. The team selected the Pro tier at 40 users per month and planned a two-week trial after internal coordination. Joachim, Laszlo, and the technical team found the integration feasible, while Susanne and Joachim would coordinate trial preparation; James offered ongoing support.\n\n## Keywords\nSDK Integration, Snowflake Data Warehouse, A/B Testing, Feature Flags, Visual Editor, Experiment Metrics\n\n## Action Items\n\n**Joachim Løvf**\nCoordinate with internal BI/data team to specify Snowflake fact tables and metrics for GrowthBook integration (37:10)\n\n**Susanne Reinertsen**\nLead internal conversations on trial start and trial feedback, coordinate with Joachim and data team, and liaise with James for potential follow-up (40:40)\n\n**James Shannon**\nProvide technical support and respond to any questions during trial; follow-up with Sats team in approximately one month to check progress (42:51)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}

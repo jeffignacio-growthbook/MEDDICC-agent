@@ -1,0 +1,18 @@
+{
+  "company": "Gen + GrowthBook",
+  "slug": "gen-growthbook",
+  "last_etl_date": "2026-09-09T06:13:44.374826",
+  "calls": [
+    {
+      "id": "01M1KZ892F3WYJ8GZSG4F1NYCH",
+      "source": "fireflies",
+      "title": "Gen + GrowthBook",
+      "date": "2026-09-08",
+      "duration_minutes": 17.190000534057617,
+      "summary": "# Gen + GrowthBook\nDate: 2026-09-08 | Duration: 17.190000534057617m\n\n## Summary\nThe team reviewed a legacy self-hosted GrowthBook Pro plan dating back to 2005, priced at $20 per user with unlimited seats, and discussed whether those terms can continue. The account lists 89 seats, including approximately 70 active users, primarily engineers, product managers, analytics professionals, and some designers. GrowthBook is used mainly for visual and backend experimentation, data bucketing, and URL-specific testing across partner pages, while feature flagging remains limited and is still handled partly through Split. Experiments are documented according to BI criteria and technically curated by engineers, with front-end teams leading creation and rollout. GrowthBook 5.0 introduces a reworked REST API supporting agent-led workflows and external management of experiments and feature flags. The team also discussed demonstrating the visual editor and integrated feature flags, potentially consolidating tools. Christian Liebenow will investigate pricing, licensing, and seat-count implications, while Kristin Papadopoulos will coordinate introductions to front-end and product leaders, including Jerome, for follow-up discussions.\n\n## Keywords\nGrowthBook, experimentation, legacy plan, feature flags, visual editor, user licensing\n\n## Action Items\n\n**Christian Liebenow**\nInvestigate grandfathered pricing and user cap policies for GrowthBook legacy plans and report back to Erik and Kristen (15:30)\nFacilitate introductions to front end and product teams most active in GrowthBook usage for further discussion and onboarding (10:25)\n\n**Kristen Papadopoulos**\nProvide accurate information about use of the GrowthBook visual editor versus traditional experiment setup and confirm (12:13)\nSchedule a follow-up meeting including Jerome (front end counterpart) for deeper discussion after Christian’s updates (11:54)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

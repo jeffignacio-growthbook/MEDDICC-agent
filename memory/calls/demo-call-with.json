@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-09-05T05:59:01.758507",
+  "last_etl_date": "2026-09-09T06:13:44.378760",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -730,6 +730,17 @@
       "summary": "# Demo Call with Bartosz Królikowski from\nDate: 2026-09-04 | Duration: 35.310001373291016m\n\n## Summary\nThe discussion focused on replacing a complex, notebook-based experimentation system with Growthbook to make analysis faster, more reliable, and easier to scale. The team runs about 10 to 20 experiments per month, but manual power analysis, monitoring, metric definition, and custom AI work require significant effort. Growthbook’s AI capabilities, MCP server, experiment automation, and planned insights and recommendations were considered promising. BigQuery is the main data warehouse, with experiment assignments already available, enabling integration through assignment SQL and metrics defined on existing tables. Key experimentation goals include improving user lifetime value, retention, engagement, conversion, and user satisfaction across web and mobile apps. Growthbook also described plans for a simpler interface combining feature flags and experiments, query-cost optimization, and expanded AI functionality. Enterprise pricing includes a US$50,000 to 100,000 base license plus US$1,000 per user annually with unlimited experiments, while an alternative per-experiment model is available. Growthbook will provide pricing and roadmap materials, and the customer will share traffic and user data before a follow-up next Thursday at 1:00 PM.\n\n## Keywords\nExperimentation, Power Analysis, Feature Flagging, Pricing Model, Data Warehouse, AI Integration\n\n## Action Items\n\n**Marcel Geldner**\nRequest marketing team about providing a suitable background for remote meetings (00:54)\nSend a deck with roadmap summary, enterprise plan details, pricing structure, and feature explanations to Bartosz (17:13)\nFollow up with Growthbook development team regarding dynamic power calculator capabilities and feature roadmap feedback from Zoe (20:55)\nSchedule and send an invite for a follow-up call with Zoe on Thursday at 1:00 PM (33:32)\nPrepare pricing and licensing breakdown clarifications between per-user and per-experiment models for Zoe (28:11)\nRequest Zoe for company size, user traffic metrics, and other relevant data to tailor pricing and product fit (33:02)\n\n**Bartosz Królikowski**\nCollect and provide internal data on user traffic and monthly experiment volume to Growthbook for pricing discussion (32:46)\nPresent Growthbook pricing and plan details to Zoe leadership and seek internal approval or feedback (32:46)\nParticipate in follow-up meeting next Thursday at 1:00 PM to discuss fit, pricing, roadmap, and next steps (33:46)\n",
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M1W3437N60WBNXTDBWMDX7Y5",
+      "source": "fireflies",
+      "title": "Demo Call with Moa Sjöberg from",
+      "date": "2026-09-08",
+      "duration_minutes": 38.540000915527344,
+      "summary": "# Demo Call with Moa Sjöberg from\nDate: 2026-09-08 | Duration: 38.540000915527344m\n\n## Summary\nThe team evaluated upgrading from Pro to Enterprise, with holdout groups identified as the main need because marketplace traffic fluctuations make baseline comparisons difficult. Enterprise also offers ramp schedules, guardrails, automatic rollback, approval workflows, experiment templates, checklists, dashboards, and private support. Current testing covers product grouping, search improvements, and shipping fees across markets, supported by approximately 3 million monthly sessions. The team is also considering Multi Armed Bandit capabilities, AI-assisted insights, MCP connections, and analytics through GA4 and BigQuery to make experimentation more accessible. GrowthBook’s Visual Editor was valued for quick, low-barrier UI tests, though URL redirects were recommended for major redesigns. Enterprise pricing starts around $20,000 annually for approximately 10 seats. GrowthBook will provide holdout guidance, documentation on experiment scale and ramp schedules, and additional product information while the team evaluates costs and benefits.\n\n## Keywords\nholdout groups, ramp schedules, enterprise features, A/B testing, visual editor, AI integration\n\n## Action Items\n\n**Dan Wathne**\nFollow up with Lizbeth Reyes and Moa Sjöberg via email providing detailed insights from data scientist on holdout segment strategies for e-commerce (23:58)\nInclude more information on the Enterprise “scale impact” feature and other relevant Enterprise documentation in follow-up email (26:33)\nShare resources about AI features, MCP connection, and skills library for easier experimentation and data analysis (28:57)\n\n**Moa Sjöberg**\nReview Enterprise features internally and discuss among the team regarding potential upgrade decision (26:13)\n\n**Despina Tsalavoutis**\nProvide web traffic data later (daily or monthly) as requested for more precise planning (15:54)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 5,
       "summary_quality": "good"
     }
   ]

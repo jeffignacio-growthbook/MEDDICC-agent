@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook POC for",
+  "slug": "growthbook-poc-for",
+  "last_etl_date": "2026-09-09T06:13:44.374095",
+  "calls": [
+    {
+      "id": "01M20JTGE3HVZBV2JG92YYXDGC",
+      "source": "fireflies",
+      "title": "GrowthBook POC for Natera",
+      "date": "2026-09-08",
+      "duration_minutes": 30.309999465942383,
+      "summary": "# GrowthBook POC for Natera\nDate: 2026-09-08 | Duration: 30.309999465942383m\n\n## Summary\nThe team selected GrowthBook as Natera’s preferred experimentation platform after comparing it with Optimizely and Statsig, citing flexibility, multi-channel support, self-hosted and warehouse-native capabilities, and a predictable flat user-based pricing model. GrowthBook currently offers unlimited experiments and feature flags under this approach, while event-based pricing is planned for November 1 without forcing existing customers to switch immediately. A cloud deployment was preferred for the POC because it simplifies setup, although self-hosting remains an option. Natera uses Heap and Data Mesh, but experiment metrics must be available in Snowflake, BigQuery, or GrowthBook’s managed warehouse; Heap can be supplemented through SDK events and callbacks. QA approval and security review are pending but do not block setup, while the BAA and contractual terms addressed legal concerns. Cameron’s trial account has 20 seats, and a shared Slack channel will support integration, data strategy, and experimentation work.\n\n## Keywords\nPOC, GrowthBook, Data Warehouse, SDK Integration, Pricing Model, Experimentation\n\n## Action Items\n\n**Scott Keller**\nCreate a shared Slack workspace for GrowthBook and Natera teams to facilitate communication and support (25:10)\nConvert Natera trial account into an enterprise Proof of Concept (POC) with admin rights and assign access for approximately 20 users (25:45)\nSend Slack invitation and support contacts to Natera team, monitor for questions, and provide assistance as needed (25:40)\n\n**Cameron Henlin**\nSpin up the GrowthBook trial account and confirm the setup is complete and ready for use (28:23)\nManage internal discussions regarding data usage and hosting decisions, specifically choosing between Snowflake and GrowthBook managed warehouse for the POC (23:50)\nCommunicate updates, questions, and decisions regarding the POC and data management via the shared Slack channel post-meeting (29:07)\n\n**Natera Engineering/Analytics Team**\nIdentify the subset of events and metrics needed for POC measurement, potentially duplicating event data from Heap for GrowthBook ingestion (18:00)\nCoordinate with GrowthBook team on SDK integration and usage of the managed warehouse for event data collection during the POC (23:50)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

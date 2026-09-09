@@ -1,0 +1,18 @@
+{
+  "company": "Alla Roman and",
+  "slug": "alla-roman-and",
+  "last_etl_date": "2026-09-09T06:13:44.380680",
+  "calls": [
+    {
+      "id": "01M1VQCR9C59HS5H0DXBD1GDYT",
+      "source": "fireflies",
+      "title": "Alla Roman and Graham McNicoll",
+      "date": "2026-09-08",
+      "duration_minutes": 48.04999923706055,
+      "summary": "# Alla Roman and Graham McNicoll\nDate: 2026-09-08 | Duration: 48.04999923706055m\n\n## Summary\nGrowthBook and the client evaluated how to introduce server-side experimentation within an edge-caching and paywall environment. GrowthBook described cache-key variants, Edge workers, deterministic hashing, and a modular open-source SDK compatible with CloudFront, Lambda, and similar edge environments. The client highlighted Cloudflare function-size constraints, aggressive caching, entitlement-based page routing, and the need to reduce edge-compute load, with a separate Lambda proposed for experiment assignments and cache keys. Both sides agreed that a technical POC and sandbox are the immediate priorities, including Astro deployment changes for versioning and rollbacks. The client plans to use BigQuery for analytics and can begin with GrowthBook’s free tier. GrowthBook also offered cloud-hosted or self-hosted deployment, direct engineer access, Slack communication, code reviews, training, and tailored enterprise support. The initiative is driven by declining revenue and a need to rebuild product-market fit, while adoption is expected to expand gradually. European contacts and an open-source, collaborative culture were viewed positively.\n\n## Keywords\nA/B testing, server-side rendering, caching, Edge worker, GrowthBook SDK, proof of concept\n\n## Action Items\n\n**Alla Roman**\nAssist in internal deployment adjustments to support proof of concept (POC) with version control and rollback capabilities (23:21)\nParticipate in technical testing and share implementation strategies with GrowthBook for feedback and best practice alignment (34:10)\n\n**Chris (Christian Juerges)**\nCoordinate with Alfredo and internal teams to prepare test environment and understand system requirements for GrowthBook integration (23:24)\nInitiate sandbox environment setup and conduct proof of concept testing for GrowthBook server-side experimentation (24:32)\nShare technical implementation code and integration details with GrowthBook engineers for review and best practice feedback (26:11)\n\n**Hal Taylor**\nLead internal coordination between product and infrastructure teams to explore technical feasibility and requirements with GrowthBook (09:00)\nEngage with GrowthBook on architectural constraints and escalate technical obstacles as needed to ensure smooth integration (40:10)\n\n**Marcel Geldner**\nSummarize meeting outcomes and send follow-up email including contact details and agreed next steps to Tamedia team (41:11)\nAct as main GrowthBook contact for Tamedia, supporting technical and strategic discussions throughout the integration process (38:26)\n\n**Remy Marin**\nProvide technical support during implementation and serve as direct contact alongside Marcel for troubleshooting and guidance (39:39)\n\n**James Shannon**\nProvide information on free tier SDK access and guide Tamedia on proof of concept contracting options (31:32)\nSupport commercial and enterprise feature discussions as Tamedia progresses in their experimentation adoption (37:24)\nAssist in establishing communication channels, including potential shared Slack channel, for direct technical support and collaboration (34:10)\n",
+      "organizer": "graham@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

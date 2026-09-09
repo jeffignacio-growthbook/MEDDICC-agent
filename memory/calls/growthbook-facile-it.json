@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook | Facile.it",
+  "slug": "growthbook-facile-it",
+  "last_etl_date": "2026-09-09T06:13:44.377951",
+  "calls": [
+    {
+      "id": "01M1PPXTK20AH8PZYXRS0BGB30",
+      "source": "fireflies",
+      "title": "Growthbook | Facile.it",
+      "date": "2026-09-08",
+      "duration_minutes": 29.239999771118164,
+      "summary": "# Growthbook | Facile.it\nDate: 2026-09-08 | Duration: 29.239999771118164m\n\n## Summary\nGrowthBook was adopted about three years ago to replace Google Optimize and now supports client- and server-side experiments, feature flags, and product and marketing experimentation across 20 product teams using Node, PHP, React, and React Native. Around 300 experiments are launched annually, with marketing experiments embedded in a Strapi CMS. Product teams use experimentation to guide feature iterations before releases, while the company continues adapting its processes because of AI. The company uses a GrowthBook proxy server to limit API calls, though its cloud-hosting status still needs confirmation, and cloud migration remains a possible area of interest. Mixpanel remains the preferred product analytics tool because of its funnel-building capabilities and speed; GrowthBook analytics has not been deeply explored. BigQuery supports GrowthBook queries, while Mixpanel uses a proprietary OLAP database, and managed ClickHouse was discussed. Renewal is due at the end of the month, with 75 full seats and 15 read-only seats. A multi-year commitment may support pricing, and the CEO will sign the order form. React Native mobile development is a priority, with the goal of increasing loyalty and lifetime value. No immediate training is needed, but a future analytics proof of concept remains possible.\n\n## Keywords\nGrowthBook, experimentation, feature flagging, product analytics, mobile app, renewal\n\n## Action Items\n**Alessandro Perduca**  \nConfirm details about GrowthBook's cloud infrastructure (12:52)  \nDiscuss internal needs and stakeholder requirements (25:33)  \nProvide feedback on renewal proposal and pricing (25:43)  \n\n**Andy Marshall**  \nPrepare contract details and pricing numbers (23:10)  \nSend renewal proposal via email to Facile (27:43)  \nSchedule renewal meeting for next Tuesday (27:43)  \n\n**Chris Sanders**  \nOffer to run proof of concept for product analytics module (19:16)",
+      "organizer": "marsh@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

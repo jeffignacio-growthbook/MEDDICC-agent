@@ -1,0 +1,18 @@
+{
+  "company": "Speero <> GrowthBook",
+  "slug": "speero-growthbook",
+  "last_etl_date": "2026-09-09T06:13:44.376029",
+  "calls": [
+    {
+      "id": "01M1W1R6QPGFB284WZV0PY493W",
+      "source": "fireflies",
+      "title": "Speero <> GrowthBook: Circus 2027",
+      "date": "2026-09-08",
+      "duration_minutes": 43,
+      "summary": "# Speero <> GrowthBook: Circus 2027\nDate: 2026-09-08 | Duration: 43m\n\n## Summary\nGrowth Book reported that its business tripled in size, now serving more than 3,000 companies, including over 150 enterprise customers and more than 1,000 self-serve paid plans, with major clients such as Anthropic, Xai, Mistral, Salesforce, and Wikipedia. Its Open Core model supports small developer teams through a free version while Pro and enterprise offerings add governance, scalability, and optimized data pipelines. The product combines experimentation, feature flagging, product analytics, and AI-enabled automation integrated with tools such as Cursor, Codex, and Claude Code. The parties discussed a comprehensive 2027 event partnership for London and a US conference, including sponsorship discounts, speaker sourcing, co-marketing, ABM, customer storytelling, and six months of preparation. The US event may move from Austin to New York to attract more high-value practitioners. Standard sponsorship is around $100K per event, with discounts linked to co-sponsorship and active support. Ben Labay will send a detailed proposal within 24 hours, followed by discussions on messaging, analytics, and technical capabilities.\n\n## Keywords\nGrowth Book, feature flagging, experimentation, Circus 2027, partnership, event sponsorship\n\n## Action Items\n\n**Ben Labay**\nSend updated sponsorship proposal and commercial pitch for Circus 2027 events, including decision tree for location options (London, Austin, possible New York) within 24 hours (32:27)\nFollow up on agreement discussions and refine event partnership terms after sending the sponsorship proposal (32:38)\n\n**Ashley Stirrup**\nProvide potential speakers and customer champions for event participation and content collaboration (18:42)\nEngage with Speero team on co-marketing, content planning, and moderation roles as part of the six-month pre-event partnership activities (14:44)\n\n**Lyndsie Berens**\nCoordinate on executive-level attendee recruitment for events and support joint marketing efforts (25:26)\n\n**Jonny Longden**\nContinue developing shared narrative around feature flagging, experimentation, and telemetry to align with Growth Book’s offerings and event themes (27:33)\n",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}
