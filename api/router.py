@@ -1816,8 +1816,27 @@ async def dynamic_query_loop(question, history, params,
         except Exception as e:
             logger.error(f"[FALLBACK] Failed to write fallback_log: {e}")
 
-    def _diagnostic_answer(tail):
+    def _diagnostic_answer(tail, reason_tag=None):
         """PLAIN user-facing sentence — names what fell through, no jargon."""
+        # Check if budget exhausted with verified dimension coverage
+        if reason_tag == "budget_exhausted" and accumulated_data:
+            from api.dimension_verification import verify_dimension_coverage
+
+            verification = verify_dimension_coverage(
+                question=question,
+                queries_run=queries_run,
+                accumulated_data=accumulated_data
+            )
+
+            if verification["verified"]:
+                # We have the correct data (filters match question), just ran out of budget
+                return (
+                    f"I found the data you asked for but ran out of processing "
+                    f"budget before I could summarize it fully. Try asking the "
+                    f"question again — the query will be faster the second time."
+                )
+
+        # Default diagnostic message
         if origin_handler:
             what = _FRIENDLY_HANDLER.get(
                 origin_handler, "answering that the usual way")
@@ -1833,7 +1852,7 @@ async def dynamic_query_loop(question, history, params,
         """Return an answered=False result with a plain diagnostic + log."""
         _fallback_log(reason_tag)
         return {
-            "answer": _diagnostic_answer(tail),
+            "answer": _diagnostic_answer(tail, reason_tag=reason_tag),
             "tool_results": _extract_rows_from_accumulated(
                 accumulated_data, sb=sb),
             "answered": False,
@@ -2328,6 +2347,43 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         logger.info(f"[STORE] saved step_{iteration}: {row_count} rows total "
                     f"({sample_size} in aggregate, {len(result.get('rows', []))} in raw), "
                     f"keys: {list(accumulated_data.keys())}")
+
+        # CHECK: Was this a verification retry that succeeded?
+        # If previous iteration forced a retry due to missing dimension filter,
+        # and this iteration's tool call added that filter, synthesize immediately
+        # instead of continuing loop (saves tokens, prevents budget exhaustion)
+        if iteration > 0 and row_count > 0:
+            from api.dimension_verification import verify_dimension_coverage
+
+            verification_check = verify_dimension_coverage(
+                question=question,
+                queries_run=queries_run,
+                accumulated_data=accumulated_data
+            )
+
+            if verification_check["verified"]:
+                # Verification NOW passes (required filter was added)
+                # Check if it previously failed (would have forced this retry)
+                # If so: synthesize immediately from this data
+                prev_queries = queries_run[:-1]  # All queries except the one just completed
+                if prev_queries:
+                    prev_verification = verify_dimension_coverage(
+                        question=question,
+                        queries_run=prev_queries,
+                        accumulated_data=accumulated_data
+                    )
+
+                    if not prev_verification["verified"]:
+                        # Previous iteration failed verification, this one passed
+                        # This means the retry succeeded - synthesize immediately
+                        logger.info(
+                            f"[DIMENSION_VERIFY] Retry succeeded - required filters now present. "
+                            f"Synthesizing immediately to avoid budget exhaustion."
+                        )
+
+                        # Force synthesis by calling _finalize_from_data
+                        # This uses the data we just retrieved
+                        return _finalize_from_data("dimension_retry_succeeded")
 
         # PART 2b: a tool call that returns zero rows is no forward progress.
         # Two no-progress steps in a row end the loop.
