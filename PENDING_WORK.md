@@ -133,10 +133,11 @@ None currently.
 
 **Evidence:**
 - EMEA pipeline question (Sept 9, 2026): "How has EMEA pipeline moved in the last 2 weeks"
-- Retrieved data showed: Aug 28 ($20K won, $100K lost), Sep 7-8 ($0 activity)
+- "Last 2 weeks" = Aug 26 - Sep 9
+- Retrieved data showed: Aug 28 ($20K won, $100K lost = $120K), Sep 7-8 ($0 activity)
 - LLM had ALL 20 rows with correct data
 - Reported: "$0 across all movements" (anchored on rows 13-20, the most recent Sep 7-8 data)
-- **Silently dropped $120K of activity from Aug 28**
+- **Silently dropped $120K of Aug 28 activity** ($20K won, $100K lost)
 
 **Impact:** High - affects all time-range aggregation questions
 - No reconciliation check catches synthesis errors (underlying data was correct)

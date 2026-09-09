@@ -10,11 +10,11 @@
 
 While verifying the waterfall integration fix from Sept 8, a Slack query revealed a synthesis bug:
 
-**User Question:** "How has EMEA pipeline moved in the last 2 weeks"
+**User Question:** "How has EMEA pipeline moved in the last 2 weeks" (asked Sept 9)
 
 **LLM Response:** "$0 across all movements"
 
-**Actual Data:** $20K won + $175K lost = $195K total activity
+**Actual Data:** $20K won + $100K lost = $120K total activity (Aug 26 - Sep 9)
 
 ---
 
@@ -24,12 +24,14 @@ While verifying the waterfall integration fix from Sept 8, a Slack query reveale
 The backend correctly retrieved 20 EMEA waterfall rows covering Aug 17 - Sep 8:
 
 ```
-Rows 1-4:   Aug 17 ($75K lost in Unknown segment)
+Rows 1-4:   Aug 17 ($75K lost - OUTSIDE "last 2 weeks" window)
 Rows 5-8:   Aug 24 ($0 activity)
-Rows 9-12:  Aug 28 ($20K won Mid-Market, $100K lost SMB)
+Rows 9-12:  Aug 28 ($20K won Mid-Market, $100K lost SMB) ← ACTIVITY HERE
 Rows 13-16: Sep 7  ($0 activity)
 Rows 17-20: Sep 8  ($0 activity)
 ```
+
+**Note:** "Last 2 weeks" from Sept 9 = Aug 26 - Sep 9. Only Aug 28 activity ($120K) falls in this window.
 
 ### Synthesis Failure (Incorrect)
 The LLM had all 20 rows but reported "$0 across all movements."
@@ -39,7 +41,7 @@ The LLM had all 20 rows but reported "$0 across all movements."
 2. Noticed rows 13-20 (most recent 8 rows) all showed $0
 3. Anchored on "recent weeks are flat" pattern
 4. Reported flatness as representative of full period
-5. **Silently dropped $120K of Aug 28 activity** (rows 9-12)
+5. **Silently dropped $120K of Aug 28 activity** (rows 9-12: $20K won, $100K lost)
 
 ---
 
