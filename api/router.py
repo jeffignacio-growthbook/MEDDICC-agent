@@ -1118,13 +1118,14 @@ TOOLS YOU CAN CALL:
   join_tables(primary_table, primary_key, joined_table,
               foreign_key, primary_filters, joined_columns, limit)
   aggregate_results(data, group_by, aggregations)
-    data: list of dicts from a previous filter_table result,
-          OR the string key "step_N" to reference a prior
-          tool result (e.g. "step_0" for the first result)
+    data: ALWAYS use "step_N" to reference a previous result
+          (e.g. "step_0" for the first filter_table result,
+           "step_1" for the second result)
+          NEVER pass the data array directly - always use step reference
     group_by: column name to group by
     aggregations: dict of {{"column": "sum"|"count"|"avg"}}
     Example: aggregate_results(
-      data="step_1",
+      data="step_0",  # Reference to first query result
       group_by="owner_email",
       aggregations={{"deal_value": "sum", "deal_id": "count"}}
     )
@@ -1138,6 +1139,8 @@ RULES:
 - Maximum 5 tool calls per question
 - If data genuinely doesn't exist, say so plainly
 - Never invent numbers
+- When calling aggregate_results, ALWAYS pass data="step_N"
+  NEVER pass data as [] or a full array - step references only
 
 DEFAULT SCOPING (CRITICAL - prevents over-filtering):
 For GENERIC pipeline questions like "What is our pipeline this quarter?":
@@ -2066,13 +2069,56 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
         if tool_name == "aggregate_results":
             data = tool_params.get("data", [])
+            original_ref = data if isinstance(data, str) else None
+
             if isinstance(data, str):
                 # Agent passed a key reference like "step_0"
+                step_ref = data
                 data = accumulated_data.get(data, {}).get("rows", [])
-            elif not isinstance(data, list):
+
+                # VALIDATION: Warn if step reference resolved to empty
+                if not data:
+                    available_steps = [k for k, v in accumulated_data.items()
+                                     if k.startswith("step_") and v.get("rows")]
+                    logger.warning(
+                        f"[BUG] aggregate_results: step reference '{step_ref}' "
+                        f"resolved to empty data. Available steps with data: {available_steps}")
+
+                    # Return error instead of continuing with empty data
+                    result = {
+                        "error": f"Step reference '{step_ref}' has no data. "
+                                f"Available: {available_steps}",
+                        "rows": [],
+                        "validation_failed": "invalid_step_reference"
+                    }
+                    tool_params["data"] = data
+                    # Skip tool execution, use error result
+                else:
+                    tool_params["data"] = data
+                    result = await tool_fn(**tool_params)
+
+            elif isinstance(data, list):
+                # Agent passed data array directly
+                if len(data) == 0:
+                    # Check if previous step had data that should have been referenced
+                    prev_steps_with_data = [
+                        (k, len(v.get("rows", [])))
+                        for k, v in accumulated_data.items()
+                        if k.startswith("step_") and v.get("rows")
+                    ]
+
+                    if prev_steps_with_data:
+                        logger.error(
+                            f"[BUG] aggregate_results received empty array, "
+                            f"but previous steps have data: {prev_steps_with_data}. "
+                            f"LLM should have passed data='step_0' or similar.")
+
+                tool_params["data"] = data
+                result = await tool_fn(**tool_params)
+            else:
                 data = []
-            tool_params["data"] = data
-            result = await tool_fn(**tool_params)
+                tool_params["data"] = data
+                result = await tool_fn(**tool_params)
         elif tool_name == "compare_periods":
             result = await tool_fn(sb, **tool_params)
         else:

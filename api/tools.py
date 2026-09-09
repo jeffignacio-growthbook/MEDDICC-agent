@@ -154,6 +154,23 @@ async def join_tables(sb, primary_table, primary_key, joined_table, foreign_key,
     return {"rows": primary_rows, "total_found": len(primary_rows)}
 
 async def aggregate_results(data, group_by, aggregations):
+    # VALIDATION: Catch empty data bug (66.7% failure rate - see AGGREGATE_RESULTS_BUG_REPORT.md)
+    if isinstance(data, list) and len(data) == 0:
+        return {
+            "error": "Empty data array. Use data='step_N' to reference previous result.",
+            "rows": [],
+            "validation_failed": "empty_array"
+        }
+
+    # VALIDATION: Catch missing group_by column
+    if isinstance(data, list) and data and group_by not in data[0]:
+        available_cols = list(data[0].keys())[:10]
+        return {
+            "error": f"Column '{group_by}' not found in data. Available: {available_cols}",
+            "rows": [],
+            "validation_failed": "invalid_group_by"
+        }
+
     # Validate and convert aggregations format
     if isinstance(aggregations, list):
         # Convert common list format to dict

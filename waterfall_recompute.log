@@ -1,0 +1,207 @@
+Qualification threshold (config): stage_order >= 2; membership is point-in-time via qualified_date
+Loaded qualification (event) data for 1890 deals
+
+Loading deal enrichment data (company_name for test deal filter)...
+Loaded enrichment data for 1890 deals
+Note: Region/segment now sourced from point-in-time snapshot data
+
+Loading deal data for close_date and stage (for won/lost detection)...
+Loaded status data for 1890 deals
+
+======================================================================
+BACKFILL MODE: Computing segmented waterfall for all historical pairs
+======================================================================
+
+Found 57 backfilled snapshot dates
+  Oldest: 2025-08-04
+  Newest: 2026-08-28
+
+Will compute 56 weekly waterfalls
+
+[1/56] Computing 2025-08-11 vs 2025-08-04
+  ✓ Wrote 1 segmented waterfall rows for 2025-08-11
+
+[2/56] Computing 2025-08-18 vs 2025-08-11
+  ✓ Wrote 1 segmented waterfall rows for 2025-08-18
+
+[3/56] Computing 2025-08-25 vs 2025-08-18
+  ✓ Wrote 1 segmented waterfall rows for 2025-08-25
+
+[4/56] Computing 2025-09-01 vs 2025-08-25
+  ✓ Wrote 1 segmented waterfall rows for 2025-09-01
+
+[5/56] Computing 2025-09-08 vs 2025-09-01
+  ✓ Wrote 1 segmented waterfall rows for 2025-09-08
+
+[6/56] Computing 2025-09-15 vs 2025-09-08
+  ✓ Wrote 1 segmented waterfall rows for 2025-09-15
+
+[7/56] Computing 2025-09-22 vs 2025-09-15
+  ✓ Wrote 1 segmented waterfall rows for 2025-09-22
+
+[8/56] Computing 2025-09-29 vs 2025-09-22
+  ✓ Wrote 1 segmented waterfall rows for 2025-09-29
+
+[9/56] Computing 2025-10-06 vs 2025-09-29
+  ✓ Wrote 1 segmented waterfall rows for 2025-10-06
+
+[10/56] Computing 2025-10-13 vs 2025-10-06
+  ✓ Wrote 1 segmented waterfall rows for 2025-10-13
+
+[11/56] Computing 2025-10-20 vs 2025-10-13
+  ✓ Wrote 1 segmented waterfall rows for 2025-10-20
+
+[12/56] Computing 2025-10-27 vs 2025-10-20
+  ✓ Wrote 1 segmented waterfall rows for 2025-10-27
+
+[13/56] Computing 2025-11-03 vs 2025-10-27
+  ✓ Wrote 1 segmented waterfall rows for 2025-11-03
+
+[14/56] Computing 2025-11-10 vs 2025-11-03
+  ✓ Wrote 1 segmented waterfall rows for 2025-11-10
+
+[15/56] Computing 2025-11-17 vs 2025-11-10
+  ✓ Wrote 1 segmented waterfall rows for 2025-11-17
+
+[16/56] Computing 2025-11-24 vs 2025-11-17
+  ✓ Wrote 1 segmented waterfall rows for 2025-11-24
+
+[17/56] Computing 2025-12-01 vs 2025-11-24
+  ✓ Wrote 1 segmented waterfall rows for 2025-12-01
+
+[18/56] Computing 2025-12-08 vs 2025-12-01
+  ✓ Wrote 1 segmented waterfall rows for 2025-12-08
+
+[19/56] Computing 2025-12-15 vs 2025-12-08
+  ✓ Wrote 1 segmented waterfall rows for 2025-12-15
+
+[20/56] Computing 2025-12-22 vs 2025-12-15
+  ✓ Wrote 1 segmented waterfall rows for 2025-12-22
+
+[21/56] Computing 2025-12-29 vs 2025-12-22
+  ✓ Wrote 1 segmented waterfall rows for 2025-12-29
+
+[22/56] Computing 2026-01-05 vs 2025-12-29
+  ✓ Wrote 1 segmented waterfall rows for 2026-01-05
+
+[23/56] Computing 2026-01-12 vs 2026-01-05
+  ✓ Wrote 1 segmented waterfall rows for 2026-01-12
+
+[24/56] Computing 2026-01-19 vs 2026-01-12
+  ✓ Wrote 1 segmented waterfall rows for 2026-01-19
+
+[25/56] Computing 2026-01-26 vs 2026-01-19
+  ✓ Wrote 1 segmented waterfall rows for 2026-01-26
+
+[26/56] Computing 2026-02-02 vs 2026-01-26
+  ✓ Wrote 1 segmented waterfall rows for 2026-02-02
+
+[27/56] Computing 2026-02-09 vs 2026-02-02
+  ✓ Wrote 1 segmented waterfall rows for 2026-02-09
+
+[28/56] Computing 2026-02-16 vs 2026-02-09
+  ✓ Wrote 1 segmented waterfall rows for 2026-02-16
+
+[29/56] Computing 2026-02-23 vs 2026-02-16
+  ✓ Wrote 1 segmented waterfall rows for 2026-02-23
+
+[30/56] Computing 2026-03-02 vs 2026-02-23
+  ✓ Wrote 1 segmented waterfall rows for 2026-03-02
+
+[31/56] Computing 2026-03-09 vs 2026-03-02
+  ✓ Wrote 1 segmented waterfall rows for 2026-03-09
+
+[32/56] Computing 2026-03-16 vs 2026-03-09
+  ✓ Wrote 1 segmented waterfall rows for 2026-03-16
+
+[33/56] Computing 2026-03-23 vs 2026-03-16
+  ✓ Wrote 1 segmented waterfall rows for 2026-03-23
+
+[34/56] Computing 2026-03-30 vs 2026-03-23
+  ✓ Wrote 1 segmented waterfall rows for 2026-03-30
+
+[35/56] Computing 2026-04-06 vs 2026-03-30
+  ✓ Wrote 1 segmented waterfall rows for 2026-04-06
+
+[36/56] Computing 2026-04-13 vs 2026-04-06
+  ✓ Wrote 1 segmented waterfall rows for 2026-04-13
+
+[37/56] Computing 2026-04-20 vs 2026-04-13
+  ✓ Wrote 1 segmented waterfall rows for 2026-04-20
+
+[38/56] Computing 2026-04-27 vs 2026-04-20
+  ✓ Wrote 1 segmented waterfall rows for 2026-04-27
+
+[39/56] Computing 2026-05-04 vs 2026-04-27
+  ✓ Wrote 1 segmented waterfall rows for 2026-05-04
+
+[40/56] Computing 2026-05-11 vs 2026-05-04
+  ✓ Wrote 1 segmented waterfall rows for 2026-05-11
+
+[41/56] Computing 2026-05-18 vs 2026-05-11
+  ✓ Wrote 1 segmented waterfall rows for 2026-05-18
+
+[42/56] Computing 2026-05-25 vs 2026-05-18
+  ✓ Wrote 1 segmented waterfall rows for 2026-05-25
+
+[43/56] Computing 2026-06-01 vs 2026-05-25
+  ✓ Wrote 1 segmented waterfall rows for 2026-06-01
+
+[44/56] Computing 2026-06-08 vs 2026-06-01
+  ✓ Wrote 1 segmented waterfall rows for 2026-06-08
+
+[45/56] Computing 2026-06-15 vs 2026-06-08
+  ✓ Wrote 1 segmented waterfall rows for 2026-06-15
+
+[46/56] Computing 2026-06-22 vs 2026-06-15
+  ✓ Wrote 1 segmented waterfall rows for 2026-06-22
+
+[47/56] Computing 2026-06-29 vs 2026-06-22
+  ✓ Wrote 1 segmented waterfall rows for 2026-06-29
+
+[48/56] Computing 2026-07-06 vs 2026-06-29
+  ✓ Wrote 1 segmented waterfall rows for 2026-07-06
+
+[49/56] Computing 2026-07-13 vs 2026-07-06
+  ✓ Wrote 1 segmented waterfall rows for 2026-07-13
+
+[50/56] Computing 2026-07-20 vs 2026-07-13
+  ✓ Wrote 1 segmented waterfall rows for 2026-07-20
+
+[51/56] Computing 2026-07-27 vs 2026-07-20
+  ✓ Wrote 1 segmented waterfall rows for 2026-07-27
+
+[52/56] Computing 2026-08-03 vs 2026-07-27
+  ✓ Wrote 1 segmented waterfall rows for 2026-08-03
+
+[53/56] Computing 2026-08-10 vs 2026-08-03
+  ✓ Wrote 1 segmented waterfall rows for 2026-08-10
+
+[54/56] Computing 2026-08-17 vs 2026-08-10
+  ✓ Wrote 1 segmented waterfall rows for 2026-08-17
+
+[55/56] Computing 2026-08-24 vs 2026-08-17
+  ✓ Wrote 1 segmented waterfall rows for 2026-08-24
+
+[56/56] Computing 2026-08-28 vs 2026-08-24
+  ✓ Wrote 1 segmented waterfall rows for 2026-08-28
+
+======================================================================
+RECONCILIATION ANALYSIS
+======================================================================
+
+Total group/week combinations: 56
+Perfect reconciliation: 15
+Reconciliation mismatches: 41
+Success rate: 26.8%
+
+Mismatches by group:
+  default/UNKNOWN/Unknown: 41 weeks (73.2%)
+
+✓ ALL MISMATCHES ARE IN UNKNOWN GROUPS
+  This is expected due to boundary crossing (deals changing enrichment)
+  All properly-enriched groups reconcile perfectly
+
+======================================================================
+✓ BACKFILL COMPLETE - FIX VERIFIED
+{'='*70}

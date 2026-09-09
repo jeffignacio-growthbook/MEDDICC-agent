@@ -81,7 +81,58 @@ None currently.
 
 ### High Priority
 
-#### 1. Snapshot ETL Phantom Exits Bug
+#### 1. aggregate_results Empty Data Bug
+**Issue:** LLM passes empty array instead of step reference, causing 66.7% failure rate on aggregate_results calls
+
+**Status:** CONFIRMED (2026-09-09)
+
+**Evidence:**
+- 3 aggregate_results calls in last 30 days
+- 2 returned 0 rows (66.7% failure rate)
+- Pattern: LLM passes `data: []` instead of `data: "step_0"`
+- One failure showed `answered: True` despite empty aggregation (silent data loss)
+
+**Root cause:** Prompt ambiguity - says "list of dicts OR step reference"
+- LLM tries to pass data array
+- Can't include full data in JSON response
+- Defaults to empty array `[]`
+- aggregate_results correctly returns 0 rows for empty input (no validation)
+
+**Impact:** Silent failure - queries complete with missing data
+- Sept 9: Budget exhaustion (visible symptom of underlying bug)
+- Sept 6: Answered successfully despite empty aggregation (silent data loss)
+- Unknown how many other queries affected
+
+**Work required:**
+1. **Prompt fix:** Change "list of dicts OR step reference" to "ALWAYS use step reference"
+   - api/router.py:1120-1130 (aggregate_results tool description)
+   - Add emphasis in RULES section
+2. **Validation fix:** Add empty data check to aggregate_results
+   - api/tools.py:156-193
+   - Return error if data is empty
+   - Return error if group_by column not in data
+3. **Logging fix:** Warn when step reference resolves to empty
+   - api/router.py:2067-2075 (tool execution section)
+   - Log available steps vs requested step
+4. **Test cases:** Add to eval suite
+   - Test empty array → error
+   - Test valid step reference → success
+   - Test missing column → error
+
+**Complexity:** Low effort (prompt change + validation), high impact
+
+**Priority justification:**
+- 66.7% failure rate (nearly all aggregate_results calls fail)
+- Silent failure mode (no error, just missing data)
+- User trust issue ("answered: True" with incomplete data)
+- Already affecting production (2 failures in 4 days)
+- Easy fix with clear root cause
+
+**Documentation:** AGGREGATE_RESULTS_BUG_REPORT.md
+
+---
+
+#### 2. Snapshot ETL Phantom Exits Bug
 **Issue:** Deals occasionally missing from single week's snapshot, causing "phantom exits" in waterfall
 
 **Status:** IDENTIFIED, NOT FIXED
@@ -275,8 +326,8 @@ Without step 3, LLM query builder cannot see the column exists.
 
 ## 📊 Summary
 
-**Total Open Items:** 4
-- High Priority: 2 (snapshot ETL phantom exits, synthesis aggregation gap)
+**Total Open Items:** 5
+- High Priority: 3 (aggregate_results empty data bug, snapshot ETL phantom exits, synthesis aggregation gap)
 - Low Priority: 2 (zero-day cycle times, forecast bugs)
 
 **Recently Completed:** 2
