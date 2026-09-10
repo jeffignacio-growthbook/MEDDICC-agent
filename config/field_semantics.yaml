@@ -61,6 +61,51 @@
 # ============================================================================
 
 # ============================================================================
+# SEGMENTATION SEMANTICS (Enterprise / Mid-Market / SMB) — NOT CONFIRMED
+# ============================================================================
+# STATUS: business definition NOT yet confirmed with Jeff/James (flagged
+# 2026-09-10, from the Zapier CRO Slack agent surfacing it live to James on
+# the EMEA pipeline-movement question). Every segment-based number is
+# uncertain until this is resolved — flag it prominently, do not present
+# segment splits as settled fact.
+#
+# CURRENT DE FACTO IMPLEMENTATION (engineering default, not a confirmed
+# business rule):
+#   - deals.segment is computed at ETL time (scripts/etl_deals.py) from
+#     scripts/utils.get_segment(), banding the associated HubSpot Company's
+#     `numberofemployees` property per config/client.yaml's `segmentation`
+#     block:
+#       SMB:         numberofemployees <= 250
+#       Mid-Market:  251 <= numberofemployees <= 2000
+#       Enterprise:  numberofemployees >= 2001
+#       Unknown:     no employee count or no associated company
+#   - This is deterministic and traceable in code — it is NOT a
+#     query-time guess — but nobody has confirmed with the business that
+#     "numberofemployees on the Company object" is actually what GrowthBook
+#     means by Enterprise vs. Mid-Market vs. SMB. It could instead be an
+#     ARR/deal-size tier, a specific HubSpot deal or company property (e.g.
+#     a dedicated "segment" or "tier" field), or something else.
+#
+# WHAT'S NEEDED TO CLOSE THIS OUT (same tier as the incremental/renewal ARR
+# split above, once answered):
+#   1. Confirm with Jeff/James: what field actually drives Enterprise vs.
+#      Mid-Market vs. SMB at GrowthBook (ARR tier? employee count? a
+#      specific HubSpot property?).
+#   2. Replace this block with the confirmed rule (field, source object,
+#      exact band boundaries) and update config/client.yaml's
+#      `segmentation` block + scripts/utils.get_segment() to match if the
+#      answer differs from the current employee-count bands.
+#   3. Remove the "NOT CONFIRMED" flag from this header and from
+#      scripts/utils.build_semantic_context()'s "## Segmentation" section
+#      once the rule is locked.
+#
+# Until then: any handler or synthesis step that breaks results out by
+# segment (query_pipeline_movement composition view, segment-based
+# coverage/forecast splits, etc.) must state that the segmentation is
+# employee-count-based and unconfirmed — never present it as authoritative.
+# ============================================================================
+
+# ============================================================================
 # PRECOMPUTED TABLES — PREFER THESE OVER RAW AGGREGATION
 # ============================================================================
 # These tables hold reconciled, point-in-time values. Use them instead of

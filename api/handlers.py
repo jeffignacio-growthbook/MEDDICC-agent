@@ -4105,6 +4105,8 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     from the latest snapshot so the thread-context layer can save entities for
     follow-up drill-downs. Counts only — deal_value is never selected/emitted.
     """
+    from datetime import date
+
     load_scope_config, is_in_scope = _pm_load_scoping()
     excluded_pipelines, stage_cfg = load_scope_config()
 
@@ -4136,11 +4138,27 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     if close_date_scope not in ("all", "current_quarter"):
         close_date_scope = "all"
 
-    # Parse time_window for movement view (select snapshots by date)
+    # Parse time_window for movement view (select snapshots by date).
+    #
+    # BUG (2026-09-10): this used to check `time_window.get("type") ==
+    # "relative_days"` and read `time_window.get("days")` — a shape nothing
+    # in the codebase ever produced. The router always resolves time_window
+    # to concrete {"start", "end", "label"} via resolve_time_window() before
+    # any handler runs (see router.route_question), so that check was always
+    # False and requested_days was always None. The 'movement' view then
+    # silently fell back to "compare whichever two snapshots happen to be
+    # most recent on file" for every question, ignoring the user's actual
+    # requested window (e.g. "last 2 weeks" from Sep 10 returning
+    # Aug 17-Aug 28 instead of Aug 27-Sep 10, because that's what the
+    # snapshot cadence happened to have on hand at query time).
     time_window = params.get("time_window", {})
     requested_days = None
-    if time_window and time_window.get("type") == "relative_days":
-        requested_days = time_window.get("days", 0)
+    if time_window and time_window.get("start") and time_window.get("end"):
+        try:
+            requested_days = (date.fromisoformat(time_window["end"])
+                               - date.fromisoformat(time_window["start"])).days
+        except (ValueError, TypeError):
+            requested_days = None
 
     # Explicit, prominent scope statement so a count can be reconciled against
     # a CRM board view (Issue 4). The default counts ALL open deals with no
@@ -4285,6 +4303,22 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     all_dates = sorted(by_date.keys())
 
     base["snapshot_source"] = chosen_source
+
+    # Freshness check: the 'current' snapshot used below is whichever date is
+    # latest ON FILE, not necessarily today's real date. If the pipeline that
+    # writes deals_snapshot has fallen behind, that gap silently shifts the
+    # entire requested window backward with no visible sign to the user (the
+    # 2026-09-10 "last 2 weeks returned Aug 17-28" defect). Flag it instead
+    # of presenting a stale snapshot as "now".
+    if all_dates:
+        stale_days = (date.today() - date.fromisoformat(all_dates[-1])).days
+        if stale_days > 3:
+            data_gaps.append(
+                f"Most recent snapshot on file is {all_dates[-1]}, "
+                f"{stale_days} days behind today ({date.today().isoformat()}). "
+                f"The window below is anchored to that stale snapshot, not "
+                f"to today."
+            )
 
     if not all_dates:
         data_gaps.append(

@@ -861,8 +861,9 @@ Required JSON:
   "params": {{
     "time_window": {{
       "period": "current_quarter|current_month|previous_month|current_week|last_N_days|specific",
-      "start": "YYYY-MM-DD or null",
-      "end":   "YYYY-MM-DD or null"
+      "n": "<REQUIRED integer when period=last_N_days: the number of days back from today, e.g. 'last 2 weeks'=14, 'last 30 days'=30, 'last 10 days'=10; else null>",
+      "start": "YYYY-MM-DD or null — ONLY for period=specific with an explicit date named in the question; never compute this yourself for a relative phrase like 'last N days/weeks', use period=last_N_days + n instead",
+      "end":   "YYYY-MM-DD or null — same rule as start"
     }},
     "company": "<single company name, or null>",
     "companies": "<list of company names when the question names MORE THAN ONE (e.g. 'score Ecco, Zalando and Natera') — [\"Ecco\", \"Zalando\", \"Natera\"]; else null. Put every named company here; do not drop any, and there is no limit.>",

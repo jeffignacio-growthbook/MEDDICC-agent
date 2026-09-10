@@ -590,6 +590,58 @@ def build_semantic_context(config: Optional[Dict] = None) -> str:
     lines.append("")
 
     # ========================================================================
+    # 4b. SEGMENTATION (Enterprise / Mid-Market / SMB)
+    # ========================================================================
+    # UNCONFIRMED WITH GROWTHBOOK (flagged 2026-09-10). deals.segment is
+    # computed at ETL time from config['segmentation'] below — it is NOT a
+    # guess made at query time — but the underlying business rule (does
+    # Enterprise/Mid-Market/SMB actually mean HubSpot Company.numberofemployees
+    # bands, or should it be ARR tier, a specific HubSpot property, or
+    # something else?) has never been confirmed with Jeff/James. Every
+    # segment-based number must say so until that's resolved.
+    seg_cfg = config.get('segmentation', {})
+    lines.append("## Segmentation")
+    lines.append("")
+    if seg_cfg:
+        seg_source = seg_cfg.get('source', 'unknown')
+        seg_field = seg_cfg.get('field', 'unknown')
+        lines.append(
+            f"  deals.segment is currently derived from {seg_source}.{seg_field} "
+            f"(HubSpot property), banded as:"
+        )
+        for band in seg_cfg.get('bands', []):
+            name = band.get('name', '?')
+            min_v, max_v = band.get('min'), band.get('max')
+            if min_v is None and max_v is None:
+                lines.append(f"    {name}: no employee count / no associated company")
+            elif min_v is None:
+                lines.append(f"    {name}: {seg_field} <= {max_v}")
+            elif max_v is None:
+                lines.append(f"    {name}: {seg_field} >= {min_v}")
+            else:
+                lines.append(f"    {name}: {seg_field} {min_v}-{max_v}")
+        lines.append("")
+        lines.append(
+            "  ⚠ UNCONFIRMED BUSINESS RULE: this employee-count banding is "
+            "the engineering default, not a rule GrowthBook has confirmed. "
+            "It has NOT been validated against how Jeff/James actually define "
+            "Enterprise vs. Mid-Market vs. SMB (could be ARR tier, a specific "
+            "HubSpot deal/company property, or something else entirely)."
+        )
+        lines.append(
+            "  Any answer that breaks results out by segment MUST flag this "
+            "uncertainty explicitly (e.g. 'segmented by employee-count bands, "
+            "pending confirmation of the actual business definition') — never "
+            "present segment splits as authoritative."
+        )
+    else:
+        lines.append(
+            "  ⚠ No segmentation config found. Segment splits should be "
+            "refused or flagged as unverifiable, not guessed."
+        )
+    lines.append("")
+
+    # ========================================================================
     # 5. TABLE RELATIONSHIPS
     # ========================================================================
     lines.append("## Table Relationships")
