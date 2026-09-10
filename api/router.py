@@ -1265,6 +1265,19 @@ When you have enough data to answer, format for Slack:
 - Lead with direct answer, then supporting detail
 - End with one actionable insight if relevant
 
+NEVER SHIP YOUR SCRATCHPAD: for a multi-step comparison or diff (e.g.
+"which deals changed stage"), you may reason through a working table or
+narrate to yourself ("let me check X first") in your OWN thinking — but
+none of that belongs in the {{"answer": "..."}} value. If you build a
+table to work out a diff, use it, then discard it: the answer field
+contains ONLY the finished, delivery-ready result. Never write things
+like "let me use what I have and produce the answer now," never include
+a work-in-progress table titled for your own reasoning ("checking for
+stage changes"), and never attempt the answer twice and send both — one
+clean pass, one clean result. If you catch yourself narrating your own
+process, stop and rewrite the answer field as if a colleague asked you
+the question directly and you're giving them the finished number.
+
 MISSING VALUE DETECTION:
 For "missing X" questions (e.g., "missing owner_email", "missing close_date"),
 extract the field name from the question and filter with ["is_", "field_name", "null"].
@@ -1781,6 +1794,46 @@ def verify_snapshot_date_labeling(answer_text: str, tool_results: dict):
 
     unmatched = [d for d in claimed_dates if d not in real_dates]
     return (len(unmatched) == 0), unmatched, real_dates
+
+# Self-referential process narration — a model "thinking out loud" rather
+# than delivering a finished answer. Deliberately narrow and anchored to
+# phrasing that only shows up when the model is describing its OWN next
+# move ("let me now...", "checking for..."), not ordinary customer-facing
+# sign-offs — "let me know if you need more" must not match, so "let me"
+# alone is not a marker; only "let me" followed by a first-person planning
+# verb is.
+_SCRATCHPAD_NARRATION_PATTERNS = [
+    r"\blet me now\b",
+    r"\blet me use what i have\b",
+    r"\blet me (check|verify|compute|recalculate|redo|try|work)\b",
+    r"\bi'll now\b",
+    r"\bi will now\b",
+    r"\bnow (let me |i'll |i will )?(produce|write|give|provide) (the|my) (final |clean )?answer\b",
+    r"\bproduce (the|my) (final |clean )?answer now\b",
+    r"\bstarting over\b",
+    r"\bscratch ?pad\b",
+    r"\bworking notes?\b",
+    r"\bfor my own reasoning\b",
+]
+
+def _looks_like_unfinished_scratchpad(text: str) -> bool:
+    """True when a 'prose answer' (the fallback path for when the model
+    doesn't wrap its response in {"answer": ...} JSON) actually contains
+    self-referential process narration rather than a finished,
+    delivery-ready message.
+
+    2026-09-11 fix: that fallback path accepted ANY non-JSON text over 50
+    characters as the final Slack message, with no check for whether it
+    was actually finished. A live response started with a scratchpad
+    table ("Deals in BOTH snapshots — checking for stage changes"),
+    narrated "let me use what I have and produce the answer now," then
+    attempted a second, cleaner answer — and ALL of it, table plus
+    narration plus both answer attempts, shipped to Slack verbatim,
+    because nothing checked whether the "prose answer" was actually one.
+    """
+    import re
+    lowered = text.lower()
+    return any(re.search(pat, lowered) for pat in _SCRATCHPAD_NARRATION_PATTERNS)
 
 async def _run_precomputed_handler(handler_fn, handler_name, params, sb):
     """
@@ -2342,6 +2395,37 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 not stripped.startswith('```') and
                 len(stripped) > 50 and
                 'tool' not in stripped[:20].lower()):
+
+                # STRUCTURAL GATE (2026-09-11): a "prose answer" that reads
+                # as the model narrating its own process — a scratchpad
+                # table, "let me use what I have," a second attempt after
+                # the first — is not a finished answer. Reject it and force
+                # one more clean synthesis pass instead of shipping raw
+                # internal reasoning to Slack. See
+                # _looks_like_unfinished_scratchpad() docstring for the
+                # incident this closes.
+                if _looks_like_unfinished_scratchpad(stripped):
+                    logger.warning(
+                        f"[LOOP iter={iteration}] prose response looks like "
+                        f"unfinished scratchpad/narration, not a clean final "
+                        f"answer — forcing a clean resynthesis instead of "
+                        f"shipping it. raw[:200]={stripped[:200]!r}"
+                    )
+                    messages.append({"role": "user", "content": (
+                        "⚠️ That response included internal reasoning, a "
+                        "working table, or narration about your own process "
+                        "(e.g. \"let me now...\", \"checking for...\") — not "
+                        "a clean, finished answer. Using the data already "
+                        "gathered, respond with ONLY the finished result, "
+                        "formatted for Slack, as {\"answer\": \"...\"}. Do "
+                        "any reasoning silently — do not include it, and do "
+                        "not attempt the answer more than once."
+                    )})
+                    no_progress_streak += 1
+                    if no_progress_streak >= 2:
+                        return _finalize_from_data("scratchpad_prose_rejected")
+                    continue
+
                 # Treat as direct prose answer
                 logger.info(f"[LOOP iter={iteration}] prose answer detected")
 

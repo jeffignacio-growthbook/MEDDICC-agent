@@ -121,6 +121,18 @@ jobs:
           # picture needs live credentials, see TEST 1b below.
           PYTHONPATH=. python3 tests/test_data_dictionary_registration.py
 
+      - name: "TEST 0f — Offline: scratchpad/narration must not ship as the final answer"
+        run: |
+          set -e
+          # 2026-09-11: the dynamic loop's "prose answer" fallback path (for
+          # when the model doesn't wrap its response in {"answer": ...}
+          # JSON) accepted ANY non-JSON text over 50 chars as the final
+          # Slack message. A live response shipped a scratchpad table plus
+          # "let me use what I have and produce the answer now" plus a
+          # second answer attempt, all concatenated, because nothing
+          # checked whether the "prose answer" was actually finished.
+          PYTHONPATH=. python3 tests/test_scratchpad_answer_rejection.py
+
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
