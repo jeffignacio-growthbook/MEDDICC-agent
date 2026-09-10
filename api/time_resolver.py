@@ -9,11 +9,30 @@ import sys
 import yaml
 from pathlib import Path
 
+def _client_config() -> dict:
+    """Load the full client.yaml config (fiscal + reporting sections)."""
+    cfg_path = Path(__file__).parent.parent / "config" / "client.yaml"
+    return yaml.safe_load(open(cfg_path)) or {}
+
 def _fiscal_config() -> dict:
     """Load fiscal configuration from client.yaml."""
-    cfg_path = Path(__file__).parent.parent / "config" / "client.yaml"
-    cfg = yaml.safe_load(open(cfg_path))
-    return cfg.get("fiscal", {"fy_start_month": 2})
+    return _client_config().get("fiscal", {"fy_start_month": 2})
+
+def _today(config: dict) -> date:
+    """'Today' for every period this module resolves.
+
+    Must be today_in_reporting_tz(), never date.today() — the server runs
+    UTC, but client.yaml's reporting.timezone (e.g. America/New_York) is
+    what "today" means for the business. Using the server clock here
+    silently disagrees with every other reporting-tz-aware caller for part
+    of each evening — this was found auditing the 2026-09-10 date-window
+    incidents: resolve_time_window() was the one function everything was
+    supposed to route through, but it still had its own, different idea of
+    "today" than the rest of the system.
+    """
+    sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+    from sdr_utils import today_in_reporting_tz
+    return today_in_reporting_tz(config)
 
 def current_quarter_label() -> str:
     """
@@ -23,9 +42,9 @@ def current_quarter_label() -> str:
     sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
     from utils import get_fiscal_quarter
 
-    cfg = _fiscal_config()
+    config = _client_config()
     _, _, label = get_fiscal_quarter(
-        date.today(), {"fiscal": cfg})
+        _today(config), {"fiscal": config.get("fiscal", {})})
     return label.replace(" ", "_")
 
 def resolve_time_window(tw: dict) -> dict:
@@ -57,10 +76,11 @@ def resolve_time_window(tw: dict) -> dict:
     if tw is None:
         tw = {}
 
-    today = date.today()
+    config = _client_config()
+    today = _today(config)
     period = tw.get("period", "current_quarter")
-    cfg_wrap = {"fiscal": _fiscal_config()}
-    fiscal_cfg = _fiscal_config()
+    fiscal_cfg = config.get("fiscal", {"fy_start_month": 2})
+    cfg_wrap = {"fiscal": fiscal_cfg}
     fy_start_month = fiscal_cfg.get("fy_start_month", 2)
 
     if period == "fiscal_quarter" or tw.get("fiscal_quarter"):

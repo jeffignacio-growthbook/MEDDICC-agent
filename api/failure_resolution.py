@@ -78,6 +78,9 @@ def find_similar_unresolved_failures(
     Returns:
         List of unresolved failure records
     """
+    # ALLOW-RAW-DATE-MATH: internal ops/diagnostic tool for engineers
+    # inspecting fallback_log — not part of the live Slack Q&A path and
+    # never parses a user's relative time phrase.
     cutoff = (datetime.utcnow() - timedelta(days=lookback_days)).isoformat()
 
     query = sb.table('fallback_log') \
@@ -126,6 +129,8 @@ def get_resolution_stats(sb, days: int = 30) -> Dict:
 
     Useful for understanding what improvements had the biggest impact.
     """
+    # ALLOW-RAW-DATE-MATH: internal ops/diagnostic tool, not the live
+    # Slack Q&A path — see note on find_similar_unresolved_failures above.
     cutoff = (datetime.utcnow() - timedelta(days=days)).isoformat()
 
     # Get all failures in period

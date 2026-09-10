@@ -365,9 +365,6 @@ def get_fiscal_quarter(as_of=None, config: Optional[Dict] = None) -> tuple:
     from datetime import date
     from dateutil.relativedelta import relativedelta
 
-    if as_of is None:
-        as_of = date.today()
-
     if config is None:
         from pathlib import Path
         import yaml
@@ -377,6 +374,16 @@ def get_fiscal_quarter(as_of=None, config: Optional[Dict] = None) -> tuple:
                 config = yaml.safe_load(f)
         else:
             config = {}
+
+    if as_of is None:
+        # today_in_reporting_tz, not date.today(): the server runs UTC, but
+        # "today" for quarter/period boundaries must match the reporting
+        # timezone in client.yaml (America/New_York here) — otherwise this
+        # silently disagrees with resolve_time_window() for part of every
+        # evening, which is exactly the "which 'today' is this using"
+        # inconsistency the 2026-09-10 date-window incidents were about.
+        from sdr_utils import today_in_reporting_tz
+        as_of = today_in_reporting_tz(config)
 
     fy_start_month = config.get('fiscal', {}).get('fy_start_month', 1)
 

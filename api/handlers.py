@@ -99,6 +99,9 @@ def compute_cycle_time(sb, since_date: str = None, until_date: str = None) -> di
     fallback_enabled = cycle_config.get("fallback_to_all_time", True)
 
     # Calculate date range based on config (unless overridden)
+    # ALLOW-RAW-DATE-MATH: metrics.yaml's rolling_window_months is a fixed
+    # config threshold, not a user's relative time phrase — resolve_time_
+    # window() has no "rolling N months" period type to route this through.
     if since_date is None and window_mode == "rolling":
         now = datetime.now(timezone.utc)
         cutoff = now - timedelta(days=rolling_window_months * 30)
@@ -354,9 +357,11 @@ def compute_at_risk_deals(sb, deal_ids=None, use_stage_aware=True,
 
     # 1. Query analyses with explicit ORDER BY for determinism
     if time_window is None:
-        time_window = {
-            "start": (datetime.now(timezone.utc) - timedelta(days=90)).isoformat()
-        }
+        try:
+            from api.time_resolver import resolve_time_window
+        except ImportError:
+            from time_resolver import resolve_time_window
+        time_window = resolve_time_window({"period": "last_N_days", "n": 90})
 
     filters = [("gte", "analyzed_at", time_window["start"])]
     if deal_ids:
@@ -2722,6 +2727,10 @@ async def query_stale_deals(params: dict, sb) -> dict:
     config_path = Path(__file__).parent.parent / "config" / "client.yaml"
     config = yaml.safe_load(open(config_path))
     
+    # ALLOW-RAW-DATE-MATH: stale_days is a numeric staleness threshold, not
+    # a user's relative time phrase to parse — and today is already
+    # today_in_reporting_tz(), the same canonical "today" resolve_time_
+    # window() now uses, so there's no parallel/disagreeing "today" here.
     today = today_in_reporting_tz(config)
     stale_cutoff = (today - timedelta(days=stale_days)).isoformat()
     
@@ -3272,6 +3281,9 @@ async def query_coaching_priorities(params: dict, sb) -> dict:
     owner_email, _rep_note = _resolve_owner_email(params, sb)
     focus = params.get("focus", "all")
     from datetime import date, timedelta
+    # ALLOW-RAW-DATE-MATH: stale_call_days is a fixed config threshold, not
+    # a user's relative time phrase — today is already today_in_reporting_tz(),
+    # the same canonical source resolve_time_window() now uses.
     today = today_in_reporting_tz()
     stale_threshold = (today - timedelta(days=COACHING_THRESHOLDS["stale_call_days"])).isoformat()
 
@@ -3841,6 +3853,12 @@ def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps, requested_days=N
     current_date = all_dates[-1]  # Always use latest
 
     if requested_days:
+        # ALLOW-RAW-DATE-MATH: downstream of resolve_time_window(), not a
+        # parallel implementation of it — requested_days is already derived
+        # from the resolved time_window (see query_pipeline_movement above),
+        # and current_date is a real snapshot date on file, not "today".
+        # resolve_time_window() has no visibility into sparse snapshot
+        # dates, so this anchor selection has to happen here.
         # Find snapshot on or before (current - requested_days)
         target_date = date.fromisoformat(current_date) - timedelta(days=requested_days)
         target_str = target_date.isoformat()
@@ -4311,11 +4329,15 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     # 2026-09-10 "last 2 weeks returned Aug 17-28" defect). Flag it instead
     # of presenting a stale snapshot as "now".
     if all_dates:
-        stale_days = (date.today() - date.fromisoformat(all_dates[-1])).days
+        # today_in_reporting_tz, not date.today(): see api/time_resolver.py's
+        # _today() docstring — this "today" must agree with the one
+        # resolve_time_window() uses, not the server's UTC clock.
+        real_today = today_in_reporting_tz()
+        stale_days = (real_today - date.fromisoformat(all_dates[-1])).days
         if stale_days > 3:
             data_gaps.append(
                 f"Most recent snapshot on file is {all_dates[-1]}, "
-                f"{stale_days} days behind today ({date.today().isoformat()}). "
+                f"{stale_days} days behind today ({real_today.isoformat()}). "
                 f"The window below is anchored to that stale snapshot, not "
                 f"to today."
             )

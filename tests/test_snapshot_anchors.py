@@ -111,18 +111,57 @@ def test_anchors_empty_when_time_window_incomplete():
     print("✓ missing time_window fields degrade to no anchor, not a guess")
 
 
-def test_anchors_empty_when_no_snapshot_exists_before_cutoff():
-    """If there's truly no snapshot data that old, don't invent a fake date."""
+def test_anchors_explicit_no_data_signal_when_no_snapshot_exists_before_cutoff():
+    """The case most likely to have been undertested: a newly onboarded
+    client or a real gap in snapshot history, where there simply is no
+    snapshot far enough back to answer the question.
+
+    This must NOT come back as "" (silence) — silence is exactly what let
+    the model quietly invent its own comparison date last time. It must be
+    an explicit, unambiguous "NO DATA AVAILABLE" instruction telling the
+    model to say it can't answer, not a signal indistinguishable from "no
+    anchor logic applies here at all"."""
     sb = _FakeSupabase(["2026-09-01", "2026-09-10"])
     time_window = {"start": "2026-01-01", "end": "2026-09-10"}
 
     note = resolve_snapshot_anchors(sb, time_window)
-    assert note == "", f"Expected no anchor note, got: {note}"
-    print("✓ no data before the window start yields no fabricated anchor")
+
+    assert note != "", (
+        "A real time_window with no data that far back must return an "
+        "explicit signal, not silence — silence is indistinguishable from "
+        "'this function doesn't apply' and risks the model inventing a "
+        "date again, exactly like the original bug."
+    )
+    assert "NO DATA AVAILABLE" in note, note
+    assert "2026-01-01" in note and "2026-09-10" in note, (
+        f"No-data note should name the window that couldn't be satisfied: {note}"
+    )
+    assert "current_snapshot_date=" not in note, (
+        f"Must not fabricate a partial/fallback anchor: {note}"
+    )
+    print("✓ no data before the window start yields an explicit no-data signal, not silence")
+
+
+def test_anchors_explicit_no_data_signal_on_lookup_failure():
+    """A DB error resolving anchors must fail the same way as 'no data' —
+    loud and explicit — never silently falling through to let the model
+    invent its own dates because the lookup itself broke."""
+    class _ExplodingSupabase:
+        def table(self, _name):
+            raise RuntimeError("connection reset")
+
+    time_window = {"start": "2026-08-27", "end": "2026-09-10"}
+    note = resolve_snapshot_anchors(_ExplodingSupabase(), time_window)
+
+    assert "NO DATA AVAILABLE" in note, (
+        f"A lookup failure must surface as an explicit no-data signal, got: {note!r}"
+    )
+    print("✓ a snapshot-lookup failure also produces an explicit no-data signal")
 
 
 if __name__ == "__main__":
     test_anchors_pick_the_correct_snapshot_for_last_2_weeks()
     test_anchors_empty_when_time_window_incomplete()
-    test_anchors_empty_when_no_snapshot_exists_before_cutoff()
+    test_anchors_explicit_no_data_signal_when_no_snapshot_exists_before_cutoff()
+    test_anchors_explicit_no_data_signal_on_lookup_failure()
     print("\n✅ All tests passed")

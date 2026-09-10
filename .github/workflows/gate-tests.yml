@@ -79,6 +79,21 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_reconstruction.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_waterfall_null_insitu.py
 
+      - name: "TEST 0c — Offline: date/time-window resolution (single-source-of-truth gate)"
+        run: |
+          set -e
+          # Structural gate for the 2026-09-10 date-window incident class:
+          # resolve_time_window() must be the ONLY place "today" or a
+          # relative time span gets converted to concrete dates anywhere in
+          # api/. Fails the build the moment a new parallel implementation
+          # (a bare date.today(), or unrouted/unmarked timedelta(days=...)
+          # math) is added, instead of waiting for a fourth live follow-up
+          # question to find it. See test_date_resolution_single_source.py
+          # for the full incident history this closes.
+          PYTHONPATH=. python3 tests/test_date_resolution_single_source.py
+          PYTHONPATH=. python3 tests/test_time_window_resolution.py
+          PYTHONPATH=. python3 tests/test_snapshot_anchors.py
+
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

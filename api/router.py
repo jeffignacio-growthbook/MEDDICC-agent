@@ -1191,6 +1191,10 @@ exact values. Use those two dates verbatim (one filter_table
 call per date) and diff yourself. NEVER invent your own prior
 snapshot_date or widen the range to "be safe" — an anchor that
 looks too close together is correct, not insufficient data.
+If that line instead says "NO DATA AVAILABLE", there is no
+snapshot far back enough to answer this — say so plainly as
+your final answer. Do NOT substitute a wider window or a
+different snapshot date to produce a number anyway.
 
 QUERY EFFICIENCY:
 When filtering on analysis scores (champion_score, overall_score, etc.),
@@ -1345,7 +1349,6 @@ def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = N
         - rows: All rows if ≤ sample_size, else sample
         - table: Original table name
     """
-    from datetime import date
     import re
 
     rows = result.get("rows", [])
@@ -1435,7 +1438,8 @@ def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = N
                 null_counts[col] = null_count
 
             if vals:
-                today_str = date.today().isoformat()
+                from sdr_utils import today_in_reporting_tz
+                today_str = today_in_reporting_tz().isoformat()
                 past_today = len([v for v in vals if v < today_str])
                 aggregates[col] = {
                     "earliest": min(vals),
@@ -1679,20 +1683,42 @@ def resolve_snapshot_anchors(sb, time_window: dict) -> str:
     from the already-correct time_window, and hand them to the model as
     fixed values instead of letting it invent a second date.
 
-    Returns the "SNAPSHOT ANCHORS" context line, or "" if no time window
-    or no snapshots are available on or before it.
+    Three distinct outcomes, all as an explicit line for the model — this
+    function never returns "" once a real time_window is present, because
+    silence is exactly what let the model quietly fall back to inventing a
+    date last time. A missing time_window (nothing to anchor against at
+    all — the one case where there is genuinely nothing to say) is the only
+    caller left to spell out for itself, and that caller (dynamic_query_loop)
+    only calls this once params['time_window'] is already resolved, so it
+    doesn't happen in practice:
+      1. Not applicable — no time_window at all: "" (nothing to anchor).
+      2. Anchors found — "SNAPSHOT ANCHORS: current=... prior=...".
+      3. No data that far back / lookup failed — an explicit "NO SNAPSHOT
+         DATA" line instructing the model to say so, not to fabricate a
+         comparison. This is the case most likely to go untested (a newly
+         onboarded client, a real gap in snapshot history) and it must
+         degrade to "I can't answer that", never to free invention.
     """
     tw_start = (time_window or {}).get("start")
     tw_end = (time_window or {}).get("end")
     if not tw_start or not tw_end:
         return ""
+
+    no_data_note = (
+        f"SNAPSHOT ANCHORS: NO DATA AVAILABLE for a deals_snapshot "
+        f"point-in-time comparison in the window {tw_start} to {tw_end} — "
+        f"no snapshot exists that far back (or the lookup failed). State "
+        f"plainly that this comparison cannot be made for the requested "
+        f"period. Do NOT invent a comparison date or widen the window "
+        f"yourself."
+    )
     try:
         current_snap = _closest_snapshot_on_or_before(sb, tw_end)
         prior_snap = _closest_snapshot_on_or_before(sb, tw_start)
     except Exception:
-        return ""
+        return no_data_note
     if not current_snap or not prior_snap:
-        return ""
+        return no_data_note
     return (
         f"SNAPSHOT ANCHORS (deals_snapshot point-in-time comparisons): "
         f"current_snapshot_date={current_snap}, "
@@ -2578,14 +2604,18 @@ async def route_question(question: str, user_id: str,
       7. Synthesize answer (Sonnet)
       8. Verify numbers against tool results (Haiku)
     """
-    from datetime import date
     from api.time_resolver import resolve_time_window, current_quarter_label
     from api.evaluator import evaluate_result, extract_missing_hint
+    from sdr_utils import today_in_reporting_tz
 
     # Classifier and synthesis use different models
     classifier_client = LLMClient.from_config(role="classifier")
     generator_client = LLMClient.from_config(role="generator")
-    today  = date.today().isoformat()
+    # today_in_reporting_tz, not date.today(): this value becomes the literal
+    # "Today is {today}" the classifier reasons about for every relative
+    # time phrase — a server-UTC date here would disagree with
+    # resolve_time_window()'s own "today" for part of every evening.
+    today  = today_in_reporting_tz().isoformat()
     cq     = current_quarter_label()
 
     # Log persona

@@ -27,29 +27,39 @@ using the last two snapshots on file.
 """
 import sys
 from pathlib import Path
-from datetime import date as real_date
+from datetime import datetime as real_datetime, timezone as real_timezone
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-import api.time_resolver as time_resolver
+import sdr_utils
 from api.time_resolver import resolve_time_window
 from api.handlers import _pm_view_movement
 
 
-class _FrozenDate(real_date):
-    """A `datetime.date` whose .today() always returns 2026-09-10."""
-    _frozen = real_date(2026, 9, 10)
+def _frozen_utc(year, month, day, hour=12, minute=0):
+    """Patch sdr_utils.datetime.now() to a fixed UTC instant.
 
-    @classmethod
-    def today(cls):
-        return cls._frozen
+    resolve_time_window() gets "today" via _today() -> today_in_reporting_tz()
+    -> sdr_utils.datetime.now(timezone.utc) — not date.today() anymore (see
+    api/time_resolver.py's _today() docstring for why). So freezing time for
+    these tests means patching sdr_utils.datetime, not api.time_resolver.date.
+    """
+    frozen = real_datetime(year, month, day, hour, minute, tzinfo=real_timezone.utc)
+
+    class _FrozenDatetime(real_datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return frozen if tz else frozen.replace(tzinfo=None)
+
+    return patch.object(sdr_utils, "datetime", _FrozenDatetime)
 
 
 def test_last_2_weeks_from_known_date_is_exact():
     """'last 2 weeks' (n=14) from a known 'today' of 2026-09-10 must resolve
     to exactly 2026-08-27 - 2026-09-10, not some other window."""
-    with patch.object(time_resolver, "date", _FrozenDate):
+    with _frozen_utc(2026, 9, 10):
         result = resolve_time_window({"period": "last_N_days", "n": 14})
 
     assert result["start"] == "2026-08-27", \
@@ -61,7 +71,7 @@ def test_last_2_weeks_from_known_date_is_exact():
 
 def test_last_30_days_from_known_date_is_exact():
     """Sanity check a second n value from the same known date."""
-    with patch.object(time_resolver, "date", _FrozenDate):
+    with _frozen_utc(2026, 9, 10):
         result = resolve_time_window({"period": "last_N_days", "n": 30})
 
     assert result["start"] == "2026-08-11", \
@@ -69,6 +79,31 @@ def test_last_30_days_from_known_date_is_exact():
     assert result["end"] == "2026-09-10", \
         f"Expected end=2026-09-10, got {result['end']}"
     print("✓ resolve_time_window('last 30 days') from a known date is exact")
+
+
+def test_resolve_time_window_uses_reporting_timezone_not_server_utc():
+    """Third instance of 'which today does this use', found auditing the
+    first two: resolve_time_window() called date.today() (server UTC)
+    directly, while client.yaml's reporting.timezone is America/New_York
+    and the rest of the system (query_stale_deals, coaching handlers, SDR
+    ETL) uses today_in_reporting_tz() instead. For part of every evening
+    (UTC has rolled to the next day, New York hasn't) that meant
+    resolve_time_window() disagreed with itself about "today" by a full
+    day — the exact bug class this whole audit is about, just one layer
+    deeper. This freezes UTC "now" to 2026-09-11 02:00 (10pm EDT on
+    2026-09-10) — a server reading date.today() would see 2026-09-11, but
+    the reporting-timezone-correct date is still 2026-09-10."""
+    with _frozen_utc(2026, 9, 11, hour=2, minute=0):
+        result = resolve_time_window({"period": "last_N_days", "n": 14})
+
+    assert result["end"] == "2026-09-10", (
+        "resolve_time_window must use the reporting timezone (America/"
+        "New_York), not server UTC — at 02:00 UTC it's still 2026-09-10 "
+        f"in New York, but got end={result['end']}"
+    )
+    assert result["start"] == "2026-08-27", \
+        f"Expected start=2026-08-27, got {result['start']}"
+    print("✓ resolve_time_window follows reporting timezone, not server UTC")
 
 
 def _rows(deal_ids):
@@ -146,6 +181,7 @@ def test_movement_view_warns_when_no_snapshot_matches_requested_window():
 if __name__ == "__main__":
     test_last_2_weeks_from_known_date_is_exact()
     test_last_30_days_from_known_date_is_exact()
+    test_resolve_time_window_uses_reporting_timezone_not_server_utc()
     test_movement_view_ignores_window_without_the_fix_reproduces_defect()
     test_movement_view_honors_requested_days_after_fix()
     test_movement_view_warns_when_no_snapshot_matches_requested_window()
