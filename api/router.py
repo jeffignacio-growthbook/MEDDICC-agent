@@ -1089,6 +1089,24 @@ internal precision that moves run-to-run; surface what's stable):
 When data includes deal_specific_next_steps, reference
 those directly rather than generic rubric guidance."""
 
+# 2026-09-11: dynamic_query_loop's iteration/token ceiling, hoisted to
+# module level so it's a single, directly-testable source of truth instead
+# of a magic number buried in a 900-line function — and so nobody can
+# quietly shrink it back down against a future one-off incident without
+# also touching the test that pins it (tests/test_loop_ceiling_sizing.py).
+#
+# These are an internal engineering backstop against a genuinely broken
+# loop, not a target: the other safety valves (no_progress_streak,
+# duplicate-tool-call detection) already end a STUCK loop in 2 iterations
+# regardless of this ceiling. Raised 2026-09-11 from 40K tokens / 5
+# iterations — values tuned against a single incident — to be sized
+# against the hardest reasonable multi-step question instead. See
+# dynamic_query_loop's TOKEN_BUDGET/MAX_ITERATIONS assignment for the full
+# worked-cost derivation. The user-facing failure message for hitting this
+# (see _diagnostic_answer) must never name it — see that function.
+DYNAMIC_LOOP_TOKEN_BUDGET = 200_000
+DYNAMIC_LOOP_MAX_ITERATIONS = 12
+
 DYNAMIC_SYSTEM_PROMPT = """CRITICAL: Respond with ONLY a JSON object. No prose,
 no explanation, no markdown. Your entire response must
 be valid JSON starting with {{ and ending with }}.
@@ -1998,11 +2016,16 @@ async def dynamic_query_loop(question, history, params,
     """
     Multi-turn tool-calling loop for novel questions.
     Agent calls tools until it has enough data to answer.
-    Capped at 5 iterations and a token budget.
+    Capped at MAX_ITERATIONS iterations and TOKEN_BUDGET tokens — an
+    internal ceiling sized for the hardest reasonable question (see the
+    constants below), not a target; a well-scoped question should never
+    come close to it. answered=False's message never names the ceiling —
+    see _diagnostic_answer.
 
     Returns {"answer": str, "tool_results": dict, "answered": bool}.
       - answered=True  → the loop produced a real, data-backed answer.
-      - answered=False → the loop gave up (budget / repetition / exhausted).
+      - answered=False → the loop gave up (repetition, no progress, or a
+        genuinely too-broad question — never surfaced as "budget/tokens").
         `answer` is then a PLAIN diagnostic naming what fell through; the
         technical detail is in the [FALLBACK] log line, not the reply. The
         caller decides whether to surface it. Sniffing the answer text for
@@ -2122,13 +2145,25 @@ async def dynamic_query_loop(question, history, params,
     queries_run = []  # Track all queries for fallback logging
     had_answer_at_iteration = None  # Detect discarded_answer trigger
 
-    # Raised from 20K to 40K after reducing per-turn cost via lightweight schema.
-    # System prompt was 20K chars (5K tokens) — 3 turns = 15K before any work.
-    # Lightweight mode reduces system to ~10K chars (2.5K tokens) — 3 turns = 7.5K.
-    # Budget is now a backstop, not the primary constraint.
-    TOKEN_BUDGET = 40000
+    # See DYNAMIC_LOOP_TOKEN_BUDGET/DYNAMIC_LOOP_MAX_ITERATIONS (module
+    # level, above DYNAMIC_SYSTEM_PROMPT) for the full sizing rationale:
+    # raised 2026-09-11 from 40K/5 iterations — values tuned against a
+    # single incident — to be sized against the hardest reasonable
+    # multi-step question instead. Worked cost estimate for a worst-case
+    # 12-iteration run (table classification + two dimension-filtered
+    # deals_snapshot pulls + an enrichment lookup + a couple of legitimate
+    # forced retries, e.g. dimension-verification or the snapshot-anchor
+    # gate, with room to spare), using the current system prompt size
+    # (~29K chars/~7.3K tokens, resent in full every iteration — the
+    # dominant per-iteration cost) and realistic message growth (~4.9K
+    # chars/~1.2K tokens added per iteration for a large aggregated
+    # result, per production logs):
+    #   12 * 7300 (system) + 1200 * (0+1+...+11) (growing messages) + 12 * 800 (output)
+    #   ≈ 87600 + 79200 + 9600 ≈ 176K tokens — DYNAMIC_LOOP_TOKEN_BUDGET is
+    #   set comfortably above that.
+    TOKEN_BUDGET = DYNAMIC_LOOP_TOKEN_BUDGET
     tokens_used = 0
-    MAX_ITERATIONS = 5
+    MAX_ITERATIONS = DYNAMIC_LOOP_MAX_ITERATIONS
     # PART 2b: repetition / no-progress detection. A duplicate tool call, a
     # parse failure, or a tool that returns zero new rows are all "no progress".
     # Two in a row means the loop is stuck — end it and answer from what exists,
@@ -2192,8 +2227,18 @@ async def dynamic_query_loop(question, history, params,
             logger.error(f"[FALLBACK] Failed to write fallback_log: {e}")
 
     def _diagnostic_answer(tail, reason_tag=None):
-        """PLAIN user-facing sentence — names what fell through, no jargon."""
-        # Check if budget exhausted with verified dimension coverage
+        """PLAIN user-facing sentence — names what fell through, no jargon.
+
+        2026-09-11: never mention budget, tokens, or processing limits here.
+        Those are internal engineering concerns — the reason_tag values that
+        track them (for logging/_fallback_log) stay internal too. What the
+        user sees must describe the business reality: the question needs to
+        be narrower, not "the system ran low on X." This branch should
+        essentially never fire in practice now that the ceiling is sized
+        for the hardest reasonable question rather than tuned to one
+        incident (see MAX_ITERATIONS/TOKEN_BUDGET above) — it exists only
+        for a genuinely pathological question that exceeds even that.
+        """
         if reason_tag == "budget_exhausted" and accumulated_data:
             from api.dimension_verification import verify_dimension_coverage
 
@@ -2204,11 +2249,13 @@ async def dynamic_query_loop(question, history, params,
             )
 
             if verification["verified"]:
-                # We have the correct data (filters match question), just ran out of budget
+                # We have the right data in hand — the question itself is
+                # just too broad to fully summarize in one pass.
                 return (
-                    f"I found the data you asked for but ran out of processing "
-                    f"budget before I could summarize it fully. Try asking the "
-                    f"question again — the query will be faster the second time."
+                    f"I found matching deals, but this question needs a "
+                    f"narrower time range or fewer filters to summarize in "
+                    f"one pass — try asking about a specific rep, a shorter "
+                    f"window, or a narrower segment/region."
                 )
 
         # Default diagnostic message
@@ -2243,15 +2290,17 @@ async def dynamic_query_loop(question, history, params,
         has_rows = bool(tr.get("rows"))
         # No data at all → nothing to synthesise from.
         if not has_rows:
-            return _give_up(reason_tag, "ran out of room before it found anything")
-        # No budget for one more call → answer with what we can describe.
+            return _give_up(reason_tag, "could not find anything that answers it")
+        # No room for one more call → answer with what we can describe.
+        # (Internal ceiling check; see _diagnostic_answer for why the
+        # user-facing text never names it.)
         est = len(system) // 4 + sum(
             len(str(m.get('content', ''))) // 4 for m in messages) + 600
         if tokens_used + est > TOKEN_BUDGET:
             _fallback_log(reason_tag)
             return {"answer": _diagnostic_answer(
-                        "gathered partial data but ran out of budget to "
-                        "assemble it"),
+                        "gathered partial data, but this question needs a "
+                        "narrower scope to fully summarize"),
                     "tool_results": tr, "answered": False}
         try:
             # Add aggregation instruction for finalization too
@@ -2357,7 +2406,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                        f"(used={tokens_used}, projected={projected_total}, budget={TOKEN_BUDGET}, "
                        f"partial={partial})")
             return _give_up("budget_exhausted",
-                            "ran out of budget before it could finish")
+                            "needs a narrower scope to complete")
 
         resp = client.complete(
             messages=messages,
@@ -2373,7 +2422,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                         f"{iteration+1} iterations, tokens={tokens_used}, "
                         f"partial={partial}")
             return _give_up("budget_exhausted",
-                            "ran out of budget before it could finish")
+                            "needs a narrower scope to complete")
 
         raw = resp.text.strip()
 

@@ -133,6 +133,24 @@ jobs:
           # checked whether the "prose answer" was actually finished.
           PYTHONPATH=. python3 tests/test_scratchpad_answer_rejection.py
 
+      - name: "TEST 0g — Offline: loop ceiling is sized against the hardest question, not one incident"
+        run: |
+          set -e
+          # 2026-09-11 reframe: the budget-exhaustion fix above (TEST 0d)
+          # closed the specific "third round-trip" cost, but the ceiling
+          # itself (TOKEN_BUDGET/MAX_ITERATIONS) had been tuned to the size
+          # of that one incident, and the failure message leaked internal
+          # engineering language ("budget exhausted") to the user. This
+          # pins two things structurally: (1) DYNAMIC_LOOP_TOKEN_BUDGET /
+          # DYNAMIC_LOOP_MAX_ITERATIONS stay well above the incident's
+          # values, sized for the hardest reasonable multi-step question
+          # with room for legitimate retries; (2) no user-facing string in
+          # the give-up/diagnostic paths ever mentions budget, tokens, or
+          # processing limits — a failure must be described in business
+          # terms (narrower time range / fewer filters), never blamed on
+          # an internal ceiling the user can't act on.
+          PYTHONPATH=. python3 tests/test_loop_ceiling_sizing.py
+
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
