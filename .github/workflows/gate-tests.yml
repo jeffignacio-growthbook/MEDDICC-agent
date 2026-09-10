@@ -94,6 +94,20 @@ jobs:
           PYTHONPATH=. python3 tests/test_time_window_resolution.py
           PYTHONPATH=. python3 tests/test_snapshot_anchors.py
 
+      - name: "TEST 0d — Offline: dynamic-loop budget shortcuts (enrichment lookup + schema visibility)"
+        run: |
+          set -e
+          # 2026-09-11 budget-exhaustion fix: a snapshot-diff question still
+          # blew the token budget on a genuinely-needed third call because
+          # (a) deals_snapshot.region/segment existed in Postgres but were
+          # never registered in data_dictionary, so the model believed they
+          # didn't exist and fell back to a full re-query of deals, and
+          # (b) even a truly unavoidable ID-scoped enrichment call (company
+          # name for already-matched deal_ids) fell through to a fresh
+          # full-budget loop iteration instead of synthesizing immediately.
+          PYTHONPATH=. python3 tests/test_schema_context_snapshot_visibility.py
+          PYTHONPATH=. python3 tests/test_enrichment_shortcut.py
+
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

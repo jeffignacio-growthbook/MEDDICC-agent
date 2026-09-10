@@ -99,7 +99,20 @@ def _build_schema_context(sb, tables_with_descriptions, lightweight=False):
         "win_loss_narratives": "AI-generated win/loss analysis for closed deals.",
         "waterfall_weekly": "Weekly pipeline movement: new, won, lost, net_change. Precomputed.",
         "rep_targets": "Quota targets by rep/team/period.",
-        "arr_by_customer": "VIEW: total ARR per won customer."}
+        "arr_by_customer": "VIEW: total ARR per won customer.",
+        "deals_snapshot": (
+            "Weekly point-in-time deal state. Each row already carries "
+            "region, segment, owner_email, stage_id, deal_value AS OF that "
+            "snapshot_date — filter directly on THIS table for a "
+            "region/segment-scoped point-in-time comparison ('changed "
+            "stage', 'moved', 'as of N days ago'). Do NOT assume you need "
+            "to join to deals for region/segment on a historical snapshot: "
+            "a deal's current region/segment can differ from what it was "
+            "at that snapshot date, and deals_snapshot already has the "
+            "point-in-time value. The one thing deals_snapshot does NOT "
+            "have is company_name — look that up by deal_id from deals "
+            "only after you already have your matched deal_ids, not before."
+        )}
     join_notes = """
 TABLE RELATIONSHIPS:
   deals.deal_id → analyses.deal_id (one deal → many analyses; use latest)

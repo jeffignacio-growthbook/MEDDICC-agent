@@ -1196,6 +1196,20 @@ snapshot far back enough to answer this — say so plainly as
 your final answer. Do NOT substitute a wider window or a
 different snapshot date to produce a number anyway.
 
+deals_snapshot ALREADY HAS region, segment, and owner_email
+as point-in-time columns (see the schema above) — filter on
+THEM DIRECTLY in your two snapshot calls for a region/segment/
+owner-scoped comparison. Do NOT decide "the snapshot doesn't
+have region/segment" and fall back to querying deals for it —
+check the schema first, that belief is very often wrong and
+costs a whole extra iteration. The one field deals_snapshot
+genuinely lacks is company_name: once you've diffed the two
+snapshots and have your matched deal_ids, ONE filter_table on
+deals with an `in_` filter on exactly those deal_ids (for
+company_name only) is the right way to name them — do not
+re-derive the population from deals, only label the ids you
+already have.
+
 QUERY EFFICIENCY:
 When filtering on analysis scores (champion_score, overall_score, etc.),
 always query the analyses table FIRST to get matching deal_ids, then look
@@ -1327,6 +1341,79 @@ def _summarize_accumulated(data: dict) -> str:
         if rows:
             parts.append(f"{len(rows)} rows from {result.get('table', key)}")
     return "; ".join(parts) if parts else "no data found"
+
+def _known_deal_ids_before(accumulated_data: dict, iteration: int) -> set:
+    """Union of deal_id values across all iterations strictly before
+    `iteration` — the population a later step can only be narrowing to,
+    never discovering."""
+    ids = set()
+    for key, data in accumulated_data.items():
+        if not key.startswith("step_") or not key.endswith("_raw"):
+            continue
+        try:
+            step_num = int(key[len("step_"):-len("_raw")])
+        except ValueError:
+            continue
+        if step_num >= iteration:
+            continue
+        for row in data.get("rows", []):
+            did = row.get("deal_id")
+            if did is not None:
+                ids.add(str(did))
+    return ids
+
+def _is_id_scoped_enrichment_call(tool_name: str, tool_params: dict,
+                                   known_deal_ids: set) -> bool:
+    """True when this filter_table call's only real selectivity is a
+    deal_id membership filter against IDs a prior step already found.
+
+    2026-09-11 budget-exhaustion fix: a "which deals changed stage"
+    question over deals_snapshot often needs a genuinely unavoidable third
+    call — deals_snapshot has region/segment/owner_email but not
+    company_name, so naming the matched deals still means a deals lookup
+    by deal_id. That call structurally CANNOT need a retry: the model
+    already picked the exact deal_ids it wants, from data already in hand,
+    so there's no "wrong population" for a dimension-verification retry to
+    correct. Treating its success as "done, synthesize now" (same as the
+    existing dimension_retry_succeeded shortcut below) removes the wasted
+    iteration that was pushing this query shape into budget exhaustion,
+    without weakening verification for calls that ARE still exploring.
+    """
+    if tool_name != "filter_table" or not known_deal_ids:
+        return False
+    filters = tool_params.get("filters") or []
+    if not isinstance(filters, list) or not filters:
+        return False
+
+    deal_id_filter_vals = None
+    other_cols = []
+    for f in filters:
+        if not (isinstance(f, (list, tuple)) and len(f) == 3):
+            return False
+        op, col, val = f
+        if col == "deal_id" and op in ("in_", "eq"):
+            deal_id_filter_vals = val if isinstance(val, list) else [val]
+        else:
+            other_cols.append(col)
+
+    if deal_id_filter_vals is None:
+        return False
+
+    filtered_ids = {str(v) for v in deal_id_filter_vals}
+    if not filtered_ids.issubset(known_deal_ids):
+        return False  # asking about IDs we haven't already found — exploring, not enriching
+
+    # A companion filter on a genuine exploration dimension means this call
+    # could still change WHICH deals qualify, not just add fields to known
+    # ones — don't short-circuit those. deal_status is deliberately not
+    # here: narrowing an already-fixed id set to "active only" doesn't
+    # redefine the population, it just excludes some of a known set.
+    exploratory_cols = {"region", "segment", "owner_email", "stage",
+                         "pipeline_id"}
+    if any(col in exploratory_cols for col in other_cols):
+        return False
+
+    return True
 
 def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = None) -> dict:
     """
@@ -2490,6 +2577,27 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                         # Force synthesis by calling _finalize_from_data
                         # This uses the data we just retrieved
                         return _finalize_from_data("dimension_retry_succeeded")
+
+        # CHECK: was this an unavoidable ID-scoped enrichment lookup
+        # (e.g. company_name for deal_ids a snapshot diff already matched)?
+        # Same idea as the dimension-retry shortcut above, generalized:
+        # once the model has narrowed to a known, fixed set of deal_ids —
+        # whether from a dimension-verified query or from diffing two
+        # deals_snapshot pulls — a follow-up call that ONLY re-fetches
+        # fields for those exact IDs can never need another retry. Letting
+        # it fall through to a fresh full-budget iteration instead of
+        # synthesizing immediately was the direct cause of the 2026-09-11
+        # budget exhaustion on "which deals changed stage" questions.
+        if iteration > 0 and row_count > 0:
+            known_ids = _known_deal_ids_before(accumulated_data, iteration)
+            if _is_id_scoped_enrichment_call(tool_name, tool_params, known_ids):
+                logger.info(
+                    f"[ENRICHMENT_LOOKUP] iteration {iteration} only "
+                    f"re-fetched fields for {len(known_ids)} already-known "
+                    f"deal_ids — synthesizing immediately instead of "
+                    f"looping further."
+                )
+                return _finalize_from_data("id_scoped_enrichment_lookup")
 
         # PART 2b: a tool call that returns zero rows is no forward progress.
         # Two no-progress steps in a row end the loop.
