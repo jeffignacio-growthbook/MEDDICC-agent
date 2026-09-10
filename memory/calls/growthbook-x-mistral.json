@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook x Mistral",
+  "slug": "growthbook-x-mistral",
+  "last_etl_date": "2026-09-10T06:13:41.848853",
+  "calls": [
+    {
+      "id": "01M1HFP413JTX35SGZDWCT2A7Y",
+      "source": "fireflies",
+      "title": "Growthbook x Mistral - Roadmap / Technical Questions",
+      "date": "2026-09-09",
+      "duration_minutes": 61.81999969482422,
+      "summary": "# Growthbook x Mistral - Roadmap / Technical Questions\nDate: 2026-09-09 | Duration: 61.81999969482422m\n\n## Summary\nGrowth Book is evolving toward AI-driven experimentation at scale through API-accessible UI functions, Slack workflows, proactive AI agents, and a comprehensive skill library covering hypothesis generation, setup, monitoring, interpretation, and learning capture. The teams discussed integrating Growth Book with Vibe and Mistral’s DBT semantic layer while maintaining authoritative metric definitions, directionality, and metadata. Backend improvements such as incremental refresh and pre-aggregation aim to support high traffic and complex metrics. Mistral highlighted operational friction, including long-running experiments with limited visibility, slow metric slicing, cluttered metric management, unclear feature-flag draft and published states, weak filtering, onboarding challenges, and insufficient SDK documentation. Growth Book identified project-scoped metric groups and data sources for the 5.1 release later this month, and discussed approval flows, warnings, AI monitoring, and better navigation. Additional feedback covered SQL transparency, sequential-testing p-values, confidence-interval visualization, Slack support, enablement sessions, and recurring technical syncs.\n\n## Keywords\nExperimentation, AI agent, Feature Flags, Metrics Management, Semantic Layer, User Onboarding\n\n## Action Items\n\n**Cary Rakin**\nCoordinate asynchronous discussion to define members of the primary Slack support channel and organize general support channel for all users (50:44)\nFacilitate enablement sessions planning with Mistral engineering teams (51:00)\n\n**Luke Sonnet**\nShare the \"skills library\" repository and keep it updated for Mistral’s integration use (09:38)\nCollaborate on developing syncing scripts or integrations between dbt semantic layer and GrowthBook to support metric definition and directionality use cases; provide proof of concept for Mistral’s internal engineer (19:51)\nProvide insights and guidance on efficient query infrastructure and experiment runtime improvements; address issues related to metric slices and performance (30:05)\nShare latest state of approvals flows for feature flags and experiments for Mistral to consider implementation (52:35)\nInvestigate feature flag UI improvements, filtering options, and default views to improve usability based on feedback (54:54)\nContinue dialogue to clarify UI refresh issues related to metrics and experiment updates (45:23)\n\n**Graham McNicoll**\nPresent AI learning and pattern recognition capabilities launched by GrowthBook that condense experiment histories into actionable insights (31:42)\nGather further UI/UX feedback from Mistral to prioritize improvements in metrics visibility and navigation (21:42)\n\n**Alice Gorgé**\nAdd end users from Mistral team to Slack EXT channel for direct communication and support (35:38)\nShare detailed feedback and pain points from data science and engineering teams on GrowthBook usage (36:16)\n\n**Renaud De Peretti**\nProvide ongoing technical feedback about feature flags, experiment setup issues, and UI difficulties experienced by engineers and data scientists (51:24)\n",
+      "organizer": "graham@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}

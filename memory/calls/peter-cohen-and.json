@@ -1,0 +1,18 @@
+{
+  "company": "Peter Cohen and",
+  "slug": "peter-cohen-and",
+  "last_etl_date": "2026-09-10T06:13:41.845639",
+  "calls": [
+    {
+      "id": "01M1SSK6B2BKAM2KABXQWDCGDB",
+      "source": "fireflies",
+      "title": "Peter Cohen and Graham McNicoll",
+      "date": "2026-09-09",
+      "duration_minutes": 36.529998779296875,
+      "summary": "# Peter Cohen and Graham McNicoll\nDate: 2026-09-09 | Duration: 36.529998779296875m\n\n## Summary\nGrowthBook’s open-source experimentation platform was positioned as a flexible, cost-effective alternative to Statsig, with full on-premises deployment, warehouse-native SQL access, transparent analysis, and seat-based pricing that enables unlimited experiments after onboarding. GrowthBook is used by about 3,500 companies, including three of the top five frontier AI firms. Statsig’s experiment and feature-flag check pricing was viewed as potentially expensive, while Peter Cohen noted that migration could be difficult and remains a significant barrier. Luke explained interleaving for comparing ranking algorithms, reducing between-user noise and supporting rapid parameter tuning, but Peter said it is lower priority because Grindr’s algorithm focuses on retrieval and about 90% of experiments concern product features. The discussion also covered network interference, equilibrium effects, and the limitations of switchback and geo-based methods for long-running user interactions. GrowthBook’s lightweight guardrail tests were presented as a way to detect regressions during rapid releases. Grindr prioritizes cost-effectiveness, practical impact, and gradual improvements to experimentation methods.\n\n## Keywords\nExperimentation, Interleaved Testing, Ranking Algorithms, Network Interference, Open Source Platform, Pricing Models\n\n## Action Items\n\n**Peter Cohen**\nReview GrowthBook pricing model and rate card sent by GrowthBook for evaluation vis-à-vis Statsig’s pricing (34:30)\nMaintain interest in potential future discussions if dissatisfaction with Statsig increases, especially for network interference solutions (24:41)\n\n**Graham McNicoll**\nFollow up with Peter Cohen providing a rate card or pricing information for GrowthBook (34:30)\n\n**Luke Sonnet**\nPrepare to share demo materials or follow-up discussions detailing GrowthBook’s guardrail sequential testing approach and advanced experimentation features (34:30)\nMaintain readiness to discuss network interference and marketplace experiment solutions as needs arise (24:41)\n",
+      "organizer": "graham@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

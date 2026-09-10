@@ -1,0 +1,18 @@
+{
+  "company": "ECCO + GrowthBook",
+  "slug": "ecco-growthbook",
+  "last_etl_date": "2026-09-10T06:13:41.849008",
+  "calls": [
+    {
+      "id": "01M235HJSN9RSSZ8WZJBYTK1Q8",
+      "source": "fireflies",
+      "title": "ECCO + GrowthBook",
+      "date": "2026-09-09",
+      "duration_minutes": 8,
+      "summary": "# ECCO + GrowthBook\nDate: 2026-09-09 | Duration: 8m\n\n## Summary\nThe team confirmed that the Growthbook proof of concept can be implemented entirely through Google Tag Manager, removing the need for front-end developer involvement and reducing coordination dependencies. Vito will lead the implementation using setup guides shared by Scott, while Giulio monitors progress and supports delivery. Slack and Teams will serve as the primary channels for documentation, troubleshooting, escalation, and rapid responses. Thomas and Nikho are available for front-end assistance if unexpected issues arise, and Scott and Logan can provide additional engineering support. The team agreed to pursue completion by the end of the week because contract requirements are expected to be finalized by month-end. Legal and administrative delays have been resolved, allowing the group to focus on technical delivery. Scott also proposed recurring check-ins, and final contract approval is expected shortly after a successful PoC.\n\n## Keywords\nGrowthBook, Google Tag Manager, GTM, integration, frontend developers, Slack channel, PoC, proof of concept\n\n## Action Items\n\n**Scott Keller**\nShare GrowthBook GTM integration documentation and setup guides via Slack and Teams channels to the Ecco team (02:18)\nEnsure the entire GrowthBook team has notifications enabled in Slack to respond quickly to Ecco’s queries (00:23)\nSet up recurring check-in calls on Teams to monitor PoC integration progress (07:09)\n\n**Giulio / Ecco**\nCoordinate with Vito to start the GrowthBook integration using GTM and monitor progress (06:26)\nRefer frontend development help requests internally to Thomas or Nikho if a blocker arises (02:45)\nEngage with Scott to get added to Slack and Teams communication channels (03:41)\n\n**Vito / Ecco**\nLead the GrowthBook PoC integration using GTM, reaching out for help through internal chat or GrowthBook channels if needed (06:26)\n\n**Logan Bates**\nProvide support and assist with engineering resources if any technical issues arise during the integration (05:41)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

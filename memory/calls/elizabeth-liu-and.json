@@ -1,0 +1,18 @@
+{
+  "company": "Elizabeth Liu and",
+  "slug": "elizabeth-liu-and",
+  "last_etl_date": "2026-09-10T06:13:41.849132",
+  "calls": [
+    {
+      "id": "01M1Y2WT5SJAJW1XA6EJ4EJQG0",
+      "source": "fireflies",
+      "title": "Elizabeth Liu and Chris Sanders",
+      "date": "2026-09-09",
+      "duration_minutes": 38.54999923706055,
+      "summary": "# Elizabeth Liu and Chris Sanders\nDate: 2026-09-09 | Duration: 38.54999923706055m\n\n## Summary\nThe discussion covered GrowthBook SDK integration, feature flag configuration, experiment targeting, analytics, and operational support. The SDK retrieves a payload containing features and experiments, evaluates flags and experiment bucketing locally, and uses developer-defined attributes for targeting; attributes can also be updated at runtime to re-evaluate rules. Projects and SDK connections scope features by platform and limit unnecessary payload data. Flags can combine forced values, experiments, and gradual ramp-ups, while randomization units are configured at the experiment level. Data can flow to GrowthBook’s managed warehouse or BigQuery through Kafka and Event Forwarder. Experiment analysis requires assignment data with user, experiment, variation, and timestamp fields, plus metric queries from one or more fact tables. A 50/50 AA test can validate exposure and tracking quality. The platform also provides UI and REST API controls, environment toggles, audit trails, approvals, webhooks, MCP capabilities, SQL templating, Slack collaboration, and 24/7 email support.\n\n## Keywords\nGrowthBook SDK, Feature Flags, Experiment Assignment, Event Forwarder, BigQuery, Attribute Targeting\n\n## Action Items\n\n**Chris Sanders**\nProvide assistance and answer follow-up technical questions via Slack for SDK integration and data pipeline (35:15)\nSupport complex SQL query setups and fact table configurations for Airalo’s use cases (37:01)\n\n**Elizabeth Liu**\nVerify SDK attribute usage and coordinate updates with developers as new targeting needs arise (14:14)\n\n**Airalo iOS/Android Developers**\nImplement and update SDK attribute setting and tracking callback integration as per GrowthBook SDK guidelines (04:05)\nManage SDK connection client keys and project scoping for iOS and Android environments (10:08)\nHandle dynamic updates to attributes post-login or other events to trigger flag reevaluation (16:07)\n\n**Vignesh Meyyappan**\nFinalize decision on using GrowthBook event forwarder to stream from SDK events into BigQuery warehouse (18:18)\n",
+      "organizer": "chris@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    }
+  ]
+}

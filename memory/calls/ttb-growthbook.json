@@ -1,0 +1,18 @@
+{
+  "company": "TTB & GrowthBook",
+  "slug": "ttb-growthbook",
+  "last_etl_date": "2026-09-10T06:13:41.849379",
+  "calls": [
+    {
+      "id": "01M1ZJSHCQXJRHWNZ01BNSJ0N3",
+      "source": "fireflies",
+      "title": "TTB & GrowthBook | First Meeting",
+      "date": "2026-09-09",
+      "duration_minutes": 32.709999084472656,
+      "summary": "# TTB & GrowthBook | First Meeting\nDate: 2026-09-09 | Duration: 32.709999084472656m\n\n## Summary\nTTB Bank Thailand is experiencing Firebase cost concerns, with approximately 10 million daily requests and expected growth. Firebase is also blocked in China, resulting in 3,000–5,000 failed requests daily; these failures are non-critical but delay configuration updates. GrowthBook’s open-source and SaaS options were discussed, including enterprise security features, dedicated support, 24/7 availability, fast SLA, and the need for local support or a Thailand contact under bank policy. The customer operates a hybrid on-premises and AKS environment and is primarily focused on configuration management and application distribution, while monitoring integration with the data warehouse is a low priority. GrowthBook uses the data warehouse as a source of truth and provides SDK integration for experiments and feature flags, although data warehouse integration is optional. Pricing includes a base license and per-user seats, with an expected user count of 5–15, unlimited feature flags and experiments, no request limits, and flexible seat management. The customer plans to submit a proposal to its boss within this month, with bank committee approval expected this year. GrowthBook will provide detailed costs, customer success stories, and Asia-Pacific or Southeast Asian references.\n\n## Keywords\nGrowthBook, Firebase, pricing, local support, feature flag, hybrid deployment\n\n## Action Items\n**Rémy Marin**  \nShare links and resources on GrowthBook architecture (20:30)  \n\n**Visit Kunakornpol**  \nConfirm internal requirements on health and monitoring (20:45)  \nPropose shortlist of replacement candidates (29:55)  \n\n**Marcel Geldner**  \nProvide customer success stories for fintech (29:55)  \nSearch for and provide regional references (30:45)  \nSend detailed summary and pricing information (30:55)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

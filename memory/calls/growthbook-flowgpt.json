@@ -1,7 +1,7 @@
 {
   "company": "Growthbook <> FlowGPT",
   "slug": "growthbook-flowgpt",
-  "last_etl_date": "2026-08-05T15:57:31.384332",
+  "last_etl_date": "2026-09-10T06:13:41.843040",
   "calls": [
     {
       "id": "01KP6Z88AXTGRHW2R8GQ86C30X",
@@ -13,7 +13,19 @@
       "organizer": "dan@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, Statsig, experiment traffic allocation, data warehouse, agentic AI, conversation-based experiments",
-      "action_items": "\n**Dan Wathne**\nPrepare a detailed proposal outlining GrowthBook’s value proposition and potential cost savings compared to Statsig, emphasizing features attractive to high-scale customers (17:50)\nCoordinate internally with GrowthBook’s AI customer team to gather insights and validate use cases involving agentic AI and conversation-based experimentation (17:50)\nSchedule and send a meeting invite for a follow-up call with Henry Wang in mid-next week (Tuesday or Wednesday) to discuss plans and detailed presentation (19:00)\nPause current billing updates for Henry Wang’s GrowthBook pro account until next steps and contract details are finalized (19:50)\n\n**Henry Wang**\nReview GrowthBook’s upcoming proposal and presentation after return from Asia, expected in about one month (18:10)\nContinue internal evaluation of GrowthBook’s traffic allocation and experiment tools to identify value beyond existing internal data warehouse analytics (00:00)\nConfirm preferred communication method (email) and respond to follow-up scheduling and proposals (19:15)\n\n**Logan Bates**\nInvestigate potential native or JDBC connectivity between StarRocks data warehouse and GrowthBook platform to support integration (09:50)\nSupport integration plans related to agentic AI flows and experiment visualizations for high-volume data customers (12:24)\n"
+      "action_items": "\n**Dan Wathne**\nPrepare a detailed proposal outlining GrowthBook’s value proposition and potential cost savings compared to Statsig, emphasizing features attractive to high-scale customers (17:50)\nCoordinate internally with GrowthBook’s AI customer team to gather insights and validate use cases involving agentic AI and conversation-based experimentation (17:50)\nSchedule and send a meeting invite for a follow-up call with Henry Wang in mid-next week (Tuesday or Wednesday) to discuss plans and detailed presentation (19:00)\nPause current billing updates for Henry Wang’s GrowthBook pro account until next steps and contract details are finalized (19:50)\n\n**Henry Wang**\nReview GrowthBook’s upcoming proposal and presentation after return from Asia, expected in about one month (18:10)\nContinue internal evaluation of GrowthBook’s traffic allocation and experiment tools to identify value beyond existing internal data warehouse analytics (00:00)\nConfirm preferred communication method (email) and respond to follow-up scheduling and proposals (19:15)\n\n**Logan Bates**\nInvestigate potential native or JDBC connectivity between StarRocks data warehouse and GrowthBook platform to support integration (09:50)\nSupport integration plans related to agentic AI flows and experiment visualizations for high-volume data customers (12:24)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M21A3ETRVC9CWS2JS23PS4F0",
+      "source": "fireflies",
+      "title": "Growthbook <> FlowGPT - Sync",
+      "date": "2026-09-09",
+      "duration_minutes": 24.90999984741211,
+      "summary": "# Growthbook <> FlowGPT - Sync\nDate: 2026-09-09 | Duration: 24.90999984741211m\n\n## Summary\nFlow GPT discussed moving from Statsig to GrowthBook’s enterprise plan to reduce costs while maintaining critical experimentation and feature-flagging capabilities. GrowthBook proposed pricing designed to cut costs by half and support a planned 420-seat contract, while Flow GPT currently has 79 active users and may grow to 110–120. Monthly feature-flagging CDN requests are about 33 million. Flow GPT does not plan to migrate full event data, focusing instead on feature-flagging events and exposures, while deeper A/B-test analysis remains internal. The team is investigating an abnormal June-to-July event spike that may result from repeated requests. Experimentation SDKs and feature flagging are top priorities; experiment-progress views are useful but could be built internally. Self-hosting is not favored because reliability and maintenance are critical. Dan will provide multiple contract options, usage details, and migration support, with a decision targeted within a month.\n\n## Keywords\nAI-generated content, feature flagging, experimentation, contract negotiation, migration support, event analytics\n\n## Action Items\n\n**Dan Wathne**\nPrepare and send two contract proposal options to Alex Xi, one with a lower seat count and one covering full migration seats, including migration support documentation (19:00)\nProvide accurate and detailed usage projections and pricing information for Alex Xi to evaluate (21:55)\nBe available for live discussions to clarify questions and assist with the migration process as needed (23:10)\n\n**Alex Xi**\nReview contract proposals and run internal cost and usage analyses to determine the best option for FlowGPT (21:50)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
     }
   ]
 }

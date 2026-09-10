@@ -1,7 +1,7 @@
 {
   "company": "Weekly GrowthBook and",
   "slug": "weekly-growthbook-and",
-  "last_etl_date": "2026-09-03T06:04:10.793775",
+  "last_etl_date": "2026-09-10T06:13:41.844759",
   "calls": [
     {
       "id": "01KKA2YRZYW6WA7Q0DFFT230Z3",
@@ -152,6 +152,17 @@
       "date": "2026-09-02",
       "duration_minutes": 18,
       "summary": "# Weekly GrowthBook and Mastiff Software Meeting\nDate: 2026-09-02 | Duration: 18m\n\n## Summary\nNo summary available",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M1YQ9VBN15486RTX1SRSN0J6",
+      "source": "fireflies",
+      "title": "Weekly GrowthBook and Mastiff Software Meeting",
+      "date": "2026-09-09",
+      "duration_minutes": 5,
+      "summary": "# Weekly GrowthBook and Mastiff Software Meeting\nDate: 2026-09-09 | Duration: 5m\n\n## Summary\nThe team discussed whether to move forward with Francesca while another candidate remains under consideration, agreeing to allow a few days for her decision and let pipeline developments inform the outcome because delaying the hire has low immediate business impact. Candidate evaluation is focused on follow-up quality and domain fit: one prospect was rejected for weak follow-up, Brent became more confident in Reese after seeing how he connected prior experience to the company’s sales personas, and Ryan planned to meet Garrett and Justin, potentially using a bake-off among two or three candidates. Jake is expected to bring deals soon, but his round-robin inclusion is being delayed until other representatives build more pipeline; Ryan, Jake, and Jeff will review reporting and pipeline status. Andy is segmenting customer lists, while Chris is developing an AI-focused prospect list. Brent offered to help communicate with Francesca and support Ryan. Ryan reported viral-like symptoms, planned to rest and take a COVID test, and Lindsay is updating the ICP with new EMEA data to improve targeting and sales accuracy.\n\n## Keywords\ncandidate evaluation, pipeline management, hire decision, viral illness, ICP update, sales reporting\n\n## Action Items\n\n**Brent Holloway**\nInform Francesca about the current situation with multiple candidates and the accounts in the pipeline to help her with timely decision-making (01:46)\nRespond to Lindsay regarding updates on ICP data for EMEA (05:35)\n\n**Ryan McGurk**\nTalk with Ella regarding Francesca and other candidate pipelines, and decide on next steps (00:56)\nAdd Jake to the round robin of accounts management once pipeline volume is sufficient, likely by next Monday (02:21)\nConduct meeting with Jake tomorrow to review reporting work (02:38)\nGet tested for COVID-19 given current viral symptoms (05:29)\n\n**Brent Holloway and Ryan McGurk**\nContinue evaluating candidates Garrett, Justin, and Reese, and decide on invitations for next interview rounds following their upcoming calls (03:29)\n",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

@@ -1,0 +1,18 @@
+{
+  "company": "Sep 09, 05:00",
+  "slug": "sep-09-05-00",
+  "last_etl_date": "2026-09-10T06:13:41.842630",
+  "calls": [
+    {
+      "id": "01M249TH8WW6G7G24JEPSCMBGT",
+      "source": "fireflies",
+      "title": "Sep 09, 05:00 PM",
+      "date": "2026-09-10",
+      "duration_minutes": 48.66999816894531,
+      "summary": "# Sep 09, 05:00 PM\nDate: 2026-09-10 | Duration: 48.66999816894531m\n\n## Summary\nThe session explained how to create and run Growth Book experiments using stable user IDs and hash-based bucketing, equal traffic splits, namespaces, feature flags, and release plans. Traffic changes during live experiments can bias results, while namespaces help prevent conflicting exposure. Feature flags determine what users see and can apply targeting rules such as country or OS. The analysis discussion covered exposure events, fact tables, metrics, dimensions, Bayesian confidence intervals, health checks, and goal, secondary, and guardrail metrics. Rare events may require longer experiments to reduce uncertainty. Customer discussions covered migration support, experiment ideation, and escalation of complex statistical questions to data scientists. The team also reviewed limited Example App access and Cross Book as a richer presales and training environment managed by designated team members.\n\n## Keywords\nexperimentation, feature flags, GrowthBook, Bayesian analysis, metric slices, namespaces\n\n## Action Items\n\n**Daniel Lin**\nFollow up with Natasha or appropriate admin to obtain access to Example App for creating and editing experiments (43:38)\nContact Logan and Scott to request admin or developer access to the GrowthBook dev environment for demo purposes (44:53)\nPrepare for upcoming enabling call with Funding Pips using shared knowledge and seek support from James and August as needed (46:25)\n\n**Chris Sanders**\nProvide Daniel Lin with clarifications and examples to understand metric slices vs. dimensions as needed (18:00)\nContinue development and refinement of experimentation instructional slide decks, incorporating feedback from peers like Daniel Lin (42:22)\nCoordinate with Luke and data scientists to support customers with complex statistical questions outside of immediate expertise (37:51)\n",
+      "organizer": "chris@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

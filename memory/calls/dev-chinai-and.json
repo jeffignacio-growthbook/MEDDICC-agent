@@ -1,0 +1,18 @@
+{
+  "company": "Dev Chinai and",
+  "slug": "dev-chinai-and",
+  "last_etl_date": "2026-09-10T06:13:41.842836",
+  "calls": [
+    {
+      "id": "01M22JAF248T387JV27YHNCRTC",
+      "source": "fireflies",
+      "title": "Dev Chinai and Graham McNicoll",
+      "date": "2026-09-09",
+      "duration_minutes": 6.579999923706055,
+      "summary": "# Dev Chinai and Graham McNicoll\nDate: 2026-09-09 | Duration: 6.579999923706055m\n\n## Summary\nNo summary available",
+      "organizer": "graham@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Pricing and",
+  "slug": "growthbook-pricing-and",
+  "last_etl_date": "2026-09-10T06:13:41.846086",
+  "calls": [
+    {
+      "id": "01M23JW85YQ7139NSJFG9557VA",
+      "source": "fireflies",
+      "title": "GrowthBook Pricing and Rollout Agreement",
+      "date": "2026-09-09",
+      "duration_minutes": 32.09000015258789,
+      "summary": "# GrowthBook Pricing and Rollout Agreement\nDate: 2026-09-09 | Duration: 32.09000015258789m\n\n## Summary\nThe team agreed to GrowthBook pricing of $1,000 per user annually, with a minimum of 20 users, a 30% blended Q3 incentive, and a 3% renewal rate cap. The 12-month contract is expected to use net 30 payment terms, with billing based on purchased seats rather than actual usage; the team will begin with 20 seats and may add users in increments of five. GrowthBook will connect to Snowflake as a read-only service using a service account, querying existing tables while keeping data in the warehouse except for aggregated experiment results. Experimentation will use assignment data and metric fact tables linked by user IDs and timestamps, with custom metrics supported through the platform. Dana will lead a gradual rollout of experimentation, supported by training, expert sessions, account management, and ongoing vendor check-ins. The next steps are receiving the order form and customer agreement for legal and finance review, completing the Snowflake connection, and beginning experiments.\n\n## Keywords\nGrowthBook, Snowflake, pricing, data warehouse, A/B testing, experiment metrics\n\n## Action Items\n\n**Scott Keller**\nSend the official order form and legal agreement document for review to Dana and team (19:11)\nProvide the Snowflake integration guide document describing connection setup and data schema mapping (21:56)\nFollow up with Dana’s team on any legal or finance questions or approval requirements related to GrowthBook contract (31:00)\n\n**Dana**\nCoordinate quick legal review and finance sign-off on GrowthBook order and contract (19:11)\nLead internal coordination to connect Snowflake data sources with GrowthBook service (30:30)\n\n**Other Participants**\nReview pricing and platform details shown during the call, especially concerning user seat counts and contract terms (15:06)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

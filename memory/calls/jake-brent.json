@@ -1,7 +1,7 @@
 {
   "company": "Jake <> Brent",
   "slug": "jake-brent",
-  "last_etl_date": "2026-09-03T06:04:10.792805",
+  "last_etl_date": "2026-09-10T06:13:41.843627",
   "calls": [
     {
       "id": "01KG325ZD2GJE3VH7WZ9SNNVDP",
@@ -311,6 +311,17 @@
       "date": "2026-09-02",
       "duration_minutes": 35.63999938964844,
       "summary": "# Jake <> Brent weekly 1:1\nDate: 2026-09-02 | Duration: 35.63999938964844m\n\n## Summary\nThe team reviewed opportunity tracking, sales outreach, and operational improvements. A new report excluding demo requests provides clearer opportunity-source and performance data, but manual tagging still creates gaps; Ryan and Jeff will be updated as automated lead-source fields and reporting are developed (30:41–34:00). The team currently generates about six new opportunities weekly, mainly through LinkedIn, with additional contributions from webinars and open-source campaigns, and plans to target smaller companies to balance the pipeline (01:20). Sales outreach will aim to create at least two new sub-100-employee enterprise opportunities within one week by filtering HubSpot accounts and contacting approximately 30 prioritized companies through calls and personalized sequences, with a 10% conversion target (04:36–11:38). Messaging will emphasize product value, experimentation features, relevant customer insights, and natural personalization rather than pricing changes. The team will also practice demos, improve CRM data quality, and hold regular pipeline reviews.\n\n## Keywords\nLead Source, Opportunity Tracking, Pro to Enterprise Upgrade, HubSpot CRM, Sales Outreach, Reporting Automation\n\n## Action Items\n\n**Jake Stangl**\nWork with Jeff to improve lead source tracking and implement source fields in CRM to better attribute leads (32:58)\nSet a goal to generate two new opportunities from sub-100 employee Pro customers by next week using filtered HubSpot lists (04:36)\nBuild and run sequences targeting the top 30 Pro customers with fewer than 100 employees to generate upgrade conversations and opportunities (11:38)\nRefine and finalize outreach messaging for both Pro customers and former Growth Book customers, keeping tone authentic and concise (26:21)\nPractice product demo and pitch presentations to improve confidence before engaging prospects (13:46)\nShare new opportunity report excluding demo requests with Ryan and update him on lead sourcing efforts (33:30)\n\n**Brent**\nAssist Jake in constructing and analyzing HubSpot reports to isolate demo requests and valid opportunities (17:29)\nSupport messaging strategy by advising on framing value propositions and commercial insights for customer upgrades (09:04)\nHelp align pricing and approach discussions with Ryan to ensure consistent deal qualification and fee justification (30:41)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M1HBA0W5KB9RDRB1B4RJ1TQP",
+      "source": "fireflies",
+      "title": "Jake <> Brent weekly 1:1",
+      "date": "2026-09-09",
+      "duration_minutes": 28.579999923706055,
+      "summary": "# Jake <> Brent weekly 1:1\nDate: 2026-09-09 | Duration: 28.579999923706055m\n\n## Summary\nThe team reviewed slow post-holiday lead flow and identified two promising software-company leads, Second Nature and Mindstorm Studios, both originating from free or open-source usage and showing interest in Growth Book’s paid enterprise version. Ryan centrally assigned leads to James or Marcel in Europe. Jake and Brent configured Apollo for champion-tracking outreach, including field mapping for names, companies, and LinkedIn URLs, after earlier tool limitations. They refined a three-step LinkedIn sequence: an initial introduction, a meeting request after seven days, and a polite closure message one week later. Messaging will use clear identity statements, personalized fields, phased calls to action, and references to newer capabilities such as Cupid sequential testing and holdouts. The team also discussed re-engaging past users with tailored messaging and using AI assistance to improve drafts. Their short-term goal is to secure four meetings by next week.\n\n## Keywords\nlead generation, open-source users, LinkedIn outreach, sales sequencing, enterprise sales, messaging templates\n\n## Action Items\n\n**Jake Stangl**\nContinue sequencing outreach to champions based on the imported lead list, including calls and LinkedIn messaging follow-up (08:24)\nFinalize and launch the customized LinkedIn messaging sequence with improved templates incorporating Brent’s feedback on tone and personalization (23:27)\nFollow up in cadence with prospects using the three-step messaging plan discussed (initial, meeting request at 7 days, and closing message 7 days later) (26:04)\nAim to secure approximately four meetings by next week and gain entry into the sales opportunity round robin (27:09)\n\n**Brent Holloway**\nProvide further support and advice on messaging and sequencing as Jake launches his outreach (26:36)\nMonitor progress of Jake’s outreach and meetings to enable round robin inclusion soon (27:20)\n",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

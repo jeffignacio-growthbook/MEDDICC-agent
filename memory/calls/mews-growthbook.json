@@ -1,0 +1,18 @@
+{
+  "company": "Mews & GrowthBook",
+  "slug": "mews-growthbook",
+  "last_etl_date": "2026-09-10T06:13:41.849255",
+  "calls": [
+    {
+      "id": "01KZZS1T37C8ANR92SAVYM8MMV",
+      "source": "fireflies",
+      "title": "Mews & GrowthBook",
+      "date": "2026-09-09",
+      "duration_minutes": 53.95000076293945,
+      "summary": "# Mews & GrowthBook\nDate: 2026-09-09 | Duration: 53.95000076293945m\n\n## Summary\nThe team discussed moving experimentation fully in-house by offboarding Spiro by Q1 next year and reducing dependence on limited internal developer capacity. GrowthBook was presented as an AI-first, API-driven platform supporting self-serve experimentation, visual editing, AI-generated variants, server-side and client-side testing, and reduced flicker through its Edge SDK proxy. Payload CMS integration, reusable experimentation blocks, Figma workflows, and HubSpot form editing were considered important for enabling marketing and growth teams to launch tests independently. Native BigQuery and Databricks integrations would support flexible metrics, funnel analysis, and retroactive reporting, while AI-assisted analysis could help teams interpret results. APIs and Claude integration could automate summaries and updates in Confluence and JIRA, with Slack notifications also planned. The current target is 12 experiments per quarter, with potential to scale substantially. Pricing discussions will use estimated seats and monthly sessions, with a pricing review planned for September 23 and budget decisions required in Q4.\n\n## Keywords\nCRO, experimentation, AI integration, GrowthBook, Spiro off-boarding, Payload CMS\n\n## Action Items\n\n**Adam Cheal**\nProvide monthly website traffic data post-meeting to support GrowthBook pricing and planning (16:22)\nDeliver count of user seats who will access experimentation tools to assist GrowthBook pricing discussions (51:36)\nContinue working on the statement of work with Spiro regarding off-boarding and potential retainer transition for early 2024 (49:57)\n\n**James Shannon**\nFollow up with Ben at Spiro to facilitate discussions and share insights about transitioning experimentation in-house (22:41)\nProvide documentation and videos clarifying how to manipulate iframe-embedded HubSpot forms in GrowthBook Visual Editor (34:54)\nShare GrowthBook pricing documents for Muse review and schedule a follow-up presentation on September 23rd at 10 AM (51:42)\nSend documentation on Edge SDK and flicker reduction techniques discussed during the meeting (13:58)\nDeliver a summary write-up of key GrowthBook features and integrations demonstrated during the Visual Editor demo (35:28)\nAssist Muse with integration strategies for linking experiment learnings and results to Confluence and JIRA using GrowthBook API and Claude automations (46:28)\n\n**Rémy Marin**\nVerify and provide details on GrowthBook’s Slack integration capabilities for experiment notifications (39:52)\nSupport James Shannon in clarifying UI features that hide or disable iframe form elements in GrowthBook Visual Editor (33:53)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

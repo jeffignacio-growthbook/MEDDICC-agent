@@ -1,7 +1,7 @@
 {
   "company": "Scott & Ryan",
   "slug": "scott-ryan",
-  "last_etl_date": "2026-09-03T06:04:10.827312",
+  "last_etl_date": "2026-09-10T06:13:41.845378",
   "calls": [
     {
       "id": "01KTMBGKNRFSK9N0ZZPP4BE7C2",
@@ -36,6 +36,17 @@
       "date": "2026-08-20",
       "duration_minutes": 1,
       "summary": "# Scott & Ryan\nDate: 2026-08-20 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M23PYQRTKX6HJWSEDB9YQ4V5",
+      "source": "fireflies",
+      "title": "Scott & Ryan",
+      "date": "2026-09-09",
+      "duration_minutes": 29,
+      "summary": "# Scott & Ryan\nDate: 2026-09-09 | Duration: 29m\n\n## Summary\nThe discussion covered a $614,000 sales pipeline, including a potential $50,000 Boston Globe deal, Echo’s expected $100,000 close, CarGurus’ 400-user POC, and Grupo SF’s $46,000 POC. Pricing is moving toward usage-based models, with event- and metric-based approaches under review; CarGurus’ event-based estimate is about $3,600 per month, pending competitor benchmarking against Optimizely and Statsig. Snowflake and Heap integrations remain important to deal velocity: Natera stalled because of Heap limitations, while clients struggle to replicate Heap’s Snowflake integration. The team cited self-serve experimentation, deployment flexibility, and developer-friendliness as competitive advantages. Scott Keller’s closing confidence rose to 8 out of 10, supported by active prospecting and strong deal engagement, although pipeline volume is slightly below the ideal 3x coverage. AI-driven software delivery, customer word of mouth, and demand for scalable experimentation support Growth Book’s market position.\n\n## Keywords\nGrowthBook, Boston Globe, CarGurus, Heap integration, Event-based pricing, Sales pipeline\n\n## Action Items\n\n**Scott Keller**\nFollow up with CarGurus technical team to clarify why Heap to Snowflake connection is not working and request explanation on Heap integration issues before discussing building a custom integration (27:22)\nMonitor Retool monthly for user engagement and pipeline status checks to ensure account activity and forecast accuracy (24:17)\n\n**Ryan McGurk**\nOffer assistance to Scott regarding possible Heap integration build by consulting Jeremy if it becomes a blocker (27:28)\n",
       "organizer": "scott.keller@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

@@ -1,7 +1,7 @@
 {
-  "company": "Eng Standup",
+  "company": "Eng standup",
   "slug": "eng-standup",
-  "last_etl_date": "2026-09-03T06:04:10.820435",
+  "last_etl_date": "2026-09-10T06:13:41.846602",
   "calls": [
     {
       "id": "01KGJ8WY3PJ95HVBNJFF68YKB0",
@@ -298,6 +298,17 @@
       "summary": "# Eng Standup\nDate: 2026-08-25 | Duration: 31m\n\n## Summary\nKey discussions revolved around product feature development, including the initiation of AI agent capabilities and permissions, aimed at improving user productivity and enterprise readiness. Enhancements such as granular permission flows were introduced to improve admin control, while session replay infrastructure was highlighted as near-release. The team also made significant strides in funnel metrics, experimentation models, and diagnostic tools, emphasizing improvements in product analytics. Concurrent editing conflict handling now protects team collaboration, while updates on SDK parity and skills management aim to unify the developer experience. Lastly, shifts toward usage-based pricing are set to replace seat-based plans, facilitating a gradual transition to enhance revenue without alienating current users.\n\n## Keywords\nSession Replay, Feature Flags, SDK Development, Experimentation, Pricing Changes, Approval Flow\n\n## Action Items\n\n**Lillia Jackson**\nCollaborate with Bryce Fitzsimons on finalizing session replay pull requests and prepare for partial rollout (00:07)\n\n**Bryce Fitzsimons**\nContinue delivering completion on permission overhauls, experiment variation management, feature page redesign, and session replay infrastructure; coordinate approval flow design with Guy Langford-lee (01:16)\n\n**Guy Langford-lee**\nAssist with approval flow improvements and onboarding design refinements; manage Net Promoter Score (NPS) dashboard Slack integration for marketing team (04:19)\n\n**Omar Elshaikh**\nReview outstanding pull requests in Skills repository and maintain Modular Chat Platform (MCP) skill bundling integration (06:17)\n\n**Madhu Chavva**\nComplete SDK parity work including eval async and sticky bucketing across Python, Go, Rust SDKs; implement contextual bandits; plan for Swift SDK development (07:18)\n\n**Luke Sonnet**\nOversee funnel metrics finalization, sticky bucketing opt-in feature, holdout API endpoint developments; engage with design and approvals work; keep documentation updated for marketing and relevant teams (08:48)\n\n**Jeremy Dorn**\nMonitor infrastructure and build tooling improvements; handle pricing and billing changes communication and rollout; support Experimentation squad as needed; facilitate revenue change monitoring strategy (13:27)\n\n**Michael Knowlton**\nLead efforts on billing and pricing changes; investigate build failures on API documentation and assist SDK/experimentation-related fixes (14:31)\n\n**Adriel Vieira**\nProvide input on pricing accessibility concerns and assist with incremental refresh and stats engine fixes for experimentation tooling (18:41)\n",
       "organizer": "elyse@growthbook.io",
       "participants": 26,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M23G5B697K2Q97PRP06WG55W",
+      "source": "fireflies",
+      "title": "Eng standup",
+      "date": "2026-09-09",
+      "duration_minutes": 1,
+      "summary": "# Eng standup\nDate: 2026-09-09 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "johnny@growthbook.io",
+      "participants": 24,
       "summary_quality": "good"
     }
   ]
