@@ -42,6 +42,8 @@ from api.router import (
     _is_id_scoped_enrichment_call,
     _queried_snapshot_dates_before,
     _snapshot_anchors_satisfied,
+    _snapshot_anchor_redirect_instruction,
+    _build_missing_snapshot_fetch,
     verify_snapshot_date_labeling,
 )
 
@@ -293,6 +295,81 @@ def test_verify_snapshot_date_labeling_noop_without_as_of_claim():
     print("✓ labeling check is a no-op when the answer makes no 'as of' claim")
 
 
+# 2026-09-11 ROUND 3: a THIRD incident on this same mechanism family — see
+# tests/test_snapshot_finalize_forced_fetch.py for the full end-to-end
+# reproduction. These two unit tests pin the extracted logic directly.
+
+def test_redirect_instruction_is_none_when_anchors_already_satisfied():
+    assert _snapshot_anchor_redirect_instruction(
+        "2026-09-08", "2026-07-27", {"2026-09-08", "2026-07-27"}) is None
+    print("✓ redirect instruction is None once both anchors are queried")
+
+
+def test_redirect_instruction_is_none_for_non_snapshot_questions():
+    assert _snapshot_anchor_redirect_instruction(None, None, set()) is None
+    print("✓ redirect instruction is None when this isn't a snapshot-comparison question")
+
+
+def test_redirect_instruction_names_the_specific_missing_date():
+    instruction = _snapshot_anchor_redirect_instruction(
+        "2026-09-08", "2026-07-27", {"2026-09-08"})
+    assert instruction is not None
+    assert "2026-07-27" in instruction, (
+        "the redirect must name the SPECIFIC missing date, not just say "
+        "'query the missing snapshot'"
+    )
+    assert "filter_table" in instruction, (
+        "the redirect must tell the model what action to take (issue a "
+        "filter_table call), not just what's wrong"
+    )
+    print("✓ redirect instruction names the specific missing snapshot_date and the concrete next action")
+
+
+def test_build_missing_snapshot_fetch_reuses_template_filters():
+    """The forced fetch must reuse the SAME region/segment/etc. filters
+    from a prior deals_snapshot query, only swapping the snapshot_date —
+    never guess fresh filters that could silently answer a different
+    population."""
+    queries_run = [
+        {"tool": "filter_table", "params": {
+            "table": "deals_snapshot",
+            "columns": ["deal_id", "stage_id", "region", "segment", "snapshot_date"],
+            "filters": [["eq", "snapshot_date", "2026-09-08"],
+                        ["eq", "region", "EMEA"],
+                        ["eq", "segment", "Enterprise"]],
+        }, "rows_returned": 5},
+    ]
+    result = _build_missing_snapshot_fetch(queries_run, "2026-07-27")
+    assert result is not None
+    table, columns, filters = result
+    assert table == "deals_snapshot"
+    filters_by_col = {f[1]: f[2] for f in filters}
+    assert filters_by_col["snapshot_date"] == "2026-07-27", (
+        "snapshot_date must be swapped to the missing date"
+    )
+    assert filters_by_col["region"] == "EMEA", (
+        "region filter must be carried over unchanged"
+    )
+    assert filters_by_col["segment"] == "Enterprise", (
+        "segment filter must be carried over unchanged"
+    )
+    print("✓ the forced fetch reuses the template query's region/segment filters, swapping only snapshot_date")
+
+
+def test_build_missing_snapshot_fetch_returns_none_without_a_template():
+    """No prior deals_snapshot filter_table call with a snapshot_date
+    filter exists yet — there is nothing safe to model the forced fetch
+    on, so this must return None rather than guess filters."""
+    assert _build_missing_snapshot_fetch([], "2026-07-27") is None
+    queries_run = [
+        {"tool": "filter_table", "params": {
+            "table": "deals", "filters": [["eq", "region", "EMEA"]],
+        }, "rows_returned": 5},
+    ]
+    assert _build_missing_snapshot_fetch(queries_run, "2026-07-27") is None
+    print("✓ returns None when no deals_snapshot query with a snapshot_date filter exists to model on")
+
+
 if __name__ == "__main__":
     test_known_deal_ids_before_unions_prior_steps_only()
     test_id_scoped_lookup_after_snapshot_diff_is_detected()
@@ -309,4 +386,9 @@ if __name__ == "__main__":
     test_verify_snapshot_date_labeling_passes_when_dates_match()
     test_verify_snapshot_date_labeling_noop_without_snapshot_data()
     test_verify_snapshot_date_labeling_noop_without_as_of_claim()
+    test_redirect_instruction_is_none_when_anchors_already_satisfied()
+    test_redirect_instruction_is_none_for_non_snapshot_questions()
+    test_redirect_instruction_names_the_specific_missing_date()
+    test_build_missing_snapshot_fetch_reuses_template_filters()
+    test_build_missing_snapshot_fetch_returns_none_without_a_template()
     print("\n✅ All tests passed")

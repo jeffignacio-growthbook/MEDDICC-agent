@@ -105,6 +105,10 @@ jobs:
           # (b) even a truly unavoidable ID-scoped enrichment call (company
           # name for already-matched deal_ids) fell through to a fresh
           # full-budget loop iteration instead of synthesizing immediately.
+          # test_enrichment_shortcut.py also carries unit coverage for the
+          # round-3 fix in TEST 0i below (_snapshot_anchor_redirect_
+          # instruction, _build_missing_snapshot_fetch) — same file since
+          # it's the same snapshot-anchor mechanism family.
           PYTHONPATH=. python3 tests/test_schema_context_snapshot_visibility.py
           PYTHONPATH=. python3 tests/test_enrichment_shortcut.py
 
@@ -161,6 +165,38 @@ jobs:
           # changes surfaced as an explicit aside rather than hidden).
           PYTHONPATH=. python3 tests/test_pipeline_stage_lookup.py
           PYTHONPATH=. python3 tests/test_snapshot_diff_reporting_scope.py
+
+      - name: "TEST 0i — Offline: scratchpad-rejection retries force the missing snapshot anchor, not a partial answer"
+        run: |
+          set -e
+          # 2026-09-11 round 3, same live run again: the scratchpad-
+          # rejection retry mechanism (TEST 0f) and the "both snapshot
+          # anchors required" gate (TEST 0d) were in conflict for this
+          # question shape. When the model narrated twice in a row
+          # instead of tool-calling, the shared no_progress_streak retry
+          # budget exhausted before the prior snapshot was ever queried —
+          # and _finalize_from_data used to synthesize straight from
+          # whatever existed, which was only ONE of the two required
+          # snapshots. Two fixes: (1) the corrective message sent after a
+          # scratchpad rejection now names the SPECIFIC missing
+          # snapshot_date and tells the model to query it
+          # (_snapshot_anchor_redirect_instruction), instead of only
+          # "stop narrating"; (2) if that still doesn't land in time,
+          # _finalize_from_data itself forces ONE direct, non-
+          # conversational filter_table call for the missing anchor
+          # (_build_missing_snapshot_fetch) before falling through to
+          # synthesis or giving up — the missing date is already known
+          # deterministically, so this isn't a guess.
+          # test_snapshot_finalize_forced_fetch.py drives the REAL
+          # dynamic_query_loop end-to-end (scripted LLM responses, stubbed
+          # DB/classification) reproducing the exact interaction: one real
+          # tool call, two scratchpad narrations in a row, then confirms
+          # the forced fetch happens and the finalize synthesis call
+          # actually sees both snapshots — plus a negative control proving
+          # the forced fetch is a no-op when both anchors were already
+          # queried. The extracted helpers get direct unit coverage in
+          # test_enrichment_shortcut.py.
+          PYTHONPATH=. python3 tests/test_snapshot_finalize_forced_fetch.py
 
       - name: "TEST 0g — Offline: loop ceiling is sized against the hardest question, not one incident"
         run: |

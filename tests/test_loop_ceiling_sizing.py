@@ -117,16 +117,20 @@ def test_no_user_facing_message_names_budget_tokens_or_processing_limits():
     # DYNAMIC_SYSTEM_PROMPT (telling the MODEL to write efficient queries
     # is not the same as telling the USER why their question failed).
     def _function_body(name):
-        """Extract a nested `    def name(...):` function's body by
-        indentation, not by looking for the next `def` — these are nested
-        functions inside dynamic_query_loop, and the code that follows
-        _finalize_from_data is the rest of that outer function's body
-        (not another nested def), so a next-def lookahead swallows
-        everything up to the next unrelated top-level function instead of
-        stopping where this one actually ends."""
+        """Extract a nested `    def name(...):` or `    async def
+        name(...):` function's body by indentation, not by looking for
+        the next `def` — these are nested functions inside
+        dynamic_query_loop, and the code that follows _finalize_from_data
+        is the rest of that outer function's body (not another nested
+        def), so a next-def lookahead swallows everything up to the next
+        unrelated top-level function instead of stopping where this one
+        actually ends. _finalize_from_data became `async def` in the
+        2026-09-11 round-3 fix (it now awaits a forced filter_table call),
+        so both prefixes must match."""
         lines = src.splitlines()
-        start = next(i for i, l in enumerate(lines) if l == f"    def {name}(" or
-                     l.startswith(f"    def {name}("))
+        start = next(i for i, l in enumerate(lines)
+                     if l.startswith(f"    def {name}(") or
+                     l.startswith(f"    async def {name}("))
         end = len(lines)
         for i in range(start + 1, len(lines)):
             stripped = lines[i]
@@ -195,14 +199,28 @@ def test_no_user_facing_message_names_budget_tokens_or_processing_limits():
         logger.*() calls (application-log text, never part of a returned
         answer) — leaving only the string literals actually assembled into
         a returned answer."""
-        # Drop the first triple-quoted docstring right after the def line.
-        body = re.sub(r'^(    def \w+\([^)]*\)[^:]*:\s*\n)\s*""".*?"""',
+        # Drop the first triple-quoted docstring right after the def line
+        # (async or not — _finalize_from_data became `async def` in the
+        # 2026-09-11 round-3 fix).
+        body = re.sub(r'^(    (?:async )?def \w+\([^)]*\)[^:]*:\s*\n)\s*""".*?"""',
                        r'\1', body, count=1, flags=re.DOTALL)
         body = _strip_logger_calls(body)
         # Drop lines that are tag comparisons/lookups, not text construction.
         body = "\n".join(
             line for line in body.splitlines()
             if "reason_tag ==" not in line and "reason_tag=" not in line
+        )
+        # Drop pure comment lines. They're never user-facing text, but a
+        # contraction in one ("didn't", "isn't") reads to the naive
+        # string-literal regex below as an opening single-quote — which
+        # then greedily matches through to the next real apostrophe or
+        # quote anywhere later in the function, sweeping in unrelated
+        # real string literals (and any banned term they contain) as a
+        # false positive. Full-line comments carry no risk of hiding a
+        # real returned string, so dropping them outright is safe.
+        body = "\n".join(
+            line for line in body.splitlines()
+            if not line.strip().startswith("#")
         )
         return body
 

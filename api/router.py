@@ -1530,6 +1530,88 @@ def _snapshot_anchors_satisfied(current_snapshot_date, prior_snapshot_date,
         return True  # not a snapshot-comparison question — nothing to gate
     return {current_snapshot_date, prior_snapshot_date}.issubset(queried_dates)
 
+def _snapshot_anchor_redirect_instruction(current_snapshot_date, prior_snapshot_date,
+                                           queried_dates: set):
+    """A concrete "query this exact date next" directive, or None if this
+    isn't a snapshot-comparison question or both anchors are already
+    queried.
+
+    2026-09-11 round 3: a scratchpad-rejection retry ("stop narrating,
+    give me a clean answer") told the model WHAT NOT TO DO but not what
+    TO DO — fine when the data in hand is actually sufficient, but for a
+    snapshot-comparison question where only one of two required anchors
+    had ever been queried, "give a clean answer" left the model nothing
+    concrete to act on except narrate an answer again from the same
+    incomplete data. That happened twice in a row, which exhausted the
+    shared no_progress_streak retry budget and forced a finalize from
+    only one snapshot's worth of data. This gives the retry message a
+    specific next action instead — the missing snapshot_date is already
+    known deterministically (resolve_snapshot_anchor_dates() resolved it
+    before the loop started), so telling the model to fetch it is not a
+    guess. Same directive text already proven to work at the
+    enrichment-shortcut gate above; factored out so both call the same
+    logic instead of drifting.
+    """
+    if _snapshot_anchors_satisfied(current_snapshot_date, prior_snapshot_date, queried_dates):
+        return None
+    missing = sorted({current_snapshot_date, prior_snapshot_date} - queried_dates)
+    return (
+        f"You have NOT yet queried snapshot_date={missing[0]!r} from "
+        f"deals_snapshot — that is why there is no complete diff to "
+        f"answer from yet, and narrating an answer again will not fix "
+        f"that. This question requires BOTH current_snapshot_date="
+        f"{current_snapshot_date} AND prior_snapshot_date="
+        f"{prior_snapshot_date} queried before any stage-change diff can "
+        f"be computed; you have only queried "
+        f"{', '.join(sorted(queried_dates)) or 'neither'} so far. Issue a "
+        f"filter_table call against deals_snapshot with "
+        f"snapshot_date={missing[0]!r} now — do not attempt any answer "
+        f"until that call has been made."
+    )
+
+def _build_missing_snapshot_fetch(queries_run: list, missing_date: str):
+    """Given a prior filter_table call against deals_snapshot for a
+    DIFFERENT snapshot_date, build (table, columns, filters) to fetch
+    `missing_date` with the SAME region/segment/etc. filters instead of
+    guessing them fresh.
+
+    2026-09-11 round 3: when a scratchpad-rejection retry still leaves a
+    required snapshot anchor unqueried (the model narrated twice instead
+    of tool-calling, and the redirect instruction didn't get through in
+    time), the fallback path forces this exact call directly rather than
+    finalizing from only one snapshot's data. The missing date itself is
+    already known deterministically from resolve_snapshot_anchor_dates()
+    — the only unknown is which region/segment/etc. filters the question
+    actually needs, and those are already sitting in the model's own
+    prior call for the OTHER anchor. Reuse them verbatim.
+
+    Returns None if no deals_snapshot filter_table call with a
+    snapshot_date filter exists yet — there is nothing safe to model the
+    forced fetch on, so the caller falls through to normal handling
+    rather than guessing filters that could silently answer a different
+    population than the one asked about.
+    """
+    for q in reversed(queries_run):
+        if q.get("tool") != "filter_table":
+            continue
+        p = q.get("params") or {}
+        if p.get("table") != "deals_snapshot":
+            continue
+        filters = p.get("filters") or []
+        if not any(
+            isinstance(f, (list, tuple)) and len(f) >= 2 and f[1] == "snapshot_date"
+            for f in filters
+        ):
+            continue
+        new_filters = []
+        for f in filters:
+            if isinstance(f, (list, tuple)) and len(f) >= 2 and f[1] == "snapshot_date":
+                new_filters.append(["eq", "snapshot_date", missing_date])
+            else:
+                new_filters.append(list(f))
+        return p.get("table"), p.get("columns"), new_filters
+    return None
+
 def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = None) -> dict:
     """
     Aggregate large result sets and sample for synthesis.
@@ -2327,12 +2409,88 @@ async def dynamic_query_loop(question, history, params,
             "answered": False,
         }
 
-    def _finalize_from_data(reason_tag):
+    async def _finalize_from_data(reason_tag):
         """PART 2b: stop looping and answer from data already gathered.
 
         One forced synthesis call (no further tools) if there is data and a
         little budget left; otherwise a plain diagnostic. Either way the loop
-        ends here instead of burning the rest of the budget."""
+        ends here instead of burning the rest of the budget.
+
+        2026-09-11 round 3: async now — scratchpad_prose_rejected may need
+        to force one direct filter_table call (see below) before falling
+        through to the normal synthesis/give-up branches.
+        """
+        # A scratchpad-rejection finalize can land here with a snapshot-
+        # comparison question still missing a required anchor: the model
+        # narrated an answer twice instead of tool-calling (the redirect
+        # instruction added to the retry message didn't get through in
+        # time), which burned the shared no_progress_streak budget before
+        # ever querying the second snapshot. The honest move here isn't
+        # "synthesize from what exists" (that would present a diff that
+        # was never actually computed — only one snapshot's worth of data
+        # exists) or "give up" (unnecessary — the missing query is a
+        # FIXED, deterministic fact already known from
+        # resolve_snapshot_anchor_dates(), not something that needs the
+        # model to reason about). Force that one direct call here instead.
+        if reason_tag == "scratchpad_prose_rejected":
+            queried_dates = _queried_snapshot_dates_before(accumulated_data, iteration)
+            if not _snapshot_anchors_satisfied(
+                    current_snapshot_date, prior_snapshot_date, queried_dates):
+                missing_date = sorted(
+                    {current_snapshot_date, prior_snapshot_date} - queried_dates)[0]
+                template = _build_missing_snapshot_fetch(queries_run, missing_date)
+                if template:
+                    fetch_table, fetch_columns, fetch_filters = template
+                    logger.info(
+                        f"[FINALIZE] scratchpad_prose_rejected with missing "
+                        f"snapshot anchor {missing_date} — forcing one "
+                        f"direct filter_table call instead of finalizing "
+                        f"from only one snapshot's data."
+                    )
+                    try:
+                        forced_result = await T.filter_table(
+                            sb, table=fetch_table, columns=fetch_columns,
+                            filters=fetch_filters)
+                        if "error" not in forced_result:
+                            forced_aggregated = _aggregate_and_sample(forced_result)
+                            accumulated_data[f"step_{iteration}_forced_anchor_raw"] = forced_result
+                            accumulated_data[f"step_{iteration}_forced_anchor"] = forced_aggregated
+                            queries_run.append({
+                                "tool": "filter_table",
+                                "params": {"table": fetch_table, "columns": fetch_columns,
+                                           "filters": fetch_filters},
+                                "rows_returned": len(forced_result.get("rows", [])),
+                            })
+                            messages.append({"role": "user", "content": (
+                                f"[SYSTEM] The prior responses narrated "
+                                f"instead of querying — automatically "
+                                f"fetched the missing required "
+                                f"snapshot_date={missing_date!r} before "
+                                f"finalizing. Tool result: "
+                                f"{json.dumps(forced_result, default=str)[:3000]}"
+                            )})
+                            logger.info(
+                                f"[FINALIZE] forced anchor fetch succeeded: "
+                                f"{len(forced_result.get('rows', []))} rows "
+                                f"for snapshot_date={missing_date}"
+                            )
+                        else:
+                            logger.warning(
+                                f"[FINALIZE] forced anchor fetch returned "
+                                f"an error: {forced_result.get('error')}"
+                            )
+                    except Exception as e:
+                        logger.warning(f"[FINALIZE] forced anchor fetch raised: {e}")
+                else:
+                    logger.warning(
+                        f"[FINALIZE] scratchpad_prose_rejected with "
+                        f"missing anchor {missing_date}, but no prior "
+                        f"deals_snapshot filter_table call exists to "
+                        f"model the forced fetch on — falling through to "
+                        f"normal partial-data handling rather than "
+                        f"guessing filters."
+                    )
+
         tr = _extract_rows_from_accumulated(accumulated_data, sb=sb)
         has_rows = bool(tr.get("rows"))
         # No data at all → nothing to synthesise from.
@@ -2507,7 +2665,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                         f"answer — forcing a clean resynthesis instead of "
                         f"shipping it. raw[:200]={stripped[:200]!r}"
                     )
-                    messages.append({"role": "user", "content": (
+                    correction = (
                         "⚠️ That response included internal reasoning, a "
                         "working table, or narration about your own process "
                         "(e.g. \"let me now...\", \"checking for...\") — not "
@@ -2516,10 +2674,22 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                         "formatted for Slack, as {\"answer\": \"...\"}. Do "
                         "any reasoning silently — do not include it, and do "
                         "not attempt the answer more than once."
-                    )})
+                    )
+                    # 2026-09-11 round 3: if this is a snapshot-comparison
+                    # question and a required anchor was never queried,
+                    # "produce a clean answer from what you have" gives the
+                    # model nothing to act on but narrate again — tell it
+                    # exactly what to query instead. See
+                    # _snapshot_anchor_redirect_instruction() docstring.
+                    queried_dates = _queried_snapshot_dates_before(accumulated_data, iteration)
+                    redirect = _snapshot_anchor_redirect_instruction(
+                        current_snapshot_date, prior_snapshot_date, queried_dates)
+                    if redirect:
+                        correction += "\n\n" + redirect
+                    messages.append({"role": "user", "content": correction})
                     no_progress_streak += 1
                     if no_progress_streak >= 2:
-                        return _finalize_from_data("scratchpad_prose_rejected")
+                        return await _finalize_from_data("scratchpad_prose_rejected")
                     continue
 
                 # Treat as direct prose answer
@@ -2561,7 +2731,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             # we stop, rather than keep spending the budget on malformed calls.
             no_progress_streak += 1
             if no_progress_streak >= 2:
-                return _finalize_from_data("no_progress")
+                return await _finalize_from_data("no_progress")
             continue
 
         if "answer" in parsed:
@@ -2596,8 +2766,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     f"resynthesis instead of shipping it. "
                     f"answer[:200]={answer_text[:200]!r}"
                 )
-                messages.append({"role": "assistant", "content": raw})
-                messages.append({"role": "user", "content": (
+                correction = (
                     "⚠️ That answer included internal reasoning, a "
                     "working table, or narration about your own process "
                     "(e.g. \"let me now...\", \"checking for...\") — not "
@@ -2606,10 +2775,21 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     "formatted for Slack, as {\"answer\": \"...\"}. Do "
                     "any reasoning silently — do not include it, and do "
                     "not attempt the answer more than once."
-                )})
+                )
+                # 2026-09-11 round 3 — see the matching comment on the
+                # prose-fallback path above: give the model a concrete
+                # next action when a required snapshot anchor is missing,
+                # instead of just telling it to stop narrating.
+                queried_dates = _queried_snapshot_dates_before(accumulated_data, iteration)
+                redirect = _snapshot_anchor_redirect_instruction(
+                    current_snapshot_date, prior_snapshot_date, queried_dates)
+                if redirect:
+                    correction += "\n\n" + redirect
+                messages.append({"role": "assistant", "content": raw})
+                messages.append({"role": "user", "content": correction})
                 no_progress_streak += 1
                 if no_progress_streak >= 2:
-                    return _finalize_from_data("scratchpad_prose_rejected")
+                    return await _finalize_from_data("scratchpad_prose_rejected")
                 continue
 
             verification_issues = []
@@ -2789,7 +2969,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                        f"short-circuiting without tool execution")
             no_progress_streak += 1
             if no_progress_streak >= 2:
-                return _finalize_from_data("duplicate_tool_call")
+                return await _finalize_from_data("duplicate_tool_call")
 
             # Don't execute the tool. Instead, inject the existing result and
             # force the model to use it or query differently.
@@ -2814,7 +2994,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
         if not tool_fn:
             logger.info(f"[LOOP iter={iteration}] unknown tool requested: {tool_name!r}")
-            return _finalize_from_data(f"unknown_tool:{tool_name}")
+            return await _finalize_from_data(f"unknown_tool:{tool_name}")
 
         if tool_name == "aggregate_results":
             data = tool_params.get("data", [])
@@ -2942,7 +3122,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
                         # Force synthesis by calling _finalize_from_data
                         # This uses the data we just retrieved
-                        return _finalize_from_data("dimension_retry_succeeded")
+                        return await _finalize_from_data("dimension_retry_succeeded")
 
         # CHECK: was this an unavoidable ID-scoped enrichment lookup
         # (e.g. company_name for deal_ids a snapshot diff already matched)?
@@ -3004,14 +3184,14 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     f"deal_ids — synthesizing immediately instead of "
                     f"looping further."
                 )
-                return _finalize_from_data("id_scoped_enrichment_lookup")
+                return await _finalize_from_data("id_scoped_enrichment_lookup")
 
         # PART 2b: a tool call that returns zero rows is no forward progress.
         # Two no-progress steps in a row end the loop.
         if row_count == 0:
             no_progress_streak += 1
             if no_progress_streak >= 2:
-                return _finalize_from_data("no_new_data")
+                return await _finalize_from_data("no_new_data")
         else:
             no_progress_streak = 0
 
@@ -3100,7 +3280,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         except Exception:
             pass
 
-    return _finalize_from_data("iterations_exhausted")
+    return await _finalize_from_data("iterations_exhausted")
 
 async def route_question(question: str, user_id: str,
                           persona: dict = None,
