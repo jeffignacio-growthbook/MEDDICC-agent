@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from llm_client import LLMClient
 from api.db import get_supabase, log_unanswered, is_admin, get_prior_entities, get_api_history
 from api import handlers
+from api.snapshot_diff import diff_snapshots, rows_for_snapshot_date
 
 # Configure logging for Railway (stderr is better captured than stdout)
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -2542,22 +2543,83 @@ async def dynamic_query_loop(question, history, params,
                         "gathered partial data, but this question needs a "
                         "narrower scope to fully summarize"),
                     "tool_results": tr, "answered": False}
+
+        # 2026-09-11 round 5: for a snapshot-comparison question, once
+        # both anchor dates' rows are actually present in
+        # accumulated_data (whether the model queried both naturally, or
+        # the round-3 forced-fetch above just filled in the missing one),
+        # compute the stage-change/entry/exit/owner-change diff HERE, in
+        # code — not by asking the model to narrate a comparison of two
+        # row sets. Three straight live-test failures (unfinished
+        # scratchpad text, narrating twice instead of tool-calling and
+        # burning the retry budget, then losing the enrichment lookup's
+        # own data) were three different failure MODES of the same root
+        # cause: a deterministic set diff is not a task an LLM should be
+        # asked to perform in prose. See api/snapshot_diff.py's module
+        # docstring for the full incident history this closes. When this
+        # fires, the model's synthesis job narrows to "write clean prose
+        # from an already-computed structured result" — never "compute
+        # the diff yourself" again.
+        diff_result = None
+        if current_snapshot_date and prior_snapshot_date:
+            current_rows = rows_for_snapshot_date(accumulated_data, current_snapshot_date)
+            prior_rows = rows_for_snapshot_date(accumulated_data, prior_snapshot_date)
+            if current_rows and prior_rows:
+                diff_result = diff_snapshots(current_rows, prior_rows)
+                logger.info(
+                    f"[SNAPSHOT_DIFF] computed deterministically: "
+                    f"{len(diff_result['stage_changes'])} stage changes, "
+                    f"{len(diff_result['population_entries'])} entries, "
+                    f"{len(diff_result['population_exits'])} exits, "
+                    f"{len(diff_result['owner_changes'])} owner changes "
+                    f"(current={len(current_rows)} rows, prior={len(prior_rows)} rows)"
+                )
+
         try:
-            # Add aggregation instruction for finalization too
-            finalize_prompt = (
-                "Stop calling tools. Using ONLY the data already gathered above, "
-                f"answer this question now: {question}\n\n"
-                "CRITICAL: If answering about activity over time/dimensions:\n"
-                "• State data from EVERY row/week/segment retrieved\n"
-                "• Do NOT anchor on subset or sample\n"
-                "• Break down by component before stating totals\n"
-                "• If a row/segment has $0 activity → say '$0' or 'flat' explicitly\n"
-                "• ONLY say 'pending' if the row is ACTUALLY MISSING (not just $0)\n"
-                "• Use explicit dimension names (Mid-Market, NAM, etc.) not dollar refs\n\n"
-                'Respond as {"answer": "..."}. If the gathered data genuinely '
-                'cannot answer it, still respond as {"answer": "..."} and say '
-                "plainly what is missing."
-            )
+            if diff_result is not None:
+                # The diff is DONE — the model only writes prose from it.
+                # Explicitly forbid recomputing it, and cap the JSON size
+                # sent to the model to keep this a bounded synthesis call
+                # regardless of how many deals changed.
+                diff_json = json.dumps(diff_result, default=str)
+                finalize_prompt = (
+                    "The stage-change diff between the two snapshots has "
+                    "ALREADY been computed in code — do NOT recompute it, "
+                    "do NOT re-derive it from raw rows, and do NOT "
+                    "describe your own comparison process. Here is the "
+                    "exact, final, structured result:\n\n"
+                    f"{diff_json[:4000]}\n\n"
+                    f"Using ONLY this structured result, write a clean, "
+                    f"finished Slack answer to: {question}\n\n"
+                    "Format as separate sections, each only if its list "
+                    "is non-empty:\n"
+                    "• *Stage changes*: for each entry in stage_changes, "
+                    "name the deal (company_name from current_row/"
+                    "prior_row if present, else deal_id) and its prior → "
+                    "current stage.\n"
+                    "• *New deals*: deal_ids in population_entries.\n"
+                    "• *Dropped*: deal_ids in population_exits.\n"
+                    "• *Owner changes*: one line per entry in "
+                    "owner_changes, noted as a stage-unrelated aside.\n\n"
+                    "Do NOT invent company names not present in the data. "
+                    'Respond as {"answer": "..."}.'
+                )
+            else:
+                # Add aggregation instruction for finalization too
+                finalize_prompt = (
+                    "Stop calling tools. Using ONLY the data already gathered above, "
+                    f"answer this question now: {question}\n\n"
+                    "CRITICAL: If answering about activity over time/dimensions:\n"
+                    "• State data from EVERY row/week/segment retrieved\n"
+                    "• Do NOT anchor on subset or sample\n"
+                    "• Break down by component before stating totals\n"
+                    "• If a row/segment has $0 activity → say '$0' or 'flat' explicitly\n"
+                    "• ONLY say 'pending' if the row is ACTUALLY MISSING (not just $0)\n"
+                    "• Use explicit dimension names (Mid-Market, NAM, etc.) not dollar refs\n\n"
+                    'Respond as {"answer": "..."}. If the gathered data genuinely '
+                    'cannot answer it, still respond as {"answer": "..."} and say '
+                    "plainly what is missing."
+                )
 
             synth = client.complete(
                 messages=messages + [{"role": "user", "content": finalize_prompt}],

@@ -231,6 +231,33 @@ jobs:
           # what makes the data visible.
           PYTHONPATH=. python3 tests/test_finalize_shortcut_message_gap.py
 
+      - name: "TEST 0k — Offline: snapshot stage-change diffs are computed in code, never asked of the LLM"
+        run: |
+          set -e
+          # 2026-09-11 round 5: three consecutive live-test failures
+          # (TEST 0f/0i's unfinished scratchpad text and narrate-twice
+          # retry exhaustion, TEST 0j's lost enrichment data) were three
+          # different failure MODES of one root cause — the model was
+          # being asked to diff two snapshot row sets in free text, which
+          # is a deterministic set operation, not a reasoning task an LLM
+          # should ever perform in prose. api/snapshot_diff.py's
+          # diff_snapshots() computes stage changes / population entries
+          # / population exits / owner-change asides in code. Wired into
+          # dynamic_query_loop's _finalize_from_data: whenever both
+          # snapshot anchors' rows are present in accumulated_data, the
+          # finalize prompt now embeds the ALREADY-COMPUTED structured
+          # result and explicitly forbids the model from recomputing it —
+          # the model's job narrows to writing clean prose from a given
+          # structure, never diffing two snapshots itself again.
+          # test_snapshot_diff.py covers diff_snapshots() correctness
+          # against the exact 29-row/31-row shape from the incident logs
+          # (stage changes, entries, exits, owner-change asides, the
+          # stage_order-with-stage_id-fallback comparison), plus an
+          # end-to-end proof that the finalize prompt sent to the LLM
+          # contains the computed diff and never the old prompt that
+          # asked the model to produce the comparison itself.
+          PYTHONPATH=. python3 tests/test_snapshot_diff.py
+
       - name: "TEST 0g — Offline: loop ceiling is sized against the hardest question, not one incident"
         run: |
           set -e
