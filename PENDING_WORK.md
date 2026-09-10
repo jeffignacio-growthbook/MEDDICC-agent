@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-09 (updated after synthesis aggregation fix completion)
+**Last Updated:** 2026-09-10 (updated after date-resolution single-source-of-truth audit)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -158,6 +158,86 @@ None currently.
 2. Segment name omission not causing user confusion
 3. Week aggregation working across all time-range queries
 
+**⚠️ CAVEAT ADDED 2026-09-10:** The date-resolution audit below found that
+"the last 2 weeks" in this test's own query resolved to roughly a 30-day
+window (Aug 17 – Sep 8), not 14 days, because the classifier's time_window
+schema had no field for the day count. The synthesis-completeness fix
+above is still correct — synthesis DID faithfully report everything that
+came back — but "everything that came back" was itself the wrong period
+for "the last 2 weeks." The -$120K figure and the Aug 17/Aug 24/Aug 28/Sep 7
+week list should be re-verified now that the date-resolution fix is
+deployed, against a genuinely 14-day window, before being cited again as
+a settled number.
+
+---
+
+### Date Resolution Single-Source-of-Truth Audit (2026-09-10)
+**Status:** ✅ COMPLETE - Four instances fixed, structural CI gate added
+
+**Issue:** "Last 2 weeks" and similar relative-time phrases resolved to
+wrong date windows in multiple, independently-broken places, discovered
+one at a time across three follow-up questions on the same live incident:
+1. `query_pipeline_movement`'s `_pm_view_movement` checked a
+   `time_window.type == "relative_days"` shape nothing ever produced —
+   silently fell back to "compare whichever two snapshots exist."
+2. The classifier's `time_window` JSON schema had no `n` field for
+   `period=last_N_days`, so `resolve_time_window()` silently defaulted to
+   30 days for any "last N days/weeks" phrase.
+3. `dynamic_query_loop`'s `deals_snapshot` "changed stage" comparisons
+   needed a second (prior) date the resolved window didn't provide, so
+   the model invented one (off by ~64 days in the reported case).
+4. Found auditing the above: `resolve_time_window()` itself called
+   `date.today()` (server UTC) while `client.yaml`'s reporting timezone
+   is `America/New_York` — disagreeing with itself for part of every
+   evening. Same root cause, one layer deeper.
+
+**Completed work:**
+- [x] Fix 1 (30a91b7): `_pm_view_movement` derives `requested_days` from
+      the resolved time_window instead of dead-code param shape; added
+      snapshot-freshness flag
+- [x] Fix 2 (30a91b7): classifier schema gained an explicit `n` field for
+      `period=last_N_days`
+- [x] Fix 3 (c0fe81f): `resolve_snapshot_anchors()` deterministically
+      resolves both comparison dates for `deals_snapshot` point-in-time
+      questions instead of leaving the second one to the model; explicit
+      "NO DATA AVAILABLE" signal (not silence) when no snapshot exists
+      that far back or the lookup fails
+- [x] Fix 4 (90d3bdf): `resolve_time_window()`, `current_quarter_label()`,
+      and `get_fiscal_quarter()`'s `as_of=None` default all switched to
+      `today_in_reporting_tz()`; same fix applied to the classifier's
+      literal "Today is {today}" prompt text and a stat helper
+- [x] Full audit of every `timedelta(days=...)` and `date.today()` site in
+      `api/` — each classified as a real parallel implementation (migrated
+      through `resolve_time_window()`) or a legitimate exception (tagged
+      `# ALLOW-RAW-DATE-MATH: <reason>`)
+- [x] `tests/test_date_resolution_single_source.py`: grep-based structural
+      gate wired into `gate-tests.yml` (offline, no credentials) — fails
+      the build on any new bare `date.today()` or unmarked
+      `timedelta(days=...)` in `api/`. Verified it actually catches a
+      planted violation before removing it.
+- [x] `tests/test_time_window_resolution.py` and `tests/test_snapshot_
+      anchors.py` extended to cover the reporting-timezone case and an
+      explicit no-data signal (4 tests total in the latter)
+
+**Confirmed NOT affected:** `scripts/analytics/compute_waterfall_
+segmented.py` (the 952/954 backfill reconciliation) calls none of the
+functions touched by Fix 4 — it never resolves "today" at all, only reads
+real `snapshot_date` values already in the table and pairs up consecutive
+ones. Re-running it post-fix will not change its result.
+
+**Residual items found but NOT fixed in this pass (see Backlog below):**
+- `scripts/analytics/snapshot_deals.py` stamps new snapshots with raw
+  `date.today()`, and both snapshot crons run at 2am UTC — inside the
+  window where UTC has already rolled to a new day but `America/New_York`
+  hasn't. Out of scope for this audit (scoped to `api/`, not batch ETL),
+  but directly relevant to "could stored snapshot_date values already be
+  off by a day" — see Backlog #4.
+- Rep-name-to-email matching in `dynamic_query_loop` is a structurally
+  similar "model fills a gap from provided context" pattern, but lower
+  risk (closed-list lookup, not computation) — see Backlog #3.
+
+**Commits:** 30a91b7, c0fe81f, 90d3bdf
+
 ---
 
 ## 📋 Backlog
@@ -231,6 +311,68 @@ None currently.
 
 ---
 
+#### 3. Rep-Name-to-Email Matching Has No Deterministic Backstop
+**Issue:** `dynamic_query_loop`'s system prompt hands the model a small
+`roster_text` list and instructs it to match a first name ("Jake") to an
+email itself — the same "model fills a gap from provided context" shape
+as the date-resolution bug class, just for names instead of dates.
+
+**Status:** NOT BROKEN (no known incident) — flagged during the
+2026-09-10 date-resolution audit as a residual, lower-priority risk, not
+chased further because there was no evidence it had actually misfired.
+
+**Why lower risk than the date bug:** it's a lookup against a small,
+fully-enumerated, explicitly-provided list, not open-ended computation —
+much smaller error surface. Stage names and `pipeline_id` are similarly
+safe (grounded via `enum_values` in the schema context).
+
+**Residual risk:** two roster members sharing a first name, or a
+close-but-wrong fuzzy match, has no deterministic tie-breaker or
+verification step.
+
+**Work (if ever prioritized):** add a deterministic exact/ambiguous-match
+check before the model reasons about a name, similar in spirit to
+`_resolve_owner_email()` (already used by classifier-routed handlers) —
+surface "which Jake did you mean?" instead of silently picking one.
+
+**Complexity:** Low-to-medium (roster is already loaded as `roster_text`)
+
+---
+
+#### 4. Snapshot ETL Stamps snapshot_date with Server-UTC date.today()
+**Issue:** `scripts/analytics/snapshot_deals.py` uses raw `date.today()`
+(not `today_in_reporting_tz()`) to decide which calendar date to stamp on
+a newly-written `deals_snapshot` row. Both snapshot crons
+(`weekly-snapshot.yml`: `0 2 * * 1`, `nightly.yml`: `0 2 * * *`) run at
+2am UTC — during EDT (UTC-4), that's 10pm the previous day in
+`America/New_York`, i.e. inside the exact window where server UTC and the
+reporting timezone disagree on "today."
+
+**Status:** IDENTIFIED, NOT FIXED — found while confirming the
+2026-09-10 date-resolution fix didn't affect this week's reconciled
+waterfall numbers (it doesn't; see the audit entry above). This is a
+separate, pre-existing issue, out of scope for that audit (scoped to the
+live `api/` Q&A path, not batch ETL).
+
+**Impact:** Every scheduled snapshot is stamped with a date that may be
+one calendar day ahead of the reporting-timezone "today" it actually ran
+in. Constant and systematic (always the same direction), unlike the
+larger multi-week misses fixed in the audit above — worth checking
+whether this explains any single-day boundary artifacts in the waterfall
+(possibly related to, but distinct from, the Phantom Exits bug above,
+which is about a deal being missing from a snapshot, not the snapshot's
+own date being wrong).
+
+**Work:** Switch `scripts/analytics/snapshot_deals.py`'s `today =
+date.today()` to `today_in_reporting_tz()`, consistent with the rest of
+the system post-audit. Decide whether to backfill/re-stamp existing rows
+or only fix new snapshots going forward.
+
+**Complexity:** Low effort to fix; needs a decision on backfill scope
+before touching historical data.
+
+---
+
 ## 📝 Notes
 
 ### Patterns Established
@@ -286,17 +428,20 @@ Without step 3, LLM query builder cannot see the column exists.
 
 ## 📊 Summary
 
-**Total Open Items:** 3
+**Total Open Items:** 5
 - High Priority: 1 (snapshot ETL phantom exits)
-- Low Priority: 2 (zero-day cycle times, forecast bugs)
+- Low Priority: 4 (zero-day cycle times, forecast bugs, rep-name-to-email
+  matching, snapshot ETL date.today() day-boundary stamp)
 
-**Recently Completed:** 4
-- Synthesis aggregation gap (2026-09-09) - **TESTED & VERIFIED** (core bug fixed)
+**Recently Completed:** 5
+- Date resolution single-source-of-truth audit (2026-09-10) - **FIXED & CI-GATED** (4 instances of the same bug class, one structural gate)
+- Synthesis aggregation gap (2026-09-09) - **TESTED & VERIFIED** (core bug fixed; ⚠️ its own "-$120K/last 2 weeks" test window has since been found wrong — see caveat, needs re-verification)
 - aggregate_results empty data bug (2026-09-09) - **IMPLEMENTED & VERIFIED** (Sept 6 impact: LOW)
 - Waterfall region + segment segmentation (2026-09-08) - **PRODUCTION VERIFIED**
 - Test data hygiene (2026-09-08)
 
 **Major Milestones:**
+- Date resolution fixed structurally, not case-by-case: resolve_time_window() is now the only place "today"/relative time phrases become dates anywhere in api/, with a CI gate (tests/test_date_resolution_single_source.py) that fails the build on a new parallel implementation. Confirmed the 952/954 waterfall backfill reconciliation is unaffected (it never resolves "today" at all).
 - Synthesis aggregation gap fixed: Eliminated week/segment anchoring and false "partial" claims. Test results show complete data reporting with no dropped segments or activities.
 - Region-segmented waterfall production-verified with 972 historical rows across 56 weeks (Aug 2025 → Sep 2026), enabling accurate EMEA/APAC/LATAM/NAM pipeline reporting by company size segment.
 - aggregate_results 66.7% failure rate fixed with three-layer validation (prompt + tool + router), verified no real user harm (Sept 6 answer accurate despite internal failure).
