@@ -198,6 +198,39 @@ jobs:
           # test_enrichment_shortcut.py.
           PYTHONPATH=. python3 tests/test_snapshot_finalize_forced_fetch.py
 
+      - name: "TEST 0j — Offline: finalize shortcuts must not synthesize blind to their own data"
+        run: |
+          set -e
+          # 2026-09-11 round 4: a live run reported "could not turn the
+          # partial data into an answer" despite accumulated_data holding
+          # complete, correct data (29-row current snapshot, 31-row prior
+          # snapshot, 11-row company_name enrichment lookup) at finalize
+          # time. Root cause: tool results only reach the model doing
+          # synthesis through `messages` entries injected after each
+          # iteration's tool call — accumulated_data is bookkeeping, never
+          # sent to the model directly. Two early-return shortcuts
+          # (dimension_retry_succeeded, id_scoped_enrichment_lookup) jump
+          # straight to `return await _finalize_from_data(...)` and used
+          # to skip that message-append entirely, because it lives further
+          # down in code an early return never reaches. The finalize
+          # synthesis call then ran on a `messages` history missing the
+          # exact data that just triggered the shortcut — the model had
+          # nothing to answer from, and (with NO exception anywhere) its
+          # response failed to parse as {"answer": ...}, falling through
+          # to the generic diagnostic despite complete, correct data the
+          # whole time. Fixed via _append_tool_result_message(), called at
+          # both shortcut sites before their early return.
+          # test_finalize_shortcut_message_gap.py drives the REAL
+          # dynamic_query_loop end-to-end reproducing the exact reported
+          # accumulated_data shape (including the "missing step_1" —
+          # a duplicate call that short-circuits without storing data),
+          # confirms the finalize context now includes the enrichment
+          # data, confirms a real answer results instead of the give-up
+          # diagnostic, and — via a negative control that neutralizes the
+          # fix — confirms the mechanism itself (not the test harness) is
+          # what makes the data visible.
+          PYTHONPATH=. python3 tests/test_finalize_shortcut_message_gap.py
+
       - name: "TEST 0g — Offline: loop ceiling is sized against the hardest question, not one incident"
         run: |
           set -e

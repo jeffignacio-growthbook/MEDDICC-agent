@@ -1612,6 +1612,41 @@ def _build_missing_snapshot_fetch(queries_run: list, missing_date: str):
         return p.get("table"), p.get("columns"), new_filters
     return None
 
+def _append_tool_result_message(messages: list, raw: str, result: dict) -> None:
+    """Append the model's tool-call request and its result to `messages`,
+    in place, using the same shape as the normal per-iteration "Tool
+    result: ..." message the loop appends when it continues to the next
+    iteration.
+
+    2026-09-11 round 4: dynamic_query_loop has two early-return synthesis
+    shortcuts — dimension_retry_succeeded and id_scoped_enrichment_lookup
+    — that detect "this iteration's tool call already gives us
+    everything we need" and jump straight to `return await
+    _finalize_from_data(...)`. Both skipped the normal message-append
+    that happens later in the SAME iteration's code path (for when the
+    loop continues instead of short-circuiting), because that code is
+    physically further down and an early `return` never reaches it.
+
+    Tool results only reach the model that performs synthesis through
+    these injected `messages` entries — accumulated_data is bookkeeping
+    for extraction/verification, not conversation content the model
+    reads. Without this, _finalize_from_data's synthesis call ran on a
+    `messages` history missing the exact data that just triggered the
+    shortcut (an enrichment lookup's company names, in the live
+    incident this closes). The model then had nothing to synthesize
+    from, and — with no exception anywhere — its response failed to
+    parse as {"answer": ...}, falling through to the generic
+    "could not turn the partial data into an answer" diagnostic despite
+    accumulated_data holding complete, correct data the whole time. See
+    tests/test_finalize_shortcut_message_gap.py for the reproduction.
+    """
+    messages.append({"role": "assistant", "content": raw})
+    messages.append({"role": "user", "content": (
+        f"Tool result: {json.dumps(result, default=str)[:3000]}\n\n"
+        f"This data is sufficient to answer — synthesize the final "
+        f"answer now."
+    )})
+
 def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = None) -> dict:
     """
     Aggregate large result sets and sample for synthesis.
@@ -3120,6 +3155,13 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                             f"Synthesizing immediately to avoid budget exhaustion."
                         )
 
+                        # 2026-09-11 round 4: this early return skips the
+                        # normal message-append further down — without
+                        # it, the finalize synthesis call can't see the
+                        # data that just made verification pass. See
+                        # _append_tool_result_message() docstring.
+                        _append_tool_result_message(messages, raw, result)
+
                         # Force synthesis by calling _finalize_from_data
                         # This uses the data we just retrieved
                         return await _finalize_from_data("dimension_retry_succeeded")
@@ -3184,6 +3226,17 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     f"deal_ids — synthesizing immediately instead of "
                     f"looping further."
                 )
+                # 2026-09-11 round 4: this early return skips the normal
+                # message-append further down — without it, the finalize
+                # synthesis call runs on a `messages` history that never
+                # saw this iteration's own enrichment lookup (company
+                # names, etc.), even though accumulated_data has it. The
+                # model then has nothing to synthesize from and (with no
+                # exception) fails to produce {"answer": ...}, falling to
+                # the generic "could not turn the partial data into an
+                # answer" diagnostic despite complete, correct data. See
+                # _append_tool_result_message() docstring.
+                _append_tool_result_message(messages, raw, result)
                 return await _finalize_from_data("id_scoped_enrichment_lookup")
 
         # PART 2b: a tool call that returns zero rows is no forward progress.
