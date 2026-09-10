@@ -11,13 +11,55 @@ except ImportError:
 
 _cached_context = None
 
+def _pipeline_name_by_stage_id() -> dict:
+    """stage_id -> pipeline display name, built from config/client.yaml's
+    pipeline.pipelines[] (the single source of truth for which stages
+    belong to which pipeline) so the model never has to guess what a
+    numeric stage/pipeline id means.
+
+    2026-09-11 incident: a live response saw deals with stage_id
+    1297321618 and, lacking this mapping, GUESSED "these appear to be a
+    renewal pipeline or pre-qualification stage" instead of knowing it.
+    The guess happened to be directionally right (1297321618 IS the
+    "Upcoming Renewal" stage of the Renewal Pipeline, id 866608541) but
+    it was still a guess about a fully knowable fact.
+    """
+    try:
+        from utils import get_pipeline_config
+    except ImportError:
+        from scripts.utils import get_pipeline_config
+    try:
+        cfg = get_pipeline_config()
+    except Exception:
+        return {}
+    mapping = {}
+    for pipeline in cfg.get("pipelines", []):
+        pname = pipeline.get("name") or pipeline.get("id")
+        for stage in pipeline.get("stages", []):
+            sid = stage.get("id")
+            if sid:
+                mapping[str(sid)] = pname
+    return mapping
+
 def _stage_prose() -> str:
     """
-    Generate stage ID prose from field_semantics (single source of truth).
-    Returns a string like: 'presentationscheduled' = Technical Evaluation, 'qualifiedtobuy' = Scoping, ...
+    Generate a COMPLETE stage ID prose from field_semantics (single
+    source of truth), each entry annotated with which pipeline it
+    belongs to — so a stage id like 1297321618 ("Upcoming Renewal",
+    Renewal Pipeline) is a lookup, not a guess. Previously showed only
+    the first 3 "open"-bucket stages "for brevity"; the full list is 14
+    entries (well under a hundred tokens) and correctness here matters
+    more than that saving.
+    Returns a string like:
+      'presentationscheduled' = Technical Evaluation (Sales Pipeline),
+      '1297321618' = Upcoming Renewal (Renewal Pipeline), ...
     """
-    parts = [f"'{sid}' = {info['label']}" for sid, info in STAGE_MAP.items() if info.get('bucket') in ['discovery', 'scoping', 'proposal']]
-    return ", ".join(parts[:3])  # Show first 3 for brevity
+    pipeline_by_stage = _pipeline_name_by_stage_id()
+    parts = []
+    for sid, info in STAGE_MAP.items():
+        pipeline_name = pipeline_by_stage.get(sid, "Sales Pipeline")
+        parts.append(f"'{sid}' = {info['label']} ({pipeline_name})")
+    return ", ".join(parts)
 
 def get_schema_context(sb, tables_with_descriptions=None, lightweight=False):
     """
@@ -77,7 +119,7 @@ def _build_schema_context(sb, tables_with_descriptions, lightweight=False):
     core_columns = {
         "deal_id", "company_name", "owner_email", "owner_name",
         "deal_value", "arr_usd", "new_arr", "expansion_arr", "renewal_revenue",
-        "deal_status", "stage", "pipeline_id",
+        "deal_status", "stage", "stage_id", "pipeline_id",
         "close_date", "created_at", "create_date",
         "segment", "forecast_category",
         # Analyses table cores
@@ -102,16 +144,24 @@ def _build_schema_context(sb, tables_with_descriptions, lightweight=False):
         "arr_by_customer": "VIEW: total ARR per won customer.",
         "deals_snapshot": (
             "Weekly point-in-time deal state. Each row already carries "
-            "region, segment, owner_email, stage_id, deal_value AS OF that "
-            "snapshot_date — filter directly on THIS table for a "
-            "region/segment-scoped point-in-time comparison ('changed "
-            "stage', 'moved', 'as of N days ago'). Do NOT assume you need "
-            "to join to deals for region/segment on a historical snapshot: "
-            "a deal's current region/segment can differ from what it was "
-            "at that snapshot date, and deals_snapshot already has the "
-            "point-in-time value. The one thing deals_snapshot does NOT "
-            "have is company_name — look that up by deal_id from deals "
-            "only after you already have your matched deal_ids, not before."
+            "region, segment, owner_email, stage_id, pipeline_id, "
+            "deal_value AS OF that snapshot_date — filter directly on "
+            "THIS table for a region/segment-scoped point-in-time "
+            "comparison ('changed stage', 'moved', 'as of N days ago'). "
+            "Do NOT assume you need to join to deals for region/segment "
+            "on a historical snapshot: a deal's current region/segment "
+            "can differ from what it was at that snapshot date, and "
+            "deals_snapshot already has the point-in-time value. The one "
+            "thing deals_snapshot does NOT have is company_name — look "
+            "that up by deal_id from deals only after you already have "
+            "your matched deal_ids, not before. "
+            f"{stage_note} A deal's pipeline_id tells you WHICH pipeline "
+            "it's in: 'default' = Sales Pipeline (new business), "
+            "'866608541' = Renewal Pipeline (excluded from new-business "
+            "stage-progression questions — it tracks upcoming renewals, "
+            "not new deals). If a deal appears in one snapshot but not "
+            "the other, check whether its pipeline_id differs before "
+            "calling it a population entry/exit within the SAME pipeline."
         )}
     join_notes = """
 TABLE RELATIONSHIPS:

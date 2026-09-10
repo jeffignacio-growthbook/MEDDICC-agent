@@ -23,11 +23,30 @@ real raw text is available, it should replace this fixture directly; the
 assertions here would not need to change, since they test the same
 underlying mechanism the description points to (self-referential process
 narration, not the specific data values).
+
+ROUND 2 (2026-09-11, same day, same question): a second live run of
+"which enterprise deals changed stage in the last 2 weeks in EMEA" hit
+this gate's blind spot from a different angle. This time the raw text
+WAS pasted verbatim into the report — see
+VERBATIM_INCIDENT_TRANSCRIPT_ROUND_2 below — and it exposed two distinct
+bugs: (1) the narration markers didn't cover "Now I have both snapshots.
+Let me diff them properly.", a gap now closed by adding "diff" to the
+check/verify/... marker alternation and a new "now i have (both|all)"
+marker; (2) the model can also wrap this exact narration INSIDE valid
+{"answer": "..."} JSON, which reaches the `if "answer" in parsed:` branch
+of dynamic_query_loop — a second entry point for a finished answer that
+never called _looks_like_unfinished_scratchpad() at all, independent of
+the prose-fallback path tested here. See
+test_json_wrapped_answer_path_also_checks_for_scratchpad below for that
+part of the fix (a structural check, since exercising the live JSON
+branch needs a real multi-turn LLM loop this sandbox can't run).
 """
+import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+REPO_ROOT = Path(__file__).parent.parent
 
 from api.router import _looks_like_unfinished_scratchpad
 
@@ -62,6 +81,55 @@ def test_reconstructed_incident_transcript_is_detected_as_scratchpad():
         "and must be caught, not shipped as-is."
     )
     print("✓ reconstructed incident transcript is detected as unfinished scratchpad")
+
+
+# 2026-09-11 ROUND 2 — this is the actual raw log text (not a
+# reconstruction), pasted verbatim from a live run of "which enterprise
+# deals changed stage in the last 2 weeks in EMEA". The opening two
+# paragraphs below are copied exactly as reported. The task's own report
+# elided the middle of the real transcript with "[... continues with raw
+# per-deal breakdown, internal reasoning about what pipeline_id 1297321618
+# 'appears to be', then a final {"answer": ...} block]" — that elision is
+# the reporter's own, not this file's; VERBATIM_INCIDENT_TRANSCRIPT_ROUND_2
+# keeps the exact opening/narration lines that matter for detection and
+# fills the elided middle with a plain marker rather than inventing
+# per-deal rows that were never actually shown. This is what slipped past
+# the gate: neither "now i have both" nor "let me diff" was a recognized
+# narration marker, so _looks_like_unfinished_scratchpad(...) returned
+# False and the raw per-deal breakdown + internal reasoning shipped
+# straight to Slack.
+VERBATIM_INCIDENT_TRANSCRIPT_ROUND_2 = """Now I have both snapshots. Let me diff them properly.
+
+**Prior snapshot (2026-07-27) — Enterprise EMEA deals with new-business stage IDs:**
+- 54169480766 → stage_order 2 (qualifiedtobuy) — Jake
+[... raw per-deal breakdown and internal reasoning about pipeline_id 1297321618, elided in the original report — see module docstring ...]"""
+
+
+def test_verbatim_incident_transcript_round_2_is_detected_as_scratchpad():
+    assert _looks_like_unfinished_scratchpad(VERBATIM_INCIDENT_TRANSCRIPT_ROUND_2), (
+        "This is the actual raw log text from the live incident (not a "
+        "reconstruction) — its opening line 'Now I have both snapshots. "
+        "Let me diff them properly.' must be caught by the narration "
+        "markers, and previously was not."
+    )
+    print("✓ verbatim round-2 incident transcript is detected as unfinished scratchpad")
+
+
+def test_now_i_have_both_and_let_me_diff_markers_individually_detected():
+    """The two specific phrases the gate missed in the round-2 incident,
+    isolated from the rest of the transcript, so a future regression in
+    either marker fails here directly rather than only via the full
+    transcript fixture above."""
+    assert _looks_like_unfinished_scratchpad("Now I have both snapshots in hand."), (
+        "'now i have both' must be a recognized narration marker"
+    )
+    assert _looks_like_unfinished_scratchpad("Let me diff them properly."), (
+        "'let me diff' must be a recognized narration marker"
+    )
+    assert _looks_like_unfinished_scratchpad("Let me diff them."), (
+        "'let me diff them' (no trailing 'properly') must also match"
+    )
+    print("✓ 'now i have both' and 'let me diff [them [properly]]' are each individually detected")
 
 
 def test_clean_finished_answer_is_not_flagged():
@@ -125,10 +193,56 @@ def test_markdown_table_alone_without_narration_is_not_flagged():
     print("✓ a deliberate table with no narration is not flagged")
 
 
+def test_json_wrapped_answer_path_also_checks_for_scratchpad():
+    """STRUCTURAL GATE (2026-09-11, round 2): dynamic_query_loop has two
+    places a finished answer can come from — the prose-fallback path
+    (when JSON parsing fails, tested above via _looks_like_unfinished_
+    scratchpad directly) and the `if "answer" in parsed:` branch (when
+    the model successfully wraps its response in {"answer": ...} JSON).
+    Before this fix, only the first path called
+    _looks_like_unfinished_scratchpad() — a model that wrapped scratchpad
+    narration inside otherwise-valid JSON skipped the check entirely.
+
+    This can't be exercised with a live multi-turn loop in this sandbox
+    (no Anthropic/Supabase credentials), so — same shape as the date-
+    resolution and data-dictionary structural gates elsewhere in this
+    suite — it greps the actual source for the call site: the scratchpad
+    check must appear BETWEEN `answer_text = parsed["answer"]` and the
+    branch's own `return {"answer": parsed["answer"], ...}`, not just
+    once anywhere in the function (which the prose-fallback call alone
+    would already satisfy without actually covering this branch)."""
+    src = (REPO_ROOT / "api" / "router.py").read_text()
+
+    marker_start = 'answer_text = parsed["answer"]'
+    marker_end = 'return {"answer": parsed["answer"], "tool_results": tool_results,'
+    start = src.find(marker_start)
+    end = src.find(marker_end)
+    assert start != -1 and end != -1 and start < end, (
+        "Could not locate the `if \"answer\" in parsed:` branch's body "
+        "between its answer_text assignment and its return — router.py "
+        "may have been restructured; update this test's markers."
+    )
+    branch_body = src[start:end]
+
+    assert "_looks_like_unfinished_scratchpad(answer_text)" in branch_body, (
+        "The `if \"answer\" in parsed:` branch of dynamic_query_loop "
+        "must call _looks_like_unfinished_scratchpad(answer_text) before "
+        "returning — otherwise scratchpad narration wrapped in valid "
+        "JSON bypasses the gate entirely, which is exactly what the "
+        "2026-09-11 round-2 incident's root-cause hypothesis #1 asked "
+        "to be ruled out or fixed."
+    )
+    print("✓ the JSON-wrapped-answer branch also calls "
+          "_looks_like_unfinished_scratchpad before returning")
+
+
 if __name__ == "__main__":
     test_reconstructed_incident_transcript_is_detected_as_scratchpad()
+    test_verbatim_incident_transcript_round_2_is_detected_as_scratchpad()
+    test_now_i_have_both_and_let_me_diff_markers_individually_detected()
     test_clean_finished_answer_is_not_flagged()
     test_benign_let_me_know_sign_off_is_not_flagged()
     test_various_narration_markers_are_each_detected()
     test_markdown_table_alone_without_narration_is_not_flagged()
+    test_json_wrapped_answer_path_also_checks_for_scratchpad()
     print("\n✅ All tests passed")

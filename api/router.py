@@ -1228,6 +1228,44 @@ company_name only) is the right way to name them — do not
 re-derive the population from deals, only label the ids you
 already have.
 
+PIPELINE/STAGE IDS ARE A LOOKUP, NOT A GUESS: every stage_id
+value (including numeric renewal-pipeline ones like 1297321618)
+and every pipeline_id value is listed with its label and which
+pipeline it belongs to in the schema note above. If you see an
+unfamiliar numeric id, find it there — never guess what it
+"appears to be." 'default' pipeline_id = Sales Pipeline (new
+business); '866608541' = Renewal Pipeline (upcoming renewals,
+not new-business stage progression).
+
+STAGE-CHANGE DIFFS — REPORT AS THREE SEPARATE, LABELED
+CATEGORIES, not one blended narrative:
+  1. STAGE CHANGES — deals present in BOTH snapshots whose
+     stage_id/stage_order differs. This is the core answer to
+     a "changed stage" question.
+  2. POPULATION ENTRIES — deals in the current snapshot but NOT
+     the prior one (new to this scope since the prior snapshot).
+  3. POPULATION EXITS — deals in the prior snapshot but NOT the
+     current one (left this scope since the prior snapshot).
+Always report entries and exits explicitly alongside stage
+changes — a user asking "what changed" wants to know about
+deals entering/leaving the population too, not only stage_order
+deltas on a fixed set of deals. Do not bury them as a vague
+aside in your reasoning or omit them. If a deal "exits" because
+its pipeline_id changed (e.g. moved into the Renewal Pipeline),
+say so explicitly — it left THIS pipeline's scope, it did not
+disappear from the business.
+
+SCOPE OF "CHANGED": stay scoped to what the question names — a
+"changed stage" question means stage_id/stage_order, not other
+fields. Do NOT fold an owner_email (rep reassignment) change
+into the stage-change count just because it's a difference
+between snapshots. But do not silently swallow it into "no
+change" either: if a deal's owner_email differs between the two
+snapshots and its stage did NOT change, add one labeled aside
+for it (e.g. "Owner reassigned: Christian → Scott Keller — no
+stage change") rather than hiding real information the data
+already surfaced.
+
 QUERY EFFICIENCY:
 When filtering on analysis scores (champion_score, overall_score, etc.),
 always query the analyses table FIRST to get matching deal_ids, then look
@@ -1823,7 +1861,7 @@ def verify_snapshot_date_labeling(answer_text: str, tool_results: dict):
 _SCRATCHPAD_NARRATION_PATTERNS = [
     r"\blet me now\b",
     r"\blet me use what i have\b",
-    r"\blet me (check|verify|compute|recalculate|redo|try|work)\b",
+    r"\blet me (check|verify|compute|recalculate|redo|try|work|diff)\b",
     r"\bi'll now\b",
     r"\bi will now\b",
     r"\bnow (let me |i'll |i will )?(produce|write|give|provide) (the|my) (final |clean )?answer\b",
@@ -1832,6 +1870,15 @@ _SCRATCHPAD_NARRATION_PATTERNS = [
     r"\bscratch ?pad\b",
     r"\bworking notes?\b",
     r"\bfor my own reasoning\b",
+    # 2026-09-11 (round 2): "Now I have both snapshots. Let me diff them
+    # properly." — a real live-run response with the exact same shape as
+    # the incident this gate was built to catch (raw per-deal breakdown
+    # followed by internal narration, then a final answer block), which
+    # slipped through because neither "now i have both" nor "let me diff"
+    # was covered. "diff" added to the check/verify/... alternation above
+    # covers "let me diff them [properly]"; this covers the "now I have
+    # the raw materials in hand" opener that precedes it.
+    r"\bnow i have (both|all)\b",
 ]
 
 def _looks_like_unfinished_scratchpad(text: str) -> bool:
@@ -2532,6 +2579,39 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
             # FIX: Verify synthesis aggregated all rows correctly
             answer_text = parsed["answer"]
+
+            # STRUCTURAL GATE (2026-09-11, round 2): the scratchpad check
+            # added for the prose-fallback path (below, for when JSON
+            # parsing fails) never runs here — this branch is reached
+            # because parsed JSON DID succeed and DID contain "answer", so
+            # a model that wraps scratchpad narration inside otherwise-
+            # valid {"answer": "..."} JSON skipped that check entirely.
+            # That is exactly the "second entry point" bypass this closes:
+            # same detector, applied to both the places an answer can
+            # originate from.
+            if _looks_like_unfinished_scratchpad(answer_text):
+                logger.warning(
+                    f"[LOOP iter={iteration}] JSON answer reads as "
+                    f"unfinished scratchpad/narration — forcing a clean "
+                    f"resynthesis instead of shipping it. "
+                    f"answer[:200]={answer_text[:200]!r}"
+                )
+                messages.append({"role": "assistant", "content": raw})
+                messages.append({"role": "user", "content": (
+                    "⚠️ That answer included internal reasoning, a "
+                    "working table, or narration about your own process "
+                    "(e.g. \"let me now...\", \"checking for...\") — not "
+                    "a clean, finished answer. Using the data already "
+                    "gathered, respond with ONLY the finished result, "
+                    "formatted for Slack, as {\"answer\": \"...\"}. Do "
+                    "any reasoning silently — do not include it, and do "
+                    "not attempt the answer more than once."
+                )})
+                no_progress_streak += 1
+                if no_progress_streak >= 2:
+                    return _finalize_from_data("scratchpad_prose_rejected")
+                continue
+
             verification_issues = []
 
             # Check 1: Verify numeric totals if question is about amounts

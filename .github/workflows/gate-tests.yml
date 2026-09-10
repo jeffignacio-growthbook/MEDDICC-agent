@@ -131,7 +131,36 @@ jobs:
           # "let me use what I have and produce the answer now" plus a
           # second answer attempt, all concatenated, because nothing
           # checked whether the "prose answer" was actually finished.
+          # ROUND 2 (same day): a second live run of the same question
+          # shipped "Now I have both snapshots. Let me diff them
+          # properly." verbatim, because neither "now i have both" nor
+          # "let me diff" was a recognized narration marker, AND because
+          # the JSON-wrapped `if "answer" in parsed:` branch never called
+          # the scratchpad check at all — a second entry point for a
+          # finished answer, independent of the prose-fallback path.
           PYTHONPATH=. python3 tests/test_scratchpad_answer_rejection.py
+
+      - name: "TEST 0h — Offline: pipeline/stage id lookup + snapshot-diff reporting scope"
+        run: |
+          set -e
+          # 2026-09-11 round 2, same live run as TEST 0f's round 2: a
+          # response found several dropped deals with stage_id 1297321618
+          # and GUESSED "these appear to be a renewal pipeline" instead of
+          # looking it up — a knowable fact (it IS the Renewal Pipeline's
+          # "Upcoming Renewal" stage) that the schema context never
+          # surfaced to the model. Separately, the same response silently
+          # folded a real owner reassignment (Christian -> Scott Keller,
+          # no stage change) into "no change", and left 11 population
+          # entries / several population exits as a vague aside instead of
+          # a labeled category. test_pipeline_stage_lookup.py pins the
+          # schema-context fix (a complete, pipeline-annotated stage
+          # glossary built from config/client.yaml); test_snapshot_diff_
+          # reporting_scope.py pins the prompt instructions for the
+          # scoping decision (stage changes / population entries /
+          # population exits as three separate labeled categories, owner
+          # changes surfaced as an explicit aside rather than hidden).
+          PYTHONPATH=. python3 tests/test_pipeline_stage_lookup.py
+          PYTHONPATH=. python3 tests/test_snapshot_diff_reporting_scope.py
 
       - name: "TEST 0g — Offline: loop ceiling is sized against the hardest question, not one incident"
         run: |
