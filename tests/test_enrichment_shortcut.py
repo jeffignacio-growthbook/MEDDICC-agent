@@ -14,17 +14,41 @@ PRIOR step already discovered. Such a call cannot need a retry — the
 population is already fixed — so its success is treated as "done,
 synthesize now" in api/router.py's dynamic_query_loop, the same as
 dimension_retry_succeeded.
+
+2026-09-11, SECOND incident on the same shortcut: a live test showed it
+firing after only ONE of the two required snapshot_date anchors had been
+queried. The model pulled snapshot 2026-08-24, then jumped straight to an
+enrichment lookup on those deal_ids against `deals` — and the shortcut,
+seeing a clean ID-scoped lookup, let synthesis fire without the model ever
+querying snapshot 2026-09-08 or computing a real stage-change diff.
+Compounding it, the resulting Slack answer labeled its deals "as of
+2026-09-08" when the data actually came from 2026-08-24 — a synthesis
+labeling bug on top of the missing-anchor bug.
+
+_snapshot_anchors_satisfied() closes the first half: the shortcut may not
+fire for a snapshot-comparison question (current_snapshot_date/
+prior_snapshot_date resolved) until BOTH anchor dates have actually
+appeared in queried rows. verify_snapshot_date_labeling() closes the
+second half: a mechanical, log-only check that an answer's "as of <date>"
+claim is backed by a real snapshot_date in the data, not an assumed one.
 """
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from api.router import _known_deal_ids_before, _is_id_scoped_enrichment_call
+from api.router import (
+    _known_deal_ids_before,
+    _is_id_scoped_enrichment_call,
+    _queried_snapshot_dates_before,
+    _snapshot_anchors_satisfied,
+    verify_snapshot_date_labeling,
+)
 
 
-def _raw_step(deal_ids):
-    return {"rows": [{"deal_id": d} for d in deal_ids]}
+def _raw_step(deal_ids, snapshot_date=None):
+    row = lambda d: {"deal_id": d, **({"snapshot_date": snapshot_date} if snapshot_date else {})}
+    return {"rows": [row(d) for d in deal_ids]}
 
 
 def test_known_deal_ids_before_unions_prior_steps_only():
@@ -135,6 +159,140 @@ def test_first_iteration_is_never_treated_as_enrichment():
     print("✓ an empty prior population never triggers the enrichment shortcut")
 
 
+# ─── 2026-09-11 second incident: shortcut fired with only one anchor ───
+
+def test_queried_snapshot_dates_before_unions_prior_steps_only():
+    accumulated = {
+        "step_0_raw": _raw_step(["1", "2"], snapshot_date="2026-08-24"),
+        "step_1_raw": _raw_step(["9"], snapshot_date="2026-09-08"),
+        "step_2_raw": _raw_step(["1", "2"]),  # current iteration — must not count
+    }
+    assert _queried_snapshot_dates_before(accumulated, iteration=2) == \
+        {"2026-08-24", "2026-09-08"}
+    assert _queried_snapshot_dates_before(accumulated, iteration=1) == {"2026-08-24"}
+    print("✓ queried_snapshot_dates_before unions prior steps' snapshot_date values only")
+
+
+def test_shortcut_blocked_when_only_one_anchor_queried_exact_incident_shape():
+    """Reproduces exactly the live-test failure: current_snapshot_date=
+    2026-09-08 and prior_snapshot_date=2026-08-24 were resolved (a real
+    snapshot-comparison question), but only 2026-08-24 has actually been
+    queried so far. The enrichment shortcut must refuse to fire — even
+    though the pending call IS a clean, ID-scoped company_name lookup on
+    already-known deal_ids — because the diff it would synthesize from
+    doesn't exist yet."""
+    accumulated = {
+        "step_0_raw": _raw_step(["101", "205"], snapshot_date="2026-08-24"),
+    }
+    queried = _queried_snapshot_dates_before(accumulated, iteration=1)
+
+    known_ids = _known_deal_ids_before(accumulated, iteration=1)
+    tool_params = {
+        "table": "deals",
+        "columns": ["deal_id", "company_name"],
+        "filters": [["in_", "deal_id", ["101", "205"]]],
+    }
+    # The call itself still looks like clean enrichment in isolation...
+    assert _is_id_scoped_enrichment_call("filter_table", tool_params, known_ids)
+    # ...but the anchor gate must refuse it: prior_snapshot_date (2026-08-24)
+    # was queried, current_snapshot_date (2026-09-08) was NOT.
+    assert not _snapshot_anchors_satisfied(
+        current_snapshot_date="2026-09-08",
+        prior_snapshot_date="2026-08-24",
+        queried_dates=queried,
+    ), (
+        "The shortcut must be blocked: only one of the two required "
+        "snapshot anchors has been queried, so there is no real diff to "
+        "synthesize from yet — firing here reproduces the live incident "
+        "(answered from snapshot 2026-08-24 alone, snapshot 2026-09-08 "
+        "never queried, no actual stage-change diff computed)."
+    )
+    print("✓ shortcut correctly blocked: only one of two required snapshot anchors queried")
+
+
+def test_shortcut_fires_once_both_anchors_are_queried():
+    """Once BOTH anchors have been queried (the model did it right this
+    time), the same enrichment call must be allowed to short-circuit —
+    the fix must not become a new source of budget exhaustion by blocking
+    forever."""
+    accumulated = {
+        "step_0_raw": _raw_step(["101", "205", "9"], snapshot_date="2026-09-08"),
+        "step_1_raw": _raw_step(["101", "205"], snapshot_date="2026-08-24"),
+    }
+    queried = _queried_snapshot_dates_before(accumulated, iteration=2)
+
+    assert _snapshot_anchors_satisfied(
+        current_snapshot_date="2026-09-08",
+        prior_snapshot_date="2026-08-24",
+        queried_dates=queried,
+    )
+    known_ids = _known_deal_ids_before(accumulated, iteration=2)
+    tool_params = {
+        "table": "deals",
+        "columns": ["deal_id", "company_name"],
+        "filters": [["in_", "deal_id", ["101", "205"]]],
+    }
+    assert _is_id_scoped_enrichment_call("filter_table", tool_params, known_ids)
+    print("✓ shortcut correctly fires once both snapshot anchors have been queried")
+
+
+def test_anchors_satisfied_is_a_noop_for_non_snapshot_questions():
+    """A question with no resolved anchors (current/prior both None) isn't
+    a snapshot comparison at all — the gate must not block the existing,
+    already-shipped enrichment shortcut for ordinary questions."""
+    assert _snapshot_anchors_satisfied(None, None, queried_dates=set())
+    print("✓ non-snapshot questions are unaffected by the anchor gate")
+
+
+# ─── 2026-09-11: synthesis labeling the wrong snapshot_date ───
+
+def test_verify_snapshot_date_labeling_catches_the_live_mismatch():
+    """Reproduces the second half of the incident: the answer said 'as of
+    2026-09-08' while every row actually queried carries snapshot_date
+    2026-08-24."""
+    answer = "2 deals moved to Negotiating as of 2026-09-08: Acme Corp, Beta Inc."
+    tool_results = {"rows": [
+        {"deal_id": "101", "company_name": "Acme Corp", "snapshot_date": "2026-08-24"},
+        {"deal_id": "205", "company_name": "Beta Inc", "snapshot_date": "2026-08-24"},
+    ]}
+
+    ok, unmatched, real_dates = verify_snapshot_date_labeling(answer, tool_results)
+
+    assert not ok
+    assert unmatched == ["2026-09-08"]
+    assert real_dates == {"2026-08-24"}
+    print("✓ verify_snapshot_date_labeling catches an answer date not backed by any row")
+
+
+def test_verify_snapshot_date_labeling_passes_when_dates_match():
+    answer = "2 deals moved to Negotiating as of 2026-08-24: Acme Corp, Beta Inc."
+    tool_results = {"rows": [
+        {"deal_id": "101", "company_name": "Acme Corp", "snapshot_date": "2026-08-24"},
+    ]}
+    ok, unmatched, real_dates = verify_snapshot_date_labeling(answer, tool_results)
+    assert ok and unmatched == []
+    print("✓ verify_snapshot_date_labeling passes when the stated date is backed by real rows")
+
+
+def test_verify_snapshot_date_labeling_noop_without_snapshot_data():
+    """A question with no snapshot_date field anywhere (not a point-in-time
+    comparison) has nothing to verify against — must not false-positive."""
+    answer = "Q3 closes as of 2026-09-08: 4 deals worth $210K."
+    tool_results = {"rows": [{"deal_id": "1", "close_date": "2026-09-08"}]}
+    ok, unmatched, real_dates = verify_snapshot_date_labeling(answer, tool_results)
+    assert ok and unmatched == [] and real_dates == set()
+    print("✓ labeling check is a no-op when the data has no snapshot_date field at all")
+
+
+def test_verify_snapshot_date_labeling_noop_without_as_of_claim():
+    """No 'as of <date>' phrasing in the answer at all — nothing to check."""
+    answer = "2 deals moved to Negotiating: Acme Corp, Beta Inc."
+    tool_results = {"rows": [{"deal_id": "101", "snapshot_date": "2026-08-24"}]}
+    ok, unmatched, real_dates = verify_snapshot_date_labeling(answer, tool_results)
+    assert ok and unmatched == []
+    print("✓ labeling check is a no-op when the answer makes no 'as of' claim")
+
+
 if __name__ == "__main__":
     test_known_deal_ids_before_unions_prior_steps_only()
     test_id_scoped_lookup_after_snapshot_diff_is_detected()
@@ -143,4 +301,12 @@ if __name__ == "__main__":
     test_id_scoped_lookup_with_companion_dimension_filter_is_excluded()
     test_deal_status_companion_filter_still_counts_as_enrichment()
     test_first_iteration_is_never_treated_as_enrichment()
+    test_queried_snapshot_dates_before_unions_prior_steps_only()
+    test_shortcut_blocked_when_only_one_anchor_queried_exact_incident_shape()
+    test_shortcut_fires_once_both_anchors_are_queried()
+    test_anchors_satisfied_is_a_noop_for_non_snapshot_questions()
+    test_verify_snapshot_date_labeling_catches_the_live_mismatch()
+    test_verify_snapshot_date_labeling_passes_when_dates_match()
+    test_verify_snapshot_date_labeling_noop_without_snapshot_data()
+    test_verify_snapshot_date_labeling_noop_without_as_of_claim()
     print("\n✅ All tests passed")

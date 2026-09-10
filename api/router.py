@@ -1362,6 +1362,34 @@ def _known_deal_ids_before(accumulated_data: dict, iteration: int) -> set:
                 ids.add(str(did))
     return ids
 
+def _queried_snapshot_dates_before(accumulated_data: dict, iteration: int) -> set:
+    """Union of snapshot_date values actually present in queried rows
+    across all iterations strictly before `iteration`.
+
+    2026-09-11 fix: the enrichment shortcut recognized "this call only
+    re-fetches fields for already-known deal_ids" and synthesized
+    immediately — correct in general, but for a snapshot comparison
+    ("changed stage in the last N days") it fired after only ONE of the
+    two required snapshot_date anchors had been queried, before any real
+    diff existed. This tells the caller which anchor date(s) have
+    actually been queried so far, so the shortcut can require both before
+    treating the population as "already fixed"."""
+    dates = set()
+    for key, data in accumulated_data.items():
+        if not key.startswith("step_") or not key.endswith("_raw"):
+            continue
+        try:
+            step_num = int(key[len("step_"):-len("_raw")])
+        except ValueError:
+            continue
+        if step_num >= iteration:
+            continue
+        for row in data.get("rows", []):
+            sd = row.get("snapshot_date")
+            if sd is not None:
+                dates.add(str(sd))
+    return dates
+
 def _is_id_scoped_enrichment_call(tool_name: str, tool_params: dict,
                                    known_deal_ids: set) -> bool:
     """True when this filter_table call's only real selectivity is a
@@ -1414,6 +1442,24 @@ def _is_id_scoped_enrichment_call(tool_name: str, tool_params: dict,
         return False
 
     return True
+
+def _snapshot_anchors_satisfied(current_snapshot_date, prior_snapshot_date,
+                                 queried_dates: set) -> bool:
+    """True if this question isn't a snapshot comparison at all (no anchors
+    resolved), OR both required anchor dates have already been queried.
+
+    2026-09-11 live-test regression: the enrichment shortcut fired after
+    only ONE of the two anchors had been pulled — the model queried
+    current_snapshot_date, jumped straight to an enrichment lookup on
+    those deal_ids, and the shortcut let synthesis fire without ever
+    querying prior_snapshot_date or computing a real diff. Extracted as
+    its own function (rather than inlined at the call site) so the exact
+    incident shape is directly unit-testable without driving the whole
+    loop.
+    """
+    if not current_snapshot_date or not prior_snapshot_date:
+        return True  # not a snapshot-comparison question — nothing to gate
+    return {current_snapshot_date, prior_snapshot_date}.issubset(queried_dates)
 
 def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = None) -> dict:
     """
@@ -1692,6 +1738,50 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
     logger.info(f"[EXTRACT] no rows found in any step, returning empty dict")
     return {}
 
+def _extract_dated_claims(answer_text: str) -> list:
+    """Dates the answer explicitly claims as 'as of' a point in time —
+    the exact phrasing the SNAPSHOT DATES rule in _VOICE_BASE asks the
+    model to use. Returns the ISO date strings found in that phrasing."""
+    import re
+    return re.findall(r'as of\s+(\d{4}-\d{2}-\d{2})', answer_text, re.IGNORECASE)
+
+def verify_snapshot_date_labeling(answer_text: str, tool_results: dict):
+    """2026-09-11 fix: a live answer labeled matched deals 'as of
+    2026-09-08' when the data backing it was actually pulled from the
+    2026-08-24 snapshot (a gap in prior_snapshot_date/current_snapshot_date
+    querying let the model assume rather than read the real date — see
+    _snapshot_anchors_satisfied() for the other half of that fix). This
+    checks any 'as of <date>' claim in the answer against the real
+    snapshot_date values present in the rows actually returned.
+
+    Returns (ok, unmatched_claims, real_dates_seen):
+      - ok=True, unmatched=[] when there's nothing to check — no 'as of'
+        claim was made, or the data has no snapshot_date field at all
+        (not a point-in-time comparison, so nothing to verify against).
+      - ok=False, unmatched=[the claimed dates not backed by any row]
+        otherwise.
+
+    Log-only at the call site (like the other SYNTHESIS_VERIFY checks) —
+    a date-format regex has false-positive risk (a close_date or
+    create_date mentioned elsewhere could coincidentally match "as of"
+    phrasing), so this flags for review rather than blocking or rewriting
+    the answer.
+    """
+    claimed_dates = _extract_dated_claims(answer_text)
+    if not claimed_dates:
+        return True, [], set()
+
+    real_dates = {
+        str(row["snapshot_date"])
+        for row in (tool_results.get("rows") or [])
+        if isinstance(row, dict) and row.get("snapshot_date")
+    }
+    if not real_dates:
+        return True, [], set()  # no snapshot_date in this data — not applicable
+
+    unmatched = [d for d in claimed_dates if d not in real_dates]
+    return (len(unmatched) == 0), unmatched, real_dates
+
 async def _run_precomputed_handler(handler_fn, handler_name, params, sb):
     """
     Execute a precomputed handler and classify its result quality.
@@ -1748,11 +1838,78 @@ def _closest_snapshot_on_or_before(sb, cutoff: str):
     return rows[0]["snapshot_date"] if rows else None
 
 
-def resolve_snapshot_anchors(sb, time_window: dict) -> str:
-    """Deterministic snapshot anchors for deals_snapshot point-in-time
-    comparisons ("which deals changed stage in the last N days/weeks").
+def resolve_snapshot_anchor_dates(sb, time_window: dict):
+    """Returns (current_snapshot_date, prior_snapshot_date) as ISO strings,
+    or (None, None) if the time_window is incomplete, no snapshot exists
+    that far back, or the lookup failed.
 
-    BUG (2026-09-10, second instance): unlike waterfall_weekly (filtered
+    Split out from resolve_snapshot_anchors() (2026-09-11, third instance
+    of this incident) so dynamic_query_loop can check "have both anchors
+    actually been queried yet" without re-deriving them from the prose
+    note or hitting the database twice for the same two dates.
+    """
+    tw_start = (time_window or {}).get("start")
+    tw_end = (time_window or {}).get("end")
+    if not tw_start or not tw_end:
+        return None, None
+    try:
+        current_snap = _closest_snapshot_on_or_before(sb, tw_end)
+        prior_snap = _closest_snapshot_on_or_before(sb, tw_start)
+    except Exception:
+        return None, None
+    if not current_snap or not prior_snap:
+        return None, None
+    return current_snap, prior_snap
+
+
+def format_snapshot_anchor_note(current_snap, prior_snap, time_window: dict) -> str:
+    """Render the SNAPSHOT ANCHORS context line from already-resolved
+    anchor dates (see resolve_snapshot_anchor_dates()). Pure formatting —
+    no DB access — so it can't disagree with whatever dates the caller
+    actually resolved.
+
+    Three distinct outcomes, all as an explicit line for the model — this
+    never returns "" once a real time_window is present, because silence
+    is exactly what let the model quietly fall back to inventing a date.
+    A missing time_window (nothing to anchor against at all) is the only
+    case left to return "", and dynamic_query_loop only calls this once
+    params['time_window'] is already resolved, so it doesn't happen in
+    practice:
+      1. Not applicable — no time_window at all: "" (nothing to anchor).
+      2. Anchors found — "SNAPSHOT ANCHORS: current=... prior=...".
+      3. No data that far back / lookup failed — an explicit "NO SNAPSHOT
+         DATA" line instructing the model to say so, not to fabricate a
+         comparison.
+    """
+    tw_start = (time_window or {}).get("start")
+    tw_end = (time_window or {}).get("end")
+    if not tw_start or not tw_end:
+        return ""
+    if not current_snap or not prior_snap:
+        return (
+            f"SNAPSHOT ANCHORS: NO DATA AVAILABLE for a deals_snapshot "
+            f"point-in-time comparison in the window {tw_start} to {tw_end} — "
+            f"no snapshot exists that far back (or the lookup failed). State "
+            f"plainly that this comparison cannot be made for the requested "
+            f"period. Do NOT invent a comparison date or widen the window "
+            f"yourself."
+        )
+    return (
+        f"SNAPSHOT ANCHORS (deals_snapshot point-in-time comparisons): "
+        f"current_snapshot_date={current_snap}, "
+        f"prior_snapshot_date={prior_snap}. These are the exact "
+        f"snapshot_date values closest to the time_window above — "
+        f"use them verbatim for any 'changed stage' / 'moved' / "
+        f"'compared to N days ago' question. NEVER pick your own "
+        f"prior snapshot_date. A final answer must state the ACTUAL "
+        f"snapshot_date value attached to each row it cites — never assume "
+        f"a result is 'as of' current_snapshot_date just because that's the "
+        f"more recent anchor; read the row's own snapshot_date."
+    )
+
+
+def resolve_snapshot_anchors(sb, time_window: dict) -> str:
+    """BUG (2026-09-10, second instance): unlike waterfall_weekly (filtered
     directly by gte/lte on the resolved time_window) or query_pipeline_
     movement's _pm_view_movement (which computes target_date = current -
     requested_days in code), a deals_snapshot diff needs TWO specific
@@ -1770,51 +1927,12 @@ def resolve_snapshot_anchors(sb, time_window: dict) -> str:
     from the already-correct time_window, and hand them to the model as
     fixed values instead of letting it invent a second date.
 
-    Three distinct outcomes, all as an explicit line for the model — this
-    function never returns "" once a real time_window is present, because
-    silence is exactly what let the model quietly fall back to inventing a
-    date last time. A missing time_window (nothing to anchor against at
-    all — the one case where there is genuinely nothing to say) is the only
-    caller left to spell out for itself, and that caller (dynamic_query_loop)
-    only calls this once params['time_window'] is already resolved, so it
-    doesn't happen in practice:
-      1. Not applicable — no time_window at all: "" (nothing to anchor).
-      2. Anchors found — "SNAPSHOT ANCHORS: current=... prior=...".
-      3. No data that far back / lookup failed — an explicit "NO SNAPSHOT
-         DATA" line instructing the model to say so, not to fabricate a
-         comparison. This is the case most likely to go untested (a newly
-         onboarded client, a real gap in snapshot history) and it must
-         degrade to "I can't answer that", never to free invention.
+    Thin wrapper over resolve_snapshot_anchor_dates() +
+    format_snapshot_anchor_note(), kept as a single function for existing
+    callers/tests that only need the prose note, not the raw dates.
     """
-    tw_start = (time_window or {}).get("start")
-    tw_end = (time_window or {}).get("end")
-    if not tw_start or not tw_end:
-        return ""
-
-    no_data_note = (
-        f"SNAPSHOT ANCHORS: NO DATA AVAILABLE for a deals_snapshot "
-        f"point-in-time comparison in the window {tw_start} to {tw_end} — "
-        f"no snapshot exists that far back (or the lookup failed). State "
-        f"plainly that this comparison cannot be made for the requested "
-        f"period. Do NOT invent a comparison date or widen the window "
-        f"yourself."
-    )
-    try:
-        current_snap = _closest_snapshot_on_or_before(sb, tw_end)
-        prior_snap = _closest_snapshot_on_or_before(sb, tw_start)
-    except Exception:
-        return no_data_note
-    if not current_snap or not prior_snap:
-        return no_data_note
-    return (
-        f"SNAPSHOT ANCHORS (deals_snapshot point-in-time comparisons): "
-        f"current_snapshot_date={current_snap}, "
-        f"prior_snapshot_date={prior_snap}. These are the exact "
-        f"snapshot_date values closest to the time_window above — "
-        f"use them verbatim for any 'changed stage' / 'moved' / "
-        f"'compared to N days ago' question. NEVER pick your own "
-        f"prior snapshot_date."
-    )
+    current_snap, prior_snap = resolve_snapshot_anchor_dates(sb, time_window)
+    return format_snapshot_anchor_note(current_snap, prior_snap, time_window)
 
 
 async def dynamic_query_loop(question, history, params,
@@ -1880,13 +1998,24 @@ async def dynamic_query_loop(question, history, params,
         question, classifier_client or client)
     logger.info(f"[SCHEMA] Relevant tables for full descriptions: {relevant_tables}")
 
-    # See resolve_snapshot_anchors() docstring for why this exists — a
+    # See resolve_snapshot_anchor_dates() docstring for why this exists — a
     # deals_snapshot diff needs two concrete snapshot_date values, and
     # nothing else on this path supplies the second (prior) one.
+    #
+    # current_snapshot_date / prior_snapshot_date are kept as loop-scoped
+    # variables (not just baked into the prose note) so the enrichment
+    # shortcut below can check "have both anchors actually been queried
+    # yet" before short-circuiting — see the 2026-09-11 fix note at that
+    # check for the incident this closes: the shortcut previously fired
+    # after only ONE anchor had been pulled, letting the model jump to an
+    # enrichment lookup and "answer" without ever computing a real diff.
+    current_snapshot_date, prior_snapshot_date = None, None
     snapshot_anchor_note = ""
     if "deals_snapshot" in relevant_tables:
-        snapshot_anchor_note = resolve_snapshot_anchors(
+        current_snapshot_date, prior_snapshot_date = resolve_snapshot_anchor_dates(
             sb, params.get("time_window", {}))
+        snapshot_anchor_note = format_snapshot_anchor_note(
+            current_snapshot_date, prior_snapshot_date, params.get("time_window", {}))
         if snapshot_anchor_note:
             logger.info(f"[SNAPSHOT_ANCHOR] {snapshot_anchor_note}")
 
@@ -2117,6 +2246,17 @@ async def dynamic_query_loop(question, history, params,
                         "answered": False
                     }
 
+                date_ok, unmatched_dates, real_dates = verify_snapshot_date_labeling(
+                    parsed2["answer"], tr)
+                if not date_ok:
+                    logger.warning(
+                        f"[SYNTHESIS_VERIFY] Answer states 'as of {unmatched_dates}' "
+                        f"but the queried rows' actual snapshot_date value(s) are "
+                        f"{sorted(real_dates)} — labeling mismatch (2026-09-11 "
+                        f"incident shape: data from one snapshot, text claims "
+                        f"another)."
+                    )
+
                 logger.info(f"[LOOP] finalized from gathered data "
                             f"(reason={reason_tag})")
                 return {"answer": parsed2["answer"],
@@ -2320,6 +2460,19 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                                 logger.warning(
                                     f"[SYNTHESIS_VERIFY] Answer claims 'partial/pending' but "
                                     f"{dim} has all {len(unique_vals)} expected values")
+
+            # Check 3: snapshot-date labeling (2026-09-11 incident) — an
+            # answer claiming "as of <date>" must be backed by a row that
+            # actually carries that snapshot_date, not an assumed anchor.
+            date_ok, unmatched_dates, real_dates = verify_snapshot_date_labeling(
+                answer_text, tool_results)
+            if not date_ok:
+                verification_issues.append("snapshot_date_labeling_mismatch")
+                logger.warning(
+                    f"[SYNTHESIS_VERIFY] Answer states 'as of {unmatched_dates}' "
+                    f"but the queried rows' actual snapshot_date value(s) are "
+                    f"{sorted(real_dates)} — labeling mismatch."
+                )
 
             if verification_issues:
                 logger.warning(f"[SYNTHESIS_VERIFY] Issues detected: {verification_issues}")
@@ -2591,6 +2744,47 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         if iteration > 0 and row_count > 0:
             known_ids = _known_deal_ids_before(accumulated_data, iteration)
             if _is_id_scoped_enrichment_call(tool_name, tool_params, known_ids):
+                # FIX (2026-09-11, live-test regression): for a snapshot-
+                # comparison question (current_snapshot_date/
+                # prior_snapshot_date are set), this shortcut must not fire
+                # until BOTH anchors have actually been queried. Without
+                # this check, the model could pull ONE snapshot, jump
+                # straight to an enrichment lookup on those deal_ids, and
+                # this shortcut would let it synthesize an answer without
+                # ever querying the second anchor or computing a real
+                # stage-change diff — exactly what happened live: snapshot
+                # 2026-08-24 was pulled, snapshot 2026-09-08 never was, and
+                # the answer went out anyway (mislabeled as "as of
+                # 2026-09-08" on top of that — see the labeling fix in
+                # _VOICE_BASE for the second half of this incident).
+                queried_dates = _queried_snapshot_dates_before(accumulated_data, iteration)
+                if not _snapshot_anchors_satisfied(
+                        current_snapshot_date, prior_snapshot_date, queried_dates):
+                    missing_anchors = {current_snapshot_date, prior_snapshot_date} - queried_dates
+                    logger.info(
+                        f"[ENRICHMENT_LOOKUP] blocked at iteration {iteration}: "
+                        f"snapshot anchor(s) {sorted(missing_anchors)} not yet "
+                        f"queried (only {sorted(queried_dates) or 'none'} so far) — "
+                        f"forcing the missing snapshot pull before enrichment "
+                        f"can short-circuit synthesis."
+                    )
+                    messages.append({"role": "assistant", "content": raw})
+                    messages.append({"role": "user", "content": (
+                        f"⚠️ You attempted an enrichment lookup on deal_ids "
+                        f"before completing the snapshot comparison. This "
+                        f"question requires BOTH "
+                        f"current_snapshot_date={current_snapshot_date} AND "
+                        f"prior_snapshot_date={prior_snapshot_date} queried "
+                        f"from deals_snapshot to compute a real diff — you "
+                        f"have only queried "
+                        f"{', '.join(sorted(queried_dates)) or 'neither'} so "
+                        f"far. Query the missing snapshot_date from "
+                        f"deals_snapshot now. Do NOT answer, and do not run "
+                        f"the enrichment lookup again, until both snapshots "
+                        f"have been queried and diffed."
+                    )})
+                    continue
+
                 logger.info(
                     f"[ENRICHMENT_LOOKUP] iteration {iteration} only "
                     f"re-fetched fields for {len(known_ids)} already-known "
@@ -3546,6 +3740,20 @@ TRUNCATION NOTES (ALWAYS surface when present):
 - Format: "*142 active deals* with no ARR recorded (showing 20 examples):"
 - The _truncated value contains the original count — extract and use it
 - Example: If _truncated says "Showing 20 of 142 items", write "142 deals" prominently
+
+SNAPSHOT DATES (when rows carry a snapshot_date field):
+- State the ACTUAL snapshot_date value attached to each row/figure you cite —
+  read it from the data, never assume or infer which date it must be.
+- Never label a result "as of <date>" based on which comparison anchor it was
+  MEANT to be (current vs. prior) — a sparse or gappy snapshot cadence can mean
+  the row you actually have is from an earlier date than the one the query
+  targeted. If the data says 2026-08-24, say 2026-08-24, even if the question
+  was framed around a more recent date.
+- If two snapshot dates were compared, name both dates explicitly in the
+  answer (e.g., "Enterprise stage changes, 2026-08-24 → 2026-09-08:"), not
+  just "current vs. prior" or an assumed date pulled from the question text.
+- This mirrors the "empty ≠ no results" rule above: state what the data
+  actually shows, not what you expect it to show.
 
 OPERATOR METADATA (ignore in answers):
 - Keys prefixed with _ EXCEPT _plausibility_warnings, _truncated, and _synthesis_note are for operators only
