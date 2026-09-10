@@ -1183,6 +1183,15 @@ DATES: Always use the exact time_window dates provided
 in the question context. Never compute your own fiscal
 quarters — the resolved start/end dates are always given.
 
+SNAPSHOT COMPARISONS: For any "changed stage", "moved", or
+"compared to N days/weeks ago" question over deals_snapshot,
+look for a "SNAPSHOT ANCHORS" line in the question context —
+it gives you current_snapshot_date and prior_snapshot_date as
+exact values. Use those two dates verbatim (one filter_table
+call per date) and diff yourself. NEVER invent your own prior
+snapshot_date or widen the range to "be safe" — an anchor that
+looks too close together is correct, not insufficient data.
+
 QUERY EFFICIENCY:
 When filtering on analysis scores (champion_score, overall_score, etc.),
 always query the analyses table FIRST to get matching deal_ids, then look
@@ -1637,6 +1646,64 @@ async def _run_precomputed_handler(handler_fn, handler_name, params, sb):
     return tool_results, result_quality, reason
 
 
+def _closest_snapshot_on_or_before(sb, cutoff: str):
+    """Latest deals_snapshot.snapshot_date that is <= cutoff, or None."""
+    rows = (sb.table("deals_snapshot")
+              .select("snapshot_date")
+              .lte("snapshot_date", cutoff)
+              .order("snapshot_date", desc=True)
+              .limit(1)
+              .execute().data or [])
+    return rows[0]["snapshot_date"] if rows else None
+
+
+def resolve_snapshot_anchors(sb, time_window: dict) -> str:
+    """Deterministic snapshot anchors for deals_snapshot point-in-time
+    comparisons ("which deals changed stage in the last N days/weeks").
+
+    BUG (2026-09-10, second instance): unlike waterfall_weekly (filtered
+    directly by gte/lte on the resolved time_window) or query_pipeline_
+    movement's _pm_view_movement (which computes target_date = current -
+    requested_days in code), a deals_snapshot diff needs TWO specific
+    snapshot_date values to compare — and nothing ever told the model
+    which two to use. The "Time context: ... = start to end" line only
+    gives a single range; picking the second (prior) comparison point for
+    a diff was left entirely to the model's own free-form reasoning, with
+    no anchor to check itself against. That produced a snapshot_date
+    gte.2026-07-08 filter for "last 2 weeks" asked on 2026-09-10 — a ~64
+    day miss — even after the resolve_time_window() "n" field fix, because
+    that fix only makes time_window["start"]/["end"] correct; it never
+    reaches this code path at all.
+
+    Fix: resolve the actual two comparison snapshot dates here, in code,
+    from the already-correct time_window, and hand them to the model as
+    fixed values instead of letting it invent a second date.
+
+    Returns the "SNAPSHOT ANCHORS" context line, or "" if no time window
+    or no snapshots are available on or before it.
+    """
+    tw_start = (time_window or {}).get("start")
+    tw_end = (time_window or {}).get("end")
+    if not tw_start or not tw_end:
+        return ""
+    try:
+        current_snap = _closest_snapshot_on_or_before(sb, tw_end)
+        prior_snap = _closest_snapshot_on_or_before(sb, tw_start)
+    except Exception:
+        return ""
+    if not current_snap or not prior_snap:
+        return ""
+    return (
+        f"SNAPSHOT ANCHORS (deals_snapshot point-in-time comparisons): "
+        f"current_snapshot_date={current_snap}, "
+        f"prior_snapshot_date={prior_snap}. These are the exact "
+        f"snapshot_date values closest to the time_window above — "
+        f"use them verbatim for any 'changed stage' / 'moved' / "
+        f"'compared to N days ago' question. NEVER pick your own "
+        f"prior snapshot_date."
+    )
+
+
 async def dynamic_query_loop(question, history, params,
                               sb, client,
                               hint: str = "",
@@ -1700,6 +1767,16 @@ async def dynamic_query_loop(question, history, params,
         question, classifier_client or client)
     logger.info(f"[SCHEMA] Relevant tables for full descriptions: {relevant_tables}")
 
+    # See resolve_snapshot_anchors() docstring for why this exists — a
+    # deals_snapshot diff needs two concrete snapshot_date values, and
+    # nothing else on this path supplies the second (prior) one.
+    snapshot_anchor_note = ""
+    if "deals_snapshot" in relevant_tables:
+        snapshot_anchor_note = resolve_snapshot_anchors(
+            sb, params.get("time_window", {}))
+        if snapshot_anchor_note:
+            logger.info(f"[SNAPSHOT_ANCHOR] {snapshot_anchor_note}")
+
     # Lightweight mode: only core columns get descriptions to reduce prompt size
     # 20K char system prompt was costing 5K tokens per turn. Lightweight mode
     # includes only essential columns (identifiers, values, status, dates).
@@ -1734,6 +1811,8 @@ async def dynamic_query_loop(question, history, params,
         f"Question: {question}",
         f"Time context: {params['time_window']['label']} = {params['time_window']['start']} to {params['time_window']['end']}",
     ]
+    if snapshot_anchor_note:
+        content_parts.append(snapshot_anchor_note)
     if quarter_context:
         content_parts.append(quarter_context)
     if hint:
