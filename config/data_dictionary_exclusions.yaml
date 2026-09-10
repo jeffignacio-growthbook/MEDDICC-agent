@@ -1,0 +1,40 @@
+# Data-dictionary registration exclusions.
+#
+# Same idea as the '# ALLOW-RAW-DATE-MATH:' comment marker used for the
+# date-resolution gate (tests/test_date_resolution_single_source.py): a
+# column that is deliberately NOT registered in the data_dictionary table
+# must be listed here, with a real reason, rather than silently missing.
+#
+# Background (2026-09-11): deals_snapshot.region and deals_snapshot.segment
+# existed in Postgres and were fully populated for days before anyone
+# noticed they were invisible to the dynamic query loop — because
+# visibility is controlled ENTIRELY by data_dictionary rows, not by the
+# real Postgres schema, and registering a new column there is a separate,
+# skippable step from the migration that adds it. This file plus
+# scripts/check_data_dictionary_coverage.py make that step structurally
+# unskippable for deals, deals_snapshot, and waterfall_weekly going
+# forward: every column on those tables must appear either in
+# data_dictionary (is_queryable true or false) or in this file.
+#
+# Format: one entry per intentionally-excluded (table, column) pair.
+#
+# excluded:
+#   - table: deals_snapshot
+#     column: some_internal_column
+#     reason: "Internal bookkeeping column, never meant to be queryable."
+#
+# NOTE ON HISTORY: this file does not yet enumerate the many columns added
+# to these three tables before migration 062 — most of those were
+# registered directly against the live database via
+# scripts/backfill_data_dictionary.py, which leaves no trace in the
+# migrations folder, so a static read of this repo cannot tell which of
+# them are genuinely covered. scripts/check_data_dictionary_coverage.py's
+# live mode (real Supabase credentials) is the actual source of truth for
+# the full historical picture; the offline structural gate
+# (tests/test_data_dictionary_registration.py) only enforces this rule for
+# migrations added after 062, so it can't retroactively flag decades of
+# history it has no way to verify. Once the live check has been run
+# against the real database, add any genuinely-intentional historical gaps
+# it finds here, backed by an actual answer from that run — not a guess.
+
+excluded: []

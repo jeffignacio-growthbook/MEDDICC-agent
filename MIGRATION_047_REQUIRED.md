@@ -32,10 +32,14 @@ ALTER TABLE forecast_weekly
 
 ## Resolution (2026-09-01)
 
-Applied successfully using URL-encoded password (`!` → `%21`):
-```python
-db_url = "postgresql://postgres.htgvkqycrwesdysustxd:ShoheiOhtani145928%21@aws-1-us-west-2.pooler.supabase.com:5432/postgres"
-```
+Applied successfully via a direct Postgres connection using
+`SUPABASE_DB_URL`, with the password URL-encoded (`!` → `%21`).
+
+**⚠️ 2026-09-11: this section previously contained the literal database
+password in plaintext.** It has been removed from this file, but it was
+committed to git history on 2026-09-06 and may still be exposed there.
+Rotate that database password if it hasn't been rotated since, and see
+PENDING_WORK.md for the git-history remediation this still needs.
 
 ## Verification
 

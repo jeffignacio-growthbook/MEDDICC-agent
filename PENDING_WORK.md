@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-10 (updated after date-resolution single-source-of-truth audit)
+**Last Updated:** 2026-09-11 (updated after snapshot-diff budget-exhaustion fix; ⚠️ see High Priority #0, a committed DB credential needs rotation)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -171,6 +171,89 @@ a settled number.
 
 ---
 
+### Budget Exhaustion on Snapshot-Diff Questions (2026-09-11)
+**Status:** ✅ COMPLETE - Round-trip eliminated, shortcut generalized, new CI gate added
+
+**Issue:** With the date/snapshot-anchor fixes from 2026-09-10 confirmed
+working (correct anchors, correct diff logic), a "which deals changed
+stage in EMEA/Enterprise" question still blew the token budget — the same
+root cause flagged two days ago (unnecessary round-trips), only partially
+addressed then.
+
+**Root cause #1 (eliminates a round-trip):** `deals_snapshot.region` and
+`deals_snapshot.segment` have existed in Postgres since migration 060
+(2026-09-08) and have been populated by `snapshot_deals.py` ever since —
+but 060 never registered them in `data_dictionary`, which is the ONLY
+thing `get_schema_context()` reads to decide what the dynamic query loop
+can see. The model's stated belief ("the snapshot data doesn't include
+segment or region columns") was true of what it was shown, false of the
+real table — a **data-dictionary registration gap**, the same class of
+bug as an earlier `deals.region` registration miss, recurring on a
+different table because registering a new column is a separate,
+skippable step from the migration that adds it.
+
+**Root cause #2 (extends an existing shortcut):** `deals_snapshot` still
+has no `company_name`, so a third call (naming the matched deal_ids) is
+genuinely unavoidable — but it fell through to a fresh full-budget loop
+iteration instead of synthesizing immediately, the same problem the
+existing `dimension_retry_succeeded` shortcut already solved for a
+different shape.
+
+**Completed work:**
+- [x] `scripts/migrations/062_register_snapshot_region_segment_in_
+      dictionary.sql` — registers both columns (not yet applied to the
+      live database as of this writing; the Supabase account connected to
+      this session doesn't include this project — needs to be run via the
+      correct account or pasted into the SQL Editor directly)
+- [x] `api/schema_context.py` + `api/router.py` prompt: explicit
+      `deals_snapshot` table description and system-prompt guidance
+      stating region/segment/owner_email are already point-in-time
+      columns there, and company_name is the one thing it lacks
+- [x] `_is_id_scoped_enrichment_call()` (api/router.py): generalizes the
+      immediate-synthesis shortcut to any `filter_table` call whose only
+      real selectivity is a `deal_id` filter against IDs a prior step
+      already found
+- [x] **New CI gate, same shape as the date-resolution gate, for this bug
+      class specifically:** `tests/test_data_dictionary_registration.py`
+      (offline, forward-looking — new migrations only) +
+      `scripts/check_data_dictionary_coverage.py` (live, authoritative,
+      catches historical gaps too) + `config/data_dictionary_exclusions.
+      yaml` (explicit-exception ledger, same idea as `# ALLOW-RAW-DATE-
+      MATH:`). Wired into `gate-tests.yml` as TEST 0e (offline) and
+      TEST 1b (live, deliberately NOT soft-fail — requires
+      `SUPABASE_DB_URL` in the `Agent` environment's secrets)
+- [x] Verified the offline gate actually catches a violation (planted a
+      fake migration adding an unregistered column, confirmed failure,
+      removed it) — same discipline as the date-resolution gate's
+      self-test
+
+**Important asymmetry documented in the gate itself:** unlike the date-
+resolution gate (fully static — "does this code call
+resolve_time_window()" is knowable from source), "is this column
+registered" is NOT knowable from the repo alone, because registration
+also happens by running `scripts/backfill_data_dictionary.py` live
+against the database with no migration-file trace. A static check against
+full history found 42 of 44 historical column additions "missing" —
+almost all false positives. The offline gate is therefore forward-looking
+only (migrations after 062); the live script is the actual source of
+truth for historical coverage.
+
+**Token accounting:** computed via the loop's own chars/4 budget
+estimator against real measured constants (not a live-run measurement —
+no Railway/live DB access this session). See chat history for the full
+derivation; summary: the worked incident shape projects to ~37K of the
+40K budget by the third call if the loop continues past it, vs. ~26K with
+the fix stopping there. Confirmation is the next live occurrence of this
+question, not this projection.
+
+**Separately found while checking this (not part of the fix, logged
+above under High Priority #0):** `MIGRATION_047_REQUIRED.md` had a live
+database password committed in plaintext since 2026-09-06. Removed from
+the file's current content; still in git history; database password not
+yet rotated.
+
+---
+
 ### Date Resolution Single-Source-of-Truth Audit (2026-09-10)
 **Status:** ✅ COMPLETE - Four instances fixed, structural CI gate added
 
@@ -243,6 +326,57 @@ ones. Re-running it post-fix will not change its result.
 ## 📋 Backlog
 
 ### High Priority
+
+#### 0. URGENT — Live Database Password Committed in Plaintext
+**Issue:** The literal production Postgres password was committed in
+plaintext in THREE places:
+- `MIGRATION_047_REQUIRED.md` (commit b75a3c1, 2026-09-06) — a full
+  connection string in a troubleshooting doc
+- `measure_stage_probabilities.py` and `measure_review_exclusion_impact.py`
+  — both hardcoded the literal password as a string literal to detect and
+  fix an unescaped `!` in `SUPABASE_DB_URL`, rather than handling the `!`
+  generically
+
+Audit note: a plain `grep -r` for the password string across the whole
+repo (not just the file that prompted the check) is what found the other
+two — worth doing the same sweep for any OTHER credential fragments,
+not just this one value.
+
+**Status:** PARTIALLY ADDRESSED — all three files fixed (password removed
+from the doc; both scripts changed to URL-encode `!` generically instead
+of hardcoding the credential) as of 2026-09-11, but:
+1. **The database password itself has NOT been rotated.** It was exposed
+   in a public-ish commit for 5 days; treat it as compromised and rotate
+   it regardless of whether anyone is known to have used it.
+2. **It is still present in git history** (commit b75a3c1 and every
+   commit after it until the redaction). Removing it from the current
+   file does not remove it from history — anyone with clone access to
+   this repo (or its history via GitHub) can still retrieve it with
+   `git log -p` or `git show b75a3c1`. A real fix requires either a
+   history rewrite (`git filter-repo` or BFG Repo-Cleaner, force-pushed,
+   coordinated with everyone who has a clone) or, more simply, treating
+   the credential as permanently burned and rotated — at which point the
+   old value in history is harmless to leave, since it no longer grants
+   access.
+
+**Recommended order:** rotate the database password FIRST (closes the
+actual exposure immediately, no coordination needed), then decide at
+leisure whether scrubbing git history is worth the disruption (force-push
++ everyone re-clones) given the credential it protects is already dead.
+
+**Work required:**
+1. Rotate the Supabase/Postgres database password now.
+2. Update `SUPABASE_DB_URL` (and any other place the connection string is
+   stored — GitHub Secrets, local `.env` files, CI) with the new password.
+3. Decide on git-history remediation (rewrite vs. accept-as-dead-credential).
+4. Audit other docs/scripts for the same pattern (a connection string
+   pasted into a markdown troubleshooting doc "to show it worked") —
+   this is an easy mistake to repeat.
+
+**Complexity:** Low effort for the rotation itself; the history question
+is a judgment call, not a coding task.
+
+---
 
 #### 1. Snapshot ETL Phantom Exits Bug
 **Issue:** Deals occasionally missing from single week's snapshot, causing "phantom exits" in waterfall
@@ -428,12 +562,13 @@ Without step 3, LLM query builder cannot see the column exists.
 
 ## 📊 Summary
 
-**Total Open Items:** 5
-- High Priority: 1 (snapshot ETL phantom exits)
+**Total Open Items:** 6
+- High Priority: 2 (⚠️ URGENT: committed DB password needs rotation, snapshot ETL phantom exits)
 - Low Priority: 4 (zero-day cycle times, forecast bugs, rep-name-to-email
   matching, snapshot ETL date.today() day-boundary stamp)
 
-**Recently Completed:** 5
+**Recently Completed:** 6
+- Budget exhaustion on snapshot-diff questions (2026-09-11) - **FIXED & CI-GATED** (data-dictionary registration gap eliminated a round-trip; ID-scoped enrichment shortcut generalized; new data-dictionary-coverage gate added, same shape as the date-resolution gate)
 - Date resolution single-source-of-truth audit (2026-09-10) - **FIXED & CI-GATED** (4 instances of the same bug class, one structural gate)
 - Synthesis aggregation gap (2026-09-09) - **TESTED & VERIFIED** (core bug fixed; ⚠️ its own "-$120K/last 2 weeks" test window has since been found wrong — see caveat, needs re-verification)
 - aggregate_results empty data bug (2026-09-09) - **IMPLEMENTED & VERIFIED** (Sept 6 impact: LOW)

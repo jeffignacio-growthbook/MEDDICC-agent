@@ -108,6 +108,19 @@ jobs:
           PYTHONPATH=. python3 tests/test_schema_context_snapshot_visibility.py
           PYTHONPATH=. python3 tests/test_enrichment_shortcut.py
 
+      - name: "TEST 0e — Offline: data-dictionary registration gate (new migrations)"
+        run: |
+          set -e
+          # Same pattern as the date-resolution gate, for a different bug
+          # class: deals_snapshot.region/segment existed in Postgres and
+          # were fully populated for days while being completely invisible
+          # to the dynamic query loop, because registering a new column in
+          # data_dictionary is a separate, skippable step from the
+          # migration that adds it — and it got skipped. This is forward-
+          # looking only (new migrations past 062); the full historical
+          # picture needs live credentials, see TEST 1b below.
+          PYTHONPATH=. python3 tests/test_data_dictionary_registration.py
+
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -136,6 +149,21 @@ jobs:
           asyncio.run(t())
           EOF
           python3 /tmp/test1.py
+
+      - name: "TEST 1b — Data-dictionary coverage (deals/deals_snapshot/waterfall_weekly)"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          PYTHONPATH=.:scripts python3 scripts/check_data_dictionary_coverage.py
+        # Deliberately NOT continue-on-error: the whole point (per the
+        # 2026-09-11 deals_snapshot.region/segment incident) is that this
+        # class of gap must be structurally unskippable, not another soft-
+        # fail check nobody looks at. Requires the SUPABASE_DB_URL secret
+        # (a direct Postgres connection string — see backfill-call-
+        # scores.yml for the existing precedent) in this workflow's `Agent`
+        # environment; if it isn't set yet, this step fails until it is —
+        # that's a configuration gap to close, not a reason to soften the
+        # gate.
 
       - name: "TEST 2 — Handler generator dry run"
         env:

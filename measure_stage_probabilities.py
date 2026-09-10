@@ -34,9 +34,16 @@ def main():
         print("⚠️  SUPABASE_DB_URL not set")
         return
 
-    # URL-encode password if needed
-    if 'ShoheiOhtani145928!' in db_url:
-        db_url = db_url.replace('ShoheiOhtani145928!', 'ShoheiOhtani145928%21')
+    # URL-encode a literal '!' in the password portion, if present —
+    # generic fix for the one special character known to break this
+    # connection string, not tied to any specific credential value. This
+    # file used to hardcode the literal production DB password here to
+    # detect exactly this case, which was itself a security issue
+    # independent of the encoding bug it was checking for.
+    import re
+    m = re.match(r'^(postgres(?:ql)?://[^:]+:)([^@]*!.*)(@.+)$', db_url)
+    if m:
+        db_url = m.group(1) + m.group(2).replace('!', '%21') + m.group(3)
 
     config = load_client_config()
 
