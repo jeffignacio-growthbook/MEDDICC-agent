@@ -274,6 +274,126 @@ def test_identical_wrong_answer_on_retry_still_escalates_not_loops_forever():
           "_finalize_from_data rather than looping forever")
 
 
+# --- The unresolved-after-retry signal must be visible, not silent ---
+
+class _CapturingTable:
+    """Minimal stand-in for supabase-py's table().insert().execute()
+    chain, capturing exactly what gets inserted — same pattern as
+    tests/test_query_cost_logging.py."""
+    def __init__(self, sink):
+        self._sink = sink
+        self._pending = None
+
+    def insert(self, data):
+        self._pending = data
+        return self
+
+    def execute(self):
+        self._sink.append(self._pending)
+        class _Result:
+            data = [self._pending]
+        return _Result()
+
+
+class _FakeSupabaseWithCostLog:
+    """Only query_cost_log works — every other table raises, so those
+    call sites hit their pre-existing try/except and degrade gracefully."""
+    def __init__(self):
+        self.query_cost_log_inserts = []
+
+    def table(self, name):
+        if name == "query_cost_log":
+            return _CapturingTable(self.query_cost_log_inserts)
+        raise AttributeError(f"no fake support for table {name!r}")
+
+
+def test_unresolved_after_retry_ships_a_caveat_and_is_not_a_silent_success():
+    """2026-09-11: this primitive used to be visible only to someone who
+    happened to grep the logs or query query_cost_log's primitives_fired
+    JSONB directly — the coarse outcome field made it look like an
+    ordinary success (result.get("answered") is True, same as any clean
+    answer). This proves BOTH halves of the fix at once, end-to-end:
+
+    1. The shipped Slack answer itself carries a user-facing caveat
+       ("could not be fully verified... double-check") — never a
+       silently-wrong number.
+    2. query_cost_log's outcome field is its own distinct bucket,
+       "answered_with_unverified_aggregation" — not folded into the
+       ordinary "answered_after_resynthesis" success bucket — so it's
+       queryable by outcome alone, no JSONB primitive digging required.
+
+    Scenario: the model repeats the same wrong total through the main
+    loop's two allowed attempts (escalating to _finalize_from_data),
+    AND through finalize's own one available retry — the worst case,
+    where even being handed the correct value directly twice over
+    doesn't take.
+    """
+    tool_call = json.dumps({"tool": "filter_table", "params": {
+        "table": "waterfall_weekly",
+        "columns": ["week_ending", "segment", "net_change"],
+        "filters": [],
+    }})
+    still_wrong = json.dumps({"answer": INCIDENT_1_WRONG_ANSWER})
+
+    # tool call, 2 unresolved main-loop attempts, finalize's own synth
+    # (also wrong), finalize's one retry (still wrong).
+    fake_client = _FakeClient(
+        [tool_call, still_wrong, still_wrong, still_wrong, still_wrong])
+    fake_sb = _FakeSupabaseWithCostLog()
+
+    filter_table_calls = []
+    orig_filter_table = tools_module.filter_table
+    orig_classify = table_classifier_module.classify_relevant_tables
+    orig_get_schema = schema_context_module.get_schema_context
+    tools_module.filter_table = _make_filter_table_stub(INCIDENT_1_ROWS, filter_table_calls)
+    table_classifier_module.classify_relevant_tables = (
+        lambda question, client: ["waterfall_weekly"])
+    schema_context_module.get_schema_context = (
+        lambda sb, tables_with_descriptions=None, lightweight=False:
+            "TABLE: waterfall_weekly\n  week_ending, segment, net_change\n")
+
+    try:
+        result = asyncio.run(router.dynamic_query_loop(
+            question="how much did pipeline move this period?",
+            history=[],
+            params={"time_window": {"label": "this period",
+                                     "start": "2026-08-01", "end": "2026-09-08"}},
+            sb=fake_sb,
+            client=fake_client,
+        ))
+    finally:
+        tools_module.filter_table = orig_filter_table
+        table_classifier_module.classify_relevant_tables = orig_classify
+        schema_context_module.get_schema_context = orig_get_schema
+
+    # 1. The shipped answer itself carries a visible caveat.
+    assert result["answered"] is True
+    assert "could not be fully verified" in result["answer"], (
+        f"expected a user-facing caveat in the shipped answer — got: "
+        f"{result['answer']!r}"
+    )
+    assert "double-check" in result["answer"].lower()
+    # No internal jargon leaked into the user-facing text.
+    for banned in ("resynthesis", "budget", "token", "primitive"):
+        assert banned not in result["answer"].lower(), (
+            f"internal jargon {banned!r} leaked into the user-facing "
+            f"caveat: {result['answer']!r}"
+        )
+
+    # 2. query_cost_log's outcome field is its own distinct bucket.
+    assert len(fake_sb.query_cost_log_inserts) == 1
+    logged = fake_sb.query_cost_log_inserts[0]
+    assert logged["outcome"] == "answered_with_unverified_aggregation", (
+        f"expected the distinct outcome bucket, not folded into an "
+        f"ordinary success bucket — got: {logged['outcome']!r}"
+    )
+    assert logged["primitives_fired"]["aggregation_mismatch_unresolved_after_retry"] is True
+
+    print("✓ an unresolved-after-retry aggregation mismatch ships a "
+          "user-facing caveat AND logs its own distinct, queryable "
+          "outcome bucket — never a silent success either way")
+
+
 if __name__ == "__main__":
     tests = [
         test_format_agg_number_whole_vs_fractional,
@@ -285,6 +405,7 @@ if __name__ == "__main__":
         test_incident_1_corrected_value_ships_end_to_end,
         test_incident_2_corrected_value_ships_end_to_end,
         test_identical_wrong_answer_on_retry_still_escalates_not_loops_forever,
+        test_unresolved_after_retry_ships_a_caveat_and_is_not_a_silent_success,
     ]
     failed = 0
     for t in tests:

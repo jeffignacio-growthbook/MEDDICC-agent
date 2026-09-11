@@ -548,6 +548,12 @@ tests/test_pipeline_movement_owner_role_note.py.
 
 #### 3. Dedicated Handlers: Owner-Email Canonicalization Gap (audit follow-up)
 
+**⭐ RECOMMENDED NEXT SESSION START (flagged 2026-09-11):** best-scoped
+open item in this file — direct sequel to the query_pipeline_movement
+incident, a real candidate root cause already proven once (the exact
+same exact-match fragility fixed there), and a closed, named list of
+5 handlers rather than an open-ended investigation.
+
 **Issue:** Following the `query_pipeline_movement` incident (#2 above),
 an audit of every OTHER dedicated handler in `api/handlers.py` that
 builds its own direct Supabase filters (not routed through

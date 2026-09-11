@@ -362,6 +362,20 @@ jobs:
           # dynamic_query_loop end-to-end, confirming the corrected
           # value actually reaches the shipped answer this time — not
           # just that the mismatch gets detected again.
+          #
+          # ROUND 2 (2026-09-11): the unresolved-after-retry primitive
+          # itself used to be visible only to someone who happened to
+          # grep the logs or query query_cost_log's primitives_fired
+          # JSONB directly — the coarse outcome field still read as an
+          # ordinary success. Closed two ways at once: the shipped Slack
+          # answer now carries a plain-language caveat ("could not be
+          # fully verified... double-check") whenever this fires, and
+          # query_cost_log's outcome field gained its own distinct
+          # bucket, answered_with_unverified_aggregation, checked before
+          # the ordinary answered_after_resynthesis bucket so this exact
+          # failure mode is queryable by outcome alone. Same test file's
+          # final test proves both halves end-to-end against a
+          # query_cost_log-capturing fake Supabase.
           PYTHONPATH=. python3 tests/test_aggregation_retry_hands_correct_value.py
 
       - name: "TEST 0p — Offline: false 'partial/pending' completeness claims force a resynthesis, not just a log line"

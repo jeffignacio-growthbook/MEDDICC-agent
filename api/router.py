@@ -2259,12 +2259,28 @@ def _new_cost_state() -> dict:
 def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
                                  exc_raised: Optional[BaseException]) -> str:
     """One of: "exception", "answered_cleanly", "answered_after_resynthesis",
-    "budget_exhausted", "other_fallback". See dynamic_query_loop()'s
-    docstring for what each means."""
+    "answered_with_unverified_aggregation", "budget_exhausted",
+    "other_fallback". See dynamic_query_loop()'s docstring for what each
+    means.
+
+    2026-09-11: "answered_with_unverified_aggregation" is its own bucket,
+    checked BEFORE "answered_after_resynthesis", specifically so this
+    case is never invisible in the coarse outcome field the way it used
+    to be — previously it only set a primitives_fired flag buried inside
+    query_cost_log's JSONB, and every other signal (result.get
+    ("answered") is True) made the outcome read as an ordinary success.
+    A wrong number that got a forced correction attempt and STILL didn't
+    verify is not the same outcome as a clean resynthesis that fixed
+    itself — collapsing them into one bucket would make this exact
+    failure mode invisible to anyone scanning outcomes rather than
+    reading every row's primitives_fired individually.
+    """
     if exc_raised is not None or result is None:
         return "exception"
     if result.get("answered"):
         primitives = cost_state["primitives_fired"]
+        if primitives["aggregation_mismatch_unresolved_after_retry"]:
+            return "answered_with_unverified_aggregation"
         if (primitives["scratchpad_rejection_fired"]
                 or primitives["aggregation_mismatch_caught"]
                 or primitives["false_partial_claim_caught"]):
@@ -2329,7 +2345,18 @@ async def dynamic_query_loop(question, history, params,
       "answered_cleanly"          — answered=True, no forced resynthesis
       "answered_after_resynthesis" — answered=True, but the scratchpad-
                                      rejection or aggregation-completeness
-                                     gate forced at least one retry
+                                     gate forced at least one retry that
+                                     then verified correctly
+      "answered_with_unverified_aggregation" — answered=True, but the
+                                     finalize step's own aggregation
+                                     retry (its last available chance,
+                                     with no further loop budget) STILL
+                                     didn't verify after being handed the
+                                     correct value directly. The shipped
+                                     answer text carries a caveat too
+                                     (see _finalize_from_data) — this is
+                                     never a silent success internally OR
+                                     to the user.
       "budget_exhausted"          — answered=False, gave up on the
                                      internal ceiling
       "other_fallback"            — answered=False, any other give-up
@@ -3064,6 +3091,22 @@ async def _dynamic_query_loop_core(question, history, params,
                             f"directly — shipping anyway (no further retry "
                             f"budget at this step): "
                             f"{recheck['all_discrepancies']!r}"
+                        )
+                        # 2026-09-11: this primitive used to be visible only
+                        # to someone who happened to grep the logs or query
+                        # query_cost_log's primitives_fired JSONB directly —
+                        # from the system's own outcome bucket, this looked
+                        # exactly like an ordinary success. A wrong number
+                        # shipped silently is worse than an honest caveat,
+                        # same principle as everywhere else this session
+                        # refused to let a plausible-looking wrong answer
+                        # pass as a good one. Appended in business language
+                        # only — no "resynthesis"/"budget"/internal jargon.
+                        final_answer_text = (
+                            f"{final_answer_text}\n\n⚠️ Note: at least one "
+                            f"figure above could not be fully verified "
+                            f"against the underlying data — please "
+                            f"double-check before relying on it."
                         )
 
                 logger.info(f"[LOOP] finalized from gathered data "
