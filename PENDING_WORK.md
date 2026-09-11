@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-11 (added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
+**Last Updated:** 2026-09-11 (added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -423,6 +423,112 @@ is a judgment call, not a coding task.
 
 ---
 
+#### 2. query_pipeline_movement Zero-Row Mystery (Jake Stangl incident) — MITIGATED, NOT ROOT-CAUSED
+
+**Issue:** A live Slack question about Jake Stangl's FY2027 Q3 pipeline
+movement returned a zero-row result from `query_pipeline_movement`
+(api/handlers.py) — a dedicated, HIGH-confidence (0.85) handler, not
+the dynamic-query fallback path. Jeff confirmed directly against live
+data that this was wrong: Jake Stangl has 10 CONFIRMED ACTIVE
+deals_snapshot rows on the 2026-09-08 snapshot alone
+(fiscal_quarter='FY2027 Q3', pipeline_id='default',
+owner_email='jake.stangl@growthbook.io', deal_status='active') —
+exactly the population this handler's filter should have matched.
+
+**Status:** MITIGATED, NOT CONFIRMED ROOT-CAUSED. Two real, defensible
+hardening fixes have shipped (commit ecbd115), but neither has been
+proven to be what actually caused this specific incident, because the
+one piece of direct evidence available — the captured live HTTP
+request — already showed the two values these fixes target
+(fiscal_quarter, owner_email) as byte-correct at time of capture. If
+this recurs after these fixes, that is the signal they were not the
+actual cause and the two hypotheses below (not yet ruled out) should
+be checked first.
+
+**Hypotheses examined, all six, via code/config inspection only (no
+live DB access available in this sandbox):**
+
+1. **owner_email format/case mismatch** — the captured request already
+   showed the correct, exact-case email reaching the filter. Not
+   confirmed as the cause of this incident, but hardened anyway
+   (`eq` → `ilike`, case-insensitive exact match) since exact-match
+   comparisons on model-reproduced text are fragile in general.
+2. **pipeline_id exclusion also excluding 'default'** — RULED OUT.
+   `config/client.yaml`'s `pipelines.excluded` lists only the renewal
+   pipeline (866608541); `default` is the *included* pipeline and the
+   exclusion branch only ever appends `neq pipeline_id 866608541`.
+3. **fiscal_quarter format/whitespace drift** — the captured request
+   already showed the literal correct value ("FY2027 Q3") reaching the
+   filter. Not confirmed as the cause of THIS incident, but a real,
+   demonstrable structural risk regardless: `api/router.py`'s own
+   classifier prompt documents two conflicting quarter-label
+   conventions ("FY2027 Q2" for this handler's `fiscal_quarter` vs.
+   the reversed "Q3_FY2027" for a different handler's `period_label`)
+   a few lines apart. Hardened via `_pm_normalize_fiscal_quarter()`.
+4. **a leftover stage_id filter** — RULED OUT. The raw `filters` list
+   sent to `select_all()` for the DB-level query never includes a
+   stage_id clause anywhere in this function; confirmed absent by
+   reading the construction top to bottom, not inferred.
+5. **deal_status exact-match mismatch** ('active' vs 'Active'/'open'/
+   etc.) — RULED OUT, definitively. `query_pipeline_movement` does not
+   select `deal_status` (see `_PM_SNAPSHOT_COLUMNS`'s own comment: "...
+   deal_status and fiscal_quarter [as a read-back column] ... were
+   dropped ...") and does not filter on it anywhere in this function.
+   The column is structurally absent from this handler's query, so it
+   cannot be the cause regardless of what value is actually stored.
+6. **snapshot_date selection picking a date with no matching rows** —
+   RULED OUT for the specific zero-row symptom reported (the exact
+   message "no snapshot rows for {fiscal_quarter} (owner {email})").
+   `query_pipeline_movement`'s raw DB query never filters by
+   snapshot_date at all — it pulls every snapshot_date within the
+   fiscal_quarter/owner/pipeline scope in one call. All snapshot_date
+   handling (grid/source selection, picking the latest date) happens
+   entirely in Python, AFTER the `if not rows:` gate, and only runs
+   when `rows` is already non-empty. It cannot be why the raw query
+   itself returned zero rows.
+
+**What remains genuinely open:** all six hypotheses are now either
+ruled out or unconfirmed-but-hardened, and NONE of them, on the
+evidence available (the captured request showing correct values),
+explains why the raw `select_all()` call returned zero rows against a
+confirmed-populated table. Possibilities not checkable from this
+sandbox (no live Supabase/Railway access):
+- **Deploy lag** — whether the code actually running on Railway at
+  the time of the incident matched this repo's HEAD at all, vs. an
+  older or hotfixed version with a since-reverted bug.
+- **Row-level security** on `deals_snapshot` in Supabase silently
+  restricting what the service role can see under some condition.
+- **A supabase-py/postgrest-py library version issue** in how chained
+  `.eq()`/`.neq()`/`.ilike()` filter calls compose on the query
+  builder — not verifiable through static reading of this
+  repo's application code alone.
+- **The captured request was incomplete/truncated** — the visible URL
+  fragment only showed `fiscal_quarter` and `owner_email`; the full,
+  untruncated query string (including the pipeline_id neq clauses)
+  was never seen directly, so a subtlety there can't be fully ruled
+  out either.
+
+**Work required (if this recurs):**
+1. Get the FULL, untruncated captured request URL from Railway/Slack
+   logs — every query parameter, not just the fragment already seen.
+2. Confirm Railway's deployed commit SHA matches this repo's HEAD at
+   the time of the incident.
+3. Check Supabase RLS policies on `deals_snapshot` for the service
+   role used by this app.
+4. Run the exact same filtered request directly against Supabase
+   (curl/psql) outside the application, to isolate app-layer vs.
+   database-layer causes.
+
+**Complexity:** Low effort per individual check above; the blocker is
+purely lack of live production/DB access from this working environment,
+not investigative complexity.
+
+**Documentation:** this session's investigation; fixes in
+tests/test_pipeline_movement_fiscal_quarter_filter_bug.py and
+tests/test_pipeline_movement_owner_role_note.py.
+
+---
+
 ### Low Priority
 
 #### 1. Zero-Day Cycle Time Deals
@@ -601,8 +707,10 @@ Without step 3, LLM query builder cannot see the column exists.
 
 ## 📊 Summary
 
-**Total Open Items:** 7
-- High Priority: 2 (⚠️ URGENT: committed DB password needs rotation, snapshot ETL phantom exits)
+**Total Open Items:** 8
+- High Priority: 3 (⚠️ URGENT: committed DB password needs rotation,
+  snapshot ETL phantom exits, query_pipeline_movement zero-row mystery
+  for an SDR — mitigated but not root-caused)
 - Low Priority: 5 (zero-day cycle times, forecast bugs, rep-name-to-email
   matching, snapshot ETL date.today() day-boundary stamp, dead
   synthesis_aggregation_fix.py needs deleting or marking historical)
