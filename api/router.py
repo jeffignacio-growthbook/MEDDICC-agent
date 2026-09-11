@@ -2229,6 +2229,50 @@ def _aggregation_correction_message(discrepancies: list) -> str:
     )
 
 
+# 2026-09-11: the standing contract every detection primitive in this
+# loop must satisfy — see PRIMITIVE_CHECKLIST.md for the full checklist
+# and tests/test_primitive_contract.py for the CI gate that enforces it
+# structurally. A "detection primitive" is anything that checks the
+# correctness/completeness of an answer and can find it wanting
+# (aggregation totals, scratchpad narration, snapshot-date labeling,
+# dimension-term ambiguity, snapshot-anchor absence, and any future
+# one) — as opposed to a primitive that just marks a MECHANISM having
+# run (snapshot_anchor_injected, dimension_resolver_matched,
+# enrichment_shortcut_fired, forced_anchor_fetch_fired, snapshot_diff_
+# computed, diff_company_name_backfill_fired, ambiguous_dimension_term_
+# flagged — that one specifically records the proactive nudge firing,
+# not a discovered failure; ambiguous_dimension_UNADDRESSED, below, is
+# the actual failure signal), which this contract doesn't apply to.
+#
+# Every key listed here MUST satisfy both:
+#   1. Its name appears in _compute_query_cost_outcome()'s source — a
+#      real, queryable field (the outcome column, or reason_tag for
+#      finalize_scratchpad_caught specifically), never only inside
+#      primitives_fired's JSONB.
+#   2. There's a code path, at the point this primitive is set True,
+#      that changes what the user sees (a caveat appended to the
+#      shipped answer, or an honest _give_up() instead of a plausible-
+#      looking wrong one) — UNLESS the check's own retry/correction
+#      resolves it before shipping (aggregation_mismatch_caught,
+#      false_partial_claim_caught, scratchpad_rejection_fired — these
+#      three are the "caught AND fixed" precursors to their own
+#      "still unresolved" siblings above; a self-corrected answer
+#      needs no caveat because it's no longer wrong).
+#
+# Adding a new detection primitive? Add its key here — that's what
+# forces the next contributor (and the CI gate) to ask the two
+# questions above before considering it done.
+FAILURE_MODE_PRIMITIVES = frozenset({
+    "aggregation_mismatch_caught",
+    "aggregation_mismatch_unresolved_after_retry",
+    "false_partial_claim_caught",
+    "scratchpad_rejection_fired",
+    "finalize_scratchpad_caught",
+    "snapshot_date_labeling_unverified",
+    "ambiguous_dimension_unaddressed",
+})
+
+
 def _new_cost_state() -> dict:
     """Mutable per-invocation state _dynamic_query_loop_core() populates
     as it runs, so dynamic_query_loop()'s wrapper can log a structured
@@ -2252,6 +2296,9 @@ def _new_cost_state() -> dict:
             "false_partial_claim_caught": False,
             "aggregation_mismatch_unresolved_after_retry": False,
             "ambiguous_dimension_term_flagged": False,
+            "snapshot_date_labeling_unverified": False,
+            "finalize_scratchpad_caught": False,
+            "ambiguous_dimension_unaddressed": False,
         },
     }
 
@@ -2259,21 +2306,25 @@ def _new_cost_state() -> dict:
 def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
                                  exc_raised: Optional[BaseException]) -> str:
     """One of: "exception", "answered_cleanly", "answered_after_resynthesis",
-    "answered_with_unverified_aggregation", "budget_exhausted",
+    "answered_with_unverified_aggregation",
+    "answered_with_unverified_date_labeling",
+    "answered_with_unaddressed_ambiguity", "budget_exhausted",
     "other_fallback". See dynamic_query_loop()'s docstring for what each
     means.
 
-    2026-09-11: "answered_with_unverified_aggregation" is its own bucket,
-    checked BEFORE "answered_after_resynthesis", specifically so this
-    case is never invisible in the coarse outcome field the way it used
-    to be — previously it only set a primitives_fired flag buried inside
-    query_cost_log's JSONB, and every other signal (result.get
+    2026-09-11: "answered_with_unverified_aggregation" (and its sibling,
+    "answered_with_unverified_date_labeling") are their own buckets,
+    checked BEFORE "answered_after_resynthesis", specifically so these
+    cases are never invisible in the coarse outcome field the way they
+    used to be — previously each only set a primitives_fired flag buried
+    inside query_cost_log's JSONB, and every other signal (result.get
     ("answered") is True) made the outcome read as an ordinary success.
-    A wrong number that got a forced correction attempt and STILL didn't
-    verify is not the same outcome as a clean resynthesis that fixed
-    itself — collapsing them into one bucket would make this exact
-    failure mode invisible to anyone scanning outcomes rather than
-    reading every row's primitives_fired individually.
+    An answer that shipped with a known, unresolved correctness question
+    is not the same outcome as a clean resynthesis that fixed itself —
+    collapsing them into one bucket would make this exact failure mode
+    invisible to anyone scanning outcomes rather than reading every row's
+    primitives_fired individually. This is the standing contract every
+    future detection primitive must satisfy — see PRIMITIVE_CHECKLIST.md.
     """
     if exc_raised is not None or result is None:
         return "exception"
@@ -2281,6 +2332,10 @@ def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
         primitives = cost_state["primitives_fired"]
         if primitives["aggregation_mismatch_unresolved_after_retry"]:
             return "answered_with_unverified_aggregation"
+        if primitives["snapshot_date_labeling_unverified"]:
+            return "answered_with_unverified_date_labeling"
+        if primitives["ambiguous_dimension_unaddressed"]:
+            return "answered_with_unaddressed_ambiguity"
         if (primitives["scratchpad_rejection_fired"]
                 or primitives["aggregation_mismatch_caught"]
                 or primitives["false_partial_claim_caught"]):
@@ -2288,6 +2343,16 @@ def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
         return "answered_cleanly"
     if cost_state.get("reason_tag") == "budget_exhausted":
         return "budget_exhausted"
+    if cost_state["primitives_fired"]["finalize_scratchpad_caught"]:
+        # Already "other_fallback" via reason_tag ==
+        # "finalize_synthesis_scratchpad" below — this branch changes no
+        # behavior. It exists so this primitive satisfies the SAME
+        # structural rule (its name appears in this function) every
+        # other entry in FAILURE_MODE_PRIMITIVES does, rather than
+        # relying on a second, harder-to-scan-for verification path
+        # (reason_tag is the real queryable field for this one, a
+        # top-level query_cost_log column — see PRIMITIVE_CHECKLIST.md).
+        return "other_fallback"
     return "other_fallback"
 
 
@@ -2357,6 +2422,28 @@ async def dynamic_query_loop(question, history, params,
                                      (see _finalize_from_data) — this is
                                      never a silent success internally OR
                                      to the user.
+      "answered_with_unverified_date_labeling" — answered=True, but an
+                                     "as of <date>" claim in the answer
+                                     wasn't backed by any queried row's
+                                     snapshot_date (verify_snapshot_
+                                     date_labeling()). Not forced through
+                                     a resynthesis retry (a documented
+                                     false-positive risk makes that the
+                                     wrong tradeoff here), but never
+                                     silent either — the shipped answer
+                                     carries a caveat and this outcome is
+                                     its own queryable bucket.
+      "answered_with_unaddressed_ambiguity" — answered=True, but a term
+                                     matching more than one governed
+                                     value (e.g. "Jake" -> two reps) was
+                                     flagged before synthesis and NONE of
+                                     the candidate names ended up
+                                     anywhere in the answer — the model
+                                     likely picked one silently instead
+                                     of saying so or asking. The shipped
+                                     answer carries a caveat naming the
+                                     candidates; this outcome is its own
+                                     queryable bucket.
       "budget_exhausted"          — answered=False, gave up on the
                                      internal ceiling
       "other_fallback"            — answered=False, any other give-up
@@ -2991,6 +3078,66 @@ async def _dynamic_query_loop_core(question, history, params,
             cost_state["final_tokens_used"] = tokens_used
             parsed2 = _extract_json(synth.text)
             if parsed2 and parsed2.get("answer"):
+                # 2026-09-11 (primitive-contract retroactive audit): the
+                # scratchpad-narration check (TEST 0f/0i) runs at two
+                # sites in the main loop but was never re-applied to
+                # _finalize_from_data's OWN synthesis call — meaning the
+                # one place scratchpad narration is MOST likely to leak
+                # (a last-resort synthesis under pressure, already
+                # escalated here because something upstream went wrong)
+                # was exactly the one path with no check on its output at
+                # all. A scratchpad-y finalize answer would have shipped
+                # as answered=True, reading as an ordinary success. An
+                # honest give-up is strictly better than shipping leaked
+                # internal reasoning as if it were a finished answer, so
+                # this doesn't try to salvage or retry — it hands off to
+                # the same give-up path any other finalize failure uses.
+                # A DISTINCT reason_tag (not the ambient one this finalize
+                # call was already invoked with) so this specific failure
+                # is queryable directly via reason_tag — a real
+                # query_cost_log column — rather than only discoverable
+                # by also reading primitives_fired's JSONB.
+                if _looks_like_unfinished_scratchpad(parsed2["answer"]):
+                    cost_state["primitives_fired"]["finalize_scratchpad_caught"] = True
+                    logger.warning(
+                        f"[SYNTHESIS_VERIFY] finalize's own synthesis "
+                        f"looked like unfinished scratchpad narration — "
+                        f"giving up honestly instead of shipping it."
+                    )
+                    return _give_up(
+                        "finalize_synthesis_scratchpad",
+                        "the gathered data could not be turned into a clean answer")
+
+                # Same ambiguous-dimension-term compliance check as the
+                # main loop's Check 4 — finalize's synthesis needs it too,
+                # since it's a separate model call that could just as
+                # easily pick a candidate silently.
+                if ambiguous_dimensions:
+                    answer_lower = parsed2["answer"].lower()
+                    unaddressed = []
+                    for amb in ambiguous_dimensions:
+                        names = [c.get("matched_name") or c["value"] for c in amb["candidates"]]
+                        if not any(name.lower() in answer_lower for name in names):
+                            unaddressed.append((amb["term"], names))
+                    if unaddressed:
+                        cost_state["primitives_fired"]["ambiguous_dimension_unaddressed"] = True
+                        for term, names in unaddressed:
+                            logger.warning(
+                                f"[SYNTHESIS_VERIFY] finalize answer left "
+                                f"ambiguous term {term!r} (candidates: "
+                                f"{names}) unaddressed — appending a caveat."
+                            )
+                        ambiguity_lines = "\n".join(
+                            f'- "{term}" could mean: {", ".join(names)}'
+                            for term, names in unaddressed)
+                        parsed2["answer"] = (
+                            f"{parsed2['answer']}\n\n⚠️ Note: this question "
+                            f"used a term that matches more than one entry "
+                            f"in our system — please confirm which was "
+                            f"meant, since the answer above may only "
+                            f"reflect one:\n{ambiguity_lines}"
+                        )
+
                 # MANDATORY GATE: Dimension coverage verification (finalization path)
                 from api.dimension_verification import verify_dimension_coverage, format_verification_error
 
@@ -3015,15 +3162,26 @@ async def _dynamic_query_loop_core(question, history, params,
                         "answered": False
                     }
 
+                # See the main loop's Check 3 (above this function) for
+                # why this stays a caveat rather than a forced-resynthesis
+                # gate — the same documented false-positive risk applies
+                # here, and this IS the last-resort finalize step besides.
                 date_ok, unmatched_dates, real_dates = verify_snapshot_date_labeling(
                     parsed2["answer"], tr)
                 if not date_ok:
+                    cost_state["primitives_fired"]["snapshot_date_labeling_unverified"] = True
                     logger.warning(
                         f"[SYNTHESIS_VERIFY] Answer states 'as of {unmatched_dates}' "
                         f"but the queried rows' actual snapshot_date value(s) are "
                         f"{sorted(real_dates)} — labeling mismatch (2026-09-11 "
                         f"incident shape: data from one snapshot, text claims "
-                        f"another)."
+                        f"another). Appending a caveat rather than blocking."
+                    )
+                    parsed2["answer"] = (
+                        f"{parsed2['answer']}\n\n⚠️ Note: a date mentioned "
+                        f"above may not exactly match the underlying data's "
+                        f"own timestamp — please double-check before "
+                        f"relying on it."
                     )
 
                 # MANDATORY GATE (2026-09-11): aggregation completeness —
@@ -3491,19 +3649,86 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             # Check 3: snapshot-date labeling (2026-09-11 incident) — an
             # answer claiming "as of <date>" must be backed by a row that
             # actually carries that snapshot_date, not an assumed anchor.
+            #
+            # 2026-09-11 (primitive-contract retroactive audit): this used
+            # to be pure log-only, same "Don't block the answer, just log
+            # for monitoring" shape the aggregation-completeness check had
+            # before it was fixed. Not promoted to a forced-resynthesis
+            # gate like that one, though — verify_snapshot_date_labeling()'s
+            # own docstring documents a real false-positive risk (a
+            # close_date/create_date narrated with "as of" phrasing that
+            # coincidentally isn't among the queried snapshot_date values),
+            # so forcing a correction loop on every mismatch risks wasted
+            # or actively wrong retries against a plausible false alarm.
+            # The proportionate fix instead: append a caveat directly to
+            # what ships, and make the mismatch queryable via its own
+            # outcome bucket — never silent, without the false-positive
+            # blast radius a hard block would carry.
             date_ok, unmatched_dates, real_dates = verify_snapshot_date_labeling(
                 answer_text, tool_results)
             if not date_ok:
                 verification_issues.append("snapshot_date_labeling_mismatch")
+                cost_state["primitives_fired"]["snapshot_date_labeling_unverified"] = True
                 logger.warning(
                     f"[SYNTHESIS_VERIFY] Answer states 'as of {unmatched_dates}' "
                     f"but the queried rows' actual snapshot_date value(s) are "
-                    f"{sorted(real_dates)} — labeling mismatch."
+                    f"{sorted(real_dates)} — labeling mismatch. Appending a "
+                    f"caveat rather than blocking (false-positive risk)."
+                )
+                parsed["answer"] = (
+                    f"{parsed['answer']}\n\n⚠️ Note: a date mentioned above "
+                    f"may not exactly match the underlying data's own "
+                    f"timestamp — please double-check before relying on it."
                 )
 
             if verification_issues:
                 logger.warning(f"[SYNTHESIS_VERIFY] Issues detected: {verification_issues}")
-                # Don't block the answer, just log for monitoring
+                # no_amounts_stated (Check 1a) stays log-only by design —
+                # it only fires when the answer names NO dollar figure at
+                # all for a question that seems to be about amounts, which
+                # is itself deliberately reported as a monitoring signal
+                # rather than a fact to correct against (there's no known-
+                # correct number to hand back, unlike aggregation, and no
+                # specific claim to caveat, unlike date labeling above).
+
+            # Check 4: ambiguous-dimension-term compliance (2026-09-11,
+            # primitive-contract retroactive audit). An ambiguous term
+            # ("Jake" matching two reps) gets a directive telling the
+            # model to say so or ask — but nothing ever verified the
+            # model actually did either, instead of silently picking one
+            # candidate and answering as if there were no ambiguity at
+            # all. That's exactly the failure mode this whole mechanism
+            # exists to prevent, left unchecked. Heuristic, not exact: if
+            # NONE of an ambiguous term's candidate names appear anywhere
+            # in the answer, the model didn't address it — append a
+            # caveat rather than trust the silence.
+            unaddressed_ambiguous = []
+            if ambiguous_dimensions:
+                answer_lower = parsed["answer"].lower()
+                for amb in ambiguous_dimensions:
+                    names = [c.get("matched_name") or c["value"] for c in amb["candidates"]]
+                    if not any(name.lower() in answer_lower for name in names):
+                        unaddressed_ambiguous.append((amb["term"], names))
+
+            if unaddressed_ambiguous:
+                cost_state["primitives_fired"]["ambiguous_dimension_unaddressed"] = True
+                for term, names in unaddressed_ambiguous:
+                    logger.warning(
+                        f"[SYNTHESIS_VERIFY] ambiguous term {term!r} "
+                        f"(candidates: {names}) was flagged but the answer "
+                        f"doesn't name any of them — appending a caveat "
+                        f"rather than trusting a silent pick."
+                    )
+                ambiguity_lines = "\n".join(
+                    f'- "{term}" could mean: {", ".join(names)}'
+                    for term, names in unaddressed_ambiguous
+                )
+                parsed["answer"] = (
+                    f"{parsed['answer']}\n\n⚠️ Note: this question used a "
+                    f"term that matches more than one entry in our "
+                    f"system — please confirm which was meant, since the "
+                    f"answer above may only reflect one:\n{ambiguity_lines}"
+                )
 
             # MANDATORY GATE: Dimension coverage verification
             # Check if question mentioned dimension values that were never filtered for

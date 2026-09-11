@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-11 (added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
+**Last Updated:** 2026-09-11 (added `PRIMITIVE_CHECKLIST.md` — a standing, CI-enforced contract every detection primitive must satisfy, retroactively applied to fix 3 primitives found log-only with the same "detect but never act" gap the original aggregation-verification incident had; added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -758,6 +758,25 @@ Schema changes for query handlers require data_dictionary registration:
 3. Register in `data_dictionary` with `is_queryable=True`
 
 Without step 3, LLM query builder cannot see the column exists.
+
+**Detection Primitives — see `PRIMITIVE_CHECKLIST.md`:**
+Any new "detects a correctness problem" check in `dynamic_query_loop`
+(aggregation totals, scratchpad narration, snapshot-date labeling,
+dimension ambiguity, and any future one) must satisfy two things
+before it's done, enforced by `tests/test_primitive_contract.py`:
+1. Its failure writes to a queryable field (an outcome bucket or a
+   distinct `reason_tag` in `query_cost_log`) — never only a log line
+   or `primitives_fired`'s JSONB.
+2. Its failure changes what the user sees when unresolved — a caveat
+   or an honest give-up — never silent shipping of a plausible-looking
+   wrong answer. Same "exists but not applied" gap pattern as the
+   Related Issues below: `verify_aggregation_completeness()` correctly
+   detected a bad total twice, live, and shipped it wrong both times
+   because the retry told the model to "recheck" instead of handing it
+   the already-computed correct value — found and fixed 2026-09-11,
+   then two more primitives (`verify_snapshot_date_labeling`, the
+   ambiguous-dimension-term flag) found with the exact same gap in the
+   same retroactive audit.
 
 ### Related Issues
 

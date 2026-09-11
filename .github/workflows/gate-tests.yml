@@ -524,6 +524,112 @@ jobs:
           # of them now leaves a byte-exact trace.
           PYTHONPATH=. python3 tests/test_handler_filter_logging.py
 
+      - name: "TEST 0u — Offline: standing contract for detection primitives, enforced structurally"
+        run: |
+          set -e
+          # 2026-09-11: verify_aggregation_completeness() correctly
+          # detected a bad total in a live answer and shipped it wrong
+          # anyway, twice — the retry told the model to "recheck" its
+          # own already-wrong math instead of using the correct value
+          # already computed to detect the mismatch. Fixed (TEST 0s
+          # above). The retroactive audit that followed found the
+          # SAME shape of gap already sitting in two more checks built
+          # earlier the same night (see TEST 0v/0w below). Three
+          # primitives, one root cause: "the check fires correctly" was
+          # being treated as "the check is done." PRIMITIVE_CHECKLIST.md
+          # is the standing contract this retires as a convention
+          # someone has to remember — every detection primitive must
+          # write its failure to a queryable field (an outcome bucket or
+          # a distinct reason_tag, never only a log line or
+          # primitives_fired's JSONB) AND change what the user sees when
+          # unresolved (a caveat, or an honest give-up — never silent).
+          # test_primitive_contract.py enforces this the same way the
+          # existing structural gates do (no bare date.today(), no
+          # budget/token language) — a naming/pattern convention check,
+          # not deep semantic analysis: every entry in api/router.py's
+          # FAILURE_MODE_PRIMITIVES registry must be referenced in
+          # _compute_query_cost_outcome() and actually set somewhere;
+          # any new function matching a detection-style naming pattern
+          # across api/*.py must be in a reviewed allowlist or the test
+          # fails; and the exact retired "Don't block the answer, just
+          # log for monitoring" anti-pattern comment must never
+          # reappear anywhere in api/.
+          PYTHONPATH=. python3 tests/test_primitive_contract.py
+
+      - name: "TEST 0v — Offline: snapshot-date-labeling mismatches get a caveat and their own outcome bucket"
+        run: |
+          set -e
+          # 2026-09-11 (primitive-contract retroactive audit): verify_
+          # snapshot_date_labeling()'s mismatch signal was pure log-only
+          # at both its call sites — the exact "Don't block the answer,
+          # just log for monitoring" shape the aggregation-completeness
+          # check had before TEST 0s fixed it. Not promoted to a forced-
+          # resynthesis gate like that one, though — the function's own
+          # docstring documents a real false-positive risk (a close_
+          # date/create_date narrated with "as of" phrasing that
+          # coincidentally isn't among the queried snapshot_date
+          # values), so forcing a correction loop risks wasted or
+          # actively wrong retries. The proportionate fix: append a
+          # caveat directly to what ships, and give the mismatch its own
+          # queryable outcome bucket (answered_with_unverified_date_
+          # labeling) — never silent, without the false-positive blast
+          # radius a hard block would carry. test_snapshot_date_
+          # labeling_visibility.py drives the real dynamic_query_loop
+          # end-to-end, confirming the caveat reaches the shipped
+          # answer with no internal jargon, a correct date never gets a
+          # spurious caveat, and the outcome is queryable directly.
+          PYTHONPATH=. python3 tests/test_snapshot_date_labeling_visibility.py
+
+      - name: "TEST 0w — Offline: ambiguous dimension terms are verified for compliance, not just flagged"
+        run: |
+          set -e
+          # 2026-09-11 (primitive-contract retroactive audit):
+          # scan_question_for_ambiguous_dimension_terms() (added earlier
+          # the same night, for the "Jake's deals" incident) injects a
+          # directive telling the model to say so or ask when a term
+          # matches more than one governed value — but nothing ever
+          # verified the model actually did either, instead of silently
+          # picking one candidate and answering as if there were no
+          # ambiguity at all. That's exactly the failure mode this whole
+          # mechanism exists to prevent, left unchecked: detection
+          # without a compliance check is not a closed loop. Fixed by
+          # checking, at both the main loop and _finalize_from_data's
+          # own synthesis, whether any of the flagged term's candidate
+          # names show up anywhere in the answer; if none do, a caveat
+          # naming the candidates gets appended and the outcome gets its
+          # own bucket (answered_with_unaddressed_ambiguity).
+          # test_ambiguous_dimension_compliance.py drives the real
+          # dynamic_query_loop end-to-end for the "Jake's deals" shape,
+          # confirming a silent pick gets caught and caveated while an
+          # answer that already names a candidate ships unchanged.
+          PYTHONPATH=. python3 tests/test_ambiguous_dimension_compliance.py
+
+      - name: "TEST 0x — Offline: _finalize_from_data's own synthesis is checked for leaked scratchpad narration"
+        run: |
+          set -e
+          # 2026-09-11 (primitive-contract retroactive audit): the
+          # scratchpad-narration check runs at two sites in the main
+          # loop's own answer path but was never re-applied to
+          # _finalize_from_data's OWN synthesis call — exactly the one
+          # place scratchpad narration is most likely to leak (a last-
+          # resort synthesis under pressure, already escalated because
+          # something upstream went wrong twice). A scratchpad-y
+          # finalize answer would have shipped as answered=True, reading
+          # as an ordinary success with raw internal reasoning delivered
+          # to Slack verbatim. Fixed: if finalize's own parsed answer
+          # looks like unfinished scratchpad narration, it doesn't try
+          # to salvage or retry — it hands off to the same give-up path
+          # any other finalize failure uses, tagged with a DISTINCT
+          # reason_tag (finalize_synthesis_scratchpad) so it's directly
+          # queryable rather than only discoverable in primitives_
+          # fired's JSONB. test_finalize_scratchpad_check.py drives the
+          # real dynamic_query_loop end-to-end (2 scratchpad rejections
+          # in the main loop escalate to finalize, whose own synthesis
+          # is ALSO scratchpad-y), confirming an honest give-up ships
+          # instead of leaked reasoning, and that a genuinely clean
+          # finalize answer still ships normally.
+          PYTHONPATH=. python3 tests/test_finalize_scratchpad_check.py
+
       - name: "TEST 0n — Offline: every dynamic_query_loop invocation logs structured cost data"
         run: |
           set -e
