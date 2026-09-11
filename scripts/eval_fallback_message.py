@@ -36,7 +36,7 @@ if "supabase" not in sys.modules:
 _HUGE_SCHEMA = "col " * 30000  # ~120k chars → ~30k est tokens, over the budget
 
 _schema_mod = types.ModuleType("api.schema_context")
-_schema_mod.get_schema_context = lambda sb, tables_with_descriptions=None: ""
+_schema_mod.get_schema_context = lambda sb, tables_with_descriptions=None, lightweight=False: ""
 sys.modules["api.schema_context"] = _schema_mod
 
 _tc_mod = types.ModuleType("api.table_classifier")
