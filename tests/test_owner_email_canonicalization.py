@@ -492,6 +492,112 @@ def test_query_stale_deals_owner_email_matches_via_ilike():
     print("✓ query_stale_deals matches owner_email via ilike (case-tolerant post-resolution)")
 
 
+# ============================================================
+# Round 2: query_pipeline's stage_filter
+# ============================================================
+# Not one of the original 5 flagged handlers — found by re-checking the
+# SHAPE of the bug (a model-extracted stage value compared exactly
+# against a canonicalized DB value) across the handlers already touched
+# tonight, rather than assuming the fix was isolated to owner_email/
+# sdr_email. stage_filter isn't in the classifier's documented params
+# JSON schema (api/router.py's build_intent_prompt) — it's a free LLM
+# output field, and scripts/test_q011_exact.py exists specifically
+# because the classifier has spontaneously emitted it. The old
+# `bucket != stage_filter` comparison required an exact-case match
+# against one of a handful of lowercase bucket keywords, so a casing
+# slip ("Discovery") or a human stage label ("Technical Evaluation")
+# instead of a bucket name would silently drop every deal.
+
+_STAGE_FILTER_DEALS = [
+    {"deal_id": "1", "company_name": "Acme", "deal_value": 100000,
+     "stage": "appointmentscheduled",  # bucket 'discovery', label 'Discovery'
+     "owner_email": "christian@growthbook.io", "pipeline_id": "default",
+     "expansion_arr": 0, "new_arr": 50000, "renewal_revenue": 0,
+     "close_date": None},
+    {"deal_id": "2", "company_name": "Globex", "deal_value": 200000,
+     "stage": "presentationscheduled",  # bucket 'proposal', label 'Technical Evaluation'
+     "owner_email": "jake.stangl@growthbook.io", "pipeline_id": "default",
+     "expansion_arr": 0, "new_arr": 75000, "renewal_revenue": 0,
+     "close_date": None},
+]
+
+
+def _run_query_pipeline_with_stage_filter(stage_filter):
+    def fake_select_all(sb, table, columns=None, filters=None):
+        if table == "deals":
+            return _STAGE_FILTER_DEALS
+        return []
+
+    orig = handlers_module.select_all
+    handlers_module.select_all = fake_select_all
+    try:
+        result, error, records = _run_and_capture(
+            handlers_module.query_pipeline, {"stage_filter": stage_filter}, _FakeSupabase())
+    finally:
+        handlers_module.select_all = orig
+    return result, error, records
+
+
+def test_query_pipeline_stage_filter_still_matches_known_bucket_keyword():
+    """Regression control: the documented, correctly-cased bucket keyword
+    ('discovery') must keep matching exactly the one deal in that bucket —
+    the fix must not change today's working case."""
+    result, error, records = _run_query_pipeline_with_stage_filter("discovery")
+    assert error is None, f"handler raised: {error!r}"
+    assert result["total_deals"] == 1, f"expected 1 deal, got: {result!r}"
+    assert result["deals"][0]["company_name"] == "Acme"
+    print("✓ query_pipeline's stage_filter still matches a correctly-cased bucket keyword")
+
+
+def test_query_pipeline_stage_filter_is_case_insensitive():
+    """A casing slip ("Discovery" instead of "discovery") used to silently
+    match nothing, since `bucket != stage_filter` is case-sensitive."""
+    result, error, records = _run_query_pipeline_with_stage_filter("Discovery")
+    assert error is None, f"handler raised: {error!r}"
+    assert result["total_deals"] == 1, (
+        f"expected the case-mismatched bucket keyword to still match — got: {result!r}"
+    )
+    assert result["deals"][0]["company_name"] == "Acme"
+    print("✓ query_pipeline's stage_filter matches a case-mismatched bucket keyword")
+
+
+def test_query_pipeline_stage_filter_resolves_a_human_stage_label():
+    """The core of this fix: a human-readable stage label the model might
+    reasonably produce ("Technical Evaluation") now resolves to its
+    bucket ('proposal') via _resolve_stage_id, instead of being compared
+    literally against the bucket keyword and matching nothing."""
+    result, error, records = _run_query_pipeline_with_stage_filter("Technical Evaluation")
+    assert error is None, f"handler raised: {error!r}"
+    assert result["total_deals"] == 1, (
+        f"expected the label to resolve to the 'proposal' bucket and match "
+        f"the one deal there — got: {result!r}"
+    )
+    assert result["deals"][0]["company_name"] == "Globex"
+    print("✓ query_pipeline's stage_filter resolves a human-readable stage label to its bucket")
+
+
+def test_query_pipeline_stage_filter_qualified_keyword_unaffected():
+    """Regression control: the special-cased 'qualified' keyword (scoping
+    or later) must be untouched by the new case-fold/resolve logic."""
+    result, error, records = _run_query_pipeline_with_stage_filter("qualified")
+    assert error is None, f"handler raised: {error!r}"
+    assert result["total_deals"] == 1, f"expected only the 'proposal'-bucket deal, got: {result!r}"
+    assert result["deals"][0]["company_name"] == "Globex"
+    print("✓ query_pipeline's stage_filter 'qualified' keyword is unaffected")
+
+
+def test_query_pipeline_stage_filter_unrecognized_value_matches_nothing_safely():
+    """False-positive check: a value matching neither a bucket keyword nor
+    any known stage label/id (_resolve_stage_id's passthrough case) must
+    not crash and must not accidentally match everything — it should
+    behave exactly as it did before this fix for a genuinely unknown
+    value (filters out all deals, no error)."""
+    result, error, records = _run_query_pipeline_with_stage_filter("some made up stage")
+    assert error is None, f"handler raised: {error!r}"
+    assert result["total_deals"] == 0, f"expected no matches for a nonsense value, got: {result!r}"
+    print("✓ query_pipeline's stage_filter safely matches nothing for an unrecognized value")
+
+
 if __name__ == "__main__":
     tests = [
         test_query_pipeline_resolves_a_name_not_just_an_email,
@@ -510,6 +616,11 @@ if __name__ == "__main__":
         test_query_stale_deals_stage_lookup_is_case_insensitive,
         test_query_stale_deals_unknown_stage_passes_through_unchanged,
         test_query_stale_deals_owner_email_matches_via_ilike,
+        test_query_pipeline_stage_filter_still_matches_known_bucket_keyword,
+        test_query_pipeline_stage_filter_is_case_insensitive,
+        test_query_pipeline_stage_filter_resolves_a_human_stage_label,
+        test_query_pipeline_stage_filter_qualified_keyword_unaffected,
+        test_query_pipeline_stage_filter_unrecognized_value_matches_nothing_safely,
     ]
     failed = 0
     for t in tests:

@@ -2194,13 +2194,33 @@ async def query_pipeline(params: dict, sb) -> dict:
         for deal in incremental_deals:
             # Stage filtering
             if stage_filter:
+                # 2026-09-11 (PENDING_WORK.md High Priority #3,
+                # canonicalization audit follow-up, round 2): stage_filter
+                # isn't in the classifier's documented params schema — it's
+                # an LLM output field, so nothing constrains it to the
+                # exact lowercase bucket keywords this comparison expects.
+                # scripts/test_q011_exact.py exists specifically because
+                # the classifier has spontaneously emitted stage_filter;
+                # a plain `bucket != stage_filter` silently drops every
+                # deal on a casing slip ("Discovery") or a human stage
+                # label ("Technical Evaluation") instead of a bucket name.
+                # Case-fold first; for a value that's still not one of the
+                # known bucket keywords, try resolving it as a stage
+                # label/id (_resolve_stage_id, same helper query_stale_
+                # deals uses) and compare buckets instead of dropping
+                # everything outright.
                 bucket = stage_bucket(deal.get("stage"))
-                if stage_filter == "qualified":
+                sf = str(stage_filter).strip().lower()
+                if sf == "qualified":
                     # Qualified = scoping or later
                     if bucket not in ["scoping", "proposal"]:
                         continue
-                elif bucket != stage_filter:
-                    continue
+                elif sf in ("discovery", "scoping", "proposal", "closed_won", "closed_lost"):
+                    if bucket != sf:
+                        continue
+                else:
+                    if stage_bucket(_resolve_stage_id(stage_filter)) != bucket:
+                        continue
 
             # Pipeline filtering
             if pipeline_filter:
