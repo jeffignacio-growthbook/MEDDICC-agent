@@ -12,3 +12,4 @@ uvicorn[standard]>=0.24.0
 httpx>=0.25.0
 python-multipart
 openai>=1.30.0
+slack_sdk>=3.27.0
