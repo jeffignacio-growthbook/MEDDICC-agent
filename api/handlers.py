@@ -2460,7 +2460,7 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
         "owner_email": owner_email,
         "owner_name": persona_name,
         "resolution_note": resolved_note,
-        "period": tw["label"] if tw else "all active",
+        "period": "all active",
         "deals": enriched_deals,
         "summary": {
             "total_deals": len(enriched_deals),
