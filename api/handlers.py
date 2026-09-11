@@ -3693,6 +3693,58 @@ def _pm_load_scoping():
     return load_scope_config, is_deal_in_analytics_scope
 
 
+def _pm_owner_role_note(owner_email: str):
+    """If owner_email matches a config/client.yaml roster member whose
+    role isn't a quota-carrying pipeline owner (e.g. an SDR/BDR), return
+    a note explaining why a zero-row pipeline-movement result is the
+    structurally expected outcome — not a snapshot staleness or data gap.
+    None if owner_email is empty, unrecognized, or belongs to an AE.
+
+    2026-09-11: a live query for an SDR (Jake Stangl, role "SDR" in the
+    roster) returned zero deals_snapshot rows for FY2027 Q3, and the
+    generic "no snapshot rows (owner ...)" message read — right next to
+    a real snapshot-staleness investigation that same night — like
+    another data-freshness problem. It wasn't one: deals_snapshot.
+    owner_email is populated from HubSpot's deal-owner property (see
+    scripts/etl_deals.py's hubspot_owner_id mapping), and SDR/BDR
+    attribution lives in a completely different column,
+    deals.sdr_owner_email (migration 031) — never copied into
+    deals_snapshot at all (_PM_SNAPSHOT_COLUMNS has no such field). An
+    SDR structurally can't be the owner_email on a snapshot row unless
+    someone manually assigned them deal ownership in HubSpot, so "zero
+    rows" here is what asking a pipeline-ownership question about
+    someone who doesn't own pipeline SHOULD return — confirmed correct,
+    just previously indistinguishable from an actual gap in the message
+    text alone.
+    """
+    if not owner_email:
+        return None
+    from api.dimension_resolver import _load_roster
+    email_norm = owner_email.strip().lower()
+    for member in _load_roster():
+        if member.get("email", "").strip().lower() != email_norm:
+            continue
+        role = (member.get("role") or "").strip()
+        if role and "account executive" not in role.lower():
+            name = member.get("name") or owner_email
+            # "an SDR" / "an MRI" — acronym letters pronounced with a
+            # leading vowel sound need "an", not just a literal A-E-I-O-U
+            # check on the first character.
+            article = "an" if role[:1].upper() in "AEFHILMNORSX" else "a"
+            return (
+                f"{name} is {article} {role}, not a quota-carrying pipeline owner — "
+                f"deals_snapshot.owner_email reflects HubSpot's deal-owner "
+                f"field (the AE), and this role typically doesn't own deal "
+                f"records there. Zero rows most likely means {name} has no "
+                f"deals assigned to them directly in HubSpot, not a data or "
+                f"snapshot problem. For SDR/BDR activity, use sourced-deal "
+                f"or SDR-metrics queries instead of pipeline movement by "
+                f"owner."
+            )
+        break
+    return None
+
+
 def _pm_current_quarter_label():
     """Current fiscal quarter in the stored column's format ('FY2027 Q3')."""
     from utils import get_fiscal_quarter
@@ -4239,6 +4291,9 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         gap = f"no snapshot rows for {fiscal_quarter}"
         if owner_email:
             gap += f" (owner {owner_email})"
+            role_note = _pm_owner_role_note(owner_email)
+            if role_note:
+                gap += f". {role_note}"
         return {**base, "snapshot_dates": [], "result": None,
                 "data_gaps": [gap]}
 

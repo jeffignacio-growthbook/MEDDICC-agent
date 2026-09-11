@@ -317,6 +317,57 @@ jobs:
           # immediately with no wasted retry.
           PYTHONPATH=. python3 tests/test_aggregation_verification.py
 
+      - name: "TEST 0p — Offline: false 'partial/pending' completeness claims force a resynthesis, not just a log line"
+        run: |
+          set -e
+          # 2026-09-09/2026-09-11: the false-completeness-claim check
+          # (false_segment_partial_claim etc.) correctly DETECTED a live
+          # answer inventing "other segments pending" when all 4
+          # segments were present in the retrieved data — twice, two
+          # nights apart — and shipped the false claim to Slack both
+          # times anyway, because the code next to the check said
+          # verbatim "Don't block the answer, just log for monitoring."
+          # Detection without a fix is not a fix; a prompt instruction
+          # alone (SYNTHESIS_FIX_TEST_RESULTS.md) had already been tried
+          # and hadn't held. Promoted to a forced-resynthesis gate,
+          # same escalation pattern (correction message, no_progress_
+          # streak, 2-strike cutover to _finalize_from_data) as the
+          # aggregation-completeness gate directly above. Bundled with
+          # this: the check's detection itself is now sentence-scoped
+          # (the completeness word must share a sentence with the
+          # dimension's own name) instead of a bare whole-answer
+          # substring search, so an ordinary, correct use of "pending"
+          # elsewhere in the answer (e.g. "3 deals pending signature")
+          # can't false-trigger a wasted resynthesis round-trip — making
+          # the check blocking without that fix would have turned every
+          # such false positive into real, avoidable cost.
+          PYTHONPATH=. python3 tests/test_false_partial_claim_gate.py
+
+      - name: "TEST 0q — Offline: pipeline-movement zero-row results explain SDR/BDR role mismatches instead of reading as a data gap"
+        run: |
+          set -e
+          # 2026-09-11: a live pipeline-movement question about an SDR
+          # (Jake Stangl) returned a bare "no snapshot rows for FY2027
+          # Q3 (owner jake.stangl@growthbook.io)" data_gap — reproduced
+          # twice, right after an unrelated investigation had confirmed
+          # deals_snapshot itself is current. Root cause, confirmed via
+          # config + ETL code inspection (no live DB needed): Jake
+          # Stangl's roster role is SDR, not AE. deals_snapshot.
+          # owner_email is populated from HubSpot's deal-owner property
+          # (the AE); SDR/BDR attribution lives in a completely separate
+          # column, deals.sdr_owner_email, never copied into
+          # deals_snapshot at all. An SDR structurally can't be the
+          # owner_email on a snapshot row, so zero rows is the CORRECT
+          # answer to a pipeline-ownership question about someone who
+          # doesn't own pipeline — the defect was only in the message,
+          # which read exactly like a staleness/coverage problem.
+          # _pm_owner_role_note() (api/handlers.py) checks the filtered
+          # owner_email against config/client.yaml's team roster and
+          # folds a role-specific explanation into data_gaps when it
+          # matches a non-AE role, instead of a bare, ambiguous "no
+          # snapshot rows" line.
+          PYTHONPATH=. python3 tests/test_pipeline_movement_owner_role_note.py
+
       - name: "TEST 0n — Offline: every dynamic_query_loop invocation logs structured cost data"
         run: |
           set -e

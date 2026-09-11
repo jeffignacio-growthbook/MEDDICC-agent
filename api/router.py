@@ -2201,6 +2201,7 @@ def _new_cost_state() -> dict:
             "forced_anchor_fetch_fired": False,
             "snapshot_diff_computed": False,
             "diff_company_name_backfill_fired": False,
+            "false_partial_claim_caught": False,
         },
     }
 
@@ -2214,7 +2215,9 @@ def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
         return "exception"
     if result.get("answered"):
         primitives = cost_state["primitives_fired"]
-        if primitives["scratchpad_rejection_fired"] or primitives["aggregation_mismatch_caught"]:
+        if (primitives["scratchpad_rejection_fired"]
+                or primitives["aggregation_mismatch_caught"]
+                or primitives["false_partial_claim_caught"]):
             return "answered_after_resynthesis"
         return "answered_cleanly"
     if cost_state.get("reason_tag") == "budget_exhausted":
@@ -3285,30 +3288,92 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     return await _finalize_from_data("aggregation_mismatch_unresolved")
                 continue
 
-            # Check 2: Detect unverified completeness claims
-            completeness_claims = ['partial', 'pending', 'incomplete', 'remaining.*pending']
-            has_claim = any(re.search(claim, answer_text.lower()) for claim in completeness_claims)
+            # Check 2: false completeness claims ("partial"/"pending"/
+            # "incomplete") about a specific dimension (segment/region/
+            # week) that the retrieved data actually covers in full.
+            #
+            # Sentence-scoped on purpose: the completeness word must
+            # appear in the SAME sentence as the dimension's own name
+            # (or its plural), not just anywhere in the answer. A bare
+            # global substring match would also fire on ordinary,
+            # correct business language elsewhere in the same answer
+            # (e.g. "3 deals pending signature") and force a resynthesis
+            # loop over a sentence that never made a completeness claim
+            # about this dimension at all.
+            #
+            # 2026-09-11: promoted from log-only to a forced-resynthesis
+            # gate, matching the aggregation-completeness gate above. A
+            # live run produced exactly the false claim this check was
+            # built to catch two days earlier (SYNTHESIS_FIX_TEST_
+            # RESULTS.md, 2026-09-09 — "Sep 7: Enterprise flat, other
+            # segments pending" when all 4 segments were present with
+            # $0 activity): the check correctly detected it, logged
+            # false_segment_partial_claim, and then shipped the false
+            # claim to Slack anyway, because detection was never wired
+            # to a fix — only a prompt instruction was, and (per that
+            # same doc) prompt instructions alone don't reliably hold.
+            all_rows = []
+            for key, data in accumulated_data.items():
+                if key.startswith("step_") and not key.endswith("_raw"):
+                    all_rows.extend(data.get("rows", []))
 
-            if has_claim:
-                # Check if claim is justified by missing dimensions
-                all_rows = []
-                for key, data in accumulated_data.items():
-                    if key.startswith("step_") and not key.endswith("_raw"):
-                        all_rows.extend(data.get("rows", []))
+            false_claims = []
+            if all_rows and isinstance(all_rows[0], dict):
+                sentences = re.split(r'(?<=[.!?])\s+', answer_text)
+                dim_terms = {
+                    'segment': ('segment', 'segments'),
+                    'region': ('region', 'regions'),
+                    'week_ending': ('week', 'weeks'),
+                }
+                completeness_claims = ['partial', 'pending', 'incomplete', 'remaining.*pending']
+                for dim in ['segment', 'region', 'week_ending']:
+                    if dim not in all_rows[0]:
+                        continue
+                    unique_vals = set(r.get(dim) for r in all_rows if r.get(dim))
+                    expected_counts = {'segment': 4, 'region': 5}
+                    expected = expected_counts.get(dim, 0)
+                    if not (expected > 0 and len(unique_vals) >= expected):
+                        continue
+                    terms = dim_terms[dim]
+                    offending = next(
+                        (s for s in sentences
+                         if any(t in s.lower() for t in terms)
+                         and any(re.search(c, s.lower()) for c in completeness_claims)),
+                        None,
+                    )
+                    if offending:
+                        false_claims.append((dim, len(unique_vals), offending.strip()))
+                        verification_issues.append(f"false_{dim}_partial_claim")
+                        logger.warning(
+                            f"[SYNTHESIS_VERIFY] Answer claims 'partial/pending' but "
+                            f"{dim} has all {len(unique_vals)} expected values — "
+                            f"forcing resynthesis. Offending sentence: {offending!r}")
 
-                if all_rows and isinstance(all_rows[0], dict):
-                    # Count unique values per dimension
-                    for dim in ['segment', 'region', 'week_ending']:
-                        if dim in all_rows[0]:
-                            unique_vals = set(r.get(dim) for r in all_rows if r.get(dim))
-                            # Check if we have expected count (4 segments, 5 regions, etc.)
-                            expected_counts = {'segment': 4, 'region': 5}
-                            expected = expected_counts.get(dim, 0)
-                            if expected > 0 and len(unique_vals) >= expected:
-                                verification_issues.append(f"false_{dim}_partial_claim")
-                                logger.warning(
-                                    f"[SYNTHESIS_VERIFY] Answer claims 'partial/pending' but "
-                                    f"{dim} has all {len(unique_vals)} expected values")
+            if false_claims:
+                cost_state["primitives_fired"]["false_partial_claim_caught"] = True
+                claim_lines = "\n".join(
+                    f'- You wrote something like "{sentence}", but the retrieved '
+                    f"data actually has all {count} {dim.replace('week_ending', 'week')} "
+                    f"values — nothing is missing or pending for {dim}."
+                    for dim, count, sentence in false_claims
+                )
+                correction = (
+                    "⚠️ Your answer claimed data was partial/pending/incomplete "
+                    "for a dimension the retrieved rows actually cover in full:\n"
+                    f"{claim_lines}\n\n"
+                    "If a row/segment/week genuinely has $0 or no activity, say "
+                    "so explicitly ('$0', 'flat') — that is NOT the same as "
+                    "'pending' or 'partial', which means a row is ACTUALLY "
+                    "MISSING from the data. Using ONLY the data already "
+                    "gathered, respond again with the corrected wording as "
+                    "{\"answer\": \"...\"}."
+                )
+                messages.append({"role": "assistant", "content": raw})
+                messages.append({"role": "user", "content": correction})
+                no_progress_streak += 1
+                if no_progress_streak >= 2:
+                    return await _finalize_from_data("false_partial_claim_unresolved")
+                continue
 
             # Check 3: snapshot-date labeling (2026-09-11 incident) — an
             # answer claiming "as of <date>" must be backed by a row that
