@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-11 (fixed a 4th detection-primitive gap found the same night, same file: the zero-rows suspicion note in `dynamic_query_loop` detected a suspicious enumeration-question zero-row result and logged an advisory note, but never verified the model acted on it before shipping — added a compliance check + its own outcome bucket (`answered_with_unresolved_zero_row_suspicion`), registered in `FAILURE_MODE_PRIMITIVES`, see `PRIMITIVE_CHECKLIST.md`'s "Follow-up audit" section; also fixed an unrelated stale test found along the way — `tests/test_zero_rows_suspicion.py`'s 3rd test had been failing since 2026-09-06 checking the wrong location for missing-value prompt guidance that was deliberately relocated to `api/router.py`'s `DYNAMIC_SYSTEM_PROMPT`, not lost; also fixed the recurring Supabase `httpx.RemoteProtocolError: ConnectionTerminated` connection issue found via a live test session — a long-lived singleton client hitting a known httpx/HTTP2 gotcha, fixed with a retry-once transport, see `scripts/supabase_client.py`'s `_RetryOnDeadConnectionTransport`; added `PRIMITIVE_CHECKLIST.md` — a standing, CI-enforced contract every detection primitive must satisfy, retroactively applied to fix 3 primitives found log-only with the same "detect but never act" gap the original aggregation-verification incident had; added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
+**Last Updated:** 2026-09-11 (added Low Priority #6, a known unclosed blind spot in `PRIMITIVE_CHECKLIST.md`'s two structural scans — a resolver-style function that returns ambiguous/unknown with no log call at all on that path, like `resolve_dimension_filter`, is invisible to both the function-name scan and the bracketed-log-tag scan added the same night; closing it needs a bigger lift, either a logging convention or real control-flow static analysis, not scoped or started; fixed a 4th detection-primitive gap found the same night, same file: the zero-rows suspicion note in `dynamic_query_loop` detected a suspicious enumeration-question zero-row result and logged an advisory note, but never verified the model acted on it before shipping — added a compliance check + its own outcome bucket (`answered_with_unresolved_zero_row_suspicion`), registered in `FAILURE_MODE_PRIMITIVES`, see `PRIMITIVE_CHECKLIST.md`'s "Follow-up audit" section; also fixed an unrelated stale test found along the way — `tests/test_zero_rows_suspicion.py`'s 3rd test had been failing since 2026-09-06 checking the wrong location for missing-value prompt guidance that was deliberately relocated to `api/router.py`'s `DYNAMIC_SYSTEM_PROMPT`, not lost; also fixed the recurring Supabase `httpx.RemoteProtocolError: ConnectionTerminated` connection issue found via a live test session — a long-lived singleton client hitting a known httpx/HTTP2 gotcha, fixed with a retry-once transport, see `scripts/supabase_client.py`'s `_RetryOnDeadConnectionTransport`; added `PRIMITIVE_CHECKLIST.md` — a standing, CI-enforced contract every detection primitive must satisfy, retroactively applied to fix 3 primitives found log-only with the same "detect but never act" gap the original aggregation-verification incident had; added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -741,6 +741,54 @@ that actually run today.
 because it costs nothing while it sits there; the point is to close it
 out before it becomes a real "what is this and is it still live"
 investigation for someone without this context.
+
+---
+
+#### 6. Primitive-Contract Gate Has a Known, Unclosed Blind Spot: Silent Resolvers
+
+**Issue:** `PRIMITIVE_CHECKLIST.md`'s two structural scans
+(`tests/test_primitive_contract.py`) — the function-name scan
+(`test_no_new_unreviewed_detection_functions`) and the bracketed-log-tag
+scan added the same night (`test_no_new_unreviewed_flagged_log_tags`) —
+both require SOME textual signal to catch a detection primitive: a name
+matching the naming patterns, or a `logger.*` call with a flagged
+keyword in its message. `resolve_dimension_filter` (api/router.py) is
+the standing counter-example: a resolver-style function that can return
+an ambiguous/unknown result on some code path with **no log call at
+all** on that path. Neither scan can see it, by construction — there is
+nothing for either regex to match against.
+
+**Status:** NOT FIXED, tracked here so it isn't forgotten. Not urgent —
+`resolve_dimension_filter` itself was already found and reviewed by
+manual audit (see `PRIMITIVE_CHECKLIST.md`), so this isn't an active,
+unreviewed bug; it's a gap in the STRUCTURAL GATE'S coverage that would
+let a *future* silent resolver slip through both of tonight's scans
+undetected, the same way the zero-rows suspicion note slipped through
+the first scan before tonight's follow-up added the second.
+
+**Work:** Closing this needs one of two meaningfully bigger approaches
+than tonight's keyword scan:
+(a) Make it a convention (and, ideally, enforce it) that every
+    resolver-style function logs its outcome unconditionally — including
+    the ambiguous/unknown branch, not just the success path — so the
+    existing bracketed-log-tag scan would then have something to match
+    against. Lowest-lift of the two, but relies on the convention
+    actually being followed at every future call site, which is
+    exactly the kind of "someone has to remember" gap this whole
+    checklist exists to replace with structure.
+(b) A different, heavier static check: for every function matching a
+    resolver-style naming pattern, verify every early-return branch in
+    its body has an associated log call. This is closer to real control-
+    flow analysis (walking a function's AST for return statements and
+    checking each one's containing block for a preceding/wrapping log
+    call) than the simple regex/keyword scans built tonight, and is a
+    meaningfully bigger lift — likely its own small project rather than
+    an extension of `test_primitive_contract.py`.
+
+**Complexity:** Low-medium for (a) as a convention change plus a
+lightweight lint; higher for (b), a real static-analysis tool. Neither
+is scoped or started — this entry exists purely so the blind spot is
+written down rather than living only in this session's own memory.
 
 ---
 
