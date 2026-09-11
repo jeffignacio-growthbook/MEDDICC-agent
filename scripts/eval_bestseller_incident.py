@@ -215,7 +215,7 @@ def test_assessor_floor_blocks_low_confidence():
           and not _below_floor({"score": 0.4, "issue": None}, floor=0.3))
 
     # the honest-miss message is fact-only — no speculative causes
-    msg = _honest_miss("query_deal_health", {"deals": [], "summary": "x"}).lower()
+    msg = _honest_miss("query_deal_health", 0, {"deals": [], "summary": "x"}).lower()
     check("honest miss admits it couldn't answer reliably",
           "couldn't answer" in msg or "could not answer" in msg)
     check("honest miss states what came back (facts only)",

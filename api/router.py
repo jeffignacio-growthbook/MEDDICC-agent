@@ -115,10 +115,15 @@ def _below_floor(assessment: dict, floor: float = None) -> bool:
     return isinstance(score, (int, float)) and score < floor
 
 
-def _honest_miss(question: str, entity_count: int) -> str:
+def _honest_miss(question: str, entity_count: int, tool_results: dict) -> str:
     """Plain-language below-floor reply. Technical details (handler name, score,
     drafted answer) stay in the log. The message states only: what failed, and
-    what to try next. Context-aware for entity-scoped questions."""
+    what to try next — including the same factual summary of what came back
+    that already ships to the log line right above this call
+    (_result_summary), so the user sees the same facts an engineer reading
+    the log would, not just a generic "couldn't answer." Context-aware for
+    entity-scoped questions."""
+    fact = _result_summary(tool_results)
 
     # Entity-scoped question (follow-up about specific deals from thread)
     if entity_count > 0:
@@ -126,14 +131,13 @@ def _honest_miss(question: str, entity_count: int) -> str:
         pronoun = "those" if entity_count > 1 else "that"
         return (
             f"I couldn't work out the answer for {pronoun} {entity_count} {plural} — "
-            f"I found them but couldn't confirm what you asked about. "
-            f"Try naming one specifically and I'll pull its details."
+            f"{fact}. Try naming one specifically and I'll pull its details."
         )
 
     # General fallback for discovery questions
     return (
-        "I couldn't answer that confidently. Try asking about a specific deal "
-        "or company, and I'll pull its details directly."
+        f"I couldn't answer that confidently — {fact}. Try asking about a "
+        f"specific deal or company, and I'll pull its details directly."
     )
 
 FOLLOWUP_PRONOUNS = [
@@ -5126,7 +5130,7 @@ async def route_question(question: str, user_id: str,
                     f"score={(assessment or {}).get('score')} "
                     f"handler={handler_name} entity_count={entity_count} "
                     f"result={_result_summary(tool_results)} — sending honest miss")
-        verified = _honest_miss(question, entity_count)
+        verified = _honest_miss(question, entity_count, tool_results)
         handler_name = f"{handler_name}_below_floor"
 
         # Log to fallback_log for weekly review
