@@ -508,9 +508,26 @@ sandbox (no live Supabase/Railway access):
   was never seen directly, so a subtlety there can't be fully ruled
   out either.
 
+**Instrumentation shipped (2026-09-11, round 4):** all four remaining
+hypotheses (deploy lag, RLS, a supabase-py/postgrest-py filter-chaining
+quirk, an incomplete original capture) require live production access
+to resolve — none are checkable from a sandbox, so the investigation
+could not move forward through more code inspection. Added a single
+unconditional INFO-level log line in `query_pipeline_movement`, right
+before the Supabase call: `[PIPELINE_MOVEMENT_QUERY] table=... columns=...
+filters=...`, every column/operator/value via `!r` for byte-exact
+visibility. Costs nothing when the handler works correctly. The next
+time this handler returns a zero-row result unexpectedly, the Railway
+log will show EXACTLY what was sent to Supabase — closing the one gap
+that blocked this investigation from the start: never having the
+actual outgoing query to compare against known-good data. Covered by
+`test_the_fully_constructed_filter_is_logged_byte_exact_before_the_query`
+in tests/test_pipeline_movement_fiscal_quarter_filter_bug.py.
+
 **Work required (if this recurs):**
-1. Get the FULL, untruncated captured request URL from Railway/Slack
-   logs — every query parameter, not just the fragment already seen.
+1. Pull the `[PIPELINE_MOVEMENT_QUERY]` log line for the failing
+   request from Railway — it now carries the exact filters sent, no
+   need to reconstruct them from a partial capture.
 2. Confirm Railway's deployed commit SHA matches this repo's HEAD at
    the time of the incident.
 3. Check Supabase RLS policies on `deals_snapshot` for the service

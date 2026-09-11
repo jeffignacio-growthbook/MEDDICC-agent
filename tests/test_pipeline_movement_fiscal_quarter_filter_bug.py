@@ -45,6 +45,7 @@ all once `rows` is non-empty, but this pins that behavior explicitly
 rather than leaving it as an inference.
 """
 import asyncio
+import logging
 import sys
 from pathlib import Path
 
@@ -235,6 +236,62 @@ def test_role_note_does_not_fire_once_real_matching_rows_exist():
     assert "filter-construction bug" not in serialized
 
 
+class _ListLogHandler(logging.Handler):
+    def __init__(self):
+        super().__init__()
+        self.records = []
+
+    def emit(self, record):
+        self.records.append(self.format(record))
+
+
+def test_the_fully_constructed_filter_is_logged_byte_exact_before_the_query():
+    """2026-09-11, round 4: the investigation into the original zero-row
+    mystery was blocked at the root by never having the ACTUAL outgoing
+    filter clause to compare against known-good data — every hypothesis
+    had to be checked blind, from code inspection alone. This pins the
+    fix: a single INFO-level log line, emitted unconditionally right
+    before the Supabase call, carrying the exact table/columns/filters
+    that will be sent — every operator, column, and value via !r, so a
+    stray space or case difference is visible in the log line itself,
+    not summarized away. Next time this handler returns zero rows
+    unexpectedly, the Railway log has the byte-exact query to compare
+    against the DB directly."""
+    handler = _ListLogHandler()
+    handlers_logger = logging.getLogger("api.handlers")
+    handlers_logger.addHandler(handler)
+    handlers_logger.setLevel(logging.INFO)
+
+    calls = []
+    orig = handlers_module.select_all
+    handlers_module.select_all = _make_scoped_select_all(JAKE_STANGL_SEPT8_ROWS, calls)
+    try:
+        asyncio.run(query_pipeline_movement(
+            {
+                "view": "movement",
+                "fiscal_quarter": "FY2027 Q3",
+                "owner_email": "jake.stangl@growthbook.io",
+            },
+            _FakeSupabase(),
+        ))
+    finally:
+        handlers_module.select_all = orig
+        handlers_logger.removeHandler(handler)
+
+    matches = [r for r in handler.records if "[PIPELINE_MOVEMENT_QUERY]" in r]
+    assert len(matches) == 1, (
+        f"expected exactly one query-logging line — got {len(matches)}: {matches!r}"
+    )
+    line = matches[0]
+    assert "table='deals_snapshot'" in line
+    assert "'eq', 'fiscal_quarter', 'FY2027 Q3'" in line
+    assert "'ilike', 'owner_email', 'jake.stangl@growthbook.io'" in line
+    assert "'neq', 'pipeline_id', '866608541'" in line, (
+        "the renewal-pipeline exclusion must appear explicitly — this is "
+        "exactly the clause a partially-captured request might have hidden"
+    )
+
+
 if __name__ == "__main__":
     tests = [
         test_normalize_handles_the_canonical_form_as_a_no_op,
@@ -246,6 +303,7 @@ if __name__ == "__main__":
         test_reversed_fiscal_quarter_format_no_longer_zeroes_out_real_rows,
         test_case_mismatched_owner_email_no_longer_zeroes_out_real_rows,
         test_role_note_does_not_fire_once_real_matching_rows_exist,
+        test_the_fully_constructed_filter_is_logged_byte_exact_before_the_query,
     ]
     failed = 0
     for t in tests:

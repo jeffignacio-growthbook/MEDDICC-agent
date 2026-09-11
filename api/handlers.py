@@ -4385,6 +4385,23 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         # on the renewal id keeps them.
         for pid in sorted(excluded_pipelines):
             filters.append(("neq", "pipeline_id", str(pid)))
+
+    # 2026-09-11: a zero-row result for a confirmed-populated table
+    # (Jake Stangl, 10 active FY2027 Q3 rows) could not be root-caused
+    # from code inspection alone — every hypothesis checkable without
+    # live production access was ruled out or only hardened-but-
+    # unconfirmed (see PENDING_WORK.md High Priority #2). The one gap
+    # that blocked the investigation from the start: nobody ever had
+    # the ACTUAL outgoing filter clause to compare against known-good
+    # data, only what could be inferred from a partially-captured
+    # request. Logged unconditionally, before the call, so it costs
+    # nothing when the handler works and leaves a byte-exact trace the
+    # moment it doesn't — every column/operator/value with !r so a
+    # stray space, case difference, or wrong type is visible, not
+    # summarized away.
+    logger.info(f"[PIPELINE_MOVEMENT_QUERY] table='deals_snapshot' "
+                f"columns={_PM_SNAPSHOT_COLUMNS!r} "
+                f"filters={filters!r}")
     rows = select_all(sb, "deals_snapshot",
                       columns=_PM_SNAPSHOT_COLUMNS, filters=filters)
     loaded_row_count = len(rows)

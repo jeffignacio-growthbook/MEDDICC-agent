@@ -417,6 +417,20 @@ jobs:
           # an echoed fixture), proves both hardenings independently,
           # and confirms _pm_owner_role_note() — built for the
           # genuinely-zero-rows case — never fires once real rows exist.
+          #
+          # ROUND 4 (2026-09-11): both remaining hypotheses checkable
+          # only with live access (deploy lag, Supabase RLS, a
+          # supabase-py/postgrest-py filter-chaining quirk, an
+          # incomplete original capture — see PENDING_WORK.md High
+          # Priority #2) meant the investigation could not move forward
+          # through more code inspection. Added a single unconditional
+          # INFO-level log line right before the Supabase call,
+          # printing the exact table/columns/filters that will be sent
+          # — every operator/column/value via !r. Costs nothing when
+          # the handler works; the next zero-row incident on this
+          # handler leaves a byte-exact trace in the Railway log to
+          # compare against known-good data, closing the one gap that
+          # blocked this investigation from the start.
           PYTHONPATH=. python3 tests/test_pipeline_movement_fiscal_quarter_filter_bug.py
 
       - name: "TEST 0n — Offline: every dynamic_query_loop invocation logs structured cost data"
