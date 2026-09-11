@@ -3693,56 +3693,112 @@ def _pm_load_scoping():
     return load_scope_config, is_deal_in_analytics_scope
 
 
-def _pm_owner_role_note(owner_email: str):
-    """If owner_email matches a config/client.yaml roster member whose
-    role isn't a quota-carrying pipeline owner (e.g. an SDR/BDR), return
-    a note explaining why a zero-row pipeline-movement result is the
-    structurally expected outcome — not a snapshot staleness or data gap.
-    None if owner_email is empty, unrecognized, or belongs to an AE.
+def _pm_owner_role_note(sb, owner_email: str, fiscal_quarter: str, excluded_pipelines):
+    # Returns Optional[str] — no `typing` import in this module, so the
+    # return type is documented here rather than annotated.
+    """When query_pipeline_movement's owner-filtered query returns zero
+    rows, look at this owner_email's FULL deals_snapshot history (no
+    quarter/pipeline filter) to say something more useful than a bare
+    "no snapshot rows" — while never asserting a role-based excuse that
+    isn't backed by the actual data.
 
-    2026-09-11: a live query for an SDR (Jake Stangl, role "SDR" in the
-    roster) returned zero deals_snapshot rows for FY2027 Q3, and the
-    generic "no snapshot rows (owner ...)" message read — right next to
-    a real snapshot-staleness investigation that same night — like
-    another data-freshness problem. It wasn't one: deals_snapshot.
-    owner_email is populated from HubSpot's deal-owner property (see
-    scripts/etl_deals.py's hubspot_owner_id mapping), and SDR/BDR
-    attribution lives in a completely different column,
-    deals.sdr_owner_email (migration 031) — never copied into
-    deals_snapshot at all (_PM_SNAPSHOT_COLUMNS has no such field). An
-    SDR structurally can't be the owner_email on a snapshot row unless
-    someone manually assigned them deal ownership in HubSpot, so "zero
-    rows" here is what asking a pipeline-ownership question about
-    someone who doesn't own pipeline SHOULD return — confirmed correct,
-    just previously indistinguishable from an actual gap in the message
-    text alone.
+    CORRECTED MODEL (2026-09-11, two rounds same night):
+
+    Round 1 shipped a note claiming "SDRs structurally can't own deals
+    in owner_email" — reasoning from deals_snapshot's schema (owner_email
+    = HubSpot's deal-owner property, SDR attribution lives in the
+    separate sdr_owner_email column instead) to conclude a zero-row
+    result for an SDR was automatically explained by role. Jeff
+    corrected this directly from how the team actually operates: SDRs
+    (Jake Stangl specifically) CAN and DO own deals pre-handoff, in the
+    very same owner_email field AEs use. The schema fact was real; the
+    inference from it ("therefore SDRs never appear there") was false —
+    ownership is a HubSpot data fact for a specific rep at a specific
+    time, not something a static role label can settle.
+
+    So this function no longer explains a zero-row result by role alone.
+    Instead it applies the same staleness-vs-genuine-zero distinction
+    any owner deserves: query this owner_email's rows with NO
+    quarter/pipeline restriction, and let what's actually there decide
+    what to say —
+      - never any rows, ever: say exactly that (checkable, not a guess),
+        with the roster role folded in as an aside only.
+      - rows exist, but only outside this fiscal_quarter/pipeline scope:
+        zero rows in the requested window is real and explained by
+        where their rows actually are (e.g. already handed off to an
+        AE, or not yet assigned deals this quarter) — again from data,
+        not from "SDRs don't own deals".
+      - rows exist that DO match this fiscal_quarter and the in-scope
+        pipelines: contradicts the caller's own zero-row result — flags
+        this as a likely filter-construction bug instead, per Jeff's
+        item 3, rather than papering over it with an owner explanation.
+    A non-AE role is surfaced only as extra color (deals can move to an
+    AE via handoff), never as a standalone reason a zero-row result is
+    "expected."
     """
     if not owner_email:
         return None
+
     from api.dimension_resolver import _load_roster
     email_norm = owner_email.strip().lower()
+    role, name = None, owner_email
     for member in _load_roster():
-        if member.get("email", "").strip().lower() != email_norm:
-            continue
-        role = (member.get("role") or "").strip()
-        if role and "account executive" not in role.lower():
+        if member.get("email", "").strip().lower() == email_norm:
+            role = (member.get("role") or "").strip()
             name = member.get("name") or owner_email
-            # "an SDR" / "an MRI" — acronym letters pronounced with a
-            # leading vowel sound need "an", not just a literal A-E-I-O-U
-            # check on the first character.
-            article = "an" if role[:1].upper() in "AEFHILMNORSX" else "a"
-            return (
-                f"{name} is {article} {role}, not a quota-carrying pipeline owner — "
-                f"deals_snapshot.owner_email reflects HubSpot's deal-owner "
-                f"field (the AE), and this role typically doesn't own deal "
-                f"records there. Zero rows most likely means {name} has no "
-                f"deals assigned to them directly in HubSpot, not a data or "
-                f"snapshot problem. For SDR/BDR activity, use sourced-deal "
-                f"or SDR-metrics queries instead of pipeline movement by "
-                f"owner."
-            )
-        break
-    return None
+            break
+
+    role_aside = ""
+    if role and "account executive" not in role.lower():
+        role_aside = (
+            f" ({name}'s roster role is {role} — SDR/BDR deals sometimes "
+            f"move to an AE via handoff, but that alone doesn't explain a "
+            f"zero-row result; see the actual history below.)"
+        )
+
+    try:
+        all_rows = select_all(
+            sb, "deals_snapshot",
+            columns="snapshot_date,fiscal_quarter,pipeline_id",
+            filters=[("eq", "owner_email", owner_email)],
+        )
+    except Exception:
+        return None  # diagnostic query itself failed — say nothing rather than guess
+
+    if not all_rows:
+        return (
+            f"{name} has NO deals_snapshot rows under this owner_email at "
+            f"ANY point in history, not just this quarter/pipeline filter."
+            f"{role_aside} Worth confirming this is the correct/current "
+            f"HubSpot owner email for {name}."
+        )
+
+    excluded_str = {str(p) for p in (excluded_pipelines or [])}
+    matching_scope = [
+        r for r in all_rows
+        if r.get("fiscal_quarter") == fiscal_quarter
+        and str(r.get("pipeline_id")) not in excluded_str
+    ]
+    if matching_scope:
+        return (
+            f"⚠️ {name} DOES have {len(matching_scope)} deals_snapshot "
+            f"row(s) for {fiscal_quarter} in an in-scope pipeline — this "
+            f"zero-row result contradicts that history and likely points "
+            f"at a filter-construction bug in this query, not a real gap "
+            f"or a role explanation. Needs investigation."
+        )
+
+    other_quarters = sorted({
+        r.get("fiscal_quarter") for r in all_rows if r.get("fiscal_quarter")
+    })
+    return (
+        f"{name} has {len(all_rows)} deals_snapshot row(s) on file, but "
+        f"none in {fiscal_quarter} matching this filter — their rows on "
+        f"file are in {other_quarters or 'other quarters/pipelines'} "
+        f"instead. Most likely already handed off or not yet assigned "
+        f"deals in this specific window, not a snapshot staleness "
+        f"problem.{role_aside}"
+    )
 
 
 def _pm_current_quarter_label():
@@ -4291,7 +4347,7 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         gap = f"no snapshot rows for {fiscal_quarter}"
         if owner_email:
             gap += f" (owner {owner_email})"
-            role_note = _pm_owner_role_note(owner_email)
+            role_note = _pm_owner_role_note(sb, owner_email, fiscal_quarter, excluded_pipelines)
             if role_note:
                 gap += f". {role_note}"
         return {**base, "snapshot_dates": [], "result": None,

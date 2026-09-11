@@ -343,29 +343,34 @@ jobs:
           # such false positive into real, avoidable cost.
           PYTHONPATH=. python3 tests/test_false_partial_claim_gate.py
 
-      - name: "TEST 0q — Offline: pipeline-movement zero-row results explain SDR/BDR role mismatches instead of reading as a data gap"
+      - name: "TEST 0q — Offline: pipeline-movement zero-row results are explained from actual owner history, never from role alone"
         run: |
           set -e
-          # 2026-09-11: a live pipeline-movement question about an SDR
-          # (Jake Stangl) returned a bare "no snapshot rows for FY2027
-          # Q3 (owner jake.stangl@growthbook.io)" data_gap — reproduced
-          # twice, right after an unrelated investigation had confirmed
-          # deals_snapshot itself is current. Root cause, confirmed via
-          # config + ETL code inspection (no live DB needed): Jake
-          # Stangl's roster role is SDR, not AE. deals_snapshot.
-          # owner_email is populated from HubSpot's deal-owner property
-          # (the AE); SDR/BDR attribution lives in a completely separate
-          # column, deals.sdr_owner_email, never copied into
-          # deals_snapshot at all. An SDR structurally can't be the
-          # owner_email on a snapshot row, so zero rows is the CORRECT
-          # answer to a pipeline-ownership question about someone who
-          # doesn't own pipeline — the defect was only in the message,
-          # which read exactly like a staleness/coverage problem.
-          # _pm_owner_role_note() (api/handlers.py) checks the filtered
-          # owner_email against config/client.yaml's team roster and
-          # folds a role-specific explanation into data_gaps when it
-          # matches a non-AE role, instead of a bare, ambiguous "no
-          # snapshot rows" line.
+          # 2026-09-11, two rounds same night. A live pipeline-movement
+          # question about an SDR (Jake Stangl) returned a bare "no
+          # snapshot rows for FY2027 Q3 (owner
+          # jake.stangl@growthbook.io)" data_gap, right after an
+          # unrelated investigation had confirmed deals_snapshot itself
+          # is current. Round 1 shipped a fix explaining the zero rows
+          # by role: "SDRs structurally can't own deals in owner_email
+          # — attribution lives in a separate sdr_owner_email column."
+          # The schema fact was real; the inference from it was false.
+          # Round 2: Jeff corrected this directly from how the team
+          # actually operates — SDRs (Jake Stangl specifically) CAN and
+          # DO own deals pre-handoff, in the exact same owner_email
+          # field AEs use. A static role label cannot settle whether a
+          # specific rep owns deals at a specific time; only the data
+          # can. _pm_owner_role_note() (api/handlers.py) was rewritten
+          # to never explain a zero-row result by role alone: it now
+          # pulls the owner_email's FULL deals_snapshot history with no
+          # quarter/pipeline filter and explains from what's actually
+          # there — no history anywhere, history only in other
+          # quarters/pipelines (handed off / not yet assigned), or
+          # (the case Jeff called out specifically) matching in-scope
+          # history that CONTRADICTS the zero-row result, flagged as a
+          # likely filter-construction bug rather than smoothed over. A
+          # non-AE role now appears only as a parenthetical aside, never
+          # as the standalone reason.
           PYTHONPATH=. python3 tests/test_pipeline_movement_owner_role_note.py
 
       - name: "TEST 0n — Offline: every dynamic_query_loop invocation logs structured cost data"
