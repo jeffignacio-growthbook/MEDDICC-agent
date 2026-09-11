@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-11 (added Low Priority #8 — confirming the URGENT safety fix worked via a live CI re-run surfaced a genuinely pre-existing, unrelated finding: `eval_handler_descriptions.py` has been failing on 5 undocumented handler-adjacent functions since `b75a3c1` (2026-09-06), invisible until now only because the `ClientOptions` crash blocked CI before it ever reached that check; not urgent, not caused by tonight's work, confirmed via `git blame`; 🚨 URGENT SAFETY FIX: a live CI run of `gate-tests.yml` failed twice, identically, with `ImportError: cannot import name 'ClientOptions' from 'supabase' (unknown location)` at `api/db.py`'s import — added earlier the same night for the Supabase retry-transport fix — killing every downstream test; since Railway's deploy process plausibly does a similarly fresh install, this risked crashing the live app on its next deploy. Fixed by moving the `ClientOptions` import inside `create_resilient_supabase_client()`'s own try block (`scripts/supabase_client.py`), lazy not top-level, so any import-time failure degrades to a plain client with no retry protection instead of crashing — see `tests/test_supabase_client_fallback.py` (forces the exact failure and confirms a working client still comes back) and new High Priority #4 for the not-yet-root-caused "why does GitHub's runner resolve this differently" investigation, explicitly not blocking on it; shipped `resolve_execution_cost_estimate()` (`api/router.py`) — a pre-execution cost estimate for `dynamic_query_loop`, calibrated against 13 real `query_cost_log` rows pulled via `scripts/query_cost_log_calibration.sql`, warning on an expensive-looking question before running anything; every estimate self-reports low confidence given the tiny calibration sample, tracked as Low Priority #7 for recalibration once more traffic accumulates; also fixed a `.github/workflows/gate-tests.yml` naming collision from an earlier round tonight — two unrelated CI steps were both labeled "TEST 1b"; closed the loop on High Priority #2's open question: confirmed the RemoteProtocolError/ConnectionTerminated connection bug is NOT the explanation for the original Jake Stangl incident — the incident's own captured evidence was a completed request/response, structurally incompatible with a connection that died mid-stream, and no code path exists where that error could silently become an empty result. Status unchanged (MITIGATED, NOT ROOT-CAUSED) and now explicitly deprioritized — not actively being chased, re-open only if it recurs; added Low Priority #6, a known unclosed blind spot in `PRIMITIVE_CHECKLIST.md`'s two structural scans — a resolver-style function that returns ambiguous/unknown with no log call at all on that path, like `resolve_dimension_filter`, is invisible to both the function-name scan and the bracketed-log-tag scan added the same night; closing it needs a bigger lift, either a logging convention or real control-flow static analysis, not scoped or started; fixed a 4th detection-primitive gap found the same night, same file: the zero-rows suspicion note in `dynamic_query_loop` detected a suspicious enumeration-question zero-row result and logged an advisory note, but never verified the model acted on it before shipping — added a compliance check + its own outcome bucket (`answered_with_unresolved_zero_row_suspicion`), registered in `FAILURE_MODE_PRIMITIVES`, see `PRIMITIVE_CHECKLIST.md`'s "Follow-up audit" section; also fixed an unrelated stale test found along the way — `tests/test_zero_rows_suspicion.py`'s 3rd test had been failing since 2026-09-06 checking the wrong location for missing-value prompt guidance that was deliberately relocated to `api/router.py`'s `DYNAMIC_SYSTEM_PROMPT`, not lost; also fixed the recurring Supabase `httpx.RemoteProtocolError: ConnectionTerminated` connection issue found via a live test session — a long-lived singleton client hitting a known httpx/HTTP2 gotcha, fixed with a retry-once transport, see `scripts/supabase_client.py`'s `_RetryOnDeadConnectionTransport`; added `PRIMITIVE_CHECKLIST.md` — a standing, CI-enforced contract every detection primitive must satisfy, retroactively applied to fix 3 primitives found log-only with the same "detect but never act" gap the original aggregation-verification incident had; added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
+**Last Updated:** 2026-09-11 (Low Priority #8 fixed — added 5 utility/import functions (`compute_cycle_time`, `compute_at_risk_deals`, `canonical_stage`, `load_scope_config`, `is_deal_in_analytics_scope`) to `scripts/eval_handler_descriptions.py`'s `KNOWN_NON_HANDLERS` exclusion set rather than writing them fake handler descriptions, since `HANDLER_DESCRIPTIONS` is the live routing classifier's own menu and a real entry for any of these would let it get dispatched a live question with the wrong call signature; verified 35/35 handlers now match locally; running `TEST 0`'s full eval sequence to verify this surfaced 4 more independent, pre-existing, unrelated bugs further down the same script sequence — see new Low Priority #9 — so `TEST 0` is not expected to be fully green yet even after this fix; added Low Priority #8 — confirming the URGENT safety fix worked via a live CI re-run surfaced a genuinely pre-existing, unrelated finding: `eval_handler_descriptions.py` has been failing on 5 undocumented handler-adjacent functions since `b75a3c1` (2026-09-06), invisible until now only because the `ClientOptions` crash blocked CI before it ever reached that check; not urgent, not caused by tonight's work, confirmed via `git blame`; 🚨 URGENT SAFETY FIX: a live CI run of `gate-tests.yml` failed twice, identically, with `ImportError: cannot import name 'ClientOptions' from 'supabase' (unknown location)` at `api/db.py`'s import — added earlier the same night for the Supabase retry-transport fix — killing every downstream test; since Railway's deploy process plausibly does a similarly fresh install, this risked crashing the live app on its next deploy. Fixed by moving the `ClientOptions` import inside `create_resilient_supabase_client()`'s own try block (`scripts/supabase_client.py`), lazy not top-level, so any import-time failure degrades to a plain client with no retry protection instead of crashing — see `tests/test_supabase_client_fallback.py` (forces the exact failure and confirms a working client still comes back) and new High Priority #4 for the not-yet-root-caused "why does GitHub's runner resolve this differently" investigation, explicitly not blocking on it; shipped `resolve_execution_cost_estimate()` (`api/router.py`) — a pre-execution cost estimate for `dynamic_query_loop`, calibrated against 13 real `query_cost_log` rows pulled via `scripts/query_cost_log_calibration.sql`, warning on an expensive-looking question before running anything; every estimate self-reports low confidence given the tiny calibration sample, tracked as Low Priority #7 for recalibration once more traffic accumulates; also fixed a `.github/workflows/gate-tests.yml` naming collision from an earlier round tonight — two unrelated CI steps were both labeled "TEST 1b"; closed the loop on High Priority #2's open question: confirmed the RemoteProtocolError/ConnectionTerminated connection bug is NOT the explanation for the original Jake Stangl incident — the incident's own captured evidence was a completed request/response, structurally incompatible with a connection that died mid-stream, and no code path exists where that error could silently become an empty result. Status unchanged (MITIGATED, NOT ROOT-CAUSED) and now explicitly deprioritized — not actively being chased, re-open only if it recurs; added Low Priority #6, a known unclosed blind spot in `PRIMITIVE_CHECKLIST.md`'s two structural scans — a resolver-style function that returns ambiguous/unknown with no log call at all on that path, like `resolve_dimension_filter`, is invisible to both the function-name scan and the bracketed-log-tag scan added the same night; closing it needs a bigger lift, either a logging convention or real control-flow static analysis, not scoped or started; fixed a 4th detection-primitive gap found the same night, same file: the zero-rows suspicion note in `dynamic_query_loop` detected a suspicious enumeration-question zero-row result and logged an advisory note, but never verified the model acted on it before shipping — added a compliance check + its own outcome bucket (`answered_with_unresolved_zero_row_suspicion`), registered in `FAILURE_MODE_PRIMITIVES`, see `PRIMITIVE_CHECKLIST.md`'s "Follow-up audit" section; also fixed an unrelated stale test found along the way — `tests/test_zero_rows_suspicion.py`'s 3rd test had been failing since 2026-09-06 checking the wrong location for missing-value prompt guidance that was deliberately relocated to `api/router.py`'s `DYNAMIC_SYSTEM_PROMPT`, not lost; also fixed the recurring Supabase `httpx.RemoteProtocolError: ConnectionTerminated` connection issue found via a live test session — a long-lived singleton client hitting a known httpx/HTTP2 gotcha, fixed with a retry-once transport, see `scripts/supabase_client.py`'s `_RetryOnDeadConnectionTransport`; added `PRIMITIVE_CHECKLIST.md` — a standing, CI-enforced contract every detection primitive must satisfy, retroactively applied to fix 3 primitives found log-only with the same "detect but never act" gap the original aggregation-verification incident had; added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -941,7 +941,7 @@ calibration.sql`.
 
 ---
 
-#### 8. `eval_handler_descriptions.py` Has Been Failing on 5 Undocumented Handler-Adjacent Functions Since At Least 2026-09-06
+#### 8. `eval_handler_descriptions.py` Has Been Failing on 5 Undocumented Handler-Adjacent Functions Since At Least 2026-09-06 — ✅ FIXED
 
 **Issue:** `scripts/eval_handler_descriptions.py` (run as part of `TEST
 0` in `.github/workflows/gate-tests.yml`) asserts every function it
@@ -954,37 +954,128 @@ AssertionError: Missing descriptions for 5 handlers:
  'is_deal_in_analytics_scope', 'compute_at_risk_deals'}
 ```
 
-**Status:** NOT FIXED, not urgent, not related to tonight's work.
 Confirmed via `git blame` that all five names trace back to commit
 `b75a3c1`, dated 2026-09-06 — five days before this failure was ever
-seen. This was previously invisible for an unrelated reason: the
-`httpx.RemoteProtocolError`/`ClientOptions` import-crash fix (High
-Priority #4) blocked `TEST 0` before it ever reached this specific
-check — once that crash was fixed, the workflow finally progressed far
-enough into `TEST 0`'s own sequence of eval scripts to run
-`eval_handler_descriptions.py` for the first time in this session, and
-it immediately failed. A real, if narrow, documentation gap has been
-silently un-verified in CI for five days, not a regression from
-anything done tonight.
+seen. Previously invisible because the `ClientOptions` import-crash
+(High Priority #4) blocked `TEST 0` before it ever reached this check.
 
-**Work:** For each of the 5 names, either add a `HANDLER_DESCRIPTIONS`
-entry (if it's genuinely handler-shaped and should be discoverable/
-routable) or adjust `eval_handler_descriptions.py`'s own scan to
-exclude it (if it's a helper/utility function that was never meant to
-be a "handler" in the routing sense — `load_scope_config` and
-`is_deal_in_analytics_scope` are imported from `point_in_time`, not
-defined in `api/handlers.py` itself, which suggests the scan may be
-too broad rather than these five being genuinely missing
-documentation). Needs a quick look at what the scan actually enumerates
-before deciding which fix applies to which name.
+**Status:** FIXED. Investigated what `HANDLER_DESCRIPTIONS` is actually
+FOR before writing anything — it's not just documentation, it's the
+routing classifier's own menu: `build_intent_prompt()` (`api/router.py`)
+lists every key in it as a pickable "handler" in the classifier's
+prompt, and the dispatcher calls whatever comes back as
+`getattr(handlers, handler_name)(params, sb)`. Read all 5 functions'
+actual code before deciding anything (none had been read before, per
+the explicit ask): all five are genuine utility/helper functions with
+signatures completely incompatible with the `(params, sb)` handler
+convention — `canonical_stage(stage_id: str)` (a `field_semantics`
+helper, imported like the already-excluded `stage_bucket`/`stage_label`),
+`load_scope_config(config=None)` and `is_deal_in_analytics_scope(
+stage_at_date, pipeline_id, ...)` (shared analytics-scoping helpers
+from `scripts/analytics/point_in_time.py`), and `compute_cycle_time(sb,
+since_date=None, until_date=None)` / `compute_at_risk_deals(sb,
+deal_ids=None, use_stage_aware=True, time_window=None)` (canonical
+computation helpers defined in `api/handlers.py` itself, called BY
+several already-documented handlers, e.g. `query_cycle_time` calls
+`compute_cycle_time()`).
 
-**Complexity:** Low — this is a bounded, 5-item list with a clear
-repro (the CI failure output above); the only real work is deciding
-per-name whether it needs a description or an exclusion, then making
-that small change.
+Writing real `HANDLER_DESCRIPTIONS` entries for any of these — the
+literal ask — would have been an actual, dangerous regression: it
+would let the classifier route a live user question to one of them and
+crash immediately on the argument mismatch, the exact opposite of the
+docs-completeness goal. Fixed instead by adding all 5 to
+`eval_handler_descriptions.py`'s own `KNOWN_NON_HANDLERS` exclusion
+set, extending the identical, already-established pattern for the
+`field_semantics` helpers (`stage_bucket`, `stage_label`, `is_won`,
+`is_lost`, `is_open`) already excluded there for the same reason, each
+with a one-line comment naming what it actually is and who calls it.
+`eval_handler_descriptions.py` now passes locally with zero missing
+entries (35 handlers, 35 descriptions).
 
-**Documentation:** none yet — first surfaced in this session via the
-live CI run that also confirmed High Priority #4's fix.
+**Verified further than requested:** running `TEST 0`'s full sequence
+of eval scripts locally (not just `eval_handler_descriptions.py` in
+isolation) surfaced that fixing this gap unblocks progress into SEVERAL
+MORE pre-existing, unrelated failures further down that same script
+sequence — see new Low Priority #9. `TEST 0` is still not fully green;
+this fix closes exactly the one check it targeted and no more.
+
+**Documentation:** `scripts/eval_handler_descriptions.py`'s own
+`KNOWN_NON_HANDLERS` comments; this entry.
+
+---
+
+#### 9. `TEST 0`'s Eval-Script Sequence Has Several More Pre-Existing Failures Beyond the Handler-Descriptions Gap
+
+**Issue:** Fixing Low Priority #8 let `TEST 0`'s `set -e` sequence of
+~28 `scripts/eval_*.py` calls progress past `eval_handler_descriptions.py`
+for the first time — and immediately hit more failures further down
+the same list, none related to tonight's work or to #8's fix. Found by
+running the entire `TEST 0` step's script sequence locally (matching
+`.github/workflows/gate-tests.yml` line for line), not just the one
+script being fixed. Each confirmed pre-existing via `git blame` —
+`scripts/eval_handlers_no_raise.py`, `api/router.py`'s `_honest_miss()`
+(via `eval_bestseller_incident.py`), and `scripts/eval_fallback_message.py`
+/`scripts/eval_requirements_complete.py` all trace to commit `b75a3c1`,
+2026-09-06, same as #8 — genuinely pre-existing, not a regression:
+
+1. **`eval_handlers_no_raise.py` → `query_rep_pipeline` raises
+   `NameError: name 'tw' is not defined`** (`api/handlers.py:2463`,
+   `"period": tw["label"] if tw else "all active"` — `tw` is never
+   assigned in that function; likely meant to reference a differently-
+   named local variable, or a leftover from a refactor).
+2. **`eval_bestseller_incident.py` → `_honest_miss()` raises
+   `TypeError: '>' not supported between instances of 'dict' and
+   'int'`** (`api/router.py:124`, `if entity_count > 0:`) — the eval
+   calls `_honest_miss("query_deal_health", {"deals": [], "summary":
+   "x"})`, passing a dict where the function's own signature declares
+   `entity_count: int`. Unclear yet whether the eval itself is stale
+   (calling with the wrong shape) or a real caller elsewhere in the
+   app passes a dict too — needs checking real call sites, not just
+   the eval, before fixing either side.
+3. **`eval_fallback_message.py`'s own mock is stale**: it stubs
+   `get_schema_context` as `lambda sb, tables_with_descriptions=None:
+   ""`, missing the `lightweight` keyword the real function
+   (`api/schema_context.py`) now accepts and `_dynamic_query_loop_core`
+   now always passes — `TypeError: <lambda>() got an unexpected
+   keyword argument 'lightweight'`. This one is almost certainly the
+   eval's own fixture going stale after a real signature change, not
+   an application bug.
+4. **`eval_requirements_complete.py` → `slack_sdk` imported
+   (`scripts/run_calibration_via_slack.py`) but not declared** in
+   `requirements.txt` or the eval's own alias map. A real, narrow gap
+   in dependency declaration — the import would only fail at runtime
+   if that specific script actually executes somewhere `slack_sdk`
+   isn't otherwise pulled in as a transitive dependency.
+5. **Two more failures in this local run were sandbox artifacts, not
+   real bugs** — `eval_evaluator_json_salvage.py` and
+   `eval_score_pinning.py` both failed with `ModuleNotFoundError: No
+   module named 'anthropic'` purely because this sandbox's ambient
+   Python environment doesn't have it installed (confirmed via `pip
+   show anthropic`); CI's own `pip install -r requirements.txt`
+   includes `anthropic>=0.40.0`, so these two are expected to run fine
+   in the real workflow and don't need any code change.
+
+**Status:** NOT FIXED, not urgent, not related to tonight's work. Each
+of the 4 real issues (not counting the 2 sandbox artifacts) is
+independent of the others and of #8 — they just all happen to live in
+the same `TEST 0` step, which is why fixing #8 alone won't make `TEST
+0` fully green.
+
+**Work:** Fix each of the 4 independently: (1) find what `tw` was
+supposed to reference in `query_rep_pipeline` and fix the `NameError`;
+(2) determine whether `_honest_miss()`'s real callers ever pass a dict
+for `entity_count` and align the eval and/or the function's contract;
+(3) update `eval_fallback_message.py`'s mock to match
+`get_schema_context`'s real signature; (4) add `slack_sdk` to
+`requirements.txt` (or `eval_requirements_complete.py`'s alias map if
+it's meant to stay an optional/unused script).
+
+**Complexity:** Low-medium per item — each is narrow and independent,
+but there are 4 of them, so a full green `TEST 0` is more than a
+one-line fix away.
+
+**Documentation:** none yet — first surfaced in this session running
+`TEST 0`'s full script sequence locally while verifying #8's fix.
 
 ---
 

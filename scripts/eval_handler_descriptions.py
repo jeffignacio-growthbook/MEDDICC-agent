@@ -30,7 +30,30 @@ def test_handler_descriptions_complete():
         "timedelta", "date", "defaultdict", "get_supabase",
         "rate_or_gap", "today_in_reporting_tz",
         # field_semantics helper functions (not handlers)
-        "stage_bucket", "stage_label", "is_won", "is_lost", "is_open"
+        "stage_bucket", "stage_label", "is_won", "is_lost", "is_open",
+        # 2026-09-11 (PENDING_WORK.md Low Priority #8): five more names
+        # visible in api.handlers's namespace that aren't dispatchable
+        # handlers either — confirmed by reading each one, not assumed
+        # from the name. HANDLER_DESCRIPTIONS is the routing classifier's
+        # own menu (build_intent_prompt() lists every key as a pickable
+        # "handler", then dispatches with getattr(handlers, name)(params,
+        # sb)) — adding a real entry for any of these would let the
+        # classifier route a live question to it and crash, since none
+        # of them accept (params, sb):
+        "canonical_stage",          # field_semantics helper (stage_id: str) -> str,
+                                     # imported like stage_bucket/stage_label above.
+        "load_scope_config",        # scripts/analytics/point_in_time.py: shared
+                                     # config/client.yaml scoping loader, (config=None).
+        "is_deal_in_analytics_scope",  # same module: (stage_at_date, pipeline_id, ...)
+                                     # -> bool, a scoping predicate, not a handler.
+        "compute_cycle_time",       # api/handlers.py's own canonical cycle-time
+                                     # calculation, (sb, since_date=None, until_date=None)
+                                     # — called BY query_cycle_time (already a
+                                     # documented handler), not a handler itself.
+        "compute_at_risk_deals",    # api/handlers.py's own canonical at-risk logic,
+                                     # (sb, deal_ids=None, use_stage_aware=True,
+                                     # time_window=None) — called BY several already-
+                                     # documented handlers, not a handler itself.
     }
 
     all_names = [name for name in dir(handlers) if not name.startswith('_')]
