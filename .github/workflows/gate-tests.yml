@@ -360,6 +360,39 @@ jobs:
           # an internal ceiling the user can't act on.
           PYTHONPATH=. python3 tests/test_loop_ceiling_sizing.py
 
+      - name: "TEST 0o — Offline: every deal_id in a snapshot diff gets a company_name, not just the model's guess"
+        run: |
+          set -e
+          # 2026-09-11 round 6: a live answer to "which enterprise deals
+          # changed stage in EMEA in the last 2 weeks" named some deals
+          # ("Boylesports", "Technogym") and left others as bare numeric
+          # deal_ids in the SAME answer. Root cause: the id_scoped_
+          # enrichment_lookup shortcut's company_name lookup is chosen
+          # entirely by the MODEL, picking deal_ids it expects to need
+          # BEFORE diff_snapshots() (TEST 0k) has even run — so nothing
+          # ever guaranteed that guess covered every deal_id the
+          # deterministic diff actually surfaces. It happened to cover
+          # the obviously-dropped deals (easy to pre-guess) but missed
+          # several stage-changed/newly-entered ones from the same run.
+          # Fix, same pattern as TEST 0i's forced anchor fetch:
+          # collect_diff_deal_ids() computes, in code, every deal_id the
+          # diff actually needs named; whatever the model's earlier
+          # lookup didn't cover gets exactly one forced, deterministic
+          # filter_table call, and attach_company_names() embeds the
+          # result directly into the diff structure so the model reads a
+          # company_name field instead of correlating two tool results
+          # itself. Separately, if a deal_id's company_name is genuinely
+          # NULL in the source table, the finalize prompt now forbids
+          # shipping a bare deal_id — it must render "deal_id X (name not
+          # in CRM)" plus segment/pipeline/deal_value context instead.
+          # test_diff_company_name_backfill.py covers collect_diff_
+          # deal_ids/attach_company_names directly, reproduces the exact
+          # 5 reported deal_ids as the coverage gap, and drives the real
+          # dynamic_query_loop end-to-end confirming the forced backfill
+          # fires and every deal_id in the diff sent to the model for
+          # synthesis carries a resolved (or explicitly-null) company_name.
+          PYTHONPATH=. python3 tests/test_diff_company_name_backfill.py
+
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

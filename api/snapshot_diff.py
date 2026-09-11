@@ -142,6 +142,14 @@ def diff_snapshots(current_rows: list, prior_rows: list) -> dict:
                 "prior_owner_email": prior_owner,
                 "current_owner_email": current_owner,
                 "stage_id": current_row.get("stage_id"),
+                # Identifying context beyond a bare deal_id — see
+                # attach_company_names()'s docstring for why company_name
+                # itself isn't computed here (deals_snapshot doesn't carry
+                # it; it's backfilled by the router after this function
+                # returns).
+                "segment": current_row.get("segment"),
+                "pipeline_id": current_row.get("pipeline_id"),
+                "deal_value": current_row.get("deal_value"),
             })
             continue
 
@@ -184,3 +192,70 @@ def rows_for_snapshot_date(accumulated_data: dict, snapshot_date: Optional[str])
             if did is not None:
                 by_deal_id[str(did)] = row
     return list(by_deal_id.values())
+
+
+def collect_diff_deal_ids(diff_result: dict) -> set:
+    """Every deal_id appearing anywhere in a diff_snapshots() result —
+    stage_changes, population_entries, population_exits, and
+    owner_changes — the full set of deals a synthesized answer will
+    need to name.
+
+    2026-09-11 (round 6): a live answer named some deals ("Boylesports",
+    "Technogym") and left others as bare deal_ids ("60069831015") in the
+    SAME answer. Root cause: the id_scoped_enrichment_lookup shortcut's
+    deal_id list is chosen entirely by the MODEL (see
+    _is_id_scoped_enrichment_call's docstring — "the model already
+    picked the exact deal_ids it wants"), before diff_snapshots() has
+    even run. Nothing ever guaranteed that the model's guess covered
+    every deal_id the deterministic diff actually surfaces — it happened
+    to cover the obviously-dropped deals but missed several stage-
+    changed and newly-entered ones from the same run. This function is
+    the router's way of asking "which deal_ids does the diff ACTUALLY
+    need named" — deterministically, after the diff is computed, not
+    before — so it can force one more lookup for whatever the model's
+    earlier guess missed, rather than leaving those deals nameless.
+    """
+    ids = set()
+    for entry in diff_result.get("stage_changes", []):
+        if entry.get("deal_id") is not None:
+            ids.add(str(entry["deal_id"]))
+    for row in diff_result.get("population_entries", []):
+        if isinstance(row, dict) and row.get("deal_id") is not None:
+            ids.add(str(row["deal_id"]))
+    for row in diff_result.get("population_exits", []):
+        if isinstance(row, dict) and row.get("deal_id") is not None:
+            ids.add(str(row["deal_id"]))
+    for entry in diff_result.get("owner_changes", []):
+        if entry.get("deal_id") is not None:
+            ids.add(str(entry["deal_id"]))
+    return ids
+
+
+def attach_company_names(diff_result: dict, company_names: dict) -> dict:
+    """Attach a `company_name` field to every entry/row in a
+    diff_snapshots() result, from an already-resolved
+    {deal_id: company_name} map, so a synthesis step reads a field
+    directly instead of having to correlate deal_ids against a separate
+    enrichment tool result by hand (the manual-correlation step that
+    silently failed for whichever deal_ids the earlier lookup missed —
+    see collect_diff_deal_ids()'s docstring for the incident).
+    `company_names.get(deal_id)` is used as-is, including None when a
+    deal_id genuinely has no name in the map (either never looked up, or
+    looked up and NULL in the source table) — the caller decides how to
+    render that; this function doesn't guess or invent a name. Mutates
+    and returns diff_result.
+    """
+    def _name_for(deal_id):
+        return company_names.get(str(deal_id)) if deal_id is not None else None
+
+    for entry in diff_result.get("stage_changes", []):
+        entry["company_name"] = _name_for(entry.get("deal_id"))
+    for row in diff_result.get("population_entries", []):
+        if isinstance(row, dict):
+            row["company_name"] = _name_for(row.get("deal_id"))
+    for row in diff_result.get("population_exits", []):
+        if isinstance(row, dict):
+            row["company_name"] = _name_for(row.get("deal_id"))
+    for entry in diff_result.get("owner_changes", []):
+        entry["company_name"] = _name_for(entry.get("deal_id"))
+    return diff_result

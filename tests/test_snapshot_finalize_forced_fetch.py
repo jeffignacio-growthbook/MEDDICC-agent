@@ -268,17 +268,28 @@ def _run_negative_test():
 def test_forced_fetch_is_a_noop_when_both_anchors_already_queried():
     result, fake_client, filter_table_calls = _run_negative_test()
 
-    assert len(filter_table_calls) == 2, (
-        f"expected exactly the model's own 2 real tool calls (current + "
-        f"prior snapshot) with no extra forced fetch — got "
-        f"{len(filter_table_calls)} filter_table calls. The forced-fetch "
-        f"logic must only fire when an anchor is genuinely missing, not "
+    # 2 = the model's own current+prior snapshot calls. A 3rd call is
+    # now expected too: the round-6 diff-company-name backfill
+    # (api/snapshot_diff.py's collect_diff_deal_ids/attach_company_names)
+    # always ensures every deal_id the diff surfaces gets a company_name
+    # lookup, independent of the round-3 anchor-forcing logic this test
+    # actually targets — deal "1001" has no company_name anywhere in
+    # this fixture, so that backfill correctly fires once. What this
+    # test still proves is that the ANCHOR-forcing fetch specifically
+    # (a second snapshot query) is a no-op here — not that zero extra
+    # calls of any kind ever happen.
+    anchor_fetch_calls = [c for c in filter_table_calls if c["table"] == "deals_snapshot"]
+    assert len(anchor_fetch_calls) == 2, (
+        f"expected exactly the model's own 2 real snapshot tool calls "
+        f"(current + prior) with no extra forced ANCHOR fetch — got "
+        f"{len(anchor_fetch_calls)}. The anchor-forced-fetch logic must "
+        f"only fire when an anchor is genuinely missing, not "
         f"unconditionally on every scratchpad_prose_rejected."
     )
     assert result["answered"] is True
     assert result["answer"] == FINAL_ANSWER_TEXT
-    print("✓ the forced-fetch logic is a no-op when both anchors were "
-          "already queried before the scratchpad rejection")
+    print("✓ the anchor-forced-fetch logic is a no-op when both anchors "
+          "were already queried before the scratchpad rejection")
 
 
 def test_both_scratchpad_narrations_are_caught_not_shipped():

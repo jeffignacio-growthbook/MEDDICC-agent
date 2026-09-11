@@ -299,11 +299,26 @@ def test_real_complete_data_produces_a_real_answer_not_the_giveup_diagnostic():
             f"correct data in accumulated_data — the fix did not close "
             f"the message gap"
         )
-    # Confirm the reproduction actually matches the reported shape.
-    assert len(filter_table_calls) == 3, (
-        f"expected exactly 3 real tool calls (current snapshot, prior "
-        f"snapshot, enrichment lookup) — the duplicate must not execute "
-        f"a 4th — got {len(filter_table_calls)}"
+    # Confirm the reproduction actually matches the reported shape: the
+    # model's own 3 real tool calls (current snapshot, prior snapshot,
+    # enrichment lookup) — the duplicate must not execute a 4th of
+    # THOSE. A genuinely new 4th call is expected on top of that: the
+    # round-6 diff-company-name backfill (api/snapshot_diff.py's
+    # collect_diff_deal_ids/attach_company_names) forces one more
+    # deals lookup for the 21 deal_ids this fixture's 11-id enrichment
+    # call never covered (2011-2028 plus the two exit deals) — a
+    # different, later mechanism than the duplicate-call short-circuit
+    # this assertion is actually about.
+    model_driven_calls = [c for c in filter_table_calls
+                          if not (c["table"] == "deals" and
+                                  c["filters"] not in (
+                                      [["in_", "deal_id", ENRICHMENT_DEAL_IDS]],
+                                  ))]
+    assert len(model_driven_calls) == 3, (
+        f"expected exactly 3 model-driven tool calls (current snapshot, "
+        f"prior snapshot, enrichment lookup) — the duplicate must not "
+        f"execute a 4th of those — got {len(model_driven_calls)}: "
+        f"{model_driven_calls}"
     )
     print("✓ complete accumulated_data (29 + 31 + 11 rows, matching the "
           "report exactly) now produces a real answer, not a give-up "
@@ -317,9 +332,25 @@ def test_without_the_fix_the_enrichment_data_would_be_invisible_to_synthesis():
     NOT include the enrichment data — this is exactly the defect
     reported live, isolated from the fix so a future revert of the fix
     is caught here structurally, not just by the passing tests above
-    going quiet."""
+    going quiet.
+
+    Also neutralizes attach_company_names (the round-6 diff-company-
+    name-backfill fix, a LATER, independent mechanism this same
+    fixture's diff_result now also benefits from): round-6 reads
+    company_name straight from accumulated_data — which is populated by
+    ordinary tool-execution storage, unaffected by round-4's message-
+    append neutralization — and would embed "Company0" into the
+    finalize prompt via the diff JSON regardless, masking the exact gap
+    round-4 closed. Isolating round-4's own mechanism here doesn't mean
+    round-6 is redundant; it has its own dedicated test suite
+    (test_diff_company_name_backfill.py) that neutralizing round-4
+    would not exercise at all, since that suite's fixtures always leave
+    _append_tool_result_message intact.
+    """
     orig_append = router._append_tool_result_message
+    orig_attach = router.attach_company_names
     router._append_tool_result_message = lambda messages, raw, result: None
+    router.attach_company_names = lambda diff_result, names: diff_result
     try:
         responses = _scripted_responses()
         # The model's finalize response here doesn't matter for this
@@ -335,6 +366,7 @@ def test_without_the_fix_the_enrichment_data_would_be_invisible_to_synthesis():
         result, fake_client, _ = _run(fake_client)
     finally:
         router._append_tool_result_message = orig_append
+        router.attach_company_names = orig_attach
 
     finalize_messages = fake_client.calls[-1]["messages"]
     serialized = json.dumps(finalize_messages, default=str)

@@ -16,7 +16,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from llm_client import LLMClient
 from api.db import get_supabase, log_unanswered, is_admin, get_prior_entities, get_api_history
 from api import handlers
-from api.snapshot_diff import diff_snapshots, rows_for_snapshot_date
+from api.snapshot_diff import (
+    diff_snapshots, rows_for_snapshot_date,
+    collect_diff_deal_ids, attach_company_names,
+)
 from api.dimension_resolver import (
     scan_question_for_known_dimension_terms, format_dimension_resolution_note,
 )
@@ -2197,6 +2200,7 @@ def _new_cost_state() -> dict:
             "aggregation_mismatch_caught": False,
             "forced_anchor_fetch_fired": False,
             "snapshot_diff_computed": False,
+            "diff_company_name_backfill_fired": False,
         },
     }
 
@@ -2743,6 +2747,80 @@ async def _dynamic_query_loop_core(question, history, params,
                 )
                 cost_state["primitives_fired"]["snapshot_diff_computed"] = True
 
+                # 2026-09-11 (round 6): a live answer named some deals
+                # ("Boylesports", "Technogym") and left others as bare
+                # deal_ids ("60069831015") in the SAME answer. Root
+                # cause: the id_scoped_enrichment_lookup shortcut's
+                # deal_id list is chosen entirely by the MODEL, before
+                # this diff was even computed — nothing ever guaranteed
+                # it covered every deal_id the diff actually surfaces.
+                # It happened to cover the obviously-dropped deals but
+                # missed several stage-changed and newly-entered ones.
+                # Close the gap deterministically: collect every deal_id
+                # this diff needs named, check which ones already have a
+                # company_name anywhere in accumulated_data, and force
+                # ONE more direct lookup for exactly whatever's still
+                # missing — same "force the deterministic gap closed"
+                # pattern as the round-3 forced snapshot-anchor fetch.
+                needed_ids = collect_diff_deal_ids(diff_result)
+                known_names = {}
+                for key, data in accumulated_data.items():
+                    if not key.endswith("_raw"):
+                        continue
+                    for row in data.get("rows", []) or []:
+                        if (isinstance(row, dict) and row.get("deal_id") is not None
+                                and row.get("company_name")):
+                            known_names[str(row["deal_id"])] = row["company_name"]
+                missing_ids = sorted(needed_ids - set(known_names))
+                if missing_ids:
+                    logger.info(
+                        f"[SNAPSHOT_DIFF] {len(missing_ids)} deal_id(s) in "
+                        f"the diff still need a company_name lookup (the "
+                        f"model's earlier enrichment call didn't cover "
+                        f"them) — forcing one direct filter_table call for "
+                        f"exactly these ids: {missing_ids}"
+                    )
+                    try:
+                        name_result = await T.filter_table(
+                            sb, table="deals", columns=["deal_id", "company_name"],
+                            filters=[["in_", "deal_id", missing_ids]])
+                        if "error" not in name_result:
+                            for row in name_result.get("rows", []) or []:
+                                if row.get("deal_id") is not None:
+                                    known_names[str(row["deal_id"])] = row.get("company_name")
+                            accumulated_data[f"step_{iteration}_diff_names_raw"] = name_result
+                            queries_run.append({
+                                "tool": "filter_table",
+                                "params": {"table": "deals",
+                                           "columns": ["deal_id", "company_name"],
+                                           "filters": [["in_", "deal_id", missing_ids]]},
+                                "rows_returned": len(name_result.get("rows", [])),
+                            })
+                            messages.append({"role": "user", "content": (
+                                f"[SYSTEM] Automatically looked up "
+                                f"company_name for {len(missing_ids)} "
+                                f"deal_id(s) the earlier enrichment lookup "
+                                f"didn't cover, since the final diff needs "
+                                f"to name every deal it lists. Tool "
+                                f"result: "
+                                f"{json.dumps(name_result, default=str)[:3000]}"
+                            )})
+                            cost_state["primitives_fired"]["diff_company_name_backfill_fired"] = True
+                            logger.info(
+                                f"[SNAPSHOT_DIFF] company-name backfill "
+                                f"returned {len(name_result.get('rows', []))} "
+                                f"row(s)"
+                            )
+                        else:
+                            logger.warning(
+                                f"[SNAPSHOT_DIFF] company-name backfill "
+                                f"returned an error: {name_result.get('error')}"
+                            )
+                    except Exception as e:
+                        logger.warning(
+                            f"[SNAPSHOT_DIFF] company-name backfill raised: {e}")
+                attach_company_names(diff_result, known_names)
+
         try:
             if diff_result is not None:
                 # The diff is DONE — the model only writes prose from it.
@@ -2759,18 +2837,34 @@ async def _dynamic_query_loop_core(question, history, params,
                     f"{diff_json[:4000]}\n\n"
                     f"Using ONLY this structured result, write a clean, "
                     f"finished Slack answer to: {question}\n\n"
+                    "Every entry below already has a `company_name` field "
+                    "attached, looked up for every deal_id THIS diff "
+                    "actually contains (not just a partial subset) — use "
+                    "it directly. Do not try to cross-reference deal_ids "
+                    "against any other tool result yourself.\n\n"
                     "Format as separate sections, each only if its list "
                     "is non-empty:\n"
                     "• *Stage changes*: for each entry in stage_changes, "
-                    "name the deal (company_name from current_row/"
-                    "prior_row if present, else deal_id) and its prior → "
-                    "current stage.\n"
-                    "• *New deals*: deal_ids in population_entries.\n"
-                    "• *Dropped*: deal_ids in population_exits.\n"
+                    "name the deal using its company_name, and its prior "
+                    "→ current stage.\n"
+                    "• *New deals*: name each deal in population_entries "
+                    "using its company_name.\n"
+                    "• *Dropped*: name each deal in population_exits "
+                    "using its company_name.\n"
                     "• *Owner changes*: one line per entry in "
-                    "owner_changes, noted as a stage-unrelated aside.\n\n"
-                    "Do NOT invent company names not present in the data. "
-                    'Respond as {"answer": "..."}.'
+                    "owner_changes, named using its company_name, noted "
+                    "as a stage-unrelated aside.\n\n"
+                    "If an entry's company_name is null, the CRM "
+                    "genuinely has no name on file for that deal — do "
+                    "NOT show a bare numeric deal_id with nothing else "
+                    "to anchor on. Instead write it as 'deal_id <id> "
+                    "(name not in CRM)' AND include identifying context "
+                    "from the same entry (segment, pipeline, deal_value "
+                    "— on stage_changes entries these live under "
+                    "current_row/prior_row), e.g. 'deal_id 60069831015 "
+                    "(name not in CRM) — Enterprise, Sales Pipeline, "
+                    "$145K'. Do NOT invent a company name that isn't in "
+                    'the data. Respond as {"answer": "..."}.'
                 )
             else:
                 # Add aggregation instruction for finalization too
