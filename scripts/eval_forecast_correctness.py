@@ -70,11 +70,21 @@ def _make_select_all(week3_rows, deals_rows):
 def test_numerator_and_denominator_share_scope():
     """Both sides apply the same pipeline+stage scope from the shared rule, and
     conversion is computed per pipeline. Meeting Set / null-stage deals are not
-    in the denominator; default and renewal are separate."""
+    in the denominator. The renewal pipeline is a deliberate product decision,
+    not an oversight: renewal deals don't move through a qualification funnel
+    (they start "in" the pipeline at renewal time), so week-3 conversion isn't
+    a meaningful concept for them — it's excluded from BOTH numerator and
+    denominator, not just one side. A renewal win must never appear with no
+    corresponding denominator (the bug this test originally caught: the
+    numerator counted a renewal win with no pipeline exclusion at all, while
+    the denominator already excluded the same pipeline — producing a
+    closed_won_count with a 0 denominator instead of the pipeline simply not
+    appearing in the output at all)."""
     print("\n[TEST] numerator & denominator share scope; per-pipeline")
     from unittest.mock import Mock
     # week-3 snapshot: 2 qualified default (Discovery/Scoping), 1 Meeting Set
-    # (excluded), 1 null-stage (not qualified), 1 qualified renewal.
+    # (excluded), 1 null-stage (not qualified), 1 qualified renewal (also
+    # excluded, but for a pipeline-level reason, not a stage-level one).
     week3 = [
         {"deal_id": "d1", "stage_id": "appointmentscheduled", "pipeline_id": "default", "deal_value": 1},
         {"deal_id": "d2", "stage_id": "qualifiedtobuy", "pipeline_id": "default", "deal_value": 1},
@@ -97,15 +107,22 @@ def test_numerator_and_denominator_share_scope():
     q = result["per_quarter"]["FY2027 Q1"]["by_pipeline"]
     assert q["default"]["week3_scoped_denominator"] == 2, \
         f"default denom should exclude Meeting Set + null-stage, got {q['default']}"
-    assert q["866608541"]["week3_scoped_denominator"] == 1, \
-        f"renewal denom should be its own, got {q.get('866608541')}"
-    # per-pipeline numerator attribution (renewal won stage is a renewal win)
     assert q["default"]["closed_won_count"] == 1
-    assert q["866608541"]["closed_won_count"] == 1
+    # The renewal pipeline must not appear as a row AT ALL — not a 0 denom
+    # with a real closed_won_count (the bug), and not an explicit null
+    # either: absence from by_pipeline is the distinct, unambiguous way to
+    # say "this metric doesn't apply here," so "renewal converts at 0%"
+    # (a real fact) can never be confused with "renewal doesn't have this
+    # metric" (a scope fact).
+    assert "866608541" not in q, (
+        f"renewal must be excluded from both numerator and denominator "
+        f"(no row at all), got {q.get('866608541')}")
+    # The exclusion is documented in the output, not silent.
+    assert "866608541" in result["scope"]["pooled_excluded_pipelines_in_default_view"]
     assert result["scope"]["per_pipeline"] is True
     assert "none" in result["scope"]["close_date_filter"]
-    print("  ✓ denom excludes Meeting Set/null; default vs renewal separate; "
-          "scope reported")
+    print("  ✓ denom excludes Meeting Set/null; renewal excluded from BOTH "
+          "sides (no row, not a 0/None row); scope reported")
 
 
 # ── Phase 3 — denominator rule (no close-date filter) ──────────────────

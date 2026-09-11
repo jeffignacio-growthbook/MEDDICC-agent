@@ -152,7 +152,10 @@ def _quarter_window_iso(sb, quarter: str) -> Tuple[Optional[str], Optional[str]]
     return q_start.isoformat(), q_end.isoformat()
 
 
-def _in_quarter_won_by_pipeline(sb, q_start_iso: str, q_end_iso: str) -> Dict[str, int]:
+def _in_quarter_won_by_pipeline(
+    sb, q_start_iso: str, q_end_iso: str,
+    excluded_pipelines=None
+) -> Dict[str, int]:
     """
     Per-pipeline count of deals that TRANSITIONED to won during the quarter —
     i.e. terminally won (deals.is_won(stage)) with a close_date inside the
@@ -166,9 +169,20 @@ def _in_quarter_won_by_pipeline(sb, q_start_iso: str, q_end_iso: str) -> Dict[st
     with an in-quarter close_date. Counting close-date-in-quarter counts the
     transition INTO won during the quarter, never cumulative won-as-of-a-date
     (the bug: every deal ever won appeared in every later quarter).
+
+    excluded_pipelines applies the SAME pipeline-level exclusion the
+    denominator (_qualified_in_own_pipeline) already applies — a renewal
+    win must never be counted here either, since renewal deals don't go
+    through the qualification funnel week-3 conversion measures at all (see
+    query_week3_conversion's module comment). Defaults to loading the shared
+    config when not supplied, so a caller that already has it (as
+    query_week3_conversion does) can pass it through without reloading.
     """
     from supabase_client import select_all
     from field_semantics import is_won
+    if excluded_pipelines is None:
+        from analytics.point_in_time import load_scope_config
+        excluded_pipelines, _ = load_scope_config()
     # OUTCOME-READ (defect 5): this reads `stage` from the current `deals` table
     # to determine the TERMINAL WON OUTCOME (is_won) and attribute it to a
     # pipeline — an outcome/event, NOT a point-in-time stage exclusion. The
@@ -180,8 +194,11 @@ def _in_quarter_won_by_pipeline(sb, q_start_iso: str, q_end_iso: str) -> Dict[st
                        columns='deal_id,stage,close_date,pipeline_id')
     by_pipe: Dict[str, int] = defaultdict(int)
     for d in deals:
-        stage, close_date = d.get('stage'), d.get('close_date')
+        stage, close_date, pipeline_id = (
+            d.get('stage'), d.get('close_date'), d.get('pipeline_id'))
         if not stage or not close_date:
+            continue
+        if pipeline_id is not None and str(pipeline_id) in excluded_pipelines:
             continue
         try:
             if not is_won(str(stage)):
@@ -189,7 +206,7 @@ def _in_quarter_won_by_pipeline(sb, q_start_iso: str, q_end_iso: str) -> Dict[st
         except Exception:
             continue
         if q_start_iso <= str(close_date)[:10] <= q_end_iso:
-            by_pipe[str(d.get('pipeline_id'))] += 1
+            by_pipe[str(pipeline_id)] += 1
     return dict(by_pipe)
 
 
@@ -255,10 +272,19 @@ def query_week3_conversion(
     per_quarter = {}
     min_evidence = config.get('min_evidence_count', 30)
 
-    # Shared scope (defect 2): numerator and denominator draw from the SAME
-    # pipeline population, and conversion is computed PER PIPELINE (new business
-    # and renewal are different motions — pooling describes neither). Sourced
-    # from the shared rule, never reimplemented.
+    # Shared scope (defect 2): the renewal pipeline is deliberately excluded
+    # from week-3 conversion entirely — numerator AND denominator alike.
+    # Product decision, not an oversight: renewal deals don't move through a
+    # qualification funnel (they start "in" the pipeline at renewal time), so
+    # "week-3 conversion rate" isn't a meaningful concept for them the way it
+    # is for new-business deals. New business and renewal are different
+    # motions; pooling describes neither, and neither does giving renewal a
+    # rate this metric was never built to represent. Both sides read the
+    # SAME excl_pipelines from the one shared rule below, never reimplemented,
+    # so they can't silently drift apart the way they did before this fix
+    # (the numerator used to count renewal wins with no exclusion at all,
+    # while the denominator already excluded the renewal population —
+    # producing a `closed_won_count` with no corresponding denominator).
     from analytics.point_in_time import (
         load_scope_config, is_deal_in_analytics_scope)
     from supabase_client import select_all
@@ -291,7 +317,8 @@ def query_week3_conversion(
 
         # NUMERATOR (defect 1): in-quarter terminal wins, per pipeline.
         q_start_iso, q_end_iso = _quarter_window_iso(sb, quarter)
-        won_by_pipeline = _in_quarter_won_by_pipeline(sb, q_start_iso, q_end_iso)
+        won_by_pipeline = _in_quarter_won_by_pipeline(
+            sb, q_start_iso, q_end_iso, excluded_pipelines=excl_pipelines)
 
         # Per-pipeline conversion. min_evidence gate applied PER PIPELINE:
         # a pipeline whose scoped week-3 denominator is below the threshold
