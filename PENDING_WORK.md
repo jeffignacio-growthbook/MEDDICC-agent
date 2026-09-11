@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-11 (updated after snapshot-diff budget-exhaustion fix; ⚠️ see High Priority #0, a committed DB credential needs rotation)
+**Last Updated:** 2026-09-11 (added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -507,6 +507,45 @@ before touching historical data.
 
 ---
 
+#### 5. `synthesis_aggregation_fix.py` (repo root) Is Dead, Unmarked Reference Material
+
+**Issue:** `synthesis_aggregation_fix.py` at the repo root contains an
+old `verify_synthesis_aggregation()` function and a
+`SYNTHESIS_PROMPT_ENHANCED` string from the original 2026-09-09
+synthesis-aggregation-gap fix. It is not imported anywhere — confirmed
+via a repo-wide grep for both the filename and the function name, which
+only turned up this file itself and two references in
+`PENDING_WORK.md`/`SYNTHESIS_FIX_TEST_RESULTS.md` describing it as the
+original "fix specification" (a design doc). The actual fix was carried
+into `api/router.py`'s live prompt text directly, and this file was
+never wired in.
+
+**Status:** CONFIRMED INERT AND HARMLESS (verified 2026-09-11 while
+sanity-checking that the new `verify_aggregation_completeness()` code-
+level gate — see Recently Completed below — fully replaced the old
+prompt-only check rather than running alongside it). Not a functional
+bug. The risk is purely investigative cost: a file at the repo root
+named like it should matter, containing a function named
+`verify_synthesis_aggregation` that looks similar enough to the new
+`verify_aggregation_completeness()` to raise "wait, are there two of
+these?" the next time someone (human or agent) greps for aggregation
+logic — the same shape of cost the plaintext committed DB password
+(High Priority #0) imposed before it was found, just lower stakes.
+
+**Work:** Either delete the file outright (it has no runtime role and
+its content is superseded by the live implementation in
+`api/router.py` + `api/aggregation_verification.py`), or, if it's
+worth keeping for historical reference, add a one-line header comment
+marking it explicitly superseded/historical and pointing at the files
+that actually run today.
+
+**Complexity:** Trivial (delete, or add a comment) — low priority
+because it costs nothing while it sits there; the point is to close it
+out before it becomes a real "what is this and is it still live"
+investigation for someone without this context.
+
+---
+
 ## 📝 Notes
 
 ### Patterns Established
@@ -562,10 +601,11 @@ Without step 3, LLM query builder cannot see the column exists.
 
 ## 📊 Summary
 
-**Total Open Items:** 6
+**Total Open Items:** 7
 - High Priority: 2 (⚠️ URGENT: committed DB password needs rotation, snapshot ETL phantom exits)
-- Low Priority: 4 (zero-day cycle times, forecast bugs, rep-name-to-email
-  matching, snapshot ETL date.today() day-boundary stamp)
+- Low Priority: 5 (zero-day cycle times, forecast bugs, rep-name-to-email
+  matching, snapshot ETL date.today() day-boundary stamp, dead
+  synthesis_aggregation_fix.py needs deleting or marking historical)
 
 **Recently Completed:** 6
 - Budget exhaustion on snapshot-diff questions (2026-09-11) - **FIXED & CI-GATED** (data-dictionary registration gap eliminated a round-trip; ID-scoped enrichment shortcut generalized; new data-dictionary-coverage gate added, same shape as the date-resolution gate)
