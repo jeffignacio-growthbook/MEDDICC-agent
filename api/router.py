@@ -2390,6 +2390,191 @@ def _log_query_cost(sb, question: str, cost_state: dict, result: Optional[dict],
         logger.warning(f"[QUERY_COST_LOG] Failed to write query_cost_log: {e}")
 
 
+# 2026-09-11: calibration data pulled directly from query_cost_log (the
+# table migration 063 built specifically for this purpose). Per-primitive
+# marginal deltas (avg cost when a primitive fires minus avg cost when it
+# doesn't), computed from the ONLY real traffic logged to date.
+#
+# ⚠️ SAMPLE SIZE CAVEAT — read before trusting these numbers: the entire
+# table held 13 rows at calibration time (this week's own testing, not a
+# week of organic production traffic). Outcome breakdown: answered_cleanly
+# n=4, answered_after_resynthesis n=4, exception n=4, other_fallback n=1.
+# Most individual primitives had only 1-2 rows where they fired at all —
+# enrichment_shortcut_fired and scratchpad_rejection_fired's "fired=true"
+# groups are IDENTICAL (n=2, same avg_tokens=75759, same avg_iterations=
+# 3.00), meaning those two rows are literally the same two invocations,
+# not independent evidence. dimension_resolver_matched and ambiguous_
+# dimension_term_flagged both show LOWER cost when fired than when not —
+# plausible (proactive resolution avoiding a reactive correction pass
+# later, per PRIMITIVE_CHECKLIST.md's dimension-resolution work) but
+# equally possibly just n=2/n=5 noise; kept as computed rather than
+# flipped to match intuition, because a model "corrected" to look more
+# plausible is no longer calibrated to real data, it's calibrated to my
+# own priors. Recalibrate (rerun the queries in this session's
+# calibration_query.sql, or add a query_cost_log DB trigger — TODO) once
+# real traffic accumulates past a few dozen rows per primitive; until
+# then, RESOLVE_EXECUTION_COST_ESTIMATE_CONFIDENCE below is deliberately
+# "low", and every estimate this function returns carries that label.
+RESOLVE_EXECUTION_COST_ESTIMATE_CONFIDENCE = "low (calibrated on n=13 total invocations, most cells n=1-2)"
+
+# Base case: the answered_cleanly group's own average (n=4) — "nothing
+# unusual detected" maps to the average cost of a request where nothing
+# unusual actually happened.
+_COST_BASE_ITERATIONS = 1.25
+_COST_BASE_TOKENS = 26855
+
+# (iteration_delta, token_delta) = avg(fired=true) - avg(fired=false),
+# straight from query B's real output.
+_COST_DELTAS = {
+    "dimension_resolver_matched": (1.80 - 2.40, 43966 - 34943),
+    "ambiguous_dimension_term_flagged": (1.50 - 2.25, 29165 - 40095),
+    "snapshot_anchor_injected": (2.50 - 2.00, 60787 - 34345),
+    "enrichment_shortcut_fired": (3.00 - 1.88, 75759 - 31623),
+    # No real aggregation_mismatch_caught prediction signal exists ahead
+    # of time (it's discovered mid-loop, from the model's own stated
+    # totals vs. retrieved rows) — this delta is real
+    # (aggregation_mismatch_caught: true n=2 vs false n=11), but applying
+    # it requires GUESSING whether a multi-dimension breakdown question
+    # will trigger it, which is a much weaker signal than the other four
+    # (all directly reused from the same deterministic functions the
+    # real primitive is computed from). Kept separate, applied only via
+    # _looks_like_aggregation_breakdown()'s explicit lower-confidence path.
+    "aggregation_mismatch_caught": (4.50 - 1.50, 104705 - 26360),
+}
+
+_SNAPSHOT_COMPARISON_TERMS = (
+    "vs", "versus", "compared to", "compare", "change", "movement",
+    "moved", "since last", "week over week", "week-over-week",
+    "this week", "last week", "as of", "trend", "over time",
+)
+_ENRICHMENT_FOLLOWUP_TERMS = (
+    "which deals", "list the deals", "show me the deals", "company name",
+    "company names", "name the", "which companies",
+)
+_AGGREGATION_BREAKDOWN_TERMS = (
+    "breakdown", "break down", "by region", "by segment", "by stage",
+    "by owner", "by rep", "split by", "total across", "across all",
+)
+
+
+def _looks_like_snapshot_comparison(question: str) -> bool:
+    q = question.lower()
+    return any(t in q for t in _SNAPSHOT_COMPARISON_TERMS)
+
+
+def _looks_like_enrichment_followup(question: str) -> bool:
+    q = question.lower()
+    return any(t in q for t in _ENRICHMENT_FOLLOWUP_TERMS)
+
+
+def _looks_like_aggregation_breakdown(question: str) -> bool:
+    q = question.lower()
+    return any(t in q for t in _AGGREGATION_BREAKDOWN_TERMS)
+
+
+def resolve_execution_cost_estimate(question: str, classified_shape: dict = None) -> dict:
+    """Rough PRE-execution cost estimate for dynamic_query_loop, so a
+    caller can warn on an expensive-looking question before running
+    anything rather than discovering the ceiling mid-task.
+
+    Two of the five signals below are not guesses: dimension_resolver_
+    matched and ambiguous_dimension_term_flagged are computed by calling
+    the EXACT SAME functions (scan_question_for_known_dimension_terms,
+    scan_question_for_ambiguous_dimension_terms) that dynamic_query_loop
+    itself calls before iteration 1 to set these primitives for real —
+    there is no prediction error possible on these two, only on whether
+    their calibrated cost DELTA holds for a new question.
+
+    The other three are genuine heuristics, weaker than the first two:
+    - snapshot_anchor_injected needs a table-classification call and a
+      DB lookup dynamic_query_loop does internally; pass it via
+      classified_shape (e.g. {"snapshot_anchor_injected": True}) if the
+      caller has already done that classification, otherwise this falls
+      back to a keyword heuristic (comparison language: "vs", "since
+      last week", "trend", ...).
+    - enrichment_shortcut_fired and aggregation_mismatch_caught are
+      inherently reactive (discovered mid-loop from what the model does
+      or what the data shows) — predicted here only by surface
+      resemblance to past question shapes that triggered them
+      (see _looks_like_enrichment_followup / _looks_like_aggregation_
+      breakdown), the weakest signal of the five.
+
+    See RESOLVE_EXECUTION_COST_ESTIMATE_CONFIDENCE's own comment above
+    for why every estimate is labeled "low" confidence — n=13 total
+    calibration rows, most cells n=1-2. This is a rough triage signal,
+    not a precise forecast: good enough to flag "this touches a lot of
+    ground" before running, not to bill against.
+
+    Returns:
+        {
+          "estimated_iterations": float,
+          "estimated_tokens": int,
+          "signals_detected": {primitive_name: bool, ...},
+          "confidence": str,
+          "warn_high_cost": bool,  # True once estimated_tokens crosses
+                                    # 70% of DYNAMIC_LOOP_TOKEN_BUDGET
+          "warning_message": str or None,  # plain-language, user-facing
+        }
+    """
+    shape = classified_shape or {}
+
+    resolved_dimensions = scan_question_for_known_dimension_terms(question)
+    ambiguous_dimensions = scan_question_for_ambiguous_dimension_terms(question)
+
+    signals = {
+        "dimension_resolver_matched": bool(resolved_dimensions),
+        "ambiguous_dimension_term_flagged": bool(ambiguous_dimensions),
+        "snapshot_anchor_injected": bool(
+            shape.get("snapshot_anchor_injected")
+            or _looks_like_snapshot_comparison(question)
+        ),
+        "enrichment_shortcut_fired": bool(
+            shape.get("enrichment_shortcut_fired")
+            or _looks_like_enrichment_followup(question)
+        ),
+        "aggregation_mismatch_caught": bool(
+            shape.get("aggregation_mismatch_caught")
+            or _looks_like_aggregation_breakdown(question)
+        ),
+    }
+
+    est_iterations = _COST_BASE_ITERATIONS
+    est_tokens = _COST_BASE_TOKENS
+    for key, detected in signals.items():
+        if detected:
+            d_iter, d_tok = _COST_DELTAS[key]
+            est_iterations += d_iter
+            est_tokens += d_tok
+
+    # Additive deltas from a 5-signal, n=13 calibration can push either
+    # estimate below zero or above the loop's own hard ceilings on a
+    # question that stacks several signals at once — clamp to physically
+    # meaningful bounds rather than report a nonsense negative or
+    # above-ceiling number. Floor is 1.0, not 0.0: every answered_cleanly
+    # row in the calibration data took at least 1 iteration (an "answer"
+    # requires at least one model call); 0 iterations only ever appeared
+    # on the exception outcome (a crash before the loop started, not a
+    # legitimate low-cost estimate to report).
+    est_iterations = max(1.0, min(est_iterations, float(DYNAMIC_LOOP_MAX_ITERATIONS)))
+    est_tokens = max(0, min(int(round(est_tokens)), DYNAMIC_LOOP_TOKEN_BUDGET * 2))
+
+    warn_threshold = 0.7 * DYNAMIC_LOOP_TOKEN_BUDGET
+    warn_high_cost = est_tokens >= warn_threshold
+    warning_message = (
+        "This question touches a lot of ground and may take a while to "
+        "answer completely."
+    ) if warn_high_cost else None
+
+    return {
+        "estimated_iterations": round(est_iterations, 2),
+        "estimated_tokens": est_tokens,
+        "signals_detected": signals,
+        "confidence": RESOLVE_EXECUTION_COST_ESTIMATE_CONFIDENCE,
+        "warn_high_cost": warn_high_cost,
+        "warning_message": warning_message,
+    }
+
+
 async def dynamic_query_loop(question, history, params,
                               sb, client,
                               hint: str = "",

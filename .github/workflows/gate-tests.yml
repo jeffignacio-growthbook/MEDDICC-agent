@@ -557,7 +557,7 @@ jobs:
           #
           # 2026-09-11 (same night, follow-up): the function-name scan's
           # blind spot turned out to be real, not hypothetical — the
-          # zero-rows suspicion note (TEST 1b) sat unreviewed because
+          # zero-rows suspicion note (TEST 1c) sat unreviewed because
           # it's inline code inside dynamic_query_loop with no function
           # name to match. Added a second, coarser scan: any bracketed
           # [TAG] on a logger call (this codebase's own convention)
@@ -711,7 +711,7 @@ jobs:
           # neither file touched by any commit before this fix).
           PYTHONPATH=. python3 tests/test_supabase_retry_transport.py
 
-      - name: "TEST 1b — Offline: zero-rows suspicion is verified for compliance, not just flagged"
+      - name: "TEST 1c — Offline: zero-rows suspicion is verified for compliance, not just flagged"
         run: |
           set -e
           # 2026-09-11 (PRIMITIVE_CHECKLIST.md follow-up): the zero-rows
@@ -767,6 +767,37 @@ jobs:
           # confirming every requested field is captured correctly and
           # that logging never swallows or alters the real result.
           PYTHONPATH=. python3 tests/test_query_cost_logging.py
+
+      - name: "TEST 1d — Offline: pre-execution cost estimate, calibrated against real query_cost_log rows"
+        run: |
+          set -e
+          # 2026-09-11: resolve_execution_cost_estimate() (api/router.py)
+          # is the "future decision" TEST 0n's own comment refers to —
+          # given a question, estimate its likely iteration/token cost
+          # BEFORE running anything, so an expensive-looking question can
+          # get a plain-language "this touches a lot of ground" warning
+          # instead of discovering the 200K ceiling mid-task. Calibrated
+          # against REAL rows pulled from query_cost_log (scripts/
+          # query_cost_log_calibration.sql), not guesses — but that table
+          # held only 13 rows at calibration time (this week's own
+          # testing, not a week of organic traffic), so every estimate
+          # this function returns carries an explicit low-confidence,
+          # sample-size-honest label; see the function's own module-level
+          # comment in api/router.py for the exact deltas and which are
+          # real signals (dimension_resolver_matched and ambiguous_
+          # dimension_term_flagged reuse the EXACT SAME detection
+          # functions the real primitive uses, no prediction error
+          # possible on whether they fire) vs. genuine keyword heuristics
+          # for the three inherently reactive, mid-loop primitives
+          # (snapshot_anchor_injected, enrichment_shortcut_fired,
+          # aggregation_mismatch_caught) that can't be known for certain
+          # ahead of time. Validated against the one real, individually-
+          # identified case from the calibration pull (query_cost_log
+          # id=13, "Which stale Enterprise deals does jake.stangl@
+          # growthbook.io own in EMEA?" — 2 iterations, 35452 tokens
+          # actually measured) to same-order-of-magnitude, not a tight
+          # tolerance the n=13 calibration data doesn't support.
+          PYTHONPATH=. python3 tests/test_execution_cost_estimate.py
 
       - name: "TEST 0g — Offline: loop ceiling is sized against the hardest question, not one incident"
         run: |

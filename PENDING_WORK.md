@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-11 (closed the loop on High Priority #2's open question: confirmed the RemoteProtocolError/ConnectionTerminated connection bug is NOT the explanation for the original Jake Stangl incident — the incident's own captured evidence was a completed request/response, structurally incompatible with a connection that died mid-stream, and no code path exists where that error could silently become an empty result. Status unchanged (MITIGATED, NOT ROOT-CAUSED) and now explicitly deprioritized — not actively being chased, re-open only if it recurs; added Low Priority #6, a known unclosed blind spot in `PRIMITIVE_CHECKLIST.md`'s two structural scans — a resolver-style function that returns ambiguous/unknown with no log call at all on that path, like `resolve_dimension_filter`, is invisible to both the function-name scan and the bracketed-log-tag scan added the same night; closing it needs a bigger lift, either a logging convention or real control-flow static analysis, not scoped or started; fixed a 4th detection-primitive gap found the same night, same file: the zero-rows suspicion note in `dynamic_query_loop` detected a suspicious enumeration-question zero-row result and logged an advisory note, but never verified the model acted on it before shipping — added a compliance check + its own outcome bucket (`answered_with_unresolved_zero_row_suspicion`), registered in `FAILURE_MODE_PRIMITIVES`, see `PRIMITIVE_CHECKLIST.md`'s "Follow-up audit" section; also fixed an unrelated stale test found along the way — `tests/test_zero_rows_suspicion.py`'s 3rd test had been failing since 2026-09-06 checking the wrong location for missing-value prompt guidance that was deliberately relocated to `api/router.py`'s `DYNAMIC_SYSTEM_PROMPT`, not lost; also fixed the recurring Supabase `httpx.RemoteProtocolError: ConnectionTerminated` connection issue found via a live test session — a long-lived singleton client hitting a known httpx/HTTP2 gotcha, fixed with a retry-once transport, see `scripts/supabase_client.py`'s `_RetryOnDeadConnectionTransport`; added `PRIMITIVE_CHECKLIST.md` — a standing, CI-enforced contract every detection primitive must satisfy, retroactively applied to fix 3 primitives found log-only with the same "detect but never act" gap the original aggregation-verification incident had; added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
+**Last Updated:** 2026-09-11 (shipped `resolve_execution_cost_estimate()` (`api/router.py`) — a pre-execution cost estimate for `dynamic_query_loop`, calibrated against 13 real `query_cost_log` rows pulled via `scripts/query_cost_log_calibration.sql`, warning on an expensive-looking question before running anything; every estimate self-reports low confidence given the tiny calibration sample, tracked as Low Priority #7 for recalibration once more traffic accumulates; also fixed a `.github/workflows/gate-tests.yml` naming collision from an earlier round tonight — two unrelated CI steps were both labeled "TEST 1b"; closed the loop on High Priority #2's open question: confirmed the RemoteProtocolError/ConnectionTerminated connection bug is NOT the explanation for the original Jake Stangl incident — the incident's own captured evidence was a completed request/response, structurally incompatible with a connection that died mid-stream, and no code path exists where that error could silently become an empty result. Status unchanged (MITIGATED, NOT ROOT-CAUSED) and now explicitly deprioritized — not actively being chased, re-open only if it recurs; added Low Priority #6, a known unclosed blind spot in `PRIMITIVE_CHECKLIST.md`'s two structural scans — a resolver-style function that returns ambiguous/unknown with no log call at all on that path, like `resolve_dimension_filter`, is invisible to both the function-name scan and the bracketed-log-tag scan added the same night; closing it needs a bigger lift, either a logging convention or real control-flow static analysis, not scoped or started; fixed a 4th detection-primitive gap found the same night, same file: the zero-rows suspicion note in `dynamic_query_loop` detected a suspicious enumeration-question zero-row result and logged an advisory note, but never verified the model acted on it before shipping — added a compliance check + its own outcome bucket (`answered_with_unresolved_zero_row_suspicion`), registered in `FAILURE_MODE_PRIMITIVES`, see `PRIMITIVE_CHECKLIST.md`'s "Follow-up audit" section; also fixed an unrelated stale test found along the way — `tests/test_zero_rows_suspicion.py`'s 3rd test had been failing since 2026-09-06 checking the wrong location for missing-value prompt guidance that was deliberately relocated to `api/router.py`'s `DYNAMIC_SYSTEM_PROMPT`, not lost; also fixed the recurring Supabase `httpx.RemoteProtocolError: ConnectionTerminated` connection issue found via a live test session — a long-lived singleton client hitting a known httpx/HTTP2 gotcha, fixed with a retry-once transport, see `scripts/supabase_client.py`'s `_RetryOnDeadConnectionTransport`; added `PRIMITIVE_CHECKLIST.md` — a standing, CI-enforced contract every detection primitive must satisfy, retroactively applied to fix 3 primitives found log-only with the same "detect but never act" gap the original aggregation-verification incident had; added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -808,6 +808,58 @@ than tonight's keyword scan:
 lightweight lint; higher for (b), a real static-analysis tool. Neither
 is scoped or started — this entry exists purely so the blind spot is
 written down rather than living only in this session's own memory.
+
+---
+
+#### 7. Cost-Aware Planner Needs Recalibration Once Real Traffic Accumulates
+
+**Issue:** `resolve_execution_cost_estimate()` (`api/router.py`) —
+a pre-execution cost estimate for `dynamic_query_loop`, warning on an
+expensive-looking question before running anything — was calibrated
+against real `query_cost_log` rows (`scripts/query_cost_log_
+calibration.sql`), not guesses, per the explicit ask that built it. But
+the table held only **13 rows** at calibration time: this week's own
+testing, not a week of organic production traffic. Most individual
+primitives had only 1-2 rows where they fired at all —
+`enrichment_shortcut_fired` and `scratchpad_rejection_fired`'s
+"fired=true" groups turned out to be the exact same two invocations,
+not independent evidence. Two of the five calibrated deltas
+(`dimension_resolver_matched`, `ambiguous_dimension_term_flagged`) came
+back showing LOWER cost when fired than when not, which is plausible
+(proactive resolution avoiding a reactive correction pass later) but
+just as likely n=2/n=5 noise — kept as computed rather than flipped to
+match intuition, since a "corrected" model would be calibrated to
+priors, not data.
+
+**Status:** SHIPPED, WORKING, LOW CONFIDENCE BY DESIGN. Every estimate
+this function returns carries an explicit `confidence: "low (n=13...)"`
+label naming the real sample size — it is not silently presented as
+precise. Validated against the one real, individually-identified case
+from the calibration pull (`query_cost_log` id=13, the EMEA/Enterprise/
+Jake question — 2 iterations, 35452 tokens actually measured) to
+same-order-of-magnitude, not a tight tolerance the data doesn't
+support: the estimate came back at 1 iteration / ~24,948 tokens, in the
+right neighborhood but not precise.
+
+**Work:** Re-run `scripts/query_cost_log_calibration.sql` (or extend it)
+once meaningfully more traffic has accumulated — a few dozen rows per
+primitive at minimum — and update `api/router.py`'s
+`_COST_BASE_ITERATIONS` / `_COST_BASE_TOKENS` / `_COST_DELTAS`
+constants directly from the new numbers, the same way they were built
+this time. No automated recalibration pipeline exists; this is a
+manual, occasional pass. Worth specifically re-checking the two
+counter-intuitive negative deltas once there's enough data to tell
+signal from noise.
+
+**Complexity:** Low — the recalibration procedure itself is just
+re-running the same SQL and updating four named constants. The
+blocker is purely accumulated traffic volume, not investigative or
+implementation complexity.
+
+**Documentation:** `api/router.py`'s `resolve_execution_cost_estimate()`
+own module-level comment (exact deltas and full caveat);
+`tests/test_execution_cost_estimate.py`; `scripts/query_cost_log_
+calibration.sql`.
 
 ---
 
