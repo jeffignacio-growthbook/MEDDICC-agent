@@ -80,11 +80,27 @@ def _load_roster() -> List[Dict[str, str]]:
 
 
 def _normalize(term: str) -> str:
-    """Case-insensitive, whitespace/hyphen-insensitive comparison key —
-    'Mid-Market', 'mid market', and 'MID-MARKET' must all resolve the
-    same way, since a model or a user typing a question won't reliably
-    match the config file's exact punctuation."""
-    return re.sub(r"[\s\-]+", " ", term.strip().lower())
+    """Case-insensitive, whitespace/hyphen/possessive-insensitive
+    comparison key — 'Mid-Market', 'mid market', and 'MID-MARKET' must
+    all resolve the same way, since a model or a user typing a question
+    won't reliably match the config file's exact punctuation.
+
+    2026-09-11: "Jake's deals" never fired DIMENSION_RESOLVE at all —
+    not an untested ambiguous-match branch, a real coverage gap.
+    scan_question_for_known_dimension_terms()'s tokenizer (by design)
+    keeps apostrophes as word characters so it can extract a whole term
+    in one pass, which means "Jake's" reaches this function as a single
+    token, not "Jake" — and nothing stripped the possessive before
+    comparing against the roster's first-name entries. Stripping a
+    trailing 's or bare trailing ' here means every comparison this
+    module does (region/segment/roster, in both directions) treats
+    "Jake's", "Jake", and "JAKE'S" identically, without the tokenizer
+    or its caller needing to know about possessives at all.
+    """
+    t = term.strip().lower()
+    t = re.sub(r"'s$", "", t)
+    t = re.sub(r"'$", "", t)
+    return re.sub(r"[\s\-]+", " ", t)
 
 
 def _region_candidates(term: str) -> List[Dict[str, Any]]:
@@ -229,6 +245,76 @@ def scan_question_for_known_dimension_terms(question: str) -> List[Dict[str, Any
         seen_keys.add(key)
         resolved.append({"term": term, **result})
     return resolved
+
+
+def scan_question_for_ambiguous_dimension_terms(question: str) -> List[Dict[str, Any]]:
+    """
+    Companion to scan_question_for_known_dimension_terms(): finds terms
+    in `question` that match MORE THAN ONE governed value (e.g. "Jake"
+    matching both Jake Stangl and Jake H) instead of silently discarding
+    them.
+
+    2026-09-11: "Jake's deals" never fired DIMENSION_RESOLVE at all,
+    for two stacked reasons. First, the possessive form never reached
+    the roster comparison as bare "Jake" (see _normalize()'s docstring
+    for that fix). Second, even once it does, an ambiguous match used
+    to be dropped by scan_question_for_known_dimension_terms() with no
+    trace anywhere — not logged, not surfaced to the model, nothing.
+    That left the model with zero signal that "Jake" was a name it
+    needed to be careful about, and nothing stopped it from silently
+    picking one Jake (or inventing an owner_email outright) with the
+    same unearned confidence this whole resolver exists to prevent.
+    This surfaces the ambiguity itself as a directive instead: the
+    model is told exactly which candidates matched and must say so or
+    ask, rather than guessing.
+
+    Returns: [{"term": "Jake's", "candidates": [...]}, ...],
+    deduplicated by the sorted set of candidate values so the same
+    ambiguous person mentioned twice only produces one entry.
+    """
+    words = re.findall(r"[A-Za-z][A-Za-z\-']*", question or "")
+    candidate_terms = set(words)
+    for i in range(len(words) - 1):
+        candidate_terms.add(f"{words[i]} {words[i + 1]}")
+
+    ambiguous = []
+    seen_keys = set()
+    for term in sorted(candidate_terms):
+        result = resolve_dimension_filter(term, question_context={"question": question})
+        if result.get("error") != "ambiguous":
+            continue
+        key = tuple(sorted(c["value"] for c in result["candidates"]))
+        if key in seen_keys:
+            continue
+        seen_keys.add(key)
+        ambiguous.append({"term": term, "candidates": result["candidates"]})
+    return ambiguous
+
+
+def format_ambiguous_dimension_note(ambiguous: List[Dict[str, Any]]) -> str:
+    """Format scan_question_for_ambiguous_dimension_terms()'s output as
+    a directive telling the model NOT to guess — same "hand it a fact,
+    don't make it guess" pattern as format_dimension_resolution_note(),
+    but for the case where the fact is "this term doesn't resolve to
+    exactly one value." Returns "" when nothing is ambiguous."""
+    if not ambiguous:
+        return ""
+    lines = []
+    for a in ambiguous:
+        names = ", ".join(
+            c.get("matched_name") or c["value"] for c in a["candidates"]
+        )
+        lines.append(
+            f"- {a['term']!r} matches more than one person on the roster "
+            f"({names}) — do not guess which one"
+        )
+    return (
+        "AMBIGUOUS TERMS (matched more than one governed value — do NOT "
+        "silently pick one): if the question doesn't disambiguate some "
+        'other way, say so explicitly in your answer (e.g. "there are '
+        'two reps named Jake — did you mean Jake Stangl or Jake H?") '
+        "rather than guessing:\n" + "\n".join(lines)
+    )
 
 
 def format_dimension_resolution_note(resolved: List[Dict[str, Any]]) -> str:

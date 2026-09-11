@@ -29,6 +29,8 @@ from api.dimension_resolver import (
     resolve_dimension_filter,
     scan_question_for_known_dimension_terms,
     format_dimension_resolution_note,
+    scan_question_for_ambiguous_dimension_terms,
+    format_ambiguous_dimension_note,
 )
 
 # Reconstructed from the incident description (see module docstring) —
@@ -177,6 +179,143 @@ def test_format_dimension_resolution_note_is_empty_when_nothing_resolves():
     print("✓ a question with no known dimension terms produces no directive text")
 
 
+# --- 2026-09-11: "Jake's deals" never fired DIMENSION_RESOLVE at all ---
+
+def test_possessive_form_resolves_the_same_as_the_bare_name():
+    """'Jake's' must normalize identically to 'Jake' — this was the
+    actual coverage gap: not an untested ambiguous-match branch, a
+    possessive form that never reached the roster comparison as a bare
+    name at all."""
+    bare = resolve_dimension_filter("Jake")
+    possessive = resolve_dimension_filter("Jake's")
+    assert possessive == bare, (
+        f"'Jake's' must resolve identically to 'Jake' — got {possessive!r} "
+        f"vs {bare!r}"
+    )
+    assert possessive.get("error") == "ambiguous"
+    print("✓ 'Jake's' resolves identically to bare 'Jake'")
+
+
+def test_possessive_form_of_an_unambiguous_name_also_resolves():
+    assert resolve_dimension_filter("Christian's") == resolve_dimension_filter("Christian")
+    assert resolve_dimension_filter("Christian's")["column"] == "owner_email"
+    print("✓ a possessive form of an unambiguous name resolves the same as the bare name")
+
+
+def test_bare_trailing_apostrophe_also_strips():
+    """A plural-possessive-style trailing apostrophe with no 's (rare
+    for a first name, but cheap to handle the same way) must not block
+    the match either."""
+    assert resolve_dimension_filter("Jake'") == resolve_dimension_filter("Jake")
+    print("✓ a bare trailing apostrophe is also stripped")
+
+
+def test_jakes_deals_question_now_surfaces_the_ambiguous_directive():
+    """The exact live incident: 'Jake's deals' must now produce the
+    ambiguous-candidates signal (both Jake Stangl and Jake H), not
+    silence. scan_question_for_known_dimension_terms() still correctly
+    returns nothing for it (ambiguous terms are never injected as a
+    confident directive — see test_ambiguous_terms_are_not_injected_
+    into_the_proactive_scan above), but
+    scan_question_for_ambiguous_dimension_terms() must now catch it and
+    say so explicitly."""
+    question = "What are Jake's deals?"
+    resolved = scan_question_for_known_dimension_terms(question)
+    assert resolved == [], (
+        "an ambiguous term must still never appear as a confident "
+        "resolved directive"
+    )
+    ambiguous = scan_question_for_ambiguous_dimension_terms(question)
+    assert len(ambiguous) == 1
+    assert ambiguous[0]["term"] == "Jake's"
+    matched_names = {c["matched_name"] for c in ambiguous[0]["candidates"]}
+    assert matched_names == {"Jake Stangl", "Jake H"}
+    note = format_ambiguous_dimension_note(ambiguous)
+    assert "Jake Stangl" in note
+    assert "Jake H" in note
+    assert "do not guess" in note.lower() or "do NOT" in note
+    print("✓ 'Jake's deals' now surfaces the ambiguous-candidates directive "
+          "(Jake Stangl, Jake H) instead of silence")
+
+
+def test_format_ambiguous_note_is_empty_when_nothing_ambiguous():
+    assert format_ambiguous_dimension_note([]) == ""
+    question = "what's the pipeline for Scott Keller this month"
+    ambiguous = scan_question_for_ambiguous_dimension_terms(question)
+    assert ambiguous == []
+    assert format_ambiguous_dimension_note(ambiguous) == ""
+    print("✓ an unambiguous question produces no ambiguous-terms directive")
+
+
+# --- End-to-end: the ambiguous note actually reaches the model ---
+
+import asyncio
+import json
+import api.router as router
+import api.tools as tools_module
+import api.table_classifier as table_classifier_module
+import api.schema_context as schema_context_module
+
+
+class _FakeResponse:
+    def __init__(self, text, input_tokens=1000, output_tokens=100):
+        self.text = text
+        self.input_tokens = input_tokens
+        self.output_tokens = output_tokens
+
+
+class _FakeClient:
+    def __init__(self, responses):
+        self._responses = list(responses)
+        self.calls = []
+
+    def complete(self, messages=None, system=None, max_tokens=None):
+        idx = len(self.calls)
+        self.calls.append({"messages": messages, "system": system})
+        return _FakeResponse(self._responses[idx])
+
+
+class _FakeSupabase:
+    pass
+
+
+def test_jakes_deals_ambiguous_note_reaches_the_first_model_message():
+    """End-to-end proof, not just unit-level: drives the real
+    dynamic_query_loop with the exact live question shape and confirms
+    the AMBIGUOUS TERMS directive is actually present in the first
+    message content the model sees — the same place SNAPSHOT ANCHORS
+    and RESOLVED DIMENSION FILTERS notes are injected."""
+    answer = json.dumps({"answer": "placeholder"})
+    fake_client = _FakeClient([answer])
+
+    orig_classify = table_classifier_module.classify_relevant_tables
+    orig_get_schema = schema_context_module.get_schema_context
+    table_classifier_module.classify_relevant_tables = (
+        lambda question, client: ["deals_snapshot"])
+    schema_context_module.get_schema_context = (
+        lambda sb, tables_with_descriptions=None, lightweight=False:
+            "TABLE: deals_snapshot\n  owner_email, stage_id\n")
+    try:
+        asyncio.run(router.dynamic_query_loop(
+            question="What are Jake's deals?",
+            history=[],
+            params={"time_window": {"label": "this quarter",
+                                     "start": "2026-08-01", "end": "2026-09-08"}},
+            sb=_FakeSupabase(),
+            client=fake_client,
+        ))
+    finally:
+        table_classifier_module.classify_relevant_tables = orig_classify
+        schema_context_module.get_schema_context = orig_get_schema
+
+    first_message = fake_client.calls[0]["messages"][0]["content"]
+    assert "AMBIGUOUS TERMS" in first_message
+    assert "Jake Stangl" in first_message
+    assert "Jake H" in first_message
+    print("✓ the ambiguous-candidates directive for 'Jake's deals' "
+          "reaches the model's first message end-to-end")
+
+
 if __name__ == "__main__":
     test_emea_resolves_correctly_before_any_query_runs()
     test_emea_resolution_is_case_insensitive_on_direct_lookup()
@@ -188,4 +327,10 @@ if __name__ == "__main__":
     test_common_word_collisions_are_not_injected_by_the_scan()
     test_mid_market_resolves_with_or_without_the_hyphen()
     test_format_dimension_resolution_note_is_empty_when_nothing_resolves()
+    test_possessive_form_resolves_the_same_as_the_bare_name()
+    test_possessive_form_of_an_unambiguous_name_also_resolves()
+    test_bare_trailing_apostrophe_also_strips()
+    test_jakes_deals_question_now_surfaces_the_ambiguous_directive()
+    test_format_ambiguous_note_is_empty_when_nothing_ambiguous()
+    test_jakes_deals_ambiguous_note_reaches_the_first_model_message()
     print("\n✅ All tests passed")

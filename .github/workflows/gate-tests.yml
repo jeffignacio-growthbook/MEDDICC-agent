@@ -285,6 +285,23 @@ jobs:
           # guess, and common-English-word collisions (the "ROW" region,
           # the "Unknown" segment) are never injected as false-positive
           # directives from ordinary prose.
+          #
+          # ROUND 2 (2026-09-11): "Jake's deals" never fired
+          # DIMENSION_RESOLVE at all live — not an untested ambiguous-
+          # match branch, a real coverage gap. The possessive form
+          # never reached the roster comparison as bare "Jake"
+          # (_normalize() now strips a trailing 's/'), and even once it
+          # does, an ambiguous match used to be dropped with NO trace
+          # anywhere — not logged, not surfaced to the model. That left
+          # the model with zero signal it was looking at a name it
+          # should be careful about. scan_question_for_ambiguous_
+          # dimension_terms()/format_ambiguous_dimension_note() now
+          # surface the ambiguity itself as a directive (do not guess,
+          # say so or ask) instead of silence. Tests added to this same
+          # file cover the possessive fix directly, confirm "Jake's
+          # deals" now produces the ambiguous-candidates signal (Jake
+          # Stangl, Jake H), and drive dynamic_query_loop end-to-end
+          # proving the directive reaches the model's first message.
           PYTHONPATH=. python3 tests/test_dimension_resolver.py
 
       - name: "TEST 0m — Offline: aggregation totals are verified against retrieved rows, in code"
@@ -316,6 +333,36 @@ jobs:
           # and actual figures named, while a correct first answer ships
           # immediately with no wasted retry.
           PYTHONPATH=. python3 tests/test_aggregation_verification.py
+
+      - name: "TEST 0s — Offline: aggregation-mismatch retry hands the model the correct value instead of asking it to recompute"
+        run: |
+          set -e
+          # 2026-09-11: two live incidents the SAME night both failed
+          # the aggregation-completeness gate's resynthesis retry —
+          # not by evading detection, but by getting the identical
+          # wrong number back after being told it was wrong (stated 11
+          # vs actual -1,417,100; separately, stated 4 vs actual
+          # 35,771,117.85). The retry message already NAMED the correct
+          # value, computed deterministically to detect the mismatch in
+          # the first place, but still told the model to "recheck your
+          # aggregation" — i.e. recompute its own already-wrong math a
+          # second time, instead of just using the number it was
+          # already handed. _aggregation_correction_message()
+          # (api/router.py) rewrites this at both call sites that build
+          # a retry (the main loop's happy path, and _finalize_from_
+          # data's own last-resort check): the correct value is stated
+          # as DEFINITIVE, the model is told NOT to recompute it, and
+          # to substitute it verbatim. The finalize call site also
+          # re-verifies its own retry and flags loudly (new primitive:
+          # aggregation_mismatch_unresolved_after_retry) if even that
+          # still doesn't take, rather than silently shipping a
+          # still-wrong number with no trace. test_aggregation_retry_
+          # hands_correct_value.py reproduces BOTH of tonight's exact
+          # number pairs as fixtures and drives the real
+          # dynamic_query_loop end-to-end, confirming the corrected
+          # value actually reaches the shipped answer this time — not
+          # just that the mismatch gets detected again.
+          PYTHONPATH=. python3 tests/test_aggregation_retry_hands_correct_value.py
 
       - name: "TEST 0p — Offline: false 'partial/pending' completeness claims force a resynthesis, not just a log line"
         run: |

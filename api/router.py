@@ -22,6 +22,7 @@ from api.snapshot_diff import (
 )
 from api.dimension_resolver import (
     scan_question_for_known_dimension_terms, format_dimension_resolution_note,
+    scan_question_for_ambiguous_dimension_terms, format_ambiguous_dimension_note,
 )
 from api.aggregation_verification import (
     extract_stated_totals_from_answer, verify_aggregation_completeness,
@@ -2181,6 +2182,53 @@ def resolve_snapshot_anchors(sb, time_window: dict) -> str:
     return format_snapshot_anchor_note(current_snap, prior_snap, time_window)
 
 
+def _format_agg_number(x: float) -> str:
+    """Format an aggregation value for the correction message: whole
+    numbers with no decimals, fractional values keeping their exact
+    cents — so a model copying the number verbatim never has to guess
+    how much precision to preserve."""
+    if abs(x - round(x)) < 1e-9:
+        return f"{x:,.0f}"
+    return f"{x:,.2f}"
+
+
+def _aggregation_correction_message(discrepancies: list) -> str:
+    """Build the forced-resynthesis correction message for one or more
+    aggregation-completeness mismatches (verify_aggregation_completeness()'s
+    `all_discrepancies`).
+
+    2026-09-11: two live incidents the same night had the model return
+    the IDENTICAL wrong number on retry — stated 11 vs actual
+    -1,417,100, and separately stated 4 vs actual 35,771,117.85 — under
+    the prior version of this message, which named the discrepancy but
+    still told the model to "recheck your aggregation," i.e. recompute
+    its own already-wrong math a second time. The correct value is
+    ALREADY computed deterministically, in code, from the very rows the
+    mismatch was detected against — the check has to do that math to
+    detect the mismatch in the first place. This message hands that
+    value to the model directly and tells it to substitute it verbatim,
+    instead of asking it to re-derive a number it has already gotten
+    wrong once.
+    """
+    plural = len(discrepancies) > 1
+    lines = "\n".join(
+        f'- "{d["category"]}": you stated {_format_agg_number(d["stated"])}, '
+        f"but the correct total — computed directly from the rows you "
+        f'already retrieved — is {_format_agg_number(d["actual_sum"])}.'
+        for d in discrepancies
+    )
+    return (
+        f"⚠️ Your aggregation was WRONG for the following "
+        f"categor{'ies' if plural else 'y'}:\n"
+        f"{lines}\n\n"
+        "These corrected totals are DEFINITIVE — already computed from "
+        "the real retrieved data, not a guess. Do NOT recompute or "
+        "re-derive them yourself. Respond again with the same answer, "
+        "but replace each wrong stated total above with its exact "
+        'corrected number, verbatim. Respond as {"answer": "..."}.'
+    )
+
+
 def _new_cost_state() -> dict:
     """Mutable per-invocation state _dynamic_query_loop_core() populates
     as it runs, so dynamic_query_loop()'s wrapper can log a structured
@@ -2202,6 +2250,8 @@ def _new_cost_state() -> dict:
             "snapshot_diff_computed": False,
             "diff_company_name_backfill_fired": False,
             "false_partial_claim_caught": False,
+            "aggregation_mismatch_unresolved_after_retry": False,
+            "ambiguous_dimension_term_flagged": False,
         },
     }
 
@@ -2457,6 +2507,19 @@ async def _dynamic_query_loop_core(question, history, params,
         cost_state["primitives_fired"]["dimension_resolver_matched"] = True
         cost_state["resolved_dimension_terms"] = [r["term"] for r in resolved_dimensions]
 
+    # Ambiguous terms (e.g. "Jake" matching two reps) used to be dropped
+    # with no trace anywhere once resolve_dimension_filter found more
+    # than one candidate — silence that left the model with zero signal
+    # it was even looking at a name it should be careful about. Surfaced
+    # as its own directive so the model is told to say so or ask,
+    # instead of silently picking one. See scan_question_for_ambiguous_
+    # dimension_terms()'s docstring for the "Jake's deals" incident.
+    ambiguous_dimensions = scan_question_for_ambiguous_dimension_terms(question)
+    ambiguous_dimension_note = format_ambiguous_dimension_note(ambiguous_dimensions)
+    if ambiguous_dimension_note:
+        logger.info(f"[DIMENSION_RESOLVE] {ambiguous_dimension_note}")
+        cost_state["primitives_fired"]["ambiguous_dimension_term_flagged"] = True
+
     # Build initial message content
     content_parts = [
         f"Question: {question}",
@@ -2466,6 +2529,8 @@ async def _dynamic_query_loop_core(question, history, params,
         content_parts.append(snapshot_anchor_note)
     if dimension_resolution_note:
         content_parts.append(dimension_resolution_note)
+    if ambiguous_dimension_note:
+        content_parts.append(ambiguous_dimension_note)
     if quarter_context:
         content_parts.append(quarter_context)
     if hint:
@@ -2951,23 +3016,17 @@ async def _dynamic_query_loop_core(question, history, params,
                     all_raw_rows_for_agg, stated_totals)
                 if not aggregation_check["match"]:
                     cost_state["primitives_fired"]["aggregation_mismatch_caught"] = True
-                    discrepancy = aggregation_check["discrepancy"]
-                    logger.warning(
-                        f"[AGGREGATION_VERIFY] finalize answer stated "
-                        f"{discrepancy['category']!r} = {discrepancy['stated']} "
-                        f"but retrieved rows sum to {discrepancy['actual_sum']} "
-                        f"— forcing one resynthesis (last retry available at "
-                        f"this finalize step)."
-                    )
-                    retry_prompt = (
-                        f"⚠️ Your answer stated {discrepancy['category']} = "
-                        f"{discrepancy['stated']:,.0f}, but the rows actually "
-                        f"retrieved for that category sum to "
-                        f"{discrepancy['actual_sum']:,.0f}. Recheck your "
-                        f"aggregation — you likely dropped a row, a week, or "
-                        f"a segment. Respond again with the CORRECTED figure "
-                        'as {"answer": "..."}.'
-                    )
+                    all_disc = aggregation_check["all_discrepancies"]
+                    for d in all_disc:
+                        logger.warning(
+                            f"[AGGREGATION_VERIFY] finalize answer stated "
+                            f"{d['category']!r} = {d['stated']} but retrieved "
+                            f"rows sum to {d['actual_sum']} — forcing one "
+                            f"resynthesis (last retry available at this "
+                            f"finalize step) with the correct value handed "
+                            f"to the model directly."
+                        )
+                    retry_prompt = _aggregation_correction_message(all_disc)
                     try:
                         retry_synth = client.complete(
                             messages=messages + [
@@ -2986,8 +3045,26 @@ async def _dynamic_query_loop_core(question, history, params,
                             f"[AGGREGATION_VERIFY] resynthesis retry raised: {e}")
                     # Ship the retry's answer regardless of whether it now
                     # matches — this is the last retry available at this
-                    # finalize step, and the model has already been told
-                    # the exact discrepancy explicitly, not left guessing.
+                    # finalize step, and the model has already been handed
+                    # the exact correct value directly, not left guessing.
+                    # Still re-verify and flag loudly (never silently) if it
+                    # STILL doesn't match, since a wrong number shipping
+                    # unnoticed is worse than an observable failure — this
+                    # is the signal that a THIRD mechanism (a deterministic
+                    # text substitution rather than one more model call) is
+                    # needed if it ever fires in production.
+                    recheck_totals = extract_stated_totals_from_answer(final_answer_text)
+                    recheck = verify_aggregation_completeness(
+                        all_raw_rows_for_agg, recheck_totals)
+                    if not recheck["match"]:
+                        cost_state["primitives_fired"]["aggregation_mismatch_unresolved_after_retry"] = True
+                        logger.warning(
+                            f"[AGGREGATION_VERIFY] finalize retry STILL "
+                            f"wrong after being handed the correct value "
+                            f"directly — shipping anyway (no further retry "
+                            f"budget at this step): "
+                            f"{recheck['all_discrepancies']!r}"
+                        )
 
                 logger.info(f"[LOOP] finalized from gathered data "
                             f"(reason={reason_tag})")
@@ -3264,23 +3341,16 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
             if not aggregation_check["match"]:
                 cost_state["primitives_fired"]["aggregation_mismatch_caught"] = True
-                discrepancy = aggregation_check["discrepancy"]
-                logger.warning(
-                    f"[AGGREGATION_VERIFY] stated {discrepancy['category']!r} = "
-                    f"{discrepancy['stated']} but the retrieved rows for that "
-                    f"category actually sum to {discrepancy['actual_sum']} — "
-                    f"forcing resynthesis."
-                )
-                correction = (
-                    f"⚠️ Your answer stated {discrepancy['category']} = "
-                    f"{discrepancy['stated']:,.0f}, but the rows actually "
-                    f"retrieved for that category sum to "
-                    f"{discrepancy['actual_sum']:,.0f}. Recheck your "
-                    f"aggregation — you likely dropped a row, a week, or a "
-                    f"segment from the total. Using ONLY the data already "
-                    f"gathered, respond again with the CORRECTED figure as "
-                    "{\"answer\": \"...\"}."
-                )
+                all_disc = aggregation_check["all_discrepancies"]
+                for d in all_disc:
+                    logger.warning(
+                        f"[AGGREGATION_VERIFY] stated {d['category']!r} = "
+                        f"{d['stated']} but the retrieved rows for that "
+                        f"category actually sum to {d['actual_sum']} — "
+                        f"forcing resynthesis with the correct value handed "
+                        f"to the model directly (not asked to recompute)."
+                    )
+                correction = _aggregation_correction_message(all_disc)
                 messages.append({"role": "assistant", "content": raw})
                 messages.append({"role": "user", "content": correction})
                 no_progress_streak += 1
