@@ -11,10 +11,10 @@ import base64
 import logging
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
-from supabase import create_client, Client, ClientOptions
+from supabase import create_client, Client
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
-from supabase_client import _resilient_httpx_client
+from supabase_client import create_resilient_supabase_client
 
 logger = logging.getLogger("cro_agent")
 _sb = None
@@ -25,19 +25,24 @@ def get_supabase() -> Client:
     2026-09-11: this singleton lives for the entire process lifetime (a
     long-running Railway service), which is exactly the shape that
     exposes httpx/HTTP2's "connection looked fine at checkout, died
-    mid-request" gap — see _resilient_httpx_client()'s docstring in
-    scripts/supabase_client.py for the full root-cause writeup (a
-    production log showed httpx.RemoteProtocolError: ConnectionTerminated
-    recurring across multiple independent handlers). The injected
-    httpx_client retries exactly once when that happens, transparently,
-    for every call made through this client.
+    mid-request" gap — see create_resilient_supabase_client()'s
+    docstring in scripts/supabase_client.py for the full root-cause
+    writeup (a production log showed httpx.RemoteProtocolError:
+    ConnectionTerminated recurring across multiple independent
+    handlers). The injected httpx_client retries exactly once when that
+    happens, transparently, for every call made through this client —
+    or, if the retry-transport wiring itself can't be built in this
+    environment (see that function's own fallback and PENDING_WORK.md),
+    degrades to a plain client rather than ever crashing get_supabase()
+    itself. This function must never raise on that specific failure —
+    an app that can't retry a dead connection is degraded; an app that
+    can't import at all is down, a strictly worse outcome.
     """
     global _sb
     if _sb is None:
-        _sb = create_client(
+        _sb = create_resilient_supabase_client(
             os.environ["SUPABASE_URL"],
             os.environ["SUPABASE_SERVICE_KEY"],
-            options=ClientOptions(httpx_client=_resilient_httpx_client())
         )
         # Log which role this key grants (diagnostic for RLS issues)
         _log_supabase_role()

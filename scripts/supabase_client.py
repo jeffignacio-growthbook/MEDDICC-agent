@@ -7,7 +7,7 @@ Handles parallel writes to Supabase alongside GitHub for:
 - Call transcripts with signal detection (feature gaps, objections)
 - MEDDICC analyses with full scoring breakdown
 """
-from supabase import create_client, Client, ClientOptions
+from supabase import create_client, Client
 import httpx
 import logging
 import os
@@ -65,6 +65,47 @@ def _resilient_httpx_client() -> httpx.Client:
     for injection via supabase.ClientOptions(httpx_client=...) — the hook
     supabase-py exposes specifically for a caller-supplied httpx.Client."""
     return httpx.Client(http2=True, transport=_RetryOnDeadConnectionTransport(http2=True))
+
+
+def create_resilient_supabase_client(url: str, key: str) -> Client:
+    """Build a Supabase client with the dead-connection retry wired in —
+    the one place both get_supabase() (api/db.py) and SupabaseWriter
+    (below) should get their client from, so the fallback logic here
+    only has to be right once.
+
+    2026-09-11: a live CI run (GitHub Actions, ubuntu-latest, a fresh
+    `pip install -r requirements.txt` with no venv) failed with
+    `ImportError: cannot import name 'ClientOptions' from 'supabase'
+    (unknown location)` at the exact `from supabase import ClientOptions`
+    this function needs — reproduced twice (ruled out as a one-run
+    flake), but NOT reproducible in a genuinely fresh local venv install
+    of the identical pinned versions, so the specific trigger is still
+    unknown (see PENDING_WORK.md for the follow-up investigation). Since
+    Railway's own deploy process plausibly does something similar to
+    that fresh CI install, an unguarded top-level `ClientOptions` import
+    could crash the entire app before it ever starts — turning a
+    "some requests occasionally fail and retry" bug into a "the app is
+    down" one, a strictly worse outcome. ClientOptions is imported HERE,
+    lazily, inside the try block, specifically so that failure — or any
+    other import-time problem building the resilient client — degrades
+    to a plain client with no retry protection instead of ever
+    propagating up and crashing the caller. A degraded-but-running app
+    beats a dead one.
+    """
+    try:
+        from supabase import ClientOptions
+        return create_client(
+            url, key,
+            options=ClientOptions(httpx_client=_resilient_httpx_client()))
+    except Exception as e:
+        logger.warning(
+            f"[SUPABASE_RETRY] dead-connection retry transport unavailable "
+            f"in this environment ({e!r}) — falling back to a plain "
+            f"Supabase client with no retry protection. The app will "
+            f"still run; it just won't automatically recover from the "
+            f"httpx.RemoteProtocolError this transport was built to catch."
+        )
+        return create_client(url, key)
 
 FEATURE_GAP_KEYWORDS = [
     'feature gap', 'missing feature', "doesn't support", "can't do",
@@ -176,9 +217,7 @@ class SupabaseWriter:
         if not url or not key:
             raise ValueError(
                 'SUPABASE_URL and SUPABASE_SERVICE_KEY must be set')
-        self.client: Client = create_client(
-            url, key,
-            options=ClientOptions(httpx_client=_resilient_httpx_client()))
+        self.client: Client = create_resilient_supabase_client(url, key)
 
     def upsert_deal(self, deal: dict) -> None:
         """Upsert a deal from the deal index or analytics ETL."""

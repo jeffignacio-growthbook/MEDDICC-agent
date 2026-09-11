@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-11 (shipped `resolve_execution_cost_estimate()` (`api/router.py`) — a pre-execution cost estimate for `dynamic_query_loop`, calibrated against 13 real `query_cost_log` rows pulled via `scripts/query_cost_log_calibration.sql`, warning on an expensive-looking question before running anything; every estimate self-reports low confidence given the tiny calibration sample, tracked as Low Priority #7 for recalibration once more traffic accumulates; also fixed a `.github/workflows/gate-tests.yml` naming collision from an earlier round tonight — two unrelated CI steps were both labeled "TEST 1b"; closed the loop on High Priority #2's open question: confirmed the RemoteProtocolError/ConnectionTerminated connection bug is NOT the explanation for the original Jake Stangl incident — the incident's own captured evidence was a completed request/response, structurally incompatible with a connection that died mid-stream, and no code path exists where that error could silently become an empty result. Status unchanged (MITIGATED, NOT ROOT-CAUSED) and now explicitly deprioritized — not actively being chased, re-open only if it recurs; added Low Priority #6, a known unclosed blind spot in `PRIMITIVE_CHECKLIST.md`'s two structural scans — a resolver-style function that returns ambiguous/unknown with no log call at all on that path, like `resolve_dimension_filter`, is invisible to both the function-name scan and the bracketed-log-tag scan added the same night; closing it needs a bigger lift, either a logging convention or real control-flow static analysis, not scoped or started; fixed a 4th detection-primitive gap found the same night, same file: the zero-rows suspicion note in `dynamic_query_loop` detected a suspicious enumeration-question zero-row result and logged an advisory note, but never verified the model acted on it before shipping — added a compliance check + its own outcome bucket (`answered_with_unresolved_zero_row_suspicion`), registered in `FAILURE_MODE_PRIMITIVES`, see `PRIMITIVE_CHECKLIST.md`'s "Follow-up audit" section; also fixed an unrelated stale test found along the way — `tests/test_zero_rows_suspicion.py`'s 3rd test had been failing since 2026-09-06 checking the wrong location for missing-value prompt guidance that was deliberately relocated to `api/router.py`'s `DYNAMIC_SYSTEM_PROMPT`, not lost; also fixed the recurring Supabase `httpx.RemoteProtocolError: ConnectionTerminated` connection issue found via a live test session — a long-lived singleton client hitting a known httpx/HTTP2 gotcha, fixed with a retry-once transport, see `scripts/supabase_client.py`'s `_RetryOnDeadConnectionTransport`; added `PRIMITIVE_CHECKLIST.md` — a standing, CI-enforced contract every detection primitive must satisfy, retroactively applied to fix 3 primitives found log-only with the same "detect but never act" gap the original aggregation-verification incident had; added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
+**Last Updated:** 2026-09-11 (🚨 URGENT SAFETY FIX: a live CI run of `gate-tests.yml` failed twice, identically, with `ImportError: cannot import name 'ClientOptions' from 'supabase' (unknown location)` at `api/db.py`'s import — added earlier the same night for the Supabase retry-transport fix — killing every downstream test; since Railway's deploy process plausibly does a similarly fresh install, this risked crashing the live app on its next deploy. Fixed by moving the `ClientOptions` import inside `create_resilient_supabase_client()`'s own try block (`scripts/supabase_client.py`), lazy not top-level, so any import-time failure degrades to a plain client with no retry protection instead of crashing — see `tests/test_supabase_client_fallback.py` (forces the exact failure and confirms a working client still comes back) and new High Priority #4 for the not-yet-root-caused "why does GitHub's runner resolve this differently" investigation, explicitly not blocking on it; shipped `resolve_execution_cost_estimate()` (`api/router.py`) — a pre-execution cost estimate for `dynamic_query_loop`, calibrated against 13 real `query_cost_log` rows pulled via `scripts/query_cost_log_calibration.sql`, warning on an expensive-looking question before running anything; every estimate self-reports low confidence given the tiny calibration sample, tracked as Low Priority #7 for recalibration once more traffic accumulates; also fixed a `.github/workflows/gate-tests.yml` naming collision from an earlier round tonight — two unrelated CI steps were both labeled "TEST 1b"; closed the loop on High Priority #2's open question: confirmed the RemoteProtocolError/ConnectionTerminated connection bug is NOT the explanation for the original Jake Stangl incident — the incident's own captured evidence was a completed request/response, structurally incompatible with a connection that died mid-stream, and no code path exists where that error could silently become an empty result. Status unchanged (MITIGATED, NOT ROOT-CAUSED) and now explicitly deprioritized — not actively being chased, re-open only if it recurs; added Low Priority #6, a known unclosed blind spot in `PRIMITIVE_CHECKLIST.md`'s two structural scans — a resolver-style function that returns ambiguous/unknown with no log call at all on that path, like `resolve_dimension_filter`, is invisible to both the function-name scan and the bracketed-log-tag scan added the same night; closing it needs a bigger lift, either a logging convention or real control-flow static analysis, not scoped or started; fixed a 4th detection-primitive gap found the same night, same file: the zero-rows suspicion note in `dynamic_query_loop` detected a suspicious enumeration-question zero-row result and logged an advisory note, but never verified the model acted on it before shipping — added a compliance check + its own outcome bucket (`answered_with_unresolved_zero_row_suspicion`), registered in `FAILURE_MODE_PRIMITIVES`, see `PRIMITIVE_CHECKLIST.md`'s "Follow-up audit" section; also fixed an unrelated stale test found along the way — `tests/test_zero_rows_suspicion.py`'s 3rd test had been failing since 2026-09-06 checking the wrong location for missing-value prompt guidance that was deliberately relocated to `api/router.py`'s `DYNAMIC_SYSTEM_PROMPT`, not lost; also fixed the recurring Supabase `httpx.RemoteProtocolError: ConnectionTerminated` connection issue found via a live test session — a long-lived singleton client hitting a known httpx/HTTP2 gotcha, fixed with a retry-once transport, see `scripts/supabase_client.py`'s `_RetryOnDeadConnectionTransport`; added `PRIMITIVE_CHECKLIST.md` — a standing, CI-enforced contract every detection primitive must satisfy, retroactively applied to fix 3 primitives found log-only with the same "detect but never act" gap the original aggregation-verification incident had; added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -637,6 +637,84 @@ updated (one pre-existing test's target field changed since
 too, though its specific test value matches neither lookup table so the
 byte-exact logging assertion still holds); logging fix from the earlier
 pass unchanged.
+
+---
+
+#### 4. Why Does GitHub Actions' Hosted Runner Fail to Import `ClientOptions` from `supabase`?
+
+**Issue:** A live GitHub Actions run of `gate-tests.yml` (ubuntu-latest,
+a fresh `pip install -r requirements.txt` with no venv) failed twice in
+a row, identically (ruled out as a one-run flake via `rerun_failed_jobs`)
+with:
+
+```
+ImportError: cannot import name 'ClientOptions' from 'supabase' (unknown location)
+```
+
+at `api/db.py`'s top-level `from supabase import create_client, Client,
+ClientOptions` — the import added earlier the same night for the
+Supabase dead-connection retry-transport fix. This killed every single
+downstream test in the workflow (everything after `TEST 0` reported
+"skipped," never actually running).
+
+**Could NOT be reproduced** despite real effort: this sandbox's own
+long-lived environment imports `ClientOptions` fine; a genuinely fresh,
+isolated `python3 -m venv` + `pip install -r requirements.txt` using
+the EXACT same pinned versions CI's own install log reported
+(`supabase==2.31.0`, `postgrest==2.31.0`, and every other transitive
+version matching byte-for-byte) also imports cleanly. No shadowing
+`supabase` file or directory exists anywhere in this repo that could
+create a namespace-package collision (the `(unknown location)` phrasing
+in the error is the specific signature of Python resolving `supabase`
+to a namespace package with no real `__init__.py`, rather than the
+actual installed package — but the trigger for that happening
+specifically on GitHub's hosted runner remains unidentified).
+
+**Status:** MITIGATED, NOT ROOT-CAUSED — same shape as High Priority
+#2. `create_resilient_supabase_client()` (`scripts/supabase_client.py`)
+now imports `ClientOptions` lazily, inside a try block, so this same
+failure (or any other import-time problem building the resilient
+client) degrades to a plain client with no retry protection instead of
+crashing the app outright — see the commit that added this fix and
+`tests/test_supabase_client_fallback.py`. This closes the actual risk
+(an app that can't start, plausibly including on a live Railway
+deploy) without requiring the root cause to be understood first — a
+degraded-but-running app beats a dead one. Not blocking on the
+investigation below; logged so it isn't lost.
+
+**Likely candidates, not yet checked (needs live access to GitHub's
+runner environment or a way to inspect it, neither available from this
+sandbox):**
+- A stale or corrupted entry in GitHub's hosted-runner pip cache for
+  this specific `supabase==2.31.0` wheel, distinct from PyPI's own
+  (correct) copy — would explain why a fresh venv here, presumably
+  pulling from PyPI directly rather than any GitHub-side cache, doesn't
+  reproduce it.
+- A version pin mismatch between what `requirements.txt` declares
+  (`supabase>=2.0.0`, an open range) and what the runner's environment
+  ACTUALLY resolved and installed, despite the install log's own
+  stdout claiming `supabase-2.31.0` — worth confirming with a
+  `pip show supabase` step added temporarily to the workflow, printed
+  immediately before the failing import, to rule out the log itself
+  being misleading.
+- An environment variable or `PYTHONPATH` interaction specific to
+  GitHub Actions' `ubuntu-latest` runner image (this workflow sets
+  `PYTHONPATH=.:scripts:api:scripts/analytics` for its Python steps)
+  that affects import resolution differently than a plain local `venv`
+  activation does — not yet isolated to a specific mechanism.
+
+**Work:** Add a temporary diagnostic step to `gate-tests.yml` (e.g.
+`pip show supabase`, `python3 -c "import supabase; print(supabase.__file__, supabase.__path__)"`)
+on a throwaway branch to actually observe what CI's runner resolves
+`supabase` to, before removing it — the fastest way to distinguish
+between the three candidates above rather than continuing to guess from
+this sandbox, which has already been shown not to reproduce the issue.
+
+**Complexity:** Unknown until the diagnostic step above actually runs
+in CI — could be a one-line pip-cache-clearing fix, or something
+requiring more investigation. Not urgent: the fallback fix means this
+investigation is purely about understanding a mitigated risk, not
+closing an open one.
 
 ---
 

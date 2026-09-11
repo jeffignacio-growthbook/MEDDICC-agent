@@ -33,6 +33,45 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: "TEST 1e — Offline: Supabase client construction degrades gracefully, never crashes the app on import"
+        run: |
+          set -e
+          # 2026-09-11: THIS EXACT JOB failed twice in a row (ruled out as
+          # a flake) with `ImportError: cannot import name 'ClientOptions'
+          # from 'supabase' (unknown location)` at api/db.py's top-level
+          # import — added for the retry-transport fix earlier the same
+          # night — killing every single downstream test in this
+          # workflow before any of them got a chance to run. Could NOT be
+          # reproduced in a fresh local venv install of the identical
+          # pinned requirements; the specific trigger on GitHub's hosted
+          # runner is still unknown (see PENDING_WORK.md's follow-up
+          # investigation) — but Railway's own deploy process plausibly
+          # does something similar to this fresh CI install, so an
+          # unguarded top-level ClientOptions import risked crashing the
+          # live app on its next deploy, not just this workflow.
+          # Fixed by moving the ClientOptions import inside
+          # create_resilient_supabase_client()'s own try block (scripts/
+          # supabase_client.py) — lazy, not top-level — so ANY import-time
+          # failure building the resilient client (ClientOptions missing,
+          # or any other exception) degrades to a plain create_client()
+          # with no retry protection and a clear [SUPABASE_RETRY] warning,
+          # rather than ever propagating up and crashing the caller.
+          # api/db.py itself no longer imports ClientOptions at all.
+          # Placed as the FIRST test in this workflow, before TEST 0,
+          # specifically because it is the fix for the failure that took
+          # down TEST 0 itself — if this regresses, it should be the
+          # first thing to go red, not discovered via a cascade of
+          # skipped downstream steps. test_supabase_client_fallback.py
+          # proves the trap actually springs: forces the exact
+          # ImportError shape from the live CI log (not just the happy
+          # path, already covered when the retry transport shipped) and
+          # confirms a working client still comes back, a clear warning
+          # gets logged, ANY exception (not just ImportError) triggers
+          # the same fallback, and api/db.py's own source no longer
+          # imports ClientOptions at module level at all — the literal
+          # line that crashed.
+          PYTHONPATH=. python3 tests/test_supabase_client_fallback.py
+
       - name: "TEST 0 — Offline: greeting/help handler + handler descriptions"
         run: |
           set -e
