@@ -630,6 +630,36 @@ jobs:
           # finalize answer still ships normally.
           PYTHONPATH=. python3 tests/test_finalize_scratchpad_check.py
 
+      - name: "TEST 0y — Offline: owner_email/sdr_email/stage canonicalization across the 5 handlers TEST 0t's audit flagged"
+        run: |
+          set -e
+          # 2026-09-11, direct sequel to TEST 0t: that fix shipped
+          # defensive logging everywhere but deliberately left the
+          # deeper canonicalization out of scope. This is that
+          # canonicalization, applied one handler at a time (each
+          # tested individually before moving to the next, per this
+          # session's own repeated lesson that a "should be safe" batch
+          # change tends to hit a handler-specific wrinkle):
+          # query_pipeline and query_call_quality (raw owner_email eq,
+          # no resolver at all) and query_sdr_metrics and query_sdr_
+          # pipeline_sourced (raw sdr_email eq, no resolver) now all
+          # route through _resolve_owner_email() (accepts a name or an
+          # email) and filter via ilike instead of eq. query_stale_deals
+          # needed two distinct fixes: its owner_email was already
+          # resolved via _resolve_owner_email() but the downstream
+          # filter was still eq — a name resolves to user_personas.email
+          # verbatim, with no case-fold, so the same casing risk
+          # survived resolution; and its stage param reached an eq
+          # filter completely raw, with no canonicalization against
+          # deals.stage's actual raw-HubSpot-id storage — fixed via a
+          # new _resolve_stage_id() helper that resolves a model-
+          # extracted human label (e.g. "Technical Evaluation") to its
+          # raw stage_id (presentationscheduled), case-insensitively,
+          # via api/field_semantics.py's own label/alias tables, falling
+          # through unchanged for a value matching neither. Not verified
+          # live — no Supabase/Railway access from this sandbox.
+          PYTHONPATH=. python3 tests/test_owner_email_canonicalization.py
+
       - name: "TEST 0n — Offline: every dynamic_query_loop invocation logs structured cost data"
         run: |
           set -e

@@ -25,9 +25,15 @@ from point_in_time import load_scope_config, is_deal_in_analytics_scope
 
 # Import field semantics (single source of truth for stage meanings)
 try:
-    from field_semantics import stage_bucket, stage_label, is_won, is_lost, is_open
+    from field_semantics import (
+        stage_bucket, stage_label, is_won, is_lost, is_open,
+        canonical_stage, _ALIAS_TO_CANONICAL, _LABEL_TO_STAGE_ID,
+    )
 except ImportError:
-    from api.field_semantics import stage_bucket, stage_label, is_won, is_lost, is_open
+    from api.field_semantics import (
+        stage_bucket, stage_label, is_won, is_lost, is_open,
+        canonical_stage, _ALIAS_TO_CANONICAL, _LABEL_TO_STAGE_ID,
+    )
 
 # Import renewal handlers (separated for clarity)
 try:
@@ -298,6 +304,37 @@ def _resolve_owner_email(params: dict, sb):
                     if p.get("email"):
                         return p["email"], f"resolved '{cand}' to {p['email']}"
     return None, f"could not resolve '{candidates[0]}' to a known rep"
+
+
+def _resolve_stage_id(stage):
+    """Canonicalize a model-extracted stage value to the stage_id string
+    actually stored in deals.stage.
+
+    2026-09-11 (PENDING_WORK.md High Priority #3, canonicalization audit
+    follow-up): query_stale_deals's `stage` param used to go straight into
+    an exact-match `eq` filter — but a model extracting "Technical
+    Evaluation" from free text has no way of knowing deals.stage actually
+    stores the raw HubSpot stage id ('presentationscheduled'), so that
+    filter silently matched nothing. Checks the raw-id/alias table first
+    (also resolves numeric aliases via canonical_stage), then falls back
+    to a case-insensitive match against the human-readable label table —
+    both generated from the same source of truth (api/field_semantics.py,
+    itself generated from config/field_semantics.yaml).
+
+    Returns the resolved stage_id, or the original value unchanged if it
+    matches neither table (so an already-correct or genuinely unknown
+    value still reaches the filter rather than being silently dropped).
+    """
+    if not stage:
+        return stage
+    s = str(stage).strip()
+    if s in _ALIAS_TO_CANONICAL:
+        return canonical_stage(s)
+    sl = s.lower()
+    for label, stage_id in _LABEL_TO_STAGE_ID.items():
+        if label.lower() == sl:
+            return stage_id
+    return s
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1641,7 +1678,14 @@ async def query_sdr_pipeline_sourced(params: dict, sb) -> dict:
     config = yaml.safe_load(open(config_path))
 
     tw = _resolve_tw(params)
-    sdr_email = params.get("sdr_email")  # Optional: filter to specific SDR
+    # 2026-09-11 (PENDING_WORK.md High Priority #3, canonicalization
+    # audit follow-up): raw params.get("sdr_email") used to go straight
+    # into an exact-match `eq` filter below (sdr_owner_email OR
+    # owner_email, depending on config) — no name resolution, no case
+    # tolerance. A wrong-case value used to silently produce an empty
+    # sdr_pipeline list with no error at all. Optional: filter to
+    # specific SDR; omitting it returns all SDRs.
+    sdr_email, _sdr_resolution_note = _resolve_owner_email(params, sb)
 
     # Get attribution method from config
     attribution_config = config.get("sdr_tools", {}).get("pipeline_attribution", {})
@@ -1662,11 +1706,11 @@ async def query_sdr_pipeline_sourced(params: dict, sb) -> dict:
         # sdr_field attribution was configured.
         filters.append(("__not_null__", "sdr_owner_email"))
         if sdr_email:
-            filters.append(("eq", "sdr_owner_email", sdr_email))
+            filters.append(("ilike", "sdr_owner_email", sdr_email))
     else:
         # Fall back to current owner (pre-handoff only)
         if sdr_email:
-            filters.append(("eq", "owner_email", sdr_email))
+            filters.append(("ilike", "owner_email", sdr_email))
         # Note: This will miss deals that have been handed off from SDR to AE
 
     # Query deals table
@@ -1718,7 +1762,13 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
     Returns call volume, voicemails, connect rate (if available),
     email activity from sdr_metrics table.
     """
-    sdr_email = params.get("sdr_email")
+    # 2026-09-11 (PENDING_WORK.md High Priority #3, canonicalization
+    # audit follow-up): raw params.get("sdr_email") used to go straight
+    # into exact-match `eq` filters below (both sdr_users.user_email and
+    # meetings.owner_email) — no name resolution, no case tolerance.
+    # _resolve_owner_email() already recognizes "sdr_email"/"sdr_name"
+    # among its checked keys, so it's a drop-in replacement here.
+    sdr_email, _sdr_resolution_note = _resolve_owner_email(params, sb)
     tw = _resolve_tw(params)
 
     if not sdr_email:
@@ -1728,7 +1778,7 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
         }
 
     # Get user's tool_user_id from sdr_users table
-    sdr_users_filters = [("eq", "user_email", sdr_email)]
+    sdr_users_filters = [("ilike", "user_email", sdr_email)]
     logger.info(f"[QUERY_SDR_METRICS_FILTER] table='sdr_users' filters={sdr_users_filters!r}")
     user_rows = select_all(sb, "sdr_users",
         columns="tool,tool_user_id,user_name,user_email",
@@ -1766,7 +1816,7 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
 
     # Query meetings data
     meetings_filters = [
-        ("eq", "owner_email", sdr_email),
+        ("ilike", "owner_email", sdr_email),
         ("gte", "scheduled_at", tw["start"]),
         ("lte", "scheduled_at", tw["end"])
     ]
@@ -2059,9 +2109,24 @@ async def query_pipeline(params: dict, sb) -> dict:
     # DO NOT filter by time_window/close_date - current state has no time scope
     base_filters = [("eq", "deal_status", "active")]
 
-    # Only add optional filters if explicitly provided
-    if params.get("owner_email"):
-        base_filters.append(("eq", "owner_email", params["owner_email"]))
+    # Only add optional filters if explicitly provided.
+    #
+    # 2026-09-11 (PENDING_WORK.md High Priority #3, canonicalization
+    # audit follow-up): this used to take params["owner_email"] raw and
+    # filter with an exact-match `eq` — no name resolution (a model
+    # passing a rep's name instead of an email would silently match
+    # nothing) and no case tolerance (HubSpot sync casing isn't
+    # guaranteed to match whatever casing a model reproduces). Ranked
+    # HIGHEST risk in the audit: the single most-used top-level handler
+    # ("what's our pipeline?"), with neither protection at all — the
+    # same exact-match fragility query_pipeline_movement's owner_email
+    # fix hardened. _resolve_owner_email() (already the established
+    # pattern in query_rep_pipeline/query_deal_health/query_stale_deals)
+    # accepts a name OR an email; ilike (not eq) makes the match itself
+    # case-insensitive once resolved.
+    owner_email, _owner_resolution_note = _resolve_owner_email(params, sb)
+    if owner_email:
+        base_filters.append(("ilike", "owner_email", owner_email))
 
     # Stage filtering (only if requested)
     stage_filter = params.get("stage_filter")  # e.g., "qualified", "discovery"
@@ -2266,7 +2331,7 @@ async def query_pipeline(params: dict, sb) -> dict:
         "filters_applied": {
             "stage_filter": stage_filter,
             "pipeline_filter": pipeline_filter,
-            "owner_email": params.get("owner_email"),
+            "owner_email": owner_email,
         },
         "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total ($18.6M) AND Q3-scoped (q3_scoped_pipeline). COVERAGE: Always computed against Q3-scoped figure, never against timeless total. Format: '$18.6M total pipeline (timeless); $X closing this quarter (Y.Yx coverage)'. STAGE BREAKDOWN: Show ALL stages from by_stage dict (typically 10 stages). Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals (306). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
         "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering. Coverage ratio scoped to deals closing in target quarter only."
@@ -2734,7 +2799,12 @@ async def query_stale_deals(params: dict, sb) -> dict:
     """
     # A rep name resolves to owner_email; None means "all reps" (valid here).
     owner_email, _rep_note = _resolve_owner_email(params, sb)
-    stage = params.get("stage")
+    # 2026-09-11 (PENDING_WORK.md High Priority #3, canonicalization audit
+    # follow-up): stage used to reach the eq filter below completely raw —
+    # see _resolve_stage_id()'s docstring for why a model-extracted label
+    # like "Technical Evaluation" would silently match zero rows against
+    # deals.stage's actual raw-id storage.
+    stage = _resolve_stage_id(params.get("stage"))
     stale_days = params.get("stale_days", 21)
     tw = params.get("time_window")
     
@@ -2756,8 +2826,16 @@ async def query_stale_deals(params: dict, sb) -> dict:
     filters = [("eq", "deal_status", "active")]
     
     if owner_email:
-        filters.append(("eq", "owner_email", owner_email))
-    
+        # 2026-09-11 (PENDING_WORK.md High Priority #3, canonicalization
+        # audit follow-up): this handler's audit note originally read
+        # owner_email as "already fixed" because it's resolved through
+        # _resolve_owner_email() — true for name lookups, but a name
+        # resolves to user_personas.email verbatim (no case-folding),
+        # which isn't guaranteed to match deals.owner_email's casing.
+        # ilike closes that residual gap the same way the other 4
+        # handlers' fixes did.
+        filters.append(("ilike", "owner_email", owner_email))
+
     if stage:
         filters.append(("eq", "stage", stage))
     
@@ -3532,7 +3610,13 @@ async def query_call_quality(params: dict, sb) -> dict:
       time_window: dict    — for pattern mode
     """
     company = params.get("company") or (params.get("company_names") or [""])[0]
-    owner_email = params.get("owner_email")
+    # 2026-09-11 (PENDING_WORK.md High Priority #3, canonicalization
+    # audit follow-up): raw params.get("owner_email") here used to go
+    # straight into an exact-match `eq` filter below (Mode 2) — no name
+    # resolution, no case tolerance. _resolve_owner_email() (the
+    # established pattern in query_rep_pipeline/query_deal_health/
+    # query_stale_deals) accepts a name OR an email.
+    owner_email, _owner_resolution_note = _resolve_owner_email(params, sb)
     tw = params.get("time_window", {})
 
     # Mode 1: Single call review for a specific company
@@ -3595,7 +3679,7 @@ async def query_call_quality(params: dict, sb) -> dict:
     # Mode 2: Rep or team discovery pattern
     filters = []
     if owner_email:
-        filters.append(("eq", "owner_email", owner_email))
+        filters.append(("ilike", "owner_email", owner_email))
     if tw.get("start"):
         filters.append(("gte", "call_date", tw["start"]))
     if tw.get("end"):

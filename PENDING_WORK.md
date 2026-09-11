@@ -564,56 +564,60 @@ and no roster resolution via `_resolve_owner_email()`. This is the
 same risk class as `query_pipeline_movement`'s bug, just not yet
 confirmed to have caused an incident in any of these specific handlers.
 
-**Status:** DEFENSIVE LOGGING SHIPPED (2026-09-11, commit — see TEST
-0t), CANONICALIZATION NOT YET APPLIED. Every handler below now logs
-its fully-constructed filter clause unconditionally before the
-Supabase call, so a future zero-row incident on any of them leaves a
-byte-exact trace immediately instead of requiring another multi-hour
-blind investigation. The deeper fix — actually canonicalizing the
-value before filtering, the way `query_pipeline_movement` now does via
-`ilike` and `_pm_normalize_fiscal_quarter()` — was deliberately left
-out of this pass: it changes real production query behavior across
-several live handlers at once, and deserves its own scoped review
-rather than a blanket sweep bundled into a logging-only fix.
+**Status:** ✅ CANONICALIZATION APPLIED (2026-09-11, same night as the
+logging pass — see `tests/test_owner_email_canonicalization.py`).
+Fixed one handler at a time, each tested individually against its own
+realistic case before moving to the next, per the session's own
+"batch changes hide handler-specific wrinkles" lesson from the earlier
+`query_pipeline_movement` and primitive-contract rounds.
 
-**Handlers needing the deeper fix, ranked by the audit's risk
-assessment:**
-1. `query_pipeline` (~2014) — HIGHEST. Raw `owner_email` eq, no
-   resolver at all. The single most-used top-level handler ("what's
-   our pipeline").
-2. `query_call_quality` (~3516, team/rep mode) — raw `owner_email` eq,
-   no resolver.
-3. `query_sdr_metrics` (~1714) — raw `sdr_email` eq against
-   `sdr_users.user_email` and `meetings.owner_email`, no case-fold, no
-   roster resolution.
-4. `query_sdr_pipeline_sourced` (~1627) — raw `sdr_email` eq against
-   `sdr_owner_email` or `owner_email` depending on config.
-5. `query_stale_deals` (~2721) — owner_email IS resolved via
-   `_resolve_owner_email()` (good), but `stage` is a raw eq filter
-   against free-text-extracted stage names with no canonicalization
-   against actual DB stage strings/casing.
+1. `query_pipeline` (~2014) — now routes through
+   `_resolve_owner_email()` (accepts a name or an email) and filters
+   via `ilike` instead of `eq`.
+2. `query_call_quality` (~3531, team/rep mode) — same fix; Mode 1
+   (single call by company) untouched.
+3. `query_sdr_metrics` (~1714) — same fix at BOTH call sites
+   (`sdr_users.user_email` and `meetings.owner_email`).
+4. `query_sdr_pipeline_sourced` (~1627) — same fix on whichever
+   attribution column is active (`sdr_owner_email` or `owner_email`
+   per `config/client.yaml`'s `sdr_tools.pipeline_attribution.method`);
+   the no-SDR-filter path (returns all SDRs) verified to add no
+   spurious clause.
+5. `query_stale_deals` (~2749) — two fixes, not one: (a) the audit note
+   above called `owner_email` "already fixed" because it's resolved via
+   `_resolve_owner_email()`, but missed that a name resolves to
+   `user_personas.email` VERBATIM (no case-fold) — switched the
+   downstream filter from `eq` to `ilike` to close that residual gap
+   too; (b) `stage` now goes through a new `_resolve_stage_id()` helper
+   (`api/handlers.py`, next to `_resolve_owner_email()`) that resolves a
+   model-extracted human label (e.g. "Technical Evaluation") to the raw
+   HubSpot stage id actually stored in `deals.stage`
+   (`presentationscheduled`) — case-insensitively — via
+   `api/field_semantics.py`'s `_LABEL_TO_STAGE_ID`/`_ALIAS_TO_CANONICAL`
+   tables (generated from the same `config/field_semantics.yaml` source
+   of truth as `STAGE_MAP`), falling through unchanged for a value
+   matching neither table.
 
-Lower risk (already call `_resolve_owner_email()`, or use
-deterministically-computed rather than free-text values):
 `query_rep_pipeline`, `query_deal_health`, `query_team_leaderboard`,
-`query_coverage` — these got the logging pass for completeness but
-don't need the canonicalization fix.
+`query_coverage` were left as-is (lower risk — already call
+`_resolve_owner_email()`, or use deterministically-computed rather than
+free-text values), matching the audit's original scoping.
 
-**Work required:** for each of the 5 handlers above, either route
-`owner_email`/`sdr_email` through `_resolve_owner_email()` (where a
-name-or-email param makes sense) or switch the filter op from `eq` to
-`ilike` (case-insensitive exact match, no wildcards) the way
-`query_pipeline_movement` now does; for `query_stale_deals`'s `stage`
-param specifically, canonicalize against the real stage glossary
-(`api/field_semantics.py`'s `STAGE_MAP`) before filtering.
+**Not verified live:** no live Supabase/Railway/production log access
+in this sandbox at any point in this session — none of these fixes (nor
+the original `query_pipeline_movement` mitigation) has been confirmed
+against real production data. The `[PIPELINE_MOVEMENT_QUERY]` debug
+line shipped for the Jake Stangl incident could not be checked for
+recurrence either, for the same reason.
 
-**Complexity:** Low-medium per handler; the work itself is
-well-understood and mirrors the exact fix already proven in
-`query_pipeline_movement`. Deserves per-handler testing before
-shipping, not a single blanket sweep.
-
-**Documentation:** this session's investigation (handler audit);
-logging fix in `tests/test_handler_filter_logging.py`.
+**Documentation:** `tests/test_owner_email_canonicalization.py` (16
+tests, one section per handler); `tests/test_handler_filter_logging.py`
+updated (one pre-existing test's target field changed since
+`query_pipeline`'s `owner_email` is now deliberately normalized, and
+`query_stale_deals`'s `stage` now passes through `_resolve_stage_id()`
+too, though its specific test value matches neither lookup table so the
+byte-exact logging assertion still holds); logging fix from the earlier
+pass unchanged.
 
 ---
 

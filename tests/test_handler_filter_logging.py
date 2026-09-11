@@ -181,21 +181,34 @@ def test_query_coverage_logs_filter():
 
 
 def test_filters_are_exact_and_byte_visible_not_summarized():
-    """Spot-check: the logged filter for a case-sensitive email must
-    show the value verbatim (via !r), not a summarized/truncated form —
-    this is the entire point of the fix."""
+    """Spot-check: the logged filter for a distinctively-cased,
+    space-containing value must show it verbatim (via !r), not a
+    summarized/truncated form — this is the entire point of the fix.
+
+    Uses query_stale_deals's `stage` param rather than an owner_email
+    field: as of the 2026-09-11 canonicalization follow-up,
+    query_pipeline's owner_email is deliberately normalized (resolved
+    via _resolve_owner_email() and case-folded for ilike matching)
+    before it reaches this same log line — correct behavior for that
+    field, but it would make a "nothing is altered" claim false for the
+    wrong reason. `stage` now passes through _resolve_stage_id() too
+    (added the same night, see tests/test_owner_email_canonicalization.py's
+    Handler 5/5 section), but that resolver only rewrites values matching
+    a known raw-id/alias/label — an unrecognized value like this test's
+    passes through byte-identical, so it stays a clean example of the
+    logging mechanism's own fidelity."""
     orig = handlers_module.select_all
     handlers_module.select_all = _empty_select_all
     try:
         _, _, records = _run_and_capture(
-            handlers_module.query_pipeline, {"owner_email": "Christian@GrowthBook.io"},
-            _FakeSupabase())
+            handlers_module.query_stale_deals,
+            {"stage": "Contract Sent (Legal Review)"}, _FakeSupabase())
     finally:
         handlers_module.select_all = orig
 
-    line = next(r for r in records if "[QUERY_PIPELINE_FILTER]" in r)
-    assert "'Christian@GrowthBook.io'" in line, (
-        f"expected the exact-case email to appear verbatim in the log — got: {line!r}"
+    line = next(r for r in records if "[QUERY_STALE_DEALS_FILTER]" in r)
+    assert "'Contract Sent (Legal Review)'" in line, (
+        f"expected the exact value to appear verbatim in the log — got: {line!r}"
     )
     print("✓ logged filters preserve exact case/values, nothing summarized away")
 
