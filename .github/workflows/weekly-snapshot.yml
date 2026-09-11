@@ -36,8 +36,10 @@ jobs:
       
       - name: Verify snapshot coverage
         if: success()
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
           echo "✓ Weekly snapshot completed"
-          echo "  Coverage assertion passed (≥95%)"
-          echo "  Snapshot will be available for downstream analysis"
+          python scripts/check_snapshot_arr_fields.py
 
