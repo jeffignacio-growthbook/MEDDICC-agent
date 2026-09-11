@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-11 (Low Priority #8 fixed — added 5 utility/import functions (`compute_cycle_time`, `compute_at_risk_deals`, `canonical_stage`, `load_scope_config`, `is_deal_in_analytics_scope`) to `scripts/eval_handler_descriptions.py`'s `KNOWN_NON_HANDLERS` exclusion set rather than writing them fake handler descriptions, since `HANDLER_DESCRIPTIONS` is the live routing classifier's own menu and a real entry for any of these would let it get dispatched a live question with the wrong call signature; verified 35/35 handlers now match locally; running `TEST 0`'s full eval sequence to verify this surfaced 4 more independent, pre-existing, unrelated bugs further down the same script sequence — see new Low Priority #9 — so `TEST 0` is not expected to be fully green yet even after this fix; added Low Priority #8 — confirming the URGENT safety fix worked via a live CI re-run surfaced a genuinely pre-existing, unrelated finding: `eval_handler_descriptions.py` has been failing on 5 undocumented handler-adjacent functions since `b75a3c1` (2026-09-06), invisible until now only because the `ClientOptions` crash blocked CI before it ever reached that check; not urgent, not caused by tonight's work, confirmed via `git blame`; 🚨 URGENT SAFETY FIX: a live CI run of `gate-tests.yml` failed twice, identically, with `ImportError: cannot import name 'ClientOptions' from 'supabase' (unknown location)` at `api/db.py`'s import — added earlier the same night for the Supabase retry-transport fix — killing every downstream test; since Railway's deploy process plausibly does a similarly fresh install, this risked crashing the live app on its next deploy. Fixed by moving the `ClientOptions` import inside `create_resilient_supabase_client()`'s own try block (`scripts/supabase_client.py`), lazy not top-level, so any import-time failure degrades to a plain client with no retry protection instead of crashing — see `tests/test_supabase_client_fallback.py` (forces the exact failure and confirms a working client still comes back) and new High Priority #4 for the not-yet-root-caused "why does GitHub's runner resolve this differently" investigation, explicitly not blocking on it; shipped `resolve_execution_cost_estimate()` (`api/router.py`) — a pre-execution cost estimate for `dynamic_query_loop`, calibrated against 13 real `query_cost_log` rows pulled via `scripts/query_cost_log_calibration.sql`, warning on an expensive-looking question before running anything; every estimate self-reports low confidence given the tiny calibration sample, tracked as Low Priority #7 for recalibration once more traffic accumulates; also fixed a `.github/workflows/gate-tests.yml` naming collision from an earlier round tonight — two unrelated CI steps were both labeled "TEST 1b"; closed the loop on High Priority #2's open question: confirmed the RemoteProtocolError/ConnectionTerminated connection bug is NOT the explanation for the original Jake Stangl incident — the incident's own captured evidence was a completed request/response, structurally incompatible with a connection that died mid-stream, and no code path exists where that error could silently become an empty result. Status unchanged (MITIGATED, NOT ROOT-CAUSED) and now explicitly deprioritized — not actively being chased, re-open only if it recurs; added Low Priority #6, a known unclosed blind spot in `PRIMITIVE_CHECKLIST.md`'s two structural scans — a resolver-style function that returns ambiguous/unknown with no log call at all on that path, like `resolve_dimension_filter`, is invisible to both the function-name scan and the bracketed-log-tag scan added the same night; closing it needs a bigger lift, either a logging convention or real control-flow static analysis, not scoped or started; fixed a 4th detection-primitive gap found the same night, same file: the zero-rows suspicion note in `dynamic_query_loop` detected a suspicious enumeration-question zero-row result and logged an advisory note, but never verified the model acted on it before shipping — added a compliance check + its own outcome bucket (`answered_with_unresolved_zero_row_suspicion`), registered in `FAILURE_MODE_PRIMITIVES`, see `PRIMITIVE_CHECKLIST.md`'s "Follow-up audit" section; also fixed an unrelated stale test found along the way — `tests/test_zero_rows_suspicion.py`'s 3rd test had been failing since 2026-09-06 checking the wrong location for missing-value prompt guidance that was deliberately relocated to `api/router.py`'s `DYNAMIC_SYSTEM_PROMPT`, not lost; also fixed the recurring Supabase `httpx.RemoteProtocolError: ConnectionTerminated` connection issue found via a live test session — a long-lived singleton client hitting a known httpx/HTTP2 gotcha, fixed with a retry-once transport, see `scripts/supabase_client.py`'s `_RetryOnDeadConnectionTransport`; added `PRIMITIVE_CHECKLIST.md` — a standing, CI-enforced contract every detection primitive must satisfy, retroactively applied to fix 3 primitives found log-only with the same "detect but never act" gap the original aggregation-verification incident had; added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
+**Last Updated:** 2026-09-11 (Low Priority #9 fully closed — all 4 items fixed, each its own standalone commit, each verified against a live CI re-run in sequence (runs #61-#64 on `claude/dazzling-brown-rxeaje`): the `query_rep_pipeline` `NameError` (a real live production bug — every call to this handler crashed since `b75a3c1`, unrelated to CI), the `eval_fallback_message.py` stale mock, the `slack_sdk` dependency gap (investigated and confirmed genuinely used by a real, wired `run-calibration.yml` workflow — added the dependency rather than deleting anything), and `_honest_miss()`'s `TypeError` — which on inspection turned out to hide a second, deeper issue: fixing just the type mismatch didn't make the eval pass, because `_honest_miss()`'s real message never stated the facts its own sibling `_result_summary()` computes and was docstring'd as being "for the honest-miss message" but was only ever wired into an internal log line; shipped as a deliberate user-facing behavior change (`_honest_miss()` now threads `_result_summary(tool_results)` into what the user actually sees), with before/after message text and a new dedicated test (`tests/test_honest_miss_includes_facts.py`); `TEST 0` came back fully green in live CI (run #64) for the first time all night; that same run immediately surfaced a new, separate, real metric-logic bug in `TEST 0b` (forecast correctness — the renewal pipeline's conversion denominator isn't scoped independently from the default pipeline) — logged fresh as Low Priority #10, explicitly NOT fixed tonight since it's real business logic deserving unhurried investigation, not a stale mock or dead import; added Low Priority #8 — confirming the URGENT safety fix worked via a live CI re-run surfaced a genuinely pre-existing, unrelated finding: `eval_handler_descriptions.py` has been failing on 5 undocumented handler-adjacent functions (`compute_cycle_time`, `compute_at_risk_deals`, `canonical_stage`, `load_scope_config`, `is_deal_in_analytics_scope`) to `scripts/eval_handler_descriptions.py`'s `KNOWN_NON_HANDLERS` exclusion set rather than writing them fake handler descriptions, since `HANDLER_DESCRIPTIONS` is the live routing classifier's own menu and a real entry for any of these would let it get dispatched a live question with the wrong call signature; verified 35/35 handlers now match locally; running `TEST 0`'s full eval sequence to verify this surfaced 4 more independent, pre-existing, unrelated bugs further down the same script sequence — see new Low Priority #9 — so `TEST 0` is not expected to be fully green yet even after this fix; added Low Priority #8 — confirming the URGENT safety fix worked via a live CI re-run surfaced a genuinely pre-existing, unrelated finding: `eval_handler_descriptions.py` has been failing on 5 undocumented handler-adjacent functions since `b75a3c1` (2026-09-06), invisible until now only because the `ClientOptions` crash blocked CI before it ever reached that check; not urgent, not caused by tonight's work, confirmed via `git blame`; 🚨 URGENT SAFETY FIX: a live CI run of `gate-tests.yml` failed twice, identically, with `ImportError: cannot import name 'ClientOptions' from 'supabase' (unknown location)` at `api/db.py`'s import — added earlier the same night for the Supabase retry-transport fix — killing every downstream test; since Railway's deploy process plausibly does a similarly fresh install, this risked crashing the live app on its next deploy. Fixed by moving the `ClientOptions` import inside `create_resilient_supabase_client()`'s own try block (`scripts/supabase_client.py`), lazy not top-level, so any import-time failure degrades to a plain client with no retry protection instead of crashing — see `tests/test_supabase_client_fallback.py` (forces the exact failure and confirms a working client still comes back) and new High Priority #4 for the not-yet-root-caused "why does GitHub's runner resolve this differently" investigation, explicitly not blocking on it; shipped `resolve_execution_cost_estimate()` (`api/router.py`) — a pre-execution cost estimate for `dynamic_query_loop`, calibrated against 13 real `query_cost_log` rows pulled via `scripts/query_cost_log_calibration.sql`, warning on an expensive-looking question before running anything; every estimate self-reports low confidence given the tiny calibration sample, tracked as Low Priority #7 for recalibration once more traffic accumulates; also fixed a `.github/workflows/gate-tests.yml` naming collision from an earlier round tonight — two unrelated CI steps were both labeled "TEST 1b"; closed the loop on High Priority #2's open question: confirmed the RemoteProtocolError/ConnectionTerminated connection bug is NOT the explanation for the original Jake Stangl incident — the incident's own captured evidence was a completed request/response, structurally incompatible with a connection that died mid-stream, and no code path exists where that error could silently become an empty result. Status unchanged (MITIGATED, NOT ROOT-CAUSED) and now explicitly deprioritized — not actively being chased, re-open only if it recurs; added Low Priority #6, a known unclosed blind spot in `PRIMITIVE_CHECKLIST.md`'s two structural scans — a resolver-style function that returns ambiguous/unknown with no log call at all on that path, like `resolve_dimension_filter`, is invisible to both the function-name scan and the bracketed-log-tag scan added the same night; closing it needs a bigger lift, either a logging convention or real control-flow static analysis, not scoped or started; fixed a 4th detection-primitive gap found the same night, same file: the zero-rows suspicion note in `dynamic_query_loop` detected a suspicious enumeration-question zero-row result and logged an advisory note, but never verified the model acted on it before shipping — added a compliance check + its own outcome bucket (`answered_with_unresolved_zero_row_suspicion`), registered in `FAILURE_MODE_PRIMITIVES`, see `PRIMITIVE_CHECKLIST.md`'s "Follow-up audit" section; also fixed an unrelated stale test found along the way — `tests/test_zero_rows_suspicion.py`'s 3rd test had been failing since 2026-09-06 checking the wrong location for missing-value prompt guidance that was deliberately relocated to `api/router.py`'s `DYNAMIC_SYSTEM_PROMPT`, not lost; also fixed the recurring Supabase `httpx.RemoteProtocolError: ConnectionTerminated` connection issue found via a live test session — a long-lived singleton client hitting a known httpx/HTTP2 gotcha, fixed with a retry-once transport, see `scripts/supabase_client.py`'s `_RetryOnDeadConnectionTransport`; added `PRIMITIVE_CHECKLIST.md` — a standing, CI-enforced contract every detection primitive must satisfy, retroactively applied to fix 3 primitives found log-only with the same "detect but never act" gap the original aggregation-verification incident had; added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -1004,7 +1004,7 @@ this fix closes exactly the one check it targeted and no more.
 
 ---
 
-#### 9. `TEST 0`'s Eval-Script Sequence Has Several More Pre-Existing Failures Beyond the Handler-Descriptions Gap
+#### 9. `TEST 0`'s Eval-Script Sequence Has Several More Pre-Existing Failures Beyond the Handler-Descriptions Gap — ✅ FIXED (all 4 items closed)
 
 **Issue:** Fixing Low Priority #8 let `TEST 0`'s `set -e` sequence of
 ~28 `scripts/eval_*.py` calls progress past `eval_handler_descriptions.py`
@@ -1055,27 +1055,126 @@ script being fixed. Each confirmed pre-existing via `git blame` —
    includes `anthropic>=0.40.0`, so these two are expected to run fine
    in the real workflow and don't need any code change.
 
-**Status:** NOT FIXED, not urgent, not related to tonight's work. Each
-of the 4 real issues (not counting the 2 sandbox artifacts) is
-independent of the others and of #8 — they just all happen to live in
-the same `TEST 0` step, which is why fixing #8 alone won't make `TEST
-0` fully green.
+**Status:** ✅ ALL 4 FIXED, each as its own standalone commit, each
+verified locally AND against a live CI re-run before moving to the
+next:
 
-**Work:** Fix each of the 4 independently: (1) find what `tw` was
-supposed to reference in `query_rep_pipeline` and fix the `NameError`;
-(2) determine whether `_honest_miss()`'s real callers ever pass a dict
-for `entity_count` and align the eval and/or the function's contract;
-(3) update `eval_fallback_message.py`'s mock to match
-`get_schema_context`'s real signature; (4) add `slack_sdk` to
-`requirements.txt` (or `eval_requirements_complete.py`'s alias map if
-it's meant to stay an optional/unused script).
+1. **`query_rep_pipeline` `NameError`** — fixed by hardcoding
+   `"period": "all active"`, matching the function's own docstring
+   ("CURRENT STATE — never filters by close_date... no time scope");
+   `tw` was dead, copy-pasted logic from a sibling time-windowed
+   handler, never adapted. This was a genuine LIVE PRODUCTION BUG —
+   every real call to this handler crashed, independent of CI.
+2. **`_honest_miss()` `TypeError`** — fixing just the eval's type
+   mismatch (a dict where `entity_count: int` was expected) surfaced a
+   SECOND, independent, previously-invisible gap once actually run:
+   `_honest_miss()`'s real message never stated facts about what came
+   back, despite its sibling `_result_summary()` being docstring'd as
+   "for the honest-miss message" and already computing the exact
+   phrase the eval expected — but only ever wired into an internal log
+   line, never the user-facing message. Fixed as a deliberate
+   USER-FACING BEHAVIOR CHANGE: `_honest_miss()` now takes
+   `tool_results` and threads `_result_summary()`'s output into both
+   of its messages, so the log and what the user sees can no longer
+   diverge. New test: `tests/test_honest_miss_includes_facts.py`.
+3. **`eval_fallback_message.py`'s stale mock** — added the missing
+   `lightweight=False` param to its `get_schema_context` stub. Purely
+   a test-file change, no production code touched.
+4. **`slack_sdk` dependency gap** — investigated before assuming this
+   was dead code to delete: `scripts/run_calibration_via_slack.py` is
+   real, wired into a real GitHub Actions workflow
+   (`.github/workflows/run-calibration.yml`) with a real
+   `SLACK_BOT_TOKEN` secret, deliberately using a direct Slack client
+   (not the Zapier flow production Q&A uses) so it can observe the
+   agent's actual reply landing in a Slack thread. `slack_sdk` was
+   never in `requirements.txt` at any point — added `slack_sdk>=3.27.0`,
+   verified in a genuinely fresh virtualenv install.
 
-**Complexity:** Low-medium per item — each is narrow and independent,
-but there are 4 of them, so a full green `TEST 0` is more than a
-one-line fix away.
+**Verified live in CI, not just locally**, across 4 separate re-runs of
+`gate-tests.yml` on `claude/dazzling-brown-rxeaje` (runs #61-#64) — each
+re-run progressed exactly one bug further than the last, confirming
+each fix in turn and ruling out anything hiding behind it, until
+**`TEST 0` itself came back fully green (run #64)**: 35/35 handler
+descriptions, no `NameError`, no stale mocks, `slack_sdk` resolved, and
+`_honest_miss()`'s new behavior all passing for real. This closes out
+Low Priority #9 completely.
 
-**Documentation:** none yet — first surfaced in this session running
-`TEST 0`'s full script sequence locally while verifying #8's fix.
+**Documentation:** `scripts/eval_handlers_no_raise.py`,
+`scripts/eval_bestseller_incident.py`, `scripts/eval_fallback_message.py`,
+`scripts/eval_requirements_complete.py`'s own passing output;
+`tests/test_honest_miss_includes_facts.py`; this entry.
+
+---
+
+#### 10. `TEST 0b` (Forecast Correctness) Fails on Renewal Denominator Scoping — Real Metric-Logic Bug, First Reached Only Now That `TEST 0` No Longer Blocks It
+
+**Issue:** With Low Priority #9 fully closed, `TEST 0` no longer blocks
+the rest of `gate-tests.yml` for the first time all night — and the
+very next step, `TEST 0b` (`scripts/eval_forecast_correctness.py`),
+immediately failed on a test that has never once been reached before
+tonight:
+
+```
+❌ FAILED: test_numerator_and_denominator_share_scope
+   renewal denom should be its own, got {'rate_count': None,
+   'closed_won_count': 1, 'week3_scoped_denominator': 0,
+   'reason': 'denominator 0 < min_evidence 30'}
+RESULTS: 11 passed, 1 failed
+```
+
+The test's own intent (per its docstring): "Both sides apply the same
+pipeline+stage scope from the shared rule, and conversion is computed
+per pipeline... default and renewal are separate." The renewal
+pipeline's denominator is coming back as 0 (triggering a
+below-min-evidence null) instead of its own real, independently-scoped
+count — meaning the renewal-pipeline win-rate/conversion metric is
+either silently nulling out when it shouldn't, or the scoping logic
+that's supposed to keep default and renewal pipelines separate isn't
+actually separating them correctly.
+
+Confirmed pre-existing via `git blame`: both the test and the
+`eval_forecast_correctness.py` module itself trace to commit `b75a3c1`
+(2026-09-06) — same original commit as every item in #8 and #9, but
+this is a genuinely separate, independent script/step (`TEST 0b`, not
+part of `TEST 0`'s eval sequence at all) that was simply never reached
+by any CI run until tonight's fixes removed everything blocking it.
+Not caused by, or related to, anything touched tonight.
+
+**Why this is NOT another quick same-night fix:** every item in #8 and
+#9 was either a stale test fixture, a dead/unreferenced code path, or a
+narrow dependency-declaration gap — safe to reason about and fix in
+isolation late at night. This is different: it's REAL forecast/metric
+business logic (how the renewal pipeline's conversion-rate denominator
+gets scoped and whether it's being kept separate from the default
+pipeline as designed). Getting this wrong in either direction (a
+false-negative null suppressing a real number, or a scoping bug
+quietly blending two pipelines that are supposed to stay apart) has
+actual reporting/forecasting consequences if this ships. This deserves
+a real, unhurried investigation into the scoping rule itself — reading
+`eval_forecast_correctness.py`'s full test setup, the actual scoping
+function it's testing, and forming a real hypothesis for why the
+renewal population is coming back empty — not a late-night guess.
+
+**Status:** NOT FIXED, not urgent tonight, not related to anything
+fixed this session. Logged fresh, separate from the now-closed #9.
+
+**Work:** Dedicated investigation needed: (1) read the full test setup
+in `test_numerator_and_denominator_share_scope` and the real scoping
+function it exercises to understand what "renewal denom should be its
+own" is supposed to mean structurally; (2) determine whether the
+renewal pipeline's population is being miscounted (a real scoping bug)
+or whether the test's own fixture/expectation is stale relative to a
+later scoping-rule change (mirroring the #9 pattern, but not to be
+assumed here without checking); (3) fix whichever side is actually
+wrong, with the same standard as tonight — root-cause it, don't paper
+over the assertion.
+
+**Complexity:** Unknown until investigated — this is real business
+logic, not a mechanical mismatch, so complexity depends on what the
+actual scoping bug (if any) turns out to be.
+
+**Documentation:** none yet — first surfaced tonight, live CI run #64
+on `claude/dazzling-brown-rxeaje`, once `TEST 0` stopped blocking it.
 
 ---
 
