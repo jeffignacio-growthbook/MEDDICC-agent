@@ -221,7 +221,7 @@ def main():
         # Get week-3 snapshot for this quarter
         week3_rows = select_all(
             sb, 'deals_snapshot',
-            columns='deal_id,stage_id,pipeline_id,deal_value',
+            columns='deal_id,stage_id,pipeline_id,deal_value,new_arr,expansion_arr',
             filters=[('eq', 'fiscal_quarter', fq_label),
                      ('eq', 'week_of_quarter', 3)])
 
@@ -250,20 +250,30 @@ def main():
                 print(f"  ✓ {fq_label}: week-3 count={week3_count}, "
                       f"using won-deal avg=${avg_deal_size:,.0f} (bias-corrected)")
             else:
-                # Fallback: week-3 pipeline average. deals_snapshot has no
-                # new_arr/expansion_arr columns (never carried through by
-                # the point-in-time backfill), so unlike the open-deals loop
-                # above, this can't recompute Incremental ARR directly — the
-                # honest stopgap is null-propagation on deal_value itself,
-                # matching compute_waterfall.py's established treatment of
-                # this same table/column: exclude unknown-value deals from
-                # BOTH the sum and the average's denominator (never
-                # zero-fill), and count them for visibility. See
-                # PENDING_WORK.md for the real fix (a schema migration +
-                # backfill to carry new_arr/expansion_arr into the snapshot).
+                # Fallback: week-3 pipeline average. Recompute Incremental
+                # ARR directly from new_arr/expansion_arr where available
+                # (migration 064) — same treatment as the open-deals loop
+                # above, avoiding the NULL-out hazard in HubSpot's own
+                # combined "Incremental ARR" field (config/client.yaml's
+                # value_field comment). Snapshots taken before migration 064
+                # have both columns NULL (intentionally not backfilled — a
+                # deal's current ARR components don't reflect a past date),
+                # and any deal where both are genuinely blank falls back to
+                # that deal's own deal_value — still null-propagated (never
+                # zero-filled) rather than fabricated, matching
+                # compute_waterfall.py's established treatment.
                 from null_propagation import null_propagate
-                npr = null_propagate(
-                    [r.get('deal_value') for r in week3_qualified], max_null_pct)
+                per_deal_values = []
+                for r in week3_qualified:
+                    r_new_arr = r.get('new_arr')
+                    r_expansion_arr = r.get('expansion_arr')
+                    if r_new_arr is not None or r_expansion_arr is not None:
+                        per_deal_values.append(
+                            float(r_new_arr or 0) + float(r_expansion_arr or 0))
+                    else:
+                        per_deal_values.append(r.get('deal_value'))
+
+                npr = null_propagate(per_deal_values, max_null_pct)
                 week3_value = npr['sum']
                 week3_known_count = npr['valued_count']
                 avg_deal_size = (week3_value / week3_known_count
