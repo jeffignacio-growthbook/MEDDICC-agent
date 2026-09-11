@@ -155,6 +155,144 @@ def test_known_detection_functions_are_still_present():
     print("✓ every allowlisted detection function still exists")
 
 
+# ══════════════════════════════════════════════════════════════════════
+# Secondary, coarser scan: flagged log tags (2026-09-11)
+# ══════════════════════════════════════════════════════════════════════
+# The name-based scan above has a confirmed, not hypothetical, blind
+# spot: the zero-rows suspicion note (api/router.py's dynamic_query_
+# loop) detected a real problem, logged it, and shipped the answer
+# unresolved anyway — the exact anti-pattern this whole file exists to
+# catch — and sat there unreviewed because it's inline code with no
+# function name for _DETECTION_NAME_RE to match. It was only found by
+# someone asking about it directly and manually re-walking the
+# checklist.
+#
+# This is a second net cast wider on purpose: this codebase's own
+# established convention is a bracketed [TAG] at the start of every
+# logger.info/warning/error message (grep any file in api/ — it's
+# everywhere). Rather than trying to name-match inline code (there's no
+# name to match), flag any such tagged log call whose MESSAGE TEXT
+# (never the tag itself, which often encodes an unrelated domain noun
+# like "STALE_DEALS" the handler/table name) contains a keyword that
+# suggests it might be reporting a discovered problem. Far noisier than
+# the function-name scan by design: KNOWN_FLAGGED_LOG_TAGS below keeps
+# a real, deliberately-preserved false positive ([ENTITY_SCOPE]'s
+# staleness check, a self-correcting cache-TTL mechanism, not a
+# shipped-unresolved failure) rather than tuning the keyword list to
+# avoid it — tuning away one false positive risks tuning away the next
+# real gap, which is exactly how the zero-rows suspicion note went
+# unreviewed for as long as it did.
+_FLAGGED_LOG_KEYWORDS = (
+    "suspicion", "gap", "missing", "zero row", "zero-row", "defaulted",
+    "ambigu", "stale", "inconsistent", "mismatch", "drift", "uncertain",
+)
+
+# Matches logger.info/warning/error(f"[TAG] message text" [f"more text"]*)
+# — handles this codebase's common style of an f-string message split
+# across several adjacent, implicitly-concatenated string literals.
+# Group 1 is the bracketed tag; group 2 is everything after it, up to
+# the call's closing quote — the text this scan's keyword check runs
+# against (the tag itself is excluded deliberately, see above).
+_LOG_TAG_CALL_RE = re.compile(
+    r'logger\.(?:info|warning|error)\(\s*f?"(\[[A-Z][A-Z0-9_]*\])'
+    r'((?:[^"]*"\s*\n?\s*f?")*[^"]*)"',
+    re.MULTILINE,
+)
+
+# Every bracketed log TAG this scan currently finds, reviewed against
+# PRIMITIVE_CHECKLIST.md's two questions. A NEW tag not listed here
+# fails the test until someone reads the surrounding code and adds an
+# entry with the verdict — "false positive, here's why" is a complete,
+# valid entry; it does not have to mean a fix is needed.
+KNOWN_FLAGGED_LOG_TAGS = {
+    # Real gap, found and fixed 2026-09-11 — see PRIMITIVE_CHECKLIST.md's
+    # "Follow-up audit". Now has a compliance check and its own outcome
+    # bucket (zero_rows_suspicion_unresolved /
+    # answered_with_unresolved_zero_row_suspicion).
+    "[SUSPICION]",
+    # False positive: a cache-freshness/TTL check (prior-turn entities
+    # older than 30 minutes force rediscovery) — not a detection
+    # primitive under this checklist's own definition, since it
+    # self-corrects immediately and deterministically (returns False,
+    # forcing a fresh lookup) rather than ever shipping a stale answer.
+    # Matched only because "stale" is in its own vocabulary, not
+    # because it exhibits "detect, log, ship anyway".
+    "[ENTITY_SCOPE]",
+    # The proactive nudge firing (ambiguous_dimension_term_flagged) —
+    # not a discovered failure, the same category PRIMITIVE_CHECKLIST.md
+    # already excludes by design ("What counts as a detection
+    # primitive"). The compliance check on whether it was ADDRESSED is
+    # the separate [SYNTHESIS_VERIFY] tag, reviewed below.
+    "[DIMENSION_RESOLVE]",
+    # Shared log line several already-compliant checks emit from
+    # (aggregation mismatch, snapshot-date-labeling, ambiguous-
+    # dimension, zero-rows-suspicion) — not one primitive, a tag
+    # several reviewed primitives happen to share.
+    "[SYNTHESIS_VERIFY]",
+    # MANDATORY GATE: forces a retry with an explicit required query
+    # before an answer ever ships — the forced iteration IS the visible
+    # consequence; there is no unresolved-and-shipped path here at all.
+    "[DIMENSION_VERIFY]",
+    # forced_anchor_fetch_fired / finalize's own scratchpad handling —
+    # reviewed primitives from the original retroactive audit
+    # (queryable, self-corrects or escalates to _give_up).
+    "[FINALIZE]",
+    # diff_company_name_backfill_fired — reviewed: logs a real gap it
+    # then backfills or reports, never a silent ship.
+    "[SNAPSHOT_DIFF]",
+    # snapshot_anchor_injected's blocking path — forces the loop to
+    # fetch the missing anchor before proceeding; the block IS the
+    # consequence, not a silent log.
+    "[ENRICHMENT_LOOKUP]",
+}
+
+
+def _scan_flagged_log_tags():
+    """{tag: filename} for every bracketed-tag logger call across
+    api/*.py whose MESSAGE text (not the tag) contains a keyword
+    suggesting it might report a discovered problem, rather than
+    ordinary status/progress logging."""
+    found = {}
+    for path in sorted(API_DIR.glob("*.py")):
+        text = path.read_text()
+        for m in _LOG_TAG_CALL_RE.finditer(text):
+            tag, msg = m.group(1), m.group(2)
+            if any(k in msg.lower() for k in _FLAGGED_LOG_KEYWORDS):
+                found[tag] = path.name
+    return found
+
+
+def test_no_new_unreviewed_flagged_log_tags():
+    found = _scan_flagged_log_tags()
+    unreviewed = sorted(set(found) - KNOWN_FLAGGED_LOG_TAGS)
+    assert not unreviewed, (
+        f"New log tag(s) with message text suggesting a discovered "
+        f"problem, not yet reviewed against PRIMITIVE_CHECKLIST.md: "
+        f"{[(tag, found[tag]) for tag in unreviewed]}. This is the "
+        f"coarse, inline-code-aware companion to test_no_new_unreviewed_"
+        f"detection_functions — deliberately noisier (false positives "
+        f"are expected and fine), added because the zero-rows suspicion "
+        f"note sat unreviewed for exactly this reason: no function name "
+        f"for the precise scan to match. Read the surrounding code,  "
+        f"answer the checklist's two questions, then add the tag to "
+        f"KNOWN_FLAGGED_LOG_TAGS with a one-line verdict — 'false "
+        f"positive, here's why' is a complete, valid entry."
+    )
+    print(f"✓ no unreviewed flagged log tags ({len(found)} known, all accounted for)")
+
+
+def test_known_flagged_log_tags_are_still_present():
+    """Sanity check on the allowlist itself, same reasoning as
+    test_known_detection_functions_are_still_present."""
+    found = _scan_flagged_log_tags()
+    missing = sorted(KNOWN_FLAGGED_LOG_TAGS - set(found))
+    assert not missing, (
+        f"KNOWN_FLAGGED_LOG_TAGS tags no longer found by the scan "
+        f"(renamed, removed, or reworded past the keyword list?): {missing}"
+    )
+    print("✓ every allowlisted flagged log tag still exists")
+
+
 def test_every_failure_mode_primitive_is_referenced_in_outcome_computation():
     """The first half of the contract: a detection primitive's failure
     signal must be a real, queryable field — referenced directly inside
@@ -215,6 +353,8 @@ if __name__ == "__main__":
     tests = [
         test_no_new_unreviewed_detection_functions,
         test_known_detection_functions_are_still_present,
+        test_no_new_unreviewed_flagged_log_tags,
+        test_known_flagged_log_tags_are_still_present,
         test_every_failure_mode_primitive_is_referenced_in_outcome_computation,
         test_every_failure_mode_primitive_is_actually_set_somewhere,
         test_the_log_only_anti_pattern_never_reappears,

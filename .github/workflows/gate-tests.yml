@@ -554,6 +554,20 @@ jobs:
           # fails; and the exact retired "Don't block the answer, just
           # log for monitoring" anti-pattern comment must never
           # reappear anywhere in api/.
+          #
+          # 2026-09-11 (same night, follow-up): the function-name scan's
+          # blind spot turned out to be real, not hypothetical — the
+          # zero-rows suspicion note (TEST 1b) sat unreviewed because
+          # it's inline code inside dynamic_query_loop with no function
+          # name to match. Added a second, coarser scan: any bracketed
+          # [TAG] on a logger call (this codebase's own convention)
+          # whose MESSAGE text contains a keyword suggesting a
+          # discovered problem (suspicion/gap/missing/zero row/
+          # defaulted/ambiguous/stale/inconsistent/mismatch/drift/
+          # uncertain) must be in a reviewed allowlist
+          # (KNOWN_FLAGGED_LOG_TAGS) too — deliberately noisier, false
+          # positives kept rather than tuned away (see
+          # PRIMITIVE_CHECKLIST.md's item 5).
           PYTHONPATH=. python3 tests/test_primitive_contract.py
 
       - name: "TEST 0v — Offline: snapshot-date-labeling mismatches get a caveat and their own outcome bucket"

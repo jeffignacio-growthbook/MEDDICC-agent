@@ -109,17 +109,38 @@ deep semantic analysis. It asserts:
 4. The literal retired anti-pattern comment — `"Don't block the
    answer, just log for monitoring"` — never reappears anywhere in
    `api/`. If it does, something regressed to the exact pre-fix shape.
+5. **Secondary, coarser scan (added 2026-09-11):** every bracketed
+   `[TAG]` on a `logger.info`/`warning`/`error` call across `api/*.py`
+   — this codebase's own established logging convention — whose
+   *message text* (never the tag itself, which often just encodes an
+   unrelated domain noun) contains a keyword suggesting it might report
+   a discovered problem (`suspicion`, `gap`, `missing`, `zero row`,
+   `defaulted`, `ambigu`, `stale`, `inconsistent`, `mismatch`, `drift`,
+   `uncertain`) must be in a reviewed allowlist (`KNOWN_FLAGGED_LOG_
+   TAGS`). This exists because item 1's naming scan has a confirmed —
+   not hypothetical — blind spot: the zero-rows suspicion note detected
+   a real problem, logged it, and shipped the answer unresolved anyway,
+   sitting unreviewed because it's inline code inside `dynamic_query_
+   loop`'s body with no function name to match. Deliberately noisier by
+   design: `KNOWN_FLAGGED_LOG_TAGS` keeps a real false positive
+   (`[ENTITY_SCOPE]`'s staleness check, a self-correcting cache-TTL
+   mechanism, not a shipped-unresolved failure) rather than tuning the
+   keyword list to avoid it — tuning away one false positive risks
+   tuning away the next real gap the same way.
 
-This is deliberately a naming/pattern check, not a full semantic
-verifier: the goal is forcing the question to get asked for every
-future primitive, not perfectly verifying the answer every time. A
-detection function that doesn't match the naming patterns above (a
-"resolver" that can also return an ambiguous/unknown result, for
-example — `resolve_dimension_filter` wasn't caught by the scan) can
-still slip past it. The retroactive audit that found tonight's three
-gaps was a manual read of the code, not this test; the test is the
-tripwire for the more obviously-named future case, and a periodic
-manual audit is still worth doing.
+This is deliberately a naming/pattern check (both the function-name
+scan and the log-tag scan), not a full semantic verifier: the goal is
+forcing the question to get asked for every future primitive, not
+perfectly verifying the answer every time. The retroactive audit that
+found the original three gaps, and the follow-up that found the
+zero-rows suspicion gap, were both manual reads of the code, not this
+test — the two scans are tripwires for the more obviously-named or
+obviously-worded future case, and a periodic manual audit is still
+worth doing. Even with both scans, a detection primitive with neither a
+matching function name NOR a keyword-matching log message (e.g. a
+`resolver` that can silently return an ambiguous/unknown result and
+never logs at all, like `resolve_dimension_filter`) can still slip past
+both — that specific case was still only found by manual review.
 
 ## Scope note: `route_question`'s precomputed-handler path
 
