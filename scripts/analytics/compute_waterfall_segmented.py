@@ -210,10 +210,20 @@ def main():
                     # NEW: Show phantom exits if any
                     phantom_exits = r.get('phantom_exits', [])
                     if phantom_exits:
-                        phantom_total = sum(p['value'] for p in phantom_exits)
-                        print(f"      Phantom exits: {len(phantom_exits)} deals, ${phantom_total:,.0f}")
+                        # 'value' can be None (_deal_value never 0-coalesces) —
+                        # exclude and count unknowns rather than crashing on
+                        # sum()/format of None, matching this file's own
+                        # established null-propagation convention.
+                        known = [p['value'] for p in phantom_exits if p['value'] is not None]
+                        unknown_count = len(phantom_exits) - len(known)
+                        phantom_total = sum(known)
+                        suffix = f" (+{unknown_count} unknown-value)" if unknown_count else ""
+                        print(f"      Phantom exits: {len(phantom_exits)} deals, "
+                              f"${phantom_total:,.0f}{suffix}")
                         for p in phantom_exits:
-                            print(f"        - Deal {p['deal_id']}: ${p['value']:,.0f}")
+                            val_str = (f"${p['value']:,.0f}" if p['value'] is not None
+                                       else "unknown value")
+                            print(f"        - Deal {p['deal_id']}: {val_str}")
                 raise ValueError("Reconciliation failures in properly-enriched groups indicate a bug")
         else:
             print(f"\n✓ ZERO MISMATCHES - PERFECT RECONCILIATION ACROSS ALL GROUPS")
@@ -673,7 +683,7 @@ def compute_waterfall_for_dates(sb, config, qual_map, enrichment_map, deal_statu
                 prev_deal = prev_snap[deal_id]
                 phantom_exits.append({
                     'deal_id': deal_id,
-                    'value': prev_deal.get('deal_value') or 0
+                    'value': _deal_value(prev_deal)
                 })
 
         # Store reconciliation status for later reporting
