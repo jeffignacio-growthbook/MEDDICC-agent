@@ -81,29 +81,42 @@ def test_suspicion_message():
     print("✅ Suspicion message format correct")
 
 
-def test_semantic_context_includes_missing_values():
-    """Test that semantic context includes missing value semantics."""
-    from scripts.utils import build_semantic_context
+def test_dynamic_system_prompt_includes_missing_value_semantics():
+    """Missing-value/zero-rows-suspicion guidance lives in api/router.py's
+    DYNAMIC_SYSTEM_PROMPT, not scripts/utils.py's build_semantic_context() —
+    a deliberate relocation (see the "MOVED TO DYNAMIC LOOP ONLY" comment
+    in build_semantic_context()) made because this content only matters
+    for the tool-calling dynamic loop, and was crowding the classifier's
+    prompt (which just routes, and doubled its token budget for no
+    benefit). This test used to check build_semantic_context() and had
+    been failing/excluded since the relocation — not because the guidance
+    was lost, but because nobody updated the test to check where it
+    actually lives now. Confirmed by reading DYNAMIC_SYSTEM_PROMPT
+    directly: all the expected content is there, verbatim or near enough."""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    import api.router as router
 
-    context = build_semantic_context()
+    prompt = router.DYNAMIC_SYSTEM_PROMPT
 
-    print("Checking semantic context for missing value semantics:")
+    print("Checking DYNAMIC_SYSTEM_PROMPT for missing value semantics:")
     print("-" * 80)
 
     required_phrases = [
         "No ARR recorded",
-        "deal_value is often populated with 0",
-        "Zero-rows suspicion rule",
+        "deal_value is often populated",
+        "Zero-rows suspicion",
         "component fields",
     ]
 
     for phrase in required_phrases:
-        found = phrase in context
+        found = phrase in prompt
         status = "✓" if found else "✗"
-        print(f"{status} '{phrase}' found in context: {found}")
-        assert found, f"Missing phrase in semantic context: {phrase}"
+        print(f"{status} '{phrase}' found in DYNAMIC_SYSTEM_PROMPT: {found}")
+        assert found, f"Missing phrase in DYNAMIC_SYSTEM_PROMPT: {phrase}"
 
-    print("\n✅ Semantic context includes missing value semantics")
+    print("\n✅ DYNAMIC_SYSTEM_PROMPT includes missing value semantics")
 
 
 if __name__ == '__main__':
@@ -111,5 +124,5 @@ if __name__ == '__main__':
     print()
     test_suspicion_message()
     print()
-    test_semantic_context_includes_missing_values()
+    test_dynamic_system_prompt_includes_missing_value_semantics()
     print("\n✅ All zero-rows suspicion tests passed")

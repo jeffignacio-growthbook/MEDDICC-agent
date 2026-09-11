@@ -158,3 +158,24 @@ list above:
 
 Three genuine gaps found and fixed, all in one pass, following exactly
 the pattern proven on the original aggregation-verification incident.
+
+## Follow-up audit (2026-09-11, same night)
+
+A fourth gap surfaced answering a direct question about a different
+mechanism entirely (the zero-rows suspicion note, asked about
+separately from this audit) — this table is the reason it got checked
+against the same two questions rather than taken on faith as "obviously
+fine because it's advisory."
+
+| Primitive | Queryable? | User-visible on unresolved failure? | Status |
+|---|---|---|---|
+| zero-rows suspicion (`zero_rows_suspicion_unresolved`) | ❌ → ✅ own outcome bucket (`answered_with_unresolved_zero_row_suspicion`) | ❌ → ✅ compliance check added; caveat when the answer asserts absence with no acknowledgment the filter may be defaulted | **Fixed** (detection + advisory note existed since before this session; compliance verification didn't — same "detect, log, ship anyway" shape as the three found earlier, just never scanned because it's inline code, not a named function `test_primitive_contract.py` can match) |
+
+Found by manually re-reading the code against the checklist, not by the
+structural scan — confirms the scan's own documented limitation
+("a detection function that doesn't match the naming patterns... can
+still slip past it"). `zero_rows_suspicion_flagged` (the note firing at
+all, mirroring `ambiguous_dimension_term_flagged`) is deliberately NOT
+in `FAILURE_MODE_PRIMITIVES` — it just marks the mechanism having run,
+not a discovered-and-shipped problem; only
+`zero_rows_suspicion_unresolved` is registered.

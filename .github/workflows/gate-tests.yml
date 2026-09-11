@@ -658,7 +658,76 @@ jobs:
           # via api/field_semantics.py's own label/alias tables, falling
           # through unchanged for a value matching neither. Not verified
           # live — no Supabase/Railway access from this sandbox.
+          #
+          # Round 2 (same file, appended after re-checking the SHAPE of
+          # this fix across the handlers already touched tonight, not
+          # just owner_email/sdr_email): query_pipeline's stage_filter
+          # in-memory comparison had the identical fragility (`bucket !=
+          # stage_filter`, exact-case against a lowercase bucket keyword)
+          # — not hypothetical, scripts/test_q011_exact.py exists
+          # specifically because the classifier has spontaneously
+          # emitted stage_filter despite it not being in the documented
+          # params schema. Fixed by case-folding and falling back to
+          # _resolve_stage_id() + stage_bucket() for a value matching no
+          # known bucket keyword (a human label like "Technical
+          # Evaluation").
           PYTHONPATH=. python3 tests/test_owner_email_canonicalization.py
+
+      - name: "TEST 1a — Offline: Supabase client retries once on a dead HTTP/2 connection instead of failing the request"
+        run: |
+          set -e
+          # 2026-09-11: a live test session against the deployed app hit
+          # httpx.RemoteProtocolError: ConnectionTerminated repeatedly,
+          # mid-request, across unrelated handlers — a long-lived
+          # singleton Supabase client (get_supabase() in api/db.py;
+          # SupabaseWriter in scripts/supabase_client.py) hitting
+          # httpcore's own is_available() checkout gap: a pooled HTTP/2
+          # connection can look fine at checkout even after the server
+          # already sent GOAWAY, since the local check has no way to know
+          # until the client actually tries the next stream — at which
+          # point httpcore raises RemoteProtocolError directly, bypassing
+          # httpx's own ConnectionNotAvailable-based pool retry entirely.
+          # httpx.HTTPTransport(retries=N) does NOT cover this either —
+          # confirmed via httpcore's own docstring, that parameter only
+          # retries CONNECTION-ESTABLISHMENT failures. Fixed with
+          # _RetryOnDeadConnectionTransport (scripts/supabase_client.py),
+          # injected into both get_supabase() and SupabaseWriter via
+          # supabase.ClientOptions(httpx_client=...). Predates and is
+          # unrelated to tonight's canonicalization work (git log showed
+          # neither file touched by any commit before this fix).
+          PYTHONPATH=. python3 tests/test_supabase_retry_transport.py
+
+      - name: "TEST 1b — Offline: zero-rows suspicion is verified for compliance, not just flagged"
+        run: |
+          set -e
+          # 2026-09-11 (PRIMITIVE_CHECKLIST.md follow-up): the zero-rows
+          # suspicion note (fires when a "which/show/list" enumeration
+          # question returns zero rows from filter_table) told the model
+          # to broaden its filter or state what was checked instead of
+          # asserting absence — but nothing ever verified either
+          # happened, exactly the "detect, log, ship anyway" gap this
+          # checklist exists to catch. Not caught by test_primitive_
+          # contract.py's structural scan because it's inline code with
+          # no function name matching that test's naming patterns — found
+          # by manual review, the same way the original three gaps were.
+          # Fixed with the same compliance-check shape as ambiguous_
+          # dimension_unaddressed (TEST 0w): if the suspicion fired and
+          # no LATER tool call in the same loop found real rows (self-
+          # correction — same allowance as false_partial_claim_caught /
+          # scratchpad_rejection_fired), the final answer must at least
+          # acknowledge the check was made, or get a caveat appended and
+          # its own queryable outcome bucket
+          # (answered_with_unresolved_zero_row_suspicion). Also fixed a
+          # separate, unrelated staleness bug found along the way:
+          # test_zero_rows_suspicion.py's third test had been failing
+          # since 2026-09-06 (excluded from every gate run since) because
+          # it checked scripts/utils.py's build_semantic_context() for
+          # missing-value guidance that was deliberately relocated to
+          # api/router.py's DYNAMIC_SYSTEM_PROMPT — a real relocation,
+          # not lost content, confirmed by reading the prompt directly;
+          # the test just never got updated to check the new location.
+          PYTHONPATH=. python3 tests/test_zero_rows_suspicion.py
+          PYTHONPATH=. python3 tests/test_zero_rows_suspicion_compliance.py
 
       - name: "TEST 0n — Offline: every dynamic_query_loop invocation logs structured cost data"
         run: |

@@ -2270,6 +2270,7 @@ FAILURE_MODE_PRIMITIVES = frozenset({
     "finalize_scratchpad_caught",
     "snapshot_date_labeling_unverified",
     "ambiguous_dimension_unaddressed",
+    "zero_rows_suspicion_unresolved",
 })
 
 
@@ -2299,6 +2300,8 @@ def _new_cost_state() -> dict:
             "snapshot_date_labeling_unverified": False,
             "finalize_scratchpad_caught": False,
             "ambiguous_dimension_unaddressed": False,
+            "zero_rows_suspicion_flagged": False,
+            "zero_rows_suspicion_unresolved": False,
         },
     }
 
@@ -2308,7 +2311,8 @@ def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
     """One of: "exception", "answered_cleanly", "answered_after_resynthesis",
     "answered_with_unverified_aggregation",
     "answered_with_unverified_date_labeling",
-    "answered_with_unaddressed_ambiguity", "budget_exhausted",
+    "answered_with_unaddressed_ambiguity",
+    "answered_with_unresolved_zero_row_suspicion", "budget_exhausted",
     "other_fallback". See dynamic_query_loop()'s docstring for what each
     means.
 
@@ -2336,6 +2340,8 @@ def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
             return "answered_with_unverified_date_labeling"
         if primitives["ambiguous_dimension_unaddressed"]:
             return "answered_with_unaddressed_ambiguity"
+        if primitives["zero_rows_suspicion_unresolved"]:
+            return "answered_with_unresolved_zero_row_suspicion"
         if (primitives["scratchpad_rejection_fired"]
                 or primitives["aggregation_mismatch_caught"]
                 or primitives["false_partial_claim_caught"]):
@@ -2683,6 +2689,19 @@ async def _dynamic_query_loop_core(question, history, params,
     # Two in a row means the loop is stuck — end it and answer from what exists,
     # rather than spend the rest of the budget rediscovering nothing.
     no_progress_streak = 0
+
+    # 2026-09-11 (PRIMITIVE_CHECKLIST.md follow-up): the zero-rows
+    # suspicion note below (Part 2a) only ever logged and hoped the
+    # model acted on it — the exact "detect, log, ship anyway" anti-
+    # pattern PRIMITIVE_CHECKLIST.md exists to catch, just never caught
+    # by test_primitive_contract.py's structural scan because it's
+    # inline code with no function name to match. True whenever the
+    # note has fired and no LATER tool call in this same loop has yet
+    # returned real rows (self-correction by broadening, mirroring how
+    # false_partial_claim_caught / scratchpad_rejection_fired are
+    # allowed to self-correct) — checked against the final answer
+    # below (Check 4-equivalent) and at the finalize path.
+    zero_rows_suspicion_pending = False
 
     # Friendlier names for the handful of handlers that most often fall through,
     # so the user-facing diagnostic says what was being attempted in plain terms
@@ -3136,6 +3155,30 @@ async def _dynamic_query_loop_core(question, history, params,
                             f"in our system — please confirm which was "
                             f"meant, since the answer above may only "
                             f"reflect one:\n{ambiguity_lines}"
+                        )
+
+                # Same zero-rows suspicion compliance check as the main
+                # loop's Check 4b — finalize's synthesis needs it too,
+                # since it's a separate model call that could just as
+                # easily assert absence with no acknowledgment.
+                if zero_rows_suspicion_pending:
+                    acknowledgment_terms = ("checked", "did not find", "didn't find",
+                                            "no record", "unable to find", "may be",
+                                            "not recorded", "not populated", "wrong column")
+                    if not any(t in parsed2["answer"].lower() for t in acknowledgment_terms):
+                        cost_state["primitives_fired"]["zero_rows_suspicion_unresolved"] = True
+                        logger.warning(
+                            "[SYNTHESIS_VERIFY] finalize answer asserts absence "
+                            "with no acknowledgment of the zero-rows suspicion "
+                            "flagged earlier — appending a caveat."
+                        )
+                        parsed2["answer"] = (
+                            f"{parsed2['answer']}\n\n⚠️ Note: this answer is "
+                            f"based on a filter that returned zero rows — the "
+                            f"field checked may be defaulted rather than "
+                            f"genuinely empty, so treat this as 'nothing found "
+                            f"under the filter used' rather than a confirmed "
+                            f"absence."
                         )
 
                 # MANDATORY GATE: Dimension coverage verification (finalization path)
@@ -3730,6 +3773,37 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     f"answer above may only reflect one:\n{ambiguity_lines}"
                 )
 
+            # Check 4b: zero-rows suspicion compliance (2026-09-11,
+            # PRIMITIVE_CHECKLIST.md follow-up). The suspicion note fired
+            # earlier told the model to either broaden its filter or state
+            # what was checked instead of asserting absence — but nothing
+            # ever verified either happened, exactly the "detect, log,
+            # ship anyway" gap this checklist exists to catch. If no LATER
+            # tool call found real rows (self-correction — see
+            # zero_rows_suspicion_pending's own comment above the main
+            # loop), require the answer to at least acknowledge the check
+            # was made; a bare absence claim with no such acknowledgment
+            # gets a caveat appended rather than trusting the silence.
+            if zero_rows_suspicion_pending:
+                acknowledgment_terms = ("checked", "did not find", "didn't find",
+                                        "no record", "unable to find", "may be",
+                                        "not recorded", "not populated", "wrong column")
+                answer_lower = parsed["answer"].lower()
+                if not any(t in answer_lower for t in acknowledgment_terms):
+                    cost_state["primitives_fired"]["zero_rows_suspicion_unresolved"] = True
+                    logger.warning(
+                        "[SYNTHESIS_VERIFY] zero-rows suspicion was flagged "
+                        "but the answer asserts absence with no acknowledgment "
+                        "of what was checked — appending a caveat."
+                    )
+                    parsed["answer"] = (
+                        f"{parsed['answer']}\n\n⚠️ Note: this answer is based on "
+                        f"a filter that returned zero rows — the field checked "
+                        f"may be defaulted rather than genuinely empty, so "
+                        f"treat this as 'nothing found under the filter used' "
+                        f"rather than a confirmed absence."
+                    )
+
             # MANDATORY GATE: Dimension coverage verification
             # Check if question mentioned dimension values that were never filtered for
             from api.dimension_verification import verify_dimension_coverage, format_verification_error
@@ -4072,6 +4146,12 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 return await _finalize_from_data("no_new_data")
         else:
             no_progress_streak = 0
+            # A later call finding real rows is exactly the self-correction
+            # the suspicion note (below) hoped for — same "self-corrects or
+            # escalates" allowance as false_partial_claim_caught /
+            # scratchpad_rejection_fired, not a forced re-flag on every
+            # subsequent zero-row call.
+            zero_rows_suspicion_pending = False
 
         messages.append({"role": "assistant", "content": raw})
         # PART 2a: after every tool result, ask the model DIRECTLY whether the
@@ -4100,6 +4180,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 )
                 logger.info(f"[SUSPICION] Zero rows on enumeration question, "
                            f"filters={filter_desc}")
+                cost_state["primitives_fired"]["zero_rows_suspicion_flagged"] = True
+                zero_rows_suspicion_pending = True
 
         # FIX: Synthesis Aggregation Gap - Explicit instruction to aggregate ALL rows
         aggregation_instruction = ""
