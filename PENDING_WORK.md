@@ -1155,26 +1155,83 @@ a real, unhurried investigation into the scoping rule itself — reading
 function it's testing, and forming a real hypothesis for why the
 renewal population is coming back empty — not a late-night guess.
 
-**Status:** NOT FIXED, not urgent tonight, not related to anything
-fixed this session. Logged fresh, separate from the now-closed #9.
+**Status:** ✅ FIXED. Investigated per Jeff's explicit decision: renewal
+deals should NOT have a week-3 conversion rate at all (they don't move
+through a qualification funnel — the concept doesn't apply, not "we
+don't know the number"). Root cause: `_in_quarter_won_by_pipeline()`
+(the numerator) counted a renewal win with no pipeline exclusion at
+all, while the denominator already excluded the renewal pipeline via
+the shared `is_deal_in_analytics_scope()` rule — the two sides were
+never symmetric despite the code's own comment claiming they were.
+Fixed by applying the same pipeline exclusion to the numerator (an
+optional `excluded_pipelines` param, defaulting to the shared config).
+Renewal now doesn't appear as a row in `by_pipeline` at all — absence,
+not a 0-with-a-real-numerator or an explicit null, so "renewal
+converts at 0%" (a value fact) can never be confused with "renewal
+doesn't have this metric" (a scope fact). Test updated to assert this
+correct behavior; verified passing for the right reason both locally
+and in live CI (run #65).
 
-**Work:** Dedicated investigation needed: (1) read the full test setup
-in `test_numerator_and_denominator_share_scope` and the real scoping
-function it exercises to understand what "renewal denom should be its
-own" is supposed to mean structurally; (2) determine whether the
-renewal pipeline's population is being miscounted (a real scoping bug)
-or whether the test's own fixture/expectation is stale relative to a
-later scoping-rule change (mirroring the #9 pattern, but not to be
-assumed here without checking); (3) fix whichever side is actually
-wrong, with the same standard as tonight — root-cause it, don't paper
-over the assertion.
+**Documentation:** `scripts/analytics/forecast_analyses.py`'s updated
+inline comment above `query_week3_conversion`; the updated
+`test_numerator_and_denominator_share_scope`; this entry.
 
-**Complexity:** Unknown until investigated — this is real business
-logic, not a mechanical mismatch, so complexity depends on what the
-actual scoping bug (if any) turns out to be.
+---
 
-**Documentation:** none yet — first surfaced tonight, live CI run #64
-on `claude/dazzling-brown-rxeaje`, once `TEST 0` stopped blocking it.
+#### 11. `deals_snapshot` Has No `new_arr`/`expansion_arr` Columns — Blocks a True Recompute of Week-3 Incremental ARR
+
+**Issue:** Investigating the null-coalescing findings from #10's
+verification chain (see the eval_reconstruction.py ratchet items below)
+surfaced that `compute_forecast.py`'s week-3 average-deal-size fallback
+reads `deal_value` from `deals_snapshot` because that's *all* it can
+read — the table has never carried the two raw Incremental-ARR
+components (`new_arr`/`expansion_arr`) that the `deals` table has had
+since migration `007_add_reporting_fields.sql`. Checked every migration
+touching `deals_snapshot` (`005`, `017`, `037`, `038`, `039`, `045`,
+`060`, `062`) — its full column set is `deal_id, snapshot_date,
+pipeline_id, stage_id, stage_order, deal_value, close_date, owner_email,
+deal_status, snapshot_source, forecast_category, fiscal_quarter,
+week_of_quarter, renewal_revenue, region, segment`. `renewal_revenue`
+was added later (migration 045) specifically for GRR/NRR; the two
+incremental components never were.
+
+This matters because `config/client.yaml`'s own comment documents a
+real, verified HubSpot hazard: HubSpot's own combined "Incremental ARR"
+calculated field nulls out when *either* New ARR or Expansion ARR is
+individually blank, even when the other is a real known value — this
+codebase already avoids that hazard everywhere it CAN, by summing the
+two raw components directly instead of trusting the combined field
+(verified against 1,523 deals, zero disagreements). `deals_snapshot`
+is the one place that can't, because the raw components were never
+carried into the snapshot at all.
+
+**Current stopgap (shipped tonight):** `compute_forecast.py`'s week-3
+average-deal-size calculation null-propagates the existing `deal_value`
+field instead — excludes unknown-value deals from both the sum and the
+average's denominator, counts them, never zero-fills — matching
+`compute_waterfall.py`'s already-established treatment of this exact
+table/column. This is honest ("we can't recompute this, and we don't
+fully trust a value that might reflect the HubSpot hazard") but not a
+true fix — a deal_value that already avoided the hazard at write time
+would be handled correctly, but a deal_value that inherited it upstream
+would still silently understate.
+
+**Work:** A real fix needs (1) a schema migration adding `new_arr`/
+`expansion_arr` (`NUMERIC`, nullable) to `deals_snapshot`; (2) updating
+whichever ETL/backfill writes `deals_snapshot` rows (the point-in-time
+reconstruction path) to populate them, presumably reading the same
+`new_revenue`/`expansion_revenue` HubSpot properties `etl_deals.py`
+already reads for the `deals` table; (3) then `compute_forecast.py`'s
+week-3 fallback can recompute directly, matching the fix already
+shipped for the open-deals loop (`compute_forecast.py`'s Site 1, same
+investigation).
+
+**Complexity:** Medium — a real schema migration plus a backfill
+change to existing point-in-time reconstruction logic, not a one-file
+fix. Needs its own dedicated look, not a late-night addition.
+
+**Documentation:** `scripts/analytics/compute_forecast.py`'s inline
+comment above the null-propagation stopgap; this entry.
 
 ---
 

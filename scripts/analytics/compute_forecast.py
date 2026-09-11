@@ -35,6 +35,8 @@ def main():
 
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
     config = load_client_config()
+    max_null_pct = float(config.get('forecast_analysis', {})
+                         .get('max_null_value_pct', 5))
 
     # Get historical conversion rates from registry
     # Verified 2026-09-01, Q2 excluded (grid coverage issue)
@@ -101,6 +103,7 @@ def main():
             lambda: {'count': 0, 'value': 0.0, 'weighted': 0.0}),
         'uncategorized_value': 0.0,
         'unknown_incremental_count': 0,  # Track renewals with no incremental data
+        'unknown_incremental_count_default': 0,  # Same, for non-renewal deals
     })
 
     for d in open_deals:
@@ -128,8 +131,25 @@ def main():
             # Coalesce each component to 0 if the other exists
             forecast_value = float(new_arr or 0) + float(expansion_arr or 0)
         else:
-            # For default pipeline: deal_value equals incremental
-            forecast_value = float(d.get('deal_value') or 0)
+            # For default pipeline: Incremental ARR = New ARR + Expansion ARR.
+            # Recompute directly from the two raw, independently-reliable
+            # components rather than reading deal_value — HubSpot's own
+            # combined "Incremental ARR" field has a NULL-out hazard when
+            # either component is individually blank, even if the other is
+            # known (see config/client.yaml's value_field comment; verified
+            # against 1,523 deals). deal_value is computed the same null-safe
+            # way at write time, but recomputing here avoids the indirection
+            # and stays symmetric with the renewal branch above.
+            new_arr = d.get('new_arr')
+            expansion_arr = d.get('expansion_arr')
+
+            # If both are null, incremental is unknown (not zero) — exclude,
+            # same treatment as the renewal branch above.
+            if new_arr is None and expansion_arr is None:
+                g['unknown_incremental_count_default'] += 1
+                continue  # Skip this deal
+
+            forecast_value = float(new_arr or 0) + float(expansion_arr or 0)
 
         g['open_value'] += forecast_value
         g['open_count'] += 1
@@ -230,12 +250,29 @@ def main():
                 print(f"  ✓ {fq_label}: week-3 count={week3_count}, "
                       f"using won-deal avg=${avg_deal_size:,.0f} (bias-corrected)")
             else:
-                # Fallback: week-3 pipeline average
-                week3_value = sum(r.get('deal_value') or 0 for r in week3_qualified)
-                avg_deal_size = (week3_value / week3_count
-                               if week3_count > 0 else 0)
+                # Fallback: week-3 pipeline average. deals_snapshot has no
+                # new_arr/expansion_arr columns (never carried through by
+                # the point-in-time backfill), so unlike the open-deals loop
+                # above, this can't recompute Incremental ARR directly — the
+                # honest stopgap is null-propagation on deal_value itself,
+                # matching compute_waterfall.py's established treatment of
+                # this same table/column: exclude unknown-value deals from
+                # BOTH the sum and the average's denominator (never
+                # zero-fill), and count them for visibility. See
+                # PENDING_WORK.md for the real fix (a schema migration +
+                # backfill to carry new_arr/expansion_arr into the snapshot).
+                from null_propagation import null_propagate
+                npr = null_propagate(
+                    [r.get('deal_value') for r in week3_qualified], max_null_pct)
+                week3_value = npr['sum']
+                week3_known_count = npr['valued_count']
+                avg_deal_size = (week3_value / week3_known_count
+                               if week3_known_count > 0 else 0)
                 print(f"  ⚠️  {fq_label}: week-3 count={week3_count}, "
                       f"using week-3 avg=${avg_deal_size:,.0f} (no won-deal data)")
+                if npr['null_count'] > 0:
+                    print(f"      {npr['null_count']} week-3 deals with unknown "
+                          f"value excluded from the average (not zero-filled)")
 
         # Kellogg method: expected_wins = week3_count × conversion_rate
         # forecast = expected_wins × won_deal_avg (not pipeline avg — corrects 40% bias)
@@ -292,6 +329,10 @@ def main():
         if g['unknown_incremental_count'] > 0:
             print(f"  ⚠️  {g['unknown_incremental_count']} renewal deals excluded "
                   f"(both new_arr and expansion_arr NULL — incremental unknown, not zero)")
+
+        if g['unknown_incremental_count_default'] > 0:
+            print(f"  ⚠️  {g['unknown_incremental_count_default']} default-pipeline deals "
+                  f"excluded (both new_arr and expansion_arr NULL — incremental unknown, not zero)")
 
     print(f"\n✓ Wrote {written} forecast rows for {today_iso}")
 
