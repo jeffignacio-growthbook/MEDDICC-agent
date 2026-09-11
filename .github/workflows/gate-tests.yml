@@ -373,6 +373,52 @@ jobs:
           # as the standalone reason.
           PYTHONPATH=. python3 tests/test_pipeline_movement_owner_role_note.py
 
+      - name: "TEST 0r — Offline: query_pipeline_movement no longer silently drops real rows on exact-match string drift"
+        run: |
+          set -e
+          # 2026-09-11, round 3 of the same incident. Jeff confirmed
+          # directly against live data that the "no data" explanation
+          # itself was wrong: Jake Stangl has 10 CONFIRMED ACTIVE
+          # deals_snapshot rows for the exact 2026-09-08 snapshot /
+          # FY2027 Q3 / pipeline_id=default / owner_email filter
+          # query_pipeline_movement uses — and the live query returned
+          # zero. This is a real, previously-hidden bug in a dedicated,
+          # HIGH-confidence (0.85) handler — a separate code path from
+          # everything else fixed tonight in dynamic_query_loop.
+          #
+          # Ruled out from code/config inspection alone: pipeline
+          # exclusion (config/client.yaml excludes ONLY the renewal
+          # pipeline, 866608541 — "default" is the INCLUDED pipeline,
+          # never touched by the neq-exclusion branch) and a leftover
+          # stage_id filter (confirmed absent from the raw filters list
+          # sent to the DB — never existed in this code path at all).
+          #
+          # The real, structural risk: fiscal_quarter and owner_email
+          # both reach an exact-match `eq` filter as free-form text a
+          # model extracts from the question, with nothing canonicalizing
+          # either one first — unlike every other exact-match value this
+          # codebase resolves from free text (dimension terms, rep
+          # names), which already goes through a deterministic resolver
+          # for exactly this reason. api/router.py's own classifier
+          # prompt documents TWO conflicting quarter-label conventions
+          # a few lines apart ("FY2027 Q2" for this handler's
+          # fiscal_quarter, "Q3_FY2027" for a different handler's
+          # period_label) — exactly the kind of thing a model blends by
+          # accident, and a wrong space/underscore/reversed order
+          # returns zero rows with no error, indistinguishable from a
+          # real gap.
+          #
+          # _pm_normalize_fiscal_quarter() canonicalizes any FY/Q
+          # ordering, separator, or case before the DB filter;
+          # owner_email now matches via ilike (case-insensitive exact
+          # match) instead of eq. test_pipeline_movement_fiscal_quarter_
+          # filter_bug.py reproduces Jeff's exact confirmed 10-row case
+          # end-to-end against a filter-honoring fake Supabase (not just
+          # an echoed fixture), proves both hardenings independently,
+          # and confirms _pm_owner_role_note() — built for the
+          # genuinely-zero-rows case — never fires once real rows exist.
+          PYTHONPATH=. python3 tests/test_pipeline_movement_fiscal_quarter_filter_bug.py
+
       - name: "TEST 0n — Offline: every dynamic_query_loop invocation logs structured cost data"
         run: |
           set -e

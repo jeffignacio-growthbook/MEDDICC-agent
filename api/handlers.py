@@ -5,6 +5,7 @@ structured data (not prose). The router generates prose answers
 from this data using Sonnet.
 """
 
+import re
 import sys
 import logging
 from pathlib import Path
@@ -3760,7 +3761,9 @@ def _pm_owner_role_note(sb, owner_email: str, fiscal_quarter: str, excluded_pipe
         all_rows = select_all(
             sb, "deals_snapshot",
             columns="snapshot_date,fiscal_quarter,pipeline_id",
-            filters=[("eq", "owner_email", owner_email)],
+            # ilike, not eq — same case-insensitive exact-match reasoning
+            # as the main query's owner_email filter above.
+            filters=[("ilike", "owner_email", owner_email)],
         )
     except Exception:
         return None  # diagnostic query itself failed — say nothing rather than guess
@@ -3806,6 +3809,50 @@ def _pm_current_quarter_label():
     from utils import get_fiscal_quarter
     _, _, label = get_fiscal_quarter()
     return label
+
+
+_PM_FQ_FY_FIRST = re.compile(r'FY\s*[-_]?\s*(\d{4}).{0,3}?Q\s*[-_]?\s*([1-4])', re.IGNORECASE)
+_PM_FQ_Q_FIRST = re.compile(r'Q\s*[-_]?\s*([1-4]).{0,3}?FY\s*[-_]?\s*(\d{4})', re.IGNORECASE)
+
+
+def _pm_normalize_fiscal_quarter(raw):
+    """Canonicalize any reasonable spelling of a fiscal-quarter label to
+    the exact 'FY<year> Q<n>' form deals_snapshot.fiscal_quarter actually
+    stores (scripts/utils.py's get_fiscal_quarter() — single space, no
+    zero-padding). Returns the input unchanged if it doesn't look like a
+    fiscal-quarter label at all, rather than inventing a value.
+
+    2026-09-11: an SDR's 10 confirmed-active FY2027 Q3 deals were
+    invisible to query_pipeline_movement's exact-match fiscal_quarter
+    filter. The router's classifier prompt (api/router.py's
+    INTENT_PROMPT) extracts fiscal_quarter as free-form model-generated
+    text — "'FY2027 Q2' style label" — but the SAME prompt, a few lines
+    away, documents a DIFFERENT param (period_label) in the reversed
+    "Q3_FY2027" convention used by several other handlers (rep
+    attainment, rep pipeline). Two label conventions sitting next to
+    each other in one prompt is exactly the kind of thing a model
+    blends by accident, and unlike owner_email or a dimension term nothing
+    downstream ever canonicalized fiscal_quarter before it hit an exact
+    `eq` filter against Postgres — a single wrong space, underscore, or
+    reversed year/quarter order silently returns zero rows with no error
+    anywhere, indistinguishable from a real data gap. Every other
+    exact-match value this codebase resolves from free text (segment/
+    region terms, rep names) already goes through a deterministic
+    resolver for exactly this reason (see api/dimension_resolver.py); this
+    was the one that didn't.
+    """
+    if not raw:
+        return raw
+    s = str(raw).strip()
+    m = _PM_FQ_FY_FIRST.search(s)
+    if m:
+        year, quarter = m.group(1), m.group(2)
+    else:
+        m = _PM_FQ_Q_FIRST.search(s)
+        if not m:
+            return s
+        quarter, year = m.group(1), m.group(2)
+    return f"FY{year} Q{quarter}"
 
 
 def _pm_stage_name(stage_id, stage_cfg):
@@ -4250,6 +4297,11 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
                 "error": f"could not resolve current fiscal quarter ({e}); "
                          "pass fiscal_quarter explicitly",
             }
+    else:
+        # Explicit param, model-extracted from free text — canonicalize
+        # before it hits an exact-match DB filter. See
+        # _pm_normalize_fiscal_quarter()'s docstring for the incident.
+        fiscal_quarter = _pm_normalize_fiscal_quarter(fiscal_quarter)
 
     try:
         weeks = int(params.get("weeks")) if params.get("weeks") is not None else 4
@@ -4258,6 +4310,10 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     weeks = max(1, min(weeks, 13))
 
     owner_email = params.get("owner_email") or params.get("rep_email")
+    if owner_email:
+        # Model-extracted from free text (a rep's name or email) — strip
+        # incidental whitespace so it can't silently fail an exact match.
+        owner_email = str(owner_email).strip()
     pipeline_id = params.get("pipeline_id")
     deal_ids = params.get("deal_ids")
     close_date_scope = (params.get("close_date_scope") or "all").strip().lower()
@@ -4312,7 +4368,13 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     # ── load snapshot rows for the quarter ──
     filters = [("eq", "fiscal_quarter", fiscal_quarter)]
     if owner_email:
-        filters.append(("eq", "owner_email", owner_email))
+        # ilike (no wildcards) rather than eq: an exact case-insensitive
+        # match. HubSpot owner-email casing isn't guaranteed consistent
+        # with whatever casing a model reproduces from a rep's name, and
+        # an eq mismatch on case alone silently returns zero rows with
+        # no error — same failure shape as the fiscal_quarter incident
+        # this same round fixed.
+        filters.append(("ilike", "owner_email", owner_email))
     if pipeline_id:
         filters.append(("eq", "pipeline_id", str(pipeline_id)))
     else:
