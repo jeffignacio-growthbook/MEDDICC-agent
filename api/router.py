@@ -16,6 +16,12 @@ from llm_client import LLMClient
 from api.db import get_supabase, log_unanswered, is_admin, get_prior_entities, get_api_history
 from api import handlers
 from api.snapshot_diff import diff_snapshots, rows_for_snapshot_date
+from api.dimension_resolver import (
+    scan_question_for_known_dimension_terms, format_dimension_resolution_note,
+)
+from api.aggregation_verification import (
+    extract_stated_totals_from_answer, verify_aggregation_completeness,
+)
 
 # Configure logging for Railway (stderr is better captured than stdout)
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -2289,6 +2295,23 @@ async def dynamic_query_loop(question, history, params,
         if m["role"] in ("user", "assistant")
     ]
 
+    # 2026-09-11: proactive dimension resolution — BEFORE the model's
+    # first tool call, resolve any region/segment/rep term in the
+    # question against the governed sources (regions.yaml, client.yaml's
+    # segmentation, client.yaml's team roster) and hand the model the
+    # exact filter clause, same pattern as SNAPSHOT ANCHORS above. Every
+    # dimension bug this week (a fabricated "EMEA isn't a tracked
+    # region," a missing region/segment filter) was caught reactively —
+    # by verify_dimension_coverage() below, after the model had already
+    # guessed. This makes most of those catches unnecessary in the first
+    # place; the reactive gate stays as a backstop for anything this scan
+    # doesn't catch (an ambiguous rep name, a term worded in a way the
+    # scan doesn't recognize). See api/dimension_resolver.py.
+    resolved_dimensions = scan_question_for_known_dimension_terms(question)
+    dimension_resolution_note = format_dimension_resolution_note(resolved_dimensions)
+    if dimension_resolution_note:
+        logger.info(f"[DIMENSION_RESOLVE] {dimension_resolution_note}")
+
     # Build initial message content
     content_parts = [
         f"Question: {question}",
@@ -2296,6 +2319,8 @@ async def dynamic_query_loop(question, history, params,
     ]
     if snapshot_anchor_note:
         content_parts.append(snapshot_anchor_note)
+    if dimension_resolution_note:
+        content_parts.append(dimension_resolution_note)
     if quarter_context:
         content_parts.append(quarter_context)
     if hint:
@@ -2661,9 +2686,61 @@ async def dynamic_query_loop(question, history, params,
                         f"another)."
                     )
 
+                # MANDATORY GATE (2026-09-11): aggregation completeness —
+                # same check, same two historical incidents (missing
+                # week, missing segment), as the main loop's happy-path
+                # call site above. Bounded to ONE resynthesis here (this
+                # IS the last-resort finalize step; there's no further
+                # loop iteration budget to spend), naming the
+                # discrepancy explicitly, same as there.
+                final_answer_text = parsed2["answer"]
+                all_raw_rows_for_agg = []
+                for key, data in accumulated_data.items():
+                    if key.endswith("_raw"):
+                        all_raw_rows_for_agg.extend(data.get("rows", []) or [])
+                stated_totals = extract_stated_totals_from_answer(final_answer_text)
+                aggregation_check = verify_aggregation_completeness(
+                    all_raw_rows_for_agg, stated_totals)
+                if not aggregation_check["match"]:
+                    discrepancy = aggregation_check["discrepancy"]
+                    logger.warning(
+                        f"[AGGREGATION_VERIFY] finalize answer stated "
+                        f"{discrepancy['category']!r} = {discrepancy['stated']} "
+                        f"but retrieved rows sum to {discrepancy['actual_sum']} "
+                        f"— forcing one resynthesis (last retry available at "
+                        f"this finalize step)."
+                    )
+                    retry_prompt = (
+                        f"⚠️ Your answer stated {discrepancy['category']} = "
+                        f"{discrepancy['stated']:,.0f}, but the rows actually "
+                        f"retrieved for that category sum to "
+                        f"{discrepancy['actual_sum']:,.0f}. Recheck your "
+                        f"aggregation — you likely dropped a row, a week, or "
+                        f"a segment. Respond again with the CORRECTED figure "
+                        'as {"answer": "..."}.'
+                    )
+                    try:
+                        retry_synth = client.complete(
+                            messages=messages + [
+                                {"role": "user", "content": finalize_prompt},
+                                {"role": "assistant", "content": synth.text},
+                                {"role": "user", "content": retry_prompt},
+                            ],
+                            system=system, max_tokens=600)
+                        retry_parsed = _extract_json(retry_synth.text)
+                        if retry_parsed and retry_parsed.get("answer"):
+                            final_answer_text = retry_parsed["answer"]
+                    except Exception as e:
+                        logger.warning(
+                            f"[AGGREGATION_VERIFY] resynthesis retry raised: {e}")
+                    # Ship the retry's answer regardless of whether it now
+                    # matches — this is the last retry available at this
+                    # finalize step, and the model has already been told
+                    # the exact discrepancy explicitly, not left guessing.
+
                 logger.info(f"[LOOP] finalized from gathered data "
                             f"(reason={reason_tag})")
-                return {"answer": parsed2["answer"],
+                return {"answer": final_answer_text,
                         "tool_results": tr, "answered": True}
         except Exception:
             pass
@@ -2891,40 +2968,65 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
             verification_issues = []
 
-            # Check 1: Verify numeric totals if question is about amounts
+            # Check 1a: is the question about amounts at all, and did the
+            # answer state any $ figure? (log-only signal — a question
+            # about totals that names no number at all is worth flagging
+            # for monitoring even though there's nothing to recompute a
+            # discrepancy against.)
             amount_keywords = ['how much', 'total', 'sum', '$', 'arr', 'pipeline', 'revenue']
             is_amount_question = any(kw in question.lower() for kw in amount_keywords)
+            if is_amount_question and not re.search(r'\$[\d,]', answer_text):
+                verification_issues.append("no_amounts_stated")
+                logger.warning(f"[SYNTHESIS_VERIFY] Amount question but no $ stated in answer.")
 
-            if is_amount_question:
-                import re
-                # Extract $ amounts from answer
-                stated_amounts = []
-                for match in re.finditer(r'\$?([\d,]+\.?\d*)\s*([KkMm])?', answer_text):
-                    try:
-                        val = float(match.group(1).replace(',', ''))
-                        mult = match.group(2)
-                        if mult and mult.lower() == 'k':
-                            val *= 1000
-                        elif mult and mult.lower() == 'm':
-                            val *= 1000000
-                        stated_amounts.append(val)
-                    except ValueError:
-                        pass
+            # MANDATORY GATE (2026-09-11): aggregation completeness. This
+            # replaces what used to be here — a check that only logged a
+            # warning when the answer named NO dollar figure at all, and
+            # never verified whether a figure it DID state was actually
+            # correct. That's why it never caught either of the two
+            # historical incidents it was nominally guarding against: a
+            # stated week/segment breakdown that silently dropped real
+            # retrieved activity ("Aug 28: -$20K" when the real week-28
+            # activity, across both segments, was "$20K won + $100K
+            # lost"). verify_aggregation_completeness() recomputes the
+            # real sum per stated category from the RAW retrieved rows
+            # (not the aggregated/sampled view) and forces one
+            # resynthesis, naming the discrepancy explicitly, when they
+            # don't match — same escalation pattern (no_progress_streak,
+            # continue, _finalize_from_data as the 2-strike fallback)
+            # already proven for the scratchpad-rejection gate above.
+            all_raw_rows = []
+            for key, data in accumulated_data.items():
+                if key.endswith("_raw"):
+                    all_raw_rows.extend(data.get("rows", []) or [])
 
-                # Calculate actual totals from data
-                actual_totals = {}
-                for key, data in accumulated_data.items():
-                    if key.startswith("step_") and not key.endswith("_raw"):
-                        rows = data.get("rows", [])
-                        for col in ['won_value', 'lost_value', 'net_change', 'deal_value']:
-                            if rows and col in rows[0]:
-                                actual_totals[col] = sum(r.get(col, 0) or 0 for r in rows)
+            stated_totals = extract_stated_totals_from_answer(answer_text)
+            aggregation_check = verify_aggregation_completeness(all_raw_rows, stated_totals)
 
-                # Log for monitoring (don't fail, just warn)
-                if actual_totals and not stated_amounts:
-                    verification_issues.append("no_amounts_stated")
-                    logger.warning(f"[SYNTHESIS_VERIFY] Amount question but no $ stated. "
-                                 f"Actual totals: {actual_totals}")
+            if not aggregation_check["match"]:
+                discrepancy = aggregation_check["discrepancy"]
+                logger.warning(
+                    f"[AGGREGATION_VERIFY] stated {discrepancy['category']!r} = "
+                    f"{discrepancy['stated']} but the retrieved rows for that "
+                    f"category actually sum to {discrepancy['actual_sum']} — "
+                    f"forcing resynthesis."
+                )
+                correction = (
+                    f"⚠️ Your answer stated {discrepancy['category']} = "
+                    f"{discrepancy['stated']:,.0f}, but the rows actually "
+                    f"retrieved for that category sum to "
+                    f"{discrepancy['actual_sum']:,.0f}. Recheck your "
+                    f"aggregation — you likely dropped a row, a week, or a "
+                    f"segment from the total. Using ONLY the data already "
+                    f"gathered, respond again with the CORRECTED figure as "
+                    "{\"answer\": \"...\"}."
+                )
+                messages.append({"role": "assistant", "content": raw})
+                messages.append({"role": "user", "content": correction})
+                no_progress_streak += 1
+                if no_progress_streak >= 2:
+                    return await _finalize_from_data("aggregation_mismatch_unresolved")
+                continue
 
             # Check 2: Detect unverified completeness claims
             completeness_claims = ['partial', 'pending', 'incomplete', 'remaining.*pending']

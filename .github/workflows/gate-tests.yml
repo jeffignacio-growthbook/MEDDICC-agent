@@ -258,6 +258,65 @@ jobs:
           # asked the model to produce the comparison itself.
           PYTHONPATH=. python3 tests/test_snapshot_diff.py
 
+      - name: "TEST 0l — Offline: dimension terms are resolved proactively, before the model can guess"
+        run: |
+          set -e
+          # 2026-09-11: every dimension-related bug this week (a
+          # fabricated "EMEA isn't a tracked region," a missing region/
+          # segment filter) was caught REACTIVELY, by verify_dimension_
+          # coverage() below, after the model had already guessed —
+          # sometimes guessing wrong out loud to the user. api/dimension_
+          # resolver.py's resolve_dimension_filter() looks up any term a
+          # model might extract from a question against the SAME
+          # governed sources already built elsewhere (regions.yaml,
+          # client.yaml's segmentation.bands, client.yaml's team roster)
+          # and returns the exact filter clause — deterministically, no
+          # DB or LLM call. scan_question_for_known_dimension_terms() is
+          # wired into dynamic_query_loop BEFORE the model's first tool
+          # call: it resolves every plausible term in the question and
+          # injects a directive (same pattern as SNAPSHOT ANCHORS) so the
+          # model never has to guess which column/value a term means.
+          # The reactive gate (TEST 0 above) stays as an unchanged
+          # backstop for anything this scan doesn't catch. test_dimension
+          # _resolver.py proves EMEA resolves correctly via pure config
+          # lookup (making the reported fabrication structurally
+          # impossible), a shared first name ("Jake", two reps on the
+          # roster) returns an ambiguous error rather than a silent
+          # guess, and common-English-word collisions (the "ROW" region,
+          # the "Unknown" segment) are never injected as false-positive
+          # directives from ordinary prose.
+          PYTHONPATH=. python3 tests/test_dimension_resolver.py
+
+      - name: "TEST 0m — Offline: aggregation totals are verified against retrieved rows, in code"
+        run: |
+          set -e
+          # 2026-09-11: the original synthesis-aggregation bug from days
+          # ago (dropping a week, dropping a segment from a stated
+          # total) was fixed only at the prompt level — "report data
+          # from EVERY row/week/segment... never anchor on subset." A
+          # prompt instruction asking the model to be careful is the
+          # same category of fix as asking it not to narrate a
+          # scratchpad; it doesn't hold up. api/aggregation_verification
+          # .py's verify_aggregation_completeness() recomputes the real
+          # sum per stated category from the ACTUAL retrieved rows and
+          # compares, in code. Wired in as a mandatory check between
+          # "model produces answer text" and "answer is shipped to
+          # Slack" — same insertion point as the scratchpad check, same
+          # escalation pattern (one forced resynthesis naming the
+          # discrepancy explicitly, e.g. "you said $120K total but the
+          # retrieved rows sum to $195K"). test_aggregation_verification
+          # .py reconstructs both historical incidents as fixtures
+          # directly from the prompt's own worked examples (a missing
+          # week: stated $20K vs real -$155K across three weeks; a
+          # missing segment: stated "Aug 28: -$20K" vs the real -$80K
+          # once the OTHER segment's -$100K is included), confirms a
+          # correct, complete aggregation is never a false positive, and
+          # drives the real dynamic_query_loop end-to-end proving a wrong
+          # total forces exactly one resynthesis with both the stated
+          # and actual figures named, while a correct first answer ships
+          # immediately with no wasted retry.
+          PYTHONPATH=. python3 tests/test_aggregation_verification.py
+
       - name: "TEST 0g — Offline: loop ceiling is sized against the hardest question, not one incident"
         run: |
           set -e
