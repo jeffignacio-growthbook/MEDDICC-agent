@@ -5,22 +5,39 @@ quota targets, and unanswered query logs.
 """
 
 import os
+import sys
 import json
 import base64
 import logging
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
-from supabase import create_client, Client
+from supabase import create_client, Client, ClientOptions
+
+sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+from supabase_client import _resilient_httpx_client
 
 logger = logging.getLogger("cro_agent")
 _sb = None
 
 def get_supabase() -> Client:
-    """Singleton Supabase client."""
+    """Singleton Supabase client.
+
+    2026-09-11: this singleton lives for the entire process lifetime (a
+    long-running Railway service), which is exactly the shape that
+    exposes httpx/HTTP2's "connection looked fine at checkout, died
+    mid-request" gap — see _resilient_httpx_client()'s docstring in
+    scripts/supabase_client.py for the full root-cause writeup (a
+    production log showed httpx.RemoteProtocolError: ConnectionTerminated
+    recurring across multiple independent handlers). The injected
+    httpx_client retries exactly once when that happens, transparently,
+    for every call made through this client.
+    """
     global _sb
     if _sb is None:
         _sb = create_client(
             os.environ["SUPABASE_URL"],
-            os.environ["SUPABASE_SERVICE_KEY"]
+            os.environ["SUPABASE_SERVICE_KEY"],
+            options=ClientOptions(httpx_client=_resilient_httpx_client())
         )
         # Log which role this key grants (diagnostic for RLS issues)
         _log_supabase_role()

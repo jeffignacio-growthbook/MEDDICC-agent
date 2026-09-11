@@ -7,12 +7,64 @@ Handles parallel writes to Supabase alongside GitHub for:
 - Call transcripts with signal detection (feature gaps, objections)
 - MEDDICC analyses with full scoring breakdown
 """
-from supabase import create_client, Client
+from supabase import create_client, Client, ClientOptions
+import httpx
+import logging
 import os
 import re
 import json
 from datetime import datetime, date
 from typing import Optional
+
+logger = logging.getLogger(__name__)
+
+
+class _RetryOnDeadConnectionTransport(httpx.HTTPTransport):
+    """Retries a request exactly once if the pooled connection it landed on
+    turns out to already be dead (httpx.RemoteProtocolError /
+    ConnectionTerminated).
+
+    2026-09-11: a production log showed this app's long-lived Supabase
+    client (get_supabase()'s singleton in api/db.py; SupabaseWriter here)
+    repeatedly hitting httpx.RemoteProtocolError: ConnectionTerminated
+    mid-request, across unrelated handlers. Root-caused by reading
+    httpcore 1.0.9's HTTP/2 connection code directly: httpcore's pool
+    checkout check (is_available()) only inspects LOCAL connection state
+    (has an h2 ProtocolError/GOAWAY already been read off the socket?),
+    which has no way to know the server side has already closed/capped a
+    connection until the client actually attempts the next stream on it.
+    When that happens, httpcore raises RemoteProtocolError straight to
+    the caller instead of the ConnectionNotAvailable it uses for
+    failures that ARE detectable at checkout time — so httpx's own pool
+    never retries this case on its own.
+    httpx.HTTPTransport(retries=N) does NOT cover this either: per
+    httpcore's own docstring, that parameter only retries CONNECTION-
+    ESTABLISHMENT failures, not a mid-stream failure on a connection
+    that was already established and looked fine at checkout.
+    By the time this except-block runs, httpcore has already torn down
+    the failed connection (see http2.py's _response_closed(), which
+    calls close() once a terminated stream has no other events pending)
+    and marked it CLOSED, so the pool will not hand the SAME dead
+    connection back out for the retry below — it gets a different
+    live connection, or the pool establishes a fresh one.
+    """
+
+    def handle_request(self, request: httpx.Request) -> httpx.Response:
+        try:
+            return super().handle_request(request)
+        except httpx.RemoteProtocolError as e:
+            logger.warning(
+                f"[SUPABASE_RETRY] {request.method} {request.url.path} hit "
+                f"a dead connection ({e!r}) — retrying once"
+            )
+            return super().handle_request(request)
+
+
+def _resilient_httpx_client() -> httpx.Client:
+    """An httpx.Client pre-configured with the dead-connection retry above,
+    for injection via supabase.ClientOptions(httpx_client=...) — the hook
+    supabase-py exposes specifically for a caller-supplied httpx.Client."""
+    return httpx.Client(http2=True, transport=_RetryOnDeadConnectionTransport(http2=True))
 
 FEATURE_GAP_KEYWORDS = [
     'feature gap', 'missing feature', "doesn't support", "can't do",
@@ -124,7 +176,9 @@ class SupabaseWriter:
         if not url or not key:
             raise ValueError(
                 'SUPABASE_URL and SUPABASE_SERVICE_KEY must be set')
-        self.client: Client = create_client(url, key)
+        self.client: Client = create_client(
+            url, key,
+            options=ClientOptions(httpx_client=_resilient_httpx_client()))
 
     def upsert_deal(self, deal: dict) -> None:
         """Upsert a deal from the deal index or analytics ETL."""
