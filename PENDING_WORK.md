@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-11 (added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
+**Last Updated:** 2026-09-11 (added High Priority #3, a follow-up audit of every other dedicated handler for the same owner-email exact-match risk found in query_pipeline_movement — defensive logging shipped everywhere, deeper canonicalization fix still pending per-handler; added High Priority #2, a query_pipeline_movement zero-row bug for an SDR that is MITIGATED but NOT root-caused — two hypotheses hardened, two more ruled out, the actual trigger still unconfirmed; added Low Priority #5, a confirmed-inert `synthesis_aggregation_fix.py` at the repo root that should be deleted or marked historical; ⚠️ see High Priority #0, a committed DB credential needs rotation)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -546,6 +546,71 @@ tests/test_pipeline_movement_owner_role_note.py.
 
 ---
 
+#### 3. Dedicated Handlers: Owner-Email Canonicalization Gap (audit follow-up)
+
+**Issue:** Following the `query_pipeline_movement` incident (#2 above),
+an audit of every OTHER dedicated handler in `api/handlers.py` that
+builds its own direct Supabase filters (not routed through
+`dynamic_query_loop`) found several that filter `owner_email`/
+`sdr_email` with an exact-match `eq` against a raw value from `params`
+— i.e. whatever a model extracted from free text — with no case-fold
+and no roster resolution via `_resolve_owner_email()`. This is the
+same risk class as `query_pipeline_movement`'s bug, just not yet
+confirmed to have caused an incident in any of these specific handlers.
+
+**Status:** DEFENSIVE LOGGING SHIPPED (2026-09-11, commit — see TEST
+0t), CANONICALIZATION NOT YET APPLIED. Every handler below now logs
+its fully-constructed filter clause unconditionally before the
+Supabase call, so a future zero-row incident on any of them leaves a
+byte-exact trace immediately instead of requiring another multi-hour
+blind investigation. The deeper fix — actually canonicalizing the
+value before filtering, the way `query_pipeline_movement` now does via
+`ilike` and `_pm_normalize_fiscal_quarter()` — was deliberately left
+out of this pass: it changes real production query behavior across
+several live handlers at once, and deserves its own scoped review
+rather than a blanket sweep bundled into a logging-only fix.
+
+**Handlers needing the deeper fix, ranked by the audit's risk
+assessment:**
+1. `query_pipeline` (~2014) — HIGHEST. Raw `owner_email` eq, no
+   resolver at all. The single most-used top-level handler ("what's
+   our pipeline").
+2. `query_call_quality` (~3516, team/rep mode) — raw `owner_email` eq,
+   no resolver.
+3. `query_sdr_metrics` (~1714) — raw `sdr_email` eq against
+   `sdr_users.user_email` and `meetings.owner_email`, no case-fold, no
+   roster resolution.
+4. `query_sdr_pipeline_sourced` (~1627) — raw `sdr_email` eq against
+   `sdr_owner_email` or `owner_email` depending on config.
+5. `query_stale_deals` (~2721) — owner_email IS resolved via
+   `_resolve_owner_email()` (good), but `stage` is a raw eq filter
+   against free-text-extracted stage names with no canonicalization
+   against actual DB stage strings/casing.
+
+Lower risk (already call `_resolve_owner_email()`, or use
+deterministically-computed rather than free-text values):
+`query_rep_pipeline`, `query_deal_health`, `query_team_leaderboard`,
+`query_coverage` — these got the logging pass for completeness but
+don't need the canonicalization fix.
+
+**Work required:** for each of the 5 handlers above, either route
+`owner_email`/`sdr_email` through `_resolve_owner_email()` (where a
+name-or-email param makes sense) or switch the filter op from `eq` to
+`ilike` (case-insensitive exact match, no wildcards) the way
+`query_pipeline_movement` now does; for `query_stale_deals`'s `stage`
+param specifically, canonicalize against the real stage glossary
+(`api/field_semantics.py`'s `STAGE_MAP`) before filtering.
+
+**Complexity:** Low-medium per handler; the work itself is
+well-understood and mirrors the exact fix already proven in
+`query_pipeline_movement`. Deserves per-handler testing before
+shipping, not a single blanket sweep.
+
+**Documentation:** this session's investigation (handler audit);
+logging fix in `tests/test_handler_filter_logging.py`.
+
+---
+
 ### Low Priority
 
 #### 1. Zero-Day Cycle Time Deals
@@ -724,10 +789,12 @@ Without step 3, LLM query builder cannot see the column exists.
 
 ## 📊 Summary
 
-**Total Open Items:** 8
-- High Priority: 3 (⚠️ URGENT: committed DB password needs rotation,
+**Total Open Items:** 9
+- High Priority: 4 (⚠️ URGENT: committed DB password needs rotation,
   snapshot ETL phantom exits, query_pipeline_movement zero-row mystery
-  for an SDR — mitigated but not root-caused)
+  for an SDR — mitigated but not root-caused, and a follow-up
+  canonicalization gap in 5 other dedicated handlers — logging shipped,
+  fix still pending)
 - Low Priority: 5 (zero-day cycle times, forecast bugs, rep-name-to-email
   matching, snapshot ETL date.today() day-boundary stamp, dead
   synthesis_aggregation_fix.py needs deleting or marking historical)

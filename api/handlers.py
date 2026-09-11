@@ -872,9 +872,11 @@ async def query_coverage(params: dict, sb) -> dict:
     tw = _resolve_tw(params)
     period_label = tw.get("label", "").replace(" ", "_")
 
+    coverage_targets_filters = [("eq", "period", period_label)]
+    logger.info(f"[QUERY_COVERAGE_FILTER] table='rep_targets' filters={coverage_targets_filters!r}")
     targets = select_all(sb, "rep_targets",
         columns="level,entity_name,role,metric,target_value",
-        filters=[("eq", "period", period_label)])
+        filters=coverage_targets_filters)
 
     deals = select_all(sb, "deals",
         columns="deal_value,deal_status,stage,owner_email,"
@@ -1668,6 +1670,7 @@ async def query_sdr_pipeline_sourced(params: dict, sb) -> dict:
         # Note: This will miss deals that have been handed off from SDR to AE
 
     # Query deals table
+    logger.info(f"[QUERY_SDR_PIPELINE_SOURCED_FILTER] table='deals' filters={filters!r}")
     rows = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,stage,owner_email,sdr_owner_email,create_date",
         filters=filters
@@ -1725,9 +1728,11 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
         }
 
     # Get user's tool_user_id from sdr_users table
+    sdr_users_filters = [("eq", "user_email", sdr_email)]
+    logger.info(f"[QUERY_SDR_METRICS_FILTER] table='sdr_users' filters={sdr_users_filters!r}")
     user_rows = select_all(sb, "sdr_users",
         columns="tool,tool_user_id,user_name,user_email",
-        filters=[("eq", "user_email", sdr_email)]
+        filters=sdr_users_filters
     )
 
     if not user_rows:
@@ -1760,13 +1765,15 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
     total_emails = sum(m.get("emails_sent") or 0 for m in metrics_rows)
 
     # Query meetings data
+    meetings_filters = [
+        ("eq", "owner_email", sdr_email),
+        ("gte", "scheduled_at", tw["start"]),
+        ("lte", "scheduled_at", tw["end"])
+    ]
+    logger.info(f"[QUERY_SDR_METRICS_FILTER] table='meetings' filters={meetings_filters!r}")
     meetings_rows = select_all(sb, "meetings",
         columns="scheduled_at,held,held_confidence,title",
-        filters=[
-            ("eq", "owner_email", sdr_email),
-            ("gte", "scheduled_at", tw["start"]),
-            ("lte", "scheduled_at", tw["end"])
-        ]
+        filters=meetings_filters
     )
 
     # Meetings breakdown: Call recordings can confirm held but not no-shows
@@ -2061,6 +2068,14 @@ async def query_pipeline(params: dict, sb) -> dict:
     # Pipeline type filtering (only if requested)
     pipeline_filter = params.get("pipeline_filter")  # e.g., "new_business", "renewal"
 
+    # 2026-09-11: defensive logging added across every dedicated handler
+    # that builds its own direct Supabase filters (the same category
+    # query_pipeline_movement fell into) after a zero-row bug there went
+    # unexplainable for hours because nobody had the actual outgoing
+    # filter clause to compare against known-good data. Unconditional,
+    # costs nothing when the handler works — see api/handlers.py's
+    # query_pipeline_movement for the incident this pattern closes.
+    logger.info(f"[QUERY_PIPELINE_FILTER] table='deals' filters={base_filters!r}")
     # Fetch all active deals with ARR breakdown fields
     deals_rows = select_all(
         sb, "deals",
@@ -2297,6 +2312,7 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
     ]
     
     # Get active deals for this rep
+    logger.info(f"[QUERY_REP_PIPELINE_FILTER] table='deals' filters={filters!r}")
     deals_rows = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,stage,close_date,forecast_category",
         filters=filters
@@ -2629,6 +2645,7 @@ async def query_deal_health(params: dict, sb) -> dict:
         deals_filters.append(("gte", "close_date", tw["start"]))
         deals_filters.append(("lte", "close_date", tw["end"]))
     
+    logger.info(f"[QUERY_DEAL_HEALTH_FILTER] table='deals' filters={deals_filters!r}")
     deals_rows = select_all(sb, "deals",
         columns="deal_id,company_name,owner_email,close_date,deal_value",
         filters=deals_filters
@@ -2748,11 +2765,12 @@ async def query_stale_deals(params: dict, sb) -> dict:
         filters.append(("gte", "close_date", tw["start"]))
         filters.append(("lte", "close_date", tw["end"]))
     
+    logger.info(f"[QUERY_STALE_DEALS_FILTER] table='deals' filters={filters!r}")
     deals_rows = select_all(sb, "deals",
         columns="deal_id,company_name,owner_email,stage,close_date,deal_value,last_analyzed,updated_at",
         filters=filters
     )
-    
+
     # Get latest analysis for each deal
     analyses_map = {}
     if deals_rows:
@@ -2877,13 +2895,15 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
     )
     
     # Get targets for this period
+    targets_filters = [
+        ("eq", "period", period),
+        ("eq", "level", "rep"),
+        ("eq", "role", "ae")
+    ]
+    logger.info(f"[QUERY_TEAM_LEADERBOARD_FILTER] table='rep_targets' filters={targets_filters!r}")
     targets = select_all(sb, "rep_targets",
         columns="entity_email,target_value,metric",
-        filters=[
-            ("eq", "period", period),
-            ("eq", "level", "rep"),
-            ("eq", "role", "ae")
-        ]
+        filters=targets_filters
     )
     
     # Get all personas
@@ -3581,6 +3601,7 @@ async def query_call_quality(params: dict, sb) -> dict:
     if tw.get("end"):
         filters.append(("lte", "call_date", tw["end"]))
 
+    logger.info(f"[QUERY_CALL_QUALITY_FILTER] table='call_quality' filters={filters!r}")
     quality_rows = select_all(sb, "call_quality",
         columns="owner_email,call_date,overall_quality_score,"
                 "quantification_score,decision_process_score,"

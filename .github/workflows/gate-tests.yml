@@ -480,6 +480,36 @@ jobs:
           # blocked this investigation from the start.
           PYTHONPATH=. python3 tests/test_pipeline_movement_fiscal_quarter_filter_bug.py
 
+      - name: "TEST 0t — Offline: every dedicated handler with its own DB filters logs the exact clause before querying"
+        run: |
+          set -e
+          # 2026-09-11, fix #3 of the same night's batch: an audit of
+          # every OTHER dedicated handler in api/handlers.py that builds
+          # its own direct Supabase filters (NOT routed through
+          # dynamic_query_loop — the same category query_pipeline_
+          # movement fell into) found none of them had the defensive
+          # filter-logging the Jake Stangl incident above proved
+          # necessary. Ranked by resemblance to that bug (own filter
+          # construction + free-text-extracted exact-match values, most
+          # often owner_email/sdr_email with no case-fold or roster
+          # resolution + no diagnostic trace): query_pipeline (highest
+          # risk — the single most-used top-level handler, raw
+          # owner_email eq, no resolver at all), query_call_quality,
+          # query_sdr_metrics, query_sdr_pipeline_sourced,
+          # query_stale_deals, query_rep_pipeline, query_deal_health,
+          # query_team_leaderboard, query_coverage. Each now logs its
+          # fully-constructed filter clause — table, columns where
+          # relevant, every (operator, column, value) tuple via !r —
+          # unconditionally, right before the Supabase call, same
+          # pattern and same cost (none, when the handler works) as
+          # query_pipeline_movement's fix. query_rep_attainment already
+          # had this kind of logging before tonight and isn't re-tested
+          # here. test_handler_filter_logging.py drives each handler
+          # for real (Supabase stubbed, not the handler's own logic)
+          # and captures the actual logger output, confirming every one
+          # of them now leaves a byte-exact trace.
+          PYTHONPATH=. python3 tests/test_handler_filter_logging.py
+
       - name: "TEST 0n — Offline: every dynamic_query_loop invocation logs structured cost data"
         run: |
           set -e
