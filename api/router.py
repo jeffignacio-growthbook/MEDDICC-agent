@@ -11,6 +11,7 @@ import logging
 import sys
 from pathlib import Path
 from datetime import datetime
+from typing import Optional
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from llm_client import LLMClient
 from api.db import get_supabase, log_unanswered, is_admin, get_prior_entities, get_api_history
@@ -2177,6 +2178,74 @@ def resolve_snapshot_anchors(sb, time_window: dict) -> str:
     return format_snapshot_anchor_note(current_snap, prior_snap, time_window)
 
 
+def _new_cost_state() -> dict:
+    """Mutable per-invocation state _dynamic_query_loop_core() populates
+    as it runs, so dynamic_query_loop()'s wrapper can log a structured
+    cost row afterward regardless of how the core function exits (a
+    clean answer, any give-up path, or an uncaught exception). See
+    dynamic_query_loop()'s own docstring for why this exists."""
+    return {
+        "final_iteration": None,
+        "final_tokens_used": 0,
+        "reason_tag": None,
+        "resolved_dimension_terms": [],
+        "primitives_fired": {
+            "snapshot_anchor_injected": False,
+            "dimension_resolver_matched": False,
+            "enrichment_shortcut_fired": False,
+            "scratchpad_rejection_fired": False,
+            "aggregation_mismatch_caught": False,
+            "forced_anchor_fetch_fired": False,
+            "snapshot_diff_computed": False,
+        },
+    }
+
+
+def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
+                                 exc_raised: Optional[BaseException]) -> str:
+    """One of: "exception", "answered_cleanly", "answered_after_resynthesis",
+    "budget_exhausted", "other_fallback". See dynamic_query_loop()'s
+    docstring for what each means."""
+    if exc_raised is not None or result is None:
+        return "exception"
+    if result.get("answered"):
+        primitives = cost_state["primitives_fired"]
+        if primitives["scratchpad_rejection_fired"] or primitives["aggregation_mismatch_caught"]:
+            return "answered_after_resynthesis"
+        return "answered_cleanly"
+    if cost_state.get("reason_tag") == "budget_exhausted":
+        return "budget_exhausted"
+    return "other_fallback"
+
+
+def _log_query_cost(sb, question: str, cost_state: dict, result: Optional[dict],
+                     exc_raised: Optional[BaseException]) -> None:
+    """Best-effort structured cost logging for every dynamic_query_loop
+    invocation — never allowed to affect the actual response; a logging
+    failure here is caught and warned about, same discipline as
+    _fallback_log/_log_successful_query. Writes to query_cost_log
+    (migration 063), a dedicated table rather than reusing fallback_log:
+    fallback_log only ever gets a row on specific give-up/success call
+    sites (not every exit path, and with no iteration/token/primitive
+    breakdown), which is exactly the gap this closes — every invocation,
+    one row, regardless of outcome.
+    """
+    try:
+        outcome = _compute_query_cost_outcome(result, cost_state, exc_raised)
+        sb.table("query_cost_log").insert({
+            "question": question,
+            "final_iteration_count": cost_state.get("final_iteration"),
+            "final_tokens_used": cost_state.get("final_tokens_used"),
+            "primitives_fired": cost_state.get("primitives_fired"),
+            "resolved_dimension_terms": cost_state.get("resolved_dimension_terms"),
+            "reason_tag": cost_state.get("reason_tag"),
+            "outcome": outcome,
+            "answered": bool(result.get("answered")) if result else False,
+        }).execute()
+    except Exception as e:
+        logger.warning(f"[QUERY_COST_LOG] Failed to write query_cost_log: {e}")
+
+
 async def dynamic_query_loop(question, history, params,
                               sb, client,
                               hint: str = "",
@@ -2184,6 +2253,61 @@ async def dynamic_query_loop(question, history, params,
                               classifier_client=None,
                               origin_handler: str = "",
                               origin_reason: str = "") -> dict:
+    """
+    Thin cost-logging wrapper around _dynamic_query_loop_core() — see
+    that function for the actual multi-turn tool-calling loop.
+
+    2026-09-11: every invocation gets exactly one query_cost_log row,
+    independent of whether it succeeds, hits budget, or fails any other
+    way (including an uncaught exception) — a try/finally around the
+    core call, not instrumentation scattered across the core's dozen
+    return points, guarantees this regardless of which one fires. Pure
+    observability: no behavior visible to a caller changes here. The
+    ceiling itself (DYNAMIC_LOOP_TOKEN_BUDGET=200_000,
+    DYNAMIC_LOOP_MAX_ITERATIONS=12) is deliberately left untouched — a
+    real week or two of this log's data, not another guess, is what
+    should ever move it next.
+
+    outcome is one of:
+      "answered_cleanly"          — answered=True, no forced resynthesis
+      "answered_after_resynthesis" — answered=True, but the scratchpad-
+                                     rejection or aggregation-completeness
+                                     gate forced at least one retry
+      "budget_exhausted"          — answered=False, gave up on the
+                                     internal ceiling
+      "other_fallback"            — answered=False, any other give-up
+                                     reason (repetition, no progress,
+                                     unresolved aggregation mismatch, ...)
+      "exception"                 — the core loop raised; re-raised to
+                                     the caller unchanged after logging
+    """
+    cost_state = _new_cost_state()
+    result = None
+    exc_raised = None
+    try:
+        result = await _dynamic_query_loop_core(
+            question, history, params, sb, client,
+            hint=hint, roster_text=roster_text,
+            classifier_client=classifier_client,
+            origin_handler=origin_handler, origin_reason=origin_reason,
+            cost_state=cost_state,
+        )
+        return result
+    except Exception as e:
+        exc_raised = e
+        raise
+    finally:
+        _log_query_cost(sb, question, cost_state, result, exc_raised)
+
+
+async def _dynamic_query_loop_core(question, history, params,
+                              sb, client,
+                              hint: str = "",
+                              roster_text: str = "",
+                              classifier_client=None,
+                              origin_handler: str = "",
+                              origin_reason: str = "",
+                              cost_state: Optional[dict] = None) -> dict:
     """
     Multi-turn tool-calling loop for novel questions.
     Agent calls tools until it has enough data to answer.
@@ -2205,7 +2329,17 @@ async def dynamic_query_loop(question, history, params,
     `origin_handler` / `origin_reason` name the precomputed handler that fell
     through to here and why (PART 1). Empty when the loop was entered directly
     (a `dynamic_query` intent), i.e. this IS the primary path, not a fallback.
+
+    `cost_state`, when given by the dynamic_query_loop() wrapper, is a
+    mutable dict this function populates as it runs (final iteration/
+    token counts, which primitives fired, the give-up reason_tag) so the
+    wrapper can log a cost row after this function returns or raises.
+    Defaults to a throwaway dict when called directly (e.g. from tests
+    or scripts that don't need the logging) so this parameter is never
+    required.
     """
+    if cost_state is None:
+        cost_state = _new_cost_state()
     from api.schema_context import get_schema_context
     from api.table_classifier import classify_relevant_tables
     from api.time_resolver import resolve_time_window
@@ -2265,6 +2399,7 @@ async def dynamic_query_loop(question, history, params,
             current_snapshot_date, prior_snapshot_date, params.get("time_window", {}))
         if snapshot_anchor_note:
             logger.info(f"[SNAPSHOT_ANCHOR] {snapshot_anchor_note}")
+            cost_state["primitives_fired"]["snapshot_anchor_injected"] = True
 
     # Lightweight mode: only core columns get descriptions to reduce prompt size
     # 20K char system prompt was costing 5K tokens per turn. Lightweight mode
@@ -2311,6 +2446,9 @@ async def dynamic_query_loop(question, history, params,
     dimension_resolution_note = format_dimension_resolution_note(resolved_dimensions)
     if dimension_resolution_note:
         logger.info(f"[DIMENSION_RESOLVE] {dimension_resolution_note}")
+    if resolved_dimensions:
+        cost_state["primitives_fired"]["dimension_resolver_matched"] = True
+        cost_state["resolved_dimension_terms"] = [r["term"] for r in resolved_dimensions]
 
     # Build initial message content
     content_parts = [
@@ -2462,6 +2600,7 @@ async def dynamic_query_loop(question, history, params,
 
     def _give_up(reason_tag, tail):
         """Return an answered=False result with a plain diagnostic + log."""
+        cost_state["reason_tag"] = reason_tag
         _fallback_log(reason_tag)
         return {
             "answer": _diagnostic_answer(tail, reason_tag=reason_tag),
@@ -2481,6 +2620,8 @@ async def dynamic_query_loop(question, history, params,
         to force one direct filter_table call (see below) before falling
         through to the normal synthesis/give-up branches.
         """
+        nonlocal tokens_used
+        cost_state["reason_tag"] = reason_tag
         # A scratchpad-rejection finalize can land here with a snapshot-
         # comparison question still missing a required anchor: the model
         # narrated an answer twice instead of tool-calling (the redirect
@@ -2535,6 +2676,7 @@ async def dynamic_query_loop(question, history, params,
                                 f"{len(forced_result.get('rows', []))} rows "
                                 f"for snapshot_date={missing_date}"
                             )
+                            cost_state["primitives_fired"]["forced_anchor_fetch_fired"] = True
                         else:
                             logger.warning(
                                 f"[FINALIZE] forced anchor fetch returned "
@@ -2599,6 +2741,7 @@ async def dynamic_query_loop(question, history, params,
                     f"{len(diff_result['owner_changes'])} owner changes "
                     f"(current={len(current_rows)} rows, prior={len(prior_rows)} rows)"
                 )
+                cost_state["primitives_fired"]["snapshot_diff_computed"] = True
 
         try:
             if diff_result is not None:
@@ -2649,6 +2792,14 @@ async def dynamic_query_loop(question, history, params,
             synth = client.complete(
                 messages=messages + [{"role": "user", "content": finalize_prompt}],
                 system=system, max_tokens=600)
+            # 2026-09-11: this call was previously invisible to
+            # tokens_used entirely — a finalize-path invocation always
+            # spends at least this much, so leaving it out made the
+            # "actual measured" token count in query_cost_log an
+            # undercount for exactly the requests most worth measuring
+            # accurately (the ones that reached finalization at all).
+            tokens_used += synth.input_tokens + synth.output_tokens
+            cost_state["final_tokens_used"] = tokens_used
             parsed2 = _extract_json(synth.text)
             if parsed2 and parsed2.get("answer"):
                 # MANDATORY GATE: Dimension coverage verification (finalization path)
@@ -2702,6 +2853,7 @@ async def dynamic_query_loop(question, history, params,
                 aggregation_check = verify_aggregation_completeness(
                     all_raw_rows_for_agg, stated_totals)
                 if not aggregation_check["match"]:
+                    cost_state["primitives_fired"]["aggregation_mismatch_caught"] = True
                     discrepancy = aggregation_check["discrepancy"]
                     logger.warning(
                         f"[AGGREGATION_VERIFY] finalize answer stated "
@@ -2727,6 +2879,8 @@ async def dynamic_query_loop(question, history, params,
                                 {"role": "user", "content": retry_prompt},
                             ],
                             system=system, max_tokens=600)
+                        tokens_used += retry_synth.input_tokens + retry_synth.output_tokens
+                        cost_state["final_tokens_used"] = tokens_used
                         retry_parsed = _extract_json(retry_synth.text)
                         if retry_parsed and retry_parsed.get("answer"):
                             final_answer_text = retry_parsed["answer"]
@@ -2758,6 +2912,11 @@ Answer: {answer}
 Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
     for iteration in range(MAX_ITERATIONS):
+        # Recorded unconditionally at the top of every iteration (before
+        # any branch/return below can fire) so query_cost_log always
+        # reflects the correct final iteration count, whichever exit
+        # path actually runs this turn.
+        cost_state["final_iteration"] = iteration
         # INSTRUMENTATION: Log context sizes to find what's accumulating
         import json
         sizes = {
@@ -2793,6 +2952,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             max_tokens=800,
         )
         tokens_used += resp.input_tokens + resp.output_tokens
+        cost_state["final_tokens_used"] = tokens_used
 
         # Post-call verification (should never trigger if prediction is accurate)
         if tokens_used > TOKEN_BUDGET:
@@ -2833,6 +2993,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 # _looks_like_unfinished_scratchpad() docstring for the
                 # incident this closes.
                 if _looks_like_unfinished_scratchpad(stripped):
+                    cost_state["primitives_fired"]["scratchpad_rejection_fired"] = True
                     logger.warning(
                         f"[LOOP iter={iteration}] prose response looks like "
                         f"unfinished scratchpad/narration, not a clean final "
@@ -2934,6 +3095,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             # same detector, applied to both the places an answer can
             # originate from.
             if _looks_like_unfinished_scratchpad(answer_text):
+                cost_state["primitives_fired"]["scratchpad_rejection_fired"] = True
                 logger.warning(
                     f"[LOOP iter={iteration}] JSON answer reads as "
                     f"unfinished scratchpad/narration — forcing a clean "
@@ -3004,6 +3166,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             aggregation_check = verify_aggregation_completeness(all_raw_rows, stated_totals)
 
             if not aggregation_check["match"]:
+                cost_state["primitives_fired"]["aggregation_mismatch_caught"] = True
                 discrepancy = aggregation_check["discrepancy"]
                 logger.warning(
                     f"[AGGREGATION_VERIFY] stated {discrepancy['category']!r} = "
@@ -3384,6 +3547,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     )})
                     continue
 
+                cost_state["primitives_fired"]["enrichment_shortcut_fired"] = True
                 logger.info(
                     f"[ENRICHMENT_LOOKUP] iteration {iteration} only "
                     f"re-fetched fields for {len(known_ids)} already-known "

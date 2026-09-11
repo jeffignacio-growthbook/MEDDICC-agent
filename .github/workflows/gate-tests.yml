@@ -317,6 +317,31 @@ jobs:
           # immediately with no wasted retry.
           PYTHONPATH=. python3 tests/test_aggregation_verification.py
 
+      - name: "TEST 0n — Offline: every dynamic_query_loop invocation logs structured cost data"
+        run: |
+          set -e
+          # 2026-09-11: the 200K-token/12-iteration ceiling (TEST 0g)
+          # stays deliberately generous and untouched by this change —
+          # no ceiling tuning here. What this adds is the data a future
+          # decision about that ceiling should be based on: one
+          # query_cost_log row (migration 063) per dynamic_query_loop
+          # invocation, independent of outcome — question text, final
+          # iteration/token counts (actual measured, via a try/finally
+          # around the whole loop rather than instrumenting its dozen
+          # individual return points), which structural primitives fired
+          # (snapshot anchor, dimension resolver, enrichment shortcut,
+          # scratchpad rejection, aggregation mismatch, forced anchor
+          # fetch, snapshot diff), the internal give-up reason, and a
+          # coarse outcome bucket. Pure observability — the wrapper
+          # returns exactly what the renamed core loop returns.
+          # test_query_cost_logging.py drives the REAL dynamic_query_loop
+          # end-to-end across the full outcome space (a clean answer that
+          # fires several primitives at once, a forced-resynthesis
+          # answer, budget_exhausted, and an uncaught exception),
+          # confirming every requested field is captured correctly and
+          # that logging never swallows or alters the real result.
+          PYTHONPATH=. python3 tests/test_query_cost_logging.py
+
       - name: "TEST 0g — Offline: loop ceiling is sized against the hardest question, not one incident"
         run: |
           set -e

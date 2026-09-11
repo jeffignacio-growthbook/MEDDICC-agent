@@ -210,6 +210,18 @@ def test_no_user_facing_message_names_budget_tokens_or_processing_limits():
             line for line in body.splitlines()
             if "reason_tag ==" not in line and "reason_tag=" not in line
         )
+        # Drop cost_state[...] bookkeeping lines (2026-09-11 structured
+        # cost-logging fix): dict keys like "final_tokens_used" are
+        # internal telemetry field NAMES, not text ever assembled into a
+        # returned answer — the same "not user-facing" category as the
+        # reason_tag comparisons above, just a different internal
+        # tracking structure. Without this, cost_state["final_tokens_
+        # used"] = ... false-positives on the banned term "token" purely
+        # because of the dict key's own name.
+        body = "\n".join(
+            line for line in body.splitlines()
+            if "cost_state[" not in line and "cost_state.get(" not in line
+        )
         # Drop pure comment lines. They're never user-facing text, but a
         # contraction in one ("didn't", "isn't") reads to the naive
         # string-literal regex below as an opening single-quote — which
