@@ -2102,7 +2102,8 @@ async def query_pipeline(params: dict, sb) -> dict:
     Note:
       Wave 4 fixes: Removed time_window filtering, dollar-level split, NEITHER surfacing, coverage ratio, proactive framing.
     """
-    from field_semantics import stage_bucket, stage_label, is_open, is_incremental_pipeline
+    from field_semantics import (stage_bucket, stage_label, is_open,
+                                  is_incremental_pipeline, _RENEWAL_PIPELINE_ID)
     from time_resolver import current_quarter_label
 
     # CRITICAL: Default to NO filters (all active deals)
@@ -2140,7 +2141,15 @@ async def query_pipeline(params: dict, sb) -> dict:
     # filter clause to compare against known-good data. Unconditional,
     # costs nothing when the handler works — see api/handlers.py's
     # query_pipeline_movement for the incident this pattern closes.
-    logger.info(f"[QUERY_PIPELINE_FILTER] table='deals' filters={base_filters!r}")
+    #
+    # 2026-09-12: this originally only logged base_filters (the DB-level
+    # filters) — stage_filter/pipeline_filter are applied IN-MEMORY
+    # further down and were never logged at all, which is exactly what
+    # made the Low Priority #17 pipeline_filter bug hard to confirm from
+    # logs alone (no way to tell whether pipeline_filter="new_business"
+    # was even set for a given request without this). Logged here too now.
+    logger.info(f"[QUERY_PIPELINE_FILTER] table='deals' filters={base_filters!r} "
+                f"stage_filter={stage_filter!r} pipeline_filter={pipeline_filter!r}")
     # Fetch all active deals with ARR breakdown fields
     deals_rows = select_all(
         sb, "deals",
@@ -2223,11 +2232,34 @@ async def query_pipeline(params: dict, sb) -> dict:
                         continue
 
             # Pipeline filtering
+            #
+            # 2026-09-12 (PENDING_WORK.md Low Priority #17): this used
+            # to check `"renewal" in pipeline_id.lower()` — but
+            # pipeline_id is always the raw numeric HubSpot pipeline id
+            # ("default" or the renewal pipeline's id, "866608541" for
+            # this client — confirmed via field_semantics._RENEWAL_
+            # PIPELINE_ID, the same constant is_incremental_pipeline()
+            # above already uses correctly), never a human-readable
+            # string containing the literal word "renewal". That
+            # substring check could never match either real value, so
+            # pipeline_filter="new_business" silently excluded NOTHING
+            # (every deal, renewal-pipeline included, passed through)
+            # and pipeline_filter="renewal" silently excluded
+            # EVERYTHING (always returned zero deals) — since this
+            # handler's first commit (b75a3c1, 2026-09-06). A live
+            # "current New Business pipeline" question surfaced this:
+            # 11 deals in Upcoming Renewal/Renewal Engaged stages shipped
+            # under a "New Business Pipeline" heading with no caveat,
+            # because the exclusion that was supposed to filter them out
+            # never actually fired. Fixed with an exact-value comparison
+            # against the same renewal-pipeline-id source
+            # is_incremental_pipeline() already trusts.
             if pipeline_filter:
-                pipeline_id = deal.get("pipeline_id", "")
-                if pipeline_filter == "new_business" and "renewal" in pipeline_id.lower():
+                pipeline_id = str(deal.get("pipeline_id") or "")
+                is_renewal_pipeline_deal = pipeline_id == _RENEWAL_PIPELINE_ID
+                if pipeline_filter == "new_business" and is_renewal_pipeline_deal:
                     continue
-                if pipeline_filter == "renewal" and "renewal" not in pipeline_id.lower():
+                if pipeline_filter == "renewal" and not is_renewal_pipeline_deal:
                     continue
 
             filtered_deals.append(deal)
