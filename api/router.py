@@ -2296,6 +2296,7 @@ def _new_cost_state() -> dict:
             "scratchpad_rejection_fired": False,
             "aggregation_mismatch_caught": False,
             "forced_anchor_fetch_fired": False,
+            "dimension_verify_forced_fetch_fired": False,
             "snapshot_diff_computed": False,
             "diff_company_name_backfill_fired": False,
             "false_partial_claim_caught": False,
@@ -3381,16 +3382,132 @@ async def _dynamic_query_loop_core(question, history, params,
 
                 if not verification["verified"]:
                     missing_filters = verification["missing_filters"]
-                    logger.error(
+                    required_query = verification["required_query"]
+                    # 2026-09-11 (PENDING_WORK.md Low Priority #12): this
+                    # gate used to say "Cannot retry (budget exhausted)"
+                    # unconditionally — but _finalize_from_data is called
+                    # with 10 different reason_tags (no_progress,
+                    # duplicate_tool_call, id_scoped_enrichment_lookup,
+                    # no_new_data, etc.), and only "iterations_exhausted"
+                    # genuinely means the loop's iteration/token budget ran
+                    # out. A "New Business" pipeline question reached this
+                    # exact branch via a non-budget reason_tag with real
+                    # budget still available, and the old code shipped a
+                    # bare diagnostic warning with no follow-up — exactly
+                    # the dead-end this closes. required_query is fully
+                    # deterministic (an exact filter_table call, not
+                    # something the model needs to decide), so force it
+                    # directly here — same pattern as the scratchpad-anchor
+                    # and diff-company-name forced fetches above in this
+                    # same function — instead of giving up unconditionally.
+                    logger.warning(
                         f"[DIMENSION_VERIFY] Finalized answer failed verification: "
-                        f"Question mentioned {missing_filters} but never filtered for it. "
-                        f"Cannot retry (budget exhausted). Returning diagnostic error."
+                        f"Question mentioned {missing_filters} but never filtered "
+                        f"for it (reason_tag={reason_tag}). Forcing one direct "
+                        f"{required_query['tool']} call with the required filter "
+                        f"before giving up."
                     )
 
-                    # Cannot retry (already at finalization), return error
+                    forced_ok = False
+                    try:
+                        base_columns = None
+                        if queries_run and queries_run[0].get('tool') == 'filter_table':
+                            base_columns = queries_run[0]['params'].get('columns')
+                        forced_result = await T.filter_table(
+                            sb, table=required_query['table'],
+                            columns=base_columns,
+                            filters=required_query['filters'])
+                        if "error" not in forced_result:
+                            forced_aggregated = _aggregate_and_sample(forced_result)
+                            accumulated_data[f"step_{iteration}_dimension_verify_raw"] = forced_result
+                            accumulated_data[f"step_{iteration}_dimension_verify"] = forced_aggregated
+                            queries_run.append({
+                                "tool": required_query['tool'],
+                                "params": {"table": required_query['table'],
+                                           "columns": base_columns,
+                                           "filters": required_query['filters']},
+                                "rows_returned": len(forced_result.get("rows", [])),
+                            })
+                            messages.append({"role": "user", "content": (
+                                f"[SYSTEM] The prior answer never filtered for "
+                                f"{', '.join(f'{v} ({d})' for d, v in missing_filters)} "
+                                f"even though the question asked about it — "
+                                f"automatically fetched the correctly-filtered "
+                                f"data before finalizing. Tool result: "
+                                f"{json.dumps(forced_result, default=str)[:3000]}"
+                            )})
+                            forced_ok = True
+                            cost_state["primitives_fired"]["dimension_verify_forced_fetch_fired"] = True
+                            logger.info(
+                                f"[DIMENSION_VERIFY] forced fetch succeeded: "
+                                f"{len(forced_result.get('rows', []))} rows for "
+                                f"filters={required_query['filters']}"
+                            )
+                        else:
+                            logger.warning(
+                                f"[DIMENSION_VERIFY] forced fetch returned an "
+                                f"error: {forced_result.get('error')}"
+                            )
+                    except Exception as e:
+                        logger.warning(f"[DIMENSION_VERIFY] forced fetch raised: {e}")
+
+                    if forced_ok:
+                        try:
+                            retry_synth = client.complete(
+                                messages=messages + [{"role": "user", "content": finalize_prompt}],
+                                system=system, max_tokens=600)
+                            tokens_used += retry_synth.input_tokens + retry_synth.output_tokens
+                            cost_state["final_tokens_used"] = tokens_used
+                            retry_parsed = _extract_json(retry_synth.text)
+                            if retry_parsed and retry_parsed.get("answer"):
+                                reverify = verify_dimension_coverage(
+                                    question=question,
+                                    queries_run=queries_run,
+                                    accumulated_data=accumulated_data
+                                )
+                                if reverify["verified"]:
+                                    logger.info(
+                                        "[DIMENSION_VERIFY] retry after forced "
+                                        "fetch now verifies cleanly — shipping "
+                                        "the corrected answer."
+                                    )
+                                    return {
+                                        "answer": retry_parsed["answer"],
+                                        "tool_results": _extract_rows_from_accumulated(
+                                            accumulated_data, sb=sb),
+                                        "answered": True
+                                    }
+                                logger.warning(
+                                    "[DIMENSION_VERIFY] retry after forced fetch "
+                                    "STILL fails verification — giving up honestly."
+                                )
+                        except Exception as e:
+                            logger.warning(
+                                f"[DIMENSION_VERIFY] resynthesis after forced "
+                                f"fetch raised: {e}")
+
+                    # Either the forced fetch itself failed, or the retry
+                    # still didn't verify — no further retry available at
+                    # this finalize step. Say so honestly and completely
+                    # (never a bare warning with nothing after it): this
+                    # response explicitly states BOTH that verification
+                    # failed AND that an automatic correction was already
+                    # attempted and did not resolve it.
+                    logger.error(
+                        f"[DIMENSION_VERIFY] Finalized answer failed verification "
+                        f"and could not be corrected automatically "
+                        f"(reason_tag={reason_tag}). Returning honest diagnostic."
+                    )
                     return {
-                        "answer": format_verification_error(missing_filters, verification["required_query"]),
-                        "tool_results": tr,
+                        "answer": (
+                            format_verification_error(missing_filters, required_query)
+                            + "\n\n⚠️ An automatic retry with the correct filter "
+                            "was attempted and still could not produce a "
+                            "verified answer — this question could not be "
+                            "fully answered."
+                        ),
+                        "tool_results": _extract_rows_from_accumulated(
+                            accumulated_data, sb=sb),
                         "answered": False
                     }
 
