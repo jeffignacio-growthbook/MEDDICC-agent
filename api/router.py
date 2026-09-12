@@ -2968,7 +2968,8 @@ async def _dynamic_query_loop_core(question, history, params,
             verification = verify_dimension_coverage(
                 question=question,
                 queries_run=queries_run,
-                accumulated_data=accumulated_data
+                accumulated_data=accumulated_data,
+                sb=sb
             )
 
             if verification["verified"]:
@@ -3377,7 +3378,8 @@ async def _dynamic_query_loop_core(question, history, params,
                 verification = verify_dimension_coverage(
                     question=question,
                     queries_run=queries_run,
-                    accumulated_data=accumulated_data
+                    accumulated_data=accumulated_data,
+                    sb=sb
                 )
 
                 if not verification["verified"]:
@@ -3463,7 +3465,8 @@ async def _dynamic_query_loop_core(question, history, params,
                                 reverify = verify_dimension_coverage(
                                     question=question,
                                     queries_run=queries_run,
-                                    accumulated_data=accumulated_data
+                                    accumulated_data=accumulated_data,
+                                    sb=sb
                                 )
                                 if reverify["verified"]:
                                     logger.info(
@@ -3760,7 +3763,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 verification = verify_dimension_coverage(
                     question=question,
                     queries_run=queries_run,
-                    accumulated_data=accumulated_data
+                    accumulated_data=accumulated_data,
+                    sb=sb
                 )
 
                 if not verification["verified"]:
@@ -4117,7 +4121,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             verification = verify_dimension_coverage(
                 question=question,
                 queries_run=queries_run,
-                accumulated_data=accumulated_data
+                accumulated_data=accumulated_data,
+                sb=sb
             )
 
             if not verification["verified"]:
@@ -4336,7 +4341,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             verification_check = verify_dimension_coverage(
                 question=question,
                 queries_run=queries_run,
-                accumulated_data=accumulated_data
+                accumulated_data=accumulated_data,
+                sb=sb
             )
 
             if verification_check["verified"]:
@@ -4348,7 +4354,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     prev_verification = verify_dimension_coverage(
                         question=question,
                         queries_run=prev_queries,
-                        accumulated_data=accumulated_data
+                        accumulated_data=accumulated_data,
+                        sb=sb
                     )
 
                     if not prev_verification["verified"]:

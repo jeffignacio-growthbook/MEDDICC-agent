@@ -3,6 +3,21 @@
 **Date:** 2026-09-09
 **Purpose:** Mandatory post-generation check that prevents answering about specific dimension values without actually filtering for them
 
+> **⚠️ Superseded in part, 2026-09-12 — see PENDING_WORK.md Low Priority
+> #12 and #14.** Two things changed since this doc was written: (1) the
+> "Point C" finalization path described below no longer just returns a
+> diagnostic on failure — it forces the deterministic `required_query`
+> directly before giving up (Low Priority #12). (2) The `known_dimensions`
+> registry below shows a `"pipeline": [...]` entry — that was removed
+> entirely: no column named `pipeline` has ever existed in this schema,
+> so every filter meant to satisfy it was silently dropped by
+> `filter_table()` while verification still reported "verified" (Low
+> Priority #14). `check_dimension_filtered()` also gained a general
+> safeguard that cross-checks any claimed filter's column against the
+> table's actually-registered-queryable columns, so this class of bug
+> can't recur for a different dimension. Kept below as a historical
+> record of the original design, not current behavior in every detail.
+
 ---
 
 ## What This Fixes

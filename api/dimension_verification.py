@@ -19,9 +19,37 @@ def load_known_dimensions() -> Dict[str, List[str]]:
         {
             "region": ["NAM", "EMEA", "APAC", "LATAM", "ROW", "UNKNOWN"],
             "segment": ["Enterprise", "Mid-Market", "SMB", "Unknown"],
-            "pipeline": [...],
             ...
         }
+
+    2026-09-12 (PENDING_WORK.md Low Priority #14): a 'pipeline' entry
+    used to live here — ['New Business', 'Renewal', 'Upsell',
+    'Cross-Sell'] — assuming a literal `pipeline` column held these
+    values. No such column has ever existed: no migration ever created
+    it on deals, deals_snapshot, or waterfall_weekly (only `pipeline_id`
+    exists, which is the HubSpot pipeline *object*, e.g. "Sales
+    Pipeline" — a different concept that can hold New Business AND
+    Expansion deals together), and scripts/discover_properties.py's own
+    comment confirms "deal_type ... don't exist in Supabase deals
+    table." The real signal this repo actually uses to distinguish deal
+    types (scripts/../verify_segment_scope_and_deal_type.py) is derived
+    from deals.renewal_revenue being null/0 (New Business) vs >0
+    (Expansion) — a 2-way split that doesn't even match the 4 fictional
+    values this used to check, and can't be expressed as the single
+    `['eq', col, value]` filter this whole gate is built around (it
+    needs "IS NULL OR = 0", not an equality match).
+    Every existing/future filter naming an unregistered column is now
+    also caught structurally by check_dimension_filtered()'s column-
+    validation safeguard (see its docstring) — but 'pipeline' is
+    removed here outright rather than left to rely on that safeguard,
+    because it could never be correctly verified even in principle
+    given the real data model, not just accidentally misconfigured.
+    Silently checking a fictional dimension that can never really be
+    satisfied is worse than not checking it at all: a real fix needs
+    either a materialized deal-type column (backed by renewal_revenue
+    at ETL time) or a content-based check (verify returned rows'
+    renewal_revenue values match the claimed deal type) — a real
+    schema/design decision, not a same-night patch.
     """
     known_dims = {}
 
@@ -46,10 +74,6 @@ def load_known_dimensions() -> Dict[str, List[str]]:
 
     # Known segments (hardcoded - could be loaded from config)
     known_dims['segment'] = ['Enterprise', 'Mid-Market', 'SMB', 'Unknown']
-
-    # Known pipeline names (could be loaded from client.yaml)
-    # For now, just track the pattern
-    known_dims['pipeline'] = ['New Business', 'Renewal', 'Upsell', 'Cross-Sell']
 
     return known_dims
 
@@ -83,7 +107,8 @@ def extract_dimension_mentions(question: str, known_dimensions: Dict[str, List[s
     return mentions
 
 
-def check_dimension_filtered(dimension: str, value: str, queries_run: list) -> bool:
+def check_dimension_filtered(dimension: str, value: str, queries_run: list,
+                              sb=None) -> bool:
     """
     Check if any query filtered for the specific dimension value.
 
@@ -91,15 +116,61 @@ def check_dimension_filtered(dimension: str, value: str, queries_run: list) -> b
         dimension: Column name (e.g., "region")
         value: Value to check (e.g., "EMEA")
         queries_run: List of query dicts with tool/params/rows
+        sb: optional live Supabase client. When provided, a claimed
+            filter is only trusted if `dimension` is an actual,
+            registered-queryable column for the query's target table.
 
     Returns:
         True if dimension=value filter found in any query
+
+    2026-09-12 (PENDING_WORK.md Low Priority #14): queries_run records
+    what a query REQUESTED, never what actually reached Postgres.
+    api/tools.py's filter_table() silently DROPS any filter naming a
+    column that isn't registered as queryable for that table
+    (_validate_filters()) — it never errors, so the caller has no way
+    to tell a dropped filter from an applied one just by looking at
+    queries_run. Before this fix, that gap meant a filter on a
+    nonexistent column (the removed 'pipeline' dimension — see
+    load_known_dimensions() — is the exact incident this closes) could
+    report "verified" even though the underlying data was never
+    actually filtered by it, and a confidently wrong-scoped answer
+    shipped with no warning at all.
+    When `sb` is given, this cross-checks the claimed column against
+    the same data_dictionary-backed valid-column set filter_table()
+    itself validates against (api.tools._VALID_COLUMNS) before trusting
+    a match — a filter on a column filter_table() would silently drop
+    can never count as satisfying verification, for ANY dimension, not
+    just the one this was found on. `sb=None` (the default — used by a
+    few standalone/offline scripts with no live client) skips this
+    extra check and falls back to the original queries_run-only
+    behavior; a failure loading column metadata (offline test double,
+    transient DB issue) degrades the same way rather than crashing the
+    whole verification gate.
     """
+    valid_columns_by_table = {}
+    if sb is not None:
+        try:
+            from api import tools as T
+            T._init_valid_columns(sb)
+            valid_columns_by_table = T._VALID_COLUMNS
+        except Exception:
+            valid_columns_by_table = {}
+
     for query in queries_run:
         tool = query.get('tool', '')
         params = query.get('params', {})
 
         if tool in ('filter_table', 'compare_periods', 'aggregate_results'):
+            table = params.get('table')
+            if table:
+                valid_cols = valid_columns_by_table.get(table) or set()
+                if valid_cols and dimension not in valid_cols:
+                    # filter_table() would silently drop a filter on
+                    # this column for this table — never treat it as
+                    # having satisfied verification, no matter what
+                    # queries_run claims was requested.
+                    continue
+
             filters = params.get('filters', [])
 
             # Check filters for [operator, column, value] format
@@ -115,7 +186,7 @@ def check_dimension_filtered(dimension: str, value: str, queries_run: list) -> b
 
 
 def verify_dimension_coverage(question: str, queries_run: list,
-                             accumulated_data: dict) -> dict:
+                             accumulated_data: dict, sb=None) -> dict:
     """
     MANDATORY GATE: Verify dimension values mentioned in question were queried.
 
@@ -126,6 +197,11 @@ def verify_dimension_coverage(question: str, queries_run: list,
         question: User's question
         queries_run: List of queries executed this turn
         accumulated_data: Data retrieved (for row count checks)
+        sb: optional live Supabase client, passed through to
+            check_dimension_filtered() so a filter on a column that
+            isn't actually queryable can never falsely "verify" — see
+            that function's docstring. Optional and defaults to None
+            for callers without a live client (offline scripts/tests).
 
     Returns:
         {
@@ -152,7 +228,7 @@ def verify_dimension_coverage(question: str, queries_run: list,
     missing_filters = []
 
     for dim_name, value in mentions:
-        if not check_dimension_filtered(dim_name, value, queries_run):
+        if not check_dimension_filtered(dim_name, value, queries_run, sb=sb):
             missing_filters.append((dim_name, value))
 
     if not missing_filters:

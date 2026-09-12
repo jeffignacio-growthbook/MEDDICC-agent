@@ -1,14 +1,15 @@
 """
-Regression test for PENDING_WORK.md Low Priority #12: the dimension-
-verification dead-end.
+Regression tests for PENDING_WORK.md Low Priority #12 (the dimension-
+verification dead-end) and Low Priority #14 (the fictional 'pipeline'
+dimension / column-validation safeguard it led to).
 
-Symptom (real, reported): a question mentioning "New Business" produced
-"⚠️ Verification failed: Question asked about New Business (pipeline)
-but query never filtered for it. Retrieved data may be unfiltered.
-Required query: filter_table with filters [['eq', 'pipeline_id',
-'default'], ['gte', 'week_ending', '2026-08-21'], ['lte', 'week_ending',
-'2026-09-11'], ['eq', 'pipeline', 'New Business']]" and then stopped —
-no corrected answer ever followed.
+--- Low Priority #12 ---
+
+Symptom (real, reported): a question mentioning "EMEA" produced
+"⚠️ Verification failed: Question asked about EMEA (region) but query
+never filtered for it. Retrieved data may be unfiltered. Required
+query: filter_table with filters [...]" and then stopped — no
+corrected answer ever followed.
 
 Root cause (found via exact-string match against format_verification_
 error()'s only call site, api/router.py's finalization-path dimension-
@@ -18,12 +19,19 @@ meant the loop's iteration/token budget was exhausted. It doesn't —
 _finalize_from_data is invoked with 10 different reason_tags (no_
 progress, duplicate_tool_call, id_scoped_enrichment_lookup, no_new_
 data, etc.), and only "iterations_exhausted" genuinely correlates to
-budget exhaustion. This test reproduces the exact reported scenario via
-the "no_progress" reason_tag (two malformed responses in a row) —
-budget is nowhere near exhausted — and confirms the gate no longer
-gives up unconditionally: required_query is fully deterministic (an
-exact filter_table call), so the fix forces it directly, one retry,
-before ever giving up.
+budget exhaustion. These tests reproduce the scenario via the
+"no_progress" reason_tag (two malformed responses in a row) — budget is
+nowhere near exhausted — and confirm the gate no longer gives up
+unconditionally: required_query is fully deterministic (an exact
+filter_table call), so the fix forces it directly, one retry, before
+ever giving up.
+
+(The original report actually mentioned "New Business" — a pipeline/
+deal-type dimension. Low Priority #14, below, found that dimension was
+never backed by a real column at all and removed it; these two tests
+use "EMEA"/region instead, a dimension that IS real, so they keep
+testing the forced-fetch retry MECHANISM itself rather than the
+now-removed fictional dimension.)
 
 Two behaviors are proven:
 1. When the forced corrective fetch succeeds and the resynthesis then
@@ -34,6 +42,45 @@ Two behaviors are proven:
    statement that an automatic retry was attempted and still could not
    produce a verified answer — never a bare warning with nothing after
    it.
+
+--- Low Priority #14 ---
+
+While confirming the #12 fix against a live Slack question ("How has
+our new business ARR changed week over week"), the answer that shipped
+was scoped to "Sales Pipeline" (pipeline_id — the whole HubSpot
+pipeline object, which the client confirmed mixes New Business AND
+Expansion deals) rather than "New Business" specifically, despite
+apparently passing dimension verification. Root cause: the 'pipeline'
+entry in load_known_dimensions() (['New Business', 'Renewal', 'Upsell',
+'Cross-Sell']) assumed a literal `pipeline` column that has never
+existed in this schema (confirmed via every migration touching deals/
+deals_snapshot/waterfall_weekly, and scripts/discover_properties.py's
+own comment that deal_type "don't exist in Supabase deals table").
+api/tools.py's filter_table() silently DROPS a filter on any column
+that isn't registered as queryable — never errors — so a "corrective"
+filter on the fictional `pipeline` column got silently discarded before
+reaching Postgres, while queries_run (and thus verification) recorded
+it as if it had been applied: a false-positive "verified" state that
+shipped a confidently wrong-scoped answer with no warning at all.
+
+Fixed two ways: (1) removed 'pipeline' from known_dimensions outright,
+since it can never be correctly verified even in principle given the
+real data model (deal type is derived from renewal_revenue being
+null/0 vs >0 — a 2-way split, not 4 values, and not expressible as a
+single eq filter anyway); (2) added a general structural safeguard —
+check_dimension_filtered() now cross-checks a claimed filter's column
+against the table's actually-registered-queryable columns (same set
+filter_table() itself validates against) before trusting it, so ANY
+future dimension naming an unregistered/renamed column can never again
+silently "pass" verification while the real query silently dropped it.
+
+Three behaviors are proven:
+1. 'pipeline' is gone from known_dimensions (regression guard).
+2. A filter naming a column NOT registered as queryable for its table
+   never counts as satisfying verification, even though queries_run
+   claims it was applied.
+3. A filter naming a column that IS actually registered still verifies
+   normally (the safeguard doesn't break the common case).
 """
 import asyncio
 import json
@@ -44,25 +91,26 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import api.router as router
 import api.tools as tools_module
+import api.dimension_verification as dv
 import api.table_classifier as table_classifier_module
 import api.schema_context as schema_context_module
 
-QUESTION = "How much New Business pipeline moved between 2026-08-21 and 2026-09-11?"
+QUESTION = "How much EMEA pipeline moved between 2026-08-21 and 2026-09-11?"
 
-# Mirrors the exact required_query filters from the real reported incident.
+# Mirrors the shape of the real reported incident's required_query filters.
 BASE_FILTERS = [
     ["eq", "pipeline_id", "default"],
     ["gte", "week_ending", "2026-08-21"],
     ["lte", "week_ending", "2026-09-11"],
 ]
-CORRECTED_FILTERS = BASE_FILTERS + [["eq", "pipeline", "New Business"]]
+CORRECTED_FILTERS = BASE_FILTERS + [["eq", "region", "EMEA"]]
 
 UNFILTERED_ROWS = [
-    {"week_ending": "2026-08-28", "pipeline": "New Business", "net_change": -30000},
-    {"week_ending": "2026-08-28", "pipeline": "Renewal", "net_change": -20000},
+    {"week_ending": "2026-08-28", "region": "EMEA", "net_change": -30000},
+    {"week_ending": "2026-08-28", "region": "NAM", "net_change": -20000},
 ]
 FILTERED_ROWS = [
-    {"week_ending": "2026-08-28", "pipeline": "New Business", "net_change": -30000},
+    {"week_ending": "2026-08-28", "region": "EMEA", "net_change": -30000},
 ]
 
 
@@ -98,7 +146,7 @@ def _make_filter_table_stub(call_log, forced_fetch_should_error=False):
                                  limit=200, order_by=None):
         call_log.append({"table": table, "columns": columns, "filters": filters})
         is_corrected = any(
-            len(f) >= 3 and f[0] == "eq" and f[1] == "pipeline" and f[2] == "New Business"
+            len(f) >= 3 and f[0] == "eq" and f[1] == "region" and f[2] == "EMEA"
             for f in (filters or [])
         )
         if is_corrected:
@@ -116,6 +164,16 @@ def _run(fake_client, forced_fetch_should_error=False):
     orig_classify = table_classifier_module.classify_relevant_tables
     orig_get_schema = schema_context_module.get_schema_context
     orig_resolve_anchor_dates = router.resolve_snapshot_anchor_dates
+    # Isolation: _VALID_COLUMNS is a process-wide memoized cache (see
+    # api/tools.py's _init_valid_columns) — a value left over from
+    # another test in this same process/file must not leak in here and
+    # change whether the column-validation safeguard engages. Starting
+    # empty means _init_valid_columns(fake_sb) actually attempts the
+    # real path, hits _FakeSupabase's AttributeError, and the try/except
+    # in check_dimension_filtered() degrades to the original
+    # queries_run-only behavior — exactly what these two tests exercise.
+    orig_valid_columns = dict(tools_module._VALID_COLUMNS)
+    tools_module._VALID_COLUMNS.clear()
 
     tools_module.filter_table = _make_filter_table_stub(
         filter_table_calls, forced_fetch_should_error=forced_fetch_should_error)
@@ -123,7 +181,7 @@ def _run(fake_client, forced_fetch_should_error=False):
         lambda q, client: ["waterfall_weekly"])
     schema_context_module.get_schema_context = (
         lambda sb, tables_with_descriptions=None, lightweight=False:
-            "TABLE: waterfall_weekly\n  week_ending, pipeline, pipeline_id, net_change\n")
+            "TABLE: waterfall_weekly\n  week_ending, pipeline_id, region, net_change\n")
     router.resolve_snapshot_anchor_dates = (
         lambda sb, time_window: (None, None))
 
@@ -142,6 +200,8 @@ def _run(fake_client, forced_fetch_should_error=False):
         table_classifier_module.classify_relevant_tables = orig_classify
         schema_context_module.get_schema_context = orig_get_schema
         router.resolve_snapshot_anchor_dates = orig_resolve_anchor_dates
+        tools_module._VALID_COLUMNS.clear()
+        tools_module._VALID_COLUMNS.update(orig_valid_columns)
 
 
 def _reach_finalize_via_no_progress(forced_fetch_should_error, final_answers):
@@ -151,7 +211,7 @@ def _reach_finalize_via_no_progress(forced_fetch_should_error, final_answers):
     finalize-synthesis answers the caller wants scripted after that."""
     initial_call = json.dumps({"tool": "filter_table", "params": {
         "table": "waterfall_weekly",
-        "columns": ["week_ending", "pipeline", "net_change"],
+        "columns": ["week_ending", "region", "net_change"],
         "filters": BASE_FILTERS,
     }})
     malformed = "hmm"  # <=50 chars, no braces: _extract_json returns None,
@@ -161,17 +221,17 @@ def _reach_finalize_via_no_progress(forced_fetch_should_error, final_answers):
 
 
 def test_forced_fetch_succeeds_and_ships_corrected_answer():
-    """The core fix: dimension verification fails inside the finalize
+    """The core #12 fix: dimension verification fails inside the finalize
     path via a non-budget reason_tag (no_progress), the required_query
     is forced directly (a real filter_table call with the corrective
-    pipeline='New Business' filter), and once the resynthesis verifies
-    cleanly, a real answered=True answer ships — never the bare warning."""
+    region='EMEA' filter), and once the resynthesis verifies cleanly, a
+    real answered=True answer ships — never the bare warning."""
     unfiltered_answer = json.dumps({
-        "answer": "New Business pipeline moved -$50,000 this period."
+        "answer": "EMEA pipeline moved -$50,000 this period."
     })
     corrected_answer = json.dumps({
-        "answer": "New Business pipeline (filtered specifically to New "
-                   "Business) moved -$30,000 this period."
+        "answer": "EMEA pipeline (filtered specifically to EMEA) moved "
+                   "-$30,000 this period."
     })
     fake_client = _reach_finalize_via_no_progress(
         forced_fetch_should_error=False,
@@ -193,11 +253,11 @@ def test_forced_fetch_succeeds_and_ships_corrected_answer():
 
     corrective_calls = [
         c for c in filter_calls
-        if any(f[:3] == ["eq", "pipeline", "New Business"] for f in (c["filters"] or []))
+        if any(f[:3] == ["eq", "region", "EMEA"] for f in (c["filters"] or []))
     ]
     assert len(corrective_calls) == 1, (
         f"expected exactly one forced corrective filter_table call with "
-        f"the required pipeline filter — got {len(corrective_calls)}: "
+        f"the required region filter — got {len(corrective_calls)}: "
         f"{filter_calls}"
     )
     print("✓ dimension-verification failure inside the finalize path "
@@ -211,7 +271,7 @@ def test_forced_fetch_failure_gives_honest_complete_message():
     verification failed AND that an automatic retry was attempted and
     still could not produce a verified answer."""
     unfiltered_answer = json.dumps({
-        "answer": "New Business pipeline moved -$50,000 this period."
+        "answer": "EMEA pipeline moved -$50,000 this period."
     })
     fake_client = _reach_finalize_via_no_progress(
         forced_fetch_should_error=True,
@@ -233,7 +293,108 @@ def test_forced_fetch_failure_gives_honest_complete_message():
           "honest, complete give-up message — never a bare dead-end warning")
 
 
+def test_pipeline_dimension_removed():
+    """Low Priority #14 regression guard: 'pipeline' (New Business/
+    Renewal/Upsell/Cross-Sell) must stay removed from known_dimensions
+    — see load_known_dimensions()'s docstring for why it was fictional
+    from the start (no real column ever backed it). If someone re-adds
+    it, this forces them to reckon with why it was removed rather than
+    silently reintroducing the false-positive-verification bug."""
+    known = dv.load_known_dimensions()
+    assert "pipeline" not in known, (
+        "the 'pipeline' dimension was removed because no real column "
+        "ever backed it (see load_known_dimensions()'s docstring) — "
+        "don't re-add it without fixing the underlying data model first"
+    )
+    print("✓ the fictional 'pipeline' dimension stays removed from known_dimensions")
+
+
+def test_column_validation_rejects_filter_on_unregistered_column():
+    """Low Priority #14's general structural safeguard: if a query
+    claims to have filtered on a column that isn't actually registered
+    as queryable for that table, verify_dimension_coverage() must NOT
+    trust it — api/tools.py's filter_table() would have silently
+    dropped that exact filter before it ever reached Postgres. This is
+    the general-purpose fix (works for any dimension/column), proven
+    independently of the now-removed 'pipeline' dimension."""
+    orig_valid_columns = dict(tools_module._VALID_COLUMNS)
+    tools_module._VALID_COLUMNS.clear()
+    tools_module._VALID_COLUMNS["waterfall_weekly"] = {
+        "week_ending", "pipeline_id", "net_change",
+        # deliberately NOT including "region" — simulates a column
+        # that isn't registered as queryable for this table.
+    }
+
+    queries_run = [{
+        "tool": "filter_table",
+        "params": {
+            "table": "waterfall_weekly",
+            "filters": [["eq", "region", "EMEA"]],
+        },
+        "rows_returned": 10,
+    }]
+
+    try:
+        result = dv.verify_dimension_coverage(
+            question="How has EMEA pipeline moved?",
+            queries_run=queries_run,
+            accumulated_data={},
+            sb=object(),  # never touched: _init_valid_columns short-circuits
+                          # once _VALID_COLUMNS is already non-empty.
+        )
+    finally:
+        tools_module._VALID_COLUMNS.clear()
+        tools_module._VALID_COLUMNS.update(orig_valid_columns)
+
+    assert result["verified"] is False, (
+        "a filter naming a column that isn't registered as queryable "
+        "must never count as satisfying verification, even though it "
+        "appears in queries_run — filter_table() would have silently "
+        "dropped it before it reached Postgres"
+    )
+    assert ("region", "EMEA") in result["missing_filters"]
+    print("✓ a filter on an unregistered column never falsely satisfies "
+          "dimension verification, even when queries_run claims it was applied")
+
+
+def test_column_validation_still_accepts_real_registered_columns():
+    """Sanity check the safeguard doesn't break the common case: a
+    filter on a column that IS actually registered as queryable still
+    verifies normally."""
+    orig_valid_columns = dict(tools_module._VALID_COLUMNS)
+    tools_module._VALID_COLUMNS.clear()
+    tools_module._VALID_COLUMNS["waterfall_weekly"] = {
+        "week_ending", "pipeline_id", "net_change", "region",
+    }
+
+    queries_run = [{
+        "tool": "filter_table",
+        "params": {
+            "table": "waterfall_weekly",
+            "filters": [["eq", "region", "EMEA"]],
+        },
+        "rows_returned": 10,
+    }]
+
+    try:
+        result = dv.verify_dimension_coverage(
+            question="How has EMEA pipeline moved?",
+            queries_run=queries_run,
+            accumulated_data={},
+            sb=object(),
+        )
+    finally:
+        tools_module._VALID_COLUMNS.clear()
+        tools_module._VALID_COLUMNS.update(orig_valid_columns)
+
+    assert result["verified"] is True
+    print("✓ a filter on an actually-registered column still verifies normally")
+
+
 if __name__ == "__main__":
     test_forced_fetch_succeeds_and_ships_corrected_answer()
     test_forced_fetch_failure_gives_honest_complete_message()
+    test_pipeline_dimension_removed()
+    test_column_validation_rejects_filter_on_unregistered_column()
+    test_column_validation_still_accepts_real_registered_columns()
     print("\n✅ All tests passed")
