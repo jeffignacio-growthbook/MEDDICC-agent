@@ -22,6 +22,20 @@ model's first tool call (see scan_question_for_known_dimension_terms()
 and its call site in api/router.py), it turns "the model guesses which
 column/value a term means, sometimes wrong" into "the exact filter
 clause is handed to the model as a directive it never had to guess."
+
+2026-09-12 (PENDING_WORK.md Low Priority #14/#16): also resolves
+New Business / Expansion / Upsell / Renewal deal-type terms — unlike
+the fictional `pipeline` dimension dimension_verification.py's
+load_known_dimensions() removed (no real column ever backed it), these
+map to real, already-existing columns (deals.new_arr, deals.
+expansion_arr — both since migration 007 — and deals.pipeline_id
+against client.yaml's configured renewal_pipeline_ids), so no
+migration is needed. See _deal_type_candidates()'s own docstring for
+the exact mapping and why it's deliberately NOT the same definition as
+api/field_semantics.py's is_renewal_base()/is_incremental_pipeline()
+(a different, GRR/NRR-specific distinction). These terms are also NOT
+mutually exclusive — a deal can be Renewal AND Expansion at once — see
+format_dimension_resolution_note()'s handling of that.
 """
 import re
 from pathlib import Path
@@ -139,10 +153,90 @@ def _roster_candidates(term: str) -> List[Dict[str, Any]]:
     return matches
 
 
+def _load_renewal_pipeline_id() -> Optional[str]:
+    """The renewal pipeline id, from config/client.yaml's
+    pipeline.value_field.renewal_pipeline_ids — the exact same config
+    path scripts/utils.py, scripts/analytics/compute_forecast.py, and
+    api/handlers_renewal.py already read this from (grep confirms no
+    other path is used anywhere in this repo). Only the first
+    configured id is used: this client has exactly one renewal
+    pipeline, and resolve_dimension_filter()'s single-eq-value shape
+    has no way to express more than one anyway — the same single-value
+    assumption api/handlers_renewal.py already makes
+    ("Use first renewal pipeline")."""
+    ids = (
+        _load_yaml("config/client.yaml")
+        .get("pipeline", {})
+        .get("value_field", {})
+        .get("renewal_pipeline_ids", []) or []
+    )
+    return str(ids[0]) if ids else None
+
+
+# column, operator, value for each deal-type alias that maps directly
+# (no live config lookup needed) — "renewal" is handled separately
+# below since its value comes from client.yaml, not a fixed literal.
+#
+# Deliberately NOT the same definition as api/field_semantics.py's
+# is_renewal_base()/is_incremental_pipeline(): those encode a stricter,
+# GRR/NRR-specific distinction (renewal BASE requires renewal_revenue
+# > 0 in addition to the renewal pipeline id; "pipeline"/incremental
+# ARR excludes pure renewal base). This maps the plain-English TERM a
+# question uses ("Expansion deals", "Renewal deals") to what it most
+# naturally means for an ad-hoc question — literally "carries expansion
+# ARR" and "sits in the Renewal pipeline" — not the narrower subset
+# GRR/NRR math needs. Two different, deliberately separate definitions
+# for two different purposes; not an inconsistency.
+_DEAL_TYPE_ALIASES = {
+    "new business": ("new_arr", "gt", 0),
+    "new": ("new_arr", "gt", 0),
+    "expansion": ("expansion_arr", "gt", 0),
+    "upsell": ("expansion_arr", "gt", 0),
+}
+
+# "new" alone is far too common an English word to scan a whole
+# question for opportunistically (same reasoning as the ROW region /
+# Unknown segment values in _SCAN_COLLISION_DENYLIST above — "what's
+# new this week" or "any new updates" must not inject a new_arr
+# directive). It still resolves correctly on a deliberate, explicit
+# call to resolve_dimension_filter() — this only affects the scan.
+# Kept as its own set (not folded into _SCAN_COLLISION_DENYLIST, which
+# is keyed by (column, value)) because "new business" and "new" both
+# resolve to the exact same (column, value) pair, and denylisting that
+# pair there would incorrectly also block the "new business" scan.
+_SCAN_DENYLISTED_TERMS = {"new"}
+
+
+def _deal_type_candidates(term: str) -> List[Dict[str, Any]]:
+    """New Business / Expansion / Upsell / Renewal — see the module
+    docstring and _DEAL_TYPE_ALIASES' own comment for the exact mapping
+    and why it's independent from field_semantics.py's GRR/NRR
+    definitions. Tagged with "category": "deal_type" so
+    format_dimension_resolution_note() can add the non-mutual-
+    exclusivity and historical-data-gap guidance these terms need but
+    region/segment/roster terms don't."""
+    norm = _normalize(term)
+
+    if norm == "renewal":
+        renewal_pipeline_id = _load_renewal_pipeline_id()
+        if renewal_pipeline_id:
+            return [{"column": "pipeline_id", "operator": "eq",
+                      "value": renewal_pipeline_id, "category": "deal_type"}]
+        return []
+
+    if norm in _DEAL_TYPE_ALIASES:
+        column, operator, value = _DEAL_TYPE_ALIASES[norm]
+        return [{"column": column, "operator": operator, "value": value,
+                  "category": "deal_type"}]
+
+    return []
+
+
 def _all_known_values() -> List[str]:
     values = list(_load_regions().keys())
     values += _load_segment_names()
     values += [m["name"] for m in _load_roster()]
+    values += ["New Business", "Expansion", "Upsell", "Renewal"]
     return values
 
 
@@ -167,8 +261,13 @@ def resolve_dimension_filter(mentioned_term: str,
             to do anything yet.
 
     Returns exactly one of:
-        {"column": ..., "operator": "eq", "value": ...}
-            — an unambiguous match against region, segment, or roster.
+        {"column": ..., "operator": "eq" | "gt", "value": ...}
+            — an unambiguous match against region, segment, roster, or
+              deal-type. A deal-type match also carries
+              "category": "deal_type" (see _deal_type_candidates()) so
+              callers building the injected directive can add the
+              non-mutual-exclusivity / historical-gap guidance those
+              terms specifically need.
         {"error": "ambiguous", "candidates": [...]}
             — more than one governed value matches (e.g. "Jake" against
               both Jake Stangl and Jake H). Each candidate has the same
@@ -176,10 +275,11 @@ def resolve_dimension_filter(mentioned_term: str,
               matches.
         {"error": "unknown_value", "known_values": [...]}
             — the term matches nothing in any governed source.
-            known_values is the full union of region/segment/roster
-            names actually configured, so a caller (or the model, via
-            the injected directive) can see what IS available instead
-            of being told only that this one term failed.
+            known_values is the full union of region/segment/roster/
+            deal-type names actually configured, so a caller (or the
+            model, via the injected directive) can see what IS
+            available instead of being told only that this one term
+            failed.
     """
     if not mentioned_term or not mentioned_term.strip():
         return {"error": "unknown_value", "known_values": _all_known_values()}
@@ -188,6 +288,7 @@ def resolve_dimension_filter(mentioned_term: str,
         _region_candidates(mentioned_term)
         + _segment_candidates(mentioned_term)
         + _roster_candidates(mentioned_term)
+        + _deal_type_candidates(mentioned_term)
     )
 
     if len(candidates) == 1:
@@ -222,7 +323,9 @@ def scan_question_for_known_dimension_terms(question: str) -> List[Dict[str, Any
     "ROW" region or "Unknown" segment) is also skipped here, so a
     sentence merely containing "row" or "unknown" doesn't inject a
     dimension directive that was never intended — see the denylist's
-    own docstring above.
+    own docstring above. Same reasoning for _SCAN_DENYLISTED_TERMS
+    (currently just "new" — too common an English word to opportunistically
+    scan for, unlike "new business" as a whole phrase).
 
     Returns: [{"term": "EMEA", "column": "region", "operator": "eq",
                "value": "EMEA"}, ...], deduplicated by (column, value)
@@ -236,6 +339,8 @@ def scan_question_for_known_dimension_terms(question: str) -> List[Dict[str, Any
     resolved = []
     seen_keys = set()
     for term in sorted(candidate_terms):
+        if _normalize(term) in _SCAN_DENYLISTED_TERMS:
+            continue
         result = resolve_dimension_filter(term, question_context={"question": question})
         if "error" in result:
             continue
@@ -317,12 +422,44 @@ def format_ambiguous_dimension_note(ambiguous: List[Dict[str, Any]]) -> str:
     )
 
 
+# The fixed date migration 064 was applied and deals_snapshot.new_arr/
+# expansion_arr started being populated (see that migration's own
+# data_dictionary description) — a fixed historical fact, not something
+# to compute from "today", since it never moves forward with the
+# calendar.
+_ARR_COMPONENTS_SNAPSHOT_CUTOFF = "2026-09-11"
+
+
 def format_dimension_resolution_note(resolved: List[Dict[str, Any]]) -> str:
     """Format scan_question_for_known_dimension_terms()'s output as a
     directive for the model, same pattern as SNAPSHOT ANCHORS in
     api/router.py's dynamic_query_loop — a fact handed to the model
     up front, not left for it to guess or discover the hard way.
-    Returns "" when there's nothing to report (no known terms found)."""
+    Returns "" when there's nothing to report (no known terms found).
+
+    2026-09-12: deal-type terms (category == "deal_type") get two
+    pieces of extra guidance region/segment/roster terms don't need:
+    1. NON-MUTUAL-EXCLUSIVITY — fires only when 2+ deal-type terms are
+       resolved together (e.g. "Renewal and Expansion deals"). A deal
+       can independently match more than one (a renewal that also
+       carries expansion ARR is BOTH), so combining them must mean
+       "match ANY of them" (a union), not "match ALL of them at once"
+       (an AND/intersection) — the opposite of how multiple region/
+       segment terms combine (an "EMEA Enterprise" question DOES mean
+       the intersection). Without this, the model would default to the
+       AND pattern it already uses everywhere else and silently under-
+       count.
+    2. HISTORICAL DATA GAP — fires only for the new_arr/expansion_arr-
+       backed terms (New Business, Expansion, Upsell — not Renewal,
+       which uses pipeline_id and has no such gap). deals_snapshot only
+       has these columns populated from _ARR_COMPONENTS_SNAPSHOT_CUTOFF
+       forward (migration 064); a point-in-time historical question
+       needing an earlier snapshot must say so honestly rather than
+       reading a NULL/missing value as zero or absent. The `deals`
+       table itself (current pipeline, or any closed deal by
+       close_date) has no such gap — these columns exist there since
+       migration 007 — and the note says so explicitly.
+    """
     if not resolved:
         return ""
     lines = [
@@ -330,9 +467,40 @@ def format_dimension_resolution_note(resolved: List[Dict[str, Any]]) -> str:
         f"{r['column']}.{r['operator']}.{r['value']}"
         for r in resolved
     ]
-    return (
+    note = (
         "RESOLVED DIMENSION FILTERS (looked up against the governed "
-        "region/segment/roster config, not a guess): these terms in the "
-        "question map to exact filter clauses — use them verbatim, do "
-        "not re-derive or second-guess them:\n" + "\n".join(lines)
+        "region/segment/roster/deal-type config, not a guess): these "
+        "terms in the question map to exact filter clauses — use them "
+        "verbatim, do not re-derive or second-guess them:\n" + "\n".join(lines)
     )
+
+    deal_type_terms = [r for r in resolved if r.get("category") == "deal_type"]
+    if len(deal_type_terms) >= 2:
+        note += (
+            "\n\nDEAL-TYPE TERMS ARE NOT MUTUALLY EXCLUSIVE: a single "
+            "deal can independently match more than one of the "
+            "deal-type filters above (e.g. a renewal deal that also "
+            "carries expansion ARR is BOTH Renewal and Expansion at "
+            "once). Since more than one is mentioned here, query each "
+            "one's condition and report the UNION — deals matching ANY "
+            "of them — do NOT combine the filters into one query "
+            "requiring a deal to satisfy all of them simultaneously "
+            "unless the question explicitly asks for the overlap."
+        )
+
+    arr_component_terms = [r for r in deal_type_terms
+                            if r["column"] in ("new_arr", "expansion_arr")]
+    if arr_component_terms:
+        note += (
+            f"\n\nHISTORICAL DATA GAP: new_arr/expansion_arr are only "
+            f"populated on deals_snapshot for snapshot dates on or "
+            f"after {_ARR_COMPONENTS_SNAPSHOT_CUTOFF} — if answering "
+            f"this requires a deals_snapshot row from before that date, "
+            f"this breakdown is NOT available for it; say so honestly "
+            f"rather than treating a missing/null value as zero or "
+            f"absent. The `deals` table itself (current pipeline, or "
+            f"any closed deal by close_date) is unaffected by this gap "
+            f"and always has real, current values."
+        )
+
+    return note
