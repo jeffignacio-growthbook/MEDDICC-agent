@@ -895,6 +895,8 @@ Required JSON:
     "fiscal_quarter": "<for query_pipeline_movement: 'FY2027 Q2' style label, or null for current>",
     "weeks": "<for query_pipeline_movement composition: integer count of recent weeks, or null>",
     "stage": "<for query_pipeline_movement stage_deals: stage name like 'Discovery', else null>",
+    "pipeline_filter": "new_business|renewal|null — set to 'new_business' when question explicitly asks for new business or incremental pipeline (e.g., 'new business pipeline', 'current new business pipeline', 'incremental pipeline'); set to 'renewal' for renewal-specific questions; null for all pipelines (default)",
+    "stage_filter": "qualified|discovery|scoping|proposal|null — for query_pipeline: filter to specific stage bucket when explicitly mentioned; null for all stages",
     "close_date_scope": "<for query_pipeline_movement: 'current_quarter' to reconcile against a CRM board filtered by close date, else null (default all)>",
     "component": "<for query_rubric / submit_score_correction: a MEDDICC component (champion, economic_buyer, metrics, decision_criteria, decision_process, pain, competition), else null>",
     "proposed_score": "<for submit_score_correction ONLY: the 0-10 score the user says it should be, else null>",
