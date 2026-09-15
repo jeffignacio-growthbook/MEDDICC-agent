@@ -359,10 +359,9 @@ def verify_total_placement(
         return {"placement_ok": True}
 
     # Count how many times the corrected total appears in the answer
-    # If it appears MORE THAN ONCE, that's suspicious (one must be misplaced)
-    # If it appears exactly once, that's probably the total line (OK)
     matches_count = sum(1 for amount in all_amounts if abs(amount - corrected_total) <= tolerance)
 
+    # SIGNAL 1: Multiple occurrences (definite corruption)
     if matches_count > 1:
         # The corrected total appears multiple times - at least one must be misplaced
         # (If the answer has both "Creative CX: $6.89M" AND "Total: $6.89M",
@@ -382,5 +381,58 @@ def verify_total_placement(
             )
         }
 
-    # Total appears 0 or 1 times - OK
+    # SIGNAL 2: Single occurrence, but in suspicious context (line item, not summary)
+    if matches_count == 1:
+        # Find the ONE match and check its IMMEDIATE context (same line only)
+        # If it appears next to a company/deal name (not a total-indicator phrase),
+        # that's implausible: no single deal should equal aggregate of 100+ deals
+        for match in _AMOUNT_WITH_DOLLAR_RE.finditer(retry_answer_text):
+            if match.group(2):
+                value = _amount_to_number(*match.groups())
+                if abs(value - corrected_total) <= tolerance:
+                    # Found the match - extract the LINE it's on (not 80 chars back)
+                    # Find the start of the line (search backwards for newline)
+                    line_start = retry_answer_text.rfind('\n', 0, match.start()) + 1
+                    line_end = retry_answer_text.find('\n', match.end())
+                    if line_end == -1:
+                        line_end = len(retry_answer_text)
+                    line = retry_answer_text[line_start:line_end]
+
+                    # Check if THIS LINE contains company/deal name pattern
+                    # Pattern: Capital letter + words + colon/dash IMMEDIATELY before $
+                    import re as re_module
+                    # Look for pattern at start of line, before the dollar amount
+                    dollar_pos_in_line = match.start() - line_start
+                    prefix = line[:dollar_pos_in_line]
+
+                    # Check last 50 chars before $ for company name pattern
+                    check_prefix = prefix[-50:] if len(prefix) > 50 else prefix
+                    company_pattern = r'([A-Z][A-Za-z0-9\s&,\.]+?)(?::|\s—|\s-)\s*$'
+                    context_match = re_module.search(company_pattern, check_prefix)
+
+                    if context_match:
+                        label = context_match.group(1).strip().lower()
+                        # Exclude total-indicator phrases
+                        TOTAL_INDICATORS = {"total", "overall", "grand", "sum", "net", "aggregate"}
+                        if not any(indicator in label for indicator in TOTAL_INDICATORS):
+                            # Suspicious: appears next to specific entity name, not summary
+                            return {
+                                "placement_ok": False,
+                                "suspect_value": corrected_total,
+                                "actual_total": corrected_total,
+                                "matches_count": 1,
+                                "suspicious_context": label,
+                                "likely_corruption": (
+                                    f"Corrected total ${corrected_total:,.2f} appears next to "
+                                    f"specific entity name '{context_match.group(1).strip()}' "
+                                    f"rather than in a summary/total line. This is implausible - "
+                                    f"a single deal/company matching the aggregate total across "
+                                    f"{len(retrieved_rows)} rows is a near-certain sign of "
+                                    f"misplacement (model replaced line item instead of adding "
+                                    f"separate summary)."
+                                )
+                            }
+                    break  # Found and checked the one match
+
+    # Total appears 0 times, or 1 time in valid context - OK
     return {"placement_ok": True}
