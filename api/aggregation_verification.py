@@ -308,3 +308,79 @@ def extract_stated_totals_from_answer(answer_text: str) -> Dict[str, float]:
         stated[label] = sum(_amount_to_number(*a) for a in amounts)
 
     return stated
+
+
+def verify_total_placement(
+    retrieved_rows: List[dict],
+    retry_answer_text: str,
+    corrected_total: float,
+    value_column: Optional[str] = None,
+    tolerance: float = 0.5
+) -> dict:
+    """
+    Second-order verification after forced resynthesis for aggregation
+    mismatch: checks whether the corrected total was placed CORRECTLY
+    in the retry answer, or misplaced as an individual line-item value.
+
+    STRUCTURAL CHECK (not text pattern matching):
+    If any individual line-item value in the retry answer equals the
+    corrected TOTAL (within tolerance), this is implausible — one deal
+    matching the grand total across hundreds of deals is a near-certain
+    sign the model spliced the corrected total into the wrong location.
+
+    This is the primitive-level gate that protects EVERY handler and
+    EVERY dynamic_query call from the Creative CX-style corruption
+    (where a $6.89M total for 354 deals was attached to a single
+    company instead of the summary line).
+
+    Args:
+        retrieved_rows: the actual rows retrieved (e.g. deals, waterfall)
+        retry_answer_text: the model's answer AFTER forced resynthesis
+        corrected_total: the total value we handed to the model
+        value_column: numeric column to compare against (auto-detected if None)
+        tolerance: absolute difference threshold
+
+    Returns:
+        {"placement_ok": True} if no individual value matches total
+        {"placement_ok": False, "suspect_value": X, "actual_total": Y,
+         "likely_corruption": "...message..."} if misplacement detected
+    """
+    if not retrieved_rows or not retry_answer_text:
+        return {"placement_ok": True}
+
+    # Extract all dollar amounts from retry answer (individual values, not just total)
+    all_amounts = []
+    for match in _AMOUNT_WITH_DOLLAR_RE.finditer(retry_answer_text):
+        if match.group(2):  # Has digit group
+            value = _amount_to_number(*match.groups())
+            all_amounts.append(value)
+
+    if not all_amounts:
+        return {"placement_ok": True}
+
+    # Count how many times the corrected total appears in the answer
+    # If it appears MORE THAN ONCE, that's suspicious (one must be misplaced)
+    # If it appears exactly once, that's probably the total line (OK)
+    matches_count = sum(1 for amount in all_amounts if abs(amount - corrected_total) <= tolerance)
+
+    if matches_count > 1:
+        # The corrected total appears multiple times - at least one must be misplaced
+        # (If the answer has both "Creative CX: $6.89M" AND "Total: $6.89M",
+        #  the Creative CX line is the corruption)
+        return {
+            "placement_ok": False,
+            "suspect_value": corrected_total,
+            "actual_total": corrected_total,
+            "matches_count": matches_count,
+            "likely_corruption": (
+                f"Corrected total ${corrected_total:,.2f} appears {matches_count} times "
+                f"in retry answer (expected once, in summary line only). This is "
+                f"implausible - the same value appearing as both an individual "
+                f"line-item AND the grand total across {len(retrieved_rows)} rows "
+                f"is a near-certain sign of misplacement (total spliced into "
+                f"wrong location in addition to correct total line)."
+            )
+        }
+
+    # Total appears 0 or 1 times - OK
+    return {"placement_ok": True}

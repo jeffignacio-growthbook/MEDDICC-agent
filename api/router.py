@@ -3661,20 +3661,23 @@ async def _dynamic_query_loop_core(question, history, params,
                         retry_parsed = _extract_json(retry_synth.text)
                         if retry_parsed and retry_parsed.get("answer"):
                             final_answer_text = retry_parsed["answer"]
-                            # STRUCTURAL GATE (2026-09-14): Check if corrected
-                            # total ended up in wrong location
-                            suspicious = _check_suspicious_total_substitution(
-                                final_answer_text, all_disc
-                            )
-                            if suspicious:
-                                logger.error(
-                                    f"[AGGREGATION_VERIFY] finalize retry put "
-                                    f"corrected total in wrong location: {suspicious}"
+                            # PRIMITIVE-LEVEL GATE (2026-09-14, rebuilt): Check if corrected
+                            # total was placed correctly, not misplaced as individual line item
+                            from api.aggregation_verification import verify_total_placement
+                            for disc in all_disc:
+                                corrected_total = disc["actual_sum"]
+                                placement_check = verify_total_placement(
+                                    all_raw_rows_for_agg, final_answer_text, corrected_total
                                 )
-                                # Force honest fallback instead of shipping corrupted data
-                                return _diagnostic_answer(
-                                    tail, "aggregation_substitution_suspicious"
-                                )
+                                if not placement_check["placement_ok"]:
+                                    logger.error(
+                                        f"[AGGREGATION_VERIFY] finalize retry placement corruption: "
+                                        f"{placement_check['likely_corruption']}"
+                                    )
+                                    # Force honest fallback instead of shipping corrupted data
+                                    return _diagnostic_answer(
+                                        tail, "aggregation_placement_corruption"
+                                    )
                     except Exception as e:
                         logger.warning(
                             f"[AGGREGATION_VERIFY] resynthesis retry raised: {e}")
@@ -3911,24 +3914,34 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             # FIX: Verify synthesis aggregated all rows correctly
             answer_text = parsed["answer"]
 
-            # STRUCTURAL GATE (2026-09-14): If previous iteration forced an
-            # aggregation retry, check if the corrected total ended up in a
-            # SUSPICIOUS location (e.g., replacing an individual deal's line
-            # item instead of the summary). If so, escalate immediately to
-            # "unresolved" rather than shipping corrupted data.
-            if "_agg_retry_totals" in cost_state:
-                suspicious = _check_suspicious_total_substitution(
-                    answer_text, cost_state["_agg_retry_totals"]
-                )
-                if suspicious:
-                    logger.error(
-                        f"[AGGREGATION_VERIFY] After retry, corrected total "
-                        f"appears in wrong location: {suspicious}"
+            # PRIMITIVE-LEVEL GATE (2026-09-14, rebuilt): If previous iteration
+            # forced an aggregation retry, verify the corrected total was placed
+            # CORRECTLY (in summary/total line) and not misplaced as an individual
+            # line-item value. This is the structural check at the primitive level
+            # that protects EVERY handler/dynamic_query call, not just this one case.
+            if "_agg_retry_totals" in cost_state and "_agg_retry_rows" in cost_state:
+                from api.aggregation_verification import verify_total_placement
+
+                all_disc = cost_state["_agg_retry_totals"]
+                all_rows = cost_state["_agg_retry_rows"]
+
+                # Check each corrected total for misplacement
+                for disc in all_disc:
+                    corrected_total = disc["actual_sum"]
+                    placement_check = verify_total_placement(
+                        all_rows, answer_text, corrected_total
                     )
-                    cost_state["primitives_fired"]["aggregation_mismatch_unresolved_after_retry"] = True
-                    return await _finalize_from_data("aggregation_substitution_suspicious")
-                # Clear the flag after check
+                    if not placement_check["placement_ok"]:
+                        logger.error(
+                            f"[AGGREGATION_VERIFY] Placement corruption detected: "
+                            f"{placement_check['likely_corruption']}"
+                        )
+                        cost_state["primitives_fired"]["aggregation_placement_corruption"] = True
+                        return await _finalize_from_data("aggregation_placement_corruption")
+
+                # Clear the flags after check
                 del cost_state["_agg_retry_totals"]
+                del cost_state["_agg_retry_rows"]
 
             # STRUCTURAL GATE (2026-09-11, round 2): the scratchpad check
             # added for the prose-fallback path (below, for when JSON
@@ -4027,8 +4040,9 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 no_progress_streak += 1
                 if no_progress_streak >= 2:
                     return await _finalize_from_data("aggregation_mismatch_unresolved")
-                # Store corrected totals for post-retry verification
+                # Store corrected totals + raw rows for post-retry placement verification
                 cost_state["_agg_retry_totals"] = all_disc
+                cost_state["_agg_retry_rows"] = all_raw_rows
                 continue
 
             # Check 2: false completeness claims ("partial"/"pending"/
