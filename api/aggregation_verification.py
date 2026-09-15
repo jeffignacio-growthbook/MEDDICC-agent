@@ -187,9 +187,19 @@ def verify_aggregation_completeness(retrieved_rows: List[dict], stated_totals: D
     }
 
 
-_AMOUNT_RE = re.compile(
-    r"([+-]?)\$?([\d][\d,]*(?:\.\d+)?)\s*([KkMm])?\s*(won|lost)?", re.IGNORECASE
+# Primary regex: match dollar amounts with explicit $ sign (most reliable)
+_AMOUNT_WITH_DOLLAR_RE = re.compile(
+    r"([+-]?)\$([\d][\d,]*(?:\.\d+)?)\s*([KkMm])?\s*(won|lost)?", re.IGNORECASE
 )
+
+# Fallback regex: bare numbers (no $) - ONLY used when $ sign not found
+# and we have strong context (e.g., immediately after "total:" or "total is")
+_BARE_NUMBER_RE = re.compile(
+    r"([+-]?)([\d][\d,]*(?:\.\d+)?)\s*([KkMm])?\s*(won|lost)?", re.IGNORECASE
+)
+
+# Legacy name for backwards compatibility - now points to $ -required version
+_AMOUNT_RE = _AMOUNT_WITH_DOLLAR_RE
 
 
 def _amount_to_number(sign: str, digits: str, mult: Optional[str], verb: Optional[str]) -> float:
@@ -214,12 +224,44 @@ def _extract_total(answer_text: str) -> Optional[float]:
     sentence-scoped (not a fixed character window) so ordinary phrasing
     ("Total pipeline movement this period was $20K.") isn't missed just
     because there are more than a few words between "total" and the
-    figure."""
+    figure.
+
+    FIX (2026-09-14): Original regex had optional $ sign (\$?), matching
+    ANY bare number — so "Jan 2025 to Date... Total: $6.8M" extracted
+    2025.0 (the year) instead of $6.8M. Now searches for $ amounts first
+    (most reliable), only falling back to bare numbers when:
+    1. No $ amount found in the sentence, AND
+    2. The bare number appears immediately after "total" + connector
+       (e.g., "Total: 1500000" or "Total is 1.5M")
+    This prevents extracting years, deal counts, or other stray digits.
+    """
     for sentence in _SENTENCE_SPLIT_RE.split(answer_text):
         if re.search(r"\btotal\b", sentence, re.IGNORECASE):
-            m = _AMOUNT_RE.search(sentence)
+            # PHASE 1: Look for explicit dollar amount ($ sign required)
+            m = _AMOUNT_WITH_DOLLAR_RE.search(sentence)
             if m and m.group(2):
                 return _amount_to_number(*m.groups())
+
+            # PHASE 2: Only if no $ amount found, check for bare number
+            # after "total" + connector word/punctuation, allowing intervening
+            # words like "Total ARR pipeline is 4" or "Total movement was 11"
+            # Allowed patterns:
+            #   "Total: 1.5M" (immediate)
+            #   "Total is 1.5M" (immediate)
+            #   "Total ARR pipeline is 1.5M" (with words between)
+            #   "Total movement this period was 1.5M" (with words between)
+            context_match = re.search(
+                r'\btotal\b(?:[^.!?:]*?)(?::|is|was|of)\s*([+-]?[\d][\d,]*(?:\.\d+)?)\s*([KkMm])?\b',
+                sentence,
+                re.IGNORECASE
+            )
+            if context_match:
+                sign = ""
+                digits = context_match.group(1)
+                mult = context_match.group(2)
+                verb = None  # No won/lost in this context
+                return _amount_to_number(sign, digits, mult, verb)
+
     return None
 
 
