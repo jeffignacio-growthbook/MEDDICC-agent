@@ -48,6 +48,7 @@ KNOWN_INTERNAL_PARAMS = {
     # Computed/resolved by primitives
     "fiscal_quarter",  # Computed from time_window by time_resolver
     "close_date_scope",  # Legacy, derived from time_window
+    "pipeline_id",  # Resolved from pipeline_filter/config, not user-specified numeric ID
 
     # Submission/correction params (not query params)
     "reason",  # For submit_score_correction
@@ -61,6 +62,10 @@ KNOWN_INTERNAL_PARAMS = {
     "metric",  # For set_target
     "entity_name",  # For set_target
     "period_label",  # For set_target
+
+    # Config/system thresholds (not user-specified)
+    "component_threshold",  # System-defined health threshold (default 4)
+    "score_threshold",  # System-defined health threshold (default 5)
 
     # Bulk query internal params
     # (These handlers are called internally with pre-resolved params,
