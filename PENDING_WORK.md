@@ -472,7 +472,33 @@ is a judgment call, not a coding task.
 
 3. **Verification**: Re-run drift check, confirm 0 gaps
 
-**Recommended Priority**: Address soon, but not tonight — dedicated handlers provide a safety net. Real urgency depends on routing accuracy audit (step 1).
+**Routing Audit Results (2026-09-15): ✅ LATENT RISK CONFIRMED, NO ACTIVE HARM**
+
+Audited query_cost_log, fallback_log, and conversation_threads for last 30 days:
+
+*Findings:*
+1. **Zero instances of silent wrong answers** due to missing schema registration
+2. **Zero instances of dynamic_query successfully querying the 4 invisible tables**
+   - Confirmed via fallback_log queries_run: no queries reference sdr_metrics/sdr_users/user_personas/arr_by_customer
+3. **SDR/call quality questions DO attempt dynamic_query first** (found in query_cost_log)
+   - Example: "How's Scott's call quality been this month?" (ID 7, 2026-09-11 13:21:27)
+   - Example: "How many meetings has Jake Stangl's SDR pipeline generated this quarter" (ID 10, 2026-09-11 13:28:33)
+4. **When dynamic_query fails (exception), system falls back to dedicated handlers**
+   - Both example questions got honest answers via fallback: "No call quality scores on record", "Zero deals attributed"
+5. **All real user questions got correct answers** — the fallback mechanism worked
+
+*Conclusion:*
+- **"Latent risk" assessment is accurate** — the gap exists but hasn't caused harm
+- Routing does fail (questions hit dynamic_query first), but fallback prevents damage
+- No urgency to fix immediately, but should address to eliminate the failed dynamic_query attempts and reliance on fallback
+
+*Evidence:*
+- query_cost_log: 2 SDR-related exceptions (both fell back successfully)
+- conversation_threads: Both questions delivered with honest answers
+- fallback_log: No queries ever reached the 4 invisible tables
+- 20+ SDR/ARR/metrics questions in last 30 days, all answered correctly
+
+**Recommended Priority**: Address when convenient — no production harm detected, but eliminating the exception-then-fallback pattern is cleaner than relying on it.
 
 **Related:** This gap is exactly why the schema-dictionary drift check (4th gate) was built — would have caught region/segment and new_arr/expansion_arr immediately instead of days later.
 
