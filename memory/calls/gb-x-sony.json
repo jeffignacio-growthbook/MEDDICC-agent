@@ -1,0 +1,18 @@
+{
+  "company": "GB x Sony",
+  "slug": "gb-x-sony",
+  "last_etl_date": "2026-09-15T06:20:33.391839",
+  "calls": [
+    {
+      "id": "01M28HV7AKCDN5BDJV4S37X9Q7",
+      "source": "fireflies",
+      "title": "GB x Sony: Contextual Bandits",
+      "date": "2026-09-14",
+      "duration_minutes": 30.459999084472656,
+      "summary": "# GB x Sony: Contextual Bandits\nDate: 2026-09-14 | Duration: 30.459999084472656m\n\n## Summary\nThe discussion evaluated where contextual and regular multi-arm bandits provide value, emphasizing short campaigns, promotions, and lightweight personalization. Promotion optimization was identified as an initial pitch, with teams potentially optimizing multivariate campaigns during the first 48 hours. Two-arm tests may gain little over 50/50 allocation because changing assignment probabilities adds inference complexity. SRMs, difficult diagnosis, and unreliable logging were highlighted as deployment risks. Contextual bandits use SDK-level attributes such as region, device, role, or account plan to personalize assignments, while high-cardinality contexts are coarsened to reduce noise. The product is currently in closed beta, with public beta planned for later this month, and at least one attribute is currently required. Journey-level optimization of copy, messaging, and variants appears feasible, while ML parameter evaluation and higher-level orchestration are longer-term opportunities. Tom O’Connor will arrange a session with an ML or algorithm team, and Cris will help find a time slot.\n\n## Keywords\nContextual bandits, Multi-armed bandits, Experimentation, Personalisation, Sample-ratio mismatch, GrowthBook\n\n## Action Items\n**Luke Sonnet**\nSend bandit configuration information (23:50)\nEngage Sony machine learning team (28:48)\n\n**Tom O'Connor**\nSchedule machine learning session (27:51)\n\n**Cris**\nPropose meeting session slot (27:51)",
+      "organizer": "cris@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Metric UX Review",
+  "slug": "metric-ux-review",
+  "last_etl_date": "2026-09-15T06:20:33.390905",
+  "calls": [
+    {
+      "id": "01M2GVHHABSY6WRGN26V1Z3NVE",
+      "source": "fireflies",
+      "title": "Metric UX Review",
+      "date": "2026-09-14",
+      "duration_minutes": 51,
+      "summary": "# Metric UX Review\nDate: 2026-09-14 | Duration: 51m\n\n## Summary\nThe team reviewed progress on the metric flow, including removing sample rows, moving tags upward, aligning graph styling with designs, and updating trial activation previews to emphasize today’s value and historical data. A refresh control is planned to address cached data, while advanced settings are being aligned with Johnny’s designs. Metric creation will use a details-first structure, with descriptions inside metric-type dropdowns, row filters after the fact table, and sentence-style retention selectors. The team preferred simpler date selection, checkbox-based optional settings, indented dependent fields, and a default denominator fact table. Metric windows will move into the definition area, while retention keeps conversion windows enabled by default. Preview work includes clearer ratio and funnel visualizations, an immediate unavailable-preview message for retention, and a sticky right rail with save and cancel controls. Risks include a dense metric detail page, incomplete previews, missing empty states, and premium-state UI requirements. A design punch list will be shared, the release may move to next week, and the experiment is targeted for end of day Wednesday, with Luke and Speaker 1 testing before launch.\n\n## Keywords\nMetric UX, Preview visualisation, Metric builder, Funnel analysis, Retention metrics, Advanced settings\n\n## Action Items\n**Nobu Ajito**\n- Add refresh controls (03:54)\n- Implement dropdown descriptions (08:03)\n- Remove preview introduction (12:57)\n- Remove sample rows link (12:57)\n- Refine Metric-type layouts (17:36)\n- Exclude identifier columns (22:06)\n- Add empty state UI (42:19)\n- Add retention unavailable state (45:37)\n- Validate dark-mode styling (48:36)\n\n**Johnny**\n- Design compact funnel layout (21:41)\n- Refine aggregation presentation (23:11)\n- Redesign denominator selector (23:11)\n- Explore percentile layouts (25:54)\n- Improve right-rail density (38:36)\n\n**Jeremy**\n- Send design screenshots (21:48)\n- Post meeting notes (21:48)\n- Coordinate preview testing (49:51)\n- Launch Metric UX experiment (49:51)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

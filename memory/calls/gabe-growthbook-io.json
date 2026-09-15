@@ -1,7 +1,7 @@
 {
   "company": "gabe@growthbook.io",
   "slug": "gabe-growthbook-io",
-  "last_etl_date": "2026-09-09T06:13:44.374456",
+  "last_etl_date": "2026-09-15T06:20:33.391389",
   "calls": [
     {
       "id": "01M0XFDQ4XT2R1P5GYR8QCECX4",
@@ -21,6 +21,17 @@
       "date": "2026-09-08",
       "duration_minutes": 35.06999969482422,
       "summary": "# gabe@growthbook.io - Tue, 08 Sep 2026 12:33:22 PDT - Untitled\nDate: 2026-09-08 | Duration: 35.06999969482422m\n\n## Summary\nThe discussion focused on redesigning the experiment experience by forking UX based on experiment type, reducing excessive CTAs and modal overload, and favoring inline editing with consistent save behavior. Approval should cover the whole experiment and remain connected to organization feature-flag settings, while managed flags should launch only with polished UX to preserve trust. Attribute linkage needs improvement through consolidated randomized-by-field selection, a cascading menu with breadcrumbs, and auto-selection for the happy path; multiple dropdowns may be an initial solution, with linkage data backfilled during creation as a temporary measure. A broader redesign beyond managed flags is needed, with async iteration, quick feedback, and an end-of-month working prototype. The pre-launch checklist may also be redesigned, including a disabled start-button hover state and reconsideration of checklist length and custom items.\n\n## Keywords\nfeature flags, UX redesign, experiment setup, approval flow, inline editing, cascading menu\n\n## Action Items\n**Gabe Melean**  \nRedesign values editing modal (06:13)  \nRefine approval callout integration (17:20)  \nImprove cascading menu in Create Experiment modal (26:38)  \nDeliver polished UX prototype (30:22)  \n\n**Bryce Fitzsimons**  \nExplore inline editing for experiment values (07:39)  \nImplement smaller usability improvements (32:27)  \nRedesign experiment pre-launch checklist UI (32:41)  \n\n**Jeremy Dorn**  \nProvide UX feedback emphasizing simplicity (20:07)  \nAdvocate asynchronous iterative review (29:52)  \n\n**Luke Sonnet**  \nCoordinate asynchronous iteration process (29:56)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2GMX4KM2PV7PCP0MTXGHV8Z",
+      "source": "fireflies",
+      "title": "gabe@growthbook.io - Mon, 14 Sep 2026 12:04:36 PDT - Untitled",
+      "date": "2026-09-14",
+      "duration_minutes": 27.510000228881836,
+      "summary": "# gabe@growthbook.io - Mon, 14 Sep 2026 12:04:36 PDT - Untitled\nDate: 2026-09-14 | Duration: 27.510000228881836m\n\n## Summary\nThe discussion focused on enabling day-one QA testing for complete experiments rather than only testing user experiences. Minimal targeting overrides could target specific user IDs without publishing new versions, operate outside versioning, be evaluated before feature-flag rules, and potentially fire exposure events. Existing force rules require approval and publishing, while pseudo-experiment rules with a 100% bucket and fake key were proposed to better follow the SDK path and test the full event flow. The group discussed approval safeguards, attribute allowlisting, org-level validation, and whether experiments must be live before overrides apply. Production and non-production environments may need explicit designation, with fake keys for non-production tracking exclusion. UI improvements could show environment targeting, testing status, and test traffic, although multi-warehouse setups create complexity. Gabe will review the discussion, and Spotify Confidence QA flows may provide additional inspiration.\n\n## Keywords\nQA testing, experiment overrides, feature flags, environment targeting, exposure events, pre-bucketing\n\n## Action Items\n**Gabe Melean**\nReview QA testing flow concepts (25:24)  \nInvestigate Spotify Confidence QA flow (26:07)",
       "organizer": "gabe@growthbook.io",
       "participants": 1,
       "summary_quality": "good"

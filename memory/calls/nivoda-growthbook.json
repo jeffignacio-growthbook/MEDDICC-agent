@@ -1,0 +1,18 @@
+{
+  "company": "Nivoda & GrowthBook",
+  "slug": "nivoda-growthbook",
+  "last_etl_date": "2026-09-15T06:20:33.396290",
+  "calls": [
+    {
+      "id": "01M2B2D366GB024H1C06P9DSET",
+      "source": "fireflies",
+      "title": "Nivoda & GrowthBook | First Meeting",
+      "date": "2026-09-14",
+      "duration_minutes": 34.099998474121094,
+      "summary": "# Nivoda & GrowthBook | First Meeting\nDate: 2026-09-14 | Duration: 34.099998474121094m\n\n## Summary\nNivoda is a Series C company operating in 70 countries with 400 employees and is evaluating whether to build or buy a stronger AB testing foundation. Current experimentation is limited to basic conditional testing, creating a need for feature flags and front-end, back-end, and marketing experimentation that PMs, engineers, and data scientists can use independently. Snowflake integration is critical, with client-side computation and SQL queries fitting the existing data stack, alongside GDPR compliance and multi-region support across the US, EU, LATAM, and APAC. GrowthBook was reviewed as a potential fit because it uses the warehouse as the source of truth, supports several SDKs, offers estimated 1–2 day integration per SDK and platform, and includes CLI, UI, MCP server, visual editing, and AI assistance. Demonstrated capabilities included significance testing, segmentation, guardrails, sticky bucketing, namespaces, feature-flag ramp-ups, approvals, role-based access, environment separation, and impact dashboards. Vendor evaluation has begun, with a decision expected within 1–2 months and integration targeted for Q4 or early Q1 if selected.\n\n## Keywords\nA/B testing, feature flags, Snowflake integration, experimentation platform, data warehouse, role-based access\n\n## Action Items\n**Justin Drees**  \nShare technical questions (09:50)  \nSchedule next meetings (32:50)  \n\n**Marcel Geldner**  \nShare pricing and commercial model (12:00)  \nProvide slide decks and customer success stories (13:00)  \n\n**Rémy Marin**  \nSupport answering technical questions (10:20)",
+      "organizer": "remy@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

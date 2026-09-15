@@ -1,0 +1,18 @@
+{
+  "company": "PX + GrowthBook",
+  "slug": "px-growthbook",
+  "last_etl_date": "2026-09-15T06:20:33.394212",
+  "calls": [
+    {
+      "id": "01M2689H0J83W5G7GVP5DET2EC",
+      "source": "fireflies",
+      "title": "PX + GrowthBook",
+      "date": "2026-09-14",
+      "duration_minutes": 7.610000133514404,
+      "summary": "# PX + GrowthBook\nDate: 2026-09-14 | Duration: 7.610000133514404m\n\n## Summary\nNo summary available",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

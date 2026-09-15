@@ -1,0 +1,18 @@
+{
+  "company": "Power analysis and",
+  "slug": "power-analysis-and",
+  "last_etl_date": "2026-09-15T06:20:33.391149",
+  "calls": [
+    {
+      "id": "01M2BQR71N0BF69MXETS8J4ZJM",
+      "source": "fireflies",
+      "title": "Power analysis and seed finding in experiment creation",
+      "date": "2026-09-14",
+      "duration_minutes": 50.90999984741211,
+      "summary": "# Power analysis and seed finding in experiment creation\nDate: 2026-09-14 | Duration: 50.90999984741211m\n\n## Summary\nThe discussion focused on embedding the power calculator into the experiment creation flow, pre-filling settings such as data source, goal metric, and variation count, and enabling settings to sync back to experiment configuration. Population filtering should use SQL matching while reducing manual SQL input through SDK attribute-to-fact-table mappings and simple UI selection. The current calculator does not save state, so calculations should be materialized, stored, and linked to experiments. Fact tables offer the strongest automation potential among supported sources, while accurate filtering remains important for accounting for traffic volume and metric differences. The initial scope covers traditional experiments, excluding bandits and switchbacks, while seed finder is a related but separate possibility. Users need runtime and sample-size confidence for budgeting and scheduling; more than 100 power analyses occur weekly, and improved UX could encourage greater use of fact-table filtering. Prioritization depends on team bandwidth, with contextual bandit bugs currently ranked higher.\n\n## Keywords\npower analysis, experiment creation, targeting conditions, SQL filters, fact table, Minimum Detectable Effect Size (MDE)\n\n## Action Items\n**Luke Smith**  \nReach out about next steps with Teresa (43:49)  \nCoordinate with Teresa on engineering plan (49:09)  \n\n**Teresa Yung**  \nConsider prioritization and bandwidth for integration work (43:49)  \n\n**Gabe Melean**  \nShare design placeholder for power calculation integration (49:16)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

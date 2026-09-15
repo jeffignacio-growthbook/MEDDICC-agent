@@ -1,0 +1,18 @@
+{
+  "company": "Diagnostics Sync",
+  "slug": "diagnostics-sync",
+  "last_etl_date": "2026-09-15T06:20:33.391996",
+  "calls": [
+    {
+      "id": "01M2BHVJWY556MK469AS7KJN9F",
+      "source": "fireflies",
+      "title": "Diagnostics Sync",
+      "date": "2026-09-14",
+      "duration_minutes": 19.350000381469727,
+      "summary": "# Diagnostics Sync\nDate: 2026-09-14 | Duration: 19.350000381469727m\n\n## Summary\nThe team discussed a diagnostics prototype expected by the end of the month on a two-week timeline, while noting that its scope still needs clarification during the upcoming kickoff. Diagnostics will have lightweight and power user versions, with the power user version planned for the 5.2 release. The team also identified a need for clearer communication when no data is available, including a distinction between benign and error states. Sample ratio mismatch detection currently lacks root-cause detail, so slice-level analysis is needed to investigate causes by slice. Debugging may require two screens, but the presentation of debugging and trace data remains undecided, with a goal of avoiding complicated user steps. The first experiment details page redesign was rejected, while the second version was accepted and is being refined. Johnny and Gabe will coordinate scope clarification, further requirements will be discussed, and exploration of Statsig data will continue with alignment to Jeremy’s vision.\n\n## Keywords\nDiagnostics, Prototype, UX design, Sample ratio mismatch, Statsig, Kickoff meeting\n\n## Action Items\n**Gabe Melean**  \nShare experiment details page redesign progress (04:41)  \nAttend diagnostics kickoff meeting (06:35)  \nReview diagnostics project scope and UX (08:21)  \nInvestigate debugging diagnostics details (13:05)  \nEvaluate integration of Statsig trace data (14:24)  \n\n**Johnny Martinez**  \nParticipate in diagnostics kickoff meeting coordination (06:35)  \nPrepare questions for diagnostics kickoff meeting (17:01)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

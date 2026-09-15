@@ -1,7 +1,7 @@
 {
   "company": "Johnny / Jeremy",
   "slug": "johnny-jeremy",
-  "last_etl_date": "2026-09-03T06:04:10.800135",
+  "last_etl_date": "2026-09-15T06:20:33.391670",
   "calls": [
     {
       "id": "01M1CPHH6FV29WP3AG291HZSWM",
@@ -10,6 +10,17 @@
       "date": "2026-08-31",
       "duration_minutes": 1,
       "summary": "# Johnny / Jeremy 1-on-1\nDate: 2026-08-31 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "johnny@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2GMP1VYE3JB52FXCNR4ZAPK",
+      "source": "fireflies",
+      "title": "Johnny / Jeremy",
+      "date": "2026-09-14",
+      "duration_minutes": 1,
+      "summary": "# Johnny / Jeremy\nDate: 2026-09-14 | Duration: 1m\n\n## Summary\nNo summary available",
       "organizer": "johnny@growthbook.io",
       "participants": 2,
       "summary_quality": "good"
