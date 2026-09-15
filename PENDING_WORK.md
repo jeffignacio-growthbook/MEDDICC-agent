@@ -423,7 +423,62 @@ is a judgment call, not a coding task.
 
 ---
 
-#### 1. Snapshot ETL Phantom Exits Bug
+#### 1. 62 Unregistered Columns - 4 Tables Completely Invisible to dynamic_query
+**Issue:** The schema-dictionary drift check (4th structural gate, deployed 2026-09-15) found 62 columns in real Postgres schema that are missing from `data_dictionary` with `is_queryable=TRUE`. This is LIVE invisible data RIGHT NOW — the exact bug pattern (region/segment, new_arr/expansion_arr) the investigation has been chasing.
+
+**Severity: LATENT RISK, not actively broken**
+- Dedicated handlers work fine (they use explicit column lists via `select_all()`)
+- But if the classifier misroutes a question to `dynamic_query`, those queries will fail silently
+- Risk depends on classifier routing accuracy
+
+**Breakdown:**
+- **4 fully-unregistered tables** (0 columns in data_dictionary):
+  - `sdr_metrics`: 20 columns missing (calls_made, connected_calls, emails_sent, etc.)
+  - `user_personas`: 15 columns missing (name, email, persona, role, slack_user_id, etc.)
+  - `sdr_users`: 8 columns missing (user_email, user_name, tool, tool_user_id, etc.)
+  - `arr_by_customer`: 4 columns missing (company_name, total_arr, won_deal_count, most_recent_close)
+  - **Subtotal: 47 columns across 4 tables**
+
+- **5 partially-unregistered tables** (some columns missing):
+  - `deals_snapshot`: 4 columns missing (renewal_revenue, fiscal_quarter, forecast_category, week_of_quarter)
+  - `calls`: 5 columns missing (competitors_mentioned, duration_minutes, formatted_summary, has_feature_gap, has_objection)
+  - `forecast_weekly`: 3 columns missing (historical_conversion_high/mid/low)
+  - `waterfall_weekly`: 2 columns missing (newly_arr_bearing_count, newly_arr_bearing_value)
+  - `analyses`: 1 column missing (stage_at_analysis)
+  - **Subtotal: 15 columns across 5 tables**
+
+**Handler Coverage (protects against immediate failure):**
+- `query_arr` → queries `arr_by_customer` directly with explicit columns ✓
+- `query_sdr_metrics`, `query_sdr_leaderboard`, `query_sdr_pipeline_sourced` → query `sdr_metrics`/`sdr_users` directly ✓
+- `user_personas` → no dedicated query handler, used internally for persona lookups ⚠️
+
+**Failure Modes:**
+1. **If routing works correctly** → Dedicated handlers see their columns → safe
+2. **If classifier routes to dynamic_query** → Schema context shows 0 columns for these 4 tables → silent wrong answer or "I don't have that data" when data actually exists
+3. **If a question needs a join across these tables** → dynamic_query can't construct it → fails
+
+**Status:** FOUND, NOT FIXED
+
+**Work Required:**
+1. **Immediate triage**: Confirm current routing accuracy
+   - Pull recent logs, check if any SDR/ARR questions routed to `dynamic_query` (should route to dedicated handlers)
+   - If misrouting is happening → URGENT, fix routing or register columns
+   - If routing is perfect → still fix, but lower urgency
+
+2. **Fix options** (pick one):
+   - **Option A**: Run `python scripts/backfill_data_dictionary.py` (bulk registration for all 62 columns)
+   - **Option B**: Create targeted migrations for each table (see migration 062 pattern)
+   - **Option C**: If any tables genuinely shouldn't be queryable via dynamic_query, add to exclusions with justification
+
+3. **Verification**: Re-run drift check, confirm 0 gaps
+
+**Recommended Priority**: Address soon, but not tonight — dedicated handlers provide a safety net. Real urgency depends on routing accuracy audit (step 1).
+
+**Related:** This gap is exactly why the schema-dictionary drift check (4th gate) was built — would have caught region/segment and new_arr/expansion_arr immediately instead of days later.
+
+---
+
+#### 2. Snapshot ETL Phantom Exits Bug
 **Issue:** Deals occasionally missing from single week's snapshot, causing "phantom exits" in waterfall
 
 **Status:** IDENTIFIED, NOT FIXED
@@ -468,7 +523,7 @@ is a judgment call, not a coding task.
 
 ---
 
-#### 2. query_pipeline_movement Zero-Row Mystery (Jake Stangl incident) — MITIGATED, NOT ROOT-CAUSED, DEPRIORITIZED
+#### 3. query_pipeline_movement Zero-Row Mystery (Jake Stangl incident) — MITIGATED, NOT ROOT-CAUSED, DEPRIORITIZED
 
 **Issue:** A live Slack question about Jake Stangl's FY2027 Q3 pipeline
 movement returned a zero-row result from `query_pipeline_movement`
@@ -610,7 +665,7 @@ tests/test_pipeline_movement_owner_role_note.py.
 
 ---
 
-#### 3. Dedicated Handlers: Owner-Email Canonicalization Gap (audit follow-up)
+#### 4. Dedicated Handlers: Owner-Email Canonicalization Gap (audit follow-up)
 
 **⭐ RECOMMENDED NEXT SESSION START (flagged 2026-09-11):** best-scoped
 open item in this file — direct sequel to the query_pipeline_movement
@@ -685,7 +740,7 @@ pass unchanged.
 
 ---
 
-#### 4. Why Does GitHub Actions' Hosted Runner Fail to Import `ClientOptions` from `supabase`?
+#### 5. Why Does GitHub Actions' Hosted Runner Fail to Import `ClientOptions` from `supabase`?
 
 **Issue:** A live GitHub Actions run of `gate-tests.yml` (ubuntu-latest,
 a fresh `pip install -r requirements.txt` with no venv) failed twice in
