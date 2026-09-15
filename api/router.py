@@ -2198,6 +2198,84 @@ def _format_agg_number(x: float) -> str:
     return f"{x:,.2f}"
 
 
+def _check_suspicious_total_substitution(answer_text: str, corrected_totals: list) -> Optional[str]:
+    """
+    Detect if a corrected aggregation total was spliced into the WRONG
+    location (e.g., replacing an individual deal's line item instead of
+    the summary total).
+
+    INCIDENT (2026-09-14): AGGREGATION_VERIFY gave model correct total
+    ($6.89M for EMEA closed-lost), but retry answer replaced Creative CX's
+    individual deal amount with $6.89M instead of fixing the summary line.
+    Result: Wrong dollar figure attached to real company name, shipped to
+    production.
+
+    Returns:
+        Warning message if suspicious, None if OK.
+
+    Detection heuristic:
+        If a corrected total appears in the answer alongside a company/deal
+        name or in a bulleted/line-item context (not just a "Total:" line),
+        flag as suspicious. This isn't perfect (can't parse all formats),
+        but catches the most dangerous case: a huge total getting attached
+        to a single entity's line.
+    """
+    if not corrected_totals or not answer_text:
+        return None
+
+    import re
+    from aggregation_verification import _format_agg_number
+
+    for d in corrected_totals:
+        corrected_val = d["actual_sum"]
+        # Format variations the model might use
+        formatted_variations = [
+            _format_agg_number(corrected_val),  # e.g., "6,890,371.78"
+            f"{corrected_val:,.0f}",  # "6,890,372"
+            f"{corrected_val/1000:.1f}K",  # "6890.4K"
+            f"{corrected_val/1000000:.2f}M",  # "6.89M"
+        ]
+
+        for fmt_val in formatted_variations:
+            # Look for this value appearing in a suspicious context
+            # Pattern 1: Company name + this value on same line
+            # (e.g., "Creative CX: $6.89M" or "Creative CX — $6,890,372")
+            # BUT: Exclude if the label is a known total-indicator phrase
+            pattern = rf'([A-Z][A-Za-z0-9\s&]+)(?::|\s—|\s-)\s*\$?{re.escape(fmt_val)}'
+            company_match = re.search(pattern, answer_text)
+            if company_match:
+                # Extract the label before the colon/dash
+                label = company_match.group(1).strip().lower()
+                # Check if it's a total indicator - if so, this is NOT suspicious
+                TOTAL_INDICATORS = {"total", "overall", "grand total", "grand_total", "sum", "net"}
+                if not any(indicator in label for indicator in TOTAL_INDICATORS):
+                    return (
+                        f"⚠️ SUSPICIOUS: Corrected total {fmt_val} appears next "
+                        f"to what looks like a company/entity name, not in a "
+                        f"summary line. This may be a wrong substitution "
+                        f"(total spliced into individual line item)."
+                    )
+
+            # Pattern 2: Bulleted/line-item format with this value
+            # (e.g., "• Creative CX: $6.89M" or "- Deal 123: $6,890,372")
+            bullet_context = re.search(
+                rf'[•\-\*]\s*[^\n:]+:\s*\$?{re.escape(fmt_val)}',
+                answer_text
+            )
+            if bullet_context:
+                matched_line = bullet_context.group(0)
+                # Exception: If the line explicitly says "Total" or "Grand",
+                # it's probably OK (bulleted summary is fine)
+                if not re.search(r'\b(total|grand|overall|sum)\b', matched_line, re.IGNORECASE):
+                    return (
+                        f"⚠️ SUSPICIOUS: Corrected total {fmt_val} appears in "
+                        f"a bulleted/line-item context without 'total' keyword. "
+                        f"This may be a wrong substitution."
+                    )
+
+    return None
+
+
 def _aggregation_correction_message(discrepancies: list) -> str:
     """Build the forced-resynthesis correction message for one or more
     aggregation-completeness mismatches (verify_aggregation_completeness()'s
@@ -2229,9 +2307,13 @@ def _aggregation_correction_message(discrepancies: list) -> str:
         f"{lines}\n\n"
         "These corrected totals are DEFINITIVE — already computed from "
         "the real retrieved data, not a guess. Do NOT recompute or "
-        "re-derive them yourself. Respond again with the same answer, "
-        "but replace each wrong stated total above with its exact "
-        'corrected number, verbatim. Respond as {"answer": "..."}.'
+        "re-derive them yourself.\n\n"
+        "CRITICAL: These corrected totals belong in your SUMMARY/TOTAL "
+        "line(s) ONLY. Do NOT alter any individual deal amounts, "
+        "per-week figures, or line-item breakdowns — those are already "
+        "correct. Replace ONLY the wrong summary total(s) named above "
+        "with the exact corrected number(s), verbatim.\n\n"
+        'Respond as {"answer": "..."}.'
     )
 
 
@@ -3579,6 +3661,20 @@ async def _dynamic_query_loop_core(question, history, params,
                         retry_parsed = _extract_json(retry_synth.text)
                         if retry_parsed and retry_parsed.get("answer"):
                             final_answer_text = retry_parsed["answer"]
+                            # STRUCTURAL GATE (2026-09-14): Check if corrected
+                            # total ended up in wrong location
+                            suspicious = _check_suspicious_total_substitution(
+                                final_answer_text, all_disc
+                            )
+                            if suspicious:
+                                logger.error(
+                                    f"[AGGREGATION_VERIFY] finalize retry put "
+                                    f"corrected total in wrong location: {suspicious}"
+                                )
+                                # Force honest fallback instead of shipping corrupted data
+                                return _diagnostic_answer(
+                                    tail, "aggregation_substitution_suspicious"
+                                )
                     except Exception as e:
                         logger.warning(
                             f"[AGGREGATION_VERIFY] resynthesis retry raised: {e}")
@@ -3815,6 +3911,25 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             # FIX: Verify synthesis aggregated all rows correctly
             answer_text = parsed["answer"]
 
+            # STRUCTURAL GATE (2026-09-14): If previous iteration forced an
+            # aggregation retry, check if the corrected total ended up in a
+            # SUSPICIOUS location (e.g., replacing an individual deal's line
+            # item instead of the summary). If so, escalate immediately to
+            # "unresolved" rather than shipping corrupted data.
+            if "_agg_retry_totals" in cost_state:
+                suspicious = _check_suspicious_total_substitution(
+                    answer_text, cost_state["_agg_retry_totals"]
+                )
+                if suspicious:
+                    logger.error(
+                        f"[AGGREGATION_VERIFY] After retry, corrected total "
+                        f"appears in wrong location: {suspicious}"
+                    )
+                    cost_state["primitives_fired"]["aggregation_mismatch_unresolved_after_retry"] = True
+                    return await _finalize_from_data("aggregation_substitution_suspicious")
+                # Clear the flag after check
+                del cost_state["_agg_retry_totals"]
+
             # STRUCTURAL GATE (2026-09-11, round 2): the scratchpad check
             # added for the prose-fallback path (below, for when JSON
             # parsing fails) never runs here — this branch is reached
@@ -3912,6 +4027,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 no_progress_streak += 1
                 if no_progress_streak >= 2:
                     return await _finalize_from_data("aggregation_mismatch_unresolved")
+                # Store corrected totals for post-retry verification
+                cost_state["_agg_retry_totals"] = all_disc
                 continue
 
             # Check 2: false completeness claims ("partial"/"pending"/

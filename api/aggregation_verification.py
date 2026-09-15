@@ -213,6 +213,16 @@ def _amount_to_number(sign: str, digits: str, mult: Optional[str], verb: Optiona
     return value
 
 
+def _format_agg_number(value: float) -> str:
+    """Format a number with commas and appropriate decimal places for aggregation display."""
+    if value == int(value):
+        # Whole number - no decimals
+        return f"{value:,.0f}"
+    else:
+        # Has decimals - show 2 decimal places
+        return f"{value:,.2f}"
+
+
 _LABEL_LINE_RE = re.compile(
     r"([A-Za-z][A-Za-z0-9 ,'\-]{0,40}?):\s*([^\n]+?)(?=(?:,\s*[A-Za-z][\w ,'\-]{0,40}?:|\n|$))"
 )
