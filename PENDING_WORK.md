@@ -7,6 +7,51 @@
 
 ## ✅ Recently Completed
 
+### Schema-Dictionary Drift Check (2026-09-15)
+**Status:** ✅ COMPLETE - Fourth structural gate deployed
+
+**The Bug Pattern:**
+When manual DB migrations add columns (e.g., `ALTER TABLE deals ADD COLUMN xyz`) but forget to register them in `data_dictionary`, those columns become INVISIBLE to the dynamic query system — the exact pattern that hid `region`/`segment` and `new_arr`/`expansion_arr`/`renewal_revenue` from queries for days.
+
+**What Makes This Gate Different:**
+Unlike the first three gates (date-math, primitive-contract, handler-param-completeness) which run per-PR, this gate runs on a SCHEDULE (weekly) because schema drift comes from manual DB migrations, not code commits. A per-PR gate would never catch it.
+
+**Completed Work:**
+- [x] `scripts/check_schema_dictionary_drift.py` - Queries information_schema.columns vs data_dictionary for 19 queryable tables
+- [x] Two drift categories:
+  - Category (a) HIGH: Columns in real schema but missing from data_dictionary (makes data invisible)
+  - Category (b) LOWER: Columns in data_dictionary but not in real schema (stale registration)
+- [x] `.github/workflows/schema-drift-check.yml` - Weekly scheduled check (Mondays 9 AM UTC)
+- [x] Fails loudly on category (a) drift with actionable error message
+- [x] Tested against current production state (found 62 gaps, as expected for newly-added tables)
+- [x] Verified trap springs: Added test column to `deals`, confirmed detection, reverted
+
+**How It Works:**
+1. Queries `information_schema.columns` for all columns in QUERYABLE_TABLES
+2. Queries `data_dictionary WHERE is_queryable=TRUE` for registered columns
+3. Compares and reports both missing (category a) and stale (category b) columns
+4. Checks `config/data_dictionary_exclusions.yaml` for intentional omissions
+5. Exits 1 on category (a) drift, triggering workflow failure
+
+**Protected Tables (19 total):**
+deals, deals_snapshot, calls, analyses, objections, feature_gaps, win_loss_narratives, competitive_signals, pipeline_signals, deal_risks, waterfall_weekly, forecast_weekly, pipeline_generation_weekly, rep_performance, rep_targets, sdr_metrics, sdr_users, user_personas, arr_by_customer
+
+**The Four Structural Gates:**
+1. **Date-math gate** (tests/test_date_resolution.py) - Per-PR, prevents `date.today()` calls
+2. **Primitive-contract gate** (tests/test_primitive_contract.py) - Per-PR, ensures detection primitives act on findings
+3. **Handler-param-completeness gate** (tests/test_handler_schema_completeness.py) - Per-PR, prevents handlers reading params not in classifier schema
+4. **Schema-dictionary drift gate** (scripts/check_schema_dictionary_drift.py) - SCHEDULED (weekly), prevents unregistered columns
+
+**Commits:**
+- [script + workflow created, not yet committed in this session]
+
+**Files:**
+- `scripts/check_schema_dictionary_drift.py` - Drift detection script
+- `.github/workflows/schema-drift-check.yml` - Weekly scheduled workflow
+- This entry in PENDING_WORK.md
+
+---
+
 ### Region + Segment Waterfall Segmentation (2026-09-08)
 **Status:** ✅ PRODUCTION VERIFIED (with one caveat - see below)
 

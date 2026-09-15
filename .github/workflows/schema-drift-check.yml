@@ -1,0 +1,64 @@
+name: Schema-Dictionary Drift Check
+
+# SCHEDULED CHECK - runs weekly, not per-PR
+#
+# Why scheduled? Schema drift comes from manual DB migrations (someone runs
+# `ALTER TABLE deals ADD COLUMN xyz` but forgets to register in data_dictionary),
+# not from code commits. A per-PR gate would never catch it.
+#
+# This is the FOURTH structural gate (after date-math, primitive-contract,
+# and handler-param-completeness), protecting against the region/segment
+# incident pattern where real data becomes invisible to queries.
+
+on:
+  schedule:
+    # Run weekly on Mondays at 9 AM UTC
+    - cron: '0 9 * * 1'
+
+  # Allow manual trigger for testing
+  workflow_dispatch:
+
+jobs:
+  check-drift:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install psycopg2-binary pyyaml
+
+    - name: Run schema drift check
+      env:
+        SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      run: |
+        python scripts/check_schema_dictionary_drift.py --verbose
+
+    - name: Report failure
+      if: failure()
+      run: |
+        echo "=========================================="
+        echo "SCHEMA DRIFT DETECTED"
+        echo "=========================================="
+        echo ""
+        echo "The drift check found columns in the real Postgres schema"
+        echo "that are missing from data_dictionary (or vice versa)."
+        echo ""
+        echo "This is the same bug pattern that made region/segment/new_arr"
+        echo "invisible to queries for days."
+        echo ""
+        echo "Check the workflow output above for details."
+        echo ""
+        echo "To fix:"
+        echo "  1. Run: python scripts/backfill_data_dictionary.py"
+        echo "  2. OR create a migration inserting into data_dictionary"
+        echo "  3. OR add to config/data_dictionary_exclusions.yaml with reason"
+        echo ""
+        exit 1
