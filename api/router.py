@@ -901,7 +901,12 @@ Required JSON:
     "component": "<for query_rubric / submit_score_correction: a MEDDICC component (champion, economic_buyer, metrics, decision_criteria, decision_process, pain, competition), else null>",
     "proposed_score": "<for submit_score_correction ONLY: the 0-10 score the user says it should be, else null>",
     "correction_reason": "<for submit_score_correction ONLY: the user's justification for the corrected score, else null>",
-    "help_category": "<for query_help ONLY: greeting|capability|prompt_seeking|recovery, else null>"
+    "help_category": "<for query_help ONLY: greeting|capability|prompt_seeking|recovery, else null>",
+    "limit": "<integer: result count limit when question asks for 'top N' or 'show me N' (e.g., 'top 10', 'show me 5 customers'). Common values: 5, 10, 20. If not specified: null (handlers use sensible defaults: 10-20)>",
+    "sort_by": "<for query_team_leaderboard: sort dimension when question specifies ordering (e.g., 'sort by ARR', 'ranked by pipeline'). Values: 'pipeline'|'arr'|'win_rate'|null. Default: null (handler uses 'pipeline')>",
+    "focus": "<for query_coaching_priorities: what to focus coaching on when question specifies area (e.g., 'focus on discovery', 'champion issues'). Values: component name (champion, metrics, etc.) or 'all'. Default: null (handler uses 'all')>",
+    "score": "<for query_rubric: specific MEDDICC score (0-10) when asking about rubric criteria for a score (e.g., 'what's a 7 for champion?', 'show me score 5 criteria'). Must be used WITH component parameter. Integer 0-10 or null>",
+    "stale_days": "<for query_stale_deals: number of days threshold for 'stale' when question specifies duration (e.g., 'deals stale > 30 days', 'inactive for 45 days'). Integer or null. Default: null (handler uses 21 days)>"
   }},
   "unanswerable_reason": "<REQUIRED for unanswerable: specific table or column that is missing, e.g. 'no competitor field in deals table', 'no pricing_tier dimension exists'. DO NOT use vague reasons like 'no_data' or 'complex query'. If you cannot name a specific missing table/column, route to dynamic_query instead. For other handlers: null>",
   "confidence": 0.0-1.0
