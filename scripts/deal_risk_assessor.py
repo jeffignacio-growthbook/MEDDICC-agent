@@ -7,7 +7,14 @@ OR forecast_category='COMMIT', with close_date in current fiscal quarter.
 
 Risk signals:
 1. Deal duration vs. typical segment sales cycle (from historical closed-won data)
-2. MEDDICC weakness/staleness (from analyses table, 14-day cutoff)
+2. MEDDICC weakness/staleness (DEFERRED - insufficient historical data)
+
+MEDDICC Signal Status (as of 2026-09-16):
+- Only 4 of 327 closed-won deals (1.2%) have MEDDICC scores
+- Timing analysis confirms all 4 were scored PRE-CLOSE (not post-close artifacts)
+- No discrimination observed: won deals score identically to at-risk deals on 6/7 components
+- Signal remains explicitly marked as "insufficient_data" until ≥30 won deals with scores
+  exist AND those scores demonstrate clear discrimination from at-risk deals
 
 Returns per-deal risk_factors list + overall_label (high_risk/moderate_risk/
 low_risk/insufficient_data). No fabricated probabilities.
@@ -138,36 +145,33 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
                 f"benchmark for comparison)"
             )
 
-        # RISK SIGNAL 2: MEDDICC weakness/staleness
+        # RISK SIGNAL 2: MEDDICC weakness/staleness (DEFERRED)
+        # 2026-09-16: Insufficient historical data to validate MEDDICC framework.
+        # Only 1.2% of won deals (4/327) have scores, showing no discrimination
+        # from at-risk deals. Signal explicitly marked as insufficient_data until
+        # ≥30 won deals with scores exist AND demonstrate clear discrimination.
         meddicc_data = meddicc_scores.get(deal_id)
-        meddicc_status = "missing"
+        meddicc_status = "insufficient_data"
         meddicc_age_days = None
         weak_components = []
 
+        # Still fetch score age for transparency, but don't use for risk classification
         if meddicc_data:
             analyzed_at = meddicc_data.get("analyzed_at")
             if analyzed_at:
-                analyzed_dt = datetime.fromisoformat(analyzed_at)
-                if analyzed_dt.tzinfo is None:
-                    analyzed_dt = analyzed_dt.replace(tzinfo=timezone.utc)
-                meddicc_age_days = (now - analyzed_dt).days
+                try:
+                    analyzed_dt = datetime.fromisoformat(analyzed_at)
+                    if analyzed_dt.tzinfo is None:
+                        analyzed_dt = analyzed_dt.replace(tzinfo=timezone.utc)
+                    meddicc_age_days = (now - analyzed_dt).days
+                except (ValueError, TypeError):
+                    pass
 
-                if meddicc_age_days <= MEDDICC_STALENESS_DAYS:
-                    meddicc_status = "fresh"
-                    # Check for weak components (reuse compute_at_risk_deals logic)
-                    weak_components = _identify_weak_components(meddicc_data, stage)
-                    if weak_components:
-                        risk_factors.append(
-                            f"Weak MEDDICC components: {', '.join(weak_components)}"
-                        )
-                else:
-                    meddicc_status = "stale"
-                    risk_factors.append(
-                        f"MEDDICC score stale ({meddicc_age_days} days old, "
-                        f"threshold {MEDDICC_STALENESS_DAYS} days)"
-                    )
-        else:
-            risk_factors.append("No MEDDICC analysis on file")
+        # Explicit note that MEDDICC signal is deferred (not just missing)
+        risk_factors.append(
+            "MEDDICC: insufficient_data (1.2% won-deal coverage, "
+            "framework validation pending)"
+        )
 
         # OVERALL LABEL: Classify based on risk factors
         overall_label = _classify_risk(
@@ -244,7 +248,11 @@ def _identify_weak_components(meddicc_data: Dict[str, Any], stage: str) -> List[
     """
     Identify MEDDICC components scoring below expected threshold for stage.
 
-    Reuses compute_at_risk_deals' band logic:
+    2026-09-16: CURRENTLY UNUSED - MEDDICC signal deferred.
+    Kept for future use once sufficient historical data exists (≥30 won deals
+    with scores that discriminate from at-risk deals).
+
+    Original logic:
     - Late-stage deals (Negotiating/Awaiting Signature) should have Green (8-10) across the board
     - Yellow (5-7) or Red (0-4) in late stage = weak component
     """
@@ -277,39 +285,37 @@ def _classify_risk(
     segment: str
 ) -> str:
     """
-    Classify overall risk level based on signals.
+    Classify overall risk level based on cycle-length signal only.
+
+    2026-09-16: MEDDICC signal deferred due to insufficient historical data
+    (1.2% won-deal coverage, no observed discrimination). Risk classification
+    uses ONLY the cycle-length signal until MEDDICC can be validated.
 
     Logic:
-    - insufficient_data: Unknown segment with no benchmark + no/stale MEDDICC
-    - high_risk: Significantly past benchmark (>30 days) OR multiple weak MEDDICC components
-    - moderate_risk: Moderately past benchmark (0-30 days) OR stale MEDDICC OR 1-2 weak components
-    - low_risk: Within benchmark AND fresh MEDDICC with no weak components
+    - insufficient_data: Unknown segment with no cycle benchmark
+    - high_risk: Significantly past benchmark (>30 days)
+    - moderate_risk: Moderately past benchmark (0-30 days)
+    - low_risk: Within benchmark
+
+    Args:
+        days_past_benchmark: Days beyond segment's 75th percentile, or None if no benchmark
+        meddicc_status: IGNORED (deferred) - kept for interface compatibility
+        weak_components: IGNORED (deferred) - kept for interface compatibility
+        segment: Deal segment for context
     """
-    # Insufficient data: can't assess either signal meaningfully
-    if segment == "Unknown" and meddicc_status in ["missing", "stale"]:
+    # Insufficient data: no cycle benchmark to assess
+    if days_past_benchmark is None:
         return "insufficient_data"
 
-    if days_past_benchmark is None and meddicc_status in ["missing", "stale"]:
-        return "insufficient_data"
-
-    # High risk: significantly overdue OR multiple MEDDICC weaknesses
-    if days_past_benchmark is not None and days_past_benchmark > 30:
+    # High risk: significantly overdue (>30 days past benchmark)
+    if days_past_benchmark > 30:
         return "high_risk"
 
-    if len(weak_components) >= 3:
-        return "high_risk"
-
-    # Moderate risk: moderately overdue OR stale score OR some weak components
-    if days_past_benchmark is not None and days_past_benchmark > 0:
+    # Moderate risk: moderately overdue (0-30 days past benchmark)
+    if days_past_benchmark > 0:
         return "moderate_risk"
 
-    if meddicc_status == "stale":
-        return "moderate_risk"
-
-    if len(weak_components) > 0:
-        return "moderate_risk"
-
-    # Low risk: within benchmark and healthy MEDDICC
+    # Low risk: within or ahead of benchmark
     return "low_risk"
 
 

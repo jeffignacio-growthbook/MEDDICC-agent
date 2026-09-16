@@ -49,11 +49,17 @@ def test_assess_deal_risk_with_overdue_cycle():
 
 
 def test_assess_deal_risk_with_weak_meddicc():
-    """Test deal with multiple weak MEDDICC components is flagged high_risk."""
+    """Test MEDDICC signal is deferred - risk based on cycle-length only.
+
+    2026-09-16: MEDDICC signal deferred due to insufficient historical data.
+    Deal with 50 days open and SMB benchmark of 138 days should be low_risk
+    (within benchmark), regardless of MEDDICC scores. MEDDICC insufficient_data
+    note should appear in risk_factors.
+    """
     today = date.today()
     create_date = (today - timedelta(days=50)).isoformat()
 
-    # Mock MEDDICC data with multiple weak scores
+    # Mock MEDDICC data with multiple weak scores (IGNORED for risk classification)
     mock_sb = MagicMock()
     mock_sb.table().select().in_().order().execute.return_value = MagicMock(data=[{
         "deal_id": "123",
@@ -71,7 +77,7 @@ def test_assess_deal_risk_with_weak_meddicc():
     deals = [{
         "deal_id": "123",
         "company_name": "Test Corp",
-        "stage": LATE_STAGE_IDS[0],  # Negotiating - should have all Green
+        "stage": LATE_STAGE_IDS[0],  # Negotiating
         "create_date": create_date,
         "close_date": today.isoformat(),
         "segment": "SMB",
@@ -81,18 +87,27 @@ def test_assess_deal_risk_with_weak_meddicc():
 
     result = assess_deal_risk(deals, mock_sb)
 
-    assert result["summary"]["high_risk"] == 1
+    # Should be low_risk (50 days < 138-day SMB benchmark), not high_risk
+    assert result["summary"]["low_risk"] == 1
     deal = result["assessed_deals"][0]
-    assert len(deal["weak_components"]) >= 3  # Multiple weak components
-    assert deal["overall_label"] == "high_risk"
+    # MEDDICC status marked as insufficient_data, not used for classification
+    assert deal["meddicc_status"] == "insufficient_data"
+    assert deal["overall_label"] == "low_risk"
+    # Verify MEDDICC insufficient_data note is present
+    assert any("insufficient_data" in rf for rf in deal["risk_factors"])
 
 
 def test_assess_deal_risk_with_stale_meddicc():
-    """Test deal with stale MEDDICC score (>14 days) is flagged moderate_risk."""
+    """Test MEDDICC staleness is tracked but not used for risk classification.
+
+    2026-09-16: MEDDICC signal deferred. Deal with 50 days open (within SMB
+    138-day benchmark) should be low_risk regardless of MEDDICC staleness.
+    MEDDICC age is still tracked for transparency.
+    """
     today = date.today()
     create_date = (today - timedelta(days=50)).isoformat()
 
-    # Mock stale MEDDICC data (18 days old)
+    # Mock stale MEDDICC data (18 days old) - IGNORED for risk classification
     stale_date = datetime.now(timezone.utc) - timedelta(days=18)
     mock_sb = MagicMock()
     mock_sb.table().select().in_().order().execute.return_value = MagicMock(data=[{
@@ -122,18 +137,24 @@ def test_assess_deal_risk_with_stale_meddicc():
     result = assess_deal_risk(deals, mock_sb)
 
     deal = result["assessed_deals"][0]
-    assert deal["meddicc_status"] == "stale"
-    assert deal["meddicc_age_days"] == 18
-    assert deal["overall_label"] == "moderate_risk"
-    assert any("stale" in rf.lower() for rf in deal["risk_factors"])
+    # MEDDICC status always marked as insufficient_data (deferred)
+    assert deal["meddicc_status"] == "insufficient_data"
+    assert deal["meddicc_age_days"] == 18  # Age still tracked for transparency
+    assert deal["overall_label"] == "low_risk"  # Based on cycle-length only
+    # Verify MEDDICC insufficient_data note is present
+    assert any("insufficient_data" in rf for rf in deal["risk_factors"])
 
 
 def test_assess_deal_risk_low_risk():
-    """Test deal within benchmark with fresh good MEDDICC is low_risk."""
+    """Test deal within benchmark is low_risk, MEDDICC marked insufficient_data.
+
+    2026-09-16: MEDDICC signal deferred. Risk classification based solely on
+    cycle-length. MEDDICC insufficient_data note should appear in risk_factors.
+    """
     today = date.today()
     create_date = (today - timedelta(days=50)).isoformat()  # Well within SMB 138-day benchmark
 
-    # Mock fresh MEDDICC data with all Green scores
+    # Mock fresh MEDDICC data with all Green scores (IGNORED for risk classification)
     mock_sb = MagicMock()
     mock_sb.table().select().in_().order().execute.return_value = MagicMock(data=[{
         "deal_id": "123",
@@ -164,11 +185,17 @@ def test_assess_deal_risk_low_risk():
     deal = result["assessed_deals"][0]
     assert deal["overall_label"] == "low_risk"
     assert deal["days_past_benchmark"] < 0  # Within benchmark
-    assert len(deal["weak_components"]) == 0
+    assert deal["meddicc_status"] == "insufficient_data"  # Deferred, not "fresh"
+    # Verify MEDDICC insufficient_data note is present in risk_factors
+    assert any("insufficient_data" in rf for rf in deal["risk_factors"])
 
 
 def test_assess_deal_risk_insufficient_data():
-    """Test deal with Unknown segment and no MEDDICC is insufficient_data."""
+    """Test deal with Unknown segment (no cycle benchmark) is insufficient_data.
+
+    2026-09-16: MEDDICC signal deferred. insufficient_data triggered by lack of
+    cycle benchmark only (segment-specific historical data missing).
+    """
     today = date.today()
     create_date = (today - timedelta(days=50)).isoformat()
 
@@ -181,7 +208,7 @@ def test_assess_deal_risk_insufficient_data():
         "stage": LATE_STAGE_IDS[0],
         "create_date": create_date,
         "close_date": today.isoformat(),
-        "segment": "Unknown",  # No benchmark
+        "segment": "Unknown",  # No cycle benchmark
         "forecast_category": "COMMIT",
         "deal_status": "active"
     }]
@@ -191,41 +218,49 @@ def test_assess_deal_risk_insufficient_data():
     deal = result["assessed_deals"][0]
     assert deal["overall_label"] == "insufficient_data"
     assert deal["cycle_benchmark_days"] is None
+    assert deal["meddicc_status"] == "insufficient_data"  # Always deferred
+    # Verify MEDDICC insufficient_data note is present
+    assert any("insufficient_data" in rf for rf in deal["risk_factors"])
 
 
 def test_classify_risk_logic():
-    """Test risk classification logic directly."""
+    """Test risk classification logic (cycle-length only, MEDDICC deferred).
+
+    2026-09-16: MEDDICC signal deferred. Classification uses only cycle-length
+    signal. meddicc_status and weak_components parameters are ignored.
+    """
     # High risk: >30 days past benchmark
-    assert _classify_risk(days_past_benchmark=50, meddicc_status="fresh",
+    assert _classify_risk(days_past_benchmark=50, meddicc_status="ignored",
                          weak_components=[], segment="SMB") == "high_risk"
 
-    # High risk: 3+ weak components
-    assert _classify_risk(days_past_benchmark=-10, meddicc_status="fresh",
-                         weak_components=["A", "B", "C"], segment="SMB") == "high_risk"
-
     # Moderate risk: 0-30 days past benchmark
-    assert _classify_risk(days_past_benchmark=15, meddicc_status="fresh",
+    assert _classify_risk(days_past_benchmark=15, meddicc_status="ignored",
                          weak_components=[], segment="SMB") == "moderate_risk"
 
-    # Moderate risk: stale MEDDICC
-    assert _classify_risk(days_past_benchmark=-10, meddicc_status="stale",
-                         weak_components=[], segment="SMB") == "moderate_risk"
-
-    # Moderate risk: 1-2 weak components
-    assert _classify_risk(days_past_benchmark=-10, meddicc_status="fresh",
-                         weak_components=["A"], segment="SMB") == "moderate_risk"
-
-    # Low risk: within benchmark, fresh MEDDICC, no weak components
-    assert _classify_risk(days_past_benchmark=-10, meddicc_status="fresh",
+    # Low risk: within benchmark (negative days_past_benchmark)
+    assert _classify_risk(days_past_benchmark=-10, meddicc_status="ignored",
                          weak_components=[], segment="SMB") == "low_risk"
 
-    # Insufficient data: Unknown segment + no/stale MEDDICC
-    assert _classify_risk(days_past_benchmark=None, meddicc_status="missing",
+    # Low risk at boundary: exactly at benchmark (0 days past)
+    assert _classify_risk(days_past_benchmark=0, meddicc_status="ignored",
+                         weak_components=[], segment="SMB") == "low_risk"
+
+    # Insufficient data: no cycle benchmark available
+    assert _classify_risk(days_past_benchmark=None, meddicc_status="ignored",
                          weak_components=[], segment="Unknown") == "insufficient_data"
+
+    # MEDDICC params are IGNORED - verify weak components don't affect classification
+    assert _classify_risk(days_past_benchmark=-10, meddicc_status="stale",
+                         weak_components=["A", "B", "C"], segment="SMB") == "low_risk"
 
 
 def test_identify_weak_components_late_stage():
-    """Test weak component identification for late-stage deals (Green threshold)."""
+    """Test weak component identification for late-stage deals (Green threshold).
+
+    2026-09-16: This tests currently-unused logic (MEDDICC signal deferred).
+    Kept to verify the function remains intact for future use once sufficient
+    historical data exists to validate the MEDDICC framework.
+    """
     meddicc_data = {
         "champion_score": 7,  # Yellow - weak for late stage
         "economic_buyer_score": 9,  # Green - OK
