@@ -72,6 +72,13 @@ Path 2 (Dedicated Handlers - Hand-Written):
    - SHOULD USE: aggregate_results primitive with sum/group_by
    - Benefit: Consistent aggregation rules, easier to extend
 
+6. **Classifier schema gaps (2026-09-15):**
+   - Handlers may have parameter logic that never executes because HANDLER_SCHEMA is missing parameters
+   - Example: query_pipeline had pipeline_filter/stage_filter logic, but classifier couldn't populate them
+   - FIXED: test_handler_schema_completeness.py now enforces schema completeness (2026-09-09)
+   - Benefit: Impossible to add handler param without adding to classifier schema
+   - Note: This isn't handler duplication per se, but a parallel risk - handlers bypass primitives AND may have dead code due to schema gaps
+
 **Audit checklist for each handler:**
 - [ ] Dimension filtering (region, segment, pipeline_type, stage, owner)
 - [ ] Date/time window resolution
@@ -179,8 +186,21 @@ Path 2 (Dedicated Handlers - Hand-Written):
 - [ ] Every dedicated handler < 100 lines (ideally < 50)
 - [ ] No duplicated business logic (pipeline classification, stage bucketing, date resolution, etc.)
 - [ ] All handlers call shared primitives/field_semantics functions
+- [ ] Handlers satisfy all 4 structural gates:
+  - tests/test_date_resolution_single_source.py (no raw date.today() calls)
+  - tests/test_primitive_contract.py (detection primitives log + act)
+  - tests/test_handler_schema_completeness.py (all params in HANDLER_SCHEMA)
+  - scripts/check_schema_dictionary_drift.py (no invisible columns)
 - [ ] Regression suite: 20+ live Slack questions answered identically before/after
-- [ ] audit_handler_param_gaps.py shows zero real gaps (all params in schema)
+- [ ] test_handler_schema_completeness.py passes (all handler params registered in schema)
+
+**Available reusable tools for refactoring (2026-09-15):**
+- `verify_corrected_value_placement()` (api/placement_verification.py) - Two-signal placement corruption check for any corrected value handed to model
+- `resolve_dimension_filter()` (api/dimension_resolver.py) - Governed dimension term resolution (region/segment/owner/deal-type)
+- `resolve_time_window()` (api/time_resolver.py) - Fiscal-quarter-aware date resolution
+- `field_semantics.py` functions - is_incremental_pipeline(), stage_bucket(), is_renewal_base(), etc.
+- `filter_table()` (api/tools.py) - Governed filtering primitive
+- `aggregate_results()` (api/tools.py) - Governed aggregation primitive
 
 **For Part 2 (Primitives-first policy):**
 - [ ] Documentation: "New Client Setup Guide" requires primitives before handlers
