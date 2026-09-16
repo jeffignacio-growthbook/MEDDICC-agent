@@ -228,3 +228,65 @@ async def compare_periods(sb, table, column, agg, period_a, period_b, date_colum
     return {"period_a": {**period_a, "value": val_a}, "period_b": {**period_b, "value": val_b},
         "delta": delta, "pct_change": round(pct, 1) if pct else None,
         "trend": ("up" if delta > 0 else "down" if delta < 0 else "flat") if delta is not None else "unknown"}
+
+
+async def assess_deal_risk(sb, deal_ids=None, fiscal_quarter=None):
+    """
+    Assess risk for high-priority deals (late-stage OR COMMIT forecast).
+
+    Targets deals that are EITHER:
+    - Late-stage (Negotiating/Awaiting Signature)
+    - forecast_category='COMMIT'
+
+    AND have close_date in current or specified fiscal quarter.
+
+    Risk signal: Deal duration vs. segment-specific cycle benchmarks (75th percentile
+    from 327 historical closed-won deals).
+
+    MEDDICC signal: DEFERRED as of 2026-09-16 (insufficient historical data - only
+    1.2% of won deals have scores, no discrimination observed). Explicitly marked as
+    "insufficient_data" in output.
+
+    Args:
+        sb: Supabase client
+        deal_ids: Optional list of deal IDs to assess (for entity-scoped queries).
+                 If None, queries all late-stage/COMMIT deals in target quarter.
+        fiscal_quarter: Optional fiscal quarter (e.g. "FY2027 Q2"). Defaults to current.
+
+    Returns:
+        {
+            "assessed_deals": [
+                {
+                    "deal_id": str,
+                    "company_name": str,
+                    "days_open": int,
+                    "segment": str,
+                    "risk_factors": [str],
+                    "overall_label": "high_risk" | "moderate_risk" | "low_risk" | "insufficient_data",
+                    "cycle_benchmark_days": int | None,
+                    "days_past_benchmark": int | None,
+                    "meddicc_status": "insufficient_data"  # Always deferred
+                }
+            ],
+            "summary": {
+                "total_assessed": int,
+                "high_risk": int,
+                "moderate_risk": int,
+                "low_risk": int,
+                "insufficient_data": int
+            }
+        }
+
+    Example:
+        # Assess all high-priority deals in current quarter
+        result = await assess_deal_risk(sb)
+
+        # Assess specific deals
+        result = await assess_deal_risk(sb, deal_ids=["123", "456"])
+    """
+    # Import here to avoid circular dependency
+    from deal_risk_assessor import get_at_risk_deals
+
+    # get_at_risk_deals is synchronous, but we're in async context
+    # Call it directly (no await needed - it's not async)
+    return get_at_risk_deals(sb, fiscal_quarter=fiscal_quarter)

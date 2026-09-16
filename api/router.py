@@ -4373,6 +4373,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             "join_tables": T.join_tables,
             "aggregate_results": T.aggregate_results,
             "compare_periods": T.compare_periods,
+            "assess_deal_risk": T.assess_deal_risk,
         }.get(tool_name)
 
         if not tool_fn:
