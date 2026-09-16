@@ -19,11 +19,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from supabase_client import select_all
 from sdr_utils import rate_or_gap, today_in_reporting_tz
 
-# Import aggregate_results primitive (Phase 1a refactor 2026-09-15)
-try:
-    from tools import aggregate_results
-except ImportError:
-    from api.tools import aggregate_results
+# aggregate_results import moved to function scope (query_pipeline)
+# to avoid false positive in handler registry scanner (Phase 1a fix)
 
 # Import analytics scope filter (shared with snapshots)
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts" / "analytics"))
@@ -2111,6 +2108,13 @@ async def query_pipeline(params: dict, sb) -> dict:
     from field_semantics import (stage_bucket, stage_label, is_open,
                                   is_incremental_pipeline, _RENEWAL_PIPELINE_ID)
     from time_resolver import current_quarter_label
+
+    # Phase 1a refactor: Import aggregate_results primitive (function-scoped
+    # to avoid handler registry false positive)
+    try:
+        from tools import aggregate_results
+    except ImportError:
+        from api.tools import aggregate_results
 
     # CRITICAL: Default to NO filters (all active deals)
     # DO NOT filter by time_window/close_date - current state has no time scope
