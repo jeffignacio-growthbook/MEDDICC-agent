@@ -1,0 +1,28 @@
+# Regression Test Questions
+# Accumulated from real production sessions - each question exercises
+# a specific handler or code path that's been verified to work correctly.
+#
+# Usage:
+#   python scripts/test_question.py tests/regression_questions.txt
+#
+# Lines starting with # are comments/section headers. Empty lines are skipped.
+
+# Dynamic Query Loop - Geographic Filters
+# Tests: dimension resolver (EMEA), snapshot diff, stage-change detection
+What was the closed won/lost split in EMEA last quarter?
+
+# Dynamic Query Loop - Breakdown Aggregation
+# Tests: country-level grouping, aggregation verification
+Show me the pipeline breakdown by country
+
+# Dynamic Query Loop - Risk Assessment (NEW)
+# Tests: assess_deal_risk tool routing, cycle-length benchmarks, MEDDICC deferral
+please look at all hubspot deals in the 'negotiating' or 'awaiting signature' stages and assess them based on likelihood to close vs risk
+
+# Dedicated Handler - Pipeline Query
+# Tests: query_pipeline handler, stage filtering, active deal counts
+What is the Current New Business Pipeline?
+
+# Dedicated Handler - Historical Comparison
+# Tests: query_pipeline with time window, period comparison
+Show me new business vs expansion pipeline over the last 6 months

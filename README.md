@@ -199,6 +199,35 @@ reporting:
 
 ---
 
+## Local Testing
+
+Test questions locally against the full production code path
+(classification → routing → handlers → synthesis) without posting
+to Slack or triggering the nightly workflow.
+
+### Single question
+```bash
+python scripts/test_question.py "What is the current pipeline?"
+```
+
+### Regression test suite
+```bash
+python scripts/test_question.py tests/regression_questions.txt
+```
+
+The script:
+- Uses your local `.env` credentials (Supabase/HubSpot/Anthropic)
+- Runs through the SAME production code path as Railway
+- Prints full log trace (`[ROUTING]`, `[INTENT]`, `[LOOP]`, `[TOOL]`, etc.)
+- **Read-only** — queries only, no writes to HubSpot or production data
+
+### Add test cases
+Edit `tests/regression_questions.txt` to add questions that should
+keep working. Each question on its own line. Lines starting with `#`
+are comments.
+
+---
+
 ## Costs
 
 | Scenario | Cost |
