@@ -330,6 +330,34 @@ if not verification_result["match"]:
    - User sees "I don't have data to answer that yet" (router's error handling)
    - NOT a silent wrong answer — verification prevents corrupted data from shipping
 
+**Failure mode: Hard error vs. caveated partial answer**
+
+DELIBERATE DESIGN TRADEOFF (2026-09-16): Verification failure returns a
+hard error (no data shown) rather than a caveated partial answer. This is
+the safe, honest default — if aggregations don't match recomputed values,
+something is genuinely wrong (handler bug, edge case tolerance doesn't
+cover, etc.), and shipping ANY data risks the same "plausible-looking
+wrong answer" corruption this whole primitive was built to prevent.
+
+**Why hard error is the right default:**
+- A wrong total that looks right is worse than "can't answer"
+- Verification failure indicates a REAL BUG, not just uncertainty
+- Forces the bug to surface immediately (logs + user report) rather than
+  silently shipping
+- Same principle as aggregation_placement_corruption: escalate to
+  `_give_up()` instead of shipping the corrupted retry
+
+**Worth revisiting per-handler in Phase 1b:**
+Different handlers may have different failure-mode preferences. Examples:
+- `query_pipeline`: Hard error appropriate (core numbers must be right)
+- `query_at_risk`: Maybe caveat is better? ("Showing deals, but counts
+  may be incomplete — one stage's aggregation looked off")
+- `query_win_loss`: Hard error (win rates/conversion critical)
+
+Not a universal answer — document the tradeoff per handler as Phase 1b
+spreads this pattern. For now: fail hard and safe is the documented,
+deliberate choice, not an implicit one.
+
 **Why this is NOT in FAILURE_MODE_PRIMITIVES:**
 This is a handler-level verification gate, not a `dynamic_query_loop`
 primitive. It prevents corrupted outputs before they reach synthesis,
