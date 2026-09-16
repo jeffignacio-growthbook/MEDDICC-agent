@@ -19,6 +19,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from supabase_client import select_all
 from sdr_utils import rate_or_gap, today_in_reporting_tz
 
+# Import aggregate_results primitive (Phase 1a refactor 2026-09-15)
+try:
+    from tools import aggregate_results
+except ImportError:
+    from api.tools import aggregate_results
+
 # Import analytics scope filter (shared with snapshots)
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts" / "analytics"))
 from point_in_time import load_scope_config, is_deal_in_analytics_scope
@@ -2314,27 +2320,46 @@ async def query_pipeline(params: dict, sb) -> dict:
         logger.warning(f"[PIPELINE] Failed to fetch quarterly target or compute coverage: {e}")
 
     # Breakdown by stage (using incremental value, not deal_value)
-    by_stage = {}
+    # Phase 1a refactor (2026-09-15): Use aggregate_results() primitive
+    # instead of manual group-by loop. Prepares data with stage labels,
+    # calls governed aggregation primitive, transforms output to match
+    # original format for backward compatibility.
     for deal in incremental_deals:
-        stage = deal.get("stage")
-        label = stage_label(stage)
-        if label not in by_stage:
-            by_stage[label] = {"count": 0, "value": 0}
-        by_stage[label]["count"] += 1
-        by_stage[label]["value"] += deal.get("_incremental_value") or 0
+        deal["_stage_label"] = stage_label(deal.get("stage"))
+
+    stage_agg = await aggregate_results(
+        incremental_deals,
+        group_by="_stage_label",
+        aggregations={"_incremental_value": "sum", "deal_id": "count"}
+    )
+
+    by_stage = {}
+    for row in stage_agg["rows"]:
+        by_stage[row["_stage_label"]] = {
+            "count": row["deal_id_count"],
+            "value": row["_incremental_value_sum"]
+        }
 
     # Breakdown by owner (top 10, using incremental value)
-    by_owner = {}
+    # Phase 1a refactor (2026-09-15): Use aggregate_results() primitive.
+    # Note: aggregate_results() already sorts by value descending, so we
+    # just need to take top 10 after transformation.
     for deal in incremental_deals:
-        owner = deal.get("owner_email") or "unassigned"
-        if owner not in by_owner:
-            by_owner[owner] = {"count": 0, "value": 0}
-        by_owner[owner]["count"] += 1
-        by_owner[owner]["value"] += deal.get("_incremental_value") or 0
+        deal["_owner"] = deal.get("owner_email") or "unassigned"
 
-    # Sort by value, take top 10
-    top_owners = sorted(by_owner.items(), key=lambda x: x[1]["value"], reverse=True)[:10]
-    by_owner = {email: stats for email, stats in top_owners}
+    owner_agg = await aggregate_results(
+        incremental_deals,
+        group_by="_owner",
+        aggregations={"_incremental_value": "sum", "deal_id": "count"}
+    )
+
+    # Transform to original format and take top 10 (aggregate_results already sorted)
+    by_owner = {}
+    for row in owner_agg["rows"][:10]:  # Top 10 only
+        by_owner[row["_owner"]] = {
+            "count": row["deal_id_count"],
+            "value": row["_incremental_value_sum"]
+        }
 
     # Top deals by incremental value (not deal_value)
     sorted_deals = sorted(incremental_deals, key=lambda d: d.get("_incremental_value") or 0, reverse=True)

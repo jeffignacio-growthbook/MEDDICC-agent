@@ -1,0 +1,1449 @@
+{
+  "captured_at": "2026-09-15 (pre-aggregation-refactor)",
+  "test_cases": [
+    {
+      "name": "no_filters",
+      "params": {},
+      "result": {
+        "total_deals": 313,
+        "total_pipeline": 20084794.13,
+        "q3_scoped_pipeline": 7858049.13,
+        "q3_scoped_deals": 119,
+        "quarterly_target": 1550000,
+        "coverage_ratio": 5.069709116129032,
+        "current_quarter": "FY2027_Q3",
+        "zero_arr_deals": {
+          "count": 20,
+          "total_value": 459850.0,
+          "note": "Data quality hygiene issues (stage-based rules): Meeting Set excluded (expected $0 at this stage); renewal stages flagged for $0 renewal_revenue; other stages flagged for $0 incremental ARR"
+        },
+        "uncategorized_deals": {
+          "count": 39,
+          "total_value": 732554.6,
+          "note": "Deals with no ARR classification (expansion_arr, new_arr, renewal_revenue all NULL/0)"
+        },
+        "by_stage": {
+          "Meeting Set": {
+            "count": 125,
+            "value": 1895040.0
+          },
+          "Technical Evaluation": {
+            "count": 33,
+            "value": 3745250.0
+          },
+          "Discovery": {
+            "count": 91,
+            "value": 8424408.45
+          },
+          "Scoping": {
+            "count": 27,
+            "value": 3750450.0
+          },
+          "Awaiting Signature": {
+            "count": 3,
+            "value": 93170.68
+          },
+          "Negotiating": {
+            "count": 9,
+            "value": 855220.0
+          },
+          "Upcoming Renewal": {
+            "count": 7,
+            "value": 918755.0
+          },
+          "Renewal Engaged": {
+            "count": 3,
+            "value": 195000.0
+          },
+          "": {
+            "count": 1,
+            "value": 0
+          },
+          "Review": {
+            "count": 14,
+            "value": 207500.0
+          }
+        },
+        "by_owner": {
+          "christian@growthbook.io": {
+            "count": 88,
+            "value": 7178408.45
+          },
+          "james.shannon@growthbook.io": {
+            "count": 38,
+            "value": 3384720.0
+          },
+          "scott.keller@growthbook.io": {
+            "count": 51,
+            "value": 3317790.0
+          },
+          "cary@growthbook.io": {
+            "count": 24,
+            "value": 2181120.6799999997
+          },
+          "jake@growthbook.io": {
+            "count": 43,
+            "value": 2155000.0
+          },
+          "dan@growthbook.io": {
+            "count": 32,
+            "value": 1089000.0
+          },
+          "marcel@growthbook.io": {
+            "count": 17,
+            "value": 530000.0
+          },
+          "marsh@growthbook.io": {
+            "count": 5,
+            "value": 248755.0
+          },
+          "jake.stangl@growthbook.io": {
+            "count": 9,
+            "value": 0
+          },
+          "unassigned": {
+            "count": 3,
+            "value": 0
+          }
+        },
+        "deals": [
+          {
+            "company_name": "Tubi",
+            "incremental_arr": 500000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 500000.0,
+            "deal_value": 500000.0,
+            "stage": "Discovery",
+            "close_date": "2027-07-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Anthropic",
+            "incremental_arr": 500000.0,
+            "expansion_arr": 500000.0,
+            "new_arr": 0.0,
+            "deal_value": 1310000.0,
+            "stage": "Upcoming Renewal",
+            "close_date": "2026-12-12",
+            "owner_email": "cary@growthbook.io"
+          },
+          {
+            "company_name": "Ingka Ikea",
+            "incremental_arr": 500000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 500000.0,
+            "deal_value": 500000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-29",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Decathlon",
+            "incremental_arr": 400000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 400000.0,
+            "deal_value": 400000.0,
+            "stage": "Discovery",
+            "close_date": "2027-05-12",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-29",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Zalando",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-23",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "UPS",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-31",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Perplexity AI",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Crunchyroll",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 300000.0,
+            "new_arr": 0.0,
+            "deal_value": 300000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-10-31",
+            "owner_email": "cary@growthbook.io"
+          },
+          {
+            "company_name": "Zoro",
+            "incremental_arr": 275000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 275000.0,
+            "deal_value": 275000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-10-30",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Box",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-18",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "BESTSELLER",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-11-13",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "Notion",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-09-30",
+            "owner_email": "jake@growthbook.io"
+          },
+          {
+            "company_name": "GitLab Inc.",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Meeting Set",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "JPMorganChase",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "CarGurus Inc",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-30",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Livesport",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-31",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "Stone",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Ryanair",
+            "incremental_arr": 225000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 225000.0,
+            "deal_value": 225000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-11-30",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "OpenTable",
+            "incremental_arr": 220000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 220000.0,
+            "deal_value": 220000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-10-23",
+            "owner_email": "dan@growthbook.io"
+          }
+        ],
+        "filters_applied": {
+          "stage_filter": null,
+          "pipeline_filter": null,
+          "owner_email": null
+        },
+        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total ($18.6M) AND Q3-scoped (q3_scoped_pipeline). COVERAGE: Always computed against Q3-scoped figure, never against timeless total. Format: '$18.6M total pipeline (timeless); $X closing this quarter (Y.Yx coverage)'. STAGE BREAKDOWN: Show ALL stages from by_stage dict (typically 10 stages). Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals (306). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
+        "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering. Coverage ratio scoped to deals closing in target quarter only."
+      }
+    },
+    {
+      "name": "stage_filter_scoping",
+      "params": {
+        "stage_filter": "scoping"
+      },
+      "result": {
+        "total_deals": 30,
+        "total_pipeline": 3945450.0,
+        "q3_scoped_pipeline": 1320000.0,
+        "q3_scoped_deals": 11,
+        "quarterly_target": 1550000,
+        "coverage_ratio": 0.8516129032258064,
+        "current_quarter": "FY2027_Q3",
+        "zero_arr_deals": {
+          "count": 20,
+          "total_value": 459850.0,
+          "note": "Data quality hygiene issues (stage-based rules): Meeting Set excluded (expected $0 at this stage); renewal stages flagged for $0 renewal_revenue; other stages flagged for $0 incremental ARR"
+        },
+        "uncategorized_deals": {
+          "count": 39,
+          "total_value": 732554.6,
+          "note": "Deals with no ARR classification (expansion_arr, new_arr, renewal_revenue all NULL/0)"
+        },
+        "by_stage": {
+          "Scoping": {
+            "count": 27,
+            "value": 3750450.0
+          },
+          "Renewal Engaged": {
+            "count": 3,
+            "value": 195000.0
+          }
+        },
+        "by_owner": {
+          "christian@growthbook.io": {
+            "count": 7,
+            "value": 1350000.0
+          },
+          "scott.keller@growthbook.io": {
+            "count": 5,
+            "value": 1050000.0
+          },
+          "jake@growthbook.io": {
+            "count": 5,
+            "value": 525000.0
+          },
+          "james.shannon@growthbook.io": {
+            "count": 4,
+            "value": 475000.0
+          },
+          "cary@growthbook.io": {
+            "count": 5,
+            "value": 220450.0
+          },
+          "dan@growthbook.io": {
+            "count": 2,
+            "value": 210000.0
+          },
+          "marcel@growthbook.io": {
+            "count": 1,
+            "value": 75000.0
+          },
+          "marsh@growthbook.io": {
+            "count": 1,
+            "value": 40000.0
+          }
+        },
+        "deals": [
+          {
+            "company_name": "Ingka Ikea",
+            "incremental_arr": 500000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 500000.0,
+            "deal_value": 500000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-29",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Zalando",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-23",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "UPS",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-31",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Box",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-18",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "CarGurus Inc",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-30",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Livesport",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-31",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "Stone",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "ASAPP",
+            "incremental_arr": 200000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 200000.0,
+            "deal_value": 200000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-31",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "The New York Times",
+            "incremental_arr": 150000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 150000.0,
+            "deal_value": 150000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-31",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Ziff Davis",
+            "incremental_arr": 150000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 150000.0,
+            "deal_value": 150000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-29",
+            "owner_email": "jake@growthbook.io"
+          },
+          {
+            "company_name": "SAP",
+            "incremental_arr": 150000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 150000.0,
+            "deal_value": 150000.0,
+            "stage": "Scoping",
+            "close_date": "2027-02-01",
+            "owner_email": "jake@growthbook.io"
+          },
+          {
+            "company_name": "Bamboo HR LLC",
+            "incremental_arr": 125000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 125000.0,
+            "deal_value": 125000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-30",
+            "owner_email": "jake@growthbook.io"
+          },
+          {
+            "company_name": "PocketFM",
+            "incremental_arr": 125000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 125000.0,
+            "deal_value": 125000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-23",
+            "owner_email": "dan@growthbook.io"
+          },
+          {
+            "company_name": "Dassault Syst\u00e8mes",
+            "incremental_arr": 120000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 120000.0,
+            "deal_value": 120000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-16",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "Breeze Airways",
+            "incremental_arr": 105000.0,
+            "expansion_arr": 105000.0,
+            "new_arr": 0.0,
+            "deal_value": 127750.0,
+            "stage": "Renewal Engaged",
+            "close_date": "2027-02-23",
+            "owner_email": "cary@growthbook.io"
+          },
+          {
+            "company_name": "RecargaPay",
+            "incremental_arr": 85000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 85000.0,
+            "deal_value": 85000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-29",
+            "owner_email": "dan@growthbook.io"
+          },
+          {
+            "company_name": "TickPick",
+            "incremental_arr": 75000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 75000.0,
+            "deal_value": 75000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Forty Eight Point One",
+            "incremental_arr": 75000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 75000.0,
+            "deal_value": 75000.0,
+            "stage": "Scoping",
+            "close_date": "2026-11-12",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "DasWeltAuto",
+            "incremental_arr": 75000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 75000.0,
+            "deal_value": 75000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-16",
+            "owner_email": "marcel@growthbook.io"
+          },
+          {
+            "company_name": "Aircall",
+            "incremental_arr": 70000.0,
+            "expansion_arr": 70000.0,
+            "new_arr": 0.0,
+            "deal_value": 70000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          }
+        ],
+        "filters_applied": {
+          "stage_filter": "scoping",
+          "pipeline_filter": null,
+          "owner_email": null
+        },
+        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total ($18.6M) AND Q3-scoped (q3_scoped_pipeline). COVERAGE: Always computed against Q3-scoped figure, never against timeless total. Format: '$18.6M total pipeline (timeless); $X closing this quarter (Y.Yx coverage)'. STAGE BREAKDOWN: Show ALL stages from by_stage dict (typically 10 stages). Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals (306). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
+        "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering. Coverage ratio scoped to deals closing in target quarter only."
+      }
+    },
+    {
+      "name": "pipeline_filter_new_business",
+      "params": {
+        "pipeline_filter": "new_business"
+      },
+      "result": {
+        "total_deals": 303,
+        "total_pipeline": 18971039.13,
+        "q3_scoped_pipeline": 7748049.13,
+        "q3_scoped_deals": 116,
+        "quarterly_target": 1550000,
+        "coverage_ratio": 4.998741374193548,
+        "current_quarter": "FY2027_Q3",
+        "zero_arr_deals": {
+          "count": 20,
+          "total_value": 459850.0,
+          "note": "Data quality hygiene issues (stage-based rules): Meeting Set excluded (expected $0 at this stage); renewal stages flagged for $0 renewal_revenue; other stages flagged for $0 incremental ARR"
+        },
+        "uncategorized_deals": {
+          "count": 39,
+          "total_value": 732554.6,
+          "note": "Deals with no ARR classification (expansion_arr, new_arr, renewal_revenue all NULL/0)"
+        },
+        "by_stage": {
+          "Meeting Set": {
+            "count": 125,
+            "value": 1895040.0
+          },
+          "Technical Evaluation": {
+            "count": 33,
+            "value": 3745250.0
+          },
+          "Discovery": {
+            "count": 91,
+            "value": 8424408.45
+          },
+          "Scoping": {
+            "count": 27,
+            "value": 3750450.0
+          },
+          "Awaiting Signature": {
+            "count": 3,
+            "value": 93170.68
+          },
+          "Negotiating": {
+            "count": 9,
+            "value": 855220.0
+          },
+          "": {
+            "count": 1,
+            "value": 0
+          },
+          "Review": {
+            "count": 14,
+            "value": 207500.0
+          }
+        },
+        "by_owner": {
+          "christian@growthbook.io": {
+            "count": 88,
+            "value": 7178408.45
+          },
+          "james.shannon@growthbook.io": {
+            "count": 38,
+            "value": 3384720.0
+          },
+          "scott.keller@growthbook.io": {
+            "count": 51,
+            "value": 3317790.0
+          },
+          "jake@growthbook.io": {
+            "count": 43,
+            "value": 2155000.0
+          },
+          "cary@growthbook.io": {
+            "count": 18,
+            "value": 1166120.68
+          },
+          "dan@growthbook.io": {
+            "count": 32,
+            "value": 1089000.0
+          },
+          "marcel@growthbook.io": {
+            "count": 17,
+            "value": 530000.0
+          },
+          "marsh@growthbook.io": {
+            "count": 1,
+            "value": 150000.0
+          },
+          "jake.stangl@growthbook.io": {
+            "count": 9,
+            "value": 0
+          },
+          "unassigned": {
+            "count": 3,
+            "value": 0
+          }
+        },
+        "deals": [
+          {
+            "company_name": "Tubi",
+            "incremental_arr": 500000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 500000.0,
+            "deal_value": 500000.0,
+            "stage": "Discovery",
+            "close_date": "2027-07-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Ingka Ikea",
+            "incremental_arr": 500000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 500000.0,
+            "deal_value": 500000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-29",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Decathlon",
+            "incremental_arr": 400000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 400000.0,
+            "deal_value": 400000.0,
+            "stage": "Discovery",
+            "close_date": "2027-05-12",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-29",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Zalando",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-23",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "UPS",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-31",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Perplexity AI",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Crunchyroll",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 300000.0,
+            "new_arr": 0.0,
+            "deal_value": 300000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-10-31",
+            "owner_email": "cary@growthbook.io"
+          },
+          {
+            "company_name": "Zoro",
+            "incremental_arr": 275000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 275000.0,
+            "deal_value": 275000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-10-30",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Box",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-18",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "BESTSELLER",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-11-13",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "Notion",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-09-30",
+            "owner_email": "jake@growthbook.io"
+          },
+          {
+            "company_name": "GitLab Inc.",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Meeting Set",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "JPMorganChase",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "CarGurus Inc",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-30",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Livesport",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-31",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "Stone",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Ryanair",
+            "incremental_arr": 225000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 225000.0,
+            "deal_value": 225000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-11-30",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "OpenTable",
+            "incremental_arr": 220000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 220000.0,
+            "deal_value": 220000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-10-23",
+            "owner_email": "dan@growthbook.io"
+          },
+          {
+            "company_name": "Gen\u2122",
+            "incremental_arr": 200000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 200000.0,
+            "deal_value": 200000.0,
+            "stage": "Meeting Set",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          }
+        ],
+        "filters_applied": {
+          "stage_filter": null,
+          "pipeline_filter": "new_business",
+          "owner_email": null
+        },
+        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total ($18.6M) AND Q3-scoped (q3_scoped_pipeline). COVERAGE: Always computed against Q3-scoped figure, never against timeless total. Format: '$18.6M total pipeline (timeless); $X closing this quarter (Y.Yx coverage)'. STAGE BREAKDOWN: Show ALL stages from by_stage dict (typically 10 stages). Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals (306). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
+        "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering. Coverage ratio scoped to deals closing in target quarter only."
+      }
+    },
+    {
+      "name": "owner_filter",
+      "params": {
+        "owner_email": "christian@growthbook.io"
+      },
+      "result": {
+        "total_deals": 88,
+        "total_pipeline": 7178408.45,
+        "q3_scoped_pipeline": 2995908.45,
+        "q3_scoped_deals": 49,
+        "quarterly_target": 1550000,
+        "coverage_ratio": 1.9328441612903227,
+        "current_quarter": "FY2027_Q3",
+        "zero_arr_deals": {
+          "count": 4,
+          "total_value": 0,
+          "note": "Data quality hygiene issues (stage-based rules): Meeting Set excluded (expected $0 at this stage); renewal stages flagged for $0 renewal_revenue; other stages flagged for $0 incremental ARR"
+        },
+        "uncategorized_deals": {
+          "count": 1,
+          "total_value": 0,
+          "note": "Deals with no ARR classification (expansion_arr, new_arr, renewal_revenue all NULL/0)"
+        },
+        "by_stage": {
+          "Discovery": {
+            "count": 39,
+            "value": 4171408.45
+          },
+          "Technical Evaluation": {
+            "count": 6,
+            "value": 654500.0
+          },
+          "Meeting Set": {
+            "count": 29,
+            "value": 905000.0
+          },
+          "Scoping": {
+            "count": 7,
+            "value": 1350000.0
+          },
+          "Review": {
+            "count": 7,
+            "value": 97500.0
+          }
+        },
+        "by_owner": {
+          "christian@growthbook.io": {
+            "count": 88,
+            "value": 7178408.45
+          }
+        },
+        "deals": [
+          {
+            "company_name": "Tubi",
+            "incremental_arr": 500000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 500000.0,
+            "deal_value": 500000.0,
+            "stage": "Discovery",
+            "close_date": "2027-07-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Ingka Ikea",
+            "incremental_arr": 500000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 500000.0,
+            "deal_value": 500000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-29",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Perplexity AI",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Zoro",
+            "incremental_arr": 275000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 275000.0,
+            "deal_value": 275000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-10-30",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Box",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-18",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "GitLab Inc.",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Meeting Set",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "JPMorganChase",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Stone",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Gen\u2122",
+            "incremental_arr": 200000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 200000.0,
+            "deal_value": 200000.0,
+            "stage": "Meeting Set",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "ASAPP",
+            "incremental_arr": 200000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 200000.0,
+            "deal_value": 200000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-31",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Electronic Arts",
+            "incremental_arr": 200000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 200000.0,
+            "deal_value": 200000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Carrefour",
+            "incremental_arr": 200000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 200000.0,
+            "deal_value": 200000.0,
+            "stage": "Discovery",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Taskrabbit",
+            "incremental_arr": 178000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 178000.0,
+            "deal_value": 178000.0,
+            "stage": "Technical Evaluation",
+            "close_date": "2026-10-30",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Sword Health Inc",
+            "incremental_arr": 175000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 175000.0,
+            "deal_value": 175000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Deel",
+            "incremental_arr": 175000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 175000.0,
+            "deal_value": 175000.0,
+            "stage": "Discovery",
+            "close_date": "2026-09-28",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Twitch",
+            "incremental_arr": 150000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 150000.0,
+            "deal_value": 150000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "MedCof",
+            "incremental_arr": 150000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 150000.0,
+            "deal_value": 150000.0,
+            "stage": "Discovery",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Superhuman",
+            "incremental_arr": 150000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 150000.0,
+            "deal_value": 150000.0,
+            "stage": "Discovery",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Zocdoc",
+            "incremental_arr": 150000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 150000.0,
+            "deal_value": 150000.0,
+            "stage": "Meeting Set",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Visible",
+            "incremental_arr": 150000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 150000.0,
+            "deal_value": 150000.0,
+            "stage": "Discovery",
+            "close_date": "2026-10-05",
+            "owner_email": "christian@growthbook.io"
+          }
+        ],
+        "filters_applied": {
+          "stage_filter": null,
+          "pipeline_filter": null,
+          "owner_email": "christian@growthbook.io"
+        },
+        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total ($18.6M) AND Q3-scoped (q3_scoped_pipeline). COVERAGE: Always computed against Q3-scoped figure, never against timeless total. Format: '$18.6M total pipeline (timeless); $X closing this quarter (Y.Yx coverage)'. STAGE BREAKDOWN: Show ALL stages from by_stage dict (typically 10 stages). Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals (306). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
+        "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering. Coverage ratio scoped to deals closing in target quarter only."
+      }
+    },
+    {
+      "name": "combined_stage_pipeline",
+      "params": {
+        "stage_filter": "scoping",
+        "pipeline_filter": "new_business"
+      },
+      "result": {
+        "total_deals": 27,
+        "total_pipeline": 3750450.0,
+        "q3_scoped_pipeline": 1230000.0,
+        "q3_scoped_deals": 9,
+        "quarterly_target": 1550000,
+        "coverage_ratio": 0.7935483870967742,
+        "current_quarter": "FY2027_Q3",
+        "zero_arr_deals": {
+          "count": 20,
+          "total_value": 459850.0,
+          "note": "Data quality hygiene issues (stage-based rules): Meeting Set excluded (expected $0 at this stage); renewal stages flagged for $0 renewal_revenue; other stages flagged for $0 incremental ARR"
+        },
+        "uncategorized_deals": {
+          "count": 39,
+          "total_value": 732554.6,
+          "note": "Deals with no ARR classification (expansion_arr, new_arr, renewal_revenue all NULL/0)"
+        },
+        "by_stage": {
+          "Scoping": {
+            "count": 27,
+            "value": 3750450.0
+          }
+        },
+        "by_owner": {
+          "christian@growthbook.io": {
+            "count": 7,
+            "value": 1350000.0
+          },
+          "scott.keller@growthbook.io": {
+            "count": 5,
+            "value": 1050000.0
+          },
+          "jake@growthbook.io": {
+            "count": 5,
+            "value": 525000.0
+          },
+          "james.shannon@growthbook.io": {
+            "count": 4,
+            "value": 475000.0
+          },
+          "dan@growthbook.io": {
+            "count": 2,
+            "value": 210000.0
+          },
+          "marcel@growthbook.io": {
+            "count": 1,
+            "value": 75000.0
+          },
+          "cary@growthbook.io": {
+            "count": 3,
+            "value": 65450.0
+          }
+        },
+        "deals": [
+          {
+            "company_name": "Ingka Ikea",
+            "incremental_arr": 500000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 500000.0,
+            "deal_value": 500000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-29",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Zalando",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-23",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "UPS",
+            "incremental_arr": 300000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 300000.0,
+            "deal_value": 300000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-31",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Box",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-18",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "CarGurus Inc",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-30",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Livesport",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-31",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "Stone",
+            "incremental_arr": 250000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 250000.0,
+            "deal_value": 250000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-25",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "ASAPP",
+            "incremental_arr": 200000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 200000.0,
+            "deal_value": 200000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-31",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "The New York Times",
+            "incremental_arr": 150000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 150000.0,
+            "deal_value": 150000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-31",
+            "owner_email": "scott.keller@growthbook.io"
+          },
+          {
+            "company_name": "Ziff Davis",
+            "incremental_arr": 150000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 150000.0,
+            "deal_value": 150000.0,
+            "stage": "Scoping",
+            "close_date": "2027-01-29",
+            "owner_email": "jake@growthbook.io"
+          },
+          {
+            "company_name": "SAP",
+            "incremental_arr": 150000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 150000.0,
+            "deal_value": 150000.0,
+            "stage": "Scoping",
+            "close_date": "2027-02-01",
+            "owner_email": "jake@growthbook.io"
+          },
+          {
+            "company_name": "Bamboo HR LLC",
+            "incremental_arr": 125000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 125000.0,
+            "deal_value": 125000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-30",
+            "owner_email": "jake@growthbook.io"
+          },
+          {
+            "company_name": "PocketFM",
+            "incremental_arr": 125000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 125000.0,
+            "deal_value": 125000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-23",
+            "owner_email": "dan@growthbook.io"
+          },
+          {
+            "company_name": "Dassault Syst\u00e8mes",
+            "incremental_arr": 120000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 120000.0,
+            "deal_value": 120000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-16",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "RecargaPay",
+            "incremental_arr": 85000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 85000.0,
+            "deal_value": 85000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-29",
+            "owner_email": "dan@growthbook.io"
+          },
+          {
+            "company_name": "TickPick",
+            "incremental_arr": 75000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 75000.0,
+            "deal_value": 75000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Forty Eight Point One",
+            "incremental_arr": 75000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 75000.0,
+            "deal_value": 75000.0,
+            "stage": "Scoping",
+            "close_date": "2026-11-12",
+            "owner_email": "james.shannon@growthbook.io"
+          },
+          {
+            "company_name": "DasWeltAuto",
+            "incremental_arr": 75000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 75000.0,
+            "deal_value": 75000.0,
+            "stage": "Scoping",
+            "close_date": "2026-12-16",
+            "owner_email": "marcel@growthbook.io"
+          },
+          {
+            "company_name": "Aircall",
+            "incremental_arr": 70000.0,
+            "expansion_arr": 70000.0,
+            "new_arr": 0.0,
+            "deal_value": 70000.0,
+            "stage": "Scoping",
+            "close_date": "2026-10-26",
+            "owner_email": "christian@growthbook.io"
+          },
+          {
+            "company_name": "Stay Partners",
+            "incremental_arr": 50000.0,
+            "expansion_arr": 0.0,
+            "new_arr": 50000.0,
+            "deal_value": 50000.0,
+            "stage": "Scoping",
+            "close_date": "2027-03-31",
+            "owner_email": "scott.keller@growthbook.io"
+          }
+        ],
+        "filters_applied": {
+          "stage_filter": "scoping",
+          "pipeline_filter": "new_business",
+          "owner_email": null
+        },
+        "_synthesis_note": "TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total ($18.6M) AND Q3-scoped (q3_scoped_pipeline). COVERAGE: Always computed against Q3-scoped figure, never against timeless total. Format: '$18.6M total pipeline (timeless); $X closing this quarter (Y.Yx coverage)'. STAGE BREAKDOWN: Show ALL stages from by_stage dict (typically 10 stages). Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals (306). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
+        "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering. Coverage ratio scoped to deals closing in target quarter only."
+      }
+    }
+  ],
+  "critical_fields_to_verify": [
+    "total_deals",
+    "total_pipeline",
+    "by_stage (all keys and values)",
+    "by_owner (all keys and values)",
+    "deals (top 20 list length and values)"
+  ]
+}

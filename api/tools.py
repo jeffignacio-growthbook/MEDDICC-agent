@@ -4,7 +4,10 @@ from pathlib import Path
 from collections import defaultdict
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from supabase_client import select_all, _coerce_in_values
-from field_semantics import is_test_deal
+try:
+    from field_semantics import is_test_deal
+except ImportError:
+    from api.field_semantics import is_test_deal
 
 _VALID_COLUMNS = {}
 
