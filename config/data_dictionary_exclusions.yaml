@@ -37,4 +37,80 @@
 # against the real database, add any genuinely-intentional historical gaps
 # it finds here, backed by an actual answer from that run — not a guess.
 
-excluded: []
+excluded:
+  # sdr_metrics - internal/housekeeping columns
+  - table: sdr_metrics
+    column: id
+    reason: "Primary key - internal database ID, not queryable business data"
+  - table: sdr_metrics
+    column: tool_user_id
+    reason: "External system user ID (Apollo/Salesloft internal ID), not queryable - use user_name instead"
+  - table: sdr_metrics
+    column: etl_run_at
+    reason: "ETL timestamp - internal housekeeping, not queryable business data"
+
+  # sdr_users - internal/housekeeping columns
+  - table: sdr_users
+    column: id
+    reason: "Primary key - internal database ID, not queryable business data"
+  - table: sdr_users
+    column: internal_user_id
+    reason: "Internal system user ID mapping, not queryable - use user_email instead"
+  - table: sdr_users
+    column: tool_user_id
+    reason: "External system user ID (Apollo/Salesloft internal ID), not queryable - use user_name instead"
+  - table: sdr_users
+    column: first_seen
+    reason: "ETL tracking timestamp - when user first appeared in tool data, not queryable business data"
+  - table: sdr_users
+    column: last_seen
+    reason: "ETL tracking timestamp - when user last appeared in tool data, not queryable business data"
+
+  # user_personas - ALL columns are internal bot configuration, not queryable sales data
+  # This table configures how the Slack bot formats responses based on user role/preferences
+  # Organizational data (who's on the sales team) should come from deals.owner_email or rep_targets, not bot config
+  - table: user_personas
+    column: id
+    reason: "Primary key - internal database ID"
+  - table: user_personas
+    column: email
+    reason: "User email - bot config lookup key, not queryable sales data (use deals.owner_email for team queries)"
+  - table: user_personas
+    column: name
+    reason: "User name - bot config, not queryable sales data (use rep_targets.entity_name for team queries)"
+  - table: user_personas
+    column: display_name
+    reason: "Bot UI display name - internal formatting config"
+  - table: user_personas
+    column: slack_user_id
+    reason: "Slack-specific user ID - internal bot routing, not queryable business data"
+  - table: user_personas
+    column: role
+    reason: "User job role - bot config for response formatting, not queryable sales data"
+  - table: user_personas
+    column: role_group
+    reason: "Role grouping (sales/cs/ops) - bot config for response formatting"
+  - table: user_personas
+    column: title
+    reason: "Job title - bot config, not queryable sales data"
+  - table: user_personas
+    column: persona
+    reason: "Bot persona type (executive/operational/IC) - internal response formatting config"
+  - table: user_personas
+    column: preferred_detail_level
+    reason: "User preference for response verbosity - bot config"
+  - table: user_personas
+    column: wants_metrics_context
+    reason: "User preference flag - bot config"
+  - table: user_personas
+    column: source
+    reason: "Registration source tracking - internal housekeeping"
+  - table: user_personas
+    column: registered_at
+    reason: "Registration timestamp - internal housekeeping"
+  - table: user_personas
+    column: last_seen_at
+    reason: "Activity timestamp - internal housekeeping"
+  - table: user_personas
+    column: updated_at
+    reason: "Record update timestamp - internal housekeeping"
