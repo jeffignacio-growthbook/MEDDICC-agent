@@ -18,6 +18,15 @@ MEDDICC Signal Status (as of 2026-09-16):
 
 Returns per-deal risk_factors list + overall_label (high_risk/moderate_risk/
 low_risk/insufficient_data). No fabricated probabilities.
+
+WHY SEPARATE FROM compute_at_risk_deals (api/handlers.py):
+- Different scope: late-stage/COMMIT only vs. ALL active deals
+- Different signal: cycle-length duration vs. MEDDICC stage-progression readiness
+- Different use case: "which high-priority deals are overdue" vs. "which deals lack stage requirements"
+- Data grounding: cycle-length from 327 historical wins vs. abstract MEDDICC bands
+
+Both exist intentionally. Convergence attempted 2026-09-16, determined to be
+inappropriate due to fundamentally different scopes and signals.
 """
 from datetime import datetime, date, timezone, timedelta
 from typing import List, Dict, Optional, Any

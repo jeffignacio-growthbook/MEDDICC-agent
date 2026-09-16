@@ -746,6 +746,16 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
 
     Supports entity-scoped queries: if deal_ids provided, checks only those deals.
     Otherwise checks all active deals.
+
+    WHY SEPARATE FROM deal_risk_assessor (scripts/deal_risk_assessor.py):
+    - Different scope: ALL active deals vs. late-stage/COMMIT only
+    - Different signal: MEDDICC stage-progression readiness vs. cycle-length duration
+    - Different use case: "which deals lack stage requirements" vs. "which high-priority deals are overdue"
+    - MEDDICC status: This uses stage-aware MEDDICC (though deferred per 2026-09-16 finding)
+      vs. deal_risk_assessor uses cycle-length benchmarks (data-grounded)
+
+    Both exist intentionally. Convergence attempted 2026-09-16, determined to be
+    inappropriate due to fundamentally different scopes and signals.
     """
     tw = _resolve_tw(params)
     deal_ids = params.get("deal_ids", [])
