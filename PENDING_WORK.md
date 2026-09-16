@@ -424,12 +424,14 @@ is a judgment call, not a coding task.
 ---
 
 #### 1. 62 Unregistered Columns - 4 Tables Completely Invisible to dynamic_query
-**Issue:** The schema-dictionary drift check (4th structural gate, deployed 2026-09-15) found 62 columns in real Postgres schema that are missing from `data_dictionary` with `is_queryable=TRUE`. This is LIVE invisible data RIGHT NOW — the exact bug pattern (region/segment, new_arr/expansion_arr) the investigation has been chasing.
+**Status:** ✅ COMPLETE (2026-09-15) - All 62 gaps closed
 
-**Severity: LATENT RISK, not actively broken**
-- Dedicated handlers work fine (they use explicit column lists via `select_all()`)
-- But if the classifier misroutes a question to `dynamic_query`, those queries will fail silently
-- Risk depends on classifier routing accuracy
+**Original Issue:** The schema-dictionary drift check (4th structural gate, deployed 2026-09-15) found 62 columns in real Postgres schema that are missing from `data_dictionary` with `is_queryable=TRUE`. This was LIVE invisible data — the exact bug pattern (region/segment, new_arr/expansion_arr) the investigation has been chasing.
+
+**Original Severity: LATENT RISK, not actively broken**
+- Dedicated handlers worked fine (they use explicit column lists via `select_all()`)
+- But if the classifier misrouted a question to `dynamic_query`, those queries would fail
+- Risk depended on classifier routing accuracy
 
 **Breakdown:**
 - **4 fully-unregistered tables** (0 columns in data_dictionary):
@@ -457,20 +459,31 @@ is a judgment call, not a coding task.
 2. **If classifier routes to dynamic_query** → Schema context shows 0 columns for these 4 tables → silent wrong answer or "I don't have that data" when data actually exists
 3. **If a question needs a join across these tables** → dynamic_query can't construct it → fails
 
-**Status:** FOUND, NOT FIXED
+**Resolution (2026-09-15):**
 
-**Work Required:**
-1. **Immediate triage**: Confirm current routing accuracy
-   - Pull recent logs, check if any SDR/ARR questions routed to `dynamic_query` (should route to dedicated handlers)
-   - If misrouting is happening → URGENT, fix routing or register columns
-   - If routing is perfect → still fix, but lower urgency
+Closed all 62 gaps via table-by-table triage (NOT bulk backfill):
 
-2. **Fix options** (pick one):
-   - **Option A**: Run `python scripts/backfill_data_dictionary.py` (bulk registration for all 62 columns)
-   - **Option B**: Create targeted migrations for each table (see migration 062 pattern)
-   - **Option C**: If any tables genuinely shouldn't be queryable via dynamic_query, add to exclusions with justification
+*REGISTERED (39 queryable columns):*
+- analyses (1): stage_at_analysis
+- arr_by_customer (4): company_name, total_arr, won_deal_count, most_recent_close
+- calls (5): competitors_mentioned, duration_minutes, formatted_summary, has_feature_gap, has_objection
+- deals_snapshot (4): fiscal_quarter, forecast_category, renewal_revenue, week_of_quarter
+- forecast_weekly (3): historical_conversion_high/mid/low
+- waterfall_weekly (2): newly_arr_bearing_count/value
+- sdr_metrics (17): all activity metrics (calls_made, emails_sent, connect_rate, etc.)
+- sdr_users (3): tool, user_email, user_name
 
-3. **Verification**: Re-run drift check, confirm 0 gaps
+*EXCLUDED (23 internal columns):*
+- sdr_metrics (3): id, tool_user_id, etl_run_at - housekeeping
+- sdr_users (5): id, internal_user_id, tool_user_id, first_seen, last_seen - housekeeping
+- user_personas (15): ALL columns - bot configuration, not queryable sales data
+
+*Decision rationale:* Each column triaged individually per handler-param pattern from earlier tonight - queryable business data → registered, internal IDs/ETL timestamps → excluded.
+
+*Verification:*
+✓ scripts/check_schema_dictionary_drift.py reports 0 category-(a) gaps
+✓ All 275 columns across 19 tables registered or explicitly excluded
+✓ Test suite passes (269 tests)
 
 **Routing Audit Results (2026-09-15): ✅ LATENT RISK CONFIRMED, NO ACTIVE HARM**
 
@@ -498,7 +511,17 @@ Audited query_cost_log, fallback_log, and conversation_threads for last 30 days:
 - fallback_log: No queries ever reached the 4 invisible tables
 - 20+ SDR/ARR/metrics questions in last 30 days, all answered correctly
 
-**Recommended Priority**: Address when convenient — no production harm detected, but eliminating the exception-then-fallback pattern is cleaner than relying on it.
+**Classifier Routing Follow-up:**
+
+Fixing schema registration does NOT fix the routing pattern. The classifier uses `HANDLER_DESCRIPTIONS` and confidence thresholds to decide routing, NOT data_dictionary. Evidence shows SDR/call quality questions routed to dynamic_query first (then fell back to dedicated handlers after exceptions).
+
+Key question: Will the exception-then-fallback pattern continue even with full schema coverage? Or will dynamic_query now successfully query these tables directly (potentially with partial/wrong results if the classifier confidence was independently too low)?
+
+**Logged as separate follow-up:** See High Priority #6 below - "SDR/ARR Question Routing: Confidence vs. Handler Matching"
+
+**Commits:**
+- 783a6bf: Register 39 queryable columns, exclude 23 internal columns
+- ebffc47: Fix test suite for expanded schema drift coverage
 
 **Related:** This gap is exactly why the schema-dictionary drift check (4th gate) was built — would have caught region/segment and new_arr/expansion_arr immediately instead of days later.
 
@@ -841,6 +864,53 @@ in CI — could be a one-line pip-cache-clearing fix, or something
 requiring more investigation. Not urgent: the fallback fix means this
 investigation is purely about understanding a mitigated risk, not
 closing an open one.
+
+---
+
+#### 6. SDR/ARR Question Routing: Does Schema Fix Affect Classifier Behavior?
+
+**Issue:** After registering the 62 missing columns (High Priority #1), will SDR/ARR questions still route to dynamic_query first (with exceptions), or will routing behavior change?
+
+**Background:**
+- Routing audit confirmed SDR/call quality questions DO attempt dynamic_query first
+- dynamic_query then fails with exception (tables were invisible)
+- System falls back to dedicated handlers (query_sdr_metrics, query_call_quality, etc.)
+- Handlers answer correctly
+
+**The Question:**
+Does fixing `data_dictionary` registration affect classifier routing decisions?
+
+**Investigation Findings (2026-09-15):**
+
+*Classifier routing mechanism:*
+- Uses `HANDLER_DESCRIPTIONS` (api/router.py) to match questions to handlers
+- Applies confidence thresholds (confidence < 0.80 → falls through to dynamic_query)
+- Does NOT consult data_dictionary for routing decisions
+
+*Conclusion:*
+**NO** - registering columns does NOT change routing. Classifier will continue routing based on confidence scores, independent of schema coverage.
+
+**Implications:**
+
+Two possible outcomes post-fix:
+1. **If confidence remains low (<0.80):** Questions still route to dynamic_query first
+   - Previously: dynamic_query exception → fallback to dedicated handler
+   - Now: dynamic_query might succeed with partial schema → risk of wrong answers?
+   - OR: dynamic_query still routes internally to correct handler via schema context
+
+2. **If confidence was never the issue:** Questions might route differently for other reasons
+   - Need to verify actual classification scores for these questions
+   - Check if handler descriptions match question phrasing well enough
+
+**Recommended Next Steps:**
+1. Monitor query_cost_log after schema fix deployed to production
+2. Check if SDR/ARR questions still appear (routing to dynamic_query) or disappear (routing directly to handlers)
+3. If they still appear: Check outcome - success or exception?
+4. If success with wrong answers: Investigate classifier confidence scores and handler description matching
+
+**Status:** ANALYSIS COMPLETE, MONITORING RECOMMENDED
+
+**Priority:** Low urgency - current exception-then-fallback pattern is working, no production harm. This is about eliminating the exception pattern, not fixing a broken system.
 
 ---
 
