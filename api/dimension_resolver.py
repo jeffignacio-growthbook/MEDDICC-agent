@@ -37,11 +37,14 @@ api/field_semantics.py's is_renewal_base()/is_incremental_pipeline()
 mutually exclusive — a deal can be Renewal AND Expansion at once — see
 format_dimension_resolution_note()'s handling of that.
 """
+import logging
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
+
+logger = logging.getLogger(__name__)
 
 _REPO_ROOT = Path(__file__).parent.parent
 
@@ -282,6 +285,10 @@ def resolve_dimension_filter(mentioned_term: str,
             failed.
     """
     if not mentioned_term or not mentioned_term.strip():
+        logger.info(
+            f"[DIMENSION_RESOLVE] empty term → unknown_value "
+            f"(known count: {len(_all_known_values())})"
+        )
         return {"error": "unknown_value", "known_values": _all_known_values()}
 
     candidates = (
@@ -294,11 +301,26 @@ def resolve_dimension_filter(mentioned_term: str,
     if len(candidates) == 1:
         result = dict(candidates[0])
         result.pop("matched_name", None)
+        logger.info(
+            f"[DIMENSION_RESOLVE] '{mentioned_term}' → "
+            f"{result['column']}.{result['operator']}.{result['value']}"
+        )
         return result
 
     if len(candidates) > 1:
+        candidate_summary = ", ".join(
+            f"{c['column']}={c['value']}" for c in candidates[:3]
+        ) + ("..." if len(candidates) > 3 else "")
+        logger.info(
+            f"[DIMENSION_RESOLVE] '{mentioned_term}' → ambiguous "
+            f"({len(candidates)} candidates: {candidate_summary})"
+        )
         return {"error": "ambiguous", "candidates": candidates}
 
+    logger.info(
+        f"[DIMENSION_RESOLVE] '{mentioned_term}' → unknown_value "
+        f"(known count: {len(_all_known_values())})"
+    )
     return {"error": "unknown_value", "known_values": _all_known_values()}
 
 

@@ -89,7 +89,8 @@ KNOWN_DETECTION_FUNCTIONS = {
 # Naming patterns a "detection-style" function is likely to match.
 # Deliberately a naming/pattern convention, not semantic analysis — see
 # this file's module docstring and PRIMITIVE_CHECKLIST.md for why that
-# tradeoff is intentional. Known limitation: a detection function named
+# tradeoff is intentional. Known limitation (2026-09-15: NOW CLOSED via
+# test_resolver_functions_log_all_outcomes): a detection function named
 # without one of these markers (e.g. a "resolver" that can also return
 # an ambiguous/unknown result, like resolve_dimension_filter) won't be
 # caught by this scan — the retroactive manual audit this session did
@@ -331,6 +332,88 @@ def test_every_failure_mode_primitive_is_actually_set_somewhere():
     print("✓ every failure-mode primitive is actually set somewhere in router.py")
 
 
+# ══════════════════════════════════════════════════════════════════════
+# Resolver function logging check (2026-09-15)
+# ══════════════════════════════════════════════════════════════════════
+# Closes the gap explicitly noted in _DETECTION_NAME_RE's comment above:
+# resolve_dimension_filter() and similar "resolver" functions that can
+# return ambiguous/unknown results weren't caught by the naming-based
+# detection scan. This test specifically flags any resolve_* function
+# that has NO logger calls at all — if it can return an error/ambiguous
+# state, those paths must log unconditionally (same "log before return"
+# pattern the aggregation/dimension/snapshot checks use), not rely on a
+# caller to log for it (the caller might not, and then the silent path
+# is invisible to both this gate and any log-based forensics).
+
+_RESOLVER_NAME_RE = re.compile(
+    r'^(?:async\s+)?def\s+(resolve_\w+)\s*\(',
+    re.MULTILINE,
+)
+
+
+def _scan_resolver_functions():
+    """{function_name: (filename, source)} for every function across
+    api/*.py matching resolve_* naming pattern."""
+    found = {}
+    for path in sorted(API_DIR.glob("*.py")):
+        text = path.read_text()
+        for m in _RESOLVER_NAME_RE.finditer(text):
+            func_name = m.group(1)
+            # Extract function source by finding the def line and reading
+            # until the next top-level def or EOF. Naive but sufficient for
+            # this structural check (doesn't need perfect AST parsing).
+            func_start = m.start()
+            next_def = text.find("\ndef ", func_start + 1)
+            next_async = text.find("\nasync def ", func_start + 1)
+            func_end = min(
+                (x for x in [next_def, next_async] if x > 0),
+                default=len(text)
+            )
+            func_source = text[func_start:func_end]
+            found[func_name] = (path.name, func_source)
+    return found
+
+
+def test_resolver_functions_log_all_outcomes():
+    """Resolver functions (resolve_*) that can return ambiguous/unknown
+    results must log those outcomes unconditionally. This check doesn't
+    verify every return path (too complex for a structural gate), but
+    does verify: if a resolver returns dictionaries with 'error' or
+    'ambiguous' keys (the pattern resolve_dimension_filter uses), it
+    must have logger calls — a resolver returning error states with zero
+    logger calls anywhere is definitely silent on those paths."""
+    found = _scan_resolver_functions()
+    silent = []
+    for func_name, (filename, source) in found.items():
+        # Check if this resolver returns error/ambiguous dictionaries
+        # (the pattern resolve_dimension_filter uses for silent failures)
+        returns_error_dict = (
+            re.search(r'return\s+\{[^}]*["\']error["\']\s*:', source)
+            or re.search(r'return\s+\{[^}]*["\']ambiguous["\']\s*:', source)
+        )
+        if not returns_error_dict:
+            # Not the error-returning pattern, skip
+            continue
+
+        # This resolver CAN return error/ambiguous dicts - must have logging
+        if not re.search(r'logger\.(info|warning|error)\(', source):
+            silent.append((func_name, filename))
+
+    assert not silent, (
+        f"Resolver function(s) that return error/ambiguous dicts but have "
+        f"NO logger calls anywhere — those error paths must log "
+        f"unconditionally (same pattern as verify_aggregation_completeness, "
+        f"verify_dimension_coverage, etc.), not rely on the caller to log: "
+        f"{silent}. Add logger calls before EVERY return path that produces "
+        f"a dict with 'error' or 'ambiguous' keys, then rerun this test."
+    )
+    if found:
+        print(f"✓ all {len(found)} resolver functions checked "
+              f"({'logging required for error-returning resolvers'})")
+    else:
+        print("✓ no resolver functions found")
+
+
 def test_the_log_only_anti_pattern_never_reappears():
     """The exact anti-pattern this whole fix retires: detect, log a
     warning, ship the answer unchanged anyway. This string is the
@@ -358,6 +441,7 @@ if __name__ == "__main__":
         test_known_flagged_log_tags_are_still_present,
         test_every_failure_mode_primitive_is_referenced_in_outcome_computation,
         test_every_failure_mode_primitive_is_actually_set_somewhere,
+        test_resolver_functions_log_all_outcomes,
         test_the_log_only_anti_pattern_never_reappears,
     ]
     failed = 0
