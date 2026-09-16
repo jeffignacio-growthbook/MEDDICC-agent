@@ -192,6 +192,7 @@ HANDLER_DESCRIPTIONS = {
     "query_won_deals": "which deals did we ALREADY win/close (past tense), retrospective wins/bookings. NOT future close dates.",
     "query_arr": "ARR by customer, total ARR",
     "query_deals_at_risk": "weak MEDDICC scores, deals at risk, champion gaps",
+    "query_high_priority_deal_risk": "risk assessment for late-stage deals (Negotiating/Awaiting Signature) OR COMMIT forecast, deal duration vs segment cycle length, stale MEDDICC scores",
     "query_definition": "what does a term mean, how is X defined, what counts as Y — looks up definitions in semantic layer (field_semantics.yaml, client.yaml, metrics.yaml). Examples: 'what does at-risk mean to you?', 'what counts as qualified?', 'how do you define forecast?'",
     "query_win_loss": "why deals were won/lost, narratives",
     "query_objections": "objections by category/stage/trend",

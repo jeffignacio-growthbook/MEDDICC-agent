@@ -773,6 +773,57 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
     }
 
 
+async def query_high_priority_deal_risk(params: dict, sb) -> dict:
+    """
+    Structured risk assessment for high-priority deals (late-stage OR COMMIT forecast).
+
+    Targets deals that are EITHER:
+    - Late-stage (Negotiating/Awaiting Signature)
+    - forecast_category='COMMIT'
+
+    AND have close_date in current fiscal quarter.
+
+    Risk signals:
+    1. Deal duration vs. typical segment sales cycle (from historical closed-won data)
+    2. MEDDICC weakness/staleness (14-day cutoff)
+
+    Returns per-deal risk_factors list + overall_label (high_risk/moderate_risk/
+    low_risk/insufficient_data). No fabricated probabilities.
+
+    Answers questions like:
+    - "Which late-stage deals are at risk?"
+    - "Show me COMMIT deals with problems"
+    - "What are the risk factors for deals closing this quarter?"
+    """
+    from deal_risk_assessor import get_at_risk_deals
+
+    fiscal_quarter = params.get("fiscal_quarter")  # Optional explicit quarter
+
+    try:
+        result = get_at_risk_deals(sb, fiscal_quarter=fiscal_quarter)
+    except Exception as e:
+        logger.error(f"[HIGH_PRIORITY_RISK] Failed to assess deals: {e}")
+        return {
+            "error": f"Failed to assess high-priority deal risk: {e}",
+            "assessed_deals": [],
+            "summary": {
+                "total_assessed": 0,
+                "high_risk": 0,
+                "moderate_risk": 0,
+                "low_risk": 0,
+                "insufficient_data": 0
+            }
+        }
+
+    # Sort by risk level, then days_open desc
+    risk_order = {"high_risk": 0, "moderate_risk": 1, "low_risk": 2, "insufficient_data": 3}
+    result["assessed_deals"].sort(
+        key=lambda d: (risk_order[d["overall_label"]], -d["days_open"])
+    )
+
+    return result
+
+
 async def query_win_loss(params: dict, sb) -> dict:
     """
     Comprehensive win/loss analysis combining:
