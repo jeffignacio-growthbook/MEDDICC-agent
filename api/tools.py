@@ -293,4 +293,13 @@ async def assess_deal_risk(sb, deal_ids=None, fiscal_quarter=None):
 
     # get_at_risk_deals is synchronous, but we're in async context
     # Call it directly (no await needed - it's not async)
-    return get_at_risk_deals(sb, fiscal_quarter=fiscal_quarter)
+    raw_result = get_at_risk_deals(sb, fiscal_quarter=fiscal_quarter)
+
+    # Normalize to router.py's expected {"rows": [...]} format
+    # The dynamic_query_loop expects all tools to return this structure
+    return {
+        "rows": raw_result.get("assessed_deals", []),
+        "summary": raw_result.get("summary", {}),
+        "total_found": raw_result.get("summary", {}).get("total_assessed", 0),
+        "table": "deal_risks"
+    }

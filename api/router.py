@@ -1174,6 +1174,20 @@ TOOLS YOU CAN CALL:
     )
   compare_periods(table, column, agg, period_a, period_b,
                   date_column)
+  assess_deal_risk(deal_ids, fiscal_quarter)
+    **USE THIS when the question asks to**:
+    - assess, evaluate, score, or judge deals by RISK level
+    - determine likelihood to close or deal health
+    - identify "at-risk deals" or "which deals might slip"
+    - evaluate deals in Negotiating/Awaiting Signature stages
+    - compare deals on probability to close
+    Phrasing patterns: "assess them based on likelihood to close vs risk",
+    "which deals are at risk", "evaluate late-stage deals", "deal health".
+    **DO NOT use filter_table for risk assessment - use this specialized tool**
+    **RETURNS**: Risk-scored deals (high/moderate/low risk labels) with
+    cycle-length benchmarks. MEDDICC deferred (insufficient historical data).
+    Example: assess_deal_risk() for all high-priority deals in current quarter
+    Example: assess_deal_risk(deal_ids=["123"], fiscal_quarter="FY2027 Q2")
 
 RULES:
 - Only use column names that appear in the schema above
@@ -1184,6 +1198,7 @@ RULES:
 - Never invent numbers
 - When calling aggregate_results, ALWAYS pass data="step_N"
   NEVER pass data as [] or a full array - step references only
+- For risk assessment questions: ALWAYS use assess_deal_risk, NOT filter_table
 
 DEFAULT SCOPING (CRITICAL - prevents over-filtering):
 For GENERIC pipeline questions like "What is our pipeline this quarter?":
