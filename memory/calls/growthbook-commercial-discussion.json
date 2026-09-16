@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook Commercial Discussion",
   "slug": "growthbook-commercial-discussion",
-  "last_etl_date": "2026-08-08T17:33:40.673378",
+  "last_etl_date": "2026-09-16T06:18:47.914645",
   "calls": [
     {
       "id": "01KZBXWWQSJ1ZA79FS13PYPQ2X",
@@ -16,7 +16,19 @@
       "action_items": "\n, *, *, J, a, m, e, s,  , S, h, a, n, n, o, n, *, *, \n, P, r, e, p, a, r, e,  , a,  , c, u, s, t, o, m, i, z, e, d,  , d, e, p, l, o, y, m, e, n, t, ,,  , r, o, l, l, o, u, t, ,,  , a, n, d,  , i, m, p, l, e, m, e, n, t, a, t, i, o, n,  , t, i, m, e, l, i, n, e,  , a, n, d,  , d, o, c, u, m, e, n, t, a, t, i, o, n,  , t, a, i, l, o, r, e, d,  , f, o, r,  , A, i, r, a, l, o, ’, s,  , t, e, c, h, n, o, l, o, g, y,  , s, t, a, c, k,  , a, n, d,  , s, p, e, c, i, f, i, c,  , n, e, e, d, s,  , t, o,  , a, s, s, i, s, t,  , i, n,  , d, e, c, i, s, i, o, n, -, m, a, k, i, n, g,  , (, 1, 4, :, 3, 9, ), \n, P, r, o, v, i, d, e,  , a,  , s, u, m, m, a, r, y,  , d, o, c, u, m, e, n, t,  , e, a, r, l, y,  , n, e, x, t,  , w, e, e, k,  , t, o,  , s, u, p, p, o, r, t,  , A, i, r, a, l, o, ’, s,  , f, i, n, a, l,  , p, l, a, t, f, o, r, m,  , r, e, c, o, m, m, e, n, d, a, t, i, o, n,  , d, o, c, u, m, e, n, t,  , (, 1, 5, :, 5, 0, ), \n, \n, *, *, A, n, d, r, a,  , T, o, l, b, u, s, *, *, \n, S, e, n, d,  , o, u, t,  , a,  , p, r, o, d, u, c, t,  , t, e, a, m,  , s, u, r, v, e, y,  , f, o, l, l, o, w, i, n, g,  , t, h, e,  , t, h, i, r, d,  , v, e, n, d, o, r,  , d, e, m, o,  , t, o,  , g, a, t, h, e, r,  , f, e, e, d, b, a, c, k,  , o, n,  , p, l, a, t, f, o, r, m,  , p, r, e, f, e, r, e, n, c, e, s,  , (, 1, 2, :, 0, 0, ), \n, P, a, r, t, i, c, i, p, a, t, e,  , i, n,  , t, h, e,  , t, e, c, h, n, i, c, a, l,  , c, h, e, c, k, -, i, n,  , c, a, l, l,  , p, l, a, n, n, e, d,  , f, o, r,  , n, e, x, t,  , T, h, u, r, s, d, a, y,  , w, i, t, h,  , t, h, e,  , i, n, t, e, r, n, a, l,  , t, e, a, m,  , t, r, i, a, l, i, n, g,  , G, r, o, w, t, h,  , B, o, o, k, ’, s,  , e, n, t, e, r, p, r, i, s, e,  , v, e, r, s, i, o, n, ,,  , i, f,  , a, v, a, i, l, a, b, l, e,  , (, 1, 2, :, 5, 0, ), \n, M, a, k, e,  , t, h, e,  , f, i, n, a, l,  , p, l, a, t, f, o, r, m,  , d, e, c, i, s, i, o, n,  , b, y,  , t, h, e,  , e, n, d,  , o, f,  , n, e, x, t,  , w, e, e, k,  , a, n, d,  , c, o, o, r, d, i, n, a, t, e,  , c, o, n, t, r, a, c, t,  , s, i, g, n, i, n, g,  , i, f,  , G, r, o, w, t, h,  , B, o, o, k,  , i, s,  , s, e, l, e, c, t, e, d,  , (, 1, 6, :, 0, 3, ), \n",
       "participant_domains": [
         "airalo.com"
-      ]
+      ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2D949WM2HG0DW8W8SMZBD0P",
+      "source": "fireflies",
+      "title": "GrowthBook Commercial Discussion",
+      "date": "2026-09-15",
+      "duration_minutes": 30.68000030517578,
+      "summary": "# GrowthBook Commercial Discussion\nDate: 2026-09-15 | Duration: 30.68000030517578m\n\n## Summary\nMaría and James discussed whether Growth Book could replace AB Tasty while es.guess faces strict post-acquisition financial scrutiny. AB Tasty auto-renewed in August for one year at €40,800 annually, covering unlimited tests and personalization, so María must consult legal and AB Tasty about exit or amendment options. Growth Book proposed experiment-based pricing starting at €95,000 annually, including unlimited traffic and feature flags, but the increase is difficult to justify without clear ROI or added value. James highlighted BigQuery integration, improved dashboards, a visual no-code editor, Figma integration, AI-driven experiment suggestions, and hierarchical component control. María said these capabilities could improve data trust and simplify testing, while emphasizing that finance requires one supplier and strong cost justification. James offered six months of free usage, potential discounts, flexible contract terms, and a possible case study collaboration. María will review the proposal with finance, legal, and AB Tasty, while James will send revised pricing by email; a product demo and further discussions remain possible.\n\n## Keywords\nA/B testing, contract renewal, pricing negotiation, feature flags, no-code visual editor, budgeting constraints\n\n## Action Items\n\n**María Fernández**\nDiscuss current AB Tasty contract terms with legal and finance to explore early termination or amendments (08:54)\nReview pricing and commercial proposal internally and with AB Tasty, then follow up with James via email with decision or negotiation points (26:19)\nConfirm willingness to engage in case study or joint best practice sharing with GrowthBook after internal discussions (27:50)\n\n**James Shannon**\nSend revised commercial proposals reflecting six months free usage offer and potential pricing adjustments for contract signing by end October (25:25)\nFollow up with María by email with commercial options and possible solutions to accommodate budget constraints (29:27)\nProvide a demo or additional information on GrowthBook’s no-code visual experimentation editor if requested by María’s team (15:00)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

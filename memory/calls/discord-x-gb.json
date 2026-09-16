@@ -1,0 +1,18 @@
+{
+  "company": "Discord x GB",
+  "slug": "discord-x-gb",
+  "last_etl_date": "2026-09-16T06:18:47.913286",
+  "calls": [
+    {
+      "id": "01M260TRGCD9C1VH9GQ37E733X",
+      "source": "fireflies",
+      "title": "Discord x GB: Metric Roles Discussion",
+      "date": "2026-09-15",
+      "duration_minutes": 44.77000045776367,
+      "summary": "# Discord x GB: Metric Roles Discussion\nDate: 2026-09-15 | Duration: 44.77000045776367m\n\n## Summary\nThe discussion covered simpler experiment readouts that classify results as supported, harmful, inconclusive, or conclusive but centered around zero, while emphasizing meaningful thresholds over fixation on 0.05 significance. An empirical Bayes approach is being developed with metric-specific priors based on historical movement and posterior probabilities for assessing relevant effects. Adaptive shrinkage was favored over normal priors for long-tail metrics, with implementation completed in Python, although GrowthBook does not currently support that prior type natively. The metric framework should separate planned causal evidence, secondary metrics, guardrails, and exploratory findings, while causal pathways would initially provide visual guidance rather than mediation estimates. Guardrails should remain unobtrusive unless movement warrants investigation. GrowthBook may add metric visibility and ordering controls, custom estimation support, and JavaScript-based recommendations from result snapshots. Jake will share a Bayesian write-up, while Luke and Hampus will revisit GrowthBook’s metric organization.\n\n## Keywords\nEmpirical Bayes, Metric roles, Guardrails, Adaptive shrinkage, Experiment decision frameworks, Planned versus exploratory evidence\n\n## Action Items\n**Jake Mainwaring**\nFit metric-specific priors (10:49)\nKeep GrowthBook updated (31:12)\nShare Bayesian write-up (32:07)\n\n**Hampus Poppius**\nDevelop metric organisation ideas (24:25)\n\n**Luke Sonnet**\nAssess non-Gaussian prior support (26:54)\nImprove metric organisation (26:58)\nExplore custom recommendation functions (28:38)",
+      "organizer": "cris@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

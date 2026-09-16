@@ -1,7 +1,7 @@
 {
   "company": "Growthbook | Facile.it",
   "slug": "growthbook-facile-it",
-  "last_etl_date": "2026-09-09T06:13:44.377951",
+  "last_etl_date": "2026-09-16T06:18:47.913765",
   "calls": [
     {
       "id": "01M1PPXTK20AH8PZYXRS0BGB30",
@@ -10,6 +10,17 @@
       "date": "2026-09-08",
       "duration_minutes": 29.239999771118164,
       "summary": "# Growthbook | Facile.it\nDate: 2026-09-08 | Duration: 29.239999771118164m\n\n## Summary\nGrowthBook was adopted about three years ago to replace Google Optimize and now supports client- and server-side experiments, feature flags, and product and marketing experimentation across 20 product teams using Node, PHP, React, and React Native. Around 300 experiments are launched annually, with marketing experiments embedded in a Strapi CMS. Product teams use experimentation to guide feature iterations before releases, while the company continues adapting its processes because of AI. The company uses a GrowthBook proxy server to limit API calls, though its cloud-hosting status still needs confirmation, and cloud migration remains a possible area of interest. Mixpanel remains the preferred product analytics tool because of its funnel-building capabilities and speed; GrowthBook analytics has not been deeply explored. BigQuery supports GrowthBook queries, while Mixpanel uses a proprietary OLAP database, and managed ClickHouse was discussed. Renewal is due at the end of the month, with 75 full seats and 15 read-only seats. A multi-year commitment may support pricing, and the CEO will sign the order form. React Native mobile development is a priority, with the goal of increasing loyalty and lifetime value. No immediate training is needed, but a future analytics proof of concept remains possible.\n\n## Keywords\nGrowthBook, experimentation, feature flagging, product analytics, mobile app, renewal\n\n## Action Items\n**Alessandro Perduca**  \nConfirm details about GrowthBook's cloud infrastructure (12:52)  \nDiscuss internal needs and stakeholder requirements (25:33)  \nProvide feedback on renewal proposal and pricing (25:43)  \n\n**Andy Marshall**  \nPrepare contract details and pricing numbers (23:10)  \nSend renewal proposal via email to Facile (27:43)  \nSchedule renewal meeting for next Tuesday (27:43)  \n\n**Chris Sanders**  \nOffer to run proof of concept for product analytics module (19:16)",
+      "organizer": "marsh@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M20TDEH5RV5PJMN796MZDHHP",
+      "source": "fireflies",
+      "title": "Growthbook | Facile.it - Renewal Discussion",
+      "date": "2026-09-15",
+      "duration_minutes": 32.20000076293945,
+      "summary": "# Growthbook | Facile.it - Renewal Discussion\nDate: 2026-09-15 | Duration: 32.20000076293945m\n\n## Summary\nThe client described extensive platform value, with over 700 experiments run in 3.5 years, 189 tests live simultaneously, nearly 20 user teams, and most seats used daily. Of 700 flags, 550 are linked to experiments, while some are used as a CMS with JSON features. Experimentation produced 133 wins and 253 learnings from failures, contributing to revenue insights. Renewal pricing was the main concern: the current $50K platform fee could rise to $116K, despite a 41% discount from list price and no charges for API requests or read-only seats. The client expected a 15–20% increase and raised concerns about finance and shareholder scrutiny, including the possibility of considering open source. Options discussed included a case-study discount reducing the price to about $90K, removing experimentation enablement to reach the low $70K range, and using a multi-year commitment to smooth the increase. The client preferred direct negotiation with Andy. Andy agreed to revise the proposal toward the mid-$60K to $70K range, include discount and case-study options, and send it the same day. Both sides valued the platform’s workflow integration and stability, and the client was receptive to an in-person renewal signing in Milan.\n\n## Keywords\nfeature flags, experimentation, pricing negotiation, platform renewal, case study, multi-year commitment\n\n## Action Items\n**Alessandro Perduca**  \nDiscuss revised pricing options with finance and procurement (23:29)  \nProvide feedback on revised pricing quote (27:31)  \n\n**Andy Marshall**  \nShare revised pricing proposal with deeper discounts (27:31)  \nExplore multi-year commitment options (27:31)  \nAssist client with renewal process and Milan event (28:21)",
       "organizer": "marsh@growthbook.io",
       "participants": 4,
       "summary_quality": "good"

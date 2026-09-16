@@ -1,7 +1,7 @@
 {
   "company": "BlaBlaCar & GrowthBook",
   "slug": "blablacar-growthbook",
-  "last_etl_date": "2026-08-18T16:55:06.187105",
+  "last_etl_date": "2026-09-16T06:18:47.914208",
   "calls": [
     {
       "id": "01M05TK8MEMKSQCJEH81W9XK08",
@@ -17,6 +17,17 @@
       "participant_domains": [
         "blablacar.com"
       ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2DWW0DKHHA03BTN0RKNVGGS",
+      "source": "fireflies",
+      "title": "BlaBlaCar & GrowthBook Check in",
+      "date": "2026-09-15",
+      "duration_minutes": 27.399999618530273,
+      "summary": "# BlaBlaCar & GrowthBook Check in\nDate: 2026-09-15 | Duration: 27.399999618530273m\n\n## Summary\nGrowth Book and the client agreed to pursue a 30-day POC comparing Growth Book with a competitor. Growth Book proposed starting at the current 75k license price and revisiting pricing after the trial, with no formal contract initially. Data and product teams will test real experimentation use cases in pre-production or production, supported by a kickoff demo, tailored training, Slack assistance, and strategy calls. The evaluation will focus on metrics setup, experiment management, ease of use, and reliability. Budget remains a major concern because the competitor offered 30k, while Growth Book offered 75k. Adrien Loison must confirm the approach with his boss and finance teams and coordinate overloaded PMs and data analysts. The goal is to finalize an agreement by the end of October. Growth Book will prioritize linking related experiments rather than combining them, helping preserve unbiased results. Rémy Marin will provide local European technical support, while regular syncs and transparent communication will maintain momentum.\n\n## Keywords\nproof of concept, pilot teams, pricing negotiation, experiment linkage, product demo, bandwidth constraints\n\n## Action Items\n\n**Adrien Loison**\nConfirm internal buy-in and finance approval for entering the POC at the proposed pricing and without a contract before the start (12:16)\nSynchronize with product, data, and engineering teams to plan the experiment schedule and ensure pilot team availability for the 30-day POC (17:35)\nCoordinate and confirm participation for a combined demo and kickoff session with relevant stakeholders, providing availability and syncing calendars (19:15)\nAim to finalize agreement and have terms in place by the end of October while managing internal bandwidth challenges (22:48)\n\n**Rémy Marin**\nServe as primary point of contact for execution of the POC and ongoing communications (02:16)\nShare availability for a brief catch-up meeting next week to sync on demo and POC progress (24:22)\nSupport product and experimentation setup and provide troubleshooting and guidance during the POC phase (13:25)\n\n**James Shannon**\nFacilitate setup of the POC without contract, providing enterprise product access and full support (12:00)\nSchedule and conduct combined demo/kickoff meeting for product, data, and engineering teams per Adrien’s coordination (18:58)\nMaintain communication via Slack for quick troubleshooting and collaboration during the POC (23:21)\nRevisit pricing negotiation post-POC based on achieved value and results (12:00)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

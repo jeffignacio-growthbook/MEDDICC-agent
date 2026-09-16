@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Extra Space",
+  "slug": "growthbook-extra-space",
+  "last_etl_date": "2026-09-16T06:18:47.912055",
+  "calls": [
+    {
+      "id": "01M2GY2CCFBDFW4TZ01BZ5Y2QC",
+      "source": "fireflies",
+      "title": "GrowthBook Extra Space Touch Base",
+      "date": "2026-09-15",
+      "duration_minutes": 41.09000015258789,
+      "summary": "# GrowthBook Extra Space Touch Base\nDate: 2026-09-15 | Duration: 41.09000015258789m\n\n## Summary\nThe team reviewed challenges affecting the visual editor’s image handling, icon fidelity, content insertion, performance, and AI reliability. Existing images and icons are often regenerated instead of reused, while the editor lacks a visible shared asset library and cannot directly upload SVGs. Font Awesome icons frequently appear misaligned or visually inaccurate. The editor mainly supports replacing existing components, making new sections and complex additions difficult without developer involvement. Slow scrolling and navigation hinder testing on large pages in both Growth Book and Optimizely. AI-generated content can work inconsistently—mloveland said successful results occur only about 10% of the time—and clean variants or direct SVG input may improve output. The team will compare Growth Book with Optimizely, collect screenshots and use cases, and escalate issues with logs and feedback. A fixability assessment is expected within a 10-day timeframe, while Scott Keller coordinates follow-up with Graham and the development team. (00:05–38:51)\n\n## Keywords\nVisual editor, AI-generated images, SVG icons, GrowthBook, Optimizely comparison, component insertion\n\n## Action Items\n\n**Allie J**\nCompile and share screenshots and documented comparisons of GrowthBook visual editor versus Optimizely to illustrate feature gaps and guide development (37:37)\n\n**cdiepenbrock**\nContinue testing the GrowthBook visual editor, document any errors or issues encountered, and share detailed logs and feedback with Scott Keller (38:39)\n\n**Scott Keller**\nEscalate all collected feedback, including screenshots and error logs, to Graham and the GrowthBook visual editor team immediately after the call and provide follow-up feedback on potential fixes and roadmap by the next day (38:49)\n\n**GrowthBook visual editor team, led by Graham**\nReview the compiled issues and comparisons between GrowthBook and Optimizely visual editors, assess feasibility of fixes, and provide recommendations or solutions for image management, SVG handling, and adding new content (39:03)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

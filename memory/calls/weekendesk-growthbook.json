@@ -1,0 +1,18 @@
+{
+  "company": "Weekendesk & GrowthBook",
+  "slug": "weekendesk-growthbook",
+  "last_etl_date": "2026-09-16T06:18:47.913998",
+  "calls": [
+    {
+      "id": "01M2DMSTQR4X0TH9P7A4W7K31H",
+      "source": "fireflies",
+      "title": "Weekendesk & GrowthBook | First Meeting",
+      "date": "2026-09-15",
+      "duration_minutes": 69,
+      "summary": "# Weekendesk & GrowthBook | First Meeting\nDate: 2026-09-15 | Duration: 69m\n\n## Summary\nThe team currently uses AB Tasty for 50/50 A/B tests and feature rollouts but lacks a visual editor and depends on technical staff. They want easier access to multiple experiment types and techniques for gaining insights in low-traffic markets and product segments. GrowthBook was presented as a unified platform for feature flags, experiments, and product analytics, with a visual editor, BigQuery integration, client- and server-side options, audience targeting, ramp-up guardrails, automatic kill rules, Slack alerts, Bayesian results, and an AI assistant. The platform can use custom application attributes, existing BI data, ETL pipelines, and semantic layers, although fact tables must be modeled for metric reuse. Pricing is based on the platform and user seats rather than traffic, with unlimited experiments and feature flags. Deployment options include open source, Pro, and Enterprise, with self-hosting available in Enterprise and cloud hosting supporting EU data residency. Next steps are a basic Next.js demo, a free account, and possibly a supported proof of concept with onboarding and data scientist assistance.\n\n## Keywords\nExperimentation platform, feature flags, A/B testing, data warehouse integration, BigQuery, Next.js\n\n## Action Items\n**Marcel Geldner**  \nFollow up on BigQuery cost estimation (19:24)  \nProvide documentation and details for Next.js integration (48:14)  \nSet up Slack support channel and prepare POC offer (54:43)  \nSend meeting summary and outline next steps (58:02)  \n\n**Rémy Marin**  \nPrepare and deliver demo of visual editor and lifecycle UI (19:24)  \nConfirm GrowthBook integration with BigQuery and custom attributes (35:49)  \nCoordinate with data scientists on Warehouse experiment best practices (54:43)  \n\n**Antonio Guilló & Erika Odena**  \nEvaluate GrowthBook integration readiness with data workflows (38:44)  \n\n**F. Javier Pedrosa**  \nCreate Next.js proof of concept replicating Weekendesk config (52:09)  \n\n**Marta Alonso**  \nTest GrowthBook platform for Weekendesk experiment needs (52:43)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

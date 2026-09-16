@@ -1,0 +1,18 @@
+{
+  "company": "grothbook x hp24",
+  "slug": "grothbook-x-hp24",
+  "last_etl_date": "2026-09-16T06:18:47.914452",
+  "calls": [
+    {
+      "id": "01M2JBDFQJSK6SHGPBNSZ0Q0XB",
+      "source": "fireflies",
+      "title": "grothbook x hp24",
+      "date": "2026-09-15",
+      "duration_minutes": 40,
+      "summary": "# grothbook x hp24\nDate: 2026-09-15 | Duration: 40m\n\n## Summary\nGrowth Book provides client- and server-side SDKs, including Next.js and Nuxt integration, with a community open-source Nuxt plugin. Its platform links feature flags and experiments: flags control rollouts by attributes, while experiments use guardrail and secondary metrics to monitor risks. The team prefers client-side testing to avoid developer coding and server-side delays. Results are displayed with chance to win and revenue lift, and Growth Book ingests Google Analytics data for analysis. Data warehouse integrations such as Snowflake and BigQuery connect exposure to metrics through SQL fact tables. Rollouts can target browser, geography, and audience attributes, use rules and percentages, and be managed through the UI, CLI, or API with approval workflows and gradual ramp-ups. A deterministic hash assigns users to variants, and an automatic kill switch can respond to negative metric impact. The visual editor Chrome extension enables direct page changes and live feature flags or experiments. The stated goal is to move ideas to production in hours with minimal developer involvement, while the client requested trial access and documentation.\n\n## Keywords\nfeature flags, client-side SDK, Nuxt integration, experimentation platform, analytics integration, visual editor\n\n## Action Items\n**Marcel Geldner**  \nSend platform access and full documentation (00:46)  \nFollow up on proof of concept and pricing (26:47)  \n\n**Rémy Marin**  \nFacilitate trial access to platform (23:49)  \n\n**Zeynep Karacam**  \nCoordinate internal platform evaluation (23:49)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

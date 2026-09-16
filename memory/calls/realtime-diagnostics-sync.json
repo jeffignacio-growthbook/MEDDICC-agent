@@ -1,0 +1,18 @@
+{
+  "company": "realtime diagnostics sync",
+  "slug": "realtime-diagnostics-sync",
+  "last_etl_date": "2026-09-16T06:18:47.913141",
+  "calls": [
+    {
+      "id": "01M2K8V9WPR01YKPF4PCNHRTPV",
+      "source": "fireflies",
+      "title": "realtime diagnostics sync",
+      "date": "2026-09-15",
+      "duration_minutes": 55,
+      "summary": "# realtime diagnostics sync\nDate: 2026-09-15 | Duration: 55m\n\n## Summary\nThe discussion defined Diagnostics Core as a reusable, filterable event or exposure timeline for production debugging, with drill-down by user, session, cohort, experiment variation, feature flag, or organization ID. The workflow should move from aggregate issue discovery to individual exposure or session investigation, supporting cases such as unexpected targeting, SRM issues, unexplained traffic, incorrect flag evaluation, and Yazio’s contextual-bandit debugging. The MVP will prioritize exposure lists, feature usage, and experiment exposure rather than generic event streams, using reusable components and potentially separate feature and experiment views. The design must support multiple data sources beyond Managed Warehouse, manual refresh, clear freshness indicators, query-cost controls, and flexible rendering of unknown columns and embedded JSON. Existing exposure debugging, feature diagnostics, and feature-usage tables provide a foundation. One exposure-stream surface will be built first, with a working prototype targeted within the next couple weeks ahead of a Notion meeting expected in two to three weeks. Bryce Fitzsimons will advance design, Jeremy Dorn will work across product analytics and experimentation, and Luke Sonnet will support implementation questions.\n\n## Keywords\nDiagnostics, Feature flags, Experiment exposures, Event streams, Product Analytics, Warehouse-native data\n\n## Action Items\n**Bryce Fitzsimons**\nReview diagnostics prototype (44:16)\nImprove diagnostics filtering (47:03)\nBuild diagnostics design prototype (51:06)\n\n**Jeremy Dorn**\nCoordinate product analytics work (51:49)\nDesign reusable diagnostics components (52:59)\nDefine MVP scope (54:04)\n\n**Jeremy Dorn and Bryce Fitzsimons**\nBuild cloud diagnostics prototype (51:30)\nPrepare diagnostics product launch (51:41)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}
