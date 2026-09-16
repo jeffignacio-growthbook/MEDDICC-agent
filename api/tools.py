@@ -285,7 +285,11 @@ async def assess_deal_risk(sb, deal_ids=None, fiscal_quarter=None):
         result = await assess_deal_risk(sb, deal_ids=["123", "456"])
     """
     # Import here to avoid circular dependency
-    from deal_risk_assessor import get_at_risk_deals
+    # Use try/except to handle both local and CI import paths
+    try:
+        from scripts.deal_risk_assessor import get_at_risk_deals
+    except ImportError:
+        from deal_risk_assessor import get_at_risk_deals
 
     # get_at_risk_deals is synchronous, but we're in async context
     # Call it directly (no await needed - it's not async)
