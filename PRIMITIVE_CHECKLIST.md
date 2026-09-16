@@ -239,6 +239,115 @@ The primitives that CALL it (like `aggregation_placement_corruption` in
 `api/router.py`) are what get registered and must satisfy the checklist
 above.
 
+### Structured Aggregation Verification (2026-09-16)
+
+**Location:** `api/structured_verification.py` → `verify_structured_aggregations()`
+
+**Purpose:** Deterministic verification of structured handler outputs
+against underlying raw data. Complements the existing prose-extraction
+verification (`api/aggregation_verification.py`) which works on
+model-generated text in `dynamic_query_loop`.
+
+**Integration point:** Dedicated handlers (e.g., `query_pipeline`) call
+this BEFORE their return statement. If verification fails, handler
+returns error dict instead of corrupted data — honest failure better
+than silent wrong answer.
+
+**What it verifies:**
+- **Simple aggregations:** total_pipeline (sum), total_deals (count)
+- **Group-by aggregations:** by_stage, by_owner (with optional top-N limit)
+- **Float precision:** Uses tolerance (default 0.01 = 1 cent) for comparison
+
+**Verification spec format:**
+```python
+{
+    "total_pipeline": {
+        "type": "sum",
+        "field": "_incremental_value",
+        "expected": 20082320.68
+    },
+    "total_deals": {
+        "type": "count",
+        "expected": 313
+    },
+    "by_stage": {
+        "type": "group_by",
+        "group_field": "_stage_label",
+        "aggregations": {"count": "count", "value": "sum:_incremental_value"},
+        "expected": {"Discovery": {"count": 50, "value": 5000000}, ...}
+    },
+    "by_owner": {
+        "type": "group_by",
+        "group_field": "_owner",
+        "aggregations": {"count": "count", "value": "sum:_incremental_value"},
+        "expected": {"rep1@example.com": {"count": 30, "value": 3000000}, ...},
+        "limit": 10  # Optional top-N
+    }
+}
+```
+
+**Call signature:**
+```python
+from api.structured_verification import verify_structured_aggregations
+
+verification_result = verify_structured_aggregations(
+    underlying_data=incremental_deals,  # Raw deals list with fields
+    structured_output={
+        "total_pipeline": 20082320.68,
+        "total_deals": 313,
+        "by_stage": {...},
+        "by_owner": {...}
+    },
+    verification_spec={...},  # See format above
+    tolerance=0.01  # Float comparison tolerance
+)
+
+if not verification_result["match"]:
+    logger.error(f"[STRUCTURED_VERIFY] Aggregation verification failed: "
+                 f"{verification_result['discrepancies']}")
+    return {
+        "error": "aggregation_verification_failed",
+        "discrepancies": verification_result["discrepancies"],
+        "note": "Aggregation outputs did not match recomputed values..."
+    }
+```
+
+**Returns:**
+- `{"match": True}` if all verifications pass
+- `{"match": False, "discrepancies": [...]}` if mismatches found
+
+**Checklist answers:**
+
+1. **Queryable outcome field?** ✅ YES
+   - Handler returns `{"error": "aggregation_verification_failed", ...}`
+   - Router's evaluator marks as "error" result_quality
+   - Logged as `[STRUCTURED_VERIFY]` prefix for monitoring
+   - Fails honestly instead of shipping corrupted data
+
+2. **User-visible on unresolved failure?** ✅ YES
+   - Handler returns error dict with plain-language note (no internal jargon)
+   - Router synthesis receives the error, generates honest "can't answer" response
+   - User sees "I don't have data to answer that yet" (router's error handling)
+   - NOT a silent wrong answer — verification prevents corrupted data from shipping
+
+**Why this is NOT in FAILURE_MODE_PRIMITIVES:**
+This is a handler-level verification gate, not a `dynamic_query_loop`
+primitive. It prevents corrupted outputs before they reach synthesis,
+rather than catching prose extraction errors during synthesis. The
+checklist still applies (queryable + user-visible), but registration is
+through handler error returns rather than router outcome tracking.
+
+**Test coverage:**
+`tests/test_structured_aggregation_verification.py` proves the trap springs:
+- Planted wrong total_pipeline (100K discrepancy) → caught
+- Planted missing stage in by_stage → caught
+- Planted wrong stage value → caught
+- Correct aggregations → no false alarm
+- Float tolerance (0.01) → working as designed
+- Top-N limit (by_owner top 10) → respected
+
+**First integration:** `api/handlers.py` → `query_pipeline()` (Phase 1a+, 2026-09-16)
+
 ## Follow-up audit (2026-09-11, same night)
 
 A fourth gap surfaced answering a direct question about a different

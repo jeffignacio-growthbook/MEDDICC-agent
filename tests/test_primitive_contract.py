@@ -94,6 +94,19 @@ KNOWN_DETECTION_FUNCTIONS = {
     # tools primitives use, not primitives themselves. See
     # PRIMITIVE_CHECKLIST.md's "Reusable Primitives" section.
     "verify_corrected_value_placement",
+    # verify_structured_aggregations (api/structured_verification.py):
+    # Handler-level verification gate (2026-09-16, Phase 1a+) that
+    # checks structured outputs against underlying data BEFORE handlers
+    # return. Unlike verify_aggregation_completeness (which extracts from
+    # prose in dynamic_query_loop), this works on structured dicts from
+    # dedicated handlers (query_pipeline, etc.). Satisfies checklist:
+    # (a) queryable — handler returns {"error": "aggregation_verification_
+    # failed"}, router marks as "error" result_quality; (b) user-visible
+    # — error dict ships honest failure instead of corrupted data. NOT in
+    # FAILURE_MODE_PRIMITIVES (handler-level gate, not dynamic_query_loop
+    # primitive). See PRIMITIVE_CHECKLIST.md "Structured Aggregation
+    # Verification" section. First integration: query_pipeline.
+    "verify_structured_aggregations",
 }
 
 # Naming patterns a "detection-style" function is likely to match.

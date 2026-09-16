@@ -2388,6 +2388,61 @@ async def query_pipeline(params: dict, sb) -> dict:
     uncategorized_count = len(uncategorized_deals)
     uncategorized_value = sum(d.get("deal_value") or 0 for d in uncategorized_deals)
 
+    # Phase 1a+: Structured aggregation verification (2026-09-16)
+    # Verify computed aggregations against underlying data before returning.
+    # Catches corruption (wrong totals, missing stages, misplaced values)
+    # before it ships to synthesis. Same "prove the trap springs" standard
+    # as every other primitive built tonight.
+    from api.structured_verification import verify_structured_aggregations
+
+    verification_result = verify_structured_aggregations(
+        underlying_data=incremental_deals,
+        structured_output={
+            "total_pipeline": total_pipeline,
+            "total_deals": total_deals,
+            "by_stage": by_stage,
+            "by_owner": by_owner,
+        },
+        verification_spec={
+            "total_pipeline": {
+                "type": "sum",
+                "field": "_incremental_value",
+                "expected": total_pipeline
+            },
+            "total_deals": {
+                "type": "count",
+                "expected": total_deals
+            },
+            "by_stage": {
+                "type": "group_by",
+                "group_field": "_stage_label",
+                "aggregations": {"count": "count", "value": "sum:_incremental_value"},
+                "expected": by_stage
+            },
+            "by_owner": {
+                "type": "group_by",
+                "group_field": "_owner",
+                "aggregations": {"count": "count", "value": "sum:_incremental_value"},
+                "expected": by_owner,
+                "limit": 10
+            }
+        },
+        tolerance=0.01  # Same float tolerance as Phase 1a baseline tests
+    )
+
+    if not verification_result["match"]:
+        # Corruption detected - return error instead of corrupted data
+        # (honest failure better than silent wrong answer)
+        logger.error(f"[STRUCTURED_VERIFY] query_pipeline aggregation "
+                     f"verification failed: {verification_result['discrepancies']}")
+        return {
+            "error": "aggregation_verification_failed",
+            "discrepancies": verification_result["discrepancies"],
+            "note": "Aggregation outputs did not match recomputed values from underlying data. "
+                   "This is a code-level gate, not a data issue — if you see this, there is "
+                   "a bug in the aggregation logic that must be fixed before shipping results."
+        }
+
     return {
         "total_deals": total_deals,
         "total_pipeline": total_pipeline,
