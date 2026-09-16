@@ -84,6 +84,16 @@ KNOWN_DETECTION_FUNCTIONS = {
     "check_rate_bounds",
     "check_subset_relationships",
     "check_sum_consistency",
+    # verify_corrected_value_placement (api/placement_verification.py):
+    # Reusable tool extracted 2026-09-15, not a primitive itself — the
+    # primitives that CALL it (like aggregation_placement_corruption in
+    # router.py) are what get registered and must satisfy the checklist.
+    # This is a shared verification function available to any primitive
+    # that hands a corrected value to the model for resynthesis — same
+    # pattern as dimension_verification.py's helper functions, which are
+    # tools primitives use, not primitives themselves. See
+    # PRIMITIVE_CHECKLIST.md's "Reusable Primitives" section.
+    "verify_corrected_value_placement",
 }
 
 # Naming patterns a "detection-style" function is likely to match.

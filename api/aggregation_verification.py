@@ -322,117 +322,38 @@ def verify_total_placement(
     mismatch: checks whether the corrected total was placed CORRECTLY
     in the retry answer, or misplaced as an individual line-item value.
 
-    STRUCTURAL CHECK (not text pattern matching):
-    If any individual line-item value in the retry answer equals the
-    corrected TOTAL (within tolerance), this is implausible — one deal
-    matching the grand total across hundreds of deals is a near-certain
-    sign the model spliced the corrected total into the wrong location.
-
-    This is the primitive-level gate that protects EVERY handler and
-    EVERY dynamic_query call from the Creative CX-style corruption
-    (where a $6.89M total for 354 deals was attached to a single
-    company instead of the summary line).
+    2026-09-15: Now a thin wrapper around placement_verification.py's
+    verify_corrected_value_placement(), the reusable extracted version
+    available to any primitive (not just aggregation verification).
 
     Args:
         retrieved_rows: the actual rows retrieved (e.g. deals, waterfall)
         retry_answer_text: the model's answer AFTER forced resynthesis
         corrected_total: the total value we handed to the model
-        value_column: numeric column to compare against (auto-detected if None)
+        value_column: numeric column to compare against (unused, reserved)
         tolerance: absolute difference threshold
 
     Returns:
         {"placement_ok": True} if no individual value matches total
-        {"placement_ok": False, "suspect_value": X, "actual_total": Y,
-         "likely_corruption": "...message..."} if misplacement detected
+        {"placement_ok": False, "suspect_value": X, "likely_corruption": "..."}
+            if misplacement detected
     """
-    if not retrieved_rows or not retry_answer_text:
+    if not retrieved_rows:
         return {"placement_ok": True}
 
-    # Extract all dollar amounts from retry answer (individual values, not just total)
-    all_amounts = []
-    for match in _AMOUNT_WITH_DOLLAR_RE.finditer(retry_answer_text):
-        if match.group(2):  # Has digit group
-            value = _amount_to_number(*match.groups())
-            all_amounts.append(value)
+    from api.placement_verification import verify_corrected_value_placement
 
-    if not all_amounts:
-        return {"placement_ok": True}
+    result = verify_corrected_value_placement(
+        retry_answer_text=retry_answer_text,
+        corrected_value=corrected_total,
+        row_count=len(retrieved_rows),
+        tolerance=tolerance,
+        entity_type="deal"  # Can be parameterized in future if needed
+    )
 
-    # Count how many times the corrected total appears in the answer
-    matches_count = sum(1 for amount in all_amounts if abs(amount - corrected_total) <= tolerance)
+    # Preserve backward compatibility: add actual_total field for callers
+    # that expect it (it's always equal to corrected_total in this context)
+    if not result["placement_ok"]:
+        result["actual_total"] = corrected_total
 
-    # SIGNAL 1: Multiple occurrences (definite corruption)
-    if matches_count > 1:
-        # The corrected total appears multiple times - at least one must be misplaced
-        # (If the answer has both "Creative CX: $6.89M" AND "Total: $6.89M",
-        #  the Creative CX line is the corruption)
-        return {
-            "placement_ok": False,
-            "suspect_value": corrected_total,
-            "actual_total": corrected_total,
-            "matches_count": matches_count,
-            "likely_corruption": (
-                f"Corrected total ${corrected_total:,.2f} appears {matches_count} times "
-                f"in retry answer (expected once, in summary line only). This is "
-                f"implausible - the same value appearing as both an individual "
-                f"line-item AND the grand total across {len(retrieved_rows)} rows "
-                f"is a near-certain sign of misplacement (total spliced into "
-                f"wrong location in addition to correct total line)."
-            )
-        }
-
-    # SIGNAL 2: Single occurrence, but in suspicious context (line item, not summary)
-    if matches_count == 1:
-        # Find the ONE match and check its IMMEDIATE context (same line only)
-        # If it appears next to a company/deal name (not a total-indicator phrase),
-        # that's implausible: no single deal should equal aggregate of 100+ deals
-        for match in _AMOUNT_WITH_DOLLAR_RE.finditer(retry_answer_text):
-            if match.group(2):
-                value = _amount_to_number(*match.groups())
-                if abs(value - corrected_total) <= tolerance:
-                    # Found the match - extract the LINE it's on (not 80 chars back)
-                    # Find the start of the line (search backwards for newline)
-                    line_start = retry_answer_text.rfind('\n', 0, match.start()) + 1
-                    line_end = retry_answer_text.find('\n', match.end())
-                    if line_end == -1:
-                        line_end = len(retry_answer_text)
-                    line = retry_answer_text[line_start:line_end]
-
-                    # Check if THIS LINE contains company/deal name pattern
-                    # Pattern: Capital letter + words + colon/dash IMMEDIATELY before $
-                    import re as re_module
-                    # Look for pattern at start of line, before the dollar amount
-                    dollar_pos_in_line = match.start() - line_start
-                    prefix = line[:dollar_pos_in_line]
-
-                    # Check last 50 chars before $ for company name pattern
-                    check_prefix = prefix[-50:] if len(prefix) > 50 else prefix
-                    company_pattern = r'([A-Z][A-Za-z0-9\s&,\.]+?)(?::|\s—|\s-)\s*$'
-                    context_match = re_module.search(company_pattern, check_prefix)
-
-                    if context_match:
-                        label = context_match.group(1).strip().lower()
-                        # Exclude total-indicator phrases
-                        TOTAL_INDICATORS = {"total", "overall", "grand", "sum", "net", "aggregate"}
-                        if not any(indicator in label for indicator in TOTAL_INDICATORS):
-                            # Suspicious: appears next to specific entity name, not summary
-                            return {
-                                "placement_ok": False,
-                                "suspect_value": corrected_total,
-                                "actual_total": corrected_total,
-                                "matches_count": 1,
-                                "suspicious_context": label,
-                                "likely_corruption": (
-                                    f"Corrected total ${corrected_total:,.2f} appears next to "
-                                    f"specific entity name '{context_match.group(1).strip()}' "
-                                    f"rather than in a summary/total line. This is implausible - "
-                                    f"a single deal/company matching the aggregate total across "
-                                    f"{len(retrieved_rows)} rows is a near-certain sign of "
-                                    f"misplacement (model replaced line item instead of adding "
-                                    f"separate summary)."
-                                )
-                            }
-                    break  # Found and checked the one match
-
-    # Total appears 0 times, or 1 time in valid context - OK
-    return {"placement_ok": True}
+    return result

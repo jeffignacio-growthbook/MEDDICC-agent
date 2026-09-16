@@ -180,6 +180,65 @@ list above:
 Three genuine gaps found and fixed, all in one pass, following exactly
 the pattern proven on the original aggregation-verification incident.
 
+## Reusable Primitives (2026-09-15)
+
+### Placement-Plausibility Check
+
+**Location:** `api/placement_verification.py` → `verify_corrected_value_placement()`
+
+**Purpose:** Two-signal corruption check for any primitive that hands a
+corrected value to the model for resynthesis:
+
+- **SIGNAL 1:** Corrected value appears MULTIPLE times in retry answer
+  (definite corruption — if the answer has both "Company X: $6.89M" AND
+  "Total: $6.89M", the company line is the corruption)
+- **SIGNAL 2:** Corrected value appears ONCE, but in suspicious context
+  (next to an entity name rather than a summary/total line — implausible
+  for one item to equal the aggregate)
+
+**Extracted from:** `api/aggregation_verification.py`'s
+`verify_total_placement()` (2026-09-14), which now wraps this reusable
+version. The check was originally built to protect aggregation
+verification from the Creative CX-style corruption (a $6.89M total for
+354 deals attached to a single company), but the underlying mechanism —
+"did the model splice this value into the wrong location?" — applies to
+ANY corrected value handed to the model, not just aggregation totals.
+
+**Available to:** Any primitive that forces resynthesis with a corrected
+value. Examples:
+- Aggregation totals (current use)
+- Dimension filters (if a corrective filter is handed to the model)
+- Snapshot anchors (if corrected dates are handed to the model)
+- Any future primitive with the same shape
+
+**Call signature:**
+```python
+from api.placement_verification import verify_corrected_value_placement
+
+result = verify_corrected_value_placement(
+    retry_answer_text=answer_after_forced_resynthesis,
+    corrected_value=12345.67,  # The value you handed to the model
+    row_count=354,  # Number of underlying items (for error message context)
+    tolerance=0.5,  # Numeric comparison threshold
+    entity_type="deal"  # What kind of items ("deal", "company", "row", etc.)
+)
+
+if not result["placement_ok"]:
+    # Misplacement detected
+    logger.error(f"Placement corruption: {result['likely_corruption']}")
+    # Either force honest fallback or escalate to _give_up()
+```
+
+**Returns:**
+- `{"placement_ok": True}` if no misplacement detected
+- `{"placement_ok": False, "suspect_value": X, "likely_corruption": "..."}` if misplacement detected
+
+**Not a detection primitive itself:** This is a reusable verification
+tool, not a primitive that gets registered in `FAILURE_MODE_PRIMITIVES`.
+The primitives that CALL it (like `aggregation_placement_corruption` in
+`api/router.py`) are what get registered and must satisfy the checklist
+above.
+
 ## Follow-up audit (2026-09-11, same night)
 
 A fourth gap surfaced answering a direct question about a different
