@@ -2393,7 +2393,10 @@ async def query_pipeline(params: dict, sb) -> dict:
     # Catches corruption (wrong totals, missing stages, misplaced values)
     # before it ships to synthesis. Same "prove the trap springs" standard
     # as every other primitive built tonight.
-    from api.structured_verification import verify_structured_aggregations
+    try:
+        from structured_verification import verify_structured_aggregations
+    except ImportError:
+        from api.structured_verification import verify_structured_aggregations
 
     verification_result = verify_structured_aggregations(
         underlying_data=incremental_deals,
