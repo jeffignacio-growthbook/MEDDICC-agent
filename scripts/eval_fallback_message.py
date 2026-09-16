@@ -53,10 +53,13 @@ async def _aggregate_results(**kw):
     return {"rows": [{"n": 1}], "table": "agg"}
 async def _compare_periods(sb, **kw):
     return {"rows": [], "table": "cmp"}
+async def _assess_deal_risk(sb, **kw):
+    return {"assessed_deals": [], "summary": {"total_assessed": 0}}
 _tools_mod.filter_table = _filter_table
 _tools_mod.join_tables = _join_tables
 _tools_mod.aggregate_results = _aggregate_results
 _tools_mod.compare_periods = _compare_periods
+_tools_mod.assess_deal_risk = _assess_deal_risk
 sys.modules["api.tools"] = _tools_mod
 
 
