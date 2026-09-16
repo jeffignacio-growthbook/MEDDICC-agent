@@ -56,6 +56,7 @@ KNOWN_DETECTION_FUNCTIONS = {
     # dynamic_query_loop's own primitives — see FAILURE_MODE_PRIMITIVES
     # above for how each satisfies the contract via query_cost_log.
     "verify_aggregation_completeness",
+    "verify_total_placement",  # Aggregation placement verification primitive (2026-09-15)
     "verify_dimension_coverage",
     "verify_snapshot_date_labeling",
     "scan_question_for_ambiguous_dimension_terms",

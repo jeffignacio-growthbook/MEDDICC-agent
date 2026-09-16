@@ -51,6 +51,18 @@ EXCLUSIONS_PATH = REPO_ROOT / "config" / "data_dictionary_exclusions.yaml"
 
 TRACKED_TABLES = {"deals", "deals_snapshot", "waterfall_weekly"}
 
+# All queryable tables that the schema drift check monitors
+# (these can have exclusions in data_dictionary_exclusions.yaml)
+ALL_QUERYABLE_TABLES = {
+    "deals", "deals_snapshot", "calls", "analyses",
+    "objections", "feature_gaps", "win_loss_narratives",
+    "competitive_signals", "pipeline_signals", "deal_risks",
+    "waterfall_weekly", "forecast_weekly", "pipeline_generation_weekly",
+    "rep_performance", "rep_targets",
+    "sdr_metrics", "sdr_users", "user_personas",
+    "arr_by_customer"
+}
+
 # The last migration present when this gate was written (062 registered
 # deals_snapshot.region/segment). Only migrations numbered after this one
 # are held to the "must register or exclude" rule — see module docstring
@@ -152,9 +164,9 @@ def test_exclusions_file_is_well_formed():
         assert "table" in entry and "column" in entry and "reason" in entry, (
             f"Exclusion entry missing table/column/reason: {entry}"
         )
-        assert entry["table"] in TRACKED_TABLES, (
-            f"Exclusion for untracked table {entry['table']!r} — "
-            f"tracked tables are {TRACKED_TABLES}"
+        assert entry["table"] in ALL_QUERYABLE_TABLES, (
+            f"Exclusion for unknown table {entry['table']!r} — "
+            f"queryable tables are {ALL_QUERYABLE_TABLES}"
         )
     print("✓ data_dictionary_exclusions.yaml is well-formed")
 
