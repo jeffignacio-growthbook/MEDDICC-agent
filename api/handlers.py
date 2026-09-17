@@ -4619,7 +4619,23 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         # Model-extracted from free text (a rep's name or email) — strip
         # incidental whitespace so it can't silently fail an exact match.
         owner_email = str(owner_email).strip()
+
+    # Translate pipeline_filter to pipeline_id if provided
     pipeline_id = params.get("pipeline_id")
+    pipeline_filter = params.get("pipeline_filter")
+    if pipeline_filter and not pipeline_id:
+        # Map high-level filter to actual pipeline ID
+        # (Same pattern as query_pipeline lines 2328-2334)
+        _, _, _RENEWAL_PIPELINE_ID = _load_config()
+        if pipeline_filter == "new_business":
+            # For new_business, we want to EXCLUDE the renewal pipeline
+            # This is handled by excluded_pipelines logic below (lines 4686-4692)
+            # So we don't set pipeline_id here - let default scope handle it
+            pass
+        elif pipeline_filter == "renewal":
+            # For renewal, explicitly set to renewal pipeline ID
+            pipeline_id = _RENEWAL_PIPELINE_ID
+
     deal_ids = params.get("deal_ids")
     close_date_scope = (params.get("close_date_scope") or "all").strip().lower()
     if close_date_scope not in ("all", "current_quarter"):
