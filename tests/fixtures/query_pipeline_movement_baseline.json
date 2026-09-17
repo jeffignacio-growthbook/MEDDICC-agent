@@ -8569,9 +8569,7 @@
             "Closed Won",
             "Closed Lost"
           ],
-          "excluded_pipelines": [
-            "866608541"
-          ],
+          "excluded_pipelines": [],
           "close_date_scope": "all",
           "statement": "Counting all open deals as of each snapshot, with NO close-date filter. Excludes Meeting Set, Disqualified, Closed Won, Closed Lost; the renewal pipeline is out of analytics scope. A CRM board filtered by close date or including renewals will not match."
         },
@@ -8584,13 +8582,1590 @@
         "_current_position_date": "2026-09-14",
         "_current_position_source": "prospective",
         "snapshot_source": "prospective",
-        "snapshot_dates": [],
-        "result": null,
-        "data_gaps": [
-          "no in-scope rows for FY2027 Q3 on the 'prospective' grid"
-        ]
+        "snapshot_dates": [
+          "2026-09-11",
+          "2026-09-14"
+        ],
+        "by_stage": [
+          {
+            "stage": "Upcoming Renewal",
+            "prior": 139,
+            "current": 141,
+            "net": 2,
+            "entered": 3,
+            "entered_from_other_stage": 1,
+            "new_to_pipeline": 2,
+            "exited": 1,
+            "deal_ids": [
+              "18506348636",
+              "19618157118",
+              "19620657669",
+              "20977383029",
+              "20977664275",
+              "22108646244",
+              "29591984407",
+              "29615479136",
+              "41104410396",
+              "41609744228",
+              "41609747349",
+              "41610727788",
+              "43319455532",
+              "43476197521",
+              "43595329097",
+              "43743405430",
+              "43827243898",
+              "47210330751",
+              "47660344655",
+              "51244763042",
+              "52514918935",
+              "54223525438",
+              "54223525454",
+              "54223525470",
+              "54223739553",
+              "54223739671",
+              "54223739723",
+              "54276667418",
+              "54277193775",
+              "54277193796",
+              "54277379328",
+              "54277379727",
+              "54277617698",
+              "54277617715",
+              "54277632935",
+              "54277633142",
+              "54277987476",
+              "54277987495",
+              "54287857771",
+              "54287857800",
+              "54321336947",
+              "54729392426",
+              "55036450093",
+              "55036758597",
+              "55038684330",
+              "55040949050",
+              "55040949054",
+              "55041878185",
+              "55042449509",
+              "55049247510",
+              "55049557932",
+              "55053411846",
+              "55057469357",
+              "55058398882",
+              "55058709152",
+              "55072135544",
+              "55078377235",
+              "55078996265",
+              "55080541837",
+              "55101004563",
+              "55781406995",
+              "55827449116",
+              "56814175798",
+              "56840269182",
+              "56843364692",
+              "56848607650",
+              "56848632366",
+              "56848640555",
+              "56848645900",
+              "56848645901",
+              "56848650909",
+              "56848659613",
+              "56848664379",
+              "56848674983",
+              "56848677642",
+              "56848875840",
+              "56848875841",
+              "56848875842",
+              "56849029812",
+              "56849043498",
+              "56849043499",
+              "56849054092",
+              "56849073806",
+              "56849236151",
+              "56849247760",
+              "56849258323",
+              "56849258324",
+              "56849260720",
+              "56849868385",
+              "56849894788",
+              "56849924608",
+              "56849946144",
+              "56849954139",
+              "56850122094",
+              "56850138411",
+              "56850138414",
+              "56850140942",
+              "56850144302",
+              "57539105397",
+              "57553731729",
+              "57610378882",
+              "57856222619",
+              "57865592069",
+              "59186332732",
+              "59727997782",
+              "60349422364",
+              "60354769077",
+              "60368048467",
+              "60370909080",
+              "60378145930",
+              "60382944531",
+              "60962193265",
+              "60964829459",
+              "61111828323",
+              "61112646762",
+              "61177049113",
+              "61180302487",
+              "61183895167",
+              "61186064496",
+              "61187144037",
+              "62929860909",
+              "63189256475",
+              "63189447605",
+              "63290950013",
+              "63433693084",
+              "63433693112",
+              "63433997141",
+              "63434060937",
+              "63434182718",
+              "63434182757",
+              "63436280843",
+              "63436280863",
+              "63436341163",
+              "63436659025",
+              "63436659549",
+              "63739918673",
+              "64133406245",
+              "64138563750",
+              "64279365540",
+              "64538727736",
+              "64832008585"
+            ],
+            "entered_from_other_stage_ids": [
+              "54223739671"
+            ],
+            "new_to_pipeline_ids": [
+              "64538727736",
+              "64832008585"
+            ],
+            "exited_ids": [
+              "44951588885"
+            ]
+          },
+          {
+            "stage": "Renewal Engaged",
+            "prior": 8,
+            "current": 8,
+            "net": 0,
+            "entered": 1,
+            "entered_from_other_stage": 1,
+            "new_to_pipeline": 0,
+            "exited": 1,
+            "deal_ids": [
+              "44452371744",
+              "44951588885",
+              "49070493462",
+              "54223739569",
+              "54277617691",
+              "54287857716",
+              "55066437033",
+              "56849073809"
+            ],
+            "entered_from_other_stage_ids": [
+              "44951588885"
+            ],
+            "new_to_pipeline_ids": [],
+            "exited_ids": [
+              "54223739671"
+            ]
+          },
+          {
+            "stage": "Pricing Presented",
+            "prior": 1,
+            "current": 1,
+            "net": 0,
+            "entered": 0,
+            "entered_from_other_stage": 0,
+            "new_to_pipeline": 0,
+            "exited": 0,
+            "deal_ids": [
+              "41609747277"
+            ],
+            "entered_from_other_stage_ids": [],
+            "new_to_pipeline_ids": [],
+            "exited_ids": []
+          }
+        ],
+        "totals": {
+          "prior": 148,
+          "current": 150,
+          "net": 2
+        },
+        "summary": {
+          "new_to_pipeline": 2,
+          "left_pipeline": 0,
+          "moved_between_stages": 2
+        },
+        "confidence": {
+          "exact": 0,
+          "pre_history": 0,
+          "no_history": 0,
+          "other": 150
+        },
+        "current_position": null,
+        "rows": [
+          {
+            "deal_id": "41609747277",
+            "company_name": "The Lifetime Value Co.",
+            "stage": "Pricing Presented",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2026-02-01",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "44452371744",
+            "company_name": "Which?",
+            "stage": "Renewal Engaged",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-09-04",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "44951588885",
+            "company_name": "facile.it",
+            "stage": "Renewal Engaged",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-09-30",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "49070493462",
+            "company_name": "Khan Academy",
+            "stage": "Renewal Engaged",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-29",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54223739569",
+            "company_name": "PepsiCo",
+            "stage": "Renewal Engaged",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-10-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54277617691",
+            "company_name": "Mistral",
+            "stage": "Renewal Engaged",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-10-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54287857716",
+            "company_name": "PRODUCKS",
+            "stage": "Renewal Engaged",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-08-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55066437033",
+            "company_name": "Flipp",
+            "stage": "Renewal Engaged",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-12-19",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849073809",
+            "company_name": "Breeze Airways",
+            "stage": "Renewal Engaged",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "18506348636",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2025-04-04",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "19618157118",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2025-05-21",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "19620657669",
+            "company_name": "BESTSECRET",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-05-01",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "20977383029",
+            "company_name": "Which?",
+            "stage": "Upcoming Renewal",
+            "owner_email": "",
+            "close_date": "2024-10-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "20977664275",
+            "company_name": "PepsiCo",
+            "stage": "Upcoming Renewal",
+            "owner_email": "",
+            "close_date": "2024-08-04",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "22108646244",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2025-09-12",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "29591984407",
+            "company_name": "Inditex",
+            "stage": "Upcoming Renewal",
+            "owner_email": null,
+            "close_date": "2025-07-11",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "29615479136",
+            "company_name": "Upstart",
+            "stage": "Upcoming Renewal",
+            "owner_email": "",
+            "close_date": "2025-07-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "41104410396",
+            "company_name": "Inditex",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-07-11",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "41609744228",
+            "company_name": "Fellow",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2025-10-02",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "41609747349",
+            "company_name": "Docsity",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-04-11",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "41610727788",
+            "company_name": "Haystack TV Inc",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-07-24",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "43319455532",
+            "company_name": "Takealot",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-09-01",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "43476197521",
+            "company_name": "Opera",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-09-08",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "43595329097",
+            "company_name": "BIKE24",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-08-29",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "43743405430",
+            "company_name": "Cochlear Ltd",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-09-14",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "43827243898",
+            "company_name": "Action Nederland",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-07-11",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "47210330751",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2026-10-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "47660344655",
+            "company_name": "Meister",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-30",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "51244763042",
+            "company_name": "Avaaz",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-12-05",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "52514918935",
+            "company_name": "Reach plc",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-11-22",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54223525438",
+            "company_name": "x.ai",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jake@growthbook.io",
+            "close_date": "2026-09-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54223525454",
+            "company_name": "Thekrazycouponlady",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-09-30",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54223525470",
+            "company_name": "lingokids",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-02",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54223739553",
+            "company_name": "Aira",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-20",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54223739671",
+            "company_name": "Boylesports",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-28",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54223739723",
+            "company_name": "Intergamma",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-12-19",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54276667418",
+            "company_name": "VSCO",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2026-01-17",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54277193775",
+            "company_name": "FahadTest",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-08-13",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54277193796",
+            "company_name": "Dorado Games",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-10",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54277379328",
+            "company_name": "Prodigy Game",
+            "stage": "Upcoming Renewal",
+            "owner_email": "christian@growthbook.io",
+            "close_date": "2027-03-03",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54277379727",
+            "company_name": "Lease a Bike",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2026-06-17",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54277617698",
+            "company_name": "foris",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-11-02",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54277617715",
+            "company_name": "LeoVegas",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-11-04",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54277632935",
+            "company_name": "Planner5D",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54277633142",
+            "company_name": "Wellhub",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-11-07",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54277987476",
+            "company_name": "Anthropic",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-12-12",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54277987495",
+            "company_name": "Dropbox",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2028-01-02",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54287857771",
+            "company_name": "knowunity.ai",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54287857800",
+            "company_name": "TicketNetwork",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-09-05",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54321336947",
+            "company_name": "AgencyAnalytics",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-03-01",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "54729392426",
+            "company_name": "Aira",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-17",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55036450093",
+            "company_name": "7shifts",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-02-01",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55036758597",
+            "company_name": "Space Neobank",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2027-01-03",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55038684330",
+            "company_name": "SecureTicketPurchase",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-09-05",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55040949050",
+            "company_name": "Libertex Group",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-12-17",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55040949054",
+            "company_name": "Lease a Bike Nederland",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-06-17",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55041878185",
+            "company_name": "rapportlabs",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-12-22",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55042449509",
+            "company_name": "eldorado.gg",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-10-10",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55049247510",
+            "company_name": "Tomahawk (Pepsi)",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-08-04",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55049557932",
+            "company_name": "Cochlear Ltd",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-09-15",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55053411846",
+            "company_name": "Apify",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2027-01-10",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55057469357",
+            "company_name": "Dribbleup",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-03-06",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55058398882",
+            "company_name": "Trade Republic",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2027-01-21",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55058709152",
+            "company_name": "ASM Technologies",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-09-20",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55072135544",
+            "company_name": "Joyteractive",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-02-01",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55078377235",
+            "company_name": "lendable",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-01-22",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55078996265",
+            "company_name": "Fortis Games",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2027-01-09",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55080541837",
+            "company_name": "esh",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-12-10",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55101004563",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-02-01",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55781406995",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jeff.ignacio@growthbook.io",
+            "close_date": "2027-02-09",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "55827449116",
+            "company_name": "TSH",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2027-01-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56814175798",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56840269182",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56843364692",
+            "company_name": "7shifts",
+            "stage": "Upcoming Renewal",
+            "owner_email": "graham@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848607650",
+            "company_name": "7shifts",
+            "stage": "Upcoming Renewal",
+            "owner_email": "christian@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848632366",
+            "company_name": "Fellow",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848640555",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848645900",
+            "company_name": "Square",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-01-08",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848645901",
+            "company_name": "Make",
+            "stage": "Upcoming Renewal",
+            "owner_email": "christian@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848650909",
+            "company_name": "Breeze Airways",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jake@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848659613",
+            "company_name": "Haystack TV Inc",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848664379",
+            "company_name": "Cochlear Ltd",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848674983",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "christian@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848677642",
+            "company_name": "Discord",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2028-01-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848875840",
+            "company_name": "VSCO",
+            "stage": "Upcoming Renewal",
+            "owner_email": "",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848875841",
+            "company_name": "Khan Academy",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56848875842",
+            "company_name": "Which?",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849029812",
+            "company_name": "TSH",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849043498",
+            "company_name": "Workable",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-22",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849043499",
+            "company_name": "Enable",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849054092",
+            "company_name": "ClickUp",
+            "stage": "Upcoming Renewal",
+            "owner_email": "",
+            "close_date": "2027-07-09",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849073806",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849236151",
+            "company_name": "Fortis Games",
+            "stage": "Upcoming Renewal",
+            "owner_email": "",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849247760",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849258323",
+            "company_name": "Fortis Games",
+            "stage": "Upcoming Renewal",
+            "owner_email": "christian@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849258324",
+            "company_name": "Treatwell",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849260720",
+            "company_name": "Opera",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849868385",
+            "company_name": "Which?",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849894788",
+            "company_name": "7shifts",
+            "stage": "Upcoming Renewal",
+            "owner_email": "graham@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849924608",
+            "company_name": "Meister",
+            "stage": "Upcoming Renewal",
+            "owner_email": "",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849946144",
+            "company_name": "Khan Academy",
+            "stage": "Upcoming Renewal",
+            "owner_email": "",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56849954139",
+            "company_name": "The Lifetime Value Co.",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56850122094",
+            "company_name": "Quizlet",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56850138411",
+            "company_name": "Khan Academy",
+            "stage": "Upcoming Renewal",
+            "owner_email": "",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56850138414",
+            "company_name": "AgencyAnalytics",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56850140942",
+            "company_name": "Breeze Airways",
+            "stage": "Upcoming Renewal",
+            "owner_email": "graham@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "56850144302",
+            "company_name": "EDF Energy",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-02-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "57539105397",
+            "company_name": "The Weather Company",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jennifer@growthbook.io",
+            "close_date": "2026-08-03",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "57553731729",
+            "company_name": "facile.it",
+            "stage": "Upcoming Renewal",
+            "owner_email": "",
+            "close_date": "2025-10-01",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "57610378882",
+            "company_name": "1800Flowers",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jake@growthbook.io",
+            "close_date": "2027-02-26",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "57856222619",
+            "company_name": "Make",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2027-01-28",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "57865592069",
+            "company_name": "Refurbed Marketplace GmbH",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-08-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "59186332732",
+            "company_name": "TV 2",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2027-01-30",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "59727997782",
+            "company_name": "Lion Studios",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-02-04",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "60349422364",
+            "company_name": "Oda",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-04-30",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "60354769077",
+            "company_name": "shiftkey",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-04-30",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "60368048467",
+            "company_name": "EQT",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-04-30",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "60370909080",
+            "company_name": "Pizza Express",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-03-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "60378145930",
+            "company_name": "knowunity.ai",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "60382944531",
+            "company_name": "Rune Org",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-04-30",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "60962193265",
+            "company_name": "Schibsted",
+            "stage": "Upcoming Renewal",
+            "owner_email": "james.shannon@growthbook.io",
+            "close_date": "2027-05-27",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "60964829459",
+            "company_name": "VRT",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-10-10",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "61111828323",
+            "company_name": "Gifthealth",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jake@growthbook.io",
+            "close_date": "2027-04-21",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "61112646762",
+            "company_name": "Polymarket",
+            "stage": "Upcoming Renewal",
+            "owner_email": "chris@growthbook.io",
+            "close_date": "2027-03-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "61177049113",
+            "company_name": "Wellhub",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-05-23",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "61180302487",
+            "company_name": "Cape",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-06-11",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "61183895167",
+            "company_name": "Plusgrade",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-05-20",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "61186064496",
+            "company_name": "LeoVegas",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-06-05",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "61187144037",
+            "company_name": "Legend",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-06-02",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "62929860909",
+            "company_name": "Neon",
+            "stage": "Upcoming Renewal",
+            "owner_email": "marsh@growthbook.io",
+            "close_date": "2026-12-10",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63189256475",
+            "company_name": "University of Phoenix",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jake@growthbook.io",
+            "close_date": "2027-07-02",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63189447605",
+            "company_name": "Neko Health",
+            "stage": "Upcoming Renewal",
+            "owner_email": "james.shannon@growthbook.io",
+            "close_date": "2027-08-01",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63290950013",
+            "company_name": "Little Caesars",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2026-12-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63433693084",
+            "company_name": "Capture Higher Ed",
+            "stage": "Upcoming Renewal",
+            "owner_email": "scott.keller@growthbook.io",
+            "close_date": "2027-07-27",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63433693112",
+            "company_name": "",
+            "stage": "Upcoming Renewal",
+            "owner_email": "scott.keller@growthbook.io",
+            "close_date": "2027-07-28",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63433997141",
+            "company_name": "Schibsted",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-05-27",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63434060937",
+            "company_name": "Marfatech",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-04-27",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63434182718",
+            "company_name": "Funding Pips",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-07-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63434182757",
+            "company_name": "Pic-Time",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-10-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63436280843",
+            "company_name": "MC Sonae",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jake@growthbook.io",
+            "close_date": "2028-07-30",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63436280863",
+            "company_name": "Opendoor",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jake@growthbook.io",
+            "close_date": "2027-07-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63436341163",
+            "company_name": "Extra Space Storage",
+            "stage": "Upcoming Renewal",
+            "owner_email": "scott.keller@growthbook.io",
+            "close_date": "2027-07-26",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63436659025",
+            "company_name": "Neko Health",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-07-07",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63436659549",
+            "company_name": "SWAG",
+            "stage": "Upcoming Renewal",
+            "owner_email": "cary@growthbook.io",
+            "close_date": "2027-06-24",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "63739918673",
+            "company_name": "Gdn-Commerce",
+            "stage": "Upcoming Renewal",
+            "owner_email": "jake@growthbook.io",
+            "close_date": "2027-05-01",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "64133406245",
+            "company_name": "dm-drogerie markt",
+            "stage": "Upcoming Renewal",
+            "owner_email": "christian@growthbook.io",
+            "close_date": "2029-07-31",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "64138563750",
+            "company_name": "Goodnotes",
+            "stage": "Upcoming Renewal",
+            "owner_email": "dan@growthbook.io",
+            "close_date": "2027-08-18",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "64279365540",
+            "company_name": null,
+            "stage": "Upcoming Renewal",
+            "owner_email": "james.shannon@growthbook.io",
+            "close_date": "2027-08-24",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "64538727736",
+            "company_name": "Airalo",
+            "stage": "Upcoming Renewal",
+            "owner_email": "james.shannon@growthbook.io",
+            "close_date": "2027-09-01",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          },
+          {
+            "deal_id": "64832008585",
+            "company_name": "Baton",
+            "stage": "Upcoming Renewal",
+            "owner_email": "scott.keller@growthbook.io",
+            "close_date": "2027-09-08",
+            "week_of_quarter": 7,
+            "backfill_confidence": null
+          }
+        ],
+        "data_gaps": []
       },
-      "note": "H1 fix complete: renewal filter now returns actual renewal deals (verified: 150 deals, prior=148, current=150, net=2)",
+      "note": "H1 fix complete: renewal filter returns actual renewal deals",
       "verified_working": true,
       "verified_result_summary": {
         "rows": 150,
