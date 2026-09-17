@@ -1,0 +1,2445 @@
+{
+  "captured_at": "2026-09-17 (post-N+1-fix, post-H4b, pre-further-refactor)",
+  "test_cases": [
+    {
+      "name": "no_filters_default_21_days",
+      "params": {},
+      "result": {
+        "stale_deals": [
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-05-21",
+            "deal_value": 6000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Inditex",
+            "owner_email": null,
+            "stage": "1297321618",
+            "close_date": "2025-07-11",
+            "deal_value": 0.0,
+            "days_since_activity": 37,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-19",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-09-12",
+            "deal_value": 35250.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-04-04",
+            "deal_value": 22500.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "VSCO",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-01-17",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Kitchen Warehouse",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-14",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "TicketNetwork",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-05",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "USIM",
+            "owner_email": "christian@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-09-11",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 0
+          },
+          {
+            "company_name": "Which?",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321619",
+            "close_date": "2026-09-04",
+            "deal_value": 31250.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Which?",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2024-10-23",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "SecureTicketPurchase",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-05",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "BIKE24",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-29",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "The Weather Company",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-03",
+            "deal_value": 13786.02,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Opera",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-08",
+            "deal_value": 2400.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Joyteractive",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-02-01",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Docsity",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-04-11",
+            "deal_value": 5750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Lease a Bike Nederland",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-06-17",
+            "deal_value": 13000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "IMPACT Commerce",
+            "owner_email": "",
+            "stage": "79653122",
+            "close_date": "2026-09-06",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Upstart",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2025-07-23",
+            "deal_value": 195575.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "PepsiCo",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2024-08-04",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 7
+          },
+          {
+            "company_name": "Lease a Bike",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-06-17",
+            "deal_value": 13000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Takealot",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-01",
+            "deal_value": 10750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Refurbed Marketplace GmbH",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-31",
+            "deal_value": 9240.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Tomahawk (Pepsi)",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-04",
+            "deal_value": 37626.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Fellow",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-10-02",
+            "deal_value": 3360.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Cochlear Ltd",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-14",
+            "deal_value": 29750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "facile.it",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2025-10-01",
+            "deal_value": 44944.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Haystack TV Inc",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-07-24",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "FahadTest",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-13",
+            "deal_value": 5000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "PRODUCKS",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321619",
+            "close_date": "2026-08-31",
+            "deal_value": 14600.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Cochlear Ltd",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-15",
+            "deal_value": 29750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Dribbleup",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-03-06",
+            "deal_value": 12563.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "The Lifetime Value Co.",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321620",
+            "close_date": "2026-02-01",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-23",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "",
+            "stage": "79653122",
+            "close_date": "2026-09-14",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Moneytree",
+            "owner_email": "graham@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-09-08",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Phoenix Energy",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-17",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "84.51\u02da",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-20",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Solotopia",
+            "owner_email": "graham@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-09-02",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Value Retail",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-27",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Doorlist",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-30",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Luciano",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-19",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "National Debt Relief, LLC",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-25",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "GrowthBook",
+            "owner_email": "ashley@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-05",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Pitstop",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-09",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "FloatMe",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-04",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "DM",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-12",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Jmhour Lab",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-04",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Tesoro XP, Inc.",
+            "owner_email": "christian@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-08-03",
+            "deal_value": 15000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 38
+          },
+          {
+            "company_name": "AxisCare",
+            "owner_email": "christian@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-04-30",
+            "deal_value": 75000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "User Testing Inc",
+            "owner_email": "jake@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-07-18",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Quizlet",
+            "owner_email": "cary@growthbook.io",
+            "stage": "qualifiedtobuy",
+            "close_date": "2026-06-30",
+            "deal_value": 30100.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Oda",
+            "owner_email": "christian@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 28
+          },
+          {
+            "company_name": "Little Caesars",
+            "owner_email": "cary@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2025-05-31",
+            "deal_value": 40000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Scale AI",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2025-07-24",
+            "deal_value": 60000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "mountain",
+            "owner_email": "dan@growthbook.io",
+            "stage": "presentationscheduled",
+            "close_date": "2026-09-11",
+            "deal_value": 51000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 45
+          },
+          {
+            "company_name": "SecureTicketPurchase",
+            "owner_email": "christian@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2025-05-21",
+            "deal_value": 20000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Picnic Technologies",
+            "owner_email": "dan@growthbook.io",
+            "stage": "presentationscheduled",
+            "close_date": "2026-09-04",
+            "deal_value": 120000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 40
+          },
+          {
+            "company_name": "freeCodeCamp",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 1000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "los angeles times",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 3000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Insight Co.",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 1000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Skillshare, Inc",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "HotelsCombined",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 5000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          }
+        ],
+        "past_close_date_count": 64,
+        "stale_count": 1,
+        "total_stale_pipeline": 987194.02,
+        "stale_threshold_days": 21
+      }
+    },
+    {
+      "name": "stale_days_30",
+      "params": {
+        "stale_days": 30
+      },
+      "result": {
+        "stale_deals": [
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-05-21",
+            "deal_value": 6000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Inditex",
+            "owner_email": null,
+            "stage": "1297321618",
+            "close_date": "2025-07-11",
+            "deal_value": 0.0,
+            "days_since_activity": 37,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-19",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-09-12",
+            "deal_value": 35250.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-04-04",
+            "deal_value": 22500.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "VSCO",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-01-17",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Kitchen Warehouse",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-14",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "TicketNetwork",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-05",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "USIM",
+            "owner_email": "christian@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-09-11",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 0
+          },
+          {
+            "company_name": "Which?",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321619",
+            "close_date": "2026-09-04",
+            "deal_value": 31250.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Which?",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2024-10-23",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "SecureTicketPurchase",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-05",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "BIKE24",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-29",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "The Weather Company",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-03",
+            "deal_value": 13786.02,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Opera",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-08",
+            "deal_value": 2400.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Joyteractive",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-02-01",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Docsity",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-04-11",
+            "deal_value": 5750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Lease a Bike Nederland",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-06-17",
+            "deal_value": 13000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "IMPACT Commerce",
+            "owner_email": "",
+            "stage": "79653122",
+            "close_date": "2026-09-06",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Upstart",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2025-07-23",
+            "deal_value": 195575.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "PepsiCo",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2024-08-04",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 7
+          },
+          {
+            "company_name": "Lease a Bike",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-06-17",
+            "deal_value": 13000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Takealot",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-01",
+            "deal_value": 10750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Refurbed Marketplace GmbH",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-31",
+            "deal_value": 9240.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Tomahawk (Pepsi)",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-04",
+            "deal_value": 37626.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Fellow",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-10-02",
+            "deal_value": 3360.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Cochlear Ltd",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-14",
+            "deal_value": 29750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "facile.it",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2025-10-01",
+            "deal_value": 44944.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Haystack TV Inc",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-07-24",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "FahadTest",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-13",
+            "deal_value": 5000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "PRODUCKS",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321619",
+            "close_date": "2026-08-31",
+            "deal_value": 14600.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Cochlear Ltd",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-15",
+            "deal_value": 29750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Dribbleup",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-03-06",
+            "deal_value": 12563.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "The Lifetime Value Co.",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321620",
+            "close_date": "2026-02-01",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-23",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "",
+            "stage": "79653122",
+            "close_date": "2026-09-14",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Moneytree",
+            "owner_email": "graham@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-09-08",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Phoenix Energy",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-17",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "84.51\u02da",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-20",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Solotopia",
+            "owner_email": "graham@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-09-02",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Value Retail",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-27",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Doorlist",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-30",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Luciano",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-19",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "National Debt Relief, LLC",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-25",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "GrowthBook",
+            "owner_email": "ashley@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-05",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Pitstop",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-09",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "FloatMe",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-04",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "DM",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-12",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Jmhour Lab",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-04",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Tesoro XP, Inc.",
+            "owner_email": "christian@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-08-03",
+            "deal_value": 15000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 38
+          },
+          {
+            "company_name": "AxisCare",
+            "owner_email": "christian@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-04-30",
+            "deal_value": 75000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "User Testing Inc",
+            "owner_email": "jake@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-07-18",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Quizlet",
+            "owner_email": "cary@growthbook.io",
+            "stage": "qualifiedtobuy",
+            "close_date": "2026-06-30",
+            "deal_value": 30100.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Oda",
+            "owner_email": "christian@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 28
+          },
+          {
+            "company_name": "Little Caesars",
+            "owner_email": "cary@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2025-05-31",
+            "deal_value": 40000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Scale AI",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2025-07-24",
+            "deal_value": 60000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "mountain",
+            "owner_email": "dan@growthbook.io",
+            "stage": "presentationscheduled",
+            "close_date": "2026-09-11",
+            "deal_value": 51000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 45
+          },
+          {
+            "company_name": "SecureTicketPurchase",
+            "owner_email": "christian@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2025-05-21",
+            "deal_value": 20000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Picnic Technologies",
+            "owner_email": "dan@growthbook.io",
+            "stage": "presentationscheduled",
+            "close_date": "2026-09-04",
+            "deal_value": 120000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 40
+          },
+          {
+            "company_name": "freeCodeCamp",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 1000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "los angeles times",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 3000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Insight Co.",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 1000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Skillshare, Inc",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "HotelsCombined",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 5000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          }
+        ],
+        "past_close_date_count": 64,
+        "stale_count": 1,
+        "total_stale_pipeline": 987194.02,
+        "stale_threshold_days": 30
+      }
+    },
+    {
+      "name": "owner_filter",
+      "params": {
+        "owner_email": "jennifer@growthbook.io"
+      },
+      "result": {
+        "stale_deals": [
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-05-21",
+            "deal_value": 6000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-09-12",
+            "deal_value": 35250.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-04-04",
+            "deal_value": 22500.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "VSCO",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-01-17",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "The Weather Company",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-03",
+            "deal_value": 13786.02,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Lease a Bike",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-06-17",
+            "deal_value": 13000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Fellow",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-10-02",
+            "deal_value": 3360.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "The Lifetime Value Co.",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321620",
+            "close_date": "2026-02-01",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          }
+        ],
+        "past_close_date_count": 8,
+        "stale_count": 0,
+        "total_stale_pipeline": 93896.02,
+        "stale_threshold_days": 21
+      }
+    },
+    {
+      "name": "stage_filter",
+      "params": {
+        "stage": "1297321618"
+      },
+      "result": {
+        "stale_deals": [
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-05-21",
+            "deal_value": 6000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Inditex",
+            "owner_email": null,
+            "stage": "1297321618",
+            "close_date": "2025-07-11",
+            "deal_value": 0.0,
+            "days_since_activity": 37,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-09-12",
+            "deal_value": 35250.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-04-04",
+            "deal_value": 22500.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "VSCO",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-01-17",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "TicketNetwork",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-05",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Which?",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2024-10-23",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "SecureTicketPurchase",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-05",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "BIKE24",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-29",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "The Weather Company",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-03",
+            "deal_value": 13786.02,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Opera",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-08",
+            "deal_value": 2400.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Joyteractive",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-02-01",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Docsity",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-04-11",
+            "deal_value": 5750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Lease a Bike Nederland",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-06-17",
+            "deal_value": 13000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Upstart",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2025-07-23",
+            "deal_value": 195575.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "PepsiCo",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2024-08-04",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 7
+          },
+          {
+            "company_name": "Lease a Bike",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-06-17",
+            "deal_value": 13000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Takealot",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-01",
+            "deal_value": 10750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Refurbed Marketplace GmbH",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-31",
+            "deal_value": 9240.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Tomahawk (Pepsi)",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-04",
+            "deal_value": 37626.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Fellow",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-10-02",
+            "deal_value": 3360.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Cochlear Ltd",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-14",
+            "deal_value": 29750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "facile.it",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2025-10-01",
+            "deal_value": 44944.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Haystack TV Inc",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-07-24",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "FahadTest",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-13",
+            "deal_value": 5000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Cochlear Ltd",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-15",
+            "deal_value": 29750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Dribbleup",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-03-06",
+            "deal_value": 12563.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          }
+        ],
+        "past_close_date_count": 27,
+        "stale_count": 1,
+        "total_stale_pipeline": 520244.02,
+        "stale_threshold_days": 21
+      }
+    },
+    {
+      "name": "stale_days_60",
+      "params": {
+        "stale_days": 60
+      },
+      "result": {
+        "stale_deals": [
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-05-21",
+            "deal_value": 6000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Inditex",
+            "owner_email": null,
+            "stage": "1297321618",
+            "close_date": "2025-07-11",
+            "deal_value": 0.0,
+            "days_since_activity": 37,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-19",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-09-12",
+            "deal_value": 35250.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-04-04",
+            "deal_value": 22500.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "VSCO",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-01-17",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Kitchen Warehouse",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-14",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "TicketNetwork",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-05",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "USIM",
+            "owner_email": "christian@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-09-11",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 0
+          },
+          {
+            "company_name": "Which?",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321619",
+            "close_date": "2026-09-04",
+            "deal_value": 31250.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Which?",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2024-10-23",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "SecureTicketPurchase",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-05",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "BIKE24",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-29",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "The Weather Company",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-03",
+            "deal_value": 13786.02,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Opera",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-08",
+            "deal_value": 2400.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Joyteractive",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-02-01",
+            "deal_value": 10000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Docsity",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-04-11",
+            "deal_value": 5750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Lease a Bike Nederland",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-06-17",
+            "deal_value": 13000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "IMPACT Commerce",
+            "owner_email": "",
+            "stage": "79653122",
+            "close_date": "2026-09-06",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Upstart",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2025-07-23",
+            "deal_value": 195575.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "PepsiCo",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2024-08-04",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 7
+          },
+          {
+            "company_name": "Lease a Bike",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-06-17",
+            "deal_value": 13000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Takealot",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-01",
+            "deal_value": 10750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Refurbed Marketplace GmbH",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-31",
+            "deal_value": 9240.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Tomahawk (Pepsi)",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-04",
+            "deal_value": 37626.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Fellow",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-10-02",
+            "deal_value": 3360.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Cochlear Ltd",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-14",
+            "deal_value": 29750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "facile.it",
+            "owner_email": "",
+            "stage": "1297321618",
+            "close_date": "2025-10-01",
+            "deal_value": 44944.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Haystack TV Inc",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-07-24",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "FahadTest",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-13",
+            "deal_value": 5000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "PRODUCKS",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321619",
+            "close_date": "2026-08-31",
+            "deal_value": 14600.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Cochlear Ltd",
+            "owner_email": "marsh@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-09-15",
+            "deal_value": 29750.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Dribbleup",
+            "owner_email": "cary@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-03-06",
+            "deal_value": 12563.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "The Lifetime Value Co.",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321620",
+            "close_date": "2026-02-01",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-23",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "",
+            "stage": "79653122",
+            "close_date": "2026-09-14",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Moneytree",
+            "owner_email": "graham@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-09-08",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Phoenix Energy",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-17",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "84.51\u02da",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-20",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Solotopia",
+            "owner_email": "graham@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-09-02",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Value Retail",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-27",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Doorlist",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-30",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Luciano",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-07-19",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "National Debt Relief, LLC",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-25",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "GrowthBook",
+            "owner_email": "ashley@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-05",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Pitstop",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-09",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "FloatMe",
+            "owner_email": "jake@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-04",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "DM",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-12",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Jmhour Lab",
+            "owner_email": "christian@growthbook.io",
+            "stage": "79653122",
+            "close_date": "2026-08-04",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Tesoro XP, Inc.",
+            "owner_email": "christian@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-08-03",
+            "deal_value": 15000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 38
+          },
+          {
+            "company_name": "AxisCare",
+            "owner_email": "christian@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-04-30",
+            "deal_value": 75000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "User Testing Inc",
+            "owner_email": "jake@growthbook.io",
+            "stage": "appointmentscheduled",
+            "close_date": "2026-07-18",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Quizlet",
+            "owner_email": "cary@growthbook.io",
+            "stage": "qualifiedtobuy",
+            "close_date": "2026-06-30",
+            "deal_value": 30100.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Oda",
+            "owner_email": "christian@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 28
+          },
+          {
+            "company_name": "Little Caesars",
+            "owner_email": "cary@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2025-05-31",
+            "deal_value": 40000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Scale AI",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2025-07-24",
+            "deal_value": 60000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "mountain",
+            "owner_email": "dan@growthbook.io",
+            "stage": "presentationscheduled",
+            "close_date": "2026-09-11",
+            "deal_value": 51000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 45
+          },
+          {
+            "company_name": "SecureTicketPurchase",
+            "owner_email": "christian@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2025-05-21",
+            "deal_value": 20000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Picnic Technologies",
+            "owner_email": "dan@growthbook.io",
+            "stage": "presentationscheduled",
+            "close_date": "2026-09-04",
+            "deal_value": 120000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": 40
+          },
+          {
+            "company_name": "freeCodeCamp",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 1000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "los angeles times",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 3000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Insight Co.",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 1000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Skillshare, Inc",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "HotelsCombined",
+            "owner_email": "jake@growthbook.io",
+            "stage": "decisionmakerboughtin",
+            "close_date": "2023-12-31",
+            "deal_value": 5000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          }
+        ],
+        "past_close_date_count": 64,
+        "stale_count": 0,
+        "total_stale_pipeline": 987194.02,
+        "stale_threshold_days": 60
+      }
+    },
+    {
+      "name": "combined_owner_stale_days",
+      "params": {
+        "owner_email": "jennifer@growthbook.io",
+        "stale_days": 30
+      },
+      "result": {
+        "stale_deals": [
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-05-21",
+            "deal_value": 6000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-09-12",
+            "deal_value": 35250.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-04-04",
+            "deal_value": 22500.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "VSCO",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-01-17",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "The Weather Company",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-08-03",
+            "deal_value": 13786.02,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Lease a Bike",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2026-06-17",
+            "deal_value": 13000.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "Fellow",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321618",
+            "close_date": "2025-10-02",
+            "deal_value": 3360.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          },
+          {
+            "company_name": "The Lifetime Value Co.",
+            "owner_email": "jennifer@growthbook.io",
+            "stage": "1297321620",
+            "close_date": "2026-02-01",
+            "deal_value": 0.0,
+            "days_since_activity": 3,
+            "is_past_close_date": true,
+            "overall_score": null
+          }
+        ],
+        "past_close_date_count": 8,
+        "stale_count": 0,
+        "total_stale_pipeline": 93896.02,
+        "stale_threshold_days": 30
+      }
+    }
+  ],
+  "critical_fields_to_verify": [
+    "stale_count",
+    "past_close_date_count",
+    "total_stale_pipeline",
+    "stale_threshold_days",
+    "stale_deals (length and sample deal_ids)"
+  ]
+}
