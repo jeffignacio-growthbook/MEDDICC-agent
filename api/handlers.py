@@ -3007,19 +3007,14 @@ async def query_stale_deals(params: dict, sb) -> dict:
     stage = _resolve_stage_id(params.get("stage"))
     stale_days = params.get("stale_days", 21)
     tw = params.get("time_window")
-    
-    import yaml
+
     from datetime import date, timedelta
-    
-    # Load config for reporting timezone
-    config_path = Path(__file__).parent.parent / "config" / "client.yaml"
-    config = yaml.safe_load(open(config_path))
-    
+
     # ALLOW-RAW-DATE-MATH: stale_days is a numeric staleness threshold, not
     # a user's relative time phrase to parse — and today is already
     # today_in_reporting_tz(), the same canonical "today" resolve_time_
     # window() now uses, so there's no parallel/disagreeing "today" here.
-    today = today_in_reporting_tz(config)
+    today = today_in_reporting_tz()  # Loads config internally
     stale_cutoff = (today - timedelta(days=stale_days)).isoformat()
     
     # Get active deals
@@ -3049,17 +3044,23 @@ async def query_stale_deals(params: dict, sb) -> dict:
         filters=filters
     )
 
-    # Get latest analysis for each deal
+    # Get latest analysis for each deal (bulk query, not N+1)
     analyses_map = {}
     if deals_rows:
         deal_ids = [d["deal_id"] for d in deals_rows]
-        for deal_id in deal_ids:
-            analyses = select_all(sb, "analyses",
-                columns="deal_id,overall_score",
-                filters=[("eq", "deal_id", deal_id)]
-            )
-            if analyses:
-                analyses_map[deal_id] = analyses[-1]
+        # Single bulk query with IN operator instead of looping
+        all_analyses = select_all(sb, "analyses",
+            columns="deal_id,overall_score",
+            filters=[("in_", "deal_id", deal_ids)]
+        )
+        # Group by deal_id and take the last analysis for each
+        from collections import defaultdict
+        by_deal = defaultdict(list)
+        for analysis in all_analyses:
+            by_deal[analysis["deal_id"]].append(analysis)
+        # Take last analysis for each deal (sorted by insertion order from DB)
+        for deal_id, analyses_list in by_deal.items():
+            analyses_map[deal_id] = analyses_list[-1]
     
     # Filter stale and past-close deals
     stale_deals = []
