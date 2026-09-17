@@ -4640,6 +4640,14 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         elif pipeline_filter == "renewal":
             # For renewal, explicitly set to renewal pipeline ID
             pipeline_id = _RENEWAL_PIPELINE_ID
+            # CRITICAL H1 FIX COMPLETION: Remove renewal pipeline from exclusion list
+            # when user explicitly requests renewal deals. Without this,
+            # is_deal_in_analytics_scope() (called from _pm_in_scope line 4213)
+            # will reject all renewal deals even though the DB query correctly
+            # loaded them. This is the SECOND part of the H1 fix - the first part
+            # was removing the redundant pipeline check from _pm_in_scope itself.
+            excluded_pipelines = [p for p in excluded_pipelines
+                                 if str(p) != str(_RENEWAL_PIPELINE_ID)]
 
     deal_ids = params.get("deal_ids")
     close_date_scope = (params.get("close_date_scope") or "all").strip().lower()
