@@ -4297,6 +4297,74 @@ def _pm_deal_rows(date_rows, stage_cfg, company_map=None, limit=200):
     return rows[:limit]
 
 
+def _pm_compute_stage_movement(prior_rows, current_rows, stage_cfg):
+    """
+    Compute stage-by-stage movement metrics (H2 convergence refactor).
+
+    Args:
+        prior_rows: list of deal rows from prior snapshot
+        current_rows: list of deal rows from current snapshot
+        stage_cfg: stage configuration dict
+
+    Returns:
+        tuple: (by_stage, moved_between, new_ids, left_ids)
+        - by_stage: list of dicts with stage movement metrics
+        - moved_between: set of deal_ids that moved between stages
+        - new_ids: set of deal_ids new to pipeline
+        - left_ids: set of deal_ids that left pipeline
+    """
+    prior_sets, _ = _pm_stage_sets(prior_rows, stage_cfg)
+    current_sets, _ = _pm_stage_sets(current_rows, stage_cfg)
+
+    prior_all = {r["deal_id"] for r in prior_rows}
+    current_all = {r["deal_id"] for r in current_rows}
+    new_ids = current_all - prior_all         # absent in prior → new to pipeline
+    left_ids = prior_all - current_all        # present in prior, gone in current
+
+    stage_names = set(prior_sets) | set(current_sets)
+
+    def _order(name):
+        # order a stage name for display using stage_cfg
+        for sid, cfg in stage_cfg.items():
+            if cfg["name"] == name:
+                return cfg["order"]
+        return 9_999  # 'unknown' and unmapped sort last
+
+    by_stage = []
+    for name in sorted(stage_names, key=_order):
+        p = prior_sets.get(name, set())
+        c = current_sets.get(name, set())
+        entered = c - p
+        # A deal in this stage now that wasn't here before is either new to the
+        # pipeline entirely (absent in prior) or moved in from another stage.
+        # Reporting a newly-created deal as "entered a stage" overstates
+        # movement (Issue 3), so split them.
+        entered_new = entered & new_ids
+        entered_moved = entered - new_ids
+        by_stage.append({
+            "stage": name,
+            "prior": len(p),
+            "current": len(c),
+            "net": len(c) - len(p),
+            "entered": len(entered),                 # total, back-compat
+            "entered_from_other_stage": len(entered_moved),
+            "new_to_pipeline": len(entered_new),
+            "exited": len(p - c),
+            "deal_ids": sorted(c),
+            "entered_from_other_stage_ids": sorted(entered_moved),
+            "new_to_pipeline_ids": sorted(entered_new),
+            "exited_ids": sorted(p - c),
+        })
+
+    # Moved between stages = present in both snapshots but changed stage.
+    _, prior_stage_of = _pm_stage_sets(prior_rows, stage_cfg)
+    _, current_stage_of = _pm_stage_sets(current_rows, stage_cfg)
+    moved_between = {d for d in (prior_all & current_all)
+                     if prior_stage_of.get(d) != current_stage_of.get(d)}
+
+    return by_stage, moved_between, new_ids, left_ids
+
+
 def _pm_select_snapshot_anchors(all_dates, requested_days=None):
     """
     Select two snapshot dates for movement comparison (H3 convergence refactor).
@@ -4376,54 +4444,10 @@ def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps, requested_days=N
     prior_rows = list(_pm_latest_row_per_deal(by_date[prior_date]).values())
     current_rows = list(_pm_latest_row_per_deal(by_date[current_date]).values())
 
-    prior_sets, _ = _pm_stage_sets(prior_rows, stage_cfg)
-    current_sets, _ = _pm_stage_sets(current_rows, stage_cfg)
-
-    prior_all = {r["deal_id"] for r in prior_rows}
-    current_all = {r["deal_id"] for r in current_rows}
-    new_ids = current_all - prior_all         # absent in prior → new to pipeline
-    left_ids = prior_all - current_all        # present in prior, gone in current
-
-    stage_names = set(prior_sets) | set(current_sets)
-
-    def _order(name):
-        # order a stage name for display using stage_cfg
-        for sid, cfg in stage_cfg.items():
-            if cfg["name"] == name:
-                return cfg["order"]
-        return 9_999  # 'unknown' and unmapped sort last
-
-    by_stage = []
-    for name in sorted(stage_names, key=_order):
-        p = prior_sets.get(name, set())
-        c = current_sets.get(name, set())
-        entered = c - p
-        # A deal in this stage now that wasn't here before is either new to the
-        # pipeline entirely (absent in prior) or moved in from another stage.
-        # Reporting a newly-created deal as "entered a stage" overstates
-        # movement (Issue 3), so split them.
-        entered_new = entered & new_ids
-        entered_moved = entered - new_ids
-        by_stage.append({
-            "stage": name,
-            "prior": len(p),
-            "current": len(c),
-            "net": len(c) - len(p),
-            "entered": len(entered),                 # total, back-compat
-            "entered_from_other_stage": len(entered_moved),
-            "new_to_pipeline": len(entered_new),
-            "exited": len(p - c),
-            "deal_ids": sorted(c),
-            "entered_from_other_stage_ids": sorted(entered_moved),
-            "new_to_pipeline_ids": sorted(entered_new),
-            "exited_ids": sorted(p - c),
-        })
-
-    # Moved between stages = present in both snapshots but changed stage.
-    _, prior_stage_of = _pm_stage_sets(prior_rows, stage_cfg)
-    _, current_stage_of = _pm_stage_sets(current_rows, stage_cfg)
-    moved_between = {d for d in (prior_all & current_all)
-                     if prior_stage_of.get(d) != current_stage_of.get(d)}
+    # H2 convergence: use extracted helper for stage movement aggregation
+    by_stage, moved_between, new_ids, left_ids = _pm_compute_stage_movement(
+        prior_rows, current_rows, stage_cfg
+    )
 
     totals = {
         "prior": len(prior_rows),
