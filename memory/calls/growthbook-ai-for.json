@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook AI for",
+  "slug": "growthbook-ai-for",
+  "last_etl_date": "2026-09-17T06:19:53.893292",
+  "calls": [
+    {
+      "id": "01M2MCS262KQJ88CEZ4A719VZF",
+      "source": "fireflies",
+      "title": "GrowthBook AI for 5.2",
+      "date": "2026-09-16",
+      "duration_minutes": 35.779998779296875,
+      "summary": "# GrowthBook AI for 5.2\nDate: 2026-09-16 | Duration: 35.779998779296875m\n\n## Summary\nThe team discussed an AI-driven experimentation workflow that guides experiment setup, flags missing guardrails, validates launches, monitors metrics, and recommends ramp-up or cleanup actions. Slack is the intended primary interface for proactive alerts, experiment queries, approvals, and pauses, although the team must balance flexible AI responses with structured, low-noise interactions. Smart notifications, event coalescing, text-based digests, concise templates, and interactive buttons were identified as priorities. Technical work includes a large pull request supporting streaming and chat AI, new APIs for experiment changes and deeper data queries, event-payload integration for AI calls, and a Langfuse event-source integration for testing AI metrics. The team also discussed whether to use scheduled AI agents or built-in monitoring, while positioning Growthbook as an experimentation-focused complement to enterprise automation tools. Near-term priorities include Slack digests, experiment analysis, infrastructure support, technical-debt reduction, and preparation of AI capabilities for the 5.2 release.\n\n## Keywords\nAI-driven experiments, Slack integration, smart notifications, experiment digest, Langfuse integration, event coalescing\n\n## Action Items\n\n**Ashley Stirrup**\nPresent AI-driven experiment management mockup and gather further feedback for 5.2 release (01:01)\nAdvocate user guidance features for next steps in experiment lifecycle within the product or Slack (18:46)\n\n**Luke Sonnet**\nReview Slack integration PRs focusing on digests and smart notifications; decide on text-based digest format for usability (27:34)\nCollaborate with Adriel to finalize and polish Slack experiment digest feature and add capabilities for event payload AI annotations (31:04)\nPrioritize infrastructure and API improvements to support smart notifications and agent-assisted deep dives into experiment results (31:04)\n\n**Graham McNicoll**\nContinue refinement of in-chat AI features adapting from web focus to streaming data for GrowthBook Slack integration (09:30)\nInitiate Langfuse integration for AI observability and experimentation support; reach out to Langfuse contacts for collaboration (32:07)\nAssist in enabling Slack buttons and event coalescing features for richer AI-driven interaction (19:24)\n\n**Jeremy Dorn**\nDevelop smart notification logic focused on filtering noise and grouping events to improve Slack app usability (13:59)\nImplement Slack digest using text format with hyperlinks that allows better mobile and desktop user experience (28:10)\nCollaborate on better AI judgment integration for assessing experiment anomalies and generating actionable reports (07:55)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Jon Rhome and",
+  "slug": "jon-rhome-and",
+  "last_etl_date": "2026-09-17T06:19:53.894703",
+  "calls": [
+    {
+      "id": "01M2GZ5SYR565HG26B2YJQTDR5",
+      "source": "fireflies",
+      "title": "Jon Rhome and Graham McNicoll",
+      "date": "2026-09-16",
+      "duration_minutes": 37.619998931884766,
+      "summary": "# Jon Rhome and Graham McNicoll\nDate: 2026-09-16 | Duration: 37.619998931884766m\n\n## Summary\nThe discussion covered GrowthBook’s evolution into a warehouse-native experimentation platform with feature flags, product analytics, SQL-native metrics, custom reports, APIs, and MCPs for AI-driven workflows. Graham described an experiment quality score assessing hypotheses, metric stability, power calculations, execution consistency, and process adherence, while Jonathan supported its use for coaching product managers. They also discussed lightweight scheduling, idea tracking, calendar views, namespaces, and power calculation integration to reduce manual coordination. GrowthBook’s learning library links behavioral patterns to supporting or contradicting evidence, with AI helping keep insights current. Dave serves underbanked and paycheck-to-paycheck users through transparent short-term loans, instant Plaid-based underwriting, and a planned Buy Now Pay Later card, with a broader vision for financial guidance and spending tools. Dave processes about $1 billion in loans monthly and is growing 30–40% year over year. Both sides emphasized unbiased implementation, ratio mismatch monitoring, metric governance, Snowflake, semantic layers, and AI-enabled experimentation.\n\n## Keywords\nGrowthBook, AB testing, experimental quality, payday loans, financial product expansion, experimentation coordination\n\n## Action Items\n\n**Graham McNicoll**\nShare prototype and details of the experimental quality score system with Jonathan for feedback and possible collaboration (33:00)\nFollow up with Jonathan regarding potential podcast or case study collaboration featuring his experience with GrowthBook (36:00)\n\n**Jonathan Rhome**\nProvide feedback and input on GrowthBook's quality score and experimentation process improvements based on his experience at Dave (33:00)\nCoordinate with Graham for potential participation in GrowthBook marketing activities like podcast or case studies (36:00)\n",
+      "organizer": "graham@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "Jake <> Brent",
   "slug": "jake-brent",
-  "last_etl_date": "2026-09-10T06:13:41.843627",
+  "last_etl_date": "2026-09-17T06:19:53.893818",
   "calls": [
     {
       "id": "01KG325ZD2GJE3VH7WZ9SNNVDP",
@@ -322,6 +322,17 @@
       "date": "2026-09-09",
       "duration_minutes": 28.579999923706055,
       "summary": "# Jake <> Brent weekly 1:1\nDate: 2026-09-09 | Duration: 28.579999923706055m\n\n## Summary\nThe team reviewed slow post-holiday lead flow and identified two promising software-company leads, Second Nature and Mindstorm Studios, both originating from free or open-source usage and showing interest in Growth Book’s paid enterprise version. Ryan centrally assigned leads to James or Marcel in Europe. Jake and Brent configured Apollo for champion-tracking outreach, including field mapping for names, companies, and LinkedIn URLs, after earlier tool limitations. They refined a three-step LinkedIn sequence: an initial introduction, a meeting request after seven days, and a polite closure message one week later. Messaging will use clear identity statements, personalized fields, phased calls to action, and references to newer capabilities such as Cupid sequential testing and holdouts. The team also discussed re-engaging past users with tailored messaging and using AI assistance to improve drafts. Their short-term goal is to secure four meetings by next week.\n\n## Keywords\nlead generation, open-source users, LinkedIn outreach, sales sequencing, enterprise sales, messaging templates\n\n## Action Items\n\n**Jake Stangl**\nContinue sequencing outreach to champions based on the imported lead list, including calls and LinkedIn messaging follow-up (08:24)\nFinalize and launch the customized LinkedIn messaging sequence with improved templates incorporating Brent’s feedback on tone and personalization (23:27)\nFollow up in cadence with prospects using the three-step messaging plan discussed (initial, meeting request at 7 days, and closing message 7 days later) (26:04)\nAim to secure approximately four meetings by next week and gain entry into the sales opportunity round robin (27:09)\n\n**Brent Holloway**\nProvide further support and advice on messaging and sequencing as Jake launches his outreach (26:36)\nMonitor progress of Jake’s outreach and meetings to enable round robin inclusion soon (27:20)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M23FQYQJWSFVZKN784WGEMB5",
+      "source": "fireflies",
+      "title": "Jake <> Brent weekly 1:1",
+      "date": "2026-09-16",
+      "duration_minutes": 25.920000076293945,
+      "summary": "# Jake <> Brent weekly 1:1\nDate: 2026-09-16 | Duration: 25.920000076293945m\n\n## Summary\nThe discussion focused on strengthening the sales pipeline, improving outreach effectiveness, and increasing the number of late-stage and closed-won deals. The champion program generated a meeting with Immersion, a LaunchDarkly user considering GrowthBook, through targeted email and LinkedIn outreach. Other leads included GoPro and Preply. New HubSpot weekly reports are improving visibility into meetings and opportunities, while a $3.3 million Zalando opportunity forecasted for December requires review because it was previously lost and later recreated under another contact and rep. HubSpot record fragmentation and incomplete AI linking may be causing source-attribution errors. Brent requested closer monitoring of late-stage and closed-lost opportunities, plus call and email activity reports connected to lead sources. LinkedIn activity remains difficult to measure. A BDR hire is anticipated within four to six weeks, while the Dripify webhook remains unresolved until follow-up with Jeff Bradkin after the responsible engineer’s vacation.\n\n## Keywords\nChampion tracking, Dripify webhook, HubSpot pipeline, Immersion lead, Zalando opportunity, activity reporting\n\n## Action Items\n\n**Jake Stangl**\nFollow up with Jeff Bradkin on the Dripify webhook error after Jeff returns from vacation on June 20 (00:59)\nProvide updates on Immersion meeting and further learnings after the scheduled meeting (07:41)\nCreate and save HubSpot report filtering meetings and pipeline data by calendar week and share findings (08:26)\nInvestigate pipeline opportunities, specifically accounts like Zalando, to determine correct source attribution and update as necessary (11:41)\nCompile and send activity reports including email, calls, and LinkedIn outreach segmented by lead source to Brent and Ryan via Slack (24:38)\n\n**Brent Holloway**\nMonitor champion tracking program scalability and follow up with Jake on lead progress and pipeline maturity (00:12)\nReview incoming data and coordinate the hiring/onboarding of new BDR in four to six weeks timeline (24:48)\n",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

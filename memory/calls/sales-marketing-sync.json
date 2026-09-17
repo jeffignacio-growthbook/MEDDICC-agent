@@ -1,0 +1,18 @@
+{
+  "company": "Sales <> Marketing Sync",
+  "slug": "sales-marketing-sync",
+  "last_etl_date": "2026-09-17T06:19:53.896330",
+  "calls": [
+    {
+      "id": "01M21ZR1HHNGCE26QS07X1JP95",
+      "source": "fireflies",
+      "title": "Sales <> Marketing Sync: 5.1 Sales Enablement Training",
+      "date": "2026-09-16",
+      "duration_minutes": 58,
+      "summary": "# Sales <> Marketing Sync: 5.1 Sales Enablement Training\nDate: 2026-09-16 | Duration: 58m\n\n## Summary\nGrowthBook 5.1 focuses on closing the experimentation learning loop through scalable testing, user journeys, funnel analysis, the Learnings module, and AI-powered knowledge sharing. Contextual bandits support rapid optimization for time-sensitive, personalized, and continuously changing scenarios, with examples from Sony, Yasio, and Anthropic. Learnings creates a searchable repository that combines experiment outcomes across tools, preserves institutional knowledge, and distributes insights through Slack and AI agents. Product updates include a 30-user Pro limit, event caps and overage charges for managed warehouses, Enterprise-only event forwarding, composable permissions, holdout APIs, Adobe Experience Platform support, and EU data-residency progress. AI agents can now publish experiments under governance controls, while hosted MCP with OAuth, natural-language dashboards, and expanded AI skills improve self-service. Sales and customer teams requested stronger demos, real data, educational assets, and simpler onboarding. Sources: sections timestamped 02:00–44:35.\n\n## Keywords\nLearnings module, Contextual Bandits, Product Analytics, AI agents, Experimentation Culture, Slack Integration\n\n## Action Items\n\n**Elyse Fox**\nDistribute updated release slides, future roadmap deck, and recording after the 5.1 release scheduled for next Tuesday (47:50)\n\n**Scott Bailey**\nExplore building a demo environment featuring upcoming or beta features to enhance sales enablement and demo capabilities (32:39)\n\n**Unassigned**\nProduce recorded office hours videos segmented by feature with engineers presenting, to support sales enablement (24:35)\nExplore adding in-platform tooltips, info hotlinks, and demo/documentation links for complex features like Contextual Bandits to improve user discoverability and reduce overwhelm (45:12)\nConsider developing specific training sessions focused on 5.1 feature adoption to improve usage and onboarding success for existing customers (43:57)\nDevelop messaging and sales enablement assets that emphasize experimentation culture transformation and how the new features support it, moving beyond solely feature-focused outreach (33:10)\n\n**Lyndsie Berens**\nInvestigate API automation issues consuming Apollo sales credits and ensure credits are preserved for the sales team (47:07)\n",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 20,
+      "summary_quality": "good"
+    }
+  ]
+}

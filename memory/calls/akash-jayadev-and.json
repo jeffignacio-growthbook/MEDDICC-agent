@@ -1,0 +1,18 @@
+{
+  "company": "Akash Jayadev and",
+  "slug": "akash-jayadev-and",
+  "last_etl_date": "2026-09-17T06:19:53.895992",
+  "calls": [
+    {
+      "id": "01M2F4RN0DKS4D9AXZYVHXDCJK",
+      "source": "fireflies",
+      "title": "Akash Jayadev and Ashley Stirrup",
+      "date": "2026-09-16",
+      "duration_minutes": 26.200000762939453,
+      "summary": "# Akash Jayadev and Ashley Stirrup\nDate: 2026-09-16 | Duration: 26.200000762939453m\n\n## Summary\nThe discussion covered data integration, alerting, account scoring, outreach strategy, and Rio’s evolving product and professional services capabilities. Data flow limits were updated, with deletion segments planned for delivery by tomorrow morning so Ashley can clean data proactively and avoid processing bottlenecks. The team explored Slack alerts that prioritize meaningful messages, such as pull request approvals, while addressing limitations in Claude and Rio’s access to message context. Ashley described plans to segment 500 high-potential accounts using Rio signals, LinkedIn data, and behavioral information, with particular interest in experimentation roles. Rio’s professional services team may support workflows that move data into HubSpot and Apollo, although pricing depends on detailed scope, signals, data flows, and scoring complexity. Rio can segment audiences by skills, technologies, behaviors, engineering roles, and enriched LinkedIn history, while saved lists and expanded copilot capabilities are being developed. Ashley also emphasized that technical data must be paired with content strategy, personalization, and customer-journey guidance.\n\n## Keywords\nRio, HubSpot integration, Apollo, personalized outreach, buyer audience, pro services\n\n## Action Items\n\n**Akash Jayadev**\nShare deletion segments with Ashley by next day morning for data cleanup (00:34)\nScope detailed workflow and technical requirements for Rio to HubSpot integration and personalized outreach; prepare cost quotation based on hours needed (14:03)\nCoordinate with Rio Pro Serve technical experts regarding integration and workflow support while awaiting Ashley’s decision (24:30)\n\n**Ashley Stirrup**\nReview progress and plans with current consultant (Aaron) doing Clay integration and outreach setup to decide on Rio team involvement (23:50)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

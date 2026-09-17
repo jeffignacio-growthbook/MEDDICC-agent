@@ -1,7 +1,7 @@
 {
-  "company": "MVF + GrowthBook",
+  "company": "MVF & GrowthBook",
   "slug": "mvf-growthbook",
-  "last_etl_date": "2026-08-08T17:33:40.675955",
+  "last_etl_date": "2026-09-17T06:19:53.897154",
   "calls": [
     {
       "id": "01KZ1S17J5MMBB8KDTV1XRKFBQ",
@@ -16,7 +16,19 @@
       "action_items": "\n, *, *, B, i, l, l, y,  , A, m, p, s, *, *, \n, C, o, n, f, i, r, m,  , i, n, t, e, r, n, a, l, l, y,  , w, i, t, h,  , d, i, r, e, c, t, o, r,  , a, n, d,  , l, e, g, a, l,  , t, e, a, m,  , t, o,  , a, p, p, r, o, v, e,  , t, h, e,  , p, r, o, o, f,  , o, f,  , c, o, n, c, e, p, t,  , t, r, i, a, l,  , a, g, r, e, e, m, e, n, t,  , a, n, d,  , i, d, e, n, t, i, f, y,  , t, h, e,  , r, i, g, h, t,  , M, V, F,  , p, a, r, t, i, c, i, p, a, n, t, s,  , f, o, r,  , t, h, e,  , t, r, i, a, l,  , (, 0, 5, :, 4, 4, ), \n, \n, *, *, J, a, m, e, s,  , S, h, a, n, n, o, n, *, *, \n, D, r, a, f, t,  , a, n, d,  , s, e, n, d,  , p, r, o, o, f,  , o, f,  , c, o, n, c, e, p, t,  , a, g, r, e, e, m, e, n, t,  , f, o, r,  , M, V, F, ’, s,  , r, e, v, i, e, w,  , (, 0, 6, :, 1, 5, ), \n, S, c, h, e, d, u, l, e,  , a, n, d,  , a, r, r, a, n, g, e,  , a,  , f, o, l, l, o, w, -, u, p,  , c, a, l, l,  , i, n,  , a, b, o, u, t,  , t, w, o,  , w, e, e, k, s,  , t, o,  , r, e, v, i, e, w,  , t, r, i, a, l,  , p, r, o, g, r, e, s, s,  , (, 0, 6, :, 4, 5, ), \n",
       "participant_domains": [
         "mvfglobal.com"
-      ]
+      ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M08CZZR8WVRNRC0TR9W5XDYS",
+      "source": "fireflies",
+      "title": "MVF & GrowthBook Trial Discussion",
+      "date": "2026-09-16",
+      "duration_minutes": 11.529999732971191,
+      "summary": "# MVF & GrowthBook Trial Discussion\nDate: 2026-09-16 | Duration: 11.529999732971191m\n\n## Summary\nThe discussion evaluated a potential consulting partner that targets large clients and may support market entry rather than directly use the product. Marcel Geldner described the partner as focused on CRM implementation at customer sites, with an agency-style model distinct from existing vendors and positioned similarly to Accenture in consulting. James Shannon emphasized clarifying the business model to align expectations, resources, and collaboration workflows. The participants also addressed unexplained meeting no-shows, noting that accepted invitations were not followed by attendance or communication, which disrupted discussions and wasted team time. They agreed that unavailable participants should decline invitations proactively. James proposed monitoring no-show rates and conducting follow-ups. He tasked Marcel with investigating the partner’s role and confirming its implementation capabilities, after which the collaboration approach could be finalized. Both also agreed to reinforce meeting communication norms across teams. Sources: 04:28–06:00.\n\n## Keywords\ntranscription, multilingual calls, trial feedback, proof of concept, CRM implementation, meeting attendance\n\n## Action Items\n\n**Marcel Geldner**\nInvestigate and follow up on transcription accuracy issues when switching between English and German during calls (00:16)\nConduct the introduction call with Dial at 03:00 and assess their potential role in CRM implementation partnerships or as intermediaries for entering client companies (03:24)\nFollow up regarding the participant who accepted but did not join the scheduled meeting, and prepare to re-engage if they join late (05:36)\n\n**James Shannon**\nMonitor feedback from Optimizing related to the order form and their interest in a proof of concept trial (00:55)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
     }
   ]
 }

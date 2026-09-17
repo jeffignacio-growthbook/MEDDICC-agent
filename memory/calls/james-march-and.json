@@ -1,0 +1,18 @@
+{
+  "company": "James March and",
+  "slug": "james-march-and",
+  "last_etl_date": "2026-09-17T06:19:53.896475",
+  "calls": [
+    {
+      "id": "01M21QMA6Z7B5MV7GY67YTN1T8",
+      "source": "fireflies",
+      "title": "James March and Chris Sanders",
+      "date": "2026-09-16",
+      "duration_minutes": 51.93000030517578,
+      "summary": "# James March and Chris Sanders\nDate: 2026-09-16 | Duration: 51.93000030517578m\n\n## Summary\nGrowthBook supports data-driven experimentation by identifying features that create meaningful product impact, addressing the fact that only about one-third of new features positively affect products. Its hashing-based bucketing assigns users consistently using a user ID and experiment key, while feature flags, targeting rules, and namespaces manage variant exposure and prevent conflicts. Experiment data connects to warehouse metrics, including Snowflake-based data and analytics sources such as Adobe Analytics. Reusable metrics, dimensions, metric slices, saved groups, and templates streamline setup. Bayesian analysis provides confidence intervals and chance-to-win measures, while health checks, SQL visibility, webhooks, guardrail metrics, holdouts, and power calculators support reliable execution and evaluation. Projects separate web and mobile experiments, maintain audit histories, and control access. The Legend team is adopting the platform with Games Zodiac leading the initiative, while initial data and segmentation work will involve the data team. Advanced capabilities include multi-armed bandits, and dimensions are replacing legacy segments.\n\n## Keywords\nGrowthBook, experimentation, feature flags, Snowflake, Bayesian statistics, metrics integration\n\n## Action Items\n\n**Devin Laltoo**\nConfirm with Kaido or relevant team member about complete Snowflake integration and data pipelines for metrics and fact tables in GrowthBook (00:24)\n\n**James March**\nCoordinate with Central team and data owners to verify ongoing setup progress and integration of Adobe Analytics data into GrowthBook metrics (00:21)\n\n**Scott Collens**\nClarify organization’s standard metric definitions and confirm if bespoke metrics are needed per experiment or reused generally (00:27)\n\n**Devin Laltoo & James March**\nExplore and define saved groups (targeting segments) for recurring attribute combinations to streamline experiment targeting (00:47)\n\n**GrowthBook team**\nAssist with setup of templates and saved groups to simplify experiment creation workflows (00:48)\n\n**All users**\nBegin running experiments using current GrowthBook setup, reach out for technical support or questions as they arise (00:50)\n",
+      "organizer": "chris@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

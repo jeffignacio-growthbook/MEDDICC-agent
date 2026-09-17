@@ -1,7 +1,7 @@
 {
   "company": "Weekly GrowthBook and",
   "slug": "weekly-growthbook-and",
-  "last_etl_date": "2026-09-10T06:13:41.844759",
+  "last_etl_date": "2026-09-17T06:19:53.895397",
   "calls": [
     {
       "id": "01KKA2YRZYW6WA7Q0DFFT230Z3",
@@ -163,6 +163,17 @@
       "date": "2026-09-09",
       "duration_minutes": 5,
       "summary": "# Weekly GrowthBook and Mastiff Software Meeting\nDate: 2026-09-09 | Duration: 5m\n\n## Summary\nThe team discussed whether to move forward with Francesca while another candidate remains under consideration, agreeing to allow a few days for her decision and let pipeline developments inform the outcome because delaying the hire has low immediate business impact. Candidate evaluation is focused on follow-up quality and domain fit: one prospect was rejected for weak follow-up, Brent became more confident in Reese after seeing how he connected prior experience to the company’s sales personas, and Ryan planned to meet Garrett and Justin, potentially using a bake-off among two or three candidates. Jake is expected to bring deals soon, but his round-robin inclusion is being delayed until other representatives build more pipeline; Ryan, Jake, and Jeff will review reporting and pipeline status. Andy is segmenting customer lists, while Chris is developing an AI-focused prospect list. Brent offered to help communicate with Francesca and support Ryan. Ryan reported viral-like symptoms, planned to rest and take a COVID test, and Lindsay is updating the ICP with new EMEA data to improve targeting and sales accuracy.\n\n## Keywords\ncandidate evaluation, pipeline management, hire decision, viral illness, ICP update, sales reporting\n\n## Action Items\n\n**Brent Holloway**\nInform Francesca about the current situation with multiple candidates and the accounts in the pipeline to help her with timely decision-making (01:46)\nRespond to Lindsay regarding updates on ICP data for EMEA (05:35)\n\n**Ryan McGurk**\nTalk with Ella regarding Francesca and other candidate pipelines, and decide on next steps (00:56)\nAdd Jake to the round robin of accounts management once pipeline volume is sufficient, likely by next Monday (02:21)\nConduct meeting with Jake tomorrow to review reporting work (02:38)\nGet tested for COVID-19 given current viral symptoms (05:29)\n\n**Brent Holloway and Ryan McGurk**\nContinue evaluating candidates Garrett, Justin, and Reese, and decide on invitations for next interview rounds following their upcoming calls (03:29)\n",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2GR2PZQ9JJBPCNN9QMHXR5N",
+      "source": "fireflies",
+      "title": "Weekly GrowthBook and Mastiff Software Meeting",
+      "date": "2026-09-16",
+      "duration_minutes": 32,
+      "summary": "# Weekly GrowthBook and Mastiff Software Meeting\nDate: 2026-09-16 | Duration: 32m\n\n## Summary\nThe team emphasized shifting from seat-based pricing toward AI consumption and experiment-based models to capture growing customer AI budgets and support scalable growth without adding sales staff. Revenira was considered for managing mixed licensing, consumption, and credit models, although reducing tool complexity remains a priority. Revenue recognition risks were discussed using Anthropic and Snowflake as examples. Hiring discussions prioritized Justin Hawks, Kevin, and Ella for further evaluation, while Garrett and Reese were kept warm for future opportunities. Sales process changes include reducing reliance on cold email, focusing on LinkedIn and calls, improving activity tracking, and running a pro-to-enterprise upgrade campaign with assessments, onboarding, and discounts. Brent presented an AI advisor combining internal metrics with external market signals, with weekly tactical briefs and monthly strategic insights recommended. The team also reviewed Jake’s pipeline, inbound lead handling, certification training, and a planned commission adjustment to 20%.\n\n## Keywords\nAI pricing, candidate evaluation, sales pipeline, revenue recognition, pro-to-enterprise campaign, market insights\n\n## Action Items\n\n**Brent Holloway**\nCoordinate scheduling of role play for candidate Justin once calendar access is restored (12:29)\nArrange meeting with Kevin following Ryan’s introduction (14:23)\nSchedule interviews for Ella with Ashley, Lindsay, James, and Christian, and organize subsequent role play if interviews go well (16:09)\nKeep Garrett and Reese warm with appropriate communication about current hiring priorities and potential future opportunities (17:09)\nReview Jake’s sales input data with Jeff to better correlate effort and output, once access is granted (23:27)\n\n**Ryan McGurk**\nIntroduce Brent to candidate Kevin via Slack or email (14:23)\nSend Slack messages to Lindsay, James, and Christian about scheduling Ella’s interviews (16:49)\nHelp prioritize Jake’s calling efforts in the pro-to-enterprise campaign (21:02)\nReschedule business value session due to key person’s absence (18:39)\nProvide Brent with access to Jake’s opportunity tracking spreadsheet for review (23:29)\nForward Brent relevant portfolio company hiring insights from a16z for prospecting use (30:54)\n",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 3,
       "summary_quality": "good"
