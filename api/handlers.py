@@ -4297,6 +4297,64 @@ def _pm_deal_rows(date_rows, stage_cfg, company_map=None, limit=200):
     return rows[:limit]
 
 
+def _pm_select_snapshot_anchors(all_dates, requested_days=None):
+    """
+    Select two snapshot dates for movement comparison (H3 convergence refactor).
+
+    Args:
+        all_dates: sorted list of snapshot date strings (ISO format)
+        requested_days: optional int, desired number of days between snapshots
+
+    Returns:
+        tuple: (prior_date, current_date, gaps)
+        where gaps is a list of data gap messages to append
+    """
+    from datetime import date, timedelta
+
+    current_date = all_dates[-1]  # Always use latest snapshot
+    gaps = []
+
+    if requested_days:
+        # ALLOW-RAW-DATE-MATH: downstream of resolve_time_window(), not a
+        # parallel implementation of it — requested_days is already derived
+        # from the resolved time_window (see query_pipeline_movement above),
+        # and current_date is a real snapshot date on file, not "today".
+        # resolve_time_window() has no visibility into sparse snapshot
+        # dates, so this anchor selection has to happen here.
+
+        # Find snapshot on or before (current - requested_days)
+        target_date = date.fromisoformat(current_date) - timedelta(days=requested_days)
+        target_str = target_date.isoformat()
+
+        # Find closest snapshot on or before target
+        valid_prior = [d for d in all_dates if d <= target_str]
+        if valid_prior:
+            prior_date = valid_prior[-1]  # Closest to target
+        else:
+            # No snapshot old enough — use oldest available
+            prior_date = all_dates[0]
+            actual_days = (date.fromisoformat(current_date) - date.fromisoformat(prior_date)).days
+            gaps.append(
+                f"Requested {requested_days}-day window, but oldest snapshot is "
+                f"{prior_date} ({actual_days} days). Comparing {actual_days} days "
+                f"instead of {requested_days}."
+            )
+    else:
+        # Default: use last two snapshots
+        prior_date = all_dates[-2]
+
+    # Check actual span
+    actual_days = (date.fromisoformat(current_date) - date.fromisoformat(prior_date)).days
+    if requested_days and abs(actual_days - requested_days) > 2:
+        # Significant mismatch — warn user
+        gaps.append(
+            f"Comparing snapshots from {prior_date} and {current_date} "
+            f"({actual_days} days). Requested {requested_days} days."
+        )
+
+    return prior_date, current_date, gaps
+
+
 def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps, requested_days=None, base=None):
     if len(all_dates) < 2:
         data_gaps.append(
@@ -4312,47 +4370,9 @@ def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps, requested_days=N
             "current_position": None
         }
 
-    # Select snapshots based on requested_days
-    from datetime import date, timedelta
-
-    current_date = all_dates[-1]  # Always use latest
-
-    if requested_days:
-        # ALLOW-RAW-DATE-MATH: downstream of resolve_time_window(), not a
-        # parallel implementation of it — requested_days is already derived
-        # from the resolved time_window (see query_pipeline_movement above),
-        # and current_date is a real snapshot date on file, not "today".
-        # resolve_time_window() has no visibility into sparse snapshot
-        # dates, so this anchor selection has to happen here.
-        # Find snapshot on or before (current - requested_days)
-        target_date = date.fromisoformat(current_date) - timedelta(days=requested_days)
-        target_str = target_date.isoformat()
-
-        # Find closest snapshot on or before target
-        valid_prior = [d for d in all_dates if d <= target_str]
-        if valid_prior:
-            prior_date = valid_prior[-1]  # Closest to target
-        else:
-            # No snapshot old enough — use oldest available
-            prior_date = all_dates[0]
-            actual_days = (date.fromisoformat(current_date) - date.fromisoformat(prior_date)).days
-            data_gaps.append(
-                f"Requested {requested_days}-day window, but oldest snapshot is "
-                f"{prior_date} ({actual_days} days). Comparing {actual_days} days "
-                f"instead of {requested_days}."
-            )
-    else:
-        # Default: use last two snapshots
-        prior_date = all_dates[-2]
-
-    # Check actual span
-    actual_days = (date.fromisoformat(current_date) - date.fromisoformat(prior_date)).days
-    if requested_days and abs(actual_days - requested_days) > 2:
-        # Significant mismatch — warn user
-        data_gaps.append(
-            f"Comparing snapshots from {prior_date} and {current_date} "
-            f"({actual_days} days). Requested {requested_days} days."
-        )
+    # H3 convergence: use extracted helper for snapshot anchor selection
+    prior_date, current_date, anchor_gaps = _pm_select_snapshot_anchors(all_dates, requested_days)
+    data_gaps.extend(anchor_gaps)
     prior_rows = list(_pm_latest_row_per_deal(by_date[prior_date]).values())
     current_rows = list(_pm_latest_row_per_deal(by_date[current_date]).values())
 
