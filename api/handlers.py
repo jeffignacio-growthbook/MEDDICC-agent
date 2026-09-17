@@ -4193,10 +4193,15 @@ def _pm_in_scope(row, excluded_pipelines, stage_cfg, is_in_scope):
       - Closed Won / Closed Lost are dropped explicitly (the shared function
         keeps them because their order is >= qualified; the spec lists them
         as excluded).
+
+    Pipeline exclusions are NOT checked here - those are handled server-side
+    at query construction (lines 4699-4708). Re-filtering in memory would
+    incorrectly exclude explicitly-requested pipelines (e.g. when
+    pipeline_filter='renewal' sets pipeline_id to the renewal pipeline,
+    the DB correctly loads those deals, but this function was stripping
+    them back out because excluded_pipelines contains that ID).
     """
     pid = row.get("pipeline_id")
-    if pid is not None and str(pid) in excluded_pipelines:
-        return False  # renewal / partner / marketing pipelines
     stage_id = row.get("stage_id")
     if stage_id is None or not str(stage_id).strip():
         return True   # null stage → counted downstream as 'unknown'
@@ -4584,6 +4589,7 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     follow-up drill-downs. Counts only — deal_value is never selected/emitted.
     """
     from datetime import date
+    from field_semantics import _RENEWAL_PIPELINE_ID
 
     load_scope_config, is_in_scope = _pm_load_scoping()
     excluded_pipelines, stage_cfg = load_scope_config()
@@ -4626,7 +4632,6 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     if pipeline_filter and not pipeline_id:
         # Map high-level filter to actual pipeline ID
         # (Same pattern as query_pipeline lines 2328-2334)
-        _, _, _RENEWAL_PIPELINE_ID = _load_config()
         if pipeline_filter == "new_business":
             # For new_business, we want to EXCLUDE the renewal pipeline
             # This is handled by excluded_pipelines logic below (lines 4686-4692)
