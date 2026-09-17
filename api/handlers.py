@@ -3115,7 +3115,60 @@ async def query_stale_deals(params: dict, sb) -> dict:
             
             if deal.get("deal_value"):
                 total_stale_pipeline += deal["deal_value"]
-    
+
+    # Verify computed aggregations against underlying stale_deals data.
+    # Protects stale_count, past_close_date_count, total_stale_pipeline
+    # from wrong aggregations reaching synthesis/users on every live query.
+    # Same pattern as query_pipeline — honest failure better than silent
+    # wrong answer.
+    try:
+        from structured_verification import verify_structured_aggregations
+    except ImportError:
+        from api.structured_verification import verify_structured_aggregations
+
+    # Compute expected counts from stale_deals for verification
+    # (stale_count = deals with days_since_activity >= stale_days,
+    #  past_close_date_count = deals with is_past_close_date == True)
+    verification_result = verify_structured_aggregations(
+        underlying_data=stale_deals,
+        structured_output={
+            "stale_count": stale_count,
+            "past_close_date_count": past_close_count,
+            "total_stale_pipeline": total_stale_pipeline,
+        },
+        verification_spec={
+            "stale_count": {
+                "type": "count_filtered",
+                "filter": lambda d: (d.get("days_since_activity") is not None
+                                    and d.get("days_since_activity") >= stale_days),
+                "expected": stale_count
+            },
+            "past_close_date_count": {
+                "type": "count_filtered",
+                "filter": lambda d: d.get("is_past_close_date") == True,
+                "expected": past_close_count
+            },
+            "total_stale_pipeline": {
+                "type": "sum",
+                "field": "deal_value",
+                "expected": total_stale_pipeline
+            }
+        },
+        tolerance=0.01  # Same float tolerance as baseline tests
+    )
+
+    if not verification_result["match"]:
+        # Corruption detected - return error instead of corrupted data
+        logger.error(f"[STRUCTURED_VERIFY] query_stale_deals aggregation "
+                     f"verification failed: {verification_result['discrepancies']}")
+        return {
+            "error": "aggregation_verification_failed",
+            "discrepancies": verification_result["discrepancies"],
+            "note": "Aggregation outputs did not match recomputed values from underlying data. "
+                   "This is a code-level gate, not a data issue — if you see this, there is "
+                   "a bug in the aggregation logic that must be fixed before shipping results."
+        }
+
     return {
         "stale_deals": stale_deals,
         "past_close_date_count": past_close_count,

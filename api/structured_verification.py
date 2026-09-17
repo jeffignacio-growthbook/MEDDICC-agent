@@ -59,6 +59,11 @@ def verify_structured_aggregations(
                       "type": "count",
                       "expected": structured_output["total_deals"]
                   },
+                  "stale_count": {
+                      "type": "count_filtered",
+                      "filter": lambda d: d.get("days_since_activity") >= threshold,
+                      "expected": structured_output["stale_count"]
+                  },
                   "by_stage": {
                       "type": "group_by",
                       "group_field": "_stage_label",
@@ -127,6 +132,25 @@ def verify_structured_aggregations(
                     "actual": actual,
                     "diff": abs(actual - expected),
                     "type": "count"
+                })
+
+        elif spec_type == "count_filtered":
+            # Verify a conditional count (e.g., stale_count = count where days >= threshold)
+            filter_func = spec.get("filter")
+            if not filter_func:
+                logger.warning(f"[STRUCTURED_VERIFY] {field_name}: "
+                              f"'count_filtered' type requires 'filter' function, skipping")
+                continue
+
+            actual = sum(1 for row in underlying_data if filter_func(row))
+
+            if actual != expected:
+                discrepancies.append({
+                    "field": field_name,
+                    "expected": expected,
+                    "actual": actual,
+                    "diff": abs(actual - expected),
+                    "type": "count_filtered"
                 })
 
         elif spec_type == "group_by":

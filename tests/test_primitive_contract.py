@@ -269,6 +269,12 @@ KNOWN_FLAGGED_LOG_TAGS = {
     # fetch the missing anchor before proceeding; the block IS the
     # consequence, not a silent log.
     "[ENRICHMENT_LOOKUP]",
+    # MANDATORY GATE: structured aggregation verification (query_pipeline,
+    # query_stale_deals) — catches aggregation mismatches before they ship,
+    # returns error dict instead of corrupted data. Same honest-failure
+    # pattern as [DIMENSION_VERIFY] — never a silent ship, always an
+    # explicit error with discrepancy details.
+    "[STRUCTURED_VERIFY]",
 }
 
 
