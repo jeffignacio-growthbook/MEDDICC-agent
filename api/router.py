@@ -1186,6 +1186,20 @@ TOOLS YOU CAN CALL:
     cycle-length benchmarks. MEDDICC deferred (insufficient historical data).
     Example: assess_deal_risk() for all high-priority deals in current quarter
     Example: assess_deal_risk(deal_ids=["123"], fiscal_quarter="FY2027 Q2")
+  query_pipeline(owner_email, stage_filter, pipeline_filter)
+    **PHASE 2: Handler 1/6 migrated to unified routing**
+    **USE THIS when the question asks about**:
+    - CURRENT PIPELINE STATE, OVERALL PIPELINE, TOTAL PIPELINE
+    - What is pipeline, how much pipeline, show me pipeline
+    - Pipeline snapshot, funnel, active/open deals
+    - Pipeline breakdown by stage, owner, or pipeline type
+    **DO NOT use for pipeline MOVEMENT or "how has pipeline changed"** (use query_pipeline_movement)
+    Params:
+    - owner_email: filter to specific rep (optional, accepts email or name)
+    - stage_filter: "qualified", "discovery", "scoping", "proposal" (optional, defaults to all stages)
+    - pipeline_filter: "new_business" or "renewal" (optional, defaults to all incremental pipeline)
+    **RETURNS**: Current pipeline snapshot with total deals, total ARR, coverage ratio, breakdowns by stage/owner
+    Examples: "what is our pipeline", "show me pipeline", "how much pipeline do we have", "Jake's pipeline"
   query_pipeline_movement(view, fiscal_quarter, pipeline_filter, owner_email, stage, weeks, close_date_scope, time_window)
     **PHASE 1 PILOT: unified routing test for handler-as-tool pattern**
     **USE THIS when the question asks about**:
@@ -4446,6 +4460,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             "aggregate_results": T.aggregate_results,
             "compare_periods": T.compare_periods,
             "assess_deal_risk": T.assess_deal_risk,
+            "query_pipeline": lambda sb_arg, **params: _call_handler_as_tool("query_pipeline", params, sb_arg),
             "query_pipeline_movement": lambda sb_arg, **params: _call_handler_as_tool("query_pipeline_movement", params, sb_arg),
         }.get(tool_name)
 
@@ -4544,16 +4559,22 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     f"({sample_size} in aggregate, {len(result.get('rows', []))} in raw), "
                     f"keys: {list(accumulated_data.keys())}")
 
-        # Phase 1 Pilot: Fast-path preservation for handler-as-tool
-        # If query_pipeline_movement called successfully, finalize immediately
-        # (same speed as direct routing, no multi-step reasoning)
+        # Phase 2: Fast-path preservation for row-based migrated handlers
+        # query_pipeline_movement: row-based, can fast-path finalize
+        # query_pipeline: structured result, let normal synthesis handle it
         if tool_name == "query_pipeline_movement" and "error" not in result:
-            logger.info(f"[UNIFIED_ROUTING_PILOT] query_pipeline_movement succeeded "
+            logger.info(f"[UNIFIED_ROUTING] {tool_name} succeeded "
                        f"→ finalizing immediately (fast-path preservation)")
             # Must append tool result to messages before finalization
             # (see _append_tool_result_message docstring - 2026-09-11 incident)
             _append_tool_result_message(messages, raw, result)
-            return await _finalize_from_data("pilot_fast_path")
+            return await _finalize_from_data(f"{tool_name}_fast_path")
+
+        # Structured handlers continue to next iteration for normal synthesis
+        if tool_name == "query_pipeline" and "error" not in result:
+            logger.info(f"[UNIFIED_ROUTING] {tool_name} (structured) succeeded "
+                       f"→ continuing to synthesis (no fast-path for structured handlers)")
+            # Continue loop - next iteration will synthesize
 
         # CHECK: Was this a verification retry that succeeded?
         # If previous iteration forced a retry due to missing dimension filter,
@@ -5070,12 +5091,13 @@ async def route_question(question: str, user_id: str,
         print(f"[INTENT] handler={handler_name} "
               f"confidence={confidence:.2f}", flush=True)
 
-        # ── Phase 1 Pilot: Unified routing for query_pipeline_movement ──
-        # Skip classifier routing for query_pipeline_movement - route to dynamic loop
-        # where it's registered as a callable tool (same pattern as assess_deal_risk).
+        # ── Phase 2: Unified routing for migrated handlers ──
+        # Phase 1: query_pipeline_movement
+        # Phase 2: query_pipeline, query_stale_deals, query_waterfall, query_rep_pipeline, query_win_loss, query_deals_at_risk
+        # Skip classifier routing - route to dynamic loop where they're registered as callable tools.
         # All other handlers continue using classifier routing unchanged.
-        if handler_name == "query_pipeline_movement":
-            logger.info(f"[UNIFIED_ROUTING_PILOT] query_pipeline_movement → dynamic loop "
+        if handler_name in ("query_pipeline_movement", "query_pipeline"):
+            logger.info(f"[UNIFIED_ROUTING] {handler_name} → dynamic loop "
                        f"(classifier confidence={confidence:.2f}, bypassed)")
             handler_name = "dynamic_query"
             # params already extracted by classifier, will be available to loop
