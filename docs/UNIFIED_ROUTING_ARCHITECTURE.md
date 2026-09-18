@@ -138,14 +138,14 @@ Proposed loop-with-handlers approach:
 
 **Latency impact:** +0.2-0.5 seconds per question (loop first iteration slightly larger than classifier)
 
-**Break-even analysis:**
+**Break-even analysis (for reference, not justification):**
 - Cost increase: $5/month per 1,000 questions
 - Cost to diagnose + fix routing bug: 2-4 engineer hours = $150-600
-- Break-even: 0.8-3 bugs per month
+- Theoretical break-even: 0.8-3 bugs per month
 
-**Phase 1b found:** 3 distinct routing bugs in one session (max_tokens truncation silent for 1 month, circular redirects, routing ambiguities).
+**Phase 1b found:** 3 distinct routing bugs in one session - a backlog of latent bugs discovered through systematic audit, not a confirmed ongoing recurrence rate.
 
-**Conclusion:** Cost increase is justified. Reliability gain outweighs $5/month cost.
+**Actual decision rationale:** $5/month is negligible regardless of exact bug frequency. The cost is justified by eliminating a demonstrated fragility class (classifier-specific configuration, redirect chains, confidence ambiguities) with explicit reasoning + single-mechanism simplicity. The break-even math is directionally supportive but not the primary justification.
 
 ### 2. Baseline Re-Verification For Converged Handlers
 
