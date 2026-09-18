@@ -4917,7 +4917,7 @@ async def route_question(question: str, user_id: str,
             }],
             system="Respond with valid JSON only. No markdown, "
                    "no backticks, no explanation.",
-            max_tokens=300
+            max_tokens=600  # Increased from 300: full JSON with all params requires ~500 tokens
         )
         try:
             intent = _extract_json(intent_resp.text)
