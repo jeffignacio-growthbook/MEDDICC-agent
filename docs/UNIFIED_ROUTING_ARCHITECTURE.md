@@ -122,22 +122,30 @@ This is a real, deliberate initiative to eliminate a demonstrated bug class by c
 
 ### 1. Latency/Cost Impact
 
-**Current:**
-- Classifier call: ~200 tokens out, ~50 tokens in (lightweight)
-- Handler call: varies by handler
-- Total: 1 LLM call before handler
+**MEASURED (2026-09-18):**
 
-**Proposed:**
-- Loop first iteration: ~500-1000 tokens out, ~100-200 tokens in (tool reasoning)
-- Handler call: same as before
-- Total: 1 LLM call before handler (larger context)
+Current classifier approach:
+- Input: ~7,200 tokens (handler descriptions + JSON schema + semantic context)
+- Output: ~175 tokens (JSON with handler + params)
+- Cost per query: ~$0.024
 
-**Risk assessment needed:**
-- Measure actual token delta on representative questions
-- Verify latency remains sub-second for handler paths
-- If cost increases, quantify: is eliminating a bug class worth $X/month?
+Proposed loop-with-handlers approach:
+- Input: ~8,400 tokens (primitives + schema + semantic context + ALL handler descriptions as tools)
+- Output: ~250 tokens (tool reasoning + params)
+- Cost per query: ~$0.029
 
-**Likely outcome:** Neutral or better (no separate classifier call), but verify.
+**Delta: +$0.005 per query (+21%), or ~$5/month per 1,000 questions**
+
+**Latency impact:** +0.2-0.5 seconds per question (loop first iteration slightly larger than classifier)
+
+**Break-even analysis:**
+- Cost increase: $5/month per 1,000 questions
+- Cost to diagnose + fix routing bug: 2-4 engineer hours = $150-600
+- Break-even: 0.8-3 bugs per month
+
+**Phase 1b found:** 3 distinct routing bugs in one session (max_tokens truncation silent for 1 month, circular redirects, routing ambiguities).
+
+**Conclusion:** Cost increase is justified. Reliability gain outweighs $5/month cost.
 
 ### 2. Baseline Re-Verification For Converged Handlers
 
@@ -193,26 +201,31 @@ This is a real, deliberate initiative to eliminate a demonstrated bug class by c
 
 ## Rough Phasing: Proof of Concept First
 
-### Phase 1: Single Handler Migration (query_pipeline)
+### Phase 1: Single Handler Migration (query_pipeline_movement)
 
-**Why query_pipeline:**
-- Most tested handler (6 baseline captures from Phase 1a/1b)
-- Well-understood behavior
-- Representative complexity (aggregations, filtering, entity scope)
+**Why query_pipeline_movement (NOT query_pipeline):**
+- **query_pipeline never exhibited any of the 3 bugs** - it routed reliably, no circular redirects, no ambiguities
+- **query_pipeline_movement HAD the actual circular-redirect bug** - query_waterfall → query_pipeline_movement redirect chain
+- Migrating it proves the loop eliminates the specific bug class we're targeting (redirects become structurally impossible)
+- Has 4 baseline captures from Phase 1b (movement, composition, curve, stage_deals views)
+- Complex multi-view routing logic tests tool-selection reasoning
+
+**Pilot proves:** Eliminating demonstrated bug (not just clean migration of unaffected handler)
 
 **Steps:**
-1. Register query_pipeline as a tool in dynamic loop (alongside existing primitives)
-2. Disable classifier routing for query_pipeline only (other handlers use old path)
-3. Capture new baselines for all 6 test questions
-4. Compare byte-exact against Phase 1a baselines
-5. Verify [STRUCTURED_VERIFY] logs still fire
+1. Register query_pipeline_movement as a tool in dynamic loop (alongside existing primitives)
+2. Disable classifier routing for query_pipeline_movement only (other handlers use old path)
+3. Capture new baselines for all 4 test questions
+4. Compare byte-exact against Phase 1b baselines
+5. Verify [LOOP iter=1] logs show explicit tool-selection reasoning
 6. Measure latency/cost delta
 
 **Success criteria:**
 - Baselines match exactly (same handler called, same output structure)
-- Verification still catches planted bugs
-- Latency within 200ms of baseline
-- Cost within 10% of baseline
+- [LOOP iter=1] logs show clear reasoning for selecting query_pipeline_movement
+- No circular redirect possible (structural property of loop)
+- Latency delta <500ms
+- Cost delta within 25% of current
 
 ### Phase 2: Full Migration
 
