@@ -1186,6 +1186,23 @@ TOOLS YOU CAN CALL:
     cycle-length benchmarks. MEDDICC deferred (insufficient historical data).
     Example: assess_deal_risk() for all high-priority deals in current quarter
     Example: assess_deal_risk(deal_ids=["123"], fiscal_quarter="FY2027 Q2")
+  query_pipeline_movement(view, fiscal_quarter, pipeline_filter, owner_email, stage, weeks, close_date_scope)
+    **PHASE 1 PILOT: unified routing test for handler-as-tool pattern**
+    **USE THIS when the question asks about**:
+    - PIPELINE MOVED, PIPELINE MOVEMENT, PIPELINE CHANGED
+    - HOW HAS PIPELINE [moved/changed], DEALS THAT MOVED
+    - Historical pipeline movement over time (not current state)
+    Params:
+    - view: "movement" (default), "composition", "deal_changes", "curve", or "stage_deals"
+    - fiscal_quarter: "FY2027 Q3" format (optional, defaults to current)
+    - pipeline_filter: "new_business" or "renewal" (optional, defaults to new_business)
+    - owner_email: filter to specific rep (optional)
+    - stage: filter to specific stage name (optional, for stage_deals view)
+    - weeks: number of recent weeks for composition view (optional)
+    - close_date_scope: "current_quarter" to filter by close date (optional)
+    **RETURNS**: Snapshot-based movement analysis with stage changes, entries, exits
+    Examples: "how has pipeline moved this quarter", "renewal pipeline movement",
+    "which deals moved to Technical Evaluation", "Christian's pipeline changes"
 
 RULES:
 - Only use column names that appear in the schema above
@@ -2681,6 +2698,33 @@ def resolve_execution_cost_estimate(question: str, classified_shape: dict = None
         "warn_high_cost": warn_high_cost,
         "warning_message": warning_message,
     }
+
+
+async def _call_handler_as_tool(handler_name: str, params: dict, sb) -> dict:
+    """
+    Call a precomputed handler from within the dynamic loop.
+    Phase 1 pilot: query_pipeline_movement only.
+
+    Returns tool_results dict in the format expected by the loop:
+    - {"data": [...]} for successful handler execution
+    - Raises exception for handler errors (caught by loop's error handling)
+    """
+    handler_fn = getattr(handlers, handler_name, None)
+    if not handler_fn:
+        raise ValueError(f"Handler {handler_name} not found")
+
+    # Call handler with params + sb
+    tool_results, result_quality, failure_reason = await _run_precomputed_handler(
+        handler_fn, handler_name, params, sb
+    )
+
+    if result_quality in ("empty", "error"):
+        # Handler failed - raise to trigger loop's fallback logic
+        raise ValueError(f"Handler {handler_name} returned {result_quality}: {failure_reason}")
+
+    # Success - return results in loop-expected format
+    # tool_results is already a dict with handler-specific keys
+    return tool_results
 
 
 async def dynamic_query_loop(question, history, params,
@@ -4387,6 +4431,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             "aggregate_results": T.aggregate_results,
             "compare_periods": T.compare_periods,
             "assess_deal_risk": T.assess_deal_risk,
+            "query_pipeline_movement": lambda **params: _call_handler_as_tool("query_pipeline_movement", params, sb),
         }.get(tool_name)
 
         if not tool_fn:
@@ -4934,6 +4979,16 @@ async def route_question(question: str, user_id: str,
         params = intent.get("params", {})
         params["time_window"] = resolve_time_window(
             params.get("time_window", {}))
+
+        # ── Phase 1 Pilot: Unified routing for query_pipeline_movement ──
+        # Skip classifier routing for query_pipeline_movement - route to dynamic loop
+        # where it's registered as a callable tool (same pattern as assess_deal_risk).
+        # All other handlers continue using classifier routing unchanged.
+        if handler_name == "query_pipeline_movement":
+            logger.info(f"[UNIFIED_ROUTING_PILOT] query_pipeline_movement → dynamic loop "
+                       f"(classifier confidence={confidence:.2f}, bypassed)")
+            handler_name = "dynamic_query"
+            # params already extracted by classifier, will be available to loop
 
         # ── Scope Decision (explicit, not inherited) ────
         # Classifier decides: prior_set, new_population, or full_scope
