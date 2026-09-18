@@ -1218,6 +1218,20 @@ TOOLS YOU CAN CALL:
     **RETURNS**: Snapshot-based movement analysis with stage changes, entries, exits
     Examples: "how has pipeline moved this quarter", "renewal pipeline movement",
     "which deals moved to Technical Evaluation", "Christian's pipeline changes"
+  query_stale_deals(owner_email, stage, stale_days, time_window)
+    **PHASE 2: Handler 2/6 migrated to unified routing**
+    **USE THIS when the question asks about**:
+    - STALE DEALS, DEALS HAVEN'T MOVED, STUCK DEALS, INACTIVE DEALS
+    - Deals with no activity for extended period
+    - Deals past their close date
+    - "Which deals are stale", "show me stale deals", "deals stuck in [stage]"
+    Params:
+    - owner_email: filter to specific rep (optional, accepts email or name)
+    - stage: filter to specific stage name (optional, e.g. "Discovery", "Technical Evaluation")
+    - stale_days: number of days threshold for staleness (optional, defaults to 21)
+    - time_window: dict for time range filtering (optional, e.g. {{"period": "current_quarter"}})
+    **RETURNS**: Deals with no stage movement for stale_days OR past close_date, with activity metrics
+    Examples: "what deals are stale", "Cary's stale deals", "deals stale for 30 days", "stuck Discovery deals"
 
 RULES:
 - Only use column names that appear in the schema above
@@ -4462,6 +4476,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             "assess_deal_risk": T.assess_deal_risk,
             "query_pipeline": lambda sb_arg, **params: _call_handler_as_tool("query_pipeline", params, sb_arg),
             "query_pipeline_movement": lambda sb_arg, **params: _call_handler_as_tool("query_pipeline_movement", params, sb_arg),
+            "query_stale_deals": lambda sb_arg, **params: _call_handler_as_tool("query_stale_deals", params, sb_arg),
         }.get(tool_name)
 
         if not tool_fn:
@@ -5096,7 +5111,7 @@ async def route_question(question: str, user_id: str,
         # Phase 2: query_pipeline, query_stale_deals, query_waterfall, query_rep_pipeline, query_win_loss, query_deals_at_risk
         # Skip classifier routing - route to dynamic loop where they're registered as callable tools.
         # All other handlers continue using classifier routing unchanged.
-        if handler_name in ("query_pipeline_movement", "query_pipeline"):
+        if handler_name in ("query_pipeline_movement", "query_pipeline", "query_stale_deals"):
             logger.info(f"[UNIFIED_ROUTING] {handler_name} → dynamic loop "
                        f"(classifier confidence={confidence:.2f}, bypassed)")
             handler_name = "dynamic_query"

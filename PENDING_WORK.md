@@ -2267,3 +2267,40 @@ Dedicated handlers (query_pipeline, query_waterfall, etc.) contain hand-written 
 
 **Do NOT start without explicit approval.** This is architectural hygiene - user-facing behavior should be identical before/after.
 
+
+---
+
+## Phase 2 Migration Finding: query_stale_deals Over-Scoping Bug (2026-09-18)
+
+**Discovery Context**: Handler 2/6 baseline testing during unified routing migration
+
+**Issue**: The OLD direct-handler path was applying an implicit current-quarter 
+time_window filter to `query_stale_deals` queries, even when the user's question 
+("what deals are stale") didn't mention any time scope.
+
+**Behavior Comparison**:
+- OLD path: 30 deals / $390K (filtered to close_date in Q3 FY2027: 2026-08-01 to 2026-10-31)
+- NEW path: 64 deals / $987K (no time filter - all stale deals regardless of close date)
+
+**Root Cause**: The classifier in the OLD path was proactively extracting a 
+current-quarter time_window for stale deals queries, creating an implicit filter 
+that has no semantic connection to what "stale" actually means.
+
+**Correctness Analysis**: "Stale" is a duration-based measure of deal inactivity 
+(deals with no stage movement for N days or past their close date). This concept 
+does NOT logically depend on WHEN a deal is scheduled to close. A deal closing 
+next quarter that has been inactive since June is genuinely stale RIGHT NOW, and 
+filtering it out because its close_date falls outside "this quarter" discards 
+real signal for no principled reason.
+
+**Resolution**: The NEW path's behavior (all stale deals, no implicit time filter) 
+is CORRECT. The OLD path had a pre-existing product-correctness bug that happened 
+to surface during this baseline comparison. Users who want stale deals scoped to a 
+specific window (e.g., "stale deals closing this quarter") should explicitly 
+mention the time scope in their question, exactly as time_window's schema supports.
+
+**Baseline Updated**: query_stale_deals now uses 64 deals / $987,194.02 as the 
+correct baseline.
+
+**Status**: Documented. No code fix needed - the migration corrected the behavior.
+
