@@ -56,6 +56,62 @@ This likely affected OTHER handlers beyond Phase 1b's two. Any handler expecting
 
 ---
 
+### query_definition Handler - Completely Non-Functional Since Creation (2026-09-18)
+**Status:** ✅ FIXED - Discovered as side effect of query_waterfall audit
+
+**The Bug:**
+query_definition handler was completely non-functional from creation (commit df8048d, Sept 1, 2026) through Sept 18, 2026 — **17 days of total breakage**. Every keyword match against an empty question string always evaluated False, so the handler could never successfully answer ANY question, regardless of what was asked.
+
+**Discovery:**
+Found accidentally as a side effect of auditing query_waterfall's separate, unrelated schema gap — NOT through any direct test of query_definition itself. The handler was routing correctly (classifier selected it at high confidence), but execution was silently broken.
+
+**Root Cause:**
+Same missing `params["question"]` router injection that broke query_waterfall's report_shape detection. Both handlers read `params.get("question", "")` for keyword matching, but the router never populated it.
+
+**Evidence:**
+```python
+# Line 5268 in api/handlers.py (query_definition)
+question = params.get("question", "").lower()  # Always got ""
+
+# Line 5289: All keyword checks
+if "at risk" in question or "at-risk" in question:  # "at risk" in "" → False
+if "qualified" in question:                         # "qualified" in "" → False
+if "renewal" in question:                           # "renewal" in "" → False
+# ... etc, ALL checks always False
+```
+
+**Impact:**
+- User asks: "What does at-risk mean to you?"
+- Handler receives: `question = ""`
+- ALL keyword checks fail
+- Result: Empty or minimal response, NO definitions matched
+
+**Timeline:**
+- **Sept 1, 2026** (commit df8048d): query_definition added, immediately broken
+- **Sept 18, 2026** (commit e8e3d65): Fixed via router injection of `params["question"]`
+- **Duration:** 17 days of complete non-functionality
+
+**Fix:**
+Same commit (e8e3d65) that fixed query_waterfall also fixed query_definition — router now injects `params["question"] = question` before calling any handler.
+
+**Pattern Recognition - SECOND Handler Found Silently Broken:**
+This is the SECOND time this session a handler has been found completely or partially unreachable/non-functional for an extended period, discovered only by accident while working on something else:
+
+1. **First:** max_tokens truncation (1 month) - ALL handlers potentially unreachable, found during Phase 1b routing tests
+2. **Second:** query_definition (17 days) - completely non-functional, found during query_waterfall audit
+
+**Recommendation:**
+Consider whether this justifies a **periodic, deliberate health-check pass across ALL handlers** — not just the ones currently being refactored — to catch any other silently-dead handlers before they're found by accident a third time. Neither of these failures would have been caught by typical "does it return a response" smoke testing; both required looking at the actual execution logic to spot.
+
+**Files Changed:**
+- `api/router.py` - Same fix as query_waterfall (inject params["question"])
+
+**Related Commits:**
+- e8e3d65: Fix HIGH: Inject raw question text into params for handler use (fixed both handlers)
+- df8048d: Add query_definition handler (introduced the bug)
+
+---
+
 ### Handler Routing Ambiguities - Acceptable Overlaps (2026-09-18)
 **Status:** ✅ DOCUMENTED - Not fixing, monitoring for user dissatisfaction
 
