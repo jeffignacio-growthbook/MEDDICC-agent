@@ -2611,18 +2611,24 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
     )
     
     # Get latest analysis for each deal (left join)
+    # Phase 1b fix (2026-09-18): Bulk fetch all analyses in one query instead of
+    # N+1 pattern. Converges with query_win_loss (line 907) and query_stale_deals
+    # (fixed in commit 174fde2).
     analyses_map = {}
     if deals_rows:
         deal_ids = [d["deal_id"] for d in deals_rows]
-        # Get latest analysis per deal
-        for deal_id in deal_ids:
-            analyses = select_all(sb, "analyses",
-                columns="deal_id,overall_score,champion_score",
-                filters=[("eq", "deal_id", deal_id)]
-            )
-            if analyses:
-                # Sort by analyzed_at (implicit - latest insert = latest)
-                analyses_map[deal_id] = analyses[-1]
+        # Bulk fetch all analyses for these deals
+        all_analyses = select_all(sb, "analyses",
+            columns="deal_id,overall_score,champion_score,analyzed_at",
+            filters=[("in_", "deal_id", deal_ids)]
+        )
+        # Sort by analyzed_at DESC to get latest per deal (explicit, not insertion-order assumption)
+        all_analyses.sort(key=lambda x: x.get("analyzed_at", ""), reverse=True)
+        # Take first (most recent) per deal_id
+        for analysis in all_analyses:
+            deal_id = analysis["deal_id"]
+            if deal_id not in analyses_map:
+                analyses_map[deal_id] = analysis
     
     # Enrich deals with analysis data
     enriched_deals = []
