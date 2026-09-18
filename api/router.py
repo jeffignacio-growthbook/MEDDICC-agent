@@ -165,7 +165,7 @@ NEW_DISCOVERY_SIGNALS = [
 # Maps question keywords to bulk handler names for entity-scoped queries
 # Handler descriptions - single source of truth for both INTENT_PROMPT and entity-scope classification
 HANDLER_DESCRIPTIONS = {
-    "query_waterfall": "pipeline CHANGE/MOVEMENT — new deals added, deals won, deals lost. Use for questions about what CHANGED, MOVED, or FLOWED. Do NOT use for current state snapshots (use query_pipeline). Do NOT use for 'What is our pipeline this quarter?' (that's current state, not movement).",
+    "query_waterfall": "WATERFALL FLOWS — new deals ADDED, deals WON, deals LOST (flow metrics, not snapshot comparisons). Use for: 'what deals were added', 'deals we won/lost', 'pipeline generated', 'flow of deals'. DO NOT use for 'how has pipeline moved' or 'deals that moved stage' (use query_pipeline_movement). DO NOT use for current state (use query_pipeline).",
     "query_pipeline_movement": (
         "PIPELINE MOVED, PIPELINE MOVEMENT, PIPELINE CHANGED, HOW HAS PIPELINE, "
         "DEALS THAT MOVED — Historical pipeline movement over time. "
