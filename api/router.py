@@ -165,7 +165,7 @@ NEW_DISCOVERY_SIGNALS = [
 # Maps question keywords to bulk handler names for entity-scoped queries
 # Handler descriptions - single source of truth for both INTENT_PROMPT and entity-scope classification
 HANDLER_DESCRIPTIONS = {
-    "query_waterfall": "WATERFALL FLOWS — new deals ADDED, deals WON, deals LOST (flow metrics, not snapshot comparisons). Use for: 'what deals were added', 'deals we won/lost', 'pipeline generated', 'flow of deals'. DO NOT use for 'how has pipeline moved' or 'deals that moved stage' (use query_pipeline_movement). DO NOT use for current state (use query_pipeline).",
+    "query_waterfall": "WATERFALL FLOWS — new deals ADDED, deals WON, deals LOST (flow metrics, not snapshot comparisons). Use for: 'what deals were added', 'deals we won/lost', 'pipeline generated', 'flow of deals'. DO NOT use for 'how has pipeline moved' or 'deals that moved stage' (use query_pipeline_movement). DO NOT use for current state (use query_pipeline). DO NOT use for win/loss analysis or 'why' questions (use query_win_loss).",
     "query_pipeline_movement": (
         "PIPELINE MOVED, PIPELINE MOVEMENT, PIPELINE CHANGED, HOW HAS PIPELINE, "
         "DEALS THAT MOVED — Historical pipeline movement over time. "
@@ -189,7 +189,7 @@ HANDLER_DESCRIPTIONS = {
     "query_deals_at_risk": "weak MEDDICC scores, deals at risk, champion gaps",
     "query_high_priority_deal_risk": "risk assessment for late-stage deals (Negotiating/Awaiting Signature) OR COMMIT forecast, deal duration vs segment cycle length, stale MEDDICC scores",
     "query_definition": "what does a term mean, how is X defined, what counts as Y — looks up definitions in semantic layer (field_semantics.yaml, client.yaml, metrics.yaml). Examples: 'what does at-risk mean to you?', 'what counts as qualified?', 'how do you define forecast?'",
-    "query_win_loss": "why deals were won/lost, narratives",
+    "query_win_loss": "WIN/LOSS ANALYSIS, WHY we won/lost, win/loss BREAKDOWN, win/loss SUMMARY — narrative analysis of closed deal outcomes, not just counts. Use for: 'why are we losing', 'win loss breakdown', 'breakdown of wins vs losses', 'win rate by segment', 'give me a win loss summary', 'what's causing deals to close lost', 'win/loss reasons', 'loss analysis'. DO NOT use for simple counts of won/lost deals (use query_waterfall for flow metrics).",
     "query_objections": "objections by category/stage/trend",
     "query_feature_gaps": "feature gaps by severity/competitor",
     "query_coverage": "pipeline coverage vs target, quota attainment",

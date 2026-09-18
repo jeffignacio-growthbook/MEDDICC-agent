@@ -56,6 +56,44 @@ This likely affected OTHER handlers beyond Phase 1b's two. Any handler expecting
 
 ---
 
+### Handler Routing Ambiguities - Acceptable Overlaps (2026-09-18)
+**Status:** ✅ DOCUMENTED - Not fixing, monitoring for user dissatisfaction
+
+**Context:**
+During Phase 1b routing health check, found 2 semantic overlaps where natural phrasings route to plausible alternate handlers rather than the "expected" one. These are NOT routing failures (all questions route at 0.95 confidence, above 0.80 threshold), but semantically adjacent handlers competing for ambiguous phrasing.
+
+**Acceptable Overlaps:**
+
+1. **query_deals_at_risk vs query_coaching_priorities**
+   - Question: "what deals need attention"
+   - Routes to: `query_coaching_priorities` (0.95 confidence)
+   - Expected: `query_deals_at_risk`
+   - Rationale: Coaching priorities explicitly includes "deals needing attention" — semantically defensible
+
+2. **query_deals_at_risk vs query_deal_health**
+   - Question: "show me weak deals"
+   - Routes to: `query_deal_health` (0.95 confidence)
+   - Expected: `query_deals_at_risk`
+   - Rationale: Deal health handles MEDDICC health filters for weak scores — semantically defensible
+
+**Why Not Fixing:**
+- Both alternates are genuinely related handlers that could reasonably answer the question
+- Routing confidence is strong (0.95), not degraded
+- No evidence yet of user dissatisfaction with these routings
+- Strengthening one handler's description risks introducing NEW ambiguities elsewhere
+
+**Resolution Criteria:**
+Revisit if real usage shows users explicitly reject these answers or rephrase questions to get different handlers. Until then, treat as acceptable semantic overlap in a 40+ handler system.
+
+**Related Fix (Same Session):**
+Fixed a REAL routing gap (query_win_loss vs query_waterfall) where "win loss breakdown" was routing to waterfall — that one warranted immediate fix because waterfall returns flow metrics (counts) not win/loss analysis (narratives). See commit [pending].
+
+**Files:**
+- This entry in PENDING_WORK.md
+- Related routing tests in `/tmp/test_waterfall_*.log`, `/tmp/test_at_risk_*.log`
+
+---
+
 ### Schema-Dictionary Drift Check (2026-09-15)
 **Status:** ✅ COMPLETE - Fourth structural gate deployed
 
