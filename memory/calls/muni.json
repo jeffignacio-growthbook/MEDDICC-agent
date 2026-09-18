@@ -1,0 +1,18 @@
+{
+  "company": "Muni",
+  "slug": "muni",
+  "last_etl_date": "2026-09-18T06:10:42.050777",
+  "calls": [
+    {
+      "id": "01M25N5DTZMXQMJBMGDMDV2SZ1",
+      "source": "fireflies",
+      "title": "Muni - Reo.Dev and Ashley Stirrup",
+      "date": "2026-09-17",
+      "duration_minutes": 11.489999771118164,
+      "summary": "# Muni - Reo.Dev and Ashley Stirrup\nDate: 2026-09-17 | Duration: 11.489999771118164m\n\n## Summary\nThe team discussed how customized one-pagers can improve buyer engagement by combining rio.dev branding with content tailored to stages from the Ideal Customer Profile through “ready to buy.” Key elements—including the heading, vocalo, logo, navbar, hero section, and signals—were fully customized to preserve brand consistency and make each asset feel authentic. SDRs’ company-specific research was considered essential because automated systems failed to capture the necessary nuance and accurate language. One-pagers can also be shared through Slack and other internal channels, helping discover the right buyer beyond the initial recipient. To support repeatability, Muni offered Ashley a working template, examples, and assistance during creation calls. The approach uses templates as a structured baseline while retaining manual tailoring, prioritizing message accuracy over automation alone.\n\n## Keywords\npersonalization, one-pager, branding, SDR research, template, buyer targeting\n\n## Action Items\n\n**Muni Narayana**\nShare a template version of the one-pager to Ashley for copying and customization to support her personalization strategy (02:00)\nProvide ongoing support and be available for calls or assistance as Ashley works on her version of the one-pager (01:47)\n\n**Ashley Stirrup**\nReview the provided one-pager template and develop a personalization strategy for targeting the right buyers effectively (02:09)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

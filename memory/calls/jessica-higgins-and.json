@@ -1,0 +1,18 @@
+{
+  "company": "Jessica Higgins and",
+  "slug": "jessica-higgins-and",
+  "last_etl_date": "2026-09-18T06:10:42.048301",
+  "calls": [
+    {
+      "id": "01M2K7AZQPEWDY0PWAHKHC962E",
+      "source": "fireflies",
+      "title": "Jessica Higgins and Dan Wathne + Logan Bates",
+      "date": "2026-09-17",
+      "duration_minutes": 26.209999084472656,
+      "summary": "# Jessica Higgins and Dan Wathne + Logan Bates\nDate: 2026-09-17 | Duration: 26.209999084472656m\n\n## Summary\nThe team resolved identity mapping, removing a major blocker and enabling a large experiment to compare Growth Book with existing analytics tools while reducing manual analytics work. Warehouse transformations currently run nightly despite raw data arriving hourly, so Pallabi Barua’s team is pursuing at least hourly updates; Growth Book’s event forwarder can support near-real-time streaming, although daily updates are usually sufficient unless traffic is extremely high. The pilot aims to demonstrate value to product and analytics teams, with the trial extended from the 19th to the 30th and weekly updates showing strong engagement. Analytics is the primary champion, while product is focused on requirements. A joint analytics review, potentially including product, is planned for Thursday or Friday next week. Jessica Higgins and Pallabi will follow up with Christina about contract readiness. The team also praised Growth Book’s low-pressure, product-first approach compared with competitors such as LaunchDarkly.\n\n## Keywords\nGrowth Book, data pipeline, analytics, experiment, contracting, trial extension\n\n## Action Items\n\n**Jessica Higgins**\nFollow up with Christina to get updates on the contracting process and current status (14:46)\nCoordinate with Pallabi and Dan to schedule the analytics-focused experiment dashboard review/Q&A session next week (19:55)\n\n**Pallabi Barua**\nAssist Jessica with follow-up communication to Christina regarding contract status (14:46)\nConfirm analytics team availability and coordinate with Jessica and Dan for the experiment review session that includes answering analytics questions on Growth Book usage (19:55)\n\n**Dan Wathne**\nSupport scheduling and preparation for the analytics session and ongoing communication with Rula teams (21:00)\n\n**Logan Bates**\nProvide documentation and guidance on the new event forwarder feature to help enable near real-time data streaming to the warehouse (12:05)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

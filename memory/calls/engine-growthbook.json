@@ -1,0 +1,18 @@
+{
+  "company": "Engine + GrowthBook",
+  "slug": "engine-growthbook",
+  "last_etl_date": "2026-09-18T06:10:42.047971",
+  "calls": [
+    {
+      "id": "01M2JJY7B51NP0MG8F5G912SE8",
+      "source": "fireflies",
+      "title": "Engine + GrowthBook",
+      "date": "2026-09-17",
+      "duration_minutes": 52.9900016784668,
+      "summary": "# Engine + GrowthBook\nDate: 2026-09-17 | Duration: 52.9900016784668m\n\n## Summary\nEngine’s experimentation program is functional but remains at an early “crawling” to “walking” maturity level. Frontend teams use GrowthBook extensively for UI tests, while backend experimentation is limited but growing, particularly for decisioning models affecting approval rates and yield. Around 90 experiments are registered, though many are inactive or lingering. Engine remains on GrowthBook 3.4 because stability and avoiding potentially breaking API changes take priority. Newer releases provide agentic workflows, ramp schedules, monitored rollouts, AI-powered analysis, decision criteria, and a learnings library. GrowthBook primarily serves as Engine’s decision engine and cohorting tool, while BI systems handle event analysis. API-driven workflows, MCP, React, Next.js server-side rendering, and self-hosted LLMs align with Engine’s technical needs. However, the self-hosted Pro plan excludes features such as approval workflows, audit logs, templates, and advanced RBAC. Logan Bates will verify compatibility, prepare upgrade guidance, clarify feature access, and share integration documentation.\n\n## Keywords\nExperimentation, Feature Flags, GrowthBook Upgrade, AI Analytics, Ramp Schedules, Self-Hosted\n\n## Action Items\n\n**Logan Bates**\nVerify and confirm with GrowthBook team if any breaking API changes affect upgrade from v3.4 to latest versions and provide upgrade guidance to Engine team (49:33)\nProvide Engine team references and guides on integrating Datadog alerts with GrowthBook’s experiment rollback and webhook capabilities (23:55)\nShare documentation or examples illustrating server-side rendering support in GrowthBook for frameworks like Next.js to address flicker concerns (43:21)\nFollow up on AI agentic workflow features' compatibility with Engine’s self-hosted setup and clarify limitations for AI features under Pro license (48:45)\n\n**Logan Bates / Christian Liebenow**\nSend additional materials explaining MCP server, skills library, and agentic workflows for Engine’s API-heavy user cases (47:30)\n\n**Kristin Papadopoulos**\nMonitor email thread for further communications and updates post-meeting (49:01)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    }
+  ]
+}

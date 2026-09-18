@@ -1,0 +1,18 @@
+{
+  "company": "power in experiment",
+  "slug": "power-in-experiment",
+  "last_etl_date": "2026-09-18T06:10:42.047348",
+  "calls": [
+    {
+      "id": "01M2KVZNPRTEK7DPWWQXBCWNJW",
+      "source": "fireflies",
+      "title": "power in experiment configuration followup",
+      "date": "2026-09-17",
+      "duration_minutes": 28.25,
+      "summary": "# power in experiment configuration followup\nDate: 2026-09-17 | Duration: 28.25m\n\n## Summary\nThe discussion focused on integrating power analysis settings into experiments while preserving experiment configuration as the primary source of truth. Duration and the stats engine were considered easier to port, while Cupid was excluded initially because of SQL complexity and new-user traffic issues. The calculator will initially control variation count, variation weights, and duration; sequential settings remain at the organization level. Variation count and custom weights are important because reducing variations can increase power, while fixed 50/50 splits have prompted feature requests. Automatic synchronization was rejected because adding or removing variations could cause unintended deletions. Instead, key inputs such as population, metric, MDE, variation splits, and coverage should appear on the experiment overview, with out-of-sync states summarized for manual resolution and explicit user confirmation. Future work includes percent split control, fact table filtering, moving the calculator off the browser for scalability, evaluating integration with the new experiment configuration design, and considering scheduling and fixed-horizon use cases.\n\n## Keywords\npower calculation, experiment configuration, variation weights, number of variations, syncing settings, UI integration\n\n## Action Items\n**Gabe Melean**  \nEvaluate integration approach for syncing power calculation results (24:35)  \n\n**Luke Smith**  \nReview experiment creation scheduling thread (26:07)  \nList two options for porting power calculation settings (26:15)  \n\n**Luke Sonnet**  \nCoordinate migration of power calculator with Teresa (26:37)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "OTP Bank",
+  "slug": "otp-bank",
+  "last_etl_date": "2026-09-18T06:10:42.051829",
+  "calls": [
+    {
+      "id": "01M2QTN87DZG262WDXV5FCVTBV",
+      "source": "fireflies",
+      "title": "OTP Bank",
+      "date": "2026-09-17",
+      "duration_minutes": 162.67999267578125,
+      "summary": "# OTP Bank\nDate: 2026-09-17 | Duration: 162.67999267578125m\n\n## Summary\nThe team evaluated how to scale experimentation across products, targeting two experiments per week per product instead of the current rate of approximately one per quarter. Success measures include new digital customers, cross-sold products, income per client, digital activity, and customers with multiple products, while operational metrics would support management of up to 50–60 concurrent experiments. Data readiness remains in progress: mobile app, digital marketing, and CRM warehouses are being consolidated into a Customer Data Platform, with Azure Data Lake and Kafka planned for real-time streaming. GrowthBook combines feature flags, experiments, and analytics, supports visual no-code edits and API-based development, and integrates with warehouses such as BigQuery and Databricks. Its workflow includes targeted feature flags, visual or code-based experiments, primary and guardrail metrics, statistical confidence, and AI-assisted variant generation. The team also discussed CRM, marketing, content, product, data, and engineering collaboration. Next steps include documentation on attribution and tracking, a product analytics demo, and testing with partial warehouses by year-end.\n\n## Keywords\nExperimentation, Data Integration, Marketing Automation, Customer Data Platform, Feature Flags, GrowthBook Demo\n\n## Action Items\n\n**James Shannon**\nShare the demo recording and demo notes with OTP Bank team after the meeting (05:42)\nProvide detailed explanation and documentation on GrowthBook’s attribution process including session, campaign, and source tracking for experimentation to assist OTP Bank’s future experiment adjustments (59:25)\nContinue supporting OTP Bank’s evaluation of GrowthBook by following up on questions raised during the meeting and chat (01:00:45)\n\n**Maksym Volchenko**\nCollect and consolidate OTP Bank team questions from chat and send them to James Shannon for detailed follow-up (01:00:23)\n\n**IVASKEVYCH Oleksandr Volodymyrovych**\nLead development of holistic data integration approaches after data aggregation is completed to support GrowthBook integration (28:14)\n\n**Mykhailenko Stanislav Serhiiovych**\nSupport clarification and finalization of data pipelines and Customer Data Platform development to enable full GrowthBook integration (36:53)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

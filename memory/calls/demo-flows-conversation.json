@@ -1,0 +1,18 @@
+{
+  "company": "Demo flows conversation",
+  "slug": "demo-flows-conversation",
+  "last_etl_date": "2026-09-18T06:10:42.048156",
+  "calls": [
+    {
+      "id": "01M2K5NJKG91DD38BXCJHECW41",
+      "source": "fireflies",
+      "title": "Demo flows conversation",
+      "date": "2026-09-17",
+      "duration_minutes": 42.790000915527344,
+      "summary": "# Demo flows conversation\nDate: 2026-09-17 | Duration: 42.790000915527344m\n\n## Summary\nThe discussion refined a persona-based demo flow in which an engineer creates a feature flag, a data scientist attaches and monitors an experiment, and an experiment leader reviews the program. The demo should begin with the GrowthBook AI Assistant and an experiments overview, using a live story rather than starting from a cloud desktop. The engineer section should show a basic flag in the app, a complex flag in Cursor or a Claude Code terminal, then targeted delivery and ramp scheduling in the app. Data scientist content should combine experiment health checks, shared metrics, templates, warehouse-native metric definitions, and guardrails. Slack notifications were proposed for experiment status or metric drops. For shipping, the PM moves the flag to 100%, while the engineer cleans up feature flags, potentially using an auto-cleanup skill. The leader persona should focus on ROI, experimentation culture, and program value. The tagline remains undecided, and a video-first prototype will be recorded to validate flow and timing with stakeholders.\n\n## Keywords\nfeature flags, experimentation, demo flow, ROI, data scientist, GrowthBook app\n\n## Action Items\n**Alyssa Nicoll**  \nCreate feature flag poll with engineering team (12:49)  \nIncorporate Slack integration concept into demo (29:09)  \nStart building and recording demo video (40:10)  \n\n**Scott Bailey**  \nProvide feedback on script timing and sections (27:26)  \nReview demo workflow and script with Logan (40:30)  \n\n**Ashley Stirrup**  \nHelp finalize ROI messaging and storytelling (38:48)  \nProvide input on demo key takeaways (41:08)",
+      "organizer": "alyssa@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

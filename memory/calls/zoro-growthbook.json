@@ -1,7 +1,7 @@
 {
   "company": "Zoro + GrowthBook",
   "slug": "zoro-growthbook",
-  "last_etl_date": "2026-09-03T06:04:10.817583",
+  "last_etl_date": "2026-09-18T06:10:42.051044",
   "calls": [
     {
       "id": "01KVXF4DB3N44ZB5WM8AJ453WB",
@@ -71,6 +71,17 @@
       "summary": "# Zoro + GrowthBook\nDate: 2026-08-26 | Duration: Unknown\n\n## Summary\nNo summary available",
       "organizer": "christian@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2KCQ7EMSBQY7NNA204QSJAW",
+      "source": "fireflies",
+      "title": "Zoro + GrowthBook",
+      "date": "2026-09-17",
+      "duration_minutes": 37.470001220703125,
+      "summary": "# Zoro + GrowthBook\nDate: 2026-09-17 | Duration: 37.470001220703125m\n\n## Summary\nThe team discussed Identity Federation support, noting it is currently unavailable but may be explored to reduce service-account key rotation and simplify Zoro’s integration. They designed a flexible experiment exposure model for static and time-dependent user attributes, using timestamps to capture user state at exposure and separate exposure queries for different experiments or product areas. The team preferred a slim, dedicated analytic event type with arbitrary targeting-attribute keys rather than a wide, null-filled exposures table or generic catchall schema. User ID would remain the primary bucketing attribute, while other attributes support targeting and analytical breakdowns. They also considered automating experiment-specific dimensions to reduce manual query writing, with post-ingestion data massaging as a fallback. Wills McKenna and Terrence Rowe were assigned to lead SDK and implementation work, while invite and communication processes were updated. Logan planned to validate the timestamping approach with Luke, head of experimentation.\n\n## Keywords\nexperiment dimensions, exposures table, workload Identity Federation, analytics events, dynamic segmentation, timestamping\n\n## Action Items\n\n**Logan Bates**\nEscalate the request to GrowthBook internal team regarding support and roadmap for workload Identity Federation to enable easier key management or alternatives (10:11)\nClarify with head of experimentation (Luke) how timestamping handles slowly changing user attributes to ensure accurate exposure state mapping (25:59)\nInvestigate and discuss with GrowthBook team approaches to handling dynamic experiment dimensions to accommodate flexible segmentation needs across multiple experiments (34:10)\n\n**Jay Shelllarson**\nAdd missing technical team members to future meeting calendar invites to ensure full participation (36:20)\nFacilitate communication channel for engineers Wills McKenna and Terrence Rowe to post SDK implementation questions and track responses (35:21)\n\n**Jared**\nDevelop and push a new slim schema event type for exposure tracking in analytics using CLI to avoid mixing with generic events (14:33)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]

@@ -1,7 +1,7 @@
 {
   "company": "Product Analytics |",
   "slug": "product-analytics",
-  "last_etl_date": "2026-09-03T06:04:10.801702",
+  "last_etl_date": "2026-09-18T06:10:42.049179",
   "calls": [
     {
       "id": "01KGMVVVST5VWF9HEYV5ZPW8E8",
@@ -736,6 +736,17 @@
       "date": "2026-08-31",
       "duration_minutes": 13,
       "summary": "# Product Analytics | Standup\nDate: 2026-08-31 | Duration: 13m\n\n## Summary\nThe team discussed reviving the user journey, with Jeremy resurrecting the work and reviewing designs with Johnny, while metric work had started and Johnny was applying Friday feedback before updating Nobu. More metrics pages are planned, and decision tree work has been loaded, though designs remain a dependency. Engineering updates included a funnel multi-fact PR awaiting Luke’s feedback, an unresolved and unreproducible Snowflake error, SQL Explorer nearing wrap-up, and AI SQL tooling progressing ahead of Lillia’s Thursday and Friday absence, with Johnny’s session replay review planned today. The team also discussed unifying AI views, potentially combining a sidebar for core interaction with full pages for complex experiences. Dashboard and SQL skills may be reusable through REST APIs, with MCP and CLI support. Final UI consensus remains pending. Squad meetings will shift to start after the company meeting, with Monday sessions providing more planning time.\n\n## Keywords\nMetric design, AI SQL agent, Dashboard skills, Analytics chat, SQL Explorer, REST API skills\n\n## Action Items\n**Jeremy Dorn**\nSchedule design review session (02:44)\nChange recurring meeting schedule (11:46)\n\n**Nobu Ajito**\nAdvance SQL Explorer work (03:16)\n\n**Lillia Jackson**\nReview session-replay feedback (03:59)\nProgress AI SQL tooling (03:59)\n\n**Johnny Martinez**\nSend metric design materials (05:35)\nSchedule AI-agent discussion (05:35)\nExplore remaining metric pages (05:35)\n\n**Nhat Ho**\nInvestigate folder issue (06:59)\nClean up dependent pull request (06:59)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2R3Z7FPZ8MNX32DJATKEEF8",
+      "source": "fireflies",
+      "title": "Product Analytics | Squad Standup",
+      "date": "2026-09-17",
+      "duration_minutes": 8,
+      "summary": "# Product Analytics | Squad Standup\nDate: 2026-09-17 | Duration: 8m\n\n## Summary\nUser Journeys went live, although a Managed Warehouse test may have encountered an out-of-memory error; a fast-follow PR was planned using better production test data. A prior bug fix was merged, while a fix for an overly long encoded Explorer configuration parameter needed more testing before review. Nhat Ho finalized the Databricks plan with Nobu Ajito, obtained an account from Luke, and identified documentation and cloud-support blockers. Databricks authentication work was split into eight incremental changes, while HubSpot license-data synchronization and alternatives to Vercel AI remained under evaluation. Lillia Jackson completed session replay work, with PRs ready for staging and review pending from Guy Bryce. Exposure diagnostics continued for an upcoming Notion meeting, alongside planned design collaboration with Gabe. Metrics UX cleanup, preview-build reliability work with Depot, and early cohorts research also progressed.\n\n## Keywords\nUser Journeys, Databricks, Session Replay, Metrics UX, HubSpot, Preview Builds\n\n## Action Items\n**Jeremy Dorn**\nInvestigate out-of-memory error (00:00)\nPrepare fast-follow PR (00:00)\nTest Nobu’s metric UX PR (00:00)\nSend cleanup details to Nobu (00:00)\n\n**Nhat Ho**\nReview Databricks implementation plan (00:53)\nComplete Databricks account setup (00:53)\nFix authentication issues (00:53)\nTest incremental PR changes (00:53)\n\n**Michael**\nSubmit HubSpot sync PRs (00:53)\nTest Explorer configuration PR (00:53)\nEvaluate AI usage alternatives (00:53)\n\n**Lillia Jackson**\nMove session replay PRs to staging (03:08)\nCoordinate review with Guy Bryce (03:08)\nRefine exposure-log diagnostics (03:08)\nShare design with Gabe (03:08)\n\n**Nobu Ajito**\nComplete UI changes from Johnny (04:44)\nClean up related work (04:44)\nExplore Depot preview builds (04:44)\nTest preview-build autoscaling changes (04:44)\n\n**Johnny Martinez**\nDocument Metrics edits (05:30)\nResearch cohort features (05:30)\nCreate cohort wireframes (05:30)",
       "organizer": "johnny@growthbook.io",
       "participants": 7,
       "summary_quality": "good"

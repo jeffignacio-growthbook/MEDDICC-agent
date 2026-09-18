@@ -1,0 +1,18 @@
+{
+  "company": "Mursion and GrowthBook",
+  "slug": "mursion-and-growthbook",
+  "last_etl_date": "2026-09-18T06:10:42.047160",
+  "calls": [
+    {
+      "id": "01M28XVY1STGNZSNMD05WM50E2",
+      "source": "fireflies",
+      "title": "Mursion and GrowthBook",
+      "date": "2026-09-17",
+      "duration_minutes": 20.899999618530273,
+      "summary": "# Mursion and GrowthBook\nDate: 2026-09-17 | Duration: 20.899999618530273m\n\n## Summary\nThe team is auditing and cleaning up legacy LaunchDarkly flags because of improper historical use, while the frontend rebuild creates an opportunity to establish a new feature-flag strategy. Allen Romano emphasized completing an internal audit and aligning teams on current pain points before evaluating GrowthBook further or scheduling technical demos. Dan Wathne presented GrowthBook’s combined feature-flagging and experimentation capabilities, including AI integrations, sequential testing, warehouse-native querying, customizable metrics, health checks, exposure monitoring, funnel metrics, dashboards, experiment histories, and cumulative learning features. GrowthBook 5.1 is expected to expand AI capabilities and API controls. Dan also described flexible self-service and enterprise plans, staged onboarding, and engineering support. Dan plans to follow up with talking points and a booking link, while the team expects its audit and internal review to guide next steps.\n\n## Keywords\nfeature flagging, experimentation, GrowthBook, LaunchDarkly, AI experimentation, product analytics\n\n## Action Items\n\n**Allen Romano**\nConduct an audit of current LaunchDarkly feature flags and platform usage to clarify pain points and shared team understanding (17:54)\nComplete initial scaffolding and architecture setup for new front-end and flag management (18:31)\n\n**Dan Wathne**\nSend follow-up email with talking points summarizing GrowthBook features and discussion (18:59)\nProvide booking link for future team demo sessions and support calls when Mursion is ready to proceed (18:59)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,18 +1,8 @@
 {
-  "company": "Second Nature +",
+  "company": "Second Nature &",
   "slug": "second-nature",
-  "last_etl_date": "2026-08-05T15:57:31.320881",
+  "last_etl_date": "2026-09-18T06:10:42.054876",
   "calls": [
-    {
-      "id": "69cac5b49dd403001903d44f",
-      "source": "apollo",
-      "title": "Second Nature + GrowthBook",
-      "date": "2026-03-30",
-      "duration_minutes": 12,
-      "summary": "[Summary failed] [Nir Altmark]: Here. Hello. Just a second.\n[Christian Liebenow]: I'm sorry. I'm sorry I was late. I. I was in the wrong. In the wrong zoom room. So my apologies.\n[Nir Altmark]: Oh really? Was. I.\n[Chr",
-      "host": "Christian Liebenow",
-      "participants": 2
-    },
     {
       "id": "01KMTW54G89DGAWW0D3AHMJ1CB",
       "source": "fireflies",
@@ -23,7 +13,19 @@
       "organizer": "christian@growthbook.io",
       "participants": 2,
       "keywords": "Feature flags, GrowthBook pricing, Self-hosted solution, Enterprise plan, Pro plan, Case study discount",
-      "action_items": "\n**Nir Altmark**\nEvaluate GrowthBook Pro plan costs and check internal approval feasibility (07:40)\nConsider starting GrowthBook usage with a limited number of users on the Pro plan (11:40)\n\n**Christian Liebenow**\nProvide detailed pricing information for GrowthBook enterprise cloud and self-hosted solutions (00:50)\nCheck internally about potential discounted pricing options tied to case studies and press releases with Second Nature using feature flags (08:45)\nFollow up on discount possibilities for Second Nature’s feature flag use case and communicate findings (09:30)\n"
+      "action_items": "\n**Nir Altmark**\nEvaluate GrowthBook Pro plan costs and check internal approval feasibility (07:40)\nConsider starting GrowthBook usage with a limited number of users on the Pro plan (11:40)\n\n**Christian Liebenow**\nProvide detailed pricing information for GrowthBook enterprise cloud and self-hosted solutions (00:50)\nCheck internally about potential discounted pricing options tied to case studies and press releases with Second Nature using feature flags (08:45)\nFollow up on discount possibilities for Second Nature’s feature flag use case and communicate findings (09:30)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M22K54NFNTQMSH5QRD96MXJE",
+      "source": "fireflies",
+      "title": "Second Nature & GrowthBook | First Meeting",
+      "date": "2026-09-17",
+      "duration_minutes": 13.170000076293945,
+      "summary": "# Second Nature & GrowthBook | First Meeting\nDate: 2026-09-17 | Duration: 13.170000076293945m\n\n## Summary\nNir requested GrowthBook enterprise pricing while moving from the static offering, specifically asking about SSO, role management, and a formal offer for 50 seats. Marcel explained that pricing consists of a platform fee plus user seats, at around $1,000 per user per year, and confirmed that enterprise includes feature flags, experiments, training, and customer support without extra costs for those capabilities. Nir currently uses static for feature gates and does not expect experimentation to be a priority over the next 3–6 months. Marcel agreed to provide both cloud and self-hosted pricing, including technical and feature details, customer success, and onboarding information. Nir expects to make a decision in about one week, will compare the offers, and plans to show the self-hosted option to the startup founder. Marcel will follow up and remain available for technical questions.\n\n## Keywords\nfeature gates, enterprise pricing, GrowthBook, SSO, role management, self-hosted solution\n\n## Action Items\n**Marcel Geldner**  \nSend enterprise pricing offer for 50 users (09:07)  \nInclude self-hosted pricing in proposal (10:23)  \n\n**Nir Altmark**  \nReview pricing proposal and decide next steps (09:07)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
     }
   ]
 }

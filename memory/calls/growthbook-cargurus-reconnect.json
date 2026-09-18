@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook CarGurus Reconnect",
+  "slug": "growthbook-cargurus-reconnect",
+  "last_etl_date": "2026-09-18T06:10:42.047502",
+  "calls": [
+    {
+      "id": "01M2RDGABPXT7XGD2QGEQN618B",
+      "source": "fireflies",
+      "title": "GrowthBook CarGurus Reconnect",
+      "date": "2026-09-17",
+      "duration_minutes": 23,
+      "summary": "# GrowthBook CarGurus Reconnect\nDate: 2026-09-17 | Duration: 23m\n\n## Summary\nThe team is preparing for a POC kickoff in early October, dependent on completing the NDA and selecting a vendor. Hannah is coordinating legal review, while Scott shared the POC plan and is updating timing and migration language, including the expected move from the current flag tool by 2027. Max is defining threshold metrics and validation criteria. GrowthBook is favored, with one other option still under evaluation; the decision must address analytics, app, legacy, and Autolist team requirements, as well as cost concerns. Infosec review may take up to two months and could delay contract execution, so a written post-POC commitment was suggested. Technical evaluation will cover prerequisite feature flags, stale and long-lived flags, multiple organizations, projects, and data sources. Slack and Google Docs will support rapid communication and collaborative planning.\n\n## Keywords\nPOC plan, feature flags, security review, NDA, data sources, pricing model\n\n## Action Items\n\n**Hannah Duhaime**\nSend redlined NDA to legal and manage the review process to get NDA signed prior to POC initiation (04:00)\nCoordinate with Ben and internal teams post-meeting to share call outcomes and define timing for POC initiation (21:20)\n\n**Max Kokorovets**\nDefine threshold metrics and validation criteria for POC from CarGurus side to guide success evaluation (08:40)\nLead creation and refinement of the POC plan, including metrics and success criteria; review GrowthBook’s POC plan and provide feedback (12:30)\nUse Slack channel for any asynchronous questions and communication with GrowthBook during POC (19:10)\n\n**Scott Keller**\nUpdate POC plan with accurate timing, pricing switch details, and migration roadmap context; share as Google Doc for collaboration (18:20)\nSet up Slack channel for communication across teams to facilitate real-time collaboration and updates (12:55)\nNotify CRO about the expected two-month security review timeline to align expectations and planning (19:30)\nSupport technical questions during POC and assist with onboarding once NDA and security reviews are complete (12:45)\n\n**Logan Bates**\nProvide detailed explanation and documentation on “prerequisite feature flags” (parent-child flags) for CarGurus usage (13:00)\nAssist with Slack setup and handling asynchronous technical questions during POC to ensure effective communication (12:55)\nSupport architecture discussion regarding multiple organizations, data sources, and projects for diverse CarGurus product teams (17:00)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

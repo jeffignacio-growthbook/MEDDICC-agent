@@ -1,0 +1,18 @@
+{
+  "company": "Aditya Birla +",
+  "slug": "aditya-birla",
+  "last_etl_date": "2026-09-18T06:10:42.051667",
+  "calls": [
+    {
+      "id": "01M2MD7ATHV6NQM9T64EYQGKE1",
+      "source": "fireflies",
+      "title": "Aditya Birla + GrowthBook",
+      "date": "2026-09-17",
+      "duration_minutes": 37.619998931884766,
+      "summary": "# Aditya Birla + GrowthBook\nDate: 2026-09-17 | Duration: 37.619998931884766m\n\n## Summary\nThe team is evaluating a centralized experimentation platform for 15 brands, with active testing across 10 to 11 mostly custom platforms and future Shopify use. Adobe Target currently supports advanced client-side tests, including UI changes, popups, upsell and cross-sell widgets, personalized content, and cross-domain content retrieval. The team also has a server-side experimentation pilot on React Native apps and plans to support server-side web testing. Key requirements include cross-domain session, cart, and wishlist synchronization; backend pre-evaluation using flexible IDs; and integration with Adobe Analytics, GA4, BigQuery, and Adobe Experience Platform. Growth Book was presented as a potential Adobe Target replacement, supported by positive sister-brand experience, client-side and server-side SDKs, visual editing, cross-website experiments, and enterprise scalability. Pricing discussed was US$200,000 annually for self-hosted or US$250,000 for cloud, plus US$1,250 per internal user annually. A 45-minute Enterprise demo will cover setup, integrations, workflows, and pricing.\n\n## Keywords\nexperiment platform, client-side experimentation, server-side experimentation, Adobe Target, multi-brand eCommerce, GrowthBook pricing\n\n## Action Items\n\n**Malavika**\nCoordinate internally to confirm demo scheduling around 7:30pm IST early next week and share available days with Christian Liebenow (35:41)\nCheck internally with Kamal and Dushan about finalizing the number of users and brands for the next discussion (34:03)\n\n**Christian Liebenow**\nSet up a follow-up demo session (~45 minutes) to showcase GrowthBook capabilities tailored to ABFRL’s experimentation needs (30:28)\n\n**Kamal Sahni and team**\nPrepare specific questions and requirements for the demo around client-side and server-side experimentation, including data integration with BigQuery and GA4 (17:05)\n\n**GrowthBook team**\nShare detailed pricing model documentation with Malavika and Kamal following the meeting (30:28)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

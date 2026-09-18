@@ -1,0 +1,18 @@
+{
+  "company": "GB x Tom",
+  "slug": "gb-x-tom",
+  "last_etl_date": "2026-09-18T06:10:42.055155",
+  "calls": [
+    {
+      "id": "6aabe4e001c2650010c3778f",
+      "source": "apollo",
+      "title": "GB x Tom - PepsiCo Discussion Continued ",
+      "date": "2026-09-17",
+      "duration_minutes": 0.0,
+      "summary": "# GB x Tom - PepsiCo Discussion Continued \nDate: 2026-09-17\n\n## Transcript\n[Cary Rakin]: Terry. Good morning.",
+      "organizer": "",
+      "participants": 0,
+      "summary_quality": "good"
+    }
+  ]
+}

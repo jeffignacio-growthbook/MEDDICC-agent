@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-09-11T06:17:07.459779",
+  "last_etl_date": "2026-09-18T06:10:42.053184",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -751,6 +751,17 @@
       "duration_minutes": 16.3700008392334,
       "summary": "# Demo Call with Clive O'Shea from PB Tech\nDate: 2026-09-11 | Duration: 16.3700008392334m\n\n## Summary\nThe discussion reviewed GrowthBook’s pricing, licensing, and fit for Clive’s single-user experimentation setup. Enterprise pricing starts at $1,000 per user annually, with contracts typically above $20,000, and includes SSO, dedicated support, SLA guarantees, and advanced experimentation tools. Cloud Pro costs $40 per user monthly and includes features such as Cupid and quartiles, while allowing customers to use their own data warehouses, but it does not include SSO and has no self-hosted version. Clive prefers self-hosted infrastructure and believes enterprise pricing is too high for his current usage, where he alone sets up tests and shares reports every few weeks. GrowthBook’s open source version meets most needs, although quartiles are desirable. The parties also discussed Statsig’s support decline after its acquisition by Amplitude and GrowthBook’s open source differentiation. Clive will remain on open source, while Dan will investigate roadmap possibilities, flexible pricing, and self-hosted Pro options.\n\n## Keywords\nGrowthBook, open source, enterprise pricing, self-hosted, experimentation, Statsig\n\n## Action Items\n\n**Dan Wathne**\nFollow up with GrowthBook internal team about any roadmap for a self-hosted Pro plan and potential pricing flexibility (12:41)\nSend Clive a recap outlining general upgrade costs and feature benefits of GrowthBook plans for future reference (12:41)\nMonitor any new startup programs or initiatives that may benefit Clive’s organization and notify him accordingly (09:39)\n",
       "organizer": "dan@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2MCE3GARARD7BKA8WX3VGHT",
+      "source": "fireflies",
+      "title": "Demo Call with Sushant Singh from Vetic",
+      "date": "2026-09-17",
+      "duration_minutes": 12.0600004196167,
+      "summary": "# Demo Call with Sushant Singh from Vetic\nDate: 2026-09-17 | Duration: 12.0600004196167m\n\n## Summary\nNo summary available",
+      "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "summary_quality": "good"
     }
