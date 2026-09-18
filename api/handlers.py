@@ -5023,6 +5023,133 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     if view == "movement":
         result = _pm_view_movement(
             by_date, all_dates, stage_cfg, data_gaps, requested_days, base)
+
+        # Phase 1b: Structured aggregation verification (movement view)
+        # Verify H2 convergence outputs (stage movement counts) against underlying
+        # snapshot data before returning. Same "prove the trap springs" standard
+        # as query_pipeline and query_stale_deals.
+        if result.get("snapshot_dates"):
+            try:
+                from structured_verification import verify_structured_aggregations
+            except ImportError:
+                from api.structured_verification import verify_structured_aggregations
+
+            # Extract underlying data for verification
+            prior_date, current_date = result["snapshot_dates"]
+            prior_rows = list(_pm_latest_row_per_deal(by_date[prior_date]).values())
+            current_rows = list(_pm_latest_row_per_deal(by_date[current_date]).values())
+
+            # Recompute movement components for verification (same logic as _pm_view_movement)
+            # This catches corruption in totals/summary before it reaches synthesis
+            prior_ids = {r["deal_id"] for r in prior_rows}
+            current_ids = {r["deal_id"] for r in current_rows}
+            new_ids = current_ids - prior_ids
+            left_ids = prior_ids - current_ids
+
+            # Count deals that moved stage (present in both snapshots, different stage)
+            moved_between = []
+            for r in current_rows:
+                if r["deal_id"] in prior_ids:
+                    prior_r = next((p for p in prior_rows if p["deal_id"] == r["deal_id"]), None)
+                    if prior_r and prior_r.get("stage_id") != r.get("stage_id"):
+                        moved_between.append(r["deal_id"])
+
+            totals = result.get("totals", {})
+            summary = result.get("summary", {})
+
+            verification_result = verify_structured_aggregations(
+                underlying_data={"prior_rows": prior_rows, "current_rows": current_rows,
+                                "new_ids": new_ids, "left_ids": left_ids,
+                                "moved_between": moved_between},
+                structured_output={
+                    "totals": totals,
+                    "summary": summary,
+                },
+                verification_spec={
+                    "totals.prior": {
+                        "type": "count_filtered",
+                        "filter": lambda d: True if isinstance(d, dict) and "prior_rows" in str(type(d)) else len(prior_rows) if d == "prior_rows" else False,
+                        "expected": totals.get("prior", 0)
+                    },
+                    "totals.current": {
+                        "type": "count",
+                        "expected": totals.get("current", 0)
+                    },
+                    "summary.new_to_pipeline": {
+                        "type": "count_filtered",
+                        "filter": lambda d: True,  # Verified against len(new_ids)
+                        "expected": summary.get("new_to_pipeline", 0)
+                    },
+                    "summary.left_pipeline": {
+                        "type": "count_filtered",
+                        "filter": lambda d: True,  # Verified against len(left_ids)
+                        "expected": summary.get("left_pipeline", 0)
+                    },
+                    "summary.moved_between_stages": {
+                        "type": "count_filtered",
+                        "filter": lambda d: True,  # Verified against len(moved_between)
+                        "expected": summary.get("moved_between_stages", 0)
+                    },
+                }
+            )
+
+            # Actually verify against the recomputed values directly (simpler than filter functions)
+            actual_totals_current = len(current_rows)
+            actual_totals_prior = len(prior_rows)
+            actual_new = len(new_ids)
+            actual_left = len(left_ids)
+            actual_moved = len(moved_between)
+
+            discrepancies = []
+            if totals.get("current") != actual_totals_current:
+                discrepancies.append({
+                    "field": "totals.current",
+                    "expected": totals.get("current"),
+                    "actual": actual_totals_current,
+                    "diff": abs(totals.get("current", 0) - actual_totals_current)
+                })
+            if totals.get("prior") != actual_totals_prior:
+                discrepancies.append({
+                    "field": "totals.prior",
+                    "expected": totals.get("prior"),
+                    "actual": actual_totals_prior,
+                    "diff": abs(totals.get("prior", 0) - actual_totals_prior)
+                })
+            if summary.get("new_to_pipeline") != actual_new:
+                discrepancies.append({
+                    "field": "summary.new_to_pipeline",
+                    "expected": summary.get("new_to_pipeline"),
+                    "actual": actual_new,
+                    "diff": abs(summary.get("new_to_pipeline", 0) - actual_new)
+                })
+            if summary.get("left_pipeline") != actual_left:
+                discrepancies.append({
+                    "field": "summary.left_pipeline",
+                    "expected": summary.get("left_pipeline"),
+                    "actual": actual_left,
+                    "diff": abs(summary.get("left_pipeline", 0) - actual_left)
+                })
+            if summary.get("moved_between_stages") != actual_moved:
+                discrepancies.append({
+                    "field": "summary.moved_between_stages",
+                    "expected": summary.get("moved_between_stages"),
+                    "actual": actual_moved,
+                    "diff": abs(summary.get("moved_between_stages", 0) - actual_moved)
+                })
+
+            if discrepancies:
+                # Corruption detected - return error instead of corrupted data
+                logger.error(f"[STRUCTURED_VERIFY] query_pipeline_movement aggregation "
+                           f"verification failed: {discrepancies}")
+                return {
+                    "error": "aggregation_verification_failed",
+                    "discrepancies": discrepancies,
+                    "note": "Movement counts (totals/summary) did not match recomputed values "
+                           "from underlying snapshot data. This is a code-level gate, not a data "
+                           "issue — if you see this, there is a bug in the aggregation logic that "
+                           "must be fixed before shipping results."
+                }
+
         return {
             **base,
             "snapshot_dates": result.get("snapshot_dates", []),
