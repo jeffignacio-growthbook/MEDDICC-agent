@@ -491,7 +491,7 @@ models:
     max_tokens: 4000
 
   classifier:
-    name: "claude-haiku-4-5-20251001"
+    name: "claude-sonnet-4-5-20250929"  # Upgraded from Haiku: 40+ handlers require stronger reasoning
     provider: "anthropic"
     max_tokens: 500
 

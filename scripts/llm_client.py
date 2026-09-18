@@ -98,7 +98,7 @@ class LLMClient:
         "generator":       ("claude-sonnet-4-6",        "anthropic"),
         "evaluator":       ("claude-haiku-4-5-20251001", "anthropic"),
         "context_builder": ("claude-haiku-4-5-20251001", "anthropic"),
-        "classifier":      ("claude-haiku-4-5-20251001", "anthropic"),
+        "classifier":      ("claude-sonnet-4-5-20250929", "anthropic"),  # Upgraded from Haiku: 40+ handlers with overlapping keywords require stronger reasoning
         "assessor":        ("claude-haiku-4-5-20251001", "anthropic"),
         "enrichment":      ("claude-haiku-4-5-20251001", "anthropic"),
     }
