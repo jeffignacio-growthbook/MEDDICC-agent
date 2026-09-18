@@ -242,7 +242,7 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "STRUCTURAL ENFORCEMENT: defaults to ALL active deals (no filters). "
         "Use for CURRENT STATE questions about pipeline/funnel without movement. "
         "Covers: pipeline, funnel, open deals, active deals, what's in the pipeline. "
-        "Do NOT use for 'pipeline movement' (use query_waterfall instead). "
+        "Do NOT use for 'pipeline movement' or 'how has pipeline moved' (use query_pipeline_movement instead). "
         "Examples: 'What is our pipeline?', 'Show me the pipeline', "
         "'How much pipeline do we have?', 'What's in our pipeline this quarter?', "
         "'How much open pipeline?', 'What's in the funnel?', 'Show me active deals'"
