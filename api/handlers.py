@@ -603,30 +603,57 @@ async def query_waterfall(params: dict, sb) -> dict:
                 f"{after_qualified_count} after qualification gate")
 
     # Total open pipeline
+    # Phase 1b refactor: Keep simple sums for totals (no grouping needed)
     total_open_arr = sum(d.get("arr_usd") or 0 for d in included_deals)
     total_open_count = len(included_deals)
 
     # By-stage breakdown
-    from collections import defaultdict
-    stage_stats = defaultdict(lambda: {"count": 0, "arr": 0})
+    # Phase 1b refactor (2026-09-18): Use aggregate_results() primitive instead of
+    # manual defaultdict loop. Converges with query_pipeline pattern (lines 2388-2406).
+    # Prepares data with stage metadata, calls governed aggregation, transforms output
+    # to match original format with stage ordering.
 
+    # Import aggregate_results (function-scoped to avoid handler registry false positive)
+    try:
+        from tools import aggregate_results
+    except ImportError:
+        from api.tools import aggregate_results
+
+    # Enrich deals with stage metadata for aggregation
     for d in included_deals:
         stage_id = d.get("stage")
         if stage_id in stage_lookup:
-            stage_stats[stage_id]["count"] += 1
-            stage_stats[stage_id]["arr"] += d.get("arr_usd") or 0
+            d["_stage_name"] = stage_lookup[stage_id].get("name", stage_id)
+            d["_stage_order"] = stage_lookup[stage_id].get("order", 999)
+        else:
+            d["_stage_name"] = stage_id
+            d["_stage_order"] = 999  # Unknown stages sort last
 
-    # Sort by stage order
+    # Aggregate by stage
+    stage_agg = await aggregate_results(
+        included_deals,
+        group_by="_stage_name",
+        aggregations={"arr_usd": "sum", "deal_id": "count"}
+    )
+
+    # Transform to original format with stage order for sorting
     by_stage = []
-    for stage_id in sorted(stage_stats.keys(),
-                          key=lambda sid: stage_lookup.get(sid, {}).get("order", 999)):
-        stage_info = stage_lookup.get(stage_id, {})
-        stats = stage_stats[stage_id]
+    for row in stage_agg.get("rows", []):
+        stage_name = row["_stage_name"]
+        # Find first deal with this stage to get order (all same stage have same order)
+        stage_order = next((d["_stage_order"] for d in included_deals
+                           if d.get("_stage_name") == stage_name), 999)
         by_stage.append({
-            "stage_name": stage_info.get("name", stage_id),
-            "count": stats["count"],
-            "arr": stats["arr"]
+            "stage_name": stage_name,
+            "count": row["deal_id_count"],
+            "arr": row["arr_usd_sum"],
+            "_order": stage_order  # Temp field for sorting
         })
+
+    # Sort by stage order, then remove temp field
+    by_stage.sort(key=lambda s: s["_order"])
+    for s in by_stage:
+        del s["_order"]
 
     # Needs attention: deals with no ARR
     no_arr_deals = [d for d in included_deals if not d.get("arr_usd")]
