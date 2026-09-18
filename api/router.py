@@ -4431,7 +4431,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             "aggregate_results": T.aggregate_results,
             "compare_periods": T.compare_periods,
             "assess_deal_risk": T.assess_deal_risk,
-            "query_pipeline_movement": lambda **params: _call_handler_as_tool("query_pipeline_movement", params, sb),
+            "query_pipeline_movement": lambda sb_arg, **params: _call_handler_as_tool("query_pipeline_movement", params, sb_arg),
         }.get(tool_name)
 
         if not tool_fn:
@@ -4528,6 +4528,17 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         logger.info(f"[STORE] saved step_{iteration}: {row_count} rows total "
                     f"({sample_size} in aggregate, {len(result.get('rows', []))} in raw), "
                     f"keys: {list(accumulated_data.keys())}")
+
+        # Phase 1 Pilot: Fast-path preservation for handler-as-tool
+        # If query_pipeline_movement called successfully, finalize immediately
+        # (same speed as direct routing, no multi-step reasoning)
+        if tool_name == "query_pipeline_movement" and "error" not in result:
+            logger.info(f"[UNIFIED_ROUTING_PILOT] query_pipeline_movement succeeded "
+                       f"→ finalizing immediately (fast-path preservation)")
+            # Must append tool result to messages before finalization
+            # (see _append_tool_result_message docstring - 2026-09-11 incident)
+            _append_tool_result_message(messages, raw, result)
+            return await _finalize_from_data("pilot_fast_path")
 
         # CHECK: Was this a verification retry that succeeded?
         # If previous iteration forced a retry due to missing dimension filter,
@@ -4980,16 +4991,6 @@ async def route_question(question: str, user_id: str,
         params["time_window"] = resolve_time_window(
             params.get("time_window", {}))
 
-        # ── Phase 1 Pilot: Unified routing for query_pipeline_movement ──
-        # Skip classifier routing for query_pipeline_movement - route to dynamic loop
-        # where it's registered as a callable tool (same pattern as assess_deal_risk).
-        # All other handlers continue using classifier routing unchanged.
-        if handler_name == "query_pipeline_movement":
-            logger.info(f"[UNIFIED_ROUTING_PILOT] query_pipeline_movement → dynamic loop "
-                       f"(classifier confidence={confidence:.2f}, bypassed)")
-            handler_name = "dynamic_query"
-            # params already extracted by classifier, will be available to loop
-
         # ── Scope Decision (explicit, not inherited) ────
         # Classifier decides: prior_set, new_population, or full_scope
         scope_decision = intent.get("scope", "full_scope")  # Default to full if missing
@@ -5053,6 +5054,16 @@ async def route_question(question: str, user_id: str,
 
         print(f"[INTENT] handler={handler_name} "
               f"confidence={confidence:.2f}", flush=True)
+
+        # ── Phase 1 Pilot: Unified routing for query_pipeline_movement ──
+        # Skip classifier routing for query_pipeline_movement - route to dynamic loop
+        # where it's registered as a callable tool (same pattern as assess_deal_risk).
+        # All other handlers continue using classifier routing unchanged.
+        if handler_name == "query_pipeline_movement":
+            logger.info(f"[UNIFIED_ROUTING_PILOT] query_pipeline_movement → dynamic loop "
+                       f"(classifier confidence={confidence:.2f}, bypassed)")
+            handler_name = "dynamic_query"
+            # params already extracted by classifier, will be available to loop
 
         # ── 1b. Confidence floor (PROVISIONAL) ──────────────────────────
         # Below threshold, skip precomputed handler and route to dynamic loop.
