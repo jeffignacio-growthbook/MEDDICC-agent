@@ -1186,7 +1186,7 @@ TOOLS YOU CAN CALL:
     cycle-length benchmarks. MEDDICC deferred (insufficient historical data).
     Example: assess_deal_risk() for all high-priority deals in current quarter
     Example: assess_deal_risk(deal_ids=["123"], fiscal_quarter="FY2027 Q2")
-  query_pipeline_movement(view, fiscal_quarter, pipeline_filter, owner_email, stage, weeks, close_date_scope)
+  query_pipeline_movement(view, fiscal_quarter, pipeline_filter, owner_email, stage, weeks, close_date_scope, time_window)
     **PHASE 1 PILOT: unified routing test for handler-as-tool pattern**
     **USE THIS when the question asks about**:
     - PIPELINE MOVED, PIPELINE MOVEMENT, PIPELINE CHANGED
@@ -1200,6 +1200,7 @@ TOOLS YOU CAN CALL:
     - stage: filter to specific stage name (optional, for stage_deals view)
     - weeks: number of recent weeks for composition view (optional)
     - close_date_scope: "current_quarter" to filter by close date (optional)
+    - time_window: dict with period/fiscal_quarter/n for time range (optional, e.g. {{"period": "current_quarter"}} or {{"period": "last_N_days", "n": 30}})
     **RETURNS**: Snapshot-based movement analysis with stage changes, entries, exits
     Examples: "how has pipeline moved this quarter", "renewal pipeline movement",
     "which deals moved to Technical Evaluation", "Christian's pipeline changes"
@@ -2712,6 +2713,20 @@ async def _call_handler_as_tool(handler_name: str, params: dict, sb) -> dict:
     handler_fn = getattr(handlers, handler_name, None)
     if not handler_fn:
         raise ValueError(f"Handler {handler_name} not found")
+
+    # Resolve time_window if present (same pattern as classifier path)
+    # Handler code expects concrete {"start", "end", "label"} not raw period specs
+    from api.time_resolver import resolve_time_window
+    if "time_window" in params:
+        params["time_window"] = resolve_time_window(params["time_window"])
+    elif "fiscal_quarter" in params:
+        # If fiscal_quarter provided but time_window not extracted by LLM,
+        # derive time_window from fiscal_quarter (e.g. "FY2027 Q3" → concrete dates)
+        # This matches OLD classifier path behavior where both are set
+        params["time_window"] = resolve_time_window({
+            "period": "fiscal_quarter",
+            "fiscal_quarter": params["fiscal_quarter"]
+        })
 
     # Call handler with params + sb
     tool_results, result_quality, failure_reason = await _run_precomputed_handler(
