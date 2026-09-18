@@ -5131,6 +5131,9 @@ async def route_question(question: str, user_id: str,
         else:
             handler_fn = getattr(handlers, handler_name, None)
             if handler_fn:
+                # Inject raw question text for handlers that need it (e.g., query_waterfall report_shape detection)
+                # This is router-injected metadata, not a classifier-extracted structured param
+                params["question"] = question
                 tool_results, result_quality, handler_failure_reason = \
                     await _run_precomputed_handler(
                         handler_fn, handler_name, params, sb)
