@@ -4611,6 +4611,11 @@ def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps, requested_days=N
     # H3 convergence: use extracted helper for snapshot anchor selection
     prior_date, current_date, anchor_gaps = _pm_select_snapshot_anchors(all_dates, requested_days)
     data_gaps.extend(anchor_gaps)
+
+    # Phase 1 pilot diagnostics: log selected snapshot anchors
+    logger.info(f"[PM_MOVEMENT_ANCHORS] prior_date={prior_date!r} current_date={current_date!r} "
+                f"requested_days={requested_days!r}")
+
     prior_rows = list(_pm_latest_row_per_deal(by_date[prior_date]).values())
     current_rows = list(_pm_latest_row_per_deal(by_date[current_date]).values())
 
@@ -4624,6 +4629,11 @@ def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps, requested_days=N
         "current": len(current_rows),
         "net": len(current_rows) - len(prior_rows),
     }
+
+    # Phase 1 pilot diagnostics: log computed totals
+    logger.info(f"[PM_MOVEMENT_TOTALS] prior={len(prior_rows)} current={len(current_rows)} "
+                f"net={len(current_rows) - len(prior_rows)} moved_between={len(moved_between)} "
+                f"new_ids={len(new_ids)} left_ids={len(left_ids)}")
     # Deal-level, mutually exclusive tallies so nothing double-counts: a new
     # deal is in `new_to_pipeline`, not in `moved_between_stages`.
     summary = {
@@ -5057,6 +5067,11 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
 
     by_date = _pm_by_date(scoped)
     all_dates = sorted(by_date.keys())
+
+    # Phase 1 pilot diagnostics: log snapshot anchor selection
+    logger.info(f"[PM_SNAPSHOT_ANCHORS] chosen_source={chosen_source!r} "
+                f"all_dates={all_dates!r} (count={len(all_dates)}) "
+                f"scoped_rows={len(scoped)}")
 
     base["snapshot_source"] = chosen_source
 
