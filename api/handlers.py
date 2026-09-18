@@ -738,7 +738,7 @@ async def query_waterfall(params: dict, sb) -> dict:
     else:
         report_shape = "snapshot"  # Default to snapshot
 
-    return {
+    result = {
         "pipeline_summary": pipeline_summary,  # Current state
         "waterfall": weekly,                   # Movement
         "period": tw["label"],
@@ -747,6 +747,45 @@ async def query_waterfall(params: dict, sb) -> dict:
             "deals": deals
         }
     }
+
+    # Phase 1b: Structured verification (2026-09-18)
+    # Protect aggregates after aggregate_results() convergence
+    try:
+        from structured_verification import verify_structured_aggregations
+    except ImportError:
+        from api.structured_verification import verify_structured_aggregations
+
+    verification_result = verify_structured_aggregations(
+        underlying_data=included_deals,
+        structured_output={
+            "total_open_arr": result["pipeline_summary"]["total_open_arr"],
+            "total_open_count": result["pipeline_summary"]["total_open_count"],
+            "no_arr_count": result["pipeline_summary"]["needs_attention"]["no_arr_count"]
+        },
+        verification_spec={
+            "total_open_arr": {
+                "type": "sum",
+                "field": "arr_usd",
+                "expected": result["pipeline_summary"]["total_open_arr"]
+            },
+            "total_open_count": {
+                "type": "count",
+                "expected": result["pipeline_summary"]["total_open_count"]
+            },
+            "no_arr_count": {
+                "type": "count_filtered",
+                "filter": lambda row: not row.get("arr_usd"),
+                "expected": result["pipeline_summary"]["needs_attention"]["no_arr_count"]
+            }
+        },
+        tolerance=0.01
+    )
+
+    if not verification_result["match"]:
+        logger.error(f"[STRUCTURED_VERIFY] query_waterfall aggregation mismatch: {verification_result}")
+        raise ValueError(f"Aggregation verification failed: {verification_result['details']}")
+
+    return result
 
 
 async def query_arr(params: dict, sb) -> dict:
@@ -2668,8 +2707,8 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
         persona_name = persona_rows[0].get("display_name") or persona_rows[0].get("name")
     
     avg_deal_value = total_pipeline / len([d for d in enriched_deals if d["deal_value"] is not None]) if enriched_deals and any(d["deal_value"] is not None for d in enriched_deals) else None
-    
-    return {
+
+    result = {
         "owner_email": owner_email,
         "owner_name": persona_name,
         "resolution_note": resolved_note,
@@ -2683,6 +2722,45 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
         },
         "data_gap": False
     }
+
+    # Phase 1b: Structured verification (2026-09-18)
+    # Protect aggregates after bulk-fetch refactor (same Creative CX risk as other handlers)
+    try:
+        from structured_verification import verify_structured_aggregations
+    except ImportError:
+        from api.structured_verification import verify_structured_aggregations
+
+    verification_result = verify_structured_aggregations(
+        underlying_data=enriched_deals,
+        structured_output={
+            "total_deals": result["summary"]["total_deals"],
+            "total_pipeline": result["summary"]["total_pipeline"],
+            "no_value_count": result["summary"]["no_value_count"]
+        },
+        verification_spec={
+            "total_deals": {
+                "type": "count",
+                "expected": result["summary"]["total_deals"]
+            },
+            "total_pipeline": {
+                "type": "sum",
+                "field": "deal_value",
+                "expected": result["summary"]["total_pipeline"]
+            },
+            "no_value_count": {
+                "type": "count_filtered",
+                "filter": lambda row: row.get("deal_value") is None,
+                "expected": result["summary"]["no_value_count"]
+            }
+        },
+        tolerance=0.01
+    )
+
+    if not verification_result["match"]:
+        logger.error(f"[STRUCTURED_VERIFY] query_rep_pipeline aggregation mismatch: {verification_result}")
+        raise ValueError(f"Aggregation verification failed: {verification_result['details']}")
+
+    return result
 
 
 async def query_rep_attainment(params: dict, sb) -> dict:

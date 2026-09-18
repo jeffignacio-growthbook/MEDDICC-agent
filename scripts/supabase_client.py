@@ -266,6 +266,8 @@ class SupabaseWriter:
             row['new_arr'] = _safe_numeric(deal['new_arr'])
         if 'expansion_arr' in deal:
             row['expansion_arr'] = _safe_numeric(deal['expansion_arr'])
+        if 'incremental_arr' in deal:
+            row['incremental_arr'] = _safe_numeric(deal['incremental_arr'])
         if 'prior_arr' in deal:
             row['prior_arr'] = _safe_numeric(deal['prior_arr'])
         if 'renewal_revenue' in deal:

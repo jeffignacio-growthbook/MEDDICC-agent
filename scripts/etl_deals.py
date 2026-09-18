@@ -721,6 +721,7 @@ def main():
 
             new_arr = safe_numeric(props.get('new_revenue'))
             expansion_arr = safe_numeric(props.get('expansion_revenue'))
+            incremental_arr = safe_numeric(props.get('incremental_arr'))
             prior_arr = safe_numeric(props.get('prior_arr'))
             renewal_revenue = safe_numeric(props.get('renewal_revenue'))
 
@@ -743,6 +744,7 @@ def main():
             deal_dict['deal_value'] = deal_value
             deal_dict['new_arr'] = new_arr
             deal_dict['expansion_arr'] = expansion_arr
+            deal_dict['incremental_arr'] = incremental_arr
             deal_dict['prior_arr'] = prior_arr
             deal_dict['renewal_revenue'] = renewal_revenue
             deal_dict['sao'] = sao
