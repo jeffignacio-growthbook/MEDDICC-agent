@@ -3005,7 +3005,12 @@ async def query_stale_deals(params: dict, sb) -> dict:
     # like "Technical Evaluation" would silently match zero rows against
     # deals.stage's actual raw-id storage.
     stage = _resolve_stage_id(params.get("stage"))
-    stale_days = params.get("stale_days", 21)
+    # Default 21 days: ~2/3 of shortest segment cycle (SMB=33 days per client.yaml).
+    # Data-grounded: if an SMB deal hasn't moved in 2/3 of expected lifecycle, that's
+    # a meaningful stale signal. Handle explicit None from LLM (not just missing key).
+    stale_days = params.get("stale_days")
+    if stale_days is None:
+        stale_days = 21
     tw = params.get("time_window")
 
     from datetime import date, timedelta
