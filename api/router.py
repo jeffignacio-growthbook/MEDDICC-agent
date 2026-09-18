@@ -167,19 +167,14 @@ NEW_DISCOVERY_SIGNALS = [
 HANDLER_DESCRIPTIONS = {
     "query_waterfall": "pipeline CHANGE/MOVEMENT — new deals added, deals won, deals lost. Use for questions about what CHANGED, MOVED, or FLOWED. Do NOT use for current state snapshots (use query_pipeline). Do NOT use for 'What is our pipeline this quarter?' (that's current state, not movement).",
     "query_pipeline_movement": (
-        "Pipeline movement, pipeline changed, how has pipeline moved — "
-        "Historical pipeline movement, stage composition over time, "
-        "deal-level stage changes, and the coverage curve by week. Works for "
-        "ALL pipeline types (new business, renewal, expansion). COUNT-based only "
-        "(no dollar figures). Common phrasings: 'how has pipeline moved', "
-        "'pipeline movement', 'pipeline changed', 'show me renewal pipeline movement', "
-        "'how has [rep]'s pipeline changed', 'deals that moved', 'negotiating deals "
-        "that moved', 'pipeline moved in the last N weeks/days', 'since the beginning'. "
-        "Set params.view: 'movement' for week-over-week counts in/out by stage, "
-        "'composition' for stage-by-week grid, 'deal_changes' for which deals moved/"
-        "advanced/regressed/left, 'curve' for deal count by week-of-quarter, "
-        "'stage_deals' to list deals currently in a named stage (set params.stage). "
-        "Read from reconstructed weekly deals_snapshot series (FY2026 Q3 onward)."
+        "PIPELINE MOVED, PIPELINE MOVEMENT, PIPELINE CHANGED, HOW HAS PIPELINE, "
+        "DEALS THAT MOVED — Historical pipeline movement over time. "
+        "Use for: 'how has pipeline moved', 'pipeline movement in last N weeks', "
+        "'show me renewal pipeline movement', 'how has [rep's] pipeline changed', "
+        "'deals that moved', '[stage] deals that moved', 'pipeline changed this quarter'. "
+        "Works for ALL pipelines (new business, renewal, expansion). COUNT-based snapshots. "
+        "Params: view=movement/composition/deal_changes/curve/stage_deals, fiscal_quarter, "
+        "pipeline_filter=renewal/new_business, owner_email, stage."
     ),
     "query_new_deals": "which deals were created, added to pipeline, or started in a time window",
     "query_upcoming_renewals": (
@@ -279,14 +274,13 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "'show me deals where pain is identified but metrics are not'"
     ),
     "query_stale_deals": (
-        "Stale deals, deals stale, what deals are stale — Deals with no recent "
-        "activity or past their close date. Common phrasings: 'what deals are stale', "
-        "'stale deals', 'deals stale for more than N days', 'stale deals [rep] owns', "
-        "'which [stage] deals are stale', 'show me all stale deals', 'deals haven't "
-        "moved', 'stuck deals', 'deals past their close date', 'inactive deals'. "
-        "Works with filters: owner (rep), stage, stale_days threshold (default 21). "
-        "Returns deals with either: (1) no activity in stale_days threshold, OR "
-        "(2) close_date in the past but still open."
+        "STALE DEALS, DEALS STALE, WHAT DEALS ARE STALE, DEALS HAVEN'T MOVED, "
+        "STUCK DEALS — Deals with no activity or past close date. "
+        "Use for: 'what deals are stale', 'stale deals', 'deals stale for N days', "
+        "'[rep's] stale deals', 'which [stage] deals are stale', 'show me all stale deals', "
+        "'deals haven't moved', 'stuck deals', 'inactive deals', 'deals past close date'. "
+        "Params: owner_email (rep filter), stage, stale_days (default 21). "
+        "Returns deals: (1) no activity in stale_days threshold OR (2) close_date passed."
     ),
     "query_team_leaderboard": (
         "Full AE team ranking across pipeline, attainment, MEDDICC quality, "
