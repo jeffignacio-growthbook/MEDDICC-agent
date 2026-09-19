@@ -901,7 +901,14 @@ def _actual_incremental_closed_won(sb, q_start_iso: str, q_end_iso: str):
     """Actual closed-won incremental ARR (new_arr+expansion_arr), renewal
     pipeline excluded, deals table. Promoted UNMODIFIED from
     scripts/audit_coverage_curve.py::actual_incremental_closed_won after
-    live confirmation (2026-09-19)."""
+    live confirmation (2026-09-19).
+
+    OUTCOME-READ (same as _in_quarter_won_by_pipeline/_classify_deal_
+    outcome elsewhere in this module): `stage` here determines the
+    TERMINAL WON outcome (is_won), not a point-in-time stage exclusion —
+    the backfilled complete quarters hold zero won rows in
+    deals_snapshot, so a won transition has no point-in-time snapshot
+    equivalent; close_date bounds it to the (prior-year) quarter window."""
     from field_semantics import _RENEWAL_PIPELINE_ID, is_won
     from supabase_client import select_all
     deals = select_all(sb, 'deals',
@@ -936,8 +943,18 @@ def _qualified_pipeline_at_week(sb, quarter: str, week: int,
     qualified-stage threshold applied, CLOSE-QUARTER SCOPED (a deal only
     counts if its own close_date at that snapshot falls inside the SAME
     quarter being measured — matches query_pipeline()'s q3_scoped_pipeline
-    precedent). Promoted UNMODIFIED from
-    scripts/audit_coverage_curve.py::qualified_pipeline_at_week."""
+    precedent). Adapted from
+    scripts/audit_coverage_curve.py::qualified_pipeline_at_week — NULL-
+    PROPAGATED here (that audit script coalesced a null deal_value to 0;
+    promoting it into this dollar-weighted, deals_snapshot-reading module
+    tripped eval_reconstruction.py's null-coalescing ratchet, confirmed
+    live in CI on 2026-09-19). A deal with no value history as of this
+    snapshot returns None, not 0 — EXCLUDED from the dollar sum and
+    counted separately (n_null_excluded), never coalesced to a
+    fabricated 0 — same discipline compute_waterfall.py's _deal_value()
+    enforces.
+
+    Returns (total, n, n_null_excluded)."""
     from field_semantics import _RENEWAL_PIPELINE_ID
     from supabase_client import select_all
     rows = select_all(sb, 'deals_snapshot',
@@ -946,6 +963,7 @@ def _qualified_pipeline_at_week(sb, quarter: str, week: int,
                  ('eq', 'week_of_quarter', week)])
     total = 0.0
     n = 0
+    n_null_excluded = 0
     for r in rows:
         if str(r.get('pipeline_id')) == _RENEWAL_PIPELINE_ID:
             continue
@@ -955,9 +973,13 @@ def _qualified_pipeline_at_week(sb, quarter: str, week: int,
         close_date = r.get('close_date')
         if not close_date or not (q_start_iso <= str(close_date)[:10] <= q_end_iso):
             continue
-        total += r.get('deal_value') or 0
+        deal_value = r.get('deal_value')
+        if deal_value is None:
+            n_null_excluded += 1
+            continue
+        total += deal_value
         n += 1
-    return total, n
+    return total, n, n_null_excluded
 
 
 def _prior_year_window(q_start_iso: str):
@@ -1051,17 +1073,22 @@ def query_coverage_proxy_target_by_week(sb=None) -> Dict:
                        if proxy_targets[q]['value'] > 0]
 
     pooled_by_week = {}
+    total_null_excluded = 0
     for week in range(1, 14):
         ratios = []
+        week_null_excluded = 0
         for quarter in valid_quarters:
             q_start_iso, q_end_iso = quarter_windows[quarter]
-            pipeline_val, _n = _qualified_pipeline_at_week(
+            pipeline_val, _n, n_null_excluded = _qualified_pipeline_at_week(
                 sb, quarter, week, qualified_stage_order, q_start_iso, q_end_iso)
             ratios.append(pipeline_val / proxy_targets[quarter]['value'])
+            week_null_excluded += n_null_excluded
+        total_null_excluded += week_null_excluded
         pooled_by_week[week] = {
             'mean_ratio': statistics.mean(ratios) if ratios else None,
             'median_ratio': statistics.median(ratios) if ratios else None,
             'n_quarters': len(ratios),
+            'null_value_excluded_count': week_null_excluded,
         }
 
     evidence_ceiling = (all(proxy_targets[q]['evidence_gated'] for q in valid_quarters)
@@ -1073,6 +1100,9 @@ def query_coverage_proxy_target_by_week(sb=None) -> Dict:
         'quarters_used': valid_quarters,
         'min_evidence_count': min_evidence,
         'evidence_ceiling': evidence_ceiling,
+        'null_value_excluded_count': total_null_excluded,  # deals with no
+            # deal_value history at that snapshot, excluded from every
+            # week's dollar sum (never coalesced to a fabricated 0)
         'heuristic': True,
         'label': 'HEURISTIC',
         'note': (
