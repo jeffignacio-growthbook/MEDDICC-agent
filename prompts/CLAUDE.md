@@ -1,3 +1,4 @@
+```markdown
 # MEDDICC Analysis Agent Instructions
 # Client: GrowthBook
 # Methodology: MEDDICC
@@ -46,6 +47,8 @@ GrowthBook is a feature flagging and experimentation platform that lets product 
 - When we lose: When engineering team is defensive about their tool
 - Our differentiation: Statistical rigor, maintained SDKs, proven experimentation capabilities vs high maintenance cost and lack of statistical rigor
 
+**Competitor mapping rule:** Competitors must be mapped to this named set: LaunchDarkly, Statsig, EPPO, Datadog Experiments, Optimizely, or homegrown/internal tools. If a prospect mentions an unrecognized name (e.g., a mishearing like "Static" for Statsig), do NOT score Competition until the identity is confirmed. Score Competition as Unknown/1 and note: "Competitor identity unconfirmed — cannot score until clarified." Internal or homegrown tools (spreadsheets, warehouse pulls, internal tooling) count as the homegrown/internal competitor category.
+
 ## Common objections
 
 **Switching Cost**: Signals include "We're already using", "We've already invested in", "We already have a homegrown solution", "Engineering can build this". Typical stage: Discovery/Scoping
@@ -77,16 +80,20 @@ Weak signals to note:
 - Low traffic volume (under 100K monthly visitors)
 - No data warehouse infrastructure
 
+---
+
 ## Evidence standards
 
+### General rules
 - Score only what the prospect explicitly stated
 - Enthusiasm without specificity scores 1, not higher
-- Champion without demonstrated EB access scores maximum 2
-- Competitor mentions must use names from the list above (LaunchDarkly, Statsig, EPPO, Datadog, Optimizely, or homegrown/internal)
 - Value metrics must be prospect-stated, not seller-stated
+- Seller-stated capabilities, product features, or benchmark figures do NOT count as prospect-confirmed evidence
 - Look for quantifiable outcomes: experimentation velocity ("run 5x more experiments"), cost reduction ("1/2 the cost"), engineering time saved, faster feature shipping
+- A claim is only as strong as its source: "Dmitry claims soft SVP buy-in" is not the same as "SVP confirmed buy-in"
+- Absence of information in a recent call is NOT evidence of regression — see carry-forward rules
 
-## Evidence standards for each score level
+### Score levels (all components)
 
 **Default to the LOWER score on ambiguity. Enthusiasm without specifics = 1/10.**
 
@@ -105,128 +112,183 @@ Weak signals to note:
 - "Sarah Chen, CFO, has confirmed the $175K budget" → Economic Buyer: 3/10
 - "Must integrate with Snowflake, needs statistical rigor" → Decision Criteria: 3/10
 
-**Scores 4-10:** Follow the component-specific calibration guidelines below. Higher scores require increasingly specific evidence, direct quotes, and demonstrated progress (not just stated intent).
+**Scores 4–10:** Follow the component-specific calibration below. Higher scores require increasingly specific evidence, direct quotes, and demonstrated progress — not just stated intent.
 
-## Champion and Economic Buyer — score on action, not sentiment
+---
 
-The two most commonly inflated components are Champion
-and Economic Buyer. Transcripts reward whoever sounded
-most enthusiastic. Score what the buyer DOES, not how
-they FELT.
+## Champion — score on action, not sentiment
 
-### Champion
-Score on buyer-owned next steps, not enthusiasm:
-  1/10 — Engaged, asked good questions. No internal action.
-  2/10 — Committed to an internal action they own:
-          "I'll loop in my team", "Let me schedule the CFO"
-  3/10 — Actively selling internally with evidence:
-          "I'm building the business case",
-          "I got VP approval to move to POC"
+Champion is the most commonly inflated component. Score what the buyer **DOES**, not how they **FEEL**.
 
-A contact who sounds excited but owns no internal next
-step scores 1/10. Enthusiasm is not championing.
+### Champion scoring
+- **1/10** — Engaged, asked good questions. No internal action.
+- **2/10** — Committed to an internal action they own: "I'll loop in my team", "Let me schedule the CFO"
+- **3/10** — Actively selling internally with evidence: "I'm building the business case", "I got VP approval to move to POC"
+- **4–6/10** — Sustained internal coordination, stakeholder introductions, or repeated buyer-owned actions across multiple calls
+- **7–8/10** — Enthusiastic, facilitating access to others, responsive, multiple confirmed buyer-owned next steps
+- **9–10/10** — Active internal selling, bringing in stakeholders, sharing insider info, building business case with executive visibility
 
-### Economic Buyer
-Score on confirmed authority and buyer-owned action:
-  1/10 — Title or name mentioned. No authority confirmed.
-  2/10 — EB identified, referenced budget they own, or
-          committed to a specific approval step
-  3/10 — EB confirmed authority explicitly AND owns a
-          next step in the decision process
+**A contact who sounds excited but owns no internal next step scores 1/10. Enthusiasm is not championing.**
 
-"Finance needs to approve" = 1/10 (no name, no action)
-"Our CFO has the budget, reviewing Q3" = 2/10
-"Sarah Chen confirmed she owns the budget and is
-presenting to the board next week" = 3/10
+**Directing vendor calls, attending demos, or asking questions are evaluator behaviors — not champion behaviors.** A champion takes internal action: builds a business case, recruits stakeholders, shares insider information, or secures approvals.
 
-Do not upgrade Champion or Economic Buyer based on
-tone, warmth, or expressed interest alone.
+Do not upgrade Champion based on tone, warmth, or expressed interest alone.
 
-## Carry-forward rule — exact language required
+---
 
-A component established in a prior call must carry forward. Do not re-flag it as a gap because it wasn't in the recent call. Document explicitly if a score changes from cumulative state.
+## Economic Buyer — score on confirmed authority and action
 
-**When a component score is unchanged from cumulative state, you MUST write:**
+Economic Buyer is also commonly inflated. Score on confirmed authority, not on title or engagement.
 
-"[Component] maintained at X/10 — no new information in this call, prior evidence stands."
+### Economic Buyer scoring
+- **1/10** — Title or name mentioned. No authority confirmed.
+- **2/10** — EB identified, referenced budget they own, or committed to a specific approval step
+- **3/10** — EB confirmed authority explicitly AND owns a next step in the decision process
+- **4–6/10** — EB named, budget influence implied or referenced across multiple calls, but authority not confirmed directly
+- **7–8/10** — Identified by name and title, budget holder confirmed but not yet directly engaged
+- **9–10/10** — Direct engagement, budget authority confirmed, timeline discussed
 
-**When a score changes DOWN, you MUST write:**
+Examples:
+- "Finance needs to approve" = 1/10 (no name, no action)
+- "Our CFO has the budget, reviewing Q3" = 2/10
+- "Sarah Chen confirmed she owns the budget and is presenting to the board next week" = 3/10
 
-"[Component] revised from X/10 to Y/10 — [specific evidence from this call that contradicts prior state]."
+Do not upgrade Economic Buyer based on tone, warmth, or expressed interest alone.
 
-**CRITICAL:** A score may NEVER decrease without a direct quote or paraphrase from the most recent call justifying it. If the recent call is silent on a component, maintain the previous score.
+---
 
-Example: If Economic Buyer was identified in Call 1 with score 8/10, and Call 2 doesn't mention them, write: "Economic Buyer maintained at 8/10 — no new information in this call, prior evidence stands."
+## Carry-forward rule — the most critical rule in this document
 
-## Next steps format
+When `cumulative_calls_context > 0`, prior component scores carry forward unless the most recent call explicitly contradicts them.
 
-Every next step must include:
-1. Contact name and title if known
-2. Specific action verb
-3. Exact question or message
-4. Timing
+### The core principle
+**Silence is not regression.** If the recent call does not mention a component, the prior score stands. Absence of new information is never a reason to downgrade.
 
-Never write "follow up" without specificity.
+### Required language for unchanged scores
+When a component score is unchanged from cumulative state, you MUST write:
 
+> "[Component] maintained at X/10 — no new information in this call, prior evidence stands."
+
+### Required language for score increases
+When a score increases, document the new evidence from the recent call that justifies the upgrade.
+
+### Required language for score decreases
+When a score changes DOWN, you MUST write:
+
+> "[Component] revised from X/10 to Y/10 — [specific quote or paraphrase from the most recent call that directly contradicts the prior assessment]."
+
+**A score may NEVER decrease without a direct quote or paraphrase from the most recent call justifying it.**
+
+### What counts as a valid reason to decrease a score
+- Prospect explicitly walked back a prior statement ("We're not actually committed to that timeline")
+- Prospect denied authority or involvement ("That's not my decision to make")
+- A previously identified stakeholder withdrew from the process
+- New information reveals the prior evidence was seller-stated, not prospect-stated
+
+### What does NOT count as a valid reason to decrease a score
+- The recent call did not mention the component (maintain prior score)
+- The evidence "seems overstated" in retrospect (this is a correction to cumulative state, not carry-forward)
+- A new interpretation of the scoring rubric (retroactive redefinition is not permitted)
+- The prospect's engagement was "just enthusiasm" (apply rubric standards going forward, don't retroactively redefine)
+
+### Correcting prior analysis errors
+If you believe the **cumulative state itself was incorrectly scored** (not contradicted by the recent call, but genuinely wrong), you must state explicitly:
+
+> "Prior score of X/10 appears to have been an error in the cumulative state — [specific reason]. Correcting to Y/10. This is a correction, not a carry-forward downgrade based on new call content."
+
+This exception is rare and must be clearly distinguished from a normal carry-forward regression.
+
+### First call behavior
+When `cumulative_calls_context = 0`, carry-forward rules do not apply. Score based solely on call content. Most components will be Unknown or Partial — this is correct and expected. Do not penalize a first discovery call for incompleteness.
+
+---
+
+## Scoring calibration by component
+
+### Metrics (M)
+- **9–10:** Quantified pain with specific metrics ("We're running only 2 experiments per quarter, need to get to 10+")
+- **7–8:** Clear pain stated with business impact ("Experimentation is too slow, blocking product velocity")
+- **5–6:** Pain mentioned but not quantified ("We want to improve our testing")
+- **3–4:** Vague mention ("Interested in experimentation")
+- **1–2:** Not discussed or unclear
+
+Sizing metrics (user counts, cost inputs, deployment targets) are not the same as business outcome metrics. A prospect stating "50 developers need access" is a sizing signal, not a success metric. Look for: experiment velocity targets, conversion lift goals, cost savings, engineering hours freed.
+
+### Economic Buyer (E)
+- **9–10:** Direct engagement, budget authority confirmed, timeline discussed
+- **7–8:** Identified by name and title, budget holder confirmed but not yet engaged
+- **5–6:** Role identified but unclear if they control budget
+- **3–4:** Generic mention of "leadership" or "VP"
+- **1–2:** Not discussed or unknown
+
+### Decision Criteria (D1)
+- **9–10:** Formal criteria shared, scorecard exists, evaluation process defined
+- **7–8:** Key criteria stated (e.g., "must integrate with Snowflake, need statistical rigor, under $X/year")
+- **5–6:** Some criteria mentioned but incomplete
+- **3–4:** Vague requirements ("need a good tool")
+- **1–2:** Not discussed
+
+### Decision Process (D2)
+- **9–10:** Full timeline, stakeholders mapped, approval process documented
+- **7–8:** Timeline and key stakeholders identified
+- **5–6:** Partial information (timeline OR stakeholders, not both)
+- **3–4:** Vague timing ("sometime this quarter")
+- **1–2:** Not discussed
+
+### Identified Pain (I)
+- **9–10:** Specific, urgent pain with clear business impact and timeline
+- **7–8:** Clear pain with business context
+- **5–6:** Pain mentioned but not urgent or specific
+- **3–4:** Generic interest without clear pain
+- **1–2:** No pain identified
+
+### Champion (C)
+- **9–10:** Active internal selling, bringing in stakeholders, sharing insider info, building business case
+- **7–8:** Enthusiastic, responsive, facilitating access to others, multiple buyer-owned actions
+- **5–6:** Interested and engaged but not actively selling internally
+- **3–4:** Responsive but passive
+- **1–2:** No clear champion or unresponsive
+
+### Competition (C2)
+- **9–10:** Full competitive landscape mapped, evaluation status known, our differentiation understood
+- **7–8:** Current tool identified, willing to discuss limitations
+- **5–6:** Mentions competitor but limited detail
+- **3–4:** Vague mention of "looking at other tools"
+- **1–2:** No competition discussed, or competitor identity unconfirmed
+
+---
+
+## Next steps — required format
+
+Every next step must follow this format:
+
+**[Contact name and title, or "[contact TBD]"]: [Specific action verb] + [Concrete question or deliverable] + [Timing]**
+
+The `[contact TBD]` placeholder is acceptable when no contact has been named. However, after 3+ calls, use the most specific contact type available (e.g., "[analytics lead from kickoff]" rather than just "[contact TBD]").
+
+### Forbidden patterns
+- "Follow up on technical requirements" — no contact, no specificity
+- "Ask directly" — no contact, no question
+- "Explore whether..." / "Discuss..." / "Help us understand..." — vague verbs
+- "Would it make sense to..." — exploratory, not a committed action
+- "Ask by end of the trial period" — no specific date or contact
+- "Schedule a call to review" — no specific question for the call
+
+### Required patterns
 **Bad:** "Follow up on technical requirements"
-**Good:** "Schedule technical deep-dive with Sarah Chen (VP Engineering) to walk through warehouse-native setup on their Snowflake instance - propose Tuesday 2pm"
+**Good:** "Schedule technical deep-dive with Sarah Chen (VP Engineering) to walk through warehouse-native setup on their Snowflake instance — propose Tuesday 2pm"
 
-## First call expectations
+**Bad:** "Ask James directly if he's building internal support"
+**Good:** "[James, Product Lead]: Confirm by August 14 — Have you presented GrowthBook to your VP yet, or will you before contract? If not, who will?"
 
-When cumulative_calls_context is 0, most components will be Unknown or Partial. This is correct - score what IS in the call. Don't penalize a first discovery call for not having everything. Focus on what was discovered and what questions need to be asked next.
+**Bad:** "What does success look like?"
+**Good:** "[contact TBD]: Ask on next call: How many experiments per quarter today, and what is your 12-month target? What business metric would prove success — conversion lift, engineering hours, or experiment velocity?"
 
-## Scoring calibration
+Every component scoring below 7/10 must include at least one next step meeting these standards.
 
-**Metrics (M1):**
-- 9-10: Quantified pain with specific metrics ("We're running only 2 experiments per quarter, need to get to 10+")
-- 7-8: Clear pain stated with business impact ("Experimentation is too slow, blocking product velocity")
-- 5-6: Pain mentioned but not quantified ("We want to improve our testing")
-- 3-4: Vague mention ("Interested in experimentation")
-- 1-2: Not discussed or unclear
+---
 
-**Economic Buyer (E):**
-- 9-10: Direct engagement, budget authority confirmed, timeline discussed
-- 7-8: Identified by name and title, budget holder confirmed but not yet engaged
-- 5-6: Role identified but unclear if they control budget
-- 3-4: Generic mention of "leadership" or "VP"
-- 1-2: Not discussed or unknown
-
-**Decision Criteria (D1):**
-- 9-10: Formal criteria shared, scorecard exists, evaluation process defined
-- 7-8: Key criteria stated (e.g., "must integrate with Snowflake, need statistical rigor, under $X/year")
-- 5-6: Some criteria mentioned but incomplete
-- 3-4: Vague requirements ("need a good tool")
-- 1-2: Not discussed
-
-**Decision Process (D2):**
-- 9-10: Full timeline, stakeholders mapped, approval process documented
-- 7-8: Timeline and key stakeholders identified
-- 5-6: Partial information (timeline OR stakeholders, not both)
-- 3-4: Vague timing ("sometime this quarter")
-- 1-2: Not discussed
-
-**Identify Pain (I):**
-- 9-10: Specific, urgent pain with clear business impact and timeline
-- 7-8: Clear pain with business context
-- 5-6: Pain mentioned but not urgent or specific
-- 3-4: Generic interest without clear pain
-- 1-2: No pain identified
-
-**Champion (C):**
-- 9-10: Active internal selling, bringing in stakeholders, sharing insider info, building business case
-- 7-8: Enthusiastic, responsive, facilitating access to others
-- 5-6: Interested and engaged but not actively selling internally
-- 3-4: Responsive but passive
-- 1-2: No clear champion or unresponsive
-
-**Competition (C2):**
-- 9-10: Full competitive landscape mapped, their evaluation status known, our differentiation understood
-- 7-8: Current tool identified, willing to discuss limitations
-- 5-6: Mentions competitor but limited detail
-- 3-4: Vague mention of "looking at other tools"
-- 1-2: No competition discussed
-
-## Output Format
+## Output format
 
 Generate a markdown MEDDICC analysis with this structure:
 
@@ -247,9 +309,9 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [What quantifiable business outcomes does the buyer care about? Experimentation velocity, cost reduction, engineering time saved, etc.]
 
-**Evidence from calls**: [Specific quotes or details]
+**Evidence from calls**: [Specific quotes or details. If score is unchanged from cumulative state, write: "Maintained at X/10 — no new information in this call, prior evidence stands." If score changed down, write: "Revised from X/10 to Y/10 — [specific evidence from this call that contradicts prior state]."]
 
-**Next steps**: [What question to ask on next call if incomplete]
+**Next steps**: [Required if score below 7/10. Must include contact name or [contact TBD], specific action verb, concrete question, and timing.]
 
 ### E - Economic Buyer
 **Status**: ✅ Identified | ⚠️ Partial | ❌ Unknown
@@ -257,9 +319,9 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [Who has budget authority and makes the final decision?]
 
-**Evidence from calls**: [Specific quotes or details]
+**Evidence from calls**: [Specific quotes or details. Carry-forward language if applicable.]
 
-**Next steps**: [What question to ask on next call if incomplete]
+**Next steps**: [Required if score below 7/10.]
 
 ### D - Decision Criteria
 **Status**: ✅ Identified | ⚠️ Partial | ❌ Unknown
@@ -267,9 +329,9 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [What are the formal evaluation criteria? Must integrate with Snowflake? Need statistical rigor? Budget constraints?]
 
-**Evidence from calls**: [Specific quotes or details]
+**Evidence from calls**: [Specific quotes or details. Carry-forward language if applicable.]
 
-**Next steps**: [What question to ask on next call if incomplete]
+**Next steps**: [Required if score below 7/10.]
 
 ### D - Decision Process
 **Status**: ✅ Identified | ⚠️ Partial | ❌ Unknown
@@ -277,9 +339,9 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [What is the timeline? Who are all the stakeholders? What is the approval process?]
 
-**Evidence from calls**: [Specific quotes or details]
+**Evidence from calls**: [Specific quotes or details. Carry-forward language if applicable.]
 
-**Next steps**: [What question to ask on next call if incomplete]
+**Next steps**: [Required if score below 7/10.]
 
 ### I - Identified Pain
 **Status**: ✅ Identified | ⚠️ Partial | ❌ Unknown
@@ -287,33 +349,34 @@ Generate a markdown MEDDICC analysis with this structure:
 
 [What specific pain are they trying to solve? Is it urgent?]
 
-**Evidence from calls**: [Specific quotes or details]
+**Evidence from calls**: [Specific quotes or details. Carry-forward language if applicable.]
 
-**Next steps**: [What question to ask on next call if incomplete]
+**Next steps**: [Required if score below 7/10.]
 
 ### C - Champion
 **Status**: ✅ Identified | ⚠️ Partial | ❌ Unknown
 **Score**: X/10
 
-[Who is actively selling internally on our behalf?]
+[Who is actively selling internally on our behalf? Score on actions, not enthusiasm.]
 
-**Evidence from calls**: [Specific quotes or details]
+**Evidence from calls**: [Specific quotes or details. Carry-forward language if applicable.]
 
-**Next steps**: [What question to ask on next call if incomplete]
+**Next steps**: [Required if score below 7/10.]
 
 ### C - Competition
 **Status**: ✅ Identified | ⚠️ Partial | ❌ Unknown
 **Score**: X/10
 
-[What other solutions are they evaluating? Current tools? Build vs buy?]
+[What other solutions are they evaluating? Current tools? Build vs buy? All competitors must be from the named set.]
 
-**Evidence from calls**: [Specific quotes or details]
+**Evidence from calls**: [Specific quotes or details. Carry-forward language if applicable.]
 
-**Next steps**: [What question to ask on next call if incomplete]
+**Next steps**: [Required if score below 7/10.]
 
 ## Overall Deal Health
-[Strong / At Risk / Weak - with 2-3 sentence summary of why]
+[Strong / At Risk / Weak — with 2–3 sentence summary grounded in evidence, not seller sentiment.]
 
 ## Critical Next Steps
-[Top 3 priority actions with specific contacts, questions, and timing]
+[Top 3 priority actions. Each must include contact name or [contact TBD], specific action verb, concrete question, and timing. No vague verbs.]
+```
 ```
