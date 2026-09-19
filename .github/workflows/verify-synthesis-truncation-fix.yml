@@ -1,16 +1,28 @@
 name: Verify Synthesis Truncation Fix (one-off)
 
-# One-off diagnostic workflow, not part of the regular gates. Re-runs
-# query_pipeline's and query_stale_deals' realistic baseline questions
-# through the REAL production code path (scripts/test_question.py →
-# route_question()) to confirm the rendered, synthesized answer states
-# the full totals (313 deals for "show me our pipeline"; 64 deals /
-# $987,194.02 for "what deals are stale") now that api/router.py's
-# synthesis-truncation fix (STRUCTURED_HANDLERS-based, see
-# PENDING_WORK.md's "SYSTEMIC FINDING: Synthesis-truncation bug is
-# pipeline-wide") is live. READ-ONLY — route_question() does not write
-# to HubSpot or Supabase (see scripts/test_question.py's own docstring).
-# Safe to delete once this one-time confirmation is done.
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY —
+# route_question() does not write to HubSpot or Supabase (see
+# scripts/test_question.py's own docstring). Reused across two related
+# live verifications rather than creating a second workflow file:
+#
+# 1. query_pipeline's and query_stale_deals' realistic baseline questions
+#    through the REAL production code path (scripts/test_question.py →
+#    route_question()), confirming the rendered, synthesized answer
+#    states the full totals (313 deals for "show me our pipeline"; 64
+#    deals / $987,194.02 for "what deals are stale") now that api/
+#    router.py's synthesis-truncation fix (STRUCTURED_HANDLERS-based, see
+#    PENDING_WORK.md's "SYSTEMIC FINDING: Synthesis-truncation bug is
+#    pipeline-wide") is live. CONFIRMED 2026-09-19 (run 35441623265).
+#
+# 2. Handler 5/6 (query_win_loss) migration to unified routing: Step C's
+#    baseline capture (tests/fixtures/capture_query_win_loss_baseline.py,
+#    direct handler call against live data) plus a live rendered-answer
+#    check through the same real production path, now that query_
+#    win_loss is registered as a dynamic-loop tool — the same synthesis-
+#    layer scrutiny Steps A-D alone don't provide (see PENDING_WORK.md's
+#    Handler 5 entry).
+#
+# Safe to delete once these one-time confirmations are done.
 
 on:
   workflow_dispatch:
@@ -51,3 +63,30 @@ jobs:
           HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
         run: |
           python scripts/test_question.py "what deals are stale"
+
+      - name: "Handler 5 Step C — query_win_loss direct-handler baseline capture"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python tests/fixtures/capture_query_win_loss_baseline.py
+          echo "---- captured fixture ----"
+          cat tests/fixtures/query_win_loss_baseline.json
+
+      - name: "Handler 5 Step C — query_win_loss live rendered answer (unified routing)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          python scripts/test_question.py "why are we losing"
+
+      - name: "Handler 5 Step C — query_win_loss live rendered answer, second phrasing"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          python scripts/test_question.py "give me a win loss summary for this quarter"
