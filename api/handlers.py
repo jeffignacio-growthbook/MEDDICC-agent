@@ -241,20 +241,34 @@ def _labeled_overall(score):
 def _resolve_tw(params: dict) -> dict:
     """Return a resolved time window, defaulting to the current quarter.
 
-    The router always injects params['time_window'], but a handler must never
-    KeyError on a missing param: a raise drops the whole request to the dynamic
-    loop, which burns the query budget and returns nothing useful (the most
-    common user-visible failure in this system). Guarding here keeps every
-    time-scoped handler answerable even when called directly or under test.
+    The router always injects an already-resolved params['time_window']
+    (concrete start/end/label), but a handler must never KeyError on a
+    missing OR unresolved param: a raise drops the whole request to the
+    dynamic loop, which burns the query budget and returns nothing useful
+    (the most common user-visible failure in this system). Guarding here
+    keeps every time-scoped handler answerable even when called directly
+    or under test.
+
+    2026-09-19 (Handler 5 migration audit): a truthy-but-unresolved raw
+    spec (e.g. {"period": "last_N_days", "n": 90}, with no "start"/"end"
+    yet) used to be returned as-is, since the old check was just `if tw:`
+    — every real production path pre-resolves time_window before calling
+    a handler (route_question()'s classifier path, _call_handler_as_tool()
+    for unified-routing handlers), so this never fired live, but it broke
+    this exact docstring's own "answerable... under test" guarantee: a
+    handler called directly with a raw spec (e.g. a baseline-capture
+    script, matching every OTHER param this codebase resolves defensively)
+    got a bare KeyError deep in a filter clause instead of a real answer.
+    Now resolves anything not already carrying both "start" and "end".
     """
     tw = params.get("time_window")
-    if tw:
+    if tw and "start" in tw and "end" in tw:
         return tw
     try:
         from api.time_resolver import resolve_time_window
     except ImportError:
         from time_resolver import resolve_time_window
-    return resolve_time_window({})
+    return resolve_time_window(tw or {})
 
 
 def _resolve_owner_email(params: dict, sb):

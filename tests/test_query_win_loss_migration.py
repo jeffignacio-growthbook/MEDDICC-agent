@@ -17,8 +17,9 @@ separately via a live GitHub Actions run (see PENDING_WORK.md's Handler 5
 entry) and tests/test_synthesis_truncation_fix.py's captured-baseline
 pattern for the offline synthesis-layer proof.
 
-Two real bugs were found and fixed during this handler's Step A/B/D audit
-(not hypothetical — reproduced here):
+Three real bugs were found and fixed during this handler's Step A/B/C/D
+audit (not hypothetical — reproduced here, and #3 was found BY that live
+Step C run crashing):
 
 1. STRUCTURED_HANDLERS["query_win_loss"] only listed "losses" as the
    primary key evaluate_result() checks for data. A genuine wins-only
@@ -38,6 +39,19 @@ Two real bugs were found and fixed during this handler's Step A/B/D audit
    diagnostic behind an unrelated crash. Copied into query_win_loss's own
    first draft during this migration; caught and fixed in all three
    places before this commit.
+
+3. _resolve_tw() — the time-window helper 14 handlers share, query_win_loss
+   included — only guarded against a MISSING time_window, not a truthy
+   but UNRESOLVED one (a raw {"period": ..., "n": ...} spec with no
+   "start"/"end" yet). Its own docstring already promised "answerable...
+   under test," but `if tw: return tw` returned the raw spec verbatim,
+   and query_win_loss's own `tw["start"]` then raised a bare KeyError.
+   Never fired in production (every real path pre-resolves time_window
+   before calling any handler) but broke the very first live Step C
+   baseline-capture run for a non-default time_window on this handler —
+   found by that run crashing, not by inspection. Fixed to resolve
+   anything not already carrying both "start" and "end", benefiting all
+   14 call sites, not just this one.
 """
 import asyncio
 import logging
@@ -262,6 +276,35 @@ def test_correct_data_passes_verification_cleanly():
     print("✓ correct win/loss data passes verification cleanly, no false positive")
 
 
+def test_resolve_tw_handles_unresolved_raw_spec():
+    """Regression test for bug #3: _resolve_tw() must resolve a truthy but
+    unresolved raw time_window spec (missing start/end), not return it
+    verbatim — the exact defect that crashed the live Step C baseline
+    capture with KeyError('start') inside query_win_loss."""
+    from api.handlers import _resolve_tw
+
+    # Missing entirely -> current-quarter default (unchanged behavior)
+    r1 = _resolve_tw({})
+    assert "start" in r1 and "end" in r1
+
+    # Already resolved -> passed through unchanged (unchanged behavior,
+    # matches what every real production path already hands handlers)
+    resolved = {"start": "2026-08-01", "end": "2026-10-31", "label": "FY2027 Q3"}
+    r2 = _resolve_tw({"time_window": resolved})
+    assert r2 == resolved, "an already-resolved time_window must pass through unchanged"
+
+    # Raw, unresolved spec -> must now resolve instead of KeyError-ing
+    # downstream on tw["start"]
+    r3 = _resolve_tw({"time_window": {"period": "last_N_days", "n": 90}})
+    assert "start" in r3 and "end" in r3, (
+        f"a raw unresolved time_window spec must be resolved, not "
+        f"returned verbatim — got {r3!r}"
+    )
+    print("✓ _resolve_tw() now resolves a raw, unresolved time_window spec "
+          "instead of returning it verbatim (fixes the KeyError that "
+          "crashed the live query_win_loss Step C baseline capture)")
+
+
 def test_query_waterfall_and_query_rep_pipeline_details_keyerror_fixed():
     """Regression test for bug #2: both handlers' verify_structured_
     aggregations() failure branches must use the real 'discrepancies' key,
@@ -294,5 +337,6 @@ if __name__ == "__main__":
     test_genuinely_empty_quarter_is_empty()
     test_step_d_planted_discrepancy_is_caught()
     test_correct_data_passes_verification_cleanly()
+    test_resolve_tw_handles_unresolved_raw_spec()
     test_query_waterfall_and_query_rep_pipeline_details_keyerror_fixed()
     print("\n✅ All tests passed")
