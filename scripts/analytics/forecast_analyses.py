@@ -1252,5 +1252,61 @@ def main():
             print(f"\n{result.get('note', '')}")
 
 
+def query_coaching_transcript_coverage(sb=None) -> str:
+    """
+    Fleet-wide coverage sentence for rep-coaching primitives: what fraction
+    of deals have at least one transcript-scored call available (call_scores
+    where text_source='transcript').
+
+    Promoted from scripts/audit_coaching_transcript_coverage.py (PART 1 of
+    the rep-coaching-primitive pre-scoping audit) after the hard transcript
+    gate shipped (2026-09-19). Returns a plain English sentence, never null —
+    permanently embedded unconditionally in assess_rep_coaching()'s output
+    (both insufficient_data and ok paths), the same standard as the HEURISTIC
+    label in pipeline_coverage.py.
+
+    Returns:
+        A plain English sentence describing current transcript coverage across
+        the fleet, e.g. "34.2% of deals have at least one transcript-scored
+        call (42 of 123 deals, based on current data)."
+    """
+    if sb is None:
+        sb = create_client(
+            os.environ['SUPABASE_URL'],
+            os.environ['SUPABASE_SERVICE_KEY']
+        )
+
+    from supabase_client import select_all
+
+    # Total deals in the fleet
+    deals = select_all(sb, "deals", columns="deal_id,deal_status")
+    total_deals = len(deals)
+
+    if total_deals == 0:
+        return ("No deals found in the fleet — transcript coverage cannot be "
+                "computed without a deals table.")
+
+    # Calls with resolved deal_id
+    calls = select_all(sb, "calls", columns="call_id,deal_id")
+    calls_with_deal_id = [c for c in calls if c.get("deal_id")]
+
+    # Call_scores rows where text_source='transcript'
+    call_scores = select_all(
+        sb, "call_scores",
+        columns="call_id,deal_id,text_source",
+        filters=[("eq", "text_source", "transcript")]
+    )
+
+    # Distinct deals with at least one transcript-scored call
+    deals_with_transcript = {cs["deal_id"] for cs in call_scores if cs.get("deal_id")}
+
+    n_with_transcript = len(deals_with_transcript)
+    coverage_pct = (n_with_transcript / total_deals * 100) if total_deals else 0
+
+    return (f"{coverage_pct:.1f}% of deals have at least one transcript-scored "
+            f"call available for coaching analysis ({n_with_transcript} of "
+            f"{total_deals} deals, based on current data).")
+
+
 if __name__ == '__main__':
     main()
