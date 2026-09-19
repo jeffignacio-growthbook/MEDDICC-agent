@@ -2127,6 +2127,48 @@ this entry.
 
 ---
 
+#### 18. `get_week_of_quarter()` Duplicated — Two Independent Implementations, No Shared Source of Truth
+
+**Issue:** The same "which week (1-13) of the fiscal quarter is this
+date" formula exists twice, written independently:
+- `scripts/analytics/snapshot_deals.py::get_week_of_quarter(snapshot_date, quarter_start)`
+  — used by the live/prospective nightly snapshot writer.
+- `scripts/analytics/backfill_snapshots.py::BackfillEngine.week_of_quarter(snapshot_date)`
+  — used by the historical reconstruction path, resolves `quarter_start`
+  internally via `get_fiscal_quarter()`.
+
+Both compute `((snapshot_date - quarter_start).days // 7) + 1`, capped
+to 13, and currently agree. Neither imports from the other.
+
+**Found during:** forecast-trustworthiness primitive design (CRO
+Priority #1, NORTH_STAR.md). The primitive needs "what week of the
+CURRENT quarter is it today" at call time and was pointed at the live
+writer's version (`snapshot_deals.py`) rather than adding a third copy.
+
+**Why it matters:** this is the same failure shape as other duplicated-
+formula bugs found earlier this session (e.g. the two independently-
+coalesced `pipeline_filter` checks in Low Priority #17, and the
+point-in-time reconstruction work's explicit ratchet test
+`test_no_duplicate_reconstruction_implementations` guarding against
+exactly this in `point_in_time.py`) — two copies of one formula don't
+drift until someone fixes a boundary case (leap week, fiscal-year-start
+edge, off-by-one) in one and not the other, and nothing would catch it.
+
+**Status:** NOT BROKEN (both currently agree, confirmed identical
+output shape). Not urgent — logged so it has a paper trail before it
+silently drifts, per the pattern already seen elsewhere tonight.
+
+**Work:** Consolidate to one shared function (e.g. move to
+`point_in_time.py` alongside the other shared population/value
+reconstruction logic, or a small dedicated fiscal-week module), with
+both `snapshot_deals.py` and `backfill_snapshots.py` importing it. Add
+a ratchet test analogous to `test_no_duplicate_reconstruction_implementations`
+if consolidated.
+
+**Complexity:** Low effort, no urgency.
+
+---
+
 ## 📝 Notes
 
 ### Patterns Established
