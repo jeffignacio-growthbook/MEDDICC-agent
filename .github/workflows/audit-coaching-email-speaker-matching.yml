@@ -1,0 +1,44 @@
+name: Audit Coaching Email-Speaker Matching Reliability (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY,
+# Supabase only.
+#
+# Full-population reliability quantification for the email-anchored
+# speaker-matching bridge (call_transcripts.speakers matched against
+# THAT CALL'S OWN calls.participant_emails, not the deal owner's
+# inferred name). Fixes the two known gaps (dotted local-parts,
+# first-initial+lastname conventions) before measuring at scale, and
+# excludes generic/alias emails and non-human speakers explicitly.
+#
+# Report only. No primitive is designed or built here, and this does
+# NOT re-run the won/lost calibration — that stays a separate, later
+# step. Safe to delete once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit coaching email-speaker matching reliability"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/audit_coaching_email_speaker_matching.py
