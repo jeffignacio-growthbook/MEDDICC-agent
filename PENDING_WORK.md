@@ -2127,6 +2127,210 @@ this entry.
 
 ---
 
+#### 18. `get_week_of_quarter()` Duplicated — Two Independent Implementations, No Shared Source of Truth
+
+**Issue:** The same "which week (1-13) of the fiscal quarter is this
+date" formula exists twice, written independently:
+- `scripts/analytics/snapshot_deals.py::get_week_of_quarter(snapshot_date, quarter_start)`
+  — used by the live/prospective nightly snapshot writer.
+- `scripts/analytics/backfill_snapshots.py::BackfillEngine.week_of_quarter(snapshot_date)`
+  — used by the historical reconstruction path, resolves `quarter_start`
+  internally via `get_fiscal_quarter()`.
+
+Both compute `((snapshot_date - quarter_start).days // 7) + 1`, capped
+to 13, and currently agree. Neither imports from the other.
+
+**Found during:** forecast-trustworthiness primitive design (CRO
+Priority #1, NORTH_STAR.md). The primitive needs "what week of the
+CURRENT quarter is it today" at call time and was pointed at the live
+writer's version (`snapshot_deals.py`) rather than adding a third copy.
+
+**Why it matters:** this is the same failure shape as other duplicated-
+formula bugs found earlier this session (e.g. the two independently-
+coalesced `pipeline_filter` checks in Low Priority #17, and the
+point-in-time reconstruction work's explicit ratchet test
+`test_no_duplicate_reconstruction_implementations` guarding against
+exactly this in `point_in_time.py`) — two copies of one formula don't
+drift until someone fixes a boundary case (leap week, fiscal-year-start
+edge, off-by-one) in one and not the other, and nothing would catch it.
+
+**Status:** NOT BROKEN (both currently agree, confirmed identical
+output shape). Not urgent — logged so it has a paper trail before it
+silently drifts, per the pattern already seen elsewhere tonight.
+
+**Work:** Consolidate to one shared function (e.g. move to
+`point_in_time.py` alongside the other shared population/value
+reconstruction logic, or a small dedicated fiscal-week module), with
+both `snapshot_deals.py` and `backfill_snapshots.py` importing it. Add
+a ratchet test analogous to `test_no_duplicate_reconstruction_implementations`
+if consolidated.
+
+**Complexity:** Low effort, no urgency.
+
+**Addendum (found during Step A of `assess_forecast_trust()` implementation):**
+the same underlying pattern extends one level up — "quarter label/date
+-> quarter boundaries" also has multiple independent implementations,
+not just "date -> week number":
+- `scripts/utils.py::get_fiscal_quarter(as_of=None, config=None)` —
+  the canonical date-in, `(q_start, q_end, label)`-out function.
+- `scripts/deal_risk_assessor.py::get_at_risk_deals()` — resolves an
+  explicit `fiscal_quarter` label back to boundaries via its own
+  regex (`FY(\d{4})\s+Q([1-4])`) plus manual calendar math, because it
+  only ever receives a label, never a date.
+- `scripts/analytics/forecast_analyses.py::_quarter_window_iso(sb, quarter)`
+  — resolves a label back to boundaries a third way: looks up any
+  existing `deals_snapshot` row for that quarter, takes its
+  `snapshot_date`, and calls `get_fiscal_quarter()` on that date.
+
+Three call sites, three different strategies for label->boundaries,
+none sharing a source of truth for that direction (only the date->label
+direction is canonical, via `get_fiscal_quarter()`). `assess_forecast_trust()`
+sidesteps this entirely by always starting from a date (`as_of`) and
+calling `get_fiscal_quarter()` directly — it does not add a fourth
+implementation. Not fixing the pre-existing two (`get_at_risk_deals`'s
+regex, `_quarter_window_iso`'s snapshot-lookup) as part of this build —
+out of scope for a primitive that doesn't need label->boundaries at
+all — but logging it here since it's the same class of risk as the
+entry above, one level up the same call chain.
+
+---
+
+#### 19. `api/tools.py::assess_deal_risk()` — Documented `deal_ids` Parameter Is Always Ignored
+
+**Issue:** The `dynamic_query_loop`-facing async wrapper
+`api/tools.py::assess_deal_risk(sb, deal_ids=None, fiscal_quarter=None)`
+documents `deal_ids` as "Optional list of deal IDs to assess (for
+entity-scoped queries). If None, queries all late-stage/COMMIT deals in
+target quarter" — but the implementation never reads it:
+
+```python
+async def assess_deal_risk(sb, deal_ids=None, fiscal_quarter=None):
+    ...
+    raw_result = get_at_risk_deals(sb, fiscal_quarter=fiscal_quarter)
+    ...
+```
+
+`get_at_risk_deals()` always runs its own late-stage-OR-COMMIT query
+regardless of what (if anything) was passed as `deal_ids`. Anyone
+calling this tool with specific `deal_ids` today — e.g. an
+entity-scoped question like "assess risk for these 3 deals" — silently
+gets the full current-fiscal-quarter cohort back instead, with no
+error or warning that the scoping was dropped.
+
+**Different pattern from #18/#18-addendum:** those are duplicated
+formulas that currently agree; this is a documented-but-dead parameter
+— a caller relying on the docstring gets silently wrong scope, not
+just a risk of future drift.
+
+**Found during:** `assess_forecast_trust()` implementation (Step A),
+while confirming `scripts/deal_risk_assessor.py::assess_deal_risk()`
+(the lower-level, general-purpose function this wrapper calls into)
+was the right thing to compose against directly, rather than through
+this wrapper.
+
+**Status:** NOT BROKEN for the wrapper's actual current callers (none
+found passing `deal_ids` in this audit), but the parameter is
+unconditionally a no-op today. Not fixed as part of this build — out
+of scope, `assess_forecast_trust()` doesn't call this wrapper at all.
+
+**Work:** Either wire `deal_ids` through to a scoped query in
+`get_at_risk_deals()` (or a new parameter path), or remove the
+parameter from the signature/docstring until it's implemented, so the
+documented contract matches what the function actually does.
+
+**Complexity:** Low effort, no urgency.
+
+---
+
+#### 20. `api/handlers.py::query_coverage()` — Confirmed Broken, Produces 8,000%+ Nonsense
+
+**Issue:** `query_coverage()` fetches ALL qualified pipeline as a single
+unscoped total (`total_pipeline`), then divides that SAME total against
+EACH individual target row (team-level and every per-rep row alike)
+from `rep_targets`:
+
+```python
+coverage_rows.append({
+    ...
+    "target":   tv,
+    "pipeline": total_pipeline,   # same unscoped total for every row
+    "coverage": round(total_pipeline/max(tv,1)*100, 1),
+})
+```
+
+A rep with a $250k individual target gets `coverage` computed against
+the WHOLE team's qualified pipeline (millions), not their own book —
+producing coverage percentages in the thousands, confirmed live during
+the 2026-09-19 pipeline-coverage audit (NORTH_STAR.md CRO Priority #2).
+
+**Found during:** the pre-build audit for
+`scripts/pipeline_coverage.py::assess_pipeline_coverage()` — confirmed
+live via `scripts/audit_pipeline_coverage.py` before concluding
+pipeline-coverage was a genuine reasoning-layer gap rather than an
+already-solved question.
+
+**Status:** NOT fixed. Out of scope for the `assess_pipeline_coverage()`
+build — that primitive is a new, correctly-scoped composition
+(`api/handlers.py::query_pipeline_coverage`, intent-routed ahead of
+`query_coverage` for coverage questions), not a patch to this handler.
+`query_coverage`'s intent-map entry now flags it as legacy/broken so the
+router prefers `query_pipeline_coverage`, but the handler itself is
+unchanged and still produces this output if reached directly (e.g. via
+the dynamic-query-loop fallback).
+
+**Work:** Either fix `query_coverage()` to scope `pipeline` per-target
+(team total vs. company-wide qualified pipeline; per-rep target vs. that
+rep's own qualified pipeline, via `owner_email`), or remove/deprecate it
+now that `query_pipeline_coverage` exists as the correct, tested
+replacement.
+
+**Complexity:** Low-medium (the fix is a per-row scoping change, not a
+new algorithm) — no urgency now that the router steers questions to the
+correct handler.
+
+---
+
+#### 21. `rep_targets` — Two Live Period-Label Formats for the Same Quarter (`FY2027_Q3` vs `Q3_FY2027`)
+
+**Issue:** Confirmed live during the same 2026-09-19 pipeline-coverage
+audit: the `rep_targets` table has 11 total rows for the current
+quarter, split across TWO different label formats — 7 rows under
+`FY2027_Q3` (from `scripts/seed_targets.py`'s own convention:
+`quarter_key.replace('fy','FY').replace('_q','_Q').upper()`, 6 reps + 1
+team-total row) and 4 rows under `Q3_FY2027` (source unconfirmed —
+plausibly an older seeding pass or a manual Slack `set target` write
+using a different convention). `current_quarter_label()`
+(`api/time_resolver.py`) itself produces `FY2027_Q3` (its own docstring
+example of `'Q3_FY2027'` is stale/wrong — `get_fiscal_quarter()`'s real
+label format is `"FYyyyy Qn"`, underscored), so every handler that
+queries `rep_targets` by `current_quarter_label()`
+(`query_pipeline()`, `query_coverage()`, the new
+`query_pipeline_coverage()`) correctly finds the 7 `FY2027_Q3` rows —
+but the 4 `Q3_FY2027` rows are silently invisible to all of them. Same
+class of finding as an earlier-session incident (TEST 0r, "FY2027 Q2"
+vs "Q3_FY2027" quarter-label-convention risk).
+
+**Found during:** the `rep_targets`-population confirmation step for
+`assess_pipeline_coverage()`'s Step A (`scripts/audit_rep_targets_all_periods.py`).
+
+**Status:** NOT fixed — does not currently produce wrong output (the
+canonical format is the one every handler queries), but is dead/orphaned
+data sitting under the wrong key, and a latent trap for any future code
+that queries `rep_targets` without going through
+`current_quarter_label()`.
+
+**Work:** Identify the source of the 4 `Q3_FY2027` rows (check
+`set_target` handler's own period-formatting logic against
+`seed_targets.py`'s), reconcile or delete the orphaned rows, and — if
+`set_target` is the source — fix it to use the same canonical format
+`current_quarter_label()`/`seed_targets.py` already agree on.
+
+**Complexity:** Low effort (a data cleanup + one formatting fix), no
+urgency — not currently causing wrong output, but should not be left to
+silently accumulate more orphaned rows each quarter.
+
+---
+
 ## 📝 Notes
 
 ### Patterns Established
@@ -2337,4 +2541,458 @@ correct baseline.
 
 **Impact**:
 Users now get complete, accurate pipeline views matching handler's "never filters by close_date" design intent.
+
+
+## ✅ SYSTEMIC FINDING: Synthesis-truncation bug is pipeline-wide, not Handler-4-specific (2026-09-19) — FIXED
+
+**Status update (2026-09-19, same day): fixed at the source.** The
+narrow, shape-specific detection condition described below has been
+replaced with a structural one in `api/router.py`:
+`tool_name in api.evaluator.STRUCTURED_HANDLERS` (the same registry
+`evaluate_result()` already uses to know a handler's return isn't raw
+"rows" to sample — hoisted from a function-local dict to a module-level
+constant in `api/evaluator.py` so `router.py` can share it). Extracted
+into one shared helper, `_serialize_tool_result_for_synthesis()`, used
+at **both** truncation sites — the main loop body, and a **second,
+independently-broken, unconditional `[:3000]` site inside
+`_append_tool_result_message()`** (found during this fix, not part of
+the original report below) used by three early-return synthesis
+shortcuts (`query_pipeline_movement` fast-path, `dimension_retry_
+succeeded`, `id_scoped_enrichment_lookup`) — the original Handler 4 fix
+never touched this second site, so a structured handler reaching
+synthesis through one of those shortcuts was still silently truncated
+even after that fix shipped.
+
+This automatically covers `query_waterfall` too (already registered in
+`STRUCTURED_HANDLERS` as `["pipeline_summary", "waterfall"]`), even
+though no baseline fixture exists to empirically confirm its real
+payload size — see `test_query_waterfall_is_covered_by_the_same_
+structural_fix` below.
+
+**Verification:** `tests/test_synthesis_truncation_fix.py` drives the
+real `dynamic_query_loop` end-to-end (scripted LLM responses; only the
+handler functions are stubbed, returning the EXACT captured production
+baseline data from `tests/fixtures/query_pipeline_baseline.json` and
+`query_stale_deals_baseline.json` — not synthetic data) and confirms:
+the full 7,654-char/313-deal `query_pipeline` payload and the full
+14,207-char/64-deal `query_stale_deals` payload both now reach the
+synthesis call intact (including a real company name from each — "UPS"
+/ "Opera" — that sits past the old 3000-char cutoff); a negative control
+proves the `STRUCTURED_HANDLERS` check specifically (not the test
+harness) is what makes the data visible; `query_waterfall` is covered
+via a synthetic payload shaped like its real, uncapped return value; and
+a genuinely unstructured raw-row result (`filter_table`) is confirmed
+**still** truncated, proving the fix didn't disable truncation
+universally. Wired into `.github/workflows/gate-tests.yml` as TEST 0z.
+
+**Not independently confirmable in this environment:** an actual live
+LLM producing correct synthesized English from this data — no
+`ANTHROPIC_API_KEY` / live Supabase credentials are available here. The
+test instead proves the exact thing that was broken (the content handed
+to the model), which is the full extent verifiable without live
+credentials. A live re-ask of "show me our pipeline" / "what deals are
+stale" in Slack is the remaining confirmation step, same as any other
+fix from this session that needed live access (see High Priority #2 and
+similar entries above).
+
+**Existing baseline-capture scripts left unchanged, deliberately:**
+`capture_query_pipeline_baseline.py` / `capture_query_stale_deals_
+baseline.py` call handlers directly, bypassing `api/router.py`'s
+synthesis step entirely — they verify handler output, never what the
+LLM receives, which is why they never caught this bug class in 4
+handler migrations. Rather than rewire them to also drive a live LLM +
+Supabase (slow, non-deterministic, and costly on every CI run, for a
+check that doesn't need either), the fix is verified by a separate,
+deterministic synthesis-level test using the same captured baseline
+JSON. If a future change needs the baseline scripts themselves to
+exercise the full router path, that's a bigger, separate lift (real
+LLM + live DB in CI) and should be scoped on its own, not bundled into
+this fix.
+
+**Original report follows, preserved for context:**
+
+**Discovered while auditing the 3 previously-migrated handlers (query_pipeline,
+query_stale_deals, query_waterfall) after the Handler 4 fix above, before
+proceeding to Handler 5.** This is logged separately from the Handler 4 entry
+because it is not a query_rep_pipeline bug — it is a property of the shared
+synthesis step in `api/router.py` (~line 4877) that every handler and every
+future handler passes through.
+
+### The mechanism
+
+Before a tool result reaches the LLM for synthesis, `api/router.py` checks:
+
+```python
+is_complete_structured = ("summary" in result and "total_deals" in result.get("summary", {}))
+```
+
+If this is False, the result is silently hard-truncated with `json.dumps(result, default=str)[:3000]`
+before the LLM ever sees it — mid-list, mid-object, wherever 3000 chars lands.
+The LLM then synthesizes an answer from whatever fragment survived, with no
+signal to itself or the user that the data was cut.
+
+This condition only matches a payload with a **top-level `summary` key that
+itself contains a `total_deals` key** — the exact shape `query_rep_pipeline`
+happens to return. It is not a general "is this a complete structured
+dataset" check; it is a check for one handler's specific return shape.
+
+### Exposure of the 3 previously-migrated handlers, checked directly against real captured output
+
+| Handler | Has `summary.total_deals` shape? | Realistic-question payload size | Exposed? |
+|---|---|---|---|
+| `query_pipeline` | **No** — `total_deals` is top-level, no `summary` key at all | 6,856–7,654 chars across all 5 baseline test cases (`tests/fixtures/query_pipeline_baseline.json`) | **Yes — every captured test case exceeds 3000 chars** |
+| `query_stale_deals` | **No** — `stale_count`/`total_stale_pipeline` are top-level, no `summary` key | Default/unscoped question ("what deals are stale"): **14,207 chars** (`tests/fixtures/query_stale_deals_baseline.json`, 3 of 6 test cases at this size). Single-owner-scoped questions: 1,891 chars (safe) | **Yes for the realistic default question — nearly 5x the truncation threshold.** Only owner-narrowed questions happen to stay under 3000 by coincidence of a smaller deal list, not by design |
+| `query_waterfall` | **No** — top-level keys are `pipeline_summary`, `waterfall`, `period`, `report_shape`, `cache_payload`; `pipeline_summary` is a different key than `summary` and the condition checks the literal string `"summary"` | Not empirically captured — **no baseline fixture exists for this handler** (no `capture_query_waterfall_baseline.py`, unlike the other two). Structural estimate: `cache_payload.deals` is an uncapped `select_all()` over all deals closing in the time window (no `[:20]` or similar limit anywhere in the handler), stacked on top of `pipeline_summary.by_stage`, `needs_attention` lists, and the `waterfall` weekly rows — almost certainly exceeds 3000 chars for any non-trivial time window, consistent with `query_pipeline`'s capped 20-deal list alone already costing ~7000 chars | **Structurally confirmed to bypass the fix's detection condition; size not empirically measured — measuring it requires a live DB capture, which the environment used for this audit does not have credentials for** |
+
+**Conclusion: all 3 previously-migrated handlers are structurally guaranteed to
+bypass the fix's detection condition** (none has a `summary.total_deals`
+shape), and at least 2 of 3 (`query_pipeline`, `query_stale_deals`) are
+empirically confirmed, from their own captured baseline data, to produce
+payloads well over the 3000-char cutoff for realistic, unscoped questions —
+meaning they hit the *exact* same silent-truncation-before-synthesis bug
+Handler 4 had, right now, in production, independent of and prior to any
+Handler 5 work.
+
+### Why the existing "Step C" baselines did not catch this
+
+`tests/fixtures/capture_query_pipeline_baseline.py` and
+`capture_query_stale_deals_baseline.py` both call the handler function
+**directly** (`await query_pipeline({}, sb)`, `await query_stale_deals({}, sb)`),
+bypassing `api/router.py` entirely. Their `critical_fields_to_verify` lists
+(`total_deals`, `by_stage`, `by_owner`, `stale_count`, `total_stale_pipeline`,
+deal-list lengths) are all fields of the **raw handler return value**. These
+baselines never invoke the synthesis step and never capture or compare any
+LLM-synthesized text at all — this is stronger than "only spot-checked that
+the answer looked reasonable": there is no synthesized-answer check present
+in these fixtures whatsoever. `query_waterfall` has no baseline fixture of
+either kind.
+
+The Handler 4 bug itself was only caught because it happened to be tested
+live through the full Slack → router → synthesis path ("show me Christian's
+pipeline" → "94 total active deals" — no equivalent fixture file exists for
+`query_rep_pipeline` either). Nothing currently in the automated test suite
+exercises the truncation-then-synthesis step at all — a repo-wide grep for
+the fix's own marker strings (`is_complete_structured`, `COMPLETE DATASET`,
+`[:3000]`) returns zero matches under `tests/`.
+
+### Why structured verification ("Step D", `verify_structured_aggregations()`) does not protect against this
+
+`verify_structured_aggregations()` runs **inside each handler, before
+`return`** — it checks the handler's own internal aggregation math (e.g. that
+`by_stage`/`pipeline_summary.total_open_arr` sums match a recomputation from
+raw rows). By the time its result reaches `api/router.py`'s truncation step,
+verification has already passed and returned. It has no visibility into, and
+provides no protection against, what happens to that already-verified object
+on its way to the LLM. A handler can pass `verify_structured_aggregations()`
+with a perfectly correct return value and still have the user see a wrong
+answer, because the corruption happens strictly after verification, in a
+step verification never touches. This is true of `query_pipeline` and
+`query_waterfall` today (both call `verify_structured_aggregations()` at
+return) and was true of `query_rep_pipeline` before its fix.
+
+### Forward-looking implication
+
+**Any current or future handler** — migrated to unified routing or not —
+that returns a payload without the specific `summary.total_deals` shape, and
+whose realistic-question payload exceeds 3000 chars, is exposed to this same
+silent truncation, regardless of how well-tested its internal aggregation
+logic is. This includes Handler 5 and Handler 6 (not yet migrated) and any
+handler built after this point. Passing `verify_structured_aggregations()`
+and having a fixture-based baseline in the current style are both
+insufficient to catch it, because neither exercises the synthesis step.
+
+**[Superseded by the "FIXED" status update at the top of this entry —
+left here for history.] Not fixed in this pass** — this was a report,
+per explicit instruction at the time, to establish full exposure before
+Handler 5 proceeded or Handler 4 was considered closed. Two directions
+were visible during this audit but not evaluated for tradeoffs or
+implemented then:
+1. Generalize the detection condition to something structural (e.g. "does
+   this result contain a count/total field anywhere, regardless of nesting"
+   or "is this a `dict`, not a `rows` list, at all" — the latter matches the
+   comment already in the code: "Row-based results are already
+   sampled/aggregated" implies the *intent* was "any non-row-based
+   structured result," not "only this one handler's shape"). **Done** —
+   implemented as option 1's spirit, via `STRUCTURED_HANDLERS` membership
+   rather than a `dict`-vs-`rows` shape check (a cleaner structural signal
+   already single-sourced elsewhere, per Jeff's direction).
+2. Add a baseline-capture mode that runs the full router/synthesis path (not
+   just the bare handler call) and asserts the synthesized text's stated
+   count/total against the verified raw data, for every migrated handler —
+   closing the exact gap that let the Handler 4 bug through 3 handler
+   migrations before anyone was testing that path at all. **Done**, via a
+   separate dedicated test (`tests/test_synthesis_truncation_fix.py`)
+   rather than rewiring the existing baseline-capture scripts themselves —
+   see the "Existing baseline-capture scripts left unchanged" note above
+   for why.
+
+
+## ✅ Phase 2 Handler 5/6 (query_win_loss) — Migrated, 3 real bugs found
+
+**Date**: 2026-09-19. Steps A/B/C/D done; live-verified via GitHub
+Actions (Agent environment secrets) since this environment has no local
+credentials — see the two runs linked below.
+
+**STEP A (parameter completeness):** No gaps. `time_window` is the
+generic schema field, pre-resolved by `_call_handler_as_tool()` before
+any registered handler runs; `deal_ids` is injected by the same generic
+entity-scope/pronoun-resolution/explicit-ID mechanism every handler
+(migrated or not) already relies on.
+
+**STEP B (registration):** Added to the `tool_fn` dict, the dynamic
+loop's tool-description section, and the classifier bypass list.
+
+**STEP D (structured verification):** `query_win_loss` had no
+`verify_structured_aggregations()` call at all — added one, verifying
+`win_count`/`loss_count` against the actual won/lost split, tested with
+a planted discrepancy (`tests/test_query_win_loss_migration.py`).
+
+**STEP C (baseline + live verification):** capture script added
+(`tests/fixtures/capture_query_win_loss_baseline.py`). Two live GitHub
+Actions runs against the `Agent` environment's real Supabase/HubSpot/
+Anthropic secrets:
+- Run 1 ([35442311297](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35442311297)) — **failed** on the baseline capture step, surfacing real bug #3 below.
+- Run 2 ([35442557240](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35442557240)) — **succeeded** after the fix. Baseline: current quarter = 7 wins / 80 losses ($322K win ARR, 142,742-char full payload); last 90 days = 39 wins / 199 losses. Live rendered answers for two independent phrasings ("why are we losing", "give me a win loss summary for this quarter") both correctly stated **7 wins ($322K ARR) vs. 80 losses**, with real deal names (Comcast $350K, Fanatics Live $250K, ASN Bank lost to Adobe Target, etc.) and an honest data-quality caveat — no truncation, no hallucination, consistent across both phrasings.
+
+**Three real bugs found and fixed during this audit** (not
+hypothetical — this handler surfaced independent bugs the same way
+every other handler touched this session has):
+
+1. **`STRUCTURED_HANDLERS["query_win_loss"]` only checked `"losses"`.**
+   A genuine wins-only quarter (real wins, zero losses — a *good*
+   outcome) would return `losses=[]` and get misclassified as `"empty"`
+   by `evaluate_result()`, discarding a real answer. Fixed to check
+   `"wins"` OR `"losses"` (`api/evaluator.py`).
+
+2. **`query_waterfall` and `query_rep_pipeline`'s verification-failure
+   branches read `verification_result['details']`**, but the real
+   return key on failure is `'discrepancies'` (confirmed against
+   `api/structured_verification.py`'s own docstring and its two other
+   call sites, `query_pipeline`/`query_stale_deals`, which already use
+   the correct key). A genuine verification failure in either handler
+   would have raised `KeyError` instead of the intended, clear
+   `ValueError` message — copied into `query_win_loss`'s own first
+   draft during this migration, caught and fixed in all three places.
+
+3. **`_resolve_tw()` — shared by 14 handlers — didn't resolve a
+   truthy-but-unresolved raw `time_window` spec**, only a missing one
+   (`if tw: return tw` returned a raw `{"period": ..., "n": ...}` dict
+   verbatim). Never fired in production (every real path pre-resolves
+   `time_window` before calling any handler) but broke the function's
+   own documented "answerable... under test" guarantee, and is exactly
+   what crashed the live Step C baseline-capture run above with
+   `KeyError: 'start'`. Fixed to resolve anything not already carrying
+   both `"start"` and `"end"`, benefiting all 14 call sites.
+
+**Also notable, not a bug:** `query_win_loss`'s full current-quarter
+payload is 142,742 chars — by far the largest of the 5 migrated
+handlers (query_stale_deals' was 14,207). Now safely un-truncated per
+the `STRUCTURED_HANDLERS` fix above, and the live run confirms the LLM
+handles it correctly, but this is a real cost/latency data point:
+`narratives` (free-text weekly AI narratives) is the likely dominant
+contributor. Worth a future look at whether `query_win_loss` needs its
+own internal capping/summarization for cost, independent of the
+truncation-correctness question this session was about — not urgent,
+not a correctness bug, just flagged so it isn't rediscovered as a
+surprise later.
+
+**Status: Handler 5/6 complete, live-verified, ready for Handler 6
+(query_deals_at_risk).**
+
+
+## ✅ Phase 2 Handler 6/6 (query_deals_at_risk) — Migrated, final handler in the set
+
+**Date**: 2026-09-19. Steps A/B/C/D done, live-verified via GitHub
+Actions — this is the last of the 6 Phase-2 handlers (plus the Phase 1
+query_pipeline_movement pilot), so all 7 unified-routing handlers are
+now migrated and live-verified.
+
+**STEP A:** No gaps — `deal_ids` and `time_window` both reach the
+handler via the same generic mechanisms every other handler relies on.
+
+**STEP B:** Registered in `tool_fn`, tool description, classifier
+bypass list. **Real bug found and fixed BEFORE any live run** (Step
+A/B review alone, not live testing): `STRUCTURED_HANDLERS` had no entry
+for `query_deals_at_risk` at all, and a naive `["deals_at_risk"]`-only
+entry would have reproduced `query_win_loss`'s exact wins-only mistake
+— the genuinely-empty "no deals at risk" case has an empty
+`deals_at_risk` list but a complete, human-readable `message`
+explaining why. Registered as `["deals_at_risk", "message"]` so that
+case classifies `"good"` instead of `"empty"` (which would have wasted
+a dynamic-query fallback on a question the handler already answered).
+
+**STEP D:** `query_deals_at_risk` had no `verify_structured_
+aggregations()` call — added one verifying `total_at_risk` against the
+real count *before* the top-10 display slice, tested with a planted
+discrepancy.
+
+**STEP C (baseline + live verification):** capture script added
+(`tests/fixtures/capture_query_deals_at_risk_baseline.py`), including a
+raw-unresolved `time_window` case specifically re-testing the
+`_resolve_tw()` fix from Handler 5's audit against this handler too —
+**confirmed it protects this handler as well** (no crash; baseline:
+current scope = 63 at-risk deals, raw last-30-days spec = 52, both
+succeeded). Live GitHub Actions run
+([35443858332](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35443858332)):
+"which deals are at risk" correctly routed to `query_deals_at_risk`
+(`[HANDLER] query_deals_at_risk → good`, confirming the STRUCTURED_
+HANDLERS fix classifies correctly) and answered **"63 deals flagged at
+risk"** — exact match to the baseline capture's 63 — with real company
+names (UPS $300K, ClickHouse $200K, etc.), real risk flags, and a
+genuine pattern observation (Discovery-stage deals lacking Pain/
+Champion scores, likely call-coverage gaps).
+
+**Honest note on the second live phrasing:** "which deals have champion
+gaps this quarter" did **not** route to `query_deals_at_risk` — the
+classifier picked `query_deal_health` (confidence 0.95) instead, a
+different, pre-existing, unmigrated handler. Confirmed this is **not a
+regression from this migration**: `query_deal_health` isn't in the
+unified-routing bypass list, was never touched by this work, and the
+ambiguity is a genuine natural-language one between two legitimate
+handlers with overlapping claims on "champion gaps" phrasing — exactly
+the kind of classifier routing ambiguity `docs/UNIFIED_ROUTING_
+ARCHITECTURE.md` names as a demonstrated bug class motivating the whole
+migration, just not one this session chased down (out of scope: neither
+handler was wrong to want that phrasing, and `query_deal_health` isn't
+part of the Phase 2 migration set). So Handler 6 has ONE exact-match
+live confirmation, not two — reported honestly rather than treating the
+second run as a second success.
+
+**No new `STRUCTURED_HANDLERS`/`['details']`-class bugs found in this
+handler beyond the one listed above** — the `_resolve_tw()` and
+`verification_result['details']` bugs were both shared-code issues
+already fixed during Handler 5's audit and confirmed (via the raw-spec
+baseline test case above) to already protect this handler too.
+
+**Status: Phase 2 migration COMPLETE.** All 7 unified-routing handlers
+(`query_pipeline_movement`, `query_pipeline`, `query_stale_deals`,
+`query_waterfall`, `query_rep_pipeline`, `query_win_loss`, `query_deals_
+at_risk`) are migrated, registered in `STRUCTURED_HANDLERS` (so none of
+them can hit the synthesis-truncation bug class), have structured
+verification wired, and have at least one live-verified exact-match
+rendered answer. Remaining follow-ups from this whole audit, not
+blocking: (1) `query_win_loss`'s 142K-char payload as a future cost/
+latency look; (2) the `query_deal_health` / `query_deals_at_risk`
+phrasing ambiguity noted above, if it's ever worth disambiguating
+further; (3) the deferred `docs/UNIFIED_ROUTING_ARCHITECTURE.md` Phase 2
+follow-through items (removing `HANDLER_DESCRIPTIONS` entries for
+migrated handlers, removing now-dead redirect logic) — cosmetic/cleanup,
+not correctness, left for a deliberate separate pass.
+
+
+## 📊 EVIDENCE AUDIT: What primitive to build next (2026-09-19, report only — nothing built)
+
+**Purpose:** replace the roadmap's guess-based ordering with real
+frequency data from `query_cost_log` (every `dynamic_query_loop`
+invocation, full history — 166 rows) and `learning_log` (assessor
+correctness signals, full history — 517 rows). Script:
+`scripts/audit_dynamic_query_failure_shapes.py`, run live via
+[`audit-dynamic-query-failure-shapes.yml`](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35444671737)
+(one-off, read-only).
+
+**Population:** 82 of 166 query_cost_log rows (49.4%) were not a clean
+answer — 37 failed outright (exception/other_fallback), 17 shipped
+caveated, 28 needed a resynthesis. From learning_log: 105 floor
+rejections, 10 `should_be_dynamic` flags, 402 ordinary dedicated-handler
+mistakes (excluded from shape analysis — those are bugs in an existing
+handler, not evidence for a new primitive). 197 rows total went into
+shape classification (a live Haiku call per batch, role=evaluator).
+
+**Methodology note, disclosed rather than hidden:** batching the Haiku
+classification calls (40 questions/call) let the model coin a fresh
+label per batch instead of reusing one — the raw output had 35 near-
+duplicate labels (`pipeline movement tracking`, `pipeline trend`,
+`pipeline velocity`, `pipeline trend analysis`, ... all the same
+underlying need). The counts below are **consolidated by hand from the
+actual example questions in each raw label** — a more reliable ground
+truth than trusting the model to self-merge — not the raw per-batch
+output. Full raw output is in the workflow run's log if anyone wants to
+re-check the consolidation.
+
+**A second, code-verified correction, not a guess:** once a handler is
+added to the classifier bypass tuple (all 7 unified-routing handlers,
+6 of them migrated THIS session), it can never again produce a
+`floor_rejection` learning_log row — that check only runs for handlers
+still on the classifier path, and bypassed handlers are redirected to
+`dynamic_query` *before* the floor check ever executes. So any
+`floor_rejection` evidence whose shape maps to an already-migrated
+handler is now structurally impossible to recur, confirmed by reading
+`route_question()`'s own code order, not inferred from timestamps
+(which weren't captured in this pass). Resynthesis/caveat/exception/
+`should_be_dynamic` evidence is NOT covered by this correction — those
+are dynamic_query's own synthesis behavior or a dedicated handler's
+substantive wrongness, neither of which the routing migration touches.
+
+### Consolidated shape frequency (raw → adjusted after removing migration-fixed floor_rejections)
+
+| Shape | Raw count | Migration-fixed portion | Adjusted (still open) | % of adjusted total |
+|---|---|---|---|---|
+| Pipeline movement / trend over time | 100 | 66 (floor_rejection, now-migrated `query_pipeline_movement`/`query_waterfall`) | **34** | 34.7% |
+| Pipeline current state / snapshot | ~29 | 4 | **25** | 25.5% |
+| Risk/likelihood judgment | 18 | 0 (not a migrated-handler concept) | **18** | 18.4% |
+| Stale deals | 18 | 10 (`query_stale_deals`, migrated) | **8** | 8.2% |
+| Rep coaching / activity metrics | 6 | 0 | **6** | 6.1% |
+| Data hygiene / corrections | ~5–6 | 0 | **~5** | 5.1% |
+| Pipeline segmentation (geo/market) | 3 | 0 | **3** | 3.1% |
+| Why did we win/lose | 4 | 3 (`query_win_loss`, migrated) | **1** | 1.0% |
+| Competitive positioning | 1 | 0 | **1** | 1.0% |
+| Forecast trustworthiness | 1 | 0 | **1** | 1.0% |
+| Objection patterns | 1 | 0 | **1** | 1.0% |
+| Sales cycle velocity | 1 | 0 | **1** | 1.0% |
+| *(meta/noise — bot complaints, acknowledgments, "run that query" — excluded)* | ~8 | — | — | — |
+
+**Two honest caveats on the numbers, not swept under the rug:**
+
+1. **Risk/likelihood judgment's 18 is one person retrying one exact
+   question** ("please look at all hubspot deals in the 'negotiating'
+   or 'awaiting signature' stages and assess them based on likelihood
+   to close vs risk") repeatedly, not 18 distinct asks. As a *distinct-
+   question* count it's ~1; as a *this kept failing and someone kept
+   trying anyway* signal it's real and matches this session's own
+   earlier `assess_deal_risk()`/`deal_risk_assessor.py` scoping work
+   directly — a live, previously-uncounted confirmation that the demand
+   for it is real, not hypothetical.
+2. **The "adjusted" pipeline-movement/snapshot numbers (34, 25) are a
+   floor, not a ceiling** — some of their remaining resynthesis/caveat
+   rows may *also* already be fixed by this session's synthesis-
+   truncation fix (a `caveated:answered_with_unverified_aggregation`
+   result on a large pipeline payload is exactly this bug's signature),
+   but confirming that needs each row's `primitives_fired`/timestamp
+   cross-referenced against the truncation-fix commit, which this pass
+   didn't do. So 34 and 25 are conservative upper bounds on what's
+   still genuinely open there, not confirmed floors.
+
+### Reading the ranking
+
+**Risk/likelihood judgment is the strongest *qualified* signal for a
+new primitive**: fully unaffected by tonight's routing/truncation
+fixes, matches a primitive already designed (not from scratch) in this
+session's earlier `assess_deal_risk()` scoping and the pulled-in
+`scripts/deal_risk_assessor.py`, and the repeated-retry pattern is
+itself evidence of real, unresolved frustration — just don't read "18"
+as "18 different people asked this."
+
+**Pipeline movement/snapshot's raw dominance (65% of all evidence
+combined) is real but mostly not a call for a NEW primitive** — the
+handlers already exist (`query_pipeline_movement`, `query_pipeline`,
+`query_waterfall`, `query_rep_pipeline`); the bulk of the evidence is
+either a routing-confidence problem this session's own migration
+structurally closed tonight, or (plausibly, unconfirmed) the synthesis-
+truncation bug this session also already fixed. Worth a live spot-check
+of a few of the remaining "adjusted" rows before assuming they're still
+open, not worth a new primitive.
+
+**Everything else (rep coaching, data hygiene, pipeline segmentation,
+win/loss, competitive positioning, forecast trustworthiness, objection
+patterns, sales cycle velocity) is real but low-volume** — none has
+enough distinct occurrences in the available history to outrank risk/
+likelihood judgment on frequency alone. Objection patterns and
+competitive positioning both already appear as named gaps elsewhere
+(objection vault extraction is on the "Pending features" list at the
+top of this file); this audit doesn't newly discover them, it just adds
+a real (if thin: n=1 each) frequency data point to what was previously
+a pure guess.
+
+**No primitive was designed or built in this pass — report only, per
+explicit instruction.**
 

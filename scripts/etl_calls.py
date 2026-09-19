@@ -895,7 +895,7 @@ def main():
                         cid, src = str(c.get('id') or ''), c.get('source') or ''
                         if not cid or not src:
                             continue
-                        utts, err = fetch_utterances(src, cid, clients)
+                        utts, err, extra = fetch_utterances(src, cid, clients)
                         if err:
                             # Transient fetch failure — don't write a row; the
                             # call is left absent so the next nightly re-attempts
@@ -903,7 +903,7 @@ def main():
                             deferred += 1
                             continue
                         rows.append(build_transcript_row(src, cid, utts, error=None,
-                                                         call_date=c.get('date')))
+                                                         call_date=c.get('date'), extra=extra))
                 stored = sb.bulk_upsert_transcripts(rows)
                 have = sum(1 for r in rows if r.get('transcript'))
                 print(f"  ✓ Supabase: {stored} transcripts upserted "

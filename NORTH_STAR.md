@@ -65,82 +65,122 @@ Never guess thresholds. Every classification boundary (at-risk, stale, overdue) 
 
 **Context**: Aggregation correctness (Phase 1) protects data integrity. The reasoning layer interprets PATTERNS across that data to answer "why" and "what should we do" questions. Each primitive below represents a cross-cutting analytical capability motivated by real user questions.
 
-**Source**: Audited from query_cost_log (300 recent questions, 2026-09-17) and conversation history. Questions marked with ✓ were answered; ✗ indicates partial/failed attempts.
+**Source (2026-09-19 revision)**: This ordering was built from Jeff's
+direct domain expertise — what a CRO, and separately what a marketing/
+RevOps lead (Lyndsie), actually asks in the role — **not** from a
+query_cost_log audit. It replaces the earlier version of this section,
+which was sourced from a 300-question query_cost_log sample
+(2026-09-17). A query_cost_log/learning_log audit against real usage is
+still recommended as a future validation step to confirm or reorder
+this list (see "Real-Usage Cross-Check" below for a first pass at
+that, done against the *prior* version of this list) — but this
+ordering is the working plan until that validation happens.
 
-### Priority 1: Cross-Rep Trend Analysis
+### CRO-facing primitives, in priority order
 
-**Real Questions**:
-- ✓ "Show me win rate by segment for Q3"
-- ✗ "How's Scott's call quality been this month?"
-- ✗ "How many meetings has Jake Stangl's SDR pipeline generated this quarter"
+1. **Forecast trustworthiness** — "how much should I believe this
+   quarter's number." Built and verified (2026-09-19):
+   `scripts/forecast_trust.py::assess_forecast_trust()` composes
+   `assess_deal_risk()` (run directly on the current quarter's own
+   COMMIT+MOST_LIKELY cohort, not the COMMIT-only scope
+   `assess_deal_risk` was originally scoped for) with a pooled,
+   week-indexed historical calibration baseline
+   (`query_commit_ml_calibration_by_week()`, `forecast_analyses.py`) —
+   a moving comparison against whichever week the current quarter is
+   actually in, never a fixed anchor. Gated below week 3 (reps
+   structurally don't tag Commit/Most-Likely with real forecasting
+   intent that early). See the 2026-09-19 Decision Log entry below for
+   the full design.
+2. **Pipeline health/coverage** — Built and verified (2026-09-19):
+   `scripts/pipeline_coverage.py::assess_pipeline_coverage()`. Audited
+   first: `query_pipeline()`/`query_coverage()` already compute a
+   coverage ratio, so this was NOT a from-scratch gap — but
+   `query_coverage()` is confirmed broken in production (8,000%+
+   nonsense), and neither weights pipeline by historical stage-level
+   close rate or reports gap-to-goal against a real target. New+
+   Expansion-ARR-only, qualified-pipeline-only (reusing the existing
+   split and qualification boundary exactly), stage-weighted (fresh
+   `query_stage_close_rate()` — no per-stage close-rate primitive
+   existed to reuse), compared against a REAL current-quarter
+   quota+stretch target (`config/targets.yaml`), always phrased
+   gap-to-goal, never a bare ratio. A HEURISTIC historical coverage
+   curve (2x-prior-year-actual proxy — confirmed live that no complete
+   historical quarter ever had a real target) is shown for context
+   only, permanently labeled as such. See the 2026-09-19 Decision Log
+   entry below for the full design.
+3. **Deal risk/likelihood to close** — covered by `assess_deal_risk()`,
+   cycle-length signal only. This is the gap that started this whole
+   thread of work.
+4. **Rep performance and coaching signal** — no primitive exists.
+5. **Win/loss pattern reasoning** — `query_win_loss` exists as a
+   lookup, not yet a reasoning primitive (no synthesis over WHY, just
+   what).
+6. **Territory/segment/region performance comparison** — dimension
+   resolution exists, no comparative-reasoning layer on top.
 
-**Primitive**: `compute_cohort_performance_trends(dimension, metric, time_window)`
-- **What it does**: Compute metric (win rate, call quality, meeting generation) grouped by dimension (segment, rep, region) over time window, with statistical significance flags for outliers
-- **Why it's hard**: Need historical baseline, variance calculation, multi-dimensional grouping
-- **Status**: **PARTIAL** - Individual metrics exist (win_rate in query_win_loss, sdr_metrics per rep) but no cross-cohort comparison or trend detection
-- **Blocks**: Rep coaching prioritization (can't identify "who's struggling" without cohort context), forecast confidence (can't assess rep-level reliability)
+### Marketing/RevOps-lead-facing primitives (Lyndsie), in priority order
 
-### Priority 2: Win/Loss Attribution
+1. **Pipeline generation by source/channel** — no primitive exists.
+2. **Country/segment/region breakdown** — a real question was asked
+   live (the EMEA country-breakdown thread); not yet a governed
+   dimension the way region/segment/owner already are.
+3. **Conversion rate by stage/source** (MQL-to-SQL-style) — no
+   primitive exists.
+4. **Data hygiene/attribution quality as a queryable signal** —
+   currently only surfaces as an aside in prose answers, never directly
+   queryable.
 
-**Real Questions**:
-- ✓ "What was the closed won/lost split in EMEA last quarter?"
-- ✓ "Why wasn't this deal included in the German closed won calculations?"
-- Current: competitive_intel exists but only searches mentions, doesn't attribute outcomes
+### Real-Usage Cross-Check (2026-09-19 full-history audit)
 
-**Primitive**: `attribute_outcome_to_factors(deal_id, outcome, candidate_factors)`
-- **What it does**: For a won/lost deal, rank contributing factors (competitor mentioned, missing champion, pricing objection, segment, cycle time variance) by attribution weight
-- **Why it's hard**: Causation vs correlation, sparse data (only 327 historical wins), need multi-factor modeling
-- **Status**: **PARTIAL** - win_loss_narratives table exists, competitive_intel searches mentions, but no attribution model or factor ranking
-- **Blocks**: Competitive intel (can't answer "lost 5 deals to Statsig due to X"), rep coaching (can't identify which competency gaps matter most)
+**This does not replace the domain-expertise ordering above** — it's a
+second, independent signal sitting alongside it: what `query_cost_log`
+(every `dynamic_query_loop` invocation) and `learning_log` (assessor
+correctness signals) actually show across the FULL available history
+(166 + 517 rows respectively). It was run against the *prior* version
+of this section's list, before this revision — the mapping below is to
+the current (CRO/Marketing) list. Full methodology, consolidated
+frequency table, and caveats are in `PENDING_WORK.md`'s "EVIDENCE
+AUDIT: What primitive to build next" entry.
 
-### Priority 3: Competitive Loss Patterns
+- **Deal risk/likelihood to close** (CRO #3 — the gap that started this
+  whole thread): **strongest standing signal in real usage**,
+  unaffected by tonight's routing/truncation fixes. Real usage and
+  domain expertise **agree** here — it's the one place both lists point
+  the same direction. Already has `assess_deal_risk()` scoped and
+  partially built (`scripts/deal_risk_assessor.py`), not a
+  from-scratch ask.
+- **Pipeline health/coverage** (CRO #2): raw-dominant in the logs (65%
+  of all non-clean evidence, under the old "pipeline movement/
+  snapshot" framing), but mostly a Phase 1b routing/handler-existence
+  problem tonight's unified-routing migration and synthesis-truncation
+  fix already closed, not a reasoning-layer gap. **Not a new-primitive
+  priority** — worth a live spot-check for recurrence, not a build
+  target.
+- **Rep performance/coaching (CRO #4), win/loss pattern reasoning (CRO
+  #5), country/segment/region breakdown (Marketing #2), data hygiene
+  (Marketing #4)**: present in real usage but low-volume — consistent
+  with, not contradicting, where they sit on the lists above. The
+  country/segment/region evidence directly corroborates Marketing #2's
+  own stated example (the EMEA country-breakdown thread is in the
+  audited evidence).
+- **Forecast trustworthiness (CRO #1)** — ranked #1 by domain expertise
+  — shows only **1 raw hit** in the full-history real-usage audit.
+  Can't tell from log data alone whether that means genuinely rare so
+  far, or that people haven't learned to ask the agent for it yet.
+- **Territory/segment/region performance comparison (CRO #6), pipeline
+  generation by source/channel (Marketing #1), and conversion rate by
+  stage/source (Marketing #3)**: no clear corresponding evidence found
+  in the audited history at all — not contradicted, simply unconfirmed
+  either way.
 
-**Real Questions**:
-- ✗ "Which competitors keep coming up?" (answered via search, not pattern analysis)
-- No direct "we lost N deals to X in segment Y citing reason Z" questions in log yet
-
-**Primitive**: `analyze_competitive_loss_patterns(competitor_name=None, segment=None)`
-- **What it does**: Cross-reference competitor mentions in objections/feature_gaps/win_loss_narratives with deal outcomes to find: frequency of competitor by segment, win rate when X mentioned, common objection themes when losing to X
-- **Why it's hard**: Unstructured text extraction (competitor names not always in competitor_mentioned field), need to link mentions → outcomes → patterns
-- **Status**: **PARTIAL** - competitive_intel searches mentions, win_loss_narratives exist, but no outcome correlation or pattern detection
-- **Depends on**: Win/loss attribution (need causal model, not just search)
-
-### Priority 4: Rep Coaching Prioritization
-
-**Real Questions**:
-- Current: coaching_priorities exists but per-deal flagging only, no cross-rep trends
-- No "which reps struggle with X competency" questions in log yet (coaching questions route to deal-level flags)
-
-**Primitive**: `prioritize_coaching_needs(rep_email=None, competency=None)`
-- **What it does**: Rank reps by competency gaps (champion identification, pain discovery, objection handling) weighted by: frequency of gap, deal value at risk, historical improvement rate after coaching
-- **Why it's hard**: Need historical coaching→outcome tracking (not instrumented yet), competency must correlate with win/loss (unproven for this client per 2026-09-16 MEDDICC decision)
-- **Status**: **PARTIAL** - coaching_priorities flags deals with low component scores, but no cross-rep ranking, no competency-to-outcome correlation, no coaching effectiveness tracking
-- **Depends on**: Cohort performance trends (need rep-level benchmarks), win/loss attribution (need to prove competency X predicts outcome Y)
-- **Blocker**: MEDDICC data insufficient (only 4 of 327 won deals scored) - shelved until ≥30 scored wins exist
-
-### Priority 5: Forecast Confidence Scoring
-
-**Real Questions**:
-- ✗ "Show me forecast confidence" (not in log - aspirational primitive)
-- Current: query_pipeline returns coverage ratio but no confidence assessment
-
-**Primitive**: `score_forecast_confidence(pipeline_snapshot, target, time_window)`
-- **What it does**: For a given pipeline snapshot and target, compute confidence score (0-100) based on: historical close rate by stage, rep reliability (forecast vs actual), deal age distribution, MEDDICC maturity distribution
-- **Why it's hard**: Need historical forecast→actual tracking (not instrumented yet), stage-specific close rates need ≥50 deals per stage, rep reliability needs ≥6 months history
-- **Status**: **NOT STARTED** - no historical forecast snapshots, no close rate by stage computation, no rep reliability tracking
-- **Depends on**: Cohort performance trends (need rep-level close rate history), deal risk assessment (partially exists but shelved due to MEDDICC data gap)
-
-### Priority 6: Root Cause Drill-Down
-
-**Real Questions**:
-- ✓ "Which deals are stale in Discovery stage?" (answered, but no root cause analysis)
-- ✓ "Which deals haven't moved in 30 days?" (flagging only, no "why stale" reasoning)
-
-**Primitive**: `explain_cohort_anomaly(cohort_definition, metric, threshold)`
-- **What it does**: For a cohort showing anomalous metric (12 deals stale in Discovery, win rate dropped 20% in EMEA), drill down to shared factors (same rep, same competitor, same objection, same missing competency) and rank by frequency
-- **Why it's hard**: Anomaly detection needs baseline (see Priority 1), root cause needs multi-dimensional correlation (see Priority 2)
-- **Status**: **NOT STARTED** - flagging handlers exist (stale_deals, coaching_priorities) but no cross-deal pattern extraction
-- **Depends on**: Win/loss attribution (factor ranking), cohort performance trends (anomaly detection)
+**The one thing worth stating plainly**: real usage *confirms* deal
+risk/likelihood as a top priority — both lists agree, and it's ranked
+#3 here only because forecast trustworthiness and pipeline health sit
+above it by domain reasoning, not because usage ranks it lower. It does
+**not yet confirm** forecast trustworthiness as urgent from real usage,
+even though it's ranked #1 here on domain judgment. That gap between
+domain judgment and observed usage is itself worth tracking over time,
+not a reason to resolve by picking one list over the other now.
 
 ---
 
@@ -223,6 +263,36 @@ Never guess thresholds. Every classification boundary (at-risk, stale, overdue) 
 **Rationale**: Abstract Red/Yellow/Green bands don't predict outcomes for this client. Using unvalidated thresholds would create false alarms. Cycle-length signal (days past benchmark) is well-grounded in 327 historical wins - ship that alone.
 
 **Status**: deal_risk_assessor shelved pending data. Focus returns to Phase 1b (query_pipeline_movement).
+
+### 2026-09-19: Forecast Trustworthiness (CRO Priority #1) Built and Verified
+**Context**: audited whether a quarter-level "how much should I trust this quarter's number" signal was computable on top of `assess_deal_risk()`. Historical COMMIT-only tagging was too sparse (peak 6-16 deals/week per quarter, all below `min_evidence_count=30`); pooling COMMIT+MOST_LIKELY across the 4 complete quarters cleared the floor (n=176 "ever tagged," n=74-104 per fixed week). Point-in-time integrity confirmed: `deals.forecast_category` (live) must never be used to judge a past quarter — 62.6% of checked historical-vs-current comparisons mismatched; only `deals_snapshot` is point-in-time-correct.
+
+**Decisions**:
+- Scope is COMMIT+MOST_LIKELY, not COMMIT alone (COMMIT-only's historical sample is too thin at any granularity).
+- Below week 3 of the current quarter: hard `insufficient_data`/`too_early` gate — reps structurally don't produce honest Commit/Most-Likely tags in the coverage-building phase (Jeff's domain read, corroborated but not independently proven by the pooled win-rate-delta data).
+- Comparison is a MOVING lookup against the historical win rate at whatever week the current quarter is actually in — never a fixed anchor. Week 10 (the most stable, best-evidenced point on the curve, n=104) is cited only as calibration evidence that the underlying approach is real, never as the live comparison point.
+- Stability bands from the pooled week-by-week table: weeks 3-6 "forming" (lower confidence), 7-10 "settled" (highest confidence), 11-13 "late_quarter" (`lost` collapses toward zero by then — comparison answers a narrower question).
+- New primitive (`scripts/forecast_trust.py`), not a mode on `assess_deal_risk()` or `forecast_analyses.py` — neither had the other's logic (per-deal risk vs. population-level calibration), so composition was the only structurally correct option.
+- Composes against `assess_deal_risk()` directly, not via `get_at_risk_deals()` — that convenience wrapper hardcodes COMMIT-only and would silently drop MOST_LIKELY-tagged, non-late-stage deals from the cohort. Regression-tested directly (Step D).
+
+**Rationale**: same standard as deal_risk_assessor's own MEDDICC deferral — no fabricated probabilities, no signal shipped below its evidence floor, every gate and band grounded in real pooled data rather than assumed.
+
+**Status**: shipped and registered (`api/handlers.py::query_forecast_trust`, `api/router.py` intent map, `api/evaluator.py::STRUCTURED_HANDLERS`). Full Steps A-E build cycle complete: baseline tests (3), planted-discrepancy test proving the week-lookup is genuinely dynamic (not hardcoded/cached — verified by planting that exact bug and confirming the test caught it), and the MOST_LIKELY-only regression test (verified the same way — also confirmed the deal-presence assertion alone would NOT have caught a reintroduced COMMIT-only bug; only the query-shape assertion does). Live CI (`gate-tests.yml`, run [35451944255](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35451944255)): 33/33 executed steps passed, 0 failures.
+
+### 2026-09-19: Pipeline Coverage (CRO Priority #2) Built and Verified
+**Context**: audited whether "pipeline health/coverage" was a genuine gap before scoping anything. `query_pipeline()` and a dedicated `query_coverage()` handler already compute a coverage-ratio — not a from-scratch primitive. But `query_coverage()` is confirmed broken live (divides one unscoped total pipeline figure against each individual rep's own target, producing 8,000%+ nonsense), and neither weights pipeline by historical stage performance or ever reports a real gap-to-goal.
+
+**Decisions**:
+- Scope: New+Expansion ARR only (`is_incremental_pipeline()`), renewal pipeline excluded — the existing split, reused exactly, never re-derived.
+- Qualified pipeline only: `highest_stage_order_reached >= qualified_stage_order` — the exact existing boundary `query_pipeline()`/`query_coverage()` already use.
+- Stage-level weighting is built fresh (`forecast_analyses.query_stage_close_rate()`) — no existing per-stage close-rate primitive to reuse (only `SEGMENT_CYCLE_BENCHMARKS`, segment-keyed not stage-keyed). Pools deal-week observations by `stage_order` across the complete quarters, gated by `min_evidence_count`; a deal at an ungated stage is excluded from the weighted total, never defaulted to a 1.0 weight.
+- The goal for the current quarter (FY2027 Q3) = the REAL stated quota (`rep_targets` team total, $1.55M) + a manually-set $2.1M stretch figure — a real, explicit GrowthBook business decision (2x YoY growth target current headcount can't organically support), NOT computed. Lives in `config/targets.yaml` (`targets.fy2027_q3.stretch_target`/`stretch_note`), documented there with the full WHY. The stretch figure is read directly from that config file at call time (not seeded into the live `rep_targets` table — doing so would require a live write this build didn't perform); the quota component is read from the live table, matching `query_pipeline()`'s own precedent.
+- Every pipeline-vs-target comparison is phrased gap-to-goal ("$X short of target"/"$X over target"), never a bare ratio.
+- The historical coverage-TARGET curve cannot be built from real historical targets: confirmed live that NONE of the 4 complete historical quarters (FY2026 Q3/Q4, FY2027 Q1/Q2) ever had a real target in `rep_targets`, in any label format (zero rows). The curve instead uses a proxy: target = 2x the SAME quarter's actual closed-won incremental ARR from the PRIOR YEAR. Further checked: none of the 4 prior-year bases (FY2025 Q3/Q4, FY2026 Q1/Q2 — 9-17 deals each) clear `min_evidence_count=30` — confirmed this is a **permanent structural ceiling** (monotonic 8-quarter growth trend, HubSpot history doesn't extend further back), not a fixable gap. The curve is therefore permanently labeled a **HEURISTIC** — the literal word, not "directional" or "approximate" — everywhere it appears in output text, explicitly distinguished from the real current-quarter target (never labeled a heuristic).
+
+**Rationale**: same standard as the forecast-trustworthiness build — never fabricate a signal past its real evidence floor, and never let a smooth-looking curve substitute for checking the reliability of its own inputs.
+
+**Status**: shipped and registered (`api/handlers.py::query_pipeline_coverage`, `api/router.py` intent map — disambiguated from the legacy, confirmed-broken `query_coverage`, `api/evaluator.py::STRUCTURED_HANDLERS`). Full Steps A-E build cycle complete: baseline tests (scope exclusion, stage weighting, gap-to-goal phrasing in both directions, HEURISTIC-vs-real-target labeling) plus two planted-discrepancy proofs — the HEURISTIC label requirement and the renewal-pipeline exclusion were each verified by actually planting the regression in `scripts/pipeline_coverage.py`, confirming the relevant test genuinely failed, then restoring and confirming a clean pass. Two new structural tests added to `scripts/test_forecast_analyses.py` for the underlying `query_stage_close_rate()`/`query_coverage_proxy_target_by_week()` functions. Wired into `gate-tests.yml` (TEST 0bf). Along the way, promoting the audit-script logic into `scripts/analytics/forecast_analyses.py` tripped two of this codebase's own existing correctness ratchets in `eval_reconstruction.py` — a null-coalescing violation (`_qualified_pipeline_at_week()` was coalescing a null `deal_value` to 0 in a dollar sum) and a missing `OUTCOME-READ` marker (`_actual_incremental_closed_won()`'s terminal-outcome read of `stage`) — both real findings, fixed by null-propagating (exclude-and-count, matching `compute_waterfall.py`'s established pattern) and adding the marker respectively. Live CI (`gate-tests.yml`, run [35457724659](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35457724659)): 39/39 executed steps passed, 0 failures (TEST 3's live smoke test skipped by design, gated behind an explicit opt-in input).
 
 ---
 

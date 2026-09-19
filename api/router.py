@@ -188,11 +188,25 @@ HANDLER_DESCRIPTIONS = {
     "query_arr": "ARR by customer, total ARR",
     "query_deals_at_risk": "weak MEDDICC scores, deals at risk, champion gaps",
     "query_high_priority_deal_risk": "risk assessment for late-stage deals (Negotiating/Awaiting Signature) OR COMMIT forecast, deal duration vs segment cycle length, stale MEDDICC scores",
+    "query_forecast_trust": "how much to trust THIS QUARTER's forecast number, forecast trustworthiness/reliability/confidence, is our Commit pipeline reliable, how risky is this quarter's number — compares this quarter's COMMIT+MOST_LIKELY pipeline against historical win rates at the same point in the quarter. NOT the same as query_high_priority_deal_risk (per-deal list) — this is a quarter-level trust signal.",
     "query_definition": "what does a term mean, how is X defined, what counts as Y — looks up definitions in semantic layer (field_semantics.yaml, client.yaml, metrics.yaml). Examples: 'what does at-risk mean to you?', 'what counts as qualified?', 'how do you define forecast?'",
     "query_win_loss": "WIN/LOSS ANALYSIS, WHY we won/lost, win/loss BREAKDOWN, win/loss SUMMARY — narrative analysis of closed deal outcomes, not just counts. Use for: 'why are we losing', 'win loss breakdown', 'breakdown of wins vs losses', 'win rate by segment', 'give me a win loss summary', 'what's causing deals to close lost', 'win/loss reasons', 'loss analysis'. DO NOT use for simple counts of won/lost deals (use query_waterfall for flow metrics).",
     "query_objections": "objections by category/stage/trend",
     "query_feature_gaps": "feature gaps by severity/competitor",
-    "query_coverage": "pipeline coverage vs target, quota attainment",
+    "query_coverage": "pipeline coverage vs target, quota attainment — LEGACY, confirmed broken (produces nonsensical 8,000%+ ratios). Prefer query_pipeline_coverage for coverage questions.",
+    "query_pipeline_coverage": (
+        "current-quarter pipeline coverage vs the REAL quota+stretch goal, "
+        "always gap-to-goal ('$X short of target'/'$X over target'), never "
+        "a bare ratio. New+Expansion ARR only, qualified pipeline only, "
+        "weighted by historical stage-level close rate. Includes a "
+        "HEURISTIC historical coverage curve for context (labeled as "
+        "such — proxy-calibrated, not a real historical target). Use for: "
+        "'how much pipeline coverage do we have', 'are we tracking to "
+        "goal on pipeline', 'how far short of target is our pipeline', "
+        "'pipeline health'. NOT query_coverage (broken) and NOT "
+        "query_pipeline (that's the raw pipeline snapshot, no gap-to-goal "
+        "or stage weighting)."
+    ),
     "query_deal": "deep dive on a specific company's deal",
     "query_rubric": "general scoring questions like \"what does a 6 mean for champion?\"",
     "generate_win_loss": "full narrative for a specific closed deal (slow)",
@@ -1254,6 +1268,38 @@ TOOLS YOU CAN CALL:
     - owner_email: rep email or name (required, accepts "cary@growthbook.io" or "Cary" or "Christian")
     **RETURNS**: All active deals for the rep with MEDDICC scores, sorted by deal value descending
     Examples: "show me Christian's pipeline", "what deals does Cary have", "Jake's pipeline"
+  query_win_loss(time_window, deal_ids)
+    **PHASE 2: Handler 5/6 migrated to unified routing**
+    **USE THIS when the question asks about**:
+    - WIN/LOSS ANALYSIS, WHY we won/lost, win/loss BREAKDOWN, win/loss SUMMARY
+    - Narrative analysis of closed deal outcomes, not just counts
+    - "why are we losing", "win loss breakdown", "give me a win loss summary",
+      "what's causing deals to close lost", "win/loss reasons", "loss analysis"
+    **DO NOT use for simple counts of won/lost deals** (use query_waterfall for flow metrics)
+    Params:
+    - time_window: dict for time range (optional, defaults to current quarter, e.g. {{"period": "current_quarter"}})
+    - deal_ids: filter to a specific set of deals (optional, injected automatically for entity-scoped follow-ups)
+    **RETURNS**: AI-generated win/loss narratives, recent closed deals with lost_reason, MEDDICC scores at time of close, win/loss counts
+    Examples: "why are we losing", "win loss breakdown this quarter", "why did we lose Acme", "win/loss summary"
+  query_deals_at_risk(deal_ids, time_window)
+    **PHASE 2: Handler 6/6 migrated to unified routing**
+    **USE THIS when the question asks about**:
+    - WEAK MEDDICC SCORES, DEALS AT RISK, CHAMPION GAPS
+    - "which deals are at risk", "which deals lack MEDDICC requirements",
+      "weak deals", "deals missing a champion", "which of those are at risk"
+    - Stage-aware MEDDICC band checking: flags a deal if ANY component required
+      at its current stage is below the threshold band needed to advance
+    **DO NOT use for cycle-length/overdue-deal risk** (use assess_deal_risk for
+    likelihood-to-close / duration-based risk — this tool is MEDDICC-readiness only)
+    Params:
+    - deal_ids: filter to a specific set of deals (optional, injected automatically
+      for entity-scoped follow-ups like "which of those are at risk?"; else all active deals)
+    - time_window: dict for time range on the underlying MEDDICC analyses (optional,
+      defaults to last 90 days, e.g. {{"period": "current_quarter"}})
+    **RETURNS**: Up to 10 at-risk deals (deal_id, company_name, overall_score,
+    champion_band, deal_value, stage, risk_flags) plus the true total_at_risk count;
+    a clear message when nothing is currently flagged
+    Examples: "which deals are at risk", "champion gaps this quarter", "which of those are at risk"
 
 RULES:
 - Only use column names that appear in the schema above
@@ -1717,7 +1763,53 @@ def _build_missing_snapshot_fetch(queries_run: list, missing_date: str):
         return p.get("table"), p.get("columns"), new_filters
     return None
 
-def _append_tool_result_message(messages: list, raw: str, result: dict) -> None:
+def _serialize_tool_result_for_synthesis(result: dict, tool_name: str) -> tuple:
+    """Serialize a tool result for the synthesis prompt, deciding once
+    whether it's safe to send in full.
+
+    2026-09-19: the previous check here (`"summary" in result and
+    "total_deals" in result["summary"]`) was a pattern-match on
+    query_rep_pipeline's specific return shape, not a real "is this
+    complete" test — query_pipeline, query_stale_deals, and
+    query_waterfall all have differently-shaped structured returns and
+    silently failed it, so their JSON kept getting hard-truncated to
+    [:3000] chars before the LLM ever saw it (confirmed to cut real
+    payloads of 7,654 and 14,207 chars for query_pipeline and
+    query_stale_deals respectively — see PENDING_WORK.md, "SYSTEMIC
+    FINDING: Synthesis-truncation bug is pipeline-wide").
+
+    The structural fix: any handler listed in
+    api.evaluator.STRUCTURED_HANDLERS returns a finished, purpose-built
+    object (an explicit key set, not an arbitrary row dump) — the same
+    property evaluate_result() already relies on to know these results
+    aren't "rows" to sample. That result is never blindly truncated,
+    regardless of its shape or size. Truncation stays in place only for
+    genuinely unbounded raw data (dynamic_query primitives' row results
+    before _aggregate_and_sample narrows them, e.g. filter_table).
+
+    Returns (result_json, complete_instruction).
+    """
+    from api.evaluator import STRUCTURED_HANDLERS
+
+    is_structured_handler = tool_name in STRUCTURED_HANDLERS and "error" not in result
+
+    if is_structured_handler:
+        result_json = json.dumps(result, default=str)
+        complete_instruction = (
+            f"⚠️ **COMPLETE DATASET**: This is the full, finished result "
+            f"from the `{tool_name}` handler — not a truncated sample. "
+            f"State every count and total in it exactly as given, do not "
+            f"assume anything is missing.\n\n"
+        )
+    else:
+        result_json = json.dumps(result, default=str)[:3000]
+        complete_instruction = ""
+
+    return result_json, complete_instruction
+
+
+def _append_tool_result_message(messages: list, raw: str, result: dict,
+                                 tool_name: str = "") -> None:
     """Append the model's tool-call request and its result to `messages`,
     in place, using the same shape as the normal per-iteration "Tool
     result: ..." message the loop appends when it continues to the next
@@ -1744,10 +1836,19 @@ def _append_tool_result_message(messages: list, raw: str, result: dict) -> None:
     "could not turn the partial data into an answer" diagnostic despite
     accumulated_data holding complete, correct data the whole time. See
     tests/test_finalize_shortcut_message_gap.py for the reproduction.
+
+    2026-09-19: this had its own unconditional [:3000] truncation,
+    independent of (and not covered by) the Handler 4 truncation fix in
+    the main loop body — a structured handler reaching synthesis through
+    one of these three shortcuts was silently truncated even after that
+    fix. Now shares _serialize_tool_result_for_synthesis() with the main
+    loop body so both truncation sites use the same rule.
     """
+    result_json, complete_instruction = _serialize_tool_result_for_synthesis(result, tool_name)
     messages.append({"role": "assistant", "content": raw})
     messages.append({"role": "user", "content": (
-        f"Tool result: {json.dumps(result, default=str)[:3000]}\n\n"
+        f"{complete_instruction}"
+        f"Tool result: {result_json}\n\n"
         f"This data is sufficient to answer — synthesize the final "
         f"answer now."
     )})
@@ -4517,6 +4618,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             "query_stale_deals": lambda sb_arg, **params: _call_handler_as_tool("query_stale_deals", params, sb_arg),
             "query_waterfall": lambda sb_arg, **params: _call_handler_as_tool("query_waterfall", params, sb_arg),
             "query_rep_pipeline": lambda sb_arg, **params: _call_handler_as_tool("query_rep_pipeline", params, sb_arg),
+            "query_win_loss": lambda sb_arg, **params: _call_handler_as_tool("query_win_loss", params, sb_arg),
+            "query_deals_at_risk": lambda sb_arg, **params: _call_handler_as_tool("query_deals_at_risk", params, sb_arg),
         }.get(tool_name)
 
         if not tool_fn:
@@ -4622,7 +4725,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                        f"→ finalizing immediately (fast-path preservation)")
             # Must append tool result to messages before finalization
             # (see _append_tool_result_message docstring - 2026-09-11 incident)
-            _append_tool_result_message(messages, raw, result)
+            _append_tool_result_message(messages, raw, result, tool_name)
             return await _finalize_from_data(f"{tool_name}_fast_path")
 
         # Structured handlers continue to next iteration for normal synthesis
@@ -4671,7 +4774,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                         # it, the finalize synthesis call can't see the
                         # data that just made verification pass. See
                         # _append_tool_result_message() docstring.
-                        _append_tool_result_message(messages, raw, result)
+                        _append_tool_result_message(messages, raw, result, tool_name)
 
                         # Force synthesis by calling _finalize_from_data
                         # This uses the data we just retrieved
@@ -4748,7 +4851,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 # the generic "could not turn the partial data into an
                 # answer" diagnostic despite complete, correct data. See
                 # _append_tool_result_message() docstring.
-                _append_tool_result_message(messages, raw, result)
+                _append_tool_result_message(messages, raw, result, tool_name)
                 return await _finalize_from_data("id_scoped_enrichment_lookup")
 
         # PART 2b: a tool call that returns zero rows is no forward progress.
@@ -4822,22 +4925,12 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 "\nWrong: '$20K won (closed out of $1.12M segment)' ← name the segment!"
             )
 
-        # For structured results with summary fields (complete datasets), don't truncate
-        # so LLM sees all data. Row-based results are already sampled/aggregated.
-        is_complete_structured = ("summary" in result and "total_deals" in result.get("summary", {}))
-
-        if is_complete_structured:
-            # Complete structured dataset - include full JSON (no truncation)
-            total_deals = result["summary"]["total_deals"]
-            result_json = json.dumps(result, default=str)
-            complete_instruction = (
-                f"⚠️ **COMPLETE DATASET**: This result contains ALL {total_deals} deals. "
-                f"State this total in your answer.\n\n"
-            )
-        else:
-            # Row-based or other result - use existing truncation
-            result_json = json.dumps(result, default=str)[:3000]
-            complete_instruction = ""
+        # Structural truncation-safety check (2026-09-19) — see
+        # _serialize_tool_result_for_synthesis() docstring. Any handler in
+        # api.evaluator.STRUCTURED_HANDLERS is a finished, purpose-built
+        # result and is never truncated; everything else keeps the
+        # existing [:3000] cap.
+        result_json, complete_instruction = _serialize_tool_result_for_synthesis(result, tool_name)
 
         messages.append({"role": "user",
             "content": f"{complete_instruction}"
@@ -5169,7 +5262,7 @@ async def route_question(question: str, user_id: str,
         # Phase 2: query_pipeline, query_stale_deals, query_waterfall, query_rep_pipeline, query_win_loss, query_deals_at_risk
         # Skip classifier routing - route to dynamic loop where they're registered as callable tools.
         # All other handlers continue using classifier routing unchanged.
-        if handler_name in ("query_pipeline_movement", "query_pipeline", "query_stale_deals", "query_waterfall", "query_rep_pipeline"):
+        if handler_name in ("query_pipeline_movement", "query_pipeline", "query_stale_deals", "query_waterfall", "query_rep_pipeline", "query_win_loss", "query_deals_at_risk"):
             logger.info(f"[UNIFIED_ROUTING] {handler_name} → dynamic loop "
                        f"(classifier confidence={confidence:.2f}, bypassed)")
             handler_name = "dynamic_query"

@@ -110,9 +110,86 @@ def _fetch_fireflies(call_id, clients):
         # permanent for this id → return them.
         if _is_rate_limit(msg):
             raise RateLimited(f"fireflies: {msg[:100]}")
-        return [], f"fireflies GraphQL: {msg[:140]}"
+        return [], f"fireflies GraphQL: {msg[:140]}", {}
     sents = ((res.get("data") or {}).get("transcript") or {}).get("sentences") or []
-    return _fireflies_utterances(sents), None
+    return _fireflies_utterances(sents), None, {}
+
+
+_BOT_NAME_MARKERS = ("notetaker", "recorder", "meeting bot")
+
+
+def _internal_domains():
+    """organization.internal_domains from config/client.yaml — this
+    codebase's own canonical internal/external definition, reused here
+    rather than trusting Apollo's own internal/external bucketing."""
+    import yaml
+    from pathlib import Path
+    cfg_path = Path(__file__).parent.parent / "config" / "client.yaml"
+    try:
+        cfg = yaml.safe_load(cfg_path.read_text()) or {}
+    except Exception:
+        return set()
+    domains = (cfg.get("organization") or {}).get("internal_domains") or []
+    return {d.lower() for d in domains}
+
+
+def _extract_apollo_participant_identities(conversation):
+    """Real Apollo identity data (confirmed LIVE 2026-09-19, three-run
+    investigation — see migration 065's header for the full trail):
+    conversation['participants'] = {"internal": [...],
+    "external": {account_id: [...]}}, each record carrying a real
+    id/name/email/title/account_id. That id is CONFIRMED (live overlap
+    check) to be the SAME id used as participant_id in this same
+    conversation's transcript fragments — the identical speaker_key this
+    module already uses for talk_time_seconds/question_count/speakers.
+    No name-matching anywhere in this function.
+
+    Bot/notetaker artifacts (e.g. "Fireflies.ai Notetaker Christi", which
+    has email=None) are flagged is_bot=True — never a real participant,
+    never scored as one, but not silently dropped either (a caller can
+    see it was seen and excluded).
+
+    Returns {participant_id: {"name", "email", "title", "account_id",
+    "is_internal", "is_bot"}}. {} if the conversation carries no
+    'participants' dict (Fireflies/Gong never call this at all — only
+    _fetch_apollo does).
+    """
+    participants = conversation.get("participants")
+    if not isinstance(participants, dict):
+        return {}
+
+    records = []
+    internal = participants.get("internal")
+    if isinstance(internal, list):
+        records.extend(p for p in internal if isinstance(p, dict))
+    external = participants.get("external")
+    if isinstance(external, dict):
+        for v in external.values():
+            if isinstance(v, list):
+                records.extend(p for p in v if isinstance(p, dict))
+    elif isinstance(external, list):
+        records.extend(p for p in external if isinstance(p, dict))
+
+    internal_domains = _internal_domains()
+    out = {}
+    for p in records:
+        pid = p.get("id")
+        if not pid:
+            continue
+        name = p.get("name") or ""
+        email = (p.get("email") or "").strip().lower() or None
+        is_bot = email is None and any(m in name.lower() for m in _BOT_NAME_MARKERS)
+        is_internal = bool(email and "@" in email
+                           and email.split("@", 1)[1] in internal_domains)
+        out[pid] = {
+            "name": name or None,
+            "email": email,
+            "title": p.get("title"),
+            "account_id": p.get("account_id"),
+            "is_internal": is_internal,
+            "is_bot": is_bot,
+        }
+    return out
 
 
 def _fetch_apollo(call_id, clients):
@@ -121,7 +198,8 @@ def _fetch_apollo(call_id, clients):
         from apollo_client import ApolloClient
         client = clients["apollo"] = ApolloClient()
     convo = client.get_conversation(call_id)
-    return _apollo_utterances(convo), None
+    identities = _extract_apollo_participant_identities(convo)
+    return _apollo_utterances(convo), None, {"participant_identities": identities}
 
 
 def _fetch_gong(call_id, clients):
@@ -134,27 +212,32 @@ def _fetch_gong(call_id, clients):
             from adapters.gong_adapter import GongAdapter
             client = clients["gong"] = GongAdapter()
         except Exception as e:
-            return [], f"gong adapter unavailable: {type(e).__name__}"
+            return [], f"gong adapter unavailable: {type(e).__name__}", {}
     text = client.get_transcript(call_id) or ""
     # One pseudo-utterance carrying the text so it still gets stored/assembled.
     return ([{"key": "gong", "name": "transcript", "sec": 0.0, "text": text,
-              "q": False}] if text.strip() else []), None
+              "q": False}] if text.strip() else []), None, {}
 
 
 _FETCHERS = {"fireflies": _fetch_fireflies, "apollo": _fetch_apollo, "gong": _fetch_gong}
 
 
 def fetch_utterances(source, call_id, clients, retries=6, backoff=2.0, throttle=0.0):
-    """Fetch normalised utterances for one call. Returns (utterances, error).
+    """Fetch normalised utterances for one call. Returns (utterances, error, extra).
+
+    `extra` carries source-specific data beyond the shared utterance
+    model — today only {"participant_identities": {...}} from Apollo
+    (see _extract_apollo_participant_identities); every other source
+    returns {}. Callers that don't need it can ignore the third value.
 
     `throttle` sleeps before each call to stay under a source's request rate
     (Fireflies rate-limits a fast sequential sweep). A rate-limit backs off
     LONG (15s, 30s, 60s, …) and uses the full retry budget, since the limit is
     a burst window that only clears with real wait; other exceptions use the
-    short backoff. After the cap, returns ([], reason)."""
+    short backoff. After the cap, returns ([], reason, {})."""
     fetcher = _FETCHERS.get((source or "").lower())
     if fetcher is None:
-        return [], f"no transcript fetcher for source '{source}'"
+        return [], f"no transcript fetcher for source '{source}'", {}
     last = None
     for attempt in range(retries):
         if throttle:
@@ -169,7 +252,7 @@ def fetch_utterances(source, call_id, clients, retries=6, backoff=2.0, throttle=
             last = f"{type(e).__name__}: {str(e)[:140]}"
             if attempt < retries - 1:
                 time.sleep(backoff * (2 ** attempt))
-    return [], last
+    return [], last, {}
 
 
 # ── assembly + metrics ───────────────────────────────────────────────────────
@@ -263,14 +346,22 @@ def is_done(quality, reason):
     return bool(reason) and reason.startswith(TERMINAL)
 
 
-def build_transcript_row(source, call_id, utterances, error=None, call_date=None):
+def build_transcript_row(source, call_id, utterances, error=None, call_date=None, extra=None):
     """Shape one call_transcripts row from normalised utterances: assembled
     text + metrics, or an honest 'unavailable' row. Enforces NULL-never-empty
     and the unavailable_reason invariant the schema also checks. The empty-row
     reason is TERMINAL vs RETRY by call age (see STILL_PROCESSING_DAYS) so a
-    genuinely-empty old call stops being re-fetched every pass."""
+    genuinely-empty old call stops being re-fetched every pass.
+
+    `extra`: the third element fetch_utterances() returns — only Apollo
+    ever sets extra["participant_identities"]; every other source leaves
+    it absent, so participant_identities is always explicitly None on
+    the row for non-Apollo sources (migration 065 — Apollo-only by
+    design, never a backfill gap to close for Fireflies/Gong)."""
+    extra = extra or {}
     text = assemble_text(utterances or [])
-    base = {"call_id": str(call_id), "source": source}
+    base = {"call_id": str(call_id), "source": source,
+            "participant_identities": extra.get("participant_identities")}
     if text.strip():
         return {**base, "transcript": text, "transcript_quality": FULL,
                 "unavailable_reason": None, "char_count": len(text),

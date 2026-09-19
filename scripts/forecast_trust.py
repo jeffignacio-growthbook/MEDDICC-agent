@@ -1,0 +1,226 @@
+#!/usr/bin/env python3
+"""
+Forecast Trustworthiness Assessor — quarter-level trust signal for the
+current quarter's COMMIT+MOST_LIKELY forecast category.
+
+Answers NORTH_STAR.md's CRO Priority #1: "how much should I trust this
+quarter's number." Composes two existing, separately-scoped primitives
+rather than extending either one (confirmed 2026-09-19 — neither has
+the other's logic, so this is a new module, not a mode on either):
+
+  - scripts/deal_risk_assessor.py::assess_deal_risk() — per-deal
+    cycle-length risk flagging, called here directly on THIS QUARTER's
+    COMMIT+MOST_LIKELY cohort. NOT via get_at_risk_deals(): that
+    convenience wrapper hardcodes forecast_category='COMMIT' and would
+    silently drop MOST_LIKELY-tagged deals that aren't also late-stage.
+  - scripts/analytics/forecast_analyses.py::query_commit_ml_calibration_by_week()
+    — pooled, week-indexed historical win rate across the complete
+    (closed) quarters.
+
+Design, confirmed across the 2026-09-19 scoping session:
+  - Below week 3 of the current quarter: insufficient_data/too_early,
+    hard gate. Reps structurally don't produce honest Commit/Most-Likely
+    tags in the coverage-building phase (weeks 1-2) — no historical
+    baseline at any week is a fair comparison for this period. Week 3
+    itself is the first allowed week (Jeff's domain cutoff; the pooled
+    win-rate-delta data neither proves nor contradicts week 3 over
+    week 4 specifically, so this is a domain call, not a data-forced
+    one).
+  - Week 3 onward: MOVING comparison — look up the historical win rate
+    at the SAME week number the current quarter is actually in, never
+    a fixed anchor. A week-4 question compares against week 4's
+    historical rate, not week 10's.
+  - Stability band, from the already-computed week-by-week table:
+      3-6:   "forming"     (cohort still filling in, lower confidence)
+      7-10:  "settled"     (largest, most stable pooled cohort)
+      11-13: "late_quarter" (lost collapses toward zero by this point;
+                             comparison answers a narrower question)
+  - "Directional, not final" caveat applies for weeks 3-9 (the current
+    quarter's cohort hasn't had as much time to resolve as the
+    historical week-10 cohort had by quarter end); drops away from
+    week 10 onward, where the comparison is time-matched.
+  - Week 10's 30.8% figure is cited ONLY as evidence the underlying
+    calibration approach is real (large n, stable) — never hardcoded
+    as the live comparison point.
+
+No fabricated probabilities. Read-only.
+"""
+import sys
+from pathlib import Path
+from datetime import date
+from typing import Optional, Dict, Any
+import logging
+
+REPO_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+sys.path.insert(0, str(REPO_ROOT / "scripts" / "analytics"))
+sys.path.insert(0, str(REPO_ROOT / "api"))
+
+logger = logging.getLogger(__name__)
+
+EARLY_QUARTER_GATE_WEEK = 3  # Jeff's domain cutoff (coverage-building phase ends)
+CALIBRATION_EVIDENCE_WEEK = 10  # cited as evidence only, never the comparison anchor
+
+STABILITY_BANDS = {
+    "forming": range(3, 7),
+    "settled": range(7, 11),
+    "late_quarter": range(11, 14),
+}
+
+CATEGORIES = ["COMMIT", "MOST_LIKELY"]
+
+
+def _stability_band(week: int) -> str:
+    for label, wk_range in STABILITY_BANDS.items():
+        if week in wk_range:
+            return label
+    raise ValueError(f"week {week} outside the expected 3-13 range")
+
+
+def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
+    """
+    Quarter-level forecast-trustworthiness signal for the CURRENT
+    quarter's COMMIT+MOST_LIKELY pipeline.
+
+    Args:
+        sb: Supabase client
+        as_of: Date to evaluate "today" as (default: date.today()). Exposed
+               for testability — NOT a historical-quarter override; this
+               primitive always answers for the quarter containing `as_of`.
+
+    Returns (gated):
+        {"status": "insufficient_data", "reason": "too_early",
+         "fiscal_quarter": str, "current_week": int,
+         "gate_week": int, "note": str}
+      or:
+        {"status": "ok", "fiscal_quarter": str, "current_week": int,
+         "stability": "forming"|"settled"|"late_quarter",
+         "directional_caveat": bool,
+         "pipeline": {"deal_count": int, "amount": float},
+         "risk_summary": {...assess_deal_risk()'s summary...},
+         "high_risk_count": int, "high_risk_fraction": float|None,
+         "historical": {"week": int, "win_rate": float|None,
+                        "n": int, "reason": str|None},
+         "calibration_evidence": {"week": 10, "win_rate": float|None,
+                                   "n": int, "note": str},
+         "assessed_deals": [...assess_deal_risk()'s per-deal output...],
+         "note": str}
+    """
+    from utils import get_fiscal_quarter
+    from deal_risk_assessor import assess_deal_risk
+    from forecast_analyses import query_commit_ml_calibration_by_week
+    from snapshot_deals import get_week_of_quarter
+
+    if as_of is None:
+        as_of = date.today()
+
+    q_start, q_end, fiscal_quarter = get_fiscal_quarter(as_of)
+    current_week = get_week_of_quarter(as_of, q_start)
+
+    if current_week < EARLY_QUARTER_GATE_WEEK:
+        return {
+            "status": "insufficient_data",
+            "reason": "too_early",
+            "fiscal_quarter": fiscal_quarter,
+            "current_week": current_week,
+            "gate_week": EARLY_QUARTER_GATE_WEEK,
+            "note": (
+                f"Week {current_week} of {fiscal_quarter}: reps structurally "
+                f"aren't producing reliable Commit/Most-Likely tags this "
+                f"early in the quarter (coverage-building phase, not "
+                f"forecasting yet). No trust signal until week "
+                f"{EARLY_QUARTER_GATE_WEEK}."
+            ),
+        }
+
+    # This quarter's COMMIT+MOST_LIKELY deals — own query, deliberately NOT
+    # get_at_risk_deals() (hardcodes COMMIT-only; see module docstring).
+    response = sb.table("deals").select(
+        "deal_id,company_name,stage,create_date,close_date,segment,"
+        "forecast_category,deal_status,amount"
+    ).in_("forecast_category", CATEGORIES).eq(
+        "deal_status", "active"
+    ).gte("close_date", q_start.isoformat()).lte(
+        "close_date", q_end.isoformat()
+    ).execute()
+    deals = response.data or []
+
+    risk_result = assess_deal_risk(deals, sb)
+    assessed = risk_result.get("assessed_deals", [])
+    summary = risk_result.get("summary", {})
+    total_assessed = summary.get("total_assessed", len(assessed))
+    high_risk_count = summary.get("high_risk", 0)
+    high_risk_fraction = (high_risk_count / total_assessed) if total_assessed else None
+
+    total_amount = sum(float(d.get("amount") or 0) for d in deals)
+
+    calib = query_commit_ml_calibration_by_week(sb)
+    by_week = calib.get("by_week", {})
+    current_week_row = by_week.get(current_week, {})
+    evidence_week_row = by_week.get(CALIBRATION_EVIDENCE_WEEK, {})
+
+    stability = _stability_band(current_week)
+    directional_caveat = current_week < CALIBRATION_EVIDENCE_WEEK
+
+    if directional_caveat:
+        note = (
+            f"Directional, not final: at week {current_week} of "
+            f"{fiscal_quarter}, this quarter's cohort hasn't had as much "
+            f"time to resolve as the historical week-{current_week} "
+            f"baseline had by quarter end."
+        )
+    elif stability == "late_quarter":
+        note = (
+            f"Week {current_week} of {fiscal_quarter}: in the historical "
+            f"baseline, terminally lost deals have mostly already exited "
+            f"the tracked cohort by this point in the quarter (lost "
+            f"collapses toward zero after week {CALIBRATION_EVIDENCE_WEEK}) "
+            f"— this comparison is answering a narrower, less meaningful "
+            f"question than earlier in the quarter."
+        )
+    else:
+        note = (
+            f"Week {current_week} of {fiscal_quarter} — comparison is "
+            f"time-matched against the historical week-{current_week} "
+            f"baseline."
+        )
+
+    return {
+        "status": "ok",
+        "fiscal_quarter": fiscal_quarter,
+        "current_week": current_week,
+        "stability": stability,
+        "directional_caveat": directional_caveat,
+        "pipeline": {
+            "deal_count": len(deals),
+            "amount": total_amount,
+        },
+        "risk_summary": summary,
+        "high_risk_count": high_risk_count,
+        "high_risk_fraction": high_risk_fraction,
+        "historical": {
+            "week": current_week,
+            "win_rate": current_week_row.get("win_rate"),
+            "n": current_week_row.get("classified", 0),
+            "reason": current_week_row.get("reason"),
+        },
+        "calibration_evidence": {
+            "week": CALIBRATION_EVIDENCE_WEEK,
+            "win_rate": evidence_week_row.get("win_rate"),
+            "n": evidence_week_row.get("classified", 0),
+            "note": (
+                "Cited as evidence the calibration approach is real (the "
+                "largest, most stable pooled cohort) — not used as the "
+                "comparison point for this result."
+            ),
+        },
+        "assessed_deals": assessed,
+        "note": note,
+    }
+
+
+if __name__ == "__main__":
+    from db import get_supabase
+    sb = get_supabase()
+    import json
+    print(json.dumps(assess_forecast_trust(sb), indent=2, default=str))

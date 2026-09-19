@@ -155,11 +155,11 @@ def test_rate_limit_is_retryable_not_recorded():
     ts._FETCHERS["_faketest"] = lambda cid, clients: (_ for _ in ()).throw(
         ts.RateLimited("fireflies: Too many requests"))
     try:
-        utts, err = ts.fetch_utterances("_faketest", "c1", {}, retries=1)
+        utts, err, extra = ts.fetch_utterances("_faketest", "c1", {}, retries=1)
     finally:
         ts._FETCHERS.pop("_faketest", None)
     cases.append(("rate-limited fetch returns an error, not empty-success",
-                  utts == [] and err and "RateLimited" in err))
+                  utts == [] and err and "RateLimited" in err and extra == {}))
     return cases
 
 
@@ -195,6 +195,77 @@ def test_terminal_vs_retryable_empty():
     return cases
 
 
+def test_apollo_participant_identities_extraction():
+    """Apollo's real participants shape ({"internal": [...], "external":
+    {account_id: [...]}}), confirmed live 2026-09-19: keyed by id (the
+    same id confirmed live to match participant_id in transcript
+    fragments), is_internal derived from email domain against
+    config/client.yaml (this codebase's own canonical definition, not
+    Apollo's own internal/external bucketing), bot/notetaker artifacts
+    flagged is_bot=True — seen and excluded, never silently dropped."""
+    from transcript_store import _extract_apollo_participant_identities
+    cases = []
+
+    convo = {"participants": {
+        "internal": [
+            {"id": "p1", "name": "Christian Liebenow",
+             "email": "christian@growthbook.io", "title": "Account Executive",
+             "account_id": "acct1"},
+            {"id": "p2", "name": "Fireflies.ai Notetaker Christi", "email": None},
+        ],
+        "external": {
+            "acctX": [
+                {"id": "p3", "name": "Shawn Hansen",
+                 "email": "shansen@a24films.com", "account_id": "acctX"},
+            ],
+        },
+    }}
+    out = _extract_apollo_participant_identities(convo)
+
+    cases.append(("keyed by id (matches transcript fragment participant_id)",
+                  set(out.keys()) == {"p1", "p2", "p3"}))
+    cases.append(("real GrowthBook email -> is_internal True, not a bot",
+                  out["p1"]["is_internal"] is True and out["p1"]["is_bot"] is False))
+    cases.append(("external email -> is_internal False, email preserved",
+                  out["p3"]["is_internal"] is False
+                  and out["p3"]["email"] == "shansen@a24films.com"))
+    cases.append(("notetaker bot (email=None, name matches marker) -> "
+                  "is_bot True, seen not dropped",
+                  "p2" in out and out["p2"]["is_bot"] is True
+                  and out["p2"]["email"] is None))
+    cases.append(("bot is never accidentally classified internal",
+                  out["p2"]["is_internal"] is False))
+    cases.append(("no 'participants' dict -> {} (Fireflies/Gong never call this)",
+                  _extract_apollo_participant_identities({}) == {}
+                  and _extract_apollo_participant_identities({"participants": None}) == {}))
+    return cases
+
+
+def test_build_transcript_row_carries_participant_identities():
+    """participant_identities flows through build_transcript_row via
+    `extra`, explicitly None (not omitted) for non-Apollo sources — a
+    caller can always rely on the key being present, never a KeyError."""
+    from transcript_store import build_transcript_row
+    cases = []
+
+    ident = {"p1": {"name": "A", "email": "a@growthbook.io", "title": None,
+                    "account_id": None, "is_internal": True, "is_bot": False}}
+    r = build_transcript_row("apollo", "c1", [_utt("p1", "A", 1.0, "hi")],
+                             extra={"participant_identities": ident})
+    cases.append(("apollo row carries participant_identities",
+                  r["participant_identities"] == ident))
+
+    r2 = build_transcript_row("fireflies", "c2", [_utt("A", "Ann", 1.0, "hi")])
+    cases.append(("fireflies row has participant_identities explicitly None, "
+                  "not omitted (migration 065 — Apollo-only by design)",
+                  "participant_identities" in r2 and r2["participant_identities"] is None))
+
+    r3 = build_transcript_row("apollo", "c3", [])  # no extra passed at all
+    cases.append(("apollo row with no extra arg -> None, not a KeyError",
+                  r3["participant_identities"] is None))
+    return cases
+
+
 def run():
     print("=" * 72)
     print("TRANSCRIPT STORE — split intact, NULL≠'', Apollo assembled (Phase 5)")
@@ -207,6 +278,8 @@ def run():
         ("metrics: units, per-speaker talk/questions, backchannel monologue", test_metrics_from_utterances),
         ("rate-limit is retryable + deferred, not recorded", test_rate_limit_is_retryable_not_recorded),
         ("terminal vs retryable empty (resume stops re-fetching old empties)", test_terminal_vs_retryable_empty),
+        ("apollo participant_identities extraction (id-keyed, bot-flagged)", test_apollo_participant_identities_extraction),
+        ("build_transcript_row carries participant_identities", test_build_transcript_row_carries_participant_identities),
     ):
         print(f"\n[{title}]")
         for label, ok in fn():

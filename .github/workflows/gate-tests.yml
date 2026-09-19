@@ -118,6 +118,133 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_reconstruction.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_waterfall_null_insitu.py
 
+      - name: "TEST 0be — Offline: forecast-trustworthiness primitive (assess_forecast_trust)"
+        run: |
+          set -e
+          # 2026-09-19: NORTH_STAR.md CRO Priority #1 — "how much should I
+          # trust this quarter's number." scripts/forecast_trust.py composes
+          # assess_deal_risk() (called directly on THIS quarter's own
+          # COMMIT+MOST_LIKELY query, never via get_at_risk_deals()'s
+          # COMMIT-only scope) with a new, week-indexed historical baseline
+          # (query_commit_ml_calibration_by_week(), forecast_analyses.py) —
+          # a MOVING comparison against whatever week the current quarter
+          # is actually in, never a fixed anchor. Gated below week 3 (reps
+          # structurally don't tag Commit/Most-Likely honestly in the
+          # coverage-building phase yet).
+          #
+          # scripts/test_forecast_trust.py covers the composing function
+          # itself: the week-3 hard gate (asserts no downstream query
+          # fires), stability-band/caveat assignment across weeks 7 and 12,
+          # a planted-discrepancy proof that the historical lookup
+          # genuinely varies across 4 distinct weeks (not a hardcoded or
+          # cached value — verified by actually planting that exact bug and
+          # confirming the test caught it before this shipped), and the
+          # single most important test in the batch: a MOST_LIKELY-tagged,
+          # non-late-stage deal must still appear in the assessed cohort —
+          # the direct regression guard for the get_at_risk_deals()
+          # COMMIT-only gap this primitive was built to avoid (also
+          # verified by planting that exact regression and confirming the
+          # query-shape assertion, not the data-presence one, is what
+          # actually catches it — a Mock returns its canned data
+          # regardless of the real filter, so only checking the deal
+          # showed up would have been a false sense of security).
+          #
+          # test_commit_ml_calibration_by_week_structure (added to
+          # test_forecast_analyses.py) covers the new calibration function
+          # independently: full 13-week coverage, defaults to
+          # COMMIT_ML_CATEGORIES, and queries via .in_() rather than a
+          # single-category .eq() — already run above by TEST 0b, not
+          # duplicated here.
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/test_forecast_trust.py
+
+      - name: "TEST 0bf — Offline: pipeline-coverage primitive (assess_pipeline_coverage)"
+        run: |
+          set -e
+          # 2026-09-19: NORTH_STAR.md CRO Priority #2 — "how much pipeline
+          # coverage do we have against goal." scripts/pipeline_coverage.py
+          # composes: New+Expansion-only, qualified-pipeline-only, Q-scoped
+          # current pipeline; a stage-level close-rate weighting built
+          # fresh (forecast_analyses.query_stage_close_rate — no per-stage
+          # close-rate primitive existed to reuse); a REAL current-quarter
+          # quota+stretch target (rep_targets team total + a manually-set
+          # $2.1M stretch figure documented in config/targets.yaml, a real
+          # GrowthBook business decision, not computed); and a HEURISTIC
+          # historical coverage curve (forecast_analyses.query_coverage_
+          # proxy_target_by_week — confirmed live that no complete
+          # historical quarter ever had a real target, so this is a 2x-
+          # prior-year-actual proxy resting on a permanent, confirmed
+          # evidence ceiling: none of the 4 prior-year bases clear
+          # min_evidence_count=30). Every output surface always phrases
+          # gap-to-goal ("$X short of target"/"$X over target"), never a
+          # bare ratio, and the historical curve must always carry the
+          # literal word HEURISTIC — never conflated with the real
+          # current-quarter target.
+          #
+          # scripts/test_pipeline_coverage.py covers the composing
+          # function itself: scope filtering (New+Expansion only, renewal
+          # pipeline excluded, qualified-stage boundary reused exactly),
+          # stage weighting (a gated stage's deal is weighted by its real
+          # win_rate; an ungated stage's deal is excluded from the
+          # weighted total, never defaulted to a 1.0 weight), gap-to-goal
+          # phrasing in both directions, and the mandatory HEURISTIC
+          # label on the historical curve vs. the real target's note
+          # never carrying one. Both the heuristic-label requirement and
+          # the renewal-pipeline exclusion were verified by actually
+          # planting the exact regression in scripts/pipeline_coverage.py
+          # (stripping the HEURISTIC word from the output note; bypassing
+          # is_incremental_pipeline()) and confirming the relevant tests
+          # genuinely failed before restoring the real code and confirming
+          # a clean pass — not just written and trusted.
+          #
+          # test_stage_close_rate_structure / test_coverage_proxy_target_
+          # by_week_structure (added to test_forecast_analyses.py, already
+          # run above by TEST 0b) cover the two new forecast_analyses.py
+          # functions independently — deal-week pooling by stage_order
+          # with renewal exclusion, and the 2x-prior-year proxy-target
+          # computation with mandatory heuristic labeling — not duplicated
+          # here.
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/test_pipeline_coverage.py
+
+      - name: "TEST 0bg — Offline: rep-coaching Criterion C talk-ratio diagnostic (assess_call_talk_ratio)"
+        run: |
+          set -e
+          # 2026-09-19: rep-coaching primitive, Criterion C (talk-time /
+          # question-share). DIAGNOSTIC ONLY, no pass/fail threshold — the
+          # first calibration attempt (owner-name matched against a call's
+          # own participant_emails) never cleared the 90% reliability bar
+          # (76.7%/81.5% on the full population). scripts/coaching_talk_
+          # ratio.py replaces that entirely for Apollo-sourced calls with
+          # an EXACT PARTICIPANT-ID MATCH (no name-matching anywhere),
+          # confirmed live via a three-run investigation that Apollo's
+          # conversation-detail `participants` field ties a diarized
+          # speaker to a real email/account by the same id already used
+          # as call_transcripts' speaker key (migration 065,
+          # participant_identities). That mechanism's own reliability has
+          # not yet been calibrated into a won/lost threshold, so this
+          # returns plain numbers only — never a judgment.
+          #
+          # Fireflies has NO equivalent anywhere in its API (confirmed
+          # live — querying `email` on its Sentence type is rejected by
+          # the schema) and MUST return insufficient_data/
+          # source_not_supported here, explicitly, every time.
+          #
+          # scripts/test_coaching_talk_ratio.py covers: the source gate
+          # (non-Apollo always insufficient_data), missing-identities /
+          # missing-speech-data gating, the normal Apollo case (hand-
+          # verified ratio arithmetic), bot/unmatched-speaker exclusion
+          # from BOTH sides of the ratio (never dropped silently —
+          # counted in unmatched_seconds), and two planted-discrepancy
+          # regressions — bot exclusion and the source gate itself — each
+          # verified by actually breaking scripts/coaching_talk_ratio.py
+          # on disk, confirming the test failed, and restoring it clean.
+          #
+          # scripts/eval_transcript_store.py (run above by TEST 0) covers
+          # the extraction side: _extract_apollo_participant_identities()
+          # id-keying, is_internal derivation, bot flagging, and that
+          # participant_identities flows through build_transcript_row()
+          # (always present, explicitly None for non-Apollo sources).
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/test_coaching_talk_ratio.py
+
       - name: "TEST 0c — Offline: date/time-window resolution (single-source-of-truth gate)"
         run: |
           set -e
@@ -725,6 +852,61 @@ jobs:
           # known bucket keyword (a human label like "Technical
           # Evaluation").
           PYTHONPATH=. python3 tests/test_owner_email_canonicalization.py
+
+      - name: "TEST 0z — Offline: structured handler results reach synthesis whole, never truncated mid-object"
+        run: |
+          set -e
+          # 2026-09-19: the Handler 4 (query_rep_pipeline) truncation fix
+          # (94 real deals silently reduced to 16-25 by an unconditional
+          # json.dumps(result)[:3000] cut before the LLM ever saw the tool
+          # result) was detected via a pattern-match on query_rep_pipeline's
+          # OWN return shape ("summary" in result and "total_deals" in
+          # result["summary"]) — not a real "is this a finished, structured
+          # result" test. Auditing the three OTHER already-migrated
+          # handlers (query_pipeline, query_stale_deals, query_waterfall)
+          # against that exact condition found all three fail it
+          # structurally, and their own previously-captured production
+          # baselines confirmed this is not theoretical: query_pipeline's
+          # realistic "show me pipeline" payload is 7,654 chars and query_
+          # stale_deals' realistic "what deals are stale" payload is
+          # 14,207 chars — both routinely truncated to 3,000 chars before
+          # synthesis, the exact Handler 4 bug, live, on two handlers
+          # already marked "complete." See PENDING_WORK.md, "SYSTEMIC
+          # FINDING: Synthesis-truncation bug is pipeline-wide."
+          #
+          # Fixed structurally: any handler registered in api.evaluator.
+          # STRUCTURED_HANDLERS (the same registry evaluate_result()
+          # already uses to know a handler's return isn't raw "rows" to
+          # sample) is never truncated, regardless of its specific shape —
+          # via one shared helper, _serialize_tool_result_for_synthesis(),
+          # used at BOTH truncation sites in api/router.py (the main loop
+          # body, and _append_tool_result_message() — a second,
+          # independent, unconditional [:3000] site the original Handler 4
+          # fix never touched, used by three early-return synthesis
+          # shortcuts). Genuinely unbounded raw data (filter_table, etc.)
+          # keeps the existing cap.
+          #
+          # This closes the exact gap that let the bug reach production
+          # unnoticed across 4 handler migrations: the existing baseline-
+          # capture fixtures (capture_query_pipeline_baseline.py, capture_
+          # query_stale_deals_baseline.py) call handlers directly, bypassing
+          # api/router.py's synthesis step entirely — they verify handler
+          # output, never what the LLM actually receives. Rather than
+          # rewire those fixtures to also drive a live LLM + Supabase (slow,
+          # non-deterministic, costly on every CI run) for a check that
+          # doesn't need either, this is a deterministic, dedicated
+          # synthesis-level test using the SAME captured production
+          # baseline JSON, driving the real dynamic_query_loop end-to-end
+          # with a scripted LLM client — confirming query_pipeline's and
+          # query_stale_deals' worst-case real payloads (including a real
+          # company name that sits past the old 3000-char cutoff in each)
+          # now reach the synthesis call whole; a negative control proves
+          # the STRUCTURED_HANDLERS check specifically (not the test
+          # harness) is what makes the data visible; and a fourth test
+          # confirms a genuinely unstructured raw-row result (filter_table)
+          # is still truncated — this fix targets finished handler results,
+          # not every large tool result.
+          PYTHONPATH=. python3 tests/test_synthesis_truncation_fix.py
 
       - name: "TEST 1a — Offline: Supabase client retries once on a dead HTTP/2 connection instead of failing the request"
         run: |

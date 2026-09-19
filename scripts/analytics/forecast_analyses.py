@@ -664,6 +664,460 @@ def query_commit_calibration(
     }
 
 
+# Forecast-trustworthiness primitive (NORTH_STAR.md CRO Priority #1,
+# scripts/forecast_trust.py::assess_forecast_trust). Confirmed 2026-09-19:
+# COMMIT alone is too sparse for this org's forecast-trust question;
+# scope is COMMIT+MOST_LIKELY.
+COMMIT_ML_CATEGORIES = ["COMMIT", "MOST_LIKELY"]
+
+
+def query_commit_ml_calibration_by_week(sb=None, categories=None) -> Dict:
+    """
+    Pooled (across complete quarters), week-indexed hit-rate table for an
+    arbitrary forecast_category set — generalizes query_commit_outcome_by_week()
+    (hardcoded to COMMIT alone) so a caller can look up the SAME week the
+    current quarter is actually in, rather than being anchored to one fixed
+    week. Built for assess_forecast_trust() (scripts/forecast_trust.py),
+    which needs a MOVING comparison: week 4 of the current quarter compares
+    against week 4's historical rate here, not a hardcoded week 10.
+
+    Reuses _classify_deal_outcome, _quarter_window_iso, _get_complete_quarters,
+    _load_config UNMODIFIED — only the category filter is new (query_commit_
+    outcome_by_week's query is otherwise identical, .eq('forecast_category',
+    'COMMIT') vs .in_('forecast_category', categories) here).
+
+    Args:
+        sb: Supabase client
+        categories: forecast_category values to pool (default: COMMIT_ML_CATEGORIES)
+
+    Returns:
+        {
+            'by_week': {1: {...}, ..., 13: {...}},  # same row shape as
+                query_commit_outcome_by_week's by_week (n_tagged instead of
+                n_committed, since the cohort is no longer COMMIT-only):
+                {'n_tagged', 'classified', 'unclassified', 'won', 'lost',
+                 'slipped', 'win_rate' (gated), 'reason'}
+            'categories': [...],
+            'quarters_analyzed': int,
+            'complete_quarters': [...],
+            'min_evidence_count': int,
+        }
+    """
+    if sb is None:
+        sb = create_client(
+            os.environ['SUPABASE_URL'],
+            os.environ['SUPABASE_SERVICE_KEY']
+        )
+    if categories is None:
+        categories = COMMIT_ML_CATEGORIES
+
+    config = _load_config()
+    min_evidence = config.get('min_evidence_count', 30)
+
+    complete_quarters = _get_complete_quarters(sb)
+    if not complete_quarters:
+        return {
+            'error': 'No complete quarters available',
+            'coverage_note': 'Insufficient historical data'
+        }
+
+    # OUTCOME-READ (defect 5, same as query_commit_outcome_by_week): terminal
+    # state from the current deals table, never a snapshot row.
+    from supabase_client import select_all
+    deals_rows = select_all(sb, 'deals', columns='deal_id,stage,close_date')
+    deals_by_id = {str(d['deal_id']): d for d in deals_rows}
+
+    def _blank():
+        return {'n_tagged': 0, 'won': 0, 'lost': 0, 'slipped': 0,
+                'unclassified': 0}
+
+    pooled_by_week = defaultdict(_blank)
+
+    for quarter in complete_quarters:
+        q_start_iso, q_end_iso = _quarter_window_iso(sb, quarter)
+        for week in range(1, 14):
+            res = sb.table('deals_snapshot').select('deal_id').eq(
+                'fiscal_quarter', quarter).eq(
+                'week_of_quarter', week).in_(
+                'forecast_category', categories).execute()
+            for r in res.data:
+                did = r['deal_id']
+                outcome = _classify_deal_outcome(
+                    did, q_start_iso, q_end_iso, deals_by_id)
+                agg = pooled_by_week[week]
+                agg['n_tagged'] += 1
+                if outcome == 'WON':
+                    agg['won'] += 1
+                elif outcome == 'LOST':
+                    agg['lost'] += 1
+                elif outcome == 'SLIPPED':
+                    agg['slipped'] += 1
+                else:  # deal absent from deals table — cannot classify
+                    agg['unclassified'] += 1
+
+    def _finish(agg):
+        classified = agg['won'] + agg['lost'] + agg['slipped']
+        gated = classified >= min_evidence
+        return {
+            'n_tagged': agg['n_tagged'],
+            'classified': classified,
+            'unclassified': agg['unclassified'],
+            'won': agg['won'], 'lost': agg['lost'], 'slipped': agg['slipped'],
+            'win_rate': (agg['won'] / classified) if gated and classified else None,
+            'reason': (None if gated
+                       else f'{classified} classified < min_evidence {min_evidence}'),
+        }
+
+    by_week = {w: _finish(pooled_by_week[w]) for w in range(1, 14)}
+
+    return {
+        'by_week': by_week,
+        'categories': list(categories),
+        'quarters_analyzed': len(complete_quarters),
+        'complete_quarters': complete_quarters,
+        'min_evidence_count': min_evidence,
+    }
+
+
+# Pipeline-coverage primitive (NORTH_STAR.md CRO Priority #2,
+# scripts/pipeline_coverage.py::assess_pipeline_coverage). Confirmed
+# 2026-09-19: no existing per-stage close-rate primitive to reuse (only
+# SEGMENT_CYCLE_BENCHMARKS, segment-keyed not stage-keyed) — built fresh,
+# reusing the METHOD from query_commit_outcome_by_week.
+
+def query_stage_close_rate(sb=None) -> Dict:
+    """
+    Historical close rate per stage_order, pooled across the complete
+    quarters and ALL weeks (not per-week — a stage's close-rate isn't
+    expected to move week-to-week the way a commit-week cohort does;
+    pooling within stage across the whole quarter maximizes the sample).
+
+    Reuses _classify_deal_outcome, _get_complete_quarters,
+    _quarter_window_iso, _load_config UNMODIFIED — same terminal-outcome
+    read as query_commit_outcome_by_week, grouped by stage_order instead
+    of commit-week.
+
+    SCOPE: New+Expansion only (renewal pipeline excluded) — must match
+    assess_pipeline_coverage()'s own scope. A renewal deal's close-rate
+    behavior is a different motion; it must not leak into weights
+    applied to New+Expansion pipeline.
+
+    Counting convention: each (deal, week) snapshot observation at a
+    stage_order counts once — a deal seen at the same stage across
+    multiple weeks contributes multiple observations. Same convention
+    query_commit_outcome_by_week already uses (deal-week observations,
+    not deduped to unique deals).
+
+    Returns:
+        {'by_stage_order': {stage_order: {'n_observed', 'classified',
+            'unclassified', 'won', 'lost', 'slipped', 'win_rate' (gated),
+            'reason'}},
+         'quarters_analyzed': int, 'complete_quarters': [...],
+         'min_evidence_count': int, 'scope': str, 'note': str}
+    """
+    if sb is None:
+        sb = create_client(
+            os.environ['SUPABASE_URL'],
+            os.environ['SUPABASE_SERVICE_KEY']
+        )
+
+    from field_semantics import _RENEWAL_PIPELINE_ID
+    from supabase_client import select_all
+
+    config = _load_config()
+    min_evidence = config.get('min_evidence_count', 30)
+
+    complete_quarters = _get_complete_quarters(sb)
+    if not complete_quarters:
+        return {
+            'error': 'No complete quarters available',
+            'coverage_note': 'Insufficient historical data'
+        }
+
+    # OUTCOME-READ (same as query_commit_outcome_by_week): terminal state
+    # from the current deals table, never a snapshot row.
+    deals_rows = select_all(sb, 'deals', columns='deal_id,stage,close_date')
+    deals_by_id = {str(d['deal_id']): d for d in deals_rows}
+
+    def _blank():
+        return {'n_observed': 0, 'won': 0, 'lost': 0, 'slipped': 0,
+                'unclassified': 0}
+
+    pooled_by_stage = defaultdict(_blank)
+
+    for quarter in complete_quarters:
+        q_start_iso, q_end_iso = _quarter_window_iso(sb, quarter)
+        rows = select_all(sb, 'deals_snapshot',
+            columns='deal_id,stage_order,pipeline_id',
+            filters=[('eq', 'fiscal_quarter', quarter)])
+        for r in rows:
+            if str(r.get('pipeline_id')) == _RENEWAL_PIPELINE_ID:
+                continue
+            stage_order = r.get('stage_order')
+            if stage_order is None:
+                continue
+            outcome = _classify_deal_outcome(
+                r.get('deal_id'), q_start_iso, q_end_iso, deals_by_id)
+            agg = pooled_by_stage[stage_order]
+            agg['n_observed'] += 1
+            if outcome == 'WON':
+                agg['won'] += 1
+            elif outcome == 'LOST':
+                agg['lost'] += 1
+            elif outcome == 'SLIPPED':
+                agg['slipped'] += 1
+            else:  # deal absent from deals table — cannot classify
+                agg['unclassified'] += 1
+
+    def _finish(agg):
+        classified = agg['won'] + agg['lost'] + agg['slipped']
+        gated = classified >= min_evidence
+        return {
+            'n_observed': agg['n_observed'],
+            'classified': classified,
+            'unclassified': agg['unclassified'],
+            'won': agg['won'], 'lost': agg['lost'], 'slipped': agg['slipped'],
+            'win_rate': (agg['won'] / classified) if gated and classified else None,
+            'reason': (None if gated
+                       else f'{classified} classified < min_evidence {min_evidence}'),
+        }
+
+    by_stage_order = {so: _finish(agg) for so, agg in pooled_by_stage.items()}
+
+    return {
+        'by_stage_order': by_stage_order,
+        'quarters_analyzed': len(complete_quarters),
+        'complete_quarters': complete_quarters,
+        'min_evidence_count': min_evidence,
+        'scope': 'New+Expansion only (renewal pipeline excluded)',
+        'note': ('Pooled across all weeks and complete quarters per '
+                 'stage_order (not per-week). win_rate is null where the '
+                 'classified cohort at that stage is below '
+                 'min_evidence_count.'),
+    }
+
+
+def _actual_incremental_closed_won(sb, q_start_iso: str, q_end_iso: str):
+    """Actual closed-won incremental ARR (new_arr+expansion_arr), renewal
+    pipeline excluded, deals table. Promoted UNMODIFIED from
+    scripts/audit_coverage_curve.py::actual_incremental_closed_won after
+    live confirmation (2026-09-19).
+
+    OUTCOME-READ (same as _in_quarter_won_by_pipeline/_classify_deal_
+    outcome elsewhere in this module): `stage` here determines the
+    TERMINAL WON outcome (is_won), not a point-in-time stage exclusion —
+    the backfilled complete quarters hold zero won rows in
+    deals_snapshot, so a won transition has no point-in-time snapshot
+    equivalent; close_date bounds it to the (prior-year) quarter window."""
+    from field_semantics import _RENEWAL_PIPELINE_ID, is_won
+    from supabase_client import select_all
+    deals = select_all(sb, 'deals',
+        columns='deal_id,stage,close_date,pipeline_id,new_arr,expansion_arr')
+    total = 0.0
+    n = 0
+    for d in deals:
+        stage, close_date, pipeline_id = d.get('stage'), d.get('close_date'), d.get('pipeline_id')
+        if not stage or not close_date:
+            continue
+        if str(pipeline_id) == _RENEWAL_PIPELINE_ID:
+            continue
+        try:
+            if not is_won(str(stage)):
+                continue
+        except Exception:
+            continue
+        if not (q_start_iso <= str(close_date)[:10] <= q_end_iso):
+            continue
+        total += (d.get('new_arr') or 0) + (d.get('expansion_arr') or 0)
+        n += 1
+    return total, n
+
+
+def _qualified_pipeline_at_week(sb, quarter: str, week: int,
+                                 qualified_stage_order: int,
+                                 q_start_iso: str, q_end_iso: str):
+    """deal_value-based proxy (deals_snapshot.new_arr/expansion_arr are NOT
+    backfilled — migration 064 — so the exact incremental-ARR split isn't
+    computable historically; deal_value with the renewal pipeline excluded
+    is the best available approximation), renewal pipeline excluded,
+    qualified-stage threshold applied, CLOSE-QUARTER SCOPED (a deal only
+    counts if its own close_date at that snapshot falls inside the SAME
+    quarter being measured — matches query_pipeline()'s q3_scoped_pipeline
+    precedent). Adapted from
+    scripts/audit_coverage_curve.py::qualified_pipeline_at_week — NULL-
+    PROPAGATED here (that audit script coalesced a null deal_value to 0;
+    promoting it into this dollar-weighted, deals_snapshot-reading module
+    tripped eval_reconstruction.py's null-coalescing ratchet, confirmed
+    live in CI on 2026-09-19). A deal with no value history as of this
+    snapshot returns None, not 0 — EXCLUDED from the dollar sum and
+    counted separately (n_null_excluded), never coalesced to a
+    fabricated 0 — same discipline compute_waterfall.py's _deal_value()
+    enforces.
+
+    Returns (total, n, n_null_excluded)."""
+    from field_semantics import _RENEWAL_PIPELINE_ID
+    from supabase_client import select_all
+    rows = select_all(sb, 'deals_snapshot',
+        columns='deal_id,deal_value,pipeline_id,stage_order,close_date',
+        filters=[('eq', 'fiscal_quarter', quarter),
+                 ('eq', 'week_of_quarter', week)])
+    total = 0.0
+    n = 0
+    n_null_excluded = 0
+    for r in rows:
+        if str(r.get('pipeline_id')) == _RENEWAL_PIPELINE_ID:
+            continue
+        stage_order = r.get('stage_order')
+        if stage_order is None or stage_order < qualified_stage_order:
+            continue
+        close_date = r.get('close_date')
+        if not close_date or not (q_start_iso <= str(close_date)[:10] <= q_end_iso):
+            continue
+        deal_value = r.get('deal_value')
+        if deal_value is None:
+            n_null_excluded += 1
+            continue
+        total += deal_value
+        n += 1
+    return total, n, n_null_excluded
+
+
+def _prior_year_window(q_start_iso: str):
+    """(prior_start_iso, prior_end_iso, prior_label) for the SAME quarter
+    one fiscal year earlier, via get_fiscal_quarter() — not naive date
+    subtraction, so this respects the actual fiscal calendar. Promoted
+    UNMODIFIED from
+    scripts/audit_coverage_curve_proxy_target.py::prior_year_window."""
+    from utils import get_fiscal_quarter
+    from datetime import date as _date
+    from dateutil.relativedelta import relativedelta
+    q_start = _date.fromisoformat(q_start_iso)
+    shifted = q_start - relativedelta(years=1)
+    prior_start, prior_end, prior_label = get_fiscal_quarter(shifted)
+    return prior_start.isoformat(), prior_end.isoformat(), prior_label
+
+
+def query_coverage_proxy_target_by_week(sb=None) -> Dict:
+    """
+    HEURISTIC historical pipeline-coverage curve for
+    scripts/pipeline_coverage.py::assess_pipeline_coverage() (NORTH_STAR.md
+    CRO Priority #2). Promoted from
+    scripts/audit_coverage_curve_proxy_target.py after live confirmation
+    (2026-09-19): NO complete historical quarter (FY2026 Q3, FY2026 Q4,
+    FY2027 Q1, FY2027 Q2) ever had a real target in rep_targets, in any
+    label format (confirmed live: zero rows for any of the four). A real
+    coverage-TARGET curve therefore cannot be built from real historical
+    targets — this is a PROXY: target = 2x the SAME quarter's actual
+    closed-won incremental ARR from the PRIOR YEAR.
+
+    PERMANENT EVIDENCE CEILING (confirmed Path #2, not a fixable gap):
+    each of the 4 prior-year bases (FY2025 Q3/Q4, FY2026 Q1/Q2) has only
+    9-17 deals — none clears min_evidence_count=30, and no further
+    history will ever exist for these already-closed quarters. This
+    function NEVER excludes a quarter on that basis, but the output
+    always carries evidence_ceiling=True, heuristic=True and
+    label='HEURISTIC'. EVERY caller MUST surface the literal word
+    "HEURISTIC" (not "directional", not "approximate", not a buried
+    footnote) whenever this curve appears in synthesized output text —
+    this is fundamentally different from a real historical calibration
+    (e.g. query_commit_ml_calibration_by_week): a proxy stand-in, never
+    a measurement against a real historical goal.
+
+    Returns:
+        {'by_week': {1..13: {'mean_ratio', 'median_ratio', 'n_quarters'}},
+         'proxy_targets': {quarter: {'value', 'prior_year_label',
+             'prior_year_actual', 'prior_year_deal_count',
+             'evidence_gated': bool}},
+         'quarters_used': [...], 'min_evidence_count': int,
+         'evidence_ceiling': bool, 'heuristic': True, 'label': 'HEURISTIC',
+         'note': str}
+    """
+    import statistics
+    if sb is None:
+        sb = create_client(
+            os.environ['SUPABASE_URL'],
+            os.environ['SUPABASE_SERVICE_KEY']
+        )
+
+    config = _load_config()
+    min_evidence = config.get('min_evidence_count', 30)
+
+    from utils import get_pipeline_config
+    pipeline_config = get_pipeline_config()
+    qualified_stage_order = pipeline_config.get('qualified_stage_order', 1)
+
+    complete_quarters = _get_complete_quarters(sb)
+    if not complete_quarters:
+        return {
+            'error': 'No complete quarters available',
+            'coverage_note': 'Insufficient historical data'
+        }
+
+    proxy_targets = {}
+    quarter_windows = {}
+    for quarter in complete_quarters:
+        q_start_iso, q_end_iso = _quarter_window_iso(sb, quarter)
+        quarter_windows[quarter] = (q_start_iso, q_end_iso)
+        prior_start_iso, prior_end_iso, prior_label = _prior_year_window(q_start_iso)
+        prior_actual, prior_n = _actual_incremental_closed_won(
+            sb, prior_start_iso, prior_end_iso)
+        proxy_targets[quarter] = {
+            'value': 2 * prior_actual,
+            'prior_year_label': prior_label,
+            'prior_year_actual': prior_actual,
+            'prior_year_deal_count': prior_n,
+            'evidence_gated': prior_n < min_evidence,
+        }
+
+    valid_quarters = [q for q in complete_quarters
+                       if proxy_targets[q]['value'] > 0]
+
+    pooled_by_week = {}
+    total_null_excluded = 0
+    for week in range(1, 14):
+        ratios = []
+        week_null_excluded = 0
+        for quarter in valid_quarters:
+            q_start_iso, q_end_iso = quarter_windows[quarter]
+            pipeline_val, _n, n_null_excluded = _qualified_pipeline_at_week(
+                sb, quarter, week, qualified_stage_order, q_start_iso, q_end_iso)
+            ratios.append(pipeline_val / proxy_targets[quarter]['value'])
+            week_null_excluded += n_null_excluded
+        total_null_excluded += week_null_excluded
+        pooled_by_week[week] = {
+            'mean_ratio': statistics.mean(ratios) if ratios else None,
+            'median_ratio': statistics.median(ratios) if ratios else None,
+            'n_quarters': len(ratios),
+            'null_value_excluded_count': week_null_excluded,
+        }
+
+    evidence_ceiling = (all(proxy_targets[q]['evidence_gated'] for q in valid_quarters)
+                         if valid_quarters else True)
+
+    return {
+        'by_week': pooled_by_week,
+        'proxy_targets': proxy_targets,
+        'quarters_used': valid_quarters,
+        'min_evidence_count': min_evidence,
+        'evidence_ceiling': evidence_ceiling,
+        'null_value_excluded_count': total_null_excluded,  # deals with no
+            # deal_value history at that snapshot, excluded from every
+            # week's dollar sum (never coalesced to a fabricated 0)
+        'heuristic': True,
+        'label': 'HEURISTIC',
+        'note': (
+            'HEURISTIC: this curve is calibrated against a 2x-prior-year-'
+            'actual PROXY target, not a real historical quota — confirmed '
+            'live that no complete historical quarter ever had one. None '
+            f'of the prior-year bases clear min_evidence_count={min_evidence} '
+            'deals; this is a permanent structural ceiling (no further '
+            'historical data will ever exist for these closed quarters), '
+            'not a fixable gap. Never present this curve as a calibrated '
+            'measurement against real historical goals.'
+        ),
+    }
+
+
 def main():
     """CLI for testing analyses."""
     import argparse

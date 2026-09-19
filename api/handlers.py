@@ -241,20 +241,34 @@ def _labeled_overall(score):
 def _resolve_tw(params: dict) -> dict:
     """Return a resolved time window, defaulting to the current quarter.
 
-    The router always injects params['time_window'], but a handler must never
-    KeyError on a missing param: a raise drops the whole request to the dynamic
-    loop, which burns the query budget and returns nothing useful (the most
-    common user-visible failure in this system). Guarding here keeps every
-    time-scoped handler answerable even when called directly or under test.
+    The router always injects an already-resolved params['time_window']
+    (concrete start/end/label), but a handler must never KeyError on a
+    missing OR unresolved param: a raise drops the whole request to the
+    dynamic loop, which burns the query budget and returns nothing useful
+    (the most common user-visible failure in this system). Guarding here
+    keeps every time-scoped handler answerable even when called directly
+    or under test.
+
+    2026-09-19 (Handler 5 migration audit): a truthy-but-unresolved raw
+    spec (e.g. {"period": "last_N_days", "n": 90}, with no "start"/"end"
+    yet) used to be returned as-is, since the old check was just `if tw:`
+    — every real production path pre-resolves time_window before calling
+    a handler (route_question()'s classifier path, _call_handler_as_tool()
+    for unified-routing handlers), so this never fired live, but it broke
+    this exact docstring's own "answerable... under test" guarantee: a
+    handler called directly with a raw spec (e.g. a baseline-capture
+    script, matching every OTHER param this codebase resolves defensively)
+    got a bare KeyError deep in a filter clause instead of a real answer.
+    Now resolves anything not already carrying both "start" and "end".
     """
     tw = params.get("time_window")
-    if tw:
+    if tw and "start" in tw and "end" in tw:
         return tw
     try:
         from api.time_resolver import resolve_time_window
     except ImportError:
         from time_resolver import resolve_time_window
-    return resolve_time_window({})
+    return resolve_time_window(tw or {})
 
 
 def _resolve_owner_email(params: dict, sb):
@@ -783,7 +797,7 @@ async def query_waterfall(params: dict, sb) -> dict:
 
     if not verification_result["match"]:
         logger.error(f"[STRUCTURED_VERIFY] query_waterfall aggregation mismatch: {verification_result}")
-        raise ValueError(f"Aggregation verification failed: {verification_result['details']}")
+        raise ValueError(f"Aggregation verification failed: {verification_result['discrepancies']}")
 
     return result
 
@@ -843,6 +857,40 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
                        "MEDDICC analysis yet — those run nightly.")
         }
 
+    # Phase 2 Handler 6/6: Structured aggregation verification (2026-09-19)
+    # Same standard as the other 5 migrated handlers — total_at_risk must be
+    # verified against the actual at_risk list BEFORE it's sliced to the
+    # top 10 for display, since a future edit computing the count from the
+    # sliced list instead (e.g. len(at_risk[:10])) would silently cap
+    # "total_at_risk" at 10 no matter how many deals are really at risk.
+    try:
+        from structured_verification import verify_structured_aggregations
+    except ImportError:
+        from api.structured_verification import verify_structured_aggregations
+
+    verification_result = verify_structured_aggregations(
+        underlying_data=at_risk,
+        structured_output={"total_at_risk": len(at_risk)},
+        verification_spec={
+            "total_at_risk": {
+                "type": "count",
+                "expected": len(at_risk)
+            },
+        },
+        tolerance=0.01
+    )
+
+    if not verification_result["match"]:
+        logger.error(f"[STRUCTURED_VERIFY] query_deals_at_risk aggregation "
+                     f"verification failed: {verification_result['discrepancies']}")
+        return {
+            "error": "aggregation_verification_failed",
+            "discrepancies": verification_result["discrepancies"],
+            "note": "Aggregation outputs did not match recomputed values from underlying data. "
+                   "This is a code-level gate, not a data issue — if you see this, there is "
+                   "a bug in the aggregation logic that must be fixed before shipping results."
+        }
+
     return {
         "deals_at_risk": at_risk[:10],
         "total_at_risk": len(at_risk)
@@ -898,6 +946,88 @@ async def query_high_priority_deal_risk(params: dict, sb) -> dict:
     )
 
     return result
+
+
+async def query_forecast_trust(params: dict, sb) -> dict:
+    """
+    Quarter-level forecast-trustworthiness signal: how much to trust THIS
+    quarter's COMMIT+MOST_LIKELY number (NORTH_STAR.md CRO Priority #1).
+
+    Composes assess_deal_risk() (per-deal cycle-length risk on this
+    quarter's COMMIT+MOST_LIKELY cohort — NOT the COMMIT-only cohort
+    query_high_priority_deal_risk uses) with a pooled, week-indexed
+    historical win-rate baseline, looked up at whatever week the current
+    quarter is actually in — a moving comparison, never a fixed anchor.
+
+    Below week 3 of the current quarter, returns insufficient_data/
+    too_early: reps structurally don't produce reliable Commit/Most-Likely
+    tags in the coverage-building phase (not yet forecasting).
+
+    Answers questions like:
+    - "How much should I trust this quarter's number?"
+    - "Is our Commit pipeline reliable this quarter?"
+    - "How risky is this quarter's forecast right now?"
+    """
+    from forecast_trust import assess_forecast_trust
+
+    as_of = None
+    as_of_str = params.get("as_of")  # optional ISO date, for testability only
+    if as_of_str:
+        from datetime import date as _date
+        try:
+            as_of = _date.fromisoformat(as_of_str)
+        except ValueError:
+            logger.error(f"[FORECAST_TRUST] Invalid as_of date: {as_of_str!r}")
+
+    try:
+        return assess_forecast_trust(sb, as_of=as_of)
+    except Exception as e:
+        logger.error(f"[FORECAST_TRUST] Failed to assess forecast trust: {e}")
+        return {
+            "error": f"Failed to assess forecast trust: {e}",
+            "status": "error",
+        }
+
+
+async def query_pipeline_coverage(params: dict, sb) -> dict:
+    """
+    Current-quarter pipeline-coverage assessment against the REAL stated
+    quota+stretch goal, gap-to-goal always (never a bare ratio)
+    (NORTH_STAR.md CRO Priority #2).
+
+    NOT the same as query_coverage (that handler's coverage-ratio math
+    is confirmed broken in production — divides one unscoped total
+    pipeline figure against each individual rep's own target). This is
+    a fresh composition: New+Expansion-only, qualified-pipeline-only,
+    weighted by historical stage-level close rate, compared against a
+    real quota+stretch target, with a HEURISTIC historical curve
+    (2x-prior-year-actual proxy — no real historical target ever
+    existed) shown for context only, always labeled as a heuristic.
+
+    Answers questions like:
+    - "How much pipeline coverage do we have this quarter?"
+    - "Are we tracking to goal on pipeline?"
+    - "How far short of target is our qualified pipeline?"
+    """
+    from pipeline_coverage import assess_pipeline_coverage
+
+    as_of = None
+    as_of_str = params.get("as_of")  # optional ISO date, for testability only
+    if as_of_str:
+        from datetime import date as _date
+        try:
+            as_of = _date.fromisoformat(as_of_str)
+        except ValueError:
+            logger.error(f"[PIPELINE_COVERAGE] Invalid as_of date: {as_of_str!r}")
+
+    try:
+        return assess_pipeline_coverage(sb, as_of=as_of)
+    except Exception as e:
+        logger.error(f"[PIPELINE_COVERAGE] Failed to assess pipeline coverage: {e}")
+        return {
+            "error": f"Failed to assess pipeline coverage: {e}",
+            "status": "error",
+        }
 
 
 async def query_win_loss(params: dict, sb) -> dict:
@@ -961,6 +1091,54 @@ async def query_win_loss(params: dict, sb) -> dict:
              if d.get("deal_status") == "won"]
     losses = [d for d in closed_deals
               if d.get("deal_status") == "lost"]
+
+    # Phase 2 Handler 5/6: Structured aggregation verification (2026-09-19)
+    # Same "prove the trap springs" standard as query_pipeline/query_waterfall/
+    # query_stale_deals/query_rep_pipeline — verify win_count/loss_count
+    # against the actual won/lost deals before returning, since this is the
+    # first migrated handler whose primary payload is a SPLIT of one list
+    # (closed_deals) by a field value rather than a straight sum/count.
+    try:
+        from structured_verification import verify_structured_aggregations
+    except ImportError:
+        from api.structured_verification import verify_structured_aggregations
+
+    verification_result = verify_structured_aggregations(
+        underlying_data=closed_deals,
+        structured_output={
+            "win_count": len(wins),
+            "loss_count": len(losses),
+        },
+        verification_spec={
+            "win_count": {
+                "type": "count_filtered",
+                "filter": lambda d: d.get("deal_status") == "won",
+                "expected": len(wins)
+            },
+            "loss_count": {
+                "type": "count_filtered",
+                "filter": lambda d: d.get("deal_status") == "lost",
+                "expected": len(losses)
+            },
+        },
+        tolerance=0.01
+    )
+
+    if not verification_result["match"]:
+        # Corruption detected - return error instead of corrupted data
+        # (matches query_pipeline/query_stale_deals's graceful-degradation
+        # pattern, not query_waterfall/query_rep_pipeline's raise — see
+        # PENDING_WORK.md's Handler 5 entry for why those two also had a
+        # ['details'] KeyError bug in this same branch, fixed alongside this)
+        logger.error(f"[STRUCTURED_VERIFY] query_win_loss aggregation "
+                     f"verification failed: {verification_result['discrepancies']}")
+        return {
+            "error": "aggregation_verification_failed",
+            "discrepancies": verification_result["discrepancies"],
+            "note": "Aggregation outputs did not match recomputed values from underlying data. "
+                   "This is a code-level gate, not a data issue — if you see this, there is "
+                   "a bug in the aggregation logic that must be fixed before shipping results."
+        }
 
     return {
         "narratives":    narratives,
@@ -2758,7 +2936,7 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
 
     if not verification_result["match"]:
         logger.error(f"[STRUCTURED_VERIFY] query_rep_pipeline aggregation mismatch: {verification_result}")
-        raise ValueError(f"Aggregation verification failed: {verification_result['details']}")
+        raise ValueError(f"Aggregation verification failed: {verification_result['discrepancies']}")
 
     return result
 

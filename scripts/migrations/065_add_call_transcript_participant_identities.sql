@@ -1,0 +1,40 @@
+-- Apollo-specific participant identity data for the rep-coaching
+-- primitive's Criterion C (talk-time/question-share diagnostic).
+--
+-- Confirmed LIVE (2026-09-19, three-run investigation): Apollo's
+-- conversation DETAIL response (ApolloClient.get_conversation, NOT the
+-- /conversations/search endpoint scripts/enrichment/apollo_participants.py
+-- already reads) carries a `participants` field shaped as
+-- {"internal": [...], "external": {account_id: [...]}}, where every
+-- record has a real id/name/email/title/account_id. That id is CONFIRMED
+-- (live overlap check against a real call) to be the exact same id
+-- Apollo's transcript fragments use as participant_id — the same key
+-- already stored in call_transcripts.talk_time_seconds/question_count/
+-- speakers. So Apollo-sourced calls can attribute talk time to a real
+-- identity by EXACT ID LOOKUP, no name-matching at all.
+--
+-- Fireflies has NO equivalent anywhere in its API: querying `email` on
+-- its Sentence type is rejected by the live schema, and its top-level
+-- speakers{id,name} field carries a meaningless small ordinal id with no
+-- email — confirmed live. This column is therefore Apollo-only BY
+-- DESIGN, not an oversight: it stays NULL for every source='fireflies'
+-- (and 'gong') row, forever, and callers must treat that as
+-- source_not_supported, never as a backfill gap to close.
+--
+-- Deliberately NOT merged into calls.participant_emails: that field is a
+-- call-level, source-generic roster both sources' deal-resolution
+-- (scripts/enrichment/resolve_calls.py) already depends on meaning the
+-- same thing for either source. This is a separate, per-SPEAKER-KEY
+-- structure only Apollo can ever populate, added on call_transcripts
+-- (the table that already owns the speaker_key namespace).
+
+ALTER TABLE call_transcripts ADD COLUMN IF NOT EXISTS participant_identities JSONB;
+  -- {speaker_key: {"name", "email", "title", "account_id",
+  --   "is_internal", "is_bot"}} — keyed EXACTLY like talk_time_seconds/
+  -- question_count/speakers on this same row, so a caller looks up a
+  -- speaker's identity by the identical key, never by name. is_internal
+  -- is derived from the email domain against config/client.yaml's
+  -- organization.internal_domains (this codebase's own canonical
+  -- definition), not Apollo's own internal/external bucketing. is_bot
+  -- flags notetaker/recorder artifacts (e.g. "Fireflies.ai Notetaker") —
+  -- never a real participant, never scored as one.

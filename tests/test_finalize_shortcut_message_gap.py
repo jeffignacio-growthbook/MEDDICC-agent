@@ -349,7 +349,7 @@ def test_without_the_fix_the_enrichment_data_would_be_invisible_to_synthesis():
     """
     orig_append = router._append_tool_result_message
     orig_attach = router.attach_company_names
-    router._append_tool_result_message = lambda messages, raw, result: None
+    router._append_tool_result_message = lambda messages, raw, result, tool_name="": None
     router.attach_company_names = lambda diff_result, names: diff_result
     try:
         responses = _scripted_responses()
