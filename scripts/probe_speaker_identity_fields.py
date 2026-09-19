@@ -232,6 +232,37 @@ def probe_apollo_identity(client, call_ids):
             elif isinstance(praw, dict):
                 print(f"    dict with {len(praw)} keys: {sorted(praw.keys())}")
                 print(f"    RAW (truncated): {json.dumps({k: str(v)[:150] for k, v in praw.items()})}")
+                # Apollo's real shape here (confirmed live): {"internal": [...],
+                # "external": {account_id: [...]}}. Flatten both sides into one
+                # participant-record list and check id-overlap against the
+                # transcript fragments' participant_id — the one check that
+                # actually answers whether this can bridge speaker->identity.
+                flat_participants = []
+                internal = praw.get("internal")
+                if isinstance(internal, list):
+                    flat_participants.extend(p for p in internal if isinstance(p, dict))
+                external = praw.get("external")
+                if isinstance(external, dict):
+                    for v in external.values():
+                        if isinstance(v, list):
+                            flat_participants.extend(p for p in v if isinstance(p, dict))
+                elif isinstance(external, list):
+                    flat_participants.extend(p for p in external if isinstance(p, dict))
+                if flat_participants:
+                    print(f"    flattened participant records (internal+external): "
+                          f"{len(flat_participants)}")
+                    print(f"    each record's keys: {sorted(flat_participants[0].keys())}")
+                    for p in flat_participants:
+                        print(f"      id={p.get('id')!r} name={p.get('name')!r} "
+                              f"email={p.get('email')!r}")
+                    participant_ids_in_dict = {p.get("id") for p in flat_participants
+                                               if p.get("id")}
+                    overlap = participant_ids_in_dict & set(frag_participant_ids)
+                    print(f"    transcript fragment participant_ids: {frag_participant_ids}")
+                    print(f"    ids present in flattened participants: "
+                          f"{sorted(participant_ids_in_dict)}")
+                    print(f"    OVERLAP (can bridge speaker->identity via id): "
+                          f"{sorted(overlap) if overlap else 'NONE — no shared id field'}")
             else:
                 print(f"    RAW value (truncated): {str(praw)[:300]}")
         else:
