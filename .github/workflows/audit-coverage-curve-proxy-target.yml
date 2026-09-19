@@ -1,0 +1,46 @@
+name: Audit Coverage Curve Proxy Target (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY,
+# Supabase only.
+#
+# Per Jeff's correction: no real target ever existed for any of the 4
+# complete historical quarters (confirmed live in a prior audit). This
+# rebuilds the coverage curve on the corrected basis — proxy target =
+# 2x the SAME quarter's actual closed-won incremental ARR from the
+# PRIOR YEAR — REPLACING the earlier pipeline/same-quarter-actual-
+# outcome curve, not sitting alongside it. Checks all 4 needed
+# prior-year quarters (FY2025 Q3/Q4, FY2026 Q1/Q2), not just the one
+# Jeff named as an example (FY2026 Q1), since the same logic generalizes
+# to all four complete quarters.
+#
+# Report only. No primitive is designed or built here. Safe to delete
+# once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit coverage curve proxy target"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/audit_coverage_curve_proxy_target.py
