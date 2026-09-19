@@ -1,0 +1,44 @@
+name: Audit Coverage Curve Shape (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY,
+# Supabase only.
+#
+# Per Jeff's domain-spec point 4 for the pipeline-coverage primitive:
+# does real historical data support a 3x-early -> ~1x-late decay curve
+# for how much qualified pipeline is "enough," or a different shape?
+# Runs scripts/audit_coverage_curve.py, which pools across the same 4
+# complete quarters already used for the forecast-trustworthiness
+# calibration, computing (qualified pipeline $ at week W) / (actual
+# closed-won incremental ARR for the quarter) at every week 1-13.
+#
+# Report only. No primitive is designed or built here. Safe to delete
+# once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit coverage curve shape"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/audit_coverage_curve.py
