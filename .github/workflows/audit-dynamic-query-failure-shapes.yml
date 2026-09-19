@@ -1,0 +1,46 @@
+name: Audit Dynamic Query Failure Shapes (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY.
+#
+# Audits query_cost_log (every dynamic_query_loop invocation, full
+# history) and learning_log (assessor-driven correctness signals, full
+# history) to build a real, evidence-based frequency table of WHAT SHAPE
+# of underlying need is actually going unmet in dynamic_query — as the
+# basis for deciding which primitive to build next, replacing a guess-
+# based roadmap ordering. Runs scripts/audit_dynamic_query_failure_
+# shapes.py, which classifies each failed/caveated/rescued question's
+# shape via a live Haiku call (role=evaluator) against a candidate list,
+# allowing new shape labels rather than force-fitting.
+#
+# Does not write to query_cost_log, learning_log, HubSpot, or anything
+# else. Safe to delete once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit dynamic_query failure/caveat shapes across full history"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python scripts/audit_dynamic_query_failure_shapes.py
