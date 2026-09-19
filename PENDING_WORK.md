@@ -2595,3 +2595,83 @@ surprise later.
 **Status: Handler 5/6 complete, live-verified, ready for Handler 6
 (query_deals_at_risk).**
 
+
+## ✅ Phase 2 Handler 6/6 (query_deals_at_risk) — Migrated, final handler in the set
+
+**Date**: 2026-09-19. Steps A/B/C/D done, live-verified via GitHub
+Actions — this is the last of the 6 Phase-2 handlers (plus the Phase 1
+query_pipeline_movement pilot), so all 7 unified-routing handlers are
+now migrated and live-verified.
+
+**STEP A:** No gaps — `deal_ids` and `time_window` both reach the
+handler via the same generic mechanisms every other handler relies on.
+
+**STEP B:** Registered in `tool_fn`, tool description, classifier
+bypass list. **Real bug found and fixed BEFORE any live run** (Step
+A/B review alone, not live testing): `STRUCTURED_HANDLERS` had no entry
+for `query_deals_at_risk` at all, and a naive `["deals_at_risk"]`-only
+entry would have reproduced `query_win_loss`'s exact wins-only mistake
+— the genuinely-empty "no deals at risk" case has an empty
+`deals_at_risk` list but a complete, human-readable `message`
+explaining why. Registered as `["deals_at_risk", "message"]` so that
+case classifies `"good"` instead of `"empty"` (which would have wasted
+a dynamic-query fallback on a question the handler already answered).
+
+**STEP D:** `query_deals_at_risk` had no `verify_structured_
+aggregations()` call — added one verifying `total_at_risk` against the
+real count *before* the top-10 display slice, tested with a planted
+discrepancy.
+
+**STEP C (baseline + live verification):** capture script added
+(`tests/fixtures/capture_query_deals_at_risk_baseline.py`), including a
+raw-unresolved `time_window` case specifically re-testing the
+`_resolve_tw()` fix from Handler 5's audit against this handler too —
+**confirmed it protects this handler as well** (no crash; baseline:
+current scope = 63 at-risk deals, raw last-30-days spec = 52, both
+succeeded). Live GitHub Actions run
+([35443858332](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35443858332)):
+"which deals are at risk" correctly routed to `query_deals_at_risk`
+(`[HANDLER] query_deals_at_risk → good`, confirming the STRUCTURED_
+HANDLERS fix classifies correctly) and answered **"63 deals flagged at
+risk"** — exact match to the baseline capture's 63 — with real company
+names (UPS $300K, ClickHouse $200K, etc.), real risk flags, and a
+genuine pattern observation (Discovery-stage deals lacking Pain/
+Champion scores, likely call-coverage gaps).
+
+**Honest note on the second live phrasing:** "which deals have champion
+gaps this quarter" did **not** route to `query_deals_at_risk` — the
+classifier picked `query_deal_health` (confidence 0.95) instead, a
+different, pre-existing, unmigrated handler. Confirmed this is **not a
+regression from this migration**: `query_deal_health` isn't in the
+unified-routing bypass list, was never touched by this work, and the
+ambiguity is a genuine natural-language one between two legitimate
+handlers with overlapping claims on "champion gaps" phrasing — exactly
+the kind of classifier routing ambiguity `docs/UNIFIED_ROUTING_
+ARCHITECTURE.md` names as a demonstrated bug class motivating the whole
+migration, just not one this session chased down (out of scope: neither
+handler was wrong to want that phrasing, and `query_deal_health` isn't
+part of the Phase 2 migration set). So Handler 6 has ONE exact-match
+live confirmation, not two — reported honestly rather than treating the
+second run as a second success.
+
+**No new `STRUCTURED_HANDLERS`/`['details']`-class bugs found in this
+handler beyond the one listed above** — the `_resolve_tw()` and
+`verification_result['details']` bugs were both shared-code issues
+already fixed during Handler 5's audit and confirmed (via the raw-spec
+baseline test case above) to already protect this handler too.
+
+**Status: Phase 2 migration COMPLETE.** All 7 unified-routing handlers
+(`query_pipeline_movement`, `query_pipeline`, `query_stale_deals`,
+`query_waterfall`, `query_rep_pipeline`, `query_win_loss`, `query_deals_
+at_risk`) are migrated, registered in `STRUCTURED_HANDLERS` (so none of
+them can hit the synthesis-truncation bug class), have structured
+verification wired, and have at least one live-verified exact-match
+rendered answer. Remaining follow-ups from this whole audit, not
+blocking: (1) `query_win_loss`'s 142K-char payload as a future cost/
+latency look; (2) the `query_deal_health` / `query_deals_at_risk`
+phrasing ambiguity noted above, if it's ever worth disambiguating
+further; (3) the deferred `docs/UNIFIED_ROUTING_ARCHITECTURE.md` Phase 2
+follow-through items (removing `HANDLER_DESCRIPTIONS` entries for
+migrated handlers, removing now-dead redirect logic) — cosmetic/cleanup,
+not correctness, left for a deliberate separate pass.
+
