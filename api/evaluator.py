@@ -14,7 +14,11 @@ Assesses whether handler results are useful before committing to synthesis.
 STRUCTURED_HANDLERS = {
     "query_deal":      ["deal"],
     "query_rubric":    ["description", "rubric_overview"],  # score-specific or general
-    "query_win_loss":  ["losses"],  # check losses instead of wins
+    "query_win_loss":  ["wins", "losses"],  # either populated is a real result;
+        # checking "losses" alone (as this read prior to the Handler 5 unified-
+        # routing audit) misclassified a genuine wins-only quarter (real wins,
+        # zero losses) as "empty" — losses.get() returns [] there, which the
+        # loop below treats as "try the next key", and there was no next key
     "generate_win_loss": ["narrative"],
     "set_target":      ["set"],
     "query_arr":       ["arr_by_customer"],

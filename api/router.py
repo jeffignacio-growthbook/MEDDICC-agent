@@ -1254,6 +1254,19 @@ TOOLS YOU CAN CALL:
     - owner_email: rep email or name (required, accepts "cary@growthbook.io" or "Cary" or "Christian")
     **RETURNS**: All active deals for the rep with MEDDICC scores, sorted by deal value descending
     Examples: "show me Christian's pipeline", "what deals does Cary have", "Jake's pipeline"
+  query_win_loss(time_window, deal_ids)
+    **PHASE 2: Handler 5/6 migrated to unified routing**
+    **USE THIS when the question asks about**:
+    - WIN/LOSS ANALYSIS, WHY we won/lost, win/loss BREAKDOWN, win/loss SUMMARY
+    - Narrative analysis of closed deal outcomes, not just counts
+    - "why are we losing", "win loss breakdown", "give me a win loss summary",
+      "what's causing deals to close lost", "win/loss reasons", "loss analysis"
+    **DO NOT use for simple counts of won/lost deals** (use query_waterfall for flow metrics)
+    Params:
+    - time_window: dict for time range (optional, defaults to current quarter, e.g. {{"period": "current_quarter"}})
+    - deal_ids: filter to a specific set of deals (optional, injected automatically for entity-scoped follow-ups)
+    **RETURNS**: AI-generated win/loss narratives, recent closed deals with lost_reason, MEDDICC scores at time of close, win/loss counts
+    Examples: "why are we losing", "win loss breakdown this quarter", "why did we lose Acme", "win/loss summary"
 
 RULES:
 - Only use column names that appear in the schema above
@@ -4572,6 +4585,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             "query_stale_deals": lambda sb_arg, **params: _call_handler_as_tool("query_stale_deals", params, sb_arg),
             "query_waterfall": lambda sb_arg, **params: _call_handler_as_tool("query_waterfall", params, sb_arg),
             "query_rep_pipeline": lambda sb_arg, **params: _call_handler_as_tool("query_rep_pipeline", params, sb_arg),
+            "query_win_loss": lambda sb_arg, **params: _call_handler_as_tool("query_win_loss", params, sb_arg),
         }.get(tool_name)
 
         if not tool_fn:
@@ -5214,7 +5228,7 @@ async def route_question(question: str, user_id: str,
         # Phase 2: query_pipeline, query_stale_deals, query_waterfall, query_rep_pipeline, query_win_loss, query_deals_at_risk
         # Skip classifier routing - route to dynamic loop where they're registered as callable tools.
         # All other handlers continue using classifier routing unchanged.
-        if handler_name in ("query_pipeline_movement", "query_pipeline", "query_stale_deals", "query_waterfall", "query_rep_pipeline"):
+        if handler_name in ("query_pipeline_movement", "query_pipeline", "query_stale_deals", "query_waterfall", "query_rep_pipeline", "query_win_loss"):
             logger.info(f"[UNIFIED_ROUTING] {handler_name} → dynamic loop "
                        f"(classifier confidence={confidence:.2f}, bypassed)")
             handler_name = "dynamic_query"

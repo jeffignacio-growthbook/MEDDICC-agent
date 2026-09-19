@@ -783,7 +783,7 @@ async def query_waterfall(params: dict, sb) -> dict:
 
     if not verification_result["match"]:
         logger.error(f"[STRUCTURED_VERIFY] query_waterfall aggregation mismatch: {verification_result}")
-        raise ValueError(f"Aggregation verification failed: {verification_result['details']}")
+        raise ValueError(f"Aggregation verification failed: {verification_result['discrepancies']}")
 
     return result
 
@@ -961,6 +961,54 @@ async def query_win_loss(params: dict, sb) -> dict:
              if d.get("deal_status") == "won"]
     losses = [d for d in closed_deals
               if d.get("deal_status") == "lost"]
+
+    # Phase 2 Handler 5/6: Structured aggregation verification (2026-09-19)
+    # Same "prove the trap springs" standard as query_pipeline/query_waterfall/
+    # query_stale_deals/query_rep_pipeline — verify win_count/loss_count
+    # against the actual won/lost deals before returning, since this is the
+    # first migrated handler whose primary payload is a SPLIT of one list
+    # (closed_deals) by a field value rather than a straight sum/count.
+    try:
+        from structured_verification import verify_structured_aggregations
+    except ImportError:
+        from api.structured_verification import verify_structured_aggregations
+
+    verification_result = verify_structured_aggregations(
+        underlying_data=closed_deals,
+        structured_output={
+            "win_count": len(wins),
+            "loss_count": len(losses),
+        },
+        verification_spec={
+            "win_count": {
+                "type": "count_filtered",
+                "filter": lambda d: d.get("deal_status") == "won",
+                "expected": len(wins)
+            },
+            "loss_count": {
+                "type": "count_filtered",
+                "filter": lambda d: d.get("deal_status") == "lost",
+                "expected": len(losses)
+            },
+        },
+        tolerance=0.01
+    )
+
+    if not verification_result["match"]:
+        # Corruption detected - return error instead of corrupted data
+        # (matches query_pipeline/query_stale_deals's graceful-degradation
+        # pattern, not query_waterfall/query_rep_pipeline's raise — see
+        # PENDING_WORK.md's Handler 5 entry for why those two also had a
+        # ['details'] KeyError bug in this same branch, fixed alongside this)
+        logger.error(f"[STRUCTURED_VERIFY] query_win_loss aggregation "
+                     f"verification failed: {verification_result['discrepancies']}")
+        return {
+            "error": "aggregation_verification_failed",
+            "discrepancies": verification_result["discrepancies"],
+            "note": "Aggregation outputs did not match recomputed values from underlying data. "
+                   "This is a code-level gate, not a data issue — if you see this, there is "
+                   "a bug in the aggregation logic that must be fixed before shipping results."
+        }
 
     return {
         "narratives":    narratives,
@@ -2758,7 +2806,7 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
 
     if not verification_result["match"]:
         logger.error(f"[STRUCTURED_VERIFY] query_rep_pipeline aggregation mismatch: {verification_result}")
-        raise ValueError(f"Aggregation verification failed: {verification_result['details']}")
+        raise ValueError(f"Aggregation verification failed: {verification_result['discrepancies']}")
 
     return result
 
