@@ -205,6 +205,46 @@ jobs:
           # here.
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/test_pipeline_coverage.py
 
+      - name: "TEST 0bg — Offline: rep-coaching Criterion C talk-ratio diagnostic (assess_call_talk_ratio)"
+        run: |
+          set -e
+          # 2026-09-19: rep-coaching primitive, Criterion C (talk-time /
+          # question-share). DIAGNOSTIC ONLY, no pass/fail threshold — the
+          # first calibration attempt (owner-name matched against a call's
+          # own participant_emails) never cleared the 90% reliability bar
+          # (76.7%/81.5% on the full population). scripts/coaching_talk_
+          # ratio.py replaces that entirely for Apollo-sourced calls with
+          # an EXACT PARTICIPANT-ID MATCH (no name-matching anywhere),
+          # confirmed live via a three-run investigation that Apollo's
+          # conversation-detail `participants` field ties a diarized
+          # speaker to a real email/account by the same id already used
+          # as call_transcripts' speaker key (migration 065,
+          # participant_identities). That mechanism's own reliability has
+          # not yet been calibrated into a won/lost threshold, so this
+          # returns plain numbers only — never a judgment.
+          #
+          # Fireflies has NO equivalent anywhere in its API (confirmed
+          # live — querying `email` on its Sentence type is rejected by
+          # the schema) and MUST return insufficient_data/
+          # source_not_supported here, explicitly, every time.
+          #
+          # scripts/test_coaching_talk_ratio.py covers: the source gate
+          # (non-Apollo always insufficient_data), missing-identities /
+          # missing-speech-data gating, the normal Apollo case (hand-
+          # verified ratio arithmetic), bot/unmatched-speaker exclusion
+          # from BOTH sides of the ratio (never dropped silently —
+          # counted in unmatched_seconds), and two planted-discrepancy
+          # regressions — bot exclusion and the source gate itself — each
+          # verified by actually breaking scripts/coaching_talk_ratio.py
+          # on disk, confirming the test failed, and restoring it clean.
+          #
+          # scripts/eval_transcript_store.py (run above by TEST 0) covers
+          # the extraction side: _extract_apollo_participant_identities()
+          # id-keying, is_internal derivation, bot flagging, and that
+          # participant_identities flows through build_transcript_row()
+          # (always present, explicitly None for non-Apollo sources).
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/test_coaching_talk_ratio.py
+
       - name: "TEST 0c — Offline: date/time-window resolution (single-source-of-truth gate)"
         run: |
           set -e

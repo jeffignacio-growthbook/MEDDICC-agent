@@ -119,7 +119,7 @@ def backfill(dry_run=True, only_source=None, limit=None, batch=25):
         pending = []
         for i, c in enumerate(todo, 1):
             cid = str(c["call_id"])
-            utts, err = fetch_utterances(source, cid, clients,
+            utts, err, extra = fetch_utterances(source, cid, clients,
                                          throttle=throttle.get(source, 0.0))
             stats["attempted"] += 1
             if err:
@@ -131,7 +131,7 @@ def backfill(dry_run=True, only_source=None, limit=None, batch=25):
                 stats["reasons"][("defer: " + err)[:48]] += 1
             else:
                 row = build_transcript_row(source, cid, utts, error=None,
-                                           call_date=c.get("call_date"))
+                                           call_date=c.get("call_date"), extra=extra)
                 if row["transcript_quality"] == UNAVAILABLE:
                     stats["unavailable"] += 1   # genuine no-content
                     stats["reasons"][(row["unavailable_reason"] or "")[:48]] += 1
