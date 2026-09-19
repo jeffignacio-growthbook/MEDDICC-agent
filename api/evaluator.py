@@ -3,6 +3,32 @@ Result quality evaluator for CRO Slack Agent.
 Assesses whether handler results are useful before committing to synthesis.
 """
 
+# Handlers that return finished, structured fields (not raw "rows" to sample).
+# Module-level (not function-local) because api.router also reads this list:
+# a handler in here has a bounded, purpose-built return shape by construction
+# (an explicit key set a human wrote, not an arbitrary row dump), so its JSON
+# is safe to pass to synthesis in full — see the truncation-safety check next
+# to `json.dumps(result, default=str)[:3000]` in router.py's
+# _dynamic_query_loop_core. Adding a new structured handler here also makes
+# it truncation-safe; that's intentional, not a side effect to guard against.
+STRUCTURED_HANDLERS = {
+    "query_deal":      ["deal"],
+    "query_rubric":    ["description", "rubric_overview"],  # score-specific or general
+    "query_win_loss":  ["losses"],  # check losses instead of wins
+    "generate_win_loss": ["narrative"],
+    "set_target":      ["set"],
+    "query_arr":       ["arr_by_customer"],
+    "query_competitive_intel": ["competitor_counts"],
+    "query_rubric_scores_bulk": ["scores"],
+    "query_deal_stages_bulk":   ["stages"],
+    "query_deal_owners_bulk":   ["owners"],
+    "query_deal_values_bulk":   ["values"],
+    "query_pipeline":  ["total_deals", "total_pipeline"],  # Phase 2 migration
+    "query_stale_deals": ["stale_deals", "stale_count"],  # Phase 2 handler 2/6
+    "query_waterfall": ["pipeline_summary", "waterfall"],  # Phase 2 handler 3/6
+    "query_rep_pipeline": ["deals", "summary"],  # Phase 2 handler 4/6
+}
+
 
 def evaluate_result(result: dict, handler_name: str) -> str:
     """
@@ -22,25 +48,8 @@ def evaluate_result(result: dict, handler_name: str) -> str:
     if result.get("error"):
         return "error"
 
-    # Handlers that return structured fields (not rows)
-    # Check the primary key field is populated
-    STRUCTURED_HANDLERS = {
-        "query_deal":      ["deal"],
-        "query_rubric":    ["description", "rubric_overview"],  # score-specific or general
-        "query_win_loss":  ["losses"],  # check losses instead of wins
-        "generate_win_loss": ["narrative"],
-        "set_target":      ["set"],
-        "query_arr":       ["arr_by_customer"],
-        "query_competitive_intel": ["competitor_counts"],
-        "query_rubric_scores_bulk": ["scores"],
-        "query_deal_stages_bulk":   ["stages"],
-        "query_deal_owners_bulk":   ["owners"],
-        "query_deal_values_bulk":   ["values"],
-        "query_pipeline":  ["total_deals", "total_pipeline"],  # Phase 2 migration
-        "query_stale_deals": ["stale_deals", "stale_count"],  # Phase 2 handler 2/6
-        "query_waterfall": ["pipeline_summary", "waterfall"],  # Phase 2 handler 3/6
-        "query_rep_pipeline": ["deals", "summary"],  # Phase 2 handler 4/6
-    }
+    # Handlers that return structured fields (not rows) —
+    # check the primary key field is populated
     if handler_name in STRUCTURED_HANDLERS:
         primary_keys = STRUCTURED_HANDLERS[handler_name]
         # Check if ANY of the expected keys exist and have data

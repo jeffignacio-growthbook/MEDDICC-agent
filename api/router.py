@@ -1717,7 +1717,53 @@ def _build_missing_snapshot_fetch(queries_run: list, missing_date: str):
         return p.get("table"), p.get("columns"), new_filters
     return None
 
-def _append_tool_result_message(messages: list, raw: str, result: dict) -> None:
+def _serialize_tool_result_for_synthesis(result: dict, tool_name: str) -> tuple:
+    """Serialize a tool result for the synthesis prompt, deciding once
+    whether it's safe to send in full.
+
+    2026-09-19: the previous check here (`"summary" in result and
+    "total_deals" in result["summary"]`) was a pattern-match on
+    query_rep_pipeline's specific return shape, not a real "is this
+    complete" test — query_pipeline, query_stale_deals, and
+    query_waterfall all have differently-shaped structured returns and
+    silently failed it, so their JSON kept getting hard-truncated to
+    [:3000] chars before the LLM ever saw it (confirmed to cut real
+    payloads of 7,654 and 14,207 chars for query_pipeline and
+    query_stale_deals respectively — see PENDING_WORK.md, "SYSTEMIC
+    FINDING: Synthesis-truncation bug is pipeline-wide").
+
+    The structural fix: any handler listed in
+    api.evaluator.STRUCTURED_HANDLERS returns a finished, purpose-built
+    object (an explicit key set, not an arbitrary row dump) — the same
+    property evaluate_result() already relies on to know these results
+    aren't "rows" to sample. That result is never blindly truncated,
+    regardless of its shape or size. Truncation stays in place only for
+    genuinely unbounded raw data (dynamic_query primitives' row results
+    before _aggregate_and_sample narrows them, e.g. filter_table).
+
+    Returns (result_json, complete_instruction).
+    """
+    from api.evaluator import STRUCTURED_HANDLERS
+
+    is_structured_handler = tool_name in STRUCTURED_HANDLERS and "error" not in result
+
+    if is_structured_handler:
+        result_json = json.dumps(result, default=str)
+        complete_instruction = (
+            f"⚠️ **COMPLETE DATASET**: This is the full, finished result "
+            f"from the `{tool_name}` handler — not a truncated sample. "
+            f"State every count and total in it exactly as given, do not "
+            f"assume anything is missing.\n\n"
+        )
+    else:
+        result_json = json.dumps(result, default=str)[:3000]
+        complete_instruction = ""
+
+    return result_json, complete_instruction
+
+
+def _append_tool_result_message(messages: list, raw: str, result: dict,
+                                 tool_name: str = "") -> None:
     """Append the model's tool-call request and its result to `messages`,
     in place, using the same shape as the normal per-iteration "Tool
     result: ..." message the loop appends when it continues to the next
@@ -1744,10 +1790,19 @@ def _append_tool_result_message(messages: list, raw: str, result: dict) -> None:
     "could not turn the partial data into an answer" diagnostic despite
     accumulated_data holding complete, correct data the whole time. See
     tests/test_finalize_shortcut_message_gap.py for the reproduction.
+
+    2026-09-19: this had its own unconditional [:3000] truncation,
+    independent of (and not covered by) the Handler 4 truncation fix in
+    the main loop body — a structured handler reaching synthesis through
+    one of these three shortcuts was silently truncated even after that
+    fix. Now shares _serialize_tool_result_for_synthesis() with the main
+    loop body so both truncation sites use the same rule.
     """
+    result_json, complete_instruction = _serialize_tool_result_for_synthesis(result, tool_name)
     messages.append({"role": "assistant", "content": raw})
     messages.append({"role": "user", "content": (
-        f"Tool result: {json.dumps(result, default=str)[:3000]}\n\n"
+        f"{complete_instruction}"
+        f"Tool result: {result_json}\n\n"
         f"This data is sufficient to answer — synthesize the final "
         f"answer now."
     )})
@@ -4622,7 +4677,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                        f"→ finalizing immediately (fast-path preservation)")
             # Must append tool result to messages before finalization
             # (see _append_tool_result_message docstring - 2026-09-11 incident)
-            _append_tool_result_message(messages, raw, result)
+            _append_tool_result_message(messages, raw, result, tool_name)
             return await _finalize_from_data(f"{tool_name}_fast_path")
 
         # Structured handlers continue to next iteration for normal synthesis
@@ -4671,7 +4726,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                         # it, the finalize synthesis call can't see the
                         # data that just made verification pass. See
                         # _append_tool_result_message() docstring.
-                        _append_tool_result_message(messages, raw, result)
+                        _append_tool_result_message(messages, raw, result, tool_name)
 
                         # Force synthesis by calling _finalize_from_data
                         # This uses the data we just retrieved
@@ -4748,7 +4803,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 # the generic "could not turn the partial data into an
                 # answer" diagnostic despite complete, correct data. See
                 # _append_tool_result_message() docstring.
-                _append_tool_result_message(messages, raw, result)
+                _append_tool_result_message(messages, raw, result, tool_name)
                 return await _finalize_from_data("id_scoped_enrichment_lookup")
 
         # PART 2b: a tool call that returns zero rows is no forward progress.
@@ -4822,22 +4877,12 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 "\nWrong: '$20K won (closed out of $1.12M segment)' ← name the segment!"
             )
 
-        # For structured results with summary fields (complete datasets), don't truncate
-        # so LLM sees all data. Row-based results are already sampled/aggregated.
-        is_complete_structured = ("summary" in result and "total_deals" in result.get("summary", {}))
-
-        if is_complete_structured:
-            # Complete structured dataset - include full JSON (no truncation)
-            total_deals = result["summary"]["total_deals"]
-            result_json = json.dumps(result, default=str)
-            complete_instruction = (
-                f"⚠️ **COMPLETE DATASET**: This result contains ALL {total_deals} deals. "
-                f"State this total in your answer.\n\n"
-            )
-        else:
-            # Row-based or other result - use existing truncation
-            result_json = json.dumps(result, default=str)[:3000]
-            complete_instruction = ""
+        # Structural truncation-safety check (2026-09-19) — see
+        # _serialize_tool_result_for_synthesis() docstring. Any handler in
+        # api.evaluator.STRUCTURED_HANDLERS is a finished, purpose-built
+        # result and is never truncated; everything else keeps the
+        # existing [:3000] cap.
+        result_json, complete_instruction = _serialize_tool_result_for_synthesis(result, tool_name)
 
         messages.append({"role": "user",
             "content": f"{complete_instruction}"

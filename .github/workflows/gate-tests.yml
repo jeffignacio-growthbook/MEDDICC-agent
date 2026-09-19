@@ -726,6 +726,61 @@ jobs:
           # Evaluation").
           PYTHONPATH=. python3 tests/test_owner_email_canonicalization.py
 
+      - name: "TEST 0z — Offline: structured handler results reach synthesis whole, never truncated mid-object"
+        run: |
+          set -e
+          # 2026-09-19: the Handler 4 (query_rep_pipeline) truncation fix
+          # (94 real deals silently reduced to 16-25 by an unconditional
+          # json.dumps(result)[:3000] cut before the LLM ever saw the tool
+          # result) was detected via a pattern-match on query_rep_pipeline's
+          # OWN return shape ("summary" in result and "total_deals" in
+          # result["summary"]) — not a real "is this a finished, structured
+          # result" test. Auditing the three OTHER already-migrated
+          # handlers (query_pipeline, query_stale_deals, query_waterfall)
+          # against that exact condition found all three fail it
+          # structurally, and their own previously-captured production
+          # baselines confirmed this is not theoretical: query_pipeline's
+          # realistic "show me pipeline" payload is 7,654 chars and query_
+          # stale_deals' realistic "what deals are stale" payload is
+          # 14,207 chars — both routinely truncated to 3,000 chars before
+          # synthesis, the exact Handler 4 bug, live, on two handlers
+          # already marked "complete." See PENDING_WORK.md, "SYSTEMIC
+          # FINDING: Synthesis-truncation bug is pipeline-wide."
+          #
+          # Fixed structurally: any handler registered in api.evaluator.
+          # STRUCTURED_HANDLERS (the same registry evaluate_result()
+          # already uses to know a handler's return isn't raw "rows" to
+          # sample) is never truncated, regardless of its specific shape —
+          # via one shared helper, _serialize_tool_result_for_synthesis(),
+          # used at BOTH truncation sites in api/router.py (the main loop
+          # body, and _append_tool_result_message() — a second,
+          # independent, unconditional [:3000] site the original Handler 4
+          # fix never touched, used by three early-return synthesis
+          # shortcuts). Genuinely unbounded raw data (filter_table, etc.)
+          # keeps the existing cap.
+          #
+          # This closes the exact gap that let the bug reach production
+          # unnoticed across 4 handler migrations: the existing baseline-
+          # capture fixtures (capture_query_pipeline_baseline.py, capture_
+          # query_stale_deals_baseline.py) call handlers directly, bypassing
+          # api/router.py's synthesis step entirely — they verify handler
+          # output, never what the LLM actually receives. Rather than
+          # rewire those fixtures to also drive a live LLM + Supabase (slow,
+          # non-deterministic, costly on every CI run) for a check that
+          # doesn't need either, this is a deterministic, dedicated
+          # synthesis-level test using the SAME captured production
+          # baseline JSON, driving the real dynamic_query_loop end-to-end
+          # with a scripted LLM client — confirming query_pipeline's and
+          # query_stale_deals' worst-case real payloads (including a real
+          # company name that sits past the old 3000-char cutoff in each)
+          # now reach the synthesis call whole; a negative control proves
+          # the STRUCTURED_HANDLERS check specifically (not the test
+          # harness) is what makes the data visible; and a fourth test
+          # confirms a genuinely unstructured raw-row result (filter_table)
+          # is still truncated — this fix targets finished handler results,
+          # not every large tool result.
+          PYTHONPATH=. python3 tests/test_synthesis_truncation_fix.py
+
       - name: "TEST 1a — Offline: Supabase client retries once on a dead HTTP/2 connection instead of failing the request"
         run: |
           set -e

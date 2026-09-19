@@ -2339,7 +2339,73 @@ correct baseline.
 Users now get complete, accurate pipeline views matching handler's "never filters by close_date" design intent.
 
 
-## 🔴 SYSTEMIC FINDING: Synthesis-truncation bug is pipeline-wide, not Handler-4-specific (2026-09-19)
+## ✅ SYSTEMIC FINDING: Synthesis-truncation bug is pipeline-wide, not Handler-4-specific (2026-09-19) — FIXED
+
+**Status update (2026-09-19, same day): fixed at the source.** The
+narrow, shape-specific detection condition described below has been
+replaced with a structural one in `api/router.py`:
+`tool_name in api.evaluator.STRUCTURED_HANDLERS` (the same registry
+`evaluate_result()` already uses to know a handler's return isn't raw
+"rows" to sample — hoisted from a function-local dict to a module-level
+constant in `api/evaluator.py` so `router.py` can share it). Extracted
+into one shared helper, `_serialize_tool_result_for_synthesis()`, used
+at **both** truncation sites — the main loop body, and a **second,
+independently-broken, unconditional `[:3000]` site inside
+`_append_tool_result_message()`** (found during this fix, not part of
+the original report below) used by three early-return synthesis
+shortcuts (`query_pipeline_movement` fast-path, `dimension_retry_
+succeeded`, `id_scoped_enrichment_lookup`) — the original Handler 4 fix
+never touched this second site, so a structured handler reaching
+synthesis through one of those shortcuts was still silently truncated
+even after that fix shipped.
+
+This automatically covers `query_waterfall` too (already registered in
+`STRUCTURED_HANDLERS` as `["pipeline_summary", "waterfall"]`), even
+though no baseline fixture exists to empirically confirm its real
+payload size — see `test_query_waterfall_is_covered_by_the_same_
+structural_fix` below.
+
+**Verification:** `tests/test_synthesis_truncation_fix.py` drives the
+real `dynamic_query_loop` end-to-end (scripted LLM responses; only the
+handler functions are stubbed, returning the EXACT captured production
+baseline data from `tests/fixtures/query_pipeline_baseline.json` and
+`query_stale_deals_baseline.json` — not synthetic data) and confirms:
+the full 7,654-char/313-deal `query_pipeline` payload and the full
+14,207-char/64-deal `query_stale_deals` payload both now reach the
+synthesis call intact (including a real company name from each — "UPS"
+/ "Opera" — that sits past the old 3000-char cutoff); a negative control
+proves the `STRUCTURED_HANDLERS` check specifically (not the test
+harness) is what makes the data visible; `query_waterfall` is covered
+via a synthetic payload shaped like its real, uncapped return value; and
+a genuinely unstructured raw-row result (`filter_table`) is confirmed
+**still** truncated, proving the fix didn't disable truncation
+universally. Wired into `.github/workflows/gate-tests.yml` as TEST 0z.
+
+**Not independently confirmable in this environment:** an actual live
+LLM producing correct synthesized English from this data — no
+`ANTHROPIC_API_KEY` / live Supabase credentials are available here. The
+test instead proves the exact thing that was broken (the content handed
+to the model), which is the full extent verifiable without live
+credentials. A live re-ask of "show me our pipeline" / "what deals are
+stale" in Slack is the remaining confirmation step, same as any other
+fix from this session that needed live access (see High Priority #2 and
+similar entries above).
+
+**Existing baseline-capture scripts left unchanged, deliberately:**
+`capture_query_pipeline_baseline.py` / `capture_query_stale_deals_
+baseline.py` call handlers directly, bypassing `api/router.py`'s
+synthesis step entirely — they verify handler output, never what the
+LLM receives, which is why they never caught this bug class in 4
+handler migrations. Rather than rewire them to also drive a live LLM +
+Supabase (slow, non-deterministic, and costly on every CI run, for a
+check that doesn't need either), the fix is verified by a separate,
+deterministic synthesis-level test using the same captured baseline
+JSON. If a future change needs the baseline scripts themselves to
+exercise the full router path, that's a bigger, separate lift (real
+LLM + live DB in CI) and should be scoped on its own, not bundled into
+this fix.
+
+**Original report follows, preserved for context:**
 
 **Discovered while auditing the 3 previously-migrated handlers (query_pipeline,
 query_stale_deals, query_waterfall) after the Handler 4 fix above, before
@@ -2431,19 +2497,28 @@ handler built after this point. Passing `verify_structured_aggregations()`
 and having a fixture-based baseline in the current style are both
 insufficient to catch it, because neither exercises the synthesis step.
 
-**Not fixed in this pass** — this is a report, per explicit instruction, to
-establish full exposure before Handler 5 proceeds or Handler 4 is considered
-closed. Two directions were visible during this audit but not evaluated for
-tradeoffs or implemented:
+**[Superseded by the "FIXED" status update at the top of this entry —
+left here for history.] Not fixed in this pass** — this was a report,
+per explicit instruction at the time, to establish full exposure before
+Handler 5 proceeded or Handler 4 was considered closed. Two directions
+were visible during this audit but not evaluated for tradeoffs or
+implemented then:
 1. Generalize the detection condition to something structural (e.g. "does
    this result contain a count/total field anywhere, regardless of nesting"
    or "is this a `dict`, not a `rows` list, at all" — the latter matches the
    comment already in the code: "Row-based results are already
    sampled/aggregated" implies the *intent* was "any non-row-based
-   structured result," not "only this one handler's shape").
+   structured result," not "only this one handler's shape"). **Done** —
+   implemented as option 1's spirit, via `STRUCTURED_HANDLERS` membership
+   rather than a `dict`-vs-`rows` shape check (a cleaner structural signal
+   already single-sourced elsewhere, per Jeff's direction).
 2. Add a baseline-capture mode that runs the full router/synthesis path (not
    just the bare handler call) and asserts the synthesized text's stated
    count/total against the verified raw data, for every migrated handler —
    closing the exact gap that let the Handler 4 bug through 3 handler
-   migrations before anyone was testing that path at all.
+   migrations before anyone was testing that path at all. **Done**, via a
+   separate dedicated test (`tests/test_synthesis_truncation_fix.py`)
+   rather than rewiring the existing baseline-capture scripts themselves —
+   see the "Existing baseline-capture scripts left unchanged" note above
+   for why.
 
