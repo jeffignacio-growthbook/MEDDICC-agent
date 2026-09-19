@@ -43,6 +43,26 @@ for p in ("", "scripts", "api"):
     sys.path.insert(0, str(REPO / p) if p else str(REPO))
 
 
+def _http_error_detail(e):
+    """A GraphQL schema-validation error (e.g. querying a field that
+    doesn't exist) can come back as HTTP 400 BEFORE the JSON body is
+    parsed, so fireflies_client._query's raise_for_status() raises
+    before we ever see the actual message. Reach into the response body
+    if one is attached, so 'field doesn't exist' is distinguishable from
+    a real outage."""
+    resp = getattr(e, "response", None)
+    if resp is not None:
+        try:
+            body = resp.json()
+            errs = body.get("errors") or []
+            if errs:
+                return errs[0].get("message", "")[:150]
+            return str(body)[:150]
+        except Exception:
+            return (resp.text or "")[:150]
+    return str(e)[:150]
+
+
 def _recent_call_ids(sb, source, n=5):
     from supabase_client import select_all
     rows = select_all(sb, "calls", columns="call_id,call_date",
@@ -67,7 +87,13 @@ def probe_fireflies_identity(client, call_ids):
         for fields in sentence_field_candidates:
             q = ("query T($id:String!){ transcript(id:$id){ sentences { %s } } }"
                  % fields)
-            res = client._query(q, {"id": cid})
+            try:
+                res = client._query(q, {"id": cid})
+            except Exception as e:
+                print(f"  call {cid[:20]} sentences[{fields}] -> HTTP/GraphQL "
+                      f"REJECTED (pre-execution validation error): "
+                      f"{_http_error_detail(e)}")
+                continue
             errs = res.get("errors")
             if errs:
                 print(f"  call {cid[:20]} sentences[{fields}] -> REJECTED: "
@@ -84,21 +110,53 @@ def probe_fireflies_identity(client, call_ids):
     else:
         print("  (no call returned sentences with any candidate field set)")
 
-    # Top-level 'speakers' roster — separate from meeting_attendees
+    # Top-level 'speakers' roster — separate from meeting_attendees.
+    # Tried WITH the speakers{id name} sub-selection first; if the field
+    # itself doesn't exist in the schema, that alone must not also blank
+    # out the meeting_attendees-vs-sentences comparison below, so this
+    # falls back to a query without it rather than bundling both into one
+    # all-or-nothing request.
     print()
+    speakers_field_exists = None  # None = untested, True/False once known
     for cid in call_ids:
-        q = ("query T($id:String!){ transcript(id:$id){ "
+        q_with_speakers = ("query T($id:String!){ transcript(id:$id){ "
              "speakers { id name } "
              "meeting_attendees { displayName email } "
              "sentences { speaker_name } } }")
-        res = client._query(q, {"id": cid})
-        errs = res.get("errors")
-        if errs:
-            print(f"  call {cid[:20]} top-level speakers{{id name}} -> REJECTED: "
-                  f"{errs[0].get('message','')[:120]}")
-            continue
-        t = (res.get("data") or {}).get("transcript") or {}
-        speakers = t.get("speakers") or []
+        q_without_speakers = ("query T($id:String!){ transcript(id:$id){ "
+             "meeting_attendees { displayName email } "
+             "sentences { speaker_name } } }")
+
+        t = None
+        speakers = []
+        if speakers_field_exists is not False:
+            try:
+                res = client._query(q_with_speakers, {"id": cid})
+                errs = res.get("errors")
+                if errs:
+                    raise RuntimeError(errs[0].get("message", ""))
+                t = (res.get("data") or {}).get("transcript") or {}
+                speakers = t.get("speakers") or []
+                speakers_field_exists = True
+            except Exception as e:
+                if speakers_field_exists is None:
+                    print(f"  top-level 'speakers{{id name}}' field -> REJECTED: "
+                          f"{_http_error_detail(e)}")
+                speakers_field_exists = False
+                t = None
+
+        if t is None:
+            try:
+                res = client._query(q_without_speakers, {"id": cid})
+            except Exception as e:
+                print(f"  call {cid[:20]} -> HTTP/GraphQL REJECTED: "
+                      f"{_http_error_detail(e)}")
+                continue
+            errs = res.get("errors")
+            if errs:
+                print(f"  call {cid[:20]} -> REJECTED: {errs[0].get('message','')[:120]}")
+                continue
+            t = (res.get("data") or {}).get("transcript") or {}
         attendees = t.get("meeting_attendees") or []
         sentence_names = sorted({s.get("speaker_name") for s in (t.get("sentences") or [])
                                   if s.get("speaker_name")})
@@ -132,6 +190,10 @@ def probe_apollo_identity(client, call_ids):
 
         print(f"  call {cid[:20]}:")
         print(f"    ALL top-level keys: {sorted(convo.keys())}")
+        print(f"    host: {convo.get('host')!r}  host_id: {convo.get('host_id')!r}")
+        accounts = convo.get("accounts")
+        print(f"    accounts field: type={type(accounts).__name__}  "
+              f"value={json.dumps(accounts)[:300] if accounts is not None else None}")
 
         participants_key = None
         for k in ("participants_info", "participants", "attendees"):
@@ -144,21 +206,34 @@ def probe_apollo_identity(client, call_ids):
                                        if f.get("participant_id")})
 
         if participants_key:
-            plist = convo.get(participants_key) or []
-            print(f"    found '{participants_key}' array, {len(plist)} entries")
-            if plist:
-                print(f"    first entry keys: {sorted(plist[0].keys())}")
-                print(f"    first entry sample: "
-                      f"{json.dumps({k: str(v)[:60] for k, v in plist[0].items()})}")
-                participant_ids_in_list = {
-                    p.get("id") or p.get("participant_id") for p in plist
-                    if (p.get("id") or p.get("participant_id"))
-                }
-                overlap = participant_ids_in_list & set(frag_participant_ids)
-                print(f"    transcript fragment participant_ids: {frag_participant_ids}")
-                print(f"    ids present in '{participants_key}': {sorted(participant_ids_in_list)}")
-                print(f"    OVERLAP (can bridge speaker->identity via id): "
-                      f"{sorted(overlap) if overlap else 'NONE — no shared id field'}")
+            praw = convo.get(participants_key)
+            print(f"    found '{participants_key}', type={type(praw).__name__}")
+            # Apollo's shape here is unconfirmed — could be a list of
+            # participant dicts, OR a dict keyed some other way. Print the
+            # raw structure honestly rather than assuming a list, which is
+            # exactly the bug that crashed the first run of this probe.
+            if isinstance(praw, list):
+                plist = praw
+                print(f"    {len(plist)} entries (list)")
+                if plist:
+                    print(f"    first entry keys: {sorted(plist[0].keys()) if isinstance(plist[0], dict) else type(plist[0]).__name__}")
+                    print(f"    first entry sample: "
+                          f"{json.dumps({k: str(v)[:60] for k, v in plist[0].items()}) if isinstance(plist[0], dict) else str(plist[0])[:200]}")
+                    if isinstance(plist[0], dict):
+                        participant_ids_in_list = {
+                            p.get("id") or p.get("participant_id") for p in plist
+                            if isinstance(p, dict) and (p.get("id") or p.get("participant_id"))
+                        }
+                        overlap = participant_ids_in_list & set(frag_participant_ids)
+                        print(f"    transcript fragment participant_ids: {frag_participant_ids}")
+                        print(f"    ids present in '{participants_key}': {sorted(participant_ids_in_list)}")
+                        print(f"    OVERLAP (can bridge speaker->identity via id): "
+                              f"{sorted(overlap) if overlap else 'NONE — no shared id field'}")
+            elif isinstance(praw, dict):
+                print(f"    dict with {len(praw)} keys: {sorted(praw.keys())}")
+                print(f"    RAW (truncated): {json.dumps({k: str(v)[:150] for k, v in praw.items()})}")
+            else:
+                print(f"    RAW value (truncated): {str(praw)[:300]}")
         else:
             print(f"    NO participants/participants_info/attendees key in the "
                   f"DETAIL response at all")
