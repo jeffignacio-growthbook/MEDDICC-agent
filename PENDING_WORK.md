@@ -2675,3 +2675,120 @@ follow-through items (removing `HANDLER_DESCRIPTIONS` entries for
 migrated handlers, removing now-dead redirect logic) — cosmetic/cleanup,
 not correctness, left for a deliberate separate pass.
 
+
+## 📊 EVIDENCE AUDIT: What primitive to build next (2026-09-19, report only — nothing built)
+
+**Purpose:** replace the roadmap's guess-based ordering with real
+frequency data from `query_cost_log` (every `dynamic_query_loop`
+invocation, full history — 166 rows) and `learning_log` (assessor
+correctness signals, full history — 517 rows). Script:
+`scripts/audit_dynamic_query_failure_shapes.py`, run live via
+[`audit-dynamic-query-failure-shapes.yml`](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35444671737)
+(one-off, read-only).
+
+**Population:** 82 of 166 query_cost_log rows (49.4%) were not a clean
+answer — 37 failed outright (exception/other_fallback), 17 shipped
+caveated, 28 needed a resynthesis. From learning_log: 105 floor
+rejections, 10 `should_be_dynamic` flags, 402 ordinary dedicated-handler
+mistakes (excluded from shape analysis — those are bugs in an existing
+handler, not evidence for a new primitive). 197 rows total went into
+shape classification (a live Haiku call per batch, role=evaluator).
+
+**Methodology note, disclosed rather than hidden:** batching the Haiku
+classification calls (40 questions/call) let the model coin a fresh
+label per batch instead of reusing one — the raw output had 35 near-
+duplicate labels (`pipeline movement tracking`, `pipeline trend`,
+`pipeline velocity`, `pipeline trend analysis`, ... all the same
+underlying need). The counts below are **consolidated by hand from the
+actual example questions in each raw label** — a more reliable ground
+truth than trusting the model to self-merge — not the raw per-batch
+output. Full raw output is in the workflow run's log if anyone wants to
+re-check the consolidation.
+
+**A second, code-verified correction, not a guess:** once a handler is
+added to the classifier bypass tuple (all 7 unified-routing handlers,
+6 of them migrated THIS session), it can never again produce a
+`floor_rejection` learning_log row — that check only runs for handlers
+still on the classifier path, and bypassed handlers are redirected to
+`dynamic_query` *before* the floor check ever executes. So any
+`floor_rejection` evidence whose shape maps to an already-migrated
+handler is now structurally impossible to recur, confirmed by reading
+`route_question()`'s own code order, not inferred from timestamps
+(which weren't captured in this pass). Resynthesis/caveat/exception/
+`should_be_dynamic` evidence is NOT covered by this correction — those
+are dynamic_query's own synthesis behavior or a dedicated handler's
+substantive wrongness, neither of which the routing migration touches.
+
+### Consolidated shape frequency (raw → adjusted after removing migration-fixed floor_rejections)
+
+| Shape | Raw count | Migration-fixed portion | Adjusted (still open) | % of adjusted total |
+|---|---|---|---|---|
+| Pipeline movement / trend over time | 100 | 66 (floor_rejection, now-migrated `query_pipeline_movement`/`query_waterfall`) | **34** | 34.7% |
+| Pipeline current state / snapshot | ~29 | 4 | **25** | 25.5% |
+| Risk/likelihood judgment | 18 | 0 (not a migrated-handler concept) | **18** | 18.4% |
+| Stale deals | 18 | 10 (`query_stale_deals`, migrated) | **8** | 8.2% |
+| Rep coaching / activity metrics | 6 | 0 | **6** | 6.1% |
+| Data hygiene / corrections | ~5–6 | 0 | **~5** | 5.1% |
+| Pipeline segmentation (geo/market) | 3 | 0 | **3** | 3.1% |
+| Why did we win/lose | 4 | 3 (`query_win_loss`, migrated) | **1** | 1.0% |
+| Competitive positioning | 1 | 0 | **1** | 1.0% |
+| Forecast trustworthiness | 1 | 0 | **1** | 1.0% |
+| Objection patterns | 1 | 0 | **1** | 1.0% |
+| Sales cycle velocity | 1 | 0 | **1** | 1.0% |
+| *(meta/noise — bot complaints, acknowledgments, "run that query" — excluded)* | ~8 | — | — | — |
+
+**Two honest caveats on the numbers, not swept under the rug:**
+
+1. **Risk/likelihood judgment's 18 is one person retrying one exact
+   question** ("please look at all hubspot deals in the 'negotiating'
+   or 'awaiting signature' stages and assess them based on likelihood
+   to close vs risk") repeatedly, not 18 distinct asks. As a *distinct-
+   question* count it's ~1; as a *this kept failing and someone kept
+   trying anyway* signal it's real and matches this session's own
+   earlier `assess_deal_risk()`/`deal_risk_assessor.py` scoping work
+   directly — a live, previously-uncounted confirmation that the demand
+   for it is real, not hypothetical.
+2. **The "adjusted" pipeline-movement/snapshot numbers (34, 25) are a
+   floor, not a ceiling** — some of their remaining resynthesis/caveat
+   rows may *also* already be fixed by this session's synthesis-
+   truncation fix (a `caveated:answered_with_unverified_aggregation`
+   result on a large pipeline payload is exactly this bug's signature),
+   but confirming that needs each row's `primitives_fired`/timestamp
+   cross-referenced against the truncation-fix commit, which this pass
+   didn't do. So 34 and 25 are conservative upper bounds on what's
+   still genuinely open there, not confirmed floors.
+
+### Reading the ranking
+
+**Risk/likelihood judgment is the strongest *qualified* signal for a
+new primitive**: fully unaffected by tonight's routing/truncation
+fixes, matches a primitive already designed (not from scratch) in this
+session's earlier `assess_deal_risk()` scoping and the pulled-in
+`scripts/deal_risk_assessor.py`, and the repeated-retry pattern is
+itself evidence of real, unresolved frustration — just don't read "18"
+as "18 different people asked this."
+
+**Pipeline movement/snapshot's raw dominance (65% of all evidence
+combined) is real but mostly not a call for a NEW primitive** — the
+handlers already exist (`query_pipeline_movement`, `query_pipeline`,
+`query_waterfall`, `query_rep_pipeline`); the bulk of the evidence is
+either a routing-confidence problem this session's own migration
+structurally closed tonight, or (plausibly, unconfirmed) the synthesis-
+truncation bug this session also already fixed. Worth a live spot-check
+of a few of the remaining "adjusted" rows before assuming they're still
+open, not worth a new primitive.
+
+**Everything else (rep coaching, data hygiene, pipeline segmentation,
+win/loss, competitive positioning, forecast trustworthiness, objection
+patterns, sales cycle velocity) is real but low-volume** — none has
+enough distinct occurrences in the available history to outrank risk/
+likelihood judgment on frequency alone. Objection patterns and
+competitive positioning both already appear as named gaps elsewhere
+(objection vault extraction is on the "Pending features" list at the
+top of this file); this audit doesn't newly discover them, it just adds
+a real (if thin: n=1 each) frequency data point to what was previously
+a pure guess.
+
+**No primitive was designed or built in this pass — report only, per
+explicit instruction.**
+
