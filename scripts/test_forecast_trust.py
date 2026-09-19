@@ -21,9 +21,15 @@ Covers the three realistic week bands from the confirmed design:
 3. Late-quarter (week 12, "late_quarter" band, no directional caveat,
    but the lost-collapse caveat note applies instead).
 
-Planted-discrepancy proof that the lookup genuinely varies by week
-(not defaulting to one row), and the MOST_LIKELY-only regression test,
-are Step D — separate file, separate purpose.
+Step D adds two more tests to this same file (matching
+test_forecast_analyses.py's convention of mixing structural and
+defect-specific regression tests in one file, rather than splitting):
+4. Planted-discrepancy proof that the historical lookup genuinely
+   varies by week — not defaulting to one row or a cached value.
+5. MOST_LIKELY-only, non-late-stage deal regression test — the single
+   most important test here, directly guarding against
+   assess_forecast_trust() silently reverting to get_at_risk_deals()'s
+   narrower COMMIT-only scope.
 """
 import sys
 from pathlib import Path
@@ -50,6 +56,43 @@ def _mock_deals_sb(deals_data):
     sb = Mock()
     sb.table = Mock(return_value=chain)
     return sb
+
+
+def _mock_multi_table_sb(deals_data, analyses_data=None):
+    """A Supabase mock that dispatches by table name — 'deals' for
+    assess_forecast_trust()'s own query, 'analyses' for assess_deal_risk()'s
+    internal MEDDICC-score fetch (_fetch_latest_meddicc_scores). Needed for
+    the MOST_LIKELY regression test, which calls the REAL assess_deal_risk()
+    rather than mocking it, so both queries it and forecast_trust issue must
+    resolve. Raises if any OTHER table is queried, so a future change that
+    adds an unexpected query fails loudly instead of silently returning a
+    Mock().data that could mask a bug."""
+    analyses_data = analyses_data or []
+
+    deals_chain = MagicMock()
+    deals_chain.select.return_value = deals_chain
+    deals_chain.in_.return_value = deals_chain
+    deals_chain.eq.return_value = deals_chain
+    deals_chain.gte.return_value = deals_chain
+    deals_chain.lte.return_value = deals_chain
+    deals_chain.execute.return_value = Mock(data=deals_data)
+
+    analyses_chain = MagicMock()
+    analyses_chain.select.return_value = analyses_chain
+    analyses_chain.in_.return_value = analyses_chain
+    analyses_chain.order.return_value = analyses_chain
+    analyses_chain.execute.return_value = Mock(data=analyses_data)
+
+    def _table_router(name):
+        if name == "deals":
+            return deals_chain
+        if name == "analyses":
+            return analyses_chain
+        raise AssertionError(f"Unexpected table queried in this test: {name!r}")
+
+    sb = Mock()
+    sb.table = Mock(side_effect=_table_router)
+    return sb, deals_chain, analyses_chain
 
 
 def _fake_calibration_table():
@@ -229,11 +272,169 @@ def test_late_quarter_week_12_lost_collapse_caveat():
     print("  ✓ Late-quarter band correctly distinguished from a plain no-caveat result")
 
 
+def test_historical_lookup_genuinely_varies_by_week():
+    """
+    PLANTED-DISCREPANCY TEST: the historical win_rate returned must track
+    the ACTUAL current week, not default to one row or a cached value.
+
+    Runs assess_forecast_trust() at four distinct weeks spanning three
+    different stability bands (4=forming, 7 & 9=settled, 12=late_quarter),
+    against a calibration table where every week has a DELIBERATELY
+    different win_rate (_fake_calibration_table()'s w-dependent formula).
+    Asserts each call returns EXACTLY that week's rate, AND that the four
+    observed rates are not all equal — the second check is what actually
+    catches a hardcoded-week or caching bug: a implementation that always
+    returned (say) week 7's row would pass a single-week assertion by
+    coincidence if that happened to be the week under test, but cannot
+    pass this check across four different weeks with four different
+    planted values.
+    """
+    print("\n[TEST] Historical lookup genuinely varies by week (planted discrepancy)")
+
+    fake_calib = _fake_calibration_table()
+    weeks_to_check = [4, 7, 9, 12]  # forming, settled, settled, late_quarter
+    observed_rates = []
+
+    for week in weeks_to_check:
+        sb = _mock_deals_sb([])
+        with patch('utils.get_fiscal_quarter') as mock_gfq, \
+             patch('snapshot_deals.get_week_of_quarter') as mock_gwoq, \
+             patch('deal_risk_assessor.assess_deal_risk') as mock_risk, \
+             patch('forecast_analyses.query_commit_ml_calibration_by_week') as mock_calib:
+            mock_gfq.return_value = (date(2026, 8, 1), date(2026, 10, 31), 'FY2026 Q3')
+            mock_gwoq.return_value = week
+            mock_risk.return_value = {
+                'assessed_deals': [],
+                'summary': {'total_assessed': 0, 'high_risk': 0, 'moderate_risk': 0,
+                            'low_risk': 0, 'insufficient_data': 0},
+            }
+            mock_calib.return_value = fake_calib
+
+            result = assess_forecast_trust(sb, as_of=date(2026, 9, 1))
+
+        expected = fake_calib['by_week'][week]['win_rate']
+        actual = result['historical']['win_rate']
+        if actual != expected:
+            raise AssertionError(
+                f"Week {week}: expected historical.win_rate={expected} "
+                f"(that week's planted value), got {actual} — the lookup is "
+                f"not tracking the actual current week")
+        if result['historical']['week'] != week:
+            raise AssertionError(
+                f"Week {week}: expected historical.week={week}, got "
+                f"{result['historical']['week']}")
+        observed_rates.append(actual)
+        print(f"  ✓ week {week}: historical.win_rate = {actual} (matches planted value)")
+
+    if len(set(observed_rates)) == 1:
+        raise AssertionError(
+            f"All four weeks returned the SAME win_rate ({observed_rates[0]}) — "
+            f"this would happen if the lookup silently defaulted to one row "
+            f"or cached its first result instead of genuinely varying by week. "
+            f"Observed: {observed_rates}")
+    print(f"  ✓ All {len(weeks_to_check)} weeks returned genuinely distinct rates: {observed_rates}")
+
+
+def test_most_likely_only_non_late_stage_deal_appears_in_cohort():
+    """
+    THE MOST IMPORTANT TEST IN THIS BATCH.
+
+    A deal tagged forecast_category='MOST_LIKELY' that is NOT late-stage
+    (not Negotiating/Awaiting Signature) must still appear in
+    assess_forecast_trust()'s assessed cohort. This is the direct
+    regression guard for the gap found during Step A:
+    get_at_risk_deals() hardcodes forecast_category='COMMIT' in its own
+    query, so a MOST_LIKELY-only, non-late-stage deal would be silently
+    invisible to it. assess_forecast_trust() was deliberately built with
+    its OWN query instead of calling get_at_risk_deals() — this test
+    fails loudly if a future refactor ever routes it back through that
+    narrower path.
+
+    Uses the REAL, unmocked deal_risk_assessor.assess_deal_risk() (only
+    the calibration lookup and week/quarter resolution are mocked) so
+    this is a genuine end-to-end check that the deal survives the whole
+    pipeline, not just that a mock was told to include it.
+    """
+    print("\n[TEST] MOST_LIKELY-only, non-late-stage deal appears in the assessed cohort")
+
+    from deal_risk_assessor import LATE_STAGE_IDS
+    non_late_stage = 'presentationscheduled'
+    if non_late_stage in LATE_STAGE_IDS:
+        raise AssertionError(
+            f"Test setup error: {non_late_stage!r} is a late-stage id "
+            f"({LATE_STAGE_IDS}) — pick a genuinely non-late-stage stage "
+            f"or this test doesn't prove what it claims to")
+
+    test_deal = {
+        'deal_id': 'ml_only_test_deal',
+        'company_name': 'Most Likely Only Co',
+        'stage': non_late_stage,
+        'create_date': '2026-08-05',
+        'close_date': '2026-09-30',
+        'segment': 'Mid-Market',
+        'forecast_category': 'MOST_LIKELY',
+        'deal_status': 'active',
+        'amount': 42000,
+    }
+
+    sb, deals_chain, analyses_chain = _mock_multi_table_sb(
+        deals_data=[test_deal], analyses_data=[])
+    fake_calib = _fake_calibration_table()
+
+    with patch('utils.get_fiscal_quarter') as mock_gfq, \
+         patch('snapshot_deals.get_week_of_quarter') as mock_gwoq, \
+         patch('forecast_analyses.query_commit_ml_calibration_by_week') as mock_calib:
+        mock_gfq.return_value = (date(2026, 8, 1), date(2026, 10, 31), 'FY2026 Q3')
+        mock_gwoq.return_value = 7  # settled band, clean mid-quarter week
+        mock_calib.return_value = fake_calib
+        # deal_risk_assessor.assess_deal_risk is DELIBERATELY NOT mocked here.
+
+        result = assess_forecast_trust(sb, as_of=date(2026, 9, 18))
+
+    if result.get('status') != 'ok':
+        raise AssertionError(f"Expected status='ok', got {result.get('status')!r}: {result}")
+
+    if result['pipeline']['deal_count'] != 1:
+        raise AssertionError(
+            f"Expected the MOST_LIKELY-only deal in the pipeline query "
+            f"result, got deal_count={result['pipeline']['deal_count']}")
+
+    assessed_ids = [d['deal_id'] for d in result['assessed_deals']]
+    if 'ml_only_test_deal' not in assessed_ids:
+        raise AssertionError(
+            f"THE MOST_LIKELY-only, non-late-stage deal did NOT appear in "
+            f"assessed_deals ({assessed_ids}) — this means the primitive "
+            f"has silently reverted to a COMMIT-only (or late-stage-only) "
+            f"scope, the exact regression this test exists to catch")
+    print(f"  ✓ MOST_LIKELY-only deal 'ml_only_test_deal' found in assessed_deals")
+
+    # Prove it via the QUERY, not just the mocked data. This assertion is
+    # load-bearing, not redundant with the assessed_deals check above:
+    # verified by planting a COMMIT-only regression here and re-running —
+    # the mock still returned the test deal regardless (a Mock doesn't
+    # simulate real Postgres filtering), so the assessed_deals check alone
+    # passed even with the bug reintroduced. Only this query-shape check
+    # actually caught it.
+    in_calls = [c.args for c in deals_chain.in_.call_args_list]
+    category_calls = [args for args in in_calls if args and args[0] == 'forecast_category']
+    if not category_calls:
+        raise AssertionError("assess_forecast_trust() never called .in_('forecast_category', ...)")
+    categories_queried = category_calls[0][1]
+    if 'MOST_LIKELY' not in categories_queried or 'COMMIT' not in categories_queried:
+        raise AssertionError(
+            f"Expected the deals query to filter on BOTH COMMIT and "
+            f"MOST_LIKELY, got: {categories_queried}")
+    print(f"  ✓ Underlying query used forecast_category IN {categories_queried} "
+          f"(not COMMIT-only)")
+
+
 def main():
     tests = [
         test_week_below_gate_returns_insufficient_data,
         test_mid_quarter_settled_band_with_directional_caveat,
         test_late_quarter_week_12_lost_collapse_caveat,
+        test_historical_lookup_genuinely_varies_by_week,
+        test_most_likely_only_non_late_stage_deal_appears_in_cohort,
     ]
 
     failed = []
