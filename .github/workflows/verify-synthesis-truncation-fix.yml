@@ -20,7 +20,16 @@ name: Verify Synthesis Truncation Fix (one-off)
 #    check through the same real production path, now that query_
 #    win_loss is registered as a dynamic-loop tool — the same synthesis-
 #    layer scrutiny Steps A-D alone don't provide (see PENDING_WORK.md's
-#    Handler 5 entry).
+#    Handler 5 entry). CONFIRMED 2026-09-19 (run 35442557240, after a
+#    first run — 35442311297 — crashed and surfaced the _resolve_tw()
+#    bug fixed in the same commit as the retry).
+#
+# 3. Handler 6/6 (query_deals_at_risk) migration to unified routing —
+#    the final handler in the Phase 2 migration set. Same Step C
+#    discipline: direct-handler baseline capture (tests/fixtures/
+#    capture_query_deals_at_risk_baseline.py, including a raw-unresolved
+#    time_window case specifically re-testing the _resolve_tw() fix
+#    against this handler too) plus a live rendered-answer check.
 #
 # Safe to delete once these one-time confirmations are done.
 
@@ -90,3 +99,30 @@ jobs:
           HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
         run: |
           python scripts/test_question.py "give me a win loss summary for this quarter"
+
+      - name: "Handler 6 Step C — query_deals_at_risk direct-handler baseline capture"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python tests/fixtures/capture_query_deals_at_risk_baseline.py
+          echo "---- captured fixture ----"
+          cat tests/fixtures/query_deals_at_risk_baseline.json
+
+      - name: "Handler 6 Step C — query_deals_at_risk live rendered answer (unified routing)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          python scripts/test_question.py "which deals are at risk"
+
+      - name: "Handler 6 Step C — query_deals_at_risk live rendered answer, second phrasing"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          python scripts/test_question.py "which deals have champion gaps this quarter"
