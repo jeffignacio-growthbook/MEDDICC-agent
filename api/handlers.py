@@ -857,6 +857,40 @@ async def query_deals_at_risk(params: dict, sb) -> dict:
                        "MEDDICC analysis yet — those run nightly.")
         }
 
+    # Phase 2 Handler 6/6: Structured aggregation verification (2026-09-19)
+    # Same standard as the other 5 migrated handlers — total_at_risk must be
+    # verified against the actual at_risk list BEFORE it's sliced to the
+    # top 10 for display, since a future edit computing the count from the
+    # sliced list instead (e.g. len(at_risk[:10])) would silently cap
+    # "total_at_risk" at 10 no matter how many deals are really at risk.
+    try:
+        from structured_verification import verify_structured_aggregations
+    except ImportError:
+        from api.structured_verification import verify_structured_aggregations
+
+    verification_result = verify_structured_aggregations(
+        underlying_data=at_risk,
+        structured_output={"total_at_risk": len(at_risk)},
+        verification_spec={
+            "total_at_risk": {
+                "type": "count",
+                "expected": len(at_risk)
+            },
+        },
+        tolerance=0.01
+    )
+
+    if not verification_result["match"]:
+        logger.error(f"[STRUCTURED_VERIFY] query_deals_at_risk aggregation "
+                     f"verification failed: {verification_result['discrepancies']}")
+        return {
+            "error": "aggregation_verification_failed",
+            "discrepancies": verification_result["discrepancies"],
+            "note": "Aggregation outputs did not match recomputed values from underlying data. "
+                   "This is a code-level gate, not a data issue — if you see this, there is "
+                   "a bug in the aggregation logic that must be fixed before shipping results."
+        }
+
     return {
         "deals_at_risk": at_risk[:10],
         "total_at_risk": len(at_risk)

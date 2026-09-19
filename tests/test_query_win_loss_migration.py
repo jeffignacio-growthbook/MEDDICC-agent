@@ -126,12 +126,17 @@ def test_step_b_registered_as_tool():
     )
     assert '"query_win_loss"' in src.split("tool_fn = {")[0] or True  # bypass list is elsewhere
 
-    src_route = inspect.getsource(router.route_question) if hasattr(router, "route_question") else ""
-    # The bypass tuple lives in _dynamic_query_loop_core's caller (route_question);
-    # search the whole module source instead of one function, since the tuple
-    # may be assembled across a wider scope.
+    # The bypass tuple lives in route_question(); search the whole module
+    # source for the tuple literal itself (matched by its distinctive
+    # first two entries, not the full membership) so this doesn't need
+    # updating every time a later handler is added to the same tuple.
+    import re
     full_src = open(router.__file__).read()
-    assert 'in ("query_pipeline_movement", "query_pipeline", "query_stale_deals", "query_waterfall", "query_rep_pipeline", "query_win_loss")' in full_src, (
+    bypass_tuple_match = re.search(
+        r'handler_name in \(("query_pipeline_movement", "query_pipeline".*?)\):',
+        full_src)
+    assert bypass_tuple_match, "could not find the classifier bypass tuple at all"
+    assert '"query_win_loss"' in bypass_tuple_match.group(1), (
         "query_win_loss must be added to the classifier bypass tuple"
     )
     assert "query_win_loss" in STRUCTURED_HANDLERS, (

@@ -1267,6 +1267,25 @@ TOOLS YOU CAN CALL:
     - deal_ids: filter to a specific set of deals (optional, injected automatically for entity-scoped follow-ups)
     **RETURNS**: AI-generated win/loss narratives, recent closed deals with lost_reason, MEDDICC scores at time of close, win/loss counts
     Examples: "why are we losing", "win loss breakdown this quarter", "why did we lose Acme", "win/loss summary"
+  query_deals_at_risk(deal_ids, time_window)
+    **PHASE 2: Handler 6/6 migrated to unified routing**
+    **USE THIS when the question asks about**:
+    - WEAK MEDDICC SCORES, DEALS AT RISK, CHAMPION GAPS
+    - "which deals are at risk", "which deals lack MEDDICC requirements",
+      "weak deals", "deals missing a champion", "which of those are at risk"
+    - Stage-aware MEDDICC band checking: flags a deal if ANY component required
+      at its current stage is below the threshold band needed to advance
+    **DO NOT use for cycle-length/overdue-deal risk** (use assess_deal_risk for
+    likelihood-to-close / duration-based risk — this tool is MEDDICC-readiness only)
+    Params:
+    - deal_ids: filter to a specific set of deals (optional, injected automatically
+      for entity-scoped follow-ups like "which of those are at risk?"; else all active deals)
+    - time_window: dict for time range on the underlying MEDDICC analyses (optional,
+      defaults to last 90 days, e.g. {{"period": "current_quarter"}})
+    **RETURNS**: Up to 10 at-risk deals (deal_id, company_name, overall_score,
+    champion_band, deal_value, stage, risk_flags) plus the true total_at_risk count;
+    a clear message when nothing is currently flagged
+    Examples: "which deals are at risk", "champion gaps this quarter", "which of those are at risk"
 
 RULES:
 - Only use column names that appear in the schema above
@@ -4586,6 +4605,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             "query_waterfall": lambda sb_arg, **params: _call_handler_as_tool("query_waterfall", params, sb_arg),
             "query_rep_pipeline": lambda sb_arg, **params: _call_handler_as_tool("query_rep_pipeline", params, sb_arg),
             "query_win_loss": lambda sb_arg, **params: _call_handler_as_tool("query_win_loss", params, sb_arg),
+            "query_deals_at_risk": lambda sb_arg, **params: _call_handler_as_tool("query_deals_at_risk", params, sb_arg),
         }.get(tool_name)
 
         if not tool_fn:
@@ -5228,7 +5248,7 @@ async def route_question(question: str, user_id: str,
         # Phase 2: query_pipeline, query_stale_deals, query_waterfall, query_rep_pipeline, query_win_loss, query_deals_at_risk
         # Skip classifier routing - route to dynamic loop where they're registered as callable tools.
         # All other handlers continue using classifier routing unchanged.
-        if handler_name in ("query_pipeline_movement", "query_pipeline", "query_stale_deals", "query_waterfall", "query_rep_pipeline", "query_win_loss"):
+        if handler_name in ("query_pipeline_movement", "query_pipeline", "query_stale_deals", "query_waterfall", "query_rep_pipeline", "query_win_loss", "query_deals_at_risk"):
             logger.info(f"[UNIFIED_ROUTING] {handler_name} → dynamic loop "
                        f"(classifier confidence={confidence:.2f}, bypassed)")
             handler_name = "dynamic_query"

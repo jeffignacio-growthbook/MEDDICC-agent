@@ -31,6 +31,14 @@ STRUCTURED_HANDLERS = {
     "query_stale_deals": ["stale_deals", "stale_count"],  # Phase 2 handler 2/6
     "query_waterfall": ["pipeline_summary", "waterfall"],  # Phase 2 handler 3/6
     "query_rep_pipeline": ["deals", "summary"],  # Phase 2 handler 4/6
+    "query_deals_at_risk": ["deals_at_risk", "message"],  # Phase 2 handler 6/6 —
+        # "message" must be checked too: the genuinely-empty "no deals at
+        # risk" case has an empty deals_at_risk list but a complete,
+        # human-readable answer in "message". Checking deals_at_risk alone
+        # would misclassify that as "empty" and trigger a wasteful dynamic-
+        # query fallback instead of just using the handler's own answer —
+        # the same wins-only-quarter mistake query_win_loss's audit found,
+        # caught here before it shipped instead of after.
 }
 
 
