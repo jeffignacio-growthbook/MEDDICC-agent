@@ -157,6 +157,54 @@ jobs:
           # duplicated here.
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/test_forecast_trust.py
 
+      - name: "TEST 0bf — Offline: pipeline-coverage primitive (assess_pipeline_coverage)"
+        run: |
+          set -e
+          # 2026-09-19: NORTH_STAR.md CRO Priority #2 — "how much pipeline
+          # coverage do we have against goal." scripts/pipeline_coverage.py
+          # composes: New+Expansion-only, qualified-pipeline-only, Q-scoped
+          # current pipeline; a stage-level close-rate weighting built
+          # fresh (forecast_analyses.query_stage_close_rate — no per-stage
+          # close-rate primitive existed to reuse); a REAL current-quarter
+          # quota+stretch target (rep_targets team total + a manually-set
+          # $2.1M stretch figure documented in config/targets.yaml, a real
+          # GrowthBook business decision, not computed); and a HEURISTIC
+          # historical coverage curve (forecast_analyses.query_coverage_
+          # proxy_target_by_week — confirmed live that no complete
+          # historical quarter ever had a real target, so this is a 2x-
+          # prior-year-actual proxy resting on a permanent, confirmed
+          # evidence ceiling: none of the 4 prior-year bases clear
+          # min_evidence_count=30). Every output surface always phrases
+          # gap-to-goal ("$X short of target"/"$X over target"), never a
+          # bare ratio, and the historical curve must always carry the
+          # literal word HEURISTIC — never conflated with the real
+          # current-quarter target.
+          #
+          # scripts/test_pipeline_coverage.py covers the composing
+          # function itself: scope filtering (New+Expansion only, renewal
+          # pipeline excluded, qualified-stage boundary reused exactly),
+          # stage weighting (a gated stage's deal is weighted by its real
+          # win_rate; an ungated stage's deal is excluded from the
+          # weighted total, never defaulted to a 1.0 weight), gap-to-goal
+          # phrasing in both directions, and the mandatory HEURISTIC
+          # label on the historical curve vs. the real target's note
+          # never carrying one. Both the heuristic-label requirement and
+          # the renewal-pipeline exclusion were verified by actually
+          # planting the exact regression in scripts/pipeline_coverage.py
+          # (stripping the HEURISTIC word from the output note; bypassing
+          # is_incremental_pipeline()) and confirming the relevant tests
+          # genuinely failed before restoring the real code and confirming
+          # a clean pass — not just written and trusted.
+          #
+          # test_stage_close_rate_structure / test_coverage_proxy_target_
+          # by_week_structure (added to test_forecast_analyses.py, already
+          # run above by TEST 0b) cover the two new forecast_analyses.py
+          # functions independently — deal-week pooling by stage_order
+          # with renewal exclusion, and the 2x-prior-year proxy-target
+          # computation with mandatory heuristic labeling — not duplicated
+          # here.
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/test_pipeline_coverage.py
+
       - name: "TEST 0c — Offline: date/time-window resolution (single-source-of-truth gate)"
         run: |
           set -e

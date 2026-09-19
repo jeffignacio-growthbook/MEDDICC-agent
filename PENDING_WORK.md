@@ -2242,6 +2242,95 @@ documented contract matches what the function actually does.
 
 ---
 
+#### 20. `api/handlers.py::query_coverage()` — Confirmed Broken, Produces 8,000%+ Nonsense
+
+**Issue:** `query_coverage()` fetches ALL qualified pipeline as a single
+unscoped total (`total_pipeline`), then divides that SAME total against
+EACH individual target row (team-level and every per-rep row alike)
+from `rep_targets`:
+
+```python
+coverage_rows.append({
+    ...
+    "target":   tv,
+    "pipeline": total_pipeline,   # same unscoped total for every row
+    "coverage": round(total_pipeline/max(tv,1)*100, 1),
+})
+```
+
+A rep with a $250k individual target gets `coverage` computed against
+the WHOLE team's qualified pipeline (millions), not their own book —
+producing coverage percentages in the thousands, confirmed live during
+the 2026-09-19 pipeline-coverage audit (NORTH_STAR.md CRO Priority #2).
+
+**Found during:** the pre-build audit for
+`scripts/pipeline_coverage.py::assess_pipeline_coverage()` — confirmed
+live via `scripts/audit_pipeline_coverage.py` before concluding
+pipeline-coverage was a genuine reasoning-layer gap rather than an
+already-solved question.
+
+**Status:** NOT fixed. Out of scope for the `assess_pipeline_coverage()`
+build — that primitive is a new, correctly-scoped composition
+(`api/handlers.py::query_pipeline_coverage`, intent-routed ahead of
+`query_coverage` for coverage questions), not a patch to this handler.
+`query_coverage`'s intent-map entry now flags it as legacy/broken so the
+router prefers `query_pipeline_coverage`, but the handler itself is
+unchanged and still produces this output if reached directly (e.g. via
+the dynamic-query-loop fallback).
+
+**Work:** Either fix `query_coverage()` to scope `pipeline` per-target
+(team total vs. company-wide qualified pipeline; per-rep target vs. that
+rep's own qualified pipeline, via `owner_email`), or remove/deprecate it
+now that `query_pipeline_coverage` exists as the correct, tested
+replacement.
+
+**Complexity:** Low-medium (the fix is a per-row scoping change, not a
+new algorithm) — no urgency now that the router steers questions to the
+correct handler.
+
+---
+
+#### 21. `rep_targets` — Two Live Period-Label Formats for the Same Quarter (`FY2027_Q3` vs `Q3_FY2027`)
+
+**Issue:** Confirmed live during the same 2026-09-19 pipeline-coverage
+audit: the `rep_targets` table has 11 total rows for the current
+quarter, split across TWO different label formats — 7 rows under
+`FY2027_Q3` (from `scripts/seed_targets.py`'s own convention:
+`quarter_key.replace('fy','FY').replace('_q','_Q').upper()`, 6 reps + 1
+team-total row) and 4 rows under `Q3_FY2027` (source unconfirmed —
+plausibly an older seeding pass or a manual Slack `set target` write
+using a different convention). `current_quarter_label()`
+(`api/time_resolver.py`) itself produces `FY2027_Q3` (its own docstring
+example of `'Q3_FY2027'` is stale/wrong — `get_fiscal_quarter()`'s real
+label format is `"FYyyyy Qn"`, underscored), so every handler that
+queries `rep_targets` by `current_quarter_label()`
+(`query_pipeline()`, `query_coverage()`, the new
+`query_pipeline_coverage()`) correctly finds the 7 `FY2027_Q3` rows —
+but the 4 `Q3_FY2027` rows are silently invisible to all of them. Same
+class of finding as an earlier-session incident (TEST 0r, "FY2027 Q2"
+vs "Q3_FY2027" quarter-label-convention risk).
+
+**Found during:** the `rep_targets`-population confirmation step for
+`assess_pipeline_coverage()`'s Step A (`scripts/audit_rep_targets_all_periods.py`).
+
+**Status:** NOT fixed — does not currently produce wrong output (the
+canonical format is the one every handler queries), but is dead/orphaned
+data sitting under the wrong key, and a latent trap for any future code
+that queries `rep_targets` without going through
+`current_quarter_label()`.
+
+**Work:** Identify the source of the 4 `Q3_FY2027` rows (check
+`set_target` handler's own period-formatting logic against
+`seed_targets.py`'s), reconcile or delete the orphaned rows, and — if
+`set_target` is the source — fix it to use the same canonical format
+`current_quarter_label()`/`seed_targets.py` already agree on.
+
+**Complexity:** Low effort (a data cleanup + one formatting fix), no
+urgency — not currently causing wrong output, but should not be left to
+silently accumulate more orphaned rows each quarter.
+
+---
+
 ## 📝 Notes
 
 ### Patterns Established

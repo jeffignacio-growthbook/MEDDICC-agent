@@ -91,8 +91,23 @@ ordering is the working plan until that validation happens.
    structurally don't tag Commit/Most-Likely with real forecasting
    intent that early). See the 2026-09-19 Decision Log entry below for
    the full design.
-2. **Pipeline health/coverage** — largely covered already by
-   `query_pipeline`/`query_waterfall`.
+2. **Pipeline health/coverage** — Built and verified (2026-09-19):
+   `scripts/pipeline_coverage.py::assess_pipeline_coverage()`. Audited
+   first: `query_pipeline()`/`query_coverage()` already compute a
+   coverage ratio, so this was NOT a from-scratch gap — but
+   `query_coverage()` is confirmed broken in production (8,000%+
+   nonsense), and neither weights pipeline by historical stage-level
+   close rate or reports gap-to-goal against a real target. New+
+   Expansion-ARR-only, qualified-pipeline-only (reusing the existing
+   split and qualification boundary exactly), stage-weighted (fresh
+   `query_stage_close_rate()` — no per-stage close-rate primitive
+   existed to reuse), compared against a REAL current-quarter
+   quota+stretch target (`config/targets.yaml`), always phrased
+   gap-to-goal, never a bare ratio. A HEURISTIC historical coverage
+   curve (2x-prior-year-actual proxy — confirmed live that no complete
+   historical quarter ever had a real target) is shown for context
+   only, permanently labeled as such. See the 2026-09-19 Decision Log
+   entry below for the full design.
 3. **Deal risk/likelihood to close** — covered by `assess_deal_risk()`,
    cycle-length signal only. This is the gap that started this whole
    thread of work.
@@ -263,6 +278,21 @@ not a reason to resolve by picking one list over the other now.
 **Rationale**: same standard as deal_risk_assessor's own MEDDICC deferral — no fabricated probabilities, no signal shipped below its evidence floor, every gate and band grounded in real pooled data rather than assumed.
 
 **Status**: shipped and registered (`api/handlers.py::query_forecast_trust`, `api/router.py` intent map, `api/evaluator.py::STRUCTURED_HANDLERS`). Full Steps A-E build cycle complete: baseline tests (3), planted-discrepancy test proving the week-lookup is genuinely dynamic (not hardcoded/cached — verified by planting that exact bug and confirming the test caught it), and the MOST_LIKELY-only regression test (verified the same way — also confirmed the deal-presence assertion alone would NOT have caught a reintroduced COMMIT-only bug; only the query-shape assertion does). Live CI (`gate-tests.yml`, run [35451944255](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35451944255)): 33/33 executed steps passed, 0 failures.
+
+### 2026-09-19: Pipeline Coverage (CRO Priority #2) Built and Verified
+**Context**: audited whether "pipeline health/coverage" was a genuine gap before scoping anything. `query_pipeline()` and a dedicated `query_coverage()` handler already compute a coverage-ratio — not a from-scratch primitive. But `query_coverage()` is confirmed broken live (divides one unscoped total pipeline figure against each individual rep's own target, producing 8,000%+ nonsense), and neither weights pipeline by historical stage performance or ever reports a real gap-to-goal.
+
+**Decisions**:
+- Scope: New+Expansion ARR only (`is_incremental_pipeline()`), renewal pipeline excluded — the existing split, reused exactly, never re-derived.
+- Qualified pipeline only: `highest_stage_order_reached >= qualified_stage_order` — the exact existing boundary `query_pipeline()`/`query_coverage()` already use.
+- Stage-level weighting is built fresh (`forecast_analyses.query_stage_close_rate()`) — no existing per-stage close-rate primitive to reuse (only `SEGMENT_CYCLE_BENCHMARKS`, segment-keyed not stage-keyed). Pools deal-week observations by `stage_order` across the complete quarters, gated by `min_evidence_count`; a deal at an ungated stage is excluded from the weighted total, never defaulted to a 1.0 weight.
+- The goal for the current quarter (FY2027 Q3) = the REAL stated quota (`rep_targets` team total, $1.55M) + a manually-set $2.1M stretch figure — a real, explicit GrowthBook business decision (2x YoY growth target current headcount can't organically support), NOT computed. Lives in `config/targets.yaml` (`targets.fy2027_q3.stretch_target`/`stretch_note`), documented there with the full WHY. The stretch figure is read directly from that config file at call time (not seeded into the live `rep_targets` table — doing so would require a live write this build didn't perform); the quota component is read from the live table, matching `query_pipeline()`'s own precedent.
+- Every pipeline-vs-target comparison is phrased gap-to-goal ("$X short of target"/"$X over target"), never a bare ratio.
+- The historical coverage-TARGET curve cannot be built from real historical targets: confirmed live that NONE of the 4 complete historical quarters (FY2026 Q3/Q4, FY2027 Q1/Q2) ever had a real target in `rep_targets`, in any label format (zero rows). The curve instead uses a proxy: target = 2x the SAME quarter's actual closed-won incremental ARR from the PRIOR YEAR. Further checked: none of the 4 prior-year bases (FY2025 Q3/Q4, FY2026 Q1/Q2 — 9-17 deals each) clear `min_evidence_count=30` — confirmed this is a **permanent structural ceiling** (monotonic 8-quarter growth trend, HubSpot history doesn't extend further back), not a fixable gap. The curve is therefore permanently labeled a **HEURISTIC** — the literal word, not "directional" or "approximate" — everywhere it appears in output text, explicitly distinguished from the real current-quarter target (never labeled a heuristic).
+
+**Rationale**: same standard as the forecast-trustworthiness build — never fabricate a signal past its real evidence floor, and never let a smooth-looking curve substitute for checking the reliability of its own inputs.
+
+**Status**: shipped and registered (`api/handlers.py::query_pipeline_coverage`, `api/router.py` intent map — disambiguated from the legacy, confirmed-broken `query_coverage`, `api/evaluator.py::STRUCTURED_HANDLERS`). Full Steps A-E build cycle complete: baseline tests (scope exclusion, stage weighting, gap-to-goal phrasing in both directions, HEURISTIC-vs-real-target labeling) plus two planted-discrepancy proofs — the HEURISTIC label requirement and the renewal-pipeline exclusion were each verified by actually planting the regression in `scripts/pipeline_coverage.py`, confirming the relevant test genuinely failed, then restoring and confirming a clean pass. Two new structural tests added to `scripts/test_forecast_analyses.py` for the underlying `query_stage_close_rate()`/`query_coverage_proxy_target_by_week()` functions. Wired into `gate-tests.yml` (TEST 0bf).
 
 ---
 

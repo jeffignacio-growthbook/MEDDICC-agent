@@ -193,7 +193,20 @@ HANDLER_DESCRIPTIONS = {
     "query_win_loss": "WIN/LOSS ANALYSIS, WHY we won/lost, win/loss BREAKDOWN, win/loss SUMMARY — narrative analysis of closed deal outcomes, not just counts. Use for: 'why are we losing', 'win loss breakdown', 'breakdown of wins vs losses', 'win rate by segment', 'give me a win loss summary', 'what's causing deals to close lost', 'win/loss reasons', 'loss analysis'. DO NOT use for simple counts of won/lost deals (use query_waterfall for flow metrics).",
     "query_objections": "objections by category/stage/trend",
     "query_feature_gaps": "feature gaps by severity/competitor",
-    "query_coverage": "pipeline coverage vs target, quota attainment",
+    "query_coverage": "pipeline coverage vs target, quota attainment — LEGACY, confirmed broken (produces nonsensical 8,000%+ ratios). Prefer query_pipeline_coverage for coverage questions.",
+    "query_pipeline_coverage": (
+        "current-quarter pipeline coverage vs the REAL quota+stretch goal, "
+        "always gap-to-goal ('$X short of target'/'$X over target'), never "
+        "a bare ratio. New+Expansion ARR only, qualified pipeline only, "
+        "weighted by historical stage-level close rate. Includes a "
+        "HEURISTIC historical coverage curve for context (labeled as "
+        "such — proxy-calibrated, not a real historical target). Use for: "
+        "'how much pipeline coverage do we have', 'are we tracking to "
+        "goal on pipeline', 'how far short of target is our pipeline', "
+        "'pipeline health'. NOT query_coverage (broken) and NOT "
+        "query_pipeline (that's the raw pipeline snapshot, no gap-to-goal "
+        "or stage weighting)."
+    ),
     "query_deal": "deep dive on a specific company's deal",
     "query_rubric": "general scoring questions like \"what does a 6 mean for champion?\"",
     "generate_win_loss": "full narrative for a specific closed deal (slow)",

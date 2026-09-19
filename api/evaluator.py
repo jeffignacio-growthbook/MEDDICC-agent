@@ -42,6 +42,9 @@ STRUCTURED_HANDLERS = {
     "query_forecast_trust": ["status"],  # always "insufficient_data" or "ok" —
         # the gated too-early response is a complete, honest answer, not an
         # empty result, same principle as query_deals_at_risk's "message" key.
+    "query_pipeline_coverage": ["status"],  # always "ok" or "error" — same
+        # principle as query_forecast_trust; a complete "ok" result is not
+        # "empty" just because some sub-fields (e.g. quota/stretch) are null.
 }
 
 

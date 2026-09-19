@@ -989,6 +989,47 @@ async def query_forecast_trust(params: dict, sb) -> dict:
         }
 
 
+async def query_pipeline_coverage(params: dict, sb) -> dict:
+    """
+    Current-quarter pipeline-coverage assessment against the REAL stated
+    quota+stretch goal, gap-to-goal always (never a bare ratio)
+    (NORTH_STAR.md CRO Priority #2).
+
+    NOT the same as query_coverage (that handler's coverage-ratio math
+    is confirmed broken in production — divides one unscoped total
+    pipeline figure against each individual rep's own target). This is
+    a fresh composition: New+Expansion-only, qualified-pipeline-only,
+    weighted by historical stage-level close rate, compared against a
+    real quota+stretch target, with a HEURISTIC historical curve
+    (2x-prior-year-actual proxy — no real historical target ever
+    existed) shown for context only, always labeled as a heuristic.
+
+    Answers questions like:
+    - "How much pipeline coverage do we have this quarter?"
+    - "Are we tracking to goal on pipeline?"
+    - "How far short of target is our qualified pipeline?"
+    """
+    from pipeline_coverage import assess_pipeline_coverage
+
+    as_of = None
+    as_of_str = params.get("as_of")  # optional ISO date, for testability only
+    if as_of_str:
+        from datetime import date as _date
+        try:
+            as_of = _date.fromisoformat(as_of_str)
+        except ValueError:
+            logger.error(f"[PIPELINE_COVERAGE] Invalid as_of date: {as_of_str!r}")
+
+    try:
+        return assess_pipeline_coverage(sb, as_of=as_of)
+    except Exception as e:
+        logger.error(f"[PIPELINE_COVERAGE] Failed to assess pipeline coverage: {e}")
+        return {
+            "error": f"Failed to assess pipeline coverage: {e}",
+            "status": "error",
+        }
+
+
 async def query_win_loss(params: dict, sb) -> dict:
     """
     Comprehensive win/loss analysis combining:

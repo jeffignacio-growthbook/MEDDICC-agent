@@ -13,6 +13,7 @@ These tests verify the analyses are correct before any proposals are built on th
 """
 import sys
 from pathlib import Path
+from datetime import date
 from unittest.mock import Mock, MagicMock, patch
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -25,6 +26,8 @@ from analytics.forecast_analyses import (
     query_commit_calibration,
     query_commit_ml_calibration_by_week,
     COMMIT_ML_CATEGORIES,
+    query_stage_close_rate,
+    query_coverage_proxy_target_by_week,
 )
 
 
@@ -263,6 +266,142 @@ def test_commit_ml_calibration_by_week_structure():
     print("  ✓ query uses .in_('forecast_category', ...), not .eq() (single-category)")
 
 
+def test_stage_close_rate_structure():
+    """
+    query_stage_close_rate() — built fresh for assess_pipeline_coverage()
+    (scripts/pipeline_coverage.py, NORTH_STAR.md CRO Priority #2). Checks
+    it independently of assess_pipeline_coverage() (which only ever
+    exercises it mocked away): pools deal-week observations by
+    stage_order across complete quarters, EXCLUDES the renewal pipeline,
+    and gates win_rate on min_evidence_count.
+    """
+    print("\n[TEST] stage close-rate structure")
+
+    deals_rows = [
+        {'deal_id': 'd1', 'stage': 'closedwon', 'close_date': '2026-04-15'},
+        {'deal_id': 'd2', 'stage': 'closedlost', 'close_date': '2026-04-20'},
+        {'deal_id': 'd3', 'stage': 'closedwon', 'close_date': '2099-01-01'},  # outside window -> SLIPPED
+    ]
+    snapshot_rows = [
+        {'deal_id': 'd1', 'stage_order': 1, 'pipeline_id': 'default'},
+        {'deal_id': 'd2', 'stage_order': 1, 'pipeline_id': 'default'},
+        {'deal_id': 'd3', 'stage_order': 1, 'pipeline_id': 'default'},
+        {'deal_id': 'renewal_deal', 'stage_order': 1, 'pipeline_id': '866608541'},
+    ]
+
+    def _select_all_side_effect(sb, table, columns='*', filters=None, page_size=1000):
+        if table == 'deals':
+            return deals_rows
+        if table == 'deals_snapshot':
+            return snapshot_rows
+        raise AssertionError(f"Unexpected table queried: {table!r}")
+
+    with patch('analytics.forecast_analyses._get_complete_quarters') as mock_quarters, \
+         patch('analytics.forecast_analyses._load_config') as mock_config, \
+         patch('analytics.forecast_analyses._quarter_window_iso') as mock_win, \
+         patch('supabase_client.select_all', side_effect=_select_all_side_effect):
+        mock_quarters.return_value = ['FY2026 Q1']
+        mock_config.return_value = {'min_evidence_count': 2}
+        mock_win.return_value = ('2026-02-01', '2026-04-30')
+
+        sb = Mock()
+        result = query_stage_close_rate(sb)
+
+    for key in ('by_stage_order', 'quarters_analyzed', 'complete_quarters',
+                'min_evidence_count', 'scope'):
+        if key not in result:
+            raise AssertionError(f"Missing {key!r} in result")
+
+    if 1 not in result['by_stage_order']:
+        raise AssertionError(
+            f"Expected stage_order 1 in by_stage_order, got {result['by_stage_order'].keys()}")
+    stage1 = result['by_stage_order'][1]
+
+    if stage1['n_observed'] != 3:
+        raise AssertionError(
+            f"Renewal-pipeline deal leaked into stage close-rate pooling — "
+            f"expected n_observed=3 (renewal excluded), got {stage1['n_observed']}")
+    if stage1['won'] != 1 or stage1['lost'] != 1 or stage1['slipped'] != 1:
+        raise AssertionError(
+            f"Expected won=1 (d1, in-window), lost=1 (d2), slipped=1 "
+            f"(d3, out-of-window close_date), got {stage1}")
+    if stage1['classified'] != 3:
+        raise AssertionError(f"Expected classified=3, got {stage1}")
+    if stage1['win_rate'] != 1 / 3:
+        raise AssertionError(f"Expected win_rate=1/3, got {stage1['win_rate']}")
+
+    print("  ✓ by_stage_order pools deal-week observations per stage, renewal pipeline excluded")
+    print(f"  ✓ win_rate correctly computed and gated: {stage1}")
+
+
+def test_coverage_proxy_target_by_week_structure():
+    """
+    query_coverage_proxy_target_by_week() — the HEURISTIC historical
+    pipeline-coverage curve for assess_pipeline_coverage() (NORTH_STAR.md
+    CRO Priority #2). Checks structure and the mandatory heuristic
+    labeling independently of assess_pipeline_coverage() (which only
+    ever exercises it mocked away). Confirmed live (2026-09-19): no
+    complete historical quarter ever had a real target — this curve is
+    a 2x-prior-year-actual proxy, and its output MUST always carry
+    heuristic=True, label='HEURISTIC', and the literal word HEURISTIC
+    in its note.
+    """
+    print("\n[TEST] coverage proxy-target-by-week structure and heuristic labeling")
+
+    def _select_all_side_effect(sb, table, columns='*', filters=None, page_size=1000):
+        if table == 'deals':
+            # actual_incremental_closed_won: one won, incremental, non-renewal deal
+            return [{'deal_id': 'w1', 'stage': 'closedwon', 'close_date': '2025-04-15',
+                     'pipeline_id': 'default', 'new_arr': 100000, 'expansion_arr': 0}]
+        if table == 'deals_snapshot':
+            return [{'deal_id': 's1', 'deal_value': 50000, 'pipeline_id': 'default',
+                     'stage_order': 1, 'close_date': '2026-04-15'}]
+        raise AssertionError(f"Unexpected table queried: {table!r}")
+
+    with patch('analytics.forecast_analyses._get_complete_quarters') as mock_quarters, \
+         patch('analytics.forecast_analyses._load_config') as mock_config, \
+         patch('analytics.forecast_analyses._quarter_window_iso') as mock_win, \
+         patch('utils.get_pipeline_config') as mock_pcfg, \
+         patch('utils.get_fiscal_quarter') as mock_gfq, \
+         patch('supabase_client.select_all', side_effect=_select_all_side_effect):
+        mock_quarters.return_value = ['FY2026 Q1']
+        mock_config.return_value = {'min_evidence_count': 30}
+        mock_win.return_value = ('2026-02-01', '2026-04-30')
+        mock_pcfg.return_value = {'qualified_stage_order': 1}
+        mock_gfq.return_value = (date(2025, 2, 1), date(2025, 4, 30), 'FY2025 Q1')
+
+        sb = Mock()
+        result = query_coverage_proxy_target_by_week(sb)
+
+    for key in ('by_week', 'proxy_targets', 'quarters_used', 'min_evidence_count',
+                'evidence_ceiling', 'heuristic', 'label', 'note'):
+        if key not in result:
+            raise AssertionError(f"Missing {key!r} in result")
+
+    if result['heuristic'] is not True or result['label'] != 'HEURISTIC':
+        raise AssertionError(
+            f"Expected heuristic=True, label='HEURISTIC', got "
+            f"{result['heuristic']}, {result['label']!r}")
+    if 'HEURISTIC' not in result['note']:
+        raise AssertionError(f"Expected the literal word HEURISTIC in note, got {result['note']!r}")
+
+    if set(result['by_week'].keys()) != set(range(1, 14)):
+        raise AssertionError(
+            f"Expected by_week to cover all 13 weeks, got {sorted(result['by_week'].keys())}")
+
+    q = 'FY2026 Q1'
+    if q not in result['proxy_targets']:
+        raise AssertionError(f"Expected proxy_targets to include {q!r}, got {result['proxy_targets'].keys()}")
+    pt = result['proxy_targets'][q]
+    if pt['value'] != 200000:
+        raise AssertionError(f"Expected proxy target value=200000 (2x prior-year $100k), got {pt}")
+    if pt['prior_year_deal_count'] != 1:
+        raise AssertionError(f"Expected prior_year_deal_count=1, got {pt}")
+
+    print("  ✓ by_week covers all 13 weeks; proxy_targets computed as 2x prior-year actual")
+    print("  ✓ heuristic=True, label='HEURISTIC', literal word present in note")
+
+
 def test_analyses_return_null_on_thin_data_never_fabricate():
     """
     All analyses must return null/error on thin data, never fabricate numbers.
@@ -335,6 +474,8 @@ def main():
         test_commit_calibration_classifies_slip_separately_from_loss,
         test_commit_outcome_by_week_structure,
         test_commit_ml_calibration_by_week_structure,
+        test_stage_close_rate_structure,
+        test_coverage_proxy_target_by_week_structure,
         test_analyses_return_null_on_thin_data_never_fabricate,
     ]
 
