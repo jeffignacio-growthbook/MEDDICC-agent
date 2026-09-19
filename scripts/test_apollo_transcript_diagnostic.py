@@ -13,8 +13,8 @@ if REVOPS_METRICS.exists():
     sys.path.insert(0, str(REVOPS_METRICS))
 sys.path.insert(0, str(REPO_ROOT / 'scripts'))
 
-# Set API key
-os.environ['APOLLO_API_KEY'] = '05njgutZFqWl0tZ3YhPUig'
+# API key should be set in environment variables
+# os.environ['APOLLO_API_KEY'] should be loaded from .env
 
 # Configure logging to show DEBUG level
 logging.basicConfig(
