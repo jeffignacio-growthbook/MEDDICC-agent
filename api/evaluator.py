@@ -39,6 +39,9 @@ STRUCTURED_HANDLERS = {
         # query fallback instead of just using the handler's own answer —
         # the same wins-only-quarter mistake query_win_loss's audit found,
         # caught here before it shipped instead of after.
+    "query_forecast_trust": ["status"],  # always "insufficient_data" or "ok" —
+        # the gated too-early response is a complete, honest answer, not an
+        # empty result, same principle as query_deals_at_risk's "message" key.
 }
 
 

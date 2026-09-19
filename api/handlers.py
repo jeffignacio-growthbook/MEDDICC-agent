@@ -948,6 +948,47 @@ async def query_high_priority_deal_risk(params: dict, sb) -> dict:
     return result
 
 
+async def query_forecast_trust(params: dict, sb) -> dict:
+    """
+    Quarter-level forecast-trustworthiness signal: how much to trust THIS
+    quarter's COMMIT+MOST_LIKELY number (NORTH_STAR.md CRO Priority #1).
+
+    Composes assess_deal_risk() (per-deal cycle-length risk on this
+    quarter's COMMIT+MOST_LIKELY cohort — NOT the COMMIT-only cohort
+    query_high_priority_deal_risk uses) with a pooled, week-indexed
+    historical win-rate baseline, looked up at whatever week the current
+    quarter is actually in — a moving comparison, never a fixed anchor.
+
+    Below week 3 of the current quarter, returns insufficient_data/
+    too_early: reps structurally don't produce reliable Commit/Most-Likely
+    tags in the coverage-building phase (not yet forecasting).
+
+    Answers questions like:
+    - "How much should I trust this quarter's number?"
+    - "Is our Commit pipeline reliable this quarter?"
+    - "How risky is this quarter's forecast right now?"
+    """
+    from forecast_trust import assess_forecast_trust
+
+    as_of = None
+    as_of_str = params.get("as_of")  # optional ISO date, for testability only
+    if as_of_str:
+        from datetime import date as _date
+        try:
+            as_of = _date.fromisoformat(as_of_str)
+        except ValueError:
+            logger.error(f"[FORECAST_TRUST] Invalid as_of date: {as_of_str!r}")
+
+    try:
+        return assess_forecast_trust(sb, as_of=as_of)
+    except Exception as e:
+        logger.error(f"[FORECAST_TRUST] Failed to assess forecast trust: {e}")
+        return {
+            "error": f"Failed to assess forecast trust: {e}",
+            "status": "error",
+        }
+
+
 async def query_win_loss(params: dict, sb) -> dict:
     """
     Comprehensive win/loss analysis combining:

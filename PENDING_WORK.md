@@ -2167,6 +2167,32 @@ if consolidated.
 
 **Complexity:** Low effort, no urgency.
 
+**Addendum (found during Step A of `assess_forecast_trust()` implementation):**
+the same underlying pattern extends one level up — "quarter label/date
+-> quarter boundaries" also has multiple independent implementations,
+not just "date -> week number":
+- `scripts/utils.py::get_fiscal_quarter(as_of=None, config=None)` —
+  the canonical date-in, `(q_start, q_end, label)`-out function.
+- `scripts/deal_risk_assessor.py::get_at_risk_deals()` — resolves an
+  explicit `fiscal_quarter` label back to boundaries via its own
+  regex (`FY(\d{4})\s+Q([1-4])`) plus manual calendar math, because it
+  only ever receives a label, never a date.
+- `scripts/analytics/forecast_analyses.py::_quarter_window_iso(sb, quarter)`
+  — resolves a label back to boundaries a third way: looks up any
+  existing `deals_snapshot` row for that quarter, takes its
+  `snapshot_date`, and calls `get_fiscal_quarter()` on that date.
+
+Three call sites, three different strategies for label->boundaries,
+none sharing a source of truth for that direction (only the date->label
+direction is canonical, via `get_fiscal_quarter()`). `assess_forecast_trust()`
+sidesteps this entirely by always starting from a date (`as_of`) and
+calling `get_fiscal_quarter()` directly — it does not add a fourth
+implementation. Not fixing the pre-existing two (`get_at_risk_deals`'s
+regex, `_quarter_window_iso`'s snapshot-lookup) as part of this build —
+out of scope for a primitive that doesn't need label->boundaries at
+all — but logging it here since it's the same class of risk as the
+entry above, one level up the same call chain.
+
 ---
 
 ## 📝 Notes

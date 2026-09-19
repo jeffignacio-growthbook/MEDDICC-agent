@@ -188,6 +188,7 @@ HANDLER_DESCRIPTIONS = {
     "query_arr": "ARR by customer, total ARR",
     "query_deals_at_risk": "weak MEDDICC scores, deals at risk, champion gaps",
     "query_high_priority_deal_risk": "risk assessment for late-stage deals (Negotiating/Awaiting Signature) OR COMMIT forecast, deal duration vs segment cycle length, stale MEDDICC scores",
+    "query_forecast_trust": "how much to trust THIS QUARTER's forecast number, forecast trustworthiness/reliability/confidence, is our Commit pipeline reliable, how risky is this quarter's number — compares this quarter's COMMIT+MOST_LIKELY pipeline against historical win rates at the same point in the quarter. NOT the same as query_high_priority_deal_risk (per-deal list) — this is a quarter-level trust signal.",
     "query_definition": "what does a term mean, how is X defined, what counts as Y — looks up definitions in semantic layer (field_semantics.yaml, client.yaml, metrics.yaml). Examples: 'what does at-risk mean to you?', 'what counts as qualified?', 'how do you define forecast?'",
     "query_win_loss": "WIN/LOSS ANALYSIS, WHY we won/lost, win/loss BREAKDOWN, win/loss SUMMARY — narrative analysis of closed deal outcomes, not just counts. Use for: 'why are we losing', 'win loss breakdown', 'breakdown of wins vs losses', 'win rate by segment', 'give me a win loss summary', 'what's causing deals to close lost', 'win/loss reasons', 'loss analysis'. DO NOT use for simple counts of won/lost deals (use query_waterfall for flow metrics).",
     "query_objections": "objections by category/stage/trend",

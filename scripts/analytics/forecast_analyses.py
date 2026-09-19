@@ -664,6 +664,121 @@ def query_commit_calibration(
     }
 
 
+# Forecast-trustworthiness primitive (NORTH_STAR.md CRO Priority #1,
+# scripts/forecast_trust.py::assess_forecast_trust). Confirmed 2026-09-19:
+# COMMIT alone is too sparse for this org's forecast-trust question;
+# scope is COMMIT+MOST_LIKELY.
+COMMIT_ML_CATEGORIES = ["COMMIT", "MOST_LIKELY"]
+
+
+def query_commit_ml_calibration_by_week(sb=None, categories=None) -> Dict:
+    """
+    Pooled (across complete quarters), week-indexed hit-rate table for an
+    arbitrary forecast_category set — generalizes query_commit_outcome_by_week()
+    (hardcoded to COMMIT alone) so a caller can look up the SAME week the
+    current quarter is actually in, rather than being anchored to one fixed
+    week. Built for assess_forecast_trust() (scripts/forecast_trust.py),
+    which needs a MOVING comparison: week 4 of the current quarter compares
+    against week 4's historical rate here, not a hardcoded week 10.
+
+    Reuses _classify_deal_outcome, _quarter_window_iso, _get_complete_quarters,
+    _load_config UNMODIFIED — only the category filter is new (query_commit_
+    outcome_by_week's query is otherwise identical, .eq('forecast_category',
+    'COMMIT') vs .in_('forecast_category', categories) here).
+
+    Args:
+        sb: Supabase client
+        categories: forecast_category values to pool (default: COMMIT_ML_CATEGORIES)
+
+    Returns:
+        {
+            'by_week': {1: {...}, ..., 13: {...}},  # same row shape as
+                query_commit_outcome_by_week's by_week (n_tagged instead of
+                n_committed, since the cohort is no longer COMMIT-only):
+                {'n_tagged', 'classified', 'unclassified', 'won', 'lost',
+                 'slipped', 'win_rate' (gated), 'reason'}
+            'categories': [...],
+            'quarters_analyzed': int,
+            'complete_quarters': [...],
+            'min_evidence_count': int,
+        }
+    """
+    if sb is None:
+        sb = create_client(
+            os.environ['SUPABASE_URL'],
+            os.environ['SUPABASE_SERVICE_KEY']
+        )
+    if categories is None:
+        categories = COMMIT_ML_CATEGORIES
+
+    config = _load_config()
+    min_evidence = config.get('min_evidence_count', 30)
+
+    complete_quarters = _get_complete_quarters(sb)
+    if not complete_quarters:
+        return {
+            'error': 'No complete quarters available',
+            'coverage_note': 'Insufficient historical data'
+        }
+
+    # OUTCOME-READ (defect 5, same as query_commit_outcome_by_week): terminal
+    # state from the current deals table, never a snapshot row.
+    from supabase_client import select_all
+    deals_rows = select_all(sb, 'deals', columns='deal_id,stage,close_date')
+    deals_by_id = {str(d['deal_id']): d for d in deals_rows}
+
+    def _blank():
+        return {'n_tagged': 0, 'won': 0, 'lost': 0, 'slipped': 0,
+                'unclassified': 0}
+
+    pooled_by_week = defaultdict(_blank)
+
+    for quarter in complete_quarters:
+        q_start_iso, q_end_iso = _quarter_window_iso(sb, quarter)
+        for week in range(1, 14):
+            res = sb.table('deals_snapshot').select('deal_id').eq(
+                'fiscal_quarter', quarter).eq(
+                'week_of_quarter', week).in_(
+                'forecast_category', categories).execute()
+            for r in res.data:
+                did = r['deal_id']
+                outcome = _classify_deal_outcome(
+                    did, q_start_iso, q_end_iso, deals_by_id)
+                agg = pooled_by_week[week]
+                agg['n_tagged'] += 1
+                if outcome == 'WON':
+                    agg['won'] += 1
+                elif outcome == 'LOST':
+                    agg['lost'] += 1
+                elif outcome == 'SLIPPED':
+                    agg['slipped'] += 1
+                else:  # deal absent from deals table — cannot classify
+                    agg['unclassified'] += 1
+
+    def _finish(agg):
+        classified = agg['won'] + agg['lost'] + agg['slipped']
+        gated = classified >= min_evidence
+        return {
+            'n_tagged': agg['n_tagged'],
+            'classified': classified,
+            'unclassified': agg['unclassified'],
+            'won': agg['won'], 'lost': agg['lost'], 'slipped': agg['slipped'],
+            'win_rate': (agg['won'] / classified) if gated and classified else None,
+            'reason': (None if gated
+                       else f'{classified} classified < min_evidence {min_evidence}'),
+        }
+
+    by_week = {w: _finish(pooled_by_week[w]) for w in range(1, 14)}
+
+    return {
+        'by_week': by_week,
+        'categories': list(categories),
+        'quarters_analyzed': len(complete_quarters),
+        'complete_quarters': complete_quarters,
+        'min_evidence_count': min_evidence,
+    }
+
+
 def main():
     """CLI for testing analyses."""
     import argparse
