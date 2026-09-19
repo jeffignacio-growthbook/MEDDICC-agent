@@ -1,0 +1,42 @@
+name: Audit rep_targets All Periods (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY,
+# Supabase only.
+#
+# Directly answers Jeff's question: did rep_targets EVER have a row for
+# FY2026 Q3, FY2026 Q4, FY2027 Q1, or FY2027 Q2 (the 4 complete quarters
+# used in the coverage-curve audit), independent of config/targets.yaml
+# (which only has fy2027_q3 configured). Checks the live table for ALL
+# periods, not just the current quarter.
+#
+# Report only. No primitive is designed or built here. Safe to delete
+# once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit rep_targets all periods"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/audit_rep_targets_all_periods.py
