@@ -1,0 +1,47 @@
+name: Audit Pipeline Coverage Primitive Scoping (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY,
+# Supabase only.
+#
+# Scopes the "pipeline health/coverage" question (NORTH_STAR.md CRO
+# Priority #2) per Jeff's audit request. Static code reading already
+# found query_pipeline() and a dedicated query_coverage() handler both
+# already compute a real coverage ratio (pipeline$/quota$) from the
+# rep_targets table — the premise that no handler does this is false.
+# This workflow runs scripts/audit_pipeline_coverage.py to get live
+# numbers: current rep_targets population, whether a previously-flagged
+# metric-scoping discrepancy (scripts/verify_coverage_ratio.py) is
+# still live, and real example output from query_pipeline/query_coverage/
+# query_rep_attainment.
+#
+# Report only. No primitive is designed or built here. Safe to delete
+# once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit pipeline coverage primitive scoping"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/audit_pipeline_coverage.py
