@@ -1,7 +1,7 @@
 {
   "company": "Engineering Team Sync",
   "slug": "engineering-team-sync",
-  "last_etl_date": "2026-09-03T06:04:10.808952",
+  "last_etl_date": "2026-09-19T06:09:55.671654",
   "calls": [
     {
       "id": "01KGT5917ZP7J7SSP08X1N1ZW3",
@@ -182,6 +182,17 @@
       "summary": "# Engineering Team Sync\nDate: 2026-08-28 | Duration: 70m\n\n## Summary\nParticipants discussed maintaining the current on-call rotation while assessing its necessity based on support feedback. They also explored consolidating AI product analytics and sidebar agents to simplify the user experience amid potential technical challenges. The team is developing a real-time tracking solution for a major client managing enormous data volumes, aiming for cost-effective strategies. Improvements to the fact table creation process were highlighted, including an editable SQL interface to enhance usability. Finally, the progress on an interleaved experimentation method to efficiently compare ranking algorithms was presented, focusing on the need for clear metrics and refinements for UI presentation.\n\n## Keywords\non-call rotation, AI agent consolidation, dynamic sampling, real-time analytics, interleaved experimentation, fact table UI\n\n## Action Items\n\n**Alyssa Nicoll**\nOrganize a 30-minute GitHub issues triage meeting including Luke Brights and Jeremy Dorn to consolidate and close issues (00:59)\n\n**Adriel Vieira**\nShare a message in the support channel to confirm if on-call rotation is still needed (03:21)\nExpand on-call roster with new engineers if rotation continues after support check (03:08)\n\n**Jeremy Dorn**\nCoordinate with support team on whether to continue or kill on-call rotation (03:08)\nPrepare rough proposal and timeline for Block or Square client on dynamic sampling and real-time data analytics solution (19:53)\nIncorporate discussion and prepare for Demos sharing unfinished work progress in Friday meetings (01:00:00)\n\n**Luke Sonnet**\nClean up interleaving experiment implementation and results UI; prepare feature team review for integration with feature flags (57:19)\n\n**Gabe Melean**\nFollow up on engineering feedback to refine design collaboration process; plan subsequent conversations for process improvements (13:25)\n\n**Michael Knowlton**\nExplore UI improvements for fact table setup inspired by Lightdash and BigQuery patterns (39:00)\n\n**Bryce Fitzsimons**\nContinue working on SDK session ID for connecting event and session replay data to improve real-time experiment metrics (26:07)\n",
       "organizer": "michael@growthbook.io",
       "participants": 27,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M26WWFXP57DEGDPV03GXVZE4",
+      "source": "fireflies",
+      "title": "Engineering Team Sync",
+      "date": "2026-09-18",
+      "duration_minutes": 50,
+      "summary": "# Engineering Team Sync\nDate: 2026-09-18 | Duration: 50m\n\n## Summary\nThe team planned the Tuesday 5.1 release, prioritizing completion of the Slack app integration and User Journeys. The 5.2 vision for the end of October includes SDK auto-capture, redesigned metrics and experiments pages, feature flag management, QA tools, smart Slack notifications, cohorts or populations, power analysis, and potentially audience health checks. Session replay, experiment quality, and interleaving are planned as beta launches, while cluster-randomized experimentation is expected before future switchback support. The Slack app will provide standard workspace and channel connections, event recommendations, clearer filters, visual or text messages, and future snooze, digest, subscription, and AI chat capabilities. Metrics creation is moving to a full-screen workflow with previews, SQL visibility, richer filtering, and more metric types, launching after 5.1. The team also discussed Lang Fuse, AI coding tools, confusing AI-generated feature flag names, better metadata, and stronger feedback channels.\n\n## Keywords\nSlack integration, metrics revamp, cohort populations, power analysis, AI coding assistants, LangFuse integration\n\n## Action Items\n\n**Jeremy Dorn**\nFinalize and prepare for the Tuesday release including the Slack app and User Journeys feature (00:25)\n\n**Luke Smith**\nContinue developing and refining Slack app integration, including adding AI chat functionality and improving event filtering user experience (15:13)\nCollaborate on improving metric preview clarity regarding proportion and unit representation to reduce user confusion (27:58)\n\n**Nobu Ajito**\nFinalize the enhanced metrics creation UI and ensure integration with product analytics Explorer for data parity (22:31)\n\n**Graham McNicoll**\nFollow up on Slack app permissions review and submit Slack app for review with possible permission optimizations (17:01)\nPrepare documentation on LangFuse integration goals and features to stimulate focused development efforts (30:45)\n\n**Unassigned**\nDevelop filtering and subscription model improvements for Slack notifications to support dashboard-based subscriptions and smart digests (19:00)\n\n**Bryce Fitzsimons**\nCoordinate and funnel external feedback from Claude Design through proper channels to ensure contractual compliance and effective internal adoption (35:30)\n",
+      "organizer": "michael@growthbook.io",
+      "participants": 28,
       "summary_quality": "good"
     }
   ]

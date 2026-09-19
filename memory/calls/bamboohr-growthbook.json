@@ -1,0 +1,18 @@
+{
+  "company": "BambooHR<>GrowthBook",
+  "slug": "bamboohr-growthbook",
+  "last_etl_date": "2026-09-19T06:09:55.675867",
+  "calls": [
+    {
+      "id": "01M2GDDRTAYN49V7D59RW9D8WV",
+      "source": "fireflies",
+      "title": "BambooHR<>GrowthBook - Technical Discussion",
+      "date": "2026-09-18",
+      "duration_minutes": 46,
+      "summary": "# BambooHR<>GrowthBook - Technical Discussion\nDate: 2026-09-18 | Duration: 46m\n\n## Summary\nThe team aligned on integrating Sanity CMS with GrowthBook to support granular content experimentation. Sanity schemas define editable components, while GrowthBook feature flags and experiments can swap component references or manage variant arrays through Sanity’s personalization plugin without coding changes. A proof of concept using self-hosted GrowthBook and a minimal Sanity build validated the core approach. One GrowthBook SDK instance can support both Sanity and Visual Editor experiments, with Next.js server-side rendering reducing flicker and client-side changes potentially causing brief flicker. Feature evaluation should occur near the point of use to avoid irrelevant bucketing. Consent-aware activation, session management, exposure callbacks, Adobe Analytics, Power BI, and SQL-compatible warehouses support privacy and reporting needs. GrowthBook and Sanity offered hands-on implementation support. The team reported strong confidence, no immediate blockers, and planned a Monday demo to confirm workflows and technical details.\n\n## Keywords\nGrowthBook, Sanity CMS, feature flags, personalization plugin, experimentation, Next.js\n\n## Action Items\n\n**Alan Lyes**\nContinue preparing Sanity CMS setup with personalization plugin for integration with GrowthBook SDK, ensuring schema and experiment configurations are aligned (24:44)\n\n**Jake Heier**\nShare the recorded meeting and outline next steps to all participants to ensure alignment and preparation for upcoming demo (01:54)\nSupport BambooHR’s GrowthBook SDK integration and collaborate on preparations for the scheduled demo, providing technical guidance and troubleshooting as needed (35:27)\n\n**Chris Sanders**\nProvide technical support and collaborate on solutions around GrowthBook SDK integration with Sanity and visual editor experiments, including investigation of flicker minimization techniques (31:31)\nInvestigate and share options for minimizing flicker especially related to Next.js and SDK hydration strategies to improve user experience during experiments (17:06)\n\n**James Collier**\nVerify Adobe Analytics data flow and confirm backend data warehousing solutions for experiment reporting to ensure accurate and actionable insights (34:30)\n\n**James Collier and Tom Scott**\nScope and finalize decision on usage of visual editor versus Sanity personalization plugin for different experimentation needs, balancing rapid testing and schema-driven experiments (10:58)\n",
+      "organizer": "jake@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "[PoC Kick-off] InPost.pl",
+  "slug": "poc-kick-off-inpost-pl",
+  "last_etl_date": "2026-09-19T06:09:55.676012",
+  "calls": [
+    {
+      "id": "01M2MW9ZT27MCXZBHZZVJGEZXE",
+      "source": "fireflies",
+      "title": "[PoC Kick-off] InPost.pl <> Growthbook",
+      "date": "2026-09-18",
+      "duration_minutes": 64.6500015258789,
+      "summary": "# [PoC Kick-off] InPost.pl <> Growthbook\nDate: 2026-09-18 | Duration: 64.6500015258789m\n\n## Summary\nThe discussion covered GrowthBook SDK implementation, data integration, experimentation, analysis, and rollout support. Engineering had started the SDK integration, with attributes configured and a tracking callback still pending; the SDK was considered safe for production traffic and supported organizational roles. Databricks is the data warehouse, and GrowthBook requires a read-access user. Metrics can be built from fact tables using SQL views or tables, with dynamically generated queries supporting filters and examples such as purchase conversion and session duration. Cohorts can be targeted through SDK attributes or prerequisite features, while events alone cannot define target groups. Proposed experiments included ecommerce button and homepage icon CTR tests, a web login verification change, and possible AI assistant testing. Success metrics include conversion rate, engagement, and incremental revenue, with guardrail metrics recommended. Reporting supports dashboards, segmentation, exports through an MCP server and Claude skills, frequentist and Bayesian methods, a default 95% confidence level, and business decision frameworks. Next steps include data-team and tracking-callback work, administrative setup, product training, and ongoing Teams support.\n\n## Keywords\nA/B testing, SDK integration, Databricks, Metrics tracking, Experiment targeting, Data warehouse\n\n## Action Items\n**Anita Krasińska**  \nCreate Jira ticket for GrowthBook integration (09:33)  \nCreate Teams channel for GrowthBook communication (33:28)  \nSchedule technical call with data team for connectivity (53:00)  \nRequest GrowthBook account setup emails (01:03:10)  \n\n**Maciej Polonski**  \nAssist with Jira ticket creation and communication (09:45)  \n\n**Rémy Marin**  \nSupport technical questions during onboarding (07:05)  \nConfirm flexibility of confidence level settings (48:32)  \n\n**Judyta Kraus**  \nCoordinate data team engagement and access (53:00)  \n\n**Janusz Bossy**  \nContinue SDK integration and tracking callback setup (58:00)  \n\n**James Shannon**  \nSend summary email with next steps after meeting (01:03:06)  \nSend GrowthBook team contacts and emails (01:03:18)",
+      "organizer": "remy@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

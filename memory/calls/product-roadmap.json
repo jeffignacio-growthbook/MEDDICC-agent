@@ -1,0 +1,18 @@
+{
+  "company": "Product Roadmap",
+  "slug": "product-roadmap",
+  "last_etl_date": "2026-09-19T06:09:55.675719",
+  "calls": [
+    {
+      "id": "01M2QWPVZGN6FJG70DCY8E80ZJ",
+      "source": "fireflies",
+      "title": "Product Roadmap - 5.2, 5.3",
+      "date": "2026-09-18",
+      "duration_minutes": 33,
+      "summary": "# Product Roadmap - 5.2, 5.3\nDate: 2026-09-18 | Duration: 33m\n\n## Summary\nGrowthbook 5.2 is planned to streamline workflows through redesigned experiment and feature flag pages, integrated diagnostics, live QA testing with targeted overrides, interleaved experiments, and large cohort targeting. Diagnostic tools will show experiment or flag exposure and related events using existing Growthbook data, while QA will work across all SDKs without developer-tool extensions. Interleaved experiments will beta launch with TaskRabbit, and large cohorts will support millions of user IDs through server-side or proxy SDKs and exports to marketing tools. By year-end, Growthbook aims to combine managed warehouse data with real-time event streaming, targeting latency under 30 seconds, with current tests below 5 seconds. AI-powered notifications, smart digests, and Slack actions will reduce noise and support experiment management with audit logging. The team also discussed cohort abstractions, AI-assisted SQL exploration, future switchback experiments, session replay, LLM traces, approval flows, SDK auto capture, release messaging, and prioritization for 5.3 and later.\n\n## Keywords\nExperiment UX redesign, diagnostic tooling, QA workflows, interleaved experiments, real-time data integration, AI notifications\n\n## Action Items\n\n**Jeremy Dorn**\nMove prototype timeline for diagnostic tooling and QA workflows forward with development starting imminently, targeting October release (03:40)\nContinue building interleaved experiments with TaskRabbit as early adopter for beta feedback (06:10)\nAdvance development of large save groups and cohorts integration, including server-side support and potential export destination planning (06:19)\nPursue real-time data integration for 5.3, targeting latency under 30 seconds and combined warehouse plus event stream solution (09:50)\nWork on AI-driven Slack notifications and smart digest capabilities aiming for inclusion in 5.2 release (12:05)\nCoordinate Slack app development for operational use, including authentication and audit logging features (14:15)\nFinalize blog launch copy edits to reflect accurate product messaging around SQL Explorer and agent capabilities (20:00)\n\n**Elyse Fox**\nConnect with Jeremy on Monday to confirm status of AI assistant and Slack app features to ensure accurate release information (15:12)\nAdjust launch announcement blog based on discussion with Jeremy and Scott to maintain clarity on product capabilities (22:53)\n\n**Scott Bailey**\nUse the refined product roadmap and themes from the meeting to update sales materials and prepare sales teams for discussions (18:21)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

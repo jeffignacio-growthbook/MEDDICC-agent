@@ -1,0 +1,18 @@
+{
+  "company": "Ying Lin and",
+  "slug": "ying-lin-and",
+  "last_etl_date": "2026-09-19T06:09:55.672346",
+  "calls": [
+    {
+      "id": "01M2NPCTYGZ42VFAF2WGQ6C39M",
+      "source": "fireflies",
+      "title": "Ying Lin and Chris Sanders",
+      "date": "2026-09-18",
+      "duration_minutes": 52.22999954223633,
+      "summary": "# Ying Lin and Chris Sanders\nDate: 2026-09-18 | Duration: 52.22999954223633m\n\n## Summary\nThe discussion explained how Growth Book supports experimentation from setup through governance and optimization. User bucketing uses a hash combining a tracking key with a user, device, or organization ID to assign consistent variants. Experiments can target segments, use gradual rollouts, and require new phases for major traffic or variant changes. Feature flags connect variants to application behavior and support prioritized, layered rules, while namespaces prevent conflicting experiments. Growth Book joins exposure events with fact tables and metrics, offering dimensions, metric slices, Bayesian chance-to-win results, frequentist statistics, confidence intervals, health checks, and query diagnostics. Projects, roles, audit logs, and approval flows support organizational control. Advanced capabilities include multi-armed bandits, emerging contextual bandits and interleaving, holdout groups, power calculations, and reusable templates. Participants also emphasized humility, data-driven learning, naming standards, iterative testing, and sharing results across partners.\n\n## Keywords\nGrowthBook, experimentation, feature flags, user bucketing, Bayesian analysis, multi-armed bandits\n\n## Action Items\n\n**Chris Sanders**\nShare the meeting recording and deck presentation with Ying Lin for distribution to the team (50:34)\n\n**Ying Lin**\nDistribute the shared Growth Book resources (deck and recording) to the team members (50:45)\n",
+      "organizer": "chris@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

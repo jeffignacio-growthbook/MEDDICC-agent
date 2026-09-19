@@ -1,7 +1,7 @@
 {
   "company": "A24 + GrowthBook",
   "slug": "a24-growthbook",
-  "last_etl_date": "2026-09-03T06:04:10.810141",
+  "last_etl_date": "2026-09-19T06:09:55.675467",
   "calls": [
     {
       "id": "01KYQK1Q6JJAHNJKY44HJMKP8F",
@@ -28,6 +28,17 @@
       "summary": "# A24 + GrowthBook\nDate: 2026-08-28 | Duration: 29.219999313354492m\n\n## Summary\nA24 Labs discussed the adoption and expansion of GrowthBook to enhance experimentation and quality assurance processes. The team emphasized the need to integrate GrowthBook with CI pipelines and feature workflows to optimize testing and reporting while reducing manual efforts. They explored the potential of AI-driven tools to customize workflows and improve team collaboration. Leadership buy-in was also a key topic, with strategies for communicating GrowthBook’s value focused on risk reduction and innovation. Additionally, the user experience strengths of GrowthBook were highlighted, alongside the upcoming focus on enhancing Slack integration for better communication around experiment updates.\n\n## Keywords\nfeature flags, experimentation, AI integration, continuous integration, QA automation, GrowthBook\n\n## Action Items\n\n**Sean Hansen**\nDevelop an internal presentation to pitch GrowthBook’s full solution and AI-enhanced QA/CI adoption to A24 leadership (25:09)\nIncrease personal, hands-on use of GrowthBook to deepen product familiarity and leverage its features with his team (25:09)\nSchedule a follow-up meeting with GrowthBook after Labor Day for guidance and to discuss progress on GrowthBook adoption and Enterprise plan considerations (26:27)\n\n**Christian**\nProvide recording and transcript of the meeting to Sean for internal sharing and review (26:27)\nSupport Sean with guidance and expertise through the upcoming quarter to facilitate GrowthBook adoption and Enterprise upgrade (26:27)\n",
       "organizer": "christian@growthbook.io",
       "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M288398D3BFY8RSSD5ESDW97",
+      "source": "fireflies",
+      "title": "A24 + GrowthBook",
+      "date": "2026-09-18",
+      "duration_minutes": 26.34000015258789,
+      "summary": "# A24 + GrowthBook\nDate: 2026-09-18 | Duration: 26.34000015258789m\n\n## Summary\nThe team discussed preparing for an Enterprise transition within 6 to 12 months, primarily to support SSO, security, governance, auditability, and future AI integrations. Enterprise-only capabilities include MCP AI features, approval workflows, and ramp schedules, while many AI tools and the Visual Editor remain available before Enterprise. QA priorities include replacing manual regression work with automated and programmatic testing, CI/CD integration, A/B testing, and Chrome DevTools for live feature previews, targeting overrides, user-attribute changes, and simulated user archetypes. Terraform and API integrations support GitOps, version control, and auditable environment management, while reversible feature flags reduce deployment risk. The Visual Editor enables marketers and other non-engineers to create code-free experiments, apply AI-assisted UI changes, generate images, and share visual previews. The team also emphasized configuration hygiene, infrastructure-as-code governance, cautious AI adoption, knowledge transfer, and continued collaboration between product and technical stakeholders.\n\n## Keywords\nGrowthBook, AI Visual Editor, Terraform provider, SSO, QA automation, Enterprise features\n\n## Action Items\n\n**Shawn Hansen**\nDisseminate the meeting recording to the A24 tech team for further review and internal discussion (00:15)\nEvaluate the Terraform provider shared by Logan Bates and consider integrating GrowthBook environment management into A24’s CI/CD process (09:16)\nPromote the use of infrastructure-as-code and GitOps strategies internally at A24, leveraging GrowthBook’s Terraform and API options (09:51)\nShare further feedback and potential meeting requests based on internal exploration of GrowthBook AI features and Enterprise transition timing (24:59)\n\n**Logan Bates**\nProvide specific documentation on GrowthBook’s developer mode and Chrome extension features to Shawn Hansen (04:16)\nSupport troubleshooting and guidance for A24’s team on utilizing the GrowthBook Terraform provider as needed (09:26)\nFollow up regarding interest in GrowthBook’s AI Visual Editor and additional AI-powered features, including potential separate discussions with other A24 application teams (20:40)\n\n**Christian Liebenow**\nSend the meeting recording to Shawn Hansen and the A24 team (24:47)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 5,
       "summary_quality": "good"
     }
   ]

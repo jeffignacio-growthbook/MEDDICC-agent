@@ -1,7 +1,7 @@
 {
   "company": "Growthbook <> OpenTable",
   "slug": "growthbook-opentable",
-  "last_etl_date": "2026-09-03T06:04:10.813863",
+  "last_etl_date": "2026-09-19T06:09:55.674975",
   "calls": [
     {
       "id": "69de6935c1f9eb0011fa27dc",
@@ -126,6 +126,17 @@
       "summary": "# Growthbook <> OpenTable - POC Kickoff\nDate: 2026-08-27 | Duration: 33.529998779296875m\n\n## Summary\nThe meeting discussed a strategic approach to deployment and hosting, opting for a cloud-managed version initially for simplicity and speed, with self-hosting as a future option. Integration of Single Sign-On (SSO) is planned but not urgent, allowing for a faster initial proof of concept (POC). Data integration will involve dual publishing events to ensure accuracy and comparison with Growthbook, alongside technical priorities like connecting the Snowflake data warehouse. Event tracking and user context management were also covered, emphasizing the use of existing analytics systems while managing user eligibility effectively. The team scheduled regular check-ins for ongoing support and encouraged active feedback during the POC to enhance the user experience.\n\n## Keywords\nexperiment targeting, data warehouse integration, SDK tracking callback, cloud managed deployment, user attribute handling, PoC onboarding\n\n## Action Items\n\n**Rahul Bhatia**\nSign up for Growthbook cloud account, then share org ID or sign-up name with Dan Wathne for enterprise license provisioning (29:10)\n\n**Dan Wathne**\nProvision enterprise license once sign-up info is received; share Growthbook documentation and sign-up link with OpenTable team and Slack channel (29:20)\nSchedule recurring weekly or bi-weekly check-ins to provide ongoing support and troubleshoot; hold invite at current meeting time initially (31:15)\n\n**OpenTable Team**\nBegin wiring up data warehouse connections (Snowflake etc.) and SDK implementation for the proof of concept (05:00)\nPrepare initial A/B tests for frontend and ML backend; set up double event publishing system for side-by-side comparison versus existing experiments (07:00)\nUse Slack channel for questions; tag Logan Bates or support staff for technical issues during trial period (19:40)\nEvaluate targeting configurations and attribute requirements for experiments, review documentation on targeting and caching (25:00)\n",
       "organizer": "dan@growthbook.io",
       "participants": 9,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M28XVY2KT8C2SHS8XWW4A7VV",
+      "source": "fireflies",
+      "title": "Growthbook <> OpenTable - Weekly POC Sync",
+      "date": "2026-09-18",
+      "duration_minutes": 34.63999938964844,
+      "summary": "# Growthbook <> OpenTable - Weekly POC Sync\nDate: 2026-09-18 | Duration: 34.63999938964844m\n\n## Summary\nThe team discussed how to structure an experimentation platform for long-term use, recommending separate projects for consumer web and iOS within one organization to preserve clarity, shared data, and executive visibility. Dashboards, an experiments ledger, and organization-wide reporting can combine results across projects. Teams would manage their own SDK configurations using company standards. Metrics and fact tables can be version-controlled as YAML in GitHub and synchronized through APIs, while backward-compatible SDK updates, training, throttled releases, or self-hosting can reduce disruption. Proxy layers and Open Feature offer flexibility but require additional maintenance. For execution, only user attributes explicitly registered in SDK configuration are evaluated, and exposure events must be triggered client-side at the relevant user action. Asynchronous SDK initialization supports non-blocking page loads, though attribute updates should be monitored. AI tools can summarize experiment results, suggest experiments, manage flags, and help create metrics, while dashboards and timelines support reporting. Dedicated client resources, open communication, and ongoing technical support were also emphasized.\n\n## Keywords\nGrowthbook, SDK versioning, experiment management, AI assistant, project organization, feature flags\n\n## Action Items\n\n**Rahul Bhatia**\nFollow up with questions after first test setup regarding user attribute definitions and experiment setup (25:27)\nCoordinate with front-end team on handling exposure call timing to optimize page load performance (30:48)\n\n**Logan Bates**\nProvide documentation links and examples on enabling AI assistant features and GitHub YAML-based metric version control (11:44)\nShare guides on proxy services and open feature integration to support SDK version control and API abstraction (19:51)\nCheck with Growthbook team to confirm best practices or solutions for delaying experiment exposure calls to avoid frontend performance impact and follow up via Slack (32:00)\nOffer training and onboarding support for any UI/SDK breaking changes to ensure smooth adoption (16:49)\n\n**Dan Wathne**\nOffer continuous support and dedicated resource team assistance if OpenTable moves forward with partnership (24:27)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 10,
       "summary_quality": "good"
     }
   ]
