@@ -142,6 +142,50 @@ Never guess thresholds. Every classification boundary (at-risk, stale, overdue) 
 - **Status**: **NOT STARTED** - flagging handlers exist (stale_deals, coaching_priorities) but no cross-deal pattern extraction
 - **Depends on**: Win/loss attribution (factor ranking), cohort performance trends (anomaly detection)
 
+### Real-Usage Cross-Check (2026-09-19 full-history audit)
+
+**This does not replace the six priorities above** — it's a second,
+independent signal sitting alongside them: what `query_cost_log` (every
+`dynamic_query_loop` invocation) and `learning_log` (assessor
+correctness signals) actually show across the FULL available history
+(166 + 517 rows respectively), not a 300-question recent window. Full
+methodology, consolidated frequency table, and caveats are in
+`PENDING_WORK.md`'s "EVIDENCE AUDIT: What primitive to build next"
+entry — this is the summary against the list above.
+
+- **Risk/likelihood judgment** (the deal-risk-assessment concept
+  referenced above as a dependency for Priorities 4 and 5, and shelved
+  in the 2026-09-16 Decision Log entry below): **strongest standing
+  signal in real usage**, unaffected by tonight's routing/truncation
+  fixes. Real usage and this roadmap's own reasoning **agree** here —
+  it's the one place both lists point the same direction. Already has
+  `assess_deal_risk()` scoped and partially built
+  (`scripts/deal_risk_assessor.py`), not a from-scratch ask.
+- **Pipeline movement/snapshot**: raw-dominant in the logs (65% of all
+  non-clean evidence), but mostly a Phase 1b routing/handler-existence
+  problem tonight's unified-routing migration and synthesis-truncation
+  fix already closed, not a reasoning-layer gap. **Not a new-primitive
+  priority** — worth a live spot-check for recurrence, not a build
+  target.
+- **Stale deals, rep coaching (Priority 4), data hygiene, geo/market
+  segmentation, win/loss (Priority 2)**: present in real usage but
+  low-volume. Consistent with — not contradicting — where they already
+  sit on the list above.
+- **Forecast trustworthiness (Priority 5) and competitive positioning
+  (Priority 3)** — both named among the six reasoning-layer priorities
+  above — show only **1 raw hit each** in the full-history real-usage
+  audit. Can't tell from log data alone whether that means genuinely
+  rare so far, or that people haven't learned to ask the agent for them
+  yet.
+
+**The one thing worth stating plainly**: real usage *confirms* risk/
+likelihood judgment as the top priority — both lists agree. It does
+**not yet confirm** forecast confidence scoring as urgent from real
+usage, even though it's reasoned as a high priority on the list above.
+That gap between domain judgment and observed usage is itself worth
+tracking over time, not a reason to resolve by picking one list over
+the other now.
+
 ---
 
 ## Reasoning Layer: Decision Criteria
