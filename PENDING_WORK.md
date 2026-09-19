@@ -2338,3 +2338,112 @@ correct baseline.
 **Impact**:
 Users now get complete, accurate pipeline views matching handler's "never filters by close_date" design intent.
 
+
+## 🔴 SYSTEMIC FINDING: Synthesis-truncation bug is pipeline-wide, not Handler-4-specific (2026-09-19)
+
+**Discovered while auditing the 3 previously-migrated handlers (query_pipeline,
+query_stale_deals, query_waterfall) after the Handler 4 fix above, before
+proceeding to Handler 5.** This is logged separately from the Handler 4 entry
+because it is not a query_rep_pipeline bug — it is a property of the shared
+synthesis step in `api/router.py` (~line 4877) that every handler and every
+future handler passes through.
+
+### The mechanism
+
+Before a tool result reaches the LLM for synthesis, `api/router.py` checks:
+
+```python
+is_complete_structured = ("summary" in result and "total_deals" in result.get("summary", {}))
+```
+
+If this is False, the result is silently hard-truncated with `json.dumps(result, default=str)[:3000]`
+before the LLM ever sees it — mid-list, mid-object, wherever 3000 chars lands.
+The LLM then synthesizes an answer from whatever fragment survived, with no
+signal to itself or the user that the data was cut.
+
+This condition only matches a payload with a **top-level `summary` key that
+itself contains a `total_deals` key** — the exact shape `query_rep_pipeline`
+happens to return. It is not a general "is this a complete structured
+dataset" check; it is a check for one handler's specific return shape.
+
+### Exposure of the 3 previously-migrated handlers, checked directly against real captured output
+
+| Handler | Has `summary.total_deals` shape? | Realistic-question payload size | Exposed? |
+|---|---|---|---|
+| `query_pipeline` | **No** — `total_deals` is top-level, no `summary` key at all | 6,856–7,654 chars across all 5 baseline test cases (`tests/fixtures/query_pipeline_baseline.json`) | **Yes — every captured test case exceeds 3000 chars** |
+| `query_stale_deals` | **No** — `stale_count`/`total_stale_pipeline` are top-level, no `summary` key | Default/unscoped question ("what deals are stale"): **14,207 chars** (`tests/fixtures/query_stale_deals_baseline.json`, 3 of 6 test cases at this size). Single-owner-scoped questions: 1,891 chars (safe) | **Yes for the realistic default question — nearly 5x the truncation threshold.** Only owner-narrowed questions happen to stay under 3000 by coincidence of a smaller deal list, not by design |
+| `query_waterfall` | **No** — top-level keys are `pipeline_summary`, `waterfall`, `period`, `report_shape`, `cache_payload`; `pipeline_summary` is a different key than `summary` and the condition checks the literal string `"summary"` | Not empirically captured — **no baseline fixture exists for this handler** (no `capture_query_waterfall_baseline.py`, unlike the other two). Structural estimate: `cache_payload.deals` is an uncapped `select_all()` over all deals closing in the time window (no `[:20]` or similar limit anywhere in the handler), stacked on top of `pipeline_summary.by_stage`, `needs_attention` lists, and the `waterfall` weekly rows — almost certainly exceeds 3000 chars for any non-trivial time window, consistent with `query_pipeline`'s capped 20-deal list alone already costing ~7000 chars | **Structurally confirmed to bypass the fix's detection condition; size not empirically measured — measuring it requires a live DB capture, which the environment used for this audit does not have credentials for** |
+
+**Conclusion: all 3 previously-migrated handlers are structurally guaranteed to
+bypass the fix's detection condition** (none has a `summary.total_deals`
+shape), and at least 2 of 3 (`query_pipeline`, `query_stale_deals`) are
+empirically confirmed, from their own captured baseline data, to produce
+payloads well over the 3000-char cutoff for realistic, unscoped questions —
+meaning they hit the *exact* same silent-truncation-before-synthesis bug
+Handler 4 had, right now, in production, independent of and prior to any
+Handler 5 work.
+
+### Why the existing "Step C" baselines did not catch this
+
+`tests/fixtures/capture_query_pipeline_baseline.py` and
+`capture_query_stale_deals_baseline.py` both call the handler function
+**directly** (`await query_pipeline({}, sb)`, `await query_stale_deals({}, sb)`),
+bypassing `api/router.py` entirely. Their `critical_fields_to_verify` lists
+(`total_deals`, `by_stage`, `by_owner`, `stale_count`, `total_stale_pipeline`,
+deal-list lengths) are all fields of the **raw handler return value**. These
+baselines never invoke the synthesis step and never capture or compare any
+LLM-synthesized text at all — this is stronger than "only spot-checked that
+the answer looked reasonable": there is no synthesized-answer check present
+in these fixtures whatsoever. `query_waterfall` has no baseline fixture of
+either kind.
+
+The Handler 4 bug itself was only caught because it happened to be tested
+live through the full Slack → router → synthesis path ("show me Christian's
+pipeline" → "94 total active deals" — no equivalent fixture file exists for
+`query_rep_pipeline` either). Nothing currently in the automated test suite
+exercises the truncation-then-synthesis step at all — a repo-wide grep for
+the fix's own marker strings (`is_complete_structured`, `COMPLETE DATASET`,
+`[:3000]`) returns zero matches under `tests/`.
+
+### Why structured verification ("Step D", `verify_structured_aggregations()`) does not protect against this
+
+`verify_structured_aggregations()` runs **inside each handler, before
+`return`** — it checks the handler's own internal aggregation math (e.g. that
+`by_stage`/`pipeline_summary.total_open_arr` sums match a recomputation from
+raw rows). By the time its result reaches `api/router.py`'s truncation step,
+verification has already passed and returned. It has no visibility into, and
+provides no protection against, what happens to that already-verified object
+on its way to the LLM. A handler can pass `verify_structured_aggregations()`
+with a perfectly correct return value and still have the user see a wrong
+answer, because the corruption happens strictly after verification, in a
+step verification never touches. This is true of `query_pipeline` and
+`query_waterfall` today (both call `verify_structured_aggregations()` at
+return) and was true of `query_rep_pipeline` before its fix.
+
+### Forward-looking implication
+
+**Any current or future handler** — migrated to unified routing or not —
+that returns a payload without the specific `summary.total_deals` shape, and
+whose realistic-question payload exceeds 3000 chars, is exposed to this same
+silent truncation, regardless of how well-tested its internal aggregation
+logic is. This includes Handler 5 and Handler 6 (not yet migrated) and any
+handler built after this point. Passing `verify_structured_aggregations()`
+and having a fixture-based baseline in the current style are both
+insufficient to catch it, because neither exercises the synthesis step.
+
+**Not fixed in this pass** — this is a report, per explicit instruction, to
+establish full exposure before Handler 5 proceeds or Handler 4 is considered
+closed. Two directions were visible during this audit but not evaluated for
+tradeoffs or implemented:
+1. Generalize the detection condition to something structural (e.g. "does
+   this result contain a count/total field anywhere, regardless of nesting"
+   or "is this a `dict`, not a `rows` list, at all" — the latter matches the
+   comment already in the code: "Row-based results are already
+   sampled/aggregated" implies the *intent* was "any non-row-based
+   structured result," not "only this one handler's shape").
+2. Add a baseline-capture mode that runs the full router/synthesis path (not
+   just the bare handler call) and asserts the synthesized text's stated
+   count/total against the verified raw data, for every migrated handler —
+   closing the exact gap that let the Handler 4 bug through 3 handler
+   migrations before anyone was testing that path at all.
+
