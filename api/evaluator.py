@@ -39,6 +39,7 @@ def evaluate_result(result: dict, handler_name: str) -> str:
         "query_pipeline":  ["total_deals", "total_pipeline"],  # Phase 2 migration
         "query_stale_deals": ["stale_deals", "stale_count"],  # Phase 2 handler 2/6
         "query_waterfall": ["pipeline_summary", "waterfall"],  # Phase 2 handler 3/6
+        "query_rep_pipeline": ["deals", "summary"],  # Phase 2 handler 4/6
     }
     if handler_name in STRUCTURED_HANDLERS:
         primary_keys = STRUCTURED_HANDLERS[handler_name]

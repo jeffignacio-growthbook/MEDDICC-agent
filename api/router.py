@@ -1244,6 +1244,16 @@ TOOLS YOU CAN CALL:
     - time_window: dict for time range (optional, defaults to current quarter, e.g. {{"period": "current_quarter"}})
     **RETURNS**: Pipeline summary (total, by-stage, needs-attention) + weekly waterfall (new/won/lost)
     Examples: "show me pipeline", "what is our pipeline", "pipeline this quarter", "how did pipeline change this month"
+  query_rep_pipeline(owner_email)
+    **PHASE 2: Handler 4/6 migrated to unified routing**
+    **USE THIS when the question asks about**:
+    - SPECIFIC REP'S PIPELINE, INDIVIDUAL AE'S DEALS
+    - "Show me Christian's pipeline", "what deals does Cary own", "Jake's active deals"
+    - Rep-specific pipeline view (current state, no time filtering)
+    Params:
+    - owner_email: rep email or name (required, accepts "cary@growthbook.io" or "Cary" or "Christian")
+    **RETURNS**: All active deals for the rep with MEDDICC scores, sorted by deal value descending
+    Examples: "show me Christian's pipeline", "what deals does Cary have", "Jake's pipeline"
 
 RULES:
 - Only use column names that appear in the schema above
@@ -1764,6 +1774,22 @@ def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = N
         - table: Original table name
     """
     import re
+
+    # Phase 2 fix: Handle structured results that use keys other than "rows"
+    # (e.g. query_rep_pipeline uses "deals", query_waterfall uses "pipeline_summary")
+    # These should pass through without row-based aggregation logic.
+    if "rows" not in result:
+        # Structured result - pass through whole
+        # Try to infer row count from common list keys
+        potential_lists = [v for v in result.values() if isinstance(v, list)]
+        inferred_count = len(potential_lists[0]) if potential_lists else 0
+        return {
+            **result,
+            "row_count": inferred_count,
+            "truncated": False,
+            "complete": True,
+            "_note": f"STRUCTURED RESULT: Passed through without aggregation ({inferred_count} items inferred)."
+        }
 
     rows = result.get("rows", [])
     row_count = len(rows)
@@ -4490,6 +4516,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             "query_pipeline_movement": lambda sb_arg, **params: _call_handler_as_tool("query_pipeline_movement", params, sb_arg),
             "query_stale_deals": lambda sb_arg, **params: _call_handler_as_tool("query_stale_deals", params, sb_arg),
             "query_waterfall": lambda sb_arg, **params: _call_handler_as_tool("query_waterfall", params, sb_arg),
+            "query_rep_pipeline": lambda sb_arg, **params: _call_handler_as_tool("query_rep_pipeline", params, sb_arg),
         }.get(tool_name)
 
         if not tool_fn:
@@ -4587,9 +4614,9 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     f"({sample_size} in aggregate, {len(result.get('rows', []))} in raw), "
                     f"keys: {list(accumulated_data.keys())}")
 
-        # Phase 2: Fast-path preservation for row-based migrated handlers
-        # query_pipeline_movement: row-based, can fast-path finalize
-        # query_pipeline: structured result, let normal synthesis handle it
+        # Phase 2: Fast-path preservation for ROW-BASED migrated handlers only
+        # Fast-path: query_pipeline_movement (row-based, preserves OLD synthesis)
+        # Normal synthesis: query_pipeline, query_waterfall, query_stale_deals, query_rep_pipeline (structured)
         if tool_name == "query_pipeline_movement" and "error" not in result:
             logger.info(f"[UNIFIED_ROUTING] {tool_name} succeeded "
                        f"→ finalizing immediately (fast-path preservation)")
@@ -4599,7 +4626,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             return await _finalize_from_data(f"{tool_name}_fast_path")
 
         # Structured handlers continue to next iteration for normal synthesis
-        if tool_name == "query_pipeline" and "error" not in result:
+        if tool_name in ("query_pipeline", "query_rep_pipeline") and "error" not in result:
             logger.info(f"[UNIFIED_ROUTING] {tool_name} (structured) succeeded "
                        f"→ continuing to synthesis (no fast-path for structured handlers)")
             # Continue loop - next iteration will synthesize
@@ -5124,7 +5151,7 @@ async def route_question(question: str, user_id: str,
         # Phase 2: query_pipeline, query_stale_deals, query_waterfall, query_rep_pipeline, query_win_loss, query_deals_at_risk
         # Skip classifier routing - route to dynamic loop where they're registered as callable tools.
         # All other handlers continue using classifier routing unchanged.
-        if handler_name in ("query_pipeline_movement", "query_pipeline", "query_stale_deals", "query_waterfall"):
+        if handler_name in ("query_pipeline_movement", "query_pipeline", "query_stale_deals", "query_waterfall", "query_rep_pipeline"):
             logger.info(f"[UNIFIED_ROUTING] {handler_name} → dynamic loop "
                        f"(classifier confidence={confidence:.2f}, bypassed)")
             handler_name = "dynamic_query"

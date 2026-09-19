@@ -2304,3 +2304,41 @@ correct baseline.
 
 **Status**: Documented. No code fix needed - the migration corrected the behavior.
 
+
+## Handler 4 (query_rep_pipeline) Migration - Synthesis Bug
+
+**Date**: 2026-09-19
+**Context**: Phase 2 Handler 4/6 migration (query_rep_pipeline → unified routing)
+
+**Finding**: NEW path synthesis incorrectly filters results, violating handler's documented intent.
+
+**Data Correctness**: ✅ Handler returns correct data (94 deals / $7.5M)
+- Direct handler test: 94 deals, $7,500,275.02
+- OLD path (classifier routing): 94 deals, ~$7.5M (correctly shows all active deals)
+
+**Synthesis Bug**: ❌ NEW path filters to Q3-focused subset
+- NEW path varies between runs: 16-25 deals, $3.86M-$4.6M
+- Filters by close_date despite handler docstring (line 2612-2613):
+  > "IMPORTANT: Rep pipeline is CURRENT STATE - never filters by close_date."
+
+**Root Cause**: 
+- _aggregate_and_sample now correctly recognizes structured results (doesn't need "rows" key)
+- Full data (94 deals) is passed to LLM in accumulated_data
+- But generic dynamic loop synthesis prioritizes "relevant" deals (Q3 focus)
+- OLD path used handler-specific synthesis that showed complete picture
+
+**Attempted Fixes**:
+1. ✅ Fixed _aggregate_and_sample to handle structured results without "rows" key
+2. ❌ Fast-path preservation (doesn't work for structured handlers - needs row-based data)
+3. ⏸️  Dynamic loop synthesis prompt adjustment (deferred - requires broader changes)
+
+**Current State**:
+- Mig ration complete (tool registered, classifier bypassed, evaluator updated)
+- Data flows correctly (all 94 deals reach synthesis)
+- Synthesis behavior differs from OLD path (filters instead of showing all)
+
+**Recommendation**: 
+Accept NEW path behavior for now (functional but different prioritization) OR add handler-specific synthesis instructions to dynamic loop for query_rep_pipeline to show ALL active deals without close_date filtering.
+
+**Impact**: Users get Q3-focused subset instead of complete pipeline view when asking "show me [rep]'s pipeline".
+
