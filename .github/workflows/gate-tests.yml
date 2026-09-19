@@ -118,6 +118,45 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_reconstruction.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_waterfall_null_insitu.py
 
+      - name: "TEST 0be — Offline: forecast-trustworthiness primitive (assess_forecast_trust)"
+        run: |
+          set -e
+          # 2026-09-19: NORTH_STAR.md CRO Priority #1 — "how much should I
+          # trust this quarter's number." scripts/forecast_trust.py composes
+          # assess_deal_risk() (called directly on THIS quarter's own
+          # COMMIT+MOST_LIKELY query, never via get_at_risk_deals()'s
+          # COMMIT-only scope) with a new, week-indexed historical baseline
+          # (query_commit_ml_calibration_by_week(), forecast_analyses.py) —
+          # a MOVING comparison against whatever week the current quarter
+          # is actually in, never a fixed anchor. Gated below week 3 (reps
+          # structurally don't tag Commit/Most-Likely honestly in the
+          # coverage-building phase yet).
+          #
+          # scripts/test_forecast_trust.py covers the composing function
+          # itself: the week-3 hard gate (asserts no downstream query
+          # fires), stability-band/caveat assignment across weeks 7 and 12,
+          # a planted-discrepancy proof that the historical lookup
+          # genuinely varies across 4 distinct weeks (not a hardcoded or
+          # cached value — verified by actually planting that exact bug and
+          # confirming the test caught it before this shipped), and the
+          # single most important test in the batch: a MOST_LIKELY-tagged,
+          # non-late-stage deal must still appear in the assessed cohort —
+          # the direct regression guard for the get_at_risk_deals()
+          # COMMIT-only gap this primitive was built to avoid (also
+          # verified by planting that exact regression and confirming the
+          # query-shape assertion, not the data-presence one, is what
+          # actually catches it — a Mock returns its canned data
+          # regardless of the real filter, so only checking the deal
+          # showed up would have been a false sense of security).
+          #
+          # test_commit_ml_calibration_by_week_structure (added to
+          # test_forecast_analyses.py) covers the new calibration function
+          # independently: full 13-week coverage, defaults to
+          # COMMIT_ML_CATEGORIES, and queries via .in_() rather than a
+          # single-category .eq() — already run above by TEST 0b, not
+          # duplicated here.
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/test_forecast_trust.py
+
       - name: "TEST 0c — Offline: date/time-window resolution (single-source-of-truth gate)"
         run: |
           set -e

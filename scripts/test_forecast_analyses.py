@@ -22,7 +22,9 @@ from analytics.forecast_analyses import (
     _classify_deal_outcome,
     query_week3_conversion,
     query_commit_outcome_by_week,
-    query_commit_calibration
+    query_commit_calibration,
+    query_commit_ml_calibration_by_week,
+    COMMIT_ML_CATEGORIES,
 )
 
 
@@ -201,6 +203,66 @@ def test_commit_outcome_by_week_structure():
     print("  ✓ outcome-by-week structure present; no retention curve")
 
 
+def test_commit_ml_calibration_by_week_structure():
+    """
+    query_commit_ml_calibration_by_week() — built for assess_forecast_trust()
+    (scripts/forecast_trust.py) — generalizes query_commit_outcome_by_week()
+    to an arbitrary forecast_category set. This checks it independently of
+    assess_forecast_trust() (which only ever exercises it mocked away):
+    the by_week table covers all 13 weeks, defaults to COMMIT_ML_CATEGORIES
+    (['COMMIT', 'MOST_LIKELY']), and queries with .in_(), never .eq()
+    (a .eq() would silently narrow back to a single category).
+    """
+    print("\n[TEST] commit+most_likely calibration-by-week structure")
+
+    from unittest.mock import MagicMock
+
+    with patch('analytics.forecast_analyses._get_complete_quarters') as mock_get_quarters, \
+         patch('analytics.forecast_analyses._load_config') as mock_config, \
+         patch('analytics.forecast_analyses._quarter_window_iso') as mock_win, \
+         patch('supabase_client.select_all') as mock_select_all:
+        mock_get_quarters.return_value = ['FY2027 Q1']
+        mock_config.return_value = {'min_evidence_count': 30}
+        mock_win.return_value = ('2026-02-01', '2026-04-30')
+        mock_select_all.return_value = []  # deals table load
+
+        sb = Mock()
+        mock_response = Mock(); mock_response.data = []
+        chain = MagicMock()
+        chain.eq.return_value = chain
+        chain.in_.return_value = chain
+        chain.execute.return_value = mock_response
+        sb.table = Mock(return_value=Mock(select=Mock(return_value=chain)))
+
+        result = query_commit_ml_calibration_by_week(sb)
+
+    for key in ('by_week', 'categories', 'quarters_analyzed', 'min_evidence_count'):
+        if key not in result:
+            raise AssertionError(f"Missing {key} in result")
+    if result['categories'] != COMMIT_ML_CATEGORIES:
+        raise AssertionError(
+            f"Expected default categories={COMMIT_ML_CATEGORIES}, got {result['categories']}")
+    if set(result['by_week'].keys()) != set(range(1, 14)):
+        raise AssertionError(
+            f"Expected by_week to cover all 13 weeks, got keys {sorted(result['by_week'].keys())}")
+    for w, row in result['by_week'].items():
+        for key in ('n_tagged', 'classified', 'won', 'lost', 'slipped', 'win_rate', 'reason'):
+            if key not in row:
+                raise AssertionError(f"week {w}: missing {key!r} in row {row}")
+
+    if chain.eq.call_count == 0:
+        raise AssertionError("Expected .eq() calls for fiscal_quarter/week_of_quarter")
+    in_calls = [c.args for c in chain.in_.call_args_list]
+    category_calls = [args for args in in_calls if args and args[0] == 'forecast_category']
+    if not category_calls:
+        raise AssertionError(
+            "Query never called .in_('forecast_category', ...) — a .eq() would "
+            "silently narrow this back to a single category")
+    print("  ✓ by_week covers all 13 weeks with the full row shape")
+    print(f"  ✓ defaults to COMMIT_ML_CATEGORIES={COMMIT_ML_CATEGORIES}")
+    print("  ✓ query uses .in_('forecast_category', ...), not .eq() (single-category)")
+
+
 def test_analyses_return_null_on_thin_data_never_fabricate():
     """
     All analyses must return null/error on thin data, never fabricate numbers.
@@ -272,6 +334,7 @@ def main():
         test_week3_conversion_returns_null_not_zero_on_insufficient_history,
         test_commit_calibration_classifies_slip_separately_from_loss,
         test_commit_outcome_by_week_structure,
+        test_commit_ml_calibration_by_week_structure,
         test_analyses_return_null_on_thin_data_never_fabricate,
     ]
 
