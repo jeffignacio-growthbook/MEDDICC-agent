@@ -5691,3 +5691,86 @@ async def query_definition(params: dict, sb) -> dict:
         "definitions": definitions,
         "count": len(definitions)
     }
+
+
+async def query_rep_coaching(params: dict, sb) -> dict:
+    """
+    Per-deal rep coaching assessment — actionable coaching moments from the
+    most recent transcript-scored call.
+
+    Entry paths:
+      * Entity-scoped follow-up: passes deal_ids from prior thread context
+      * Direct question naming a company: passes `company` — resolved to deal(s) here
+
+    Requires at least one transcript-scored call. Returns structured assessment
+    with three criteria:
+      - Criterion A: MEDDICC component advancement (did rep advance weak components)
+      - Criterion B: Discovery question mapping (did rep ask stage-appropriate questions)
+      - Criterion C: Talk-time diagnostic (Apollo only)
+
+    Plus unconditional coverage_note (transcript availability across fleet).
+    """
+    from scripts.rep_coaching import assess_rep_coaching
+
+    deal_ids = list(params.get("deal_ids") or [])
+
+    # Resolve company name to deal_ids if needed
+    companies = []
+    for v in (params.get("companies"), params.get("company_names")):
+        if isinstance(v, str):
+            companies.append(v)
+        elif isinstance(v, (list, tuple)):
+            companies.extend(v)
+    if params.get("company"):
+        companies.append(params["company"])
+
+    # De-dup company strings
+    seen_c, deduped = set(), []
+    for c in companies:
+        c = str(c).strip()
+        if c and c.lower() not in seen_c:
+            seen_c.add(c.lower())
+            deduped.append(c)
+    companies = deduped
+
+    if not deal_ids and companies:
+        seen_ids = set()
+        for c in companies:
+            matches = select_all(sb, "deals", columns="deal_id,company_name",
+                filters=[("ilike", "company_name", f"%{c}%")])
+            for d in matches:
+                if d["deal_id"] not in seen_ids:
+                    seen_ids.add(d["deal_id"])
+                    deal_ids.append(d["deal_id"])
+
+    if not deal_ids:
+        return {
+            "status": "error",
+            "error": "No deal ID provided and no company to resolve. "
+                     "Name a company (e.g. 'how did Christian do on the Acme call?') "
+                     "or specify a deal.",
+            "queried_companies": companies
+        }
+
+    # assess_rep_coaching is per-deal (takes single deal_id, not list)
+    # Take first deal_id
+    deal_id = deal_ids[0]
+
+    try:
+        result = assess_rep_coaching(sb, deal_id)
+        # Add metadata about resolution
+        result["deal_id"] = deal_id
+        if len(deal_ids) > 1:
+            result["note_multiple_deals"] = (
+                f"Question matched {len(deal_ids)} deals; assessed first: {deal_id}"
+            )
+        return result
+    except Exception as e:
+        import traceback
+        print(f"[REP_COACHING ERROR] {e}", flush=True)
+        print(traceback.format_exc(), flush=True)
+        return {
+            "status": "error",
+            "error": f"Coaching assessment failed: {type(e).__name__}: {e}",
+            "deal_id": deal_id
+        }

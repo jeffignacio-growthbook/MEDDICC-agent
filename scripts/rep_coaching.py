@@ -51,6 +51,7 @@ from field_semantics import stage_bucket
 from rubric import band_label
 from call_scorer import roll_up, COMPONENT_KEYS, COMPONENT_LABELS
 from llm_client import LLMClient
+from coaching_talk_ratio import assess_call_talk_ratio
 import yaml
 import json
 
@@ -416,6 +417,59 @@ In your response, if the rep asked about champion behaviors (e.g., "Would you be
     }
 
 
+def _assess_criterion_c(sb, target_call_id: str) -> Dict[str, Any]:
+    """Criterion C: Talk-time/question-share diagnostic (Apollo-sourced calls only).
+
+    Args:
+        sb: Supabase client
+        target_call_id: The most recent transcript-scored call
+
+    Returns:
+        For Apollo: {"internal_talk_ratio": float, "internal_question_share": float|None,
+                     "matched_seconds": float, "total_speech_seconds": float,
+                     "unmatched_seconds": float, "note": "DIAGNOSTIC ONLY..."}
+        For non-Apollo: {"status": "source_not_supported", "reason": str, "note": str}
+    """
+    # Get the target call's call_transcripts row (has source field)
+    transcript_row = sb.table("call_transcripts").select(
+        "call_id,source,talk_time_seconds,question_count,total_speech_seconds,"
+        "participant_identities"
+    ).eq("call_id", target_call_id).execute()
+
+    if not transcript_row.data:
+        return {
+            "status": "insufficient_data",
+            "reason": "call_transcripts_row_not_found",
+            "note": (f"Target call {target_call_id} not found in call_transcripts "
+                     "table - cannot assess talk-time diagnostic")
+        }
+
+    row = transcript_row.data[0]
+    source = (row.get("source") or "").lower()
+
+    # Explicit source check - Apollo only
+    if source != "apollo":
+        return {
+            "status": "source_not_supported",
+            "reason": f"criterion_c_not_available_for_{source or 'unknown'}",
+            "note": (
+                f"Criterion C requires per-speaker identity data this codebase can "
+                f"only capture from Apollo (exact participant-id match). '{source or 'unknown'}' "
+                f"has no equivalent anywhere in its API — this is a permanent, "
+                f"source-level limitation, not a missing backfill. This response "
+                f"is explicit (never silently omitted) so synthesis knows to state "
+                f"the limitation rather than fabricate talk-time numbers."
+            )
+        }
+
+    # Apollo-sourced: call coaching_talk_ratio diagnostic
+    diagnostic = assess_call_talk_ratio(row)
+
+    # coaching_talk_ratio already returns proper structure with status/reason/note
+    # for its own insufficient_data cases (no participant_identities, no speech data, etc.)
+    return diagnostic
+
+
 def assess_rep_coaching(sb, deal_id: str, as_of: Optional[date] = None) -> Dict[str, Any]:
     """
     Per-deal coaching assessment composing three criteria.
@@ -530,12 +584,21 @@ def assess_rep_coaching(sb, deal_id: str, as_of: Optional[date] = None) -> Dict[
             "coverage_note": coverage_note
         }
 
-    # STEP 6: Criterion C (to be implemented)
+    # STEP 6: Criterion C - talk-time diagnostic (Apollo only)
+    try:
+        criterion_c = _assess_criterion_c(sb, target_call_id)
+    except Exception as e:
+        logger.error(f"[REP_COACHING] Criterion C failed: {e}")
+        return {
+            "status": "insufficient_data",
+            "reason": "criterion_c_failed",
+            "note": f"Failed to assess Criterion C: {str(e)}",
+            "coverage_note": coverage_note
+        }
 
     return {
-        "status": "insufficient_data",
-        "reason": "criterion_c_not_yet_implemented",
-        "note": f"Criteria A-B complete, Criterion C pending",
+        "status": "ok",
+        "note": "Rep coaching assessment complete for all three criteria",
         "target_call_id": target_call_id,
         "target_call_date": target_call_date,
         "transcript_call_count": len(transcript_calls),
@@ -543,6 +606,7 @@ def assess_rep_coaching(sb, deal_id: str, as_of: Optional[date] = None) -> Dict[
         "weak_components": weak_analysis["weak_components"],
         "criterion_a": criterion_a,
         "criterion_b": criterion_b,
+        "criterion_c": criterion_c,
         "coverage_note": coverage_note
     }
 

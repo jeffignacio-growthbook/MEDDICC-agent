@@ -326,6 +326,19 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "discovery?', 'show me the team's discovery quality this month', "
         "'what happened on James's Stone call?'"
     ),
+    "query_rep_coaching": (
+        "Per-deal rep coaching assessment — actionable coaching moments from "
+        "the most recent transcript-scored call. THREE CRITERIA: (A) MEDDICC "
+        "component advancement (did rep advance weak components), (B) discovery "
+        "question mapping (did rep ask stage-appropriate questions), (C) talk-time "
+        "diagnostic (Apollo only — internal vs prospect speaking ratio). Requires "
+        "at least one transcript-scored call. Use for: 'how did [rep] do on the "
+        "[company] call?', 'assess [rep]'s discovery performance on [deal]', "
+        "'coaching feedback for [rep] on [company]', 'did [rep] ask the right "
+        "questions on the [company] call?', 'how is [rep] advancing MEDDICC "
+        "on [deal]?'. Returns structured coaching assessment with all three "
+        "criteria plus coverage note (transcript availability across fleet)."
+    ),
     "dynamic_query": "question requires combining data from multiple tables or filters not covered by the precomputed handlers above. Use when no other handler fits but the data likely exists in Supabase.",
     "query_help": (
         "The person is orienting, not asking a data question — a greeting, "
