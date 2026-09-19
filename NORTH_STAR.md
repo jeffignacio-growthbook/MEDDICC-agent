@@ -79,9 +79,18 @@ ordering is the working plan until that validation happens.
 ### CRO-facing primitives, in priority order
 
 1. **Forecast trustworthiness** — "how much should I believe this
-   quarter's number." Partially covered by `assess_deal_risk()`'s
-   cycle-length signal; the MEDDICC component is still deferred pending
-   real won-deal data (see the 2026-09-16 Decision Log entry below).
+   quarter's number." Built and verified (2026-09-19):
+   `scripts/forecast_trust.py::assess_forecast_trust()` composes
+   `assess_deal_risk()` (run directly on the current quarter's own
+   COMMIT+MOST_LIKELY cohort, not the COMMIT-only scope
+   `assess_deal_risk` was originally scoped for) with a pooled,
+   week-indexed historical calibration baseline
+   (`query_commit_ml_calibration_by_week()`, `forecast_analyses.py`) —
+   a moving comparison against whichever week the current quarter is
+   actually in, never a fixed anchor. Gated below week 3 (reps
+   structurally don't tag Commit/Most-Likely with real forecasting
+   intent that early). See the 2026-09-19 Decision Log entry below for
+   the full design.
 2. **Pipeline health/coverage** — largely covered already by
    `query_pipeline`/`query_waterfall`.
 3. **Deal risk/likelihood to close** — covered by `assess_deal_risk()`,
@@ -239,6 +248,21 @@ not a reason to resolve by picking one list over the other now.
 **Rationale**: Abstract Red/Yellow/Green bands don't predict outcomes for this client. Using unvalidated thresholds would create false alarms. Cycle-length signal (days past benchmark) is well-grounded in 327 historical wins - ship that alone.
 
 **Status**: deal_risk_assessor shelved pending data. Focus returns to Phase 1b (query_pipeline_movement).
+
+### 2026-09-19: Forecast Trustworthiness (CRO Priority #1) Built and Verified
+**Context**: audited whether a quarter-level "how much should I trust this quarter's number" signal was computable on top of `assess_deal_risk()`. Historical COMMIT-only tagging was too sparse (peak 6-16 deals/week per quarter, all below `min_evidence_count=30`); pooling COMMIT+MOST_LIKELY across the 4 complete quarters cleared the floor (n=176 "ever tagged," n=74-104 per fixed week). Point-in-time integrity confirmed: `deals.forecast_category` (live) must never be used to judge a past quarter — 62.6% of checked historical-vs-current comparisons mismatched; only `deals_snapshot` is point-in-time-correct.
+
+**Decisions**:
+- Scope is COMMIT+MOST_LIKELY, not COMMIT alone (COMMIT-only's historical sample is too thin at any granularity).
+- Below week 3 of the current quarter: hard `insufficient_data`/`too_early` gate — reps structurally don't produce honest Commit/Most-Likely tags in the coverage-building phase (Jeff's domain read, corroborated but not independently proven by the pooled win-rate-delta data).
+- Comparison is a MOVING lookup against the historical win rate at whatever week the current quarter is actually in — never a fixed anchor. Week 10 (the most stable, best-evidenced point on the curve, n=104) is cited only as calibration evidence that the underlying approach is real, never as the live comparison point.
+- Stability bands from the pooled week-by-week table: weeks 3-6 "forming" (lower confidence), 7-10 "settled" (highest confidence), 11-13 "late_quarter" (`lost` collapses toward zero by then — comparison answers a narrower question).
+- New primitive (`scripts/forecast_trust.py`), not a mode on `assess_deal_risk()` or `forecast_analyses.py` — neither had the other's logic (per-deal risk vs. population-level calibration), so composition was the only structurally correct option.
+- Composes against `assess_deal_risk()` directly, not via `get_at_risk_deals()` — that convenience wrapper hardcodes COMMIT-only and would silently drop MOST_LIKELY-tagged, non-late-stage deals from the cohort. Regression-tested directly (Step D).
+
+**Rationale**: same standard as deal_risk_assessor's own MEDDICC deferral — no fabricated probabilities, no signal shipped below its evidence floor, every gate and band grounded in real pooled data rather than assumed.
+
+**Status**: shipped and registered (`api/handlers.py::query_forecast_trust`, `api/router.py` intent map, `api/evaluator.py::STRUCTURED_HANDLERS`). Full Steps A-E build cycle complete: baseline tests (3), planted-discrepancy test proving the week-lookup is genuinely dynamic (not hardcoded/cached — verified by planting that exact bug and confirming the test caught it), and the MOST_LIKELY-only regression test (verified the same way — also confirmed the deal-presence assertion alone would NOT have caught a reintroduced COMMIT-only bug; only the query-shape assertion does). Live CI (`gate-tests.yml`, run [35451944255](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35451944255)): 33/33 executed steps passed, 0 failures.
 
 ---
 
