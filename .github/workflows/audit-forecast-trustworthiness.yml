@@ -1,0 +1,47 @@
+name: Audit Forecast Trustworthiness Primitive (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY,
+# Supabase only (no HubSpot fetch — see reconstruct-forecast-category.yml
+# for the heavier point-in-time-reconstruction diagnostic, which this
+# audit also triggers separately when needed).
+#
+# Scopes a forecast-trustworthiness primitive on top of assess_deal_risk
+# (NORTH_STAR.md CRO Priority #1) by running scripts/audit_forecast_
+# trustworthiness.py, which calls the EXISTING, already-correctness-
+# reviewed query_commit_outcome_by_week()/query_commit_calibration()
+# analyses (scripts/analytics/forecast_analyses.py) unmodified, checks
+# whether deals_snapshot.forecast_category is actually populated for
+# historical (backfilled) rows, demonstrates the point-in-time trap
+# concretely against live data, and adds a segment-level breakdown.
+#
+# Report only. No primitive is designed or built here. Safe to delete
+# once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit forecast-trustworthiness primitive scoping"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python scripts/audit_forecast_trustworthiness.py
