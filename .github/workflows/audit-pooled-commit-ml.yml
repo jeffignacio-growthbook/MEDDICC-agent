@@ -1,0 +1,45 @@
+name: Audit Pooled COMMIT+MOST_LIKELY Sample Size (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY,
+# Supabase only.
+#
+# Checks whether pooling COMMIT+MOST_LIKELY deals across all complete
+# (closed) quarters clears min_evidence_count=30, now that per-quarter
+# breakdowns are already ruled out under either category definition
+# (see reconstruct-forecast-category.yml's dry-run go/no-go table).
+# Runs scripts/audit_pooled_commit_ml.py, which reuses the existing,
+# already-correctness-reviewed _classify_deal_outcome/_quarter_window_iso/
+# _get_complete_quarters helpers from scripts/analytics/forecast_analyses.py
+# unmodified, only adding new COMMIT+MOST_LIKELY querying logic.
+#
+# Report only. No primitive is designed or built here. Safe to delete
+# once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit pooled COMMIT+MOST_LIKELY sample size"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python scripts/audit_pooled_commit_ml.py
