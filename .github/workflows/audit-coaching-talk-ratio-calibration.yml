@@ -1,0 +1,43 @@
+name: Audit Coaching Talk-Ratio Calibration (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY,
+# Supabase only.
+#
+# PIECE 1 of the rep-coaching-primitive build (run BEFORE any
+# implementation): spot-checks the brand-new rep-speaker-identification
+# heuristic against 5-10 real calls, then (if that looks reliable) computes
+# the pooled won-vs-lost distribution of rep_talk_ratio and
+# rep_question_share on GrowthBook's own transcript-scored calls — same
+# 75th-percentile empirical method SEGMENT_CYCLE_BENCHMARKS already uses.
+#
+# Report only. No primitive is designed or built here. Safe to delete
+# once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit coaching talk-ratio calibration"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/audit_coaching_talk_ratio_calibration.py
