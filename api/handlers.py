@@ -5753,17 +5753,35 @@ async def query_rep_coaching(params: dict, sb) -> dict:
         }
 
     # assess_rep_coaching is per-deal (takes single deal_id, not list)
-    # Take first deal_id
+    # If multiple deals matched, return error asking for disambiguation
+    if len(deal_ids) > 1:
+        # Get company names for the matched deals to help user disambiguate
+        matched_deals = select_all(sb, "deals",
+            columns="deal_id,company_name,stage,owner_email",
+            filters=[("in_", "deal_id", deal_ids)])
+
+        deal_list = "\n".join([
+            f"  - {d.get('company_name')} ({d.get('stage', 'unknown stage')}, "
+            f"owner: {d.get('owner_email', 'unknown')})"
+            for d in matched_deals[:5]  # Limit to first 5 for readability
+        ])
+
+        return {
+            "status": "error",
+            "error": f"Found {len(deal_ids)} deals matching your query. "
+                     f"Please be more specific (e.g., mention the rep's name or stage). "
+                     f"Matched deals:\n{deal_list}",
+            "matched_deal_count": len(deal_ids),
+            "matched_deal_ids": deal_ids[:10],  # Limit for response size
+            "queried_companies": companies
+        }
+
     deal_id = deal_ids[0]
 
     try:
         result = assess_rep_coaching(sb, deal_id)
         # Add metadata about resolution
         result["deal_id"] = deal_id
-        if len(deal_ids) > 1:
-            result["note_multiple_deals"] = (
-                f"Question matched {len(deal_ids)} deals; assessed first: {deal_id}"
-            )
         return result
     except Exception as e:
         import traceback
