@@ -2195,6 +2195,53 @@ entry above, one level up the same call chain.
 
 ---
 
+#### 19. `api/tools.py::assess_deal_risk()` — Documented `deal_ids` Parameter Is Always Ignored
+
+**Issue:** The `dynamic_query_loop`-facing async wrapper
+`api/tools.py::assess_deal_risk(sb, deal_ids=None, fiscal_quarter=None)`
+documents `deal_ids` as "Optional list of deal IDs to assess (for
+entity-scoped queries). If None, queries all late-stage/COMMIT deals in
+target quarter" — but the implementation never reads it:
+
+```python
+async def assess_deal_risk(sb, deal_ids=None, fiscal_quarter=None):
+    ...
+    raw_result = get_at_risk_deals(sb, fiscal_quarter=fiscal_quarter)
+    ...
+```
+
+`get_at_risk_deals()` always runs its own late-stage-OR-COMMIT query
+regardless of what (if anything) was passed as `deal_ids`. Anyone
+calling this tool with specific `deal_ids` today — e.g. an
+entity-scoped question like "assess risk for these 3 deals" — silently
+gets the full current-fiscal-quarter cohort back instead, with no
+error or warning that the scoping was dropped.
+
+**Different pattern from #18/#18-addendum:** those are duplicated
+formulas that currently agree; this is a documented-but-dead parameter
+— a caller relying on the docstring gets silently wrong scope, not
+just a risk of future drift.
+
+**Found during:** `assess_forecast_trust()` implementation (Step A),
+while confirming `scripts/deal_risk_assessor.py::assess_deal_risk()`
+(the lower-level, general-purpose function this wrapper calls into)
+was the right thing to compose against directly, rather than through
+this wrapper.
+
+**Status:** NOT BROKEN for the wrapper's actual current callers (none
+found passing `deal_ids` in this audit), but the parameter is
+unconditionally a no-op today. Not fixed as part of this build — out
+of scope, `assess_forecast_trust()` doesn't call this wrapper at all.
+
+**Work:** Either wire `deal_ids` through to a scoped query in
+`get_at_risk_deals()` (or a new parameter path), or remove the
+parameter from the signature/docstring until it's implemented, so the
+documented contract matches what the function actually does.
+
+**Complexity:** Low effort, no urgency.
+
+---
+
 ## 📝 Notes
 
 ### Patterns Established
