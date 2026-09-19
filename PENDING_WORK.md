@@ -2522,3 +2522,76 @@ implemented then:
    see the "Existing baseline-capture scripts left unchanged" note above
    for why.
 
+
+## ✅ Phase 2 Handler 5/6 (query_win_loss) — Migrated, 3 real bugs found
+
+**Date**: 2026-09-19. Steps A/B/C/D done; live-verified via GitHub
+Actions (Agent environment secrets) since this environment has no local
+credentials — see the two runs linked below.
+
+**STEP A (parameter completeness):** No gaps. `time_window` is the
+generic schema field, pre-resolved by `_call_handler_as_tool()` before
+any registered handler runs; `deal_ids` is injected by the same generic
+entity-scope/pronoun-resolution/explicit-ID mechanism every handler
+(migrated or not) already relies on.
+
+**STEP B (registration):** Added to the `tool_fn` dict, the dynamic
+loop's tool-description section, and the classifier bypass list.
+
+**STEP D (structured verification):** `query_win_loss` had no
+`verify_structured_aggregations()` call at all — added one, verifying
+`win_count`/`loss_count` against the actual won/lost split, tested with
+a planted discrepancy (`tests/test_query_win_loss_migration.py`).
+
+**STEP C (baseline + live verification):** capture script added
+(`tests/fixtures/capture_query_win_loss_baseline.py`). Two live GitHub
+Actions runs against the `Agent` environment's real Supabase/HubSpot/
+Anthropic secrets:
+- Run 1 ([35442311297](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35442311297)) — **failed** on the baseline capture step, surfacing real bug #3 below.
+- Run 2 ([35442557240](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35442557240)) — **succeeded** after the fix. Baseline: current quarter = 7 wins / 80 losses ($322K win ARR, 142,742-char full payload); last 90 days = 39 wins / 199 losses. Live rendered answers for two independent phrasings ("why are we losing", "give me a win loss summary for this quarter") both correctly stated **7 wins ($322K ARR) vs. 80 losses**, with real deal names (Comcast $350K, Fanatics Live $250K, ASN Bank lost to Adobe Target, etc.) and an honest data-quality caveat — no truncation, no hallucination, consistent across both phrasings.
+
+**Three real bugs found and fixed during this audit** (not
+hypothetical — this handler surfaced independent bugs the same way
+every other handler touched this session has):
+
+1. **`STRUCTURED_HANDLERS["query_win_loss"]` only checked `"losses"`.**
+   A genuine wins-only quarter (real wins, zero losses — a *good*
+   outcome) would return `losses=[]` and get misclassified as `"empty"`
+   by `evaluate_result()`, discarding a real answer. Fixed to check
+   `"wins"` OR `"losses"` (`api/evaluator.py`).
+
+2. **`query_waterfall` and `query_rep_pipeline`'s verification-failure
+   branches read `verification_result['details']`**, but the real
+   return key on failure is `'discrepancies'` (confirmed against
+   `api/structured_verification.py`'s own docstring and its two other
+   call sites, `query_pipeline`/`query_stale_deals`, which already use
+   the correct key). A genuine verification failure in either handler
+   would have raised `KeyError` instead of the intended, clear
+   `ValueError` message — copied into `query_win_loss`'s own first
+   draft during this migration, caught and fixed in all three places.
+
+3. **`_resolve_tw()` — shared by 14 handlers — didn't resolve a
+   truthy-but-unresolved raw `time_window` spec**, only a missing one
+   (`if tw: return tw` returned a raw `{"period": ..., "n": ...}` dict
+   verbatim). Never fired in production (every real path pre-resolves
+   `time_window` before calling any handler) but broke the function's
+   own documented "answerable... under test" guarantee, and is exactly
+   what crashed the live Step C baseline-capture run above with
+   `KeyError: 'start'`. Fixed to resolve anything not already carrying
+   both `"start"` and `"end"`, benefiting all 14 call sites.
+
+**Also notable, not a bug:** `query_win_loss`'s full current-quarter
+payload is 142,742 chars — by far the largest of the 5 migrated
+handlers (query_stale_deals' was 14,207). Now safely un-truncated per
+the `STRUCTURED_HANDLERS` fix above, and the live run confirms the LLM
+handles it correctly, but this is a real cost/latency data point:
+`narratives` (free-text weekly AI narratives) is the likely dominant
+contributor. Worth a future look at whether `query_win_loss` needs its
+own internal capping/summarization for cost, independent of the
+truncation-correctness question this session was about — not urgent,
+not a correctness bug, just flagged so it isn't rediscovered as a
+surprise later.
+
+**Status: Handler 5/6 complete, live-verified, ready for Handler 6
+(query_deals_at_risk).**
+
