@@ -1,0 +1,42 @@
+name: Audit Coaching Transcript Coverage (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY,
+# Supabase only.
+#
+# PART 1 of the rep-coaching-primitive pre-scoping audit: what fraction of
+# GrowthBook's deals actually have a usable call transcript (not just a
+# resolved call), broken out honestly (deal_id resolution rate vs.
+# transcript-fetch rate vs. transcript-quality — never conflated into one
+# rounded-up "coverage" number).
+#
+# Report only. No primitive is designed or built here. Safe to delete
+# once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit coaching transcript coverage"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/audit_coaching_transcript_coverage.py
