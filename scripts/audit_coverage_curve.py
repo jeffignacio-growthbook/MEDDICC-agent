@@ -83,12 +83,22 @@ def actual_incremental_closed_won(sb, q_start_iso, q_end_iso):
     return total, n
 
 
-def qualified_pipeline_at_week(sb, quarter, week, qualified_stage_order):
+def qualified_pipeline_at_week(sb, quarter, week, qualified_stage_order,
+                                q_start_iso, q_end_iso):
     """deal_value-based proxy (see module docstring caveat), renewal
     pipeline excluded, qualified stage threshold applied, from the
-    point-in-time snapshot."""
+    point-in-time snapshot.
+
+    CLOSE-QUARTER SCOPED (added after the first live run showed an
+    unscoped version producing an implausible, wrong-direction result):
+    a deal only counts here if ITS OWN close_date at that snapshot
+    falls inside the SAME quarter being measured — matching
+    query_pipeline()'s own q3_scoped_pipeline precedent. Without this,
+    "qualified pipeline at week 1" includes deals expected to close many
+    quarters out (long enterprise cycles), which isn't pipeline FOR this
+    quarter's number at all and inflates/distorts the ratio."""
     rows = select_all(sb, "deals_snapshot",
-        columns="deal_id,deal_value,pipeline_id,stage_order",
+        columns="deal_id,deal_value,pipeline_id,stage_order,close_date",
         filters=[("eq", "fiscal_quarter", quarter),
                  ("eq", "week_of_quarter", week)])
     total = 0.0
@@ -98,6 +108,9 @@ def qualified_pipeline_at_week(sb, quarter, week, qualified_stage_order):
             continue
         stage_order = r.get("stage_order")
         if stage_order is None or stage_order < qualified_stage_order:
+            continue
+        close_date = r.get("close_date")
+        if not close_date or not (q_start_iso <= str(close_date)[:10] <= q_end_iso):
             continue
         total += r.get("deal_value") or 0
         n += 1
@@ -115,14 +128,18 @@ def main():
     print(f"Complete (closed) quarters: {complete_quarters}\n")
 
     quarter_actuals = {}
+    quarter_windows = {}
     for quarter in complete_quarters:
         q_start_iso, q_end_iso = _quarter_window_iso(sb, quarter)
+        quarter_windows[quarter] = (q_start_iso, q_end_iso)
         actual, n_won = actual_incremental_closed_won(sb, q_start_iso, q_end_iso)
         quarter_actuals[quarter] = actual
         print(f"{quarter}: actual closed-won incremental ARR = ${actual:,.0f} "
               f"({n_won} deals, window {q_start_iso}..{q_end_iso})")
 
     print("\n" + "=" * 100)
+    print("CLOSE-QUARTER-SCOPED (matches query_pipeline()'s q3_scoped_pipeline precedent —")
+    print("only counts a deal if ITS OWN close_date falls in the quarter being measured)")
     print(f"{'week':>4s}  " + "  ".join(f"{q:>16s}" for q in complete_quarters) +
           f"  {'pooled_mean':>12s}  {'pooled_median':>13s}")
     print("=" * 100)
@@ -132,7 +149,9 @@ def main():
         row_ratios = []
         cells = []
         for quarter in complete_quarters:
-            pipeline_val, n_deals = qualified_pipeline_at_week(sb, quarter, week, qualified_stage_order)
+            q_start_iso, q_end_iso = quarter_windows[quarter]
+            pipeline_val, n_deals = qualified_pipeline_at_week(
+                sb, quarter, week, qualified_stage_order, q_start_iso, q_end_iso)
             actual = quarter_actuals[quarter]
             if actual and actual > 0:
                 ratio = pipeline_val / actual
