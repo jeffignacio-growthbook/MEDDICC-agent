@@ -4822,8 +4822,26 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 "\nWrong: '$20K won (closed out of $1.12M segment)' ← name the segment!"
             )
 
+        # For structured results with summary fields (complete datasets), don't truncate
+        # so LLM sees all data. Row-based results are already sampled/aggregated.
+        is_complete_structured = ("summary" in result and "total_deals" in result.get("summary", {}))
+
+        if is_complete_structured:
+            # Complete structured dataset - include full JSON (no truncation)
+            total_deals = result["summary"]["total_deals"]
+            result_json = json.dumps(result, default=str)
+            complete_instruction = (
+                f"⚠️ **COMPLETE DATASET**: This result contains ALL {total_deals} deals. "
+                f"State this total in your answer.\n\n"
+            )
+        else:
+            # Row-based or other result - use existing truncation
+            result_json = json.dumps(result, default=str)[:3000]
+            complete_instruction = ""
+
         messages.append({"role": "user",
-            "content": f"Tool result: {json.dumps(result, default=str)[:3000]}{suspicion_note}"
+            "content": f"{complete_instruction}"
+                       f"Tool result: {result_json}{suspicion_note}"
                        f"{aggregation_instruction}\n\n"
                        f"Can you now answer the question "
                        f"\"{question}\" from the data gathered so far? "

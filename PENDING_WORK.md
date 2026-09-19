@@ -2305,40 +2305,36 @@ correct baseline.
 **Status**: Documented. No code fix needed - the migration corrected the behavior.
 
 
-## Handler 4 (query_rep_pipeline) Migration - Synthesis Bug
+## ✅ Handler 4 (query_rep_pipeline) Migration - Synthesis Bug FIXED
 
 **Date**: 2026-09-19
-**Context**: Phase 2 Handler 4/6 migration (query_rep_pipeline → unified routing)
+**Status**: ✅ FIXED - NEW path now shows complete datasets correctly
 
-**Finding**: NEW path synthesis incorrectly filters results, violating handler's documented intent.
+**Finding**: NEW path synthesis was incorrectly filtering results to Q3-focused subset (16-25 deals) instead of showing all 94 active deals, violating handler's documented intent.
 
-**Data Correctness**: ✅ Handler returns correct data (94 deals / $7.5M)
-- Direct handler test: 94 deals, $7,500,275.02
-- OLD path (classifier routing): 94 deals, ~$7.5M (correctly shows all active deals)
+**Root Cause**:
+- Handler returned all 94 deals correctly (17,677 chars JSON)
+- _aggregate_and_sample recognized structured results without "rows" key ✅
+- BUT: Tool result was truncated to 3000 chars before being shown to LLM (line 4876)
+- Truncation cut off after ~15 deals, so LLM synthesized based on incomplete data
+- Result: Varied between runs (16-25 deals, $3.86M-$4.6M) instead of all 94 / $7.5M
 
-**Synthesis Bug**: ❌ NEW path filters to Q3-focused subset
-- NEW path varies between runs: 16-25 deals, $3.86M-$4.6M
-- Filters by close_date despite handler docstring (line 2612-2613):
-  > "IMPORTANT: Rep pipeline is CURRENT STATE - never filters by close_date."
+**Fix (2026-09-19)**:
+1. Detect structured results with "summary" field containing "total_deals" (line 4877)
+2. For complete datasets, skip [:3000] truncation and pass full JSON to LLM
+3. Add explicit instruction: "⚠️ COMPLETE DATASET: This result contains ALL X deals"
+4. Row-based results still use existing 3000-char truncation (already aggregated/sampled)
 
-**Root Cause**: 
-- _aggregate_and_sample now correctly recognizes structured results (doesn't need "rows" key)
-- Full data (94 deals) is passed to LLM in accumulated_data
-- But generic dynamic loop synthesis prioritizes "relevant" deals (Q3 focus)
-- OLD path used handler-specific synthesis that showed complete picture
+**Verification**:
+- Baseline test: "show me Christian's pipeline"
+- NEW path: "94 total active deals, $7.5M total ARR" ✅ CORRECT
+- Matches OLD path and direct handler test
+- Consistent across multiple runs
 
-**Attempted Fixes**:
-1. ✅ Fixed _aggregate_and_sample to handle structured results without "rows" key
-2. ❌ Fast-path preservation (doesn't work for structured handlers - needs row-based data)
-3. ⏸️  Dynamic loop synthesis prompt adjustment (deferred - requires broader changes)
+**Files Changed**:
+- `api/router.py` lines 1775-1788: _aggregate_and_sample handles structured results
+- `api/router.py` lines 4875-4894: Conditional truncation for complete datasets
 
-**Current State**:
-- Mig ration complete (tool registered, classifier bypassed, evaluator updated)
-- Data flows correctly (all 94 deals reach synthesis)
-- Synthesis behavior differs from OLD path (filters instead of showing all)
-
-**Recommendation**: 
-Accept NEW path behavior for now (functional but different prioritization) OR add handler-specific synthesis instructions to dynamic loop for query_rep_pipeline to show ALL active deals without close_date filtering.
-
-**Impact**: Users get Q3-focused subset instead of complete pipeline view when asking "show me [rep]'s pipeline".
+**Impact**:
+Users now get complete, accurate pipeline views matching handler's "never filters by close_date" design intent.
 
