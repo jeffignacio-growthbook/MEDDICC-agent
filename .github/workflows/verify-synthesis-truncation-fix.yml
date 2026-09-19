@@ -1,0 +1,53 @@
+name: Verify Synthesis Truncation Fix (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. Re-runs
+# query_pipeline's and query_stale_deals' realistic baseline questions
+# through the REAL production code path (scripts/test_question.py →
+# route_question()) to confirm the rendered, synthesized answer states
+# the full totals (313 deals for "show me our pipeline"; 64 deals /
+# $987,194.02 for "what deals are stale") now that api/router.py's
+# synthesis-truncation fix (STRUCTURED_HANDLERS-based, see
+# PENDING_WORK.md's "SYSTEMIC FINDING: Synthesis-truncation bug is
+# pipeline-wide") is live. READ-ONLY — route_question() does not write
+# to HubSpot or Supabase (see scripts/test_question.py's own docstring).
+# Safe to delete once this one-time confirmation is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "query_pipeline baseline question — realistic default, 313-deal payload"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          python scripts/test_question.py "show me our pipeline"
+
+      - name: "query_stale_deals baseline question — realistic default, 64-deal / $987,194.02 payload"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          python scripts/test_question.py "what deals are stale"
