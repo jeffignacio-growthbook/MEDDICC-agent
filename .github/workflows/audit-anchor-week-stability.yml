@@ -1,0 +1,47 @@
+name: Audit Anchor-Week Stability for COMMIT+MOST_LIKELY (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY,
+# Supabase only.
+#
+# Computes pooled n and win_rate at EVERY week 1-13, pooled across the
+# 4 complete quarters, for the COMMIT+MOST_LIKELY category - so a
+# specific anchor week can be picked on sample size, decision-relevance,
+# and week-to-week win-rate stability, not just "first week that
+# clears min_evidence_count=30" (which landed on week 1 in the prior
+# audit, an artifact of the selection rule, not necessarily the right
+# checkpoint). Runs scripts/audit_anchor_week_stability.py, which
+# reuses the existing, already-correctness-reviewed
+# _classify_deal_outcome/_quarter_window_iso/_get_complete_quarters
+# helpers from scripts/analytics/forecast_analyses.py unmodified.
+#
+# Report only. No primitive is designed or built here. Safe to delete
+# once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit anchor-week stability for COMMIT+MOST_LIKELY"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python scripts/audit_anchor_week_stability.py
