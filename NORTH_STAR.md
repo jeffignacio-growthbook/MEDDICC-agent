@@ -65,126 +65,98 @@ Never guess thresholds. Every classification boundary (at-risk, stale, overdue) 
 
 **Context**: Aggregation correctness (Phase 1) protects data integrity. The reasoning layer interprets PATTERNS across that data to answer "why" and "what should we do" questions. Each primitive below represents a cross-cutting analytical capability motivated by real user questions.
 
-**Source**: Audited from query_cost_log (300 recent questions, 2026-09-17) and conversation history. Questions marked with ✓ were answered; ✗ indicates partial/failed attempts.
+**Source (2026-09-19 revision)**: This ordering was built from Jeff's
+direct domain expertise — what a CRO, and separately what a marketing/
+RevOps lead (Lyndsie), actually asks in the role — **not** from a
+query_cost_log audit. It replaces the earlier version of this section,
+which was sourced from a 300-question query_cost_log sample
+(2026-09-17). A query_cost_log/learning_log audit against real usage is
+still recommended as a future validation step to confirm or reorder
+this list (see "Real-Usage Cross-Check" below for a first pass at
+that, done against the *prior* version of this list) — but this
+ordering is the working plan until that validation happens.
 
-### Priority 1: Cross-Rep Trend Analysis
+### CRO-facing primitives, in priority order
 
-**Real Questions**:
-- ✓ "Show me win rate by segment for Q3"
-- ✗ "How's Scott's call quality been this month?"
-- ✗ "How many meetings has Jake Stangl's SDR pipeline generated this quarter"
+1. **Forecast trustworthiness** — "how much should I believe this
+   quarter's number." Partially covered by `assess_deal_risk()`'s
+   cycle-length signal; the MEDDICC component is still deferred pending
+   real won-deal data (see the 2026-09-16 Decision Log entry below).
+2. **Pipeline health/coverage** — largely covered already by
+   `query_pipeline`/`query_waterfall`.
+3. **Deal risk/likelihood to close** — covered by `assess_deal_risk()`,
+   cycle-length signal only. This is the gap that started this whole
+   thread of work.
+4. **Rep performance and coaching signal** — no primitive exists.
+5. **Win/loss pattern reasoning** — `query_win_loss` exists as a
+   lookup, not yet a reasoning primitive (no synthesis over WHY, just
+   what).
+6. **Territory/segment/region performance comparison** — dimension
+   resolution exists, no comparative-reasoning layer on top.
 
-**Primitive**: `compute_cohort_performance_trends(dimension, metric, time_window)`
-- **What it does**: Compute metric (win rate, call quality, meeting generation) grouped by dimension (segment, rep, region) over time window, with statistical significance flags for outliers
-- **Why it's hard**: Need historical baseline, variance calculation, multi-dimensional grouping
-- **Status**: **PARTIAL** - Individual metrics exist (win_rate in query_win_loss, sdr_metrics per rep) but no cross-cohort comparison or trend detection
-- **Blocks**: Rep coaching prioritization (can't identify "who's struggling" without cohort context), forecast confidence (can't assess rep-level reliability)
+### Marketing/RevOps-lead-facing primitives (Lyndsie), in priority order
 
-### Priority 2: Win/Loss Attribution
-
-**Real Questions**:
-- ✓ "What was the closed won/lost split in EMEA last quarter?"
-- ✓ "Why wasn't this deal included in the German closed won calculations?"
-- Current: competitive_intel exists but only searches mentions, doesn't attribute outcomes
-
-**Primitive**: `attribute_outcome_to_factors(deal_id, outcome, candidate_factors)`
-- **What it does**: For a won/lost deal, rank contributing factors (competitor mentioned, missing champion, pricing objection, segment, cycle time variance) by attribution weight
-- **Why it's hard**: Causation vs correlation, sparse data (only 327 historical wins), need multi-factor modeling
-- **Status**: **PARTIAL** - win_loss_narratives table exists, competitive_intel searches mentions, but no attribution model or factor ranking
-- **Blocks**: Competitive intel (can't answer "lost 5 deals to Statsig due to X"), rep coaching (can't identify which competency gaps matter most)
-
-### Priority 3: Competitive Loss Patterns
-
-**Real Questions**:
-- ✗ "Which competitors keep coming up?" (answered via search, not pattern analysis)
-- No direct "we lost N deals to X in segment Y citing reason Z" questions in log yet
-
-**Primitive**: `analyze_competitive_loss_patterns(competitor_name=None, segment=None)`
-- **What it does**: Cross-reference competitor mentions in objections/feature_gaps/win_loss_narratives with deal outcomes to find: frequency of competitor by segment, win rate when X mentioned, common objection themes when losing to X
-- **Why it's hard**: Unstructured text extraction (competitor names not always in competitor_mentioned field), need to link mentions → outcomes → patterns
-- **Status**: **PARTIAL** - competitive_intel searches mentions, win_loss_narratives exist, but no outcome correlation or pattern detection
-- **Depends on**: Win/loss attribution (need causal model, not just search)
-
-### Priority 4: Rep Coaching Prioritization
-
-**Real Questions**:
-- Current: coaching_priorities exists but per-deal flagging only, no cross-rep trends
-- No "which reps struggle with X competency" questions in log yet (coaching questions route to deal-level flags)
-
-**Primitive**: `prioritize_coaching_needs(rep_email=None, competency=None)`
-- **What it does**: Rank reps by competency gaps (champion identification, pain discovery, objection handling) weighted by: frequency of gap, deal value at risk, historical improvement rate after coaching
-- **Why it's hard**: Need historical coaching→outcome tracking (not instrumented yet), competency must correlate with win/loss (unproven for this client per 2026-09-16 MEDDICC decision)
-- **Status**: **PARTIAL** - coaching_priorities flags deals with low component scores, but no cross-rep ranking, no competency-to-outcome correlation, no coaching effectiveness tracking
-- **Depends on**: Cohort performance trends (need rep-level benchmarks), win/loss attribution (need to prove competency X predicts outcome Y)
-- **Blocker**: MEDDICC data insufficient (only 4 of 327 won deals scored) - shelved until ≥30 scored wins exist
-
-### Priority 5: Forecast Confidence Scoring
-
-**Real Questions**:
-- ✗ "Show me forecast confidence" (not in log - aspirational primitive)
-- Current: query_pipeline returns coverage ratio but no confidence assessment
-
-**Primitive**: `score_forecast_confidence(pipeline_snapshot, target, time_window)`
-- **What it does**: For a given pipeline snapshot and target, compute confidence score (0-100) based on: historical close rate by stage, rep reliability (forecast vs actual), deal age distribution, MEDDICC maturity distribution
-- **Why it's hard**: Need historical forecast→actual tracking (not instrumented yet), stage-specific close rates need ≥50 deals per stage, rep reliability needs ≥6 months history
-- **Status**: **NOT STARTED** - no historical forecast snapshots, no close rate by stage computation, no rep reliability tracking
-- **Depends on**: Cohort performance trends (need rep-level close rate history), deal risk assessment (partially exists but shelved due to MEDDICC data gap)
-
-### Priority 6: Root Cause Drill-Down
-
-**Real Questions**:
-- ✓ "Which deals are stale in Discovery stage?" (answered, but no root cause analysis)
-- ✓ "Which deals haven't moved in 30 days?" (flagging only, no "why stale" reasoning)
-
-**Primitive**: `explain_cohort_anomaly(cohort_definition, metric, threshold)`
-- **What it does**: For a cohort showing anomalous metric (12 deals stale in Discovery, win rate dropped 20% in EMEA), drill down to shared factors (same rep, same competitor, same objection, same missing competency) and rank by frequency
-- **Why it's hard**: Anomaly detection needs baseline (see Priority 1), root cause needs multi-dimensional correlation (see Priority 2)
-- **Status**: **NOT STARTED** - flagging handlers exist (stale_deals, coaching_priorities) but no cross-deal pattern extraction
-- **Depends on**: Win/loss attribution (factor ranking), cohort performance trends (anomaly detection)
+1. **Pipeline generation by source/channel** — no primitive exists.
+2. **Country/segment/region breakdown** — a real question was asked
+   live (the EMEA country-breakdown thread); not yet a governed
+   dimension the way region/segment/owner already are.
+3. **Conversion rate by stage/source** (MQL-to-SQL-style) — no
+   primitive exists.
+4. **Data hygiene/attribution quality as a queryable signal** —
+   currently only surfaces as an aside in prose answers, never directly
+   queryable.
 
 ### Real-Usage Cross-Check (2026-09-19 full-history audit)
 
-**This does not replace the six priorities above** — it's a second,
-independent signal sitting alongside them: what `query_cost_log` (every
-`dynamic_query_loop` invocation) and `learning_log` (assessor
+**This does not replace the domain-expertise ordering above** — it's a
+second, independent signal sitting alongside it: what `query_cost_log`
+(every `dynamic_query_loop` invocation) and `learning_log` (assessor
 correctness signals) actually show across the FULL available history
-(166 + 517 rows respectively), not a 300-question recent window. Full
-methodology, consolidated frequency table, and caveats are in
-`PENDING_WORK.md`'s "EVIDENCE AUDIT: What primitive to build next"
-entry — this is the summary against the list above.
+(166 + 517 rows respectively). It was run against the *prior* version
+of this section's list, before this revision — the mapping below is to
+the current (CRO/Marketing) list. Full methodology, consolidated
+frequency table, and caveats are in `PENDING_WORK.md`'s "EVIDENCE
+AUDIT: What primitive to build next" entry.
 
-- **Risk/likelihood judgment** (the deal-risk-assessment concept
-  referenced above as a dependency for Priorities 4 and 5, and shelved
-  in the 2026-09-16 Decision Log entry below): **strongest standing
-  signal in real usage**, unaffected by tonight's routing/truncation
-  fixes. Real usage and this roadmap's own reasoning **agree** here —
-  it's the one place both lists point the same direction. Already has
-  `assess_deal_risk()` scoped and partially built
-  (`scripts/deal_risk_assessor.py`), not a from-scratch ask.
-- **Pipeline movement/snapshot**: raw-dominant in the logs (65% of all
-  non-clean evidence), but mostly a Phase 1b routing/handler-existence
+- **Deal risk/likelihood to close** (CRO #3 — the gap that started this
+  whole thread): **strongest standing signal in real usage**,
+  unaffected by tonight's routing/truncation fixes. Real usage and
+  domain expertise **agree** here — it's the one place both lists point
+  the same direction. Already has `assess_deal_risk()` scoped and
+  partially built (`scripts/deal_risk_assessor.py`), not a
+  from-scratch ask.
+- **Pipeline health/coverage** (CRO #2): raw-dominant in the logs (65%
+  of all non-clean evidence, under the old "pipeline movement/
+  snapshot" framing), but mostly a Phase 1b routing/handler-existence
   problem tonight's unified-routing migration and synthesis-truncation
   fix already closed, not a reasoning-layer gap. **Not a new-primitive
   priority** — worth a live spot-check for recurrence, not a build
   target.
-- **Stale deals, rep coaching (Priority 4), data hygiene, geo/market
-  segmentation, win/loss (Priority 2)**: present in real usage but
-  low-volume. Consistent with — not contradicting — where they already
-  sit on the list above.
-- **Forecast trustworthiness (Priority 5) and competitive positioning
-  (Priority 3)** — both named among the six reasoning-layer priorities
-  above — show only **1 raw hit each** in the full-history real-usage
-  audit. Can't tell from log data alone whether that means genuinely
-  rare so far, or that people haven't learned to ask the agent for them
-  yet.
+- **Rep performance/coaching (CRO #4), win/loss pattern reasoning (CRO
+  #5), country/segment/region breakdown (Marketing #2), data hygiene
+  (Marketing #4)**: present in real usage but low-volume — consistent
+  with, not contradicting, where they sit on the lists above. The
+  country/segment/region evidence directly corroborates Marketing #2's
+  own stated example (the EMEA country-breakdown thread is in the
+  audited evidence).
+- **Forecast trustworthiness (CRO #1)** — ranked #1 by domain expertise
+  — shows only **1 raw hit** in the full-history real-usage audit.
+  Can't tell from log data alone whether that means genuinely rare so
+  far, or that people haven't learned to ask the agent for it yet.
+- **Territory/segment/region performance comparison (CRO #6), pipeline
+  generation by source/channel (Marketing #1), and conversion rate by
+  stage/source (Marketing #3)**: no clear corresponding evidence found
+  in the audited history at all — not contradicted, simply unconfirmed
+  either way.
 
-**The one thing worth stating plainly**: real usage *confirms* risk/
-likelihood judgment as the top priority — both lists agree. It does
-**not yet confirm** forecast confidence scoring as urgent from real
-usage, even though it's reasoned as a high priority on the list above.
-That gap between domain judgment and observed usage is itself worth
-tracking over time, not a reason to resolve by picking one list over
-the other now.
+**The one thing worth stating plainly**: real usage *confirms* deal
+risk/likelihood as a top priority — both lists agree, and it's ranked
+#3 here only because forecast trustworthiness and pipeline health sit
+above it by domain reasoning, not because usage ranks it lower. It does
+**not yet confirm** forecast trustworthiness as urgent from real usage,
+even though it's ranked #1 here on domain judgment. That gap between
+domain judgment and observed usage is itself worth tracking over time,
+not a reason to resolve by picking one list over the other now.
 
 ---
 
