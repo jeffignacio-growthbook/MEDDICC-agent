@@ -1,0 +1,45 @@
+name: Audit Apollo Exact-ID Match Rate (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY —
+# Supabase reads + live Apollo get_conversation() fetches, no writes
+# anywhere (migration 065 does not need to be applied for this to run).
+#
+# Reliability re-quantification for the Apollo-specific exact
+# participant-id identity bridge (Criterion C), scoped to Apollo-sourced,
+# transcript-scored calls only. Measures the real, production
+# _extract_apollo_participant_identities() function against the
+# already-stored call_transcripts speaker keys. Reports match rate by
+# speaker count and by speech-seconds against the 90% bar.
+#
+# Report only. No primitive design decision is made here. Safe to
+# delete once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit Apollo exact-ID match rate"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          APOLLO_API_KEY: ${{ secrets.APOLLO_API_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/audit_apollo_exact_id_match_rate.py
