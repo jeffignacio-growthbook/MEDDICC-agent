@@ -69,6 +69,53 @@ def test_emea_resolution_is_case_insensitive_on_direct_lookup():
     print("✓ EMEA resolves identically regardless of how the model or user cased it")
 
 
+def test_nam_resolves_correctly():
+    """2026-09-20 (PENDING_WORK.md #23): confirmed directly by Jeff that
+    NAM, not AMER, is GrowthBook's actual region terminology — the
+    territory-comparison audit's "How does EMEA compare to AMER" test
+    question used the wrong term, not a data gap. NAM itself already
+    resolved correctly before this fix; this test locks that in as a
+    baseline so a future regression here isn't mistaken for the AMER
+    alias (below) being the only thing broken."""
+    result = resolve_dimension_filter("NAM")
+    assert result == {"column": "region", "operator": "eq", "value": "NAM"}
+    print("✓ NAM resolves to region.eq.NAM via pure config lookup")
+
+
+def test_amer_resolves_as_a_colloquial_alias_for_nam():
+    """A real user may still reasonably say "AMER" colloquially even
+    though GrowthBook's own systems call the region "NAM" — resolved via
+    _REGION_ALIASES, the same alias-map pattern _country_candidates()
+    already uses for country variants (Netherlands/The Netherlands,
+    Russia/Russian Federation). Must resolve to the SAME canonical
+    region_code as a direct "NAM" lookup, not a separate "AMER" value —
+    the underlying region_definitions key is still NAM."""
+    for variant in ("AMER", "amer", "Amer"):
+        result = resolve_dimension_filter(variant)
+        assert result == {"column": "region", "operator": "eq", "value": "NAM"}, (
+            f"variant {variant!r} must resolve to the canonical NAM region, got {result!r}"
+        )
+    print("✓ AMER resolves to region.eq.NAM (colloquial alias, not a "
+          "second region value) regardless of casing")
+
+
+def test_amer_is_surfaced_by_the_proactive_scan_too():
+    """The alias must be wired into resolve_dimension_filter() itself
+    (not just a table scan_question_for_known_dimension_terms()
+    consults some other way), since the scanner calls
+    resolve_dimension_filter() per candidate term — confirms the exact
+    original incident question ("How does EMEA compare to AMER this
+    quarter?") now surfaces BOTH regions, not just EMEA."""
+    resolved = scan_question_for_known_dimension_terms(
+        "How does EMEA compare to AMER this quarter?")
+    by_column = {r["term"]: r for r in resolved}
+    assert by_column["AMER"]["column"] == "region"
+    assert by_column["AMER"]["value"] == "NAM"
+    assert by_column["EMEA"]["value"] == "EMEA"
+    print("✓ 'How does EMEA compare to AMER' now surfaces both region "
+          "directives (region.eq.EMEA and region.eq.NAM), not just EMEA")
+
+
 def test_scan_surfaces_emea_from_the_original_incident_question_shape():
     """The exact question shape from this session's recurring incident:
     'which enterprise deals changed stage in the last 2 weeks in EMEA'.
@@ -319,6 +366,9 @@ def test_jakes_deals_ambiguous_note_reaches_the_first_model_message():
 if __name__ == "__main__":
     test_emea_resolves_correctly_before_any_query_runs()
     test_emea_resolution_is_case_insensitive_on_direct_lookup()
+    test_nam_resolves_correctly()
+    test_amer_resolves_as_a_colloquial_alias_for_nam()
+    test_amer_is_surfaced_by_the_proactive_scan_too()
     test_scan_surfaces_emea_from_the_original_incident_question_shape()
     test_ambiguous_rep_first_name_returns_candidates_not_a_guess()
     test_ambiguous_terms_are_not_injected_into_the_proactive_scan()
