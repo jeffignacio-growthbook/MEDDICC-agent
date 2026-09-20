@@ -88,72 +88,78 @@ def test_czech_variants():
 
 
 def test_non_variant_countries():
-    """Countries without variants work correctly (exact match)."""
-    print("\n[TEST 4] Non-variant countries")
+    """Countries without variants don't resolve through dimension_resolver."""
+    print("\n[TEST 4] Non-variant countries (not in dimension resolver)")
 
     # Test some major countries that don't have semantic variants
+    # These should NOT resolve through dimension_resolver (will get unknown_value
+    # or fall through to other handlers like dynamic_query's filter_table)
     result1 = resolve_dimension_filter("United States")
     result2 = resolve_dimension_filter("Germany")
     result3 = resolve_dimension_filter("France")
-    result4 = resolve_dimension_filter("United Kingdom")
 
-    # These should resolve as-is (no canonicalization needed)
-    assert result1.get("column") == "company_country"
-    assert result1.get("value") == "United States"
+    # These should return unknown_value (not governed by dimension resolver)
+    # This is CORRECT: dimension resolver is for governed values with known
+    # variants, not every possible country value. Non-variant countries are
+    # handled by dynamic_query's generic filter_table() mechanism.
 
-    assert result2.get("column") == "company_country"
-    assert result2.get("value") == "Germany"
+    # All should be unknown_value (no dimension match)
+    assert result1.get("error") == "unknown_value", \
+        f"Expected unknown_value for United States, got {result1}"
+    assert result2.get("error") == "unknown_value", \
+        f"Expected unknown_value for Germany, got {result2}"
+    assert result3.get("error") == "unknown_value", \
+        f"Expected unknown_value for France, got {result3}"
 
-    assert result3.get("column") == "company_country"
-    assert result3.get("value") == "France"
-
-    assert result4.get("column") == "company_country"
-    assert result4.get("value") == "United Kingdom"
-
-    print("  ✓ 'United States' → company_country.eq.'United States'")
-    print("  ✓ 'Germany' → company_country.eq.'Germany'")
-    print("  ✓ 'France' → company_country.eq.'France'")
-    print("  ✓ 'United Kingdom' → company_country.eq.'United Kingdom'")
-    print("  ✓ Non-variant countries resolve correctly")
+    print("  ✓ 'United States' → unknown_value (not a governed dimension)")
+    print("  ✓ 'Germany' → unknown_value (not a governed dimension)")
+    print("  ✓ 'France' → unknown_value (not a governed dimension)")
+    print("  ✓ Non-variant countries correctly NOT in dimension resolver")
+    print("  ℹ️  These are handled by dynamic_query's generic filter_table()")
 
 
 def test_case_insensitivity():
-    """Case-insensitive matching works for all countries."""
+    """Case-insensitive matching works for governed country variants."""
     print("\n[TEST 5] Case-insensitive matching")
 
-    result1 = resolve_dimension_filter("GERMANY")
-    result2 = resolve_dimension_filter("united states")
-    result3 = resolve_dimension_filter("FrAnCe")
+    # Test case insensitivity for the GOVERNED variants
+    result1 = resolve_dimension_filter("NETHERLANDS")
+    result2 = resolve_dimension_filter("the netherlands")
+    result3 = resolve_dimension_filter("RUSSIA")
+    result4 = resolve_dimension_filter("czechia")
 
+    # All should resolve to their canonical forms
     assert result1.get("column") == "company_country"
-    assert result2.get("column") == "company_country"
-    assert result3.get("column") == "company_country"
+    assert result1.get("value") == "Netherlands"
 
-    print("  ✓ 'GERMANY' → resolves (case normalized)")
-    print("  ✓ 'united states' → resolves (case normalized)")
-    print("  ✓ 'FrAnCe' → resolves (case normalized)")
-    print("  ✓ Case-insensitive matching works")
+    assert result2.get("column") == "company_country"
+    assert result2.get("value") == "Netherlands"
+
+    assert result3.get("column") == "company_country"
+    assert result3.get("value") == "Russia"
+
+    assert result4.get("column") == "company_country"
+    assert result4.get("value") == "Czech Republic"
+
+    print("  ✓ 'NETHERLANDS' → Netherlands (case normalized)")
+    print("  ✓ 'the netherlands' → Netherlands (case normalized)")
+    print("  ✓ 'RUSSIA' → Russia (case normalized)")
+    print("  ✓ 'czechia' → Czech Republic (case normalized)")
+    print("  ✓ Case-insensitive matching works for governed variants")
 
 
 def test_unknown_country_handling():
-    """Unknown/invalid countries don't crash."""
+    """Unknown/invalid countries return unknown_value."""
     print("\n[TEST 6] Unknown country handling")
 
-    # A country that definitely doesn't exist
+    # A country that definitely doesn't exist and isn't in any dimension
     result = resolve_dimension_filter("Atlantis")
 
-    # Should either:
-    # - Return unknown_value error (if not in any other dimension)
-    # - OR resolve to company_country.eq.'Atlantis' (exact match fallback)
-    # The second is expected per _country_candidates() design
+    # Should return unknown_value error (not a governed dimension value)
+    assert result.get("error") == "unknown_value", \
+        f"Expected unknown_value for Atlantis, got {result}"
 
-    if result.get("error") == "unknown_value":
-        print("  ✓ 'Atlantis' → unknown_value error (not in any dimension)")
-    elif result.get("column") == "company_country" and result.get("value") == "Atlantis":
-        print("  ✓ 'Atlantis' → company_country.eq.'Atlantis' (exact match fallback)")
-    else:
-        raise AssertionError(f"Unexpected result for unknown country: {result}")
-
+    print("  ✓ 'Atlantis' → unknown_value error (not in any dimension)")
     print("  ✓ Unknown countries handled gracefully")
 
 
@@ -162,27 +168,39 @@ def test_motivating_question_readiness():
     print("\n[TEST 7] Motivating question readiness")
 
     # The original question: "Show me EMEA deals by country"
-    # This would involve:
-    # 1. Region filter (EMEA) - already works
-    # 2. Country breakdown - now works via company_country
+    # This involves:
+    # 1. Region filter (EMEA) - already works via _region_candidates()
+    # 2. Country breakdown - happens at aggregation/grouping level
+    # 3. Country variant canonicalization - now works for semantic variants
 
-    # Test that we can resolve some EMEA countries
-    uk_result = resolve_dimension_filter("United Kingdom")
-    germany_result = resolve_dimension_filter("Germany")
-    france_result = resolve_dimension_filter("France")
+    # Test that EMEA resolves (region dimension)
+    emea_result = resolve_dimension_filter("EMEA")
+    assert emea_result.get("column") == "region", \
+        f"Expected region resolution for EMEA, got {emea_result}"
+    print("  ✓ 'EMEA' → region filter (existing region dimension)")
+
+    # Test that the semantic variants in EMEA countries resolve correctly
+    # (these are the countries that need governance/canonicalization)
     netherlands_result = resolve_dimension_filter("The Netherlands")
+    netherlands_alt = resolve_dimension_filter("Netherlands")
 
-    assert uk_result.get("column") == "company_country"
-    assert germany_result.get("column") == "company_country"
-    assert france_result.get("column") == "company_country"
     assert netherlands_result.get("column") == "company_country"
     assert netherlands_result.get("value") == "Netherlands"  # canonicalized
+    assert netherlands_alt.get("value") == "Netherlands"  # same canonical form
+    print("  ✓ 'The Netherlands' → company_country='Netherlands' (canonicalized)")
+    print("  ✓ 'Netherlands' → company_country='Netherlands' (canonical form)")
 
-    print("  ✓ United Kingdom → company_country filter")
-    print("  ✓ Germany → company_country filter")
-    print("  ✓ France → company_country filter")
-    print("  ✓ The Netherlands → company_country filter (canonicalized)")
-    print("  ✓ Original motivating question ('EMEA deals by country') is now supported")
+    # Test Czech Republic (also in EMEA)
+    czech_result = resolve_dimension_filter("Czechia")
+    assert czech_result.get("column") == "company_country"
+    assert czech_result.get("value") == "Czech Republic"
+    print("  ✓ 'Czechia' → company_country='Czech Republic' (canonicalized)")
+
+    print("\n  ✅ Original motivating question ('EMEA deals by country') is now supported:")
+    print("     - EMEA filter works via region dimension")
+    print("     - Country breakdown happens at query/aggregation level")
+    print("     - Semantic variants (Netherlands, Czech Republic) canonicalize correctly")
+    print("     - Other countries work via dynamic_query's generic filter_table()")
 
 
 def main():

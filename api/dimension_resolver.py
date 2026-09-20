@@ -258,14 +258,12 @@ def _country_candidates(term: str) -> List[Dict[str, Any]]:
     canonicalization for semantic variants (Netherlands vs The
     Netherlands, Russia vs Russian Federation, Czech Republic vs
     Czechia). Returns the canonical form from _COUNTRY_ALIASES if the
-    normalized term matches a known variant, or the term itself if not
-    (allowing exact matches against other country values that don't
-    have variants). Does NOT validate whether the country actually
-    exists in the deals table — that's intentional, same as
-    region/segment/roster matching: resolve_dimension_filter() is a
-    RESOLUTION function (what filter clause does this term mean), not a
-    VALIDATION function (does that value exist in the data). Validation
-    happens at query time via the DB's actual records."""
+    normalized term matches a known variant. Does NOT have a fallback
+    for arbitrary terms — follows the same pattern as
+    _region_candidates() and _segment_candidates(), which only return
+    matches for governed values. This prevents false matches where
+    "EMEA" (a region) or "enterprise" (a segment) would incorrectly
+    appear as potential country filters."""
     norm = _normalize(term)
 
     # Check if this is a known variant that needs canonicalization
@@ -273,10 +271,8 @@ def _country_candidates(term: str) -> List[Dict[str, Any]]:
         canonical = _COUNTRY_ALIASES[norm]
         return [{"column": "company_country", "operator": "eq", "value": canonical}]
 
-    # Not a known variant — return the term as-is (capitalized properly)
-    # This allows exact matches for countries like "United States",
-    # "Germany", etc. that don't have variants in the data
-    return [{"column": "company_country", "operator": "eq", "value": term.strip()}]
+    # Not a known country variant — return empty list (no match)
+    return []
 
 
 def _all_known_values() -> List[str]:
