@@ -2331,6 +2331,68 @@ silently accumulate more orphaned rows each quarter.
 
 ---
 
+#### 22. Country Canonicalization Mapping Duplicated — Two Independent Sources of Truth
+
+**Issue:** The same country semantic-variant mapping (Netherlands/The
+Netherlands, Russia/Russian Federation, Czech Republic/Czechia) exists
+twice, written independently:
+- `api/dimension_resolver.py::_COUNTRY_ALIASES` — used by the FILTER
+  path in `resolve_dimension_filter()` when a question mentions a
+  country (e.g., "show me Netherlands deals").
+- `api/tools.py::_COUNTRY_CANONICALIZATION` — used by the GROUP BY path
+  in `aggregate_results()` when grouping deals by company_country (e.g.,
+  "show me EMEA deals by country").
+
+Both currently contain identical mappings:
+```python
+# dimension_resolver.py
+"netherlands": "Netherlands",
+"the netherlands": "Netherlands",
+"russia": "Russia",
+"russian federation": "Russia",
+"czech republic": "Czech Republic",
+"czechia": "Czech Republic",
+
+# tools.py (same values)
+"the netherlands": "Netherlands",
+"netherlands": "Netherlands",
+"russian federation": "Russia",
+"russia": "Russia",
+"czechia": "Czech Republic",
+"czech republic": "Czech Republic",
+```
+
+Neither imports from the other.
+
+**Found during:** Country dimension implementation (Marketing Priority
+#2, 2026-09-19). Initial implementation only handled FILTER path;
+follow-up testing confirmed GROUP BY path needed separate
+canonicalization. Both were fixed in the same session (commits 47e0963,
+3a1b38a), but as two separate constants to meet immediate need.
+
+**Why it matters:** Same failure shape as other duplicated-mapping bugs
+found earlier (#18/#18-addendum: `get_week_of_quarter()` duplication).
+Two copies of one mapping don't drift until a fourth country variant
+needs adding (e.g., "Korea" vs "South Korea" vs "Republic of Korea") —
+someone updates one constant and not the other, and queries would
+canonicalize inconsistently between filtering and aggregation paths.
+
+**Status:** NOT BROKEN (both currently agree, confirmed identical
+mappings). Not urgent — logged so it has a paper trail before it
+silently drifts, per the pattern already seen elsewhere.
+
+**Work:** Consolidate to one shared constant (e.g., move to a new
+`api/country_canonicalization.py` module or add to
+`api/dimension_resolver.py` and import from `api/tools.py`), with both
+FILTER and GROUP BY paths importing from the same source. Worth doing
+proactively if a fourth country variant ever needs adding, so it only
+has to be added once.
+
+**Complexity:** Low effort, no urgency — only becomes urgent if/when a
+new country variant is discovered in the data.
+
+---
+
 ## 📝 Notes
 
 ### Patterns Established
