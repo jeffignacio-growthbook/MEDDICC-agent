@@ -45,6 +45,10 @@ STRUCTURED_HANDLERS = {
     "query_pipeline_coverage": ["status"],  # always "ok" or "error" — same
         # principle as query_forecast_trust; a complete "ok" result is not
         # "empty" just because some sub-fields (e.g. quota/stretch) are null.
+    "query_loss_concentration": ["status"],  # always "insufficient_data" or
+        # "ok" — the gated too-few-closed-deals response is a complete,
+        # honest answer (closed_deal_count + min_required), same principle
+        # as query_forecast_trust's week-3 gate, not an empty result.
     "query_rep_coaching": ["status"],  # always "insufficient_data" or "ok" —
         # gated on transcript-scored calls; the gate response is a complete
         # answer with coverage_note (not empty), same as forecast_trust pattern.
