@@ -126,9 +126,37 @@ ordering is the working plan until that validation happens.
    equivalent to Apollo's exact participant-ID match). Registered as
    `query_rep_coaching` handler with proper ambiguity handling (errors
    when company name matches multiple deals, not silent picking).
-5. **Win/loss pattern reasoning** — `query_win_loss` exists as a
-   lookup, not yet a reasoning primitive (no synthesis over WHY, just
-   what).
+5. **Win/loss pattern reasoning** — **Partially built (2026-09-19)**.
+   Audited first, per this roadmap's own discipline: `query_win_loss`
+   existed as a lookup (raw `narratives`/`wins`/`losses` lists, zero
+   aggregation in code), leaving all pattern-finding to whatever the
+   synthesis model did with the raw rows. Split the gap in two:
+   - **Rep/segment/stage-of-loss concentration: shipped.**
+     `scripts/loss_concentration.py::assess_loss_concentration()`,
+     registered as `query_loss_concentration`. Computed directly from
+     `deals.owner_email`/`segment`/`highest_stage_order_reached` — no
+     dependency on `win_loss_narratives`, so no data-quality ceiling.
+     Rate-normalized (never a bare count) against the team average,
+     with a min-n=5 floor per rep/segment slice. Stage-of-loss uses the
+     canonical bucket mapping (`field_semantics.stage_bucket()`), not
+     raw stage order — two administrative stages (`Review`,
+     `Disqualified`, orders 8-9) sit out of the real 0-6 stage sequence
+     and accounted for 90.8% of all lost deals fleet-wide at audit
+     time; their share is reported as its own explicit, labeled line,
+     never folded into the real stage-depth signal. Ghost-deal ($0
+     `deal_value`) share reported separately too, same precedent as
+     pipeline-coverage's HEURISTIC-vs-real-target split.
+   - **Competitor-mention / stated-reason narrative reasoning:
+     remains blocked** by a fleet-wide data ceiling, same category as
+     the MEDDICC signal's 2026-09-16 deferral — `deals.lost_reason` is
+     0% populated across all 1,132 lost deals (not a sample; the full
+     population), and `win_loss_narratives.competitor_mentioned` is
+     1.7% populated (1 of 58 lost-outcome rows). No amount of primitive
+     design manufactures data that was never captured. **Re-trigger
+     condition**: revisit if GrowthBook's own data collection improves
+     (e.g. `lost_reason` becomes a meaningfully-populated field) — this
+     is not something fixable in this codebase alone. See the
+     recommendation in the 2026-09-20 Decision Log entry below.
 6. **Territory/segment/region performance comparison** — **Deferred
    (2026-09-19)**. Audited: existing `dynamic_query` behavior already
    produces substantive, correctly-caveated comparisons (3/3 test
@@ -333,6 +361,27 @@ not a reason to resolve by picking one list over the other now.
 **Rationale**: same standard as forecast-trustworthiness and pipeline-coverage — gate on data availability, never fabricate signals past their evidence floor, explicit labeling of limitations (Fireflies/Gong not silently absent).
 
 **Status**: shipped and registered (`scripts/rep_coaching.py::assess_rep_coaching()`, `api/handlers.py::query_rep_coaching`, `api/router.py` intent map, `api/evaluator.py::STRUCTURED_HANDLERS`). Full Steps 2-6 plus A-E build cycle complete: hard transcript gate tests (2), coverage disclosure tests (2), Criterion A tests (3), Criterion B tests (4), Criterion C tests (3), integration tests (4 baseline scenarios), planted-discrepancy test (verifies no corruption/omission in combined output), ambiguity-handling tests (2). Total: 21 tests pass locally. Live CI (`gate-tests.yml`, runs [35476559151](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35476559151) and [35477162917](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35477162917) post-ambiguity-fix): 40/40 executed steps passed, 0 failures.
+
+### 2026-09-20: Win/Loss Pattern Reasoning (CRO Priority #5) — Partially Built
+
+**Context**: audited whether `query_win_loss` (a lookup over `win_loss_narratives`, zero aggregation in code) had a real reasoning-layer gap worth building, per this roadmap's own discipline of auditing before scoping. Full audit in `scripts/audit_win_loss_pattern_reasoning.py`'s live output (dispatched via `audit-win-loss-pattern-reasoning.yml`).
+
+**Findings**:
+- `deals.lost_reason` is 0% populated across all 1,132 lost deals fleet-wide (not a sample). `win_loss_narratives.competitor_mentioned` is 1.7% populated (1 of 58 lost-outcome rows). `win_loss_narratives` itself covers only 4.5% of closed deals (generated in capped batches, not automatically on every close). Separately: `key_factors` reads 100% "non-empty" but the LLM fills the absence of real data with commentary about the absence ("Rep provided no loss reason") rather than an empty list — see `PENDING_WORK.md` #24 for the full finding and the risk it poses to any future consumer.
+- Rep/segment/stage-of-loss concentration has NO such ceiling — `deals.owner_email`/`segment`/`highest_stage_order_reached` are populated on the full closed-deal population, independent of `win_loss_narratives` entirely.
+- Digging into stage-of-loss data during scoping surfaced a real methodological trap before any code was written: raw `highest_stage_order_reached` numeric order is NOT monotonic with real sales-cycle depth — two administrative "parking lot" stages (`Review`=order 8, `Disqualified`=order 9) sit OUT OF SEQUENCE after the real terminal stages (Closed Won=6, Closed Lost=7), both flagged `exclude_from_analysis` in `config/client.yaml`, and accounted for 90.8% of all 1,132 lost deals fleet-wide. This independently corroborated a separate, earlier live-test observation (`dynamic_query`'s own ad hoc answer to "why are we losing" flagged "~50+ of 80 losses are $0-value ghost deals") — two different investigation paths landing on the same underlying data-quality issue.
+
+**Decisions**:
+- Split the primitive in two rather than building one primitive on a mixed evidence floor: ship what's genuinely computable (concentration), hold what isn't (narrative reasoning).
+- **Shipped**: `scripts/loss_concentration.py::assess_loss_concentration()` — see the roadmap entry above (CRO #5) for the full design (rate-normalization vs. team average, min-n floor, canonical bucket-based stage mapping, administrative-stage share and ghost-deal share each reported as their own explicit, labeled lines).
+- **Not built**: competitor-mention/stated-reason pattern reasoning. Same standard as the MEDDICC signal's 2026-09-16 deferral — no primitive design manufactures data that was never captured. `query_win_loss`'s existing narrative lookup is unaffected and still runs (via `dynamic_query`, per the routing investigation below).
+- Also investigated, not assumed: `query_win_loss`'s routing to `dynamic_query` (rather than running standalone) turned out to be `router.py`'s own already-shipped "Phase 2: Unified routing" logic (confirmed live: classifier confidence 0.95, nowhere near the 0.80 floor — not a confidence-threshold miss, the same bug class fixed multiple times earlier this session). No fix needed; logged in `PENDING_WORK.md` #26 as a stale-docstring-only issue.
+
+**Recommendation (business process, not an engineering task)**: the only real path to unblocking competitor/stated-reason pattern reasoning is upstream of this codebase — making `lost_reason` a required HubSpot field on deal-close for Closed Lost, and prompting reps for a brief note when a competitor is involved. This is a decision for Jeff/Ryan and GrowthBook's own sales process, not something fixable in code. Logged, not scheduled as a task.
+
+**Rationale**: same standard as every other primitive this session — audit before building, never fabricate a signal past its real evidence floor, and treat "the data doesn't support this" as a legitimate, honestly-reported outcome rather than something to route around.
+
+**Status**: concentration piece shipped and registered (`api/handlers.py::query_loss_concentration`, `api/router.py` intent map — explicitly distinguished from `query_win_loss`, `api/evaluator.py::STRUCTURED_HANDLERS`). Full Steps A-E build cycle complete: 7 tests including two planted-discrepancy proofs (the `order`→`stage_id` bucket mapping and the loss-rate formula), each verified by actually breaking `scripts/loss_concentration.py` on disk, confirming the relevant test failed, and restoring it clean. Wired into `gate-tests.yml` as TEST 0bh. Live CI: green on the feature branch (run 35517842477) and re-confirmed on `main`'s own head after merge.
 
 ---
 
