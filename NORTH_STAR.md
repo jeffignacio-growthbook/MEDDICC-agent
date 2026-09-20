@@ -111,7 +111,21 @@ ordering is the working plan until that validation happens.
 3. **Deal risk/likelihood to close** — covered by `assess_deal_risk()`,
    cycle-length signal only. This is the gap that started this whole
    thread of work.
-4. **Rep performance and coaching signal** — no primitive exists.
+4. **Rep performance and coaching signal** — Built and verified
+   (2026-09-19): `scripts/rep_coaching.py::assess_rep_coaching()`
+   composes three coaching criteria over the most recent
+   transcript-scored call. Hard transcript gate (short-circuits if zero
+   transcript-scored calls present). Permanent coverage disclosure
+   (unconditional fleet-wide transcript availability sentence). Three
+   criteria: (A) MEDDICC component advancement (did rep advance
+   weak-and-concerning components at this stage), (B) discovery-question
+   mapping via LLM (did rep ask stage-appropriate questions from
+   `stage_focus_questions`), (C) talk-time diagnostic (Apollo only —
+   internal vs prospect speaking ratio; Fireflies/Gong limitation is
+   permanent and source-level, not a pending fix — those APIs provide no
+   equivalent to Apollo's exact participant-ID match). Registered as
+   `query_rep_coaching` handler with proper ambiguity handling (errors
+   when company name matches multiple deals, not silent picking).
 5. **Win/loss pattern reasoning** — `query_win_loss` exists as a
    lookup, not yet a reasoning primitive (no synthesis over WHY, just
    what).
@@ -293,6 +307,22 @@ not a reason to resolve by picking one list over the other now.
 **Rationale**: same standard as the forecast-trustworthiness build — never fabricate a signal past its real evidence floor, and never let a smooth-looking curve substitute for checking the reliability of its own inputs.
 
 **Status**: shipped and registered (`api/handlers.py::query_pipeline_coverage`, `api/router.py` intent map — disambiguated from the legacy, confirmed-broken `query_coverage`, `api/evaluator.py::STRUCTURED_HANDLERS`). Full Steps A-E build cycle complete: baseline tests (scope exclusion, stage weighting, gap-to-goal phrasing in both directions, HEURISTIC-vs-real-target labeling) plus two planted-discrepancy proofs — the HEURISTIC label requirement and the renewal-pipeline exclusion were each verified by actually planting the regression in `scripts/pipeline_coverage.py`, confirming the relevant test genuinely failed, then restoring and confirming a clean pass. Two new structural tests added to `scripts/test_forecast_analyses.py` for the underlying `query_stage_close_rate()`/`query_coverage_proxy_target_by_week()` functions. Wired into `gate-tests.yml` (TEST 0bf). Along the way, promoting the audit-script logic into `scripts/analytics/forecast_analyses.py` tripped two of this codebase's own existing correctness ratchets in `eval_reconstruction.py` — a null-coalescing violation (`_qualified_pipeline_at_week()` was coalescing a null `deal_value` to 0 in a dollar sum) and a missing `OUTCOME-READ` marker (`_actual_incremental_closed_won()`'s terminal-outcome read of `stage`) — both real findings, fixed by null-propagating (exclude-and-count, matching `compute_waterfall.py`'s established pattern) and adding the marker respectively. Live CI (`gate-tests.yml`, run [35457724659](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35457724659)): 39/39 executed steps passed, 0 failures (TEST 3's live smoke test skipped by design, gated behind an explicit opt-in input).
+
+### 2026-09-19: Rep Coaching (CRO Priority #4) Built and Verified
+**Context**: per-deal coaching assessment composing three criteria over the most recent transcript-scored call. Identified need for: (A) MEDDICC component advancement (did rep advance weak components), (B) discovery-question mapping (did rep ask stage-appropriate questions), (C) talk-time diagnostic (speaking ratio).
+
+**Decisions**:
+- Hard transcript gate: short-circuits with `insufficient_data` if deal has zero transcript-scored calls (`call_scores.text_source='transcript'`). No fabricated assessment when underlying data doesn't exist.
+- Permanent coverage disclosure: unconditional fleet-wide transcript availability sentence (`query_coaching_transcript_coverage()`) in BOTH gated and ungated paths — never omitted, matching HEURISTIC label pattern from pipeline-coverage primitive.
+- Shared Step 0 (weak component identification): stage bucketing (`stage_bucket()`), stage-specific `concerning_threshold` lookup (`stage_scoring_expectations`), pre-call baseline via `roll_up()`, band labeling (`band_label()`) and concerning-threshold comparison. Zero weak components returns empty list (not error) — "nothing to advance" is a valid coaching state.
+- Criterion A (MEDDICC component advancement): checks if target call improved weak component bands vs. pre-call baseline. Returns per-component advancement status with evidence.
+- Criterion B (discovery-question mapping): LLM (Haiku/assessor) reads transcript against `stage_focus_questions[bucket][component]`. Champion-specific: checks `genuine_champion.signals` for champion-elicitation attempts. Graceful LLM failure (question_asked=None with error note, doesn't crash). Transcript limit: 100,000 chars (12.5% of Haiku's 800k capacity) — initial 8,000-char PREFIX truncation was caught as critical bug (dropped 74.5% of avg 31,404-char transcript, silently cutting late-call champion elicitation, documented in `scripts/CRITERION_B_TRUNCATION_FIX.md`).
+- Criterion C (talk-time diagnostic): Apollo-sourced calls return diagnostic numbers (internal_talk_ratio, internal_question_share) via `coaching_talk_ratio.py::assess_call_talk_ratio()`. Fireflies/Gong return explicit `source_not_supported` with reason (never silently omitted) — those APIs provide no equivalent to Apollo's exact participant-ID matching (`participant_identities`), permanent source-level limitation not a pending fix.
+- Handler ambiguity handling: when company name resolves to multiple deals, returns explicit error listing deals (company, stage, owner) and asks user to disambiguate — no silent picking of first match.
+
+**Rationale**: same standard as forecast-trustworthiness and pipeline-coverage — gate on data availability, never fabricate signals past their evidence floor, explicit labeling of limitations (Fireflies/Gong not silently absent).
+
+**Status**: shipped and registered (`scripts/rep_coaching.py::assess_rep_coaching()`, `api/handlers.py::query_rep_coaching`, `api/router.py` intent map, `api/evaluator.py::STRUCTURED_HANDLERS`). Full Steps 2-6 plus A-E build cycle complete: hard transcript gate tests (2), coverage disclosure tests (2), Criterion A tests (3), Criterion B tests (4), Criterion C tests (3), integration tests (4 baseline scenarios), planted-discrepancy test (verifies no corruption/omission in combined output), ambiguity-handling tests (2). Total: 21 tests pass locally. Live CI (`gate-tests.yml`, runs [35476559151](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35476559151) and [35477162917](https://github.com/jeffignacio-growthbook/MEDDICC-agent/actions/runs/35477162917) post-ambiguity-fix): 40/40 executed steps passed, 0 failures.
 
 ---
 
