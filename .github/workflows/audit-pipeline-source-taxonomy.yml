@@ -1,0 +1,48 @@
+name: Audit Pipeline Source Taxonomy (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY —
+# HubSpot property-definition + deal-data reads, Supabase reads. No
+# writes anywhere.
+#
+# Marketing Priority #1 (pipeline generation by source/channel) scoping,
+# corrected per Jeff: demo request is one category among several
+# (also inbound content, outbound, partner-referred); UTMs are
+# unreliable at GrowthBook. Checks live HubSpot property schema for any
+# demo/form-related property on DEAL or CONTACT objects, real fill
+# rates on candidate source/channel deal properties (channel,
+# hs_analytics_source, hs_object_source, bdr_owner, etc.), Supabase's
+# existing sdr_owner_email fill rate, and real historical demand in
+# query_cost_log/fallback_log/learning_log/unanswered_queries.
+#
+# Report only. No primitive is designed or built here. Safe to delete
+# once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit pipeline source/channel taxonomy"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/audit_pipeline_source_taxonomy.py
