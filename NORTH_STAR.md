@@ -110,7 +110,13 @@ ordering is the working plan until that validation happens.
    entry below for the full design.
 3. **Deal risk/likelihood to close** — covered by `assess_deal_risk()`,
    cycle-length signal only. This is the gap that started this whole
-   thread of work.
+   thread of work. The MEDDICC-score signal is **NOT a currently-
+   actionable next build** — it's TIME-GATED, not engineering-gated:
+   deferred 2026-09-16 because closed-won deals with scores (N=4) show
+   no discriminative power, and the framework needs ≥30 to validate at
+   all. That threshold is reached by real quarters closing with scored
+   deals accumulating, not by more build effort now. See the
+   2026-09-16 Decision Log entry below for the full rationale.
 4. **Rep performance and coaching signal** — Built and verified
    (2026-09-19): `scripts/rep_coaching.py::assess_rep_coaching()`
    composes three coaching criteria over the most recent
@@ -173,9 +179,20 @@ ordering is the working plan until that validation happens.
 ### Marketing/RevOps-lead-facing primitives (Lyndsie), in priority order
 
 1. **Pipeline generation by source/channel** — no primitive exists.
-2. **Country/segment/region breakdown** — a real question was asked
-   live (the EMEA country-breakdown thread); not yet a governed
-   dimension the way region/segment/owner already are.
+2. **Country/segment/region breakdown** — **Shipped and verified
+   (2026-09-19)**. Country is now a fully governed dimension, both
+   directions: the FILTER path (`api/dimension_resolver.py`'s
+   `_country_candidates()`/`_COUNTRY_ALIASES`, commits `15295f5`/
+   `47e0963`) and the GROUP BY path (`api/tools.py`'s
+   `_COUNTRY_CANONICALIZATION`, used by `aggregate_results()`, commit
+   `3a1b38a`). Handles semantic variants affecting 78 deals (4.1% of
+   the dataset): Netherlands/The Netherlands, Russia/Russian
+   Federation, Czech Republic/Czechia. 7 tests in
+   `scripts/test_country_dimension.py`. Full build trail in
+   `scripts/COUNTRY_DIMENSION_BUILD_SUMMARY.md`. The two
+   canonicalization maps are currently independent, duplicated copies
+   of the same mapping (not yet consolidated) — logged as
+   `PENDING_WORK.md` #22, low urgency (both currently agree).
 3. **Conversion rate by stage/source** (MQL-to-SQL-style) — no
    primitive exists.
 4. **Data hygiene/attribution quality as a queryable signal** —
@@ -200,7 +217,11 @@ AUDIT: What primitive to build next" entry.
   domain expertise **agree** here — it's the one place both lists point
   the same direction. Already has `assess_deal_risk()` scoped and
   partially built (`scripts/deal_risk_assessor.py`), not a
-  from-scratch ask.
+  from-scratch ask. **This is usage evidence for the cycle-length
+  signal already shipped, NOT a green light to build the MEDDICC-score
+  signal next** — that piece is time-gated on real quarters
+  accumulating ≥30 scored won deals (2026-09-16 deferral), not
+  something more engineering effort unblocks now.
 - **Pipeline health/coverage** (CRO #2): raw-dominant in the logs (65%
   of all non-clean evidence, under the old "pipeline movement/
   snapshot" framing), but mostly a Phase 1b routing/handler-existence
@@ -210,11 +231,14 @@ AUDIT: What primitive to build next" entry.
   target.
 - **Rep performance/coaching (CRO #4), win/loss pattern reasoning (CRO
   #5), country/segment/region breakdown (Marketing #2), data hygiene
-  (Marketing #4)**: present in real usage but low-volume — consistent
-  with, not contradicting, where they sit on the lists above. The
-  country/segment/region evidence directly corroborates Marketing #2's
-  own stated example (the EMEA country-breakdown thread is in the
-  audited evidence).
+  (Marketing #4)**: present in real usage but low-volume at the time of
+  this 2026-09-19 audit — consistent with, not contradicting, where
+  they sit on the lists above. The country/segment/region evidence
+  directly corroborates Marketing #2's own stated example (the EMEA
+  country-breakdown thread is in the audited evidence). Note: CRO #4
+  and Marketing #2 have both since shipped (see their roadmap entries
+  above) — this bullet is a historical snapshot of evidence as of the
+  audit date, not a live status list.
 - **Forecast trustworthiness (CRO #1)** — ranked #1 by domain expertise
   — shows only **1 raw hit** in the full-history real-usage audit.
   Can't tell from log data alone whether that means genuinely rare so
@@ -233,6 +257,14 @@ above it by domain reasoning, not because usage ranks it lower. It does
 even though it's ranked #1 here on domain judgment. That gap between
 domain judgment and observed usage is itself worth tracking over time,
 not a reason to resolve by picking one list over the other now.
+
+**A second thing worth stating plainly, so this section is never
+mistaken for a build queue**: "top priority" here describes the
+cycle-length signal already shipped, not the deferred MEDDICC-score
+signal. The MEDDICC piece is blocked on calendar time (real quarters
+closing with enough scored won deals to clear the ≥30 validation
+floor), not on engineering bandwidth — picking it up "next" isn't
+possible regardless of priority ranking until that data exists.
 
 ---
 
