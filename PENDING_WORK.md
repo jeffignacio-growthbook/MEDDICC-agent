@@ -2393,55 +2393,43 @@ new country variant is discovered in the data.
 
 ---
 
-#### 23. AMER vs NAM Region Naming Inconsistency — Data Hygiene Gap
-
-**Issue:** The `deals.region` column does not contain any rows with
-`region = 'AMER'`, but real questions from users naturally reference
-"AMER" when asking about the Americas region. This creates a data
-quality gap where dimension resolution correctly identifies "AMER" as a
-region filter, but all queries return zero results.
+#### 23. AMER vs NAM Region Naming — RESOLVED (was misdiagnosed as a data-hygiene gap)
 
 **Found during:** Territory comparison audit (CRO Priority #6,
 2026-09-19). Test question "How does EMEA compare to AMER this
 quarter?" returned zero AMER deals (0 active, 0 won, 0 lost), while
-EMEA returned 47 active deals — a clear asymmetry. The query log shows
-AMER was correctly resolved and filtered for, but the data contains no
+EMEA returned 47 active deals — a clear asymmetry. The query log showed
+AMER was correctly resolved and filtered for, but the data contained no
 matching region values.
 
-**Expected reality:** AMER/NAM/Americas deals do exist in the pipeline,
-they're just tagged with a different region value (likely "NAM",
-"Americas", or null/UNKNOWN).
+**Confirmed directly by Jeff (2026-09-20):** this was NOT a data
+hygiene gap. "NAM" is GrowthBook's actual, correct region terminology
+— not a typo, not a legacy value, not one of several inconsistent
+variants in the data. The test question itself used the wrong term
+("AMER" instead of "NAM"); the data was never broken.
 
-**Why it matters:** Questions about regional performance are legitimate
-CRO-level questions. When a user asks "How does AMER compare to EMEA",
-they expect to see Americas data, not a zero-result response that
-implies no deals exist in that region. The current mismatch between
-natural language ("AMER") and actual data values creates a bad
-experience where the agent appears to misunderstand the question or
-suggests the data is broken.
-
-**Status:** NOT BROKEN from a system perspective — dimension resolution
-works correctly, queries execute correctly, the gap is purely a naming
-mismatch between user vocabulary and data values. But BROKEN from a
-user experience perspective — the question fails to produce useful
-results.
-
-**Work:** Three options:
-1. **Data normalization** (recommended): Audit `deals.region` to find
-   the actual value used for Americas deals (likely "NAM" or
-   "Americas"), then either:
-   - Add "AMER" as a semantic alias in dimension_resolver.py's region
-     canonicalization (same pattern as country variants), OR
-   - Standardize all region values in the data to match user vocabulary
-2. **Documentation**: If "AMER" is genuinely not a region in
-   GrowthBook's model, document the correct region names in the schema
-   descriptions so the LLM can use the right terminology
-3. **Both**: Canonicalize common variants AND document the canonical
-   names
-
-**Complexity:** Low effort (add one alias to dimension_resolver.py, or
-audit and document region names). No urgency unless regional comparison
-questions become frequent.
+**Fix shipped:** Even though the underlying data was never wrong, a
+real user asking a live question might still reasonably say "AMER"
+colloquially. `api/dimension_resolver.py`'s `_region_candidates()` now
+resolves "AMER" as an alias to the canonical "NAM" region_code, via a
+new `_REGION_ALIASES` map — the same alias-map pattern
+`_country_candidates()` already uses for country variants (Netherlands
+vs The Netherlands, Russia vs Russian Federation). Verified locally
+before the fix: `resolve_dimension_filter("NAM")` already resolved
+correctly (`region.eq.NAM`); `resolve_dimension_filter("AMER")`
+returned `unknown_value`. After the fix, both resolve to the same
+canonical `region.eq.NAM` filter, in both the direct-lookup path and
+the proactive whole-question scan
+(`scan_question_for_known_dimension_terms()`, which calls
+`resolve_dimension_filter()` per candidate term, so no separate wiring
+was needed there). Three regression tests added to
+`tests/test_dimension_resolver.py`
+(`test_nam_resolves_correctly`, `test_amer_resolves_as_a_colloquial_
+alias_for_nam`, `test_amer_is_surfaced_by_the_proactive_scan_too`);
+the alias's own load-bearing-ness was verified by actually emptying
+`_REGION_ALIASES` and confirming the AMER test fails before restoring
+it clean. No `deals.region` data changes were made or needed — this
+was a resolver-side vocabulary fix only.
 
 ---
 

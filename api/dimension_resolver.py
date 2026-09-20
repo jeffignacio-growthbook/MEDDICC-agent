@@ -120,10 +120,25 @@ def _normalize(term: str) -> str:
     return re.sub(r"[\s\-]+", " ", t)
 
 
+# Colloquial region synonyms that don't appear as region_definitions keys
+# in config/regions.yaml — GrowthBook's own systems call the Americas
+# region "NAM", never "AMER" (confirmed directly by Jeff, 2026-09-20, after
+# the territory comparison audit's "How does EMEA compare to AMER" test
+# question returned zero results: NAM is correct terminology, the test
+# question used the wrong term, not a data gap). A real user asking a
+# question may still reasonably say "AMER" colloquially, so it's resolved
+# here to the same canonical region_code rather than left to fail as
+# unknown_value.
+_REGION_ALIASES = {"AMER": "NAM"}
+
+
 def _region_candidates(term: str) -> List[Dict[str, Any]]:
     norm = _normalize(term)
     for region_code in _load_regions():
         if _normalize(region_code) == norm:
+            return [{"column": "region", "operator": "eq", "value": region_code}]
+    for alias, region_code in _REGION_ALIASES.items():
+        if _normalize(alias) == norm and region_code in _load_regions():
             return [{"column": "region", "operator": "eq", "value": region_code}]
     return []
 
