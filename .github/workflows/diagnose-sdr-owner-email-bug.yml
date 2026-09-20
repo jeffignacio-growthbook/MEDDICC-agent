@@ -1,0 +1,43 @@
+name: Diagnose sdr_owner_email ETL Bug (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY —
+# HubSpot API reads only. No writes anywhere.
+#
+# deals.sdr_owner_email is 0/1912 populated in Supabase despite
+# HubSpot's own bdr_owner property being populated on 157/1937 live
+# deals (confirmed by audit-pipeline-source-taxonomy.yml). Checks
+# whether the ETL's owner_id->email map (fetch_owner_emails(), GET
+# /crm/v3/owners) is missing the real bdr_owner id values in use,
+# specifically whether they're ARCHIVED owners the default
+# (unarchived-only) endpoint call never sees.
+#
+# Report only — the actual code fix happens separately once this
+# confirms the real root cause. Safe to delete once done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Diagnose sdr_owner_email ETL bug"
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          PYTHONPATH=.:scripts python3 scripts/diagnose_sdr_owner_email_bug.py
