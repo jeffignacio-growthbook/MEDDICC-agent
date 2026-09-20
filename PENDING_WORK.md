@@ -2433,6 +2433,148 @@ was a resolver-side vocabulary fix only.
 
 ---
 
+#### 24. `win_loss_narratives.key_factors` — "100% Populated" Is Misleading, LLM Fills Absence-of-Data as a Factor
+
+**Issue:** `scripts/analytics/generate_win_loss.py`'s prompt asks the
+model for "key_factors: list of 3-5 short factor strings" for every
+closed deal, whether or not there's any real signal to report. When the
+underlying data is empty (no `lost_reason`, no call transcripts, no
+MEDDICC history), the model does not return an empty list — it fills
+the field with commentary ABOUT the absence, e.g. "Rep provided no loss
+reason" (10x across 58 lost narratives), "No call activity documented"
+(8x), "No call transcripts recorded" (7x), "Poor deal hygiene" (3x).
+
+**Found during:** CRO Priority #5 audit (win/loss pattern reasoning,
+2026-09-20). `key_factors` reads as 58/58 (100%) non-empty across all
+lost-outcome narratives — which looks like excellent coverage until the
+actual strings are inspected. Of 290 total key_factors mentions
+sampled, the top 10 most common strings are ALL variations of "there
+was nothing to report here," not real loss drivers (competitor,
+pricing, timing, champion loss, etc.).
+
+**Why it matters:** This is the same class of danger as a confidently-
+wrong number, just in a text field. Any future code (or any future
+`dynamic_query` reasoning pass) that checks `if key_factors:` or counts
+non-empty rows as "signal available" will systematically overcount —
+the field's fill rate looks like 100% coverage of REAL pattern data
+when it is actually ~100% coverage of "the LLM said something," a
+meaningful fraction of which is itself a report of missing data. A
+naive competitor-frequency or factor-frequency aggregation built
+directly on this field, without first filtering out the "no data"-
+flavored strings, would produce a pattern-reasoning primitive whose top
+finding is "we have no data" dressed up as a substantive factor.
+
+**Status:** NOT FIXED. Confirmed live, not hypothetical — this is the
+actual content of the actual table today, not a worst-case guess.
+
+**Work:** Either (a) change `generate_win_loss.py`'s prompt to return an
+empty `key_factors` list (or a single explicit `"insufficient_data"`
+sentinel) when there's no real signal, instead of narrating the
+absence, or (b) if the field is ever read for pattern reasoning, filter
+out absence-of-data phrasing (e.g. a denylist of "no reason"/"no call"/
+"no data"/"not provided" substrings) before treating a non-empty
+`key_factors` as real signal. (a) is the more durable fix since it
+closes the gap at the source instead of requiring every future
+consumer to remember the filter.
+
+**Complexity:** Low effort for (a) — a one-line prompt change plus a
+backfill decision for the 58 existing rows. Not urgent on its own
+(nothing reads `key_factors` for aggregation today), but load-bearing
+BEFORE any pattern-reasoning primitive is built on top of it.
+
+---
+
+#### 25. `generate_win_loss.py` Double-Encodes `key_factors` — Stored as a JSON String, Not a Native jsonb Array
+
+**Issue:** `scripts/analytics/generate_win_loss.py` writes
+`'key_factors': json.dumps(parsed.get('key_factors', []))` into
+`win_loss_narratives.key_factors`, a `jsonb` column. Passing an
+already-`json.dumps()`'d Python string into a jsonb column write
+double-encodes it: Postgres stores a JSON STRING whose contents happen
+to look like a JSON array (`"[\"a\", \"b\"]"`), not a real JSON array
+value.
+
+**Found during:** CRO Priority #5 audit (win/loss pattern reasoning,
+2026-09-20), while checking whether `key_factors` was safe to iterate
+directly for frequency counting. Confirmed live: all 58 lost-outcome
+`win_loss_narratives` rows return `key_factors` as a Python `str`
+requiring an explicit `json.loads()` to recover the actual list, not a
+native Python `list` as a correctly-stored jsonb array would.
+
+**Why it matters:** Any code written against `key_factors` assuming
+supabase-py hands back a Python list directly (as it does for a
+correctly-stored jsonb array elsewhere in this codebase) will either
+crash (iterating a string instead of a list produces one character at
+a time) or silently misbehave. Real but minor — nothing currently reads
+this field, so it hasn't caused a live incident, but it's a landmine
+for whoever builds the first thing that does.
+
+**Status:** NOT FIXED. Confirmed via live data, not a guess.
+
+**Work:** Change `generate_win_loss.py` to write
+`parsed.get('key_factors', [])` directly (the native list), not
+`json.dumps(...)` of it — the supabase client / PostgREST layer handles
+jsonb serialization on its own. A backfill (`UPDATE ... SET
+key_factors = key_factors::text::jsonb` or a small Python pass calling
+`json.loads()` on each existing row) would fix the 58 rows already
+written this way.
+
+**Complexity:** Low effort — one-line fix in the writer, small backfill
+for existing rows. Not blocking anything today.
+
+---
+
+#### 26. `query_win_loss`'s Routing to `dynamic_query` Is Intentional, Not a Confidence-Floor Miss — Docstring Is Stale
+
+**Issue:** Live-testing "why are we losing deals," "what's causing our
+losses," and "which competitor do we lose to most" (CRO Priority #5
+audit, 2026-09-20) showed all three routed through `dynamic_query`,
+never through `query_win_loss` as a standalone dedicated handler —
+apparently contradicting `api/router.py`'s own `INTENT_MAP` description
+of `query_win_loss`, which explicitly lists these exact phrasings
+("why are we losing," "what's causing deals to close lost") as its
+territory.
+
+**Investigated (not assumed):** the production log for all three test
+runs shows `[UNIFIED_ROUTING] query_win_loss → dynamic loop (classifier
+confidence=0.95, bypassed)` — confidence 0.95, nowhere near the 0.80
+routing floor. This is **not** a confidence-threshold miss, the same
+bug class fixed multiple times earlier this session. It's `api/
+router.py`'s own explicit, already-shipped "Phase 2: Unified routing
+for migrated handlers" logic (line ~5275): `query_pipeline_movement`,
+`query_pipeline`, `query_stale_deals`, `query_waterfall`,
+`query_rep_pipeline`, `query_win_loss`, and `query_deals_at_risk` are
+ALL deliberately routed to `dynamic_query` regardless of classifier
+confidence, because each is registered as a callable TOOL for the
+dynamic loop (`_call_handler_as_tool`, line ~4634) rather than run
+directly — this is the same migration already logged and closed in
+this file's own "✅ Phase 2 Handler 5/6 (query_win_loss) — Migrated, 3
+real bugs found" section.
+
+**Why it matters:** Nothing is broken — `query_win_loss`'s raw-list
+logic still runs, just as one tool inside `dynamic_query`'s reasoning
+loop rather than as the sole handler, which is why the live answers
+showed genuine ad hoc computation (ARR breakdowns, MEDDICC averages,
+$0-value ghost-deal detection) rather than a bare dump. The only real
+issue is `INTENT_MAP`'s description text for `query_win_loss` (and the
+other 6 migrated handlers) still reads as if the classifier's chosen
+handler is what actually executes — a future reader could reasonably
+assume there's live branching here when the routing for these 7
+handlers is now unconditional.
+
+**Status:** NOT A BUG. No fix pass needed on the routing itself.
+
+**Work:** Optional, cosmetic only: update `INTENT_MAP`'s entries for
+the 7 unified-routing handlers to note that they always execute via
+`dynamic_query` as a tool, not as a standalone handler, so a future
+reader of `router.py` doesn't have to trace the Phase-2 migration logic
+to learn that.
+
+**Complexity:** Trivial (comment/docstring text only) if done at all —
+no functional change.
+
+---
+
 ## 📝 Notes
 
 ### Patterns Established
