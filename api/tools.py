@@ -9,6 +9,17 @@ try:
 except ImportError:
     from api.field_semantics import is_test_deal
 
+# Country canonicalization for GROUP BY operations (same mapping as
+# dimension_resolver.py's _COUNTRY_ALIASES - see COUNTRY_DIMENSION_BUILD_SUMMARY.md)
+_COUNTRY_CANONICALIZATION = {
+    "the netherlands": "Netherlands",
+    "netherlands": "Netherlands",
+    "russian federation": "Russia",
+    "russia": "Russia",
+    "czechia": "Czech Republic",
+    "czech republic": "Czech Republic",
+}
+
 _VALID_COLUMNS = {}
 
 def _init_valid_columns(sb):
@@ -188,9 +199,20 @@ async def aggregate_results(data, group_by, aggregations):
     if not isinstance(aggregations, dict) or not aggregations:
         return {"error": "aggregations must be a non-empty dict like {'column': 'sum'}"}
 
+    # Apply country canonicalization when grouping by company_country
+    # (fixes gap where "Netherlands" and "The Netherlands" would show as
+    # separate rows instead of combined - see test_groupby_canonicalization_gap.py)
+    def _canonicalize_group_key(value, column_name):
+        if column_name == "company_country" and value:
+            normalized = str(value).strip().lower()
+            return _COUNTRY_CANONICALIZATION.get(normalized, value)
+        return value
+
     groups = defaultdict(list)
     for row in data:
-        groups[row.get(group_by, "unknown")].append(row)
+        raw_key = row.get(group_by, "unknown")
+        canonical_key = _canonicalize_group_key(raw_key, group_by)
+        groups[canonical_key].append(row)
     result = []
     for key, rows in groups.items():
         entry = {group_by: key}
