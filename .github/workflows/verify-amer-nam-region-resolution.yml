@@ -1,0 +1,53 @@
+name: Verify AMER/NAM Region Resolution (one-off)
+
+# One-off live verification workflow, not part of the regular gates.
+# READ-ONLY against Supabase (route_question()/query_cost_log writes are
+# the same benign logging side effect every real production question
+# already has — no deal data is written).
+#
+# PENDING_WORK.md #23: confirmed by Jeff that "NAM" (not "AMER") is
+# GrowthBook's actual region terminology, and api/dimension_resolver.py
+# now resolves "AMER" as a colloquial alias for the canonical "NAM"
+# region_code. This runs BOTH the original test question ("...AMER...")
+# and its NAM equivalent through the full production pipeline via
+# scripts/test_question.py, end to end (classification -> routing ->
+# handler -> synthesis) — not just the resolver unit, which was already
+# verified locally without live credentials.
+#
+# Report only. Safe to delete once this one-time verification is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Verify NAM resolves + AMER resolves as its alias, end to end"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          cat <<'EOF' > /tmp/amer_nam_questions.txt
+          # PENDING_WORK.md #23 verification
+          How does EMEA compare to NAM this quarter?
+          How does EMEA compare to AMER this quarter?
+          EOF
+          python scripts/test_question.py /tmp/amer_nam_questions.txt
