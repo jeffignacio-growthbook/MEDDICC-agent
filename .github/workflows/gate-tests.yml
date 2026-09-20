@@ -245,6 +245,51 @@ jobs:
           # (always present, explicitly None for non-Apollo sources).
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/test_coaching_talk_ratio.py
 
+      - name: "TEST 0bh — Offline: loss-concentration primitive (assess_loss_concentration)"
+        run: |
+          set -e
+          # 2026-09-20: NORTH_STAR.md CRO Priority #5, the buildable half
+          # of the win/loss pattern-reasoning audit. query_win_loss already
+          # exists and reads win_loss_narratives, but does zero aggregation
+          # in code — pattern reasoning is left entirely to the synthesis
+          # model. The audit split that gap in two: competitor-mention/
+          # stated-reason reasoning is BLOCKED by a hard data ceiling
+          # (deals.lost_reason 0% populated fleet-wide, win_loss_
+          # narratives.competitor_mentioned 1.7% populated) — not built
+          # here, same class as MEDDICC's 1.2% coverage. Rep/segment/
+          # stage-of-loss concentration has NO such ceiling — computed
+          # directly from deals.owner_email/segment/
+          # highest_stage_order_reached, independent of win_loss_
+          # narratives entirely.
+          #
+          # Design decisions confirmed before building: time-window
+          # scoped with an insufficient_data floor (never a rate off too
+          # few deals); rep/segment breakdowns are RATE-normalized vs. the
+          # team average with their own per-row min-n=5 floor
+          # (insufficient_volume, not a misleading 100%/0% off 1-2
+          # deals); stage-of-loss uses the CANONICAL BUCKET mapping
+          # (field_semantics.stage_bucket()), not raw
+          # highest_stage_order_reached — confirmed live during scoping
+          # that two administrative stages (Review/Disqualified, orders 8
+          # and 9) sit OUT OF SEQUENCE after the real terminal stages
+          # (Closed Won=6, Closed Lost=7) and accounted for 90.8% of all
+          # lost deals fleet-wide at audit time — their share is reported
+          # as its own explicit, labeled line, never folded into the
+          # bucket breakdown. Ghost-deal ($0 deal_value) share is also
+          # reported separately, not silently excluded — same precedent
+          # as pipeline_coverage's HEURISTIC-vs-real-target separation.
+          #
+          # scripts/test_loss_concentration.py covers: the insufficient_
+          # data floor, rate-normalization with the min-n floor, the
+          # bucket-vs-raw-order stage mapping (using the real config/
+          # client.yaml, not mocked), the ghost-deal share, and two
+          # planted-discrepancy proofs — breaking the order->stage_id
+          # mapping and breaking the loss-rate formula — each verified by
+          # actually editing scripts/loss_concentration.py on disk,
+          # confirming the relevant test failed, and restoring it clean
+          # (confirmed via a post-restore re-run, not just trusted).
+          PYTHONPATH=.:scripts:api python3 scripts/test_loss_concentration.py
+
       - name: "TEST 0c — Offline: date/time-window resolution (single-source-of-truth gate)"
         run: |
           set -e

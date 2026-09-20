@@ -1030,6 +1030,41 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
         }
 
 
+async def query_loss_concentration(params: dict, sb) -> dict:
+    """
+    Rep/segment/stage-of-loss concentration for closed deals in a time
+    window (NORTH_STAR.md CRO Priority #5, the buildable half of the
+    win/loss pattern-reasoning audit, 2026-09-20).
+
+    NOT the same as query_win_loss (that handler reads win_loss_
+    narratives' competitor/reason fields, which are blocked by a hard
+    data ceiling — 0% lost_reason fleet-wide, 1.7% competitor_mentioned).
+    This composes rep/segment loss-RATE breakdowns (never a bare count,
+    always vs. the team average) and a canonical bucket-based stage-of-
+    loss distribution (not raw highest_stage_order_reached — two
+    administrative stages sit out of the real stage sequence and would
+    otherwise dominate the numbers) from deals.owner_email/segment/
+    highest_stage_order_reached directly — no win_loss_narratives
+    dependency, no data-quality ceiling.
+
+    Answers questions like:
+    - "Where are our losses concentrated?"
+    - "Which rep/segment has the worst loss rate this quarter?"
+    - "How deep into the funnel are we losing deals?"
+    """
+    from loss_concentration import assess_loss_concentration
+
+    tw = _resolve_tw(params)
+    try:
+        return assess_loss_concentration(sb, time_window=tw)
+    except Exception as e:
+        logger.error(f"[LOSS_CONCENTRATION] Failed to assess loss concentration: {e}")
+        return {
+            "error": f"Failed to assess loss concentration: {e}",
+            "status": "error",
+        }
+
+
 async def query_win_loss(params: dict, sb) -> dict:
     """
     Comprehensive win/loss analysis combining:

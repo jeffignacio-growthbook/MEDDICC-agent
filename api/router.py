@@ -190,7 +190,22 @@ HANDLER_DESCRIPTIONS = {
     "query_high_priority_deal_risk": "risk assessment for late-stage deals (Negotiating/Awaiting Signature) OR COMMIT forecast, deal duration vs segment cycle length, stale MEDDICC scores",
     "query_forecast_trust": "how much to trust THIS QUARTER's forecast number, forecast trustworthiness/reliability/confidence, is our Commit pipeline reliable, how risky is this quarter's number — compares this quarter's COMMIT+MOST_LIKELY pipeline against historical win rates at the same point in the quarter. NOT the same as query_high_priority_deal_risk (per-deal list) — this is a quarter-level trust signal.",
     "query_definition": "what does a term mean, how is X defined, what counts as Y — looks up definitions in semantic layer (field_semantics.yaml, client.yaml, metrics.yaml). Examples: 'what does at-risk mean to you?', 'what counts as qualified?', 'how do you define forecast?'",
-    "query_win_loss": "WIN/LOSS ANALYSIS, WHY we won/lost, win/loss BREAKDOWN, win/loss SUMMARY — narrative analysis of closed deal outcomes, not just counts. Use for: 'why are we losing', 'win loss breakdown', 'breakdown of wins vs losses', 'win rate by segment', 'give me a win loss summary', 'what's causing deals to close lost', 'win/loss reasons', 'loss analysis'. DO NOT use for simple counts of won/lost deals (use query_waterfall for flow metrics).",
+    "query_win_loss": "WIN/LOSS ANALYSIS, WHY we won/lost, win/loss BREAKDOWN, win/loss SUMMARY — narrative analysis of closed deal outcomes, not just counts. Use for: 'why are we losing', 'win loss breakdown', 'breakdown of wins vs losses', 'win rate by segment', 'give me a win loss summary', 'what's causing deals to close lost', 'win/loss reasons', 'loss analysis'. DO NOT use for simple counts of won/lost deals (use query_waterfall for flow metrics). DO NOT use for WHERE losses concentrate by rep/segment/stage (use query_loss_concentration).",
+    "query_loss_concentration": (
+        "WHERE losses are CONCENTRATED — by rep, by segment, or by how "
+        "deep into the funnel (stage-of-loss), each as a RATE vs. the "
+        "team average, never a bare count. Use for: 'which rep has the "
+        "worst loss rate', 'which segment loses the most', 'how deep "
+        "into the funnel are we losing deals', 'loss concentration by "
+        "rep/segment', 'is this rep/segment losing more than average'. "
+        "Computed directly from deals.owner_email/segment/"
+        "highest_stage_order_reached — NOT dependent on "
+        "win_loss_narratives, so NOT subject to that table's data-"
+        "quality ceiling. DO NOT use for WHY deals are lost (competitor/"
+        "stated-reason narrative) — use query_win_loss for that, though "
+        "note its own reasoning ceiling is a hard data-quality gap, not "
+        "a routing choice."
+    ),
     "query_objections": "objections by category/stage/trend",
     "query_feature_gaps": "feature gaps by severity/competitor",
     "query_coverage": "pipeline coverage vs target, quota attainment — LEGACY, confirmed broken (produces nonsensical 8,000%+ ratios). Prefer query_pipeline_coverage for coverage questions.",
