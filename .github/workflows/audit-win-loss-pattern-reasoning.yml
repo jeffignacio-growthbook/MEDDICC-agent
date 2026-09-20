@@ -1,0 +1,62 @@
+name: Audit Win/Loss Pattern Reasoning (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY —
+# Supabase reads only in step 1 (no writes anywhere); step 2 runs real
+# questions through the full production pipeline via test_question.py,
+# the same benign query_cost_log logging side effect every real
+# production question already has.
+#
+# CRO Priority #5 scoping (win/loss PATTERN reasoning — why we're
+# losing, competitor/rep/segment concentration — not just individual
+# win/loss outcome listing). query_win_loss already exists and reads
+# win_loss_narratives; this audits whether it (or dynamic_query) already
+# does real pattern computation, whether the underlying data supports
+# it (lost_reason blank-rate ceiling, competitor_mentioned/key_factors
+# fill rate), and whether real historical questions asked for this.
+#
+# Report only. No primitive is designed or built here. Safe to delete
+# once this one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Step 1 — data quality + what's-computable audit (read-only)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/audit_win_loss_pattern_reasoning.py
+
+      - name: "Step 2 — real pattern-style questions through the full production pipeline"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+        run: |
+          cat <<'EOF' > /tmp/win_loss_pattern_questions.txt
+          # CRO Priority #5 scoping audit
+          Why are we losing deals this quarter?
+          What's causing our losses this quarter?
+          Which competitor do we lose to most?
+          EOF
+          python scripts/test_question.py /tmp/win_loss_pattern_questions.txt
