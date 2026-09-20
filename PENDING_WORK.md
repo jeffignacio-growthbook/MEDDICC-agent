@@ -2393,6 +2393,58 @@ new country variant is discovered in the data.
 
 ---
 
+#### 23. AMER vs NAM Region Naming Inconsistency — Data Hygiene Gap
+
+**Issue:** The `deals.region` column does not contain any rows with
+`region = 'AMER'`, but real questions from users naturally reference
+"AMER" when asking about the Americas region. This creates a data
+quality gap where dimension resolution correctly identifies "AMER" as a
+region filter, but all queries return zero results.
+
+**Found during:** Territory comparison audit (CRO Priority #6,
+2026-09-19). Test question "How does EMEA compare to AMER this
+quarter?" returned zero AMER deals (0 active, 0 won, 0 lost), while
+EMEA returned 47 active deals — a clear asymmetry. The query log shows
+AMER was correctly resolved and filtered for, but the data contains no
+matching region values.
+
+**Expected reality:** AMER/NAM/Americas deals do exist in the pipeline,
+they're just tagged with a different region value (likely "NAM",
+"Americas", or null/UNKNOWN).
+
+**Why it matters:** Questions about regional performance are legitimate
+CRO-level questions. When a user asks "How does AMER compare to EMEA",
+they expect to see Americas data, not a zero-result response that
+implies no deals exist in that region. The current mismatch between
+natural language ("AMER") and actual data values creates a bad
+experience where the agent appears to misunderstand the question or
+suggests the data is broken.
+
+**Status:** NOT BROKEN from a system perspective — dimension resolution
+works correctly, queries execute correctly, the gap is purely a naming
+mismatch between user vocabulary and data values. But BROKEN from a
+user experience perspective — the question fails to produce useful
+results.
+
+**Work:** Three options:
+1. **Data normalization** (recommended): Audit `deals.region` to find
+   the actual value used for Americas deals (likely "NAM" or
+   "Americas"), then either:
+   - Add "AMER" as a semantic alias in dimension_resolver.py's region
+     canonicalization (same pattern as country variants), OR
+   - Standardize all region values in the data to match user vocabulary
+2. **Documentation**: If "AMER" is genuinely not a region in
+   GrowthBook's model, document the correct region names in the schema
+   descriptions so the LLM can use the right terminology
+3. **Both**: Canonicalize common variants AND document the canonical
+   names
+
+**Complexity:** Low effort (add one alias to dimension_resolver.py, or
+audit and document region names). No urgency unless regional comparison
+questions become frequent.
+
+---
+
 ## 📝 Notes
 
 ### Patterns Established

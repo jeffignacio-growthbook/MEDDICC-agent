@@ -129,8 +129,18 @@ ordering is the working plan until that validation happens.
 5. **Win/loss pattern reasoning** — `query_win_loss` exists as a
    lookup, not yet a reasoning primitive (no synthesis over WHY, just
    what).
-6. **Territory/segment/region performance comparison** — dimension
-   resolution exists, no comparative-reasoning layer on top.
+6. **Territory/segment/region performance comparison** — **Deferred
+   (2026-09-19)**. Audited: existing `dynamic_query` behavior already
+   produces substantive, correctly-caveated comparisons (3/3 test
+   questions succeeded with appropriate sample-size warnings and
+   statistical awareness). Historical usage: 0.6% of queries (1/166),
+   no explicit user requests. Dimension resolution already works;
+   `filter_table` + `aggregate_results` + synthesis already compute and
+   compare win rates, coverage ratios, and segment rankings. No
+   evidence of weak/wrong/generic output. **Re-trigger conditions**:
+   2-3 more comparative questions in logs, OR explicit user request, OR
+   demonstrated failure/inadequate output. Full audit:
+   `scripts/TERRITORY_COMPARISON_AUDIT_REPORT.md`.
 
 ### Marketing/RevOps-lead-facing primitives (Lyndsie), in priority order
 
