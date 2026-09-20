@@ -197,6 +197,24 @@ _DEAL_TYPE_ALIASES = {
     "upsell": ("expansion_arr", "gt", 0),
 }
 
+# Country canonicalization mapping — semantic variants found in the
+# deals table that refer to the same country. Audit (2026-09-19)
+# found 3 variant groups affecting 78 deals (4.1% of total 1,912):
+#   - Netherlands (38 deals) + Netherlands (20 deals) = 58 deals
+#   - Russia (3) + Russian Federation (1) = 4 deals
+#   - Czech Republic (12) + Czechia (4) = 16 deals
+# Maps each variant to its canonical form (what the query should
+# filter against). The canonical form is also listed as a variant for
+# completeness, so "Netherlands" matches itself.
+_COUNTRY_ALIASES = {
+    "netherlands": "Netherlands",
+    "the netherlands": "Netherlands",
+    "russia": "Russia",
+    "russian federation": "Russia",
+    "czech republic": "Czech Republic",
+    "czechia": "Czech Republic",
+}
+
 # "new" alone is far too common an English word to scan a whole
 # question for opportunistically (same reasoning as the ROW region /
 # Unknown segment values in _SCAN_COLLISION_DENYLIST above — "what's
@@ -235,11 +253,47 @@ def _deal_type_candidates(term: str) -> List[Dict[str, Any]]:
     return []
 
 
+def _country_candidates(term: str) -> List[Dict[str, Any]]:
+    """Matches a country name against company_country, with
+    canonicalization for semantic variants (Netherlands vs The
+    Netherlands, Russia vs Russian Federation, Czech Republic vs
+    Czechia). Returns the canonical form from _COUNTRY_ALIASES if the
+    normalized term matches a known variant, or the term itself if not
+    (allowing exact matches against other country values that don't
+    have variants). Does NOT validate whether the country actually
+    exists in the deals table — that's intentional, same as
+    region/segment/roster matching: resolve_dimension_filter() is a
+    RESOLUTION function (what filter clause does this term mean), not a
+    VALIDATION function (does that value exist in the data). Validation
+    happens at query time via the DB's actual records."""
+    norm = _normalize(term)
+
+    # Check if this is a known variant that needs canonicalization
+    if norm in _COUNTRY_ALIASES:
+        canonical = _COUNTRY_ALIASES[norm]
+        return [{"column": "company_country", "operator": "eq", "value": canonical}]
+
+    # Not a known variant — return the term as-is (capitalized properly)
+    # This allows exact matches for countries like "United States",
+    # "Germany", etc. that don't have variants in the data
+    return [{"column": "company_country", "operator": "eq", "value": term.strip()}]
+
+
 def _all_known_values() -> List[str]:
     values = list(_load_regions().keys())
     values += _load_segment_names()
     values += [m["name"] for m in _load_roster()]
     values += ["New Business", "Expansion", "Upsell", "Renewal"]
+    # Add canonical country names from the alias mapping — the known
+    # semantic variants that have explicit canonicalization rules.
+    # Does NOT include all 83 distinct country values from the deals
+    # table (that would require a DB query, breaking the "in-memory
+    # config lookup only" design). This is intentional: the
+    # unknown_value error is meant to show governed/configured values,
+    # not exhaustive data — a country not in _COUNTRY_ALIASES will
+    # still resolve (via _country_candidates()'s exact-match fallback)
+    # but won't appear in this list.
+    values += list(set(_COUNTRY_ALIASES.values()))
     return values
 
 
@@ -265,8 +319,8 @@ def resolve_dimension_filter(mentioned_term: str,
 
     Returns exactly one of:
         {"column": ..., "operator": "eq" | "gt", "value": ...}
-            — an unambiguous match against region, segment, roster, or
-              deal-type. A deal-type match also carries
+            — an unambiguous match against region, segment, roster,
+              country, or deal-type. A deal-type match also carries
               "category": "deal_type" (see _deal_type_candidates()) so
               callers building the injected directive can add the
               non-mutual-exclusivity / historical-gap guidance those
@@ -295,6 +349,7 @@ def resolve_dimension_filter(mentioned_term: str,
         _region_candidates(mentioned_term)
         + _segment_candidates(mentioned_term)
         + _roster_candidates(mentioned_term)
+        + _country_candidates(mentioned_term)
         + _deal_type_candidates(mentioned_term)
     )
 
