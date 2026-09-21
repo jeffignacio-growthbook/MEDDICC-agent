@@ -11,6 +11,7 @@ Auto-detects pipeline stages to exclude (closed won/lost, meeting set) in active
 import json
 import sys
 import os
+import time
 import argparse
 from pathlib import Path
 from datetime import datetime
@@ -328,6 +329,8 @@ def fetch_owner_emails(hubspot):
             if not next_link:
                 break
             params['after'] = next_link
+            # Rate limiting: small delay between pagination calls
+            time.sleep(0.2)
 
         print(f"   Fetched {len(owner_map)} owners")
         return owner_map

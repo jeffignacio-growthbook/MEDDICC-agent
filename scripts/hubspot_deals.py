@@ -5,6 +5,7 @@ Manages active deals and deal notes for MEDDICC analysis.
 """
 import os
 import sys
+import time
 import requests
 import yaml
 import pytz
@@ -47,20 +48,20 @@ class HubSpotDealsClient:
         })
 
     def _get(self, endpoint: str, params: dict = None) -> dict:
-        """Execute GET request."""
-        response = self.session.get(f"{self.BASE_URL}{endpoint}", params=params)
+        """Execute GET request with 30-second timeout."""
+        response = self.session.get(f"{self.BASE_URL}{endpoint}", params=params, timeout=30)
         response.raise_for_status()
         return response.json()
 
     def _post(self, endpoint: str, data: dict = None) -> dict:
-        """Execute POST request."""
-        response = self.session.post(f"{self.BASE_URL}{endpoint}", json=data)
+        """Execute POST request with 30-second timeout."""
+        response = self.session.post(f"{self.BASE_URL}{endpoint}", json=data, timeout=30)
         response.raise_for_status()
         return response.json()
 
     def _patch(self, endpoint: str, data: dict = None) -> dict:
-        """Execute PATCH request."""
-        response = self.session.patch(f"{self.BASE_URL}{endpoint}", json=data)
+        """Execute PATCH request with 30-second timeout."""
+        response = self.session.patch(f"{self.BASE_URL}{endpoint}", json=data, timeout=30)
         response.raise_for_status()
         return response.json()
 
@@ -142,6 +143,8 @@ class HubSpotDealsClient:
         while True:
             if after:
                 body['after'] = after
+                # Rate limiting: small delay between pagination calls to avoid 429s
+                time.sleep(0.2)
 
             response = self._post(endpoint, body)
             results = response.get('results', [])
@@ -202,6 +205,8 @@ class HubSpotDealsClient:
         while True:
             if after:
                 body['after'] = after
+                # Rate limiting: small delay between pagination calls to avoid 429s
+                time.sleep(0.2)
 
             response = self._post(endpoint, body)
             results = response.get('results', [])
@@ -255,6 +260,8 @@ class HubSpotDealsClient:
         while True:
             if after:
                 body['after'] = after
+                # Rate limiting: small delay between pagination calls to avoid 429s
+                time.sleep(0.2)
 
             response = self._post(endpoint, body)
             results = response.get('results', [])
