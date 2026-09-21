@@ -2,8 +2,8 @@ name: MEDDICC Agent Nightly Run
 
 on:
   schedule:
-    # Run at 2am UTC daily
-    - cron: '0 2 * * *'
+    # Run at 3 AM UTC daily (staggered: 2 hours after Calls ETL starts, 90min buffer)
+    - cron: '0 3 * * *'
 
   workflow_dispatch:  # Allow manual triggers
     inputs:

@@ -2,8 +2,8 @@ name: Daily Deal ETL
 
 on:
   schedule:
-    # Run daily at 1 AM UTC (before nightly run at 2 AM)
-    - cron: '0 1 * * *'
+    # Run daily at midnight UTC (staggered: Deal ETL → Calls ETL → Nightly)
+    - cron: '0 0 * * *'
   workflow_dispatch:  # Allow manual trigger
 
 permissions:
