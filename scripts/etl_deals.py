@@ -589,6 +589,7 @@ def main():
         'no_slug': 0
     }
     unmapped_bdr_owners = set()  # Track bdr_owner IDs that fail to map
+    bdr_owner_stats = {'total': 0, 'email': 0, 'mapped': 0, 'unmapped': 0}  # Track bdr_owner processing
 
     for i, deal_obj in enumerate(all_deals_api, 1):
         if i % 50 == 0:
@@ -616,14 +617,19 @@ def main():
         bdr_owner_value = props.get('bdr_owner', '')
         sdr_owner_email = None
         if bdr_owner_value:
+            bdr_owner_stats['total'] += 1
             # Check if it's already an email (contains @)
             if '@' in str(bdr_owner_value):
                 sdr_owner_email = bdr_owner_value
+                bdr_owner_stats['email'] += 1
             else:
                 # Try looking it up as an owner_id
                 sdr_owner_email = owner_emails.get(str(bdr_owner_value), '')
-                if not sdr_owner_email:
+                if sdr_owner_email:
+                    bdr_owner_stats['mapped'] += 1
+                else:
                     # Track owner IDs that failed to map
+                    bdr_owner_stats['unmapped'] += 1
                     unmapped_bdr_owners.add(str(bdr_owner_value))
 
         if not deal_id:
@@ -898,6 +904,13 @@ def main():
                     print(f'  ⚠️  Supabase upsert failed for '
                           f'{deal.get("company_name")}: {e}')
             print(f'  ✓ Supabase: {count} deals upserted')
+
+            # Report BDR owner attribution stats
+            print(f'  ℹ️  SDR attribution stats:')
+            print(f'      Total deals with bdr_owner: {bdr_owner_stats["total"]}')
+            print(f'      Already email format: {bdr_owner_stats["email"]}')
+            print(f'      Mapped owner ID→email: {bdr_owner_stats["mapped"]}')
+            print(f'      Failed to map: {bdr_owner_stats["unmapped"]}')
 
             # Report unmapped BDR owner IDs if any
             if unmapped_bdr_owners:
