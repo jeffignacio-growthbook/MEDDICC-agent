@@ -1,0 +1,55 @@
+APOLLO.IO API USAGE - VISUAL SUMMARY
+=====================================
+
+Daily Credits Consumed (Last 15 Days)
+--------------------------------------
+2026-09-21: ███ (3 credits)
+2026-09-20: ███ (3 credits)
+2026-09-19: █████ (5 credits) ← Peak
+2026-09-18: ███ (3 credits)
+2026-09-17: ██ (2 credits)
+2026-09-16: ██ (2 credits)
+2026-09-15: ██ (2 credits)
+2026-09-14: ██ (2 credits)
+2026-09-13: ██ (2 credits)
+2026-09-12: ██ (2 credits)
+2026-09-11: █ (1 credit) ← Lowest
+2026-09-10: █ (1 credit)
+2026-09-09: ███ (3 credits)
+2026-09-08: ▢ (0 credits)
+2026-09-07: ▢ (0 credits)
+
+Average: 2.07 credits/day
+Total: 31 credits (15 days)
+
+Weekly Trend
+------------
+Week of 2026-09-21:  ███ (3 credits, partial week)
+Week of 2026-09-14:  ███████████████████ (19 credits)
+Week of 2026-09-07:  █████████ (9 credits)
+
+Monthly Projection
+------------------
+Current month (15 days):  ███████████████ (31 credits)
+Projected (30 days):      ██████████████████████████████ (50-62 credits)
+
+API Call Breakdown
+------------------
+POST /conversations/search: ██████████████████ (180 calls, FREE)
+GET /conversations/{id}:    ███ (31 calls, 31 credits)
+
+Workflow Distribution
+---------------------
+Daily Calls ETL:  ████████████████████████████████████████ (31 credits, 100%)
+Nightly Run:      ▢ (0 credits, 0%)
+Apollo Audit:     ▢ (0 credits, 0%)
+
+Efficiency Metrics
+------------------
+Search-to-Fetch Ratio: 5.8:1 (Excellent)
+Cache Hit Rate: ~83% (Estimated)
+Error Rate: 0% (No Apollo errors)
+Rate Limit Issues: 0 (None detected)
+
+Risk Level: 🟢 LOW
+Status: ✅ Optimal Performance

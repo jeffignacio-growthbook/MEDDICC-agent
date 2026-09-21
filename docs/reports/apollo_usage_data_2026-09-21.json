@@ -1,0 +1,463 @@
+{
+  "workflows": {
+    "Daily Calls ETL": {
+      "post": 180,
+      "get": 31,
+      "credits": 31,
+      "runs": 15,
+      "errors": 0
+    },
+    "Nightly Run": {
+      "post": 0,
+      "get": 0,
+      "credits": 0,
+      "runs": 15,
+      "errors": 0
+    },
+    "Apollo Audit": {
+      "post": 0,
+      "get": 0,
+      "credits": 0,
+      "runs": 1,
+      "errors": 0
+    }
+  },
+  "daily": {
+    "2026-09-21": {
+      "post": 12,
+      "get": 3,
+      "credits": 3,
+      "runs": 2
+    },
+    "2026-09-20": {
+      "post": 12,
+      "get": 3,
+      "credits": 3,
+      "runs": 2
+    },
+    "2026-09-19": {
+      "post": 12,
+      "get": 5,
+      "credits": 5,
+      "runs": 3
+    },
+    "2026-09-18": {
+      "post": 12,
+      "get": 3,
+      "credits": 3,
+      "runs": 2
+    },
+    "2026-09-17": {
+      "post": 12,
+      "get": 2,
+      "credits": 2,
+      "runs": 2
+    },
+    "2026-09-16": {
+      "post": 12,
+      "get": 2,
+      "credits": 2,
+      "runs": 2
+    },
+    "2026-09-15": {
+      "post": 12,
+      "get": 2,
+      "credits": 2,
+      "runs": 2
+    },
+    "2026-09-14": {
+      "post": 12,
+      "get": 2,
+      "credits": 2,
+      "runs": 2
+    },
+    "2026-09-13": {
+      "post": 12,
+      "get": 2,
+      "credits": 2,
+      "runs": 2
+    },
+    "2026-09-12": {
+      "post": 12,
+      "get": 2,
+      "credits": 2,
+      "runs": 2
+    },
+    "2026-09-11": {
+      "post": 12,
+      "get": 1,
+      "credits": 1,
+      "runs": 2
+    },
+    "2026-09-10": {
+      "post": 12,
+      "get": 1,
+      "credits": 1,
+      "runs": 2
+    },
+    "2026-09-09": {
+      "post": 12,
+      "get": 3,
+      "credits": 3,
+      "runs": 2
+    },
+    "2026-09-08": {
+      "post": 12,
+      "get": 0,
+      "credits": 0,
+      "runs": 2
+    },
+    "2026-09-07": {
+      "post": 12,
+      "get": 0,
+      "credits": 0,
+      "runs": 2
+    }
+  },
+  "weekly": {
+    "2026-09-21": {
+      "post": 12,
+      "get": 3,
+      "credits": 3,
+      "runs": 2
+    },
+    "2026-09-14": {
+      "post": 84,
+      "get": 19,
+      "credits": 19,
+      "runs": 15
+    },
+    "2026-09-07": {
+      "post": 84,
+      "get": 9,
+      "credits": 9,
+      "runs": 14
+    }
+  },
+  "monthly": {
+    "2026-09": {
+      "post": 180,
+      "get": 31,
+      "credits": 31,
+      "runs": 31
+    }
+  },
+  "detailed_runs": {
+    "Daily Calls ETL": [
+      {
+        "run_id": 35569459203,
+        "date": "2026-09-21",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 3,
+        "credits": 3,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 35494538499,
+        "date": "2026-09-20",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 3,
+        "credits": 3,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 35425830876,
+        "date": "2026-09-19",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 5,
+        "credits": 5,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 35313729632,
+        "date": "2026-09-18",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 3,
+        "credits": 3,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 35189294468,
+        "date": "2026-09-17",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 2,
+        "credits": 2,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 35063081690,
+        "date": "2026-09-16",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 2,
+        "credits": 2,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34936439334,
+        "date": "2026-09-15",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 2,
+        "credits": 2,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34814198586,
+        "date": "2026-09-14",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 2,
+        "credits": 2,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34742750614,
+        "date": "2026-09-13",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 2,
+        "credits": 2,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34677123645,
+        "date": "2026-09-12",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 2,
+        "credits": 2,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34569240370,
+        "date": "2026-09-11",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 1,
+        "credits": 1,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34444244214,
+        "date": "2026-09-10",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 1,
+        "credits": 1,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34318105559,
+        "date": "2026-09-09",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 3,
+        "credits": 3,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34193356450,
+        "date": "2026-09-08",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34090245707,
+        "date": "2026-09-07",
+        "conclusion": "success",
+        "post_search": 12,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      }
+    ],
+    "Nightly Run": [
+      {
+        "run_id": 35574370973,
+        "date": "2026-09-21",
+        "conclusion": "failure",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 35497156690,
+        "date": "2026-09-20",
+        "conclusion": "failure",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 35428474950,
+        "date": "2026-09-19",
+        "conclusion": "failure",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 35318146218,
+        "date": "2026-09-18",
+        "conclusion": "failure",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 35193937384,
+        "date": "2026-09-17",
+        "conclusion": "failure",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 35068229129,
+        "date": "2026-09-16",
+        "conclusion": "failure",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34941438585,
+        "date": "2026-09-15",
+        "conclusion": "failure",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34818945710,
+        "date": "2026-09-14",
+        "conclusion": "success",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34744819137,
+        "date": "2026-09-13",
+        "conclusion": "success",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34679491498,
+        "date": "2026-09-12",
+        "conclusion": "success",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34572813068,
+        "date": "2026-09-11",
+        "conclusion": "success",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34448306687,
+        "date": "2026-09-10",
+        "conclusion": "success",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34322482896,
+        "date": "2026-09-09",
+        "conclusion": "success",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34197266804,
+        "date": "2026-09-08",
+        "conclusion": "success",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      },
+      {
+        "run_id": 34093847523,
+        "date": "2026-09-07",
+        "conclusion": "success",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      }
+    ],
+    "Apollo Audit": [
+      {
+        "run_id": 35466716832,
+        "date": "2026-09-19",
+        "conclusion": "success",
+        "post_search": 0,
+        "get_calls": 0,
+        "credits": 0,
+        "rate_limit": true,
+        "apollo_errors": 0
+      }
+    ]
+  }
+}
