@@ -183,7 +183,8 @@ def main():
         deal_id = call_data['deal_id']
         call_intent = call_data['call_intent']
 
-        if len(summary) < 100:
+        # Skip if summary is None or too short for extraction
+        if not summary or len(summary) < 100:
             # Stamp scanned anyway — nothing to extract
             _stamp(sb, call_id, JOB_NAME, company or 'unknown', 0)
             scanned += 1
