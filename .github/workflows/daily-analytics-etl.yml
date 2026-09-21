@@ -1,0 +1,31 @@
+name: Daily Analytics ETL
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # Daily 4:00 AM UTC (offset from weekly Monday 3am)
+  workflow_dispatch:
+
+jobs:
+  etl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests supabase python-dateutil pyyaml pytz
+
+      - name: Analytics deal ETL (base upsert only)
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          echo "Running daily base deals ETL (upserts deals table only)"
+          echo "Snapshot/waterfall/forecast/win-loss remain weekly"
+          python scripts/etl_deals.py --mode analytics

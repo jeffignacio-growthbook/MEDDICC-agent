@@ -25,12 +25,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Analytics deal ETL (all stages)
-        env:
-          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python scripts/etl_deals.py --mode analytics
+      # Note: Base deals ETL now runs daily via daily-analytics-etl.yml
+      # This weekly job focuses on snapshot/waterfall/forecast/enrichment
 
       - name: Snapshot deals
         env:
