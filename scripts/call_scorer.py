@@ -32,7 +32,7 @@ COMPONENTS = [
     ("Economic Buyer", "economic_buyer"),
     ("Decision Criteria", "decision_criteria"),
     ("Decision Process", "decision_process"),
-    ("Identified Pain", "pain"),
+    ("Identified Pain", "identified_pain"),  # Match HubSpot property key (setup_hubspot_properties.py)
     ("Champion", "champion"),
     ("Competition", "competition"),
 ]
