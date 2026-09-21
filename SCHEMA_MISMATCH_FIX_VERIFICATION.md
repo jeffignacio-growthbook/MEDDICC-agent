@@ -64,9 +64,22 @@ HubSpot API:          meddicc_identified_pain_score property ✅
 ---
 
 ## Remaining Deals Not Analyzed (81/179):
-- Expected: Deals without scored calls in call_scores table yet
-- These deals will be analyzed when new calls are scored
-- No schema errors preventing analysis
+
+**✅ VERIFIED by direct database check** (not assumed):
+
+- **67 deals:** Zero call_scores rows (never scored yet)
+  - Expected: Daily call scoring hasn't reached them
+  - Will be analyzed when first calls are scored
+
+- **14 deals:** Already analyzed in previous runs
+  - Have call_scores AND analyses from earlier runs
+  - No new calls to trigger re-analysis in progressive mode
+
+**Critical verification:**
+- Queried call_scores and analyses tables for all 179 deals individually
+- **0 deals** have call_scores but no analysis (no failures hidden)
+- Same rigorous ID-level check that caught the two-independent-bugs finding
+- All 81 have legitimate reasons for not being analyzed
 
 ---
 
