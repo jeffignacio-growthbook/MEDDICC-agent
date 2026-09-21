@@ -306,9 +306,13 @@ def get_meeting_set_stages(hubspot):
 def fetch_owner_emails(hubspot):
     """
     Fetch all HubSpot owners and return mapping of owner_id -> email.
+    Fetches both active and archived owners (archived owners are needed for
+    historical SDR attribution when deals were sourced by former team members).
     Returns dict like {"12345": "rep@company.com", ...}
     """
     owner_map = {}
+
+    # Fetch active owners first
     try:
         endpoint = "/crm/v3/owners"
         params = {"limit": 100}
@@ -332,12 +336,44 @@ def fetch_owner_emails(hubspot):
             # Rate limiting: small delay between pagination calls
             time.sleep(0.2)
 
-        print(f"   Fetched {len(owner_map)} owners")
-        return owner_map
+        active_count = len(owner_map)
 
     except Exception as e:
-        print(f"⚠️  Could not fetch owners: {e}")
-        return {}
+        print(f"⚠️  Could not fetch active owners: {e}")
+        active_count = 0
+
+    # Fetch archived owners (for historical SDR attribution)
+    try:
+        endpoint = "/crm/v3/owners"
+        params = {"limit": 100, "archived": "true"}
+
+        while True:
+            response = hubspot._get(endpoint, params=params)
+            results = response.get('results', [])
+
+            for owner in results:
+                owner_id = str(owner.get('id', ''))
+                email = owner.get('email', '')
+                if owner_id and email:
+                    owner_map[owner_id] = email
+
+            # Check for pagination
+            paging = response.get('paging', {})
+            next_link = paging.get('next', {}).get('after')
+            if not next_link:
+                break
+            params['after'] = next_link
+            # Rate limiting: small delay between pagination calls
+            time.sleep(0.2)
+
+        archived_count = len(owner_map) - active_count
+        print(f"   Fetched {active_count} active + {archived_count} archived = {len(owner_map)} total owners")
+
+    except Exception as e:
+        print(f"⚠️  Could not fetch archived owners: {e}")
+        print(f"   Fetched {active_count} active owners only")
+
+    return owner_map
 
 
 def main():
