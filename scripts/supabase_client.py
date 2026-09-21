@@ -289,6 +289,10 @@ class SupabaseWriter:
         if 'segment_reason' in deal:
             row['segment_reason'] = deal.get('segment_reason')  # Diagnostic field
 
+        # SDR/BDR attribution (Task 4 fix)
+        if 'sdr_owner_email' in deal:
+            row['sdr_owner_email'] = deal.get('sdr_owner_email')
+
         # Handle highest_stage_order_reached (max logic)
         if 'current_stage_order' in deal:
             current_order = deal['current_stage_order']
