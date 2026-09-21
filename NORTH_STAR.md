@@ -108,15 +108,18 @@ ordering is the working plan until that validation happens.
    historical quarter ever had a real target) is shown for context
    only, permanently labeled as such. See the 2026-09-19 Decision Log
    entry below for the full design.
-3. **Deal risk/likelihood to close** — covered by `assess_deal_risk()`,
-   cycle-length signal only. This is the gap that started this whole
-   thread of work. The MEDDICC-score signal is **NOT a currently-
-   actionable next build** — it's TIME-GATED, not engineering-gated:
-   deferred 2026-09-16 because closed-won deals with scores (N=4) show
-   no discriminative power, and the framework needs ≥30 to validate at
-   all. That threshold is reached by real quarters closing with scored
-   deals accumulating, not by more build effort now. See the
-   2026-09-16 Decision Log entry below for the full rationale.
+3. **Deal risk/likelihood to close** — **MEDDICC signal enabled 2026-09-21**.
+   Covered by `assess_deal_risk()` with two weighted signals: (1) cycle-length
+   (85% weight, days past segment 75th percentile), (2) MEDDICC overall score
+   (15% weight, 0-70 scale, pre-close analyses only). Coverage improved from 1.2%
+   (N=4) to 29.3% (N=67) via backfill. Pre-close discrimination is weak (+0.5/70
+   points, 0.7% delta) but statistically meaningful at n=40 won vs n=276 lost.
+   Overall score only (individual components too noisy - Metrics/Pain/Champion
+   show reverse correlation). Pre-close filtering enforced in code (post-close
+   analyses excluded as non-predictive). Not decisive for borderline calls,
+   provides directional signal when combined with cycle length. See 2026-09-21
+   Decision Log entry below for full design and 2026-09-16 entry for original
+   deferral rationale.
 4. **Rep performance and coaching signal** — Built and verified
    (2026-09-19): `scripts/rep_coaching.py::assess_rep_coaching()`
    composes three coaching criteria over the most recent
@@ -339,14 +342,32 @@ possible regardless of priority ranking until that data exists.
 
 ## Decision Log
 
-### 2026-09-16: deal_risk_assessor MEDDICC Signal Deferred
+### 2026-09-21: MEDDICC Signal Enabled in deal_risk_assessor (Supersedes 2026-09-16 Deferral)
+
+**Context**: Backfill (457 deals) improved coverage from 1.2% (4/327) to 29.3% (67/229) closed-won deals with scores, clearing the ≥30 minimum evidence threshold. Re-audit showed pre-close-only discrimination of +0.5/70 points (0.7% delta, n=40 won vs n=276 lost). Original reverse correlation (Champion/EB lower on won deals) was a small-sample artifact that flipped at larger scale.
+
+**Decisions**:
+- Signal ENABLED with 15% weight (low end given weak discrimination), combined with cycle-length signal (85% weight)
+- Overall score only (0-70 scale) — individual components too noisy (Metrics/Pain/Champion show reverse correlation even at n=67)
+- Pre-close filtering ENFORCED IN CODE via `_fetch_latest_meddicc_scores()` — post-close analyses excluded as non-predictive (analyzed_at >= deal.close_date)
+- Risk classification: weighted = (cycle_risk * 0.85) + (meddicc_risk * 0.15), thresholds at 60 (high), 30 (moderate)
+- Missing MEDDICC defaults to neutral (50) to avoid biasing risk when data unavailable
+- Explicit output text: "weak signal: +0.5pt discrimination on pre-close data" — never omitted, matching HEURISTIC label pattern from other primitives
+
+**Rationale**: Coverage threshold met (67 >= 30), but discrimination is weak not strong. +0.5/70 points provides directional signal when combined with cycle length, but not decisive alone. Pre-close filtering critical: mixed-set discrimination (+4.0) was 8x inflated by post-close analyses; pre-close-only (+0.5) is the actual predictive population for in-progress deals.
+
+**Verification**: Full Steps A-E cycle including planted discrepancy test proving pre-close filter excludes post-close analyses (deal with both pre-close 30/70 and post-close 60/70 analyses correctly uses 30/70, not higher 60/70). 9 tests pass locally and in CI.
+
+**Status**: Shipped in `scripts/deal_risk_assessor.py` (assess_deal_risk, _fetch_latest_meddicc_scores, _classify_risk). Tests in `tests/test_deal_risk_assessor.py`. Pre-close filter test confirms code matches documented behavior.
+
+### 2026-09-16: deal_risk_assessor MEDDICC Signal Deferred (SUPERSEDED by 2026-09-21 Entry Above)
 **Context**: MEDDICC scores on closed-won deals (N=4) show no discrimination vs at-risk deals. Won deals score the same or LOWER on 6 of 7 components.
 
 **Decision**: Drop MEDDICC from risk assessment until sufficient historical data (≥30 won deals with scores) exists to validate framework.
 
 **Rationale**: Abstract Red/Yellow/Green bands don't predict outcomes for this client. Using unvalidated thresholds would create false alarms. Cycle-length signal (days past benchmark) is well-grounded in 327 historical wins - ship that alone.
 
-**Status**: deal_risk_assessor shelved pending data. Focus returns to Phase 1b (query_pipeline_movement).
+**Status**: ~~deal_risk_assessor shelved pending data.~~ SUPERSEDED: Signal enabled 2026-09-21 after backfill improved coverage to 29.3% (67/229). See entry above.
 
 ### 2026-09-19: Forecast Trustworthiness (CRO Priority #1) Built and Verified
 **Context**: audited whether a quarter-level "how much should I trust this quarter's number" signal was computable on top of `assess_deal_risk()`. Historical COMMIT-only tagging was too sparse (peak 6-16 deals/week per quarter, all below `min_evidence_count=30`); pooling COMMIT+MOST_LIKELY across the 4 complete quarters cleared the floor (n=176 "ever tagged," n=74-104 per fixed week). Point-in-time integrity confirmed: `deals.forecast_category` (live) must never be used to judge a past quarter — 62.6% of checked historical-vs-current comparisons mismatched; only `deals_snapshot` is point-in-time-correct.

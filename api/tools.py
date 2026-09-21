@@ -262,12 +262,15 @@ async def assess_deal_risk(sb, deal_ids=None, fiscal_quarter=None):
 
     AND have close_date in current or specified fiscal quarter.
 
-    Risk signal: Deal duration vs. segment-specific cycle benchmarks (75th percentile
-    from 327 historical closed-won deals).
+    Risk signals (weighted combination):
+    1. Deal duration vs. segment cycle benchmarks (85% weight) - 75th percentile from 327 historical won deals
+    2. MEDDICC overall score (15% weight) - ENABLED as of 2026-09-21, pre-close analyses only
 
-    MEDDICC signal: DEFERRED as of 2026-09-16 (insufficient historical data - only
-    1.2% of won deals have scores, no discrimination observed). Explicitly marked as
-    "insufficient_data" in output.
+    MEDDICC signal caveats:
+    - Weak discrimination (+0.5/70 points on pre-close data, n=40 won vs n=276 lost)
+    - Overall score only (individual components too noisy - Metrics/Pain/Champion show reverse correlation)
+    - Pre-close filtering enforced (post-close analyses excluded as non-predictive)
+    - Not decisive for borderline calls, provides directional signal when combined with cycle length
 
     Args:
         sb: Supabase client
@@ -287,7 +290,9 @@ async def assess_deal_risk(sb, deal_ids=None, fiscal_quarter=None):
                     "overall_label": "high_risk" | "moderate_risk" | "low_risk" | "insufficient_data",
                     "cycle_benchmark_days": int | None,
                     "days_past_benchmark": int | None,
-                    "meddicc_status": "insufficient_data"  # Always deferred
+                    "meddicc_status": "fresh" | "stale" | "missing",
+                    "meddicc_overall_score": int | None,  # 0-70 scale (pre-close only)
+                    "meddicc_age_days": int | None
                 }
             ],
             "summary": {

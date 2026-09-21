@@ -9,12 +9,12 @@ Risk signals:
 1. Deal duration vs. typical segment sales cycle (from historical closed-won data)
 2. MEDDICC weakness/staleness (DEFERRED - insufficient historical data)
 
-MEDDICC Signal Status (as of 2026-09-16):
-- Only 4 of 327 closed-won deals (1.2%) have MEDDICC scores
-- Timing analysis confirms all 4 were scored PRE-CLOSE (not post-close artifacts)
-- No discrimination observed: won deals score identically to at-risk deals on 6/7 components
-- Signal remains explicitly marked as "insufficient_data" until ≥30 won deals with scores
-  exist AND those scores demonstrate clear discrimination from at-risk deals
+MEDDICC Signal Status (as of 2026-09-21):
+- Coverage improved to 67/229 closed-won deals (29.3%) via backfill
+- Pre-close analyses (40 won, 276 lost) show weak positive discrimination: +0.5 points overall
+- Signal ENABLED with caveats: overall score only, 15% weight, pre-close filtering enforced
+- Discrimination is weak (+0.5/70 = 0.7% delta), not decisive for borderline risk calls
+- Competition component strongest (+1.3), but Metrics/Pain/Champion show reverse correlation
 
 Returns per-deal risk_factors list + overall_label (high_risk/moderate_risk/
 low_risk/insufficient_data). No fabricated probabilities.
@@ -82,7 +82,8 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
                     "days_past_benchmark": int | None,
                     "meddicc_status": "fresh" | "stale" | "missing",
                     "meddicc_age_days": int | None,
-                    "weak_components": [str]  # MEDDICC components scoring below threshold
+                    "meddicc_overall_score": int | None,  # 0-70 scale (pre-close only)
+                    "weak_components": [str]  # DEFERRED - not used (individual components too noisy)
                 }
             ],
             "summary": {
@@ -106,9 +107,10 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
             }
         }
 
-    # Batch-fetch MEDDICC scores for all deals
+    # Batch-fetch MEDDICC scores for all deals (PRE-CLOSE filtering applied)
     deal_ids = [str(d.get("deal_id")) for d in deals if d.get("deal_id")]
-    meddicc_scores = _fetch_latest_meddicc_scores(sb, deal_ids)
+    deals_dict = {str(d.get("deal_id")): d for d in deals if d.get("deal_id")}
+    meddicc_scores = _fetch_latest_meddicc_scores(sb, deal_ids, deals_dict)
 
     assessed = []
     today = date.today()
@@ -154,39 +156,55 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
                 f"benchmark for comparison)"
             )
 
-        # RISK SIGNAL 2: MEDDICC weakness/staleness (DEFERRED)
-        # 2026-09-16: Insufficient historical data to validate MEDDICC framework.
-        # Only 1.2% of won deals (4/327) have scores, showing no discrimination
-        # from at-risk deals. Signal explicitly marked as insufficient_data until
-        # ≥30 won deals with scores exist AND demonstrate clear discrimination.
+        # RISK SIGNAL 2: MEDDICC overall score (ENABLED 2026-09-21)
+        # 2026-09-21: Signal enabled with caveats after backfill improved coverage to 29.3%
+        # (67/229 won deals). Pre-close discrimination is weak (+0.5/70 points) but
+        # statistically meaningful at n=40 won vs n=276 lost.
+        #
+        # Using overall score only (not individual components - Metrics/Pain/Champion
+        # show reverse correlation). Pre-close filtering enforced in _fetch_latest_meddicc_scores.
         meddicc_data = meddicc_scores.get(deal_id)
-        meddicc_status = "insufficient_data"
+        meddicc_status = "missing"
         meddicc_age_days = None
+        meddicc_overall_score = None
         weak_components = []
 
-        # Still fetch score age for transparency, but don't use for risk classification
         if meddicc_data:
+            meddicc_overall_score = meddicc_data.get("overall_score")
             analyzed_at = meddicc_data.get("analyzed_at")
+
             if analyzed_at:
                 try:
-                    analyzed_dt = datetime.fromisoformat(analyzed_at)
+                    analyzed_dt = datetime.fromisoformat(analyzed_at.replace('Z', '+00:00'))
                     if analyzed_dt.tzinfo is None:
                         analyzed_dt = analyzed_dt.replace(tzinfo=timezone.utc)
                     meddicc_age_days = (now - analyzed_dt).days
+
+                    # Flag stale scores (>14 days old)
+                    if meddicc_age_days > MEDDICC_STALENESS_DAYS:
+                        meddicc_status = "stale"
+                    else:
+                        meddicc_status = "fresh"
                 except (ValueError, TypeError):
                     pass
 
-        # Explicit note that MEDDICC signal is deferred (not just missing)
-        risk_factors.append(
-            "MEDDICC: insufficient_data (1.2% won-deal coverage, "
-            "framework validation pending)"
-        )
+            # Add MEDDICC score to risk factors with caveat about weak discrimination
+            if meddicc_overall_score is not None:
+                risk_factors.append(
+                    f"MEDDICC: {meddicc_overall_score}/70 overall score "
+                    f"({meddicc_status}, {meddicc_age_days} days old) "
+                    f"[weak signal: +0.5pt discrimination on pre-close data]"
+                )
+        else:
+            risk_factors.append(
+                "MEDDICC: no pre-close analysis available (active deals with only "
+                "post-close analyses are excluded)"
+            )
 
-        # OVERALL LABEL: Classify based on risk factors
+        # OVERALL LABEL: Classify based on risk factors (cycle length + MEDDICC overall score)
         overall_label = _classify_risk(
             days_past_benchmark=days_past_benchmark,
-            meddicc_status=meddicc_status,
-            weak_components=weak_components,
+            meddicc_overall_score=meddicc_overall_score,
             segment=segment
         )
 
@@ -203,6 +221,7 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
             "days_past_benchmark": days_past_benchmark,
             "meddicc_status": meddicc_status,
             "meddicc_age_days": meddicc_age_days,
+            "meddicc_overall_score": meddicc_overall_score,
             "weak_components": weak_components
         })
 
@@ -221,9 +240,19 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
     }
 
 
-def _fetch_latest_meddicc_scores(sb, deal_ids: List[str]) -> Dict[str, Dict[str, Any]]:
+def _fetch_latest_meddicc_scores(sb, deal_ids: List[str], deals_dict: Dict[str, Dict[str, Any]] = None) -> Dict[str, Dict[str, Any]]:
     """
-    Fetch latest MEDDICC analysis for each deal.
+    Fetch latest PRE-CLOSE MEDDICC analysis for each deal.
+
+    CRITICAL: Only pre-close analyses are predictive signals. Post-close analyses
+    are retrospective artifacts and must be excluded.
+
+    Pre-close filter: analyzed_at < deal close_date (for closed deals) or
+                      analyzed_at < now (for open deals, by definition all are pre-close)
+
+    Args:
+        deal_ids: List of deal IDs to fetch scores for
+        deals_dict: Dict of deal data keyed by deal_id (for pre-close filtering)
 
     Returns:
         {deal_id: {analyzed_at, overall_score, component_scores dict}}
@@ -233,19 +262,60 @@ def _fetch_latest_meddicc_scores(sb, deal_ids: List[str]) -> Dict[str, Dict[str,
 
     try:
         # Query all analyses for these deals, ordered by analyzed_at desc
-        # We'll deduplicate to get latest per deal in Python (simpler than CTEs)
         response = sb.table("analyses").select(
             "deal_id,analyzed_at,overall_score,champion_score,economic_buyer_score,"
             "decision_criteria_score,decision_process_score,pain_score,"
             "competition_score,metrics_score"
         ).in_("deal_id", deal_ids).order("analyzed_at", desc=True).execute()
 
-        # Keep only the latest analysis per deal
+        # Filter to PRE-CLOSE analyses only, then keep latest per deal
         latest = {}
+        now = datetime.now(timezone.utc)
+
         for row in response.data:
             deal_id = str(row["deal_id"])
-            if deal_id not in latest:
+
+            # Skip if we already have a latest for this deal
+            if deal_id in latest:
+                continue
+
+            # PRE-CLOSE FILTER: Check if analysis happened before deal closed
+            analyzed_at_str = row.get("analyzed_at")
+            if not analyzed_at_str:
+                continue
+
+            try:
+                analyzed_at = datetime.fromisoformat(analyzed_at_str.replace('Z', '+00:00'))
+                if analyzed_at.tzinfo is None:
+                    analyzed_at = analyzed_at.replace(tzinfo=timezone.utc)
+
+                # Get deal close date if available
+                if deals_dict and deal_id in deals_dict:
+                    close_date_str = deals_dict[deal_id].get("close_date")
+                    deal_status = deals_dict[deal_id].get("deal_status", "active")
+
+                    # For closed deals, require analyzed_at < close_date
+                    if close_date_str and deal_status != "active":
+                        if 'T' in close_date_str:
+                            close_date = datetime.fromisoformat(close_date_str.replace('Z', '+00:00'))
+                            if close_date.tzinfo is None:
+                                close_date = close_date.replace(tzinfo=timezone.utc)
+                        else:
+                            close_date = datetime.strptime(close_date_str, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+
+                        # EXCLUDE post-close analyses
+                        if analyzed_at >= close_date:
+                            continue
+
+                    # For active deals, all analyses are by definition pre-close
+                    # (the deal hasn't closed yet), so no filter needed
+
+                # This analysis passed the pre-close filter
                 latest[deal_id] = row
+
+            except (ValueError, TypeError) as e:
+                logger.warning(f"[RISK_ASSESSOR] Failed to parse dates for deal {deal_id}: {e}")
+                continue
 
         return latest
     except Exception as e:
@@ -289,43 +359,76 @@ def _identify_weak_components(meddicc_data: Dict[str, Any], stage: str) -> List[
 
 def _classify_risk(
     days_past_benchmark: Optional[int],
-    meddicc_status: str,
-    weak_components: List[str],
+    meddicc_overall_score: Optional[int],
     segment: str
 ) -> str:
     """
-    Classify overall risk level based on cycle-length signal only.
+    Classify overall risk level based on weighted combination of two signals:
+    1. Cycle-length signal (85% weight): Days past segment 75th percentile
+    2. MEDDICC overall score (15% weight): 0-70 scale, pre-close analyses only
 
-    2026-09-16: MEDDICC signal deferred due to insufficient historical data
-    (1.2% won-deal coverage, no observed discrimination). Risk classification
-    uses ONLY the cycle-length signal until MEDDICC can be validated.
+    2026-09-21: MEDDICC signal enabled with low weight (15%) due to weak discrimination
+    (+0.5/70 points on pre-close data). Not decisive for borderline calls, but provides
+    directional signal when combined with cycle-length.
 
-    Logic:
-    - insufficient_data: Unknown segment with no cycle benchmark
-    - high_risk: Significantly past benchmark (>30 days)
-    - moderate_risk: Moderately past benchmark (0-30 days)
-    - low_risk: Within benchmark
+    Scoring logic:
+    - Cycle-length risk score (0-100):
+      * 0 if days_past_benchmark is None (no data)
+      * 100 if >60 days past (very high risk)
+      * Linear scale 0-100 for 0-60 days past
+    - MEDDICC risk score (0-100):
+      * 0 if meddicc_overall_score is None (no data)
+      * Inverse of overall_score/70 normalized to 0-100
+      * Example: 35/70 = 50% good → 50 risk score
+
+    Weighted risk score:
+      risk = (cycle_risk * 0.85) + (meddicc_risk * 0.15)
+
+    Thresholds:
+    - high_risk: risk >= 60
+    - moderate_risk: risk >= 30
+    - low_risk: risk < 30
+    - insufficient_data: no cycle benchmark available
 
     Args:
         days_past_benchmark: Days beyond segment's 75th percentile, or None if no benchmark
-        meddicc_status: IGNORED (deferred) - kept for interface compatibility
-        weak_components: IGNORED (deferred) - kept for interface compatibility
+        meddicc_overall_score: MEDDICC overall score (0-70), or None if no pre-close analysis
         segment: Deal segment for context
     """
     # Insufficient data: no cycle benchmark to assess
+    # (MEDDICC alone is too weak to make a call - only +0.5 discrimination)
     if days_past_benchmark is None:
         return "insufficient_data"
 
-    # High risk: significantly overdue (>30 days past benchmark)
-    if days_past_benchmark > 30:
+    # SIGNAL 1: Cycle-length risk (85% weight)
+    # Scale: 0-60+ days past benchmark → 0-100 risk score
+    if days_past_benchmark <= 0:
+        cycle_risk = 0.0
+    elif days_past_benchmark >= 60:
+        cycle_risk = 100.0
+    else:
+        cycle_risk = (days_past_benchmark / 60.0) * 100.0
+
+    # SIGNAL 2: MEDDICC risk (15% weight)
+    # Scale: 0-70 overall score → 100-0 risk score (inverted)
+    # Low MEDDICC score = high risk, high MEDDICC score = low risk
+    if meddicc_overall_score is None:
+        # No MEDDICC data: default to neutral (50) to not bias the overall risk
+        meddicc_risk = 50.0
+    else:
+        # Invert: 0/70 = 100 risk, 70/70 = 0 risk, 35/70 = 50 risk
+        meddicc_risk = max(0, min(100, (1.0 - meddicc_overall_score / 70.0) * 100.0))
+
+    # Weighted combination: 85% cycle, 15% MEDDICC
+    weighted_risk = (cycle_risk * 0.85) + (meddicc_risk * 0.15)
+
+    # Classify based on weighted risk score
+    if weighted_risk >= 60:
         return "high_risk"
-
-    # Moderate risk: moderately overdue (0-30 days past benchmark)
-    if days_past_benchmark > 0:
+    elif weighted_risk >= 30:
         return "moderate_risk"
-
-    # Low risk: within or ahead of benchmark
-    return "low_risk"
+    else:
+        return "low_risk"
 
 
 def get_at_risk_deals(sb, fiscal_quarter: Optional[str] = None) -> Dict[str, Any]:

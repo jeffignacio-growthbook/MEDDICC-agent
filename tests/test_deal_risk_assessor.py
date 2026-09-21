@@ -1,5 +1,7 @@
 """
 Tests for deal_risk_assessor.py — structured risk assessment for high-priority deals.
+
+Updated 2026-09-21: MEDDICC signal enabled with 15% weighting, pre-close filtering enforced.
 """
 import sys
 from pathlib import Path
@@ -11,14 +13,18 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from deal_risk_assessor import (
     assess_deal_risk,
     _classify_risk,
-    _identify_weak_components,
+    _fetch_latest_meddicc_scores,
     SEGMENT_CYCLE_BENCHMARKS,
     LATE_STAGE_IDS
 )
 
 
 def test_assess_deal_risk_with_overdue_cycle():
-    """Test deal significantly past segment cycle benchmark is flagged high_risk."""
+    """Test deal significantly past segment cycle benchmark is flagged high_risk.
+
+    2026-09-21: Now includes MEDDICC signal (15% weight) but cycle-length dominates
+    for deals significantly past benchmark.
+    """
     mock_sb = MagicMock()
     mock_sb.table().select().in_().order().execute.return_value = MagicMock(data=[])
 
@@ -48,79 +54,28 @@ def test_assess_deal_risk_with_overdue_cycle():
     assert any("224 days past" in rf for rf in deal["risk_factors"])
 
 
-def test_assess_deal_risk_with_weak_meddicc():
-    """Test MEDDICC signal is deferred - risk based on cycle-length only.
+def test_assess_deal_risk_with_meddicc_signal():
+    """Test MEDDICC signal (15% weight) affects risk classification at moderate levels.
 
-    2026-09-16: MEDDICC signal deferred due to insufficient historical data.
-    Deal with 50 days open and SMB benchmark of 138 days should be low_risk
-    (within benchmark), regardless of MEDDICC scores. MEDDICC insufficient_data
-    note should appear in risk_factors.
+    2026-09-21: MEDDICC signal enabled. Deal with 35 days past benchmark (moderate by
+    cycle-length alone) + low MEDDICC score (20/70) should be high_risk when combined.
     """
     today = date.today()
-    create_date = (today - timedelta(days=50)).isoformat()
+    create_date = (today - timedelta(days=173)).isoformat()  # 35 days past SMB 138-day benchmark
 
-    # Mock MEDDICC data with multiple weak scores (IGNORED for risk classification)
+    # Mock MEDDICC data with low overall score
     mock_sb = MagicMock()
     mock_sb.table().select().in_().order().execute.return_value = MagicMock(data=[{
         "deal_id": "123",
-        "analyzed_at": datetime.now(timezone.utc).isoformat(),
-        "overall_score": 45,
-        "champion_score": 3,  # Red
-        "economic_buyer_score": 4,  # Red
-        "decision_criteria_score": 5,  # Yellow
-        "decision_process_score": 3,  # Red
-        "pain_score": 4,  # Red
-        "competition_score": 6,  # Yellow
-        "metrics_score": 5  # Yellow
-    }])
-
-    deals = [{
-        "deal_id": "123",
-        "company_name": "Test Corp",
-        "stage": LATE_STAGE_IDS[0],  # Negotiating
-        "create_date": create_date,
-        "close_date": today.isoformat(),
-        "segment": "SMB",
-        "forecast_category": "COMMIT",
-        "deal_status": "active"
-    }]
-
-    result = assess_deal_risk(deals, mock_sb)
-
-    # Should be low_risk (50 days < 138-day SMB benchmark), not high_risk
-    assert result["summary"]["low_risk"] == 1
-    deal = result["assessed_deals"][0]
-    # MEDDICC status marked as insufficient_data, not used for classification
-    assert deal["meddicc_status"] == "insufficient_data"
-    assert deal["overall_label"] == "low_risk"
-    # Verify MEDDICC insufficient_data note is present
-    assert any("insufficient_data" in rf for rf in deal["risk_factors"])
-
-
-def test_assess_deal_risk_with_stale_meddicc():
-    """Test MEDDICC staleness is tracked but not used for risk classification.
-
-    2026-09-16: MEDDICC signal deferred. Deal with 50 days open (within SMB
-    138-day benchmark) should be low_risk regardless of MEDDICC staleness.
-    MEDDICC age is still tracked for transparency.
-    """
-    today = date.today()
-    create_date = (today - timedelta(days=50)).isoformat()
-
-    # Mock stale MEDDICC data (18 days old) - IGNORED for risk classification
-    stale_date = datetime.now(timezone.utc) - timedelta(days=18)
-    mock_sb = MagicMock()
-    mock_sb.table().select().in_().order().execute.return_value = MagicMock(data=[{
-        "deal_id": "123",
-        "analyzed_at": stale_date.isoformat(),
-        "overall_score": 85,
-        "champion_score": 9,
-        "economic_buyer_score": 8,
-        "decision_criteria_score": 8,
-        "decision_process_score": 9,
-        "pain_score": 9,
-        "competition_score": 8,
-        "metrics_score": 8
+        "analyzed_at": (datetime.now(timezone.utc) - timedelta(days=2)).isoformat(),
+        "overall_score": 20,  # Low score = high risk
+        "champion_score": 3,
+        "economic_buyer_score": 2,
+        "decision_criteria_score": 3,
+        "decision_process_score": 2,
+        "pain_score": 3,
+        "competition_score": 4,
+        "metrics_score": 3
     }])
 
     deals = [{
@@ -137,36 +92,38 @@ def test_assess_deal_risk_with_stale_meddicc():
     result = assess_deal_risk(deals, mock_sb)
 
     deal = result["assessed_deals"][0]
-    # MEDDICC status always marked as insufficient_data (deferred)
-    assert deal["meddicc_status"] == "insufficient_data"
-    assert deal["meddicc_age_days"] == 18  # Age still tracked for transparency
-    assert deal["overall_label"] == "low_risk"  # Based on cycle-length only
-    # Verify MEDDICC insufficient_data note is present
-    assert any("insufficient_data" in rf for rf in deal["risk_factors"])
+    # Cycle risk: 35/60 * 100 * 0.85 = 49.6
+    # MEDDICC risk: (1 - 20/70) * 100 * 0.15 = 10.7
+    # Weighted: 49.6 + 10.7 = 60.3 → high_risk (threshold 60)
+    assert deal["overall_label"] == "high_risk"
+    assert deal["meddicc_status"] == "fresh"
+    assert deal["meddicc_overall_score"] == 20
+    assert any("20/70 overall score" in rf for rf in deal["risk_factors"])
+    assert any("weak signal" in rf for rf in deal["risk_factors"])
 
 
-def test_assess_deal_risk_low_risk():
-    """Test deal within benchmark is low_risk, MEDDICC marked insufficient_data.
+def test_assess_deal_risk_low_risk_with_good_meddicc():
+    """Test deal within benchmark with good MEDDICC score is low_risk.
 
-    2026-09-16: MEDDICC signal deferred. Risk classification based solely on
-    cycle-length. MEDDICC insufficient_data note should appear in risk_factors.
+    2026-09-21: MEDDICC signal enabled. Deal well within benchmark + good MEDDICC
+    should be confidently low_risk.
     """
     today = date.today()
     create_date = (today - timedelta(days=50)).isoformat()  # Well within SMB 138-day benchmark
 
-    # Mock fresh MEDDICC data with all Green scores (IGNORED for risk classification)
+    # Mock fresh MEDDICC data with high overall score
     mock_sb = MagicMock()
     mock_sb.table().select().in_().order().execute.return_value = MagicMock(data=[{
         "deal_id": "123",
         "analyzed_at": datetime.now(timezone.utc).isoformat(),
-        "overall_score": 90,
-        "champion_score": 9,
-        "economic_buyer_score": 9,
+        "overall_score": 55,  # Above median
+        "champion_score": 6,
+        "economic_buyer_score": 7,
         "decision_criteria_score": 8,
-        "decision_process_score": 9,
+        "decision_process_score": 6,
         "pain_score": 9,
-        "competition_score": 8,
-        "metrics_score": 9
+        "competition_score": 7,
+        "metrics_score": 7
     }])
 
     deals = [{
@@ -185,16 +142,125 @@ def test_assess_deal_risk_low_risk():
     deal = result["assessed_deals"][0]
     assert deal["overall_label"] == "low_risk"
     assert deal["days_past_benchmark"] < 0  # Within benchmark
-    assert deal["meddicc_status"] == "insufficient_data"  # Deferred, not "fresh"
-    # Verify MEDDICC insufficient_data note is present in risk_factors
-    assert any("insufficient_data" in rf for rf in deal["risk_factors"])
+    assert deal["meddicc_status"] == "fresh"
+    assert deal["meddicc_overall_score"] == 55
+    assert any("55/70 overall score" in rf for rf in deal["risk_factors"])
+
+
+def test_assess_deal_risk_missing_meddicc():
+    """Test deal without MEDDICC analysis uses neutral (50) risk score.
+
+    2026-09-21: Missing MEDDICC defaults to neutral (50) to not bias risk.
+    """
+    today = date.today()
+    create_date = (today - timedelta(days=155)).isoformat()  # 17 days past SMB benchmark
+
+    mock_sb = MagicMock()
+    mock_sb.table().select().in_().order().execute.return_value = MagicMock(data=[])
+
+    deals = [{
+        "deal_id": "123",
+        "company_name": "Test Corp",
+        "stage": LATE_STAGE_IDS[0],
+        "create_date": create_date,
+        "close_date": today.isoformat(),
+        "segment": "SMB",
+        "forecast_category": "COMMIT",
+        "deal_status": "active"
+    }]
+
+    result = assess_deal_risk(deals, mock_sb)
+
+    deal = result["assessed_deals"][0]
+    # Cycle risk: 17/60 * 100 * 0.85 = 24.1
+    # MEDDICC risk: 50 * 0.15 = 7.5 (neutral)
+    # Weighted: 24.1 + 7.5 = 31.6 → moderate_risk (threshold 30)
+    assert deal["overall_label"] == "moderate_risk"
+    assert deal["meddicc_status"] == "missing"
+    assert deal["meddicc_overall_score"] is None
+    assert any("no pre-close analysis available" in rf for rf in deal["risk_factors"])
+
+
+def test_pre_close_filter_excludes_post_close_analyses():
+    """PLANTED DISCREPANCY: Verify pre-close filter actually excludes post-close analyses.
+
+    2026-09-21: Critical test to prove pre-close filtering works as documented.
+    Creates a deal with TWO analyses:
+    1. Post-close analysis (should be EXCLUDED)
+    2. Pre-close analysis (should be INCLUDED)
+
+    If filter is NOT working, the post-close analysis (higher score) would be used.
+    If filter IS working, the pre-close analysis (lower score) is used.
+
+    Expected: pre-close analysis (30/70) is used, not post-close analysis (60/70).
+    """
+    mock_sb = MagicMock()
+
+    today = date.today()
+    close_date = today - timedelta(days=10)  # Deal closed 10 days ago
+    create_date = close_date - timedelta(days=150)  # Deal was open 150 days
+
+    # Two analyses: one post-close (should be excluded), one pre-close (should be included)
+    mock_analyses = [
+        {
+            "deal_id": "999",
+            "analyzed_at": (close_date + timedelta(days=5)).isoformat(),  # 5 days AFTER close (POST-CLOSE)
+            "overall_score": 60,  # Higher score (should be IGNORED)
+            "champion_score": 7,
+            "economic_buyer_score": 8,
+            "decision_criteria_score": 7,
+            "decision_process_score": 8,
+            "pain_score": 9,
+            "competition_score": 9,
+            "metrics_score": 7
+        },
+        {
+            "deal_id": "999",
+            "analyzed_at": (close_date - timedelta(days=2)).isoformat(),  # 2 days BEFORE close (PRE-CLOSE)
+            "overall_score": 30,  # Lower score (should be USED)
+            "champion_score": 3,
+            "economic_buyer_score": 4,
+            "decision_criteria_score": 4,
+            "decision_process_score": 5,
+            "pain_score": 5,
+            "competition_score": 4,
+            "metrics_score": 5
+        }
+    ]
+
+    mock_sb.table().select().in_().order().execute.return_value = MagicMock(data=mock_analyses)
+
+    deals = [{
+        "deal_id": "999",
+        "company_name": "Pre-Close Filter Test Corp",
+        "stage": LATE_STAGE_IDS[0],
+        "create_date": create_date.isoformat(),
+        "close_date": close_date.isoformat(),
+        "segment": "SMB",
+        "forecast_category": "COMMIT",
+        "deal_status": "closed_won"  # Closed deal
+    }]
+
+    result = assess_deal_risk(deals, mock_sb)
+
+    deal = result["assessed_deals"][0]
+
+    # CRITICAL ASSERTION: If pre-close filter is working, score should be 30 (pre-close), NOT 60 (post-close)
+    assert deal["meddicc_overall_score"] == 30, \
+        f"Pre-close filter FAILED: expected score 30 (pre-close), got {deal['meddicc_overall_score']} (likely post-close 60)"
+
+    # Additional verification: analyzed_at should be the pre-close date
+    assert deal["meddicc_age_days"] >= 12, \
+        f"Pre-close filter FAILED: analysis age {deal['meddicc_age_days']} days suggests post-close analysis was used"
+
+    print(f"✅ PLANTED DISCREPANCY PASSED: Pre-close filter correctly used score {deal['meddicc_overall_score']}/70 from pre-close analysis")
 
 
 def test_assess_deal_risk_insufficient_data():
     """Test deal with Unknown segment (no cycle benchmark) is insufficient_data.
 
-    2026-09-16: MEDDICC signal deferred. insufficient_data triggered by lack of
-    cycle benchmark only (segment-specific historical data missing).
+    2026-09-21: MEDDICC alone insufficient to classify (only +0.5 discrimination).
+    insufficient_data triggered by lack of cycle benchmark.
     """
     today = date.today()
     create_date = (today - timedelta(days=50)).isoformat()
@@ -218,66 +284,106 @@ def test_assess_deal_risk_insufficient_data():
     deal = result["assessed_deals"][0]
     assert deal["overall_label"] == "insufficient_data"
     assert deal["cycle_benchmark_days"] is None
-    assert deal["meddicc_status"] == "insufficient_data"  # Always deferred
-    # Verify MEDDICC insufficient_data note is present
-    assert any("insufficient_data" in rf for rf in deal["risk_factors"])
+    assert deal["meddicc_status"] == "missing"
 
 
-def test_classify_risk_logic():
-    """Test risk classification logic (cycle-length only, MEDDICC deferred).
+def test_classify_risk_logic_with_meddicc_weighting():
+    """Test risk classification logic with MEDDICC signal (15% weight).
 
-    2026-09-16: MEDDICC signal deferred. Classification uses only cycle-length
-    signal. meddicc_status and weak_components parameters are ignored.
+    2026-09-21: _classify_risk now incorporates MEDDICC overall score.
     """
-    # High risk: >30 days past benchmark
-    assert _classify_risk(days_past_benchmark=50, meddicc_status="ignored",
-                         weak_components=[], segment="SMB") == "high_risk"
+    # High risk: significantly overdue + low MEDDICC
+    assert _classify_risk(
+        days_past_benchmark=50,  # High cycle risk
+        meddicc_overall_score=15,  # Low MEDDICC score
+        segment="SMB"
+    ) == "high_risk"
 
-    # Moderate risk: 0-30 days past benchmark
-    assert _classify_risk(days_past_benchmark=15, meddicc_status="ignored",
-                         weak_components=[], segment="SMB") == "moderate_risk"
+    # Moderate risk: moderately overdue + neutral MEDDICC
+    assert _classify_risk(
+        days_past_benchmark=20,  # Moderate cycle risk
+        meddicc_overall_score=35,  # Mid MEDDICC score
+        segment="SMB"
+    ) == "moderate_risk"
 
-    # Low risk: within benchmark (negative days_past_benchmark)
-    assert _classify_risk(days_past_benchmark=-10, meddicc_status="ignored",
-                         weak_components=[], segment="SMB") == "low_risk"
+    # Low risk: within benchmark + good MEDDICC
+    assert _classify_risk(
+        days_past_benchmark=-10,  # Within benchmark
+        meddicc_overall_score=50,  # Good MEDDICC score
+        segment="SMB"
+    ) == "low_risk"
 
-    # Low risk at boundary: exactly at benchmark (0 days past)
-    assert _classify_risk(days_past_benchmark=0, meddicc_status="ignored",
-                         weak_components=[], segment="SMB") == "low_risk"
+    # Boundary case: 35 days past + no MEDDICC (neutral 50)
+    # Cycle: 35/60 * 100 * 0.85 = 49.6
+    # MEDDICC: 50 * 0.15 = 7.5
+    # Weighted: 57.1 → moderate_risk (just below 60 threshold)
+    assert _classify_risk(
+        days_past_benchmark=35,
+        meddicc_overall_score=None,  # Missing → neutral 50
+        segment="SMB"
+    ) == "moderate_risk"
 
-    # Insufficient data: no cycle benchmark available
-    assert _classify_risk(days_past_benchmark=None, meddicc_status="ignored",
-                         weak_components=[], segment="Unknown") == "insufficient_data"
+    # Insufficient data: no cycle benchmark (MEDDICC too weak alone)
+    assert _classify_risk(
+        days_past_benchmark=None,
+        meddicc_overall_score=60,  # Even with MEDDICC, can't classify without cycle
+        segment="Unknown"
+    ) == "insufficient_data"
 
-    # MEDDICC params are IGNORED - verify weak components don't affect classification
-    assert _classify_risk(days_past_benchmark=-10, meddicc_status="stale",
-                         weak_components=["A", "B", "C"], segment="SMB") == "low_risk"
 
+def test_fetch_latest_meddicc_scores_pre_close_filter():
+    """Test _fetch_latest_meddicc_scores filters to pre-close analyses.
 
-def test_identify_weak_components_late_stage():
-    """Test weak component identification for late-stage deals (Green threshold).
-
-    2026-09-16: This tests currently-unused logic (MEDDICC signal deferred).
-    Kept to verify the function remains intact for future use once sufficient
-    historical data exists to validate the MEDDICC framework.
+    2026-09-21: Function should exclude post-close analyses.
     """
-    meddicc_data = {
-        "champion_score": 7,  # Yellow - weak for late stage
-        "economic_buyer_score": 9,  # Green - OK
-        "decision_criteria_score": 5,  # Yellow - weak
-        "decision_process_score": 8,  # Green - OK
-        "pain_score": 3,  # Red - weak
-        "competition_score": 9,  # Green - OK
-        "metrics_score": 6  # Yellow - weak
+    mock_sb = MagicMock()
+
+    today = date.today()
+    close_date = today - timedelta(days=5)
+
+    # Mock two analyses: pre-close (should be kept) and post-close (should be excluded)
+    mock_analyses = [
+        {
+            "deal_id": "123",
+            "analyzed_at": (close_date + timedelta(days=1)).isoformat(),  # POST-close
+            "overall_score": 70,
+            "champion_score": 9,
+            "economic_buyer_score": 9,
+            "decision_criteria_score": 9,
+            "decision_process_score": 9,
+            "pain_score": 9,
+            "competition_score": 9,
+            "metrics_score": 9
+        },
+        {
+            "deal_id": "123",
+            "analyzed_at": (close_date - timedelta(days=3)).isoformat(),  # PRE-close
+            "overall_score": 40,
+            "champion_score": 5,
+            "economic_buyer_score": 5,
+            "decision_criteria_score": 5,
+            "decision_process_score": 5,
+            "pain_score": 5,
+            "competition_score": 5,
+            "metrics_score": 5
+        }
+    ]
+
+    mock_sb.table().select().in_().order().execute.return_value = MagicMock(data=mock_analyses)
+
+    deals_dict = {
+        "123": {
+            "deal_id": "123",
+            "close_date": close_date.isoformat(),
+            "deal_status": "closed_won"
+        }
     }
 
-    weak = _identify_weak_components(meddicc_data, LATE_STAGE_IDS[0])
+    result = _fetch_latest_meddicc_scores(mock_sb, ["123"], deals_dict)
 
-    assert len(weak) == 4
-    assert "Champion (7/10)" in weak
-    assert "Decision Criteria (5/10)" in weak
-    assert "Pain (3/10)" in weak
-    assert "Metrics (6/10)" in weak
+    # Should only get the pre-close analysis (score 40, not 70)
+    assert "123" in result
+    assert result["123"]["overall_score"] == 40
 
 
 def test_empty_deals_list():
@@ -294,23 +400,26 @@ if __name__ == "__main__":
     test_assess_deal_risk_with_overdue_cycle()
     print("✓ test_assess_deal_risk_with_overdue_cycle")
 
-    test_assess_deal_risk_with_weak_meddicc()
-    print("✓ test_assess_deal_risk_with_weak_meddicc")
+    test_assess_deal_risk_with_meddicc_signal()
+    print("✓ test_assess_deal_risk_with_meddicc_signal")
 
-    test_assess_deal_risk_with_stale_meddicc()
-    print("✓ test_assess_deal_risk_with_stale_meddicc")
+    test_assess_deal_risk_low_risk_with_good_meddicc()
+    print("✓ test_assess_deal_risk_low_risk_with_good_meddicc")
 
-    test_assess_deal_risk_low_risk()
-    print("✓ test_assess_deal_risk_low_risk")
+    test_assess_deal_risk_missing_meddicc()
+    print("✓ test_assess_deal_risk_missing_meddicc")
+
+    test_pre_close_filter_excludes_post_close_analyses()
+    print("✓ test_pre_close_filter_excludes_post_close_analyses [PLANTED DISCREPANCY]")
 
     test_assess_deal_risk_insufficient_data()
     print("✓ test_assess_deal_risk_insufficient_data")
 
-    test_classify_risk_logic()
-    print("✓ test_classify_risk_logic")
+    test_classify_risk_logic_with_meddicc_weighting()
+    print("✓ test_classify_risk_logic_with_meddicc_weighting")
 
-    test_identify_weak_components_late_stage()
-    print("✓ test_identify_weak_components_late_stage")
+    test_fetch_latest_meddicc_scores_pre_close_filter()
+    print("✓ test_fetch_latest_meddicc_scores_pre_close_filter")
 
     test_empty_deals_list()
     print("✓ test_empty_deals_list")
