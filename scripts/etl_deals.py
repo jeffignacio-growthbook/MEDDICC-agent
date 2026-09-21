@@ -588,6 +588,7 @@ def main():
         'no_company': 0,
         'no_slug': 0
     }
+    unmapped_bdr_owners = set()  # Track bdr_owner IDs that fail to map
 
     for i, deal_obj in enumerate(all_deals_api, 1):
         if i % 50 == 0:
@@ -621,6 +622,9 @@ def main():
             else:
                 # Try looking it up as an owner_id
                 sdr_owner_email = owner_emails.get(str(bdr_owner_value), '')
+                if not sdr_owner_email:
+                    # Track owner IDs that failed to map
+                    unmapped_bdr_owners.add(str(bdr_owner_value))
 
         if not deal_id:
             continue
@@ -894,6 +898,15 @@ def main():
                     print(f'  ⚠️  Supabase upsert failed for '
                           f'{deal.get("company_name")}: {e}')
             print(f'  ✓ Supabase: {count} deals upserted')
+
+            # Report unmapped BDR owner IDs if any
+            if unmapped_bdr_owners:
+                print(f'  ⚠️  SDR attribution: {len(unmapped_bdr_owners)} bdr_owner IDs failed to map to email:')
+                for owner_id in sorted(unmapped_bdr_owners)[:10]:  # Show first 10
+                    print(f'      - Owner ID {owner_id} not found in fetched owners')
+                if len(unmapped_bdr_owners) > 10:
+                    print(f'      ... and {len(unmapped_bdr_owners) - 10} more')
+
         except Exception as e:
             print(f'  ⚠️  Supabase write failed: {e}')
     else:
