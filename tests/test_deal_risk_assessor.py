@@ -54,21 +54,21 @@ def test_assess_deal_risk_with_overdue_cycle():
     assert any("224 days past" in rf for rf in deal["risk_factors"])
 
 
-def test_assess_deal_risk_with_meddicc_signal():
-    """Test MEDDICC signal (15% weight) affects risk classification at moderate levels.
+def test_assess_deal_risk_with_meddicc_context_only():
+    """Test MEDDICC displayed as context only, NOT weighted into risk classification.
 
-    2026-09-21: MEDDICC signal enabled. Deal with 35 days past benchmark (moderate by
-    cycle-length alone) + low MEDDICC score (20/70) should be high_risk when combined.
+    2026-09-21: MEDDICC NOT statistically significant (p=0.80). Deal with 20 days past
+    benchmark is moderate_risk (by cycle-length) regardless of MEDDICC score.
     """
     today = date.today()
-    create_date = (today - timedelta(days=173)).isoformat()  # 35 days past SMB 138-day benchmark
+    create_date = (today - timedelta(days=158)).isoformat()  # 20 days past SMB 138-day benchmark
 
-    # Mock MEDDICC data with low overall score
+    # Mock MEDDICC data with low overall score (should NOT affect classification)
     mock_sb = MagicMock()
     mock_sb.table().select().in_().order().execute.return_value = MagicMock(data=[{
         "deal_id": "123",
         "analyzed_at": (datetime.now(timezone.utc) - timedelta(days=2)).isoformat(),
-        "overall_score": 20,  # Low score = high risk
+        "overall_score": 20,  # Low score, but NOT used for classification
         "champion_score": 3,
         "economic_buyer_score": 2,
         "decision_criteria_score": 3,
@@ -92,14 +92,14 @@ def test_assess_deal_risk_with_meddicc_signal():
     result = assess_deal_risk(deals, mock_sb)
 
     deal = result["assessed_deals"][0]
-    # Cycle risk: 35/60 * 100 * 0.85 = 49.6
-    # MEDDICC risk: (1 - 20/70) * 100 * 0.15 = 10.7
-    # Weighted: 49.6 + 10.7 = 60.3 → high_risk (threshold 60)
-    assert deal["overall_label"] == "high_risk"
+    # Cycle-length only: 20 days past → moderate_risk (NOT affected by low MEDDICC score)
+    assert deal["overall_label"] == "moderate_risk"
     assert deal["meddicc_status"] == "fresh"
     assert deal["meddicc_overall_score"] == 20
+    # Verify MEDDICC is displayed with "context only" caveat
     assert any("20/70 overall score" in rf for rf in deal["risk_factors"])
-    assert any("weak signal" in rf for rf in deal["risk_factors"])
+    assert any("context only" in rf for rf in deal["risk_factors"])
+    assert any("p=0.80" in rf for rf in deal["risk_factors"])
 
 
 def test_assess_deal_risk_low_risk_with_good_meddicc():
@@ -287,46 +287,44 @@ def test_assess_deal_risk_insufficient_data():
     assert deal["meddicc_status"] == "missing"
 
 
-def test_classify_risk_logic_with_meddicc_weighting():
-    """Test risk classification logic with MEDDICC signal (15% weight).
+def test_classify_risk_logic_cycle_length_only():
+    """Test risk classification logic (cycle-length only, MEDDICC NOT weighted).
 
-    2026-09-21: _classify_risk now incorporates MEDDICC overall score.
+    2026-09-21: MEDDICC NOT statistically significant (p=0.80), so classification
+    uses cycle-length only.
     """
-    # High risk: significantly overdue + low MEDDICC
+    # High risk: significantly overdue
     assert _classify_risk(
-        days_past_benchmark=50,  # High cycle risk
-        meddicc_overall_score=15,  # Low MEDDICC score
+        days_past_benchmark=50,
         segment="SMB"
     ) == "high_risk"
 
-    # Moderate risk: moderately overdue + neutral MEDDICC
+    # Moderate risk: moderately overdue
     assert _classify_risk(
-        days_past_benchmark=20,  # Moderate cycle risk
-        meddicc_overall_score=35,  # Mid MEDDICC score
+        days_past_benchmark=20,
         segment="SMB"
     ) == "moderate_risk"
 
-    # Low risk: within benchmark + good MEDDICC
+    # Low risk: within benchmark
     assert _classify_risk(
-        days_past_benchmark=-10,  # Within benchmark
-        meddicc_overall_score=50,  # Good MEDDICC score
+        days_past_benchmark=-10,
         segment="SMB"
     ) == "low_risk"
 
-    # Boundary case: 35 days past + no MEDDICC (neutral 50)
-    # Cycle: 35/60 * 100 * 0.85 = 49.6
-    # MEDDICC: 50 * 0.15 = 7.5
-    # Weighted: 57.1 → moderate_risk (just below 60 threshold)
+    # Boundary case: exactly at threshold (30 days past → moderate)
     assert _classify_risk(
-        days_past_benchmark=35,
-        meddicc_overall_score=None,  # Missing → neutral 50
+        days_past_benchmark=31,
+        segment="SMB"
+    ) == "high_risk"
+
+    assert _classify_risk(
+        days_past_benchmark=30,
         segment="SMB"
     ) == "moderate_risk"
 
-    # Insufficient data: no cycle benchmark (MEDDICC too weak alone)
+    # Insufficient data: no cycle benchmark
     assert _classify_risk(
         days_past_benchmark=None,
-        meddicc_overall_score=60,  # Even with MEDDICC, can't classify without cycle
         segment="Unknown"
     ) == "insufficient_data"
 
@@ -400,8 +398,8 @@ if __name__ == "__main__":
     test_assess_deal_risk_with_overdue_cycle()
     print("✓ test_assess_deal_risk_with_overdue_cycle")
 
-    test_assess_deal_risk_with_meddicc_signal()
-    print("✓ test_assess_deal_risk_with_meddicc_signal")
+    test_assess_deal_risk_with_meddicc_context_only()
+    print("✓ test_assess_deal_risk_with_meddicc_context_only")
 
     test_assess_deal_risk_low_risk_with_good_meddicc()
     print("✓ test_assess_deal_risk_low_risk_with_good_meddicc")
@@ -415,8 +413,8 @@ if __name__ == "__main__":
     test_assess_deal_risk_insufficient_data()
     print("✓ test_assess_deal_risk_insufficient_data")
 
-    test_classify_risk_logic_with_meddicc_weighting()
-    print("✓ test_classify_risk_logic_with_meddicc_weighting")
+    test_classify_risk_logic_cycle_length_only()
+    print("✓ test_classify_risk_logic_cycle_length_only")
 
     test_fetch_latest_meddicc_scores_pre_close_filter()
     print("✓ test_fetch_latest_meddicc_scores_pre_close_filter")

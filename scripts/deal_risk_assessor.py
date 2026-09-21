@@ -11,10 +11,11 @@ Risk signals:
 
 MEDDICC Signal Status (as of 2026-09-21):
 - Coverage improved to 67/229 closed-won deals (29.3%) via backfill
-- Pre-close analyses (40 won, 276 lost) show weak positive discrimination: +0.5 points overall
-- Signal ENABLED with caveats: overall score only, 15% weight, pre-close filtering enforced
-- Discrimination is weak (+0.5/70 = 0.7% delta), not decisive for borderline risk calls
-- Competition component strongest (+1.3), but Metrics/Pain/Champion show reverse correlation
+- Pre-close analyses (40 won, 276 lost) show +0.5 points raw difference
+- Statistical test: p=0.80, 95% CI [-3.44, +4.45], Cohen's d=0.04 (negligible)
+- Signal NOT statistically distinguishable from zero - direction could flip by chance
+- MEDDICC displayed as INFORMATIONAL CONTEXT ONLY - NOT weighted into risk classification
+- Pre-close filtering still enforced (post-close analyses excluded as non-predictive)
 
 Returns per-deal risk_factors list + overall_label (high_risk/moderate_risk/
 low_risk/insufficient_data). No fabricated probabilities.
@@ -156,13 +157,13 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
                 f"benchmark for comparison)"
             )
 
-        # RISK SIGNAL 2: MEDDICC overall score (ENABLED 2026-09-21)
-        # 2026-09-21: Signal enabled with caveats after backfill improved coverage to 29.3%
-        # (67/229 won deals). Pre-close discrimination is weak (+0.5/70 points) but
-        # statistically meaningful at n=40 won vs n=276 lost.
+        # RISK SIGNAL 2: MEDDICC overall score (INFORMATIONAL ONLY - NOT WEIGHTED)
+        # 2026-09-21: Coverage improved to 29.3% (67/229 won deals) via backfill.
+        # Statistical test on pre-close data (n=40 won, n=276 lost): p=0.80, 95% CI [-3.44, +4.45]
+        # Discrimination (+0.5 points) NOT distinguishable from zero - direction could flip by chance.
         #
-        # Using overall score only (not individual components - Metrics/Pain/Champion
-        # show reverse correlation). Pre-close filtering enforced in _fetch_latest_meddicc_scores.
+        # MEDDICC displayed for context but NOT used in risk classification (cycle-length only).
+        # Pre-close filtering still enforced in _fetch_latest_meddicc_scores.
         meddicc_data = meddicc_scores.get(deal_id)
         meddicc_status = "missing"
         meddicc_age_days = None
@@ -188,12 +189,12 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
                 except (ValueError, TypeError):
                     pass
 
-            # Add MEDDICC score to risk factors with caveat about weak discrimination
+            # Display MEDDICC score with explicit note that it's NOT weighted
             if meddicc_overall_score is not None:
                 risk_factors.append(
                     f"MEDDICC: {meddicc_overall_score}/70 overall score "
                     f"({meddicc_status}, {meddicc_age_days} days old) "
-                    f"[weak signal: +0.5pt discrimination on pre-close data]"
+                    f"[shown for context only; not yet strong enough signal to weight into risk classification - p=0.80]"
                 )
         else:
             risk_factors.append(
@@ -201,10 +202,9 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
                 "post-close analyses are excluded)"
             )
 
-        # OVERALL LABEL: Classify based on risk factors (cycle length + MEDDICC overall score)
+        # OVERALL LABEL: Classify based on cycle-length only (MEDDICC not statistically significant)
         overall_label = _classify_risk(
             days_past_benchmark=days_past_benchmark,
-            meddicc_overall_score=meddicc_overall_score,
             segment=segment
         )
 
@@ -359,76 +359,40 @@ def _identify_weak_components(meddicc_data: Dict[str, Any], stage: str) -> List[
 
 def _classify_risk(
     days_past_benchmark: Optional[int],
-    meddicc_overall_score: Optional[int],
     segment: str
 ) -> str:
     """
-    Classify overall risk level based on weighted combination of two signals:
-    1. Cycle-length signal (85% weight): Days past segment 75th percentile
-    2. MEDDICC overall score (15% weight): 0-70 scale, pre-close analyses only
+    Classify overall risk level based on cycle-length signal only.
 
-    2026-09-21: MEDDICC signal enabled with low weight (15%) due to weak discrimination
-    (+0.5/70 points on pre-close data). Not decisive for borderline calls, but provides
-    directional signal when combined with cycle-length.
+    2026-09-21: MEDDICC signal tested but NOT statistically significant (p=0.80,
+    95% CI [-3.44, +4.45], discrimination indistinguishable from zero). MEDDICC
+    displayed for context but NOT weighted into risk classification.
 
-    Scoring logic:
-    - Cycle-length risk score (0-100):
-      * 0 if days_past_benchmark is None (no data)
-      * 100 if >60 days past (very high risk)
-      * Linear scale 0-100 for 0-60 days past
-    - MEDDICC risk score (0-100):
-      * 0 if meddicc_overall_score is None (no data)
-      * Inverse of overall_score/70 normalized to 0-100
-      * Example: 35/70 = 50% good → 50 risk score
-
-    Weighted risk score:
-      risk = (cycle_risk * 0.85) + (meddicc_risk * 0.15)
-
-    Thresholds:
-    - high_risk: risk >= 60
-    - moderate_risk: risk >= 30
-    - low_risk: risk < 30
-    - insufficient_data: no cycle benchmark available
+    Logic:
+    - insufficient_data: Unknown segment with no cycle benchmark
+    - high_risk: Significantly past benchmark (>30 days)
+    - moderate_risk: Moderately past benchmark (0-30 days)
+    - low_risk: Within benchmark
 
     Args:
         days_past_benchmark: Days beyond segment's 75th percentile, or None if no benchmark
-        meddicc_overall_score: MEDDICC overall score (0-70), or None if no pre-close analysis
         segment: Deal segment for context
     """
     # Insufficient data: no cycle benchmark to assess
-    # (MEDDICC alone is too weak to make a call - only +0.5 discrimination)
+    # MEDDICC alone insufficient (p=0.80, not statistically significant)
     if days_past_benchmark is None:
         return "insufficient_data"
 
-    # SIGNAL 1: Cycle-length risk (85% weight)
-    # Scale: 0-60+ days past benchmark → 0-100 risk score
-    if days_past_benchmark <= 0:
-        cycle_risk = 0.0
-    elif days_past_benchmark >= 60:
-        cycle_risk = 100.0
-    else:
-        cycle_risk = (days_past_benchmark / 60.0) * 100.0
-
-    # SIGNAL 2: MEDDICC risk (15% weight)
-    # Scale: 0-70 overall score → 100-0 risk score (inverted)
-    # Low MEDDICC score = high risk, high MEDDICC score = low risk
-    if meddicc_overall_score is None:
-        # No MEDDICC data: default to neutral (50) to not bias the overall risk
-        meddicc_risk = 50.0
-    else:
-        # Invert: 0/70 = 100 risk, 70/70 = 0 risk, 35/70 = 50 risk
-        meddicc_risk = max(0, min(100, (1.0 - meddicc_overall_score / 70.0) * 100.0))
-
-    # Weighted combination: 85% cycle, 15% MEDDICC
-    weighted_risk = (cycle_risk * 0.85) + (meddicc_risk * 0.15)
-
-    # Classify based on weighted risk score
-    if weighted_risk >= 60:
+    # High risk: significantly overdue (>30 days past benchmark)
+    if days_past_benchmark > 30:
         return "high_risk"
-    elif weighted_risk >= 30:
+
+    # Moderate risk: moderately overdue (0-30 days past benchmark)
+    if days_past_benchmark > 0:
         return "moderate_risk"
-    else:
-        return "low_risk"
+
+    # Low risk: within or ahead of benchmark
+    return "low_risk"
 
 
 def get_at_risk_deals(sb, fiscal_quarter: Optional[str] = None) -> Dict[str, Any]:

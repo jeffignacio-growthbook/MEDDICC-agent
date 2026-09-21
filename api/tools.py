@@ -262,15 +262,14 @@ async def assess_deal_risk(sb, deal_ids=None, fiscal_quarter=None):
 
     AND have close_date in current or specified fiscal quarter.
 
-    Risk signals (weighted combination):
-    1. Deal duration vs. segment cycle benchmarks (85% weight) - 75th percentile from 327 historical won deals
-    2. MEDDICC overall score (15% weight) - ENABLED as of 2026-09-21, pre-close analyses only
+    Risk signal: Deal duration vs. segment cycle benchmarks (75th percentile from 327 historical won deals)
 
-    MEDDICC signal caveats:
-    - Weak discrimination (+0.5/70 points on pre-close data, n=40 won vs n=276 lost)
-    - Overall score only (individual components too noisy - Metrics/Pain/Champion show reverse correlation)
+    MEDDICC signal status (as of 2026-09-21):
+    - Coverage improved to 29.3% (67/229 won deals) via backfill
+    - Statistical test: p=0.80, 95% CI [-3.44, +4.45], discrimination NOT significant
+    - Displayed as INFORMATIONAL CONTEXT ONLY - NOT weighted into risk classification
     - Pre-close filtering enforced (post-close analyses excluded as non-predictive)
-    - Not decisive for borderline calls, provides directional signal when combined with cycle length
+    - Risk classification uses cycle-length only until stronger evidence exists
 
     Args:
         sb: Supabase client
