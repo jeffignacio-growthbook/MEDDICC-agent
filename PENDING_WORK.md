@@ -2575,6 +2575,61 @@ no functional change.
 
 ---
 
+#### 27. `deals_snapshot` Daily Cadence Blocked by Evidence-Counting Dedup Gap — `query_commit_ml_calibration_by_week` and `query_stage_close_rate`
+
+**Issue:** Two primitives built tonight (`forecast_trust.py`'s
+`query_commit_ml_calibration_by_week()` and `pipeline_coverage.py`'s
+`query_stage_close_rate()`) count `deals_snapshot` **rows** matching a
+`(fiscal_quarter, week_of_quarter)` pair without deduplicating by
+`deal_id`. Both gate their output on `classified >= min_evidence_count`
+(default 30) before trusting a win-rate computation. This design is
+correct under the current weekly snapshot cadence — each deal
+contributes ≤1 row per week, so row count ≈ distinct deal count — but
+would break if `deals_snapshot` moves to daily cadence: a deal that
+doesn't change stage/category for a week would contribute ~7 identical
+rows to that week's bucket, inflating `n_tagged`/`classified` counts
+~7x while the real number of distinct deals stays the same.
+
+**Why it matters:** The evidence floor would trip roughly 7x too early,
+silently letting a genuinely thin week (e.g., 5 real deals) pass as if
+it had 35 — defeating the exact protection `min_evidence_count` exists
+for. The win-rate point estimate itself would likely stay close to
+correct (numerator and denominator inflate together), but the
+statistical significance gate would be systematically wrong.
+
+**Found during:** Daily analytics ETL audit (2026-09-21). Both
+primitives (`query_commit_ml_calibration_by_week` and
+`query_stage_close_rate`) explicitly document the row-counting
+assumption in their docstrings: *"deal-week observations, not deduped
+to unique deals"*. This was a deliberate design choice under weekly
+cadence, not an oversight.
+
+**Status:** NOT BROKEN today — `deals_snapshot` is still written weekly
+via `weekly-analytics.yml`, so the current row-counting logic is
+correct. This is a **hard prerequisite blocking any future move of
+`deals_snapshot` to daily cadence**. The audit explicitly defers moving
+snapshot writes to daily (Step 2 only moves the base `deals` table
+upsert to daily, snapshot stays weekly).
+
+**Work:** If/when `deals_snapshot` moves to daily cadence:
+1. **Add deduplication by `deal_id`** to both
+   `query_commit_ml_calibration_by_week()` and
+   `query_stage_close_rate()` — either via a DISTINCT clause in the SQL
+   query or by counting unique `deal_id` values per week in Python
+2. **OR select one row per deal per week** — e.g., `MAX(snapshot_date)`
+   per `(deal_id, fiscal_quarter, week_of_quarter)` group, so each deal
+   contributes exactly one row per week regardless of how many daily
+   snapshots exist
+3. Update docstrings to reflect the new dedup logic
+
+**Complexity:** Low effort (one DISTINCT clause or GROUP BY per query,
+~10-15 lines total), but **blocking** — do not move
+`snapshot_deals.py` to daily cadence without fixing this first. Logged
+here so nobody makes that change later without reading this
+prerequisite.
+
+---
+
 ## 📝 Notes
 
 ### Patterns Established
