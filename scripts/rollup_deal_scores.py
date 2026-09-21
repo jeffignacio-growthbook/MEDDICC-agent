@@ -182,7 +182,14 @@ def write_rollup(deal, sb, hubspot, sb_writer, output_dir):
                                       component_details=details,
                                       stage_at_analysis=deal.get('stage'))
         except Exception as e:
-            print(f"   ⚠️  {company}: Supabase analysis write failed: {e}")
+            import traceback
+            print(f"   ⚠️  {company} ({deal_id}): Supabase analysis write failed")
+            print(f"      Exception type: {type(e).__name__}")
+            print(f"      Message: {str(e)}")
+            print(f"      Traceback:")
+            for line in traceback.format_exc().split('\n'):
+                if line.strip():
+                    print(f"        {line}")
 
     return {"deal_id": deal_id, "company": company, "status": "analyzed",
             "mode": "progressive", "calls": len(rows), "overall_score": tot,
