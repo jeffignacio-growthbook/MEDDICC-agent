@@ -153,6 +153,14 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add memory/ output/
           git diff --quiet && git diff --staged --quiet || git commit -m "Update MEDDICC agent memory and analyses [skip ci]"
+          echo "=== Git status before pull/rebase ==="
+          git status --porcelain
+          echo "=== Staged files ==="
+          git diff --staged --name-only
+          echo "=== Unstaged files ==="
+          git diff --name-only
+          echo "=== Untracked files ==="
+          git ls-files --others --exclude-standard
           git pull --rebase origin main || {
             git rebase --abort
             git pull origin main --no-rebase -X ours
