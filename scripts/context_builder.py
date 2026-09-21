@@ -61,7 +61,7 @@ Output a JSON object with this exact structure:
     "economic_buyer": { ... },
     "decision_criteria": { ... },
     "decision_process": { ... },
-    "identified_pain": { ... },
+    "pain": { ... },
     "champion": { ... },
     "competition": { ... }
   },
@@ -152,7 +152,7 @@ CRITICAL: Return ONLY a valid JSON object. Do NOT include any explanatory text, 
             "meddicc_state": {
                 k: {"status": "unknown", "evidence": "", "score": 0}
                 for k in ["metrics", "economic_buyer", "decision_criteria",
-                         "decision_process", "identified_pain", "champion", "competition"]
+                         "decision_process", "pain", "champion", "competition"]
             },
             "key_context": "Cumulative context unavailable — analyze recent call independently.",
             "error": str(e)

@@ -29,6 +29,13 @@ class HubSpotDealsClient:
 
     BASE_URL = "https://api.hubapi.com"
 
+    # HubSpot property key translation: Supabase uses "pain" (matching DB schema),
+    # but HubSpot properties use "identified_pain" (from setup_hubspot_properties.py).
+    # This mapping translates internal keys to HubSpot property names only at write time.
+    HUBSPOT_KEY_MAPPING = {
+        "pain": "identified_pain",  # pain_score → meddicc_identified_pain_score
+    }
+
     # Pipeline IDs
     SALES_PIPELINE = "default"
     RENEWAL_PIPELINE = "866608541"
@@ -586,9 +593,12 @@ class HubSpotDealsClient:
             status   = data.get('status', 'unknown')
             evidence = (data.get('evidence') or '').strip()[:1000]
 
-            properties[f"meddicc_{component}_score"]    = str(score)
-            properties[f"meddicc_{component}_status"]   = status
-            properties[f"meddicc_{component}_rationale"]= evidence
+            # Translate Supabase key to HubSpot property key (e.g., "pain" → "identified_pain")
+            hubspot_key = self.HUBSPOT_KEY_MAPPING.get(component, component)
+
+            properties[f"meddicc_{hubspot_key}_score"]    = str(score)
+            properties[f"meddicc_{hubspot_key}_status"]   = status
+            properties[f"meddicc_{hubspot_key}_rationale"]= evidence
 
         if not properties:
             return {}

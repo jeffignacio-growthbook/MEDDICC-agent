@@ -390,7 +390,7 @@ def process_single_deal(deal: dict, memory, tracker, hubspot, sb_writer) -> dict
                 "meddicc_state": {
                     k: {"status": "unknown", "evidence": "", "score": 0}
                     for k in ["metrics", "economic_buyer", "decision_criteria",
-                             "decision_process", "identified_pain", "champion", "competition"]
+                             "decision_process", "pain", "champion", "competition"]
                 },
                 "key_context": "First call on record — no prior context."
             }

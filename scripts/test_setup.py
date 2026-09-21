@@ -148,7 +148,7 @@ Technical review with Sarah Chen. Confirmed feature flag requirements and SDK in
                 "economic_buyer": {"status": "partial", "evidence": "CFO approval needed", "score": 5},
                 "decision_criteria": {"status": "unknown", "evidence": "", "score": 2},
                 "decision_process": {"status": "unknown", "evidence": "", "score": 2},
-                "identified_pain": {"status": "partial", "evidence": "Feature flag complexity", "score": 5},
+                "pain": {"status": "partial", "evidence": "Feature flag complexity", "score": 5},
                 "champion": {"status": "unknown", "evidence": "", "score": 2},
                 "competition": {"status": "unknown", "evidence": "", "score": 2}
             },

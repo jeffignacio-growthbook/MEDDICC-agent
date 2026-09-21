@@ -700,7 +700,7 @@ SDK quality, visual editor, experimentation, SSO, SAML, budget approval
                 "evidence": "CFO approval needed for >$50k, timeline Q4 planning in September",
                 "score": 6
             },
-            "identified_pain": {
+            "pain": {
                 "status": "identified",
                 "evidence": "Feature flagging complexity and LaunchDarkly pricing frustration",
                 "score": 8

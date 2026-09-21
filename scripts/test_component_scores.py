@@ -165,7 +165,7 @@ def main():
         'economic_buyer': 'ECONOMIC BUYER',
         'decision_criteria': 'DECISION CRITERIA',
         'decision_process': 'DECISION PROCESS',
-        'identified_pain': 'IDENTIFIED PAIN',
+        'pain': 'IDENTIFIED PAIN',
         'champion': 'CHAMPION',
         'competition': 'COMPETITION',
     }
@@ -226,7 +226,7 @@ def main():
                 'economic_buyer_score': component_details.get('economic_buyer', {}).get('score', 0),
                 'decision_criteria_score': component_details.get('decision_criteria', {}).get('score', 0),
                 'decision_process_score': component_details.get('decision_process', {}).get('score', 0),
-                'pain_score': component_details.get('identified_pain', {}).get('score', 0),
+                'pain_score': component_details.get('pain', {}).get('score', 0),
                 'champion_score': component_details.get('champion', {}).get('score', 0),
                 'competition_score': component_details.get('competition', {}).get('score', 0),
                 'summary': 'Test run'
