@@ -1,58 +1,79 @@
 # Pending Work
 
-**Last Updated:** 2026-09-21 (MEDDICC Component Naming Inconsistency — "pain" vs "identified_pain")
+**Last Updated:** 2026-09-21 (CRITICAL: Database Schema Mismatch Fixed — "pain" vs "identified_pain")
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
 
 ## 🟡 Open Items
 
-### Low Priority #18: MEDDICC Component Naming Inconsistency (2026-09-21)
-**Status:** 🟡 DOCUMENTED - Naming split between HubSpot integration and rest of system
-
-**The Inconsistency:**
-The "Identified Pain" MEDDICC component has inconsistent internal naming across the codebase:
-- **"pain"**: Used in 35+ locations (canonical in most code)
-  - Supabase schema: `pain_score` column (migration 043)
-  - Most scoring/evaluation scripts (rollup_deal_scores.py, eval_*.py, etc.)
-  - Database queries and aggregations
-- **"identified_pain"**: Used in 7 locations (HubSpot integration + some newer files)
-  - HubSpot properties: `meddicc_identified_pain_score/status/rationale` (setup_hubspot_properties.py)
-  - call_scorer.py (fixed Sept 21 to match HubSpot, commit a90e7c8)
-  - context_builder.py, run_nightly.py, meddicc_agent.py
-
-**User-facing display name:** "Identified Pain" in prompts/CLAUDE.md (consistent everywhere)
-
-**Why the split exists:**
-1. Aug 12, 2026 (be16c07c): HubSpot properties created with "identified_pain" key
-2. Aug 23, 2026 (17aaecfb): Progressive Scoring introduced call_scorer.py with "pain" key
-3. Sept 21, 2026 (a90e7c8): call_scorer.py changed to "identified_pain" to fix HubSpot 400 errors
-
-**Impact:**
-- Code works correctly (HubSpot writes succeed after Sept 21 fix)
-- But naming is split: some files use "pain", others use "identified_pain"
-- Creates maintenance burden: new code must know which key to use in which context
-- Risk of future bugs if someone assumes one naming convention throughout
-
-**Recommended reconciliation (NOT urgent, but should be done eventually):**
-1. Pick ONE canonical internal key for the entire system
-2. Either standardize on "pain" (more prevalent, matches DB schema) OR "identified_pain" (matches HubSpot, more explicit)
-3. Update all references to use the chosen key consistently
-4. Add a type/constant to prevent future divergence (e.g., `COMPONENT_KEYS = {...}`)
-
-**Why not fixed immediately:**
-- Current code works correctly after Sept 21 fix
-- Full reconciliation touches 40+ files (risk of introducing new bugs)
-- Requires careful testing of HubSpot writes, Supabase queries, and scoring logic
-- Better to document now, schedule dedicated refactor later
-
-**Previous context (for when this is eventually addressed):**
-- Intent classifier max_tokens truncation (2026-09-18) fixed a systemic routing failure
-- See full PENDING_WORK.md history for Low Priority #17 and earlier
+(No open items currently — last item escalated to CRITICAL and fixed Sept 21)
 
 ---
 
 ## ✅ Recently Completed
+
+### CRITICAL: Database Schema Mismatch — "pain" vs "identified_pain" (2026-09-21)
+**Status:** ✅ FIXED (commit 44cb20c) - Proper architecture: separate Supabase/HubSpot key mappings
+
+**Timeline:**
+1. **Aug 12** (be16c07c): HubSpot properties created with "identified_pain" key
+2. **Aug 23** (17aaecfb): Progressive Scoring introduced with "pain" key (matching DB schema)
+3. **Sept 21** (a90e7c8): Bug #1 fix globally renamed "pain" → "identified_pain" (caused cascading failure)
+4. **Sept 21** (44cb20c): **THIS FIX** - Reverted to "pain" internally, added HubSpot translation layer
+
+**The Crisis (Sept 21, Post-Bug #1 Fix):**
+Bug #1 fix (commit a90e7c8) changed call_scorer.py to use "identified_pain" globally, which cascaded into **100% failure rate**:
+- ALL 179 deals failed with: `column call_scores.identified_pain_score does not exist`
+- Progressive mode completely broken (0% analysis success rate)
+- rollup_deal_scores.py could not read ANY existing call_scores rows
+- More severe than original Bug #1 (which only affected 54.7% of deals)
+
+**Root Cause:**
+1. Database schema (migrations/043) defines column: `pain_score`
+2. 1,469 existing call_scores rows use `pain_score`
+3. Bug #1 fix globally renamed "pain" → "identified_pain" in COMPONENTS
+4. rollup_deal_scores.py generates column list from COMPONENT_KEYS: `[f"{k}_score" for k in cs.COMPONENT_KEYS]`
+5. SQL SELECT tried to read "identified_pain_score" column (doesn't exist in schema)
+
+**The Proper Fix (commit 44cb20c):**
+1. **Reverted call_scorer.py** COMPONENTS to use "pain" (matches DB schema: `pain_score`)
+2. **Added HUBSPOT_KEY_MAPPING** in hubspot_deals.py to translate "pain" → "identified_pain" ONLY when writing to HubSpot properties
+3. **Updated all files** to use "pain" internally (Supabase-facing):
+   - context_builder.py: meddicc_state keys
+   - run_nightly.py: meddicc_state initialization
+   - meddicc_agent.py: example test data
+   - test_setup.py, test_component_scores.py: test fixtures
+
+**Design Principle Established:**
+**Never use one global key for both Supabase and HubSpot.** The two systems have genuinely different naming conventions that don't need to match. Maintain TWO separate mappings:
+- **Supabase/internal:** "pain" (matches `call_scores.pain_score` column)
+- **HubSpot properties:** "identified_pain" (matches `meddicc_identified_pain_score`)
+- **Translation layer:** `write_component_scores()` applies `HUBSPOT_KEY_MAPPING` at write time
+
+**Why This Architecture is Correct:**
+- Supabase schema is fixed (1,469 existing rows, migration-based)
+- HubSpot properties are fixed (created Aug 12, can't easily rename)
+- Systems genuinely have different conventions — forcing one name breaks the other
+- Translation layer is explicit, localized, and easy to maintain
+
+**Verification Still Needed:**
+Live test run must confirm BOTH paths work simultaneously:
+1. Supabase read: `load_deal_call_scores()` succeeds (no schema error)
+2. HubSpot write: `write_component_scores()` succeeds (no 400 error)
+
+**Files Changed:**
+- scripts/call_scorer.py - Reverted COMPONENTS to "pain"
+- scripts/hubspot_deals.py - Added HUBSPOT_KEY_MAPPING translation
+- scripts/context_builder.py - "identified_pain" → "pain"
+- scripts/run_nightly.py - "identified_pain" → "pain"
+- scripts/meddicc_agent.py - "identified_pain" → "pain"
+- scripts/test_setup.py - "identified_pain" → "pain"
+- scripts/test_component_scores.py - "identified_pain" → "pain"
+
+**Lesson:** Low-priority naming inconsistencies can escalate to critical failures when "fixed" with global renames without considering schema dependencies. Proper fix required understanding that the two systems legitimately differ and need explicit translation, not unification.
+
+---
 
 ### Intent Classifier max_tokens Truncation (2026-09-18)
 **Status:** ✅ FIXED - Systemic routing failure resolved
