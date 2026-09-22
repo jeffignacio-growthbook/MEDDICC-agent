@@ -6,6 +6,10 @@ Extends base Fireflies client with company-based search for MEDDICC analysis.
 import os
 import sys
 import requests
+
+# (connect, read) seconds. A hung connection must fail and be retried/deferred,
+# never stall a backfill until the job timeout.
+REQUEST_TIMEOUT = (10, 60)
 from typing import List, Dict, Optional
 from datetime import datetime
 
@@ -29,7 +33,7 @@ class FirefliesClient:
         payload = {"query": query}
         if variables:
             payload["variables"] = variables
-        response = self.session.post(self.BASE_URL, json=payload)
+        response = self.session.post(self.BASE_URL, json=payload, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         return response.json()
 

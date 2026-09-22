@@ -11,7 +11,7 @@ on:
       branch:
         description: 'Branch to run from'
         required: true
-        default: 'claude/git-pull-origin-main-6r028h'
+        default: 'main'
       dry_run:
         description: 'Report per-source counts without writing'
         required: false
@@ -20,6 +20,18 @@ on:
         description: 'Only this source (fireflies|apollo), blank = all'
         required: false
         default: ''
+      limit:
+        description: 'Cap calls processed per source (blank = no cap)'
+        required: false
+        default: ''
+      max_consecutive_deferrals:
+        description: 'Stop a source after this many deferrals in a row (rate limit / outage breaker)'
+        required: false
+        default: '8'
+      fetch_retries:
+        description: 'Fetch attempts per call (HTTP 429 backs off 15s, 30s, 60s, 120s)'
+        required: false
+        default: '6'
 
 permissions:
   contents: read
@@ -52,5 +64,8 @@ jobs:
           ARGS=""
           if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
           if [ -n "${{ inputs.source }}" ]; then ARGS="$ARGS --source ${{ inputs.source }}"; fi
+          if [ -n "${{ inputs.limit }}" ]; then ARGS="$ARGS --limit ${{ inputs.limit }}"; fi
+          if [ -n "${{ inputs.max_consecutive_deferrals }}" ]; then ARGS="$ARGS --max-consecutive-deferrals ${{ inputs.max_consecutive_deferrals }}"; fi
+          if [ -n "${{ inputs.fetch_retries }}" ]; then ARGS="$ARGS --fetch-retries ${{ inputs.fetch_retries }}"; fi
           echo "Running: backfill_transcripts.py $ARGS"
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/backfill_transcripts.py $ARGS

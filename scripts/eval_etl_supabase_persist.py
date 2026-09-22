@@ -361,7 +361,61 @@ def test_resync_targets_only_bare_calls_rows():
     return cases
 
 
+def test_http_429_gets_long_backoff_and_timeouts_are_set():
+    """Bulk-backfill hardening: an HTTP 429 from Apollo/Fireflies must get the
+    LONG backoff (and honor Retry-After), not the 2s..32s generic schedule;
+    both API clients must set request timeouts."""
+    import transcript_store as ts
+    cases = []
+
+    class Resp:
+        def __init__(self, status, headers=None):
+            self.status_code, self.headers = status, headers or {}
+
+    class HTTPErr(Exception):
+        def __init__(self, status, headers=None, msg="HTTP error"):
+            super().__init__(msg)
+            self.response = Resp(status, headers)
+
+    def run(exc, retries=3):
+        sleeps = []
+        saved_sleep, saved = ts.time.sleep, dict(ts._FETCHERS)
+        ts.time.sleep = sleeps.append
+
+        def boom(call_id, clients):
+            raise exc
+        ts._FETCHERS["apollo"] = boom
+        try:
+            utts, err, extra = ts.fetch_utterances("apollo", "6ab4290000", {}, retries=retries)
+        finally:
+            ts.time.sleep = saved_sleep
+            ts._FETCHERS.clear(); ts._FETCHERS.update(saved)
+        return utts, err, sleeps
+
+    utts, err, sleeps = run(HTTPErr(429, msg="429 Client Error: Too Many Requests"))
+    cases.append(("429 without Retry-After: long backoff 15s, 30s", sleeps == [15.0, 30.0]))
+    cases.append(("429 is reported as RateLimited(HTTP 429), deferred not written",
+                  utts == [] and err.startswith("RateLimited(HTTP 429)")))
+    _, _, sleeps = run(HTTPErr(429, {"Retry-After": "7"}))
+    cases.append(("429 honors Retry-After", sleeps == [7.0, 7.0]))
+    _, _, sleeps = run(HTTPErr(429, {"Retry-After": "900"}))
+    cases.append(("Retry-After capped at 120s", sleeps == [120.0, 120.0]))
+    _, _, sleeps = run(HTTPErr(500))
+    cases.append(("HTTP 500 keeps the short generic backoff", sleeps == [2.0, 4.0]))
+    _, _, sleeps = run(ConnectionError("Max retries exceeded with url: /conversations/6ab4290000"))
+    cases.append(("a '429' inside a URL/call id is NOT treated as a rate limit", sleeps == [2.0, 4.0]))
+
+    for p in ("apollo_client.py", "fireflies_client.py"):
+        src = (REPO / "scripts" / p).read_text()
+        import re
+        calls = re.findall(r"self\.session\.(?:get|post|patch)\([^\n]*", src)
+        cases.append((f"{p}: every session request sets a timeout",
+                      calls and all("timeout=REQUEST_TIMEOUT" in c for c in calls)))
+    return cases
+
+
 TESTS = [
+    test_http_429_gets_long_backoff_and_timeouts_are_set,
     test_late_same_day_arrival_is_caught_without_reprocessing,
     test_resync_targets_only_bare_calls_rows,
     test_self_heal_is_capped_and_breaks_on_rate_limit,
