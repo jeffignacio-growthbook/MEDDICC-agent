@@ -822,30 +822,31 @@ jobs:
           # references and wildcards are allowlisted (can't statically
           # validate). Reports coverage stats every run: "X/Y validated, Z
           # allowlisted" so the allowlist size stays visible. Currently
-          # validates 60.8% of .select() calls (45/74 found with same-line
-          # .table().select() pattern), allowlists 39.2% (wildcards, dynamic
-          # columns, count queries). Multi-line .table().select() not yet
-          # covered but major patterns caught. Test against Bug #1: this gate
-          # would have caught "amount" reference before production.
+          # validates 69.5% of Supabase .table().select() calls (73 same-line
+          # patterns out of 105 total Supabase patterns; 32 multi-line patterns
+          # are a known blind spot). Allowlists wildcards, dynamic columns, and
+          # count queries. Multi-line .table().select() not yet covered but
+          # major patterns caught. Test against Bug #1: this gate would have
+          # caught "amount" reference before production.
           PYTHONPATH=. python3 tests/test_column_reference_validity.py
 
       - name: "GATE 1 — Tool schema completeness: handler params match router tool descriptions"
-        continue-on-error: true  # Known gaps exist - gate documents them, doesn't block yet
         run: |
           set -e
           # Pre-2026-09-10 (query_pipeline_movement time_window gap): handler
-          # accepted 'time_window' parameter for filtering snapshot date ranges,
-          # but router.py tool description did NOT list it. Model couldn't use
-          # the parameter (schema said it didn't exist). Result: "last 2 weeks"
-          # questions fell back to arbitrary snapshot pairs (e.g., Aug 17-28
-          # instead of requested Aug 27-Sep 10). This gate prevents recurrence
-          # by validating that all parameters accepted by unified-routing
-          # handlers are documented in router.py's tool descriptions. Source of
-          # truth: handler docstring "params:" sections (where semantic
-          # parameters are listed) vs router.py function signatures. Currently
-          # runs with continue-on-error due to known documentation gaps across
-          # 7 migrated handlers - gate documents the gaps without blocking.
-          # Coverage: validates all query_* handlers migrated to unified-routing.
+          # CODE used params.get('time_window'), but router.py tool description
+          # did NOT list it. Model couldn't use the parameter (schema said it
+          # didn't exist). Result: "last 2 weeks" questions fell back to
+          # arbitrary snapshot pairs (e.g., Aug 17-28 instead of Aug 27-Sep 10).
+          # This gate prevents recurrence by validating that all parameters READ
+          # in handler CODE (via params.get/params[]) are documented in router.py
+          # tool descriptions. Source of truth: actual params.get() calls in
+          # handler function bodies (not docstrings - docstring omissions aren't
+          # functional bugs). Uses proven regex extraction from test_handler_
+          # schema_completeness.py. Handles helper functions (_resolve_tw,
+          # _resolve_owner_email) that read params. Coverage: 7 unified-routing
+          # handlers. BLOCKS on any mismatch - gate is accurate after code-based
+          # extraction fix.
           PYTHONPATH=. python3 tests/test_tool_schema_completeness.py
 
       - name: "TEST 0v — Offline: snapshot-date-labeling mismatches get a caveat and their own outcome bucket"
