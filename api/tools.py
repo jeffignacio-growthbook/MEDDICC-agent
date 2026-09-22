@@ -222,6 +222,12 @@ async def aggregate_results(data, group_by, aggregations):
     # (fixes gap where "Netherlands" and "The Netherlands" would show as
     # separate rows instead of combined - see test_groupby_canonicalization_gap.py)
     def _canonicalize_group_key(value, column_name):
+        # Handle array columns (text[] in Postgres) - convert to hashable tuple
+        # (2026-09-22: fixes crash when grouping by participant_emails, participant_domains, etc.)
+        if isinstance(value, list):
+            # Sort for consistent grouping regardless of array order
+            return tuple(sorted(value))
+
         if column_name == "company_country" and value:
             normalized = str(value).strip().lower()
             return _COUNTRY_CANONICALIZATION.get(normalized, value)
