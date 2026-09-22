@@ -275,6 +275,12 @@ KNOWN_FLAGGED_LOG_TAGS = {
     # pattern as [DIMENSION_VERIFY] — never a silent ship, always an
     # explicit error with discrepancy details.
     "[STRUCTURED_VERIFY]",
+    # Bug #3 fix (governed-alias override): detects when classifier
+    # incorrectly routes to unanswerable despite data_dictionary showing
+    # the field IS queryable, then CORRECTS by overriding to dynamic_query.
+    # Self-correcting detection (logged warning + immediate fix), not a
+    # detect-and-ship gap. Added 2026-09-22, commit c794f31.
+    "[ROUTING]",
 }
 
 
