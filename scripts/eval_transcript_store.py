@@ -195,6 +195,72 @@ def test_terminal_vs_retryable_empty():
     return cases
 
 
+def test_apollo_state_overrides_age_for_terminal_classification():
+    """2026-09-22 terminal-empty gap investigation: Jeff flagged 90 calls
+    marked terminal-empty as suspicious. Live evidence (dispatched CI
+    diagnostic against real Apollo/Fireflies data) proved the age-only
+    heuristic got all 90 right — but only by luck, since it never actually
+    checked whether the source had finished processing. Apollo's
+    conversation `state` (confirmed live: all 3 real Apollo terminal rows
+    show 'insights_generated') is a real completion signal that must now
+    override an age guess: an old call whose source `state` says
+    processing ISN'T finished must be RETRY, never TERMINAL — the exact
+    bug shape Jeff's original hypothesis described (a still-processing
+    call wrongly written off forever), now closed with real evidence
+    instead of assumed away."""
+    from datetime import date, timedelta
+    from transcript_store import _empty_reason, build_transcript_row, TERMINAL, RETRY
+    cases = []
+    old_date = (date.today() - timedelta(days=300)).isoformat()
+
+    # PLANT THE OLD BUG: before this fix, _empty_reason took only call_date —
+    # calling it with the pre-fix signature (no state argument at all) on this
+    # exact old+still-processing case is what shipped as production behavior.
+    # It DOES get this wrong (this is the bug, reproduced against the real
+    # function, not a hypothetical) — confirming there's a real regression to
+    # guard, not a strawman.
+    pre_fix_reason = _empty_reason(old_date)
+    cases.append(("OLD BUG reproduced: age-only classification wrongly marks "
+                  "a call terminal with zero knowledge of source state",
+                  pre_fix_reason.startswith(TERMINAL)))
+
+    # CONFIRM THE FIX: the same old call, now WITH Apollo's real state signal
+    # showing processing isn't finished, must be RETRY — never terminal on an
+    # age guess while the source itself says "not done".
+    fixed_reason = _empty_reason(old_date, source_state="processing")
+    cases.append(("FIX: old call + Apollo state NOT in APOLLO_DONE_STATES → "
+                  "retry, age guess overridden by real signal",
+                  fixed_reason.startswith(RETRY) and "processing" in fixed_reason))
+
+    # A DONE Apollo state (the real shape of all 90 live terminal calls) still
+    # correctly terminal-izes an old call — the fix changes nothing for the
+    # calls that actually are genuinely empty.
+    done_reason = _empty_reason(old_date, source_state="insights_generated")
+    cases.append(("Apollo state IN APOLLO_DONE_STATES → still terminal by age "
+                  "(no regression for genuinely-empty old calls)",
+                  done_reason.startswith(TERMINAL)))
+
+    # Fireflies never sets source_state (no such field found) → unaffected,
+    # falls through to the same age heuristic as before.
+    ff_reason = _empty_reason(old_date, source_state=None)
+    cases.append(("no source_state (Fireflies) → unchanged age-based terminal",
+                  ff_reason.startswith(TERMINAL)))
+
+    # End-to-end through build_transcript_row: extra["source_state"] set by
+    # _fetch_apollo actually reaches the classification, not just the helper.
+    row = build_transcript_row("apollo", "c1", [], call_date=old_date,
+                               extra={"source_state": "processing"})
+    cases.append(("build_transcript_row: extra['source_state'] reaches "
+                  "_empty_reason end-to-end (not just the unit helper)",
+                  row["unavailable_reason"].startswith(RETRY)))
+
+    row_done = build_transcript_row("apollo", "c2", [], call_date=old_date,
+                                    extra={"source_state": "completed"})
+    cases.append(("build_transcript_row: 'completed' state still terminal-izes",
+                  row_done["unavailable_reason"].startswith(TERMINAL)))
+    return cases
+
+
 def test_apollo_participant_identities_extraction():
     """Apollo's real participants shape ({"internal": [...], "external":
     {account_id: [...]}}), confirmed live 2026-09-19: keyed by id (the
@@ -278,6 +344,8 @@ def run():
         ("metrics: units, per-speaker talk/questions, backchannel monologue", test_metrics_from_utterances),
         ("rate-limit is retryable + deferred, not recorded", test_rate_limit_is_retryable_not_recorded),
         ("terminal vs retryable empty (resume stops re-fetching old empties)", test_terminal_vs_retryable_empty),
+        ("apollo state overrides age for terminal classification (2026-09-22 gap fix)",
+         test_apollo_state_overrides_age_for_terminal_classification),
         ("apollo participant_identities extraction (id-keyed, bot-flagged)", test_apollo_participant_identities_extraction),
         ("build_transcript_row carries participant_identities", test_build_transcript_row_carries_participant_identities),
     ):
