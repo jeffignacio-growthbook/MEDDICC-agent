@@ -114,11 +114,29 @@ def main():
     from apollo_client import ApolloClient
     apollo = ApolloClient()
     try:
-        resp = apollo._get("/users/search", params={"page": 1, "per_page": 1})
+        resp = apollo._get("/users/search", params={"page": 1, "per_page": 25})
+        users = resp.get("users") or []
+        emails = [u.get("email") for u in users if u.get("email")]
+        domains = sorted({e.split("@", 1)[1] for e in emails if "@" in e})
         print(f"  Apollo /users/search succeeded — key is valid and scoped. "
-              f"Sample response keys: {list(resp.keys())}")
+              f"{len(users)} workspace user(s), email domain(s): {domains or 'none returned'}")
+        if emails:
+            print(f"  Apollo workspace user emails (first 5): {emails[:5]}")
     except Exception as e:
         print(f"  Apollo /users/search failed ({type(e).__name__}: {e})")
+
+    try:
+        convos = apollo.get_conversations(page=1, per_page=25).get("conversations", [])
+        participant_domains = set()
+        for c in convos:
+            for p in (c.get("participants") or []):
+                em = p.get("email") or ""
+                if "@" in em:
+                    participant_domains.add(em.split("@", 1)[1])
+        print(f"  Apollo: {len(convos)} recent conversation(s) fetched OK — real participant "
+              f"email domain(s) seen: {sorted(participant_domains) or 'none present in payload'}")
+    except Exception as e:
+        print(f"  Apollo conversations fetch failed ({type(e).__name__}: {e})")
 
     from fireflies_client import FirefliesClient
     ff = FirefliesClient()
