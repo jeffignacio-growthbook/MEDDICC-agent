@@ -162,6 +162,37 @@ def main():
     else:
         print("  skipped (no APOLLO_API_KEY or SPOT_CHECK_N=0)")
 
+    # ── 6. calls-row completeness (cause A open item) ───────────────────
+    # On nights the etl_calls.py calls upsert failed, the only writers of
+    # these rows were the participant steps, which never set
+    # formatted_summary / duration_minutes / company_slug. Measure it.
+    print("\n" + "=" * 100)
+    print("6. CALLS-ROW COMPLETENESS (call_date > cutoff): formatted_summary / duration / company_slug")
+    print("=" * 100)
+    rich = select_all(sb, "calls",
+                      columns="call_id,source,call_date,formatted_summary,duration_minutes,company_slug",
+                      filters=[("gt", "call_date", str(CUTOFF))])
+    comp = defaultdict(Counter)
+    for r in rich:
+        src = (r.get("source") or "?").lower()
+        tstate = "transcript_missing" if state(r["call_id"]) != "TEXT" else "transcript_ok"
+        k = (src, tstate)
+        comp[k]["rows"] += 1
+        if not (r.get("formatted_summary") or "").strip():
+            comp[k]["no_summary"] += 1
+        if r.get("duration_minutes") in (None, 0, "0"):
+            comp[k]["no_duration"] += 1
+        if not (r.get("company_slug") or "").strip():
+            comp[k]["no_company_slug"] += 1
+        if (not (r.get("formatted_summary") or "").strip()
+                and r.get("duration_minutes") in (None, 0, "0")):
+            comp[k]["no_summary_and_no_duration"] += 1
+    for k in sorted(comp):
+        c = comp[k]
+        print(f"  {k[0]:10} {k[1]:19} rows={c['rows']:4}  no_summary={c['no_summary']:4}  "
+              f"no_duration={c['no_duration']:4}  no_company_slug={c['no_company_slug']:4}  "
+              f"both_missing={c['no_summary_and_no_duration']:4}")
+
     print("\nDONE")
 
 
