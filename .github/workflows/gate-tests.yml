@@ -804,6 +804,9 @@ jobs:
           PYTHONPATH=. python3 tests/test_no_bare_substring_matching.py
 
       - name: "GATE 2 — Column reference validity: no references to non-existent columns"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
           set -e
           # 2026-09-21 (Bug #1): scripts/forecast_trust.py referenced column
