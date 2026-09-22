@@ -97,7 +97,7 @@ def _make_sequenced_filter_table_stub(row_sequence, call_log):
     the last entry once exhausted) — needed to simulate a first call
     finding nothing and a later, broader call finding real rows."""
     async def fake_filter_table(sb, table=None, columns=None, filters=None,
-                                 limit=200, order_by=None):
+                                 limit=200, order_by=None, resolved_dimension_filters=None, resolved_quarter_filter=None):
         idx = min(len(call_log), len(row_sequence) - 1)
         call_log.append({"table": table, "columns": columns, "filters": filters})
         return {"rows": row_sequence[idx], "table": table}

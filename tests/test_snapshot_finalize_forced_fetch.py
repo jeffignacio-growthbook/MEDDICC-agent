@@ -108,7 +108,8 @@ class _FakeClient:
 
 def _make_filter_table_stub(call_log):
     async def fake_filter_table(sb, table=None, columns=None, filters=None,
-                                 limit=200, order_by=None):
+                                 limit=200, order_by=None,
+                                 resolved_dimension_filters=None, resolved_quarter_filter=None):
         call_log.append({"table": table, "columns": columns, "filters": filters})
         snap_date = None
         for f in (filters or []):

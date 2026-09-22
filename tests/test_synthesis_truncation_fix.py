@@ -373,7 +373,7 @@ def test_unstructured_raw_results_are_still_truncated():
                  "notes": "x" * 100} for i in range(200)]
 
     async def fake_filter_table(sb, table=None, columns=None, filters=None,
-                                 limit=200, order_by=None):
+                                 limit=200, order_by=None, resolved_dimension_filters=None, resolved_quarter_filter=None):
         return {"rows": big_rows, "table": table}
 
     orig_filter_table = tools_module.filter_table

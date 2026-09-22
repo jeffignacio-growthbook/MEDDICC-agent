@@ -160,7 +160,7 @@ class _FakeSupabase:
 
 def _make_filter_table_stub(rows, call_log):
     async def fake_filter_table(sb, table=None, columns=None, filters=None,
-                                 limit=200, order_by=None):
+                                 limit=200, order_by=None, resolved_dimension_filters=None, resolved_quarter_filter=None):
         call_log.append({"table": table, "columns": columns, "filters": filters})
         return {"rows": rows, "table": table}
     return fake_filter_table
