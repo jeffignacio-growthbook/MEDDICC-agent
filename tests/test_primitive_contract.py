@@ -275,6 +275,16 @@ KNOWN_FLAGGED_LOG_TAGS = {
     # pattern as [DIMENSION_VERIFY] — never a silent ship, always an
     # explicit error with discrepancy details.
     "[STRUCTURED_VERIFY]",
+    # MANDATORY GATE: cross-step incompleteness detection (Phase 1 V2) —
+    # detects when filter_table queries a subset of IDs from previous steps
+    # (e.g. step_0 has 341 deal_ids, step_2 queries only 10), then CODE
+    # executes retry with complete ID list before model continues. The retry
+    # IS the enforcement — model never sees incomplete data, no unresolved-
+    # and-shipped path exists. Satisfies checklist: (a) queryable —
+    # completeness_retry_forced in primitives_fired, incompleteness details
+    # in fallback_log; (b) user-visible — CODE forces complete data fetch,
+    # merges into accumulated_data, final answer contains all IDs.
+    "[COMPLETENESS]",
     # Bug #3 fix (governed-alias override): detects when classifier
     # incorrectly routes to unanswerable despite data_dictionary showing
     # the field IS queryable, then CORRECTS by overriding to dynamic_query.
