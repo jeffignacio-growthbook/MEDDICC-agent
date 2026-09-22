@@ -46,6 +46,8 @@ COMPUTED_PARAMS = {
     "company_names",  # Extracted from entity_registry
     "companies",  # Extracted from entity_registry
     "pipeline_id",  # Resolved from pipeline_filter by handler, not user input
+    "resolved_quarter_filter",  # Injected by router after quarter resolution
+    "resolved_dimension_filters",  # Injected by router after dimension resolution
 
     # NOTE: deal_ids removed - it IS documented in some tool schemas
     # (query_deals_at_risk, query_win_loss) even though often computed
