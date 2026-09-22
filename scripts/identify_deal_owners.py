@@ -43,7 +43,7 @@ validation_deals = [
 def get_deal_owner(company_name):
     """Get deal owner from deals table"""
     response = sb.table('deals').select(
-        'deal_id, company_name, owner, stage, segment, deal_status'
+        'deal_id, company_name, owner_email, stage, segment, deal_status'
     ).eq('company_name', company_name).eq('deal_status', 'active').execute()
 
     if response.data:

@@ -50,7 +50,7 @@ def verify_activity_baseline():
 
     # Check calls table
     try:
-        calls_count = sb.table("calls").select("id", count="exact").execute()
+        calls_count = sb.table("calls").select("*", count="exact").execute()
         print(f"✅ calls table exists: {calls_count.count} total rows")
     except Exception as e:
         print(f"❌ calls table error: {e}")
@@ -58,7 +58,7 @@ def verify_activity_baseline():
 
     # Check emails table
     try:
-        emails_count = sb.table("emails").select("id", count="exact").execute()
+        emails_count = sb.table("emails").select("*", count="exact").execute()
         print(f"✅ emails table exists: {emails_count.count} total rows")
     except Exception as e:
         print(f"❌ emails table error: {e}")

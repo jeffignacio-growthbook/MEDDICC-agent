@@ -474,7 +474,7 @@ def run_backfill(tool: str, config: dict, months: int = 6) -> None:
 
         # Check if this month already has data
         existing = (supabase.table("sdr_metrics")
-                      .select("id", count="exact")
+                      .select("*", count="exact")
                       .eq("tool", tool)
                       .gte("metric_date", current.isoformat())
                       .lte("metric_date", month_end.isoformat())

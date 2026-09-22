@@ -803,7 +803,22 @@ jobs:
           # the correct pattern.
           PYTHONPATH=. python3 tests/test_no_bare_substring_matching.py
 
-      - name: "GATE 2 — Column reference validity: no references to non-existent columns"
+      - name: "GATE 2a — No table mis-association: each .select() matched to its own .table()"
+        run: |
+          set -e
+          # 2026-09-22: Discovered mis-association bug in Gate 2's extraction
+          # logic. Pattern: Line 61 .table("emails").select("id", count="exact")
+          # failed regex (didn't handle keyword args), triggered lookahead that
+          # incorrectly matched Line 76's .select() (from .table("deals")) with
+          # Line 61's "emails" table. Result: validated columns against WRONG
+          # table schema (could false-pass if wrong table happened to have the
+          # column, or false-fail if it didn't). This is a CORRECTNESS bug, not
+          # coverage. Test verifies each .select() is matched to its OWN .table()
+          # call, never mis-associated with an earlier unrelated .table(). Tests
+          # the exact verify_activity_baseline.py case that exposed the bug.
+          PYTHONPATH=. python3 tests/test_gate2_misassociation.py
+
+      - name: "GATE 2b — Column reference validity: no references to non-existent columns"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
@@ -821,13 +836,17 @@ jobs:
           # validates against data_dictionary. Conservative: dynamic column
           # references and wildcards are allowlisted (can't statically
           # validate). Reports coverage stats every run: "X/Y validated, Z
-          # allowlisted" so the allowlist size stays visible. Currently
-          # validates 69.5% of Supabase .table().select() calls (73 same-line
-          # patterns out of 105 total Supabase patterns; 32 multi-line patterns
-          # are a known blind spot). Allowlists wildcards, dynamic columns, and
-          # count queries. Multi-line .table().select() not yet covered but
-          # major patterns caught. Test against Bug #1: this gate would have
-          # caught "amount" reference before production.
+          # allowlisted" so the allowlist size stays visible.
+          #
+          # 2026-09-22: Fixed mis-association bug and extraction gaps. Coverage:
+          # 67.0% of .select() calls validated (142/212), 33.0% allowlisted
+          # (wildcards, dynamic columns, unregistered tables). Before fix: buggy
+          # extraction found only 115 patterns (missing 97 entirely). After fix:
+          # 212 patterns found, each correctly associated with its own .table().
+          # Handles same-line with keyword args (.select("id", count="exact")),
+          # multi-line patterns, and split arguments. Stops lookahead if another
+          # .table() found (prevents mis-association). Found 3 real bugs during
+          # fix: sdr_metrics.id, deals.owner, calls.id (all corrected).
           PYTHONPATH=. python3 tests/test_column_reference_validity.py
 
       - name: "GATE 1 — Tool schema completeness: handler params match router tool descriptions"

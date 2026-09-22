@@ -113,9 +113,15 @@ def extract_select_calls(file_path: Path) -> List[Tuple[int, str, str, str]]:
 
     Handles both same-line and multi-line patterns:
     - Same-line: sb.table("deals").select("deal_id, arr_usd")
+    - Same-line with kwargs: sb.table("deals").select("id", count="exact")
     - Multi-line: sb.table("deals")\n    .select("deal_id, arr_usd")
+    - Multi-line split: sb.table("deals").select(\n    "deal_id, arr_usd")
 
     Returns: [(line_num, table_name, select_arg, full_line), ...]
+
+    CRITICAL: Each .select() must be associated with its OWN .table() call.
+    The mis-association bug (validating columns against wrong table) is
+    prevented by only looking ahead when .select( is NOT on same line as .table().
     """
     if not file_path.suffix == ".py":
         return []
@@ -130,14 +136,18 @@ def extract_select_calls(file_path: Path) -> List[Tuple[int, str, str, str]]:
 
     # Patterns
     table_pattern = r'\.table\(["\'](\w+)["\']\)'
-    select_pattern = r'\.select\(["\']([^"\']+)["\']\)'
+    # FIX 1: Allow optional keyword arguments after the first string argument
+    # Matches: .select("cols") or .select("cols", count="exact") or .select("*", count="exact")
+    select_pattern = r'\.select\(["\']([^"\']+)["\'](?:\s*,\s*\w+\s*=\s*[^)]+)?\)'
 
-    # Track which lines we've already processed as multi-line selects
-    processed_selects = set()
+    # Track which lines we've already processed to avoid double-counting
+    processed_lines = set()
 
-    for i, line in enumerate(lines, 1):
-        # Skip comments
-        if line.strip().startswith("#"):
+    for i, line in enumerate(lines):
+        line_num = i + 1  # 1-based line numbers for reporting
+
+        # Skip comments and already-processed lines
+        if line.strip().startswith("#") or i in processed_lines:
             continue
 
         # Find table name
@@ -147,50 +157,77 @@ def extract_select_calls(file_path: Path) -> List[Tuple[int, str, str, str]]:
 
         table_name = table_match.group(1)
 
-        # Try to find select on the same line first (most common)
-        select_match = re.search(select_pattern, line)
-        if select_match:
-            select_arg = select_match.group(1)
-            selects.append((i, table_name, select_arg, line.strip()))
-            continue
+        # Check if .select( is on the same line as .table()
+        has_select_on_line = '.select(' in line
 
-        # No select on same line - look ahead for multi-line pattern
-        # Most multi-line patterns are within 1-3 lines, but check up to 15 for safety
-        for j in range(i, min(i + 15, len(lines))):
-            if j in processed_selects:
+        if has_select_on_line:
+            # SAME-LINE CASE: Both .table() and .select( are on this line
+            # Try to match complete .select("...") pattern
+            select_match = re.search(select_pattern, line)
+            if select_match:
+                # Complete pattern on one line
+                select_arg = select_match.group(1)
+                processed_lines.add(i)
+                selects.append((line_num, table_name, select_arg, line.strip()))
                 continue
 
-            lookahead_line = lines[j]
+            # .select( is on this line but argument is on next line
+            # Pattern: .table("x").select(
+            #              "columns")
+            if i + 1 < len(lines):
+                next_line = lines[i + 1]
+                arg_match = re.match(r'\s*["\']([^"\']+)["\']', next_line)
+                if arg_match:
+                    select_arg = arg_match.group(1)
+                    processed_lines.add(i)
+                    processed_lines.add(i + 1)
+                    selects.append((line_num + 1, table_name, select_arg, next_line.strip()))
+                    continue
+        else:
+            # MULTI-LINE CASE: .table() on this line, .select( on a later line
+            # Pattern: .table("x")\
+            #              .select("columns")
+            # FIX 2: Start lookahead from NEXT line (i+1), not current line
+            # This prevents associating a later .table().select() pair with this .table()
+            for j in range(i + 1, min(i + 16, len(lines))):
+                if j in processed_lines:
+                    continue
 
-            # Skip empty lines and comments
-            if not lookahead_line.strip() or lookahead_line.strip().startswith("#"):
-                continue
+                lookahead_line = lines[j]
+                lookahead_line_num = j + 1
 
-            # Look for .select( on this line
-            if '.select(' in lookahead_line:
-                select_line_num = j + 1
+                # Skip empty lines and comments
+                if not lookahead_line.strip() or lookahead_line.strip().startswith("#"):
+                    continue
 
-                # Try to find the select argument on this line first
-                select_match = re.search(select_pattern, lookahead_line)
-                if select_match:
-                    select_arg = select_match.group(1)
-                    processed_selects.add(j)
-                    selects.append((select_line_num, table_name, select_arg, lookahead_line.strip()))
+                # CRITICAL: If we find another .table() before finding .select(),
+                # stop looking - the .select() belongs to that new .table(), not ours
+                if '.table(' in lookahead_line:
                     break
 
-                # Select argument might be on the next line (e.g., .select(\n    'columns'))
-                # Look ahead one more line for the string argument
-                if j + 1 < len(lines):
-                    next_line = lines[j + 1]
-                    # Match a string at the start of the line (after whitespace)
-                    arg_match = re.match(r'\s*["\']([^"\']+)["\']', next_line)
-                    if arg_match:
-                        select_arg = arg_match.group(1)
-                        processed_selects.add(j)
-                        processed_selects.add(j + 1)
-                        # Use the line where the columns are actually defined
-                        selects.append((j + 2, table_name, select_arg, next_line.strip()))
+                # Look for .select( on this line
+                if '.select(' in lookahead_line:
+                    # Try to find the select argument on this line first
+                    select_match = re.search(select_pattern, lookahead_line)
+                    if select_match:
+                        select_arg = select_match.group(1)
+                        processed_lines.add(j)
+                        selects.append((lookahead_line_num, table_name, select_arg, lookahead_line.strip()))
                         break
+
+                    # Select argument might be on the next line
+                    if j + 1 < len(lines):
+                        next_line = lines[j + 1]
+                        arg_match = re.match(r'\s*["\']([^"\']+)["\']', next_line)
+                        if arg_match:
+                            select_arg = arg_match.group(1)
+                            processed_lines.add(j)
+                            processed_lines.add(j + 1)
+                            selects.append((j + 2, table_name, select_arg, next_line.strip()))
+                            break
+
+                    # Couldn't extract argument - stop looking
+                    break
 
     return selects
 
