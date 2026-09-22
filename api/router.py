@@ -5422,6 +5422,83 @@ async def route_question(question: str, user_id: str,
                         "handler_name": "unanswerable_override_dynamic"}
 
             # Justified unanswerable - specific table/column named as missing
+            # BUT: check data_dictionary first - classifier might not know about
+            # newly-registered columns (Bug #3: country dimension was registered
+            # but classifier still thought it didn't exist)
+
+            # Extract potential column names from reason (country, region, etc.)
+            reason_lower = unanswerable_reason.lower()
+            potential_columns = []
+
+            # Common patterns: "no X field", "no X column", "X doesn't exist"
+            import re
+            field_patterns = [
+                r'no (\w+) (?:field|column|dimension)',
+                r"(\w+) (?:field|column|dimension) (?:doesn't|does not) exist",
+                r"(?:missing|no) (\w+) in",
+            ]
+            for pattern in field_patterns:
+                matches = re.findall(pattern, reason_lower)
+                potential_columns.extend(matches)
+
+            # Check if any mentioned columns are actually registered as queryable
+            if potential_columns:
+                try:
+                    # Query data_dictionary for queryable columns matching the terms
+                    dict_check = sb.table("data_dictionary").select(
+                        "supabase_column, supabase_table"
+                    ).eq("is_queryable", True).execute()
+
+                    queryable_cols = {row["supabase_column"].lower()
+                                     for row in dict_check.data}
+
+                    # Governed aliases for known semantic variants (follows dimension_resolver pattern)
+                    # Maps common question terms to actual column names where there's a known synonym gap
+                    # NO substring fallback - exact match or governed alias only, to prevent false positives
+                    # (see CRITICAL_BUG3_FIX_ANALYSIS.md for why bare substring matching was removed)
+                    _COLUMN_ALIASES = {
+                        "country": "company_country",
+                        "region": "region",
+                    }
+
+                    # Check if any potential column from the reason is actually queryable
+                    # Use exact match or governed alias only - NO substring matching
+                    found_queryable = []
+                    for col_term in potential_columns:
+                        # Exact match with registered column
+                        if col_term in queryable_cols:
+                            found_queryable.append(col_term)
+                        # Governed alias lookup (e.g., "country" -> "company_country")
+                        elif col_term in _COLUMN_ALIASES:
+                            canonical = _COLUMN_ALIASES[col_term]
+                            if canonical.lower() in queryable_cols:
+                                found_queryable.append(canonical)
+
+                    if found_queryable:
+                        logger.warning(
+                            f"[ROUTING] unanswerable claims missing columns {potential_columns}, "
+                            f"but data_dictionary shows {found_queryable} ARE queryable "
+                            f"- overriding to dynamic_query (Bug #3 fix)"
+                        )
+
+                        dynamic_result = await dynamic_query_loop(
+                            question=question,
+                            history=history,
+                            params=params,
+                            sb=sb,
+                            client=generator_client,
+                            hint=f"Classifier thought {potential_columns} didn't exist, but data_dictionary shows {found_queryable} are queryable - proceed with query",
+                            roster_text=roster_text,
+                            classifier_client=classifier_client,
+                        )
+                        return {"answer": dynamic_result.get("answer", ""),
+                                "needs_ack": is_slow,
+                                "tool_results": dynamic_result.get("tool_results", {}),
+                                "handler_name": "unanswerable_override_dictionary"}
+                except Exception as e:
+                    logger.warning(f"[ROUTING] data_dictionary check failed: {e} - accepting unanswerable")
+
+            # No registered columns found - accept unanswerable verdict
             logger.info(f"[ROUTING] unanswerable with justification: {unanswerable_reason}")
             result_quality = "unanswerable"
 
