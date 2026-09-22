@@ -1,0 +1,56 @@
+name: Repair bare calls rows from cache (one-off)
+
+# One-off repair for the post-8/21 transcript gap, cause A (see
+# TRANSCRIPT_GAP_INVESTIGATION_2026-09-22.md). Re-upserts, from the JSON
+# call cache, ONLY cached calls whose Supabase `calls` row has no
+# formatted_summary. Calls rows only — transcripts are the backfill's job.
+# DRY RUN by default; a push to the investigation branch always dry-runs.
+# Safe to delete once the repair is done.
+
+on:
+  workflow_dispatch:
+    inputs:
+      since:
+        description: 'Repair cached calls dated after (YYYY-MM-DD)'
+        required: true
+        default: '2026-08-21'
+      dry_run:
+        description: 'true = report only, write nothing'
+        required: true
+        default: 'true'
+  push:
+    branches: [claude/exciting-bohr-qb365q]
+    paths:
+      - .github/workflows/repair-calls-resync.yml
+
+permissions:
+  contents: read
+
+jobs:
+  resync:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Resync bare calls rows
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SINCE: ${{ github.event.inputs.since || '2026-08-21' }}
+          DRY_RUN: ${{ github.event_name == 'push' && 'true' || github.event.inputs.dry_run }}
+        run: |
+          [[ "$SINCE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "since must be YYYY-MM-DD"; exit 1; }
+          ARGS="--resync-cache-since $SINCE"
+          if [ "$DRY_RUN" != "false" ]; then ARGS="$ARGS --dry-run"; fi
+          echo "Running: etl_calls.py $ARGS"
+          PYTHONPATH=.:scripts:api python3 scripts/etl_calls.py $ARGS

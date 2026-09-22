@@ -5,6 +5,11 @@ on:
     # Run daily at 1 AM UTC (staggered: 1 hour after Deal ETL, 2 hours before Nightly)
     - cron: '0 1 * * *'
   workflow_dispatch:  # Allow manual trigger
+    inputs:
+      since_date:
+        description: 'One-time catch-up: override the auto cutoff (YYYY-MM-DD). Blank = normal nightly behaviour.'
+        required: false
+        default: ''
 
 env:
   FIREFLIES_API_KEY: ${{ secrets.FIREFLIES_API_KEY }}
@@ -39,9 +44,17 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run incremental calls ETL
+        env:
+          SINCE_DATE: ${{ github.event.inputs.since_date }}
         run: |
           cd $GITHUB_WORKSPACE
-          python scripts/etl_calls.py --mode incremental
+          if [ -n "$SINCE_DATE" ]; then
+            [[ "$SINCE_DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "since_date must be YYYY-MM-DD"; exit 1; }
+            echo "Running: etl_calls.py --mode incremental --since-date $SINCE_DATE"
+            python scripts/etl_calls.py --mode incremental --since-date "$SINCE_DATE"
+          else
+            python scripts/etl_calls.py --mode incremental
+          fi
         continue-on-error: false
 
       - name: Backfill Fireflies participants
