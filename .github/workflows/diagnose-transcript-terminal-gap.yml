@@ -1,0 +1,45 @@
+name: Diagnose Transcript Terminal-Empty Gap (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY
+# against Supabase; the Apollo/Fireflies calls are read-only GET/GraphQL
+# fetches (no writes anywhere).
+#
+# Jeff flagged that 90 of 286 calls in the transcript backfill were
+# marked "terminal empty" and is confident this is wrong for at least
+# some of them, since the sales team has been actively running calls
+# since 9/21. This confirms account identity, pulls the real current
+# terminal-empty set with real ages, and live re-fetches the 10 most
+# recent ones right now to test whether they've since become available.
+#
+# Safe to delete once this investigation is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Diagnose transcript terminal-empty gap"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          APOLLO_API_KEY: ${{ secrets.APOLLO_API_KEY }}
+          FIREFLIES_API_KEY: ${{ secrets.FIREFLIES_API_KEY }}
+        run: |
+          PYTHONPATH=.:scripts python3 scripts/diagnose_transcript_terminal_gap.py
