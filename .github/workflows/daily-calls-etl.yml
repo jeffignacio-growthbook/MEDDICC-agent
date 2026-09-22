@@ -62,6 +62,24 @@ jobs:
           python scripts/enrichment/resolve_calls.py --only-unresolved --yes
         continue-on-error: false
 
+      # Self-heal (post-8/21 transcript gap): any call in `calls` with no
+      # usable call_transcripts row — for ANY reason, including one we have
+      # not found yet — is re-attempted here, newest first. Capped so a large
+      # backlog can never become a cost / rate-limit problem:
+      #   - at most 40 calls per source per night,
+      #   - a source stops after 5 consecutive deferrals (rate limit/outage),
+      #   - 3 fetch attempts per call (worst-case backoff ~45s, not ~6 min),
+      #   - 20-minute step timeout.
+      # Per-source counts and the remaining backlog go to the run summary.
+      # Non-blocking: a heal hiccup must not stop scoring or the cache commit.
+      - name: Self-heal missing transcripts (capped)
+        run: |
+          cd $GITHUB_WORKSPACE
+          PYTHONPATH=.:scripts:api python scripts/backfill_transcripts.py \
+            --limit 40 --newest-first --max-consecutive-deferrals 5 --fetch-retries 3
+        timeout-minutes: 20
+        continue-on-error: true
+
       # Progressive scoring (PROGRESSIVE_SCORING_SPEC Phase 5b): score the new
       # calls resolved above into call_scores so the roll-up is current each
       # morning. Only new calls are scored (prior rolled state reused); a

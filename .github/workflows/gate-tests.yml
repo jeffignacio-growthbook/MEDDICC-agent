@@ -90,6 +90,7 @@ jobs:
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_score_correction.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_scoring_bands.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_transcript_store.py
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_etl_supabase_persist.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_evaluator_json_salvage.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_score_pinning.py
           PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/eval_force_reanalyze.py

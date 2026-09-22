@@ -74,19 +74,47 @@ def _done_transcript_ids(client):
             and is_done(r.get("transcript_quality"), r.get("unavailable_reason"))}
 
 
-def _calls_for_source(client, source):
+def _calls_for_source(client, source, newest_first=False):
     from supabase_client import select_all
     rows = select_all(client, "calls", columns="call_id,source,company_name,call_date",
                       filters=[("eq", "source", source)])
-    # deterministic order → stable, resumable progress
+    # deterministic order → stable, resumable progress. newest_first (the
+    # nightly self-heal) spends a capped budget on the calls coaching reads
+    # soonest; ties broken by call_id so the order is still deterministic.
     rows = [r for r in rows if r.get("call_id")]
     rows.sort(key=lambda r: str(r["call_id"]))
+    if newest_first:
+        rows.sort(key=lambda r: str(r.get("call_date") or ""), reverse=True)
     return rows
 
 
-def backfill(dry_run=True, only_source=None, limit=None, batch=25):
+def format_backfill_report(grand, dry_run, limit, max_consecutive_deferrals):
+    """Markdown per-source report for $GITHUB_STEP_SUMMARY: every state with
+    its real count, plus the backlog left for the next run, so a capped or
+    tripped run is visible on the run page."""
+    lines = [f"### Transcript self-heal / backfill{' (DRY RUN)' if dry_run else ''}", "",
+             f"Cap: {limit if limit else 'none'} calls per source per run; circuit breaker after "
+             f"{max_consecutive_deferrals} consecutive deferrals.", "",
+             "| source | pending before | attempted | text | unavailable | deferred | written | pending after | stopped early |",
+             "|---|---|---|---|---|---|---|---|---|"]
+    for src, s in grand.items():
+        written = s["with_text"] + s["unavailable"] if dry_run else s["written"]
+        # still pending = not resolved (retryable-empty rows stay pending)
+        after = s["pending"] - s["resolved"]
+        lines.append(f"| {src} | {s['pending']} | {s['attempted']} | {s['with_text']} | "
+                     f"{s['unavailable']} | {s['deferred']} | {written} | {after} | "
+                     f"{s['stopped'] or 'no'} |")
+    lines.append("")
+    for src, s in grand.items():
+        for reason, n in s["reasons"].most_common(6):
+            lines.append(f"- {src} ×{n}: `{reason}`")
+    return "\n".join(lines)
+
+
+def backfill(dry_run=True, only_source=None, limit=None, batch=25,
+             newest_first=False, max_consecutive_deferrals=None, fetch_retries=6):
     from supabase_client import SupabaseWriter
-    from transcript_store import fetch_utterances, build_transcript_row, UNAVAILABLE
+    from transcript_store import fetch_utterances, build_transcript_row, UNAVAILABLE, is_done
 
     writer = SupabaseWriter()
     client = writer.client
@@ -106,21 +134,24 @@ def backfill(dry_run=True, only_source=None, limit=None, batch=25):
 
     grand = {}
     for source in sources:
-        calls = _calls_for_source(client, source)
+        calls = _calls_for_source(client, source, newest_first=newest_first)
         todo = [c for c in calls if str(c["call_id"]) not in already]
+        pending_count = len(todo)
         if limit:
             todo = todo[:limit]
-        stats = {"calls": len(calls), "already": len(calls) - len(todo),
+        stats = {"calls": len(calls), "already": len(calls) - pending_count,
+                 "pending": pending_count, "stopped": "", "resolved": 0,
                  "attempted": 0, "with_text": 0, "unavailable": 0,
                  "deferred": 0, "written": 0, "chars": [], "reasons": Counter()}
+        consecutive_deferrals = 0
         print(f"\n[{source}] {len(calls)} calls, {stats['already']} done, "
               f"{len(todo)} to process  (throttle={throttle.get(source, 0.0)}s)")
 
         pending = []
         for i, c in enumerate(todo, 1):
             cid = str(c["call_id"])
-            utts, err, extra = fetch_utterances(source, cid, clients,
-                                         throttle=throttle.get(source, 0.0))
+            utts, err, extra = fetch_utterances(source, cid, clients, retries=fetch_retries,
+                                                throttle=throttle.get(source, 0.0))
             stats["attempted"] += 1
             if err:
                 # Transient fetch failure (e.g. rate limit that outlasted the
@@ -129,9 +160,22 @@ def backfill(dry_run=True, only_source=None, limit=None, batch=25):
                 # 'unavailable' that resume would skip forever.
                 stats["deferred"] += 1
                 stats["reasons"][("defer: " + err)[:48]] += 1
+                consecutive_deferrals += 1
+                if (max_consecutive_deferrals
+                        and consecutive_deferrals >= max_consecutive_deferrals):
+                    # Rate limit / outage: every further call would burn the
+                    # full backoff budget. Stop this source; the rest stays
+                    # pending for the next run.
+                    stats["stopped"] = (f"circuit breaker: {consecutive_deferrals} "
+                                        f"consecutive deferrals ({err[:60]})")
+                    print(f"    ⛔ {source}: {stats['stopped']} — stopping this source")
+                    break
             else:
+                consecutive_deferrals = 0
                 row = build_transcript_row(source, cid, utts, error=None,
                                            call_date=c.get("call_date"), extra=extra)
+                if is_done(row["transcript_quality"], row["unavailable_reason"]):
+                    stats["resolved"] += 1      # text, or terminal empty
                 if row["transcript_quality"] == UNAVAILABLE:
                     stats["unavailable"] += 1   # genuine no-content
                     stats["reasons"][(row["unavailable_reason"] or "")[:48]] += 1
@@ -188,12 +232,29 @@ def main():
                     help="report per-source counts, write nothing")
     ap.add_argument("--source", default=None, help="only this source")
     ap.add_argument("--limit", type=int, default=None,
-                    help="cap calls processed per source (testing)")
+                    help="cap calls processed per source per run")
+    ap.add_argument("--newest-first", action="store_true",
+                    help="process the most recent calls first (nightly self-heal)")
+    ap.add_argument("--max-consecutive-deferrals", type=int, default=None,
+                    help="stop a source after this many deferrals in a row "
+                         "(rate limit / outage circuit breaker)")
+    ap.add_argument("--fetch-retries", type=int, default=6,
+                    help="per-call fetch attempts (fewer = shorter worst-case backoff)")
     args = ap.parse_args()
     if not (os.getenv("SUPABASE_URL") and os.getenv("SUPABASE_SERVICE_KEY")):
         print("cannot run — SUPABASE_URL / SUPABASE_SERVICE_KEY not set")
         return 2
-    backfill(dry_run=args.dry_run, only_source=args.source, limit=args.limit)
+    grand = backfill(dry_run=args.dry_run, only_source=args.source, limit=args.limit,
+                     newest_first=args.newest_first,
+                     max_consecutive_deferrals=args.max_consecutive_deferrals,
+                     fetch_retries=args.fetch_retries)
+    report = format_backfill_report(grand, args.dry_run, args.limit,
+                                    args.max_consecutive_deferrals)
+    print(report)
+    summary = os.getenv("GITHUB_STEP_SUMMARY")
+    if summary:
+        with open(summary, "a", encoding="utf-8") as f:
+            f.write(report + "\n\n")
     return 0
 
 
