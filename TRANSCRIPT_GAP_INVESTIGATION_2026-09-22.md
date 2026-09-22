@@ -125,3 +125,35 @@ Once any call dated D is cached, every later-arriving call dated D is dropped fo
 3. **Decouple the transcript persist from the calls upsert.** Give it its own `try`, and make an upsert failure exit non-zero so `Alert on failure` fires, instead of printing and exiting 0.
 4. **Fix the cutoff (C).** Use `>=` with id-dedup, or a lookback of a few days, instead of `call_date > max_cached_date`.
 5. Optional guard: a monitor comparing `calls` vs `call_transcripts` counts by day, in the style of `monitor_data_completeness.py`.
+
+---
+
+## Update: fixes landed on `claude/exciting-bohr-qb365q` (backfill not yet run)
+
+Live baseline was re-run before any fix (audit run 35783899650, attempt 2, 21:06 UTC). It is unchanged:
+- **201 missing:** Apollo 17/19, Fireflies 184/285.
+- **Per-cause split:** A→B 149, B 22, C 28, NULL 2.
+
+**Cause A open item, now measured** (audit run 35785110841, section 6):
+- **50 of the 201** transcript-missing calls also have metadata-only `calls` rows: no `formatted_summary`, no `company_slug`. That is 7 Apollo and 43 Fireflies.
+- The other 151 do have summaries. On the failed nights, the companies processed before the bad batch were written.
+- Cause C calls are also missing from the JSON cache, which means they were never MEDDICC-analyzed:
+
+  | call date | `calls` table | JSON cache |
+  |---|---|---|
+  | 9/10 | 12 | 2 |
+  | 9/11 | 12 | 1 |
+  | 9/14 | 14 | 11 |
+
+**Is removing `fetch_apollo_incremental()` safe? No.**
+- In run 29 the adapter found 4 Apollo calls and the legacy path found 13.
+- The adapter only ever reads search page 1. The `etl_calls.py` loop breaks when the *filtered* batch is under 50, and at REST volume page 1 covers about 2 days.
+- The legacy copy is also what `write_cache` keeps today (8 of the 10 post-8/21 Apollo cache entries).
+- So: dedupe now; fix adapter pagination, then remove the legacy path later.
+
+| cause | fix | commit |
+|---|---|---|
+| B: duplicate Apollo id in one upsert (21000) | `dedupe_calls_by_id()`, last copy wins, applied before both cache and Supabase | 0b011dd2 |
+| D: silent swallow | Per-company upsert; transcript persist independent of the calls upsert (only the FK parent must exist). Every state counted per source and shown in `$GITHUB_STEP_SUMMARY`. Exit 1 on lost data. Capped nightly self-heal step. | 0b011dd2 |
+| C: late same-day arrivals dropped | 3-day lookback plus skip of already-cached ids, in both fetchers | d3d65849 |
+| A: schema drift left bare calls rows | Source already fixed 9/2. New `--resync-cache-since` repair (targets bare rows only). The D fix makes a repeat loud. | 4e8ff6a5 |
