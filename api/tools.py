@@ -117,7 +117,26 @@ async def filter_table(sb, table, columns=None, filters=None, limit=200, order_b
         # Build query with order before limit for efficiency
         q = sb.table(table).select(",".join(cols) if cols else "*")
         for f in processed_filters:
-            q = getattr(q, f[0])(*f[1:])
+            op, filter_col = f[0], f[1]
+            # Special handling for "not null" filter (2026-09-22)
+            # The __not_null__ marker from line 91 requires q.not_.is_(col, "null")
+            # not getattr(q, "__not_null__")(col), which doesn't exist
+            if op == "__not_null__":
+                q = q.not_.is_(filter_col, "null")
+            else:
+                # Array-column handling: ilike on text[] requires special operator
+                # Known array columns: participant_emails (calls table)
+                is_array_col = (table == "calls" and filter_col == "participant_emails")
+                if is_array_col and op in ("ilike", "like"):
+                    # For array contains pattern match, use cs (contains) operator
+                    # with array format: cs.{pattern}
+                    # PostgREST pattern: ?column=cs.{value} for "contains string"
+                    pattern = f[2] if len(f) > 2 else ""
+                    # Strip % wildcards since cs does substring match by default
+                    pattern_clean = pattern.strip("%")
+                    q = q.filter(filter_col, "cs", f'{{{pattern_clean}}}')
+                else:
+                    q = getattr(q, op)(*f[1:])
         q = q.order(col, desc=(direction == 'desc'))
         rows = q.limit(limit).execute().data or []
 
