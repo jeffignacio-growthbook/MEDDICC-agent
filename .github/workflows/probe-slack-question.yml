@@ -1,0 +1,71 @@
+name: Probe /slack/question (one-off)
+
+# One-off: send ONE question to the production CRO agent exactly the way
+# Zapier Zap 1 does (plain JSON POST, no Slack signing), then read the
+# answer back from conversation_threads the way scripts/smoke_test.py does.
+# Reply also goes to Slack via Zap 2 in the sandbox smoke-test channel.
+# Safe to delete after use.
+
+on:
+  push:
+    branches: [claude/exciting-bohr-qb365q]
+    paths:
+      - .github/workflows/probe-slack-question.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -q supabase
+      - name: POST one question + read the answer back
+        env:
+          RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          CHANNEL: ${{ vars.SMOKE_TEST_CHANNEL || 'sandbox-smoke-test' }}
+        run: |
+          set -e
+          TS="probe_$(date +%s)"
+          echo "== GET /health"
+          curl -sS -m 15 -w "\nHTTP %{http_code}  time %{time_total}s\n" "$RAILWAY_URL/health"
+          echo "== POST /slack/question  thread_ts=$TS channel=$CHANNEL"
+          curl -sS -m 30 -X POST "$RAILWAY_URL/slack/question" \
+            -H "Content-Type: application/json" \
+            -d "{\"text\":\"What is our pipeline this quarter?\",\"user_id\":\"probe_test\",\"channel_id\":\"$CHANNEL\",\"thread_ts\":\"$TS\",\"ts\":\"$TS\"}" \
+            -w "\nHTTP %{http_code}  time %{time_total}s\n"
+          echo "== negative check: same POST with a bogus Slack signature header"
+          curl -sS -m 30 -o /dev/null -X POST "$RAILWAY_URL/slack/question" \
+            -H "Content-Type: application/json" -H "X-Slack-Signature: v0=bogus" -H "X-Slack-Request-Timestamp: 1" \
+            -d '{"text":""}' -w "HTTP %{http_code} (empty text → ignored, no processing)\n"
+          echo "== polling conversation_threads for the answer"
+          THREAD_TS="$TS" python3 - <<'PY'
+          import json, os, time
+          from supabase import create_client
+          sb = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"])
+          ts, t0 = os.environ["THREAD_TS"], time.time()
+          while time.time() - t0 < 240:
+              time.sleep(5)
+              r = sb.table("conversation_threads").select("history,channel_id").eq("thread_ts", ts).execute()
+              if r.data:
+                  h = r.data[0]["history"]
+                  h = json.loads(h) if isinstance(h, str) else (h or [])
+                  a = [m for m in h if m.get("role") == "assistant"]
+                  if a:
+                      print(f"answer after {time.time()-t0:.0f}s, channel_id={r.data[0]['channel_id']}")
+                      print("roles in history:", [m.get("role") for m in h])
+                      for m in h:
+                          if m.get("role") == "assistant":
+                              print("---- ANSWER ----"); print(m.get("content", "")[:3000])
+                      break
+          else:
+              print("no answer in conversation_threads after 240s")
+          PY
