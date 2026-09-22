@@ -1,6 +1,6 @@
 # Post-8/21 call transcript gap: investigation (2026-09-22)
 
-Status: **root-caused, not fixed yet.** Findings only; the fix options are at the bottom.
+Status: **root-caused; fixes landed on `claude/exciting-bohr-qb365q` (see Update at the bottom). Backfill not yet run.**
 
 Evidence:
 - `scripts/audit_apollo_transcript_gap.py`: read-only production audit, run
@@ -114,8 +114,8 @@ Once any call dated D is cached, every later-arriving call dated D is dropped fo
   - `coaching_talk_ratio.py`
   - the calibration audits
 - `participant_identities` (migration 065, Criterion C) is missing for 16 of the 17 in-scope Apollo calls.
-- Separate but same root: the `calls` upsert from `etl_calls.py` also failed those nights. So those calls' `calls` rows lack `formatted_summary` / `company_slug` / `duration_minutes` from this path. They hold only the participant-step metadata. That has not been audited here.
-- The JSON call cache (the MEDDICC nightly input) is **not** affected: it is written before Supabase.
+- Separate but same root: the `calls` upsert from `etl_calls.py` also failed those nights. So those calls' `calls` rows lack `formatted_summary` / `company_slug` / `duration_minutes` from this path. They hold only the participant-step metadata. Measured later: 50 of the 201 (see Update).
+- The JSON call cache (the MEDDICC nightly input) is not affected by causes A/B, because it is written before Supabase. It **is** affected by cause C: those calls were never cached, so never MEDDICC-analyzed (see Update).
 - Nothing about this is recoverable by waiting. No path re-attempts these calls on its own.
 
 ## Fix options (not applied, for decision)
