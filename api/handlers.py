@@ -2547,6 +2547,29 @@ async def query_pipeline(params: dict, sb) -> dict:
         elif incremental_value == 0 and renewal_revenue == 0:
             uncategorized_deals.append(deal)
 
+    # ── PRE-FILTER: Apply resolved quarter filter (2026-09-22) ────────────────
+    #
+    # When dynamic_query resolves a quarter (e.g., "Q4 FY2027"), it injects
+    # resolved_quarter_filter into params. Apply it HERE (before stage/pipeline
+    # filtering and aggregation) so totals/counts reflect the filtered quarter,
+    # not all-time.
+    #
+    # Root cause of Q4 bug: query_pipeline returns top-20 ALL-TIME deals. Post-
+    # filtering that 20-deal sample gave wrong totals (Q4: 13 instead of 116).
+    # Fix: Filter the FULL incremental_deals list before aggregation/sampling.
+    if "resolved_quarter_filter" in params:
+        tw = params["resolved_quarter_filter"]
+        start_date = tw["start"]
+        end_date = tw["end"]
+        pre_filter_count = len(incremental_deals)
+
+        incremental_deals = [
+            d for d in incremental_deals
+            if d.get("close_date") and start_date <= d["close_date"] <= end_date
+        ]
+
+        logger.info(f"[QUARTER_PRE_FILTER] {pre_filter_count} → {len(incremental_deals)} deals (close_date in {start_date} to {end_date})")
+
     # Apply stage/pipeline filters in memory (if requested)
     if stage_filter or pipeline_filter:
         filtered_deals = []

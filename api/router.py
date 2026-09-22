@@ -1109,6 +1109,32 @@ region-segmented waterfall data.*
 Never silently substitute a narrower answer. If you can't answer the
 full question, say what you CAN answer and flag what's missing.
 
+**CRITICAL: NEVER COUNT OR SUM ARRAY ITEMS — USE AGGREGATE FIELDS**
+
+When data includes BOTH a sample array (e.g., "deals": [20 items]) AND
+aggregate totals (e.g., "total_deals": 116, "total_pipeline": 12908158):
+
+✅ CORRECT: Use the aggregate fields directly
+   "116 deals totaling $12.9M" (from total_deals, total_pipeline fields)
+
+❌ WRONG: Count/sum the array items
+   "20 deals totaling $5.3M" (len(deals), sum of deals array)
+
+WHY: Arrays are often SAMPLES (top N by value, recent items, etc.), not
+the full population. Counting len(deals) when total_deals exists is the
+exact "model doing arithmetic on a sample" anti-pattern that causes
+catastrophic undercounts (Q4 bug: reported 20 deals when 116 existed).
+
+**Apply this rule to ALL handlers:**
+- If total_deals exists → use it, never len(deals)
+- If total_pipeline exists → use it, never sum(deals)
+- If by_stage/by_owner exists → use those breakdowns, never recompute
+- Sample arrays are for DETAIL (company names, close dates), not TOTALS
+
+This is a STRUCTURAL RULE: aggregate fields are computed deterministically
+in code and verified. Array-derived counts are model arithmetic on samples,
+which fails silently and catastrophically.
+
 FACTS VS NARRATIVES — STOP SHORT OF UNEARNED JUDGMENTS:
 Report observable facts plainly. Do NOT frame them as concerns or problems
 unless you can show historical baseline context proving the fact is unusual.
@@ -1177,6 +1203,31 @@ be valid JSON starting with {{ and ending with }}.
 Either a tool call: {{"tool": "...", "params": {{...}}}}
 Or your final answer: {{"answer": "..."}}
 Nothing else.
+
+**CRITICAL: NEVER COUNT OR SUM ARRAY ITEMS — USE AGGREGATE FIELDS**
+
+When tool results include BOTH a sample array (e.g., "deals": [20 items]) AND
+aggregate totals (e.g., "total_deals": 116, "total_pipeline": 12908158):
+
+✅ CORRECT: Use the aggregate fields directly
+   "116 deals totaling $12.9M" (from total_deals, total_pipeline fields)
+
+❌ WRONG: Count/sum the array items
+   "20 deals totaling $5.3M" (len(deals), sum of deals array)
+
+WHY: Arrays are often SAMPLES (top N by value), not full population.
+The aggregate fields contain the TRUE totals computed from ALL rows
+before sampling. Counting the array gives you the sample size, not
+the population size.
+
+**Apply this rule to ALL tool results:**
+- If total_deals exists → use it, never len(deals)
+- If total_pipeline exists → use it, never sum(deals)
+- If total_count exists → use it, never len(rows)
+- Check for aggregate fields FIRST before computing from arrays
+
+This is not optional — counting/summing sample arrays produces
+systematically wrong answers that fail verification against ground truth.
 
 You answer RevOps questions for a B2B SaaS CRO using query tools.
 You have access to tools that read Supabase tables.
@@ -2934,6 +2985,66 @@ async def _call_handler_as_tool(handler_name: str, params: dict, sb) -> dict:
         # Handler failed - raise to trigger loop's fallback logic
         raise ValueError(f"Handler {handler_name} returned {result_quality}: {failure_reason}")
 
+    # ── POST-FILTERING: Apply resolved context filters (2026-09-22) ──────────
+    #
+    # Some handlers (like query_pipeline) are intentionally timeless/unscoped
+    # and return ALL deals. When resolved_quarter_filter or dimension_filters
+    # are injected by dynamic_query_loop, apply them HERE in code AFTER the
+    # handler returns, so the model only sees correctly-filtered data.
+    #
+    # This ensures date/dimension filtering happens deterministically, never
+    # by the model eyeballing prose context (the Q4 bug pattern).
+
+    if "resolved_quarter_filter" in params or "resolved_dimension_filters" in params:
+        # Only filter if handler returned a deals list
+        deals = tool_results.get("deals", [])
+        if deals:
+            original_count = len(deals)
+
+            # Apply quarter filter (close_date range)
+            if "resolved_quarter_filter" in params:
+                tw = params["resolved_quarter_filter"]
+                start_date = tw["start"]
+                end_date = tw["end"]
+                deals = [
+                    d for d in deals
+                    if d.get("close_date") and start_date <= d["close_date"] <= end_date
+                ]
+                logger.info(f"[POST_FILTER] quarter: {original_count} → {len(deals)} deals (close_date in {start_date} to {end_date})")
+
+            # Apply dimension filters
+            if "resolved_dimension_filters" in params:
+                for dim_filter in params["resolved_dimension_filters"]:
+                    column = dim_filter["column"]
+                    value = dim_filter["value"]
+                    operator = dim_filter.get("operator", "eq")
+
+                    pre_filter_count = len(deals)
+                    if operator == "eq":
+                        deals = [d for d in deals if d.get(column) == value]
+                    logger.info(f"[POST_FILTER] {column}={value}: {pre_filter_count} → {len(deals)} deals")
+
+            # Update tool_results with filtered deals
+            tool_results["deals"] = deals
+
+            # DON'T recalculate aggregates from sample arrays (2026-09-22)
+            # If the handler returned aggregate fields (total_deals, total_pipeline)
+            # alongside a deals array, the aggregates are computed from the FULL
+            # population before sampling. Post-filtering a sample array (top 20)
+            # and recalculating aggregates from it gives you the sample size/sum,
+            # not the population totals.
+            #
+            # Only recalculate if deals array size == total_deals (not a sample).
+            if "total_deals" in tool_results and len(deals) == tool_results["total_deals"]:
+                # Array is full population, safe to recalculate
+                tool_results["total_deals"] = len(deals)
+                if "total_pipeline" in tool_results and deals:
+                    tool_results["total_pipeline"] = sum(
+                        (d.get("expansion_arr") or 0) + (d.get("new_arr") or 0)
+                        for d in deals
+                    )
+            # else: array is a sample, keep handler's aggregate fields unchanged
+
     # Success - return results in loop-expected format
     # tool_results is already a dict with handler-specific keys
     return tool_results
@@ -3188,6 +3299,40 @@ async def _dynamic_query_loop_core(question, history, params,
     if ambiguous_dimension_note:
         logger.info(f"[DIMENSION_RESOLVE] {ambiguous_dimension_note}")
         cost_state["primitives_fired"]["ambiguous_dimension_term_flagged"] = True
+
+    # ── CRITICAL FIX (2026-09-22): Inject resolved context into params ───────
+    #
+    # Root cause of Q4 pipeline bug (45 vs 116 deals, 63% undercount):
+    # quarter_context and dimension filters were correctly RESOLVED but only
+    # passed as PROSE to the model, trusting the LLM to manually filter 192
+    # deals by eyeballing dates - the exact "model doing arithmetic" anti-
+    # pattern. This caused catastrophic miscounts (Q4: 45 instead of 116).
+    #
+    # Fix: Inject resolved time_window and dimension filters directly into
+    # params so handlers apply them DETERMINISTICALLY before returning data.
+    # Never rely on model reading prose context and re-deriving filters.
+    #
+    # Pattern applies to:
+    # 1. resolved_quarters → inject time_window for date filtering
+    # 2. resolved_dimensions → inject dimension filters (region/segment/owner)
+    #
+    # Defense-in-depth note: This fix prevents the model from doing arithmetic
+    # in the first place (stronger than checking arithmetic after). Broader
+    # runtime verification (Gate 3-style count/sum population checks generalized
+    # to dynamic_query) still worth building but lower priority now.
+
+    if resolved_quarters:
+        # Inject first resolved quarter as time_window for handler filtering
+        # (multiple quarters use full range in prose, but handlers take single window)
+        params["resolved_quarter_filter"] = resolved_quarters[0]
+        logger.info(f"[PARAM_INJECTION] time_window → {resolved_quarters[0]['label']}")
+        cost_state["primitives_fired"]["quarter_filter_injected"] = True
+
+    if resolved_dimensions:
+        # Inject dimension filters as structured params for handler use
+        params["resolved_dimension_filters"] = resolved_dimensions
+        logger.info(f"[PARAM_INJECTION] dimension_filters → {[d['column'] + '=' + str(d['value']) for d in resolved_dimensions]}")
+        cost_state["primitives_fired"]["dimension_filters_injected"] = True
 
     # Build initial message content
     content_parts = [
@@ -4655,6 +4800,16 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         if not tool_fn:
             logger.info(f"[LOOP iter={iteration}] unknown tool requested: {tool_name!r}")
             return await _finalize_from_data(f"unknown_tool:{tool_name}")
+
+        # ── MERGE RESOLVED CONTEXT: Inject loop-level filters into tool params ──
+        #
+        # When quarter or dimension filters were resolved at loop setup (lines 3191-
+        # 3223), inject them into tool_params so handlers receive them. Model's
+        # params take precedence (don't override if model explicitly passed values).
+        if "resolved_quarter_filter" in params and "resolved_quarter_filter" not in tool_params:
+            tool_params["resolved_quarter_filter"] = params["resolved_quarter_filter"]
+        if "resolved_dimension_filters" in params and "resolved_dimension_filters" not in tool_params:
+            tool_params["resolved_dimension_filters"] = params["resolved_dimension_filters"]
 
         if tool_name == "aggregate_results":
             data = tool_params.get("data", [])
