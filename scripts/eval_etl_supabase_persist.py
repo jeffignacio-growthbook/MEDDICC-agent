@@ -329,8 +329,41 @@ def test_late_same_day_arrival_is_caught_without_reprocessing():
     return cases
 
 
+def test_resync_targets_only_bare_calls_rows():
+    """Cause A repair: re-upsert only cached calls whose Supabase row has no
+    formatted_summary, calls rows only."""
+    import json
+    import supabase_client
+    from etl_calls import resync_cache_to_supabase
+    cases = []
+    with tempfile.TemporaryDirectory() as d:
+        Path(d, "acme.json").write_text(json.dumps({"company": "Acme", "slug": "acme", "calls": [
+            {"id": "bare", "source": "fireflies", "date": "2026-08-25", "summary": "s1"},
+            {"id": "full", "source": "fireflies", "date": "2026-08-25", "summary": "s2"},
+            {"id": "old", "source": "fireflies", "date": "2026-08-01", "summary": "s3"}]}))
+        table = [{"call_id": "bare", "formatted_summary": None},
+                 {"call_id": "full", "formatted_summary": "already here"}]
+
+        class SB(FakeSB):
+            client = object()
+        sb = SB()
+        saved = supabase_client.select_all
+        supabase_client.select_all = lambda *a, **k: table
+        try:
+            res = resync_cache_to_supabase(Path(d), "2026-08-21", sb)
+            dry = resync_cache_to_supabase(Path(d), "2026-08-21", SB(), dry_run=True)
+        finally:
+            supabase_client.select_all = saved
+    cases.append(("2 cached calls in window, 1 targeted", (res["candidates"], res["targeted"]) == (2, 1)))
+    cases.append(("only the bare row re-upserted", sb.call_batches == [["bare"]]))
+    cases.append(("no transcripts written by the resync", sb.transcript_rows == []))
+    cases.append(("dry run writes nothing", dry["targeted"] == 1 and dry["stats"]["calls"]["upserted"] == 0))
+    return cases
+
+
 TESTS = [
     test_late_same_day_arrival_is_caught_without_reprocessing,
+    test_resync_targets_only_bare_calls_rows,
     test_self_heal_is_capped_and_breaks_on_rate_limit,
     test_duplicate_apollo_id_reaches_supabase_once,
     test_one_company_failure_does_not_drop_the_rest,
