@@ -1,0 +1,18 @@
+{
+  "company": "Kard and GrowthBook",
+  "slug": "kard-and-growthbook",
+  "last_etl_date": "2026-09-22T05:36:26.976445",
+  "calls": [
+    {
+      "id": "01M28XVY1W7151N83S3111RF5Q",
+      "source": "fireflies",
+      "title": "Kard and GrowthBook - POC and Pricing Sync",
+      "date": "2026-09-21",
+      "duration_minutes": 16.829999923706055,
+      "summary": "# Kard and GrowthBook - POC and Pricing Sync\nDate: 2026-09-21 | Duration: 16.829999923706055m\n\n## Summary\nThe application-side integration with Flagsmith and OpenFeature is complete, including exposure logging, and the experiment is ready once Jesse’s team finishes configuring Databricks tables connected to Growth Book. The incomplete data infrastructure is causing a slight delay, but no fundamental tool issues were identified. The team is considering Enterprise because holdouts, experiment consistency, contextual bandits, custom experiment fields, unlimited experiments, SSO, and premium support are important. Pricing discussed included approximately $29,750 annually for 20 seats with a 15% discount and $36,000 for 30 seats with a 20% discount. A smaller option requires a minimum $20,000 contract for five seats, with prorated billing for later additions. Security prefers self-hosting, while hosted deployment remains possible if compliance requirements are addressed. Dan Jarvis will present the proposal to the CFO and CTO, and Dan Wathne will send a standard order form. The trial continues through September, with billing beginning October 1.\n\n## Keywords\nEnterprise plan, holdouts, feature flags, GrowthBook, pricing negotiation, self-hosted\n\n## Action Items\n\n**Dan Wathne**\nPrepare and send a standard order form for a 5-seat Enterprise self-hosted plan to Dan Jarvis (14:36)\nBe available for additional calls or Slack communication to assist with security reviews or any follow-up questions from Kard’s security/governance teams (14:36)\n\n**Dan Jarvis**\nPresent pricing and plan details to CFO and CTO during scheduled internal meeting and provide feedback on their decision or questions (13:31)\nInform Dan Wathne promptly about the CFO and CTO decision or any requests following internal discussion (14:10)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

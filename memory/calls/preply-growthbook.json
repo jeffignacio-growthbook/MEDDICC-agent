@@ -1,0 +1,18 @@
+{
+  "company": "Preply & GrowthBook",
+  "slug": "preply-growthbook",
+  "last_etl_date": "2026-09-22T05:36:26.980770",
+  "calls": [
+    {
+      "id": "01M2X364J4NT3EFKYF2T7H7RWK",
+      "source": "fireflies",
+      "title": "Preply & GrowthBook",
+      "date": "2026-09-21",
+      "duration_minutes": 30.709999084472656,
+      "summary": "# Preply & GrowthBook\nDate: 2026-09-21 | Duration: 30.709999084472656m\n\n## Summary\nThe discussion focused on unreliable global control-group results caused by cross-device switching: about 50–80% of subscribers switch devices, and the 95% high-split design can expose users to multiple variants. This contamination creates uncertain uplift estimates, orphan denominators, and reduced leadership confidence. The team plans to favor logged-in users with stable IDs for control groups, while using hierarchical Bayesian shrinkage to adjust growth and pre-login experiments that lack reliable controls. Logged-in holdouts planned for Q1/Q2 2027 will help validate and calibrate the method, which is expected to be slightly conservative but more trustworthy than the polluted global control. The discussion also covered experiment duration, attribution challenges, novelty effects, cannibalization, and interference. Growth Book described support for standardized tagging, experiment governance, learning repositories, metadata APIs, empirical shrinkage, and potential future multi-armed bandit capabilities.\n\n## Keywords\nExperimentation, Control Group, Bayesian Shrinkage, Device Switching, Holdout Groups, GrowthBook\n\n## Action Items\n\n**Sebastien Pôlis**\nContinue to apply the Bayesian shrinkage method to upcoming experiments and refine it by comparing with holdout group results in Q1/Q2 to improve estimation accuracy (11:15)\nMaintain communication with GrowthBook team for updates on platform capabilities and discuss potential future needs such as multi-armed bandit features (26:15)\n\n**James Shannon**\nProvide regular updates to Preply on GrowthBook’s product releases and development progress approximately every 6 weeks (29:09)\n\n**Luke Sonnet & GrowthBook Team**\nContinue enhancement of GrowthBook platform features related to linking experiment learnings and team-specific lift estimations using empirical Bayesian methods (27:59)\n\n**GrowthBook Team**\nExplore ways to further assist Preply in experiment debugging, cluster analysis, and experiment metadata organization to enhance program hygiene and standardized experimentation practices (24:30)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

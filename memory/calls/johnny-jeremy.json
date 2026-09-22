@@ -1,7 +1,7 @@
 {
   "company": "Johnny / Jeremy",
   "slug": "johnny-jeremy",
-  "last_etl_date": "2026-09-15T06:20:33.391670",
+  "last_etl_date": "2026-09-22T05:36:26.976190",
   "calls": [
     {
       "id": "01M1CPHH6FV29WP3AG291HZSWM",
@@ -21,6 +21,17 @@
       "date": "2026-09-14",
       "duration_minutes": 1,
       "summary": "# Johnny / Jeremy\nDate: 2026-09-14 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "johnny@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M32NF3DMNS73Z0JCPB3KTVE1",
+      "source": "fireflies",
+      "title": "Johnny / Jeremy",
+      "date": "2026-09-21",
+      "duration_minutes": 19,
+      "summary": "# Johnny / Jeremy\nDate: 2026-09-21 | Duration: 19m\n\n## Summary\nWork priorities included Johnny Martinez owning the feature-flag detail page and coordinating with Gabe on experiments-page designs, while Jeremy Dorn recommended collaboration because the flows are broad and frequently used. The feature-flag design kickoff was deferred until later in the week; Johnny will schedule it after release work, and Jeremy will check availability with Bryce and the team. The release was scheduled for tonight, metrics were near completion, and additional punch-list changes were expected. Data-source onboarding was prioritized because only about 10% of users complete the current flow. The proposed improvements include making the managed warehouse the clear default, positioning own-data connections for advanced users, removing the data-source model and logo-selection steps, simplifying the modal-heavy flow, and supporting partial save and resume. BigQuery OAuth was considered; BigQuery covers 80% of sources, BigQuery and Snowflake about 90%, and Postgres raises coverage to about 95%. Johnny will work on onboarding screens with Jeremy. Homepage direction needs more design work, Johnny will check Nobu’s existing work, and Jeremy will send a design-sync invite for tomorrow.\n\n## Keywords\nFeature flags, Data-source onboarding, BigQuery OAuth, Experiment assignment queries, Homepage design, UX prioritisation\n\n## Action Items\n**Johnny Martinez**\n- Focus feature flag details (05:49)\n- Coordinate experiment-page designs (05:49)\n- Prepare feature flag updates (05:49)\n- Improve data-source onboarding (16:11)\n- Prepare onboarding screens (16:11)\n- Review screens with Jeremy Dorn (16:11)\n- Ask Nobu about homepage design (18:18)\n- Clarify homepage requirements (18:18)\n- Incorporate homepage feedback (18:18)\n\n**Jeremy Dorn**\n- Schedule feature flag kickoff (07:38)\n- Send kickoff invitation (07:38)\n- Send design-sync invitation (18:33)",
       "organizer": "johnny@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

@@ -1,0 +1,18 @@
+{
+  "company": "Default <> Newton",
+  "slug": "default-newton",
+  "last_etl_date": "2026-09-22T05:36:26.978889",
+  "calls": [
+    {
+      "id": "01M2XGJJKK91AK4NJ0A1Z3P1F9",
+      "source": "fireflies",
+      "title": "Default <> Newton Growth Workflow Session",
+      "date": "2026-09-21",
+      "duration_minutes": 26.670000076293945,
+      "summary": "# Default <> Newton Growth Workflow Session\nDate: 2026-09-21 | Duration: 26.670000076293945m\n\n## Summary\nThe team aligned on simplifying territory assignment through a waterfall approach, consolidating enrichment checks and auditing the current setup before migration. Territory-to-queue rules will be evaluated sequentially, with a “rest of world” fallback, while workflow integration and testing are targeted for completion within the week. Lead-distribution imbalances arose when newer queue members such as Dan and Jake received additional leads while Christian and Scott fell behind, so calibration counts and queue resets were discussed. Daanveer described new-platform monitoring, MCP access, and audit logs for automated fairness checks. He also committed to historical August and September reports showing assignments by queue and sales representative, with additional reports available through Slack requests. Current legacy reporting is manual, and discrepancies may be linked to cancellations not updating HubSpot deal statuses. The migration has started, user settings will carry over, and the Contact Us routing will be adjusted to use Default workflow queues.\n\n## Keywords\nlead distribution, territories, migration, workflow, queue assignment, audit\n\n## Action Items\n\n**Daanveer Hehr**\nPull and deliver audit report on lead distribution and queue assignments for August and September across reps to identify any gaps or workflow pitfalls (16:19)\nSimplify and consolidate territories and segments in the new platform workspace; review and suggest improvements around meeting cancellation handling and deal source field updates to optimize reporting and workflows (21:16)\nShare detailed instructions and next steps related to migration via Slack within 30-60 minutes after meeting end (23:13)\n\n**Chris Newton and Jeff Ignacio**\nCoordinate scheduling of a follow-up meeting on Friday to assess progress on migration and workflow adjustments (24:46)\n\n**Jeff Ignacio**\nProvide specifics for requested reports and questions regarding lead distribution to Daanveer via Slack (18:30)\n\n**Team (via Daanveer)**\nMonitor and eventually swap booking links for sales reps if they hold their own post-migration to ensure continuity (23:13)\n",
+      "organizer": "jeff.ignacio@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

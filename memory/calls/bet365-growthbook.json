@@ -1,0 +1,18 @@
+{
+  "company": "Bet365 + GrowthBook",
+  "slug": "bet365-growthbook",
+  "last_etl_date": "2026-09-22T05:36:26.976612",
+  "calls": [
+    {
+      "id": "01M32BZQE5YFJZMPPYNVK40NC4",
+      "source": "fireflies",
+      "title": "Bet365 + GrowthBook",
+      "date": "2026-09-21",
+      "duration_minutes": 16.670000076293945,
+      "summary": "# Bet365 + GrowthBook\nDate: 2026-09-21 | Duration: 16.670000076293945m\n\n## Summary\nGrowthBook and Bet agreed to strengthen their partnership so Bet can fully use GrowthBook for sports homepage personalization experiments. Bet implemented GrowthBook around March but only recently began active experimentation, and its first live test has data flowing without clear interpretation. The experiment compares a personalized homepage with a non-personalized control group, tracking measures such as bets placed and time to bet; the control group is performing approximately 10% better, but the reasons and country-level differences remain unclear. GrowthBook offered tailored onboarding, technical help with data integration and exports, experiment-design guidance, and strategic support from Chris Dazon. Urgent enablement sessions will begin this week, followed by weekly or bi-weekly check-ins for at least a month. Russell Booth will ensure relevant Bet product staff attend, while GrowthBook and Bet will co-create success criteria over the next two months to measure progress, adoption, and business value.\n\n## Keywords\nproduct development, GrowthBook integration, experimentation, metrics interpretation, customer enablement, homepage personalization\n\n## Action Items\n\n**Cary Rakin**\nSend Russ Booth a calendly link to schedule follow-up enablement meetings with Chris Sanders and Chris Dizon (12:32)\nCoordinate internal meeting with Chris Dizon to discuss Bet’s onboarding needs and experiment review (12:59)\nSchedule and conduct enablement sessions promptly, aiming to start within the week after this meeting (11:39)\nDefine success criteria and ongoing support plan with Bet to ensure value realized from GrowthBook (14:59)\n\n**Russell Booth**\nShare the GrowthBook dashboard access with his product team and mandate their attendance in follow-up training and enablement calls (13:07)\nParticipate in scheduled enablement sessions to improve understanding and interpretation of GrowthBook experiments and metrics (13:22)\n\n**Chris Sanders**\nProvide technical onboarding and experiment setup support to Bet’s team (06:31)\nAssist in analyzing current experiments to help Bet understand the performance metrics and data flows (11:08)\n\n**Chris Dizon**\nLead sessions on experimentation program strategy and advise on appropriate experiment design and scheduling (06:46)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}
