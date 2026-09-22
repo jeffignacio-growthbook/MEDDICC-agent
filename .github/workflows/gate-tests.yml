@@ -829,6 +829,25 @@ jobs:
           # would have caught "amount" reference before production.
           PYTHONPATH=. python3 tests/test_column_reference_validity.py
 
+      - name: "GATE 1 — Tool schema completeness: handler params match router tool descriptions"
+        continue-on-error: true  # Known gaps exist - gate documents them, doesn't block yet
+        run: |
+          set -e
+          # Pre-2026-09-10 (query_pipeline_movement time_window gap): handler
+          # accepted 'time_window' parameter for filtering snapshot date ranges,
+          # but router.py tool description did NOT list it. Model couldn't use
+          # the parameter (schema said it didn't exist). Result: "last 2 weeks"
+          # questions fell back to arbitrary snapshot pairs (e.g., Aug 17-28
+          # instead of requested Aug 27-Sep 10). This gate prevents recurrence
+          # by validating that all parameters accepted by unified-routing
+          # handlers are documented in router.py's tool descriptions. Source of
+          # truth: handler docstring "params:" sections (where semantic
+          # parameters are listed) vs router.py function signatures. Currently
+          # runs with continue-on-error due to known documentation gaps across
+          # 7 migrated handlers - gate documents the gaps without blocking.
+          # Coverage: validates all query_* handlers migrated to unified-routing.
+          PYTHONPATH=. python3 tests/test_tool_schema_completeness.py
+
       - name: "TEST 0v — Offline: snapshot-date-labeling mismatches get a caveat and their own outcome bucket"
         run: |
           set -e
