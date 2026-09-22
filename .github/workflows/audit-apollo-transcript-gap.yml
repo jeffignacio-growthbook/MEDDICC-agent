@@ -1,0 +1,40 @@
+name: Audit Apollo Transcript Gap (one-off)
+
+# One-off diagnostic, READ-ONLY (Supabase selects + a handful of Apollo
+# GET /conversations/{id}). Scopes the post-8/21 call_transcripts gap by
+# source and date. Safe to delete once the investigation is closed.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/exciting-bohr-qb365q]
+    paths:
+      - scripts/audit_apollo_transcript_gap.py
+      - .github/workflows/audit-apollo-transcript-gap.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit Apollo transcript gap"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          APOLLO_API_KEY: ${{ secrets.APOLLO_API_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api python3 scripts/audit_apollo_transcript_gap.py
