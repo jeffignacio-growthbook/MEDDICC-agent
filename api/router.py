@@ -4140,6 +4140,26 @@ async def _dynamic_query_loop_core(question, history, params,
                             f"double-check before relying on it."
                         )
 
+                # CHECK: Incomplete data disclosure (from completeness verification)
+                # If completeness check detected incomplete cross-reference and retries failed,
+                # force explicit disclosure in final answer
+                if cost_state.get("_incomplete_data_disclosure"):
+                    disclosure = cost_state["_incomplete_data_disclosure"]
+                    missing_count = disclosure["missing_count"]
+                    total_count = disclosure["total_count"]
+                    id_column = disclosure["id_column"]
+                    logger.warning(
+                        f"[COMPLETENESS] Forcing incomplete data disclosure: "
+                        f"{missing_count}/{total_count} {id_column}s not queried"
+                    )
+                    final_answer_text = (
+                        f"{final_answer_text}\n\n⚠️ Note: this answer is based on "
+                        f"incomplete data — only {total_count - missing_count}/{total_count} "
+                        f"{id_column}s were queried. The remaining {missing_count} "
+                        f"{id_column}s were not checked and may contain additional "
+                        f"results. Please treat this as a partial answer."
+                    )
+
                 logger.info(f"[LOOP] finalized from gathered data "
                             f"(reason={reason_tag})")
                 return {"answer": final_answer_text,
@@ -4920,6 +4940,124 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             logger.info(f"[UNIFIED_ROUTING] {tool_name} (structured) succeeded "
                        f"→ continuing to synthesis (no fast-path for structured handlers)")
             # Continue loop - next iteration will synthesize
+
+        # CHECK: Completeness verification for filter_table cross-references
+        # Detect if filter_table used fewer IDs than previous step WITHOUT explicit filters
+        # (indicating accidental truncation rather than intentional narrowing)
+        if tool_name == "filter_table" and iteration > 0 and "error" not in result:
+            from api.completeness_check import detect_incomplete_cross_reference
+
+            incompleteness = detect_incomplete_cross_reference(
+                accumulated_data=accumulated_data,
+                iteration=iteration,
+                parsed_response=parsed,
+                tool_result=result
+            )
+
+            if incompleteness:
+                missing_ids = incompleteness["missing_ids"]
+                requested_ids_raw = incompleteness.get("requested_ids")
+                if not requested_ids_raw:
+                    # Extract from filters
+                    from api.completeness_check import _extract_in_filter_ids
+                    requested_ids_raw = _extract_in_filter_ids(params.get("filters", []))
+
+                id_column = incompleteness["id_column"]
+                missing_count = incompleteness["missing_count"]
+                prev_count = incompleteness["previous_count"]
+
+                logger.warning(
+                    f"[COMPLETENESS] Incomplete cross-reference detected: "
+                    f"{missing_count}/{prev_count} {id_column}s not queried. "
+                    f"CODE-ENFORCED RETRY with complete ID list."
+                )
+
+                # CODE-ENFORCED RETRY: Execute filter_table directly with complete IDs
+                # Model never gets a choice - code forces correct behavior
+                cost_state["primitives_fired"]["completeness_retry_forced"] = True
+
+                # Merge requested + missing IDs to get complete set
+                requested_ids = requested_ids_raw if requested_ids_raw else []
+                all_ids = list(set(requested_ids) | set(missing_ids))
+
+                logger.info(
+                    f"[COMPLETENESS] Executing CODE-ENFORCED retry: "
+                    f"{len(all_ids)} total IDs (was {len(requested_ids)}, adding {len(missing_ids)})"
+                )
+
+                # Construct retry params: same as original but with complete ID list
+                original_params = parsed.get("params", {})
+                retry_params = original_params.copy()
+
+                # Remove old 'in_' filter for this ID column
+                original_filters = retry_params.get("filters", [])
+                retry_filters = [
+                    f for f in original_filters
+                    if not (isinstance(f, (list, tuple)) and len(f) >= 3
+                           and f[0] in ("in_", "in") and f[1] == id_column)
+                ]
+
+                # Add complete ID list
+                retry_filters.append(["in_", id_column, all_ids])
+                retry_params["filters"] = retry_filters
+
+                # Execute filter_table directly (code-enforced, not model instruction)
+                try:
+                    import traceback
+                    from api import tools as T
+
+                    logger.info(
+                        f"[COMPLETENESS] Retry params: table={retry_params.get('table')}, "
+                        f"filters={retry_params.get('filters')}, "
+                        f"columns={retry_params.get('columns')}"
+                    )
+
+                    retry_result = await T.filter_table(
+                        sb=sb,
+                        table=retry_params.get("table"),
+                        columns=retry_params.get("columns"),
+                        filters=retry_params.get("filters"),
+                        limit=retry_params.get("limit", 200),
+                        order_by=retry_params.get("order_by")
+                    )
+
+                    if "error" not in retry_result:
+                        retry_row_count = len(retry_result.get("rows", []))
+                        logger.info(
+                            f"[COMPLETENESS] CODE-ENFORCED retry succeeded: "
+                            f"{retry_row_count} rows (was {row_count})"
+                        )
+
+                        # REPLACE incomplete result with complete result
+                        accumulated_data[f"step_{iteration}_raw"] = retry_result
+
+                        # Re-aggregate with complete data (same as normal filter_table flow)
+                        retry_aggregated = _aggregate_and_sample(
+                            retry_result,
+                            sample_size=20,
+                            order_by=retry_params.get("order_by")
+                        )
+                        accumulated_data[f"step_{iteration}"] = retry_aggregated
+
+                        logger.info(
+                            f"[COMPLETENESS] Merged complete data into step_{iteration}: "
+                            f"{retry_row_count} rows total. Model will proceed with ALL {prev_count} {id_column}s."
+                        )
+
+                        # Continue loop - model sees complete data, no retry instruction needed
+                    else:
+                        # Retry failed - log error but continue with incomplete data
+                        logger.error(
+                            f"[COMPLETENESS] CODE-ENFORCED retry failed: {retry_result.get('error')}. "
+                            f"Continuing with incomplete data."
+                        )
+
+                except Exception as e:
+                    logger.error(
+                        f"[COMPLETENESS] CODE-ENFORCED retry crashed: {type(e).__name__}: {e}"
+                    )
+                    logger.error(f"[COMPLETENESS] Traceback:\n{traceback.format_exc()}")
+                    logger.error(f"[COMPLETENESS] Continuing with incomplete data.")
 
         # CHECK: Was this a verification retry that succeeded?
         # If previous iteration forced a retry due to missing dimension filter,
