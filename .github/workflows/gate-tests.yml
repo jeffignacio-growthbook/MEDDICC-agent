@@ -803,6 +803,29 @@ jobs:
           # the correct pattern.
           PYTHONPATH=. python3 tests/test_no_bare_substring_matching.py
 
+      - name: "GATE 2 — Column reference validity: no references to non-existent columns"
+        run: |
+          set -e
+          # 2026-09-21 (Bug #1): scripts/forecast_trust.py referenced column
+          # "amount" that never existed in any table (should be "arr_usd").
+          # Mocked tests passed (mocked data had whatever columns test wanted),
+          # production crashed: "column 'amount' does not exist". Result:
+          # forecast_trust primitive completely broken in production. This gate
+          # prevents recurrence by statically validating that every column
+          # referenced in .select() calls exists in the LIVE data_dictionary
+          # table (source of truth - migration files can be stale). Scans all
+          # .select() calls in scripts/ and api/, parses literal column names,
+          # validates against data_dictionary. Conservative: dynamic column
+          # references and wildcards are allowlisted (can't statically
+          # validate). Reports coverage stats every run: "X/Y validated, Z
+          # allowlisted" so the allowlist size stays visible. Currently
+          # validates 60.8% of .select() calls (45/74 found with same-line
+          # .table().select() pattern), allowlists 39.2% (wildcards, dynamic
+          # columns, count queries). Multi-line .table().select() not yet
+          # covered but major patterns caught. Test against Bug #1: this gate
+          # would have caught "amount" reference before production.
+          PYTHONPATH=. python3 tests/test_column_reference_validity.py
+
       - name: "TEST 0v — Offline: snapshot-date-labeling mismatches get a caveat and their own outcome bucket"
         run: |
           set -e

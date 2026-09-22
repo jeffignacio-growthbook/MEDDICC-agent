@@ -160,7 +160,7 @@ def analyze_bulk_event(
 
     # Fetch deal names from Supabase deals table
     deal_ids = [str(d['deal_id']) for d in sample_deals]
-    deals_result = sb.table('deals').select('deal_id, company_name, num_notes').in_('deal_id', deal_ids).execute()
+    deals_result = sb.table('deals').select('deal_id, company_name').in_('deal_id', deal_ids).execute()
 
     deal_details = {str(d['deal_id']): d for d in deals_result.data}
 
@@ -186,7 +186,8 @@ def analyze_bulk_event(
             for trans in sample_deals
         ],
         'activity_summary': {
-            'with_notes': sum(1 for d in deal_details.values() if (d.get('num_notes') or 0) > 0),
+            # num_notes column doesn't exist in data_dictionary - removed
+            # 'with_notes': sum(1 for d in deal_details.values() if (d.get('num_notes') or 0) > 0),
             'sample_size': len(deal_details)
         }
     }
