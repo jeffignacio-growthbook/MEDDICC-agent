@@ -849,6 +849,24 @@ jobs:
           # fix: sdr_metrics.id, deals.owner, calls.id (all corrected).
           PYTHONPATH=. python3 tests/test_column_reference_validity.py
 
+      - name: "GATE 3 — Count/sum population match: handlers reporting both count and dollars use same filtered set"
+        run: |
+          set -e
+          # 2026-09-22 (count/sum population mismatch bug): is_incremental_pipeline()
+          # returned True for ALL new business pipeline deals (pipeline_id != renewal)
+          # regardless of ARR amount. query_pipeline and pipeline_coverage used it to
+          # filter deals for COUNTING, then separately calculated incremental_value =
+          # expansion_arr + new_arr for SUMMING. Result: count included $0 ARR deals,
+          # sum excluded them — misleading metrics (Q1: claimed 316 deals/$20.1M, truth
+          # was 207 deals/$21.4M — 109 phantom deals, underreported dollars).
+          # Fixed by changing is_incremental_pipeline() to check (expansion_arr > 0 OR
+          # new_arr > 0) instead of just pipeline_id. This gate prevents recurrence:
+          # (1) Tests is_incremental_pipeline() returns False for $0 ARR deals
+          # (2) Verifies query_pipeline and pipeline_coverage use consistent populations
+          # (3) Blocks if pipeline_id-only filtering reappears (the exact buggy pattern)
+          # Protects against any code that counts one set of deals but sums a different set.
+          PYTHONPATH=. python3 tests/test_count_sum_population_match.py
+
       - name: "GATE 1 — Tool schema completeness: handler params match router tool descriptions"
         run: |
           set -e

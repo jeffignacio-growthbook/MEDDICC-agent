@@ -228,41 +228,42 @@ _RENEWAL_PIPELINE_ID = "866608541"
 
 def is_incremental_pipeline(deal: dict) -> bool:
     """
-    True if deal contributes to PIPELINE (Incremental ARR).
+    True if deal contributes to PIPELINE (Incremental ARR > 0).
 
     Pipeline means expansion_arr + new_arr (excludes renewal base).
 
-    A deal is in pipeline if:
-      - It's in new business pipeline (pipeline_id != renewal), OR
-      - It has expansion_arr > 0 OR new_arr > 0
+    A deal is in pipeline if it has expansion_arr > 0 OR new_arr > 0.
+    Pipeline classification is dollar-based, not pipeline_id-based.
 
     Args:
-        deal: Dict with pipeline_id, expansion_arr, new_arr keys
+        deal: Dict with expansion_arr, new_arr keys
 
     Returns:
-        True if deal contributes to incremental ARR pipeline
+        True if deal has incremental ARR > 0
 
     Examples:
         is_incremental_pipeline({"pipeline_id": "default", "new_arr": 100000}) -> True
+        is_incremental_pipeline({"pipeline_id": "default", "new_arr": 0}) -> False
         is_incremental_pipeline({"pipeline_id": "866608541", "expansion_arr": 50000}) -> True (renewal + expansion)
         is_incremental_pipeline({"pipeline_id": "866608541", "renewal_revenue": 200000}) -> False (pure renewal)
 
     Note:
         Per PIPELINE SEMANTICS in config/field_semantics.yaml:
         "Pipeline" = Incremental ARR only. Renewal base excluded and reported separately.
+
+        FIX (2026-09-22): Changed from pipeline_id-based to dollar-based classification.
+        Previously returned True for ALL new business deals (pipeline_id != renewal)
+        regardless of ARR, causing count/sum population mismatch where deal count
+        included $0 ARR deals but dollar total excluded them. Now returns True ONLY
+        when incremental ARR > 0, ensuring count and sum use the same population.
     """
     if not deal:
         return False
 
-    pipeline_id = deal.get("pipeline_id", "")
     expansion_arr = deal.get("expansion_arr", 0) or 0
     new_arr = deal.get("new_arr", 0) or 0
 
-    # New business pipeline always counts
-    if pipeline_id != _RENEWAL_PIPELINE_ID:
-        return True
-
-    # Renewal pipeline: only counts if has incremental ARR
+    # Deal contributes to pipeline if it has incremental ARR > 0
     return expansion_arr > 0 or new_arr > 0
 
 
