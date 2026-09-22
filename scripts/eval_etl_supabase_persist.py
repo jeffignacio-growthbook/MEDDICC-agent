@@ -291,7 +291,46 @@ def test_self_heal_is_capped_and_breaks_on_rate_limit():
     return cases
 
 
+def test_late_same_day_arrival_is_caught_without_reprocessing():
+    """Cause C: cutoff = newest cached date D. A call dated D that finished
+    recording after D was first cached used to be dropped forever."""
+    from datetime import datetime, date
+    from etl_calls import is_new_call, get_cached_call_ids, LOOKBACK_DAYS
+    cases = []
+    cutoff = datetime(2026, 9, 10)
+    cached = {"early-9-10"}
+    cases.append(("late call dated ON the cutoff day is picked up",
+                  is_new_call(date(2026, 9, 10), "late-9-10", cutoff, cached)))
+    cases.append(("call 2 days before cutoff, not cached, is picked up",
+                  is_new_call(date(2026, 9, 8), "late-9-8", cutoff, cached)))
+    cases.append(("already-cached call on the cutoff day is skipped (no re-summarize)",
+                  not is_new_call(date(2026, 9, 10), "early-9-10", cutoff, cached)))
+    cases.append((f"call older than the {LOOKBACK_DAYS}-day lookback is skipped",
+                  not is_new_call(date(2026, 9, 7), "old", cutoff, cached)))
+    cases.append(("undated call skipped", not is_new_call(None, "x", cutoff, cached)))
+    cases.append(("lookback defaults to 3 days (= STILL_PROCESSING_DAYS)", LOOKBACK_DAYS == 3))
+
+    with tempfile.TemporaryDirectory() as d:
+        import json
+        Path(d, "acme.json").write_text(json.dumps(
+            {"company": "Acme", "slug": "acme", "calls": [{"id": "c1"}, {"id": "c2"}]}))
+        Path(d, "_deal_index.json").write_text(json.dumps([1, 2]))
+        cases.append(("cached ids read from every cache file, non-dict files ignored",
+                      get_cached_call_ids(Path(d)) == {"c1", "c2"}))
+
+    # Both fetch paths gate on is_new_call, not the old `<= since_date.date()`.
+    src = (REPO / "scripts" / "etl_calls.py").read_text()
+    cases.append(("old strict date-only cutoff gone from both fetchers",
+                  "if call_date <= since_date.date():" not in src
+                  and "if convo_date <= since_date.date():" not in src))
+    legacy = src[src.index("def fetch_apollo_incremental"):src.index("def summarize_apollo_transcript")]
+    cases.append(("legacy Apollo path checks the id BEFORE get_conversation (no extra cost)",
+                  legacy.index("is_new_call(") < legacy.index("client.get_conversation(")))
+    return cases
+
+
 TESTS = [
+    test_late_same_day_arrival_is_caught_without_reprocessing,
     test_self_heal_is_capped_and_breaks_on_rate_limit,
     test_duplicate_apollo_id_reaches_supabase_once,
     test_one_company_failure_does_not_drop_the_rest,

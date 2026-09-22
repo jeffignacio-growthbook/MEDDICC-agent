@@ -144,6 +144,41 @@ def get_last_cache_date(cache_dir: Path) -> datetime:
     return latest_date or (datetime.now() - timedelta(days=7))
 
 
+# Late-arrival lookback (cause C of the post-8/21 transcript gap). The cutoff
+# is the newest cached call date, and both fetchers used to skip
+# `call_date <= cutoff` — so once any call dated D was cached, every call dated
+# D that the recorder finished LATER was dropped for good (9/10: 10 of 12
+# Fireflies calls; 9/11: 11 of 12). Re-scan this many days before the cutoff
+# and skip ids already cached, so late arrivals are caught without
+# re-summarizing anything. Matches transcript_store.STILL_PROCESSING_DAYS.
+LOOKBACK_DAYS = int(os.getenv("CALLS_ETL_LOOKBACK_DAYS", "3"))
+
+
+def get_cached_call_ids(cache_dir: Path) -> set:
+    """Every call id already in the JSON cache (memory/calls/*.json)."""
+    ids = set()
+    for cache_file in cache_dir.glob('*.json'):
+        try:
+            with open(cache_file) as f:
+                data = json.load(f)
+            for call in (data.get('calls', []) if isinstance(data, dict) else []):
+                if call.get('id'):
+                    ids.add(str(call['id']))
+        except Exception:
+            continue
+    return ids
+
+
+def is_new_call(call_date, call_id, since_date: datetime, cached_ids: set) -> bool:
+    """A call is new when it is dated after (cutoff - LOOKBACK_DAYS) and its id
+    is not already cached. Date-only gating dropped late same-day arrivals;
+    the id check is what keeps the lookback from re-processing cached calls."""
+    floor = (since_date - timedelta(days=LOOKBACK_DAYS)).date()
+    if call_date is None or call_date <= floor:
+        return False
+    return str(call_id or '') not in (cached_ids or set())
+
+
 def get_call_adapter():
     """
     Load call intelligence adapter based on config/client.yaml.
@@ -172,7 +207,8 @@ def get_call_adapter():
         raise ValueError(f"Unknown call tool: {call_tool}. Must be 'gong' or 'fireflies'")
 
 
-def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: dict):
+def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: dict,
+                                        cached_ids: set = None):
     """
     Fetch new calls from configured call intelligence sources.
 
@@ -216,7 +252,8 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
 
         while True:
             try:
-                batch = adapter.fetch_recent(limit=limit, skip=skip, since=since_date)
+                batch = adapter.fetch_recent(limit=limit, skip=skip,
+                                             since=since_date - timedelta(days=LOOKBACK_DAYS))
 
                 if not batch:
                     break
@@ -254,8 +291,9 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
         except:
             continue
 
-        # Skip if before cutoff
-        if call_date <= since_date.date():
+        # Skip if before the lookback window, or already cached (late
+        # same-day arrivals are caught; cached calls are not re-processed)
+        if not is_new_call(call_date, normalized_call.source_call_id, since_date, cached_ids):
             continue
 
         # Extract company from title
@@ -291,7 +329,8 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
     print(f"   Added {total_new} new calls to cache")
 
 
-def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total_summarized: list):
+def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total_summarized: list,
+                             cached_ids: set = None):
     """Fetch new Apollo calls since date via API."""
     try:
         from apollo_client import get_apollo_client
@@ -323,8 +362,10 @@ def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total
         except:
             continue
 
-        # Skip if before cutoff or not completed
-        if convo_date <= since_date.date():
+        # Skip if before the lookback window, already cached, or not completed.
+        # The id check runs BEFORE get_conversation + Haiku summarization, so
+        # the lookback costs no extra API calls or LLM tokens here.
+        if not is_new_call(convo_date, convo.get('id'), since_date, cached_ids):
             continue
         if convo.get('state') not in ['completed', 'insights_generated']:
             continue
@@ -1046,8 +1087,12 @@ def main():
             print(f"Auto-detected cutoff: {since_date.strftime('%Y-%m-%d')}")
 
         # Fetch from APIs
-        fetch_call_intelligence_incremental(since_date, calls_by_company)
-        fetch_apollo_incremental(since_date, calls_by_company, total_summarized)
+        cached_ids = get_cached_call_ids(output_dir)
+        print(f"Lookback: {LOOKBACK_DAYS}d before cutoff "
+              f"(> {(since_date - timedelta(days=LOOKBACK_DAYS)).strftime('%Y-%m-%d')}), "
+              f"skipping {len(cached_ids)} already-cached call ids")
+        fetch_call_intelligence_incremental(since_date, calls_by_company, cached_ids)
+        fetch_apollo_incremental(since_date, calls_by_company, total_summarized, cached_ids)
 
     # One entry per call id before anything is persisted (21000 guard — see
     # dedupe_calls_by_id). Cache and Supabase then see the identical set.
