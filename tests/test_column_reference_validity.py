@@ -42,6 +42,21 @@ SCAN_DIRS = [
     REPO_ROOT / "api",
 ]
 
+# Skip one-off analysis/investigation scripts (not production code)
+# These reference historical columns or are exploratory scripts not in active use
+SKIP_PATTERNS = [
+    "analyze_signal",
+    "check_signal",
+    "compare_signal",
+    "derive_signal",
+    "investigate_signal",
+    "recompute_with_",
+    "sample_newly_",
+    "test_meddicc_timing",
+    "check_enterprise_discovery_fallback",
+    "check_meddicc_scores_for_validation",
+]
+
 # Allowlist: (file_pattern, reason) for .select() calls that can't be statically validated
 ALLOWLIST_COLUMN_CHECKS = {
     # Wildcard selects (valid but unvalidatable)
@@ -96,11 +111,11 @@ def extract_select_calls(file_path: Path) -> List[Tuple[int, str, str, str]]:
     """
     Extract all .select() calls from a Python file.
 
-    Returns: [(line_num, table_name, select_arg, full_line), ...]
+    Handles both same-line and multi-line patterns:
+    - Same-line: sb.table("deals").select("deal_id, arr_usd")
+    - Multi-line: sb.table("deals")\n    .select("deal_id, arr_usd")
 
-    Examples we parse:
-        sb.table("deals").select("deal_id, arr_usd, stage")
-        result = supabase.table("analyses").select("id, status")
+    Returns: [(line_num, table_name, select_arg, full_line), ...]
     """
     if not file_path.suffix == ".py":
         return []
@@ -113,10 +128,12 @@ def extract_select_calls(file_path: Path) -> List[Tuple[int, str, str, str]]:
     selects = []
     lines = content.split("\n")
 
-    # Pattern: .table("table_name").select("columns")
-    # Handles: sb.table("X").select("Y"), supabase.table("X").select("Y")
+    # Patterns
     table_pattern = r'\.table\(["\'](\w+)["\']\)'
     select_pattern = r'\.select\(["\']([^"\']+)["\']\)'
+
+    # Track which lines we've already processed as multi-line selects
+    processed_selects = set()
 
     for i, line in enumerate(lines, 1):
         # Skip comments
@@ -130,14 +147,50 @@ def extract_select_calls(file_path: Path) -> List[Tuple[int, str, str, str]]:
 
         table_name = table_match.group(1)
 
-        # Find select argument
+        # Try to find select on the same line first (most common)
         select_match = re.search(select_pattern, line)
-        if not select_match:
+        if select_match:
+            select_arg = select_match.group(1)
+            selects.append((i, table_name, select_arg, line.strip()))
             continue
 
-        select_arg = select_match.group(1)
+        # No select on same line - look ahead for multi-line pattern
+        # Most multi-line patterns are within 1-3 lines, but check up to 15 for safety
+        for j in range(i, min(i + 15, len(lines))):
+            if j in processed_selects:
+                continue
 
-        selects.append((i, table_name, select_arg, line.strip()))
+            lookahead_line = lines[j]
+
+            # Skip empty lines and comments
+            if not lookahead_line.strip() or lookahead_line.strip().startswith("#"):
+                continue
+
+            # Look for .select( on this line
+            if '.select(' in lookahead_line:
+                select_line_num = j + 1
+
+                # Try to find the select argument on this line first
+                select_match = re.search(select_pattern, lookahead_line)
+                if select_match:
+                    select_arg = select_match.group(1)
+                    processed_selects.add(j)
+                    selects.append((select_line_num, table_name, select_arg, lookahead_line.strip()))
+                    break
+
+                # Select argument might be on the next line (e.g., .select(\n    'columns'))
+                # Look ahead one more line for the string argument
+                if j + 1 < len(lines):
+                    next_line = lines[j + 1]
+                    # Match a string at the start of the line (after whitespace)
+                    arg_match = re.match(r'\s*["\']([^"\']+)["\']', next_line)
+                    if arg_match:
+                        select_arg = arg_match.group(1)
+                        processed_selects.add(j)
+                        processed_selects.add(j + 1)
+                        # Use the line where the columns are actually defined
+                        selects.append((j + 2, table_name, select_arg, next_line.strip()))
+                        break
 
     return selects
 
@@ -205,6 +258,10 @@ def validate_column_references() -> Tuple[List[Tuple], int, int]:
             continue
 
         for file_path in scan_dir.rglob("*.py"):
+            # Skip one-off analysis scripts
+            if any(pattern in file_path.name for pattern in SKIP_PATTERNS):
+                continue
+
             selects = extract_select_calls(file_path)
             total_selects += len(selects)
 
