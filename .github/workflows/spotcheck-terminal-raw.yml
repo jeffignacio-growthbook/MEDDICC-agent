@@ -1,0 +1,38 @@
+name: Spot-check terminal-empty raw content (one-off)
+
+# One-off Step 6 verification for the 2026-09-22 terminal-empty gap
+# investigation. Fetches the FULL raw Fireflies/Apollo payload for 3 of
+# the 90 terminal-empty calls directly from the live source, so the
+# "genuinely empty" conclusion rests on eyeballing real content (or its
+# absence), not just a computed sentence_count.
+#
+# Safe to delete once this investigation is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  spotcheck:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Spot-check raw content of 3 terminal-empty calls"
+        env:
+          APOLLO_API_KEY: ${{ secrets.APOLLO_API_KEY }}
+          FIREFLIES_API_KEY: ${{ secrets.FIREFLIES_API_KEY }}
+        run: |
+          PYTHONPATH=.:scripts python3 scripts/spotcheck_terminal_raw.py
