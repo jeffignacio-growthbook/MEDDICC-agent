@@ -4806,10 +4806,12 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         # When quarter or dimension filters were resolved at loop setup (lines 3191-
         # 3223), inject them into tool_params so handlers receive them. Model's
         # params take precedence (don't override if model explicitly passed values).
-        if "resolved_quarter_filter" in params and "resolved_quarter_filter" not in tool_params:
-            tool_params["resolved_quarter_filter"] = params["resolved_quarter_filter"]
-        if "resolved_dimension_filters" in params and "resolved_dimension_filters" not in tool_params:
-            tool_params["resolved_dimension_filters"] = params["resolved_dimension_filters"]
+        # ONLY inject for query_* handlers, not primitive tools like filter_table.
+        if tool_name.startswith("query_"):
+            if "resolved_quarter_filter" in params and "resolved_quarter_filter" not in tool_params:
+                tool_params["resolved_quarter_filter"] = params["resolved_quarter_filter"]
+            if "resolved_dimension_filters" in params and "resolved_dimension_filters" not in tool_params:
+                tool_params["resolved_dimension_filters"] = params["resolved_dimension_filters"]
 
         if tool_name == "aggregate_results":
             data = tool_params.get("data", [])
