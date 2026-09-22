@@ -1242,7 +1242,7 @@ TOOLS YOU CAN CALL:
     - pipeline_filter: "new_business" or "renewal" (optional, defaults to all incremental pipeline)
     **RETURNS**: Current pipeline snapshot with total deals, total ARR, coverage ratio, breakdowns by stage/owner
     Examples: "what is our pipeline", "show me pipeline", "how much pipeline do we have", "Jake's pipeline"
-  query_pipeline_movement(view, fiscal_quarter, pipeline_filter, owner_email, stage, weeks, close_date_scope, time_window)
+  query_pipeline_movement(view, fiscal_quarter, pipeline_filter, owner_email, stage, weeks, close_date_scope, time_window, deal_ids)
     **PHASE 1 PILOT: unified routing test for handler-as-tool pattern**
     **USE THIS when the question asks about**:
     - PIPELINE MOVED, PIPELINE MOVEMENT, PIPELINE CHANGED
@@ -1257,6 +1257,7 @@ TOOLS YOU CAN CALL:
     - weeks: number of recent weeks for composition view (optional)
     - close_date_scope: "current_quarter" to filter by close date (optional)
     - time_window: dict with period/fiscal_quarter/n for time range (optional, e.g. {{"period": "current_quarter"}} or {{"period": "last_N_days", "n": 30}})
+    - deal_ids: list of specific deal IDs for deal_changes view (optional, for entity-scoped queries)
     **RETURNS**: Snapshot-based movement analysis with stage changes, entries, exits
     Examples: "how has pipeline moved this quarter", "renewal pipeline movement",
     "which deals moved to Technical Evaluation", "Christian's pipeline changes"
@@ -1274,7 +1275,7 @@ TOOLS YOU CAN CALL:
     - time_window: dict for time range filtering (optional, e.g. {{"period": "current_quarter"}})
     **RETURNS**: Deals with no stage movement for stale_days OR past close_date, with activity metrics
     Examples: "what deals are stale", "Cary's stale deals", "deals stale for 30 days", "stuck Discovery deals"
-  query_waterfall(time_window)
+  query_waterfall(time_window, question)
     **PHASE 2: Handler 3/6 migrated to unified routing**
     **USE THIS when the question asks about**:
     - PIPELINE SNAPSHOT + WEEKLY MOVEMENT (combined view)
@@ -1284,6 +1285,7 @@ TOOLS YOU CAN CALL:
     - "Show me pipeline", "what's our pipeline", "pipeline this quarter", "how did pipeline change"
     Params:
     - time_window: dict for time range (optional, defaults to current quarter, e.g. {{"period": "current_quarter"}})
+    - question: original user question text (optional, used for emphasis/framing in synthesis)
     **RETURNS**: Pipeline summary (total, by-stage, needs-attention) + weekly waterfall (new/won/lost)
     Examples: "show me pipeline", "what is our pipeline", "pipeline this quarter", "how did pipeline change this month"
   query_rep_pipeline(owner_email)
