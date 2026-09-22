@@ -781,6 +781,28 @@ jobs:
           # PRIMITIVE_CHECKLIST.md's item 5).
           PYTHONPATH=. python3 tests/test_primitive_contract.py
 
+      - name: "TEST 0z — Offline: no overly-broad substring matching in routing/filtering without governed whitelists"
+        run: |
+          set -e
+          # 2026-09-21/22: Two real incidents in one night, same root cause
+          # — broadening a matcher to fix a false negative without checking
+          # what it now incorrectly accepts. (1) dimension_resolver.py
+          # commit 47e0963: _country_candidates() had an always-return
+          # fallback matching ANY term (including "EMEA", "enterprise") as
+          # a country. (2) router.py commit c794f31: Bug #3 fix initially
+          # used bare substring matching `[qcol for qcol in cols if term in
+          # qcol or qcol in term]` causing 6/6 false positives (date →
+          # close_date, count → company_country, id → deal_id, etc.). Both
+          # fixed with governed-alias pattern (exact match + whitelist dict,
+          # NO substring fallback). This gate flags new instances of the
+          # SPECIFIC dangerous form: bidirectional substring matching in
+          # list comprehensions used to match user terms against schema
+          # names. Narrow and precise — only catches the exact anti-pattern,
+          # not every "in" check. See dimension_resolver.py's
+          # _COUNTRY_ALIASES or router.py's _COLUMN_ALIASES (c794f31) for
+          # the correct pattern.
+          PYTHONPATH=. python3 tests/test_no_bare_substring_matching.py
+
       - name: "TEST 0v — Offline: snapshot-date-labeling mismatches get a caveat and their own outcome bucket"
         run: |
           set -e
