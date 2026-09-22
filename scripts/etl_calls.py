@@ -144,6 +144,41 @@ def get_last_cache_date(cache_dir: Path) -> datetime:
     return latest_date or (datetime.now() - timedelta(days=7))
 
 
+# Late-arrival lookback (cause C of the post-8/21 transcript gap). The cutoff
+# is the newest cached call date, and both fetchers used to skip
+# `call_date <= cutoff` — so once any call dated D was cached, every call dated
+# D that the recorder finished LATER was dropped for good (9/10: 10 of 12
+# Fireflies calls; 9/11: 11 of 12). Re-scan this many days before the cutoff
+# and skip ids already cached, so late arrivals are caught without
+# re-summarizing anything. Matches transcript_store.STILL_PROCESSING_DAYS.
+LOOKBACK_DAYS = int(os.getenv("CALLS_ETL_LOOKBACK_DAYS", "3"))
+
+
+def get_cached_call_ids(cache_dir: Path) -> set:
+    """Every call id already in the JSON cache (memory/calls/*.json)."""
+    ids = set()
+    for cache_file in cache_dir.glob('*.json'):
+        try:
+            with open(cache_file) as f:
+                data = json.load(f)
+            for call in (data.get('calls', []) if isinstance(data, dict) else []):
+                if call.get('id'):
+                    ids.add(str(call['id']))
+        except Exception:
+            continue
+    return ids
+
+
+def is_new_call(call_date, call_id, since_date: datetime, cached_ids: set) -> bool:
+    """A call is new when it is dated after (cutoff - LOOKBACK_DAYS) and its id
+    is not already cached. Date-only gating dropped late same-day arrivals;
+    the id check is what keeps the lookback from re-processing cached calls."""
+    floor = (since_date - timedelta(days=LOOKBACK_DAYS)).date()
+    if call_date is None or call_date <= floor:
+        return False
+    return str(call_id or '') not in (cached_ids or set())
+
+
 def get_call_adapter():
     """
     Load call intelligence adapter based on config/client.yaml.
@@ -172,7 +207,8 @@ def get_call_adapter():
         raise ValueError(f"Unknown call tool: {call_tool}. Must be 'gong' or 'fireflies'")
 
 
-def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: dict):
+def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: dict,
+                                        cached_ids: set = None):
     """
     Fetch new calls from configured call intelligence sources.
 
@@ -216,7 +252,8 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
 
         while True:
             try:
-                batch = adapter.fetch_recent(limit=limit, skip=skip, since=since_date)
+                batch = adapter.fetch_recent(limit=limit, skip=skip,
+                                             since=since_date - timedelta(days=LOOKBACK_DAYS))
 
                 if not batch:
                     break
@@ -254,8 +291,9 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
         except:
             continue
 
-        # Skip if before cutoff
-        if call_date <= since_date.date():
+        # Skip if before the lookback window, or already cached (late
+        # same-day arrivals are caught; cached calls are not re-processed)
+        if not is_new_call(call_date, normalized_call.source_call_id, since_date, cached_ids):
             continue
 
         # Extract company from title
@@ -291,7 +329,8 @@ def fetch_call_intelligence_incremental(since_date: datetime, calls_by_company: 
     print(f"   Added {total_new} new calls to cache")
 
 
-def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total_summarized: list):
+def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total_summarized: list,
+                             cached_ids: set = None):
     """Fetch new Apollo calls since date via API."""
     try:
         from apollo_client import get_apollo_client
@@ -323,8 +362,10 @@ def fetch_apollo_incremental(since_date: datetime, calls_by_company: dict, total
         except:
             continue
 
-        # Skip if before cutoff or not completed
-        if convo_date <= since_date.date():
+        # Skip if before the lookback window, already cached, or not completed.
+        # The id check runs BEFORE get_conversation + Haiku summarization, so
+        # the lookback costs no extra API calls or LLM tokens here.
+        if not is_new_call(convo_date, convo.get('id'), since_date, cached_ids):
             continue
         if convo.get('state') not in ['completed', 'insights_generated']:
             continue
@@ -795,6 +836,241 @@ def save_call_caches(calls_by_company: dict, output_dir: Path):
     print(f"\n✅ Processed {len(calls_by_company)} company cache files")
 
 
+def dedupe_calls_by_id(calls_by_company: dict) -> int:
+    """Keep ONE entry per call id across all companies, last occurrence wins.
+
+    Apollo is fetched twice in incremental mode: through the ApolloAdapter
+    (get_call_sources, since 893ddefa) and through the legacy
+    fetch_apollo_incremental(), which runs second. The legacy path still
+    uniquely covers deep windows (the adapter reads one search page), so it
+    stays — but both copies of the same conversation landed in one
+    bulk_upsert_calls batch and Postgres rejected the whole batch
+    (21000 "ON CONFLICT DO UPDATE command cannot affect row a second time").
+    Last-wins keeps the legacy copy, matching what write_cache() already
+    persisted to the JSON cache, so cache and Supabase stay identical.
+    Returns the number of duplicate entries removed."""
+    last_seen = {}
+    for slug, data in calls_by_company.items():
+        for idx, c in enumerate(data.get('calls', [])):
+            cid = str(c.get('id') or '')
+            if cid:
+                last_seen[cid] = (slug, idx)
+    removed = 0
+    for slug, data in calls_by_company.items():
+        kept = []
+        for idx, c in enumerate(data.get('calls', [])):
+            cid = str(c.get('id') or '')
+            if cid and last_seen[cid] != (slug, idx):
+                removed += 1
+                continue
+            kept.append(c)
+        data['calls'] = kept
+    return removed
+
+
+def _new_stats():
+    return {
+        "calls": {"attempted": 0, "upserted": 0, "failed": 0, "failures": []},
+        # per source: attempted / text / unavailable / deferred / write_failed
+        #             / skipped_parent_failed, plus reason counters
+        "transcripts": {},
+        "transcript_write_errors": [],
+    }
+
+
+def _tstats(stats, source):
+    return stats["transcripts"].setdefault(source or "?", {
+        "attempted": 0, "text": 0, "unavailable": 0, "deferred": 0,
+        "write_failed": 0, "skipped_parent_failed": 0,
+        "deferred_reasons": {},
+    })
+
+
+def persist_to_supabase(calls_by_company: dict, sb, fetch=None, build=None,
+                        chunk: int = 25, transcripts: bool = True) -> dict:
+    """Write calls + transcripts to Supabase and COUNT every outcome.
+
+    The calls upsert and the transcript persist are independent stages:
+      - each company's calls upsert has its own try, so one bad batch no
+        longer drops every other company's rows;
+      - the transcript persist always runs, for every call whose parent
+        calls row was written (call_transcripts.call_id has an FK to calls).
+        Calls whose parent upsert failed are counted skipped_parent_failed.
+    Nothing is swallowed: every failure is counted with its error so the
+    caller can print it, put it in the run summary and exit non-zero.
+    `fetch` / `build` default to transcript_store's; tests stub them.
+    transcripts=False writes the calls rows only (the --resync-cache-since
+    repair, where the transcript backfill owns transcripts)."""
+    if transcripts and (fetch is None or build is None):
+        from transcript_store import fetch_utterances, build_transcript_row
+        fetch = fetch or fetch_utterances
+        build = build or build_transcript_row
+
+    stats = _new_stats()
+    parent_ok = set()
+    for slug, data in calls_by_company.items():
+        calls = data.get('calls', [])
+        if not calls:
+            continue
+        for c in calls:
+            c['company_slug'] = slug
+        stats["calls"]["attempted"] += len(calls)
+        try:
+            stats["calls"]["upserted"] += sb.bulk_upsert_calls(calls, data['company'])
+            parent_ok.update(str(c.get('id') or '') for c in calls)
+        except Exception as e:
+            stats["calls"]["failed"] += len(calls)
+            stats["calls"]["failures"].append((slug, len(calls), f"{type(e).__name__}: {str(e)[:200]}"))
+
+    if not transcripts:
+        return stats
+    clients, rows = {}, []
+    for slug, data in calls_by_company.items():
+        for c in data.get('calls', []):
+            cid, src = str(c.get('id') or ''), (c.get('source') or '').lower()
+            if not cid or not src:
+                continue
+            t = _tstats(stats, src)
+            if cid not in parent_ok:
+                t["skipped_parent_failed"] += 1
+                continue
+            t["attempted"] += 1
+            utts, err, extra = fetch(src, cid, clients)
+            if err:
+                # Transient fetch failure — no row written, so the call stays
+                # absent and the nightly self-heal step re-attempts it.
+                t["deferred"] += 1
+                key = str(err)[:80]
+                t["deferred_reasons"][key] = t["deferred_reasons"].get(key, 0) + 1
+                continue
+            row = build(src, cid, utts, error=None, call_date=c.get('date'), extra=extra)
+            rows.append(row)
+
+    for i in range(0, len(rows), chunk):
+        part = rows[i:i + chunk]
+        try:
+            sb.bulk_upsert_transcripts(part)
+            for r in part:
+                t = _tstats(stats, r.get("source"))
+                if r.get("transcript"):
+                    t["text"] += 1
+                else:
+                    t["unavailable"] += 1
+        except Exception as e:
+            for r in part:
+                _tstats(stats, r.get("source"))["write_failed"] += 1
+            stats["transcript_write_errors"].append(
+                (len(part), f"{type(e).__name__}: {str(e)[:200]}"))
+    return stats
+
+
+def persist_failed(stats: dict) -> bool:
+    """True when this run lost data it should have written. Deferred fetches
+    alone are NOT a failure (the self-heal step retries them), unless every
+    attempted fetch for a source deferred (>=3 attempts) — that is an outage
+    (bad key, API down), not a transient."""
+    if stats["calls"]["failed"] or stats["transcript_write_errors"]:
+        return True
+    for t in stats["transcripts"].values():
+        if t["skipped_parent_failed"] or t["write_failed"]:
+            return True
+        if t["attempted"] >= 3 and t["deferred"] == t["attempted"]:
+            return True
+    return False
+
+
+def format_persist_report(stats: dict) -> str:
+    """Markdown report of every persist outcome — printed to the log AND
+    appended to $GITHUB_STEP_SUMMARY, so a partial failure is diagnosable
+    from the run page alone (which failed, how many, and why)."""
+    c = stats["calls"]
+    lines = ["### Supabase persist (etl_calls.py)", "",
+             f"**Calls:** {c['upserted']}/{c['attempted']} upserted"
+             + (f", **{c['failed']} FAILED**" if c["failed"] else ""), ""]
+    for slug, n, err in c["failures"]:
+        lines.append(f"- calls upsert failed for `{slug}` ({n} calls): `{err}`")
+    if c["failures"]:
+        lines.append("")
+    lines += ["**Transcripts** (written = text + unavailable):", "",
+              "| source | attempted | written | text | unavailable | deferred | write failed | skipped (parent failed) |",
+              "|---|---|---|---|---|---|---|---|"]
+    tot = {k: 0 for k in ("attempted", "text", "unavailable", "deferred",
+                          "write_failed", "skipped_parent_failed")}
+    for src in sorted(stats["transcripts"]):
+        t = stats["transcripts"][src]
+        for k in tot:
+            tot[k] += t[k]
+        lines.append(f"| {src} | {t['attempted']} | {t['text'] + t['unavailable']} | {t['text']} | "
+                     f"{t['unavailable']} | {t['deferred']} | {t['write_failed']} | {t['skipped_parent_failed']} |")
+    lines.append(f"| **total** | {tot['attempted']} | {tot['text'] + tot['unavailable']} | {tot['text']} | "
+                 f"{tot['unavailable']} | {tot['deferred']} | {tot['write_failed']} | {tot['skipped_parent_failed']} |")
+    lines.append("")
+    for src in sorted(stats["transcripts"]):
+        for reason, n in sorted(stats["transcripts"][src]["deferred_reasons"].items(),
+                                key=lambda kv: -kv[1]):
+            lines.append(f"- {src} deferred ×{n}: `{reason}`")
+    for n, err in stats["transcript_write_errors"]:
+        lines.append(f"- transcript upsert failed ({n} rows): `{err}`")
+    lines += ["", "**Result:** " + ("❌ FAILED — data was not written; this step exits non-zero"
+                                    if persist_failed(stats) else "✅ OK")]
+    return "\n".join(lines)
+
+
+def load_cached_calls_since(cache_dir: Path, since: str) -> dict:
+    """calls_by_company rebuilt from the JSON cache for calls dated > since."""
+    out = {}
+    for cache_file in sorted(cache_dir.glob('*.json')):
+        try:
+            with open(cache_file) as f:
+                data = json.load(f)
+        except Exception:
+            continue
+        if not isinstance(data, dict) or not data.get('slug'):
+            continue
+        calls = [dict(c) for c in data.get('calls', [])
+                 if c.get('id') and str(c.get('date') or '')[:10] > since]
+        if calls:
+            out[data['slug']] = {"company": data.get('company') or data['slug'],
+                                 "slug": data['slug'], "calls": calls}
+    return out
+
+
+def resync_cache_to_supabase(cache_dir: Path, since: str, sb, dry_run: bool = False) -> dict:
+    """One-time repair (cause A of the post-8/21 gap): on nights the calls
+    upsert failed, the only writer of those `calls` rows was a participant
+    step, which never sets formatted_summary / company_slug / duration. Re-
+    upsert, from the JSON cache, ONLY the cached calls whose Supabase row
+    lacks formatted_summary. Calls rows only — transcripts are the
+    backfill's job. Returns {"candidates", "targeted", "stats"}."""
+    from supabase_client import select_all
+    cached = load_cached_calls_since(cache_dir, since)
+    ids = {str(c['id']) for d in cached.values() for c in d['calls']}
+    rows = select_all(sb.client, "calls", columns="call_id,formatted_summary",
+                      filters=[("gt", "call_date", since)])
+    bare = {r["call_id"] for r in rows
+            if r.get("call_id") in ids and not (r.get("formatted_summary") or "").strip()}
+    target = {}
+    for slug, d in cached.items():
+        calls = [c for c in d['calls'] if str(c['id']) in bare]
+        if calls:
+            target[slug] = {**d, "calls": calls}
+    n = sum(len(d['calls']) for d in target.values())
+    stats = _new_stats() if dry_run else persist_to_supabase(target, sb, transcripts=False)
+    return {"candidates": len(ids), "targeted": n, "stats": stats}
+
+
+def write_step_summary(markdown: str):
+    """Append to the GitHub Actions run summary when running in Actions."""
+    path = os.getenv("GITHUB_STEP_SUMMARY")
+    if not path:
+        return
+    try:
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(markdown + "\n\n")
+    except Exception as e:
+        print(f"  ⚠️  could not write step summary: {e}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="ETL call transcripts to cache")
     parser.add_argument(
@@ -817,6 +1093,17 @@ def main():
         help='Path to Fireflies CSV file (backfill mode only)'
     )
     parser.add_argument(
+        '--resync-cache-since',
+        type=str,
+        help=('One-time repair: re-upsert cached calls dated after YYYY-MM-DD whose '
+              'Supabase calls row has no formatted_summary (calls rows only), then exit')
+    )
+    parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='With --resync-cache-since: report what would be re-upserted, write nothing'
+    )
+    parser.add_argument(
         '--since-date',
         type=str,
         help='Override cutoff date (YYYY-MM-DD) for incremental mode'
@@ -826,6 +1113,19 @@ def main():
     # Setup paths
     repo_root = Path(__file__).parent.parent
     output_dir = repo_root / 'memory' / 'calls'
+
+    if args.resync_cache_since:
+        from supabase_client import SupabaseWriter
+        res = resync_cache_to_supabase(output_dir, args.resync_cache_since,
+                                       SupabaseWriter(), dry_run=args.dry_run)
+        head = (f"### Resync cache → Supabase calls (since {args.resync_cache_since})"
+                f"{' — DRY RUN' if args.dry_run else ''}\n\n"
+                f"Cached calls in window: {res['candidates']}; calls rows missing "
+                f"formatted_summary (targeted): {res['targeted']}\n\n")
+        report = head + ("" if args.dry_run else format_persist_report(res["stats"]))
+        print(report)
+        write_step_summary(report)
+        return 1 if (not args.dry_run and persist_failed(res["stats"])) else 0
 
     # Track progress
     calls_by_company = {}
@@ -858,60 +1158,42 @@ def main():
             print(f"Auto-detected cutoff: {since_date.strftime('%Y-%m-%d')}")
 
         # Fetch from APIs
-        fetch_call_intelligence_incremental(since_date, calls_by_company)
-        fetch_apollo_incremental(since_date, calls_by_company, total_summarized)
+        cached_ids = get_cached_call_ids(output_dir)
+        print(f"Lookback: {LOOKBACK_DAYS}d before cutoff "
+              f"(> {(since_date - timedelta(days=LOOKBACK_DAYS)).strftime('%Y-%m-%d')}), "
+              f"skipping {len(cached_ids)} already-cached call ids")
+        fetch_call_intelligence_incremental(since_date, calls_by_company, cached_ids)
+        fetch_apollo_incremental(since_date, calls_by_company, total_summarized, cached_ids)
+
+    # One entry per call id before anything is persisted (21000 guard — see
+    # dedupe_calls_by_id). Cache and Supabase then see the identical set.
+    removed = dedupe_calls_by_id(calls_by_company)
+    if removed:
+        print(f"\n   ✂️  Removed {removed} duplicate call id(s) fetched by two paths")
 
     # Save results
     save_call_caches(calls_by_company, output_dir)
 
-    # Write to Supabase if configured
+    # Write to Supabase if configured. Every outcome is counted and reported;
+    # a lost write fails the step (exit 1) instead of printing and exiting 0.
+    persist_ok = True
     if os.getenv('SUPABASE_URL'):
         print(f"\n📤 Writing to Supabase...")
         try:
-            import sys
             sys.path.insert(0, str(repo_root / 'scripts'))
             from supabase_client import SupabaseWriter
             sb = SupabaseWriter()
-            total = 0
-            for slug, data in calls_by_company.items():
-                calls = data.get('calls', [])
-                if calls:
-                    for c in calls:
-                        c['company_slug'] = slug
-                    n = sb.bulk_upsert_calls(calls, data['company'])
-                    total += n
-            print(f"  ✓ Supabase: {total} calls upserted")
-
-            # Go-forward transcript persist (STORE_AND_BACKFILL_TRANSCRIPTS):
-            # store each newly-ingested call's transcript alongside the call.
-            # The calls upsert above committed first, so the FK parent exists.
-            # Fully guarded — a transcript fetch/store failure must NOT fail the
-            # calls ETL, which is the primary artifact.
-            try:
-                from transcript_store import fetch_utterances, build_transcript_row
-                clients, rows, deferred = {}, [], 0
-                for slug, data in calls_by_company.items():
-                    for c in data.get('calls', []):
-                        cid, src = str(c.get('id') or ''), c.get('source') or ''
-                        if not cid or not src:
-                            continue
-                        utts, err, extra = fetch_utterances(src, cid, clients)
-                        if err:
-                            # Transient fetch failure — don't write a row; the
-                            # call is left absent so the next nightly re-attempts
-                            # it (same discipline as the backfill).
-                            deferred += 1
-                            continue
-                        rows.append(build_transcript_row(src, cid, utts, error=None,
-                                                         call_date=c.get('date'), extra=extra))
-                stored = sb.bulk_upsert_transcripts(rows)
-                have = sum(1 for r in rows if r.get('transcript'))
-                print(f"  ✓ Supabase: {stored} transcripts upserted "
-                      f"({have} with text, {stored - have} unavailable, {deferred} deferred)")
-            except Exception as te:
-                print(f"  ⚠️  Transcript persist failed (calls unaffected): {te}")
         except Exception as e:
-            print(f"  ⚠️  Supabase write failed: {e}")
+            report = ("### Supabase persist (etl_calls.py)\n\n"
+                      f"**Result:** ❌ FAILED — could not construct Supabase client: "
+                      f"`{type(e).__name__}: {str(e)[:200]}`. No calls or transcripts written.")
+            persist_ok = False
+        else:
+            stats = persist_to_supabase(calls_by_company, sb)
+            report = format_persist_report(stats)
+            persist_ok = not persist_failed(stats)
+        print(report)
+        write_step_summary(report)
     else:
         print(f"\n  ⏭️  SUPABASE_URL not set — skipping Supabase write")
 
@@ -930,6 +1212,11 @@ def main():
     print(f"Output: {output_dir}/")
     print(f"{'='*60}\n")
 
+    if not persist_ok:
+        print("❌ Supabase persist lost data this run (see report above) — exiting 1")
+        return 1
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
