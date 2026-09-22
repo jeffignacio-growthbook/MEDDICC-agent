@@ -1291,6 +1291,8 @@ TOOLS YOU CAN CALL:
     - owner_email: filter to specific rep (optional, accepts email or name)
     - stage_filter: "qualified", "discovery", "scoping", "proposal" (optional, defaults to all stages)
     - pipeline_filter: "new_business" or "renewal" (optional, defaults to all incremental pipeline)
+    - resolved_quarter_filter: auto-injected time window (optional, internal - router injects this)
+    - resolved_dimension_filters: auto-injected dimension filters (optional, internal - router injects this)
     **RETURNS**: Current pipeline snapshot with total deals, total ARR, coverage ratio, breakdowns by stage/owner
     Examples: "what is our pipeline", "show me pipeline", "how much pipeline do we have", "Jake's pipeline"
   query_pipeline_movement(view, fiscal_quarter, pipeline_filter, owner_email, stage, weeks, close_date_scope, time_window, deal_ids)
