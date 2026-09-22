@@ -33,12 +33,24 @@ Needs SUPABASE_URL + SUPABASE_SERVICE_KEY + APOLLO_API_KEY +
 FIREFLIES_API_KEY.
 """
 import sys
+import time
 from pathlib import Path
 from datetime import date, datetime
 from collections import Counter
 
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+except Exception:
+    pass
+
+# Fireflies rate-limits a fast sequential sweep (see transcript_store.py's own
+# comments) — a real, un-throttled loop over ~85 ids stalled a prior run of
+# this exact script past its 20-minute job timeout. Throttle + a hard
+# try/except around every call, not just the GraphQL error-body check.
+FIREFLIES_THROTTLE_SECONDS = 0.4
 
 
 def _raw_fireflies_inspect(client, call_id):
@@ -50,7 +62,10 @@ def _raw_fireflies_inspect(client, call_id):
         meeting_attendees { displayName email }
         sentences { text }
     } }"""
-    res = client._query(q, {"id": call_id})
+    try:
+        res = client._query(q, {"id": call_id})
+    except Exception as e:
+        return {"fetch_error": f"{type(e).__name__}: {str(e)[:160]}"}
     if res.get("errors"):
         return {"raw_errors": [e.get("message", "")[:120] for e in res["errors"]]}
     t = (res.get("data") or {}).get("transcript")
@@ -173,15 +188,18 @@ def main():
           f"(duration/attendees/state, not just utterance count):\n{'='*100}")
 
     raw_results = []
-    for e in with_age:
+    for i, e in enumerate(with_age):
         cid, source = e["call_id"], (e["source"] or "").lower()
         if source == "fireflies":
+            time.sleep(FIREFLIES_THROTTLE_SECONDS)
             raw = _raw_fireflies_inspect(ff, cid)
         elif source == "apollo":
             raw = _raw_apollo_inspect(apollo, cid)
         else:
             raw = {"skipped": f"unhandled source {source!r}"}
         raw_results.append({**e, "raw": raw})
+        print(f"  [{i+1}/{len(with_age)}] call_id={cid}  source={source}  "
+              f"age={e['age_days']}d  raw={raw}")
 
     # Classify what these calls actually are, from real evidence.
     zero_duration = [r for r in raw_results if r["raw"].get("duration_seconds") == 0
