@@ -249,10 +249,37 @@ def fetch_utterances(source, call_id, clients, retries=6, backoff=2.0, throttle=
             if attempt < retries - 1:
                 time.sleep(min(120.0, 15.0 * (2 ** attempt)))
         except Exception as e:
+            wait = _http_rate_limit_wait(e, attempt)
+            if wait is not None:
+                # HTTP 429 (Apollo REST, or Fireflies at the HTTP layer):
+                # same LONG backoff as an in-body rate limit — the short
+                # 2s..32s schedule below would just re-hit the window.
+                last = f"RateLimited(HTTP 429): {str(e)[:130]}"
+                if attempt < retries - 1:
+                    time.sleep(wait)
+                continue
             last = f"{type(e).__name__}: {str(e)[:140]}"
             if attempt < retries - 1:
                 time.sleep(backoff * (2 ** attempt))
     return [], last, {}
+
+
+def _http_rate_limit_wait(exc, attempt):
+    """Seconds to wait if `exc` is an HTTP 429, else None. Honors a numeric
+    Retry-After header (capped at 120s); otherwise 15s, 30s, 60s, 120s."""
+    resp = getattr(exc, "response", None)
+    status = getattr(resp, "status_code", None)
+    if status != 429:
+        # No HTTP status: only explicit phrases count — never a bare "429"
+        # substring, which can appear inside a URL / hex call id.
+        t = str(exc).lower()
+        if status is not None or not ("too many request" in t or "rate limit" in t):
+            return None
+    try:
+        ra = float((getattr(resp, "headers", None) or {}).get("Retry-After"))
+        return max(1.0, min(120.0, ra))
+    except (TypeError, ValueError):
+        return min(120.0, 15.0 * (2 ** attempt))
 
 
 # ── assembly + metrics ───────────────────────────────────────────────────────

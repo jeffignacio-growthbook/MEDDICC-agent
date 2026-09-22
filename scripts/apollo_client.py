@@ -9,6 +9,10 @@ GrowthBook uses Apollo.io for recording and transcribing sales calls.
 import os
 import sys
 import requests
+
+# (connect, read) seconds. A hung connection must fail and be retried/deferred,
+# never stall a backfill until the job timeout.
+REQUEST_TIMEOUT = (10, 60)
 from typing import List, Dict, Optional
 from datetime import datetime
 
@@ -31,19 +35,19 @@ class ApolloClient:
 
     def _get(self, endpoint: str, params: dict = None) -> dict:
         """Execute GET request."""
-        response = self.session.get(f"{self.BASE_URL}{endpoint}", params=params)
+        response = self.session.get(f"{self.BASE_URL}{endpoint}", params=params, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         return response.json()
 
     def _post(self, endpoint: str, data: dict = None) -> dict:
         """Execute POST request."""
-        response = self.session.post(f"{self.BASE_URL}{endpoint}", json=data or {})
+        response = self.session.post(f"{self.BASE_URL}{endpoint}", json=data or {}, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         return response.json()
 
     def _patch(self, endpoint: str, data: dict = None) -> dict:
         """Execute PATCH request."""
-        response = self.session.patch(f"{self.BASE_URL}{endpoint}", json=data or {})
+        response = self.session.patch(f"{self.BASE_URL}{endpoint}", json=data or {}, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         return response.json()
 
