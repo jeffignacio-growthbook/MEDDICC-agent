@@ -92,8 +92,9 @@ def test_verify_activity_baseline_case():
     # Verify emails pattern was found correctly
     assert emails_pattern is not None, \
         "Should find emails.select() around line 61"
-    assert emails_pattern[2] == "id", \
-        f"emails pattern should select 'id', got '{emails_pattern[2]}'"
+    # Note: Line 61 was fixed to use "*" instead of "id" (emails table has no id column)
+    assert emails_pattern[2] == "*", \
+        f"emails pattern should select '*', got '{emails_pattern[2]}'"
 
     # Verify deals pattern was found correctly
     assert deals_pattern is not None, \
