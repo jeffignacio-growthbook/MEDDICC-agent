@@ -2954,6 +2954,25 @@ correct baseline.
 3. Add explicit instruction: "⚠️ COMPLETE DATASET: This result contains ALL X deals"
 4. Row-based results still use existing 3000-char truncation (already aggregated/sampled)
 
+   **⚠️ CORRECTION (2026-09-23): item 4 was false.** Row-based results
+   were NOT already aggregated/sampled when they reached the model. The
+   serializer was handed the RAW tool result and cut it to 3000 chars
+   mid-row. The aggregate `_aggregate_and_sample()` had computed over
+   every row was stored in `accumulated_data[step_N]` and never shown to
+   the model. The canary test (`tests/test_canary_no_silent_drop.py`)
+   measured it on a 60-row filter_table result: the model saw 13 rows,
+   no `aggregates`, no `row_count`. So any dynamic question over 20 rows
+   was answered from a partial raw slice. After a CODE-ENFORCED
+   completeness retry it was worse: the message was still built from
+   the incomplete first call. FIXED: `_serialize_tool_result_for_synthesis()`
+   now sends the stored aggregated view (summary keys first, whole sample
+   rows trimmed only if over `LOOP_STEP_VIEW_CHARS` (8000), never a character
+   cut while rows remain). The same applies at the three forced-fetch
+   message sites in `_finalize_from_data`, and `_aggregate_and_sample()`
+   now passes through every key it doesn't compute. Guarded by
+   `test_fix_aggregate_view_reaches_synthesis_is_guarded` and
+   `test_fix_aggregate_passthrough_is_guarded`.
+
 **Verification**:
 - Baseline test: "show me Christian's pipeline"
 - NEW path: "94 total active deals, $7.5M total ARR" ✅ CORRECT

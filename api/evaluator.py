@@ -31,6 +31,15 @@ STRUCTURED_HANDLERS = {
     "query_stale_deals": ["stale_deals", "stale_count"],  # Phase 2 handler 2/6
     "query_waterfall": ["pipeline_summary", "waterfall"],  # Phase 2 handler 3/6
     "query_rep_pipeline": ["deals", "summary"],  # Phase 2 handler 4/6
+    "query_pipeline_movement": ["rows", "data_gaps", "snapshot_dates"],  # Phase 1
+        # pilot — registered 2026-09-23 after the canary test (tests/
+        # test_canary_no_silent_drop.py) found it was the one unified-routing
+        # handler left out: its result was cut to [:3000] chars before
+        # synthesis, so the model answered from 3 of 64 deal rows with no
+        # data_gaps. data_gaps/snapshot_dates count as a real result: the
+        # no-snapshot returns carry an empty rows list but a complete,
+        # honest explanation in data_gaps, and a stage_deals view with zero
+        # matching deals still has snapshot_dates — neither is "empty".
     "query_deals_at_risk": ["deals_at_risk", "message"],  # Phase 2 handler 6/6 —
         # "message" must be checked too: the genuinely-empty "no deals at
         # risk" case has an empty deals_at_risk list but a complete,

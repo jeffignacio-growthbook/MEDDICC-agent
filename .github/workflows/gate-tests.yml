@@ -1222,6 +1222,27 @@ jobs:
           # synthesis carries a resolved (or explicitly-null) company_name.
           PYTHONPATH=. python3 tests/test_diff_company_name_backfill.py
 
+      - name: "TEST 0za — Offline: canary — nothing a handler computes is silently dropped before synthesis"
+        run: |
+          set -e
+          # 2026-09-23: four separate incidents tonight (SNAPSHOT_DIFF
+          # discarded from the return payload, SNAPSHOT_DIFF chopped by
+          # blind truncation, the enrichment-shortcut message gap, the
+          # structured-handler [:3000] cut) shared one shape — a value
+          # computed correctly upstream fell out at a narrowing point
+          # nobody was watching, found only by a live question. This
+          # appends a canary key as the LAST key of each tool result and
+          # drives the REAL dynamic_query_loop for all 7 unified-routing
+          # handlers plus the filter_table fallback, checking three
+          # channels: the synthesis LLM input, the stored step, and the
+          # tool_results returned to save_thread. It is a ratchet: any
+          # drop not in KNOWN_DROPS fails, and any KNOWN_DROPS entry that
+          # stops dropping also fails, so the list can only shrink.
+          # Includes a negative control proving the harness can fail, and
+          # a coverage check that fails if route_question's unified-
+          # routing list gains a handler without a canary case.
+          PYTHONPATH=. python3 tests/test_canary_no_silent_drop.py
+
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

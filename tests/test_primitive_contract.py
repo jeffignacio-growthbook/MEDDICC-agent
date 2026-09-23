@@ -258,6 +258,15 @@ KNOWN_FLAGGED_LOG_TAGS = {
     # before an answer ever ships — the forced iteration IS the visible
     # consequence; there is no unresolved-and-shipped path here at all.
     "[DIMENSION_VERIFY]",
+    # Reviewed 2026-09-23 (added in b8ee628 without a review entry):
+    # _detect_semantic_gap() before query_pipeline_movement's fast-path
+    # finalize. Compliant on both checklist questions — (1) queryable:
+    # sets primitives_fired.semantic_gap_detected, persisted to
+    # query_cost_log's primitives_fired JSONB; (2) changes what the user
+    # sees: it blocks the immediate finalize and keeps the loop running so
+    # the missing data (e.g. dollar fields) is fetched before answering —
+    # there is no detect-log-ship-anyway path.
+    "[SEMANTIC_GAP]",
     # forced_anchor_fetch_fired / finalize's own scratchpad handling —
     # reviewed primitives from the original retroactive audit
     # (queryable, self-corrects or escalates to _give_up).
