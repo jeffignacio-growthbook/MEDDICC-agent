@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-23 (#33 placement fallback, YAML latency, #36 deals-ETL failures resolved; Supabase deals staleness mitigated 24h → ~4h; incremental deal sync and LOW test_question.py flag open)
+**Last Updated:** 2026-09-23 (incremental deal sync built, PR #40, ~1h staleness once merged; Inditex ghost removed; LOW test_question.py flag, owner-less deals and dead delta path open)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -13,59 +13,14 @@ Inditex fix; unrelated to it. `deal_status='active'` with an empty
 `owner_email`: **ClickUp 56849054092** and **63138461244** (no company name
 either). Needs an owner assigned in HubSpot; nothing to fix in code.
 
-### 🟠 MEDIUM: Incremental deal sync to cut Supabase `deals` staleness below ~4h (found 2026-09-23)
-**Status:** OPEN. This is the real fix; the 4-hour cron below is a stopgap.
-Scope it carefully, on its own; don't rush it.
-
-**Why:** only `etl_deals.py --mode analytics` writes Supabase `deals`, so its
-schedule sets the worst-case staleness of every deal field against HubSpot
-(see "Supabase deals up to 24h stale" under Recently Completed).
-
-**Plan:** an hourly (or more frequent) job that fetches only the deals
-modified since a stored checkpoint and upserts them. The full design, from
-the 2026-09-23 audit, covers the checkpoint table, a 30-min overlap,
-`hs_object_id` keyset paging, deletion handling and a ~12h full
-reconciliation.
-
-**Correction (2026-09-23 audit):** an earlier version of this entry said
-`HubSpotDealsClient.get_deals_modified_since()` "already exists and is
-unused" and "requests the same property list as
-`get_all_deals_including_closed()`". **Both were wrong:**
-- **It isn't unused, it's dead.** Its one caller, the delta check in
-  `scripts/run_nightly.py` (~line 649), passes `counter.get('last_run_date')`.
-  Since 2026-08-10 (`6cfd6a67`, per-run counter files) the rollup counter
-  has no `last_run_date` key, so the argument is always `''` and the branch
-  never runs. Even when it did run, it only printed a count and never wrote
-  anything.
-- **It requests only 8 properties:** `dealname`, `dealstage`, `pipeline`,
-  `closedate`, `amount`, `incremental_arr`, `hubspot_owner_id`,
-  `hs_lastmodifieddate`. It has no `new_revenue`, `expansion_revenue`,
-  `prior_arr`, `renewal_revenue`, `sao`, forecast category or `bdr_owner`.
-- **It would fail if it ran.** Its documented input format (ISO without a
-  timezone, e.g. `'2026-08-01T02:00:00'`) returns **HTTP 400** from
-  deals/search (probe run 35899912562). The caller catches the error and
-  prints a warning.
-
-**Don't reuse it as-is.** The sync needs a new fetch: the full property
-list, epoch-millisecond filter values, and keyset paging on `hs_object_id`.
-
-**⚠️ Boundary safety is the whole risk.** A "since last successful run"
-watermark is exactly the kind of mechanism behind this session's
-transcript-ETL cutoff bug, where a boundary condition silently dropped
-records. A deal whose edit lands late for a window already processed must
-never be silently skipped. Build in, and test with real boundary cases:
-- Only advance the watermark after a fully successful run. Store it
-  durably, not in memory. Any failed or partial run leaves it where it was.
-- Advance to the max `hs_lastmodifieddate` actually received, never to the
-  wall clock. Overlap each window by a safety margin (e.g. re-read the last
-  15-30 min), and rely on idempotent upserts to absorb the duplicates.
-- Test edits exactly at the boundary, edits whose `hs_lastmodifieddate`
-  arrives late, clock skew, and a run that fails halfway. The search cap of
-  10,000 results per query needs a paging strategy for a large backlog
-  (e.g. split by date range).
-- Keep the full every-4h analytics run as a reconciliation backstop, and
-  have the incremental job report how many deals it fetched vs upserted,
-  like the #36 RUN SUMMARY.
+### 🟢 LOW: Remove the dead `get_deals_modified_since()` path (found 2026-09-23)
+**Status:** OPEN, not urgent. `HubSpotDealsClient.get_deals_modified_since()`
+and the delta block in `scripts/run_nightly.py` (~line 649) have never run
+since 2026-08-10: the counter has no `last_run_date`, so the argument is
+always `''`. If they did run, the ISO-without-timezone filter would return
+HTTP 400. The incremental sync replaced them (see Recently Completed). Delete
+both, or point nightly at `deal_sync_checkpoints` if a delta is ever needed
+there.
 
 ### 🟢 LOW: `scripts/test_question.py` prints "Answered: False" for every direct dynamic_query answer (found 2026-09-23)
 **Status:** OPEN. Cosmetic, but it reads as a failure.
@@ -84,6 +39,134 @@ so the flag reflects the loop's real outcome.
 ---
 
 ## ✅ Recently Completed
+
+### MEDIUM: Incremental deal sync, Supabase `deals` ~1h behind HubSpot (built 2026-09-23)
+**Status:** ✅ BUILT and verified live on production, in PR #40. Five
+commits, each with its own tests and CI run. The hourly schedule starts
+once the PR merges.
+
+**What it does:**
+- **Hourly** `etl_deals.py --mode incremental` (`hourly-deal-sync.yml`, :17
+  past each hour) upserts:
+  - every deal with `hs_lastmodifieddate >= checkpoint - 30 min`,
+    keyset-paged on `hs_object_id`;
+  - the deals of companies modified in the same window;
+  - tombstones for any deleted or merged-away deals still in `deals`.
+- **Twice daily**, the full analytics sync (`7 5,17 * * *`) is the safety
+  net:
+  - keyset-paged full listing and the same deletion pass;
+  - Supabase-vs-HubSpot reconciliation: purged deals are tombstoned;
+    a deal that still exists but is missing from the listing fails the run;
+    more than 25 orphans fails the run and touches nothing;
+  - it re-sets the checkpoint.
+- The two share a concurrency group and both alert on failure.
+
+**Boundary rules** (the transcript-ETL lessons, each pinned by a
+planted-bug test):
+- The checkpoint (`deal_sync_checkpoints`, migration 069) advances only
+  after a run with **no** failures. It moves to min(max hs_lastmodifieddate
+  seen, fetch start) and never backwards.
+- The 30-min overlap, inclusive (GTE) and in epoch ms, re-reads late-indexed
+  and seconds-late calculated changes.
+- A missing checkpoint or a backlog over 9,000 exits 1 rather than guessing.
+- Deletions use the atomic `tombstone_deal()` (migration 070, executable by
+  service_role only) into the 067 `deleted_deals` table:
+  - deleted in HubSpot: snapshots dated after the deletion are removed;
+  - merged away or purged: snapshots are kept.
+- `get_all_deals_including_closed()` is now keyset-paged, which also fixes
+  history mode and `export_deals_to_csv`. The old offset + lastmodified-DESC
+  paging skipped a deal edited mid-fetch (reproduced: 249/250).
+
+**Tests:** 5 files, 40 checks, all in `pr-offline-tests.yml`:
+- `test_deal_sync_keyset_and_checkpoint.py`
+- `test_deal_sync_incremental.py`
+- `test_deal_sync_deletions.py`
+- `test_deal_sync_company_pass.py`
+- `test_deal_sync_full_reconciliation.py`
+
+**Live proof** (production runs of the branch code):
+- **Keyset listing:** 1,956/1,956 unique, matching HubSpot's total; the
+  7-day window gave 872/872.
+- **Full sync (part-2 code):** set the checkpoint for the first time
+  (19:13:19Z). The two incremental runs that followed each read 14 deals
+  and correctly left the checkpoint unchanged.
+- **Full sync (part-5 code):**
+  - 1,956 upserted, 0 failures;
+  - deletions: 3 deleted + 10 merged-away ids checked, 0 tombstoned
+    (Inditex was already fixed);
+  - reconciliation clean (1,956 = 1,956);
+  - checkpoint moved to 19:40:27Z.
+- **Incremental run after it:** 12s. 20 companies modified gave 15 more
+  deals; 21 upserted, 0 failures.
+- **`tombstone_deal()` SQL:** verified in a forced-rollback transaction,
+  and production counts were unchanged afterwards.
+
+**Staleness:** about 1h nominal for deal and company fields, plus GitHub's
+scheduling delay. Deletions are caught within ~1h. The full backstop runs
+every ~12h.
+
+**Incident during the build, recorded in migration 069:** the checkpoint
+table was first created as `etl_checkpoints` with IF NOT EXISTS. That name
+already belonged to the SDR metrics ETL's table, so the CREATE silently did
+nothing, and a trigger landed on the SDR table that would have broken its
+next write. It was reverted about a minute later, nothing wrote in between,
+and RLS was restored to off. The table was renamed, and new migrations use
+a plain CREATE so a collision fails loudly.
+
+**Superseded design notes (the original open entry):**
+> ### 🟠 MEDIUM: Incremental deal sync to cut Supabase `deals` staleness below ~4h (found 2026-09-23)
+> **Status:** OPEN. This is the real fix; the 4-hour cron below is a stopgap.
+> Scope it carefully, on its own; don't rush it.
+>
+> **Why:** only `etl_deals.py --mode analytics` writes Supabase `deals`, so its
+> schedule sets the worst-case staleness of every deal field against HubSpot
+> (see "Supabase deals up to 24h stale" under Recently Completed).
+>
+> **Plan:** an hourly (or more frequent) job that fetches only the deals
+> modified since a stored checkpoint and upserts them. The full design, from
+> the 2026-09-23 audit, covers the checkpoint table, a 30-min overlap,
+> `hs_object_id` keyset paging, deletion handling and a ~12h full
+> reconciliation.
+>
+> **Correction (2026-09-23 audit):** an earlier version of this entry said
+> `HubSpotDealsClient.get_deals_modified_since()` "already exists and is
+> unused" and "requests the same property list as
+> `get_all_deals_including_closed()`". **Both were wrong:**
+> - **It isn't unused, it's dead.** Its one caller, the delta check in
+>   `scripts/run_nightly.py` (~line 649), passes `counter.get('last_run_date')`.
+>   Since 2026-08-10 (`6cfd6a67`, per-run counter files) the rollup counter
+>   has no `last_run_date` key, so the argument is always `''` and the branch
+>   never runs. Even when it did run, it only printed a count and never wrote
+>   anything.
+> - **It requests only 8 properties:** `dealname`, `dealstage`, `pipeline`,
+>   `closedate`, `amount`, `incremental_arr`, `hubspot_owner_id`,
+>   `hs_lastmodifieddate`. It has no `new_revenue`, `expansion_revenue`,
+>   `prior_arr`, `renewal_revenue`, `sao`, forecast category or `bdr_owner`.
+> - **It would fail if it ran.** Its documented input format (ISO without a
+>   timezone, e.g. `'2026-08-01T02:00:00'`) returns **HTTP 400** from
+>   deals/search (probe run 35899912562). The caller catches the error and
+>   prints a warning.
+>
+> **Don't reuse it as-is.** The sync needs a new fetch: the full property
+> list, epoch-millisecond filter values, and keyset paging on `hs_object_id`.
+>
+> **⚠️ Boundary safety is the whole risk.** A "since last successful run"
+> watermark is exactly the kind of mechanism behind this session's
+> transcript-ETL cutoff bug, where a boundary condition silently dropped
+> records. A deal whose edit lands late for a window already processed must
+> never be silently skipped. Build in, and test with real boundary cases:
+> - Only advance the watermark after a fully successful run. Store it
+>   durably, not in memory. Any failed or partial run leaves it where it was.
+> - Advance to the max `hs_lastmodifieddate` actually received, never to the
+>   wall clock. Overlap each window by a safety margin (e.g. re-read the last
+>   15-30 min), and rely on idempotent upserts to absorb the duplicates.
+> - Test edits exactly at the boundary, edits whose `hs_lastmodifieddate`
+>   arrives late, clock skew, and a run that fails halfway. The search cap of
+>   10,000 results per query needs a paging strategy for a large backlog
+>   (e.g. split by date range).
+> - Keep the full every-4h analytics run as a reconciliation backstop, and
+>   have the incremental job report how many deals it fetched vs upserted,
+>   like the #36 RUN SUMMARY.
 
 ### MEDIUM: Ghost deal deleted in HubSpot, still active in Supabase for six weeks (found and fixed 2026-09-23)
 **Status:** ✅ FIXED 2026-09-23 (migrations 067 + 068, applied to production).
