@@ -12,6 +12,8 @@ env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(env_path)
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "api"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 from db import get_supabase
 from field_semantics import stage_label
 
@@ -42,12 +44,10 @@ def verify_renewal_flags():
             print(f"  deal_value: {repr(d.get('deal_value'))}")
             print()
 
-            expansion_arr = d.get("expansion_arr") or 0
-            new_arr = d.get("new_arr") or 0
             renewal_revenue = d.get("renewal_revenue") or 0
 
             print("Calculated values:")
-            print(f"  incremental_value = expansion_arr + new_arr = {expansion_arr + new_arr}")
+            print(f"  incremental_value = incremental_arr(d) = {incremental_arr(d)}")
             print(f"  renewal_revenue (coalesced) = {renewal_revenue}")
             print()
 

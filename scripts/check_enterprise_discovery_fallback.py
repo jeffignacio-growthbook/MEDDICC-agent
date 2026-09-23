@@ -12,6 +12,10 @@ import os
 from datetime import datetime, timezone
 from supabase import create_client, Client
 from dotenv import load_dotenv
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 
 load_dotenv()
 
@@ -168,9 +172,7 @@ def main():
             deal_age = None
 
         # Calculate deal value
-        new_arr = deal.get('new_arr', 0) or 0
-        expansion_arr = deal.get('expansion_arr', 0) or 0
-        deal_value = new_arr + expansion_arr
+        deal_value = incremental_arr(deal)
 
         deal_info = {
             'company': deal['company_name'],

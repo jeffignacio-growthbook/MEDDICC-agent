@@ -108,8 +108,10 @@ def test_query_pipeline_consistency():
         "query_pipeline should use is_incremental_pipeline() for filtering"
 
     # Check that incremental_value is calculated from the same deal object
-    assert "expansion_arr + new_arr" in query_pipeline_section, \
-        "query_pipeline should calculate incremental_value from expansion_arr + new_arr"
+    # 2026-09-23: via the canonical incremental_arr() on the SAME deal
+    # object, never an inline re-sum (tests/test_incremental_arr_single_source.py).
+    assert "incremental_value = incremental_arr(deal)" in query_pipeline_section, \
+        "query_pipeline should calculate incremental_value via incremental_arr(deal)"
 
     # Check that the pattern is: filter with is_incremental_pipeline, THEN calculate
     # This ensures count and sum use the same population
@@ -139,8 +141,8 @@ def test_pipeline_coverage_consistency():
         "pipeline_coverage should use is_incremental_pipeline() for filtering"
 
     # Check that it calculates incremental_value from the same deal
-    assert 'expansion_arr") or 0) + (d.get("new_arr")' in content, \
-        "pipeline_coverage should calculate incremental_value from expansion_arr + new_arr"
+    assert 'd["_incremental_value"] = incremental_arr(d)' in content, \
+        "pipeline_coverage should calculate incremental_value via incremental_arr(d)"
 
     # Check the pattern: filter first, then calculate
     filter_pos = content.find("is_incremental_pipeline(d)")

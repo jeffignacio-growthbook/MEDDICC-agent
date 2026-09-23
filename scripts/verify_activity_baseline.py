@@ -16,6 +16,8 @@ env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(env_path)
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "api"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 from db import get_supabase
 from field_semantics import is_incremental_pipeline
 
@@ -80,9 +82,7 @@ def verify_activity_baseline():
     with_arr = []
     for deal in deals.data:
         if is_incremental_pipeline(deal):
-            expansion_arr = deal.get("expansion_arr") or 0
-            new_arr = deal.get("new_arr") or 0
-            incremental_value = expansion_arr + new_arr
+            incremental_value = incremental_arr(deal)
 
             if incremental_value > 0:
                 with_arr.append(deal)
@@ -101,7 +101,7 @@ def verify_activity_baseline():
     for deal in sample_deals:
         deal_id = deal.get("deal_id")
         company = deal.get("company_name")
-        incremental = (deal.get("expansion_arr") or 0) + (deal.get("new_arr") or 0)
+        incremental = incremental_arr(deal)
 
         # Check engagements
         activity_found = False

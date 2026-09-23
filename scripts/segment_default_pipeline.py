@@ -21,6 +21,8 @@ env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(env_path)
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "api"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 from db import get_supabase
 from field_semantics import is_won
 
@@ -59,8 +61,7 @@ def segment_default():
     ]
 
     total_incremental_arr = sum(
-        (d.get("new_arr") or 0) + (d.get("expansion_arr") or 0)
-        for d in active_default_incremental
+        incremental_arr(d) for d in active_default_incremental
     )
 
     print(f"ACTIVE deals in default pipeline: {len(active_default)} of {len(active_deals)}")

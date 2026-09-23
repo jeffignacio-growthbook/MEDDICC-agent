@@ -25,6 +25,8 @@ from collections import defaultdict
 import yaml
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 
 from supabase import create_client
 
@@ -928,7 +930,7 @@ def _actual_incremental_closed_won(sb, q_start_iso: str, q_end_iso: str):
             continue
         if not (q_start_iso <= str(close_date)[:10] <= q_end_iso):
             continue
-        total += (d.get('new_arr') or 0) + (d.get('expansion_arr') or 0)
+        total += incremental_arr(d)
         n += 1
     return total, n
 

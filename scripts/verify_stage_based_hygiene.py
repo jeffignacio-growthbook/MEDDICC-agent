@@ -11,6 +11,8 @@ env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(env_path)
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "api"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 from db import get_supabase
 from field_semantics import is_incremental_pipeline, stage_label
 
@@ -33,10 +35,8 @@ def verify_stage_based_hygiene():
     renewal_stages_valid_incr = []
 
     for deal in deals.data:
-        expansion_arr = deal.get("expansion_arr") or 0
-        new_arr = deal.get("new_arr") or 0
         renewal_revenue = deal.get("renewal_revenue") or 0
-        incremental_value = expansion_arr + new_arr
+        incremental_value = incremental_arr(deal)
 
         stage = stage_label(deal.get("stage"))
         in_incremental_pipeline = is_incremental_pipeline(deal)

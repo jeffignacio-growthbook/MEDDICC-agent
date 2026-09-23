@@ -16,6 +16,8 @@ env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(env_path)
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "api"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 from db import get_supabase
 from field_semantics import is_incremental_pipeline, is_renewal_base
 
@@ -66,11 +68,9 @@ def reconcile():
     dollar_neither = []
 
     for deal in all_active:
-        expansion_arr = deal.get("expansion_arr") or 0
-        new_arr = deal.get("new_arr") or 0
         renewal_revenue = deal.get("renewal_revenue") or 0
 
-        incremental_value = expansion_arr + new_arr
+        incremental_value = incremental_arr(deal)
 
         has_incremental = incremental_value > 0
         has_renewal = renewal_revenue > 0
@@ -159,13 +159,12 @@ def reconcile():
     # Calculate correct numbers
     audit_incremental_deals = audit_incremental_only + audit_both
     total_incremental_arr = sum(
-        (d.get("expansion_arr") or 0) + (d.get("new_arr") or 0)
-        for d in audit_incremental_deals
+        incremental_arr(d) for d in audit_incremental_deals
     )
 
     zero_arr_deals = [
         d for d in audit_incremental_deals
-        if ((d.get("expansion_arr") or 0) + (d.get("new_arr") or 0)) == 0
+        if incremental_arr(d) == 0
     ]
 
     print("CORRECT VERIFIED VALUE:")

@@ -9,6 +9,8 @@ from supabase import create_client
 
 load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 
 from api.field_semantics import is_open, is_renewal_base
 
@@ -43,7 +45,7 @@ print()
 
 # Alternative clean: Sum new_arr + expansion_arr (incremental components)
 incremental_total = sum(
-    (d.get("new_arr", 0) or 0) + (d.get("expansion_arr", 0) or 0)
+    incremental_arr(d)
     for d in active
 )
 print(f"Clean pipeline (new_arr + expansion_arr): ${incremental_total:,.2f}")
