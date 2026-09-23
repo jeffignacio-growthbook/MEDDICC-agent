@@ -41,6 +41,13 @@ jobs:
       run: |
         python scripts/check_schema_dictionary_drift.py --verbose
 
+    - name: GATE 2 schema snapshot matches the live schema
+      if: success() || failure()
+      env:
+        SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      run: |
+        python scripts/snapshot_db_schema.py --check
+
     - name: Report failure
       if: failure()
       run: |
