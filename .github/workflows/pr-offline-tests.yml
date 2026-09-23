@@ -38,12 +38,17 @@ jobs:
       - name: "Canary — nothing a handler computes is silently dropped before synthesis"
         run: PYTHONPATH=. python3 tests/test_canary_no_silent_drop.py
 
+      - name: "Incremental ARR single source — no inline new_arr + expansion_arr outside the canonical function"
+        run: PYTHONPATH=. python3 tests/test_incremental_arr_single_source.py
+
       - name: Offline regression tests
         run: |
           failed=0
           for t in \
             tests/test_extract_rows_preserves_computed_fields.py \
             tests/test_snapshot_diff_return_payload.py \
+            tests/test_incremental_arr_null_handling.py \
+            tests/test_attainment_fix.py \
             tests/test_supabase_client_fallback.py \
             tests/test_date_resolution_single_source.py \
             tests/test_time_window_resolution.py \
