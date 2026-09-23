@@ -280,6 +280,36 @@ class HubSpotDealsClient:
                 'properties': ['hs_object_id'], 'limit': 1}
         return int(self._post("/crm/v3/objects/deals/search", body).get('total', 0))
 
+    def list_archived_deals(self) -> List[dict]:
+        """Deals deleted in HubSpot (still in its recycle bin), as
+        [{'id', 'archivedAt'}]. deals/search never returns these, which is
+        why a deleted deal used to stay 'active' in Supabase indefinitely."""
+        out, after = [], None
+        while True:
+            params = {'archived': 'true', 'limit': 100, 'properties': 'hs_object_id'}
+            if after:
+                params['after'] = after
+            response = self._get("/crm/v3/objects/deals", params=params)
+            out.extend({'id': str(r.get('id')), 'archivedAt': r.get('archivedAt')}
+                       for r in response.get('results', []))
+            after = response.get('paging', {}).get('next', {}).get('after')
+            if not after:
+                return out
+
+    def merged_away_deal_ids(self) -> List[tuple]:
+        """[(merged_away_id, survivor_id)] from every deal whose
+        hs_merged_object_ids is set. A merged-away id no longer exists as its
+        own record: HubSpot resolves it to the survivor."""
+        pairs = []
+        for d in self.search_deals_keyset(
+                extra_filters=[{'propertyName': 'hs_merged_object_ids',
+                                'operator': 'HAS_PROPERTY'}],
+                properties=['hs_object_id', 'hs_merged_object_ids']):
+            for mid in str((d.get('properties') or {}).get('hs_merged_object_ids') or '').split(';'):
+                if mid.strip():
+                    pairs.append((mid.strip(), str(d['id'])))
+        return pairs
+
     def search_deals_keyset(self, extra_filters: List[dict] = None,
                             properties: List[str] = None) -> List[dict]:
         """Every deal matching `extra_filters`, paged by hs_object_id.
