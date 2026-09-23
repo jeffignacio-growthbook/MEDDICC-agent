@@ -1,11 +1,43 @@
 # Pending Work
 
-**Last Updated:** 2026-09-23 (HIGH placement-corruption fallback resolved in #33; MEDIUM YAML re-parse latency resolved; LOW test_question.py answered flag still open)
+**Last Updated:** 2026-09-23 (#33 placement fallback, YAML latency, #36 deals-ETL failures resolved; Supabase deals staleness mitigated 24h → ~4h; incremental deal sync and LOW test_question.py flag open)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
 
 ## 🟡 Open Items
+
+### 🟠 MEDIUM: Incremental deal sync to cut Supabase `deals` staleness below ~4h (found 2026-09-23)
+**Status:** OPEN. This is the real fix; the 4-hour cron below is a stopgap.
+Scope it carefully, on its own; don't rush it.
+
+**Why:** only `etl_deals.py --mode analytics` writes Supabase `deals`, so its
+schedule sets the worst-case staleness of every deal field against HubSpot
+(see "Supabase deals up to 24h stale" under Recently Completed).
+
+**Plan:** an hourly (or more frequent) job built on
+`HubSpotDealsClient.get_deals_modified_since()`. That method already exists
+and is unused. It filters `hs_lastmodifieddate` and requests the same
+property list as `get_all_deals_including_closed()`. Upsert only the deals
+that changed.
+
+**⚠️ Boundary safety is the whole risk.** A "since last successful run"
+watermark is exactly the kind of mechanism behind this session's
+transcript-ETL cutoff bug, where a boundary condition silently dropped
+records. A deal whose edit lands late for a window already processed must
+never be silently skipped. Build in, and test with real boundary cases:
+- Only advance the watermark after a fully successful run. Store it
+  durably, not in memory. Any failed or partial run leaves it where it was.
+- Advance to the max `hs_lastmodifieddate` actually received, never to the
+  wall clock. Overlap each window by a safety margin (e.g. re-read the last
+  15-30 min), and rely on idempotent upserts to absorb the duplicates.
+- Test edits exactly at the boundary, edits whose `hs_lastmodifieddate`
+  arrives late, clock skew, and a run that fails halfway. The search cap of
+  10,000 results per query needs a paging strategy for a large backlog
+  (e.g. split by date range).
+- Keep the full every-4h analytics run as a reconciliation backstop, and
+  have the incremental job report how many deals it fetched vs upserted,
+  like the #36 RUN SUMMARY.
 
 ### 🟢 LOW: `scripts/test_question.py` prints "Answered: False" for every direct dynamic_query answer (found 2026-09-23)
 **Status:** OPEN. Cosmetic, but it reads as a failure.
@@ -24,6 +56,50 @@ so the flag reflects the loop's real outcome.
 ---
 
 ## ✅ Recently Completed
+
+### MEDIUM: Supabase `deals` up to 24h stale vs HubSpot (found 2026-09-23; mitigated to ~4h)
+**Status:** ✅ MITIGATED 2026-09-23. `daily-analytics-etl.yml` cron changed
+from `0 4 * * *` to `0 */4 * * *`. The real fix, an incremental sync, is
+open above.
+
+**Finding:** Ryan's "pipeline added in the last two weeks" answer said
+**$2,776,296 / net $1,798,796** at 04:59 UTC. At 16:13 the same question
+said **$2,726,296 / net $1,748,796**. Same 24 added and 10 exited deals,
+exactly $50,000 lower. HubSpot's property history reconciles it to the
+dollar with two edits made the evening before, both by HubSpot user
+84883357:
+- **Twitch** (61032303431): `new_revenue` $150,000 → $250,000 at 2026-09-22 19:19Z.
+- **Engine / Gen™** (64576827032): $200,000 → $50,000 at 20:05Z.
+
+So (150k + 200k) − (250k + 50k) = +$50,000.
+
+HubSpot already held the new values at 04:59: the 24 deals summed to
+$2,726,295.68 then, the same as now. **The 04:59 answer was wrong when it
+was given.** Supabase still had the values from the 2026-09-22 09:05
+analytics run until the 2026-09-23 09:07 run replaced them.
+
+**Cause:** `etl_deals.py --mode analytics` is the only job that writes
+Supabase `deals`. The Daily Deal ETL (active mode) runs without
+`SUPABASE_URL`, and all 57 runs log `⏭️ SUPABASE_URL not set — skipping
+Supabase write`, so it only writes `memory/deals/index.json`. With one
+writer running once a day (cron 04:00, actual starts ~09:05 because of
+GitHub schedule delay), the **whole row** was up to ~24h behind HubSpot.
+
+**Correction of the record:** my first explanation said active mode
+refreshed `arr_usd` at 02:40 but not `new_arr`/`expansion_arr`, leaving
+fields in one row of different ages for ~6.5h a day. That was **wrong**:
+active mode never writes Supabase at all. The ETL does gate those four
+fields to analytics mode, but that doesn't matter while active mode has no
+Supabase access. The planned "make active mode write ARR" fix would
+therefore have changed nothing and was dropped.
+
+**Cost of every 4h:** $0 in Actions minutes, since this is a public repo on
+standard runners (6 × 8-12 min ≈ 48-72 runner-min/day). HubSpot load is
+~60 requests per run, and Supabase load is ~3.9k small requests per run.
+
+**Caveat:** GitHub delays scheduled runs, and the old 04:00 cron actually
+started ~09:05, so "~4h" is nominal. Real gaps can be longer, which is one
+more reason for the incremental sync.
 
 ### HIGH: Deals ETL swallowed HubSpot failures and exited 0 (found and fixed 2026-09-23)
 **Status:** ✅ FIXED 2026-09-23.
