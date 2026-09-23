@@ -65,7 +65,7 @@ KNOWN_DETECTION_FUNCTIONS = {
     # dimension_coverage (dimension_verification.py) — not an
     # independent primitive; covered by that function's own review.
     "check_dimension_filtered",
-    # api/plausibility.py's 5 checks: found by this test's scan, but
+    # api/plausibility.py's checks (5 at first review): found by this test's scan, but
     # pre-existing and NOT wired into dynamic_query_loop — they run
     # inside route_question()'s separate precomputed-handler synthesis
     # path, which query_cost_log's contract doesn't cover (a
@@ -80,6 +80,12 @@ KNOWN_DETECTION_FUNCTIONS = {
     # explicitly instructs the model to include in its answer. Never
     # the "detect, log, ship anyway" anti-pattern this fix retires.
     "check_metric_registry_divergence",
+    # check_benchmark_offsets (2026-09-23): the 6th, same run_all_checks()
+    # mechanism as the five above; its 'error' violations reach the answer
+    # through _plausibility_warnings. Replaces check_negative_counts' false
+    # flag on signed days_past_* offsets with the checks that are real
+    # (missing/invalid benchmark, offset != days_open - benchmark).
+    "check_benchmark_offsets",
     "check_negative_counts",
     "check_rate_bounds",
     "check_subset_relationships",

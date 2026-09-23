@@ -11,6 +11,7 @@ A plausibility violation either:
 
 Never silently passes.
 """
+import re
 import sys
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Any
@@ -201,6 +202,62 @@ def check_sum_consistency(data: Dict) -> List[PlausibilityViolation]:
     return violations
 
 
+_SIGNED_DAY_OFFSET = re.compile(r'(^|_)days_past_')
+
+
+def check_benchmark_offsets(data: Dict) -> List[PlausibilityViolation]:
+    """
+    days_past_benchmark (scripts/deal_risk_assessor.py) is days_open minus the
+    segment's cycle benchmark, so it's negative for every deal still inside
+    its benchmark. What IS implausible, per record that carries it:
+    - no valid benchmark next to it (cycle_benchmark_days missing, None, <= 0);
+    - it isn't days_open - cycle_benchmark_days (e.g. a flipped sign).
+
+    2026-09-23: before this, check_negative_counts() flagged every negative
+    days_past_benchmark, 11 in the first live forecast_trust answer after the
+    deals.amount fix, which put a "worth verifying" banner on a correct answer.
+    """
+    violations = []
+
+    def check_record(rec: Dict, path: str):
+        if rec.get('days_past_benchmark') is None:
+            return
+        offset = rec['days_past_benchmark']
+        bench = rec.get('cycle_benchmark_days')
+        if not isinstance(bench, (int, float)) or bench <= 0:
+            violations.append(PlausibilityViolation(
+                check='benchmark_offset',
+                severity='error',
+                message=(f"{path}days_past_benchmark ({offset}) without a valid "
+                         f"cycle_benchmark_days ({bench!r})"),
+                context={'days_past_benchmark': offset, 'cycle_benchmark_days': bench}
+            ))
+            return
+        days_open = rec.get('days_open')
+        if isinstance(days_open, (int, float)) and days_open - bench != offset:
+            violations.append(PlausibilityViolation(
+                check='benchmark_offset',
+                severity='error',
+                message=(f"{path}days_past_benchmark is {offset}, but days_open - "
+                         f"cycle_benchmark_days = {days_open} - {bench} = {days_open - bench}"),
+                context={'days_past_benchmark': offset, 'days_open': days_open,
+                         'cycle_benchmark_days': bench}
+            ))
+
+    def traverse(obj: Any, path: str = ""):
+        if isinstance(obj, dict):
+            if 'days_past_benchmark' in obj:
+                check_record(obj, path)
+            for key, value in obj.items():
+                traverse(value, f"{path}{key}.")
+        elif isinstance(obj, list):
+            for i, item in enumerate(obj):
+                traverse(item, f"{path}[{i}].")
+
+    traverse(data)
+    return violations
+
+
 def check_negative_counts(data: Dict) -> List[PlausibilityViolation]:
     """
     Check for negative counts or durations.
@@ -228,6 +285,12 @@ def check_negative_counts(data: Dict) -> List[PlausibilityViolation]:
 
         # Skip signed fields (net, delta, change, etc.)
         if any(sf in key_lower for sf in signed_fields):
+            return
+        # Skip signed day offsets: days_past_benchmark, days_past_close, ...
+        # are "days beyond a reference", negative while the reference hasn't
+        # been reached (a deal still inside its cycle benchmark is low_risk,
+        # not implausible). check_benchmark_offsets() checks those for real.
+        if _SIGNED_DAY_OFFSET.search(key_lower):
             return
 
         # Check if field name suggests it's a count
@@ -463,6 +526,7 @@ def run_all_checks(data: Dict, handler_name: str = None) -> Tuple[List[Plausibil
     all_violations.extend(check_subset_relationships(data))
     all_violations.extend(check_sum_consistency(data))
     all_violations.extend(check_negative_counts(data))
+    all_violations.extend(check_benchmark_offsets(data))
     all_violations.extend(check_metric_registry_divergence(data, handler_name))
 
     # Determine if we should block
