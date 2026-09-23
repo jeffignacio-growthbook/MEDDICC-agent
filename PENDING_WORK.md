@@ -15,11 +15,33 @@ Scope it carefully, on its own; don't rush it.
 schedule sets the worst-case staleness of every deal field against HubSpot
 (see "Supabase deals up to 24h stale" under Recently Completed).
 
-**Plan:** an hourly (or more frequent) job built on
-`HubSpotDealsClient.get_deals_modified_since()`. That method already exists
-and is unused. It filters `hs_lastmodifieddate` and requests the same
-property list as `get_all_deals_including_closed()`. Upsert only the deals
-that changed.
+**Plan:** an hourly (or more frequent) job that fetches only the deals
+modified since a stored checkpoint and upserts them. The full design, from
+the 2026-09-23 audit, covers the checkpoint table, a 30-min overlap,
+`hs_object_id` keyset paging, deletion handling and a ~12h full
+reconciliation.
+
+**Correction (2026-09-23 audit):** an earlier version of this entry said
+`HubSpotDealsClient.get_deals_modified_since()` "already exists and is
+unused" and "requests the same property list as
+`get_all_deals_including_closed()`". **Both were wrong:**
+- **It isn't unused, it's dead.** Its one caller, the delta check in
+  `scripts/run_nightly.py` (~line 649), passes `counter.get('last_run_date')`.
+  Since 2026-08-10 (`6cfd6a67`, per-run counter files) the rollup counter
+  has no `last_run_date` key, so the argument is always `''` and the branch
+  never runs. Even when it did run, it only printed a count and never wrote
+  anything.
+- **It requests only 8 properties:** `dealname`, `dealstage`, `pipeline`,
+  `closedate`, `amount`, `incremental_arr`, `hubspot_owner_id`,
+  `hs_lastmodifieddate`. It has no `new_revenue`, `expansion_revenue`,
+  `prior_arr`, `renewal_revenue`, `sao`, forecast category or `bdr_owner`.
+- **It would fail if it ran.** Its documented input format (ISO without a
+  timezone, e.g. `'2026-08-01T02:00:00'`) returns **HTTP 400** from
+  deals/search (probe run 35899912562). The caller catches the error and
+  prints a warning.
+
+**Don't reuse it as-is.** The sync needs a new fetch: the full property
+list, epoch-millisecond filter values, and keyset paging on `hs_object_id`.
 
 **⚠️ Boundary safety is the whole risk.** A "since last successful run"
 watermark is exactly the kind of mechanism behind this session's
