@@ -27,14 +27,18 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import logging
 logging.disable(logging.CRITICAL)
 
+import api.evaluator as evaluator
 import api.router as router
 from canary_harness import CHANNELS, run_canary_case
 from canary_fixtures import CASES, QUERY_REP_PIPELINE
 
+_CASES_BY_LABEL = {c[0]: c for c in CASES}
+
 _RETURNED_PAYLOAD_NARROWING = (
-    "_extract_rows_from_accumulated() rebuilds tool_results as "
-    "{'rows', 'table'} only; save_thread() consumes by_stage (named sets for "
-    "follow-ups) and cache_payload (thread deal cache) from this payload")
+    "_extract_rows_from_accumulated() only considers steps with a non-empty "
+    "'rows' key, so a structured result without one returns {}; save_thread() "
+    "consumes by_stage (named sets for follow-ups) and cache_payload (thread "
+    "deal cache) from this payload")
 _SERIALIZE_3000 = (
     "_serialize_tool_result_for_synthesis() hard-cuts non-STRUCTURED_HANDLERS "
     "results to [:3000] chars of the RAW result — the aggregated view is never "
@@ -45,12 +49,15 @@ _AGGREGATE_REBUILD = (
 
 # (case label, channel) -> narrowing point responsible
 KNOWN_DROPS = {
-    ("query_pipeline_movement", "synthesis_input"): _SERIALIZE_3000 + " (not in STRUCTURED_HANDLERS; 3 of 64 rows and data_gaps reach the model)",
     ("query_pipeline_movement", "stored_step"): _AGGREGATE_REBUILD,
     ("dynamic_query:filter_table(60 rows)", "synthesis_input"): _SERIALIZE_3000 + " (13 of 60 rows reach the model, no aggregates/row_count)",
     ("dynamic_query:filter_table(60 rows)", "stored_step"): _AGGREGATE_REBUILD,
+    # Structured handlers with no top-level "rows" key: f9b2bf6 made
+    # _extract_rows_from_accumulated pass step keys through, but only for
+    # steps that HAVE rows, so these still come back as {}.
     **{(label, "returned_payload"): _RETURNED_PAYLOAD_NARROWING
-       for label, *_ in CASES},
+       for label in ("query_pipeline", "query_stale_deals", "query_waterfall",
+                     "query_rep_pipeline", "query_win_loss", "query_deals_at_risk")},
 }
 
 
@@ -135,8 +142,39 @@ def test_negative_control_harness_detects_a_drop():
     print("✓ negative control: a narrowing serializer is detected as a drop")
 
 
+def _assert_reintroduced_drop_is_caught(label, channel, revert, restore):
+    """Revert one fix in-process and confirm that exact (case, channel)
+    drops again and is NOT in KNOWN_DROPS — i.e. the ratchet would fail
+    as a NEW drop. Proves each fix is guarded, not just currently passing."""
+    assert (label, channel) not in KNOWN_DROPS, (
+        f"{label} / {channel} is listed in KNOWN_DROPS — a reintroduced "
+        f"drop there would be silently accepted")
+    _, question, tool_name, tool_params, fixture = _CASES_BY_LABEL[label]
+    revert()
+    try:
+        r = run_canary_case(question, tool_name, tool_params, fixture)
+    finally:
+        restore()
+    assert r["channels"][channel] is False, (
+        f"reverting the fix for {label} / {channel} did not reintroduce the "
+        f"drop — this guard no longer proves the fix holds")
+
+
+def test_fix_structured_pipeline_movement_is_guarded():
+    """Fix 1: query_pipeline_movement registered in STRUCTURED_HANDLERS."""
+    saved = evaluator.STRUCTURED_HANDLERS["query_pipeline_movement"]
+    _assert_reintroduced_drop_is_caught(
+        "query_pipeline_movement", "synthesis_input",
+        revert=lambda: evaluator.STRUCTURED_HANDLERS.pop("query_pipeline_movement"),
+        restore=lambda: evaluator.STRUCTURED_HANDLERS.__setitem__(
+            "query_pipeline_movement", saved))
+    print("✓ fix 1 guarded: dropping query_pipeline_movement from "
+          "STRUCTURED_HANDLERS is caught as a NEW drop")
+
+
 if __name__ == "__main__":
     test_every_unified_routing_handler_is_covered()
     test_negative_control_harness_detects_a_drop()
+    test_fix_structured_pipeline_movement_is_guarded()
     test_canary_reaches_every_channel_except_known_drops()
     print("\n✅ All tests passed")
