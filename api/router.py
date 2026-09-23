@@ -3498,14 +3498,23 @@ async def _dynamic_query_loop_core(question, history, params,
                 f"Try naming a specific deal or rep, or narrowing the "
                 f"question to a shorter time range.")
 
-    def _give_up(reason_tag, tail):
-        """Return an answered=False result with a plain diagnostic + log."""
+    def _give_up(reason_tag, tail, diff_result=None):
+        """Return an answered=False result with a plain diagnostic + log.
+
+        If diff_result is provided (from a SNAPSHOT_DIFF computation that
+        completed before synthesis failed), include it in tool_results so
+        the computed diff isn't lost even when we can't synthesize an answer.
+        """
         cost_state["reason_tag"] = reason_tag
         _fallback_log(reason_tag)
+        tool_results = _extract_rows_from_accumulated(accumulated_data, sb=sb)
+        if diff_result is not None:
+            tool_results["snapshot_diff"] = diff_result
+            logger.info(f"[SNAPSHOT_DIFF] including computed diff in give-up "
+                       f"return payload (synthesis failed but diff exists)")
         return {
             "answer": _diagnostic_answer(tail, reason_tag=reason_tag),
-            "tool_results": _extract_rows_from_accumulated(
-                accumulated_data, sb=sb),
+            "tool_results": tool_results,
             "answered": False,
         }
 
@@ -4162,11 +4171,23 @@ async def _dynamic_query_loop_core(question, history, params,
 
                 logger.info(f"[LOOP] finalized from gathered data "
                             f"(reason={reason_tag})")
+                # Include computed diff_result in return payload so synthesis
+                # and downstream consumers have access to the structured diff,
+                # not just raw rows. Without this, a successfully-computed diff
+                # would be thrown away and only raw rows would be returned.
+                if diff_result is not None:
+                    tr["snapshot_diff"] = diff_result
+                    logger.info(f"[SNAPSHOT_DIFF] including computed diff in "
+                               f"return payload (not just synthesis prompt)")
                 return {"answer": final_answer_text,
                         "tool_results": tr, "answered": True}
         except Exception:
             pass
-        return _give_up(reason_tag, "could not turn the partial data into an answer")
+        # Pass diff_result to _give_up so it's included in return payload even
+        # when synthesis fails - the diff was computed successfully, just the
+        # prose generation failed.
+        return _give_up(reason_tag, "could not turn the partial data into an answer",
+                       diff_result=diff_result)
 
     EVAL_PROMPT = """Score this answer 0-1:
   1.0 = fully answers with specific data
