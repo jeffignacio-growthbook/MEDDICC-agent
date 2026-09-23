@@ -2698,6 +2698,64 @@ prerequisite.
 
 ---
 
+#### 28. Hardcoded Fireflies API Key in `fireflies_client.py` — Live Secret Exposure
+
+**Issue:** `scripts/fireflies_client.py` line 24 contained a hardcoded Fireflies API key as a fallback default: `"5313ce93-256a-4bd7-840e-864941fa3e81"`. This is a live credential committed to source control.
+
+**Security impact:**
+- Same severity class as the earlier database password exposure (item at top of this file)
+- Anyone with read access to this repo (or its git history) can retrieve and use this API key
+- Fireflies API access includes read/write permissions to all meeting transcripts
+
+**Found during:** Transcript gap investigation (2026-09-22), while verifying terminal empty call classification logic.
+
+**Status:** **FIXED** (2026-09-22) — Hardcoded key removed, replaced with explicit ValueError if environment variables not set. However:
+1. **The API key has NOT been rotated** — it was exposed in git history; treat as compromised
+2. **Still present in git history** — commit history contains the key; anyone can retrieve it
+
+**Work required:**
+1. **Rotate the Fireflies API key immediately** (closes live exposure)
+2. Update `FIREFLIES_API_KEY` / `GROWTHBOOK_FIREFLIES_API_KEY` in all environments (.env, GitHub Secrets, etc.)
+3. Optional: git history scrubbing (BFG Repo-Cleaner) or accept as dead credential after rotation
+
+**Complexity:** Low effort for rotation; history scrubbing is optional if key is rotated.
+
+---
+
+#### 29. Apollo Phone-Dialer Calls Have No `formatted_summary` — Richer Data Exists But Isn't Fetched
+
+**Issue:** Apollo phone-dialer calls (source=`apollo`, identified by short duration and lack of meeting URL) are fetched via the `get_conversation()` endpoint, which returns only transcript fragments. Apollo's dedicated phone-call analytics API provides richer structured data:
+- Call outcome (connected, voicemail, no-answer, busy)
+- Call direction (inbound vs outbound)
+- Call disposition/notes
+- Linked contact/account metadata
+
+The current implementation treats phone calls identically to meeting recordings, resulting in:
+- No `formatted_summary` (stored as None)
+- No outcome/disposition tracking
+- Missed opportunity to distinguish connected calls from voicemails
+
+**Impact:**
+- Rep coaching features (talk time, question rate) still work (transcript fragments sufficient)
+- But higher-level activity metrics (connect rate, call outcomes by rep) are unavailable
+- Current workaround: infer call type from duration (short = likely phone, long = likely meeting), but not definitive
+
+**Found during:** Transcript gap investigation (2026-09-22), while analyzing Apollo call completeness.
+
+**Status:** **NOT BROKEN** — current behavior is working-as-designed for available data. This is a **feature unlock** opportunity, not a bug.
+
+**Work required:**
+1. Identify Apollo phone calls (heuristic: duration < X minutes, no meeting URL, or dedicated API flag)
+2. Route phone calls to Apollo's phone-analytics API instead of `get_conversation()`
+3. Transform phone-call structured data into `formatted_summary` equivalent (e.g., "Outbound call, connected, 3m 24s, disposition: interested")
+4. Optionally: add `call_outcome` / `call_disposition` columns to `calls` table for queryability
+
+**Complexity:** Medium — requires Apollo phone-analytics API integration (not currently wired) + routing logic to distinguish phone from meeting calls.
+
+**Priority:** Low — transcript gap fixed; this is a quality-of-life enhancement for deeper phone-call analysis, not blocking any current feature.
+
+---
+
 ## 📝 Notes
 
 ### Patterns Established

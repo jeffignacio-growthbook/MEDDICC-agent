@@ -199,7 +199,14 @@ def _fetch_apollo(call_id, clients):
         client = clients["apollo"] = ApolloClient()
     convo = client.get_conversation(call_id)
     identities = _extract_apollo_participant_identities(convo)
-    return _apollo_utterances(convo), None, {"participant_identities": identities}
+    return _apollo_utterances(convo), None, {
+        "participant_identities": identities,
+        # confirmed live (2026-09-22 terminal-empty gap investigation) that
+        # Apollo's conversation carries this field, and that every one of
+        # GrowthBook's real empty terminal calls shows a DONE state —
+        # letting _empty_reason() use it instead of guessing from age alone.
+        "source_state": convo.get("conversation", convo).get("state"),
+    }
 
 
 def _fetch_gong(call_id, clients):
@@ -351,9 +358,30 @@ _EMPTY_METRICS = {
 }
 
 
-def _empty_reason(call_date):
-    """Classify an empty result as TERMINAL (old call — no transcript will ever
-    appear) or RETRY (recent call — may still be processing), by call age."""
+# Apollo conversation `state` values confirmed (2026-09-22 terminal-empty gap
+# investigation, apollo_client.py's own search_conversations_by_company
+# precedent) to mean Apollo's own processing has actually finished. A state
+# outside this set (e.g. still transcribing) means Apollo itself says it
+# isn't done yet — that's real, positive evidence, and must never be
+# overridden by an age guess.
+APOLLO_DONE_STATES = {"completed", "insights_generated"}
+
+
+def _empty_reason(call_date, source_state=None):
+    """Classify an empty result as TERMINAL (no transcript will ever appear)
+    or RETRY (may still be processing).
+
+    When the source itself exposes a real completion signal (today, Apollo's
+    conversation `state`), that signal wins outright: a state outside
+    APOLLO_DONE_STATES means Apollo says it hasn't finished processing yet,
+    so this is RETRY regardless of call age — a call must never be declared
+    terminal on a guess while the source itself is still saying "not done".
+
+    Without such a signal (Fireflies exposes none), fall back to the age
+    heuristic: an empty result on an OLD call is TERMINAL, a RECENT one is
+    RETRY (may still be processing)."""
+    if source_state is not None and source_state not in APOLLO_DONE_STATES:
+        return f"{RETRY} no transcript yet (source state={source_state!r}, not finished processing)"
     try:
         age = (date.today() - date.fromisoformat(str(call_date)[:10])).days
     except Exception:
@@ -384,7 +412,9 @@ def build_transcript_row(source, call_id, utterances, error=None, call_date=None
     ever sets extra["participant_identities"]; every other source leaves
     it absent, so participant_identities is always explicitly None on
     the row for non-Apollo sources (migration 065 — Apollo-only by
-    design, never a backfill gap to close for Fireflies/Gong)."""
+    design, never a backfill gap to close for Fireflies/Gong). Apollo also
+    sets extra["source_state"] (its conversation `state`), consulted by
+    _empty_reason() before it falls back to the age heuristic."""
     extra = extra or {}
     text = assemble_text(utterances or [])
     base = {"call_id": str(call_id), "source": source,
@@ -394,7 +424,7 @@ def build_transcript_row(source, call_id, utterances, error=None, call_date=None
                 "unavailable_reason": None, "char_count": len(text),
                 **compute_metrics(utterances)}
     # A transient fetch error is always retryable; a clean-but-empty result is
-    # terminal-or-pending by age.
-    reason = f"{RETRY} {error}" if error else _empty_reason(call_date)
+    # terminal-or-pending by the source's own state if it exposes one, else age.
+    reason = f"{RETRY} {error}" if error else _empty_reason(call_date, extra.get("source_state"))
     return {**base, "transcript": None, "transcript_quality": UNAVAILABLE,
             "unavailable_reason": reason, "char_count": 0, **_EMPTY_METRICS}

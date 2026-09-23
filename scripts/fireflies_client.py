@@ -21,7 +21,9 @@ class FirefliesClient:
 
     def __init__(self, api_key: str = None):
         """Initialize with API key."""
-        self.api_key = api_key or os.getenv("FIREFLIES_API_KEY") or os.getenv("GROWTHBOOK_FIREFLIES_API_KEY", "5313ce93-256a-4bd7-840e-864941fa3e81")
+        self.api_key = api_key or os.getenv("FIREFLIES_API_KEY") or os.getenv("GROWTHBOOK_FIREFLIES_API_KEY")
+        if not self.api_key:
+            raise ValueError("FIREFLIES_API_KEY or GROWTHBOOK_FIREFLIES_API_KEY environment variable must be set")
         self.session = requests.Session()
         self.session.headers.update({
             "Authorization": f"Bearer {self.api_key}",
