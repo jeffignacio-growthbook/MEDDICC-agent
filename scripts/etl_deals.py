@@ -339,8 +339,10 @@ def fetch_owner_emails(hubspot):
         active_count = len(owner_map)
 
     except Exception as e:
-        print(f"⚠️  Could not fetch active owners: {e}")
-        active_count = 0
+        # Fatal: an empty owner map would write owner_email='' over every
+        # deal's stored owner. Retries (hubspot_deals._request) already ran.
+        print(f"❌ Could not fetch active owners: {e}")
+        raise
 
     # Fetch archived owners (for historical SDR attribution)
     try:
@@ -370,8 +372,10 @@ def fetch_owner_emails(hubspot):
         print(f"   Fetched {active_count} active + {archived_count} archived = {len(owner_map)} total owners")
 
     except Exception as e:
-        print(f"⚠️  Could not fetch archived owners: {e}")
-        print(f"   Fetched {active_count} active owners only")
+        # Fatal for the same reason: deals sourced by former team members
+        # would get sdr_owner_email=None written over their attribution.
+        print(f"❌ Could not fetch archived owners: {e}")
+        raise
 
     return owner_map
 
@@ -404,7 +408,7 @@ def main():
     if args.file and args.mode == 'active':
         print("ERROR: --file can only be used with --mode history or --mode analytics")
         print("       Active mode fetches live data from HubSpot API")
-        return
+        return 2
 
     print("=" * 80)
     print(f"HUBSPOT DEALS ETL - MODE: {args.mode.upper()}")
@@ -425,9 +429,9 @@ def main():
             print("\n1b. Fetching owner emails...")
             owner_emails = fetch_owner_emails(hubspot)
         except Exception as e:
-            print(f"❌ Failed to initialize HubSpot client: {e}")
+            print(f"❌ Failed to initialize HubSpot client or fetch owners: {e}")
             print("\nMake sure HUBSPOT_API_KEY environment variable is set.")
-            return
+            return 1
     else:
         print("\n1. CSV Mode - skipping HubSpot API connection")
 
@@ -447,7 +451,7 @@ def main():
             print(f"   Auto-excluded closed stages: {closed_stages}")
         except Exception as e:
             print(f"❌ Failed to fetch deals: {e}")
-            return
+            return 1
     elif args.mode == 'analytics':
         # Analytics mode: fetch ALL deals (no stage exclusions)
         meeting_set_stages = []
@@ -490,7 +494,7 @@ def main():
                 print(f"❌ Failed to load CSV: {e}")
                 import traceback
                 traceback.print_exc()
-                return
+                return 1
 
         else:
             # Fetch from HubSpot API
@@ -500,7 +504,7 @@ def main():
                 print(f"   Fetched {len(all_deals_api)} deals (all stages)")
             except Exception as e:
                 print(f"❌ Failed to fetch deals: {e}")
-                return
+                return 1
     else:  # history mode
         meeting_set_stages = []
         closed_stages = []
@@ -533,7 +537,7 @@ def main():
             except Exception as e:
                 print(f"❌ Failed to load CSV: {e}")
                 print("   Make sure CSV has columns: Record ID, Deal Name, Pipeline, Deal Stage, Close Date, Create Date")
-                return
+                return 1
         else:
             # Fetch ALL deals including closed from API
             print("\n2. Fetching ALL deals (including closed) from HubSpot API...")
@@ -545,7 +549,7 @@ def main():
             except Exception as e:
                 print(f"❌ Failed to fetch deals: {e}")
                 print("   Try exporting from HubSpot and using --file instead")
-                return
+                return 1
 
     # Batch fetch company associations for all modes (except CSV mode which already has it)
     # This runs for both active and analytics API modes
@@ -589,6 +593,7 @@ def main():
         'no_slug': 0
     }
     unmapped_bdr_owners = set()  # Track bdr_owner IDs that fail to map
+    company_unknown = set()  # deal_ids whose company batch read failed (see below)
     bdr_owner_stats = {'total': 0, 'email': 0, 'mapped': 0, 'unmapped': 0}  # Track bdr_owner processing
 
     for i, deal_obj in enumerate(all_deals_api, 1):
@@ -814,6 +819,10 @@ def main():
 
             deal_dict['stage_source'] = 'prospective'
 
+        if hubspot is not None and _company_lookup_failed(hubspot, deal_id, company_id):
+            _drop_unknown_company_fields(deal_dict)
+            company_unknown.add(deal_id)
+
         deals[deal_id] = deal_dict
 
     # In active mode, write memory/deals/index.json. In history/analytics mode, skip (Supabase only).
@@ -831,6 +840,8 @@ def main():
         }
 
         out = DEALS_DIR / 'index.json'
+        if company_unknown:
+            index['deals'] = _with_previous_company_fields(deals, company_unknown, out)
         with open(out, 'w', encoding='utf-8') as f:
             json.dump(index, f, indent=2, ensure_ascii=False)
 
@@ -888,6 +899,9 @@ def main():
         for status, count in sorted(status_counts.items()):
             print(f'    {status}: {count} deals')
 
+    supabase_status = 'not configured (SUPABASE_URL unset) — skipped'
+    upserted = upsert_failed = 0
+    supabase_fatal = False
     # Write to Supabase if configured
     if os.getenv('SUPABASE_URL'):
         print(f'\n6. Writing to Supabase...')
@@ -895,15 +909,16 @@ def main():
             sys.path.insert(0, str(REPO_ROOT / 'scripts'))
             from supabase_client import SupabaseWriter
             sb = SupabaseWriter()
-            count = 0
             for deal_id, deal in deals.items():
                 try:
                     sb.upsert_deal(deal)
-                    count += 1
+                    upserted += 1
                 except Exception as e:
+                    upsert_failed += 1
                     print(f'  ⚠️  Supabase upsert failed for '
                           f'{deal.get("company_name")}: {e}')
-            print(f'  ✓ Supabase: {count} deals upserted')
+            print(f'  ✓ Supabase: {upserted} deals upserted')
+            supabase_status = f'{upserted} upserted, {upsert_failed} failed'
 
             # Report BDR owner attribution stats
             print(f'  ℹ️  SDR attribution stats:')
@@ -921,7 +936,9 @@ def main():
                     print(f'      ... and {len(unmapped_bdr_owners) - 10} more')
 
         except Exception as e:
-            print(f'  ⚠️  Supabase write failed: {e}')
+            print(f'  ❌ Supabase write failed: {e}')
+            supabase_fatal = True
+            supabase_status = f'FAILED before/while writing ({upserted} upserted): {e}'
     else:
         print(f'\n  ⏭️  SUPABASE_URL not set — skipping Supabase write')
 
@@ -938,10 +955,107 @@ def main():
         count = sum(1 for d in deals.values() if d['stage'] == s)
         print(f'  {s}: {count} deals')
 
+    return _print_run_summary(
+        mode=args.mode,
+        fetched=len(all_deals_api),
+        processed=len(deals),
+        hubspot=hubspot,
+        company_unknown=company_unknown,
+        supabase_status=supabase_status,
+        upsert_failed=upsert_failed,
+        supabase_fatal=supabase_fatal,
+    )
+
+
+# ── partial-failure handling + run summary (2026-09-23) ─────────────────────
+#
+# Before this, every failure path printed a message and returned None, so the
+# process exited 0 and every GitHub Actions run showed green whatever
+# happened. A failed company-association batch was worse than silent: its
+# deals were recorded as "no company" and written with company_id=None,
+# segment='Unknown', segment_reason='no_company' over their good values.
+#
+# Policy, explicit:
+#   fatal (exit 1, nothing written): HubSpot client/owner fetch, deal fetch,
+#       CSV load, Supabase writer creation. Usage error: exit 2.
+#   partial (exit 1, good data written): an association/company batch or
+#       individual Supabase upserts still failing after retries. The affected
+#       deals keep their stored company fields (never overwritten with
+#       "unknown"); everything else about them is refreshed.
+
+COMPANY_DERIVED_FIELDS = ('company_id', 'company_domain', 'company_employee_count',
+                          'segment', 'segment_reason')
+
+
+def _company_lookup_failed(hubspot, deal_id, company_id):
+    """True if this deal's company data is unknown because a batch read failed
+    after retries (as opposed to the deal genuinely having no company)."""
+    return (str(deal_id) in hubspot.failed_association_deal_ids
+            or (company_id is not None and str(company_id) in hubspot.failed_company_ids))
+
+
+def _drop_unknown_company_fields(deal_dict):
+    """Leave the stored company fields alone for this deal: company_name /
+    company_slug set to None are preserved by SupabaseWriter.upsert_deal, and
+    the other company-derived keys are omitted so the upsert doesn't send them."""
+    deal_dict['company_name'] = None
+    deal_dict['company_slug'] = None
+    for k in COMPANY_DERIVED_FIELDS:
+        deal_dict.pop(k, None)
+
+
+def _with_previous_company_fields(deals, company_unknown, index_path):
+    """The index is rewritten whole each run, so for deals whose company
+    lookup failed, carry their company fields over from the previous index."""
+    try:
+        with open(index_path, encoding='utf-8') as f:
+            previous = json.load(f).get('deals', {})
+    except (OSError, ValueError):
+        previous = {}
+    merged = {}
+    for did, d in deals.items():
+        if did in company_unknown and did in previous:
+            d = dict(d)
+            for k in ('company_name', 'company_slug') + COMPANY_DERIVED_FIELDS:
+                if k in previous[did]:
+                    d[k] = previous[did][k]
+        merged[did] = d
+    return merged
+
+
+def _print_run_summary(*, mode, fetched, processed, hubspot, company_unknown,
+                       supabase_status, upsert_failed, supabase_fatal):
+    """Counts of what succeeded and failed, then the exit code: 0 only when
+    nothing failed after retries."""
+    assoc_failed = len(hubspot.failed_association_deal_ids) if hubspot else 0
+    company_failed = len(hubspot.failed_company_ids) if hubspot else 0
+    retries = hubspot.retry_count if hubspot else 0
+    problems = []
+    if assoc_failed:
+        problems.append(f'{assoc_failed} deals: company-association batch failed')
+    if company_failed:
+        problems.append(f'{company_failed} companies: company batch read failed')
+    if upsert_failed:
+        problems.append(f'{upsert_failed} Supabase upserts failed')
+    if supabase_fatal:
+        problems.append('Supabase write aborted')
+
     print("\n" + "=" * 80)
-    print("✓ ETL Complete")
+    print(f"RUN SUMMARY ({mode} mode)")
+    print(f"  Deals fetched from HubSpot:        {fetched}")
+    print(f"  Deals processed:                   {processed}")
+    print(f"  Company data unknown (preserved):  {len(company_unknown)}")
+    print(f"  Supabase:                          {supabase_status}")
+    print(f"  HubSpot request retries taken:     {retries}")
+    if problems:
+        print("❌ ETL finished with failures (exit 1):")
+        for p in problems:
+            print(f"   - {p}")
+    else:
+        print("✓ ETL Complete — no failures")
     print("=" * 80)
+    return 1 if problems else 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

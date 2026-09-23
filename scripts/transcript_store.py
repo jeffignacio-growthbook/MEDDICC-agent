@@ -16,6 +16,11 @@ import time
 from collections import defaultdict
 from datetime import date
 
+try:
+    from http_retry import rate_limit_wait, retry_call
+except ImportError:  # imported as scripts.transcript_store
+    from scripts.http_retry import rate_limit_wait, retry_call
+
 FULL = "full"
 PARTIAL = "partial"
 FRAGMENTS_ONLY = "fragments_only"
@@ -245,48 +250,34 @@ def fetch_utterances(source, call_id, clients, retries=6, backoff=2.0, throttle=
     fetcher = _FETCHERS.get((source or "").lower())
     if fetcher is None:
         return [], f"no transcript fetcher for source '{source}'", {}
-    last = None
-    for attempt in range(retries):
+    if retries < 1:
+        return [], None, {}
+
+    def once():
         if throttle:
             time.sleep(throttle)
-        try:
-            return fetcher(call_id, clients)
-        except RateLimited as e:
-            last = f"RateLimited: {str(e)[:140]}"
-            if attempt < retries - 1:
-                time.sleep(min(120.0, 15.0 * (2 ** attempt)))
-        except Exception as e:
-            wait = _http_rate_limit_wait(e, attempt)
-            if wait is not None:
-                # HTTP 429 (Apollo REST, or Fireflies at the HTTP layer):
-                # same LONG backoff as an in-body rate limit — the short
-                # 2s..32s schedule below would just re-hit the window.
-                last = f"RateLimited(HTTP 429): {str(e)[:130]}"
-                if attempt < retries - 1:
-                    time.sleep(wait)
-                continue
-            last = f"{type(e).__name__}: {str(e)[:140]}"
-            if attempt < retries - 1:
-                time.sleep(backoff * (2 ** attempt))
-    return [], last, {}
+        return fetcher(call_id, clients)
 
+    def wait_for(e, attempt):
+        # An in-body rate limit (RateLimited) gets the same LONG schedule as
+        # an HTTP 429; http_retry.rate_limit_wait handles the 429 itself.
+        if isinstance(e, RateLimited):
+            return min(120.0, 15.0 * (2 ** attempt))
+        return None
 
-def _http_rate_limit_wait(exc, attempt):
-    """Seconds to wait if `exc` is an HTTP 429, else None. Honors a numeric
-    Retry-After header (capped at 120s); otherwise 15s, 30s, 60s, 120s."""
-    resp = getattr(exc, "response", None)
-    status = getattr(resp, "status_code", None)
-    if status != 429:
-        # No HTTP status: only explicit phrases count — never a bare "429"
-        # substring, which can appear inside a URL / hex call id.
-        t = str(exc).lower()
-        if status is not None or not ("too many request" in t or "rate limit" in t):
-            return None
     try:
-        ra = float((getattr(resp, "headers", None) or {}).get("Retry-After"))
-        return max(1.0, min(120.0, ra))
-    except (TypeError, ValueError):
-        return min(120.0, 15.0 * (2 ** attempt))
+        return retry_call(once, retries=retries, backoff=backoff, wait_for=wait_for)
+    except RateLimited as e:
+        return [], f"RateLimited: {str(e)[:140]}", {}
+    except Exception as e:
+        if _http_rate_limit_wait(e, 0) is not None:
+            return [], f"RateLimited(HTTP 429): {str(e)[:130]}", {}
+        return [], f"{type(e).__name__}: {str(e)[:140]}", {}
+
+
+# The 429 / Retry-After wait lives in http_retry, shared with the HubSpot
+# deals client; kept under its old name for existing callers and tests.
+_http_rate_limit_wait = rate_limit_wait
 
 
 # ── assembly + metrics ───────────────────────────────────────────────────────

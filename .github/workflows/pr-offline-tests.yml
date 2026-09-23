@@ -68,6 +68,7 @@ jobs:
             tests/test_dimension_resolver.py \
             tests/test_dimension_resolver_config_cache.py \
             tests/test_slack_mrkdwn_conversion.py \
+            tests/test_deal_etl_failure_handling.py \
             tests/test_aggregation_verification.py \
             tests/test_aggregation_retry_hands_correct_value.py \
             tests/test_false_partial_claim_gate.py \

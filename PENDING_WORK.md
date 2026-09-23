@@ -25,6 +25,47 @@ so the flag reflects the loop's real outcome.
 
 ## ✅ Recently Completed
 
+### HIGH: Deals ETL swallowed HubSpot failures and exited 0 (found and fixed 2026-09-23)
+**Status:** ✅ FIXED 2026-09-23.
+
+**What:** `scripts/hubspot_deals.py` made bare `requests` calls, with no
+retry and no 429 handling. Every failure path in `scripts/etl_deals.py`
+printed a message and returned, so the process exited 0 and the Actions run
+showed green, with the "Alert on failure" step skipped.
+
+**It already fired three times.** Daily Deal ETL runs #18 (2026-08-15), #40
+(2026-09-06) and #41 (2026-09-07) each logged `❌ Failed to fetch deals: 429
+Client Error: Too Many Requests for url:
+https://api.hubapi.com/crm/v3/objects/deals/search`. Each fetched 0 deals,
+committed nothing, and left `memory/deals/index.json` a day stale. All 57
+runs were checked; the 3 analytics runs were clean.
+
+**Two latent corruptions in the same code (not seen in logs):**
+- A company-association or company batch that failed wrote
+  `company_id=None`, `segment='Unknown'` and `segment_reason='no_company'`
+  over good values.
+- An owner-fetch failure would have written `owner_email=''` over every deal.
+
+**Fix:**
+- `scripts/http_retry.py` holds the one retry mechanism, extracted from
+  `transcript_store.fetch_utterances` (#28). That function now calls it
+  too, and its behaviour is unchanged: `eval_transcript_store` 48/48 and
+  `eval_etl_supabase_persist` ALL PASS, before and after.
+- `HubSpotDealsClient._request` makes 5 attempts:
+  - 429 honours Retry-After, else waits 15/30/60/120s;
+  - 5xx and network errors wait 2/4/8/16s;
+  - other 4xx responses fail at once.
+- `etl_deals.main()` returns an exit code, and the entry point is
+  `sys.exit(main())`. The policy is explicit in the code:
+  - **fatal, exit 1, nothing written:** client or owner fetch, deal fetch,
+    CSV load, creating the Supabase writer;
+  - **partial, exit 1, good data written:** a batch or upserts still failing
+    after retries. The affected deals keep their stored company fields in
+    Supabase and in the index.
+- A RUN SUMMARY prints fetched, processed, preserved, upserted/failed and
+  retries taken.
+- Test: `tests/test_deal_etl_failure_handling.py`, with planted-bug controls.
+
 ### MEDIUM: Config YAML re-parsed hundreds of times per dynamic question (found and fixed 2026-09-23)
 **Status:** ✅ FIXED 2026-09-23.
 

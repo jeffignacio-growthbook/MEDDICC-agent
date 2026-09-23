@@ -13,6 +13,11 @@ from typing import List, Dict, Optional
 from datetime import datetime
 from pathlib import Path
 
+try:
+    from http_retry import retry_call
+except ImportError:  # imported as scripts.hubspot_deals
+    from scripts.http_retry import retry_call
+
 
 def get_client_timezone() -> str:
     """Get client timezone from config/client.yaml, default to UTC."""
@@ -48,29 +53,63 @@ class HubSpotDealsClient:
         self.api_key = api_key or os.getenv("HUBSPOT_API_KEY")
         if not self.api_key:
             raise ValueError("HUBSPOT_API_KEY environment variable not set")
+        self.retry_count = 0  # retries taken by _request, for run summaries
+        # IDs whose batch read still failed after retries (see the batch_get_*
+        # methods). A caller must treat their company data as unknown.
+        self.failed_association_deal_ids = set()
+        self.failed_company_ids = set()
         self.session = requests.Session()
         self.session.headers.update({
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         })
 
+    # Attempts per request (1 + 4 retries). With the shared schedule
+    # (scripts/http_retry.py) that is at most 2+4+8+16s for a 5xx or network
+    # error, or 15+30+60+120s for a 429 without Retry-After.
+    RETRIES = 5
+
+    @staticmethod
+    def _retryable(exc) -> bool:
+        """429, 5xx, timeouts and dropped connections are transient; any other
+        4xx (bad request, auth, not found, conflict) is a real error that a
+        retry would only delay."""
+        if isinstance(exc, (requests.ConnectionError, requests.Timeout)):
+            return True
+        status = getattr(getattr(exc, "response", None), "status_code", None)
+        return status == 429 or (status is not None and status >= 500)
+
+    def _request(self, method: str, endpoint: str, **kwargs) -> dict:
+        """One HubSpot call, retried per _retryable with the shared backoff
+        (HTTP 429 honours Retry-After). Raises the final error unchanged."""
+        def once():
+            response = self.session.request(
+                method, f"{self.BASE_URL}{endpoint}", timeout=30, **kwargs)
+            response.raise_for_status()
+            return response.json()
+
+        def log_retry(exc, attempt, wait):
+            self.retry_count += 1
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            print(f"   ↻ HubSpot {method} {endpoint}: "
+                  f"{status or type(exc).__name__} — retry {attempt + 1}/"
+                  f"{self.RETRIES - 1} in {wait:.0f}s")
+
+        return retry_call(once, retries=self.RETRIES, retry_if=self._retryable,
+                          on_retry=log_retry)
+
     def _get(self, endpoint: str, params: dict = None) -> dict:
-        """Execute GET request with 30-second timeout."""
-        response = self.session.get(f"{self.BASE_URL}{endpoint}", params=params, timeout=30)
-        response.raise_for_status()
-        return response.json()
+        """GET with 30-second timeout and retry (see _request)."""
+        return self._request("GET", endpoint, params=params)
 
     def _post(self, endpoint: str, data: dict = None) -> dict:
-        """Execute POST request with 30-second timeout."""
-        response = self.session.post(f"{self.BASE_URL}{endpoint}", json=data, timeout=30)
-        response.raise_for_status()
-        return response.json()
+        """POST with 30-second timeout and retry (see _request)."""
+        return self._request("POST", endpoint, json=data)
 
     def _patch(self, endpoint: str, data: dict = None) -> dict:
-        """Execute PATCH request with 30-second timeout."""
-        response = self.session.patch(f"{self.BASE_URL}{endpoint}", json=data, timeout=30)
-        response.raise_for_status()
-        return response.json()
+        """PATCH with 30-second timeout and retry (see _request). PATCH sets
+        properties, so a retried write lands the same values."""
+        return self._request("PATCH", endpoint, json=data)
 
     def _get_closed_stage_ids(self) -> List[str]:
         """
@@ -384,9 +423,12 @@ class HubSpotDealsClient:
                 print(f"  ⚠️  Batch association request failed for {len(batch)} deals: {e}")
                 import traceback
                 print(f"  [DEBUG] Full error: {traceback.format_exc()}")
-                # Add None entries for failed batch
+                # Add None entries for failed batch, and record them: None here
+                # means "unknown", not "no company", and callers must not
+                # write it over a deal's stored company fields.
                 for deal_id in batch:
                     deal_to_company[deal_id] = None
+                self.failed_association_deal_ids.update(str(d) for d in batch)
 
         return deal_to_company
 
@@ -433,6 +475,7 @@ class HubSpotDealsClient:
 
             except Exception as e:
                 print(f"  ⚠️  Batch company request failed for {len(batch)} companies: {e}")
+                self.failed_company_ids.update(str(c) for c in batch)
 
         return company_data
 
