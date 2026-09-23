@@ -1,6 +1,6 @@
 # Pending Work
 
-**Last Updated:** 2026-09-21 (CRITICAL: Database Schema Mismatch Fixed — "pain" vs "identified_pain")
+**Last Updated:** 2026-09-22 (Transcript terminal-empty gap fix + 2 new findings: hardcoded Fireflies key, Apollo phone-dialer content gap)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
@@ -1122,6 +1122,41 @@ Two possible outcomes post-fix:
 **Status:** ANALYSIS COMPLETE, MONITORING RECOMMENDED
 
 **Priority:** Low urgency - current exception-then-fallback pattern is working, no production harm. This is about eliminating the exception pattern, not fixing a broken system.
+
+---
+
+#### 7. URGENT — Live Fireflies API Key Hardcoded as a Fallback Default in Source
+
+**Issue:** `scripts/fireflies_client.py` line 24:
+```python
+self.api_key = api_key or os.getenv("FIREFLIES_API_KEY") or os.getenv("GROWTHBOOK_FIREFLIES_API_KEY", "5313ce93-256a-4bd7-840e-864941fa3e81")
+```
+A real Fireflies API key is committed in plaintext as the literal default
+value of `os.getenv(..., DEFAULT)` — same class of finding as High
+Priority #0 (the database password), just a different credential and a
+different mechanism (a fallback default instead of a doc/troubleshooting
+script).
+
+**Found during:** 2026-09-22 terminal-empty transcript-classification
+investigation, while reading `fireflies_client.py` end to end to confirm
+account identity for an unrelated bug — not something that was being
+searched for.
+
+**Status:** NOT FIXED. Only spotted and logged tonight; do the same
+`grep -r` sweep High Priority #0 recommends (for this exact string, and
+for any other literal-looking API-key-shaped defaults elsewhere in
+`scripts/*_client.py`) before considering this closed.
+
+**Work required:**
+1. Rotate this Fireflies API key immediately — treat it as compromised
+   regardless of whether git history for this file is public or private,
+   same reasoning as #0.
+2. Remove the hardcoded fallback; `FirefliesClient.__init__` should raise
+   (like `ApolloClient.__init__` already does for `APOLLO_API_KEY`) when
+   neither `FIREFLIES_API_KEY` nor `GROWTHBOOK_FIREFLIES_API_KEY` is set,
+   never silently fall back to an embedded credential.
+3. Check git history for how long this has been committed and whether it
+   was ever exposed in a public-ish context.
 
 ---
 
@@ -2695,6 +2730,61 @@ upsert to daily, snapshot stays weekly).
 `snapshot_deals.py` to daily cadence without fixing this first. Logged
 here so nobody makes that change later without reading this
 prerequisite.
+
+---
+
+#### 28. Apollo Phone-Dialer Calls Carry Real Extracted Content That the Transcript Pipeline Never Reads
+
+**Issue:** Investigating the 2026-09-22 terminal-empty gap (90 of 286
+calls marked "no transcript will ever appear"), a full-raw-payload
+spot-check of one of the 3 terminal Apollo calls (`6a9749c4620c05000185cde9`,
+"Call with Mouna Chenfouri", `state: insights_generated`, 161s) showed
+this was a REAL, substantive sales call — not a no-show or recording
+failure:
+- `call_summary.outcome`: a real, specific summary (Christian Liebenow
+  inviting Mouna Chenfouri to a dinner event, her interest and travel
+  concerns)
+- `key_topics.question_insights[].questions[].spoken_sentence`: real
+  verbatim quotes from both participants ("Can you please share more?",
+  "Is that something that you'd be interested in?", etc.)
+- `call_summary.pain_points`, `.objections`, `.next_steps`: real,
+  specific extracted signal
+
+None of this reaches `scripts/transcript_store.py`'s
+`_apollo_utterances()`, which only reads `conversation.get("transcript")`
+— a raw per-fragment array. This specific conversation's raw payload has
+**no `transcript` key at all**; instead `phone_call.transcribed: false`
+and `phone_call.transcription_progress: 0` — confirming Apollo's
+phone-dialer call type (`recording_source: dialer`, as opposed to a
+video-meeting `conversation_type`) routes through a DIFFERENT pipeline
+that produces `call_summary`/`key_topics` insights directly from audio,
+and never populates the raw fragment array at all, regardless of how
+long you wait. So `terminal: no transcript` is still the technically
+correct classification for this call (the code's specific data source
+really will never appear) — but "no transcript" reads as "no content,"
+which is false for this call: there IS real, usable signal, just in a
+different shape than what the pipeline extracts.
+
+**Scope note:** NOT fixed as part of the 2026-09-22 terminal-empty
+classification fix — that fix was specifically about the TERMINAL/RETRY
+decision (age vs. source-state), not about broadening what counts as
+"content." This is a separate, real opportunity: recovering MEDDICC
+signal from phone-dialer calls that currently get zero analysis.
+
+**Work required (not started):**
+1. Confirm how common `recording_source: dialer` + `phone_call.transcribed:
+   false` is among Apollo calls (both the 3 terminal ones and any
+   non-terminal Apollo calls that might quietly hit the same gap).
+2. Design a fallback path in `_fetch_apollo`/`_apollo_utterances`: when
+   the raw `transcript` array is empty AND `call_summary`/`key_topics`
+   are present, assemble a text representation from
+   `call_summary.outcome` + `question_insights[].spoken_sentence` +
+   `pain_points`/`objections`/`next_steps` instead of treating the call
+   as contentless. This changes `transcript_quality` semantics (likely a
+   new tier below FULL, since it's a summary/quotes, not a full
+   transcript) — needs explicit design, not a quick patch.
+3. Re-run MEDDICC scoring for any deal whose only calls are this type,
+   once built.
 
 ---
 
