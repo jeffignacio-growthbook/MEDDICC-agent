@@ -96,21 +96,33 @@ def test_keyset_fetch_returns_every_deal_despite_mid_fetch_edits():
     print("✓ keyset fetch: all 250 deals exactly once while a deal is edited mid-fetch")
 
 
+def _legacy_offset_fetch(post):
+    """The pre-2026-09-23 get_all_deals_including_closed() paging, verbatim
+    in shape: lastmodified DESC + the search cursor (an offset)."""
+    body = {"filterGroups": [], "properties": list(hubspot_deals.HubSpotDealsClient.DEAL_SYNC_PROPERTIES),
+            "sorts": [{"propertyName": "hs_lastmodifieddate", "direction": "DESCENDING"}], "limit": 100}
+    out, after = [], None
+    while True:
+        if after:
+            body["after"] = after
+        r = post("/crm/v3/objects/deals/search", body)
+        out.extend(r.get("results", []))
+        after = r.get("paging", {}).get("next", {}).get("after")
+        if not after:
+            return out
+
+
 def test_offset_lastmodified_fetch_skips_under_the_same_edit():
-    """Planted-bug control: the existing full fetch's paging (lastmodified
-    DESC + offset cursor) under the identical edit."""
-    import time
+    """Planted-bug control: the legacy full-fetch paging under the identical
+    edit skips the deal, and the current full fetch doesn't."""
     fake = FakeSearch(on_page=_edit_old_deal_after_first_page)
-    saved = time.sleep
-    time.sleep = lambda s: None
-    try:
-        got = _client(fake).get_all_deals_including_closed()
-    finally:
-        time.sleep = saved
-    ids = {d["id"] for d in got}
-    assert "1010" not in ids, "expected the offset/lastmodified fetch to skip the edited deal"
-    assert len(ids) == 249
-    print("✓ control: the offset + lastmodified-DESC fetch skips deal 1010 under the same edit (249/250)")
+    ids = {d["id"] for d in _legacy_offset_fetch(fake.post)}
+    assert "1010" not in ids and len(ids) == 249, len(ids)
+    fake2 = FakeSearch(on_page=_edit_old_deal_after_first_page)
+    now = {d["id"] for d in _client(fake2).get_all_deals_including_closed()}
+    assert len(now) == 250 and "1010" in now
+    print("✓ control: legacy offset + lastmodified-DESC paging skips deal 1010 (249/250); "
+          "get_all_deals_including_closed() now returns all 250")
 
 
 def test_keyset_and_full_fetch_share_one_property_list():
@@ -118,12 +130,7 @@ def test_keyset_and_full_fetch_share_one_property_list():
     c = _client(fake)
     c.search_deals_keyset()
     keyset_props = fake.bodies[-1]["properties"]
-    import time
-    saved, time.sleep = time.sleep, (lambda s: None)
-    try:
-        c.get_all_deals_including_closed()
-    finally:
-        time.sleep = saved
+    c.get_all_deals_including_closed()
     full_props = fake.bodies[-1]["properties"]
     assert keyset_props == full_props == list(hubspot_deals.HubSpotDealsClient.DEAL_SYNC_PROPERTIES)
     for p in ("new_revenue", "expansion_revenue", "prior_arr", "renewal_revenue",
