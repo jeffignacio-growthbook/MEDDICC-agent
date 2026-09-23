@@ -167,10 +167,10 @@ def test_mid_quarter_settled_band_with_directional_caveat():
     deals_data = [
         {'deal_id': 'd1', 'company_name': 'Acme', 'stage': 'presentationscheduled',
          'create_date': '2026-06-01', 'close_date': '2026-09-15', 'segment': 'Mid-Market',
-         'forecast_category': 'COMMIT', 'deal_status': 'active', 'amount': 50000},
+         'forecast_category': 'COMMIT', 'deal_status': 'active', 'new_arr': 50000, 'expansion_arr': None},
         {'deal_id': 'd2', 'company_name': 'Beta', 'stage': 'decisionmakerboughtin',
          'create_date': '2026-06-15', 'close_date': '2026-09-20', 'segment': 'SMB',
-         'forecast_category': 'MOST_LIKELY', 'deal_status': 'active', 'amount': 20000},
+         'forecast_category': 'MOST_LIKELY', 'deal_status': 'active', 'new_arr': None, 'expansion_arr': 20000},
     ]
     sb = _mock_deals_sb(deals_data)
     fake_calib = _fake_calibration_table()
@@ -221,8 +221,8 @@ def test_mid_quarter_settled_band_with_directional_caveat():
 
     if result['pipeline']['deal_count'] != 2:
         raise AssertionError(f"Expected 2 deals in pipeline, got {result['pipeline']['deal_count']}")
-    if result['pipeline']['amount'] != 70000:
-        raise AssertionError(f"Expected pipeline amount=70000, got {result['pipeline']['amount']}")
+    if result['pipeline']['incremental_arr'] != 70000:
+        raise AssertionError(f"Expected pipeline incremental_arr=70000, got {result['pipeline']}")
     if result['high_risk_count'] != 1 or result['high_risk_fraction'] != 0.5:
         raise AssertionError(
             f"Expected high_risk_count=1, high_risk_fraction=0.5, got "
@@ -374,7 +374,7 @@ def test_most_likely_only_non_late_stage_deal_appears_in_cohort():
         'segment': 'Mid-Market',
         'forecast_category': 'MOST_LIKELY',
         'deal_status': 'active',
-        'amount': 42000,
+        'new_arr': 42000,
     }
 
     sb, deals_chain, analyses_chain = _mock_multi_table_sb(
@@ -428,6 +428,64 @@ def test_most_likely_only_non_late_stage_deal_appears_in_cohort():
           f"(not COMMIT-only)")
 
 
+def test_dollars_are_incremental_arr_from_real_columns():
+    """
+    2026-09-23: the deals query selected `amount`, a column that has never
+    existed in `deals`, so every production call failed ("column
+    deals.amount does not exist", 7 Postgres log errors 2026-09-21 23:55 -
+    2026-09-23 00:23 UTC). The mocks here returned whatever keys the test
+    wanted, so they passed. Now the dollars are incremental_arr() (new_arr +
+    expansion_arr, the quota basis); count, sum and risk all use the same
+    incremental deals (is_incremental_pipeline, as Gate 3), and deals with
+    no incremental ARR (pure renewals) are reported, not silently counted.
+    """
+    print("\n[TEST] Dollars = incremental_arr() from real columns; same population for count/sum/risk")
+    deals_data = [
+        {'deal_id': 'n1', 'company_name': 'NewCo', 'stage': 's', 'create_date': '2026-06-01',
+         'close_date': '2026-09-15', 'segment': 'SMB', 'forecast_category': 'COMMIT',
+         'deal_status': 'active', 'pipeline_id': 'default', 'new_arr': 30000, 'expansion_arr': None},
+        {'deal_id': 'x1', 'company_name': 'ExpandCo', 'stage': 's', 'create_date': '2026-06-01',
+         'close_date': '2026-09-20', 'segment': 'SMB', 'forecast_category': 'MOST_LIKELY',
+         'deal_status': 'active', 'pipeline_id': '866608541', 'new_arr': None, 'expansion_arr': 12000,
+         'renewal_revenue': 90000},
+        {'deal_id': 'r1', 'company_name': 'RenewCo', 'stage': 's', 'create_date': '2026-06-01',
+         'close_date': '2026-09-25', 'segment': 'SMB', 'forecast_category': 'COMMIT',
+         'deal_status': 'active', 'pipeline_id': '866608541', 'new_arr': None, 'expansion_arr': None,
+         'renewal_revenue': 200000},
+    ]
+    sb = _mock_deals_sb(deals_data)
+    chain = sb.table.return_value
+    risk_inputs = []
+
+    def fake_risk(deals, _sb):
+        risk_inputs.append([d['deal_id'] for d in deals])
+        return {'assessed_deals': [], 'summary': {'total_assessed': len(deals), 'high_risk': 0}}
+
+    with patch('utils.get_fiscal_quarter') as mock_gfq, \
+         patch('snapshot_deals.get_week_of_quarter') as mock_gwoq, \
+         patch('deal_risk_assessor.assess_deal_risk', side_effect=fake_risk), \
+         patch('forecast_analyses.query_commit_ml_calibration_by_week') as mock_calib:
+        mock_gfq.return_value = (date(2026, 8, 1), date(2026, 10, 31), 'FY2027 Q3')
+        mock_gwoq.return_value = 8
+        mock_calib.return_value = _fake_calibration_table()
+        result = assess_forecast_trust(sb, as_of=date(2026, 9, 23))
+
+    selected = [c.strip() for c in chain.select.call_args.args[0].split(',')]
+    if 'amount' in selected:
+        raise AssertionError(f"deals has no `amount` column; the query selects {selected}")
+    if not {'new_arr', 'expansion_arr'} <= set(selected):
+        raise AssertionError(f"incremental_arr() needs new_arr and expansion_arr; selected {selected}")
+    p = result['pipeline']
+    if p.get('incremental_arr') != 42000 or p.get('deal_count') != 2:
+        raise AssertionError(f"Expected 2 incremental deals worth $42,000 (renewal base excluded), got {p}")
+    if p.get('excluded_no_incremental_arr') != 1:
+        raise AssertionError(f"The pure-renewal deal must be reported as excluded, got {p}")
+    if risk_inputs != [['n1', 'x1']]:
+        raise AssertionError(f"Risk must be assessed on the same 2 deals as the count and sum, got {risk_inputs}")
+    print("  ✓ selects new_arr/expansion_arr (no `amount`); $42,000 over 2 deals; "
+          "pure renewal excluded and reported; risk on the same 2 deals")
+
+
 def main():
     tests = [
         test_week_below_gate_returns_insufficient_data,
@@ -435,6 +493,7 @@ def main():
         test_late_quarter_week_12_lost_collapse_caveat,
         test_historical_lookup_genuinely_varies_by_week,
         test_most_likely_only_non_late_stage_deal_appears_in_cohort,
+        test_dollars_are_incremental_arr_from_real_columns,
     ]
 
     failed = []

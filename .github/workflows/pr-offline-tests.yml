@@ -78,6 +78,7 @@ jobs:
             tests/test_deal_sync_lease.py \
             tests/test_column_reference_gate_parser.py \
             tests/test_column_reference_validity.py \
+            scripts/test_forecast_trust.py \
             tests/test_aggregation_verification.py \
             tests/test_aggregation_retry_hands_correct_value.py \
             tests/test_false_partial_claim_gate.py \
