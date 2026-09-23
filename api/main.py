@@ -71,7 +71,18 @@ async def receive_question(request: Request,
 
 async def send_to_zap(channel: str, thread_ts: str,
                       text: str):
-    """POST answer to Zapier catch hook → Slack reply."""
+    """POST answer to Zapier catch hook → Slack reply.
+
+    The one place text leaves for Slack, so the one place it's converted
+    from standard markdown to Slack mrkdwn (see api/slack_format.py). The
+    caller keeps the unconverted text for thread history.
+    """
+    try:
+        from api.slack_format import to_slack_mrkdwn
+        text = to_slack_mrkdwn(text)
+    except Exception as e:
+        # Formatting must never cost the user their answer: send it as-is.
+        logger.warning(f"[SLACK_FORMAT] conversion failed, sending unconverted: {e}")
     if not ZAP_REPLY_URL:
         print(f"⚠️  ZAP_REPLY_URL not set — would reply: {text[:100]}")
         return
