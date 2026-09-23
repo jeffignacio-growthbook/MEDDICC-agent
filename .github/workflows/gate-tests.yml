@@ -1243,7 +1243,7 @@ jobs:
           # routing list gains a handler without a canary case.
           PYTHONPATH=. python3 tests/test_canary_no_silent_drop.py
 
-      - name: "TEST 0q — Offline: Incremental ARR has one definition (no inline new_arr + expansion_arr)"
+      - name: "TEST 0zb — Offline: Incremental ARR has one definition (no inline new_arr + expansion_arr)"
         run: |
           set -e
           # 2026-09-23: ~25 inline copies of new_arr + expansion_arr across
