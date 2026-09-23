@@ -6310,7 +6310,14 @@ def _log_unanswered(sb, question, user_id, reason):
 
 def _log_learning(sb, question, handler, assessment,
                   retries_used):
-    """Log the assessment for the weekly learning report."""
+    """Log the assessment for the weekly learning report.
+
+    NOT evidence that `handler` executed correctly: `handler` is the routed
+    handler, logged even when it returned an error and the answer came from
+    the retry/dynamic fallback; `retry_succeeded` is the evaluator's verdict
+    on the final answer text. 9 entries graded query_forecast_trust
+    "correct" on 2026-09-22 while every call failed on a missing column
+    (PENDING_WORK "Standing caveat: learning_log")."""
     try:
         note = assessment.get("learning_note")
         issue = assessment.get("issue")
