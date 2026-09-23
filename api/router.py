@@ -1844,7 +1844,8 @@ def _build_missing_snapshot_fetch(queries_run: list, missing_date: str):
         return p.get("table"), p.get("columns"), new_filters
     return None
 
-def _serialize_tool_result_for_synthesis(result: dict, tool_name: str) -> tuple:
+def _serialize_tool_result_for_synthesis(result: dict, tool_name: str,
+                                         aggregated: dict = None) -> tuple:
     """Serialize a tool result for the synthesis prompt, deciding once
     whether it's safe to send in full.
 
@@ -1864,9 +1865,22 @@ def _serialize_tool_result_for_synthesis(result: dict, tool_name: str) -> tuple:
     object (an explicit key set, not an arbitrary row dump) — the same
     property evaluate_result() already relies on to know these results
     aren't "rows" to sample. That result is never blindly truncated,
-    regardless of its shape or size. Truncation stays in place only for
-    genuinely unbounded raw data (dynamic_query primitives' row results
-    before _aggregate_and_sample narrows them, e.g. filter_table).
+    regardless of its shape or size.
+
+    2026-09-23: everything else (dynamic_query primitives like
+    filter_table) used to get json.dumps(result)[:3000] of the RAW
+    result — mid-row, mid-object — while the aggregate
+    _aggregate_and_sample() had already computed over EVERY row sat
+    unused in accumulated_data. The canary test (tests/
+    test_canary_no_silent_drop.py) measured it: on a 60-row result the
+    model saw 13 rows and no aggregates or row_count at all. Now the
+    model reads that already-computed aggregated view (`aggregated`,
+    the same dict stored as accumulated_data[step_N]; computed here
+    only when a caller has none stored), with its summary keys first.
+    It is bounded by construction (≤ sample_size rows plus per-column
+    aggregates), and if a wide sample still overruns
+    LOOP_STEP_VIEW_CHARS, whole sample rows are dropped — never
+    characters — so the aggregates always survive.
 
     Returns (result_json, complete_instruction).
     """
@@ -1882,15 +1896,69 @@ def _serialize_tool_result_for_synthesis(result: dict, tool_name: str) -> tuple:
             f"State every count and total in it exactly as given, do not "
             f"assume anything is missing.\n\n"
         )
-    else:
-        result_json = json.dumps(result, default=str)[:3000]
-        complete_instruction = ""
+        return result_json, complete_instruction
 
-    return result_json, complete_instruction
+    view = aggregated if aggregated is not None else _aggregate_and_sample(result)
+    return _serialize_aggregated_view(view), ""
+
+
+# Keys the model must read first on an aggregated result — the totals it
+# should answer from — ahead of the illustrative sample rows.
+# Per-step ceiling for a row-based tool result's aggregated view in the
+# loop's messages. Loop messages accumulate (every iteration resends the
+# history), so this stays near the old 3000-char cut's cost rather than
+# SYNTH_PAYLOAD_CHARS; the difference is that only whole sample rows are
+# trimmed to meet it — aggregates and row_count always survive.
+LOOP_STEP_VIEW_CHARS = 8000
+
+_AGGREGATE_SUMMARY_KEYS = ("_note", "row_count", "aggregates", "sample_basis",
+                           "truncated", "complete", "table")
+
+
+def _serialize_aggregated_view(view: dict, char_limit: int = None) -> str:
+    """JSON for an _aggregate_and_sample() view: summary keys first, every
+    other key passed through, the duplicate "sample" list dropped (it is
+    the same list as "rows"). Over char_limit, halve the sample rows
+    until it fits; only a view with zero rows left is ever cut by
+    characters, and that is logged as a warning."""
+    char_limit = char_limit or LOOP_STEP_VIEW_CHARS
+    ordered = {k: view[k] for k in _AGGREGATE_SUMMARY_KEYS if k in view}
+    ordered.update({k: v for k, v in view.items()
+                    if k not in ordered and k != "sample"})
+
+    result_json = json.dumps(ordered, default=str)
+    rows = ordered.get("rows")
+    if len(result_json) <= char_limit or not isinstance(rows, list):
+        return result_json if len(result_json) <= char_limit else _last_resort_cut(result_json, char_limit)
+
+    total = ordered.get("row_count", len(rows))
+    keep = len(rows)
+    while keep > 0 and len(result_json) > char_limit:
+        keep //= 2
+        ordered["rows"] = rows[:keep]
+        ordered["_rows_trimmed_for_context"] = (
+            f"Showing {keep} of the {len(rows)} sample rows to fit the context "
+            f"limit. aggregates and row_count still cover all {total} rows."
+            if "aggregates" in ordered else
+            f"Showing {keep} of {total} rows to fit the context limit — the "
+            f"rest were fetched but not shown; say so rather than treating "
+            f"these as the full result.")
+        result_json = json.dumps(ordered, default=str)
+    logger.info(f"[SYNTH_SERIALIZE] trimmed sample to {keep} rows "
+                f"({len(result_json)} chars) — aggregates preserved")
+    if len(result_json) > char_limit:
+        return _last_resort_cut(result_json, char_limit)
+    return result_json
+
+
+def _last_resort_cut(result_json: str, char_limit: int) -> str:
+    logger.warning(f"[SYNTH_SERIALIZE] aggregate view alone exceeds "
+                   f"{char_limit} chars ({len(result_json)}) — character cut")
+    return result_json[:char_limit]
 
 
 def _append_tool_result_message(messages: list, raw: str, result: dict,
-                                 tool_name: str = "") -> None:
+                                 tool_name: str = "", aggregated: dict = None) -> None:
     """Append the model's tool-call request and its result to `messages`,
     in place, using the same shape as the normal per-iteration "Tool
     result: ..." message the loop appends when it continues to the next
@@ -1925,7 +1993,8 @@ def _append_tool_result_message(messages: list, raw: str, result: dict,
     fix. Now shares _serialize_tool_result_for_synthesis() with the main
     loop body so both truncation sites use the same rule.
     """
-    result_json, complete_instruction = _serialize_tool_result_for_synthesis(result, tool_name)
+    result_json, complete_instruction = _serialize_tool_result_for_synthesis(
+        result, tool_name, aggregated)
     messages.append({"role": "assistant", "content": raw})
     messages.append({"role": "user", "content": (
         f"{complete_instruction}"
@@ -2091,7 +2160,15 @@ def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = N
 
     sample = rows[:sample_size]
 
+    # Every key this function doesn't itself compute passes through
+    # (2026-09-23, canary test): a row-bearing result's other computed
+    # fields — query_pipeline_movement's by_stage/summary/data_gaps, or
+    # anything a future tool adds — used to be dropped here for any
+    # result over sample_size rows.
+    passthrough = {k: v for k, v in result.items() if k != "rows"}
+
     return {
+        **passthrough,
         "rows": sample,
         "row_count": row_count,
         "aggregates": aggregates,
@@ -3595,7 +3672,7 @@ async def _dynamic_query_loop_core(question, history, params,
                                 f"fetched the missing required "
                                 f"snapshot_date={missing_date!r} before "
                                 f"finalizing. Tool result: "
-                                f"{json.dumps(forced_result, default=str)[:3000]}"
+                                f"{_serialize_aggregated_view(forced_aggregated)}"
                             )})
                             logger.info(
                                 f"[FINALIZE] forced anchor fetch succeeded: "
@@ -3725,7 +3802,7 @@ async def _dynamic_query_loop_core(question, history, params,
                                 f"didn't cover, since the final diff needs "
                                 f"to name every deal it lists. Tool "
                                 f"result: "
-                                f"{json.dumps(name_result, default=str)[:3000]}"
+                                f"{_serialize_aggregated_view(_aggregate_and_sample(name_result))}"
                             )})
                             cost_state["primitives_fired"]["diff_company_name_backfill_fired"] = True
                             logger.info(
@@ -3966,7 +4043,7 @@ async def _dynamic_query_loop_core(question, history, params,
                                 f"even though the question asked about it — "
                                 f"automatically fetched the correctly-filtered "
                                 f"data before finalizing. Tool result: "
-                                f"{json.dumps(forced_result, default=str)[:3000]}"
+                                f"{_serialize_aggregated_view(forced_aggregated)}"
                             )})
                             forced_ok = True
                             cost_state["primitives_fired"]["dimension_verify_forced_fetch_fired"] = True
@@ -4985,7 +5062,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                            f"→ finalizing immediately (fast-path preservation)")
                 # Must append tool result to messages before finalization
                 # (see _append_tool_result_message docstring - 2026-09-11 incident)
-                _append_tool_result_message(messages, raw, result, tool_name)
+                _append_tool_result_message(messages, raw, result, tool_name,
+                                            accumulated_data.get(f"step_{iteration}"))
                 return await _finalize_from_data(f"{tool_name}_fast_path")
 
         # Structured handlers continue to next iteration for normal synthesis
@@ -5152,7 +5230,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                         # it, the finalize synthesis call can't see the
                         # data that just made verification pass. See
                         # _append_tool_result_message() docstring.
-                        _append_tool_result_message(messages, raw, result, tool_name)
+                        _append_tool_result_message(messages, raw, result, tool_name,
+                                            accumulated_data.get(f"step_{iteration}"))
 
                         # Force synthesis by calling _finalize_from_data
                         # This uses the data we just retrieved
@@ -5229,7 +5308,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 # the generic "could not turn the partial data into an
                 # answer" diagnostic despite complete, correct data. See
                 # _append_tool_result_message() docstring.
-                _append_tool_result_message(messages, raw, result, tool_name)
+                _append_tool_result_message(messages, raw, result, tool_name,
+                                            accumulated_data.get(f"step_{iteration}"))
                 return await _finalize_from_data("id_scoped_enrichment_lookup")
 
         # PART 2b: a tool call that returns zero rows is no forward progress.
@@ -5303,12 +5383,17 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 "\nWrong: '$20K won (closed out of $1.12M segment)' ← name the segment!"
             )
 
-        # Structural truncation-safety check (2026-09-19) — see
+        # Structural truncation-safety check (2026-09-19, 2026-09-23) — see
         # _serialize_tool_result_for_synthesis() docstring. Any handler in
         # api.evaluator.STRUCTURED_HANDLERS is a finished, purpose-built
-        # result and is never truncated; everything else keeps the
-        # existing [:3000] cap.
-        result_json, complete_instruction = _serialize_tool_result_for_synthesis(result, tool_name)
+        # result and is never truncated; everything else is sent as its
+        # already-computed aggregated view (summary first, whole sample
+        # rows trimmed only if over LOOP_STEP_VIEW_CHARS).
+        # Reads the stored aggregate, not `result`: after a CODE-ENFORCED
+        # completeness retry, accumulated_data[step_N] holds the complete
+        # re-fetch while `result` is still the incomplete first call.
+        result_json, complete_instruction = _serialize_tool_result_for_synthesis(
+            result, tool_name, accumulated_data.get(f"step_{iteration}"))
 
         messages.append({"role": "user",
             "content": f"{complete_instruction}"

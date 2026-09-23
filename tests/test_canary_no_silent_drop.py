@@ -39,19 +39,9 @@ _RETURNED_PAYLOAD_NARROWING = (
     "'rows' key, so a structured result without one returns {}; save_thread() "
     "consumes by_stage (named sets for follow-ups) and cache_payload (thread "
     "deal cache) from this payload")
-_SERIALIZE_3000 = (
-    "_serialize_tool_result_for_synthesis() hard-cuts non-STRUCTURED_HANDLERS "
-    "results to [:3000] chars of the RAW result — the aggregated view is never "
-    "sent to the model")
-_AGGREGATE_REBUILD = (
-    "_aggregate_and_sample() rebuilds results with >20 rows from a fixed key "
-    "set, dropping every other key")
 
 # (case label, channel) -> narrowing point responsible
 KNOWN_DROPS = {
-    ("query_pipeline_movement", "stored_step"): _AGGREGATE_REBUILD,
-    ("dynamic_query:filter_table(60 rows)", "synthesis_input"): _SERIALIZE_3000 + " (13 of 60 rows reach the model, no aggregates/row_count)",
-    ("dynamic_query:filter_table(60 rows)", "stored_step"): _AGGREGATE_REBUILD,
     # Structured handlers with no top-level "rows" key: f9b2bf6 made
     # _extract_rows_from_accumulated pass step keys through, but only for
     # steps that HAVE rows, so these still come back as {}.
@@ -124,7 +114,7 @@ def test_negative_control_harness_detects_a_drop():
     canary key, and a case that normally passes must report the drop."""
     orig = router._serialize_tool_result_for_synthesis
 
-    def narrowing_serializer(result, tool_name):
+    def narrowing_serializer(result, tool_name, aggregated=None):
         narrowed = {k: v for k, v in result.items() if not k.startswith("__")}
         return orig(narrowed, tool_name)
 
@@ -161,20 +151,147 @@ def _assert_reintroduced_drop_is_caught(label, channel, revert, restore):
 
 
 def test_fix_structured_pipeline_movement_is_guarded():
-    """Fix 1: query_pipeline_movement registered in STRUCTURED_HANDLERS."""
-    saved = evaluator.STRUCTURED_HANDLERS["query_pipeline_movement"]
+    """Fix 1: query_pipeline_movement registered in STRUCTURED_HANDLERS.
+
+    Since fix 2 an unregistered handler no longer loses its extra keys —
+    it's sent as its complete aggregated view — so the canary alone can't
+    tell fix 1 apart. What only fix 1 provides is EVERY deal row: this
+    handler exists to name the deals that moved, and unregistered it is
+    sampled down to 20 of 64. So the guard checks the last deal row."""
+    from canary_harness import _message_text
+    label = "query_pipeline_movement"
+    _, question, tool_name, tool_params, fixture = _CASES_BY_LABEL[label]
+    last_deal = fixture["rows"][-1]["company_name"]
+
+    import canary_harness
+    orig_complete = canary_harness.ScriptedClient.complete
+    seen = []
+
+    def recording_complete(self, messages=None, system=None, max_tokens=None):
+        seen.append(_message_text(messages))
+        return orig_complete(self, messages, system, max_tokens)
+
+    canary_harness.ScriptedClient.complete = recording_complete
+    saved = evaluator.STRUCTURED_HANDLERS[label]
+    try:
+        run_canary_case(question, tool_name, tool_params, fixture)
+        with_fix = f'"company_name": "{last_deal}"' in seen[-1]
+        seen.clear()
+        evaluator.STRUCTURED_HANDLERS.pop(label)
+        try:
+            run_canary_case(question, tool_name, tool_params, fixture)
+        finally:
+            evaluator.STRUCTURED_HANDLERS[label] = saved
+        without_fix = f'"company_name": "{last_deal}"' in seen[-1]
+    finally:
+        canary_harness.ScriptedClient.complete = orig_complete
+
+    assert with_fix, (
+        f"{label}: the last of {len(fixture['rows'])} deal rows ({last_deal}) "
+        f"does not reach synthesis — the handler's full row list is being cut")
+    assert not without_fix, (
+        f"reverting fix 1 still delivers {last_deal} — this guard no longer "
+        f"proves the STRUCTURED_HANDLERS registration matters")
+    print(f"✓ fix 1 guarded: all {len(fixture['rows'])} deal rows reach synthesis; "
+          f"unregistering query_pipeline_movement drops them to a sample")
+
+
+def _pre_fix2_serializer(result, tool_name, aggregated=None):
+    """The serializer as it was before fix 2: raw result, [:3000] cut."""
+    import json
+    from api.evaluator import STRUCTURED_HANDLERS
+    if tool_name in STRUCTURED_HANDLERS and "error" not in result:
+        return json.dumps(result, default=str), ""
+    return json.dumps(result, default=str)[:3000], ""
+
+
+def _pre_fix2_aggregate(orig):
+    """_aggregate_and_sample as it was before fix 2: a >20-row result keeps
+    only the keys the function itself builds."""
+    built = {"rows", "row_count", "aggregates", "sample", "sample_basis",
+             "truncated", "complete", "_note", "table"}
+
+    def narrowed(result, *args, **kwargs):
+        out = orig(result, *args, **kwargs)
+        if out.get("truncated"):
+            out = {k: v for k, v in out.items() if k in built}
+        return out
+    return narrowed
+
+
+def test_fix_aggregate_view_reaches_synthesis_is_guarded():
+    """Fix 2a: a large row result reaches the model as its aggregated view
+    (all-row totals + row_count), not a [:3000] cut of raw rows."""
+    import canary_harness
+    from canary_harness import _message_text
+    label = "dynamic_query:filter_table(60 rows)"
+    _, question, tool_name, tool_params, fixture = _CASES_BY_LABEL[label]
+
+    orig_complete = canary_harness.ScriptedClient.complete
+    seen = []
+
+    def recording_complete(self, messages=None, system=None, max_tokens=None):
+        seen.append(_message_text(messages))
+        return orig_complete(self, messages, system, max_tokens)
+
+    canary_harness.ScriptedClient.complete = recording_complete
+    try:
+        run_canary_case(question, tool_name, tool_params, fixture)
+    finally:
+        canary_harness.ScriptedClient.complete = orig_complete
+    text = seen[-1]
+    assert '"row_count": 60' in text and '"aggregates":' in text, (
+        "the 60-row result's row_count/aggregates (computed over every row) "
+        "did not reach synthesis")
+    assert '"new_arr": {"sum": 1800000' in text, (
+        "the all-row new_arr sum (60 x 30,000) did not reach synthesis")
+
+    orig = router._serialize_tool_result_for_synthesis
     _assert_reintroduced_drop_is_caught(
-        "query_pipeline_movement", "synthesis_input",
-        revert=lambda: evaluator.STRUCTURED_HANDLERS.pop("query_pipeline_movement"),
-        restore=lambda: evaluator.STRUCTURED_HANDLERS.__setitem__(
-            "query_pipeline_movement", saved))
-    print("✓ fix 1 guarded: dropping query_pipeline_movement from "
-          "STRUCTURED_HANDLERS is caught as a NEW drop")
+        label, "synthesis_input",
+        revert=lambda: setattr(router, "_serialize_tool_result_for_synthesis",
+                               _pre_fix2_serializer),
+        restore=lambda: setattr(router, "_serialize_tool_result_for_synthesis", orig))
+    print("✓ fix 2a guarded: the 60-row aggregate (row_count=60, all-row sums) "
+          "reaches synthesis; restoring the raw [:3000] cut is caught as a NEW drop")
+
+
+def test_fix_aggregate_passthrough_is_guarded():
+    """Fix 2b: _aggregate_and_sample passes through keys it doesn't compute."""
+    orig = router._aggregate_and_sample
+    for label in ("query_pipeline_movement", "dynamic_query:filter_table(60 rows)"):
+        _assert_reintroduced_drop_is_caught(
+            label, "stored_step",
+            revert=lambda: setattr(router, "_aggregate_and_sample", _pre_fix2_aggregate(orig)),
+            restore=lambda: setattr(router, "_aggregate_and_sample", orig))
+    print("✓ fix 2b guarded: restoring the fixed-key rebuild in "
+          "_aggregate_and_sample is caught as a NEW stored_step drop")
+
+
+def test_wide_rows_trim_whole_rows_never_characters():
+    """Fix 2 bound: an oversized aggregated view drops whole sample rows,
+    stays valid JSON (no mid-row cut), and keeps row_count + aggregates."""
+    import json
+    wide = {"rows": [{"deal_id": str(i), "new_arr": 1000, "notes": "x" * 2000}
+                     for i in range(60)], "table": "calls"}
+    view = router._aggregate_and_sample(wide)
+    text = router._serialize_aggregated_view(view)
+    parsed = json.loads(text)  # raises if cut mid-JSON
+    assert len(text) <= router.LOOP_STEP_VIEW_CHARS
+    assert parsed["row_count"] == 60
+    assert parsed["aggregates"]["new_arr"]["sum"] == 60000
+    assert 0 < len(parsed["rows"]) < 20 and "_rows_trimmed_for_context" in parsed
+    assert "sample" not in parsed, "duplicate sample list should not be sent"
+    print(f"✓ wide rows: trimmed to {len(parsed['rows'])} whole rows, "
+          f"{len(text)} chars, valid JSON, row_count/aggregates intact")
 
 
 if __name__ == "__main__":
     test_every_unified_routing_handler_is_covered()
     test_negative_control_harness_detects_a_drop()
     test_fix_structured_pipeline_movement_is_guarded()
+    test_fix_aggregate_view_reaches_synthesis_is_guarded()
+    test_fix_aggregate_passthrough_is_guarded()
+    test_wide_rows_trim_whole_rows_never_characters()
     test_canary_reaches_every_channel_except_known_drops()
     print("\n✅ All tests passed")
