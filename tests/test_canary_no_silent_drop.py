@@ -15,8 +15,11 @@ This is a RATCHET, not a snapshot:
   - Any KNOWN_DROPS entry that no longer drops ALSO fails — when one is
     fixed, its entry must be deleted here, so the list can only shrink.
 
-Each KNOWN_DROPS entry names the exact narrowing point; they were found by
-this test's first run (2026-09-23), not by live incidents.
+The first run (2026-09-23) found 3 narrowing points — the [:3000] cut of
+query_pipeline_movement and of raw row results, _aggregate_and_sample's
+fixed-key rebuild, and _extract_rows_from_accumulated's rows-only
+payload. All are fixed; each fix has a test_fix_*_is_guarded test that
+reverts it in-process and requires the drop to come back.
 """
 import sys
 from pathlib import Path
@@ -30,25 +33,16 @@ logging.disable(logging.CRITICAL)
 import api.evaluator as evaluator
 import api.router as router
 from canary_harness import CHANNELS, run_canary_case
-from canary_fixtures import CASES, QUERY_REP_PIPELINE
+from canary_fixtures import (CASES, QUERY_PIPELINE_MOVEMENT, QUERY_REP_PIPELINE,
+                             QUERY_WATERFALL)
 
 _CASES_BY_LABEL = {c[0]: c for c in CASES}
 
-_RETURNED_PAYLOAD_NARROWING = (
-    "_extract_rows_from_accumulated() only considers steps with a non-empty "
-    "'rows' key, so a structured result without one returns {}; save_thread() "
-    "consumes by_stage (named sets for follow-ups) and cache_payload (thread "
-    "deal cache) from this payload")
-
-# (case label, channel) -> narrowing point responsible
-KNOWN_DROPS = {
-    # Structured handlers with no top-level "rows" key: f9b2bf6 made
-    # _extract_rows_from_accumulated pass step keys through, but only for
-    # steps that HAVE rows, so these still come back as {}.
-    **{(label, "returned_payload"): _RETURNED_PAYLOAD_NARROWING
-       for label in ("query_pipeline", "query_stale_deals", "query_waterfall",
-                     "query_rep_pipeline", "query_win_loss", "query_deals_at_risk")},
-}
+# (case label, channel) -> narrowing point responsible.
+# EMPTY as of 2026-09-23: every drop the first run found is fixed and has
+# its own reintroduction guard below. Keep it empty — a new entry needs a
+# fix plan, not just a place to park a failure.
+KNOWN_DROPS = {}
 
 
 def _run_all():
@@ -286,6 +280,113 @@ def test_wide_rows_trim_whole_rows_never_characters():
           f"{len(text)} chars, valid JSON, row_count/aggregates intact")
 
 
+def _pre_fix3_extract(orig):
+    """_extract_rows_from_accumulated as it was before fix 3 (after
+    f9b2bf6): every branch skipped steps without a non-empty "rows" key,
+    so a rows-free structured result came back as {}."""
+    def narrowed(accumulated_data, *args, **kwargs):
+        if not any((v or {}).get("rows") for v in accumulated_data.values()
+                   if isinstance(v, dict)):
+            return {}
+        return orig(accumulated_data, *args, **kwargs)
+    return narrowed
+
+
+def test_fix_extract_passthrough_is_guarded():
+    """Fix 3: the returned payload passes every step key through, including
+    for structured results with no "rows" — and save_thread()'s real
+    consumers get what they need from it."""
+    from api.db import _extract_named_sets
+    orig = router._extract_rows_from_accumulated
+    for label in ("query_pipeline", "query_stale_deals", "query_waterfall",
+                  "query_rep_pipeline", "query_win_loss", "query_deals_at_risk"):
+        _assert_reintroduced_drop_is_caught(
+            label, "returned_payload",
+            revert=lambda: setattr(router, "_extract_rows_from_accumulated",
+                                   _pre_fix3_extract(orig)),
+            restore=lambda: setattr(router, "_extract_rows_from_accumulated", orig))
+
+    r = run_canary_case("show me the pipeline waterfall", "query_waterfall", {},
+                        QUERY_WATERFALL)
+    payload = r["result"]["tool_results"]
+    assert len(payload.get("cache_payload", {}).get("deals", [])) == 64, (
+        "query_waterfall's cache_payload (the thread deal cache save_thread "
+        "pops) must reach the returned payload")
+
+    r = run_canary_case("how has pipeline moved between stages since the start of the quarter?",
+                        "query_pipeline_movement", {"view": "movement"},
+                        QUERY_PIPELINE_MOVEMENT)
+    expected = len(_extract_named_sets(QUERY_PIPELINE_MOVEMENT))
+    got = len(_extract_named_sets(r["result"]["tool_results"]))
+    assert got == expected > 0, (
+        f"named sets for follow-ups: handler produced {expected}, returned "
+        f"payload yields {got}")
+    print(f"✓ fix 3 guarded: 6 rows-free handlers' payloads survive (reverting "
+          f"is caught as NEW drops); waterfall cache_payload has 64 deals; "
+          f"pipeline-movement named sets {got}/{expected}")
+
+
+def test_extract_orders_steps_chronologically():
+    """Fix 3: "most recent step" is by iteration number, not string order
+    ("step_10" used to sort before "step_2")."""
+    acc = {"step_2_raw": {"rows": [], "marker": "old"},
+           "step_10_raw": {"marker": "new", "summary": {"n": 1}}}
+    out = router._extract_rows_from_accumulated(acc)
+    assert out.get("marker") == "new", (
+        f"expected step_10 (latest) to win, got {out.get('marker')!r}")
+    print("✓ step_10 is treated as newer than step_2")
+
+
+def test_structured_result_reaching_finalize_is_answered():
+    """Fix 3: _finalize_from_data treated a result with no "rows" as "no
+    data at all" and gave up. A structured handler followed by two
+    unparseable responses (the no_progress finalize path) must now be
+    synthesized, not answered with 'could not find anything'."""
+    import json, copy, asyncio
+    import canary_harness as H
+
+    def run(extract):
+        orig_extract = router._extract_rows_from_accumulated
+        orig_handler = H.handlers_module.query_waterfall
+        orig_classify = H.table_classifier_module.classify_relevant_tables
+        orig_schema = H.schema_context_module.get_schema_context
+        orig_anchors = router.resolve_snapshot_anchor_dates
+
+        async def fake(params, sb):
+            return copy.deepcopy(QUERY_WATERFALL)
+        H.handlers_module.query_waterfall = fake
+        router._extract_rows_from_accumulated = extract
+        H.table_classifier_module.classify_relevant_tables = lambda q, c: ["deals"]
+        H.schema_context_module.get_schema_context = (
+            lambda sb, tables_with_descriptions=None, lightweight=False: "TABLE: deals\n  deal_id\n")
+        router.resolve_snapshot_anchor_dates = lambda sb, tw: (None, None)
+        client = H.ScriptedClient([json.dumps({"tool": "query_waterfall", "params": {}}),
+                                   "not json", "still not json",
+                                   json.dumps({"answer": "Waterfall answer."})])
+        try:
+            return asyncio.run(router.dynamic_query_loop(
+                question="show me the pipeline waterfall", history=[],
+                params={"time_window": H.DEFAULT_TIME_WINDOW},
+                sb=H._FakeSupabase(), client=client))
+        finally:
+            router._extract_rows_from_accumulated = orig_extract
+            H.handlers_module.query_waterfall = orig_handler
+            H.table_classifier_module.classify_relevant_tables = orig_classify
+            H.schema_context_module.get_schema_context = orig_schema
+            router.resolve_snapshot_anchor_dates = orig_anchors
+
+    orig = router._extract_rows_from_accumulated
+    fixed = run(orig)
+    assert fixed["answered"] is True and fixed["answer"] == "Waterfall answer.", (
+        f"structured result at finalize was not synthesized: {fixed['answer']!r}")
+    reverted = run(_pre_fix3_extract(orig))
+    assert reverted["answered"] is False, (
+        "reverting fix 3 should reproduce the give-up — this guard no longer "
+        "proves anything")
+    print("✓ structured result reaching finalize is synthesized; reverting fix 3 "
+          "reproduces the 'could not find anything' give-up")
+
+
 if __name__ == "__main__":
     test_every_unified_routing_handler_is_covered()
     test_negative_control_harness_detects_a_drop()
@@ -293,5 +394,8 @@ if __name__ == "__main__":
     test_fix_aggregate_view_reaches_synthesis_is_guarded()
     test_fix_aggregate_passthrough_is_guarded()
     test_wide_rows_trim_whole_rows_never_characters()
+    test_fix_extract_passthrough_is_guarded()
+    test_extract_orders_steps_chronologically()
+    test_structured_result_reaching_finalize_is_answered()
     test_canary_reaches_every_channel_except_known_drops()
     print("\n✅ All tests passed")

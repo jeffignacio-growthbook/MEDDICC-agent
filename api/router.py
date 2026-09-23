@@ -2186,19 +2186,39 @@ def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = N
 
 def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_extraction", sb=None) -> dict:
     """
-    Extract rows from accumulated_data for entity context or synthesis.
+    Build the tool_results payload returned from the loop (entity
+    extraction, thread context, follow-ups) out of accumulated_data.
 
     Args:
-        accumulated_data: {"step_0": {...}, "step_1": {...}}
+        accumulated_data: {"step_0": {...}, "step_0_raw": {...}, ...}
         mode: "entity_extraction" or "synthesis"
         sb: Supabase client (required for entity_extraction mode)
 
-    Returns dict with "rows" key for extract_entity_context().
+    2026-09-23: passes through EVERY key of the chosen step instead of
+    naming fields. f9b2bf6 already stopped the rows-bearing paths from
+    rebuilding the payload as {"rows", "table"}, but every branch still
+    skipped steps without a non-empty "rows" key, so a structured
+    handler's result (query_waterfall, query_pipeline, query_rep_pipeline,
+    ... — 6 of the 7 unified-routing handlers have no top-level "rows")
+    came back as {}: save_thread() lost query_waterfall's cache_payload,
+    and every by_stage/summary with it (tests/test_canary_no_silent_drop.py).
 
     Modes:
-    - "entity_extraction": Prefer steps with entity ID columns (from entity_registry)
-    - "synthesis": Return last step with data (for aggregates/rollups)
+    - "entity_extraction": the most recent step's FULL raw result (every
+      key), with "rows" replaced by the merged, deduplicated rows of all
+      entity-bearing raw steps when there are any.
+    - "synthesis": the most recent aggregated step with any data, whole.
     """
+    import re
+
+    def _step_order_key(step_key: str) -> tuple:
+        # Chronological, not lexicographic: plain string sorting put
+        # "step_10" before "step_2", so from iteration 10 on "most recent
+        # step" silently meant the wrong step. (Nested so the function
+        # stays self-contained for tests that compile it in isolation.)
+        m = re.match(r"step_(\d+)(.*)$", step_key)
+        return (int(m.group(1)), m.group(2)) if m else (-1, step_key)
+
     logger.info(f"[EXTRACT] mode={mode}, accumulated_data keys={list(accumulated_data.keys())}")
 
     if not accumulated_data:
@@ -2206,26 +2226,20 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
         return {}
 
     if mode == "synthesis":
-        # Synthesis mode: return last step with data (aggregated results only)
-        # Filter out _raw keys — synthesis reads aggregates, not full populations
-        step_keys = sorted([k for k in accumulated_data.keys() if not k.endswith("_raw")], reverse=True)
+        # Aggregated views only — synthesis reads aggregates, not full populations
+        step_keys = sorted((k for k in accumulated_data if not k.endswith("_raw")),
+                           key=_step_order_key, reverse=True)
         for step_key in step_keys:
-            step_data = accumulated_data.get(step_key, {})
-            rows = step_data.get("rows", [])
-            if rows:
-                logger.info(f"[EXTRACT] synthesis mode: returning {len(rows)} rows from {step_key} (aggregate)")
-                # Preserve ALL fields from step_data, not just rows/table
-                # This ensures computed fields (summary, totals, snapshot_dates, ARR, etc.)
-                # survive extraction. Default to keep everything - only explicitly handle rows.
-                result = {k: v for k, v in step_data.items() if k != "rows"}
-                result["rows"] = rows  # Rows already extracted above (may be capped/sampled)
-                if "table" not in result:
-                    result["table"] = "unknown"
+            step_data = accumulated_data.get(step_key) or {}
+            if any(v for key, v in step_data.items() if key != "table"):
+                logger.info(f"[EXTRACT] synthesis mode: returning {step_key} whole "
+                            f"(keys={list(step_data.keys())})")
+                result = dict(step_data)
+                result.setdefault("table", "unknown")
                 return result
         return {}
 
-    # Entity extraction mode: merge all entity-bearing steps from RAW results
-    # Use _raw keys to get full populations, not aggregated samples
+    # Entity extraction: RAW results, so full populations rather than samples.
     # Load entity registry to know which columns are entity IDs
     entity_id_columns = set()
     if sb:
@@ -2236,33 +2250,39 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
         except Exception as e:
             logger.warning(f"[EXTRACT] failed to load entity_registry: {e}")
 
-    # Scan _raw steps in reverse order, looking for entity-bearing rows
-    raw_step_keys = sorted([k for k in accumulated_data.keys() if k.endswith("_raw")], reverse=True)
+    # Prefer raw steps (full results); a step stored without a _raw twin
+    # (none today, but nothing guarantees it) still counts.
+    raw_keys = [k for k in accumulated_data if k.endswith("_raw")]
+    candidate_keys = raw_keys or list(accumulated_data)
+    candidate_keys = sorted(candidate_keys, key=_step_order_key, reverse=True)
+    # "Has data" = any non-empty value besides the table name, so an empty
+    # filter_table result ({"rows": [], "table": ...}) never shadows an
+    # earlier step that has data.
+    steps_with_data = [(k, accumulated_data[k]) for k in candidate_keys
+                       if isinstance(accumulated_data.get(k), dict)
+                       and any(v for key, v in accumulated_data[k].items() if key != "table")]
+    if not steps_with_data:
+        logger.info(f"[EXTRACT] no data in any step, returning empty dict")
+        return {}
+
+    # Scan steps newest-first for entity-bearing rows
     entity_bearing_steps = []
+    for step_key, step_data in steps_with_data:
+        rows = step_data.get("rows") or []
+        if rows and isinstance(rows, list) and isinstance(rows[0], dict):
+            matching_entities = set(rows[0].keys()) & entity_id_columns
+            if matching_entities:
+                entity_bearing_steps.append((step_key, step_data, matching_entities))
+                logger.info(f"[EXTRACT] {step_key}: {len(rows)} rows with entities {matching_entities}")
+            else:
+                logger.info(f"[EXTRACT] {step_key}: {len(rows)} rows, no entity columns")
 
-    for step_key in raw_step_keys:
-        step_data = accumulated_data.get(step_key, {})
-        rows = step_data.get("rows", [])
+    # Start from the most recent step's full result — every key it has.
+    latest_key, latest_data = steps_with_data[0]
+    result = dict(latest_data)
 
-        if not rows:
-            continue
-
-        # Check if rows contain any registered entity ID columns
-        if rows and isinstance(rows, list) and len(rows) > 0:
-            first_row = rows[0]
-            if isinstance(first_row, dict):
-                row_columns = set(first_row.keys())
-                matching_entities = row_columns & entity_id_columns
-
-                if matching_entities:
-                    entity_bearing_steps.append((step_key, step_data, matching_entities))
-                    logger.info(f"[EXTRACT] {step_key}: {len(rows)} rows with entities {matching_entities}")
-                else:
-                    logger.info(f"[EXTRACT] {step_key}: {len(rows)} rows, no entity columns")
-
-    # Merge all entity-bearing steps, deduplicating on entity ID
     if entity_bearing_steps:
-        # Determine which entity ID column to use for deduplication
+        # Merge all entity-bearing steps, deduplicating on entity ID.
         # Prefer deal_id, then company_id, then first available
         all_entities = set()
         for _, _, entities in entity_bearing_steps:
@@ -2273,16 +2293,13 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
             if preferred in all_entities:
                 dedup_key = preferred
                 break
-
         if not dedup_key:
-            dedup_key = list(all_entities)[0] if all_entities else None
+            dedup_key = sorted(all_entities)[0] if all_entities else None
 
         merged_rows = []
         seen_ids = set()
-
         for step_key, step_data, entities in entity_bearing_steps:
-            rows = step_data.get("rows", [])
-            for row in rows:
+            for row in step_data.get("rows", []):
                 if dedup_key and dedup_key in row:
                     row_id = row[dedup_key]
                     if row_id not in seen_ids:
@@ -2293,33 +2310,16 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
                     merged_rows.append(row)
 
         step_sources = ", ".join([sk for sk, _, _ in entity_bearing_steps])
-        logger.info(f"[EXTRACT] merged {len(merged_rows)} unique rows (deduplicated on {dedup_key}) from {len(entity_bearing_steps)} steps: {step_sources}")
+        logger.info(f"[EXTRACT] merged {len(merged_rows)} unique rows (deduplicated on {dedup_key}) "
+                    f"from {len(entity_bearing_steps)} steps: {step_sources}; "
+                    f"other keys from {latest_key}")
+        result["rows"] = merged_rows
+    else:
+        logger.info(f"[EXTRACT] no entity-bearing rows; returning {latest_key} whole "
+                    f"(keys={list(latest_data.keys())})")
 
-        # Preserve ALL fields from most recent step, not just rows/table
-        # Start with all fields from most recent step's data
-        most_recent_step_data = entity_bearing_steps[0][1]
-        result = {k: v for k, v in most_recent_step_data.items() if k != "rows"}
-        result["rows"] = merged_rows  # Use merged/deduplicated rows
-        if "table" not in result:
-            result["table"] = "unknown"
-        return result
-
-    # Fallback: no entity-bearing steps found, return last step with data
-    all_step_keys = sorted(accumulated_data.keys(), reverse=True)
-    for step_key in all_step_keys:
-        step_data = accumulated_data.get(step_key, {})
-        rows = step_data.get("rows", [])
-        if rows:
-            logger.info(f"[EXTRACT] fallback: returning {len(rows)} rows from {step_key} (no entities found)")
-            # Preserve ALL fields from step_data, not just rows/table
-            result = {k: v for k, v in step_data.items() if k != "rows"}
-            result["rows"] = rows
-            if "table" not in result:
-                result["table"] = "unknown"
-            return result
-
-    logger.info(f"[EXTRACT] no rows found in any step, returning empty dict")
-    return {}
+    result.setdefault("table", "unknown")
+    return result
 
 def _extract_dated_claims(answer_text: str) -> list:
     """Dates the answer explicitly claims as 'as of' a point in time —
@@ -3698,7 +3698,10 @@ async def _dynamic_query_loop_core(question, history, params,
                     )
 
         tr = _extract_rows_from_accumulated(accumulated_data, sb=sb)
-        has_rows = bool(tr.get("rows"))
+        # Any data at all, not just rows: a structured handler's result
+        # (query_waterfall, query_pipeline, ...) has no top-level "rows"
+        # and used to be treated as "nothing found" here (2026-09-23).
+        has_rows = any(v for k, v in tr.items() if k not in ("table", "error"))
         # No data at all → nothing to synthesise from.
         if not has_rows:
             return _give_up(reason_tag, "could not find anything that answers it")
