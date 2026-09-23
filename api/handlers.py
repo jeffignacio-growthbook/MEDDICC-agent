@@ -5095,7 +5095,11 @@ def _pm_view_curve(by_date, all_dates, stage_cfg):
 async def query_pipeline_movement(params: dict, sb) -> dict:
     """
     Pipeline movement / composition / deal-level changes / coverage curve,
-    read from deals_snapshot. COUNTS ONLY — never dollars (see module header).
+    read from deals_snapshot.
+
+    Movement view now includes dollar fields (added_arr_total, exited_arr_total,
+    net_arr_change) computed from deals table using canonical incremental_arr().
+    This provides defense in depth with the general semantic gap detector.
 
     params:
       view          : 'movement' | 'composition' | 'deal_changes' | 'curve' |
@@ -5454,6 +5458,49 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     if view == "movement":
         result = _pm_view_movement(
             by_date, all_dates, stage_cfg, data_gaps, requested_days, base)
+
+        # Add dollar fields (defense in depth with semantic gap detector)
+        # Query deals table for incremental ARR of added/exited deals
+        if result.get("snapshot_dates"):
+            from incremental_arr import incremental_arr
+            try:
+                prior_date, current_date = result["snapshot_dates"]
+                prior_rows = list(_pm_latest_row_per_deal(by_date[prior_date]).values())
+                current_rows = list(_pm_latest_row_per_deal(by_date[current_date]).values())
+
+                prior_ids = {r["deal_id"] for r in prior_rows}
+                current_ids = {r["deal_id"] for r in current_rows}
+                new_ids = list(current_ids - prior_ids)
+                left_ids = list(prior_ids - current_ids)
+
+                # Query for dollar data (new_arr, expansion_arr)
+                added_arr_total = 0
+                if new_ids:
+                    added_deals = sb.table("deals").select(
+                        "deal_id", "new_arr", "expansion_arr"
+                    ).in_("deal_id", new_ids).execute().data
+                    added_arr_total = sum(incremental_arr(d) for d in added_deals)
+
+                exited_arr_total = 0
+                if left_ids:
+                    exited_deals = sb.table("deals").select(
+                        "deal_id", "new_arr", "expansion_arr"
+                    ).in_("deal_id", left_ids).execute().data
+                    exited_arr_total = sum(incremental_arr(d) for d in exited_deals)
+
+                # Add to summary
+                if "summary" not in result:
+                    result["summary"] = {}
+                result["summary"]["added_arr_total"] = added_arr_total
+                result["summary"]["exited_arr_total"] = exited_arr_total
+                result["summary"]["net_arr_change"] = added_arr_total - exited_arr_total
+
+                logger.info(f"[PM_MOVEMENT_ARR] added={len(new_ids)} deals ${added_arr_total:,.0f}, "
+                           f"exited={len(left_ids)} deals ${exited_arr_total:,.0f}, "
+                           f"net=${added_arr_total - exited_arr_total:,.0f}")
+            except Exception as e:
+                logger.warning(f"[PM_MOVEMENT_ARR] Could not compute dollar fields: {e}")
+                # Don't fail the whole request - counts still work
 
         # Phase 1b: Structured aggregation verification (movement view)
         # Verify H2 convergence outputs (stage movement counts) against underlying
