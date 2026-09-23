@@ -50,6 +50,8 @@ jobs:
             tests/test_incremental_arr_null_handling.py \
             tests/test_attainment_fix.py \
             tests/test_aggregation_value_column_inference.py \
+            tests/test_finalize_placement_corruption_fallback.py \
+            tests/test_aggregation_placement_corruption.py \
             tests/test_supabase_client_fallback.py \
             tests/test_date_resolution_single_source.py \
             tests/test_time_window_resolution.py \

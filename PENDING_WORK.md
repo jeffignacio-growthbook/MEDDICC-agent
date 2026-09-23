@@ -1,46 +1,11 @@
 # Pending Work
 
-**Last Updated:** 2026-09-23 (3 open items logged: placement-corruption fallback HIGH, YAML re-parse latency MEDIUM, test_question.py answered flag LOW)
+**Last Updated:** 2026-09-23 (HIGH placement-corruption fallback resolved in #33; MEDIUM YAML re-parse latency and LOW test_question.py answered flag still open)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
 
 ## 🟡 Open Items
-
-### 🔴 HIGH: Aggregation placement-corruption fallback has never worked (found 2026-09-23)
-**Status:** OPEN. Needs investigation and a fix soon; don't let this sit.
-
-**What:** in `_finalize_from_data`'s aggregation retry (`api/router.py`,
-~line 4211 at 5f58fcf), when `verify_total_placement()` detects
-placement corruption in the resynthesized answer, the code is meant to
-"force honest fallback instead of shipping corrupted data":
-```python
-return _diagnostic_answer(
-    tail, "aggregation_placement_corruption"
-)
-```
-`tail` is not defined in that scope. `_diagnostic_answer(tail, reason_tag)`
-(~line 3556) takes it as a parameter, but this call site never binds it
-(pyflakes: `undefined name 'tail'`). The `NameError` is raised inside a
-`try:` whose `except Exception` only logs `[AGGREGATION_VERIFY]
-resynthesis retry raised: ...`, and then execution falls through to ship
-the retry's answer anyway.
-
-**Impact:** this safety net has provided zero protection since it was
-written. Every detected placement corruption on the finalize path ships
-the corrupted answer, and it looks like a caught exception rather than
-the detection it actually was. There's a second defect on the same line:
-even with `tail` bound, `_diagnostic_answer()` returns a string, but the
-caller must return `{"answer", "tool_results", "answered"}`. So the fix
-should route through `_give_up(...)` (or build the dict) and not just
-define `tail`.
-
-**Fix plan:** replace the call with `return _give_up("aggregation_placement_corruption",
-"<business-language tail>")`. Then add a test that drives a
-placement-corrupted resynthesis through `_finalize_from_data` and asserts
-the diagnostic ships with `answered=False`, not the corrupted text.
-Negative control: re-introduce the undefined name and require the test
-to fail.
 
 ### 🟠 MEDIUM: ~11s avoidable latency per dynamic question: config YAML re-parsed 162× per call (found 2026-09-23)
 **Status:** OPEN.
@@ -77,6 +42,93 @@ so the flag reflects the loop's real outcome.
 ---
 
 ## ✅ Recently Completed
+
+### HIGH: Aggregation placement-corruption fallback had never worked (found and fixed 2026-09-23)
+**Status:** ✅ FIXED 2026-09-23 (PR #33). Broken from the moment it was introduced (2026-09-15, 8bae539)
+until this fix; it never once blocked a corrupted answer.
+
+**What:** in `_finalize_from_data`'s aggregation retry (`api/router.py`,
+~line 4211 at 5f58fcf), when `verify_total_placement()` detects
+placement corruption in the resynthesized answer, the code is meant to
+"force honest fallback instead of shipping corrupted data":
+```python
+return _diagnostic_answer(
+    tail, "aggregation_placement_corruption"
+)
+```
+`tail` is not defined in that scope. `_diagnostic_answer(tail, reason_tag)`
+(~line 3556) takes it as a parameter, but this call site never binds it
+(pyflakes: `undefined name 'tail'`). The `NameError` is raised inside a
+`try:` whose `except Exception` only logs `[AGGREGATION_VERIFY]
+resynthesis retry raised: ...`, and then execution falls through to ship
+the retry's answer anyway.
+
+**Impact:** this safety net has provided zero protection since it was
+written. Every detected placement corruption on the finalize path ships
+the corrupted answer, and it looks like a caught exception rather than
+the detection it actually was. There's a second defect on the same line:
+even with `tail` bound, `_diagnostic_answer()` returns a string, but the
+caller must return `{"answer", "tool_results", "answered"}`. So the fix
+should route through `_give_up(...)` (or build the dict) and not just
+define `tail`.
+
+**Fix plan:** replace the call with `return _give_up("aggregation_placement_corruption",
+"<business-language tail>")`. Then add a test that drives a
+placement-corrupted resynthesis through `_finalize_from_data` and asserts
+the diagnostic ships with `answered=False`, not the corrupted text.
+Negative control: re-introduce the undefined name and require the test
+to fail.
+
+**Resolution (2026-09-23):**
+- **Confirmed live:** the detector fired correctly ("finalize retry placement
+  corruption: Corrected value … appears 2 times"). Then `NameError: name 'tail'
+  is not defined` was raised in `_finalize_from_data`, logged only as
+  "[AGGREGATION_VERIFY] resynthesis retry raised: …", and the corrupted
+  answer shipped with `answered=True`.
+- **Never worked:** introduced in 8bae539 (2026-09-15, "Rebuild aggregation
+  placement fix at primitive level") with `tail` already undefined, and
+  undefined in every later version of router.py.
+- **Fix:** the gate now sets `primitives_fired.aggregation_placement_corruption`
+  and returns `_give_up("aggregation_placement_corruption", ...)`. That's the
+  proper `{"answer", "tool_results", "answered": False}` dict, and it keeps
+  diff_result and records a queryable reason_tag.
+- **Test:** `tests/test_finalize_placement_corruption_fallback.py` replays the
+  2026-09-14 EMEA incident through the real loop. Its planted-bug control
+  compiles router.py with the old call restored and reproduces the silent
+  ship. The existing placement tests only unit-tested the detector and were
+  in no workflow.
+- **Impact check against production data** (query_cost_log, 456 rows from
+  2026-09-11 to 09-23, cross-referenced with conversation_threads):
+  - 11 questions had placement corruption detected by the main loop, and all
+    11 shipped an answer (0 fell back). None of them has a Slack thread:
+    they were test/verification runs, 10 of them on 09-17/18 when no Slack
+    threads were saved at all.
+  - About 48 other mismatch events ended on a finalize path, where this gate
+    lives but left no flag before the fix. Only 2 of those reached Slack
+    (#449 Mid-Market win rate, #453 Ryan's pipeline question on 09-23 03:04
+    UTC). Re-running verify_total_placement on both delivered texts gives
+    placement_ok=True, so the broken fallback was not hit for either.
+  - #453 did ship a wrong answer ("Total new deals added to pipeline:
+    1,408"), but that came from the week_of_quarter value-column inference
+    bug fixed in #29, not from this gap.
+  - The definitive record would be Railway's logs for the string "name 'tail'
+    is not defined"; this session has no access to them.
+- **Second finding, fixed in the same PR:** `aggregation_placement_corruption`
+  was set by both placement gates but never registered in
+  `FAILURE_MODE_PRIMITIVES`. It had no default in `_new_cost_state` and no
+  outcome bucket, so a blocked corruption read as generic `other_fallback`
+  and a shipped one as `answered_after_resynthesis`. It's now registered,
+  defaulted to False, and a blocked corruption gets its own
+  `blocked_placement_corruption` outcome (asserted by the incident-route
+  test).
+- **Historical signature:** replaying the incident against the pre-fix
+  code logs outcome=`answered_after_resynthesis` with
+  reason_tag=`aggregation_placement_corruption`. Three production rows match
+  that signature exactly (query_cost_log ids 52, 73, 86; 2026-09-17/18,
+  "How has [new business] pipeline moved in the last 2 weeks?"). The logs
+  can't tell whether their finalize retry was corrupted (the gap) or
+  correct, since both log identically. None of the three has a Slack thread
+  in conversation_threads.
 
 ### CRITICAL: Database Schema Mismatch — "pain" vs "identified_pain" (2026-09-21)
 **Status:** ✅ FIXED (commit 44cb20c) - Proper architecture: separate Supabase/HubSpot key mappings

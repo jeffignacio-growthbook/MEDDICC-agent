@@ -2744,6 +2744,10 @@ FAILURE_MODE_PRIMITIVES = frozenset({
     "snapshot_date_labeling_unverified",
     "ambiguous_dimension_unaddressed",
     "zero_rows_suspicion_unresolved",
+    # 2026-09-23: set by both placement gates (main loop and finalize retry)
+    # but never registered here, so it had no default in _new_cost_state and
+    # no outcome bucket. A blocked corruption read as generic "other_fallback".
+    "aggregation_placement_corruption",
 })
 
 
@@ -2770,6 +2774,7 @@ def _new_cost_state() -> dict:
             "diff_company_name_backfill_fired": False,
             "false_partial_claim_caught": False,
             "aggregation_mismatch_unresolved_after_retry": False,
+            "aggregation_placement_corruption": False,
             "ambiguous_dimension_term_flagged": False,
             "snapshot_date_labeling_unverified": False,
             "finalize_scratchpad_caught": False,
@@ -2787,7 +2792,7 @@ def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
     "answered_with_unverified_date_labeling",
     "answered_with_unaddressed_ambiguity",
     "answered_with_unresolved_zero_row_suspicion", "budget_exhausted",
-    "other_fallback". See dynamic_query_loop()'s docstring for what each
+    "blocked_placement_corruption", "other_fallback". See dynamic_query_loop()'s docstring for what each
     means.
 
     2026-09-11: "answered_with_unverified_aggregation" (and its sibling,
@@ -2818,11 +2823,18 @@ def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
             return "answered_with_unresolved_zero_row_suspicion"
         if (primitives["scratchpad_rejection_fired"]
                 or primitives["aggregation_mismatch_caught"]
+                or primitives["aggregation_placement_corruption"]
                 or primitives["false_partial_claim_caught"]):
             return "answered_after_resynthesis"
         return "answered_cleanly"
     if cost_state.get("reason_tag") == "budget_exhausted":
         return "budget_exhausted"
+    if (cost_state["primitives_fired"]["aggregation_placement_corruption"]
+            and cost_state.get("reason_tag") == "aggregation_placement_corruption"):
+        # The finalize placement gate replaced a corrupted answer with the
+        # honest fallback — its own bucket, so a blocked corruption is
+        # countable in the coarse outcome field (2026-09-23).
+        return "blocked_placement_corruption"
     if cost_state["primitives_fired"]["finalize_scratchpad_caught"]:
         # Already "other_fallback" via reason_tag ==
         # "finalize_synthesis_scratchpad" below — this branch changes no
@@ -4205,9 +4217,24 @@ async def _dynamic_query_loop_core(question, history, params,
                                         f"[AGGREGATION_VERIFY] finalize retry placement corruption: "
                                         f"{placement_check['likely_corruption']}"
                                     )
-                                    # Force honest fallback instead of shipping corrupted data
-                                    return _diagnostic_answer(
-                                        tail, "aggregation_placement_corruption"
+                                    # Force honest fallback instead of shipping corrupted data.
+                                    # 2026-09-23: this used to be
+                                    # `return _diagnostic_answer(tail, ...)`
+                                    # with `tail` never defined in this scope
+                                    # (since 8bae539, 2026-09-15). The NameError
+                                    # was swallowed by the `except Exception`
+                                    # below, so the corrupted retry answer
+                                    # (already in final_answer_text) shipped
+                                    # every time. It also returned a bare
+                                    # string where this function's contract is
+                                    # the {"answer", "tool_results",
+                                    # "answered"} dict. _give_up() builds both.
+                                    cost_state["primitives_fired"]["aggregation_placement_corruption"] = True
+                                    return _give_up(
+                                        "aggregation_placement_corruption",
+                                        "found the figures but could not state "
+                                        "the corrected total reliably",
+                                        diff_result=diff_result,
                                     )
                     except Exception as e:
                         logger.warning(
