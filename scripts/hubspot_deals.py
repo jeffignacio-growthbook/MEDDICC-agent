@@ -64,6 +64,37 @@ class HubSpotDealsClient:
             "Content-Type": "application/json"
         })
 
+    # One property list for every sync fetch (full analytics fetch and the
+    # incremental keyset fetch), so the two can never drift apart. Covers all
+    # four Incremental ARR components plus renewal ARR, and the two fields
+    # the incremental sync pages and windows on (hs_object_id,
+    # hs_lastmodifieddate).
+    DEAL_SYNC_PROPERTIES = (
+        'dealname',
+        'dealstage',
+        'pipeline',
+        'closedate',
+        'incremental_arr',
+        'amount',
+        'hubspot_owner_id',
+        'dealtype',
+        'createdate',
+        'hs_lastmodifieddate',
+        'hs_object_id',
+        'last_meddicc_analysis_date',
+        # Phase B.6 cardinal-rule fields
+        'new_revenue',
+        'expansion_revenue',
+        'prior_arr',
+        # HubSpot "Renewal ARR": the portion of ACV/ARR renewing existing
+        # contracted ARR. Renewal deals are Incremental ARR + Renewal ARR,
+        # so without this they compute to 0.
+        'renewal_revenue',
+        'sao',
+        'hs_manual_forecast_category',
+        'bdr_owner',  # SDR attribution field
+    )
+
     # Attempts per request (1 + 4 retries). With the shared schedule
     # (scripts/http_retry.py) that is at most 2+4+8+16s for a 5xx or network
     # error, or 15+30+60+120s for a 429 without Retry-After.
@@ -215,30 +246,7 @@ class HubSpotDealsClient:
 
         body = {
             'filterGroups': [],  # No filters - get everything
-            'properties': [
-                'dealname',
-                'dealstage',
-                'pipeline',
-                'closedate',
-                'incremental_arr',
-                'amount',
-                'hubspot_owner_id',
-                'dealtype',
-                'createdate',
-                'hs_lastmodifieddate',
-                'last_meddicc_analysis_date',
-                # Phase B.6 cardinal-rule fields
-                'new_revenue',
-                'expansion_revenue',
-                'prior_arr',
-                # HubSpot "Renewal ARR": the portion of ACV/ARR renewing
-                # existing contracted ARR. Renewal deals are Incremental ARR
-                # + Renewal ARR, so without this they compute to 0.
-                'renewal_revenue',
-                'sao',
-                'hs_manual_forecast_category',
-                'bdr_owner'  # SDR attribution field
-            ],
+            'properties': list(self.DEAL_SYNC_PROPERTIES),
             'sorts': [
                 {'propertyName': 'hs_lastmodifieddate', 'direction': 'DESCENDING'}
             ],
@@ -264,6 +272,48 @@ class HubSpotDealsClient:
             if not after:
                 break
 
+        return all_deals
+
+    def search_deals_keyset(self, extra_filters: List[dict] = None,
+                            properties: List[str] = None) -> List[dict]:
+        """Every deal matching `extra_filters`, paged by hs_object_id.
+
+        Each page asks for hs_object_id > (last id seen), sorted by
+        hs_object_id ascending, instead of using the search cursor. That
+        cursor behaves as an offset, so a deal edited mid-fetch shifts the
+        listing and can be skipped (see get_all_deals_including_closed, which
+        sorts by hs_lastmodifieddate). An id never changes, so keyset paging
+        can't skip a deal whatever changes during the run. It also isn't
+        bound by the search API's 10,000-result paging cap, because each
+        query starts fresh from an id.
+
+        extra_filters: ANDed with the id cursor, e.g.
+            [{'propertyName': 'hs_lastmodifieddate', 'operator': 'GTE',
+              'value': '<epoch ms>'}]
+        Datetime values must be epoch milliseconds as a string; an ISO
+        string with no timezone makes deals/search return HTTP 400.
+        """
+        endpoint = "/crm/v3/objects/deals/search"
+        props = list(properties or self.DEAL_SYNC_PROPERTIES)
+        all_deals, last_id = [], None
+        while True:
+            filters = list(extra_filters or [])
+            if last_id is not None:
+                filters.append({'propertyName': 'hs_object_id', 'operator': 'GT',
+                                'value': str(last_id)})
+            body = {
+                'filterGroups': [{'filters': filters}] if filters else [],
+                'properties': props,
+                'sorts': [{'propertyName': 'hs_object_id', 'direction': 'ASCENDING'}],
+                'limit': 100,
+            }
+            response = self._post(endpoint, body)
+            results = response.get('results', [])
+            all_deals.extend(results)
+            if len(results) < 100:
+                break
+            last_id = int(results[-1]['id'])
+            time.sleep(0.2)  # pacing only; retries live in _request
         return all_deals
 
     def get_deals_modified_since(self, since_date: str) -> List[dict]:
