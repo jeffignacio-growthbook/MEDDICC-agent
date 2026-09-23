@@ -96,7 +96,8 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
         {"status": "ok", "fiscal_quarter": str, "current_week": int,
          "stability": "forming"|"settled"|"late_quarter",
          "directional_caveat": bool,
-         "pipeline": {"deal_count": int, "amount": float},
+         "pipeline": {"deal_count": int, "incremental_arr": float,
+                      "excluded_no_incremental_arr": int},
          "risk_summary": {...assess_deal_risk()'s summary...},
          "high_risk_count": int, "high_risk_fraction": float|None,
          "historical": {"week": int, "win_rate": float|None,
@@ -135,15 +136,26 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
 
     # This quarter's COMMIT+MOST_LIKELY deals — own query, deliberately NOT
     # get_at_risk_deals() (hardcodes COMMIT-only; see module docstring).
+    # 2026-09-23: this selected `amount`, a column `deals` has never had, so
+    # every production call failed (Postgres: "column deals.amount does not
+    # exist"). Dollars are now the quota basis, incremental_arr() (new_arr +
+    # expansion_arr; renewal base excluded), and the deal count, the dollar
+    # total and the risk assessment all use the same incremental deals
+    # (is_incremental_pipeline, the Gate 3 count/sum rule). Deals with no
+    # incremental ARR (pure renewals) are counted in
+    # excluded_no_incremental_arr, not dropped silently.
+    from incremental_arr import incremental_arr
+    from field_semantics import is_incremental_pipeline
     response = sb.table("deals").select(
         "deal_id,company_name,stage,create_date,close_date,segment,"
-        "forecast_category,deal_status,amount"
+        "forecast_category,deal_status,pipeline_id,new_arr,expansion_arr"
     ).in_("forecast_category", CATEGORIES).eq(
         "deal_status", "active"
     ).gte("close_date", q_start.isoformat()).lte(
         "close_date", q_end.isoformat()
     ).execute()
-    deals = response.data or []
+    fetched = response.data or []
+    deals = [d for d in fetched if is_incremental_pipeline(d)]
 
     risk_result = assess_deal_risk(deals, sb)
     assessed = risk_result.get("assessed_deals", [])
@@ -152,7 +164,7 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
     high_risk_count = summary.get("high_risk", 0)
     high_risk_fraction = (high_risk_count / total_assessed) if total_assessed else None
 
-    total_amount = sum(float(d.get("amount") or 0) for d in deals)
+    total_incremental_arr = sum(incremental_arr(d) for d in deals)
 
     calib = query_commit_ml_calibration_by_week(sb)
     by_week = calib.get("by_week", {})
@@ -193,7 +205,8 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
         "directional_caveat": directional_caveat,
         "pipeline": {
             "deal_count": len(deals),
-            "amount": total_amount,
+            "incremental_arr": total_incremental_arr,
+            "excluded_no_incremental_arr": len(fetched) - len(deals),
         },
         "risk_summary": summary,
         "high_risk_count": high_risk_count,
