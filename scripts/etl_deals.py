@@ -1001,6 +1001,11 @@ def main():
 
     problems = _collect_problems(hubspot=hubspot, upsert_failed=upsert_failed,
                                  supabase_fatal=supabase_fatal)
+    deletion_status = 'not used in this mode'
+    if checkpoint_store is not None:
+        deletion_status, deletion_problem = _apply_deletions(hubspot, checkpoint_store.sb)
+        if deletion_problem:
+            problems.append(deletion_problem)
     checkpoint_status, checkpoint_problem = _update_checkpoint(
         checkpoint_store, checkpoint_before, all_deals_api, fetch_start_ms,
         problems, upserted)
@@ -1015,6 +1020,7 @@ def main():
         supabase_status=supabase_status,
         problems=problems,
         checkpoint_status=checkpoint_status,
+        deletion_status=deletion_status,
     )
 
 
@@ -1129,8 +1135,41 @@ def _update_checkpoint(store, stored, fetched_deals, fetch_start_ms, problems, u
     return f'advanced {stored} ({_ms_iso(stored)}) → {new} ({_ms_iso(new)})', None
 
 
+def _apply_deletions(hubspot, sb):
+    """Tombstone every deal HubSpot has deleted or merged away that is still
+    in `deals` (migration 070 tombstone_deal(), atomic per deal; reuses the
+    067 deleted_deals table). (status line, problem or None): any failure is
+    a run failure, so the checkpoint isn't advanced past it."""
+    source = f"deal_sync_{os.getenv('GITHUB_RUN_ID', 'local')}"
+    try:
+        archived = hubspot.list_archived_deals()
+        merged = hubspot.merged_away_deal_ids()
+    except Exception as e:
+        return 'failed listing HubSpot deletions', f'deletion check failed: {e}'
+    candidates = [(a['id'], a.get('archivedAt'), 'deleted_in_hubspot', source)
+                  for a in archived]
+    candidates += [(mid, None, 'merged_away', f'{source} (merged into {survivor})')
+                   for mid, survivor in merged]
+    tombstoned = []
+    try:
+        for deal_id, archived_at, reason, src in candidates:
+            result = sb.rpc('tombstone_deal', {
+                'p_deal_id': deal_id, 'p_archived_at': archived_at,
+                'p_reason': reason, 'p_source': src}).execute().data
+            if result == 'tombstoned':
+                tombstoned.append(f'{deal_id} ({reason})')
+    except Exception as e:
+        return (f'{len(tombstoned)} tombstoned before failure',
+                f'tombstone_deal failed: {e}')
+    status = (f'{len(tombstoned)} tombstoned'
+              + (f': {", ".join(tombstoned)}' if tombstoned else '')
+              + f' (checked {len(archived)} deleted + {len(merged)} merged-away ids)')
+    return status, None
+
+
 def _print_run_summary(*, mode, fetched, processed, hubspot, company_unknown,
-                       supabase_status, problems, checkpoint_status):
+                       supabase_status, problems, checkpoint_status,
+                       deletion_status='not used in this mode'):
     """Counts of what succeeded and failed, then the exit code: 0 only when
     nothing failed after retries."""
     retries = hubspot.retry_count if hubspot else 0
@@ -1141,6 +1180,7 @@ def _print_run_summary(*, mode, fetched, processed, hubspot, company_unknown,
     print(f"  Company data unknown (preserved):  {len(company_unknown)}")
     print(f"  Supabase:                          {supabase_status}")
     print(f"  HubSpot request retries taken:     {retries}")
+    print(f"  Deletions:                         {deletion_status}")
     print(f"  Checkpoint:                        {checkpoint_status}")
     if problems:
         print("❌ ETL finished with failures (exit 1):")

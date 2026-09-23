@@ -100,9 +100,13 @@ class Hub:
             return _resp(200, {"results": [{"id": "1", "email": "rep@example.com"}]})
         if path == "/crm/v3/pipelines/deals":
             return _resp(200, {"results": [{"stages": [{"id": "closedwon", "label": "Closed Won"}]}]})
+        if path == "/crm/v3/objects/deals" and (params or {}).get("archived") == "true":
+            return _resp(200, {"results": []})      # no deleted deals (see test_deal_sync_deletions)
         if path == "/crm/v3/objects/deals/search":
-            self.searches.append(json)
             filters = [f for g in json.get("filterGroups", []) for f in g["filters"]]
+            if any(f.get("operator") == "HAS_PROPERTY" for f in filters):
+                return _resp(200, {"total": 0, "results": []})   # no merged-away ids
+            self.searches.append(json)
             rows = sorted((int(i), i, d) for i, d in self.deals.items()
                           if not d["hidden"] and all(self._match(i, d, f) for f in filters))
             limit = json.get("limit", 100)
@@ -128,6 +132,11 @@ class DB:
 
     def table(self, name):
         return _Q(self, name)
+
+    def rpc(self, name, params):
+        """tombstone_deal() for the no-deletions case; the deletion contract
+        itself is tested in test_deal_sync_deletions.py."""
+        return type("Call", (), {"execute": lambda self_: type("R", (), {"data": "absent"})()})()
 
 
 class _Q:
