@@ -1,14 +1,51 @@
 # Pending Work
 
-**Last Updated:** 2026-09-23 (3 open items logged: placement-corruption fallback HIGH, YAML re-parse latency MEDIUM, test_question.py answered flag LOW)
+**Last Updated:** 2026-09-23 (HIGH placement-corruption fallback resolved in #33; MEDIUM YAML re-parse latency and LOW test_question.py answered flag still open)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
 
 ## 🟡 Open Items
 
-### 🔴 HIGH: Aggregation placement-corruption fallback has never worked (found 2026-09-23)
-**Status:** ✅ FIXED 2026-09-23 (see "Resolution" at the end of this entry).
+### 🟠 MEDIUM: ~11s avoidable latency per dynamic question: config YAML re-parsed 162× per call (found 2026-09-23)
+**Status:** OPEN.
+
+**What:** `api/dimension_resolver.py:_load_yaml()` (line 63) re-reads
+and re-parses its file on every call, with no caching. Its callers
+(`_load_regions()`, the segmentation-band and team-roster loaders,
+line ~186) run per dimension-term lookup. Profiling one offline
+`dynamic_query_loop` run (tests/canary_harness.py, 2026-09-23) showed
+`config/client.yaml` parsed **108×** and `config/regions.yaml` **54×**
+for a single question, about 11s of the loop's ~14s wall time spent
+inside PyYAML. The same code runs in production on every dynamic question.
+
+**Fix plan:** memoize by path plus mtime (so a config edit is still
+picked up without a restart), e.g. `functools.lru_cache` on a
+`(path, mtime)` key. Verify with the same profile: the parse count per
+question should drop to 1–2, and every `test_dimension_resolver.py` case
+must still pass.
+
+### 🟢 LOW: `scripts/test_question.py` prints "Answered: False" for every direct dynamic_query answer (found 2026-09-23)
+**Status:** OPEN. Cosmetic, but it reads as a failure.
+
+**What:** `route_question()`'s direct `dynamic_query` return
+(`api/router.py` ~line 5838: `{"answer", "needs_ack", "tool_results",
+"handler_name": "dynamic_query"}`) drops the loop's `answered` flag, so
+`test_question.py:107` (`result.get('answered', False)`) prints
+`Answered: False` even for a complete, correct answer. Seen on the
+2026-09-23 live verification of Ryan's question.
+
+**Fix plan:** pass `"answered": dynamic_result.get("answered")` through
+in that return (and the two sibling dynamic returns that also drop it),
+so the flag reflects the loop's real outcome.
+
+---
+
+## ✅ Recently Completed
+
+### HIGH: Aggregation placement-corruption fallback had never worked (found and fixed 2026-09-23)
+**Status:** ✅ FIXED 2026-09-23 (PR #33). Broken from the moment it was introduced (2026-09-15, 8bae539)
+until this fix; it never once blocked a corrupted answer.
 
 **What:** in `_finalize_from_data`'s aggregation retry (`api/router.py`,
 ~line 4211 at 5f58fcf), when `verify_total_placement()` detects
@@ -76,42 +113,22 @@ to fail.
     bug fixed in #29, not from this gap.
   - The definitive record would be Railway's logs for the string "name 'tail'
     is not defined"; this session has no access to them.
-
-### 🟠 MEDIUM: ~11s avoidable latency per dynamic question: config YAML re-parsed 162× per call (found 2026-09-23)
-**Status:** OPEN.
-
-**What:** `api/dimension_resolver.py:_load_yaml()` (line 63) re-reads
-and re-parses its file on every call, with no caching. Its callers
-(`_load_regions()`, the segmentation-band and team-roster loaders,
-line ~186) run per dimension-term lookup. Profiling one offline
-`dynamic_query_loop` run (tests/canary_harness.py, 2026-09-23) showed
-`config/client.yaml` parsed **108×** and `config/regions.yaml` **54×**
-for a single question, about 11s of the loop's ~14s wall time spent
-inside PyYAML. The same code runs in production on every dynamic question.
-
-**Fix plan:** memoize by path plus mtime (so a config edit is still
-picked up without a restart), e.g. `functools.lru_cache` on a
-`(path, mtime)` key. Verify with the same profile: the parse count per
-question should drop to 1–2, and every `test_dimension_resolver.py` case
-must still pass.
-
-### 🟢 LOW: `scripts/test_question.py` prints "Answered: False" for every direct dynamic_query answer (found 2026-09-23)
-**Status:** OPEN. Cosmetic, but it reads as a failure.
-
-**What:** `route_question()`'s direct `dynamic_query` return
-(`api/router.py` ~line 5838: `{"answer", "needs_ack", "tool_results",
-"handler_name": "dynamic_query"}`) drops the loop's `answered` flag, so
-`test_question.py:107` (`result.get('answered', False)`) prints
-`Answered: False` even for a complete, correct answer. Seen on the
-2026-09-23 live verification of Ryan's question.
-
-**Fix plan:** pass `"answered": dynamic_result.get("answered")` through
-in that return (and the two sibling dynamic returns that also drop it),
-so the flag reflects the loop's real outcome.
-
----
-
-## ✅ Recently Completed
+- **Second finding, fixed in the same PR:** `aggregation_placement_corruption`
+  was set by both placement gates but never registered in
+  `FAILURE_MODE_PRIMITIVES`. It had no default in `_new_cost_state` and no
+  outcome bucket, so a blocked corruption read as generic `other_fallback`
+  and a shipped one as `answered_after_resynthesis`. It's now registered,
+  defaulted to False, and a blocked corruption gets its own
+  `blocked_placement_corruption` outcome (asserted by the incident-route
+  test).
+- **Historical signature:** replaying the incident against the pre-fix
+  code logs outcome=`answered_after_resynthesis` with
+  reason_tag=`aggregation_placement_corruption`. Three production rows match
+  that signature exactly (query_cost_log ids 52, 73, 86; 2026-09-17/18,
+  "How has [new business] pipeline moved in the last 2 weeks?"). The logs
+  can't tell whether their finalize retry was corrupted (the gap) or
+  correct, since both log identically. None of the three has a Slack thread
+  in conversation_threads.
 
 ### CRITICAL: Database Schema Mismatch — "pain" vs "identified_pain" (2026-09-21)
 **Status:** ✅ FIXED (commit 44cb20c) - Proper architecture: separate Supabase/HubSpot key mappings

@@ -169,7 +169,16 @@ def _run_incident_route(router_module):
         "classify": H.table_classifier_module.classify_relevant_tables,
         "schema": H.schema_context_module.get_schema_context,
         "anchors": router_module.resolve_snapshot_anchor_dates,
+        "log": router_module._log_query_cost,
     }
+    logged = {}
+
+    def capture_log(sb, question, cost_state, result, exc_raised):
+        # The outcome query_cost_log would record (the fake Supabase
+        # can't take the insert itself).
+        logged["outcome"] = router_module._compute_query_cost_outcome(
+            result, cost_state, exc_raised)
+        logged["reason_tag"] = cost_state.get("reason_tag")
 
     async def fake_filter_table(sb, **kwargs):
         return {"rows": copy.deepcopy(EMEA_ROWS), "table": "deals"}
@@ -180,12 +189,16 @@ def _run_incident_route(router_module):
         lambda sb, tables_with_descriptions=None, lightweight=False:
             "TABLE: deals\n  deal_id, company_name, deal_value, region\n")
     router_module.resolve_snapshot_anchor_dates = lambda sb, tw: (None, None)
+    router_module._log_query_cost = capture_log
     try:
-        return asyncio.run(router_module.dynamic_query_loop(
+        result = asyncio.run(router_module.dynamic_query_loop(
             question=INCIDENT_QUESTION, history=[],
             params={"time_window": H.DEFAULT_TIME_WINDOW},
-            sb=H._FakeSupabase(), client=client)), client
+            sb=H._FakeSupabase(), client=client))
+        result["_logged"] = logged
+        return result, client
     finally:
+        router_module._log_query_cost = saved["log"]
         H.tools_module.filter_table = saved["filter_table"]
         H.table_classifier_module.classify_relevant_tables = saved["classify"]
         H.schema_context_module.get_schema_context = saved["schema"]
@@ -202,8 +215,13 @@ def test_incident_route_main_loop_then_finalize_ships_the_fallback():
     assert "Creative CX at $6,890,371.78" not in result["answer"], (
         f"the corrupted retry answer shipped: {result['answer']!r}")
     assert "could not state the corrected total reliably" in result["answer"]
+    assert result["_logged"] == {"outcome": "blocked_placement_corruption",
+                                 "reason_tag": "aggregation_placement_corruption"}, (
+        f"query_cost_log must record the blocked corruption in its own "
+        f"outcome bucket — got {result['_logged']}")
     print("✓ incident route (EMEA, real region filter, main-loop detection "
-          "→ finalize): the honest fallback ships, not the corruption")
+          "→ finalize): the honest fallback ships, not the corruption; "
+          "query_cost_log outcome = blocked_placement_corruption")
 
 
 def test_incident_route_planted_bug_ships_the_corruption():
@@ -213,8 +231,10 @@ def test_incident_route_planted_bug_ships_the_corruption():
         f"with the old undefined-`tail` call restored, the incident route "
         f"should ship the corrupted answer as answered=True — got "
         f"answered={result.get('answered')}: {result['answer']!r}")
-    print("✓ incident route, planted bug: the corrupted answer ships as "
-          "answered=True — exactly the pre-fix production behavior")
+    assert result["_logged"]["outcome"] != "blocked_placement_corruption"
+    print(f"✓ incident route, planted bug: the corrupted answer ships as "
+          f"answered=True, logged as outcome={result['_logged']['outcome']!r} "
+          f"— exactly the pre-fix production behavior")
 
 
 def test_placement_corruption_at_finalize_ships_the_fallback_not_the_corruption():
