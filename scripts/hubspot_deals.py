@@ -276,9 +276,7 @@ class HubSpotDealsClient:
 
     def count_deals(self, filters: List[dict] = None) -> int:
         """HubSpot's total for a deals/search filter, without paging (one request)."""
-        body = {'filterGroups': [{'filters': filters}] if filters else [],
-                'properties': ['hs_object_id'], 'limit': 1}
-        return int(self._post("/crm/v3/objects/deals/search", body).get('total', 0))
+        return self.count_objects('deals', filters)
 
     def list_archived_deals(self) -> List[dict]:
         """Deals deleted in HubSpot (still in its recycle bin), as
@@ -329,9 +327,15 @@ class HubSpotDealsClient:
         Datetime values must be epoch milliseconds as a string; an ISO
         string with no timezone makes deals/search return HTTP 400.
         """
-        endpoint = "/crm/v3/objects/deals/search"
-        props = list(properties or self.DEAL_SYNC_PROPERTIES)
-        all_deals, last_id = [], None
+        return self.search_objects_keyset('deals', extra_filters,
+                                          properties or self.DEAL_SYNC_PROPERTIES)
+
+    def search_objects_keyset(self, object_type: str, extra_filters: List[dict] = None,
+                              properties: List[str] = None) -> List[dict]:
+        """Keyset-paged search over any CRM object (see search_deals_keyset)."""
+        endpoint = f"/crm/v3/objects/{object_type}/search"
+        props = list(properties or ['hs_object_id'])
+        all_rows, last_id = [], None
         while True:
             filters = list(extra_filters or [])
             if last_id is not None:
@@ -345,12 +349,42 @@ class HubSpotDealsClient:
             }
             response = self._post(endpoint, body)
             results = response.get('results', [])
-            all_deals.extend(results)
+            all_rows.extend(results)
             if len(results) < 100:
                 break
             last_id = int(results[-1]['id'])
             time.sleep(0.2)  # pacing only; retries live in _request
-        return all_deals
+        return all_rows
+
+    def count_objects(self, object_type: str, filters: List[dict] = None) -> int:
+        """HubSpot's total for a search filter on any CRM object (one request)."""
+        body = {'filterGroups': [{'filters': filters}] if filters else [],
+                'properties': ['hs_object_id'], 'limit': 1}
+        return int(self._post(f"/crm/v3/objects/{object_type}/search", body).get('total', 0))
+
+    def batch_get_company_deal_associations(self, company_ids: List[str]) -> dict:
+        """{company_id: [deal_id, ...]}. Unlike the deal->company batch read,
+        a failed batch raises (after _request's retries) instead of being
+        swallowed: the incremental company pass must never silently skip."""
+        out = {}
+        for i in range(0, len(company_ids), 100):
+            batch = company_ids[i:i + 100]
+            response = self._post("/crm/v4/associations/companies/deals/batch/read",
+                                  {"inputs": [{"id": c} for c in batch]})
+            for r in response.get('results', []):
+                out[str(r.get('from', {}).get('id'))] = [
+                    str(t.get('toObjectId')) for t in r.get('to', []) if t.get('toObjectId')]
+        return out
+
+    def batch_read_deals(self, deal_ids: List[str]) -> List[dict]:
+        """Deals by id with the sync property list, same shape as search results."""
+        out = []
+        for i in range(0, len(deal_ids), 100):
+            response = self._post("/crm/v3/objects/deals/batch/read", {
+                "properties": list(self.DEAL_SYNC_PROPERTIES),
+                "inputs": [{"id": d} for d in deal_ids[i:i + 100]]})
+            out.extend(response.get('results', []))
+        return out
 
     def get_deals_modified_since(self, since_date: str) -> List[dict]:
         """

@@ -441,6 +441,7 @@ def main():
     # Incremental-sync checkpoint (scripts/deal_sync.py). Used by analytics
     # (sets it) and incremental (reads and advances it); None elsewhere.
     checkpoint_store = checkpoint_before = fetch_start_ms = None
+    company_pass_status = 'not used in this mode'
     if args.mode in FULL_FIELD_MODES and not args.file and os.getenv('SUPABASE_URL'):
         from deal_sync import CheckpointStore, JOB_DEALS
         try:
@@ -467,8 +468,12 @@ def main():
         from deal_sync import SyncBlocked, fetch_incremental
         print("\n2. Fetching deals modified since the checkpoint (keyset-paged)...")
         try:
-            all_deals_api, checkpoint_before, window_start_ms, fetch_start_ms = \
-                fetch_incremental(hubspot, checkpoint_store)
+            fetched = fetch_incremental(hubspot, checkpoint_store)
+            all_deals_api = fetched['deals']
+            checkpoint_before = fetched['checkpoint']
+            window_start_ms = fetched['window_start_ms']
+            fetch_start_ms = fetched['fetch_start_ms']
+            company_pass_status = fetched['company_status']
         except SyncBlocked as e:
             print(f"❌ {e}")
             return 1
@@ -477,7 +482,7 @@ def main():
             return 1
         print(f"   Checkpoint {checkpoint_before} ({_ms_iso(checkpoint_before)}); "
               f"window from {window_start_ms} ({_ms_iso(window_start_ms)})")
-        print(f"   Fetched {len(all_deals_api)} deals")
+        print(f"   Fetched {len(all_deals_api)} deals (company pass: {company_pass_status})")
     elif args.mode == 'active':
         # Auto-detect Meeting Set stages
         print("\n2. Auto-detecting Meeting Set stages...")
@@ -1021,6 +1026,7 @@ def main():
         problems=problems,
         checkpoint_status=checkpoint_status,
         deletion_status=deletion_status,
+        company_pass_status=company_pass_status,
     )
 
 
@@ -1169,7 +1175,8 @@ def _apply_deletions(hubspot, sb):
 
 def _print_run_summary(*, mode, fetched, processed, hubspot, company_unknown,
                        supabase_status, problems, checkpoint_status,
-                       deletion_status='not used in this mode'):
+                       deletion_status='not used in this mode',
+                       company_pass_status='not used in this mode'):
     """Counts of what succeeded and failed, then the exit code: 0 only when
     nothing failed after retries."""
     retries = hubspot.retry_count if hubspot else 0
@@ -1180,6 +1187,7 @@ def _print_run_summary(*, mode, fetched, processed, hubspot, company_unknown,
     print(f"  Company data unknown (preserved):  {len(company_unknown)}")
     print(f"  Supabase:                          {supabase_status}")
     print(f"  HubSpot request retries taken:     {retries}")
+    print(f"  Company pass:                      {company_pass_status}")
     print(f"  Deletions:                         {deletion_status}")
     print(f"  Checkpoint:                        {checkpoint_status}")
     if problems:

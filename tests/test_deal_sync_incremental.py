@@ -100,6 +100,8 @@ class Hub:
             return _resp(200, {"results": [{"id": "1", "email": "rep@example.com"}]})
         if path == "/crm/v3/pipelines/deals":
             return _resp(200, {"results": [{"stages": [{"id": "closedwon", "label": "Closed Won"}]}]})
+        if path == "/crm/v3/objects/companies/search":
+            return _resp(200, {"total": 0, "results": []})   # no changed companies (see company-pass test)
         if path == "/crm/v3/objects/deals" and (params or {}).get("archived") == "true":
             return _resp(200, {"results": []})      # no deleted deals (see test_deal_sync_deletions)
         if path == "/crm/v3/objects/deals/search":
