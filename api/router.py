@@ -2137,7 +2137,14 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
             rows = step_data.get("rows", [])
             if rows:
                 logger.info(f"[EXTRACT] synthesis mode: returning {len(rows)} rows from {step_key} (aggregate)")
-                return {"rows": rows, "table": step_data.get("table", "unknown")}
+                # Preserve ALL fields from step_data, not just rows/table
+                # This ensures computed fields (summary, totals, snapshot_dates, ARR, etc.)
+                # survive extraction. Default to keep everything - only explicitly handle rows.
+                result = {k: v for k, v in step_data.items() if k != "rows"}
+                result["rows"] = rows  # Rows already extracted above (may be capped/sampled)
+                if "table" not in result:
+                    result["table"] = "unknown"
+                return result
         return {}
 
     # Entity extraction mode: merge all entity-bearing steps from RAW results
@@ -2211,9 +2218,14 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
         step_sources = ", ".join([sk for sk, _, _ in entity_bearing_steps])
         logger.info(f"[EXTRACT] merged {len(merged_rows)} unique rows (deduplicated on {dedup_key}) from {len(entity_bearing_steps)} steps: {step_sources}")
 
-        # Use table name from most recent step
-        table_name = entity_bearing_steps[0][1].get("table", "unknown")
-        return {"rows": merged_rows, "table": table_name}
+        # Preserve ALL fields from most recent step, not just rows/table
+        # Start with all fields from most recent step's data
+        most_recent_step_data = entity_bearing_steps[0][1]
+        result = {k: v for k, v in most_recent_step_data.items() if k != "rows"}
+        result["rows"] = merged_rows  # Use merged/deduplicated rows
+        if "table" not in result:
+            result["table"] = "unknown"
+        return result
 
     # Fallback: no entity-bearing steps found, return last step with data
     all_step_keys = sorted(accumulated_data.keys(), reverse=True)
@@ -2222,7 +2234,12 @@ def _extract_rows_from_accumulated(accumulated_data: dict, mode: str = "entity_e
         rows = step_data.get("rows", [])
         if rows:
             logger.info(f"[EXTRACT] fallback: returning {len(rows)} rows from {step_key} (no entities found)")
-            return {"rows": rows, "table": step_data.get("table", "unknown")}
+            # Preserve ALL fields from step_data, not just rows/table
+            result = {k: v for k, v in step_data.items() if k != "rows"}
+            result["rows"] = rows
+            if "table" not in result:
+                result["table"] = "unknown"
+            return result
 
     logger.info(f"[EXTRACT] no rows found in any step, returning empty dict")
     return {}
