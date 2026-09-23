@@ -156,6 +156,10 @@ class _Q:
         self.row = row
         return self
 
+    def range(self, a, b):          # select_all() pages with .range(), like the real client
+        self._range = (a, b)
+        return self
+
     def execute(self):
         t = self.db.tables[self.name]
         if self.row is not None:
@@ -167,6 +171,8 @@ class _Q:
             t[key] = {**t.get(key, {}), **self.row}
             return type("R", (), {"data": [self.row]})()
         rows = [r for r in t.values() if all(r.get(k) == v for k, v in self.filters.items())]
+        if getattr(self, "_range", None):
+            rows = rows[self._range[0]:self._range[1] + 1]
         return type("R", (), {"data": rows})()
 
 

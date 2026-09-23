@@ -2,11 +2,12 @@ name: Daily Analytics ETL
 
 on:
   schedule:
-    # Every 4 hours (was daily 04:00). This is the ONLY job that writes the
-    # Supabase deals table, so its cadence is the worst-case staleness of
-    # every deal field vs HubSpot: 24h -> ~4h (2026-09-23; see PENDING_WORK
-    # "Supabase deals up to 24h stale"). ~8-12 min/run; free on a public repo.
-    - cron: '0 */4 * * *'
+    # Full sync + reconciliation, twice a day (was every 4h). Freshness now
+    # comes from the hourly incremental sync (hourly-deal-sync.yml); this run
+    # is the safety net: keyset-paged full listing, deletion pass,
+    # Supabase-vs-HubSpot reconciliation, and it re-sets the checkpoint.
+    # :07 past 05/17 UTC to stay off the congested top-of-hour slots.
+    - cron: '7 5,17 * * *'
   workflow_dispatch:
 
 # Shared with hourly-deal-sync.yml: never two writers of deals / the

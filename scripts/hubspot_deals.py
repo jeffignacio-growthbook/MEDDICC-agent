@@ -236,43 +236,17 @@ class HubSpotDealsClient:
         return all_deals
 
     def get_all_deals_including_closed(self) -> List[dict]:
+        """Get ALL deals including Closed Won/Lost (analytics/history modes,
+        export_deals_to_csv).
+
+        2026-09-23: now keyset-paged (search_deals_keyset). It used to sort
+        by hs_lastmodifieddate DESC and page with the search cursor, which
+        behaves as an offset, so a deal edited mid-fetch jumped to an
+        already-read page and was skipped for that run.
+        test_deal_sync_keyset_and_checkpoint reproduces that skip with the
+        legacy paging.
         """
-        Get ALL deals including Closed Won/Lost (for analytics mode).
-
-        Returns deals with company associations and key properties.
-        No stage filtering - fetches everything.
-        """
-        endpoint = "/crm/v3/objects/deals/search"
-
-        body = {
-            'filterGroups': [],  # No filters - get everything
-            'properties': list(self.DEAL_SYNC_PROPERTIES),
-            'sorts': [
-                {'propertyName': 'hs_lastmodifieddate', 'direction': 'DESCENDING'}
-            ],
-            'limit': 100
-        }
-
-        all_deals = []
-        after = None
-
-        while True:
-            if after:
-                body['after'] = after
-                # Rate limiting: small delay between pagination calls to avoid 429s
-                time.sleep(0.2)
-
-            response = self._post(endpoint, body)
-            results = response.get('results', [])
-            all_deals.extend(results)
-
-            paging = response.get('paging', {})
-            after = paging.get('next', {}).get('after')
-
-            if not after:
-                break
-
-        return all_deals
+        return self.search_deals_keyset()
 
     def count_deals(self, filters: List[dict] = None) -> int:
         """HubSpot's total for a deals/search filter, without paging (one request)."""

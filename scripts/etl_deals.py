@@ -1011,6 +1011,15 @@ def main():
         deletion_status, deletion_problem = _apply_deletions(hubspot, checkpoint_store.sb)
         if deletion_problem:
             problems.append(deletion_problem)
+    reconcile_status = 'not used in this mode'
+    if checkpoint_store is not None and args.mode == 'analytics':
+        if problems:
+            reconcile_status = 'skipped: run had failures (orphans would be unreliable)'
+        else:
+            reconcile_status, reconcile_problem = _reconcile(
+                hubspot, checkpoint_store.sb, {str(d.get('id')) for d in all_deals_api})
+            if reconcile_problem:
+                problems.append(reconcile_problem)
     checkpoint_status, checkpoint_problem = _update_checkpoint(
         checkpoint_store, checkpoint_before, all_deals_api, fetch_start_ms,
         problems, upserted)
@@ -1027,6 +1036,7 @@ def main():
         checkpoint_status=checkpoint_status,
         deletion_status=deletion_status,
         company_pass_status=company_pass_status,
+        reconcile_status=reconcile_status,
     )
 
 
@@ -1173,10 +1183,80 @@ def _apply_deletions(hubspot, sb):
     return status, None
 
 
+# More orphans than this in one full sync means the HubSpot listing itself is
+# suspect (partial response, filter/permission problem), not that this many
+# deals were purged. Tombstone nothing and fail the run: a bad listing must
+# never turn into a mass deletion.
+MAX_RECONCILE_ORPHANS = 25
+
+
+def _reconcile(hubspot, sb, fetched_ids):
+    """Full-sync safety net: deals in Supabase that the complete HubSpot
+    listing didn't return, after the deletion pass. Each one is looked up
+    directly:
+      404 -> purged from HubSpot (gone from the recycle bin too): tombstone it
+             as purged_from_hubspot. The deletion date is unknown, so its
+             snapshots stay.
+      200 with a different id -> merged into that survivor: tombstone as
+             merged_away.
+      200, same id -> exists but missing from the listing: a real gap, so
+             report it (exit 1) and don't touch it.
+    (status line, problem or None)."""
+    import requests
+    from supabase_client import select_all
+    source = f"deal_sync_reconcile_{os.getenv('GITHUB_RUN_ID', 'local')}"
+    try:
+        supa_ids = {str(r['deal_id']) for r in select_all(sb, 'deals', 'deal_id')}
+    except Exception as e:
+        return 'failed reading Supabase deal ids', f'reconciliation failed: {e}'
+    orphans = sorted(supa_ids - set(fetched_ids))
+    if not orphans:
+        return f'clean: Supabase {len(supa_ids)} deals, all in the HubSpot listing', None
+    if len(orphans) > MAX_RECONCILE_ORPHANS:
+        return (f'{len(orphans)} orphans (> {MAX_RECONCILE_ORPHANS}): listing suspect, nothing touched',
+                f'reconciliation found {len(orphans)} deals missing from the HubSpot listing '
+                f'(> {MAX_RECONCILE_ORPHANS}); treated as a bad listing, nothing tombstoned: '
+                f'{", ".join(orphans[:10])}{" ..." if len(orphans) > 10 else ""}')
+    purged, merged, missing = [], [], []
+    try:
+        for did in orphans:
+            try:
+                record = hubspot._get(f"/crm/v3/objects/deals/{did}",
+                                      params={'properties': 'hs_object_id'})
+            except requests.HTTPError as e:
+                if getattr(e.response, 'status_code', None) != 404:
+                    raise
+                sb.rpc('tombstone_deal', {'p_deal_id': did, 'p_archived_at': None,
+                                          'p_reason': 'purged_from_hubspot',
+                                          'p_source': source}).execute()
+                purged.append(did)
+                continue
+            survivor = str(record.get('id'))
+            if survivor and survivor != did:
+                sb.rpc('tombstone_deal', {'p_deal_id': did, 'p_archived_at': None,
+                                          'p_reason': 'merged_away',
+                                          'p_source': f'{source} (merged into {survivor})'}).execute()
+                merged.append(did)
+            else:
+                missing.append(did)
+    except Exception as e:
+        return (f'{len(purged)} purged, {len(merged)} merged before failure',
+                f'reconciliation failed: {e}')
+    status = (f'Supabase {len(supa_ids)} vs listing {len(fetched_ids)}: '
+              f'{len(purged)} purged{": " + ", ".join(purged) if purged else ""}, '
+              f'{len(merged)} merged{": " + ", ".join(merged) if merged else ""}, '
+              f'{len(missing)} missing from the full listing'
+              f'{": " + ", ".join(missing) if missing else ""}')
+    problem = (f'{len(missing)} deals exist in HubSpot but were missing from the full listing: '
+               f'{", ".join(missing)}') if missing else None
+    return status, problem
+
+
 def _print_run_summary(*, mode, fetched, processed, hubspot, company_unknown,
                        supabase_status, problems, checkpoint_status,
                        deletion_status='not used in this mode',
-                       company_pass_status='not used in this mode'):
+                       company_pass_status='not used in this mode',
+                       reconcile_status='not used in this mode'):
     """Counts of what succeeded and failed, then the exit code: 0 only when
     nothing failed after retries."""
     retries = hubspot.retry_count if hubspot else 0
@@ -1189,6 +1269,7 @@ def _print_run_summary(*, mode, fetched, processed, hubspot, company_unknown,
     print(f"  HubSpot request retries taken:     {retries}")
     print(f"  Company pass:                      {company_pass_status}")
     print(f"  Deletions:                         {deletion_status}")
+    print(f"  Reconciliation:                    {reconcile_status}")
     print(f"  Checkpoint:                        {checkpoint_status}")
     if problems:
         print("❌ ETL finished with failures (exit 1):")
