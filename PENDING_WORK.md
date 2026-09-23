@@ -7,6 +7,12 @@
 
 ## 🟡 Open Items
 
+### 🟢 LOW: Two active deals have no owner in HubSpot (found 2026-09-23)
+**Status:** OPEN, not actioned. Found incidentally while verifying the
+Inditex fix; unrelated to it. `deal_status='active'` with an empty
+`owner_email`: **ClickUp 56849054092** and **63138461244** (no company name
+either). Needs an owner assigned in HubSpot; nothing to fix in code.
+
 ### 🟠 MEDIUM: Incremental deal sync to cut Supabase `deals` staleness below ~4h (found 2026-09-23)
 **Status:** OPEN. This is the real fix; the 4-hour cron below is a stopgap.
 Scope it carefully, on its own; don't rush it.
@@ -107,8 +113,13 @@ dollar total moved anywhere.
   - 2026-09-02 18:44 UTC ("$0 renewal, past due");
   - 2026-09-06 04:47 and 16:22 UTC ("the 1 active deal missing an owner",
     recommending someone assign an owner to a deleted deal);
-  - 2026-08-28 06:56 UTC, possibly: it lists "Inditex — $0 (TBD) | Jul 11
-    (Cary)", but the ghost had no owner, so this may be another deal.
+  - **Not the ghost:** a 2026-08-28 06:56 UTC answer lists "Inditex — $0
+    (TBD) | Jul 11 (Cary) — Enterprise". That refers to a different, real
+    deal. The ghost's last-written row (2026-08-11, no writes after) had
+    owner null, segment Unknown and close date 2025-07-11. The answer's
+    owner (Cary), segment (Enterprise) and 2026 date (listed with x.ai Jul 7
+    and Upstart Jul 13) match the real renewal **56839409542** (owner Cary,
+    Enterprise, close 2026-07-11, since closed-won at $115,200).
 
 **Fix:**
 - **067** adds a `deleted_deals` tombstone table. A status flag on `deals`
