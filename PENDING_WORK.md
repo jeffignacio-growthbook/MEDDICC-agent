@@ -1,13 +1,78 @@
 # Pending Work
 
-**Last Updated:** 2026-09-21 (CRITICAL: Database Schema Mismatch Fixed — "pain" vs "identified_pain")
+**Last Updated:** 2026-09-23 (3 open items logged: placement-corruption fallback HIGH, YAML re-parse latency MEDIUM, test_question.py answered flag LOW)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
 
 ## 🟡 Open Items
 
-(No open items currently — last item escalated to CRITICAL and fixed Sept 21)
+### 🔴 HIGH: Aggregation placement-corruption fallback has never worked (found 2026-09-23)
+**Status:** OPEN. Needs investigation and a fix soon; don't let this sit.
+
+**What:** in `_finalize_from_data`'s aggregation retry (`api/router.py`,
+~line 4211 at 5f58fcf), when `verify_total_placement()` detects
+placement corruption in the resynthesized answer, the code is meant to
+"force honest fallback instead of shipping corrupted data":
+```python
+return _diagnostic_answer(
+    tail, "aggregation_placement_corruption"
+)
+```
+`tail` is not defined in that scope. `_diagnostic_answer(tail, reason_tag)`
+(~line 3556) takes it as a parameter, but this call site never binds it
+(pyflakes: `undefined name 'tail'`). The `NameError` is raised inside a
+`try:` whose `except Exception` only logs `[AGGREGATION_VERIFY]
+resynthesis retry raised: ...`, and then execution falls through to ship
+the retry's answer anyway.
+
+**Impact:** this safety net has provided zero protection since it was
+written. Every detected placement corruption on the finalize path ships
+the corrupted answer, and it looks like a caught exception rather than
+the detection it actually was. There's a second defect on the same line:
+even with `tail` bound, `_diagnostic_answer()` returns a string, but the
+caller must return `{"answer", "tool_results", "answered"}`. So the fix
+should route through `_give_up(...)` (or build the dict) and not just
+define `tail`.
+
+**Fix plan:** replace the call with `return _give_up("aggregation_placement_corruption",
+"<business-language tail>")`. Then add a test that drives a
+placement-corrupted resynthesis through `_finalize_from_data` and asserts
+the diagnostic ships with `answered=False`, not the corrupted text.
+Negative control: re-introduce the undefined name and require the test
+to fail.
+
+### 🟠 MEDIUM: ~11s avoidable latency per dynamic question: config YAML re-parsed 162× per call (found 2026-09-23)
+**Status:** OPEN.
+
+**What:** `api/dimension_resolver.py:_load_yaml()` (line 63) re-reads
+and re-parses its file on every call, with no caching. Its callers
+(`_load_regions()`, the segmentation-band and team-roster loaders,
+line ~186) run per dimension-term lookup. Profiling one offline
+`dynamic_query_loop` run (tests/canary_harness.py, 2026-09-23) showed
+`config/client.yaml` parsed **108×** and `config/regions.yaml` **54×**
+for a single question, about 11s of the loop's ~14s wall time spent
+inside PyYAML. The same code runs in production on every dynamic question.
+
+**Fix plan:** memoize by path plus mtime (so a config edit is still
+picked up without a restart), e.g. `functools.lru_cache` on a
+`(path, mtime)` key. Verify with the same profile: the parse count per
+question should drop to 1–2, and every `test_dimension_resolver.py` case
+must still pass.
+
+### 🟢 LOW: `scripts/test_question.py` prints "Answered: False" for every direct dynamic_query answer (found 2026-09-23)
+**Status:** OPEN. Cosmetic, but it reads as a failure.
+
+**What:** `route_question()`'s direct `dynamic_query` return
+(`api/router.py` ~line 5838: `{"answer", "needs_ack", "tool_results",
+"handler_name": "dynamic_query"}`) drops the loop's `answered` flag, so
+`test_question.py:107` (`result.get('answered', False)`) prints
+`Answered: False` even for a complete, correct answer. Seen on the
+2026-09-23 live verification of Ryan's question.
+
+**Fix plan:** pass `"answered": dynamic_result.get("answered")` through
+in that return (and the two sibling dynamic returns that also drop it),
+so the flag reflects the loop's real outcome.
 
 ---
 
