@@ -79,6 +79,62 @@ so the flag reflects the loop's real outcome.
 
 ## ✅ Recently Completed
 
+### MEDIUM: Ghost deal deleted in HubSpot, still active in Supabase for six weeks (found and fixed 2026-09-23)
+**Status:** ✅ FIXED 2026-09-23 (migrations 067 + 068, applied to production).
+
+**What:** Inditex **29591984407** ("Inditex - 2025 renewal (should
+expand)", renewal pipeline, stage Upcoming Renewal) was deleted in HubSpot
+at 2026-08-11 23:26:35Z. HubSpot confirms it: the deal is in
+`GET /crm/v3/objects/deals?archived=true`, and a normal GET returns 404.
+deals/search never returns archived deals, so no ETL ever learned about
+the deletion. Its `deals` row (last written 2026-08-11 20:03Z) stayed
+`deal_status='active'`, and every weekly snapshot kept re-adding it. That's
+because `snapshot_deals.py` reads every `deals` row and filters by stage,
+not status.
+
+**Impact (counts, not dollars):** every value field was $0 or null, so no
+dollar total moved anywhere.
+- **Snapshots:** 12 `deals_snapshot` rows dated after the deletion
+  (2026-08-17 .. 09-21) showed it as an open renewal, so renewal-pipeline
+  counts from snapshots for those dates were 1 too high.
+- **Forecast:** `forecast_weekly` counts open deals by close-date quarter,
+  and its close date was 2025-07-11, so only that past quarter's renewal
+  row had +1 open deal (at $0).
+- **Unaffected:** the waterfall and pipeline-generation "created" counts
+  (it was created in 2024), and `query_upcoming_renewals` for any forward
+  window.
+- **Slack answers that cited it:**
+  - 2026-09-02 18:44 UTC ("$0 renewal, past due");
+  - 2026-09-06 04:47 and 16:22 UTC ("the 1 active deal missing an owner",
+    recommending someone assign an owner to a deleted deal);
+  - 2026-08-28 06:56 UTC, possibly: it lists "Inditex — $0 (TBD) | Jul 11
+    (Cary)", but the ghost had no owner, so this may be another deal.
+
+**Fix:**
+- **067** adds a `deleted_deals` tombstone table. A status flag on `deals`
+  wouldn't work: consumers filter status in different ways
+  (`neq won`/`neq lost`, no filter at all in the snapshot writer, and
+  model-written dynamic queries), so a 'deleted' flag would slip through.
+  Moving the row out makes `deals` mean "exists in HubSpot" for every
+  consumer.
+- **068**, in one transaction, writes the tombstone (the full deal row plus
+  the 12 post-deletion snapshot rows), then deletes those rows. The 54
+  pre-deletion snapshots stay, because they're correct history.
+
+**Result:**
+- `deals` went from 1,957 to **1,956**, which equals HubSpot's own search
+  total.
+- `deals_snapshot` went from 28,684 to 28,672.
+- The snapshot diff now shows the deal leaving in the week it was actually
+  deleted.
+
+**Still open:**
+- Deletion handling in the incremental sync (below) finds future cases
+  automatically.
+- Historical diffs that join pre-deletion snapshots to `deals` for company
+  names will show no name for this deal. The name is kept in
+  `deleted_deals.deal_row`.
+
 ### HIGH: ETL failure alerts could never fire (found and fixed 2026-09-23)
 **Status:** ✅ FIXED 2026-09-23.
 
