@@ -5,6 +5,28 @@
 
 ---
 
+## ⚠️ Standing caveat: `learning_log` is not evidence that a handler worked (2026-09-23)
+
+`learning_log` grades the **final answer text**, not the code path that
+produced it (`api/router.py` `_log_learning()`):
+- `handler_used` is the handler the router chose. It is logged even when that
+  handler returned an error and the answer came from the retry or
+  dynamic-loop fallback.
+- `retry_succeeded` / `suggested_fix` are the evaluator's verdict on that
+  answer.
+
+Proven wrong on 9 real entries: on 2026-09-22 `learning_log` shows
+`query_forecast_trust` "correctly returned stability, risk breakdown…",
+while every call of that handler failed (`column deals.amount does not
+exist`, 7 Postgres log errors 2026-09-21 23:55 – 2026-09-23 00:23 UTC; the
+column has never existed).
+
+So "learning_log confirms X worked", past or future, is not evidence for any
+handler. Confirm execution from the handler's own result (a live run),
+Postgres/API logs, or `query_cost_log.primitives_fired`, and name which one.
+
+---
+
 ## 🟡 Open Items
 
 ### 🟢 LOW: Two active deals have no owner in HubSpot (found 2026-09-23)
