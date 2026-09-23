@@ -3004,10 +3004,24 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     Quota attainment for one or all AEs this period.
     Used for: "who's on track to hit quota?", "show me Q3 attainment by rep",
               "which reps are above 50% to quota?", "who is furthest from their number?"
-    
+
     params:
       owner_email: str or None  — if None, returns all reps
       time_window: dict         — determines which quarter to pull targets for
+
+    SYNTHESIS REQUIREMENTS:
+    - ALWAYS report closed_won_qtd (actual closed-won incremental ARR this quarter)
+    - ALWAYS report ALL THREE target components separately:
+      1. Quota target and gap to quota alone
+      2. Stretch target and gap to stretch alone (if stretch exists)
+      3. Combined target (quota+stretch) and gap to combined
+    - DO NOT only report the combined figure - user needs to see quota vs stretch breakdown
+    - Example: "$X short of quota ($Y), $Z short of stretch ($W), $A short of combined target ($B)"
+
+    METRIC BASIS:
+    - All won_arr and targets use INCREMENTAL ARR basis (new_arr + expansion_arr)
+    - Renewals EXCLUDED (matches quota/target definition)
+    - This is NOT deal_value (which incorrectly includes renewals)
     """
     # A rep name resolves to owner_email; None means "all reps" (valid here).
     owner_email, _rep_note = _resolve_owner_email(params, sb)
@@ -3049,12 +3063,19 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     logger.info(f"[REP_TARGETS] row count: {len(target_rows) if target_rows else 0}")
     if target_rows:
         logger.info(f"[REP_TARGETS] sample row: {target_rows[0] if target_rows else None}")
-    
-    # Build target map
-    targets_by_email = {}
+
+    # Build target map - support quota, stretch, and combined
+    # Store all target components separately per email
+    targets_by_email = {}  # {email: {"quota": X, "stretch": Y, "incremental_arr": Z}}
     for t in target_rows:
-        if t.get("metric") == "incremental_arr":  # new_arr + expansion_arr
-            targets_by_email[t["entity_email"]] = t["target_value"]
+        email = t["entity_email"]
+        metric = t.get("metric")
+        value = t.get("target_value")
+
+        if metric in ("incremental_arr", "quota", "stretch"):
+            if email not in targets_by_email:
+                targets_by_email[email] = {}
+            targets_by_email[email][metric] = value
 
     logger.info(f"[REP_TARGETS] targets_by_email after filter: {len(targets_by_email)} entries")
     if targets_by_email:
@@ -3071,33 +3092,48 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             "reps": [],
             "team_summary": {
                 "total_won": 0,
-                "total_target": 0,
+                "total_quota": 0,
+                "total_stretch": 0,
+                "total_combined": 0,
                 "team_attainment": {"value": None, "data_gap": True},
                 "reps_above_50pct": 0,
                 "reps_above_100pct": 0
             },
             "note": "AE quotas not set — run seed_rep_targets.py or ask Ryan to set quotas for this period"
         }
-    
-    # Load won deals in time window
+
+    # Load won deals in time window - use INCREMENTAL ARR basis (new_arr + expansion_arr)
+    # NOT deal_value (which includes renewals) - must match quota basis
+    from field_semantics import _RENEWAL_PIPELINE_ID
+
     won_filters = [
         ("eq", "deal_status", "won"),
         ("gte", "close_date", tw["start"]),
         ("lte", "close_date", tw["end"])
     ]
-    
+
     won_rows = select_all(sb, "deals",
-        columns="owner_email,deal_value",
+        columns="owner_email,new_arr,expansion_arr,pipeline_id",
         filters=won_filters
     )
-    
-    # Group won deals by owner
+
+    # Group won deals by owner - use incremental ARR (new_arr + expansion_arr), exclude renewals
     won_by_email = {}
     for deal in won_rows:
         owner = deal.get("owner_email")
-        value = deal.get("deal_value") or 0
+        pipeline_id = str(deal.get("pipeline_id") or "")
+
+        # Skip renewal pipeline deals (same exclusion as quota basis)
+        if pipeline_id == _RENEWAL_PIPELINE_ID:
+            continue
+
+        # Incremental ARR = new_arr + expansion_arr (matches quota basis)
+        new_arr = deal.get("new_arr") or 0
+        expansion_arr = deal.get("expansion_arr") or 0
+        incremental_arr = new_arr + expansion_arr
+
         if owner:
-            won_by_email[owner] = won_by_email.get(owner, 0) + value
+            won_by_email[owner] = won_by_email.get(owner, 0) + incremental_arr
     
     # Get all unique rep emails (union of targets and won)
     all_rep_emails = set(targets_by_email.keys()) | set(won_by_email.keys())
@@ -3123,55 +3159,88 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             email = p.get("email")
             persona_map[email] = p.get("display_name") or p.get("name")
     
+    # Calculate closed_won_qtd using same incremental ARR basis as quota
+    # This is the team's actual closed-won incremental ARR for the quarter
+    closed_won_qtd = sum(won_by_email.values())
+
     # Build rep attainment list
     reps = []
     total_won = 0
-    total_target = 0
+    total_quota = 0
+    total_stretch = 0
+    total_combined = 0
     reps_above_50 = 0
     reps_above_100 = 0
-    
+
     for email in all_rep_emails:
-        target = targets_by_email.get(email)
+        target_dict = targets_by_email.get(email, {})
         won = won_by_email.get(email, 0)
-        
-        attainment = rate_or_gap(won, target)
+
+        # Extract separate target components
+        quota = target_dict.get("quota") or target_dict.get("incremental_arr")
+        stretch = target_dict.get("stretch")
+        combined = (quota or 0) + (stretch or 0) if (quota or stretch) else None
+
+        # Calculate attainment against combined target (current behavior)
+        attainment = rate_or_gap(won, combined)
         attainment_pct = attainment.get("value")
-        
+
+        # Also calculate attainment vs quota alone and vs stretch alone
+        quota_attainment = rate_or_gap(won, quota) if quota else {"value": None, "data_gap": True}
+        stretch_attainment = rate_or_gap(won, stretch) if stretch else {"value": None, "data_gap": True}
+
         # Count won deals for this rep
-        deals_won = len([d for d in won_rows if d.get("owner_email") == email])
-        
+        deals_won = len([d for d in won_rows
+                        if d.get("owner_email") == email
+                        and str(d.get("pipeline_id") or "") != _RENEWAL_PIPELINE_ID])
+
         reps.append({
             "owner_email": email,
             "name": persona_map.get(email),
-            "target": target,
+            "quota": quota,
+            "stretch": stretch,
+            "combined_target": combined,
             "won_arr": won,
-            "attainment": attainment,
-            "attainment_pct": attainment_pct,
+            "quota_attainment": quota_attainment,
+            "stretch_attainment": stretch_attainment,
+            "combined_attainment": attainment,
+            "attainment_pct": attainment_pct,  # Combined for sorting/filtering
             "deals_won": deals_won,
-            "data_gap": target is None
+            "data_gap": combined is None
         })
-        
+
         total_won += won
-        if target:
-            total_target += target
-        
+        if quota:
+            total_quota += quota
+        if stretch:
+            total_stretch += stretch
+        if combined:
+            total_combined += combined
+
         if attainment_pct and attainment_pct >= 50:
             reps_above_50 += 1
         if attainment_pct and attainment_pct >= 100:
             reps_above_100 += 1
-    
+
     # Sort by attainment ascending (lowest first)
     reps.sort(key=lambda x: (x["attainment_pct"] is None, x["attainment_pct"] or 0))
-    
-    team_attainment = rate_or_gap(total_won, total_target)
-    
+
+    # Team-level attainment for all three target types
+    team_quota_attainment = rate_or_gap(total_won, total_quota if total_quota > 0 else None)
+    team_stretch_attainment = rate_or_gap(total_won, total_stretch if total_stretch > 0 else None)
+    team_combined_attainment = rate_or_gap(total_won, total_combined if total_combined > 0 else None)
+
     return {
         "period": period,
         "reps": reps,
         "team_summary": {
-            "total_won": total_won,
-            "total_target": total_target,
-            "team_attainment": team_attainment,
+            "closed_won_qtd": closed_won_qtd,
+            "total_quota": total_quota,
+            "total_stretch": total_stretch,
+            "total_combined": total_combined,
+            "quota_attainment": team_quota_attainment,
+            "stretch_attainment": team_stretch_attainment,
+            "combined_attainment": team_combined_attainment,
             "reps_above_50pct": reps_above_50,
             "reps_above_100pct": reps_above_100
         }
