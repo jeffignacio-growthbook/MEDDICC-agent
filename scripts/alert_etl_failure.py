@@ -31,8 +31,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).parent.parent / 'api'))
 
-from db import get_supabase
-from supabase_client import select_all
+# db / supabase_client are imported inside record_failure(): an import error
+# there must degrade to "count unknown, alert anyway", never crash the alert.
 
 
 def send_zapier_alert(job_name: str, run_id: str, failure_count: int):
@@ -58,7 +58,9 @@ def send_zapier_alert(job_name: str, run_id: str, failure_count: int):
         "run_id": run_id,
         "run_url": run_url,
         "failed_at": datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC'),
-        "message": f"ETL job '{job_name}' failed {failure_count} times in a row"
+        "message": (f"ETL job '{job_name}' failed {failure_count} times in the last 3 days"
+                    if failure_count else
+                    f"ETL job '{job_name}' failed (failure count unavailable)")
     }
 
     try:
@@ -73,10 +75,13 @@ def send_zapier_alert(job_name: str, run_id: str, failure_count: int):
 
 def record_failure(job_name: str, run_id: str) -> int:
     """
-    Record ETL failure in database and return consecutive failure count.
-    Returns 0 if this is first failure, 1 if second consecutive, etc.
+    Record ETL failure in database and return the failure count (this one
+    included) within the last 3 days. Returns None if the count can't be
+    determined — main() then alerts regardless of threshold.
     """
     try:
+        from db import get_supabase
+        from supabase_client import select_all
         sb = get_supabase()
 
         # Check for recent failures (last 3 days)
@@ -104,9 +109,13 @@ def record_failure(job_name: str, run_id: str) -> int:
         return consecutive + 1
 
     except Exception as e:
-        # If we can't record failures, assume first failure and alert anyway
+        # 2026-09-23: this used to `return 1` — "first failure", below the
+        # default threshold of 2 — so a job that couldn't reach Supabase
+        # (every caller: none passed SUPABASE_URL to the alert step) could
+        # never alert. etl_failures had 0 rows, ever. Unknown count now
+        # means alert, as the old comment here already intended.
         print(f"⚠️  Could not record failure in database: {e}")
-        return 1
+        return None
 
 
 def main():
@@ -125,8 +134,12 @@ def main():
 
     print(f"Consecutive failures: {consecutive}")
 
-    # Alert if threshold reached
-    if consecutive >= args.threshold:
+    # Alert if threshold reached, or if the count is unknown (fail open:
+    # a failure we can't count is still a failure someone should hear about)
+    if consecutive is None:
+        print("Failure count unknown - sending alert anyway")
+        send_zapier_alert(args.job, args.run_id, 0)
+    elif consecutive >= args.threshold:
         print(f"Threshold reached ({consecutive} >= {args.threshold}) - sending alert")
         send_zapier_alert(args.job, args.run_id, consecutive)
     else:
