@@ -136,11 +136,18 @@ class FakeTable:
         return type("R", (), {"data": []})()
 
 
+def _granted_rpc(_s, name, params):
+    """The sync lease functions, always granted (test_deal_sync_lease covers them)."""
+    data = {"acquired": True, "holder": params.get("p_holder")} if name.startswith("acquire") else True
+    return type("Call", (), {"execute": lambda _c: type("R", (), {"data": data})()})()
+
+
 class FakeWriter(supabase_client.SupabaseWriter):
     rows = []
 
     def __init__(self):
-        self.client = type("C", (), {"table": lambda _s, name: FakeTable(FakeWriter.rows)})()
+        self.client = type("C", (), {"table": lambda _s, name: FakeTable(FakeWriter.rows),
+                                     "rpc": _granted_rpc})()
 
 
 @contextlib.contextmanager

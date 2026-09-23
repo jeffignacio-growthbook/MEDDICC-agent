@@ -10,16 +10,20 @@ on:
     - cron: '7 5,17 * * *'
   workflow_dispatch:
 
-# Shared with hourly-deal-sync.yml: never two writers of deals / the
-# incremental checkpoint at once. Queue rather than cancel.
+# Writers of deals are serialised by the sync lease in Supabase
+# (scripts/deal_sync.py SyncLease), which also covers the manual analytics
+# workflows. This group only stops two full syncs piling up. It is not
+# shared with hourly-deal-sync.yml: in a shared group a newly queued
+# incremental would cancel a pending full sync.
 concurrency:
-  group: deals-supabase-sync
+  group: deals-full-sync
   cancel-in-progress: false
 
 jobs:
   etl:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # up to 5 min waiting for the sync lease + an 8-12 min sync
+    timeout-minutes: 25
 
     steps:
       - uses: actions/checkout@v4

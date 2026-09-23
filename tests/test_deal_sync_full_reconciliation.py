@@ -18,8 +18,8 @@ to every ~12h. Its job is to catch whatever the incremental path could miss:
          it; don't auto-fix.
      Reconciliation only runs after a clean run, since a partial one would
      make every unwritten deal look like an orphan.
-  3. The schedule: full sync ~12h, hourly incremental, sharing a concurrency
-     group, both alerting.
+  3. The schedule: full sync ~12h, hourly incremental, both alerting (their
+     writes are serialised by the sync lease, test_deal_sync_lease).
 
 Planted control: without reconciliation, a deal purged from HubSpot stays in
 Supabase indefinitely.
@@ -139,7 +139,7 @@ def test_without_reconciliation_the_purged_deal_stays():
     print("✓ control: without reconciliation the purged deal stays in Supabase")
 
 
-def test_schedule_full_12h_hourly_incremental_shared_concurrency():
+def test_schedule_full_12h_hourly_incremental():
     full = yaml.safe_load((REPO / ".github/workflows/daily-analytics-etl.yml").read_text())
     inc = yaml.safe_load((REPO / ".github/workflows/hourly-deal-sync.yml").read_text())
     full_cron = full[True]["schedule"][0]["cron"]
@@ -148,9 +148,9 @@ def test_schedule_full_12h_hourly_incremental_shared_concurrency():
     runs_per_day = len(hours.split(",")) if "," in hours else (24 // int(hours.split("/")[1]) if "/" in hours else 1)
     assert runs_per_day == 2, f"full sync should run ~12-hourly, cron={full_cron!r}"
     assert inc_cron.split()[1] == "*", f"incremental should run hourly, cron={inc_cron!r}"
-    assert full["concurrency"]["group"] == inc["concurrency"]["group"] == "deals-supabase-sync"
-    print(f"✓ schedule: full sync {full_cron!r} (2/day), incremental {inc_cron!r} (hourly), "
-          "one shared concurrency group")
+    # write serialisation is the DB lease, not a shared group
+    # (test_deal_sync_lease.test_workflows_rely_on_the_lease_not_a_shared_group)
+    print(f"✓ schedule: full sync {full_cron!r} (2/day), incremental {inc_cron!r} (hourly)")
 
 
 def test_many_orphans_means_a_bad_listing_so_nothing_is_tombstoned():
@@ -174,6 +174,6 @@ if __name__ == "__main__":
     test_reconciliation_skipped_when_the_run_had_failures()
     test_incremental_run_does_not_reconcile()
     test_without_reconciliation_the_purged_deal_stays()
-    test_schedule_full_12h_hourly_incremental_shared_concurrency()
+    test_schedule_full_12h_hourly_incremental()
     test_many_orphans_means_a_bad_listing_so_nothing_is_tombstoned()
     print("\n✅ All tests passed")
