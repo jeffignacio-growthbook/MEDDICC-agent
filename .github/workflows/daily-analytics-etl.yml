@@ -9,6 +9,12 @@ on:
     - cron: '0 */4 * * *'
   workflow_dispatch:
 
+# Shared with hourly-deal-sync.yml: never two writers of deals / the
+# incremental checkpoint at once. Queue rather than cancel.
+concurrency:
+  group: deals-supabase-sync
+  cancel-in-progress: false
+
 jobs:
   etl:
     runs-on: ubuntu-latest

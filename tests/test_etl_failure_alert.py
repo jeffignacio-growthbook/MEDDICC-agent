@@ -37,6 +37,7 @@ ETL_WORKFLOWS = {
     "daily-deal-etl.yml": "etl_deals.py",
     "daily-calls-etl.yml": "etl_calls.py",
     "daily-analytics-etl.yml": "etl_deals.py --mode analytics",
+    "hourly-deal-sync.yml": "etl_deals.py --mode incremental",
 }
 REQUIRED_ALERT_ENV = {"ZAPIER_ALERT_URL", "SUPABASE_URL", "SUPABASE_SERVICE_KEY"}
 

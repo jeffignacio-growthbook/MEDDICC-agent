@@ -15,7 +15,80 @@ late arrivals for good (cause C). So:
     returns HTTP 400 for an ISO string with no timezone.
 """
 
+import time
+from datetime import datetime
+
 JOB_DEALS = "deals"
+
+# Each run re-reads this much before the checkpoint. It covers HubSpot search
+# index lag, a calculated property landing seconds after its
+# hs_lastmodifieddate stamp (seen live: +2.5s, no re-bump), runner/HubSpot
+# clock skew, and deals edited while a run is fetching. It must exceed the
+# longest fetch: incremental runs take seconds, the full sync 8-12 min.
+OVERLAP_MS = 30 * 60 * 1000
+# Inclusive, so a deal stamped exactly on the window start is read. A strict
+# `>` on the max value seen is transcript-ETL cause C.
+WINDOW_OPERATOR = "GTE"
+# Above this, don't page an incremental backlog; exit 1 and let the full
+# sync (which resets the checkpoint) handle it.
+MAX_INCREMENTAL_DEALS = 9000
+
+
+class SyncBlocked(Exception):
+    """The incremental run must not proceed (no checkpoint, backlog too big)."""
+
+
+def hs_ms(value):
+    """hs_lastmodifieddate (ISO '...Z' as search returns it, or epoch-ms
+    digits) as int epoch ms; None if absent or unparseable."""
+    if value in (None, ""):
+        return None
+    text = str(value).strip()
+    if text.isdigit():
+        return int(text)
+    try:
+        return int(datetime.fromisoformat(text.replace("Z", "+00:00")).timestamp() * 1000)
+    except ValueError:
+        return None
+
+
+def window_filters(checkpoint_ms):
+    """(window_start_ms, filters) for deals modified since checkpoint - overlap."""
+    start = checkpoint_ms - OVERLAP_MS
+    return start, [{"propertyName": "hs_lastmodifieddate", "operator": WINDOW_OPERATOR,
+                    "value": str(start)}]
+
+
+def fetch_incremental(hubspot, store):
+    """Deals modified since (checkpoint - overlap), keyset-paged.
+    Returns (deals, checkpoint_before, window_start_ms, fetch_start_ms).
+    Raises SyncBlocked instead of guessing when it can't be done safely."""
+    checkpoint = store.get(JOB_DEALS)
+    if checkpoint is None:
+        raise SyncBlocked("no checkpoint yet: run the full sync once "
+                          "(etl_deals.py --mode analytics) to set it")
+    start, filters = window_filters(checkpoint)
+    backlog = hubspot.count_deals(filters)
+    if backlog > MAX_INCREMENTAL_DEALS:
+        raise SyncBlocked(f"{backlog} deals modified since the checkpoint window "
+                          f"(> {MAX_INCREMENTAL_DEALS}): run the full sync instead")
+    fetch_start_ms = int(time.time() * 1000)
+    deals = hubspot.search_deals_keyset(extra_filters=filters)
+    return deals, checkpoint, start, fetch_start_ms
+
+
+def next_watermark(stored_ms, deals, fetch_start_ms):
+    """The checkpoint a fully successful run may advance to:
+    min(max hs_lastmodifieddate seen, fetch start), never below stored_ms.
+    Capping at fetch start means a deal stamped after the fetch began (or a
+    clock-skewed future stamp) can't pull the checkpoint past work this run
+    didn't see. Returns stored_ms if the run saw nothing newer."""
+    seen = [m for m in (hs_ms((d.get("properties") or {}).get("hs_lastmodifieddate"))
+                        for d in deals) if m is not None]
+    if not seen:
+        return stored_ms
+    candidate = min(max(seen), fetch_start_ms)
+    return candidate if stored_ms is None else max(stored_ms, candidate)
 
 # Epoch ms for 2001-09-09 .. 2286-11-20. A 10-digit value is epoch seconds
 # and would put the window ~55 years back; refuse it instead.

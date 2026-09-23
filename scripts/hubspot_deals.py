@@ -274,6 +274,12 @@ class HubSpotDealsClient:
 
         return all_deals
 
+    def count_deals(self, filters: List[dict] = None) -> int:
+        """HubSpot's total for a deals/search filter, without paging (one request)."""
+        body = {'filterGroups': [{'filters': filters}] if filters else [],
+                'properties': ['hs_object_id'], 'limit': 1}
+        return int(self._post("/crm/v3/objects/deals/search", body).get('total', 0))
+
     def search_deals_keyset(self, extra_filters: List[dict] = None,
                             properties: List[str] = None) -> List[dict]:
         """Every deal matching `extra_filters`, paged by hs_object_id.

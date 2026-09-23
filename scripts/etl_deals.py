@@ -385,12 +385,15 @@ def main():
     parser.add_argument(
         '--mode',
         type=str,
-        choices=['active', 'history', 'analytics'],
+        choices=['active', 'history', 'analytics', 'incremental'],
         default='active',
         help=('active (default): active deals for MEDDICC agent\n'
               'history: all deals including closed (Supabase only)\n'
               'analytics: ALL deals all stages (Supabase only, '
-              'for snapshot/waterfall/qualification-rate)')
+              'for snapshot/waterfall/qualification-rate); also sets the '
+              'incremental checkpoint on success\n'
+              'incremental: only deals modified since the checkpoint minus '
+              '30 min, same fields as analytics (Supabase only)')
     )
     parser.add_argument(
         '--file',
@@ -405,7 +408,7 @@ def main():
     args = parser.parse_args()
 
     # Validate: --file requires --mode history or analytics
-    if args.file and args.mode == 'active':
+    if args.file and args.mode in ('active', 'incremental'):
         print("ERROR: --file can only be used with --mode history or --mode analytics")
         print("       Active mode fetches live data from HubSpot API")
         return 2
@@ -435,8 +438,47 @@ def main():
     else:
         print("\n1. CSV Mode - skipping HubSpot API connection")
 
+    # Incremental-sync checkpoint (scripts/deal_sync.py). Used by analytics
+    # (sets it) and incremental (reads and advances it); None elsewhere.
+    checkpoint_store = checkpoint_before = fetch_start_ms = None
+    if args.mode in FULL_FIELD_MODES and not args.file and os.getenv('SUPABASE_URL'):
+        from deal_sync import CheckpointStore, JOB_DEALS
+        try:
+            sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+            from supabase_client import SupabaseWriter
+            checkpoint_store = CheckpointStore(SupabaseWriter().client)
+            checkpoint_before = checkpoint_store.get(JOB_DEALS)
+        except Exception as e:
+            if args.mode == 'incremental':
+                print(f"❌ Could not read the sync checkpoint: {e}")
+                return 1
+            print(f"⚠️  Could not read the sync checkpoint ({e}); "
+                  f"this run won't update it")
+            checkpoint_store = None
+
     # Determine which deals to fetch based on mode
-    if args.mode == 'active':
+    if args.mode == 'incremental':
+        meeting_set_stages = []
+        closed_stages = []
+        if checkpoint_store is None:
+            print("❌ Incremental mode writes Supabase and needs its checkpoint: "
+                  "SUPABASE_URL is not set")
+            return 1
+        from deal_sync import SyncBlocked, fetch_incremental
+        print("\n2. Fetching deals modified since the checkpoint (keyset-paged)...")
+        try:
+            all_deals_api, checkpoint_before, window_start_ms, fetch_start_ms = \
+                fetch_incremental(hubspot, checkpoint_store)
+        except SyncBlocked as e:
+            print(f"❌ {e}")
+            return 1
+        except Exception as e:
+            print(f"❌ Failed to fetch deals: {e}")
+            return 1
+        print(f"   Checkpoint {checkpoint_before} ({_ms_iso(checkpoint_before)}); "
+              f"window from {window_start_ms} ({_ms_iso(window_start_ms)})")
+        print(f"   Fetched {len(all_deals_api)} deals")
+    elif args.mode == 'active':
         # Auto-detect Meeting Set stages
         print("\n2. Auto-detecting Meeting Set stages...")
         meeting_set_stages = get_meeting_set_stages(hubspot)
@@ -500,6 +542,7 @@ def main():
             # Fetch from HubSpot API
             print("\n2. Fetching ALL deals from HubSpot API (analytics mode)...")
             try:
+                fetch_start_ms = int(time.time() * 1000)
                 all_deals_api = hubspot.get_all_deals_including_closed()
                 print(f"   Fetched {len(all_deals_api)} deals (all stages)")
             except Exception as e:
@@ -579,7 +622,8 @@ def main():
         assoc_calls = (len(deal_ids) + 99) // 100
         company_calls = (len(unique_company_ids) + 99) // 100
         print(f"   API calls: {assoc_calls} association batches + {company_calls} company batches = {assoc_calls + company_calls} total")
-        print(f"   (vs {len(deal_ids) * 2} individual calls = {100 - int(100 * (assoc_calls + company_calls) / (len(deal_ids) * 2))}% reduction)")
+        if deal_ids:  # 0 deals is normal for an incremental run with no changes
+            print(f"   (vs {len(deal_ids) * 2} individual calls = {100 - int(100 * (assoc_calls + company_calls) / (len(deal_ids) * 2))}% reduction)")
 
     # Process deals
     print_step = "\n5" if args.mode == 'analytics' else "\n5"
@@ -657,8 +701,8 @@ def main():
             if stage in meeting_set_stages:
                 skipped['meeting_set'] += 1
                 continue
-        elif args.mode == 'analytics':
-            # Analytics mode: include ALL pipelines and stages (no exclusions)
+        elif args.mode in FULL_FIELD_MODES:
+            # Analytics/incremental: include ALL pipelines and stages (no exclusions)
             # Renewal pipeline is now included for GRR/NRR metrics
             pass
         # history mode: include everything, no filters
@@ -749,8 +793,8 @@ def main():
             if renewal_revenue is not None:
                 deal_dict['renewal_revenue'] = renewal_revenue
 
-        # Add analytics-specific fields
-        if args.mode == 'analytics':
+        # Add analytics-specific fields (incremental writes the same set)
+        if args.mode in FULL_FIELD_MODES:
             # Determine deal_status using pipeline config
             if is_won_stage(stage):
                 deal_status = 'won'
@@ -853,8 +897,8 @@ def main():
         print(f'    {skipped["no_company"]} No company')
         print(f'    {skipped["no_slug"]} Invalid slug')
         print(f'  Output: {out}')
-    elif args.mode == 'analytics':
-        print(f"\n5. Analytics mode: {len(deals)} deals fetched")
+    elif args.mode in FULL_FIELD_MODES:
+        print(f"\n5. {args.mode.capitalize()} mode: {len(deals)} deals fetched")
         # Count by status
         status_counts = {'active': 0, 'won': 0, 'lost': 0}
         qualified_count = 0
@@ -955,6 +999,13 @@ def main():
         count = sum(1 for d in deals.values() if d['stage'] == s)
         print(f'  {s}: {count} deals')
 
+    problems = _collect_problems(hubspot=hubspot, upsert_failed=upsert_failed,
+                                 supabase_fatal=supabase_fatal)
+    checkpoint_status, checkpoint_problem = _update_checkpoint(
+        checkpoint_store, checkpoint_before, all_deals_api, fetch_start_ms,
+        problems, upserted)
+    if checkpoint_problem:
+        problems.append(checkpoint_problem)
     return _print_run_summary(
         mode=args.mode,
         fetched=len(all_deals_api),
@@ -962,8 +1013,8 @@ def main():
         hubspot=hubspot,
         company_unknown=company_unknown,
         supabase_status=supabase_status,
-        upsert_failed=upsert_failed,
-        supabase_fatal=supabase_fatal,
+        problems=problems,
+        checkpoint_status=checkpoint_status,
     )
 
 
@@ -982,6 +1033,10 @@ def main():
 #       individual Supabase upserts still failing after retries. The affected
 #       deals keep their stored company fields (never overwritten with
 #       "unknown"); everything else about them is refreshed.
+
+# Modes that fetch every deal field (ARR components, status, stage order)
+# and write Supabase; incremental is analytics restricted to recent changes.
+FULL_FIELD_MODES = ('analytics', 'incremental')
 
 COMPANY_DERIVED_FIELDS = ('company_id', 'company_domain', 'company_employee_count',
                           'segment', 'segment_reason')
@@ -1023,14 +1078,11 @@ def _with_previous_company_fields(deals, company_unknown, index_path):
     return merged
 
 
-def _print_run_summary(*, mode, fetched, processed, hubspot, company_unknown,
-                       supabase_status, upsert_failed, supabase_fatal):
-    """Counts of what succeeded and failed, then the exit code: 0 only when
-    nothing failed after retries."""
+def _collect_problems(*, hubspot, upsert_failed, supabase_fatal):
+    """Everything that failed after retries this run ([] = clean)."""
+    problems = []
     assoc_failed = len(hubspot.failed_association_deal_ids) if hubspot else 0
     company_failed = len(hubspot.failed_company_ids) if hubspot else 0
-    retries = hubspot.retry_count if hubspot else 0
-    problems = []
     if assoc_failed:
         problems.append(f'{assoc_failed} deals: company-association batch failed')
     if company_failed:
@@ -1039,7 +1091,49 @@ def _print_run_summary(*, mode, fetched, processed, hubspot, company_unknown,
         problems.append(f'{upsert_failed} Supabase upserts failed')
     if supabase_fatal:
         problems.append('Supabase write aborted')
+    return problems
 
+
+def _checkpoint_may_advance(problems):
+    """The whole rule: only a run with no failures may move the checkpoint.
+    Advancing past a failed write is the transcript-ETL bug (its cutoff moved
+    on data written before the real write failed, and those calls were
+    never retried)."""
+    return not problems
+
+
+def _ms_iso(ms):
+    if ms is None:
+        return 'none'
+    return datetime.utcfromtimestamp(ms / 1000).strftime('%Y-%m-%d %H:%M:%S UTC')
+
+
+def _update_checkpoint(store, stored, fetched_deals, fetch_start_ms, problems, upserted):
+    """(status line, problem or None). Advances only after a clean run, to
+    deal_sync.next_watermark(); a failed write is a problem (exit 1), and the
+    next run just re-reads the same window."""
+    if store is None:
+        return 'not used in this mode', None
+    if not _checkpoint_may_advance(problems):
+        return f'unchanged at {stored} ({_ms_iso(stored)}): run had failures', None
+    from deal_sync import JOB_DEALS, next_watermark
+    new = next_watermark(stored, fetched_deals, fetch_start_ms)
+    if new is None or new == stored:
+        return f'unchanged at {stored} ({_ms_iso(stored)}): nothing newer', None
+    try:
+        store.advance(JOB_DEALS, new, run_id=os.getenv('GITHUB_RUN_ID', 'local'),
+                      fetched=len(fetched_deals), upserted=upserted)
+    except Exception as e:
+        return (f'unchanged at {stored} ({_ms_iso(stored)})',
+                f'checkpoint write failed: {e}')
+    return f'advanced {stored} ({_ms_iso(stored)}) → {new} ({_ms_iso(new)})', None
+
+
+def _print_run_summary(*, mode, fetched, processed, hubspot, company_unknown,
+                       supabase_status, problems, checkpoint_status):
+    """Counts of what succeeded and failed, then the exit code: 0 only when
+    nothing failed after retries."""
+    retries = hubspot.retry_count if hubspot else 0
     print("\n" + "=" * 80)
     print(f"RUN SUMMARY ({mode} mode)")
     print(f"  Deals fetched from HubSpot:        {fetched}")
@@ -1047,6 +1141,7 @@ def _print_run_summary(*, mode, fetched, processed, hubspot, company_unknown,
     print(f"  Company data unknown (preserved):  {len(company_unknown)}")
     print(f"  Supabase:                          {supabase_status}")
     print(f"  HubSpot request retries taken:     {retries}")
+    print(f"  Checkpoint:                        {checkpoint_status}")
     if problems:
         print("❌ ETL finished with failures (exit 1):")
         for p in problems:

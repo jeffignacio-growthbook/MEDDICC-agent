@@ -1,0 +1,52 @@
+name: Hourly Deal Sync (incremental)
+
+# Upserts only the deals modified since the stored checkpoint minus 30 min
+# (etl_deals.py --mode incremental; design: PENDING_WORK "Incremental deal
+# sync"). The checkpoint advances only after a fully successful run and is
+# set by the full analytics sync (daily-analytics-etl.yml), which remains the
+# reconciliation backstop.
+
+on:
+  schedule:
+    # :17 past the hour: top-of-hour crons on this repo have started 2-5h late
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+# Shared with the full analytics sync so the two never write deals or the
+# checkpoint at the same time. Queue rather than cancel.
+concurrency:
+  group: deals-supabase-sync
+  cancel-in-progress: false
+
+jobs:
+  etl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests supabase python-dateutil pyyaml pytz
+
+      - name: Incremental deal sync
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python scripts/etl_deals.py --mode incremental
+
+      - name: Alert on failure
+        if: failure()
+        env:
+          ZAPIER_ALERT_URL: ${{ secrets.ZAPIER_ALERT_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python scripts/alert_etl_failure.py \
+            --job "etl-deals-incremental" \
+            --run-id "${{ github.run_id }}"
