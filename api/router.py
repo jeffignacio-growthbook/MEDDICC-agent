@@ -5931,7 +5931,7 @@ async def route_question(question: str, user_id: str,
             {"role": "user",
              "content": f"Question: {question}\n\n"
                         f"Data:\n"
-                        f"{json.dumps(synthesis_results, indent=2, default=str)[:SYNTH_PAYLOAD_CHARS]}"}
+                        f"{_smart_truncate_for_synthesis(synthesis_results, SYNTH_PAYLOAD_CHARS)}"}
         ],
         system=build_synthesis_prompt(persona),
         max_tokens=SYNTH_MAX_TOKENS
@@ -5944,8 +5944,8 @@ async def route_question(question: str, user_id: str,
             VERIFY_PROMPT.format(
                 question=question,
                 answer=raw_answer,
-                tool_results=json.dumps(
-                    tool_results, default=str)[:SYNTH_PAYLOAD_CHARS],
+                tool_results=_smart_truncate_for_synthesis(
+                    tool_results, SYNTH_PAYLOAD_CHARS),
             )
         }],
         system="Respond with only the verified answer text. "
@@ -5964,7 +5964,7 @@ async def route_question(question: str, user_id: str,
                     {"role": "user",
                      "content": f"Question: {question}\n\n"
                                 f"Data:\n"
-                                f"{json.dumps(tool_results, indent=2, default=str)[:SYNTH_PAYLOAD_CHARS]}\n\n"
+                                f"{_smart_truncate_for_synthesis(tool_results, SYNTH_PAYLOAD_CHARS)}\n\n"
                                 "Answer completely — do not cut off mid-sentence "
                                 "or mid-list. Be concise enough to finish."}
                 ],
@@ -6082,7 +6082,7 @@ async def route_question(question: str, user_id: str,
                 {"role": "user",
                  "content": f"Question: {question}\n\n"
                             f"Context: {retry_context}\n\n"
-                            f"Data:\n{json.dumps(tool_results, indent=2, default=str)[:SYNTH_PAYLOAD_CHARS]}"}
+                            f"Data:\n{_smart_truncate_for_synthesis(tool_results, SYNTH_PAYLOAD_CHARS)}"}
             ],
             system=build_synthesis_prompt(persona),
             max_tokens=SYNTH_MAX_TOKENS
@@ -6537,6 +6537,65 @@ def _cap_rows_for_synthesis(tool_results: dict, max_rows: int = 20) -> dict:
 
     cap_at_level(synthesis_copy)
     return synthesis_copy
+
+
+def _smart_truncate_for_synthesis(tool_results: dict, char_limit: int = 20000) -> str:
+    """
+    Smart JSON truncation that preserves high-value computed results.
+
+    CRITICAL: snapshot_diff and other explicitly-computed results must NEVER be
+    truncated. If the payload is too large, aggressively cap rows first, then
+    do character truncation only as a last resort.
+
+    This fixes the bug where snapshot_diff was successfully added to tool_results
+    but then got chopped off by blind [:SYNTH_PAYLOAD_CHARS] truncation.
+    """
+    import copy
+    import json
+
+    # High-value keys that should never be truncated
+    PRESERVE_KEYS = {'snapshot_diff', 'waterfall', 'summary', 'narrative', 'table'}
+
+    # First attempt: serialize as-is
+    full_json = json.dumps(tool_results, indent=2, default=str)
+    if len(full_json) <= char_limit:
+        return full_json
+
+    # Oversized - need to cap. Check if we have high-value computed results
+    has_preserved = any(key in tool_results for key in PRESERVE_KEYS)
+
+    if has_preserved:
+        # Aggressively cap rows to preserve computed results
+        capped = copy.deepcopy(tool_results)
+        if 'rows' in capped and isinstance(capped['rows'], list):
+            original_count = len(capped['rows'])
+            # Start with just 5 rows to leave room for snapshot_diff
+            capped['rows'] = capped['rows'][:5]
+            capped['_rows_capped'] = f"Showing 5 of {original_count} rows to preserve snapshot_diff. Counts include all {original_count}."
+
+        attempt_json = json.dumps(capped, indent=2, default=str)
+        if len(attempt_json) <= char_limit:
+            logger.info(f"[TRUNCATE] Capped rows to 5 to preserve computed results "
+                       f"({len(full_json)} → {len(attempt_json)} chars)")
+            return attempt_json
+
+        # Still too big - try no rows at all, just computed results
+        no_rows = copy.deepcopy(tool_results)
+        if 'rows' in no_rows:
+            original_count = len(no_rows['rows'])
+            no_rows['rows'] = []
+            no_rows['_rows_removed'] = f"Rows removed for synthesis (had {original_count}). snapshot_diff preserved with full data."
+
+        attempt_json = json.dumps(no_rows, indent=2, default=str)
+        if len(attempt_json) <= char_limit:
+            logger.warning(f"[TRUNCATE] Removed all rows to preserve snapshot_diff "
+                          f"({len(full_json)} → {len(attempt_json)} chars)")
+            return attempt_json
+
+    # Last resort: character truncation (but we tried to preserve computed results first)
+    logger.warning(f"[TRUNCATE] Character-level truncation as last resort "
+                  f"({len(full_json)} → {char_limit} chars)")
+    return full_json[:char_limit]
 
 
 def build_synthesis_prompt(persona: dict) -> str:
