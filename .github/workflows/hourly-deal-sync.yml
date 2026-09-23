@@ -12,10 +12,12 @@ on:
     - cron: '17 * * * *'
   workflow_dispatch:
 
-# Shared with the full analytics sync so the two never write deals or the
-# checkpoint at the same time. Queue rather than cancel.
+# The full sync and this run never write at the same time: both hold the
+# sync lease in Supabase (scripts/deal_sync.py SyncLease). A run that finds
+# it held skips (exit 0) and the next hour re-reads the window. Own group,
+# so a queued incremental can never cancel a pending full sync.
 concurrency:
-  group: deals-supabase-sync
+  group: deals-incremental-sync
   cancel-in-progress: false
 
 jobs:

@@ -417,6 +417,53 @@ def main():
     print(f"HUBSPOT DEALS ETL - MODE: {args.mode.upper()}")
     print("=" * 80)
 
+    # Every run that writes Supabase holds the sync lease, so a full sync and
+    # an incremental run never write at the same time (scripts/deal_sync.py).
+    lease = None
+    if os.getenv('SUPABASE_URL'):
+        lease, code = _take_lease(args.mode)
+        if lease is None:
+            return code
+    try:
+        return _run(args, lease)
+    finally:
+        if lease is not None:
+            lease.release()
+
+
+def _take_lease(mode):
+    """(lease, None) once held; (None, exit code) when this run must stop.
+    An incremental run skips (exit 0) if another run holds the lease; any
+    other mode waits LEASE_WAIT_S, then exits 1. A DB error exits 1."""
+    import uuid
+    import deal_sync
+    print("\n0. Taking the deal sync lease...")
+    holder = f"{os.getenv('GITHUB_RUN_ID', 'local')}-{mode}-{uuid.uuid4().hex[:8]}"
+    wait_s = 0 if mode == 'incremental' else deal_sync.LEASE_WAIT_S
+    try:
+        sys.path.insert(0, str(REPO_ROOT / 'scripts'))
+        from supabase_client import SupabaseWriter
+        lease = deal_sync.SyncLease(SupabaseWriter().client, holder, mode)
+        if lease.acquire(wait_s=wait_s):
+            print(f"   ✓ Lease held by this run ({holder})")
+            return lease, None
+    except Exception as e:
+        print(f"❌ Could not take the deal sync lease: {e}")
+        return None, 1
+    if mode == 'incremental':
+        print("\n" + "=" * 80)
+        print("RUN SUMMARY (incremental mode)")
+        print(f"  ⏭️  Skipped: the sync lease is held by {lease.describe_other()}.")
+        print("  Nothing fetched or written; checkpoint unchanged. The next hourly")
+        print("  run re-reads this window.")
+        print("=" * 80)
+        return None, 0
+    print(f"❌ The sync lease is still held by {lease.describe_other()} after waiting "
+          f"{wait_s}s; nothing written")
+    return None, 1
+
+
+def _run(args, lease):
     # Load stage exclusions from config
     excluded = get_excluded_stages()
 
@@ -951,8 +998,15 @@ def main():
     supabase_status = 'not configured (SUPABASE_URL unset) — skipped'
     upserted = upsert_failed = 0
     supabase_fatal = False
+    # The lease must still be ours: one that expired and was taken means
+    # another run may be writing, so this one writes nothing.
+    lease_lost = lease is not None and not _still_hold(lease)
+    if lease_lost:
+        print('\n6. ❌ Sync lease lost before the write phase — not writing Supabase')
+        supabase_fatal = True
+        supabase_status = 'NOT written: sync lease lost before the write phase'
     # Write to Supabase if configured
-    if os.getenv('SUPABASE_URL'):
+    elif os.getenv('SUPABASE_URL'):
         print(f'\n6. Writing to Supabase...')
         try:
             sys.path.insert(0, str(REPO_ROOT / 'scripts'))
@@ -1007,7 +1061,9 @@ def main():
     problems = _collect_problems(hubspot=hubspot, upsert_failed=upsert_failed,
                                  supabase_fatal=supabase_fatal)
     deletion_status = 'not used in this mode'
-    if checkpoint_store is not None:
+    if lease_lost:
+        deletion_status = 'skipped: sync lease lost'
+    elif checkpoint_store is not None:
         deletion_status, deletion_problem = _apply_deletions(hubspot, checkpoint_store.sb)
         if deletion_problem:
             problems.append(deletion_problem)
@@ -1114,6 +1170,15 @@ def _collect_problems(*, hubspot, upsert_failed, supabase_fatal):
     if supabase_fatal:
         problems.append('Supabase write aborted')
     return problems
+
+
+def _still_hold(lease):
+    """Renew the lease; False if it was lost or can't be confirmed."""
+    try:
+        return lease.renew()
+    except Exception as e:
+        print(f'  ⚠️  Could not renew the sync lease: {e}')
+        return False
 
 
 def _checkpoint_may_advance(problems):

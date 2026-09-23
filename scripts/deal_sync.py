@@ -156,3 +156,61 @@ class CheckpointStore:
             "fetched": int(fetched),
             "upserted": int(upserted),
         }, on_conflict="job").execute()
+
+
+# ── Write lease ──────────────────────────────────────────────────────────────
+# Any etl_deals.py run that writes Supabase holds this lease (deal_sync_leases,
+# migration 071) so a full sync and an incremental run never write at once.
+# A GitHub Actions concurrency group alone can't guarantee that: the manual
+# analytics workflows aren't in it, and a newly queued run cancels the pending
+# one. Longer than the longest run (full sync 8-12 min); renewed before the
+# write phase, so it only expires on a crashed or hung runner.
+LEASE_TTL_S = 45 * 60
+# A non-incremental run finding the lease held waits this long (incremental
+# runs take seconds to a couple of minutes) before exiting 1. An incremental
+# run doesn't wait: it skips, and the next hourly run re-reads the window.
+LEASE_WAIT_S = 5 * 60
+LEASE_POLL_S = 15
+
+
+class SyncLease:
+    """Lease on the deals sync, held in Supabase through atomic SQL functions."""
+
+    def __init__(self, sb, holder, mode, job=JOB_DEALS):
+        self.sb, self.holder, self.mode, self.job = sb, holder, mode, job
+        self.held = False
+        self.other = None      # {'holder', 'mode', 'expires_at'} when someone else holds it
+
+    def _call(self, name, **params):
+        return self.sb.rpc(name, {'p_job': self.job, 'p_holder': self.holder, **params}).execute().data
+
+    def acquire(self, wait_s=0):
+        """True once held. Polls until wait_s has passed; a DB error raises."""
+        deadline = time.monotonic() + wait_s
+        while True:
+            row = self._call('acquire_deal_sync_lease', p_mode=self.mode, p_ttl_seconds=LEASE_TTL_S)
+            if row and row.get('acquired'):
+                self.held, self.other = True, None
+                return True
+            self.other = row
+            if time.monotonic() >= deadline:
+                return False
+            time.sleep(min(LEASE_POLL_S, max(deadline - time.monotonic(), 0)))
+
+    def renew(self):
+        """True if still ours (extends the expiry); False if it was lost."""
+        return bool(self._call('renew_deal_sync_lease', p_ttl_seconds=LEASE_TTL_S))
+
+    def release(self):
+        """Release it if ours. Never raises: expiry covers a failed release."""
+        if not self.held:
+            return
+        try:
+            self._call('release_deal_sync_lease')
+        except Exception as e:
+            print(f"⚠️  Could not release the sync lease ({e}); it expires in {LEASE_TTL_S // 60} min")
+        self.held = False
+
+    def describe_other(self):
+        o = self.other or {}
+        return f"{o.get('mode', '?')} run {o.get('holder', '?')} (lease until {o.get('expires_at', '?')})"

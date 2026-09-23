@@ -83,12 +83,14 @@ class DB(base.DB):
         self.rpc_calls = []
 
     def rpc(self, name, params):
+        if name != "tombstone_deal":
+            return super().rpc(name, params)     # lease functions
         db = self
 
         class Call:
             def execute(self_inner):
-                assert name == "tombstone_deal", name
                 db.rpc_calls.append(params)
+                db.rpc_log.append((name, params))
                 if db.fail_rpc:
                     raise RuntimeError("planted tombstone failure")
                 return type("R", (), {"data": db._tombstone(**params)})()

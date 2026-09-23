@@ -59,7 +59,16 @@ once the PR merges.
     a deal that still exists but is missing from the listing fails the run;
     more than 25 orphans fails the run and touches nothing;
   - it re-sets the checkpoint.
-- The two share a concurrency group and both alert on failure.
+- Both alert on failure. Their writes are serialised by a DB lease, not a
+  shared Actions group (migration 071 `deal_sync_leases`, `deal_sync.SyncLease`).
+  A shared group left the manual analytics workflows unguarded and let a
+  newly queued incremental cancel a pending full sync. Every Supabase-writing
+  `etl_deals.py` run takes the lease. An incremental run that finds it held
+  skips (exit 0; the next hour re-reads the window). Other runs wait 5 min,
+  then exit 1. TTL 45 min, renewed before writing; a lost lease means no
+  writes. Test: `test_deal_sync_lease.py` (two real concurrent runs; the
+  no-lease control shows a stale overwrite plus a false reconciliation
+  failure). Live SQL contract checked in a rolled-back transaction.
 
 **Boundary rules** (the transcript-ETL lessons, each pinned by a
 planted-bug test):

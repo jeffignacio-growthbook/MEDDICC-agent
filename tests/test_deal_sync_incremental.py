@@ -35,6 +35,7 @@ import io
 import json
 import os
 import sys
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -128,17 +129,61 @@ class DB:
     KEYS = {"deals": "deal_id", "deal_sync_checkpoints": "job"}
 
     def __init__(self):
-        self.tables = {"deals": {}, "deal_sync_checkpoints": {}}
+        self.tables = {"deals": {}, "deal_sync_checkpoints": {}, "deal_sync_leases": {}}
         self.fail_upsert_ids = set()
         self.fail_checkpoint_write = False
+        self.rpc_log = []
+        self.on_rpc = None               # test hook, called before each rpc runs
+        self._lock = threading.Lock()    # each SQL function is one atomic statement
 
     def table(self, name):
         return _Q(self, name)
 
+    def now(self):
+        return time.time()
+
+    def rpc_calls_named(self, name):
+        return [p for n, p in self.rpc_log if n == name]
+
     def rpc(self, name, params):
-        """tombstone_deal() for the no-deletions case; the deletion contract
-        itself is tested in test_deal_sync_deletions.py."""
-        return type("Call", (), {"execute": lambda self_: type("R", (), {"data": "absent"})()})()
+        db = self
+
+        class Call:
+            def execute(self_):
+                with db._lock:
+                    db.rpc_log.append((name, params))
+                    if db.on_rpc:
+                        db.on_rpc(name, params)
+                    return type("R", (), {"data": db._rpc(name, params)})()
+        return Call()
+
+    def _rpc(self, name, params):
+        """Mirrors of the lease functions (migration 071); tombstone_deal()
+        is 'absent' here, its contract is tested in test_deal_sync_deletions."""
+        leases, now = self.tables["deal_sync_leases"], self.now()
+        if name == "acquire_deal_sync_lease":
+            cur = leases.get(params["p_job"])
+            if cur is None or cur["expires_at"] <= now or cur["holder"] == params["p_holder"]:
+                cur = leases[params["p_job"]] = {
+                    "job": params["p_job"], "holder": params["p_holder"], "mode": params["p_mode"],
+                    "expires_at": now + params["p_ttl_seconds"]}
+            return {"acquired": cur["holder"] == params["p_holder"], "holder": cur["holder"],
+                    "mode": cur["mode"], "expires_at": datetime.fromtimestamp(
+                        cur["expires_at"], timezone.utc).isoformat()}
+        if name == "renew_deal_sync_lease":
+            cur = leases.get(params["p_job"])
+            if cur is None or cur["holder"] != params["p_holder"]:
+                return False
+            cur["expires_at"] = now + params["p_ttl_seconds"]
+            return True
+        if name == "release_deal_sync_lease":
+            cur = leases.get(params["p_job"])
+            if cur is None or cur["holder"] != params["p_holder"]:
+                return False
+            del leases[params["p_job"]]
+            return True
+        assert name == "tombstone_deal", name
+        return "absent"
 
 
 class _Q:
