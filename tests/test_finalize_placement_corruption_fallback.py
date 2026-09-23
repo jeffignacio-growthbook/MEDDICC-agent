@@ -21,9 +21,16 @@ The existing placement tests (test_aggregation_placement_corruption.py
 etc.) only unit-test the DETECTOR (verify_total_placement), never what the
 loop does once it fires, which is why this went unnoticed.
 
-This test replays the 2026-09-14 EMEA incident shape end-to-end through
-the REAL dynamic_query_loop, reaching _finalize_from_data via the
-query_pipeline_movement fast path:
+Primary test: the faithful 2026-09-14 route. An EMEA question is answered
+by filter_table WITH the region filter, so dimension verification passes on
+its own merits; the main loop's detection hands off to finalize, and
+finalize's own retry is corrupted again (see _run_incident_route).
+
+Secondary test: the same corruption reached through the
+query_pipeline_movement fast path, a different real entry into
+_finalize_from_data. Its question omits "EMEA" deliberately: that path
+never runs a region filter, so dimension verification would (correctly)
+reject the answer before the aggregation check ever runs:
   1. the first answer states a wrong total ($50,000 vs a real $6,890,371.78),
   2. AGGREGATION_VERIFY forces one retry with the correct value,
   3. the retry puts $6,890,371.78 on Creative CX's line item (the incident),
@@ -134,6 +141,82 @@ def _planted_bug_router():
     return mod
 
 
+INCIDENT_QUESTION = "show me EMEA closed won and closed lost deals since January"
+EMEA_ROWS = [dict(d, region="EMEA") for d in DEALS]
+
+
+def _run_incident_route(router_module):
+    """The faithful 2026-09-14 route, every gate real and none bypassed:
+    an EMEA question answered by filter_table WITH the region filter (so
+    dimension verification passes on its own merits), then the main loop's
+    AGGREGATION_VERIFY forces a retry, the main loop's placement gate
+    detects the corrupted retry and hands off to _finalize_from_data,
+    whose own aggregation check forces its one retry, and that retry is
+    corrupted again. Five LLM calls, each triggered by a real detection."""
+    wrong = "EMEA " + WRONG_FIRST_ANSWER[0].lower() + WRONG_FIRST_ANSWER[1:]
+    corrupted = "EMEA " + CORRUPTED_RETRY[0].lower() + CORRUPTED_RETRY[1:]
+    client = H.ScriptedClient([
+        json.dumps({"tool": "filter_table", "params": {
+            "table": "deals", "columns": ["deal_id", "company_name", "deal_value", "region"],
+            "filters": [["eq", "region", "EMEA"]]}}),
+        json.dumps({"answer": wrong}),       # main loop: wrong total
+        json.dumps({"answer": corrupted}),   # main loop retry: corrupted
+        json.dumps({"answer": wrong}),       # finalize synthesis: wrong total
+        json.dumps({"answer": corrupted}),   # finalize retry: corrupted again
+    ])
+    saved = {
+        "filter_table": H.tools_module.filter_table,
+        "classify": H.table_classifier_module.classify_relevant_tables,
+        "schema": H.schema_context_module.get_schema_context,
+        "anchors": router_module.resolve_snapshot_anchor_dates,
+    }
+
+    async def fake_filter_table(sb, **kwargs):
+        return {"rows": copy.deepcopy(EMEA_ROWS), "table": "deals"}
+
+    H.tools_module.filter_table = fake_filter_table
+    H.table_classifier_module.classify_relevant_tables = lambda q, c: ["deals"]
+    H.schema_context_module.get_schema_context = (
+        lambda sb, tables_with_descriptions=None, lightweight=False:
+            "TABLE: deals\n  deal_id, company_name, deal_value, region\n")
+    router_module.resolve_snapshot_anchor_dates = lambda sb, tw: (None, None)
+    try:
+        return asyncio.run(router_module.dynamic_query_loop(
+            question=INCIDENT_QUESTION, history=[],
+            params={"time_window": H.DEFAULT_TIME_WINDOW},
+            sb=H._FakeSupabase(), client=client)), client
+    finally:
+        H.tools_module.filter_table = saved["filter_table"]
+        H.table_classifier_module.classify_relevant_tables = saved["classify"]
+        H.schema_context_module.get_schema_context = saved["schema"]
+        router_module.resolve_snapshot_anchor_dates = saved["anchors"]
+
+
+def test_incident_route_main_loop_then_finalize_ships_the_fallback():
+    result, client = _run_incident_route(router)
+    assert len(client.calls) == 5, (
+        f"the incident route must reach the finalize retry through real "
+        f"detections (tool, answer, main-loop retry, finalize synthesis, "
+        f"finalize retry) — got {len(client.calls)} LLM calls")
+    assert result["answered"] is False
+    assert "Creative CX at $6,890,371.78" not in result["answer"], (
+        f"the corrupted retry answer shipped: {result['answer']!r}")
+    assert "could not state the corrected total reliably" in result["answer"]
+    print("✓ incident route (EMEA, real region filter, main-loop detection "
+          "→ finalize): the honest fallback ships, not the corruption")
+
+
+def test_incident_route_planted_bug_ships_the_corruption():
+    result, client = _run_incident_route(_planted_bug_router())
+    assert len(client.calls) == 5
+    assert "Creative CX at $6,890,371.78" in result["answer"] and result["answered"] is True, (
+        f"with the old undefined-`tail` call restored, the incident route "
+        f"should ship the corrupted answer as answered=True — got "
+        f"answered={result.get('answered')}: {result['answer']!r}")
+    print("✓ incident route, planted bug: the corrupted answer ships as "
+          "answered=True — exactly the pre-fix production behavior")
+
+
 def test_placement_corruption_at_finalize_ships_the_fallback_not_the_corruption():
     result, client = _run(router)
     assert len(client.calls) == 3, (
@@ -161,6 +244,8 @@ def test_planted_bug_reproduces_the_silent_ship():
 
 
 if __name__ == "__main__":
+    test_incident_route_main_loop_then_finalize_ships_the_fallback()
+    test_incident_route_planted_bug_ships_the_corruption()
     test_placement_corruption_at_finalize_ships_the_fallback_not_the_corruption()
     test_planted_bug_reproduces_the_silent_ship()
     print("\n✅ All tests passed")
