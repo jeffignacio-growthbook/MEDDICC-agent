@@ -16,6 +16,9 @@ import os
 import json
 from datetime import date
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 
@@ -129,7 +132,7 @@ def main():
                 continue  # Skip this deal
 
             # Coalesce each component to 0 if the other exists
-            forecast_value = float(new_arr or 0) + float(expansion_arr or 0)
+            forecast_value = incremental_arr(d)
         else:
             # For default pipeline: Incremental ARR = New ARR + Expansion ARR.
             # Recompute directly from the two raw, independently-reliable
@@ -149,7 +152,7 @@ def main():
                 g['unknown_incremental_count_default'] += 1
                 continue  # Skip this deal
 
-            forecast_value = float(new_arr or 0) + float(expansion_arr or 0)
+            forecast_value = incremental_arr(d)
 
         g['open_value'] += forecast_value
         g['open_count'] += 1

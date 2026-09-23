@@ -19,6 +19,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from supabase_client import select_all
 from sdr_utils import rate_or_gap, today_in_reporting_tz
 
+# The ONE definition of Incremental ARR (new_arr + expansion_arr, NULL-safe).
+# Never re-sum the two fields inline — tests/test_incremental_arr_single_
+# source.py fails the build on any reimplementation outside this function.
+from api.incremental_arr import incremental_arr
+
 # aggregate_results import moved to function scope (query_pipeline)
 # to avoid false positive in handler registry scanner (Phase 1a fix)
 
@@ -2514,12 +2519,10 @@ async def query_pipeline(params: dict, sb) -> dict:
     uncategorized_deals = []  # Deals with NO classification (neither incremental nor renewal)
 
     for deal in deals_rows:
-        expansion_arr = deal.get("expansion_arr") or 0
-        new_arr = deal.get("new_arr") or 0
         renewal_revenue = deal.get("renewal_revenue") or 0
 
         # Calculate incremental value (dollar-level)
-        incremental_value = expansion_arr + new_arr
+        incremental_value = incremental_arr(deal)
 
         # Use is_incremental_pipeline() to determine if deal counts (matches audit)
         if is_incremental_pipeline(deal):
@@ -3127,13 +3130,11 @@ async def query_rep_attainment(params: dict, sb) -> dict:
         if pipeline_id == _RENEWAL_PIPELINE_ID:
             continue
 
-        # Incremental ARR = new_arr + expansion_arr (matches quota basis)
-        new_arr = deal.get("new_arr") or 0
-        expansion_arr = deal.get("expansion_arr") or 0
-        incremental_arr = new_arr + expansion_arr
+        # Incremental ARR (matches quota basis)
+        deal_incremental = incremental_arr(deal)
 
         if owner:
-            won_by_email[owner] = won_by_email.get(owner, 0) + incremental_arr
+            won_by_email[owner] = won_by_email.get(owner, 0) + deal_incremental
     
     # Get all unique rep emails (union of targets and won)
     all_rep_emails = set(targets_by_email.keys()) | set(won_by_email.keys())
@@ -5475,7 +5476,6 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         # Add dollar fields (defense in depth with semantic gap detector)
         # Query deals table for incremental ARR of added/exited deals
         if result.get("snapshot_dates"):
-            from incremental_arr import incremental_arr
             try:
                 prior_date, current_date = result["snapshot_dates"]
                 prior_rows = list(_pm_latest_row_per_deal(by_date[prior_date]).values())

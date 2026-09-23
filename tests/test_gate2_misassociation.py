@@ -79,14 +79,18 @@ def test_verify_activity_baseline_case():
 
     results = extract_select_calls(test_file)
 
-    # Find the specific patterns at lines 61 and 75-76
+    # Find the specific patterns: the emails .select() (originally line 61)
+    # and the multi-line deals .select() right after it (originally 75-76)
+    # that the buggy parser mis-associated with it. Located by content,
+    # not hardcoded line numbers — an unrelated edit above them (e.g. an
+    # added import) must not break this test.
     emails_pattern = None
     deals_pattern = None
 
     for line_num, table, cols, _ in results:
-        if 60 <= line_num <= 62 and table == "emails":
+        if table == "emails" and emails_pattern is None:
             emails_pattern = (line_num, table, cols)
-        if 75 <= line_num <= 77 and table == "deals":
+        elif table == "deals" and emails_pattern is not None and deals_pattern is None:
             deals_pattern = (line_num, table, cols)
 
     # Verify emails pattern was found correctly

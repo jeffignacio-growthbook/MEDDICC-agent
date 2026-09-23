@@ -3139,10 +3139,9 @@ async def _call_handler_as_tool(handler_name: str, params: dict, sb) -> dict:
                 # Array is full population, safe to recalculate
                 tool_results["total_deals"] = len(deals)
                 if "total_pipeline" in tool_results and deals:
+                    from api.incremental_arr import incremental_arr
                     tool_results["total_pipeline"] = sum(
-                        (d.get("expansion_arr") or 0) + (d.get("new_arr") or 0)
-                        for d in deals
-                    )
+                        incremental_arr(d) for d in deals)
             # else: array is a sample, keep handler's aggregate fields unchanged
 
     # Success - return results in loop-expected format

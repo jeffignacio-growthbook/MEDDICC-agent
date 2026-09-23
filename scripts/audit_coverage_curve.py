@@ -48,6 +48,8 @@ REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 sys.path.insert(0, str(REPO_ROOT / "scripts" / "analytics"))
 sys.path.insert(0, str(REPO_ROOT / "api"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 
 from supabase_client import select_all
 from db import get_supabase
@@ -78,7 +80,7 @@ def actual_incremental_closed_won(sb, q_start_iso, q_end_iso):
             continue
         if not (q_start_iso <= str(close_date)[:10] <= q_end_iso):
             continue
-        total += (d.get("new_arr") or 0) + (d.get("expansion_arr") or 0)
+        total += incremental_arr(d)
         n += 1
     return total, n
 

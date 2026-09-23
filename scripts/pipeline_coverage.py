@@ -68,6 +68,8 @@ REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 sys.path.insert(0, str(REPO_ROOT / "scripts" / "analytics"))
 sys.path.insert(0, str(REPO_ROOT / "api"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 
 logger = logging.getLogger(__name__)
 
@@ -151,7 +153,7 @@ def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]
         close_date = d.get("close_date")
         if not close_date or not (q_start_iso <= str(close_date)[:10] <= q_end_iso):
             continue
-        d["_incremental_value"] = (d.get("expansion_arr") or 0) + (d.get("new_arr") or 0)
+        d["_incremental_value"] = incremental_arr(d)
         d["_stage_order"] = stage_order
         qualified_deals.append(d)
 

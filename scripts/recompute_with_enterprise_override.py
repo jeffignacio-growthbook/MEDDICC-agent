@@ -11,6 +11,10 @@ import os
 from datetime import datetime, timezone
 from supabase import create_client, Client
 from dotenv import load_dotenv
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+from api.incremental_arr import incremental_arr  # the one Incremental ARR definition
 
 load_dotenv()
 
@@ -213,7 +217,7 @@ def main():
                                   else 'WARN' if signal_2_fires and signal_3_result == 'no_fire'
                                   else 'no_signal_at_risk' if signal_2_fires and signal_3_result == 'no_data'
                                   else 'HEALTHY',
-                'deal_value': (deal.get('new_arr', 0) or 0) + (deal.get('expansion_arr', 0) or 0)
+                'deal_value': incremental_arr(deal)
             })
 
     # Report overall results

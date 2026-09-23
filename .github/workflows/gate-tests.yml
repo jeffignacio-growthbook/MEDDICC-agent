@@ -1243,6 +1243,17 @@ jobs:
           # routing list gains a handler without a canary case.
           PYTHONPATH=. python3 tests/test_canary_no_silent_drop.py
 
+      - name: "TEST 0zb — Offline: Incremental ARR has one definition (no inline new_arr + expansion_arr)"
+        run: |
+          set -e
+          # 2026-09-23: ~25 inline copies of new_arr + expansion_arr across
+          # api/ and scripts/ were audited "individually correct" — not
+          # the same as governed, since any one could drift unnoticed.
+          # All now call api/incremental_arr.py:incremental_arr(); this
+          # AST gate fails on any new inline sum (every shape the
+          # originals used, incl. HubSpot's new_revenue/expansion_revenue).
+          PYTHONPATH=. python3 tests/test_incremental_arr_single_source.py
+
       - name: "TEST 1 — Competitive intel handler against real data"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
