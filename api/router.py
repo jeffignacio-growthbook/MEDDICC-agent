@@ -4949,12 +4949,27 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
         # Fast-path: query_pipeline_movement (row-based, preserves OLD synthesis)
         # Normal synthesis: query_pipeline, query_waterfall, query_stale_deals, query_rep_pipeline (structured)
         if tool_name == "query_pipeline_movement" and "error" not in result:
-            logger.info(f"[UNIFIED_ROUTING] {tool_name} succeeded "
-                       f"→ finalizing immediately (fast-path preservation)")
-            # Must append tool result to messages before finalization
-            # (see _append_tool_result_message docstring - 2026-09-11 incident)
-            _append_tool_result_message(messages, raw, result, tool_name)
-            return await _finalize_from_data(f"{tool_name}_fast_path")
+            # SEMANTIC GAP DETECTION: Check if question asks for something
+            # the handler didn't provide. If user asks for dollars/ARR but
+            # handler has no dollar fields, continue loop to fill the gap
+            # instead of finalizing with incomplete data.
+            semantic_gap = _detect_semantic_gap(question, result, tool_name)
+            if semantic_gap:
+                gap_type, gap_detail = semantic_gap
+                logger.warning(
+                    f"[SEMANTIC_GAP] {tool_name} succeeded but missing {gap_type}: "
+                    f"{gap_detail}. Continuing loop to fill gap instead of "
+                    f"finalizing immediately."
+                )
+                cost_state["primitives_fired"]["semantic_gap_detected"] = True
+                # Don't finalize - continue loop to let model query for missing data
+            else:
+                logger.info(f"[UNIFIED_ROUTING] {tool_name} succeeded "
+                           f"→ finalizing immediately (fast-path preservation)")
+                # Must append tool result to messages before finalization
+                # (see _append_tool_result_message docstring - 2026-09-11 incident)
+                _append_tool_result_message(messages, raw, result, tool_name)
+                return await _finalize_from_data(f"{tool_name}_fast_path")
 
         # Structured handlers continue to next iteration for normal synthesis
         if tool_name in ("query_pipeline", "query_rep_pipeline") and "error" not in result:
@@ -6596,6 +6611,64 @@ def _smart_truncate_for_synthesis(tool_results: dict, char_limit: int = 20000) -
     logger.warning(f"[TRUNCATE] Character-level truncation as last resort "
                   f"({len(full_json)} → {char_limit} chars)")
     return full_json[:char_limit]
+
+
+def _detect_semantic_gap(question: str, handler_result: dict, handler_name: str) -> tuple:
+    """
+    Detect if question asks for something the handler didn't provide.
+
+    This is a GENERAL gap detector that catches any handler with incomplete
+    output before fast-path finalization happens. Prevents finalizing when
+    the user asked X but the handler didn't return X.
+
+    Returns:
+        (gap_type, gap_detail) if gap detected, None if no gap
+
+    Example gaps:
+    - Question mentions "dollar", "ARR", "$", "pipeline value" but result has no dollar fields
+    - Question asks for "top deals" but result has no deal details
+    - Question asks "why" but result has no analysis/reasons
+
+    This catches the NEXT handler with a similar blind spot before a real
+    question exposes it, rather than needing to patch each handler individually.
+    """
+    q_lower = question.lower()
+
+    # Dollar/ARR gap: Question asks for monetary values but result has none
+    dollar_terms = ["dollar", "arr", "$", "pipeline value", "deal value",
+                    "how much", "total value", "revenue"]
+    asks_for_dollars = any(term in q_lower for term in dollar_terms)
+
+    if asks_for_dollars:
+        # Check if result has any dollar-related fields
+        dollar_fields = ["incremental_arr", "new_arr", "expansion_arr", "deal_value",
+                        "arr", "total_arr", "pipeline_value", "total_value",
+                        "arr_total", "arr_sum"]
+
+        def has_dollar_field(obj, depth=0):
+            """Recursively check for dollar fields in nested dicts."""
+            if depth > 3:  # Limit recursion
+                return False
+            if not isinstance(obj, dict):
+                return False
+            for key, value in obj.items():
+                if any(df in key.lower() for df in dollar_fields):
+                    return True
+                if isinstance(value, dict) and has_dollar_field(value, depth + 1):
+                    return True
+            return False
+
+        if not has_dollar_field(handler_result):
+            return ("dollar_fields",
+                   f"Question asks for monetary values ({[t for t in dollar_terms if t in q_lower]}) "
+                   f"but {handler_name} returned no dollar fields")
+
+    # Future gap types can be added here:
+    # - "top deals" mentioned but no deal_id/company_name fields
+    # - "why" questions but no analysis/reason fields
+    # - "breakdown by" but no by_X dimension fields
+
+    return None
 
 
 def build_synthesis_prompt(persona: dict) -> str:
