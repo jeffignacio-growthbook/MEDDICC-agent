@@ -1,0 +1,94 @@
+name: PR Offline Tests
+
+# Runs automatically on every pull request and every push to main — no
+# manual dispatch, no secrets, no environment approval. gate-tests.yml
+# stays the manual, secrets-backed pre-merge gate (live-data tests and the
+# Slack smoke test); this is its offline subset, so the guards that need
+# nothing but the code (the canary no-silent-drop ratchet above all) can
+# never depend on someone remembering to trigger them.
+#
+# Keep this list in step with the offline ("set -e", no secrets) steps of
+# gate-tests.yml. A test belongs here if it passes with no SUPABASE_*,
+# ANTHROPIC_*, or HubSpot credentials.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Canary — nothing a handler computes is silently dropped before synthesis"
+        run: PYTHONPATH=. python3 tests/test_canary_no_silent_drop.py
+
+      - name: Offline regression tests
+        run: |
+          failed=0
+          for t in \
+            tests/test_extract_rows_preserves_computed_fields.py \
+            tests/test_snapshot_diff_return_payload.py \
+            tests/test_supabase_client_fallback.py \
+            tests/test_date_resolution_single_source.py \
+            tests/test_time_window_resolution.py \
+            tests/test_snapshot_anchors.py \
+            tests/test_schema_context_snapshot_visibility.py \
+            tests/test_enrichment_shortcut.py \
+            tests/test_data_dictionary_registration.py \
+            tests/test_scratchpad_answer_rejection.py \
+            tests/test_pipeline_stage_lookup.py \
+            tests/test_snapshot_diff_reporting_scope.py \
+            tests/test_snapshot_finalize_forced_fetch.py \
+            tests/test_finalize_shortcut_message_gap.py \
+            tests/test_snapshot_diff.py \
+            tests/test_dimension_resolver.py \
+            tests/test_aggregation_verification.py \
+            tests/test_aggregation_retry_hands_correct_value.py \
+            tests/test_false_partial_claim_gate.py \
+            tests/test_pipeline_movement_owner_role_note.py \
+            tests/test_pipeline_movement_fiscal_quarter_filter_bug.py \
+            tests/test_handler_filter_logging.py \
+            tests/test_primitive_contract.py \
+            tests/test_no_bare_substring_matching.py \
+            tests/test_gate2_misassociation.py \
+            tests/test_count_sum_population_match.py \
+            tests/test_tool_schema_completeness.py \
+            tests/test_snapshot_date_labeling_visibility.py \
+            tests/test_ambiguous_dimension_compliance.py \
+            tests/test_finalize_scratchpad_check.py \
+            tests/test_owner_email_canonicalization.py \
+            tests/test_synthesis_truncation_fix.py \
+            tests/test_supabase_retry_transport.py \
+            tests/test_zero_rows_suspicion.py \
+            tests/test_zero_rows_suspicion_compliance.py \
+            tests/test_query_cost_logging.py \
+            tests/test_execution_cost_estimate.py \
+            tests/test_loop_ceiling_sizing.py \
+            tests/test_diff_company_name_backfill.py
+          do
+            echo "::group::$t"
+            if PYTHONPATH=. python3 "$t"; then
+              echo "PASS $t"
+            else
+              echo "::error title=Offline test failed::$t"
+              failed=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $failed
