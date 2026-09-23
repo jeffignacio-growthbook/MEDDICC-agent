@@ -76,13 +76,26 @@ def _label_matches_row_value(label: str, value: Any) -> bool:
     return False
 
 
+# Name fragments that mark a column as money, and ones that mark it as an
+# ordinal/identifier/count/score — the latter always win.
+_VALUE_NAME_RE = re.compile(r"(arr|value|revenue|amount|pipeline|won|lost|"
+                            r"change|total|price|mrr|usd|dollar)", re.I)
+_NOT_VALUE_NAME_RE = re.compile(r"(week|order|_id$|^id$|count|days|score|"
+                                r"quarter|rank|index|num|pct|percent|rate|"
+                                r"ratio|age|year|month|confidence|probability)", re.I)
+
+
+def _looks_like_value_column(name: str) -> bool:
+    return bool(_VALUE_NAME_RE.search(name)) and not _NOT_VALUE_NAME_RE.search(name)
+
+
 def _infer_value_column(rows: List[dict]) -> Optional[str]:
     """Pick the numeric column to sum when the caller doesn't specify
     one. Prefers known value-like column names (real names from
     waterfall_weekly/deals_snapshot); falls back to the single numeric
-    column if there's exactly one candidate, since a genuinely
-    unambiguous shape shouldn't require the caller to name the column
-    just to be safe."""
+    column if there's exactly one candidate AND its name looks like money
+    (never a week/order/id/count/score column) — see the fallback's own
+    comment for the live incident that required that second condition."""
     if not rows:
         return None
     keys = set()
@@ -98,8 +111,16 @@ def _infer_value_column(rows: List[dict]) -> Optional[str]:
     for preferred in _PREFERRED_VALUE_COLUMNS:
         if preferred in numeric_keys:
             return preferred
-    if len(numeric_keys) == 1:
-        return numeric_keys[0]
+    # Single-numeric-column fallback, but only for a column that could
+    # plausibly hold the money a stated "total" is about (2026-09-23): on
+    # Ryan's live "pipeline added in the last two weeks" question, the
+    # query_pipeline_movement rows' ONLY numeric field was week_of_quarter,
+    # so this summed week numbers (176 rows -> 1408), declared the model's
+    # correct "$2.78M" wrong, and forced a resynthesis that shipped
+    # "$1,408 in ARR". An ordinal/id/count column is never a value column.
+    value_like = [k for k in numeric_keys if _looks_like_value_column(k)]
+    if len(numeric_keys) == 1 and value_like:
+        return value_like[0]
     return None
 
 

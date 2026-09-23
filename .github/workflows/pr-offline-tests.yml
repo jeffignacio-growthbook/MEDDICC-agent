@@ -44,6 +44,7 @@ jobs:
           for t in \
             tests/test_extract_rows_preserves_computed_fields.py \
             tests/test_snapshot_diff_return_payload.py \
+            tests/test_aggregation_value_column_inference.py \
             tests/test_supabase_client_fallback.py \
             tests/test_date_resolution_single_source.py \
             tests/test_time_window_resolution.py \
