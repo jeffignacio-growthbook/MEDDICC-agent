@@ -33,3 +33,18 @@ jobs:
           echo "Running daily base deals ETL (upserts deals table only)"
           echo "Snapshot/waterfall/forecast/win-loss remain weekly"
           python scripts/etl_deals.py --mode analytics
+
+      # Fix A (#36) makes etl_deals exit non-zero on failure; without this a
+      # red run notifies nobody. Same alert as the deal/calls ETLs.
+      - name: Alert on failure
+        if: failure()
+        env:
+          ZAPIER_ALERT_URL: ${{ secrets.ZAPIER_ALERT_URL }}
+          # record_failure() counts prior failures in Supabase etl_failures;
+          # without these it can't, and (pre-2026-09-23) then never alerted.
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python scripts/alert_etl_failure.py \
+            --job "etl-deals-analytics" \
+            --run-id "${{ github.run_id }}"

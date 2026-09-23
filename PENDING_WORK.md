@@ -57,6 +57,36 @@ so the flag reflects the loop's real outcome.
 
 ## ✅ Recently Completed
 
+### HIGH: ETL failure alerts could never fire (found and fixed 2026-09-23)
+**Status:** ✅ FIXED 2026-09-23.
+
+**What:** `scripts/alert_etl_failure.py` counts failures in Supabase
+`etl_failures` and alerts at the 2nd one. It has three gaps:
+- **No credentials.** The Daily Deal and Daily Calls ETL alert steps passed
+  only `ZAPIER_ALERT_URL`, not the Supabase credentials the counter needs.
+- **Silent fallback.** On that error `record_failure()` returned 1 ("first
+  failure"), below threshold, so no alert was ever sent. The code's own
+  comment said "alert anyway". `etl_failures` had **0 rows, ever**.
+- **No alert at all.** The Daily Analytics ETL (every 4h since #37, and the
+  only writer of Supabase `deals`) had no alert step.
+
+**Fix:**
+- An unknown failure count now alerts (fail open).
+- The db imports are lazy, so an import error degrades to "alert anyway"
+  instead of crashing the alert step.
+- All three workflows' alert steps get `SUPABASE_URL`/`SUPABASE_SERVICE_KEY`,
+  step-scoped, so the Daily Deal ETL step still has no Supabase access.
+- The analytics workflow gets the alert step, with `--job etl-deals-analytics`.
+- Test: `tests/test_etl_failure_alert.py` checks the alert logic and pins
+  all three workflows' alert wiring, with planted pre-fix controls.
+
+**Not live-tested:** a real Zapier send. That posts to the channel, so it
+needs sign-off first.
+
+**Known quirk, left as is:** despite the name, the "consecutive" count is
+the number of failures in the last 3 days, not reset by a success. That
+errs toward alerting.
+
 ### MEDIUM: Supabase `deals` up to 24h stale vs HubSpot (found 2026-09-23; mitigated to ~4h)
 **Status:** ✅ MITIGATED 2026-09-23. `daily-analytics-etl.yml` cron changed
 from `0 4 * * *` to `0 */4 * * *`. The real fix, an incremental sync, is
