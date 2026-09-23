@@ -32,6 +32,11 @@ WINDOW_OPERATOR = "GTE"
 # Above this, don't page an incremental backlog; exit 1 and let the full
 # sync (which resets the checkpoint) handle it.
 MAX_INCREMENTAL_DEALS = 9000
+# Company edits don't touch a deal's hs_lastmodifieddate, so each run also
+# re-reads the deals of companies modified in the window. Above this many
+# changed companies (e.g. a bulk enrichment), skip that pass visibly; the
+# full sync refreshes every deal's company fields anyway.
+MAX_COMPANY_PASS = 2000
 
 
 class SyncBlocked(Exception):
@@ -59,10 +64,28 @@ def window_filters(checkpoint_ms):
                     "value": str(start)}]
 
 
+def company_pass(hubspot, filters, already_ids):
+    """Deals of companies modified in the window, not already fetched.
+    Returns (extra deals, status line). A failed read raises: the run fails
+    and the checkpoint stays put. Too many changed companies is not a failure
+    (the full sync covers it) but is reported."""
+    n = hubspot.count_objects('companies', filters)
+    if n > MAX_COMPANY_PASS:
+        return [], (f"skipped: {n} companies modified (> {MAX_COMPANY_PASS}); "
+                    f"company fields refresh on the next full sync")
+    companies = hubspot.search_objects_keyset('companies', filters, ['hs_object_id'])
+    assoc = hubspot.batch_get_company_deal_associations([c['id'] for c in companies])
+    wanted = sorted({d for deals in assoc.values() for d in deals} - set(already_ids), key=int)
+    extra = hubspot.batch_read_deals(wanted) if wanted else []
+    return extra, (f"{len(companies)} companies modified -> {len(extra)} more deals re-read")
+
+
 def fetch_incremental(hubspot, store):
-    """Deals modified since (checkpoint - overlap), keyset-paged.
-    Returns (deals, checkpoint_before, window_start_ms, fetch_start_ms).
-    Raises SyncBlocked instead of guessing when it can't be done safely."""
+    """Deals modified since (checkpoint - overlap), keyset-paged, plus the
+    deals of companies modified in the same window.
+    Returns dict(deals, checkpoint, window_start_ms, fetch_start_ms,
+    company_status). Raises SyncBlocked instead of guessing when it can't be
+    done safely."""
     checkpoint = store.get(JOB_DEALS)
     if checkpoint is None:
         raise SyncBlocked("no checkpoint yet: run the full sync once "
@@ -72,9 +95,13 @@ def fetch_incremental(hubspot, store):
     if backlog > MAX_INCREMENTAL_DEALS:
         raise SyncBlocked(f"{backlog} deals modified since the checkpoint window "
                           f"(> {MAX_INCREMENTAL_DEALS}): run the full sync instead")
+    # Taken before both searches, so the watermark cap covers the company
+    # pass as well as the deal window.
     fetch_start_ms = int(time.time() * 1000)
     deals = hubspot.search_deals_keyset(extra_filters=filters)
-    return deals, checkpoint, start, fetch_start_ms
+    extra, company_status = company_pass(hubspot, filters, {d['id'] for d in deals})
+    return {"deals": deals + extra, "checkpoint": checkpoint, "window_start_ms": start,
+            "fetch_start_ms": fetch_start_ms, "company_status": company_status}
 
 
 def next_watermark(stored_ms, deals, fetch_start_ms):
