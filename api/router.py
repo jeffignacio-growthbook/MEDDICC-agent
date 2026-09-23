@@ -4205,9 +4205,24 @@ async def _dynamic_query_loop_core(question, history, params,
                                         f"[AGGREGATION_VERIFY] finalize retry placement corruption: "
                                         f"{placement_check['likely_corruption']}"
                                     )
-                                    # Force honest fallback instead of shipping corrupted data
-                                    return _diagnostic_answer(
-                                        tail, "aggregation_placement_corruption"
+                                    # Force honest fallback instead of shipping corrupted data.
+                                    # 2026-09-23: this used to be
+                                    # `return _diagnostic_answer(tail, ...)`
+                                    # with `tail` never defined in this scope
+                                    # (since 8bae539, 2026-09-15). The NameError
+                                    # was swallowed by the `except Exception`
+                                    # below, so the corrupted retry answer
+                                    # (already in final_answer_text) shipped
+                                    # every time. It also returned a bare
+                                    # string where this function's contract is
+                                    # the {"answer", "tool_results",
+                                    # "answered"} dict. _give_up() builds both.
+                                    cost_state["primitives_fired"]["aggregation_placement_corruption"] = True
+                                    return _give_up(
+                                        "aggregation_placement_corruption",
+                                        "found the figures but could not state "
+                                        "the corrected total reliably",
+                                        diff_result=diff_result,
                                     )
                     except Exception as e:
                         logger.warning(
