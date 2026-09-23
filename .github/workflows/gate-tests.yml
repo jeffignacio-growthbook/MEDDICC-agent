@@ -1222,7 +1222,7 @@ jobs:
           # synthesis carries a resolved (or explicitly-null) company_name.
           PYTHONPATH=. python3 tests/test_diff_company_name_backfill.py
 
-      - name: "TEST 0p — Offline: canary — nothing a handler computes is silently dropped before synthesis"
+      - name: "TEST 0za — Offline: canary — nothing a handler computes is silently dropped before synthesis"
         run: |
           set -e
           # 2026-09-23: four separate incidents tonight (SNAPSHOT_DIFF
