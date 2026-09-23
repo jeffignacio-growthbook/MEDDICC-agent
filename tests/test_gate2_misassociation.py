@@ -16,7 +16,13 @@ import sys
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT / "tests"))
 
-from test_column_reference_validity import extract_select_calls
+from test_column_reference_validity import extract_selects
+
+
+def extract_select_calls(path):
+    """The (line, table, columns, _) shape this test was written against,
+    from the ast-based extractor (2026-09-23 rewrite of GATE 2)."""
+    return [(s.line, s.table, s.arg, None) for s in extract_selects(path, root=path.parent)]
 
 def test_no_misassociation():
     """

@@ -848,7 +848,16 @@ jobs:
           # multi-line patterns, and split arguments. Stops lookahead if another
           # .table() found (prevents mis-association). Found 3 real bugs during
           # fix: sdr_metrics.id, deals.owner, calls.id (all corrected).
+          #
+          # 2026-09-23: rewritten on ast. "Handles split arguments" above was
+          # not true: the regex read only the first of two adjacent string
+          # literals, which is how scripts/forecast_trust.py's deals.amount
+          # (the bug this gate was built for) passed; 15 of the 144
+          # "validated" selects were truncated that way. It now checks against
+          # a snapshot of the real schema (tests/fixtures/db_schema_columns.json)
+          # and also runs on every push in pr-offline-tests.yml.
           PYTHONPATH=. python3 tests/test_column_reference_validity.py
+          PYTHONPATH=. python3 tests/test_column_reference_gate_parser.py
 
       - name: "GATE 3 — Count/sum population match: handlers reporting both count and dollars use same filtered set"
         run: |
