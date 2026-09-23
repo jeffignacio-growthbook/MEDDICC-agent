@@ -37,6 +37,8 @@ api/field_semantics.py's is_renewal_base()/is_incremental_pipeline()
 mutually exclusive — a deal can be Renewal AND Expansion at once — see
 format_dimension_resolution_note()'s handling of that.
 """
+import copy
+import functools
 import logging
 import re
 from pathlib import Path
@@ -60,7 +62,25 @@ _REPO_ROOT = Path(__file__).parent.parent
 _SCAN_COLLISION_DENYLIST = {("region", "ROW"), ("segment", "Unknown")}
 
 
-def _load_yaml(relative_path: str) -> dict:
+@functools.lru_cache(maxsize=None)
+def _parse_yaml_once(relative_path: str) -> dict:
+    """Parse a config file once per process.
+
+    2026-09-23: _load_yaml() used to open and re-parse the file on EVERY
+    call, and every per-term helper calls it, several times for a term
+    that resolves to unknown_value (see resolve_dimension_filter). The two
+    scans try every word and word-pair in the question, so one question
+    re-parsed client.yaml 180-420 times and regions.yaml 92-210 times:
+    6.8-16.3s of the request, and 630 of the 635 YAML parses in a full
+    dynamic_query_loop run.
+
+    Caching for the process lifetime is safe. These files are static
+    config that nothing writes at runtime; they change only through a
+    deploy, and each deploy starts a fresh process (railway.toml:
+    uvicorn api.main:app), so the new file is picked up on first use.
+    A missing or unparseable file is cached as {} too, exactly the value
+    the old code returned for it on every call.
+    """
     path = _REPO_ROOT / relative_path
     if not path.exists():
         return {}
@@ -69,6 +89,12 @@ def _load_yaml(relative_path: str) -> dict:
             return yaml.safe_load(f) or {}
     except Exception:
         return {}
+
+
+def _load_yaml(relative_path: str) -> dict:
+    # A deep copy per call, so a caller that mutates what it's handed can
+    # never corrupt the cached parse for the rest of the process.
+    return copy.deepcopy(_parse_yaml_once(relative_path))
 
 
 def _load_regions() -> Dict[str, dict]:
@@ -395,7 +421,8 @@ def scan_question_for_known_dimension_terms(question: str) -> List[Dict[str, Any
     Try resolving every plausible term or two-word phrase in `question`
     against the governed sources, keeping only the ones that resolve to
     an unambiguous filter. Over-inclusive by design: resolving a term is
-    an in-memory config lookup, not a DB or LLM call, so trying every
+    an in-memory config lookup (the files are parsed once per process —
+    see _parse_yaml_once), not a DB or LLM call, so trying every
     word/word-pair in a question and keeping only real hits costs
     nothing and can't miss a real region/segment/rep mention to an
     imperfect "does this look like a dimension term" heuristic.
