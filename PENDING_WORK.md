@@ -1,29 +1,11 @@
 # Pending Work
 
-**Last Updated:** 2026-09-23 (HIGH placement-corruption fallback resolved in #33; MEDIUM YAML re-parse latency and LOW test_question.py answered flag still open)
+**Last Updated:** 2026-09-23 (HIGH placement-corruption fallback resolved in #33; MEDIUM YAML re-parse latency resolved; LOW test_question.py answered flag still open)
 **Purpose:** Single tracking mechanism for all documented-but-not-implemented work
 
 ---
 
 ## 🟡 Open Items
-
-### 🟠 MEDIUM: ~11s avoidable latency per dynamic question: config YAML re-parsed 162× per call (found 2026-09-23)
-**Status:** OPEN.
-
-**What:** `api/dimension_resolver.py:_load_yaml()` (line 63) re-reads
-and re-parses its file on every call, with no caching. Its callers
-(`_load_regions()`, the segmentation-band and team-roster loaders,
-line ~186) run per dimension-term lookup. Profiling one offline
-`dynamic_query_loop` run (tests/canary_harness.py, 2026-09-23) showed
-`config/client.yaml` parsed **108×** and `config/regions.yaml` **54×**
-for a single question, about 11s of the loop's ~14s wall time spent
-inside PyYAML. The same code runs in production on every dynamic question.
-
-**Fix plan:** memoize by path plus mtime (so a config edit is still
-picked up without a restart), e.g. `functools.lru_cache` on a
-`(path, mtime)` key. Verify with the same profile: the parse count per
-question should drop to 1–2, and every `test_dimension_resolver.py` case
-must still pass.
 
 ### 🟢 LOW: `scripts/test_question.py` prints "Answered: False" for every direct dynamic_query answer (found 2026-09-23)
 **Status:** OPEN. Cosmetic, but it reads as a failure.
@@ -42,6 +24,58 @@ so the flag reflects the loop's real outcome.
 ---
 
 ## ✅ Recently Completed
+
+### MEDIUM: Config YAML re-parsed hundreds of times per dynamic question (found and fixed 2026-09-23)
+**Status:** ✅ FIXED 2026-09-23.
+
+**Cause:** `api/dimension_resolver.py:_load_yaml()` opened and re-parsed
+its file on every call, with no caching. Every per-term helper
+(`_load_regions`, `_load_segment_names`, `_load_roster`,
+`_load_renewal_pipeline_id`) calls it, and `_all_known_values()` calls
+all of them. A term that resolves costs 1 regions.yaml + 2 client.yaml
+parses. An unknown term costs 3 + 6, because the unknown_value path in
+`resolve_dimension_filter()` calls `_all_known_values()` twice. Both
+`scan_question_for_*` functions try every word and word-pair, and most
+of those are unknown, so parse count grew with question length. The
+scan docstring's claim that "resolving a term is an in-memory config
+lookup" was false. Slow since the scans shipped (2026-09-11, ba350116);
+2026-09-16's 6dc0f01e added the second `_all_known_values()` call (for a
+log line), doubling the cost of every unknown term. No other module reads config per term; the other
+config reads (handlers, time_resolver, db, plausibility, ...) happen
+once per request.
+
+**Fix:** `_parse_yaml_once()` (`functools.lru_cache`) parses each file
+once per process. `_load_yaml()` returns a deep copy, so a caller that
+mutates its result can't corrupt the cache. This deliberately differs
+from the original "path plus mtime" plan. Nothing writes these files
+at runtime; they change only through a deploy, and each Railway deploy
+starts a fresh `uvicorn api.main:app` process, so there is no
+stale-config risk in production. Locally, editing a config YAML now
+needs a server restart (`--reload` only watches .py files).
+
+**Measured (offline, same container, before = origin/main 1c88b505):**
+
+| | Before | After |
+|---|---|---|
+| Both scans, 151 questions (every distinct `query_cost_log` question + 24-question battery + `tests/regression_questions.txt`) | 1015.6s total; median 5.7s, p95 15.0s, max 56.3s | 8.7s total; median 48ms, p95 130ms, max 473ms |
+| YAML parses in those scans | 40,895 (max 2,322 per question) | 2 (one per file, whole process) |
+| Ryan's "added in the last two weeks" question, scans only | 16.3s | 134ms |
+| Same question, full offline `dynamic_query_loop` (canary_harness, 3 runs) | 16.5 / 16.1 / 15.9s; 635 parses | 0.39 / 0.27 / 0.27s; 5 parses (all once per request) |
+
+**No behavior change:** the resolution output (known and ambiguous
+terms) for all 151 questions is byte-identical before and after. 34
+questions have at least one known term and 4 have an ambiguous one.
+
+**Regression test:** `tests/test_dimension_resolver_config_cache.py`,
+wired into `pr-offline-tests.yml`, checks four things:
+- at most one parse per file across 6 dimension-heavy questions;
+- the cached read equals a fresh parse;
+- 12 terms, covering every outcome type, resolve identically cached and
+  uncached;
+- mutating a returned config doesn't reach the cache.
+
+Planted-bug controls: restoring the old reader is caught (1,408
+client.yaml / 706 regions.yaml parses), and so is dropping the deep copy.
 
 ### HIGH: Aggregation placement-corruption fallback had never worked (found and fixed 2026-09-23)
 **Status:** ✅ FIXED 2026-09-23 (PR #33). Broken from the moment it was introduced (2026-09-15, 8bae539)
