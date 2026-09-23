@@ -3131,7 +3131,7 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             continue
 
         # Incremental ARR (matches quota basis)
-        deal_incremental = incremental_arr(deal)
+        deal_incremental = (deal.get("new_arr") or 0) + (deal.get("expansion_arr") or 0)
 
         if owner:
             won_by_email[owner] = won_by_email.get(owner, 0) + deal_incremental
