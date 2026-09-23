@@ -70,6 +70,7 @@ jobs:
             tests/test_slack_mrkdwn_conversion.py \
             tests/test_deal_etl_failure_handling.py \
             tests/test_etl_failure_alert.py \
+            tests/test_deal_sync_keyset_and_checkpoint.py \
             tests/test_aggregation_verification.py \
             tests/test_aggregation_retry_hands_correct_value.py \
             tests/test_false_partial_claim_gate.py \
