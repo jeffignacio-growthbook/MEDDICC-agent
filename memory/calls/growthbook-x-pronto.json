@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook x Pronto",
+  "slug": "growthbook-x-pronto",
+  "last_etl_date": "2026-09-23T05:23:43.197374",
+  "calls": [
+    {
+      "id": "01M34SZW6A4H8YEEKT7FGM2K6B",
+      "source": "fireflies",
+      "title": "Growthbook x Pronto",
+      "date": "2026-09-22",
+      "duration_minutes": 11.619999885559082,
+      "summary": "# Growthbook x Pronto\nDate: 2026-09-22 | Duration: 11.619999885559082m\n\n## Summary\nNo summary available",
+      "organizer": "dan@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

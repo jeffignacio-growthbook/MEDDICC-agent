@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook implementation",
+  "slug": "growthbook-implementation",
+  "last_etl_date": "2026-09-23T05:23:43.197813",
+  "calls": [
+    {
+      "id": "01M34JXKJ7T5HVPD2HMJ6WV3BV",
+      "source": "fireflies",
+      "title": "Growthbook implementation",
+      "date": "2026-09-22",
+      "duration_minutes": 28.899999618530273,
+      "summary": "# Growthbook implementation\nDate: 2026-09-22 | Duration: 28.899999618530273m\n\n## Summary\nGrowthbook SDK was implemented through GTM on all pages using an HTML script tag and a Client ID lookup table variable. The initial experiment was created without a feature flag, with both control and variation configured as an AA test. However, experiment variant data-layer events were not firing, and no SDK payload or event log appeared in developer tools. Experiment data was also absent from GA4 and BigQuery, while the current SDK setup appeared to bypass the usual GA4-to-BigQuery analytics pipeline. The team discussed the possibility that a hardcoded SDK integration was missing and that existing tools such as VWO could be interfering with scripts or blocking the connection. Clear SDK logs were identified as necessary for diagnosing the failure. Next steps included rerunning tests with feature flags, seeking guidance on their implementation, involving Natasha and Logan from the support team, and asking frontend developer Nikita to help with script placement if code changes are needed. Slack communication will continue, with a follow-up meeting planned around 16:30.\n\n## Keywords\nGrowthbook, SDK, Google Tag Manager, GA4, BigQuery, feature flag\n\n## Action Items\n**Witold Styczen**  \nProvide access to Google Tag Manager and analytics (10:35)  \nCoordinate SDK and code troubleshooting (16:20)  \nRetry experiment with feature flag (18:09)  \nBe available for follow-up support call (26:19)  \n\n**Rémy Marin**  \nVerify data pipeline and logs (10:35)  \nCreate experiment with feature flag (18:09)  \nEngage Growthbook support Natasha and Logan (25:55)  \nSchedule follow-up support meeting (27:05)  \n\n**Gc (Julio)**  \nCheck with Nikita about code snippets (20:42)",
+      "organizer": "remy@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

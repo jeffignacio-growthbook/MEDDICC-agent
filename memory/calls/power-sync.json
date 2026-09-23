@@ -1,0 +1,18 @@
+{
+  "company": "power sync",
+  "slug": "power-sync",
+  "last_etl_date": "2026-09-23T05:23:43.196711",
+  "calls": [
+    {
+      "id": "01M354K16BCNAHKGWW535FHKAC",
+      "source": "fireflies",
+      "title": "power sync",
+      "date": "2026-09-22",
+      "duration_minutes": 30.579999923706055,
+      "summary": "# power sync\nDate: 2026-09-22 | Duration: 30.579999923706055m\n\n## Summary\nThe team agreed to move power calculation logic from the frontend to a backend model with API support, enabling persistence, experiment integration, and a simpler frontend while expecting minimal performance impact. The calculator should support manual mode, old experiment data, fact tables, and EAQs as population sources, with metrics selectable independently from source tables. Planned enhancements include population filters, traffic sliders, variation adjustments, adding or removing variations, and persistence of power-analysis settings. A major unresolved issue is automatically mapping SDK targeting attributes to warehouse SQL columns; manual SQL filters remain a simpler but error-prone fallback. Outdated options such as stats engine selection, chance-to-win thresholds, and deprecated segments may be removed, while several experiment types may remain out of scope. The old standalone calculator is expected to remain available alongside the new version integrated into experiment configuration. Teresa is preparing the migration plan, Luke will review it, Gabe is expected to support frontend design, and the team will finalize feature scope and filtering decisions.\n\n## Keywords\npower calculation, experiment configuration, population filter, EAQ, traffic slider, API support\n\n## Action Items\n\n**Teresa Yung**\nFinalize and share the migration and porting plan for the power calculation feature, focusing on backend API development and enabling persistence and linkage of power calculations to experiments (06:45)\nCoordinate with Gabe to align on frontend design and confirm design requirements related to the power calculator features (08:30)\nBegin API development for backend power calculation to support persistence and linkage of power calculations to experiments (24:00)\n\n**Luke Smith**\nReview and confirm the feature list to add or remove in the power calculator before the next meeting (08:30)\nPrepare documentation or examples clarifying how targeting attributes map to SQL filters in power analysis (19:20)\nFacilitate discussion with Gabe on design and provide necessary information for frontend work related to the power calculator (08:40)\nParticipate in upcoming alignment meeting to finalize features and migration plan for the power calculation feature (29:20)\n",
+      "organizer": "teresa@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

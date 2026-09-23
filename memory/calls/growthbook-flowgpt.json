@@ -1,7 +1,7 @@
 {
   "company": "Growthbook <> FlowGPT",
   "slug": "growthbook-flowgpt",
-  "last_etl_date": "2026-09-10T06:13:41.843040",
+  "last_etl_date": "2026-09-23T05:23:43.193966",
   "calls": [
     {
       "id": "01KP6Z88AXTGRHW2R8GQ86C30X",
@@ -25,6 +25,17 @@
       "summary": "# Growthbook <> FlowGPT - Sync\nDate: 2026-09-09 | Duration: 24.90999984741211m\n\n## Summary\nFlow GPT discussed moving from Statsig to GrowthBook’s enterprise plan to reduce costs while maintaining critical experimentation and feature-flagging capabilities. GrowthBook proposed pricing designed to cut costs by half and support a planned 420-seat contract, while Flow GPT currently has 79 active users and may grow to 110–120. Monthly feature-flagging CDN requests are about 33 million. Flow GPT does not plan to migrate full event data, focusing instead on feature-flagging events and exposures, while deeper A/B-test analysis remains internal. The team is investigating an abnormal June-to-July event spike that may result from repeated requests. Experimentation SDKs and feature flagging are top priorities; experiment-progress views are useful but could be built internally. Self-hosting is not favored because reliability and maintenance are critical. Dan will provide multiple contract options, usage details, and migration support, with a decision targeted within a month.\n\n## Keywords\nAI-generated content, feature flagging, experimentation, contract negotiation, migration support, event analytics\n\n## Action Items\n\n**Dan Wathne**\nPrepare and send two contract proposal options to Alex Xi, one with a lower seat count and one covering full migration seats, including migration support documentation (19:00)\nProvide accurate and detailed usage projections and pricing information for Alex Xi to evaluate (21:55)\nBe available for live discussions to clarify questions and assist with the migration process as needed (23:10)\n\n**Alex Xi**\nReview contract proposals and run internal cost and usage analyses to determine the best option for FlowGPT (21:50)\n",
       "organizer": "dan@growthbook.io",
       "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2K7AZQBGFB659GTRD6CN6D6",
+      "source": "fireflies",
+      "title": "Growthbook <> FlowGPT - Pricing Sync",
+      "date": "2026-09-22",
+      "duration_minutes": 14.65999984741211,
+      "summary": "# Growthbook <> FlowGPT - Pricing Sync\nDate: 2026-09-22 | Duration: 14.65999984741211m\n\n## Summary\nDan Wathne proposed discounted Enterprise pricing of about $76,500 for 80 seats, compared with $90,000, including a CDN limit increase, onboarding, private channels, SLAs, SSO, and advanced security. Growth Book currently spends $65,000 on Pro. Alex Xi estimated that 30–40 seats could support engineering-focused feature flagging, while 120 seats might be needed for broader adoption, since many business users mainly visualize experiments and rely on an in-house warehouse and data team for validation. Dan said reducing seats to 40 would save about $12,000 annually because CDN usage drives much of the cost. Read-only seats at $300, half the full-seat price of $600, were proposed for visualization-only users. Dan also offered prorated mid-year seat additions, multiple order-form options for 40 and 100–120 seats, and a waiver of the upcoming approximately $5,500 Pro bill if the Enterprise contract is signed before the next billing cycle.\n\n## Keywords\nEnterprise Upgrade, Pricing Discount, Seat Limit, Feature Flags, Case Study, Read-Only Seats\n\n## Action Items\n\n**Dan Wathne**\nProvide FlowGPT with an order form including pricing options for both 40 seats and 100-120 seats scenarios to accommodate their organizational needs (13:25)\nInclude an add-on pricing option for additional read-only seats in the order form as requested by FlowGPT (12:38)\nWaive FlowGPT’s upcoming Pro plan bill if they commit to upgrading to the Enterprise plan before the next billing cycle this month to provide cost savings (11:57)\n\n**Alex xi**\nConsider the pricing options including the 15% case study discount and provide feedback on moving forward with the Enterprise upgrade (11:51)\nReview and decide between the two seat count scenarios (40 seats vs. 100-120 seats) when the order form is provided to optimize cost and coverage (13:49)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

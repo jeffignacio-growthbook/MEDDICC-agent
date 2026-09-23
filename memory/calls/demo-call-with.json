@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-09-19T06:09:55.676846",
+  "last_etl_date": "2026-09-23T05:23:43.198581",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -774,6 +774,17 @@
       "summary": "# Demo Call with Ruta Povilauskiene from\nDate: 2026-09-18 | Duration: 24.450000762939453m\n\n## Summary\nAzeta evaluated Growthbook as a potential replacement or modernization of its experimentation approach. Ruta Pov, a CRO specialist, described goals to optimize the funnel from product pages through checkout, using experimentation to address user psychology and service friction. Azeta has approximately 700,000–800,000 monthly users, 25,000 daily users, 1,500 daily orders, an estimated 6% conversion rate, and an average order value of €32–35. Convert costs about $8,000 annually but has support issues. Growthbook’s professional tier costs $40 per user monthly without support, while its enterprise package costs about $50,000 annually plus $750 per user annually and includes support and advanced features. James Shannon explained that a 1% conversion increase could add approximately $200,000 in monthly revenue. Ruta said pricing must be justified to decision-makers and the board, while also considering Statsig, Verify, and in-house development. James highlighted Growthbook’s documentation, server-side rendering capabilities, statistical models, continuous development, and the costs and complexity of building an internal platform.\n\n## Keywords\ne-pharmacy, CRO, experimentation, pricing, server-side rendering, funnel optimization\n\n## Action Items\n\n**James Shannon**\nSend answers to Ruta’s questions along with Growthbook documentation, especially on server-side rendering and technical implementation (21:38)\nProvide support materials and detailed pricing breakdown to aid Ruta’s internal decision-making process (21:38)\n\n**Ruta Pov**\nShare Growthbook documentation and technical details with Azeta engineers and product team for further evaluation (22:07)\nDiscuss Growthbook’s pricing and solution internally with decision makers and the board to evaluate feasibility (16:58)\n",
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2T1BM5CE1RQ0P1ZNW7KXYN9",
+      "source": "fireflies",
+      "title": "Demo Call with Marcelo Da Silva from L'azurde",
+      "date": "2026-09-22",
+      "duration_minutes": 46.77000045776367,
+      "summary": "# Demo Call with Marcelo Da Silva from L'azurde\nDate: 2026-09-22 | Duration: 46.77000045776367m\n\n## Summary\nThe discussion evaluated starting with GrowthBook’s Pro tier for 2027 testing and learning at an annual budget of about $5,000 for two to three users, with governance intended to preserve statistical validity and control costs. GrowthBook was considered suitable because it supports no-code and developer-led experiments, Arabic UI testing across UAE, Kuwait, and Saudi Arabia, and integration with BigCommerce, Next.js, Amazon S3, GA4, and BigQuery. Combined traffic is about 750,000 monthly sessions, but conversion is approximately 0.3% to 0.4% and funnel drop-off limits statistical power. Priority use cases include homepage, merchandising, mobile, and product-detail-page tests, with 90% of traffic coming from mobile. Simple visual edits can be handled without code, while complex layout changes require developers. James explained GrowthBook’s privacy-focused data model, power analysis, Flowward’s reported revenue lift, and Pro-tier support. James will provide a customized deck, while Marcelo will consult the eComm and technical teams before seeking 2027 budget approval.\n\n## Keywords\nA/B testing, GrowthBook, ecommerce, Arabic market, experiment governance, headless architecture\n\n## Action Items\n\n**Marcelo Da Silva**\nShare GrowthBook slide deck with L’azurde ecommerce team and leadership for feedback and buy-in (44:33)\nCoordinate with developers for a technical discovery session when ready to explore integration and setup in detail (44:51)\nFinalize internal budget approval process for A/B testing tool spend for fiscal year 2027 (44:55)\n\n**James Shannon**\nSend GrowthBook slide deck and relevant demo materials to Marcelo for internal presentation (43:55)\nRespond to follow-up questions from Marcelo via email to support decision-making and clarify technical details (43:57)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

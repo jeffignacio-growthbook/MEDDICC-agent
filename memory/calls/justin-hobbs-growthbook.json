@@ -1,0 +1,18 @@
+{
+  "company": "Justin Hobbs, GrowthBook",
+  "slug": "justin-hobbs-growthbook",
+  "last_etl_date": "2026-09-23T05:23:43.194961",
+  "calls": [
+    {
+      "id": "01M306EZ1TENYWXY04XF2V82X9",
+      "source": "fireflies",
+      "title": "Justin Hobbs, GrowthBook discovery + negotiation role play",
+      "date": "2026-09-22",
+      "duration_minutes": 63.29999923706055,
+      "summary": "# Justin Hobbs, GrowthBook discovery + negotiation role play\nDate: 2026-09-22 | Duration: 63.29999923706055m\n\n## Summary\nThe discussion evaluated Justin Hobbs’s sales approach through account preparation, discovery, negotiation, and coaching. Justin described combining public filings, company news, hiring signals, LinkedIn, Sales Navigator, Demand Gen, and AI for tailored preparation, spending five minutes to one hour based on account priority. Brent Holloway described Roblox’s fragmented experimentation tools, inconsistent KPIs, and approximately 30% feature-release experiment coverage, while seeking a 90-day Growth Book trial against LaunchDarkly and Statsig. Growth Book was differentiated through its open-source, warehouse-native architecture, ease of use, and AI workflows. Pricing discussions moved from a preliminary $80,000–$120,000 range and competing offers to a $75,000, two-year agreement with case study participation. Coaching emphasized deeper pain quantification, investor-style discovery, stronger anchoring, incremental concessions, and value preservation. Justin used Sandler and MEDDIC and was identified as a finalist.\n\n## Keywords\nsales negotiation, discovery call, product evaluation, AB testing platforms, pricing strategy, AI-assisted sales prep\n\n## Action Items\n\n**Justin Hobbs**\nSend calendar invite for next detailed call (02:00 pm next Wednesday) to discuss success criteria and deeper product overview (24:12)\nFollow up with CFO/CRO regarding pricing flexibility and prepare to negotiate price between $70K-$80K, emphasizing two-year contract and case study commitments (37:00)\nSubmit final offer around $75K with two-year term and annual payments including customer reference agreement (40:00)\nSend signed Docusign contract shortly after agreement (41:35)\nReach out to Ryan or Brent if no feedback by following Tuesday or Wednesday regarding selection status (01:01:06)\n\n**Brent Holloway**\nShare vendor evaluation form with Justin, outlining success criteria and assessment metrics for Roblox trial (21:05)\nCoordinate communication between evaluation teams for Growth Book, LaunchDarkly, and Statsig (22:22)\nProvide feedback and coaching on discovery and negotiation performance post role play session (43:30)\nFollow up with Justin about process timeline and final candidate selection (01:01:08)\n\n**Ryan McGurk**\nObserve and provide feedback on Justin’s sales approach and role play negotiation \nIf needed, engage with Roblox for executive discussion to support final pricing and deal closure (38:44)\nStay involved in process review and candidate evaluation to identify top hire (01:00:50)\n",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

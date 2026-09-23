@@ -1,0 +1,18 @@
+{
+  "company": "Ferratum & GrowthBook",
+  "slug": "ferratum-growthbook",
+  "last_etl_date": "2026-09-23T05:23:43.200256",
+  "calls": [
+    {
+      "id": "01M2Z0ZM89E1Z5JB41464ND7WV",
+      "source": "fireflies",
+      "title": "Ferratum & GrowthBook | First Meeting",
+      "date": "2026-09-22",
+      "duration_minutes": 29.200000762939453,
+      "summary": "# Ferratum & GrowthBook | First Meeting\nDate: 2026-09-22 | Duration: 29.200000762939453m\n\n## Summary\nFerratum operates a fintech business with banking licenses in more than 15 countries, 600 microservices, and 200 engineers in Slovakia. The company uses GrowthBook 4.0.4 on-premises, originally adopting the community version mainly for feature flagging, and is considering an upgrade. It is reviewing prerequisites, scheduled features, SDK streaming, encrypted endpoints, and multi-project support. Visual experiments are not planned because of UX/UI capacity limits, although marketing is interested, and AI agent features are being explored, including a possible marketing approval workflow. Pricing combines a platform fee with user seats, while enterprise includes security features, support, and self-hosted or cloud-hosted options, including EU cloud hosting. Procurement is lengthy because of banking regulations and requires GDPR and ISO documentation. The budget follows an annual cycle, with a decision needed by September, and the target decision timeline is within one month. Marcel will send pricing and hosting options by October 7, while Martin will present them to IT leadership for budget approval, followed by possible IT feedback within two weeks.\n\n## Keywords\nfeature flagging, on-premise licensing, pricing tiers, enterprise governance, fintech compliance, GrowthBook upgrade\n\n## Action Items\n**Rémy Marin**  \nOffer assistance to marketing team (13:07)  \n\n**Marcel Geldner**  \nPrepare and send pricing materials (22:57)  \nSchedule follow-up call (27:22)  \n\n**Martin Šustek**  \nReview pricing materials with IT leadership (24:31)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

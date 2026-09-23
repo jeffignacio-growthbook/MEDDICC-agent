@@ -1,0 +1,18 @@
+{
+  "company": "ECCO",
+  "slug": "ecco",
+  "last_etl_date": "2026-09-23T05:23:43.197682",
+  "calls": [
+    {
+      "id": "01M34S23ZSGTN0J68VVGGP6ZA4",
+      "source": "fireflies",
+      "title": "ECCO",
+      "date": "2026-09-22",
+      "duration_minutes": 11.850000381469727,
+      "summary": "# ECCO\nDate: 2026-09-22 | Duration: 11.850000381469727m\n\n## Summary\nWitold was on the Starter plan, which limited visual editor access, so the organization was temporarily upgraded to Enterprise. A license seat limit was noted, and the visual editor became available after a refresh. The setup also contained duplicate GTM tags: a manual tag and a standard tag. The recommendation was to delete one to avoid conflicts. The scripts in use included Custom HTML and Grub Book Twitter flags scripts, and Witold was asked to stop the Custom HTML script for testing. Witold requested a video and documentation focused on setting up the first AA test. Logan encouraged further questions, and support from Remy and Natasha was acknowledged.\n\n## Keywords\nvisual editor, enterprise tier, AI settings, GTM tags, Snowflake guidance, A/A test\n\n## Action Items\n**Logan Bates**  \nVerify Witold access to AI features (01:04)  \nSend video guide and documentation to Witold (04:07)  \n\n**Rémy Marin**  \nUpgrade Witold organization to enterprise tier (01:25)  \nAdvise Witold on removing duplicate GTM tags (02:49)  \n\n**Witold Styczen**  \nPrepare tests for visual editor (02:26)  \nContact support team for Snowflake guidance (02:40)  \nTemporarily disable custom HTML Growbook script (03:40)",
+      "organizer": "remy@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

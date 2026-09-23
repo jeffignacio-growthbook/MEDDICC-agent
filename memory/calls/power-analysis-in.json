@@ -1,0 +1,18 @@
+{
+  "company": "power analysis in",
+  "slug": "power-analysis-in",
+  "last_etl_date": "2026-09-23T05:23:43.193703",
+  "calls": [
+    {
+      "id": "01M30ECM860R54CMSPR19Z0PM9",
+      "source": "fireflies",
+      "title": "power analysis in experiment configuration",
+      "date": "2026-09-22",
+      "duration_minutes": 36.099998474121094,
+      "summary": "# power analysis in experiment configuration\nDate: 2026-09-22 | Duration: 36.099998474121094m\n\n## Summary\nThe team aligned on manual filtering, option 1A, for power analysis V1 because it requires more UI work but reduces backend complexity. Traffic sliders and variation weights were accepted using conservative power estimates, with documentation and warnings needed for approximations when weights are uneven. Power calculations will be unified under one engine, with the experiment page using a default population and the standalone calculator supporting exploratory use. Calculations will persist in the backend for list views, while manual and SQL query entry points remain available for now. The team identified a mismatch between experiment configuration and power results and plans to show a diff callout while simplifying how weight impacts are explained. Previous power calculations may be imported using old experiment data as a population proxy. Initial development will focus on the experiment case, advanced settings may be hidden, Gabe will refine the UI flow, and backend API work will follow. The segment setting will be removed from the engine, and a new channel will be used for notes and updates.\n\n## Keywords\nPower Analysis, Experiment Configuration, Manual Filtering, Variation Weights, UI Design, Backend API\n\n## Action Items\n**Luke Smith**  \nCreate communication channel (00:16)  \nUpdate documentation (34:54)  \n\n**Gabe Melean**  \nBegin UI design work (34:32)  \n\n**Teresa Yung**  \nStart backend API development (34:32)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}
