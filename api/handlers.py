@@ -5121,6 +5121,19 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     Every view also returns a `rows` list of {deal_id, company_name, stage, ...}
     from the latest snapshot so the thread-context layer can save entities for
     follow-up drill-downs. Counts only — deal_value is never selected/emitted.
+
+    SYNTHESIS REQUIREMENTS (movement view, whenever the dollar fields exist):
+    - ALWAYS state all three together: added $ (added_arr_total, with the
+      new-deal count), exited $ (exited_arr_total, with the exited-deal
+      count), and net $ (net_arr_change)
+    - Regardless of which direction the question emphasized: "what did we
+      add" still gets the exits and the net
+    - DO NOT report only the added figure — "$2.78M added" without "but
+      $977K left, net +$1.8M" misstates what happened to pipeline; net is
+      the single most decision-relevant number
+    - Example: "24 deals added ($2.78M), 10 exited ($977.5K) — net +$1.80M"
+    Delivered to the model via result["_synthesis_note"] (see below), which
+    DYNAMIC_SYSTEM_PROMPT and build_synthesis_prompt() both require it to follow.
     """
     from datetime import date
     from field_semantics import _RENEWAL_PIPELINE_ID
@@ -5494,6 +5507,15 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
                 result["summary"]["added_arr_total"] = added_arr_total
                 result["summary"]["exited_arr_total"] = exited_arr_total
                 result["summary"]["net_arr_change"] = added_arr_total - exited_arr_total
+                # SYNTHESIS REQUIREMENTS (see docstring): all three, always.
+                result["_synthesis_note"] = (
+                    "DOLLAR MOVEMENT: ALWAYS state all three figures together, "
+                    "regardless of which direction the question emphasized — "
+                    f"added ${added_arr_total:,.0f} ({len(new_ids)} new deals), "
+                    f"exited ${exited_arr_total:,.0f} ({len(left_ids)} deals), and "
+                    f"net ${added_arr_total - exited_arr_total:,.0f}. Never report "
+                    "only the added figure: net is the most decision-relevant number."
+                )
 
                 logger.info(f"[PM_MOVEMENT_ARR] added={len(new_ids)} deals ${added_arr_total:,.0f}, "
                            f"exited={len(left_ids)} deals ${exited_arr_total:,.0f}, "

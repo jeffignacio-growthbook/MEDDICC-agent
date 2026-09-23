@@ -1,0 +1,18 @@
+{
+  "company": "Attivo",
+  "slug": "attivo",
+  "last_etl_date": "2026-09-23T05:23:43.196568",
+  "calls": [
+    {
+      "id": "01M3043Z2ZEBFHN6EQ3TGXE6GT",
+      "source": "fireflies",
+      "title": "Ashley (Growthbook) <> Greg (Attivo)",
+      "date": "2026-09-22",
+      "duration_minutes": 10.140000343322754,
+      "summary": "# Ashley (Growthbook) <> Greg (Attivo)\nDate: 2026-09-22 | Duration: 10.140000343322754m\n\n## Summary\nThe team discussed proposing Ali Rizvi as TiVo’s fractional CFO after previous contractor Mark fully stopped working. Ali is positioned as a hands-on finance leader who can manage accounting and finance processes, oversee outsourced accounting firms, handle revenue recognition, prepare financial models, and deliver timely, accurate information. Ashley emphasized that the role must go beyond bookkeeping: the CFO should run finance, improve vendor classification, enforce stronger workflows, manage deadlines, prepare board packages, and provide realistic forecasts. The discussion highlighted errors in which vendors were classified under advertising, demonstrating the need for better controls and data quality. Gregory plans to explain Ashley’s expectations to Ali and introduce him to Ashley quickly. Ali is expected to discuss availability and next steps within the next two days, supporting a rapid transition and continuity of finance operations.\n\n## Keywords\nfractional CFO, finance management, vendor classification, revenue recognition, board reporting, outsourced accounting\n\n## Action Items\n\n**Gregory Capitolo**\nReach out to Ali Rizvi to discuss Ashley’s needs and team structure, and initiate the introduction by the end of the day (07:07)\nFacilitate Ali Rizvi’s direct contact with Ashley via text within the next two days to schedule a meeting (08:36)\n\n**Ashley Stirrup**\nShare contact information with Gregory to enable Ali Rizvi’s outreach (07:26)\nCoordinate availability with Ali Rizvi once contacted, aiming for a call on the next day or Thursday (08:08)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

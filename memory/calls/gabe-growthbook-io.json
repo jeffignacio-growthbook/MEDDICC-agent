@@ -1,7 +1,7 @@
 {
   "company": "gabe@growthbook.io",
   "slug": "gabe-growthbook-io",
-  "last_etl_date": "2026-09-16T06:18:47.912885",
+  "last_etl_date": "2026-09-23T05:23:43.194312",
   "calls": [
     {
       "id": "01M0XFDQ4XT2R1P5GYR8QCECX4",
@@ -43,6 +43,17 @@
       "date": "2026-09-15",
       "duration_minutes": 53.90999984741211,
       "summary": "# gabe@growthbook.io - Tue, 15 Sep 2026 12:32:45 PDT - Untitled\nDate: 2026-09-15 | Duration: 53.90999984741211m\n\n## Summary\nThe discussion covered a reusable event-stream diagnostics component for debugging production issues by user or session, similar to session recording without video. It would support feature flags and experiments through traffic-flow visibility, rule evaluation, user-event drill-down, aggregate views, filtering, and a standardized diagnostics tab separate from experiment results. Managed Warehouse queries are near real time, while other sources require manual refresh; separate event and feature-usage tables, indexing, partitioning, and pagination were discussed for scale. Product analytics integration would filter experiment populations by exposure and variation, while customizable flag dashboards would emphasize usage metrics. The existing exposure debugger could support an MVP in the next 2 weeks, with Gabe Melean and Johnny leading design, Lillia Jackson bridging product analytics and experimentation, and Luke Sonnet coordinating messaging. The interface would include flexible event filtering, expandable JSON, an exposure graph, and a recent-exposures list.\n\n## Keywords\nfeature flags, exposure stream, event diagnostics, product analytics, real-time data, event forwarder\n\n## Action Items\n**Jeremy Dorn**  \nIntegrate tabbed diagnostics views (18:26)  \nAdd feature flag rule traffic percent metric (38:33)  \nMeet with Notion to demo diagnostics (33:54)  \nBuild filterable exposure lists UI (42:56)  \n\n**Bryce Fitzsimons**  \nEnsure support for multiple data sources (36:54)  \n\n**Lillia Jackson**  \nProvide design prototype for diagnostics UI (42:23)  \nWork on diagnostics UI and features (50:09)  \n\n**Gabe Melean**  \nHack on diagnostics UI design (49:04)  \n\n**Luke Sonnet**  \nCollaborate on diagnostics development (50:11)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M35C8RZTKFNTE8TYGBBX5RK1",
+      "source": "fireflies",
+      "title": "gabe@growthbook.io - Tue, 22 Sep 2026 13:17:43 PDT - Untitled",
+      "date": "2026-09-22",
+      "duration_minutes": 16.920000076293945,
+      "summary": "# gabe@growthbook.io - Tue, 22 Sep 2026 13:17:43 PDT - Untitled\nDate: 2026-09-22 | Duration: 16.920000076293945m\n\n## Summary\nThe discussion covered a feature flags data visualization that aggregates evaluation data across revisions, with a noted legend bug and filters applying globally across cards. Time-frame and environment filters are static, while grouping can use value sources and environments; filters should remain sticky, though separate filters per view and UI chrome were debated. Queries consume time and money, and changing filters triggers re-querying. Using one query for both graphs and tables is complex, while Managed Warehouse can run queries automatically. Query output is relatively low-volume because results use summarized time buckets and only limited rows appear on screen. The interface should support variable columns, user attributes, critical user-ID search, and rule-pointing rather than text alone. Reusable widgets could be included or excluded by context, with expanded rows or drawers for details. Large rule sets, including an example of 500 rules, may clutter the UI, creating a need to filter inactive rules. The population feature kickoff is pending, with product analytics owning the initial design, planned design review, wider team feedback, and engineering-capacity concerns.\n\n## Keywords\nfeature flags, evaluation stream, query costs, filters, user attributes, populations design review\n\n## Action Items\n**Gabe Melean**  \nExperiment with making global filters sticky (04:14)  \nFollow up with Luke and Bryce on data columns (06:56)  \nExplore feature flag rule context integration (08:45)  \n\n**Jeremy Dorn**  \nSchedule design review meeting for populations (12:24)  \nEncourage team to submit pull requests (14:54)  \n\n**Johnny Martinez**  \nProvide prototypes for population-defining project (13:23)  \nShare defects and nits document link in Slack (14:39)  \n\n**Adriel Vieira**  \nEngage engineering team on populations bandwidth (14:01)",
       "organizer": "gabe@growthbook.io",
       "participants": 1,
       "summary_quality": "good"

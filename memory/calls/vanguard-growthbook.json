@@ -1,0 +1,18 @@
+{
+  "company": "Vanguard + GrowthBook",
+  "slug": "vanguard-growthbook",
+  "last_etl_date": "2026-09-23T05:23:43.197543",
+  "calls": [
+    {
+      "id": "01M2JJY7AV8CKT7VZV056NAC1W",
+      "source": "fireflies",
+      "title": "Vanguard + GrowthBook",
+      "date": "2026-09-22",
+      "duration_minutes": 43.54999923706055,
+      "summary": "# Vanguard + GrowthBook\nDate: 2026-09-22 | Duration: 43.54999923706055m\n\n## Summary\nVanguard is seeking a centralized, self-service experimentation platform to address inconsistent tools and methods across decentralized teams, improve knowledge sharing, and support end-to-end experiment design, execution, and documentation. Laura described the applied economics and behavioral science team’s enterprise-wide role in running tests for other business units. GrowthBook presented a warehouse-native architecture that queries aggregated warehouse data, supports self-hosting, enables metric updates, and limits data movement. Its capabilities include randomization, assignment, feature flags, staged rollouts, user targeting, A/B tests, multi-armed bandits, Bayesian and frequentist analysis, power calculations, health checks, guardrails, audit logs, and collaboration tools. Templates, AI-powered hypothesis suggestions, historical experiment learnings, and visual documentation aim to help less-experienced users create stronger experiments and avoid duplicated work. Christian also outlined platform-plus-per-user pricing, while offering follow-up materials and discussions about pricing and infrastructure requirements.\n\n## Keywords\nexperimentation, warehouse native, feature flagging, power calculation, AI integration, decentralized testing\n\n## Action Items\n\n**Christian Liebenow**\nSend GrowthBook demo recording and a short five-minute demo clip to Laura for distribution to the Vanguard team, including director Guillaume (40:03)\nConsider and send relevant GrowthBook documentation and materials to Laura to aid Vanguard’s evaluation (40:36)\n\n**Laura**\nForward the demo recording and information to Vanguard’s director Guillaume and coordinate any follow-up questions from him or her to the GrowthBook team (40:17)\nCommunicate any additional questions from Vanguard’s side to Christian or Logan for further clarification (40:17)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

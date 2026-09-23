@@ -1,7 +1,7 @@
 {
   "company": "Design sync",
   "slug": "design-sync",
-  "last_etl_date": "2026-09-16T06:18:47.913489",
+  "last_etl_date": "2026-09-23T05:23:43.194695",
   "calls": [
     {
       "id": "01KZVCR674TK3ARKVTWS0G38BP",
@@ -36,6 +36,17 @@
       "date": "2026-09-15",
       "duration_minutes": 34,
       "summary": "# Design sync\nDate: 2026-09-15 | Duration: 34m\n\n## Summary\nThe design syncs were reinstated for idea sharing, design-system work, cross-squad projects, and ownership visibility. Near-term priorities include refining existing components such as inputs, selectors, spacing, typography, and labels; addressing low-hanging design debt; and redesigning metrics, experiments, feature flags, and the collapsible sidebar. The experiment-details redesign is intended to create reusable layouts for feature flags and roughly 10–20 core product pages. AI design work will standardize review-bot iteration and linting, while code-based PRs are preferred for communicating prototypes and enabling engineering generalization. Prototype-to-production handoff remains unresolved because edge cases still require design and engineering review. Metrics and experiments redesigns include read-only and editing states, metadata, analysis plans, previews, and SQL controls. Near-term actions include opening a design-fix PR, reviewing Slack’s generated experiment-result image cards, targeting metrics UX for possible release next week, and scheduling the next sync. Sources: 00:06–33:02.\n\n## Keywords\nDesign system, Metrics redesign, Experiment details, AI-assisted workflows, Figma and Claude, Cross-squad collaboration\n\n## Action Items\n\n**Adriel Vieira**\nPrepare and submit the design-guidance pull request for review, incorporating enforceable standards for AI-generated UI such as approved icon libraries (12:24)\n\n**Jeremy Dorn**\nSchedule a recurring design sync meeting that avoids conflicts with the every-other-week cadence to maintain regular collaboration and updates (30:29)\n\n**Johnny Martinez**\nComplete and share the metrics UX checklist to guide ongoing and future design improvements in metrics-related pages (32:56)\nPost the compiled design nit checklist to the design group to facilitate lightweight design improvements and awareness (31:25)\n\n**Gabe Melean**\nReview the Slack experiment-result image cards and related Slack preview designs to ensure they meet quality standards and improve their visual polish (32:09)\n",
+      "organizer": "johnny@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M35BAJD7AGT8Q63PSJ233BFY",
+      "source": "fireflies",
+      "title": "Design sync",
+      "date": "2026-09-22",
+      "duration_minutes": 33,
+      "summary": "# Design sync\nDate: 2026-09-22 | Duration: 33m\n\n## Summary\nWork on the experiment is nearing approval, with final analysis-plan tweaks, benchmark review, QA scheduling, power-analysis review, code reviews, and testing underway. A diagnostics prototype is being refined before broader review. Data-source onboarding should make the sample CTA and Connect warehouse option more prominent, while draft setup states and BigQuery OAuth could reduce credential friction. Managed Warehouse is favored for new organizations, with bring-your-own warehouse retained as a secondary option. A guided checklist may cover data sources, event destinations, and exposure assignment queries. Diagnostics planning focuses on aggregate evaluation trends, a debugging stream, clearer communication about query-refresh costs, filter behavior, cached results, user context, rule links, and future rule-traffic visibility. Populations work will begin with product analytics prototypes, followed by design and engineering review. Johnny also created a NITS document and encouraged cautious quick-fix pull requests.\n\n## Keywords\nFeature flags, Diagnostics, Managed warehouse, Data-source onboarding, Experiment analytics, Populations\n\n## Action Items\n**Gabe Melean**\nReview analysis benchmark (03:44)\nShare feature-flag prototype (03:44)\nSchedule QA catch-up (03:44)\nConduct design review (30:21)\n\n**Unassigned**\nShare populations prototype (30:45)\nOpen quick pull requests (32:21)\n\n**Johnny Martinez**\nRefine data-source onboarding (16:16)\nShare NITS document (31:53)",
       "organizer": "johnny@growthbook.io",
       "participants": 4,
       "summary_quality": "good"

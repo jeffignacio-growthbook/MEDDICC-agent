@@ -1544,6 +1544,12 @@ Step 2: filter_table(deals, columns=[deal_id,
   filters=[['in_', 'deal_id', <step_1_ids>]])
 Step 3: synthesize
 
+HANDLER SYNTHESIS NOTES: if a tool result contains a "_synthesis_note"
+field, ALWAYS follow its instructions in your final answer — it is the
+handler's own required reporting rule (e.g. pipeline movement must state
+added $, exited $ AND net $ together). It overrides the 5-8 line guideline
+below when they conflict.
+
 ANSWER FORMATTING (for final {{"answer": "..."}} only):
 When you have enough data to answer, format for Slack:
 - Use bullet points (•) not markdown tables (| col | col |)
