@@ -329,6 +329,37 @@ def test_main_loop_answer_is_checked_per_population_too():
     print("✓ main-loop answer: $2.91M → $2.71M checked per snapshot, ships without a forced correction")
 
 
+def test_diff_exits_say_how_the_deal_left():
+    """The shipped answer read Discovery -1 / Negotiating +1 as "1 deal
+    advanced from Discovery -> likely into Negotiating". What happened:
+    Comcast (Discovery) closed lost and Plusgrade moved Scoping ->
+    Negotiating. The diff's population_exits carried only the prior
+    snapshot row, and the prompt said "Dropped", so a loss and a win and
+    a reassignment looked the same. Each exit now carries exit_status from
+    the deals table, and the prompt says how to report each one."""
+    from api.snapshot_diff import attach_exit_status
+    d = {"population_exits": [{"deal_id": "1"}, {"deal_id": "2"}, {"deal_id": "3"}, {"deal_id": "4"}]}
+    attach_exit_status(d, {"1": "lost", "2": "won", "3": "active"})
+    assert [r["exit_status"] for r in d["population_exits"]] == \
+        ["closed_lost", "closed_won", "still_open", "unknown"], d
+    result, client, calls, logs = _replay()
+    final = client.prompts[-1]
+    i = final.index('"population_exits"')
+    exits = final[i:i + 800]
+    assert "Comcast" in exits and '"exit_status": "closed_lost"' in exits, exits
+    assert "closed lost" in final and "never as a stage advance" in final, final[-3000:]
+    # the model's own lookup selects names only: the status must come from
+    # the diff's forced lookup, which now asks for deal_status too
+    names_only = dict(NAMES_A, params=dict(NAMES_A["params"], columns=["deal_id", "company_name"]))
+    steps = [STEPS[0], STEPS[1], "Names.\n" + json.dumps(names_only)]
+    result, client, calls, logs = _replay(steps=steps)
+    final = client.prompts[-1]
+    exits = final[final.index('"population_exits"'):][:800]
+    assert '"exit_status": "closed_lost"' in exits, exits
+    print("✓ diff exits carry exit_status from deals (Comcast: closed_lost), and the prompt says to "
+          "report a loss as a loss, never as a stage advance")
+
+
 def test_replay_completeness_retry_covers_every_id():
     result, client, calls, logs = _replay()
     retries = [c for c in calls if c["table"] == "deals"

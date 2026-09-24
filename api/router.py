@@ -18,7 +18,7 @@ from api.db import get_supabase, log_unanswered, is_admin, get_prior_entities, g
 from api import handlers
 from api.snapshot_diff import (
     diff_snapshots, rows_for_snapshot_date,
-    collect_diff_deal_ids, attach_company_names,
+    collect_diff_deal_ids, attach_company_names, attach_exit_status,
 )
 from api.dimension_resolver import (
     scan_question_for_known_dimension_terms, format_dimension_resolution_note,
@@ -3918,14 +3918,24 @@ async def _dynamic_query_loop_core(question, history, params,
                 # pattern as the round-3 forced snapshot-anchor fetch.
                 needed_ids = collect_diff_deal_ids(diff_result)
                 known_names = {}
+                # how each exit left: today's deals.deal_status, read only
+                # from deals-table rows (a snapshot row's status is that
+                # snapshot's, not the outcome)
+                known_status = {}
                 for key, data in accumulated_data.items():
                     if not key.endswith("_raw"):
                         continue
+                    from_deals = isinstance(data, dict) and data.get("table") == "deals"
                     for row in data.get("rows", []) or []:
                         if (isinstance(row, dict) and row.get("deal_id") is not None
                                 and row.get("company_name")):
                             known_names[str(row["deal_id"])] = row["company_name"]
-                missing_ids = sorted(needed_ids - set(known_names))
+                        if (from_deals and isinstance(row, dict) and row.get("deal_id") is not None
+                                and row.get("deal_status")):
+                            known_status[str(row["deal_id"])] = row["deal_status"]
+                exit_ids = {str(r.get("deal_id")) for r in diff_result.get("population_exits", [])
+                            if isinstance(r, dict) and r.get("deal_id") is not None}
+                missing_ids = sorted((needed_ids - set(known_names)) | (exit_ids - set(known_status)))
                 if missing_ids:
                     logger.info(
                         f"[SNAPSHOT_DIFF] {len(missing_ids)} deal_id(s) in "
@@ -3936,17 +3946,19 @@ async def _dynamic_query_loop_core(question, history, params,
                     )
                     try:
                         name_result = await T.filter_table(
-                            sb, table="deals", columns=["deal_id", "company_name"],
-                            filters=[["in_", "deal_id", missing_ids]])
+                            sb, table="deals", columns=["deal_id", "company_name", "deal_status"],
+                            filters=[["in_", "deal_id", missing_ids]], limit=len(missing_ids))
                         if "error" not in name_result:
                             for row in name_result.get("rows", []) or []:
                                 if row.get("deal_id") is not None:
                                     known_names[str(row["deal_id"])] = row.get("company_name")
+                                    if row.get("deal_status"):
+                                        known_status[str(row["deal_id"])] = row["deal_status"]
                             accumulated_data[f"step_{iteration}_diff_names_raw"] = name_result
                             queries_run.append({
                                 "tool": "filter_table",
                                 "params": {"table": "deals",
-                                           "columns": ["deal_id", "company_name"],
+                                           "columns": ["deal_id", "company_name", "deal_status"],
                                            "filters": [["in_", "deal_id", missing_ids]]},
                                 "rows_returned": len(name_result.get("rows", [])),
                             })
@@ -3974,6 +3986,7 @@ async def _dynamic_query_loop_core(question, history, params,
                         logger.warning(
                             f"[SNAPSHOT_DIFF] company-name backfill raised: {e}")
                 attach_company_names(diff_result, known_names)
+                attach_exit_status(diff_result, known_status)
 
         try:
             if diff_result is not None:
@@ -4004,7 +4017,12 @@ async def _dynamic_query_loop_core(question, history, params,
                     "• *New deals*: name each deal in population_entries "
                     "using its company_name.\n"
                     "• *Dropped*: name each deal in population_exits "
-                    "using its company_name.\n"
+                    "using its company_name, and say how it left, from its "
+                    "exit_status: closed_lost → closed lost; closed_won → "
+                    "closed won; still_open → still open but no longer in "
+                    "this set (e.g. reassigned); unknown → left the "
+                    "snapshot, outcome not on record. Report an exit as "
+                    "what it is, never as a stage advance.\n"
                     "• *Owner changes*: one line per entry in "
                     "owner_changes, named using its company_name, noted "
                     "as a stage-unrelated aside.\n\n"
