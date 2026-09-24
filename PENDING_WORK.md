@@ -38,6 +38,12 @@ counting this outcome. The answer shipped with a false caveat appended.
 
 ## 🟡 Open Items
 
+### 🟡 MEDIUM: Tool calls aren't logged, so a crashing tool is invisible (found 2026-09-24)
+**Status:** OPEN.
+- **The gap:** `query_cost_log` records one row per question (outcome, iterations, tokens, a fixed set of `primitives_fired` flags), but not the individual tool calls the dynamic loop makes (`filter_table`, `join_tables`, `aggregate_results`, `compare_periods`, `query_*`). None of their arguments, row counts, errors or exceptions are recorded.
+- **Why it matters:** `join_tables` crashed on every call with primary rows from 2026-09-01 until #53, and there is no way to tell how often it fired or which answers it broke. The same holds for any future tool regression, and for `filter_table`'s new refusals of filters it can't apply.
+- **Fix:** a per-question record of tool calls, either a `tool_calls` jsonb column on `query_cost_log` or a child table, holding tool name, table, filter columns, row count and error. It needs a migration.
+
 ### 🔵 ROADMAP (not urgent, not blocking): Rebuild pre-2026-09-11 incremental ARR history for the waterfall (logged 2026-09-24)
 **Status:** FUTURE. Nothing is broken; historical weeks are labeled, not wrong.
 
