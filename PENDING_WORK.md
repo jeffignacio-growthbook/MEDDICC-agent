@@ -119,6 +119,47 @@ phrase-ownership check to cover these two (assess_deal_risk isn't a
 unified-routing tool, so it's outside that test's set today), and run
 `scripts/eval_dynamic_routing.py` against the real model.
 
+### 🟡 MEDIUM: Waterfall's irregular week_ending dates, and net ≠ new − won − lost (found 2026-09-24)
+**Status:** Logged, not fixed.
+
+**What:** the live FY2027 Q3 waterfall answer (2026-09-24, "show me this
+quarter's pipeline waterfall — new, won and lost by week") listed week
+rows for Aug 3, Aug 10, Aug 17, Aug 24, **Aug 28**, **Sep 7**, **Sep 8**,
+Sep 14 and Sep 21. Aug 28 and Sep 7/Sep 8 aren't week-ending dates next to
+the regular Sunday ones: `waterfall_weekly` has rows keyed on irregular
+snapshot dates, so one calendar week can appear twice and some weeks have
+no row.
+
+The weekly net doesn't follow from the listed flows either. Concrete case:
+**Aug 24 shows New $0 / Won $0 / Lost $0 but Net −$407K**. Aug 3 shows New
+$235K and Net +$1,278K. Net carries pulled-in / pushed-out and value
+changes the answer doesn't show, so a reader can't reconcile it.
+Probably the same root as the NAM-slice reconciliation mismatch found
+earlier.
+
+**To look at:**
+1. Which snapshot dates `compute_waterfall_segmented.py` treats as
+   week_ending, and why Aug 28 / Sep 7 / Sep 8 appear.
+2. Whether net_change should equal new − won − lost + pulled_in −
+   pushed_out ± value changes, and make the handler state the
+   reconciliation per week.
+
+### 🟢 LOW: Dimension resolver matches the bare word "new" to a `new_arr > 0` filter (found 2026-09-24)
+**Status:** Logged, not fixed. Harmless in the live case.
+
+**What:** `api/dimension_resolver.py` `_DEAL_TYPE_ALIASES` maps
+`"new": ("new_arr", "gt", 0)` next to `"new business"`. In "Show me this
+quarter's pipeline waterfall — new, won and lost by week", "new" means new
+pipeline flow, not the New Business deal type. The live log showed
+`[DIMENSION_RESOLVE] 'new' → new_arr.gt.0`. The model ignored the injected
+hint and called query_waterfall, but a question like "new deals in
+EMEA" could get a silent New-Business-only filter.
+
+**Likely fix:** drop the bare "new" alias (keep "new business" / "new
+logo"), or only match it when followed by business / logo / customer. Add
+a resolver test with "new, won and lost" and "new pipeline" as must-not-
+match cases.
+
 ### 🟢 LOW: Two active deals have no owner in HubSpot (found 2026-09-23)
 **Status:** OPEN, not actioned. Found incidentally while verifying the
 Inditex fix; unrelated to it. `deal_status='active'` with an empty
