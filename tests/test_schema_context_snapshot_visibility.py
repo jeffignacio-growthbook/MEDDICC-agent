@@ -25,39 +25,15 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from api.schema_context import _build_schema_context
 
 
-class _FakeQuery:
-    """Mimics the .select().eq().range().execute() chain select_all() uses."""
-
-    def __init__(self, rows):
-        self._all_rows = rows
-        self._filtered = rows
-
-    def select(self, *_a, **_kw):
-        return self
-
-    def eq(self, column, value):
-        self._filtered = [r for r in self._filtered if r.get(column) == value]
-        return self
-
-    def range(self, start, end):
-        self._page = self._filtered[start:end + 1]
-        return self
-
-    def execute(self):
-        class _Result:
-            pass
-        r = _Result()
-        r.data = self._page
-        return r
+sys.path.insert(0, str(Path(__file__).parent))
+from strict_supabase import StrictSupabase  # noqa: E402
 
 
-class _FakeSupabase:
-    def __init__(self, dictionary_rows):
-        self._rows = dictionary_rows
-
-    def table(self, name):
-        assert name == "data_dictionary"
-        return _FakeQuery(list(self._rows))
+def _FakeSupabase(dictionary_rows):
+    """Strict fake (tests/strict_supabase.py): real select_all, only the
+    selected data_dictionary columns come back, every filter applies. (Until
+    2026-09-24 a hand-rolled chain applied eq but returned whole rows.)"""
+    return StrictSupabase({"data_dictionary": dictionary_rows})
 
 
 def _dict_row(table, column, is_queryable=True, description="", data_type="text"):
