@@ -2837,6 +2837,10 @@ async def query_pipeline(params: dict, sb) -> dict:
     sorted_deals = sorted(incremental_deals, key=lambda d: d.get("_incremental_value") or 0, reverse=True)
     top_deals = [
         {
+            # deal_id: what extract_entity_context() keys on. Without it
+            # save_thread stored zero entities for every query_pipeline
+            # answer, so follow-ups had nothing to resolve (2026-09-24).
+            "deal_id": d.get("deal_id"),
             "company_name": d.get("company_name"),
             "incremental_arr": d.get("_incremental_value"),
             "expansion_arr": d.get("expansion_arr"),
