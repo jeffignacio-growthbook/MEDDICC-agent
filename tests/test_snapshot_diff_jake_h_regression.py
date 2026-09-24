@@ -205,6 +205,39 @@ def _trace_populations():
 
 # ── the production run, replayed ────────────────────────────────────────────
 
+def test_replay_knows_both_snapshots_and_diffs_them_in_code():
+    result, client, calls, logs = _replay()
+    assert not any("not yet queried" in l for l in logs), [l for l in logs if "not yet queried" in l]
+    diff = [l for l in logs if l.startswith("[SNAPSHOT_DIFF] computed")]
+    assert diff and "1 stage changes, 2 entries, 1 exits" in diff[0], diff or logs[-5:]
+    assert "current=53 rows, prior=52 rows" in diff[0], diff[0]
+    # item 3 of the report: neither loop guard was too eager. The duplicate
+    # signature includes filter values, so the two snapshot pulls are never
+    # duplicates of each other; production's iteration-5 call was a
+    # byte-identical re-pull of 2026-09-14, made because the loop couldn't see
+    # it already had that snapshot. With the rows dated, neither guard fires.
+    assert sum(1 for c in calls if c["table"] == "deals_snapshot") == 2, calls
+    assert not any("duplicate tool call detected" in l for l in logs)
+    assert not any("unfinished scratchpad/narration" in l for l in logs)
+    last = client.prompts[-1]
+    for name in ("Plusgrade", "Starz", "Comcast"):
+        assert name in last, (name, last[-2000:])
+    print("✓ replay: 2026-09-14 is recognised as queried; the diff is computed in code (1 stage change "
+          "Plusgrade, 2 entries Starz/grüum, 1 exit Comcast) and handed to the model by name; two "
+          "snapshot pulls, no duplicate, no narration")
+
+
+def test_replay_completeness_retry_covers_every_id():
+    result, client, calls, logs = _replay()
+    retries = [c for c in calls if c["table"] == "deals"
+               and any(f[0] in ("in_", "in") and len(f[2]) > 9 for f in c["filters"] or [])]
+    assert retries, calls
+    for c in retries:
+        n = len(next(f[2] for f in c["filters"] if f[0] in ("in_", "in")))
+        assert c["limit"] >= n, (c["limit"], n)
+    assert not any("retry succeeded: 20 rows (was 9)" in l for l in logs)
+    print("✓ replay: the completeness retry's limit covers all its ids (was the model's 20 of 54)")
+
 
 if __name__ == "__main__":
     tests = [v for k, v in list(globals().items()) if k.startswith("test_")]

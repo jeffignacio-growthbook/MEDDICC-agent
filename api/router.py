@@ -5306,7 +5306,9 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                         table=retry_params.get("table"),
                         columns=retry_params.get("columns"),
                         filters=retry_params.get("filters"),
-                        limit=retry_params.get("limit", 200),
+                        # 2026-09-24: the model's own limit (20) kept 20 of the
+                        # 54 ids this retry exists to fetch in full
+                        limit=max(int(retry_params.get("limit") or 200), len(all_ids)),
                         order_by=retry_params.get("order_by")
                     )
 
@@ -5330,7 +5332,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
 
                         logger.info(
                             f"[COMPLETENESS] Merged complete data into step_{iteration}: "
-                            f"{retry_row_count} rows total. Model will proceed with ALL {prev_count} {id_column}s."
+                            f"{retry_row_count} rows for {len(all_ids)} requested {id_column}s."
                         )
 
                         # Continue loop - model sees complete data, no retry instruction needed
