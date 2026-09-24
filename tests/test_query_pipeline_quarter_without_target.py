@@ -43,7 +43,8 @@ from canary_harness import run_canary_case  # noqa: E402
 def _deal(deal_id, close, arr):
     return {"deal_id": deal_id, "company_name": f"Co{deal_id}", "deal_value": arr,
             "stage": "presentationscheduled", "close_date": close, "owner_email": "a@x.com",
-            "pipeline_id": "default", "new_arr": arr, "expansion_arr": None, "renewal_revenue": None}
+            "pipeline_id": "default", "new_arr": arr, "expansion_arr": None, "renewal_revenue": None,
+            "deal_status": "active"}
 
 
 DEALS = [
@@ -54,46 +55,35 @@ DEALS = [
 ]
 
 
-class _SB:
-    """rep_targets holds only what `targets` says: {period: value}."""
+# In the tables, but excluded by query_pipeline's own filters
+DECOY_DEAL = dict(_deal("WON", "2026-09-15", 900000), deal_status="won")
 
-    def __init__(self, targets):
-        self.targets = targets
 
-    def table(self, name):
-        sb = self
-
-        class _Q:
-            def __init__(self):
-                self.period = None
-
-            def select(self, *a, **k):
-                return self
-
-            def eq(self, col, val):
-                if col == "period":
-                    self.period = val
-                return self
-
-            def __getattr__(self, _):
-                return lambda *a, **k: self
-
-            def execute(self):
-                data = []
-                if name == "rep_targets" and self.period in sb.targets:
-                    data = [{"target_value": sb.targets[self.period]}]
-                return type("R", (), {"data": data})()
-        return _Q()
+def _sb(targets):
+    """Strict fake (tests/strict_supabase.py): the REAL select_all, only
+    selected columns, every filter applied. rep_targets holds the team
+    incremental_arr target per period in `targets`, plus decoys for the same
+    periods at rep level and for another metric, which the handler's
+    level/metric filters must skip. (Until 2026-09-24: a lambda returning
+    every deal for any table and filter, and a target fake that honoured
+    only the period.)"""
+    from strict_supabase import StrictSupabase
+    rows = []
+    for period, value in targets.items():
+        # decoys first: Postgres guarantees no row order, and the handler takes data[0]
+        rows += [{"period": period, "level": "rep", "metric": "incremental_arr", "target_value": 1},
+                 {"period": period, "level": "team", "metric": "bookings", "target_value": 2},
+                 {"period": period, "level": "team", "metric": "incremental_arr", "target_value": value}]
+    return StrictSupabase({"deals": DEALS + [DECOY_DEAL], "rep_targets": rows})
 
 
 def _run(quarter, targets):
-    saved = (handlers.select_all, time_resolver.current_quarter_label)
-    handlers.select_all = lambda sb, table, columns="*", filters=None, **kw: [dict(d) for d in DEALS]
+    saved = time_resolver.current_quarter_label
     time_resolver.current_quarter_label = lambda *a, **k: quarter
     try:
-        return asyncio.run(handlers.query_pipeline({}, _SB(targets)))
+        return asyncio.run(handlers.query_pipeline({}, _sb(targets)))
     finally:
-        handlers.select_all, time_resolver.current_quarter_label = saved
+        time_resolver.current_quarter_label = saved
 
 
 def test_no_target_row_keeps_the_quarter_total_and_states_why_coverage_is_missing():

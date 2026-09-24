@@ -192,26 +192,23 @@ def test_query_call_quality_single_call_mode_unaffected():
     """False-positive check: Mode 1 (single call review by company) must
     still work exactly as before — it never used owner_email in its own
     filter, only company_name matching."""
-    def fake_select_all(sb, table, columns=None, filters=None):
-        if table == "deals":
-            return [{"deal_id": "d1", "company_name": "Acme Corp",
-                      "owner_email": "christian@growthbook.io", "stage": "Discovery"}]
-        if table == "calls":
-            return [{"call_id": "c1", "call_date": "2026-09-01", "title": "Discovery call",
-                      "source": "fireflies", "summary": "Good call."}]
-        if table == "call_quality":
-            return []
-        if table == "objections":
-            return []
-        return []
-
-    orig = handlers_module.select_all
-    handlers_module.select_all = fake_select_all
-    try:
-        result, error, records = _run_and_capture(
-            handlers_module.query_call_quality, {"company": "Acme"}, _FakeSupabase())
-    finally:
-        handlers_module.select_all = orig
+    # the REAL select_all against a strict fake (tests/strict_supabase.py);
+    # a call on another deal must not leak into Acme's review
+    sys.path.insert(0, str(Path(__file__).parent))
+    from strict_supabase import StrictSupabase
+    sb = StrictSupabase({
+        "deals": [{"deal_id": "d1", "company_name": "Acme Corp",
+                   "owner_email": "christian@growthbook.io", "stage": "Discovery"},
+                  {"deal_id": "d2", "company_name": "Other Inc",
+                   "owner_email": "christian@growthbook.io", "stage": "Discovery"}],
+        "calls": [{"call_id": "c1", "deal_id": "d1", "call_date": "2026-09-01", "title": "Discovery call",
+                   "source": "fireflies", "summary": "Good call."},
+                  {"call_id": "c2", "deal_id": "d2", "call_date": "2026-09-05", "title": "Other deal call",
+                   "source": "fireflies", "summary": "Not Acme."}],
+        "call_quality": [], "objections": [],
+    })
+    result, error, records = _run_and_capture(
+        handlers_module.query_call_quality, {"company": "Acme"}, sb)
 
     assert error is None, f"handler raised: {error!r}"
     assert result["company_name"] == "Acme Corp"
@@ -513,29 +510,29 @@ _STAGE_FILTER_DEALS = [
      "stage": "appointmentscheduled",  # bucket 'discovery', label 'Discovery'
      "owner_email": "christian@growthbook.io", "pipeline_id": "default",
      "expansion_arr": 0, "new_arr": 50000, "renewal_revenue": 0,
-     "close_date": None},
+     "close_date": None, "deal_status": "active"},
     {"deal_id": "2", "company_name": "Globex", "deal_value": 200000,
      "stage": "presentationscheduled",  # bucket 'proposal', label 'Technical Evaluation'
      "owner_email": "jake.stangl@growthbook.io", "pipeline_id": "default",
      "expansion_arr": 0, "new_arr": 75000, "renewal_revenue": 0,
-     "close_date": None},
+     "close_date": None, "deal_status": "active"},
+]
+# a won deal in the discovery bucket: query_pipeline's own deal_status filter
+# must drop it (the old fake returned every row whatever was filtered)
+_STAGE_FILTER_DECOYS = [
+    {"deal_id": "9", "company_name": "WonCo", "deal_value": 500000, "stage": "appointmentscheduled",
+     "owner_email": "christian@growthbook.io", "pipeline_id": "default", "expansion_arr": 0,
+     "new_arr": 500000, "renewal_revenue": 0, "close_date": None, "deal_status": "won"},
 ]
 
 
 def _run_query_pipeline_with_stage_filter(stage_filter):
-    def fake_select_all(sb, table, columns=None, filters=None):
-        if table == "deals":
-            return _STAGE_FILTER_DEALS
-        return []
-
-    orig = handlers_module.select_all
-    handlers_module.select_all = fake_select_all
-    try:
-        result, error, records = _run_and_capture(
-            handlers_module.query_pipeline, {"stage_filter": stage_filter}, _FakeSupabase())
-    finally:
-        handlers_module.select_all = orig
-    return result, error, records
+    """The REAL select_all against a strict fake (tests/strict_supabase.py):
+    only selected columns come back and every filter applies."""
+    sys.path.insert(0, str(Path(__file__).parent))
+    from strict_supabase import StrictSupabase
+    sb = StrictSupabase({"deals": _STAGE_FILTER_DEALS + _STAGE_FILTER_DECOYS, "rep_targets": []})
+    return _run_and_capture(handlers_module.query_pipeline, {"stage_filter": stage_filter}, sb)
 
 
 def test_query_pipeline_stage_filter_still_matches_known_bucket_keyword():
