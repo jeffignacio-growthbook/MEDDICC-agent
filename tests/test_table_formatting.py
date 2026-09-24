@@ -10,13 +10,15 @@ bullet lists." This pins:
      live eval uses, on tonight's real answers: the 15:05 waterfall table
      passes, and the movement answer's bullet stage breakdown, a ragged
      table, a pipe table and markup inside a fence all fail;
-  3. api/slack_format.py, the safety net, is unchanged: fenced tables pass
-     through byte-for-byte, and pipe tables are still converted;
+  3. api/slack_format.py, the safety net: pipe tables are still converted,
+     and fenced tables reach Slack aligned (re-aligned in code at delivery,
+     tests/test_slack_table_realign.py) with every value kept;
   4. the per-week basis answer check still reads rows inside a fence.
 
 Whether the model reliably writes the tables can only be measured live:
 scripts/eval_table_formatting.py.
 """
+import re
 import sys
 from pathlib import Path
 
@@ -111,13 +113,17 @@ Andy Marshall     10    $0.30M  AM, no quota
           f"movement bullets, a one-character misalignment and a footnote asterisk")
 
 
-def test_slack_fallback_is_unchanged():
-    assert to_slack_mrkdwn(FENCED_ANSWER) == FENCED_ANSWER, "a fenced table must reach Slack untouched"
-    assert to_slack_mrkdwn(MOVEMENT_TABLE) == MOVEMENT_TABLE
+def test_slack_delivery_keeps_the_pipe_fallback():
+    for answer in (FENCED_ANSWER, MOVEMENT_TABLE):
+        out = to_slack_mrkdwn(answer)
+        assert check_answer_tables(out)["pass"], out
+        assert to_slack_mrkdwn(out) == out, "delivery conversion is idempotent"
+        words = lambda t: [w for w in re.findall(r"\S+", t) if set(w) != {"-"}]
+        assert words(out) == words(answer), "only whitespace (and dashed rules) may change"
     pipe = "| Stage | Deals |\n|---|---|\n| Discovery | 99 |\n| Scoping | 30 |"
     assert to_slack_mrkdwn(pipe) == "*Stage | Deals*\n• Discovery | 99\n• Scoping | 30", to_slack_mrkdwn(pipe)
-    print("✓ slack_format: fenced tables pass through byte-for-byte; a pipe table is still converted "
-          "to a bold header plus bullets (safety net in place)")
+    print("✓ slack_format: fenced tables reach Slack aligned, only whitespace and dashed rules changed; a pipe table "
+          "is still converted to a bold header plus bullets (safety net in place)")
 
 
 def test_week_basis_check_reads_rows_inside_a_fence():
@@ -134,6 +140,6 @@ def test_week_basis_check_reads_rows_inside_a_fence():
 if __name__ == "__main__":
     test_every_synthesis_prompt_carries_the_table_rule()
     test_checker_on_tonights_real_answers()
-    test_slack_fallback_is_unchanged()
+    test_slack_delivery_keeps_the_pipe_fallback()
     test_week_basis_check_reads_rows_inside_a_fence()
     print("\n✅ All tests passed")
