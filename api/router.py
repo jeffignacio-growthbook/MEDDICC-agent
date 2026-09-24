@@ -2772,6 +2772,8 @@ FAILURE_MODE_PRIMITIVES = frozenset({
     # 2026-09-24: api/plausibility.check_answer_week_basis, run on every
     # answer in dynamic_query_loop()'s wrapper (_apply_answer_checks).
     "answer_week_basis_mismatch",
+    # 2026-09-24: api/plausibility.check_answer_unit_slips, same hook.
+    "answer_unit_slip_suspected",
 })
 
 
@@ -2806,6 +2808,7 @@ def _new_cost_state() -> dict:
             "zero_rows_suspicion_flagged": False,
             "zero_rows_suspicion_unresolved": False,
             "answer_week_basis_mismatch": False,
+            "answer_unit_slip_suspected": False,
         },
     }
 
@@ -2817,7 +2820,8 @@ def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
     "answered_with_unverified_date_labeling",
     "answered_with_unaddressed_ambiguity",
     "answered_with_unresolved_zero_row_suspicion",
-    "answered_with_week_basis_mismatch", "budget_exhausted",
+    "answered_with_week_basis_mismatch", "answered_with_suspected_unit_slip",
+    "budget_exhausted",
     "blocked_placement_corruption", "other_fallback". See dynamic_query_loop()'s docstring for what each
     means.
 
@@ -2847,6 +2851,8 @@ def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
             return "answered_with_unaddressed_ambiguity"
         if primitives["zero_rows_suspicion_unresolved"]:
             return "answered_with_unresolved_zero_row_suspicion"
+        if primitives["answer_unit_slip_suspected"]:
+            return "answered_with_suspected_unit_slip"
         if primitives["answer_week_basis_mismatch"]:
             return "answered_with_week_basis_mismatch"
         if (primitives["scratchpad_rejection_fired"]
@@ -3255,6 +3261,11 @@ async def dynamic_query_loop(question, history, params,
                                      (api/plausibility.check_answer_week_
                                      basis, via _apply_answer_checks). The
                                      shipped answer carries a caveat.
+      "answered_with_suspected_unit_slip" — answered=True, but a stated $
+                                     figure matches a source value only
+                                     after a factor of 1,000 or 1,000,000
+                                     (check_answer_unit_slips). The shipped
+                                     answer carries a caveat naming both.
       "budget_exhausted"          — answered=False, gave up on the
                                      internal ceiling
       "other_fallback"            — answered=False, any other give-up
@@ -3288,9 +3299,11 @@ def _answer_check_data(result: Optional[dict], cost_state: dict) -> dict:
     gathered (step_N_raw), as the model saw it, or the returned tool_results
     when the loop recorded none."""
     acc = cost_state.get("_accumulated_data") or {}
-    steps = [_model_view(v) for k, v in acc.items() if k.endswith("_raw")]
+    # A dict, not a list: a step's summary scalars must stay summary scalars
+    # (check_answer_unit_slips treats values inside lists as row values).
+    steps = {k: _model_view(v) for k, v in acc.items() if k.endswith("_raw")}
     if steps:
-        return {"steps": steps}
+        return steps
     return (result or {}).get("tool_results") or {}
 
 
@@ -3313,6 +3326,8 @@ def _apply_answer_checks(result: Optional[dict], cost_state: dict) -> None:
         logger.error(f"[PLAUSIBILITY] answer {v.check}: {v.message}")
         if v.check == "answer_week_basis":
             cost_state["primitives_fired"]["answer_week_basis_mismatch"] = True
+        if v.check == "answer_unit_slip":
+            cost_state["primitives_fired"]["answer_unit_slip_suspected"] = True
     caveat = answer_caveat(violations)
     if caveat:
         result["answer"] = f"{result['answer']}\n\n{caveat}"
