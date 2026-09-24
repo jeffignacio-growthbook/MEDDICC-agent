@@ -869,6 +869,8 @@ async def query_waterfall(params: dict, sb) -> dict:
             f"BASIS: say the dollars are Incremental ARR (new + expansion; renewal base "
             f"excluded). HEADLINE: ${period_incremental_arr:,.0f} across {total_open_count} "
             f"qualified deals closing in {tw['label']} ({tw['start']} to {tw['end']}). "
+            f"The {total_open_count} INCLUDES {no_arr_count} deal(s) with no ARR entered "
+            f"(pipeline_summary.needs_attention): say so with the count, as a hygiene flag. "
             f"The ${all_open_incremental_arr:,.0f} across {after_qualified_count} deals is ALL "
             f"open pipeline regardless of close date: if you cite it, label it that way, "
             f"never as {tw['label']}'s pipeline. WEEKLY: each waterfall row is one "
@@ -2528,8 +2530,13 @@ async def query_pipeline(params: dict, sb) -> dict:
 
     BUSINESS DEFINITION (dollar-level split confirmed Sep 6, 2026):
     - "Pipeline" = sum of (expansion_arr + new_arr) for each deal
-    - DEAL COUNT: Use is_incremental_pipeline() (includes deals in pipeline even if ARR=0)
-    - DOLLAR TOTAL: Sum expansion_arr + new_arr per deal (dollar-level split)
+    - DEAL COUNT (2026-09-24): is_incremental_pipeline() (incremental ARR > 0), PLUS
+      non-renewal-pipeline deals past Meeting Set with $0 incremental ARR, the same
+      rule query_waterfall applies. Those are counted and flagged in zero_arr_deals,
+      never silently dropped. $0 Meeting Set deals (expected unsized) are reported
+      as meeting_set_unsized, not counted.
+    - DOLLAR TOTAL: Sum expansion_arr + new_arr per deal (dollar-level split), over
+      the same population as the count ($0 deals add $0)
     - DATA QUALITY: Flag deals in pipeline with $0 incremental ARR as data quality gap
 
     TIMELESS DESIGN:
@@ -2550,7 +2557,7 @@ async def query_pipeline(params: dict, sb) -> dict:
       owner_email: str (optional) - specific rep email
 
     Returns:
-      total_deals: int (deals matching is_incremental_pipeline, regardless of ARR value)
+      total_deals: int (the DEAL COUNT population above, including flagged $0 deals)
       total_pipeline: float (sum of expansion_arr + new_arr per deal, dollar-level)
       coverage_ratio: float (pipeline / quarterly target)
       quarterly_target: float (from rep_targets table)
@@ -2628,7 +2635,7 @@ async def query_pipeline(params: dict, sb) -> dict:
     # CRITICAL: Use is_incremental_pipeline() for deal count (matches audit logic)
     # Then calculate incremental_value per deal for dollar-level split
     incremental_deals = []
-    zero_arr_deals = []  # Deals in pipeline but with $0 incremental ARR
+    meeting_set_unsized = []  # $0 Meeting Set deals: expected unsized, reported not counted
     uncategorized_deals = []  # Deals with NO classification (neither incremental nor renewal)
 
     for deal in deals_rows:
@@ -2636,29 +2643,29 @@ async def query_pipeline(params: dict, sb) -> dict:
 
         # Calculate incremental value (dollar-level)
         incremental_value = incremental_arr(deal)
+        stage = stage_label(deal.get("stage"))
+        renewal_pipe = str(deal.get("pipeline_id")) == _RENEWAL_PIPELINE_ID
 
-        # Use is_incremental_pipeline() to determine if deal counts (matches audit)
-        if is_incremental_pipeline(deal):
+        # Count: incremental ARR > 0 (is_incremental_pipeline), or a non-renewal
+        # deal past Meeting Set with $0 (query_waterfall's rule; 2026-09-24).
+        if is_incremental_pipeline(deal) or (not renewal_pipe and stage != "Meeting Set"):
             deal["_incremental_value"] = incremental_value
-            incremental_deals.append(deal)
 
-            # Track deals in pipeline with $0 incremental ARR (stage-based hygiene rules)
+            # Stage-based hygiene rules, marked here and collected AFTER the
+            # quarter/stage/pipeline filters below, so the flags describe the
+            # same population as total_deals:
             # Meeting Set: $0 incremental ARR is EXPECTED (too early to size), not flagged
             # Renewal stages: Check renewal_revenue (not incremental ARR) - $0 renewal_revenue = issue
             # Other stages: $0 incremental ARR = hygiene issue
-            stage = stage_label(deal.get("stage"))
-
             if stage == "Meeting Set":
-                # Expected at this stage, don't flag
-                pass
+                deal["_zero_arr_hygiene"] = False
             elif stage in ["Upcoming Renewal", "Renewal Engaged"]:
-                # For renewal stages, check renewal_revenue instead of incremental ARR
-                if renewal_revenue == 0:
-                    zero_arr_deals.append(deal)
+                deal["_zero_arr_hygiene"] = renewal_revenue == 0
             else:
-                # All other stages: $0 incremental ARR is a hygiene issue
-                if incremental_value == 0:
-                    zero_arr_deals.append(deal)
+                deal["_zero_arr_hygiene"] = incremental_value == 0
+            incremental_deals.append(deal)
+        elif not renewal_pipe and stage == "Meeting Set":
+            meeting_set_unsized.append(deal)
         # Track NEITHER-category deals (no classification at all)
         elif incremental_value == 0 and renewal_revenue == 0:
             uncategorized_deals.append(deal)
@@ -2865,6 +2872,7 @@ async def query_pipeline(params: dict, sb) -> dict:
     ]
 
     # Data quality gaps
+    zero_arr_deals = [d for d in incremental_deals if d.get("_zero_arr_hygiene")]
     zero_arr_count = len(zero_arr_deals)
     zero_arr_value = sum(d.get("deal_value") or 0 for d in zero_arr_deals)
 
@@ -2940,7 +2948,14 @@ async def query_pipeline(params: dict, sb) -> dict:
         "zero_arr_deals": {
             "count": zero_arr_count,
             "total_value": zero_arr_value,
-            "note": "Data quality hygiene issues (stage-based rules): Meeting Set excluded (expected $0 at this stage); renewal stages flagged for $0 renewal_revenue; other stages flagged for $0 incremental ARR"
+            "note": "Data quality hygiene issues (stage-based rules): Meeting Set excluded (expected $0 at this stage); renewal stages flagged for $0 renewal_revenue; other stages flagged for $0 incremental ARR. These deals ARE counted in total_deals (at $0); total_value is their HubSpot deal_value, not pipeline dollars.",
+            "deals": [{"deal_id": d.get("deal_id"), "company_name": d.get("company_name"),
+                       "stage": stage_label(d.get("stage")), "deal_value": d.get("deal_value")}
+                      for d in zero_arr_deals[:10]],
+        },
+        "meeting_set_unsized": {
+            "count": len(meeting_set_unsized),
+            "note": "Meeting Set deals with no incremental ARR yet (expected at this stage). NOT counted in total_deals.",
         },
         "uncategorized_deals": {
             "count": uncategorized_count,
@@ -2957,7 +2972,7 @@ async def query_pipeline(params: dict, sb) -> dict:
         },
         # 2026-09-24: the totals in this note were hardcoded ($18.6M, 306
         # deals) from whenever it was written; they now come from this call.
-        "_synthesis_note": f"TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total (${total_pipeline:,.0f}) AND Q3-scoped (q3_scoped_pipeline). COVERAGE: Always computed against Q3-scoped figure, never against timeless total. Format: '${total_pipeline:,.0f} total pipeline (timeless); $X closing this quarter (Y.Yx coverage)'. STAGE BREAKDOWN: Show ALL stages from by_stage dict. Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals ({total_deals}). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
+        "_synthesis_note": f"TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total (${total_pipeline:,.0f}) AND Q3-scoped (q3_scoped_pipeline). COVERAGE: Always computed against Q3-scoped figure, never against timeless total. Format: '${total_pipeline:,.0f} total pipeline (timeless); $X closing this quarter (Y.Yx coverage)'. STAGE BREAKDOWN: Show ALL stages from by_stage dict. Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals ({total_deals}). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. They ARE included in total_deals ({total_deals}) at $0: say so when you give the count (e.g. '{total_deals} deals, {zero_arr_count} of them flagged with no ARR entered'). meeting_set_unsized deals are NOT in the count. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
         "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering. Coverage ratio scoped to deals closing in target quarter only."
     }
 

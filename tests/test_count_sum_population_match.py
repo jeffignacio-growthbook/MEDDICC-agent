@@ -91,6 +91,12 @@ def test_query_pipeline_consistency():
 
     This is a code inspection test - we verify the code structure ensures
     count and sum operate on the same filtered population.
+
+    2026-09-24: query_pipeline's population is is_incremental_pipeline() PLUS
+    non-renewal deals past Meeting Set with $0 incremental ARR, counted at $0
+    and flagged in zero_arr_deals (the rule query_waterfall already used).
+    Count and sum still cover the same deals; the $0 ones add $0 and are
+    disclosed with the count. tests/test_zero_arr_deal_counting.py covers it.
     """
     handlers_file = REPO_ROOT / "api" / "handlers.py"
     content = handlers_file.read_text()
