@@ -96,6 +96,7 @@ jobs:
             tests/test_table_formatting.py \
             tests/test_slack_table_realign.py \
             tests/test_commit_cohort_walk.py \
+            tests/test_commit_close_date_check.py \
             tests/test_aggregation_verification.py \
             tests/test_aggregation_retry_hands_correct_value.py \
             tests/test_false_partial_claim_gate.py \

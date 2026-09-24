@@ -2658,7 +2658,7 @@ async def query_pipeline(params: dict, sb) -> dict:
     # Fetch all active deals with ARR breakdown fields
     deals_rows = select_all(
         sb, "deals",
-        columns="deal_id,company_name,deal_value,stage,close_date,owner_email,pipeline_id,expansion_arr,new_arr,renewal_revenue",
+        columns="deal_id,company_name,deal_value,stage,close_date,owner_email,pipeline_id,expansion_arr,new_arr,renewal_revenue,forecast_category,deal_status",
         filters=base_filters
     )
 
@@ -2827,6 +2827,16 @@ async def query_pipeline(params: dict, sb) -> dict:
         q3_scoped_pipeline = sum(d.get("_incremental_value") or 0 for d in q3_deals)
     except Exception as e:
         logger.warning(f"[PIPELINE] Could not resolve {current_quarter!r} for the this-quarter total: {e}")
+
+    # 2026-09-24: COMMIT-tagged deals whose close date sits outside this
+    # quarter (or is missing). Same population as the rest of the answer (all
+    # active deals, after the owner filter), before the stage/pipeline filters.
+    # Hygiene, like zero_arr_deals: see api/commit_close_date.py.
+    commit_close_date_mismatch = None
+    if this_quarter:
+        from commit_close_date import commit_close_date_mismatches
+        commit_close_date_mismatch = commit_close_date_mismatches(
+            deals_rows, this_quarter["start"], this_quarter["end"], quarter_label)
 
     # Coverage needs a target: omitted with a stated reason when there is none.
     try:
@@ -3001,6 +3011,7 @@ async def query_pipeline(params: dict, sb) -> dict:
                        "stage": stage_label(d.get("stage")), "deal_value": d.get("deal_value")}
                       for d in zero_arr_deals[:10]],
         },
+        "commit_close_date_mismatch": commit_close_date_mismatch,
         "meeting_set_unsized": {
             "count": len(meeting_set_unsized),
             "note": "Meeting Set deals with no incremental ARR yet (expected at this stage). NOT counted in total_deals.",
@@ -3020,7 +3031,7 @@ async def query_pipeline(params: dict, sb) -> dict:
         },
         # 2026-09-24: the totals in this note were hardcoded ($18.6M, 306
         # deals) from whenever it was written; they now come from this call.
-        "_synthesis_note": f"TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total (${total_pipeline:,.0f}) AND {_this_quarter_phrase}. COVERAGE: {_coverage_phrase} STAGE BREAKDOWN: Show ALL stages from by_stage dict. Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals ({total_deals}). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. They ARE included in total_deals ({total_deals}) at $0: say so when you give the count (e.g. '{total_deals} deals, {zero_arr_count} of them flagged with no ARR entered'). meeting_set_unsized deals are NOT in the count. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
+        "_synthesis_note": f"TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total (${total_pipeline:,.0f}) AND {_this_quarter_phrase}. COVERAGE: {_coverage_phrase} STAGE BREAKDOWN: Show ALL stages from by_stage dict. Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals ({total_deals}). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. They ARE included in total_deals ({total_deals}) at $0: say so when you give the count (e.g. '{total_deals} deals, {zero_arr_count} of them flagged with no ARR entered'). meeting_set_unsized deals are NOT in the count. COMMIT CLOSE DATES: " + (f"commit_close_date_mismatch lists {commit_close_date_mismatch['count']} active COMMIT deal(s) whose close date is outside {quarter_label} or missing: report them as a hygiene flag (the tag and the close date disagree), naming each deal and its close date, not as deals at risk. " if commit_close_date_mismatch and commit_close_date_mismatch['count'] else "none. ") + "PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
         "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering. Coverage ratio scoped to deals closing in target quarter only."
     }
 
