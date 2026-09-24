@@ -157,6 +157,22 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
     fetched = response.data or []
     deals = [d for d in fetched if is_incremental_pipeline(d)]
 
+    # 2026-09-24: COMMIT deals whose close date is outside this quarter or
+    # missing. The cohort query above filters on close_date, so it never sees
+    # them; surfaced as hygiene. After the cohort query (and after the week-3
+    # gate, which makes no queries at all). See api/commit_close_date.py.
+    # A failure here must not take the trust signal down with it.
+    from commit_close_date import commit_close_date_mismatches
+    try:
+        commit_rows = sb.table("deals").select(
+            "deal_id,company_name,forecast_category,deal_status,close_date,deal_value,pipeline_id"
+        ).in_("forecast_category", ["COMMIT"]).eq("deal_status", "active").execute().data or []
+        commit_close_date_mismatch = commit_close_date_mismatches(
+            commit_rows, q_start, q_end, fiscal_quarter)
+    except Exception as e:
+        logger.error(f"[FORECAST_TRUST] COMMIT close-date check failed: {e}")
+        commit_close_date_mismatch = None
+
     risk_result = assess_deal_risk(deals, sb)
     assessed = risk_result.get("assessed_deals", [])
     summary = risk_result.get("summary", {})
@@ -228,6 +244,7 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
             ),
         },
         "assessed_deals": assessed,
+        "commit_close_date_mismatch": commit_close_date_mismatch,
         "note": note,
     }
 

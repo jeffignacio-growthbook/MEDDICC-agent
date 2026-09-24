@@ -1,0 +1,100 @@
+{
+ "source": "deals, deal_status active and forecast_category COMMIT (live, 2026-09-24)",
+ "quarter": {
+  "label": "FY2027 Q3",
+  "start": "2026-08-01",
+  "end": "2026-10-31"
+ },
+ "deals": [
+  {
+   "deal_id": "54277617691",
+   "company_name": "Mistral",
+   "pipeline_id": "866608541",
+   "stage": "1297321620",
+   "close_date": "2026-10-31",
+   "deal_value": 180000.0,
+   "forecast_category": "COMMIT",
+   "deal_status": "active"
+  },
+  {
+   "deal_id": "60069831015",
+   "company_name": "InPost",
+   "pipeline_id": "default",
+   "stage": "43449439",
+   "close_date": "2026-10-30",
+   "deal_value": 145220.0,
+   "forecast_category": "COMMIT",
+   "deal_status": "active"
+  },
+  {
+   "deal_id": "54956375177",
+   "company_name": "Trade Me",
+   "pipeline_id": "default",
+   "stage": "24682892",
+   "close_date": "2026-09-30",
+   "deal_value": 100000.0,
+   "forecast_category": "COMMIT",
+   "deal_status": "active"
+  },
+  {
+   "deal_id": "61176368035",
+   "company_name": "ClickHouse",
+   "pipeline_id": "default",
+   "stage": "24682892",
+   "close_date": "2026-09-30",
+   "deal_value": 75000.0,
+   "forecast_category": "COMMIT",
+   "deal_status": "active"
+  },
+  {
+   "deal_id": "53466496122",
+   "company_name": "Taxfix",
+   "pipeline_id": "default",
+   "stage": "24682892",
+   "close_date": "2026-10-30",
+   "deal_value": 70000.0,
+   "forecast_category": "COMMIT",
+   "deal_status": "active"
+  },
+  {
+   "deal_id": "44951588885",
+   "company_name": "facile.it",
+   "pipeline_id": "866608541",
+   "stage": "1297321622",
+   "close_date": "2026-09-30",
+   "deal_value": 65000.0,
+   "forecast_category": "COMMIT",
+   "deal_status": "active"
+  },
+  {
+   "deal_id": "43948380965",
+   "company_name": "Freie Presse",
+   "pipeline_id": "default",
+   "stage": "43449439",
+   "close_date": "2026-10-13",
+   "deal_value": 27500.0,
+   "forecast_category": "COMMIT",
+   "deal_status": "active"
+  },
+  {
+   "deal_id": "43595329097",
+   "company_name": "Bike24",
+   "pipeline_id": "866608541",
+   "stage": "1297321622",
+   "close_date": "2026-09-30",
+   "deal_value": 12700.0,
+   "forecast_category": "COMMIT",
+   "deal_status": "active"
+  },
+  {
+   "deal_id": "64836805007",
+   "company_name": "Apify",
+   "pipeline_id": "default",
+   "stage": "43449439",
+   "close_date": "2026-09-30",
+   "deal_value": 670.68,
+   "forecast_category": "COMMIT",
+   "deal_status": "active"
+  }
+ ]
+}

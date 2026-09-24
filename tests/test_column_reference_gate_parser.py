@@ -100,10 +100,15 @@ def test_unknown_table_and_dynamic_selects_are_reported_not_passed():
 
 
 def test_real_forecast_trust_select_is_read_in_full():
-    (s,) = [x for x in gate.extract_selects(REPO / "scripts" / "forecast_trust.py")
-            if x.table == "deals"]
-    assert "forecast_category" in s.arg and "deal_status" in s.arg, s.arg
-    print(f"✓ scripts/forecast_trust.py:{s.line}: the gate reads the whole column list ({s.arg!r})")
+    # the cohort query (adjacent string literals), then the COMMIT close-date
+    # hygiene query added 2026-09-24
+    cohort, hygiene = [x for x in gate.extract_selects(REPO / "scripts" / "forecast_trust.py")
+                       if x.table == "deals"]
+    assert "segment," in cohort.arg and "forecast_category" in cohort.arg and "deal_status" in cohort.arg, cohort.arg
+    assert "new_arr,expansion_arr" in cohort.arg, cohort.arg
+    assert "forecast_category" in hygiene.arg and "deal_status" in hygiene.arg, hygiene.arg
+    print(f"✓ scripts/forecast_trust.py:{cohort.line}: the gate reads the whole column list ({cohort.arg!r}), "
+          f"and the hygiene query at line {hygiene.line}")
 
 
 def test_select_all_and_multi_argument_selects_are_checked():

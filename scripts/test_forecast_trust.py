@@ -470,9 +470,13 @@ def test_dollars_are_incremental_arr_from_real_columns():
         mock_calib.return_value = _fake_calibration_table()
         result = assess_forecast_trust(sb, as_of=date(2026, 9, 23))
 
-    selected = [c.strip() for c in chain.select.call_args.args[0].split(',')]
-    if 'amount' in selected:
-        raise AssertionError(f"deals has no `amount` column; the query selects {selected}")
+    # The cohort query is the first select (a COMMIT close-date hygiene query
+    # follows it, 2026-09-24); no query may select `amount`.
+    all_selects = [[c.strip() for c in call.args[0].split(',')] for call in chain.select.call_args_list]
+    for cols in all_selects:
+        if 'amount' in cols:
+            raise AssertionError(f"deals has no `amount` column; a query selects {cols}")
+    selected = all_selects[0]
     if not {'new_arr', 'expansion_arr'} <= set(selected):
         raise AssertionError(f"incremental_arr() needs new_arr and expansion_arr; selected {selected}")
     p = result['pipeline']
