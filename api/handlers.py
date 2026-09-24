@@ -612,6 +612,32 @@ def _waterfall_weeks(slices, excluded_pipelines=()):
     return out
 
 
+def _waterfall_totals(weeks):
+    """Quarter-level totals across the weekly rows (2026-09-24). Each field
+    carries the bases of the weeks that actually contribute to it (non-zero),
+    so a total mixing deal-value and Incremental ARR weeks says so, the same
+    way each week row states its own basis."""
+    out = {}
+    for f in _WATERFALL_VALUE_FIELDS:
+        by_basis = {}
+        for w in weeks:
+            v = float(w.get(f) or 0)
+            if v:
+                by_basis[w["value_basis"]] = by_basis.get(w["value_basis"], 0.0) + v
+        bases = sorted(by_basis)
+        basis = bases[0] if len(bases) == 1 else ("mixed" if bases else None)
+        out[f] = {
+            "total": sum(by_basis.values()),
+            "value_basis": basis,
+            "basis_label": (WATERFALL_BASIS_LABELS[basis] if basis in ("incremental_arr", "deal_value")
+                            else "mixed basis: " + " + ".join(
+                                f"${by_basis[b]:,.0f} {WATERFALL_BASIS_LABELS[b]}" for b in bases)
+                            if basis == "mixed" else None),
+            "by_basis": by_basis,
+        }
+    return out
+
+
 async def query_waterfall(params: dict, sb) -> dict:
     """
     Pipeline snapshot + movement in ONE handler with question-aware emphasis.
@@ -859,6 +885,7 @@ async def query_waterfall(params: dict, sb) -> dict:
     result = {
         "pipeline_summary": pipeline_summary,  # Headline: closing in the period
         "waterfall": weekly,                   # One company-wide row per week
+        "waterfall_totals": _waterfall_totals(weekly),   # Quarter-level, basis-labeled
         "waterfall_basis_statement": waterfall_basis_statement,
         "period": tw["label"],
         "report_shape": report_shape,          # Declared shape for synthesis
@@ -878,7 +905,10 @@ async def query_waterfall(params: dict, sb) -> dict:
             f"week total). WEEKLY BASIS: weeks can differ. State EACH week's own "
             f"basis_label next to that week's figures (a Basis column, or on the week's "
             f"line), in those exact words. Never state one basis for the whole weekly "
-            f"table. {waterfall_basis_statement}"
+            f"table. {waterfall_basis_statement} QUARTER TOTALS: any total across weeks "
+            f"(quarter-to-date new / won / lost / net) comes from waterfall_totals and states "
+            f"its basis_label; when it is a mixed basis, give that split, never one "
+            f"unlabeled mixed-basis figure."
         ),
     }
 

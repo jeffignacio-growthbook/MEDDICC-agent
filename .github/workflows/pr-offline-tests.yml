@@ -91,6 +91,7 @@ jobs:
             tests/test_zero_arr_deal_counting.py \
             tests/test_query_pipeline_quarter_without_target.py \
             tests/test_pipeline_movement_exit_split.py \
+            tests/test_waterfall_quarter_totals_basis.py \
             tests/test_aggregation_verification.py \
             tests/test_aggregation_retry_hands_correct_value.py \
             tests/test_false_partial_claim_gate.py \
