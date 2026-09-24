@@ -2,8 +2,10 @@
 """
 Plausibility checks for analytical outputs.
 
-Runs before synthesis to catch arithmetic errors, invalid rates, structural
-impossibilities, and metric drift from verified registry values.
+run_all_checks() runs before synthesis to catch arithmetic errors, invalid
+rates, structural impossibilities, and metric drift from verified registry
+values. run_answer_checks() runs after it, comparing the answer with the
+data it came from (see "Answer-side checks" below).
 
 A plausibility violation either:
 1. Surfaces in the answer with a warning flag, OR
@@ -655,6 +657,155 @@ def format_block_message(violations: List[PlausibilityViolation]) -> str:
 
 
 # For testing
+# ══════════════════════════════════════════════════════════════════════
+# Answer-side checks (2026-09-24)
+# ══════════════════════════════════════════════════════════════════════
+# run_all_checks() above looks at handler data before synthesis, and only
+# on route_question's classifier path; dynamic_query returns before it
+# runs. These compare the synthesized ANSWER with the data it came from
+# and run on both paths: dynamic_query_loop()'s wrapper (every exit of the
+# loop) and route_question after synthesis. A violation appends a caveat
+# to the shipped answer (answer_caveat()); in the dynamic loop it also
+# sets its own query_cost_log outcome (see router.FAILURE_MODE_PRIMITIVES).
+
+_MONTHS = ["January", "February", "March", "April", "May", "June", "July",
+           "August", "September", "October", "November", "December"]
+
+# Answer wording -> value_basis. Matched case-insensitively per line.
+_BASIS_WORDS = {
+    "incremental_arr": re.compile(r"incremental\s+arr", re.I),
+    "deal_value": re.compile(r"deal[\s_]value", re.I),
+    "mixed": re.compile(r"mixed\s+basis", re.I),
+}
+
+
+def _iter_dicts(data):
+    """Every dict nested anywhere in data (lists and dicts walked)."""
+    stack = [data]
+    while stack:
+        x = stack.pop()
+        if isinstance(x, dict):
+            yield x
+            stack.extend(x.values())
+        elif isinstance(x, list):
+            stack.extend(x)
+
+
+def _waterfall_week_rows(data) -> Dict[str, str]:
+    """week_ending -> value_basis for every waterfall week row in data."""
+    weeks = {}
+    for d in _iter_dicts(data):
+        if d.get("week_ending") and d.get("value_basis") and "by_slice" in d:
+            weeks[str(d["week_ending"])[:10]] = d["value_basis"]
+    return weeks
+
+
+def _week_date_pattern(week_ending: str):
+    """Ways an answer writes a week date: 2026-09-14, Sep 14, Sept. 14,
+    September 14, 9/14, 09/14."""
+    y, m, d = week_ending.split("-")
+    mi, di = int(m), int(d)
+    full = _MONTHS[mi - 1]
+    names = {full, full[:3]} | ({"Sept"} if mi == 9 else set())
+    alts = [re.escape(week_ending),
+            r"\b(?:%s)\.?\s+0?%d(?:st|nd|rd|th)?\b" % ("|".join(sorted(names)), di),
+            r"(?<![\d/])0?%d/0?%d(?![\d/])" % (mi, di)]
+    return re.compile("|".join(alts), re.I)
+
+
+def _bases_named(text: str) -> set:
+    return {b for b, rx in _BASIS_WORDS.items() if rx.search(text)}
+
+
+def check_answer_week_basis(answer: str, data: Dict) -> List[PlausibilityViolation]:
+    """Each waterfall week the answer mentions must carry its own row's
+    basis. waterfall_weekly weeks before 2026-09-11 are valued on deal_value
+    and later ones on incremental_arr, so a multi-week table can mix them.
+
+    For each answer line naming a week:
+      - the line names a basis: it must be that week's value_basis;
+      - the line names none: the answer's other lines (a header or footnote)
+        count as a table-wide statement. One table-wide basis that isn't
+        this week's is a mismatch. No basis anywhere while the mentioned
+        weeks differ is flagged too: the reader can't tell which is which.
+    """
+    weeks = _waterfall_week_rows(data)
+    if not answer or not weeks:
+        return []
+    lines = answer.splitlines()
+    mentions = []                                   # (week, line_no, bases on line)
+    for week, basis in weeks.items():
+        rx = _week_date_pattern(week)
+        for i, line in enumerate(lines):
+            if rx.search(line):
+                mentions.append((week, i, _bases_named(line)))
+    if not mentions:
+        return []
+    week_lines = {i for _, i, _ in mentions}
+    table_wide = _bases_named("\n".join(l for i, l in enumerate(lines) if i not in week_lines))
+
+    wrong, unlabeled = [], []
+    for week, i, named in mentions:
+        actual = weeks[week]
+        effective = named or table_wide
+        if effective and actual not in effective:
+            wrong.append({"week_ending": week, "stated": sorted(effective), "actual": actual,
+                          "line": lines[i].strip()[:160]})
+        elif len(effective) > 1 and not named:
+            wrong.append({"week_ending": week, "stated": sorted(effective), "actual": actual,
+                          "line": lines[i].strip()[:160]})
+        elif not effective:
+            unlabeled.append(week)
+    mentioned_bases = {weeks[w] for w, _, _ in mentions}
+    out = []
+    if wrong:
+        out.append(PlausibilityViolation(
+            "answer_week_basis", "error",
+            f"answer states the wrong basis for {len(wrong)} week(s): "
+            + "; ".join(f"{w['week_ending']} stated {w['stated']} but stored as {w['actual']}"
+                        for w in wrong),
+            {"wrong": wrong}))
+    if unlabeled and len(mentioned_bases) > 1:
+        out.append(PlausibilityViolation(
+            "answer_week_basis", "error",
+            f"answer gives no basis for week(s) {sorted(set(unlabeled))} while the weeks it "
+            f"shows are on different bases ({sorted(mentioned_bases)})",
+            {"unlabeled": sorted(set(unlabeled)), "bases": sorted(mentioned_bases)}))
+    return out
+
+
+def run_answer_checks(answer: str, data: Dict) -> List[PlausibilityViolation]:
+    """Every answer-side check. Never raises: a checker bug must not cost
+    the user their answer (it is logged by the caller and returns [])."""
+    out = []
+    for check in (check_answer_week_basis,):
+        try:
+            out.extend(check(answer, data))
+        except Exception as e:  # pragma: no cover - defensive
+            import logging
+            logging.getLogger(__name__).warning(f"[PLAUSIBILITY] {check.__name__} raised: {e}")
+    return out
+
+
+_ANSWER_CAVEATS = {
+    "answer_week_basis": (
+        "⚠️ Note: weekly figures before Sep 11, 2026 are valued on deal value and later weeks "
+        "on Incremental ARR. The basis shown for one or more weeks above doesn't match how "
+        "that week was computed."),
+}
+
+
+def answer_caveat(violations: List[PlausibilityViolation]) -> str:
+    """The plain-language note appended to an answer for these violations
+    (one line per kind of check), or '' when there are none."""
+    seen = []
+    for v in violations:
+        text = _ANSWER_CAVEATS.get(v.check)
+        if text and text not in seen:
+            seen.append(text)
+    return "\n".join(seen)
+
+
 if __name__ == "__main__":
     # Test with sample data
     test_data = {

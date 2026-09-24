@@ -2769,6 +2769,9 @@ FAILURE_MODE_PRIMITIVES = frozenset({
     # but never registered here, so it had no default in _new_cost_state and
     # no outcome bucket. A blocked corruption read as generic "other_fallback".
     "aggregation_placement_corruption",
+    # 2026-09-24: api/plausibility.check_answer_week_basis, run on every
+    # answer in dynamic_query_loop()'s wrapper (_apply_answer_checks).
+    "answer_week_basis_mismatch",
 })
 
 
@@ -2802,6 +2805,7 @@ def _new_cost_state() -> dict:
             "ambiguous_dimension_unaddressed": False,
             "zero_rows_suspicion_flagged": False,
             "zero_rows_suspicion_unresolved": False,
+            "answer_week_basis_mismatch": False,
         },
     }
 
@@ -2812,7 +2816,8 @@ def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
     "answered_with_unverified_aggregation",
     "answered_with_unverified_date_labeling",
     "answered_with_unaddressed_ambiguity",
-    "answered_with_unresolved_zero_row_suspicion", "budget_exhausted",
+    "answered_with_unresolved_zero_row_suspicion",
+    "answered_with_week_basis_mismatch", "budget_exhausted",
     "blocked_placement_corruption", "other_fallback". See dynamic_query_loop()'s docstring for what each
     means.
 
@@ -2842,6 +2847,8 @@ def _compute_query_cost_outcome(result: Optional[dict], cost_state: dict,
             return "answered_with_unaddressed_ambiguity"
         if primitives["zero_rows_suspicion_unresolved"]:
             return "answered_with_unresolved_zero_row_suspicion"
+        if primitives["answer_week_basis_mismatch"]:
+            return "answered_with_week_basis_mismatch"
         if (primitives["scratchpad_rejection_fired"]
                 or primitives["aggregation_mismatch_caught"]
                 or primitives["aggregation_placement_corruption"]
@@ -3242,6 +3249,12 @@ async def dynamic_query_loop(question, history, params,
                                      answer carries a caveat naming the
                                      candidates; this outcome is its own
                                      queryable bucket.
+      "answered_with_week_basis_mismatch" — answered=True, but a waterfall
+                                     week in the answer carries a basis
+                                     that isn't its row's value_basis
+                                     (api/plausibility.check_answer_week_
+                                     basis, via _apply_answer_checks). The
+                                     shipped answer carries a caveat.
       "budget_exhausted"          — answered=False, gave up on the
                                      internal ceiling
       "other_fallback"            — answered=False, any other give-up
@@ -3261,12 +3274,50 @@ async def dynamic_query_loop(question, history, params,
             origin_handler=origin_handler, origin_reason=origin_reason,
             cost_state=cost_state,
         )
+        _apply_answer_checks(result, cost_state)
         return result
     except Exception as e:
         exc_raised = e
         raise
     finally:
         _log_query_cost(sb, question, cost_state, result, exc_raised)
+
+
+def _answer_check_data(result: Optional[dict], cost_state: dict) -> dict:
+    """What the answer checks compare against: every tool result the loop
+    gathered (step_N_raw), as the model saw it, or the returned tool_results
+    when the loop recorded none."""
+    acc = cost_state.get("_accumulated_data") or {}
+    steps = [_model_view(v) for k, v in acc.items() if k.endswith("_raw")]
+    if steps:
+        return {"steps": steps}
+    return (result or {}).get("tool_results") or {}
+
+
+def _apply_answer_checks(result: Optional[dict], cost_state: dict) -> None:
+    """Runs api/plausibility.run_answer_checks on a shipped answer, whichever
+    exit of _dynamic_query_loop_core produced it. A violation appends a
+    plain-language caveat, sets its primitive (its own query_cost_log
+    outcome) and lists the violations on the result. Never raises."""
+    if not result or not result.get("answered") or not result.get("answer"):
+        return
+    try:
+        from api.plausibility import run_answer_checks, answer_caveat
+        violations = run_answer_checks(result["answer"], _answer_check_data(result, cost_state))
+    except Exception as e:
+        logger.warning(f"[PLAUSIBILITY] answer checks raised: {e}")
+        return
+    if not violations:
+        return
+    for v in violations:
+        logger.error(f"[PLAUSIBILITY] answer {v.check}: {v.message}")
+        if v.check == "answer_week_basis":
+            cost_state["primitives_fired"]["answer_week_basis_mismatch"] = True
+    caveat = answer_caveat(violations)
+    if caveat:
+        result["answer"] = f"{result['answer']}\n\n{caveat}"
+    result["plausibility_violations"] = [
+        {"check": v.check, "severity": v.severity, "message": v.message} for v in violations]
 
 
 async def _dynamic_query_loop_core(question, history, params,
@@ -3487,6 +3538,7 @@ async def _dynamic_query_loop_core(question, history, params,
         {"role": "user", "content": "\n\n".join(content_parts)}
     ]
     accumulated_data = {}
+    cost_state["_accumulated_data"] = accumulated_data  # for _apply_answer_checks
     executed_tools = []  # Track tool calls to detect near-duplicates
     queries_run = []  # Track all queries for fallback logging
     had_answer_at_iteration = None  # Detect discarded_answer trigger
@@ -6293,6 +6345,22 @@ async def route_question(question: str, user_id: str,
         except Exception as e:
             logger.error(f"[FALLBACK] Failed to write below_floor log: {e}")
 
+    # ── 8.5. Answer-side plausibility (2026-09-24) ─────────
+    # Same checks dynamic_query_loop's wrapper runs (_apply_answer_checks),
+    # against the data this answer was synthesized from.
+    answer_violations = []
+    try:
+        from api.plausibility import run_answer_checks, answer_caveat
+        answer_violations = run_answer_checks(verified, _model_view(tool_results))
+    except Exception as e:
+        logger.warning(f"[PLAUSIBILITY] answer checks raised: {e}")
+    if answer_violations:
+        for v in answer_violations:
+            logger.error(f"[PLAUSIBILITY] answer {v.check}: {v.message}")
+        caveat = answer_caveat(answer_violations)
+        if caveat:
+            verified = f"{verified}\n\n{caveat}"
+
     # ── 9. Log learning note (win or lose) ────────────────
     _log_learning(sb, question, handler_name,
                  assessment, retry_count)
@@ -6316,9 +6384,14 @@ async def route_question(question: str, user_id: str,
         logger.error(f"[MEMORY] Failed to save answer: {e}")
         # Non-fatal - don't block answer delivery
 
-    return {"answer": verified, "needs_ack": is_slow,
-            "tool_results": tool_results,
-            "handler_name": handler_name}
+    out = {"answer": verified, "needs_ack": is_slow,
+           "tool_results": tool_results,
+           "handler_name": handler_name}
+    if answer_violations:
+        out["plausibility_violations"] = [
+            {"check": v.check, "severity": v.severity, "message": v.message}
+            for v in answer_violations]
+    return out
 
 
 # Helper to keep route_question() clean

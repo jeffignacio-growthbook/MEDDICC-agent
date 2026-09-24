@@ -86,6 +86,14 @@ KNOWN_DETECTION_FUNCTIONS = {
     # flag on signed days_past_* offsets with the checks that are real
     # (missing/invalid benchmark, offset != days_open - benchmark).
     "check_benchmark_offsets",
+    # check_answer_week_basis (2026-09-24): answer-side, not run_all_checks.
+    # Run on every dynamic_query_loop answer by the wrapper's
+    # _apply_answer_checks: (a) sets answer_week_basis_mismatch (in
+    # FAILURE_MODE_PRIMITIVES, own outcome answered_with_week_basis_mismatch);
+    # (b) appends a plain-language caveat to the shipped answer. On
+    # route_question's path the same caveat is appended and the violation
+    # returned in plausibility_violations.
+    "check_answer_week_basis",
     "check_negative_counts",
     "check_rate_bounds",
     "check_subset_relationships",
