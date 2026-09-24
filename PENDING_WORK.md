@@ -54,6 +54,49 @@ about 1-2% (10 of 1,700 deals; 20 of 918 snapshot rows since 09-11).
 Rewrites 67 weeks of production history, so it needs its own plan,
 dry-run diff and sign-off.
 
+### 🟡 DECISION PENDING: Pre-synthesis plausibility checks don't run on the dynamic-loop path (found 2026-09-24)
+**Status:** Deliberately left unwired. Needs a decision on blocking vs. caveat
+behavior before any change.
+
+**What:** `api/plausibility.run_all_checks()` (rate bounds, subset, sum
+consistency, benchmark offsets, registry divergence) runs only in
+`route_question` step 6, on the classifier path. `dynamic_query` returns
+straight from `dynamic_query_loop()` (`api/router.py`, "3b. Direct
+dynamic_query") before step 6. So the seven unified-routing handlers never
+get these checks: query_pipeline, query_waterfall, query_pipeline_movement,
+query_stale_deals, query_rep_pipeline, query_win_loss, query_deals_at_risk.
+
+**What does run on both paths (2026-09-24):** the answer-side checks,
+`run_answer_checks()` (`check_answer_week_basis`, `check_answer_unit_slips`).
+In the loop they're applied by `_apply_answer_checks` in the wrapper. They
+append a caveat and set their own `query_cost_log` outcome. They never block.
+
+**Why not wired now:** a critical `run_all_checks` violation replaces the
+answer with a block message. Wiring it into the loop can block answers that
+ship today. That's a bigger behavior change than the caveat-only answer
+checks, and it needs its own scoping: which checks, block or caveat, and a
+replay on production traffic first (as done for the unit-slip check).
+
+### 🟢 LOW: `assess_deal_risk` / `query_deals_at_risk` routing overlap (found 2026-09-24)
+**Status:** Found, not fixed. Same pattern as the pipeline / waterfall /
+movement split (commit "Routing: split pipeline wording...").
+
+**What:** in the dynamic loop's tool list (`DYNAMIC_SYSTEM_PROMPT`), both
+tools claim "which deals are at risk": `assess_deal_risk` in its "Phrasing
+patterns" line, and `query_deals_at_risk` in its USE THIS bullets and
+Examples. `query_deals_at_risk` has a DO NOT line pointing
+cycle-length/overdue risk to `assess_deal_risk`, but the shared phrase stays
+ambiguous. Not in the 2026-09-18 "Acceptable Overlaps" entry, which covers
+two different pairs on the classifier path.
+
+**Likely fix:** give each tool distinct wording. "At risk" / "likelihood to
+close" / "might slip" goes to assess_deal_risk; "MEDDICC gaps" / "champion
+gaps" / "weak MEDDICC" goes to query_deals_at_risk. Pick an owner for bare
+"which deals are at risk". Then extend `tests/test_pipeline_routing_split.py`'s
+phrase-ownership check to cover these two (assess_deal_risk isn't a
+unified-routing tool, so it's outside that test's set today), and run
+`scripts/eval_dynamic_routing.py` against the real model.
+
 ### 🟢 LOW: Two active deals have no owner in HubSpot (found 2026-09-23)
 **Status:** OPEN, not actioned. Found incidentally while verifying the
 Inditex fix; unrelated to it. `deal_status='active'` with an empty
