@@ -29,6 +29,31 @@ Postgres/API logs, or `query_cost_log.primitives_fired`, and name which one.
 
 ## 🟡 Open Items
 
+### 🔵 ROADMAP (not urgent, not blocking): Rebuild pre-2026-09-11 incremental ARR history for the waterfall (logged 2026-09-24)
+**Status:** FUTURE. Nothing is broken; historical weeks are labeled, not wrong.
+
+**What:** `deals_snapshot` has `new_arr` / `expansion_arr` only from
+2026-09-11 (0 of ~26,000 earlier rows; checked 2026-09-24). So
+`compute_waterfall_segmented.py` values weeks on `incremental_arr()` only
+from then (`INCREMENTAL_BASIS_FROM`). The 67 earlier snapshot dates
+(2025-08-04 onward) stay on `deal_value`, which is Incremental ARR, or
+HubSpot `amount` where none was recorded. Every `waterfall_weekly` row
+states its `value_basis` (migration 072), and `query_waterfall` tells the
+model which basis each week uses. For non-renewal deals the two differ by
+about 1-2% (10 of 1,700 deals; 20 of 918 snapshot rows since 09-11).
+
+**To move history onto the governed basis:**
+1. Pull `new_revenue` / `expansion_revenue` value history per deal from
+   HubSpot (`propertiesWithHistory`). `property_history` stores only
+   `dealstage` and `notes_last_updated` today.
+2. Backfill `deals_snapshot.new_arr` / `expansion_arr` point-in-time for
+   each snapshot date. Never use today's values.
+3. `compute_waterfall_segmented.py --recompute-from 2025-08-04` after
+   moving `INCREMENTAL_BASIS_FROM` back.
+
+Rewrites 67 weeks of production history, so it needs its own plan,
+dry-run diff and sign-off.
+
 ### 🟢 LOW: Two active deals have no owner in HubSpot (found 2026-09-23)
 **Status:** OPEN, not actioned. Found incidentally while verifying the
 Inditex fix; unrelated to it. `deal_status='active'` with an empty
