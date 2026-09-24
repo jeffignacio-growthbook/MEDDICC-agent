@@ -273,9 +273,13 @@ def test_router_forces_backfill_for_deal_ids_the_model_missed():
         f"{filter_calls}"
     )
     backfilled_ids = set(backfill_calls[0]["filters"][0][2])
-    assert backfilled_ids == set(STAGE_CHANGE_IDS + NEW_ENTRY_IDS), (
+    # the 5 names the model's enrichment missed, plus the exit deal: its
+    # name was covered, but not its deal_status, which the diff now needs
+    # to say how it left (2026-09-24, attach_exit_status)
+    assert backfilled_ids == set(STAGE_CHANGE_IDS + NEW_ENTRY_IDS + [EXIT_ID_COVERED]), (
         f"the forced backfill must cover exactly the 5 reported "
-        f"deal_ids the model's enrichment call missed — got {backfilled_ids}"
+        f"deal_ids the model's enrichment call missed, plus the exit's "
+        f"status — got {backfilled_ids}"
     )
 
     finalize_messages = fake_client.calls[-1]["messages"]

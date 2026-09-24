@@ -259,3 +259,28 @@ def attach_company_names(diff_result: dict, company_names: dict) -> dict:
     for entry in diff_result.get("owner_changes", []):
         entry["company_name"] = _name_for(entry.get("deal_id"))
     return diff_result
+
+
+_EXIT_STATUS = {"lost": "closed_lost", "won": "closed_won", "active": "still_open"}
+
+
+def attach_exit_status(diff_result: dict, deal_statuses: dict) -> dict:
+    """Attach `exit_status` to every population exit: how the deal left.
+
+    2026-09-24: a population exit carried only its prior-snapshot row, and
+    the synthesis prompt called every exit "Dropped", so a loss, a win and
+    a reassignment looked the same. Jake H's week-over-week answer read
+    Discovery -1 / Negotiating +1 as "1 deal advanced from Discovery ->
+    likely into Negotiating"; what happened was Comcast (Discovery) closing
+    lost and Plusgrade moving Scoping -> Negotiating. Same gap the
+    pipeline-movement handler closed with its exit split (_pm_left_reason).
+
+    `deal_statuses` is {deal_id: deals.deal_status} as of today: 'lost' ->
+    closed_lost, 'won' -> closed_won, 'active' -> still_open (left this
+    set some other way: reassigned, moved out of scope), anything else or
+    missing -> unknown. Mutates and returns diff_result."""
+    for row in diff_result.get("population_exits", []):
+        if isinstance(row, dict):
+            status = deal_statuses.get(str(row.get("deal_id")))
+            row["exit_status"] = _EXIT_STATUS.get(str(status or "").lower(), "unknown")
+    return diff_result
