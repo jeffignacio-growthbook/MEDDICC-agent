@@ -1281,23 +1281,30 @@ TOOLS YOU CAN CALL:
     Example: assess_deal_risk(deal_ids=["123"], fiscal_quarter="FY2027 Q2")
   query_pipeline(owner_email, stage_filter, pipeline_filter)
     **PHASE 2: Handler 1/6 migrated to unified routing**
+    **DEFAULT for a bare "pipeline" question** (no quarter, no qualified, no waterfall,
+    no movement wording).
     **USE THIS when the question asks about**:
-    - CURRENT PIPELINE STATE, OVERALL PIPELINE, TOTAL PIPELINE
-    - What is pipeline, how much pipeline, show me pipeline
-    - Pipeline snapshot, funnel, active/open deals
-    - Pipeline breakdown by stage, owner, or pipeline type
-    **DO NOT use for pipeline MOVEMENT or "how has pipeline changed"** (use query_pipeline_movement)
+    - ALL ACTIVE / TOTAL / OVERALL PIPELINE, including Meeting Set and
+      renewal-pipeline expansion
+    - Pipeline breakdown by stage, by rep, or by pipeline type
+    - Pipeline coverage
+    **DO NOT use for** qualified pipeline this quarter or a weekly waterfall
+    (use query_waterfall), for pipeline that moved / changed / entered / exited
+    (use query_pipeline_movement), or for one named rep's deals (use query_rep_pipeline)
     Params:
     - owner_email: filter to specific rep (optional, accepts email or name)
     - stage_filter: "qualified", "discovery", "scoping", "proposal" (optional, defaults to all stages)
     - pipeline_filter: "new_business" or "renewal" (optional, defaults to all incremental pipeline)
     **RETURNS**: Current pipeline snapshot with total deals, total ARR, coverage ratio, breakdowns by stage/owner
-    Examples: "what is our pipeline", "show me pipeline", "how much pipeline do we have", "Jake's pipeline"
+    Examples: "what is our pipeline", "show me pipeline", "how much pipeline do we have",
+    "total pipeline by stage", "all active pipeline including Meeting Set", "pipeline by rep",
+    "what's our pipeline coverage"
   query_pipeline_movement(view, fiscal_quarter, pipeline_filter, owner_email, stage, weeks, close_date_scope, time_window, deal_ids)
     **PHASE 1 PILOT: unified routing test for handler-as-tool pattern**
     **USE THIS when the question asks about**:
-    - PIPELINE MOVED, PIPELINE MOVEMENT, PIPELINE CHANGED
-    - HOW HAS PIPELINE [moved/changed], DEALS THAT MOVED
+    - PIPELINE MOVED, PIPELINE MOVEMENT, PIPELINE CHANGED / CHANGE
+    - HOW HAS / HOW DID PIPELINE [move/change], DEALS THAT MOVED or CHANGED STAGE
+    - What ENTERED or EXITED pipeline (added, dropped out)
     - Historical pipeline movement over time (not current state)
     Params:
     - view: "movement" (default), "composition", "deal_changes", "curve", or "stage_deals"
@@ -1310,8 +1317,9 @@ TOOLS YOU CAN CALL:
     - time_window: dict with period/fiscal_quarter/n for time range (optional, e.g. {{"period": "current_quarter"}} or {{"period": "last_N_days", "n": 30}})
     - deal_ids: list of specific deal IDs for deal_changes view (optional, for entity-scoped queries)
     **RETURNS**: Snapshot-based movement analysis with stage changes, entries, exits
-    Examples: "how has pipeline moved this quarter", "renewal pipeline movement",
-    "which deals moved to Technical Evaluation", "Christian's pipeline changes"
+    Examples: "how has pipeline moved this quarter", "how did pipeline change this month",
+    "renewal pipeline movement", "which deals moved to Technical Evaluation",
+    "what entered or exited pipeline this quarter", "Christian's pipeline changes"
   query_stale_deals(owner_email, stage, stale_days, time_window)
     **PHASE 2: Handler 2/6 migrated to unified routing**
     **USE THIS when the question asks about**:
@@ -1329,16 +1337,17 @@ TOOLS YOU CAN CALL:
   query_waterfall(time_window, question)
     **PHASE 2: Handler 3/6 migrated to unified routing**
     **USE THIS when the question asks about**:
-    - PIPELINE SNAPSHOT + WEEKLY MOVEMENT (combined view)
-    - What is pipeline, how much pipeline, show me pipeline
-    - Current pipeline state with weekly flow metrics
-    - Pipeline summary, funnel, active deals with movement trends
-    - "Show me pipeline", "what's our pipeline", "pipeline this quarter", "how did pipeline change"
+    - QUALIFIED PIPELINE THIS QUARTER (or a named quarter): qualified deals
+      closing in the period
+    - PIPELINE WATERFALL: new / won / lost pipeline by week
+    **DO NOT use for** a bare "what is our pipeline" (use query_pipeline) or for
+    pipeline that moved / changed / entered / exited (use query_pipeline_movement)
     Params:
     - time_window: dict for time range (optional, defaults to current quarter, e.g. {{"period": "current_quarter"}})
     - question: original user question text (optional, used for emphasis/framing in synthesis)
     **RETURNS**: Pipeline summary (total, by-stage, needs-attention) + weekly waterfall (new/won/lost)
-    Examples: "show me pipeline", "what is our pipeline", "pipeline this quarter", "how did pipeline change this month"
+    Examples: "what's our qualified pipeline this quarter", "show me the pipeline waterfall",
+    "new, won and lost pipeline by week", "qualified pipeline for Q3"
   query_rep_pipeline(owner_email)
     **PHASE 2: Handler 4/6 migrated to unified routing**
     **USE THIS when the question asks about**:
