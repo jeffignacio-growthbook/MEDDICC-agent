@@ -42,8 +42,19 @@ def _validate_columns(table, columns):
     return good or list(valid)[:10], bad
 
 def _validate_filters(table, filters):
+    """(filters that can be applied, filters naming a column that isn't
+    queryable for `table`). A table with no data_dictionary entries is not
+    validated.
+
+    2026-09-24: this used to return only the first list and silently drop
+    the rest, so a filter on an invented, misspelled or hidden column never
+    reached Postgres and the unfiltered rows came back as if it had
+    (PENDING_WORK #14: a wrong-scoped answer shipped "verified"). Callers
+    must refuse, not drop, the second list."""
     valid = _VALID_COLUMNS.get(table, set())
-    return [(op, col, val) for op, col, val in filters if col in valid or not valid]
+    ok = [(op, col, val) for op, col, val in filters if col in valid or not valid]
+    bad = [(op, col, val) for op, col, val in filters if valid and col not in valid]
+    return ok, bad
 
 VALID_OPS = {"eq", "neq", "gt", "gte", "lt", "lte", "like", "ilike", "is_", "in_"}
 
@@ -72,7 +83,13 @@ async def filter_table(sb, table, columns=None, filters=None, limit=200, order_b
                 "deal_status", "close_date"]
     # Strip heavy text blobs — the fallback dumps rows into synthesis (see above).
     cols = [c for c in cols if c not in HEAVY_COLUMNS] or ["deal_id", "company_name"]
-    valid_filters = _validate_filters(table, [tuple(f) for f in (filters or [])])
+    valid_filters, unknown = _validate_filters(table, [tuple(f) for f in (filters or [])])
+    if unknown:
+        cols = sorted({c for _, c, _ in unknown})
+        return {"error": (f"Can't filter {table} on {cols}: not a queryable column of {table}. "
+                          f"The query was not run (running it without the filter would return "
+                          f"the wrong rows). Queryable columns: {sorted(_VALID_COLUMNS.get(table, set()))}"),
+                "unknown_filter_columns": cols}
     invalid_ops = [(op,col,val) for op,col,val in valid_filters if op not in VALID_OPS]
     if invalid_ops:
         return {"error": f"Invalid operators: {invalid_ops}. Use one of: {sorted(VALID_OPS)}"}
@@ -170,14 +187,23 @@ async def filter_table(sb, table, columns=None, filters=None, limit=200, order_b
 async def join_tables(sb, primary_table, primary_key, joined_table, foreign_key,
                       primary_filters=None, joined_columns=None, limit=50):
     _init_valid_columns(sb)
-    primary_rows = (await filter_table(sb, primary_table, filters=primary_filters, limit=limit))["rows"]
+    primary = await filter_table(sb, primary_table, filters=primary_filters, limit=limit)
+    if "error" in primary:
+        return primary                  # e.g. a filter it couldn't apply: never join on the wrong rows
+    primary_rows = primary["rows"]
     if not primary_rows:
         return {"rows": [], "total_found": 0}
     key_values = [r[primary_key] for r in primary_rows if r.get(primary_key)]
     if not key_values:
         return {"rows": primary_rows, "total_found": len(primary_rows)}
+    # _validate_columns returns (good, unavailable) since 2026-09-01; joining that
+    # tuple raised TypeError on every call with primary rows. The foreign key must
+    # be selected too, or no joined row can be matched back.
+    joined_cols, _unavailable = _validate_columns(joined_table, joined_columns or [])
+    if joined_cols and foreign_key not in joined_cols:
+        joined_cols = [foreign_key] + list(joined_cols)
     joined = select_all(sb, joined_table,
-        columns=",".join(_validate_columns(joined_table, joined_columns or [])) or "*",
+        columns=",".join(joined_cols) or "*",
         filters=[("in_", foreign_key, key_values)])
     joined_map = {}
     for j in joined:
