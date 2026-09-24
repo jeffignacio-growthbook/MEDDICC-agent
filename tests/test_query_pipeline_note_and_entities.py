@@ -29,6 +29,7 @@ import logging  # noqa: E402
 logging.disable(logging.CRITICAL)
 
 import api.handlers as handlers  # noqa: E402
+from api.db import extract_entity_context  # noqa: E402
 
 DEALS = [
     {"deal_id": "101", "company_name": "Alpha", "deal_value": 120000, "stage": "presentationscheduled",
@@ -91,6 +92,17 @@ def test_note_states_the_handlers_own_totals():
           "(no hardcoded $18.6M / 306)")
 
 
+def test_deal_rows_carry_deal_id_and_entities_are_extracted():
+    r = _run()
+    assert all(d.get("deal_id") for d in r["deals"]), r["deals"]
+    ctx = extract_entity_context(r, sb=_SB())
+    assert sorted(ctx["deal_ids"]) == ["101", "102", "103"], ctx
+    assert sorted(ctx["company_names"]) == ["Alpha", "Bravo", "Charlie"], ctx
+    print("✓ deals rows carry deal_id; extract_entity_context stores all 3 deals "
+          "(was zero: no entity-bearing list)")
+
+
 if __name__ == "__main__":
     test_note_states_the_handlers_own_totals()
+    test_deal_rows_carry_deal_id_and_entities_are_extracted()
     print("\n✅ All tests passed")
