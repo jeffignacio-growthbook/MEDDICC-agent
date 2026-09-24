@@ -106,6 +106,43 @@ def test_real_forecast_trust_select_is_read_in_full():
     print(f"✓ scripts/forecast_trust.py:{s.line}: the gate reads the whole column list ({s.arg!r})")
 
 
+def test_select_all_and_multi_argument_selects_are_checked():
+    """2026-09-24: the 09-23 rewrite checked only .table().select() chains
+    and only a select's first argument. select_all(sb, table, columns=...)
+    (307 calls) and .select("a", "b") went unchecked."""
+    cases = {
+        "select_all positional": 'rows = select_all(sb, "deals", "deal_id, bogus_f")\n',
+        "select_all keyword": 'rows = select_all(sb, "deals", columns="deal_id,bogus_g", filters=[])\n',
+        "attribute select_all": 'rows = supabase_client.select_all(sb, table="deals", columns="bogus_h")\n',
+        "multi-argument select": 'x = sb.table("deals").select("deal_id", "new_arr", "bogus_i")\n',
+    }
+    for name, src in cases.items():
+        bad = [c for _, c in _bad(_audit(src))]
+        assert len(bad) == 1 and bad[0].startswith("bogus_"), (name, bad)
+    r = _audit('a = select_all(sb, name, columns="deal_id")\n'
+               'b = select_all(sb, "deals", columns=cols)\n'
+               'c = select_all(sb, "deals")\n')
+    assert len(r["unchecked"]["dynamic_table_or_columns"]) == 2
+    assert len(r["unchecked"]["wildcard_only"]) == 1           # default columns='*'
+    print(f"✓ {len(cases)} select_all / multi-argument shapes caught; dynamic and default-'*' "
+          "select_all counted as NOT checked")
+
+
+def test_control_the_previous_extractor_missed_them():
+    """What the 09-23 extractor saw: only .select() attributes, first arg."""
+    import ast as _ast
+    src = ('rows = select_all(sb, "deals", "deal_id, bogus_f")\n'
+           'x = sb.table("deals").select("deal_id", "new_arr", "bogus_i")\n')
+    seen = []
+    for node in _ast.walk(_ast.parse(src)):
+        if (isinstance(node, _ast.Call) and isinstance(node.func, _ast.Attribute)
+                and node.func.attr == "select"):
+            seen.append(node.args[0].value)
+    assert seen == ["deal_id"], seen
+    assert _bad(_audit(src)) == [("deals", "bogus_f"), ("deals", "bogus_i")]
+    print("✓ control: the previous extractor saw only 'deal_id' here; the gate now reports both bogus columns")
+
+
 if __name__ == "__main__":
     test_split_literal_forecast_trust_shape_is_caught()
     test_control_old_regex_saw_only_the_first_literal()
@@ -113,4 +150,6 @@ if __name__ == "__main__":
     test_valid_postgrest_syntax_is_not_flagged()
     test_unknown_table_and_dynamic_selects_are_reported_not_passed()
     test_real_forecast_trust_select_is_read_in_full()
+    test_select_all_and_multi_argument_selects_are_checked()
+    test_control_the_previous_extractor_missed_them()
     print("\n✅ All tests passed")

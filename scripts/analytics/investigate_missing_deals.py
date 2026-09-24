@@ -46,7 +46,7 @@ snapshot_deal_ids = set(s['deal_id'] for s in snapshots if s.get('pipeline_id') 
 
 # Get all deals
 deals = select_all(sb, 'deals',
-                  columns='deal_id, create_date, close_date, pipeline_id, deal_status, stage_id')
+                  columns='deal_id, create_date, close_date, pipeline_id, deal_status, stage_id:stage')  # deals has no stage_id column
 
 # Find genuinely open deals
 genuinely_open_deals = []
