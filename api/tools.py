@@ -90,14 +90,17 @@ async def filter_table(sb, table, columns=None, filters=None, limit=200, order_b
                           f"The query was not run (running it without the filter would return "
                           f"the wrong rows). Queryable columns: {sorted(_VALID_COLUMNS.get(table, set()))}"),
                 "unknown_filter_columns": cols}
-    # A row filtered on snapshot_date must say which snapshot it is. The
-    # code-level snapshot diff, the anchor check and AGGREGATION_VERIFY tell
-    # snapshots apart by the row's own snapshot_date; a query that filtered
-    # on it without selecting it (2026-09-24, Jake H's Sep 14 snapshot)
-    # returned rows none of them could place, so the loop believed that
-    # snapshot was never queried and the diff never ran.
-    if any(len(f) > 1 and f[1] == "snapshot_date" for f in valid_filters) and "snapshot_date" not in cols:
-        cols = cols + ["snapshot_date"]
+    # Every column the query filters on comes back with its rows: a caller
+    # can only reason about what it got if the rows say what they were
+    # selected by. 2026-09-24, Jake H's diff: the 2026-09-14 pull filtered
+    # on snapshot_date without selecting it; the code-level diff, the anchor
+    # check and AGGREGATION_VERIFY all tell snapshots apart by that field,
+    # so the loop believed that snapshot was never queried and the diff
+    # never ran. (Heavy text columns are still left out; a filter on one
+    # doesn't need its value echoed.)
+    for f in valid_filters:
+        if len(f) > 1 and f[1] not in cols and f[1] not in HEAVY_COLUMNS:
+            cols = cols + [f[1]]
     invalid_ops = [(op,col,val) for op,col,val in valid_filters if op not in VALID_OPS]
     if invalid_ops:
         return {"error": f"Invalid operators: {invalid_ops}. Use one of: {sorted(VALID_OPS)}"}

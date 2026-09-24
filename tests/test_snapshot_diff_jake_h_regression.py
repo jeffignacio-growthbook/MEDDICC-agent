@@ -196,6 +196,23 @@ def test_filter_table_returns_the_snapshot_date_it_filtered_on():
     print("✓ filter_table: rows filtered on snapshot_date carry it even when it wasn't selected")
 
 
+def test_filter_table_returns_every_column_it_filtered_on():
+    """The general form of the fix: a caller can only reason about what it
+    got back if every column it filtered on comes back with the rows."""
+    T._VALID_COLUMNS.clear()
+    sb = with_data_dictionary({"deals_snapshot": FX["snapshots"], "deals": FX["deals"]})
+    r = asyncio.run(T.filter_table(sb, "deals_snapshot", columns=["deal_id", "deal_value"],
+                                   filters=[["eq", "owner_email", "jake@growthbook.io"],
+                                            ["eq", "pipeline_id", "default"],
+                                            ["gte", "stage_order", 1]]))
+    assert r["rows"] and all({"owner_email", "pipeline_id", "stage_order"} <= set(row) for row in r["rows"]), \
+        r["rows"][:1]
+    r = asyncio.run(T.filter_table(sb, "deals", columns=["company_name"],
+                                   filters=[["in_", "deal_id", ["58798224498"]]], order_by="deal_value desc"))
+    assert r["rows"] == [{"company_name": "Comcast", "deal_id": "58798224498"}], r
+    print("✓ filter_table: every filtered-on column comes back (paginated and order_by paths)")
+
+
 # ── bug 2: a stated total is checked per population ────────────────────────
 
 def _trace_populations():

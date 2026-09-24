@@ -61,10 +61,12 @@ def _run(**kw):
 
 
 def test_registered_filters_still_apply():
+    # the filtered-on column comes back too (2026-09-24: a row must say what
+    # it was selected by; see tests/test_snapshot_diff_jake_h_regression.py)
     r, _ = _run(columns=["deal_id", "deal_value"], filters=[["eq", "region", "EMEA"]])
-    assert r.get("rows") == [{"deal_id": "1", "deal_value": 10}], r
+    assert r.get("rows") == [{"deal_id": "1", "deal_value": 10, "region": "EMEA"}], r
     r, _ = _run(columns=["deal_id"], filters=[["eq", "region", "EMEA"]], order_by="deal_value desc")
-    assert r.get("rows") == [{"deal_id": "1"}], r
+    assert r.get("rows") == [{"deal_id": "1", "region": "EMEA"}], r
     print("✓ a filter on a registered column is applied (paginated and order_by paths)")
 
 
@@ -94,7 +96,7 @@ def test_unregistered_table_is_still_not_validated():
     tools._VALID_COLUMNS.clear()
     sb = StrictSupabase({"data_dictionary": [], "calls": [{"call_id": "c1", "deal_id": "1"}]})
     r = asyncio.run(tools.filter_table(sb, "calls", columns=["call_id"], filters=[["eq", "deal_id", "1"]]))
-    assert r.get("rows") == [{"call_id": "c1"}], r
+    assert r.get("rows") == [{"call_id": "c1", "deal_id": "1"}], r      # filtered-on column comes back
     print("✓ a table with no data_dictionary entries is not validated (unchanged)")
 
 
