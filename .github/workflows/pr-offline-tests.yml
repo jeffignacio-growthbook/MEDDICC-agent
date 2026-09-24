@@ -93,6 +93,7 @@ jobs:
             tests/test_pipeline_movement_exit_split.py \
             tests/test_waterfall_quarter_totals_basis.py \
             tests/test_week_basis_check_live_false_positive.py \
+            tests/test_table_formatting.py \
             tests/test_aggregation_verification.py \
             tests/test_aggregation_retry_hands_correct_value.py \
             tests/test_false_partial_claim_gate.py \

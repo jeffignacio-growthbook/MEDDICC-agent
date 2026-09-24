@@ -1027,6 +1027,32 @@ REPORT_SHAPES = {
     },
 }
 
+# 2026-09-24: shared by every synthesis prompt. They used to say "Never use
+# markdown tables. Use bullet lists", which turned 9-week waterfalls and
+# 5-stage breakdowns into ragged bullets. A code-fenced, space-aligned table
+# renders monospace in Slack; api/slack_format.py leaves fences untouched and
+# still converts any pipe table that slips through (the safety net). No braces
+# in this text: DYNAMIC_SYSTEM_PROMPT is .format()ed.
+TABLE_FORMAT_RULE = """- TABLES: for 3+ rows of parallel data (stage breakdowns, weekly series, rep
+  comparisons, per-segment figures), use a code-fenced table: ``` on its own
+  line, a header row, one row per item, then ``` on its own line.
+  - Pad every cell with spaces so the columns line up on every row: text
+    left-aligned, numbers right-aligned.
+  - Inside the fence: no | pipes, no * or _ at all (not even as footnote
+    markers), no emoji or :codes: (Slack shows them literally in code
+    blocks).
+  - Every row under 80 characters, counting padding: abbreviate labels (Incr.
+    ARR, Tech Eval, $235K), or drop a column such as notes and put it below
+    the table, rather than exceed it.
+  - A totals row is fine. If it adds rows valued on different bases, its label
+    says so (e.g. "QTD (mixed)"), with the split below the table.
+  - Titles, notes and interpretation go outside the fence. A table counts as
+    one item toward the line limit.
+  - Never use markdown pipe tables (| col | col |).
+  - 1-2 items, or deal lists with long names and several fields: bullets.
+"""
+
+
 SYNTHESIS_SYSTEM_PROMPT = """You answer RevOps questions
 for a B2B SaaS CRO in Slack.
 
@@ -1162,8 +1188,7 @@ prior 12 weeks. This is the first 2-week zero since Q2."
 See DESIGN_LESSON_CORRECT_NUMBERS_VS_NARRATIVES.md for full pattern.
 
 FORMATTING (Slack-native):
-- Never use markdown tables. Use bullet lists.
-- Bold with *asterisks*, not **double**
+""" + TABLE_FORMAT_RULE + """- Bold with *asterisks*, not **double**
 - Deal format: • *Company* — $Value | Stage | Close | Score
 - 5-8 lines max. Lead with the direct answer.
 - End with one actionable insight when relevant.
@@ -1561,7 +1586,7 @@ below when they conflict.
 
 ANSWER FORMATTING (for final {{"answer": "..."}} only):
 When you have enough data to answer, format for Slack:
-- Use bullet points (•) not markdown tables (| col | col |)
+""" + TABLE_FORMAT_RULE + """- Otherwise use bullet points (•)
 - Bold company names with *asterisks*
 - Deal format: • *Company* — $Value | Stage | Date (MEDDICC as a band/gap if relevant, never "X/10")
 - Keep to 5-8 lines max
@@ -6554,7 +6579,7 @@ OPERATOR METADATA (ignore in answers):
 
 CRITICAL SLACK FORMATTING:
 - Bold: *single asterisks* only. Never **double**.
-- No markdown tables. Use bullet lists: • metric: *value*
+""" + TABLE_FORMAT_RULE + """- Otherwise bullet lists: • metric: *value*
 - No ## headers. Use *bold label* on its own line.
 - Null/missing values: write _not available_ not **null** or None
 - Data gaps: write _(data gap — explanation)_ in italics
