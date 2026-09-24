@@ -328,7 +328,13 @@ def test_query_waterfall_is_covered_by_the_same_structural_fix():
     synthetic payload shaped like its actual return value (top-level keys
     pipeline_summary/waterfall/period/report_shape/cache_payload, an
     uncapped cache_payload.deals list — see api/handlers.py's
-    query_waterfall(), which has no [:20]-style limit on that list)."""
+    query_waterfall(), which has no [:20]-style limit on that list).
+
+    2026-09-24: cache_payload itself is now dropped before synthesis
+    (router._model_view; the model computed an unstated-basis "Wins to
+    date" from its raw rows). So "not truncated" is measured on everything
+    else, made large through the per-week by_slice rows, and cache_payload
+    must be absent."""
     big_deals = [{"deal_id": str(i), "company_name": f"WaterfallCo{i}",
                   "arr_usd": 10000 + i} for i in range(150)]
     synthetic_waterfall_result = {
@@ -340,7 +346,9 @@ def test_query_waterfall_is_covered_by_the_same_structural_fix():
             "needs_attention": {"no_arr_count": 0, "no_arr_deals": [],
                                  "at_risk_count": 0, "at_risk_deals": []},
         },
-        "waterfall": [{"week_ending": f"2026-0{i%9+1}-01", "new_pipeline_value": 100000}
+        "waterfall": [{"week_ending": f"2026-0{i%9+1}-01", "new_pipeline_value": 100000,
+                       "by_slice": [{"region": f"Region{i}_{j}", "segment": "SMB",
+                                     "new_pipeline_value": 1000 + j} for j in range(12)]}
                       for i in range(13)],
         "period": "FY2027 Q3",
         "report_shape": "snapshot",
@@ -352,7 +360,8 @@ def test_query_waterfall_is_covered_by_the_same_structural_fix():
         "different key) — this must stay true for this test to mean "
         "anything"
     )
-    payload_size = len(json.dumps(synthetic_waterfall_result, default=str))
+    model_visible = {k: v for k, v in synthetic_waterfall_result.items() if k != "cache_payload"}
+    payload_size = len(json.dumps(model_visible, default=str))
     assert payload_size > 3000, (
         f"fixture must exceed the old truncation threshold to prove "
         f"anything — got {payload_size} chars"
@@ -365,10 +374,12 @@ def test_query_waterfall_is_covered_by_the_same_structural_fix():
         f"query_waterfall must NOT be truncated — got {len(result_json)} "
         f"chars of a {payload_size}-char payload"
     )
-    assert "WaterfallCo149" in result_json, (
-        "the last deal in the uncapped cache_payload.deals list must "
-        "survive — this is exactly the kind of entry the old [:3000] "
-        "cut would have silently dropped"
+    assert "Region12_11" in result_json, (
+        "the last slice of the last week must survive — this is exactly "
+        "the kind of entry the old [:3000] cut would have silently dropped"
+    )
+    assert "WaterfallCo" not in result_json and '"cache_payload"' not in result_json, (
+        "cache_payload is for save_thread, never for the model"
     )
     assert complete_instruction, (
         "expected the 'complete dataset' instruction for a recognized "
