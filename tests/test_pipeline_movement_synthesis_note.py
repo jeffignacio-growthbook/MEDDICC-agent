@@ -49,39 +49,23 @@ ROWS = ([_snap("K", "2026-09-14"), _snap("X", "2026-09-14")]
 DEAL_ARR = {"N1": (100000, None), "N2": (None, 25000), "X": (40000, 5000), "K": (1, 1)}
 
 
-def _fake_select_all(sb, table, columns=None, filters=None, **kw):
-    assert table == "deals_snapshot", table
-    out = list(ROWS)
-    for op, col, val in filters or []:
-        if op == "eq":
-            out = [r for r in out if str(r.get(col)) == str(val)]
-        elif op == "neq":
-            out = [r for r in out if str(r.get(col)) != str(val)]
-        elif op == "ilike":
-            out = [r for r in out if str(r.get(col) or "").lower() == str(val).lower()]
-    return [dict(r) for r in out]
+def _deal_row(deal_id, new=None, exp=None, **kw):
+    return {"deal_id": deal_id, "company_name": f"Co {deal_id}", "new_arr": new, "expansion_arr": exp,
+            "deal_status": "active", "stage": "presentationscheduled", "close_date": "2026-10-30",
+            "pipeline_id": "default", **kw}
 
 
-class _DealsQuery:
-    def __init__(self):
-        self.ids = []
-
-    def select(self, *cols):
-        return self
-
-    def in_(self, col, ids):
-        self.ids = list(ids)
-        return self
-
-    def execute(self):
-        return type("R", (), {"data": [{"deal_id": i, "new_arr": DEAL_ARR[i][0],
-                                        "expansion_arr": DEAL_ARR[i][1]} for i in self.ids]})()
-
-
-class _SB:
-    def table(self, name):
-        assert name == "deals", name
-        return _DealsQuery()
+def _sb(rows=None, deals=None):
+    """Strict fake (tests/strict_supabase.py) for deals_snapshot + deals: the
+    REAL select_all runs against it, only selected columns come back, every
+    filter applies. Until 2026-09-24 the snapshot fake returned whole rows,
+    knew only eq/neq/exact-ilike and asserted table == deals_snapshot, so
+    _pm_company_map's select_all("deals") raised inside a swallowing except
+    and company names were never looked up."""
+    from strict_supabase import StrictSupabase
+    if deals is None:
+        deals = [_deal_row(i, *DEAL_ARR[i]) for i in DEAL_ARR]
+    return StrictSupabase({"deals_snapshot": ROWS if rows is None else rows, "deals": deals})
 
 
 def _as_serialized(text):
@@ -90,14 +74,9 @@ def _as_serialized(text):
     return json.dumps(text)[1:-1]
 
 
-def _run_handler():
-    saved = handlers.select_all
-    handlers.select_all = _fake_select_all
-    try:
-        return asyncio.run(handlers.query_pipeline_movement(
-            {"view": "movement", "fiscal_quarter": "FY2027 Q3"}, _SB()))
-    finally:
-        handlers.select_all = saved
+def _run_handler(params=None, sb=None):
+    return asyncio.run(handlers.query_pipeline_movement(
+        params or {"view": "movement", "fiscal_quarter": "FY2027 Q3"}, sb or _sb()))
 
 
 def test_handler_returns_the_note_with_real_figures():
@@ -108,6 +87,10 @@ def test_handler_returns_the_note_with_real_figures():
     assert note, "query_pipeline_movement computed a _synthesis_note but its final return dropped it"
     for part in ("added $125,000", "exited $45,000", "net $80,000", "ALWAYS state all three"):
         assert part in note, (part, note)
+    # company names come from deals via _pm_company_map (dead in these tests
+    # until 2026-09-24: the old fake refused the deals table and the handler
+    # swallowed the error)
+    assert [row.get("company_name") for row in r["rows"]] == ["Co K", "Co N1", "Co N2"], r["rows"]
     print("✓ real handler: added $125,000 (2 deals), exited $45,000, net $80,000, "
           "and the _synthesis_note carrying all three is in the returned result")
 

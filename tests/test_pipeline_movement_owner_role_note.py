@@ -52,6 +52,20 @@ class _FakeSupabase:
     pass
 
 
+def _strict(jake_rows, owner="jake.stangl@growthbook.io"):
+    """Strict fake (tests/strict_supabase.py): the REAL select_all, so the
+    owner_email ilike and every other filter apply. A decoy owner with rows
+    in every quarter must never leak into the note."""
+    import sys as _s
+    _s.path.insert(0, str(Path(__file__).parent))
+    from strict_supabase import StrictSupabase
+    rows = [dict(r, owner_email=owner) for r in jake_rows]
+    rows += [{"deal_id": f"decoy{i}", "snapshot_date": d, "fiscal_quarter": fq, "pipeline_id": "default",
+              "owner_email": "someone.else@growthbook.io"}
+             for i, (d, fq) in enumerate([("2026-06-01", "FY2027 Q1"), ("2026-09-07", "FY2027 Q3")])]
+    return StrictSupabase({"deals_snapshot": rows})
+
+
 def _patch_select_all(fn):
     orig = handlers_module.select_all
     handlers_module.select_all = fn
@@ -62,17 +76,8 @@ def test_sdr_with_no_history_anywhere_gets_a_checkable_no_history_note():
     """Jake Stangl (SDR), zero deals_snapshot rows at ANY point in
     history — the note must say exactly that (a checkable fact), and
     may mention the SDR role only as an aside, never as the reason."""
-    def fake_select_all(sb, table, columns=None, filters=None):
-        assert table == "deals_snapshot"
-        return []
-
-    orig = _patch_select_all(fake_select_all)
-    try:
-        note = _pm_owner_role_note(
-            _FakeSupabase(), "jake.stangl@growthbook.io",
-            "FY2027 Q3", {"866608541"})
-    finally:
-        handlers_module.select_all = orig
+    note = _pm_owner_role_note(_strict([]), "jake.stangl@growthbook.io",
+                               "FY2027 Q3", {"866608541"})
 
     assert note is not None
     assert "NO deals_snapshot rows" in note
@@ -94,19 +99,11 @@ def test_sdr_with_only_other_quarter_history_explains_from_data_not_role():
         {"snapshot_date": "2026-06-08", "fiscal_quarter": "FY2027 Q1", "pipeline_id": "default"},
     ]
 
-    def fake_select_all(sb, table, columns=None, filters=None):
-        return history_rows
-
-    orig = _patch_select_all(fake_select_all)
-    try:
-        note = _pm_owner_role_note(
-            _FakeSupabase(), "jake.stangl@growthbook.io",
-            "FY2027 Q3", {"866608541"})
-    finally:
-        handlers_module.select_all = orig
+    note = _pm_owner_role_note(_strict(history_rows, owner="Jake.Stangl@growthbook.io"),
+                               "jake.stangl@growthbook.io", "FY2027 Q3", {"866608541"})
 
     assert note is not None
-    assert "2 deals_snapshot row(s) on file" in note
+    assert "2 deals_snapshot row(s) on file" in note, note   # decoy owner's rows not counted
     assert "FY2027 Q1" in note
     assert "handed off" in note or "not yet assigned" in note
     assert "structurally" not in note.lower()
@@ -123,16 +120,8 @@ def test_sdr_with_matching_active_rows_flags_a_likely_bug_not_a_role_excuse():
         {"snapshot_date": "2026-09-07", "fiscal_quarter": "FY2027 Q3", "pipeline_id": "default"},
     ]
 
-    def fake_select_all(sb, table, columns=None, filters=None):
-        return history_rows
-
-    orig = _patch_select_all(fake_select_all)
-    try:
-        note = _pm_owner_role_note(
-            _FakeSupabase(), "jake.stangl@growthbook.io",
-            "FY2027 Q3", {"866608541"})
-    finally:
-        handlers_module.select_all = orig
+    note = _pm_owner_role_note(_strict(history_rows), "jake.stangl@growthbook.io",
+                               "FY2027 Q3", {"866608541"})
 
     assert note is not None
     assert "DOES have" in note
@@ -147,16 +136,8 @@ def test_ae_zero_row_gets_the_same_data_driven_treatment_no_role_aside():
     """An AE (no non-AE role) with genuinely no history anywhere gets
     the same no-history note, with no role aside at all — the fix isn't
     SDR-specific, it's owner-agnostic."""
-    def fake_select_all(sb, table, columns=None, filters=None):
-        return []
-
-    orig = _patch_select_all(fake_select_all)
-    try:
-        note = _pm_owner_role_note(
-            _FakeSupabase(), "jake@growthbook.io",
-            "FY2027 Q3", {"866608541"})
-    finally:
-        handlers_module.select_all = orig
+    note = _pm_owner_role_note(_strict([]), "jake@growthbook.io",
+                               "FY2027 Q3", {"866608541"})
 
     assert note is not None
     assert "NO deals_snapshot rows" in note
@@ -196,31 +177,21 @@ def test_query_pipeline_movement_end_to_end_folds_the_note_into_data_gaps():
     query returning only prior-quarter rows — reproducing the "already
     handed off" shape end-to-end and confirming the resulting data_gaps
     text is data-driven, not role-driven."""
-    calls = []
+    # jake has only prior-quarter history; the decoy owner has FY2027 Q3 rows
+    # that the owner filter must keep out of the scoped query
+    sb = _strict([{"deal_id": "J1", "snapshot_date": "2026-06-01",
+                   "fiscal_quarter": "FY2027 Q1", "pipeline_id": "default"}])
+    result = asyncio.run(query_pipeline_movement(
+        {
+            "view": "movement",
+            "fiscal_quarter": "FY2027 Q3",
+            "owner_email": "jake.stangl@growthbook.io",
+        },
+        sb,
+    ))
 
-    def fake_select_all(sb, table, columns=None, filters=None):
-        calls.append({"table": table, "columns": columns, "filters": filters})
-        filter_pairs = {(f[1], f[2]) for f in (filters or [])}
-        if ("fiscal_quarter", "FY2027 Q3") in filter_pairs:
-            return []  # the main, scoped query: nothing this quarter
-        # the unscoped diagnostic query (owner_email only): prior-quarter history
-        return [{"snapshot_date": "2026-06-01", "fiscal_quarter": "FY2027 Q1",
-                  "pipeline_id": "default"}]
-
-    orig = _patch_select_all(fake_select_all)
-    try:
-        result = asyncio.run(query_pipeline_movement(
-            {
-                "view": "movement",
-                "fiscal_quarter": "FY2027 Q3",
-                "owner_email": "jake.stangl@growthbook.io",
-            },
-            _FakeSupabase(),
-        ))
-    finally:
-        handlers_module.select_all = orig
-
-    assert len(calls) >= 2, "expected both the scoped query and the diagnostic query"
+    snap_queries = [q for q in sb.queries if q["table"] == "deals_snapshot"]
+    assert len(snap_queries) >= 2, "expected both the scoped query and the diagnostic query"
     gap_text = result["data_gaps"][0]
     assert "jake.stangl@growthbook.io" in gap_text
     assert "FY2027 Q1" in gap_text
