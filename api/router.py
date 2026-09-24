@@ -1850,6 +1850,24 @@ def _build_missing_snapshot_fetch(queries_run: list, missing_date: str):
         return p.get("table"), p.get("columns"), new_filters
     return None
 
+# Keys a handler returns for operators and thread follow-ups, never for the
+# model. query_waterfall's cache_payload (every deal closing in the period,
+# with deal_value / arr_usd) was only stripped by save_thread(), after
+# synthesis; live on 2026-09-24 the model summed its raw rows into an
+# unstated-basis "wins to date" figure. Every model-facing serializer goes
+# through _model_view(); the returned payload keeps these keys so
+# save_thread() can still cache and extract entities from them.
+MODEL_HIDDEN_KEYS = ("cache_payload",)
+
+
+def _model_view(result):
+    """`result` without MODEL_HIDDEN_KEYS (a shallow copy; the caller's dict
+    is never mutated). Non-dicts and dicts without them pass through."""
+    if isinstance(result, dict) and any(k in result for k in MODEL_HIDDEN_KEYS):
+        return {k: v for k, v in result.items() if k not in MODEL_HIDDEN_KEYS}
+    return result
+
+
 def _serialize_tool_result_for_synthesis(result: dict, tool_name: str,
                                          aggregated: dict = None) -> tuple:
     """Serialize a tool result for the synthesis prompt, deciding once
@@ -1891,6 +1909,7 @@ def _serialize_tool_result_for_synthesis(result: dict, tool_name: str,
     Returns (result_json, complete_instruction).
     """
     from api.evaluator import STRUCTURED_HANDLERS
+    result = _model_view(result)
 
     is_structured_handler = tool_name in STRUCTURED_HANDLERS and "error" not in result
 
@@ -1927,6 +1946,7 @@ def _serialize_aggregated_view(view: dict, char_limit: int = None) -> str:
     the same list as "rows"). Over char_limit, halve the sample rows
     until it fits; only a view with zero rows left is ever cut by
     characters, and that is logged as a warning."""
+    view = _model_view(view)
     char_limit = char_limit or LOOP_STEP_VIEW_CHARS
     ordered = {k: view[k] for k in _AGGREGATE_SUMMARY_KEYS if k in view}
     ordered.update({k: v for k, v in view.items()
@@ -2030,6 +2050,7 @@ def _aggregate_and_sample(result: dict, sample_size: int = 20, order_by: str = N
         - rows: All rows if ≤ sample_size, else sample
         - table: Original table name
     """
+    result = _model_view(result)
     import re
 
     # Phase 2 fix: Handle structured results that use keys other than "rows"
@@ -6709,6 +6730,7 @@ def _smart_truncate_for_synthesis(tool_results: dict, char_limit: int = 20000) -
     This fixes the bug where snapshot_diff was successfully added to tool_results
     but then got chopped off by blind [:SYNTH_PAYLOAD_CHARS] truncation.
     """
+    tool_results = _model_view(tool_results)
     import copy
     import json
 
