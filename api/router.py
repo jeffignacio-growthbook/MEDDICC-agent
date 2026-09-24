@@ -26,6 +26,7 @@ from api.dimension_resolver import (
 )
 from api.aggregation_verification import (
     extract_stated_totals_from_answer, verify_aggregation_completeness,
+    row_populations, verify_aggregation_by_population,
 )
 
 # Configure logging for Railway (stderr is better captured than stdout)
@@ -2736,12 +2737,23 @@ def _aggregation_correction_message(discrepancies: list) -> str:
     wrong once.
     """
     plural = len(discrepancies) > 1
-    lines = "\n".join(
-        f'- "{d["category"]}": you stated {_format_agg_number(d["stated"])}, '
-        f"but the correct total — computed directly from the rows you "
-        f'already retrieved — is {_format_agg_number(d["actual_sum"])}.'
-        for d in discrepancies
-    )
+
+    def _line(d):
+        if d.get("actual_sum") is None:
+            # 2026-09-24: several populations (e.g. two snapshots), none
+            # summing to the stated figure. There is no single "correct
+            # total" to substitute; hand over each one, labeled.
+            pops = "; ".join(f'{c["population"]}: {_format_agg_number(c["sum"])} '
+                             f'({c["rows"]} rows)' for c in d["candidates"])
+            return (f'- "{d["category"]}": you stated {_format_agg_number(d["stated"])}, '
+                    f"but no single set of the rows you retrieved adds up to that. "
+                    f"Their totals, computed directly from those rows: {pops}. A total "
+                    f"is the total of ONE of these; state it with the one it belongs "
+                    f"to (e.g. which snapshot date).")
+        return (f'- "{d["category"]}": you stated {_format_agg_number(d["stated"])}, '
+                f"but the correct total — computed directly from the rows you "
+                f'already retrieved — is {_format_agg_number(d["actual_sum"])}.')
+    lines = "\n".join(_line(d) for d in discrepancies)
     return (
         f"⚠️ Your aggregation was WRONG for the following "
         f"categor{'ies' if plural else 'y'}:\n"
@@ -4294,13 +4306,12 @@ async def _dynamic_query_loop_core(question, history, params,
                 # loop iteration budget to spend), naming the
                 # discrepancy explicitly, same as there.
                 final_answer_text = parsed2["answer"]
-                all_raw_rows_for_agg = []
-                for key, data in accumulated_data.items():
-                    if key.endswith("_raw"):
-                        all_raw_rows_for_agg.extend(data.get("rows", []) or [])
+                # per population (one table, one snapshot), never the pool:
+                # see row_populations() for the $7.67M this caused
+                agg_populations = row_populations(accumulated_data)
                 stated_totals = extract_stated_totals_from_answer(final_answer_text)
-                aggregation_check = verify_aggregation_completeness(
-                    all_raw_rows_for_agg, stated_totals)
+                aggregation_check = verify_aggregation_by_population(
+                    agg_populations, stated_totals)
                 if not aggregation_check["match"]:
                     cost_state["primitives_fired"]["aggregation_mismatch_caught"] = True
                     all_disc = aggregation_check["all_discrepancies"]
@@ -4308,7 +4319,7 @@ async def _dynamic_query_loop_core(question, history, params,
                         logger.warning(
                             f"[AGGREGATION_VERIFY] finalize answer stated "
                             f"{d['category']!r} = {d['stated']} but retrieved "
-                            f"rows sum to {d['actual_sum']} — forcing one "
+                            f"rows sum to {d['actual_sum'] if d['actual_sum'] is not None else d.get('candidates')} — forcing one "
                             f"resynthesis (last retry available at this "
                             f"finalize step) with the correct value handed "
                             f"to the model directly."
@@ -4332,8 +4343,10 @@ async def _dynamic_query_loop_core(question, history, params,
                             from api.aggregation_verification import verify_total_placement
                             for disc in all_disc:
                                 corrected_total = disc["actual_sum"]
+                                if corrected_total is None:
+                                    continue    # no single value was handed over to misplace
                                 placement_check = verify_total_placement(
-                                    all_raw_rows_for_agg, final_answer_text, corrected_total
+                                    disc["missing_rows"], final_answer_text, corrected_total
                                 )
                                 if not placement_check["placement_ok"]:
                                     logger.error(
@@ -4373,8 +4386,8 @@ async def _dynamic_query_loop_core(question, history, params,
                     # text substitution rather than one more model call) is
                     # needed if it ever fires in production.
                     recheck_totals = extract_stated_totals_from_answer(final_answer_text)
-                    recheck = verify_aggregation_completeness(
-                        all_raw_rows_for_agg, recheck_totals)
+                    recheck = verify_aggregation_by_population(
+                        agg_populations, recheck_totals)
                     if not recheck["match"]:
                         cost_state["primitives_fired"]["aggregation_mismatch_unresolved_after_retry"] = True
                         logger.warning(
@@ -4641,8 +4654,10 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 # Check each corrected total for misplacement
                 for disc in all_disc:
                     corrected_total = disc["actual_sum"]
+                    if corrected_total is None:
+                        continue        # no single value was handed over to misplace
                     placement_check = verify_total_placement(
-                        all_rows, answer_text, corrected_total
+                        disc.get("missing_rows") or all_rows, answer_text, corrected_total
                     )
                     if not placement_check["placement_ok"]:
                         logger.error(
@@ -4734,7 +4749,10 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     all_raw_rows.extend(data.get("rows", []) or [])
 
             stated_totals = extract_stated_totals_from_answer(answer_text)
-            aggregation_check = verify_aggregation_completeness(all_raw_rows, stated_totals)
+            # per population (one table, one snapshot), never the pool:
+            # see row_populations() for the $7.67M this caused
+            aggregation_check = verify_aggregation_by_population(
+                row_populations(accumulated_data), stated_totals)
 
             if not aggregation_check["match"]:
                 cost_state["primitives_fired"]["aggregation_mismatch_caught"] = True
@@ -4743,7 +4761,7 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                     logger.warning(
                         f"[AGGREGATION_VERIFY] stated {d['category']!r} = "
                         f"{d['stated']} but the retrieved rows for that "
-                        f"category actually sum to {d['actual_sum']} — "
+                        f"category actually sum to {d['actual_sum'] if d['actual_sum'] is not None else d.get('candidates')} — "
                         f"forcing resynthesis with the correct value handed "
                         f"to the model directly (not asked to recompute)."
                     )

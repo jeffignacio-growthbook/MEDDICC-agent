@@ -208,6 +208,82 @@ def verify_aggregation_completeness(retrieved_rows: List[dict], stated_totals: D
     }
 
 
+def row_populations(accumulated_data: dict) -> Dict[str, List[dict]]:
+    """Split a loop's raw rows into the populations a total can be about.
+
+    2026-09-24: both call sites used to concatenate every `_raw` step and
+    sum it as one population. On Jake H's week-over-week diff that pool
+    was the 2026-09-21 snapshot, the 2026-09-14 snapshot and the same 20
+    deals rows fetched twice: $7.67M, a number no population has. The
+    model's correct $2.91M was "corrected" to it, and the recheck agreed.
+
+    One population per table and snapshot_date (a table's rows with no
+    snapshot_date form one population; a step with no table is its own).
+    Within a population rows are deduplicated on deal_id, else on the whole
+    row, so the same deals fetched by two lookups count once."""
+    pops: Dict[str, Dict[Any, dict]] = {}
+    for key in sorted(k for k in (accumulated_data or {}) if k.endswith("_raw")):
+        data = accumulated_data.get(key) or {}
+        if not isinstance(data, dict):
+            continue
+        table = data.get("table") or key
+        for row in data.get("rows", []) or []:
+            if not isinstance(row, dict):
+                continue
+            sd = row.get("snapshot_date")
+            name = f"{table} on {str(sd)[:10]}" if sd else str(table)
+            ident = (("deal_id", str(row["deal_id"])) if row.get("deal_id") is not None
+                     else tuple(sorted((k, str(v)) for k, v in row.items())))
+            pops.setdefault(name, {})[ident] = row
+    return {name: list(rows.values()) for name, rows in pops.items()}
+
+
+def verify_aggregation_by_population(populations: Dict[str, List[dict]],
+                                     stated_totals: Dict[str, float],
+                                     tolerance: float = 0.5) -> dict:
+    """verify_aggregation_completeness(), but a stated figure is checked
+    against each population (row_populations()) instead of a pool of all
+    of them. It matches if ANY population's sum matches.
+
+    A mismatch against exactly one population behaves as before: its sum
+    is the correct value to hand the model. A mismatch when several
+    populations could hold the figure has no single correct value, so
+    actual_sum is None and `candidates` lists each population's labeled
+    sum and row count, for the model to state the one it means."""
+    if not populations or not stated_totals:
+        return {"match": True}
+    discrepancies = []
+    for label in sorted(stated_totals):
+        stated = stated_totals[label]
+        cands = []
+        for name, rows in populations.items():
+            column = _infer_value_column(rows)
+            if not column:
+                continue
+            if label.strip().lower() in _CATEGORY_ALIASES:
+                matching = rows
+            else:
+                matching = [r for r in rows
+                            if any(_label_matches_row_value(label, v) for v in r.values())]
+                if not matching:
+                    continue
+            cands.append((name, sum((r.get(column) or 0) for r in matching), matching))
+        if not cands or any(abs(s - stated) <= tolerance for _, s, _ in cands):
+            continue
+        if len(cands) == 1:
+            name, s, matching = cands[0]
+            discrepancies.append({"category": label, "stated": stated, "actual_sum": s,
+                                  "missing_rows": matching, "population": name})
+        else:
+            discrepancies.append({"category": label, "stated": stated, "actual_sum": None,
+                                  "missing_rows": [],
+                                  "candidates": [{"population": n, "sum": s, "rows": len(m)}
+                                                 for n, s, m in cands]})
+    if not discrepancies:
+        return {"match": True}
+    return {"match": False, "discrepancy": discrepancies[0], "all_discrepancies": discrepancies}
+
+
 # Primary regex: match dollar amounts with explicit $ sign (most reliable)
 _AMOUNT_WITH_DOLLAR_RE = re.compile(
     r"([+-]?)\$([\d][\d,]*(?:\.\d+)?)\s*([KkMm])?\s*(won|lost)?", re.IGNORECASE
@@ -257,7 +333,7 @@ def _extract_total(answer_text: str) -> Optional[float]:
     because there are more than a few words between "total" and the
     figure.
 
-    FIX (2026-09-14): Original regex had optional $ sign (\$?), matching
+    FIX (2026-09-14): Original regex had optional $ sign (\\$?), matching
     ANY bare number — so "Jan 2025 to Date... Total: $6.8M" extracted
     2025.0 (the year) instead of $6.8M. Now searches for $ amounts first
     (most reliable), only falling back to bare numbers when:

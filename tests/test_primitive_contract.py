@@ -56,6 +56,16 @@ KNOWN_DETECTION_FUNCTIONS = {
     # dynamic_query_loop's own primitives — see FAILURE_MODE_PRIMITIVES
     # above for how each satisfies the contract via query_cost_log.
     "verify_aggregation_completeness",
+    # verify_aggregation_by_population (2026-09-24): the same check per
+    # population (one table, one snapshot_date) instead of a pool of all
+    # raw rows; now what both dynamic_query_loop call sites use. Same
+    # failure path as verify_aggregation_completeness: it sets
+    # aggregation_mismatch_caught / aggregation_mismatch_unresolved_after_
+    # retry (FAILURE_MODE_PRIMITIVES, so query_cost_log's outcome), and the
+    # user sees a forced resynthesis, then the "could not be fully
+    # verified" caveat if the retry is still wrong
+    # (tests/test_snapshot_diff_jake_h_regression.py asserts both).
+    "verify_aggregation_by_population",
     "verify_total_placement",  # Aggregation placement verification primitive (2026-09-15)
     "verify_dimension_coverage",
     "verify_snapshot_date_labeling",
