@@ -92,7 +92,7 @@ QUERY_STALE_DEALS = {
 # api/handlers.py:802 — waterfall rows are weekly; cache_payload holds all deals.
 QUERY_WATERFALL = {
     "pipeline_summary": {
-        "total_open_arr": 2_410_000,
+        "total_incremental_arr": 2_410_000,
         "total_open_count": 64,
         "population_statement": "64 open deals across all pipelines.",
         "by_stage": [{"stage_name": s, "count": 10, "arr": 400_000} for s in STAGES],

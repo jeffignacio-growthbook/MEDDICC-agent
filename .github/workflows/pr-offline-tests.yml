@@ -80,6 +80,8 @@ jobs:
             tests/test_column_reference_validity.py \
             scripts/test_forecast_trust.py \
             tests/test_plausibility_signed_offsets.py \
+            tests/test_waterfall_basis_and_disclosure.py \
+            tests/test_waterfall_etl_value_basis.py \
             tests/test_aggregation_verification.py \
             tests/test_aggregation_retry_hands_correct_value.py \
             tests/test_false_partial_claim_gate.py \

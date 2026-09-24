@@ -667,6 +667,7 @@
    "pushed_out_value",
    "region",
    "segment",
+   "value_basis",
    "week_ending",
    "won_value"
   ],
