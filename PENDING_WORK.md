@@ -229,6 +229,9 @@ Inditex fix; unrelated to it. `deal_status='active'` with an empty
 `owner_email`: **ClickUp 56849054092** and **63138461244** (no company name
 either). Needs an owner assigned in HubSpot; nothing to fix in code.
 
+### 🟢 LOW: `SYNTHESIS_SYSTEM_PROMPT` is dead code (found 2026-09-24)
+**Status:** OPEN, not urgent. `api/router.py` ~line 1056 defines it, and no production code uses it (only `scripts/eval_voice_layer.py` and `tests/test_table_formatting.py` read it). Synthesis runs on `DYNAMIC_SYSTEM_PROMPT` (the dynamic loop) and `build_synthesis_prompt()` / `_VOICE_BASE` (the classifier path). Delete it, or wire it in, so a prompt edit isn't made in the one place that never runs.
+
 ### 🟢 LOW: Remove the dead `get_deals_modified_since()` path (found 2026-09-23)
 **Status:** OPEN, not urgent. `HubSpotDealsClient.get_deals_modified_since()`
 and the delta block in `scripts/run_nightly.py` (~line 649) have never run
