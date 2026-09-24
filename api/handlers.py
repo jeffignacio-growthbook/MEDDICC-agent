@@ -5762,6 +5762,12 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
             "current_position": result.get("current_position"),  # Off-grid snapshot if present
             "rows": latest_rows,
             "data_gaps": data_gaps,
+            # The added/exited/net reporting rule (#32). This return rebuilds
+            # the result from a fixed key list; the note was left out of it,
+            # so it never reached synthesis (found 2026-09-23). Pinned by
+            # tests/test_pipeline_movement_synthesis_note.py.
+            **({"_synthesis_note": result["_synthesis_note"]}
+               if result.get("_synthesis_note") else {}),
         }
 
     if view == "composition":
