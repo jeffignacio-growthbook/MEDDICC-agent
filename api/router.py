@@ -923,6 +923,7 @@ Required JSON:
     "company": "<single company name, or null>",
     "companies": "<list of company names when the question names MORE THAN ONE (e.g. 'score Ecco, Zalando and Natera') — [\"Ecco\", \"Zalando\", \"Natera\"]; else null. Put every named company here; do not drop any, and there is no limit.>",
     "rep_email": "<email or null>",
+    "rep_name": "<the person's name EXACTLY as the question writes it (e.g. 'Jake', 'Sarah Johnson'), even if no roster entry matches; null if the question names no person>",
     "sdr_email": "<SDR/BDR email for query_sdr_metrics or null>",
     "role": "ae|am|null",
     "metric": "new_arr|expansion_arr|total_arr|null",
@@ -5590,6 +5591,41 @@ async def route_question(question: str, user_id: str,
                           persona: dict = None,
                           history: list = None, sb = None,
                           thread_ts: str = "") -> dict:
+    """Route a question, settling any person it names in code first.
+
+    A reply to a pending clarification ("1", "Jake H", "stangl") is matched
+    here, before anything else sees it, and the ORIGINAL question runs with
+    the chosen person's full name in place. A disclosure line decided by
+    the gate (see api/rep_clarification.py) is prefixed to the answer here,
+    in code, whatever path produced the answer.
+    """
+    from api.rep_clarification import find_pending, match_reply, apply_choice
+    gate: dict = {}
+    pending = find_pending(history or [])
+    if pending:
+        choice = match_reply(question, pending)
+        if choice:
+            resolved = apply_choice(pending, choice)
+            logger.info(f"[REP_GATE] reply {question!r} picked {choice['email']}; "
+                        f"rerunning {resolved!r}")
+            gate["resolved_question"] = resolved
+            question = resolved
+        else:
+            logger.info(f"[REP_GATE] {question!r} doesn't answer the pending "
+                        f"clarification; treating it as a new question")
+    result = await _route_question(question, user_id, persona=persona, history=history,
+                                   sb=sb, thread_ts=thread_ts, _rep_gate=gate)
+    if gate.get("disclosure") and result.get("answer"):
+        result["answer"] = f"{gate['disclosure']}\n\n{result['answer']}"
+    if gate.get("resolved_question"):
+        result["resolved_question"] = gate["resolved_question"]
+    return result
+
+
+async def _route_question(question: str, user_id: str,
+                          persona: dict = None,
+                          history: list = None, sb = None,
+                          thread_ts: str = "", _rep_gate: dict = None) -> dict:
     """
     Robust question routing with inner evaluation loop.
 
@@ -5812,6 +5848,38 @@ async def route_question(question: str, user_id: str,
         params = intent.get("params", {})
         params["time_window"] = resolve_time_window(
             params.get("time_window", {}))
+
+        # ── Rep gate: every person the question names is settled in code ──
+        # (api/rep_clarification.py). Ask / decline return here, before any
+        # handler runs; a disclosed or full name is pinned into params,
+        # overriding whatever email the classifier picked from the roster.
+        try:
+            from api.rep_clarification import rep_gate, load_people, might_name_someone
+            if might_name_someone(question, [r.get("name") for r in (team_roster.data or [])],
+                                  params.get("rep_name")):
+                gate = rep_gate(question, handler_name, load_people(sb),
+                                extracted_name=params.get("rep_name"))
+            else:
+                gate = {"action": "proceed", "question": question, "pin": {}}
+        except Exception as e:
+            logger.warning(f"[REP_GATE] skipped: {e}")
+            gate = {"action": "proceed", "question": question, "pin": {}}
+        if gate.get("mentions"):
+            logger.info(f"[REP_GATE] action={gate['action']} handler={handler_name} "
+                        f"population={gate.get('population')} mentions={gate['mentions']}")
+        if gate["action"] in ("ask", "decline"):
+            return {"answer": gate["message"],
+                    "handler_name": ("rep_clarification_ask" if gate["action"] == "ask"
+                                     else "rep_name_declined"),
+                    "tool_results": {},
+                    "pending_clarification": gate.get("pending")}
+        for k, v in gate.get("pin", {}).items():
+            if params.get(k) and params[k] != v:
+                logger.info(f"[REP_GATE] classifier's {k}={params[k]!r} overridden by {v!r}")
+            params[k] = v
+        question = gate["question"]
+        if gate.get("disclosure") and _rep_gate is not None:
+            _rep_gate["disclosure"] = gate["disclosure"]
 
         # ── Scope Decision (explicit, not inherited) ────
         # Classifier decides: prior_set, new_population, or full_scope

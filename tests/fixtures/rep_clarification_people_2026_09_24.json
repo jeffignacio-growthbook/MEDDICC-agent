@@ -1,0 +1,617 @@
+{
+ "_about": "Real production data, read 2026-09-24 from Supabase (Deal Intelligence): every user_personas row (name, display_name, email, role, source); deals counted by owner_email and deal_status (select owner_email, deal_status, count(*) from deals group by 1,2); every sdr_users row. Tests expand deal_counts into that many deals rows.",
+ "personas": [
+  {
+   "name": "Alyssa Nicoll",
+   "display_name": null,
+   "email": "alyssa@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Andy Marshall",
+   "display_name": null,
+   "email": "andy.marshall@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Ashley Stirrup",
+   "display_name": null,
+   "email": "ashley@growthbook.io",
+   "role": "ae",
+   "source": "hubspot"
+  },
+  {
+   "name": "Atharva Gogawale",
+   "display_name": null,
+   "email": "atharva@reo.dev",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "August Allard",
+   "display_name": null,
+   "email": "august@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Brent Holloway",
+   "display_name": null,
+   "email": "brent@saassalesadvisors.com",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Cary",
+   "display_name": "Cary",
+   "email": "cary@growthbook.io",
+   "role": "ae",
+   "source": "config_seed"
+  },
+  {
+   "name": "Charlie Campo",
+   "display_name": null,
+   "email": "ccampo@attivopartners.com",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Chris Sanders",
+   "display_name": null,
+   "email": "chris@growthbook.io",
+   "role": "ae",
+   "source": "hubspot"
+  },
+  {
+   "name": "Chris Newton",
+   "display_name": null,
+   "email": "chris@newtongrowth.com",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Christian",
+   "display_name": "Christian",
+   "email": "christian@growthbook.io",
+   "role": "ae",
+   "source": "config_seed"
+  },
+  {
+   "name": "Cris Dizon",
+   "display_name": null,
+   "email": "cris@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Crystal Hopper",
+   "display_name": null,
+   "email": "crystal@unlimitedtechsolutions.com",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Dan",
+   "display_name": "Dan",
+   "email": "dan@growthbook.io",
+   "role": "ae",
+   "source": "config_seed"
+  },
+  {
+   "name": "Daniel Lin",
+   "display_name": null,
+   "email": "daniel@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Deb Schleede",
+   "display_name": null,
+   "email": "deb@opmethods.com",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Elyse Fox",
+   "display_name": null,
+   "email": "elyse@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Emmy Sharp",
+   "display_name": null,
+   "email": "emmy@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Ethan Shultz",
+   "display_name": null,
+   "email": "ethan.shultz@markopia.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Graham McNicoll",
+   "display_name": null,
+   "email": "graham@growthbook.io",
+   "role": "ceo",
+   "source": "config_seed"
+  },
+  {
+   "name": "Iain McNicoll",
+   "display_name": null,
+   "email": "iain@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Ivan Gomez",
+   "display_name": null,
+   "email": "ivan@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Jake Stangl",
+   "display_name": "Jake Stangl",
+   "email": "jake.stangl@growthbook.io",
+   "role": "sdr",
+   "source": "config_seed"
+  },
+  {
+   "name": "Jake H",
+   "display_name": "Jake H",
+   "email": "jake@growthbook.io",
+   "role": "ae",
+   "source": "config_seed"
+  },
+  {
+   "name": "James Shannon",
+   "display_name": "James Shannon",
+   "email": "james.shannon@growthbook.io",
+   "role": "ae",
+   "source": "config_seed"
+  },
+  {
+   "name": "James Irwin",
+   "display_name": null,
+   "email": "james@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Jeff Ignacio",
+   "display_name": "Jeff Ignacio",
+   "email": "jeff.ignacio@growthbook.io",
+   "role": "vp_revops",
+   "source": "config_seed"
+  },
+  {
+   "name": "Jeff Ignacio",
+   "display_name": null,
+   "email": "jeff@revopsimpact.com",
+   "role": "RevOps",
+   "source": "hubspot"
+  },
+  {
+   "name": "Jennifer",
+   "display_name": "Jennifer",
+   "email": "jennifer@growthbook.io",
+   "role": "ae",
+   "source": "config_seed"
+  },
+  {
+   "name": "Jeremy Dorn",
+   "display_name": null,
+   "email": "jeremy@growthbook.io",
+   "role": "cto",
+   "source": "config_seed"
+  },
+  {
+   "name": "Karen Henke",
+   "display_name": null,
+   "email": "karen@leapstrategies.ai",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Kari Kay",
+   "display_name": null,
+   "email": "kari@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Kathy Lam",
+   "display_name": null,
+   "email": "kathy@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Kevin McMahon",
+   "display_name": null,
+   "email": "kevin.mcmahon@markopia.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Logan Bates",
+   "display_name": null,
+   "email": "logan.bates@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Luke Sonnet",
+   "display_name": null,
+   "email": "luke@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Lyndsie Berens",
+   "display_name": null,
+   "email": "lyndsie@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Marcel Geldner",
+   "display_name": null,
+   "email": "marcel@growthbook.io",
+   "role": "ae",
+   "source": "hubspot"
+  },
+  {
+   "name": "Marcelo De Freitas",
+   "display_name": null,
+   "email": "marcelo@unlimitedtechsolutions.com",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "",
+   "display_name": null,
+   "email": "marketing@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Matthew Du Pont",
+   "display_name": null,
+   "email": "matt.dupont@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Matthew Du Pont",
+   "display_name": null,
+   "email": "matt@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Michael Knowlton",
+   "display_name": null,
+   "email": "michael@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Michael Funduc",
+   "display_name": null,
+   "email": "michael@opmethods.com",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Natasha Lee",
+   "display_name": null,
+   "email": "natasha@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Rémy Marin",
+   "display_name": null,
+   "email": "remy@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Roman Kniahynyckyj - UTS",
+   "display_name": null,
+   "email": "roman@unlimitedtechsolutions.com",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Ryan McGurk",
+   "display_name": null,
+   "email": "ryan.mcgurk@growthbook.io",
+   "role": "cro",
+   "source": "config_seed"
+  },
+  {
+   "name": "Ryan Feigenbaum",
+   "display_name": null,
+   "email": "ryan@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Scott Keller",
+   "display_name": "Scott Keller",
+   "email": "scott.keller@growthbook.io",
+   "role": "ae",
+   "source": "config_seed"
+  },
+  {
+   "name": "Scott Bailey",
+   "display_name": null,
+   "email": "scott@growthbook.io",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Shawn Green",
+   "display_name": null,
+   "email": "shawn@opmethods.com",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Tatev Torabyan",
+   "display_name": null,
+   "email": "tatevtorabyan@gmail.com",
+   "role": "other",
+   "source": "hubspot"
+  },
+  {
+   "name": "Omni Lab Team",
+   "display_name": null,
+   "email": "team@omnilabconsulting.com",
+   "role": "other",
+   "source": "hubspot"
+  }
+ ],
+ "deal_counts": [
+  {
+   "owner_email": "",
+   "deal_status": "active",
+   "n": 2
+  },
+  {
+   "owner_email": "",
+   "deal_status": "lost",
+   "n": 148
+  },
+  {
+   "owner_email": "",
+   "deal_status": "won",
+   "n": 1
+  },
+  {
+   "owner_email": "ashley@growthbook.io",
+   "deal_status": "active",
+   "n": 1
+  },
+  {
+   "owner_email": "cary@growthbook.io",
+   "deal_status": "active",
+   "n": 67
+  },
+  {
+   "owner_email": "cary@growthbook.io",
+   "deal_status": "lost",
+   "n": 12
+  },
+  {
+   "owner_email": "cary@growthbook.io",
+   "deal_status": "won",
+   "n": 48
+  },
+  {
+   "owner_email": "chris@growthbook.io",
+   "deal_status": "active",
+   "n": 1
+  },
+  {
+   "owner_email": "christian@growthbook.io",
+   "deal_status": "active",
+   "n": 93
+  },
+  {
+   "owner_email": "christian@growthbook.io",
+   "deal_status": "lost",
+   "n": 131
+  },
+  {
+   "owner_email": "christian@growthbook.io",
+   "deal_status": "won",
+   "n": 30
+  },
+  {
+   "owner_email": "dan@growthbook.io",
+   "deal_status": "active",
+   "n": 37
+  },
+  {
+   "owner_email": "dan@growthbook.io",
+   "deal_status": "lost",
+   "n": 55
+  },
+  {
+   "owner_email": "dan@growthbook.io",
+   "deal_status": "won",
+   "n": 7
+  },
+  {
+   "owner_email": "graham@growthbook.io",
+   "deal_status": "active",
+   "n": 5
+  },
+  {
+   "owner_email": "graham@growthbook.io",
+   "deal_status": "lost",
+   "n": 35
+  },
+  {
+   "owner_email": "graham@growthbook.io",
+   "deal_status": "won",
+   "n": 17
+  },
+  {
+   "owner_email": "iain@growthbook.io",
+   "deal_status": "lost",
+   "n": 1
+  },
+  {
+   "owner_email": "ivan@growthbook.io",
+   "deal_status": "active",
+   "n": 6
+  },
+  {
+   "owner_email": "ivan@growthbook.io",
+   "deal_status": "lost",
+   "n": 201
+  },
+  {
+   "owner_email": "ivan@growthbook.io",
+   "deal_status": "won",
+   "n": 92
+  },
+  {
+   "owner_email": "jake.stangl@growthbook.io",
+   "deal_status": "active",
+   "n": 5
+  },
+  {
+   "owner_email": "jake.stangl@growthbook.io",
+   "deal_status": "lost",
+   "n": 33
+  },
+  {
+   "owner_email": "jake@growthbook.io",
+   "deal_status": "active",
+   "n": 54
+  },
+  {
+   "owner_email": "jake@growthbook.io",
+   "deal_status": "lost",
+   "n": 153
+  },
+  {
+   "owner_email": "jake@growthbook.io",
+   "deal_status": "won",
+   "n": 25
+  },
+  {
+   "owner_email": "james.shannon@growthbook.io",
+   "deal_status": "active",
+   "n": 47
+  },
+  {
+   "owner_email": "james.shannon@growthbook.io",
+   "deal_status": "lost",
+   "n": 102
+  },
+  {
+   "owner_email": "james.shannon@growthbook.io",
+   "deal_status": "won",
+   "n": 8
+  },
+  {
+   "owner_email": "jeff.ignacio@growthbook.io",
+   "deal_status": "active",
+   "n": 1
+  },
+  {
+   "owner_email": "jeff.ignacio@growthbook.io",
+   "deal_status": "won",
+   "n": 1
+  },
+  {
+   "owner_email": "jennifer@growthbook.io",
+   "deal_status": "active",
+   "n": 27
+  },
+  {
+   "owner_email": "jennifer@growthbook.io",
+   "deal_status": "lost",
+   "n": 1
+  },
+  {
+   "owner_email": "jennifer@growthbook.io",
+   "deal_status": "won",
+   "n": 42
+  },
+  {
+   "owner_email": "marcel@growthbook.io",
+   "deal_status": "active",
+   "n": 28
+  },
+  {
+   "owner_email": "marcel@growthbook.io",
+   "deal_status": "lost",
+   "n": 4
+  },
+  {
+   "owner_email": "marsh@growthbook.io",
+   "deal_status": "active",
+   "n": 31
+  },
+  {
+   "owner_email": "marsh@growthbook.io",
+   "deal_status": "lost",
+   "n": 6
+  },
+  {
+   "owner_email": "matt.dupont@growthbook.io",
+   "deal_status": "lost",
+   "n": 3
+  },
+  {
+   "owner_email": "matt@growthbook.io",
+   "deal_status": "active",
+   "n": 3
+  },
+  {
+   "owner_email": "matt@growthbook.io",
+   "deal_status": "lost",
+   "n": 255
+  },
+  {
+   "owner_email": "matt@growthbook.io",
+   "deal_status": "won",
+   "n": 54
+  },
+  {
+   "owner_email": "scott.keller@growthbook.io",
+   "deal_status": "active",
+   "n": 65
+  },
+  {
+   "owner_email": "scott.keller@growthbook.io",
+   "deal_status": "lost",
+   "n": 21
+  },
+  {
+   "owner_email": "scott.keller@growthbook.io",
+   "deal_status": "won",
+   "n": 4
+  }
+ ],
+ "sdr_users": [
+  {
+   "tool": "apollo",
+   "user_email": "jake.stangl@growthbook.io",
+   "user_name": "Jake Stangl"
+  }
+ ]
+}

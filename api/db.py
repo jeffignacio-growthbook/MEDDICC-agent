@@ -473,7 +473,8 @@ def load_thread(sb: Client, thread_ts: str) -> list:
 
 def save_thread(sb: Client, thread_ts: str, channel: str,
                 history: list, question: str, answer: str,
-                tool_results: dict, handler_name: str = "unknown"):
+                tool_results: dict, handler_name: str = "unknown",
+                pending_clarification: dict = None):
     """Append Q&A + optional entity context to thread.
 
     Args:
@@ -481,6 +482,10 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
                      Making this required (no default) turns silent omissions
                      into immediate TypeErrors.
         handler_name: Handler that produced this answer, for negative-case logging.
+        pending_clarification: a clarifying question this answer asked
+                     (api/rep_clarification.py), stored as its own history
+                     entry (PENDING_ROLE; get_api_history never sends it to
+                     the model) for the next message to be matched against.
     """
     import logging
     logger = logging.getLogger(__name__)
@@ -573,6 +578,14 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
                 "content": result_key,
                 "turn": len(history),
             })
+
+    if pending_clarification:
+        from api.rep_clarification import PENDING_ROLE
+        history.append({
+            "role": PENDING_ROLE,
+            "content": json.dumps(pending_clarification),
+            "turn": len(history),
+        })
 
     now = datetime.now(timezone.utc)
     sb.table("conversation_threads").upsert({
