@@ -6001,6 +6001,15 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
             "snapshot_dates": snap_dates or [],
             "exit_reason_as_of": ("closed_won / closed_lost: the deals table, today; "
                                   "other exit reasons: the current snapshot"),
+            # Scope disclosure (2026-09-24): this view counts qualified
+            # pipeline only, so a new deal at Meeting Set is not a change here
+            # (Starz and grüum were left out of Jake H's answer without a word).
+            "_synthesis_note": (
+                "SCOPE: this view counts qualified pipeline only; deals at Meeting "
+                "Set, Disqualified or a closed stage are not in it. Include this "
+                "line in the answer, verbatim: \"Meeting Set deals not counted in "
+                "this view.\""
+            ),
             "changes": changes,
             "summary": summary,
             "rows": change_rows,
