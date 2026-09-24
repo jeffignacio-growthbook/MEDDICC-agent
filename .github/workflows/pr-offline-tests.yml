@@ -123,7 +123,8 @@ jobs:
             tests/test_execution_cost_estimate.py \
             tests/test_loop_ceiling_sizing.py \
             tests/test_diff_company_name_backfill.py \
-            tests/test_rep_clarification.py
+            tests/test_rep_clarification.py \
+            tests/test_snapshot_diff_jake_h_regression.py
           do
             echo "::group::$t"
             if PYTHONPATH=. python3 "$t"; then
