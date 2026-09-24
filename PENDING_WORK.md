@@ -27,6 +27,15 @@ Postgres/API logs, or `query_cost_log.primitives_fired`, and name which one.
 
 ---
 
+## ⚠️ Known false outcome record: `query_cost_log` id 465 (2026-09-24)
+Row 465 (2026-09-24 15:05:04 UTC, "Show me this quarter's pipeline waterfall —
+new, won and lost by week") has outcome `answered_with_week_basis_mismatch` and
+`primitives_fired.answer_week_basis_mismatch = true`. The answer was correct. The
+flag was a checker bug (unrecognised "Incr. ARR" labels plus a fallback that read
+several table-wide bases as "wrong"), fixed in the commit "check_answer_week_basis:
+stop flagging correctly labeled answers". The row is left as-is; exclude it when
+counting this outcome. The answer shipped with a false caveat appended.
+
 ## 🟡 Open Items
 
 ### 🔵 ROADMAP (not urgent, not blocking): Rebuild pre-2026-09-11 incremental ARR history for the waterfall (logged 2026-09-24)

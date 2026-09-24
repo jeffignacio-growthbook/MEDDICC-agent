@@ -673,7 +673,8 @@ _MONTHS = ["January", "February", "March", "April", "May", "June", "July",
 
 # Answer wording -> value_basis. Matched case-insensitively per line.
 _BASIS_WORDS = {
-    "incremental_arr": re.compile(r"incremental\s+arr", re.I),
+    # "Incremental ARR", and table abbreviations "Incr. ARR" / "Incr ARR" (2026-09-24 live)
+    "incremental_arr": re.compile(r"\bincr(?:emental|\.)?\s*arr\b", re.I),
     "deal_value": re.compile(r"deal[\s_]value", re.I),
     "mixed": re.compile(r"mixed\s+basis", re.I),
 }
@@ -763,18 +764,38 @@ def check_answer_week_basis(answer: str, data: Dict) -> List[PlausibilityViolati
     week_lines = {i for _, i, _ in mentions}
     table_wide = _bases_named("\n".join(l for i, l in enumerate(lines) if i not in week_lines))
 
-    wrong, unlabeled = [], []
+    # A week is judged on the lines that name it:
+    #   - a line naming bases that don't include the week's own: wrong;
+    #   - a line naming none: the answer's other lines count as a table-wide
+    #     statement only if they name exactly ONE basis (the "one note
+    #     applied to the whole table" failure). Several table-wide bases
+    #     don't say which week is which: not stated, never "wrong";
+    #   - once any line labels the week correctly, other mentions of it
+    #     (prose like "especially Sep 21: $1.76M pushed out") can't make it
+    #     unlabeled.
+    # 2026-09-24: the first live run flagged a correct table because its
+    # rows said "Incr. ARR" (unrecognised) and the old fallback treated
+    # several table-wide bases as a wrong one.
+    wrong, unlabeled, labeled_ok, seen_wrong = [], [], set(), set()
     for week, i, named in mentions:
         actual = weeks[week]
-        effective = named or table_wide
-        if effective and actual not in effective:
-            wrong.append({"week_ending": week, "stated": sorted(effective), "actual": actual,
-                          "line": lines[i].strip()[:160]})
-        elif len(effective) > 1 and not named:
-            wrong.append({"week_ending": week, "stated": sorted(effective), "actual": actual,
-                          "line": lines[i].strip()[:160]})
-        elif not effective:
+        if named:
+            if actual in named:
+                labeled_ok.add(week)
+            elif (week, i) not in seen_wrong:
+                seen_wrong.add((week, i))
+                wrong.append({"week_ending": week, "stated": sorted(named), "actual": actual,
+                              "line": lines[i].strip()[:160]})
+        elif len(table_wide) == 1:
+            if actual in table_wide:
+                labeled_ok.add(week)
+            elif (week, i) not in seen_wrong:
+                seen_wrong.add((week, i))
+                wrong.append({"week_ending": week, "stated": sorted(table_wide), "actual": actual,
+                              "line": lines[i].strip()[:160]})
+        elif not table_wide:
             unlabeled.append(week)
+    unlabeled = [w for w in unlabeled if w not in labeled_ok]
     mentioned_bases = {weeks[w] for w, _, _ in mentions}
     out = []
 

@@ -1,0 +1,28 @@
+Q3 FY2027 Pipeline Waterfall — New, Won & Lost by Week
+Basis: Incremental ARR (new + expansion; renewal base excluded). Headline: $4,857,066 across 46 qualified deals closing Q3 FY2027. :warning: 3 deals have no ARR entered (1800Flowers, Vio, Simpro) — hygiene flag.
+
+Note on basis: Weeks through Aug 28 = deal value (pre-2026-09-11 basis); weeks Sep 14+ = Incremental ARR. Each week labeled accordingly.
+
+Week Ending   New        Won       Lost       Net Change   Basis
+-----------   ---------  --------  ---------  -----------  -----
+Aug 03        $235,000   $0        $0         +$1,277,500  Deal value
+Aug 10        $190,000   $0        $0         +$780,000    Deal value
+Aug 17        $0         $0        $75,000    -$180,000    Deal value
+Aug 24        $0         $0        $0         -$407,100    Deal value
+Aug 28        $0         $80,000   $750,000   -$830,000    Deal value
+Sep 07        $0         $0        $0         $0           Deal value
+Sep 08        $0         $0        $0         $0           Deal value
+Sep 14        $0         $0        $0         +$200,670    Incr. ARR
+Sep 21        $0         $0        $140,000   +$16,800     Incr. ARR
+
+
+
+
+Quarter-to-date totals (mixed basis — see split below):
+• New added: $425,000 (deal value basis)
+• Won: $80,000 (deal value basis)
+• Lost: $965,000 — $825K deal value + $140K Incremental ARR
+• Net change: +$857,870 — $640K deal value + $217K Incremental ARR
+• Pushed out: $4,074,408 — $1.96M deal value + $2.11M Incremental ARR
+
+:warning: The large push-outs (especially Sep 21: $1.76M pushed out) are the main story — more value is slipping to future quarters than is being won or added. Worth reviewing which deals are being repeatedly pushed.
