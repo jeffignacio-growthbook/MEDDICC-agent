@@ -203,7 +203,58 @@ def _trace_populations():
             "deals": FX["deals"][:20]}
 
 
+def test_verifier_checks_each_population_not_the_pool():
+    pops = _trace_populations()
+    for stated in (2_910_000, 2_710_000):
+        assert verify_aggregation_by_population(pops, {"total": stated})["match"], stated
+    bad = verify_aggregation_by_population(pops, {"total": 7_670_000})
+    assert not bad["match"]
+    d = bad["discrepancy"]
+    assert d["actual_sum"] is None, "several populations: there is no single correct total to hand over"
+    assert sorted((c["population"], c["sum"], c["rows"]) for c in d["candidates"]) == [
+        ("deals", 1_025_000, 20), ("deals_snapshot on 2026-09-14", 2_910_000, 52),
+        ("deals_snapshot on 2026-09-21", 2_710_000, 53)], d["candidates"]
+    one = verify_aggregation_by_population({"deals_snapshot on 2026-09-14": S14}, {"total": 3_000_000})
+    assert one["discrepancy"]["actual_sum"] == 2_910_000 and len(one["discrepancy"]["missing_rows"]) == 52
+    print("✓ verifier: $2.91M and $2.71M each match a real population; $7.67M matches none and gets "
+          "every population's labeled total, not an invented one; one population behaves as before")
+
+
+def test_populations_split_by_table_and_snapshot_and_dedupe():
+    acc = {"step_0_raw": {"table": "deals_snapshot", "rows": S21},
+           "step_1_raw": {"table": "deals_snapshot", "rows": S14},
+           "step_2_raw": {"table": "deals", "rows": FX["deals"][:20]},
+           "step_3_raw": {"table": "deals", "rows": FX["deals"][:20]},          # the duplicate lookup
+           "step_3": {"rows": FX["deals"][:5]}}                                  # a sample, not raw
+    pops = row_populations(acc)
+    assert {k: len(v) for k, v in pops.items()} == {
+        "deals_snapshot on 2026-09-21": 53, "deals_snapshot on 2026-09-14": 52, "deals": 20}, pops.keys()
+    print("✓ populations: one per table and snapshot_date; the duplicate lookup is counted once")
+
+
+def test_correction_message_lists_populations_when_none_matches():
+    bad = verify_aggregation_by_population(_trace_populations(), {"total": 7_670_000})
+    msg = router._aggregation_correction_message(bad["all_discrepancies"])
+    for s in ("2,910,000", "2,710,000", "deals_snapshot on 2026-09-14", "deals_snapshot on 2026-09-21"):
+        assert s in msg, (s, msg)
+    assert "7,670,000" in msg and "None" not in msg, msg
+    print("✓ correction message: names every population's total when no single one is 'the' total")
+
+
 # ── the production run, replayed ────────────────────────────────────────────
+
+def test_replay_ships_the_real_totals():
+    result, client, calls, logs = _replay()
+    answer = result.get("answer", "")
+    assert "7.67" not in answer and "4.96" not in answer, answer
+    assert "$2.91M → $2.71M" in answer, answer
+    assert not any("Your aggregation was WRONG" in p for p in client.prompts), \
+        "the model must never be told its correct $2.91M is wrong"
+    assert json.dumps({"answer": FORCED_ANSWER}) not in client.served
+    assert not any("[AGGREGATION_VERIFY]" in l and "forcing" in l for l in logs), \
+        [l for l in logs if "AGGREGATION_VERIFY" in l]
+    print("✓ replay: the correct $2.91M → $2.71M ships; AGGREGATION_VERIFY no longer forces $7.67M")
+
 
 def test_replay_knows_both_snapshots_and_diffs_them_in_code():
     result, client, calls, logs = _replay()
@@ -225,6 +276,40 @@ def test_replay_knows_both_snapshots_and_diffs_them_in_code():
     print("✓ replay: 2026-09-14 is recognised as queried; the diff is computed in code (1 stage change "
           "Plusgrade, 2 entries Starz/grüum, 1 exit Comcast) and handed to the model by name; two "
           "snapshot pulls, no duplicate, no narration")
+
+
+def test_resynthesis_is_rechecked_against_the_populations():
+    """The resynthesis was always re-checked; it passed because the recheck
+    used the same pool. Now: a model that states $7.67M, is handed every
+    population's total, and states $7.67M again is caught by the recheck
+    and the answer ships with the caveat, never as verified."""
+    wrong = json.dumps({"answer": FORCED_ANSWER})
+    # the retry states the POOL's sum (both snapshots + the 54 deals rows:
+    # $2.71M + $2.91M + $3.04M), the kind of number the old pooled check
+    # handed over and then accepted on recheck
+    pooled = json.dumps({"answer": FORCED_ANSWER.replace("$7.67M", "$8.66M")})
+    assert sum(r["deal_value"] for r in S14 + S21 + FX["deals"]) == 8_660_000
+    result, client, calls, logs = _replay(answers=[wrong, pooled])
+    corrections = [p for p in client.prompts if "Your aggregation was WRONG" in p]
+    assert len(corrections) == 1, len(corrections)
+    for s_ in ("deals_snapshot on 2026-09-14: 2,910,000", "deals_snapshot on 2026-09-21: 2,710,000"):
+        assert s_ in corrections[0], corrections[0][-1500:]
+    assert any("STILL wrong" in l for l in logs), [l for l in logs if "AGGREGATION" in l]
+    assert "could not be fully verified" in result["answer"], result["answer"]
+    print("✓ a resynthesis stating the pooled $8.66M is caught by the recheck (against the "
+          "populations, not the pool) and ships with the unverified-figure caveat")
+
+
+def test_main_loop_answer_is_checked_per_population_too():
+    """The other call site: a model that answers straight after the two
+    snapshot pulls. Pooled, $2.91M was checked against $5.62M (both
+    snapshots) and "corrected"; per population it is the 2026-09-14 total."""
+    steps = [json.dumps(SEP21), json.dumps(SEP14), json.dumps({"answer": FIRST_ANSWER})]
+    result, client, calls, logs = _replay(steps=steps, answers=[json.dumps({"answer": FORCED_ANSWER})])
+    assert not any("Your aggregation was WRONG" in p for p in client.prompts), \
+        [l for l in logs if "AGGREGATION" in l]
+    assert "$2.91M → $2.71M" in result["answer"], result["answer"]
+    print("✓ main-loop answer: $2.91M → $2.71M checked per snapshot, ships without a forced correction")
 
 
 def test_replay_completeness_retry_covers_every_id():
