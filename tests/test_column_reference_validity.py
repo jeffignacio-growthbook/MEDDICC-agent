@@ -7,6 +7,12 @@ selects deals.amount, a column that has never existed. Mocked tests passed;
 in production every call failed ("column deals.amount does not exist" in the
 Postgres logs, 7 times 2026-09-21 23:55 to 2026-09-23 00:23 UTC).
 
+2026-09-24: the 2026-09-23 rewrite still missed two shapes: select_all(sb,
+table, columns=...) (scripts/supabase_client.py's paginated select, 307
+calls) and multi-argument .select("a", "b"). Both are covered now; the
+first real finding was scripts/analytics/investigate_missing_deals.py
+selecting deals.stage_id (deals has `stage`).
+
 The first version of this gate (8d3c1380) never caught it. It found selects
 with regexes and read only the FIRST string literal of the argument, and
 forecast_trust.py writes its column list as two adjacent literals:
@@ -76,6 +82,8 @@ EXISTENCE_PROBES = {
 
 
 class Select(NamedTuple):
+    """One Supabase select: a .table(...).select(...) chain or a
+    select_all(sb, table, columns) call."""
     file: str
     line: int
     table: Optional[str]      # None: no .table() in the chain; DYNAMIC: not a literal
@@ -110,16 +118,46 @@ def extract_selects(path: Path, root: Path = REPO_ROOT) -> List[Select]:
     rel = str(path.relative_to(root)) if path.is_relative_to(root) else str(path)
     out = []
     for node in ast.walk(tree):
-        if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
-                and node.func.attr == "select"):
+        if not isinstance(node, ast.Call):
             continue
-        table = _chain_table(node.func.value)
-        first = node.args[0] if node.args else None
-        arg = first.value if isinstance(first, ast.Constant) and isinstance(first.value, str) else None
-        if table is None and arg is None:
-            continue      # not a Supabase select we can say anything about
-        out.append(Select(rel, node.lineno, table, arg))
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "select":
+            table = _chain_table(node.func.value)
+            # supabase-py joins .select("a", "b") into "a,b": check every
+            # argument, not just the first.
+            arg = (",".join(a.value for a in node.args) if node.args and all(
+                isinstance(a, ast.Constant) and isinstance(a.value, str) for a in node.args)
+                else None)
+            if table is None and arg is None:
+                continue      # not a Supabase select we can say anything about
+            out.append(Select(rel, node.lineno, table, arg))
+        elif _is_select_all(node):
+            # select_all(sb, table, columns='*', filters=None) in
+            # scripts/supabase_client.py: the paginated select most code uses.
+            t = _arg(node, 1, "table")
+            cols = _arg(node, 2, "columns")
+            table = (t.value if isinstance(t, ast.Constant) and isinstance(t.value, str)
+                     else DYNAMIC)
+            if cols is None:
+                arg = "*"
+            elif isinstance(cols, ast.Constant) and isinstance(cols.value, str):
+                arg = cols.value
+            else:
+                arg = None
+            out.append(Select(rel, node.lineno, table, arg))
     return sorted(out, key=lambda x: x.line)
+
+
+def _is_select_all(node: ast.Call) -> bool:
+    f = node.func
+    return (isinstance(f, ast.Name) and f.id == "select_all") or (
+        isinstance(f, ast.Attribute) and f.attr == "select_all")
+
+
+def _arg(node: ast.Call, pos: int, name: str):
+    for k in node.keywords:
+        if k.arg == name:
+            return k.value
+    return node.args[pos] if len(node.args) > pos else None
 
 
 def _split_top_level(s: str) -> List[str]:
