@@ -568,6 +568,13 @@ _WATERFALL_BASIS_STATEMENTS = {
               "where none was recorded) for weeks before 2026-09-11 and on Incremental "
               "ARR from then on; each week's value_basis says which."),
 }
+# The words each week row carries in basis_label, which the model states per
+# week. api/plausibility.py check_answer_week_basis matches them in the answer.
+WATERFALL_BASIS_LABELS = {
+    "incremental_arr": "Incremental ARR",
+    "deal_value": "deal value (pre-2026-09-11 basis)",
+    "mixed": "mixed basis (slices on different bases)",
+}
 _WATERFALL_VALUE_FIELDS = ("new_pipeline_value", "won_value", "lost_value", "net_change",
                            "pulled_in_value", "pushed_out_value")
 
@@ -575,8 +582,8 @@ _WATERFALL_VALUE_FIELDS = ("new_pipeline_value", "won_value", "lost_value", "net
 def _waterfall_weeks(slices, excluded_pipelines=()):
     """waterfall_weekly slice rows -> one company-wide row per week_ending:
     value fields and deals_qualified_count summed over slices, value_basis
-    ('incremental_arr' | 'deal_value' | 'mixed'), and the non-zero slices as
-    labeled by_slice detail."""
+    ('incremental_arr' | 'deal_value' | 'mixed') with its basis_label, and the
+    non-zero slices as labeled by_slice detail."""
     from collections import OrderedDict
     weeks = OrderedDict()
     for r in sorted(slices, key=lambda r: (str(r.get("week_ending")), str(r.get("region")),
@@ -600,6 +607,7 @@ def _waterfall_weeks(slices, excluded_pipelines=()):
     for w in weeks.values():
         bases = w.pop("_bases")
         w["value_basis"] = bases.pop() if len(bases) == 1 else "mixed"
+        w["basis_label"] = WATERFALL_BASIS_LABELS[w["value_basis"]]
         out.append(w)
     return out
 
@@ -865,7 +873,10 @@ async def query_waterfall(params: dict, sb) -> dict:
             f"open pipeline regardless of close date: if you cite it, label it that way, "
             f"never as {tw['label']}'s pipeline. WEEKLY: each waterfall row is one "
             f"company-wide week (region/segment slices summed; by_slice is detail, never a "
-            f"week total). {waterfall_basis_statement}"
+            f"week total). WEEKLY BASIS: weeks can differ. State EACH week's own "
+            f"basis_label next to that week's figures (a Basis column, or on the week's "
+            f"line), in those exact words. Never state one basis for the whole weekly "
+            f"table. {waterfall_basis_statement}"
         ),
     }
 
