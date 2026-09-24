@@ -259,6 +259,23 @@ so the flag reflects the loop's real outcome.
 
 ## ✅ Recently Completed
 
+### HIGH: filter_table silently dropped filters; join_tables crashed (found and fixed 2026-09-24)
+**Found by** the permissive-test-fake sweep: every Supabase fake in the offline suite now answers like Postgres (`tests/strict_supabase.py`), and the dynamic-loop tests run the real `filter_table` against it.
+
+**Two production bugs, both fixed in `api/tools.py`:**
+1. **Filters silently dropped.** `_validate_filters()` discarded any filter naming a column that isn't queryable for the table (invented, misspelled, hidden or unregistered). The query ran without it and returned the unfiltered rows as if it had applied, with nothing in the result to say so.
+   - This was the root cause behind Low Priority #14 (2026-09-12). The fix then handled the symptom downstream in dimension_verification.
+   - Unregistered columns today: `sdr_metrics` (etl_run_at, id, tool_user_id) and `sdr_users` (first_seen, id, internal_user_id, last_seen, tool_user_id). Any column a model invents is also affected.
+   - Now `filter_table` refuses such a filter with an error naming it and the queryable columns, and doesn't run the query.
+2. **`join_tables` crashed** whenever its primary query found rows. `",".join()` was applied to the `(good, unavailable)` tuple that `_validate_columns()` has returned since 2026-09-01. The select also left out the foreign key, so under real projection nothing could be matched.
+   - Live impact is unknown: `query_cost_log` doesn't record tool calls, and the Railway logs weren't checked.
+
+**Tests that were only passing because a fake was generous, now rewritten:**
+- `test_diff_company_name_backfill` (an SMB exit deal against the model's own Enterprise filter);
+- `test_zero_rows_suspicion_compliance` and `test_ambiguous_dimension_compliance`: filters and columns that `deals` doesn't have (`stage_id`, `component_arr`).
+
+**Going forward:** new tests should build Supabase fakes from `tests/strict_supabase.py` (`StrictSupabase`, `with_data_dictionary`, `real_filter_table_on`) rather than hand-rolled chains.
+
 ### MEDIUM: Incremental deal sync, Supabase `deals` ~1h behind HubSpot (built 2026-09-23)
 **Status:** ✅ BUILT and verified live on production, in PR #40. Five
 commits, each with its own tests and CI run. The hourly schedule starts
