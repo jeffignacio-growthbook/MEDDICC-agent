@@ -86,6 +86,7 @@ jobs:
             tests/test_query_pipeline_note_and_entities.py \
             tests/test_cache_payload_never_reaches_model.py \
             tests/test_waterfall_per_week_basis.py \
+            tests/test_answer_unit_slip_guard.py \
             tests/test_aggregation_verification.py \
             tests/test_aggregation_retry_hands_correct_value.py \
             tests/test_false_partial_claim_gate.py \

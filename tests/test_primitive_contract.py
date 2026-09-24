@@ -94,6 +94,11 @@ KNOWN_DETECTION_FUNCTIONS = {
     # route_question's path the same caveat is appended and the violation
     # returned in plausibility_violations.
     "check_answer_week_basis",
+    # check_answer_unit_slips (2026-09-24): same answer-side hook and
+    # contract as check_answer_week_basis; sets answer_unit_slip_suspected
+    # (outcome answered_with_suspected_unit_slip) and appends a caveat
+    # naming the stated figure and the source value.
+    "check_answer_unit_slips",
     "check_negative_counts",
     "check_rate_bounds",
     "check_subset_relationships",

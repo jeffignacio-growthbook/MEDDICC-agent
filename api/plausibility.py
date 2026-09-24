@@ -774,11 +774,119 @@ def check_answer_week_basis(answer: str, data: Dict) -> List[PlausibilityViolati
     return out
 
 
+# A stated dollar figure: $4,577,066 / $4577 / $374K / $4.6M / $1.2 billion
+_DOLLAR_FIGURE = re.compile(
+    r"\$\s?(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?\s?(k|m|mm|b|bn|thousand|million|billion)?\b", re.I)
+_SUFFIX = {"k": 1e3, "thousand": 1e3, "m": 1e6, "mm": 1e6, "million": 1e6,
+           "b": 1e9, "bn": 1e9, "billion": 1e9}
+# Keys whose numbers are dollars, and keys that look like it but aren't.
+_MONEY_KEY = re.compile(r"arr|value|amount|revenue|pipeline|bookings|won|lost|net_change|"
+                        r"_usd|quota|target|acv|deal_size|pulled_in|pushed_out|total", re.I)
+_NOT_MONEY_KEY = re.compile(r"count|days|pct|percent|rate|ratio|_id$|^id$|order|week|quarter|"
+                            r"score|rank|prob|age|_deals$|^deals$|num_|_num|year", re.I)
+_SLIP_FACTORS = (1e3, 1e6)
+_SLIP_MIN_SOURCE = 10_000   # a slip is against a real deal-sized figure
+_SLIP_MIN_SIG_DIGITS = 3    # "$30" or "$25.0M" x1000 hits round deal values by chance
+
+
+def _stated_dollar_figures(answer: str):
+    """(text, value, display_unit, significant_digits) for each $ figure in
+    the answer. The unit is the precision it was written to ($4.6M ->
+    100,000; $374K -> 1,000)."""
+    out = []
+    for m in _DOLLAR_FIGURE.finditer(answer or ""):
+        whole, frac, suffix = m.group(1), m.group(2) or "", (m.group(3) or "").lower()
+        mult = _SUFFIX.get(suffix, 1.0)
+        value = float(whole.replace(",", "") + ("." + frac if frac else "")) * mult
+        sig = len((whole.replace(",", "") + frac).lstrip("0").rstrip("0"))
+        out.append((m.group(0).strip(), value, mult / (10 ** len(frac)), sig))
+    return out
+
+
+def _source_money_values(data) -> List[Tuple[str, float, bool]]:
+    """(key, value, in_row) for every dollar-valued number anywhere in data.
+    in_row: the dict sits inside a list (a deal or week row), as opposed to
+    a summary scalar such as pipeline_summary.total_incremental_arr."""
+    out = []
+    stack = [(data, False)]
+    while stack:
+        x, in_row = stack.pop()
+        if isinstance(x, list):
+            stack.extend((i, True) for i in x)
+        elif isinstance(x, dict):
+            for k, v in x.items():
+                if (isinstance(v, (int, float)) and not isinstance(v, bool) and v
+                        and _MONEY_KEY.search(str(k)) and not _NOT_MONEY_KEY.search(str(k))):
+                    out.append((str(k), abs(float(v)), in_row))
+                elif isinstance(v, (dict, list)):
+                    stack.append((v, in_row))
+    return out
+
+
+def _matches(stated: float, unit: float, source: float) -> bool:
+    """stated agrees with source at the precision stated was written to
+    (half a display unit, or 1% for rounded prose)."""
+    return abs(stated - source) <= max(unit / 2, 0.01 * source)
+
+
+def _exact_at_precision(stated: float, unit: float, source: float) -> bool:
+    """Stricter, for slip candidates: within half a display unit, no 1% slack."""
+    return abs(stated - source) <= unit / 2
+
+
+def check_answer_unit_slips(answer: str, data: Dict) -> List[PlausibilityViolation]:
+    """A dollar figure that matches no source value, but matches one after
+    multiplying or dividing by 1,000 or 1,000,000, is a suspected unit slip:
+    "$4,577" for $4,577,066, "$374M" for $374,000.
+
+    Figures matching a source value directly are never flagged, and neither
+    are ones that match nothing (derived totals, sums the model computed):
+    this only fires when the only explanation found is a factor of 1,000.
+
+    Tuned on 2,053 figures in 159 production answers (answers_given,
+    2026-09-24) replayed against every money value in deals (352): a loose
+    version flagged 26 figures, all false. The limits that brought it to 0:
+      - a slip match must be exact at the figure's written precision, and
+        the figure needs 3+ significant digits ("$30" x1000 or "$25.0M"
+        /1000 hits a round deal value by chance);
+      - "stated too LARGE" (source x1000) is only checked against summary
+        scalars, never row values: a multi-million aggregate /1000 equals
+        some $10-40K deal ("$23.8M" vs a $23,800 deal) too often.
+    """
+    stated = _stated_dollar_figures(answer)
+    if not stated:
+        return []
+    sources = _source_money_values(data)
+    if not sources:
+        return []
+    slips = []
+    for text, value, unit, sig in stated:
+        if value <= 0 or sig < _SLIP_MIN_SIG_DIGITS or any(
+                _matches(value, unit, v) for _, v, _ in sources):
+            continue
+        for factor in _SLIP_FACTORS:
+            hit = next(((k, v) for k, v, in_row in sources if v >= _SLIP_MIN_SOURCE and (
+                _exact_at_precision(value * factor, unit * factor, v)
+                or (not in_row and _exact_at_precision(value / factor, unit / factor, v)))), None)
+            if hit:
+                slips.append({"stated": text, "stated_value": value, "source_key": hit[0],
+                              "source_value": hit[1], "factor": factor})
+                break
+    if not slips:
+        return []
+    return [PlausibilityViolation(
+        "answer_unit_slip", "error",
+        f"{len(slips)} stated figure(s) off from a source value by a factor of 1,000 or more: "
+        + "; ".join(f"{s['stated']} vs {s['source_key']}={s['source_value']:,.0f} "
+                    f"(x{s['factor']:,.0f})" for s in slips),
+        {"slips": slips})]
+
+
 def run_answer_checks(answer: str, data: Dict) -> List[PlausibilityViolation]:
     """Every answer-side check. Never raises: a checker bug must not cost
     the user their answer (it is logged by the caller and returns [])."""
     out = []
-    for check in (check_answer_week_basis,):
+    for check in (check_answer_week_basis, check_answer_unit_slips):
         try:
             out.extend(check(answer, data))
         except Exception as e:  # pragma: no cover - defensive
@@ -800,6 +908,12 @@ def answer_caveat(violations: List[PlausibilityViolation]) -> str:
     (one line per kind of check), or '' when there are none."""
     seen = []
     for v in violations:
+        if v.check == "answer_unit_slip":
+            for sl in v.context.get("slips", []):
+                seen.append(f"⚠️ Note: {sl['stated']} above may be off by a factor of "
+                            f"{sl['factor']:,.0f}: the underlying figure is "
+                            f"${sl['source_value']:,.0f}. Please double-check before relying on it.")
+            continue
         text = _ANSWER_CAVEATS.get(v.check)
         if text and text not in seen:
             seen.append(text)
