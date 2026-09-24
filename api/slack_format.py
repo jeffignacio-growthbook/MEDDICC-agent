@@ -23,6 +23,19 @@ Left alone: *single* asterisks (the prompts use them as Slack bold on
             them fine), "---" rules (shown as a plain divider), and
             everything inside `inline code` or ``` fences.
 Idempotent: already-Slack text passes through unchanged.
+
+Fenced tables (2026-09-24): a ``` block shaped like a table (a header and
+2+ rows whose cells are separated by 2+ spaces) is re-aligned here, because
+a model asked to pad columns can't reliably count characters (live eval: 16
+of 20 prompt-only tables aligned). Cells are split on 2+ spaces; each column
+is padded to its widest cell with a two-space gutter; number columns are
+right-aligned, text columns left-aligned; "-----" rule rows are redrawn to
+the new widths. Markup Slack would show literally inside a code block is
+normalised: *bold* / _italic_ pairs lose their markers, and footnote
+asterisks ("Mixed*") become daggers ("Mixed†"), as does the footnote line
+right after the fence ("*QTD totals are..." -> "†QTD totals are...").
+Anything that isn't table-shaped (code, prose, a one-line block) is left
+exactly as written.
 """
 import re
 
@@ -82,6 +95,83 @@ def _convert_lines(block: str) -> str:
     return "\n".join(out)
 
 
+_FENCE_PARTS = re.compile(r"\A(```[^\n]*\n)(.*?)(\n?```)\Z", re.S)
+_RULE_ROW = re.compile(r"^\s*[-=+]{3,}[\s\-=+]*$")
+_SPLIT = re.compile(r" {2,}")
+_NUMBER = re.compile(r"^[(+\-−]?[$€£]?\s*[+\-−]?\d[\d,]*(\.\d+)?\s*[KMBkmb%x×]?\)?$|^[—–\-]$|^n/?a$", re.I)
+_PAIR = re.compile(r"(?<![\w*])([*_])(?=\S)(.+?)(?<=\S)\1(?![\w*])")
+_FOOTNOTE = re.compile(r"(?<=\S)(\*{1,3})$")
+
+
+def _clean_cell(cell: str):
+    """Markup Slack shows literally in a code block. Returns (cell, marks)."""
+    cell = _PAIR.sub(r"\2", cell)
+    m = _FOOTNOTE.search(cell)
+    if m:
+        return cell[:m.start()] + "†" * len(m.group(1)), len(m.group(1))
+    return cell, 0
+
+
+def _realign_table(body: str):
+    """Re-aligned table text and the footnote marks converted, or None when
+    the block isn't table-shaped."""
+    lines = body.split("\n")
+    rows = []                       # list of cell lists, or None for a rule row
+    for line in lines:
+        if not line.strip():
+            rows.append([])
+        elif _RULE_ROW.match(line):
+            rows.append(None)
+        else:
+            # "$         0" (a "$" pinned left) is one cell: "$0"
+            rows.append(_SPLIT.split(re.sub(r"([$€£]) +(?=[\d(+\-])", r"\1", line.strip())))
+    data = [r for r in rows if r]
+    if len(data) < 3:
+        return None
+    ncols = len(data[0])
+    if ncols < 2 or any(len(r) > ncols or len(r) < 2 for r in data):
+        return None
+    marks = 0
+    cleaned = []
+    for r in rows:
+        if r:
+            out = []
+            for c in r:
+                c, k = _clean_cell(c)
+                marks = max(marks, k)
+                out.append(c)
+            cleaned.append(out)
+        else:
+            cleaned.append(r)
+    data = [r for r in cleaned if r]
+    widths = [max(len(r[j]) for r in data if len(r) > j) for j in range(ncols)]
+    numeric = [j > 0 and all(_NUMBER.match(r[j].rstrip("†")) for r in data[1:] if len(r) > j and r[j])
+               for j in range(ncols)]
+    out = []
+    for r in cleaned:
+        if r is None:
+            out.append("  ".join("-" * w for w in widths))
+        elif not r:
+            out.append("")
+        else:
+            cells = [(c.rjust(widths[j]) if numeric[j] else c.ljust(widths[j]))
+                     for j, c in enumerate(r)]
+            out.append("  ".join(cells).rstrip())
+    return "\n".join(out), marks
+
+
+def realign_fenced_table(fence: str):
+    """A ``` block, re-aligned if it's a table. Returns (block, footnote marks)."""
+    m = _FENCE_PARTS.match(fence)
+    if not m:
+        return fence, 0
+    done = _realign_table(m.group(2))
+    if done is None:
+        return fence, 0
+    body, marks = done
+    return m.group(1) + body + ("\n```" if m.group(3).startswith("\n") else "```"), marks
+
+
 def _protect(pattern, text, store):
     def keep(m):
         store.append(m.group(0))
@@ -95,6 +185,13 @@ def to_slack_mrkdwn(text: str) -> str:
         return text
     kept = []
     text = _protect(_FENCE, text, kept)
+    n_fences = len(kept)
     text = _protect(_INLINE_CODE, text, kept)
     text = _convert_lines(text)
+    for i in range(n_fences):
+        kept[i], marks = realign_fenced_table(kept[i])
+        if marks:
+            # the footnote line right after the fence: "*note" -> "†note"
+            text = re.sub(r"(\x00%d\x00\n+)(\*{1,3})(?=[^*\s])" % i,
+                          lambda m: m.group(1) + "†" * len(m.group(2)), text, count=1)
     return re.sub(r"\x00(\d+)\x00", lambda m: kept[int(m.group(1))], text)

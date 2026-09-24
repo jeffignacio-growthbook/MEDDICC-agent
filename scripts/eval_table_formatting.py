@@ -5,13 +5,15 @@ code-fenced tables?
 
 Asks real questions through the real dynamic_query_loop (real prompts, real
 Supabase, real model) N times each and checks every answer with
-check_answer_tables(). Writes nothing: every log/cache insert the loop makes
+check_answer_tables(), twice: the raw answer as the model wrote it, and the
+text Slack receives (api/slack_format.to_slack_mrkdwn, which re-aligns
+fenced tables). Writes nothing: every log/cache insert the loop makes
 goes to a no-op table, reads pass through.
 
     SUPABASE_URL=... SUPABASE_SERVICE_KEY=... ANTHROPIC_API_KEY=... \\
         python scripts/eval_table_formatting.py [--repeats N] [--label NAME]
 
-Exit 1 if any answer fails. --label only tags the printed report (the
+Exit 1 if any delivered answer fails. --label only tags the printed report (the
 workflow runs it once on the branch's prompts and once on main's).
 """
 import argparse
@@ -136,6 +138,7 @@ def main():
     args = ap.parse_args()
 
     import api.router as router
+    from api.slack_format import to_slack_mrkdwn
     from llm_client import LLMClient
     router._log_query_cost = lambda *a, **k: None
     sb = ReadOnlySB(router.get_supabase())
@@ -145,26 +148,37 @@ def main():
     roster_text = "\n".join(f"- {r['name']} — {r['email']} ({r['role']})" for r in roster)
     tw = {"label": "FY2027 Q3", "start": "2026-08-01", "end": "2026-10-31"}
 
-    results, failures = [], 0
+    results, failures, raw_failures = [], 0, 0
     for q in QUESTIONS:
         for k in range(args.repeats):
             out = asyncio.run(router.dynamic_query_loop(
                 question=q, history=[], params={"time_window": tw}, sb=sb,
                 client=generator, roster_text=roster_text, classifier_client=classifier))
             answer = out.get("answer", "")
-            chk = check_answer_tables(answer)
+            raw = check_answer_tables(answer)
+            delivered = to_slack_mrkdwn(answer)
+            chk = check_answer_tables(delivered)
             failures += not chk["pass"]
-            results.append({"question": q, "run": k + 1, **chk, "answer": answer})
+            raw_failures += not raw["pass"]
+            results.append({"question": q, "run": k + 1, **chk, "raw_pass": raw["pass"],
+                            "raw_problems": [p for t in raw["tables"] for p in t["problems"]],
+                            "answer": answer, "delivered": delivered})
             probs = [p for t in chk["tables"] for p in t["problems"]]
             print(f"[{args.label}] {'PASS' if chk['pass'] else 'FAIL'} {q[:50]!r} run {k + 1}: "
+                  f"raw={'pass' if raw['pass'] else 'fail'} "
+                  f"{results[-1]['raw_problems'] or ''}, delivered: "
                   f"{len(chk['tables'])} table(s) {[t['rows'] for t in chk['tables']]} rows, "
                   f"pipe_table={chk['pipe_table']}, bullets={chk['bullet_lines']}"
                   + (f", problems={probs}" if probs else ""), flush=True)
     n = len(results)
-    print(f"\n[{args.label}] {n - failures}/{n} answers had an aligned code-fenced table")
+    print(f"\n[{args.label}] raw: {n - raw_failures}/{n} answers had an aligned code-fenced table")
+    print(f"[{args.label}] delivered: {n - failures}/{n} answers had an aligned code-fenced table")
     for r in results:
         print(f"\n===== [{args.label}] {r['question']} (run {r['run']}) =====\n{r['answer']}")
-    print("\nJSON " + json.dumps([{k: v for k, v in r.items() if k != "answer"} for r in results]))
+        if r["delivered"] != r["answer"]:
+            print(f"----- [{args.label}] as delivered to Slack -----\n{r['delivered']}")
+    print("\nJSON " + json.dumps([{k: v for k, v in r.items() if k not in ("answer", "delivered")}
+                                  for r in results]))
     sys.exit(1 if failures else 0)
 
 
