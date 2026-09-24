@@ -438,9 +438,12 @@ def test_unstructured_raw_results_are_still_truncated():
     big_rows = [{"deal_id": str(i), "company_name": f"Company{i}",
                  "notes": "x" * 100} for i in range(200)]
 
-    async def fake_filter_table(sb, table=None, columns=None, filters=None,
-                                 limit=200, order_by=None, resolved_dimension_filters=None, resolved_quarter_filter=None):
-        return {"rows": big_rows, "table": table}
+    # the REAL filter_table against a strict fake (tests/strict_supabase.py):
+    # the unselected `notes` blob stays in the table and out of the result, as
+    # in Postgres (until 2026-09-24 a stub returned it with every row)
+    sys.path.insert(0, str(Path(__file__).parent))
+    from strict_supabase import with_data_dictionary, real_filter_table_on
+    fake_filter_table = real_filter_table_on(with_data_dictionary({"deals": big_rows}))
 
     orig_filter_table = tools_module.filter_table
     tools_module.filter_table = fake_filter_table
@@ -463,6 +466,7 @@ def test_unstructured_raw_results_are_still_truncated():
         "before reaching synthesis — this fix targets finished handler "
         "results specifically, not every large tool result"
     )
+    assert "x" * 100 not in serialized, "a column the call never selected must not reach synthesis"
     assert '\\"row_count\\": 200' in serialized, (
         "the bounded view must carry the all-row row_count (200) so the "
         "model can state the true total, not just the sample size"

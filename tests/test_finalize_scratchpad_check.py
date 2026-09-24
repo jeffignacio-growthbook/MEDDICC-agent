@@ -93,11 +93,13 @@ class _FakeSupabase:
 
 
 def _make_filter_table_stub(rows, call_log):
-    async def fake_filter_table(sb, table=None, columns=None, filters=None,
-                                 limit=200, order_by=None, resolved_dimension_filters=None, resolved_quarter_filter=None):
-        call_log.append({"table": table, "columns": columns, "filters": filters})
-        return {"rows": rows, "table": table}
-    return fake_filter_table
+    """The REAL filter_table against a strict fake (tests/strict_supabase.py)
+    holding the fixture rows in waterfall_weekly: only selected columns come back and
+    every filter applies. (Until 2026-09-24 a stub returned the fixture for
+    any call, whatever it selected or filtered.)"""
+    sys.path.insert(0, str(Path(__file__).parent))
+    from strict_supabase import with_data_dictionary, real_filter_table_on
+    return real_filter_table_on(with_data_dictionary({"waterfall_weekly": rows}), call_log)
 
 
 def _run(fake_client, sb=None):
