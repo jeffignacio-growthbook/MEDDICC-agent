@@ -38,6 +38,12 @@ counting this outcome. The answer shipped with a false caveat appended.
 
 ## 🟡 Open Items
 
+### 🔵 STANDING NEXT STEP (ready when there's appetite to act, not study): test one coaching change live on the Meeting Set → qualified crossing rate (logged 2026-09-24)
+**Status:** OPEN, waiting on a decision to act. No more analysis of this cohort is planned.
+- **What's done:** Qualification Phase 2 (`scripts/analytics/qualification_call_comparison.py`, merged as 8f7b4b1b in #59) compared MEDDICC scores on the calls made before the move, for Meeting Set deals that progressed (52) vs deals that stalled (69, 20 still open). It found **no reliable signal in either view**. That comparison was exploratory, and it is limited by sample size: after controlling for segment × size × tenure, only about half the training deals had a match in the other cohort. Two confounds can't be removed from this data: stalled deals are mostly lost (lead fit), and a score may simply mark a deal that was already moving.
+- **The real path to a confident answer:** pick **one concrete coaching change** (e.g. a specific question every rep asks on the first Meeting Set call), roll it out, and track the **Meeting Set → qualified crossing rate week over week** against the weeks before. That answers the question sooner than any amount of waiting on this cohort to grow.
+- **Choosing the change is a coaching call, not a statistical one:** the data didn't point at a component. Before the rollout, fix the date it starts and the crossing-rate definition (as in `qualification_crossing_walk.py`: first qualified snapshot after the first Meeting Set snapshot), so the before/after comparison can't be tuned afterwards.
+
 ### 🟠 MEDIUM-HIGH: Call-quality / coaching scores have never been produced for anyone (found 2026-09-24)
 **Status:** OPEN. Reported as "Scott Keller shows zero September call-quality scores; he uses Granola, which has no ingestion path." Checked against the database (2026-09-24) before logging; the cause is wider than that.
 - **`call_quality` has 0 rows, ever, for every rep.** Migration 030 created it (commit 106d2986, "Add coaching handlers"), and `query_call_quality` reads it (both its single-call and team modes; no other handler does), but nothing in the repo writes it: no script, workflow or handler inserts into `call_quality` or computes `overall_quality_score`. Every call-quality or coaching-score question returns the empty-result path, for every rep and month.
