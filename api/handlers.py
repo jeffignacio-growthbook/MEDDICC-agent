@@ -2772,42 +2772,48 @@ async def query_pipeline(params: dict, sb) -> dict:
     # - Coverage = Q3-scoped / Q3 target (apples-to-apples)
     from time_resolver import resolve_time_window
 
-    current_quarter = current_quarter_label()
+    current_quarter = current_quarter_label()          # e.g. "FY2027_Q3" (rep_targets.period)
+    quarter_label = current_quarter.replace("_", " ")   # "FY2027 Q3"
     quarterly_target = None
     coverage_ratio = None
-    q3_scoped_pipeline = None
+    coverage_omitted_reason = None
+    q3_scoped_pipeline = None   # this quarter's total; key name kept (used as a precedent elsewhere)
     q3_scoped_deals = None
+    this_quarter = None
 
+    # 2026-09-24: the this-quarter total is a close-date filter and never
+    # depends on rep_targets. It used to be computed only when a target row
+    # existed (one does, for FY2027_Q3 only), so from Nov 1 it would have
+    # vanished. The dates also came from resolve_time_window({"time_window":
+    # label}), a shape the resolver ignores (it fell back to today's quarter).
     try:
-        # Query for team-level incremental_arr target (matches pipeline metric)
+        tw_q = resolve_time_window({"period": "fiscal_quarter", "fiscal_quarter": quarter_label})
+        this_quarter = {"label": quarter_label, "start": tw_q["start"], "end": tw_q["end"]}
+        q3_deals = [
+            d for d in incremental_deals
+            if d.get("close_date") and tw_q["start"] <= d.get("close_date") <= tw_q["end"]
+        ]
+        q3_scoped_deals = len(q3_deals)
+        q3_scoped_pipeline = sum(d.get("_incremental_value") or 0 for d in q3_deals)
+    except Exception as e:
+        logger.warning(f"[PIPELINE] Could not resolve {current_quarter!r} for the this-quarter total: {e}")
+
+    # Coverage needs a target: omitted with a stated reason when there is none.
+    try:
         target_response = sb.table("rep_targets").select("target_value").eq(
             "period", current_quarter
         ).eq("level", "team").eq("metric", "incremental_arr").execute()
-
         if target_response.data:
             quarterly_target = target_response.data[0].get("target_value")
-
-            if quarterly_target and quarterly_target > 0:
-                # Get Q3 date range for scoped coverage calculation
-                time_window = resolve_time_window({"time_window": current_quarter})
-                q3_start = time_window.get("start")
-                q3_end = time_window.get("end")
-
-                # Filter to deals closing THIS quarter only (same period as target)
-                q3_deals = [
-                    d for d in incremental_deals
-                    if d.get("close_date") and q3_start <= d.get("close_date") <= q3_end
-                ]
-
-                q3_scoped_deals = len(q3_deals)
-                q3_scoped_pipeline = sum(d.get("_incremental_value") or 0 for d in q3_deals)
-
-                # Coverage ratio against Q3-scoped pipeline (same period as target)
-                if q3_scoped_pipeline > 0:
-                    coverage_ratio = q3_scoped_pipeline / quarterly_target
-
     except Exception as e:
-        logger.warning(f"[PIPELINE] Failed to fetch quarterly target or compute coverage: {e}")
+        logger.warning(f"[PIPELINE] Failed to fetch the {current_quarter} target: {e}")
+        coverage_omitted_reason = f"Couldn't load the {quarter_label} target"
+    if quarterly_target and quarterly_target > 0 and q3_scoped_pipeline is not None:
+        coverage_ratio = q3_scoped_pipeline / quarterly_target
+    elif coverage_omitted_reason is None:
+        coverage_omitted_reason = (f"No {quarter_label} team incremental_arr target loaded yet"
+                                   if not quarterly_target else
+                                   f"The {quarter_label} this-quarter total couldn't be computed")
 
     # Breakdown by stage (using incremental value, not deal_value)
     # Phase 1a refactor (2026-09-15): Use aggregate_results() primitive
@@ -2937,6 +2943,16 @@ async def query_pipeline(params: dict, sb) -> dict:
                    "a bug in the aggregation logic that must be fixed before shipping results."
         }
 
+    _this_quarter_phrase = (
+        f"${q3_scoped_pipeline:,.0f} closing in {quarter_label} ({q3_scoped_deals} deals; "
+        f"q3_scoped_pipeline)" if q3_scoped_pipeline is not None
+        else f"say the {quarter_label} figure is unavailable")
+    _coverage_phrase = (
+        f"{coverage_ratio:.2f}x, always against the {quarter_label} figure, never the timeless "
+        f"total. Format: '${total_pipeline:,.0f} total pipeline (timeless); $X closing this "
+        f"quarter (Y.Yx coverage)'." if coverage_ratio is not None
+        else f"omitted: {coverage_omitted_reason}. Say so in those words; never compute or "
+             f"estimate a coverage ratio.")
     return {
         "total_deals": total_deals,
         "total_pipeline": total_pipeline,
@@ -2944,6 +2960,8 @@ async def query_pipeline(params: dict, sb) -> dict:
         "q3_scoped_deals": q3_scoped_deals,
         "quarterly_target": quarterly_target,
         "coverage_ratio": coverage_ratio,
+        "coverage_omitted_reason": coverage_omitted_reason,
+        "this_quarter": this_quarter,
         "current_quarter": current_quarter,
         "zero_arr_deals": {
             "count": zero_arr_count,
@@ -2972,7 +2990,7 @@ async def query_pipeline(params: dict, sb) -> dict:
         },
         # 2026-09-24: the totals in this note were hardcoded ($18.6M, 306
         # deals) from whenever it was written; they now come from this call.
-        "_synthesis_note": f"TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total (${total_pipeline:,.0f}) AND Q3-scoped (q3_scoped_pipeline). COVERAGE: Always computed against Q3-scoped figure, never against timeless total. Format: '${total_pipeline:,.0f} total pipeline (timeless); $X closing this quarter (Y.Yx coverage)'. STAGE BREAKDOWN: Show ALL stages from by_stage dict. Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals ({total_deals}). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. They ARE included in total_deals ({total_deals}) at $0: say so when you give the count (e.g. '{total_deals} deals, {zero_arr_count} of them flagged with no ARR entered'). meeting_set_unsized deals are NOT in the count. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
+        "_synthesis_note": f"TIMELESS DESIGN: Pipeline is current state (all active incremental ARR), NOT time-scoped. Do NOT say 'This Quarter's Pipeline' or 'Q3 Pipeline'. Say 'Current Pipeline (Incremental ARR)'. TWO FIGURES: Report both timeless total (${total_pipeline:,.0f}) AND {_this_quarter_phrase}. COVERAGE: {_coverage_phrase} STAGE BREAKDOWN: Show ALL stages from by_stage dict. Do NOT drop or skip stages. Sum ALL stage counts and verify it equals total_deals ({total_deals}). If sum < total_deals, explicitly state the gap. TOP DEALS: ALWAYS include close_date for each deal. Flag deals closing > 6 months out (e.g., 'Tubi $500K - closes Jul 2027'). Near-term deals (< 3 months) more actionable. HYGIENE ISSUES: zero_arr_deals uses stage-based rules - Meeting Set excluded (expected $0 at this early stage), renewal stages flagged for $0 renewal_revenue, other stages flagged for $0 incremental ARR. Frame as 'X hygiene issues' not 'X deals with $0 ARR'. They ARE included in total_deals ({total_deals}) at $0: say so when you give the count (e.g. '{total_deals} deals, {zero_arr_count} of them flagged with no ARR entered'). meeting_set_unsized deals are NOT in the count. PROACTIVE FRAMING: Offer to show upcoming renewals or next quarter's pipeline.",
         "business_definition_note": "Pipeline = sum of expansion_arr + new_arr (dollar-level). Renewal base excluded. Timeless current state - no close_date filtering. Coverage ratio scoped to deals closing in target quarter only."
     }
 
