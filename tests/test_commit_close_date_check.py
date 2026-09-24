@@ -129,53 +129,58 @@ def test_query_pipeline_answer_carries_the_flag():
 
 
 def test_forecast_trust_answer_carries_the_flag():
-    from unittest.mock import MagicMock, Mock
     import forecast_trust
-    rows = [{"deal_id": "BAD", "company_name": "Mis-dated", "forecast_category": "COMMIT",
-             "deal_status": "active", "close_date": "2026-12-12", "deal_value": 960000,
-             "pipeline_id": "866608541", "stage": "1297321618", "new_arr": 0, "expansion_arr": 500000}]
-    chain = MagicMock()
-    for m in ("select", "in_", "eq", "gte", "lte"):
-        getattr(chain, m).return_value = chain
-    chain.execute.return_value = Mock(data=rows)
-    sb = Mock(); sb.table = Mock(return_value=chain)
-    with patch("deal_risk_assessor.assess_deal_risk",
-               return_value={"assessed_deals": [], "summary": {"total_assessed": 0}}), \
-         patch("forecast_analyses.query_commit_ml_calibration_by_week",
-               return_value={"by_week": {}}):
-        r = forecast_trust.assess_forecast_trust(sb, as_of=date(2026, 9, 24))   # week 8
+    from strict_supabase import StrictSupabase
+
+    def deal(i, cat, close, inc):
+        return {"deal_id": i, "company_name": i, "forecast_category": cat, "deal_status": "active",
+                "close_date": close, "deal_value": inc, "pipeline_id": "default", "stage": "24682892",
+                "create_date": "2026-05-01", "segment": "SMB", "new_arr": inc, "expansion_arr": None}
+    rows = [deal("BAD", "COMMIT", "2026-12-12", 960000),     # COMMIT, closes after Q3
+            deal("OK", "COMMIT", "2026-09-30", 40000),       # COMMIT, closes in Q3
+            deal("ML", "MOST_LIKELY", "2026-12-12", 10000)]  # not COMMIT: never flagged
+
+    def run(sb, as_of=date(2026, 9, 24)):                    # week 8 of FY2027 Q3
+        with patch("deal_risk_assessor.assess_deal_risk",
+                   return_value={"assessed_deals": [], "summary": {"total_assessed": 0}}), \
+             patch("forecast_analyses.query_commit_ml_calibration_by_week",
+                   return_value={"by_week": {}}):
+            return forecast_trust.assess_forecast_trust(sb, as_of=as_of)
+
+    # strict fake (tests/strict_supabase.py): the real filters apply, so the
+    # cohort query itself shows what the flag exists for
+    sb = StrictSupabase({"deals": rows})
+    r = run(sb)
+    assert r["pipeline"]["deal_count"] == 1, r["pipeline"]        # the cohort sees OK only
     flag = r.get("commit_close_date_mismatch")
-    assert flag and flag["count"] == 1 and flag["deals"][0]["reason"] == "after_quarter", r
-    # the cohort query stays first and keeps COMMIT + MOST_LIKELY (the existing regression guard)
-    cats = [c.args[1] for c in chain.in_.call_args_list if c.args and c.args[0] == "forecast_category"]
-    assert cats[0] == forecast_trust.CATEGORIES and cats[1] == ["COMMIT"], cats
-    # the hygiene query must NOT filter on close_date (that filter is what hides these deals);
-    # a mock returns rows whatever the filters, so check the query shape
-    assert chain.gte.call_count == 1 and chain.lte.call_count == 1, (chain.gte.call_args_list,
-                                                                      chain.lte.call_args_list)
-    hyg_cols = {c.strip() for c in chain.select.call_args_list[1].args[0].split(",")}
-    assert {"forecast_category", "deal_status", "close_date"} <= hyg_cols, hyg_cols
+    assert flag and flag["count"] == 1 and flag["deals"][0]["deal_id"] == "BAD", flag
+    assert flag["deals"][0]["reason"] == "after_quarter" and flag["checked"] == 2, flag
+    deals_q = [q for q in sb.queries if q["table"] == "deals"]
+    cats = [f[2] for f in deals_q[0]["filters"] if f[:2] == ("in", "forecast_category")]
+    assert cats == [forecast_trust.CATEGORIES], deals_q[0]            # cohort first, COMMIT + ML
+    assert not any(f[1] == "close_date" for f in deals_q[1]["filters"]), deals_q[1]
+
     # the hygiene query failing leaves the trust result intact, flag None
-    calls = {"n": 0}
-    def flaky_table(name):
-        calls["n"] += 1
-        if calls["n"] == 2:
-            raise RuntimeError("network")
-        return chain
-    flaky = Mock(); flaky.table = Mock(side_effect=flaky_table)
-    with patch("deal_risk_assessor.assess_deal_risk",
-               return_value={"assessed_deals": [], "summary": {"total_assessed": 0}}), \
-         patch("forecast_analyses.query_commit_ml_calibration_by_week",
-               return_value={"by_week": {}}):
-        f = forecast_trust.assess_forecast_trust(flaky, as_of=date(2026, 9, 24))
+    class Flaky(StrictSupabase):
+        n = 0
+        def table(self, name):
+            Flaky.n += 1
+            if Flaky.n == 2:
+                raise RuntimeError("network")
+            return super().table(name)
+    f = run(Flaky({"deals": rows}))
     assert f["status"] == "ok" and f["commit_close_date_mismatch"] is None, f
+
     # below week 3 the gate is a hard stop: no queries, so no flag
-    gated_sb = Mock(); gated_sb.table = Mock(side_effect=AssertionError("gate must not query"))
-    g = forecast_trust.assess_forecast_trust(gated_sb, as_of=date(2026, 8, 5))
+    class NoQuery:
+        def table(self, name):
+            raise AssertionError("gate must not query")
+    g = forecast_trust.assess_forecast_trust(NoQuery(), as_of=date(2026, 8, 5))
     assert g["status"] == "insufficient_data" and "commit_close_date_mismatch" not in g, g
-    print("✓ assess_forecast_trust (week 3+): the mis-dated COMMIT deal its own "
-          "close-date-filtered query drops is surfaced in commit_close_date_mismatch; the "
-          "cohort query stays first; below week 3 the gate still makes no queries")
+    print("✓ assess_forecast_trust (week 3+), on the strict fake: its close-date-filtered cohort "
+          "sees only the in-quarter COMMIT deal; the mis-dated one is surfaced in "
+          "commit_close_date_mismatch (MOST_LIKELY never flagged); a failed hygiene query is "
+          "contained; below week 3 the gate still makes no queries")
 
 
 if __name__ == "__main__":

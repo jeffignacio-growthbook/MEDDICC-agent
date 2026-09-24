@@ -42,57 +42,28 @@ sys.path.insert(0, str(Path(__file__).parent / "analytics"))
 from forecast_trust import assess_forecast_trust, EARLY_QUARTER_GATE_WEEK, CALIBRATION_EVIDENCE_WEEK
 
 
-def _mock_deals_sb(deals_data):
-    """A Supabase mock whose .table('deals').select(...)...execute() chain
-    returns the given rows, for whatever combination of .in_/.eq/.gte/.lte
-    assess_forecast_trust's own query happens to call."""
-    chain = MagicMock()
-    chain.select.return_value = chain
-    chain.in_.return_value = chain
-    chain.eq.return_value = chain
-    chain.gte.return_value = chain
-    chain.lte.return_value = chain
-    chain.execute.return_value = Mock(data=deals_data)
-    sb = Mock()
-    sb.table = Mock(return_value=chain)
-    return sb
+sys.path.insert(0, str(Path(__file__).parent.parent / "tests"))
+from strict_supabase import StrictSupabase  # noqa: E402
+
+
+def _mock_deals_sb(deals_data, analyses_data=None):
+    """A strict fake (tests/strict_supabase.py) holding `deals` (and
+    `analyses`, for assess_deal_risk's MEDDICC fetch): only selected columns
+    come back, every filter applies, and a column or table that isn't in the
+    real schema raises, as Postgres would. Until 2026-09-24 this was a
+    MagicMock chain that returned the same rows to every query whatever it
+    selected or filtered."""
+    return StrictSupabase({"deals": deals_data, "analyses": analyses_data or []})
 
 
 def _mock_multi_table_sb(deals_data, analyses_data=None):
-    """A Supabase mock that dispatches by table name — 'deals' for
-    assess_forecast_trust()'s own query, 'analyses' for assess_deal_risk()'s
-    internal MEDDICC-score fetch (_fetch_latest_meddicc_scores). Needed for
-    the MOST_LIKELY regression test, which calls the REAL assess_deal_risk()
-    rather than mocking it, so both queries it and forecast_trust issue must
-    resolve. Raises if any OTHER table is queried, so a future change that
-    adds an unexpected query fails loudly instead of silently returning a
-    Mock().data that could mask a bug."""
-    analyses_data = analyses_data or []
+    sb = _mock_deals_sb(deals_data, analyses_data)
+    return sb, sb, sb
 
-    deals_chain = MagicMock()
-    deals_chain.select.return_value = deals_chain
-    deals_chain.in_.return_value = deals_chain
-    deals_chain.eq.return_value = deals_chain
-    deals_chain.gte.return_value = deals_chain
-    deals_chain.lte.return_value = deals_chain
-    deals_chain.execute.return_value = Mock(data=deals_data)
 
-    analyses_chain = MagicMock()
-    analyses_chain.select.return_value = analyses_chain
-    analyses_chain.in_.return_value = analyses_chain
-    analyses_chain.order.return_value = analyses_chain
-    analyses_chain.execute.return_value = Mock(data=analyses_data)
-
-    def _table_router(name):
-        if name == "deals":
-            return deals_chain
-        if name == "analyses":
-            return analyses_chain
-        raise AssertionError(f"Unexpected table queried in this test: {name!r}")
-
-    sb = Mock()
-    sb.table = Mock(side_effect=_table_router)
-    return sb, deals_chain, analyses_chain
+class _NoQuerySB:
+    def table(self, name):
+        raise AssertionError(f"the week-3 gate must make no queries (asked for {name!r})")
 
 
 def _fake_calibration_table():
@@ -131,7 +102,7 @@ def test_week_below_gate_returns_insufficient_data():
         mock_gfq.return_value = (date(2026, 8, 1), date(2026, 10, 31), 'FY2026 Q3')
         mock_gwoq.return_value = 2  # week 2 — below the gate
 
-        sb = Mock()  # deliberately no .table() wired up — must never be called
+        sb = _NoQuerySB()  # .table() raises: the gate must never query
         result = assess_forecast_trust(sb, as_of=date(2026, 8, 10))
 
         if mock_risk.called:
@@ -415,8 +386,9 @@ def test_most_likely_only_non_late_stage_deal_appears_in_cohort():
     # simulate real Postgres filtering), so the assessed_deals check alone
     # passed even with the bug reintroduced. Only this query-shape check
     # actually caught it.
-    in_calls = [c.args for c in deals_chain.in_.call_args_list]
-    category_calls = [args for args in in_calls if args and args[0] == 'forecast_category']
+    in_filters = [f for q in sb.queries if q["table"] == "deals" for f in q["filters"]
+                  if f[0] == "in" and f[1] == "forecast_category"]
+    category_calls = [(f[1], f[2]) for f in in_filters]
     if not category_calls:
         raise AssertionError("assess_forecast_trust() never called .in_('forecast_category', ...)")
     categories_queried = category_calls[0][1]
@@ -454,7 +426,6 @@ def test_dollars_are_incremental_arr_from_real_columns():
          'renewal_revenue': 200000},
     ]
     sb = _mock_deals_sb(deals_data)
-    chain = sb.table.return_value
     risk_inputs = []
 
     def fake_risk(deals, _sb):
@@ -472,7 +443,7 @@ def test_dollars_are_incremental_arr_from_real_columns():
 
     # The cohort query is the first select (a COMMIT close-date hygiene query
     # follows it, 2026-09-24); no query may select `amount`.
-    all_selects = [[c.strip() for c in call.args[0].split(',')] for call in chain.select.call_args_list]
+    all_selects = [cols for cols in sb.selected("deals")]
     for cols in all_selects:
         if 'amount' in cols:
             raise AssertionError(f"deals has no `amount` column; a query selects {cols}")
