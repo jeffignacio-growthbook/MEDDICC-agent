@@ -1,0 +1,18 @@
+{
+  "company": "Twitch + GrowthBook",
+  "slug": "twitch-growthbook",
+  "last_etl_date": "2026-09-24T05:38:50.726696",
+  "calls": [
+    {
+      "id": "01M2TD10ZZDQK72WFECAKEJ78B",
+      "source": "fireflies",
+      "title": "Twitch + GrowthBook",
+      "date": "2026-09-23",
+      "duration_minutes": 62.18000030517578,
+      "summary": "# Twitch + GrowthBook\nDate: 2026-09-23 | Duration: 62.18000030517578m\n\n## Summary\nTwitch is evaluating alternatives to EPO after Datadog’s acquisition led to support concerns and created a required migration before the contract ends in Q1 2027. GrowthBook described prior migrations for Anthropic, Discord, and Twitter, including Anthropic’s migration in under a month with custom importers for thousands of metrics. The discussion covered Twitch’s 50 to 80 concurrent monthly experiments, incremental data refreshes, pre-aggregation, configurable Redshift data lifecycles, and recent-data windows for long-term holdouts. GrowthBook supports cloud, self-hosted, hybrid, CDN-fronted, client-side, and server-side feature-flag delivery, aligning with Twitch’s custom CDN and 10-minute TTL. Migration risks include reproducing EPO’s long-term holdout hashing and potentially running both SDKs in parallel. GrowthBook also presented certified metrics, ownership metadata, scoped search, metric slices, templates, and possible lifecycle-management improvements. Engineering follow-ups and a platform demo are planned.\n\n## Keywords\nfeature flags, experimentation platform, migration, holdout experiments, scalability, metric management\n\n## Action Items\n\n**Mengru Fu**\nCoordinate with Jessica and GrowthBook team to set up a follow-up call involving Twitch engineering leaders to discuss SDKs and feature flag implementation in detail (01:00:17)\n\n**Jessica**\nServe as main point of contact to involve Twitch engineering team for the next detailed technical follow-up meeting with GrowthBook (01:00:28)\n\n**Christian Liebenow**\nShare a 5-minute demo video of GrowthBook’s platform with the Twitch team for asynchronous review before the next meeting (01:00:31)\nCollaborate with Jessica to schedule the next detailed technical follow-up meeting involving Twitch engineering leads and GrowthBook team (01:00:31)\n\n**GrowthBook Team**\nPrepare for a detailed demo covering SDKs and feature flagging implementation tailored for Twitch’s engineering team for the next meeting (01:00:00)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    }
+  ]
+}

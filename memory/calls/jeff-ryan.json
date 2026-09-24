@@ -1,7 +1,7 @@
 {
   "company": "Jeff & Ryan",
   "slug": "jeff-ryan",
-  "last_etl_date": "2026-08-05T15:57:31.397171",
+  "last_etl_date": "2026-09-24T05:38:50.727261",
   "calls": [
     {
       "id": "01KJXBXKMSCY1QRR4ZCXJXXMBF",
@@ -13,7 +13,19 @@
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 2,
       "keywords": "HubSpot, Stripe, Renewal, Expansion, ACV, Win Rate",
-      "action_items": "\n**Jeff Ignacio**\nContinue cleaning and updating HubSpot with missing renewals and renewals misclassified, aligning with Stripe order forms (28:27)\nCoordinate with Jennifer to get expense data from CFO needed for sales efficiency and CAC calculations (26:58)\nDocument renewal and expansion booking process and create training video/material for the team (34:30)\nFollow up with Jennifer on responses regarding missing or incomplete HubSpot data (27:33)\nInvestigate and potentially implement tracking of seats quantity at deal level to prevent double counting expansion deals (24:31)\n\n**Ryan McGurk**\nDiscuss data discrepancy and missing renewals with Jennifer and Jeremy, especially regarding $2 million in Stripe revenue not reflected in HubSpot (32:20)\nRequest Jennifer to provide Stripe auto-bill data download in Excel format for easier data reconciliation and faster updates (33:55)\nFrame and clarify issue in Slack for team alignment and next steps regarding revenue data integrity (34:21)\n"
+      "action_items": "\n**Jeff Ignacio**\nContinue cleaning and updating HubSpot with missing renewals and renewals misclassified, aligning with Stripe order forms (28:27)\nCoordinate with Jennifer to get expense data from CFO needed for sales efficiency and CAC calculations (26:58)\nDocument renewal and expansion booking process and create training video/material for the team (34:30)\nFollow up with Jennifer on responses regarding missing or incomplete HubSpot data (27:33)\nInvestigate and potentially implement tracking of seats quantity at deal level to prevent double counting expansion deals (24:31)\n\n**Ryan McGurk**\nDiscuss data discrepancy and missing renewals with Jennifer and Jeremy, especially regarding $2 million in Stripe revenue not reflected in HubSpot (32:20)\nRequest Jennifer to provide Stripe auto-bill data download in Excel format for easier data reconciliation and faster updates (33:55)\nFrame and clarify issue in Slack for team alignment and next steps regarding revenue data integrity (34:21)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M37JXBP0GJ8RPTHQZWQS6A4B",
+      "source": "fireflies",
+      "title": "Jeff & Ryan",
+      "date": "2026-09-23",
+      "duration_minutes": 34,
+      "summary": "# Jeff & Ryan\nDate: 2026-09-23 | Duration: 34m\n\n## Summary\nThe team reviewed improvements to SDR activity tracking, CRM management, forecasting, and sales planning. LinkedIn and Apollo activity is being integrated into HubSpot through Clay and Zapier, with Clay enriching about 90% of prospects with business emails. Deals are created at meeting set, move to discovery only after a completed and accepted meeting, and are disqualified when unqualified or no-show; recent checks found no past-due meeting-set deals. Forecasting is moving toward scenario-based planning, with the current forecast around $1.9M and upside to $2.1M, while September added $2.8M across 31 deals. A 15–20 minute AE order-form training, recording, and office hours are planned. The team also discussed merging Rev Ops and Growth Ops boards, reinstating forecast calls, reviewing funnel conversion, and beginning territory and capacity planning. Jeff may shift from technical support toward strategic cadence and planning.\n\n## Keywords\nRev Ops Sprint, Clay, SDR reporting, HubSpot order form, sales funnel process, pipeline review\n\n## Action Items\n\n**Jeff Ignacio**\nSend Ryan the latest Rev Ops Sprint board draft and Growth Ops merged content for review and consolidation (01:04)\nUpdate HubSpot with the required order form fields today to ensure data accuracy and compliance (03:42)\nProvide weekly written SDR activity and reporting updates on Jake’s campaigns for Ryan to review during one-on-one meetings (12:53)\nWork with Jake to combine Apollo email and LinkedIn outreach sequences and ensure integration with Clay and HubSpot for enriched data syncing (07:01)\nAnalyze the sales funnel stages from meeting set to discovery and disqualified deals; present data and recommendations for sales process cleanup (22:49)\nSupport pipeline analysis focusing on larger deals that require executive briefing and customer references for closing (15:08)\nPrepare to discuss prioritization of operational tasks and strategic support areas such as sales capacity and territory modeling with Ryan in upcoming meetings (23:08)\n\n**Ryan McGurk**\nSchedule a 15-20 minute recorded training session or Slack briefing with AES on the new order form and required HubSpot fields (04:33)\nResume regular forecasting calls and decide on the appropriate cadence moving forward (03:57)\nShare spreadsheet showing deals sourced by campaign with Jeff for adding input metrics and further analysis (11:13)\nProvide Jeff with a list of large pipeline deals for detailed review and support in closing strategies (14:35)\nCoordinate with Jeff to assess sales process and SDR reporting overlap with the Ops Methods team to improve efficiency (23:35)\nPrepare to discuss strategic adjustments and priorities including sales capacity, territory modeling, and win rates in the upcoming Friday meeting (23:23)\n",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

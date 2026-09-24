@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook and Kard",
+  "slug": "growthbook-and-kard",
+  "last_etl_date": "2026-09-24T05:38:50.726869",
+  "calls": [
+    {
+      "id": "01M35M89S9NTK49YVZXN3YJED3",
+      "source": "fireflies",
+      "title": "GrowthBook and Kard - POC Check In",
+      "date": "2026-09-23",
+      "duration_minutes": 16,
+      "summary": "# GrowthBook and Kard - POC Check In\nDate: 2026-09-23 | Duration: 16m\n\n## Summary\nThe team is finalizing a Growth Book contract by weighing a five-seat, $20,000 annual Enterprise plan against a lower-cost Pro option. Enterprise offers self-hosting, unlimited event usage, private support channels, direct engineering access, advanced experimentation capabilities, and predictable fixed costs, while Pro lacks holdout experiments and dedicated support. Jessie Raye Bauer prefers Enterprise because the initial team is small and will rely on vendor support during ramp-up, although Pro remains a fallback if SSO setup is manageable. SSO and self-hosting are critical requirements. Growth Book is positioned against Posthog and Statsig through stronger experimentation methodology, statistical quality, support, and independence amid competitor acquisitions and pricing changes. CFO Nick is skeptical of $20,000 and expects closer to $15,000, so Jessie and Dan Jarvis are preparing dual proposals and arranging a direct discussion with Nick this week, preferably Friday, to clarify trade-offs and support approval.\n\n## Keywords\nEnterprise plan, Growth Book, PostHog, Statsig, self-hosted, SSO\n\n## Action Items\n\n**Dan Jarvis**\nReach out to Nick (CFO) to arrange a meeting for contract and budget discussion (11:02)\n\n**Jessie Raye Bauer**\nPrepare proposal documents detailing both Pro and Enterprise plans for CFO review (11:28)\n\n**Jake Stangl**\nCoordinate and schedule call with Nick for further contract discussions, preferably Friday; monitor Slack chat for updates (12:35)\n\n**Jessie Raye Bauer and Dan Jarvis**\nCollaborate on proposal details to present a refined plan and roadmap for Nick’s review (14:00)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

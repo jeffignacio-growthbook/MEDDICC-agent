@@ -1,0 +1,18 @@
+{
+  "company": "Attivo<>Growthbook",
+  "slug": "attivo-growthbook",
+  "last_etl_date": "2026-09-24T05:38:50.727454",
+  "calls": [
+    {
+      "id": "01M37CA5CCQVFY584T60S66JB6",
+      "source": "fireflies",
+      "title": "Attivo<>Growthbook",
+      "date": "2026-09-23",
+      "duration_minutes": 30.15999984741211,
+      "summary": "# Attivo<>Growthbook\nDate: 2026-09-23 | Duration: 30.15999984741211m\n\n## Summary\nThe company needs a stronger financial foundation because late forecasts, unchecked assumptions, misclassified vendor expenses, weak approval workflows, and renewal-management failures have reduced financial visibility and board confidence. Fondo’s bookkeeping does not sufficiently separate marketing, contractor, and other vendor costs, while collections and renewals lack clear ownership and reporting; a missed major renewal resulted in lost expansion opportunity. Ali proposed a structured monthly close with burn analysis, budget-versus-actual reporting, SaaS metrics separated between self-service and enterprise revenue, and deliverables within two weeks after month-end. Ashley rated the current model 8 out of 10 for forecasting fiscal year-end burn and cash, but noted outdated deal-size assumptions and other classifications requiring refinement. The growth target was reduced from 100% to 85% year over year because of AI-market uncertainty. Leadership also needs integrated hiring, sales, spending, fundraising, and cash scenarios, including early 2027 planning. Ali and Ashley emphasized CEO and founder coaching, disciplined hiring, and ongoing fractional CFO leadership.\n\n## Keywords\nfinancial modeling, SaaS metrics, board meeting, expense classification, forecasting, cash flow management\n\n## Action Items\n\n**Ali Rizvi**\nConnect with Mark to review current financial models and identify gaps in processes (28:15)\nConnect with Charlie Campbell to clarify audit findings and renewal process details (28:22)\nCoordinate with Greg to gather broader company context and understand existing workflows (28:35)\nProvide Ashley Stirrup a summary email of the call including next steps and contact details (28:45)\nPropose and plan a kickoff meeting to start improving financial processes and modeling (28:55)\n\n**Ashley Stirrup**\nShare additional company vendor list and expense categorization details for Fondo and internal finance teams (15:00)\nCollaborate with Ali on validating current financial models and scenario planning for the next fiscal year (15:00)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

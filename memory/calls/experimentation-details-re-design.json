@@ -1,0 +1,18 @@
+{
+  "company": "Experimentation Details Re-design",
+  "slug": "experimentation-details-re-design",
+  "last_etl_date": "2026-09-24T05:38:50.728980",
+  "calls": [
+    {
+      "id": "01M2XRMRY08JN0NQ7XYFEAPQ6M",
+      "source": "fireflies",
+      "title": "Experimentation Details Re-design Sync",
+      "date": "2026-09-23",
+      "duration_minutes": 56.70000076293945,
+      "summary": "# Experimentation Details Re-design Sync\nDate: 2026-09-23 | Duration: 56.70000076293945m\n\n## Summary\nThe discussion covered improvements to analysis plans, approval flows, experiment editing, navigation, and release planning. Scheduling placement remained unclear, with possible ties to the start process, decision-making, and power analysis. The team questioned how conditional and advanced options should be exposed and proposed simplifying analysis-plan changes by hiding unused fields and showing key experiment details. Approval flows were to be rewritten for a cohesive experience, with call outs remaining the primary indicator for pending requests; comments would remain secondary and would not change approval state. A full-screen review surface was preferred over modals because of scrolling concerns, while multi-approver and stale-approval cases required attention. UI discussions addressed inline versus modal editing, rich text in experiment setup, traffic split diagrams, drag-and-drop metadata ordering, inline editing for linked feature flags, and JSON editing in a modal. Navigation topics included the Review Changes button, avoiding layout shifts, and whether a sidebar should collapse on the results tab. The team targeted an 80% solution for broad release, emphasized P0 priorities, noted uncertainty around QA resources, and accepted iterative improvements after launch.\n\n## Keywords\nExperiment redesign, Approval flows, Analysis plan, Inline editing, UI layout, Change requests\n\n## Action Items\n**Bryce Fitzsimons**  \nBring approval flow design to Experimentation Squad (11:20)  \nShare screenshot of detailed modals with Gabe (20:11)  \nDeliver redesigned full-screen approval surface (21:39)  \nExplore inline editing for feature flag values (47:07)  \nOrganize QA sessions for redesign (54:14)  \n\n**Gabe Melean**  \nPresent approval callouts and change request UI to Experimentation Squad (11:23)  \nPlan comment visibility and callout triggers (13:19)  \nAdjust UI to avoid layout shifts (23:17)  \nThink through callout placement and interaction (26:08)  \nShare screenshots of linked changes implementation with Bryce (37:49)  \nCoordinate QA resource availability and scheduling (54:54)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

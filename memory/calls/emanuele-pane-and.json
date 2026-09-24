@@ -1,0 +1,18 @@
+{
+  "company": "Emanuele Pane and",
+  "slug": "emanuele-pane-and",
+  "last_etl_date": "2026-09-24T05:38:50.729224",
+  "calls": [
+    {
+      "id": "01M2T1BM5VTX8Q64J2VS7ZY688",
+      "source": "fireflies",
+      "title": "Emanuele Pane and James Shannon",
+      "date": "2026-09-23",
+      "duration_minutes": 64.27999877929688,
+      "summary": "# Emanuele Pane and James Shannon\nDate: 2026-09-23 | Duration: 64.27999877929688m\n\n## Summary\nThe team wants to overcome a current limit of 80 experiments per year, caused by technical limitations and operational fragility, while improving trust, learning, and growth. The goal is to enable squads and product managers to create and interpret experiments independently, shifting the CRO team toward strategic guidance. GrowthBook was presented as a warehouse-native platform that connects with Snowflake, supports reusable metrics, feature flags, sticky bucketing, namespaces, holdouts, 27 SDK variants, and AI-assisted Bayesian and frequentist analysis. Data integration could reuse existing Telium and Adobe Analytics pipelines through custom middleware or use GrowthBook’s managed event forwarder, with the latter involving an infrastructure fee. The three-month pilot will run during peak season, assess technical and organizational fit, improve metric and Adobe Analytics data alignment, and define resources, data flows, costs, and operating-model changes. Current benchmarks show about 25% of experiments produce an RPV lift, while the aspiration is to increase experiment volume by 50% without reducing quality.\n\n## Keywords\nexperimentation, data integration, A/B testing, Growth Book, Snowflake, pilot program\n\n## Action Items\n\n**Emanuele Pane and Emily Simpson**\nEngage in commercial discussions regarding the pilot scope and pricing details (01:02:57)\n\n**James Shannon**\nSet up Slack communication channel for ongoing collaboration with Storio Group team (01:02:17)\n\n**James Shannon and Rémy Marin**\nLead technical pilot setup including integration of Growth Book SDK and data pipelines with Snowflake (01:01:14)\n\n**Unassigned**\nSchedule a kickoff call to define success criteria, technical requirements, and pilot timeline (01:02:40)\nArrange follow-up call(s) focused on detailed data integration scenarios and Snowflake event ingestion pipelines with Storio’s data team (01:01:10)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook & kfzteile24",
+  "slug": "growthbook-kfzteile24",
+  "last_etl_date": "2026-09-24T05:38:50.729353",
+  "calls": [
+    {
+      "id": "01M33YMYHD4NCKA0P25D0QYEGD",
+      "source": "fireflies",
+      "title": "GrowthBook & kfzteile24 | Intro + Enterprise Overview",
+      "date": "2026-09-23",
+      "duration_minutes": 38,
+      "summary": "# GrowthBook & kfzteile24 | Intro + Enterprise Overview\nDate: 2026-09-23 | Duration: 38m\n\n## Summary\nThe discussion covered network and meeting quality, with advice to use the least busy 2.4, 5, or 6 GHz WiFi band, preferably Ethernet, and to monitor Mac resource usage when Google Meet issues occur. GrowthBook has been newly integrated for A/B testing, beginning with a product-sorting test in the Netherlands and potentially expanding to other sales channels and company-wide use. The team is starting without an established testing process, with data involved from the beginning while PMs seek independent test management through a shared configuration. Planned testing includes UI and backend changes, with desired features such as IP exclusion, automation, and alerting. Conversion rate is the north star metric, currently about 1.5% for the shop and 25% for B2B. Enterprise capabilities discussed included role-based permissions, SSO, onboarding, SLA support, cloud or self-hosted deployment, and GDPR and ISO compliance. Pricing uses a base license plus users or experiments; approximately 10–20 users are expected, with a goal of about 10 experiments monthly. A rough cost estimate was requested because budget was needed by the end of the week.\n\n## Keywords\nGrowthBook, A/B testing, Enterprise plan, conversion rate, pricing model, data integration\n\n## Action Items\n**Marcel Geldner**  \nProvide pricing comparison (20:14)  \nShare presentation slides and case studies (22:46)  \nSend cost estimates and pricing options (24:30)  \nCreate and invite to shared Slack channel (28:07)  \n\n**Lina Scheck**  \nProvide user and experiment estimates (24:30)  \n\n**Rémy Marin**  \nAssist with technical questions on Slack (28:07)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}
