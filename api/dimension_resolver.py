@@ -493,7 +493,17 @@ def scan_question_for_ambiguous_dimension_terms(question: str) -> List[Dict[str,
     ambiguous person mentioned twice only produces one entry.
     """
     words = re.findall(r"[A-Za-z][A-Za-z\-']*", question or "")
-    candidate_terms = set(words)
+    # 2026-09-24: a first name that a full name in the question already
+    # settles ("Jake Stangl", "Jake H") is not ambiguous. Both times this
+    # scan fired in production (2 of 453 dynamic-loop runs) it was this
+    # false positive: the question named Jake Stangl in full and the bare
+    # word "Jake" was still flagged.
+    settled = set()
+    for i in range(len(words) - 1):
+        pair = resolve_dimension_filter(f"{words[i]} {words[i + 1]}")
+        if pair.get("column") == "owner_email":
+            settled |= {i, i + 1}
+    candidate_terms = {w for i, w in enumerate(words) if i not in settled}
     for i in range(len(words) - 1):
         candidate_terms.add(f"{words[i]} {words[i + 1]}")
 
@@ -516,7 +526,17 @@ def format_ambiguous_dimension_note(ambiguous: List[Dict[str, Any]]) -> str:
     a directive telling the model NOT to guess — same "hand it a fact,
     don't make it guess" pattern as format_dimension_resolution_note(),
     but for the case where the fact is "this term doesn't resolve to
-    exactly one value." Returns "" when nothing is ambiguous."""
+    exactly one value." Returns "" when nothing is ambiguous.
+
+    DEPRECATED for people, 2026-09-24: api/rep_clarification.rep_gate()
+    now settles every name in code right after the classifier. It asks
+    (in code, before anything runs), declines, or rewrites the question
+    with the full name, so on the classifier path a person's first name
+    can no longer reach the dynamic loop ambiguous. This directive is
+    kept only as the fallback for loop runs that skip the classifier (a
+    thread entity-scope or cache follow-up that reaches the loop through
+    the evaluator's guided retry); it is not the mechanism
+    for asking a clarifying question and must not become one."""
     if not ambiguous:
         return ""
     lines = []

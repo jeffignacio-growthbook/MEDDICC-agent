@@ -147,7 +147,8 @@ async def process_and_reply(text: str, user_id: str,
     tool_results = result.get("tool_results", {})
     handler_name = result.get("handler_name", "unknown")
     save_thread(sb, thread_ts, channel,
-                history, text, answer, tool_results, handler_name)
+                history, text, answer, tool_results, handler_name,
+                pending_clarification=result.get("pending_clarification"))
 
 @app.get("/health")
 def health():

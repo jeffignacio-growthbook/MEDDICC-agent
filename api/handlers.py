@@ -288,6 +288,15 @@ def _resolve_owner_email(params: dict, sb):
 
     Returns (email_or_None, note_or_None). `note` explains a name→email
     resolution or a miss, for transparency in the handler's output.
+
+    2026-09-24: this used to return the first unordered SUBSTRING match
+    across every persona, external HubSpot contacts included: "Jake" gave
+    whichever Jake came first, "Scott" could be Scott Bailey (no deals),
+    "an" matched Dan. It now uses rep_clarification.owner_email_for_name():
+    an exact full or first name, cut to people who own deals, and an email
+    only when exactly one person is left. Otherwise None, and the note
+    names the candidates (the router's rep gate has normally asked the
+    user before a handler gets here).
     """
     # 1. An email supplied under any of the known keys wins outright.
     for key in ("owner_email", "rep_email", "sdr_email", "email"):
@@ -307,24 +316,21 @@ def _resolve_owner_email(params: dict, sb):
         return None, None
 
     try:
-        personas = select_all(sb, "user_personas",
-                              columns="email,name,display_name")
+        from api.rep_clarification import load_people, owner_email_for_name
+    except ImportError:
+        from rep_clarification import load_people, owner_email_for_name
+    try:
+        people = load_people(sb, select_all=select_all)
     except Exception:
-        personas = []
+        people = []
 
     for cand in candidates:
-        cl = cand.lower().strip()
-        if not cl:
-            continue
-        for p in personas:
-            for nm in (p.get("name"), p.get("display_name")):
-                nml = str(nm or "").lower().strip()
-                if not nml:
-                    continue
-                first = nml.split()[0] if nml.split() else nml
-                if cl == nml or cl == first or cl in nml:
-                    if p.get("email"):
-                        return p["email"], f"resolved '{cand}' to {p['email']}"
+        r = owner_email_for_name(cand, people)
+        if r["email"]:
+            return r["email"], f"resolved '{cand}' to {r['email']}"
+        if len(r["candidates"]) > 1:
+            return None, (f"'{cand}' matches more than one rep "
+                          f"({', '.join(r['candidates'])}); not guessing")
     return None, f"could not resolve '{candidates[0]}' to a known rep"
 
 

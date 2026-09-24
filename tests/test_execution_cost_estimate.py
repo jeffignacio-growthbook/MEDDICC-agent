@@ -55,11 +55,20 @@ def test_reuses_the_real_dimension_detection_functions_not_a_reimplementation():
         "this question names EMEA/Enterprise/an owner — the real dimension "
         "resolver matches all three; the estimate must reflect that"
     )
-    assert est["signals_detected"]["ambiguous_dimension_term_flagged"] is True, (
-        "'Jake' matches two known reps (Jake Stangl, Jake H) in the real "
+    # 2026-09-24: this used to assert True. The question names
+    # jake.stangl@growthbook.io, i.e. Jake Stangl in full, so "Jake" is not
+    # ambiguous; the old scan flagged it anyway (the same false positive as
+    # the two logged "Jake Stangl" questions, fixed in dimension_resolver).
+    assert est["signals_detected"]["ambiguous_dimension_term_flagged"] is False, (
+        "the question names Jake Stangl in full (his email); 'Jake' is settled, not ambiguous"
+    )
+    bare = router.resolve_execution_cost_estimate("Which stale Enterprise deals does Jake own in EMEA?")
+    assert bare["signals_detected"]["ambiguous_dimension_term_flagged"] is True, (
+        "a bare 'Jake' matches two known reps (Jake Stangl, Jake H) in the real "
         "roster-matching logic — the estimate must reflect that"
     )
-    print("✓ dimension signals come from the real detection functions, matching the known case exactly")
+    print("✓ dimension signals come from the real detection functions: the known case names "
+          "Jake Stangl in full (not ambiguous); a bare 'Jake' is flagged")
 
 
 def test_known_case_estimate_is_same_order_of_magnitude_as_measured_cost():

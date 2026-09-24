@@ -38,6 +38,12 @@ counting this outcome. The answer shipped with a false caveat appended.
 
 ## 🟡 Open Items
 
+### 🟡 MEDIUM: The correction-scope follow-up can never fire (found 2026-09-24)
+**Status:** OPEN.
+- **What:** after the bot asks "is this correction general or specific?", `route_question` is meant to treat the reply ("general"/"specific") as the answer. It detects that with `history[-1].get('handler_name') == 'correction_scope_question'`.
+- **Why it's dead:** `db.save_thread` stores history entries as `{"role", "content"}` only; no entry ever carries `handler_name`. The last entry is also usually `entity_context` or `result_cache_ref`, not the assistant turn (live `conversation_threads`, 2026-09-24: `user,assistant,entity_context,result_cache_ref`). So a "general" reply is routed as a new question, and no correction proposal is created from this path.
+- **Fix:** use the same mechanism as the rep clarification (`api/rep_clarification.py`): save the pending scope question as its own history entry and match the reply in code. Found while building that mechanism; left out of that PR to keep it scoped.
+
 ### 🟡 MEDIUM: Tool calls aren't logged, so a crashing tool is invisible (found 2026-09-24)
 **Status:** OPEN.
 - **The gap:** `query_cost_log` records one row per question (outcome, iterations, tokens, a fixed set of `primitives_fired` flags), but not the individual tool calls the dynamic loop makes (`filter_table`, `join_tables`, `aggregate_results`, `compare_periods`, `query_*`). None of their arguments, row counts, errors or exceptions are recorded.
