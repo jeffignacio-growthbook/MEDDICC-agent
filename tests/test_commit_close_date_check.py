@@ -110,28 +110,15 @@ def test_reasons_boundaries_and_scope():
 def test_query_pipeline_answer_carries_the_flag():
     import test_query_pipeline_note_and_entities as qp
     import test_zero_arr_deal_counting as za
-    saved = qp.DEALS
     base = dict(za.DEALS[0])
-    qp.DEALS = [dict(base, deal_id="OK", forecast_category="COMMIT", close_date="2026-09-30"),
-                dict(base, deal_id="BAD", company_name="Mis-dated", forecast_category="COMMIT",
-                     close_date="2026-12-12", deal_value=960000),
-                dict(base, deal_id="ML", forecast_category="MOST_LIKELY", close_date="2026-12-12")]
-    import asyncio
-
-    def projected_select_all(sb, table, columns="*", filters=None, **kw):
-        # like Postgres: only the selected columns come back, so a query that
-        # forgets forecast_category flags nothing
-        assert table == "deals", table
-        cols = [c.strip() for c in columns.split(",")]
-        return [{c: d.get(c) for c in cols} for d in qp.DEALS]
-
-    saved_sa = qp.handlers.select_all
-    qp.handlers.select_all = projected_select_all
-    try:
-        r = asyncio.run(qp.handlers.query_pipeline({}, qp._SB()))
-    finally:
-        qp.handlers.select_all = saved_sa
-        qp.DEALS = saved
+    deals = [dict(base, deal_id="OK", forecast_category="COMMIT", close_date="2026-09-30"),
+             dict(base, deal_id="BAD", company_name="Mis-dated", forecast_category="COMMIT",
+                  close_date="2026-12-12", deal_value=960000),
+             dict(base, deal_id="ML", forecast_category="MOST_LIKELY", close_date="2026-12-12")]
+    # the strict fake (tests/strict_supabase.py) returns only the selected
+    # columns, like Postgres: a query that forgets forecast_category or
+    # deal_status flags nothing
+    r = qp._run({}, deals)
     flag = r.get("commit_close_date_mismatch")
     assert flag and flag["count"] == 1 and flag["deals"][0]["deal_id"] == "BAD", flag
     assert flag["checked"] == 2

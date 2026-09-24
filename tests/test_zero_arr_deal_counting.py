@@ -56,22 +56,7 @@ DEALS = [
 
 
 def _query_pipeline(params=None):
-    saved = qp.DEALS
-    qp.DEALS = DEALS
-    try:
-        return qp._run() if not params else _run_qp(params)
-    finally:
-        qp.DEALS = saved
-
-
-def _run_qp(params):
-    import asyncio
-    saved = qp.handlers.select_all
-    qp.handlers.select_all = qp._fake_select_all
-    try:
-        return asyncio.run(qp.handlers.query_pipeline(params, qp._SB()))
-    finally:
-        qp.handlers.select_all = saved
+    return qp._run(params, DEALS)       # strict fake: real select_all, real filters
 
 
 def _query_waterfall():

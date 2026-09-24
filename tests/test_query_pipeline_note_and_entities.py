@@ -13,7 +13,7 @@ this quarter?", routed to query_pipeline):
      extract_entity_context() found no entity-bearing list, and a follow-up
      ("which of those are at risk?") had nothing to resolve.
 
-Runs the real handler against a fake Supabase, then the real
+Runs the real handler against a strict fake Supabase, then the real
 extract_entity_context() on its output.
 """
 import asyncio
@@ -24,6 +24,7 @@ REPO = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "api"))
 sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "tests"))
 
 import logging  # noqa: E402
 logging.disable(logging.CRITICAL)
@@ -33,50 +34,40 @@ from api.db import extract_entity_context  # noqa: E402
 
 DEALS = [
     {"deal_id": "101", "company_name": "Alpha", "deal_value": 120000, "stage": "presentationscheduled",
-     "close_date": "2026-09-30", "owner_email": "a@x.com", "pipeline_id": "default",
+     "close_date": "2026-09-30", "owner_email": "a@x.com", "pipeline_id": "default", "deal_status": "active",
      "new_arr": 120000, "expansion_arr": None, "renewal_revenue": None},
     {"deal_id": "102", "company_name": "Bravo", "deal_value": 55000, "stage": "qualifiedtobuy",
-     "close_date": "2027-01-15", "owner_email": "b@x.com", "pipeline_id": "default",
+     "close_date": "2027-01-15", "owner_email": "b@x.com", "pipeline_id": "default", "deal_status": "active",
      "new_arr": 50000, "expansion_arr": 5000, "renewal_revenue": None},
     {"deal_id": "103", "company_name": "Charlie", "deal_value": 300000, "stage": "1297321619",
-     "close_date": "2026-10-20", "owner_email": "c@x.com", "pipeline_id": "866608541",
+     "close_date": "2026-10-20", "owner_email": "c@x.com", "pipeline_id": "866608541", "deal_status": "active",
      "new_arr": None, "expansion_arr": 30000, "renewal_revenue": 270000},
 ]
 
 
-class _Chain:
-    def __init__(self, data):
-        self.data = data
-
-    def __getattr__(self, name):          # select / eq / in_ / order / limit ...
-        return lambda *a, **k: self
-
-    def execute(self):
-        return type("R", (), {"data": self.data})()
-
-
-class _SB:
-    def table(self, name):
-        if name == "rep_targets":
-            return _Chain([{"target_value": 150000}])
-        if name == "entity_registry":
-            return _Chain([{"id_column": "deal_id", "entity_type": "deal",
-                            "entity_label_column": "company_name", "supabase_table": "deals"}])
-        return _Chain([])
+def _sb(deals=None):
+    """A strict fake (tests/strict_supabase.py): the REAL select_all runs
+    against it, only selected columns come back, every filter applies.
+    (Until 2026-09-24 this harness returned every deal whatever was selected
+    or filtered, and a rep_targets row whatever period was asked for.)"""
+    from strict_supabase import StrictSupabase
+    from time_resolver import current_quarter_label
+    return StrictSupabase({
+        "deals": DEALS if deals is None else deals,
+        "rep_targets": [{"period": current_quarter_label(), "level": "team",
+                         "metric": "incremental_arr", "target_value": 150000},
+                        {"period": "FY2099_Q1", "level": "team",
+                         "metric": "incremental_arr", "target_value": 1}],
+        "entity_registry": [{"id_column": "deal_id", "entity_type": "deal",
+                             "entity_label_column": "company_name", "supabase_table": "deals"}],
+    })
 
 
-def _fake_select_all(sb, table, columns="*", filters=None, **kw):
-    assert table == "deals", table
-    return [dict(d) for d in DEALS]
+_SB = _sb          # importers call qp._SB()
 
 
-def _run():
-    saved = handlers.select_all
-    handlers.select_all = _fake_select_all
-    try:
-        return asyncio.run(handlers.query_pipeline({}, _SB()))
-    finally:
-        handlers.select_all = saved
+def _run(params=None, deals=None):
+    return asyncio.run(handlers.query_pipeline(params or {}, _sb(deals)))
 
 
 def test_note_states_the_handlers_own_totals():
@@ -102,7 +93,20 @@ def test_deal_rows_carry_deal_id_and_entities_are_extracted():
           "(was zero: no entity-bearing list)")
 
 
+def test_only_active_deals_are_read():
+    """The strict fake applies the handler's own filters, so the fixture can
+    carry deals the query must exclude (the old fake returned everything)."""
+    closed = [dict(DEALS[0], deal_id="901", company_name="WonCo", deal_status="won", new_arr=999000),
+              dict(DEALS[1], deal_id="902", company_name="LostCo", deal_status="lost", new_arr=888000)]
+    r = _run(deals=DEALS + closed)
+    assert (r["total_pipeline"], r["total_deals"]) == (205000, 3), (r["total_pipeline"], r["total_deals"])
+    assert {d["deal_id"] for d in r["deals"]} == {"101", "102", "103"}, r["deals"]
+    print("✓ won and lost deals in the table are filtered out by the handler's own deal_status "
+          "filter: still $205,000 over 3 deals")
+
+
 if __name__ == "__main__":
     test_note_states_the_handlers_own_totals()
     test_deal_rows_carry_deal_id_and_entities_are_extracted()
+    test_only_active_deals_are_read()
     print("\n✅ All tests passed")
