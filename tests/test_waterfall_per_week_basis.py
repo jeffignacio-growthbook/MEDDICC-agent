@@ -54,8 +54,14 @@ def _stored_basis_by_week():
 def _week_segments(text):
     """week_ending -> the synthesis-input text from that week's row to the next."""
     hits = [(m.start(), m.group(1)) for m in re.finditer(r'"week_ending": ?"(\d{4}-\d{2}-\d{2})"', text)]
-    return {w: text[a:(hits[i + 1][0] if i + 1 < len(hits) else len(text))]
-            for i, (a, w) in enumerate(hits)}
+    def _end(i, a):
+        # the last week's segment stops where the next top-level key starts
+        # (waterfall_totals carries its own basis labels, not a week's)
+        if i + 1 < len(hits):
+            return hits[i + 1][0]
+        nxt = text.find('"waterfall_totals"', a)
+        return nxt if nxt != -1 else len(text)
+    return {w: text[a:_end(i, a)] for i, (a, w) in enumerate(hits)}
 
 
 def test_every_week_row_carries_its_stored_basis():

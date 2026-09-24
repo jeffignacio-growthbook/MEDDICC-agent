@@ -691,13 +691,34 @@ def _iter_dicts(data):
             stack.extend(x)
 
 
-def _waterfall_week_rows(data) -> Dict[str, str]:
-    """week_ending -> value_basis for every waterfall week row in data."""
+def _waterfall_week_dicts(data) -> Dict[str, Dict]:
+    """week_ending -> the waterfall week row itself, for every week row in data."""
     weeks = {}
     for d in _iter_dicts(data):
         if d.get("week_ending") and d.get("value_basis") and "by_slice" in d:
-            weeks[str(d["week_ending"])[:10]] = d["value_basis"]
+            weeks[str(d["week_ending"])[:10]] = d
     return weeks
+
+
+def _waterfall_week_rows(data) -> Dict[str, str]:
+    """week_ending -> value_basis for every waterfall week row in data."""
+    return {w: d["value_basis"] for w, d in _waterfall_week_dicts(data).items()}
+
+
+_TOTAL_FIELDS = ("new_pipeline_value", "won_value", "lost_value", "net_change",
+                 "pulled_in_value", "pushed_out_value")
+
+
+def _mixed_basis_totals(week_rows: Dict[str, Dict]) -> List[Tuple[str, float]]:
+    """(field, total) for every quarter-level total whose contributing
+    (non-zero) weeks are on more than one basis."""
+    out = []
+    for f in _TOTAL_FIELDS:
+        contrib = [(float(r.get(f) or 0), r["value_basis"]) for r in week_rows.values()
+                   if float(r.get(f) or 0)]
+        if len({b for _, b in contrib}) > 1:
+            out.append((f, sum(v for v, _ in contrib)))
+    return out
 
 
 def _week_date_pattern(week_ending: str):
@@ -739,8 +760,6 @@ def check_answer_week_basis(answer: str, data: Dict) -> List[PlausibilityViolati
         for i, line in enumerate(lines):
             if rx.search(line):
                 mentions.append((week, i, _bases_named(line)))
-    if not mentions:
-        return []
     week_lines = {i for _, i, _ in mentions}
     table_wide = _bases_named("\n".join(l for i, l in enumerate(lines) if i not in week_lines))
 
@@ -758,6 +777,27 @@ def check_answer_week_basis(answer: str, data: Dict) -> List[PlausibilityViolati
             unlabeled.append(week)
     mentioned_bases = {weeks[w] for w, _, _ in mentions}
     out = []
+
+    # Quarter-level totals (2026-09-24): a line quoting a total across weeks
+    # whose contributing weeks are on different bases must say so ("mixed
+    # basis", or both bases named). Week lines are left to the rules above.
+    unlabeled_totals = []
+    for f, total in _mixed_basis_totals(_waterfall_week_dicts(data)):
+        for i, line in enumerate(lines):
+            if i in week_lines:
+                continue
+            if not any(_matches(v, u, total) for _, v, u, _ in _stated_dollar_figures(line)):
+                continue
+            named = _bases_named(line)
+            if "mixed" in named or {"deal_value", "incremental_arr"} <= named:
+                continue
+            unlabeled_totals.append({"field": f, "total": total, "line": line.strip()[:160]})
+    if unlabeled_totals:
+        out.append(PlausibilityViolation(
+            "answer_week_basis", "error",
+            "answer states quarter-level total(s) mixing bases without saying so: "
+            + "; ".join(f"{t['field']} ${t['total']:,.0f}" for t in unlabeled_totals),
+            {"unlabeled_totals": unlabeled_totals}))
     if wrong:
         out.append(PlausibilityViolation(
             "answer_week_basis", "error",
@@ -908,6 +948,12 @@ def answer_caveat(violations: List[PlausibilityViolation]) -> str:
     (one line per kind of check), or '' when there are none."""
     seen = []
     for v in violations:
+        if v.check == "answer_week_basis" and v.context.get("unlabeled_totals"):
+            text = ("⚠️ Note: a quarter total above adds weeks valued on deal value (before "
+                    "Sep 11, 2026) to weeks valued on Incremental ARR, so it mixes two bases.")
+            if text not in seen:
+                seen.append(text)
+            continue
         if v.check == "answer_unit_slip":
             for sl in v.context.get("slips", []):
                 seen.append(f"⚠️ Note: {sl['stated']} above may be off by a factor of "
