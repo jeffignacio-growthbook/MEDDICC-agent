@@ -53,7 +53,7 @@ def test_waterfall_output():
     if result and "pipeline_summary" in result:
         summary = result["pipeline_summary"]
         print(f"total_open_count: {summary.get('total_open_count')}")
-        print(f"total_open_arr: ${summary.get('total_open_arr', 0):,.0f}")
+        print(f"total_incremental_arr: ${summary.get('total_incremental_arr', 0):,.0f}")
         print(f"\npopulation_statement: {summary.get('population_statement')}\n")
 
         # Check by_stage sum

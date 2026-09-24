@@ -555,6 +555,55 @@ def compute_at_risk_deals(sb, deal_ids=None, use_stage_aware=True,
     return at_risk
 
 
+# query_waterfall's weekly rows. One statement per value_basis; see
+# scripts/analytics/compute_waterfall_segmented.py INCREMENTAL_BASIS_FROM.
+_WATERFALL_BASIS_STATEMENTS = {
+    "incremental_arr": ("Weekly flows are valued on Incremental ARR (new + expansion), "
+                        "the same basis as the headline."),
+    "deal_value": ("Weekly flows for these weeks are valued on deal_value (Incremental ARR, "
+                   "or HubSpot amount where no incremental ARR was recorded): snapshots "
+                   "before 2026-09-11 don't carry new_arr/expansion_arr. For non-renewal "
+                   "deals the two differ by about 1-2%."),
+    "mixed": ("Weekly flows are valued on deal_value (Incremental ARR, or HubSpot amount "
+              "where none was recorded) for weeks before 2026-09-11 and on Incremental "
+              "ARR from then on; each week's value_basis says which."),
+}
+_WATERFALL_VALUE_FIELDS = ("new_pipeline_value", "won_value", "lost_value", "net_change",
+                           "pulled_in_value", "pushed_out_value")
+
+
+def _waterfall_weeks(slices, excluded_pipelines=()):
+    """waterfall_weekly slice rows -> one company-wide row per week_ending:
+    value fields and deals_qualified_count summed over slices, value_basis
+    ('incremental_arr' | 'deal_value' | 'mixed'), and the non-zero slices as
+    labeled by_slice detail."""
+    from collections import OrderedDict
+    weeks = OrderedDict()
+    for r in sorted(slices, key=lambda r: (str(r.get("week_ending")), str(r.get("region")),
+                                          str(r.get("segment")))):
+        if str(r.get("pipeline_id")) in excluded_pipelines:
+            continue
+        w = weeks.setdefault(r["week_ending"], {
+            "week_ending": r["week_ending"], "scope": "company-wide (all regions and segments)",
+            **{f: 0.0 for f in _WATERFALL_VALUE_FIELDS}, "deals_qualified_count": 0,
+            "_bases": set(), "slice_count": 0, "by_slice": []})
+        for f in _WATERFALL_VALUE_FIELDS:
+            w[f] += float(r.get(f) or 0)
+        w["deals_qualified_count"] += int(r.get("deals_qualified_count") or 0)
+        w["_bases"].add(r.get("value_basis") or "deal_value")
+        w["slice_count"] += 1
+        if any(r.get(f) for f in _WATERFALL_VALUE_FIELDS) or r.get("deals_qualified_count"):
+            w["by_slice"].append({"region": r.get("region"), "segment": r.get("segment"),
+                                  **{f: r.get(f) for f in _WATERFALL_VALUE_FIELDS},
+                                  "deals_qualified_count": r.get("deals_qualified_count")})
+    out = []
+    for w in weeks.values():
+        bases = w.pop("_bases")
+        w["value_basis"] = bases.pop() if len(bases) == 1 else "mixed"
+        out.append(w)
+    return out
+
+
 async def query_waterfall(params: dict, sb) -> dict:
     """
     Pipeline snapshot + movement in ONE handler with question-aware emphasis.
@@ -592,10 +641,19 @@ async def query_waterfall(params: dict, sb) -> dict:
                 "order": stage["order"]
             }
 
-    # === PIPELINE SUMMARY: Current state ===
-    # Query active deals
+    # === PIPELINE SUMMARY ===
+    # 2026-09-24: the headline was sum(arr_usd) over every open deal, labeled
+    # with the quarter it wasn't scoped to. arr_usd is HubSpot's
+    # incremental_arr property falling back to `amount`, not the governed
+    # basis. Now:
+    #   - dollars are incremental_arr() (new_arr + expansion_arr, renewal
+    #     base excluded), the basis quota, attainment, coverage and
+    #     forecast_trust use;
+    #   - the headline is the in-scope deals closing in the labeled period;
+    #   - the all-open total stays, as its own labeled figure.
     active_deals = select_all(sb, "deals",
-        columns="deal_id,company_name,arr_usd,stage,deal_status,pipeline_id",
+        columns="deal_id,company_name,new_arr,expansion_arr,stage,deal_status,"
+                "pipeline_id,close_date",
         filters=[("eq", "deal_status", "active")])
 
     # Track exclusions separately for reporting
@@ -604,7 +662,7 @@ async def query_waterfall(params: dict, sb) -> dict:
                                  if str(d.get("pipeline_id", "default")) not in excluded_pipelines]
 
     # Apply full scope filter (pipeline + qualification gate)
-    included_deals = [
+    open_in_scope = [
         d for d in active_deals
         if is_deal_in_analytics_scope(
             d.get("stage"),
@@ -613,18 +671,23 @@ async def query_waterfall(params: dict, sb) -> dict:
             stage_cfg
         )
     ]
+    for d in open_in_scope:
+        d["_incremental_arr"] = incremental_arr(d)
+    # Headline population: in scope AND closing in the labeled period.
+    included_deals = [d for d in open_in_scope
+                      if d.get("close_date") and tw["start"] <= str(d["close_date"])[:10] <= tw["end"]]
 
     # Log exclusion breakdown for verification
     after_pipeline_count = len(after_pipeline_exclusion)
-    after_qualified_count = len(included_deals)
+    after_qualified_count = len(open_in_scope)
     logger.info(f"[WATERFALL] Scope filter: {before_count} total → "
                 f"{after_pipeline_count} after renewal exclusion → "
-                f"{after_qualified_count} after qualification gate")
+                f"{after_qualified_count} after qualification gate → "
+                f"{len(included_deals)} closing in {tw['label']}")
 
-    # Total open pipeline
-    # Phase 1b refactor: Keep simple sums for totals (no grouping needed)
-    total_open_arr = sum(d.get("arr_usd") or 0 for d in included_deals)
+    period_incremental_arr = sum(d["_incremental_arr"] for d in included_deals)
     total_open_count = len(included_deals)
+    all_open_incremental_arr = sum(d["_incremental_arr"] for d in open_in_scope)
 
     # By-stage breakdown
     # Phase 1b refactor (2026-09-18): Use aggregate_results() primitive instead of
@@ -652,7 +715,7 @@ async def query_waterfall(params: dict, sb) -> dict:
     stage_agg = await aggregate_results(
         included_deals,
         group_by="_stage_name",
-        aggregations={"arr_usd": "sum", "deal_id": "count"}
+        aggregations={"_incremental_arr": "sum", "deal_id": "count"}
     )
 
     # Transform to original format with stage order for sorting
@@ -665,7 +728,7 @@ async def query_waterfall(params: dict, sb) -> dict:
         by_stage.append({
             "stage_name": stage_name,
             "count": row["deal_id_count"],
-            "arr": row["arr_usd_sum"],
+            "incremental_arr": row["_incremental_arr_sum"],
             "_order": stage_order  # Temp field for sorting
         })
 
@@ -674,8 +737,8 @@ async def query_waterfall(params: dict, sb) -> dict:
     for s in by_stage:
         del s["_order"]
 
-    # Needs attention: deals with no ARR
-    no_arr_deals = [d for d in included_deals if not d.get("arr_usd")]
+    # Needs attention: deals with no incremental ARR
+    no_arr_deals = [d for d in included_deals if not d["_incremental_arr"]]
     no_arr_count = len(no_arr_deals)
     no_arr_list = [d["company_name"] for d in no_arr_deals[:5]]
 
@@ -703,15 +766,31 @@ async def query_waterfall(params: dict, sb) -> dict:
     renewals_excluded = before_count - after_pipeline_count
     prequalified_excluded = after_pipeline_count - after_qualified_count
 
+    basis_statement = (
+        "Dollars are Incremental ARR (new_arr + expansion_arr; the renewal "
+        "base is excluded), on qualified deals outside the renewal pipeline."
+    )
     population_statement = (
-        f"{total_open_count} qualified new-business deals. "
-        f"Excludes {renewals_excluded} renewals and {prequalified_excluded} pre-qualification (Meeting Set)."
+        f"{total_open_count} qualified new-business deals closing in "
+        f"{tw['label']} ({tw['start']} to {tw['end']}), of {after_qualified_count} "
+        f"open. Excludes {renewals_excluded} renewal-pipeline deals and "
+        f"{prequalified_excluded} below qualification (Meeting Set, Disqualified, "
+        f"unmapped stages)."
     )
 
     pipeline_summary = {
-        "total_open_arr": total_open_arr,
+        "basis": "incremental_arr",
+        "basis_statement": basis_statement,
+        "period": {"label": tw["label"], "start": tw["start"], "end": tw["end"]},
+        "total_incremental_arr": period_incremental_arr,
         "total_open_count": total_open_count,
         "population_statement": population_statement,
+        "all_open_pipeline": {
+            "incremental_arr": all_open_incremental_arr,
+            "count": after_qualified_count,
+            "statement": (f"All {after_qualified_count} open qualified deals regardless of "
+                          f"close date. NOT scoped to {tw['label']}."),
+        },
         "by_stage": by_stage,
         "needs_attention": {
             "no_arr_count": no_arr_count,
@@ -721,14 +800,26 @@ async def query_waterfall(params: dict, sb) -> dict:
         }
     }
 
-    # === WATERFALL: Weekly movement (unchanged) ===
-    weekly = select_all(sb, "waterfall_weekly",
-        columns="week_ending,pipeline_id,new_pipeline_value,"
-                "won_value,lost_value,net_change,"
-                "pulled_in_value,pushed_out_value,"
-                "deals_qualified_count",
+    # === WATERFALL: Weekly movement ===
+    # waterfall_weekly holds one row per (week, pipeline, region, segment)
+    # slice. Returned raw, the model got up to 19 unlabeled rows per week and
+    # couldn't tell a slice from a total. Now one company-wide row per week
+    # (the slices sum: the table's primary key makes them disjoint), with the
+    # non-zero slices kept as labeled detail. Each week states its value
+    # basis: compute_waterfall_segmented.py values weeks on incremental_arr()
+    # from INCREMENTAL_BASIS_FROM (the first snapshot with new_arr /
+    # expansion_arr); earlier weeks were computed on deal_value (NULL
+    # value_basis = computed before the column existed = deal_value).
+    weekly_slices = select_all(sb, "waterfall_weekly",
+        columns="week_ending,pipeline_id,region,segment,value_basis,"
+                "new_pipeline_value,won_value,lost_value,net_change,"
+                "pulled_in_value,pushed_out_value,deals_qualified_count",
         filters=[("gte", "week_ending", tw["start"]),
                  ("lte", "week_ending", tw["end"])])
+    weekly = _waterfall_weeks(weekly_slices, excluded_pipelines)
+    week_bases = sorted({w["value_basis"] for w in weekly})
+    waterfall_basis_statement = _WATERFALL_BASIS_STATEMENTS.get(
+        week_bases[0] if len(week_bases) == 1 else "mixed", "")
 
     # Deal-level rows for follow-ups (cache_payload)
     deals = select_all(sb, "deals",
@@ -758,13 +849,24 @@ async def query_waterfall(params: dict, sb) -> dict:
         report_shape = "snapshot"  # Default to snapshot
 
     result = {
-        "pipeline_summary": pipeline_summary,  # Current state
-        "waterfall": weekly,                   # Movement
+        "pipeline_summary": pipeline_summary,  # Headline: closing in the period
+        "waterfall": weekly,                   # One company-wide row per week
+        "waterfall_basis_statement": waterfall_basis_statement,
         "period": tw["label"],
         "report_shape": report_shape,          # Declared shape for synthesis
         "cache_payload": {                     # Retained, NOT shown
             "deals": deals
-        }
+        },
+        "_synthesis_note": (
+            f"BASIS: say the dollars are Incremental ARR (new + expansion; renewal base "
+            f"excluded). HEADLINE: ${period_incremental_arr:,.0f} across {total_open_count} "
+            f"qualified deals closing in {tw['label']} ({tw['start']} to {tw['end']}). "
+            f"The ${all_open_incremental_arr:,.0f} across {after_qualified_count} deals is ALL "
+            f"open pipeline regardless of close date: if you cite it, label it that way, "
+            f"never as {tw['label']}'s pipeline. WEEKLY: each waterfall row is one "
+            f"company-wide week (region/segment slices summed; by_slice is detail, never a "
+            f"week total). {waterfall_basis_statement}"
+        ),
     }
 
     # Phase 1b: Structured verification (2026-09-18)
@@ -777,15 +879,15 @@ async def query_waterfall(params: dict, sb) -> dict:
     verification_result = verify_structured_aggregations(
         underlying_data=included_deals,
         structured_output={
-            "total_open_arr": result["pipeline_summary"]["total_open_arr"],
+            "total_incremental_arr": result["pipeline_summary"]["total_incremental_arr"],
             "total_open_count": result["pipeline_summary"]["total_open_count"],
             "no_arr_count": result["pipeline_summary"]["needs_attention"]["no_arr_count"]
         },
         verification_spec={
-            "total_open_arr": {
+            "total_incremental_arr": {
                 "type": "sum",
-                "field": "arr_usd",
-                "expected": result["pipeline_summary"]["total_open_arr"]
+                "field": "_incremental_arr",
+                "expected": result["pipeline_summary"]["total_incremental_arr"]
             },
             "total_open_count": {
                 "type": "count",
@@ -793,7 +895,7 @@ async def query_waterfall(params: dict, sb) -> dict:
             },
             "no_arr_count": {
                 "type": "count_filtered",
-                "filter": lambda row: not row.get("arr_usd"),
+                "filter": lambda row: not row.get("_incremental_arr"),
                 "expected": result["pipeline_summary"]["needs_attention"]["no_arr_count"]
             }
         },

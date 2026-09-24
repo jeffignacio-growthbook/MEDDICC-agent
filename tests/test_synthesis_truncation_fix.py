@@ -333,7 +333,7 @@ def test_query_waterfall_is_covered_by_the_same_structural_fix():
                   "arr_usd": 10000 + i} for i in range(150)]
     synthetic_waterfall_result = {
         "pipeline_summary": {
-            "total_open_arr": 5_000_000, "total_open_count": 150,
+            "total_incremental_arr": 5_000_000, "total_open_count": 150,
             "population_statement": "150 qualified new-business deals.",
             "by_stage": [{"stage_name": f"Stage{i}", "count": 10, "arr": 100000}
                          for i in range(10)],

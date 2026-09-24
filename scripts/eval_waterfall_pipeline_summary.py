@@ -138,12 +138,12 @@ def test_pipeline_summary():
 
     pipeline_summary = result.get("pipeline_summary", {})
 
-    print(f"  Total open ARR: ${pipeline_summary.get('total_open_arr', 0):,.0f}")
+    print(f"  Incremental ARR closing in period: ${pipeline_summary.get('total_incremental_arr', 0):,.0f}")
     print(f"  Total open count: {pipeline_summary.get('total_open_count', 0)}")
     print(f"  By-stage breakdown: {len(pipeline_summary.get('by_stage', []))} stages")
 
     # Verify structure
-    assert "total_open_arr" in pipeline_summary, "Missing total_open_arr"
+    assert "total_incremental_arr" in pipeline_summary, "Missing total_incremental_arr"
     assert "total_open_count" in pipeline_summary, "Missing total_open_count"
     assert "by_stage" in pipeline_summary, "Missing by_stage"
     assert "needs_attention" in pipeline_summary, "Missing needs_attention"

@@ -182,6 +182,7 @@ def run_canary_case(question: str, tool_name: str, tool_params: dict,
         },
         "tool_executed": bool(stored_steps),
         "keys_missing_from_synthesis": keys_missing_from(synthesis_text, canaried),
+        "synthesis_text": synthesis_text,   # to assert specific text reached the model
         "answered": result.get("answered"),
         "answer": result.get("answer", ""),
         "llm_calls": len(client.calls),

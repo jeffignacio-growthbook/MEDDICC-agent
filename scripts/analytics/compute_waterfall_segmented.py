@@ -25,6 +25,20 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 
+# First snapshot that carries new_arr / expansion_arr (deals_snapshot, checked
+# 2026-09-24: 0 rows before it, 376 of 442 on it). A week whose EARLIER
+# snapshot is on or after this date is valued on incremental_arr(), the
+# governed basis query_waterfall's headline uses. Earlier weeks stay on
+# deal_value (Incremental ARR, or HubSpot amount where none was recorded),
+# because the incremental fields don't exist for them; each row records its
+# value_basis so the difference is stated, not silent. Mixing bases within a
+# week would invent ARR changes, so the earlier snapshot decides.
+INCREMENTAL_BASIS_FROM = '2026-09-11'
+
+
+def value_basis_for(prev_date: str) -> str:
+    return 'incremental_arr' if str(prev_date) >= INCREMENTAL_BASIS_FROM else 'deal_value'
+
 
 def _qualified_as_of(qual_map, deal_id, as_of_iso):
     """Point-in-time qualified-pipeline membership (defect 5)."""
@@ -45,6 +59,9 @@ def main():
     parser = argparse.ArgumentParser(description='Compute segmented pipeline waterfall')
     parser.add_argument('--backfill', action='store_true',
                        help='Backfill mode: compute waterfall for all historical snapshot pairs')
+    parser.add_argument('--recompute-from', metavar='YYYY-MM-DD',
+                       help='Recompute (overwrite) every week whose earlier snapshot is on '
+                            'or after this date, e.g. to move weeks onto a new value basis')
     args = parser.parse_args()
 
     SUPABASE_URL = os.getenv('SUPABASE_URL')
@@ -113,6 +130,18 @@ def main():
         for row in deal_status_rows
     }
     print(f"Loaded status data for {len(deal_status_map)} deals")
+
+    if args.recompute_from:
+        dates = sorted({r['snapshot_date'] for r in select_all(
+            sb, 'deals_snapshot', columns='snapshot_date',
+            filters=[('gte', 'snapshot_date', args.recompute_from)])})
+        print(f"Recomputing {max(len(dates) - 1, 0)} week(s) from {args.recompute_from}: {dates}")
+        for prev_date, new_date in zip(dates, dates[1:]):
+            print(f"  {prev_date} -> {new_date} ({value_basis_for(prev_date)})")
+            compute_waterfall_for_dates(
+                sb, config, qual_map, enrichment_map, deal_status_map, is_test_deal, threshold,
+                prev_date, new_date, computed_source='prospective')
+        return
 
     if args.backfill:
         # Backfill mode: get all snapshot dates and compute waterfalls for all pairs
@@ -294,10 +323,19 @@ def compute_waterfall_for_dates(sb, config, qual_map, enrichment_map, deal_statu
     max_null_pct = float(config.get('forecast_analysis', {})
                          .get('max_null_value_pct', 5))
 
+    value_basis = value_basis_for(prev_date)
+    sys.path.insert(0, str(REPO_ROOT))
+    from api.incremental_arr import incremental_arr
+
     def _deal_value(row):
-        """deal_value as float, or None when unknown — NEVER 0-coalesced."""
+        """The row's value on this week's basis, or None when there's no row.
+        deal_value basis: deal_value as float, None when unknown (NEVER
+        0-coalesced). incremental_arr basis: incremental_arr(), which by its
+        governed definition counts NULL new/expansion ARR as 0."""
         if not row:
             return None
+        if value_basis == 'incremental_arr':
+            return incremental_arr(row)
         v = row.get('deal_value')
         return float(v) if v is not None else None
 
@@ -733,6 +771,7 @@ def compute_waterfall_for_dates(sb, config, qual_map, enrichment_map, deal_statu
             'deals_qualified_count': wf['deals_qualified_count'],
             'details': json.dumps(wf['details']),
             'computed_source': computed_source,
+            'value_basis': value_basis,
         }
 
         # NEW: Conflict resolution now includes region and segment
