@@ -75,7 +75,35 @@ def test_the_result_says_the_status_is_as_of_today():
     print("✓ deal_changes says an exit's won/lost status is the deals table's, as of today")
 
 
+EXCLUSION_LINE = "Meeting Set deals not counted in this view."
+
+
+def test_note_states_the_meeting_set_exclusion_on_both_paths():
+    """The same live answer left out Starz ($150K) and grüum ($0), both
+    new at Meeting Set: this view counts qualified pipeline only. The
+    scope_statement reached the model, but nothing required the answer to
+    say so. The view's _synthesis_note now carries the exact line, and it
+    reaches the synthesis input on the classifier and dynamic-loop paths."""
+    import copy
+    import json
+    import api.router as router
+    from canary_harness import run_canary_case
+    r = _run()
+    note = r.get("_synthesis_note") or ""
+    assert EXCLUSION_LINE in note, note
+    params = {"view": "deal_changes", "fiscal_quarter": "FY2027 Q3"}
+    classifier = router._smart_truncate_for_synthesis(
+        router._cap_rows_for_synthesis(copy.deepcopy(r)), router.SYNTH_PAYLOAD_CHARS)
+    loop = run_canary_case("What's changed with Jake H's deals this week?",
+                           "query_pipeline_movement", params, r)["synthesis_text"]
+    for name, text in (("classifier", classifier), ("dynamic loop", loop)):
+        assert json.dumps(note)[1:-1] in text, name
+    print("✓ deal_changes' _synthesis_note carries 'Meeting Set deals not counted in this view.' "
+          "and reaches both synthesis paths")
+
+
 if __name__ == "__main__":
     test_a_close_with_no_current_snapshot_row_is_reported_as_the_close()
     test_the_result_says_the_status_is_as_of_today()
+    test_note_states_the_meeting_set_exclusion_on_both_paths()
     print("\n✅ All tests passed")
