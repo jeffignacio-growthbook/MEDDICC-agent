@@ -5960,6 +5960,30 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         snap_dates, changes = _pm_view_deal_changes(
             by_date, all_dates, stage_cfg, data_gaps,
             company_map=company_map, unscoped_current=unscoped_current)
+        # How each exit left, from its CURRENT deals row (2026-09-24). The
+        # snapshot-based reason alone called almost every close
+        # "gone_from_snapshot": a deal's snapshot rows stop when it closes
+        # (107 of 108 Sales-pipeline closes since 2026-08-01 end on an open
+        # stage), so "Comcast ... if it closed lost" went out for a deal the
+        # CRM had as lost. Same source as _pm_classify_exits.
+        left_ids = [c["deal_id"] for c in changes if c["direction"] == "left_pipeline"]
+        if left_ids:
+            try:
+                now_rows = sb.table("deals").select("deal_id", "deal_status", "stage") \
+                    .in_("deal_id", left_ids).execute().data or []
+            except Exception as e:
+                logger.warning(f"[PIPELINE_MOVEMENT] exit status lookup failed: {e}")
+                now_rows = []
+            now = {str(d.get("deal_id")): d for d in now_rows}
+            for c in changes:
+                d = now.get(str(c["deal_id"])) if c["direction"] == "left_pipeline" else None
+                if not d:
+                    continue
+                status, stage = (d.get("deal_status") or "").lower(), str(d.get("stage") or "")
+                if status == "won" or (stage and is_won(stage)):
+                    c["reason"] = "closed_won"
+                elif status == "lost" or (stage and is_lost(stage)):
+                    c["reason"] = "closed_lost"
         summary = {}
         for c in changes:
             summary[c["direction"]] = summary.get(c["direction"], 0) + 1
@@ -5975,6 +5999,8 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         return {
             **base,
             "snapshot_dates": snap_dates or [],
+            "exit_reason_as_of": ("closed_won / closed_lost: the deals table, today; "
+                                  "other exit reasons: the current snapshot"),
             "changes": changes,
             "summary": summary,
             "rows": change_rows,
