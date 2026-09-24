@@ -277,3 +277,45 @@ class StrictSupabase:
     def selected(self, table):
         """Column lists selected from `table`, in order (None = '*')."""
         return [q["columns"] for q in self.queries if q["table"] == table and not q["write"]]
+
+
+def with_data_dictionary(tables, hidden=()):
+    """`tables` plus a data_dictionary registering every real column of each
+    as queryable (production today, 2026-09-24, for every main table), except
+    `hidden` (table, column) pairs, registered is_queryable=false."""
+    dd = [{"supabase_table": t, "supabase_column": c, "is_queryable": (t, c) not in set(hidden)}
+          for t in tables for c in sorted(SCHEMA[t])]
+    return StrictSupabase({**tables, "data_dictionary": dd})
+
+
+def real_filter_table_on(strict, call_log=None):
+    """A drop-in for api.tools.filter_table in dynamic-loop tests: the REAL
+    filter_table (column validation, filter refusal, order_by and select_all
+    paths) running against strict fake `sb`, whatever sb the loop passes.
+    Replaces canned-row stubs that ignored filters and returned unselected
+    columns."""
+    import api.tools as T
+    real = _REAL_FILTER_TABLE[0] or T.filter_table
+    _REAL_FILTER_TABLE[0] = real
+
+    async def filter_table(sb_passed=None, table=None, columns=None, filters=None, limit=200,
+                           order_by=None, *, sb=None):
+        # same signature as the real one, including sb= by keyword (the router's
+        # completeness retry calls it that way); whichever sb the loop passes,
+        # the strict fake answers
+        if call_log is not None:
+            call_log.append({"table": table, "columns": columns, "filters": filters})
+        T._VALID_COLUMNS.clear()      # module cache: always validate against this sb's dictionary
+        return await real(strict, table, columns=columns, filters=filters, limit=limit, order_by=order_by)
+    return filter_table
+
+
+_REAL_FILTER_TABLE = [None]
+try:
+    import sys as _sys
+    from pathlib import Path as _P
+    _sys.path.insert(0, str(_P(__file__).parent.parent))
+    import api.tools as _T
+    _REAL_FILTER_TABLE[0] = _T.filter_table
+except Exception:          # api not importable in some isolated runs: resolved lazily
+    pass
