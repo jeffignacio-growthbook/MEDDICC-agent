@@ -36,7 +36,7 @@ import api.schema_context as schema_context_module
 
 ROWS = [
     {"deal_id": "1001", "owner_email": "jake.stangl@growthbook.io",
-     "stage_id": "qualifiedtobuy", "deal_value": 50000},
+     "stage": "qualifiedtobuy", "deal_value": 50000},
 ]
 SILENT_PICK_ANSWER = "This rep has 1 deal worth $50K in Qualified to Buy."
 COMPLIANT_ANSWER = (
@@ -90,11 +90,12 @@ class _FakeSupabaseWithCostLog:
 
 
 def _make_filter_table_stub(rows, call_log):
-    async def fake_filter_table(sb, table=None, columns=None, filters=None,
-                                 limit=200, order_by=None, resolved_dimension_filters=None, resolved_quarter_filter=None):
-        call_log.append({"table": table, "columns": columns, "filters": filters})
-        return {"rows": rows, "table": table}
-    return fake_filter_table
+    """The REAL filter_table against a strict fake (tests/strict_supabase.py).
+    (Until 2026-09-24 a stub returned `rows` for any call, and the fixture
+    selected deals.stage_id, a column deals doesn't have; it is `stage`.)"""
+    sys.path.insert(0, str(Path(__file__).parent))
+    from strict_supabase import with_data_dictionary, real_filter_table_on
+    return real_filter_table_on(with_data_dictionary({"deals": rows}), call_log)
 
 
 def _run(fake_client, sb=None):
@@ -108,7 +109,7 @@ def _run(fake_client, sb=None):
         lambda question, client: ["deals"])
     schema_context_module.get_schema_context = (
         lambda sb, tables_with_descriptions=None, lightweight=False:
-            "TABLE: deals\n  deal_id, owner_email, stage_id, deal_value\n")
+            "TABLE: deals\n  deal_id, owner_email, stage, deal_value\n")
 
     try:
         result = asyncio.run(router.dynamic_query_loop(
@@ -130,7 +131,7 @@ def _run(fake_client, sb=None):
 def test_silent_pick_gets_a_caveat_and_its_own_outcome_bucket():
     tool_call = json.dumps({"tool": "filter_table", "params": {
         "table": "deals",
-        "columns": ["deal_id", "owner_email", "stage_id", "deal_value"],
+        "columns": ["deal_id", "owner_email", "stage", "deal_value"],
         "filters": [],
     }})
     silent_answer = json.dumps({"answer": SILENT_PICK_ANSWER})
@@ -165,7 +166,7 @@ def test_compliant_answer_never_gets_a_spurious_caveat():
     piled on top."""
     tool_call = json.dumps({"tool": "filter_table", "params": {
         "table": "deals",
-        "columns": ["deal_id", "owner_email", "stage_id", "deal_value"],
+        "columns": ["deal_id", "owner_email", "stage", "deal_value"],
         "filters": [],
     }})
     compliant_answer = json.dumps({"answer": COMPLIANT_ANSWER})

@@ -20,32 +20,22 @@ sys.path.insert(0, str(REPO / "scripts" / "analytics"))
 sys.path.insert(0, str(REPO))
 
 import compute_waterfall_segmented as cws  # noqa: E402
-import supabase_client  # noqa: E402
 
 
-class _Q:
-    def __init__(self, db, name):
-        self.db, self.name, self.row = db, name, None
-
-    def __getattr__(self, attr):          # select/eq/order/limit/in_/... -> chain
-        return lambda *a, **k: self
-
-    def upsert(self, row, on_conflict=None):
-        self.row = row
-        return self
-
-    def execute(self):
-        if self.row is not None:
-            self.db.upserts.append(self.row)
-        return type("R", (), {"data": []})()
+sys.path.insert(0, str(REPO / "tests"))
+from strict_supabase import StrictSupabase  # noqa: E402
 
 
-class DB:
-    def __init__(self):
-        self.upserts = []
-
-    def table(self, name):
-        return _Q(self, name)
+class DB(StrictSupabase):
+    """Strict fake (tests/strict_supabase.py): reads answer like Postgres
+    (the REAL select_all, only selected columns, every filter), and every
+    upsert is checked against the real schema before it is recorded. Until
+    2026-09-24 a select_all lambda ignored the table and filter operator, and
+    a catch-all chain accepted any call."""
+    @property
+    def upserts(self):
+        return [row for w in self.writes if w["kind"] == "upsert"
+                for row in (w["payload"] if isinstance(w["payload"], list) else [w["payload"]])]
 
 
 def _snap(deal_id, date, **over):
@@ -58,22 +48,17 @@ def _snap(deal_id, date, **over):
 
 
 def _run(prev_date, new_date):
-    snaps = {prev_date: [], new_date: [_snap("D1", new_date)]}
-    db = DB()
-    saved = supabase_client.select_all
-    supabase_client.select_all = lambda sb, table, cols="*", filters=None, **k: [
-        dict(r) for r in snaps.get(next(v for op, c, v in filters if c == "snapshot_date"), [])]
-    try:
-        from utils import load_client_config
-        cws.compute_waterfall_for_dates(
-            db, load_client_config(),
-            qual_map={"D1": {"qualified_date": "2026-01-01"}},
-            enrichment_map={"D1": {"company_name": "Delta Co"}},
-            deal_status_map={"D1": {"close_date": "2026-10-30", "stage": "presentationscheduled"}},
-            is_test_deal_fn=lambda d: False, threshold=1,
-            prev_date=prev_date, new_date=new_date, computed_source="prospective")
-    finally:
-        supabase_client.select_all = saved
+    # the new snapshot holds D1; a decoy row on another date must not be read
+    db = DB({"deals_snapshot": [_snap("D1", new_date), _snap("DECOY", "2026-01-05")],
+             "waterfall_weekly": [], "property_history": []})
+    from utils import load_client_config
+    cws.compute_waterfall_for_dates(
+        db, load_client_config(),
+        qual_map={"D1": {"qualified_date": "2026-01-01"}},
+        enrichment_map={"D1": {"company_name": "Delta Co"}},
+        deal_status_map={"D1": {"close_date": "2026-10-30", "stage": "presentationscheduled"}},
+        is_test_deal_fn=lambda d: False, threshold=1,
+        prev_date=prev_date, new_date=new_date, computed_source="prospective")
     rows = [r for r in db.upserts if r.get("region") == "EMEA"]
     assert len(rows) == 1, db.upserts
     return rows[0]

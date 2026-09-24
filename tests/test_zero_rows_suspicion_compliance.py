@@ -36,9 +36,11 @@ import api.tools as tools_module
 import api.table_classifier as table_classifier_module
 import api.schema_context as schema_context_module
 
+# deal_value 0 (not NULL): an is_(deal_value, null) query genuinely finds
+# nothing, and eq(deal_value, 0) finds this deal
 REAL_ROWS = [
-    {"deal_id": "2001", "owner_email": "christian@growthbook.io",
-     "stage_id": "qualifiedtobuy", "deal_value": 0, "component_arr": 50000},
+    {"deal_id": "2001", "company_name": "Acme", "owner_email": "christian@growthbook.io",
+     "stage": "qualifiedtobuy", "deal_value": 0, "new_arr": None},
 ]
 SILENT_ABSENCE_ANSWER = "There are no deals with missing ARR."
 ACKNOWLEDGING_ANSWER = (
@@ -93,15 +95,15 @@ class _FakeSupabaseWithCostLog:
 
 
 def _make_sequenced_filter_table_stub(row_sequence, call_log):
-    """Returns row_sequence[i] on the i-th filter_table call (clamped to
-    the last entry once exhausted) — needed to simulate a first call
-    finding nothing and a later, broader call finding real rows."""
-    async def fake_filter_table(sb, table=None, columns=None, filters=None,
-                                 limit=200, order_by=None, resolved_dimension_filters=None, resolved_quarter_filter=None):
-        idx = min(len(call_log), len(row_sequence) - 1)
-        call_log.append({"table": table, "columns": columns, "filters": filters})
-        return {"rows": row_sequence[idx], "table": table}
-    return fake_filter_table
+    """The REAL filter_table against a strict fake (tests/strict_supabase.py)
+    holding REAL_ROWS: an empty result now comes from a query that genuinely
+    matches nothing, not from call order. (Until 2026-09-24 this returned
+    row_sequence[i] on the i-th call whatever it asked; its "narrow" call
+    filtered on component_arr, which deals doesn't have, and selected
+    deals.stage_id, which is `stage`. row_sequence is kept for the call sites.)"""
+    sys.path.insert(0, str(Path(__file__).parent))
+    from strict_supabase import with_data_dictionary, real_filter_table_on
+    return real_filter_table_on(with_data_dictionary({"deals": REAL_ROWS}), call_log)
 
 
 def _run(fake_client, row_sequence, sb=None):
@@ -115,7 +117,7 @@ def _run(fake_client, row_sequence, sb=None):
         lambda question, client: ["deals"])
     schema_context_module.get_schema_context = (
         lambda sb, tables_with_descriptions=None, lightweight=False:
-            "TABLE: deals\n  deal_id, owner_email, stage_id, deal_value\n")
+            "TABLE: deals\n  deal_id, company_name, owner_email, stage, deal_value\n")
 
     try:
         result = asyncio.run(router.dynamic_query_loop(
@@ -137,7 +139,7 @@ def _run(fake_client, row_sequence, sb=None):
 def _tool_call(filters):
     return json.dumps({"tool": "filter_table", "params": {
         "table": "deals",
-        "columns": ["deal_id", "owner_email", "stage_id", "deal_value"],
+        "columns": ["deal_id", "company_name", "owner_email", "stage", "deal_value"],
         "filters": filters,
     }})
 
@@ -194,7 +196,7 @@ def test_self_correction_via_a_later_broader_query_needs_no_caveat():
     real rows, that's the suspicion resolving itself — no caveat should
     be appended even though the answer doesn't use any acknowledgment
     language, since there's no unresolved absence claim to caveat."""
-    narrow_filter_call = _tool_call([("is_", "component_arr", "null")])
+    narrow_filter_call = _tool_call([("is_", "deal_value", "null")])     # genuinely 0 rows
     broad_filter_call = _tool_call([("eq", "deal_value", 0)])
     found_answer = json.dumps({
         "answer": "Found 1 deal with $0 recorded ARR: the Acme deal."
