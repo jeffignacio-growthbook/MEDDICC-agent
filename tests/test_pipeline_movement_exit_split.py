@@ -15,7 +15,6 @@ only through it.
 Two layers: the REAL handler (fake deals_snapshot + deals), then its exact
 result through both synthesis paths.
 """
-import asyncio
 import copy
 import json
 import sys
@@ -50,49 +49,13 @@ DEALS = {   # current `deals` rows
 }
 
 
-def _fake_select_all(sb, table, columns=None, filters=None, **kw):
-    assert table == "deals_snapshot", table
-    out = list(ROWS)
-    for op, col, val in filters or []:
-        if op == "eq":
-            out = [r for r in out if str(r.get(col)) == str(val)]
-        elif op == "neq":
-            out = [r for r in out if str(r.get(col)) != str(val)]
-    return [dict(r) for r in out]
-
-
-class _DealsQuery:
-    def __init__(self):
-        self.ids = []
-
-    def select(self, *cols):
-        return self
-
-    def in_(self, col, ids):
-        self.ids = list(ids)
-        return self
-
-    def execute(self):
-        rows = [{"deal_id": i, "company_name": f"Co {i}", "pipeline_id": "default",
-                 "new_arr": None, "expansion_arr": None, **DEALS[i]}
-                for i in self.ids if i in DEALS]
-        return type("R", (), {"data": rows})()
-
-
-class _SB:
-    def table(self, name):
-        assert name == "deals", name
-        return _DealsQuery()
-
-
 def _run():
-    saved = handlers.select_all
-    handlers.select_all = _fake_select_all
-    try:
-        return asyncio.run(handlers.query_pipeline_movement(
-            {"view": "movement", "fiscal_quarter": "FY2027 Q3"}, _SB()))
-    finally:
-        handlers.select_all = saved
+    """Strict fake (tests/strict_supabase.py): real select_all, only selected
+    columns, every filter applied. GONE has no deals row."""
+    deals = [{"deal_id": i, "company_name": f"Co {i}", "pipeline_id": "default",
+              "new_arr": None, "expansion_arr": None, **DEALS[i]} for i in DEALS]
+    return pm._run_handler({"view": "movement", "fiscal_quarter": "FY2027 Q3"},
+                           pm._sb(rows=ROWS, deals=deals))
 
 
 def test_exits_are_split_by_outcome():
@@ -141,8 +104,26 @@ def test_split_reaches_both_synthesis_paths():
     print("✓ the note and exited_breakdown reach the synthesis input on both paths")
 
 
+def test_status_alone_classifies_an_exit_when_the_stage_is_unmapped():
+    """deal_status is read from the exited-deals lookup, not just the stage:
+    a deal marked won whose stage id isn't a mapped won stage is still won.
+    Needs the strict fake (only selected columns come back) to mean anything."""
+    rows = [pm._snap(i, PRIOR) for i in ("K", "WS")] + [pm._snap("K", CURRENT)]
+    deals = [{"deal_id": "K", "company_name": "Co K", "pipeline_id": "default", "new_arr": 1,
+              "expansion_arr": None, "deal_status": "active", "stage": "presentationscheduled",
+              "close_date": "2026-10-30"},
+             {"deal_id": "WS", "company_name": "Co WS", "pipeline_id": "default", "new_arr": 15000,
+              "expansion_arr": None, "deal_status": "won", "stage": "999999999",
+              "close_date": "2026-09-17"}]
+    r = pm._run_handler({"view": "movement", "fiscal_quarter": "FY2027 Q3"}, pm._sb(rows=rows, deals=deals))
+    b = r["summary"]["exited_breakdown"]
+    assert [d["deal_id"] for d in b["won"]["deals"]] == ["WS"], b
+    print("✓ an exited deal with deal_status 'won' and an unmapped stage id is classified won")
+
+
 if __name__ == "__main__":
     test_exits_are_split_by_outcome()
     test_note_states_the_split_and_forbids_reading_exits_as_losses()
     test_split_reaches_both_synthesis_paths()
+    test_status_alone_classifies_an_exit_when_the_stage_is_unmapped()
     print("\n✅ All tests passed")

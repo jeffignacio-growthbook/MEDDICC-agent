@@ -79,22 +79,29 @@ class _FakeSupabase:
     pass
 
 
+DECOY_ROWS = [   # must be excluded by the handler's own filters
+    dict(JAKE_STANGL_SEPT8_ROWS[0], deal_id="decoy_other_owner", owner_email="someone.else@growthbook.io"),
+    dict(JAKE_STANGL_SEPT8_ROWS[0], deal_id="decoy_other_quarter", fiscal_quarter="FY2027 Q2",
+         snapshot_date="2026-06-08"),
+    dict(JAKE_STANGL_SEPT8_ROWS[0], deal_id="decoy_renewal", pipeline_id="866608541"),
+]
+
+
 def _make_scoped_select_all(rows, call_log):
-    """Simulates deals_snapshot honoring eq/neq/ilike the way Postgres
-    actually would, so the test proves the FILTER LOGIC works, not just
-    that a canned fixture gets echoed back regardless of what's asked."""
-    def fake_select_all(sb, table, columns=None, filters=None):
+    """The REAL select_all against a strict fake (tests/strict_supabase.py),
+    so the handler's filters apply exactly as Postgres would: only selected
+    columns come back, every operator is honoured, and decoy rows (another
+    owner, another quarter, the renewal pipeline) must stay out. Until
+    2026-09-24 this was a hand-rolled eq/neq/ilike filter over whole rows
+    that ignored the table name and any other operator."""
+    sys.path.insert(0, str(Path(__file__).parent))
+    from strict_supabase import StrictSupabase
+    from supabase_client import select_all as real_select_all
+    sb = StrictSupabase({"deals_snapshot": list(rows) + DECOY_ROWS, "deals": []})
+
+    def fake_select_all(_sb, table, columns="*", filters=None, **kw):
         call_log.append({"table": table, "columns": columns, "filters": filters})
-        result = list(rows)
-        for op, col, val in (filters or []):
-            if op == "eq":
-                result = [r for r in result if str(r.get(col)) == str(val)]
-            elif op == "neq":
-                result = [r for r in result if str(r.get(col)) != str(val)]
-            elif op == "ilike":
-                result = [r for r in result
-                          if str(r.get(col) or "").lower() == str(val).lower()]
-        return result
+        return real_select_all(sb, table, columns, filters, **kw)
     return fake_select_all
 
 
