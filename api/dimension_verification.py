@@ -125,11 +125,12 @@ def check_dimension_filtered(dimension: str, value: str, queries_run: list,
 
     2026-09-12 (PENDING_WORK.md Low Priority #14): queries_run records
     what a query REQUESTED, never what actually reached Postgres.
-    api/tools.py's filter_table() silently DROPS any filter naming a
+    api/tools.py's filter_table() silently DROPPED any filter naming a
     column that isn't registered as queryable for that table
-    (_validate_filters()) — it never errors, so the caller has no way
+    (_validate_filters()) and never errored, so the caller had no way
     to tell a dropped filter from an applied one just by looking at
-    queries_run. Before this fix, that gap meant a filter on a
+    queries_run. (2026-09-24: filter_table now refuses such a filter with
+    an error instead; this check stays as defense in depth.) Before this fix, that gap meant a filter on a
     nonexistent column (the removed 'pipeline' dimension — see
     load_known_dimensions() — is the exact incident this closes) could
     report "verified" even though the underlying data was never
