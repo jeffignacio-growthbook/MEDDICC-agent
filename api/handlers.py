@@ -4852,6 +4852,65 @@ def _pm_confidence_mix(rows):
     return mix
 
 
+def _pm_classify_exits(left_ids, exited_deals, fiscal_quarter, excluded_pipelines,
+                       stage_cfg, is_in_scope):
+    """Why each exited deal left this quarter's pipeline (2026-09-24).
+
+    "Exited" only means the deal is in the prior snapshot's scope and not in
+    the current one: it closed won, closed lost, or is still open but out of
+    scope (close date moved out of the quarter, stage now excluded, ...).
+    Before this split, a live answer read 8 Negotiating exits as slippage
+    risk without knowing whether any were wins.
+
+    Status is the deal's CURRENT row in `deals`, not its state on the
+    current snapshot date (`status_as_of` says so).
+    """
+    from time_resolver import resolve_time_window
+    try:
+        tw = resolve_time_window({"period": "fiscal_quarter", "fiscal_quarter": fiscal_quarter})
+        q_start, q_end = tw["start"], tw["end"]
+    except Exception:
+        q_start = q_end = None
+    by_id = {str(d.get("deal_id")): d for d in exited_deals or []}
+    buckets = {k: {"count": 0, "incremental_arr": 0.0, "deals": []}
+               for k in ("won", "lost", "still_open_out_of_scope", "not_found")}
+    reasons = {}
+    for deal_id in sorted(str(i) for i in left_ids):
+        d = by_id.get(deal_id)
+        if d is None:
+            key, reason = "not_found", None
+        else:
+            status = (d.get("deal_status") or "").lower()
+            stage = str(d.get("stage") or "")
+            if status == "won" or (stage and is_won(stage)):
+                key, reason = "won", None
+            elif status == "lost" or (stage and is_lost(stage)):
+                key, reason = "lost", None
+            else:
+                key = "still_open_out_of_scope"
+                close = d.get("close_date")
+                if q_start and close and not (q_start <= str(close)[:10] <= q_end):
+                    reason = "close_date_moved_out_of_quarter"
+                elif stage and not _pm_in_scope({"pipeline_id": d.get("pipeline_id"), "stage_id": stage},
+                                                 excluded_pipelines, stage_cfg, is_in_scope):
+                    reason = "stage_now_out_of_scope"
+                else:
+                    reason = "other"
+        b = buckets[key]
+        b["count"] += 1
+        arr = incremental_arr(d) if d else 0
+        b["incremental_arr"] += arr
+        row = {"deal_id": deal_id, "company_name": (d or {}).get("company_name"),
+               "incremental_arr": arr}
+        if reason:
+            row["reason"] = reason
+            reasons[reason] = reasons.get(reason, 0) + 1
+        b["deals"].append(row)
+    buckets["still_open_out_of_scope"]["reasons"] = reasons
+    buckets["status_as_of"] = "current deals table (today), not the current snapshot date"
+    return buckets
+
+
 def _pm_latest_row_per_deal(rows):
     """Collapse to one row per deal for a single snapshot date (PK is
     (deal_id, snapshot_date), so this is normally 1:1; guard duplicates)."""
@@ -5649,9 +5708,14 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
                 exited_arr_total = 0
                 if left_ids:
                     exited_deals = sb.table("deals").select(
-                        "deal_id", "new_arr", "expansion_arr"
+                        "deal_id", "company_name", "new_arr", "expansion_arr",
+                        "deal_status", "stage", "close_date", "pipeline_id"
                     ).in_("deal_id", left_ids).execute().data
                     exited_arr_total = sum(incremental_arr(d) for d in exited_deals)
+                else:
+                    exited_deals = []
+                exits = _pm_classify_exits(left_ids, exited_deals, fiscal_quarter,
+                                           excluded_pipelines, stage_cfg, is_in_scope)
 
                 # Add to summary
                 if "summary" not in result:
@@ -5659,6 +5723,10 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
                 result["summary"]["added_arr_total"] = added_arr_total
                 result["summary"]["exited_arr_total"] = exited_arr_total
                 result["summary"]["net_arr_change"] = added_arr_total - exited_arr_total
+                result["summary"]["exited_breakdown"] = exits
+                won, lost, still = (exits["won"], exits["lost"], exits["still_open_out_of_scope"])
+                _reasons = ", ".join(f"{n} {r.replace('_', ' ')}"
+                                     for r, n in sorted(still["reasons"].items())) or "none"
                 # SYNTHESIS REQUIREMENTS (see docstring): all three, always.
                 result["_synthesis_note"] = (
                     "DOLLAR MOVEMENT: ALWAYS state all three figures together, "
@@ -5666,7 +5734,17 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
                     f"added ${added_arr_total:,.0f} ({len(new_ids)} new deals), "
                     f"exited ${exited_arr_total:,.0f} ({len(left_ids)} deals), and "
                     f"net ${added_arr_total - exited_arr_total:,.0f}. Never report "
-                    "only the added figure: net is the most decision-relevant number."
+                    "only the added figure: net is the most decision-relevant number. "
+                    f"EXITS ARE NOT LOSSES: of the {len(left_ids)} exited deals, "
+                    f"{won['count']} closed won (${won['incremental_arr']:,.0f}), "
+                    f"{lost['count']} closed lost (${lost['incremental_arr']:,.0f}), "
+                    f"{still['count']} are still open but out of this quarter's scope "
+                    f"(${still['incremental_arr']:,.0f}; {_reasons})"
+                    + (f", {exits['not_found']['count']} no longer in deals"
+                       if exits['not_found']['count'] else "")
+                    + ". State this split whenever you mention exits, and interpret exits "
+                    "(risk, slippage, losses) only through it: a won exit is good news. "
+                    "Statuses are as of today, not the snapshot date."
                 )
 
                 logger.info(f"[PM_MOVEMENT_ARR] added={len(new_ids)} deals ${added_arr_total:,.0f}, "
