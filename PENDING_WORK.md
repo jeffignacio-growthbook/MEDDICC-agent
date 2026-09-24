@@ -169,6 +169,60 @@ logo"), or only match it when followed by business / logo / customer. Add
 a resolver test with "new, won and lost" and "new pipeline" as must-not-
 match cases.
 
+### 🟡 MEDIUM: Movement answers name snapshot-time deals, exit statuses use today's data (found 2026-09-24)
+**Status:** Logged, not fixed. Own follow-up.
+
+**What:** `query_pipeline_movement` builds its stage breakdown (and the deals an
+answer names from it) from the current snapshot date, but
+`summary.exited_breakdown` classifies exits by each deal's CURRENT `deals` row.
+A deal that changes between the snapshot and today can be named in a way that
+contradicts its current state, with nothing in the answer saying so.
+
+**Concrete case (live, 2026-09-24 15:26 UTC):** the answer said "watch dentsu,
+ClickHouse, MVF Global for Q3 close". MVF Global (`61615709775`) was in
+Negotiating with a 2026-10-31 close on the 2026-09-21 snapshot, but its close
+date moved to 2027-01-28 on 2026-09-24. It's no longer a Q3 deal.
+
+**To scope:** before the answer ships, check every deal the result names
+(stage lists, "watch" lists) against its current `deals` row. Then either use
+the current state, or caveat any named deal whose close date, stage or status
+has changed since the snapshot ("close date moved to Jan 28, 2027 after the
+Sep 21 snapshot").
+
+### 🟢 LOW: Exit classification reports only the first matching reason (found 2026-09-24)
+**Status:** Logged, not fixed.
+
+**What:** `_pm_classify_exits` (`api/handlers.py`) picks one reason per
+still-open exit from an `if / elif` chain: close date moved out of the quarter,
+then stage now out of scope, then other. Termgrid (`61625300846`) matched the
+first: its close date is now 2027-05-20. But it also moved back to Meeting Set,
+which the answer never mentions.
+
+**Fix:** collect every applicable reason per deal (a list), count each in
+`reasons`, and have the note state all of them for a deal ("close date moved to
+May 2027 and back to Meeting Set").
+
+### 🟢 CRM HYGIENE (not a code bug): Newton Growth has no stage and no close date (found 2026-09-24)
+**Status:** Flag to whoever owns HubSpot hygiene.
+
+**What:** deal `61167803975` (Newton Growth, owner dan@growthbook.io, default
+pipeline, `deal_status = active`) has an empty stage (`''`) and a NULL close
+date in `deals`. It exited this quarter's movement scope and was classified
+"still open, other", because there's no stage or date to reason about.
+
+**Ask:** set its stage and close date in HubSpot, or close it out. No code
+change: the handler handled it honestly. It's a record problem.
+
+### 🟢 CRM HYGIENE (not a code bug): Won deal with a blank company name (found 2026-09-24)
+**Status:** Flag to whoever owns HubSpot hygiene.
+
+**What:** deal `57977964601` (closed won 2026-08-24, $30,000 new ARR, owner
+james.shannon@growthbook.io) has an empty `company_name`. The live movement
+answer could only call it "+ 1 unnamed" among the Q3 wins.
+
+**Ask:** associate the deal with its company in HubSpot so it syncs a name. Same
+category as Newton Growth: a record gap, not a bug.
+
 ### 🟢 LOW: Two active deals have no owner in HubSpot (found 2026-09-23)
 **Status:** OPEN, not actioned. Found incidentally while verifying the
 Inditex fix; unrelated to it. `deal_status='active'` with an empty
