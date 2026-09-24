@@ -54,6 +54,28 @@ about 1-2% (10 of 1,700 deals; 20 of 918 snapshot rows since 09-11).
 Rewrites 67 weeks of production history, so it needs its own plan,
 dry-run diff and sign-off.
 
+### 🟠 MEDIUM, before 2026-11-01: `query_pipeline`'s this-quarter figure depends on a `rep_targets` row (found 2026-09-24)
+**Status:** Fix queued (own commit, own tests).
+
+**What:** `query_pipeline` returns two figures: all active pipeline, and pipeline
+closing this quarter (`q3_scoped_pipeline` / `q3_scoped_deals`), plus coverage
+against the quarter's target. The this-quarter total is only computed inside
+the branch that found a team `incremental_arr` target in `rep_targets` for the
+current quarter. With no row, it stays `None`, as does `coverage_ratio`, and
+the answer silently loses its this-quarter figure.
+
+**Why it matters now:** `rep_targets` holds exactly one such row, `FY2027_Q3`
+($1,550,000, checked 2026-09-24). From 2026-11-01 (FY2027 Q4), unless a Q4
+target is loaded first, "what's our pipeline?" drops to the all-active total
+with no quarter figure and no coverage. That lands right when Q4 planning
+questions start. The same shape as tonight's other incidents: it works today
+only because a precondition happens to hold, and nothing flags it when it stops.
+
+**Fix:** compute the this-quarter total from close dates whenever the fiscal
+quarter resolves, independent of `rep_targets`. Coverage still needs a target:
+omit it with a stated reason ("no FY2027 Q4 target loaded yet") instead of
+dropping it silently. Test the no-target-row case directly.
+
 ### 🟡 DECISION PENDING: Pre-synthesis plausibility checks don't run on the dynamic-loop path (found 2026-09-24)
 **Status:** Deliberately left unwired. Needs a decision on blocking vs. caveat
 behavior before any change.
