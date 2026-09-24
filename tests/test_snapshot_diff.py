@@ -247,29 +247,21 @@ class _FakeClient:
 
 
 def _make_filter_table_stub(call_log):
+    """The REAL filter_table against a strict fake (tests/strict_supabase.py):
+    only the columns the model selected come back, and every filter it sends
+    (snapshot_date, region, segment, deal_id in_) applies. Decoy rows in NAM
+    and SMB at both anchors must stay out of the diff. (Until 2026-09-24 a
+    canned stub returned whole rows by snapshot_date and ignored
+    region/segment.)"""
+    sys.path.insert(0, str(Path(__file__).parent))
+    from strict_supabase import with_data_dictionary, real_filter_table_on
     current_rows, prior_rows = _incident_shape()
-
-    async def fake_filter_table(sb, table=None, columns=None, filters=None,
-                                 limit=200, order_by=None, resolved_dimension_filters=None, resolved_quarter_filter=None):
-        call_log.append({"table": table, "columns": columns, "filters": filters})
-        snap_date = None
-        deal_id_in = None
-        for f in (filters or []):
-            if len(f) >= 2 and f[1] == "snapshot_date":
-                snap_date = f[2]
-            if len(f) >= 2 and f[1] == "deal_id" and f[0] in ("in_", "in"):
-                deal_id_in = f[2]
-        if deal_id_in is not None:
-            wanted = set(deal_id_in)
-            rows = [r for r in ENRICHMENT_ROWS if r["deal_id"] in wanted]
-        elif snap_date == CURRENT_DATE:
-            rows = current_rows
-        elif snap_date == PRIOR_DATE:
-            rows = prior_rows
-        else:
-            rows = []
-        return {"rows": rows, "table": table}
-    return fake_filter_table
+    decoys = [_row(f"9{i}", date, "appointmentscheduled", 1, region=reg, segment=seg)
+              for i, (reg, seg) in enumerate([("NAM", "Enterprise"), ("EMEA", "SMB")])
+              for date in (CURRENT_DATE, PRIOR_DATE)]
+    sb = with_data_dictionary({"deals_snapshot": current_rows + prior_rows + decoys,
+                               "deals": ENRICHMENT_ROWS})
+    return real_filter_table_on(sb, call_log)
 
 
 class _FakeSupabase:

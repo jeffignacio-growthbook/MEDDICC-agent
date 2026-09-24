@@ -107,22 +107,19 @@ class _FakeClient:
 
 
 def _make_filter_table_stub(call_log):
-    async def fake_filter_table(sb, table=None, columns=None, filters=None,
-                                 limit=200, order_by=None,
-                                 resolved_dimension_filters=None, resolved_quarter_filter=None):
-        call_log.append({"table": table, "columns": columns, "filters": filters})
-        snap_date = None
-        for f in (filters or []):
-            if len(f) >= 2 and f[1] == "snapshot_date":
-                snap_date = f[2]
-        if snap_date == CURRENT_DATE:
-            rows = CURRENT_ROWS
-        elif snap_date == PRIOR_DATE:
-            rows = PRIOR_ROWS
-        else:
-            rows = []
-        return {"rows": rows, "table": table}
-    return fake_filter_table
+    """The REAL filter_table against a strict fake (tests/strict_supabase.py),
+    including for the router's own forced fetch (which reuses the model's
+    columns and filters): only selected columns, every filter applies, and
+    decoys in another region and segment at both anchors must stay out.
+    (Until 2026-09-24 a canned stub keyed only on snapshot_date.)"""
+    sys.path.insert(0, str(Path(__file__).parent))
+    from strict_supabase import with_data_dictionary, real_filter_table_on
+    decoys = [{"deal_id": f"99{i}", "snapshot_date": d, "region": reg, "segment": seg,
+               "stage_id": "appointmentscheduled"}
+              for i, (reg, seg) in enumerate([("NAM", "Enterprise"), ("EMEA", "SMB")])
+              for d in (CURRENT_DATE, PRIOR_DATE)]
+    sb = with_data_dictionary({"deals_snapshot": CURRENT_ROWS + PRIOR_ROWS + decoys, "deals": []})
+    return real_filter_table_on(sb, call_log)
 
 
 class _FakeSupabase:

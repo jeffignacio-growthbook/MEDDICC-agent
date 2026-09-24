@@ -175,30 +175,33 @@ REAL_NAMES = {
 }
 
 
+def _strict_db():
+    """Strict fake (tests/strict_supabase.py) behind the REAL filter_table:
+    only selected columns come back and every filter the model sends
+    (snapshot_date, region, segment, deal_id in_) applies. A decoy SMB deal
+    and a NAM deal at both anchors must never reach the diff."""
+    sys.path.insert(0, str(Path(__file__).parent))
+    from strict_supabase import with_data_dictionary
+    snaps = ([_row(d, CURRENT_DATE, "presentationscheduled", 3) for d in STAGE_CHANGE_IDS]
+             + [_row(d, CURRENT_DATE, "appointmentscheduled", 1) for d in NEW_ENTRY_IDS]
+             + [_row(d, PRIOR_DATE, "appointmentscheduled", 1) for d in STAGE_CHANGE_IDS]
+             # the exit deal was in scope (EMEA Enterprise) at the prior anchor and is
+             # gone at the current one, like the live report's "Dropped from Scope"
+             # Technogym. Until 2026-09-24 it was SMB here, which the model's own
+             # segment filter excludes: the test passed only because the canned stub
+             # ignored that filter and returned it anyway.
+             + [_row(EXIT_ID_COVERED, PRIOR_DATE, "appointmentscheduled", 1)])
+    snaps += [_row("80000000001", date, "appointmentscheduled", 1, segment="SMB") for date in (CURRENT_DATE, PRIOR_DATE)]
+    snaps += [_row("80000000002", date, "appointmentscheduled", 1, region="NAM") for date in (CURRENT_DATE, PRIOR_DATE)]
+    deals = [{"deal_id": d, "company_name": n} for d, n in REAL_NAMES.items()]
+    deals += [{"deal_id": "80000000001", "company_name": "DecoySMB"},
+              {"deal_id": "80000000002", "company_name": "DecoyNAM"}]
+    return with_data_dictionary({"deals_snapshot": snaps, "deals": deals})
+
+
 def _make_filter_table_stub(call_log):
-    async def fake_filter_table(sb, table=None, columns=None, filters=None,
-                                 limit=200, order_by=None, resolved_dimension_filters=None, resolved_quarter_filter=None):
-        call_log.append({"table": table, "columns": columns, "filters": filters})
-        snap_date = None
-        deal_id_in = None
-        for f in (filters or []):
-            if len(f) >= 2 and f[1] == "snapshot_date":
-                snap_date = f[2]
-            if len(f) >= 2 and f[1] == "deal_id" and f[0] in ("in_", "in"):
-                deal_id_in = f[2]
-        if deal_id_in is not None:
-            rows = [{"deal_id": d, "company_name": REAL_NAMES[d]}
-                    for d in deal_id_in if d in REAL_NAMES]
-        elif snap_date == CURRENT_DATE:
-            rows = ([_row(d, CURRENT_DATE, "presentationscheduled", 3) for d in STAGE_CHANGE_IDS]
-                    + [_row(d, CURRENT_DATE, "appointmentscheduled", 1) for d in NEW_ENTRY_IDS])
-        elif snap_date == PRIOR_DATE:
-            rows = ([_row(d, PRIOR_DATE, "appointmentscheduled", 1) for d in STAGE_CHANGE_IDS]
-                    + [_row(EXIT_ID_COVERED, PRIOR_DATE, "appointmentscheduled", 1, segment="SMB")])
-        else:
-            rows = []
-        return {"rows": rows, "table": table}
-    return fake_filter_table
+    from strict_supabase import real_filter_table_on
+    return real_filter_table_on(_strict_db(), call_log)
 
 
 def _run(fake_client):
@@ -332,8 +335,12 @@ def test_diff_result_sent_to_model_has_every_deal_named():
     assert stage_names["61475205473"] == "Gamma LLC"
     assert entry_names["63436694904"] == "Delta Co"
     assert entry_names["64174280502"] == "Epsilon Ltd"
+    everything_shown = json.dumps([c["messages"] for c in fake_client.calls])
+    for decoy in ("80000000001", "80000000002", "DecoySMB", "DecoyNAM"):
+        assert decoy not in everything_shown, f"{decoy}: a row the model's own filters exclude reached it"
     print("✓ the diff_result JSON embedded in the finalize prompt has "
-          "every one of the 5 previously-bare deal_ids correctly named")
+          "every one of the 5 previously-bare deal_ids correctly named; the SMB and NAM "
+          "decoys the model's region/segment filters exclude never reach it")
 
 
 if __name__ == "__main__":
