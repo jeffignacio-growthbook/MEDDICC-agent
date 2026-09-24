@@ -155,19 +155,28 @@ def test_keyset_fetch_combines_window_filter_with_id_cursor():
           "(hs_object_id > 1199): exactly deals 1100-1249, boundary deal included")
 
 
+sys.path.insert(0, str(Path(__file__).parent))
+from strict_supabase import parse_select, check_column, check_write, project  # noqa: E402
+
+
 class FakeTable:
+    """deal_sync_checkpoints, read like Postgres (tests/strict_supabase.py):
+    only selected columns come back; unknown columns raise."""
     def __init__(self, rows):
-        self.rows, self._f, self._pending = rows, {}, None
+        self.rows, self._f, self._pending, self._cols = rows, {}, None, None
 
     def select(self, *a):
         self._f = {}
+        self._cols = parse_select("deal_sync_checkpoints", *a)
         return self
 
     def eq(self, k, v):
+        check_column("deal_sync_checkpoints", k)
         self._f[k] = v
         return self
 
     def upsert(self, row, on_conflict=None):
+        check_write("deal_sync_checkpoints", row)
         self._pending = row
         return self
 
@@ -176,7 +185,8 @@ class FakeTable:
             self.rows[self._pending["job"]] = dict(self._pending)
             self._pending = None
             return type("R", (), {"data": []})()
-        data = [r for r in self.rows.values() if all(r.get(k) == v for k, v in self._f.items())]
+        data = [project(r, self._cols) for r in self.rows.values()
+                if all(r.get(k) == v for k, v in self._f.items())]
         return type("R", (), {"data": data})()
 
 

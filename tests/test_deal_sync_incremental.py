@@ -124,6 +124,9 @@ class Hub:
         return _resp(404, {"message": f"unrouted {path}"})
 
 
+sys.path.insert(0, str(Path(__file__).parent))
+from strict_supabase import parse_select, check_column, check_write, project  # noqa: E402
+
 class DB:
     """Fake Supabase: tables keyed by their natural key, with failure injection."""
     KEYS = {"deals": "deal_id", "deal_sync_checkpoints": "job"}
@@ -187,17 +190,24 @@ class DB:
 
 
 class _Q:
+    """Reads like Postgres (tests/strict_supabase.py): only selected columns
+    come back, and a table or column missing from the real schema raises.
+    Only eq and range are modelled; anything else raises AttributeError.
+    (Until 2026-09-24 select() was a no-op and whole rows came back.)"""
     def __init__(self, db, name):
-        self.db, self.name, self.filters, self.row = db, name, {}, None
+        self.db, self.name, self.filters, self.row, self.cols = db, name, {}, None, None
 
     def select(self, *a):
+        self.cols = parse_select(self.name, *a)
         return self
 
     def eq(self, k, v):
+        check_column(self.name, k)
         self.filters[k] = v
         return self
 
     def upsert(self, row, on_conflict=None):
+        check_write(self.name, row)
         self.row = row
         return self
 
@@ -218,7 +228,7 @@ class _Q:
         rows = [r for r in t.values() if all(r.get(k) == v for k, v in self.filters.items())]
         if getattr(self, "_range", None):
             rows = rows[self._range[0]:self._range[1] + 1]
-        return type("R", (), {"data": rows})()
+        return type("R", (), {"data": [project(r, self.cols) for r in rows]})()
 
 
 def run(hub, db, mode="incremental"):

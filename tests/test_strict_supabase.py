@@ -92,7 +92,10 @@ def test_writes_are_recorded_not_applied():
     assert sb.writes == [{"table": "deals", "kind": "update", "payload": {"deal_status": "lost"},
                           "filters": [("eq", "deal_id", "1")]}], sb.writes
     assert sb.table("deals").select("deal_status").eq("deal_id", "1").execute().data == [{"deal_status": "active"}]
-    print("✓ writes are recorded with their filters and not applied")
+    _raises(lambda: sb.table("deals").upsert({"deal_id": "1", "amount": 5}), "deals.amount does not exist")
+    _raises(lambda: sb.table("deals").insert([{"deal_id": "1"}, {"bogus": 1}]), "deals.bogus does not exist")
+    print("✓ writes are recorded with their filters and not applied; a write naming an unknown "
+          "column raises (PGRST204)")
 
 
 if __name__ == "__main__":

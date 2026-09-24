@@ -18,7 +18,8 @@ This fake:
     (tests/fixtures/db_schema_columns.json), like Postgres would;
   - refuses a query shape it does not model (aliases, casts, embedded
     resources) instead of guessing, so a test can't pass on a misread.
-Writes (insert/upsert/update/delete) are recorded in .writes, not applied.
+Writes (insert/upsert/update/delete) are recorded in .writes, not applied;
+a write naming a column the real table doesn't have raises (PGRST204).
 
 Use with the REAL supabase_client.select_all, so its filter translation is
 exercised too:
@@ -190,6 +191,10 @@ class _Query:
 
     # --- writes (recorded, not applied) ----------------------------------------
     def _w(self, kind, payload=None, **kw):
+        # PostgREST rejects a write naming a column the table doesn't have (PGRST204)
+        for row in (payload if isinstance(payload, list) else [payload] if payload else []):
+            for col in row:
+                self._check_col(col)
         self._write = (kind, payload, kw)
         return self
 
@@ -233,6 +238,27 @@ class _Result:
     def __init__(self, data):
         self.data = data
         self.count = len(data) if isinstance(data, list) else (1 if data else 0)
+
+
+def parse_select(table, *columns):
+    """Validate a select list against the real schema; None means '*'.
+    For stateful fakes that keep their own storage but must read like
+    Postgres (only selected columns, only real columns)."""
+    return _Query(StrictSupabase({}), table).select(*columns)._cols
+
+
+def check_column(table, col):
+    _Query(StrictSupabase({}), table)._check_col(col)
+
+
+def check_write(table, row):
+    """A write naming a column the real table doesn't have fails (PGRST204)."""
+    for col in row:
+        check_column(table, col)
+
+
+def project(row, cols):
+    return dict(row) if cols is None else {c: row.get(c) for c in cols}
 
 
 class StrictSupabase:
