@@ -82,28 +82,36 @@ SLICES = [
 ]
 
 
-def _fake_select_all(sb, table, columns="*", filters=None, page_size=1000):
-    rows = {"deals": DEALS, "waterfall_weekly": SLICES}.get(table, [])
-    out = []
-    for r in rows:
-        ok = True
-        for op, col, val in filters or []:
-            v = r.get(col)
-            ok &= {"eq": v == val, "gte": v is not None and str(v) >= str(val),
-                   "lte": v is not None and str(v) <= str(val)}[op]
-        if ok:
-            out.append(copy.deepcopy(r))
-    return out
+def _sb():
+    """Strict fake (tests/strict_supabase.py): the REAL select_all runs
+    against it, so only selected columns come back and every filter applies.
+    (Until 2026-09-24 a hand-rolled select_all returned whole rows and knew
+    only eq/gte/lte.)"""
+    from strict_supabase import StrictSupabase
+    return StrictSupabase({"deals": DEALS + DECOY_DEALS, "waterfall_weekly": SLICES + DECOY_SLICES})
+
+
+# In the tables but outside what query_waterfall asks for: its own filters
+# must drop them (the old fake would have returned them, or had nothing to drop).
+DECOY_DEALS = [
+    {"deal_id": "W", "company_name": "WonCo", "stage": "closedwon", "pipeline_id": "default",
+     "deal_status": "won", "close_date": "2026-09-15", "new_arr": 777000, "expansion_arr": None,
+     "arr_usd": 777000},
+]
+DECOY_SLICES = [
+    {"week_ending": "2026-07-27", "pipeline_id": "default", "region": "EMEA", "segment": "Enterprise",
+     "value_basis": None, "new_pipeline_value": 555000, "won_value": 555000, "lost_value": 555000,
+     "net_change": 555000, "pulled_in_value": 0, "pushed_out_value": 0, "deals_qualified_count": 9},
+]
 
 
 def _run_handler(question="what does our pipeline look like this quarter?"):
-    saved = (handlers.select_all, handlers.compute_at_risk_deals)
-    handlers.select_all = _fake_select_all
+    saved = handlers.compute_at_risk_deals
     handlers.compute_at_risk_deals = lambda sb, **kw: []
     try:
-        return asyncio.run(handlers.query_waterfall({"time_window": TW, "question": question}, None))
+        return asyncio.run(handlers.query_waterfall({"time_window": TW, "question": question}, _sb()))
     finally:
-        handlers.select_all, handlers.compute_at_risk_deals = saved
+        handlers.compute_at_risk_deals = saved
 
 
 def test_headline_is_incremental_arr_closing_in_the_period():
