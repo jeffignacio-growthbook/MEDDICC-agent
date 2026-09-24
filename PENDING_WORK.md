@@ -38,6 +38,22 @@ counting this outcome. The answer shipped with a false caveat appended.
 
 ## 🟡 Open Items
 
+### 🟠 MEDIUM-HIGH: Call-quality / coaching scores have never been produced for anyone (found 2026-09-24)
+**Status:** OPEN. Reported as "Scott Keller shows zero September call-quality scores; he uses Granola, which has no ingestion path." Checked against the database (2026-09-24) before logging; the cause is wider than that.
+- **`call_quality` has 0 rows, ever, for every rep.** Migration 030 created it (commit 106d2986, "Add coaching handlers"), and `query_call_quality` reads it (both its single-call and team modes; no other handler does), but nothing in the repo writes it: no script, workflow or handler inserts into `call_quality` or computes `overall_quality_score`. Every call-quality or coaching-score question returns the empty-result path, for every rep and month.
+- **The empty-result message is false.** `query_call_quality` answers "The call quality assessment runs as part of the enrichment pipeline — scores accumulate as new calls are processed." No such step exists. That wording is what makes an empty result read as a processing delay.
+- **Scott Keller is not uncovered.** September: 12 calls ingested (all Fireflies), 11 with MEDDICC `call_scores`. His calls are in the system; the call-quality layer is what's missing.
+- **Granola (or any other unintegrated call tool) is still a real, separate gap:** no ingestion path exists for it. Size it before treating it as a bug. It can't be seen directly (a call that never arrives leaves no row), but active deal owners with few or no ingested September calls are the candidates to ask about:
+  | Rep | Active deals | Sept calls ingested (source) |
+  |---|---|---|
+  | Jennifer | 27 | 0 |
+  | marsh@growthbook.io (no persona) | 31 | 1 (fireflies) |
+  | Cary | 67 | 4 (apollo 1, fireflies 3) |
+  | Graham McNicoll (CEO) | 5 | 0 |
+  All September calls: fireflies 214, apollo 14. By contrast Christian 31, James Shannon 25, Jake H 20, Dan 19, Scott Keller 12, Marcel 11.
+- **Why it matters:** the rep-coaching trend view (roadmap) assumes per-call quality scores exist to trend against. Today none do for anyone, so it has no input, before any per-tool gap.
+- **Next steps, in order:** (1) correct the empty-result message so it says no call-quality scoring runs yet (a small, user-visible honesty fix); (2) decide whether call-quality scoring should exist, and build the writer, e.g. alongside `call_scores` in the nightly run; (3) ask Jennifer, Cary and marsh which call tool they use, to size the Granola gap; only then (4) decide on a Granola ingestion path.
+
 ### 🟡 MEDIUM: The correction-scope follow-up can never fire (found 2026-09-24)
 **Status:** OPEN.
 - **What:** after the bot asks "is this correction general or specific?", `route_question` is meant to treat the reply ("general"/"specific") as the answer. It detects that with `history[-1].get('handler_name') == 'correction_scope_question'`.
