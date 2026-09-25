@@ -110,6 +110,7 @@ jobs:
             tests/test_quarter_health_renewals_live.py \
             tests/test_loss_rate_qualified.py \
             tests/test_quarter_health_qtd_and_wording.py \
+            tests/test_quarter_health_rep_context.py \
             tests/test_strict_supabase.py \
             tests/test_filter_table_refuses_unknown_filter_columns.py \
             tests/test_aggregation_verification.py \

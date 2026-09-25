@@ -45,6 +45,17 @@ SYNTH_MAX_TOKENS_RETRY = 8000
 # several at once). Cost is not the constraint here — a complete answer over
 # many deals beats a truncated one — so this is sized for the many-deal case.
 SYNTH_PAYLOAD_CHARS = 20000
+# The quarter-health entry points compose four primitives (forecast trust,
+# pipeline, deal risk, loss concentration), each of which gets
+# SYNTH_PAYLOAD_CHARS on its own, plus the composer's own lines. On the live
+# 2026-09-25 inputs the downside view reached 20,706 chars compact once the
+# per-rep "still live" lines went in, so the composed view gets its own budget
+# rather than having figures cut to fit one primitive's.
+SYNTH_PAYLOAD_CHARS_BY_HANDLER = {"query_quarter_health": 26000, "query_quarter_downside": 26000}
+
+
+def synth_payload_chars(handler_name: str) -> int:
+    return SYNTH_PAYLOAD_CHARS_BY_HANDLER.get(handler_name, SYNTH_PAYLOAD_CHARS)
 
 _TERMINAL_ENDINGS = ".!?)\"'`]}…"
 
@@ -6351,7 +6362,7 @@ async def _route_question(question: str, user_id: str,
             {"role": "user",
              "content": f"Question: {question}\n\n"
                         f"Data:\n"
-                        f"{_smart_truncate_for_synthesis(synthesis_results, SYNTH_PAYLOAD_CHARS)}"}
+                        f"{_smart_truncate_for_synthesis(synthesis_results, synth_payload_chars(handler_name))}"}
         ],
         system=build_synthesis_prompt(persona),
         max_tokens=SYNTH_MAX_TOKENS
@@ -6365,7 +6376,7 @@ async def _route_question(question: str, user_id: str,
                 question=question,
                 answer=raw_answer,
                 tool_results=_smart_truncate_for_synthesis(
-                    tool_results, SYNTH_PAYLOAD_CHARS),
+                    tool_results, synth_payload_chars(handler_name)),
             )
         }],
         system="Respond with only the verified answer text. "
@@ -6384,7 +6395,7 @@ async def _route_question(question: str, user_id: str,
                     {"role": "user",
                      "content": f"Question: {question}\n\n"
                                 f"Data:\n"
-                                f"{_smart_truncate_for_synthesis(tool_results, SYNTH_PAYLOAD_CHARS)}\n\n"
+                                f"{_smart_truncate_for_synthesis(tool_results, synth_payload_chars(handler_name))}\n\n"
                                 "Answer completely — do not cut off mid-sentence "
                                 "or mid-list. Be concise enough to finish."}
                 ],
@@ -6502,7 +6513,7 @@ async def _route_question(question: str, user_id: str,
                 {"role": "user",
                  "content": f"Question: {question}\n\n"
                             f"Context: {retry_context}\n\n"
-                            f"Data:\n{_smart_truncate_for_synthesis(tool_results, SYNTH_PAYLOAD_CHARS)}"}
+                            f"Data:\n{_smart_truncate_for_synthesis(tool_results, synth_payload_chars(handler_name))}"}
             ],
             system=build_synthesis_prompt(persona),
             max_tokens=SYNTH_MAX_TOKENS

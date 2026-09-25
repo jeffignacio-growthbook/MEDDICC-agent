@@ -80,6 +80,23 @@ def _stability_band(week: int) -> str:
     raise ValueError(f"week {week} outside the expected 3-13 range")
 
 
+def forecast_by_owner(deals: list) -> Dict[str, Dict[str, Any]]:
+    """The forecast split by deal owner: COMMIT and MOST_LIKELY incremental
+    ARR and deal count per owner_email, over exactly the deals the forecast
+    total counts (so the owners sum to pipeline.incremental_arr)."""
+    from incremental_arr import incremental_arr
+    out: Dict[str, Dict[str, Any]] = {}
+    for d in deals:
+        o = out.setdefault(d.get("owner_email") or "unassigned",
+                           {"commit_arr": 0.0, "most_likely_arr": 0.0, "deal_count": 0})
+        key = "commit_arr" if d.get("forecast_category") == "COMMIT" else "most_likely_arr"
+        o[key] += incremental_arr(d)
+        o["deal_count"] += 1
+    for o in out.values():
+        o["forecast_arr"] = o["commit_arr"] + o["most_likely_arr"]
+    return dict(sorted(out.items(), key=lambda kv: -kv[1]["forecast_arr"]))
+
+
 def plain_baseline_sentence(win_rate: Optional[float], week: int) -> str:
     """Weeks 3-9: why this quarter's cohort can't be read against the
     same-week historical rate yet, in plain words (said word for word by
@@ -163,7 +180,7 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
     from field_semantics import is_incremental_pipeline
     response = sb.table("deals").select(
         "deal_id,company_name,stage,create_date,close_date,segment,"
-        "forecast_category,deal_status,pipeline_id,new_arr,expansion_arr"
+        "forecast_category,deal_status,pipeline_id,new_arr,expansion_arr,owner_email"
     ).in_("forecast_category", CATEGORIES).eq(
         "deal_status", "active"
     ).gte("close_date", q_start.isoformat()).lte(
@@ -259,6 +276,7 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
         "high_risk_count": high_risk_count,
         "high_risk_fraction": high_risk_fraction,
         "risk_dollars": risk_dollars,
+        "by_owner": forecast_by_owner(deals),
         "historical": {
             "week": current_week,
             "win_rate": current_week_row.get("win_rate"),

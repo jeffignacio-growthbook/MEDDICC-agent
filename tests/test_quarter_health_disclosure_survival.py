@@ -35,7 +35,7 @@ reach, for both scenarios (base and downside):
                          view (8,000 chars) drops disclosures: pinned below,
                          so the entry points can't ship without registering.
 and the four headline numbers must reach them too. The classifier text
-must still parse as JSON: the 20,000-char cut never fired.
+must still parse as JSON: the character cut (router.synth_payload_chars) never fired.
 """
 import copy
 import json
@@ -111,9 +111,10 @@ def _loop_text(composed, scenario, registered=True):
 
 
 def _model_inputs(composed, scenario):
+    limit = router.synth_payload_chars(qh.ENTRY_POINTS[scenario])
     classifier = router._smart_truncate_for_synthesis(
-        router._cap_rows_for_synthesis(copy.deepcopy(composed)), router.SYNTH_PAYLOAD_CHARS)
-    verify = router._smart_truncate_for_synthesis(copy.deepcopy(composed), router.SYNTH_PAYLOAD_CHARS)
+        router._cap_rows_for_synthesis(copy.deepcopy(composed)), limit)
+    verify = router._smart_truncate_for_synthesis(copy.deepcopy(composed), limit)
     return {"classifier synthesis": classifier, "verify / retry": verify,
             "dynamic loop": _loop_text(composed, scenario)}
 
@@ -144,7 +145,7 @@ def test_the_collector_sees_the_known_disclosures():
 def _check_survival(scenario, raw=None):
     composed = _compose(scenario, raw)
     inputs = _model_inputs(composed, scenario)
-    json.loads(inputs["classifier synthesis"])      # the 20,000-char cut never fired
+    json.loads(inputs["classifier synthesis"])      # the character cut never fired
     json.loads(inputs["verify / retry"])
     missing = [(name, prim, path) for name, text in inputs.items()
                for prim, path, s in DISCLOSURES if not _present(s, text)]

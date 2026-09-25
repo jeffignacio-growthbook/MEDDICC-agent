@@ -81,7 +81,9 @@ TEXT_ROWS = {"query_loss_concentration": ("by_rep", "by_segment")}
 # the synthesis note, verbatim), not again in the primitive's copy.
 IN_FIGURES = {"query_loss_concentration": (
     "closed_deal_count", "won_count", "lost_count", "qualified", "qualified_loss_rate",
-    "all_closed_loss_rate", "excluded_from_qualified", "loss_rate_headline", "won_incremental_arr")}
+    "all_closed_loss_rate", "excluded_from_qualified", "loss_rate_headline", "won_incremental_arr",
+    "by_rep"),
+    "query_forecast_trust": ("by_owner",)}
 HIGH_RISK_KEEP = 10
 AT_RISK_KEEP = 10
 # days_past_benchmark only means something beside the benchmark it is measured
@@ -161,6 +163,10 @@ def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
         "deal_risk": _risk_figures(results.get("query_high_priority_deal_risk")),
         "loss_concentration": _loss_figures(results.get("query_loss_concentration")),
     }
+    ctx = rep_context(results.get("query_loss_concentration"), results.get("query_forecast_trust"),
+                      results.get("query_pipeline"))
+    if ctx and figures["loss_concentration"].get("status") == "ok":
+        figures["loss_concentration"].update(ctx)
     figures["quarter_to_date"] = _qtd_figures(results.get("query_loss_concentration"),
                                               results.get("query_pipeline"),
                                               figures["forecast_trust"], as_of or _today())
@@ -255,8 +261,10 @@ def _slim(prim: str, res: dict) -> dict:
     for k in moved:
         res.pop(k)
     if moved:
-        res["_in_figures"] = ("counts, the qualified and all-closed loss rates and the closed-won "
-                              "ARR are in figures; the loss-rate headline is in _synthesis_note")
+        res["_in_figures"] = (
+            "in figures.loss_concentration (rep rows in rep_context); the loss-rate headline is in "
+            "_synthesis_note" if prim == "query_loss_concentration"
+            else "by_owner is joined into figures.loss_concentration.rep_context")
     excl = res.get("by_rep_excluded") if prim == "query_loss_concentration" else None
     if isinstance(excl, list):
         res["by_rep_excluded"] = [
@@ -333,6 +341,46 @@ def _loss_figures(res):
             "qualified_loss_rate", "all_closed_loss_rate", "excluded_from_qualified",
             "won_incremental_arr")
     return {k: res.get(k) for k in keys if k in res}
+
+
+def rep_context(loss, ft, pipe):
+    """Each qualified-loss rep row with what that rep still has live: their
+    forecast this quarter (query_forecast_trust.by_owner, COMMIT and Most
+    Likely) and their open pipeline (query_pipeline.by_owner), both as the
+    primitives returned them. None when there are no rep rows."""
+    rows = (loss or {}).get("by_rep") if isinstance(loss, dict) else None
+    if not isinstance(rows, list) or not rows or not all(isinstance(r, dict) for r in rows):
+        return None
+    fc = (ft or {}).get("by_owner") if (ft or {}).get("status") == "ok" else None
+    pp = (pipe or {}).get("by_owner") if not _unavailable(pipe) else None
+
+    def live(owner):
+        if fc is None:
+            f = "forecast by rep unavailable"
+        elif owner in fc:
+            o = fc[owner]
+            n = o.get("deal_count") or 0
+            f = (f"${o['forecast_arr']:,.0f} forecast (COMMIT ${o['commit_arr']:,.0f}, Most Likely "
+                 f"${o['most_likely_arr']:,.0f}; {n} deal{'' if n == 1 else 's'})")
+        else:
+            f = "$0 forecast (no COMMIT or Most Likely deals closing this quarter)"
+        if pp is None:
+            p = "open pipeline unavailable"
+        elif owner in pp:
+            p = f"${pp[owner].get('value') or 0:,.0f} open pipeline ({pp[owner].get('count')} deals)"
+        else:
+            p = "open pipeline not among query_pipeline's top 10 owners"
+        return f"{f}; {p}"
+
+    return {
+        "rep_context": [f"{r.get('text')} | still live: {live(r.get('owner_email'))}" for r in rows],
+        "rep_context_basis": (
+            "Loss rows are this quarter's closed qualified deals (backward-looking); 'still live' is "
+            "what the rep has open now. Forecast = the rep's COMMIT + Most Likely incremental ARR "
+            "closing this quarter (query_forecast_trust.by_owner: the forecast total's own deals). "
+            "Open pipeline = all the rep's active incremental pipeline, any close date "
+            "(query_pipeline.by_owner, top 10 owners; current state, not this quarter)."),
+    }
 
 
 def _qtd_figures(loss, pipe, ft: dict, as_of: date) -> dict:
@@ -568,6 +616,11 @@ def _note(scenario: str, quarter: str, figures: dict, loss_headline: str = None)
     if loss_line:
         parts.append("LOSS RATE: give it with this line, verbatim: \"" + loss_line + "\" Never give "
                      "the all-closed rate alone or call it the loss rate.")
+    if (figures.get("loss_concentration") or {}).get("rep_context"):
+        parts.append("REPS: never give a rep's loss rate on its own. Give each rep's line from "
+                     "figures.loss_concentration.rep_context with its 'still live' forecast and open "
+                     "pipeline (basis: rep_context_basis), so a poor loss record with little live "
+                     "behind it reads differently from one with a strong forecast behind it.")
     baseline = forecast_baseline_sentence(figures.get("forecast_trust") or {})
     if baseline:
         parts.append("FORECAST BASELINE: when you give the historical same-week win rate, follow it "
