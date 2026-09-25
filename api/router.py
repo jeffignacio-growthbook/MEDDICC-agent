@@ -207,6 +207,24 @@ HANDLER_DESCRIPTIONS = {
         "note its own reasoning ceiling is a hard data-quality gap, not "
         "a routing choice."
     ),
+    "query_quarter_health": (
+        "ARE WE IN GOOD SHAPE THIS QUARTER: one overall read on the current quarter "
+        "composed from forecast trust, pipeline, late-stage deal risk and where "
+        "losses sit, as a plain-language verdict with each figure's own basis. Use "
+        "for: 'are we in good shape this quarter', 'how is the quarter looking "
+        "overall', 'quarter health check', 'overall read on this quarter'. NOT for "
+        "any one of those four alone (query_forecast_trust, query_pipeline, "
+        "query_high_priority_deal_risk, query_loss_concentration) and NOT for the "
+        "downside or worst case (query_quarter_downside)."
+    ),
+    "query_quarter_downside": (
+        "DOWNSIDE / WORST CASE THIS QUARTER: what could go wrong this quarter. The "
+        "forecast minus expected losses on its high-risk deals, weighted by the "
+        "governed stage win rates, plus the same four-part read as "
+        "query_quarter_health. Use for: 'what's the downside this quarter', 'worst "
+        "case for this quarter', 'what could go wrong this quarter', 'how bad could "
+        "this quarter get'. NOT for the overall read (query_quarter_health)."
+    ),
     "query_objections": "objections by category/stage/trend",
     "query_feature_gaps": "feature gaps by severity/competitor",
     "query_coverage": "pipeline coverage vs target, quota attainment — LEGACY, confirmed broken (produces nonsensical 8,000%+ ratios). Prefer query_pipeline_coverage for coverage questions.",
@@ -1417,6 +1435,23 @@ TOOLS YOU CAN CALL:
     champion_band, deal_value, stage, risk_flags) plus the true total_at_risk count;
     a clear message when nothing is currently flagged
     Examples: "which deals are at risk", "champion gaps this quarter", "which of those are at risk"
+  query_quarter_health()
+    **USE THIS when the question asks about**:
+    - WHETHER THE QUARTER IS IN GOOD SHAPE overall, a quarter health check
+    **DO NOT use for** any single one of its parts (pipeline, forecast trust,
+    deal risk, loss concentration) or for the downside (use query_quarter_downside)
+    Params: none (always the current quarter)
+    **RETURNS**: four primitives' own figures with every disclosed basis, and an
+    instruction to give a plain-language verdict without blending them
+    Examples: "are we in good shape this quarter", "quarter health check"
+  query_quarter_downside()
+    **USE THIS when the question asks about**:
+    - THE DOWNSIDE or WORST CASE for the current quarter, what could go wrong
+    **DO NOT use for** the overall read (use query_quarter_health)
+    Params: none (always the current quarter)
+    **RETURNS**: worst_case_arr (forecast minus high-risk deals' ARR weighted by
+    governed stage win rates) with its basis, plus the same four-part read
+    Examples: "what's the downside this quarter", "worst case for this quarter"
 
 RULES:
 - Only use column names that appear in the schema above
@@ -5124,6 +5159,8 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
             "query_rep_pipeline": lambda sb_arg, **params: _call_handler_as_tool("query_rep_pipeline", params, sb_arg),
             "query_win_loss": lambda sb_arg, **params: _call_handler_as_tool("query_win_loss", params, sb_arg),
             "query_deals_at_risk": lambda sb_arg, **params: _call_handler_as_tool("query_deals_at_risk", params, sb_arg),
+            "query_quarter_health": lambda sb_arg, **params: _call_handler_as_tool("query_quarter_health", params, sb_arg),
+            "query_quarter_downside": lambda sb_arg, **params: _call_handler_as_tool("query_quarter_downside", params, sb_arg),
         }.get(tool_name)
 
         if not tool_fn:

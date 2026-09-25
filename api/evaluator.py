@@ -58,6 +58,10 @@ STRUCTURED_HANDLERS = {
         # "ok" — the gated too-few-closed-deals response is a complete,
         # honest answer (closed_deal_count + min_required), same principle
         # as query_forecast_trust's week-3 gate, not an empty result.
+    "query_quarter_health": ["status"],    # composed result: "ok" or "error".
+    "query_quarter_downside": ["status"],  # Unregistered, the loop reads it through its
+        # 8,000-char row-aggregation view and drops disclosures
+        # (tests/test_quarter_health_disclosure_survival.py).
     "query_rep_coaching": ["status"],  # always "insufficient_data" or "ok" —
         # gated on transcript-scored calls; the gate response is a complete
         # answer with coverage_note (not empty), same as forecast_trust pattern.

@@ -1221,6 +1221,39 @@ async def query_loss_concentration(params: dict, sb) -> dict:
         }
 
 
+async def _quarter_health_entry(scenario: str, sb) -> dict:
+    # Current quarter only: every composed primitive defaults to it, and a
+    # classifier-extracted time_window or owner is deliberately not passed
+    # on, so the four figures always cover the same period.
+    import api.quarter_health as quarter_health
+    try:
+        return await quarter_health.compose_quarter_health(sb, {}, scenario)
+    except Exception as e:
+        logger.error(f"[QUARTER_HEALTH] {scenario} composition failed: {e}")
+        return {"status": "error", "error": f"Failed to compose quarter health: {e}"}
+
+
+async def query_quarter_health(params: dict, sb) -> dict:
+    """
+    "Are we in good shape this quarter?" One plain-language verdict over
+    four existing primitives, composed by api/quarter_health.py
+    (query_forecast_trust, query_pipeline, query_high_priority_deal_risk,
+    query_loss_concentration), each figure with its own disclosed basis
+    and never blended into a score.
+    """
+    return await _quarter_health_entry("base", sb)
+
+
+async def query_quarter_downside(params: dict, sb) -> dict:
+    """
+    The downside mirror of query_quarter_health: the same four primitives,
+    plus the worst case (forecast minus each high-risk forecast deal's ARR
+    x (1 - its current stage's governed win rate); see
+    api/quarter_health.downside_worst_case).
+    """
+    return await _quarter_health_entry("downside", sb)
+
+
 async def query_win_loss(params: dict, sb) -> dict:
     """
     Comprehensive win/loss analysis combining:
