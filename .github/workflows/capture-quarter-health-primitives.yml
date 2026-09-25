@@ -1,0 +1,39 @@
+name: Capture quarter-health primitives (one-off)
+
+# One-off, READ-ONLY (Supabase selects only). Captures the real outputs of
+# the four primitives the quarter-health composer calls, for use as test
+# fixtures. Safe to delete once the capture is committed.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/affectionate-hypatia-bzd1m9]
+    paths:
+      - .github/workflows/capture-quarter-health-primitives.yml
+      - tests/fixtures/capture_quarter_health_primitives.py
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Capture primitives (live Supabase)"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 tests/fixtures/capture_quarter_health_primitives.py
