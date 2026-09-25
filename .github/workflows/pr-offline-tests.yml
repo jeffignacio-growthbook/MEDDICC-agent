@@ -99,6 +99,7 @@ jobs:
             tests/test_commit_close_date_check.py \
             tests/test_qualification_crossing_walk.py \
             tests/test_qualification_call_comparison.py \
+            tests/test_deal_risk_basis_disclosure.py \
             tests/test_strict_supabase.py \
             tests/test_filter_table_refuses_unknown_filter_columns.py \
             tests/test_aggregation_verification.py \
