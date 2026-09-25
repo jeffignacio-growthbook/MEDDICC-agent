@@ -9,20 +9,19 @@ win_loss_narratives, but does zero aggregation in code — pattern
 reasoning (why we're losing, concentration by rep/segment/competitor)
 is left to whatever the synthesis model does with a raw list. The
 audit split that gap in two:
-  - competitor-mention / stated-reason pattern reasoning is BLOCKED by
-    a hard data ceiling (deals.lost_reason 0% populated fleet-wide,
-    win_loss_narratives.competitor_mentioned 1.7% populated) — not
-    buildable regardless of primitive design, same class as MEDDICC's
-    1.2% coverage or Fireflies' identity dead-end. NOT addressed here.
-    # [CORRECTION 2026-09-25] The "deals.lost_reason 0% populated" claim
-    # above is FALSE. HubSpot's closed_lost_reason is ~100% populated
-    # (50/50 closed-lost this quarter); deals.lost_reason reads empty
-    # only because the ETL never fetches it (DEAL_SYNC_PROPERTIES omits
-    # closed_lost_reason; etl_deals.py:913 .get(...,'') swallows the
-    # gap). It is a code gap, NOT a CRM data ceiling — stated-reason
-    # analysis IS buildable once the ETL is fixed and backfilled. See
-    # PENDING_WORK.md "DATA BUG (confirmed 2026-09-25)". Strike this
-    # BLOCKED claim once the fix lands.
+  - stated-reason (deals.lost_reason) pattern reasoning IS buildable
+    (fixed 2026-09-25). It was long recorded here as BLOCKED by a "hard
+    data ceiling (deals.lost_reason 0% populated)", but that was an ETL
+    FETCH GAP, not a CRM ceiling: HubSpot's closed_lost_reason is
+    populated (100% of the recent quarter's closed-lost, ~44% fleet-wide
+    over all history — older deals predate the field), the ETL just never
+    requested it. Now fetched (DEAL_SYNC_PROPERTIES) and backfilled, and
+    win_loss_narratives.stated_reason tracks it. Bucketing losses by
+    stated reason (competitor / budget / fit / unresponsive) is a real,
+    buildable primitive — NOT built here; logged in PENDING_WORK.
+  - competitor-mention pattern reasoning IS still ceilinged
+    (win_loss_narratives.competitor_mentioned 1.7% populated) — genuinely
+    thin data, same class as MEDDICC's 1.2% coverage. NOT addressed here.
   - rep/segment/stage-of-loss concentration has NO such ceiling —
     owner_email/segment/highest_stage_order_reached are populated on
     the full closed-deal population, independent of win_loss_narratives
