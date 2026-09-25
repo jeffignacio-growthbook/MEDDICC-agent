@@ -1,0 +1,239 @@
+{
+ "captured_at": "2026-09-25 04:46:14.948062+00",
+ "deals_last_updated": "2026-09-25 01:28:39.634151+00",
+ "source": "live Supabase (Deal Intelligence), read-only SQL via the Supabase MCP: FY2027 Q3 active COMMIT+MOST_LIKELY deals closing 2026-08-01..2026-10-31 (the forecast_trust cohort, with owner_email)",
+ "md5_of_capture": "a98f1c6c5ed150c489badfa0f032eb15",
+ "deals": [
+  {
+   "deal_id": "43595329097",
+   "company_name": "Bike24",
+   "owner_email": "marsh@growthbook.io",
+   "forecast_category": "COMMIT",
+   "pipeline_id": "866608541",
+   "new_arr": 0.0,
+   "expansion_arr": 2700.0,
+   "close_date": "2026-09-30",
+   "stage": "1297321622"
+  },
+  {
+   "deal_id": "43948380965",
+   "company_name": "Freie Presse",
+   "owner_email": "james.shannon@growthbook.io",
+   "forecast_category": "COMMIT",
+   "pipeline_id": "default",
+   "new_arr": 27500.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-10-13",
+   "stage": "43449439"
+  },
+  {
+   "deal_id": "44951588885",
+   "company_name": "facile.it",
+   "owner_email": "marsh@growthbook.io",
+   "forecast_category": "COMMIT",
+   "pipeline_id": "866608541",
+   "new_arr": 0.0,
+   "expansion_arr": 13285.0,
+   "close_date": "2026-09-30",
+   "stage": "1297321622"
+  },
+  {
+   "deal_id": "53466496122",
+   "company_name": "Taxfix",
+   "owner_email": "jake@growthbook.io",
+   "forecast_category": "COMMIT",
+   "pipeline_id": "default",
+   "new_arr": 70000.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-10-30",
+   "stage": "24682892"
+  },
+  {
+   "deal_id": "54223739671",
+   "company_name": "Boylesports",
+   "owner_email": "marsh@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "866608541",
+   "new_arr": 0.0,
+   "expansion_arr": 20000.0,
+   "close_date": "2026-10-28",
+   "stage": "1297321619"
+  },
+  {
+   "deal_id": "54277617691",
+   "company_name": "Mistral",
+   "owner_email": "cary@growthbook.io",
+   "forecast_category": "COMMIT",
+   "pipeline_id": "866608541",
+   "new_arr": 0.0,
+   "expansion_arr": 95000.0,
+   "close_date": "2026-10-31",
+   "stage": "1297321620"
+  },
+  {
+   "deal_id": "54956375177",
+   "company_name": "Trade Me",
+   "owner_email": "jake@growthbook.io",
+   "forecast_category": "COMMIT",
+   "pipeline_id": "default",
+   "new_arr": 100000.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-09-30",
+   "stage": "24682892"
+  },
+  {
+   "deal_id": "55049557932",
+   "company_name": "Cochlear Ltd",
+   "owner_email": "marsh@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "866608541",
+   "new_arr": 0.0,
+   "expansion_arr": 4500.0,
+   "close_date": "2026-10-30",
+   "stage": "1297321619"
+  },
+  {
+   "deal_id": "55660576681",
+   "company_name": "Skyscanner",
+   "owner_email": "christian@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "default",
+   "new_arr": 148800.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-10-30",
+   "stage": "presentationscheduled"
+  },
+  {
+   "deal_id": "56258367868",
+   "company_name": "Derive",
+   "owner_email": "jake@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "default",
+   "new_arr": 90000.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-10-31",
+   "stage": "24682892"
+  },
+  {
+   "deal_id": "58134855076",
+   "company_name": "Square",
+   "owner_email": "cary@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "default",
+   "new_arr": 0.0,
+   "expansion_arr": 378000.0,
+   "close_date": "2026-10-31",
+   "stage": "presentationscheduled"
+  },
+  {
+   "deal_id": "60069831015",
+   "company_name": "InPost",
+   "owner_email": "james.shannon@growthbook.io",
+   "forecast_category": "COMMIT",
+   "pipeline_id": "default",
+   "new_arr": 145220.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-10-30",
+   "stage": "43449439"
+  },
+  {
+   "deal_id": "60652001696",
+   "company_name": "Taskrabbit",
+   "owner_email": "christian@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "default",
+   "new_arr": 178000.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-10-30",
+   "stage": "presentationscheduled"
+  },
+  {
+   "deal_id": "61176368035",
+   "company_name": "ClickHouse",
+   "owner_email": "cary@growthbook.io",
+   "forecast_category": "COMMIT",
+   "pipeline_id": "default",
+   "new_arr": 0.0,
+   "expansion_arr": 75000.0,
+   "close_date": "2026-09-30",
+   "stage": "24682892"
+  },
+  {
+   "deal_id": "61437846967",
+   "company_name": "Zoro",
+   "owner_email": "christian@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "default",
+   "new_arr": 275000.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-10-30",
+   "stage": "presentationscheduled"
+  },
+  {
+   "deal_id": "61475205473",
+   "company_name": "BESTSELLER",
+   "owner_email": "james.shannon@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "default",
+   "new_arr": 45000.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-10-30",
+   "stage": "presentationscheduled"
+  },
+  {
+   "deal_id": "62852783774",
+   "company_name": "BlaBlaCar",
+   "owner_email": "james.shannon@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "default",
+   "new_arr": 67500.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-10-28",
+   "stage": "24682892"
+  },
+  {
+   "deal_id": "63290950013",
+   "company_name": "Little Caesars",
+   "owner_email": "cary@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "866608541",
+   "new_arr": 0.0,
+   "expansion_arr": 90000.0,
+   "close_date": "2026-10-31",
+   "stage": "1297321620"
+  },
+  {
+   "deal_id": "63433850647",
+   "company_name": "Voyage Priv\u00e9 FR",
+   "owner_email": "jake@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "default",
+   "new_arr": 85000.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-10-30",
+   "stage": "24682892"
+  },
+  {
+   "deal_id": "64389395879",
+   "company_name": "CODE.ID",
+   "owner_email": "marcel@growthbook.io",
+   "forecast_category": "MOST_LIKELY",
+   "pipeline_id": "default",
+   "new_arr": 35000.0,
+   "expansion_arr": 0.0,
+   "close_date": "2026-10-30",
+   "stage": "24682892"
+  },
+  {
+   "deal_id": "64836805007",
+   "company_name": "Apify",
+   "owner_email": "cary@growthbook.io",
+   "forecast_category": "COMMIT",
+   "pipeline_id": "default",
+   "new_arr": 0.0,
+   "expansion_arr": 670.68,
+   "close_date": "2026-09-30",
+   "stage": "43449439"
+  }
+ ]
+}
