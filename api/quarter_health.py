@@ -199,6 +199,14 @@ def _slim(prim: str, res: dict) -> dict:
         if len(hi) > HIGH_RISK_KEEP:
             res["high_risk_omitted"] = (f"{len(hi) - HIGH_RISK_KEEP} more high-risk deals not "
                                         "named; the counts cover all of them")
+    # Not-assessed (Renewal-pipeline) deals: named, bounded; the reason is the
+    # primitive's note, lifted into disclosed_bases once.
+    holder, key = ((res.get("risk_not_assessed"), "deals") if prim == "query_forecast_trust"
+                   else (res, "not_assessed_deals"))
+    if isinstance(holder, dict) and isinstance(holder.get(key), list):
+        na = holder.pop(key)
+        holder["not_assessed_companies"] = [d.get("company_name") for d in na[:HIGH_RISK_KEEP]]
+        holder["not_assessed_count"] = len(na)
     omitted = {}
     for dotted in DETAIL_LISTS.get(prim, ()):
         *parents, key = dotted.split(".")
@@ -354,9 +362,13 @@ def downside_worst_case(forecast_trust: dict, stage_rates: dict, deal_rows: list
     unrated = [x for x in deals if x["expected_loss"] is None]
     moderate = sum(1 for d in (forecast_trust.get("assessed_deals") or [])
                    if d.get("overall_label") == "moderate_risk")
+    renewals = len(((forecast_trust.get("risk_not_assessed") or {}).get("deals")) or [])
     mod_line = (f"Only high_risk deals are subtracted: {moderate} moderate_risk deal"
                 f"{'' if moderate == 1 else 's'} in the forecast cohort (0-30 days past the cycle "
-                "benchmark) not subtracted, and low_risk and insufficient_data deals are not either. ")
+                "benchmark) not subtracted, and low_risk and insufficient_data deals are not either. "
+                f"{renewals} Renewal-pipeline deal{'' if renewals == 1 else 's'} in the forecast "
+                f"{'is' if renewals == 1 else 'are'} not risk-assessed (reason in disclosed_bases) "
+                "and not subtracted. ")
     listed = sorted(deals, key=lambda x: -(x["incremental_arr"] or 0))[:AT_RISK_KEEP]
     for x in listed:
         x.pop("stage", None)
@@ -371,6 +383,7 @@ def downside_worst_case(forecast_trust: dict, stage_rates: dict, deal_rows: list
         "unrated_count": len(unrated),
         "unrated_at_risk_arr": unrated_arr,
         "moderate_risk_excluded_count": moderate,
+        "renewal_not_assessed_count": renewals,
         "floor_if_all_at_risk_lost": (forecast - total) if forecast is not None else None,
         "at_risk_deals": listed,
         **({"at_risk_deals_omitted": f"{len(deals) - len(listed)} smaller at-risk deals not listed; "
