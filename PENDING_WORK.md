@@ -82,6 +82,12 @@ From #30 (daafb3c5, 2026-09-23) until #60 (merged 2026-09-25), Pre-Merge Gate Te
 - **Why it matters:** `join_tables` crashed on every call with primary rows from 2026-09-01 until #53, and there is no way to tell how often it fired or which answers it broke. The same holds for any future tool regression, and for `filter_table`'s new refusals of filters it can't apply.
 - **Fix:** a per-question record of tool calls, either a `tool_calls` jsonb column on `query_cost_log` or a child table, holding tool name, table, filter columns, row count and error. It needs a migration.
 
+### 🔵 ROADMAP (not urgent, a new capability): what would a real renewal-risk signal look like? (logged 2026-09-25)
+**Status:** OPEN, not started, deliberately not built as part of any fix.
+- **Why it's open:** since 2026-09-25, `assess_deal_risk` reports Renewal-pipeline deals as not assessed. Its cycle-length label measures new-business sales cycles; renewals run on a different clock (won renewals' 75th percentile is 364 days for SMB vs the 138-day benchmark applied), so it was calling renewals high risk for being renewals. A per-pipeline benchmark was considered and dropped: it would add false precision to a signal that doesn't apply to renewals at all.
+- **The real question:** what actually predicts a renewal slipping or churning? Candidate signals, none currently ingested: product usage trend, support ticket volume and severity, champion turnover (the customer's contact leaving), and contract changes (seat or scope reductions, pricing disputes).
+- **Before building:** check which of these the data can reach (usage and support tickets need new sources), and test any candidate against past renewals' outcomes before it labels anything. Until then renewals stay unlabelled, with the reason stated.
+
 ### 🔵 ROADMAP (not urgent, not blocking): Rebuild pre-2026-09-11 incremental ARR history for the waterfall (logged 2026-09-24)
 **Status:** FUTURE. Nothing is broken; historical weeks are labeled, not wrong.
 
