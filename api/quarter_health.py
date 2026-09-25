@@ -146,8 +146,14 @@ async def compose_quarter_health(sb, params: dict = None, scenario: str = "base"
     except Exception as e:
         logger.error(f"[QUARTER_HEALTH] bookings seasonality failed: {e}")
         seasonality = {"status": "error", "error": str(e)}
+    try:
+        from rep_scorecard import assess_rep_scorecard
+        scorecard = assess_rep_scorecard(sb, as_of=as_of)
+    except Exception as e:
+        logger.error(f"[QUARTER_HEALTH] rep scorecard failed: {e}")
+        scorecard = {"status": "error", "error": str(e)}
     return compose_from_results(results, scenario, stage_rates=stage_rates, deal_rows=deal_rows,
-                                as_of=as_of, seasonality=seasonality)
+                                as_of=as_of, seasonality=seasonality, scorecard=scorecard)
 
 
 def _today() -> date:
@@ -176,7 +182,7 @@ def _downside_inputs(sb, forecast_trust: dict):
 
 def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
                          deal_rows: list = None, as_of: date = None,
-                         seasonality: dict = None) -> dict:
+                         seasonality: dict = None, scorecard: dict = None) -> dict:
     """Pure composition over the primitive results (keyed by name). as_of
     (default: today in the reporting timezone) sets days elapsed and weeks
     left; seasonality is assess_bookings_seasonality()'s result."""
@@ -196,7 +202,7 @@ def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
         "loss_concentration": _loss_figures(results.get("query_loss_concentration")),
     }
     ctx = rep_context(results.get("query_loss_concentration"), results.get("query_forecast_trust"),
-                      results.get("query_pipeline"))
+                      results.get("query_pipeline"), scorecard)
     if ctx and figures["loss_concentration"].get("status") == "ok":
         figures["loss_concentration"].update(ctx)
     as_of = as_of or _today()
@@ -393,7 +399,7 @@ def _loss_figures(res):
     return {k: res.get(k) for k in keys if k in res}
 
 
-def rep_context(loss, ft, pipe):
+def rep_context(loss, ft, pipe, scorecard=None):
     """Each qualified-loss rep row with what that rep still has live: their
     forecast this quarter (query_forecast_trust.by_owner, COMMIT and Most
     Likely) and their open pipeline (query_pipeline.by_owner), both as the
@@ -403,6 +409,13 @@ def rep_context(loss, ft, pipe):
         return None
     fc = (ft or {}).get("by_owner") if (ft or {}).get("status") == "ok" else None
     pp = (pipe or {}).get("by_owner") if not _unavailable(pipe) else None
+    sc = (scorecard or {}).get("by_owner") if (scorecard or {}).get("status") == "ok" else None
+
+    def history(owner):
+        if sc is None or owner not in sc:
+            return "loss/pace history unavailable"
+        o = sc[owner]
+        return f"losses: {o['loss_depth']} | {o['pace']}"
 
     def live(owner):
         if fc is None:
@@ -423,13 +436,18 @@ def rep_context(loss, ft, pipe):
         return f"{f}; {p}"
 
     return {
-        "rep_context": [f"{r.get('text')} | still live: {live(r.get('owner_email'))}" for r in rows],
+        "rep_context": [f"{r.get('text')} | still live: {live(r.get('owner_email'))} | "
+                        f"{history(r.get('owner_email'))}" for r in rows],
         "rep_context_basis": (
             "Loss rows are this quarter's closed qualified deals (backward-looking); 'still live' is "
             "what the rep has open now. Forecast = the rep's COMMIT + Most Likely incremental ARR "
             "closing this quarter (query_forecast_trust.by_owner: the forecast total's own deals). "
             "Open pipeline = all the rep's active incremental pipeline, any close date "
-            "(query_pipeline.by_owner, top 10 owners; current state, not this quarter)."),
+            "(query_pipeline.by_owner, top 10 owners; current state, not this quarter). losses = of "
+            "the rep's qualified losses, how many never passed Discovery and how many were ever "
+            "COMMIT/Most Likely; pace = the rep's wins/incremental ARR by this point of the quarter "
+            "vs the same point in their last 3 quarters with a Sales win (rep_scorecard). All facts, "
+            "no verdict."),
     }
 
 

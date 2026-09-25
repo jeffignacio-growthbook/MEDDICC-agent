@@ -55,15 +55,22 @@ def build():
                                    "pipeline, not assessed).")}
     raw["query_loss_concentration"] = lossfx.real_result()
     raw["query_pipeline_coverage"] = covfx.run(rates=PRIMS["stage_close_rate"])[0]
-    return raw, szfx.run()[0]
+    return raw, szfx.run()[0], _scorecard()
 
 
-RAW, SEASONALITY = build()
+def _scorecard():
+    import rep_scorecard
+    import test_rep_scorecard as scfx
+    return rep_scorecard.assess_rep_scorecard(scfx._sb(), as_of=AS_OF)
 
 
-def compose(scenario, raw=None, seasonality=None):
+RAW, SEASONALITY, SCORECARD = build()
+
+
+def compose(scenario, raw=None, seasonality=None, scorecard=None):
     import api.quarter_health as qh
     return qh.compose_from_results(copy.deepcopy(raw or RAW), scenario,
                                    stage_rates=PRIMS["stage_close_rate"],
                                    deal_rows=PRIMS["high_risk_deal_rows"], as_of=AS_OF,
-                                   seasonality=seasonality if seasonality is not None else SEASONALITY)
+                                   seasonality=seasonality if seasonality is not None else SEASONALITY,
+                                   scorecard=scorecard if scorecard is not None else SCORECARD)

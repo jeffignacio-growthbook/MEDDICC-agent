@@ -115,15 +115,17 @@ def test_forecast_trust_splits_its_own_deals_by_owner():
 
 def test_every_rep_row_carries_its_live_figures():
     f = _compose("base")["figures"]["loss_concentration"]
-    assert f["rep_context"] == REAL_LINES, f["rep_context"]
     by_rep = RAW["query_loss_concentration"]["by_rep"]
     assert len(f["rep_context"]) == len(by_rep) == 7
-    for line, row in zip(f["rep_context"], by_rep):
-        assert line.startswith(row["text"] + " | still live: "), line
+    for line, prefix, row in zip(f["rep_context"], REAL_LINES, by_rep):
+        assert line.startswith(prefix + " | losses: "), line   # still-live prefix, then scorecard
+        assert line.startswith(row["text"] + " | still live: ")
+        assert " | day-56 pace: " in line
     assert not any("jake.stangl" in line for line in f["rep_context"])
     assert "backward-looking" in f["rep_context_basis"] and "query_pipeline.by_owner" in f["rep_context_basis"]
-    print("✓ all 7 rep rows carry forecast and open pipeline beside the loss row (Christian 14/14 with "
-          "$601,800 forecast; Dan 4/6 and Scott 2/3 with no forecast deals); the SDR is not a rep row")
+    assert "rep_scorecard" in f["rep_context_basis"] and "never passed Discovery" in f["rep_context_basis"]
+    print("✓ all 7 rep rows carry forecast, open pipeline, loss depth and win pace beside the loss "
+          "row; the SDR is not a rep row")
 
 
 def test_note_asks_for_losses_with_live_context():
@@ -140,11 +142,12 @@ def test_missing_sources_are_said_not_guessed():
     raw["query_pipeline"]["by_owner"].pop("marcel@growthbook.io")
     lines = _compose("base", raw)["figures"]["loss_concentration"]["rep_context"]
     assert all("forecast by rep unavailable" in l for l in lines)
-    assert lines[-1].endswith("open pipeline not among query_pipeline's top 10 owners"), lines[-1]
+    # marcel dropped from by_owner: the still-live segment (before the scorecard segment) says so
+    assert "open pipeline not among query_pipeline's top 10 owners | " in lines[-1], lines[-1]
     raw = copy.deepcopy(RAW)
     raw["query_pipeline"] = {"status": "error", "error": "boom"}
     lines = _compose("base", raw)["figures"]["loss_concentration"]["rep_context"]
-    assert all(l.endswith("open pipeline unavailable") for l in lines)
+    assert all("open pipeline unavailable | " in l for l in lines)
     raw = copy.deepcopy(RAW)
     raw["query_loss_concentration"] = {"status": "error", "error": "x"}
     assert "rep_context" not in _compose("base", raw)["figures"]["loss_concentration"]
