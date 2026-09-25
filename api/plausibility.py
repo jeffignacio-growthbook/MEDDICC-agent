@@ -56,6 +56,7 @@ def check_rate_bounds(data: Dict, path: str = "") -> List[PlausibilityViolation]
     def check_value(key: str, value: Any, path: str):
         if not isinstance(value, (int, float)):
             return
+        key = str(key)  # tables keyed by stage order / week are int-keyed
 
         # Check if field name suggests it's a rate
         is_rate_field = any(rf in key.lower() for rf in rate_fields)
@@ -282,6 +283,7 @@ def check_negative_counts(data: Dict) -> List[PlausibilityViolation]:
     def check_value(key: str, value: Any, path: str):
         if not isinstance(value, (int, float)):
             return
+        key = str(key)  # tables keyed by stage order / week are int-keyed
 
         key_lower = key.lower()
 

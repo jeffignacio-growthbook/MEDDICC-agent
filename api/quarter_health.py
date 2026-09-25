@@ -290,8 +290,8 @@ def _slim(prim: str, res: dict) -> dict:
         holder["not_assessed_count"] = len(na)
     sw = res.get("stage_weighting") if prim == "query_pipeline_coverage" else None
     if isinstance(sw, dict) and isinstance(sw.get("by_stage_order"), dict):
-        sw["win_rate_by_stage_order"] = {
-            k: (round(v["win_rate"], 4) if isinstance(v, dict) and v.get("win_rate") is not None else None)
+        sw["win_rate_by_stage_order"] = {    # string keys, as a JSON payload has them
+            str(k): (round(v["win_rate"], 4) if isinstance(v, dict) and v.get("win_rate") is not None else None)
             for k, v in sw.pop("by_stage_order").items()}
     omitted = {}
     for dotted in DETAIL_LISTS.get(prim, ()):

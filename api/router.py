@@ -7107,7 +7107,7 @@ def _detect_semantic_gap(question: str, handler_result: dict, handler_name: str)
             if not isinstance(obj, dict):
                 return False
             for key, value in obj.items():
-                if any(df in key.lower() for df in dollar_fields):
+                if any(df in str(key).lower() for df in dollar_fields):  # int-keyed tables too
                     return True
                 if isinstance(value, dict) and has_dollar_field(value, depth + 1):
                     return True
