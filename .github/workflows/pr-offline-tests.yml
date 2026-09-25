@@ -101,6 +101,8 @@ jobs:
             tests/test_qualification_call_comparison.py \
             tests/test_deal_risk_basis_disclosure.py \
             tests/test_smart_truncate_compact_before_cut.py \
+            tests/test_quarter_health_composer.py \
+            tests/test_quarter_health_disclosure_survival.py \
             tests/test_strict_supabase.py \
             tests/test_filter_table_refuses_unknown_filter_columns.py \
             tests/test_aggregation_verification.py \
