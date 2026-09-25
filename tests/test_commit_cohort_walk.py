@@ -176,7 +176,40 @@ def test_headlines_lead_with_the_three_findings():
           "(largest first, weeks listed); late-tagged wins 1 of 3 in weeks 11-13")
 
 
+def test_unknown_deal_value_is_excluded_and_counted_never_zero_filled():
+    """eval_reconstruction (Pre-Merge Gate Tests) flagged two `deal_value or
+    0` sites here: a snapshot row with no value history reconstructs to
+    None (Phase 2b), and 0-filling it re-fabricates the number inside a
+    dollar total. An unknown committed value (last COMMIT snapshot) or won
+    value (deals row) now stays None: out of every dollar figure,
+    numerator and denominator alike, and counted; deal counts unchanged."""
+    snaps = SNAPS + _snaps("NULLV", range(1, 14), [3], None) + _snaps("NULLWON", range(1, 8), [4], 40000)
+    deals = DEALS + [_deal("NULLV", "closedlost", "2026-06-01", None),
+                     _deal("NULLWON", "closedwon", "2026-06-10", None)]
+    res = cw.walk(snaps, DATES, deals, HIST, [], Q_START, Q_END, [RENEWAL])
+    r = _by_id(res)
+    assert r["NULLV"]["committed_value"] is None and r["NULLV"]["bucket"] == "LOST", r["NULLV"]
+    assert r["NULLWON"]["won_value"] is None and r["NULLWON"]["committed_value"] == 40000, r["NULLWON"]
+    s, base = res["summary"]["all"], _walk()["summary"]["all"]
+    assert s["n"] == 11 and s["committed_value"] == base["committed_value"] + 40000, s
+    assert s["value_unknown"] == {"committed": 1, "won": 1}, s.get("value_unknown")
+    h = s["in_quarter_hit"]
+    assert (h["won"], h["of"]) == (4, 11), h                        # counts include both
+    assert h["committed_value_won"] == base["in_quarter_hit"]["committed_value_won"] + 40000
+    assert h["won_value"] == base["in_quarter_hit"]["won_value"], "an unknown won value adds nothing"
+    assert s["buckets"]["LOST"]["committed_value"] == base["buckets"]["LOST"]["committed_value"]
+    text = cw.report("Ever COMMIT", s)
+    assert "1 committed value and 1 won value unknown" in text, text
+    assert "unknown" in cw.detail(res["rows"])
+    hl = cw.headlines(res["rows"], last_week=13)
+    assert hl["lost_value"] == base["buckets"]["LOST"]["committed_value"] and hl["lost_value_unknown"] == 1
+    assert "1 with no value" in cw.headline_text(hl)
+    print("✓ unknown deal_value: None, excluded from every dollar total and counted "
+          "(1 committed, 1 won); deal counts and the known dollars unchanged")
+
+
 if __name__ == "__main__":
+    test_unknown_deal_value_is_excluded_and_counted_never_zero_filled()
     test_buckets_and_outcome_dates()
     test_ambiguity_is_detected_and_explained()
     test_two_framings_keep_their_own_denominators()
