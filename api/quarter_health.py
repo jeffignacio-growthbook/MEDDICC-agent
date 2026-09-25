@@ -260,6 +260,12 @@ def _forecast_figures(res):
             "forecast_arr": p.get("incremental_arr"), "forecast_deal_count": p.get("deal_count"),
             "high_risk_count": res.get("high_risk_count"),
             "high_risk_fraction": res.get("high_risk_fraction"),
+            "high_risk_fraction_basis": "share of risk-assessed deals (by count), not of the forecast",
+            "assessed_deal_count": (res.get("risk_summary") or {}).get("total_assessed"),
+            "not_assessed_deal_count": (res.get("risk_summary") or {}).get("not_assessed"),
+            **{k: (res.get("risk_dollars") or {}).get(k)
+               for k in ("high_risk_arr", "high_risk_share_of_forecast", "not_assessed_arr",
+                         "not_assessed_share_of_forecast") if res.get("risk_dollars")},
             "historical_win_rate_same_week": (res.get("historical") or {}).get("win_rate"),
             "historical_n": (res.get("historical") or {}).get("n")}
 
@@ -416,6 +422,20 @@ _POPULATIONS = (
 )
 
 
+def forecast_risk_headline(ft: dict):
+    """The dollar read a reader should get first, built in code: high-risk
+    and not-assessed ARR as shares of the WHOLE forecast. None when the
+    forecast figures carry no risk dollars (gated, unavailable, or an older
+    primitive)."""
+    f, hi, na = ft.get("forecast_arr"), ft.get("high_risk_arr"), ft.get("not_assessed_arr")
+    if not f or hi is None or na is None:
+        return None
+    k = ft.get("not_assessed_deal_count") or 0
+    return (f"{hi / f:.0%} of the forecast (${hi:,.0f} of ${f:,.0f}) is high risk; "
+            f"{na / f:.0%} (${na:,.0f} across {k} Renewal-pipeline deal{'' if k == 1 else 's'}) "
+            "has no risk read yet.")
+
+
 def _note(scenario: str, quarter: str, figures: dict) -> str:
     down = [k for k, v in figures.items() if v.get("status") == "unavailable"]
     names = {"forecast_trust": "query_forecast_trust", "pipeline": "query_pipeline",
@@ -430,6 +450,12 @@ def _note(scenario: str, quarter: str, figures: dict) -> str:
                      "stated with its `basis`; give unrated_at_risk_arr (and why those deals are "
                      "unrated) and floor_if_all_at_risk_lost beside it. Then a plain-language verdict "
                      "on the downside grounded in the four figures in `figures`.")
+    headline = forecast_risk_headline(figures.get("forecast_trust") or {})
+    if headline:
+        parts.append("FORECAST RISK: lead the risk read with this line, verbatim: \"" + headline + "\" "
+                     "Give the deal-count fraction only after it, as a share of risk-assessed deals "
+                     "(not of the forecast); the late-stage view's counts are also shares of assessed "
+                     "deals.")
     parts.append("State each figure with its own basis from `disclosed_bases` (keep each basis's "
                  "caveats and wording rules: e.g. the pipeline total is current state, not this "
                  "quarter's).")

@@ -236,6 +236,28 @@ def test_renewal_deals_and_gated_rates_are_never_given_a_default_weight():
           "at 0 or 1")
 
 
+def test_forecast_risk_headline_is_dollar_shares_of_the_whole_forecast():
+    """The line a reader gets first, built in code and required verbatim:
+    high-risk and not-assessed ARR as shares of the WHOLE forecast, not a
+    deal-count fraction over assessed deals only."""
+    ft = {"forecast_arr": 1946175.68, "high_risk_arr": 436300.0, "not_assessed_arr": 225485.0,
+          "not_assessed_deal_count": 6}
+    line = qh.forecast_risk_headline(ft)
+    assert line == ("22% of the forecast ($436,300 of $1,946,176) is high risk; 12% ($225,485 "
+                    "across 6 Renewal-pipeline deals) has no risk read yet."), line
+    assert qh.forecast_risk_headline({"forecast_arr": 100.0}) is None     # no risk dollars: no line
+    raw = copy.deepcopy(RAW)
+    raw["query_forecast_trust"]["risk_dollars"] = {"forecast_arr": 1946175.68, "high_risk_arr": 436300.0,
+                                                   "not_assessed_arr": 225485.0}
+    raw["query_forecast_trust"]["risk_summary"]["not_assessed"] = 6
+    for scenario in qh.SCENARIOS:
+        note = qh.compose_from_results(raw, scenario, stage_rates=RATES, deal_rows=ROWS)["_synthesis_note"]
+        assert "verbatim: \"" + line + "\"" in note and "share of risk-assessed deals" in note, note
+    assert qh.forecast_risk_headline(_compose("base")["figures"]["forecast_trust"]) is None
+    print("✓ forecast risk headline: '22% of the forecast ($436,300 of $1,946,176) is high risk; 12% "
+          "... has no risk read yet', required verbatim in both notes; absent without risk dollars")
+
+
 def test_only_high_risk_forecast_deals_are_at_risk():
     """At-risk = the forecast cohort's high_risk label, nothing wider: a
     moderate_risk deal, and a high-risk deal outside the forecast cohort

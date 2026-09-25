@@ -94,7 +94,8 @@ def test_forecast_trust_fraction_is_over_assessed_deals_only():
     deals = [_deal("S", 400, "default", new_arr=50000, expansion_arr=None, close_date="2026-09-30"),
              _deal("R", 400, RENEWAL, new_arr=None, expansion_arr=20000, close_date="2026-09-30",
                    fc="MOST_LIKELY"),
-             _deal("S2", 10, "default", new_arr=10000, expansion_arr=None, close_date="2026-09-30")]
+             _deal("S2", 10, "default", new_arr=10000, expansion_arr=None, close_date="2026-09-30"),
+             _deal("M", 150, "default", new_arr=5000, expansion_arr=None, close_date="2026-09-30")]  # moderate
     sb = StrictSupabase({"deals": deals, "analyses": []})
     by_week = {w: {"classified": 40, "won": 10, "win_rate": 0.25, "reason": None} for w in range(1, 14)}
     with patch("utils.get_fiscal_quarter") as gfq, \
@@ -104,12 +105,18 @@ def test_forecast_trust_fraction_is_over_assessed_deals_only():
         gw.return_value = 8
         cal.return_value = {"by_week": by_week}
         r = assess_forecast_trust(sb, as_of=date(2026, 9, 25))
-    assert r["pipeline"]["deal_count"] == 3, r["pipeline"]          # the forecast itself is unchanged
-    assert r["high_risk_count"] == 1 and r["high_risk_fraction"] == 0.5, r
+    assert r["pipeline"]["deal_count"] == 4, r["pipeline"]          # the forecast itself is unchanged
+    assert r["high_risk_count"] == 1 and r["high_risk_fraction"] == 1 / 3, r
+    assert r["risk_summary"]["moderate_risk"] == 1
     assert [d["deal_id"] for d in r["risk_not_assessed"]["deals"]] == ["R"], r["risk_not_assessed"]
     assert "renewal" in r["risk_not_assessed"]["note"].lower()
-    print("✓ forecast trust: the forecast still counts all 3 deals; the high-risk fraction is 1 of "
-          "the 2 assessed, and the renewal is reported as not assessed")
+    rd = r["risk_dollars"]
+    assert (rd["forecast_arr"], rd["high_risk_arr"], rd["not_assessed_arr"]) == (85000, 50000, 20000), rd
+    assert rd["high_risk_share_of_forecast"] == 50000 / 85000 and rd["not_assessed_share_of_forecast"] == 20000 / 85000
+    assert "whole forecast" in rd["note"]
+    print("✓ forecast trust: the forecast still counts all 4 deals; the high-risk fraction is 1 of "
+          "the 3 assessed (the moderate deal's dollars are not high-risk dollars), the renewal is reported as not assessed, and risk_dollars gives high-risk "
+          "and not-assessed dollars as shares of the whole forecast")
 
 
 def test_loop_tool_keeps_basis_and_not_assessed():
