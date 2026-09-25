@@ -107,6 +107,7 @@ jobs:
             tests/test_quarter_health_entry_points.py \
             tests/test_quarter_health_plausibility.py \
             tests/test_deal_risk_renewal_not_assessed.py \
+            tests/test_quarter_health_renewals_live.py \
             tests/test_strict_supabase.py \
             tests/test_filter_table_refuses_unknown_filter_columns.py \
             tests/test_aggregation_verification.py \
