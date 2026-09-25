@@ -1203,7 +1203,13 @@ async def query_loss_concentration(params: dict, sb) -> dict:
     highest_stage_order_reached directly — no win_loss_narratives
     dependency, no data-quality ceiling.
 
+    The headline is the QUALIFIED loss rate (Sales deals seen at Discovery
+    or later before closing, not closed as Disqualified; stage history from
+    deals_snapshot), with the all-closed rate beside it; rep and segment
+    rows are over the qualified deals, SDR owners left out of the rep table.
+
     Answers questions like:
+    - "What's our loss rate this quarter?"
     - "Where are our losses concentrated?"
     - "Which rep/segment has the worst loss rate this quarter?"
     - "How deep into the funnel are we losing deals?"

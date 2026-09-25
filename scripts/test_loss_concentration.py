@@ -55,7 +55,24 @@ def _deal(deal_id, status, owner_email="rep_a@growthbook.io", segment="SMB",
         "deal_id": deal_id, "deal_status": status, "deal_value": deal_value,
         "close_date": "2026-08-15", "owner_email": owner_email,
         "segment": segment, "highest_stage_order_reached": stage_order,
+        "pipeline_id": "default", "stage": "closedwon" if status == "won" else "closedlost",
     }
+
+
+def _tables(deals):
+    """select_all stand-in answering per table: the deals, a Discovery
+    snapshot before close for each (so every deal here is in the qualified
+    population and the rates below are unchanged), and no personas. The
+    qualified-population boundary itself is tested on real data in
+    tests/test_loss_rate_qualified.py."""
+    def fake(sb, table, columns="*", filters=None, page_size=1000):
+        if table == "deals":
+            return deals
+        if table == "deals_snapshot":
+            return [{"deal_id": d["deal_id"], "snapshot_date": "2026-08-01",
+                     "stage_id": "appointmentscheduled"} for d in deals]
+        return []
+    return fake
 
 
 def _basic_population():
@@ -75,7 +92,7 @@ def _basic_population():
 
 def test_below_min_n_returns_insufficient_data():
     thin = _basic_population()[:MIN_N - 1]
-    with patch("supabase_client.select_all", return_value=thin):
+    with patch("supabase_client.select_all", side_effect=_tables(thin)):
         result = assess_loss_concentration(sb=None, time_window=FAKE_TW)
     assert result["status"] == "insufficient_data"
     assert result["reason"] == "too_few_closed_deals"
@@ -87,7 +104,7 @@ def test_below_min_n_returns_insufficient_data():
 
 def test_rep_breakdown_is_rate_normalized_vs_team_average():
     deals = _basic_population()
-    with patch("supabase_client.select_all", return_value=deals):
+    with patch("supabase_client.select_all", side_effect=_tables(deals)):
         result = assess_loss_concentration(sb=None, time_window=FAKE_TW)
 
     assert result["status"] == "ok"
@@ -128,7 +145,7 @@ def test_segment_breakdown_same_shape():
         _deal("s9", "won", segment="SMB"),
         _deal("s10", "lost", segment="SMB"),
     ]
-    with patch("supabase_client.select_all", return_value=deals):
+    with patch("supabase_client.select_all", side_effect=_tables(deals)):
         result = assess_loss_concentration(sb=None, time_window=FAKE_TW)
 
     by_seg = {r["segment"]: r for r in result["by_segment"]}
@@ -150,7 +167,7 @@ def test_stage_of_loss_uses_canonical_bucket_not_raw_order():
     deals += [_deal(f"t-{i}", "lost", stage_order=3) for i in range(2)]
     deals += [_deal(f"x-{i}", "lost", stage_order=9) for i in range(5)]
 
-    with patch("supabase_client.select_all", return_value=deals):
+    with patch("supabase_client.select_all", side_effect=_tables(deals)):
         result = assess_loss_concentration(sb=None, time_window=FAKE_TW)
 
     by_bucket = result["stage_of_loss"]["by_bucket"]
@@ -176,7 +193,7 @@ def test_ghost_deal_share_computed_but_not_excluded():
     deals += [_deal(f"real-{i}", "lost", deal_value=50000) for i in range(3)]
     deals += [_deal(f"ghost-{i}", "lost", deal_value=0) for i in range(2)]
 
-    with patch("supabase_client.select_all", return_value=deals):
+    with patch("supabase_client.select_all", side_effect=_tables(deals)):
         result = assess_loss_concentration(sb=None, time_window=FAKE_TW)
 
     assert result["lost_count"] == 5, (
@@ -223,7 +240,7 @@ def test_planted_discrepancy_bucket_mapping_is_load_bearing():
         deals = [loss_concentration.assess_loss_concentration]  # unused, keep import alive
         test_deals = [_deal("w1", "won")]
         test_deals += [_deal(f"x-{i}", "lost", stage_order=9) for i in range(5)]
-        with patch("supabase_client.select_all", return_value=test_deals):
+        with patch("supabase_client.select_all", side_effect=_tables(test_deals)):
             result = loss_concentration.assess_loss_concentration(
                 sb=None, time_window=FAKE_TW)
 
@@ -243,7 +260,7 @@ def test_planted_discrepancy_bucket_mapping_is_load_bearing():
         # Confirm clean restore: the real test must pass again post-restore.
         test_deals = [_deal("w1", "won")]
         test_deals += [_deal(f"x-{i}", "lost", stage_order=9) for i in range(5)]
-        with patch("supabase_client.select_all", return_value=test_deals):
+        with patch("supabase_client.select_all", side_effect=_tables(test_deals)):
             restored = loss_concentration.assess_loss_concentration(
                 sb=None, time_window=FAKE_TW)
         assert restored["stage_of_loss"]["administrative_stage_share"]["count"] == 5
@@ -270,7 +287,7 @@ def test_planted_discrepancy_rate_normalization_is_load_bearing():
         importlib.reload(loss_concentration)
 
         deals = _basic_population()
-        with patch("supabase_client.select_all", return_value=deals):
+        with patch("supabase_client.select_all", side_effect=_tables(deals)):
             result = loss_concentration.assess_loss_concentration(
                 sb=None, time_window=FAKE_TW)
 
@@ -288,7 +305,7 @@ def test_planted_discrepancy_rate_normalization_is_load_bearing():
         import loss_concentration
         importlib.reload(loss_concentration)
         deals = _basic_population()
-        with patch("supabase_client.select_all", return_value=deals):
+        with patch("supabase_client.select_all", side_effect=_tables(deals)):
             restored = loss_concentration.assess_loss_concentration(
                 sb=None, time_window=FAKE_TW)
         by_rep = {r["owner_email"]: r for r in restored["by_rep"]}
