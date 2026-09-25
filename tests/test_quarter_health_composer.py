@@ -143,7 +143,7 @@ def test_no_new_score_and_the_note_forbids_blending():
         assert f["forecast_trust"]["forecast_arr"] == RAW["query_forecast_trust"]["pipeline"]["incremental_arr"]
         assert f["pipeline"]["total_pipeline"] == RAW["query_pipeline"]["total_pipeline"]
         assert f["deal_risk"]["summary"] == RAW["query_high_priority_deal_risk"]["summary"]
-        assert f["loss_concentration"]["team_loss_rate"] == RAW["query_loss_concentration"]["team_loss_rate"]
+        assert f["loss_concentration"]["lost_count"] == RAW["query_loss_concentration"]["lost_count"]
     print("✓ no score/grade/composite key; each figure is its primitive's own number; the note "
           "forbids combining them")
 

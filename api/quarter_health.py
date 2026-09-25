@@ -17,7 +17,18 @@ anything a character cut could reach. The synthesis note asks for a
 plain-language verdict grounded in the four figures and forbids combining
 them: they measure different populations.
 
-The only calculation is the downside scenario's worst case:
+Three lines are built here and required verbatim in the synthesis note:
+  - quarter to date: closed-won incremental ARR (query_loss_concentration's
+    won_incremental_arr, over the same rows its won_count counts: no fifth
+    query) against query_pipeline's quarterly_target (rep_targets), the
+    remaining gap, weeks left (query_pipeline's this_quarter end), and the
+    gap as a share of query_forecast_trust's forecast;
+  - the loss-rate headline (query_loss_concentration's loss_rate_headline:
+    qualified rate first, all-closed rate beside it);
+  - the forecast baseline in plain words (forecast_baseline_sentence).
+
+Besides the QTD gap and its share of the forecast, the only calculation is
+the downside scenario's worst case:
     forecast_arr - sum(high-risk forecast deal incremental ARR
                        x (1 - its current stage's win rate))
 with the win rate from the governed table query_stage_close_rate() (the
@@ -36,6 +47,7 @@ deals there are.
 import copy
 import logging
 import re
+from datetime import date
 
 import api.handlers as handlers
 from api.incremental_arr import incremental_arr
@@ -61,10 +73,15 @@ DETAIL_LISTS = {
     "query_pipeline": ("deals", "zero_arr_deals.deals"),
 }
 # Breakdowns dropped from the composed view (not needed for a quarter verdict).
-DROP_KEYS = {"query_pipeline": ("by_owner",)}
+DROP_KEYS = {"query_pipeline": ("by_owner", "by_stage")}
 # Row lists whose rows are reduced to the primitive's own rendered line,
 # which already states every number in the row.
 TEXT_ROWS = {"query_loss_concentration": ("by_rep", "by_segment")}
+# Keys the composed view carries once, in `figures` (or, for the headline, in
+# the synthesis note, verbatim), not again in the primitive's copy.
+IN_FIGURES = {"query_loss_concentration": (
+    "closed_deal_count", "won_count", "lost_count", "qualified", "qualified_loss_rate",
+    "all_closed_loss_rate", "excluded_from_qualified", "loss_rate_headline", "won_incremental_arr")}
 HIGH_RISK_KEEP = 10
 AT_RISK_KEEP = 10
 # days_past_benchmark only means something beside the benchmark it is measured
@@ -101,6 +118,11 @@ async def compose_quarter_health(sb, params: dict = None, scenario: str = "base"
     return compose_from_results(results, scenario, stage_rates=stage_rates, deal_rows=deal_rows)
 
 
+def _today() -> date:
+    from sdr_utils import today_in_reporting_tz
+    return today_in_reporting_tz()
+
+
 def _downside_inputs(sb, forecast_trust: dict):
     from forecast_analyses import query_stage_close_rate
     try:
@@ -121,8 +143,9 @@ def _downside_inputs(sb, forecast_trust: dict):
 
 
 def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
-                         deal_rows: list = None) -> dict:
-    """Pure composition over the four primitive results (keyed by name)."""
+                         deal_rows: list = None, as_of: date = None) -> dict:
+    """Pure composition over the four primitive results (keyed by name).
+    as_of (default: today in the reporting timezone) only sets weeks left."""
     if scenario not in SCENARIOS:
         raise ValueError(f"unknown scenario {scenario!r}")
     bases, primitives = [], {}
@@ -138,6 +161,9 @@ def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
         "deal_risk": _risk_figures(results.get("query_high_priority_deal_risk")),
         "loss_concentration": _loss_figures(results.get("query_loss_concentration")),
     }
+    figures["quarter_to_date"] = _qtd_figures(results.get("query_loss_concentration"),
+                                              results.get("query_pipeline"),
+                                              figures["forecast_trust"], as_of or _today())
     quarter = (figures["forecast_trust"].get("fiscal_quarter")
                or figures["loss_concentration"].get("period") or "this quarter")
 
@@ -153,7 +179,9 @@ def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
         out["downside"] = downside_worst_case(results.get("query_forecast_trust") or {},
                                               stage_rates or {}, deal_rows or [])
     out["primitives"] = primitives
-    out["_synthesis_note"] = _note(scenario, quarter, figures)
+    loss = results.get("query_loss_concentration")
+    out["_synthesis_note"] = _note(scenario, quarter, figures,
+                                   loss.get("loss_rate_headline") if isinstance(loss, dict) else None)
     return out
 
 
@@ -218,12 +246,23 @@ def _slim(prim: str, res: dict) -> dict:
         n = len(holder[key])
         if n:
             holder[key] = []
-            omitted[dotted] = (f"{n} per-deal rows not shown in this composed view; every count "
-                               f"and total above covers all {n}")
+            omitted[dotted] = f"{n} rows not shown here; the counts above cover all {n}"
     for key in DROP_KEYS.get(prim, ()):
         if key in res:
             res.pop(key)
-            omitted[key] = "breakdown not shown in this composed view"
+            omitted[key] = "not shown here"
+    moved = [k for k in IN_FIGURES.get(prim, ()) if k in res and res.get("status") == "ok"]
+    for k in moved:
+        res.pop(k)
+    if moved:
+        res["_in_figures"] = ("counts, the qualified and all-closed loss rates and the closed-won "
+                              "ARR are in figures; the loss-rate headline is in _synthesis_note")
+    excl = res.get("by_rep_excluded") if prim == "query_loss_concentration" else None
+    if isinstance(excl, list):
+        res["by_rep_excluded"] = [
+            f"{e.get('owner_email')} ({e.get('role')}): {e.get('closed_all')} closed, "
+            f"{e.get('qualified_closed')} qualified; not in by_rep ({e.get('reason')})"
+            for e in excl if isinstance(e, dict)]
     for key in TEXT_ROWS.get(prim, ()):
         rows = res.get(key)
         if isinstance(rows, list) and all(isinstance(r, dict) and r.get("text") for r in rows):
@@ -290,8 +329,61 @@ def _loss_figures(res):
     bad = _unavailable(res)
     if bad:
         return bad
-    keys = ("status", "period", "closed_deal_count", "won_count", "lost_count", "team_loss_rate")
+    keys = ("status", "period", "closed_deal_count", "won_count", "lost_count", "qualified",
+            "qualified_loss_rate", "all_closed_loss_rate", "excluded_from_qualified",
+            "won_incremental_arr")
     return {k: res.get(k) for k in keys if k in res}
+
+
+def _qtd_figures(loss, pipe, ft: dict, as_of: date) -> dict:
+    """Closed won QTD vs the quarter's target, the gap, weeks left, and the
+    gap as a share of the forecast. Reuses what the primitives already
+    fetched; unavailable (with the reason, and no line) rather than guessed
+    when a piece is missing or the two quarters disagree."""
+    def na(reason):
+        return {"status": "unavailable", "reason": reason}
+    for name, res in (("query_loss_concentration", loss), ("query_pipeline", pipe)):
+        bad = _unavailable(res)
+        if bad:
+            return na(f"{name} unavailable ({bad['error']})")
+    won, target = loss.get("won_incremental_arr"), pipe.get("quarterly_target")
+    tq = pipe.get("this_quarter") or {}
+    q = loss.get("period") or ""
+    if won is None:
+        return na("query_loss_concentration returned no closed-won incremental ARR")
+    if not target:
+        return na(f"no quarterly target in rep_targets for {tq.get('label') or q or 'this quarter'}")
+    if q != (tq.get("label") or "") or not tq.get("end"):
+        return na(f"quarter mismatch: closed won is for {q!r}, the target is for {tq.get('label')!r}")
+    end = date.fromisoformat(str(tq["end"])[:10])
+    days_left = max((end - as_of).days, 0)
+    weeks_left = days_left // 7
+    left = (f"{weeks_left} week{'' if weeks_left == 1 else 's'} left" if weeks_left
+            else f"{days_left} day{'' if days_left == 1 else 's'} left")
+    remaining = target - won
+    gap = (f"(${remaining:,.0f} remaining)" if remaining > 0 else f"(${-remaining:,.0f} over target)")
+    line = (f"${won:,.0f} closed won QTD against the ${target:,.0f} target {gap}, with {left} "
+            "in the quarter.")
+    forecast = ft.get("forecast_arr") if ft.get("status") == "ok" else None
+    share = remaining / forecast if (forecast and remaining > 0) else None
+    if share is not None and share <= 1:
+        line += (f" Closing that gap takes {share:.0%} of the ${forecast:,.0f} forecast "
+                 "(COMMIT+MOST_LIKELY deals closing this quarter).")
+    elif share is not None:
+        line += (f" The gap is larger than the whole ${forecast:,.0f} forecast (COMMIT+MOST_LIKELY "
+                 f"deals closing this quarter): {share:.0%} of it.")
+    return {
+        "status": "ok", "fiscal_quarter": q,
+        "closed_won_arr": won, "closed_won_count": loss.get("won_count"), "target": target,
+        "remaining_to_target": remaining, "days_left": days_left, "weeks_left": weeks_left,
+        "forecast_arr": forecast, "remaining_share_of_forecast": share,
+        "line": line,
+        "basis": (f"Closed won = new+expansion ARR of the {loss.get('won_count')} deals won in {q} "
+                  "(query_loss_concentration's rows). Target = rep_targets team incremental_arr, "
+                  f"as query_pipeline reads it. Weeks left = whole weeks from {as_of.isoformat()} to "
+                  f"{end.isoformat()}. Share of forecast = remaining / query_forecast_trust's open "
+                  "COMMIT+MOST_LIKELY ARR: what has to close, not a prediction."),
+    }
 
 
 # ----------------------------------------------------------------- downside
@@ -358,9 +450,9 @@ def downside_worst_case(forecast_trust: dict, stage_rates: dict, deal_rows: list
                 item["unrated_reason"] = ((row or {}).get("reason")
                                           or f"no governed win rate for stage order {so}")
             else:
-                item["stage_win_rate"] = wr
-                item["expected_loss"] = arr * (1 - wr)
-                weighted += item["expected_loss"]
+                item["stage_win_rate"] = round(wr, 4)
+                item["expected_loss"] = round(arr * (1 - wr), 2)
+                weighted += arr * (1 - wr)
         if item["expected_loss"] is None:
             unrated_arr += arr
         deals.append(item)
@@ -418,7 +510,8 @@ def downside_worst_case(forecast_trust: dict, stage_rates: dict, deal_rows: list
 _POPULATIONS = (
     "forecast_trust = COMMIT+MOST_LIKELY deals closing in {q}; pipeline = all active incremental "
     "ARR (current state, not this quarter) plus its own this-quarter figure; deal_risk = late-stage "
-    "or COMMIT deals closing in {q}; loss_concentration = deals closed in {q}"
+    "or COMMIT deals closing in {q}; loss_concentration = deals closed in {q}; quarter_to_date = deals "
+    "won in {q} against {q}'s target"
 )
 
 
@@ -436,33 +529,59 @@ def forecast_risk_headline(ft: dict):
             "has no risk read yet.")
 
 
-def _note(scenario: str, quarter: str, figures: dict) -> str:
+def forecast_baseline_sentence(ft: dict):
+    """forecast_trust's weeks 3-9 caveat in plain words, from the forecast
+    figures (None outside those weeks or when the forecast is gated)."""
+    from forecast_trust import CALIBRATION_EVIDENCE_WEEK, plain_baseline_sentence
+    week = ft.get("current_week")
+    if ft.get("status") != "ok" or not isinstance(week, int) or week >= CALIBRATION_EVIDENCE_WEEK:
+        return None
+    return plain_baseline_sentence(ft.get("historical_win_rate_same_week"), week)
+
+
+def _note(scenario: str, quarter: str, figures: dict, loss_headline: str = None) -> str:
     down = [k for k, v in figures.items() if v.get("status") == "unavailable"]
     names = {"forecast_trust": "query_forecast_trust", "pipeline": "query_pipeline",
-             "deal_risk": "query_high_priority_deal_risk", "loss_concentration": "query_loss_concentration"}
+             "deal_risk": "query_high_priority_deal_risk", "loss_concentration": "query_loss_concentration",
+             "quarter_to_date": "quarter_to_date (QTD closed won vs target)"}
     parts = []
     if scenario == "base":
         parts.append(f"QUARTER HEALTH ({quarter}): answer \"are we in good shape this quarter?\" with a "
-                     "plain-language verdict grounded only in the four figures in `figures`.")
+                     "plain-language verdict grounded only in the figures in `figures`.")
     else:
         parts.append(f"QUARTER DOWNSIDE ({quarter}): answer what the downside looks like this quarter. "
                      "Lead with `downside`: worst_case_arr = forecast_arr - weighted_expected_loss, "
                      "stated with its `basis`; give unrated_at_risk_arr (and why those deals are "
                      "unrated) and floor_if_all_at_risk_lost beside it. Then a plain-language verdict "
-                     "on the downside grounded in the four figures in `figures`.")
+                     "on the downside grounded in the figures in `figures`.")
     headline = forecast_risk_headline(figures.get("forecast_trust") or {})
     if headline:
         parts.append("FORECAST RISK: lead the risk read with this line, verbatim: \"" + headline + "\" "
                      "Give the deal-count fraction only after it, as a share of risk-assessed deals "
                      "(not of the forecast); the late-stage view's counts are also shares of assessed "
                      "deals.")
+    qtd = figures.get("quarter_to_date") or {}
+    if qtd.get("line"):
+        parts.append("QUARTER TO DATE: state this, verbatim: \"" + qtd["line"] + "\" (basis: "
+                     "figures.quarter_to_date.basis).")
+    loss_line = loss_headline
+    if loss_line:
+        parts.append("LOSS RATE: give it with this line, verbatim: \"" + loss_line + "\" Never give "
+                     "the all-closed rate alone or call it the loss rate.")
+    baseline = forecast_baseline_sentence(figures.get("forecast_trust") or {})
+    if baseline:
+        parts.append("FORECAST BASELINE: when you give the historical same-week win rate, follow it "
+                     "with this, verbatim: \"" + baseline + "\" Say it this way instead of the "
+                     "forecast note's wording; do not call it directional or a baseline.")
     parts.append("State each figure with its own basis from `disclosed_bases` (keep each basis's "
                  "caveats and wording rules: e.g. the pipeline total is current state, not this "
                  "quarter's).")
     parts.append("Do not combine the figures into a score, grade, index or overall number, and do not "
                  "weight one against another numerically: they measure different populations ("
                  + _POPULATIONS.format(q=quarter) + "). Do not add or subtract across them"
-                 + (" (the worst case is the one defined calculation)." if scenario == "downside" else ".")
+                 + (" (the QTD gap, its share of the forecast"
+                    + (" and the worst case are" if scenario == "downside" else " are")
+                    + " the defined calculations, given above).")
                  + " The verdict is a judgement in words: which figures point which way, and the "
                  "weakest one named.")
     if down:
