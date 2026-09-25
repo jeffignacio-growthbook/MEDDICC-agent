@@ -41,12 +41,10 @@ From #30 (daafb3c5, 2026-09-23) until #60 (merged 2026-09-25), Pre-Merge Gate Te
 
 ## 🟡 Open Items
 
-### 🟠 MEDIUM: `query_pipeline_coverage` weights deals by the wrong stage key (found 2026-09-25)
-**Status:** OPEN, logged only. Found while building the quarter-health downside, which reuses the same governed table correctly.
-- `assess_pipeline_coverage()` looks each deal's rate up in `query_stage_close_rate()`'s `by_stage_order` by `deals.highest_stage_order_reached`. The table is built from `deals_snapshot.stage_order`, the config order of the stage the deal was **in** (checked 2026-09-25: snapshot `stage_order` matches config order exactly). `highest_stage_order_reached` is a different measure: the highest stage ever reached, and it numbers Review as 9 where snapshots use 8. Active Meeting Set deals show 1–4 there.
-- **Size (FY2027 Q3, qualified incremental pipeline, 2026-09-25):** 16 of 44 Sales-pipeline deals ($2,106,050 of $4,907,066) get a rate under a different key than their current stage. Examples: Negotiating deals weighted at Awaiting Signature's 65% instead of Negotiating's 29%; Freie Presse (Awaiting Signature, `highest_stage_order_reached` 8) at Review's 0.2%.
-- **Also:** 8 Renewal-pipeline expansion deals ($295,485) are weighted with Sales-pipeline stage rates. The table is New+Expansion Sales-pipeline only, so they have no governed rate, and their stage orders are renewal stages.
-- **Fix when picked up:** key by the current stage's config order on the Sales pipeline, and leave renewal-pipeline deals unweighted, as `api/quarter_health.downside_worst_case` does. Tests first; the weighted coverage figure will move.
+### ✅ FIXED 2026-09-25: `query_pipeline_coverage` weighted deals by the wrong stage key
+
+- Was: each deal's rate looked up by `deals.highest_stage_order_reached` (a high-water mark) instead of the config order of its current stage, which is what the governed table is built from. Live FY2027 Q3: 16 of 44 qualified Sales deals ($2,106,050) keyed to a stage they were not in; weighted pipeline read $1,231,113 instead of $701,826. Renewal-pipeline expansion ($295,485) was weighted with Sales stage rates.
+- Now: qualified = Sales deal whose current stage is Discovery through Awaiting Signature (the qualified-loss-rate boundary); rate by current stage; renewal expansion reported as `renewal_not_weighted`; the query filters server-side. `tests/test_pipeline_coverage_stage_key.py` on the live capture.
 
 ### 🟡 MEDIUM: `query_loss_concentration`'s stage-of-loss breakdown can't show funnel depth (found 2026-09-25)
 
