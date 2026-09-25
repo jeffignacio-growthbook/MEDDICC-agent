@@ -1,0 +1,349 @@
+{
+"_meta": {
+"purpose": "FY2027 Q3 qualified-closed population (won+lost) for rate-vs-mix decomposition validation. Qualified = Sales-pipeline deals seen at Discovery-or-later on/before close, not closed as Disqualified — same definition as scripts/loss_concentration.py. Reproduces the published headline: 28 lost of 36 = 77.8%.",
+"project": "htgvkqycrwesdysustxd (read-only capture)",
+"captured": "2026-09-25",
+"window": {
+"fiscal_quarter": "FY2027 Q3",
+"start": "2026-08-01",
+"end": "2026-10-31"
+},
+"fields": {
+"deepest_qual_order": "deepest qualifying stage order reached on/before close (1=Discovery, 2=Scoping, 3=Technical Eval, 4=Negotiating, 5=Awaiting Signature)",
+"ever_commit_ml": "ever tagged COMMIT or MOST_LIKELY at a snapshot on/before close",
+"deal_status": "won|lost (the rate numerator is deal_status=='lost')"
+},
+"team": {
+"closed": 36,
+"lost": 28,
+"won": 8,
+"loss_rate": 0.7778
+}
+},
+"qualified_closed": [
+{
+"deal_id": "58630730677",
+"company_name": "Philo",
+"owner_email": "cary@growthbook.io",
+"segment": "SMB",
+"deal_status": "won",
+"deepest_qual_order": 4,
+"ever_commit_ml": true
+},
+{
+"deal_id": "63222153531",
+"company_name": "Apify",
+"owner_email": "cary@growthbook.io",
+"segment": "SMB",
+"deal_status": "won",
+"deepest_qual_order": 5,
+"ever_commit_ml": true
+},
+{
+"deal_id": "63222360840",
+"company_name": "Angel",
+"owner_email": "cary@growthbook.io",
+"segment": "SMB",
+"deal_status": "won",
+"deepest_qual_order": 4,
+"ever_commit_ml": true
+},
+{
+"deal_id": "52003079188",
+"company_name": "Optimic",
+"owner_email": "christian@growthbook.io",
+"segment": "Unknown",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "54599396690",
+"company_name": "Harper",
+"owner_email": "christian@growthbook.io",
+"segment": "SMB",
+"deal_status": "lost",
+"deepest_qual_order": 3,
+"ever_commit_ml": false
+},
+{
+"deal_id": "56583966281",
+"company_name": "Hangikredi",
+"owner_email": "christian@growthbook.io",
+"segment": "SMB",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "56685250888",
+"company_name": "Chaos",
+"owner_email": "christian@growthbook.io",
+"segment": "Mid-Market",
+"deal_status": "lost",
+"deepest_qual_order": 3,
+"ever_commit_ml": false
+},
+{
+"deal_id": "57642729106",
+"company_name": "Cloudretails.com (Cloudretails)",
+"owner_email": "christian@growthbook.io",
+"segment": "SMB",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "58135849096",
+"company_name": "Neuroth",
+"owner_email": "christian@growthbook.io",
+"segment": "Mid-Market",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "58867845224",
+"company_name": "Paradigm Technology",
+"owner_email": "christian@growthbook.io",
+"segment": "Mid-Market",
+"deal_status": "lost",
+"deepest_qual_order": 2,
+"ever_commit_ml": false
+},
+{
+"deal_id": "59019110029",
+"company_name": "KBX",
+"owner_email": "christian@growthbook.io",
+"segment": "Mid-Market",
+"deal_status": "lost",
+"deepest_qual_order": 2,
+"ever_commit_ml": false
+},
+{
+"deal_id": "61149585726",
+"company_name": "TickPick",
+"owner_email": "christian@growthbook.io",
+"segment": "SMB",
+"deal_status": "lost",
+"deepest_qual_order": 2,
+"ever_commit_ml": false
+},
+{
+"deal_id": "62296851044",
+"company_name": "Electronic Arts",
+"owner_email": "christian@growthbook.io",
+"segment": "Enterprise",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "62741857928",
+"company_name": "World Vision USA",
+"owner_email": "christian@growthbook.io",
+"segment": "Mid-Market",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "62921497713",
+"company_name": "RedCore Group",
+"owner_email": "christian@growthbook.io",
+"segment": "SMB",
+"deal_status": "lost",
+"deepest_qual_order": 4,
+"ever_commit_ml": false
+},
+{
+"deal_id": "63120688011",
+"company_name": "Fanatics Live",
+"owner_email": "christian@growthbook.io",
+"segment": "Enterprise",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "64366810627",
+"company_name": "Test Org",
+"owner_email": "christian@growthbook.io",
+"segment": "SMB",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "60056558933",
+"company_name": "18Birdies",
+"owner_email": "dan@growthbook.io",
+"segment": "SMB",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "60142222672",
+"company_name": "Rappi",
+"owner_email": "dan@growthbook.io",
+"segment": "Unknown",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "60217095483",
+"company_name": "Picnic Technologies",
+"owner_email": "dan@growthbook.io",
+"segment": "SMB",
+"deal_status": "lost",
+"deepest_qual_order": 3,
+"ever_commit_ml": false
+},
+{
+"deal_id": "61602481512",
+"company_name": "Pronto",
+"owner_email": "dan@growthbook.io",
+"segment": "SMB",
+"deal_status": "lost",
+"deepest_qual_order": 3,
+"ever_commit_ml": false
+},
+{
+"deal_id": "59860100786",
+"company_name": "Goodnotes",
+"owner_email": "dan@growthbook.io",
+"segment": "Mid-Market",
+"deal_status": "won",
+"deepest_qual_order": 4,
+"ever_commit_ml": true
+},
+{
+"deal_id": "60868340629",
+"company_name": "mountain",
+"owner_email": "dan@growthbook.io",
+"segment": "Mid-Market",
+"deal_status": "won",
+"deepest_qual_order": 3,
+"ever_commit_ml": false
+},
+{
+"deal_id": "56091261251",
+"company_name": "Visable",
+"owner_email": "jake@growthbook.io",
+"segment": "Mid-Market",
+"deal_status": "lost",
+"deepest_qual_order": 2,
+"ever_commit_ml": true
+},
+{
+"deal_id": "58798224498",
+"company_name": "Comcast",
+"owner_email": "jake@growthbook.io",
+"segment": "Enterprise",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "59171632668",
+"company_name": "Exodus",
+"owner_email": "jake@growthbook.io",
+"segment": "Unknown",
+"deal_status": "lost",
+"deepest_qual_order": 4,
+"ever_commit_ml": false
+},
+{
+"deal_id": "64434424673",
+"company_name": "Clipboard",
+"owner_email": "jake@growthbook.io",
+"segment": "Enterprise",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "61398761834",
+"company_name": "Fixter",
+"owner_email": "james.shannon@growthbook.io",
+"segment": "SMB",
+"deal_status": "lost",
+"deepest_qual_order": 3,
+"ever_commit_ml": false
+},
+{
+"deal_id": "62395520059",
+"company_name": "DocPlanner",
+"owner_email": "james.shannon@growthbook.io",
+"segment": "Enterprise",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "64138895731",
+"company_name": "KAPE",
+"owner_email": "james.shannon@growthbook.io",
+"segment": "Mid-Market",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "57977964601",
+"company_name": "",
+"owner_email": "james.shannon@growthbook.io",
+"segment": "SMB",
+"deal_status": "won",
+"deepest_qual_order": 5,
+"ever_commit_ml": true
+},
+{
+"deal_id": "62121618183",
+"company_name": "Airalo",
+"owner_email": "james.shannon@growthbook.io",
+"segment": "SMB",
+"deal_status": "won",
+"deepest_qual_order": 5,
+"ever_commit_ml": true
+},
+{
+"deal_id": "64279105157",
+"company_name": "Noxtua",
+"owner_email": "marcel@growthbook.io",
+"segment": "Enterprise",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "61093099416",
+"company_name": "Holded",
+"owner_email": "scott.keller@growthbook.io",
+"segment": "SMB",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "62654930012",
+"company_name": "",
+"owner_email": "scott.keller@growthbook.io",
+"segment": "Unknown",
+"deal_status": "lost",
+"deepest_qual_order": 1,
+"ever_commit_ml": false
+},
+{
+"deal_id": "64307147547",
+"company_name": "Baton",
+"owner_email": "scott.keller@growthbook.io",
+"segment": "SMB",
+"deal_status": "won",
+"deepest_qual_order": 3,
+"ever_commit_ml": false
+}
+]
+}
