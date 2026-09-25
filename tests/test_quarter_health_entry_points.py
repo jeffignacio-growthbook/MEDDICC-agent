@@ -50,8 +50,19 @@ import api.router as router  # noqa: E402
 from canary_harness import run_canary_case  # noqa: E402
 from test_pipeline_routing_split import claimed_phrases, tool_entries  # noqa: E402
 import test_quarter_health_disclosure_survival as surv  # noqa: E402
+import quarter_health_inputs as qi  # noqa: E402
 
-FIXTURE = surv.FIXTURE
+# The full live input set for 2026-09-25 (tests/quarter_health_inputs.py).
+FIXTURE = {**qi.RAW, "stage_close_rate": qi.PRIMS["stage_close_rate"],
+           "high_risk_deal_rows": qi.PRIMS["high_risk_deal_rows"]}
+DISCLOSURES = surv.collect_disclosures(qi.RAW)
+EXCLUDED = surv.collect_disclosures(qi.RAW, excluded=True)
+HEADLINE = {
+    "forecast ARR": repr(qi.RAW["query_forecast_trust"]["pipeline"]["incremental_arr"]),
+    "pipeline total": repr(qi.RAW["query_pipeline"]["total_pipeline"]),
+    "weighted coverage": "$701,826",
+    "qualified loss rate": "77.8%",
+}
 ENTRY = {"base": "query_quarter_health", "downside": "query_quarter_downside"}
 QUESTION = {"base": "Are we in good shape this quarter?",
             "downside": "What's the downside this quarter?"}
@@ -88,7 +99,10 @@ def _real_primitives(calls=None):
 def _run_entry(scenario, params=None, calls=None):
     with _real_primitives(calls), \
          patch("forecast_analyses.query_stage_close_rate",
-               side_effect=lambda sb=None: copy.deepcopy(FIXTURE["stage_close_rate"])):
+               side_effect=lambda sb=None: copy.deepcopy(FIXTURE["stage_close_rate"])), \
+         patch("bookings_seasonality.assess_bookings_seasonality",
+               side_effect=lambda sb, as_of=None: copy.deepcopy(qi.SEASONALITY)), \
+         patch.object(qh, "_today", lambda: qi.AS_OF):
         return asyncio.run(getattr(handlers, ENTRY[scenario])(params or {}, _SB()))
 
 
@@ -159,15 +173,19 @@ def test_end_to_end_through_the_real_dynamic_loop():
         assert rep["tool_executed"], f"{name}: the loop never ran the tool"
         assert all(rep["channels"].values()), (name, rep["channels"])
         text = rep["synthesis_text"]
-        missing = [p for _, p, s in surv.DISCLOSURES if not surv._present(s, text)]
+        missing = [p for _, p, s in DISCLOSURES if not surv._present(s, text)]
         assert not missing, (name, missing[:5])
-        for label, needle in surv.HEADLINE.items():
+        leaked = [p for _, p, s in EXCLUDED if surv._present(s, text)]
+        assert not leaked, (name, leaked)
+        for label, needle in HEADLINE.items():
             assert needle in text, (name, label)
         assert rep["answered"], name
         if scenario == "downside":
-            assert '"worst_case_arr"' in text and "1 moderate_risk deal" in text
-    print(f"✓ end to end, each entry point through the real dynamic loop: all {len(surv.DISCLOSURES)} "
-          "disclosures, the 4 headline numbers and the canary reach the synthesis call")
+            assert "falls from $701,826 to $590,533" in text and "0 moderate_risk deals" in text
+            assert "worst_case_arr" not in text
+    print(f"✓ end to end, each entry point through the real dynamic loop on the live 2026-09-25 "
+          f"inputs: all {len(DISCLOSURES)} disclosures, the {len(HEADLINE)} headline numbers and the "
+          "canary reach the synthesis call; the left-out historical cohort does not")
 
 
 if __name__ == "__main__":

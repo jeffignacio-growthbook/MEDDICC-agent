@@ -1230,7 +1230,7 @@ async def query_loss_concentration(params: dict, sb) -> dict:
 async def _quarter_health_entry(scenario: str, sb) -> dict:
     # Current quarter only: every composed primitive defaults to it, and a
     # classifier-extracted time_window or owner is deliberately not passed
-    # on, so the four figures always cover the same period.
+    # on, so the figures always cover the same period.
     import api.quarter_health as quarter_health
     try:
         return await quarter_health.compose_quarter_health(sb, {}, scenario)
@@ -1241,21 +1241,20 @@ async def _quarter_health_entry(scenario: str, sb) -> dict:
 
 async def query_quarter_health(params: dict, sb) -> dict:
     """
-    "Are we in good shape this quarter?" One plain-language verdict over
-    four existing primitives, composed by api/quarter_health.py
-    (query_forecast_trust, query_pipeline, query_high_priority_deal_risk,
-    query_loss_concentration), each figure with its own disclosed basis
-    and never blended into a score.
+    "Are we in good shape this quarter?" One plain-language verdict composed
+    by api/quarter_health.py from five existing primitives (qh.PRIMITIVE_ORDER):
+    where the quarter stands (closed won vs target, pace with seasonality),
+    stage-weighted coverage of what is still needed, and the modifiers on
+    it; each figure with its own disclosed basis, never blended into a score.
     """
     return await _quarter_health_entry("base", sb)
 
 
 async def query_quarter_downside(params: dict, sb) -> dict:
     """
-    The downside mirror of query_quarter_health: the same four primitives,
-    plus the worst case (forecast minus each high-risk forecast deal's ARR
-    x (1 - its current stage's governed win rate); see
-    api/quarter_health.downside_worst_case).
+    The downside mirror of query_quarter_health: the same read, plus the
+    stage-weighted coverage with the forecast's high-risk deals taken out
+    (see api/quarter_health.downside_coverage).
     """
     return await _quarter_health_entry("downside", sb)
 

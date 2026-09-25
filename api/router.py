@@ -45,8 +45,8 @@ SYNTH_MAX_TOKENS_RETRY = 8000
 # several at once). Cost is not the constraint here — a complete answer over
 # many deals beats a truncated one — so this is sized for the many-deal case.
 SYNTH_PAYLOAD_CHARS = 20000
-# The quarter-health entry points compose four primitives (forecast trust,
-# pipeline, deal risk, loss concentration), each of which gets
+# The quarter-health entry points compose five primitives (forecast trust,
+# pipeline, pipeline coverage, deal risk, loss concentration), each of which gets
 # SYNTH_PAYLOAD_CHARS on its own, plus the composer's own lines. On the live
 # 2026-09-25 inputs the downside view reached 20,706 chars compact once the
 # per-rep "still live" lines went in, so the composed view gets its own budget
@@ -222,9 +222,10 @@ HANDLER_DESCRIPTIONS = {
         "a routing choice."
     ),
     "query_quarter_health": (
-        "ARE WE IN GOOD SHAPE THIS QUARTER: one overall read on the current quarter "
-        "composed from forecast trust, pipeline, late-stage deal risk and where "
-        "losses sit, as a plain-language verdict with each figure's own basis. Use "
+        "ARE WE IN GOOD SHAPE THIS QUARTER: one overall read on the current quarter: "
+        "closed won against target and pace, stage-weighted coverage of what is "
+        "still needed, and how far to trust it (forecast risk, loss rate, reps), "
+        "as a plain-language verdict with each figure's own basis. Use "
         "for: 'are we in good shape this quarter', 'how is the quarter looking "
         "overall', 'quarter health check', 'overall read on this quarter'. NOT for "
         "any one of those four alone (query_forecast_trust, query_pipeline, "
@@ -233,9 +234,9 @@ HANDLER_DESCRIPTIONS = {
     ),
     "query_quarter_downside": (
         "DOWNSIDE / WORST CASE THIS QUARTER: what could go wrong this quarter. The "
-        "forecast minus expected losses on its high-risk deals, weighted by the "
-        "governed stage win rates, plus the same four-part read as "
-        "query_quarter_health. Use for: 'what's the downside this quarter', 'worst "
+        "stage-weighted coverage of what is still needed with the forecast's "
+        "high-risk deals taken out, plus the same read as query_quarter_health. "
+        "Use for: 'what's the downside this quarter', 'worst "
         "case for this quarter', 'what could go wrong this quarter', 'how bad could "
         "this quarter get'. NOT for the overall read (query_quarter_health)."
     ),
@@ -1455,16 +1456,17 @@ TOOLS YOU CAN CALL:
     **DO NOT use for** any single one of its parts (pipeline, forecast trust,
     deal risk, loss concentration) or for the downside (use query_quarter_downside)
     Params: none (always the current quarter)
-    **RETURNS**: four primitives' own figures with every disclosed basis, and an
-    instruction to give a plain-language verdict without blending them
+    **RETURNS**: closed won vs target, pace, stage-weighted coverage of the
+    remaining gap, and the forecast-risk / loss-rate / rep modifiers, each with
+    its disclosed basis, and an instruction to give a plain-language verdict
     Examples: "are we in good shape this quarter", "quarter health check"
   query_quarter_downside()
     **USE THIS when the question asks about**:
     - THE DOWNSIDE or WORST CASE for the current quarter, what could go wrong
     **DO NOT use for** the overall read (use query_quarter_health)
     Params: none (always the current quarter)
-    **RETURNS**: worst_case_arr (forecast minus high-risk deals' ARR weighted by
-    governed stage win rates) with its basis, plus the same four-part read
+    **RETURNS**: the stage-weighted coverage of the remaining gap if the
+    forecast's high-risk deals are lost, with its basis, plus the same read
     Examples: "what's the downside this quarter", "worst case for this quarter"
 
 RULES:

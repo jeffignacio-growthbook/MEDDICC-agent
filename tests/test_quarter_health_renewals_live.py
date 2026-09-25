@@ -17,8 +17,9 @@ code's, not a hand count:
 
 And the composed result: no plausibility violation, every disclosure
 (including the not-assessed note) reaches every model input, and the
-downside subtracts only the 5 Sales-pipeline high-risk deals, with the 6
-renewals named as not assessed rather than left unrated.
+downside takes only the 5 Sales-pipeline high-risk deals out of the
+weighted coverage, with the 6 renewals named as not assessed rather than
+left unrated.
 """
 import copy
 import json
@@ -40,7 +41,7 @@ import test_quarter_health_disclosure_survival as surv  # noqa: E402
 
 FIXTURE = json.loads((REPO / "tests" / "fixtures" /
                       "quarter_health_primitives_2026_09_25_renewals_not_assessed.json").read_text())
-RAW = {k: FIXTURE[k] for k in qh.PRIMITIVE_ORDER}
+RAW = {k: FIXTURE[k] for k in qh.PRIMITIVE_ORDER if k in FIXTURE}
 FT, HP = RAW["query_forecast_trust"], RAW["query_high_priority_deal_risk"]
 RENEWALS_FT = {"Bike24", "Boylesports", "Mistral", "facile.it", "Cochlear Ltd", "Little Caesars"}
 
@@ -88,22 +89,25 @@ def test_composed_views_pass_plausibility_and_keep_every_disclosure():
           "the not-assessed note included, reach every model input; renewals named")
 
 
-def test_downside_subtracts_only_sales_high_risk_deals():
-    d = _compose("downside")["downside"]
+def test_downside_takes_out_only_sales_high_risk_deals():
+    import quarter_health_inputs as qi
+    c = qi.compose("downside")
+    d, cov = c["downside"], c["figures"]["coverage"]
     assert d["at_risk_count"] == 5 and d["unrated_count"] == 0, d
     assert all(x["pipeline_id"] == "default" for x in d["at_risk_deals"])
     assert d["renewal_not_assessed_count"] == 6 and d["moderate_risk_excluded_count"] == 0
     assert "6 Renewal-pipeline deals in the forecast are not risk-assessed" in d["basis"], d["basis"]
     assert abs(d["at_risk_arr"] - 436300.0) < 0.01
-    assert abs(d["floor_if_all_at_risk_lost"] - (1946175.68 - 436300.0)) < 0.01
-    assert d["worst_case_arr"] > d["floor_if_all_at_risk_lost"]
-    print(f"✓ downside: 5 Sales high-risk deals (${d['at_risk_arr']:,.0f}), expected loss "
-          f"${d['weighted_expected_loss']:,.0f}, worst case ${d['worst_case_arr']:,.0f}, floor "
-          f"${d['floor_if_all_at_risk_lost']:,.0f}; 6 renewals not assessed, 0 unrated")
+    assert abs(d["weighted_arr_if_lost"] - (cov["weighted_arr"] - d["at_risk_weighted_arr"])) < 0.01
+    assert round(d["weighted_arr_if_lost"], 2) == 590532.67 and round(d["coverage_of_remaining_if_lost"], 4) == 0.5019
+    print(f"✓ downside: the 5 Sales high-risk deals (${d['at_risk_arr']:,.0f}) carry "
+          f"${d['at_risk_weighted_arr']:,.0f} of weighted pipeline; without them coverage is "
+          f"${d['weighted_arr_if_lost']:,.0f} ({d['coverage_of_remaining_if_lost']:.2f}x the remaining "
+          "gap); 6 renewals not assessed, 0 unrated")
 
 
 if __name__ == "__main__":
     test_the_capture_excludes_renewals_from_risk()
     test_composed_views_pass_plausibility_and_keep_every_disclosure()
-    test_downside_subtracts_only_sales_high_risk_deals()
+    test_downside_takes_out_only_sales_high_risk_deals()
     print("\n✅ All tests passed")

@@ -3,28 +3,27 @@
 Quarter-health composer (api/quarter_health.py): the contract, apart from
 disclosure survival (tests/test_quarter_health_disclosure_survival.py).
 
-  - One composer, fixed order: query_forecast_trust, query_pipeline,
-    query_high_priority_deal_risk, query_loss_concentration, the same for
-    both scenarios; the scenario changes the framing and adds the downside
+  - One composer, fixed order (qh.PRIMITIVE_ORDER), the same for both
+    scenarios; the scenario changes the framing and adds the downside
     block, nothing else.
   - No new score: no composite/score/grade/index key anywhere the composer
     writes; each figure is its primitive's own number; the synthesis note
     forbids combining them and says the populations differ.
   - A primitive that raises or returns an error is reported as unavailable
-    in its own section; the other three are unaffected (fail gracefully).
-  - Downside: worst case = forecast (query_forecast_trust's COMMIT +
-    MOST_LIKELY incremental ARR) minus each high-risk forecast deal's
-    incremental ARR x (1 - its stage's win rate) from the governed table
-    query_stage_close_rate() (the one query_pipeline_coverage weights
-    with), looked up by the deal's CURRENT stage order, Sales pipeline
-    only. The table is built from snapshot stage_order, which is the
-    config order of the stage the deal was in; deals.highest_stage_order_
-    reached is a different measure (highest stage ever, and Review = 9
-    there vs 8 in snapshots), so it is not the key. A deal with no
-    governed rate (Renewal pipeline, or a rate below min_evidence) is
-    listed and left out of the weighted figure, never given a default
-    weight; the floor (every at-risk deal lost) is stated beside it.
-Real primitive outputs from tests/fixtures/quarter_health_primitives_2026_09_25.json.
+    in its own section; the others are unaffected (fail gracefully).
+  - Downside: the coverage figure with the forecast's high-risk deals taken
+    out. Each Sales-pipeline high-risk deal's weighted value is its
+    incremental ARR x its CURRENT stage's governed rate
+    (query_stage_close_rate, by the stage's config order; not
+    highest_stage_order_reached, a high-water mark), the same rate the
+    coverage figure gave it. A deal with no governed rate (Renewal pipeline,
+    a rate below min_evidence, no deals row) added nothing, is listed as
+    unrated and never given a default weight.
+Real primitive outputs from tests/fixtures/quarter_health_primitives_2026_09_25.json
+(the incident capture), with query_pipeline_coverage and
+query_loss_concentration from the live captures (tests/quarter_health_inputs.py:
+the same quarter) so there is a remaining gap and a coverage figure to take
+the high-risk deals out of.
 """
 import asyncio
 import copy
@@ -46,18 +45,22 @@ logging.disable(logging.CRITICAL)
 import api.quarter_health as qh  # noqa: E402
 import api.handlers as handlers  # noqa: E402
 
+import quarter_health_inputs as qi  # noqa: E402
+
 FIXTURE = json.loads((REPO / "tests" / "fixtures" / "quarter_health_primitives_2026_09_25.json").read_text())
-ORDER = ("query_forecast_trust", "query_pipeline", "query_high_priority_deal_risk",
-         "query_loss_concentration")
-RAW = {k: FIXTURE[k] for k in ORDER}
+ORDER = qh.PRIMITIVE_ORDER
+RAW = {k: FIXTURE[k] for k in ORDER if k in FIXTURE}
+RAW["query_pipeline_coverage"] = copy.deepcopy(qi.RAW["query_pipeline_coverage"])
+RAW["query_loss_concentration"] = copy.deepcopy(qi.RAW["query_loss_concentration"])  # carries won_incremental_arr
 RATES = FIXTURE["stage_close_rate"]
 ROWS = FIXTURE["high_risk_deal_rows"]
 SCORE_KEY = re.compile(r"(score|grade|rating|composite|index|health_value)", re.I)
 
 
-def _compose(scenario, raw=None, rows=None):
-    return qh.compose_from_results(copy.deepcopy(raw or RAW), scenario,
-                                   stage_rates=RATES, deal_rows=ROWS if rows is None else rows)
+def _compose(scenario, raw=None, rows=None, rates=None):
+    return qh.compose_from_results(copy.deepcopy(raw or RAW), scenario, stage_rates=rates or RATES,
+                                   deal_rows=ROWS if rows is None else rows, as_of=qi.AS_OF,
+                                   seasonality=qi.SEASONALITY)
 
 
 class _SB:
@@ -103,7 +106,7 @@ def test_one_composer_fixed_order_for_both_scenarios():
         assert tuple(calls) == ORDER, (scenario, calls)
         assert rates.called == (scenario == "downside"), scenario
     assert qh.SCENARIOS == ("base", "downside")
-    print("✓ both scenarios call the same four primitives in the fixed order; only the downside "
+    print(f"✓ both scenarios call the same {len(ORDER)} primitives in the fixed order; only the downside "
           "reads the governed stage table")
 
 
@@ -160,7 +163,7 @@ def test_a_failing_primitive_is_reported_and_the_rest_survive():
     c = _compose("base", err)
     assert c["figures"]["loss_concentration"]["status"] == "unavailable"
     print("✓ a primitive that raises or errors is marked unavailable in its own section and named "
-          "in the note; the other three are intact")
+          "in the note; the others are intact")
 
 
 # ------------------------------------------------------------ downside maths
@@ -185,30 +188,33 @@ def _expected_downside():
         if wr is None:
             unrated += arr
         else:
-            weighted += arr * (1 - wr)
-    f = ft["pipeline"]["incremental_arr"]
-    return {"forecast": f, "at_risk": total, "weighted": weighted, "unrated": unrated,
-            "worst": f - weighted, "floor": f - total}
+            weighted += arr * wr
+    cov = RAW["query_pipeline_coverage"]["stage_weighting"]["weighted_value"]
+    return {"at_risk": total, "weighted": weighted, "unrated": unrated, "after": cov - weighted}
 
 
-def test_worst_case_on_the_real_capture():
-    d = _compose("downside")["downside"]
+def test_downside_coverage_on_the_real_capture():
+    c = _compose("downside")
+    d, cov = c["downside"], c["figures"]["coverage"]
     e = _expected_downside()
     near = lambda a, b: abs(a - b) < 0.01
-    assert near(d["forecast_arr"], e["forecast"]), (d["forecast_arr"], e)
     assert near(d["at_risk_arr"], e["at_risk"]) and near(e["at_risk"], 567285.0), (d["at_risk_arr"], e)
-    assert near(d["weighted_expected_loss"], e["weighted"]), (d["weighted_expected_loss"], e)
-    assert near(d["unrated_at_risk_arr"], e["unrated"]) and near(e["unrated"], 130985.0), e
-    assert near(d["worst_case_arr"], e["worst"]) and near(d["floor_if_all_at_risk_lost"], e["floor"])
+    assert near(d["at_risk_weighted_arr"], e["weighted"]), (d["at_risk_weighted_arr"], e)
+    assert near(d["weighted_arr_if_lost"], e["after"])
+    assert near(d["coverage_of_remaining_if_lost"], e["after"] / cov["remaining_to_target"])
     assert d["at_risk_count"] == 9 and d["unrated_count"] == 4, d
+    for gone in ("worst_case_arr", "weighted_expected_loss", "floor_if_all_at_risk_lost", "forecast_arr"):
+        assert gone not in d, gone
     by = {x["company_name"]: x for x in d["at_risk_deals"]}
     assert by["Freie Presse"]["stage_order"] == 5 and abs(by["Freie Presse"]["stage_win_rate"] - 0.6505) < 1e-3
     assert by["Skyscanner"]["stage_order"] == 3
     assert by["Mistral"]["stage_win_rate"] is None and "Renewal" in by["Mistral"]["unrated_reason"]
     assert "query_stage_close_rate" in d["basis"] and "current stage" in d["basis"]
-    print(f"✓ downside on the real capture: forecast ${e['forecast']:,.0f} - weighted expected loss "
-          f"${e['weighted']:,.0f} = worst case ${e['worst']:,.0f}; ${e['unrated']:,.0f} of renewal "
-          f"at-risk ARR unrated (no governed rate); floor ${e['floor']:,.0f}")
+    assert d["line"].startswith("If the 9 high-risk forecast deals ($567,285) are lost, weighted coverage "
+                                f"falls from ${cov['weighted_arr']:,.0f} to ${e['after']:,.0f}"), d["line"]
+    print(f"✓ downside on the real capture: the 9 high-risk forecast deals carry ${e['weighted']:,.0f} "
+          f"of weighted pipeline; without them coverage is ${e['after']:,.0f}; ${e['unrated']:,.0f} of "
+          "renewal at-risk ARR carried no rate and takes nothing out; no worst-case or floor figure")
 
 
 def test_rate_is_keyed_by_current_stage_not_highest_stage_reached():
@@ -223,14 +229,13 @@ def test_rate_is_keyed_by_current_stage_not_highest_stage_reached():
 
 
 def test_renewal_deals_and_gated_rates_are_never_given_a_default_weight():
-    rows = copy.deepcopy(ROWS)
     rates = copy.deepcopy(RATES)
     rates["by_stage_order"]["3"]["win_rate"] = None          # Skyscanner's stage below min_evidence
-    d = qh.compose_from_results(copy.deepcopy(RAW), "downside", stage_rates=rates, deal_rows=rows)["downside"]
+    d = _compose("downside", rates=rates)["downside"]
     sky = next(x for x in d["at_risk_deals"] if x["company_name"] == "Skyscanner")
-    assert sky["stage_win_rate"] is None and sky["expected_loss"] is None and sky["unrated_reason"], sky
+    assert sky["stage_win_rate"] is None and sky["weighted_arr"] is None and sky["unrated_reason"], sky
     renewal = [x for x in d["at_risk_deals"] if x["pipeline_id"] == "866608541"]
-    assert len(renewal) == 4 and all(x["expected_loss"] is None for x in renewal), renewal
+    assert len(renewal) == 4 and all(x["weighted_arr"] is None for x in renewal), renewal
     assert d["unrated_count"] == 5
     print("✓ renewal-pipeline deals and a gated (null) stage rate stay unrated, never weighted "
           "at 0 or 1")
@@ -251,7 +256,7 @@ def test_forecast_risk_headline_is_dollar_shares_of_the_whole_forecast():
                                                    "not_assessed_arr": 225485.0}
     raw["query_forecast_trust"]["risk_summary"]["not_assessed"] = 6
     for scenario in qh.SCENARIOS:
-        note = qh.compose_from_results(raw, scenario, stage_rates=RATES, deal_rows=ROWS)["_synthesis_note"]
+        note = _compose(scenario, raw)["_synthesis_note"]
         assert "verbatim: \"" + line + "\"" in note and "share of risk-assessed deals" in note, note
     assert qh.forecast_risk_headline(_compose("base")["figures"]["forecast_trust"]) is None
     print("✓ forecast risk headline: '22% of the forecast ($436,300 of $1,946,176) is high risk; 12% "
@@ -266,19 +271,19 @@ def test_only_high_risk_forecast_deals_are_at_risk():
     raw = copy.deepcopy(RAW)
     low = next(d for d in raw["query_forecast_trust"]["assessed_deals"] if d["overall_label"] == "low_risk")
     low["overall_label"] = "moderate_risk"
-    d = qh.compose_from_results(raw, "downside", stage_rates=RATES, deal_rows=ROWS)["downside"]
+    d = _compose("downside", raw)["downside"]
     ids = {x["deal_id"] for x in d["at_risk_deals"]}
     assert low["deal_id"] not in ids and d["at_risk_count"] == 9, d["at_risk_count"]
     ft_hi = {x["deal_id"] for x in RAW["query_forecast_trust"]["assessed_deals"] if x["overall_label"] == "high_risk"}
     hp_hi = {x["deal_id"] for x in RAW["query_high_priority_deal_risk"]["assessed_deals"] if x["overall_label"] == "high_risk"}
     assert ids == ft_hi and hp_hi - ft_hi, "the two cohorts differ, and only the forecast one is used"
     assert d["moderate_risk_excluded_count"] == 2, d.get("moderate_risk_excluded_count")
-    assert "2 moderate_risk deals" in d["basis"] and "not subtracted" in d["basis"], d["basis"]
+    assert "2 moderate_risk deals" in d["basis"] and "not taken out" in d["basis"], d["basis"]
     real = _compose("downside")["downside"]          # the capture has one: Cochlear Ltd, 25 days past
     assert real["moderate_risk_excluded_count"] == 1 and "1 moderate_risk deal in" in real["basis"], real["basis"]
     assert "Cochlear" not in {x["company_name"] for x in real["at_risk_deals"]}
     print(f"✓ at-risk = the forecast cohort's high_risk deals only ({len(hp_hi - ft_hi)} late-stage "
-          "high-risk deals outside the forecast are not subtracted; moderate_risk is not at-risk, and "
+          "high-risk deals outside the forecast are not taken out; moderate_risk is not at-risk, and "
           "the basis says how many were left out)")
 
 

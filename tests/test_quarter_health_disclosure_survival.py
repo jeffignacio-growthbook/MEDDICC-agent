@@ -65,8 +65,17 @@ DISCLOSURE_KEY = re.compile(r"^(note|basis|risk_basis|_synthesis_note|coverage_o
                             r"reason|scope|period|caveat|text|.+_note)$")
 
 
-def collect_disclosures(raw):
-    """(primitive, path, text) for every disclosure-like string, any depth."""
+def _excluded(prim, path):
+    """Is this path under a key the composer leaves out of the verdict
+    (qh.VERDICT_EXCLUDED)? Those must NOT reach the model."""
+    return any(path == f"{prim}.{k}" or path.startswith(f"{prim}.{k}.") or path.startswith(f"{prim}.{k}[")
+               for k in qh.VERDICT_EXCLUDED.get(prim, ()))
+
+
+def collect_disclosures(raw, excluded=False):
+    """(primitive, path, text) for every disclosure-like string, any depth:
+    the ones that must reach the model, or (excluded=True) the ones under
+    qh.VERDICT_EXCLUDED that must not."""
     out = []
 
     def walk(o, prim, path):
@@ -82,10 +91,11 @@ def collect_disclosures(raw):
 
     for prim, result in raw.items():
         walk(result, prim, prim)
-    return out
+    return [d for d in out if _excluded(d[0], d[1]) == excluded]
 
 
 DISCLOSURES = collect_disclosures(RAW)
+EXCLUDED = collect_disclosures(RAW, excluded=True)
 
 
 def _present(text, haystack):
@@ -129,8 +139,7 @@ HEADLINE = {
 
 def test_the_collector_sees_the_known_disclosures():
     paths = {p for _, p, _ in DISCLOSURES}
-    for must in ("query_forecast_trust.note", "query_forecast_trust.risk_basis",
-                 "query_forecast_trust.calibration_evidence.note",
+    for must in ("query_forecast_trust.risk_basis",
                  "query_pipeline._synthesis_note", "query_pipeline.business_definition_note",
                  "query_pipeline.zero_arr_deals.note", "query_pipeline.meeting_set_unsized.note",
                  "query_high_priority_deal_risk.basis", "query_loss_concentration.note",
@@ -139,7 +148,10 @@ def test_the_collector_sees_the_known_disclosures():
                  "query_loss_concentration.period"):
         assert must in paths, must
     assert any(p.startswith("query_loss_concentration.by_rep[") for p in paths)
-    print(f"✓ collector: {len(DISCLOSURES)} disclosure strings across the 4 real primitive outputs")
+    assert {p for _, p, _ in EXCLUDED} == {"query_forecast_trust.note",
+                                          "query_forecast_trust.calibration_evidence.note"}, EXCLUDED
+    print(f"✓ collector: {len(DISCLOSURES)} disclosure strings across the 4 real primitive outputs, "
+          "plus the 2 left out of the verdict (the historical cohort's note and calibration evidence)")
 
 
 def _check_survival(scenario, raw=None):
@@ -150,6 +162,9 @@ def _check_survival(scenario, raw=None):
     missing = [(name, prim, path) for name, text in inputs.items()
                for prim, path, s in DISCLOSURES if not _present(s, text)]
     assert not missing, f"{len(missing)} disclosures dropped, e.g. {missing[:5]}"
+    leaked = [(name, path) for name, text in inputs.items()
+              for _, path, s in EXCLUDED if _present(s, text)]
+    assert not leaked, f"left-out-of-verdict text reached the model: {leaked}"
     for label, needle in HEADLINE.items():
         for name, text in inputs.items():
             assert needle in text, (scenario, label, name)
