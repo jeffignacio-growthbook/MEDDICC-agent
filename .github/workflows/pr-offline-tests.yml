@@ -118,6 +118,7 @@ jobs:
             tests/test_rep_scorecard.py \
             tests/test_metric_reconciliation.py \
             tests/test_rate_mix_decomposition.py \
+            tests/test_deal_close_reasons.py \
             tests/test_strict_supabase.py \
             tests/test_filter_table_refuses_unknown_filter_columns.py \
             tests/test_aggregation_verification.py \

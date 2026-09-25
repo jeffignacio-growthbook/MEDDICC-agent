@@ -50,6 +50,24 @@ deals:
   hubspot: closed_lost_reason
   label: Closed Lost Reason
   type: text
+- column: closed_lost_from
+  description: The pipeline stage the deal was in immediately before it moved to Closed
+    Lost (e.g. "Meeting Set", "Scoping"). Empty for won/active deals.
+  hubspot: closed_lost_from
+  label: Closed Lost From
+  type: text
+- column: dq_reason
+  description: Disqualification reason (e.g. "Pro deal"), set when a deal is disqualified.
+    Empty when not disqualified.
+  hubspot: dq_reason
+  label: DQ Reason
+  type: text
+- column: closed_won_reason
+  description: Reason a deal was won — the won-side counterpart to lost_reason. Empty
+    for lost/active deals.
+  hubspot: closed_won_reason
+  label: Closed Won Reason
+  type: text
 - column: close_date
   description: Date the deal was closed. This property is set automatically by HubSpot.
   hubspot: closedate

@@ -254,6 +254,13 @@ class SupabaseWriter:
             row['deal_value'] = _safe_numeric(deal['deal_value'])
         if 'lost_reason' in deal:
             row['lost_reason'] = deal.get('lost_reason')
+        # Close-reason enrichment columns (migration 073, 2026-09-25)
+        if 'closed_lost_from' in deal:
+            row['closed_lost_from'] = deal.get('closed_lost_from')
+        if 'dq_reason' in deal:
+            row['dq_reason'] = deal.get('dq_reason')
+        if 'closed_won_reason' in deal:
+            row['closed_won_reason'] = deal.get('closed_won_reason')
         if 'stage_source' in deal:
             row['stage_source'] = deal['stage_source']
         if 'create_date' in deal:
