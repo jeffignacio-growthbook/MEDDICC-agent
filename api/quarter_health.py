@@ -348,6 +348,11 @@ def downside_worst_case(forecast_trust: dict, stage_rates: dict, deal_rows: list
         deals.append(item)
 
     unrated = [x for x in deals if x["expected_loss"] is None]
+    moderate = sum(1 for d in (forecast_trust.get("assessed_deals") or [])
+                   if d.get("overall_label") == "moderate_risk")
+    mod_line = (f"Only high_risk deals are subtracted: {moderate} moderate_risk deal"
+                f"{'' if moderate == 1 else 's'} in the forecast cohort (0-30 days past the cycle "
+                "benchmark) not subtracted, and low_risk and insufficient_data deals are not either. ")
     listed = sorted(deals, key=lambda x: -(x["incremental_arr"] or 0))[:AT_RISK_KEEP]
     for x in listed:
         x.pop("stage", None)
@@ -361,6 +366,7 @@ def downside_worst_case(forecast_trust: dict, stage_rates: dict, deal_rows: list
         "worst_case_arr": (forecast - weighted) if forecast is not None else None,
         "unrated_count": len(unrated),
         "unrated_at_risk_arr": unrated_arr,
+        "moderate_risk_excluded_count": moderate,
         "floor_if_all_at_risk_lost": (forecast - total) if forecast is not None else None,
         "at_risk_deals": listed,
         **({"at_risk_deals_omitted": f"{len(deals) - len(listed)} smaller at-risk deals not listed; "
@@ -373,7 +379,8 @@ def downside_worst_case(forecast_trust: dict, stage_rates: dict, deal_rows: list
             "from the governed stage close-rate table query_stage_close_rate() (won / (won + lost + "
             f"slipped) within the quarter, pooled over {(stage_rates or {}).get('quarters_analyzed')} "
             "complete quarters, New+Expansion only; the table query_pipeline_coverage weights with). "
-            "Looked up by the deal's current stage order on the Sales pipeline. Deals with no governed "
+            "Looked up by the deal's current stage order on the Sales pipeline. " + mod_line
+            + "Deals with no governed "
             "rate (Renewal pipeline, which the table excludes, or a stage below min_evidence_count) are "
             "listed as unrated and left out of the weighted figure, never given a default weight; "
             "floor_if_all_at_risk_lost assumes every at-risk deal is lost. The stage rate is the "
