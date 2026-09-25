@@ -32,9 +32,10 @@ Structure of the read (2026-09-25 reframe):
 Left out of the verdict (VERDICT_EXCLUDED, dropped before anything is
 lifted): forecast_trust's historical same-week win rate (the "91 deals,
 prior quarters" cohort) with its note and calibration evidence, until that
-population is fully specified and verified; and query_pipeline_coverage's
+population is fully specified and verified; query_pipeline_coverage's
 HEURISTIC proxy curve and quota-plus-stretch goal, which would compete with
-the remaining-gap figure.
+the remaining-gap figure; and query_pipeline's standalone synthesis note,
+which states the unweighted coverage ratio ("COVERAGE: 3.38x").
 
 It invents no score. Each primitive's own figures go to synthesis as that
 primitive returned them, and every basis statement it disclosed (outside
@@ -75,6 +76,11 @@ VERDICT_EXCLUDED = {
     "query_forecast_trust": ("historical", "calibration_evidence", "note", "stability",
                              "directional_caveat"),
     "query_pipeline_coverage": ("historical_heuristic_curve", "gap_to_goal", "real_target", "note"),
+    # Written for a standalone pipeline answer: "COVERAGE: 3.38x" (the
+    # unweighted ratio this view drops) and stage-breakdown/top-deal rules.
+    # Its definitional rule (the total is current state, not this quarter's)
+    # is in business_definition_note and the composer's own note.
+    "query_pipeline": ("_synthesis_note",),
 }
 SALES_PIPELINE = "default"
 RENEWAL_PIPELINE = "866608541"

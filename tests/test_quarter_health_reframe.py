@@ -112,6 +112,27 @@ def test_competing_and_unverified_figures_are_left_out():
           "worst-case figure")
 
 
+def test_no_unweighted_coverage_figure_reaches_the_model():
+    """query_pipeline's own _synthesis_note is written for a standalone
+    pipeline answer: "COVERAGE: 3.38x, always against the FY2027 Q3
+    figure", plus stage-breakdown and top-deal formatting rules. Lifted
+    verbatim, it put the unweighted ratio back in front of the model in an
+    answer whose only coverage figure is the weighted one. It is left out of
+    the verdict; the definition it carries (the total is current state, not
+    this quarter's) is in business_definition_note and in the composer note."""
+    ratio = qi.RAW["query_pipeline"]["coverage_ratio"]
+    assert "COVERAGE: 3.38x" in qi.RAW["query_pipeline"]["_synthesis_note"]
+    for scenario in qh.SCENARIOS:
+        c = qi.compose(scenario)
+        for name, text in surv._model_inputs(c, scenario).items():
+            for needle in ("3.38x", repr(ratio), f"{ratio:.2f}x", "COVERAGE: "):
+                assert needle not in text, (scenario, name, needle)
+            assert "current state, not" in text, (scenario, name)
+        assert "_synthesis_note" in c["primitives"]["query_pipeline"]["_left_out_of_verdict"]
+    print("✓ no unweighted coverage ratio (3.38x) anywhere in the model inputs; the pipeline "
+          "total's current-state rule still reaches the model")
+
+
 def test_unavailable_inputs_are_stated():
     c = qi.compose("base", seasonality={"status": "insufficient_data", "reason": "only 2 quarters"})
     assert c["figures"]["pace"]["seasonality_line"].startswith("No seasonality read (only 2 quarters)")
@@ -133,5 +154,6 @@ if __name__ == "__main__":
     test_pace_and_coverage_figures()
     test_note_is_three_steps_with_modifiers_last()
     test_competing_and_unverified_figures_are_left_out()
+    test_no_unweighted_coverage_figure_reaches_the_model()
     test_unavailable_inputs_are_stated()
     print("\n✅ All tests passed")
