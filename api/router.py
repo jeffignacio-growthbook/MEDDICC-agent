@@ -6970,6 +6970,14 @@ def _smart_truncate_for_synthesis(tool_results: dict, char_limit: int = 20000) -
     if len(full_json) <= char_limit:
         return full_json
 
+    # Same content without indentation (a fifth or more of a nested payload)
+    # before capping or cutting anything: whitespace is never worth data.
+    compact_json = json.dumps(tool_results, default=str)
+    if len(compact_json) <= char_limit:
+        logger.info(f"[TRUNCATE] Sent compact JSON ({len(full_json)} → {len(compact_json)} chars), "
+                    f"nothing capped or cut")
+        return compact_json
+
     # Oversized - need to cap. Check if we have high-value computed results
     has_preserved = any(key in tool_results for key in PRESERVE_KEYS)
 
