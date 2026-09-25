@@ -46,6 +46,23 @@ SEGMENT_CYCLE_BENCHMARKS = {
 }
 
 MEDDICC_STALENESS_DAYS = 14  # Scores older than this are flagged as stale
+HIGH_RISK_DAYS_PAST = 30     # > this many days past the benchmark = high_risk
+
+
+def risk_basis() -> str:
+    """The method behind overall_label, returned with every result so an
+    answer (or a composed answer) states it instead of relaying bare
+    counts. Built from the constants _classify_risk uses."""
+    bench = ", ".join(f"{seg} {days}" for seg, days in SEGMENT_CYCLE_BENCHMARKS.items())
+    return (
+        "Risk label is cycle-length only: days open vs. the deal's segment 75th percentile "
+        f"sales cycle from historical closed-won deals ({bench} days). high_risk = more than "
+        f"{HIGH_RISK_DAYS_PAST} days past it, moderate_risk = 0-{HIGH_RISK_DAYS_PAST} days past, "
+        "low_risk = within it, insufficient_data = no benchmark for the segment. MEDDICC is "
+        "shown for context only and not weighted (p=0.80, not distinguishable from zero); "
+        f"a score older than {MEDDICC_STALENESS_DAYS} days is marked stale. The label is not "
+        "a probability."
+    )
 
 # Late-stage stage IDs (from config/field_semantics.yaml)
 LATE_STAGE_IDS = ['24682892', '43449439']  # Negotiating, Awaiting Signature
@@ -99,6 +116,7 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
     if not deals:
         return {
             "assessed_deals": [],
+            "basis": risk_basis(),
             "summary": {
                 "total_assessed": 0,
                 "high_risk": 0,
@@ -236,6 +254,7 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
 
     return {
         "assessed_deals": assessed,
+        "basis": risk_basis(),
         "summary": summary
     }
 
@@ -384,7 +403,7 @@ def _classify_risk(
         return "insufficient_data"
 
     # High risk: significantly overdue (>30 days past benchmark)
-    if days_past_benchmark > 30:
+    if days_past_benchmark > HIGH_RISK_DAYS_PAST:
         return "high_risk"
 
     # Moderate risk: moderately overdue (0-30 days past benchmark)

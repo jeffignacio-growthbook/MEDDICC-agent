@@ -225,6 +225,7 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
             "excluded_no_incremental_arr": len(fetched) - len(deals),
         },
         "risk_summary": summary,
+        "risk_basis": risk_result.get("basis"),
         "high_risk_count": high_risk_count,
         "high_risk_fraction": high_risk_fraction,
         "historical": {
