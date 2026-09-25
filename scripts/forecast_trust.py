@@ -182,6 +182,24 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
 
     total_incremental_arr = sum(incremental_arr(d) for d in deals)
 
+    # The dollar read of the risk labels, as shares of the WHOLE forecast (the
+    # number a reader cares about): a deal-count fraction over assessed deals
+    # alone reads as "a third of the forecast is shaky" when it isn't.
+    arr_by_id = {str(d.get("deal_id")): incremental_arr(d) for d in deals}
+    high_risk_arr = sum(arr_by_id.get(str(d.get("deal_id")), 0) for d in assessed
+                        if d.get("overall_label") == "high_risk")
+    not_assessed_arr = sum(arr_by_id.get(str(d.get("deal_id")), 0)
+                           for d in risk_result.get("not_assessed_deals", []))
+    risk_dollars = {
+        "forecast_arr": total_incremental_arr,
+        "high_risk_arr": high_risk_arr,
+        "high_risk_share_of_forecast": (high_risk_arr / total_incremental_arr) if total_incremental_arr else None,
+        "not_assessed_arr": not_assessed_arr,
+        "not_assessed_share_of_forecast": (not_assessed_arr / total_incremental_arr) if total_incremental_arr else None,
+        "note": ("Shares are of the whole forecast's incremental ARR: high-risk deals' ARR, and "
+                 "the ARR of deals with no risk read (Renewal pipeline, not assessed)."),
+    }
+
     calib = query_commit_ml_calibration_by_week(sb)
     by_week = calib.get("by_week", {})
     current_week_row = by_week.get(current_week, {})
@@ -230,6 +248,7 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
                               "note": risk_result.get("not_assessed_note")},
         "high_risk_count": high_risk_count,
         "high_risk_fraction": high_risk_fraction,
+        "risk_dollars": risk_dollars,
         "historical": {
             "week": current_week,
             "win_rate": current_week_row.get("win_rate"),
