@@ -5,28 +5,22 @@
 
 ---
 
-## 🔴 DATA BUG (confirmed 2026-09-25): `deals.lost_reason` is empty because the ETL never fetches it — not because HubSpot lacks it
+## ✅ FIXED 2026-09-25: `deals.lost_reason` was empty because the ETL never fetched it — not because HubSpot lacked it
 
-**What's true now:** HubSpot's `closed_lost_reason` deal property is **100% populated** on this quarter's closed-lost deals (50/50 default-pipeline Closed Lost in FY2027 Q3, checked directly via the HubSpot API; 11/11 on the deals in the Sept-25 Christian/Enterprise loss investigation). In Supabase, `deals.lost_reason` is **0% populated** (0 of 111 closed-lost this quarter). The data existed the whole time.
+**The bug:** HubSpot's `closed_lost_reason` was populated (100% of the recent quarter's closed-lost, ~44% fleet-wide over all history) but Supabase `deals.lost_reason` read 0% populated. Root cause was a fetch/consume gap: `DEAL_SYNC_PROPERTIES` never requested `closed_lost_reason`, and `etl_deals.py` did `props.get('closed_lost_reason', '')` on a property the fetch never asked for — `.get`'s default silently turned "never fetched" into "confirmed empty", no error. Same failure shape as `filter_table` dropping a filtered-on column and `highest_stage_order_reached` answering a different question than asked; distinct from `call_quality`, which was genuinely dead — this was live data swallowed by plumbing. The false "BLOCKED by a hard data ceiling" claim in `loss_concentration.py`'s docstring went unquestioned through three separate loss investigations before a direct HubSpot read disproved it.
 
-**Root cause — a fetch/consume gap, not a CRM gap:**
-- `scripts/hubspot_deals.py` `DEAL_SYNC_PROPERTIES` (the exact property list requested from HubSpot) **does not include** `closed_lost_reason` (nor `closed_lost_from`, `dq_reason`, `closed_won_reason`).
-- `scripts/etl_deals.py:913` then does `deal_dict['lost_reason'] = props.get('closed_lost_reason', '')` — reading a property the fetch never asked for. `.get(..., '')` silently turns "never fetched" into "confirmed empty": no error, no warning, nothing distinguishing "HubSpot has no answer" from "we never asked."
+**The fix (shipped):**
+- `DEAL_SYNC_PROPERTIES` now requests `closed_lost_reason`, `closed_lost_from`, `dq_reason`, `closed_won_reason`; `etl_deals.py` maps all four; `upsert_deal` persists them; migration 073 added + registered the three new columns. `tests/test_deal_close_reasons.py` (5/5 planted bugs) pins it, including the regression that would have caught the original fetch omission.
+- **Fleet backfill run 2026-09-25** (via HubSpot API → Supabase): `deals.lost_reason` 515/1163 lost filled (44% — the true fill of what HubSpot holds; recent-quarter qualified 50/50 = 100%); `closed_won_reason` 268, `closed_lost_from` 778. `win_loss_narratives.stated_reason` targeted-backfilled from `deals.lost_reason` (33 filled, **0 mismatches** — they track exactly; a plain `generate_win_loss.py` re-run would NOT have touched them because it skips deals that already have a narrative row). `competitor_mentioned` unchanged at 1 (that ~1.7% IS a genuine ceiling).
+- `loss_concentration.py`'s docstring corrected: stated-reason analysis is buildable; the `[CORRECTION 2026-09-25]` flag is removed.
 
-**This is the session's recurring failure shape** (a downstream consumer trusting an upstream supply it never verified, absence read as a fact about the world instead of a fact about the code): same class as `filter_table` dropping a filtered-on column, and `highest_stage_order_reached` silently answering a different question than the one asked. Distinct from `call_quality`, which was genuinely dead — this one was live data swallowed by plumbing.
+**Still worth doing:**
+- **Revisit prior "loss reason blank" conclusions** now that the data exists: the compound-synthesis rep-context work, the earlier "cleanup" check, and the Sept-25 Christian/Paradigm stage-hygiene thread (the real reasons settle it outright — Paradigm = *"Not a good fit (FF only)"*, a fit loss, not a mislogged live negotiation).
+- **Going forward:** every "this field/table is empty" claim deserves a first-principles check of the fetch path before it's trusted, not just a Supabase query.
 
-**FALSE CLAIM TO STRIKE ONCE FIXED:** `scripts/loss_concentration.py`'s module docstring asserts competitor/stated-reason pattern reasoning is *"BLOCKED by a hard data ceiling (deals.lost_reason 0% populated fleet-wide) … not buildable regardless of primitive design."* **That "hard data ceiling" is false** — it is this ETL omission, not a CRM gap. The claim was stated as a structural fact and never checked against HubSpot; it went unquestioned through three separate loss investigations on 2026-09-25 before a direct HubSpot property read disproved it. The docstring carries a `[CORRECTION 2026-09-25]` flag pointing here until the fix lands.
+### 🔵 ROADMAP (now unblocked, not built): loss-reason pattern analysis primitive (logged 2026-09-25)
 
-**Every prior "loss reason is blank" conclusion rests on this bug and must be revisited once backfilled:** the compound-synthesis rep-context work, the earlier "cleanup" check ("loss_reason blank across the whole team"), and the entire Sept-25 Christian/Paradigm stage-hygiene thread (which the real reasons settle outright — e.g. Paradigm = *"Not a good fit (FF only)"*, a fit loss, not a mislogged live negotiation).
-
-**Fix (deferred — real production write-path work, its own PR after PR #69 merges):**
-1. Add `closed_lost_reason`, `closed_lost_from`, `dq_reason`, `closed_won_reason` to `DEAL_SYNC_PROPERTIES`; map them in `etl_deals.py` (add/confirm Supabase columns for the new ones).
-2. Backfill, then verify against the same 11 deals **and** a fleet-wide re-check (expect 50/50 → populated, not just the sample).
-3. Strike the `loss_concentration.py` "hard data ceiling" docstring claim and this flag.
-4. Re-scope whether loss-reason pattern analysis (competitor / budget / fit / unresponsive buckets) is now a real buildable primitive.
-5. **Confirm separately, do not assume:** `win_loss_narratives.stated_reason` is also 0% populated — check its own fetch/generation path directly before concluding it shares this root cause; it's a different table and could be a different kind of empty.
-
-**Going forward:** every "this field/table is empty" claim in this codebase deserves a first-principles check of the fetch path before it's trusted, not just a query against Supabase.
+With `deals.lost_reason` / `win_loss_narratives.stated_reason` now populated (see the FIXED entry above), bucketing losses by stated reason — competitor / budget / fit ("not a good fit") / unresponsive-or-ghosted / on-hold / disqualified — is a real, buildable primitive for the first time. Recent-quarter closed-lost has ~100% coverage; fleet-wide ~44% (older deals predate the field, so bucket rates should be reported over the deals that HAVE a reason, with the coverage stated, never as a fleet-wide rate off a partial denominator). Deliberately NOT built in the backfill PR — its own scoping pass.
 
 ## ⚠️ Standing caveat: `learning_log` is not evidence that a handler worked (2026-09-23)
 
