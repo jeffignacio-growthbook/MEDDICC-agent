@@ -38,7 +38,7 @@ import api.quarter_health as qh  # noqa: E402
 from api.plausibility import run_all_checks  # noqa: E402
 
 FIXTURE = json.loads((REPO / "tests" / "fixtures" / "quarter_health_primitives_2026_09_25.json").read_text())
-RAW = {k: FIXTURE[k] for k in qh.PRIMITIVE_ORDER}
+RAW = {k: FIXTURE[k] for k in qh.PRIMITIVE_ORDER if k in FIXTURE}
 LIVE_EIGHT = {"Bike24", "Freie Presse", "facile.it", "knowunity.ai", "Mistral", "Taxfix",
               "Derive", "Trade Me"}
 

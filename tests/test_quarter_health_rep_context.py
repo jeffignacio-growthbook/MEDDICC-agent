@@ -48,12 +48,12 @@ import api.router as router  # noqa: E402
 from api.plausibility import run_all_checks  # noqa: E402
 from forecast_trust import forecast_by_owner  # noqa: E402
 from strict_supabase import StrictSupabase  # noqa: E402
-import test_quarter_health_qtd_and_wording as base  # noqa: E402
 import test_quarter_health_disclosure_survival as surv  # noqa: E402
 
 COHORT = json.loads((REPO / "tests" / "fixtures" / "forecast_cohort_owners_2026_09_25.json").read_text())
-RAW = copy.deepcopy(base.RAW)
-RAW["query_forecast_trust"]["by_owner"] = forecast_by_owner(COHORT["deals"])
+import quarter_health_inputs as qi  # noqa: E402
+
+RAW = qi.RAW          # the full live set; forecast_trust.by_owner from COHORT (checked below)
 
 REAL_LINES = [
     "christian@growthbook.io: 14/14 qualified closed lost (100.0% loss rate), 22.2 pts above the "
@@ -77,7 +77,7 @@ REAL_LINES = [
 
 
 def _compose(scenario, raw=None):
-    return base._compose(scenario, raw or RAW)
+    return qi.compose(scenario, raw)
 
 
 def test_forecast_by_owner_on_the_live_cohort():
@@ -129,7 +129,7 @@ def test_every_rep_row_carries_its_live_figures():
 def test_note_asks_for_losses_with_live_context():
     for scenario in qh.SCENARIOS:
         note = _compose(scenario)["_synthesis_note"]
-        assert "REPS: never give a rep's loss rate on its own" in note, note
+        assert "Reps: never give a rep's loss rate on its own" in note, note
         assert "figures.loss_concentration.rep_context" in note
     print("✓ the synthesis note: never a rep's loss rate on its own, always with its live figures")
 

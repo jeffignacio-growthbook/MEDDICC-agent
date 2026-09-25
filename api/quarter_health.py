@@ -2,38 +2,44 @@
 Quarter health: one composer behind "are we in good shape this quarter?"
 and its downside mirror.
 
-compose_quarter_health() calls four existing primitives in a fixed order,
+compose_quarter_health() calls five existing primitives in a fixed order,
 the same for both scenarios:
 
-    query_forecast_trust            how much to trust COMMIT+MOST_LIKELY
-    query_pipeline                  current pipeline, plus this quarter's slice
+    query_forecast_trust            COMMIT+MOST_LIKELY forecast and its risk read
+    query_pipeline                  current pipeline, the quarter's target
+    query_pipeline_coverage         qualified pipeline weighted by current-stage rate
     query_high_priority_deal_risk   late-stage/COMMIT deals past their cycle
-    query_loss_concentration        where this quarter's losses sit
+    query_loss_concentration        this quarter's losses and wins
+
+plus one read of its own, bookings seasonality (scripts/bookings_seasonality.py).
+
+Structure of the read (2026-09-25 reframe):
+  1. Where the quarter stands: closed won QTD against target (QTD line) and
+     pace: share of the quarter gone vs share of target won, with this
+     business's own seasonality beside it (bookings are back-loaded and
+     uneven here, so pace is never called ahead or behind on its own).
+  2. The primary forward-looking figure: weighted remaining-gap coverage.
+     query_pipeline_coverage's qualified Sales pipeline closing this
+     quarter, each deal weighted by its current stage's governed close rate
+     (query_stage_close_rate), against what is still needed (target minus
+     closed won). The downside scenario gives the same figure with the
+     forecast's high-risk deals removed. No flat historical rate is applied
+     to anything.
+  3. Modifiers on how far to trust that coverage, not verdict lines of
+     their own: the forecast risk read (dollar shares), the qualified loss
+     rate, and each rep's loss row with what they still have live.
+
+Left out of the verdict (VERDICT_EXCLUDED, dropped before anything is
+lifted): forecast_trust's historical same-week win rate (the "91 deals,
+prior quarters" cohort) with its note and calibration evidence, until that
+population is fully specified and verified; and query_pipeline_coverage's
+HEURISTIC proxy curve and quota-plus-stretch goal, which would compete with
+the remaining-gap figure.
 
 It invents no score. Each primitive's own figures go to synthesis as that
-primitive returned them, and every basis statement it disclosed is lifted,
-verbatim, into `disclosed_bases` at the top of the result, ahead of
-anything a character cut could reach. The synthesis note asks for a
-plain-language verdict grounded in the four figures and forbids combining
-them: they measure different populations.
-
-Three lines are built here and required verbatim in the synthesis note:
-  - quarter to date: closed-won incremental ARR (query_loss_concentration's
-    won_incremental_arr, over the same rows its won_count counts: no fifth
-    query) against query_pipeline's quarterly_target (rep_targets), the
-    remaining gap, weeks left (query_pipeline's this_quarter end), and the
-    gap as a share of query_forecast_trust's forecast;
-  - the loss-rate headline (query_loss_concentration's loss_rate_headline:
-    qualified rate first, all-closed rate beside it);
-  - the forecast baseline in plain words (forecast_baseline_sentence).
-
-Besides the QTD gap and its share of the forecast, the only calculation is
-the downside scenario's worst case:
-    forecast_arr - sum(high-risk forecast deal incremental ARR
-                       x (1 - its current stage's win rate))
-with the win rate from the governed table query_stage_close_rate() (the
-one query_pipeline_coverage weights with), never a new estimate. See
-downside_worst_case().
+primitive returned them, and every basis statement it disclosed (outside
+VERDICT_EXCLUDED) is lifted, verbatim, into `disclosed_bases` at the top of
+the result, ahead of anything a character cut could reach.
 
 Result layout, in this order (order matters: the classifier path's
 last-resort cut takes the end):
@@ -58,8 +64,18 @@ SCENARIOS = ("base", "downside")
 # Handler names the two thin routed entry points will register under (both
 # must go in api.evaluator.STRUCTURED_HANDLERS; see the survival test).
 ENTRY_POINTS = {"base": "query_quarter_health", "downside": "query_quarter_downside"}
-PRIMITIVE_ORDER = ("query_forecast_trust", "query_pipeline",
+PRIMITIVE_ORDER = ("query_forecast_trust", "query_pipeline", "query_pipeline_coverage",
                    "query_high_priority_deal_risk", "query_loss_concentration")
+# Dropped from the composed view before lifting, so neither the figures nor
+# their notes reach synthesis. forecast_trust's same-week historical win rate
+# ("91 deals, prior quarters") led to three wrong conclusions on 2026-09-25
+# and its population is not yet fully specified; the coverage primitive's
+# proxy curve and quota+stretch goal compete with the remaining-gap figure.
+VERDICT_EXCLUDED = {
+    "query_forecast_trust": ("historical", "calibration_evidence", "note", "stability",
+                             "directional_caveat"),
+    "query_pipeline_coverage": ("historical_heuristic_curve", "gap_to_goal", "real_target", "note"),
+}
 SALES_PIPELINE = "default"
 RENEWAL_PIPELINE = "866608541"
 
@@ -73,7 +89,7 @@ DETAIL_LISTS = {
     "query_pipeline": ("deals", "zero_arr_deals.deals"),
 }
 # Breakdowns dropped from the composed view (not needed for a quarter verdict).
-DROP_KEYS = {"query_pipeline": ("by_owner", "by_stage")}
+DROP_KEYS = {"query_pipeline": ("by_owner", "by_stage", "coverage_ratio")}
 # Row lists whose rows are reduced to the primitive's own rendered line,
 # which already states every number in the row.
 TEXT_ROWS = {"query_loss_concentration": ("by_rep", "by_segment")}
@@ -101,7 +117,7 @@ FRAMES = {
 # ----------------------------------------------------------------- compose
 
 async def compose_quarter_health(sb, params: dict = None, scenario: str = "base") -> dict:
-    """Call the four primitives in PRIMITIVE_ORDER and compose. A primitive
+    """Call the primitives in PRIMITIVE_ORDER and compose. A primitive
     that raises is reported unavailable in its own section; the rest go on."""
     if scenario not in SCENARIOS:
         raise ValueError(f"unknown scenario {scenario!r}")
@@ -117,7 +133,15 @@ async def compose_quarter_health(sb, params: dict = None, scenario: str = "base"
     stage_rates = deal_rows = None
     if scenario == "downside":
         stage_rates, deal_rows = _downside_inputs(sb, results.get("query_forecast_trust") or {})
-    return compose_from_results(results, scenario, stage_rates=stage_rates, deal_rows=deal_rows)
+    as_of = _today()
+    try:
+        from bookings_seasonality import assess_bookings_seasonality
+        seasonality = assess_bookings_seasonality(sb, as_of=as_of)
+    except Exception as e:
+        logger.error(f"[QUARTER_HEALTH] bookings seasonality failed: {e}")
+        seasonality = {"status": "error", "error": str(e)}
+    return compose_from_results(results, scenario, stage_rates=stage_rates, deal_rows=deal_rows,
+                                as_of=as_of, seasonality=seasonality)
 
 
 def _today() -> date:
@@ -145,9 +169,11 @@ def _downside_inputs(sb, forecast_trust: dict):
 
 
 def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
-                         deal_rows: list = None, as_of: date = None) -> dict:
-    """Pure composition over the four primitive results (keyed by name).
-    as_of (default: today in the reporting timezone) only sets weeks left."""
+                         deal_rows: list = None, as_of: date = None,
+                         seasonality: dict = None) -> dict:
+    """Pure composition over the primitive results (keyed by name). as_of
+    (default: today in the reporting timezone) sets days elapsed and weeks
+    left; seasonality is assess_bookings_seasonality()'s result."""
     if scenario not in SCENARIOS:
         raise ValueError(f"unknown scenario {scenario!r}")
     bases, primitives = [], {}
@@ -155,7 +181,7 @@ def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
         res = results.get(name)
         if not isinstance(res, dict):
             res = {"status": "error", "error": f"{name} returned nothing"}
-        primitives[name] = _slim(name, _lift(name, copy.deepcopy(res), bases))
+        primitives[name] = _slim(name, _lift(name, _exclude(name, copy.deepcopy(res)), bases))
 
     figures = {
         "forecast_trust": _forecast_figures(results.get("query_forecast_trust")),
@@ -167,9 +193,14 @@ def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
                       results.get("query_pipeline"))
     if ctx and figures["loss_concentration"].get("status") == "ok":
         figures["loss_concentration"].update(ctx)
+    as_of = as_of or _today()
     figures["quarter_to_date"] = _qtd_figures(results.get("query_loss_concentration"),
                                               results.get("query_pipeline"),
-                                              figures["forecast_trust"], as_of or _today())
+                                              figures["forecast_trust"], as_of)
+    figures["pace"] = pace_figures(figures["quarter_to_date"], results.get("query_pipeline"),
+                                   seasonality, as_of)
+    figures["coverage"] = coverage_figures(results.get("query_pipeline_coverage"),
+                                           figures["quarter_to_date"])
     quarter = (figures["forecast_trust"].get("fiscal_quarter")
                or figures["loss_concentration"].get("period") or "this quarter")
 
@@ -182,16 +213,26 @@ def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
         "figures": figures,
     }
     if scenario == "downside":
-        out["downside"] = downside_worst_case(results.get("query_forecast_trust") or {},
-                                              stage_rates or {}, deal_rows or [])
+        out["downside"] = downside_coverage(results.get("query_forecast_trust") or {},
+                                            stage_rates or {}, deal_rows or [], figures["coverage"])
     out["primitives"] = primitives
     loss = results.get("query_loss_concentration")
     out["_synthesis_note"] = _note(scenario, quarter, figures,
-                                   loss.get("loss_rate_headline") if isinstance(loss, dict) else None)
+                                   loss.get("loss_rate_headline") if isinstance(loss, dict) else None,
+                                   (out.get("downside") or {}).get("line"))
     return out
 
 
 # ------------------------------------------------------------------ lifting
+
+def _exclude(prim: str, res):
+    """Drop VERDICT_EXCLUDED keys before anything is lifted from them."""
+    if isinstance(res, dict):
+        dropped = [k for k in VERDICT_EXCLUDED.get(prim, ()) if res.pop(k, None) is not None]
+        if dropped:
+            res["_left_out_of_verdict"] = dropped
+    return res
+
 
 def _lift(prim: str, obj, bases: list, path: str = ""):
     """Move every disclosure string into `bases` (verbatim), leaving a
@@ -241,6 +282,11 @@ def _slim(prim: str, res: dict) -> dict:
         na = holder.pop(key)
         holder["not_assessed_companies"] = [d.get("company_name") for d in na[:HIGH_RISK_KEEP]]
         holder["not_assessed_count"] = len(na)
+    sw = res.get("stage_weighting") if prim == "query_pipeline_coverage" else None
+    if isinstance(sw, dict) and isinstance(sw.get("by_stage_order"), dict):
+        sw["win_rate_by_stage_order"] = {
+            k: (round(v["win_rate"], 4) if isinstance(v, dict) and v.get("win_rate") is not None else None)
+            for k, v in sw.pop("by_stage_order").items()}
     omitted = {}
     for dotted in DETAIL_LISTS.get(prim, ()):
         *parents, key = dotted.split(".")
@@ -303,7 +349,7 @@ def _forecast_figures(res):
                 "fiscal_quarter": res.get("fiscal_quarter"), "current_week": res.get("current_week")}
     p = res.get("pipeline") or {}
     return {"status": "ok", "fiscal_quarter": res.get("fiscal_quarter"),
-            "current_week": res.get("current_week"), "stability": res.get("stability"),
+            "current_week": res.get("current_week"),
             "forecast_arr": p.get("incremental_arr"), "forecast_deal_count": p.get("deal_count"),
             "high_risk_count": res.get("high_risk_count"),
             "high_risk_fraction": res.get("high_risk_fraction"),
@@ -312,9 +358,7 @@ def _forecast_figures(res):
             "not_assessed_deal_count": (res.get("risk_summary") or {}).get("not_assessed"),
             **{k: (res.get("risk_dollars") or {}).get(k)
                for k in ("high_risk_arr", "high_risk_share_of_forecast", "not_assessed_arr",
-                         "not_assessed_share_of_forecast") if res.get("risk_dollars")},
-            "historical_win_rate_same_week": (res.get("historical") or {}).get("win_rate"),
-            "historical_n": (res.get("historical") or {}).get("n")}
+                         "not_assessed_share_of_forecast") if res.get("risk_dollars")}}
 
 
 def _pipeline_figures(res):
@@ -322,7 +366,7 @@ def _pipeline_figures(res):
     if bad:
         return bad
     keys = ("total_pipeline", "total_deals", "q3_scoped_pipeline", "q3_scoped_deals",
-            "quarterly_target", "coverage_ratio", "this_quarter")
+            "quarterly_target", "this_quarter")
     return {"status": "ok", **{k: res.get(k) for k in keys if k in res}}
 
 
@@ -444,36 +488,129 @@ def _sales_stage_orders():
     return {}
 
 
-def downside_worst_case(forecast_trust: dict, stage_rates: dict, deal_rows: list) -> dict:
-    """worst_case_arr = forecast_arr - weighted_expected_loss.
+def _money(x):
+    return f"${x:,.0f}"
 
-    forecast_arr: query_forecast_trust's COMMIT+MOST_LIKELY incremental ARR
-    closing this quarter. At-risk deals: that same cohort's high_risk deals
-    (assess_deal_risk labels), so the subtraction stays inside one
-    population. Each deal's expected loss is incremental_arr x (1 - win
-    rate), the win rate read from stage_rates (query_stage_close_rate()'s
-    by_stage_order) at the config order of the deal's CURRENT stage, Sales
-    pipeline only: the table is built from snapshot stage_order (the stage
-    the deal was in), and deals.highest_stage_order_reached is a different
-    measure. No rate, no weight: the deal is listed as unrated."""
+
+def pace_figures(qtd: dict, pipe, seasonality, as_of: date) -> dict:
+    """Share of the quarter gone vs share of target closed won, with this
+    business's own bookings seasonality beside it. Never an ahead/behind
+    verdict: the seasonality line says why pace alone can't give one."""
+    tq = (pipe or {}).get("this_quarter") if isinstance(pipe, dict) else None
+    if qtd.get("status") != "ok" or not isinstance(tq, dict) or not tq.get("start") or not tq.get("end"):
+        return {"status": "unavailable",
+                "reason": qtd.get("reason") or "no quarter dates or QTD figure to take pace from"}
+    start, end = date.fromisoformat(str(tq["start"])[:10]), date.fromisoformat(str(tq["end"])[:10])
+    days = (end - start).days + 1
+    elapsed = min(max((as_of - start).days + 1, 0), days)
+    won, target = qtd["closed_won_arr"], qtd["target"]
+    line = (f"{elapsed} of {days} days ({elapsed / days:.0%}) of the quarter have passed and "
+            f"{won / target:.0%} of the {_money(target)} target ({_money(won)}) is closed won.")
+    sz = seasonality if isinstance(seasonality, dict) else {}
+    if sz.get("status") == "ok":
+        n = len(sz.get("quarters") or [])
+        caveat = (f"Bookings here are back-loaded and uneven: over the last {n} complete quarters, "
+                  f"{sz['min_share_by_this_point']:.0%} to {sz['max_share_by_this_point']:.0%} "
+                  f"(median {sz['median_share_by_this_point']:.0%}) of a quarter's closed-won ARR was "
+                  f"in by this point, and a median {sz['median_share_final_week']:.0%} closed in the "
+                  "final week, so pace alone doesn't show whether this quarter is ahead or behind.")
+    else:
+        why = sz.get("reason") or sz.get("error") or "no bookings history read"
+        caveat = (f"No seasonality read ({why}), so pace alone doesn't show whether this quarter is "
+                  "ahead or behind.")
+    return {"status": "ok", "days_elapsed": elapsed, "days_in_quarter": days,
+            "elapsed_share": elapsed / days, "target_share_won": won / target,
+            "line": line, "seasonality_line": caveat,
+            "seasonality": {k: sz.get(k) for k in ("status", "median_share_by_this_point",
+                                                    "min_share_by_this_point", "max_share_by_this_point",
+                                                    "median_share_final_week", "quarters_with_bookings")
+                            if k in sz},
+            "basis": ("Days: this quarter's dates from query_pipeline, today counted. Target share: "
+                      "closed won QTD / target (figures.quarter_to_date). Seasonality: "
+                      "scripts/bookings_seasonality.py, the share of each past quarter's closed-won "
+                      "incremental ARR closed by the same point of that quarter.")}
+
+
+def coverage_figures(cov, qtd: dict) -> dict:
+    """The primary forward-looking figure: qualified Sales pipeline closing
+    this quarter, each deal weighted by its current stage's governed close
+    rate (query_pipeline_coverage), against what is still needed (target
+    minus closed won, figures.quarter_to_date)."""
+    bad = _unavailable(cov)
+    if bad:
+        return {"status": "unavailable", "reason": f"query_pipeline_coverage unavailable ({bad['error']})"}
+    if qtd.get("status") != "ok":
+        return {"status": "unavailable", "reason": f"no remaining gap: {qtd.get('reason')}"}
+    q, sw = cov.get("qualified_pipeline") or {}, cov.get("stage_weighting") or {}
+    rn = cov.get("renewal_not_weighted") or {}
+    weighted, raw, n = sw.get("weighted_value"), q.get("raw_value"), q.get("deal_count")
+    remaining = qtd["remaining_to_target"]
+    if weighted is None or raw is None:
+        return {"status": "unavailable", "reason": "query_pipeline_coverage returned no weighted value"}
+    out = {"status": "ok", "qualified_pipeline_arr": raw, "qualified_deal_count": n,
+           "weighted_arr": weighted, "remaining_to_target": remaining,
+           "unweighted_arr": sw.get("unweighted_value"),
+           "unweighted_deal_count": sw.get("unweighted_deal_count"),
+           "renewal_not_weighted_arr": rn.get("value"),
+           "renewal_not_weighted_count": rn.get("deal_count")}
+    if remaining <= 0:
+        out["coverage_of_remaining"] = None
+        line = (f"The target is already met; weighted by each deal's current-stage close rate, the "
+                f"{_money(raw)} of qualified Sales pipeline closing this quarter ({n} deals) is worth "
+                f"{_money(weighted)} on top.")
+    else:
+        out["coverage_of_remaining"] = weighted / remaining
+        line = (f"Weighted by each deal's current-stage close rate, the {_money(raw)} of qualified "
+                f"Sales pipeline closing this quarter ({n} deals) is worth {_money(weighted)}: "
+                f"{weighted / remaining:.2f}x the {_money(remaining)} still needed to reach target.")
+    extra = []
+    if sw.get("unweighted_deal_count"):
+        extra.append(f"{sw['unweighted_deal_count']} deal(s) ({_money(sw.get('unweighted_value') or 0)}) "
+                     "at a stage with too little history have no rate and are not counted")
+    if rn.get("deal_count"):
+        extra.append(f"{_money(rn.get('value') or 0)} of Renewal-pipeline expansion "
+                     f"({rn['deal_count']} deal{'' if rn['deal_count'] == 1 else 's'}) has no stage rate "
+                     "and is not counted")
+    if extra:
+        line += " " + "; ".join(extra)[0].upper() + "; ".join(extra)[1:] + "."
+    out["line"] = line
+    out["basis"] = ("Stage rate: the share of deals at that stage during a quarter that closed won by "
+                    "quarter end (won / (won + lost + slipped)), pooled over complete past quarters, "
+                    "Sales-pipeline New+Expansion only (query_stage_close_rate, as "
+                    "query_pipeline_coverage uses it). It is not specific to the weeks left. Still "
+                    "needed = target - closed won QTD (figures.quarter_to_date).")
+    return out
+
+
+def downside_coverage(forecast_trust: dict, stage_rates: dict, deal_rows: list, cov: dict) -> dict:
+    """The coverage figure with the forecast's high-risk deals removed.
+
+    At-risk deals: query_forecast_trust's high_risk deals (assess_deal_risk
+    labels). Each Sales-pipeline deal's weighted value is its incremental
+    ARR x its current stage's governed rate: the same rate
+    query_pipeline_coverage gave it, so removing it takes out exactly what
+    that deal added to the weighted figure. A deal with no rate (Renewal
+    pipeline, a stage without enough history, no deals row) added nothing
+    and is listed as unrated."""
     fq = forecast_trust.get("fiscal_quarter") or "this quarter"
     if forecast_trust.get("status") != "ok":
         return {"status": "unavailable",
                 "reason": f"query_forecast_trust returned {forecast_trust.get('status') or 'no result'}: "
-                          "no forecast to take a worst case from"}
-    forecast = (forecast_trust.get("pipeline") or {}).get("incremental_arr")
+                          "no high-risk deals to take out"}
+    if cov.get("status") != "ok" or cov.get("coverage_of_remaining") is None:
+        return {"status": "unavailable",
+                "reason": cov.get("reason") or "no weighted coverage of a remaining gap to take them from"}
     by_order = (stage_rates or {}).get("by_stage_order") or {}
     orders = _sales_stage_orders()
     rows = {str(r.get("deal_id")): r for r in deal_rows or []}
-
-    deals, weighted, unrated_arr, total = [], 0.0, 0.0, 0.0
+    deals, at_risk_weighted, total = [], 0.0, 0.0
     for d in _high_risk(forecast_trust):
         did = str(d.get("deal_id"))
         r = rows.get(did)
         item = {"deal_id": did, "company_name": d.get("company_name"),
-                "pipeline_id": (r or {}).get("pipeline_id"), "stage": (r or {}).get("stage"),
-                "incremental_arr": None, "stage_order": None, "stage_win_rate": None,
-                "expected_loss": None, "unrated_reason": None}
+                "pipeline_id": (r or {}).get("pipeline_id"), "incremental_arr": None,
+                "stage_order": None, "stage_win_rate": None, "weighted_arr": None,
+                "unrated_reason": None}
         if r is None:
             item["unrated_reason"] = "no deals row returned for this deal"
             deals.append(item)
@@ -499,75 +636,60 @@ def downside_worst_case(forecast_trust: dict, stage_rates: dict, deal_rows: list
                                           or f"no governed win rate for stage order {so}")
             else:
                 item["stage_win_rate"] = round(wr, 4)
-                item["expected_loss"] = round(arr * (1 - wr), 2)
-                weighted += arr * (1 - wr)
-        if item["expected_loss"] is None:
-            unrated_arr += arr
+                item["weighted_arr"] = round(arr * wr, 2)
+                at_risk_weighted += arr * wr
         deals.append(item)
-
-    unrated = [x for x in deals if x["expected_loss"] is None]
+    remaining, weighted = cov["remaining_to_target"], cov["weighted_arr"]
+    after = weighted - at_risk_weighted
+    k = len(deals)
+    line = (f"If the {k} high-risk forecast deal{'' if k == 1 else 's'} ({_money(total)}) "
+            f"{'is' if k == 1 else 'are'} lost, weighted coverage falls from {_money(weighted)} to "
+            f"{_money(after)}: {after / remaining:.2f}x the {_money(remaining)} still needed "
+            f"(was {cov['coverage_of_remaining']:.2f}x).")
+    unrated = [x for x in deals if x["weighted_arr"] is None]
+    renewals = len(((forecast_trust.get("risk_not_assessed") or {}).get("deals")) or [])
     moderate = sum(1 for d in (forecast_trust.get("assessed_deals") or [])
                    if d.get("overall_label") == "moderate_risk")
-    renewals = len(((forecast_trust.get("risk_not_assessed") or {}).get("deals")) or [])
-    mod_line = (f"Only high_risk deals are subtracted: {moderate} moderate_risk deal"
-                f"{'' if moderate == 1 else 's'} in the forecast cohort (0-30 days past the cycle "
-                "benchmark) not subtracted, and low_risk and insufficient_data deals are not either. "
-                f"{renewals} Renewal-pipeline deal{'' if renewals == 1 else 's'} in the forecast "
-                f"{'is' if renewals == 1 else 'are'} not risk-assessed (reason in disclosed_bases) "
-                "and not subtracted. ")
     listed = sorted(deals, key=lambda x: -(x["incremental_arr"] or 0))[:AT_RISK_KEEP]
-    for x in listed:
-        x.pop("stage", None)
     return {
-        "status": "ok",
-        "fiscal_quarter": fq,
-        "forecast_arr": forecast,
-        "at_risk_count": len(deals),
-        "at_risk_arr": total,
-        "weighted_expected_loss": weighted,
-        "worst_case_arr": (forecast - weighted) if forecast is not None else None,
-        "unrated_count": len(unrated),
-        "unrated_at_risk_arr": unrated_arr,
+        "status": "ok", "fiscal_quarter": fq,
+        "at_risk_count": k, "at_risk_arr": total, "at_risk_weighted_arr": at_risk_weighted,
+        "weighted_arr_if_lost": after, "coverage_of_remaining_if_lost": after / remaining,
+        "unrated_count": len(unrated), "renewal_not_assessed_count": renewals,
         "moderate_risk_excluded_count": moderate,
-        "renewal_not_assessed_count": renewals,
-        "floor_if_all_at_risk_lost": (forecast - total) if forecast is not None else None,
+        "line": line,
         "at_risk_deals": listed,
-        **({"at_risk_deals_omitted": f"{len(deals) - len(listed)} smaller at-risk deals not listed; "
-                                     "every total above covers all of them"}
-           if len(deals) > len(listed) else {}),
-        "basis": (
-            f"Worst case = query_forecast_trust's forecast (COMMIT+MOST_LIKELY incremental ARR closing "
-            f"in {fq}) minus, for each of that cohort's high-risk deals (assess_deal_risk labels, basis "
-            "in disclosed_bases), its incremental ARR x (1 - the win rate of the deal's current stage) "
-            "from the governed stage close-rate table query_stage_close_rate() (won / (won + lost + "
-            f"slipped) within the quarter, pooled over {(stage_rates or {}).get('quarters_analyzed')} "
-            "complete quarters, New+Expansion only; the table query_pipeline_coverage weights with). "
-            "Looked up by the deal's current stage order on the Sales pipeline. " + mod_line
-            + "Deals with no governed "
-            "rate (Renewal pipeline, which the table excludes, or a stage below min_evidence_count) are "
-            "listed as unrated and left out of the weighted figure, never given a default weight; "
-            "floor_if_all_at_risk_lost assumes every at-risk deal is lost. The stage rate is the "
-            "historical rate for every deal at that stage, not for deals flagged high-risk, so the "
-            "weighted loss may understate the downside."
-        ),
+        **({"at_risk_deals_omitted": f"{k - len(listed)} smaller at-risk deals not listed; "
+                                     "every total above covers all of them"} if k > len(listed) else {}),
+        "basis": (f"At-risk deals: the high-risk deals in query_forecast_trust's forecast "
+                  f"(COMMIT+MOST_LIKELY closing in {fq}; assess_deal_risk labels, basis in "
+                  "disclosed_bases). Each Sales-pipeline deal's weighted value is its incremental ARR "
+                  "x its current stage's governed rate (query_stage_close_rate), the same rate the "
+                  "coverage figure gave it, so taking it out removes exactly what it added. Deals with "
+                  "no rate added nothing and are listed as unrated. Only high_risk deals are taken "
+                  f"out: {moderate} moderate_risk deal{'' if moderate == 1 else 's'} in the forecast "
+                  "(0-30 days past the cycle benchmark) not taken out, and low_risk and "
+                  f"insufficient_data deals are not either. {renewals} Renewal-pipeline deal"
+                  f"{'' if renewals == 1 else 's'} in the forecast "
+                  f"{'is' if renewals == 1 else 'are'} not risk-assessed (reason in disclosed_bases)."),
     }
 
 
 # --------------------------------------------------------------------- note
 
 _POPULATIONS = (
-    "forecast_trust = COMMIT+MOST_LIKELY deals closing in {q}; pipeline = all active incremental "
-    "ARR (current state, not this quarter) plus its own this-quarter figure; deal_risk = late-stage "
-    "or COMMIT deals closing in {q}; loss_concentration = deals closed in {q}; quarter_to_date = deals "
-    "won in {q} against {q}'s target"
+    "coverage = qualified Sales pipeline closing in {q} against what {q} still needs; forecast_trust "
+    "= COMMIT+MOST_LIKELY deals closing in {q}; pipeline = all active incremental ARR (current "
+    "state, not this quarter); deal_risk = late-stage or COMMIT deals closing in {q}; "
+    "loss_concentration = deals closed in {q}"
 )
 
 
 def forecast_risk_headline(ft: dict):
-    """The dollar read a reader should get first, built in code: high-risk
-    and not-assessed ARR as shares of the WHOLE forecast. None when the
-    forecast figures carry no risk dollars (gated, unavailable, or an older
-    primitive)."""
+    """The dollar read of the forecast risk labels, built in code:
+    high-risk and not-assessed ARR as shares of the WHOLE forecast. None
+    when the forecast figures carry no risk dollars (gated, unavailable, or
+    an older primitive)."""
     f, hi, na = ft.get("forecast_arr"), ft.get("high_risk_arr"), ft.get("not_assessed_arr")
     if not f or hi is None or na is None:
         return None
@@ -577,72 +699,71 @@ def forecast_risk_headline(ft: dict):
             "has no risk read yet.")
 
 
-def forecast_baseline_sentence(ft: dict):
-    """forecast_trust's weeks 3-9 caveat in plain words, from the forecast
-    figures (None outside those weeks or when the forecast is gated)."""
-    from forecast_trust import CALIBRATION_EVIDENCE_WEEK, plain_baseline_sentence
-    week = ft.get("current_week")
-    if ft.get("status") != "ok" or not isinstance(week, int) or week >= CALIBRATION_EVIDENCE_WEEK:
-        return None
-    return plain_baseline_sentence(ft.get("historical_win_rate_same_week"), week)
+def _q(line: str) -> str:
+    return "\"" + line + "\""
 
 
-def _note(scenario: str, quarter: str, figures: dict, loss_headline: str = None) -> str:
-    down = [k for k, v in figures.items() if v.get("status") == "unavailable"]
+def _note(scenario: str, quarter: str, figures: dict, loss_headline: str = None,
+          downside_line: str = None) -> str:
     names = {"forecast_trust": "query_forecast_trust", "pipeline": "query_pipeline",
              "deal_risk": "query_high_priority_deal_risk", "loss_concentration": "query_loss_concentration",
-             "quarter_to_date": "quarter_to_date (QTD closed won vs target)"}
+             "quarter_to_date": "quarter_to_date (QTD closed won vs target)",
+             "pace": "pace (share of quarter gone vs share of target won)",
+             "coverage": "coverage (weighted pipeline vs what is still needed)"}
     parts = []
     if scenario == "base":
-        parts.append(f"QUARTER HEALTH ({quarter}): answer \"are we in good shape this quarter?\" with a "
-                     "plain-language verdict grounded only in the figures in `figures`.")
+        parts.append(f"QUARTER HEALTH ({quarter}): answer \"are we in good shape this quarter?\" in "
+                     "three steps, in this order.")
     else:
-        parts.append(f"QUARTER DOWNSIDE ({quarter}): answer what the downside looks like this quarter. "
-                     "Lead with `downside`: worst_case_arr = forecast_arr - weighted_expected_loss, "
-                     "stated with its `basis`; give unrated_at_risk_arr (and why those deals are "
-                     "unrated) and floor_if_all_at_risk_lost beside it. Then a plain-language verdict "
-                     "on the downside grounded in the figures in `figures`.")
+        parts.append(f"QUARTER DOWNSIDE ({quarter}): answer what the downside looks like this quarter "
+                     "in three steps, in this order.")
+    qtd, pace, cov = (figures.get(k) or {} for k in ("quarter_to_date", "pace", "coverage"))
+    step1 = ["1. WHERE THE QUARTER STANDS. State, verbatim:"]
+    step1 += [_q(x) for x in (qtd.get("line"), pace.get("line"), pace.get("seasonality_line")) if x]
+    step1.append("Do not call the quarter ahead or behind from pace.")
+    parts.append(" ".join(step1))
+    step2 = ("2. COVERAGE, THE FORWARD-LOOKING READ. State, verbatim: " + _q(cov["line"])
+             if cov.get("line") else "2. COVERAGE: unavailable (see below).")
+    if scenario == "downside":
+        dl = downside_line
+        if dl:
+            step2 += " Then the downside, verbatim: " + _q(dl) + " List the at-risk deals from `downside`."
+    step2 += (" This is the only coverage figure: do not quote query_pipeline's unweighted coverage "
+              "ratio, do not apply any single historical win rate to the forecast or the pipeline, and "
+              "do not project a quarter-end total.")
+    parts.append(step2)
+    step3 = ["3. HOW FAR TO TRUST THAT COVERAGE. These are modifiers on the coverage read, not "
+             "separate verdicts: say for each whether it makes the coverage figure more or less "
+             "reliable, and why."]
     headline = forecast_risk_headline(figures.get("forecast_trust") or {})
     if headline:
-        parts.append("FORECAST RISK: lead the risk read with this line, verbatim: \"" + headline + "\" "
-                     "Give the deal-count fraction only after it, as a share of risk-assessed deals "
-                     "(not of the forecast); the late-stage view's counts are also shares of assessed "
-                     "deals.")
-    qtd = figures.get("quarter_to_date") or {}
-    if qtd.get("line"):
-        parts.append("QUARTER TO DATE: state this, verbatim: \"" + qtd["line"] + "\" (basis: "
-                     "figures.quarter_to_date.basis).")
-    loss_line = loss_headline
-    if loss_line:
-        parts.append("LOSS RATE: give it with this line, verbatim: \"" + loss_line + "\" Never give "
-                     "the all-closed rate alone or call it the loss rate.")
+        step3.append("Forecast risk, verbatim: " + _q(headline) + " (the deal-count fraction, if "
+                     "given, is a share of risk-assessed deals, not of the forecast).")
+    if loss_headline:
+        step3.append("Loss rate, verbatim: " + _q(loss_headline) + " Never give the all-closed rate "
+                     "alone or call it the loss rate.")
     if (figures.get("loss_concentration") or {}).get("rep_context"):
-        parts.append("REPS: never give a rep's loss rate on its own. Give each rep's line from "
+        step3.append("Reps: never give a rep's loss rate on its own; give each rep's line from "
                      "figures.loss_concentration.rep_context with its 'still live' forecast and open "
-                     "pipeline (basis: rep_context_basis), so a poor loss record with little live "
-                     "behind it reads differently from one with a strong forecast behind it.")
-    baseline = forecast_baseline_sentence(figures.get("forecast_trust") or {})
-    if baseline:
-        parts.append("FORECAST BASELINE: when you give the historical same-week win rate, follow it "
-                     "with this, verbatim: \"" + baseline + "\" Say it this way instead of the "
-                     "forecast note's wording; do not call it directional or a baseline.")
-    parts.append("State each figure with its own basis from `disclosed_bases` (keep each basis's "
-                 "caveats and wording rules: e.g. the pipeline total is current state, not this "
-                 "quarter's).")
-    parts.append("Do not combine the figures into a score, grade, index or overall number, and do not "
-                 "weight one against another numerically: they measure different populations ("
-                 + _POPULATIONS.format(q=quarter) + "). Do not add or subtract across them"
-                 + (" (the QTD gap, its share of the forecast"
-                    + (" and the worst case are" if scenario == "downside" else " are")
-                    + " the defined calculations, given above).")
-                 + " The verdict is a judgement in words: which figures point which way, and the "
-                 "weakest one named.")
+                     "pipeline (basis: rep_context_basis).")
+    parts.append(" ".join(step3))
+    parts.append("State each figure with its own basis from `figures` and `disclosed_bases` (keep each "
+                 "basis's caveats and wording rules: e.g. the pipeline total is current state, not "
+                 "this quarter's).")
+    parts.append("Do not combine the figures into a score, grade, index or overall number: they "
+                 "measure different populations (" + _POPULATIONS.format(q=quarter) + "). The defined "
+                 "calculations are the ones given above; do not add, subtract or multiply across "
+                 "figures yourself. The verdict is a judgement in words on the coverage read, "
+                 "adjusted by the modifiers, with the weakest point named.")
+    down = [k for k, v in figures.items() if isinstance(v, dict) and v.get("status") == "unavailable"]
     if down:
-        parts.append("Unavailable: " + ", ".join(f"{names[k]} ({figures[k].get('error')})" for k in down)
-                     + ". Say that figure is unavailable; do not estimate it from the others.")
-    not_ok = [k for k, v in figures.items() if v.get("status") not in ("ok", "unavailable")]
+        parts.append("Unavailable: " + ", ".join(
+            f"{names.get(k, k)} ({figures[k].get('error') or figures[k].get('reason')})" for k in down)
+            + ". Say that figure is unavailable; do not estimate it from the others.")
+    not_ok = [k for k, v in figures.items()
+              if isinstance(v, dict) and v.get("status") not in ("ok", "unavailable")]
     if not_ok:
         parts.append("Gated (not an error): " + ", ".join(
-            f"{names[k]} returned {figures[k].get('status')}" for k in not_ok)
+            f"{names.get(k, k)} returned {figures[k].get('status')}" for k in not_ok)
             + ". Report its disclosed reason instead of a figure.")
     return " ".join(parts)
