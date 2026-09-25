@@ -250,8 +250,14 @@ def test_only_high_risk_forecast_deals_are_at_risk():
     ft_hi = {x["deal_id"] for x in RAW["query_forecast_trust"]["assessed_deals"] if x["overall_label"] == "high_risk"}
     hp_hi = {x["deal_id"] for x in RAW["query_high_priority_deal_risk"]["assessed_deals"] if x["overall_label"] == "high_risk"}
     assert ids == ft_hi and hp_hi - ft_hi, "the two cohorts differ, and only the forecast one is used"
+    assert d["moderate_risk_excluded_count"] == 2, d.get("moderate_risk_excluded_count")
+    assert "2 moderate_risk deals" in d["basis"] and "not subtracted" in d["basis"], d["basis"]
+    real = _compose("downside")["downside"]          # the capture has one: Cochlear Ltd, 25 days past
+    assert real["moderate_risk_excluded_count"] == 1 and "1 moderate_risk deal in" in real["basis"], real["basis"]
+    assert "Cochlear" not in {x["company_name"] for x in real["at_risk_deals"]}
     print(f"✓ at-risk = the forecast cohort's high_risk deals only ({len(hp_hi - ft_hi)} late-stage "
-          "high-risk deals outside the forecast are not subtracted; moderate_risk is not at-risk)")
+          "high-risk deals outside the forecast are not subtracted; moderate_risk is not at-risk, and "
+          "the basis says how many were left out)")
 
 
 def test_a_high_risk_deal_with_no_deals_row_is_unrated_not_dropped():
