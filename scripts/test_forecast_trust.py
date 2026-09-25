@@ -198,8 +198,9 @@ def test_mid_quarter_settled_band_with_directional_caveat():
         raise AssertionError(
             f"Expected high_risk_count=1, high_risk_fraction=0.5, got "
             f"{result['high_risk_count']}, {result['high_risk_fraction']}")
-    if 'directional' not in result['note'].lower():
-        raise AssertionError(f"Expected a directional caveat in the note text, got: {result['note']!r}")
+    from forecast_trust import plain_baseline_sentence
+    if result['note'] != plain_baseline_sentence(expected_week7['win_rate'], 7):
+        raise AssertionError(f"Expected the plain-language week-7 caveat, got: {result['note']!r}")
     print("  ✓ Settled band, directional caveat present, week-7 row used (not week 10's)")
 
 

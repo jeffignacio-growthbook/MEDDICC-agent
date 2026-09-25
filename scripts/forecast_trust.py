@@ -39,6 +39,9 @@ Design, confirmed across the 2026-09-19 scoping session:
     quarter's cohort hasn't had as much time to resolve as the
     historical week-10 cohort had by quarter end); drops away from
     week 10 onward, where the comparison is time-matched.
+    Worded in plain language by plain_baseline_sentence() ("That 32%
+    comes from deals that had a full quarter to close. We're only 8
+    weeks into this one, ..."), which quarter health requires verbatim.
   - Week 10's 30.8% figure is cited ONLY as evidence the underlying
     calibration approach is real (large n, stable) — never hardcoded
     as the live comparison point.
@@ -75,6 +78,18 @@ def _stability_band(week: int) -> str:
         if week in wk_range:
             return label
     raise ValueError(f"week {week} outside the expected 3-13 range")
+
+
+def plain_baseline_sentence(win_rate: Optional[float], week: int) -> str:
+    """Weeks 3-9: why this quarter's cohort can't be read against the
+    same-week historical rate yet, in plain words (said word for word by
+    quarter health; the old wording was "Directional, not final: ... hasn't
+    had as much time to resolve as the historical week-N baseline had by
+    quarter end")."""
+    rate = f"That {win_rate:.0%}" if win_rate is not None else f"The historical week-{week} rate"
+    return (f"{rate} comes from deals that had a full quarter to close. We're only {week} "
+            f"week{'' if week == 1 else 's'} into this one, so some deals that look stuck today "
+            "may still close before quarter end.")
 
 
 def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
@@ -209,12 +224,7 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
     directional_caveat = current_week < CALIBRATION_EVIDENCE_WEEK
 
     if directional_caveat:
-        note = (
-            f"Directional, not final: at week {current_week} of "
-            f"{fiscal_quarter}, this quarter's cohort hasn't had as much "
-            f"time to resolve as the historical week-{current_week} "
-            f"baseline had by quarter end."
-        )
+        note = plain_baseline_sentence(current_week_row.get("win_rate"), current_week)
     elif stability == "late_quarter":
         note = (
             f"Week {current_week} of {fiscal_quarter}: in the historical "
