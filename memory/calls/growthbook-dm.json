@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook & dm",
+  "slug": "growthbook-dm",
+  "last_etl_date": "2026-09-25T05:35:27.954945",
+  "calls": [
+    {
+      "id": "01M2PAMSV5TJ38Q2Z4XPGH93ZP",
+      "source": "fireflies",
+      "title": "GrowthBook & dm Agentic workflows",
+      "date": "2026-09-24",
+      "duration_minutes": 11.75,
+      "summary": "# GrowthBook & dm Agentic workflows\nDate: 2026-09-24 | Duration: 11.75m\n\n## Summary\nThe discussion focused on remote-work logistics and coordination. Kevin Chant described moving from central Tokyo to Yokohama’s suburbs because central Tokyo was costly and offered limited space, while Yokohama provided more room and remained connected to urban areas. Kevin and Chris Sanders emphasized that team members in similar time zones, including Daniel in Tokyo, support easier scheduling and real-time collaboration. Kevin also noted that rural Japan is shrinking more than suburbs near major urban centers, while Yokohama remains large enough to avoid population-decline impacts. The team experienced confusion from overlapping Teams links and time differences, but members identified the correct link and joined successfully. Omar Elshaikh’s microphone produced static, which Kevin noticed and Omar fixed, allowing communication to continue smoothly. The participants also supported one another by sharing links and troubleshooting issues.\n\n## Keywords\nYokohama, Tokyo, population trends, suburbs, Microsoft Teams, microphone issue\n\n## Action Items\n\n**Omar Elshaikh**\nFix microphone static issue based on feedback received during the meeting (02:00)\n\n**Kevin Chant, Chris Sanders, Omar Elshaikh**\nSwitch to the appropriate Microsoft Teams meeting link to continue the discussion without confusion (01:51)\nSwitch to the appropriate Microsoft Teams meeting link to continue the discussion without confusion (02:22)\n",
+      "organizer": "chris@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

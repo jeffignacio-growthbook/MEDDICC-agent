@@ -1,0 +1,18 @@
+{
+  "company": "Focus Lab x",
+  "slug": "focus-lab-x",
+  "last_etl_date": "2026-09-25T05:35:27.951622",
+  "calls": [
+    {
+      "id": "01M3583R2RHBF5V6530BEV6GF8",
+      "source": "fireflies",
+      "title": "Focus Lab x GrowthBook",
+      "date": "2026-09-24",
+      "duration_minutes": 31.790000915527344,
+      "summary": "# Focus Lab x GrowthBook\nDate: 2026-09-24 | Duration: 31.790000915527344m\n\n## Summary\nGrowth Book and Focus Lab discussed how to evolve Growth Book’s brand amid competitor feature convergence. Priorities included differentiating through distinct audience needs, emotional relevance, and authentic personality rather than feature parity; balancing enterprise and developer audiences through shared pillars, tailored messaging, or possible sub-brands; and aligning internal culture with external brand expression. Messaging must address engineering, product management, and data science buyers while maintaining a unifying product-team theme. The teams also explored adaptable design pillars, serious enterprise credibility paired with approachable creativity, and immersive trade-show experiences that extend beyond standard booths and demos. Simple mascot web animation is within scope, while complex video and voiceover production may require external partners managed by Focus Lab. The project is expected to begin with research and deep brand strategy, followed by iterative development and continued collaboration.\n\n## Keywords\nbrand strategy, mascot animation, enterprise positioning, developer audience, trade show branding, competitive differentiation\n\n## Action Items\n\n**Will Straughn**\nContinue to coordinate with GrowthBook team and manage potential collaboration post-meeting (30:00)\nRespond to any follow-up questions GrowthBook sends via email regarding brand strategy and potential project scope (30:50)\n\n**GrowthBook Team - Lyndsie Berens, Scott Bailey, Ashley Stirrup**\nEvaluate internal branding needs, including mascot use and enterprise vs. developer messaging balance (06:22)\nConsider refining trade show and event branding strategies to enhance engagement (26:13)\nShare any outstanding questions or clarifications with Focus Lab via email (30:00)\n\n**Focus Lab Team - Anna Beyerle Rosen, Álvaro Ramos, Bill Kenney**\nPrepare for brand strategy and research work based on GrowthBook’s core audience and business objectives, focusing on differentiators and positioning (08:14)\nDevelop adaptable visual and messaging pillars to accommodate diverse audiences and contexts, including use scenarios for mascot and design (21:00)\nSupport with creative direction for potential future large-scale mascot animation through partner agencies as needed (06:30)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

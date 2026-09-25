@@ -1,0 +1,18 @@
+{
+  "company": "Will Guyeskey and",
+  "slug": "will-guyeskey-and",
+  "last_etl_date": "2026-09-25T05:35:27.950790",
+  "calls": [
+    {
+      "id": "01M2PM695XXPG2CYXTHJCQ37RP",
+      "source": "fireflies",
+      "title": "Will Guyeskey and Ashley Stirrup + 2 others",
+      "date": "2026-09-24",
+      "duration_minutes": 38.470001220703125,
+      "summary": "# Will Guyeskey and Ashley Stirrup + 2 others\nDate: 2026-09-24 | Duration: 38.470001220703125m\n\n## Summary\nGoPro’s current experimentation process is cumbersome and engineering-heavy because its SFCC, Contentstack GraphQL CMS, and single-page application require engineers to build and manually hide features for tests. An acquisition expected to complete by year-end has paused migration and tool changes until the post-merger direction is clearer, although Optimizely and Adobe Test & Target were previously considered. GrowthBook was presented as a data-warehouse-native platform supporting Databricks and BigQuery for GA4 integration, SQL transparency, integrated feature flagging, experimentation, and product analytics. Its dashboards track experiment velocity, win rates, and key metrics such as checkout conversions. The AI-powered visual editor supports copy, styling, images, JavaScript, DOM changes, SPA route changes, Figma-based mockups, and engineer-assisted feature flag workflows. Results include Bayesian control-versus-treatment analysis with significance flagged at 95% confidence, customizable funnel metrics, and post-launch metric additions. Pricing is seat-based with a platform fee, positioned against Monetate and LaunchDarkly. A non-committal POC, Slack support, cloud hosting, documentation, and a technical discussion with GoPro engineering were identified as next steps.\n\n## Keywords\nA/B Testing, Experimentation, Feature Flagging, AI Integration, Visual Editor, Data Warehouse\n\n## Action Items\n\n**Cary Rakin**\nInitiate setting up a Proof of Concept (POC) environment for GoPro’s team including an open cloud organization and a Slack support channel to facilitate quick onboarding and support (34:56)\n\n**Cary Rakin, Logan Bates**\nSchedule a follow-up technical meeting with GoPro’s product, strategy, and engineering leads to review integration details and architecture, preferably during Eastern morning hours (35:39)\nExplore arranging engineering calls for tailored demonstrations and validation of the visual editor’s compatibility with GoPro’s SPA and CMS stack (22:33)\n\n**Logan Bates**\nSend documentation to GoPro covering platform setup, integration details, AI agent capabilities, and example use cases ahead of the technical meeting (36:42)\nProvide short demo videos illustrating GrowthBook’s agentic workflows for feature building and the visual editor capabilities (20:26)\n\n**Will Guyeskey**\nIdentify key GoPro engineers and directors from product and strategy teams to participate in the follow-up integration meeting (36:25)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

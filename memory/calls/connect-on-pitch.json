@@ -1,0 +1,18 @@
+{
+  "company": "Connect on pitch",
+  "slug": "connect-on-pitch",
+  "last_etl_date": "2026-09-25T05:35:27.953002",
+  "calls": [
+    {
+      "id": "01M37NXBZJQAW2SB74N9APHCF5",
+      "source": "fireflies",
+      "title": "Connect on pitch deck talk track",
+      "date": "2026-09-24",
+      "duration_minutes": 31,
+      "summary": "# Connect on pitch deck talk track\nDate: 2026-09-24 | Duration: 31m\n\n## Summary\nThe team discussed positioning product analytics as part of a unified platform that reduces tool fragmentation and creates a single source of truth, while complementing feature flags and experimentation. Christian Liebenow emphasized the need for stronger customer examples, including Notion and insights from Jay at Zorro, because internal usage data and pitching confidence remain limited. Elyse Fox highlighted consolidation feedback from LaunchDarkly interviews and planned calls with data-focused users, training, and clearer use cases around funnels, drop-offs, and session replay. The platform was positioned around six years of scaled feature flagging and experimentation, lightweight SDKs, warehouse-native approaches, an open-source skills library, and an MCP server. AI capabilities include programmatic control through APIs, MCP, Claude, and Codex. The learnings library was presented as a way to preserve tribal knowledge, support onboarding, centralize experiment insights, and enable AI analysis, with Sony cited as an example. Elyse will refine speaker notes, add customer stories and AI use cases, roll out the pitch to sales on Monday, and use Slack feedback to iterate. Key logos will remain but can be tailored by sales teams.\n\n## Keywords\nfeature flags, product analytics, experimentation platform, AI integration, sales pitch, knowledge consolidation\n\n## Action Items\n\n**Christian Liebenow**\nProvide feedback and surface sales pitch insights and customer discovery results through Slack to support pitch refinement (21:04)\nEngage further with champion Jay from Zorro to understand practical use cases and workflows around product analytics to inform pitch development (06:13)\nPrepare for Monday’s pitch presentation using updated slide decks and talking points, focusing on discovery and customer engagement (20:23)\n\n**Elyse Fox**\nArrange calls with more data-focused personas to gather deeper examples of product analytics usage and identify migration opportunities (08:44)\nDevelop and deliver training focused on pitching product analytics and identifying day-to-day user value (09:45)\nRefine sales pitch deck with additional detailed and specific AI lifecycle examples and talking points for easy reference during presentations (13:57)\nReview and tweak speaker notes to better align marketing messaging with the sales pitch style developed by Christian (20:30)\nLead the rollout of the refined pitch on Monday and coordinate follow-up feedback sessions to iterate on content and approach (21:31)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-09-23T05:23:43.198581",
+  "last_etl_date": "2026-09-25T05:35:27.956685",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -784,6 +784,17 @@
       "duration_minutes": 46.77000045776367,
       "summary": "# Demo Call with Marcelo Da Silva from L'azurde\nDate: 2026-09-22 | Duration: 46.77000045776367m\n\n## Summary\nThe discussion evaluated starting with GrowthBook’s Pro tier for 2027 testing and learning at an annual budget of about $5,000 for two to three users, with governance intended to preserve statistical validity and control costs. GrowthBook was considered suitable because it supports no-code and developer-led experiments, Arabic UI testing across UAE, Kuwait, and Saudi Arabia, and integration with BigCommerce, Next.js, Amazon S3, GA4, and BigQuery. Combined traffic is about 750,000 monthly sessions, but conversion is approximately 0.3% to 0.4% and funnel drop-off limits statistical power. Priority use cases include homepage, merchandising, mobile, and product-detail-page tests, with 90% of traffic coming from mobile. Simple visual edits can be handled without code, while complex layout changes require developers. James explained GrowthBook’s privacy-focused data model, power analysis, Flowward’s reported revenue lift, and Pro-tier support. James will provide a customized deck, while Marcelo will consult the eComm and technical teams before seeking 2027 budget approval.\n\n## Keywords\nA/B testing, GrowthBook, ecommerce, Arabic market, experiment governance, headless architecture\n\n## Action Items\n\n**Marcelo Da Silva**\nShare GrowthBook slide deck with L’azurde ecommerce team and leadership for feedback and buy-in (44:33)\nCoordinate with developers for a technical discovery session when ready to explore integration and setup in detail (44:51)\nFinalize internal budget approval process for A/B testing tool spend for fiscal year 2027 (44:55)\n\n**James Shannon**\nSend GrowthBook slide deck and relevant demo materials to Marcelo for internal presentation (43:55)\nRespond to follow-up questions from Marcelo via email to support decision-making and clarify technical details (43:57)\n",
       "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M357PZY36AGTF4EHYSFJE4PB",
+      "source": "fireflies",
+      "title": "Demo Call with Erika King from",
+      "date": "2026-09-24",
+      "duration_minutes": 11.539999961853027,
+      "summary": "# Demo Call with Erika King from\nDate: 2026-09-24 | Duration: 11.539999961853027m\n\n## Summary\nNo summary available",
+      "organizer": "dan@growthbook.io",
       "participants": 4,
       "summary_quality": "good"
     }

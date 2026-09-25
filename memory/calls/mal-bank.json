@@ -1,0 +1,18 @@
+{
+  "company": "Mal Bank +",
+  "slug": "mal-bank",
+  "last_etl_date": "2026-09-25T05:35:27.958418",
+  "calls": [
+    {
+      "id": "01M36JCE5ADQ9HX6QC35HH74ZW",
+      "source": "fireflies",
+      "title": "Mal Bank + GrowthBook",
+      "date": "2026-09-24",
+      "duration_minutes": 11.760000228881836,
+      "summary": "# Mal Bank + GrowthBook\nDate: 2026-09-24 | Duration: 11.760000228881836m\n\n## Summary\nNo summary available",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

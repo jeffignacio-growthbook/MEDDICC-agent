@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Live Demo",
+  "slug": "growthbook-live-demo",
+  "last_etl_date": "2026-09-25T05:35:27.952850",
+  "calls": [
+    {
+      "id": "01M2PM695GM9PG9YC80KY9K7VC",
+      "source": "fireflies",
+      "title": "GrowthBook Live Demo - Sep 24",
+      "date": "2026-09-24",
+      "duration_minutes": 42,
+      "summary": "# GrowthBook Live Demo - Sep 24\nDate: 2026-09-24 | Duration: 42m\n\n## Summary\nGrowth Book combines feature flagging, experimentation, and product analytics to help teams make better product decisions and iterate faster. Feature flags support gradual rollouts, precise targeting, ramp-up schedules, automatic rollback, multiple environments, audit logs, and role-based governance. Embedded experiments split traffic across variants, track goals and guardrails, and support Bayesian and frequentist analysis, health checks, sub-cohort breakdowns, multi-armed and contextual bandits, holdouts, and power analysis. Only about a third of shipped features positively affect business metrics, making win-rate tracking and rigorous testing valuable. AI can use historical experiments to generate hypotheses, design tests, interpret results, and produce reports. Product analytics provides warehouse-native, natural-language querying, dashboards, funnels, journey visualizations, and visible SQL. SDKs support event logging and exposure tracking, while personalization remains limited and under consideration.\n\n## Keywords\nfeature flagging, experimentation platform, AI assistant, product analytics, Bayesian analysis, multi-armed bandits\n\n## Action Items\n\n**Logan Bates**\nFollow up with participants by sharing the recorded webinar video (41:46)\nProvide more detailed examples or responses regarding personalization features upon receiving specific use cases from customers (40:22)\nContinue providing support and technical assistance to participants via Slack or email regarding experiment implementations, especially with headless environments and AI integration (34:22)\n\n**Lindsay**\nShare pricing and sales-related information and follow-up contacts with attendees (38:51)\n\n**Unassigned**\nEncourage all participants to join the free community Slack channel to engage with peers and get ongoing support (38:51)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

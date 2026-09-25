@@ -1,0 +1,18 @@
+{
+  "company": "[Mandatory] KBYG AI",
+  "slug": "mandatory-kbyg-ai",
+  "last_etl_date": "2026-09-25T05:35:27.950985",
+  "calls": [
+    {
+      "id": "01M2PM695JCBSN1K72Y8R6YFTW",
+      "source": "fireflies",
+      "title": "[Mandatory] KBYG AI Conference",
+      "date": "2026-09-24",
+      "duration_minutes": 31.93000030517578,
+      "summary": "# [Mandatory] KBYG AI Conference\nDate: 2026-09-24 | Duration: 31.93000030517578m\n\n## Summary\nThe team finalized preparations for Growth Book’s AI Conference presence in San Francisco. The booth is secured at Pier 48 Shed A, booth 206, as a 10x10 kiosk with a back-wall graphic, screen, and storage counter; loading is scheduled the day before the event from noon to 6pm. Staff discussed Hyatt Regency lodging, transit, badge pickup on Tuesday from 3–6pm, onsite meals, WiFi access after check-in, and essential supplies. Swag will be tiered by visitor engagement, while two daily AirPods Max 2 drawings will require badge verification. Lyndsie and Ashley will manage two lead-scanning iPads, using code 123456, qualification ratings, conversation scores, and notes. Staff should follow up with hot leads on LinkedIn, book meetings onsite, and consolidate data after the event. Graham, Michael, and Scott will support demos, with Michael receiving additional practice. Demos will emphasize feature flag safety, gradual rollouts, targeted releases, A/B testing, AI coding-tool integration, and customer references such as Anthropic. The team also planned targeted networking, app-based scheduling, expense reporting through Google Sheets, and submission to Jennifer within one week.\n\n## Keywords\nAI Conference, Growth Book booth, lead capture, swag giveaway, demo preparation, event logistics\n\n## Action Items\n\n**Liz Fox**\nSend Michael prep materials including the demo rundown and event playbook for first-time trade show preparation (03:12)\nCoordinate and ensure booth swag setup, particularly water bottles positioned by demo station (12:22)\n\n**Lyndsie Berens**\nCoordinate lunch pickups during the conference ensuring booth coverage (06:35)\nTrack and manage shipment of booth materials on-site; troubleshoot missing packages using tracking info on Notion (07:50)\nOversee lead scanning operations and manage lead scanner iPads, ensuring they are taken home and charged nightly (15:55)\nConduct live AirPods Max 2 giveaway drawings daily at 3:45 pm using automated spreadsheet and branded wheel (13:18)\nReview FAQs on giveaway process with booth team to ensure consistency in answering questions (14:30)\nMaintain and consolidate all event expense reports; request submission within one week post-event from all participants (23:45)\nSupport sales team by managing lead routing when personal booking links are not available (19:10)\nCoordinate introductions to key AI company contacts for networking, facilitating Ashley’s offer to connect with Databricks CMO (22:30)\nProvide final “Know Before You Go” documentation before event (30:10)\n\n**Michael Samper**\nReview demo materials and event playbook; practice demo to build confidence before event (03:00)\n\n**Ashley Stirrup**\nOffer introductions to Databricks CMO as requested by Chris (22:25)\nSupport lead capture and demo readiness; coach first-timers on effective booth engagement and messaging approach (26:20)\n\n**Kris Washburn**\nEngage in prompt LinkedIn connection with hot leads onsite and send immediate follow-ups to warm leads to maximize conversions (18:15)\n",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

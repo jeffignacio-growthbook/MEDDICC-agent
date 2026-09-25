@@ -1,0 +1,18 @@
+{
+  "company": "Aroundhome & GrowthBook",
+  "slug": "aroundhome-growthbook",
+  "last_etl_date": "2026-09-25T05:35:27.959106",
+  "calls": [
+    {
+      "id": "01M2QRE1JTC89CQV8S75V30802",
+      "source": "fireflies",
+      "title": "Aroundhome & GrowthBook | Introduction Meeting",
+      "date": "2026-09-24",
+      "duration_minutes": 38.709999084472656,
+      "summary": "# Aroundhome & GrowthBook | Introduction Meeting\nDate: 2026-09-24 | Duration: 38.709999084472656m\n\n## Summary\nThe company is seeking a company-wide experimentation capability because it currently uses Unleash only for feature flags and relies on manual product-analytics analysis. Desired capabilities include experimentation across web, server-side, and mobile surfaces; persistent variant assignment; customer-attribute targeting; exposure tracking; multi-experiment management; and low-traffic support. Its environment includes TypeScript, Node, Ruby, Go, AWS Lambda at the CloudFront edge, Kubernetes on IPv6 ARM infrastructure, and an AWS S3 lakehouse queried with Athena. The company wants minimal transformation effort, Iceberg compatibility, and low integration cost. GrowthBook presented native warehouse integration, local SDK evaluation with rule caching, exposure events, feature flags, experiments, guardrail metrics, automated feature toggling, self-hosting or cloud hosting, EU availability, GDPR, SSO, and SAML. Pricing includes a platform fee and $1,000 per user annually, with unlimited experiments and feature flags and no traffic-based fees. Next steps include sharing pricing and documentation, reviewing caching performance and integration costs, and evaluating a proof of concept before a decision planned within two months.\n\n## Keywords\nExperimentation, Data Lakehouse, Feature Flagging, AWS Athena, Proof of Concept, Pricing Model\n\n## Action Items\n**Rémy Marin**  \nProvide technical documentation on AWS Athena integration (29:32)  \nFollow up with technical effort and cost comparisons for GrowthBook integration (30:30)  \nSend links and examples of POC processes and checklists (36:19)  \n\n**Marcel Geldner**  \nShare POC agenda and documentation (36:19)  \nSend detailed platform pricing list to Around Home team (36:52)  \n\n**Trupti Karnire**  \nCoordinate potential follow-up call (36:28)  \n\n**Bita Motamedian**  \nReview pricing and technical details and determine next steps (36:35)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

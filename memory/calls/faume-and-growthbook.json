@@ -1,0 +1,18 @@
+{
+  "company": "Faume and GrowthBook",
+  "slug": "faume-and-growthbook",
+  "last_etl_date": "2026-09-25T05:35:27.958944",
+  "calls": [
+    {
+      "id": "01M2R4WVRD1SBFM58Q563CY8QK",
+      "source": "fireflies",
+      "title": "Faume and GrowthBook",
+      "date": "2026-09-24",
+      "duration_minutes": 33.900001525878906,
+      "summary": "# Faume and GrowthBook\nDate: 2026-09-24 | Duration: 33.900001525878906m\n\n## Summary\nThe client wants to test dynamic ranking algorithms on collection pages across about 30 white-label websites, initially piloting on 2–3 sites and measuring conversion-rate improvement. They expect to run around 20–30 ranking A/B tests annually, with possible expansion into UX and feature experimentation if pricing and tooling support it. Results should be consolidated across sites through a unified view, using existing Matomo analytics and Snowflake data pipelines. Feature flags will control ranking variants, while ranking scores will be managed in MediSearch. Exposure events will be tracked through an SDK, with integrations or custom forwarding available for analytics platforms and Snowflake. GrowthBook was presented as a platform combining feature flags, experiment analysis, multi-variant testing, contextual bandits, targeting, and debugging. Next steps include sharing pricing, technical documentation, slide decks, and arranging a technical discussion with the client’s CTO.\n\n## Keywords\ndynamic ranking, A/B testing, feature flags, experimentation platform, secondhand marketplace, analytics integration\n\n## Action Items\n\n**Marcel Geldner**\nShare GrowthBook architecture slide deck and summary of the call with Foam after the meeting (15:12)\nProvide detailed pricing plans including self-hosting and cloud hosting options and seat pricing to Foam for benchmarking (32:00)\n\n**Rémy Marin**\nSupport technical questions and clarifications about integrating GrowthBook with Foam’s tech stack and analytics pipeline (15:12)\nCoordinate technical call with Foam’s CTO for in-depth discussion of integration and experimentation needs (18:45)\n\n**Foam Team**\nReview the shared GrowthBook materials and pricing to assess solution fit (32:40)\nArrange follow-up technical call involving Foam’s CTO to dive deeper into technical integration and requirements (18:45)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}
