@@ -388,6 +388,9 @@ async def assess_deal_risk(sb, deal_ids=None, fiscal_quarter=None):
     return {
         "rows": raw_result.get("assessed_deals", []),
         "summary": raw_result.get("summary", {}),
+        "basis": raw_result.get("basis"),
+        "not_assessed_deals": raw_result.get("not_assessed_deals", []),
+        "not_assessed_note": raw_result.get("not_assessed_note"),
         "total_found": raw_result.get("summary", {}).get("total_assessed", 0),
         "table": "deal_risks"
     }
