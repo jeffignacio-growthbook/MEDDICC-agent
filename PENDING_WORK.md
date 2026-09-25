@@ -36,6 +36,9 @@ several table-wide bases as "wrong"), fixed in the commit "check_answer_week_bas
 stop flagging correctly labeled answers". The row is left as-is; exclude it when
 counting this outcome. The answer shipped with a false caveat appended.
 
+## ⚠️ Standing caveat: the Pre-Merge Gate was dark from #30 to #60 (2026-09-23 to 2026-09-25)
+From #30 (daafb3c5, 2026-09-23) until #60 (merged 2026-09-25), Pre-Merge Gate Tests failed at step 1 (`eval_handler_descriptions` counted the `incremental_arr` import as a handler) and stopped there, so "CI green" on any PR merged in that window means PR Offline Tests only, never the gate's later checks. When the gate next ran in full (#60), it had caught two null-to-$0 `deal_value` sites merged in the meantime (`commit_cohort_walk.py`, `qualification_call_comparison.py`), both fixed in #60.
+
 ## 🟡 Open Items
 
 ### 🟠 MEDIUM: `query_pipeline_coverage` weights deals by the wrong stage key (found 2026-09-25)
