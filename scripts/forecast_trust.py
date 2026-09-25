@@ -226,6 +226,8 @@ def assess_forecast_trust(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
         },
         "risk_summary": summary,
         "risk_basis": risk_result.get("basis"),
+        "risk_not_assessed": {"deals": risk_result.get("not_assessed_deals", []),
+                              "note": risk_result.get("not_assessed_note")},
         "high_risk_count": high_risk_count,
         "high_risk_fraction": high_risk_fraction,
         "historical": {

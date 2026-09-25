@@ -48,6 +48,20 @@ SEGMENT_CYCLE_BENCHMARKS = {
 MEDDICC_STALENESS_DAYS = 14  # Scores older than this are flagged as stale
 HIGH_RISK_DAYS_PAST = 30     # > this many days past the benchmark = high_risk
 
+try:
+    from api.field_semantics import _RENEWAL_PIPELINE_ID
+except ImportError:
+    from field_semantics import _RENEWAL_PIPELINE_ID
+
+# Renewal-pipeline deals get no label. The benchmark is new-business cycle
+# time; renewals run on a different clock (won renewals' 75th percentile is
+# 364 days for SMB vs the 138 applied), so the label called deals high risk
+# for being renewals (2026-09-25: 4 of the forecast's 9 high-risk deals).
+# There is no reliable renewal-risk signal yet; they are reported, not labelled.
+NOT_ASSESSED_REASON = ("Renewal-pipeline deal: not risk-assessed. There is no reliable "
+                       "renewal-risk signal yet, and the cycle-length benchmark measures "
+                       "new-business sales cycles, not renewals.")
+
 
 def risk_basis() -> str:
     """The method behind overall_label, returned with every result so an
@@ -61,7 +75,8 @@ def risk_basis() -> str:
         "low_risk = within it, insufficient_data = no benchmark for the segment. MEDDICC is "
         "shown for context only and not weighted (p=0.80, not distinguishable from zero); "
         f"a score older than {MEDDICC_STALENESS_DAYS} days is marked stale. The label is not "
-        "a probability."
+        "a probability. Renewal-pipeline deals are not assessed: they are listed in "
+        "not_assessed_deals and counted in summary.not_assessed, outside every risk count."
     )
 
 # Late-stage stage IDs (from config/field_semantics.yaml)
@@ -113,16 +128,27 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
             }
         }
     """
+    not_assessed = [
+        {"deal_id": str(d.get("deal_id", "")), "company_name": d.get("company_name", "Unknown"),
+         "pipeline_id": str(d.get("pipeline_id")), "segment": d.get("segment") or "Unknown",
+         "stage": d.get("stage", ""), "forecast_category": d.get("forecast_category"),
+         "reason": NOT_ASSESSED_REASON}
+        for d in deals if str(d.get("pipeline_id")) == _RENEWAL_PIPELINE_ID]
+    deals = [d for d in deals if str(d.get("pipeline_id")) != _RENEWAL_PIPELINE_ID]
+
     if not deals:
         return {
             "assessed_deals": [],
+            "not_assessed_deals": not_assessed,
+            "not_assessed_note": NOT_ASSESSED_REASON,
             "basis": risk_basis(),
             "summary": {
                 "total_assessed": 0,
                 "high_risk": 0,
                 "moderate_risk": 0,
                 "low_risk": 0,
-                "insufficient_data": 0
+                "insufficient_data": 0,
+                "not_assessed": len(not_assessed),
             }
         }
 
@@ -249,11 +275,14 @@ def assess_deal_risk(deals: List[Dict[str, Any]], sb) -> Dict[str, Any]:
         "high_risk": sum(1 for d in assessed if d["overall_label"] == "high_risk"),
         "moderate_risk": sum(1 for d in assessed if d["overall_label"] == "moderate_risk"),
         "low_risk": sum(1 for d in assessed if d["overall_label"] == "low_risk"),
-        "insufficient_data": sum(1 for d in assessed if d["overall_label"] == "insufficient_data")
+        "insufficient_data": sum(1 for d in assessed if d["overall_label"] == "insufficient_data"),
+        "not_assessed": len(not_assessed),
     }
 
     return {
         "assessed_deals": assessed,
+        "not_assessed_deals": not_assessed,
+        "not_assessed_note": NOT_ASSESSED_REASON,
         "basis": risk_basis(),
         "summary": summary
     }
@@ -478,14 +507,14 @@ def get_at_risk_deals(sb, fiscal_quarter: Optional[str] = None) -> Dict[str, Any
 
         # Query 1: Late-stage deals
         response1 = sb.table("deals").select(
-            "deal_id,company_name,stage,create_date,close_date,segment,forecast_category,deal_status"
+            "deal_id,company_name,stage,create_date,close_date,segment,forecast_category,deal_status,pipeline_id"
         ).in_("stage", LATE_STAGE_IDS).eq("deal_status", "active").gte(
             "close_date", q_start.isoformat()
         ).lte("close_date", q_end.isoformat()).execute()
 
         # Query 2: COMMIT deals
         response2 = sb.table("deals").select(
-            "deal_id,company_name,stage,create_date,close_date,segment,forecast_category,deal_status"
+            "deal_id,company_name,stage,create_date,close_date,segment,forecast_category,deal_status,pipeline_id"
         ).eq("forecast_category", "COMMIT").eq("deal_status", "active").gte(
             "close_date", q_start.isoformat()
         ).lte("close_date", q_end.isoformat()).execute()
