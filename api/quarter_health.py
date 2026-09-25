@@ -67,7 +67,11 @@ DROP_KEYS = {"query_pipeline": ("by_owner",)}
 TEXT_ROWS = {"query_loss_concentration": ("by_rep", "by_segment")}
 HIGH_RISK_KEEP = 10
 AT_RISK_KEEP = 10
-_HIGH_RISK_FIELDS = ("company_name", "segment", "days_past_benchmark")
+# days_past_benchmark only means something beside the benchmark it is measured
+# against: keep all three (check_benchmark_offsets pairs them; dropping the
+# benchmark made 8 correct rows read as "no valid benchmark" live, 2026-09-25).
+_HIGH_RISK_FIELDS = ("company_name", "segment", "days_open", "cycle_benchmark_days",
+                     "days_past_benchmark")
 
 FRAMES = {
     "base": "Are we in good shape this quarter?",
