@@ -140,7 +140,7 @@ HEADLINE = {
 def test_the_collector_sees_the_known_disclosures():
     paths = {p for _, p, _ in DISCLOSURES}
     for must in ("query_forecast_trust.risk_basis",
-                 "query_pipeline._synthesis_note", "query_pipeline.business_definition_note",
+                 "query_pipeline.business_definition_note",
                  "query_pipeline.zero_arr_deals.note", "query_pipeline.meeting_set_unsized.note",
                  "query_high_priority_deal_risk.basis", "query_loss_concentration.note",
                  "query_loss_concentration.ghost_deal_share.note",
@@ -149,9 +149,11 @@ def test_the_collector_sees_the_known_disclosures():
         assert must in paths, must
     assert any(p.startswith("query_loss_concentration.by_rep[") for p in paths)
     assert {p for _, p, _ in EXCLUDED} == {"query_forecast_trust.note",
-                                          "query_forecast_trust.calibration_evidence.note"}, EXCLUDED
+                                          "query_forecast_trust.calibration_evidence.note",
+                                          "query_pipeline._synthesis_note"}, EXCLUDED
     print(f"✓ collector: {len(DISCLOSURES)} disclosure strings across the 4 real primitive outputs, "
-          "plus the 2 left out of the verdict (the historical cohort's note and calibration evidence)")
+          "plus the 3 left out of the verdict (the historical cohort's note and calibration evidence, "
+          "query_pipeline's standalone note with the unweighted ratio)")
 
 
 def _check_survival(scenario, raw=None):
