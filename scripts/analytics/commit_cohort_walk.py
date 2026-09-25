@@ -134,7 +134,7 @@ def walk(snapshots, snapshot_dates, deals, stage_history, deleted, q_start, q_en
              "pipeline_id": str((d or {}).get("pipeline_id") or last_commit.get("pipeline_id")),
              "first_commit_week": commits[0]["week_of_quarter"],
              "commit_weeks": [s["week_of_quarter"] for s in commits],
-             "committed_value": float(last_commit.get("deal_value") or 0),
+             "committed_value": _value(last_commit.get("deal_value")),
              "committed_close_date": str(last_commit.get("close_date") or "")[:10] or None,
              "commit_weeks_close_outside": [
                  s["week_of_quarter"] for s in commits
@@ -192,11 +192,23 @@ def walk(snapshots, snapshot_dates, deals, stage_history, deleted, q_start, q_en
                 continue
         if outcome == "won":
             r["bucket"] = "WON_IN_QUARTER" if in_q else "WON_LATER"
-            r["won_value"] = float(d.get("deal_value") or 0)
+            r["won_value"] = _value(d.get("deal_value"))
         else:
             r["bucket"] = "LOST"
             r["lost_timing"] = "in_quarter" if in_q else "later"
     return {"rows": rows, "summary": summarise(rows, renewal_pipelines)}
+
+
+def _value(v):
+    """deal_value as a float, or None when unknown. A snapshot row with no
+    value history reconstructs to None (Phase 2b); 0-filling it would put a
+    fabricated $0 into a dollar total (eval_reconstruction's ratchet). An
+    unknown value is left out of every dollar sum and counted instead."""
+    return None if v is None else float(v)
+
+
+def _sum(rows, key):
+    return round(sum(r[key] for r in rows if r[key] is not None), 2)
 
 
 def summarise(rows, renewal_pipelines=()):
@@ -206,12 +218,14 @@ def summarise(rows, renewal_pipelines=()):
         n = len(rs)
         b = {k: [r for r in rs if r["bucket"] == k] for k in BUCKETS}
         amb = [r for r in rs if r["bucket"] is None]
-        cv = lambda xs: round(sum(r["committed_value"] for r in xs), 2)
-        wv = lambda xs: round(sum(r["won_value"] for r in xs), 2)
+        cv = lambda xs: _sum(xs, "committed_value")
+        wv = lambda xs: _sum(xs, "won_value")
         won = b["WON_IN_QUARTER"] + b["WON_LATER"]
         resolved = won + b["LOST"]
         return {
             "n": n, "ambiguous": len(amb), "committed_value": cv(rs),
+            "value_unknown": {"committed": sum(1 for r in rs if r["committed_value"] is None),
+                              "won": sum(1 for r in rs if r["won_value"] is None)},
             "buckets": {k: {"n": len(v), "committed_value": cv(v), "won_value": wv(v)}
                         for k, v in b.items()},
             "lost_in_quarter": sum(1 for r in b["LOST"] if r.get("lost_timing") == "in_quarter"),
@@ -238,11 +252,12 @@ def headlines(rows, last_week, late_weeks=3):
     n = len(rows)
     lost = [r for r in rows if r["bucket"] == "LOST"]
     outside = sorted((r for r in rows if r["commit_weeks_close_outside"]),
-                     key=lambda r: -r["committed_value"])
+                     key=lambda r: -(r["committed_value"] or 0))
     wins = [r for r in rows if r["bucket"] == "WON_IN_QUARTER"]
     late_from = last_week - late_weeks + 1
     late = [r for r in wins if r["first_commit_week"] >= late_from]
-    return {"n": n, "lost": len(lost), "lost_value": sum(r["committed_value"] for r in lost),
+    return {"n": n, "lost": len(lost), "lost_value": _sum(lost, "committed_value"),
+            "lost_value_unknown": sum(1 for r in lost if r["committed_value"] is None),
             "close_outside": [{"deal_id": r["deal_id"], "company_name": r["company_name"],
                                "weeks": r["commit_weeks_close_outside"],
                                "committed_value": r["committed_value"], "bucket": r["bucket"]}
@@ -252,8 +267,10 @@ def headlines(rows, last_week, late_weeks=3):
 
 
 def headline_text(h):
+    unk = h.get("lost_value_unknown") or 0
     out = [f"1. Lost outright: {h['lost']} of {h['n']} committed deals "
-           f"({_money(h['lost_value'])} committed)."]
+           f"({_money(h['lost_value'])} committed"
+           + (f"; {unk} with no value, not in that total" if unk else "") + ")."]
     co = h["close_outside"]
     if co:
         top = co[0]
@@ -276,7 +293,7 @@ def _pct(a, b):
 
 
 def _money(v):
-    return f"${v:,.0f}"
+    return "unknown" if v is None else f"${v:,.0f}"
 
 
 def report(title, s):
@@ -294,6 +311,10 @@ def report(title, s):
         out.append(f"  {k:<15} {b[k]['n']:>3} of {n}  {_money(b[k]['committed_value']):>12} committed{won}{extra}")
     if s["ambiguous"]:
         out.append(f"  AMBIGUOUS       {s['ambiguous']:>3} of {n}  (excluded from both rates below; see detail)")
+    unk = s.get("value_unknown") or {}
+    if unk.get("committed") or unk.get("won"):
+        out.append(f"  Value unknown: {unk.get('committed', 0)} committed value and {unk.get('won', 0)} won "
+                   "value unknown (no deal_value); left out of every dollar figure, deal counts unchanged")
     h, e = s["in_quarter_hit"], s["eventual_win"]
     out.append(f"  In-quarter hit rate: {h['won']} of {n} deals ({_pct(h['won'], n)}) won by quarter end; "
                f"{_money(h['committed_value_won'])} of {_money(h['committed_value_all'])} committed "
