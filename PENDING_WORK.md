@@ -38,6 +38,13 @@ counting this outcome. The answer shipped with a false caveat appended.
 
 ## 🟡 Open Items
 
+### 🟠 MEDIUM: `query_pipeline_coverage` weights deals by the wrong stage key (found 2026-09-25)
+**Status:** OPEN, logged only. Found while building the quarter-health downside, which reuses the same governed table correctly.
+- `assess_pipeline_coverage()` looks each deal's rate up in `query_stage_close_rate()`'s `by_stage_order` by `deals.highest_stage_order_reached`. The table is built from `deals_snapshot.stage_order`, the config order of the stage the deal was **in** (checked 2026-09-25: snapshot `stage_order` matches config order exactly). `highest_stage_order_reached` is a different measure: the highest stage ever reached, and it numbers Review as 9 where snapshots use 8. Active Meeting Set deals show 1–4 there.
+- **Size (FY2027 Q3, qualified incremental pipeline, 2026-09-25):** 16 of 44 Sales-pipeline deals ($2,106,050 of $4,907,066) get a rate under a different key than their current stage. Examples: Negotiating deals weighted at Awaiting Signature's 65% instead of Negotiating's 29%; Freie Presse (Awaiting Signature, `highest_stage_order_reached` 8) at Review's 0.2%.
+- **Also:** 8 Renewal-pipeline expansion deals ($295,485) are weighted with Sales-pipeline stage rates. The table is New+Expansion Sales-pipeline only, so they have no governed rate, and their stage orders are renewal stages.
+- **Fix when picked up:** key by the current stage's config order on the Sales pipeline, and leave renewal-pipeline deals unweighted, as `api/quarter_health.downside_worst_case` does. Tests first; the weighted coverage figure will move.
+
 ### 🔵 STANDING NEXT STEP (ready when there's appetite to act, not study): test one coaching change live on the Meeting Set → qualified crossing rate (logged 2026-09-24)
 **Status:** OPEN, waiting on a decision to act. No more analysis of this cohort is planned.
 - **What's done:** Qualification Phase 2 (`scripts/analytics/qualification_call_comparison.py`, merged as 8f7b4b1b in #59) compared MEDDICC scores on the calls made before the move, for Meeting Set deals that progressed (52) vs deals that stalled (69, 20 still open). It found **no reliable signal in either view**. That comparison was exploratory, and it is limited by sample size: after controlling for segment × size × tenure, only about half the training deals had a match in the other cohort. Two confounds can't be removed from this data: stalled deals are mostly lost (lead fit), and a score may simply mark a deal that was already moving.
