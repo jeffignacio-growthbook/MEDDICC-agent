@@ -112,10 +112,10 @@ def _base_deals(extra=None):
     gated stage (order 1), one at the ungated stage (order 2)."""
     deals = [
         {"deal_id": "gated1", "pipeline_id": "default", "expansion_arr": 0,
-         "new_arr": 100000, "highest_stage_order_reached": 1,
+         "new_arr": 100000, "stage": "appointmentscheduled", "highest_stage_order_reached": 1,
          "close_date": "2026-09-15", "deal_status": "active"},
         {"deal_id": "ungated1", "pipeline_id": "default", "expansion_arr": 50000,
-         "new_arr": 0, "highest_stage_order_reached": 2,
+         "new_arr": 0, "stage": "qualifiedtobuy", "highest_stage_order_reached": 2,
          "close_date": "2026-09-20", "deal_status": "active"},
     ]
     if extra:
@@ -147,7 +147,7 @@ def _run(deals_data, quota_value=2000000, current_period="FY2027_Q3"):
 def test_scope_excludes_renewal_and_unqualified_deals():
     """
     A renewal-pipeline deal (pipeline_id == RENEWAL_PIPELINE_ID) and a
-    sub-qualified-stage deal (highest_stage_order_reached < 1) must both be
+    sub-qualified-stage deal (current stage Meeting Set) must both be
     excluded from qualified_pipeline — only the two clean deals count.
     """
     print("\n[TEST] Scope excludes renewal-pipeline and sub-qualified deals")
@@ -160,10 +160,10 @@ def test_scope_excludes_renewal_and_unqualified_deals():
         # renewal-base deal, with no incremental ARR at all, must be excluded).
         {"deal_id": "renewal1", "pipeline_id": RENEWAL_PIPELINE_ID,
          "expansion_arr": 0, "new_arr": 0, "renewal_revenue": 999999,
-         "highest_stage_order_reached": 3,
+         "stage": "presentationscheduled", "highest_stage_order_reached": 3,
          "close_date": "2026-09-10", "deal_status": "active"},
         {"deal_id": "subqual1", "pipeline_id": "default", "expansion_arr": 0,
-         "new_arr": 777777, "highest_stage_order_reached": 0,
+         "new_arr": 777777, "stage": "79653122", "highest_stage_order_reached": 0,
          "close_date": "2026-09-10", "deal_status": "active"},
     ]
     result = _run(_base_deals(extra))
@@ -227,7 +227,7 @@ def test_gap_to_goal_phrasing_never_bare_ratio():
     # config/targets.yaml, but a large qualified deal pushes raw pipeline
     # past the goal) -> "over target"
     huge_deal = {"deal_id": "huge1", "pipeline_id": "default", "expansion_arr": 0,
-                 "new_arr": 5000000, "highest_stage_order_reached": 1,
+                 "new_arr": 5000000, "stage": "appointmentscheduled", "highest_stage_order_reached": 1,
                  "close_date": "2026-09-12", "deal_status": "active"}
     result2 = _run(_base_deals([huge_deal]), quota_value=100000)
     gap2 = result2["gap_to_goal"]["raw_pipeline_vs_goal"]
@@ -341,7 +341,7 @@ def test_regression_renewal_deal_cannot_enter_qualified_pipeline():
 
     pure_renewal_deal = {"deal_id": "renewal_pure", "pipeline_id": RENEWAL_PIPELINE_ID,
                           "expansion_arr": 0, "new_arr": 0, "renewal_revenue": 500000,
-                          "highest_stage_order_reached": 3,
+                          "stage": "presentationscheduled", "highest_stage_order_reached": 3,
                           "close_date": "2026-09-10", "deal_status": "active"}
 
     # First: prove a broken filter that ignores pipeline_id/incremental-ARR

@@ -14,10 +14,12 @@ composition, per Jeff's explicit domain specification:
 
   1. SCOPE: New+Expansion ARR only (is_incremental_pipeline()), renewal
      pipeline excluded. Reuses the existing split — never re-derived.
-  2. QUALIFIED PIPELINE ONLY: highest_stage_order_reached >=
-     config/client.yaml's pipeline.qualified_stage_order — the exact
-     existing qualification boundary query_pipeline()/query_coverage()
-     already use, reused here rather than inventing a new one.
+  2. QUALIFIED PIPELINE ONLY: a Sales-pipeline deal whose CURRENT stage
+     is Discovery through Awaiting Signature
+     (loss_concentration.discovery_or_later_stages(): config order >=
+     qualified_stage_order, not won/lost, not exclude_from_analysis, so
+     not Meeting Set or Review). Until 2026-09-25 this read
+     highest_stage_order_reached, a high-water mark (see 3).
   3. STAGE-LEVEL WEIGHTING: each qualified deal's incremental value is
      weighted by its stage's historical close rate
      (forecast_analyses.query_stage_close_rate(), built fresh — no
@@ -25,6 +27,13 @@ composition, per Jeff's explicit domain specification:
      stage whose historical cohort doesn't clear min_evidence_count is
      excluded from the weighted total (unweighted_value/
      unweighted_deal_count), never defaulted to a 1.0 weight.
+     The rate is looked up by the config order of the deal's CURRENT
+     stage: the table is built from deals_snapshot.stage_order, the stage
+     a deal was in. It used highest_stage_order_reached, which keyed 16 of
+     44 live FY2027 Q3 deals ($2,106,050) to a stage they were not in
+     (weighted $1,231,113 instead of $701,826). Renewal-pipeline expansion
+     has no governed rate (the table is Sales, New+Expansion only): it is
+     reported as renewal_not_weighted, never given a Sales stage's rate.
   4. COVERAGE TARGET IS A CURVE, not a fixed multiple:
      forecast_analyses.query_coverage_proxy_target_by_week() — confirmed
      live that no complete historical quarter ever had a real target, so
@@ -131,30 +140,36 @@ def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]
     current_week = get_week_of_quarter(as_of, q_start)
     q_start_iso, q_end_iso = q_start.isoformat(), q_end.isoformat()
 
+    from loss_concentration import SALES_PIPELINE, discovery_or_later_stages
     pipeline_config = get_pipeline_config()
-    qualified_stage_order = pipeline_config.get("qualified_stage_order", 1)
+    qualifying = set(discovery_or_later_stages(pipeline_config))
+    stage_order_of = {str(s["id"]): s.get("order")
+                      for p in pipeline_config.get("pipelines", [])
+                      if str(p.get("id")) == SALES_PIPELINE for s in p.get("stages", [])}
 
     # 1+2: New+Expansion only, qualified only, Q-scoped by close_date
     # (same q3_scoped_pipeline precedent query_pipeline() uses — a
     # coverage figure must compare against a same-period target).
     deals = select_all(sb, "deals",
-        columns="deal_id,pipeline_id,expansion_arr,new_arr,"
-                "highest_stage_order_reached,close_date,deal_status")
+        columns="deal_id,pipeline_id,stage,expansion_arr,new_arr,close_date,deal_status",
+        filters=[("eq", "deal_status", "active"),
+                 ("gte", "close_date", q_start_iso),
+                 ("lte", "close_date", q_end_iso)])
 
-    qualified_deals = []
+    qualified_deals, renewal_deals = [], []
     for d in deals:
-        if d.get("deal_status") != "active":
-            continue
-        if not is_incremental_pipeline(d):
-            continue
-        stage_order = d.get("highest_stage_order_reached") or 0
-        if stage_order < qualified_stage_order:
+        if d.get("deal_status") != "active" or not is_incremental_pipeline(d):
             continue
         close_date = d.get("close_date")
         if not close_date or not (q_start_iso <= str(close_date)[:10] <= q_end_iso):
             continue
         d["_incremental_value"] = incremental_arr(d)
-        d["_stage_order"] = stage_order
+        if str(d.get("pipeline_id")) != SALES_PIPELINE:
+            renewal_deals.append(d)
+            continue
+        if str(d.get("stage")) not in qualifying:
+            continue
+        d["_stage_order"] = stage_order_of[str(d.get("stage"))]
         qualified_deals.append(d)
 
     raw_pipeline_total = sum(d["_incremental_value"] for d in qualified_deals)
@@ -169,7 +184,7 @@ def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]
     unweighted_total = 0.0
     unweighted_deal_count = 0
     for d in qualified_deals:
-        stage_row = by_stage_order.get(d["_stage_order"])
+        stage_row = by_stage_order.get(str(d["_stage_order"])) or by_stage_order.get(d["_stage_order"])
         win_rate = stage_row.get("win_rate") if stage_row else None
         if win_rate is None:
             unweighted_total += d["_incremental_value"]
@@ -215,12 +230,20 @@ def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]
         "fiscal_quarter": fiscal_quarter,
         "current_week": current_week,
         "scope": ("New+Expansion ARR only (is_incremental_pipeline(), "
-                  "renewal pipeline excluded); qualified pipeline only "
-                  f"(highest_stage_order_reached >= {qualified_stage_order}); "
-                  "Q-scoped by close_date"),
+                  "renewal pipeline weighted separately: see renewal_not_weighted); qualified "
+                  "pipeline only (Sales pipeline, current stage Discovery through Awaiting "
+                  "Signature); each deal weighted by its current stage's rate; Q-scoped by "
+                  "close_date"),
         "qualified_pipeline": {
             "raw_value": raw_pipeline_total,
             "deal_count": raw_deal_count,
+        },
+        "renewal_not_weighted": {
+            "deal_count": len(renewal_deals),
+            "value": sum(d["_incremental_value"] for d in renewal_deals),
+            "note": ("Renewal-pipeline expansion ARR closing this quarter: no governed stage "
+                     "rate (the table is Sales-pipeline New+Expansion only), so it is not in "
+                     "the weighted total and is not given a Sales stage's rate."),
         },
         "stage_weighting": {
             "weighted_value": weighted_total,
