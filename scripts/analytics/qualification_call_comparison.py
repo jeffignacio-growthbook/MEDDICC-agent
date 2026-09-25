@@ -194,10 +194,10 @@ def _segment(d):
 
 
 def _size_band(d):
-    amt = incremental_arr(d)
+    amt = incremental_arr(d) or d.get("deal_value")   # null stays null: no 0-fill
     if not amt:
-        amt = d.get("deal_value") or 0
-    return "0/unknown" if not amt else ("<50k" if amt < SIZE_SPLIT else ">=50k")
+        return "0/unknown"
+    return "<50k" if amt < SIZE_SPLIT else ">=50k"
 
 
 def _tenure_band(d, owners, ms_first):
