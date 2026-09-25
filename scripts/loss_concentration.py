@@ -59,6 +59,34 @@ Design decisions confirmed before building (Step A):
      targeting the bucket-mapping and rate-normalization logic
      specifically.
 
+Qualified loss rate (2026-09-25). The headline is no longer lost / all
+closed. On live FY2027 Q3 data that read 92.4% (109 of 118) because it
+counted 52 deals closed as Disqualified (inbound leads that never
+qualified), 17 that closed without reaching Discovery and the renewals.
+The lead figure is now the QUALIFIED loss rate: Sales-pipeline deals seen
+in deals_snapshot at Discovery or later (Discovery, Scoping, Technical
+Evaluation, Negotiating, Awaiting Signature; derived from config:
+order >= qualified_stage_order, not won/lost, not exclude_from_analysis)
+on or before their close_date, and not closed as Disqualified. Review is
+not "Discovery or later": config calls it a parking lot for stalled/dead
+deals, and live snapshots show deals going Meeting Set -> Review without
+ever reaching Discovery. deals.highest_stage_order_reached cannot answer
+the question (Closed Lost is order 7, Disqualified 9, so every loss reads
+7+). A Sales deal with no snapshot history is counted as
+no_stage_history, never guessed in or out; the headline gives the rate if
+all of them had qualified. The all-closed rate is always reported beside
+it, with where the difference comes from (loss_rate_headline, built here
+so the wording is code's, not the model's).
+
+by_rep and by_segment are over the qualified population, and an owner
+whose user_personas role is 'sdr' is kept out of the rep table (listed in
+by_rep_excluded; their deals still count in the team rate): otherwise a
+BDR's disqualified inbound leads read as a "100% loss rate".
+
+won_incremental_arr: closed-won incremental ARR (new + expansion) summed
+over the same fetched won rows won_count counts, for quarter health's
+QTD-vs-target line (no second query).
+
 Read-only. No writes.
 """
 import sys
@@ -79,6 +107,38 @@ ADMINISTRATIVE_STAGE_IDS = {"decisionmakerboughtin", "68509551"}
 
 MIN_N = 5  # both the primitive-level gate and the per-rep/segment row floor
 
+SALES_PIPELINE = "default"
+NON_CLOSING_ROLES = {"sdr"}  # user_personas.role values kept out of by_rep
+_ID_CHUNK = 100
+
+
+def _sales_stages(pipeline_config: dict = None) -> tuple:
+    if pipeline_config is None:
+        from utils import get_pipeline_config
+        pipeline_config = get_pipeline_config()
+    for p in pipeline_config.get("pipelines", []):
+        if str(p.get("id")) == SALES_PIPELINE:
+            return p.get("stages", []), p.get("qualified_stage_order", 1)
+    return [], 1
+
+
+def discovery_or_later_stages(pipeline_config: dict = None) -> tuple:
+    """Sales stages a deal has to have been seen at to count as qualified:
+    order >= qualified_stage_order, not won/lost, not exclude_from_analysis
+    (which leaves out Meeting Set, Review and Disqualified)."""
+    stages, qso = _sales_stages(pipeline_config)
+    return tuple(str(s["id"]) for s in sorted(stages, key=lambda s: s.get("order", 0))
+                 if s.get("order") is not None and s["order"] >= qso
+                 and not s.get("is_won") and not s.get("is_lost")
+                 and not s.get("exclude_from_analysis"))
+
+
+def disqualified_stage_ids(pipeline_config: dict = None) -> set:
+    """Config rule: Disqualified stages carry BOTH is_lost and
+    exclude_from_analysis."""
+    stages, _ = _sales_stages(pipeline_config)
+    return {str(s["id"]) for s in stages if s.get("is_lost") and s.get("exclude_from_analysis")}
+
 
 def _order_to_stage_id(pipeline_config: dict) -> Dict[int, str]:
     """highest_stage_order_reached (int) -> HubSpot stage id, from
@@ -97,7 +157,7 @@ def _order_to_stage_id(pipeline_config: dict) -> Dict[int, str]:
 
 
 def _rate_row(key_value: str, key_name: str, won: int, lost: int,
-              team_loss_rate: float) -> Dict[str, Any]:
+              team_loss_rate: Optional[float]) -> Dict[str, Any]:
     """One rep/segment row. Never a bare ratio — always phrased with
     team-average context. Below MIN_N, no rate is computed at all
     (insufficient_volume=True) rather than reporting a misleading
@@ -107,24 +167,23 @@ def _rate_row(key_value: str, key_name: str, won: int, lost: int,
     if closed < MIN_N:
         row["loss_rate"] = None
         row["insufficient_volume"] = True
-        row["text"] = (f"{key_value}: {lost}/{closed} closed lost — fewer "
-                        f"than {MIN_N} closed deals, too thin to report a "
-                        f"reliable rate")
+        row["text"] = (f"{key_value}: {lost}/{closed} closed lost, fewer than "
+                       f"{MIN_N}: too thin for a rate")
         return row
     loss_rate = lost / closed
     vs_team = loss_rate - team_loss_rate
     row["loss_rate"] = round(loss_rate, 4)
     row["vs_team_avg_pts"] = round(vs_team, 4)
-    direction = "above" if vs_team > 0 else ("below" if vs_team < 0 else "equal to")
-    row["text"] = (f"{key_value}: {lost}/{closed} closed lost "
-                    f"({loss_rate:.1%} loss rate), "
-                    f"{abs(vs_team):.1%} {direction} the team average "
-                    f"of {team_loss_rate:.1%}")
+    pts = round(abs(vs_team) * 100, 1)
+    rel = (f"{pts} pts {'above' if vs_team > 0 else 'below'} the team's {team_loss_rate:.1%}"
+           if pts else f"equal to the team's {team_loss_rate:.1%}")
+    row["text"] = (f"{key_value}: {lost}/{closed} qualified closed lost "
+                   f"({loss_rate:.1%} loss rate), {rel}")
     return row
 
 
-def _rate_breakdown(deals: List[dict], key: str,
-                     team_loss_rate: float) -> List[Dict[str, Any]]:
+def _rate_breakdown(deals: List[dict], key: str, team_loss_rate: Optional[float],
+                    roles: Optional[Dict[str, str]] = None) -> List[Dict[str, Any]]:
     by_key: Dict[str, Dict[str, int]] = {}
     for d in deals:
         k = d.get(key) or "Unknown"
@@ -133,10 +192,76 @@ def _rate_breakdown(deals: List[dict], key: str,
 
     rows = [_rate_row(k, key, c["won"], c["lost"], team_loss_rate)
             for k, c in by_key.items()]
+    if roles is not None:
+        for r in rows:
+            r["role"] = roles.get(str(r[key]).lower(), "unknown")
     # Sort by loss_rate descending (worst first); insufficient-volume rows
     # (loss_rate=None) sort last, never masquerading as "0% loss".
     rows.sort(key=lambda r: (r["loss_rate"] is None, -(r["loss_rate"] or 0)))
     return rows
+
+
+def _plural(n: int, one: str, many: str) -> str:
+    return f"{n} {one if n == 1 else many}"
+
+
+def _join(parts: List[str]) -> str:
+    return parts[0] if len(parts) == 1 else ", ".join(parts[:-1]) + " and " + parts[-1]
+
+
+def loss_rate_headline(qualified: Dict[str, int], closed: int, lost: int,
+                       excluded: Dict[str, int], no_history_lost: int) -> str:
+    """The two-figure loss-rate line, in code: the qualified rate first, the
+    all-closed rate beside it with where the difference comes from, and the
+    rate if every deal with no stage history had qualified."""
+    qc, ql = qualified["closed"], qualified["lost"]
+    if qc >= MIN_N:
+        out = (f"Qualified loss rate: {ql / qc:.1%} ({ql} of {qc} closed Sales deals that reached "
+               "Discovery or later before closing; deals closed as Disqualified are not counted).")
+    else:
+        out = (f"Qualified loss rate: not reported, only {qc} closed Sales deal"
+               f"{'' if qc == 1 else 's'} reached Discovery or later (fewer than {MIN_N}).")
+    parts = [p for n, p in (
+        (excluded["disqualified_at_close"], f"{excluded['disqualified_at_close']} closed as Disqualified"),
+        (excluded["never_reached_discovery"],
+         f"{excluded['never_reached_discovery']} that closed without reaching Discovery"),
+        (excluded["no_stage_history"], f"{excluded['no_stage_history']} with no stage history"),
+        (excluded["renewal_pipeline"], _plural(excluded["renewal_pipeline"], "renewal", "renewals")),
+    ) if n]
+    out += f" All closed deals: {lost / closed:.1%} ({lost} of {closed})"
+    out += ("; the difference is " + _join(parts) + ".") if parts else ", the same deals."
+    nh = excluded["no_stage_history"]
+    if nh and qc + nh >= MIN_N:
+        who = ("If the 1 deal with no stage history had qualified" if nh == 1 else
+               f"If all {nh} deals with no stage history had qualified")
+        out += (f" {who}, the qualified rate would be {(ql + no_history_lost) / (qc + nh):.1%} "
+                f"({ql + no_history_lost} of {qc + nh}).")
+    return out
+
+
+def _classify(deals: List[dict], snaps: Dict[str, List[tuple]], qualifying: set,
+              disqualified: set) -> Dict[str, str]:
+    """deal_id -> one of qualified / renewal_pipeline / disqualified_at_close /
+    no_stage_history / never_reached_discovery. Only snapshots dated on or
+    before the deal's close_date count ("before closing")."""
+    out = {}
+    for d in deals:
+        did = str(d.get("deal_id"))
+        if str(d.get("pipeline_id")) != SALES_PIPELINE:
+            out[did] = "renewal_pipeline"
+            continue
+        if str(d.get("stage")) in disqualified:
+            out[did] = "disqualified_at_close"
+            continue
+        close = str(d.get("close_date") or "")[:10]
+        seen = [stage for day, stage in snaps.get(did, []) if str(day)[:10] <= close]
+        if not seen:
+            out[did] = "no_stage_history"
+        elif any(stage in qualifying for stage in seen):
+            out[did] = "qualified"
+        else:
+            out[did] = "never_reached_discovery"
+    return out
 
 
 def assess_loss_concentration(sb, time_window: Optional[dict] = None) -> Dict[str, Any]:
@@ -153,18 +278,29 @@ def assess_loss_concentration(sb, time_window: Optional[dict] = None) -> Dict[st
     Returns (gated):
         {"status": "insufficient_data", "reason": "too_few_closed_deals",
          "period": str, "closed_deal_count": int, "min_required": int,
-         "note": str}
+         "won_incremental_arr": float, "won_arr_note": str, "note": str}
       or:
         {"status": "ok", "period": str,
          "closed_deal_count": int, "won_count": int, "lost_count": int,
-         "team_loss_rate": float,
-         "by_rep": [...rate rows, worst first...],
-         "by_segment": [...rate rows, worst first...],
+         "qualified": {"closed", "won", "lost"},
+         "qualified_loss_rate": float | None,   (the lead figure)
+         "all_closed_loss_rate": float,
+         "team_loss_rate": float | None,        (= qualified_loss_rate; rep
+                                                 and segment rows compare to it)
+         "excluded_from_qualified": {"renewal_pipeline",
+             "disqualified_at_close", "never_reached_discovery",
+             "no_stage_history"},
+         "loss_rate_headline": str, "loss_rate_note": str,
+         "by_rep": [...qualified rate rows, worst first, SDRs out...],
+         "by_rep_excluded": [{"owner_email", "role", "closed_all",
+                              "qualified_closed", "reason"}],
+         "by_segment": [...qualified rate rows, worst first...],
          "stage_of_loss": {
              "by_bucket": {bucket: {"count", "pct"}, ...},
              "administrative_stage_share": {"count", "pct", "note"},
          },
          "ghost_deal_share": {"count", "pct", "note"},
+         "won_incremental_arr": float, "won_arr_note": str,
          "min_n_floor": int,
          "note": str}
     """
@@ -172,6 +308,7 @@ def assess_loss_concentration(sb, time_window: Optional[dict] = None) -> Dict[st
     from supabase_client import select_all
     from time_resolver import resolve_time_window
     from utils import get_pipeline_config
+    from incremental_arr import incremental_arr
 
     if not time_window or "start" not in time_window or "end" not in time_window:
         time_window = resolve_time_window(time_window or {})
@@ -179,25 +316,13 @@ def assess_loss_concentration(sb, time_window: Optional[dict] = None) -> Dict[st
     tw_label = time_window.get("label", "")
 
     deals = select_all(sb, "deals",
-        columns="deal_id,deal_status,deal_value,close_date,"
-                "owner_email,segment,highest_stage_order_reached",
+        columns="deal_id,deal_status,deal_value,new_arr,expansion_arr,close_date,"
+                "owner_email,segment,highest_stage_order_reached,pipeline_id,stage",
         filters=[("in_", "deal_status", ["won", "lost"]),
                  ("gte", "close_date", tw_start),
                  ("lte", "close_date", tw_end)])
 
     total_closed = len(deals)
-    if total_closed < MIN_N:
-        return {
-            "status": "insufficient_data",
-            "reason": "too_few_closed_deals",
-            "period": tw_label,
-            "closed_deal_count": total_closed,
-            "min_required": MIN_N,
-            "note": (f"Only {total_closed} closed deal(s) in {tw_label} — "
-                     f"need at least {MIN_N} for a meaningful concentration "
-                     f"breakdown."),
-        }
-
     wins = [d for d in deals if d.get("deal_status") == "won"]
     losses = [d for d in deals if d.get("deal_status") == "lost"]
     # Verified by construction: wins/losses are a partition of the same
@@ -205,14 +330,74 @@ def assess_loss_concentration(sb, time_window: Optional[dict] = None) -> Dict[st
     # above, so every row lands in exactly one bucket) — no separate
     # "structured output" exists here to drift from the underlying data.
     won_count, lost_count = len(wins), len(losses)
-    team_loss_rate = lost_count / total_closed
+    won_arr = sum(incremental_arr(d) for d in wins)
+    won_renewals = sum(1 for d in wins if str(d.get("pipeline_id")) != SALES_PIPELINE)
+    won_arr_note = (f"Closed-won incremental ARR (new_arr + expansion_arr) over the {won_count} won "
+                    f"deal{'' if won_count == 1 else 's'} closed in {tw_label}, the same rows won_count "
+                    "counts." + (f" Renewal revenue is not incremental ARR, so the "
+                                 f"{_plural(won_renewals, 'won renewal counts', 'won renewals count')} "
+                                 "only expansion ARR." if won_renewals else ""))
 
-    by_rep = _rate_breakdown(deals, "owner_email", team_loss_rate)
-    by_segment = _rate_breakdown(deals, "segment", team_loss_rate)
+    if total_closed < MIN_N:
+        return {
+            "status": "insufficient_data",
+            "reason": "too_few_closed_deals",
+            "period": tw_label,
+            "closed_deal_count": total_closed,
+            "min_required": MIN_N,
+            "won_count": won_count,
+            "won_incremental_arr": won_arr,
+            "won_arr_note": won_arr_note,
+            "note": (f"Only {total_closed} closed deal(s) in {tw_label} — "
+                     f"need at least {MIN_N} for a meaningful concentration "
+                     f"breakdown."),
+        }
+
+    pipeline_config = get_pipeline_config()
+    qualifying = set(discovery_or_later_stages(pipeline_config))
+    disqualified = disqualified_stage_ids(pipeline_config)
+
+    need = sorted({str(d["deal_id"]) for d in deals
+                   if str(d.get("pipeline_id")) == SALES_PIPELINE
+                   and str(d.get("stage")) not in disqualified})
+    snaps: Dict[str, List[tuple]] = {}
+    for i in range(0, len(need), _ID_CHUNK):
+        for r in select_all(sb, "deals_snapshot", columns="deal_id,snapshot_date,stage_id",
+                            filters=[("in_", "deal_id", need[i:i + _ID_CHUNK])]):
+            snaps.setdefault(str(r["deal_id"]), []).append((r.get("snapshot_date"), str(r.get("stage_id"))))
+
+    cls = _classify(deals, snaps, qualifying, disqualified)
+    qual = [d for d in deals if cls[str(d["deal_id"])] == "qualified"]
+    q_won = sum(1 for d in qual if d.get("deal_status") == "won")
+    qualified = {"closed": len(qual), "won": q_won, "lost": len(qual) - q_won}
+    excluded = {k: sum(1 for v in cls.values() if v == k)
+                for k in ("renewal_pipeline", "disqualified_at_close",
+                          "never_reached_discovery", "no_stage_history")}
+    no_history_lost = sum(1 for d in losses if cls[str(d["deal_id"])] == "no_stage_history")
+    q_rate = (qualified["lost"] / qualified["closed"]) if qualified["closed"] >= MIN_N else None
+    all_rate = lost_count / total_closed
+
+    personas = select_all(sb, "user_personas", columns="email,role")
+    roles = {str(p.get("email") or "").lower(): (p.get("role") or "unknown") for p in personas}
+
+    def _role(d):
+        return roles.get(str(d.get("owner_email") or "").lower(), "unknown")
+
+    rep_deals = [d for d in qual if _role(d) not in NON_CLOSING_ROLES]
+    by_rep = _rate_breakdown(rep_deals, "owner_email", q_rate, roles)
+    by_rep_excluded = []
+    for owner in sorted({d.get("owner_email") for d in deals
+                         if _role(d) in NON_CLOSING_ROLES and d.get("owner_email")}):
+        by_rep_excluded.append({
+            "owner_email": owner, "role": roles.get(owner.lower()),
+            "closed_all": sum(1 for d in deals if d.get("owner_email") == owner),
+            "qualified_closed": sum(1 for d in qual if d.get("owner_email") == owner),
+            "reason": "SDR role; their qualified deals still count in the team rate",
+        })
+    by_segment = _rate_breakdown(qual, "segment", q_rate)
 
     # Stage-of-loss: canonical BUCKET mapping, not raw numeric order —
     # see module docstring decision #3.
-    pipeline_config = get_pipeline_config()
     order_to_stage_id = _order_to_stage_id(pipeline_config)
 
     bucket_counts = Counter()
@@ -250,9 +435,9 @@ def assess_loss_concentration(sb, time_window: Optional[dict] = None) -> Dict[st
         "pct": round(len(ghost_losses) / lost_count, 4) if lost_count else None,
         "note": ("Lost deals with $0/null deal_value — likely never "
                  "properly qualified or entered, not a genuine competitive "
-                 "loss. Reported separately; NOT excluded from by_rep/"
-                 "by_segment/stage_of_loss above, which cover the full "
-                 "population."),
+                 "loss. Reported separately over every loss, like "
+                 "stage_of_loss; by_rep/by_segment cover the qualified "
+                 "population only."),
     }
 
     return {
@@ -261,18 +446,28 @@ def assess_loss_concentration(sb, time_window: Optional[dict] = None) -> Dict[st
         "closed_deal_count": total_closed,
         "won_count": won_count,
         "lost_count": lost_count,
-        "team_loss_rate": round(team_loss_rate, 4),
+        "qualified": qualified,
+        "qualified_loss_rate": round(q_rate, 4) if q_rate is not None else None,
+        "all_closed_loss_rate": round(all_rate, 4),
+        "team_loss_rate": round(q_rate, 4) if q_rate is not None else None,
+        "excluded_from_qualified": excluded,
+        "loss_rate_headline": loss_rate_headline(qualified, total_closed, lost_count,
+                                                 excluded, no_history_lost),
+        "loss_rate_note": (
+            "Lead with the qualified loss rate; give the all-closed rate beside it, never alone. "
+            "Qualified = Sales deals seen at Discovery through Awaiting Signature on or before "
+            "close, not closed as Disqualified. Review does not count (config: a parking lot for "
+            "stalled deals). Renewals are outside it. team_loss_rate is the qualified rate."),
         "by_rep": by_rep,
+        "by_rep_excluded": by_rep_excluded,
         "by_segment": by_segment,
         "stage_of_loss": stage_of_loss,
         "ghost_deal_share": ghost_deal_share,
+        "won_incremental_arr": won_arr,
+        "won_arr_note": won_arr_note,
         "min_n_floor": MIN_N,
-        "note": ("Rep/segment rates are never bare — always reported "
-                 "against the team-average loss rate. Rows below "
-                 f"{MIN_N} closed deals are flagged insufficient_volume, "
-                 "not reported with a misleading rate. Stage-of-loss uses "
-                 "the canonical bucket mapping, not raw "
-                 "highest_stage_order_reached, to avoid the two "
-                 "administrative stages (order 8, 9) masquerading as "
-                 "sales-cycle depth."),
+        "note": (f"by_rep/by_segment: qualified deals only, each rate against the team's "
+                 f"qualified rate; SDR owners are in by_rep_excluded; rows under {MIN_N} closed "
+                 "deals get no rate. stage_of_loss uses the canonical bucket mapping, not raw "
+                 "highest_stage_order_reached (Review and Disqualified sit at order 8 and 9)."),
     }
