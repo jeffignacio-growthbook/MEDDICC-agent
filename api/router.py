@@ -215,11 +215,10 @@ HANDLER_DESCRIPTIONS = {
         "rep/segment', 'is this rep/segment losing more than average'. "
         "Computed directly from deals (owner, segment, stage at close) and "
         "deals_snapshot stage history — NOT dependent on "
-        "win_loss_narratives, so NOT subject to that table's data-"
-        "quality ceiling. DO NOT use for WHY deals are lost (competitor/"
-        "stated-reason narrative) — use query_win_loss for that, though "
-        "note its own reasoning ceiling is a hard data-quality gap, not "
-        "a routing choice."
+        "win_loss_narratives. DO NOT use for WHY deals are lost (the stated "
+        "close reason / competitor) — use query_win_loss for that: its "
+        "lost_reason/stated_reason is populated and authoritative now (the "
+        "earlier gap was an ETL fetch bug, since fixed)."
     ),
     "query_quarter_health": (
         "ARE WE IN GOOD SHAPE THIS QUARTER: one overall read on the current quarter: "

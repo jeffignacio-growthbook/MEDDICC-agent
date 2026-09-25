@@ -1192,16 +1192,17 @@ async def query_loss_concentration(params: dict, sb) -> dict:
     window (NORTH_STAR.md CRO Priority #5, the buildable half of the
     win/loss pattern-reasoning audit, 2026-09-20).
 
-    NOT the same as query_win_loss (that handler reads win_loss_
-    narratives' competitor/reason fields, which are blocked by a hard
-    data ceiling — 0% lost_reason fleet-wide, 1.7% competitor_mentioned).
-    This composes rep/segment loss-RATE breakdowns (never a bare count,
-    always vs. the team average) and a canonical bucket-based stage-of-
-    loss distribution (not raw highest_stage_order_reached — two
-    administrative stages sit out of the real stage sequence and would
-    otherwise dominate the numbers) from deals.owner_email/segment/
-    highest_stage_order_reached directly — no win_loss_narratives
-    dependency, no data-quality ceiling.
+    NOT the same as query_win_loss: that handler answers WHY a deal was
+    lost (its stated lost_reason/stated_reason — now populated after the
+    2026-09-25 ETL fetch-gap fix + backfill; only competitor_mentioned,
+    ~1.7% fleet-wide, remains a genuine capture ceiling). This handler
+    answers WHERE losses concentrate. It composes rep/segment loss-RATE
+    breakdowns (never a bare count, always vs. the team average) and a
+    canonical bucket-based stage-of-loss distribution (not raw
+    highest_stage_order_reached — two administrative stages sit out of the
+    real stage sequence and would otherwise dominate the numbers) from
+    deals.owner_email/segment/highest_stage_order_reached directly — no
+    win_loss_narratives dependency.
 
     The headline is the QUALIFIED loss rate (Sales deals seen at Discovery
     or later before closing, not closed as Disqualified; stage history from
@@ -1369,6 +1370,33 @@ async def query_win_loss(params: dict, sb) -> dict:
                    "a bug in the aggregation logic that must be fixed before shipping results."
         }
 
+    # Reason-authority guidance (2026-09-25): deals.lost_reason (and its
+    # verbatim copy win_loss_narratives.stated_reason) is now populated — the
+    # earlier "0% lost_reason" state was an ETL fetch gap, since fixed and
+    # backfilled (see PENDING_WORK's "DATA BUG" entry). A populated reason is
+    # the deal's OWN stated close reason from HubSpot and is the authoritative
+    # answer to "why did we lose this deal". The absence of call transcripts
+    # or MEDDICC scores for a deal is a SEPARATE data-capture gap — it may be
+    # mentioned as context but must never be used to hedge, contradict, or
+    # override a real stated reason (that is what produced the "we don't know
+    # why we lost" self-contradiction on deals that plainly carry a reason).
+    losses_missing_reason = [d for d in losses if not d.get("lost_reason")]
+    any_reason = any(d.get("lost_reason") for d in losses)
+
+    synthesis_note = None
+    if any_reason:
+        synthesis_note = (
+            "A populated lost_reason (and its verbatim copy stated_reason) is "
+            "the deal's own stated close reason from HubSpot. Treat it as the "
+            "PRIMARY, TRUSTED, authoritative answer to why that deal was lost "
+            "— state it directly and plainly. Do NOT frame a deal that has a "
+            "stated reason as 'we don't know why we lost' or 'unclear'. If a "
+            "deal lacks call transcripts or MEDDICC scores, that is a SEPARATE "
+            "data-capture gap you may note as context, but it must NEVER be "
+            "used to hedge, contradict, or override the stated reason. When "
+            "several losses each carry a reason, give each deal its own reason."
+        )
+
     return {
         "narratives":    narratives,
         "wins":          wins,
@@ -1378,13 +1406,16 @@ async def query_win_loss(params: dict, sb) -> dict:
         "analyses":      analyses,
         "period":        tw["label"],
         "has_narratives": len(narratives) > 0,
+        "_synthesis_note": synthesis_note,
+        # Scoped to the deals that ACTUALLY lack a reason (not "most deals" —
+        # that stale wording predated the backfill and invited the model to
+        # distrust reasons that are in fact present).
         "data_quality_note": (
-            "Lost reasons are blank for most deals — "
-            "recommend making lost_reason a required field "
-            "in HubSpot when marking deals Closed Lost."
-        ) if losses and not any(
-            d.get("lost_reason") for d in losses
-        ) else None,
+            f"{len(losses_missing_reason)} of {len(losses)} closed-lost deals "
+            "have no lost_reason recorded in HubSpot; for those the close "
+            "reason isn't available from the CRM field (a data-capture gap, "
+            "not a reason to doubt the deals that do carry one)."
+        ) if losses_missing_reason else None,
     }
 
 
