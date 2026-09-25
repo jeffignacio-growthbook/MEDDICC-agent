@@ -913,6 +913,15 @@ def _run(args, lease):
                 lost_reason_field = pipeline_config.get('lost_reason_field', 'closed_lost_reason')
                 deal_dict['lost_reason'] = props.get(lost_reason_field, '')
 
+            # Close-reason enrichment (2026-09-25). Now that DEAL_SYNC_PROPERTIES
+            # actually requests these, carry them through. Captured for every
+            # status — HubSpot returns '' where a reason doesn't apply, so a won
+            # deal simply has empty lost fields and vice versa. lost_reason above
+            # stays as-is (gated on lost) to preserve its existing behavior.
+            deal_dict['closed_lost_from'] = props.get('closed_lost_from', '')
+            deal_dict['dq_reason'] = props.get('dq_reason', '')
+            deal_dict['closed_won_reason'] = props.get('closed_won_reason', '')
+
             deal_dict['stage_source'] = 'prospective'
 
         if hubspot is not None and _company_lookup_failed(hubspot, deal_id, company_id):

@@ -93,6 +93,15 @@ class HubSpotDealsClient:
         'sao',
         'hs_manual_forecast_category',
         'bdr_owner',  # SDR attribution field
+        # Close-reason fields (2026-09-25). These were referenced by the write
+        # path (etl_deals.py) but never requested here, so deals.lost_reason
+        # read 0% populated while HubSpot's closed_lost_reason was ~100%
+        # populated — the fetch never asked, and .get(...,'') read the silence
+        # as "empty". See PENDING_WORK "DATA BUG (confirmed 2026-09-25)".
+        'closed_lost_reason',   # -> deals.lost_reason
+        'closed_lost_from',     # stage the deal was in before Closed Lost
+        'dq_reason',            # disqualification reason
+        'closed_won_reason',    # reason a deal was won
     )
 
     # Attempts per request (1 + 4 retries). With the shared schedule
