@@ -41,6 +41,17 @@ From #30 (daafb3c5, 2026-09-23) until #60 (merged 2026-09-25), Pre-Merge Gate Te
 
 ## 🟡 Open Items
 
+### 🔴 FIRST, before anything else is added to the quarter-health composer: classifier-path end-to-end test (logged 2026-09-25)
+
+- **Why:** the 06:22 UTC crash (PR #65) reached production because the only end-to-end test of `query_quarter_health` / `query_quarter_downside` (`tests/test_quarter_health_entry_points.py::test_end_to_end_through_the_real_dynamic_loop`) drives the dynamic-loop path, and the live question took the classifier path (`[INTENT] handler=query_quarter_health confidence=1.00`), which runs `plausibility.run_all_checks`, `_cap_rows_for_synthesis` / `_smart_truncate_for_synthesis`, the verify pass and `_detect_semantic_gap` on the result. None of that ran in any test.
+- **Do:** mirror the dynamic-loop test for the classifier path: both entry points, the full live input set (`tests/quarter_health_inputs.py`, int-keyed stage table), a scripted classifier returning each handler at confidence 1.0, and the real `_route_question` from intent through synthesis and verify (model calls stubbed, as the canary harness does), asserting no exception, every disclosure and headline line in the synthesis payload, and the left-out figures absent. Show it failing on 228bbf6f (the crash) before trusting it.
+
+### 🟡 STANDING CAVEAT: a fixture that went through JSON may not have the production shape (logged 2026-09-25)
+
+- JSON serialization silently coerces types: int (and other non-string) dict keys become strings, tuples become lists, dates and Decimals become strings or floats, sets fail or get pre-converted. A fixture captured through JSON (every live capture tonight: MCP SQL, the one-off capture workflow) can pass tests that production data would fail.
+- The 06:22 UTC crash is the second time tonight something looked tested and wasn't because of how the fixture was built, not what it held: `query_stage_close_rate`'s `by_stage_order` is int-keyed in production and str-keyed in every fixture.
+- **Rule:** before trusting a JSON fixture to stand for a production shape, check what the producing code actually returns (key types, tuples, dates, Decimals) and restore that shape in the loader, as `tests/quarter_health_inputs.py` now does for the stage table; where it matters, add a test that runs on the restored shape.
+
 ### ✅ FIXED 2026-09-25: `query_pipeline_coverage` weighted deals by the wrong stage key
 
 - Was: each deal's rate looked up by `deals.highest_stage_order_reached` (a high-water mark) instead of the config order of its current stage, which is what the governed table is built from. Live FY2027 Q3: 16 of 44 qualified Sales deals ($2,106,050) keyed to a stage they were not in; weighted pipeline read $1,231,113 instead of $701,826. Renewal-pipeline expansion ($295,485) was weighted with Sales stage rates.
