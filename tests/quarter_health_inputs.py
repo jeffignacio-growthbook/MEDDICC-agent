@@ -23,6 +23,11 @@ REPO = Path(__file__).parent.parent
 AS_OF = date(2026, 9, 25)
 _FX = REPO / "tests" / "fixtures"
 PRIMS = json.loads((_FX / "quarter_health_primitives_2026_09_25_renewals_not_assessed.json").read_text())
+# query_stage_close_rate keys by_stage_order by int stage order in production;
+# JSON turned them into strings, which hid a live crash (2026-09-25 06:22 UTC,
+# tests/test_int_keys_reach_plausibility.py). Restore the production shape.
+PRIMS["stage_close_rate"]["by_stage_order"] = {
+    int(k): v for k, v in PRIMS["stage_close_rate"]["by_stage_order"].items()}
 
 
 def build():
@@ -49,7 +54,7 @@ def build():
                                    "deals' ARR, and the ARR of deals with no risk read (Renewal "
                                    "pipeline, not assessed).")}
     raw["query_loss_concentration"] = lossfx.real_result()
-    raw["query_pipeline_coverage"] = covfx.run()[0]
+    raw["query_pipeline_coverage"] = covfx.run(rates=PRIMS["stage_close_rate"])[0]
     return raw, szfx.run()[0]
 
 
