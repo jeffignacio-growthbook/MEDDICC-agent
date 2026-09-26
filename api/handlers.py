@@ -6541,3 +6541,135 @@ async def query_stage_lag(params: dict, sb) -> dict:
         dp_threshold=dp_threshold,
         stage_labels=labels,
     )
+
+
+async def query_qualification_rate(params: dict, sb) -> dict:
+    """
+    Qualification crossing walk — Meeting Set → qualified conversion analysis.
+
+    Wraps walk() from scripts/analytics/qualification_crossing_walk.py.
+    Reads all deals_snapshot rows on the default pipeline + deals table.
+    Returns the walk() result dict: crossings list + summary with win rate,
+    conversion rate, stuck non-crossers, etc. Read-only.
+
+    No required params.
+
+    Returns: walk() result dict.
+    """
+    from qualification_crossing_walk import walk, PIPELINE, SNAP_COLS
+
+    # Fetch all deals_snapshot rows for the default pipeline.
+    snap_rows = select_all(
+        sb, "deals_snapshot",
+        columns=",".join(SNAP_COLS),
+        filters=[("eq", "pipeline_id", PIPELINE)],
+    )
+
+    # Fetch deal status/close_date for every deal_id seen in snapshots.
+    deal_ids = sorted({str(s["deal_id"]) for s in snap_rows})
+    deal_rows = []
+    for i in range(0, len(deal_ids), 100):
+        batch = deal_ids[i:i + 100]
+        rows = select_all(
+            sb, "deals",
+            columns="deal_id,deal_status,close_date,company_name",
+            filters=[("in_", "deal_id", batch)],
+        )
+        deal_rows.extend(rows)
+
+    return walk(snap_rows, deal_rows)
+
+
+async def query_path_to_target(params: dict, sb) -> dict:
+    """
+    Path-to-target: time-feasibility gate + dual-lever gap plan.
+
+    Wraps time_feasibility() + path_to_target() from
+    scripts/analytics/path_to_target.py. Composes three primitives:
+      - assess_pipeline_coverage → weighted_total (likely scenario),
+        raw_pipeline_total (stretch), by_stage_order for conservative
+      - compute_cycle_time → won cycle lengths for time_feasibility()
+      - quarter end date → days_remaining
+
+    Returns path_to_target() result dict: gap, lever plan, headline, note.
+    Read-only.
+
+    No required params.
+    """
+    from path_to_target import time_feasibility as _time_feasibility, path_to_target as _ptt
+    from pipeline_coverage import assess_pipeline_coverage
+    from api.time_resolver import current_quarter_label, quarter_end_date
+
+    # 1. Get pipeline coverage data (existing pipeline scenarios).
+    try:
+        cov = assess_pipeline_coverage(sb)
+    except Exception as e:
+        return {"error": f"pipeline_coverage failed: {e}", "status": "error"}
+
+    if cov.get("status") == "error" or "error" in cov:
+        return {"error": cov.get("error", "pipeline_coverage failed"), "status": "error"}
+
+    weighted = (cov.get("stage_weighting") or {}).get("weighted_value") or 0.0
+    raw = (cov.get("qualified_pipeline") or {}).get("raw_value") or 0.0
+
+    # Conservative = sum of the two highest-order stage buckets (late-stage pipeline)
+    # from by_stage_order; fall back to 50% of weighted if not computable.
+    try:
+        by_stage = (cov.get("stage_weighting") or {}).get("by_stage_order") or {}
+        orders = sorted(by_stage.keys(), reverse=True)
+        conservative = sum(
+            (by_stage[o].get("weighted_value") or 0.0)
+            for o in orders[:2]
+        ) if orders else weighted * 0.7
+    except Exception:
+        conservative = weighted * 0.7
+
+    existing_scenarios = {
+        "conservative": float(conservative),
+        "likely": float(weighted),
+        "stretch": float(raw),
+    }
+
+    # 2. Get gap_bare from pipeline_coverage gap_to_goal.
+    gap_info = (cov.get("gap_to_goal") or {}).get("weighted_pipeline_vs_goal") or {}
+    if gap_info.get("status") == "short":
+        gap_bare = float(gap_info.get("amount", 0.0))
+    elif gap_info.get("status") == "over":
+        gap_bare = 0.0  # at or ahead of goal
+    else:
+        # Derive from real_target if gap_to_goal is unavailable.
+        goal = (cov.get("real_target") or {}).get("goal")
+        gap_bare = max(0.0, float(goal) - float(weighted)) if goal is not None else 0.0
+
+    # 3. Compute days_remaining from quarter end.
+    try:
+        from datetime import date as _date
+        q_end = quarter_end_date(current_quarter_label())
+        days_remaining = max(0, (q_end - _date.today()).days)
+    except Exception:
+        days_remaining = 30  # safe fallback
+
+    # 4. Won cycle days — fetch closed-won deals and compute create→close in days.
+    try:
+        from datetime import date as _date_cls
+        won_deals = select_all(
+            sb, "deals",
+            columns="deal_id,create_date,close_date,deal_status,pipeline_id",
+            filters=[("eq", "deal_status", "won"), ("eq", "pipeline_id", "default")],
+        )
+        won_cycle_days = []
+        for d in won_deals:
+            try:
+                cd = _date_cls.fromisoformat(str(d["create_date"])[:10])
+                cl = _date_cls.fromisoformat(str(d["close_date"])[:10])
+                days = (cl - cd).days
+                if days >= 0:
+                    won_cycle_days.append(days)
+            except Exception:
+                pass
+    except Exception:
+        won_cycle_days = []
+
+    # 5. Compose.
+    feasibility = _time_feasibility(days_remaining, won_cycle_days)
+    return _ptt(gap_bare, existing_scenarios, feasibility)
