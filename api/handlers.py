@@ -5336,24 +5336,44 @@ def _pm_view_movement(by_date, all_dates, stage_cfg, data_gaps, requested_days=N
     }
 
 
-def _pm_view_composition(by_date, all_dates, stage_cfg, weeks):
-    dates = all_dates[-weeks:]
+def _pm_view_composition(by_date, all_dates, stage_cfg, weeks,
+                         start_anchor_date=None):
+    """Build the composition grid.
+
+    When start_anchor_date is given and predates the last-N-weeks window, the
+    FIRST real snapshot on/after start_anchor_date is prepended as an explicit
+    anchor row (tagged is_start_anchor=True) so the caller has real numbers for
+    the requested start period.  The grid never contains estimated/interpolated
+    values — every row is a real snapshot row from the database.
+    """
+    recent_dates = all_dates[-weeks:]
+    anchor_date = None
+    if start_anchor_date and all_dates and all_dates[0] < recent_dates[0]:
+        # Find the first real snapshot on or after start_anchor_date
+        candidates = [d for d in all_dates if d >= start_anchor_date]
+        if candidates and candidates[0] < recent_dates[0]:
+            anchor_date = candidates[0]
+
+    dates_to_show = ([anchor_date] if anchor_date else []) + list(recent_dates)
     grid = []
-    for d in dates:
+    for d in dates_to_show:
         rows = list(_pm_latest_row_per_deal(by_date[d]).values())
         counts = {}
         for r in rows:
             name = _pm_stage_name(r.get("stage_id"), stage_cfg)
             counts[name] = counts.get(name, 0) + 1
         week_of_quarter = rows[0].get("week_of_quarter") if rows else None
-        grid.append({
+        entry = {
             "snapshot_date": d,
             "week_of_quarter": week_of_quarter,
             "by_stage": counts,
             "total": len(rows),
             "confidence": _pm_confidence_mix(rows),
-        })
-    return dates, grid
+        }
+        if d == anchor_date:
+            entry["is_start_anchor"] = True
+        grid.append(entry)
+    return dates_to_show, grid
 
 
 def _pm_left_reason(deal_id, unscoped_current):
@@ -6066,8 +6086,26 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         }
 
     if view == "composition":
+        requested_start = (time_window or {}).get("start")
         dates, grid = _pm_view_composition(
-            by_date, all_dates, stage_cfg, weeks)
+            by_date, all_dates, stage_cfg, weeks,
+            start_anchor_date=requested_start)
+        # Warn synthesis when the requested start predates the first grid row.
+        # This note is load-bearing: it is the hard prohibition that prevents
+        # the LLM from fabricating estimated/interpolated counts for dates that
+        # have no real snapshot in the grid.
+        if grid and requested_start:
+            first_grid_date = grid[0]["snapshot_date"]
+            if first_grid_date > requested_start:
+                data_gaps.append(
+                    f"NO SNAPSHOT EXISTS for {requested_start}. "
+                    f"The earliest real snapshot in the requested range is "
+                    f"{first_grid_date} (marked is_start_anchor=True in the grid). "
+                    f"NEVER estimate, interpolate, or derive counts for "
+                    f"{requested_start} or any date not present in the grid. "
+                    f"Report real counts from {first_grid_date} with a clear "
+                    f"disclosure that this is the earliest real data point."
+                )
         return {
             **base,
             "snapshot_dates": dates,

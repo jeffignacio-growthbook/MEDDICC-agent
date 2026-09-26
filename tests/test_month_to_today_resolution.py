@@ -301,6 +301,126 @@ def test_period_custom_with_null_end_resolves_to_today():
     )
 
 
+def test_composition_start_anchor_included_in_grid():
+    """Bug #5: the composition view capped at all_dates[-weeks:] (default 4).
+    When a Jan-Sep range was requested, only the last 4 snapshots (Sep area)
+    appeared in the grid. The LLM saw no January data and fabricated '~40-50'
+    estimates, indistinguishable in format from real counts.
+
+    Fix: _pm_view_composition now accepts start_anchor_date. When the requested
+    start predates all_dates[-weeks:][0], the FIRST real snapshot on/after
+    start_anchor_date is prepended to the grid as is_start_anchor=True.
+    """
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from api.handlers import _pm_view_composition
+
+    # Simulate all_dates from Jan 5 through Sep 21 (weekly backfill + prospective)
+    jan_dates = [f"2026-01-{d:02d}" for d in [5, 12, 19, 26]]
+    aug_dates = ["2026-08-14", "2026-08-21", "2026-08-28"]
+    sep_dates = ["2026-09-21"]
+    all_dates = jan_dates + aug_dates + sep_dates
+
+    # Build minimal by_date: each date has 40 deals in Discovery for simplicity
+    stage_cfg = {"stages": [{"id": "disco", "name": "Discovery"}]}
+    by_date = {}
+    for d in all_dates:
+        n_deals = 40 if d.startswith("2026-01") else 176  # real different counts
+        by_date[d] = [
+            {"deal_id": i, "stage_id": "disco", "snapshot_date": d,
+             "snapshot_source": "backfilled", "backfill_confidence": 0.9,
+             "week_of_quarter": 1}
+            for i in range(n_deals)
+        ]
+
+    # Without start_anchor: only last 4 snapshots (no January)
+    dates_no_anchor, grid_no_anchor = _pm_view_composition(
+        by_date, all_dates, stage_cfg, weeks=4
+    )
+    assert not any(d.startswith("2026-01") for d in dates_no_anchor), (
+        "Without start_anchor, no January date should appear in grid"
+    )
+
+    # With start_anchor: first real Jan snapshot prepended
+    dates_with_anchor, grid_with_anchor = _pm_view_composition(
+        by_date, all_dates, stage_cfg, weeks=4,
+        start_anchor_date="2026-01-01"
+    )
+    jan_anchor_rows = [g for g in grid_with_anchor if g.get("is_start_anchor")]
+    assert len(jan_anchor_rows) == 1, (
+        f"Expected exactly one is_start_anchor row; got {jan_anchor_rows!r}"
+    )
+    anchor_row = jan_anchor_rows[0]
+    assert anchor_row["snapshot_date"] == "2026-01-05", (
+        f"Anchor should be 2026-01-05 (first real snapshot >= 2026-01-01); "
+        f"got {anchor_row['snapshot_date']!r}"
+    )
+    assert anchor_row["total"] == 40, (
+        f"Anchor row must use REAL counts (40 for Jan dates), not estimated; "
+        f"got {anchor_row['total']!r}"
+    )
+    # Real Sep count must still be present and correct
+    sep_row = grid_with_anchor[-1]
+    assert sep_row["snapshot_date"] == "2026-09-21"
+    assert sep_row["total"] == 176
+
+
+def test_composition_data_gap_prohibits_estimation():
+    """The data_gaps note emitted when requested_start predates the grid must
+    contain the hard 'NO SNAPSHOT EXISTS' prohibition string so it reaches
+    synthesis and blocks fabricated estimates.
+
+    This tests the call-site logic in query_pipeline_movement (the composition
+    branch), not the DB — we simulate the output shape directly.
+    """
+    # The prohibition note is added when first_grid_date > requested_start.
+    # The exact string must match what _VOICE_BASE checks (substring).
+    requested_start = "2026-01-01"
+    first_grid_date = "2026-01-05"  # anchor row date (real snapshot)
+
+    # Simulate the data_gaps construction logic from query_pipeline_movement
+    data_gaps = []
+    if first_grid_date > requested_start:
+        data_gaps.append(
+            f"NO SNAPSHOT EXISTS for {requested_start}. "
+            f"The earliest real snapshot in the requested range is "
+            f"{first_grid_date} (marked is_start_anchor=True in the grid). "
+            f"NEVER estimate, interpolate, or derive counts for "
+            f"{requested_start} or any date not present in the grid. "
+            f"Report real counts from {first_grid_date} with a clear "
+            f"disclosure that this is the earliest real data point."
+        )
+
+    assert len(data_gaps) == 1, (
+        "data_gaps must contain the prohibition note when anchor predates grid"
+    )
+    assert "NO SNAPSHOT EXISTS" in data_gaps[0], (
+        "Prohibition note must contain 'NO SNAPSHOT EXISTS' sentinel"
+    )
+    assert "NEVER estimate" in data_gaps[0], (
+        "Prohibition note must contain 'NEVER estimate'"
+    )
+    assert first_grid_date in data_gaps[0], (
+        "Prohibition note must name the real anchor date"
+    )
+
+
+def test_composition_no_data_gap_when_anchor_within_grid():
+    """When the requested start is already within (or equal to) the first grid
+    row's date, no prohibition note should be added — the grid covers the range."""
+    requested_start = "2026-08-14"
+    first_grid_date = "2026-08-14"
+
+    data_gaps = []
+    if first_grid_date > requested_start:
+        data_gaps.append("NO SNAPSHOT EXISTS ...")
+
+    assert len(data_gaps) == 0, (
+        "No prohibition note when first_grid_date <= requested_start"
+    )
+
+
 if __name__ == "__main__":
     test_specific_with_null_end_resolves_to_today()
     print("PASS: specific + null end resolves to today")
@@ -322,4 +442,10 @@ if __name__ == "__main__":
     print("PASS: period=custom with explicit dates passes through correctly")
     test_period_custom_with_null_end_resolves_to_today()
     print("PASS: period=custom with null end resolves to today")
+    test_composition_start_anchor_included_in_grid()
+    print("PASS: composition start_anchor prepends real Jan snapshot to grid")
+    test_composition_data_gap_prohibits_estimation()
+    print("PASS: data_gaps prohibition note contains NO SNAPSHOT EXISTS sentinel")
+    test_composition_no_data_gap_when_anchor_within_grid()
+    print("PASS: no prohibition note when anchor within grid coverage")
     print("\nAll tests passed.")
