@@ -220,33 +220,85 @@ def test_gap_signal_and_rule_both_present_in_loop_synthesis_context():
 
 
 # ---------------------------------------------------------------------------
-# Regression: a large result with many deals still preserves the gap
+# Regression: a large result that ACTUALLY triggers character truncation
 # ---------------------------------------------------------------------------
 
-def test_data_gap_survives_when_changes_list_is_large():
-    """When the changes list is large (would trigger row-capping), data_gaps
-    must not be sacrificed. Row-capping targets deal arrays, not metadata."""
-    large_result = copy.deepcopy(_MOVEMENT_RESULT)
-    large_result["changes"] = [
+def _large_changes_result(n_deals: int) -> dict:
+    result = copy.deepcopy(_MOVEMENT_RESULT)
+    result["changes"] = [
         {
-            "deal_id": f"deal-{i}",
-            "deal_name": f"Deal {i}",
+            "deal_id": f"deal-{i:03d}",
+            "deal_name": f"Acme Corp Deal {i:03d}",
             "direction": "advanced",
             "prior_stage": "Discovery",
             "current_stage": "Qualified",
-            "deal_value": 50000,
+            "deal_value": 50000 + i * 1000,
         }
-        for i in range(50)  # 50 deals — beyond any row cap
+        for i in range(n_deals)
     ]
-    # Loop path
-    loop_text = _loop_serialized(large_result)
-    assert GAP_MESSAGE in loop_text, (
-        "data_gap dropped in loop path when changes list is large."
+    return result
+
+
+def test_planted_bug_50_deals_does_not_trigger_truncation():
+    """Planted-bug baseline: 50-deal payload is ~10K chars, well under the
+    20K classifier limit. The old test was NOT proving truncation resistance —
+    it never triggered the character-truncation code path at all.
+    This test documents that gap explicitly."""
+    import json
+    r = _large_changes_result(50)
+    indented = json.dumps(r, indent=2)
+    assert len(indented) < 20000, (
+        f"50-deal payload is unexpectedly large ({len(indented)} chars). "
+        "This test documents it does NOT trigger truncation."
     )
-    # Classifier path
-    classifier_text = _classifier_serialized(large_result)
+
+
+def test_planted_bug_200_deals_without_fix_drops_data_gap():
+    """Planted-bug control for the real truncation scenario:
+    200 deals → ~40K chars indented → character truncation fires.
+    Without the front-load fix, data_gaps appears AFTER all of changes[]
+    in the JSON and is silently cut by full_json[:20000].
+
+    This test verifies that the naive truncation ([:20000] of the original
+    JSON) would drop data_gaps — confirming the bug we fixed was real."""
+    import json
+    r = _large_changes_result(200)
+    indented = json.dumps(r, indent=2, default=str)
+    assert len(indented) > 20000, (
+        f"200-deal payload must exceed 20K chars to trigger truncation; "
+        f"got {len(indented)} chars."
+    )
+    # Naive character truncation: data_gaps appears after changes[] in JSON
+    naive_truncated = indented[:20000]
+    assert GAP_MESSAGE not in naive_truncated, (
+        "Planted-bug baseline: data_gaps should NOT appear in a naive "
+        "[:20000] cut of a 200-deal payload — this baseline failing means "
+        "the JSON ordering assumption changed."
+    )
+
+
+def test_data_gap_survives_when_changes_list_triggers_real_truncation():
+    """After the fix: even when the changes list is large enough to actually
+    trigger character truncation (200 deals → ~40K chars), data_gaps must
+    survive because _smart_truncate_for_synthesis front-loads it before cutting.
+
+    This is the REAL truncation-resistance test — the 50-deal version never
+    triggered the character-truncation code path at all."""
+    r = _large_changes_result(200)
+
+    # Loop path: structured handlers are never truncated — always safe
+    loop_text = _loop_serialized(r)
+    assert GAP_MESSAGE in loop_text, (
+        "data_gap dropped in loop path (structured handler — should always be full)."
+    )
+
+    # Classifier path: THIS is where truncation fires. The fix must front-load
+    # data_gaps so it survives the [:char_limit] cut.
+    classifier_text = _classifier_serialized(r)
     assert GAP_MESSAGE in classifier_text, (
-        "data_gap dropped in classifier path when changes list is large (row-cap side-effect)."
+        "data_gap dropped by character truncation in classifier path. "
+        "_smart_truncate_for_synthesis must front-load data_gaps before cutting.\n"
+        f"Classifier text first 500 chars: {classifier_text[:500]!r}"
     )
 
 
@@ -269,6 +321,10 @@ if __name__ == "__main__":
     print("PASS: DYNAMIC_SYSTEM_PROMPT prohibits interpolation and estimation")
     test_gap_signal_and_rule_both_present_in_loop_synthesis_context()
     print("PASS: gap signal + rule both present in loop synthesis context")
-    test_data_gap_survives_when_changes_list_is_large()
-    print("PASS: data_gap survives large changes list (row-cap safety)")
+    test_planted_bug_50_deals_does_not_trigger_truncation()
+    print("PASS: 50-deal baseline confirms truncation was never triggered")
+    test_planted_bug_200_deals_without_fix_drops_data_gap()
+    print("PASS: planted-bug confirms naive [:20000] cut drops data_gaps")
+    test_data_gap_survives_when_changes_list_triggers_real_truncation()
+    print("PASS: data_gap survives real character truncation (200 deals)")
     print("\nAll tests passed.")
