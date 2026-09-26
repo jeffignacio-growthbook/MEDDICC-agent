@@ -948,11 +948,19 @@ Required JSON:
   "scope": "<prior_set|new_population|full_scope>",
   "params": {{
     "time_window": {{
-      "period": "current_quarter|current_month|previous_month|current_week|last_N_days|specific",
+      "period": "current_quarter|current_month|previous_month|current_week|last_N_days|specific|specific_month",
       "n": "<REQUIRED integer when period=last_N_days: the number of days back from today, e.g. 'last 2 weeks'=14, 'last 30 days'=30, 'last 10 days'=10; else null>",
-      "start": "YYYY-MM-DD or null — ONLY for period=specific with an explicit date named in the question; never compute this yourself for a relative phrase like 'last N days/weeks', use period=last_N_days + n instead",
-      "end":   "YYYY-MM-DD or null — same rule as start"
+      "start": "YYYY-MM-DD or null — ONLY for period=specific with a full explicit start+end date range named in the question (e.g. '2026-01-15 to 2026-03-31'); never compute or infer this yourself for relative phrases or month-name phrases",
+      "end":   "YYYY-MM-DD or null — same rule as start; null when the question says 'to today' or only names a start date",
+      "month": "<the month name EXACTLY as written in the question (e.g. 'January', 'February', 'March') — REQUIRED for period=specific_month; null otherwise>",
+      "year":  "<the 4-digit year EXACTLY as written in the question (e.g. 2026) as an integer — REQUIRED for period=specific_month; null otherwise. NEVER compute or infer this — copy the literal digits from the question text.>"
     }},
+    PERIOD SELECTION RULES (read carefully — wrong period is the #1 date bug):
+    - question names a month AND a year (e.g. 'January 2026', 'from February 2025', 'pipeline in March 2026 vs today', 'since June 2025'): period=specific_month, month=<name>, year=<integer>. DO NOT use period=specific here.
+    - question gives fully explicit ISO-style dates with day precision (e.g. 'between 2026-01-15 and 2026-03-31'): period=specific, start/end filled.
+    - question uses relative phrasing ('last 2 weeks', 'past 30 days', 'last month'): period=last_N_days with n, or current_month/previous_month.
+    - question names a fiscal quarter ('Q3', 'FY2027 Q2'): period=fiscal_quarter.
+    - no time phrase: period=current_quarter.
     "company": "<single company name, or null>",
     "companies": "<list of company names when the question names MORE THAN ONE (e.g. 'score Ecco, Zalando and Natera') — [\"Ecco\", \"Zalando\", \"Natera\"]; else null. Put every named company here; do not drop any, and there is no limit.>",
     "rep_email": "<email or null>",
@@ -5936,6 +5944,48 @@ async def _route_question(question: str, user_id: str,
 
         handler_name = intent.get("handler", "unanswerable")
         params = intent.get("params", {})
+        # Defense-in-depth against the whole class of month+year off-by-one bugs.
+        #
+        # The classifier is now instructed to use period=specific_month for any
+        # "Month YYYY" phrasing, but as a backstop: if it still emits
+        # period=specific with a start date AND the question contained an explicit
+        # 4-digit year, verify the year in start matches and correct it.
+        # This catches the observed failure mode where Haiku treated "January 2026"
+        # as "most recent past January" (emitting 2025-01-01 instead of 2026-01-01).
+        import re as _re
+        raw_tw = params.get("time_window") or {}
+        stated_years = _re.findall(r'\b(20\d{2})\b', question)
+        if raw_tw.get("period") == "specific" and raw_tw.get("start") and stated_years:
+            stated_year = stated_years[0]
+            tw_start = raw_tw["start"]
+            if not tw_start.startswith(stated_year):
+                corrected = stated_year + tw_start[4:]
+                raw_tw = dict(raw_tw, start=corrected)
+                params["time_window"] = raw_tw
+            tw_end = raw_tw.get("end")
+            if tw_end and not tw_end.startswith(stated_year):
+                corrected_end = stated_year + tw_end[4:]
+                raw_tw = dict(raw_tw, end=corrected_end)
+                params["time_window"] = raw_tw
+        # If the classifier still emitted period=specific but the question has a
+        # month name + year pattern, promote to specific_month so Python, not the
+        # model, constructs the date range.
+        if raw_tw.get("period") == "specific" and raw_tw.get("start") and stated_years:
+            _month_re = _re.search(
+                r'\b(january|february|march|april|may|june|july|august|'
+                r'september|october|november|december|'
+                r'jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)\b',
+                question.lower()
+            )
+            if _month_re and raw_tw.get("start", "").endswith("-01"):
+                # Looks like a month-boundary start — rewrite as specific_month
+                _year_int = int(stated_years[0])
+                raw_tw = {
+                    "period": "specific_month",
+                    "month": _month_re.group(1).capitalize(),
+                    "year": _year_int,
+                }
+                params["time_window"] = raw_tw
         params["time_window"] = resolve_time_window(
             params.get("time_window", {}))
 
