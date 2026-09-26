@@ -267,6 +267,40 @@ def test_empty_tw_isolated_month_not_rewritten():
     )
 
 
+def test_period_custom_with_explicit_dates_resolves_correctly():
+    """Bug #4: the dynamic loop's LLM emits period='custom' for cross-quarter
+    date ranges. resolve_time_window had no 'custom' branch, so it fell through
+    to the else clause and returned current-quarter dates — silently overwriting
+    the correct start/end the LLM provided.
+
+    Fix: treat period='custom' identically to period='specific': pass start/end
+    through directly, mapping null end to today.
+    """
+    result = resolve_time_window(
+        {"period": "custom", "start": "2026-01-01", "end": "2026-09-26"}
+    )
+    assert result["start"] == "2026-01-01", (
+        f"period=custom must pass start through; got {result['start']!r}"
+    )
+    assert result["end"] == "2026-09-26", (
+        f"period=custom must pass explicit end through; got {result['end']!r}"
+    )
+
+
+def test_period_custom_with_null_end_resolves_to_today():
+    """period=custom with end=null must resolve end to today, same as
+    period=specific with null end (open-ended 'from Month YYYY to today')."""
+    result = resolve_time_window(
+        {"period": "custom", "start": "2026-01-01", "end": None}
+    )
+    assert result["start"] == "2026-01-01", (
+        f"period=custom+null end must pass start through; got {result['start']!r}"
+    )
+    assert result["end"] == TODAY.isoformat(), (
+        f"period=custom+null end must resolve to today; got {result['end']!r}"
+    )
+
+
 if __name__ == "__main__":
     test_specific_with_null_end_resolves_to_today()
     print("PASS: specific + null end resolves to today")
@@ -284,4 +318,8 @@ if __name__ == "__main__":
     print("PASS: empty time_window fallback constructs from question text")
     test_empty_tw_isolated_month_not_rewritten()
     print("PASS: empty-tw fallback does not fire for isolated months")
+    test_period_custom_with_explicit_dates_resolves_correctly()
+    print("PASS: period=custom with explicit dates passes through correctly")
+    test_period_custom_with_null_end_resolves_to_today()
+    print("PASS: period=custom with null end resolves to today")
     print("\nAll tests passed.")

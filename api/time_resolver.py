@@ -259,7 +259,7 @@ def resolve_time_window(tw: dict) -> dict:
         # Unparseable month/year — fall through to current quarter
         s, e, label = get_fiscal_quarter(today, cfg_wrap)
         return {"start": s.isoformat(), "end": e.isoformat(), "label": label}
-    elif period == "specific" and tw.get("start"):
+    elif period in ("specific", "custom") and tw.get("start"):
         # `or today.isoformat()` handles "end": null — dict.get("end", default)
         # ignores the default when the key is present with value None, which is
         # exactly what the LLM emits for "to today" or an open-ended range.
