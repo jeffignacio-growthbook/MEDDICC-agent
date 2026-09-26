@@ -158,7 +158,8 @@ jobs:
             tests/test_snapshot_diff_jake_h_regression.py \
             tests/test_pipeline_movement_deal_changes_exit_status.py \
             tests/test_specific_month_date_resolution.py \
-            tests/test_pipeline_movement_time_window_date_range.py
+            tests/test_pipeline_movement_time_window_date_range.py \
+            tests/test_month_to_today_resolution.py
           do
             echo "::group::$t"
             if PYTHONPATH=. python3 "$t"; then
