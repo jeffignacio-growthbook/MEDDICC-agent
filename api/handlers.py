@@ -5398,7 +5398,8 @@ def _pm_left_reason(deal_id, unscoped_current):
 
 
 def _pm_view_deal_changes(by_date, all_dates, stage_cfg, data_gaps,
-                          company_map=None, unscoped_current=None):
+                          company_map=None, unscoped_current=None,
+                          requested_days=None):
     if len(all_dates) < 2:
         data_gaps.append(
             "deal_changes needs two snapshot dates; found "
@@ -5407,7 +5408,10 @@ def _pm_view_deal_changes(by_date, all_dates, stage_cfg, data_gaps,
         return None, []
     company_map = company_map or {}
     unscoped_current = unscoped_current or {}
-    prior_date, current_date = all_dates[-2], all_dates[-1]
+    prior_date, current_date, anchor_gaps = _pm_select_snapshot_anchors(
+        all_dates, requested_days
+    )
+    data_gaps.extend(anchor_gaps)
     prior_rows = _pm_latest_row_per_deal(by_date[prior_date])
     current_rows = _pm_latest_row_per_deal(by_date[current_date])
 
@@ -6117,7 +6121,8 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     if view == "deal_changes":
         snap_dates, changes = _pm_view_deal_changes(
             by_date, all_dates, stage_cfg, data_gaps,
-            company_map=company_map, unscoped_current=unscoped_current)
+            company_map=company_map, unscoped_current=unscoped_current,
+            requested_days=requested_days)
         # How each exit left, from its CURRENT deals row (2026-09-24). The
         # snapshot-based reason alone called almost every close
         # "gone_from_snapshot": a deal's snapshot rows stop when it closes

@@ -1519,6 +1519,16 @@ RULES:
 - Maximum 5 tool calls per question
 - If data genuinely doesn't exist, say so plainly
 - Never invent numbers
+- DATA-GAP / MISSING SNAPSHOT — NO FABRICATION (hard prohibition):
+  When tool results contain data_gaps entries, empty rows, or no matching
+  snapshot for a requested date or entity, NEVER produce numeric counts,
+  ranges, or estimates for that date/entity — not even hedged with "~",
+  "approximately", "estimated from trend", or "(est.)". The only permitted
+  response: state the real data point you DO have (the closest real
+  snapshot date and its real counts), with a clear disclosure that the
+  requested date has no data. A plain decline is always preferable to any
+  fabricated or interpolated number. Do NOT substitute a wider window or
+  a different snapshot date to produce a number anyway.
 - When calling aggregate_results, ALWAYS pass data="step_N"
   NEVER pass data as [] or a full array - step references only
 - For risk assessment questions: ALWAYS use assess_deal_risk, NOT filter_table
