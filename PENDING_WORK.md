@@ -22,6 +22,16 @@
 
 With `deals.lost_reason` / `win_loss_narratives.stated_reason` now populated (see the FIXED entry above), bucketing losses by stated reason — competitor / budget / fit ("not a good fit") / unresponsive-or-ghosted / on-hold / disqualified — is a real, buildable primitive for the first time. Recent-quarter closed-lost has ~100% coverage; fleet-wide ~44% (older deals predate the field, so bucket rates should be reported over the deals that HAVE a reason, with the coverage stated, never as a fleet-wide rate off a partial denominator). Deliberately NOT built in the backfill PR — its own scoping pass.
 
+## ✅ COLLAPSED 2026-09-26: win/loss reason-authority logic is now one shared helper, not per-handler copies
+
+**The risk (now closed):** the "surface a populated `lost_reason`/`stated_reason` authoritatively" logic — retrieve the reason, attach an authoritative `_synthesis_note` telling synthesis to trust it as the primary answer and never let missing calls/MEDDICC override it — was implemented independently in `query_win_loss` (PR #72) and again in `generate_win_loss` (PR #73). Two copies that had to change together: a change to one that missed the other would silently reintroduce the "we don't know why we lost" self-contradiction on the un-fixed path.
+
+**The fix (shipped):** extracted into `api/win_loss_reason.py` — `stated_close_reason(deal, narrative)` (reason retrieval, narrative `stated_reason` preferred, `deals.lost_reason` fallback) and `reason_synthesis_note(reason="")` (the ALWAYS-follow note). It is the single source of truth, called by **all** entry points; the note text exists in exactly one module (`tests/test_win_loss_reason_shared.py` enforces single-instance + that every handler calls the helper).
+
+**Audit finding:** it was **three** entry points, not two. `query_deal` ("deep dive on a specific company's deal") can answer "why did we lose &lt;named deal&gt;" and previously omitted the reason entirely (never selected `lost_reason`, never read narratives). It now routes through the same helper for a closed deal. (`query_competitive_intel` reads `stated_reason` too, but only to match competitor vocabulary — it does not answer the why-lost shape, so it is intentionally left out.)
+
+**Standing rule:** any future change to reason retrieval or the synthesis-note wording happens in `api/win_loss_reason.py` and is inherited by every entry point. Adding a new handler that answers "why did we win/lose X" means calling that helper, not re-inlining the logic.
+
 ## ⚠️ Standing caveat: `learning_log` is not evidence that a handler worked (2026-09-23)
 
 `learning_log` grades the **final answer text**, not the code path that

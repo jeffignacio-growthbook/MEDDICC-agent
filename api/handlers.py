@@ -24,6 +24,16 @@ from sdr_utils import rate_or_gap, today_in_reporting_tz
 # source.py fails the build on any reimplementation outside this function.
 from api.incremental_arr import incremental_arr
 
+# The ONE definition of "surface a populated lost_reason/stated_reason
+# authoritatively" — shared by query_win_loss, generate_win_loss and
+# query_deal. Never re-inline the retrieval or the synthesis note; change it
+# here and every entry point inherits it (tests/test_win_loss_reason_shared.py
+# enforces single-instance).
+try:
+    from win_loss_reason import stated_close_reason, reason_synthesis_note
+except ImportError:
+    from api.win_loss_reason import stated_close_reason, reason_synthesis_note
+
 # aggregate_results import moved to function scope (query_pipeline)
 # to avoid false positive in handler registry scanner (Phase 1a fix)
 
@@ -1370,32 +1380,15 @@ async def query_win_loss(params: dict, sb) -> dict:
                    "a bug in the aggregation logic that must be fixed before shipping results."
         }
 
-    # Reason-authority guidance (2026-09-25): deals.lost_reason (and its
-    # verbatim copy win_loss_narratives.stated_reason) is now populated — the
-    # earlier "0% lost_reason" state was an ETL fetch gap, since fixed and
-    # backfilled (see PENDING_WORK's "DATA BUG" entry). A populated reason is
-    # the deal's OWN stated close reason from HubSpot and is the authoritative
-    # answer to "why did we lose this deal". The absence of call transcripts
-    # or MEDDICC scores for a deal is a SEPARATE data-capture gap — it may be
-    # mentioned as context but must never be used to hedge, contradict, or
-    # override a real stated reason (that is what produced the "we don't know
-    # why we lost" self-contradiction on deals that plainly carry a reason).
-    losses_missing_reason = [d for d in losses if not d.get("lost_reason")]
-    any_reason = any(d.get("lost_reason") for d in losses)
-
-    synthesis_note = None
-    if any_reason:
-        synthesis_note = (
-            "A populated lost_reason (and its verbatim copy stated_reason) is "
-            "the deal's own stated close reason from HubSpot. Treat it as the "
-            "PRIMARY, TRUSTED, authoritative answer to why that deal was lost "
-            "— state it directly and plainly. Do NOT frame a deal that has a "
-            "stated reason as 'we don't know why we lost' or 'unclear'. If a "
-            "deal lacks call transcripts or MEDDICC scores, that is a SEPARATE "
-            "data-capture gap you may note as context, but it must NEVER be "
-            "used to hedge, contradict, or override the stated reason. When "
-            "several losses each carry a reason, give each deal its own reason."
-        )
+    # Reason-authority guidance: a populated lost_reason/stated_reason is the
+    # deal's own stated close reason and the authoritative answer to "why did
+    # we lose this deal"; missing calls/MEDDICC are context only, never grounds
+    # to override it. Retrieval + note come from the shared win_loss_reason
+    # helper — one source, also used by generate_win_loss and query_deal.
+    losses_missing_reason = [d for d in losses
+                             if not stated_close_reason(deal=d)]
+    any_reason = any(stated_close_reason(deal=d) for d in losses)
+    synthesis_note = reason_synthesis_note() if any_reason else None
 
     return {
         "narratives":    narratives,
@@ -1544,7 +1537,8 @@ async def query_deal(params: dict, sb) -> dict:
     deals = select_all(sb, "deals",
         columns="deal_id,company_name,deal_value,stage,"
                 "deal_status,close_date,owner_email,"
-                "highest_stage_order_reached,forecast_category")
+                "highest_stage_order_reached,forecast_category,"
+                "lost_reason")
 
     deal = next((d for d in deals
                  if company.lower() in
@@ -1629,6 +1623,16 @@ async def query_deal(params: dict, sb) -> dict:
                 data["next_steps"] = get_next_steps(component, data.get("score", 0))
         result["next_steps_source"] = "rubric_fallback"
 
+    # For a CLOSED deal, its stated close reason is the authoritative answer to
+    # "why did we win/lose this deal" — a deep dive on a lost deal that omits it
+    # (as this handler previously did) invites the same "we don't know" hedge
+    # fixed in query_win_loss / generate_win_loss. Same shared helper, so the
+    # reason logic changes in exactly one place across all three entry points.
+    if deal.get("deal_status") in ("won", "lost"):
+        reason = stated_close_reason(deal=deal)
+        if reason:
+            result["_synthesis_note"] = reason_synthesis_note(reason)
+
     return result
 
 
@@ -1695,37 +1699,24 @@ async def generate_win_loss(params: dict, sb) -> dict:
         filters=[("ilike", "company_name", f"%{company}%")])
 
     # The deal's own stated close reason is the authoritative answer to "why
-    # did we lose this deal" — same fix already proven on query_win_loss (see
-    # PENDING_WORK's "DATA BUG"): stated_reason on the narrative is a verbatim
-    # copy of deals.lost_reason, and lost_reason is populated now. Pull the
-    # deal so we can (a) fall back to lost_reason when a pre-backfill narrative
-    # row still has an empty stated_reason, and (b) surface the reason even on
-    # the no-narrative path. `lost_reason` was previously never selected here.
+    # did we lose this deal". Retrieval + note come from the shared
+    # win_loss_reason helper (one source, also used by query_win_loss and
+    # query_deal): stated_close_reason() prefers the narrative's stated_reason
+    # (a verbatim copy of deals.lost_reason) and falls back to lost_reason, so
+    # a pre-backfill narrative with an empty stated_reason still resolves.
+    # `lost_reason` was previously never selected here.
     deals = select_all(sb, "deals",
         columns="deal_id,company_name,deal_status,close_date,lost_reason")
     deal = next((d for d in deals
                  if company.lower() in
                     (d.get("company_name") or "").lower()), None)
 
-    def _reason_synthesis_note(reason: str) -> str:
-        return (
-            f'The deal\'s stated close reason is "{reason}". Treat it as the '
-            "PRIMARY, TRUSTED, authoritative answer to why this deal was "
-            "won/lost — state it directly and plainly. Do NOT frame a deal "
-            "that has a stated reason as 'we don't know' or 'unclear'. A "
-            "missing AI narrative, call transcripts, or MEDDICC scores is a "
-            "SEPARATE data-capture gap you may note as context, but it must "
-            "NEVER be used to hedge, contradict, or override the stated reason."
-        )
-
     if rows:
         narrative = rows[0]
-        reason = (narrative.get("stated_reason") or "").strip()
-        if not reason and deal:
-            reason = (deal.get("lost_reason") or "").strip()
+        reason = stated_close_reason(deal=deal, narrative=narrative)
         result = {"narrative": narrative}
         if reason:
-            result["_synthesis_note"] = _reason_synthesis_note(reason)
+            result["_synthesis_note"] = reason_synthesis_note(reason)
         return result
 
     # No narrative yet — return the component analysis instead, but surface the
@@ -1738,7 +1729,7 @@ async def generate_win_loss(params: dict, sb) -> dict:
         columns="component_details,overall_score,status",
         filters=[("eq", "deal_id", deal["deal_id"])])
 
-    reason = (deal.get("lost_reason") or "").strip()
+    reason = stated_close_reason(deal=deal)
     result = {
         "deal": deal,
         "analyses": analyses[-3:],
@@ -1752,7 +1743,7 @@ async def generate_win_loss(params: dict, sb) -> dict:
         ),
     }
     if reason:
-        result["_synthesis_note"] = _reason_synthesis_note(reason)
+        result["_synthesis_note"] = reason_synthesis_note(reason)
     return result
 
 
