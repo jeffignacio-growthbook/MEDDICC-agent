@@ -120,6 +120,7 @@ jobs:
             tests/test_rate_mix_decomposition.py \
             tests/test_rate_mix_finer_tiering.py \
             tests/test_sensitivity_analysis.py \
+            tests/test_stage_call_lag.py \
             tests/test_deal_close_reasons.py \
             tests/test_win_loss_reason_authority.py \
             tests/test_generate_win_loss_reason_authority.py \
