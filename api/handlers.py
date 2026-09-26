@@ -1693,15 +1693,44 @@ async def generate_win_loss(params: dict, sb) -> dict:
     rows = select_all(sb, "win_loss_narratives",
         columns="*",
         filters=[("ilike", "company_name", f"%{company}%")])
-    if rows:
-        return {"narrative": rows[0]}
 
-    # No narrative yet — return the component analysis instead
+    # The deal's own stated close reason is the authoritative answer to "why
+    # did we lose this deal" — same fix already proven on query_win_loss (see
+    # PENDING_WORK's "DATA BUG"): stated_reason on the narrative is a verbatim
+    # copy of deals.lost_reason, and lost_reason is populated now. Pull the
+    # deal so we can (a) fall back to lost_reason when a pre-backfill narrative
+    # row still has an empty stated_reason, and (b) surface the reason even on
+    # the no-narrative path. `lost_reason` was previously never selected here.
     deals = select_all(sb, "deals",
-        columns="deal_id,company_name,deal_status,close_date")
+        columns="deal_id,company_name,deal_status,close_date,lost_reason")
     deal = next((d for d in deals
                  if company.lower() in
                     (d.get("company_name") or "").lower()), None)
+
+    def _reason_synthesis_note(reason: str) -> str:
+        return (
+            f'The deal\'s stated close reason is "{reason}". Treat it as the '
+            "PRIMARY, TRUSTED, authoritative answer to why this deal was "
+            "won/lost — state it directly and plainly. Do NOT frame a deal "
+            "that has a stated reason as 'we don't know' or 'unclear'. A "
+            "missing AI narrative, call transcripts, or MEDDICC scores is a "
+            "SEPARATE data-capture gap you may note as context, but it must "
+            "NEVER be used to hedge, contradict, or override the stated reason."
+        )
+
+    if rows:
+        narrative = rows[0]
+        reason = (narrative.get("stated_reason") or "").strip()
+        if not reason and deal:
+            reason = (deal.get("lost_reason") or "").strip()
+        result = {"narrative": narrative}
+        if reason:
+            result["_synthesis_note"] = _reason_synthesis_note(reason)
+        return result
+
+    # No narrative yet — return the component analysis instead, but surface the
+    # deal's stated reason if one exists (a deal can carry a lost_reason before
+    # its narrative is generated).
     if not deal:
         return {"error": f"No deal found for '{company}'"}
 
@@ -1709,12 +1738,22 @@ async def generate_win_loss(params: dict, sb) -> dict:
         columns="component_details,overall_score,status",
         filters=[("eq", "deal_id", deal["deal_id"])])
 
-    return {
+    reason = (deal.get("lost_reason") or "").strip()
+    result = {
         "deal": deal,
         "analyses": analyses[-3:],
-        "note": "No narrative generated yet — "
-                "runs Sunday after close.",
+        "note": (
+            "No AI narrative has been generated for this deal yet (those run "
+            "Sunday after close) — but the deal's own stated close reason is "
+            "the answer to why it closed; the missing narrative is a separate "
+            "data-capture gap, not a reason the outcome is unknown."
+            if reason else
+            "No narrative generated yet — runs Sunday after close."
+        ),
     }
+    if reason:
+        result["_synthesis_note"] = _reason_synthesis_note(reason)
+    return result
 
 
 async def set_target(params: dict, sb) -> dict:
