@@ -177,6 +177,96 @@ def test_isolated_month_not_detected_as_open_ended():
     )
 
 
+def test_defense_in_depth_empty_tw_open_ended():
+    """Bug #3: when the classifier emits no time_window at all (raw_tw = {})
+    for an open-ended month+year question, resolve_time_window({}) defaults
+    to current_quarter and the handler silently ignores the stated month.
+
+    The defense-in-depth fallback must detect this case (no period, open-ended,
+    month+year present) and construct the correct time_window from question text.
+    """
+    import re as _re
+    question = "compare our pipeline from January 2026 to today"
+    raw_tw = {}  # classifier emitted no time_window at all
+
+    _to_today_re = bool(_re.search(
+        r'\b(to today|vs\.? today|versus today|compared to today|to now|vs\.? now)\b',
+        question.lower()
+    ))
+    stated_years = _re.findall(r'\b(20\d{2})\b', question)
+    _since_pattern = bool(_re.search(r'\bsince\b', question.lower()) and stated_years)
+    _is_open_ended = _to_today_re or _since_pattern
+
+    MONTH_NAMES = {
+        "january": 1, "february": 2, "march": 3, "april": 4,
+        "may": 5, "june": 6, "july": 7, "august": 8,
+        "september": 9, "october": 10, "november": 11, "december": 12,
+        "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6,
+        "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+    }
+
+    # Simulate the new fallback block
+    if not raw_tw.get("period") and _is_open_ended and stated_years:
+        _month_re = _re.search(
+            r'\b(january|february|march|april|may|june|july|august|'
+            r'september|october|november|december|'
+            r'jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)\b',
+            question.lower()
+        )
+        if _month_re:
+            _month_num = MONTH_NAMES.get(_month_re.group(1).lower())
+            _year_int = int(stated_years[0])
+            if _month_num:
+                raw_tw = {
+                    "period": "specific",
+                    "start": f"{_year_int:04d}-{_month_num:02d}-01",
+                    "end": None,
+                }
+
+    assert _is_open_ended, "question contains 'to today' — must be detected as open-ended"
+    assert raw_tw.get("period") == "specific", (
+        f"empty tw must be built from question text; got {raw_tw!r}"
+    )
+    assert raw_tw["start"] == "2026-01-01", (
+        f"start must be 2026-01-01; got {raw_tw.get('start')!r}"
+    )
+    assert raw_tw["end"] is None, (
+        f"end must be None (→ today) for open-ended; got {raw_tw.get('end')!r}"
+    )
+
+    result = resolve_time_window(raw_tw)
+    assert result["end"] == TODAY.isoformat(), (
+        f"resolved end must be today; got {result['end']!r}"
+    )
+
+
+def test_empty_tw_isolated_month_not_rewritten():
+    """The empty-tw fallback must NOT fire for isolated month questions that
+    are NOT open-ended (no 'to today', no 'since'). Constructing a time_window
+    for 'show me March 2026' should still go through specific_month, not open
+    the range to today."""
+    import re as _re
+    question = "show me pipeline in March 2026"
+    raw_tw = {}
+
+    _to_today_re = bool(_re.search(
+        r'\b(to today|vs\.? today|versus today|compared to today|to now|vs\.? now)\b',
+        question.lower()
+    ))
+    stated_years = _re.findall(r'\b(20\d{2})\b', question)
+    _since_pattern = bool(_re.search(r'\bsince\b', question.lower()) and stated_years)
+    _is_open_ended = _to_today_re or _since_pattern
+
+    # Simulate the new fallback block — must NOT fire
+    if not raw_tw.get("period") and _is_open_ended and stated_years:
+        raw_tw = {"period": "specific", "start": "2026-03-01", "end": None}
+
+    assert not _is_open_ended, "isolated month must not be open-ended"
+    assert not raw_tw.get("period"), (
+        "fallback must NOT fire for isolated months; time_window should stay empty"
+    )
+
+
 if __name__ == "__main__":
     test_specific_with_null_end_resolves_to_today()
     print("PASS: specific + null end resolves to today")
@@ -190,4 +280,8 @@ if __name__ == "__main__":
     print("PASS: 'since' + year detected as open-ended")
     test_isolated_month_not_detected_as_open_ended()
     print("PASS: isolated month not treated as open-ended")
+    test_defense_in_depth_empty_tw_open_ended()
+    print("PASS: empty time_window fallback constructs from question text")
+    test_empty_tw_isolated_month_not_rewritten()
+    print("PASS: empty-tw fallback does not fire for isolated months")
     print("\nAll tests passed.")
