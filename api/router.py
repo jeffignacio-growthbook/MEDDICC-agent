@@ -7225,7 +7225,21 @@ def _smart_truncate_for_synthesis(tool_results: dict, char_limit: int = 20000) -
                           f"({len(full_json)} → {len(attempt_json)} chars)")
             return attempt_json
 
-    # Last resort: character truncation (but we tried to preserve computed results first)
+    # Last resort: character truncation — but first front-load metadata that
+    # must survive regardless of payload size (data_gaps, _synthesis_note, _note).
+    # These appear after bulk arrays (e.g. changes[]) in normal dict ordering;
+    # without reordering they are silently cut when a large array fills the first
+    # char_limit chars of the JSON (confirmed: 200-deal changes[] is ~30K compact,
+    # putting data_gaps past the 20K cut point — invisible to the model).
+    _PRIORITY_META = ("data_gaps", "_synthesis_note", "_note")
+    priority = {k: tool_results[k] for k in _PRIORITY_META
+                if k in tool_results and tool_results[k]}
+    if priority:
+        rest = {k: v for k, v in tool_results.items() if k not in _PRIORITY_META}
+        ordered_compact = json.dumps({**priority, **rest}, default=str)
+        logger.warning(f"[TRUNCATE] Character-level truncation, metadata front-loaded "
+                       f"({len(full_json)} → {char_limit} chars)")
+        return ordered_compact[:char_limit]
     logger.warning(f"[TRUNCATE] Character-level truncation as last resort "
                   f"({len(full_json)} → {char_limit} chars)")
     return full_json[:char_limit]
