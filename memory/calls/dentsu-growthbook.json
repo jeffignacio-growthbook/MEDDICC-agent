@@ -1,7 +1,7 @@
 {
   "company": "Dentsu & GrowthBook",
   "slug": "dentsu-growthbook",
-  "last_etl_date": "2026-09-05T05:59:01.763954",
+  "last_etl_date": "2026-09-26T05:41:35.664660",
   "calls": [
     {
       "id": "01M1F0YSGGCRHAN1RGVGTYAN0Y",
@@ -12,6 +12,17 @@
       "summary": "# Dentsu & GrowthBook Catch Up\nDate: 2026-09-04 | Duration: 27.610000610351562m\n\n## Summary\nThe discussion established a dual partnership model for GrowthBook: smaller clients would use infrastructure managed by Simone’s team, while larger clients could self-host and receive introductions and support. Gaia Chiamonte and Pietro Manfredi are expected to lead commercial and contractual discussions, with setup and finalization targeted between the end of August and mid-October. Priority sectors include utilities, banking, automotive, and energy, with experimentation, CRO, cost reduction, privacy, and hosting flexibility central to the proposition. The team requested relevant industry case studies, particularly for utilities and automotive. James Shannon presented GrowthBook’s fully open API, revamped visual editor, CLI integrations, AI assistant, experiment analysis, and learning pages. Privacy requirements were largely cleared, RFP support continued, and Italian-language support for AI tools remained under review.\n\n## Keywords\nprivacy assessment, AI assistant, commercial partnership, experimentation, API integration, case studies\n\n## Action Items\n\n**Simone Mazzero**\nForward marketing materials and GrowthBook information to Remy and Marco for client presentations (25:40)\nInitiate introduction of James Shannon to Gaia Chiamonte and Pietro Manfredi for commercial negotiations (25:40)\nObtain and forward RFP documents to Remy as soon as available (25:50)\n\n**James Shannon**\nProvide sales deck and marketing materials showcasing AI capabilities and partnership benefits to Simone, Marco, and Remy (25:40)\nEngage with Gaia Chiamonte and Pietro Manfredi for contract and pricing discussions post introductions (11:50)\nShare link to GrowthBook agent skills and additional product information with Remy and team (19:25)\n\n**Rémy Marin**\nAssist with technical answers and RFP completion, including translating RFP from Italian to English (04:45)\n",
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2T1BM5MSKEKXWTMKND7SY8J",
+      "source": "fireflies",
+      "title": "Dentsu & GrowthBook Commercial Discussion",
+      "date": "2026-09-25",
+      "duration_minutes": 50.84000015258789,
+      "summary": "# Dentsu & GrowthBook Commercial Discussion\nDate: 2026-09-25 | Duration: 50.84000015258789m\n\n## Summary\nDentsu and GrowthBook discussed two partnership structures: a reseller model in which Dentsu refers clients and receives a 15% referral fee on annual license fees, and a central-instance model with one license supporting multiple brands. Dentsu expects to begin with one license covering about 3–4 clients, while GrowthBook will prepare tiered pricing linked to brand volumes. GrowthBook can send experiment data from client websites and products to Dentsu’s BigQuery warehouse, support isolated access for multiple brands, and provide separate instances for clients with strict security requirements such as Fastweb and Vodafone. Dentsu identified NG, Fastweb, Vodafone, and other clients as opportunities, including clients whose VWO licenses are expiring. Dentsu charges clients monthly fees combining licensing and service markups. Gaia will provide volume estimates and budget ideas; James will develop pricing models. Legal approval is expected to take 2–3 weeks, followed by senior sign-off, with both parties aiming to complete the contract before October.\n\n## Keywords\npartnership model, GrowthBook licensing, central instance, data warehouse integration, revenue share, contract approval\n\n## Action Items\n\n**Gaia Chiaramonte**\nReview client portfolio volumes and budget for GrowthBook and provide amount for sizing licenses and tiers (31:23)\nAlign internally with Pietro Manfredi and legal team on proposed partnership model and budget (43:30)\nConfirm final partnership model choice and budget to GrowthBook team (43:00)\n\n**James Shannon**\nPrepare and send tiered pricing proposals for Dentsu central instance license based on estimated USD 200,000 license budget (38:30)\nFollow up on legal questionnaire completion status with Andrea and Dentsu legal team (45:30)\nCoordinate lead registration process to protect Dentsu’s referrals and exclusivity in Italy (39:40)\nOffer to schedule a follow-up meeting with Pietro for clarifications on the commercial model if requested (48:10)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

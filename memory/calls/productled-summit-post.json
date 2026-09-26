@@ -1,0 +1,18 @@
+{
+  "company": "ProductLed Summit Post",
+  "slug": "productled-summit-post",
+  "last_etl_date": "2026-09-26T05:41:35.662823",
+  "calls": [
+    {
+      "id": "01M32XFWAD6VGW2YJCHC1SRN2C",
+      "source": "fireflies",
+      "title": "ProductLed Summit Post Event Debrief",
+      "date": "2026-09-25",
+      "duration_minutes": 28,
+      "summary": "# ProductLed Summit Post Event Debrief\nDate: 2026-09-25 | Duration: 28m\n\n## Summary\nThe team reviewed prospect engagement, booth performance, sponsorship value, and event operations. Lamb Research showed strong interest in a self-hosted, air-gapped solution that differentiated the product from LaunchDarkly, while Rob from Daikin indicated procurement interest after a lunch conversation and booth visit. Quick follow-ups, discount codes, branded shirts, and a shipped giveaway helped maintain engagement. Full booth demos had limited traction, so the team favored short, targeted “demo snacks,” concise feature presentations, onsite demo booking, and concrete product views such as the Visual Editor or Claude Desktop. Space and screen limitations restricted interactive demonstrations, and a monitor compatibility issue required a converter. The event’s mixed audience produced limited product-focused engagement, with about 40 product-led attendees within an alliance of more than 150 people. The team agreed not to sponsor the event again, preferring focused product management communities such as Mind the Product and potentially speaking opportunities. Expense reporting and centralized photo collection were also reinforced.\n\n## Keywords\nProspect Engagement, Product Demo Strategy, Event Sponsorship, Product Management Conferences, Lead Follow-up, Event Booth Optimization\n\n## Action Items\n\n**Jake Stangl**\nContinue follow-up communication with Lamb research contact, leveraging the giveaway touchpoint to maintain engagement (01:10)\n\n**Lyndsie Berens**\nShip giveaway prize to Lamb contact and assist with providing discount codes to team members for use during events to enhance engagement (01:20)\n\n**Ashley Stirrup**\nEvaluate event traffic dynamics and prepare sets of pre-made discount code links for representatives to send during events to maintain momentum (04:50)\n\n**Scott Bailey**\nRefine demo strategy to favor quick, targeted feature demos rather than full demos; consider booth design improvements to facilitate such demos (05:50)\n\n**Natasha Rogers**\nProvide perspective on demo engagement approaches and booking demos on the spot during events to improve conversion rates (07:20)\n\n**Unassigned**\nGather all event photos into a shared folder and submit individual expense reports promptly to close out event accounting (17:55)\nAdd \"Mind the Product\" conference to 2027 event evaluation portfolio and monitor for potential sponsorship or speaking slot opportunities, especially in London (16:30)\n",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

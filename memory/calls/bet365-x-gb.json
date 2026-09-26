@@ -1,0 +1,18 @@
+{
+  "company": "Bet365 x GB",
+  "slug": "bet365-x-gb",
+  "last_etl_date": "2026-09-26T05:41:35.664177",
+  "calls": [
+    {
+      "id": "01M37DS1DW7Y9QHXFHSZKHC0H8",
+      "source": "fireflies",
+      "title": "Bet365 x GB: Exp Enablement",
+      "date": "2026-09-25",
+      "duration_minutes": 45.11000061035156,
+      "summary": "# Bet365 x GB: Exp Enablement\nDate: 2026-09-25 | Duration: 45.11000061035156m\n\n## Summary\nThe homepage personalization experiment ran for approximately two weeks before being paused because of concerns about Google recommendation-engine data, not the front-end implementation or experiment setup. It is expected to restart next week, with John reviewing intended measurements and GrowthBook supporting design and metric setup. Analysis should compare control and variant groups within matching event windows, while historical traffic will determine whether narrower live-event analysis is reliable. Hourly data may be needed for short events, and country-level results require context about sports, events, bets, carousel order, and engagement. Teams should standardize primary, secondary, and guardrail metrics; GrowthBook can add metrics retroactively when required fact-table and GA data exists, with approximately three months of fact-table history indicated for confirmation. Measurement should cover short-term betting actions and longer-term repeat usage. Casino targeting will use a 13-week score from zero to one passed through SDK eligibility rules. Winning treatments may be rolled out before extended analysis ends, supported by backtesting, Visual Editor guidance, Teams support, metric reviews, and configuration training.\n\n## Keywords\nExperiment enablement, homepage personalisation, GrowthBook metrics, multi-armed bandits, experiment segmentation, Visual Editor\n\n## Action Items\n**Cris Dizon**\nReview historical traffic patterns (18:50)\nExplore multi-armed bandits (18:50)\nCoordinate Teams support channel (41:29)\nReview metric list and experiment design (41:29)\nSend Visual Editor materials (42:49)\n\n**John Dykes**\nShare homepage measurement layers (31:20)\nProvide support contact details (41:29)\n\n**Tom Parvin**\nSend planned experiment metrics (36:28)\nSubmit metric questions asynchronously (41:57)\n\n**Russell Booth**\nUse Teams support setup (41:54)",
+      "organizer": "cris@growthbook.io",
+      "participants": 13,
+      "summary_quality": "good"
+    }
+  ]
+}

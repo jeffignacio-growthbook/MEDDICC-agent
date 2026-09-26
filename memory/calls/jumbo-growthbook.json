@@ -1,0 +1,18 @@
+{
+  "company": "Jumbo & GrowthBook",
+  "slug": "jumbo-growthbook",
+  "last_etl_date": "2026-09-26T05:41:35.664978",
+  "calls": [
+    {
+      "id": "01M3A9APQE89PZC89828XJBD4G",
+      "source": "fireflies",
+      "title": "Jumbo & GrowthBook | Introduction Call",
+      "date": "2026-09-25",
+      "duration_minutes": 33.439998626708984,
+      "summary": "# Jumbo & GrowthBook | Introduction Call\nDate: 2026-09-25 | Duration: 33.439998626708984m\n\n## Summary\nJumbo is a family-owned Dutch supermarket with 20% market share in the Netherlands, owns Hema, and has approximately 105 developers working with AWS, Java, and GraphQL. Its A/B testing setup is fragmented: a side-spec DOM manipulation tool is used poorly, newsletter testing is isolated but acceptable, and Bloombreach search testing has poor quality. Jumbo has no feature toggles and currently uses on/off releases, but it has started a GrowthBook proof of concept for feature toggles and A/B testing on test and acceptance clusters, with production rollout planned within days. Because the free version lacks role-based access, Jumbo built a companion app through the API to give business users experiment visibility and basic toggle control without broad admin access. Jumbo is considering the paid version for role-based access, compliance, and SSO, with approximately 50k tentatively reserved for next year. Discussions also covered training, experiment culture, pricing models, phased onboarding, deferred payment options, a follow-up on setup and SSO, and opening a Slack channel that includes engineer Jeremy French.\n\n## Keywords\nAB testing, feature toggles, GrowthBook, experimentation culture, role-based access, Jumbo supermarket\n\n## Action Items\n**Rémy Marin**  \nAssist Kees Romijn with technical questions (22:19)  \n\n**Marcel Geldner**  \nProvide documentation on GrowthBook's compliance (23:44)  \nOpen GrowthBook Slack channel (29:35)  \nSet up follow-up meeting with Jumbo (31:30)  \n\n**Kees Romijn**  \nAdd engineer Jeremy French to GrowthBook Slack channel (29:46)  \nRespond or confirm timing for follow-up meeting (31:25)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

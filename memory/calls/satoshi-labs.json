@@ -1,0 +1,18 @@
+{
+  "company": "Satoshi Labs +",
+  "slug": "satoshi-labs",
+  "last_etl_date": "2026-09-26T05:41:35.664332",
+  "calls": [
+    {
+      "id": "01M357YHS7ZFQJNKSJJ2STH5WX",
+      "source": "fireflies",
+      "title": "Satoshi Labs + GrowthBook",
+      "date": "2026-09-25",
+      "duration_minutes": 42.529998779296875,
+      "summary": "# Satoshi Labs + GrowthBook\nDate: 2026-09-25 | Duration: 42.529998779296875m\n\n## Summary\nTrezor’s experimentation is limited to one or two tests per month because of manual work, two-to-three-week design and development cycles, data-collection requirements, and cryptocurrency seasonality. Jan Dvořák described an ambition to run 50–120 monthly tests across 78 countries, enabling parallel UX, marketing, product, and business experiments and more localized optimization. GrowthBook’s enterprise plan offers holdouts, SSO, SLAs, data-warehouse integration, and expert support, but its stated pricing of $175,000 plus $1,250 per user annually was considered high. The open-source version supports up to three users with unlimited experiments but lacks enterprise features. Trezor requires self-hosting because of security policies, so the team plans a technical demo and self-hosted trial to validate integration, usability, ROI, and internal support before considering greater investment.\n\n## Keywords\nExperimentation, Conversion Rate Optimization, Cryptocurrency, Seasonality, GrowthBook, Enterprise Pricing\n\n## Action Items\n\n**Jan Dvořák**\nCoordinate with product, UX, business, marketing, and development teams to gauge interest and availability for a demo of GrowthBook’s platform (39:24)\nConfirm feasibility of a cloud-based enterprise proof of concept with IT/security teams and communicate findings (34:20)\nSelect potential hypotheses from other teams to showcase during the demo (35:48)\nEmail Christian to schedule the demo for early-to-mid next week, preferably Tuesday to Friday (40:34)\n\n**Christian Liebenow**\nProvide a detailed demo covering technical setup, data integration, experiment design, and user roles tailored to Jan’s team size and needs (36:33)\nShare business case examples and tailored pricing options, potentially including a trial version and adjusted enterprise pricing for Satoshi Labs (26:13)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}
