@@ -5,6 +5,22 @@
 
 ---
 
+## ✅ FIXED 2026-09-26: waterfall "new pipeline generated" silently read $0 for 7 weeks — `qualified_date` frozen, no live maintainer
+
+**The bug (high-severity):** Slack "how much pipeline did we generate this week" returned **$0 for 7 straight weeks** (Aug 17–Sep 21 2026), with an actionable-sounding "review SDR metrics" recommendation — while **58 deals / ~$5.74M** had actually crossed into qualified pipeline. Independently re-derived from `deals_snapshot` stage history: wk 8/17 $558,750 (10) · 8/24 $1,507,500 (12) · 9/07 $940,000 (12) · 9/14 $1,510,671 (11) · 9/21 $1,220,000 (13).
+
+**Root cause:** the waterfall keys "new pipeline" on `deals.qualified_date` (correctly — *not* create_date; the code comment explains why). But `qualified_date` is a **materialized event column with no live maintainer**: `seed_qualification_history.py` sets it once from HubSpot dealstage history; `etl_deals.py --mode analytics` does **not** write it (its docstring falsely claimed it "maintains these fields" — same shape as the `lost_reason` fetch-gap bug). It froze at its last seed run (`max(qualified_date)=2026-08-07`); every crossing since had `qualified_date=NULL` → counted as $0. The "$235K/$190K then $0 for 7 weeks" pattern was a stopped job, not a business event.
+
+**The fix (shipped):**
+- **Backfill (executed 2026-09-26 via MCP):** filled `qualified_date` for **290** deals from `deals_snapshot` first-crossing (`stage_order>=1`), **nulls only — never overwriting** the finer-grained seeded values (318 differ; kept). All 58 recent crossers now have it.
+- **Maintainer:** `scripts/analytics/backfill_qualified_date.py` (idempotent, fills nulls from snapshot crossings), **wired into `daily-analytics-etl.yml`** so the column can't refreeze.
+- **Freshness guard + snapshot fallback:** `scripts/analytics/pipeline_generation_freshness.py` — if `max(qualified_date)` lags the latest snapshot beyond tolerance, new-pipeline is **recomputed from `deals_snapshot` crossings** (source of truth) with the basis stated, never silently reported as the empty column number. `tests/test_pipeline_generation_freshness.py` pins the real $5.74M/58 fixture; **6/6 planted bugs caught**.
+- `seed_qualification_history.py` docstring corrected (the false "etl_deals maintains these fields" claim struck).
+
+**Still to do to close the live answer:** recompute `waterfall_weekly` (via `compute_waterfall_segmented`, run by the analytics workflow) so the materialized table reflects the corrected `qualified_date`, then re-ask live. Also worth folding the freshness guard directly into `compute_waterfall_segmented`'s new-pipeline path so the recompute self-heals even mid-gap (the maintainer makes this rare; the guard is the belt).
+
+---
+
 ## ✅ FIXED 2026-09-25: `deals.lost_reason` was empty because the ETL never fetched it — not because HubSpot lacked it
 
 **The bug:** HubSpot's `closed_lost_reason` was populated (100% of the recent quarter's closed-lost, ~44% fleet-wide over all history) but Supabase `deals.lost_reason` read 0% populated. Root cause was a fetch/consume gap: `DEAL_SYNC_PROPERTIES` never requested `closed_lost_reason`, and `etl_deals.py` did `props.get('closed_lost_reason', '')` on a property the fetch never asked for — `.get`'s default silently turned "never fetched" into "confirmed empty", no error. Same failure shape as `filter_table` dropping a filtered-on column and `highest_stage_order_reached` answering a different question than asked; distinct from `call_quality`, which was genuinely dead — this was live data swallowed by plumbing. The false "BLOCKED by a hard data ceiling" claim in `loss_concentration.py`'s docstring went unquestioned through three separate loss investigations before a direct HubSpot read disproved it.
