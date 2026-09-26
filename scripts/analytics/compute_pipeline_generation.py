@@ -169,11 +169,11 @@ def main():
         print(f"   Note: {skipped_no_value:,} deals have $0 value (still counted)")
     print()
 
-    # Step 3: Write to pipeline_generation_weekly table
-    print("3. Writing to pipeline_generation_weekly table...")
+    # Step 3: Write to pipeline_generation_quarterly table
+    print("3. Writing to pipeline_generation_quarterly table...")
 
     # Clear existing data
-    sb.table('pipeline_generation_weekly').delete().neq('id', 0).execute()
+    sb.table('pipeline_generation_quarterly').delete().neq('id', 0).execute()
 
     # Collect all unique keys
     all_keys = set(generated.keys()) | set(in_quarter_contribution.keys()) | set(rollover.keys())
@@ -193,10 +193,10 @@ def main():
             'last_updated': datetime.now().isoformat()
         }
 
-        sb.table('pipeline_generation_weekly').insert(row).execute()
+        sb.table('pipeline_generation_quarterly').insert(row).execute()
         rows_written += 1
 
-    print(f"   Wrote {rows_written:,} rows to pipeline_generation_weekly")
+    print(f"   Wrote {rows_written:,} rows to pipeline_generation_quarterly")
     print()
 
     # Step 4: Print output grouped by quarter then segment

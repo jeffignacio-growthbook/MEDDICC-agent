@@ -32,7 +32,7 @@ QUERYABLE_TABLES = [
     "feature_gaps",
     "waterfall_weekly",
     "forecast_weekly",
-    "pipeline_generation_weekly",
+    "pipeline_generation_quarterly",
     "win_loss_narratives",
     "competitive_signals",
     "pipeline_signals",
@@ -155,9 +155,9 @@ Context:
 - analyses: MEDDICC scores and deal assessment results
 - objections: Customer objections extracted from call transcripts
 - feature_gaps: Missing features/capabilities mentioned in calls
-- waterfall_weekly: Week-over-week pipeline movement and changes
-- forecast_weekly: Weekly forecast category snapshots
-- pipeline_generation_weekly: New pipeline created each week
+- waterfall_weekly: WEEKLY (week_ending) pipeline movement — owns "new pipeline this week"
+- forecast_weekly: WEEKLY (week_ending) forecast category snapshots
+- pipeline_generation_quarterly: QUARTERLY (fiscal_quarter, no week column) generation totals with in-quarter/rollover split — never for "this week"
 - win_loss_narratives: Why deals closed won/lost (narrative summaries)
 - competitive_signals: Competitor mentions and win/loss patterns
 - pipeline_signals: Leading indicators of pipeline health

@@ -1,0 +1,80 @@
+name: Recompute pipeline_generation_quarterly (one-off)
+
+# One-off, workflow_dispatch only. pipeline_generation_quarterly (renamed
+# from pipeline_generation_weekly in migration 074) had no writer wired into
+# any workflow — all 77 rows were frozen at 2026-08-11 for 6+ weeks, a second
+# frozen artifact alongside the qualified_date bug fixed earlier tonight.
+# This runs the same script now wired into weekly-analytics.yml, once, to
+# bring the table current before considering the rename/routing fix closed.
+# Prints before/after row counts and the current fiscal quarter's totals by
+# segment so the refresh can be checked without a separate DB read — but the
+# PR still independently re-verifies via a direct Supabase query, not just
+# this workflow's own printed output.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deals-full-sync
+  cancel-in-progress: false
+
+jobs:
+  recompute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Show BEFORE (row count + freshness)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os
+          from supabase import create_client
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+          rows = sb.table('pipeline_generation_quarterly').select('fiscal_quarter,last_updated').execute().data
+          print(f'BEFORE: {len(rows)} rows')
+          if rows:
+              print(f'  last_updated range: {min(r[\"last_updated\"] for r in rows)} .. {max(r[\"last_updated\"] for r in rows)}')
+              print(f'  distinct fiscal_quarter: {len(set(r[\"fiscal_quarter\"] for r in rows))}')
+          "
+
+      - name: Recompute pipeline generation (quarterly)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python scripts/analytics/compute_pipeline_generation.py
+
+      - name: Show AFTER (row count + freshness + current-quarter totals)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os
+          from supabase import create_client
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+          rows = sb.table('pipeline_generation_quarterly').select('*').execute().data
+          print(f'AFTER: {len(rows)} rows')
+          if rows:
+              print(f'  last_updated range: {min(r[\"last_updated\"] for r in rows)} .. {max(r[\"last_updated\"] for r in rows)}')
+          from collections import defaultdict
+          by_q = defaultdict(lambda: [0.0, 0])
+          for r in rows:
+              a = by_q[r['fiscal_quarter']]
+              a[0] += float(r.get('generated_value') or 0); a[1] += int(r.get('deal_count') or 0)
+          print()
+          print('By quarter:')
+          for q in sorted(by_q):
+              v, c = by_q[q]
+              print(f'  {q}: \${v:,.0f}  ({c} deals)')
+          "

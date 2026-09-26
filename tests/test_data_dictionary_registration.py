@@ -57,7 +57,7 @@ ALL_QUERYABLE_TABLES = {
     "deals", "deals_snapshot", "calls", "analyses",
     "objections", "feature_gaps", "win_loss_narratives",
     "competitive_signals", "pipeline_signals", "deal_risks",
-    "waterfall_weekly", "forecast_weekly", "pipeline_generation_weekly",
+    "waterfall_weekly", "forecast_weekly", "pipeline_generation_quarterly",
     "rep_performance", "rep_targets",
     "sdr_metrics", "sdr_users", "user_personas",
     "arr_by_customer"

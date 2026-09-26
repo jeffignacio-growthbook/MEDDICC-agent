@@ -124,6 +124,7 @@ jobs:
             tests/test_path_to_target.py \
             tests/test_pipeline_generation_freshness.py \
             tests/test_waterfall_pairs_parsing.py \
+            tests/test_classifier_grain_descriptions.py \
             tests/test_deal_close_reasons.py \
             tests/test_win_loss_reason_authority.py \
             tests/test_generate_win_loss_reason_authority.py \

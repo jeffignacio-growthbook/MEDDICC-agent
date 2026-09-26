@@ -19,9 +19,9 @@ Available tables:
 - competitive_signals: Competitor mentions and win/loss patterns
 - pipeline_signals: Leading indicators of pipeline health
 - deal_risks: Risk flags and warnings for deals
-- waterfall_weekly: Weekly pipeline movement (new/won/lost)
-- forecast_weekly: Weekly forecast category snapshots
-- pipeline_generation_weekly: New pipeline created each week
+- waterfall_weekly: WEEKLY (by week_ending) new/won/lost pipeline movement. Owns "how much pipeline did we generate/create THIS WEEK" and any other week-grained pipeline question.
+- forecast_weekly: WEEKLY (by week_ending) forecast category snapshots
+- pipeline_generation_quarterly: QUARTERLY (by fiscal_quarter, NOT weekly — no week column exists) generation totals with in-quarter-vs-rollover split. Only for "this/last QUARTER" questions; never for "this week."
 - rep_performance: Sales rep metrics and quota attainment
 - rep_targets: Quota targets by rep/period
 - win_loss_narratives: Why deals closed won/lost
@@ -87,7 +87,7 @@ def _all_tables() -> List[str]:
     """Return all queryable tables as fallback."""
     return [
         "deals", "calls", "analyses", "objections", "feature_gaps",
-        "waterfall_weekly", "forecast_weekly", "pipeline_generation_weekly",
+        "waterfall_weekly", "forecast_weekly", "pipeline_generation_quarterly",
         "win_loss_narratives", "competitive_signals", "pipeline_signals",
         "deal_risks", "rep_performance", "rep_targets", "deals_snapshot"
     ]
