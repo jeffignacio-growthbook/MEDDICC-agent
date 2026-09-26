@@ -6022,6 +6022,25 @@ async def _route_question(question: str, user_id: str,
                     "end": None,
                 }
                 params["time_window"] = raw_tw
+        # Fallback: classifier emitted no time_window at all, but question
+        # contains month+year and open-ended phrasing. Construct from text.
+        if not raw_tw.get("period") and _is_open_ended and stated_years:
+            _month_re_fb = _re.search(
+                r'\b(january|february|march|april|may|june|july|august|'
+                r'september|october|november|december|'
+                r'jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)\b',
+                question.lower()
+            )
+            if _month_re_fb:
+                _month_num_fb = _MONTH_NAMES_ROUTE.get(_month_re_fb.group(1).lower())
+                _year_int_fb = int(stated_years[0])
+                if _month_num_fb:
+                    raw_tw = {
+                        "period": "specific",
+                        "start": f"{int(_year_int_fb):04d}-{_month_num_fb:02d}-01",
+                        "end": None,
+                    }
+                    params["time_window"] = raw_tw
         params["time_window"] = resolve_time_window(
             params.get("time_window", {}))
 
