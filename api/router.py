@@ -289,6 +289,17 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
 'what are Jake's metrics for August', 'how many dials did Jake make this week'""",
     "query_sdr_leaderboard": "SDR/BDR team activity overview — calls and voicemails across all SDRs. Use for team-wide SDR activity or comparing SDR performance.",
     "query_sdr_pipeline_sourced": "Pipeline sourced by SDRs/BDRs — deals attributed to an SDR via the configured attribution field or current ownership. Use when asking about SDR-sourced pipeline, BDR contribution, or meetings that converted to opportunities.",
+    "query_stage_lag": (
+        "STAGE LAG DETECTOR — open pre-commercial (Discovery/Scoping) deals "
+        "whose MEDDICC call evidence (Economic Buyer + Decision Process) signals "
+        "they are further along than their recorded stage. Returns a review list, "
+        "never an automatic stage change. Read-only. "
+        "Use for: 'which deals are mis-staged', 'deals ahead of their stage', "
+        "'stage lag review', 'call evidence vs stage', 'deals that should be further along', "
+        "'MEDDICC signal mismatch', 'stage vs call content'. "
+        "Examples: 'Which deals are mis-staged?', 'Show me stage lag', "
+        "'Any deals ahead of their recorded stage?', 'Stage vs call content review'"
+    ),
     "query_cycle_time": (
         "Sales cycle time analysis — median days from create to close, "
         "STRUCTURAL ENFORCEMENT: uses compute_cycle_time() with correct methodology "

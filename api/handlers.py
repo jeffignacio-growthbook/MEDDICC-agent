@@ -6464,3 +6464,80 @@ async def query_rep_coaching(params: dict, sb) -> dict:
             "error": f"Coaching assessment failed: {type(e).__name__}: {e}",
             "deal_id": deal_id
         }
+
+
+async def query_stage_lag(params: dict, sb) -> dict:
+    """
+    Stage-vs-call-content lag detector.
+
+    Wraps detect_stage_call_lag() from scripts/analytics/stage_call_lag.py.
+    Read-only: returns a review list of open pre-commercial-stage deals whose
+    MEDDICC call evidence (Economic Buyer + Decision Process) signals they are
+    commercially further along than their recorded stage. Never changes a stage.
+
+    params:
+      eb_threshold: int (optional, default 6) — Economic Buyer score cutoff
+      dp_threshold: int (optional, default 6) — Decision Process score cutoff
+
+    Returns: detect_stage_call_lag() result dict.
+    """
+    from stage_call_lag import (
+        detect_stage_call_lag,
+        PRECOMMERCIAL_STAGES_DEFAULT,
+        EB_THRESHOLD_DEFAULT,
+        DP_THRESHOLD_DEFAULT,
+    )
+
+    eb_threshold = int(params.get("eb_threshold", EB_THRESHOLD_DEFAULT))
+    dp_threshold = int(params.get("dp_threshold", DP_THRESHOLD_DEFAULT))
+
+    # Resolve pre-commercial stages from config if possible; fall back to default.
+    try:
+        from utils import get_pipeline_config
+        from field_semantics import stage_bucket as _stage_bucket
+        cfg = get_pipeline_config()
+        stages, labels = [], {}
+        for p in cfg.get("pipelines", []):
+            if str(p.get("id")) != "default":
+                continue
+            for s in p.get("stages", []):
+                sid = str(s.get("id"))
+                if _stage_bucket(sid) in ("discovery", "scoping"):
+                    stages.append(sid)
+                    labels[sid] = s.get("label") or _stage_bucket(sid)
+        precommercial_stages = tuple(stages) if stages else PRECOMMERCIAL_STAGES_DEFAULT
+    except Exception:
+        precommercial_stages = PRECOMMERCIAL_STAGES_DEFAULT
+        labels = {}
+
+    # Fetch open deals at pre-commercial stages on the default pipeline.
+    deal_rows = select_all(
+        sb, "deals",
+        columns="deal_id,company_name,stage,deal_status,pipeline_id",
+        filters=[
+            ("eq", "deal_status", "active"),
+            ("eq", "pipeline_id", "default"),
+            ("in_", "stage", list(precommercial_stages)),
+        ],
+    )
+
+    # Batch-fetch analyses for those deal_ids (100 at a time).
+    deal_ids = [str(d["deal_id"]) for d in deal_rows]
+    analyses_by_deal: dict = {}
+    for i in range(0, len(deal_ids), 100):
+        batch = deal_ids[i:i + 100]
+        rows = select_all(
+            sb, "analyses",
+            columns="deal_id,economic_buyer_score,decision_process_score",
+            filters=[("in_", "deal_id", batch)],
+        )
+        for a in rows:
+            analyses_by_deal.setdefault(str(a["deal_id"]), []).append(a)
+
+    return detect_stage_call_lag(
+        deal_rows, analyses_by_deal,
+        precommercial_stages=precommercial_stages,
+        eb_threshold=eb_threshold,
+        dp_threshold=dp_threshold,
+        stage_labels=labels,
+    )
