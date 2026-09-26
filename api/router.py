@@ -300,6 +300,30 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "Examples: 'Which deals are mis-staged?', 'Show me stage lag', "
         "'Any deals ahead of their recorded stage?', 'Stage vs call content review'"
     ),
+    "query_qualification_rate": (
+        "QUALIFICATION CONVERSION RATE — how many deals cross from Meeting Set "
+        "into a qualified stage, and what happens to them (win rate, conversion rate, "
+        "stuck non-crossers). Reads full deals_snapshot history for the default pipeline. "
+        "Read-only; returns crossings list + summary (win rate, conversion, ambiguous). "
+        "Use for: 'what is our qualification rate', 'how many deals go from meeting set "
+        "to qualified', 'win rate after qualification', 'qualification conversion', "
+        "'how many deals get qualified', 'Meeting Set to Discovery conversion'. "
+        "Examples: 'What is our qualification rate?', 'Win rate on qualified deals', "
+        "'How many deals cross from meeting set?', 'Qualification conversion analysis'"
+    ),
+    "query_path_to_target": (
+        "PATH TO TARGET — time-feasibility gate + dual-lever gap plan for closing "
+        "the gap to the quarterly revenue target. Composes pipeline coverage (existing "
+        "pipeline scenarios: conservative/likely/stretch), historical won-deal cycle time "
+        "(time-feasible fraction for net-new), and days remaining in the quarter. "
+        "Shows how much of the gap existing pipeline covers vs how much net-new is needed "
+        "and whether it can realistically land this quarter. Read-only. "
+        "Use for: 'how do we hit our number', 'can we hit quota', 'what does it take to "
+        "close the gap', 'path to goal', 'do we need new pipeline', 'can net-new help us "
+        "this quarter', 'gap plan', 'how to make the number'. "
+        "Examples: 'What does it take to hit our quarterly target?', "
+        "'Can we close the gap with existing pipeline?', 'Do we need net-new this quarter?'"
+    ),
     "query_cycle_time": (
         "Sales cycle time analysis — median days from create to close, "
         "STRUCTURAL ENFORCEMENT: uses compute_cycle_time() with correct methodology "
