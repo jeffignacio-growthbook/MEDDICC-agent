@@ -5603,8 +5603,29 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
         "statement": scope_statement,
     }
 
-    # ── load snapshot rows for the quarter ──
-    filters = [("eq", "fiscal_quarter", fiscal_quarter)]
+    # ── load snapshot rows ──
+    # When time_window has explicit start/end, filter by snapshot_date directly.
+    # fiscal_quarter was used as a date-range proxy and would silently override
+    # the user's intent: "compare pipeline from January 2026 to today" would
+    # return current-quarter data because fiscal_quarter defaults to the current
+    # quarter when the classifier doesn't emit it as a param. snapshot_date
+    # range filters load exactly the snapshots the user asked for, regardless
+    # of which fiscal quarter(s) they span.
+    tw_start = (time_window or {}).get("start")
+    tw_end = (time_window or {}).get("end")
+    if tw_start and tw_end:
+        filters = [
+            ("gte", "snapshot_date", tw_start),
+            ("lte", "snapshot_date", tw_end),
+        ]
+        # Use the time_window label as the display quarter when available.
+        # fall back to the computed fiscal_quarter label only when the label
+        # is absent (old-format time_window dict with no label key).
+        tw_label = (time_window or {}).get("label")
+        if tw_label and tw_label != fiscal_quarter:
+            fiscal_quarter = tw_label
+    else:
+        filters = [("eq", "fiscal_quarter", fiscal_quarter)]
     if owner_email:
         # ilike (no wildcards) rather than eq: an exact case-insensitive
         # match. HubSpot owner-email casing isn't guaranteed consistent
