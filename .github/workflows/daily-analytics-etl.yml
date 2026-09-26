@@ -45,6 +45,17 @@ jobs:
           echo "Snapshot/waterfall/forecast/win-loss remain weekly"
           python scripts/etl_deals.py --mode analytics
 
+      # Maintain deals.qualified_date from deals_snapshot crossings (2026-09-26
+      # high-severity fix). etl_deals does NOT write qualified_date; without this
+      # step it refreezes and waterfall new-pipeline silently reads $0. Idempotent,
+      # fills nulls only — safe to run every day.
+      - name: Maintain qualified_date (fill nulls from snapshot crossings)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python scripts/analytics/backfill_qualified_date.py
+
       # Fix A (#36) makes etl_deals exit non-zero on failure; without this a
       # red run notifies nobody. Same alert as the deal/calls ETLs.
       - name: Alert on failure

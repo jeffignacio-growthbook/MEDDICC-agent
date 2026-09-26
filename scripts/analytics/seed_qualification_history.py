@@ -2,8 +2,16 @@
 """
 One-time seed of highest_stage_order_reached and
 qualified_date from HubSpot dealstage property history.
-Run once after Phase A migrations. After that,
-etl_deals.py --mode analytics maintains these fields.
+Run once after Phase A migrations.
+
+MAINTENANCE (corrected 2026-09-26): etl_deals.py --mode analytics does NOT
+write qualified_date — this docstring's earlier claim that it "maintains these
+fields" was false, and qualified_date silently froze at the last seed run
+(2026-08-07), which broke waterfall new-pipeline for 7 weeks. qualified_date is
+now kept current by scripts/analytics/backfill_qualified_date.py (idempotent,
+fills nulls from deals_snapshot crossings), wired into daily-analytics-etl.yml.
+This seed remains the authoritative source where it has run (dealstage history
+is finer-grained than weekly snapshots); the maintainer only fills gaps.
 
 Usage:
   python scripts/analytics/seed_qualification_history.py

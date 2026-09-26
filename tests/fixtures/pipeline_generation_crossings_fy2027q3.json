@@ -1,0 +1,380 @@
+{
+ "description": "Real FY2027-Q3 qualification crossings (deals_snapshot first stage_order>=1), Aug17-Sep21 2026, captured read-only 2026-09-26 via Supabase MCP. The weeks waterfall_weekly wrongly reported $0 (qualified_date frozen at 2026-08-07).",
+ "threshold_stage_order": 1,
+ "crossings": [
+  {
+   "deal_id": "63064855552",
+   "company_name": "Boldin",
+   "crossing_date": "2026-08-17",
+   "incremental_arr": 50000
+  },
+  {
+   "deal_id": "63437263422",
+   "company_name": "Coverflex",
+   "crossing_date": "2026-08-17",
+   "incremental_arr": 85000
+  },
+  {
+   "deal_id": "63527836680",
+   "company_name": "Zurich Insurance",
+   "crossing_date": "2026-08-17",
+   "incremental_arr": 100000
+  },
+  {
+   "deal_id": "63535729507",
+   "company_name": "Hudu",
+   "crossing_date": "2026-08-17",
+   "incremental_arr": 0
+  },
+  {
+   "deal_id": "63549963371",
+   "company_name": "OTP Bank",
+   "crossing_date": "2026-08-17",
+   "incremental_arr": 150000
+  },
+  {
+   "deal_id": "63562515584",
+   "company_name": "LaFleur Marketing",
+   "crossing_date": "2026-08-17",
+   "incremental_arr": 40000
+  },
+  {
+   "deal_id": "63618932383",
+   "company_name": "Hungama",
+   "crossing_date": "2026-08-17",
+   "incremental_arr": 0
+  },
+  {
+   "deal_id": "63712716454",
+   "company_name": "",
+   "crossing_date": "2026-08-17",
+   "incremental_arr": 50000
+  },
+  {
+   "deal_id": "63834925459",
+   "company_name": "Conde Nast",
+   "crossing_date": "2026-08-17",
+   "incremental_arr": 33750
+  },
+  {
+   "deal_id": "53897831319",
+   "company_name": "Creative CX",
+   "crossing_date": "2026-08-19",
+   "incremental_arr": 50000
+  },
+  {
+   "deal_id": "63436694904",
+   "company_name": "Kaizen Gaming",
+   "crossing_date": "2026-08-28",
+   "incremental_arr": 0
+  },
+  {
+   "deal_id": "63516446812",
+   "company_name": "Robinhood",
+   "crossing_date": "2026-08-28",
+   "incremental_arr": 150000
+  },
+  {
+   "deal_id": "63553360052",
+   "company_name": "Hello Yellow",
+   "crossing_date": "2026-08-28",
+   "incremental_arr": 35000
+  },
+  {
+   "deal_id": "63676965456",
+   "company_name": "InMobi",
+   "crossing_date": "2026-08-28",
+   "incremental_arr": 75000
+  },
+  {
+   "deal_id": "64058802499",
+   "company_name": "Clover",
+   "crossing_date": "2026-08-28",
+   "incremental_arr": 200000
+  },
+  {
+   "deal_id": "64138895731",
+   "company_name": "KAPE",
+   "crossing_date": "2026-08-28",
+   "incremental_arr": 127500
+  },
+  {
+   "deal_id": "64175366986",
+   "company_name": "GUESS Europe Sagl",
+   "crossing_date": "2026-08-28",
+   "incremental_arr": 65000
+  },
+  {
+   "deal_id": "64279105157",
+   "company_name": "Noxtua",
+   "crossing_date": "2026-08-28",
+   "incremental_arr": 140000
+  },
+  {
+   "deal_id": "64293475180",
+   "company_name": "National Company of Telecom",
+   "crossing_date": "2026-08-28",
+   "incremental_arr": 110000
+  },
+  {
+   "deal_id": "64333729870",
+   "company_name": "Plusgrade",
+   "crossing_date": "2026-08-28",
+   "incremental_arr": 50000
+  },
+  {
+   "deal_id": "64432701550",
+   "company_name": "Tubi",
+   "crossing_date": "2026-08-28",
+   "incremental_arr": 500000
+  },
+  {
+   "deal_id": "64367179643",
+   "company_name": "Centerfield",
+   "crossing_date": "2026-08-30",
+   "incremental_arr": 55000
+  },
+  {
+   "deal_id": "63433718401",
+   "company_name": "higgsfield.ai",
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 0
+  },
+  {
+   "deal_id": "64174280502",
+   "company_name": "SATS",
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 90000
+  },
+  {
+   "deal_id": "64181340804",
+   "company_name": "PocketFM",
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 125000
+  },
+  {
+   "deal_id": "64248567201",
+   "company_name": "Acorns",
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 125000
+  },
+  {
+   "deal_id": "64285011801",
+   "company_name": "RecargaPay",
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 85000
+  },
+  {
+   "deal_id": "64307147547",
+   "company_name": "Baton",
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 30000
+  },
+  {
+   "deal_id": "64366810627",
+   "company_name": "Test Org",
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 100000
+  },
+  {
+   "deal_id": "64382140959",
+   "company_name": "Karbon",
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 25000
+  },
+  {
+   "deal_id": "64389395879",
+   "company_name": "CODE.ID",
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 35000
+  },
+  {
+   "deal_id": "64434424673",
+   "company_name": "Clipboard",
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 200000
+  },
+  {
+   "deal_id": "64576781972",
+   "company_name": "Krifa",
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 75000
+  },
+  {
+   "deal_id": "64576790955",
+   "company_name": null,
+   "crossing_date": "2026-09-07",
+   "incremental_arr": 50000
+  },
+  {
+   "deal_id": "61032303431",
+   "company_name": "Twitch",
+   "crossing_date": "2026-09-14",
+   "incremental_arr": 250000
+  },
+  {
+   "deal_id": "61625305118",
+   "company_name": "Stitch Fix",
+   "crossing_date": "2026-09-14",
+   "incremental_arr": 150000
+  },
+  {
+   "deal_id": "62115522605",
+   "company_name": "The New York Times",
+   "crossing_date": "2026-09-14",
+   "incremental_arr": 150000
+  },
+  {
+   "deal_id": "63191360945",
+   "company_name": "CarGurus Inc",
+   "crossing_date": "2026-09-14",
+   "incremental_arr": 290000
+  },
+  {
+   "deal_id": "64534469266",
+   "company_name": "Antidote",
+   "crossing_date": "2026-09-14",
+   "incremental_arr": 50000
+  },
+  {
+   "deal_id": "64573950603",
+   "company_name": "ZOE",
+   "crossing_date": "2026-09-14",
+   "incremental_arr": 50000
+  },
+  {
+   "deal_id": "64624162320",
+   "company_name": "Supercell",
+   "crossing_date": "2026-09-14",
+   "incremental_arr": 120000
+  },
+  {
+   "deal_id": "64696790346",
+   "company_name": "GSM ORG",
+   "crossing_date": "2026-09-14",
+   "incremental_arr": 125000
+  },
+  {
+   "deal_id": "64836805007",
+   "company_name": "Apify",
+   "crossing_date": "2026-09-14",
+   "incremental_arr": 671
+  },
+  {
+   "deal_id": "64885894788",
+   "company_name": "Bamboo HR LLC",
+   "crossing_date": "2026-09-14",
+   "incremental_arr": 125000
+  },
+  {
+   "deal_id": "64903790891",
+   "company_name": "SAS",
+   "crossing_date": "2026-09-14",
+   "incremental_arr": 200000
+  },
+  {
+   "deal_id": "63222887693",
+   "company_name": "Trade Republic",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 55000
+  },
+  {
+   "deal_id": "64239712647",
+   "company_name": "HolzLand Becker",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 30000
+  },
+  {
+   "deal_id": "64576827032",
+   "company_name": "Gen",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 50000
+  },
+  {
+   "deal_id": "64877467020",
+   "company_name": "Second Nature",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 65625
+  },
+  {
+   "deal_id": "64888751461",
+   "company_name": "Nivoda Marketing",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 100000
+  },
+  {
+   "deal_id": "64908215831",
+   "company_name": "Weekendesk",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 40000
+  },
+  {
+   "deal_id": "64986172075",
+   "company_name": "KPLER",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 300000
+  },
+  {
+   "deal_id": "65027232136",
+   "company_name": "Tamedia AG",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 60000
+  },
+  {
+   "deal_id": "65027251300",
+   "company_name": "Storio Group",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 200000
+  },
+  {
+   "deal_id": "65027812424",
+   "company_name": "adesso SE",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 200000
+  },
+  {
+   "deal_id": "65027814314",
+   "company_name": "FlowGPT",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 74375
+  },
+  {
+   "deal_id": "65040937129",
+   "company_name": "Minikai",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 45000
+  },
+  {
+   "deal_id": "65080037250",
+   "company_name": "MoneyLion",
+   "crossing_date": "2026-09-21",
+   "incremental_arr": 0
+  }
+ ],
+ "expected_weekly": {
+  "2026-08-17": {
+   "deals": 10,
+   "incremental_arr": 558750
+  },
+  "2026-08-24": {
+   "deals": 12,
+   "incremental_arr": 1507500
+  },
+  "2026-09-07": {
+   "deals": 12,
+   "incremental_arr": 940000
+  },
+  "2026-09-14": {
+   "deals": 11,
+   "incremental_arr": 1510671
+  },
+  "2026-09-21": {
+   "deals": 13,
+   "incremental_arr": 1220000
+  }
+ },
+ "expected_total": {
+  "deals": 58,
+  "incremental_arr": 5736921
+ }
+}
