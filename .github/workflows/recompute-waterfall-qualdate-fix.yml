@@ -1,0 +1,90 @@
+name: Recompute waterfall — qualified_date $0 fix (one-off)
+
+# One-off, workflow_dispatch only. After PR #79 backfilled deals.qualified_date
+# (frozen at 2026-08-07 → 7 weeks of false $0 new pipeline), the materialized
+# waterfall_weekly still holds the old $0 rows and must be recomputed from the
+# now-correct qualified_date.
+#
+# We recompute EXACTLY the seven affected week grid cells via --pairs, not
+# --backfill (chains only pure-backfilled dates, misses September) nor
+# --recompute-from (pairs every consecutive snapshot date, fabricating
+# sub-weekly rows because Aug 2026 interleaves backfilled and prospective
+# snapshots). Each 'new' date below is an existing week_ending; the value_basis
+# per pair (deal_value through 09-08, incremental_arr from the 09-11 boundary)
+# matches what is already stored.
+
+on:
+  workflow_dispatch:
+
+# Share the deal writers' lease group so this can't race the full sync.
+concurrency:
+  group: deals-full-sync
+  cancel-in-progress: false
+
+jobs:
+  recompute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Show BEFORE (current waterfall_weekly for the 7 weeks)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os
+          from supabase import create_client
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+          weeks = ['2026-08-17','2026-08-24','2026-08-28','2026-09-07','2026-09-08','2026-09-14','2026-09-21']
+          rows = sb.table('waterfall_weekly').select('week_ending,new_pipeline_value,newly_qualified_value,newly_qualified_count,value_basis').eq('pipeline_id','default').in_('week_ending', weeks).execute().data
+          from collections import defaultdict
+          agg = defaultdict(lambda: [0.0,0.0,0])
+          for r in rows:
+              a = agg[r['week_ending']]
+              a[0]+=float(r.get('new_pipeline_value') or 0); a[1]+=float(r.get('newly_qualified_value') or 0); a[2]+=int(r.get('newly_qualified_count') or 0)
+          print('BEFORE  week        new_pipeline   newly_qualified   nq_count')
+          for w in weeks:
+              a=agg[w]; print(f'  {w}   \${a[0]:>12,.0f}   \${a[1]:>14,.0f}   {a[2]:>6}')
+          "
+
+      - name: Recompute the 7 affected weeks
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python scripts/analytics/compute_waterfall_segmented.py --pairs \
+            "2026-08-10:2026-08-17:backfill,2026-08-17:2026-08-24:backfill,2026-08-24:2026-08-28:backfill,2026-08-31:2026-09-07:prospective,2026-09-07:2026-09-08:prospective,2026-09-11:2026-09-14:prospective,2026-09-14:2026-09-21:prospective"
+
+      - name: Show AFTER (recomputed waterfall_weekly for the 7 weeks)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -c "
+          import os
+          from supabase import create_client
+          sb = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_SERVICE_KEY'))
+          weeks = ['2026-08-17','2026-08-24','2026-08-28','2026-09-07','2026-09-08','2026-09-14','2026-09-21']
+          rows = sb.table('waterfall_weekly').select('week_ending,new_pipeline_value,newly_qualified_value,newly_qualified_count,value_basis').eq('pipeline_id','default').in_('week_ending', weeks).execute().data
+          from collections import defaultdict
+          agg = defaultdict(lambda: [0.0,0.0,0])
+          for r in rows:
+              a = agg[r['week_ending']]
+              a[0]+=float(r.get('new_pipeline_value') or 0); a[1]+=float(r.get('newly_qualified_value') or 0); a[2]+=int(r.get('newly_qualified_count') or 0)
+          print('AFTER   week        new_pipeline   newly_qualified   nq_count')
+          tot=[0.0,0.0,0]
+          for w in weeks:
+              a=agg[w]; tot[0]+=a[0];tot[1]+=a[1];tot[2]+=a[2]
+              print(f'  {w}   \${a[0]:>12,.0f}   \${a[1]:>14,.0f}   {a[2]:>6}')
+          print(f'  TOTAL       \${tot[0]:>12,.0f}   \${tot[1]:>14,.0f}   {tot[2]:>6}')
+          print('Expected newly-qualified across the window (independent snapshot derivation): ~\$5,736,921 / 58 deals')
+          "
