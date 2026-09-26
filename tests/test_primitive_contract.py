@@ -136,6 +136,17 @@ KNOWN_DETECTION_FUNCTIONS = {
     # primitive). See PRIMITIVE_CHECKLIST.md "Structured Aggregation
     # Verification" section. First integration: query_pipeline.
     "verify_structured_aggregations",
+    # _year_sanity_check (api/time_resolver.py): a pure validator called by
+    # resolve_time_window() that returns an error string when the user's
+    # stated year is implausibly far in the past or future. Satisfies
+    # checklist: (a) its error string IS the label returned from
+    # resolve_time_window() — it ends up in the synthesis prompt and the
+    # "_error" key on the time-window dict, so the path to the user is
+    # direct (not just a log line); (b) the user sees "NO DATA AVAILABLE"
+    # in the answer instead of a silent wrong date range. NOT in
+    # FAILURE_MODE_PRIMITIVES — it's a time_resolver utility, not a
+    # dynamic_query_loop primitive.
+    "_year_sanity_check",
 }
 
 # Naming patterns a "detection-style" function is likely to match.

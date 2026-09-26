@@ -156,7 +156,8 @@ jobs:
             tests/test_diff_company_name_backfill.py \
             tests/test_rep_clarification.py \
             tests/test_snapshot_diff_jake_h_regression.py \
-            tests/test_pipeline_movement_deal_changes_exit_status.py
+            tests/test_pipeline_movement_deal_changes_exit_status.py \
+            tests/test_specific_month_date_resolution.py
           do
             echo "::group::$t"
             if PYTHONPATH=. python3 "$t"; then
