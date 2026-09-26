@@ -40,6 +40,34 @@ def value_basis_for(prev_date: str) -> str:
     return 'incremental_arr' if str(prev_date) >= INCREMENTAL_BASIS_FROM else 'deal_value'
 
 
+def parse_pairs(spec: str):
+    """Parse an explicit-pairs spec into [(prev_date, new_date, source), ...].
+
+    Format: comma-separated 'prev:new[:source]' tokens, e.g.
+      '2026-08-10:2026-08-17:backfill,2026-09-14:2026-09-21:prospective'
+    Source defaults to 'prospective' when omitted. Used by --pairs to recompute
+    exactly the historical week grid (each new == an existing week_ending)
+    without --recompute-from's habit of pairing every consecutive snapshot date
+    (which fabricates sub-weekly rows when backfilled and prospective snapshots
+    interleave). Raises ValueError on a malformed or empty spec so a bad ops
+    invocation fails loudly instead of silently recomputing nothing.
+    """
+    out = []
+    for tok in spec.split(','):
+        tok = tok.strip()
+        if not tok:
+            continue
+        parts = [p.strip() for p in tok.split(':')]
+        if len(parts) not in (2, 3) or not parts[0] or not parts[1]:
+            raise ValueError(
+                f"bad pair token {tok!r}: expected 'prev:new[:source]'")
+        source = parts[2] if len(parts) == 3 and parts[2] else 'prospective'
+        out.append((parts[0], parts[1], source))
+    if not out:
+        raise ValueError(f"no pairs parsed from {spec!r}")
+    return out
+
+
 def _qualified_as_of(qual_map, deal_id, as_of_iso):
     """Point-in-time qualified-pipeline membership (defect 5)."""
     qd = (qual_map.get(deal_id) or {}).get('qualified_date')
@@ -62,6 +90,13 @@ def main():
     parser.add_argument('--recompute-from', metavar='YYYY-MM-DD',
                        help='Recompute (overwrite) every week whose earlier snapshot is on '
                             'or after this date, e.g. to move weeks onto a new value basis')
+    parser.add_argument('--pairs', metavar='prev:new[:source],...',
+                       help='Recompute exactly these snapshot pairs (comma-separated '
+                            "'prev:new[:source]'; source defaults to prospective). Unlike "
+                            '--recompute-from it never pairs interleaved dates, so it '
+                            'reproduces the existing week grid without fabricating '
+                            'sub-weekly rows. Used to repair specific weeks (e.g. the '
+                            'qualified_date $0 fix).')
     args = parser.parse_args()
 
     SUPABASE_URL = os.getenv('SUPABASE_URL')
@@ -130,6 +165,18 @@ def main():
         for row in deal_status_rows
     }
     print(f"Loaded status data for {len(deal_status_map)} deals")
+
+    if args.pairs:
+        pairs = parse_pairs(args.pairs)
+        print(f"Recomputing {len(pairs)} explicit pair(s):")
+        for prev_date, new_date, source in pairs:
+            print(f"  {prev_date} -> {new_date} "
+                  f"({value_basis_for(prev_date)}, {source})")
+            compute_waterfall_for_dates(
+                sb, config, qual_map, enrichment_map, deal_status_map,
+                is_test_deal, threshold, prev_date, new_date,
+                computed_source=source)
+        return
 
     if args.recompute_from:
         dates = sorted({r['snapshot_date'] for r in select_all(
