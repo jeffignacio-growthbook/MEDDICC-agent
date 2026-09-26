@@ -468,7 +468,7 @@
       "pct_of_total",
       "source_table"
     ],
-    "pipeline_generation_weekly": [
+    "pipeline_generation_quarterly": [
       "deal_count",
       "fiscal_quarter",
       "generated_value",

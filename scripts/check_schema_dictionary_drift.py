@@ -63,7 +63,7 @@ QUERYABLE_TABLES = [
     # Pipeline analytics
     "waterfall_weekly",
     "forecast_weekly",
-    "pipeline_generation_weekly",
+    "pipeline_generation_quarterly",
 
     # Performance & targets
     "rep_performance",

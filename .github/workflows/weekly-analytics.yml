@@ -46,6 +46,17 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: python scripts/analytics/compute_forecast.py
 
+      # 2026-09-26: pipeline_generation_quarterly (renamed from
+      # pipeline_generation_weekly) had no writer wired into any workflow —
+      # a second frozen artifact alongside the qualified_date bug, stuck at
+      # 2026-08-11 for 6+ weeks. Full recompute each run (script clears and
+      # rewrites all rows), same cadence as waterfall/forecast above.
+      - name: Compute pipeline generation (quarterly)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python scripts/analytics/compute_pipeline_generation.py
+
       - name: Generate win/loss narratives
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

@@ -112,22 +112,38 @@
 # summing raw deals when they cover the metric being asked about.
 #
 # forecast_weekly:
-#   - Columns: fiscal_quarter, week_of_quarter, computed_at,
+#   - Grain: WEEKLY — one row per week_ending (+ fiscal_quarter, computed_at)
+#   - Columns: week_ending, fiscal_quarter, computed_at,
 #              stage_weighted_forecast, historical_conversion_low/mid/high
 #   - Contains: Quarter forecast by stage probability and historical conversion
 #   - Use for: "What do you forecast for Q3?" type questions
 #
 # waterfall_weekly:
-#   - Columns: fiscal_quarter, week_of_quarter, computed_at, deal_id,
-#              category (new_to_pipeline, pulled_in, pushed_out, etc.)
-#   - Contains: Pipeline movement categorization for waterfall charts
-#   - Use for: "What entered the pipeline?" "What slipped?" type questions
+#   - Grain: WEEKLY — one row per week_ending (+ pipeline_id, region, segment)
+#   - Columns: week_ending, pipeline_id, new_pipeline_value,
+#              newly_qualified_value, moved_forward/backward_value,
+#              won_value, lost_value, value_basis
+#   - Contains: Week-over-week pipeline movement (new/won/lost/moved)
+#   - Use for: "How much pipeline did we generate/create THIS WEEK?",
+#     "What entered the pipeline?", "What slipped?" type questions —
+#     this table OWNS week-grained pipeline-generation questions.
 #
-# pipeline_generation_weekly:
-#   - Columns: fiscal_quarter, week_of_quarter, computed_at, new_deal_count,
-#              new_deal_value, by_source, by_rep
-#   - Contains: New pipeline generation metrics
-#   - Use for: "How much pipeline did we generate?" type questions
+# pipeline_generation_quarterly (renamed 2026-09-26 from
+# pipeline_generation_weekly — the old name was a grain-name lie that caused
+# a live routing failure; see scripts/migrations/074_rename_pipeline_
+# generation_weekly_to_quarterly.sql):
+#   - Grain: QUARTERLY — one row per (fiscal_quarter, pipeline_id, segment).
+#     NO week column exists. NEVER route a "this week" question here.
+#   - Columns: fiscal_quarter, pipeline_id, segment, generated_value,
+#              in_quarter_contribution_value, rollover_value, deal_count,
+#              last_updated
+#   - Contains: Pipeline generation totals by fiscal QUARTER, split into
+#     in-quarter-contribution (created and closed same quarter) vs rollover
+#     (created earlier, closing this quarter) — a genuinely quarter-level
+#     view waterfall_weekly does not provide.
+#   - Use for: "How much pipeline did we generate THIS QUARTER, by segment?"
+#     "What % of Enterprise pipeline closes in the same quarter it's
+#     created?" — never for week-grained questions.
 #
 # STALENESS GUARD (CRITICAL):
 # A precomputed value is only valid if recent. If computed_at is stale relative
@@ -730,7 +746,8 @@ field_units:
 #   Correct:   fiscal_quarter = "FY2027 Q3"
 #   Incorrect: fiscal_quarter = "FY2027Q3" (no space, returns 0 rows)
 #
-#   Examples in forecast_weekly, waterfall_weekly, pipeline_generation_weekly:
+#   Examples in forecast_weekly, pipeline_generation_quarterly (waterfall_weekly
+#   has no fiscal_quarter column — it is keyed on week_ending only):
 #   - "FY2027 Q3" (Aug 1 - Oct 31, 2026)
 #   - "FY2027 Q4" (Nov 1 - Jan 31, 2027)
 #   - "FY2028 Q1" (Feb 1 - Apr 30, 2027)
