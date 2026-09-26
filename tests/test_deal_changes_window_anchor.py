@@ -176,6 +176,128 @@ def test_deal_changes_requested_days_gap_message_when_no_old_enough_snapshot():
     )
 
 
+# ---------------------------------------------------------------------------
+# Realistic multi-deal multi-week scenario (January-comparison shape)
+# ---------------------------------------------------------------------------
+
+# 6 weekly snapshots: Aug 13 → Sep 17 (5 weeks apart = 35-day span)
+AUG_13 = "2026-08-13"
+AUG_20 = "2026-08-20"
+AUG_27 = "2026-08-27"
+SEP_03_R = "2026-09-03"  # suffixed to avoid name collision with existing constants
+SEP_10_R = "2026-09-10"
+SEP_17_R = "2026-09-17"
+
+ALL_DATES_REAL = [AUG_13, AUG_20, AUG_27, SEP_03_R, SEP_10_R, SEP_17_R]
+
+STAGE_CFG_REAL = {
+    "stage_disc": {"name": "Discovery", "order": 1},
+    "stage_qual": {"name": "Qualified", "order": 2},
+    "stage_prop": {"name": "Proposal", "order": 3},
+}
+
+
+def _snap_r(deal_id, snapshot_date, stage_id, stage_order):
+    return {
+        "deal_id": deal_id,
+        "snapshot_date": snapshot_date,
+        "stage_id": stage_id,
+        "stage_order": stage_order,
+        "pipeline_id": "new_business",
+        "owner_email": "rep@gb.io",
+        "snapshot_source": "live",
+        "backfill_confidence": None,
+    }
+
+
+# Deal B: advanced Discovery → Qualified on Aug 20 (early in window)
+# Deal C: advanced Qualified → Proposal on Sep 10 (late in window)
+# Deal D: stable Qualified throughout (no change — control)
+ROWS_B = {
+    AUG_13: _snap_r("deal-B", AUG_13, "stage_disc", 1),
+    AUG_20: _snap_r("deal-B", AUG_20, "stage_qual", 2),
+    AUG_27: _snap_r("deal-B", AUG_27, "stage_qual", 2),
+    SEP_03_R: _snap_r("deal-B", SEP_03_R, "stage_qual", 2),
+    SEP_10_R: _snap_r("deal-B", SEP_10_R, "stage_qual", 2),
+    SEP_17_R: _snap_r("deal-B", SEP_17_R, "stage_qual", 2),
+}
+ROWS_C = {
+    AUG_13: _snap_r("deal-C", AUG_13, "stage_qual", 2),
+    AUG_20: _snap_r("deal-C", AUG_20, "stage_qual", 2),
+    AUG_27: _snap_r("deal-C", AUG_27, "stage_qual", 2),
+    SEP_03_R: _snap_r("deal-C", SEP_03_R, "stage_qual", 2),
+    SEP_10_R: _snap_r("deal-C", SEP_10_R, "stage_qual", 2),
+    SEP_17_R: _snap_r("deal-C", SEP_17_R, "stage_prop", 3),
+}
+ROWS_D = {
+    d: _snap_r("deal-D", d, "stage_qual", 2)
+    for d in ALL_DATES_REAL
+}
+
+BY_DATE_REAL = {
+    d: [ROWS_B[d], ROWS_C[d], ROWS_D[d]]
+    for d in ALL_DATES_REAL
+}
+
+
+def test_multi_deal_multi_week_captures_all_window_movements():
+    """Realistic January-comparison shape: 6 weekly snapshots, 3 deals,
+    movements scattered across the window.
+
+    requested_days=35 → prior anchor Aug 13 (35 days before Sep 17).
+    Deal B: Discovery on Aug 13, Qualified on Sep 17 → 1 advancement.
+    Deal C: Qualified on Aug 13, Proposal on Sep 17 → 1 advancement.
+    Deal D: Qualified on Aug 13 and Sep 17 → 0 changes (control).
+
+    Both movements must be captured. Without the anchor fix, comparing the
+    last two snapshots (Sep 10 vs Sep 17) would find only Deal C's Sep-10→Sep-17
+    jump and miss Deal B (which advanced in week 1 of the window, invisible
+    from the last two snapshots alone)."""
+    data_gaps = []
+    snap_dates, changes = _pm_view_deal_changes(
+        BY_DATE_REAL, ALL_DATES_REAL, STAGE_CFG_REAL, data_gaps,
+        requested_days=35,
+    )
+    assert snap_dates == [AUG_13, SEP_17_R], (
+        f"Expected [Aug 13, Sep 17] anchors for 35-day window, got {snap_dates!r}"
+    )
+    advanced = [c for c in changes if c["direction"] == "advanced"]
+    deal_ids_advanced = {c["deal_id"] for c in advanced}
+    assert "deal-B" in deal_ids_advanced, (
+        "Deal B (advanced Discovery→Qualified in week 1) was invisible in the 35-day window. "
+        f"Advanced deals found: {deal_ids_advanced!r}"
+    )
+    assert "deal-C" in deal_ids_advanced, (
+        "Deal C (advanced Qualified→Proposal in final week) was not found. "
+        f"Advanced deals found: {deal_ids_advanced!r}"
+    )
+    assert "deal-D" not in deal_ids_advanced, (
+        "Deal D (stable Qualified) should not appear as an advancement."
+    )
+    assert len(advanced) == 2, (
+        f"Expected exactly 2 advancements (B and C), got {advanced!r}"
+    )
+    assert not data_gaps, (
+        f"No data_gaps expected (window fits the history), got: {data_gaps!r}"
+    )
+
+
+def test_last_two_misses_early_movement_in_six_week_scenario():
+    """Planted-bug control for the 6-week scenario: comparing only the last
+    two snapshots (Sep 10 vs Sep 17) silently drops Deal B's movement
+    that happened in week 1."""
+    prior_date = ALL_DATES_REAL[-2]   # Sep 10
+    current_date = ALL_DATES_REAL[-1]  # Sep 17
+
+    prior_b = ROWS_B[prior_date]
+    current_b = ROWS_B[current_date]
+    # Both show Qualified → hardcoded last-two hides the Discovery→Qualified jump
+    assert prior_b["stage_id"] == current_b["stage_id"] == "stage_qual", (
+        "Planted-bug baseline: deal B should appear unchanged when comparing "
+        "only Sep 10 vs Sep 17 (it advanced weeks earlier)."
+    )
+
+
 if __name__ == "__main__":
     test_planted_bug_hardcoded_last_two_misses_earlier_movement()
     print("PASS: planted-bug baseline documented")
@@ -187,4 +309,8 @@ if __name__ == "__main__":
     print("PASS: no requested_days → last two (regression)")
     test_deal_changes_requested_days_gap_message_when_no_old_enough_snapshot()
     print("PASS: gap message when window exceeds available history")
+    test_multi_deal_multi_week_captures_all_window_movements()
+    print("PASS: multi-deal 35-day window captures both movements")
+    test_last_two_misses_early_movement_in_six_week_scenario()
+    print("PASS: planted-bug control for 6-week scenario")
     print("\nAll tests passed.")
