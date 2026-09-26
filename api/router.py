@@ -956,7 +956,8 @@ Required JSON:
       "year":  "<the 4-digit year EXACTLY as written in the question (e.g. 2026) as an integer — REQUIRED for period=specific_month; null otherwise. NEVER compute or infer this — copy the literal digits from the question text.>"
     }},
     PERIOD SELECTION RULES (read carefully — wrong period is the #1 date bug):
-    - question names a month AND a year (e.g. 'January 2026', 'from February 2025', 'pipeline in March 2026 vs today', 'since June 2025'): period=specific_month, month=<name>, year=<integer>. DO NOT use period=specific here.
+    - question names a month AND a year WITHOUT 'vs today'/'to today'/'to now'/'since' (e.g. 'January 2026', 'from February 2025', 'pipeline in March 2026'): period=specific_month, month=<name>, year=<integer>. DO NOT use period=specific here.
+    - question names a month AND a year WITH an open-ended comparison to the present (e.g. 'pipeline in March 2026 vs today', 'from January 2026 to today', 'since June 2025', 'compare January 2026 to now'): period=specific, start=<YYYY-MM-01>, end=null. The null end means 'up to today'.
     - question gives fully explicit ISO-style dates with day precision (e.g. 'between 2026-01-15 and 2026-03-31'): period=specific, start/end filled.
     - question uses relative phrasing ('last 2 weeks', 'past 30 days', 'last month'): period=last_N_days with n, or current_month/previous_month.
     - question names a fiscal quarter ('Q3', 'FY2027 Q2'): period=fiscal_quarter.
@@ -5967,10 +5968,23 @@ async def _route_question(question: str, user_id: str,
                 corrected_end = stated_year + tw_end[4:]
                 raw_tw = dict(raw_tw, end=corrected_end)
                 params["time_window"] = raw_tw
+        # Detect open-ended "to today" / "since" questions — these must NOT be
+        # capped at a month end. Keep this check before the specific→specific_month
+        # promotion block so the promotion can be skipped for them.
+        _to_today_re = bool(_re.search(
+            r'\b(to today|vs\.? today|versus today|compared to today|to now|vs\.? now)\b',
+            question.lower()
+        ))
+        _since_open = bool(
+            _re.search(r'\bsince\b', question.lower()) and stated_years
+        )
+        _is_open_ended = _to_today_re or _since_open
+
         # If the classifier still emitted period=specific but the question has a
         # month name + year pattern, promote to specific_month so Python, not the
-        # model, constructs the date range.
-        if raw_tw.get("period") == "specific" and raw_tw.get("start") and stated_years:
+        # model, constructs the date range.  Skip this promotion for open-ended
+        # questions — specific+null-end already resolves correctly to today.
+        if raw_tw.get("period") == "specific" and raw_tw.get("start") and stated_years and not _is_open_ended:
             _month_re = _re.search(
                 r'\b(january|february|march|april|may|june|july|august|'
                 r'september|october|november|december|'
@@ -5984,6 +5998,28 @@ async def _route_question(question: str, user_id: str,
                     "period": "specific_month",
                     "month": _month_re.group(1).capitalize(),
                     "year": _year_int,
+                }
+                params["time_window"] = raw_tw
+        # If the classifier emitted period=specific_month for an open-ended question
+        # (expected until the classifier prompt is fully re-tuned), rewrite it to
+        # period=specific with end=null so the existing specific resolver maps null
+        # end to today instead of capping at the last day of the named month.
+        _MONTH_NAMES_ROUTE = {
+            "january": 1, "february": 2, "march": 3, "april": 4,
+            "may": 5, "june": 6, "july": 7, "august": 8,
+            "september": 9, "october": 10, "november": 11, "december": 12,
+            "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6,
+            "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+        }
+        if raw_tw.get("period") == "specific_month" and _is_open_ended:
+            _sm_month_name = (raw_tw.get("month") or "").lower()
+            _sm_month_num = _MONTH_NAMES_ROUTE.get(_sm_month_name)
+            _sm_year = raw_tw.get("year")
+            if _sm_month_num and _sm_year:
+                raw_tw = {
+                    "period": "specific",
+                    "start": f"{int(_sm_year):04d}-{_sm_month_num:02d}-01",
+                    "end": None,
                 }
                 params["time_window"] = raw_tw
         params["time_window"] = resolve_time_window(
