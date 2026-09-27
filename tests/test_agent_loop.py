@@ -9,9 +9,21 @@ pre-scripted tool call in JSON text form, matching the prompt-based
 JSON dispatch pattern used by dynamic_query_loop.
 
 Planted-bug controls (classes with 'Planted' in the name) feed the loop
-a sequence that VIOLATES a hard constraint, then assert the gate fired:
-  - deliver without prior check_result → gate auto-inserts check_result
-  - state_assumption on sensitive category → blocked, ask_user substituted
+a multi-step sequence that VIOLATES a hard constraint mid-trace, then
+assert the gate fired.  The traces are deliberately multi-step so the
+gate is tested in the middle of a real loop, not on turn 1.
+
+  C1 (deliver without check_result): 3-turn trace —
+       call_primitive → call_primitive → deliver(quantitative, no check)
+  C2 (sensitive state_assumption): 2-turn trace —
+       call_primitive → state_assumption(sensitive)
+  C4 (fetch_data for governed primitive): 3-turn trace —
+       call_primitive → fetch_data(governed query) → deliver
+
+Gates tested:
+  - C1: gate auto-inserts check_result
+  - C2: gate blocks assumption, substitutes ask_user
+  - C4: gate blocks fetch_data, records redirect in fetch_data_redirects
 """
 
 import sys
@@ -27,7 +39,9 @@ from api.agent_loop import (
     run_agent_loop,
     AgentLoopResult,
     SENSITIVE_ASSUMPTION_CATEGORIES,
+    KNOWN_PRIMITIVES,
     MAX_STEPS,
+    _find_matching_primitive,
 )
 
 
@@ -167,43 +181,55 @@ class TestQuantitativeAnswerRequiresCheckResult(unittest.TestCase):
 
 # ---------------------------------------------------------------------------
 # Planted-bug B: deliver without prior check_result — gate must auto-insert
+#
+# Multi-step trace: call_primitive × 2 → deliver(quantitative, no check_result)
+# The gate must fire at step 3, not step 1.  This mirrors the plan_cancelled
+# 3-turn scenario: real data gathering steps happen before the violated step.
 
 class TestPlantedBugDeliverWithoutCheckResult(unittest.TestCase):
     """
-    The model attempts to deliver a quantitative answer WITHOUT calling
-    check_result first.  The gate must:
-      1. Auto-insert a check_result call.
-      2. Set check_result_auto_inserted = True on the result.
-      3. Still return an answer (not crash).
+    3-turn trace: call_primitive → call_primitive → deliver(quantitative).
+    check_result is skipped.  The gate must:
+      1. Auto-insert check_result (sets check_result_auto_inserted=True).
+      2. Still return an answer (not crash).
+    The gate fires on turn 3 — after two real data-gathering steps.
     """
 
-    def _run(self, answer_text: str):
+    def _run_three_turn(self, answer_text: str):
+        """3-turn trace: two call_primitive steps, then deliver without check."""
         import asyncio
         steps = [
-            _call_primitive("query_pipeline_coverage"),
-            # SKIP check_result — jump straight to deliver with a number
-            _deliver(answer_text, sources=["query_pipeline_coverage"]),
+            _call_primitive("query_pipeline_coverage", {"quarter": "Q4"}),
+            _call_primitive("query_path_to_target", {"quarter": "Q4"}),
+            # Turn 3: quantitative deliver WITHOUT check_result — gate must fire
+            _deliver(answer_text, sources=["query_pipeline_coverage", "query_path_to_target"]),
         ]
         client = FakeClient(steps)
         return asyncio.get_event_loop().run_until_complete(
             run_agent_loop(
-                question="What is our pipeline coverage?",
+                question="What is our Q4 pipeline coverage vs target?",
                 client=client,
                 sb=_sb(),
             )
         )
 
-    def test_gate_auto_inserts_check_result(self):
-        """Gate sets check_result_auto_inserted=True when deliver skips check."""
-        result = self._run("Coverage is 2.49x — pipeline $4.86M, target $1.95M.")
+    def test_gate_fires_on_turn_3_not_turn_1(self):
+        """Gate fires at the deliver step (turn 3), after 2 real data-gathering steps."""
+        result = self._run_three_turn(
+            "Coverage is 2.49x — pipeline $4.86M vs $1.95M target."
+        )
+        # Gate must have fired (turn 3 = deliver without check_result)
         self.assertTrue(
             result.check_result_auto_inserted,
-            "Gate must set check_result_auto_inserted=True when deliver skips check_result",
+            "C1 gate must fire at deliver(turn 3), not before",
         )
+        # Steps 1 and 2 ran successfully before the gate
+        self.assertEqual(result.steps_taken, 3,
+                         "All 3 steps must have run before the gate fired")
 
-    def test_answer_still_delivered_after_auto_insert(self):
+    def test_answer_preserved_after_gate(self):
         """Auto-inserting check_result does not discard the answer."""
-        result = self._run("Coverage is 2.49x.")
+        result = self._run_three_turn("Coverage is 2.49x — $4.86M vs $1.95M.")
         self.assertFalse(result.budget_exhausted)
         self.assertIn("2.49", result.answer)
 
@@ -215,6 +241,7 @@ class TestPlantedBugDeliverWithoutCheckResult(unittest.TestCase):
         import asyncio
         steps = [
             _call_primitive("query_win_loss"),
+            _call_primitive("query_pipeline_coverage"),
             _deliver("No loss data available for Q4.", sources=[]),
         ]
         client = FakeClient(steps)
@@ -312,30 +339,39 @@ class TestLowStakesAmbiguityStateAssumption(unittest.TestCase):
 
 # ---------------------------------------------------------------------------
 # Planted-bug D: Sensitive-category state_assumption → blocked, ask_user used
+#
+# Multi-step trace: call_primitive → state_assumption(sensitive)
+# The gate fires at step 2 — after a real data-gathering step, not on turn 1.
 
 class TestPlantedBugSensitiveAssumptionBlocked(unittest.TestCase):
     """
-    The model attempts state_assumption with a sensitive disclosure category
-    (ARR vs. deal value, quota vs. stretch, renewals in/out).  The gate must:
-      1. Block the state_assumption call.
-      2. Emit ask_user instead (or return the result with ask_user_question set).
+    2-turn trace: call_primitive → state_assumption(sensitive category).
+    The gate must:
+      1. Block the state_assumption call (step 2).
+      2. Set ask_user_question (not None).
       3. NOT include the sensitive assumption in result.assumptions.
+
+    The trace has one real data-gathering step before the gate fires,
+    mirroring the 3-turn plan_cancelled scenario where context accumulates
+    before the constraint is violated.
     """
 
     def _run_sensitive(self, category: str):
         import asyncio
         steps = [
-            # Model tries to assume something in a sensitive category
+            # Step 1: real data gathering — gate must NOT fire here
+            _call_primitive("query_pipeline_coverage", {"quarter": "Q4"}),
+            # Step 2: model tries to assume something in a sensitive category
             _state_assumption(
                 "treating deal value as ARR since ARR is not in CRM",
                 category=category,
             ),
-            # Model follows up with data (this should be bypassed by the gate)
-            _call_primitive("query_pipeline_coverage"),
+            # Step 3 onwards should never run (gate ends loop at step 2)
+            _call_primitive("query_path_to_target"),
             _deliver("Coverage is 2.49x.", sources=["query_pipeline_coverage"]),
         ]
         client = FakeClient(steps)
-        return asyncio.get_event_loop().run_until_complete(
+        return client, asyncio.get_event_loop().run_until_complete(
             run_agent_loop(
                 question="What is pipeline coverage vs ARR target?",
                 client=client,
@@ -343,10 +379,18 @@ class TestPlantedBugSensitiveAssumptionBlocked(unittest.TestCase):
             )
         )
 
+    def test_gate_fires_on_turn_2_not_turn_1(self):
+        """Gate fires at state_assumption (turn 2); step 1 call_primitive must have run."""
+        client, result = self._run_sensitive("arr_vs_deal_value")
+        # The loop consumed step 1 (call_primitive) then stopped at step 2
+        self.assertEqual(result.steps_taken, 2,
+                         "Gate must fire at step 2 — after step 1 ran")
+        self.assertEqual(client.calls_made, 2,
+                         "Exactly 2 client.complete() calls: step 1 ran, step 2 blocked")
+
     def test_arr_vs_deal_value_blocks_assumption(self):
         """arr_vs_deal_value category blocks state_assumption."""
-        result = self._run_sensitive("arr_vs_deal_value")
-        # Must not contain the sensitive assumption
+        _, result = self._run_sensitive("arr_vs_deal_value")
         self.assertFalse(
             any("treating deal value as ARR" in a for a in result.assumptions),
             "Sensitive assumption must not appear in result.assumptions",
@@ -354,22 +398,31 @@ class TestPlantedBugSensitiveAssumptionBlocked(unittest.TestCase):
 
     def test_sensitive_category_triggers_ask_user(self):
         """Blocked sensitive assumption must produce an ask_user question."""
-        result = self._run_sensitive("arr_vs_deal_value")
+        _, result = self._run_sensitive("arr_vs_deal_value")
         self.assertIsNotNone(
             result.ask_user_question,
             "Blocked sensitive assumption must set result.ask_user_question",
         )
 
+    def test_loop_stops_at_blocked_assumption(self):
+        """Steps after the blocked assumption must NOT execute."""
+        client, result = self._run_sensitive("arr_vs_deal_value")
+        # Steps 3 and 4 (call_primitive, deliver) must not have run
+        self.assertLess(
+            client.calls_made, 4,
+            "Loop must stop at the blocked assumption — steps 3 and 4 must not run",
+        )
+
     def test_quota_vs_stretch_blocks_assumption(self):
         """quota_vs_stretch is also a sensitive category."""
-        result = self._run_sensitive("quota_vs_stretch")
+        _, result = self._run_sensitive("quota_vs_stretch")
         self.assertFalse(
             any("treating deal value" in a for a in result.assumptions),
         )
 
     def test_renewals_in_out_blocks_assumption(self):
         """renewals_in_out is also a sensitive category."""
-        result = self._run_sensitive("renewals_in_out")
+        _, result = self._run_sensitive("renewals_in_out")
         self.assertFalse(
             any("treating deal value" in a for a in result.assumptions),
         )
@@ -381,6 +434,151 @@ class TestPlantedBugSensitiveAssumptionBlocked(unittest.TestCase):
             required.issubset(SENSITIVE_ASSUMPTION_CATEGORIES),
             f"Missing from SENSITIVE_ASSUMPTION_CATEGORIES: {required - SENSITIVE_ASSUMPTION_CATEGORIES}",
         )
+
+
+# ---------------------------------------------------------------------------
+# Planted-bug E_C4: fetch_data for governed primitive → C4 gate blocks it
+#
+# Multi-step trace: call_primitive → fetch_data(governed query) → deliver
+# Gate fires at step 2.  Step 1 (call_primitive) runs normally; step 3
+# (deliver) runs only if the gate does not end the loop.
+# C4 does NOT end the loop — it redirects, appends the redirect to history,
+# and lets the model correct itself.  The test confirms the redirect is
+# recorded and the loop continues to deliver.
+
+class TestPlantedBugFetchDataGoverned(unittest.TestCase):
+    """
+    3-turn trace: call_primitive → fetch_data(governed) → deliver.
+
+    C4 gate fires at step 2 (fetch_data for pipeline coverage — a governed
+    primitive exists).  The gate:
+      1. Blocks the fetch_data execution.
+      2. Records the redirect in result.fetch_data_redirects.
+      3. Injects a redirect message into history (loop continues).
+      4. Does NOT end the loop — model can correct by calling call_primitive.
+
+    After the redirect, step 3 (deliver) runs.  The gate does not prevent
+    delivery; it only prevents the fetch_data from silently replacing the
+    governed primitive.
+    """
+
+    def _run_governed(self, query: str):
+        """3-turn trace: call_primitive → fetch_data(governed) → deliver."""
+        import asyncio
+        steps = [
+            _call_primitive("query_path_to_target", {"quarter": "Q4"}),   # step 1
+            _fetch_data(query),                                             # step 2: governed
+            _check_result("coverage 2.49x", {"ratio": 2.49}),              # step 3
+            _deliver("Coverage is 2.49x.", sources=["query_path_to_target"]),  # step 4
+        ]
+        client = FakeClient(steps)
+        return client, asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="How is our Q4 pipeline coverage?",
+                client=client,
+                sb=_sb(),
+            )
+        )
+
+    def _run_ungoverned(self, query: str):
+        """fetch_data for an ungoverned query — gate must NOT fire."""
+        import asyncio
+        steps = [
+            _fetch_data(query),
+            _check_result("3 deals", {"count": 3}),
+            _deliver("3 deals modified in the last hour.", sources=["fetch_data"]),
+        ]
+        client = FakeClient(steps)
+        return asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="How many deals were modified in the last hour?",
+                client=client,
+                sb=_sb(),
+            )
+        )
+
+    def test_governed_query_triggers_c4_redirect(self):
+        """fetch_data('pipeline coverage for Q4') triggers C4 redirect."""
+        _, result = self._run_governed("get pipeline coverage for Q4")
+        self.assertTrue(
+            len(result.fetch_data_redirects) > 0,
+            "C4 gate must populate fetch_data_redirects for a governed query",
+        )
+        self.assertIn("query_pipeline_coverage", result.fetch_data_redirects)
+
+    def test_c4_redirect_names_correct_primitive(self):
+        """The redirect points to the right primitive."""
+        _, result = self._run_governed("pipeline coverage vs quota")
+        self.assertTrue(
+            any("query_pipeline_coverage" in r for r in result.fetch_data_redirects),
+        )
+
+    def test_loop_continues_after_c4_redirect(self):
+        """C4 redirect does not end the loop — deliver still executes."""
+        _, result = self._run_governed("fetch pipeline coverage data for Q4")
+        self.assertFalse(result.budget_exhausted)
+        self.assertNotEqual(result.answer, "",
+                             "Loop must deliver an answer after C4 redirect")
+
+    def test_ungoverned_fetch_data_not_blocked(self):
+        """fetch_data for a query with no matching primitive is not blocked."""
+        result = self._run_ungoverned(
+            "count deals whose hs_lastmodifieddate > now() - interval '1 hour'"
+        )
+        self.assertEqual(
+            len(result.fetch_data_redirects), 0,
+            "Ungoverned fetch_data must not set fetch_data_redirects",
+        )
+
+    def test_c4_fires_on_primitive_name_in_query(self):
+        """fetch_data that mentions a primitive name verbatim is blocked."""
+        _, result = self._run_governed("run query_waterfall for Q4")
+        self.assertTrue(len(result.fetch_data_redirects) > 0)
+
+    def test_c4_fires_on_keyword_match(self):
+        """fetch_data with keyword 'win loss' maps to query_win_loss_reason."""
+        import asyncio
+        steps = [
+            _fetch_data("win loss breakdown for Q4"),
+            _check_result("40% loss rate", {"rate": 0.4}),
+            _deliver("Loss rate is 40%.", sources=["fetch_data"]),
+        ]
+        client = FakeClient(steps)
+        result = asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="What's our win/loss breakdown?",
+                client=client,
+                sb=_sb(),
+            )
+        )
+        self.assertTrue(len(result.fetch_data_redirects) > 0)
+        self.assertIn("query_win_loss_reason", result.fetch_data_redirects)
+
+    def test_find_matching_primitive_unit(self):
+        """Unit test for _find_matching_primitive helper."""
+        self.assertEqual(
+            _find_matching_primitive("query_pipeline_coverage for Q4"),
+            "query_pipeline_coverage",
+        )
+        self.assertEqual(
+            _find_matching_primitive("fetch pipeline coverage data"),
+            "query_pipeline_coverage",
+        )
+        self.assertEqual(
+            _find_matching_primitive("win/loss breakdown"),
+            "query_win_loss_reason",
+        )
+        self.assertIsNone(
+            _find_matching_primitive("count of deals created in the last hour"),
+        )
+
+    def test_known_primitives_set_nonempty(self):
+        """KNOWN_PRIMITIVES must contain at least the core governed calculators."""
+        core = {
+            "query_pipeline_coverage", "query_waterfall",
+            "query_deal_risk", "query_win_loss_reason",
+        }
+        self.assertTrue(core.issubset(KNOWN_PRIMITIVES))
 
 
 # ---------------------------------------------------------------------------

@@ -20,6 +20,9 @@ Hard constraints (enforced in code, not as model instructions):
   C2. state_assumption on a SENSITIVE_ASSUMPTION_CATEGORY is blocked;
       the loop substitutes ask_user instead.
   C3. Hitting MAX_STEPS without deliver → returns "insufficient information".
+  C4. fetch_data for a query that maps to a named primitive is blocked;
+      the loop injects a redirect message and records the suggested primitive
+      in result.fetch_data_redirects — the model must use call_primitive instead.
 
 The dispatch pattern is prompt-based JSON (same as dynamic_query_loop):
   model returns {"tool": "...", "params": {...}} as plain text.
@@ -46,6 +49,49 @@ SENSITIVE_ASSUMPTION_CATEGORIES: frozenset[str] = frozenset({
     "quota_vs_stretch",
     "renewals_in_out",
 })
+
+# C4: primitives that have governed calculators; fetch_data may not substitute them.
+KNOWN_PRIMITIVES: frozenset[str] = frozenset({
+    "query_pipeline_coverage",
+    "query_path_to_target",
+    "query_waterfall",
+    "query_pipeline_movement",
+    "query_deal_risk",
+    "query_quarter_health",
+    "query_quarter_downside",
+    "query_win_loss_reason",
+    "query_rep_scorecard",
+    "query_stage_lag",
+    "query_qualification_rate",
+    "query_coaching_hypothesis",
+    "query_loss_concentration",
+    "query_forecast_trust",
+    "query_arr",
+    "query_sdr_metrics",
+    "query_sdr_leaderboard",
+})
+
+# Keyword fragments → primitive (used when the primitive name itself is absent).
+_PRIMITIVE_KEYWORDS: list[tuple[str, str]] = [
+    ("pipeline coverage", "query_pipeline_coverage"),
+    ("path to target", "query_path_to_target"),
+    ("waterfall", "query_waterfall"),
+    ("pipeline movement", "query_pipeline_movement"),
+    ("pipeline moved", "query_pipeline_movement"),
+    ("deal risk", "query_deal_risk"),
+    ("quarter health", "query_quarter_health"),
+    ("quarter downside", "query_quarter_downside"),
+    ("win loss", "query_win_loss_reason"),
+    ("win/loss", "query_win_loss_reason"),
+    ("loss reason", "query_win_loss_reason"),
+    ("rep scorecard", "query_rep_scorecard"),
+    ("stage lag", "query_stage_lag"),
+    ("qualification rate", "query_qualification_rate"),
+    ("coaching", "query_coaching_hypothesis"),
+    ("loss concentration", "query_loss_concentration"),
+    ("loss rate", "query_loss_concentration"),
+    ("forecast trust", "query_forecast_trust"),
+]
 
 _INSUFFICIENT_ANSWER = (
     "I was unable to answer this confidently — the question required more "
@@ -75,6 +121,9 @@ class AgentLoopResult:
     ask_user_question: str | None = None
     budget_exhausted: bool = False
     steps_taken: int = 0
+    # C4: list of primitive names suggested when fetch_data was blocked.
+    # Empty when no fetch_data call triggered the gate.
+    fetch_data_redirects: list = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -145,9 +194,30 @@ def _execute_call_primitive(name: str, params: dict, sb: Any) -> dict:
         return {"error": str(e)}
 
 
+def _find_matching_primitive(query: str) -> str | None:
+    """
+    C4: Return a named primitive that should handle this query, or None.
+
+    Checks whether the query string (1) mentions a known primitive name
+    verbatim, or (2) contains a keyword fragment that maps to one.  Only
+    returns a match when confidence is high — a bare mention of a keyword
+    like "waterfall" in an otherwise unrelated query is enough.
+    """
+    q = query.lower()
+    # Verbatim primitive name wins
+    for prim in KNOWN_PRIMITIVES:
+        if prim in q:
+            return prim
+    # Keyword fragments
+    for keyword, prim in _PRIMITIVE_KEYWORDS:
+        if keyword in q:
+            return prim
+    return None
+
+
 def _execute_fetch_data(query: str, sb: Any) -> dict:
-    """Ad-hoc raw data fetch.  Returns a result dict."""
-    return {"note": f"fetch_data dispatched", "query": query}
+    """Ad-hoc raw data fetch.  Returns a result dict (C4 check already done)."""
+    return {"note": "fetch_data dispatched", "query": query}
 
 
 def _execute_check_result(claim: str, supporting_data: dict) -> dict:
@@ -273,12 +343,23 @@ async def run_agent_loop(
                 sb,
             )
 
-        # ── fetch_data ────────────────────────────────────────────────────
+        # ── fetch_data ── C4 gate then dispatch ───────────────────────────
         elif tool == "fetch_data":
-            tool_result = _execute_fetch_data(
-                tool_params.get("query", ""),
-                sb,
-            )
+            query = tool_params.get("query", "")
+            matched = _find_matching_primitive(query)
+            if matched:
+                # C4: a governed primitive exists for this query — block and redirect.
+                result.fetch_data_redirects.append(matched)
+                tool_result = {
+                    "blocked": True,
+                    "reason": (
+                        f"A governed primitive exists for this data. "
+                        f"Use call_primitive('{matched}') instead of fetch_data."
+                    ),
+                    "suggested_primitive": matched,
+                }
+            else:
+                tool_result = _execute_fetch_data(query, sb)
 
         # ── request_checkback ─────────────────────────────────────────────
         elif tool == "request_checkback":
