@@ -23,6 +23,9 @@ Hard constraints (enforced in code, not as model instructions):
   C4. fetch_data for a query that maps to a named primitive is blocked;
       the loop injects a redirect message and records the suggested primitive
       in result.fetch_data_redirects — the model must use call_primitive instead.
+      After the first redirect, a second governed fetch_data call requires
+      params.justification naming primitives considered; absent justification
+      → harder block; present → allowed and logged as a primitive candidate.
 
 The dispatch pattern is prompt-based JSON (same as dynamic_query_loop):
   model returns {"tool": "...", "params": {...}} as plain text.
@@ -50,47 +53,93 @@ SENSITIVE_ASSUMPTION_CATEGORIES: frozenset[str] = frozenset({
     "renewals_in_out",
 })
 
-# C4: primitives that have governed calculators; fetch_data may not substitute them.
-KNOWN_PRIMITIVES: frozenset[str] = frozenset({
-    "query_pipeline_coverage",
-    "query_path_to_target",
-    "query_waterfall",
-    "query_pipeline_movement",
-    "query_deal_risk",
-    "query_quarter_health",
-    "query_quarter_downside",
-    "query_win_loss_reason",
-    "query_rep_scorecard",
-    "query_stage_lag",
-    "query_qualification_rate",
-    "query_coaching_hypothesis",
-    "query_loss_concentration",
-    "query_forecast_trust",
-    "query_arr",
-    "query_sdr_metrics",
-    "query_sdr_leaderboard",
+# C4: Intents in HANDLER_DESCRIPTIONS that are NOT governed data calculators.
+# They are meta/admin/write operations — fetch_data may NOT be redirected to them.
+_NON_PRIMITIVE_INTENTS: frozenset[str] = frozenset({
+    "dynamic_query",       # is itself a fallback, not a calculator
+    "query_help",          # orientation / capability listing
+    "acknowledgment",      # social reply
+    "unanswerable",        # meta intent
+    "set_target",          # admin write
+    "submit_score_correction",  # write to review queue
+    "generate_win_loss",   # slow narrative generator, not a query primitive
+    "query_rubric",        # rubric lookup, not a data calculator
+    "query_definition",    # semantic-layer lookup, not a calculator
+    "query_coverage",      # LEGACY — confirmed broken; not a governed calculator
 })
 
-# Keyword fragments → primitive (used when the primitive name itself is absent).
+
+def _derive_known_primitives() -> frozenset[str]:
+    """
+    Derive the governed primitive set from HANDLER_DESCRIPTIONS at import time.
+    Falls back to a hardcoded set only if the router module itself fails to import
+    (should not happen in production or test environments).
+    """
+    try:
+        from api.router import HANDLER_DESCRIPTIONS  # noqa: PLC0415
+        return frozenset(HANDLER_DESCRIPTIONS.keys()) - _NON_PRIMITIVE_INTENTS
+    except Exception as exc:  # pragma: no cover
+        logger.warning("[AGENT_LOOP] Could not import HANDLER_DESCRIPTIONS: %s — using fallback set", exc)
+        # Offline fallback; kept in sync manually but a test will catch drift.
+        return frozenset({
+            "query_pipeline_coverage", "query_path_to_target", "query_waterfall",
+            "query_pipeline_movement", "query_new_deals", "query_upcoming_renewals",
+            "query_won_deals", "query_arr", "query_deals_at_risk",
+            "query_high_priority_deal_risk", "query_forecast_trust",
+            "query_win_loss", "query_loss_concentration", "query_quarter_health",
+            "query_quarter_downside", "query_objections", "query_feature_gaps",
+            "query_pipeline_coverage", "query_deal", "query_competitive_intel",
+            "query_rubric_scores_bulk", "query_deal_stages_bulk",
+            "query_deal_owners_bulk", "query_deal_values_bulk",
+            "query_sdr_metrics", "query_sdr_leaderboard", "query_sdr_pipeline_sourced",
+            "query_stage_lag", "query_qualification_rate", "query_cycle_time",
+            "query_pipeline", "query_rep_pipeline", "query_rep_attainment",
+            "query_deal_health", "query_stale_deals", "query_team_leaderboard",
+            "query_pre_call_brief", "query_coaching_priorities",
+            "query_call_quality", "query_rep_coaching",
+        })
+
+
+# C4: authoritative set — derived from HANDLER_DESCRIPTIONS minus meta/admin intents.
+# A test in tests/test_agent_loop.py asserts this stays in sync with the registry.
+KNOWN_PRIMITIVES: frozenset[str] = _derive_known_primitives()
+
+# Keyword fragments → primitive name (used when the primitive name itself is absent
+# from the fetch_data query string).  Every primitive here MUST be in KNOWN_PRIMITIVES;
+# a test will fail if any entry points at an unregistered primitive.
 _PRIMITIVE_KEYWORDS: list[tuple[str, str]] = [
     ("pipeline coverage", "query_pipeline_coverage"),
     ("path to target", "query_path_to_target"),
     ("waterfall", "query_waterfall"),
     ("pipeline movement", "query_pipeline_movement"),
     ("pipeline moved", "query_pipeline_movement"),
-    ("deal risk", "query_deal_risk"),
+    ("deals at risk", "query_deals_at_risk"),
+    ("deal risk", "query_deals_at_risk"),
+    ("at risk", "query_deals_at_risk"),
     ("quarter health", "query_quarter_health"),
     ("quarter downside", "query_quarter_downside"),
-    ("win loss", "query_win_loss_reason"),
-    ("win/loss", "query_win_loss_reason"),
-    ("loss reason", "query_win_loss_reason"),
-    ("rep scorecard", "query_rep_scorecard"),
+    ("win loss", "query_win_loss"),
+    ("win/loss", "query_win_loss"),
+    ("loss reason", "query_win_loss"),
+    ("why we lost", "query_win_loss"),
+    ("why we won", "query_win_loss"),
+    ("rep scorecard", "query_rep_attainment"),
     ("stage lag", "query_stage_lag"),
+    ("mis-staged", "query_stage_lag"),
     ("qualification rate", "query_qualification_rate"),
-    ("coaching", "query_coaching_hypothesis"),
+    ("coaching priorities", "query_coaching_priorities"),
     ("loss concentration", "query_loss_concentration"),
     ("loss rate", "query_loss_concentration"),
     ("forecast trust", "query_forecast_trust"),
+    ("rep pipeline", "query_rep_pipeline"),
+    ("team leaderboard", "query_team_leaderboard"),
+    ("pre-call brief", "query_pre_call_brief"),
+    ("pre call brief", "query_pre_call_brief"),
+    ("stale deals", "query_stale_deals"),
+    ("cycle time", "query_cycle_time"),
+    ("sdr leaderboard", "query_sdr_leaderboard"),
+    ("sdr metrics", "query_sdr_metrics"),
+    ("sdr pipeline", "query_sdr_pipeline_sourced"),
 ]
 
 _INSUFFICIENT_ANSWER = (
@@ -251,6 +300,8 @@ async def run_agent_loop(
     """
     messages: list[dict] = []
     result = AgentLoopResult(answer="")
+    # C4: tracks how many times a governed-primitive redirect has fired this loop.
+    _redirect_count: int = 0
 
     # Seed the conversation
     messages.append({
@@ -350,14 +401,42 @@ async def run_agent_loop(
             if matched:
                 # C4: a governed primitive exists for this query — block and redirect.
                 result.fetch_data_redirects.append(matched)
-                tool_result = {
-                    "blocked": True,
-                    "reason": (
-                        f"A governed primitive exists for this data. "
-                        f"Use call_primitive('{matched}') instead of fetch_data."
-                    ),
-                    "suggested_primitive": matched,
-                }
+                _redirect_count += 1
+                if _redirect_count > 1:
+                    # Bounded redirect: second governed fetch_data requires justification.
+                    justification = tool_params.get("justification", "").strip()
+                    if not justification:
+                        tool_result = {
+                            "blocked": True,
+                            "reason": (
+                                f"You have already been redirected once. "
+                                f"A governed primitive still exists for this query "
+                                f"(suggested: '{matched}'). "
+                                f"If you believe fetch_data is necessary despite this, "
+                                f"retry with params.justification naming the primitives "
+                                f"you considered and why they are insufficient."
+                            ),
+                            "suggested_primitive": matched,
+                            "redirect_count": _redirect_count,
+                        }
+                    else:
+                        # Justification present — allow but log as primitive candidate.
+                        logger.warning(
+                            "[AGENT_LOOP] C4 override: fetch_data allowed after %d redirect(s) "
+                            "for query %r — justification: %r. "
+                            "CANDIDATE for new primitive: %r",
+                            _redirect_count, query, justification, matched,
+                        )
+                        tool_result = _execute_fetch_data(query, sb)
+                else:
+                    tool_result = {
+                        "blocked": True,
+                        "reason": (
+                            f"A governed primitive exists for this data. "
+                            f"Use call_primitive('{matched}') instead of fetch_data."
+                        ),
+                        "suggested_primitive": matched,
+                    }
             else:
                 tool_result = _execute_fetch_data(query, sb)
 

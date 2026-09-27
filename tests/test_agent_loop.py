@@ -119,8 +119,11 @@ def _state_assumption(assumption: str, category: str = "general") -> dict:
 def _ask_user(question: str, context: str = "") -> dict:
     return {"tool": "ask_user", "params": {"question": question, "context": context}}
 
-def _fetch_data(query: str) -> dict:
-    return {"tool": "fetch_data", "params": {"query": query}}
+def _fetch_data(query: str, justification: str = "") -> dict:
+    params: dict = {"query": query}
+    if justification:
+        params["justification"] = justification
+    return {"tool": "fetch_data", "params": params}
 
 
 # ---------------------------------------------------------------------------
@@ -536,7 +539,7 @@ class TestPlantedBugFetchDataGoverned(unittest.TestCase):
         self.assertTrue(len(result.fetch_data_redirects) > 0)
 
     def test_c4_fires_on_keyword_match(self):
-        """fetch_data with keyword 'win loss' maps to query_win_loss_reason."""
+        """fetch_data with keyword 'win loss' maps to query_win_loss (the real handler name)."""
         import asyncio
         steps = [
             _fetch_data("win loss breakdown for Q4"),
@@ -552,10 +555,10 @@ class TestPlantedBugFetchDataGoverned(unittest.TestCase):
             )
         )
         self.assertTrue(len(result.fetch_data_redirects) > 0)
-        self.assertIn("query_win_loss_reason", result.fetch_data_redirects)
+        self.assertIn("query_win_loss", result.fetch_data_redirects)
 
     def test_find_matching_primitive_unit(self):
-        """Unit test for _find_matching_primitive helper."""
+        """Unit test for _find_matching_primitive helper — uses real handler names."""
         self.assertEqual(
             _find_matching_primitive("query_pipeline_coverage for Q4"),
             "query_pipeline_coverage",
@@ -566,7 +569,7 @@ class TestPlantedBugFetchDataGoverned(unittest.TestCase):
         )
         self.assertEqual(
             _find_matching_primitive("win/loss breakdown"),
-            "query_win_loss_reason",
+            "query_win_loss",
         )
         self.assertIsNone(
             _find_matching_primitive("count of deals created in the last hour"),
@@ -576,9 +579,12 @@ class TestPlantedBugFetchDataGoverned(unittest.TestCase):
         """KNOWN_PRIMITIVES must contain at least the core governed calculators."""
         core = {
             "query_pipeline_coverage", "query_waterfall",
-            "query_deal_risk", "query_win_loss_reason",
+            "query_deals_at_risk", "query_win_loss",
         }
-        self.assertTrue(core.issubset(KNOWN_PRIMITIVES))
+        self.assertTrue(
+            core.issubset(KNOWN_PRIMITIVES),
+            f"Missing from KNOWN_PRIMITIVES: {core - KNOWN_PRIMITIVES}",
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -760,6 +766,163 @@ class TestStepCountAccurate(unittest.TestCase):
         steps = [_ask_user("Clarify?")]
         result, client = self._run(steps)
         self.assertEqual(result.steps_taken, 1)
+
+
+# ---------------------------------------------------------------------------
+# Category I: KNOWN_PRIMITIVES stays in sync with HANDLER_DESCRIPTIONS
+#
+# This test FAILS if a handler is added to HANDLER_DESCRIPTIONS but not
+# captured in KNOWN_PRIMITIVES (either via the dynamic import or a documented
+# exclusion in _NON_PRIMITIVE_INTENTS).
+
+class TestKnownPrimitivesRegistrySync(unittest.TestCase):
+    """
+    Every key in HANDLER_DESCRIPTIONS must appear in KNOWN_PRIMITIVES unless
+    it is explicitly in _NON_PRIMITIVE_INTENTS.
+
+    This guards against drift: a new handler added to router.py without a
+    corresponding C4 entry would silently allow fetch_data to bypass it.
+    """
+
+    def test_all_handler_descriptions_primitives_are_in_known_primitives(self):
+        """
+        Importing HANDLER_DESCRIPTIONS directly — every governed handler key
+        must be in KNOWN_PRIMITIVES.  _NON_PRIMITIVE_INTENTS are the only
+        permitted exclusions, and they must remain documented there.
+        """
+        from api.router import HANDLER_DESCRIPTIONS
+        from api.agent_loop import _NON_PRIMITIVE_INTENTS
+
+        governed = frozenset(HANDLER_DESCRIPTIONS.keys()) - _NON_PRIMITIVE_INTENTS
+        missing = governed - KNOWN_PRIMITIVES
+        self.assertFalse(
+            missing,
+            f"Handlers in HANDLER_DESCRIPTIONS that are missing from KNOWN_PRIMITIVES "
+            f"(add to _NON_PRIMITIVE_INTENTS if they are not data calculators): {sorted(missing)}",
+        )
+
+    def test_known_primitives_keyword_table_names_are_valid(self):
+        """
+        Every primitive name in _PRIMITIVE_KEYWORDS must exist in KNOWN_PRIMITIVES.
+        A keyword pointing at a non-existent or renamed primitive would silently
+        misdirect fetch_data queries.
+        """
+        from api.agent_loop import _PRIMITIVE_KEYWORDS
+        stale = {prim for _, prim in _PRIMITIVE_KEYWORDS if prim not in KNOWN_PRIMITIVES}
+        self.assertFalse(
+            stale,
+            f"_PRIMITIVE_KEYWORDS entries pointing at primitives not in KNOWN_PRIMITIVES: {sorted(stale)}",
+        )
+
+
+# ---------------------------------------------------------------------------
+# Category J: Bounded redirects — second governed fetch_data requires justification
+
+class TestBoundedRedirects(unittest.TestCase):
+    """
+    After the first C4 redirect, if the model calls fetch_data again for a
+    governed query:
+      - WITHOUT params.justification → harder block message, redirect still recorded
+      - WITH params.justification → allowed through + logged as candidate
+
+    The redirect counter is per-loop-invocation (does not persist across calls).
+    """
+
+    def _run_double_redirect(self, second_has_justification: bool):
+        """
+        3-step trace:
+          call_primitive → fetch_data(governed, first) → fetch_data(governed, second) → deliver
+        Second fetch_data is governed; controlled by second_has_justification.
+        """
+        import asyncio
+        second_fetch = (
+            _fetch_data(
+                "pipeline coverage Q4",
+                justification="query_pipeline_coverage only returns ratio, not the constituent pipeline and target values I need separately",
+            )
+            if second_has_justification
+            else _fetch_data("pipeline coverage Q4")
+        )
+        steps = [
+            _call_primitive("query_path_to_target", {"quarter": "Q4"}),   # step 1
+            _fetch_data("get pipeline coverage for Q4"),                   # step 2: first governed → redirect
+            second_fetch,                                                  # step 3: second governed
+            _deliver("Coverage is 2.49x.", sources=["call_primitive"]),   # step 4
+        ]
+        client = FakeClient(steps)
+        return asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="How is our Q4 pipeline coverage?",
+                client=client,
+                sb=_sb(),
+            )
+        )
+
+    def test_second_governed_without_justification_blocked(self):
+        """
+        Second governed fetch_data without justification gets a harder block.
+        The redirect is still recorded (redirect count goes to 2).
+        """
+        result = self._run_double_redirect(second_has_justification=False)
+        self.assertGreaterEqual(
+            len(result.fetch_data_redirects), 2,
+            "Both governed fetch_data calls must be recorded in fetch_data_redirects",
+        )
+
+    def test_second_governed_with_justification_allowed(self):
+        """
+        Second governed fetch_data WITH params.justification is allowed through.
+        The loop continues to deliver an answer.
+        """
+        result = self._run_double_redirect(second_has_justification=True)
+        self.assertFalse(result.budget_exhausted)
+        self.assertNotEqual(result.answer, "")
+
+    def test_first_redirect_not_subject_to_justification_rule(self):
+        """
+        The FIRST governed fetch_data is always blocked with the standard redirect
+        message (no justification required on the first redirect).
+        """
+        import asyncio
+        steps = [
+            _fetch_data("pipeline coverage Q4"),    # step 1: first governed → standard block
+            _call_primitive("query_pipeline_coverage"),
+            _check_result("2.49x", {"ratio": 2.49}),
+            _deliver("Coverage is 2.49x.", sources=["query_pipeline_coverage"]),
+        ]
+        client = FakeClient(steps)
+        result = asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="How is our Q4 pipeline coverage?",
+                client=client,
+                sb=_sb(),
+            )
+        )
+        # First redirect recorded, loop continues to deliver
+        self.assertEqual(len(result.fetch_data_redirects), 1)
+        self.assertFalse(result.budget_exhausted)
+        self.assertNotEqual(result.answer, "")
+
+    def test_redirect_count_resets_across_loop_calls(self):
+        """Redirect count is per-invocation, not shared across run_agent_loop calls."""
+        import asyncio
+
+        async def _run_once():
+            steps = [
+                _fetch_data("pipeline coverage Q4"),   # first redirect in this call
+                _deliver("Coverage is 2.49x."),
+            ]
+            client = FakeClient(steps)
+            return await run_agent_loop(
+                question="Coverage?", client=client, sb=_sb()
+            )
+
+        loop = asyncio.get_event_loop()
+        r1 = loop.run_until_complete(_run_once())
+        r2 = loop.run_until_complete(_run_once())
+        # Each call should record exactly 1 redirect — no cross-contamination
+        self.assertEqual(len(r1.fetch_data_redirects), 1)
+        self.assertEqual(len(r2.fetch_data_redirects), 1)
 
 
 if __name__ == "__main__":
