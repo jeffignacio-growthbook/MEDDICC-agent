@@ -302,6 +302,179 @@ def test_data_gap_survives_when_changes_list_triggers_real_truncation():
     )
 
 
+# ---------------------------------------------------------------------------
+# Fix 1: single-gap emission — no duplicate messages when valid_prior is empty
+# ---------------------------------------------------------------------------
+
+def test_single_gap_emitted_when_no_valid_prior():
+    """When the oldest snapshot is more recent than the requested target date,
+    exactly ONE gap message must be emitted (not two).
+
+    Old bug: the 'no snapshot old enough' branch appended one gap, then the
+    span-check below it fired unconditionally and appended a second, redundant
+    message for the same situation. One message is what the model needs."""
+    from api.handlers import _pm_select_snapshot_anchors
+    dates = ["2026-09-17", "2026-09-24"]  # only 7 days, user wants 21
+    _, _, gaps = _pm_select_snapshot_anchors(dates, requested_days=21)
+    assert len(gaps) == 1, (
+        f"Expected exactly 1 gap message when oldest snapshot is too recent, "
+        f"got {len(gaps)}: {gaps!r}"
+    )
+    assert "21" in gaps[0] or "Requested" in gaps[0], (
+        f"Gap message should name the requested window: {gaps[0]!r}"
+    )
+
+
+def test_no_gap_emitted_when_window_exactly_matches():
+    """When the anchor snapshot lands exactly on the target date (≤ 2-day
+    tolerance), no gap is emitted — clean window, no disclosure needed."""
+    from api.handlers import _pm_select_snapshot_anchors
+    dates = ["2026-09-03", "2026-09-10", "2026-09-17", "2026-09-24"]
+    # requested_days=21, target = Sep 24 - 21 = Sep 3 — exact match
+    _, _, gaps = _pm_select_snapshot_anchors(dates, requested_days=21)
+    assert gaps == [], f"Expected no gaps for exact anchor match, got: {gaps!r}"
+
+
+def test_single_gap_emitted_when_valid_prior_but_span_drifts():
+    """When a valid prior IS found but the actual span differs by > 2 days,
+    exactly ONE span-mismatch gap is emitted (the 'oldest snapshot' branch
+    did not fire)."""
+    from api.handlers import _pm_select_snapshot_anchors
+    # Snapshots: Aug 10, Aug 24. requested_days=14 → target=Aug 10 (Sep 24-14).
+    # Wait, let me use: current=Sep 24, requested=14 → target=Sep 10.
+    # Only Aug 24 is ≤ Sep 10 → prior=Aug 24, actual=31 days, |31-14|>2 → gap.
+    dates = ["2026-08-24", "2026-09-24"]
+    _, _, gaps = _pm_select_snapshot_anchors(dates, requested_days=14)
+    assert len(gaps) == 1, (
+        f"Expected exactly 1 gap for span mismatch, got {len(gaps)}: {gaps!r}"
+    )
+    assert "14" in gaps[0] or "Requested" in gaps[0] or "days" in gaps[0], gaps[0]
+
+
+# ---------------------------------------------------------------------------
+# Fix 2: synthesis prompt generality — both gap shapes must be covered
+# ---------------------------------------------------------------------------
+
+def test_voice_base_has_general_data_gaps_surface_rule():
+    """_VOICE_BASE must instruct the model to surface ANY data_gaps entry
+    verbatim, not only the 'NO SNAPSHOT EXISTS for [date]' shape.
+
+    The original rule was pattern-matched to that specific string, so
+    window-shortfall messages ('Requested N-day window, but oldest snapshot
+    is...') were silently absorbed — the model reported results without
+    disclosing the window shortfall to the user."""
+    vb = router._VOICE_BASE
+    # Must have the general rule — look for the always/verbatim instruction
+    assert "verbatim" in vb.lower(), (
+        "_VOICE_BASE lacks a 'verbatim' instruction for data_gaps — "
+        "the rule only fires on specific message shapes."
+    )
+    assert "always" in vb.lower(), (
+        "_VOICE_BASE lacks an 'always' qualifier for data_gaps surfacing."
+    )
+
+
+def test_voice_base_covers_window_shortfall_gap_shape():
+    """_VOICE_BASE must mention the window-shortfall pattern explicitly
+    so the model recognises 'Requested N-day window' as a gap to surface."""
+    vb = router._VOICE_BASE
+    assert "window" in vb.lower() and ("shortfall" in vb.lower() or "shorter" in vb.lower()), (
+        "_VOICE_BASE does not name the window-shortfall gap shape — "
+        "the model may still silently absorb 'Requested N-day window' messages."
+    )
+
+
+def test_dynamic_system_prompt_surfaces_data_gaps_verbatim():
+    """DYNAMIC_SYSTEM_PROMPT must instruct the model to surface every data_gaps
+    entry verbatim — not just prohibit fabrication when a gap is present."""
+    dsp = router.DYNAMIC_SYSTEM_PROMPT
+    assert "verbatim" in dsp.lower(), (
+        "DYNAMIC_SYSTEM_PROMPT lacks a 'verbatim' surfacing instruction — "
+        "the model receives the prohibition but not the explicit surfacing directive."
+    )
+
+
+# ---------------------------------------------------------------------------
+# Both gap shapes survive serialization — the "NO SNAPSHOT EXISTS" case
+# ---------------------------------------------------------------------------
+
+# Second gap message shape: the waterfall/composition 'NO SNAPSHOT EXISTS'
+_NO_SNAPSHOT_GAP = (
+    "NO SNAPSHOT EXISTS for 2026-09-01. "
+    "The earliest real snapshot in the requested range is 2026-09-08 "
+    "(marked is_start_anchor=True in the grid). "
+    "NEVER estimate, interpolate, or derive counts for 2026-09-01 or any "
+    "date not present in the grid. Report real counts from 2026-09-08 with "
+    "a clear disclosure that this is the earliest real data point."
+)
+
+_MOVEMENT_WITH_NO_SNAPSHOT_GAP = {
+    "snap_dates": ["2026-09-08", "2026-10-06"],
+    "changes": [
+        {
+            "deal_id": "deal-x",
+            "deal_name": "Omega Corp",
+            "direction": "advanced",
+            "prior_stage": "Discovery",
+            "current_stage": "Qualified",
+            "deal_value": 80000,
+        }
+    ],
+    "data_gaps": [_NO_SNAPSHOT_GAP],
+    "total_advanced": 1,
+    "total_regressed": 0,
+    "_synthesis_note": "Earliest real snapshot is Sep 8, not Sep 1 — see data_gaps.",
+}
+
+
+def test_no_snapshot_exists_gap_survives_loop_serialization():
+    """The 'NO SNAPSHOT EXISTS' gap shape must survive loop-path serialization.
+    Both gap shapes — window shortfall AND missing snapshot — must reach the model."""
+    text = _loop_serialized(result=_MOVEMENT_WITH_NO_SNAPSHOT_GAP)
+    assert "NO SNAPSHOT EXISTS" in text, (
+        "'NO SNAPSHOT EXISTS' gap was dropped by _serialize_tool_result_for_synthesis.\n"
+        f"Serialized text (first 500 chars):\n  {text[:500]!r}"
+    )
+
+
+def test_no_snapshot_exists_gap_survives_classifier_serialization():
+    """The 'NO SNAPSHOT EXISTS' gap shape must survive the classifier path
+    (_cap_rows_for_synthesis + _smart_truncate_for_synthesis)."""
+    text = _classifier_serialized(result=_MOVEMENT_WITH_NO_SNAPSHOT_GAP)
+    assert "NO SNAPSHOT EXISTS" in text, (
+        "'NO SNAPSHOT EXISTS' gap was dropped during classifier synthesis serialization.\n"
+        f"Serialized text (first 500 chars):\n  {text[:500]!r}"
+    )
+
+
+def test_both_gap_shapes_survive_loop_path():
+    """Both gap shapes — window shortfall (GAP_MESSAGE) and 'NO SNAPSHOT EXISTS'
+    — must survive loop-path serialization simultaneously. If either is dropped,
+    the model will fabricate for that scenario."""
+    window_shortfall_result = copy.deepcopy(_MOVEMENT_RESULT)
+    window_shortfall_result["data_gaps"].append(_NO_SNAPSHOT_GAP)
+    text = _loop_serialized(result=window_shortfall_result)
+    assert GAP_MESSAGE in text, (
+        "Window-shortfall gap dropped from loop serialization with both shapes present."
+    )
+    assert "NO SNAPSHOT EXISTS" in text, (
+        "'NO SNAPSHOT EXISTS' gap dropped from loop serialization with both shapes present."
+    )
+
+
+def test_both_gap_shapes_survive_classifier_path():
+    """Both gap shapes survive the classifier path simultaneously."""
+    combined_result = copy.deepcopy(_MOVEMENT_RESULT)
+    combined_result["data_gaps"].append(_NO_SNAPSHOT_GAP)
+    text = _classifier_serialized(result=combined_result)
+    assert GAP_MESSAGE in text, (
+        "Window-shortfall gap dropped from classifier path with both shapes present."
+    )
+    assert "NO SNAPSHOT EXISTS" in text, (
+        "'NO SNAPSHOT EXISTS' gap dropped from classifier path with both shapes present."
+    )
+
+
 if __name__ == "__main__":
     test_data_gap_survives_loop_serialization()
     print("PASS: data_gap survives loop serialization")
@@ -327,4 +500,27 @@ if __name__ == "__main__":
     print("PASS: planted-bug confirms naive [:20000] cut drops data_gaps")
     test_data_gap_survives_when_changes_list_triggers_real_truncation()
     print("PASS: data_gap survives real character truncation (200 deals)")
+    # Fix 1: single-gap emission
+    test_single_gap_emitted_when_no_valid_prior()
+    print("PASS: single gap emitted when no valid prior (no double message)")
+    test_no_gap_emitted_when_window_exactly_matches()
+    print("PASS: no gap emitted when anchor matches within 2 days")
+    test_single_gap_emitted_when_valid_prior_but_span_drifts()
+    print("PASS: single gap emitted when valid prior found but span drifts")
+    # Fix 2: synthesis prompt generality
+    test_voice_base_has_general_data_gaps_surface_rule()
+    print("PASS: _VOICE_BASE has general always-surface-verbatim rule")
+    test_voice_base_covers_window_shortfall_gap_shape()
+    print("PASS: _VOICE_BASE explicitly covers window-shortfall gap shape")
+    test_dynamic_system_prompt_surfaces_data_gaps_verbatim()
+    print("PASS: DYNAMIC_SYSTEM_PROMPT instructs verbatim surfacing")
+    # Both shapes survive serialization
+    test_no_snapshot_exists_gap_survives_loop_serialization()
+    print("PASS: NO SNAPSHOT EXISTS gap survives loop serialization")
+    test_no_snapshot_exists_gap_survives_classifier_serialization()
+    print("PASS: NO SNAPSHOT EXISTS gap survives classifier serialization")
+    test_both_gap_shapes_survive_loop_path()
+    print("PASS: both gap shapes survive loop path simultaneously")
+    test_both_gap_shapes_survive_classifier_path()
+    print("PASS: both gap shapes survive classifier path simultaneously")
     print("\nAll tests passed.")
