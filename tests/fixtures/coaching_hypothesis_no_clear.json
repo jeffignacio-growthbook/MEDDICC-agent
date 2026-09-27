@@ -1,0 +1,527 @@
+{
+  "latest": "2026-09-27",
+  "cohorts": {
+    "progressed": 51,
+    "progressed_calls": 53,
+    "stalled": 63,
+    "stalled_calls": 78,
+    "stalled_still_open": 17,
+    "stalled_status": {
+      "lost": 46,
+      "active": 17
+    },
+    "progressed_status": {
+      "lost": 24,
+      "active": 25,
+      "won": 2
+    }
+  },
+  "views": {
+    "all_stalled": {
+      "n_progressed": 51,
+      "n_stalled": 63,
+      "n_holdout": 38,
+      "components": {
+        "pain": {
+          "train": {
+            "n_prog": 35,
+            "n_stall": 30,
+            "mean_prog": 5.3428571428571425,
+            "mean_stall": 4.933333333333334,
+            "d": 0.41364004593395726,
+            "mw_p": 0.08195380499845784,
+            "strat_diff": -0.3320895522,
+            "p": 0.7001499250374813,
+            "n_informative": 30
+          },
+          "holdout": {
+            "n_prog": 12,
+            "n_stall": 23,
+            "mean_prog": 5.416666666666667,
+            "mean_stall": 4.804347826086956,
+            "d": 0.7137638095049866,
+            "mw_p": 0.05232471328388755,
+            "strat_diff": 0.4,
+            "p": 1.0,
+            "n_informative": 6
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              47,
+              53
+            ],
+            "stalled": [
+              56,
+              78
+            ]
+          }
+        },
+        "metrics": {
+          "train": {
+            "n_prog": 34,
+            "n_stall": 28,
+            "mean_prog": 3.7058823529411766,
+            "mean_stall": 3.5714285714285716,
+            "d": 0.12238592682913116,
+            "mw_p": 0.59777111997583,
+            "strat_diff": -0.9411764706,
+            "p": 0.19790104947526238,
+            "n_informative": 28
+          },
+          "holdout": {
+            "n_prog": 12,
+            "n_stall": 22,
+            "mean_prog": 4.083333333333333,
+            "mean_stall": 3.4318181818181817,
+            "d": 0.6409427300635964,
+            "mw_p": 0.13767608316376023,
+            "strat_diff": 0.5882352941,
+            "p": 0.7531234382808596,
+            "n_informative": 7
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              47,
+              53
+            ],
+            "stalled": [
+              57,
+              78
+            ]
+          }
+        },
+        "champion": {
+          "train": {
+            "n_prog": 34,
+            "n_stall": 27,
+            "mean_prog": 3.735294117647059,
+            "mean_stall": 3.2222222222222223,
+            "d": 0.5856394667354777,
+            "mw_p": 0.029193728664396623,
+            "strat_diff": -0.0337078652,
+            "p": 1.0,
+            "n_informative": 29
+          },
+          "holdout": {
+            "n_prog": 13,
+            "n_stall": 23,
+            "mean_prog": 3.769230769230769,
+            "mean_stall": 2.9347826086956523,
+            "d": 1.0045604008459659,
+            "mw_p": 0.02004983786327319,
+            "strat_diff": 1.2352941176,
+            "p": 0.49025487256371814,
+            "n_informative": 7
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              48,
+              53
+            ],
+            "stalled": [
+              52,
+              78
+            ]
+          }
+        },
+        "economic_buyer": {
+          "train": {
+            "n_prog": 25,
+            "n_stall": 10,
+            "mean_prog": 3.8,
+            "mean_stall": 3.4,
+            "d": 0.3236694374850747,
+            "mw_p": 0.5427649221528439,
+            "strat_diff": 0.6666666667,
+            "p": 1.0,
+            "n_informative": 4
+          },
+          "holdout": {
+            "n_prog": 9,
+            "n_stall": 11,
+            "mean_prog": 3.2222222222222223,
+            "mean_stall": 3.1818181818181817,
+            "d": 0.05654027941921794,
+            "mw_p": 0.9667575958957144,
+            "strat_diff": 0.0,
+            "p": 1.0,
+            "n_informative": 0
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              34,
+              53
+            ],
+            "stalled": [
+              21,
+              78
+            ]
+          }
+        },
+        "decision_criteria": {
+          "train": {
+            "n_prog": 35,
+            "n_stall": 30,
+            "mean_prog": 4.3428571428571425,
+            "mean_stall": 3.95,
+            "d": 0.32949297093697966,
+            "mw_p": 0.20985571009315285,
+            "strat_diff": -0.2537313433,
+            "p": 0.6951524237881059,
+            "n_informative": 30
+          },
+          "holdout": {
+            "n_prog": 13,
+            "n_stall": 23,
+            "mean_prog": 4.269230769230769,
+            "mean_stall": 3.6739130434782608,
+            "d": 0.5816876529277327,
+            "mw_p": 0.20705549686308888,
+            "strat_diff": 1.3235294118,
+            "p": 0.4867566216891554,
+            "n_informative": 7
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              49,
+              53
+            ],
+            "stalled": [
+              60,
+              78
+            ]
+          }
+        },
+        "decision_process": {
+          "train": {
+            "n_prog": 34,
+            "n_stall": 26,
+            "mean_prog": 3.823529411764706,
+            "mean_stall": 3.3461538461538463,
+            "d": 0.416139099837275,
+            "mw_p": 0.12606553475832083,
+            "strat_diff": -0.164021164,
+            "p": 0.7951024487756122,
+            "n_informative": 22
+          },
+          "holdout": {
+            "n_prog": 13,
+            "n_stall": 23,
+            "mean_prog": 3.8846153846153846,
+            "mean_stall": 2.9130434782608696,
+            "d": 0.9802155886112759,
+            "mw_p": 0.015317264450260382,
+            "strat_diff": 2.2058823529,
+            "p": 0.2463768115942029,
+            "n_informative": 7
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              48,
+              53
+            ],
+            "stalled": [
+              54,
+              78
+            ]
+          }
+        },
+        "competition": {
+          "train": {
+            "n_prog": 35,
+            "n_stall": 30,
+            "mean_prog": 4.628571428571429,
+            "mean_stall": 4.433333333333334,
+            "d": 0.10654683219009621,
+            "mw_p": 0.47422036224852127,
+            "strat_diff": 0.3358208955,
+            "p": 0.8035982008995503,
+            "n_informative": 30
+          },
+          "holdout": {
+            "n_prog": 13,
+            "n_stall": 22,
+            "mean_prog": 4.3076923076923075,
+            "mean_stall": 4.568181818181818,
+            "d": -0.1398949414911912,
+            "mw_p": 0.5633372127071015,
+            "strat_diff": -0.6470588235,
+            "p": 0.7571214392803598,
+            "n_informative": 7
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              49,
+              53
+            ],
+            "stalled": [
+              59,
+              78
+            ]
+          }
+        }
+      },
+      "directional": []
+    },
+    "still_open_stalled": {
+      "n_progressed": 51,
+      "n_stalled": 17,
+      "n_holdout": 19,
+      "components": {
+        "pain": {
+          "train": {
+            "n_prog": 35,
+            "n_stall": 7,
+            "mean_prog": 5.3428571428571425,
+            "mean_stall": 5.428571428571429,
+            "d": -0.09352195295828307,
+            "mw_p": 0.9709900708669175,
+            "strat_diff": -0.52,
+            "p": 0.5802098950524738,
+            "n_informative": 12
+          },
+          "holdout": {
+            "n_prog": 12,
+            "n_stall": 5,
+            "mean_prog": 5.416666666666667,
+            "mean_stall": 5.6,
+            "d": -0.24922878993619318,
+            "mw_p": 0.8103849552827691,
+            "strat_diff": 0.0,
+            "p": 1.0,
+            "n_informative": 0
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              47,
+              53
+            ],
+            "stalled": [
+              13,
+              25
+            ]
+          }
+        },
+        "metrics": {
+          "train": {
+            "n_prog": 34,
+            "n_stall": 7,
+            "mean_prog": 3.7058823529411766,
+            "mean_stall": 3.857142857142857,
+            "d": -0.156535169363387,
+            "mw_p": 0.6911821911643201,
+            "strat_diff": -0.88,
+            "p": 0.3498250874562719,
+            "n_informative": 12
+          },
+          "holdout": {
+            "n_prog": 12,
+            "n_stall": 5,
+            "mean_prog": 4.083333333333333,
+            "mean_stall": 3.6,
+            "d": 0.3980453371533701,
+            "mw_p": 0.5493301657483189,
+            "strat_diff": 0.0,
+            "p": 1.0,
+            "n_informative": 0
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              47,
+              53
+            ],
+            "stalled": [
+              15,
+              25
+            ]
+          }
+        },
+        "champion": {
+          "train": {
+            "n_prog": 34,
+            "n_stall": 7,
+            "mean_prog": 3.735294117647059,
+            "mean_stall": 3.2857142857142856,
+            "d": 0.53015390863387,
+            "mw_p": 0.17461603709419649,
+            "strat_diff": 0.44,
+            "p": 0.30434782608695654,
+            "n_informative": 12
+          },
+          "holdout": {
+            "n_prog": 13,
+            "n_stall": 5,
+            "mean_prog": 3.769230769230769,
+            "mean_stall": 3.2,
+            "d": 0.5504940679708155,
+            "mw_p": 0.44647297114965623,
+            "strat_diff": 0.0,
+            "p": 1.0,
+            "n_informative": 0
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              48,
+              53
+            ],
+            "stalled": [
+              12,
+              25
+            ]
+          }
+        },
+        "economic_buyer": {
+          "train": {
+            "n_prog": 25,
+            "n_stall": 4,
+            "mean_prog": 3.8,
+            "mean_stall": 3.5,
+            "d": 0.22738101868795996,
+            "mw_p": 0.7412596971199317,
+            "strat_diff": 0.0,
+            "p": 1.0,
+            "n_informative": 0
+          },
+          "holdout": {
+            "n_prog": 9,
+            "n_stall": 3,
+            "mean_prog": 3.2222222222222223,
+            "mean_stall": 3,
+            "d": 0.37267799624996517,
+            "mw_p": 0.578514721507944,
+            "strat_diff": 0.0,
+            "p": 1.0,
+            "n_informative": 0
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              34,
+              53
+            ],
+            "stalled": [
+              7,
+              25
+            ]
+          }
+        },
+        "decision_criteria": {
+          "train": {
+            "n_prog": 35,
+            "n_stall": 7,
+            "mean_prog": 4.3428571428571425,
+            "mean_stall": 4.142857142857143,
+            "d": 0.16866551780406566,
+            "mw_p": 0.636654849649597,
+            "strat_diff": -0.16,
+            "p": 0.7626186906546727,
+            "n_informative": 12
+          },
+          "holdout": {
+            "n_prog": 13,
+            "n_stall": 5,
+            "mean_prog": 4.269230769230769,
+            "mean_stall": 4,
+            "d": 0.23897605969962155,
+            "mw_p": 0.798834284893152,
+            "strat_diff": 0.0,
+            "p": 1.0,
+            "n_informative": 0
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              49,
+              53
+            ],
+            "stalled": [
+              14,
+              25
+            ]
+          }
+        },
+        "decision_process": {
+          "train": {
+            "n_prog": 34,
+            "n_stall": 6,
+            "mean_prog": 3.823529411764706,
+            "mean_stall": 3.3333333333333335,
+            "d": 0.4466319423046562,
+            "mw_p": 0.20022834429800773,
+            "strat_diff": 0.5294117647,
+            "p": 0.6476761619190404,
+            "n_informative": 7
+          },
+          "holdout": {
+            "n_prog": 13,
+            "n_stall": 5,
+            "mean_prog": 3.8846153846153846,
+            "mean_stall": 3.4,
+            "d": 0.4534251929419071,
+            "mw_p": 0.6385275454361434,
+            "strat_diff": 0.0,
+            "p": 1.0,
+            "n_informative": 0
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              48,
+              53
+            ],
+            "stalled": [
+              13,
+              25
+            ]
+          }
+        },
+        "competition": {
+          "train": {
+            "n_prog": 35,
+            "n_stall": 7,
+            "mean_prog": 4.628571428571429,
+            "mean_stall": 3.7142857142857144,
+            "d": 0.48254154420046597,
+            "mw_p": 0.16985201785756532,
+            "strat_diff": 1.4,
+            "p": 0.24437781109445278,
+            "n_informative": 12
+          },
+          "holdout": {
+            "n_prog": 13,
+            "n_stall": 5,
+            "mean_prog": 4.3076923076923075,
+            "mean_stall": 5.4,
+            "d": -0.6744340351468734,
+            "mw_p": 0.2860311985312203,
+            "strat_diff": 0.0,
+            "p": 1.0,
+            "n_informative": 0
+          },
+          "directional": false,
+          "evidence": {
+            "progressed": [
+              49,
+              53
+            ],
+            "stalled": [
+              14,
+              25
+            ]
+          }
+        }
+      },
+      "directional": []
+    }
+  }
+}

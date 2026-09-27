@@ -165,7 +165,8 @@ jobs:
             tests/test_query_path_to_target_handler.py \
             tests/test_deal_changes_window_anchor.py \
             tests/test_dynamic_query_no_fabrication_rule.py \
-            tests/test_no_fabrication_data_gap_synthesis.py
+            tests/test_no_fabrication_data_gap_synthesis.py \
+            tests/test_coaching_hypothesis_loop.py
           do
             echo "::group::$t"
             if PYTHONPATH=. python3 "$t"; then

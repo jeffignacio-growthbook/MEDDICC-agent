@@ -170,3 +170,17 @@ jobs:
           python scripts/weekly_learning_report.py \
             --check-schema-gaps --slack --days 7
         continue-on-error: true
+
+      - name: Coaching hypothesis loop
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python scripts/analytics/coaching_hypothesis_loop.py
+        continue-on-error: true
+
+      - name: Coaching experiment tracker
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python scripts/analytics/coaching_experiment_tracker.py
+        continue-on-error: true
