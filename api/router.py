@@ -5748,7 +5748,58 @@ async def route_question(question: str, user_id: str,
     in code, whatever path produced the answer.
     """
     from api.rep_clarification import find_pending, match_reply, apply_choice
+    from api.composer import find_pending_plan, reply_affirms_plan
     gate: dict = {}
+
+    # ── Pending plan check (composer) ──────────────────────────────────────
+    # Must run before the rep_clarification check so an affirming "yes"
+    # to a decomposition plan executes it rather than lapsing as a new question.
+    pending_plan_entry = find_pending_plan(history or [])
+    if pending_plan_entry and reply_affirms_plan(question):
+        plan = pending_plan_entry.get("plan", {})
+        logger.info(
+            f"[COMPOSER] user affirmed plan; routing to dynamic_query_loop "
+            f"with {len(plan.get('sub_parts', []))} sub-parts"
+        )
+        try:
+            sub_parts = plan.get("sub_parts", [])
+            # Build a rich question that names the sub-parts so the dynamic
+            # loop knows what to fetch.  The original question is preserved.
+            original_q = plan.get("question", question)
+            parts_desc = "; ".join(
+                f"{p['name']} via {p['primitive']}"
+                for p in sub_parts
+                if p.get("primitive") != "_computed"
+            )
+            enriched_q = (
+                f"{original_q}\n\n"
+                f"[composer plan] fetch these sub-parts: {parts_desc}"
+            ) if parts_desc else original_q
+            dynamic_result = await dynamic_query_loop(
+                question=enriched_q,
+                history=history,
+                params={},
+                sb=sb,
+                client=generator_client if 'generator_client' in dir() else None,
+                hint=(
+                    "Answer the question by fetching each named sub-part. "
+                    "Combine the results into one coherent answer. "
+                    "Show each component value and the combined total."
+                ),
+                roster_text="",
+                classifier_client=classifier_client if 'classifier_client' in dir() else None,
+            )
+            if dynamic_result.get("answered"):
+                return {
+                    "answer": dynamic_result.get("answer", ""),
+                    "needs_ack": False,
+                    "tool_results": dynamic_result.get("tool_results", {}),
+                    "handler_name": "composer_executed",
+                }
+        except Exception as e:
+            logger.error(f"[COMPOSER] plan execution failed: {e}")
+        # If execution failed, fall through to normal routing
+
     pending = find_pending(history or [])
     if pending:
         choice = match_reply(question, pending)
@@ -6568,6 +6619,7 @@ async def _route_question(question: str, user_id: str,
     # ── 8. Correctness assessment + retry loop ───────────
     from api.assessor import (assess_correctness,
                                should_retry,
+                               should_escalate,
                                build_retry_context)
 
     MAX_RETRIES = 2
@@ -6674,6 +6726,46 @@ async def _route_question(question: str, user_id: str,
             max_tokens=SYNTH_MAX_TOKENS
         )
         verified = answer_resp.text.strip()
+
+    # ── 8a. Scope-mismatch escalation → composer plan ────────────────────────
+    # If the assessor flags scope_mismatch, the question needs multiple
+    # primitives. Instead of retrying or delivering, we decompose the question
+    # into a plan, save it as a pending_plan in thread history, and return a
+    # clarification message asking the user to confirm before execution.
+    if should_escalate(assessment):
+        try:
+            from api.composer import (
+                decompose_question,
+                plan_to_clarification_message,
+                make_pending_plan_entry,
+                PENDING_PLAN_ROLE,
+            )
+            plan = await decompose_question(
+                question=question,
+                handler_used=handler_name,
+                tool_results=tool_results,
+                client=generator_client,
+            )
+            clarification_msg = plan_to_clarification_message(plan)
+            pending_entry = make_pending_plan_entry(plan, clarification_msg)
+            # Persist the pending plan so the next turn can execute it
+            try:
+                db.save_thread(thread_id, pending_entry)
+            except Exception:
+                pass
+            logger.info(
+                f"[COMPOSER] scope_mismatch escalated; plan has "
+                f"{len(plan.get('sub_parts', []))} sub-parts"
+            )
+            return {
+                "answer": clarification_msg,
+                "needs_ack": False,
+                "tool_results": {},
+                "handler_name": f"{handler_name}_composer_plan",
+            }
+        except Exception as e:
+            logger.error(f"[COMPOSER] escalation failed: {e}")
+            # Fall through to normal delivery on composer failure
 
     # ── 8b. Confidence floor (PROVISIONAL — see ASSESS_CORRECTNESS_FLOOR) ──
     # The assessor score gated nothing before this: it only chose a retry path

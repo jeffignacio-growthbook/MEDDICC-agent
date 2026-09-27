@@ -683,6 +683,21 @@
       "narrative",
       "outcome",
       "stated_reason"
+    ],
+    "coaching_hypotheses": [
+      "id",
+      "component",
+      "direction",
+      "train_p",
+      "train_d",
+      "holdout_d",
+      "run_date",
+      "status",
+      "proposal",
+      "experiment",
+      "notes",
+      "created_at",
+      "updated_at"
     ]
   }
 }

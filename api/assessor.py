@@ -73,6 +73,8 @@ Respond with JSON only:
     "should_be_dynamic"   - precomputed handler too limited
     "data_gap"            - data genuinely missing, handled ok
     "format_only"         - correct data, poor presentation
+    "scope_mismatch"      - question needs multiple primitives combined;
+                            no single handler can answer it as-asked
   "suggested_handler": null or handler name to try instead,
   "suggested_params": null or parameter adjustments,
   "learning_note": null or one-line note for routing improvement,
@@ -186,6 +188,18 @@ def _compact_results(tool_results: dict) -> str:
         elif val is not None:
             parts.append(f"{key}: {str(val)[:50]}")
     return "; ".join(parts)[:300]
+
+
+def should_escalate(assessment: dict) -> bool:
+    """
+    Return True when the question needs the compositional layer (composer).
+    Only fires on scope_mismatch, and never on skipped assessments.
+    """
+    if assessment.get("skipped"):
+        return False
+    if assessment.get("correct", True):
+        return False
+    return assessment.get("issue") == "scope_mismatch"
 
 
 def should_retry(assessment: dict,

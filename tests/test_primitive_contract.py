@@ -147,6 +147,21 @@ KNOWN_DETECTION_FUNCTIONS = {
     # FAILURE_MODE_PRIMITIVES — it's a time_resolver utility, not a
     # dynamic_query_loop primitive.
     "_year_sanity_check",
+    # _sub_parts_sum_check (api/composer.py): internal reconciliation helper
+    # for the compositional layer. (a) Queryable: its (False, note) return
+    # surfaces as verify_plan_result's second element, which the escalation
+    # path uses to re-present the plan for correction — the note ends up in
+    # the clarification message the user sees. (b) User-visible: on False,
+    # the escalation path routes back to clarification (a re-ask), never
+    # ships a wrong answer. Not in FAILURE_MODE_PRIMITIVES — it's a composer
+    # utility, not a dynamic_query_loop primitive; its failure path is a
+    # re-ask (clarification), not a cost log event.
+    "_sub_parts_sum_check",
+    # verify_plan_result (api/composer.py): thin wrapper over
+    # _sub_parts_sum_check — same verdict. Returns (bool, reason), never
+    # raises, and on False the escalation path re-presents the plan for
+    # correction rather than shipping a wrong answer.
+    "verify_plan_result",
 }
 
 # Naming patterns a "detection-style" function is likely to match.
@@ -340,6 +355,13 @@ KNOWN_FLAGGED_LOG_TAGS = {
     # Self-correcting detection (logged warning + immediate fix), not a
     # detect-and-ship gap. Added 2026-09-22, commit c794f31.
     "[ROUTING]",
+    # [COMPOSER] (api/router.py): two log sites — (1) scope_mismatch
+    # escalation failure: caught by except, falls through to normal delivery
+    # (detect-and-fallback, not detect-log-ship-gap); (2) plan execution
+    # success log: not a failure detection at all, just an info notice that
+    # the plan was built. No detect-and-ship-unresolved path exists in either
+    # case.
+    "[COMPOSER]",
 }
 
 
