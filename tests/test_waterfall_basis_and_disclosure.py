@@ -184,10 +184,62 @@ def test_control_a_dropped_note_is_detected():
     print("✓ control: with the note dropped, its instruction is absent from the synthesis input")
 
 
+def test_trend_headline_is_waterfall_generation_total_not_snapshot():
+    """Planted bug: for a generation question (report_shape='trend'), _synthesis_note's
+    HEADLINE must be waterfall_totals.new_pipeline_value (what entered the pipe this
+    period, $32,000) NOT pipeline_summary.total_incremental_arr ($100,000 — the current
+    snapshot of deals closing in Q3). Using the snapshot figure caused the $4.86M vs
+    $1.95M mismatch in the live Slack response on 2026-09-27."""
+    r = _run_handler(question="how much new pipeline came in this quarter?")
+    assert r["report_shape"] == "trend", f"Expected trend, got: {r['report_shape']!r}"
+
+    wf_new_total = r["waterfall_totals"]["new_pipeline_value"]["total"]
+    ps_total = r["pipeline_summary"]["total_incremental_arr"]
+
+    # The two figures must be different for the planted bug to be testable
+    assert wf_new_total != ps_total, (
+        f"SLICES sum ({wf_new_total}) must differ from deals headline ({ps_total}) "
+        f"for this test to catch the bug"
+    )
+
+    note = r["_synthesis_note"]
+    wf_fmt = f"${wf_new_total:,.0f}"
+    ps_fmt = f"${ps_total:,.0f}"
+
+    assert wf_fmt in note, (
+        f"Expected generation total {wf_fmt!r} in _synthesis_note for trend question; "
+        f"got none. Pipeline snapshot {ps_fmt!r} wrongly dominated. "
+        f"First 300 chars: {note[:300]!r}"
+    )
+
+    # Reconciliation: waterfall_totals must equal the sum of the weekly rows
+    weekly_new_sum = sum(w["new_pipeline_value"] for w in r["waterfall"])
+    assert weekly_new_sum == wf_new_total, (
+        f"waterfall_totals.new_pipeline_value ({wf_new_total}) != "
+        f"sum of weekly new_pipeline_value rows ({weekly_new_sum})"
+    )
+    print(f"✓ trend: headline {wf_fmt} (generation) ≠ {ps_fmt} (snapshot); "
+          f"weekly rows reconcile to {wf_fmt}")
+
+
+def test_snapshot_headline_is_pipeline_summary_total():
+    """Shape=snapshot still uses pipeline_summary.total_incremental_arr as the headline."""
+    r = _run_handler(question="what does our pipeline look like this quarter?")
+    assert r["report_shape"] == "snapshot", f"Expected snapshot, got: {r['report_shape']!r}"
+    ps_total = r["pipeline_summary"]["total_incremental_arr"]
+    note = r["_synthesis_note"]
+    assert f"${ps_total:,.0f}" in note, (
+        f"Expected pipeline snapshot ${ps_total:,.0f} in synthesis note for snapshot question"
+    )
+    print(f"✓ snapshot: headline ${ps_total:,.0f} present in synthesis note")
+
+
 if __name__ == "__main__":
     test_headline_is_incremental_arr_closing_in_the_period()
     test_weekly_rows_are_company_wide_with_labeled_slices_and_basis()
     test_disclosure_reaches_route_question_synthesis_input()
     test_disclosure_reaches_dynamic_loop_synthesis_input()
     test_control_a_dropped_note_is_detected()
+    test_trend_headline_is_waterfall_generation_total_not_snapshot()
+    test_snapshot_headline_is_pipeline_summary_total()
     print("\n✅ All tests passed")
