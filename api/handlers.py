@@ -898,10 +898,43 @@ async def query_waterfall(params: dict, sb) -> dict:
     else:
         report_shape = "snapshot"  # Default to snapshot
 
+    # Pre-compute waterfall totals so _synthesis_note can reference them.
+    # Previously computed inline in the result dict; moved here so report_shape
+    # can select the correct headline number before the note is built.
+    waterfall_totals = _waterfall_totals(weekly)
+    wf_new_pipeline_total = waterfall_totals.get("new_pipeline_value", {}).get("total", 0.0)
+    wf_new_pipeline_deals = sum(w.get("deals_qualified_count", 0) for w in weekly)
+    wf_new_pipeline_basis_label = waterfall_totals.get("new_pipeline_value", {}).get("basis_label", "")
+
+    # Shape-aware HEADLINE: generation questions report what entered the pipe
+    # (waterfall_totals.new_pipeline_value); snapshot questions report what's
+    # currently closing in the period (pipeline_summary.total_incremental_arr).
+    # Using the snapshot figure as the headline for a generation question was the
+    # root cause of the $4.86M vs $1.95M mismatch (2026-09-27).
+    if report_shape == "trend":
+        _headline_instruction = (
+            f"HEADLINE: ${wf_new_pipeline_total:,.0f} new pipeline entered in "
+            f"{tw['label']} ({wf_new_pipeline_deals} deals qualified), "
+            f"basis: {wf_new_pipeline_basis_label}. "
+            f"This comes from waterfall_totals.new_pipeline_value — it is the GENERATION "
+            f"total (deals that entered the pipe), NOT the pipeline snapshot. "
+            f"The pipeline snapshot (${period_incremental_arr:,.0f} across "
+            f"{total_open_count} deals closing in {tw['label']}) is "
+            f"pipeline_summary.total_incremental_arr — do NOT present it as the "
+            f"headline for a generation or new-pipeline question."
+        )
+    else:
+        _headline_instruction = (
+            f"HEADLINE: ${period_incremental_arr:,.0f} across {total_open_count} "
+            f"qualified deals closing in {tw['label']} ({tw['start']} to {tw['end']}). "
+            f"The {total_open_count} INCLUDES {no_arr_count} deal(s) with no ARR entered "
+            f"(pipeline_summary.needs_attention): say so with the count, as a hygiene flag."
+        )
+
     result = {
         "pipeline_summary": pipeline_summary,  # Headline: closing in the period
         "waterfall": weekly,                   # One company-wide row per week
-        "waterfall_totals": _waterfall_totals(weekly),   # Quarter-level, basis-labeled
+        "waterfall_totals": waterfall_totals,  # Quarter-level, basis-labeled
         "waterfall_basis_statement": waterfall_basis_statement,
         "period": tw["label"],
         "report_shape": report_shape,          # Declared shape for synthesis
@@ -910,10 +943,7 @@ async def query_waterfall(params: dict, sb) -> dict:
         },
         "_synthesis_note": (
             f"BASIS: say the dollars are Incremental ARR (new + expansion; renewal base "
-            f"excluded). HEADLINE: ${period_incremental_arr:,.0f} across {total_open_count} "
-            f"qualified deals closing in {tw['label']} ({tw['start']} to {tw['end']}). "
-            f"The {total_open_count} INCLUDES {no_arr_count} deal(s) with no ARR entered "
-            f"(pipeline_summary.needs_attention): say so with the count, as a hygiene flag. "
+            f"excluded). {_headline_instruction} "
             f"The ${all_open_incremental_arr:,.0f} across {after_qualified_count} deals is ALL "
             f"open pipeline regardless of close date: if you cite it, label it that way, "
             f"never as {tw['label']}'s pipeline. WEEKLY: each waterfall row is one "
