@@ -5230,9 +5230,19 @@ def _pm_select_snapshot_anchors(all_dates, requested_days=None):
         # Find closest snapshot on or before target
         valid_prior = [d for d in all_dates if d <= target_str]
         if valid_prior:
-            prior_date = valid_prior[-1]  # Closest to target
+            # A valid prior exists — use it, but disclose if the actual span
+            # differs significantly from what was requested.
+            prior_date = valid_prior[-1]
+            actual_days = (date.fromisoformat(current_date) - date.fromisoformat(prior_date)).days
+            if abs(actual_days - requested_days) > 2:
+                gaps.append(
+                    f"Comparing snapshots from {prior_date} and {current_date} "
+                    f"({actual_days} days). Requested {requested_days} days."
+                )
         else:
-            # No snapshot old enough — use oldest available
+            # No snapshot old enough — use oldest available. Emit exactly one
+            # gap message (not two: the old code also ran the span-check below
+            # and produced a redundant second message for this same case).
             prior_date = all_dates[0]
             actual_days = (date.fromisoformat(current_date) - date.fromisoformat(prior_date)).days
             gaps.append(
@@ -5243,15 +5253,6 @@ def _pm_select_snapshot_anchors(all_dates, requested_days=None):
     else:
         # Default: use last two snapshots
         prior_date = all_dates[-2]
-
-    # Check actual span
-    actual_days = (date.fromisoformat(current_date) - date.fromisoformat(prior_date)).days
-    if requested_days and abs(actual_days - requested_days) > 2:
-        # Significant mismatch — warn user
-        gaps.append(
-            f"Comparing snapshots from {prior_date} and {current_date} "
-            f"({actual_days} days). Requested {requested_days} days."
-        )
 
     return prior_date, current_date, gaps
 
