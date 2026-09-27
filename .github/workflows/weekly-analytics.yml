@@ -84,6 +84,62 @@ jobs:
           python scripts/enrichment/extract_feature_gaps.py \
             --limit 50 --yes
 
+      # -----------------------------------------------------------------------
+      # Monitoring alerts — run after precomputed tables are fresh so
+      # stale-table checks reflect the just-written values. Each script
+      # reads config/monitoring.yaml for thresholds and posts to Slack via
+      # ZAPIER_MONITORING_WEBHOOK_URL when a threshold is breached.
+      # continue-on-error: true so a monitor failure never blocks enrichment.
+      # -----------------------------------------------------------------------
+
+      - name: Monitor data completeness
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ZAPIER_MONITORING_WEBHOOK_URL: ${{ secrets.ZAPIER_MONITORING_WEBHOOK_URL }}
+        run: python scripts/monitor_data_completeness.py
+        continue-on-error: true
+
+      - name: Monitor forecast category coverage
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ZAPIER_MONITORING_WEBHOOK_URL: ${{ secrets.ZAPIER_MONITORING_WEBHOOK_URL }}
+        run: python scripts/monitor_forecast_category_coverage.py
+        continue-on-error: true
+
+      - name: Monitor stale precomputed tables
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ZAPIER_MONITORING_WEBHOOK_URL: ${{ secrets.ZAPIER_MONITORING_WEBHOOK_URL }}
+        run: python scripts/monitor_stale_precomputed_tables.py
+        continue-on-error: true
+
+      - name: Monitor bulk closed-lost (7-day lookback)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ZAPIER_MONITORING_WEBHOOK_URL: ${{ secrets.ZAPIER_MONITORING_WEBHOOK_URL }}
+        run: python scripts/monitor_bulk_closed_lost.py --lookback-hours 168
+        continue-on-error: true
+
+      - name: Monitor unscored late-stage deals
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ZAPIER_MONITORING_WEBHOOK_URL: ${{ secrets.ZAPIER_MONITORING_WEBHOOK_URL }}
+        run: python scripts/monitor_unscored_late_stage.py
+        continue-on-error: true
+
+      - name: Monitor snapshot coverage
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ZAPIER_MONITORING_WEBHOOK_URL: ${{ secrets.ZAPIER_MONITORING_WEBHOOK_URL }}
+        run: python scripts/monitor_snapshot_coverage.py
+        continue-on-error: true
+
       - name: Weekly learning report + handler generation
         if: github.event_name == 'schedule'
         # Only on scheduled runs, not manual triggers
