@@ -1015,28 +1015,22 @@ class TestExecutorOutputs(unittest.TestCase):
 
     def test_check_result_detects_rate_bound_violation(self):
         """
-        Supporting data with a coverage_pct of 2.5 (i.e. 250%) violates
-        the rate-bounds check — _execute_check_result should surface it.
+        Supporting data with a coverage_pct of 2.5 (250%) should surface a
+        plausibility warning — the result must use the 'warnings' key (not
+        the old 'violations' key) and it must be a list.
         """
         from api.agent_loop import _execute_check_result
 
-        # coverage_pct should be a fraction (0–1 range), not 250%.
-        # run_all_checks should flag this as a bounds violation.
         bad_data = {"coverage_pct": 2.5}
         result = _execute_check_result("Coverage is 250%", bad_data)
 
         self.assertIn("verified", result)
-        self.assertIn("violations", result)
-        # Either it was blocked (verified=False) or at minimum violations were reported.
-        # Either way, the stub "always True" behaviour is gone.
-        violations = result["violations"]
-        # violations is a list (may be empty if plausibility has no rule for this key,
-        # but the function must at least call plausibility and return the real shape)
-        self.assertIsInstance(violations, list)
+        self.assertIn("warnings", result)
+        self.assertIsInstance(result["warnings"], list)
 
     def test_check_result_clean_data_passes(self):
         """
-        Well-formed data (reasonable coverage ratio) should not block delivery.
+        Well-formed data (reasonable coverage ratio) should pass verification.
         """
         from api.agent_loop import _execute_check_result
 
@@ -1044,12 +1038,13 @@ class TestExecutorOutputs(unittest.TestCase):
         result = _execute_check_result("Coverage is 2.49x.", good_data)
 
         self.assertIn("verified", result)
-        self.assertIn("violations", result)
+        self.assertIn("warnings", result)
+        self.assertIn("untraceable", result)
 
     def test_check_result_plausibility_failure_is_caught_gracefully(self):
         """
-        If plausibility raises, _execute_check_result should catch it and
-        return verified=True with a warning (does not blow up the loop).
+        If plausibility raises, _execute_check_result should silently degrade
+        (trace-to-source still works; warnings list is empty or absent).
         """
         from unittest.mock import patch
         from api.agent_loop import _execute_check_result
@@ -1057,8 +1052,11 @@ class TestExecutorOutputs(unittest.TestCase):
         with patch("api.plausibility.run_all_checks", side_effect=RuntimeError("db gone")):
             result = _execute_check_result("some claim", {"x": 1})
 
+        # Trace check still runs — no numbers in "some claim" → verified=True
         self.assertTrue(result["verified"])
-        self.assertIn("warning", result)
+        # Must not crash and must still return a dict with the expected shape
+        self.assertIn("verified", result)
+        self.assertIn("warnings", result)
 
     # ── _execute_request_checkback ──────────────────────────────────────────
 
@@ -1076,6 +1074,148 @@ class TestExecutorOutputs(unittest.TestCase):
         self.assertEqual(result["checkback_prompt"], checkback_prompt())
         self.assertTrue(result.get("recorded"))
         self.assertNotIn("note", result)
+
+
+# ---------------------------------------------------------------------------
+# Planted-bug: fabricated number in check_result → verified=False → deliver blocked
+
+class TestPlantedBugFabricatedClaim(unittest.TestCase):
+    """
+    C1b gate: when check_result returns verified=False because a number in the
+    claim cannot be traced to supporting_data, deliver must not go through.
+    """
+
+    def test_untraceable_number_sets_verified_false(self):
+        """
+        Unit test: claim states $2.1M, supporting_data has 1.5M — no match.
+        _execute_check_result must return verified=False and name the token.
+        """
+        from api.agent_loop import _execute_check_result
+
+        result = _execute_check_result(
+            claim="Pipeline is $2.1M this quarter.",
+            supporting_data={"open_pipeline": 1_500_000},  # 1.5M — not 2.1M
+        )
+        self.assertFalse(result["verified"], "Expected verified=False; $2.1M is not in supporting_data")
+        self.assertTrue(len(result["untraceable"]) > 0, "Expected at least one untraceable token")
+
+    def test_traceable_number_passes(self):
+        """A number that IS in supporting_data must not be flagged as untraceable."""
+        from api.agent_loop import _execute_check_result
+
+        result = _execute_check_result(
+            claim="Pipeline is $2.1M this quarter.",
+            supporting_data={"open_pipeline": 2_100_000},  # exact match
+        )
+        self.assertTrue(result["verified"])
+        self.assertEqual(result["untraceable"], [])
+
+    def test_full_loop_blocks_deliver_after_failed_check(self):
+        """
+        Full loop trace: model calls check_result with a fabricated claim
+        ($2.1M not in supporting_data), then tries to deliver — the C1b gate
+        must block the deliver.  With a scripted client that has no further
+        steps, the loop exhausts budget (budget_exhausted=True).
+        """
+        import asyncio
+
+        # check_result returns verified=False (from real _execute_check_result)
+        # because 2.1M is not in {"open_pipeline": 1_500_000}.
+        # Then the scripted model ignores the failure and tries to deliver.
+        steps = [
+            {
+                "tool": "check_result",
+                "params": {
+                    "claim": "Pipeline is $2.1M.",
+                    "supporting_data": {"open_pipeline": 1_500_000},
+                },
+            },
+            _deliver("Pipeline is $2.1M.", sources=[]),
+            # No further steps — loop will exhaust budget after gate blocks deliver.
+        ]
+        client = FakeClient(steps)
+        result = asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="How is our Q4 pipeline?",
+                client=client,
+                sb=_sb(),
+            )
+        )
+        # check_result was performed
+        self.assertTrue(result.check_result_performed)
+        # Verification failed
+        self.assertFalse(result.check_result_verified)
+        # Deliver was blocked → loop exhausted budget, not a successful deliver
+        self.assertNotEqual(result.answer, "Pipeline is $2.1M.")
+
+    def test_deliver_succeeds_after_passing_check(self):
+        """
+        Confirming the gate is not over-eager: a passing check_result is followed
+        by deliver and the answer goes through normally.
+        """
+        import asyncio
+
+        steps = [
+            {
+                "tool": "check_result",
+                "params": {
+                    "claim": "Coverage is 2.49x.",
+                    "supporting_data": {"coverage_ratio": 2.49},
+                },
+            },
+            _deliver("Coverage is 2.49x.", sources=["query_pipeline_coverage"]),
+        ]
+        client = FakeClient(steps)
+        result = asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="What is our Q4 pipeline coverage?",
+                client=client,
+                sb=_sb(),
+            )
+        )
+        self.assertEqual(result.answer, "Coverage is 2.49x.")
+        self.assertTrue(result.check_result_performed)
+        self.assertTrue(result.check_result_verified)
+        self.assertFalse(result.budget_exhausted)
+
+
+# ---------------------------------------------------------------------------
+# KNOWN_PRIMITIVES callability: every registered primitive must exist in
+# api.handlers as a callable async function.
+
+class TestKnownPrimitivesCallable(unittest.TestCase):
+    """
+    Confirm that every name in KNOWN_PRIMITIVES resolves to a callable async
+    function in api.handlers.  Handler signatures have differed before; this
+    test catches renames and missing registrations before a live Q4 run.
+    """
+
+    def test_all_known_primitives_exist_and_are_async(self):
+        import inspect
+        import api.handlers as handlers
+
+        missing = []
+        not_callable = []
+        not_async = []
+
+        for name in sorted(KNOWN_PRIMITIVES):
+            fn = getattr(handlers, name, None)
+            if fn is None:
+                missing.append(name)
+            elif not callable(fn):
+                not_callable.append(name)
+            elif not inspect.iscoroutinefunction(fn):
+                not_async.append(name)
+
+        errors = []
+        if missing:
+            errors.append(f"Not found in api.handlers: {missing}")
+        if not_callable:
+            errors.append(f"Not callable: {not_callable}")
+        if not_async:
+            errors.append(f"Not async (must be async def): {not_async}")
+
+        self.assertFalse(errors, "\n".join(errors))
 
 
 if __name__ == "__main__":

@@ -150,10 +150,101 @@ _INSUFFICIENT_ANSWER = (
 
 _NUMBER_RE = re.compile(r"\b\d[\d,]*(?:\.\d+)?[MKB%x]?\b")
 
+# Claim-number extractor: handles $2.1M, 2.49x, 31%, 1,234,567
+_CLAIM_NUM_RE = re.compile(
+    r'\$\s*(\d[\d,]*(?:\.\d+)?)\s*([MKBmkb])?'  # $1.2M or $1,200,000
+    r'|(\d[\d,]*(?:\.\d+)?)\s*([MKBmkb])\b'      # 1.2M (suffix required)
+    r'|(\d[\d,]+\.\d+)(?=[x%\s,\.\)\-]|$)'        # 2.49 (decimal, no suffix)
+    r'|(\d[\d,]{2,})(?=[x%\s,\.\)\-]|$)',          # 1,234 (comma-grouped integer)
+)
+
+_QUARTER_RE = re.compile(r'\bQ[1-4]\b|\bFY\d{2,4}\b', re.IGNORECASE)
+
 
 def _has_numbers(text: str) -> bool:
     """Return True if the text contains what looks like a quantitative claim."""
     return bool(_NUMBER_RE.search(text or ""))
+
+
+def _parse_claim_number(raw: str, suffix: str) -> float | None:
+    """Convert (digits_string, suffix_char) to a plain float. Returns None on error."""
+    try:
+        val = float(raw.replace(',', ''))
+    except (ValueError, TypeError):
+        return None
+    s = (suffix or '').upper()
+    if s == 'M':
+        val *= 1_000_000
+    elif s == 'K':
+        val *= 1_000
+    elif s == 'B':
+        val *= 1_000_000_000
+    return val
+
+
+def _extract_claim_numbers(claim: str) -> list[tuple[str, float]]:
+    """Return (matched_text, normalized_float) for each number in the claim."""
+    results: list[tuple[str, float]] = []
+    seen: set[float] = set()
+    for m in _CLAIM_NUM_RE.finditer(claim):
+        token = m.group(0).strip()
+        # Group layout: (dollar_digits, dollar_suffix, bare_digits, bare_suffix,
+        #                decimal_only, comma_int)
+        g = m.groups()
+        if g[0] is not None:         # $N[suffix]
+            val = _parse_claim_number(g[0], g[1])
+        elif g[2] is not None:       # N[suffix] (suffix required branch)
+            val = _parse_claim_number(g[2], g[3])
+        elif g[4] is not None:       # decimal without suffix
+            val = _parse_claim_number(g[4], '')
+        elif g[5] is not None:       # comma-grouped integer
+            val = _parse_claim_number(g[5], '')
+        else:
+            continue
+        if val is not None and val not in seen:
+            seen.add(val)
+            results.append((token, val))
+    return results
+
+
+def _flatten_numerics(data: Any, depth: int = 0) -> list[float]:
+    """Recursively collect all numeric leaf values from a nested structure."""
+    if depth > 6 or isinstance(data, bool):
+        return []
+    if isinstance(data, (int, float)):
+        return [float(data)]
+    if isinstance(data, dict):
+        out: list[float] = []
+        for v in data.values():
+            out.extend(_flatten_numerics(v, depth + 1))
+        return out
+    if isinstance(data, list):
+        out = []
+        for item in data:
+            out.extend(_flatten_numerics(item, depth + 1))
+        return out
+    return []
+
+
+def _value_traceable(claim_val: float, known_values: list[float]) -> bool:
+    """
+    Return True if claim_val is within tolerance of any value in known_values.
+
+    Tolerance:
+      - |claim_val| > 1000: 1% relative
+      - |claim_val| <= 1000: 0.05 absolute (handles ratios, percentages)
+    Also checks claim_val / 100 to handle "31%" → 0.31 stored in data.
+    """
+    candidates = [claim_val]
+    if abs(claim_val) > 1 and abs(claim_val) <= 200:
+        # Might be a percentage stored as a fraction
+        candidates.append(claim_val / 100)
+
+    for candidate in candidates:
+        threshold = max(abs(candidate) * 0.01, 0.05) if abs(candidate) > 1000 else 0.05
+        if any(abs(candidate - kv) <= threshold for kv in known_values):
+            return True
+    return False
 
 
 # ---------------------------------------------------------------------------
@@ -166,6 +257,8 @@ class AgentLoopResult:
     plan_used: list = field(default_factory=list)
     check_result_performed: bool = False
     check_result_auto_inserted: bool = False
+    # None = no check_result called yet; True = last check passed; False = last check failed.
+    check_result_verified: bool | None = None
     assumptions: list = field(default_factory=list)
     ask_user_question: str | None = None
     budget_exhausted: bool = False
@@ -186,8 +279,15 @@ Available tools (respond with JSON — one tool call per response):
 1. call_primitive  — invoke a governed data calculator
    {"tool": "call_primitive", "params": {"name": "<primitive>", "params": {...}}}
 
-2. fetch_data  — raw table retrieval for ad-hoc data
-   {"tool": "fetch_data", "params": {"query": "<description of what to retrieve>"}}
+2. fetch_data  — structured table retrieval for ad-hoc data not covered by any primitive
+   {"tool": "fetch_data", "params": {
+     "query": "<what you need>",
+     "table": "<supabase table name>",
+     "columns": ["col1", "col2"],
+     "filters": [{"column": "c", "op": "eq", "value": "v"}],
+     "limit": 200
+   }}
+   Note: "table" is required for execution.  "columns", "filters", "limit" are optional.
 
 3. check_result  — verify a number or claim against supporting data
    {"tool": "check_result", "params": {"claim": "<what you claim>", "supporting_data": {...}}}
@@ -297,22 +397,80 @@ async def _execute_fetch_data(query: str, tool_params: dict, sb: Any) -> dict:
     return {"error": "fetch_data requires a 'table' param; no governed primitive found for this query", "query": query}
 
 
-def _execute_check_result(claim: str, supporting_data: dict) -> dict:
-    """Verify claim against supporting_data using the plausibility layer."""
+def _execute_check_result(claim: str, supporting_data: dict, question: str = "") -> dict:
+    """
+    Verify that every number in the claim can be traced to a value in
+    supporting_data (within rounding tolerance), with optional additive-sum
+    and scope checks.  Plausibility violations are surfaced as warnings only
+    — they never override trace-to-source.
+
+    Returns:
+      {
+        "verified": bool,         # False iff any claim number is untraceable
+        "claim": str,
+        "untraceable": [str],     # tokens from claim that had no match
+        "warnings": [...],        # plausibility violations (non-blocking)
+      }
+    """
+    claim_numbers = _extract_claim_numbers(claim)
+    known_values = _flatten_numerics(supporting_data or {})
+
+    untraceable: list[str] = []
+    for token, val in claim_numbers:
+        if not _value_traceable(val, known_values):
+            untraceable.append(token)
+
+    verified = len(untraceable) == 0
+
+    # Additive sum check — runs only when supporting_data carries a plan structure
+    sum_warning: str | None = None
+    plan = (supporting_data or {}).get("plan")
+    results_for_sum = (supporting_data or {}).get("results")
+    if plan and results_for_sum:
+        try:
+            from api.composer import _sub_parts_sum_check  # noqa: PLC0415
+            ok, note = _sub_parts_sum_check(plan, results_for_sum)
+            if not ok:
+                sum_warning = note
+        except Exception as exc:
+            logger.debug("[AGENT_LOOP] _sub_parts_sum_check import failed: %s", exc)
+
+    # Scope check — warning only
+    scope_warnings: list[str] = []
+    claim_quarters = _QUARTER_RE.findall(claim)
+    question_quarters = _QUARTER_RE.findall(question)
+    if claim_quarters and question_quarters:
+        cq = {q.upper() for q in claim_quarters}
+        qq = {q.upper() for q in question_quarters}
+        extra = cq - qq
+        if extra:
+            scope_warnings.append(
+                f"Claim mentions {sorted(extra)} but question asked about {sorted(qq)}"
+            )
+
+    # Plausibility — warning source only (never overrides trace verdict)
+    plausibility_warnings: list[dict] = []
     try:
         from api.plausibility import run_all_checks  # noqa: PLC0415
-        violations, should_block = run_all_checks(supporting_data)
-        return {
-            "verified": not should_block,
-            "claim": claim,
-            "violations": [
-                {"check": v.check_name, "message": v.message, "severity": v.severity}
-                for v in violations
-            ],
-        }
-    except Exception as e:
-        logger.warning(f"[AGENT_LOOP] check_result plausibility check failed: {e}")
-        return {"verified": True, "claim": claim, "violations": [], "warning": str(e)}
+        violations, _ = run_all_checks(supporting_data or {})
+        plausibility_warnings = [
+            {"check": v.check, "message": v.message, "severity": v.severity}
+            for v in violations
+        ]
+    except Exception as exc:
+        logger.debug("[AGENT_LOOP] plausibility run_all_checks failed: %s", exc)
+
+    warnings = plausibility_warnings
+    if sum_warning:
+        warnings = [{"check": "additive_sum", "message": sum_warning, "severity": "warning"}] + warnings
+    warnings += [{"check": "scope", "message": w, "severity": "warning"} for w in scope_warnings]
+
+    return {
+        "verified": verified,
+        "claim": claim,
+        "untraceable": untraceable,
+        "warnings": warnings,
+    }
 
 
 def _execute_request_checkback() -> dict:
@@ -344,6 +502,9 @@ async def run_agent_loop(
     result = AgentLoopResult(answer="")
     # C4: tracks how many times a governed-primitive redirect has fired this loop.
     _redirect_count: int = 0
+    # C1b: tracks whether the most recent check_result call returned verified=False.
+    # deliver is blocked while this is True so fabricated numbers can't be published.
+    _last_check_failed: bool = False
 
     # Seed the conversation
     messages.append({
@@ -402,11 +563,24 @@ async def run_agent_loop(
             result.steps_taken = step_idx + 1
             return result
 
-        # ── deliver: apply constraint C1 then return ──────────────────────
+        # ── deliver: apply constraints C1 and C1b then return ───────────
         elif tool == "deliver":
             answer = tool_params.get("answer", "")
             sources = tool_params.get("sources") or []
             plan_used = tool_params.get("plan_used") or []
+
+            # C1b: most recent check_result returned verified=False — block.
+            if _last_check_failed:
+                messages.append({"role": "assistant", "content": raw})
+                messages.append({"role": "user", "content": json.dumps({
+                    "error": (
+                        "deliver blocked: the most recent check_result returned "
+                        "verified=False (one or more numbers in the claim could "
+                        "not be traced to supporting_data). Correct the claim "
+                        "or call ask_user before delivering."
+                    ),
+                })})
+                continue
 
             # C1: quantitative answer without a prior check_result
             if _has_numbers(answer) and not result.check_result_performed:
@@ -426,7 +600,10 @@ async def run_agent_loop(
             tool_result = _execute_check_result(
                 tool_params.get("claim", ""),
                 tool_params.get("supporting_data", {}),
+                question=question,
             )
+            result.check_result_verified = bool(tool_result.get("verified", True))
+            _last_check_failed = not result.check_result_verified
 
         # ── call_primitive ────────────────────────────────────────────────
         elif tool == "call_primitive":
