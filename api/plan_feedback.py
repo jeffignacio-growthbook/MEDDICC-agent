@@ -183,8 +183,18 @@ def record_feedback(
 def get_confirmation_count(sb: Any, plan_sig: str) -> int:
     """
     Count distinct question instances that confirmed this plan signature.
-    Deduplication: same question_hash counts as exactly 1, regardless of
-    how many times the same question was confirmed.
+
+    Dedup boundary — same question TEXT (after normalization) → same
+    question_hash → counts as exactly 1, regardless of how many times that
+    identical text was confirmed.  The same person re-asking the same question
+    on different days is NOT a new independent instance; it is the same instance
+    seen again.
+
+    "Independent confirmation" means a DIFFERENT question text that maps to
+    this plan structure (same plan_signature, different question_hash).  Two
+    differently-worded questions about the same topic that decompose to the same
+    primitives each count as one confirmation.
+
     confirmed=False rows are excluded entirely.
     """
     try:

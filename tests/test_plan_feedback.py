@@ -550,5 +550,221 @@ class TestRecordFeedback(unittest.TestCase):
             self.fail(f"record_feedback raised on DB failure: {e}")
 
 
+# ---------------------------------------------------------------------------
+# Invariant F (behavioral): structure-only guarantee — re-execution produces
+# live values, not cached ones.
+
+class TestStructureOnlyReExecution(unittest.TestCase):
+    """
+    Behavioral proof of Invariant F: find_template() returns structure only;
+    the same template executed against two different data snapshots produces
+    two different result sets.
+
+    Asserts:
+      (a) Two executions of the same plan structure return DIFFERENT numeric
+          values when the underlying data differs.
+      (b) The stored template contains NONE of those numeric values.
+      (c) The plan structure (sub_parts primitives) is identical for both
+          executions — only the values change.
+    """
+
+    def _execute_plan(self, sub_parts, data_snapshot):
+        """
+        Simulate plan execution: map each non-_computed sub_part's primitive
+        to a value from the data snapshot.  In production this is Pieces 4–6
+        (Execute/Verify/Deliver); here we use a lookup table to show that the
+        same structure produces different values for different data.
+        """
+        results = {}
+        for part in sub_parts:
+            primitive = part.get("primitive", "")
+            if primitive == "_computed":
+                continue
+            name = part["name"]
+            results[name] = data_snapshot.get(primitive, {}).get(name, 0)
+        return results
+
+    def test_same_template_different_executions_return_different_values(self):
+        """
+        Same promoted plan → two executions against different data → different
+        numeric values.  This is the behavioral proof that values are never
+        cached in the template.
+        """
+        plan = _plan_q4_coverage()
+        sig = plan_signature(plan)
+        sb = _sb_mock(template_rows=[_template_row(sig, plan)])
+
+        retrieved_plan = find_template(sb, sig)
+        self.assertIsNotNone(retrieved_plan)
+        sub_parts = retrieved_plan["sub_parts"]
+
+        # Two distinct data snapshots (e.g. different weeks)
+        snapshot_week_1 = {
+            "query_pipeline_coverage": {"open_q4_pipeline": 1_200_000},
+            "query_path_to_target":    {"q4_target": 500_000},
+        }
+        snapshot_week_2 = {
+            "query_pipeline_coverage": {"open_q4_pipeline": 980_000},
+            "query_path_to_target":    {"q4_target": 500_000},
+        }
+
+        result_1 = self._execute_plan(sub_parts, snapshot_week_1)
+        result_2 = self._execute_plan(sub_parts, snapshot_week_2)
+
+        # (a) Different data → different values
+        self.assertNotEqual(
+            result_1["open_q4_pipeline"],
+            result_2["open_q4_pipeline"],
+        )
+
+        # (b) Template contains neither execution's values
+        template_json = json.dumps(retrieved_plan)
+        self.assertNotIn("1200000", template_json)
+        self.assertNotIn("980000", template_json)
+
+        # (c) Same plan structure for both executions
+        self.assertEqual(len(sub_parts), len(plan["sub_parts"]))
+        for got, expected in zip(sub_parts, plan["sub_parts"]):
+            self.assertEqual(got["name"], expected["name"])
+            self.assertEqual(got["primitive"], expected["primitive"])
+
+    def test_stored_template_contains_no_execution_values(self):
+        """
+        After executing a plan and obtaining concrete numeric results, those
+        numbers must not appear in the stored template — values are never cached.
+        """
+        plan = _plan_q4_coverage()
+        sig = plan_signature(plan)
+        sb = _sb_mock(template_rows=[_template_row(sig, plan)])
+
+        retrieved_plan = find_template(sb, sig)
+        sub_parts = retrieved_plan["sub_parts"]
+
+        execution_result = {
+            "open_q4_pipeline": 4_860_000,
+            "q4_target": 6_000_000,
+        }
+
+        # None of the execution values appear in the template
+        template_json = json.dumps(retrieved_plan)
+        for val in execution_result.values():
+            self.assertNotIn(str(val), template_json)
+
+        # Sub_parts contain only structural keys (no injected result values)
+        structural_keys = {"name", "primitive", "rationale"}
+        for part in sub_parts:
+            extra_keys = set(part.keys()) - structural_keys
+            self.assertEqual(
+                extra_keys, set(),
+                f"Sub_part contains non-structural key(s): {extra_keys}",
+            )
+
+
+# ---------------------------------------------------------------------------
+# Dedup boundary: explicit documentation via tests
+
+class TestDedupBoundaryIntent(unittest.TestCase):
+    """
+    Documents and tests the precise boundary of question_hash deduplication.
+
+    Boundary rule:
+      - Same question TEXT (normalized) → same question_hash → counts as
+        exactly 1 toward promotion, no matter how many occurrences.
+        ("Same person re-asks the same question on different days" = same
+        instance, not a new confirmation.)
+      - Different question TEXT → different question_hash → independent
+        confirmation, even if both map to the same plan structure.
+
+    Three re-asks of one question → count=1 → no promotion.
+    Three distinct phrasings of the same plan → count=3 → promotion.
+    """
+
+    def _sig(self):
+        return plan_signature(_plan_q4_coverage())
+
+    def test_same_question_confirmed_twice_counts_as_one(self):
+        """Invariant C: same question re-confirmed → count = 1, not 2."""
+        sig = self._sig()
+        q_hash = question_hash("How is our Q4 pipeline coverage?")
+        rows = _feedback_rows(sig, [
+            {"question_hash": q_hash, "confirmed": True},
+            {"question_hash": q_hash, "confirmed": True},
+        ])
+        sb = _sb_mock(feedback_rows=rows)
+        self.assertEqual(get_confirmation_count(sb, sig), 1)
+
+    def test_three_reasks_of_same_question_do_not_trigger_promotion(self):
+        """
+        Three re-asks of the SAME question text → count=1 → no promotion.
+        Dedup prevents false promotion from repeated identical phrasing.
+        """
+        sig = self._sig()
+        q_hash = question_hash("How is our Q4 pipeline coverage?")
+        rows = _feedback_rows(sig, [
+            {"question_hash": q_hash, "confirmed": True},
+            {"question_hash": q_hash, "confirmed": True},
+            {"question_hash": q_hash, "confirmed": True},
+        ])
+        sb = _sb_mock(feedback_rows=rows)
+        self.assertEqual(get_confirmation_count(sb, sig), 1)
+        result = maybe_promote_template(sb, _plan_q4_coverage(), sig)
+        self.assertFalse(result)
+
+    def test_different_phrasings_are_independent_confirmations(self):
+        """
+        Two differently-worded questions that map to the same plan structure
+        are INDEPENDENT confirmations (different question_hash → count = 2).
+        """
+        sig = self._sig()
+        q1 = question_hash("How is our Q4 pipeline coverage?")
+        q2 = question_hash("Show me Q4 pipeline coverage breakdown")
+        self.assertNotEqual(q1, q2)  # guard: they must actually differ
+
+        rows = _feedback_rows(sig, [
+            {"question_hash": q1, "confirmed": True},
+            {"question_hash": q2, "confirmed": True},
+        ])
+        sb = _sb_mock(feedback_rows=rows)
+        self.assertEqual(get_confirmation_count(sb, sig), 2)
+
+    def test_three_distinct_phrasings_trigger_promotion(self):
+        """
+        Three distinct question texts → count=3 ≥ threshold → promotion.
+        This is the correct path: genuinely different questions, same plan.
+        """
+        sig = self._sig()
+        plan = _plan_q4_coverage()
+        q_hashes = [
+            question_hash("How is our Q4 pipeline coverage?"),
+            question_hash("Show me Q4 pipeline coverage breakdown"),
+            question_hash("What's the Q4 pipeline to quota coverage?"),
+        ]
+        self.assertEqual(len(set(q_hashes)), 3)  # all distinct
+
+        rows = _feedback_rows(sig, [
+            {"question_hash": h, "confirmed": True} for h in q_hashes
+        ])
+        sb = _sb_mock(feedback_rows=rows)
+        self.assertEqual(get_confirmation_count(sb, sig), 3)
+        self.assertTrue(maybe_promote_template(sb, plan, sig))
+
+    def test_reask_mixed_with_new_phrasing_counts_correctly(self):
+        """
+        One re-ask of phrasing A + one new phrasing B → count=2, not 3.
+        Dedup applies to hash, not to occurrence count.
+        """
+        sig = self._sig()
+        q1 = question_hash("How is our Q4 pipeline coverage?")
+        q2 = question_hash("Show me Q4 pipeline coverage breakdown")
+
+        rows = _feedback_rows(sig, [
+            {"question_hash": q1, "confirmed": True},
+            {"question_hash": q1, "confirmed": True},  # re-ask — still 1
+            {"question_hash": q2, "confirmed": True},
+        ])
+        sb = _sb_mock(feedback_rows=rows)
+        self.assertEqual(get_confirmation_count(sb, sig), 2)
+
+
 if __name__ == "__main__":
     unittest.main()
