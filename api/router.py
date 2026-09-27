@@ -5749,7 +5749,43 @@ async def route_question(question: str, user_id: str,
     """
     from api.rep_clarification import find_pending, match_reply, apply_choice
     from api.composer import find_pending_plan, reply_affirms_plan
+    from api.plan_feedback import (
+        find_pending_checkback,
+        reply_to_checkback,
+        record_feedback,
+        maybe_promote_template,
+        checkback_prompt,
+        make_pending_checkback_entry,
+    )
     gate: dict = {}
+
+    # ── Pending checkback check (Piece 7) ─────────────────────────────────
+    # Must run first: a "yes/no" reply to a delivered composed answer is
+    # feedback, not a new question.
+    pending_cb = find_pending_checkback(history or [])
+    if pending_cb:
+        verdict = reply_to_checkback(question)
+        if verdict is not None:
+            plan_sig = pending_cb.get("plan_signature", "")
+            q_hash = pending_cb.get("question_hash", "")
+            orig_q = pending_cb.get("question", "")
+            plan = pending_cb.get("plan", {})
+            confirmed = (verdict == "confirmed")
+            record_feedback(sb, plan_sig, q_hash, orig_q, thread_ts, confirmed)
+            if confirmed:
+                maybe_promote_template(sb, plan, plan_sig)
+            ack = (
+                "Got it — glad that was right! I'll remember this approach."
+                if confirmed else
+                "Thanks for the correction — noted. Ask me the same question "
+                "again and I'll try a different approach."
+            )
+            return {
+                "answer": ack,
+                "needs_ack": False,
+                "tool_results": {},
+                "handler_name": "checkback_feedback",
+            }
 
     # ── Pending plan check (composer) ──────────────────────────────────────
     # Must run before the rep_clarification check so an affirming "yes"
@@ -5790,11 +5826,15 @@ async def route_question(question: str, user_id: str,
                 classifier_client=classifier_client if 'classifier_client' in dir() else None,
             )
             if dynamic_result.get("answered"):
+                answer = dynamic_result.get("answer", "")
+                original_q = plan.get("question", question)
+                cb_entry = make_pending_checkback_entry(plan, original_q, thread_ts)
                 return {
-                    "answer": dynamic_result.get("answer", ""),
+                    "answer": answer + checkback_prompt(),
                     "needs_ack": False,
                     "tool_results": dynamic_result.get("tool_results", {}),
                     "handler_name": "composer_executed",
+                    "history_append": [cb_entry],
                 }
         except Exception as e:
             logger.error(f"[COMPOSER] plan execution failed: {e}")

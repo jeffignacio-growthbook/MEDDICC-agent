@@ -169,7 +169,8 @@ jobs:
             tests/test_coaching_hypothesis_loop.py \
             tests/test_scope_adequacy.py \
             tests/test_composer.py \
-            tests/test_composer_verification.py
+            tests/test_composer_verification.py \
+            tests/test_plan_feedback.py
           do
             echo "::group::$t"
             if PYTHONPATH=. python3 "$t"; then

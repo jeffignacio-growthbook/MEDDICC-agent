@@ -362,6 +362,11 @@ KNOWN_FLAGGED_LOG_TAGS = {
     # the plan was built. No detect-and-ship-unresolved path exists in either
     # case.
     "[COMPOSER]",
+    # [PLAN_FEEDBACK] (api/plan_feedback.py): all log sites use "failed"
+    # or "check failed" — NOT in _FLAGGED_LOG_KEYWORDS (suspicion/gap/stale/
+    # mismatch etc.) so this tag is not found by the scan. No entry needed;
+    # reviewed here for completeness: all four sites are DB failure recovery
+    # paths (feedback skipped, promotion skipped) — no detect-and-ship gap.
 }
 
 

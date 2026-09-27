@@ -474,7 +474,8 @@ def load_thread(sb: Client, thread_ts: str) -> list:
 def save_thread(sb: Client, thread_ts: str, channel: str,
                 history: list, question: str, answer: str,
                 tool_results: dict, handler_name: str = "unknown",
-                pending_clarification: dict = None):
+                pending_clarification: dict = None,
+                extra_history_entries: list = None):
     """Append Q&A + optional entity context to thread.
 
     Args:
@@ -586,6 +587,9 @@ def save_thread(sb: Client, thread_ts: str, channel: str,
             "content": json.dumps(pending_clarification),
             "turn": len(history),
         })
+
+    for entry in (extra_history_entries or []):
+        history.append({**entry, "turn": len(history)})
 
     now = datetime.now(timezone.utc)
     sb.table("conversation_threads").upsert({

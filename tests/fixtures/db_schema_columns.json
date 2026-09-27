@@ -1,7 +1,7 @@
 {
-  "_source": "information_schema.columns, schema public (tables and views), project htgvkqycrwesdysustxd",
   "_captured_at": "2026-09-23",
   "_regenerate": "python scripts/snapshot_db_schema.py (needs SUPABASE_DB_URL)",
+  "_source": "information_schema.columns, schema public (tables and views), project htgvkqycrwesdysustxd",
   "tables": {
     "_migrations": [
       "applied_at",
@@ -163,6 +163,21 @@
       "objections_scanned_at",
       "source",
       "title",
+      "updated_at"
+    ],
+    "coaching_hypotheses": [
+      "id",
+      "component",
+      "direction",
+      "train_p",
+      "train_d",
+      "holdout_d",
+      "run_date",
+      "status",
+      "proposal",
+      "experiment",
+      "notes",
+      "created_at",
       "updated_at"
     ],
     "competitive_signals": [
@@ -489,6 +504,23 @@
       "signal_type",
       "source_company"
     ],
+    "plan_feedback": [
+      "id",
+      "plan_signature",
+      "question_hash",
+      "question_text",
+      "thread_id",
+      "confirmed",
+      "created_at"
+    ],
+    "plan_templates": [
+      "plan_signature",
+      "plan_json",
+      "confirmation_count",
+      "flagged_for_handler_review",
+      "created_at",
+      "updated_at"
+    ],
     "property_history": [
       "changed_at",
       "deal_id",
@@ -683,21 +715,6 @@
       "narrative",
       "outcome",
       "stated_reason"
-    ],
-    "coaching_hypotheses": [
-      "id",
-      "component",
-      "direction",
-      "train_p",
-      "train_d",
-      "holdout_d",
-      "run_date",
-      "status",
-      "proposal",
-      "experiment",
-      "notes",
-      "created_at",
-      "updated_at"
     ]
   }
 }
