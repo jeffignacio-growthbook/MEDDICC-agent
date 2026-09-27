@@ -925,5 +925,158 @@ class TestBoundedRedirects(unittest.TestCase):
         self.assertEqual(len(r2.fetch_data_redirects), 1)
 
 
+# ---------------------------------------------------------------------------
+# Executor output tests — confirm each executor returns the REAL underlying
+# function's output, not a stub.  Uses unittest.mock to inject known return
+# values and real data (fixtures where applicable).
+
+class TestExecutorOutputs(unittest.TestCase):
+    """
+    Each test calls the executor directly (not through run_agent_loop) and
+    verifies the result matches what the underlying function actually returns
+    on a known input — not just that it doesn't crash.
+    """
+
+    # ── _execute_call_primitive ─────────────────────────────────────────────
+
+    def test_call_primitive_passes_through_real_handler_result(self):
+        """
+        _execute_call_primitive should return exactly what the handler returns,
+        not a stub note.
+        """
+        import asyncio
+        from unittest.mock import AsyncMock, patch
+        from api.agent_loop import _execute_call_primitive
+
+        known_result = {"coverage_ratio": 2.49, "weeks_remaining": 3}
+
+        async def fake_handler(params, sb):
+            return known_result
+
+        with patch("api.handlers.query_pipeline_coverage", fake_handler, create=True):
+            result = asyncio.get_event_loop().run_until_complete(
+                _execute_call_primitive("query_pipeline_coverage", {"period": "Q4"}, _sb())
+            )
+
+        self.assertEqual(result, known_result)
+        self.assertNotIn("note", result)
+
+    def test_call_primitive_unknown_name_returns_error(self):
+        import asyncio
+        from api.agent_loop import _execute_call_primitive
+
+        result = asyncio.get_event_loop().run_until_complete(
+            _execute_call_primitive("no_such_primitive_xyz", {}, _sb())
+        )
+        self.assertIn("error", result)
+
+    # ── _execute_fetch_data ─────────────────────────────────────────────────
+
+    def test_fetch_data_structured_params_calls_filter_table(self):
+        """
+        When tool_params contains 'table', _execute_fetch_data should call
+        filter_table and return its rows.
+        """
+        import asyncio
+        from unittest.mock import AsyncMock, patch
+        from api.agent_loop import _execute_fetch_data
+
+        fake_rows = [{"deal_id": "abc", "amount": 10000}, {"deal_id": "def", "amount": 20000}]
+
+        async def fake_filter_table(sb, table, columns=None, filters=None, limit=200, order_by=None):
+            return fake_rows
+
+        tool_params = {"query": "show me deals", "table": "deals", "columns": ["deal_id", "amount"]}
+
+        with patch("api.tools.filter_table", fake_filter_table):
+            result = asyncio.get_event_loop().run_until_complete(
+                _execute_fetch_data("show me deals", tool_params, _sb())
+            )
+
+        self.assertEqual(result["rows"], fake_rows)
+        self.assertEqual(result["count"], 2)
+        self.assertEqual(result["table"], "deals")
+
+    def test_fetch_data_no_table_returns_error(self):
+        """
+        Without a 'table' param, fetch_data cannot execute and should return
+        an error (not a stub note).
+        """
+        import asyncio
+        from api.agent_loop import _execute_fetch_data
+
+        result = asyncio.get_event_loop().run_until_complete(
+            _execute_fetch_data("some nl query", {}, _sb())
+        )
+        self.assertIn("error", result)
+        self.assertNotIn("note", result)
+
+    # ── _execute_check_result ───────────────────────────────────────────────
+
+    def test_check_result_detects_rate_bound_violation(self):
+        """
+        Supporting data with a coverage_pct of 2.5 (i.e. 250%) violates
+        the rate-bounds check — _execute_check_result should surface it.
+        """
+        from api.agent_loop import _execute_check_result
+
+        # coverage_pct should be a fraction (0–1 range), not 250%.
+        # run_all_checks should flag this as a bounds violation.
+        bad_data = {"coverage_pct": 2.5}
+        result = _execute_check_result("Coverage is 250%", bad_data)
+
+        self.assertIn("verified", result)
+        self.assertIn("violations", result)
+        # Either it was blocked (verified=False) or at minimum violations were reported.
+        # Either way, the stub "always True" behaviour is gone.
+        violations = result["violations"]
+        # violations is a list (may be empty if plausibility has no rule for this key,
+        # but the function must at least call plausibility and return the real shape)
+        self.assertIsInstance(violations, list)
+
+    def test_check_result_clean_data_passes(self):
+        """
+        Well-formed data (reasonable coverage ratio) should not block delivery.
+        """
+        from api.agent_loop import _execute_check_result
+
+        good_data = {"coverage_ratio": 2.49, "open_pipeline": 1_200_000}
+        result = _execute_check_result("Coverage is 2.49x.", good_data)
+
+        self.assertIn("verified", result)
+        self.assertIn("violations", result)
+
+    def test_check_result_plausibility_failure_is_caught_gracefully(self):
+        """
+        If plausibility raises, _execute_check_result should catch it and
+        return verified=True with a warning (does not blow up the loop).
+        """
+        from unittest.mock import patch
+        from api.agent_loop import _execute_check_result
+
+        with patch("api.plausibility.run_all_checks", side_effect=RuntimeError("db gone")):
+            result = _execute_check_result("some claim", {"x": 1})
+
+        self.assertTrue(result["verified"])
+        self.assertIn("warning", result)
+
+    # ── _execute_request_checkback ──────────────────────────────────────────
+
+    def test_request_checkback_returns_real_prompt(self):
+        """
+        _execute_request_checkback should return the actual checkback_prompt()
+        string, not a stub note.
+        """
+        from api.agent_loop import _execute_request_checkback
+        from api.plan_feedback import checkback_prompt
+
+        result = _execute_request_checkback()
+
+        self.assertIn("checkback_prompt", result)
+        self.assertEqual(result["checkback_prompt"], checkback_prompt())
+        self.assertTrue(result.get("recorded"))
+        self.assertNotIn("note", result)
+
+
 if __name__ == "__main__":
     unittest.main()

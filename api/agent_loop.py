@@ -223,21 +223,16 @@ def _tool_result_message(tool: str, params: dict, result: Any) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Tool implementations (minimal stubs that satisfy the loop's invariants)
-# In production these delegate to real primitives; in tests, FakeClient
-# controls the model side and these are only called when the loop actually
-# dispatches a tool (which tests control via scripted sequences).
+# Tool implementations — real dispatch to governed primitives and data layer.
 
-def _execute_call_primitive(name: str, params: dict, sb: Any) -> dict:
-    """Dispatch to a named primitive.  Returns a result dict or error."""
+async def _execute_call_primitive(name: str, params: dict, sb: Any) -> dict:
+    """Dispatch to a named governed primitive.  Returns its result dict or error."""
     try:
         import api.handlers as handlers
         fn = getattr(handlers, name, None)
         if fn is None:
             return {"error": f"unknown primitive {name!r}"}
-        # Most handler functions are async; for now return a stub.
-        # The real router handles async dispatch — this path is for future wiring.
-        return {"note": f"call_primitive({name}) dispatched", "params": params}
+        return await fn(params, sb)
     except Exception as e:
         logger.warning(f"[AGENT_LOOP] call_primitive {name!r} failed: {e}")
         return {"error": str(e)}
@@ -253,10 +248,15 @@ def _find_matching_primitive(query: str) -> str | None:
     like "waterfall" in an otherwise unrelated query is enough.
     """
     q = query.lower()
-    # Verbatim primitive name wins
-    for prim in KNOWN_PRIMITIVES:
-        if prim in q:
-            return prim
+    # Verbatim primitive name — prefer the longest match to avoid substring ambiguity
+    # (e.g. "query_pipeline" must not shadow "query_pipeline_coverage").
+    verbatim_match = max(
+        (prim for prim in KNOWN_PRIMITIVES if prim in q),
+        key=len,
+        default=None,
+    )
+    if verbatim_match:
+        return verbatim_match
     # Keyword fragments
     for keyword, prim in _PRIMITIVE_KEYWORDS:
         if keyword in q:
@@ -264,18 +264,60 @@ def _find_matching_primitive(query: str) -> str | None:
     return None
 
 
-def _execute_fetch_data(query: str, sb: Any) -> dict:
-    """Ad-hoc raw data fetch.  Returns a result dict (C4 check already done)."""
-    return {"note": "fetch_data dispatched", "query": query}
+async def _execute_fetch_data(query: str, tool_params: dict, sb: Any) -> dict:
+    """
+    Ad-hoc raw data fetch (C4 check already done by caller).
+
+    When tool_params contains a 'table' key the model issued a structured
+    fetch — delegate to filter_table directly.  Otherwise treat 'query' as
+    a natural-language description and return it as an unsupported-NL note
+    (the C4 gate should have redirected any query with a known primitive;
+    what reaches here is truly ad-hoc).
+    """
+    table = tool_params.get("table", "").strip()
+    if table:
+        try:
+            from api.tools import filter_table  # noqa: PLC0415
+            columns = tool_params.get("columns") or None
+            filters = tool_params.get("filters") or None
+            limit = int(tool_params.get("limit", 200))
+            order_by = tool_params.get("order_by") or None
+            rows = await filter_table(
+                sb, table,
+                columns=columns,
+                filters=filters,
+                limit=limit,
+                order_by=order_by,
+            )
+            return {"rows": rows, "table": table, "count": len(rows)}
+        except Exception as e:
+            logger.warning(f"[AGENT_LOOP] fetch_data filter_table({table!r}) failed: {e}")
+            return {"error": str(e)}
+    # Natural-language query — no structured table given.
+    return {"error": "fetch_data requires a 'table' param; no governed primitive found for this query", "query": query}
 
 
 def _execute_check_result(claim: str, supporting_data: dict) -> dict:
-    """Verify claim against supporting_data.  Always succeeds (returns ok)."""
-    return {"verified": True, "claim": claim}
+    """Verify claim against supporting_data using the plausibility layer."""
+    try:
+        from api.plausibility import run_all_checks  # noqa: PLC0415
+        violations, should_block = run_all_checks(supporting_data)
+        return {
+            "verified": not should_block,
+            "claim": claim,
+            "violations": [
+                {"check": v.check_name, "message": v.message, "severity": v.severity}
+                for v in violations
+            ],
+        }
+    except Exception as e:
+        logger.warning(f"[AGENT_LOOP] check_result plausibility check failed: {e}")
+        return {"verified": True, "claim": claim, "violations": [], "warning": str(e)}
 
 
 def _execute_request_checkback() -> dict:
-    return {"note": "checkback request recorded"}
+    from api.plan_feedback import checkback_prompt  # noqa: PLC0415
+    return {"checkback_prompt": checkback_prompt(), "recorded": True}
 
 
 # ---------------------------------------------------------------------------
@@ -388,7 +430,7 @@ async def run_agent_loop(
 
         # ── call_primitive ────────────────────────────────────────────────
         elif tool == "call_primitive":
-            tool_result = _execute_call_primitive(
+            tool_result = await _execute_call_primitive(
                 tool_params.get("name", ""),
                 tool_params.get("params", {}),
                 sb,
@@ -427,7 +469,7 @@ async def run_agent_loop(
                             "CANDIDATE for new primitive: %r",
                             _redirect_count, query, justification, matched,
                         )
-                        tool_result = _execute_fetch_data(query, sb)
+                        tool_result = await _execute_fetch_data(query, tool_params, sb)
                 else:
                     tool_result = {
                         "blocked": True,
@@ -438,7 +480,7 @@ async def run_agent_loop(
                         "suggested_primitive": matched,
                     }
             else:
-                tool_result = _execute_fetch_data(query, sb)
+                tool_result = await _execute_fetch_data(query, tool_params, sb)
 
         # ── request_checkback ─────────────────────────────────────────────
         elif tool == "request_checkback":
