@@ -268,14 +268,40 @@ def make_pending_plan_entry(plan: dict, clarification_msg: str) -> dict:
     }
 
 
+def make_plan_cancelled_entry(clarification_msg: str = "cancelled") -> dict:
+    """
+    Build a plan-cancelled marker entry for thread history.
+    plan=None signals 'no active plan' to find_pending_plan().
+    Emitted by the router on any non-affirmation reply to a pending plan.
+    """
+    return {
+        "role": PENDING_PLAN_ROLE,
+        "content": json.dumps({
+            "plan": None,
+            "clarification_msg": clarification_msg,
+        }),
+    }
+
+
 def find_pending_plan(history: list) -> dict | None:
-    """Return the most-recent pending_plan entry from thread history, or None."""
+    """
+    Return the most-recent active pending_plan entry from thread history,
+    or None.
+
+    An entry with plan=None is a cancellation marker — it means no plan is
+    active. find_pending_plan returns None in that case so the router does
+    not attempt to execute a stale plan.
+    """
     for entry in reversed(history or []):
         if entry.get("role") == PENDING_PLAN_ROLE:
             try:
-                return json.loads(entry["content"])
+                parsed = json.loads(entry["content"])
             except Exception:
                 return None
+            # plan=None is a cancellation marker — treat as no active plan
+            if parsed.get("plan") is None:
+                return None
+            return parsed
     return None
 
 

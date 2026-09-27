@@ -18,12 +18,11 @@ Verification 3 — _sub_parts_sum_check reconciliation: additive vs. non-additiv
   Additive sub-parts (new_arr + expansion_arr) must still be verified.
   Concrete: three cases with real expected values.
 
-Verification 4 — Correction path: NOT-YET-BUILT explicit log.
+Verification 4 — Correction path: plan cancellation on non-affirmation.
   A reply that is a correction ("No, just new ARR") is not an affirmation.
-  The code falls through to normal routing — the plan is NOT cleared.
-  Stale pending_plan entries persist in thread history across turns.
-  These are KNOWN GAPS that Pieces 4–6 must address; this test locks in
-  the current behavior so any inadvertent future change is caught.
+  The router emits a plan_cancelled marker (plan=None) into history_append.
+  find_pending_plan() treats plan=None as "no active plan" and returns None.
+  A later "yes" in the same thread does NOT execute the stale plan.
 """
 import sys
 import unittest
@@ -38,6 +37,7 @@ from api.composer import (
     reply_affirms_plan,
     find_pending_plan,
     make_pending_plan_entry,
+    make_plan_cancelled_entry,
     PENDING_PLAN_ROLE,
 )
 
@@ -300,16 +300,14 @@ class TestSumCheckRatioVsAdditive(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Verification 4: Correction path — NOT YET BUILT
+# Verification 4: Correction path — plan cancellation on non-affirmation
 
-class TestCorrectionPathNotYetBuilt(unittest.TestCase):
+class TestCorrectionPath(unittest.TestCase):
     """
-    These tests document the current (incomplete) behavior when a user
-    replies with a correction to a pending plan rather than an affirmation.
-
-    NOT YET BUILT means: no code exists to handle this path; the tests
-    lock in the current fall-through behavior so any future change is caught.
-    Pieces 4–6 must address these gaps.
+    Verifies the correction-path fix: when a user replies to a pending plan
+    with anything other than an affirmation, the router emits a
+    plan_cancelled marker (plan=None), and find_pending_plan() returns None
+    from that point forward — so a later "yes" cannot execute the stale plan.
     """
 
     def test_correction_is_not_an_affirmation(self):
@@ -330,49 +328,96 @@ class TestCorrectionPathNotYetBuilt(unittest.TestCase):
                     f"Correction {reply!r} must not be treated as affirmation",
                 )
 
-    def test_stale_plan_not_cleared_after_correction(self):
+    def test_plan_cancelled_marker_blocks_find_pending_plan(self):
         """
-        KNOWN GAP (Piece 4 must fix): after a correction falls through,
-        the pending_plan entry is never removed from thread history.
-        The NEXT "yes" turn would execute the STALE plan if the thread
-        history is not cleared or replaced.
+        END-TO-END scenario for the stale-plan bug:
 
-        This test documents the current behavior (stale plan survives).
+          Turn 1: plan A presented → pending_plan entry appended
+          Turn 2: user sends a correction → plan_cancelled marker appended
+          Turn 3: user sends "yes" (unrelated) → find_pending_plan must
+                  return None — the stale plan A must NOT execute
+
+        This exercises the actual mechanism, not just the marker's existence.
         """
+        plan_a = _q4_plan_with_ratio()
+
+        # Turn 1: plan presented
+        turn1_entry = make_pending_plan_entry(plan_a, "Shall I go ahead?")
+
+        # Turn 2: correction — router emits a cancellation marker
+        cancelled_entry = make_plan_cancelled_entry("cancelled")
+
+        # Thread history after both turns
+        history = [turn1_entry, cancelled_entry]
+
+        # Turn 3: user says "yes" — find_pending_plan must return None
+        result = find_pending_plan(history)
+        self.assertIsNone(
+            result,
+            "After a plan_cancelled marker, find_pending_plan must return None "
+            "so a later 'yes' does not execute the stale plan.",
+        )
+
+    def test_plan_cancelled_entry_has_plan_none(self):
+        """make_plan_cancelled_entry produces a well-formed marker."""
+        entry = make_plan_cancelled_entry("cancelled after correction")
+        self.assertEqual(entry["role"], PENDING_PLAN_ROLE)
+        import json
+        parsed = json.loads(entry["content"])
+        self.assertIsNone(parsed["plan"])
+        self.assertEqual(parsed["clarification_msg"], "cancelled after correction")
+
+    def test_active_plan_before_correction_is_found(self):
+        """find_pending_plan still returns a real plan when no cancellation exists."""
         plan = _q4_plan_with_ratio()
         entry = make_pending_plan_entry(plan, "Shall I go ahead?")
         history = [entry]
-
-        # After a correction, the pending_plan entry is still there
         found = find_pending_plan(history)
-        self.assertIsNotNone(
-            found,
-            "KNOWN GAP: pending_plan not cleared after correction — "
-            "Pieces 4–6 must either (a) clear it on non-affirmation, "
-            "or (b) replace it with a corrected plan on re-decomposition.",
-        )
+        self.assertIsNotNone(found)
+        self.assertEqual(found.get("plan", {}).get("question"), plan["question"])
 
-    def test_new_plan_overwrites_stale_in_find(self):
+    def test_new_plan_after_cancellation_is_found(self):
         """
-        KNOWN WORKAROUND: if the scope_mismatch fires again on the corrected
-        question, a new pending_plan entry is appended to history.
-        find_pending_plan() returns the MOST RECENT one, so the stale one
-        is shadowed (but not removed) — correct behavior for today.
+        A re-decomposed plan appended after a cancellation marker IS found.
+        The cancellation blocks the stale plan; the new plan is visible.
         """
         stale_plan = _q4_plan_with_ratio()
         new_plan = _additive_plan()
 
         stale_entry = make_pending_plan_entry(stale_plan, "Shall I go ahead? (Q4 coverage)")
+        cancelled_entry = make_plan_cancelled_entry("cancelled")
         new_entry = make_pending_plan_entry(new_plan, "Shall I go ahead? (Q4 total ARR)")
 
-        history = [stale_entry, new_entry]
+        history = [stale_entry, cancelled_entry, new_entry]
         found = find_pending_plan(history)
 
-        # Most-recent wins
+        self.assertIsNotNone(found, "New plan after cancellation must be found")
         self.assertEqual(
             found.get("plan", {}).get("question"),
             new_plan["question"],
-            "find_pending_plan must return the most-recent pending_plan entry",
+            "find_pending_plan must return the new plan, not the stale one",
+        )
+
+    def test_cancellation_mid_history_blocks_stale_plan(self):
+        """
+        Cancellation that is NOT the last entry still blocks the stale plan
+        before it, while the new plan after it is found correctly.
+        Separately: a second cancellation at the end leaves no active plan.
+        """
+        plan_a = _q4_plan_with_ratio()
+        plan_b = _additive_plan()
+
+        entry_a = make_pending_plan_entry(plan_a, "Plan A")
+        cancel1 = make_plan_cancelled_entry("user corrected")
+        entry_b = make_pending_plan_entry(plan_b, "Plan B")
+        cancel2 = make_plan_cancelled_entry("user cancelled again")
+
+        # History: A → cancel → B → cancel
+        history = [entry_a, cancel1, entry_b, cancel2]
+        result = find_pending_plan(history)
+        self.assertIsNone(
+            result,
+            "Second cancellation blocks plan B — no active plan remains",
         )
 
     def test_affirmations_are_still_recognized(self):

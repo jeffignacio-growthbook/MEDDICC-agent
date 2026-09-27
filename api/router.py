@@ -5748,7 +5748,7 @@ async def route_question(question: str, user_id: str,
     in code, whatever path produced the answer.
     """
     from api.rep_clarification import find_pending, match_reply, apply_choice
-    from api.composer import find_pending_plan, reply_affirms_plan
+    from api.composer import find_pending_plan, reply_affirms_plan, make_plan_cancelled_entry
     from api.plan_feedback import (
         find_pending_checkback,
         reply_to_checkback,
@@ -5840,6 +5840,22 @@ async def route_question(question: str, user_id: str,
             logger.error(f"[COMPOSER] plan execution failed: {e}")
         # If execution failed, fall through to normal routing
 
+    elif pending_plan_entry:
+        # User replied to a pending plan but did NOT affirm it.
+        # Emit a cancellation marker so find_pending_plan() returns None
+        # on subsequent turns — prevents a later "yes" from executing the
+        # stale plan.
+        cancelled_entry = make_plan_cancelled_entry(
+            pending_plan_entry.get("clarification_msg", "cancelled")
+        )
+        logger.info("[COMPOSER] non-affirmation reply — cancelling pending plan")
+        # The marker is appended to history_append in the result below;
+        # we thread it through _route_question's result after routing.
+        # Store it so the code below can attach it.
+        _plan_cancelled_entry = cancelled_entry
+    else:
+        _plan_cancelled_entry = None
+
     pending = find_pending(history or [])
     if pending:
         choice = match_reply(question, pending)
@@ -5858,6 +5874,9 @@ async def route_question(question: str, user_id: str,
         result["answer"] = f"{gate['disclosure']}\n\n{result['answer']}"
     if gate.get("resolved_question"):
         result["resolved_question"] = gate["resolved_question"]
+    if _plan_cancelled_entry is not None:
+        existing = result.get("history_append") or []
+        result["history_append"] = [_plan_cancelled_entry] + existing
     return result
 
 
