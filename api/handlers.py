@@ -883,7 +883,9 @@ async def query_waterfall(params: dict, sb) -> dict:
     # Use more specific patterns to avoid overlap
     movement_keywords = ["change", "moved", "movement", "trend",
                         "how did", "what happened", "new pipeline",
-                        "won this", "lost this"]
+                        "won this", "lost this",
+                        "generat", "by week", "weekly", "entered", "added",
+                        "inflow", "came in", "pipeline added"]
     snapshot_keywords = ["current", "open", "show me", "what's in",
                         "what deals", "snapshot", "how much"]
 
