@@ -221,6 +221,13 @@ def _sub_parts_sum_check(plan: dict, results: dict) -> tuple[bool, str]:
             stated = r.get("total") or r.get("total_arr")
             if not isinstance(stated, (int, float)):
                 continue
+            # Only attempt sum-check for additive relationships.
+            # A rationale that uses "/" or "*" references part names in the
+            # text without implying their values should be summed — treating
+            # coverage_ratio = pipeline / target as a sum would always flag
+            # a false mismatch.  Skip verification for non-additive rationales.
+            if "+" not in rationale:
+                continue
             # Find referenced part names in rationale
             refs = [p["name"] for p in sub_parts
                     if p.get("primitive") != "_computed"
