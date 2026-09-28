@@ -6812,6 +6812,7 @@ async def query_path_to_target(params: dict, sb) -> dict:
         if "covered_by_stretch" in _plan:
             _plan["covered_by_pipeline"] = _plan.pop("covered_by_stretch")
 
+
     # Rename existing_scenarios in output — "Likely" is reserved for the forecast category.
     feas = result.get("feasibility") or {}
     n_cyc = feas.get("n_cycles")
