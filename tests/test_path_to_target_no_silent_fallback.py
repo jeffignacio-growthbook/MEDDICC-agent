@@ -251,6 +251,95 @@ def test_qtd_closed_won_is_disclosed():
         )
 
 
+def test_conservative_uses_forecast_not_stage_rows():
+    """Conservative must come from COMMIT+ML deals, not by_stage_order.weighted_value.
+
+    Planted bug: by_stage_order rows have no 'weighted_value' field (they only carry
+    close-rate stats). Summing those fields always yields 0.0, so Conservative = 0.
+    Fix: query forecast_category instead and use the COMMIT+ML unweighted total."""
+    handler = _import_handler()
+    sb = MagicMock()
+    fake_cov = _make_cov(quota=1_550_000.0, stretch=2_100_000.0, weighted=713_000.0)
+
+    commit_deal = {
+        "deal_id": "c1", "close_date": "2026-09-15",
+        "deal_status": "active", "pipeline_id": "default",
+        "new_arr": 400_000, "expansion_arr": 0,
+        "forecast_category": "COMMIT",
+    }
+    captured = {}
+
+    def _capture_ptt(gap, scenarios, feasibility, **kwargs):
+        captured["conservative"] = scenarios.get("conservative")
+        captured["likely"] = scenarios.get("likely")
+        return {
+            "gap_bare": gap, "feasibility": feasibility, "headline": "test",
+            "bare_plan": {}, "padded_plan": {}, "existing_scenarios": scenarios,
+            "gap_padded": gap * 1.5, "pad_multiplier": 1.5, "net_new_viable": True,
+        }
+
+    def _fake_select_all(supabase, table, columns="*", filters=None, **kwargs):
+        # COMMIT+ML query: in_ filter on forecast_category and active status
+        if table == "deals" and filters and any(
+            f[0] == "in_" and f[1] == "forecast_category" for f in (filters or [])
+        ):
+            return [commit_deal]
+        return []
+
+    with (
+        patch("pipeline_coverage.assess_pipeline_coverage", return_value=fake_cov),
+        patch("api.time_resolver.current_quarter_label", return_value="Q4_FY2027"),
+        patch("api.time_resolver.quarter_end_date", return_value=_Q_END),
+        patch("api.time_resolver._client_config",
+              return_value={"fiscal": {"fy_start_month": 2}}),
+        patch("api.time_resolver._today", return_value=_TODAY),
+        patch("utils.get_fiscal_quarter", return_value=_FAKE_GET_FQ),
+        patch("field_semantics.is_incremental_pipeline", return_value=True),
+        patch("api.incremental_arr.incremental_arr", return_value=400_000),
+        patch("api.handlers.select_all", side_effect=_fake_select_all),
+        patch("path_to_target.time_feasibility", return_value=_make_feasibility()),
+        patch("path_to_target.path_to_target", side_effect=_capture_ptt),
+    ):
+        result = _run(handler({}, sb))
+
+    if result.get("status") == "error":
+        pytest.fail(f"Handler returned error unexpectedly: {result}")
+
+    conservative = captured.get("conservative")
+    assert conservative is not None, "path_to_target was never called"
+    assert conservative > 0, (
+        f"Conservative={conservative} — should be the COMMIT+ML unweighted total ($400K). "
+        "Planted bug: by_stage_order.weighted_value is always None on stage rows, "
+        "making the top-2-stage sum 0. Fix: query forecast_category directly."
+    )
+    assert abs(conservative - 400_000) < 1.0, (
+        f"Conservative={conservative:,.0f}, expected $400,000 from COMMIT deal. "
+        "Check that is_incremental_pipeline and incremental_arr are applied."
+    )
+
+
+def test_gap_regression_373400_gives_1176600_bare_and_1764900_padded():
+    """quota $1.55M minus closed-won $373,400 → bare gap $1,176,600, padded $1,764,900.
+
+    This is the reference arithmetic from the 2026-09-26 live validation. The padded
+    scenario is 1.5× the bare gap. Both must be present in the result."""
+    from scripts.analytics.path_to_target import (
+        path_to_target as _ptt_direct,
+        time_feasibility,
+    )
+    gap = 1_550_000 - 373_400  # 1_176_600
+    feas = time_feasibility(33, [20] * 10 + [45] * 30 + [80] * 40)
+    scen = {"conservative": 1_304_403, "likely": 1_527_544, "stretch": 4_897_066}
+    r = _ptt_direct(gap, scen, feas)
+    assert abs(r["gap_bare"] - 1_176_600) < 1.0, (
+        f"bare gap = {r['gap_bare']:,.0f}, expected 1,176,600"
+    )
+    assert abs(r["gap_padded"] - 1_764_900) < 1.0, (
+        f"padded gap = {r['gap_padded']:,.0f}, expected 1,764,900 (1.5 × 1,176,600)"
+    )
+    assert "padded_plan" in r, "padded_plan missing from path_to_target result"
+
+
 if __name__ == "__main__":
     test_quarter_end_date_failure_returns_error()
     print("PASS: quarter_end_date failure returns error (not silent days_remaining=30)")
@@ -260,3 +349,9 @@ if __name__ == "__main__":
 
     test_qtd_closed_won_is_disclosed()
     print("PASS: qtd_closed_won and target_basis are disclosed in result")
+
+    test_conservative_uses_forecast_not_stage_rows()
+    print("PASS: conservative uses COMMIT+ML forecast, not broken by_stage_order.weighted_value")
+
+    test_gap_regression_373400_gives_1176600_bare_and_1764900_padded()
+    print("PASS: $1.55M - $373.4K = $1.176M bare, $1.765M padded")
