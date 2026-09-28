@@ -163,12 +163,16 @@ class TestQuantitativeAnswerRequiresCheckResult(unittest.TestCase):
 
     def test_quantitative_answer_delivered_correctly(self):
         """Answer text is preserved when check_result was called."""
+        from unittest.mock import patch
         steps = [
             _call_primitive("query_pipeline_coverage"),
             _check_result("coverage is 2.49x", {"coverage_ratio": 2.49}),
             _deliver("Q4 pipeline coverage is 2.49x.", sources=["query_pipeline_coverage"]),
         ]
-        result = self._run(steps)
+        async def fake_handler(params, sb):
+            return {"period": "Q4 FY26", "coverage_ratio": 2.49}
+        with patch("api.handlers.query_pipeline_coverage", fake_handler):
+            result = self._run(steps)
         self.assertIn("2.49", result.answer)
 
     def test_sources_passed_through(self):
@@ -534,7 +538,11 @@ class TestPlantedBugFetchDataGoverned(unittest.TestCase):
 
     def test_loop_continues_after_c4_redirect(self):
         """C4 redirect does not end the loop — deliver still executes."""
-        _, result = self._run_governed("fetch pipeline coverage data for Q4")
+        from unittest.mock import patch
+        async def fake_handler(params, sb):
+            return {"period": "Q4 FY26", "ratio": 2.49}
+        with patch("api.handlers.query_path_to_target", fake_handler):
+            _, result = self._run_governed("fetch pipeline coverage data for Q4")
         self.assertFalse(result.budget_exhausted)
         self.assertNotEqual(result.answer, "",
                              "Loop must deliver an answer after C4 redirect")
@@ -646,19 +654,23 @@ class TestStepBudgetEnforced(unittest.TestCase):
     def test_budget_not_triggered_within_budget(self):
         """A 3-step sequence does not trigger budget exhaustion."""
         import asyncio
+        from unittest.mock import patch
         steps = [
             _call_primitive("query_pipeline_coverage"),
             _check_result("coverage 2.49x", {"ratio": 2.49}),
             _deliver("Coverage is 2.49x.", sources=["query_pipeline_coverage"]),
         ]
         client = FakeClient(steps)
-        result = asyncio.get_event_loop().run_until_complete(
-            run_agent_loop(
-                question="Coverage?",
-                client=client,
-                sb=_sb(),
+        async def fake_handler(params, sb):
+            return {"ratio": 2.49}
+        with patch("api.handlers.query_pipeline_coverage", fake_handler):
+            result = asyncio.get_event_loop().run_until_complete(
+                run_agent_loop(
+                    question="Coverage?",
+                    client=client,
+                    sb=_sb(),
+                )
             )
-        )
         self.assertFalse(result.budget_exhausted)
 
     def test_max_steps_is_reasonable(self):
@@ -786,12 +798,16 @@ class TestStepCountAccurate(unittest.TestCase):
         ), client
 
     def test_three_step_sequence(self):
+        from unittest.mock import patch
         steps = [
             _call_primitive("query_pipeline_coverage"),
             _check_result("2.49x", {"ratio": 2.49}),
             _deliver("2.49x.", sources=["query_pipeline_coverage"]),
         ]
-        result, client = self._run(steps)
+        async def fake_handler(params, sb):
+            return {"ratio": 2.49}
+        with patch("api.handlers.query_pipeline_coverage", fake_handler):
+            result, client = self._run(steps)
         self.assertEqual(result.steps_taken, 3)
 
     def test_single_step_ask_user(self):
@@ -916,6 +932,7 @@ class TestBoundedRedirects(unittest.TestCase):
         message (no justification required on the first redirect).
         """
         import asyncio
+        from unittest.mock import patch
         steps = [
             _fetch_data("pipeline coverage Q4"),    # step 1: first governed → standard block
             _call_primitive("query_pipeline_coverage"),
@@ -923,13 +940,16 @@ class TestBoundedRedirects(unittest.TestCase):
             _deliver("Coverage is 2.49x.", sources=["query_pipeline_coverage"]),
         ]
         client = FakeClient(steps)
-        result = asyncio.get_event_loop().run_until_complete(
-            run_agent_loop(
-                question="How is our Q4 pipeline coverage?",
-                client=client,
-                sb=_sb(),
+        async def fake_handler(params, sb):
+            return {"period": "Q4 FY26", "ratio": 2.49}
+        with patch("api.handlers.query_pipeline_coverage", fake_handler):
+            result = asyncio.get_event_loop().run_until_complete(
+                run_agent_loop(
+                    question="How is our Q4 pipeline coverage?",
+                    client=client,
+                    sb=_sb(),
+                )
             )
-        )
         # First redirect recorded, loop continues to deliver
         self.assertEqual(len(result.fetch_data_redirects), 1)
         self.assertFalse(result.budget_exhausted)
