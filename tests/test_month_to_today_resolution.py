@@ -27,15 +27,19 @@ Fix:
 These tests verify the resolver and defense-in-depth behavior offline.
 """
 import sys
-from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from api.time_resolver import resolve_time_window
+from api.time_resolver import resolve_time_window, _client_config
+from sdr_utils import today_in_reporting_tz
 
-
-TODAY = date.today()
+# Use the same "today" the resolver uses — reporting TZ from client.yaml, not
+# the server's UTC clock.  date.today() disagrees with today_in_reporting_tz()
+# near midnight UTC when the reporting TZ is behind UTC (e.g. America/New_York),
+# causing spurious failures in CI.
+TODAY = today_in_reporting_tz(_client_config())
 
 
 def test_specific_with_null_end_resolves_to_today():
