@@ -6636,7 +6636,7 @@ async def query_path_to_target(params: dict, sb) -> dict:
     """
     from path_to_target import time_feasibility as _time_feasibility, path_to_target as _ptt
     from pipeline_coverage import assess_pipeline_coverage
-    from api.time_resolver import current_quarter_label, quarter_end_date
+    from api.time_resolver import current_quarter_label
 
     # 1. Get pipeline coverage data (existing pipeline scenarios).
     try:
@@ -6682,7 +6682,8 @@ async def query_path_to_target(params: dict, sb) -> dict:
     # 3. Compute days_remaining from quarter end.
     try:
         from datetime import date as _date
-        q_end = quarter_end_date(current_quarter_label())
+        from api.time_resolver import quarter_end_date as _quarter_end_date
+        q_end = _quarter_end_date(current_quarter_label())
         days_remaining = max(0, (q_end - _date.today()).days)
     except Exception:
         days_remaining = 30  # safe fallback
