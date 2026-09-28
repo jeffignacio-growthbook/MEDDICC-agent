@@ -6622,17 +6622,17 @@ async def query_path_to_target(params: dict, sb) -> dict:
     """
     Path-to-target: time-feasibility gate + dual-lever gap plan.
 
-    Wraps time_feasibility() + path_to_target() from
-    scripts/analytics/path_to_target.py. Composes three primitives:
-      - assess_pipeline_coverage → weighted_total (likely scenario),
-        raw_pipeline_total (stretch), by_stage_order for conservative
-      - compute_cycle_time → won cycle lengths for time_feasibility()
-      - quarter end date → days_remaining
+    Three pipeline figures, each labeled by what it is:
+      - forecast_commit_ml: COMMIT + Most Likely deals, unweighted ARR
+        (what reps have staged for close this quarter)
+      - reliability_adjusted_forecast: forecast × historical COMMIT+ML hit rate
+        (how much of the forecast lands based on history, with N stated)
+      - stage_weighted_ev: all qualified deals × historical stage close rates
+        (the stage-weighted expected value; drives net-new math)
+      - unweighted_pipeline: total qualified pipeline, no win-rate applied
 
-    Gap basis: quota_only (not quota+stretch). Stretch is aspirational;
-    the committed gap is quota minus QTD closed-won. Both are disclosed
-    in the output. Returns path_to_target() result dict augmented with
-    qtd_closed_won, target_used, target_basis, days_remaining.
+    Gap basis: quota_only (quota minus QTD closed-won).
+    Closed-won basis: new_arr + expansion_arr (incremental ARR), renewals excluded.
     Read-only. No required params.
     """
     from path_to_target import time_feasibility as _time_feasibility, path_to_target as _ptt
@@ -6640,11 +6640,13 @@ async def query_path_to_target(params: dict, sb) -> dict:
     from api.time_resolver import (current_quarter_label, quarter_end_date as _quarter_end_date,
                                    _client_config, _today)
     from utils import get_fiscal_quarter
+    from field_semantics import is_incremental_pipeline
+    from api.incremental_arr import incremental_arr as _incremental_arr
 
     config = _client_config()
     today = _today(config)
 
-    # 1. Get pipeline coverage data (existing pipeline scenarios).
+    # 1. Pipeline coverage — gives weighted total and unweighted total.
     try:
         cov = assess_pipeline_coverage(sb)
     except Exception as e:
@@ -6656,40 +6658,22 @@ async def query_path_to_target(params: dict, sb) -> dict:
     weighted = (cov.get("stage_weighting") or {}).get("weighted_value") or 0.0
     raw = (cov.get("qualified_pipeline") or {}).get("raw_value") or 0.0
 
-    # Conservative = sum of the two highest-order stage buckets (late-stage pipeline)
-    # from by_stage_order; fall back to 70% of weighted if not computable.
-    try:
-        by_stage = (cov.get("stage_weighting") or {}).get("by_stage_order") or {}
-        orders = sorted(by_stage.keys(), reverse=True)
-        conservative = sum(
-            (by_stage[o].get("weighted_value") or 0.0)
-            for o in orders[:2]
-        ) if orders else weighted * 0.7
-    except Exception:
-        conservative = weighted * 0.7
-
-    existing_scenarios = {
-        "conservative": float(conservative),
-        "likely": float(weighted),
-        "stretch": float(raw),
-    }
-
-    # 2. Target: quota-only is the committed target; quota+stretch is aspirational.
-    # Gap is computed against quota so the answer is auditable against commitments.
-    # Both are disclosed in the output so the caller can surface either.
+    # 2. Target: quota-only for committed gap; stretch is aspirational.
     real_target = cov.get("real_target") or {}
     quota = real_target.get("quota")
     goal_stretch = real_target.get("goal")  # quota + stretch (aspirational)
 
-    # 3. Compute days_remaining — no silent fallback.
-    # If quarter_end_date fails, the gap plan is uncomputable and we surface the error.
+    # 3. Quarter boundaries and days_remaining — no silent fallback.
     try:
         q_label = current_quarter_label()
         q_end = _quarter_end_date(q_label)
         days_remaining = max(0, (q_end - today).days)
+        q_start, _, _ = get_fiscal_quarter(today)
+        q_start_iso = q_start.isoformat()
+        q_end_iso = q_end.isoformat()
     except Exception as e:
         return {
-            "error": f"Cannot compute quarter end date: {e}",
+            "error": f"Cannot compute quarter boundaries: {e}",
             "status": "error",
             "_diagnostic": (
                 "quarter_end_date or current_quarter_label failed — "
@@ -6697,16 +6681,13 @@ async def query_path_to_target(params: dict, sb) -> dict:
             ),
         }
 
-    # 4. QTD closed-won: incremental ARR closed this quarter.
-    # This is subtracted from quota to give the true remaining commitment gap.
+    # 4. QTD closed-won: incremental ARR (new_arr + expansion_arr, renewals excluded).
+    # Basis stated: is_incremental_pipeline excludes pure renewals (pipeline_id 866608541
+    # with no expansion_arr). Difference from a new_arr-only figure equals expansion ARR
+    # on won deals this quarter.
     qtd_closed_won = 0.0
     qtd_won_count = 0
     try:
-        q_start, _, _ = get_fiscal_quarter(today)
-        q_start_iso = q_start.isoformat()
-        q_end_iso = q_end.isoformat()
-        from field_semantics import is_incremental_pipeline
-        from api.incremental_arr import incremental_arr as _incremental_arr
         qtd_won_raw = select_all(
             sb, "deals",
             columns="deal_id,close_date,deal_status,pipeline_id,new_arr,expansion_arr",
@@ -6719,9 +6700,67 @@ async def query_path_to_target(params: dict, sb) -> dict:
                 qtd_closed_won += _incremental_arr(d)
                 qtd_won_count += 1
     except Exception:
-        pass  # qtd_closed_won stays 0.0; disclosed in output
+        pass  # stays 0.0; disclosed in output
 
-    # 5. Won cycle days for time_feasibility — all historical won deals, not QTD only.
+    # 5. COMMIT + Most Likely forecast: unweighted ARR reps have staged for close.
+    # This is the "Forecast" figure — distinct from stage-weighted EV.
+    # by_stage_order rows do NOT carry weighted_value (only close-rate stats), so
+    # Conservative can't be read from there; query forecast_category instead.
+    forecast_commit_ml = 0.0
+    forecast_deal_count = 0
+    try:
+        commit_ml_raw = select_all(
+            sb, "deals",
+            columns="deal_id,close_date,deal_status,pipeline_id,new_arr,expansion_arr,forecast_category",
+            filters=[
+                ("in_", "forecast_category", ["COMMIT", "MOST_LIKELY"]),
+                ("eq", "deal_status", "active"),
+                ("gte", "close_date", q_start_iso),
+                ("lte", "close_date", q_end_iso),
+            ],
+        )
+        for d in commit_ml_raw:
+            if is_incremental_pipeline(d):
+                forecast_commit_ml += _incremental_arr(d)
+                forecast_deal_count += 1
+    except Exception:
+        pass  # stays 0.0; disclosed in output
+
+    # 6. Historical COMMIT+ML hit rate (count-based, pooled across complete quarters).
+    # Reliability-adjusted forecast = forecast × hit_rate.
+    commit_hit_rate = None
+    commit_hit_rate_n = 0
+    try:
+        from forecast_analyses import query_commit_ml_calibration_by_week
+        cal = query_commit_ml_calibration_by_week(sb)
+        by_week = cal.get("by_week") or {}
+        total_won_hist = sum((row.get("won") or 0) for row in by_week.values())
+        total_classified = sum((row.get("classified") or 0) for row in by_week.values())
+        if total_classified:
+            commit_hit_rate = total_won_hist / total_classified
+            commit_hit_rate_n = total_classified
+    except Exception:
+        pass
+
+    reliability_adjusted = (
+        float(forecast_commit_ml) * float(commit_hit_rate)
+        if (forecast_commit_ml and commit_hit_rate)
+        else None
+    )
+
+    # 7. Scenarios for path_to_target():
+    # - conservative = COMMIT+ML forecast (most confident close signal from reps)
+    # - likely = stage-weighted EV (drives net-new math: gap - likely = net-new needed)
+    # - stretch = unweighted pipeline (all qualified pipeline, no win-rate applied)
+    # NOTE: "Likely" here is stage-weighted EV, NOT the forecast category. Renamed in output.
+    conservative = forecast_commit_ml if forecast_commit_ml > 0.0 else weighted * 0.7
+    existing_scenarios = {
+        "conservative": float(conservative),
+        "likely": float(weighted),
+        "stretch": float(raw),
+    }
+
+    # 8. Won cycle days — all historical won deals (no date filter).
     won_cycle_days = []
     try:
         from datetime import date as _date_cls
@@ -6742,15 +6781,12 @@ async def query_path_to_target(params: dict, sb) -> dict:
     except Exception:
         won_cycle_days = []
 
-    # 6. Gap: quota minus already-closed this quarter = remaining commitment.
-    # path_to_target() then deducts existing likely pipeline to size net-new.
-    # Using quota-only: stretch is aspirational, not committed.
+    # 9. Gap = quota minus QTD closed-won (remaining commitment).
     if quota is not None:
         gap_bare = max(0.0, float(quota) - qtd_closed_won)
         target_used = float(quota)
         target_basis = "quota_only"
     else:
-        # quota row missing from rep_targets; fall through to coverage's weighted gap.
         gap_info = (cov.get("gap_to_goal") or {}).get("weighted_pipeline_vs_goal") or {}
         if gap_info.get("status") == "short":
             gap_bare = float(gap_info.get("amount", 0.0))
@@ -6761,11 +6797,44 @@ async def query_path_to_target(params: dict, sb) -> dict:
         target_used = float(goal_stretch) if goal_stretch is not None else None
         target_basis = "quota_plus_stretch_fallback"
 
-    # 7. Compose.
+    # 10. Compose gap plan (bare + 1.5x padded).
     feasibility = _time_feasibility(days_remaining, won_cycle_days)
     result = _ptt(gap_bare, existing_scenarios, feasibility)
 
-    # Augment with QTD context and target basis for auditability.
+    # Rename existing_scenarios in output — "Likely" is reserved for the forecast category.
+    feas = result.get("feasibility") or {}
+    n_cyc = feas.get("n_cycles")
+    frac = feas.get("feasible_fraction")
+    result["existing_scenarios"] = {
+        "forecast_commit_ml": float(conservative),
+        "stage_weighted_ev": float(weighted),
+        "unweighted_pipeline": float(raw),
+        "scenario_definitions": (
+            "forecast_commit_ml = active COMMIT+MOST_LIKELY deals, unweighted ARR "
+            "(what reps say will close); "
+            "stage_weighted_ev = all qualified deals × historical stage close rates "
+            "(drives net-new math); "
+            "unweighted_pipeline = total qualified pipeline, no win-rate applied"
+        ),
+    }
+
+    # Augment with three labeled figures and audit fields.
+    result["forecast_commit_ml"] = float(forecast_commit_ml)
+    result["forecast_deal_count"] = forecast_deal_count
+    result["stage_weighted_ev"] = float(weighted)
+    result["unweighted_pipeline"] = float(raw)
+    result["reliability_adjusted_forecast"] = reliability_adjusted
+    result["commit_hit_rate"] = commit_hit_rate
+    result["commit_hit_rate_n"] = commit_hit_rate_n
+    result["cycle_stats_label"] = (
+        f"{(frac or 0):.0%} of historical won deals (n={n_cyc}, all-time, "
+        f"create→close) closed within {days_remaining} days"
+    )
+    result["closed_won_basis"] = (
+        "new_arr + expansion_arr (incremental ARR); renewals excluded via "
+        "is_incremental_pipeline. Differs from new_arr-only by the expansion_arr "
+        "on QTD won deals."
+    )
     result["qtd_closed_won"] = qtd_closed_won
     result["qtd_won_deal_count"] = qtd_won_count
     result["target_used"] = target_used
