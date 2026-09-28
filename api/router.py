@@ -221,13 +221,19 @@ HANDLER_DESCRIPTIONS = {
         "earlier gap was an ETL fetch bug, since fixed)."
     ),
     "query_quarter_health": (
-        "ARE WE IN GOOD SHAPE THIS QUARTER: one overall read on the current quarter: "
+        "ARE WE IN GOOD SHAPE THIS QUARTER / FORECAST UPDATE: one overall read on the current quarter: "
         "closed won against target and pace, stage-weighted coverage of what is "
         "still needed, and how far to trust it (forecast risk, loss rate, reps), "
         "as a plain-language verdict with each figure's own basis. Use "
         "for: 'are we in good shape this quarter', 'how is the quarter looking "
-        "overall', 'quarter health check', 'overall read on this quarter'. NOT for "
-        "any one of those four alone (query_forecast_trust, query_pipeline, "
+        "overall', 'quarter health check', 'overall read on this quarter', "
+        "'forecast update', 'give me a forecast update', 'succinct forecast update', "
+        "'brief forecast', 'quick read on the quarter'. "
+        "Overlap check with query_forecast_trust: query_forecast_trust answers ONLY "
+        "how trustworthy the current COMMIT+ML number is (risk read, historical rate); "
+        "this handler answers the FULL quarter read including closed won, target gap, "
+        "pipeline coverage AND forecast trust together. "
+        "NOT for any one figure alone (query_forecast_trust, query_pipeline, "
         "query_high_priority_deal_risk, query_loss_concentration) and NOT for the "
         "downside or worst case (query_quarter_downside)."
     ),

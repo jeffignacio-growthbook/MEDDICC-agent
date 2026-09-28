@@ -1270,13 +1270,14 @@ async def query_loss_concentration(params: dict, sb) -> dict:
         }
 
 
-async def _quarter_health_entry(scenario: str, sb) -> dict:
+async def _quarter_health_entry(scenario: str, sb, brief_mode: bool = False) -> dict:
     # Current quarter only: every composed primitive defaults to it, and a
     # classifier-extracted time_window or owner is deliberately not passed
     # on, so the figures always cover the same period.
     import api.quarter_health as quarter_health
     try:
-        return await quarter_health.compose_quarter_health(sb, {}, scenario)
+        return await quarter_health.compose_quarter_health(sb, {}, scenario,
+                                                           brief_mode=brief_mode)
     except Exception as e:
         logger.error(f"[QUARTER_HEALTH] {scenario} composition failed: {e}")
         return {"status": "error", "error": f"Failed to compose quarter health: {e}"}
@@ -1290,7 +1291,9 @@ async def query_quarter_health(params: dict, sb) -> dict:
     stage-weighted coverage of what is still needed, and the modifiers on
     it; each figure with its own disclosed basis, never blended into a score.
     """
-    return await _quarter_health_entry("base", sb)
+    import api.quarter_health as quarter_health
+    brief = quarter_health.is_brief_mode(params.get("question") or "")
+    return await _quarter_health_entry("base", sb, brief_mode=brief)
 
 
 async def query_quarter_downside(params: dict, sb) -> dict:
