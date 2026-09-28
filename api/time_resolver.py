@@ -87,6 +87,37 @@ def current_quarter_label() -> str:
         _today(config), {"fiscal": config.get("fiscal", {})})
     return label.replace(" ", "_")
 
+def quarter_end_date(label: str):
+    """Return the last date of the fiscal quarter identified by label (e.g. 'Q3_FY2027').
+
+    Parses the Q<N>_FY<YYYY> format produced by current_quarter_label().
+    Uses fiscal.fy_start_month from client.yaml (default 1 = calendar year).
+    """
+    import calendar as _calendar
+    label = label.replace(" ", "_")
+    parts = label.split("_")
+    quarter_num = None
+    fy_year = None
+    for p in parts:
+        if p.startswith("Q") and p[1:].isdigit():
+            quarter_num = int(p[1:])
+        elif p.startswith("FY") and p[2:].isdigit():
+            fy_year = int(p[2:])
+    if quarter_num is None or fy_year is None:
+        raise ValueError(f"Cannot parse quarter label: {label!r}")
+    config = _client_config()
+    fy_start_month = config.get("fiscal", {}).get("fy_start_month", 1)
+    # FY label is the year the FY ends; back-compute the calendar year FY started.
+    start_year = fy_year if fy_start_month == 1 else fy_year - 1
+    q_month_offset = (quarter_num - 1) * 3
+    q_end_month_idx = (fy_start_month - 1) + q_month_offset + 2  # 0-indexed from Jan of start_year
+    q_end_year = start_year + q_end_month_idx // 12
+    q_end_month = q_end_month_idx % 12 + 1
+    from datetime import date as _date
+    last_day = _calendar.monthrange(q_end_year, q_end_month)[1]
+    return _date(q_end_year, q_end_month, last_day)
+
+
 def resolve_time_window(tw: dict) -> dict:
     """
     Convert the classifier's time_window object to
