@@ -1186,29 +1186,43 @@ class TestPlantedBugFabricatedClaim(unittest.TestCase):
 
     def test_deliver_succeeds_after_passing_check(self):
         """
-        Confirming the gate is not over-eager: a passing check_result is followed
-        by deliver and the answer goes through normally.
+        Confirming the gate is not over-eager: a passing check_result (number
+        traced to the ledger via call_primitive) is followed by deliver and the
+        answer goes through normally.
+
+        The test patches query_pipeline_coverage to return coverage_ratio=2.49,
+        then the model calls check_result with that claim, and finally delivers.
+        Since 2.49 is in the ledger (from the primitive), verified=True and
+        deliver is not blocked.
         """
         import asyncio
+        from unittest.mock import patch
+
+        prim_result = {"period": "Q4 FY26", "coverage_ratio": 2.49}
+
+        async def fake_handler(params, sb):
+            return prim_result
 
         steps = [
+            _call_primitive("query_pipeline_coverage", {"quarter": "Q4"}),
             {
                 "tool": "check_result",
                 "params": {
                     "claim": "Coverage is 2.49x.",
-                    "supporting_data": {"coverage_ratio": 2.49},
+                    "supporting_data": prim_result,
                 },
             },
             _deliver("Coverage is 2.49x.", sources=["query_pipeline_coverage"]),
         ]
         client = FakeClient(steps)
-        result = asyncio.get_event_loop().run_until_complete(
-            run_agent_loop(
-                question="What is our Q4 pipeline coverage?",
-                client=client,
-                sb=_sb(),
+        with patch("api.handlers.query_pipeline_coverage", fake_handler):
+            result = asyncio.get_event_loop().run_until_complete(
+                run_agent_loop(
+                    question="What is our Q4 pipeline coverage?",
+                    client=client,
+                    sb=_sb(),
+                )
             )
-        )
         self.assertEqual(result.answer, "Coverage is 2.49x.")
         self.assertTrue(result.check_result_performed)
         self.assertTrue(result.check_result_verified)
@@ -1390,6 +1404,255 @@ class TestPlantedBugLedgerAndScope(unittest.TestCase):
         self.assertFalse(result.scope_mismatch if hasattr(result, "scope_mismatch") else False)
         self.assertEqual(result.answer, "Open pipeline is $4.86M.")
         self.assertFalse(result.budget_exhausted)
+
+
+# ---------------------------------------------------------------------------
+# Item-1: decimal number extraction (2.49, 0.60, 9.9, 7.1%)
+
+class TestDecimalExtractionAndTrace(unittest.TestCase):
+    """
+    _CLAIM_NUM_RE must extract decimals with a single integer digit (9.9, 2.49,
+    0.60).  If the claim contains 9.9 and the ledger only has 2.49, the check
+    must return verified=False with "9.9" in untraceable.
+    """
+
+    def test_unit_decimal_claim_blocked_by_wrong_ledger(self):
+        """
+        Claim mentions '9.9x'; ledger has 2.49 only.
+        verified=False, '9.9' in untraceable.
+        """
+        from api.agent_loop import _execute_check_result
+
+        ledger = [{
+            "tool": "call_primitive",
+            "primitive": "query_pipeline_coverage",
+            "result": {"coverage_ratio": 2.49},
+        }]
+        result = _execute_check_result(
+            claim="Pipeline coverage is 9.9x this quarter.",
+            supporting_data={},
+            question="What is pipeline coverage?",
+            ledger=ledger,
+        )
+        self.assertFalse(result["verified"],
+                         "9.9 not in ledger — must be untraceable")
+        self.assertIn("9.9", " ".join(result["untraceable"]),
+                      f"Expected '9.9' in untraceable, got {result['untraceable']!r}")
+
+    def test_unit_decimal_claim_passes_when_in_ledger(self):
+        """Claim mentions 2.49x; ledger has 2.49 — must pass."""
+        from api.agent_loop import _execute_check_result
+
+        ledger = [{
+            "tool": "call_primitive",
+            "primitive": "query_pipeline_coverage",
+            "result": {"coverage_ratio": 2.49},
+        }]
+        result = _execute_check_result(
+            claim="Pipeline coverage is 2.49x this quarter.",
+            supporting_data={},
+            question="What is pipeline coverage?",
+            ledger=ledger,
+        )
+        self.assertTrue(result["verified"],
+                        "2.49 is in ledger — must be traceable")
+
+    def test_unit_single_digit_decimal_extracted(self):
+        """_extract_claim_numbers must extract 9.9, 0.60, 7.1 from a claim."""
+        from api.agent_loop import _extract_claim_numbers
+
+        tokens = [tok for tok, _ in _extract_claim_numbers(
+            "Coverage 9.9x, win rate 0.60, growth 7.1%"
+        )]
+        self.assertIn("9.9", " ".join(tokens),
+                      f"9.9 not extracted; got {tokens!r}")
+        self.assertIn("0.60", " ".join(tokens),
+                      f"0.60 not extracted; got {tokens!r}")
+
+
+# ---------------------------------------------------------------------------
+# Item-2: calculate tool — operand tracing and ledger append
+
+class TestCalculateTool(unittest.TestCase):
+    """
+    _execute_calculate must:
+    - Require all operands to trace to the ledger (untraceable → error).
+    - Evaluate the expression safely.
+    - Append the result to the ledger so check_result can verify it.
+    """
+
+    def _ledger_with(self, **kw):
+        """Build a minimal ledger carrying the given keyword values."""
+        return [{
+            "tool": "call_primitive",
+            "primitive": "query_pipeline_coverage",
+            "result": kw,
+        }]
+
+    def test_calculate_with_ledger_values_passes_and_appends(self):
+        """2 × a ledger value: result appended to ledger, verified by check_result."""
+        from api.agent_loop import _execute_calculate, _execute_check_result
+
+        ledger = self._ledger_with(open_pipeline=4_800_000.0)
+        res = _execute_calculate(
+            expression="pipeline * 2",
+            operands={"pipeline": 4_800_000.0},
+            ledger=ledger,
+        )
+        self.assertNotIn("error", res, f"Expected no error, got: {res}")
+        self.assertAlmostEqual(res["result"], 9_600_000.0, places=0)
+        # The result must now be in the ledger
+        ledger_tools = [e["tool"] for e in ledger]
+        self.assertIn("calculate", ledger_tools)
+        # check_result must now verify a claim that uses the derived value
+        cr = _execute_check_result(
+            claim="Doubled pipeline is $9.6M.",
+            supporting_data={},
+            question="What is double our pipeline?",
+            ledger=ledger,
+        )
+        self.assertTrue(cr["verified"],
+                        f"Derived value should be traceable after calculate; got {cr!r}")
+
+    def test_calculate_invented_multiplier_fails(self):
+        """Operand not in ledger → error (no number fabrication)."""
+        from api.agent_loop import _execute_calculate
+
+        ledger = self._ledger_with(open_pipeline=4_800_000.0)
+        res = _execute_calculate(
+            expression="pipeline * ratio",
+            operands={"pipeline": 4_800_000.0, "ratio": 7.3},  # 7.3 not in ledger
+            ledger=ledger,
+        )
+        self.assertIn("error", res,
+                      f"Operand not in ledger must return error; got {res!r}")
+        self.assertIn("ratio", res["error"])
+
+    def test_calculate_full_loop_derived_number_verified(self):
+        """
+        Full loop: primitive runs → calculate derives a value → check_result passes.
+        The derived number (9_600_000) is in the ledger via calculate.
+        """
+        import asyncio
+        from unittest.mock import patch
+
+        q4_result = {"period": "Q4 FY26", "open_pipeline": 4_800_000.0}
+
+        async def fake_handler(params, sb):
+            return q4_result
+
+        steps = [
+            _call_primitive("query_pipeline_coverage", {"quarter": "Q4"}),
+            {
+                "tool": "calculate",
+                "params": {
+                    "expression": "pipeline * 2",
+                    "operands": {"pipeline": 4_800_000.0},
+                },
+            },
+            {
+                "tool": "check_result",
+                "params": {
+                    "claim": "Double pipeline is $9.6M.",
+                    "supporting_data": {},
+                },
+            },
+            _deliver("Double pipeline is $9.6M.", sources=["query_pipeline_coverage"]),
+        ]
+        client = FakeClient(steps)
+        with patch("api.handlers.query_pipeline_coverage", fake_handler):
+            result = asyncio.get_event_loop().run_until_complete(
+                run_agent_loop(
+                    question="What is double our Q4 open pipeline?",
+                    client=client,
+                    sb=_sb(),
+                )
+            )
+        self.assertTrue(result.check_result_verified,
+                        "Derived value through calculate must be verifiable")
+        self.assertEqual(result.answer, "Double pipeline is $9.6M.")
+
+
+# ---------------------------------------------------------------------------
+# Item-3: structured scope check — stray Q-tokens in descriptions ignored
+
+class TestStructuredScopeCheck(unittest.TestCase):
+    """
+    Scope mismatch must use structured fields (fiscal_quarter, period, quarter,
+    time_window) — NOT free-text strings in description/label fields.
+
+    A ledger entry with description="Q4 pipeline overview" but
+    fiscal_quarter="Q3" must still trigger a Q3-vs-Q4 scope mismatch.
+    """
+
+    def test_stray_q4_in_description_does_not_satisfy_scope(self):
+        """
+        Ledger entry: {"description": "Q4 pipeline", "fiscal_quarter": "Q3"}
+        Question asks about Q4.
+        Scope mismatch must fire because fiscal_quarter=Q3, not Q4.
+        """
+        from api.agent_loop import _execute_check_result
+
+        ledger = [{
+            "tool": "call_primitive",
+            "primitive": "query_pipeline_coverage",
+            "result": {
+                "description": "Q4 pipeline overview",   # stray Q4 — must not count
+                "fiscal_quarter": "Q3",                  # authoritative scope field
+                "coverage_ratio": 2.49,
+            },
+        }]
+        result = _execute_check_result(
+            claim="Pipeline coverage is 2.49x.",
+            supporting_data={},
+            question="What is our Q4 pipeline coverage?",
+            ledger=ledger,
+        )
+        self.assertFalse(result["verified"],
+                         "fiscal_quarter=Q3 must cause mismatch even if 'Q4' in description")
+        self.assertTrue(result["scope_mismatch"])
+
+    def test_structured_field_q4_satisfies_scope(self):
+        """Ledger fiscal_quarter=Q4 matches Q4 question → no mismatch."""
+        from api.agent_loop import _execute_check_result
+
+        ledger = [{
+            "tool": "call_primitive",
+            "primitive": "query_pipeline_coverage",
+            "result": {
+                "fiscal_quarter": "Q4",
+                "coverage_ratio": 2.49,
+            },
+        }]
+        result = _execute_check_result(
+            claim="Pipeline coverage is 2.49x.",
+            supporting_data={},
+            question="What is our Q4 pipeline coverage?",
+            ledger=ledger,
+        )
+        # Q4 in both question and fiscal_quarter → no mismatch
+        self.assertFalse(result["scope_mismatch"],
+                         f"Q4 in structured field should satisfy Q4 question; got {result!r}")
+        self.assertTrue(result["verified"],
+                        "2.49 is in ledger and scope matches — must be verified")
+
+    def test_period_field_q3_triggers_mismatch(self):
+        """Ledger result has period='Q3 FY26'; question asks Q4 → mismatch."""
+        from api.agent_loop import _execute_check_result
+
+        ledger = [{
+            "tool": "call_primitive",
+            "primitive": "query_pipeline_coverage",
+            "result": {"period": "Q3 FY26", "coverage_ratio": 2.49},
+        }]
+        result = _execute_check_result(
+            claim="Pipeline coverage is 2.49x.",
+            supporting_data={},
+            question="What is our Q4 FY26 pipeline coverage?",
+            ledger=ledger,
+        )
+        self.assertFalse(result["verified"])
+        self.assertTrue(result["scope_mismatch"])
 
 
 # ---------------------------------------------------------------------------

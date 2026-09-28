@@ -154,7 +154,7 @@ _NUMBER_RE = re.compile(r"\b\d[\d,]*(?:\.\d+)?[MKB%x]?\b")
 _CLAIM_NUM_RE = re.compile(
     r'\$\s*(\d[\d,]*(?:\.\d+)?)\s*([MKBmkb])?'  # $1.2M or $1,200,000
     r'|(\d[\d,]*(?:\.\d+)?)\s*([MKBmkb])\b'      # 1.2M (suffix required)
-    r'|(\d[\d,]+\.\d+)(?=[x%\s,\.\)\-]|$)'        # 2.49 (decimal, no suffix)
+    r'|(\d[\d,]*\.\d+)(?=[x%\s,\.\)\-]|$)'          # 2.49, 0.60, 9.9 (any decimal)
     r'|(\d[\d,]{2,})(?=[x%\s,\.\)\-]|$)',          # 1,234 (comma-grouped integer)
 )
 
@@ -252,9 +252,42 @@ def _is_label_number(val: float, question: str) -> bool:
     return 2000.0 <= val <= 2099.0
 
 
+_SCOPE_STRUCTURED_KEYS = frozenset({
+    "fiscal_quarter", "quarter", "period", "time_window",
+    "date_range", "start_date", "end_date",
+})
+_Q_STRUCT_RE = re.compile(r'\bQ[1-4]\b', re.IGNORECASE)
+
+
+def _extract_scope_quarters_from_result(result: Any) -> set[str]:
+    """
+    Extract Q1-Q4 tokens from STRUCTURED scope fields only.
+    Only reads keys named in _SCOPE_STRUCTURED_KEYS; free-text description
+    strings are NOT scanned so stray "Q4" in labels doesn't satisfy coverage.
+    Returns a set of upper-cased tokens (e.g. {"Q3"}).
+    """
+    found: set[str] = set()
+    if not isinstance(result, dict):
+        return found
+    for key, val in result.items():
+        if key.lower() not in _SCOPE_STRUCTURED_KEYS:
+            continue
+        if isinstance(val, str):
+            for tok in _Q_STRUCT_RE.findall(val):
+                found.add(tok.upper())
+        elif isinstance(val, dict):
+            # e.g. date_range: {start: ..., end: ...} — no Q tokens expected but safe
+            for v2 in val.values():
+                if isinstance(v2, str):
+                    for tok in _Q_STRUCT_RE.findall(v2):
+                        found.add(tok.upper())
+    return found
+
+
 def _extract_quarters_from_data(data: Any, depth: int = 0) -> set[str]:
     """
     Recursively scan all string leaf values in data for Q1-Q4 / FY tokens.
+    Used for non-ledger contexts only (e.g. supporting_data).
     Returns a set of upper-cased tokens (e.g. {"Q3", "FY26"}).
     """
     found: set[str] = set()
@@ -340,6 +373,14 @@ Available tools (respond with JSON — one tool call per response):
 
 7. request_checkback  — escalate to template promotion (for recurring patterns)
    {"tool": "request_checkback", "params": {}}
+
+8. calculate  — evaluate an arithmetic expression over values already in the ledger
+   {"tool": "calculate", "params": {
+     "expression": "<e.g. pipeline / target>",
+     "operands": {"pipeline": 4800000, "target": 2000000}
+   }}
+   All operand values must have been fetched via call_primitive or fetch_data first.
+   The result is appended to the ledger and can then be verified by check_result.
 
 Rules:
 - Always call check_result before deliver when the answer contains numbers.
@@ -481,13 +522,10 @@ def _execute_check_result(
     # Only Q1-Q4 tokens are compared; FY-year tokens are shared context and are NOT used to
     # satisfy the scope check (FY26 appears in both Q3 FY26 and Q4 FY26, so it is not specific
     # enough to confirm alignment).
-    _Q_ONLY_RE = re.compile(r'\bQ[1-4]\b', re.IGNORECASE)
-    question_quarters = {q.upper() for q in _Q_ONLY_RE.findall(question)}
+    question_quarters = {q.upper() for q in _Q_STRUCT_RE.findall(question)}
     ledger_quarters: set[str] = set()
     for entry in (ledger or []):
-        for tok in _extract_quarters_from_data(entry.get("result")):
-            if _Q_ONLY_RE.match(tok):
-                ledger_quarters.add(tok.upper())
+        ledger_quarters |= _extract_scope_quarters_from_result(entry.get("result"))
 
     if question_quarters and ledger_quarters and question_quarters.isdisjoint(ledger_quarters):
         scope_mismatch = True
@@ -539,6 +577,78 @@ def _execute_check_result(
 def _execute_request_checkback() -> dict:
     from api.plan_feedback import checkback_prompt  # noqa: PLC0415
     return {"checkback_prompt": checkback_prompt(), "recorded": True}
+
+
+def _execute_calculate(
+    expression: str,
+    operands: dict,
+    ledger: list,
+) -> dict:
+    """
+    Evaluate a simple arithmetic expression whose operands must all trace to
+    the execution ledger.  Appends the result to ledger on success.
+
+    expression: e.g. "pipeline / target"
+    operands:   e.g. {"pipeline": 4800000, "target": 2000000}
+
+    Returns:
+      {"result": float, "expression": str, "operands": dict}  on success
+      {"error": str}                                           on failure
+
+    Restrictions:
+    - Only the operand names are in scope for eval; no builtins.
+    - If any operand value cannot be traced to the ledger, the call fails
+      (the number is considered fabricated).
+    - Expression may not exceed 200 characters.
+    """
+    if not expression or not isinstance(expression, str):
+        return {"error": "calculate requires a non-empty 'expression' string"}
+    if len(expression) > 200:
+        return {"error": "expression too long (max 200 characters)"}
+    if not isinstance(operands, dict) or not operands:
+        return {"error": "calculate requires at least one operand"}
+
+    ledger_values = _flatten_ledger_numerics(ledger or [])
+    untraced: list[str] = []
+    clean: dict[str, float] = {}
+    for name, val in operands.items():
+        try:
+            fval = float(val)
+        except (TypeError, ValueError):
+            return {"error": f"operand {name!r} is not numeric: {val!r}"}
+        if not _value_traceable(fval, ledger_values):
+            untraced.append(name)
+        clean[name] = fval
+
+    if untraced:
+        return {
+            "error": (
+                f"operand(s) {untraced} could not be traced to any ledger value — "
+                "use call_primitive or fetch_data to fetch the data first"
+            )
+        }
+
+    # Safe eval: only operand names in namespace, no builtins.
+    try:
+        result_val = eval(  # noqa: S307
+            compile(expression, "<calculate>", "eval"),
+            {"__builtins__": {}},
+            clean,
+        )
+    except Exception as e:
+        return {"error": f"expression evaluation failed: {e}"}
+
+    if not isinstance(result_val, (int, float)):
+        return {"error": f"expression did not evaluate to a number: {result_val!r}"}
+
+    entry = {
+        "tool": "calculate",
+        "expression": expression,
+        "operands": clean,
+        "result": float(result_val),
+    }
+    ledger.append(entry)
+    return {"result": float(result_val), "expression": expression, "operands": clean}
 
 
 # ---------------------------------------------------------------------------
@@ -744,6 +854,14 @@ async def run_agent_loop(
         # ── request_checkback ─────────────────────────────────────────────
         elif tool == "request_checkback":
             tool_result = _execute_request_checkback()
+
+        # ── calculate ─────────────────────────────────────────────────────
+        elif tool == "calculate":
+            tool_result = _execute_calculate(
+                tool_params.get("expression", ""),
+                tool_params.get("operands", {}),
+                _ledger,
+            )
 
         else:
             tool_result = {"error": f"unknown tool {tool!r}"}
