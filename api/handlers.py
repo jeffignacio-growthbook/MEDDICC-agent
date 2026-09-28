@@ -6629,14 +6629,20 @@ async def query_path_to_target(params: dict, sb) -> dict:
       - compute_cycle_time → won cycle lengths for time_feasibility()
       - quarter end date → days_remaining
 
-    Returns path_to_target() result dict: gap, lever plan, headline, note.
-    Read-only.
-
-    No required params.
+    Gap basis: quota_only (not quota+stretch). Stretch is aspirational;
+    the committed gap is quota minus QTD closed-won. Both are disclosed
+    in the output. Returns path_to_target() result dict augmented with
+    qtd_closed_won, target_used, target_basis, days_remaining.
+    Read-only. No required params.
     """
     from path_to_target import time_feasibility as _time_feasibility, path_to_target as _ptt
     from pipeline_coverage import assess_pipeline_coverage
-    from api.time_resolver import current_quarter_label
+    from api.time_resolver import (current_quarter_label, quarter_end_date as _quarter_end_date,
+                                   _client_config, _today)
+    from utils import get_fiscal_quarter
+
+    config = _client_config()
+    today = _today(config)
 
     # 1. Get pipeline coverage data (existing pipeline scenarios).
     try:
@@ -6651,7 +6657,7 @@ async def query_path_to_target(params: dict, sb) -> dict:
     raw = (cov.get("qualified_pipeline") or {}).get("raw_value") or 0.0
 
     # Conservative = sum of the two highest-order stage buckets (late-stage pipeline)
-    # from by_stage_order; fall back to 50% of weighted if not computable.
+    # from by_stage_order; fall back to 70% of weighted if not computable.
     try:
         by_stage = (cov.get("stage_weighting") or {}).get("by_stage_order") or {}
         orders = sorted(by_stage.keys(), reverse=True)
@@ -6668,36 +6674,63 @@ async def query_path_to_target(params: dict, sb) -> dict:
         "stretch": float(raw),
     }
 
-    # 2. Get gap_bare from pipeline_coverage gap_to_goal.
-    gap_info = (cov.get("gap_to_goal") or {}).get("weighted_pipeline_vs_goal") or {}
-    if gap_info.get("status") == "short":
-        gap_bare = float(gap_info.get("amount", 0.0))
-    elif gap_info.get("status") == "over":
-        gap_bare = 0.0  # at or ahead of goal
-    else:
-        # Derive from real_target if gap_to_goal is unavailable.
-        goal = (cov.get("real_target") or {}).get("goal")
-        gap_bare = max(0.0, float(goal) - float(weighted)) if goal is not None else 0.0
+    # 2. Target: quota-only is the committed target; quota+stretch is aspirational.
+    # Gap is computed against quota so the answer is auditable against commitments.
+    # Both are disclosed in the output so the caller can surface either.
+    real_target = cov.get("real_target") or {}
+    quota = real_target.get("quota")
+    goal_stretch = real_target.get("goal")  # quota + stretch (aspirational)
 
-    # 3. Compute days_remaining from quarter end.
+    # 3. Compute days_remaining — no silent fallback.
+    # If quarter_end_date fails, the gap plan is uncomputable and we surface the error.
     try:
-        from datetime import date as _date
-        from api.time_resolver import quarter_end_date as _quarter_end_date
-        q_end = _quarter_end_date(current_quarter_label())
-        days_remaining = max(0, (q_end - _date.today()).days)
-    except Exception:
-        days_remaining = 30  # safe fallback
+        q_label = current_quarter_label()
+        q_end = _quarter_end_date(q_label)
+        days_remaining = max(0, (q_end - today).days)
+    except Exception as e:
+        return {
+            "error": f"Cannot compute quarter end date: {e}",
+            "status": "error",
+            "_diagnostic": (
+                "quarter_end_date or current_quarter_label failed — "
+                "check fiscal config (fy_start_month) in client.yaml"
+            ),
+        }
 
-    # 4. Won cycle days — fetch closed-won deals and compute create→close in days.
+    # 4. QTD closed-won: incremental ARR closed this quarter.
+    # This is subtracted from quota to give the true remaining commitment gap.
+    qtd_closed_won = 0.0
+    qtd_won_count = 0
+    try:
+        q_start, _, _ = get_fiscal_quarter(today)
+        q_start_iso = q_start.isoformat()
+        q_end_iso = q_end.isoformat()
+        from field_semantics import is_incremental_pipeline
+        from api.incremental_arr import incremental_arr as _incremental_arr
+        qtd_won_raw = select_all(
+            sb, "deals",
+            columns="deal_id,close_date,deal_status,pipeline_id,new_arr,expansion_arr",
+            filters=[("eq", "deal_status", "won"),
+                     ("gte", "close_date", q_start_iso),
+                     ("lte", "close_date", q_end_iso)],
+        )
+        for d in qtd_won_raw:
+            if is_incremental_pipeline(d):
+                qtd_closed_won += _incremental_arr(d)
+                qtd_won_count += 1
+    except Exception:
+        pass  # qtd_closed_won stays 0.0; disclosed in output
+
+    # 5. Won cycle days for time_feasibility — all historical won deals, not QTD only.
+    won_cycle_days = []
     try:
         from datetime import date as _date_cls
-        won_deals = select_all(
+        all_won = select_all(
             sb, "deals",
-            columns="deal_id,create_date,close_date,deal_status,pipeline_id",
-            filters=[("eq", "deal_status", "won"), ("eq", "pipeline_id", "default")],
+            columns="deal_id,create_date,close_date,deal_status",
+            filters=[("eq", "deal_status", "won")],
         )
-        won_cycle_days = []
-        for d in won_deals:
+        for d in all_won:
             try:
                 cd = _date_cls.fromisoformat(str(d["create_date"])[:10])
                 cl = _date_cls.fromisoformat(str(d["close_date"])[:10])
@@ -6709,6 +6742,36 @@ async def query_path_to_target(params: dict, sb) -> dict:
     except Exception:
         won_cycle_days = []
 
-    # 5. Compose.
+    # 6. Gap: quota minus already-closed this quarter = remaining commitment.
+    # path_to_target() then deducts existing likely pipeline to size net-new.
+    # Using quota-only: stretch is aspirational, not committed.
+    if quota is not None:
+        gap_bare = max(0.0, float(quota) - qtd_closed_won)
+        target_used = float(quota)
+        target_basis = "quota_only"
+    else:
+        # quota row missing from rep_targets; fall through to coverage's weighted gap.
+        gap_info = (cov.get("gap_to_goal") or {}).get("weighted_pipeline_vs_goal") or {}
+        if gap_info.get("status") == "short":
+            gap_bare = float(gap_info.get("amount", 0.0))
+        elif gap_info.get("status") == "over":
+            gap_bare = 0.0
+        else:
+            gap_bare = 0.0
+        target_used = float(goal_stretch) if goal_stretch is not None else None
+        target_basis = "quota_plus_stretch_fallback"
+
+    # 7. Compose.
     feasibility = _time_feasibility(days_remaining, won_cycle_days)
-    return _ptt(gap_bare, existing_scenarios, feasibility)
+    result = _ptt(gap_bare, existing_scenarios, feasibility)
+
+    # Augment with QTD context and target basis for auditability.
+    result["qtd_closed_won"] = qtd_closed_won
+    result["qtd_won_deal_count"] = qtd_won_count
+    result["target_used"] = target_used
+    result["target_basis"] = target_basis
+    result["stretch_target"] = float(goal_stretch) if goal_stretch is not None else None
+    result["days_remaining"] = days_remaining
+    result["fiscal_quarter"] = cov.get("fiscal_quarter")
+
+    return result
