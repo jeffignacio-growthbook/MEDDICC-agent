@@ -29,13 +29,25 @@ These tests verify the resolver and defense-in-depth behavior offline.
 import sys
 from datetime import date
 from pathlib import Path
+from unittest.mock import patch
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from api.time_resolver import resolve_time_window
 
+# Fixed date avoids UTC-vs-reporting-TZ race: CI may run before midnight ET
+# but after midnight UTC, causing date.today() != today_in_reporting_tz().
+FIXED_TODAY = date(2026, 9, 15)
+TODAY = FIXED_TODAY
 
-TODAY = date.today()
+
+@pytest.fixture(autouse=True)
+def _patch_today():
+    """Pin _today() to FIXED_TODAY so assertions never depend on wall-clock TZ."""
+    with patch("api.time_resolver._today", return_value=FIXED_TODAY):
+        yield
 
 
 def test_specific_with_null_end_resolves_to_today():
@@ -422,30 +434,32 @@ def test_composition_no_data_gap_when_anchor_within_grid():
 
 
 if __name__ == "__main__":
-    test_specific_with_null_end_resolves_to_today()
-    print("PASS: specific + null end resolves to today")
-    test_specific_month_caps_at_month_end()
-    print("PASS: specific_month caps at month end (regression guard)")
-    test_open_ended_rewrite_to_specific_null_end()
-    print("PASS: open-ended rewrite resolves to today")
-    test_defense_in_depth_vs_today_conversion()
-    print("PASS: defense-in-depth converts specific_month to specific+null for 'vs today'")
-    test_since_pattern_detected_as_open_ended()
-    print("PASS: 'since' + year detected as open-ended")
-    test_isolated_month_not_detected_as_open_ended()
-    print("PASS: isolated month not treated as open-ended")
-    test_defense_in_depth_empty_tw_open_ended()
-    print("PASS: empty time_window fallback constructs from question text")
-    test_empty_tw_isolated_month_not_rewritten()
-    print("PASS: empty-tw fallback does not fire for isolated months")
-    test_period_custom_with_explicit_dates_resolves_correctly()
-    print("PASS: period=custom with explicit dates passes through correctly")
-    test_period_custom_with_null_end_resolves_to_today()
-    print("PASS: period=custom with null end resolves to today")
-    test_composition_start_anchor_included_in_grid()
-    print("PASS: composition start_anchor prepends real Jan snapshot to grid")
-    test_composition_data_gap_prohibits_estimation()
-    print("PASS: data_gaps prohibition note contains NO SNAPSHOT EXISTS sentinel")
-    test_composition_no_data_gap_when_anchor_within_grid()
-    print("PASS: no prohibition note when anchor within grid coverage")
-    print("\nAll tests passed.")
+    from unittest.mock import patch as _patch
+    with _patch("api.time_resolver._today", return_value=FIXED_TODAY):
+        test_specific_with_null_end_resolves_to_today()
+        print("PASS: specific + null end resolves to today")
+        test_specific_month_caps_at_month_end()
+        print("PASS: specific_month caps at month end (regression guard)")
+        test_open_ended_rewrite_to_specific_null_end()
+        print("PASS: open-ended rewrite resolves to today")
+        test_defense_in_depth_vs_today_conversion()
+        print("PASS: defense-in-depth converts specific_month to specific+null for 'vs today'")
+        test_since_pattern_detected_as_open_ended()
+        print("PASS: 'since' + year detected as open-ended")
+        test_isolated_month_not_detected_as_open_ended()
+        print("PASS: isolated month not treated as open-ended")
+        test_defense_in_depth_empty_tw_open_ended()
+        print("PASS: empty time_window fallback constructs from question text")
+        test_empty_tw_isolated_month_not_rewritten()
+        print("PASS: empty-tw fallback does not fire for isolated months")
+        test_period_custom_with_explicit_dates_resolves_correctly()
+        print("PASS: period=custom with explicit dates passes through correctly")
+        test_period_custom_with_null_end_resolves_to_today()
+        print("PASS: period=custom with null end resolves to today")
+        test_composition_start_anchor_included_in_grid()
+        print("PASS: composition start_anchor prepends real Jan snapshot to grid")
+        test_composition_data_gap_prohibits_estimation()
+        print("PASS: data_gaps prohibition note contains NO SNAPSHOT EXISTS sentinel")
+        test_composition_no_data_gap_when_anchor_within_grid()
+        print("PASS: no prohibition note when anchor within grid coverage")
+        print("\nAll tests passed.")
