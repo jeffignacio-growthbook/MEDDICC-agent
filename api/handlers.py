@@ -6801,6 +6801,17 @@ async def query_path_to_target(params: dict, sb) -> dict:
     feasibility = _time_feasibility(days_remaining, won_cycle_days)
     result = _ptt(gap_bare, existing_scenarios, feasibility)
 
+    # Rename internal path_to_target allocation keys — "conservative/likely/stretch" are
+    # internal labels; the Slack output uses the three labeled figures instead.
+    for _pk in ("bare_plan", "padded_plan"):
+        _plan = result.get(_pk) or {}
+        if "covered_by_conservative" in _plan:
+            _plan["covered_by_forecast"] = _plan.pop("covered_by_conservative")
+        if "covered_by_likely" in _plan:
+            _plan["covered_by_stage_ev"] = _plan.pop("covered_by_likely")
+        if "covered_by_stretch" in _plan:
+            _plan["covered_by_pipeline"] = _plan.pop("covered_by_stretch")
+
     # Rename existing_scenarios in output — "Likely" is reserved for the forecast category.
     feas = result.get("feasibility") or {}
     n_cyc = feas.get("n_cycles")
