@@ -173,12 +173,22 @@ class TestQuantitativeAnswerRequiresCheckResult(unittest.TestCase):
 
     def test_sources_passed_through(self):
         """sources list from deliver() is on the result."""
+        import asyncio
+        # Use a question with no quarter reference to avoid triggering scope-mismatch
+        # (this test is about sources propagation, not trace-to-source verification).
         steps = [
             _call_primitive("query_waterfall"),
-            _check_result("$4M new ARR", {"total": 4_000_000}),
-            _deliver("New ARR is $4M.", sources=["query_waterfall", "query_path_to_target"]),
+            _check_result("ARR looks healthy", {}),
+            _deliver("ARR is healthy.", sources=["query_waterfall", "query_path_to_target"]),
         ]
-        result = self._run(steps)
+        client = FakeClient(steps)
+        result = asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="How is our pipeline coverage?",   # no quarter — no scope check
+                client=client,
+                sb=_sb(),
+            )
+        )
         self.assertIn("query_waterfall", result.sources)
 
 
@@ -271,21 +281,23 @@ class TestLowStakesAmbiguityStateAssumption(unittest.TestCase):
     can see what was assumed.
     """
 
-    def _run(self, assumption_text: str, category: str = "time_window"):
+    def _run(self, assumption_text: str, category: str = "time_window", _no_numeric_check: bool = False):
         import asyncio
+        # Non-numeric claim and question with no quarter reference so scope-mismatch
+        # does not fire — these tests are about assumption propagation, not tracing.
         steps = [
             _state_assumption(assumption_text, category=category),
-            _call_primitive("query_waterfall", {"quarter": "Q4"}),
-            _check_result("$4.86M total ARR", {"total": 4_860_000}),
+            _call_primitive("query_waterfall", {}),
+            _check_result("ARR looks correct", {}),
             _deliver(
-                f"Assuming {assumption_text}: total Q4 ARR is $4.86M.",
+                f"Assuming {assumption_text}: total ARR is on track.",
                 sources=["query_waterfall"],
             ),
         ]
         client = FakeClient(steps)
         return asyncio.get_event_loop().run_until_complete(
             run_agent_loop(
-                question="What's our total Q4 ARR?",
+                question="How is our ARR trend?",   # no quarter — no scope-mismatch gate
                 client=client,
                 sb=_sb(),
             )
@@ -304,9 +316,11 @@ class TestLowStakesAmbiguityStateAssumption(unittest.TestCase):
         """
         The assumption text must appear verbatim (or substantially) in the
         delivered answer — so the user sees it, not just the log.
+        The deliver step includes the assumption in its answer text.
         """
         assumption = "includes both new and expansion ARR"
         result = self._run(assumption)
+        # The _run helper builds deliver answer as f"Assuming {assumption}: total ARR is on track."
         self.assertIn(
             assumption, result.answer,
             "Assumption text must appear verbatim in the delivered answer",
@@ -321,9 +335,11 @@ class TestLowStakesAmbiguityStateAssumption(unittest.TestCase):
             _state_assumption(a1, category="time_window"),
             _state_assumption(a2, category="arr_scope"),
             _call_primitive("query_waterfall"),
-            _check_result("$4.86M", {"total": 4_860_000}),
+            # Non-numeric claim — these tests are about assumption propagation,
+            # not trace-to-source verification.
+            _check_result("ARR breakdown looks correct", {}),
             _deliver(
-                f"Assuming {a1} and {a2}: total is $4.86M.",
+                f"Assuming {a1} and {a2}: ARR is on track.",
                 sources=["query_waterfall"],
             ),
         ]
@@ -704,25 +720,41 @@ class TestAskUserEndsLoop(unittest.TestCase):
 class TestFetchDataAsDataSource(unittest.TestCase):
     """
     fetch_data (raw table retrieval) is a legitimate data source.
-    A number sourced from fetch_data satisfies the "no invented numbers" gate
-    in the same way call_primitive does.
+    A number sourced from fetch_data is recorded in the ledger and satisfies
+    the trace-to-source check the same way call_primitive does.
     """
 
     def _run(self):
         import asyncio
+        from unittest.mock import AsyncMock, patch
+
+        # Patch filter_table to return a row containing total=4_860_000 so the
+        # ledger carries the value and check_result("$4.86M") can trace to it.
+        fake_rows = [{"total": 4_860_000, "quarter": "Q4"}]
+
+        async def fake_filter_table(sb, table, **kwargs):
+            return fake_rows
+
         steps = [
-            _fetch_data("SELECT SUM(arr) FROM deals WHERE quarter='Q4'"),
+            # fetch_data with table specified — filter_table returns fake_rows → ledger entry
+            {"tool": "fetch_data", "params": {
+                "query": "total ARR for Q4",
+                "table": "deals",
+                "columns": ["total"],
+                "filters": [{"column": "quarter", "op": "eq", "value": "Q4"}],
+            }},
             _check_result("Q4 ARR is $4.86M", {"total": 4_860_000}),
             _deliver("Total Q4 ARR from raw query: $4.86M.", sources=["fetch_data"]),
         ]
         client = FakeClient(steps)
-        return asyncio.get_event_loop().run_until_complete(
-            run_agent_loop(
-                question="What's total Q4 ARR?",
-                client=client,
-                sb=_sb(),
+        with patch("api.tools.filter_table", fake_filter_table):
+            return asyncio.get_event_loop().run_until_complete(
+                run_agent_loop(
+                    question="What's total Q4 ARR?",
+                    client=client,
+                    sb=_sb(),
+                )
             )
-        )
 
     def test_fetch_data_then_deliver_is_valid(self):
         """fetch_data → check_result → deliver is a valid path."""
@@ -1100,12 +1132,16 @@ class TestPlantedBugFabricatedClaim(unittest.TestCase):
         self.assertTrue(len(result["untraceable"]) > 0, "Expected at least one untraceable token")
 
     def test_traceable_number_passes(self):
-        """A number that IS in supporting_data must not be flagged as untraceable."""
+        """A number that IS in the ledger must not be flagged as untraceable."""
         from api.agent_loop import _execute_check_result
 
+        # Ledger records a prior call_primitive result containing 2.1M.
+        ledger = [{"tool": "call_primitive", "primitive": "query_pipeline_coverage",
+                   "result": {"open_pipeline": 2_100_000}}]
         result = _execute_check_result(
             claim="Pipeline is $2.1M this quarter.",
-            supporting_data={"open_pipeline": 2_100_000},  # exact match
+            supporting_data={},
+            ledger=ledger,
         )
         self.assertTrue(result["verified"])
         self.assertEqual(result["untraceable"], [])
@@ -1180,6 +1216,183 @@ class TestPlantedBugFabricatedClaim(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# Planted-bug: ledger as the authoritative trace source and scope mismatch
+
+class TestPlantedBugLedgerAndScope(unittest.TestCase):
+    """
+    Three trace scenarios for the ledger-first verification model:
+
+    1. Fabricated claim + supporting_data (no ledger) — must be blocked.
+       The model fabricates both the claim and its supporting_data; since no
+       call_primitive or fetch_data was ever recorded, the ledger is empty and
+       the number cannot be traced.
+
+    2. Q3 data for a Q4 question — must be blocked by scope mismatch.
+       The model fetches Q3 data (handler returns period="Q3 FY26") but the
+       question asks about Q4; the scope check fires → verified=False.
+
+    3. Legitimate derived number — must pass.
+       A call_primitive records a result containing the value; the claim
+       references that exact value; verified=True.
+    """
+
+    # ── scenario 1: fabricated claim + supporting_data, no ledger ──────────
+
+    def test_full_loop_fabricated_claim_and_supporting_data_blocked(self):
+        """
+        Full loop: model fabricates both claim AND supporting_data without
+        calling any primitive first.  The ledger is empty so the number
+        cannot be traced.  Deliver must be blocked.
+        """
+        import asyncio
+
+        # Model skips call_primitive, goes straight to check_result with
+        # made-up supporting_data, then tries to deliver.
+        steps = [
+            {
+                "tool": "check_result",
+                "params": {
+                    "claim": "Pipeline is $5.3M this quarter.",
+                    # Model invents supporting_data — not from any real call.
+                    "supporting_data": {"fabricated_pipeline": 5_300_000},
+                },
+            },
+            _deliver("Pipeline is $5.3M this quarter.", sources=[]),
+        ]
+        client = FakeClient(steps)
+        result = asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="What is our pipeline this quarter?",
+                client=client,
+                sb=_sb(),
+            )
+        )
+        # check_result ran but could not trace $5.3M (ledger empty)
+        self.assertTrue(result.check_result_performed)
+        self.assertFalse(result.check_result_verified,
+                         "Fabricated claim with no ledger must return verified=False")
+        # Deliver was blocked → loop exhausted budget
+        self.assertNotEqual(result.answer, "Pipeline is $5.3M this quarter.")
+
+    def test_unit_fabricated_no_ledger_unverified(self):
+        """Unit: _execute_check_result with empty ledger rejects a numeric claim."""
+        from api.agent_loop import _execute_check_result
+
+        result = _execute_check_result(
+            claim="Total ARR is $7.2M.",
+            supporting_data={"arr": 7_200_000},  # model-supplied, not in ledger
+            ledger=[],                             # empty — no primitive ran
+        )
+        self.assertFalse(result["verified"],
+                         "Empty ledger must cause verified=False even if supporting_data matches")
+        self.assertTrue(len(result["untraceable"]) > 0)
+
+    # ── scenario 2: Q3 data for a Q4 question → scope mismatch ────────────
+
+    def test_scope_mismatch_q3_data_for_q4_question(self):
+        """
+        Unit: ledger records Q3 data; question asks about Q4.
+        Scope mismatch must set verified=False even if a number traces numerically.
+        """
+        from api.agent_loop import _execute_check_result
+
+        # Ledger contains Q3 data (wrong quarter for the question)
+        ledger = [{
+            "tool": "call_primitive",
+            "primitive": "query_pipeline_coverage",
+            "result": {"period": "Q3 FY26", "coverage_ratio": 2.49},
+        }]
+        result = _execute_check_result(
+            claim="Pipeline coverage is 2.49x.",   # 2.49 IS in ledger numerically
+            supporting_data={},
+            question="What is our Q4 FY26 pipeline coverage?",
+            ledger=ledger,
+        )
+        # Scope mismatch: Q4 in question, Q3 in ledger → verified=False
+        self.assertFalse(result["verified"],
+                         "Q3 data for Q4 question must set verified=False (scope mismatch)")
+        self.assertTrue(result["scope_mismatch"])
+
+    def test_full_loop_scope_mismatch_blocks_deliver(self):
+        """
+        Full loop: patched handler returns Q3 data; question asks about Q4.
+        Scope mismatch fires on check_result → deliver blocked.
+        """
+        import asyncio
+        from unittest.mock import patch
+
+        q3_result = {"period": "Q3 FY26", "coverage_ratio": 2.49}
+
+        async def fake_handler(params, sb):
+            return q3_result
+
+        steps = [
+            _call_primitive("query_pipeline_coverage", {"quarter": "Q4"}),
+            {
+                "tool": "check_result",
+                "params": {
+                    "claim": "Pipeline coverage is 2.49x.",
+                    "supporting_data": q3_result,
+                },
+            },
+            _deliver("Pipeline coverage is 2.49x.", sources=["query_pipeline_coverage"]),
+        ]
+        client = FakeClient(steps)
+        with patch("api.handlers.query_pipeline_coverage", fake_handler):
+            result = asyncio.get_event_loop().run_until_complete(
+                run_agent_loop(
+                    question="What is our Q4 pipeline coverage?",
+                    client=client,
+                    sb=_sb(),
+                )
+            )
+        # Q4 in question, Q3 in ledger → scope mismatch → verified=False → deliver blocked
+        self.assertFalse(result.check_result_verified)
+        self.assertNotEqual(result.answer, "Pipeline coverage is 2.49x.")
+
+    # ── scenario 3: legitimate derived number ──────────────────────────────
+
+    def test_legitimate_derived_number_passes(self):
+        """
+        Full loop: patched handler returns a value; claim references that value.
+        The number IS in the ledger → verified=True → deliver succeeds.
+        """
+        import asyncio
+        from unittest.mock import patch
+
+        q4_result = {"period": "Q4 FY26", "open_pipeline": 4_860_000}
+
+        async def fake_handler(params, sb):
+            return q4_result
+
+        steps = [
+            _call_primitive("query_pipeline_coverage", {"quarter": "Q4"}),
+            {
+                "tool": "check_result",
+                "params": {
+                    "claim": "Open pipeline is $4.86M.",
+                    "supporting_data": q4_result,
+                },
+            },
+            _deliver("Open pipeline is $4.86M.", sources=["query_pipeline_coverage"]),
+        ]
+        client = FakeClient(steps)
+        with patch("api.handlers.query_pipeline_coverage", fake_handler):
+            result = asyncio.get_event_loop().run_until_complete(
+                run_agent_loop(
+                    question="What is our Q4 open pipeline?",
+                    client=client,
+                    sb=_sb(),
+                )
+            )
+        self.assertTrue(result.check_result_verified,
+                        "Claim number traceable to ledger must set verified=True")
+        self.assertFalse(result.scope_mismatch if hasattr(result, "scope_mismatch") else False)
+        self.assertEqual(result.answer, "Open pipeline is $4.86M.")
+        self.assertFalse(result.budget_exhausted)
+
+
+# ---------------------------------------------------------------------------
 # KNOWN_PRIMITIVES callability: every registered primitive must exist in
 # api.handlers as a callable async function.
 
@@ -1197,6 +1410,7 @@ class TestKnownPrimitivesCallable(unittest.TestCase):
         missing = []
         not_callable = []
         not_async = []
+        bad_sig = []
 
         for name in sorted(KNOWN_PRIMITIVES):
             fn = getattr(handlers, name, None)
@@ -1206,6 +1420,17 @@ class TestKnownPrimitivesCallable(unittest.TestCase):
                 not_callable.append(name)
             elif not inspect.iscoroutinefunction(fn):
                 not_async.append(name)
+            else:
+                # Verify signature: first param must be "params", second must exist.
+                try:
+                    sig = inspect.signature(fn)
+                    param_names = list(sig.parameters.keys())
+                    if len(param_names) < 2:
+                        bad_sig.append(f"{name}: expected ≥2 params, got {param_names}")
+                    elif param_names[0] != "params":
+                        bad_sig.append(f"{name}: first param must be 'params', got {param_names[0]!r}")
+                except (ValueError, TypeError) as exc:
+                    bad_sig.append(f"{name}: inspect.signature failed: {exc}")
 
         errors = []
         if missing:
@@ -1214,6 +1439,8 @@ class TestKnownPrimitivesCallable(unittest.TestCase):
             errors.append(f"Not callable: {not_callable}")
         if not_async:
             errors.append(f"Not async (must be async def): {not_async}")
+        if bad_sig:
+            errors.append(f"Wrong signature (must be async def name(params, sb)): {bad_sig}")
 
         self.assertFalse(errors, "\n".join(errors))
 

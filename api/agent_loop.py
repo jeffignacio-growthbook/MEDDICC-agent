@@ -247,6 +247,43 @@ def _value_traceable(claim_val: float, known_values: list[float]) -> bool:
     return False
 
 
+def _is_label_number(val: float, question: str) -> bool:
+    """Return True for year-like values (2000-2099) — skip them in trace checks."""
+    return 2000.0 <= val <= 2099.0
+
+
+def _extract_quarters_from_data(data: Any, depth: int = 0) -> set[str]:
+    """
+    Recursively scan all string leaf values in data for Q1-Q4 / FY tokens.
+    Returns a set of upper-cased tokens (e.g. {"Q3", "FY26"}).
+    """
+    found: set[str] = set()
+    if depth > 6 or data is None:
+        return found
+    if isinstance(data, str):
+        for tok in _QUARTER_RE.findall(data):
+            found.add(tok.upper())
+        return found
+    if isinstance(data, dict):
+        for v in data.values():
+            found |= _extract_quarters_from_data(v, depth + 1)
+        return found
+    if isinstance(data, list):
+        for item in data:
+            found |= _extract_quarters_from_data(item, depth + 1)
+    return found
+
+
+def _flatten_ledger_numerics(ledger: list[dict]) -> list[float]:
+    """Extract all numeric leaf values from the execution ledger."""
+    out: list[float] = []
+    for entry in (ledger or []):
+        result_data = entry.get("result")
+        if result_data is not None:
+            out.extend(_flatten_numerics(result_data))
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Result dataclass
 
@@ -397,32 +434,66 @@ async def _execute_fetch_data(query: str, tool_params: dict, sb: Any) -> dict:
     return {"error": "fetch_data requires a 'table' param; no governed primitive found for this query", "query": query}
 
 
-def _execute_check_result(claim: str, supporting_data: dict, question: str = "") -> dict:
+def _execute_check_result(
+    claim: str,
+    supporting_data: dict,
+    question: str = "",
+    ledger: list | None = None,
+) -> dict:
     """
-    Verify that every number in the claim can be traced to a value in
-    supporting_data (within rounding tolerance), with optional additive-sum
-    and scope checks.  Plausibility violations are surfaced as warnings only
-    — they never override trace-to-source.
+    Verify that every number in the claim can be traced to a value recorded
+    in the execution ledger (call_primitive / fetch_data results accumulated
+    by run_agent_loop).  Model-supplied supporting_data may add context for
+    additive-sum and plausibility checks, but cannot make an untraceable
+    number pass — only ledger values count for the primary trace.
+
+    Scope mismatch is BLOCKING (verified=False): if the question names a
+    quarter/entity and the ledger covers a different one, the claim is rejected.
+
+    Label-like numbers (years 2000-2099) are skipped in the trace check.
 
     Returns:
       {
         "verified": bool,         # False iff any claim number is untraceable
+                                  #   OR scope mismatch detected
         "claim": str,
-        "untraceable": [str],     # tokens from claim that had no match
-        "warnings": [...],        # plausibility violations (non-blocking)
+        "untraceable": [str],     # tokens from claim that had no match in ledger
+        "scope_mismatch": bool,   # True when quarter scope blocked the claim
+        "warnings": [...],        # non-blocking plausibility / sum violations
       }
     """
     claim_numbers = _extract_claim_numbers(claim)
-    known_values = _flatten_numerics(supporting_data or {})
+
+    # Primary trace source: LEDGER ONLY
+    ledger_values = _flatten_ledger_numerics(ledger or [])
 
     untraceable: list[str] = []
     for token, val in claim_numbers:
-        if not _value_traceable(val, known_values):
+        if _is_label_number(val, question):
+            continue  # skip year-like tokens
+        if not _value_traceable(val, ledger_values):
             untraceable.append(token)
 
     verified = len(untraceable) == 0
+    scope_mismatch = False
 
-    # Additive sum check — runs only when supporting_data carries a plan structure
+    # Scope check — BLOCKING when ledger and question both name Q-quarters that don't overlap.
+    # Only Q1-Q4 tokens are compared; FY-year tokens are shared context and are NOT used to
+    # satisfy the scope check (FY26 appears in both Q3 FY26 and Q4 FY26, so it is not specific
+    # enough to confirm alignment).
+    _Q_ONLY_RE = re.compile(r'\bQ[1-4]\b', re.IGNORECASE)
+    question_quarters = {q.upper() for q in _Q_ONLY_RE.findall(question)}
+    ledger_quarters: set[str] = set()
+    for entry in (ledger or []):
+        for tok in _extract_quarters_from_data(entry.get("result")):
+            if _Q_ONLY_RE.match(tok):
+                ledger_quarters.add(tok.upper())
+
+    if question_quarters and ledger_quarters and question_quarters.isdisjoint(ledger_quarters):
+        scope_mismatch = True
+        verified = False
+
+    # Additive sum check — uses supporting_data plan structure (warning only)
     sum_warning: str | None = None
     plan = (supporting_data or {}).get("plan")
     results_for_sum = (supporting_data or {}).get("results")
@@ -434,19 +505,6 @@ def _execute_check_result(claim: str, supporting_data: dict, question: str = "")
                 sum_warning = note
         except Exception as exc:
             logger.debug("[AGENT_LOOP] _sub_parts_sum_check import failed: %s", exc)
-
-    # Scope check — warning only
-    scope_warnings: list[str] = []
-    claim_quarters = _QUARTER_RE.findall(claim)
-    question_quarters = _QUARTER_RE.findall(question)
-    if claim_quarters and question_quarters:
-        cq = {q.upper() for q in claim_quarters}
-        qq = {q.upper() for q in question_quarters}
-        extra = cq - qq
-        if extra:
-            scope_warnings.append(
-                f"Claim mentions {sorted(extra)} but question asked about {sorted(qq)}"
-            )
 
     # Plausibility — warning source only (never overrides trace verdict)
     plausibility_warnings: list[dict] = []
@@ -463,12 +521,17 @@ def _execute_check_result(claim: str, supporting_data: dict, question: str = "")
     warnings = plausibility_warnings
     if sum_warning:
         warnings = [{"check": "additive_sum", "message": sum_warning, "severity": "warning"}] + warnings
-    warnings += [{"check": "scope", "message": w, "severity": "warning"} for w in scope_warnings]
+    if scope_mismatch:
+        warnings = [{"check": "scope_mismatch", "message": (
+            f"Question asks about {sorted(question_quarters)} but ledger data covers "
+            f"{sorted(ledger_quarters)} — claim is rejected."
+        ), "severity": "error"}] + warnings
 
     return {
         "verified": verified,
         "claim": claim,
         "untraceable": untraceable,
+        "scope_mismatch": scope_mismatch,
         "warnings": warnings,
     }
 
@@ -505,6 +568,10 @@ async def run_agent_loop(
     # C1b: tracks whether the most recent check_result call returned verified=False.
     # deliver is blocked while this is True so fabricated numbers can't be published.
     _last_check_failed: bool = False
+    # Execution ledger: every call_primitive/fetch_data result is recorded here.
+    # check_result traces claim numbers against ledger values only — model-passed
+    # supporting_data cannot make an untraceable number pass.
+    _ledger: list[dict] = []
 
     # Seed the conversation
     messages.append({
@@ -601,17 +668,26 @@ async def run_agent_loop(
                 tool_params.get("claim", ""),
                 tool_params.get("supporting_data", {}),
                 question=question,
+                ledger=_ledger,
             )
             result.check_result_verified = bool(tool_result.get("verified", True))
             _last_check_failed = not result.check_result_verified
 
         # ── call_primitive ────────────────────────────────────────────────
         elif tool == "call_primitive":
+            prim_name = tool_params.get("name", "")
             tool_result = await _execute_call_primitive(
-                tool_params.get("name", ""),
+                prim_name,
                 tool_params.get("params", {}),
                 sb,
             )
+            # Record successful results in the ledger (error results excluded).
+            if "error" not in tool_result:
+                _ledger.append({
+                    "tool": "call_primitive",
+                    "primitive": prim_name,
+                    "result": tool_result,
+                })
 
         # ── fetch_data ── C4 gate then dispatch ───────────────────────────
         elif tool == "fetch_data":
@@ -647,6 +723,9 @@ async def run_agent_loop(
                             _redirect_count, query, justification, matched,
                         )
                         tool_result = await _execute_fetch_data(query, tool_params, sb)
+                        # Record non-error fetch results in ledger
+                        if "error" not in tool_result and "blocked" not in tool_result:
+                            _ledger.append({"tool": "fetch_data", "result": tool_result})
                 else:
                     tool_result = {
                         "blocked": True,
@@ -658,6 +737,9 @@ async def run_agent_loop(
                     }
             else:
                 tool_result = await _execute_fetch_data(query, tool_params, sb)
+                # Record non-error fetch results in ledger
+                if "error" not in tool_result and "blocked" not in tool_result:
+                    _ledger.append({"tool": "fetch_data", "result": tool_result})
 
         # ── request_checkback ─────────────────────────────────────────────
         elif tool == "request_checkback":
