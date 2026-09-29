@@ -1,7 +1,7 @@
 {
-  "company": "GrowthBook",
+  "company": "Growthbook",
   "slug": "growthbook",
-  "last_etl_date": "2026-09-26T05:41:35.663473",
+  "last_etl_date": "2026-09-29T06:24:05.671855",
   "calls": [
     {
       "id": "01KGHY46Z2XRQ494JJYXYSJ57B",
@@ -241,6 +241,17 @@
       "duration_minutes": 11,
       "summary": "# GrowthBook - General Legal re. Comp Plans\nDate: 2026-09-25 | Duration: 11m\n\n## Summary\nThe team discussed formalizing sales compensation as the sales organization has grown from one to nine representatives. Ryan McGurk explained that offer letters currently include quotas and commissions but lack key terms, so the team plans to separate offer letters from annual, signed compensation plans. The plans should clarify ARR-based commissions, exclude one-time professional services deals, include change rights and at-will disclaimers, and support legal compliance in states such as New York and California. Quotas currently range from $250,000 to $325,000 ARR per quarter and are assigned based on seniority and account size, with annual reviews and documented rationale recommended to reduce discrimination risks. The team also discussed windfall provisions, accelerators, and possible caps such as $100,000 per deal or $500,000 per quarter. Robert Wennagel will review existing materials, prepare a questionnaire, and draft a standardized template. Leadership may receive discretion to allocate commissions when multiple representatives contribute.\n\n## Keywords\ncompensation plans, ARR quota, commission structure, windfall provision, annual updates, legal compliance\n\n## Action Items\n\n**Ryan McGurk**\nSend Robert examples of current compensation and commission plan documents for review (10:42)\nRespond to Robert’s upcoming detailed list of commission-related questions (05:53)\n\n**Robert Wennagel**\nReview existing compensation plan documents sent by Ryan (05:53)\nSend Ryan a list of specific questions on commission terms, chargebacks, recovery methods, and other legal considerations (05:53)\nPrepare a commission and variable compensation letter template that can be customized with individual quotas and figures (06:22)\n",
       "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3FK2H2255TY4YXTDM03PHCY",
+      "source": "fireflies",
+      "title": "Growthbook - Pronto - Pricing Sync",
+      "date": "2026-09-28",
+      "duration_minutes": 21.270000457763672,
+      "summary": "# Growthbook - Pronto - Pricing Sync\nDate: 2026-09-28 | Duration: 21.270000457763672m\n\n## Summary\nThe team plans to adopt GrowthBook because in-house A/B testing lacked clear attribution, scalability, and efficient analytics as the company grows. The company recently migrated from Redshift to Databricks, expects its team to double, and wants to build internal confidence before committing to a $25,000 annual enterprise contract. Divishtha proposed starting with the $40/month Pro plan, while Dan explained that its 2 million monthly event limit may not suit the company’s estimated 70–100 million monthly events and 1.5–2.3 million monthly active users. They agreed to estimate volumes for a no-cost, custom 14-day trial. GrowthBook would read existing Mixpanel event data through Databricks rather than track every event directly, while the team monitors CDN request volumes. A broader demo and technical discussion will include product, data engineering, SRE, and leadership stakeholders. The initial goal is to validate approximately 50 experiments, with use cases focused on personalized pricing and customer journeys. Slack will be the main communication channel, and Divishtha will provide event estimates before the early-next-week demo.\n\n## Keywords\nExperimentation platform, Pricing strategy, Data warehouse integration, Trial setup, Event volume estimation, Internal stakeholder buy-in\n\n## Action Items\n\n**Divishtha Malik**\nProvide GrowthBook with an event volume estimate and trial requirements for a 14-day proof of concept by tomorrow morning IST (17:44)\nArrange a demo meeting next week with CTO, product managers, and possibly CEO, aiming for 9-10 AM IST time slot (16:24)\n\n**Dan Wathne**\nCoordinate with GrowthBook solutions engineers (Europe or US) to support the technical demo and onboarding session for Pronto’s team next week (16:56)\nPrepare follow-up materials including a trial code, demo deck featuring personalization and pricing use cases, and technical documentation to assist data engineers and SRE during onboarding (18:58)\nCommunicate all updates and follow-ups to Divishtha primarily via Slack for improved responsiveness (19:47)\nSchedule and propose demo time slots to Divishtha for next week aligned with the 9-10 AM IST window (17:37)\n",
+      "organizer": "dan@growthbook.io",
       "participants": 2,
       "summary_quality": "good"
     }

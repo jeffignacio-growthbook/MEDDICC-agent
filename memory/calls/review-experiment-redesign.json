@@ -1,0 +1,18 @@
+{
+  "company": "Review experiment redesign",
+  "slug": "review-experiment-redesign",
+  "last_etl_date": "2026-09-29T06:24:05.670734",
+  "calls": [
+    {
+      "id": "01M3MBY6AZ6DEY1NCF8J9XB0AN",
+      "source": "fireflies",
+      "title": "Review experiment redesign",
+      "date": "2026-09-28",
+      "duration_minutes": 50.150001525878906,
+      "summary": "# Review experiment redesign\nDate: 2026-09-28 | Duration: 50.150001525878906m\n\n## Summary\nThe team reviewed a Notion demo planned for next Wednesday, emphasizing the framework and UI update rather than full feature details. An early release was preferred to support QA workflow testing, despite the public launch not being ready and limited demo time. Experiment editing will include inline changes with save or discard options, namespace and holdout controls in the targeting area, reorderable variations, and hover-based edit controls. The approval flow includes review and submit steps, with some edits going live immediately while others require approval and publishing. The team discussed toggling between proposed draft and published views, while noting that a draft ribbon could misleadingly suggest that everything is in draft state. The current UI was considered overwhelming and in need of polished, prioritized controls, clearer live versus unpublished states, and an unsaved-changes warning modal. Luke will independently test a branch and provide gatekeeping and high-level feedback, while Bryce and Gabe collaborate on final UI details. Further work will prioritize controls, the right rail, analysis plan alignment, and separate power analysis meetings.\n\n## Keywords\nexperiment redesign, approval flow, pre-launch checklist, Notion demo, staged edits, UI polish\n\n## Action Items\n**Bryce Fitzsimons**  \nSend experiment redesign branch to Luke (48:29)  \nConduct follow-up meeting on UI polish and scheduling (44:38)  \n\n**Gabe Melean**  \nPrepare discussion materials on UI polish and scheduling (44:38)  \nShare draft versus published toggle concept (45:38)  \n\n**Luke Sonnet**  \nTest experiment redesign branch and provide feedback (48:29)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

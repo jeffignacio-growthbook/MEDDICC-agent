@@ -1,0 +1,18 @@
+{
+  "company": "IFM & GrowthBook",
+  "slug": "ifm-growthbook",
+  "last_etl_date": "2026-09-29T06:24:05.677929",
+  "calls": [
+    {
+      "id": "01M2N1GA45EEH6W6KHGBKJ283Z",
+      "source": "fireflies",
+      "title": "IFM & GrowthBook | Introduction Meeting & Platform Intro",
+      "date": "2026-09-28",
+      "duration_minutes": 44,
+      "summary": "# IFM & GrowthBook | Introduction Meeting & Platform Intro\nDate: 2026-09-28 | Duration: 44m\n\n## Summary\nifm’s Digital Customer Experience team explained that it uses Matomo for A/B testing and Google Analytics 4 for analytics, with tests focused mainly on feature validation and UI changes across 4–5 countries and approximately 60,000–200,000 monthly users. Its Vue.js frontend uses Google Tag Manager for test implementation, while ERP and Salesforce data are stored in a data warehouse that is not yet connected to web analytics; visualization is planned to move to Power BI. The team prefers a low-code tool that can be managed without heavy IT involvement and currently runs mostly small, incremental tests. GrowthBook presented SDK-based feature flags and experimentation, integrations with BI data, cloud or self-hosted deployment including an EU cloud option, unlimited experiments and traffic, seat-based pricing, internal-traffic exclusion, and UI, CLI, API, and CI/CD support. ifm is evaluating options as its Matomo contract ends. Marcel will provide the slide deck and Enterprise pricing, followed by a detailed demo for frontend and analytics colleagues.\n\n## Keywords\nA/B testing, GrowthBook, Matomo replacement, digital customer experience, experiment analytics, integration\n\n## Action Items\n**Rémy Marin**  \nPrepare demo on experiment creation and analysis (30:49)  \n\n**Afagh Soleiman Banaee**  \nCoordinate availability and invite developers (32:39)  \n\n**Frauke Schumacher**  \nInclude Christian and developer in demo call (32:39)  \n\n**Marcel Geldner**  \nSend slide deck to IFM team (33:11)  \nShare calendar availability for follow-up demo (33:11)  \nProvide GrowthBook pricing overview (33:25)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

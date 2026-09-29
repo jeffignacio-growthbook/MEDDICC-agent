@@ -1,0 +1,18 @@
+{
+  "company": "Lead Routing",
+  "slug": "lead-routing",
+  "last_etl_date": "2026-09-29T06:24:05.677751",
+  "calls": [
+    {
+      "id": "01M3FHBJFV7QNZXWPGPGW4REQB",
+      "source": "fireflies",
+      "title": "Automated Outreach Campaign (Lead Routing)",
+      "date": "2026-09-28",
+      "duration_minutes": 38,
+      "summary": "# Automated Outreach Campaign (Lead Routing)\nDate: 2026-09-28 | Duration: 38m\n\n## Summary\nThe team agreed to move email contact data and nurtures from Customer IO to HubSpot to centralize communication and improve data accuracy. Although 93% of Customer IO contacts already exist in HubSpot, 3,600 missing contacts must be added as unsubscribed and kept out of marketing contacts, while 7,100 contacts unsubscribed in Customer IO must also be marked unsubscribed in HubSpot. Existing Customer IO automations, including Apollo enrichment and product-plan updates, will be stopped or migrated, and onboarding nurtures will be rebuilt in HubSpot using archived content. Campaigns covering onboarding, enterprise, AI BDR, and announcements will be consolidated with clearer segmentation and a double-send blocker. The team also wants role-based messaging using Growth Book data, feedback outreach 30 days after free signup, and review incentives for high NPS scorers. Immediate priorities include unsubscribe synchronization, MongoDB integration, and a Monday planning call involving Ashley, Chris, and Lyndsie.\n\n## Keywords\nCustomer IO, HubSpot, Unsubscribe Migration, Nurture Campaigns, Role Segmentation, Email Suppression\n\n## Action Items\n\n**Lyndsie Berens**\nMark unsubscribed contacts in HubSpot based on customer IO data by creating a segment and flipping their status; verify the process with Sean from Operations (08:00)\nReview and confirm no missing steps in the plan to move data from customer IO to HubSpot and to stop customer IO automations (08:04)\nPrepare for Monday’s nurture strategy call to define required nurture campaigns and data needs post-event (16:59)\nProvide screenshots and clarify distinctions between GrowthBook role and onboarding survey role data fields for segmentation purposes (22:13)\n\n**Chris Newton**\nPrioritize routing and sales workflows to ensure proper function during Lindsey’s absence (08:29)\nAssist in moving missing data and unsubscribes into HubSpot after the event (08:40)\nExplore suppression or delay mechanisms such as a “double send blocker” to avoid duplicate emails during overlapping nurture and webinar sends (15:37)\nWork with Ashley and Lyndsie to create segmented email sending rules for integrating nurture campaigns and announcements (16:50)\n\n**Ashley Stirrup**\nCollaborate with Lyndsie and Operations Methods team to finalize the process for unsubscribe migration and segment creation in HubSpot (09:00)\nParticipate in the nurture strategy call on Monday and support breaking down email outreach problems into manageable pieces (17:00)\nIdentify key nurture campaigns needing rebuilding, including onboarding and AI BDR nurturing, with focus on role/function data (18:40)\nIncorporate post-trial feedback and NPS-based outreach in nurture planning to enhance engagement and solicit reviews (23:30)\n",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}
