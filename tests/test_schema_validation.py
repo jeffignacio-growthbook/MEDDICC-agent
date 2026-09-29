@@ -248,6 +248,30 @@ class TestSanityCheckFilterValues(SchemaFixture):
         self.assertIn("suspicious_filters", result)
         self.assertEqual(result["suspicious_filters"][0]["rows_matched"], 0)
 
+    def test_real_column_wrong_value_triggers_sanity_check(self):
+        """
+        Feature 2 independent of Feature 1: 'stage' IS a real column (passes
+        schema validation), but 'invented_stage_abc' matches zero rows.
+        The sanity check must fire and block the query.
+        """
+        count_resp = MagicMock()
+        count_resp.count = 0
+        sb = MagicMock()
+        (sb.table.return_value.select.return_value
+           .eq.return_value.limit.return_value.execute.return_value) = count_resp
+
+        with patch.object(tools_module, "_init_valid_columns"), \
+             patch("api.tools.select_all", return_value=[]):
+            result = run(filter_table(
+                sb, "deals",
+                columns=["deal_id", "stage"],
+                filters=[("eq", "stage", "invented_stage_abc")],
+            ))
+        self.assertIn("error", result,
+            "Feature 2 should block a real column with an invented value")
+        self.assertIn("suspicious_filters", result)
+        self.assertIn("invented_stage_abc", result["error"])
+
 
 # ---------------------------------------------------------------------------
 # Planted-bug control for Feature 2

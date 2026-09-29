@@ -6705,7 +6705,8 @@ async def _route_question(question: str, user_id: str,
     from api.assessor import (assess_correctness,
                                should_retry,
                                should_escalate,
-                               build_retry_context)
+                               build_retry_context,
+                               assess_format)
 
     MAX_RETRIES = 2
     retry_count = 0
@@ -6898,6 +6899,22 @@ async def _route_question(question: str, user_id: str,
         caveat = answer_caveat(answer_violations)
         if caveat:
             verified = f"{verified}\n\n{caveat}"
+
+    # ── 8.6. Format / style check ─────────────────────────
+    # Runs only after Features 1+2 succeed (those reject at query time;
+    # reaching this point means a successful query was executed).
+    # Log-only — never blocks delivery.
+    try:
+        format_result = await assess_format(question, verified, classifier_client)
+        if not format_result.get("format_ok", True):
+            logger.warning(
+                "[FORMAT] issue=%s score=%.2f note=%s",
+                format_result.get("format_issue"),
+                format_result.get("format_score", 0.5),
+                format_result.get("format_note"),
+            )
+    except Exception as _fe:
+        logger.warning(f"[FORMAT] check raised: {_fe}")
 
     # ── 9. Log learning note (win or lose) ────────────────
     _log_learning(sb, question, handler_name,
