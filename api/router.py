@@ -4902,7 +4902,28 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 messages.append({"role": "user", "content": correction})
                 no_progress_streak += 1
                 if no_progress_streak >= 2:
-                    return await _finalize_from_data("aggregation_mismatch_unresolved")
+                    # Hard decline: the verify gate caught a mismatch twice in
+                    # a row. Shipping anyway (the old behaviour) is worse than
+                    # an honest refusal — a wrong number delivered confidently
+                    # is the failure mode this gate exists to prevent. State
+                    # the real verified figure(s) plainly so the user isn't
+                    # left without any number at all.
+                    _real_parts = [
+                        f"{d['category']} actual sum = {d['actual_sum']:,.0f}"
+                        for d in all_disc
+                        if d.get("actual_sum") is not None
+                    ]
+                    _real_str = (
+                        f" Real values from the data: {'; '.join(_real_parts)}."
+                        if _real_parts else ""
+                    )
+                    return _give_up(
+                        "aggregation_mismatch_unresolved",
+                        f"the answer contained figures that couldn't be "
+                        f"reconciled with the underlying rows after two "
+                        f"correction attempts.{_real_str} Declining to "
+                        f"deliver a number that doesn't match the source data.",
+                    )
                 # Store corrected totals + raw rows for post-retry placement verification
                 cost_state["_agg_retry_totals"] = all_disc
                 cost_state["_agg_retry_rows"] = all_raw_rows
@@ -5267,23 +5288,19 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 step_ref = data
                 data = accumulated_data.get(data, {}).get("rows", [])
 
-                # VALIDATION: Warn if step reference resolved to empty
+                # VALIDATION: Fail loudly if step reference resolved to empty
                 if not data:
                     available_steps = [k for k, v in accumulated_data.items()
                                      if k.startswith("step_") and v.get("rows")]
-                    logger.warning(
+                    logger.error(
                         f"[BUG] aggregate_results: step reference '{step_ref}' "
-                        f"resolved to empty data. Available steps with data: {available_steps}")
-
-                    # Return error instead of continuing with empty data
-                    result = {
-                        "error": f"Step reference '{step_ref}' has no data. "
-                                f"Available: {available_steps}",
-                        "rows": [],
-                        "validation_failed": "invalid_step_reference"
-                    }
-                    tool_params["data"] = data
-                    # Skip tool execution, use error result
+                        f"resolved to empty. Available steps with data: "
+                        f"{available_steps}. Terminating loop.")
+                    return _give_up(
+                        "invalid_step_reference",
+                        f"aggregate_results referenced step '{step_ref}' which "
+                        f"has no data (available steps: {available_steps})",
+                    )
                 else:
                     tool_params["data"] = data
                     result = await tool_fn(**tool_params)

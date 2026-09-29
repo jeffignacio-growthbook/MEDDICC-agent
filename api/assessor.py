@@ -193,13 +193,18 @@ def _compact_results(tool_results: dict) -> str:
 def should_escalate(assessment: dict) -> bool:
     """
     Return True when the question needs the compositional layer (composer).
-    Only fires on scope_mismatch, and never on skipped assessments.
+
+    Fires on scope_mismatch (handler scope too narrow) and wrong_time_window
+    (handler returned a different period than the question asked for — e.g. a
+    Q4 question routed to a current-quarter-only handler). Both cases require
+    multi-step composition via run_agent_loop rather than a retry of the same
+    handler. Never fires on skipped assessments.
     """
     if assessment.get("skipped"):
         return False
     if assessment.get("correct", True):
         return False
-    return assessment.get("issue") == "scope_mismatch"
+    return assessment.get("issue") in ("scope_mismatch", "wrong_time_window")
 
 
 def should_retry(assessment: dict,

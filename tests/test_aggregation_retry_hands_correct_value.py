@@ -249,31 +249,32 @@ def test_incident_2_corrected_value_ships_end_to_end():
           "value ships end-to-end")
 
 
-def test_identical_wrong_answer_on_retry_still_escalates_not_loops_forever():
+def test_identical_wrong_answer_on_retry_hard_declines_not_loops_forever():
     """The exact failure mode from tonight, worst case: the model
     repeats the SAME wrong answer even after being handed the correct
-    value. The loop must not spin forever — it escalates to
-    _finalize_from_data after the second unresolved attempt, and the
-    unresolved-after-retry primitive is available for the case where
-    even THAT last-resort retry doesn't take."""
+    value. The loop must not spin forever — after the second unresolved
+    attempt it now hard-declines (answered=False) with the real numbers
+    stated plainly, rather than shipping a caveat-laden wrong answer."""
     tool_call = json.dumps({"tool": "filter_table", "params": {
         "table": "waterfall_weekly",
         "columns": ["week_ending", "segment", "net_change"],
         "filters": [],
     }})
     still_wrong = json.dumps({"answer": INCIDENT_1_WRONG_ANSWER})
-    finalize_answer = json.dumps({"answer": INCIDENT_1_CORRECT_ANSWER})
 
-    fake_client = _FakeClient([tool_call, still_wrong, still_wrong, finalize_answer])
+    # Only 3 responses consumed: tool call + 2 wrong attempts (no finalize call).
+    fake_client = _FakeClient([tool_call, still_wrong, still_wrong])
     result, fake_client, _ = _run(fake_client, INCIDENT_1_ROWS)
 
-    assert len(fake_client.calls) == 4, (
-        f"expected tool call + 2 unresolved attempts + 1 finalize "
-        f"synthesis call — got {len(fake_client.calls)}"
+    assert len(fake_client.calls) == 3, (
+        f"expected tool call + 2 unresolved attempts — got {len(fake_client.calls)}"
     )
-    assert result["answered"] is True
-    print("✓ two identical wrong answers in a row still escalate to "
-          "_finalize_from_data rather than looping forever")
+    assert result["answered"] is False, (
+        "after two unresolved aggregation mismatches the loop must hard-decline, "
+        f"not deliver — got answered={result.get('answered')!r}"
+    )
+    print("✓ two identical wrong answers in a row hard-decline rather than "
+          "looping forever or shipping a caveat-laden wrong answer")
 
 
 # --- The unresolved-after-retry signal must be visible, not silent ---
@@ -309,26 +310,22 @@ class _FakeSupabaseWithCostLog:
         raise AttributeError(f"no fake support for table {name!r}")
 
 
-def test_unresolved_after_retry_ships_a_caveat_and_is_not_a_silent_success():
-    """2026-09-11: this primitive used to be visible only to someone who
-    happened to grep the logs or query query_cost_log's primitives_fired
-    JSONB directly — the coarse outcome field made it look like an
-    ordinary success (result.get("answered") is True, same as any clean
-    answer). This proves BOTH halves of the fix at once, end-to-end:
+def test_unresolved_after_retry_hard_declines_and_is_not_a_silent_success():
+    """2026-09-29: the caveat-with-delivery approach (shipping a wrong number
+    with a ⚠️ note) is replaced by a hard decline (answered=False) that
+    states the REAL verified figure(s) plainly. A wrong number delivered
+    confidently — even with a caveat — is worse than an honest refusal.
 
-    1. The shipped Slack answer itself carries a user-facing caveat
-       ("could not be fully verified... double-check") — never a
-       silently-wrong number.
-    2. query_cost_log's outcome field is its own distinct bucket,
-       "answered_with_unverified_aggregation" — not folded into the
-       ordinary "answered_after_resynthesis" success bucket — so it's
-       queryable by outcome alone, no JSONB primitive digging required.
+    This proves the hard-decline behaviour end-to-end:
+    1. answered=False — the loop terminates without delivering an answer.
+    2. The answer text names the real number from the retrieved rows, not
+       the model's unverified figure.
+    3. query_cost_log's reason_tag is "aggregation_mismatch_unresolved"
+       — queryable independently from a generic give-up bucket.
 
     Scenario: the model repeats the same wrong total through the main
-    loop's two allowed attempts (escalating to _finalize_from_data),
-    AND through finalize's own one available retry — the worst case,
-    where even being handed the correct value directly twice over
-    doesn't take.
+    loop's two allowed attempts. The hard-decline fires immediately; there
+    is no finalize call.
     """
     tool_call = json.dumps({"tool": "filter_table", "params": {
         "table": "waterfall_weekly",
@@ -337,10 +334,8 @@ def test_unresolved_after_retry_ships_a_caveat_and_is_not_a_silent_success():
     }})
     still_wrong = json.dumps({"answer": INCIDENT_1_WRONG_ANSWER})
 
-    # tool call, 2 unresolved main-loop attempts, finalize's own synth
-    # (also wrong), finalize's one retry (still wrong).
-    fake_client = _FakeClient(
-        [tool_call, still_wrong, still_wrong, still_wrong, still_wrong])
+    # tool call + 2 unresolved main-loop attempts; no finalize call.
+    fake_client = _FakeClient([tool_call, still_wrong, still_wrong])
     fake_sb = _FakeSupabaseWithCostLog()
 
     filter_table_calls = []
@@ -368,32 +363,33 @@ def test_unresolved_after_retry_ships_a_caveat_and_is_not_a_silent_success():
         table_classifier_module.classify_relevant_tables = orig_classify
         schema_context_module.get_schema_context = orig_get_schema
 
-    # 1. The shipped answer itself carries a visible caveat.
-    assert result["answered"] is True
-    assert "could not be fully verified" in result["answer"], (
-        f"expected a user-facing caveat in the shipped answer — got: "
+    # 1. Hard decline — not delivered.
+    assert result["answered"] is False, (
+        f"expected answered=False (hard decline) — got: {result.get('answered')!r}"
+    )
+    # 2. The real figure from the rows is named in the decline message.
+    # INCIDENT_1 actual_sum = -1,417,100
+    assert "-1,417,100" in result["answer"], (
+        f"hard-decline message must state the real verified figure — got: "
         f"{result['answer']!r}"
     )
-    assert "double-check" in result["answer"].lower()
     # No internal jargon leaked into the user-facing text.
     for banned in ("resynthesis", "budget", "token", "primitive"):
         assert banned not in result["answer"].lower(), (
             f"internal jargon {banned!r} leaked into the user-facing "
-            f"caveat: {result['answer']!r}"
+            f"decline: {result['answer']!r}"
         )
 
-    # 2. query_cost_log's outcome field is its own distinct bucket.
+    # 3. query_cost_log records the aggregation_mismatch_unresolved reason.
     assert len(fake_sb.query_cost_log_inserts) == 1
     logged = fake_sb.query_cost_log_inserts[0]
-    assert logged["outcome"] == "answered_with_unverified_aggregation", (
-        f"expected the distinct outcome bucket, not folded into an "
-        f"ordinary success bucket — got: {logged['outcome']!r}"
+    assert logged["reason_tag"] == "aggregation_mismatch_unresolved", (
+        f"expected reason_tag 'aggregation_mismatch_unresolved' — got: "
+        f"{logged.get('reason_tag')!r}"
     )
-    assert logged["primitives_fired"]["aggregation_mismatch_unresolved_after_retry"] is True
 
-    print("✓ an unresolved-after-retry aggregation mismatch ships a "
-          "user-facing caveat AND logs its own distinct, queryable "
-          "outcome bucket — never a silent success either way")
+    print("✓ an unresolved aggregation mismatch hard-declines (answered=False) "
+          "with the real figure stated — never a silently-wrong delivered answer")
 
 
 if __name__ == "__main__":
@@ -406,8 +402,8 @@ if __name__ == "__main__":
         test_correction_message_handles_multiple_discrepancies_at_once,
         test_incident_1_corrected_value_ships_end_to_end,
         test_incident_2_corrected_value_ships_end_to_end,
-        test_identical_wrong_answer_on_retry_still_escalates_not_loops_forever,
-        test_unresolved_after_retry_ships_a_caveat_and_is_not_a_silent_success,
+        test_identical_wrong_answer_on_retry_hard_declines_not_loops_forever,
+        test_unresolved_after_retry_hard_declines_and_is_not_a_silent_success,
     ]
     failed = 0
     for t in tests:

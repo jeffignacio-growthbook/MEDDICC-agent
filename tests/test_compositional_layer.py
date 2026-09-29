@@ -457,11 +457,12 @@ class TestCategoryB_NoEscalation(unittest.TestCase):
 
     def test_B_non_scope_mismatch_assessments_do_not_escalate(self):
         """
-        EXPECTED: any assessment WITHOUT issue=scope_mismatch → should_escalate False.
-        These four questions should never produce scope_mismatch from the assessor.
+        EXPECTED: issues that don't require composition → should_escalate False.
+        wrong_time_window is NOT in this list — it now escalates to run_agent_loop
+        so the composer can handle Q4-style questions that single handlers can't.
         """
         for issue in ("wrong_handler", "wrong_table", "missing_join",
-                      "wrong_time_window", "should_be_dynamic",
+                      "should_be_dynamic",
                       "data_gap", "format_only", None):
             with self.subTest(issue=issue):
                 assessment = {"correct": False, "score": 0.4, "issue": issue}
@@ -469,6 +470,18 @@ class TestCategoryB_NoEscalation(unittest.TestCase):
                     should_escalate(assessment),
                     f"Non-scope-mismatch issue {issue!r} must not escalate",
                 )
+
+    def test_B_wrong_time_window_does_escalate(self):
+        """
+        EXPECTED: wrong_time_window → should_escalate True.
+        A handler that returned the wrong period can't fix itself on retry;
+        the question needs multi-step composition via run_agent_loop.
+        """
+        assessment = {"correct": False, "score": 0.4, "issue": "wrong_time_window"}
+        self.assertTrue(
+            should_escalate(assessment),
+            "wrong_time_window must escalate to the compositional layer",
+        )
 
     def test_B_correct_assessment_does_not_escalate(self):
         """
@@ -1243,16 +1256,17 @@ class TestCategoryG_StepTwoRegression(unittest.TestCase):
     already work via direct handlers must never reach the agent loop.
 
     These are deterministic (no model call needed): the escalation gate
-    fires only on scope_mismatch, and scope_mismatch only fires when the
-    assessor decides a single handler cannot cover the question's scope.
-    For each question the assessor would produce correct=True (existing
-    handler works), so should_escalate returns False.
+    fires on scope_mismatch and wrong_time_window. For each Category-B
+    question the assessor would produce correct=True (existing handler
+    works), so should_escalate returns False regardless.
 
     The tests confirm THREE layers:
-      1. should_escalate is False for all non-scope_mismatch assessments
-         (the assessor would not produce scope_mismatch for these questions)
+      1. should_escalate is False when correct=True (handler works)
       2. find_pending_plan returns None → composer gate is closed
       3. find_pending_checkback returns None → checkback gate is closed
+
+    Note: wrong_time_window now triggers escalation (added alongside
+    scope_mismatch). G5 reflects the updated non-escalating issue list.
     """
 
     _B_QUESTIONS = [
@@ -1305,14 +1319,13 @@ class TestCategoryG_StepTwoRegression(unittest.TestCase):
 
     def test_G5_all_four_non_escalating_by_assessment_issue(self):
         """
-        EXPECTED: for every non-scope_mismatch issue the assessor might raise
-        on these four questions, should_escalate returns False.  Exhaustive
-        check — every issue that IS retryable is not scope_mismatch.
+        EXPECTED: issues that don't require composition → should_escalate False.
+        wrong_time_window is intentionally excluded: it now escalates so that
+        Q4-style questions route to run_agent_loop instead of a dead retry loop.
         """
         non_escalating_issues = [
             "wrong_handler", "wrong_table", "missing_join",
-            "wrong_time_window", "should_be_dynamic",
-            "data_gap", "format_only", None,
+            "should_be_dynamic", "data_gap", "format_only", None,
         ]
         for q in self._B_QUESTIONS:
             for issue in non_escalating_issues:
@@ -1321,6 +1334,18 @@ class TestCategoryG_StepTwoRegression(unittest.TestCase):
                         should_escalate({"correct": False, "score": 0.4, "issue": issue}),
                         f"Issue {issue!r} for {q[:40]!r} must not escalate",
                     )
+
+    def test_G6_wrong_time_window_escalates(self):
+        """
+        EXPECTED: wrong_time_window → should_escalate True.
+        Q4 pipeline questions get this issue when the handler only covers the
+        current quarter. Routing to the composer lets run_agent_loop handle them.
+        """
+        assessment = {"correct": False, "score": 0.4, "issue": "wrong_time_window"}
+        self.assertTrue(
+            should_escalate(assessment),
+            "wrong_time_window must now escalate to the compositional layer",
+        )
 
 
 # ===========================================================================
