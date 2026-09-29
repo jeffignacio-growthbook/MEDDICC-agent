@@ -1,0 +1,18 @@
+{
+  "company": "15 Minute Meeting",
+  "slug": "15-minute-meeting",
+  "last_etl_date": "2026-09-29T06:24:05.671286",
+  "calls": [
+    {
+      "id": "01M3FPGBWW54AE8NMGSZHVT0PB",
+      "source": "fireflies",
+      "title": "15 Minute Meeting",
+      "date": "2026-09-28",
+      "duration_minutes": 34,
+      "summary": "# 15 Minute Meeting\nDate: 2026-09-28 | Duration: 34m\n\n## Summary\nThe team reviewed whether two MongoDB availability tests had evidence during the December-to-May audit period and confirmed that Vanta had no historical test data because availability was enabled afterward. MongoDB logs might provide supporting evidence, but retention is uncertain and the team lacks direct access. Jennifer’s team is divided between adding availability to the current audit to meet certification goals and waiting for the next audit for cleaner evidence. The team also discussed the manual, error-prone review of control histories and the need for more efficient tracking. For device security, employee-uploaded screenshots covering settings such as screen lock and encryption are currently understood to be acceptable, although test mappings and auditor expectations require confirmation. Katie will consult Vanta’s engineering, GRC, advisory, and partnerships teams, potentially engage auditors directly, and provide Jennifer with guidance by the following day.\n\n## Keywords\nSOC 2 audit, availability controls, MongoDB logs, device security, MDM evidence, retroactive test enabling\n\n## Action Items\n\n**Jennifer Pham-Le**\nSend correspondence thread with auditors about MDM and device security evidence to advisory@vanta.com for Vanta team review (24:30)\nFollow up with CTO regarding MongoDB logs to see if evidence from audit period can be pulled (07:00)\n\n**Katie Lavery**\nReview internally with engineering and GRC teams about retroactively enabling availability-related tests and implications for SOC 2 audits (09:30)\nConsult with experienced team lead and GRC compliance experts to develop recommended approach and clarify best practices for retroactive test enabling (10:30)\nInvestigate more efficient ways to assess availability control histories within Vanta instead of manual test-by-test evaluation (15:50)\nReview custom device security tests and auditing mapping to understand auditor concerns and reporting behavior (27:00)\nCoordinate potential direct communication with audit firm upon review of forwarded correspondence to clarify evidence requirements (24:50)\nProvide Jennifer a prioritized update by midday next day regarding availability control guidance (33:50)\n",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

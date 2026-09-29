@@ -1,0 +1,18 @@
+{
+  "company": "Genious Sports x GB",
+  "slug": "genious-sports-x-gb",
+  "last_etl_date": "2026-09-29T06:24:05.672630",
+  "calls": [
+    {
+      "id": "01M357YHS22PZQ1NF2J7S54BJQ",
+      "source": "fireflies",
+      "title": "Genious Sports x GB: Exp Sync",
+      "date": "2026-09-28",
+      "duration_minutes": 28.600000381469727,
+      "summary": "# Genious Sports x GB: Exp Sync\nDate: 2026-09-28 | Duration: 28.600000381469727m\n\n## Summary\nThe discussion focused on a membership-first strategy for Covers, where logged-in users currently represent 2% of online users and increased membership is expected to support click-outs and betting-slip activity. The first experiment is a homepage interstitial encouraging users to join, with control and variations A and B planned through GrowthBook; side-rail and bottom-rail concepts were deferred. Greg Phipps is setting up the test, while Cris Dizon is supporting execution and raising concerns about traffic sufficiency, allocation splits, metrics, and production readiness. GrowthBook is connected to Snowflake through the Covers SDK, with experiment assignments and user events linked through shared UUIDs, although metric ownership and SDK deployment details remain open. Practical first-test training was requested, with Halifax sessions on October 4th or 5th considered. The group also discussed AI-assisted experimentation and exploring whether agentic workflows could support 400 experiments with three people.\n\n## Keywords\nGrowthBook, Experimentation, Feature flags, Membership growth, Snowflake, Agentic workflows\n\n## Action Items\n**Greg Phipps**\nInclude Cris in execution pod (03:40)\nReview AA testing setup (05:08)\nReduce experiment variations (06:03)\nAsk Devin about SDK deployment (12:44)\nIntegrate GrowthBook into pod (27:06)\n\n**Cris Dizon**\nIdentify GrowthBook specialists (25:23)\nRegroup with Christian and team (26:27)\nSchedule experimentation training (26:27)",
+      "organizer": "cris@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}
