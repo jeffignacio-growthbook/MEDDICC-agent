@@ -207,6 +207,77 @@ class TestPendingPlanConfirmation(unittest.TestCase):
         self.assertTrue(len(appended) > 0, "history_append must be non-empty")
 
 
+    def test_ordinary_question_no_pending_plan_no_unbound_error(self):
+        """A plain question with no pending plan must not raise UnboundLocalError.
+
+        Regression: _plan_cancelled_entry was only assigned inside the
+        pending-plan branches, so every ordinary turn that skipped both
+        branches hit UnboundLocalError at the bottom of route_question
+        where it checks `if _plan_cancelled_entry is not None`.
+        """
+        history = [
+            {"role": "user", "content": "Show me the pipeline"},
+            {"role": "assistant", "content": "Here's the pipeline."},
+        ]
+        inner_return = {
+            "answer": "Pipeline looks good.",
+            "needs_ack": False,
+            "tool_results": {},
+            "handler_name": "query_pipeline",
+        }
+        sb = MagicMock()
+        sb.table.return_value.select.return_value.execute.return_value = MagicMock(data=[])
+
+        with patch("api.router._route_question", new_callable=AsyncMock,
+                    return_value=inner_return), \
+             patch("api.agent_loop.run_agent_loop", AsyncMock()), \
+             patch("api.router.LLMClient") as mock_llm:
+            mock_llm.from_config.return_value = MagicMock()
+            from api.router import route_question
+            result = run(route_question(
+                question="How does the pipeline look?",
+                user_id="U_TEST",
+                history=history,
+                sb=sb,
+                thread_ts="1727000000.000001",
+            ))
+        self.assertIn("Pipeline looks good.", result.get("answer", ""))
+
+    def test_affirmed_plan_budget_exhausted_falls_through_safely(self):
+        """When run_agent_loop exhausts its budget, route_question must
+        fall through to normal routing without UnboundLocalError."""
+        history = _history_with_pending_plan()
+
+        exhausted_result = FakeLoopResult()
+        exhausted_result.budget_exhausted = True
+
+        inner_return = {
+            "answer": "Fallback answer.",
+            "needs_ack": False,
+            "tool_results": {},
+            "handler_name": "query_pipeline",
+        }
+        sb = MagicMock()
+        sb.table.return_value.select.return_value.execute.return_value = MagicMock(data=[])
+
+        with patch("api.router._route_question", new_callable=AsyncMock,
+                    return_value=inner_return) as mock_inner, \
+             patch("api.agent_loop.run_agent_loop",
+                   AsyncMock(return_value=exhausted_result)), \
+             patch("api.router.LLMClient") as mock_llm:
+            mock_llm.from_config.return_value = MagicMock()
+            from api.router import route_question
+            result = run(route_question(
+                question="Yes",
+                user_id="U_TEST",
+                history=history,
+                sb=sb,
+                thread_ts="1727000000.000001",
+            ))
+        mock_inner.assert_called_once()
+        self.assertIn("Fallback answer.", result.get("answer", ""))
+
+
 class TestComposerEscalationPersistence(unittest.TestCase):
     """The composer-escalation return dict must include history_append."""
 

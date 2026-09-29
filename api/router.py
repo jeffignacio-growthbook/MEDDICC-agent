@@ -5814,6 +5814,7 @@ async def route_question(question: str, user_id: str,
     # Must run before the rep_clarification check so an affirming "yes"
     # to a decomposition plan executes it rather than lapsing as a new question.
     pending_plan_entry = find_pending_plan(history or [])
+    _plan_cancelled_entry = None
     if pending_plan_entry and reply_affirms_plan(question):
         plan = pending_plan_entry.get("plan", {})
         logger.info(
