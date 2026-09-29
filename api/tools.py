@@ -164,7 +164,15 @@ async def filter_table(sb, table, columns=None, filters=None, limit=200, order_b
                 "deal_status", "close_date"]
     # Strip heavy text blobs — the fallback dumps rows into synthesis (see above).
     cols = [c for c in cols if c not in HEAVY_COLUMNS] or ["deal_id", "company_name"]
-    valid_filters, unknown = _validate_filters(table, [tuple(f) for f in (filters or [])])
+    raw_filters = []
+    for f in (filters or []):
+        t = tuple(f)
+        if len(t) < 2:
+            continue
+        if len(t) == 2:
+            t = (t[0], t[1], None)
+        raw_filters.append(t)
+    valid_filters, unknown = _validate_filters(table, raw_filters)
     if unknown:
         cols = sorted({c for _, c, _ in unknown})
         return {"error": (f"Can't filter {table} on {cols}: not a queryable column of {table}. "

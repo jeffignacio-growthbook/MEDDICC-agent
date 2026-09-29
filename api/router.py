@@ -5849,10 +5849,6 @@ async def route_question(question: str, user_id: str,
                 f"check_result_verified={loop_result.check_result_verified} "
                 f"budget_exhausted={loop_result.budget_exhausted}"
             )
-            # budget_exhausted=True means the loop hit MAX_STEPS OR a
-            # client exception broke the for-loop early — both land the
-            # same _INSUFFICIENT_ANSWER fallback.  Only return to the user
-            # when the loop genuinely delivered (budget_exhausted=False).
             if loop_result.answer and not loop_result.budget_exhausted:
                 original_q = plan.get("question", question)
                 cb_entry = make_pending_checkback_entry(plan, original_q, thread_ts)
@@ -5863,9 +5859,29 @@ async def route_question(question: str, user_id: str,
                     "handler_name": "composer_agent_loop",
                     "history_append": [cb_entry],
                 }
+            if loop_result.budget_exhausted:
+                logger.warning(
+                    "[COMPOSER] agent loop exhausted budget — returning "
+                    "explicit failure instead of falling through to classifier"
+                )
+                return {
+                    "answer": loop_result.answer,
+                    "needs_ack": False,
+                    "tool_results": {},
+                    "handler_name": "composer_agent_loop_exhausted",
+                }
         except Exception as e:
             logger.error(f"[COMPOSER] plan execution failed: {e}")
-        # If execution failed, fall through to normal routing
+            return {
+                "answer": (
+                    "I wasn't able to complete the analysis — an internal "
+                    "error occurred while executing the plan. Please try "
+                    "again or rephrase with a narrower scope."
+                ),
+                "needs_ack": False,
+                "tool_results": {},
+                "handler_name": "composer_agent_loop_error",
+            }
 
     elif pending_plan_entry:
         # User replied to a pending plan but did NOT affirm it.
