@@ -1499,12 +1499,12 @@ TOOLS YOU CAN CALL:
     champion_band, deal_value, stage, risk_flags) plus the true total_at_risk count;
     a clear message when nothing is currently flagged
     Examples: "which deals are at risk", "champion gaps this quarter", "which of those are at risk"
-  query_quarter_health()
+  query_quarter_health(question)
     **USE THIS when the question asks about**:
     - WHETHER THE QUARTER IS IN GOOD SHAPE overall, a quarter health check
     **DO NOT use for** any single one of its parts (pipeline, forecast trust,
     deal risk, loss concentration) or for the downside (use query_quarter_downside)
-    Params: none (always the current quarter)
+    Params: question (string) — the user's original question text (enables brief mode for short/tl;dr requests)
     **RETURNS**: closed won vs target, pace, stage-weighted coverage of the
     remaining gap, and the forecast-risk / loss-rate / rep modifiers, each with
     its disclosed basis, and an instruction to give a plain-language verdict
