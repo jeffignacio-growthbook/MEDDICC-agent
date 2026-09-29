@@ -5831,7 +5831,11 @@ async def route_question(question: str, user_id: str,
                 f"check_result_verified={loop_result.check_result_verified} "
                 f"budget_exhausted={loop_result.budget_exhausted}"
             )
-            if loop_result.answer:
+            # budget_exhausted=True means the loop hit MAX_STEPS OR a
+            # client exception broke the for-loop early — both land the
+            # same _INSUFFICIENT_ANSWER fallback.  Only return to the user
+            # when the loop genuinely delivered (budget_exhausted=False).
+            if loop_result.answer and not loop_result.budget_exhausted:
                 original_q = plan.get("question", question)
                 cb_entry = make_pending_checkback_entry(plan, original_q, thread_ts)
                 return {
