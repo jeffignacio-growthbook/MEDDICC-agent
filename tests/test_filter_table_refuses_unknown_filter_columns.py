@@ -131,6 +131,23 @@ def test_join_tables_joins_on_real_rows():
           "(was TypeError on any primary row; the foreign key is selected even when not asked for)")
 
 
+def test_two_element_filter_does_not_crash():
+    """Reproduces the live crash: model passes a 2-element filter like
+    ["eq", "region"] (no value). Before the fix, _validate_filters
+    unpacked (op, col, val) from a 2-tuple and raised ValueError:
+    not enough values to unpack (expected 3, got 2)."""
+    r, _ = _run(columns=["deal_id"], filters=[["eq", "region"]])
+    assert isinstance(r, (dict, list)), f"expected result dict/list, got {type(r)}"
+    print("✓ a 2-element filter is handled without ValueError")
+
+
+def test_one_element_filter_is_skipped():
+    """A 1-element filter (just an operator, no column) is silently skipped."""
+    r, _ = _run(columns=["deal_id", "deal_value"], filters=[["eq"]])
+    assert "rows" in r, f"expected rows, got {r}"
+    print("✓ a 1-element filter is skipped without crashing")
+
+
 if __name__ == "__main__":
     test_registered_filters_still_apply()
     test_unknown_or_hidden_filter_column_is_refused_not_dropped()
@@ -138,4 +155,6 @@ if __name__ == "__main__":
     test_unregistered_table_is_still_not_validated()
     test_join_tables_passes_the_error_through()
     test_join_tables_joins_on_real_rows()
+    test_two_element_filter_does_not_crash()
+    test_one_element_filter_is_skipped()
     print("\n✅ All tests passed")

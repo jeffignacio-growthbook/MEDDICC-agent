@@ -1728,5 +1728,65 @@ class TestKnownPrimitivesCallable(unittest.TestCase):
         self.assertFalse(errors, "\n".join(errors))
 
 
+class TestFetchDataExceptionBudgetExhaustion(unittest.TestCase):
+    """When fetch_data raises an exception mid-loop and the loop exhausts
+    its budget without delivering, the result must explicitly state the
+    analysis failed — never read as a normal answer."""
+
+    def test_fetch_data_error_then_budget_exhaustion_says_failed(self):
+        """Sequence: fetch_data (structured, will hit error in filter_table)
+        repeated until MAX_STEPS — result.answer must say "unable" and
+        budget_exhausted must be True."""
+        import asyncio
+        steps = [
+            {"tool": "fetch_data", "params": {
+                "query": "get deals",
+                "table": "deals_snapshot",
+                "columns": ["deal_id", "deal_value"],
+                "filters": [["eq", "region", "EMEA"]],
+            }}
+            for _ in range(MAX_STEPS)
+        ]
+        client = FakeClient(steps)
+        result = asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="What is pipeline coverage?",
+                client=client,
+                sb=_sb(),
+                history=[],
+            )
+        )
+        self.assertTrue(result.budget_exhausted)
+        self.assertIn("unable", result.answer.lower())
+
+    def test_fetch_data_error_answer_not_acknowledgment(self):
+        """The budget-exhausted answer must not read like an acknowledgment
+        (the ":+1: Anytime" failure mode)."""
+        import asyncio
+        steps = [
+            {"tool": "fetch_data", "params": {
+                "query": "get deals",
+                "table": "deals_snapshot",
+                "columns": ["deal_id"],
+                "filters": [["eq", "region"]],
+            }}
+            for _ in range(MAX_STEPS)
+        ]
+        client = FakeClient(steps)
+        result = asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="What is pipeline coverage?",
+                client=client,
+                sb=_sb(),
+                history=[],
+            )
+        )
+        self.assertTrue(result.budget_exhausted)
+        answer_lower = result.answer.lower()
+        self.assertNotIn("anytime", answer_lower)
+        self.assertNotIn(":+1:", answer_lower)
+        self.assertNotIn("thumbsup", answer_lower)
+
+
 if __name__ == "__main__":
     unittest.main()

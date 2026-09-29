@@ -243,25 +243,20 @@ class TestPendingPlanConfirmation(unittest.TestCase):
             ))
         self.assertIn("Pipeline looks good.", result.get("answer", ""))
 
-    def test_affirmed_plan_budget_exhausted_falls_through_safely(self):
+    def test_affirmed_plan_budget_exhausted_returns_explicit_failure(self):
         """When run_agent_loop exhausts its budget, route_question must
-        fall through to normal routing without UnboundLocalError."""
+        return the loop's explicit failure message — never fall through
+        to the classifier (which would produce a generic acknowledgment)."""
         history = _history_with_pending_plan()
 
         exhausted_result = FakeLoopResult()
         exhausted_result.budget_exhausted = True
+        exhausted_result.answer = "I was unable to answer this confidently"
 
-        inner_return = {
-            "answer": "Fallback answer.",
-            "needs_ack": False,
-            "tool_results": {},
-            "handler_name": "query_pipeline",
-        }
         sb = MagicMock()
         sb.table.return_value.select.return_value.execute.return_value = MagicMock(data=[])
 
-        with patch("api.router._route_question", new_callable=AsyncMock,
-                    return_value=inner_return) as mock_inner, \
+        with patch("api.router._route_question", new_callable=AsyncMock) as mock_inner, \
              patch("api.agent_loop.run_agent_loop",
                    AsyncMock(return_value=exhausted_result)), \
              patch("api.router.LLMClient") as mock_llm:
@@ -274,8 +269,35 @@ class TestPendingPlanConfirmation(unittest.TestCase):
                 sb=sb,
                 thread_ts="1727000000.000001",
             ))
-        mock_inner.assert_called_once()
-        self.assertIn("Fallback answer.", result.get("answer", ""))
+        mock_inner.assert_not_called()
+        self.assertIn("unable to answer", result.get("answer", "").lower())
+        self.assertEqual(result.get("handler_name"), "composer_agent_loop_exhausted")
+
+    def test_affirmed_plan_exception_returns_explicit_failure(self):
+        """When run_agent_loop raises an exception, route_question must
+        return an explicit error message — never fall through to the
+        classifier."""
+        history = _history_with_pending_plan()
+
+        sb = MagicMock()
+        sb.table.return_value.select.return_value.execute.return_value = MagicMock(data=[])
+
+        with patch("api.router._route_question", new_callable=AsyncMock) as mock_inner, \
+             patch("api.agent_loop.run_agent_loop",
+                   AsyncMock(side_effect=RuntimeError("filter_table boom"))), \
+             patch("api.router.LLMClient") as mock_llm:
+            mock_llm.from_config.return_value = MagicMock()
+            from api.router import route_question
+            result = run(route_question(
+                question="Yes",
+                user_id="U_TEST",
+                history=history,
+                sb=sb,
+                thread_ts="1727000000.000001",
+            ))
+        mock_inner.assert_not_called()
+        self.assertIn("able to complete", result.get("answer", "").lower())
+        self.assertEqual(result.get("handler_name"), "composer_agent_loop_error")
 
 
 class TestComposerEscalationPersistence(unittest.TestCase):
