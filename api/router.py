@@ -1499,12 +1499,12 @@ TOOLS YOU CAN CALL:
     champion_band, deal_value, stage, risk_flags) plus the true total_at_risk count;
     a clear message when nothing is currently flagged
     Examples: "which deals are at risk", "champion gaps this quarter", "which of those are at risk"
-  query_quarter_health()
+  query_quarter_health(question)
     **USE THIS when the question asks about**:
     - WHETHER THE QUARTER IS IN GOOD SHAPE overall, a quarter health check
     **DO NOT use for** any single one of its parts (pipeline, forecast trust,
     deal risk, loss concentration) or for the downside (use query_quarter_downside)
-    Params: none (always the current quarter)
+    Params: question (string) — the user's original question text (enables brief mode for short/tl;dr requests)
     **RETURNS**: closed won vs target, pace, stage-weighted coverage of the
     remaining gap, and the forecast-risk / loss-rate / rep modifiers, each with
     its disclosed basis, and an instruction to give a plain-language verdict
@@ -4902,7 +4902,28 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 messages.append({"role": "user", "content": correction})
                 no_progress_streak += 1
                 if no_progress_streak >= 2:
-                    return await _finalize_from_data("aggregation_mismatch_unresolved")
+                    # Hard decline: the verify gate caught a mismatch twice in
+                    # a row. Shipping anyway (the old behaviour) is worse than
+                    # an honest refusal — a wrong number delivered confidently
+                    # is the failure mode this gate exists to prevent. State
+                    # the real verified figure(s) plainly so the user isn't
+                    # left without any number at all.
+                    _real_parts = [
+                        f"{d['category']} actual sum = {d['actual_sum']:,.0f}"
+                        for d in all_disc
+                        if d.get("actual_sum") is not None
+                    ]
+                    _real_str = (
+                        f" Real values from the data: {'; '.join(_real_parts)}."
+                        if _real_parts else ""
+                    )
+                    return _give_up(
+                        "aggregation_mismatch_unresolved",
+                        f"the answer contained figures that couldn't be "
+                        f"reconciled with the underlying rows after two "
+                        f"correction attempts.{_real_str} Declining to "
+                        f"deliver a number that doesn't match the source data.",
+                    )
                 # Store corrected totals + raw rows for post-retry placement verification
                 cost_state["_agg_retry_totals"] = all_disc
                 cost_state["_agg_retry_rows"] = all_raw_rows
@@ -5267,23 +5288,19 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 step_ref = data
                 data = accumulated_data.get(data, {}).get("rows", [])
 
-                # VALIDATION: Warn if step reference resolved to empty
+                # VALIDATION: Fail loudly if step reference resolved to empty
                 if not data:
                     available_steps = [k for k, v in accumulated_data.items()
                                      if k.startswith("step_") and v.get("rows")]
-                    logger.warning(
+                    logger.error(
                         f"[BUG] aggregate_results: step reference '{step_ref}' "
-                        f"resolved to empty data. Available steps with data: {available_steps}")
-
-                    # Return error instead of continuing with empty data
-                    result = {
-                        "error": f"Step reference '{step_ref}' has no data. "
-                                f"Available: {available_steps}",
-                        "rows": [],
-                        "validation_failed": "invalid_step_reference"
-                    }
-                    tool_params["data"] = data
-                    # Skip tool execution, use error result
+                        f"resolved to empty. Available steps with data: "
+                        f"{available_steps}. Terminating loop.")
+                    return _give_up(
+                        "invalid_step_reference",
+                        f"aggregate_results referenced step '{step_ref}' which "
+                        f"has no data (available steps: {available_steps})",
+                    )
                 else:
                     tool_params["data"] = data
                     result = await tool_fn(**tool_params)
@@ -6688,7 +6705,8 @@ async def _route_question(question: str, user_id: str,
     from api.assessor import (assess_correctness,
                                should_retry,
                                should_escalate,
-                               build_retry_context)
+                               build_retry_context,
+                               assess_format)
 
     MAX_RETRIES = 2
     retry_count = 0
@@ -6816,11 +6834,6 @@ async def _route_question(question: str, user_id: str,
             )
             clarification_msg = plan_to_clarification_message(plan)
             pending_entry = make_pending_plan_entry(plan, clarification_msg)
-            # Persist the pending plan so the next turn can execute it
-            try:
-                db.save_thread(thread_id, pending_entry)
-            except Exception:
-                pass
             logger.info(
                 f"[COMPOSER] scope_mismatch escalated; plan has "
                 f"{len(plan.get('sub_parts', []))} sub-parts"
@@ -6830,6 +6843,7 @@ async def _route_question(question: str, user_id: str,
                 "needs_ack": False,
                 "tool_results": {},
                 "handler_name": f"{handler_name}_composer_plan",
+                "history_append": [pending_entry],
             }
         except Exception as e:
             logger.error(f"[COMPOSER] escalation failed: {e}")
@@ -6881,6 +6895,22 @@ async def _route_question(question: str, user_id: str,
         caveat = answer_caveat(answer_violations)
         if caveat:
             verified = f"{verified}\n\n{caveat}"
+
+    # ── 8.6. Format / style check ─────────────────────────
+    # Runs only after Features 1+2 succeed (those reject at query time;
+    # reaching this point means a successful query was executed).
+    # Log-only — never blocks delivery.
+    try:
+        format_result = await assess_format(question, verified, classifier_client)
+        if not format_result.get("format_ok", True):
+            logger.warning(
+                "[FORMAT] issue=%s score=%.2f note=%s",
+                format_result.get("format_issue"),
+                format_result.get("format_score", 0.5),
+                format_result.get("format_note"),
+            )
+    except Exception as _fe:
+        logger.warning(f"[FORMAT] check raised: {_fe}")
 
     # ── 9. Log learning note (win or lose) ────────────────
     _log_learning(sb, question, handler_name,
