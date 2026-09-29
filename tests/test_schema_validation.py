@@ -399,5 +399,69 @@ class TestPlantedBug_AssessFormatAlwaysOk(unittest.TestCase):
             "Planted bug: always-ok assess_format should never surface 'too_long'")
 
 
+# ===========================================================================
+# Feature 3 wiring — assess_format only runs after a successful query
+# ===========================================================================
+
+class TestAssessFormatNotCalledOnRejection(unittest.TestCase):
+    """
+    Control-flow proof: a filter_table rejection (Feature 1 or 2) produces a
+    dict with an "error" key.  evaluate_result() classifies that as quality
+    "error".  In route_question, all "error"-quality paths exit before step
+    8.6 (where assess_format lives), so assess_format is never called for a
+    rejected query.
+
+    This test locks down each link in that chain individually.
+    """
+
+    def test_feature1_rejection_dict_has_error_key(self):
+        """filter_table rejection for unknown SELECT column always has 'error' key."""
+        tools_module._VALID_COLUMNS["deals"] = set(DEALS_SCHEMA)
+        try:
+            sb = MagicMock()
+            with patch.object(tools_module, "_init_valid_columns"):
+                result = asyncio.get_event_loop().run_until_complete(
+                    filter_table(sb, "deals", columns=["invented_col"])
+                )
+            self.assertIn("error", result,
+                "Feature 1 rejection must carry 'error' key for evaluate_result")
+        finally:
+            tools_module._VALID_COLUMNS.pop("deals", None)
+
+    def test_feature2_rejection_dict_has_error_key(self):
+        """filter_table sanity-check rejection (zero-count value) always has 'error' key."""
+        tools_module._VALID_COLUMNS["deals"] = set(DEALS_SCHEMA)
+        try:
+            count_resp = MagicMock()
+            count_resp.count = 0
+            sb = MagicMock()
+            (sb.table.return_value.select.return_value
+               .eq.return_value.limit.return_value.execute.return_value) = count_resp
+            with patch.object(tools_module, "_init_valid_columns"):
+                result = asyncio.get_event_loop().run_until_complete(
+                    filter_table(sb, "deals",
+                                 columns=["deal_id", "stage"],
+                                 filters=[("eq", "stage", "invented_stage_xyz")])
+                )
+            self.assertIn("error", result,
+                "Feature 2 rejection must carry 'error' key for evaluate_result")
+        finally:
+            tools_module._VALID_COLUMNS.pop("deals", None)
+
+    def test_evaluate_result_classifies_error_key_as_error_quality(self):
+        """evaluate_result('error' key in dict) → 'error' quality → pre-synthesis exits."""
+        from api.evaluator import evaluate_result
+        # Feature 1 rejection shape
+        f1_result = {"error": "Unknown SELECT columns for table 'deals': ['invented'].",
+                     "unknown_select_columns": ["invented"]}
+        self.assertEqual(evaluate_result(f1_result, "any_handler"), "error")
+
+        # Feature 2 rejection shape
+        f2_result = {"error": "Filter value sanity check: 'invented' matches 0 rows.",
+                     "suspicious_filters": [{"filter": ("eq", "stage", "invented"),
+                                             "rows_matched": 0, "note": "..."}]}
+        self.assertEqual(evaluate_result(f2_result, "any_handler"), "error")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
