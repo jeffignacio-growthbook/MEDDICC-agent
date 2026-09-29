@@ -1,5 +1,5 @@
 """Typed query tools for dynamic CRO agent queries."""
-import sys, json
+import sys, json, logging
 from pathlib import Path
 from collections import defaultdict
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
@@ -8,6 +8,8 @@ try:
     from field_semantics import is_test_deal
 except ImportError:
     from api.field_semantics import is_test_deal
+
+logger = logging.getLogger("cro_agent")
 
 # Country canonicalization for GROUP BY operations (same mapping as
 # dimension_resolver.py's _COUNTRY_ALIASES - see COUNTRY_DIMENSION_BUILD_SUMMARY.md)
@@ -37,7 +39,11 @@ def _validate_columns(table, columns):
     for c in columns:
         (good if c in valid or not valid else bad).append(c)
     if bad:
-        print(f"  ⚠️  Ignoring unknown columns for {table}: {bad}")
+        logger.warning(
+            "[SCHEMA_VALIDATION] Unknown SELECT columns for table '%s': %s. "
+            "Queryable: %s",
+            table, bad, sorted(valid),
+        )
     # Return (good_columns, unavailable_columns) so caller can surface them
     return good or list(valid)[:10], bad
 
@@ -55,6 +61,70 @@ def _validate_filters(table, filters):
     ok = [(op, col, val) for op, col, val in filters if col in valid or not valid]
     bad = [(op, col, val) for op, col, val in filters if valid and col not in valid]
     return ok, bad
+
+# String values that are obviously valid domain enums — skip the sanity-count
+# for these so we don't round-trip Supabase on every status/boolean filter.
+_ENUM_SKIP = frozenset({
+    "active", "won", "lost", "open", "closed", "pending", "complete",
+    "null", "true", "false",
+})
+
+
+async def _sanity_check_filter_values(sb, table, filters):
+    """
+    Before the main query: count how many rows each eq-filter value matches.
+    Returns a list of suspicious filters (empty list = all values look valid).
+
+    Only checks string/ID values; skips ISO dates, fiscal-quarter strings
+    (FY...), numeric values, and common known enums.  Zero-matching filters
+    are logged with a [SCHEMA_VALIDATION] prefix so repeated invented values
+    are visible as a pattern.
+    """
+    if not filters:
+        return []
+    suspicious = []
+    for f in filters:
+        if len(f) < 3:
+            continue
+        op, col, val = f[0], f[1], f[2]
+        if op != "eq" or val is None:
+            continue
+        if not isinstance(val, str):
+            continue
+        # Skip ISO dates (YYYY-MM-DD), fiscal quarter strings (FY...), enums
+        if (
+            (len(val) == 10 and val[4:5] == "-" and val[7:8] == "-")
+            or val.startswith("FY")
+            or val.lower() in _ENUM_SKIP
+        ):
+            continue
+        try:
+            resp = (
+                sb.table(table)
+                .select("*", count="exact")
+                .eq(col, val)
+                .limit(1)
+                .execute()
+            )
+            count = getattr(resp, "count", None) or 0
+            if count == 0:
+                logger.warning(
+                    "[SCHEMA_VALIDATION] Filter value '%s' on %s.%s matched 0 rows "
+                    "— possible invented or wrong ID.",
+                    val, table, col,
+                )
+                suspicious.append({
+                    "filter": (op, col, val),
+                    "rows_matched": 0,
+                    "note": f"'{val}' matches 0 rows in {table}.{col}",
+                })
+        except Exception as exc:
+            logger.warning(
+                "[SCHEMA_VALIDATION] Sanity-check error for %s.%s=%r: %s",
+                table, col, val, exc,
+            )
+    return suspicious
+
 
 VALID_OPS = {"eq", "neq", "gt", "gte", "lt", "lte", "like", "ilike", "is_", "in_"}
 
@@ -77,6 +147,17 @@ async def filter_table(sb, table, columns=None, filters=None, limit=200, order_b
     max_limit = 500
     limit = min(limit or 200, max_limit)
     cols, unavailable = _validate_columns(table, columns or [])
+    # Reject unknown SELECT columns when the table is in the data dictionary.
+    # Same pattern as filter column rejection — let the model retry with real columns.
+    if unavailable and _VALID_COLUMNS.get(table):
+        return {
+            "error": (
+                f"Unknown SELECT columns for table '{table}': {unavailable}. "
+                f"The query was not run. Queryable columns: "
+                f"{sorted(_VALID_COLUMNS.get(table, set()))}"
+            ),
+            "unknown_select_columns": unavailable,
+        }
     # If column validation found nothing valid, use safe defaults
     if not cols:
         cols = ["deal_id", "company_name", "deal_value",
@@ -136,6 +217,21 @@ async def filter_table(sb, table, columns=None, filters=None, limit=200, order_b
                     processed_filters.append((op, col, val))
             else:
                 processed_filters.append((op, col, val))
+
+    # Pre-query sanity: verify filter values actually match real rows.
+    # Zero-matching filters are almost always an invented/wrong ID, not a
+    # legitimately empty result — return an error so the model can retry with
+    # the correct value rather than silently delivering an empty answer.
+    suspicious_values = await _sanity_check_filter_values(sb, table, processed_filters)
+    if suspicious_values:
+        bad_desc = "; ".join(f["note"] for f in suspicious_values)
+        return {
+            "error": (
+                f"Filter value sanity check: {bad_desc}. "
+                f"Verify the filter value is correct before retrying."
+            ),
+            "suspicious_filters": suspicious_values,
+        }
 
     # Use PostgREST order() for efficient top-N queries
     if order_by:
@@ -210,7 +306,15 @@ async def join_tables(sb, primary_table, primary_key, joined_table, foreign_key,
     # _validate_columns returns (good, unavailable) since 2026-09-01; joining that
     # tuple raised TypeError on every call with primary rows. The foreign key must
     # be selected too, or no joined row can be matched back.
-    joined_cols, _unavailable = _validate_columns(joined_table, joined_columns or [])
+    joined_cols, jt_unavailable = _validate_columns(joined_table, joined_columns or [])
+    if jt_unavailable and _VALID_COLUMNS.get(joined_table):
+        return {
+            "error": (
+                f"Unknown SELECT columns for joined table '{joined_table}': {jt_unavailable}. "
+                f"Queryable columns: {sorted(_VALID_COLUMNS.get(joined_table, set()))}"
+            ),
+            "unknown_select_columns": jt_unavailable,
+        }
     if joined_cols and foreign_key not in joined_cols:
         joined_cols = [foreign_key] + list(joined_cols)
     joined = select_all(sb, joined_table,

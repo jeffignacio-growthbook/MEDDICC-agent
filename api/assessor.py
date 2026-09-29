@@ -231,6 +231,60 @@ def should_retry(assessment: dict,
     return issue in retryable
 
 
+FORMAT_PROMPT = """You are checking whether a CRO assistant's response matches
+the format and length the question called for.
+
+Question: {question}
+Response: {answer}
+
+Assess FORMAT only — do NOT check whether numbers are correct:
+1. Direct question ("what is...", "how many..."): should lead with the number/finding, ≤3 sentences.
+2. Breakdown/list question ("which reps...", "show me..."): should include a list or table.
+3. Analysis question ("why did...", "compare...", "what's the trend..."): 2-5 paragraphs ok.
+4. Is the response obviously too long or too short for what was asked?
+
+Respond with JSON only:
+{{
+  "format_ok": true/false,
+  "format_score": 0.0-1.0,
+  "format_issue": null or one of:
+    "too_long"    - simple question, answer is a wall of text
+    "too_short"   - breakdown requested, got one sentence
+    "wrong_shape" - list question got prose (or vice versa)
+    "no_headline" - key number or finding buried after context
+  "format_note": null or a one-line suggestion for improvement
+}}"""
+
+
+async def assess_format(question: str, answer: str, client) -> dict:
+    """
+    Format/style check: does the response shape match what the question asked for?
+    Run after correctness checks pass. Independent of number accuracy — this is
+    the only place a second separate pass is right because it judges presentation,
+    not re-derives a fact.
+    """
+    try:
+        resp = client.complete(
+            max_tokens=120,
+            system="Respond with valid JSON only. No markdown.",
+            messages=[{"role": "user", "content":
+                FORMAT_PROMPT.format(
+                    question=question,
+                    answer=answer[:500],
+                )
+            }]
+        )
+        result = _extract_json(resp.text)
+        if not result:
+            return {"format_ok": True, "format_score": 0.5,
+                    "format_issue": None, "format_note": None}
+        return result
+    except Exception as e:
+        print(f"[ASSESSOR] format check failed: {e}", flush=True)
+        return {"format_ok": True, "format_score": 0.5,
+                "format_issue": None, "format_note": None}
+
+
 def build_retry_context(assessment: dict,
                          question: str) -> str:
     """Build the context hint for a retry attempt."""
