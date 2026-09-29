@@ -5800,12 +5800,13 @@ async def route_question(question: str, user_id: str,
     if pending_plan_entry and reply_affirms_plan(question):
         plan = pending_plan_entry.get("plan", {})
         logger.info(
-            f"[COMPOSER] user affirmed plan; routing to dynamic_query_loop "
+            f"[COMPOSER] user affirmed plan; routing to run_agent_loop "
             f"with {len(plan.get('sub_parts', []))} sub-parts"
         )
         try:
+            from api.agent_loop import run_agent_loop
             sub_parts = plan.get("sub_parts", [])
-            # Build a rich question that names the sub-parts so the dynamic
+            # Build a rich question that names the sub-parts so the agent
             # loop knows what to fetch.  The original question is preserved.
             original_q = plan.get("question", question)
             parts_desc = "; ".join(
@@ -5817,29 +5818,27 @@ async def route_question(question: str, user_id: str,
                 f"{original_q}\n\n"
                 f"[composer plan] fetch these sub-parts: {parts_desc}"
             ) if parts_desc else original_q
-            dynamic_result = await dynamic_query_loop(
+            _loop_client = LLMClient.from_config(role="generator")
+            loop_result = await run_agent_loop(
                 question=enriched_q,
-                history=history,
-                params={},
+                client=_loop_client,
                 sb=sb,
-                client=generator_client if 'generator_client' in dir() else None,
-                hint=(
-                    "Answer the question by fetching each named sub-part. "
-                    "Combine the results into one coherent answer. "
-                    "Show each component value and the combined total."
-                ),
-                roster_text="",
-                classifier_client=classifier_client if 'classifier_client' in dir() else None,
+                history=history or [],
             )
-            if dynamic_result.get("answered"):
-                answer = dynamic_result.get("answer", "")
+            logger.info(
+                f"[COMPOSER] run_agent_loop finished: steps={loop_result.steps_taken} "
+                f"check_result_performed={loop_result.check_result_performed} "
+                f"check_result_verified={loop_result.check_result_verified} "
+                f"budget_exhausted={loop_result.budget_exhausted}"
+            )
+            if loop_result.answer:
                 original_q = plan.get("question", question)
                 cb_entry = make_pending_checkback_entry(plan, original_q, thread_ts)
                 return {
-                    "answer": answer + checkback_prompt(),
+                    "answer": loop_result.answer + checkback_prompt(),
                     "needs_ack": False,
-                    "tool_results": dynamic_result.get("tool_results", {}),
-                    "handler_name": "composer_executed",
+                    "tool_results": {},
+                    "handler_name": "composer_agent_loop",
                     "history_append": [cb_entry],
                 }
         except Exception as e:
