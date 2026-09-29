@@ -6834,11 +6834,6 @@ async def _route_question(question: str, user_id: str,
             )
             clarification_msg = plan_to_clarification_message(plan)
             pending_entry = make_pending_plan_entry(plan, clarification_msg)
-            # Persist the pending plan so the next turn can execute it
-            try:
-                db.save_thread(thread_id, pending_entry)
-            except Exception:
-                pass
             logger.info(
                 f"[COMPOSER] scope_mismatch escalated; plan has "
                 f"{len(plan.get('sub_parts', []))} sub-parts"
@@ -6848,6 +6843,7 @@ async def _route_question(question: str, user_id: str,
                 "needs_ack": False,
                 "tool_results": {},
                 "handler_name": f"{handler_name}_composer_plan",
+                "history_append": [pending_entry],
             }
         except Exception as e:
             logger.error(f"[COMPOSER] escalation failed: {e}")
