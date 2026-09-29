@@ -221,13 +221,19 @@ HANDLER_DESCRIPTIONS = {
         "earlier gap was an ETL fetch bug, since fixed)."
     ),
     "query_quarter_health": (
-        "ARE WE IN GOOD SHAPE THIS QUARTER: one overall read on the current quarter: "
+        "ARE WE IN GOOD SHAPE THIS QUARTER / FORECAST UPDATE: one overall read on the current quarter: "
         "closed won against target and pace, stage-weighted coverage of what is "
         "still needed, and how far to trust it (forecast risk, loss rate, reps), "
         "as a plain-language verdict with each figure's own basis. Use "
         "for: 'are we in good shape this quarter', 'how is the quarter looking "
-        "overall', 'quarter health check', 'overall read on this quarter'. NOT for "
-        "any one of those four alone (query_forecast_trust, query_pipeline, "
+        "overall', 'quarter health check', 'overall read on this quarter', "
+        "'forecast update', 'give me a forecast update', 'succinct forecast update', "
+        "'brief forecast', 'quick read on the quarter'. "
+        "Overlap check with query_forecast_trust: query_forecast_trust answers ONLY "
+        "how trustworthy the current COMMIT+ML number is (risk read, historical rate); "
+        "this handler answers the FULL quarter read including closed won, target gap, "
+        "pipeline coverage AND forecast trust together. "
+        "NOT for any one figure alone (query_forecast_trust, query_pipeline, "
         "query_high_priority_deal_risk, query_loss_concentration) and NOT for the "
         "downside or worst case (query_quarter_downside)."
     ),
@@ -5794,12 +5800,13 @@ async def route_question(question: str, user_id: str,
     if pending_plan_entry and reply_affirms_plan(question):
         plan = pending_plan_entry.get("plan", {})
         logger.info(
-            f"[COMPOSER] user affirmed plan; routing to dynamic_query_loop "
+            f"[COMPOSER] user affirmed plan; routing to run_agent_loop "
             f"with {len(plan.get('sub_parts', []))} sub-parts"
         )
         try:
+            from api.agent_loop import run_agent_loop
             sub_parts = plan.get("sub_parts", [])
-            # Build a rich question that names the sub-parts so the dynamic
+            # Build a rich question that names the sub-parts so the agent
             # loop knows what to fetch.  The original question is preserved.
             original_q = plan.get("question", question)
             parts_desc = "; ".join(
@@ -5811,29 +5818,31 @@ async def route_question(question: str, user_id: str,
                 f"{original_q}\n\n"
                 f"[composer plan] fetch these sub-parts: {parts_desc}"
             ) if parts_desc else original_q
-            dynamic_result = await dynamic_query_loop(
+            _loop_client = LLMClient.from_config(role="generator")
+            loop_result = await run_agent_loop(
                 question=enriched_q,
-                history=history,
-                params={},
+                client=_loop_client,
                 sb=sb,
-                client=generator_client if 'generator_client' in dir() else None,
-                hint=(
-                    "Answer the question by fetching each named sub-part. "
-                    "Combine the results into one coherent answer. "
-                    "Show each component value and the combined total."
-                ),
-                roster_text="",
-                classifier_client=classifier_client if 'classifier_client' in dir() else None,
+                history=history or [],
             )
-            if dynamic_result.get("answered"):
-                answer = dynamic_result.get("answer", "")
+            logger.info(
+                f"[COMPOSER] run_agent_loop finished: steps={loop_result.steps_taken} "
+                f"check_result_performed={loop_result.check_result_performed} "
+                f"check_result_verified={loop_result.check_result_verified} "
+                f"budget_exhausted={loop_result.budget_exhausted}"
+            )
+            # budget_exhausted=True means the loop hit MAX_STEPS OR a
+            # client exception broke the for-loop early — both land the
+            # same _INSUFFICIENT_ANSWER fallback.  Only return to the user
+            # when the loop genuinely delivered (budget_exhausted=False).
+            if loop_result.answer and not loop_result.budget_exhausted:
                 original_q = plan.get("question", question)
                 cb_entry = make_pending_checkback_entry(plan, original_q, thread_ts)
                 return {
-                    "answer": answer + checkback_prompt(),
+                    "answer": loop_result.answer + checkback_prompt(),
                     "needs_ack": False,
-                    "tool_results": dynamic_result.get("tool_results", {}),
-                    "handler_name": "composer_executed",
+                    "tool_results": {},
+                    "handler_name": "composer_agent_loop",
                     "history_append": [cb_entry],
                 }
         except Exception as e:

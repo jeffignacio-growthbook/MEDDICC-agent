@@ -110,7 +110,7 @@ def test_entry_points_are_thin_and_current_quarter_only():
     for scenario, name in ENTRY.items():
         seen = []
 
-        async def fake(sb, params=None, scenario_arg="base"):
+        async def fake(sb, params=None, scenario_arg="base", **kwargs):
             seen.append((params, scenario_arg))
             return {"status": "ok"}
         with patch.object(qh, "compose_quarter_health", fake):

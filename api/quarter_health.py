@@ -122,7 +122,8 @@ FRAMES = {
 
 # ----------------------------------------------------------------- compose
 
-async def compose_quarter_health(sb, params: dict = None, scenario: str = "base") -> dict:
+async def compose_quarter_health(sb, params: dict = None, scenario: str = "base",
+                                 brief_mode: bool = False) -> dict:
     """Call the primitives in PRIMITIVE_ORDER and compose. A primitive
     that raises is reported unavailable in its own section; the rest go on."""
     if scenario not in SCENARIOS:
@@ -153,7 +154,8 @@ async def compose_quarter_health(sb, params: dict = None, scenario: str = "base"
         logger.error(f"[QUARTER_HEALTH] rep scorecard failed: {e}")
         scorecard = {"status": "error", "error": str(e)}
     return compose_from_results(results, scenario, stage_rates=stage_rates, deal_rows=deal_rows,
-                                as_of=as_of, seasonality=seasonality, scorecard=scorecard)
+                                as_of=as_of, seasonality=seasonality, scorecard=scorecard,
+                                brief_mode=brief_mode)
 
 
 def _today() -> date:
@@ -182,7 +184,8 @@ def _downside_inputs(sb, forecast_trust: dict):
 
 def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
                          deal_rows: list = None, as_of: date = None,
-                         seasonality: dict = None, scorecard: dict = None) -> dict:
+                         seasonality: dict = None, scorecard: dict = None,
+                         brief_mode: bool = False) -> dict:
     """Pure composition over the primitive results (keyed by name). as_of
     (default: today in the reporting timezone) sets days elapsed and weeks
     left; seasonality is assess_bookings_seasonality()'s result."""
@@ -231,7 +234,8 @@ def compose_from_results(results: dict, scenario: str, stage_rates: dict = None,
     loss = results.get("query_loss_concentration")
     out["_synthesis_note"] = _note(scenario, quarter, figures,
                                    loss.get("loss_rate_headline") if isinstance(loss, dict) else None,
-                                   (out.get("downside") or {}).get("line"))
+                                   (out.get("downside") or {}).get("line"),
+                                   brief_mode=brief_mode)
     return out
 
 
@@ -360,17 +364,24 @@ def _forecast_figures(res):
         return {"status": res.get("status"), "reason": res.get("reason"),
                 "fiscal_quarter": res.get("fiscal_quarter"), "current_week": res.get("current_week")}
     p = res.get("pipeline") or {}
-    return {"status": "ok", "fiscal_quarter": res.get("fiscal_quarter"),
-            "current_week": res.get("current_week"),
-            "forecast_arr": p.get("incremental_arr"), "forecast_deal_count": p.get("deal_count"),
-            "high_risk_count": res.get("high_risk_count"),
-            "high_risk_fraction": res.get("high_risk_fraction"),
-            "high_risk_fraction_basis": "share of risk-assessed deals (by count), not of the forecast",
-            "assessed_deal_count": (res.get("risk_summary") or {}).get("total_assessed"),
-            "not_assessed_deal_count": (res.get("risk_summary") or {}).get("not_assessed"),
-            **{k: (res.get("risk_dollars") or {}).get(k)
-               for k in ("high_risk_arr", "high_risk_share_of_forecast", "not_assessed_arr",
-                         "not_assessed_share_of_forecast") if res.get("risk_dollars")}}
+    by_owner = res.get("by_owner") or {}
+    commit_total = sum(o.get("commit_arr", 0) for o in by_owner.values() if isinstance(o, dict))
+    ml_total = sum(o.get("most_likely_arr", 0) for o in by_owner.values() if isinstance(o, dict))
+    out = {"status": "ok", "fiscal_quarter": res.get("fiscal_quarter"),
+           "current_week": res.get("current_week"),
+           "forecast_arr": p.get("incremental_arr"), "forecast_deal_count": p.get("deal_count"),
+           "high_risk_count": res.get("high_risk_count"),
+           "high_risk_fraction": res.get("high_risk_fraction"),
+           "high_risk_fraction_basis": "share of risk-assessed deals (by count), not of the forecast",
+           "assessed_deal_count": (res.get("risk_summary") or {}).get("total_assessed"),
+           "not_assessed_deal_count": (res.get("risk_summary") or {}).get("not_assessed"),
+           **{k: (res.get("risk_dollars") or {}).get(k)
+              for k in ("high_risk_arr", "high_risk_share_of_forecast", "not_assessed_arr",
+                        "not_assessed_share_of_forecast") if res.get("risk_dollars")}}
+    if commit_total or ml_total:
+        out["commit_arr"] = commit_total
+        out["most_likely_arr"] = ml_total
+    return out
 
 
 def _pipeline_figures(res):
@@ -699,6 +710,86 @@ def downside_coverage(forecast_trust: dict, stage_rates: dict, deal_rows: list, 
     }
 
 
+# --------------------------------------------------------------------- brief mode
+
+_BRIEF_TRIGGERS = frozenset({"succinct", "brief", "short", "quick", "tl;dr", "tldr"})
+
+
+def is_brief_mode(question: str) -> bool:
+    """True when the question contains a length-shortening word."""
+    q = (question or "").lower()
+    return any(t in q for t in _BRIEF_TRIGGERS)
+
+
+def _brief_note(scenario: str, quarter: str, figures: dict) -> str:
+    """Synthesis instruction for brief mode: ~120-word forecast update.
+    Required disclosures (item 4): unweighted label, renewals not counted,
+    target basis. Word-for-word requirement lifted for loss rate, pace,
+    and seasonality — those become optional follow-up offers."""
+    ft  = figures.get("forecast_trust") or {}
+    qtd = figures.get("quarter_to_date") or {}
+    cov = figures.get("coverage") or {}
+
+    total     = ft.get("forecast_arr")
+    commit    = ft.get("commit_arr")
+    ml        = ft.get("most_likely_arr")
+    won       = qtd.get("closed_won_arr")
+    target    = qtd.get("target")
+    remaining = qtd.get("remaining_to_target")
+    weeks     = qtd.get("weeks_left")
+    weighted  = cov.get("weighted_arr")
+    raw       = cov.get("qualified_pipeline_arr")
+    ratio     = cov.get("coverage_of_remaining")
+
+    parts = [f"FORECAST UPDATE ({quarter}): reply in plain English, under 120 words."]
+
+    # Line 1: forecast total + COMMIT/ML split (always first)
+    if ft.get("status") == "ok" and total is not None:
+        if commit is not None and ml is not None:
+            open_line = (f"Forecast {quarter}: ${total:,.0f} "
+                         f"(COMMIT ${commit:,.0f}, Most Likely ${ml:,.0f}).")
+        else:
+            open_line = f"Forecast {quarter}: ${total:,.0f} (COMMIT+Most Likely combined)."
+        parts.append(f"Open with: \"{open_line}\"")
+
+    # Line 2: closed won + target + remaining
+    if qtd.get("status") == "ok" and won is not None and target is not None and remaining is not None:
+        wl = f", {weeks} week{'s' if weeks != 1 else ''} left" if weeks is not None else ""
+        parts.append(f"Then: \"${won:,.0f} closed won QTD against the ${target:,.0f} target "
+                     f"(new+expansion ARR only, not counting renewals); "
+                     f"${remaining:,.0f} remaining{wl}.\"")
+
+    # Line 3: unweighted + stage-weighted coverage — unweighted MUST be labeled as such
+    if cov.get("status") == "ok" and weighted is not None:
+        ratio_str = f"{ratio:.2f}x the gap" if ratio is not None else "coverage ratio unavailable"
+        raw_str   = f"${raw:,.0f} (unweighted)" if raw is not None else "unweighted figure unavailable"
+        parts.append(
+            f"Then: \"Pipeline: {raw_str} against the ${remaining:,.0f} gap; "
+            f"stage-weighted by close rate, ${weighted:,.0f} ({ratio_str}).\" "
+            f"Always label the unweighted figure as unweighted — it counts all stages equally, "
+            f"which overstates coverage."
+        )
+
+    # Line 4: one risk line (required disclosure: renewals not risk-assessed)
+    headline = forecast_risk_headline(ft)
+    if headline:
+        parts.append(f"Risk line (verbatim): \"{headline}\"")
+
+    # Follow-up offers
+    parts.append("Close: \"Ping me for rep detail or the full loss rate breakdown.\"")
+
+    # Required disclosures (must survive in brief mode)
+    parts.append(
+        "Required disclosures — never drop these: "
+        "(1) the pipeline figure is labeled unweighted (all stages equally, overstates coverage); "
+        "(2) closed-won and the forecast count new+expansion ARR, not renewals; "
+        "(3) the target is from rep_targets (incremental ARR quota). "
+        "Do not call the quarter ahead or behind based on pace alone."
+    )
+
+    return " ".join(parts)
+
+
 # --------------------------------------------------------------------- note
 
 _POPULATIONS = (
@@ -728,13 +819,27 @@ def _q(line: str) -> str:
 
 
 def _note(scenario: str, quarter: str, figures: dict, loss_headline: str = None,
-          downside_line: str = None) -> str:
+          downside_line: str = None, brief_mode: bool = False) -> str:
+    if brief_mode:
+        return _brief_note(scenario, quarter, figures)
     names = {"forecast_trust": "query_forecast_trust", "pipeline": "query_pipeline",
              "deal_risk": "query_high_priority_deal_risk", "loss_concentration": "query_loss_concentration",
              "quarter_to_date": "quarter_to_date (QTD closed won vs target)",
              "pace": "pace (share of quarter gone vs share of target won)",
              "coverage": "coverage (weighted pipeline vs what is still needed)"}
     parts = []
+    # Full mode: forecast total + COMMIT/ML split as the first line.
+    ft = figures.get("forecast_trust") or {}
+    total = ft.get("forecast_arr")
+    commit = ft.get("commit_arr")
+    ml = ft.get("most_likely_arr")
+    if ft.get("status") == "ok" and total is not None:
+        if commit is not None and ml is not None:
+            forecast_open = (f"Forecast {quarter}: ${total:,.0f} "
+                             f"(COMMIT ${commit:,.0f}, Most Likely ${ml:,.0f}).")
+        else:
+            forecast_open = f"Forecast {quarter}: ${total:,.0f} (COMMIT+Most Likely combined)."
+        parts.append(f"Open with: \"{forecast_open}\"")
     if scenario == "base":
         parts.append(f"QUARTER HEALTH ({quarter}): answer \"are we in good shape this quarter?\" in "
                      "three steps, in this order.")

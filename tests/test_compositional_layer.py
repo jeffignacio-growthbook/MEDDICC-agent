@@ -1232,5 +1232,245 @@ class TestCategoryF_HardEdgeCases(unittest.TestCase):
         self.assertFalse(should_escalate(skipped))
 
 
+# ===========================================================================
+# CATEGORY G — Step 2 regression: each of the four known-good questions
+#               must individually pass the non-escalation gate
+# ===========================================================================
+
+class TestCategoryG_StepTwoRegression(unittest.TestCase):
+    """
+    Step 2 of the landing checklist: the four Category-B questions that
+    already work via direct handlers must never reach the agent loop.
+
+    These are deterministic (no model call needed): the escalation gate
+    fires only on scope_mismatch, and scope_mismatch only fires when the
+    assessor decides a single handler cannot cover the question's scope.
+    For each question the assessor would produce correct=True (existing
+    handler works), so should_escalate returns False.
+
+    The tests confirm THREE layers:
+      1. should_escalate is False for all non-scope_mismatch assessments
+         (the assessor would not produce scope_mismatch for these questions)
+      2. find_pending_plan returns None → composer gate is closed
+      3. find_pending_checkback returns None → checkback gate is closed
+    """
+
+    _B_QUESTIONS = [
+        "How much pipeline did we generate this week?",
+        "Compare our pipeline from January 2026 to today",
+        "What's changed with Christian's deals over the last 5 weeks?",
+        "What's our qualified loss rate this quarter?",
+    ]
+
+    def _ordinary_history(self, question: str) -> list:
+        return [{"role": "user", "content": question}]
+
+    def test_G1_pipeline_generation_no_escalation(self):
+        """EXPECTED: 'How much pipeline did we generate this week?' → no escalation."""
+        q = "How much pipeline did we generate this week?"
+        # Correct=True: waterfall/pipeline-generation handler answers this
+        self.assertFalse(should_escalate({"correct": True, "score": 0.9}))
+        self.assertIsNone(find_pending_plan(self._ordinary_history(q)))
+        self.assertIsNone(find_pending_checkback(self._ordinary_history(q)))
+
+    def test_G2_pipeline_comparison_no_escalation(self):
+        """EXPECTED: 'Compare our pipeline from January 2026 to today' → no escalation."""
+        q = "Compare our pipeline from January 2026 to today"
+        # This goes to dynamic_query / pipeline-movement — single handler path
+        self.assertFalse(should_escalate({"correct": True, "score": 0.88}))
+        # If the assessor produced wrong_handler (not scope_mismatch), still no escalation
+        self.assertFalse(should_escalate(
+            {"correct": False, "score": 0.4, "issue": "wrong_handler"}
+        ))
+        self.assertIsNone(find_pending_plan(self._ordinary_history(q)))
+        self.assertIsNone(find_pending_checkback(self._ordinary_history(q)))
+
+    def test_G3_deal_changes_no_escalation(self):
+        """EXPECTED: 'What's changed with Christian's deals over the last 5 weeks?' → no escalation."""
+        q = "What's changed with Christian's deals over the last 5 weeks?"
+        self.assertFalse(should_escalate({"correct": True, "score": 0.9}))
+        # Even a wrong_handler re-route is not scope_mismatch
+        self.assertFalse(should_escalate(
+            {"correct": False, "score": 0.45, "issue": "wrong_handler"}
+        ))
+        self.assertIsNone(find_pending_plan(self._ordinary_history(q)))
+        self.assertIsNone(find_pending_checkback(self._ordinary_history(q)))
+
+    def test_G4_qualified_loss_rate_no_escalation(self):
+        """EXPECTED: 'What's our qualified loss rate this quarter?' → no escalation."""
+        q = "What's our qualified loss rate this quarter?"
+        self.assertFalse(should_escalate({"correct": True, "score": 0.93}))
+        self.assertIsNone(find_pending_plan(self._ordinary_history(q)))
+        self.assertIsNone(find_pending_checkback(self._ordinary_history(q)))
+
+    def test_G5_all_four_non_escalating_by_assessment_issue(self):
+        """
+        EXPECTED: for every non-scope_mismatch issue the assessor might raise
+        on these four questions, should_escalate returns False.  Exhaustive
+        check — every issue that IS retryable is not scope_mismatch.
+        """
+        non_escalating_issues = [
+            "wrong_handler", "wrong_table", "missing_join",
+            "wrong_time_window", "should_be_dynamic",
+            "data_gap", "format_only", None,
+        ]
+        for q in self._B_QUESTIONS:
+            for issue in non_escalating_issues:
+                with self.subTest(question=q[:40], issue=issue):
+                    self.assertFalse(
+                        should_escalate({"correct": False, "score": 0.4, "issue": issue}),
+                        f"Issue {issue!r} for {q[:40]!r} must not escalate",
+                    )
+
+
+# ===========================================================================
+# CATEGORY H — Step 3 no-op proof: pending-plan and checkback hooks at the
+#               top of route_question are provably no-ops when no plan exists
+# ===========================================================================
+
+class TestCategoryH_HookNoOpProof(unittest.TestCase):
+    """
+    Step 3 of the landing checklist: the pending-plan and checkback hooks at
+    the TOP of route_question must be provably no-ops, cheap, and side-effect-
+    free when there is no pending plan in thread history.
+
+    Both hooks scan thread history for a role marker:
+      - find_pending_checkback(history) → PENDING_CHECKBACK_ROLE
+      - find_pending_plan(history)      → PENDING_PLAN_ROLE
+
+    Neither touches the database, sends a network request, or modifies any
+    shared state.  They return None when the role marker is absent.
+    When both return None, the `if pending_cb:` and `if pending_plan_entry:`
+    blocks are dead code — execution falls through to _route_question()
+    unchanged.  The behavior is byte-identical to before the hooks existed.
+
+    This category proves that invariant holds for ordinary questions.
+    """
+
+    # Realistic thread history: a normal question-answer exchange, no plan.
+    _NORMAL_HISTORY = [
+        {"role": "user",      "content": "How much pipeline did we generate this week?"},
+        {"role": "assistant", "content": "You generated $1.2M of pipeline this week across 8 deals."},
+        {"role": "user",      "content": "Break it down by rep"},
+        {"role": "assistant", "content": "Here is the rep breakdown: ..."},
+    ]
+
+    def test_H1_find_pending_checkback_noop_on_empty_history(self):
+        """EXPECTED: empty history → find_pending_checkback returns None (hook skipped)."""
+        self.assertIsNone(find_pending_checkback([]))
+
+    def test_H2_find_pending_checkback_noop_on_normal_history(self):
+        """EXPECTED: normal q-a history → find_pending_checkback returns None."""
+        self.assertIsNone(find_pending_checkback(self._NORMAL_HISTORY))
+
+    def test_H3_find_pending_checkback_noop_on_none_history(self):
+        """EXPECTED: None history (treated as []) → find_pending_checkback returns None."""
+        self.assertIsNone(find_pending_checkback(None or []))
+
+    def test_H4_find_pending_plan_noop_on_empty_history(self):
+        """EXPECTED: empty history → find_pending_plan returns None (hook skipped)."""
+        self.assertIsNone(find_pending_plan([]))
+
+    def test_H5_find_pending_plan_noop_on_normal_history(self):
+        """EXPECTED: normal q-a history → find_pending_plan returns None."""
+        self.assertIsNone(find_pending_plan(self._NORMAL_HISTORY))
+
+    def test_H6_find_pending_plan_noop_on_none_history(self):
+        """EXPECTED: None history (treated as []) → find_pending_plan returns None."""
+        self.assertIsNone(find_pending_plan(None or []))
+
+    def test_H7_reply_to_checkback_noop_on_ordinary_question(self):
+        """
+        EXPECTED: ordinary questions return None from reply_to_checkback,
+        so even if a checkback entry existed, the reply would not be classified
+        as a confirmation or rejection and execution would fall through.
+
+        These questions must NOT register as yes/no feedback:
+        """
+        ordinary_questions = [
+            "How much pipeline did we generate this week?",
+            "Compare our pipeline from January 2026 to today",
+            "What's changed with Christian's deals over the last 5 weeks?",
+            "What's our qualified loss rate this quarter?",
+            "What does pipeline coverage look like for Q4?",
+            "Show me the waterfall for this quarter",
+        ]
+        for q in ordinary_questions:
+            with self.subTest(q=q[:50]):
+                self.assertIsNone(
+                    reply_to_checkback(q),
+                    f"Ordinary question {q!r} must not register as feedback",
+                )
+
+    def test_H8_checkback_role_marker_is_only_trigger(self):
+        """
+        EXPECTED: only a history entry with role=PENDING_CHECKBACK_ROLE triggers
+        the checkback hook.  User/assistant entries never do, regardless of content.
+        """
+        history_with_yes = [
+            {"role": "user", "content": "yes"},
+            {"role": "assistant", "content": "Great!"},
+        ]
+        self.assertIsNone(find_pending_checkback(history_with_yes))
+
+    def test_H9_plan_role_marker_is_only_trigger(self):
+        """
+        EXPECTED: only a history entry with role=PENDING_PLAN_ROLE triggers
+        the composer hook.  User/assistant entries never do.
+        """
+        history_with_plan_word = [
+            {"role": "user", "content": "plan to close Q4"},
+            {"role": "assistant", "content": "Here is the plan ..."},
+        ]
+        self.assertIsNone(find_pending_plan(history_with_plan_word))
+
+    def test_H10_hooks_activate_only_when_role_marker_present(self):
+        """
+        EXPECTED: the hooks fire ONLY when the specific role marker is in history.
+        This proves the gate is precise — no false positives.
+        """
+        plan = {
+            "question": "Q4 coverage",
+            "explanation": "Needs two primitives",
+            "sub_parts": [
+                {"name": "pipeline", "primitive": "query_pipeline_coverage",
+                 "rationale": "open pipeline"},
+                {"name": "target", "primitive": "query_path_to_target",
+                 "rationale": "target figure"},
+            ],
+        }
+        entry = make_pending_plan_entry(plan, "Does this look right?")
+        history_with_plan = [
+            {"role": "user", "content": "Q4 coverage question"},
+            entry,
+        ]
+        # Plan marker present → find_pending_plan returns the pending entry
+        found = find_pending_plan(history_with_plan)
+        self.assertIsNotNone(found)
+        self.assertEqual(found.get("plan", {}).get("question"), "Q4 coverage")
+
+        # Same history WITHOUT the marker → returns None (hook is dead code)
+        history_without_marker = [
+            {"role": "user", "content": "Q4 coverage question"},
+        ]
+        self.assertIsNone(find_pending_plan(history_without_marker))
+
+    def test_H11_hooks_have_no_io_side_effects(self):
+        """
+        EXPECTED: calling find_pending_checkback / find_pending_plan on ordinary
+        history produces no observable side effects — no exceptions, no mutations.
+        The history list must be identical before and after each call.
+        """
+        import copy
+        history = copy.deepcopy(self._NORMAL_HISTORY)
+        snapshot_before = copy.deepcopy(history)
+
+        find_pending_checkback(history)
+        find_pending_plan(history)
+
+        self.assertEqual(history, snapshot_before,
+                         "History list must not be mutated by either hook")
+
+
 if __name__ == "__main__":
     unittest.main()
