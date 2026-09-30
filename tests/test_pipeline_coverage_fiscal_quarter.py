@@ -243,6 +243,51 @@ def test_historical_renewal_not_weighted():
     print("✓ historical quarter: renewal deals not weighted")
 
 
+# ─── Wiring visibility tests (2026-09-30 task) ────────────────────────────
+
+def test_router_fiscal_quarter_lists_pipeline_coverage():
+    """The classifier prompt's fiscal_quarter param description must name
+    query_pipeline_coverage so the model knows to pass it."""
+    from api.router import build_intent_prompt
+    prompt = build_intent_prompt("2026-09-30", "FY2027 Q3", "", "test")
+    fq_lines = [l for l in prompt.splitlines()
+                if l.strip().startswith('"fiscal_quarter"')]
+    assert fq_lines, "fiscal_quarter param not found in classifier prompt"
+    assert "query_pipeline_coverage" in fq_lines[0], \
+        f"fiscal_quarter param description must list query_pipeline_coverage, got: {fq_lines[0]}"
+    print("✓ router fiscal_quarter lists query_pipeline_coverage")
+
+
+def test_agent_loop_prompt_lists_pipeline_coverage_fiscal_quarter():
+    """The agent loop system prompt must tell the model that
+    query_pipeline_coverage accepts a fiscal_quarter parameter."""
+    from api.agent_loop import _SYSTEM_PROMPT
+    coverage_line = [l for l in _SYSTEM_PROMPT.splitlines()
+                     if "query_pipeline_coverage" in l and "fiscal_quarter" in l]
+    assert coverage_line, \
+        "agent loop prompt must list fiscal_quarter under query_pipeline_coverage"
+    print("✓ agent loop prompt lists fiscal_quarter for query_pipeline_coverage")
+
+
+def test_historical_quota_uses_past_quarter_period_key():
+    """Item 11: quota lookup for a past quarter must use THAT quarter's
+    period key ('FY2027_Q2'), not the current quarter's ('FY2027_Q3').
+    Verifies by seeding targets for BOTH quarters and confirming only the
+    past quarter's target appears in the result."""
+    snaps = [_snapshot_row("d1", stage_order=3)]
+    deals = [_deal_row("d1", new_arr=500000, expansion_arr=0)]
+    targets = [
+        {"period": "FY2027_Q2", "level": "team",
+         "metric": "incremental_arr", "target_value": 800000},
+        {"period": "FY2027_Q3", "level": "team",
+         "metric": "incremental_arr", "target_value": 1550000},
+    ]
+    r = _run_historical(snaps, deals, fiscal_quarter="FY2027 Q2", targets=targets)
+    assert r["real_target"]["quota"] == 800000, \
+        f"expected Q2 quota 800000, got {r['real_target']['quota']}"
+    print("✓ historical quota uses past quarter's period key, not current")
+
+
 # ─── Planted-bug controls ────────────────────────────────────────────────
 
 def test_PLANTED_BUG_historical_must_read_snapshot():
@@ -269,5 +314,8 @@ if __name__ == "__main__":
     test_current_quarter_regression()
     test_normalize_quarter_label()
     test_historical_renewal_not_weighted()
+    test_router_fiscal_quarter_lists_pipeline_coverage()
+    test_agent_loop_prompt_lists_pipeline_coverage_fiscal_quarter()
+    test_historical_quota_uses_past_quarter_period_key()
     test_PLANTED_BUG_historical_must_read_snapshot()
     print("\n✅ All pipeline_coverage fiscal_quarter tests passed")
