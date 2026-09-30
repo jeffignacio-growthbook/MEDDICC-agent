@@ -42,6 +42,44 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
+# Schema context for the agent loop prompt
+
+MAX_SCHEMA_RETRIES = 4
+
+
+def _get_schema_for_prompt(question: str, sb) -> str:
+    """Build a targeted schema context for the agent loop prompt.
+
+    Uses the same table-classification step the router already uses
+    (classify_relevant_tables via Haiku) to pick only the tables that
+    matter for *this* question, then pulls real column names and
+    descriptions from the data dictionary for those tables only.
+
+    Falls back to all-tables-lightweight on classification failure, and
+    to empty string if even that fails — the loop still works without
+    schema, it just wastes more steps on schema-validation rejections.
+    """
+    if sb is None:
+        return ""
+    try:
+        from api.table_classifier import classify_relevant_tables
+        from api.schema_context import get_schema_context
+        from llm_client import LLMClient
+
+        classifier_client = LLMClient.from_config(role="classifier")
+        relevant_tables = classify_relevant_tables(question, classifier_client)
+        logger.info("[AGENT_LOOP] schema tables for prompt: %s", relevant_tables)
+        return get_schema_context(
+            sb,
+            tables_with_descriptions=relevant_tables,
+            lightweight=True,
+        ) or ""
+    except Exception as e:
+        logger.warning("[AGENT_LOOP] failed to build schema context: %s", e)
+        return ""
+
+
+# ---------------------------------------------------------------------------
 # Configuration
 
 MAX_STEPS = 12
@@ -460,14 +498,17 @@ async def _execute_fetch_data(query: str, tool_params: dict, sb: Any) -> dict:
             filters = tool_params.get("filters") or None
             limit = int(tool_params.get("limit", 200))
             order_by = tool_params.get("order_by") or None
-            rows = await filter_table(
+            ft_result = await filter_table(
                 sb, table,
                 columns=columns,
                 filters=filters,
                 limit=limit,
                 order_by=order_by,
             )
-            return {"rows": rows, "table": table, "count": len(rows)}
+            if isinstance(ft_result, dict) and "error" in ft_result:
+                return ft_result
+            rows = ft_result if isinstance(ft_result, list) else ft_result.get("rows", ft_result)
+            return {"rows": rows, "table": table, "count": len(rows) if isinstance(rows, list) else 0}
         except Exception as e:
             logger.warning(f"[AGENT_LOOP] fetch_data filter_table({table!r}) failed: {e}")
             return {"error": str(e)}
@@ -682,6 +723,21 @@ async def run_agent_loop(
     # check_result traces claim numbers against ledger values only — model-passed
     # supporting_data cannot make an untraceable number pass.
     _ledger: list[dict] = []
+    # Schema-error retry budget: fetch_data calls that fail schema validation
+    # (wrong table/column names) get free retries up to this limit so the model
+    # can learn the correct schema without burning its step budget.
+    _schema_retries_remaining: int = MAX_SCHEMA_RETRIES
+
+    # Build system prompt with schema context
+    try:
+        schema_context = _get_schema_for_prompt(question, sb)
+    except Exception as e:
+        logger.warning("[AGENT_LOOP] schema context build failed: %s", e)
+        schema_context = ""
+    if schema_context:
+        system_prompt = _SYSTEM_PROMPT + "\n\n" + schema_context
+    else:
+        system_prompt = _SYSTEM_PROMPT
 
     # Seed the conversation
     messages.append({
@@ -689,12 +745,13 @@ async def run_agent_loop(
         "content": f"Question: {question}",
     })
 
-    for step_idx in range(MAX_STEPS):
+    step_idx = 0
+    while step_idx < MAX_STEPS:
         # Ask model for next tool call
         try:
             resp = client.complete(
                 messages=messages,
-                system=_SYSTEM_PROMPT,
+                system=system_prompt,
                 max_tokens=600,
             )
             raw = (resp.text or "").strip()
@@ -711,6 +768,7 @@ async def run_agent_loop(
             messages.append({"role": "assistant", "content": raw})
             messages.append({"role": "user", "content":
                              '{"error": "could not parse tool call — respond with valid JSON"}'})
+            step_idx += 1
             continue
 
         tool = parsed.get("tool", "")
@@ -757,6 +815,7 @@ async def run_agent_loop(
                         "or call ask_user before delivering."
                     ),
                 })})
+                step_idx += 1
                 continue
 
             # C1: quantitative answer without a prior check_result
@@ -870,6 +929,29 @@ async def run_agent_loop(
         messages.append({"role": "assistant", "content": raw})
         messages.append({"role": "user", "content":
                          _tool_result_message(tool, tool_params, tool_result)})
+
+        # Schema-error free retry: a fetch_data that failed because the model
+        # used the wrong table or column names does not burn a budget step.
+        # Only schema/column errors qualify — suspicious filter values and
+        # invalid operators are data errors that should count.
+        _is_schema_error = (
+            tool == "fetch_data"
+            and isinstance(tool_result, dict)
+            and _schema_retries_remaining > 0
+            and (
+                "unknown_select_columns" in tool_result
+                or "unknown_filter_columns" in tool_result
+                or ("error" in tool_result and "not find the table" in str(tool_result.get("error", "")))
+            )
+        )
+        if _is_schema_error:
+            _schema_retries_remaining -= 1
+            logger.info(
+                "[AGENT_LOOP] fetch_data schema error — free retry "
+                "(%d remaining)", _schema_retries_remaining
+            )
+        else:
+            step_idx += 1
 
     # ── MAX_STEPS reached without deliver ── C3 ───────────────────────────
     result.budget_exhausted = True
