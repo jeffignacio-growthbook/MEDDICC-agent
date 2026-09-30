@@ -251,6 +251,7 @@ class TestPendingPlanConfirmation(unittest.TestCase):
 
         exhausted_result = FakeLoopResult()
         exhausted_result.budget_exhausted = True
+        exhausted_result.check_result_verified = None
         exhausted_result.answer = "I was unable to answer this confidently"
 
         sb = MagicMock()
@@ -272,6 +273,36 @@ class TestPendingPlanConfirmation(unittest.TestCase):
         mock_inner.assert_not_called()
         self.assertIn("unable to answer", result.get("answer", "").lower())
         self.assertEqual(result.get("handler_name"), "composer_agent_loop_exhausted")
+
+    def test_affirmed_plan_budget_exhausted_verified_delivers_answer(self):
+        """When run_agent_loop exhausts budget but check_result_verified=True,
+        the verified answer must be delivered — not the generic failure."""
+        history = _history_with_pending_plan()
+
+        verified_result = FakeLoopResult()
+        verified_result.budget_exhausted = True
+        verified_result.check_result_verified = True
+        verified_result.answer = "Pipeline coverage drops from 3.1x to 1.8x."
+
+        sb = MagicMock()
+        sb.table.return_value.select.return_value.execute.return_value = MagicMock(data=[])
+
+        with patch("api.router._route_question", new_callable=AsyncMock) as mock_inner, \
+             patch("api.agent_loop.run_agent_loop",
+                   AsyncMock(return_value=verified_result)), \
+             patch("api.router.LLMClient") as mock_llm:
+            mock_llm.from_config.return_value = MagicMock()
+            from api.router import route_question
+            result = run(route_question(
+                question="Yes",
+                user_id="U_TEST",
+                history=history,
+                sb=sb,
+                thread_ts="1727000000.000001",
+            ))
+        mock_inner.assert_not_called()
+        self.assertIn("3.1x to 1.8x", result.get("answer", ""))
+        self.assertEqual(result.get("handler_name"), "composer_agent_loop")
 
     def test_affirmed_plan_exception_returns_explicit_failure(self):
         """When run_agent_loop raises an exception, route_question must

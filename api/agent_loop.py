@@ -930,6 +930,7 @@ async def run_agent_loop(
     # C1b: tracks whether the most recent check_result call returned verified=False.
     # deliver is blocked while this is True so fabricated numbers can't be published.
     _last_check_failed: bool = False
+    _last_verified_claim: str = ""
     # Execution ledger: every call_primitive/fetch_data result is recorded here.
     # check_result traces claim numbers against ledger values only — model-passed
     # supporting_data cannot make an untraceable number pass.
@@ -1050,6 +1051,8 @@ async def run_agent_loop(
             )
             result.check_result_verified = bool(tool_result.get("verified", True))
             _last_check_failed = not result.check_result_verified
+            if result.check_result_verified:
+                _last_verified_claim = tool_params.get("claim", "")
 
         # ── call_primitive ────────────────────────────────────────────────
         elif tool == "call_primitive":
@@ -1199,7 +1202,10 @@ async def run_agent_loop(
 
     # ── MAX_STEPS reached without deliver ── C3 ───────────────────────────
     result.budget_exhausted = True
-    result.answer = _INSUFFICIENT_ANSWER
+    if result.check_result_verified and _last_verified_claim:
+        result.answer = _last_verified_claim
+    else:
+        result.answer = _INSUFFICIENT_ANSWER
     return result
 
 

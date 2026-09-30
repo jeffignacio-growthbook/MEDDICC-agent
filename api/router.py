@@ -5853,7 +5853,10 @@ async def route_question(question: str, user_id: str,
                 f"check_result_verified={loop_result.check_result_verified} "
                 f"budget_exhausted={loop_result.budget_exhausted}"
             )
-            if loop_result.answer and not loop_result.budget_exhausted:
+            if loop_result.answer and (
+                not loop_result.budget_exhausted
+                or loop_result.check_result_verified
+            ):
                 original_q = plan.get("question", question)
                 cb_entry = make_pending_checkback_entry(plan, original_q, thread_ts)
                 return {
