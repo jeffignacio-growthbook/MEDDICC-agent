@@ -314,6 +314,33 @@ def test_PLANTED_BUG_agent_loop_no_date_without_injection():
     print("✓ PLANTED BUG control: _SYSTEM_PROMPT has no hard-coded date")
 
 
+def test_agent_loop_prompt_efficiency_guidance():
+    """The agent loop system prompt must tell the model that
+    query_quarter_downside / query_quarter_health already include
+    pipeline_coverage, and that historical coverage should use
+    query_pipeline_coverage directly, not query_quarter_downside."""
+    from api.agent_loop import _SYSTEM_PROMPT
+    prompt_lower = _SYSTEM_PROMPT.lower()
+    assert "query_quarter_downside" in prompt_lower and \
+           "query_pipeline_coverage" in prompt_lower and \
+           "already" in prompt_lower, \
+        "prompt must warn that downside/health already include pipeline_coverage"
+    assert "historical" in prompt_lower and \
+           "query_pipeline_coverage" in prompt_lower and \
+           "fiscal_quarter" in prompt_lower, \
+        "prompt must direct historical coverage to query_pipeline_coverage(fiscal_quarter=...)"
+    print("✓ agent loop prompt includes efficiency guidance for coverage primitives")
+
+
+def test_PLANTED_BUG_efficiency_guidance_not_removed():
+    """CONTROL: the efficiency guidance section must exist in _SYSTEM_PROMPT.
+    If someone removes it, the model will waste budget on redundant calls."""
+    from api.agent_loop import _SYSTEM_PROMPT
+    assert "Efficiency" in _SYSTEM_PROMPT, \
+        "PLANTED BUG: efficiency guidance section removed from _SYSTEM_PROMPT"
+    assert "Do NOT call query_pipeline_coverage" in _SYSTEM_PROMPT, \
+        "PLANTED BUG: 'Do NOT call query_pipeline_coverage' directive missing"
+    print("✓ PLANTED BUG control: efficiency guidance present in _SYSTEM_PROMPT")
 
 # ─── Planted-bug controls ────────────────────────────────────────────────
 
@@ -346,5 +373,7 @@ if __name__ == "__main__":
     test_historical_quota_uses_past_quarter_period_key()
     test_agent_loop_prompt_includes_date_context()
     test_PLANTED_BUG_agent_loop_no_date_without_injection()
+    test_agent_loop_prompt_efficiency_guidance()
+    test_PLANTED_BUG_efficiency_guidance_not_removed()
     test_PLANTED_BUG_historical_must_read_snapshot()
     print("\n✅ All pipeline_coverage fiscal_quarter tests passed")

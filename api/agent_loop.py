@@ -483,6 +483,15 @@ Rules:
 - Use ask_user for ARR vs deal value, quota vs stretch, or renewals-in/out questions.
 - Keep answers concise and lead with the headline finding.
 
+Efficiency — avoiding redundant primitive calls:
+- query_quarter_downside and query_quarter_health already run query_pipeline_coverage
+  internally (output is in figures.coverage). Do NOT call query_pipeline_coverage
+  separately for the current quarter when you have already called either of these.
+- For historical quarter comparison of pipeline coverage, call
+  query_pipeline_coverage(fiscal_quarter=...) directly. Do NOT call
+  query_quarter_downside for a historical quarter — it runs 5 primitives when
+  only 1 is needed.
+
 Respond with JSON only — no markdown, no prose outside the JSON."""
 
 
