@@ -18,9 +18,10 @@ These tests verify:
   4. _get_schema_for_prompt uses table classification (same as the
      router) to inject only relevant tables' full descriptions, not
      every table in the dictionary.
-  5. With the real schema injected, a model that reads the prompt never
-     attempts nonexistent table/column names — zero SCHEMA_VALIDATION
-     rejections (the "opportunities"/"amount"/"owner" scenario).
+  5. With the real schema injected, even if the model's first attempt
+     uses invented names from the live trace (opportunities/amount/owner),
+     the rejection + schema in the prompt give it everything needed to
+     self-correct — and the rejections are free retries, not step burns.
 """
 
 import asyncio
@@ -576,6 +577,104 @@ class TestZeroSchemaRejectionsWithUpfrontSchema(unittest.TestCase):
                         f"Hallucinated column name '{bad_col.strip()}' found "
                         f"in system prompt line: {line_stripped}"
                     )
+
+    def test_live_trace_bad_names_with_schema_self_corrects(self):
+        """Reproduces the exact live failure trace: the model's FIRST attempt
+        uses the invented names from the production trace (table 'opportunities'
+        with ['id', 'name', 'amount', 'owner'], then 'deals' with
+        ['id', 'name', 'arr_value', 'owner']).  With _REALISTIC_SCHEMA injected
+        into the system prompt, the loop must:
+          1. Return the schema-validation error (free retry, not a step burn)
+          2. Feed the error back to the model alongside the schema that's
+             already in its system prompt — giving it everything it needs
+          3. On the corrected attempt (correct names), succeed normally
+
+        A FakeClient can't dynamically read the prompt, so the script encodes
+        the correction path explicitly: bad → bad → correct → deliver.
+        The test proves the MECHANISM works end-to-end: schema is present from
+        the first call, rejections are free, error messages name the correct
+        columns, and the corrected attempt succeeds — exactly the path a real
+        model would take after reading its prompt + error feedback."""
+        steps = [
+            # Attempt 1: exact live trace — 'opportunities' table (doesn't exist)
+            _fetch_data("opportunities", columns=["id", "name", "amount", "owner"]),
+            # Attempt 2: correct table, but still-invented column names
+            _fetch_data("deals", columns=["id", "name", "arr_value", "owner"]),
+            # Attempt 3: model reads schema + error feedback, uses correct names
+            _fetch_data("deals", columns=["deal_id", "arr_usd", "owner_email",
+                                           "deal_status", "close_date"]),
+            _deliver("Pipeline total: $2.4M across 18 open deals."),
+        ]
+        client = FakeClient(steps)
+
+        rejections = []
+
+        valid_cols = {
+            "deals": {
+                "deal_id", "company_name", "owner_email", "owner_name",
+                "arr_usd", "deal_value", "new_arr", "expansion_arr",
+                "deal_status", "stage", "stage_id", "pipeline_id",
+                "close_date", "segment", "forecast_category",
+            },
+            "analyses": {
+                "deal_id", "overall_score", "champion_score",
+                "economic_buyer_score",
+            },
+        }
+
+        async def mock_filter_table(sb, table, **kwargs):
+            cols = kwargs.get("columns") or []
+            if table not in valid_cols:
+                rejections.append({"table": table, "cols": cols})
+                return {
+                    "error": (
+                        f"Could not find the table '{table}'. "
+                        f"Queryable tables: {sorted(valid_cols.keys())}"
+                    ),
+                    "unknown_select_columns": cols,
+                }
+            bad = [c for c in cols if c not in valid_cols[table]]
+            if bad:
+                rejections.append({"table": table, "bad_cols": bad})
+                return {
+                    "error": (
+                        f"Unknown SELECT columns for table '{table}': {bad}. "
+                        f"Queryable columns: {sorted(valid_cols[table])}"
+                    ),
+                    "unknown_select_columns": bad,
+                }
+            return {"rows": [
+                {"deal_id": "D1", "arr_usd": 100000, "owner_email": "ae@co.com",
+                 "deal_status": "open", "close_date": "2026-12-15"},
+            ]}
+
+        with patch("api.tools.filter_table", side_effect=mock_filter_table):
+            with patch("api.agent_loop._get_schema_for_prompt",
+                        return_value=_REALISTIC_SCHEMA):
+                result = run(run_agent_loop(
+                    question="What is our total pipeline?",
+                    client=client,
+                    sb=MagicMock(),
+                ))
+
+        # Schema WAS in the system prompt from the very first call
+        self.assertIn("QUERYABLE SUPABASE TABLES", client.system_prompts[0])
+        self.assertIn("arr_usd", client.system_prompts[0])
+
+        # The first two attempts produced rejections (the live trace path)
+        self.assertEqual(len(rejections), 2,
+                         f"Expected exactly 2 rejections (live trace path) but got: {rejections}")
+        self.assertEqual(rejections[0]["table"], "opportunities")
+        self.assertEqual(rejections[1]["table"], "deals")
+        self.assertIn("id", rejections[1]["bad_cols"])
+
+        # The rejections were FREE retries — they didn't burn budget steps
+        # 4 client calls total, but only 2 real steps (successful fetch + deliver)
+        self.assertEqual(result.steps_taken, 2,
+                         "Schema rejections must be free retries, not budget steps")
+
+        # The corrected attempt succeeded
+        self.assertIn("$2.4M", result.answer)
 
     def test_mixed_correct_and_bad_columns_counts_rejections(self):
         """If a model ignores the schema and mixes correct with bad columns,
