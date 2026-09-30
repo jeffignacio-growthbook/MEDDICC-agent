@@ -124,6 +124,22 @@ def _infer_value_column(rows: List[dict]) -> Optional[str]:
     return None
 
 
+_RELATIVE_TOLERANCE = 0.01  # 1% of actual sum
+
+
+def _within_tolerance(stated: float, actual: float, abs_tolerance: float = 0.5) -> bool:
+    """True when stated and actual are close enough to count as a match.
+
+    Uses the LARGER of abs_tolerance ($0.50 default) and 1% of the actual
+    sum.  Large totals (millions) need the relative leg so that
+    presentation rounding ($26.8M vs $26,778,381) is not flagged; small
+    totals need the absolute leg so that a $0.30 rounding diff on a $50
+    figure is not flagged either.
+    """
+    threshold = max(abs_tolerance, abs(actual) * _RELATIVE_TOLERANCE)
+    return abs(actual - stated) <= threshold
+
+
 def verify_aggregation_completeness(retrieved_rows: List[dict], stated_totals: Dict[str, float],
                                      value_column: Optional[str] = None,
                                      tolerance: float = 0.5) -> dict:
@@ -144,9 +160,9 @@ def verify_aggregation_completeness(retrieved_rows: List[dict], stated_totals: D
         value_column: the numeric column to sum. Auto-detected from
             common names (net_change, deal_value, won_value, ...) when
             not given — see _infer_value_column().
-        tolerance: absolute difference below which a stated figure and
-            the real sum are considered a match (rounding/formatting
-            noise, e.g. "$75K" rounding an exact $74,850).
+        tolerance: absolute floor for the match threshold. The effective
+            threshold is max(tolerance, 1% of actual_sum) — large totals
+            use the relative leg so presentation rounding is not flagged.
 
     Returns:
         {"match": True} when nothing to check (no rows, no stated
@@ -190,7 +206,7 @@ def verify_aggregation_completeness(retrieved_rows: List[dict], stated_totals: D
         actual_sum = sum(
             (r.get(column) or 0) for r in matching_rows if isinstance(r, dict)
         )
-        if abs(actual_sum - stated_value) > tolerance:
+        if not _within_tolerance(stated_value, actual_sum, tolerance):
             discrepancies.append({
                 "category": label,
                 "stated": stated_value,
@@ -268,7 +284,7 @@ def verify_aggregation_by_population(populations: Dict[str, List[dict]],
                 if not matching:
                     continue
             cands.append((name, sum((r.get(column) or 0) for r in matching), matching))
-        if not cands or any(abs(s - stated) <= tolerance for _, s, _ in cands):
+        if not cands or any(_within_tolerance(stated, s, tolerance) for _, s, _ in cands):
             continue
         if len(cands) == 1:
             name, s, matching = cands[0]

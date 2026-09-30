@@ -6699,6 +6699,9 @@ async def _route_question(question: str, user_id: str,
         max_tokens=SYNTH_MAX_TOKENS
     )
     verified = verify_resp.text.strip()
+    _v_parsed = _extract_json(verified)
+    if _v_parsed and _v_parsed.get("answer"):
+        verified = _v_parsed["answer"]
     # Truncation guard: a multi-deal answer that hit the ceiling (or that the
     # verify pass clipped) ends mid-sentence. Shipping a sentence that stops
     # mid-word is worse than a complete one — re-synthesize once at a higher
@@ -6836,6 +6839,9 @@ async def _route_question(question: str, user_id: str,
             max_tokens=SYNTH_MAX_TOKENS
         )
         verified = answer_resp.text.strip()
+        _r_parsed = _extract_json(verified)
+        if _r_parsed and _r_parsed.get("answer"):
+            verified = _r_parsed["answer"]
 
     # ── 8a. Scope-mismatch escalation → composer plan ────────────────────────
     # If the assessor flags scope_mismatch, the question needs multiple
