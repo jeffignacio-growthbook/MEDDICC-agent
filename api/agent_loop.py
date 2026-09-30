@@ -948,7 +948,12 @@ async def run_agent_loop(
             _schema_retries_remaining -= 1
             logger.info(
                 "[AGENT_LOOP] fetch_data schema error — free retry "
-                "(%d remaining)", _schema_retries_remaining
+                "(%d remaining) | table=%r columns=%r filters=%r | error=%s",
+                _schema_retries_remaining,
+                tool_params.get("table"),
+                tool_params.get("columns"),
+                tool_params.get("filters"),
+                str(tool_result.get("error", ""))[:300],
             )
         else:
             step_idx += 1
