@@ -96,17 +96,107 @@ def _gap_to_goal(value: Optional[float], goal: Optional[float]) -> Optional[Dict
             "text": f"${-diff:,.0f} short of target"}
 
 
-def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]:
+def _normalize_quarter_label(raw: str) -> str:
+    """Normalize fiscal quarter labels to the 'FY2027 Q3' format used
+    by deals_snapshot.  Accepts 'Q3_FY2027', 'FY2027Q3', 'FY2027 Q3',
+    'q3_fy2027', 'Q2' (infers current FY)."""
+    import re
+    raw = raw.strip().upper().replace("_", " ")
+    m = re.match(r'^(FY\d{4})\s*(Q[1-4])$', raw)
+    if m:
+        return f"{m.group(1)} {m.group(2)}"
+    m = re.match(r'^(Q[1-4])\s*(FY\d{4})$', raw)
+    if m:
+        return f"{m.group(2)} {m.group(1)}"
+    m = re.match(r'^(Q[1-4])$', raw)
+    if m:
+        from utils import get_fiscal_quarter
+        _, _, current_label = get_fiscal_quarter(date.today())
+        fy = current_label.split()[0]
+        return f"{fy} {m.group(1)}"
+    return raw
+
+
+def _period_label_for_quarter(fiscal_quarter: str) -> str:
+    """Convert 'FY2027 Q3' to the rep_targets period format 'Q3_FY2027'."""
+    parts = fiscal_quarter.split()
+    if len(parts) == 2 and parts[0].startswith("FY") and parts[1].startswith("Q"):
+        return f"{parts[1]}_{parts[0]}"
+    return fiscal_quarter.replace(" ", "_")
+
+
+def _is_current_quarter(fiscal_quarter: str) -> bool:
+    """Return True if fiscal_quarter matches today's quarter."""
+    from utils import get_fiscal_quarter
+    _, _, current = get_fiscal_quarter(date.today())
+    return _normalize_quarter_label(fiscal_quarter) == current
+
+
+def _load_snapshot_deals(sb, fiscal_quarter: str) -> list:
+    """Load deal state from deals_snapshot for a completed quarter.
+
+    Reads the latest available week for the given fiscal_quarter from
+    deals_snapshot, then joins new_arr/expansion_arr from the deals
+    table (ARR fields are not stored in the snapshot).
     """
-    Current-quarter, New+Expansion-only, qualified-pipeline coverage
-    assessment: raw and stage-weighted pipeline vs. the REAL stated
-    quota+stretch goal (gap-to-goal), plus a HEURISTIC historical
-    coverage curve for context.
+    from supabase_client import select_all
+
+    snapshots = select_all(sb, "deals_snapshot",
+        columns="deal_id,pipeline_id,stage_order,close_date,deal_status,week_of_quarter",
+        filters=[("eq", "fiscal_quarter", fiscal_quarter)])
+    if not snapshots:
+        return []
+
+    max_week = max(s.get("week_of_quarter", 0) for s in snapshots)
+    end_of_q = [s for s in snapshots if s.get("week_of_quarter") == max_week]
+    logger.info("[PIPELINE_COVERAGE] historical %s: %d snapshot rows at week %d",
+                fiscal_quarter, len(end_of_q), max_week)
+
+    deal_ids = list({s["deal_id"] for s in end_of_q})
+    deals_lookup: dict = {}
+    for batch_start in range(0, len(deal_ids), 50):
+        batch = deal_ids[batch_start:batch_start + 50]
+        rows = select_all(sb, "deals",
+            columns="deal_id,new_arr,expansion_arr",
+            filters=[("in_", "deal_id", batch)])
+        for r in rows:
+            deals_lookup[r["deal_id"]] = r
+
+    enriched = []
+    for s in end_of_q:
+        deal_row = deals_lookup.get(s["deal_id"], {})
+        enriched.append({
+            "deal_id": s["deal_id"],
+            "pipeline_id": s.get("pipeline_id"),
+            "stage_order": s.get("stage_order"),
+            "close_date": s.get("close_date"),
+            "deal_status": s.get("deal_status"),
+            "new_arr": deal_row.get("new_arr"),
+            "expansion_arr": deal_row.get("expansion_arr"),
+        })
+    return enriched
+
+
+def assess_pipeline_coverage(
+    sb, as_of: Optional[date] = None, fiscal_quarter: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Pipeline-coverage assessment: New+Expansion-only, qualified-pipeline
+    coverage vs. the stated quota+stretch goal (gap-to-goal), plus a
+    HEURISTIC historical coverage curve for context.
+
+    Accepts an optional fiscal_quarter (e.g. 'FY2027 Q2') to assess a
+    past quarter from deals_snapshot.  Defaults to the current quarter
+    when omitted.
 
     Args:
         sb: Supabase client
         as_of: Date to evaluate "today" as (default: date.today()).
-               Exposed for testability.
+               Exposed for testability.  Ignored when fiscal_quarter
+               names a past quarter.
+        fiscal_quarter: Optional fiscal quarter label (e.g. 'FY2027 Q2',
+               'Q2', 'Q2_FY2027').  When omitted, uses the quarter
+               containing as_of.
 
     Returns:
         {"status": "ok", "fiscal_quarter": str, "current_week": int,
@@ -136,8 +226,24 @@ def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]
     if as_of is None:
         as_of = date.today()
 
-    q_start, q_end, fiscal_quarter = get_fiscal_quarter(as_of)
-    current_week = get_week_of_quarter(as_of, q_start)
+    # Determine which quarter we're assessing
+    is_historical = False
+    if fiscal_quarter:
+        fiscal_quarter = _normalize_quarter_label(fiscal_quarter)
+        if not _is_current_quarter(fiscal_quarter):
+            is_historical = True
+
+    if not fiscal_quarter or not is_historical:
+        q_start, q_end, fiscal_quarter = get_fiscal_quarter(as_of)
+        current_week = get_week_of_quarter(as_of, q_start)
+    else:
+        from time_resolver import resolve_time_window
+        tw = resolve_time_window({"period": "fiscal_quarter",
+                                  "fiscal_quarter": fiscal_quarter})
+        q_start = date.fromisoformat(tw["start"])
+        q_end = date.fromisoformat(tw["end"])
+        current_week = 13
+
     q_start_iso, q_end_iso = q_start.isoformat(), q_end.isoformat()
 
     from loss_concentration import SALES_PIPELINE, discovery_or_later_stages
@@ -146,30 +252,48 @@ def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]
     stage_order_of = {str(s["id"]): s.get("order")
                       for p in pipeline_config.get("pipelines", [])
                       if str(p.get("id")) == SALES_PIPELINE for s in p.get("stages", [])}
+    qualifying_orders = {o for o in stage_order_of.values() if o is not None}
 
-    # 1+2: New+Expansion only, qualified only, Q-scoped by close_date
-    # (same q3_scoped_pipeline precedent query_pipeline() uses — a
-    # coverage figure must compare against a same-period target).
-    deals = select_all(sb, "deals",
-        columns="deal_id,pipeline_id,stage,expansion_arr,new_arr,close_date,deal_status",
-        filters=[("eq", "deal_status", "active"),
-                 ("gte", "close_date", q_start_iso),
-                 ("lte", "close_date", q_end_iso)])
+    if is_historical:
+        raw_deals = _load_snapshot_deals(sb, fiscal_quarter)
+    else:
+        raw_deals = select_all(sb, "deals",
+            columns="deal_id,pipeline_id,stage,expansion_arr,new_arr,close_date,deal_status",
+            filters=[("eq", "deal_status", "active"),
+                     ("gte", "close_date", q_start_iso),
+                     ("lte", "close_date", q_end_iso)])
 
     qualified_deals, renewal_deals = [], []
-    for d in deals:
-        if d.get("deal_status") != "active" or not is_incremental_pipeline(d):
-            continue
-        close_date = d.get("close_date")
-        if not close_date or not (q_start_iso <= str(close_date)[:10] <= q_end_iso):
-            continue
+    for d in raw_deals:
+        if is_historical:
+            if d.get("deal_status") not in ("active", None):
+                continue
+            if not (d.get("new_arr") or d.get("expansion_arr")):
+                continue
+        else:
+            if d.get("deal_status") != "active" or not is_incremental_pipeline(d):
+                continue
+            close_date = d.get("close_date")
+            if not close_date or not (q_start_iso <= str(close_date)[:10] <= q_end_iso):
+                continue
+
         d["_incremental_value"] = incremental_arr(d)
-        if str(d.get("pipeline_id")) != SALES_PIPELINE:
-            renewal_deals.append(d)
-            continue
-        if str(d.get("stage")) not in qualifying:
-            continue
-        d["_stage_order"] = stage_order_of[str(d.get("stage"))]
+
+        if is_historical:
+            if str(d.get("pipeline_id")) != SALES_PIPELINE:
+                renewal_deals.append(d)
+                continue
+            so = d.get("stage_order")
+            if so is None or so not in qualifying_orders:
+                continue
+            d["_stage_order"] = so
+        else:
+            if str(d.get("pipeline_id")) != SALES_PIPELINE:
+                renewal_deals.append(d)
+                continue
+            if str(d.get("stage")) not in qualifying:
+                continue
+            d["_stage_order"] = stage_order_of[str(d.get("stage"))]
         qualified_deals.append(d)
 
     raw_pipeline_total = sum(d["_incremental_value"] for d in qualified_deals)
@@ -193,18 +317,17 @@ def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]
             weighted_total += d["_incremental_value"] * win_rate
             weighted_deal_count += 1
 
-    # 6: REAL current-quarter target. Quota from the live rep_targets
-    # table (query_pipeline()'s own precedent); stretch from
-    # config/targets.yaml directly (not yet seeded live — see module
-    # docstring).
-    current_period = current_quarter_label()
+    # Target lookup: by quarter period label (works for both current and historical)
+    period_label = _period_label_for_quarter(fiscal_quarter)
     quota = None
     try:
         target_resp = sb.table("rep_targets").select("target_value").eq(
-            "period", current_period).eq("level", "team").eq(
+            "period", period_label).eq("level", "team").eq(
             "metric", "incremental_arr").execute()
-        if target_resp.data:
-            quota = target_resp.data[0].get("target_value")
+        if isinstance(target_resp.data, list) and target_resp.data:
+            val = target_resp.data[0].get("target_value")
+            if isinstance(val, (int, float)):
+                quota = val
     except Exception as e:
         logger.warning(f"[PIPELINE_COVERAGE] Failed to fetch team quota: {e}")
 
@@ -214,26 +337,42 @@ def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]
     if targets_path.exists():
         with open(targets_path) as f:
             targets_cfg = yaml.safe_load(f) or {}
-        quarter_key = current_period.lower()
+        quarter_key = period_label.lower()
         quarter_cfg = (targets_cfg.get("targets") or {}).get(quarter_key, {})
         stretch = quarter_cfg.get("stretch_target")
         stretch_note = quarter_cfg.get("stretch_note")
 
     goal = (quota + stretch) if (quota is not None and stretch is not None) else None
 
-    # 5: historical HEURISTIC curve — never blended with the real target.
+    target_note = (
+        f"Stated target for {fiscal_quarter} — quota from rep_targets "
+        f"plus stretch from config/targets.yaml."
+    ) if goal else (
+        f"No stated target found for {fiscal_quarter} — quota and/or "
+        f"stretch not configured. Gap-to-goal cannot be computed; "
+        f"only the heuristic proxy curve is available for comparison."
+    )
+
+    # historical HEURISTIC curve — never blended with the real target.
     proxy_curve = query_coverage_proxy_target_by_week(sb)
-    current_week_ratio = proxy_curve.get("by_week", {}).get(current_week, {})
+    week_ratio = proxy_curve.get("by_week", {}).get(current_week, {})
+
+    scope_note = (
+        "New+Expansion ARR only (is_incremental_pipeline(), "
+        "renewal pipeline weighted separately: see renewal_not_weighted); qualified "
+        "pipeline only (Sales pipeline, Discovery through Awaiting "
+        "Signature); each deal weighted by its current stage's rate"
+    )
+    if is_historical:
+        scope_note += (f"; HISTORICAL: pipeline state from deals_snapshot "
+                       f"at end of {fiscal_quarter}")
 
     return {
         "status": "ok",
         "fiscal_quarter": fiscal_quarter,
         "current_week": current_week,
-        "scope": ("New+Expansion ARR only (is_incremental_pipeline(), "
-                  "renewal pipeline weighted separately: see renewal_not_weighted); qualified "
-                  "pipeline only (Sales pipeline, current stage Discovery through Awaiting "
-                  "Signature); each deal weighted by its current stage's rate; Q-scoped by "
-                  "close_date"),
+        "is_historical": is_historical,
+        "scope": scope_note,
         "qualified_pipeline": {
             "raw_value": raw_pipeline_total,
             "deal_count": raw_deal_count,
@@ -262,12 +401,7 @@ def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]
             "stretch": stretch,
             "goal": goal,
             "stretch_note": stretch_note,
-            "note": ("REAL stated target for the current quarter — quota "
-                     "from rep_targets plus a manually-set stretch figure "
-                     "from config/targets.yaml (a real, explicit business "
-                     "decision, documented there with the full WHY). This "
-                     "is NEVER a heuristic — do not conflate it with the "
-                     "historical_heuristic_curve below."),
+            "note": target_note,
         },
         "gap_to_goal": {
             "raw_pipeline_vs_goal": _gap_to_goal(raw_pipeline_total, goal),
@@ -275,7 +409,7 @@ def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]
         },
         "historical_heuristic_curve": {
             **proxy_curve,
-            "current_week_ratio": current_week_ratio,
+            "current_week_ratio": week_ratio,
         },
         "note": (
             "HEURISTIC: the historical_heuristic_curve above is calibrated "
@@ -284,9 +418,14 @@ def assess_pipeline_coverage(sb, as_of: Optional[date] = None) -> Dict[str, Any]
             "one. It rests on a permanent structural evidence ceiling (see "
             "that field's own note) and must always be labeled a HEURISTIC "
             "wherever it is surfaced, never 'directional' or 'approximate'. "
-            "The real_target and gap_to_goal above use the REAL stated "
-            f"{fiscal_quarter} quota+stretch target and are never "
-            "heuristics — the two must never be conflated."
+            + (
+                f"The real_target and gap_to_goal above use the REAL stated "
+                f"{fiscal_quarter} quota+stretch target and are never "
+                "heuristics — the two must never be conflated."
+                if goal else
+                f"No real target exists for {fiscal_quarter}, so gap_to_goal "
+                f"fields are null."
+            )
         ),
     }
 

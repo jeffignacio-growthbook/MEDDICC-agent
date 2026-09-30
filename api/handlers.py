@@ -1189,9 +1189,12 @@ async def query_forecast_trust(params: dict, sb) -> dict:
 
 async def query_pipeline_coverage(params: dict, sb) -> dict:
     """
-    Current-quarter pipeline-coverage assessment against the REAL stated
-    quota+stretch goal, gap-to-goal always (never a bare ratio)
-    (NORTH_STAR.md CRO Priority #2).
+    Pipeline-coverage assessment against the stated quota+stretch goal,
+    gap-to-goal always (never a bare ratio) (NORTH_STAR.md CRO Priority #2).
+
+    Accepts an optional fiscal_quarter parameter (e.g. 'FY2027 Q2', 'Q2')
+    to assess a past quarter from deals_snapshot.  Defaults to the
+    current quarter when omitted.
 
     NOT the same as query_coverage (that handler's coverage-ratio math
     is confirmed broken in production — divides one unscoped total
@@ -1206,11 +1209,12 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
     - "How much pipeline coverage do we have this quarter?"
     - "Are we tracking to goal on pipeline?"
     - "How far short of target is our qualified pipeline?"
+    - "What was our pipeline coverage last quarter?"
     """
     from pipeline_coverage import assess_pipeline_coverage
 
     as_of = None
-    as_of_str = params.get("as_of")  # optional ISO date, for testability only
+    as_of_str = params.get("as_of")
     if as_of_str:
         from datetime import date as _date
         try:
@@ -1218,8 +1222,10 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
         except ValueError:
             logger.error(f"[PIPELINE_COVERAGE] Invalid as_of date: {as_of_str!r}")
 
+    fiscal_quarter = params.get("fiscal_quarter")
+
     try:
-        return assess_pipeline_coverage(sb, as_of=as_of)
+        return assess_pipeline_coverage(sb, as_of=as_of, fiscal_quarter=fiscal_quarter)
     except Exception as e:
         logger.error(f"[PIPELINE_COVERAGE] Failed to assess pipeline coverage: {e}")
         return {

@@ -249,15 +249,19 @@ HANDLER_DESCRIPTIONS = {
     "query_feature_gaps": "feature gaps by severity/competitor",
     "query_coverage": "pipeline coverage vs target, quota attainment — LEGACY, confirmed broken (produces nonsensical 8,000%+ ratios). Prefer query_pipeline_coverage for coverage questions.",
     "query_pipeline_coverage": (
-        "current-quarter pipeline coverage vs the REAL quota+stretch goal, "
+        "pipeline coverage vs the stated quota+stretch goal, "
         "always gap-to-goal ('$X short of target'/'$X over target'), never "
         "a bare ratio. New+Expansion ARR only, qualified pipeline only, "
         "weighted by historical stage-level close rate. Includes a "
         "HEURISTIC historical coverage curve for context (labeled as "
-        "such — proxy-calibrated, not a real historical target). Use for: "
+        "such — proxy-calibrated, not a real historical target). "
+        "Accepts optional fiscal_quarter param (e.g. 'FY2027 Q2', 'Q2') "
+        "to assess a past quarter from deals_snapshot; defaults to "
+        "current quarter. Use for: "
         "'how much pipeline coverage do we have', 'are we tracking to "
         "goal on pipeline', 'how far short of target is our pipeline', "
-        "'pipeline health'. NOT query_coverage (broken) and NOT "
+        "'pipeline health', 'what was our pipeline coverage last quarter'. "
+        "NOT query_coverage (broken) and NOT "
         "query_pipeline (that's the raw pipeline snapshot, no gap-to-goal "
         "or stage weighting)."
     ),
