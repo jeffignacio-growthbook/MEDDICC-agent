@@ -342,8 +342,6 @@ def test_PLANTED_BUG_efficiency_guidance_not_removed():
         "PLANTED BUG: 'Do NOT call query_pipeline_coverage' directive missing"
     print("✓ PLANTED BUG control: efficiency guidance present in _SYSTEM_PROMPT")
 
-
-
 # ─── Planted-bug controls ────────────────────────────────────────────────
 
 def test_PLANTED_BUG_historical_must_read_snapshot():
