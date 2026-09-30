@@ -30,6 +30,33 @@ from api.incremental_arr import incremental_arr  # the one Incremental ARR defin
 
 from supabase import create_client
 
+import logging as _logging
+_logger = _logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Request-scoped memoization for expensive Supabase reads.
+#
+# _get_complete_quarters reads ALL deals_snapshot rows (24k+) to find which
+# quarters have 13 weeks.  query_stage_close_rate then reads per-quarter
+# snapshot rows for each complete quarter.  Both are deterministic within a
+# single HTTP request (snapshot data doesn't change mid-request), and both
+# are called multiple times in a single compose_quarter_health invocation:
+#   1. assess_pipeline_coverage → query_stage_close_rate
+#   2. _downside_inputs         → query_stage_close_rate  (downside scenario)
+#   3. model's direct query_pipeline_coverage (historical) → query_stage_close_rate
+#
+# The cache is cleared at the start of each agent_loop run via
+# clear_request_cache().
+# ---------------------------------------------------------------------------
+
+_request_cache: Dict[str, any] = {}
+
+
+def clear_request_cache() -> None:
+    """Clear the request-scoped memoization cache.  Called at the start of
+    each run_agent_loop invocation."""
+    _request_cache.clear()
+
 
 def _load_config() -> Dict:
     """Load forecast analysis configuration."""
@@ -61,7 +88,14 @@ def _get_complete_quarters(sb) -> List[str]:
     Return list of fiscal quarters with 13 complete weeks of snapshot data.
 
     A quarter is complete if it has snapshots for all weeks 1-13.
+
+    Memoized within a request via _request_cache (cleared by
+    clear_request_cache at the start of each agent_loop run).
     """
+    cache_key = "complete_quarters"
+    if cache_key in _request_cache:
+        return _request_cache[cache_key]
+
     # MUST paginate: deals_snapshot has 24k+ rows and PostgREST silently caps
     # an unpaginated .execute() at 1,000. The old direct call saw only the
     # first 1,000 rows, never observed all 13 weeks of any quarter, and so
@@ -87,6 +121,7 @@ def _get_complete_quarters(sb) -> List[str]:
         if len(weeks) == 13
     ])
 
+    _request_cache[cache_key] = complete
     return complete
 
 
@@ -142,16 +177,25 @@ def _classify_deal_outcome(
 
 def _quarter_window_iso(sb, quarter: str) -> Tuple[Optional[str], Optional[str]]:
     """(q_start_iso, q_end_iso) for a fiscal-quarter label, from the fiscal
-    calendar applied to any snapshot date in the quarter."""
+    calendar applied to any snapshot date in the quarter.
+
+    Memoized per quarter within a request via _request_cache."""
+    cache_key = f"qw_iso:{quarter}"
+    if cache_key in _request_cache:
+        return _request_cache[cache_key]
+
     from utils import get_fiscal_quarter
     from datetime import date as _date
     r = sb.table('deals_snapshot').select('snapshot_date').eq(
         'fiscal_quarter', quarter).limit(1).execute()
     if not r.data:
-        return None, None
-    d = _date.fromisoformat(r.data[0]['snapshot_date'])
-    q_start, q_end, _ = get_fiscal_quarter(d)
-    return q_start.isoformat(), q_end.isoformat()
+        result = (None, None)
+    else:
+        d = _date.fromisoformat(r.data[0]['snapshot_date'])
+        q_start, q_end, _ = get_fiscal_quarter(d)
+        result = (q_start.isoformat(), q_end.isoformat())
+    _request_cache[cache_key] = result
+    return result
 
 
 def _in_quarter_won_by_pipeline(
@@ -810,6 +854,9 @@ def query_stage_close_rate(sb=None) -> Dict:
     query_commit_outcome_by_week already uses (deal-week observations,
     not deduped to unique deals).
 
+    Memoized within a request via _request_cache (cleared by
+    clear_request_cache at the start of each agent_loop run).
+
     Returns:
         {'by_stage_order': {stage_order: {'n_observed', 'classified',
             'unclassified', 'won', 'lost', 'slipped', 'win_rate' (gated),
@@ -817,6 +864,10 @@ def query_stage_close_rate(sb=None) -> Dict:
          'quarters_analyzed': int, 'complete_quarters': [...],
          'min_evidence_count': int, 'scope': str, 'note': str}
     """
+    cache_key = "stage_close_rate"
+    if cache_key in _request_cache:
+        return _request_cache[cache_key]
+
     if sb is None:
         sb = create_client(
             os.environ['SUPABASE_URL'],
@@ -886,7 +937,7 @@ def query_stage_close_rate(sb=None) -> Dict:
 
     by_stage_order = {so: _finish(agg) for so, agg in pooled_by_stage.items()}
 
-    return {
+    result = {
         'by_stage_order': by_stage_order,
         'quarters_analyzed': len(complete_quarters),
         'complete_quarters': complete_quarters,
@@ -897,6 +948,8 @@ def query_stage_close_rate(sb=None) -> Dict:
                  'classified cohort at that stage is below '
                  'min_evidence_count.'),
     }
+    _request_cache["stage_close_rate"] = result
+    return result
 
 
 def _actual_incremental_closed_won(sb, q_start_iso: str, q_end_iso: str):
