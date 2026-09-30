@@ -595,6 +595,7 @@ def _check_filter_drop(
     return None
 
 
+
 async def _execute_fetch_data(query: str, tool_params: dict, sb: Any) -> dict:
     """
     Ad-hoc raw data fetch (C4 check already done by caller).
