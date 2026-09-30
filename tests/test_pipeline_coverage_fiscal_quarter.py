@@ -314,6 +314,7 @@ def test_PLANTED_BUG_agent_loop_no_date_without_injection():
     print("✓ PLANTED BUG control: _SYSTEM_PROMPT has no hard-coded date")
 
 
+
 # ─── Planted-bug controls ────────────────────────────────────────────────
 
 def test_PLANTED_BUG_historical_must_read_snapshot():
