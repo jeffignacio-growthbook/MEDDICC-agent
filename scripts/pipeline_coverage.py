@@ -337,7 +337,7 @@ def assess_pipeline_coverage(
     if targets_path.exists():
         with open(targets_path) as f:
             targets_cfg = yaml.safe_load(f) or {}
-        quarter_key = period_label.lower()
+        quarter_key = fiscal_quarter.lower().replace(" ", "_")
         quarter_cfg = (targets_cfg.get("targets") or {}).get(quarter_key, {})
         stretch = quarter_cfg.get("stretch_target")
         stretch_note = quarter_cfg.get("stretch_note")
@@ -346,7 +346,8 @@ def assess_pipeline_coverage(
 
     target_note = (
         f"Stated target for {fiscal_quarter} — quota from rep_targets "
-        f"plus stretch from config/targets.yaml."
+        f"plus stretch from config/targets.yaml. This is the REAL stated "
+        f"target, NEVER a heuristic."
     ) if goal else (
         f"No stated target found for {fiscal_quarter} — quota and/or "
         f"stretch not configured. Gap-to-goal cannot be computed; "
