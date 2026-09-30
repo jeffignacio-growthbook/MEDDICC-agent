@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook X Ecco",
+  "slug": "growthbook-x-ecco",
+  "last_etl_date": "2026-09-30T06:08:48.422637",
+  "calls": [
+    {
+      "id": "01M3MHFZ4TVC45ER5JFP8RJDGG",
+      "source": "fireflies",
+      "title": "GrowthBook X Ecco: Tool Intro for front end + Question time",
+      "date": "2026-09-29",
+      "duration_minutes": 53.689998626708984,
+      "summary": "# GrowthBook X Ecco: Tool Intro for front end + Question time\nDate: 2026-09-29 | Duration: 53.689998626708984m\n\n## Summary\nThe team confirmed Nur Maulidiyah’s GrowthBook access and resolved her initial login issue. GrowthBook’s 6.9 KB JavaScript SDK, Next.js and React support, edge-network options, and proxy hosting were reviewed as alternatives to VWO’s 50 MB SDK. Experiments use feature flags or the Visual Editor and connect to data warehouses such as Postgres for live metrics. Targeting relies on SDK attributes including device type and country, while Dev Tools and environment scoping support QA; there is no direct preview mode like VWO. GA4 event tracking, sticky bucketing, fallback attributes, Bayesian and Frequentist analysis, configurable MDEs, CSV exports, and health monitoring were discussed. The AA test has about 2,100 anonymous IDs, balanced traffic, and no anomalies, but its data is limited to the Czech Republic. Nur will implement the Next.js SDK for AB testing while coordinating with Vitold to avoid disruption. Teams chat, regional engineers, documentation, and follow-up meetings will provide support.\n\n## Keywords\nGrowthBook, Feature Flags, SDK Integration, Visual Editor, Experimentation, Google Analytics\n\n## Action Items\n\n**Nur Maulidiyah**\nRegister and accept GrowthBook invitation to join Ecco organization workspace (41:00)\nImplement GrowthBook SDK-based A/B test in backend after current AA test; coordinate with Vitold to avoid interference (45:30)\nBegin testing Visual Editor for experiment setup as preliminary step (45:30)\nTroubleshoot and confirm license seat and access issues with GrowthBook platform (41:00)\n\n**Scott Keller**\nFollow up with Ecco team next Monday regarding contract and further engagement (51:30)\nEnsure support resources are available for Nur in APAC time zone and coordinate handoff if needed (52:00)\n\n**Giulio Corona**\nAdd Nur Maulidiyah to GrowthBook Teams chat channel for ongoing support and communication (40:30)\nAssist with troubleshooting access and license seat quota issues with Nur (41:00)\nMonitor results of ongoing AA test and confirm sample ratio and metric validity with Logan (49:00)\nCoordinate upcoming internal meeting with Carolina on contract discussions (50:30)\n\n**Logan Bates**\nProvide Nur with documentation and support materials on SDK usage, feature flags, targeting rules, and Visual Editor (13:00)\nFollow up after call with answers regarding QA preview functionality and environment setup impact on traffic (32:00)\nConfirm no interruption will occur when adding new SDK to existing AA test, and offer debugging support if needed (48:30)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

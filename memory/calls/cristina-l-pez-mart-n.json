@@ -1,0 +1,18 @@
+{
+  "company": "Cristina López Martín",
+  "slug": "cristina-l-pez-mart-n",
+  "last_etl_date": "2026-09-30T06:08:48.420369",
+  "calls": [
+    {
+      "id": "01M349BGS9ETM31VXWP3TDBG5G",
+      "source": "fireflies",
+      "title": "Cristina López Martín and Chris Sanders",
+      "date": "2026-09-29",
+      "duration_minutes": 26.93000030517578,
+      "summary": "# Cristina López Martín and Chris Sanders\nDate: 2026-09-29 | Duration: 26.93000030517578m\n\n## Summary\nThe discussion evaluated Growthbook’s AI agent as a way to simplify experiment creation, data review, feature-flag management, and metric development through natural language. Chris Sanders explained that the agent can read connected data, suggest experiments, create new experiments, and assist with feature flags, but cannot edit existing experiments or flags. A demonstration showed country-based targeting for Spain and Germany, JSON-valued variants, automatic creation of related flags and environments, and prompts for data-source templates. Dmitry explained that his team currently configures experiments manually, injects JavaScript, and analyzes results in external systems such as Snowflake. Templates and connected fact tables could reduce manual data work and help define metrics consistently, although environment assignments require confirmation. The team will test the agent in production accounts, investigate JavaScript injection use cases with Christina, and report issues or improvement opportunities. Slack was preferred over Teams for threaded communication, while Google Meet and Zoom remain in use.\n\n## Keywords\nGrowthbook, AI agent, experiments, feature flags, data management, JavaScript injection\n\n## Action Items\n\n**Dmitry Sopov**\nFollow up with Christina about scheduling another session focused on JavaScript injection (24:40)\nTest AI agent capabilities within their Growthbook account environment (16:07)\n\n**Chris Sanders**\nShare recording of this meeting with participants (07:25)\nProvide support and answer any questions arising from Dimitry’s team while they experiment with the AI agent (24:17)\n",
+      "organizer": "chris@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

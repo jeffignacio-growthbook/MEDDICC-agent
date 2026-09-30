@@ -1,0 +1,18 @@
+{
+  "company": "Alli / Michael",
+  "slug": "alli-michael",
+  "last_etl_date": "2026-09-30T06:08:48.418376",
+  "calls": [
+    {
+      "id": "01M3PYAB6CQE0ZS47SC08N7S02",
+      "source": "fireflies",
+      "title": "Alli / Michael - Intro to Product Analytics",
+      "date": "2026-09-29",
+      "duration_minutes": 51,
+      "summary": "# Alli / Michael - Intro to Product Analytics\nDate: 2026-09-29 | Duration: 51m\n\n## Summary\nGrowthBook’s product analytics evolved from SQL Explorer into dashboards that support no-SQL exploration through reusable blocks, metrics, fact tables, filters, goals, and formatting, while SQL Explorer remains available for advanced queries. Fact tables provide controlled access to customer warehouses and reduce repeated SQL work. Event ingestion includes an event ingestor, event forwarder, managed warehouse, SDK plugins, and support for BigQuery and Snowflake, with Databricks in progress. Key UX priorities include simplifying metric creation, clarifying proportion metrics, improving data-source onboarding, and revising event forwarder setup, alongside session replay and bug fixes. Enterprise and pro customers influence priorities through Slack, Zoom, support chat, and feedback channels. Cloud deployments occur through CI/CD within 15 minutes of merged pull requests, while self-hosted customers pin versions and upgrade manually. Developers use Grepfile, Cursor, Ponytail, and D Slop to support code reviews, cross-repository work, and code clarity.\n\n## Keywords\nProduct Analytics, Fact Tables, Event Forwarder, Data Warehouses, Dashboards, Metric Creation\n\n## Action Items\n\n**Michael Knowlton**\nIdentify and assign simple starter tasks from the existing project list to Alli for onboarding in product analytics (00:22)\nShare findings on project tasks and coordinate potential huddle meetings for further onboarding discussion with Alli (00:40)\n\n**Alli Leong**\nReview shared projects and begin work on assigned starter tasks once provided (00:40)\n",
+      "organizer": "michael@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

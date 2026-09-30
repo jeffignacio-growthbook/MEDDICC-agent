@@ -1,0 +1,18 @@
+{
+  "company": "Usage-Based Pricing &",
+  "slug": "usage-based-pricing",
+  "last_etl_date": "2026-09-30T06:08:48.420110",
+  "calls": [
+    {
+      "id": "01M384PVDM2SDFD7TKFE712VTD",
+      "source": "fireflies",
+      "title": "Usage-Based Pricing & Positioning discussion",
+      "date": "2026-09-29",
+      "duration_minutes": 36,
+      "summary": "# Usage-Based Pricing & Positioning discussion\nDate: 2026-09-29 | Duration: 36m\n\n## Summary\nThe team agreed to manage CDN costs case by case, using them flexibly in negotiations rather than as a primary revenue source. Mobile and front-end SDKs drive most CDN requests, while bandwidth costs increase with larger feature-flag payloads and many simultaneous experiments. Enterprise deals will typically include about 1 GB of bandwidth per million CDN requests, with overages handled retroactively. Managed event warehousing will have a floor of about $5 per million events and may support volumes from hundreds of millions to a billion events monthly. Event forwarding will offer a lower-cost, flexible option but is less sticky because clients can rebuild it quickly; real-time monitoring is planned to improve retention. The team also proposed a calculator using monthly active users or event volume to bundle CDN, bandwidth, forwarding, and event usage into simpler packages. AI token pricing remains under consideration, likely with a markup of about 20% over provider rates.\n\n## Keywords\nCDN requests, event pricing, bandwidth costs, event forwarder, AI tokens, pricing calculator\n\n## Action Items\n\n**Jeremy Dorn**\nShare the presentation/deck with the team for reference (26:18)\nCollaborate with Dan Wathne to build a pricing calculator based on monthly active users or session data for pricing traffic-related usage components (25:29)\n\n**Dan Wathne**\nBegin work on building a pricing calculator that maps customer MAU and event usage to pricing levels, informed by prior work at Statsig (23:08)\n\n**All Sales Team**\nCollect feedback from enterprise prospects regarding their AI budget planning for next fiscal year to inform sales strategy and pricing positioning (22:38)\n",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 15,
+      "summary_quality": "good"
+    }
+  ]
+}

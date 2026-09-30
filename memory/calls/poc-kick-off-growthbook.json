@@ -1,0 +1,18 @@
+{
+  "company": "[PoC Kick-off] Growthbook",
+  "slug": "poc-kick-off-growthbook",
+  "last_etl_date": "2026-09-30T06:08:48.422752",
+  "calls": [
+    {
+      "id": "01M348SP5M0N1NSDRA3NA4M1KQ",
+      "source": "fireflies",
+      "title": "[PoC Kick-off] Growthbook x Blablacar",
+      "date": "2026-09-29",
+      "duration_minutes": 58.83000183105469,
+      "summary": "# [PoC Kick-off] Growthbook x Blablacar\nDate: 2026-09-29 | Duration: 58.83000183105469m\n\n## Summary\nBlaBlaCar participants, including engineers, PMs, data analysts, and marketing and growth teams, reviewed GrowthBook with James, its Europe lead, and Rémy, a solution engineer. GrowthBook offers warehouse-native experimentation using BigQuery, Bayesian and Frequentist statistics, SQL-based analysis, feature flags, automated ramp-ups, targeting, guardrail metrics, a full API, CLI and MCP access, a visual editor, Figma integration, AI-assisted analysis, cumulative impact dashboards, and a learnings repository. BlaBlaCar currently uses AB Tasty and mainly runs simple front-end experiments, while more complex tests are challenging and data analysts can become a bottleneck. GrowthBook could support code-based and no-code experiments, enabling PMs to implement UI and UX tests while involving engineers mainly for new feature development. The proposed POC will assess setup ease, maintenance cost, and PM autonomy, using two or three high-traffic experiments for faster feedback. BigQuery would remain the single source of truth, with support from Rémy, Natasha, August, trainers, and a Slack channel. The team is awaiting an internal decision on scope, with the next quarter starting October 5.\n\n## Keywords\nExperimentation Platform, Feature Flags, BigQuery Integration, Proof of Concept (POC), Visual Editor, AI-driven Analysis\n\n## Action Items\n**Rémy Marin**  \nDemonstrate BigQuery integration (21:30)  \nShowcase experiment setup and dashboards (29:15)  \nAssist with Slack support and Q&A (56:40)  \n\n**GrowthBook & Blablacar Teams**  \nJoin Slack channel for POC (56:40)  \nBegin 30-day POC with experiments (53:54)  \n\n**Adrien LOISON**  \nShare detailed POC experiment plan (54:48)  \nConfirm experiments and metrics for POC (54:49)  \n\n**James Shannon**  \nCoordinate support and training contacts (52:15)  \nProvide document answering Slack questions (57:35)",
+      "organizer": "remy@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

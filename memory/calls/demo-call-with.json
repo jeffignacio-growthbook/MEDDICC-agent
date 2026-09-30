@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-09-25T05:35:27.956685",
+  "last_etl_date": "2026-09-30T06:08:48.421199",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -796,6 +796,28 @@
       "summary": "# Demo Call with Erika King from\nDate: 2026-09-24 | Duration: 11.539999961853027m\n\n## Summary\nNo summary available",
       "organizer": "dan@growthbook.io",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3PNKY8T96KSB8PP22B5NBVK",
+      "source": "fireflies",
+      "title": "Demo Call with Sarah Wahba from",
+      "date": "2026-09-29",
+      "duration_minutes": 32,
+      "summary": "# Demo Call with Sarah Wahba from\nDate: 2026-09-29 | Duration: 32m\n\n## Summary\nThe team is considering GrowthBook to replace manual release tracking with automated A/B testing aimed at improving user contract completion and ongoing funding activity. Sarah Wahba asked about non-technical usability, pricing, setup, and comparisons with Statsig, while Scott Keller described GrowthBook’s visual editor, segmentation, multi-variant testing, dashboards, feature flags, guardrails, and Claude-powered AI tools. Enterprise pricing was presented at $50,000 annually, including 10 million monthly events, five users, premium support, advanced experimentation, and security features such as GDPR compliance and SSO. The client currently has 500,000 monthly events. Self-hosting a warehouse would remove event charges and use seat-based pricing at $100 per month per seat. SDK integration is required, with setup estimated at about two weeks and a target of going live by the end of October. Scott offered detailed pricing comparisons, onboarding support, and a 30-day Enterprise trial. A deeper demo was proposed for next Thursday at 2 PM Cairo time. Sources: 07:16, 14:03, 24:37, 29:46, 30:35.\n\n## Keywords\nA/B testing, feature flags, data warehouse, event pricing, experiment dashboards, AI integration\n\n## Action Items\n\n**Sarah Wahba**\nDiscuss GrowthBook pricing tiers and demo details with her team to decide on usage (23:19)\nInvite teammates to the next detailed demo meeting scheduled for next Thursday 2 PM Cairo time (31:24)\n\n**Scott Keller**\nSend an email summarizing GrowthBook pricing tiers, event pricing details with and without using their warehouse, and feature clarifications (26:48)\nProvide information differentiating GrowthBook’s event-based pricing compared to Statsig, highlighting predictable billing (26:48)\nOffer a 30-day free Enterprise trial setup with onboarding and dedicated Slack channel (23:32)\nSchedule and prepare for a comprehensive feature flagging and experiment creation demo for Sarah and her team on the agreed date (30:35)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3HAPAJRHPE64FPMWTRV0BEC",
+      "source": "fireflies",
+      "title": "Demo Call with Fadel abbadi from Eon Dental",
+      "date": "2026-09-29",
+      "duration_minutes": 34.72999954223633,
+      "summary": "# Demo Call with Fadel abbadi from Eon Dental\nDate: 2026-09-29 | Duration: 34.72999954223633m\n\n## Summary\nEon Dental’s web portal enables doctors and clinic teams to submit customized orthodontic cases, triggering order orchestration, design, manufacturing, and shipment of tailored dental products; revenue comes from product sales rather than digital services. The organization plans to establish a data-driven experimentation strategy based on clear business questions, hypotheses, metrics, and minimum detectable effects, with product managers selecting experiments and engineers implementing them. GrowthBook’s SDK would provide feature flags, deterministic user assignment, local evaluation, experiment tracking, and integration with AWS pipelines and Amazon Redshift. Experiments can progress from feature flags to variant testing, analysis, and rollout of winning variants, while permanent changes should later be incorporated into the codebase. GrowthBook can be cloud-hosted or self-hosted and offers APIs, AI-assisted workflows, no-code visual experimentation, and enterprise support. Engineering will review technical feasibility, product managers will attend a follow-up demonstration, and pricing discussions will follow review of user counts, timelines, and requirements.\n\n## Keywords\nFeature Flags, Experimentation, SDK Integration, Data Warehouse, A/B Testing, Self-Hosting\n\n## Action Items\n\n**Fadel Alabbadi**\nReview GrowthBook technical documentation and slides sent by James to understand platform capabilities and integration details (31:03)\nCoordinate with product managers to schedule a demo session with James for a walkthrough of feature flag and experiment construction, data insights, and decision-making functionalities (31:03)\nDetermine internal user count and timeline requirements for GrowthBook implementation to inform pricing and deployment discussions (32:12)\n\n**James Shannon**\nSend GrowthBook documentation, technical slides, and relevant links to Fadel for internal review and evaluation (33:16)\nPrepare to support Eon Dental with a potential 30-day free enterprise trial of GrowthBook pending their evaluation and decision (32:11)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

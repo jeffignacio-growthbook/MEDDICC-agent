@@ -1,0 +1,18 @@
+{
+  "company": "Rootle.ai + GrowthBook",
+  "slug": "rootle-ai-growthbook",
+  "last_etl_date": "2026-09-30T06:08:48.420257",
+  "calls": [
+    {
+      "id": "01M3KCP58PM2ZWYT5H8YC8A7EN",
+      "source": "fireflies",
+      "title": "Rootle.ai + GrowthBook",
+      "date": "2026-09-29",
+      "duration_minutes": 31.790000915527344,
+      "summary": "# Rootle.ai + GrowthBook\nDate: 2026-09-29 | Duration: 31.790000915527344m\n\n## Summary\nRootle is seeking an external feature flagging platform to manage 25,000–30,000 annual campaigns, expand flagging beyond model-level conditions, and reduce the manual development required by its current internal system. Feature flags are the primary need, supported by audit trails, approval workflows, role-based access controls, automated environment promotion, and API-driven backend operations. Experiments will be less frequent and mainly support champion/challenger tests tied to feature launches. GrowthBook was presented as a strong fit because of its lightweight SDKs, warehouse-native design, programmatic APIs, support for client, server, and edge environments, rollback capabilities, and statistical engine. Rootle is considering the enterprise plan, priced at $175,000 annually for self-hosting or $200,000 for cloud hosting, plus per-user costs. Rootle is also comparing GrowthBook analytics with PostHog. A Tuesday demo with Rootle’s technical team will cover APIs, SDKs, feature flag workflows, analytics, and cost scoping.\n\n## Keywords\nfeature flagging, experimentation, cloud vs self-hosted, API integration, audit logs, product analytics\n\n## Action Items\n\n**Christian Liebenow**\nShare a concise 5-minute demo video covering Growth Book's feature flags, experimentation, and product analytics with the Rootle.ai team (28:37)\nSchedule a product demo focused on feature flags, API usage, and product analytics for Rootle.ai's technical team, including their developers, for the following Tuesday at the same time (29:32)\nProvide additional documentation on Growth Book plans, hosting options, and feature overview as requested by Rootle.ai (29:50)\n\n**Jugal Bhavsar**\nCoordinate internally with Rootle.ai technical and development teams to review the Growth Book demo video and evaluate product analytics capabilities before the next call (28:18)\nAdd Rootle.ai technical team members to the scheduled Growth Book demo invite to ensure their participation (29:48)\nEvaluate Growth Book's feature flag capabilities and product analytics features for potential integration into Rootle.ai's platform (28:37)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

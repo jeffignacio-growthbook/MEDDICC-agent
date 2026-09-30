@@ -1,7 +1,7 @@
 {
-  "company": "Eng standup",
+  "company": "Eng Standup",
   "slug": "eng-standup",
-  "last_etl_date": "2026-09-10T06:13:41.846602",
+  "last_etl_date": "2026-09-30T06:08:48.419003",
   "calls": [
     {
       "id": "01KGJ8WY3PJ95HVBNJFF68YKB0",
@@ -309,6 +309,17 @@
       "summary": "# Eng standup\nDate: 2026-09-09 | Duration: 1m\n\n## Summary\nNo summary available",
       "organizer": "johnny@growthbook.io",
       "participants": 24,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M34T4Q48JHV79ZY9KGGGAVDX",
+      "source": "fireflies",
+      "title": "Eng Standup",
+      "date": "2026-09-29",
+      "duration_minutes": 103.16000366210938,
+      "summary": "# Eng Standup\nDate: 2026-09-29 | Duration: 103.16000366210938m\n\n## Summary\nThe team is improving experimentation through a managed flag system, dynamic save groups, large-list evaluation, Anthropic bug fixes, and Lang Fuse SDK 1.8 updates. Experimentation Squad B C is advancing intra-leap, cluster-randomized, switchback, contextual-bandit, power, and experiment-creation workflows. Dropbox has reached nearly 100% GrowthBook adoption for feature flagging and may explore product analytics, while analytics UX, event onboarding, an in-house event forwarder, Databricks support, and Session Replay are being developed. Platform work includes custom OAuth client credentials, AWS managed Kafka evaluation, expanded networking, and flaky-test reduction. Quality initiatives address experiment UX, timezone clarity, Visual Editor screenshot analysis, and SSO restrictions for expired licenses. The team is evaluating Sonnet 5.5, while acknowledging incomplete AI usage tracking and the need for a dedicated dashboard. Marketing support includes NPS, HubSpot, and login-page testing, and developer-tool releases are becoming faster.\n\n## Keywords\nfeature flagging, experimentation, product analytics, Slack app, OAuth, AI model, SDK release\n\n## Action Items\n\n**Graham McNicoll**\nFinish de-sloping the PR that fixes the bug allowing SSO to continue when a license is expired (15:29)\nImplement timezone display improvements in date pickers (15:48)\nContinue working on Chrome extension feature to capture screenshots for visual editor analysis (16:50)\n\n**Bryce Fitzsimons**\nComplete rollout of new dev tools and monitor approval process timing (08:30)\nContinue Lang Fuse and SDK 1.8 release preparations targeting end of day (06:07)\nHandle ongoing plumbing and UI work in Experimentation Squad 2, including save group infrastructure and performance fixes related to Anthropic feedback (04:07)\n\n**Luke Sonnet**\nLead efforts on Experimentation Squad B/C projects focused on QA workflows, experiment approvals, EAQ linkage cleanups, and cluster randomized experiments with Michael Knowlton’s support (08:59)\nFollow up on contextual bandit support improvements including visual editor integration and measurement arm holdout (10:30)\nTrack and evaluate Slack app follow-up tasks; prioritize the digest and enhanced analysis API features (12:09)\nOversee AI usage monitoring and dashboard development alongside Omar and James for improved metrics tracking (17:10)\n\n**Jeremy Dorn**\nInvestigate current AI model usage and coordinate upgrade plans to Sonnet 5.5 (17:02)\nSupport OAuth feature rollout and Kafka infrastructure review for potential migration to AWS managed Kafka (13:16)\n\n**Adriel Vieira**\nEvaluate Slack app opportunities and coordinate prioritization for future feature improvements (12:19)\nAssist with marketing requests for login page testing capabilities (08:10)\n\n**Guy Langford-lee**\nWork with marketing on documentation and implementation of NPS and HubSpot integration (07:39)\nCollaborate on login page copy and image testing features (08:10)\n\n**Michael Knowlton**\nSupport cluster randomized experiments and technical workflows with Luke Sonnet (10:30)\nAddress REST API bug fixes and assist with login page testing feature inquiries (03:56)\n",
+      "organizer": "graham@growthbook.io",
+      "participants": 27,
       "summary_quality": "good"
     }
   ]

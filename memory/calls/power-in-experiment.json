@@ -1,7 +1,7 @@
 {
-  "company": "power in experiment",
+  "company": "Power in Experiment",
   "slug": "power-in-experiment",
-  "last_etl_date": "2026-09-18T06:10:42.047348",
+  "last_etl_date": "2026-09-30T06:08:48.417403",
   "calls": [
     {
       "id": "01M2KVZNPRTEK7DPWWQXBCWNJW",
@@ -10,6 +10,17 @@
       "date": "2026-09-17",
       "duration_minutes": 28.25,
       "summary": "# power in experiment configuration followup\nDate: 2026-09-17 | Duration: 28.25m\n\n## Summary\nThe discussion focused on integrating power analysis settings into experiments while preserving experiment configuration as the primary source of truth. Duration and the stats engine were considered easier to port, while Cupid was excluded initially because of SQL complexity and new-user traffic issues. The calculator will initially control variation count, variation weights, and duration; sequential settings remain at the organization level. Variation count and custom weights are important because reducing variations can increase power, while fixed 50/50 splits have prompted feature requests. Automatic synchronization was rejected because adding or removing variations could cause unintended deletions. Instead, key inputs such as population, metric, MDE, variation splits, and coverage should appear on the experiment overview, with out-of-sync states summarized for manual resolution and explicit user confirmation. Future work includes percent split control, fact table filtering, moving the calculator off the browser for scalability, evaluating integration with the new experiment configuration design, and considering scheduling and fixed-horizon use cases.\n\n## Keywords\npower calculation, experiment configuration, variation weights, number of variations, syncing settings, UI integration\n\n## Action Items\n**Gabe Melean**  \nEvaluate integration approach for syncing power calculation results (24:35)  \n\n**Luke Smith**  \nReview experiment creation scheduling thread (26:07)  \nList two options for porting power calculation settings (26:15)  \n\n**Luke Sonnet**  \nCoordinate migration of power calculator with Teresa (26:37)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3JRR90VDZWPTQACW3Y2Y1D1",
+      "source": "fireflies",
+      "title": "Power in Experiment Configuration update",
+      "date": "2026-09-29",
+      "duration_minutes": 45.09000015258789,
+      "summary": "# Power in Experiment Configuration update\nDate: 2026-09-29 | Duration: 45.09000015258789m\n\n## Summary\nThe discussion covered a power analysis workflow with two ways to add an analysis: through experiment configuration or by attaching an existing one. Side-drawer navigation was proposed to reduce cognitive load and provide more space, while filters were considered optional for large datasets; showing the current targeting configuration alongside filters would improve clarity. The metrics table would support editable MDE, with 10% discussed as the default, alongside traffic, variation, and weight inputs. Inline edits should allow rerunning analysis and updating results, while quick parameter changes should remain separate from more expensive query reruns. Queries are expected to take under a few minutes rather than run instantly, and sampling large datasets was discussed to limit query size. Results should include graphs for power over time and MDE over time, linked to a numeric table. Existing analyses could be attached through a searchable list with metadata cards, although similar configurations may be difficult to distinguish. Attaching from a detail page was preferred, with a list page needed for MVP and a detail page considered a possible fast follow. Analyses are currently scoped to experiments, with reuse planned.\n\n## Keywords\npower analysis, experiment configuration, minimum detectable effect, population filters, UI/UX design, power calculator\n\n## Action Items\n**Gabe Melean**  \nSync with Johnny on population configuration updates (02:57)  \nAdd rerun functionality and inline editing UI (20:13)  \nRefine power analysis results page with visualizations (28:04)  \nImplement flow to attach saved power analyses (33:21)  \nCoordinate posting questions on standalone power analysis pages (42:08)  \n\n**Luke Smith**  \nAdd documentation on query runtimes and downsampling (23:40)  \nPost question about standalone power analysis detail page (40:08)  \n\n**Teresa Yung**  \nCoordinate backend planning session for power analysis (no timestamp)",
       "organizer": "gabe@growthbook.io",
       "participants": 4,
       "summary_quality": "good"

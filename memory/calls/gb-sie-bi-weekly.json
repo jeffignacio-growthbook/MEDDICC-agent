@@ -1,7 +1,7 @@
 {
   "company": "GB/SIE Bi-Weekly",
   "slug": "gb-sie-bi-weekly",
-  "last_etl_date": "2026-09-03T06:04:10.812856",
+  "last_etl_date": "2026-09-30T06:08:48.417930",
   "calls": [
     {
       "id": "01KMNXKSATD9F5333X5AADEANS",
@@ -129,6 +129,17 @@
       "summary": "# GB/SIE Bi-Weekly\nDate: 2026-08-27 | Duration: 31.079999923706055m\n\n## Summary\nThe meeting addressed several key topics including the need for internal alignment before stakeholder demos can begin, the initiation of early customer testing with feedback expected from a couple of integrating customers. Separate sessions for power users are being planned to cater to different levels of expertise, with scheduling to be managed by Cris. On the EAQ front, scoping work is ongoing with a target release for September, while concerns about query execution performance risks and project permissions are being actively redesigned. There are discussions around improving data refresh methods, particularly in light of delayed data affecting accuracy. Additionally, multi-dimensional analysis needs are being prioritized, with a focus on improving validation checks for audience queries.\n\n## Keywords\nContextual Bandits, Assignment Queries, Project Scoping, Incremental Refresh, Snowflake Data Latency, Feature Flag Management\n\n## Action Items\n\n**Cris Dizon**\nSchedule a meeting with Justin Hobart’s team to discuss Contextual Bandit implementation and open questions (01:40)\nSchedule a meeting with Ravi’s team for a gentler introduction to Contextual Bandits (01:40)\nSchedule a meeting on Monday to review the design direction for streamlining feature-flag handling and experiment creation, and obtain Ravi’s feedback (20:06)\n\n**Luke Sonnet**\nInvestigate and implement project-scoped experiment assignment queries with support for multiple identifier types per query to improve permissions and reduce confusion (08:55)\nLog and track lower-effort backlog items including audience query type validation and project scoping related tasks (24:39)\n\n**Ravi Nagaraju**\nSchedule a meeting with the SIE Snowflake team and Growth team to discuss incremental refresh issues and data latency mitigation (16:15)\nCoordinate attendance of Phil’s manager for the Snowflake discussion meeting (16:36)\nAdd Dave to the follow-up discussion on feature-flag and experiment-creation flow (21:43)\n\n**Jiong / Zhongjiong Wang**\nTest the internal SIE solution for writing experiment results back to Snowflake and provide feedback (17:40)\nPrioritize multi-dimensional analysis and time-series views as high-priority experiment-analysis functionalities in the backlog (28:02)\n\n**Angela Borgman**\nConfirm whether end-date metadata is required for migration work and report back to the team (18:17)\nShow the clarified treatment-response JSON configuration in the feature-flag creation window to Ravi and others (21:22)\n",
       "organizer": "cris@growthbook.io",
       "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2R1KEQGGYH1KA5G7SHTC6D2",
+      "source": "fireflies",
+      "title": "GB/SIE Bi-Weekly",
+      "date": "2026-09-29",
+      "duration_minutes": 36.060001373291016,
+      "summary": "# GB/SIE Bi-Weekly\nDate: 2026-09-29 | Duration: 36.060001373291016m\n\n## Summary\nThe team planned a Friday review with Snowflake representatives covering schema, performance, scaling, query structure, validation, and blockers to incremental refresh, with the goal of reducing costly full scans. Interaction-overlap analysis was added, though external data access may require further permissions review. Rows 16–17 were in final review and expected to land during the current week, while other priorities remained dependent on Snowflake decisions. Approval gating was considered fairly urgent because users can alter variant keys, potentially changing runtime identifiers and disrupting analysis; GrowthBook could provide an interim solution if needed. Participants favored deterministic analysis cutoffs, potentially using the prior day’s UTC end time, with an organization-level setting and configurable buffer considered. Delayed data and partition receive timestamps still require Snowflake discussion. Finally, the team reviewed experiment key mutation risks, the need to preserve variation IDs 0 and 1 for client console experiments, and possible validation or restrictions on editable keys.\n\n## Keywords\nSnowflake performance, Incremental refresh, Deterministic analysis windows, Late-arriving data, Experiment permissions, Variant-key validation\n\n## Action Items\n**Cary Rakin**\nSend advisory board communication (00:46)\n\n**Luke Sonnet**\nPrepare Snowflake meeting agenda (06:28)\nRaise timestamp questions (06:28)\nFix variant-key loophole (33:55)\nValidate project variation keys (33:55)\nConfirm delayed-data timeline (33:55)",
+      "organizer": "cris@growthbook.io",
+      "participants": 9,
       "summary_quality": "good"
     }
   ]

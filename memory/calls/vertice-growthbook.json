@@ -1,0 +1,18 @@
+{
+  "company": "Vertice & GrowthBook",
+  "slug": "vertice-growthbook",
+  "last_etl_date": "2026-09-30T06:08:48.423213",
+  "calls": [
+    {
+      "id": "01M3HCGY223YYM8KD7E1F2M55G",
+      "source": "fireflies",
+      "title": "Vertice & GrowthBook | First Meeting",
+      "date": "2026-09-29",
+      "duration_minutes": 22.6299991607666,
+      "summary": "# Vertice & GrowthBook | First Meeting\nDate: 2026-09-29 | Duration: 22.6299991607666m\n\n## Summary\nThe client is a large Australian online furniture retailer with about 300 employees, warehouses in Melbourne, and markets in Australia and New Zealand. It has used Optimizely for two years but is evaluating whether it remains the best fit, with interest in simpler solutions offering better margins. GrowthBook was presented as strong in experimentation, feature flagging, and A/B testing, while Optimizely was described as more marketing-focused. Integration with Snowflake, Databricks, Redshift, BigQuery, Google Analytics, Amplitude, Mixpanel, and Segment is important. GrowthBook’s pricing includes a transparent base platform fee and per-user seats, with no traffic or event charges. The client has reduced its vendor shortlist from five to two and will use an RFP, demo/Q&A, and commercial negotiation process. A pilot is likely, potentially involving a six-month contract followed by an extension, while strategic contracts typically last one to three years. A decision is expected before year-end, with the pilot starting after the Christmas peak. David Court will provide requirements and application insights, Marcel Geldner will send follow-up materials, and a GrowthBook solution engineer is expected to join the next meeting, likely in October.\n\n## Keywords\nOptimizely, GrowthBook, experimentation, feature flagging, pricing model, APAC expansion\n\n## Action Items\n**David Court**  \nCoordinate next client meeting for October (16:44)  \nSend client requirements and dates to Marcel Geldner (20:01)  \n\n**Marcel Geldner**  \nArrange GrowthBook solution engineer involvement (17:16)  \nSend presentation slides to client (20:01)  \nPrepare meeting summary and follow-up questions (20:01)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}
