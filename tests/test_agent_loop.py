@@ -1970,6 +1970,101 @@ class TestDeliverTruncationIntegration(unittest.TestCase):
         self.assertIn("Pipeline Coverage", result.answer)
 
 
+# ---------------------------------------------------------------------------
+# Budget-exhaustion with verified check_result — the loop must preserve
+# the verified claim instead of overwriting with _INSUFFICIENT_ANSWER.
+
+
+class TestBudgetExhaustedWithVerifiedAnswer(unittest.TestCase):
+    """
+    When the loop reaches MAX_STEPS and check_result_verified is True,
+    the verified claim must be returned — not the generic insufficient answer.
+    """
+
+    _VERIFIED_CLAIM = "Pipeline coverage drops from 3.1x to 1.8x without the two largest deals."
+
+    def _build_steps(self, *, verified: bool):
+        """Build a MAX_STEPS-length trace ending with check_result."""
+        primitives = [
+            _call_primitive("query_pipeline_coverage", {"quarter": "Q3"})
+            for _ in range(MAX_STEPS - 1)
+        ]
+        claim = self._VERIFIED_CLAIM if verified else "Coverage is 99.9x"
+        check = _check_result(claim, {"coverage": 1.8})
+        return primitives + [check]
+
+    def _run(self, steps, *, check_verified: bool):
+        import asyncio
+        from unittest.mock import patch
+        client = FakeClient(steps)
+        async def fake_prim(name, params, sb):
+            return {"coverage_ratio": 1.8, "period": "Q3"}
+        def fake_check(claim, supporting_data, question="", ledger=None):
+            return {"verified": check_verified}
+        with patch("api.agent_loop._execute_call_primitive", fake_prim), \
+             patch("api.agent_loop._execute_check_result", fake_check):
+            return asyncio.get_event_loop().run_until_complete(
+                run_agent_loop(
+                    question="What if we lost our two biggest deals?",
+                    client=client,
+                    sb=_sb(),
+                )
+            )
+
+    def test_verified_claim_preserved_at_max_steps(self):
+        """Verified answer at MAX_STEPS must be returned, not generic failure."""
+        steps = self._build_steps(verified=True)
+        self.assertEqual(len(steps), MAX_STEPS)
+        result = self._run(steps, check_verified=True)
+        self.assertTrue(result.budget_exhausted)
+        self.assertTrue(result.check_result_verified)
+        self.assertEqual(result.answer, self._VERIFIED_CLAIM)
+        self.assertNotIn("unable to answer", result.answer)
+
+    def test_unverified_at_max_steps_returns_generic_failure(self):
+        """Unverified at MAX_STEPS must still return the generic failure."""
+        steps = self._build_steps(verified=False)
+        result = self._run(steps, check_verified=False)
+        self.assertTrue(result.budget_exhausted)
+        self.assertFalse(result.check_result_verified)
+        self.assertIn("unable to answer", result.answer)
+
+    def test_none_verified_at_max_steps_returns_generic_failure(self):
+        """No check_result called at all → generic failure."""
+        steps = [
+            _call_primitive("query_pipeline_coverage", {"quarter": "Q3"})
+            for _ in range(MAX_STEPS)
+        ]
+        import asyncio
+        from unittest.mock import patch
+        client = FakeClient(steps)
+        async def fake_prim(name, params, sb):
+            return {"coverage_ratio": 1.8}
+        with patch("api.agent_loop._execute_call_primitive", fake_prim):
+            result = asyncio.get_event_loop().run_until_complete(
+                run_agent_loop(
+                    question="test",
+                    client=client,
+                    sb=_sb(),
+                )
+            )
+        self.assertTrue(result.budget_exhausted)
+        self.assertIsNone(result.check_result_verified)
+        self.assertIn("unable to answer", result.answer)
+
+
+def test_PLANTED_BUG_budget_exhaustion_tests_exist():
+    """Planted-bug control: budget-exhaustion test class exists."""
+    cls = TestBudgetExhaustedWithVerifiedAnswer
+    required = [
+        "test_verified_claim_preserved_at_max_steps",
+        "test_unverified_at_max_steps_returns_generic_failure",
+        "test_none_verified_at_max_steps_returns_generic_failure",
+    ]
+    for name in required:
+        assert hasattr(cls, name), f"missing {name} on {cls.__name__}"
+
+
 def test_PLANTED_BUG_deliver_parse_tests_exist():
     """Planted-bug control: the deliver-parse test class exists and has
     the expected test methods."""
