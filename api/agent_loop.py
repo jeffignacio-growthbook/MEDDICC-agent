@@ -480,6 +480,83 @@ def _find_matching_primitive(query: str) -> str | None:
     return None
 
 
+def _normalize_filters(filters):
+    """Normalize model-supplied filters to the (op, column, value) tuple format.
+
+    The tool description tells the model to use dict format:
+      {"column": "deal_status", "op": "eq", "value": "active"}
+    But filter_table expects tuples: ("eq", "deal_status", "active").
+    This normalizes deterministically so no retry is wasted on format mismatch.
+    """
+    if not filters:
+        return []
+    out = []
+    for f in filters:
+        if isinstance(f, dict):
+            col = f.get("column", "")
+            op = f.get("op", "eq")
+            val = f.get("value")
+            out.append((op, col, val))
+        else:
+            t = tuple(f)
+            if len(t) < 2:
+                continue
+            if len(t) == 2:
+                t = (t[0], t[1], None)
+            out.append(t)
+    return out
+
+
+def _ground_fetch_params(table, columns, filters, dd):
+    """Pre-dispatch grounding check against the data dictionary.
+
+    Returns None if everything checks out, or an error dict with a
+    correction message if the table/columns/filters reference something
+    not in the data dictionary. This runs before filter_table so the
+    error message is actionable (names the problem and lists valid options)
+    and does not consume a schema-retry slot.
+
+    dd: {table_name: set(column_names)} — the already-loaded data dictionary.
+    """
+    if not dd:
+        return None
+
+    if table not in dd:
+        return {
+            "error": (
+                f"Table '{table}' is not in the data dictionary. "
+                f"Available tables: {sorted(dd.keys())}. "
+                f"Correct the table name and retry."
+            ),
+            "grounding": "table_not_found",
+        }
+
+    valid = dd[table]
+    bad_cols = [c for c in (columns or []) if c not in valid]
+    bad_filter_cols = [
+        f[1] for f in (filters or [])
+        if isinstance(f, (tuple, list)) and len(f) >= 2 and f[1] not in valid
+    ]
+
+    problems = []
+    if bad_cols:
+        problems.append(f"Unknown SELECT columns: {bad_cols}")
+    if bad_filter_cols:
+        problems.append(f"Unknown filter columns: {bad_filter_cols}")
+
+    if problems:
+        return {
+            "error": (
+                f"{'; '.join(problems)}. "
+                f"Queryable columns on '{table}': {sorted(valid)}. "
+                f"Fix the column names and retry."
+            ),
+            "grounding": "column_not_found",
+        }
+
+    return None
+
+
 async def _execute_fetch_data(query: str, tool_params: dict, sb: Any) -> dict:
     """
     Ad-hoc raw data fetch (C4 check already done by caller).
@@ -493,11 +570,25 @@ async def _execute_fetch_data(query: str, tool_params: dict, sb: Any) -> dict:
     table = tool_params.get("table", "").strip()
     if table:
         try:
-            from api.tools import filter_table  # noqa: PLC0415
+            from api.tools import filter_table, _init_valid_columns, _VALID_COLUMNS  # noqa: PLC0415
+
             columns = tool_params.get("columns") or None
-            filters = tool_params.get("filters") or None
+            raw_filters = tool_params.get("filters") or None
+            filters = _normalize_filters(raw_filters)
             limit = int(tool_params.get("limit", 200))
             order_by = tool_params.get("order_by") or None
+
+            _init_valid_columns(sb)
+            grounding_err = _ground_fetch_params(
+                table, columns, filters, _VALID_COLUMNS,
+            )
+            if grounding_err:
+                logger.info(
+                    "[AGENT_LOOP] fetch_data grounding check failed: %s",
+                    grounding_err.get("error", "")[:300],
+                )
+                return grounding_err
+
             ft_result = await filter_table(
                 sb, table,
                 columns=columns,
@@ -941,6 +1032,7 @@ async def run_agent_loop(
             and (
                 "unknown_select_columns" in tool_result
                 or "unknown_filter_columns" in tool_result
+                or "grounding" in tool_result
                 or ("error" in tool_result and "not find the table" in str(tool_result.get("error", "")))
             )
         )

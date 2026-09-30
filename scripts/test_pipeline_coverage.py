@@ -134,7 +134,7 @@ def _run(deals_data, quota_value=2000000, current_period="FY2027_Q3"):
          patch('supabase_client.select_all') as mock_select_all, \
          patch('forecast_analyses.query_stage_close_rate') as mock_stage_rates, \
          patch('forecast_analyses.query_coverage_proxy_target_by_week') as mock_curve:
-        mock_gfq.return_value = (date(2026, 8, 1), date(2026, 10, 31), 'FY2026 Q3')
+        mock_gfq.return_value = (date(2026, 8, 1), date(2026, 10, 31), 'FY2027 Q3')
         mock_gwoq.return_value = 7
         mock_cql.return_value = current_period
         mock_select_all.return_value = deals_data

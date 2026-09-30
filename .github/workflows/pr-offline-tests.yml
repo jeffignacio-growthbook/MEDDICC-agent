@@ -178,7 +178,8 @@ jobs:
             tests/test_agent_loop.py \
             tests/test_agent_loop_schema_injection.py \
             tests/test_pipeline_coverage_fiscal_quarter.py \
-            tests/test_schema_error_logging.py
+            tests/test_schema_error_logging.py \
+            tests/test_filter_format_normalization.py
           do
             echo "::group::$t"
             if PYTHONPATH=. python3 "$t"; then
