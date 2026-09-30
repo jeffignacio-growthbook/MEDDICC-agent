@@ -42,6 +42,7 @@ from api.agent_loop import (
     KNOWN_PRIMITIVES,
     MAX_STEPS,
     _find_matching_primitive,
+    _parse_tool_call,
 )
 
 
@@ -1786,6 +1787,200 @@ class TestFetchDataExceptionBudgetExhaustion(unittest.TestCase):
         self.assertNotIn("anytime", answer_lower)
         self.assertNotIn(":+1:", answer_lower)
         self.assertNotIn("thumbsup", answer_lower)
+
+
+# ---------------------------------------------------------------------------
+# Deliver tool-call parsing — long markdown answers
+# ---------------------------------------------------------------------------
+
+# The real answer from the 2026-09-30 Railway trace, truncated at 600 tokens.
+_LONG_DELIVER_ANSWER = (
+    "## Pipeline Coverage Stress Test\n\n"
+    "### Current State (FY2027 Q3)\n\n"
+    "| Metric | Value |\n"
+    "|--------|-------|\n"
+    "| Total Open Pipeline | $2,450,000 |\n"
+    "| Weighted Pipeline (stage-adjusted) | $1,225,000 |\n"
+    "| Q3 Quota Target | $900,000 |\n"
+    "| Current Coverage Ratio | 2.72x |\n"
+    "| Weighted Coverage Ratio | 1.36x |\n\n"
+    "### Stress Scenario: Remove Two Largest Open Deals\n\n"
+    "Your two largest open deals this quarter are:\n\n"
+    "| Deal | Company | Value | Current Stage | Weighted Value |\n"
+    "|------|---------|-------|---------------|----------------|\n"
+    "| Enterprise Platform License | Acme Corp | $450,000 | Negotiation (70%) | $315,000 |\n"
+    "| Growth Suite Expansion | BigCo Inc | $380,000 | Technical Evaluation (40%) | $152,000 |\n"
+    "| **Total Exposure** | | **$830,000** | | **$467,000** |\n\n"
+    "These two deals represent **33.9%** of your total open pipeline "
+    "and **38.1%** of weighted pipeline.\n\n"
+    "### Post-Stress Coverage Analysis\n\n"
+    "| Metric | Before Stress | After Stress | Delta |\n"
+    "|--------|--------------|--------------|-------|\n"
+    "| Open Pipeline | $2,450,000 | $1,620,000 | -$830,000 (-33.9%) |\n"
+    "| Weighted Pipeline | $1,225,000 | $758,000 | -$467,000 (-38.1%) |\n"
+    "| Coverage Ratio | 2.72x | 1.80x | -0.92x |\n"
+    "| Weighted Coverage | 1.36x | 0.84x | -0.52x |\n\n"
+    "### Quarter-over-Quarter Exposure Comparison\n\n"
+    "| Metric | FY2027 Q2 (Last Quarter) | FY2027 Q3 Stressed | Change |\n"
+    "|--------|--------------------------|---------------------|--------|\n"
+    "| Post-Stress Coverage | 2.10x to 1.51x | 2.72x to 1.80x | Slightly better |\n"
+    "| Post-Stress Weighted | 1.05x to 0.72x | 1.36x to 0.84x | Better |\n"
+    "| Top-2 Concentration | 28.0% of pipeline | 33.9% of pipeline | More concentrated |\n"
+    "| Top-2 Weighted Share | 32.5% of weighted | 38.1% of weighted | More concentrated |\n\n"
+    "### Key Findings\n\n"
+    "1. **Coverage drops below 2x threshold:** Losing both deals takes you "
+    "from a healthy 2.72x to 1.80x — below the 2x minimum safety threshold.\n"
+    "2. **Weighted coverage falls below 1x:** At 0.84x weighted coverage "
+    "post-stress, you would not have enough probability-adjusted pipeline "
+    "to cover quota.\n"
+    "3. **Slightly less exposed than last quarter:** Last quarter the same "
+    "test dropped coverage from 2.10x to 1.51x. This quarter's stressed "
+    "1.80x is modestly better, but you are MORE concentrated — top-2 deals "
+    "are a larger share of pipeline (33.9% vs 28.0%).\n"
+    "4. **Recommendation:** Your pipeline health depends disproportionately "
+    "on two deals. Prioritize adding 3-4 mid-size opportunities "
+    "($100K-$200K range) to reduce concentration risk."
+)
+
+
+class TestDeliverParseLongMarkdown(unittest.TestCase):
+    """Regression: a deliver tool call with a long multi-table markdown
+    answer must parse successfully.  Prior to the max_tokens fix, the
+    API truncated at 600 tokens, producing invalid JSON that
+    _parse_tool_call returned None for."""
+
+    def test_long_deliver_parses(self):
+        """Full deliver JSON with ~2000-char markdown answer parses."""
+        payload = json.dumps({
+            "tool": "deliver",
+            "params": {"answer": _LONG_DELIVER_ANSWER},
+        })
+        parsed = _parse_tool_call(payload)
+        self.assertIsNotNone(parsed, "long deliver payload must parse")
+        self.assertEqual(parsed["tool"], "deliver")
+        self.assertEqual(parsed["params"]["answer"], _LONG_DELIVER_ANSWER)
+
+    def test_long_deliver_in_markdown_fence(self):
+        """Deliver JSON wrapped in ```json fences parses."""
+        inner = json.dumps({
+            "tool": "deliver",
+            "params": {"answer": _LONG_DELIVER_ANSWER},
+        })
+        text = f"```json\n{inner}\n```"
+        parsed = _parse_tool_call(text)
+        self.assertIsNotNone(parsed, "fenced long deliver must parse")
+        self.assertEqual(parsed["params"]["answer"], _LONG_DELIVER_ANSWER)
+
+    def test_truncated_deliver_returns_none(self):
+        """Truncated JSON (simulating old 600-token limit) returns None."""
+        full = json.dumps({
+            "tool": "deliver",
+            "params": {"answer": _LONG_DELIVER_ANSWER},
+        })
+        truncated = full[:800]
+        self.assertFalse(truncated.endswith("}"),
+                         "sanity: truncated text should not end with }")
+        parsed = _parse_tool_call(truncated)
+        self.assertIsNone(parsed, "truncated JSON must not parse")
+
+    def test_deliver_with_pipe_chars_and_newlines(self):
+        """Markdown table pipes and newlines inside JSON strings parse."""
+        answer = "| Col A | Col B |\n|-------|-------|\n| $1,000 | 2.5x |\n"
+        payload = json.dumps({"tool": "deliver", "params": {"answer": answer}})
+        parsed = _parse_tool_call(payload)
+        self.assertIsNotNone(parsed)
+        self.assertEqual(parsed["params"]["answer"], answer)
+
+
+class TruncatingFakeClient:
+    """FakeClient that truncates output at a character limit, simulating
+    the Anthropic API's max_tokens enforcement.  At ~3.0 chars/token
+    (measured from the live 2026-09-30 trace), 600 tokens ≈ 1800 chars."""
+
+    def __init__(self, steps, char_limit=1800):
+        self._steps = list(steps)
+        self._idx = 0
+        self._char_limit = char_limit
+
+    def complete(self, messages, system=None, max_tokens=4096, temperature=None):
+        if self._idx < len(self._steps):
+            step = self._steps[self._idx]
+            self._idx += 1
+            text = json.dumps(step)
+            if len(text) > self._char_limit:
+                text = text[:self._char_limit]
+            return _FakeResponse(text)
+        return _FakeResponse(json.dumps({
+            "tool": "deliver",
+            "params": {"answer": "script exhausted"},
+        }))
+
+
+class TestDeliverTruncationIntegration(unittest.TestCase):
+    """Integration: prove that truncation at 600-token-equivalent causes
+    budget exhaustion, while the same answer at full length succeeds."""
+
+    def test_truncated_deliver_exhausts_budget(self):
+        """When the deliver JSON is truncated (old 600-token limit),
+        the parser fails and the loop retries until budget exhaustion."""
+        import asyncio
+        long_deliver = {
+            "tool": "deliver",
+            "params": {"answer": _LONG_DELIVER_ANSWER},
+        }
+        full_json = json.dumps(long_deliver)
+        # At ~3.0 chars/token (measured from live trace), 600 tokens ≈ 1800 chars.
+        # The full JSON must exceed that to trigger truncation.
+        self.assertGreater(len(full_json), 1800,
+                           "sanity: deliver JSON must exceed 1800 chars "
+                           f"(actual: {len(full_json)})")
+
+        # Every step the model tries to deliver, but gets truncated
+        steps = [long_deliver] * MAX_STEPS
+        client = TruncatingFakeClient(steps, char_limit=1800)
+        result = asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="test truncation",
+                client=client,
+                sb=_sb(),
+            )
+        )
+        self.assertTrue(result.budget_exhausted,
+                        "truncated deliver should exhaust budget")
+
+    def test_full_deliver_succeeds(self):
+        """When deliver JSON is NOT truncated, the loop succeeds."""
+        import asyncio
+        long_deliver = {
+            "tool": "deliver",
+            "params": {"answer": _LONG_DELIVER_ANSWER},
+        }
+        # No truncation — char_limit higher than the full JSON
+        steps = [long_deliver]
+        client = TruncatingFakeClient(steps, char_limit=99999)
+        result = asyncio.get_event_loop().run_until_complete(
+            run_agent_loop(
+                question="test no truncation",
+                client=client,
+                sb=_sb(),
+            )
+        )
+        self.assertFalse(result.budget_exhausted,
+                         "full deliver should NOT exhaust budget")
+        self.assertIn("Pipeline Coverage", result.answer)
+
+
+def test_PLANTED_BUG_deliver_parse_tests_exist():
+    """Planted-bug control: the deliver-parse test class exists and has
+    the expected test methods."""
+    cls = TestDeliverParseLongMarkdown
+    required = [
+        "test_long_deliver_parses",
+        "test_truncated_deliver_returns_none",
+        "test_deliver_with_pipe_chars_and_newlines",
+    ]
+    for name in required:
+        assert hasattr(cls, name), f"missing {name} on {cls.__name__}"
 
 
 if __name__ == "__main__":
