@@ -908,8 +908,23 @@ async def run_agent_loop(
     Returns AgentLoopResult with the final answer and metadata about what
     constraints fired.
     """
+    # Clear request-scoped caches from prior invocations so expensive
+    # Supabase reads (_get_complete_quarters, query_stage_close_rate,
+    # _quarter_window_iso) are memoized within this request but never
+    # stale across requests.
+    try:
+        from forecast_analyses import clear_request_cache
+        clear_request_cache()
+    except ImportError:
+        pass
+
     messages: list[dict] = []
     result = AgentLoopResult(answer="")
+    # Primitive-result cache: keyed by (name, canonical_params_json).
+    # Prevents the model from re-running an identical primitive call
+    # it already made this loop (e.g. query_pipeline_coverage({}) after
+    # query_quarter_downside already returned its output).
+    _primitive_cache: dict[str, dict] = {}
     # C4: tracks how many times a governed-primitive redirect has fired this loop.
     _redirect_count: int = 0
     # C1b: tracks whether the most recent check_result call returned verified=False.
@@ -1039,11 +1054,19 @@ async def run_agent_loop(
         # ── call_primitive ────────────────────────────────────────────────
         elif tool == "call_primitive":
             prim_name = tool_params.get("name", "")
-            tool_result = await _execute_call_primitive(
-                prim_name,
-                tool_params.get("params", {}),
-                sb,
-            )
+            prim_params = tool_params.get("params", {})
+            cache_key = json.dumps(
+                [prim_name, prim_params], sort_keys=True, default=str)
+            if cache_key in _primitive_cache:
+                tool_result = _primitive_cache[cache_key]
+                logger.info(
+                    "[AGENT_LOOP] cache hit for %s(%s)", prim_name,
+                    json.dumps(prim_params, default=str)[:80])
+            else:
+                tool_result = await _execute_call_primitive(
+                    prim_name, prim_params, sb)
+                if "error" not in tool_result:
+                    _primitive_cache[cache_key] = tool_result
             # Record successful results in the ledger (error results excluded).
             if "error" not in tool_result:
                 _ledger.append({

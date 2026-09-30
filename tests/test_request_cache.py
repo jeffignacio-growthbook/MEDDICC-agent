@@ -1,0 +1,417 @@
+#!/usr/bin/env python3
+"""
+Tests for the two-layer request-scoped caching that eliminates redundant
+Supabase reads during a single agent_loop invocation.
+
+Layer 1 (forecast_analyses._request_cache):
+    Memoizes _get_complete_quarters, query_stage_close_rate, and
+    _quarter_window_iso so they run once per request even when called
+    from multiple code paths (assess_pipeline_coverage, _downside_inputs,
+    historical query_pipeline_coverage).
+
+Layer 2 (agent_loop._primitive_cache):
+    Prevents the model from re-running an identical call_primitive
+    invocation it already made in the same loop (e.g. query_pipeline_coverage({})
+    after query_quarter_downside already returned its coverage output).
+
+Trace shape tested: the live Slack question
+    "If we lost our two biggest open deals this quarter, what would
+     our pipeline coverage look like, and how does that compare to
+     how exposed we were last quarter?"
+triggers query_quarter_downside (which internally runs
+assess_pipeline_coverage → query_stage_close_rate → _get_complete_quarters)
+then a direct query_pipeline_coverage(fiscal_quarter='FY2027 Q2') for
+the historical half (which also calls query_stage_close_rate →
+_get_complete_quarters).  Without caching, _get_complete_quarters
+(24k+ row scan) runs 3 times.  With caching, it runs once.
+"""
+import json
+import sys
+from pathlib import Path
+from unittest.mock import patch, MagicMock, AsyncMock
+
+REPO = Path(__file__).parent.parent
+sys.path.insert(0, str(REPO / "tests"))
+sys.path.insert(0, str(REPO))
+sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "scripts" / "analytics"))
+sys.path.insert(0, str(REPO / "api"))
+
+import logging
+import pytest
+
+@pytest.fixture(autouse=True)
+def _silence_loggers():
+    prev = logging.root.manager.disable
+    logging.disable(logging.CRITICAL)
+    yield
+    logging.disable(prev)
+
+
+# ── Layer 1: forecast_analyses request cache ──────────────────────────────
+
+class TestRequestCache:
+    """_request_cache memoizes expensive Supabase reads within a request."""
+
+    def test_clear_request_cache_empties_cache(self):
+        from forecast_analyses import _request_cache, clear_request_cache
+        _request_cache["test_key"] = "value"
+        clear_request_cache()
+        assert _request_cache == {}
+
+    def test_get_complete_quarters_memoized(self):
+        """Second call to _get_complete_quarters returns cached result,
+        not a second 24k+ row Supabase scan."""
+        from forecast_analyses import (
+            _get_complete_quarters, _request_cache, clear_request_cache
+        )
+        clear_request_cache()
+
+        # Build a fake sb that tracks how many times select_all is called
+        call_count = {"n": 0}
+        fake_rows = [
+            {"fiscal_quarter": "FY2027 Q1", "week_of_quarter": w}
+            for w in range(1, 14)
+        ] + [
+            {"fiscal_quarter": "FY2027 Q2", "week_of_quarter": w}
+            for w in range(1, 14)
+        ]
+
+        def fake_select_all(sb, table, columns=None, filters=None):
+            call_count["n"] += 1
+            return fake_rows
+
+        with patch("supabase_client.select_all", fake_select_all):
+            sb = MagicMock()
+            result1 = _get_complete_quarters(sb)
+            result2 = _get_complete_quarters(sb)
+
+        assert call_count["n"] == 1, \
+            f"select_all called {call_count['n']} times, expected 1 (cache miss)"
+        assert result1 == result2
+        assert set(result1) == {"FY2027 Q1", "FY2027 Q2"}
+
+        clear_request_cache()
+
+    def test_query_stage_close_rate_memoized(self):
+        """Second call to query_stage_close_rate returns cached result."""
+        from forecast_analyses import (
+            query_stage_close_rate, _request_cache, clear_request_cache
+        )
+        clear_request_cache()
+
+        call_count = {"n": 0}
+        sentinel = {
+            "by_stage_order": {},
+            "quarters_analyzed": 0,
+            "complete_quarters": [],
+            "min_evidence_count": 5,
+            "scope": "test",
+            "note": "test",
+        }
+
+        original_fn = query_stage_close_rate.__wrapped__ if hasattr(
+            query_stage_close_rate, '__wrapped__') else None
+
+        # Pre-populate the cache to test the memoization path
+        _request_cache["stage_close_rate"] = sentinel
+        result = query_stage_close_rate(sb=MagicMock())
+        assert result is sentinel, "should return cached result"
+
+        clear_request_cache()
+
+    def test_quarter_window_iso_memoized(self):
+        """Second call to _quarter_window_iso for same quarter is cached."""
+        from forecast_analyses import (
+            _quarter_window_iso, _request_cache, clear_request_cache
+        )
+        clear_request_cache()
+
+        sb = MagicMock()
+        fake_resp = MagicMock()
+        fake_resp.data = [{"snapshot_date": "2026-05-15"}]
+        sb.table.return_value.select.return_value.eq.return_value.limit.return_value.execute.return_value = fake_resp
+
+        with patch("utils.get_fiscal_quarter") as mock_gfq:
+            from datetime import date
+            mock_gfq.return_value = (date(2026, 5, 1), date(2026, 7, 31), "FY2027 Q2")
+
+            result1 = _quarter_window_iso(sb, "FY2027 Q2")
+            result2 = _quarter_window_iso(sb, "FY2027 Q2")
+
+        assert sb.table.call_count == 1, \
+            f"Supabase hit {sb.table.call_count} times, expected 1"
+        assert result1 == result2 == ("2026-05-01", "2026-07-31")
+
+        clear_request_cache()
+
+    def test_clear_between_requests_prevents_staleness(self):
+        """clear_request_cache between invocations ensures fresh data."""
+        from forecast_analyses import _request_cache, clear_request_cache
+        _request_cache["complete_quarters"] = ["FY2027 Q1"]
+        clear_request_cache()
+        assert "complete_quarters" not in _request_cache
+
+
+# ── Layer 2: agent_loop primitive cache ───────────────────────────────────
+
+class TestPrimitiveCache:
+    """_primitive_cache in run_agent_loop prevents duplicate primitive calls."""
+
+    def test_agent_loop_clears_request_cache_on_entry(self):
+        """run_agent_loop must call clear_request_cache at the start."""
+        import api.agent_loop as al
+        src = __import__('inspect').getsource(al.run_agent_loop)
+        assert "clear_request_cache" in src, \
+            "run_agent_loop must call clear_request_cache()"
+
+    def test_primitive_cache_variable_exists(self):
+        """run_agent_loop must initialize _primitive_cache dict."""
+        import api.agent_loop as al
+        src = __import__('inspect').getsource(al.run_agent_loop)
+        assert "_primitive_cache" in src, \
+            "run_agent_loop must use _primitive_cache for dedup"
+
+    def test_primitive_cache_checks_before_execute(self):
+        """The call_primitive branch must check _primitive_cache before
+        calling _execute_call_primitive."""
+        import api.agent_loop as al
+        src = __import__('inspect').getsource(al.run_agent_loop)
+        # The cache check must appear before _execute_call_primitive
+        cache_check_pos = src.find("cache_key in _primitive_cache")
+        execute_pos = src.find("_execute_call_primitive")
+        assert cache_check_pos != -1, "cache lookup missing"
+        assert execute_pos != -1, "_execute_call_primitive missing"
+        assert cache_check_pos < execute_pos, \
+            "cache check must come before _execute_call_primitive call"
+
+    def test_primitive_cache_stores_successful_results(self):
+        """Successful primitive results (no 'error' key) must be stored."""
+        import api.agent_loop as al
+        src = __import__('inspect').getsource(al.run_agent_loop)
+        assert '_primitive_cache[cache_key]' in src, \
+            "successful results must be stored in _primitive_cache"
+
+    def test_primitive_cache_skips_errors(self):
+        """Error results must NOT be cached."""
+        import api.agent_loop as al
+        src = __import__('inspect').getsource(al.run_agent_loop)
+        # The store should be guarded by "error" not in tool_result
+        assert '"error" not in tool_result' in src, \
+            "cache storage must be guarded by error check"
+
+    def test_cache_key_is_deterministic(self):
+        """Cache key must use sort_keys for deterministic JSON."""
+        import api.agent_loop as al
+        src = __import__('inspect').getsource(al.run_agent_loop)
+        assert "sort_keys=True" in src, \
+            "cache key must use sort_keys=True for deterministic keying"
+
+
+# ── Trace-shape test: downside then historical coverage ───────────────────
+
+class TestTraceShapeCaching:
+    """Simulates tonight's exact trace: query_quarter_downside (current quarter)
+    followed by query_pipeline_coverage(fiscal_quarter='FY2027 Q2') (historical).
+
+    _get_complete_quarters should run ONCE total, not once per
+    query_stage_close_rate call."""
+
+    def test_complete_quarters_called_once_across_multiple_close_rate_calls(self):
+        """Three calls to query_stage_close_rate (the real trace shape)
+        should hit _get_complete_quarters exactly once."""
+        from forecast_analyses import (
+            query_stage_close_rate, _get_complete_quarters,
+            _request_cache, clear_request_cache,
+        )
+        clear_request_cache()
+
+        gcq_call_count = {"n": 0}
+        original_gcq = _get_complete_quarters
+
+        def counting_gcq(sb):
+            gcq_call_count["n"] += 1
+            # Return a minimal result to avoid deeper Supabase calls
+            return ["FY2027 Q1", "FY2027 Q2"]
+
+        # Pre-populate complete_quarters cache to avoid the 24k scan,
+        # then track whether query_stage_close_rate re-calls it
+        _request_cache["complete_quarters"] = ["FY2027 Q1", "FY2027 Q2"]
+
+        # Also need to mock the per-quarter snapshot reads
+        sb = MagicMock()
+        fake_resp = MagicMock()
+        fake_resp.data = []
+        sb.table.return_value.select.return_value.eq.return_value.eq.return_value.order.return_value.execute.return_value = fake_resp
+
+        with patch("forecast_analyses._get_complete_quarters", counting_gcq):
+            with patch("forecast_analyses._quarter_window_iso",
+                       return_value=("2026-02-01", "2026-04-30")):
+                with patch("supabase_client.select_all", return_value=[]):
+                    # Call 1: from assess_pipeline_coverage path
+                    r1 = query_stage_close_rate(sb)
+                    # Call 2: from _downside_inputs path
+                    r2 = query_stage_close_rate(sb)
+                    # Call 3: from historical query_pipeline_coverage path
+                    r3 = query_stage_close_rate(sb)
+
+        assert r1 is r2 is r3, \
+            "All three calls should return the exact same cached object"
+        # _get_complete_quarters is called exactly once: by the first
+        # query_stage_close_rate invocation.  Calls 2 and 3 return the
+        # cached stage_close_rate result and never reach _get_complete_quarters.
+        assert gcq_call_count["n"] == 1, \
+            f"_get_complete_quarters called {gcq_call_count['n']} times; " \
+            "expected 1 (first call only, then stage_close_rate is cached)"
+
+        clear_request_cache()
+
+    def test_quarter_window_iso_called_once_per_quarter(self):
+        """When multiple query_stage_close_rate paths all need
+        _quarter_window_iso('FY2027 Q1'), it should hit Supabase once."""
+        from forecast_analyses import (
+            _quarter_window_iso, _request_cache, clear_request_cache,
+        )
+        clear_request_cache()
+
+        sb = MagicMock()
+        fake_resp = MagicMock()
+        fake_resp.data = [{"snapshot_date": "2026-03-15"}]
+        sb.table.return_value.select.return_value.eq.return_value.limit.return_value.execute.return_value = fake_resp
+
+        with patch("utils.get_fiscal_quarter") as mock_gfq:
+            from datetime import date
+            mock_gfq.return_value = (date(2026, 2, 1), date(2026, 4, 30), "FY2027 Q1")
+
+            # Simulate 3 calls for the same quarter (one per close-rate invocation)
+            r1 = _quarter_window_iso(sb, "FY2027 Q1")
+            r2 = _quarter_window_iso(sb, "FY2027 Q1")
+            r3 = _quarter_window_iso(sb, "FY2027 Q1")
+
+        assert sb.table.call_count == 1, \
+            f"Supabase hit {sb.table.call_count} times for same quarter, expected 1"
+        assert r1 == r2 == r3
+
+        clear_request_cache()
+
+    def test_different_quarters_cached_independently(self):
+        """_quarter_window_iso caches per quarter, not globally."""
+        from forecast_analyses import (
+            _quarter_window_iso, _request_cache, clear_request_cache,
+        )
+        clear_request_cache()
+
+        sb = MagicMock()
+
+        def make_resp(snapshot_date):
+            r = MagicMock()
+            r.data = [{"snapshot_date": snapshot_date}]
+            return r
+
+        call_idx = {"i": 0}
+        responses = [
+            make_resp("2026-03-15"),  # Q1
+            make_resp("2026-06-15"),  # Q2
+        ]
+        quarters_data = [
+            (__import__('datetime').date(2026, 2, 1),
+             __import__('datetime').date(2026, 4, 30), "FY2027 Q1"),
+            (__import__('datetime').date(2026, 5, 1),
+             __import__('datetime').date(2026, 7, 31), "FY2027 Q2"),
+        ]
+
+        def side_effect_execute():
+            idx = call_idx["i"]
+            call_idx["i"] += 1
+            return responses[idx]
+
+        sb.table.return_value.select.return_value.eq.return_value.limit.return_value.execute = side_effect_execute
+
+        with patch("utils.get_fiscal_quarter") as mock_gfq:
+            mock_gfq.side_effect = [quarters_data[0], quarters_data[1]]
+
+            r_q1 = _quarter_window_iso(sb, "FY2027 Q1")
+            r_q2 = _quarter_window_iso(sb, "FY2027 Q2")
+            # Re-fetch both — should be cached
+            r_q1b = _quarter_window_iso(sb, "FY2027 Q1")
+            r_q2b = _quarter_window_iso(sb, "FY2027 Q2")
+
+        assert sb.table.call_count == 2, \
+            f"Should hit Supabase exactly 2 times (once per quarter), got {sb.table.call_count}"
+        assert r_q1 == r_q1b == ("2026-02-01", "2026-04-30")
+        assert r_q2 == r_q2b == ("2026-05-01", "2026-07-31")
+
+        clear_request_cache()
+
+
+# ── Planted-bug controls ─────────────────────────────────────────────────
+
+def test_PLANTED_BUG_request_cache_exists():
+    """CONTROL: _request_cache dict must exist in forecast_analyses.
+    If someone removes it, memoization silently breaks."""
+    import forecast_analyses as fa
+    assert hasattr(fa, '_request_cache'), \
+        "PLANTED BUG: _request_cache dict removed from forecast_analyses"
+    assert isinstance(fa._request_cache, dict), \
+        "PLANTED BUG: _request_cache is not a dict"
+    print("✓ PLANTED BUG control: _request_cache exists")
+
+
+def test_PLANTED_BUG_clear_request_cache_exists():
+    """CONTROL: clear_request_cache must be importable.
+    agent_loop.py depends on it."""
+    from forecast_analyses import clear_request_cache
+    assert callable(clear_request_cache), \
+        "PLANTED BUG: clear_request_cache not callable"
+    print("✓ PLANTED BUG control: clear_request_cache importable")
+
+
+def test_PLANTED_BUG_primitive_cache_in_agent_loop():
+    """CONTROL: _primitive_cache must be used in run_agent_loop.
+    If removed, duplicate primitives waste budget."""
+    import api.agent_loop as al
+    src = __import__('inspect').getsource(al.run_agent_loop)
+    assert "_primitive_cache" in src, \
+        "PLANTED BUG: _primitive_cache removed from run_agent_loop"
+    assert "cache_key" in src, \
+        "PLANTED BUG: cache_key logic removed from run_agent_loop"
+    print("✓ PLANTED BUG control: _primitive_cache in run_agent_loop")
+
+
+def test_PLANTED_BUG_agent_loop_clears_cache_on_entry():
+    """CONTROL: run_agent_loop must clear forecast_analyses cache.
+    If removed, stale data leaks across requests."""
+    import api.agent_loop as al
+    src = __import__('inspect').getsource(al.run_agent_loop)
+    assert "clear_request_cache" in src, \
+        "PLANTED BUG: clear_request_cache call removed from run_agent_loop"
+    print("✓ PLANTED BUG control: run_agent_loop clears request cache")
+
+
+if __name__ == "__main__":
+    # Quick smoke run
+    t = TestRequestCache()
+    t.test_clear_request_cache_empties_cache()
+    t.test_get_complete_quarters_memoized()
+    t.test_query_stage_close_rate_memoized()
+    t.test_quarter_window_iso_memoized()
+    t.test_clear_between_requests_prevents_staleness()
+
+    t2 = TestPrimitiveCache()
+    t2.test_agent_loop_clears_request_cache_on_entry()
+    t2.test_primitive_cache_variable_exists()
+    t2.test_primitive_cache_checks_before_execute()
+    t2.test_primitive_cache_stores_successful_results()
+    t2.test_primitive_cache_skips_errors()
+    t2.test_cache_key_is_deterministic()
+
+    t3 = TestTraceShapeCaching()
+    t3.test_complete_quarters_called_once_across_multiple_close_rate_calls()
+    t3.test_quarter_window_iso_called_once_per_quarter()
+    t3.test_different_quarters_cached_independently()
+
+    test_PLANTED_BUG_request_cache_exists()
+    test_PLANTED_BUG_clear_request_cache_exists()
+    test_PLANTED_BUG_primitive_cache_in_agent_loop()
+    test_PLANTED_BUG_agent_loop_clears_cache_on_entry()
+    print("\n✅ All request cache tests passed")
