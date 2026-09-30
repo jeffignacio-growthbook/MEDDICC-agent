@@ -15,6 +15,12 @@ These tests verify:
      top level (not nested under "rows").
   3. A fetch_data call that returns a schema-validation error does NOT
      count as a full budget step — the model gets a free retry.
+  4. _get_schema_for_prompt uses table classification (same as the
+     router) to inject only relevant tables' full descriptions, not
+     every table in the dictionary.
+  5. With the real schema injected, a model that reads the prompt never
+     attempts nonexistent table/column names — zero SCHEMA_VALIDATION
+     rejections (the "opportunities"/"amount"/"owner" scenario).
 """
 
 import asyncio
@@ -308,6 +314,310 @@ class TestSchemaRejectionDoesNotBurnStep(unittest.TestCase):
         self.assertEqual(result.answer, "Got $1M.")
         self.assertEqual(result.steps_taken, 2,
                          "Schema errors should not count as steps")
+
+
+# ---------------------------------------------------------------------------
+# Test: _get_schema_for_prompt uses table classification
+
+class TestSchemaClassification(unittest.TestCase):
+    """_get_schema_for_prompt must classify relevant tables (via the same
+    classify_relevant_tables the router uses) and pass them to
+    get_schema_context as tables_with_descriptions."""
+
+    def test_classify_then_build_schema(self):
+        """_get_schema_for_prompt calls classify_relevant_tables with the
+        question, then passes the classified tables to get_schema_context."""
+        from api.agent_loop import _get_schema_for_prompt
+
+        fake_schema = (
+            "QUERYABLE SUPABASE TABLES AND COLUMNS:\n"
+            "TABLE: deals\n"
+            "  deal_id (text)\n"
+        )
+        with patch("api.table_classifier.classify_relevant_tables",
+                    return_value=["deals", "analyses"]) as mock_classify, \
+             patch("api.schema_context.get_schema_context",
+                    return_value=fake_schema) as mock_schema, \
+             patch("llm_client.LLMClient") as mock_llm:
+            mock_llm.from_config.return_value = MagicMock()
+            result = _get_schema_for_prompt(
+                "What are our pipeline deals?", MagicMock())
+
+        mock_classify.assert_called_once()
+        call_args = mock_classify.call_args
+        self.assertIn("pipeline deals", call_args[0][0])
+
+        mock_schema.assert_called_once()
+        schema_kwargs = mock_schema.call_args
+        self.assertEqual(
+            schema_kwargs[1]["tables_with_descriptions"],
+            ["deals", "analyses"],
+        )
+        self.assertTrue(schema_kwargs[1]["lightweight"])
+        self.assertEqual(result, fake_schema)
+
+    def test_classification_failure_falls_back_gracefully(self):
+        """If classify_relevant_tables raises, _get_schema_for_prompt
+        returns empty string (the loop still works without schema)."""
+        from api.agent_loop import _get_schema_for_prompt
+
+        with patch("api.table_classifier.classify_relevant_tables",
+                    side_effect=RuntimeError("Haiku down")), \
+             patch("llm_client.LLMClient") as mock_llm:
+            mock_llm.from_config.return_value = MagicMock()
+            result = _get_schema_for_prompt("Show deals", MagicMock())
+
+        self.assertEqual(result, "")
+
+    def test_sb_none_skips_classification(self):
+        """When sb=None, no classification or schema build is attempted."""
+        from api.agent_loop import _get_schema_for_prompt
+
+        with patch("api.table_classifier.classify_relevant_tables") as mock_classify:
+            result = _get_schema_for_prompt("Show deals", None)
+
+        mock_classify.assert_not_called()
+        self.assertEqual(result, "")
+
+    def test_classifier_client_uses_classifier_role(self):
+        """The classifier client must be created with role='classifier'
+        (Haiku), not the generator role (Sonnet)."""
+        from api.agent_loop import _get_schema_for_prompt
+
+        with patch("api.table_classifier.classify_relevant_tables",
+                    return_value=["deals"]) as mock_classify, \
+             patch("api.schema_context.get_schema_context",
+                    return_value="schema text"), \
+             patch("llm_client.LLMClient") as mock_llm:
+            fake_client = MagicMock()
+            mock_llm.from_config.return_value = fake_client
+            _get_schema_for_prompt("Show deals", MagicMock())
+
+        mock_llm.from_config.assert_called_once_with(role="classifier")
+        self.assertIs(mock_classify.call_args[0][1], fake_client)
+
+
+# ---------------------------------------------------------------------------
+# Test: "opportunities"/"amount"/"owner" scenario — zero schema rejections
+# when the real schema is injected upfront.
+
+# Realistic schema context matching what get_schema_context produces for
+# deals+analyses — the tables the classifier would pick for a pipeline
+# coverage question.
+_REALISTIC_SCHEMA = (
+    "QUERYABLE SUPABASE TABLES AND COLUMNS:\n"
+    "(Use these exact column names in query tool calls)\n"
+    "\n"
+    "TABLE: deals — Active and closed deals.\n"
+    "  deal_id (text) — Unique deal identifier\n"
+    "  company_name (text) — Company name\n"
+    "  owner_email (text) — Deal owner email\n"
+    "  owner_name (text) — Deal owner display name\n"
+    "  arr_usd (numeric) — Annual recurring revenue in USD\n"
+    "  deal_value (numeric) — Total deal value\n"
+    "  new_arr (numeric) — New business ARR\n"
+    "  expansion_arr (numeric) — Expansion ARR\n"
+    "  deal_status (text) — open/won/lost\n"
+    "  stage (text) — HubSpot stage ID\n"
+    "  stage_id (text) — HubSpot stage ID\n"
+    "  pipeline_id (text) — Pipeline identifier\n"
+    "  close_date (date) — Expected close date\n"
+    "  segment (text) — Market segment\n"
+    "  forecast_category (text) — Forecast category\n"
+    "\n"
+    "TABLE: analyses — Nightly MEDDICC scores per deal.\n"
+    "  deal_id (text) — Unique deal identifier\n"
+    "  overall_score (numeric) — Overall MEDDICC score\n"
+    "  champion_score (numeric)\n"
+    "  economic_buyer_score (numeric)\n"
+)
+
+
+class TestZeroSchemaRejectionsWithUpfrontSchema(unittest.TestCase):
+    """Reproduces the exact production failure: the model tried table
+    'opportunities' with columns ['id', 'name', 'amount', 'owner'] because
+    it was guessing from training data.  With the real schema injected, a
+    well-behaved model reads the prompt and uses the correct names — zero
+    schema rejections in the entire run.
+
+    The FakeClient is scripted to use *correct* column names (the ones
+    listed in the schema context), proving that a model that reads its
+    prompt never triggers schema validation errors."""
+
+    def test_correct_columns_produce_zero_schema_rejections(self):
+        """A model that reads the injected schema uses correct table/column
+        names → filter_table never returns a schema error → zero rejections."""
+        steps = [
+            _fetch_data("deals", columns=["deal_id", "arr_usd", "owner_email",
+                                           "deal_status", "close_date"]),
+            _deliver("Pipeline total: $2.4M across 18 open deals."),
+        ]
+        client = FakeClient(steps)
+
+        schema_rejections = []
+
+        async def mock_filter_table(sb, table, **kwargs):
+            cols = kwargs.get("columns") or []
+            bad_cols = [c for c in cols if c not in {
+                "deal_id", "company_name", "owner_email", "owner_name",
+                "arr_usd", "deal_value", "new_arr", "expansion_arr",
+                "deal_status", "stage", "stage_id", "pipeline_id",
+                "close_date", "segment", "forecast_category",
+                "overall_score", "champion_score", "economic_buyer_score",
+            }]
+            if table not in ("deals", "analyses"):
+                schema_rejections.append({"table": table})
+                return {
+                    "error": f"Unknown table '{table}'",
+                    "unknown_select_columns": [],
+                }
+            if bad_cols:
+                schema_rejections.append({"table": table, "bad_cols": bad_cols})
+                return {
+                    "error": f"Unknown SELECT columns for table '{table}': {bad_cols}",
+                    "unknown_select_columns": bad_cols,
+                }
+            return {"rows": [
+                {"deal_id": "D1", "arr_usd": 100000, "owner_email": "ae@co.com",
+                 "deal_status": "open", "close_date": "2026-12-15"},
+            ]}
+
+        with patch("api.tools.filter_table", side_effect=mock_filter_table):
+            with patch("api.agent_loop._get_schema_for_prompt",
+                        return_value=_REALISTIC_SCHEMA):
+                result = run(run_agent_loop(
+                    question="What is our total pipeline?",
+                    client=client,
+                    sb=MagicMock(),
+                ))
+
+        self.assertEqual(len(schema_rejections), 0,
+                         f"Expected zero schema rejections but got: {schema_rejections}")
+        self.assertIn("$2.4M", result.answer)
+        self.assertEqual(result.steps_taken, 2)
+
+    def test_bad_columns_without_schema_would_produce_rejections(self):
+        """Control test: a model that guesses 'opportunities' table with
+        ['id', 'name', 'amount', 'owner'] columns DOES produce schema
+        rejections.  This proves the assertion above is meaningful — the
+        schema injection is what prevents the rejections, not the test
+        setup being trivially permissive."""
+        steps = [
+            # The "old" model behavior: guess from training data
+            _fetch_data("opportunities", columns=["id", "name", "amount", "owner"]),
+            # After rejection, it corrects itself
+            _fetch_data("deals", columns=["deal_id", "arr_usd"]),
+            _deliver("Pipeline: $2.4M"),
+        ]
+        client = FakeClient(steps)
+
+        schema_rejections = []
+
+        async def mock_filter_table(sb, table, **kwargs):
+            cols = kwargs.get("columns") or []
+            if table == "opportunities":
+                schema_rejections.append({"table": table, "cols": cols})
+                return {
+                    "error": f"Could not find the table 'opportunities'",
+                    "unknown_select_columns": cols,
+                }
+            bad_cols = [c for c in cols if c not in {
+                "deal_id", "arr_usd", "company_name", "owner_email",
+            }]
+            if bad_cols:
+                schema_rejections.append({"table": table, "bad_cols": bad_cols})
+                return {
+                    "error": f"Unknown SELECT columns: {bad_cols}",
+                    "unknown_select_columns": bad_cols,
+                }
+            return {"rows": [{"deal_id": "D1", "arr_usd": 100000}]}
+
+        with patch("api.tools.filter_table", side_effect=mock_filter_table):
+            with patch("api.agent_loop._get_schema_for_prompt", return_value=""):
+                result = run(run_agent_loop(
+                    question="What is our total pipeline?",
+                    client=client,
+                    sb=MagicMock(),
+                ))
+
+        self.assertGreater(len(schema_rejections), 0,
+                           "Control: without schema, bad columns SHOULD produce rejections")
+        self.assertEqual(result.answer, "Pipeline: $2.4M")
+
+    def test_schema_in_prompt_contains_real_column_names(self):
+        """The system prompt must contain the real column names from the
+        injected schema so the model can read them before its first call."""
+        steps = [_deliver("Done.")]
+        client = FakeClient(steps)
+
+        with patch("api.agent_loop._get_schema_for_prompt",
+                    return_value=_REALISTIC_SCHEMA):
+            run(run_agent_loop(
+                question="Show pipeline",
+                client=client,
+                sb=MagicMock(),
+            ))
+
+        system = client.system_prompts[0]
+        # These are the correct column names — NOT the hallucinated ones
+        self.assertIn("deal_id", system)
+        self.assertIn("arr_usd", system)
+        self.assertIn("owner_email", system)
+        self.assertIn("company_name", system)
+        # The hallucinated names must NOT appear
+        self.assertNotIn("opportunities", system.split("TABLE:")[0]
+                         if "TABLE:" in system else "")
+        for bad_col in ("amount", "owner\n", "id\n"):
+            # Check these don't appear as standalone column definitions
+            for line in system.split("\n"):
+                line_stripped = line.strip()
+                if line_stripped.startswith(bad_col.strip() + " ("):
+                    self.fail(
+                        f"Hallucinated column name '{bad_col.strip()}' found "
+                        f"in system prompt line: {line_stripped}"
+                    )
+
+    def test_mixed_correct_and_bad_columns_counts_rejections(self):
+        """If a model ignores the schema and mixes correct with bad columns,
+        the bad ones produce rejections while correct ones succeed."""
+        steps = [
+            # First call: mix of correct and hallucinated columns
+            _fetch_data("deals", columns=["deal_id", "amount", "owner"]),
+            # After rejection, model reads the schema and uses correct names
+            _fetch_data("deals", columns=["deal_id", "arr_usd", "owner_email"]),
+            _deliver("Total: $500K"),
+        ]
+        client = FakeClient(steps)
+
+        rejection_count = 0
+
+        async def mock_filter_table(sb, table, **kwargs):
+            nonlocal rejection_count
+            cols = kwargs.get("columns") or []
+            valid = {"deal_id", "company_name", "owner_email", "arr_usd",
+                     "deal_value", "deal_status", "close_date"}
+            bad_cols = [c for c in cols if c not in valid]
+            if bad_cols:
+                rejection_count += 1
+                return {
+                    "error": f"Unknown SELECT columns for table 'deals': {bad_cols}",
+                    "unknown_select_columns": bad_cols,
+                }
+            return {"rows": [{"deal_id": "D1", "arr_usd": 500000,
+                              "owner_email": "a@co.com"}]}
+
+        with patch("api.tools.filter_table", side_effect=mock_filter_table):
+            with patch("api.agent_loop._get_schema_for_prompt",
+                        return_value=_REALISTIC_SCHEMA):
+                result = run(run_agent_loop(
+                    question="Total pipeline",
+                    client=client,
+                    sb=MagicMock(),
+                ))
+
+        self.assertEqual(rejection_count, 1,
+                         "First call has bad cols → 1 rejection")
+        self.assertEqual(result.answer, "Total: $500K")
 
 
 if __name__ == "__main__":

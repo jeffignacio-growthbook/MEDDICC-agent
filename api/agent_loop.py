@@ -47,19 +47,33 @@ logger = logging.getLogger(__name__)
 MAX_SCHEMA_RETRIES = 4
 
 
-def _get_schema_for_prompt(sb) -> str:
-    """Build a lightweight schema context from the data dictionary.
+def _get_schema_for_prompt(question: str, sb) -> str:
+    """Build a targeted schema context for the agent loop prompt.
 
-    Returns a compact table/column listing so the model knows what tables
-    and columns exist before its first fetch_data call.  Falls back to
-    empty string on any error — the loop still works without schema, it
-    just wastes more steps on schema-validation rejections.
+    Uses the same table-classification step the router already uses
+    (classify_relevant_tables via Haiku) to pick only the tables that
+    matter for *this* question, then pulls real column names and
+    descriptions from the data dictionary for those tables only.
+
+    Falls back to all-tables-lightweight on classification failure, and
+    to empty string if even that fails — the loop still works without
+    schema, it just wastes more steps on schema-validation rejections.
     """
     if sb is None:
         return ""
     try:
+        from api.table_classifier import classify_relevant_tables
         from api.schema_context import get_schema_context
-        return get_schema_context(sb, lightweight=True) or ""
+        from llm_client import LLMClient
+
+        classifier_client = LLMClient.from_config(role="classifier")
+        relevant_tables = classify_relevant_tables(question, classifier_client)
+        logger.info("[AGENT_LOOP] schema tables for prompt: %s", relevant_tables)
+        return get_schema_context(
+            sb,
+            tables_with_descriptions=relevant_tables,
+            lightweight=True,
+        ) or ""
     except Exception as e:
         logger.warning("[AGENT_LOOP] failed to build schema context: %s", e)
         return ""
@@ -716,7 +730,7 @@ async def run_agent_loop(
 
     # Build system prompt with schema context
     try:
-        schema_context = _get_schema_for_prompt(sb)
+        schema_context = _get_schema_for_prompt(question, sb)
     except Exception as e:
         logger.warning("[AGENT_LOOP] schema context build failed: %s", e)
         schema_context = ""
