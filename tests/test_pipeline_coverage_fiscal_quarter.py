@@ -26,7 +26,16 @@ sys.path.insert(0, str(REPO / "scripts" / "analytics"))
 sys.path.insert(0, str(REPO / "api"))
 
 import logging  # noqa: E402
-logging.disable(logging.CRITICAL)
+import pytest  # noqa: E402
+
+@pytest.fixture(autouse=True)
+def _silence_loggers():
+    """Suppress noisy log output during these tests without affecting other
+    test files that may run in the same session."""
+    prev = logging.root.manager.disable
+    logging.disable(logging.CRITICAL)
+    yield
+    logging.disable(prev)
 
 from strict_supabase import StrictSupabase  # noqa: E402
 
@@ -40,7 +49,7 @@ RATES = {
     "min_evidence_count": 5,
 }
 
-TARGET_Q3 = {"period": "Q3_FY2027", "level": "team", "metric": "incremental_arr", "target_value": 1550000}
+TARGET_Q3 = {"period": "FY2027_Q3", "level": "team", "metric": "incremental_arr", "target_value": 1550000}
 
 # Sales pipeline ID (must match config/client.yaml's default)
 SALES_PIPELINE = "default"
@@ -184,7 +193,7 @@ def test_historical_quarter_with_target():
     """When targets exist for the past quarter, gap-to-goal is computed."""
     snaps = [_snapshot_row("d1", stage_order=3)]
     deals = [_deal_row("d1", new_arr=500000, expansion_arr=0)]
-    targets = [{"period": "Q2_FY2027", "level": "team",
+    targets = [{"period": "FY2027_Q2", "level": "team",
                 "metric": "incremental_arr", "target_value": 1000000}]
     r = _run_historical(snaps, deals, targets=targets)
     # No stretch target in targets.yaml for Q2, so goal = None (quota alone is not goal)

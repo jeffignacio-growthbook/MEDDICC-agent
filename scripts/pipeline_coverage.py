@@ -118,10 +118,7 @@ def _normalize_quarter_label(raw: str) -> str:
 
 
 def _period_label_for_quarter(fiscal_quarter: str) -> str:
-    """Convert 'FY2027 Q3' to the rep_targets period format 'Q3_FY2027'."""
-    parts = fiscal_quarter.split()
-    if len(parts) == 2 and parts[0].startswith("FY") and parts[1].startswith("Q"):
-        return f"{parts[1]}_{parts[0]}"
+    """Convert 'FY2027 Q3' to the rep_targets period format 'FY2027_Q3'."""
     return fiscal_quarter.replace(" ", "_")
 
 

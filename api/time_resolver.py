@@ -76,7 +76,7 @@ def _year_sanity_check(year: int, today: date) -> str | None:
 
 def current_quarter_label() -> str:
     """
-    Returns current fiscal quarter label, e.g. 'Q3_FY2027'.
+    Returns current fiscal quarter label, e.g. 'FY2027_Q3'.
     Uses utils.get_fiscal_quarter from scripts/.
     """
     sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
@@ -88,9 +88,9 @@ def current_quarter_label() -> str:
     return label.replace(" ", "_")
 
 def quarter_end_date(label: str):
-    """Return the last date of the fiscal quarter identified by label (e.g. 'Q3_FY2027').
+    """Return the last date of the fiscal quarter identified by label (e.g. 'FY2027_Q3').
 
-    Parses the Q<N>_FY<YYYY> format produced by current_quarter_label().
+    Parses the FY<YYYY>_Q<N> format produced by current_quarter_label().
     Uses fiscal.fy_start_month from client.yaml (default 1 = calendar year).
     """
     import calendar as _calendar
@@ -222,7 +222,7 @@ def resolve_time_window(tw: dict) -> dict:
         last_day = monthrange(end_year, end_month)[1]
         end_date = date(end_year, end_month, last_day)
 
-        label = f"Q{quarter_num} FY{fiscal_year}"
+        label = f"FY{fiscal_year} Q{quarter_num}"
         return {"start": start_date.isoformat(), "end": end_date.isoformat(), "label": label}
 
     elif period == "current_quarter":
