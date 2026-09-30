@@ -42,6 +42,40 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
+# Date context helpers (seam for testing)
+
+def _agent_loop_today() -> str:
+    """Today's date in the reporting timezone, as ISO string."""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    from sdr_utils import today_in_reporting_tz
+    return today_in_reporting_tz().isoformat()
+
+
+def _agent_loop_current_quarter() -> str:
+    """Current fiscal quarter label with space separator, e.g. 'FY2027 Q3'."""
+    from api.time_resolver import current_quarter_label
+    return current_quarter_label().replace("_", " ")
+
+
+def _build_system_prompt(schema_context: str = "") -> str:
+    """Assemble the full system prompt with date context and optional schema."""
+    today = _agent_loop_today()
+    cq = _agent_loop_current_quarter()
+    date_line = (
+        f"\nToday is {today}. Current fiscal quarter: {cq}. "
+        "Fiscal year starts in February (fy_start_month=2): "
+        "Q1=Feb-Apr, Q2=May-Jul, Q3=Aug-Oct, Q4=Nov-Jan. "
+        "FY label = calendar year the FY ends in."
+    )
+    prompt = _SYSTEM_PROMPT + date_line
+    if schema_context:
+        prompt += "\n\n" + schema_context
+    return prompt
+
+
+# ---------------------------------------------------------------------------
 # Schema context for the agent loop prompt
 
 MAX_SCHEMA_RETRIES = 4
@@ -882,16 +916,13 @@ async def run_agent_loop(
     _schema_retries_remaining: int = MAX_SCHEMA_RETRIES
     _retry_filter_history: dict[str, set[str]] = {}
 
-    # Build system prompt with schema context
+    # Build system prompt with date context and schema
     try:
         schema_context = _get_schema_for_prompt(question, sb)
     except Exception as e:
         logger.warning("[AGENT_LOOP] schema context build failed: %s", e)
         schema_context = ""
-    if schema_context:
-        system_prompt = _SYSTEM_PROMPT + "\n\n" + schema_context
-    else:
-        system_prompt = _SYSTEM_PROMPT
+    system_prompt = _build_system_prompt(schema_context=schema_context)
 
     # Seed the conversation
     messages.append({

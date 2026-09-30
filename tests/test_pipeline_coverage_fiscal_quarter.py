@@ -288,6 +288,33 @@ def test_historical_quota_uses_past_quarter_period_key():
     print("✓ historical quota uses past quarter's period key, not current")
 
 
+def test_agent_loop_prompt_includes_date_context():
+    """The agent loop system prompt must inject today's date and the current
+    fiscal quarter so the model can resolve 'last quarter' without guessing."""
+    from unittest.mock import patch
+    from api.agent_loop import _build_system_prompt
+    with patch("api.agent_loop._agent_loop_today", return_value="2026-09-30"), \
+         patch("api.agent_loop._agent_loop_current_quarter", return_value="FY2027 Q3"):
+        prompt = _build_system_prompt(schema_context="")
+    assert "Today is 2026-09-30" in prompt, \
+        "agent loop prompt must include today's date"
+    assert "FY2027 Q3" in prompt, \
+        "agent loop prompt must include current fiscal quarter"
+    assert "fy_start_month" in prompt.lower() or "February" in prompt, \
+        "agent loop prompt must mention fiscal year start month"
+    print("✓ agent loop prompt includes date context")
+
+
+def test_PLANTED_BUG_agent_loop_no_date_without_injection():
+    """CONTROL: _SYSTEM_PROMPT (the static template) must NOT hard-code a date.
+    The date is injected at build time, not baked in."""
+    from api.agent_loop import _SYSTEM_PROMPT
+    assert "Today is" not in _SYSTEM_PROMPT, \
+        "PLANTED BUG: _SYSTEM_PROMPT must not hard-code 'Today is' — it is injected"
+    print("✓ PLANTED BUG control: _SYSTEM_PROMPT has no hard-coded date")
+
+
+
 # ─── Planted-bug controls ────────────────────────────────────────────────
 
 def test_PLANTED_BUG_historical_must_read_snapshot():
@@ -317,5 +344,7 @@ if __name__ == "__main__":
     test_router_fiscal_quarter_lists_pipeline_coverage()
     test_agent_loop_prompt_lists_pipeline_coverage_fiscal_quarter()
     test_historical_quota_uses_past_quarter_period_key()
+    test_agent_loop_prompt_includes_date_context()
+    test_PLANTED_BUG_agent_loop_no_date_without_injection()
     test_PLANTED_BUG_historical_must_read_snapshot()
     print("\n✅ All pipeline_coverage fiscal_quarter tests passed")
