@@ -387,6 +387,29 @@ Available tools (respond with JSON — one tool call per response):
 1. call_primitive  — invoke a governed data calculator
    {"tool": "call_primitive", "params": {"name": "<primitive>", "params": {...}}}
 
+   Primitive parameter reference (pass these inside "params"):
+     query_pipeline_coverage: fiscal_quarter (e.g. "FY2027 Q2" — historical from deals_snapshot), as_of
+     query_pipeline_movement: view, fiscal_quarter, weeks, owner_email, pipeline_filter, close_date_scope, stage
+     query_waterfall: time_window ({period, start, end})
+     query_deals_at_risk: time_window, deal_ids
+     query_pipeline: owner_email, stage_filter, pipeline_filter
+     query_rep_attainment: owner_email, time_window
+     query_rep_pipeline: owner_email
+     query_loss_concentration: time_window
+     query_deal: company
+     query_competitive_intel: time_window, search_term
+     query_rubric_scores_bulk: companies, deal_ids
+     query_arr: limit
+     query_new_deals: time_window
+     query_won_deals: time_window
+     query_sdr_metrics: sdr_email, time_window
+     query_team_leaderboard: time_window, sort_by, limit
+     query_coaching_priorities: owner_email, focus
+     query_stale_deals: owner_email, stage, stale_days
+     query_path_to_target: (no params)
+     query_quarter_health: question
+     query_quarter_downside: (no params)
+
 2. fetch_data  — structured table retrieval for ad-hoc data not covered by any primitive
    {"tool": "fetch_data", "params": {
      "query": "<what you need>",

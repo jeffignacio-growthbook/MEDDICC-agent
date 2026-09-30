@@ -1019,7 +1019,7 @@ Required JSON:
     "period_label": "FY2027_Q3 or null",
     "search_term": "<specific competitor/term for query_competitive_intel or null>",
     "view": "<for query_pipeline_movement: movement|composition|deal_changes|curve|stage_deals, else null>",
-    "fiscal_quarter": "Fiscal quarter label (e.g., 'FY2027 Q2'). Used for scoping pipeline/deal queries to a specific quarter. Null for current quarter (default). Handlers: query_pipeline_movement, query_deals_at_risk.",
+    "fiscal_quarter": "Fiscal quarter label (e.g., 'FY2027 Q2'). Used for scoping pipeline/deal queries to a specific quarter. Null for current quarter (default). Handlers: query_pipeline_coverage (historical coverage from deals_snapshot), query_pipeline_movement, query_deals_at_risk.",
     "weeks": "<for query_pipeline_movement composition: integer count of recent weeks, or null>",
     "stage": "Stage name filter (e.g., 'Discovery', 'Technical Evaluation'). Used to filter deals to a specific stage. Null for all stages (default). Handlers: query_pipeline_movement (stage_deals view), query_stale_deals.",
     "owner_email": "<for query_pipeline_movement and other handlers: rep/owner email for filtering to a specific rep (accepts 'cary@growthbook.io' or extracted from rep name). Also accepts as rep_email. Null for all reps (default)>",
