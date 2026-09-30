@@ -961,7 +961,7 @@ async def run_agent_loop(
             resp = client.complete(
                 messages=messages,
                 system=system_prompt,
-                max_tokens=600,
+                max_tokens=4096,
             )
             raw = (resp.text or "").strip()
         except Exception as e:
