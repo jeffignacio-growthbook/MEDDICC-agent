@@ -4682,11 +4682,20 @@ Reply with JSON only: {{"score": 0.8, "missing": "..."}}"""
                 # internal reasoning to Slack. See
                 # _looks_like_unfinished_scratchpad() docstring for the
                 # incident this closes.
-                if _looks_like_unfinished_scratchpad(stripped):
+                #
+                # 2026-09-30: also reject prose that ends mid-word or
+                # mid-sentence (max_tokens=800 truncation). A finished
+                # answer always has terminal punctuation; one that doesn't
+                # was cut off and is never delivery-ready.
+                is_scratchpad = _looks_like_unfinished_scratchpad(stripped)
+                is_truncated = _looks_truncated(stripped)
+                if is_scratchpad or is_truncated:
                     cost_state["primitives_fired"]["scratchpad_rejection_fired"] = True
+                    reason = ("scratchpad/narration" if is_scratchpad
+                              else "truncated (no terminal punctuation)")
                     logger.warning(
                         f"[LOOP iter={iteration}] prose response looks like "
-                        f"unfinished scratchpad/narration, not a clean final "
+                        f"{reason}, not a clean final "
                         f"answer — forcing a clean resynthesis instead of "
                         f"shipping it. raw[:200]={stripped[:200]!r}"
                     )
