@@ -507,6 +507,201 @@ class TestCoverageProxyTargetCache:
         assert "coverage_proxy_target_by_week" not in _request_cache
 
 
+# ── Deep-equality: cache-hit returns identical shape to cache-miss ──────
+
+class TestCacheHitMissDeepEquality:
+    """For each cached function, call once (cache miss), call again (cache hit),
+    assert the two returns are deeply equal (and same object identity)."""
+
+    def test_get_complete_quarters_deep_equal(self):
+        from forecast_analyses import (
+            _get_complete_quarters, _request_cache, clear_request_cache
+        )
+        clear_request_cache()
+
+        fake_rows = [
+            {"fiscal_quarter": "FY2027 Q1", "week_of_quarter": w}
+            for w in range(1, 14)
+        ]
+
+        with patch("supabase_client.select_all", return_value=fake_rows):
+            sb = MagicMock()
+            miss = _get_complete_quarters(sb)
+            hit = _get_complete_quarters(sb)
+
+        assert miss == hit, f"Shape mismatch: miss={miss!r}, hit={hit!r}"
+        assert miss is hit, "Cache hit should return the same object"
+        clear_request_cache()
+
+    def test_quarter_window_iso_deep_equal(self):
+        from forecast_analyses import (
+            _quarter_window_iso, _request_cache, clear_request_cache
+        )
+        clear_request_cache()
+
+        sb = MagicMock()
+        fake_resp = MagicMock()
+        fake_resp.data = [{"snapshot_date": "2026-05-15"}]
+        sb.table.return_value.select.return_value.eq.return_value.limit.return_value.execute.return_value = fake_resp
+
+        with patch("utils.get_fiscal_quarter") as mock_gfq:
+            from datetime import date
+            mock_gfq.return_value = (date(2026, 5, 1), date(2026, 7, 31), "FY2027 Q2")
+            miss = _quarter_window_iso(sb, "FY2027 Q2")
+            hit = _quarter_window_iso(sb, "FY2027 Q2")
+
+        assert miss == hit, f"Shape mismatch: miss={miss!r}, hit={hit!r}"
+        assert miss is hit, "Cache hit should return the same object"
+        clear_request_cache()
+
+    def test_query_stage_close_rate_deep_equal(self):
+        from forecast_analyses import (
+            query_stage_close_rate, _request_cache, clear_request_cache
+        )
+        clear_request_cache()
+
+        fake_rows_snapshot = [
+            {"deal_id": "d1", "stage_order": 2, "pipeline_id": "new_biz"}
+        ]
+
+        def fake_select_all(sb, table, columns=None, filters=None):
+            if columns == 'fiscal_quarter,week_of_quarter':
+                return [{"fiscal_quarter": "FY2027 Q1", "week_of_quarter": w}
+                        for w in range(1, 14)]
+            if table == 'deals':
+                return [{"deal_id": "d1", "stage": "closedwon",
+                         "close_date": "2026-03-15"}]
+            return fake_rows_snapshot
+
+        with patch("supabase_client.select_all", fake_select_all), \
+             patch("forecast_analyses._quarter_window_iso",
+                   return_value=("2026-02-01", "2026-04-30")), \
+             patch("field_semantics._RENEWAL_PIPELINE_ID", "renewal_123"), \
+             patch("field_semantics.is_won", return_value=True):
+            sb = MagicMock()
+            miss = query_stage_close_rate(sb)
+            hit = query_stage_close_rate(sb)
+
+        assert miss == hit, f"Shape mismatch: miss keys={set(miss)}, hit keys={set(hit)}"
+        assert miss is hit, "Cache hit should return the same object"
+        clear_request_cache()
+
+    def test_coverage_proxy_target_by_week_deep_equal(self):
+        from forecast_analyses import (
+            query_coverage_proxy_target_by_week, _request_cache,
+            clear_request_cache,
+        )
+        clear_request_cache()
+
+        def fake_select_all(sb, table, columns=None, filters=None):
+            if columns == 'fiscal_quarter,week_of_quarter':
+                return [{"fiscal_quarter": "FY2027 Q1", "week_of_quarter": w}
+                        for w in range(1, 14)]
+            if columns == 'deal_id,deal_value,pipeline_id,stage_order,close_date':
+                return [{"deal_id": "d1", "deal_value": 100000.0,
+                         "pipeline_id": "new_biz", "stage_order": 3,
+                         "close_date": "2026-03-15"}]
+            if 'deal_id' in (columns or '') and 'stage' in (columns or ''):
+                return []
+            return []
+
+        def fake_gfq(d):
+            from datetime import date
+            return (date(d.year, 2, 1), date(d.year, 4, 30), "FY2027 Q1")
+
+        sb = MagicMock()
+        fake_resp = MagicMock()
+        fake_resp.data = [{"snapshot_date": "2026-03-15"}]
+        sb.table.return_value.select.return_value.eq.return_value.limit.return_value.execute.return_value = fake_resp
+
+        with patch("supabase_client.select_all", fake_select_all), \
+             patch("utils.get_fiscal_quarter", fake_gfq), \
+             patch("field_semantics._RENEWAL_PIPELINE_ID", "renewal_123"), \
+             patch("field_semantics.is_won", return_value=True):
+            miss = query_coverage_proxy_target_by_week(sb)
+            hit = query_coverage_proxy_target_by_week(sb)
+
+        assert miss == hit, f"Shape mismatch: miss keys={set(miss)}, hit keys={set(hit)}"
+        assert miss is hit, "Cache hit should return the same object"
+        clear_request_cache()
+
+
+# ── Cache-hit logging ──────────────────────────────────────────────────────
+
+class TestCacheHitLogging:
+    """Each cached function must emit a [CACHE_HIT] log line on cache hit."""
+
+    def test_get_complete_quarters_logs_cache_hit(self):
+        from forecast_analyses import (
+            _get_complete_quarters, _request_cache, clear_request_cache
+        )
+        clear_request_cache()
+        _request_cache["complete_quarters"] = ["FY2027 Q1"]
+
+        with patch("forecast_analyses._logger") as mock_logger:
+            _get_complete_quarters(MagicMock())
+        mock_logger.info.assert_called_once()
+        assert "[CACHE_HIT]" in mock_logger.info.call_args[0][0]
+        clear_request_cache()
+
+    def test_quarter_window_iso_logs_cache_hit(self):
+        from forecast_analyses import (
+            _quarter_window_iso, _request_cache, clear_request_cache
+        )
+        clear_request_cache()
+        _request_cache["qw_iso:FY2027 Q1"] = ("2026-02-01", "2026-04-30")
+
+        with patch("forecast_analyses._logger") as mock_logger:
+            _quarter_window_iso(MagicMock(), "FY2027 Q1")
+        mock_logger.info.assert_called_once()
+        assert "[CACHE_HIT]" in mock_logger.info.call_args[0][0]
+        clear_request_cache()
+
+    def test_query_stage_close_rate_logs_cache_hit(self):
+        from forecast_analyses import (
+            query_stage_close_rate, _request_cache, clear_request_cache
+        )
+        clear_request_cache()
+        _request_cache["stage_close_rate"] = {"test": True}
+
+        with patch("forecast_analyses._logger") as mock_logger:
+            query_stage_close_rate(MagicMock())
+        mock_logger.info.assert_called_once()
+        assert "[CACHE_HIT]" in mock_logger.info.call_args[0][0]
+        clear_request_cache()
+
+    def test_coverage_proxy_target_logs_cache_hit(self):
+        from forecast_analyses import (
+            query_coverage_proxy_target_by_week, _request_cache,
+            clear_request_cache
+        )
+        clear_request_cache()
+        _request_cache["coverage_proxy_target_by_week"] = {"test": True}
+
+        with patch("forecast_analyses._logger") as mock_logger:
+            query_coverage_proxy_target_by_week(MagicMock())
+        mock_logger.info.assert_called_once()
+        assert "[CACHE_HIT]" in mock_logger.info.call_args[0][0]
+        clear_request_cache()
+
+
+# ── Planted-bug controls for cache-hit logging ─────────────────────────────
+
+def test_PLANTED_BUG_cache_hit_logging_exists():
+    """CONTROL: all four cached functions must contain [CACHE_HIT] in source."""
+    import inspect
+    from forecast_analyses import (
+        _get_complete_quarters, _quarter_window_iso,
+        query_stage_close_rate, query_coverage_proxy_target_by_week
+    )
+    for fn in [_get_complete_quarters, _quarter_window_iso,
+               query_stage_close_rate, query_coverage_proxy_target_by_week]:
+        src = inspect.getsource(fn)
+        assert "[CACHE_HIT]" in src, \
+            f"PLANTED BUG: [CACHE_HIT] log missing from {fn.__name__}"
+    print("✓ PLANTED BUG control: [CACHE_HIT] logging in all four functions")
+
+
 if __name__ == "__main__":
     # Quick smoke run
     t = TestRequestCache()
@@ -539,4 +734,18 @@ if __name__ == "__main__":
     t4.test_coverage_proxy_target_memoized()
     t4.test_coverage_proxy_target_pre_populated_cache()
     t4.test_clear_request_cache_clears_coverage_proxy()
+
+    t5 = TestCacheHitMissDeepEquality()
+    t5.test_get_complete_quarters_deep_equal()
+    t5.test_quarter_window_iso_deep_equal()
+    t5.test_query_stage_close_rate_deep_equal()
+    t5.test_coverage_proxy_target_by_week_deep_equal()
+
+    t6 = TestCacheHitLogging()
+    t6.test_get_complete_quarters_logs_cache_hit()
+    t6.test_quarter_window_iso_logs_cache_hit()
+    t6.test_query_stage_close_rate_logs_cache_hit()
+    t6.test_coverage_proxy_target_logs_cache_hit()
+
+    test_PLANTED_BUG_cache_hit_logging_exists()
     print("\n✅ All request cache tests passed")
