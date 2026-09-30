@@ -1801,7 +1801,7 @@ async def set_target(params: dict, sb) -> dict:
 
     if not all([entity, period, value]):
         return {"error":
-            "Need: entity name, period (e.g. Q3_FY2027), "
+            "Need: entity name, period (e.g. FY2027_Q3), "
             "and value (e.g. $500K)"}
 
     # Determine level from entity name
@@ -2491,7 +2491,7 @@ async def query_sdr_metrics(params: dict, sb) -> dict:
     from datetime import date
     start_date = date.fromisoformat(tw["start"])
     _, _, quarter_label = get_fiscal_quarter(start_date, cfg_wrap)
-    quarter_period = quarter_label.replace(" ", "_")  # e.g. "Q3_FY2027"
+    quarter_period = quarter_label.replace(" ", "_")  # e.g. "FY2027_Q3"
 
     # Query targets for this quarter
     target_rows = select_all(sb, "rep_targets",
@@ -3385,7 +3385,7 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     
     start_date = date.fromisoformat(tw["start"])
     _, _, quarter_label = get_fiscal_quarter(start_date, cfg_wrap)
-    period = quarter_label.replace(" ", "_")  # e.g. "Q3_FY2027"
+    period = quarter_label.replace(" ", "_")  # e.g. "FY2027_Q3"
     
     # Load rep targets for this period
     target_filters = [

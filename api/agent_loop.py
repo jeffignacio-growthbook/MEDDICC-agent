@@ -557,6 +557,45 @@ def _ground_fetch_params(table, columns, filters, dd):
     return None
 
 
+def _check_filter_drop(
+    table: str,
+    filters: list,
+    retry_filter_history: dict[str, set[str]],
+) -> dict | None:
+    """Block a fetch_data that silently drops filters after schema-error retries.
+
+    retry_filter_history maps table names to sets of filter column names that
+    were used during schema-error retries. If a new fetch_data on the same
+    table has fewer filter columns, the model is "solving" the error by
+    dropping filters — which produces structurally valid but semantically
+    wrong results.
+
+    Returns None if ok, or an error dict if filters were dropped.
+    """
+    if table not in retry_filter_history:
+        return None
+    required = retry_filter_history[table]
+    if not required:
+        return None
+    current_cols = {
+        f[1] for f in filters
+        if isinstance(f, (tuple, list)) and len(f) >= 2
+    }
+    missing = required - current_cols
+    if missing:
+        return {
+            "error": (
+                f"Filter columns {sorted(missing)} were present in earlier "
+                f"attempts on table '{table}' but are now missing. "
+                f"Filters must not be silently dropped — fix the filter "
+                f"format or column name instead of removing the filter."
+            ),
+            "filter_dropped": True,
+        }
+    return None
+
+
+
 async def _execute_fetch_data(query: str, tool_params: dict, sb: Any) -> dict:
     """
     Ad-hoc raw data fetch (C4 check already done by caller).
@@ -818,6 +857,7 @@ async def run_agent_loop(
     # (wrong table/column names) get free retries up to this limit so the model
     # can learn the correct schema without burning its step budget.
     _schema_retries_remaining: int = MAX_SCHEMA_RETRIES
+    _retry_filter_history: dict[str, set[str]] = {}
 
     # Build system prompt with schema context
     try:
@@ -982,10 +1022,15 @@ async def run_agent_loop(
                             "CANDIDATE for new primitive: %r",
                             _redirect_count, query, justification, matched,
                         )
-                        tool_result = await _execute_fetch_data(query, tool_params, sb)
-                        # Record non-error fetch results in ledger
-                        if "error" not in tool_result and "blocked" not in tool_result:
-                            _ledger.append({"tool": "fetch_data", "result": tool_result})
+                        _fd_table = tool_params.get("table", "").strip()
+                        _fd_filters = _normalize_filters(tool_params.get("filters"))
+                        _fd_drop = _check_filter_drop(_fd_table, _fd_filters, _retry_filter_history)
+                        if _fd_drop:
+                            tool_result = _fd_drop
+                        else:
+                            tool_result = await _execute_fetch_data(query, tool_params, sb)
+                            if "error" not in tool_result and "blocked" not in tool_result:
+                                _ledger.append({"tool": "fetch_data", "result": tool_result})
                 else:
                     tool_result = {
                         "blocked": True,
@@ -996,10 +1041,15 @@ async def run_agent_loop(
                         "suggested_primitive": matched,
                     }
             else:
-                tool_result = await _execute_fetch_data(query, tool_params, sb)
-                # Record non-error fetch results in ledger
-                if "error" not in tool_result and "blocked" not in tool_result:
-                    _ledger.append({"tool": "fetch_data", "result": tool_result})
+                _fd_table = tool_params.get("table", "").strip()
+                _fd_filters = _normalize_filters(tool_params.get("filters"))
+                _fd_drop = _check_filter_drop(_fd_table, _fd_filters, _retry_filter_history)
+                if _fd_drop:
+                    tool_result = _fd_drop
+                else:
+                    tool_result = await _execute_fetch_data(query, tool_params, sb)
+                    if "error" not in tool_result and "blocked" not in tool_result:
+                        _ledger.append({"tool": "fetch_data", "result": tool_result})
 
         # ── request_checkback ─────────────────────────────────────────────
         elif tool == "request_checkback":
@@ -1033,11 +1083,22 @@ async def run_agent_loop(
                 "unknown_select_columns" in tool_result
                 or "unknown_filter_columns" in tool_result
                 or "grounding" in tool_result
+                or "filter_dropped" in tool_result
                 or ("error" in tool_result and "not find the table" in str(tool_result.get("error", "")))
             )
         )
         if _is_schema_error:
             _schema_retries_remaining -= 1
+            # Track filter columns used in schema-error retries so the
+            # filter-drop guard can catch silent filter removal.
+            _err_table = tool_params.get("table", "").strip()
+            _err_filters = _normalize_filters(tool_params.get("filters"))
+            _err_cols = {
+                f[1] for f in _err_filters
+                if isinstance(f, (tuple, list)) and len(f) >= 2
+            }
+            if _err_table and _err_cols:
+                _retry_filter_history.setdefault(_err_table, set()).update(_err_cols)
             logger.info(
                 "[AGENT_LOOP] fetch_data schema error — free retry "
                 "(%d remaining) | table=%r columns=%r filters=%r | error=%s",

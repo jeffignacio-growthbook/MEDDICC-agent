@@ -264,6 +264,8 @@ def test_the_fully_constructed_filter_is_logged_byte_exact_before_the_query():
     not summarized away. Next time this handler returns zero rows
     unexpectedly, the Railway log has the byte-exact query to compare
     against the DB directly."""
+    prev_disable = logging.root.manager.disable
+    logging.disable(logging.NOTSET)
     handler = _ListLogHandler()
     handlers_logger = logging.getLogger("api.handlers")
     handlers_logger.addHandler(handler)
@@ -284,6 +286,7 @@ def test_the_fully_constructed_filter_is_logged_byte_exact_before_the_query():
     finally:
         handlers_module.select_all = orig
         handlers_logger.removeHandler(handler)
+        logging.disable(prev_disable)
 
     matches = [r for r in handler.records if "[PIPELINE_MOVEMENT_QUERY]" in r]
     assert len(matches) == 1, (

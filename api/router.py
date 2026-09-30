@@ -1016,7 +1016,7 @@ Required JSON:
     "metric": "new_arr|expansion_arr|total_arr|null",
     "target_value": "<number or null>",
     "entity_name": "<rep/team name for set_target or null>",
-    "period_label": "Q3_FY2027 or null",
+    "period_label": "FY2027_Q3 or null",
     "search_term": "<specific competitor/term for query_competitive_intel or null>",
     "view": "<for query_pipeline_movement: movement|composition|deal_changes|curve|stage_deals, else null>",
     "fiscal_quarter": "Fiscal quarter label (e.g., 'FY2027 Q2'). Used for scoping pipeline/deal queries to a specific quarter. Null for current quarter (default). Handlers: query_pipeline_movement, query_deals_at_risk.",

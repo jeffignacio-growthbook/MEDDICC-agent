@@ -2,7 +2,7 @@
 quarter_end_date — unit tests for api.time_resolver.quarter_end_date.
 
 Verifies the fiscal-quarter end-date math for the label format
-produced by current_quarter_label() (e.g. 'Q3_FY2027').
+produced by current_quarter_label() (e.g. 'FY2027_Q3').
 
 All tests use a synthetic config injected via monkeypatch so the
 real client.yaml is not required.
