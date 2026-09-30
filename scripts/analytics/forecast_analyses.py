@@ -45,6 +45,11 @@ _logger = _logging.getLogger(__name__)
 #   2. _downside_inputs         → query_stage_close_rate  (downside scenario)
 #   3. model's direct query_pipeline_coverage (historical) → query_stage_close_rate
 #
+# query_coverage_proxy_target_by_week reads deals_snapshot 52 times (4
+# quarters × 13 weeks) via _qualified_pipeline_at_week.  It is called from
+# both assess_pipeline_coverage and query_path_to_target within the same
+# agent-loop invocation; caching here eliminates the second 52-call sweep.
+#
 # The cache is cleared at the start of each agent_loop run via
 # clear_request_cache().
 # ---------------------------------------------------------------------------
@@ -1065,6 +1070,13 @@ def query_coverage_proxy_target_by_week(sb=None) -> Dict:
     targets — this is a PROXY: target = 2x the SAME quarter's actual
     closed-won incremental ARR from the PRIOR YEAR.
 
+    Memoized within a request via _request_cache (cleared by
+    clear_request_cache at the start of each agent_loop run).  The inner
+    loop reads deals_snapshot once per (quarter, week) — 4 quarters × 13
+    weeks = 52 Supabase calls.  assess_pipeline_coverage() and
+    query_path_to_target both call this, so without the cache the 52-call
+    sweep runs twice per agent-loop invocation.
+
     PERMANENT EVIDENCE CEILING (confirmed Path #2, not a fixable gap):
     each of the 4 prior-year bases (FY2025 Q3/Q4, FY2026 Q1/Q2) has only
     9-17 deals — none clears min_evidence_count=30, and no further
@@ -1088,6 +1100,11 @@ def query_coverage_proxy_target_by_week(sb=None) -> Dict:
          'note': str}
     """
     import statistics
+
+    cache_key = "coverage_proxy_target_by_week"
+    if cache_key in _request_cache:
+        return _request_cache[cache_key]
+
     if sb is None:
         sb = create_client(
             os.environ['SUPABASE_URL'],
@@ -1149,15 +1166,13 @@ def query_coverage_proxy_target_by_week(sb=None) -> Dict:
     evidence_ceiling = (all(proxy_targets[q]['evidence_gated'] for q in valid_quarters)
                          if valid_quarters else True)
 
-    return {
+    result = {
         'by_week': pooled_by_week,
         'proxy_targets': proxy_targets,
         'quarters_used': valid_quarters,
         'min_evidence_count': min_evidence,
         'evidence_ceiling': evidence_ceiling,
-        'null_value_excluded_count': total_null_excluded,  # deals with no
-            # deal_value history at that snapshot, excluded from every
-            # week's dollar sum (never coalesced to a fabricated 0)
+        'null_value_excluded_count': total_null_excluded,
         'heuristic': True,
         'label': 'HEURISTIC',
         'note': (
@@ -1171,6 +1186,9 @@ def query_coverage_proxy_target_by_week(sb=None) -> Dict:
             'measurement against real historical goals.'
         ),
     }
+
+    _request_cache[cache_key] = result
+    return result
 
 
 def main():

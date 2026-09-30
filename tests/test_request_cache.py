@@ -4,9 +4,10 @@ Tests for the two-layer request-scoped caching that eliminates redundant
 Supabase reads during a single agent_loop invocation.
 
 Layer 1 (forecast_analyses._request_cache):
-    Memoizes _get_complete_quarters, query_stage_close_rate, and
-    _quarter_window_iso so they run once per request even when called
-    from multiple code paths (assess_pipeline_coverage, _downside_inputs,
+    Memoizes _get_complete_quarters, query_stage_close_rate,
+    _quarter_window_iso, and query_coverage_proxy_target_by_week so they
+    run once per request even when called from multiple code paths
+    (assess_pipeline_coverage, _downside_inputs, query_path_to_target,
     historical query_pipeline_coverage).
 
 Layer 2 (agent_loop._primitive_cache):
@@ -388,6 +389,124 @@ def test_PLANTED_BUG_agent_loop_clears_cache_on_entry():
     print("✓ PLANTED BUG control: run_agent_loop clears request cache")
 
 
+def test_PLANTED_BUG_coverage_proxy_target_cache_key():
+    """CONTROL: query_coverage_proxy_target_by_week must check _request_cache.
+    If removed, the 52-call deals_snapshot sweep runs twice per request."""
+    import inspect
+    from forecast_analyses import query_coverage_proxy_target_by_week
+    src = inspect.getsource(query_coverage_proxy_target_by_week)
+    assert "coverage_proxy_target_by_week" in src, \
+        "PLANTED BUG: cache key removed from query_coverage_proxy_target_by_week"
+    assert "_request_cache" in src, \
+        "PLANTED BUG: _request_cache lookup removed from query_coverage_proxy_target_by_week"
+    print("✓ PLANTED BUG control: coverage_proxy_target_by_week cache key present")
+
+
+# ── Layer 1 extension: coverage proxy target memoization ────────────────
+
+class TestCoverageProxyTargetCache:
+    """query_coverage_proxy_target_by_week reads deals_snapshot 52 times
+    (4 quarters × 13 weeks) via _qualified_pipeline_at_week.  Both
+    assess_pipeline_coverage and query_path_to_target call it within the
+    same agent-loop invocation.  The cache must eliminate the second
+    52-call sweep."""
+
+    def test_coverage_proxy_target_memoized(self):
+        """Second call returns cached result, zero additional Supabase hits."""
+        from forecast_analyses import (
+            query_coverage_proxy_target_by_week, _request_cache,
+            clear_request_cache,
+        )
+        clear_request_cache()
+
+        select_all_count = {"n": 0}
+
+        def fake_select_all(sb, table, columns=None, filters=None):
+            select_all_count["n"] += 1
+            if columns == 'fiscal_quarter,week_of_quarter':
+                return [
+                    {"fiscal_quarter": f"FY2027 Q{q}", "week_of_quarter": w}
+                    for q in range(1, 5) for w in range(1, 14)
+                ]
+            if columns == 'deal_id,deal_value,pipeline_id,stage_order,close_date':
+                return [
+                    {"deal_id": "d1", "deal_value": 100000.0,
+                     "pipeline_id": "new_biz", "stage_order": 3,
+                     "close_date": "2026-03-15"},
+                ]
+            if 'deal_id' in (columns or '') and 'stage' in (columns or ''):
+                return []
+            return []
+
+        def fake_get_fiscal_quarter(d):
+            from datetime import date
+            month = d.month
+            if 2 <= month <= 4:
+                fy = d.year + 1
+                return (date(d.year, 2, 1), date(d.year, 4, 30),
+                        f"FY{fy} Q1")
+            if 5 <= month <= 7:
+                fy = d.year + 1
+                return (date(d.year, 5, 1), date(d.year, 7, 31),
+                        f"FY{fy} Q2")
+            if 8 <= month <= 10:
+                fy = d.year + 1
+                return (date(d.year, 8, 1), date(d.year, 10, 31),
+                        f"FY{fy} Q3")
+            fy = d.year + 1
+            return (date(d.year, 11, 1), date(d.year + 1, 1, 31),
+                    f"FY{fy} Q4")
+
+        sb = MagicMock()
+        fake_resp = MagicMock()
+        fake_resp.data = [{"snapshot_date": "2026-03-15"}]
+        sb.table.return_value.select.return_value.eq.return_value.limit.return_value.execute.return_value = fake_resp
+
+        with patch("supabase_client.select_all", fake_select_all), \
+             patch("utils.get_fiscal_quarter", fake_get_fiscal_quarter), \
+             patch("field_semantics._RENEWAL_PIPELINE_ID", "renewal_123"), \
+             patch("field_semantics.is_won", return_value=True):
+            result1 = query_coverage_proxy_target_by_week(sb)
+            count_after_first = select_all_count["n"]
+
+            result2 = query_coverage_proxy_target_by_week(sb)
+            count_after_second = select_all_count["n"]
+
+        assert count_after_second == count_after_first, \
+            f"Second call added {count_after_second - count_after_first} " \
+            "Supabase hits; expected 0 (cached)"
+        assert result1 is result2, \
+            "Second call should return the exact same cached object"
+        assert result1.get('heuristic') is True
+        assert 'by_week' in result1
+
+        clear_request_cache()
+
+    def test_coverage_proxy_target_pre_populated_cache(self):
+        """Pre-populating the cache key returns immediately, no Supabase."""
+        from forecast_analyses import (
+            query_coverage_proxy_target_by_week, _request_cache,
+            clear_request_cache,
+        )
+        clear_request_cache()
+
+        sentinel = {"by_week": {}, "heuristic": True, "label": "HEURISTIC",
+                    "test_sentinel": True}
+        _request_cache["coverage_proxy_target_by_week"] = sentinel
+
+        result = query_coverage_proxy_target_by_week(sb=MagicMock())
+        assert result is sentinel, "Should return pre-populated cache value"
+
+        clear_request_cache()
+
+    def test_clear_request_cache_clears_coverage_proxy(self):
+        """clear_request_cache must also clear the proxy target entry."""
+        from forecast_analyses import _request_cache, clear_request_cache
+        _request_cache["coverage_proxy_target_by_week"] = {"test": True}
+        clear_request_cache()
+        assert "coverage_proxy_target_by_week" not in _request_cache
+
+
 if __name__ == "__main__":
     # Quick smoke run
     t = TestRequestCache()
@@ -414,4 +533,10 @@ if __name__ == "__main__":
     test_PLANTED_BUG_clear_request_cache_exists()
     test_PLANTED_BUG_primitive_cache_in_agent_loop()
     test_PLANTED_BUG_agent_loop_clears_cache_on_entry()
+    test_PLANTED_BUG_coverage_proxy_target_cache_key()
+
+    t4 = TestCoverageProxyTargetCache()
+    t4.test_coverage_proxy_target_memoized()
+    t4.test_coverage_proxy_target_pre_populated_cache()
+    t4.test_clear_request_cache_clears_coverage_proxy()
     print("\n✅ All request cache tests passed")
