@@ -99,6 +99,7 @@ def _get_complete_quarters(sb) -> List[str]:
     """
     cache_key = "complete_quarters"
     if cache_key in _request_cache:
+        _logger.info("[CACHE_HIT] _get_complete_quarters")
         return _request_cache[cache_key]
 
     # MUST paginate: deals_snapshot has 24k+ rows and PostgREST silently caps
@@ -187,6 +188,7 @@ def _quarter_window_iso(sb, quarter: str) -> Tuple[Optional[str], Optional[str]]
     Memoized per quarter within a request via _request_cache."""
     cache_key = f"qw_iso:{quarter}"
     if cache_key in _request_cache:
+        _logger.info("[CACHE_HIT] _quarter_window_iso(%s)", quarter)
         return _request_cache[cache_key]
 
     from utils import get_fiscal_quarter
@@ -871,6 +873,7 @@ def query_stage_close_rate(sb=None) -> Dict:
     """
     cache_key = "stage_close_rate"
     if cache_key in _request_cache:
+        _logger.info("[CACHE_HIT] query_stage_close_rate")
         return _request_cache[cache_key]
 
     if sb is None:
@@ -1103,6 +1106,7 @@ def query_coverage_proxy_target_by_week(sb=None) -> Dict:
 
     cache_key = "coverage_proxy_target_by_week"
     if cache_key in _request_cache:
+        _logger.info("[CACHE_HIT] query_coverage_proxy_target_by_week")
         return _request_cache[cache_key]
 
     if sb is None:
