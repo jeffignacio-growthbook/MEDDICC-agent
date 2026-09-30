@@ -974,7 +974,7 @@ async def run_agent_loop(
         # Parse the tool call
         parsed = _parse_tool_call(raw)
         if parsed is None:
-            logger.warning(f"[AGENT_LOOP] failed to parse tool call at step {step_idx}: {raw!r}")
+            logger.warning(f"[STEP_NO_TOOL_CALL] step={step_idx} raw={raw[:300]!r}")
             messages.append({"role": "assistant", "content": raw})
             messages.append({"role": "user", "content":
                              '{"error": "could not parse tool call — respond with valid JSON"}'})
@@ -983,6 +983,10 @@ async def run_agent_loop(
 
         tool = parsed.get("tool", "")
         tool_params = parsed.get("params", {})
+        logger.info(
+            "[STEP_CALL] step=%d tool=%s params=%s",
+            step_idx, tool, json.dumps(tool_params, default=str)[:500],
+        )
 
         # ── Hard constraint C2: block sensitive state_assumption ──────────
         if tool == "state_assumption":
