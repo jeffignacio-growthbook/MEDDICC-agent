@@ -335,7 +335,8 @@ async def join_tables(sb, primary_table, primary_key, joined_table, foreign_key,
         row[f"_{joined_table}"] = joined_map.get(row.get(primary_key), [])
     return {"rows": primary_rows, "total_found": len(primary_rows)}
 
-async def aggregate_results(data, group_by, aggregations):
+async def aggregate_results(data, group_by, aggregations,
+                            group_by_date_ranges=None):
     # VALIDATION: Catch empty data bug (66.7% failure rate - see AGGREGATE_RESULTS_BUG_REPORT.md)
     if isinstance(data, list) and len(data) == 0:
         return {
@@ -343,6 +344,65 @@ async def aggregate_results(data, group_by, aggregations):
             "rows": [],
             "validation_failed": "empty_array"
         }
+
+    # ── Date-range bucketing path ────────────────────────────────
+    # When group_by_date_ranges is provided, bucket rows by date
+    # ranges instead of by column value.  Each entry is
+    # {"label": "Q3", "column": "close_date",
+    #  "start": "2026-08-01", "end": "2026-10-31"}.
+    # Rows whose date falls outside ALL ranges land in "other".
+    if group_by_date_ranges:
+        if not isinstance(group_by_date_ranges, list):
+            return {"error": "group_by_date_ranges must be a list of "
+                    "{label, column, start, end} entries"}
+        # Validate and convert aggregations
+        if isinstance(aggregations, list):
+            converted = {}
+            for item in aggregations:
+                if isinstance(item, dict):
+                    col = item.get("column") or item.get("col", "")
+                    agg = item.get("agg") or item.get("aggregation", "count")
+                    if col:
+                        converted[col] = agg
+            aggregations = converted
+        if not isinstance(aggregations, dict) or not aggregations:
+            return {"error": "aggregations must be a non-empty dict like {'column': 'sum'}"}
+
+        buckets = {r["label"]: [] for r in group_by_date_ranges}
+        buckets["other"] = []
+        for row in data:
+            placed = False
+            for r in group_by_date_ranges:
+                date_val = str(row.get(r["column"], "") or "")[:10]
+                if date_val and r["start"] <= date_val <= r["end"]:
+                    buckets[r["label"]].append(row)
+                    placed = True
+                    break
+            if not placed:
+                buckets["other"].append(row)
+
+        result = []
+        for label, rows in buckets.items():
+            if label == "other" and not rows:
+                continue
+            entry = {"date_range": label, "row_count": len(rows)}
+            for col, agg in aggregations.items():
+                vals = [r.get(col) for r in rows if r.get(col) is not None]
+                if agg == "sum":
+                    entry[f"{col}_sum"] = sum(vals)
+                elif agg == "count":
+                    entry[f"{col}_count"] = len(rows)
+                elif agg == "avg":
+                    entry[f"{col}_avg"] = sum(vals) / len(vals) if vals else 0
+                elif agg == "max":
+                    entry[f"{col}_max"] = max(vals) if vals else None
+                elif agg == "min":
+                    entry[f"{col}_min"] = min(vals) if vals else None
+            result.append(entry)
+        return {"rows": result, "group_count": len(result),
+                "grouped": result, "bucketed_by": "date_range"}
+
+    # ── Standard column-value grouping path (unchanged) ──────────
 
     # VALIDATION: Catch missing group_by column
     if isinstance(data, list) and data and group_by not in data[0]:
