@@ -1189,7 +1189,7 @@ async def query_forecast_trust(params: dict, sb) -> dict:
 
 async def query_pipeline_coverage(params: dict, sb) -> dict:
     """
-    Pipeline-coverage assessment against the stated quota+stretch goal,
+    Pipeline-coverage assessment against the stated team quota,
     gap-to-goal always (never a bare ratio) (NORTH_STAR.md CRO Priority #2).
 
     Accepts an optional fiscal_quarter parameter (e.g. 'FY2027 Q2', 'Q2')
@@ -1201,7 +1201,7 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
     pipeline figure against each individual rep's own target). This is
     a fresh composition: New+Expansion-only, qualified-pipeline-only,
     weighted by historical stage-level close rate, compared against a
-    real quota+stretch target, with a HEURISTIC historical curve
+    real team quota, with a HEURISTIC historical curve
     (2x-prior-year-actual proxy — no real historical target ever
     existed) shown for context only, always labeled as a heuristic.
 
@@ -3353,12 +3353,10 @@ async def query_rep_attainment(params: dict, sb) -> dict:
 
     SYNTHESIS REQUIREMENTS:
     - ALWAYS report closed_won_qtd (actual closed-won incremental ARR this quarter)
-    - ALWAYS report ALL THREE target components separately:
-      1. Quota target and gap to quota alone
-      2. Stretch target and gap to stretch alone (if stretch exists)
-      3. Combined target (quota+stretch) and gap to combined
-    - DO NOT only report the combined figure - user needs to see quota vs stretch breakdown
-    - Example: "$X short of quota ($Y), $Z short of stretch ($W), $A short of combined target ($B)"
+    - ALWAYS report quota attainment as the PRIMARY target (the team's committed goal)
+    - Report stretch attainment separately as aspirational context (Ryan's 2x YoY goal)
+    - Stretch is NOT additive on top of quota — it is a separate, higher aspiration
+    - Example: "$X of $Y quota (Z% attainment); stretch aspiration is $W"
 
     METRIC BASIS:
     - All won_arr and targets use INCREMENTAL ARR basis (new_arr + expansion_arr)
@@ -6670,7 +6668,7 @@ async def query_path_to_target(params: dict, sb) -> dict:
     # 2. Target: quota-only for committed gap; stretch is aspirational.
     real_target = cov.get("real_target") or {}
     quota = real_target.get("quota")
-    goal_stretch = real_target.get("goal")  # quota + stretch (aspirational)
+    goal_stretch = real_target.get("stretch")  # Ryan's aspirational 2x YoY target (separate from quota)
 
     # 3. Quarter boundaries and days_remaining — no silent fallback.
     try:
@@ -6796,15 +6794,9 @@ async def query_path_to_target(params: dict, sb) -> dict:
         target_used = float(quota)
         target_basis = "quota_only"
     else:
-        gap_info = (cov.get("gap_to_goal") or {}).get("weighted_pipeline_vs_goal") or {}
-        if gap_info.get("status") == "short":
-            gap_bare = float(gap_info.get("amount", 0.0))
-        elif gap_info.get("status") == "over":
-            gap_bare = 0.0
-        else:
-            gap_bare = 0.0
-        target_used = float(goal_stretch) if goal_stretch is not None else None
-        target_basis = "quota_plus_stretch_fallback"
+        gap_bare = 0.0
+        target_used = None
+        target_basis = "no_quota_available"
 
     # 10. Compose gap plan (bare + 1.5x padded).
     feasibility = _time_feasibility(days_remaining, won_cycle_days)

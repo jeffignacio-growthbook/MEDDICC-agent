@@ -9,7 +9,7 @@ RATIO, but query_coverage() is badly broken in production (divides one
 unscoped total pipeline figure against each individual rep's own target,
 producing 8,000%+ nonsense) and neither ever weights pipeline by
 historical stage-level close-rate performance or reports gap-to-goal
-against a real quota+stretch target. This primitive is a fresh
+against a real quota target. This primitive is a fresh
 composition, per Jeff's explicit domain specification:
 
   1. SCOPE: New+Expansion ARR only (is_incremental_pipeline()), renewal
@@ -44,25 +44,19 @@ composition, per Jeff's explicit domain specification:
   5. GAP-TO-GOAL, never a bare ratio: every pipeline-vs-target comparison
      in this primitive's output is phrased "$X short of target" / "$X
      over target".
-  6. THE GOAL for the CURRENT quarter (FY2027 Q3) = the REAL stated quota
-     (rep_targets team-level target, $1.55M) + a manually-set $2.1M
-     stretch figure — a real, explicit GrowthBook business decision (2x
-     YoY growth target current headcount can't organically support),
-     NOT computed or derived. Lives in config/targets.yaml
-     (targets.fy2027_q3.stretch_target/stretch_note), documented there
-     with the full WHY. Never assumed to generalize to any future
-     client this codebase might serve. This REAL target is read
-     directly from config/targets.yaml for the stretch component — it
-     has NOT been seeded into the live rep_targets table (seed_targets.py
-     only seeds team_total and per-rep targets from config; adding
-     stretch_target there would require a live write this build does
-     not perform). The quota component (team_total) IS read from the
-     live rep_targets table, matching query_pipeline()'s own precedent.
+  6. THE GOAL for the CURRENT quarter (FY2027 Q3) = the team quota
+     (rep_targets team-level target, $1.55M). This is the minimum
+     committed target the team is measured against.
+     Stretch ($2.1M, config/targets.yaml) is Ryan's personal
+     aspiration (2x YoY growth) — it is NOT additive on top of
+     quota, and is reported separately as context, never summed
+     into goal. The quota (team_total) is read from the live
+     rep_targets table, matching query_pipeline()'s own precedent.
 
 CRITICAL, non-negotiable distinction (never blended, per explicit
 instruction): the HISTORICAL curve is a HEURISTIC (proxy-calibrated,
 labeled as such everywhere it appears). The CURRENT-quarter real_target
-(quota + stretch) is NEVER a heuristic — it is the actual stated goal.
+(quota) is NEVER a heuristic — it is the actual stated goal.
 
 Read-only. No writes.
 """
@@ -179,7 +173,7 @@ def assess_pipeline_coverage(
 ) -> Dict[str, Any]:
     """
     Pipeline-coverage assessment: New+Expansion-only, qualified-pipeline
-    coverage vs. the stated quota+stretch goal (gap-to-goal), plus a
+    coverage vs. the stated team quota (gap-to-goal), plus a
     HEURISTIC historical coverage curve for context.
 
     Accepts an optional fiscal_quarter (e.g. 'FY2027 Q2') to assess a
@@ -339,15 +333,14 @@ def assess_pipeline_coverage(
         stretch = quarter_cfg.get("stretch_target")
         stretch_note = quarter_cfg.get("stretch_note")
 
-    goal = (quota + stretch) if (quota is not None and stretch is not None) else None
+    goal = quota
 
     target_note = (
-        f"Stated target for {fiscal_quarter} — quota from rep_targets "
-        f"plus stretch from config/targets.yaml. This is the REAL stated "
-        f"target, NEVER a heuristic."
+        f"Stated target for {fiscal_quarter} — team quota from rep_targets. "
+        f"This is the REAL stated target, NEVER a heuristic."
     ) if goal else (
-        f"No stated target found for {fiscal_quarter} — quota and/or "
-        f"stretch not configured. Gap-to-goal cannot be computed; "
+        f"No stated target found for {fiscal_quarter} — quota "
+        f"not configured. Gap-to-goal cannot be computed; "
         f"only the heuristic proxy curve is available for comparison."
     )
 
@@ -418,7 +411,7 @@ def assess_pipeline_coverage(
             "wherever it is surfaced, never 'directional' or 'approximate'. "
             + (
                 f"The real_target and gap_to_goal above use the REAL stated "
-                f"{fiscal_quarter} quota+stretch target and are never "
+                f"{fiscal_quarter} team quota and are never "
                 "heuristics — the two must never be conflated."
                 if goal else
                 f"No real target exists for {fiscal_quarter}, so gap_to_goal "
