@@ -212,8 +212,8 @@ def test_gap_to_goal_phrasing_never_bare_ratio():
     """
     print("\n[TEST] gap_to_goal always phrased as $X short/over, both directions")
 
-    # Case 1: pipeline well below goal (quota=2,000,000 + real stretch from
-    # config/targets.yaml, raw pipeline only 150000) -> "short of target"
+    # Case 1: pipeline well below quota (quota=2,000,000, raw pipeline only
+    # 150000) -> "short of target"
     result = _run(_base_deals(), quota_value=2000000)
     gap = result["gap_to_goal"]["raw_pipeline_vs_goal"]
     if gap["status"] != "short":
@@ -223,9 +223,8 @@ def test_gap_to_goal_phrasing_never_bare_ratio():
     if gap["text"].rstrip().endswith("x") or gap["text"].strip().endswith("%"):
         raise AssertionError(f"gap_to_goal text looks like a bare ratio: {gap['text']!r}")
 
-    # Case 2: pipeline well above goal (small quota + real stretch from
-    # config/targets.yaml, but a large qualified deal pushes raw pipeline
-    # past the goal) -> "over target"
+    # Case 2: pipeline well above quota (small quota, but a large qualified
+    # deal pushes raw pipeline past it) -> "over target"
     huge_deal = {"deal_id": "huge1", "pipeline_id": "default", "expansion_arr": 0,
                  "new_arr": 5000000, "stage": "appointmentscheduled", "highest_stage_order_reached": 1,
                  "close_date": "2026-09-12", "deal_status": "active"}
@@ -372,11 +371,56 @@ def test_regression_renewal_deal_cannot_enter_qualified_pipeline():
           "planted broken filter proves the check is load-bearing")
 
 
+def test_quota_missing_from_db_produces_graceful_nulls():
+    """
+    When rep_targets has no team-level row (quota=None), the primitive must:
+    - NOT crash
+    - Return real_target.goal = None, real_target.quota = None
+    - Return gap_to_goal fields as None (not fabricated comparisons)
+    - Carry a target_note explaining the absence
+    - Still return valid qualified_pipeline and stage_weighting data
+    """
+    print("\n[TEST] Quota missing from DB -> graceful nulls, no crash")
+
+    result = _run(_base_deals(), quota_value=None)
+
+    if result.get("status") != "ok":
+        raise AssertionError(f"Expected status='ok' even with no quota, got {result.get('status')!r}")
+
+    rt = result["real_target"]
+    if rt["quota"] is not None:
+        raise AssertionError(f"Expected real_target.quota=None, got {rt['quota']!r}")
+    if rt["goal"] is not None:
+        raise AssertionError(f"Expected real_target.goal=None, got {rt['goal']!r}")
+
+    gap = result["gap_to_goal"]
+    if gap["raw_pipeline_vs_goal"] is not None:
+        raise AssertionError(
+            f"Expected gap_to_goal.raw_pipeline_vs_goal=None when no quota, "
+            f"got {gap['raw_pipeline_vs_goal']!r}")
+    if gap["weighted_pipeline_vs_goal"] is not None:
+        raise AssertionError(
+            f"Expected gap_to_goal.weighted_pipeline_vs_goal=None when no quota, "
+            f"got {gap['weighted_pipeline_vs_goal']!r}")
+
+    if "not configured" not in rt["note"].lower() and "no stated target" not in rt["note"].lower():
+        raise AssertionError(
+            f"Expected target note to explain missing quota, got: {rt['note']!r}")
+
+    if result["qualified_pipeline"]["deal_count"] != 2:
+        raise AssertionError(
+            f"Pipeline data should still be valid even without quota, "
+            f"got deal_count={result['qualified_pipeline']['deal_count']}")
+
+    print("  ✓ No crash; goal/quota=None; gap_to_goal=None; pipeline data intact")
+
+
 def main():
     tests = [
         test_scope_excludes_renewal_and_unqualified_deals,
         test_stage_weighting_excludes_ungated_stage_from_weighted_total,
         test_gap_to_goal_phrasing_never_bare_ratio,
+        test_quota_missing_from_db_produces_graceful_nulls,
         test_heuristic_curve_labeled_real_target_not,
         test_planted_discrepancy_missing_heuristic_label_caught,
         test_regression_renewal_deal_cannot_enter_qualified_pipeline,
