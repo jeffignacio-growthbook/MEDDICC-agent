@@ -1364,17 +1364,36 @@ TOOLS YOU CAN CALL:
   filter_table(table, columns, filters, limit, order_by)
   join_tables(primary_table, primary_key, joined_table,
               foreign_key, primary_filters, joined_columns, limit)
-  aggregate_results(data, group_by, aggregations)
+  aggregate_results(data, group_by, aggregations,
+                    group_by_date_ranges)
     data: ALWAYS use "step_N" to reference a previous result
           (e.g. "step_0" for the first filter_table result,
            "step_1" for the second result)
           NEVER pass the data array directly - always use step reference
-    group_by: column name to group by
+    group_by: column name to group by (ignored when
+              group_by_date_ranges is provided)
     aggregations: dict of {{"column": "sum"|"count"|"avg"}}
-    Example: aggregate_results(
-      data="step_0",  # Reference to first query result
+    group_by_date_ranges: (optional) list of date-range buckets.
+      When provided, rows are bucketed by which range their date
+      falls into, and aggregations are computed per bucket.
+      Each entry: {{"label": "Q3", "column": "close_date",
+                    "start": "2026-08-01", "end": "2026-10-31"}}
+      Rows outside all ranges land in "other".
+    Example (column grouping): aggregate_results(
+      data="step_0",
       group_by="owner_email",
       aggregations={{"deal_value": "sum", "deal_id": "count"}}
+    )
+    Example (date-range bucketing): aggregate_results(
+      data="step_0",
+      group_by="close_date",
+      aggregations={{"deal_value": "sum", "deal_id": "count"}},
+      group_by_date_ranges=[
+        {{"label": "This quarter", "column": "close_date",
+          "start": "2026-08-01", "end": "2026-10-31"}},
+        {{"label": "Next quarter", "column": "close_date",
+          "start": "2026-11-01", "end": "2027-01-31"}}
+      ]
     )
   compare_periods(table, column, agg, period_a, period_b,
                   date_column)
@@ -1545,6 +1564,14 @@ RULES:
       a different snapshot date to produce a number anyway.
 - When calling aggregate_results, ALWAYS pass data="step_N"
   NEVER pass data as [] or a full array - step references only
+- DATE-RANGE SPLITTING: When a question asks to split deals by a
+  date boundary (this quarter vs next, before vs after a date,
+  etc.), use aggregate_results with group_by_date_ranges — NOT
+  manual enumeration. Manual summation of more than a handful of
+  rows is unreliable and will be rejected by verification.
+  Steps: (1) filter_table to get the deals, (2) aggregate_results
+  with group_by_date_ranges to split and sum them by date bucket.
+  The time_window dates are already given in the question context.
 - For risk assessment questions: ALWAYS use assess_deal_risk, NOT filter_table
 
 DEFAULT SCOPING (CRITICAL - prevents over-filtering):
@@ -2883,7 +2910,12 @@ def _aggregation_correction_message(discrepancies: list) -> str:
         "line(s) ONLY. Do NOT alter any individual deal amounts, "
         "per-week figures, or line-item breakdowns — those are already "
         "correct. Replace ONLY the wrong summary total(s) named above "
-        "with the exact corrected number(s), verbatim.\n\n"
+        "with the exact corrected number(s), verbatim. The corrected "
+        "number must appear EXACTLY ONCE in your answer — as the "
+        "summary total. If you find yourself writing it a second time "
+        "(as a line item, a company total, or any other breakdown), "
+        "STOP — that is the placement corruption this instruction "
+        "exists to prevent.\n\n"
         'Respond as {"answer": "..."}.'
     )
 
