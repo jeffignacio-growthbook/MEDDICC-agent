@@ -12,14 +12,13 @@ targets:
     basis: incremental_arr  # Reps are measured on Incremental ARR, never renewal base
     stretch_target: 2100000
     stretch_note: >
-      Manually-set stretch figure, NOT computed or derived from any
-      formula — a real, explicit GrowthBook business decision, specific
-      to this client and this quarter. Exists because GrowthBook is
-      targeting 2x YoY growth (Q2'27 vs Q2'26) that current headcount
-      cannot organically support at the base quota alone. Confirmed
-      2026-09-19. Never assume this generalizes to any future client
-      this codebase might serve, and never treat it as a computed
-      target the way team_total's per-rep sum is.
+      Ryan's personal aspiration — NOT additive on top of quota.
+      The team quota ($1.55M) is the committed goal. The stretch
+      ($2.1M) is a separate, higher aspiration: Ryan wants to beat
+      $2.1M for the quarter to hit 2x YoY growth (Q3'27 vs Q3'26).
+      Report stretch separately as aspirational context, never sum
+      it with quota. Confirmed 2026-10-01. Never assume this
+      generalizes to any future client this codebase might serve.
     reps:
       jake@growthbook.io:
         target: 300000
