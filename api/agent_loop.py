@@ -131,6 +131,7 @@ _NON_PRIMITIVE_INTENTS: frozenset[str] = frozenset({
     "dynamic_query",       # is itself a fallback, not a calculator
     "query_help",          # orientation / capability listing
     "acknowledgment",      # social reply
+    "explain_prior_answer",  # re-explains the prior turn's text, no data call
     "unanswerable",        # meta intent
     "set_target",          # admin write
     "submit_score_correction",  # write to review queue
