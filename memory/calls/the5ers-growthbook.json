@@ -1,0 +1,18 @@
+{
+  "company": "The5ers & GrowthBook",
+  "slug": "the5ers-growthbook",
+  "last_etl_date": "2026-10-01T06:40:57.215099",
+  "calls": [
+    {
+      "id": "01M3777N93YFJ0N206V469973N",
+      "source": "fireflies",
+      "title": "The5ers & GrowthBook | Enterprise Scaling Options",
+      "date": "2026-09-30",
+      "duration_minutes": 25.90999984741211,
+      "summary": "# The5ers & GrowthBook | Enterprise Scaling Options\nDate: 2026-09-30 | Duration: 25.90999984741211m\n\n## Summary\nThe discussion covered how feature flags support gradual rollouts, user-based targeting, QA, production testing, marketing coordination, and disabling features when serious bugs occur. Flags are currently managed mainly through a UI, while API, CLI, and CI integrations were discussed. GrowthBook was previously used for A/B testing with Mixpanel events, although no recent experiments were run because there were no suitable launches. Experiment results and flag analytics help guide feature decisions. Improving cleanup was also discussed, including stale-flag detection through the SDK and MCP server, with flags inactive for more than 30 days considered stale. Enterprise capabilities include bandit and contextual bandit experimentation, SSO, SAML, role-based access control, customer success support, and enablement sessions. Pricing may be user- or experiment-based, with flexible payment terms and migration incentives available before the end of October. Follow-up materials, pricing details, deeper use-case discussions, and improved automation are planned for review by an approximately 30-person user base covering R&D and product teams.\n\n## Keywords\nFeature flags, A/B testing, GrowthBook Enterprise, experimentation, stale flag detection, role-based access control\n\n## Action Items\n**Rémy Marin**  \nSend information about stale feature flag detection and deletion (07:00)  \nProvide documentation and video on contextual bandits and Enterprise features (19:00)  \nShare full slide deck and pricing for Enterprise upgrade (20:30)  \n\n**Marcel Geldner**  \nSend full slide deck on Enterprise benefits and pricing (19:20)  \nFollow up with The5ers on training and support (20:00)  \nOffer flexible payment terms and incentives (20:35)  \n\n**Eyal Lewin**  \nProvide approximate current and projected user counts (23:00)  \n\n**Liel Shraga & Yossi Yonathan Gershon**  \nReview materials on Enterprise upgrade and usage optimization (25:00)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

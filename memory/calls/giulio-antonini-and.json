@@ -1,0 +1,18 @@
+{
+  "company": "Giulio Antonini and",
+  "slug": "giulio-antonini-and",
+  "last_etl_date": "2026-10-01T06:40:57.214376",
+  "calls": [
+    {
+      "id": "01M3CFV588G9H78TF1QPV8956V",
+      "source": "fireflies",
+      "title": "Giulio Antonini and Chris Sanders",
+      "date": "2026-09-30",
+      "duration_minutes": 39.77000045776367,
+      "summary": "# Giulio Antonini and Chris Sanders\nDate: 2026-09-30 | Duration: 39.77000045776367m\n\n## Summary\nThe discussion focused on eliminating Visual Editor flicker caused by client-side variant evaluation, where pages briefly show the widescreen layout before the correct variant loads. Edge evaluation was identified as the preferred approach because it evaluates features before the response reaches the client and rehydrates the variant in the browser. Standard Vercel Edge experimentation works through Next.js middleware and Edge Config, but Visual Editor experiments currently do not connect to the Vercel SDK, leaving the client-side SDK as the working option. Chris will investigate whether a thin Vercel layer, core Edge library support, or configuration changes can close this gap. The group also reviewed attribute targeting for brand, loyalty status, login state, page properties, and URLs, emphasizing that current values must be set before evaluation. Sticky bucketing is needed to preserve variants when identities or attributes change. The team will test URL targeting through repeated identify calls and review the behavior of the Vercel adapter.\n\n## Keywords\nVisual Editor, Vercel Edge, Sticky bucketing, Attribute targeting, Flags SDK, Feature evaluation\n\n## Action Items\n**Chris Sanders**\nInvestigate Visual Editor support (07:52)\nReview Edge implementation options (09:40)\nInvestigate SDK attribute updates (37:53)\n\n**Giulio Antonini**\nTest URL targeting attributes (32:39)\nVerify sticky bucketing (36:57)\nTest identify-flow attributes (36:57)\nPost Slack follow-up questions (38:16)",
+      "organizer": "chris@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

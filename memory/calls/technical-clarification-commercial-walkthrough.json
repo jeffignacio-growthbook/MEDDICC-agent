@@ -1,0 +1,18 @@
+{
+  "company": "Technical clarification, commercial walkthrough",
+  "slug": "technical-clarification-commercial-walkthrough",
+  "last_etl_date": "2026-10-01T06:40:57.214240",
+  "calls": [
+    {
+      "id": "01M2QRE1KE9KPMZP5P95VXVVVN",
+      "source": "fireflies",
+      "title": "Kpler & GrowthBook | Enterprise Setup (Technical clarification, commercial walkthrough)",
+      "date": "2026-09-30",
+      "duration_minutes": 52,
+      "summary": "# Kpler & GrowthBook | Enterprise Setup (Technical clarification, commercial walkthrough)\nDate: 2026-09-30 | Duration: 52m\n\n## Summary\nKpler needs SSO and SCIM to automate user provisioning and avoid manually adding or removing users, but SSO is not included in its current Pro plan. Growth from 200 to more than 900 employees has increased this need. GrowthBook usage is steady, with feature flags widely used by engineers, while experimentation remains limited because the source-of-truth migration is delaying testing and the company prioritizes fast shipping. Warehouse-native metrics and automatic rollback were discussed but are not currently used. Kpler has about 91 seats, compared with the Pro plan’s 30-seat cap, and expects adoption to grow toward a realistic maximum of about 200 users. Enterprise provides unlimited seats, SSO, and CDN traffic, but the higher cost requires internal approval as the budget year closes. Pricing changes take effect at the end of October, with an annual agreement needed by then for the best terms. Rémi will investigate approval, while pricing details and a proposal will be emailed before a Tuesday follow-up.\n\n## Keywords\ngrowth book, SSO, SCIM, enterprise licensing, feature flags, pricing negotiation\n\n## Action Items\n**James Shannon**  \nProvide pricing proposals with new seat limits (23:30)  \nEngage Rémi Becheras for Enterprise justification (20:30)  \n\n**Rémi Becheras**  \nFollow up with internal stakeholders on proposal (32:00)  \nInvestigate budget approval for Enterprise agreement (34:32)  \nCompare cost/benefit of Pro vs Enterprise plan (38:30)  \n\n**Philippe Delorme**  \nSend SSO and SCIM pricing questions (06:27)  \nInvestigate impact of reducing seats to 30 (36:58)  \n\n**Marcel Geldner**  \nSend contract and pricing details to Kpler (40:16)  \nSchedule follow-up call with Kpler (41:30)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

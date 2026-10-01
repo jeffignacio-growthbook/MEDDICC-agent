@@ -1,0 +1,18 @@
+{
+  "company": "GB x LeoVegas",
+  "slug": "gb-x-leovegas",
+  "last_etl_date": "2026-10-01T06:40:57.214702",
+  "calls": [
+    {
+      "id": "01M3M9XF086Q4MP35WK1H0A2SD",
+      "source": "fireflies",
+      "title": "GB x LeoVegas Regroup",
+      "date": "2026-09-30",
+      "duration_minutes": 42.720001220703125,
+      "summary": "# GB x LeoVegas Regroup\nDate: 2026-09-30 | Duration: 42.720001220703125m\n\n## Summary\nThe discussion covered the interim data pipeline, which uses DTM, Mixpanel, and a warehouse while awaiting the Group API, alongside a DBT migration toward the finalized data architecture. Feature-flag migration from LaunchDarkly was largely complete, with integrations across sportsbook, landing pages, and mobile apps. GrowthBook experimentation rollout remains dependent on product-manager enablement, with planned training using company-specific examples, prior experiments, practical exercises, and clear limits around unavailable features. Experimentation is being incorporated into the Product Development Lifecycle, combining legacy LaunchDarkly processes with sportsbook practices. Product teams will own ideation and setup, while experimentation specialists provide consultation and governance. Checklists, metric groups, templates, dashboards, and workflow prompts will support lightweight self-service. The discussion also covered soft stops, sample-size stopping, Slack notifications, and phase-date behavior to improve result consistency and issue detection. Contextual Bandits were deferred until core experimentation practices are established.\n\n## Keywords\nGrowthBook, Experimentation governance, Product manager self-service, Mixpanel integration, Experiment lifecycle, Contextual bandits\n\n## Action Items\n**Cris Dizon**\nArrange onsite onboarding training (04:12)\nCustomize training materials (05:38)\nReview experimentation process (22:29)\nInvestigate phase analysis defaults (29:45)\nSend Slack app documentation (34:09)\nSend governance documentation (40:12)\nInvite Vegas Cris (40:12)\n\n**LeoVegas team**\nAlign training topics (05:08)\nPrepare experimentation process (17:35)\nShare process document (22:29)",
+      "organizer": "cris@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

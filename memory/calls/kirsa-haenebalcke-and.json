@@ -1,0 +1,18 @@
+{
+  "company": "Kirsa Haenebalcke and",
+  "slug": "kirsa-haenebalcke-and",
+  "last_etl_date": "2026-10-01T06:40:57.211507",
+  "calls": [
+    {
+      "id": "01M3MRV93Z6AT5XAERE4E0B4XM",
+      "source": "fireflies",
+      "title": "Kirsa Haenebalcke and Dan Wathne + 2 others",
+      "date": "2026-09-30",
+      "duration_minutes": 24.09000015258789,
+      "summary": "# Kirsa Haenebalcke and Dan Wathne + 2 others\nDate: 2026-09-30 | Duration: 24.09000015258789m\n\n## Summary\nCary Rakin assumes account management from Dan, covering commercial and client success, while Chris Sanders provides technical leadership for SDK implementation, data pipelines, and experimentation guidance. Kirsa Haenebalcke leads the experimentation team; Nicholas Martin manages data queries and pipeline setup; Alli Wiley focuses on UI and funnel experimentation; and Jennifer coordinates projects. Onboarding will begin with developer training on Growth Book SDKs, feature flags, and pipeline validation, followed by experimenter training on experiment creation and platform use. The client uses a self-hosted Growth Book instance connected to BigQuery, with Harness continuing to handle feature flag assignment while Growth Book analyzes experiment results. Quick Frame will pilot Growth Book feature flags, while broader migration remains constrained by contract timing and migration effort. The longer-term vision is to support self-service experiment readouts for multiple engineering squads. Dedicated Slack support, governance guidance, periodic check-ins, and staged organizational onboarding will support adoption.\n\n## Keywords\nGrowthBook, experimentation, feature flags, onboarding, BigQuery, developer training\n\n## Action Items\n\n**Nicholas Martin**\nReceive and coordinate the scheduling of the developer training by sharing the Calendly link with relevant Mountain team members (16:19)\n\n**Cary Rakin**\nCoordinate with Growth Book’s head of customer success for a separate session on onboarding broader Mountain teams on experimentation processes when Mountain is ready (17:45)\nProvide ongoing support and escalation assistance via Slack channel and monitor for any customer issues needing intervention (21:09)\n\n**Chris Sanders**\nSend the Calendly link to Mountain team for developer implementation training (16:19)\n\n**Alli Wiley**\nParticipate in developer training, focusing on feature flag integration and SDK setup for Quick Frame team (20:18)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

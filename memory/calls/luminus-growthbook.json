@@ -1,0 +1,18 @@
+{
+  "company": "Luminus & GrowthBook",
+  "slug": "luminus-growthbook",
+  "last_etl_date": "2026-10-01T06:40:57.214965",
+  "calls": [
+    {
+      "id": "01M3777N909JH65A54KWJSM0TR",
+      "source": "fireflies",
+      "title": "Luminus & GrowthBook | Partnership + Enterprise Value",
+      "date": "2026-09-30",
+      "duration_minutes": 38,
+      "summary": "# Luminus & GrowthBook | Partnership + Enterprise Value\nDate: 2026-09-30 | Duration: 38m\n\n## Summary\nLuminus primarily uses GrowthBook for about 300 feature flags, which are managed manually through the UI without CI/CD or pipeline integration. Experimentation remains in a pilot stage linked to feature flags, with limited business-stakeholder involvement but interest from marketing. Luminus uses Next.js, Nest, and React Native; an initial Next.js SDK integration caused problems, so the React SDK was reinstated. GrowthBook reports 19 paid users, while Luminus estimates approximately 32–35, creating an over-usage and pricing discussion. The Pro plan is capped at 30 users and now costs $40 per user, compared with $20 when Luminus started two years ago. Enterprise adds SSO, governance, audit logs, role-based access, direct support, training, SLA options, and flexible invoicing, with no additional traffic or CDN charges. Marcel will clarify pricing, project limits, over-usage, and governance benefits, while Peter will review the business value and cost increase with Johan’s team.\n\n## Keywords\nfeature flags, subscription limits, experimentation, SSO integration, pricing model, enterprise governance\n\n## Action Items\n**Rémy Marin**  \nFollow up on Next.js SDK issues (13:58)  \n\n**Yoann Hertienne**  \nProvide Next.js SDK summary (16:58)  \n\n**Marcel Geldner**  \nWrite pricing structure for Luminus (22:44)  \nClarify project limits impact (25:41)  \nDiscuss GrowthBook subscription options (26:49)  \nSend payment options to Luminus (28:14)  \n\n**Peter**  \nCoordinate internal pricing review (23:41)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook | Demo",
+  "slug": "growthbook-demo",
+  "last_etl_date": "2026-10-01T06:40:57.213965",
+  "calls": [
+    {
+      "id": "01M3M308HG24101SPP8RQ16PS2",
+      "source": "fireflies",
+      "title": "GrowthBook | Demo and Q&A",
+      "date": "2026-09-30",
+      "duration_minutes": 57.27000045776367,
+      "summary": "# GrowthBook | Demo and Q&A\nDate: 2026-09-30 | Duration: 57.27000045776367m\n\n## Summary\n- **Platform Setup:** SDKs load experiments through one CDN payload; assignments flow into analytics and warehouse data.\n- **Experiment Quality:** Run a 50/50 AA test first; stable bucketing prevents users moving between variants.\n- **Governance:** Approval flows, audit history, project roles, namespaces, and release reviews support controlled experimentation.\n- **Results:** Health checks, goal metrics, guardrails, and Bayesian analysis guide decisions; example lift was 12%, but uncertainty remained.\n- **Rollout:** Internal testing comes first, followed by demonstrations and rollout to two or three teams.\n\n## Keywords\nGrowthBook, experimentation, feature flags, SDK implementation, Managed Warehouse, experiment analytics\n\n## Action Items\n**Carlos Manuel Vieira**\n- Run GrowthBook experiments (54:05)\n\n**Telmo Galante Rodrigues**\n- Organise follow-up demo (54:43)\n- Pilot GrowthBook with teams (54:43)",
+      "organizer": "chris@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

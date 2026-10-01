@@ -1,0 +1,18 @@
+{
+  "company": "Jake Stangl and",
+  "slug": "jake-stangl-and",
+  "last_etl_date": "2026-10-01T06:40:57.213361",
+  "calls": [
+    {
+      "id": "01M3PWH4C0WAA26BBJRWSXD0GB",
+      "source": "fireflies",
+      "title": "Jake Stangl and Brent Holloway @ Mastiff Software",
+      "date": "2026-09-30",
+      "duration_minutes": 38.400001525878906,
+      "summary": "# Jake Stangl and Brent Holloway @ Mastiff Software\nDate: 2026-09-30 | Duration: 38.400001525878906m\n\n## Summary\nThe discussion focused on improving sales efficiency by replacing power dialing, which had a 0.8% connect rate and poor call quality, with signal-led outreach to warmer, better-qualified leads. Jake will prioritize tiered accounts, including companies with 1,000 to 10,000 users, sub-100 Pro customers, Rio users, and high-traffic accounts flagged with more than 1 million website visitors. Dripify will support outreach to current customers that Apollo blocks, while lower-return podcast invitations and generic webinar follow-ups will receive less attention. Jake’s inbound allocation was reduced to 20%, with 80% routed to AES; inbound produces stronger meeting volume, but response speed must be monitored. Statsig displacement plays and former GrowthBook users remain valuable sources, while champion development is essential because “no champion, no deal.” The immediate goal is one outbound and one inbound opportunity weekly, with an expected path toward approximately one closed deal per month as the pipeline develops.\n\n## Keywords\nAI recommendations, power dialer, inbound routing, drip campaigns, competitive displacement, hybrid sales role\n\n## Action Items\n\n**Jake Stangl**\nContinue hybrid role outreach targeting sub-100 Pro customers using Dripify as workaround for Apollo email blocking (08:44)\nReduce podcast invite outreach due to low pipeline impact and reinvest time into more effective engagement methods (10:01)\nPersist with warm lead calling and cease use of power dialer to improve connect rates (04:25)\nMaintain LinkedIn outreach but no longer manually complete LinkedIn tasks in Apollo to save 30 minutes daily (21:14)\nPrioritize high-traffic accounts with over 1 million website visitors using HubSpot lead enrichment data for targeted outreach (17:44)\nContinue re-engagement of past demo requests and close-lost accounts consistently (06:39)\nOptimize and prioritize drip campaigns on Dripify due to connection limits, possibly turning off less effective campaigns (31:36)\nEnsure quality handling of remaining 20% inbound leads routed after shift to AES (29:00)\nImplement sequence to tier one customers emphasizing timely follow-up to increase engagement (34:58)\n\n**Brent Holloway**\nAssist Jake in leveraging AI-driven recommendations to optimize time allocation and sequence tiering (00:01)\nSupport Jake in gaining clarity on LinkedIn task completion impacts and coordinate with Jeff for deeper Apollo integration understanding (22:00)\nMonitor inbound routing changes impact on pipeline conversion rates between Jake and AES team (15:50)\nHelp set up and refine outreach approach for sub-100 Pro customers, assist with sequence strategies in Dripify (09:00)\nProvide encouragement and coaching to build pipeline for Jake’s first deal close (36:25)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

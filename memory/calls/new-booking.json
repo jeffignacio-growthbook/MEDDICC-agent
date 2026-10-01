@@ -1,0 +1,18 @@
+{
+  "company": "New Booking /",
+  "slug": "new-booking",
+  "last_etl_date": "2026-10-01T06:40:57.214105",
+  "calls": [
+    {
+      "id": "01M384PVEAT4C1C6EN8YH2Z0F7",
+      "source": "fireflies",
+      "title": "New Booking / Closed-Won Process Training",
+      "date": "2026-09-30",
+      "duration_minutes": 34,
+      "summary": "# New Booking / Closed-Won Process Training\nDate: 2026-09-30 | Duration: 34m\n\n## Summary\nThe team reviewed a new billing workflow requiring legal entity, address, purchase-order, billing-term, and MSA details before Close-Won submission, with requests sent to Jennifer through Slack. Existing order forms remain unchanged for current deals, while new deals require earlier billing-data collection to improve receivables. Revised forms will add explicit seat, CDN request, and bandwidth overage rates, simplify auto-renewal language by referencing the MSA, and favor a client-only 30-day renewal notice; legal review continues. Friday’s product analytics session, led by Ryan with Graham and Marketing participants Scott and Elise, will address discovery, customer pain, positioning, demos, and content needs. Skyscanner still requires production A/A testing before signing, with October 30th as the target, while Logan and Luke Smith investigate Bayesian test differences. Approval may take one to several weeks, and access is expected to continue through October. Pipeline work includes champion calls and phone outreach focused on October opportunities and November coverage.\n\n## Keywords\nClosed-Won workflow, HubSpot billing fields, Order form, MSA, Accounts receivable, Skyscanner evaluation\n\n## Action Items\n**Ryan McGurk**\nRevise order forms (07:51)\nPrepare Friday session (10:57)\nSupport Skyscanner review (19:42)\nContact reference customers (21:52)\n\n**Scott Keller**\nBuild marketing content (10:57)\n\n**Elise**\nBuild marketing content (10:57)\n\n**Christian Liebenow**\nHold champion-sync meetings (23:42)\nContinue proto-enterprise outreach (23:54)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 14,
+      "summary_quality": "good"
+    }
+  ]
+}

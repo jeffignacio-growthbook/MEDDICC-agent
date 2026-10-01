@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook<>WaPo",
+  "slug": "growthbook-wapo",
+  "last_etl_date": "2026-10-01T06:40:57.211730",
+  "calls": [
+    {
+      "id": "01M35SFGXAKPJP3TTSN4JKEJ8K",
+      "source": "fireflies",
+      "title": "GrowthBook<>WaPo",
+      "date": "2026-09-30",
+      "duration_minutes": 55.5099983215332,
+      "summary": "# GrowthBook<>WaPo\nDate: 2026-09-30 | Duration: 55.5099983215332m\n\n## Summary\nThe team is seeking to replace its in-house A/B testing process, which depends on manual Python statistics, custom user assignment, engineering support, and Redshift-based data workflows. GrowthBook was evaluated as a unified platform combining feature flags, experimentation, and analytics, with support for Redshift, GA4, custom metrics, dashboards, mutually exclusive experiments, namespaces, and server-side Java SDK integration. The team plans to route evaluations through a centralized Java API connected to its metering engine. Pricing and deployment options include cloud or self-hosted enterprise plans, per-seat pricing, granular roles, and a planned transition to event-based pricing while existing per-seat customers are grandfathered. Governance will determine who can create experiments, publish tests, or view results, which will also establish seat requirements. GrowthBook offered a free 30–45-day POC with enterprise access, no seat caps, dedicated Slack support, and onboarding. The team views GrowthBook as the leading candidate and is targeting a trial by the end of Q1 2027.\n\n## Keywords\nA/B testing, feature flags, experimentation platform, pricing model, server-side SDK, governance\n\n## Action Items\n\n**Davis Shaver**\nCoordinate internally with Stephen Erickson and Anuradha Uduwage to discuss seat counts and governance requirements; confirm creation of new GrowthBook account(s) with WaPo domain and identify primary contacts for POC setup (49:07)\n\n**Anuradha Uduwage**\nLead internal alignment on seat allocations and governance model to define roles for experiment creation versus view-only access; coordinate with Davis Shaver and Janith Weerasinghe for feedback (50:57)\n\n**Scott Keller**\nSend detailed recap email including meeting summary, documentation, POC plan, and side-by-side pricing comparison of current per-seat and upcoming event-based models; prepare for trial and enterprise license setup upon WaPo account creation; schedule follow-up meeting after WaPo internal alignment (53:06)\n\n**Janith Weerasinghe**\nCollaborate internally with Davis Shaver and Anuradha Uduwage to finalize experiment governance and seat requirements (50:57)\n\n**All WaPo Team Members**\nReview GrowthBook platform demo, assess Java SDK integration and experiment allocation options, and discuss rollout plans internally to meet the target of end of Q1 platform deployment (18:00)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Enterprise GrowthBook Pricing",
+  "slug": "enterprise-growthbook-pricing",
+  "last_etl_date": "2026-10-01T06:40:57.214512",
+  "calls": [
+    {
+      "id": "01M3S8J9DZYD4RP3RFXV1GW0H1",
+      "source": "fireflies",
+      "title": "Enterprise GrowthBook Pricing",
+      "date": "2026-09-30",
+      "duration_minutes": 13.079999923706055,
+      "summary": "# Enterprise GrowthBook Pricing\nDate: 2026-09-30 | Duration: 13.079999923706055m\n\n## Summary\nThe discussion covered a 30-month commitment for a self-hosted website for a Saudi travel company, with data stored exclusively in Saudi Arabia on GCP. The initial build is expected within four to six months, followed by approximately two years of personalization before client handover. Globant will operate the system for two to six employees, with expected traffic of around one million content views monthly across web and mobile. The solution includes content management, translation, content generation, personalization, and A/B testing. Pricing begins at a $75,000 annual enterprise license plus $25,000 for 50 experiments, or approximately $100,000 annually, excluding hosting; added support may raise annual pricing to between $75,000 and $150,000. The architecture uses Cloud Run, MongoDB, Compute Engine, and BigQuery in Saudi Arabia. James Shannon will provide a pricing and feature deck, while Karim Elemam requested a clear breakdown of base features, add-ons, and AI capabilities. Sources: 00:10, 01:59, 03:26, 04:20, 05:59, 08:01, 11:30.\n\n## Keywords\nSaudi data residency, Google Cloud Platform, GrowthBook licensing, personalization project, experiment pricing blocks, BigQuery\n\n## Action Items\n\n**James Shannon**\nSend Karim a concise deck or PDF summarizing GrowthBook enterprise features, pricing, and licensing information (11:30)\n\n**Karim Elemam**\nReview the directional pricing and architecture requirements provided by James to prepare the RFP response for the Saudi travel company (00:10)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook/Adyen",
+  "slug": "growthbook-adyen",
+  "last_etl_date": "2026-10-01T06:40:57.214836",
+  "calls": [
+    {
+      "id": "01M3KGWWGCM73DY6K792F1WGPP",
+      "source": "fireflies",
+      "title": "GrowthBook/Adyen",
+      "date": "2026-09-30",
+      "duration_minutes": 29,
+      "summary": "# GrowthBook/Adyen\nDate: 2026-09-30 | Duration: 29m\n\n## Summary\nThe organization has built an in-house experimentation platform over three to four years, primarily for payment optimization, with early adoption in sales and UI teams. Its experimentation culture is strong in payments but less mature elsewhere, creating a need for advocacy and broader enablement rather than faster delivery. The technical environment uses Hadoop with Trino and Druid, while GrowthBook provides feature flags, experiments, JSON-based multi-surface rules, analytics integrations, and Bayesian and frequentist statistical methods. Approximately 200–300 unique experiment owners use the system annually, including developers and other experiment users. GrowthBook supports self-hosting, EU cloud hosting, role-based access control, SSO, visual editing, and CLI workflows. Its AI assistant can help create experiments, clean up flags, and analyze results. Next steps include sharing slides and a summary, holding a follow-up call, and potentially testing the platform to assess fit.\n\n## Keywords\nexperiment platform, feature flagging, data warehouse integration, experimentation culture, AI assistant, platform governance\n\n## Action Items\n**Rémy Marin**  \nEngage technical follow-up calls with Adyen (00:00)  \n\n**Marcel Geldner**  \nSend summary slides to Adyen (28:41)  \nFollow up on Adyen’s feedback (29:00)  \n\n**Floor Jubbega**  \nReview GrowthBook summary slides internally (28:41)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

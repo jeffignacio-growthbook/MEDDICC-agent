@@ -1,7 +1,7 @@
 {
   "company": "Growthbook <> SWTHZ",
   "slug": "growthbook-swthz",
-  "last_etl_date": "2026-09-29T06:24:05.671141",
+  "last_etl_date": "2026-10-01T06:40:57.213155",
   "calls": [
     {
       "id": "01M3G7NW9EDDYK2Z39D4M94DMY",
@@ -12,6 +12,17 @@
       "summary": "# Growthbook <> SWTHZ - Intro\nDate: 2026-09-28 | Duration: 27.40999984741211m\n\n## Summary\nErika King explained that Sweat House is starting testing from zero and needs one tool for WordPress Elementor landing pages and Cloudflare-hosted purchase pages. The team wants reliable A/B testing, actionable reporting, and faster rollout of winning experiments during rapid growth. Dan Wathne demonstrated GrowthBook’s visual editor, traffic-splitting options, URL targeting, JavaScript and CSS support, GA4-based metrics, health checks, and reusable templates. GrowthBook requires an SDK and engineering support for setup, with primary goals and guardrail metrics available for monitoring outcomes such as revenue, purchase rates, sessions, and ROI. Dan also described the Features, Experiments, and Product Analytics suites. He recommended the Pro plan at $40 per user per month, supporting up to 30 users, unlimited experiments, and 2 million events before overage fees. Enterprise costs around $30,000 to $40,000 annually and was not recommended currently. Dan will send resources, and Erika will review them with Ryan and may arrange a tailored 15-minute demo.\n\n## Keywords\nA/B Testing, Site Testing, GrowthBook, WordPress Integration, Data Analytics, Paid Acquisition\n\n## Action Items\n\n**Dan Wathne**\nSend GrowthBook documentation and helpful resources to Erika for her leader, Ryan, to review (21:30)\n\n**Erika King**\nReview GrowthBook materials and share them with leader Ryan at Sweat House (26:00)\nConnect leader Ryan with Dan for a 15-minute high-level walkthrough session if further questions arise (26:10)\n",
       "organizer": "dan@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3QCXVVQBDXWEZ25PSW7MATS",
+      "source": "fireflies",
+      "title": "Growthbook <> SWTHZ - Demo",
+      "date": "2026-09-30",
+      "duration_minutes": 29.75,
+      "summary": "# Growthbook <> SWTHZ - Demo\nDate: 2026-09-30 | Duration: 29.75m\n\n## Summary\nGrowthBook demonstrated flexible AB testing for websites, including targeted audiences, traffic splitting, multiple variants, visual or manual edits, code-based changes, and URL redirect tests. Its analytics tools track journeys, funnels, signups, and other metrics, while results show percentage changes with 95% confidence intervals and support demographic reporting. Centralized metric definitions and tags promote consistent reporting, and the learnings repository preserves experiment knowledge. Setup requires SDK installation, data-source connections, and metric definitions, with documentation and AI guides available. Kill switches, activation metrics, and guardrails help protect site stability, although some safety features require engineering support. The Pro plan costs $40 per month for up to 2 million monthly events; enterprise plans begin around $10,000. Keaton Hyde and Erika King confirmed the platform meets their main requirements. Keaton will brief Ryan, who was absent due to an emergency call, while the team plans to onboard internally and involve engineers for more complex needs.\n\n## Keywords\nGrowthBook, A/B testing, data integration, SDK setup, metrics tracking, experiment analysis\n\n## Action Items\n\n**Keaton Hyde**\nUpdate Ryan on GrowthBook demo details and coordinate next steps for onboarding (28:00)\n\n**Dan Wathne**\nProvide documentation and resources for integration, experimental setup, and metric configuration; offer ongoing technical support as needed (26:23)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]

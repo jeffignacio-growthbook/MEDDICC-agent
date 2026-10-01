@@ -1,7 +1,7 @@
 {
   "company": "Weekly GrowthBook and",
   "slug": "weekly-growthbook-and",
-  "last_etl_date": "2026-09-17T06:19:53.895397",
+  "last_etl_date": "2026-10-01T06:40:57.212393",
   "calls": [
     {
       "id": "01KKA2YRZYW6WA7Q0DFFT230Z3",
@@ -174,6 +174,17 @@
       "date": "2026-09-16",
       "duration_minutes": 32,
       "summary": "# Weekly GrowthBook and Mastiff Software Meeting\nDate: 2026-09-16 | Duration: 32m\n\n## Summary\nThe team emphasized shifting from seat-based pricing toward AI consumption and experiment-based models to capture growing customer AI budgets and support scalable growth without adding sales staff. Revenira was considered for managing mixed licensing, consumption, and credit models, although reducing tool complexity remains a priority. Revenue recognition risks were discussed using Anthropic and Snowflake as examples. Hiring discussions prioritized Justin Hawks, Kevin, and Ella for further evaluation, while Garrett and Reese were kept warm for future opportunities. Sales process changes include reducing reliance on cold email, focusing on LinkedIn and calls, improving activity tracking, and running a pro-to-enterprise upgrade campaign with assessments, onboarding, and discounts. Brent presented an AI advisor combining internal metrics with external market signals, with weekly tactical briefs and monthly strategic insights recommended. The team also reviewed Jake’s pipeline, inbound lead handling, certification training, and a planned commission adjustment to 20%.\n\n## Keywords\nAI pricing, candidate evaluation, sales pipeline, revenue recognition, pro-to-enterprise campaign, market insights\n\n## Action Items\n\n**Brent Holloway**\nCoordinate scheduling of role play for candidate Justin once calendar access is restored (12:29)\nArrange meeting with Kevin following Ryan’s introduction (14:23)\nSchedule interviews for Ella with Ashley, Lindsay, James, and Christian, and organize subsequent role play if interviews go well (16:09)\nKeep Garrett and Reese warm with appropriate communication about current hiring priorities and potential future opportunities (17:09)\nReview Jake’s sales input data with Jeff to better correlate effort and output, once access is granted (23:27)\n\n**Ryan McGurk**\nIntroduce Brent to candidate Kevin via Slack or email (14:23)\nSend Slack messages to Lindsay, James, and Christian about scheduling Ella’s interviews (16:49)\nHelp prioritize Jake’s calling efforts in the pro-to-enterprise campaign (21:02)\nReschedule business value session due to key person’s absence (18:39)\nProvide Brent with access to Jake’s opportunity tracking spreadsheet for review (23:29)\nForward Brent relevant portfolio company hiring insights from a16z for prospecting use (30:54)\n",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3MSMTEARTVES7GG8EKGR7KK",
+      "source": "fireflies",
+      "title": "Weekly GrowthBook and Mastiff Software Meeting",
+      "date": "2026-09-30",
+      "duration_minutes": 30,
+      "summary": "# Weekly GrowthBook and Mastiff Software Meeting\nDate: 2026-09-30 | Duration: 30m\n\n## Summary\nBrent reaffirmed Mastiff as his long-term priority while supporting Equilar’s search for Dave Chun and sales leadership and Brad’s outbound initiative. He was open to adding roughly two weekly coaching hours for Jake, focused on execution, positioning, and custom messaging across engineering, growth, data, and product; the expansion was valued at approximately $2,000 monthly in potential equity, with Ryan discussing the structure with Graham. A Monday operating review and Friday check-in were planned, supported by Jeff’s reporting. Hiring discussions covered the pending BDR decision, a narrowed AE pipeline involving Reese, Justin, and Kevin, and a higher hiring bar. Brent updated the Lovable workflow from Opus 4.8 to Opus 5.5 and continued MCP work with Chris despite limited engineering support of five hours weekly. Ryan considered an internal sales-operations hire, while sales leadership hiring remained deferred. They also discussed the November Stage 2 Summit at Oracle, its after-party at Dominico Winery, and enterprise networking opportunities.\n\n## Keywords\nGrowthBook, Mastiff Software, Sales hiring, BDR and AE recruitment, Outbound coaching, Revenue operations\n\n## Action Items\n**Brent Holloway**\nCoach Jake more frequently (06:10)\nMeet with Jake Mondays (08:45)\nMeet with Jake Wednesdays (08:45)\nSupport incoming BDR candidate (09:23)\nKeep Riley warm (10:42)\nRun mock role-play with Kevin (17:15)\nSchedule Friday accountability session (27:52)\n\n**Ryan McGurk**\nDiscuss GrowthBook equity arrangement (08:24)\nNotify Jake about coaching plan (09:23)\nReview Ella feedback (11:23)\nMove Riley into hiring pipeline (11:23)\nTalk with James about Kevin (12:15)\nFollow up with Kevin (17:15)\nTalk with Jake about support plan (27:40)\nSchedule recurring Monday meetings (27:52)",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

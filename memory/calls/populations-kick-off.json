@@ -1,0 +1,18 @@
+{
+  "company": "Populations Kick Off",
+  "slug": "populations-kick-off",
+  "last_etl_date": "2026-10-01T06:40:57.211899",
+  "calls": [
+    {
+      "id": "01M3SV366PPBADR54SQR1YWBHS",
+      "source": "fireflies",
+      "title": "Populations Kick Off",
+      "date": "2026-09-30",
+      "duration_minutes": 36,
+      "summary": "# Populations Kick Off\nDate: 2026-09-30 | Duration: 36m\n\n## Summary\nThe discussion established a population model centered on units and conditions for feature-flag targeting, experiment power calculations, and product analytics. Product analytics was chosen as the lowest-risk starting point, with populations filtering explorations and previewing metrics. The first version will use one fact-table condition, while additional condition types and integrations will be added incrementally. Static versus dynamic populations, membership history, versioning, multiple units, and potential analysis bias remain open design questions. Experiment work can continue with ephemeral fact-table populations, while persisted power calculations may require migration or compatibility handling. Uploaded CSV targeting will proceed separately; warehouse ingestion and reverse ETL are future directions. Jeremy Dorn, Alli Leong, and Novu are expected to advance implementation, Johnny Martinez will continue UX exploration, and Michael Knowlton expects to switch after completing two remaining items. A follow-up is planned at the next stand-up.\n\n## Keywords\nPopulations, Feature-flag targeting, Experiment exposure, Uploaded CSV audiences, SQL fact tables, Remote SDK attributes\n\n## Action Items\n**Feature Squad — Andy White, and Bryce Fitzsimons**\nPush CSV targeting functionality (26:34)\n\n**Jeremy Dorn**\nBuild populations project skeleton (32:25)\nJoin first-version build team (33:59)\nHold project stand-ups (34:51)\n\n**Michael Knowlton**\nFinish event-forwarder work (33:45)\nSwitch focus to populations project (33:45)\n\n**Alli Leong**\nJoin first-version build (33:59)\n\n**Nobu**\nJoin first-version build team (33:59)\n\n**Johnny Martinez**\nContinue UX explorations (34:29)\nParticipate in follow-up touchpoints (34:29)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 11,
+      "summary_quality": "good"
+    }
+  ]
+}
