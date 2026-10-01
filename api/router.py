@@ -433,6 +433,30 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "criteria plus coverage note (transcript availability across fleet)."
     ),
     "dynamic_query": "question requires combining data from multiple tables or filters not covered by the precomputed handlers above. Use when no other handler fits but the data likely exists in Supabase.",
+    "explain_prior_answer": (
+        "The person is asking HOW or WHY a number or claim in the "
+        "PREVIOUS answer was produced — not asking a new data question, "
+        "not orienting. ALWAYS has an antecedent: something you JUST said "
+        "in the prior turn that the question points back at with 'that' / "
+        "'it' / 'this'. Trigger phrases: 'how did you come up with that "
+        "number?', 'where does that come from?', 'walk me through that "
+        "number', 'why did you say X?', 'what's behind that figure?', "
+        "'how did you get to $X?'. Always set scope=prior_set when "
+        "choosing this handler — it has no meaning without the prior turn. "
+        "CONTRAST WITH query_help's 'prompt_seeking' category — the two are "
+        "easy to confuse because both can start with 'how': prompt_seeking "
+        "is asked by someone who has NO prior answer to refer to ('how do "
+        "I use this', 'where do I start', 'what should I ask you', 'give "
+        "me examples') — there is no antecedent, nothing was just stated. "
+        "explain_prior_answer ALWAYS has a specific, just-stated figure or "
+        "claim as its subject. The test: can you point at the exact prior "
+        "sentence 'that' refers to? If yes, explain_prior_answer. If there "
+        "is no prior assistant turn in this thread at all, this can never "
+        "be the right handler. "
+        "DO NOT use for a genuinely new, general methodology question with "
+        "no specific prior figure referenced ('how do you calculate "
+        "coverage in general?' — that's dynamic_query, not explain_prior_answer)."
+    ),
     "query_help": (
         "The person is orienting, not asking a data question — a greeting, "
         "asking what the assistant can do, asking what they should ask, or "
@@ -441,9 +465,18 @@ Examples: 'how is Jake tracking this month', 'show me Jake's calls',
         "'capability' (what can you do, how does this work, who are you, "
         "what is this, help, /help), "
         "'prompt_seeking' (what should I ask you, give me examples, where do "
-        "I start, I don't know what to ask, how do I use this), "
+        "I start, I don't know what to ask, how do I use this — asked with "
+        "NO prior answer as an antecedent), "
         "'recovery' (ONLY for explicit error statements: 'that didn't work', "
         "'that's not what I asked', 'try again', 'what?' as rejection). "
+        "NEVER classify as prompt_seeking a question that points back at "
+        "something you JUST said ('how did you come up with that number', "
+        "'where does that come from', 'walk me through that') even though "
+        "the surface phrasing ('how do...') can look like prompt_seeking's "
+        "own examples — those go to explain_prior_answer instead. The "
+        "distinguishing test: prompt_seeking has no antecedent (nothing was "
+        "just stated); explain_prior_answer always does (a specific number "
+        "or claim from the immediately prior turn). "
         "DO NOT use recovery for clarifying questions about results "
         "('shouldn't X be expressed as Y?', 'what does that mean?', 'can you "
         "explain that?') — those are follow-up data questions. "
@@ -604,6 +637,25 @@ def build_help_response(help_category: str, persona: dict, user_id: str,
                 "CRM data: pipeline, deals, MEDDICC health, forecast, and rep "
                 "activity. A few things you can ask:\n" + example_lines)
     return unknown_prefix + body + invite
+
+
+def build_explain_prior_answer_response(question: str, prior_answer: str,
+                                        generator_client) -> str:
+    """Re-explain a prior answer's reasoning, grounded ONLY in its rendered
+    text — never re-derives a fresh number. Explicit when the requested
+    detail (e.g. an exact per-stage multiplier) was never printed in the
+    prior answer.
+    """
+    prompt = EXPLAIN_PRIOR_ANSWER_PROMPT.format(
+        prior_answer=prior_answer, question=question)
+    resp = generator_client.complete(
+        messages=[{"role": "user", "content": prompt}],
+        system="Explain your own prior reasoning truthfully, grounded only "
+               "in the prior answer text given. Never invent a number, "
+               "rate, or intermediate value that wasn't already stated.",
+        max_tokens=400,
+    )
+    return resp.text.strip()
 
 
 # Bulk handlers that can operate on entity scopes (deal_ids from prior context)
@@ -1053,7 +1105,9 @@ Orientation vs. data questions (weigh the WHOLE message, not a prefix):
 **Scope Decision (required on every question):**
   - **prior_set**: Question refers to entities just discussed using pronouns
     ("those", "them", "the N that...", "which of those"). Scope to the prior
-    answer's population.
+    answer's population. ALSO prior_set whenever handler=explain_prior_answer
+    (asking how/why a prior figure was produced) — there are no entities to
+    scope to, but it is still anchored to the prior turn, never full_scope.
   - **new_population**: Question names a different subject not present in the
     prior answer — a person ("Cary's expansions", "how is Christian tracking"),
     a segment ("enterprise deals"), a deal type ("renewals"), or a time period
@@ -1071,6 +1125,45 @@ Conversation history (for follow-up context):
 {history}
 
 Question: {question}"""
+
+# ══════════════════════════════════════════════════════════════
+# EXPLAIN PRIOR ANSWER — re-explain, never re-derive
+# ══════════════════════════════════════════════════════════════
+# Incident (2026-10-01): "how did you come up with that number?" misrouted
+# to query_help/prompt_seeking at 0.95 confidence, returning generic
+# onboarding examples instead of explaining the $779K/0.75x coverage answer
+# just given. This handler is strictly grounded in the prior answer's
+# RENDERED TEXT — it never recomputes, never calls a data handler, and is
+# explicit when the question asks about a step that wasn't printed (e.g. an
+# exact per-stage multiplier). Honest partial explanation beats a fabricated
+# one. A FOLLOW-UP item (not built here) is generalized tool_results caching
+# so a future version can cite exact structured fields instead of prose.
+EXPLAIN_PRIOR_ANSWER_PROMPT = """The person asked a follow-up question about
+an answer you ALREADY GAVE them earlier in this conversation. They want you
+to explain HOW or WHY you arrived at it — they are NOT asking you to compute
+anything new.
+
+Your prior answer:
+{prior_answer}
+
+Their follow-up question:
+{question}
+
+Instructions:
+- Walk back through the reasoning ALREADY PRESENT in your prior answer above
+  — cite the specific numbers, stages, or steps it already stated.
+- Do NOT invent, estimate, or re-derive any number, multiplier, rate, or
+  intermediate value that is not already written in the prior answer above.
+- If the follow-up asks about a step whose exact value was never printed in
+  the prior answer (e.g. an internal per-stage multiplier, an unlisted row,
+  a rate the answer referenced but did not enumerate), say so explicitly —
+  do not guess or approximate. Example: "The exact per-stage weighting isn't
+  broken out above, just the final weighted total — I'd need to re-run the
+  query to show that step."
+- Keep it conversational and specific to what they're asking about, not a
+  generic restatement of the entire prior answer.
+
+Reply with the explanation only — no preamble like "Sure, here's..."."""
 
 VERIFY_PROMPT = """You generated this answer to a Slack
 question. Verify that every number in the answer comes
@@ -6421,8 +6514,9 @@ async def _route_question(question: str, user_id: str,
 
         original_handler = handler_name  # Track what would have won for logging
 
-        # query_help/acknowledgment misroutes are total loss - require higher confidence
-        if handler_name in ("query_help", "acknowledgment"):
+        # query_help/acknowledgment/explain_prior_answer misroutes are total
+        # loss - require higher confidence
+        if handler_name in ("query_help", "acknowledgment", "explain_prior_answer"):
             if confidence < confidence_floor_help:
                 logger.info(f"[ROUTING] confidence {confidence:.2f} < {confidence_floor_help:.2f} "
                            f"for {original_handler} — routing to dynamic instead")
@@ -6461,6 +6555,33 @@ async def _route_question(question: str, user_id: str,
                     "handler_name": "query_help",
                     "help_category": help_category,
                     "tool_results": {}}
+
+        # ── 1d. Explain prior answer (re-explain, never re-derive) ──
+        # Uses prior_answer_context captured by the scope-decision block
+        # above (params["prior_answer_context"], set when scope=prior_set
+        # with no entities). Falls back to reading the last assistant turn
+        # directly from history if the classifier set scope wrong — this
+        # handler has no meaning without SOME prior answer to explain.
+        if handler_name == "explain_prior_answer":
+            prior_answer_context = params.get("prior_answer_context")
+            if not prior_answer_context and history:
+                api_history = get_api_history(history)
+                if api_history and api_history[-1].get("role") == "assistant":
+                    prior_answer_context = api_history[-1].get("content", "")
+
+            if not prior_answer_context:
+                logger.warning("[EXPLAIN_PRIOR] handler selected but no prior "
+                               "assistant answer available in thread — "
+                               "falling back to dynamic_query")
+                handler_name = "dynamic_query"
+            else:
+                logger.info(f"[EXPLAIN_PRIOR] explaining prior answer "
+                            f"({len(prior_answer_context)} chars) user={user_id}")
+                answer = build_explain_prior_answer_response(
+                    question, prior_answer_context, generator_client)
+                return {"answer": answer,
+                        "handler_name": "explain_prior_answer",
+                        "tool_results": {}}
 
         # ── 2. Auth check ─────────────────────────────────
         if handler_name == "set_target":
