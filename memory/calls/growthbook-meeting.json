@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook Meeting",
+  "slug": "growthbook-meeting",
+  "last_etl_date": "2026-10-02T06:25:29.668742",
+  "calls": [
+    {
+      "id": "01M3SZ5H2JHRZVTRH49H9DGAFB",
+      "source": "fireflies",
+      "title": "Growthbook Meeting",
+      "date": "2026-10-01",
+      "duration_minutes": 10,
+      "summary": "# Growthbook Meeting\nDate: 2026-10-01 | Duration: 10m\n\n## Summary\nNo summary available",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

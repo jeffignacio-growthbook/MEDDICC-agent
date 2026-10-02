@@ -1,0 +1,18 @@
+{
+  "company": "Ella Candage and",
+  "slug": "ella-candage-and",
+  "last_etl_date": "2026-10-02T06:25:29.671441",
+  "calls": [
+    {
+      "id": "6abeadddd973c100140d721e",
+      "source": "apollo",
+      "title": "Ella Candage and Christian Liebenow",
+      "date": "2026-10-01",
+      "duration_minutes": 0,
+      "summary": "[Ella Candage]: Hey, Ella. Hey. How are you doing? Well, how are you? I'm doing pretty well myself. I will say beforehand to let me know if I.",
+      "host": "Christian Liebenow",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Ripple",
+  "slug": "growthbook-ripple",
+  "last_etl_date": "2026-10-02T06:25:29.668630",
+  "calls": [
+    {
+      "id": "01M3N0NGB76AVJTYPJTCH8N5W3",
+      "source": "fireflies",
+      "title": "Growthbook <> Ripple - POC Scoping",
+      "date": "2026-10-01",
+      "duration_minutes": 11.630000114440918,
+      "summary": "# Growthbook <> Ripple - POC Scoping\nDate: 2026-10-01 | Duration: 11.630000114440918m\n\n## Summary\nThe team agreed to evaluate Growth Book through a proof of concept rather than immediately committing to a full contract. VWO will remain in use for marketing because of its existing contract, cost considerations, and product analytics capabilities, while Growth Book will be tested for experimentation, feature flags, integration, and ease of use. The evaluation will cover simple marketing tests and more complex technical experiments, including Vercel connections and edge SDKs. Growth Book’s free starter account supports 3 users, 1 project, and 1 million events per month, while the Pro tier costs $40 per user per month and includes core experimentation features and a visual editor. Enterprise contracts begin around $30,000–$40,000 annually, but the team agreed that this may be premature. Calvin will clarify goals and account needs internally. The trial will assess integration ease, user experience, and experimentation robustness, while Dan remains available to support future enterprise discussions. Growth Book may eventually support consolidation if its analytics capabilities reach parity with VWO.\n\n## Keywords\nGrowth Book, Proof of Concept, Experimentation Platform, VWO Renewal, Pro Account, Feature Flags\n\n## Action Items\n\n**Calvin Jhunjhnuwala**\nDiscuss internally whether Growth Book Pro or enterprise plans make sense after team consultation (03:54)\nLead leveraging Growth Book for a proof of concept focusing on ease of integration, usability, robustness, and layered experimentation capabilities (04:10)\nProvide feedback on POC experience and potential expansion to enterprise contract dependent on proof of value and cost considerations (07:25)\n\n**Dan Wathne**\nSupport Calvin and team with starter/free and Pro account access and clarify feature availability (06:18)\nRemain available for questions and further collaboration as needed (09:59)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

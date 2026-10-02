@@ -1,0 +1,18 @@
+{
+  "company": "Hype Digital +",
+  "slug": "hype-digital",
+  "last_etl_date": "2026-10-02T06:25:29.670866",
+  "calls": [
+    {
+      "id": "01M3Q1DPB0GVBEN1QKE74DP5EY",
+      "source": "fireflies",
+      "title": "Hype Digital + GrowthBook",
+      "date": "2026-10-01",
+      "duration_minutes": 45.61000061035156,
+      "summary": "# Hype Digital + GrowthBook\nDate: 2026-10-01 | Duration: 45.61000061035156m\n\n## Summary\nGrowth Book provides warehouse-native experimentation through BigQuery, Redshift, and Snowflake, requiring initial SQL setup while giving clients strong data ownership and flexibility. Its feature flags support Boolean and JSON values, attribute-based targeting, staged rollouts, automatic rollback, and dev, staging, and production workflows. Front-end, backend, and mobile libraries enable broad implementation, while product analytics includes funnels, heatmaps, user journeys, and beta session replay. Native integrations with Content Square and Microsoft Clarity are not currently available, though warehouse imports and exports are supported. Growth Book primarily serves direct customers, with agencies such as Spiro and Mint Mines providing consulting and co-selling. Pricing is user-based at $40 per user monthly or $480 annually for Pro, with enterprise pricing above typical user caps. Agentic workflows, MCP, and a skills library can automate experimentation; Anthropic reportedly manages more than 15,000 feature flags this way. Clients are seeking cheaper, unified PPC and conversion experimentation, while agencies assess how AI may change their services. Emily planned to develop a business plan and revisit the platform the following week. Sources: 08:34, 12:14, 16:57, 26:38, 42:30.\n\n## Keywords\nfeature flags, experimentation platform, data warehouse, integrations, funnel metrics, AI agentic workflows\n\n## Action Items\n\n**Emily**\nReview GrowthBook platform details and build a business plan to evaluate integration into agency offerings (42:30)\nFollow up with GrowthBook team with further questions via email in the next week (42:30)\n\n**Christian Liebenow**\nProvide ongoing partnership and support during Emily’s evaluation period (00:00)\nConsider UI dashboard improvements feedback to prioritize visibility of key experiment metrics on homepage (36:28)\n\n**Logan Bates**\nShare detailed demos of feature flagging, experimentation, funnel metrics, and analytics capabilities with Emily and her team (20:00)\nProvide further technical clarifications and follow-up on AI tool integrations and agentic workflow capabilities if requested (25:30)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

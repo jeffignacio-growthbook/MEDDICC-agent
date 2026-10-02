@@ -1,0 +1,18 @@
+{
+  "company": "Populations",
+  "slug": "populations",
+  "last_etl_date": "2026-10-02T06:25:29.668443",
+  "calls": [
+    {
+      "id": "01M3WE6SVHBN2YW1R769KBMZEJ",
+      "source": "fireflies",
+      "title": "Populations",
+      "date": "2026-10-01",
+      "duration_minutes": 47.810001373291016,
+      "summary": "# Populations\nDate: 2026-10-01 | Duration: 47.810001373291016m\n\n## Summary\nThe initiative defines SQL-only populations for analysis, with static exports preserving exported membership. Complex AND/OR logic is replaced by ordered funnel steps, each linked to a date and supporting sequencing, delays, lookback windows, rolling populations, and metric-based filtering. “Population” is preferred over “cohort,” and saved populations are expected to include size previews, changes over time, dimension breakdowns, and Product Analytics filtering, with an “all users” default proposed. The fact-table-first MVP includes a database model, APIs, a step editor, SQL generation, previews, detail pages, and Analytics integration. SQL generation must support 12 dialects, and an array-based funnel approach may reduce repeated event-table scans. A shared Zod validator should define the front-end and back-end contract. Alli Leong will lead backend models and endpoints, while Nobu Ajito supports SQL generation; Jeremy Dorn requires close involvement in SQL design, and Alli and Nobu plan to pair after Alli reviews the codebase.\n\n## Keywords\nPopulation builder, Funnel analysis, SQL generation, Zod validation, Product Analytics, Fact tables\n\n## Action Items\n**Jeremy Dorn**\nImplement SQL generation (22:47)\nReview SQL implementation (24:53)\nShare populations mockup (26:15)\n\n**Alli Leong**\nReview populations codebase (41:30)\nPrepare pairing questions (43:48)\n\n**Nobu Ajito**\nPair with Alli Leong (43:48)\nCoordinate design mockups (44:02)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

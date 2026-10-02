@@ -1,7 +1,7 @@
 {
   "company": "Zoro + GrowthBook",
   "slug": "zoro-growthbook",
-  "last_etl_date": "2026-09-25T05:35:27.953973",
+  "last_etl_date": "2026-10-02T06:25:29.670278",
   "calls": [
     {
       "id": "01KVXF4DB3N44ZB5WM8AJ453WB",
@@ -93,6 +93,17 @@
       "summary": "# Zoro + GrowthBook\nDate: 2026-09-24 | Duration: 31.270000457763672m\n\n## Summary\nThe team chose the Growth Book native SDK for feature flag hydration because its payload method handles bootstrap rules and network calls more simply than a pure OpenFeature setup, while OpenFeature remains useful for future interface consistency. They clarified that experimentation preserves assignment-time user states, whereas product analytics generally uses the latest user property values. Joins involving multiple identifiers, such as email and cookie-based IDs, must be configured explicitly, and unit dimensions must return one record per user. Materialized views were recommended for complex joins, but scheduling and materialization must occur externally because Growth Book does not provide those capabilities. For the POC, events will flow to both Stagehand and Google Analytics, with possible future consolidation on Stagehand after data parity is achieved. Growth Book supports absolute and percentile metric capping, including percentile-based outlier handling. Logan will share hydration, caching, documentation, and AI support resources.\n\n## Keywords\nSDK hydration, Open Feature, GrowthBook SDK, AI features, analytics dimensions, metric capping\n\n## Action Items\n\n**terence**\nReview Open Feature SDK hydration approaches and share any further questions if necessary (05:13)\n\n**Logan Bates**\nSend AI chatbot documentation snippet and references to assist with SDK hydration questions (10:06)\nFollow up with GrowthBook team on product analytics query caching details and inform Jay Shelllarson (24:40)\nRemain available for support and follow-ups on analytics and experimentation inquiries via Slack post-meeting (29:50)\n\n**Jay Shelllarson**\nCoordinate internally on enabling GrowthBook AI features, ensuring legal and security agreements are aligned (11:40)\n\n**Jared Smith**\nSync with analytics team (Alien Mel) to confirm event volume impact from flowing exposure events through both Google Analytics and Stagehand (26:24)\n\n**Vahid Tayefeh**\nImplement metric capping using GrowthBook’s percentile capping method to exclude outlier users from metric calculations (28:30)\n",
       "organizer": "christian@growthbook.io",
       "participants": 13,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3CK8BJ5X1VFQGM2EVQG2MX8",
+      "source": "fireflies",
+      "title": "Zoro + GrowthBook",
+      "date": "2026-10-01",
+      "duration_minutes": 28.40999984741211,
+      "summary": "# Zoro + GrowthBook\nDate: 2026-10-01 | Duration: 28.40999984741211m\n\n## Summary\nFeature flags are active in QA, staging, and ephemeral environments, with production rollout planned for next Monday using separate development and production SDK keys. The team is evaluating whether SDK-based code-reference capture can replace GitHub actions in every repository, reducing setup and maintenance. Growth Book projects are being used to separate payloads and manage SDK keys, while the redundant “ZCOM DEV” project is planned for deletion. Terraform is being explored for feature-flag backups, safer configuration changes, traceability, and quick rollback, using third-party providers or potentially custom tooling. Jared will begin sending exposure events to RTAP and GA development tables for proof-of-concept testing, initially using a simple flat schema. Growth Book’s planned usage analytics will provide live flag-evaluation volumes, with deduplication between client and server SDKs requiring validation. The team also discussed permissions, callbacks, debugging tools, documentation sharing, and continued analyst coordination.\n\n## Keywords\nGrowthBook, Exposure Events, Code References, GitHub Actions, SDK, Analytics\n\n## Action Items\n\n**Christian Liebenow**\nShare the previous meeting’s recording and notes with the team (03:42)\n\n**Logan Bates**\nResearch and confirm the minimal GitHub Action API key permissions needed for code references (04:31)\nDiscuss internally the feasibility of using the SDK to automatically capture code references, avoiding GitHub Action deployment in every repo (06:48)\nInvestigate and provide detailed information on upcoming usage analytics UI features, including live evaluation counts, deduplication of client/server SDK events, and alignment with callback data (17:27)\nValidate if usage analytics reflect SDK evaluations accurately and whether server-side actions require additions (20:34)\nCheck for availability or plans of a first-party Terraform provider for GrowthBook, beyond the current third-party solution (24:07)\nFollow up on answers regarding GitHub Action permissions and the possibility of SDK-only code references; communicate updates to the team (27:09)\n\n**Jared Smith**\nExecute data capture setup so exposure event data flows into RTAP and GA tables starting in dev environments prior to production rollout next week (22:59)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 14,
       "summary_quality": "good"
     }
   ]

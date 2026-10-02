@@ -1,0 +1,18 @@
+{
+  "company": "Jake Brent monthly",
+  "slug": "jake-brent-monthly",
+  "last_etl_date": "2026-10-02T06:25:29.670637",
+  "calls": [
+    {
+      "id": "01M3QC1MJF03WGDFZ7V1BR3GHE",
+      "source": "fireflies",
+      "title": "Jake Brent monthly catchup",
+      "date": "2026-10-01",
+      "duration_minutes": 15,
+      "summary": "# Jake Brent monthly catchup\nDate: 2026-10-01 | Duration: 15m\n\n## Summary\nCursor has an active 500-user evaluation and requested pricing and migration details, with its VP of Engineering engaged and procurement involved. The opportunity could consolidate Statsig usage into GrowthBook under SpaceX. Strong proof points include the Grok team’s migration from Statsig to GrowthBook, supported by existing champions and viewed as feasible. The decision has stalled after more than one week without a buyer response. GrowthBook proposed $458K for 500 seats at $666 per seat plus a $125K platform fee, while Cursor requested a greater volume discount. Statsig pricing creates leverage: a prior approximately $275K contract may be revised to $500K–$800K after expanded usage. SpaceX’s increasing on-premises requirement may also weaken Statsig’s position. Next steps are to document the Grok migration timeline, customer effort, and GrowthBook-owned work, while considering platform-fee flexibility, migration support, and potentially unused Grok licenses.\n\n## Keywords\nGrowthBook, Cursor, Statsig migration, Enterprise pricing, Feature flags, On-premises deployment\n\n## Action Items\n**Jake Heier**\nCreate migration one-pager (13:36)\nContact Graham and Jeremy (15:06)\n\n**Brent Holloway**\nEvaluate Cursor opportunity (14:47)",
+      "organizer": "jake@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}
