@@ -40,6 +40,24 @@ Test groups:
     - query_waterfall's existing load_result_cache/cached_result path is
       completely untouched
 
+  LIVE (calls the real generator client — matches tests/
+  test_explain_prior_answer_routing.py's existing convention for
+  classifier-accuracy claims; requires ANTHROPIC_API_KEY/network and
+  will fail in a credential-less sandbox, same as those 3 tests do
+  today. Deliberately excluded from .github/workflows/gate-tests.yml's
+  curated script list for the same reason those 3 are — validated by
+  whatever runs with real credentials, not this offline suite or the
+  merge gate):
+    - the heuristic/real-target carry-forward instruction (test #6 of
+      the Phase 2 plan) actually holds in a REAL model's OUTPUT, not
+      just in the prompt sent to it. The offline test above
+      (test_builder_enforces_heuristic_carry_forward_instruction) only
+      confirms the instruction reaches the model via a mocked client —
+      it cannot and does not confirm a real model complies. This is
+      the 4th live-dependent test for this fix, alongside the original
+      3 from PR #113's explain_prior_answer routing work — NOT folded
+      into the offline/deterministic count above.
+
   NOT AUTOMATED HERE (task item 10): the full live re-ask — "how did you
   come up with the $795K / the per-stage multipliers" against a REAL
   prior Slack turn with a REAL result_cache row — needs an actual Slack
@@ -509,8 +527,52 @@ def test_waterfall_cache_payload_still_gated_by_row_count_or_dict_logic():
     print("  ✓ list-shaped payloads (query_waterfall's existing shape) still persist")
 
 
+# ══════════════════════════════════════════════════════════════
+# LIVE — real generator call. See module docstring: the offline test
+# above (test_builder_enforces_heuristic_carry_forward_instruction) only
+# confirms the instruction reaches the model via a mock; it cannot
+# confirm a real model complies. This is the 4th live-dependent test for
+# this fix (alongside the 3 in test_explain_prior_answer_routing.py),
+# excluded from gate-tests.yml's curated list for the same reason those
+# are, and expected to fail here (no ANTHROPIC_API_KEY in this sandbox).
+# ══════════════════════════════════════════════════════════════
+
+HEURISTIC_FOLLOWUP_QUESTION = (
+    "what's that historical curve you compare against, and is the "
+    "$1,000,000 figure for FY2026 Q2 a real quota?"
+)
+
+
+def test_live_heuristic_carry_forward_holds_in_real_model_output():
+    """
+    Phase 2 plan item #6. PRIOR_ANSWER_FIXTURE's prose never mentions the
+    historical curve at all — the only way the model can answer this
+    follow-up is by citing historical_heuristic_curve from cached_fields.
+    The real output must then still call it a heuristic/proxy, not
+    present prior_year_actual/proxy_targets as if they were a real quota.
+    """
+    print("\n[TEST] LIVE: heuristic carry-forward holds in a real model's output")
+    from llm_client import LLMClient
+
+    client = LLMClient.from_config(role="generator")
+    result = build_explain_prior_answer_response(
+        HEURISTIC_FOLLOWUP_QUESTION, PRIOR_ANSWER_FIXTURE, client,
+        cached_fields=dict(PIPELINE_COVERAGE_FIXTURE))
+
+    print(f"  model output: {result[:300]}")
+    lowered = result.lower()
+    assert "heuristic" in lowered or "proxy" in lowered, (
+        f"REGRESSION: real model output cited historical_heuristic_curve "
+        f"without calling it a heuristic/proxy — got: {result!r}")
+    assert "real quota" not in lowered and "actual quota" not in lowered, (
+        f"REGRESSION: real model output presented the heuristic curve's "
+        f"figure as if it were a real/actual quota — got: {result!r}")
+    print("  ✓ real model output labels the cited curve a heuristic/proxy, "
+          "never presents it as a real quota")
+
+
 def main():
-    tests = [
+    offline_tests = [
         test_pipeline_coverage_handler_sets_full_cache_payload,
         test_pipeline_coverage_handler_no_cache_payload_on_error,
         test_rep_attainment_handler_sets_full_cache_payload_normal_path,
@@ -530,6 +592,10 @@ def main():
         test_load_result_cache_contract_unchanged,
         test_waterfall_cache_payload_still_gated_by_row_count_or_dict_logic,
     ]
+    live_tests = [
+        test_live_heuristic_carry_forward_holds_in_real_model_output,
+    ]
+    tests = offline_tests + live_tests
     failed = []
     for t in tests:
         try:
@@ -542,7 +608,8 @@ def main():
     print("TEST SUMMARY")
     print("=" * 70)
     passed = len(tests) - len(failed)
-    print(f"\nTotal tests: {len(tests)}")
+    print(f"\nTotal tests: {len(tests)} ({len(offline_tests)} offline, "
+          f"{len(live_tests)} live)")
     print(f"  ✓ Passed: {passed}")
     if failed:
         print(f"  ✗ Failed: {len(failed)}")
