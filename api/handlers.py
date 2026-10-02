@@ -1239,6 +1239,29 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
     # is safe to cache verbatim, no field exclusions. Never reaches
     # synthesis (MODEL_HIDDEN_KEYS strips cache_payload generically).
     if result.get("status") == "ok":
+        # Annotate by_stage_order's integer keys with display names before
+        # caching — citation output was showing raw stage_order ints
+        # (0, 1, 2...) instead of names like other answers. Additive only:
+        # the existing integer keys stay, "stage_name" is a new sibling
+        # field in each stage's own row, nothing is removed or renamed.
+        try:
+            from utils import get_sales_stage_names_by_order
+            names_by_order = get_sales_stage_names_by_order()
+            by_stage_order = (result.get("stage_weighting") or {}).get("by_stage_order") or {}
+            for stage_order, stage_row in by_stage_order.items():
+                if not isinstance(stage_row, dict):
+                    continue
+                name = names_by_order.get(stage_order)
+                if name is None:
+                    try:
+                        name = names_by_order.get(int(stage_order))
+                    except (TypeError, ValueError):
+                        name = None
+                stage_row["stage_name"] = name or f"stage {stage_order}"
+        except Exception as e:
+            logger.warning(f"[PIPELINE_COVERAGE] Failed to annotate stage "
+                          f"names for citation: {e}")
+
         result["cache_payload"] = dict(result)
 
     return result
