@@ -1215,6 +1215,12 @@ Instructions:
   answer's prose — they are the real internal numbers that produced it.
   Quote them exactly as given. Do NOT recompute, re-derive, or adjust any
   of them.
+- A per-stage entry keyed by a raw numeric stage order (e.g. "1", "3")
+  may carry its own "stage_name" field (e.g. "Discovery", "Technical
+  Evaluation") — if present, refer to that stage BY NAME, never by its
+  bare numeric key. The number is this primitive's internal
+  representation, not something a person asking about stages would
+  recognize.
 - CRITICAL: if any cached field you cite is labeled HEURISTIC, or comes
   from a field named historical_heuristic_curve or similar, you MUST
   describe it as a heuristic / proxy projection in your explanation — never

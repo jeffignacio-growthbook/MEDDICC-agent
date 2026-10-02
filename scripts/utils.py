@@ -67,6 +67,58 @@ def get_stage_order(stage_id: str, pipeline_config: Optional[Dict] = None) -> Op
     return None
 
 
+def get_sales_stage_names_by_order(pipeline_config: Optional[Dict] = None) -> Dict[int, str]:
+    """
+    {stage order: display name}, scoped to non-renewal pipelines only.
+
+    order is NOT globally unique across pipelines — e.g. in
+    config/client.yaml, order=3 is "Technical Evaluation" in the Sales
+    pipeline but "Contract Sent" in the Renewal pipeline. A single global
+    {order: name} map built from every pipeline would silently mislabel
+    whichever pipeline didn't win the key collision. This map is scoped
+    the same way forecast_analyses.query_stage_close_rate() scopes its
+    OWN by_stage_order output — New+Expansion only, renewal pipeline
+    excluded (scripts/analytics/forecast_analyses.py, the
+    `if str(r.get('pipeline_id')) == _RENEWAL_PIPELINE_ID: continue`
+    check) — so it is only safe to resolve names for THAT function's
+    output (e.g. assess_pipeline_coverage()'s stage_weighting.
+    by_stage_order), never for an arbitrary stage_order value from
+    somewhere else. No shared filter FUNCTION exists to call into (the
+    other site is a single inline equality, not an extractable unit) —
+    this duplicates that one condition against the same _RENEWAL_
+    PIPELINE_ID constant (not a re-hardcoded ID string) specifically so
+    a future change to the renewal pipeline ID only needs updating in
+    one place. If query_stage_close_rate()'s own INCLUSION rule ever
+    changes to something other than "exclude the renewal pipeline",
+    this must change with it.
+
+    Args:
+        pipeline_config: Optional pre-loaded pipeline config dict
+            (get_pipeline_config()'s own shape). Loaded if not provided.
+
+    Returns:
+        {order: name}. Within the included (non-renewal) pipelines, order
+        values do not collide — the exclusion above is what guarantees
+        that, not an assumption about how many pipelines exist.
+    """
+    from field_semantics import _RENEWAL_PIPELINE_ID
+
+    if pipeline_config is None:
+        pipeline_config = get_pipeline_config()
+
+    names_by_order: Dict[int, str] = {}
+    for pipeline in pipeline_config.get('pipelines', []):
+        if str(pipeline.get('id')) == _RENEWAL_PIPELINE_ID:
+            continue
+        for stage in pipeline.get('stages', []):
+            order = stage.get('order')
+            name = stage.get('name')
+            if order is not None and name is not None:
+                names_by_order[order] = name
+
+    return names_by_order
+
+
 def get_value_field(pipeline_config: Optional[Dict] = None):
     """
     Get the deal value field configuration (string or dict).

@@ -18,6 +18,7 @@ spec.loader.exec_module(fiscal_utils)
 load_client_config = fiscal_utils.load_client_config
 get_pipeline_config = fiscal_utils.get_pipeline_config
 get_stage_order = fiscal_utils.get_stage_order
+get_sales_stage_names_by_order = fiscal_utils.get_sales_stage_names_by_order
 get_value_field = fiscal_utils.get_value_field
 get_value_properties = fiscal_utils.get_value_properties
 compute_deal_value = fiscal_utils.compute_deal_value
@@ -32,6 +33,7 @@ __all__ = [
     'load_client_config',
     'get_pipeline_config',
     'get_stage_order',
+    'get_sales_stage_names_by_order',
     'get_value_field',
     'get_value_properties',
     'compute_deal_value',
