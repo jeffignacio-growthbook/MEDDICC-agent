@@ -639,21 +639,62 @@ def build_help_response(help_category: str, persona: dict, user_id: str,
     return unknown_prefix + body + invite
 
 
+def _cache_matches_prior_turn(cache_hit: Optional[dict],
+                              prior_question: Optional[str]) -> bool:
+    """True if a load_result_cache_with_meta() hit actually corresponds to
+    the prior turn being explained, not a different, still-live-TTL turn's
+    cache sitting in the same thread. load_result_cache_with_meta's "most
+    recent for this thread" lookup has no handler/question awareness on its
+    own — this is the check that makes citing it safe.
+
+    question is stored truncated to 500 chars by save_result_cache(); the
+    comparison truncates prior_question the same way, or a long question
+    would never match its own cache."""
+    if not cache_hit or prior_question is None:
+        return False
+    return cache_hit.get("question") == prior_question[:500]
+
+
+def _format_cached_fields_section(cached_fields: Optional[dict]) -> str:
+    """Render cached structured computation fields as a citation-only block
+    for the explain-prior-answer prompt. Empty string when no cache is
+    available — the prompt degrades to its original prose-only behavior."""
+    if not cached_fields:
+        return ""
+    import json
+    return (
+        "\nCached computation details (the exact internal fields that "
+        "produced the prior answer — quote these verbatim when relevant, "
+        "never recompute from them):\n"
+        f"{json.dumps(cached_fields, indent=2, default=str)}\n"
+    )
+
+
 def build_explain_prior_answer_response(question: str, prior_answer: str,
-                                        generator_client) -> str:
-    """Re-explain a prior answer's reasoning, grounded ONLY in its rendered
-    text — never re-derives a fresh number. Explicit when the requested
-    detail (e.g. an exact per-stage multiplier) was never printed in the
-    prior answer.
+                                        generator_client,
+                                        cached_fields: Optional[dict] = None) -> str:
+    """Re-explain a prior answer's reasoning, grounded in its rendered text
+    plus (when available) the cached structured fields that actually
+    produced it — never re-derives a fresh number from either. Explicit
+    when the requested detail is in neither source.
+
+    cached_fields: the handler's own cache_payload (query_pipeline_coverage,
+    query_rep_attainment — see MODEL_HIDDEN_KEYS), fetched and correlated to
+    the prior turn by the caller. None when no live, matching cache exists;
+    the prompt then behaves exactly as it did before this field existed.
     """
     prompt = EXPLAIN_PRIOR_ANSWER_PROMPT.format(
-        prior_answer=prior_answer, question=question)
+        prior_answer=prior_answer, question=question,
+        cached_fields_section=_format_cached_fields_section(cached_fields))
     resp = generator_client.complete(
         messages=[{"role": "user", "content": prompt}],
         system="Explain your own prior reasoning truthfully, grounded only "
-               "in the prior answer text given. Never invent a number, "
-               "rate, or intermediate value that wasn't already stated.",
-        max_tokens=400,
+               "in the prior answer text and any cached computation "
+               "details given. Never invent a number, rate, or "
+               "intermediate value that wasn't already stated or cached. "
+               "Always label a heuristic or proxy figure as a heuristic, "
+               "never as a real target or measured result.",
+        max_tokens=500,
     )
     return resp.text.strip()
 
@@ -1135,9 +1176,25 @@ Question: {question}"""
 # just given. This handler is strictly grounded in the prior answer's
 # RENDERED TEXT — it never recomputes, never calls a data handler, and is
 # explicit when the question asks about a step that wasn't printed (e.g. an
-# exact per-stage multiplier). Honest partial explanation beats a fabricated
-# one. A FOLLOW-UP item (not built here) is generalized tool_results caching
-# so a future version can cite exact structured fields instead of prose.
+# exact per-stage multiplier).
+#
+# Phase 2 (same incident, follow-up): the live test above still hit a wall
+# on "the exact per-stage multipliers aren't printed ... I'd need to re-run
+# the query" — the data existed in query_pipeline_coverage's tool_results
+# when it ran, but was never persisted. query_pipeline_coverage and
+# query_rep_attainment now opt into cache_payload (same pattern
+# query_waterfall already used, see MODEL_HIDDEN_KEYS) so their full
+# structured result survives past the turn that produced it.
+# {cached_fields_section} below is that structured data, spliced in as
+# CITATION-ONLY material — quote it, never recompute from it. This is
+# deliberately NOT the same consumption mode as load_result_cache's
+# existing "cached_result" follow-up path (which swaps the cache in as a
+# fresh tool_results and runs full synthesis against it — appropriate for
+# "which of those are at risk", wrong here, since re-synthesizing from the
+# same underlying data risks producing a SECOND, different number for the
+# SAME already-stated figure, exactly the contradiction this handler exists
+# to avoid). Honest partial explanation beats a fabricated one, whether or
+# not cached fields are available.
 EXPLAIN_PRIOR_ANSWER_PROMPT = """The person asked a follow-up question about
 an answer you ALREADY GAVE them earlier in this conversation. They want you
 to explain HOW or WHY you arrived at it — they are NOT asking you to compute
@@ -1145,21 +1202,36 @@ anything new.
 
 Your prior answer:
 {prior_answer}
-
+{cached_fields_section}
 Their follow-up question:
 {question}
 
 Instructions:
 - Walk back through the reasoning ALREADY PRESENT in your prior answer above
   — cite the specific numbers, stages, or steps it already stated.
+- If a "Cached computation details" section appears above, you MAY cite
+  exact figures from it (e.g. a per-stage win rate, a renewal-pipeline
+  value) even when those exact figures were not printed in the prior
+  answer's prose — they are the real internal numbers that produced it.
+  Quote them exactly as given. Do NOT recompute, re-derive, or adjust any
+  of them.
+- CRITICAL: if any cached field you cite is labeled HEURISTIC, or comes
+  from a field named historical_heuristic_curve or similar, you MUST
+  describe it as a heuristic / proxy projection in your explanation — never
+  present it as the real quota, the real historical target, or a measured
+  figure. This rule applies even though you are only quoting a cached
+  number, not computing a new one — citing a heuristic without calling it
+  one is exactly as misleading as fabricating it outright.
 - Do NOT invent, estimate, or re-derive any number, multiplier, rate, or
-  intermediate value that is not already written in the prior answer above.
-- If the follow-up asks about a step whose exact value was never printed in
-  the prior answer (e.g. an internal per-stage multiplier, an unlisted row,
-  a rate the answer referenced but did not enumerate), say so explicitly —
-  do not guess or approximate. Example: "The exact per-stage weighting isn't
-  broken out above, just the final weighted total — I'd need to re-run the
-  query to show that step."
+  intermediate value that is not already written in the prior answer OR the
+  cached computation details above.
+- If the follow-up asks about a step whose exact value is not in EITHER the
+  prior answer or the cached computation details (e.g. an internal per-stage
+  multiplier, an unlisted row, a rate the answer referenced but did not
+  enumerate, and no cache is available), say so explicitly — do not guess
+  or approximate. Example: "The exact per-stage weighting isn't broken out
+  above, just the final weighted total — I'd need to re-run the query to
+  show that step."
 - Keep it conversational and specific to what they're asking about, not a
   generic restatement of the entire prior answer.
 
@@ -6564,10 +6636,14 @@ async def _route_question(question: str, user_id: str,
         # handler has no meaning without SOME prior answer to explain.
         if handler_name == "explain_prior_answer":
             prior_answer_context = params.get("prior_answer_context")
-            if not prior_answer_context and history:
+            prior_question = None
+            if history:
                 api_history = get_api_history(history)
                 if api_history and api_history[-1].get("role") == "assistant":
-                    prior_answer_context = api_history[-1].get("content", "")
+                    if not prior_answer_context:
+                        prior_answer_context = api_history[-1].get("content", "")
+                    if len(api_history) >= 2:
+                        prior_question = api_history[-2].get("content")
 
             if not prior_answer_context:
                 logger.warning("[EXPLAIN_PRIOR] handler selected but no prior "
@@ -6575,10 +6651,37 @@ async def _route_question(question: str, user_id: str,
                                "falling back to dynamic_query")
                 handler_name = "dynamic_query"
             else:
+                # Citation-only cache fetch (Phase 2, 2026-10-02): NOT the
+                # same consumption mode as the cached_result follow-up path
+                # above (which swaps the cache in as a fresh tool_results
+                # and runs full synthesis against it). Correlate against
+                # the prior turn's own question before trusting the cache —
+                # load_result_cache_with_meta's "most recent for this
+                # thread" lookup has no handler/question awareness, so an
+                # unrelated still-live-TTL turn's cache must not get cited
+                # as if it explained THIS prior answer. question is stored
+                # truncated to 500 chars (save_result_cache) — truncate the
+                # same way before comparing.
+                cached_fields = None
+                if thread_ts:
+                    from api.db import load_result_cache_with_meta
+                    cache_hit = load_result_cache_with_meta(sb, thread_ts)
+                    if _cache_matches_prior_turn(cache_hit, prior_question):
+                        cached_fields = cache_hit.get("payload")
+                        logger.info(f"[EXPLAIN_PRIOR] cache hit (handler="
+                                   f"{cache_hit.get('handler_name')}) — citing "
+                                   f"structured fields alongside prose")
+                    elif cache_hit:
+                        logger.info("[EXPLAIN_PRIOR] cache present but question "
+                                   "mismatch (different turn) — prose-only, not citing")
+                    else:
+                        logger.info("[EXPLAIN_PRIOR] no live cache for thread — prose-only")
+
                 logger.info(f"[EXPLAIN_PRIOR] explaining prior answer "
                             f"({len(prior_answer_context)} chars) user={user_id}")
                 answer = build_explain_prior_answer_response(
-                    question, prior_answer_context, generator_client)
+                    question, prior_answer_context, generator_client,
+                    cached_fields=cached_fields)
                 return {"answer": answer,
                         "handler_name": "explain_prior_answer",
                         "tool_results": {}}

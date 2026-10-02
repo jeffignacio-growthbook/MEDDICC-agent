@@ -1225,13 +1225,23 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
     fiscal_quarter = params.get("fiscal_quarter")
 
     try:
-        return assess_pipeline_coverage(sb, as_of=as_of, fiscal_quarter=fiscal_quarter)
+        result = assess_pipeline_coverage(sb, as_of=as_of, fiscal_quarter=fiscal_quarter)
     except Exception as e:
         logger.error(f"[PIPELINE_COVERAGE] Failed to assess pipeline coverage: {e}")
         return {
             "error": f"Failed to assess pipeline coverage: {e}",
             "status": "error",
         }
+
+    # explain_prior_answer citation support: this primitive is aggregate-
+    # only by construction (no per-deal row ever appears in its output —
+    # qualified_pipeline is a sum, never a deal list), so the entire result
+    # is safe to cache verbatim, no field exclusions. Never reaches
+    # synthesis (MODEL_HIDDEN_KEYS strips cache_payload generically).
+    if result.get("status") == "ok":
+        result["cache_payload"] = dict(result)
+
+    return result
 
 
 async def query_loss_concentration(params: dict, sb) -> dict:
@@ -3427,7 +3437,7 @@ async def query_rep_attainment(params: dict, sb) -> dict:
 
     # If no targets found, return data gap
     if not targets_by_email:
-        return {
+        _result = {
             "period": period,
             "reps": [],
             "team_summary": {
@@ -3441,6 +3451,11 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             },
             "note": "AE quotas not set — run seed_rep_targets.py or ask Ryan to set quotas for this period"
         }
+        # explain_prior_answer citation support — see the normal-path return
+        # below for the full rationale; this data-gap shape is just as
+        # citable ("why does it say 0 attainment" needs this note).
+        _result["cache_payload"] = dict(_result)
+        return _result
 
     # Load won deals in time window - use INCREMENTAL ARR basis (new_arr + expansion_arr)
     # NOT deal_value (which includes renewals) - must match quota basis
@@ -3568,7 +3583,7 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     team_stretch_attainment = rate_or_gap(total_won, total_stretch if total_stretch > 0 else None)
     team_combined_attainment = rate_or_gap(total_won, total_combined if total_combined > 0 else None)
 
-    return {
+    result = {
         "period": period,
         "reps": reps,
         "team_summary": {
@@ -3583,6 +3598,14 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             "reps_above_100pct": reps_above_100
         }
     }
+    # explain_prior_answer citation support: like query_pipeline_coverage,
+    # this result is aggregate-only by construction — reps[] is bounded by
+    # team size (~6-8), never per-deal rows (won_rows/target_rows are
+    # aggregated away above, never returned). Safe to cache verbatim, no
+    # field exclusions. Never reaches synthesis (MODEL_HIDDEN_KEYS strips
+    # cache_payload generically).
+    result["cache_payload"] = dict(result)
+    return result
 
 
 async def query_deal_health(params: dict, sb) -> dict:
