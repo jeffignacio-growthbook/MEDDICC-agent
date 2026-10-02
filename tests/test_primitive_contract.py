@@ -367,6 +367,20 @@ KNOWN_FLAGGED_LOG_TAGS = {
     # mismatch etc.) so this tag is not found by the scan. No entry needed;
     # reviewed here for completeness: all four sites are DB failure recovery
     # paths (feedback skipped, promotion skipped) — no detect-and-ship gap.
+    #
+    # [EXPLAIN_PRIOR] (api/router.py), added 2026-10-02 (explain_prior_answer
+    # Phase 2, citation-only caching): "cache present but question mismatch
+    # (different turn) — prose-only, not citing". Same category as
+    # [ENTITY_SCOPE]'s entry above — a cache-correlation check that
+    # self-corrects immediately and deterministically: when
+    # _cache_matches_prior_turn() finds the live result_cache row belongs to
+    # a different turn than the one prior_answer_context came from, the
+    # code does NOT cite the mismatched cached fields (cached_fields stays
+    # None) and falls through to the already-reviewed prose-only behavior
+    # (PR #113). There is no detect-and-ship-the-wrong-citation path: the
+    # mismatch is exactly what prevents a citation, not something shipped
+    # despite being detected.
+    "[EXPLAIN_PRIOR]",
 }
 
 

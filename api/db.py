@@ -379,8 +379,19 @@ def save_result_cache(sb: Client, thread_ts: str, handler_name: str,
     Store a full result payload for later retrieval.
     Returns the result_key, or None if nothing worth caching.
 
-    Only caches when payload actually contains row data —
-    don't fill the table with empty aggregates.
+    Only caches a genuinely non-empty payload — the handler itself is the
+    real gate (it only sets cache_payload when there's something worth
+    reusing), so this just rejects a literal {}.
+
+    2026-10-02: previously rejected any payload with row_count == 0 (no
+    list-valued keys), which silently dropped query_pipeline_coverage's and
+    query_rep_attainment's cache_payload — both are aggregate-only dicts
+    (stage_weighting, real_target, gap_to_goal, team_summary...), never a
+    per-deal list. That gate was tuned for query_waterfall's shape
+    (cache_payload = {"deals": [...]}) and incidentally defeated any
+    dict-shaped aggregate result — looking like it worked while never
+    persisting. row_count is still computed for telemetry (list rows,
+    where present), it's just no longer the sole cache-worthiness test.
 
     IMPORTANT: Uses timedelta for expiry, NOT modular arithmetic.
     Prior bug: now.replace(hour=(now.hour+24)%24) is no-op at hour 23.
@@ -388,14 +399,14 @@ def save_result_cache(sb: Client, thread_ts: str, handler_name: str,
     import logging
     logger = logging.getLogger(__name__)
 
-    # Count rows across all list-valued keys
+    if not payload:
+        return None
+
+    # Count rows across all list-valued keys (telemetry only, not a gate)
     row_count = 0
     for v in payload.values():
         if isinstance(v, list):
             row_count += len(v)
-
-    if row_count == 0:
-        return None
 
     key = make_result_key(thread_ts, handler_name, question)
     # CORRECT expiry computation using timedelta
@@ -451,6 +462,51 @@ def load_result_cache(sb: Client, thread_ts: str) -> dict | None:
 
     except Exception as e:
         logger.error(f"[CACHE] load failed: {e}")
+        return None
+
+
+def load_result_cache_with_meta(sb: Client, thread_ts: str) -> dict | None:
+    """
+    Like load_result_cache(), but also returns handler_name and the
+    original (500-char-truncated) question the cached payload was stored
+    under. load_result_cache() itself is untouched and keeps its existing
+    consumer (the cached_result follow-up path) exactly as before — this
+    is a separate function for explain_prior_answer's citation-only
+    consumption, which needs to confirm the cache actually corresponds to
+    the prior turn it's explaining, not a different, still-live-TTL turn's
+    cache (load_result_cache's own "most recent for this thread" lookup has
+    no handler/question awareness — fine for its own use case, wrong to
+    reuse blindly here without that check).
+
+    Returns {"handler_name": str, "question": str, "payload": dict}, or
+    None if no live cache exists for the thread.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    try:
+        now_iso = datetime.now(timezone.utc).isoformat()
+
+        result = sb.table("result_cache")\
+            .select("result_key,handler_name,question,payload,row_count,created_at,expires_at")\
+            .eq("thread_ts", thread_ts)\
+            .gt("expires_at", now_iso)\
+            .order("created_at", desc=True)\
+            .limit(1)\
+            .execute()
+
+        if not result.data:
+            return None
+
+        hit = result.data[0]
+        return {
+            "handler_name": hit.get("handler_name"),
+            "question": hit.get("question"),
+            "payload": unpack_jsonb(hit.get("payload")),
+        }
+
+    except Exception as e:
+        logger.error(f"[CACHE] load_with_meta failed: {e}")
         return None
 
 
