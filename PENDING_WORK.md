@@ -5,6 +5,23 @@
 
 ---
 
+### 🔵 ROADMAP (deliberately scoped out, not an oversight): consolidate the three remaining "QTD closed-won" implementations onto the canonical definition (logged 2026-10-03)
+
+Config-driven pipeline coverage (denominator = remaining gap, `quota - qtd_won`) generalized `scripts/analytics/forecast_analyses.py::actual_incremental_closed_won` to the single definition `deal_status == "won" and is_incremental_pipeline(deal)` (dollar-based renewal test: `new_arr > 0 or expansion_arr > 0`, pipeline_id-agnostic). A shared-fixture reconciliation test (`tests/test_coverage_qtd_reconciliation.py`) proved this now agrees with two of the other three "QTD won" computations in the codebase:
+
+- `api/handlers.py::query_path_to_target` — own inline copy of the same definition (agrees).
+- `scripts/loss_concentration.py::assess_loss_concentration`'s `won_incremental_arr` — own inline copy of the same definition (agrees).
+- `api/handlers.py::query_rep_attainment` — a **different**, hybrid definition (`deal_status == "won"` + pipeline_id-based renewal exclusion, not `is_incremental_pipeline()`). Confirmed divergent on the shared fixture: **$175,000 vs. $225,000** for the other three. Left untouched — out of scope for this PR.
+
+Per explicit instruction, this PR does **not** remove `query_path_to_target`'s inline copy or `assess_loss_concentration`'s copy, even though both are now textually identical to `actual_incremental_closed_won` — keeping the PR reviewable. Still to do, as its own scoped change:
+- Replace the two now-redundant inline copies with calls to `actual_incremental_closed_won` (or a shared helper), so there is exactly one implementation of "QTD incremental closed-won" instead of three.
+
+**UPDATE 2026-10-03 (pre-merge checks on #118): `query_rep_attainment` confirmed BOTH BUGS, not an intentional difference.** Decision recorded: the $1.55M target INCLUDES renewal expansion, so `query_rep_attainment`'s pipeline_id-based renewal exclusion should match the other three, not diverge from them — not a legitimate alternate definition. A second, independent bug was found in the same investigation: `query_rep_attainment`'s `if owner:` guard silently drops any won deal with a missing/unmapped `owner_email` from `team_summary.closed_won_qtd` itself — the **team total**, not just per-rep attribution. On an extended fixture (the three deals above plus one won, real-ARR deal with `owner_email=None`), the gap was **$110,000**: $50,000 from the renewal-pipeline exclusion (confirmed above) + $60,000 from the dropped unowned deal. Also confirmed: `query_rep_attainment` ignores `config/client.yaml`'s `quota_roles` (`ae→new_arr`, `am→expansion_arr`) entirely — it hardcodes `role="ae"` in its target query and sums `new_arr + expansion_arr` for every rep regardless of role, so a seeded `role="am"` quota would never be fetched and AM wins would be invisible from attainment answers.
+
+Fix scheduled as its own PR (the "attainment PR"): reconcile `query_rep_attainment`'s won-ARR definition onto `actual_incremental_closed_won`/`is_incremental_pipeline()`, decide how an unowned won deal should be handled (count toward the team total while excluded from per-rep attribution, most likely — needs a product call, not just a code fix), and either honor `quota_roles` per-role or document why role is hardcoded to `ae`.
+
+---
+
 ## ✅ FIXED 2026-09-26: waterfall "new pipeline generated" silently read $0 for 7 weeks — `qualified_date` frozen, no live maintainer
 
 **The bug (high-severity):** Slack "how much pipeline did we generate this week" returned **$0 for 7 straight weeks** (Aug 17–Sep 21 2026), with an actionable-sounding "review SDR metrics" recommendation — while **58 deals / ~$5.74M** had actually crossed into qualified pipeline. Independently re-derived from `deals_snapshot` stage history: wk 8/17 $558,750 (10) · 8/24 $1,507,500 (12) · 9/07 $940,000 (12) · 9/14 $1,510,671 (11) · 9/21 $1,220,000 (13).

@@ -75,7 +75,15 @@ PRIMITIVE_ORDER = ("query_forecast_trust", "query_pipeline", "query_pipeline_cov
 VERDICT_EXCLUDED = {
     "query_forecast_trust": ("historical", "calibration_evidence", "note", "stability",
                              "directional_caveat"),
-    "query_pipeline_coverage": ("historical_heuristic_curve", "gap_to_goal", "real_target", "note"),
+    # 2026-10-03: gap_to_goal replaced by coverage/qtd_won (config-driven,
+    # remaining-gap coverage) — same reasoning, still dropped: this view
+    # already computes its own independent remaining-gap figure
+    # (_qtd_figures/coverage_figures, below) from a DIFFERENT QTD-won
+    # source (query_loss_concentration.won_incremental_arr, not
+    # actual_incremental_closed_won) — pipeline_coverage's own competing
+    # coverage/remaining-gap figure must not leak into this composed view.
+    "query_pipeline_coverage": ("historical_heuristic_curve", "coverage", "qtd_won",
+                               "real_target", "note"),
     # Written for a standalone pipeline answer: "COVERAGE: 3.38x" (the
     # unweighted ratio this view drops) and stage-breakdown/top-deal rules.
     # Its definitional rule (the total is current state, not this quarter's)

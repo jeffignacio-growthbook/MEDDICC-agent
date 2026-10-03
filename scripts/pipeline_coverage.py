@@ -40,11 +40,10 @@ composition, per Jeff's explicit domain specification:
      this curve is a HEURISTIC (2x prior-year-same-quarter actual proxy),
      permanently labeled as such, never presented as a real historical
      calibration. See that function's docstring for the full evidence
-     picture (a permanent structural ceiling, not a fixable gap).
-  5. GAP-TO-GOAL, never a bare ratio: every pipeline-vs-target comparison
-     in this primitive's output is phrased "$X short of target" / "$X
-     over target".
-  6. THE GOAL for the CURRENT quarter (FY2027 Q3) = the team quota
+     picture (a permanent structural ceiling, not a fixable gap). Still
+     computed and cached (cache_payload, for explain_prior_answer
+     citation) but no longer in the rendered answer — see 7.
+  5. THE GOAL for the CURRENT quarter (FY2027 Q3) = the team quota
      (rep_targets team-level target, $1.55M). This is the minimum
      committed target the team is measured against.
      Stretch ($2.1M, config/targets.yaml) is Ryan's personal
@@ -52,11 +51,39 @@ composition, per Jeff's explicit domain specification:
      quota, and is reported separately as context, never summed
      into goal. The quota (team_total) is read from the live
      rep_targets table, matching query_pipeline()'s own precedent.
+  6. CONFIG-DRIVEN COVERAGE, denominator = the REMAINING gap (2026-10-03):
+     coverage is never computed against the bare quota — it is always
+     against quota minus QTD closed-won (the remaining commitment),
+     matching query_path_to_target's own "how much more do we need"
+     framing. Two ratios are reported against that same remaining gap:
+     nominal (qualified_pipeline.raw_value) and weighted
+     (stage_weighting.weighted_value). QTD closed-won reuses
+     forecast_analyses.actual_incremental_closed_won() (made public and
+     generalized the same day — see that function's own docstring for the
+     three-way reconciliation that preceded the change) rather than a
+     fourth, new copy of "closed-won incremental ARR in a window".
+     Edge cases, all graceful, never fabricated: quota already met
+     (QTD won >= quota) reports that fact, no ratio (division by a
+     non-positive remaining gap is meaningless); zero QTD won needs no
+     special case (remaining gap is simply the full quota); missing quota
+     propagates None through remaining_gap/both ratios/ahead_behind,
+     same discipline the old gap_to_goal null-propagation used.
+  7. EXPECTED MULTIPLE AND PHASE are config/client.yaml-driven
+     (coverage.expected_multiple_schedule, coverage.phase_boundaries —
+     scripts/utils.py::get_coverage_config()). No schedule configured for
+     the current week means no ahead/behind judgment — never inferred
+     from the HEURISTIC historical curve, which is a permanently
+     evidence-ceilinged proxy, not a real per-week expectation. "phase"
+     (early/mid/late) is reported unconditionally (it only needs
+     current_week, not the schedule) so synthesis guidance can be
+     phase-aware even when no expected multiple exists for the week.
 
 CRITICAL, non-negotiable distinction (never blended, per explicit
 instruction): the HISTORICAL curve is a HEURISTIC (proxy-calibrated,
-labeled as such everywhere it appears). The CURRENT-quarter real_target
-(quota) is NEVER a heuristic — it is the actual stated goal.
+labeled as such everywhere it appears, never shown in the rendered
+answer — see api/handlers.py::query_pipeline_coverage). The CURRENT-
+quarter real_target (quota) and the remaining-gap coverage ratios are
+NEVER heuristics — they are real, measured figures.
 
 Read-only. No writes.
 """
@@ -77,17 +104,104 @@ from api.incremental_arr import incremental_arr  # the one Incremental ARR defin
 logger = logging.getLogger(__name__)
 
 
-def _gap_to_goal(value: Optional[float], goal: Optional[float]) -> Optional[Dict[str, Any]]:
-    """Always gap-to-goal phrasing, never a bare ratio. None if either
-    input is unavailable (never fabricate a comparison)."""
-    if value is None or goal is None:
+def _coverage_phase(current_week: int, phase_boundaries: Dict[str, int]) -> str:
+    """early/mid/late from config/client.yaml's coverage.phase_boundaries
+    (scripts/utils.py::get_coverage_config) — needs only current_week, so
+    this is always reported, even when no expected_multiple_schedule
+    exists for the week."""
+    if current_week <= phase_boundaries["early_through_week"]:
+        return "early"
+    if current_week >= phase_boundaries["late_from_week"]:
+        return "late"
+    return "mid"
+
+
+def _coverage_equation(value: Optional[float], remaining_gap: Optional[float],
+                       value_label: str) -> Optional[str]:
+    """'$value value_label / $remaining_gap remaining = N.NNx' — every
+    number states its basis. None if either operand is unavailable
+    (never fabricate a ratio) or remaining_gap isn't positive (quota
+    already met — no ratio makes sense against a zero-or-negative
+    remaining commitment; see the caller's quota_met handling)."""
+    if value is None or not remaining_gap or remaining_gap <= 0:
         return None
-    diff = value - goal
-    if diff >= 0:
-        return {"status": "over", "amount": diff,
-                "text": f"${diff:,.0f} over target"}
-    return {"status": "short", "amount": -diff,
-            "text": f"${-diff:,.0f} short of target"}
+    return f"${value:,.0f} {value_label} / ${remaining_gap:,.0f} remaining = {value / remaining_gap:.2f}x"
+
+
+def _assess_coverage(
+    quota: Optional[float], qtd_won: float,
+    raw_value: float, weighted_value: float,
+    current_week: int, coverage_config: Dict[str, Any],
+) -> Dict[str, Any]:
+    """The config-driven coverage block: remaining gap, nominal/weighted
+    coverage against it, expected multiple for the week, ahead/behind,
+    and phase. Denominator is ALWAYS the remaining gap (quota minus QTD
+    closed-won), never the bare quota — see this module's own docstring,
+    point 6. All null-propagated, never fabricated: missing quota, quota
+    already met, and no configured expected-multiple schedule are each
+    handled explicitly, not silently defaulted."""
+    phase = _coverage_phase(current_week, coverage_config["phase_boundaries"])
+    expected_multiple = coverage_config["expected_multiple_schedule"].get(current_week)
+
+    if quota is None:
+        return {
+            "remaining_gap": None, "quota_met": None,
+            "nominal_coverage": None, "weighted_coverage": None,
+            "expected_multiple": expected_multiple, "ahead_behind": None,
+            "phase": phase,
+            "equations": {"remaining": None, "nominal": None, "weighted": None},
+            "note": ("No stated quota for this quarter — remaining gap and "
+                     "coverage ratios cannot be computed. Pipeline figures "
+                     "above are still real; only the comparison against "
+                     "quota is unavailable."),
+        }
+
+    remaining_gap = quota - qtd_won
+    quota_met = remaining_gap <= 0
+
+    if quota_met:
+        remaining_eq = (f"${quota:,.0f} quota - ${qtd_won:,.0f} won = $0 remaining "
+                        f"(quota already met, ${-remaining_gap:,.0f} over)")
+        return {
+            "remaining_gap": 0.0, "quota_met": True,
+            "nominal_coverage": None, "weighted_coverage": None,
+            "expected_multiple": expected_multiple, "ahead_behind": None,
+            "phase": phase,
+            "equations": {"remaining": remaining_eq, "nominal": None, "weighted": None},
+            "note": (f"Quota already met this quarter (${qtd_won:,.0f} won >= "
+                     f"${quota:,.0f} quota) — no remaining gap to cover, so no "
+                     f"coverage ratio is computed. Never divide by a zero or "
+                     f"negative remaining commitment."),
+        }
+
+    nominal_coverage = raw_value / remaining_gap
+    weighted_coverage = weighted_value / remaining_gap
+    ahead_behind = None
+    if expected_multiple is not None:
+        ahead_behind = "ahead" if weighted_coverage >= expected_multiple else "behind"
+
+    remaining_eq = (f"${quota:,.0f} quota - ${qtd_won:,.0f} won = "
+                    f"${remaining_gap:,.0f} remaining")
+    nominal_eq = _coverage_equation(raw_value, remaining_gap, "raw qualified pipeline")
+    weighted_eq = _coverage_equation(weighted_value, remaining_gap, "weighted pipeline")
+
+    return {
+        "remaining_gap": remaining_gap, "quota_met": False,
+        "nominal_coverage": nominal_coverage, "weighted_coverage": weighted_coverage,
+        "expected_multiple": expected_multiple, "ahead_behind": ahead_behind,
+        "phase": phase,
+        "equations": {"remaining": remaining_eq, "nominal": nominal_eq, "weighted": weighted_eq},
+        "note": (
+            "Denominator is the REMAINING gap (quota minus QTD closed-won), "
+            "never the bare quota. nominal_coverage = qualified_pipeline."
+            "raw_value / remaining_gap; weighted_coverage = stage_weighting."
+            "weighted_value / remaining_gap. expected_multiple and "
+            "ahead_behind come from config/client.yaml's coverage."
+            "expected_multiple_schedule for the current week; null when no "
+            "schedule is configured for that week (never inferred from the "
+            "HEURISTIC historical curve)."
+        ),
+    }
 
 
 def _normalize_quarter_label(raw: str) -> str:
@@ -173,8 +287,10 @@ def assess_pipeline_coverage(
 ) -> Dict[str, Any]:
     """
     Pipeline-coverage assessment: New+Expansion-only, qualified-pipeline
-    coverage vs. the stated team quota (gap-to-goal), plus a
-    HEURISTIC historical coverage curve for context.
+    coverage vs. the REMAINING gap (quota minus QTD closed-won — never
+    the bare quota), plus a HEURISTIC historical coverage curve kept for
+    citation only (see api/handlers.py::query_pipeline_coverage — it is
+    no longer in the rendered answer).
 
     Accepts an optional fiscal_quarter (e.g. 'FY2027 Q2') to assess a
     past quarter from deals_snapshot.  Defaults to the current quarter
@@ -200,16 +316,21 @@ def assess_pipeline_coverage(
              "note": str},
          "real_target": {"quota": float|None, "stretch": float|None,
              "goal": float|None, "stretch_note": str|None, "note": str},
-         "gap_to_goal": {"raw_pipeline_vs_goal": {...}|None,
-                         "weighted_pipeline_vs_goal": {...}|None},
+         "qtd_won": {"value": float, "note": str},
+         "coverage": {"remaining_gap": float|None, "quota_met": bool|None,
+             "nominal_coverage": float|None, "weighted_coverage": float|None,
+             "expected_multiple": float|None, "ahead_behind": str|None,
+             "phase": str, "equations": {"remaining", "nominal", "weighted"},
+             "note": str},
          "historical_heuristic_curve": {...query_coverage_proxy_target_by_week()'s
              output..., "current_week_ratio": {...}},
          "note": str}
     """
-    from utils import get_fiscal_quarter, get_pipeline_config
+    from utils import get_fiscal_quarter, get_pipeline_config, get_coverage_config
     from field_semantics import is_incremental_pipeline
     from forecast_analyses import (
-        query_stage_close_rate, query_coverage_proxy_target_by_week)
+        query_stage_close_rate, query_coverage_proxy_target_by_week,
+        actual_incremental_closed_won)
     from snapshot_deals import get_week_of_quarter
     from supabase_client import select_all
     from time_resolver import current_quarter_label
@@ -340,11 +461,33 @@ def assess_pipeline_coverage(
         f"This is the REAL stated target, NEVER a heuristic."
     ) if goal else (
         f"No stated target found for {fiscal_quarter} — quota "
-        f"not configured. Gap-to-goal cannot be computed; "
+        f"not configured. Remaining-gap coverage cannot be computed; "
         f"only the heuristic proxy curve is available for comparison."
     )
 
+    # QTD closed-won incremental ARR for this same window — the remaining-
+    # gap denominator (point 6 of this module's docstring). Reuses
+    # forecast_analyses.actual_incremental_closed_won() rather than a
+    # fourth copy of "closed-won incremental ARR in [start, end]".
+    qtd_won, qtd_won_n = actual_incremental_closed_won(sb, q_start_iso, q_end_iso)
+    qtd_won_note = (
+        f"${qtd_won:,.0f} closed-won incremental ARR ({qtd_won_n} deal"
+        f"{'' if qtd_won_n == 1 else 's'}) in {fiscal_quarter}, same basis "
+        f"as qualified_pipeline (is_incremental_pipeline(), renewal pipeline "
+        f"excluded) and same outcome test as query_path_to_target/"
+        f"assess_loss_concentration (deal_status == 'won')."
+    )
+
+    coverage_config = get_coverage_config()
+    coverage = _assess_coverage(
+        quota=quota, qtd_won=qtd_won,
+        raw_value=raw_pipeline_total, weighted_value=weighted_total,
+        current_week=current_week, coverage_config=coverage_config,
+    )
+
     # historical HEURISTIC curve — never blended with the real target.
+    # Still computed (cache_payload, citation) even though it's no longer
+    # rendered — see api/handlers.py::query_pipeline_coverage.
     proxy_curve = query_coverage_proxy_target_by_week(sb)
     week_ratio = proxy_curve.get("by_week", {}).get(current_week, {})
 
@@ -394,10 +537,12 @@ def assess_pipeline_coverage(
             "stretch_note": stretch_note,
             "note": target_note,
         },
-        "gap_to_goal": {
-            "raw_pipeline_vs_goal": _gap_to_goal(raw_pipeline_total, goal),
-            "weighted_pipeline_vs_goal": _gap_to_goal(weighted_total, goal),
+        "qtd_won": {
+            "value": qtd_won,
+            "deal_count": qtd_won_n,
+            "note": qtd_won_note,
         },
+        "coverage": coverage,
         "historical_heuristic_curve": {
             **proxy_curve,
             "current_week_ratio": week_ratio,
@@ -410,11 +555,11 @@ def assess_pipeline_coverage(
             "that field's own note) and must always be labeled a HEURISTIC "
             "wherever it is surfaced, never 'directional' or 'approximate'. "
             + (
-                f"The real_target and gap_to_goal above use the REAL stated "
-                f"{fiscal_quarter} team quota and are never "
-                "heuristics — the two must never be conflated."
+                f"The real_target and coverage above use the REAL stated "
+                f"{fiscal_quarter} team quota and QTD closed-won, and are "
+                "never heuristics — the two must never be conflated."
                 if goal else
-                f"No real target exists for {fiscal_quarter}, so gap_to_goal "
+                f"No real target exists for {fiscal_quarter}, so coverage "
                 f"fields are null."
             )
         ),
