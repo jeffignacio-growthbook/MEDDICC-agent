@@ -28,6 +28,7 @@ from analytics.forecast_analyses import (
     COMMIT_ML_CATEGORIES,
     query_stage_close_rate,
     query_coverage_proxy_target_by_week,
+    clear_request_cache,
 )
 
 
@@ -334,6 +335,170 @@ def test_stage_close_rate_structure():
     print(f"  ✓ win_rate correctly computed and gated: {stage1}")
 
 
+def test_stage_close_rate_excludes_meeting_set():
+    """
+    2026-10-03 fix: query_stage_close_rate()'s by_stage_order must agree
+    with assess_pipeline_coverage()'s qualified_pipeline.deal_count on
+    POPULATION, not just coincidentally overlap. Before this fix,
+    by_stage_order pooled every stage_order seen in an open deals_snapshot
+    row — including stage_order 0 ("Meeting Set", config-flagged
+    exclude_from_analysis, order < qualified_stage_order) — while
+    discovery_or_later_stages() (which builds qualified_pipeline's own
+    population in scripts/pipeline_coverage.py) has always excluded it.
+    Citing "how many deals is that based on" from a cached payload could
+    sum by_stage_order's n_observed values and land on a bigger number
+    than the qualified_pipeline.deal_count stated in the SAME answer.
+
+    Fix: query_stage_close_rate() now builds the SAME qualifying-stage-
+    order set discovery_or_later_stages() does (reused, not re-derived)
+    and skips any deals_snapshot row whose stage_order isn't in it —
+    same exclusion, same reason, one source of truth.
+    """
+    print("\n[TEST] stage close-rate excludes Meeting Set (order 0) from by_stage_order")
+
+    snapshot_rows = [
+        # Meeting Set (order 0) — exclude_from_analysis, must NOT appear
+        {'deal_id': 'm1', 'stage_order': 0, 'pipeline_id': 'default'},
+        {'deal_id': 'm2', 'stage_order': 0, 'pipeline_id': 'default'},
+        # Discovery (order 1) — qualified, must appear
+        {'deal_id': 'd1', 'stage_order': 1, 'pipeline_id': 'default'},
+        # Review (order 8) — exclude_from_analysis, must NOT appear
+        {'deal_id': 'r1', 'stage_order': 8, 'pipeline_id': 'default'},
+    ]
+    deals_rows = [
+        {'deal_id': 'm1', 'stage': 'closedwon', 'close_date': '2026-04-15'},
+        {'deal_id': 'm2', 'stage': 'closedlost', 'close_date': '2026-04-15'},
+        {'deal_id': 'd1', 'stage': 'closedwon', 'close_date': '2026-04-15'},
+        {'deal_id': 'r1', 'stage': 'closedwon', 'close_date': '2026-04-15'},
+    ]
+
+    def _select_all_side_effect(sb, table, columns='*', filters=None, page_size=1000):
+        if table == 'deals':
+            return deals_rows
+        if table == 'deals_snapshot':
+            return snapshot_rows
+        raise AssertionError(f"Unexpected table queried: {table!r}")
+
+    clear_request_cache()  # query_stage_close_rate memoizes within a request —
+                           # clear so an earlier test's cached result doesn't leak in
+    with patch('analytics.forecast_analyses._get_complete_quarters') as mock_quarters, \
+         patch('analytics.forecast_analyses._load_config') as mock_config, \
+         patch('analytics.forecast_analyses._quarter_window_iso') as mock_win, \
+         patch('supabase_client.select_all', side_effect=_select_all_side_effect):
+        mock_quarters.return_value = ['FY2026 Q1']
+        mock_config.return_value = {'min_evidence_count': 1}
+        mock_win.return_value = ('2026-02-01', '2026-04-30')
+
+        sb = Mock()
+        result = query_stage_close_rate(sb)
+
+    by_stage_order = result['by_stage_order']
+
+    if 0 in by_stage_order or '0' in by_stage_order:
+        raise AssertionError(
+            f"Meeting Set (stage_order 0) leaked into by_stage_order: "
+            f"{by_stage_order.keys()}")
+    if 8 in by_stage_order or '8' in by_stage_order:
+        raise AssertionError(
+            f"Review (stage_order 8) leaked into by_stage_order: "
+            f"{by_stage_order.keys()}")
+    if 1 not in by_stage_order:
+        raise AssertionError(
+            f"Qualified stage_order 1 (Discovery) missing from "
+            f"by_stage_order: {by_stage_order.keys()}")
+    if by_stage_order[1]['n_observed'] != 1:
+        raise AssertionError(
+            f"Expected n_observed=1 for stage_order 1, got "
+            f"{by_stage_order[1]['n_observed']}")
+
+    print("  ✓ Meeting Set (order 0) excluded from by_stage_order")
+    print("  ✓ Review (order 8) excluded from by_stage_order")
+    print("  ✓ Discovery (order 1, qualified) still included")
+
+
+def test_stage_close_rate_population_matches_qualified_pipeline():
+    """
+    REGRESSION fixture (the Meeting Set sum-mismatch, reproduced): for the
+    SAME set of deal-stage observations, summing by_stage_order's
+    n_observed across all stages must equal the count
+    discovery_or_later_stages() itself would call "qualified" for that
+    same population — the exact two figures that disagreed in the
+    2026-10-03 incident's cached payload (by_stage_order summed higher
+    than qualified_pipeline.deal_count because Meeting Set leaked in).
+
+    This mirrors — rather than calls — scripts/pipeline_coverage.py's own
+    qualifying-stage-order filter (that module has its own test coverage
+    in scripts/test_pipeline_coverage.py with mocked rep_targets/quota
+    machinery this test has no need for); the point here is specifically
+    that query_stage_close_rate()'s own population, independently, now
+    agrees with discovery_or_later_stages() rather than merely
+    overlapping with it by coincidence.
+    """
+    print("\n[TEST] sum(by_stage_order.n_observed) now matches the qualified-stage population")
+
+    from loss_concentration import discovery_or_later_stages
+    from utils import get_pipeline_config
+
+    pipeline_config = get_pipeline_config()
+    qualifying_ids = set(discovery_or_later_stages(pipeline_config))
+    qualifying_orders = {
+        s.get("order")
+        for p in pipeline_config.get("pipelines", [])
+        if str(p.get("id")) == "default"
+        for s in p.get("stages", [])
+        if str(s.get("id")) in qualifying_ids
+    }
+    if not qualifying_orders:
+        raise AssertionError("Fixture setup bug: no qualifying stage orders found "
+                             "in config/client.yaml's default pipeline")
+
+    # One deal-observation per stage_order 0-9 (every stage in the Sales
+    # pipeline template, qualified and excluded alike) — a worst-case
+    # fixture that would have summed to 10 before this fix (one per
+    # stage_order) but must now sum to exactly len(qualifying_orders).
+    snapshot_rows = [
+        {'deal_id': f'd{order}', 'stage_order': order, 'pipeline_id': 'default'}
+        for order in range(10)
+    ]
+    deals_rows = [
+        {'deal_id': f'd{order}', 'stage': 'closedwon', 'close_date': '2026-04-15'}
+        for order in range(10)
+    ]
+
+    def _select_all_side_effect(sb, table, columns='*', filters=None, page_size=1000):
+        if table == 'deals':
+            return deals_rows
+        if table == 'deals_snapshot':
+            return snapshot_rows
+        raise AssertionError(f"Unexpected table queried: {table!r}")
+
+    clear_request_cache()  # see note in test_stage_close_rate_excludes_meeting_set
+    with patch('analytics.forecast_analyses._get_complete_quarters') as mock_quarters, \
+         patch('analytics.forecast_analyses._load_config') as mock_config, \
+         patch('analytics.forecast_analyses._quarter_window_iso') as mock_win, \
+         patch('supabase_client.select_all', side_effect=_select_all_side_effect):
+        mock_quarters.return_value = ['FY2026 Q1']
+        mock_config.return_value = {'min_evidence_count': 1}
+        mock_win.return_value = ('2026-02-01', '2026-04-30')
+
+        sb = Mock()
+        result = query_stage_close_rate(sb)
+
+    total_observed = sum(row['n_observed'] for row in result['by_stage_order'].values())
+
+    if total_observed != len(qualifying_orders):
+        raise AssertionError(
+            f"sum(n_observed)={total_observed} does not match "
+            f"len(qualifying_orders)={len(qualifying_orders)} — "
+            f"by_stage_order and the qualified-pipeline population have "
+            f"drifted apart again. by_stage_order keys: "
+            f"{sorted(result['by_stage_order'].keys())}, "
+            f"qualifying_orders: {sorted(qualifying_orders)}")
+
+    print(f"  ✓ sum(n_observed)={total_observed} == "
+          f"len(qualifying_orders)={len(qualifying_orders)}")
+
+
 def test_coverage_proxy_target_by_week_structure():
     """
     query_coverage_proxy_target_by_week() — the HEURISTIC historical
@@ -475,6 +640,8 @@ def main():
         test_commit_outcome_by_week_structure,
         test_commit_ml_calibration_by_week_structure,
         test_stage_close_rate_structure,
+        test_stage_close_rate_excludes_meeting_set,
+        test_stage_close_rate_population_matches_qualified_pipeline,
         test_coverage_proxy_target_by_week_structure,
         test_analyses_return_null_on_thin_data_never_fabricate,
     ]
