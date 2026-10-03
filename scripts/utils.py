@@ -61,13 +61,28 @@ def get_coverage_config(config: Optional[Dict] = None) -> Dict[str, Any]:
 
     Returns:
         {"expected_multiple_schedule": {int week: float multiple, ...},
+         "weighted_expected_multiple": float or None,
          "phase_boundaries": {"early_through_week": int, "late_from_week": int}}
 
-    Validation is lenient by design (log-and-drop-the-bad-entry, never
-    raise): a malformed config value must never crash a nightly run or a
-    Slack answer. An empty expected_multiple_schedule is a fully
-    supported, intentional state (see the config file's own comment) —
-    it is NOT a validation failure.
+    Per-entry validation (malformed TYPE/VALUE on an individual entry) is
+    lenient by design (log-and-drop-the-bad-entry, never raise): a typo'd
+    single entry must never crash a nightly run or a Slack answer. An
+    empty expected_multiple_schedule is a fully supported, intentional
+    state for a client that hasn't set per-week expectations yet — NOT a
+    validation failure.
+
+    But once a schedule IS configured (non-empty after per-entry
+    filtering), its STRUCTURE is validated strictly and fails loudly
+    (raises ValueError) rather than silently: it must start at week 1
+    (an ahead/behind read with a gap before the first step is a schedule
+    with no anchor — a config bug, not junk data to work around), and its
+    multiples must be non-increasing as the week increases (coverage
+    expectations taper toward the end of the quarter; an increase partway
+    through is almost certainly a transposed or mistyped entry, not a
+    real business decision). 2026-10-03: GrowthBook's real schedule
+    populated after shipping empty in #118; this validation exists so a
+    future edit to it fails at load, not as a silently wrong ahead/behind
+    verdict in a live Slack answer.
     """
     if config is None:
         config = load_client_config()
@@ -107,6 +122,36 @@ def get_coverage_config(config: Optional[Dict] = None) -> Dict[str, Any]:
                     continue
                 schedule[week_i] = multiple_f
 
+    if schedule:
+        if min(schedule) != 1:
+            raise ValueError(
+                f"[COVERAGE_CONFIG] expected_multiple_schedule is configured but has "
+                f"no entry for week 1 (first week is {min(schedule)}) — a schedule "
+                f"must start at week 1, or there is a gap with no ahead/behind "
+                f"read before the first configured week. Got: {schedule!r}")
+        weeks_sorted = sorted(schedule)
+        for prev_w, w in zip(weeks_sorted, weeks_sorted[1:]):
+            if schedule[w] > schedule[prev_w]:
+                raise ValueError(
+                    f"[COVERAGE_CONFIG] expected_multiple_schedule is not "
+                    f"non-increasing: week {w}'s multiple ({schedule[w]}) is "
+                    f"greater than week {prev_w}'s ({schedule[prev_w]}). Coverage "
+                    f"expectations must taper toward the end of the quarter, never "
+                    f"rise — check for a transposed or mistyped entry. Got: "
+                    f"{schedule!r}")
+
+    weighted_expected_multiple: Optional[float] = None
+    raw_weighted = raw.get('weighted_expected_multiple')
+    if raw_weighted is not None:
+        try:
+            weighted_expected_multiple = float(raw_weighted)
+            if weighted_expected_multiple <= 0:
+                raise ValueError
+        except (TypeError, ValueError):
+            raise ValueError(
+                f"[COVERAGE_CONFIG] weighted_expected_multiple is configured but "
+                f"invalid (must be a positive number): {raw_weighted!r}")
+
     phase = dict(_DEFAULT_PHASE_BOUNDARIES)
     raw_phase = raw.get('phase_boundaries')
     if raw_phase:
@@ -131,7 +176,9 @@ def get_coverage_config(config: Optional[Dict] = None) -> Dict[str, Any]:
                 _logger.warning("[COVERAGE_CONFIG] phase_boundaries has a non-numeric "
                                 f"entry — using defaults {_DEFAULT_PHASE_BOUNDARIES}")
 
-    return {"expected_multiple_schedule": schedule, "phase_boundaries": phase}
+    return {"expected_multiple_schedule": schedule,
+            "weighted_expected_multiple": weighted_expected_multiple,
+            "phase_boundaries": phase}
 
 
 def get_stage_order(stage_id: str, pipeline_config: Optional[Dict] = None) -> Optional[int]:
@@ -562,6 +609,36 @@ def get_fiscal_quarter(as_of=None, config: Optional[Dict] = None) -> tuple:
     label = f"FY{fy_year} Q{quarter_num}"
 
     return (q_start, q_end, label)
+
+
+def quarter_days_weeks_left(end, as_of=None) -> Dict[str, Any]:
+    """Calendar-based days/weeks remaining in a fiscal quarter — the
+    single source of truth for every coverage-related handler. Promoted
+    UNMODIFIED from api/quarter_health.py::_qtd_figures (2026-10-03):
+    that handler's exposure answer correctly said "4 weeks left" (28
+    calendar days) while query_pipeline_coverage's synthesis_note let the
+    model derive its own "3 weeks" from `13 - current_week` — wrong both
+    because it ignores that the current week is only partially elapsed,
+    and because it isn't calendar-based at all. One computation, reused
+    by both.
+
+    Args:
+        end: the quarter's end date (a date, not a string).
+        as_of: "today" to measure from (default: date.today()).
+
+    Returns:
+        {"days_left": int, "weeks_left": int, "label": str} where label
+        is "N week(s) left" once at least a full week remains, else
+        "N day(s) left" — matching _qtd_figures' own phrasing exactly.
+    """
+    from datetime import date as _date
+    if as_of is None:
+        as_of = _date.today()
+    days_left = max((end - as_of).days, 0)
+    weeks_left = days_left // 7
+    label = (f"{weeks_left} week{'' if weeks_left == 1 else 's'} left" if weeks_left
+             else f"{days_left} day{'' if days_left == 1 else 's'} left")
+    return {"days_left": days_left, "weeks_left": weeks_left, "label": label}
 
 
 # ============================================================================

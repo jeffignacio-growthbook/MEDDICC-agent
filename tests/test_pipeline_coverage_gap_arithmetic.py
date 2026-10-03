@@ -62,12 +62,16 @@ from test_explain_prior_answer_citation import _mock_rep_attainment_sb  # noqa: 
 
 
 def _coverage(remaining_gap, nominal_coverage, weighted_coverage, quota_met,
-             expected_multiple=None, ahead_behind=None, phase="mid",
+             nominal_expected_multiple=None, weighted_expected_multiple=None,
+             nominal_ahead_behind=None, weighted_ahead_behind=None, phase="mid",
              equations=None):
     return {
         "remaining_gap": remaining_gap, "quota_met": quota_met,
         "nominal_coverage": nominal_coverage, "weighted_coverage": weighted_coverage,
-        "expected_multiple": expected_multiple, "ahead_behind": ahead_behind,
+        "nominal_expected_multiple": nominal_expected_multiple,
+        "weighted_expected_multiple": weighted_expected_multiple,
+        "nominal_ahead_behind": nominal_ahead_behind,
+        "weighted_ahead_behind": weighted_ahead_behind,
         "phase": phase,
         "equations": equations or {"remaining": None, "nominal": None, "weighted": None},
         "note": "test coverage note",
@@ -78,6 +82,7 @@ BASE_FIXTURE = {
     "status": "ok",
     "fiscal_quarter": "FY2027 Q3",
     "current_week": 7,
+    "quarter_time_left": {"days_left": 42, "weeks_left": 6, "label": "6 weeks left"},
     "is_historical": False,
     "scope": "New+Expansion ARR only; qualified pipeline only",
     "qualified_pipeline": {"raw_value": 900000.0, "deal_count": 22},
@@ -96,7 +101,8 @@ BASE_FIXTURE = {
     "coverage": _coverage(
         remaining_gap=1050000.0, nominal_coverage=900000.0 / 1050000.0,
         weighted_coverage=799782.0 / 1050000.0, quota_met=False,
-        expected_multiple=1.2, ahead_behind="behind", phase="mid",
+        nominal_expected_multiple=2.0, weighted_expected_multiple=1.2,
+        nominal_ahead_behind="behind", weighted_ahead_behind="behind", phase="mid",
         equations={
             "remaining": "$1,550,000 quota - $500,000 won = $1,050,000 remaining",
             "nominal": "$900,000 raw qualified pipeline / $1,050,000 remaining = 0.86x",
@@ -125,27 +131,61 @@ def test_guidance_states_ahead_behind_and_quotes_all_three_equations():
     assert note, "expected a _synthesis_note"
 
     assert "own words" in note.lower(), "expected guidance, not a scripted sentence"
+    assert "REQUIRED in the answer" in note, "expected the required-facts framing"
     assert "$1,550,000 quota - $500,000 won = $1,050,000 remaining" in note
     assert "$900,000 raw qualified pipeline / $1,050,000 remaining = 0.86x" in note
     assert "$799,782 weighted pipeline / $1,050,000 remaining = 0.76x" in note
-    assert "behind" in note and "1.20x" in note and "week 7" in note
-    print("  ✓ all three equations quoted verbatim; ahead/behind fact + expected multiple stated")
+    assert "nominal is behind the 2.00x expectation" in note and "week 7" in note
+    assert "weighted is behind the 1.20x configured expectation" in note
+    assert "CONFIGURED facts to report, not your own judgment call" in note
+    print("  ✓ all three equations quoted verbatim; nominal/weighted ahead-behind facts + "
+          "their own expected multiples stated independently")
 
 
-def test_no_schedule_configured_says_so_instead_of_fabricating_ahead_behind():
-    """When ahead_behind is None (no expected_multiple_schedule entry for
-    this week), guidance must say there is no fact to state — never
-    silently omit it or invent a verdict."""
-    print("\n[TEST] no expected-multiple schedule -> guidance says so, no fabrication")
+def test_guidance_states_1x_floor_when_no_schedule_configured():
+    """When no per-week expected_multiple_schedule entry exists (the
+    shipped-empty default), guidance must still state SOME week's
+    expectation — the self-evident 1.0x floor (pipeline should at least
+    equal what's still needed) — and ask for nominal/weighted ahead/behind
+    against it, rather than refusing to make any ahead/behind statement
+    (the old behavior: "no ahead/behind fact to state — describe the
+    ratios themselves instead", which is exactly what production dropped
+    on 2026-10-03 — the exposure answer compares to 1x unprompted; this
+    guidance now tells pipeline_coverage's own synthesis to do the same)."""
+    print("\n[TEST] no schedule configured -> 1.0x floor expectation stated, not silence")
     fixture = copy.deepcopy(BASE_FIXTURE)
-    fixture["coverage"]["ahead_behind"] = None
-    fixture["coverage"]["expected_multiple"] = None
+    fixture["coverage"]["nominal_ahead_behind"] = None
+    fixture["coverage"]["weighted_ahead_behind"] = None
+    fixture["coverage"]["nominal_expected_multiple"] = None
+    fixture["coverage"]["weighted_expected_multiple"] = None
 
     result = asyncio.run(_run(fixture))
     note = result["_synthesis_note"]
-    assert "no expected-multiple schedule is configured" in note.lower()
-    assert "describe the ratios themselves instead" in note.lower()
-    print("  ✓ guidance explicitly states no ahead/behind fact is available")
+    assert "1.0x as the plain floor expectation" in note
+    assert "nominal and weighted coverage are each" in note.lower()
+    print("  ✓ 1.0x floor expectation stated in place of a configured schedule")
+
+
+def test_nominal_and_weighted_ahead_behind_reported_independently():
+    """2026-10-03: nominal and weighted each get their OWN configured
+    expectation and their OWN ahead/behind verdict — one can be ahead
+    while the other is behind, at the same time, which a single shared
+    ahead_behind value (the #118 shape this supersedes) could never
+    express. Guidance must state the configured fact for each, not ask
+    the model to judge, once a schedule exists for that measure."""
+    print("\n[TEST] nominal ahead + weighted behind, simultaneously, both reported as configured facts")
+    fixture = copy.deepcopy(BASE_FIXTURE)
+    fixture["coverage"]["nominal_expected_multiple"] = 0.5
+    fixture["coverage"]["nominal_ahead_behind"] = "ahead"
+    fixture["coverage"]["weighted_expected_multiple"] = 1.2
+    fixture["coverage"]["weighted_ahead_behind"] = "behind"
+
+    result = asyncio.run(_run(fixture))
+    note = result["_synthesis_note"]
+    assert "nominal is ahead of the 0.50x expectation" in note
+    assert "weighted is behind the 1.20x configured expectation" in note
+    assert "judgment call" in note.lower(), "expected the 'configured fact, not a judgment call' framing"
+    print("  ✓ nominal 'ahead' and weighted 'behind' both stated as independent configured facts")
 
 
 def test_quota_met_guidance_has_no_ratio_equations():
@@ -190,28 +230,37 @@ def test_no_quota_guidance_says_so_plainly():
 
 
 def test_late_phase_instructs_pivot_to_named_commits():
-    """LATE phase: guidance must instruct brevity on the ratio and a pivot
-    toward named, committed deals (if available) — the opposite of EARLY
-    phase, which has no such instruction."""
+    """LATE phase: guidance must instruct a pivot toward named, committed
+    deals (if available) AFTER the required facts — the opposite of EARLY
+    phase, which has no such instruction. 2026-10-03: the late-phase
+    instruction must not read as license to drop the required facts
+    (equation/expectation/renewal clause) — it says to cut RESTATING THE
+    TABLE instead, and states the calendar-based weeks-left figure rather
+    than leaving the model to derive one from `13 - current_week`."""
     print("\n[TEST] late phase -> pivot-to-named-commits instruction; early phase -> none")
     late_fixture = copy.deepcopy(BASE_FIXTURE)
     late_fixture["coverage"]["phase"] = "late"
     late_fixture["current_week"] = 11
+    late_fixture["quarter_time_left"] = {"days_left": 14, "weeks_left": 2, "label": "2 weeks left"}
 
     result = asyncio.run(_run(late_fixture))
     note = result["_synthesis_note"]
     assert "late phase" in note.lower() or "LATE phase" in note
-    assert "sentence or two" in note
+    assert "2 weeks left" in note, "expected the calendar-based weeks-left label, not a derived one"
     assert "named" in note.lower() and "committed" in note.lower()
+    assert "restating or explaining the table" in note.lower()
+    assert "REQUIRED in the answer" in note, (
+        "the required-facts framing must still be present in the late phase")
 
     early_fixture = copy.deepcopy(BASE_FIXTURE)
     early_fixture["coverage"]["phase"] = "early"
     early_fixture["current_week"] = 2
     result_early = asyncio.run(_run(early_fixture))
     note_early = result_early["_synthesis_note"]
-    assert "shift the answer's focus" not in note_early.lower(), (
+    assert "shift the rest of the answer" not in note_early.lower(), (
         f"early phase should carry no pivot-to-named-deals instruction, got: {note_early!r}")
-    print("  ✓ late phase instructs the pivot to named commits; early phase does not")
+    print("  ✓ late phase instructs the pivot to named commits (with the real weeks-left figure); "
+          "early phase does not")
 
 
 def test_historical_curve_removed_from_rendered_result_kept_in_cache_payload():
@@ -306,8 +355,8 @@ def test_guidance_states_qtd_won_includes_renewal_expansion():
         result = asyncio.run(_run(fixture))
         note = result.get("_synthesis_note")
         assert note, f"expected a _synthesis_note ({label})"
-        assert "QTD won" in note and "INCLUDES" in note and "renewal-pipeline expansion" in note, (
+        assert "QTD won includes won renewal-pipeline expansion" in note, (
             f"expected QTD-won-includes-renewal-expansion guidance in the {label} case, got: {note!r}")
-        assert "renewal_not_weighted" in note and "no governed stage close-rate" in note, (
+        assert "renewal_not_weighted" in note and "upside only" in note, (
             f"expected the open-renewal-expansion-upside distinction in the {label} case, got: {note!r}")
     print("  ✓ present in normal, quota-met, and no-quota branches alike")

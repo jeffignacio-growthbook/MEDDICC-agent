@@ -1285,67 +1285,117 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
             quota = (result.get("real_target") or {}).get("quota")
             eqs = cov.get("equations") or {}
             phase = cov.get("phase")
+            time_left = (result.get("quarter_time_left") or {}).get("label")
 
+            # These three facts (subtraction, this-week expectation, renewal
+            # clause) are REQUIRED in every answer, phase included — they are
+            # not the "detail" a brevity instruction means to cut. 2026-10-03:
+            # production dropped all three under late-phase/format-checker
+            # brevity pressure even though the instructions for them were
+            # present and uncapped; the fix is to make that explicit here and
+            # tell the model what to cut INSTEAD (prose that restates the
+            # table), not to soften the requirement.
             lines = [
                 "COVERAGE GUIDANCE (say the verdict in your own words — do not "
-                "copy a fixed sentence from here):",
-                "- QTD won (the basis for the remaining-gap figures below) "
-                "INCLUDES any already-won deal's renewal-pipeline expansion "
-                "ARR — the won/incremental test is dollar-based (new_arr or "
-                "expansion_arr > 0), not pipeline-based, matching the "
-                "decision that the $1.55M target includes renewal expansion. "
-                "Separately, STILL-OPEN renewal-pipeline expansion is shown "
-                "as upside in renewal_not_weighted, not in the weighted "
-                "coverage total — that's because renewal pipeline has no "
-                "governed stage close-rate to weight it by, not because "
-                "it's out of scope.",
+                "copy a fixed sentence from here). The three items below are "
+                "REQUIRED in the answer regardless of phase or length pressure "
+                "— if the answer needs to be short, cut prose that restates "
+                "the table instead, not these:",
+                "1. QTD won includes won renewal-pipeline expansion ARR "
+                "(dollar-based test, not pipeline-based) — say so in a "
+                "clause. Still-open renewal expansion stays separate, in "
+                "renewal_not_weighted, as upside only.",
             ]
 
             if quota is None:
                 lines.append(
-                    "- No quota is configured for this quarter. Say so plainly. "
-                    "Do not compute or imply a coverage ratio from the pipeline "
-                    "figures alone — there is nothing to cover them against."
+                    "2. No quota is configured for this quarter. Say so "
+                    "plainly. Do not compute or imply a coverage ratio from "
+                    "the pipeline figures alone — there is nothing to cover "
+                    "them against."
                 )
             elif cov.get("quota_met"):
                 lines.append(
-                    "- Quota is already met this quarter — state that as the "
-                    "headline, not a coverage ratio (there is no remaining gap "
-                    "to compute one against). Quote this equation as the basis:"
+                    "2. Quota is already met this quarter — state that as "
+                    "the headline, not a coverage ratio (there is no "
+                    "remaining gap to compute one against). State the "
+                    "subtraction once, in one sentence or a small footnote "
+                    "under the table, using this exact equation — do not "
+                    "recompute it:"
                 )
                 if eqs.get("remaining"):
                     lines.append(f"  {eqs['remaining']}")
             else:
-                ahead_behind = cov.get("ahead_behind")
+                nominal_ahead_behind = cov.get("nominal_ahead_behind")
+                weighted_ahead_behind = cov.get("weighted_ahead_behind")
+                nominal_expected = cov.get("nominal_expected_multiple")
+                weighted_expected = cov.get("weighted_expected_multiple")
                 lines.append(
-                    "- State whether coverage is " + (
-                        f"{ahead_behind} the expected {cov['expected_multiple']:.2f}x "
-                        f"pace for week {result.get('current_week')}"
-                        if ahead_behind and cov.get("expected_multiple") is not None
-                        else "ahead of or behind where you judge it should be "
-                             "(no expected-multiple schedule is configured for "
-                             "this week, so there is no ahead/behind fact to "
-                             "state — describe the ratios themselves instead)"
-                    ) + ". Quote these equations as the basis — every number "
-                    "states what it is, never a bare ratio with no derivation:"
+                    "2. State the subtraction once, in one sentence or a "
+                    "small footnote under the table, using these exact "
+                    "equations — every number states what it is, and do not "
+                    "recompute any of them:"
                 )
                 for key in ("remaining", "nominal", "weighted"):
                     if eqs.get(key):
                         lines.append(f"  {eqs[key]}")
+                # 2026-10-03: once a schedule IS configured, the ahead/behind
+                # read comes FROM it — the model states the configured fact,
+                # it does not judge. The "use 1.0x as a floor" fallback is
+                # ONLY for a client with no configured schedule at all (both
+                # nominal_expected and weighted_expected absent); do not mix
+                # a real configured value for one measure with an invented
+                # floor for the other.
+                if nominal_expected is None and weighted_expected is None:
+                    lines.append(
+                        "3. State this week's expectation and whether each "
+                        "measure (nominal and weighted) is ahead of or "
+                        "behind it, in a sentence. No schedule is configured "
+                        "yet, so use 1.0x as the plain floor expectation "
+                        "(pipeline should at least equal what's still "
+                        "needed) and say whether nominal and weighted "
+                        "coverage are each above or below it."
+                    )
+                else:
+                    def _ahead_behind_phrase(ahead_behind):
+                        return "ahead of" if ahead_behind == "ahead" else "behind"
+                    nominal_part = (
+                        f"nominal is {_ahead_behind_phrase(nominal_ahead_behind)} the "
+                        f"{nominal_expected:.2f}x expectation configured "
+                        f"for week {result.get('current_week')}"
+                        if nominal_expected is not None else
+                        "no nominal schedule is configured, so describe "
+                        "nominal coverage on its own terms, not against a "
+                        "guessed expectation"
+                    )
+                    weighted_part = (
+                        f"weighted is {_ahead_behind_phrase(weighted_ahead_behind)} the "
+                        f"{weighted_expected:.2f}x configured expectation"
+                        if weighted_expected is not None else
+                        "no weighted expectation is configured, so describe "
+                        "weighted coverage on its own terms, not against a "
+                        "guessed expectation"
+                    )
+                    lines.append(
+                        f"3. State this week's expectation and whether each "
+                        f"measure is ahead of or behind it, in a sentence — "
+                        f"these are CONFIGURED facts to report, not your own "
+                        f"judgment call: {nominal_part}; {weighted_part}."
+                    )
 
             if phase == "late":
                 lines.append(
-                    "- This is the LATE phase of the quarter (week "
-                    f"{result.get('current_week')} of 13) — there is little "
-                    "runway left for unweighted pipeline to mature. Give the "
-                    "coverage figures a sentence or two at most, then shift "
-                    "the answer's focus to which SPECIFIC, NAMED deals are "
+                    "- LATE phase" + (f", {time_left} in the quarter" if time_left else "") +
+                    " — little runway left for unweighted pipeline to "
+                    "mature. After the required items above, shift the rest "
+                    "of the answer to which SPECIFIC, NAMED deals are "
                     "committed to closing this quarter, if that data is "
-                    "available elsewhere in this context — the aggregate "
+                    "available elsewhere in this context, instead of "
+                    "restating or explaining the table — the aggregate "
                     "ratio matters less this late than which deals actually "
                     "close. If no named-deal data is available here, say so "
-                    "and suggest checking committed pipeline directly, rather "
-                    "than dwelling on the ratio."
+                    "and suggest checking committed pipeline directly, "
+                    "rather than dwelling on the ratio."
                 )
             elif phase == "early":
                 lines.append(

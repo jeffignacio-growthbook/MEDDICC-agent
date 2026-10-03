@@ -126,7 +126,9 @@ def _base_deals(extra=None):
 
 
 def _run(deals_data, quota_value=2000000, current_period="FY2027_Q3",
-        qtd_won=0.0, coverage_config=None):
+        qtd_won=0.0, coverage_config=None, as_of=None,
+        q_window=(date(2026, 8, 1), date(2026, 10, 31), 'FY2027 Q3'),
+        current_week=7):
     """Runs assess_pipeline_coverage() with the standard mock set. Returns
     the result dict.
 
@@ -148,18 +150,18 @@ def _run(deals_data, quota_value=2000000, current_period="FY2027_Q3",
          patch('forecast_analyses.query_stage_close_rate') as mock_stage_rates, \
          patch('forecast_analyses.query_coverage_proxy_target_by_week') as mock_curve, \
          patch('forecast_analyses.actual_incremental_closed_won') as mock_qtd:
-        mock_gfq.return_value = (date(2026, 8, 1), date(2026, 10, 31), 'FY2027 Q3')
+        mock_gfq.return_value = q_window
         mock_coverage_cfg.return_value = coverage_config or {
-            "expected_multiple_schedule": {}, "phase_boundaries":
-                {"early_through_week": 4, "late_from_week": 10}}
-        mock_gwoq.return_value = 7
+            "expected_multiple_schedule": {}, "weighted_expected_multiple": None,
+            "phase_boundaries": {"early_through_week": 4, "late_from_week": 10}}
+        mock_gwoq.return_value = current_week
         mock_cql.return_value = current_period
         mock_select_all.return_value = deals_data
         mock_stage_rates.return_value = _fake_stage_rates()
         mock_curve.return_value = _fake_proxy_curve()
         mock_qtd.return_value = (qtd_won, 1 if qtd_won else 0)
 
-        return assess_pipeline_coverage(sb, as_of=date(2026, 9, 18))
+        return assess_pipeline_coverage(sb, as_of=as_of or date(2026, 9, 18))
 
 
 def test_scope_excludes_renewal_and_unqualified_deals():
@@ -259,6 +261,26 @@ def test_coverage_shows_remaining_gap_and_both_ratios():
     print(f"  ✓ {eqs['remaining']}")
     print(f"  ✓ {eqs['nominal']}")
     print(f"  ✓ {eqs['weighted']}")
+
+
+def test_quarter_time_left_matches_calendar_on_week_10_fixture():
+    """2026-10-03 production bug: the coverage answer said "next 3 weeks"
+    (derived by the model as 13 - current_week) on the same day the
+    exposure answer correctly said "4 weeks left" (28 calendar days).
+    Reproduces that exact scenario — FY2027 Q3 (Aug 1 - Oct 31), week 10,
+    as_of Oct 3 (28 days before quarter end) — and asserts
+    assess_pipeline_coverage's own quarter_time_left matches the
+    calendar, not a week-index subtraction."""
+    print("\n[TEST] quarter_time_left matches the calendar on the real week-10/28-day fixture")
+    result = _run(_base_deals(), as_of=date(2026, 10, 3), current_week=10)
+    qtl = result["quarter_time_left"]
+    if qtl["days_left"] != 28:
+        raise AssertionError(f"Expected days_left=28 (Oct 31 - Oct 3), got {qtl['days_left']!r}")
+    if qtl["weeks_left"] != 4:
+        raise AssertionError(f"Expected weeks_left=4 (28 // 7), NOT 13-10=3, got {qtl['weeks_left']!r}")
+    if qtl["label"] != "4 weeks left":
+        raise AssertionError(f"Expected label='4 weeks left', got {qtl['label']!r}")
+    print(f"  ✓ {qtl['label']} (28 calendar days) — not the week-index-derived '3 weeks'")
 
 
 def test_coverage_quota_met_no_ratio():
@@ -447,7 +469,8 @@ def test_quota_missing_from_db_produces_graceful_nulls():
         raise AssertionError(f"Expected real_target.goal=None, got {rt['goal']!r}")
 
     cov = result["coverage"]
-    for key in ("remaining_gap", "quota_met", "nominal_coverage", "weighted_coverage", "ahead_behind"):
+    for key in ("remaining_gap", "quota_met", "nominal_coverage", "weighted_coverage",
+                "nominal_ahead_behind", "weighted_ahead_behind"):
         if cov[key] is not None:
             raise AssertionError(f"Expected coverage.{key}=None when no quota, got {cov[key]!r}")
     if cov["equations"]["remaining"] is not None or cov["equations"]["nominal"] is not None \
@@ -475,6 +498,7 @@ def main():
         test_scope_excludes_renewal_and_unqualified_deals,
         test_stage_weighting_excludes_ungated_stage_from_weighted_total,
         test_coverage_shows_remaining_gap_and_both_ratios,
+        test_quarter_time_left_matches_calendar_on_week_10_fixture,
         test_coverage_quota_met_no_ratio,
         test_quota_missing_from_db_produces_graceful_nulls,
         test_heuristic_curve_labeled_real_target_not,
