@@ -992,18 +992,24 @@ def query_stage_close_rate(sb=None) -> Dict:
     return result
 
 
-def _actual_incremental_closed_won(sb, q_start_iso: str, q_end_iso: str):
+def actual_incremental_closed_won(sb, q_start_iso: str, q_end_iso: str):
     """Actual closed-won incremental ARR (new_arr+expansion_arr), renewal
     pipeline excluded, deals table. Promoted UNMODIFIED from
     scripts/audit_coverage_curve.py::actual_incremental_closed_won after
-    live confirmation (2026-09-19).
+    live confirmation (2026-09-19). Made public 2026-10-03 (config-driven
+    coverage): the ORIGINAL use (query_coverage_proxy_target_by_week,
+    prior-year window, below) and the NEW use (assess_pipeline_coverage,
+    current-quarter window, scripts/pipeline_coverage.py) both need the
+    identical "closed-won incremental ARR in [start, end]" computation —
+    one function, two windows, never two copies to drift apart.
 
     OUTCOME-READ (same as _in_quarter_won_by_pipeline/_classify_deal_
     outcome elsewhere in this module): `stage` here determines the
     TERMINAL WON outcome (is_won), not a point-in-time stage exclusion —
     the backfilled complete quarters hold zero won rows in
     deals_snapshot, so a won transition has no point-in-time snapshot
-    equivalent; close_date bounds it to the (prior-year) quarter window."""
+    equivalent; close_date bounds it to whichever quarter window the
+    caller passes (prior-year for the proxy curve, current for coverage)."""
     from field_semantics import _RENEWAL_PIPELINE_ID, is_won
     from supabase_client import select_all
     deals = select_all(sb, 'deals',
@@ -1167,7 +1173,7 @@ def query_coverage_proxy_target_by_week(sb=None) -> Dict:
         q_start_iso, q_end_iso = _quarter_window_iso(sb, quarter)
         quarter_windows[quarter] = (q_start_iso, q_end_iso)
         prior_start_iso, prior_end_iso, prior_label = _prior_year_window(q_start_iso)
-        prior_actual, prior_n = _actual_incremental_closed_won(
+        prior_actual, prior_n = actual_incremental_closed_won(
             sb, prior_start_iso, prior_end_iso)
         proxy_targets[quarter] = {
             'value': 2 * prior_actual,

@@ -4,10 +4,13 @@ Shared utility functions for MEDDICC agent.
 This module provides common functionality used across ETL and analysis scripts.
 """
 
+import logging
 import re
 import yaml
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+
+_logger = logging.getLogger(__name__)
 
 
 # ============================================================================
@@ -43,6 +46,92 @@ def get_pipeline_config(config: Optional[Dict] = None) -> Dict[str, Any]:
         config = load_client_config()
 
     return config.get('pipeline', {})
+
+
+_DEFAULT_PHASE_BOUNDARIES = {"early_through_week": 4, "late_from_week": 10}
+
+
+def get_coverage_config(config: Optional[Dict] = None) -> Dict[str, Any]:
+    """
+    Load and validate config/client.yaml's `coverage` block
+    (scripts/pipeline_coverage.py::assess_pipeline_coverage).
+
+    Args:
+        config: Optional pre-loaded config dict (loaded if not provided)
+
+    Returns:
+        {"expected_multiple_schedule": {int week: float multiple, ...},
+         "phase_boundaries": {"early_through_week": int, "late_from_week": int}}
+
+    Validation is lenient by design (log-and-drop-the-bad-entry, never
+    raise): a malformed config value must never crash a nightly run or a
+    Slack answer. An empty expected_multiple_schedule is a fully
+    supported, intentional state (see the config file's own comment) —
+    it is NOT a validation failure.
+    """
+    if config is None:
+        config = load_client_config()
+
+    raw = (config or {}).get('coverage') or {}
+    if not isinstance(raw, dict):
+        _logger.warning("[COVERAGE_CONFIG] 'coverage' key is not a mapping "
+                        f"({type(raw).__name__}) — ignoring, using defaults")
+        raw = {}
+
+    schedule: Dict[int, float] = {}
+    raw_schedule = raw.get('expected_multiple_schedule')
+    if raw_schedule:
+        if not isinstance(raw_schedule, dict):
+            _logger.warning("[COVERAGE_CONFIG] expected_multiple_schedule is not "
+                            f"a mapping ({type(raw_schedule).__name__}) — ignoring, "
+                            "no ahead/behind judgment will be made")
+        else:
+            for week, multiple in raw_schedule.items():
+                try:
+                    week_i = int(week)
+                    multiple_f = float(multiple)
+                except (TypeError, ValueError):
+                    _logger.warning(f"[COVERAGE_CONFIG] dropping expected_multiple_"
+                                    f"schedule entry {week!r}: {multiple!r} "
+                                    "(not a number)")
+                    continue
+                if not (1 <= week_i <= 13):
+                    _logger.warning(f"[COVERAGE_CONFIG] dropping expected_multiple_"
+                                    f"schedule entry for week {week_i} (outside "
+                                    "1-13, a 13-week fiscal quarter)")
+                    continue
+                if multiple_f <= 0:
+                    _logger.warning(f"[COVERAGE_CONFIG] dropping expected_multiple_"
+                                    f"schedule entry for week {week_i}: {multiple_f} "
+                                    "(must be > 0)")
+                    continue
+                schedule[week_i] = multiple_f
+
+    phase = dict(_DEFAULT_PHASE_BOUNDARIES)
+    raw_phase = raw.get('phase_boundaries')
+    if raw_phase:
+        if not isinstance(raw_phase, dict):
+            _logger.warning("[COVERAGE_CONFIG] phase_boundaries is not a mapping "
+                            f"({type(raw_phase).__name__}) — using defaults "
+                            f"{_DEFAULT_PHASE_BOUNDARIES}")
+        else:
+            try:
+                early = int(raw_phase.get('early_through_week',
+                                          _DEFAULT_PHASE_BOUNDARIES['early_through_week']))
+                late = int(raw_phase.get('late_from_week',
+                                         _DEFAULT_PHASE_BOUNDARIES['late_from_week']))
+                if 1 <= early < late <= 13:
+                    phase = {"early_through_week": early, "late_from_week": late}
+                else:
+                    _logger.warning(f"[COVERAGE_CONFIG] phase_boundaries "
+                                    f"early_through_week={early}, late_from_week={late} "
+                                    f"not a valid 1-13 ordering — using defaults "
+                                    f"{_DEFAULT_PHASE_BOUNDARIES}")
+            except (TypeError, ValueError):
+                _logger.warning("[COVERAGE_CONFIG] phase_boundaries has a non-numeric "
+                                f"entry — using defaults {_DEFAULT_PHASE_BOUNDARIES}")
+
+    return {"expected_multiple_schedule": schedule, "phase_boundaries": phase}
 
 
 def get_stage_order(stage_id: str, pipeline_config: Optional[Dict] = None) -> Optional[int]:

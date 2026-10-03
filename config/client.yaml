@@ -290,8 +290,39 @@ pipeline:
           is_lost: true
 
 # ============================================================================
-# LEGACY: Backward-compatible excluded_stages configuration
+# COVERAGE (assess_pipeline_coverage — query_pipeline_coverage)
 # ============================================================================
+# Denominator is always the REMAINING gap (quota minus QTD closed-won), never
+# the bare quota — "how much more pipeline do we need" is what a coverage
+# check is actually for. Two coverage ratios are reported against that same
+# remaining gap: nominal (raw qualified pipeline) and weighted (stage-rate
+# weighted). See scripts/pipeline_coverage.py::assess_pipeline_coverage.
+coverage:
+  # Week-of-quarter -> the coverage multiple (weighted pipeline / remaining
+  # gap) leadership expects to see by that week, for an ahead/behind read.
+  # PROVISIONAL, EMPTY: GrowthBook has not yet set these numbers. Leaving
+  # this empty is a fully supported, intentional state — assess_pipeline_
+  # coverage reports nominal/weighted coverage and the remaining gap either
+  # way; it just omits expected_multiple and ahead/behind (never fabricates
+  # a schedule or infers one from the HEURISTIC historical curve, which is
+  # permanently evidence-ceilinged — see query_coverage_proxy_target_by_week).
+  # Fill in like: {4: 3.0, 8: 1.5, 12: 1.0} once Ryan/leadership sets real
+  # per-week expectations; any week not listed falls back to "no schedule"
+  # for that lookup, not the nearest neighbor.
+  expected_multiple_schedule: {}
+
+  # Week-of-quarter boundaries for the "phase" of the quarter a coverage
+  # answer is given in (early/mid/late) — used only to decide how much
+  # weight the aggregate coverage ratio gets in synthesis guidance (late-
+  # phase answers lean on named committed deals instead of the ratio, since
+  # there's little runway left for unweighted pipeline to mature). 13-week
+  # fiscal quarter, matching this codebase's existing week-of-quarter
+  # convention (scripts/snapshot_deals.py, forecast_analyses.py's by-week
+  # tables).
+  phase_boundaries:
+    early_through_week: 4   # weeks 1-4: early
+    late_from_week: 10      # weeks 10-13: late (5-9 is mid)
+
 # This block is kept for backward compatibility during Phase A transition.
 # The new pipeline.pipelines[] shape above takes precedence when both exist.
 
