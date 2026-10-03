@@ -166,6 +166,17 @@ FOLLOWUP_PRONOUNS = [
     "any of those", "any of these",
 ]
 
+# Word-boundary matching, not substring: a bare "it"/"they"/"them" substring
+# check also matches inside ordinary words ("with" contains "it", "digital"
+# contains "it") — found as part of the 2026-10-03 explain_prior_answer
+# misroute incident, where "how did you come up with that number?" tripped
+# has_followup_pronoun via "it" inside "with". \b still allows "they'd" etc.
+# ("'" is a non-word character, so the boundary after "they" still matches).
+_FOLLOWUP_PRONOUN_RE = re.compile(
+    r"\b(?:" + "|".join(re.escape(p) for p in FOLLOWUP_PRONOUNS) + r")\b",
+    re.IGNORECASE,
+)
+
 NEW_DISCOVERY_SIGNALS = [
     # Phrasing that means "ignore known entities, find a NEW set"
     # Should NOT trigger entity-scoped bypass even if entities exist in thread
@@ -713,9 +724,10 @@ ENTITY_SCOPE_BULK_HANDLERS = [
 ]
 
 def has_followup_pronoun(question: str) -> bool:
-    """Detect if question references prior answer entities."""
-    q = question.lower()
-    return any(p in q for p in FOLLOWUP_PRONOUNS)
+    """Detect if question references prior answer entities. Word-boundary
+    matched — see _FOLLOWUP_PRONOUN_RE's comment for why (not a bare
+    substring check)."""
+    return bool(_FOLLOWUP_PRONOUN_RE.search(question))
 
 def build_entity_hint(entities: dict) -> str:
     """Build a context hint for the intent classifier."""
@@ -6306,20 +6318,17 @@ async def _route_question(question: str, user_id: str,
             logger.info("[ENTITY_SCOPE] no matching bulk handler, "
                         "falling through to normal routing")
 
-    # ── G.7 cache fallback — only when no usable entity IDs ──
-    # Prefer entity_context (live re-query) over stale cache. But a message that
-    # names its own entities is not a "use the cached answer" follow-up.
-    if (not skip_normal_routing and has_followup_pronoun(question)
-            and not msg_has_own_entities):
-        from api.db import load_result_cache
-        cached = load_result_cache(sb, thread_ts) if thread_ts else None
-        if cached:
-            logger.info("[CACHE] answering follow-up from cached payload "
-                       "(no entity IDs available)")
-            tool_results = cached
-            handler_name = "cached_result"
-            result_quality = "good"
-            skip_normal_routing = True
+    # G.7 cache fallback used to run HERE, before classification — see the
+    # 2026-10-03 incident: an explain_prior_answer-shaped question
+    # ("how did you come up with that number?") was matching
+    # has_followup_pronoun's broad substring check (bare "it" inside "with")
+    # and getting answered from the old cached_result resynthesis path
+    # without the intent classifier ever running, so explain_prior_answer's
+    # own (correct) handling path never got a chance to fire. Moved to run
+    # AFTER classification — see the G.7 block below, placed once
+    # handler_name has been resolved by the classifier and the confidence
+    # floor — so it only engages when classification itself doesn't resolve
+    # to a more specific, already-self-handling intent.
 
     # ── 0. Pronoun resolution (fallback path) ────────
     # This now serves as backup when entity-scope didn't match
@@ -6611,6 +6620,33 @@ async def _route_question(question: str, user_id: str,
                 _log_routing_rejection(sb, question, original_handler, confidence, confidence_floor)
                 handler_name = "dynamic_query"
 
+        # ── G.7 cache fallback — only when classification didn't resolve to
+        # a more specific, self-handling intent ──
+        # Moved here (2026-10-03) from before classification: it must run
+        # AFTER the classifier (and the confidence floor above) have settled
+        # on handler_name, so query_help / acknowledgment / explain_prior_answer
+        # — each of which has its own correct handling path immediately below
+        # (1c/1d) and returns directly, never reaching generic handler
+        # execution or synthesis — always win over a stale-cache resynthesis.
+        # Anything else (a precomputed data handler with no entity IDs to
+        # re-query, dynamic_query, unanswerable) still falls back to
+        # resynthesizing from the last turn's full cached payload — this is
+        # the ORIGINAL "which of those are at risk" style bulk follow-up use
+        # case G.7 was built for, now reached via classification's own
+        # output rather than a pre-classification shortcut.
+        if (has_followup_pronoun(question) and not msg_has_own_entities
+                and handler_name not in ("query_help", "acknowledgment",
+                                          "explain_prior_answer")):
+            from api.db import load_result_cache
+            cached = load_result_cache(sb, thread_ts) if thread_ts else None
+            if cached:
+                logger.info(f"[CACHE] answering follow-up from cached payload "
+                           f"(classification resolved to {handler_name!r}, "
+                           f"not a self-handling intent)")
+                tool_results = cached
+                handler_name = "cached_result"
+                result_quality = "good"
+
         # ── 1c. Greeting / help / acknowledgment (orientation, no data) ──
         # Short-circuit BEFORE the data handler + synthesis path: these carry
         # no numbers to synthesize or verify. Persona- and thread-aware.
@@ -6702,10 +6738,16 @@ async def _route_question(question: str, user_id: str,
                     "tool_results": {}}
 
         # ── 3. Try precomputed handler ────────────────────
-        tool_results = {}
-        result_quality = "empty"
         handler_failure_reason = ""  # PART 1: carried into the fallback
         is_slow = handler_name == "generate_win_loss"
+        if handler_name != "cached_result":
+            # G.7 above already populated tool_results/result_quality from
+            # the cached payload when it fires — resetting them here would
+            # silently discard that and fall through to dynamic_query_loop
+            # instead (getattr(handlers, "cached_result", None) is None, so
+            # the "else" branch below is already a no-op for this handler).
+            tool_results = {}
+            result_quality = "empty"
 
         # ── 3b. Direct dynamic_query (before handler execution) ──
         # dynamic_query means "use the loop" — don't try a handler first.
