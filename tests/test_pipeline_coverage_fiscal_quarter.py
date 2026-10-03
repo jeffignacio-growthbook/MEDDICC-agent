@@ -178,13 +178,14 @@ def test_historical_quarter_uses_latest_snapshot_week():
 
 
 def test_historical_quarter_no_target_discloses():
-    """When no target exists for the requested quarter, gap_to_goal is null
-    and the note discloses the absence."""
+    """When no target exists for the requested quarter, coverage's
+    remaining-gap fields are null and the note discloses the absence."""
     snaps = [_snapshot_row("d1", stage_order=3)]
     deals = [_deal_row("d1")]
     r = _run_historical(snaps, deals, targets=[])
     assert r["real_target"]["goal"] is None
-    assert r["gap_to_goal"]["raw_pipeline_vs_goal"] is None
+    assert r["coverage"]["remaining_gap"] is None
+    assert r["coverage"]["nominal_coverage"] is None
     assert "No stated target" in r["real_target"]["note"]
     print("✓ historical quarter with no target discloses absence")
 

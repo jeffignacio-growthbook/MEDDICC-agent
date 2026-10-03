@@ -994,7 +994,7 @@ def query_stage_close_rate(sb=None) -> Dict:
 
 def actual_incremental_closed_won(sb, q_start_iso: str, q_end_iso: str):
     """Actual closed-won incremental ARR (new_arr+expansion_arr), renewal
-    pipeline excluded, deals table. Promoted UNMODIFIED from
+    pipeline excluded, deals table. Originally promoted UNMODIFIED from
     scripts/audit_coverage_curve.py::actual_incremental_closed_won after
     live confirmation (2026-09-19). Made public 2026-10-03 (config-driven
     coverage): the ORIGINAL use (query_coverage_proxy_target_by_week,
@@ -1003,34 +1003,40 @@ def actual_incremental_closed_won(sb, q_start_iso: str, q_end_iso: str):
     identical "closed-won incremental ARR in [start, end]" computation —
     one function, two windows, never two copies to drift apart.
 
-    OUTCOME-READ (same as _in_quarter_won_by_pipeline/_classify_deal_
-    outcome elsewhere in this module): `stage` here determines the
-    TERMINAL WON outcome (is_won), not a point-in-time stage exclusion —
-    the backfilled complete quarters hold zero won rows in
-    deals_snapshot, so a won transition has no point-in-time snapshot
-    equivalent; close_date bounds it to whichever quarter window the
-    caller passes (prior-year for the proxy curve, current for coverage)."""
-    from field_semantics import _RENEWAL_PIPELINE_ID, is_won
+    FILTER GENERALIZED 2026-10-03 (same day): a three-way reconciliation
+    test (tests/test_coverage_qtd_reconciliation.py) found this function's
+    ORIGINAL filter — pipeline_id == renewal ID (excludes a renewal deal
+    outright, even with real expansion ARR) + is_won(current `stage`)
+    (ignores deal_status entirely) — disagreed with BOTH
+    api/handlers.py::query_path_to_target's inline QTD computation AND
+    scripts/loss_concentration.py::assess_loss_concentration's
+    won_incremental_arr by $125,000 on a fixture exercising both
+    differences independently. Both of those (and assess_pipeline_
+    coverage's own qualified-pipeline population filter, same file) use
+    is_incremental_pipeline() (a DOLLAR-based test: new_arr > 0 or
+    expansion_arr > 0, pipeline_id-agnostic) + deal_status == "won" — now
+    adopted here too, for BOTH the prior-year and current-quarter windows,
+    so there is one definition of "closed-won incremental ARR in a
+    window," not three. See that test file for the reconciliation proof.
+
+    NOT YET generalized (deliberately, to keep this change reviewable):
+    query_path_to_target's own inline QTD computation and
+    assess_loss_concentration's won_incremental_arr still have their own,
+    separate implementations of the SAME now-matching filter — tracked as
+    a follow-up consolidation, not done in this change."""
+    from field_semantics import is_incremental_pipeline
     from supabase_client import select_all
     deals = select_all(sb, 'deals',
-        columns='deal_id,stage,close_date,pipeline_id,new_arr,expansion_arr')
+        columns='deal_id,deal_status,close_date,pipeline_id,new_arr,expansion_arr',
+        filters=[('eq', 'deal_status', 'won'),
+                 ('gte', 'close_date', q_start_iso),
+                 ('lte', 'close_date', q_end_iso)])
     total = 0.0
     n = 0
     for d in deals:
-        stage, close_date, pipeline_id = d.get('stage'), d.get('close_date'), d.get('pipeline_id')
-        if not stage or not close_date:
-            continue
-        if str(pipeline_id) == _RENEWAL_PIPELINE_ID:
-            continue
-        try:
-            if not is_won(str(stage)):
-                continue
-        except Exception:
-            continue
-        if not (q_start_iso <= str(close_date)[:10] <= q_end_iso):
-            continue
-        total += incremental_arr(d)
-        n += 1
+        if is_incremental_pipeline(d):
+            total += incremental_arr(d)
+            n += 1
     return total, n
 
 

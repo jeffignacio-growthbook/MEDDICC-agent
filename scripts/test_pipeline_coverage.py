@@ -6,7 +6,7 @@ test_forecast_trust.py's convention of mixing structural and defect-specific
 tests in one file).
 
 These test the COMPOSING function's own logic — scope filtering, stage
-weighting, gap-to-goal phrasing, and the real-target/heuristic-curve
+weighting, remaining-gap coverage, and the real-target/heuristic-curve
 distinction — not the underlying primitives it composes
 (query_stage_close_rate() and query_coverage_proxy_target_by_week() have
 their own test coverage in scripts/test_forecast_analyses.py). Those are
@@ -25,8 +25,10 @@ Covers:
    weighted by its win_rate; a deal at an ungated stage is excluded from
    the weighted total (unweighted_value/unweighted_deal_count), never
    defaulted to a 1.0 weight.
-3. Gap-to-goal is ALWAYS phrased "$X short of target"/"$X over target",
-   never a bare ratio — both directions.
+3. Coverage is ALWAYS against the remaining gap (quota minus QTD won),
+   with the full three-operand equation chain shown — never a bare
+   ratio with no derivation. Quota-already-met is a graceful no-ratio
+   edge case, not a crash or a fabricated number.
 4. The historical curve is always labeled HEURISTIC in output text; the
    real_target's own note is NEVER labeled a heuristic — the two must
    stay distinguishable in every result.
@@ -123,23 +125,39 @@ def _base_deals(extra=None):
     return deals
 
 
-def _run(deals_data, quota_value=2000000, current_period="FY2027_Q3"):
+def _run(deals_data, quota_value=2000000, current_period="FY2027_Q3",
+        qtd_won=0.0, coverage_config=None):
     """Runs assess_pipeline_coverage() with the standard mock set. Returns
-    the result dict."""
+    the result dict.
+
+    actual_incremental_closed_won is mocked at its source module, same
+    reasoning as query_stage_close_rate/query_coverage_proxy_target_by_week
+    above (it has its own dedicated test coverage — scripts/test_forecast_
+    analyses.py, tests/test_coverage_qtd_reconciliation.py — not
+    re-exercised here). Without this mock, the blanket select_all mock
+    would hand it the SAME deals_data used for qualified_pipeline
+    (ignoring the deal_status=='won' filter it actually passes), producing
+    a nonzero qtd_won no test here intends."""
     sb = _mock_rep_targets_sb(quota_value)
 
     with patch('utils.get_fiscal_quarter') as mock_gfq, \
+         patch('utils.get_coverage_config') as mock_coverage_cfg, \
          patch('snapshot_deals.get_week_of_quarter') as mock_gwoq, \
          patch('time_resolver.current_quarter_label') as mock_cql, \
          patch('supabase_client.select_all') as mock_select_all, \
          patch('forecast_analyses.query_stage_close_rate') as mock_stage_rates, \
-         patch('forecast_analyses.query_coverage_proxy_target_by_week') as mock_curve:
+         patch('forecast_analyses.query_coverage_proxy_target_by_week') as mock_curve, \
+         patch('forecast_analyses.actual_incremental_closed_won') as mock_qtd:
         mock_gfq.return_value = (date(2026, 8, 1), date(2026, 10, 31), 'FY2027 Q3')
+        mock_coverage_cfg.return_value = coverage_config or {
+            "expected_multiple_schedule": {}, "phase_boundaries":
+                {"early_through_week": 4, "late_from_week": 10}}
         mock_gwoq.return_value = 7
         mock_cql.return_value = current_period
         mock_select_all.return_value = deals_data
         mock_stage_rates.return_value = _fake_stage_rates()
         mock_curve.return_value = _fake_proxy_curve()
+        mock_qtd.return_value = (qtd_won, 1 if qtd_won else 0)
 
         return assess_pipeline_coverage(sb, as_of=date(2026, 9, 18))
 
@@ -205,37 +223,70 @@ def test_stage_weighting_excludes_ungated_stage_from_weighted_total():
     print("  ✓ Gated deal weighted by real win_rate; ungated deal excluded, not defaulted")
 
 
-def test_gap_to_goal_phrasing_never_bare_ratio():
+def test_coverage_shows_remaining_gap_and_both_ratios():
     """
-    gap_to_goal must always be phrased as a dollar shortfall/overage, in
-    both directions — never a bare ratio like "3.2x".
+    coverage.equations must show the full three-operand chain (quota -
+    won = remaining, then pipeline / remaining = Nx) for BOTH nominal and
+    weighted, with every number stating its basis — never a bare ratio
+    with no derivation. remaining_gap must reflect QTD won netted out of
+    quota, not the bare quota.
     """
-    print("\n[TEST] gap_to_goal always phrased as $X short/over, both directions")
+    print("\n[TEST] coverage shows remaining-gap equations for both nominal and weighted")
 
-    # Case 1: pipeline well below quota (quota=2,000,000, raw pipeline only
-    # 150000) -> "short of target"
-    result = _run(_base_deals(), quota_value=2000000)
-    gap = result["gap_to_goal"]["raw_pipeline_vs_goal"]
-    if gap["status"] != "short":
-        raise AssertionError(f"Expected status='short', got {gap!r}")
-    if "short of target" not in gap["text"]:
-        raise AssertionError(f"Expected '$X short of target' phrasing, got {gap['text']!r}")
-    if gap["text"].rstrip().endswith("x") or gap["text"].strip().endswith("%"):
-        raise AssertionError(f"gap_to_goal text looks like a bare ratio: {gap['text']!r}")
+    # quota=2,000,000, qtd_won=500,000 -> remaining_gap=1,500,000
+    result = _run(_base_deals(), quota_value=2000000, qtd_won=500000)
+    cov = result["coverage"]
 
-    # Case 2: pipeline well above quota (small quota, but a large qualified
-    # deal pushes raw pipeline past it) -> "over target"
-    huge_deal = {"deal_id": "huge1", "pipeline_id": "default", "expansion_arr": 0,
-                 "new_arr": 5000000, "stage": "appointmentscheduled", "highest_stage_order_reached": 1,
-                 "close_date": "2026-09-12", "deal_status": "active"}
-    result2 = _run(_base_deals([huge_deal]), quota_value=100000)
-    gap2 = result2["gap_to_goal"]["raw_pipeline_vs_goal"]
-    if gap2["status"] != "over":
-        raise AssertionError(f"Expected status='over', got {gap2!r}")
-    if "over target" not in gap2["text"]:
-        raise AssertionError(f"Expected '$X over target' phrasing, got {gap2['text']!r}")
-    print(f"  ✓ Short case: {gap['text']!r}")
-    print(f"  ✓ Over case: {gap2['text']!r}")
+    if cov["remaining_gap"] != 1500000:
+        raise AssertionError(f"Expected remaining_gap=1,500,000 (2,000,000 - 500,000 won), "
+                             f"got {cov['remaining_gap']!r}")
+    if cov["quota_met"] is not False:
+        raise AssertionError(f"Expected quota_met=False, got {cov['quota_met']!r}")
+
+    # raw=150000, weighted=40000 (from _base_deals/_fake_stage_rates)
+    if abs(cov["nominal_coverage"] - 150000 / 1500000) > 1e-9:
+        raise AssertionError(f"Expected nominal_coverage=0.10, got {cov['nominal_coverage']!r}")
+    if abs(cov["weighted_coverage"] - 40000 / 1500000) > 1e-9:
+        raise AssertionError(f"Expected weighted_coverage=0.0267, got {cov['weighted_coverage']!r}")
+
+    eqs = cov["equations"]
+    if "$2,000,000 quota - $500,000 won = $1,500,000 remaining" != eqs["remaining"]:
+        raise AssertionError(f"Unexpected remaining equation: {eqs['remaining']!r}")
+    if "$150,000 raw qualified pipeline / $1,500,000 remaining = 0.10x" != eqs["nominal"]:
+        raise AssertionError(f"Unexpected nominal equation: {eqs['nominal']!r}")
+    if "$40,000 weighted pipeline / $1,500,000 remaining = 0.03x" != eqs["weighted"]:
+        raise AssertionError(f"Unexpected weighted equation: {eqs['weighted']!r}")
+    print(f"  ✓ {eqs['remaining']}")
+    print(f"  ✓ {eqs['nominal']}")
+    print(f"  ✓ {eqs['weighted']}")
+
+
+def test_coverage_quota_met_no_ratio():
+    """
+    EDGE CASE: QTD won >= quota — remaining_gap is 0, and NEITHER ratio is
+    computed (dividing by a zero/negative remaining commitment is
+    meaningless, never silently produced as inf or a fabricated number).
+    The note must say quota is already met.
+    """
+    print("\n[TEST] quota already met -> no ratio, not a crash or a fabricated number")
+
+    result = _run(_base_deals(), quota_value=100000, qtd_won=150000)
+    cov = result["coverage"]
+
+    if cov["quota_met"] is not True:
+        raise AssertionError(f"Expected quota_met=True, got {cov['quota_met']!r}")
+    if cov["remaining_gap"] != 0.0:
+        raise AssertionError(f"Expected remaining_gap=0.0, got {cov['remaining_gap']!r}")
+    if cov["nominal_coverage"] is not None or cov["weighted_coverage"] is not None:
+        raise AssertionError(
+            f"Expected both coverage ratios None when quota is already met, got "
+            f"nominal={cov['nominal_coverage']!r} weighted={cov['weighted_coverage']!r}")
+    if "already met" not in cov["note"].lower():
+        raise AssertionError(f"Expected note to say quota already met, got: {cov['note']!r}")
+    if cov["equations"]["nominal"] is not None or cov["equations"]["weighted"] is not None:
+        raise AssertionError("Expected no nominal/weighted equation when quota is already met")
+    print(f"  ✓ {cov['equations']['remaining']}")
+    print(f"  ✓ note: {cov['note']!r}")
 
 
 def test_heuristic_curve_labeled_real_target_not():
@@ -376,7 +427,9 @@ def test_quota_missing_from_db_produces_graceful_nulls():
     When rep_targets has no team-level row (quota=None), the primitive must:
     - NOT crash
     - Return real_target.goal = None, real_target.quota = None
-    - Return gap_to_goal fields as None (not fabricated comparisons)
+    - Return coverage.remaining_gap/nominal_coverage/weighted_coverage/
+      quota_met/ahead_behind all as None (not fabricated comparisons)
+    - Still report coverage.phase (needs only current_week, not quota)
     - Carry a target_note explaining the absence
     - Still return valid qualified_pipeline and stage_weighting data
     """
@@ -393,15 +446,16 @@ def test_quota_missing_from_db_produces_graceful_nulls():
     if rt["goal"] is not None:
         raise AssertionError(f"Expected real_target.goal=None, got {rt['goal']!r}")
 
-    gap = result["gap_to_goal"]
-    if gap["raw_pipeline_vs_goal"] is not None:
-        raise AssertionError(
-            f"Expected gap_to_goal.raw_pipeline_vs_goal=None when no quota, "
-            f"got {gap['raw_pipeline_vs_goal']!r}")
-    if gap["weighted_pipeline_vs_goal"] is not None:
-        raise AssertionError(
-            f"Expected gap_to_goal.weighted_pipeline_vs_goal=None when no quota, "
-            f"got {gap['weighted_pipeline_vs_goal']!r}")
+    cov = result["coverage"]
+    for key in ("remaining_gap", "quota_met", "nominal_coverage", "weighted_coverage", "ahead_behind"):
+        if cov[key] is not None:
+            raise AssertionError(f"Expected coverage.{key}=None when no quota, got {cov[key]!r}")
+    if cov["equations"]["remaining"] is not None or cov["equations"]["nominal"] is not None \
+            or cov["equations"]["weighted"] is not None:
+        raise AssertionError(f"Expected no equations fabricated when no quota, got {cov['equations']!r}")
+    if cov["phase"] not in ("early", "mid", "late"):
+        raise AssertionError(f"Expected phase to still be reported (needs only current_week, "
+                             f"not quota), got {cov['phase']!r}")
 
     if "not configured" not in rt["note"].lower() and "no stated target" not in rt["note"].lower():
         raise AssertionError(
@@ -412,14 +466,16 @@ def test_quota_missing_from_db_produces_graceful_nulls():
             f"Pipeline data should still be valid even without quota, "
             f"got deal_count={result['qualified_pipeline']['deal_count']}")
 
-    print("  ✓ No crash; goal/quota=None; gap_to_goal=None; pipeline data intact")
+    print("  ✓ No crash; goal/quota=None; coverage fields=None; phase still reported; "
+          "pipeline data intact")
 
 
 def main():
     tests = [
         test_scope_excludes_renewal_and_unqualified_deals,
         test_stage_weighting_excludes_ungated_stage_from_weighted_total,
-        test_gap_to_goal_phrasing_never_bare_ratio,
+        test_coverage_shows_remaining_gap_and_both_ratios,
+        test_coverage_quota_met_no_ratio,
         test_quota_missing_from_db_produces_graceful_nulls,
         test_heuristic_curve_labeled_real_target_not,
         test_planted_discrepancy_missing_heuristic_label_caught,

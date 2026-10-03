@@ -381,19 +381,15 @@ KNOWN_FLAGGED_LOG_TAGS = {
     # mismatch is exactly what prevents a citation, not something shipped
     # despite being detected.
     "[EXPLAIN_PRIOR]",
-    # [PIPELINE_COVERAGE] (api/handlers.py), added 2026-10-03 (gap-to-goal
-    # arithmetic fix): "Failed to build gap-to-goal arithmetic note" —
-    # matched on "gap" in "gap-to-goal", not a discovered data problem.
-    # This is the except branch around building _synthesis_note's explicit
-    # subtraction equations (e.g. "$1,550,000 quota - $799,782 weighted =
-    # $750,218 short") from real_target.quota / qualified_pipeline.raw_value
-    # / stage_weighting.weighted_value / gap_to_goal's own amount. On
-    # failure the handler simply skips adding _synthesis_note — the
-    # already-correct result, cache_payload, and gap_to_goal.text ("$X
-    # short of target") are entirely unaffected; the only loss is the
-    # equation not being spelled out for the model this one time. No
-    # detect-and-ship-a-wrong-number path exists here at all.
-    "[PIPELINE_COVERAGE]",
+    # NOTE: [PIPELINE_COVERAGE]'s 2026-10-03 entry (gap-to-goal arithmetic
+    # fix, "Failed to build gap-to-goal arithmetic note") was removed
+    # 2026-10-03 (same day, config-driven coverage): that log message was
+    # reworded to "Failed to build coverage synthesis guidance", which no
+    # longer contains any _FLAGGED_LOG_KEYWORDS substring, so the scan no
+    # longer finds this tag at all — nothing to allowlist. See
+    # api/handlers.py::query_pipeline_coverage's own except branch for the
+    # current (still-reviewed-by-inspection, still a graceful no-op-on-
+    # failure) behavior.
 }
 
 

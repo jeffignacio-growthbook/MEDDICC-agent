@@ -1200,10 +1200,13 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
     is confirmed broken in production — divides one unscoped total
     pipeline figure against each individual rep's own target). This is
     a fresh composition: New+Expansion-only, qualified-pipeline-only,
-    weighted by historical stage-level close rate, compared against a
-    real team quota, with a HEURISTIC historical curve
-    (2x-prior-year-actual proxy — no real historical target ever
-    existed) shown for context only, always labeled as a heuristic.
+    weighted by historical stage-level close rate, compared against the
+    REMAINING gap (quota minus QTD closed-won — config-driven, 2026-10-03,
+    scripts/pipeline_coverage.py point 6). The HEURISTIC historical curve
+    (2x-prior-year-actual proxy) is still computed and cached for citation
+    (explain_prior_answer) but is no longer in the rendered answer — a
+    permanently evidence-ceilinged proxy competing with a real, measured
+    remaining-gap figure was never a good look side by side.
 
     Answers questions like:
     - "How much pipeline coverage do we have this quarter?"
@@ -1264,51 +1267,87 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
 
         result["cache_payload"] = dict(result)
 
-        # Show the gap-to-goal SUBTRACTION, not just its resulting delta.
-        # gap_to_goal's own .text (e.g. "$750,218 short of target") only
-        # ever states the result — real_target.quota, qualified_pipeline.
-        # raw_value, and stage_weighting.weighted_value are all present in
-        # the payload already, but nothing instructed the model to show the
-        # arithmetic connecting them, so a report whose core point IS the
-        # gap only ever asserted it. Built here (not left to the model) so
-        # the equation can never itself contain an arithmetic error.
+        # The HEURISTIC historical curve stays in cache_payload (citation —
+        # explain_prior_answer can still quote it on request) but comes OUT
+        # of the top-level result from here on, so it never reaches
+        # synthesis or the rendered answer. Popped AFTER cache_payload is
+        # built (dict(result) above already copied it in), never before.
+        result.pop("historical_heuristic_curve", None)
+
+        # Synthesis GUIDANCE, not a template (2026-10-03): say the verdict
+        # in plain words, state the basis, be phase-aware. The equations
+        # (coverage.equations, built in code by scripts/pipeline_coverage.py
+        # so they can never contain an arithmetic error) ARE quoted
+        # verbatim — they're the derivation. Everything else here is an
+        # instruction about what to say and how, not a sentence to copy.
         try:
-            real_target = result.get("real_target") or {}
-            quota = real_target.get("quota")
-            raw_value = (result.get("qualified_pipeline") or {}).get("raw_value")
-            weighted_value = (result.get("stage_weighting") or {}).get("weighted_value")
-            gap_to_goal = result.get("gap_to_goal") or {}
-            raw_gap = gap_to_goal.get("raw_pipeline_vs_goal")
-            weighted_gap = gap_to_goal.get("weighted_pipeline_vs_goal")
+            cov = result.get("coverage") or {}
+            quota = (result.get("real_target") or {}).get("quota")
+            eqs = cov.get("equations") or {}
+            phase = cov.get("phase")
 
-            def _equation(value, gap, value_label):
-                if quota is None or value is None or gap is None:
-                    return None
-                if gap["status"] == "short":
-                    return (f"${quota:,.0f} quota - ${value:,.0f} {value_label} "
-                            f"= ${gap['amount']:,.0f} short")
-                return (f"${value:,.0f} {value_label} - ${quota:,.0f} quota "
-                        f"= ${gap['amount']:,.0f} over")
+            lines = [
+                "COVERAGE GUIDANCE (say the verdict in your own words — do not "
+                "copy a fixed sentence from here):",
+            ]
 
-            raw_equation = _equation(raw_value, raw_gap, "raw qualified pipeline")
-            weighted_equation = _equation(weighted_value, weighted_gap, "weighted pipeline")
+            if quota is None:
+                lines.append(
+                    "- No quota is configured for this quarter. Say so plainly. "
+                    "Do not compute or imply a coverage ratio from the pipeline "
+                    "figures alone — there is nothing to cover them against."
+                )
+            elif cov.get("quota_met"):
+                lines.append(
+                    "- Quota is already met this quarter — state that as the "
+                    "headline, not a coverage ratio (there is no remaining gap "
+                    "to compute one against). Quote this equation as the basis:"
+                )
+                if eqs.get("remaining"):
+                    lines.append(f"  {eqs['remaining']}")
+            else:
+                ahead_behind = cov.get("ahead_behind")
+                lines.append(
+                    "- State whether coverage is " + (
+                        f"{ahead_behind} the expected {cov['expected_multiple']:.2f}x "
+                        f"pace for week {result.get('current_week')}"
+                        if ahead_behind and cov.get("expected_multiple") is not None
+                        else "ahead of or behind where you judge it should be "
+                             "(no expected-multiple schedule is configured for "
+                             "this week, so there is no ahead/behind fact to "
+                             "state — describe the ratios themselves instead)"
+                    ) + ". Quote these equations as the basis — every number "
+                    "states what it is, never a bare ratio with no derivation:"
+                )
+                for key in ("remaining", "nominal", "weighted"):
+                    if eqs.get(key):
+                        lines.append(f"  {eqs[key]}")
 
-            if raw_equation or weighted_equation:
-                lines = [
-                    "GAP-TO-GOAL ARITHMETIC: show the subtraction itself, not just "
-                    "the resulting delta — the gap IS the point of this report, so "
-                    "its derivation must be visible, not just asserted. Include "
-                    "these equation(s) verbatim, next to (or in) the gap-to-goal "
-                    "line(s) of your table/answer:"
-                ]
-                if raw_equation:
-                    lines.append(f"- Raw: {raw_equation}")
-                if weighted_equation:
-                    lines.append(f"- Weighted: {weighted_equation}")
-                result["_synthesis_note"] = "\n".join(lines)
+            if phase == "late":
+                lines.append(
+                    "- This is the LATE phase of the quarter (week "
+                    f"{result.get('current_week')} of 13) — there is little "
+                    "runway left for unweighted pipeline to mature. Give the "
+                    "coverage figures a sentence or two at most, then shift "
+                    "the answer's focus to which SPECIFIC, NAMED deals are "
+                    "committed to closing this quarter, if that data is "
+                    "available elsewhere in this context — the aggregate "
+                    "ratio matters less this late than which deals actually "
+                    "close. If no named-deal data is available here, say so "
+                    "and suggest checking committed pipeline directly, rather "
+                    "than dwelling on the ratio."
+                )
+            elif phase == "early":
+                lines.append(
+                    "- This is the EARLY phase of the quarter — normal to "
+                    "lean on the coverage ratios as the main signal; there's "
+                    "no need to pivot to named deals yet."
+                )
+
+            result["_synthesis_note"] = "\n".join(lines)
         except Exception as e:
-            logger.warning(f"[PIPELINE_COVERAGE] Failed to build gap-to-goal "
-                          f"arithmetic note: {e}")
+            logger.warning(f"[PIPELINE_COVERAGE] Failed to build coverage "
+                          f"synthesis guidance: {e}")
 
     return result
 
