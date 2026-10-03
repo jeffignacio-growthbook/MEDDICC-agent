@@ -1,7 +1,7 @@
 {
-  "company": "SAS & GrowthBook",
+  "company": "SAS & Growthbook",
   "slug": "sas-growthbook",
-  "last_etl_date": "2026-09-24T05:38:50.729084",
+  "last_etl_date": "2026-10-03T05:54:14.756241",
   "calls": [
     {
       "id": "01M33ZW69PZ23516THRPZ99YME",
@@ -12,6 +12,17 @@
       "summary": "# SAS & GrowthBook | Enterprise Evaluation\nDate: 2026-09-23 | Duration: 48m\n\n## Summary\nThe organization has used self-hosted GrowthBook for more than two years for organization-wide feature toggling and extensive server- and client-side experimentation, without DOM manipulation. The discussion covered enterprise benefits including SSO, SAML, role-based access, multi-organization separation, granular project permissions, customer success, training, onboarding, and support for multiple teams. Advanced capabilities include Cubed post-stratification, sequential testing, custom dashboards, query optimization, deeper behavioral insights, AI-assisted learnings, safe rollouts, automatic flag disabling after performance drops, namespace separation, and contextual bandits for adaptive traffic allocation. JIRA integration is available through webhooks, while the visual editor has limitations with Next.js hydration and is recommended for development environments. Commercial options include pricing by user seat or annual experiment count, with flexible tiering, and a proof of concept offering live access, onboarding, and support. Marcel will send a recap and commercial range information, and a follow-up will include Trills and Claudia.\n\n## Keywords\nGrowthBook, Enterprise, Experimentation, Self-hosted, Feature Toggles, JIRA Integration\n\n## Action Items\n**Rémy Marin**  \nConfirm JIRA integration compatibility (11:24)  \nSend JIRA integration setup documentation (13:00)  \nProvide visual editor DOM handling info (16:27)  \nShare video and materials on contextual bandits (28:20)  \nAssist with feature deep dives and clarifications (36:39)  \n\n**Marcel Geldner**  \nSend email recap with GrowthBook Enterprise info (30:00)  \nShare proof of concept details and contract constraints (36:20)  \nProvide calendar link for follow-up meeting (37:50)  \n\n**Daniel Calà**  \nProvide SAS budget timeline and procurement thresholds (33:46)  \nSync with Trills about GrowthBook Enterprise interest (37:11)",
       "organizer": "marcel@growthbook.io",
       "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3BXV80K06203ETHRSZTG6CT",
+      "source": "fireflies",
+      "title": "SAS & Growthbook | Enterprise Setup (POC) + Commercials",
+      "date": "2026-10-02",
+      "duration_minutes": 39.619998931884766,
+      "summary": "# SAS & Growthbook | Enterprise Setup (POC) + Commercials\nDate: 2026-10-02 | Duration: 39.619998931884766m\n\n## Summary\nGrowthBook has been used for two years with stable adoption and few technical concerns, but the organization wants to strengthen its experimentation culture through better processes, analytics, personalization, and controlled test growth. Improving the currently low conversion rate, which varies between 2% and 3% by segment, is a priority, alongside clearer alignment on key metrics. Scaling requires enterprise governance, including role-based permissions, infrastructure clarity, internal data integrations, and more understanding of JIRA usage. Funnel analytics, user journeys, contextual bandits, and AI-powered insights were discussed as tools for analyzing behavior, allocating traffic, evaluating significance, and suggesting next steps. Contentful is the CMS across markets and languages, with GrowthBook integration possible through its API and SDK, although Redis and Cloudflare caching may interfere with tests. Costs remain under review because CDN and bandwidth expenses are unclear and potentially substantial, while GrowthBook offers a flat enterprise fee that includes CDN traffic and pricing based on user seats. Further architecture discussions, cost clarification, shared materials, and a follow-up meeting were proposed.\n\n## Keywords\nGrowthBook, experimentation culture, enterprise integration, A/B testing, Contentful integration, contextual bandits\n\n## Action Items\n**Rémy Marin**  \nSupport training on GrowthBook funnel (13:28)  \nProvide guidance on GrowthBook Contentful integration (26:00)  \nAssist SAS with caching and CDN architecture (30:50)  \n\n**Daniel Calà**  \nDiscuss internal architecture and caching layers (27:26)  \n\n**Truls Wikner**  \nContinue internal discussions on GrowthBook integration (31:18)  \nConfirm and attend follow-up meeting (36:10)  \n\n**Marcel Geldner**  \nAssist SAS with IT architecture schematic (30:44)  \nCheck calendar and confirm meeting timing (36:44)  \nSend presentation deck and meeting invitation (38:20)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 5,
       "summary_quality": "good"
     }
   ]

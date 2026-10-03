@@ -1,0 +1,18 @@
+{
+  "company": "Invitation: Place holder to talk to GB. @ Fri Oct 2, 2026 11:35am",
+  "slug": "invitation-place-holder-to-talk-to-gb-fri-oct-2-2026-11-35am",
+  "last_etl_date": "2026-10-03T05:54:14.755536",
+  "calls": [
+    {
+      "id": "01M3YKYW95XPWTD8TZNRVXKT85",
+      "source": "fireflies",
+      "title": "Invitation: Place holder to talk to GB. @ Fri Oct 2, 2026 11:35am - 12:15pm (EDT) (null)",
+      "date": "2026-10-02",
+      "duration_minutes": 45.029998779296875,
+      "summary": "# Invitation: Place holder to talk to GB. @ Fri Oct 2, 2026 11:35am - 12:15pm (EDT) (null)\nDate: 2026-10-02 | Duration: 45.029998779296875m\n\n## Summary\nThe discussion focused on scalability risks as experiment imports add millions of rows to a warehouse containing approximately 200 billion rows, with potential effects on experiment analysis, custom reports, and compute. Performance was prioritized over cost measurement, while Snowflake’s finite budget remained a constraint. Proposed improvements included incremental refresh using reliable watermarks, pre-aggregated tables, clustering keys, timestamp filtering, transient or temporary processing, newer warehouse types, and query tagging. Incremental refresh is complicated by multiple data domains, missing ingestion or received timestamps, late-arriving data, and the need to scan forward from a watermark without repeatedly rescanning history. Pre-aggregation must preserve exposure details, health checks, interaction analysis, flexible date ranges, and custom reports. Better query-cost attribution, usage forecasting, data retention options, and value-based capacity decisions were also discussed. Angela will arrange a session next week with Manoj and Zhongjiong, with GrowthBook and Snowflake specialists joining as needed.\n\n## Keywords\nSnowflake scalability, Incremental refresh, Watermark timestamps, Query tagging, Pre-aggregation, Experiment analytics\n\n## Action Items\n**Zhongjiong Wang**\n- Collaborate on query-tag analysis (27:21)\n\n**Ravi Nagaraju**\n- Connect with Philip Bowditch (27:41)\n- Define incremental-refresh requirements (36:00)\n\n**Angela Borgman**\n- Schedule technical brainstorming session (34:24)\n\n**Luke Sonnet**\n- Clarify GrowthBook requirements (40:12)",
+      "organizer": "cris@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}

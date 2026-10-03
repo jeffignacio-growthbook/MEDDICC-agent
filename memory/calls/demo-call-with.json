@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-09-30T06:08:48.421199",
+  "last_etl_date": "2026-10-03T05:54:14.753946",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -817,6 +817,17 @@
       "duration_minutes": 34.72999954223633,
       "summary": "# Demo Call with Fadel abbadi from Eon Dental\nDate: 2026-09-29 | Duration: 34.72999954223633m\n\n## Summary\nEon Dental’s web portal enables doctors and clinic teams to submit customized orthodontic cases, triggering order orchestration, design, manufacturing, and shipment of tailored dental products; revenue comes from product sales rather than digital services. The organization plans to establish a data-driven experimentation strategy based on clear business questions, hypotheses, metrics, and minimum detectable effects, with product managers selecting experiments and engineers implementing them. GrowthBook’s SDK would provide feature flags, deterministic user assignment, local evaluation, experiment tracking, and integration with AWS pipelines and Amazon Redshift. Experiments can progress from feature flags to variant testing, analysis, and rollout of winning variants, while permanent changes should later be incorporated into the codebase. GrowthBook can be cloud-hosted or self-hosted and offers APIs, AI-assisted workflows, no-code visual experimentation, and enterprise support. Engineering will review technical feasibility, product managers will attend a follow-up demonstration, and pricing discussions will follow review of user counts, timelines, and requirements.\n\n## Keywords\nFeature Flags, Experimentation, SDK Integration, Data Warehouse, A/B Testing, Self-Hosting\n\n## Action Items\n\n**Fadel Alabbadi**\nReview GrowthBook technical documentation and slides sent by James to understand platform capabilities and integration details (31:03)\nCoordinate with product managers to schedule a demo session with James for a walkthrough of feature flag and experiment construction, data insights, and decision-making functionalities (31:03)\nDetermine internal user count and timeline requirements for GrowthBook implementation to inform pricing and deployment discussions (32:12)\n\n**James Shannon**\nSend GrowthBook documentation, technical slides, and relevant links to Fadel for internal review and evaluation (33:16)\nPrepare to support Eon Dental with a potential 30-day free enterprise trial of GrowthBook pending their evaluation and decision (32:11)\n",
       "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3YW45DVNVGBH28Z9X1QM79D",
+      "source": "fireflies",
+      "title": "Demo Call with Alyssa Bonneau from",
+      "date": "2026-10-02",
+      "duration_minutes": 30,
+      "summary": "# Demo Call with Alyssa Bonneau from\nDate: 2026-10-02 | Duration: 30m\n\n## Summary\nNova is in the early design phase of professionalizing experimentation across SMB financial products. Current testing is fragmented and largely manual, using SQL, internal tools, database lists, random assignments, and limited Optimizely usage; registration and results tracking are inconsistent. Nova needs a centralized repository for test populations, metadata, and results that connects to two Snowflake instances. GrowthBook was presented as an open-source, warehouse-native platform supporting multiple Snowflake connections, 200+ SDKs, feature flags, experiment setup, sticky bucketing, traffic allocation, goal metrics, and Slack or email alerts. It can track population overlap, support migration from spreadsheets or legacy platforms, and provide AI-generated experiment learnings. Because security, SSO, and governance are priorities in financial services, the Enterprise plan was recommended. Nova prefers keeping experiment execution separate while using GrowthBook for logging and analysis. Scott offered a future deep-dive demo with a solution engineer and follow-up migration details.\n\n## Keywords\nexperiment tracking, Snowflake integration, Optimizely, feature flags, test repository, data warehouse\n\n## Action Items\n\n**Scott Keller**\nSend a follow-up email to Alyssa Bonneau with detailed information about Growth Book and copy the solution engineer Logan; offer to schedule a full end-to-end demo session (29:33)\nFollow up on details about migrating test data from spreadsheets and integrating that historical data into Growth Book (24:00)\n\n**Alyssa Bonneau**\nReview initial information about Growth Book and its capabilities for test tracking and analysis to inform Nova’s early-phase design decisions (00:00)\n",
+      "organizer": "scott.keller@growthbook.io",
       "participants": 2,
       "summary_quality": "good"
     }

@@ -1,0 +1,18 @@
+{
+  "company": "Ali Rizvi and",
+  "slug": "ali-rizvi-and",
+  "last_etl_date": "2026-10-03T05:54:14.755083",
+  "calls": [
+    {
+      "id": "01M3SW330M7YBDPSGY6MRYJ7WY",
+      "source": "fireflies",
+      "title": "Ali Rizvi and Ashley Stirrup",
+      "date": "2026-10-02",
+      "duration_minutes": 33.130001068115234,
+      "summary": "# Ali Rizvi and Ashley Stirrup\nDate: 2026-10-02 | Duration: 33.130001068115234m\n\n## Summary\nThe discussion focused on restructuring inadequate financial reporting and revenue recognition processes. Revenue and ARR are manually estimated from Stripe and HubSpot, with unclear deferred revenue, amortization, ownership, and methodology. Jeremy’s investor spreadsheet remains the main source for revenue and cash metrics but is not integrated with accounting systems. Accounts receivable reached $4.4 million, with a target of $2 million. Ali plans to review Fondo’s accounting practices, gain access to QuickBooks Online, Stripe, and HubSpot, and clarify cash balances, vendor management, and expense categorization. Mark’s financial model is outdated, hard-coded, missing accounts payable, and does not include next year’s hiring or budget; Ali plans to rebuild it for fiscal year 2027. Runway estimates range from the low 20s to about 25 months, with a goal of 24 months by January end supported by a $2 million Anthropic services deal, of which $500,000 has been collected. The company also needs formal monthly closes, bank reconciliations, cash collection targets, vendor classification, a COGS policy, clearer outsourcing accountability, and stricter adherence to approved hiring plans.\n\n## Keywords\nAccounting, Revenue Recognition, Cash Collections, Financial Modeling, Expense Classification, Outsourced Bookkeeping\n\n## Action Items\n\n**Ali Rizvi**\nSend link to shared folder containing the latest spreadsheet from Mark (01:06)\nReview Fondo’s accounting procedures through a direct call; identify responsibilities and gaps (14:03)\nObtain access to company’s QuickBooks Online and HubSpot instances to analyze financial data and revenue recognition processes (20:18)\nCoordinate communication via Slack with Jennifer and request Slack invite to relevant channels (21:40)\nConduct a detailed line-by-line review of accounting entries with outsourced bookkeepers (14:03)\nMeet with Mark for rebuilding the FY2028 financial model to align with hiring and financial planning (25:26)\nPrepare comprehensive list of accounting and financial planning gaps for leadership review (24:30)\nEstablish a monthly close cadence and financial reporting framework with accounting team (23:58)\n\n**Ashley Stirrup**\nCoordinate with Jennifer to send Slack invite to Ali (21:11)\nShare investor spreadsheet and company operational metrics with Ali for better transparency (04:44)\nAssist in identifying and tagging all vendors and contractors for proper expense classification (15:05)\nFacilitate contact between Ali and Fondo’s team, especially Nick, to clarify roles and responsibilities (20:44)\nCommunicate leadership’s headcount and hiring plan limits to team to improve budgeting discipline (27:16)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

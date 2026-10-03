@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Ranking Experiment",
+  "slug": "growthbook-ranking-experiment",
+  "last_etl_date": "2026-10-03T05:54:14.752464",
+  "calls": [
+    {
+      "id": "01M3YZYWRE0068X306VA27PQF8",
+      "source": "fireflies",
+      "title": "GrowthBook Ranking Experiment MVP Planning",
+      "date": "2026-10-02",
+      "duration_minutes": 63.400001525878906,
+      "summary": "# GrowthBook Ranking Experiment MVP Planning\nDate: 2026-10-02 | Duration: 63.400001525878906m\n\n## Summary\nThe discussion focused on enabling GrowthBook access before contract terms are complete, with sandbox or enterprise access available and GrowthBook Cloud currently favored. The teams aim to finalize hosting and integration decisions next week, while starting engineering implementation. GrowthBook’s UI is preferred for runtime ranking configuration to reduce application releases, with a fallback retained in the application. The proposed MVP uses pairwise team-draft interleaving, with competitive and non-competitive items identified in exposure telemetry; testing more than two rankers is deferred. Search-level exposure is favored, while query IDs, ranking seeds, or ranking IDs must connect exposures to later clicks and conversions. Interleaving will provide rapid screening before A/B or switchback testing, but the strongest short-term engagement signal remains unresolved. Post-ranking sorting, attribution rules, telemetry feasibility, and cross-functional ownership require further alignment. A first version is targeted for the end of the month, with an engineering, ML, and data engineering meeting planned for next week.\n\n## Keywords\nInterleaving experimentation, Ranking models, GrowthBook configuration, Telemetry attribution, Team-draft algorithm, Pairwise A/B testing\n\n## Action Items\n**Tyler Jarrell**\nCoordinate access (00:26)\nFinalize implementation plan (01:10)\nContact GrowthBook team (01:26)\n\n**Luke Sonnet**\nSchedule stakeholder meeting (04:52)\nShare interleaving decisions (13:03)\nInvestigate sorting implications (01:00:29)\nPost telemetry question (01:00:29)\n\n**Siqun Wang**\nCoordinate meeting scheduling (01:00:28)\n\n**David Tse**\nTag data engineering stakeholders (01:01:24)",
+      "organizer": "luke@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

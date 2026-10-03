@@ -1,7 +1,7 @@
 {
   "company": "Zoro + GrowthBook",
   "slug": "zoro-growthbook",
-  "last_etl_date": "2026-10-02T06:25:29.670278",
+  "last_etl_date": "2026-10-03T05:54:14.755834",
   "calls": [
     {
       "id": "01KVXF4DB3N44ZB5WM8AJ453WB",
@@ -104,6 +104,17 @@
       "summary": "# Zoro + GrowthBook\nDate: 2026-10-01 | Duration: 28.40999984741211m\n\n## Summary\nFeature flags are active in QA, staging, and ephemeral environments, with production rollout planned for next Monday using separate development and production SDK keys. The team is evaluating whether SDK-based code-reference capture can replace GitHub actions in every repository, reducing setup and maintenance. Growth Book projects are being used to separate payloads and manage SDK keys, while the redundant “ZCOM DEV” project is planned for deletion. Terraform is being explored for feature-flag backups, safer configuration changes, traceability, and quick rollback, using third-party providers or potentially custom tooling. Jared will begin sending exposure events to RTAP and GA development tables for proof-of-concept testing, initially using a simple flat schema. Growth Book’s planned usage analytics will provide live flag-evaluation volumes, with deduplication between client and server SDKs requiring validation. The team also discussed permissions, callbacks, debugging tools, documentation sharing, and continued analyst coordination.\n\n## Keywords\nGrowthBook, Exposure Events, Code References, GitHub Actions, SDK, Analytics\n\n## Action Items\n\n**Christian Liebenow**\nShare the previous meeting’s recording and notes with the team (03:42)\n\n**Logan Bates**\nResearch and confirm the minimal GitHub Action API key permissions needed for code references (04:31)\nDiscuss internally the feasibility of using the SDK to automatically capture code references, avoiding GitHub Action deployment in every repo (06:48)\nInvestigate and provide detailed information on upcoming usage analytics UI features, including live evaluation counts, deduplication of client/server SDK events, and alignment with callback data (17:27)\nValidate if usage analytics reflect SDK evaluations accurately and whether server-side actions require additions (20:34)\nCheck for availability or plans of a first-party Terraform provider for GrowthBook, beyond the current third-party solution (24:07)\nFollow up on answers regarding GitHub Action permissions and the possibility of SDK-only code references; communicate updates to the team (27:09)\n\n**Jared Smith**\nExecute data capture setup so exposure event data flows into RTAP and GA tables starting in dev environments prior to production rollout next week (22:59)\n",
       "organizer": "christian@growthbook.io",
       "participants": 14,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3SJJNQCW31540TXSBVFVFD4",
+      "source": "fireflies",
+      "title": "Zoro + GrowthBook",
+      "date": "2026-10-02",
+      "duration_minutes": 22.040000915527344,
+      "summary": "# Zoro + GrowthBook\nDate: 2026-10-02 | Duration: 22.040000915527344m\n\n## Summary\nGrowth Book’s POC is progressing, with Wills leading SDK development and successfully connecting analytics callbacks. Core SDK functionality remains the priority before integrations such as Datadog, while minor questions about metric flexibility and experiment configuration remain; no major blockers were identified. The team is also discussing configuration beyond the POC, which ends October 16 but may extend to October 23 or later to support effective evaluation. Jay and Bob emphasized the need for predictable multi-year pricing, protection against year-two price increases, and flexibility for small user-count changes; expected growth is approximately 5–10 users. User seat counts will be reviewed Tuesday and shared with sales and legal. Business approval is expected to be quick, while legal review may take about three weeks. The partnership is targeted for completion by the end of October. Recent AI conference exposure and engagement from Mahesh, Dale, Alexis, and technical product managers indicate growing internal interest.\n\n## Keywords\nPOC progress, Growth Book, pricing predictability, SDK development, legal review, multi-year contract\n\n## Action Items\n\n**Christian Liebenow**\nConsult with sales leadership about multi-year versus capped pricing models and update Jay and Bob accordingly (12:18)\nAssist in prioritizing legal review of updated order form and contract language with Kim to accelerate approval process (15:48)\n\n**Logan Bates**\nProvide follow-up answers to questions raised by the team during previous discussions (08:52)\n\n**Jay Shell Larson**\nSchedule and conduct internal review of seat counts with other internal partners to confirm accurate user numbers (16:24)\n\n**Bob Brunk**\nParticipate in internal seat count review to confirm user alignment (16:24)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

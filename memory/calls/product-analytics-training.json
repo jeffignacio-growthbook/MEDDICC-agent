@@ -1,0 +1,18 @@
+{
+  "company": "Product Analytics Training",
+  "slug": "product-analytics-training",
+  "last_etl_date": "2026-10-03T05:54:14.755457",
+  "calls": [
+    {
+      "id": "01M3YM6Z8PE9076MYP1S3WTYJ7",
+      "source": "fireflies",
+      "title": "Product Analytics Training w/ Graham",
+      "date": "2026-10-02",
+      "duration_minutes": 44,
+      "summary": "# Product Analytics Training w/ Graham\nDate: 2026-10-02 | Duration: 44m\n\n## Summary\nGrowth Book’s warehouse-native product analytics strategy was presented as a market differentiator because customer data remains in the warehouse as a single source of truth, reducing duplication, supporting compliance, and unifying metrics. The platform combines analytics with experimentation and feature flags through a shared metric library, enabling safer product iteration and future AI-driven automation. Demonstrated capabilities included self-serve filtering, segmentation, funnel analysis, journey exploration, dashboards, SQL and text-to-SQL tools, and beta session replay linked to experiment variants. Session replay includes default masking, with planned AI summarization, bot detection, and on-premise or warehouse-hosted deployment. The product is aimed primarily at companies with warehouse infrastructure and serious experimentation needs, including scaling AI startups and larger enterprises. Smaller companies may prefer simpler tools. Adoption remains early, while sales enablement priorities include vertical-specific demo environments, case studies, improved sharing, and customer-feedback-driven development.\n\n## Keywords\nproduct analytics, warehouse-native, experimentation, feature flags, session replay, AI-driven insights\n\n## Action Items\n\n**Scott Bailey**\nProvide access and ensure all sales team members have demo organizations with vertical-specific demo data and dashboards for product analytics presentations (38:41)\nCoordinate environment sharing details and reset demo data weekly for consistency (39:31)\n\n**Logan Bates**\nCollect and pass along user feedback on shareable/exportable session replay or analytics links (27:54)\n\n**Jeremy Dorn**\nAccelerate development of AI features for session replay summarization and bot detection (31:00)\nPrioritize adding publicly shareable links for dashboards and reports (28:00)\nExplore readiness to implement warehouse-native session replay for enterprise client prospects (36:11)\n\n**Unassigned**\nNegotiate case studies with customers replacing competitors like Amplitude to build market stories around product analytics wins (40:07)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 16,
+      "summary_quality": "good"
+    }
+  ]
+}
