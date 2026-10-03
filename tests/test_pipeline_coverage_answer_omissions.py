@@ -75,7 +75,12 @@ _FIXTURE = {
         "nominal_coverage": 4429916.0 / 1029940.0,
         "weighted_coverage": 799782.0 / 1029940.0,
         "quota_met": False,
-        "expected_multiple": None, "ahead_behind": None,
+        # GrowthBook's real schedule (wired 2026-10-03): week 10's nominal
+        # step is 1.0x; weighted's flat constant is also 1.0x. nominal
+        # 4.30x >= 1.0x -> ahead; weighted 0.78x < 1.0x -> behind —
+        # independently true at the same time.
+        "nominal_expected_multiple": 1.0, "weighted_expected_multiple": 1.0,
+        "nominal_ahead_behind": "ahead", "weighted_ahead_behind": "behind",
         "phase": "late",
         "equations": {
             "remaining": "$1,550,000 quota - $520,060 won = $1,029,940 remaining",

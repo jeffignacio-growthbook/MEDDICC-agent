@@ -298,18 +298,37 @@ pipeline:
 # remaining gap: nominal (raw qualified pipeline) and weighted (stage-rate
 # weighted). See scripts/pipeline_coverage.py::assess_pipeline_coverage.
 coverage:
-  # Week-of-quarter -> the coverage multiple (weighted pipeline / remaining
-  # gap) leadership expects to see by that week, for an ahead/behind read.
-  # PROVISIONAL, EMPTY: GrowthBook has not yet set these numbers. Leaving
-  # this empty is a fully supported, intentional state — assess_pipeline_
-  # coverage reports nominal/weighted coverage and the remaining gap either
-  # way; it just omits expected_multiple and ahead/behind (never fabricates
-  # a schedule or infers one from the HEURISTIC historical curve, which is
-  # permanently evidence-ceilinged — see query_coverage_proxy_target_by_week).
-  # Fill in like: {4: 3.0, 8: 1.5, 12: 1.0} once Ryan/leadership sets real
-  # per-week expectations; any week not listed falls back to "no schedule"
-  # for that lookup, not the nearest neighbor.
-  expected_multiple_schedule: {}
+  # Week-of-quarter -> the NOMINAL coverage multiple (raw qualified
+  # pipeline / remaining gap) leadership expects to see by that week, for
+  # an ahead/behind read. GrowthBook's real schedule (set 2026-10-03,
+  # after shipping empty in #118): 3x early, stepping down to 2x from
+  # week 6, 1.5x from week 8, 1x from week 10 on — raw pipeline needs a
+  # bigger multiple early in the quarter since most of it won't close.
+  # STEP/CARRY-FORWARD lookup (scripts/pipeline_coverage.py::
+  # _resolve_expected_multiple), NOT a bare per-week dict.get() and NOT
+  # nearest-neighbor: a week with no entry of its own uses the most
+  # recent EARLIER entry (week 7 uses week 6's 2.0), not "no schedule".
+  # A week before the first entry (there is none here — the schedule
+  # must start at week 1, enforced at load, see below) would have no
+  # ahead/behind read. Loaded and validated by scripts/utils.py::
+  # get_coverage_config(): the schedule must start at week 1 and its
+  # multiples must be non-increasing — both checked at load and raised
+  # loudly (not logged-and-dropped) if violated, since a silently wrong
+  # schedule here means a silently wrong ahead/behind verdict in a live
+  # Slack answer.
+  expected_multiple_schedule:
+    1: 3.0
+    6: 2.0
+    8: 1.5
+    10: 1.0
+
+  # The WEIGHTED coverage multiple (stage-weighted pipeline / remaining
+  # gap) leadership expects — a SINGLE constant, not a schedule: a
+  # calibrated stage-weighted pipeline should cover the remaining gap
+  # about 1:1 throughout the quarter (that's the point of weighting by
+  # historical close rate), so there is no early/late taper the way
+  # nominal has one. GrowthBook: 1.0x.
+  weighted_expected_multiple: 1.0
 
   # Week-of-quarter boundaries for the "phase" of the quarter a coverage
   # answer is given in (early/mid/late) — used only to decide how much

@@ -1326,8 +1326,10 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
                 if eqs.get("remaining"):
                     lines.append(f"  {eqs['remaining']}")
             else:
-                ahead_behind = cov.get("ahead_behind")
-                has_schedule = ahead_behind and cov.get("expected_multiple") is not None
+                nominal_ahead_behind = cov.get("nominal_ahead_behind")
+                weighted_ahead_behind = cov.get("weighted_ahead_behind")
+                nominal_expected = cov.get("nominal_expected_multiple")
+                weighted_expected = cov.get("weighted_expected_multiple")
                 lines.append(
                     "2. State the subtraction once, in one sentence or a "
                     "small footnote under the table, using these exact "
@@ -1337,22 +1339,49 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
                 for key in ("remaining", "nominal", "weighted"):
                     if eqs.get(key):
                         lines.append(f"  {eqs[key]}")
-                lines.append(
-                    "3. State this week's expectation and whether each "
-                    "measure (nominal and weighted) is ahead of or behind "
-                    "it, in a sentence. " + (
-                        f"The configured expectation for week "
-                        f"{result.get('current_week')} is "
-                        f"{cov['expected_multiple']:.2f}x, and coverage is "
-                        f"{ahead_behind} it."
-                        if has_schedule else
-                        "No per-week schedule is configured yet, so use "
-                        "1.0x as the plain floor expectation (pipeline "
-                        "should at least equal what's still needed) and say "
-                        "whether nominal and weighted coverage are each "
-                        "above or below it."
+                # 2026-10-03: once a schedule IS configured, the ahead/behind
+                # read comes FROM it — the model states the configured fact,
+                # it does not judge. The "use 1.0x as a floor" fallback is
+                # ONLY for a client with no configured schedule at all (both
+                # nominal_expected and weighted_expected absent); do not mix
+                # a real configured value for one measure with an invented
+                # floor for the other.
+                if nominal_expected is None and weighted_expected is None:
+                    lines.append(
+                        "3. State this week's expectation and whether each "
+                        "measure (nominal and weighted) is ahead of or "
+                        "behind it, in a sentence. No schedule is configured "
+                        "yet, so use 1.0x as the plain floor expectation "
+                        "(pipeline should at least equal what's still "
+                        "needed) and say whether nominal and weighted "
+                        "coverage are each above or below it."
                     )
-                )
+                else:
+                    def _ahead_behind_phrase(ahead_behind):
+                        return "ahead of" if ahead_behind == "ahead" else "behind"
+                    nominal_part = (
+                        f"nominal is {_ahead_behind_phrase(nominal_ahead_behind)} the "
+                        f"{nominal_expected:.2f}x expectation configured "
+                        f"for week {result.get('current_week')}"
+                        if nominal_expected is not None else
+                        "no nominal schedule is configured, so describe "
+                        "nominal coverage on its own terms, not against a "
+                        "guessed expectation"
+                    )
+                    weighted_part = (
+                        f"weighted is {_ahead_behind_phrase(weighted_ahead_behind)} the "
+                        f"{weighted_expected:.2f}x configured expectation"
+                        if weighted_expected is not None else
+                        "no weighted expectation is configured, so describe "
+                        "weighted coverage on its own terms, not against a "
+                        "guessed expectation"
+                    )
+                    lines.append(
+                        f"3. State this week's expectation and whether each "
+                        f"measure is ahead of or behind it, in a sentence — "
+                        f"these are CONFIGURED facts to report, not your own "
+                        f"judgment call: {nominal_part}; {weighted_part}."
+                    )
 
             if phase == "late":
                 lines.append(

@@ -104,6 +104,23 @@ from api.incremental_arr import incremental_arr  # the one Incremental ARR defin
 logger = logging.getLogger(__name__)
 
 
+def _resolve_expected_multiple(schedule: Dict[int, float], current_week: int) -> Optional[float]:
+    """Step/carry-forward lookup, NOT a bare dict.get() and NOT nearest-
+    neighbor: the value in effect is the one at the most recent
+    configured week at or before current_week (coverage expectations
+    taper AS OF that step, not just exactly on it — a client's schedule
+    rarely lists all 13 weeks). None if current_week is before the
+    schedule's first entry, or the schedule is empty.
+
+    2026-10-03: GrowthBook's real schedule is sparse by design
+    ({1: 3.0, 6: 2.0, 8: 1.5, 10: 1.0}) — week 7 must resolve to week 6's
+    2.0, not "no schedule for week 7"."""
+    applicable = [w for w in schedule if w <= current_week]
+    if not applicable:
+        return None
+    return schedule[max(applicable)]
+
+
 def _coverage_phase(current_week: int, phase_boundaries: Dict[str, int]) -> str:
     """early/mid/late from config/client.yaml's coverage.phase_boundaries
     (scripts/utils.py::get_coverage_config) — needs only current_week, so
@@ -134,20 +151,36 @@ def _assess_coverage(
     current_week: int, coverage_config: Dict[str, Any],
 ) -> Dict[str, Any]:
     """The config-driven coverage block: remaining gap, nominal/weighted
-    coverage against it, expected multiple for the week, ahead/behind,
-    and phase. Denominator is ALWAYS the remaining gap (quota minus QTD
-    closed-won), never the bare quota — see this module's own docstring,
-    point 6. All null-propagated, never fabricated: missing quota, quota
-    already met, and no configured expected-multiple schedule are each
-    handled explicitly, not silently defaulted."""
+    coverage against it, each measure's own expected multiple and
+    ahead/behind read, and phase. Denominator is ALWAYS the remaining gap
+    (quota minus QTD closed-won), never the bare quota — see this
+    module's own docstring, point 6. All null-propagated, never
+    fabricated: missing quota, quota already met, and no configured
+    expected-multiple schedule are each handled explicitly, not silently
+    defaulted.
+
+    2026-10-03: nominal and weighted now each get their OWN expected
+    multiple and ahead/behind, not one shared value compared only to
+    weighted_coverage. GrowthBook's real schedule staggers nominal
+    (3.0 -> 2.0 -> 1.5 -> 1.0 across the quarter, via expected_multiple_
+    schedule's step lookup) against weighted's flat, separately-
+    configured weighted_expected_multiple (1.0 throughout) — a
+    calibrated stage-weighted pipeline should cover the remaining gap
+    about 1:1 regardless of how early in the quarter it is, while raw
+    unweighted pipeline legitimately needs a much bigger multiple early
+    on, since most of it won't close."""
     phase = _coverage_phase(current_week, coverage_config["phase_boundaries"])
-    expected_multiple = coverage_config["expected_multiple_schedule"].get(current_week)
+    nominal_expected_multiple = _resolve_expected_multiple(
+        coverage_config["expected_multiple_schedule"], current_week)
+    weighted_expected_multiple = coverage_config["weighted_expected_multiple"]
 
     if quota is None:
         return {
             "remaining_gap": None, "quota_met": None,
             "nominal_coverage": None, "weighted_coverage": None,
-            "expected_multiple": expected_multiple, "ahead_behind": None,
+            "nominal_expected_multiple": nominal_expected_multiple,
+            "weighted_expected_multiple": weighted_expected_multiple,
+            "nominal_ahead_behind": None, "weighted_ahead_behind": None,
             "phase": phase,
             "equations": {"remaining": None, "nominal": None, "weighted": None},
             "note": ("No stated quota for this quarter — remaining gap and "
@@ -165,7 +198,9 @@ def _assess_coverage(
         return {
             "remaining_gap": 0.0, "quota_met": True,
             "nominal_coverage": None, "weighted_coverage": None,
-            "expected_multiple": expected_multiple, "ahead_behind": None,
+            "nominal_expected_multiple": nominal_expected_multiple,
+            "weighted_expected_multiple": weighted_expected_multiple,
+            "nominal_ahead_behind": None, "weighted_ahead_behind": None,
             "phase": phase,
             "equations": {"remaining": remaining_eq, "nominal": None, "weighted": None},
             "note": (f"Quota already met this quarter (${qtd_won:,.0f} won >= "
@@ -176,9 +211,12 @@ def _assess_coverage(
 
     nominal_coverage = raw_value / remaining_gap
     weighted_coverage = weighted_value / remaining_gap
-    ahead_behind = None
-    if expected_multiple is not None:
-        ahead_behind = "ahead" if weighted_coverage >= expected_multiple else "behind"
+    nominal_ahead_behind = None
+    if nominal_expected_multiple is not None:
+        nominal_ahead_behind = "ahead" if nominal_coverage >= nominal_expected_multiple else "behind"
+    weighted_ahead_behind = None
+    if weighted_expected_multiple is not None:
+        weighted_ahead_behind = "ahead" if weighted_coverage >= weighted_expected_multiple else "behind"
 
     remaining_eq = (f"${quota:,.0f} quota - ${qtd_won:,.0f} won = "
                     f"${remaining_gap:,.0f} remaining")
@@ -188,18 +226,22 @@ def _assess_coverage(
     return {
         "remaining_gap": remaining_gap, "quota_met": False,
         "nominal_coverage": nominal_coverage, "weighted_coverage": weighted_coverage,
-        "expected_multiple": expected_multiple, "ahead_behind": ahead_behind,
+        "nominal_expected_multiple": nominal_expected_multiple,
+        "weighted_expected_multiple": weighted_expected_multiple,
+        "nominal_ahead_behind": nominal_ahead_behind,
+        "weighted_ahead_behind": weighted_ahead_behind,
         "phase": phase,
         "equations": {"remaining": remaining_eq, "nominal": nominal_eq, "weighted": weighted_eq},
         "note": (
             "Denominator is the REMAINING gap (quota minus QTD closed-won), "
             "never the bare quota. nominal_coverage = qualified_pipeline."
             "raw_value / remaining_gap; weighted_coverage = stage_weighting."
-            "weighted_value / remaining_gap. expected_multiple and "
-            "ahead_behind come from config/client.yaml's coverage."
-            "expected_multiple_schedule for the current week; null when no "
-            "schedule is configured for that week (never inferred from the "
-            "HEURISTIC historical curve)."
+            "weighted_value / remaining_gap. nominal_expected_multiple comes "
+            "from config/client.yaml's coverage.expected_multiple_schedule "
+            "(step/carry-forward lookup for the current week); "
+            "weighted_expected_multiple is a single configured constant, not "
+            "a schedule. Each is null, and its ahead_behind unset, when not "
+            "configured (never inferred from the HEURISTIC historical curve)."
         ),
     }
 
@@ -319,7 +361,8 @@ def assess_pipeline_coverage(
          "qtd_won": {"value": float, "note": str},
          "coverage": {"remaining_gap": float|None, "quota_met": bool|None,
              "nominal_coverage": float|None, "weighted_coverage": float|None,
-             "expected_multiple": float|None, "ahead_behind": str|None,
+             "nominal_expected_multiple": float|None, "weighted_expected_multiple": float|None,
+             "nominal_ahead_behind": str|None, "weighted_ahead_behind": str|None,
              "phase": str, "equations": {"remaining", "nominal", "weighted"},
              "note": str},
          "historical_heuristic_curve": {...query_coverage_proxy_target_by_week()'s

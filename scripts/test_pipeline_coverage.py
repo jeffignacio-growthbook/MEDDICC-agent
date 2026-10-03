@@ -152,8 +152,8 @@ def _run(deals_data, quota_value=2000000, current_period="FY2027_Q3",
          patch('forecast_analyses.actual_incremental_closed_won') as mock_qtd:
         mock_gfq.return_value = q_window
         mock_coverage_cfg.return_value = coverage_config or {
-            "expected_multiple_schedule": {}, "phase_boundaries":
-                {"early_through_week": 4, "late_from_week": 10}}
+            "expected_multiple_schedule": {}, "weighted_expected_multiple": None,
+            "phase_boundaries": {"early_through_week": 4, "late_from_week": 10}}
         mock_gwoq.return_value = current_week
         mock_cql.return_value = current_period
         mock_select_all.return_value = deals_data
@@ -469,7 +469,8 @@ def test_quota_missing_from_db_produces_graceful_nulls():
         raise AssertionError(f"Expected real_target.goal=None, got {rt['goal']!r}")
 
     cov = result["coverage"]
-    for key in ("remaining_gap", "quota_met", "nominal_coverage", "weighted_coverage", "ahead_behind"):
+    for key in ("remaining_gap", "quota_met", "nominal_coverage", "weighted_coverage",
+                "nominal_ahead_behind", "weighted_ahead_behind"):
         if cov[key] is not None:
             raise AssertionError(f"Expected coverage.{key}=None when no quota, got {cov[key]!r}")
     if cov["equations"]["remaining"] is not None or cov["equations"]["nominal"] is not None \

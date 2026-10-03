@@ -62,12 +62,16 @@ from test_explain_prior_answer_citation import _mock_rep_attainment_sb  # noqa: 
 
 
 def _coverage(remaining_gap, nominal_coverage, weighted_coverage, quota_met,
-             expected_multiple=None, ahead_behind=None, phase="mid",
+             nominal_expected_multiple=None, weighted_expected_multiple=None,
+             nominal_ahead_behind=None, weighted_ahead_behind=None, phase="mid",
              equations=None):
     return {
         "remaining_gap": remaining_gap, "quota_met": quota_met,
         "nominal_coverage": nominal_coverage, "weighted_coverage": weighted_coverage,
-        "expected_multiple": expected_multiple, "ahead_behind": ahead_behind,
+        "nominal_expected_multiple": nominal_expected_multiple,
+        "weighted_expected_multiple": weighted_expected_multiple,
+        "nominal_ahead_behind": nominal_ahead_behind,
+        "weighted_ahead_behind": weighted_ahead_behind,
         "phase": phase,
         "equations": equations or {"remaining": None, "nominal": None, "weighted": None},
         "note": "test coverage note",
@@ -97,7 +101,8 @@ BASE_FIXTURE = {
     "coverage": _coverage(
         remaining_gap=1050000.0, nominal_coverage=900000.0 / 1050000.0,
         weighted_coverage=799782.0 / 1050000.0, quota_met=False,
-        expected_multiple=1.2, ahead_behind="behind", phase="mid",
+        nominal_expected_multiple=2.0, weighted_expected_multiple=1.2,
+        nominal_ahead_behind="behind", weighted_ahead_behind="behind", phase="mid",
         equations={
             "remaining": "$1,550,000 quota - $500,000 won = $1,050,000 remaining",
             "nominal": "$900,000 raw qualified pipeline / $1,050,000 remaining = 0.86x",
@@ -130,8 +135,11 @@ def test_guidance_states_ahead_behind_and_quotes_all_three_equations():
     assert "$1,550,000 quota - $500,000 won = $1,050,000 remaining" in note
     assert "$900,000 raw qualified pipeline / $1,050,000 remaining = 0.86x" in note
     assert "$799,782 weighted pipeline / $1,050,000 remaining = 0.76x" in note
-    assert "behind" in note and "1.20x" in note and "week 7" in note
-    print("  ✓ all three equations quoted verbatim; ahead/behind fact + expected multiple stated")
+    assert "nominal is behind the 2.00x expectation" in note and "week 7" in note
+    assert "weighted is behind the 1.20x configured expectation" in note
+    assert "CONFIGURED facts to report, not your own judgment call" in note
+    print("  ✓ all three equations quoted verbatim; nominal/weighted ahead-behind facts + "
+          "their own expected multiples stated independently")
 
 
 def test_guidance_states_1x_floor_when_no_schedule_configured():
@@ -146,14 +154,38 @@ def test_guidance_states_1x_floor_when_no_schedule_configured():
     guidance now tells pipeline_coverage's own synthesis to do the same)."""
     print("\n[TEST] no schedule configured -> 1.0x floor expectation stated, not silence")
     fixture = copy.deepcopy(BASE_FIXTURE)
-    fixture["coverage"]["ahead_behind"] = None
-    fixture["coverage"]["expected_multiple"] = None
+    fixture["coverage"]["nominal_ahead_behind"] = None
+    fixture["coverage"]["weighted_ahead_behind"] = None
+    fixture["coverage"]["nominal_expected_multiple"] = None
+    fixture["coverage"]["weighted_expected_multiple"] = None
 
     result = asyncio.run(_run(fixture))
     note = result["_synthesis_note"]
     assert "1.0x as the plain floor expectation" in note
     assert "nominal and weighted coverage are each" in note.lower()
     print("  ✓ 1.0x floor expectation stated in place of a configured schedule")
+
+
+def test_nominal_and_weighted_ahead_behind_reported_independently():
+    """2026-10-03: nominal and weighted each get their OWN configured
+    expectation and their OWN ahead/behind verdict — one can be ahead
+    while the other is behind, at the same time, which a single shared
+    ahead_behind value (the #118 shape this supersedes) could never
+    express. Guidance must state the configured fact for each, not ask
+    the model to judge, once a schedule exists for that measure."""
+    print("\n[TEST] nominal ahead + weighted behind, simultaneously, both reported as configured facts")
+    fixture = copy.deepcopy(BASE_FIXTURE)
+    fixture["coverage"]["nominal_expected_multiple"] = 0.5
+    fixture["coverage"]["nominal_ahead_behind"] = "ahead"
+    fixture["coverage"]["weighted_expected_multiple"] = 1.2
+    fixture["coverage"]["weighted_ahead_behind"] = "behind"
+
+    result = asyncio.run(_run(fixture))
+    note = result["_synthesis_note"]
+    assert "nominal is ahead of the 0.50x expectation" in note
+    assert "weighted is behind the 1.20x configured expectation" in note
+    assert "judgment call" in note.lower(), "expected the 'configured fact, not a judgment call' framing"
+    print("  ✓ nominal 'ahead' and weighted 'behind' both stated as independent configured facts")
 
 
 def test_quota_met_guidance_has_no_ratio_equations():
