@@ -131,6 +131,151 @@ def _reopened_deal_diagnostic(sb, q_start_iso, q_end_iso):
     return stage_won_status_not, status_won_stage_not
 
 
+def _owner_email_audit(sb, q_start_iso, q_end_iso):
+    """Current-quarter won deals (deal_status=='won', renewal pipeline
+    excluded via is_incremental_pipeline — the NEW/current definition)
+    with a missing or unmapped owner_email.
+
+    'Unmapped' = owner_email is set but does not appear in either
+    config/targets.yaml (quota reps + non_quota_roles) or the
+    user_personas table — i.e. query_rep_attainment's roster would never
+    attribute this deal's ARR to a named rep, so it is silently absent
+    from team_summary.closed_won_qtd's per-rep breakdown even though it
+    may still land in a team-level sum depending on which definition is
+    used upstream."""
+    import yaml
+    from field_semantics import is_incremental_pipeline
+    from supabase_client import select_all
+    from api.incremental_arr import incremental_arr
+
+    targets_path = REPO_ROOT / "config" / "targets.yaml"
+    known_emails = set()
+    try:
+        tcfg = yaml.safe_load(open(targets_path))
+        for qdata in (tcfg or {}).get("targets", {}).values():
+            known_emails.update((qdata.get("reps") or {}).keys())
+            known_emails.update(qdata.get("non_quota_roles") or [])
+    except Exception as e:
+        print(f"  (could not load config/targets.yaml roster: {e})")
+
+    try:
+        persona_rows = select_all(sb, "user_personas", columns="email")
+        known_emails.update(p.get("email") for p in persona_rows if p.get("email"))
+    except Exception as e:
+        print(f"  (could not load user_personas roster: {e})")
+
+    deals = select_all(sb, "deals",
+        columns="deal_id,owner_email,new_arr,expansion_arr,pipeline_id,deal_status,close_date",
+        filters=[("eq", "deal_status", "won"),
+                 ("gte", "close_date", q_start_iso),
+                 ("lte", "close_date", q_end_iso)])
+
+    missing, unmapped = [], []
+    for d in deals:
+        if not is_incremental_pipeline(d):
+            continue
+        email = d.get("owner_email")
+        if not email:
+            missing.append(d)
+        elif email not in known_emails:
+            unmapped.append(d)
+
+    missing_total = sum(incremental_arr(d) for d in missing)
+    unmapped_total = sum(incremental_arr(d) for d in unmapped)
+    print(f"Missing owner_email: {len(missing)} deals, ${missing_total:,.0f} — "
+          f"{[d['deal_id'] for d in missing] if missing else '(none)'}")
+    print(f"Unmapped owner_email (set but not in config/targets.yaml or "
+          f"user_personas): {len(unmapped)} deals, ${unmapped_total:,.0f} — "
+          f"{[(d['deal_id'], d.get('owner_email')) for d in unmapped] if unmapped else '(none)'}")
+    return missing, unmapped
+
+
+def _rep_targets_report(sb, period):
+    """All rep_targets rows for `period`, regardless of level/role/metric
+    (query_rep_attainment itself only ever reads level='rep', role='ae') —
+    broken out here so any other level/role/metric combination actually
+    stored is visible, and so the rep-level sum can be checked against the
+    team-level row and against the known $1.55M team quota."""
+    from supabase_client import select_all
+
+    rows = select_all(sb, "rep_targets",
+        columns="period,level,role,entity_name,entity_email,metric,target_value",
+        filters=[("eq", "period", period)])
+
+    print(f"rep_targets rows for period={period!r}: {len(rows)} total")
+    by_key = {}
+    for r in rows:
+        key = (r.get("level"), r.get("role"), r.get("metric"))
+        by_key.setdefault(key, []).append(r)
+
+    for key in sorted(by_key, key=lambda k: (str(k[0]), str(k[1]), str(k[2]))):
+        level, role, metric = key
+        group = by_key[key]
+        subtotal = sum((r.get("target_value") or 0) for r in group)
+        print(f"  level={level!r} role={role!r} metric={metric!r}: "
+              f"{len(group)} rows, sum=${subtotal:,.0f}")
+        for r in group:
+            print(f"    {r.get('entity_name')!r} ({r.get('entity_email')}): "
+                  f"${(r.get('target_value') or 0):,.0f}")
+
+    rep_ae_rows = by_key.get(("rep", "ae", "incremental_arr"), [])
+    rep_sum = sum((r.get("target_value") or 0) for r in rep_ae_rows)
+    team_rows = [r for r in rows if r.get("level") == "team"]
+    team_value = sum((r.get("target_value") or 0) for r in team_rows)
+
+    print(f"  Sum of level='rep' role='ae' metric='incremental_arr' targets: ${rep_sum:,.0f}")
+    print(f"  Sum of level='team' row(s): ${team_value:,.0f}")
+    print(f"  Known committed team quota (config/targets.yaml team_total): $1,550,000")
+    gap_vs_known = rep_sum - 1_550_000
+    gap_vs_team_row = rep_sum - team_value if team_rows else None
+    if gap_vs_known != 0:
+        print(f"  MISMATCH: rep-level sum differs from $1.55M team quota by ${gap_vs_known:,.0f}")
+    else:
+        print("  OK: rep-level sum matches the $1.55M team quota exactly.")
+    if team_rows and gap_vs_team_row != 0:
+        print(f"  MISMATCH: rep-level sum differs from stored level='team' row by ${gap_vs_team_row:,.0f}")
+    return rows
+
+
+def _explain_rep_attainment_vs_new_diff(sb, q_start_iso, q_end_iso):
+    """Per-deal explanation of DIFF (rep_attainment - new): walks every
+    won deal in the window and flags it wherever
+    is_incremental_pipeline(d) (the NEW/actual_incremental_closed_won
+    test) disagrees with "pipeline_id != renewal_id" (query_rep_
+    attainment's own test), i.e. exactly the deals each definition
+    includes that the other excludes."""
+    from field_semantics import is_incremental_pipeline, _RENEWAL_PIPELINE_ID
+    from supabase_client import select_all
+    from api.incremental_arr import incremental_arr
+
+    deals = select_all(sb, "deals",
+        columns="deal_id,owner_email,new_arr,expansion_arr,pipeline_id,deal_status,close_date",
+        filters=[("eq", "deal_status", "won"),
+                 ("gte", "close_date", q_start_iso),
+                 ("lte", "close_date", q_end_iso)])
+
+    new_only, ra_only = [], []
+    for d in deals:
+        in_new = is_incremental_pipeline(d)
+        in_ra = str(d.get("pipeline_id") or "") != _RENEWAL_PIPELINE_ID
+        if in_new and not in_ra:
+            new_only.append(d)   # NEW includes it (real $ arr), rep_attainment excludes (renewal pipeline_id)
+        elif in_ra and not in_new:
+            ra_only.append(d)    # rep_attainment includes it (not renewal pipeline_id), NEW excludes (zero $ arr)
+
+    new_only_total = sum(incremental_arr(d) for d in new_only)
+    ra_only_total = sum(incremental_arr(d) for d in ra_only)
+    print(f"Deals NEW includes that rep_attainment excludes (renewal pipeline_id, "
+          f"real expansion/new ARR): {len(new_only)} deals, ${new_only_total:,.0f} — "
+          f"{[d['deal_id'] for d in new_only] if new_only else '(none)'}")
+    print(f"Deals rep_attainment includes that NEW excludes (non-renewal pipeline_id, "
+          f"but zero new_arr/expansion_arr): {len(ra_only)} deals, ${ra_only_total:,.0f} — "
+          f"{[d['deal_id'] for d in ra_only] if ra_only else '(none)'}")
+    print(f"Net (new_only_total - ra_only_total) should equal DIFF(new - rep_attainment) above: "
+          f"${new_only_total - ra_only_total:,.0f}")
+    return new_only, ra_only
+
+
 def _print_reopened_deal_diagnostic(label, q_start_iso, q_end_iso, a, b):
     from api.incremental_arr import incremental_arr
     a_total = sum(incremental_arr(d) for d in a)
@@ -165,6 +310,25 @@ def main():
     print(f"  DIFF (rep_attainment - new): ${ra_total - new_total:,.0f}")
     a, b = _reopened_deal_diagnostic(sb, q_start_iso, q_end_iso)
     _print_reopened_deal_diagnostic(label, q_start_iso, q_end_iso, a, b)
+
+    print()
+    print("=" * 70)
+    print("ATTAINMENT AUDIT A.1: owner_email coverage on current-quarter won deals")
+    print("=" * 70)
+    _owner_email_audit(sb, q_start_iso, q_end_iso)
+
+    print()
+    print("=" * 70)
+    print("ATTAINMENT AUDIT A.2/A.3: rep_targets rows for the current period")
+    print("=" * 70)
+    period = label.replace(" ", "_")
+    _rep_targets_report(sb, period)
+
+    print()
+    print("=" * 70)
+    print("ATTAINMENT AUDIT A.4: which deals explain (rep_attainment - new)")
+    print("=" * 70)
+    _explain_rep_attainment_vs_new_diff(sb, q_start_iso, q_end_iso)
 
     print()
     print("=" * 70)
