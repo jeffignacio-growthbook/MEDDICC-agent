@@ -510,32 +510,55 @@ def test_coverage_proxy_target_by_week_structure():
     a 2x-prior-year-actual proxy, and its output MUST always carry
     heuristic=True, label='HEURISTIC', and the literal word HEURISTIC
     in its note.
+
+    Uses StrictSupabase (not a hand-written select_all side_effect) so the
+    REAL filter predicates run, same as every other caller of
+    actual_incremental_closed_won. Decision recorded 2026-10-03: the
+    $1.55M target INCLUDES renewal expansion, so the shared filter
+    (deal_status == "won" + is_incremental_pipeline()) is correct and
+    stays as-is. The fixture includes a reopened deal — deal_status
+    flipped back to "open" but the materialized `stage` column still
+    stale at "closedwon" — so this test only passes if the proxy curve's
+    prior-year computation reads deal_status, not stage (the OLD,
+    pre-2026-10-03 filter would have wrongly counted it, inflating the
+    proxy target).
     """
     print("\n[TEST] coverage proxy-target-by-week structure and heuristic labeling")
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tests"))
+    from strict_supabase import StrictSupabase
 
-    def _select_all_side_effect(sb, table, columns='*', filters=None, page_size=1000):
-        if table == 'deals':
-            # actual_incremental_closed_won: one won, incremental, non-renewal deal
-            return [{'deal_id': 'w1', 'stage': 'closedwon', 'close_date': '2025-04-15',
-                     'pipeline_id': 'default', 'new_arr': 100000, 'expansion_arr': 0}]
-        if table == 'deals_snapshot':
-            return [{'deal_id': 's1', 'deal_value': 50000, 'pipeline_id': 'default',
-                     'stage_order': 1, 'close_date': '2026-04-15'}]
-        raise AssertionError(f"Unexpected table queried: {table!r}")
+    deals = [
+        # actual_incremental_closed_won: one won, incremental, non-renewal deal
+        {'deal_id': 'w1', 'deal_status': 'won', 'stage': 'closedwon',
+         'close_date': '2025-04-15', 'pipeline_id': 'default',
+         'new_arr': 100000, 'expansion_arr': 0},
+        # Reopened: deal_status says open (not won), but `stage` is stale
+        # at closedwon. Must be EXCLUDED — proves the filter reads
+        # deal_status, not stage. A regression back to the OLD
+        # is_won(stage) filter would count this and inflate the proxy
+        # target well past 200000.
+        {'deal_id': 'w2_reopened', 'deal_status': 'open', 'stage': 'closedwon',
+         'close_date': '2025-03-01', 'pipeline_id': 'default',
+         'new_arr': 999999, 'expansion_arr': 0},
+    ]
+    deals_snapshot = [
+        {'deal_id': 's1', 'deal_value': 50000, 'pipeline_id': 'default',
+         'stage_order': 1, 'close_date': '2026-04-15',
+         'fiscal_quarter': 'FY2026 Q1', 'week_of_quarter': 1},
+    ]
+    sb = StrictSupabase({'deals': deals, 'deals_snapshot': deals_snapshot})
 
     with patch('analytics.forecast_analyses._get_complete_quarters') as mock_quarters, \
          patch('analytics.forecast_analyses._load_config') as mock_config, \
          patch('analytics.forecast_analyses._quarter_window_iso') as mock_win, \
          patch('utils.get_pipeline_config') as mock_pcfg, \
-         patch('utils.get_fiscal_quarter') as mock_gfq, \
-         patch('supabase_client.select_all', side_effect=_select_all_side_effect):
+         patch('utils.get_fiscal_quarter') as mock_gfq:
         mock_quarters.return_value = ['FY2026 Q1']
         mock_config.return_value = {'min_evidence_count': 30}
         mock_win.return_value = ('2026-02-01', '2026-04-30')
         mock_pcfg.return_value = {'qualified_stage_order': 1}
         mock_gfq.return_value = (date(2025, 2, 1), date(2025, 4, 30), 'FY2025 Q1')
 
-        sb = Mock()
         result = query_coverage_proxy_target_by_week(sb)
 
     for key in ('by_week', 'proxy_targets', 'quarters_used', 'min_evidence_count',

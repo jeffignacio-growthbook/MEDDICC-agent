@@ -95,6 +95,53 @@ def _rep_attainment_definition(sb, q_start_iso, q_end_iso):
     return total, n
 
 
+def _reopened_deal_diagnostic(sb, q_start_iso, q_end_iso):
+    """Deals where the outcome source (deal_status) and the materialized
+    `stage` column disagree on whether the deal is won, within the given
+    close_date window. Two directions, independently real:
+      (a) stage says won, deal_status says not won — e.g. reopened after
+          being marked Closed Won, stage not yet re-synced (or lagging).
+      (b) deal_status says won, stage says not won (a stage-lag/correction
+          scenario in the other direction).
+    Needed to size how much the 2026-10-03 filter generalization (reading
+    deal_status instead of stage) actually moves real numbers, beyond the
+    synthetic fixture in tests/test_coverage_qtd_reconciliation.py.
+    Report only — no write, no primitive touched."""
+    from field_semantics import is_won
+    from supabase_client import select_all
+    from api.incremental_arr import incremental_arr
+    deals = select_all(sb, 'deals',
+        columns='deal_id,stage,deal_status,close_date,new_arr,expansion_arr',
+        filters=[('gte', 'close_date', q_start_iso),
+                 ('lte', 'close_date', q_end_iso)])
+    stage_won_status_not = []
+    status_won_stage_not = []
+    for d in deals:
+        stage = d.get('stage')
+        status = (d.get('deal_status') or '').lower()
+        try:
+            stage_says_won = bool(stage) and is_won(str(stage))
+        except Exception:
+            stage_says_won = False
+        status_says_won = status == 'won'
+        if stage_says_won and not status_says_won:
+            stage_won_status_not.append(d)
+        elif status_says_won and not stage_says_won:
+            status_won_stage_not.append(d)
+    return stage_won_status_not, status_won_stage_not
+
+
+def _print_reopened_deal_diagnostic(label, q_start_iso, q_end_iso, a, b):
+    from api.incremental_arr import incremental_arr
+    a_total = sum(incremental_arr(d) for d in a)
+    b_total = sum(incremental_arr(d) for d in b)
+    print(f"{label} [{q_start_iso}..{q_end_iso}] reopened/stage-lag diagnostic:")
+    print(f"  (a) stage=won, deal_status!=won: {len(a)} deals, ${a_total:,.0f} — "
+          f"{[d['deal_id'] for d in a] if a else '(none)'}")
+    print(f"  (b) deal_status=won, stage!=won: {len(b)} deals, ${b_total:,.0f} — "
+          f"{[d['deal_id'] for d in b] if b else '(none)'}")
+
+
 def main():
     from db import get_supabase
     from utils import get_fiscal_quarter
@@ -116,6 +163,8 @@ def main():
     print(f"  DIFF (new - old): ${new_total - old_total:,.0f}")
     print(f"  query_rep_attainment's own rule (4th definition): ${ra_total:,.0f} (n={ra_n})")
     print(f"  DIFF (rep_attainment - new): ${ra_total - new_total:,.0f}")
+    a, b = _reopened_deal_diagnostic(sb, q_start_iso, q_end_iso)
+    _print_reopened_deal_diagnostic(label, q_start_iso, q_end_iso, a, b)
 
     print()
     print("=" * 70)
@@ -143,6 +192,8 @@ def main():
         if diff != 0:
             print(f"  -> This changes query_coverage_proxy_target_by_week's proxy_targets['{quarter}']"
                   f"['value'] (2x this base) by ${2 * diff:,.0f}")
+        a, b = _reopened_deal_diagnostic(sb, prior_start_iso, prior_end_iso)
+        _print_reopened_deal_diagnostic(prior_label, prior_start_iso, prior_end_iso, a, b)
 
     print()
     print(f"Sum of |diff| across all prior-year windows: ${total_abs_diff:,.0f}")

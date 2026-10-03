@@ -412,31 +412,49 @@ class TestCoverageProxyTargetCache:
     52-call sweep."""
 
     def test_coverage_proxy_target_memoized(self):
-        """Second call returns cached result, zero additional Supabase hits."""
+        """Second call returns cached result, zero additional Supabase hits.
+
+        Uses StrictSupabase + the REAL select_all (wrapped only to count
+        calls) so the real deal_status/is_incremental_pipeline() filter
+        predicates run, same as every other caller of
+        actual_incremental_closed_won — not a hand-written select_all
+        side_effect keyed on the old 'stage' shape."""
         from forecast_analyses import (
             query_coverage_proxy_target_by_week, _request_cache,
             clear_request_cache,
         )
+        import supabase_client as _sc
+        from strict_supabase import StrictSupabase
         clear_request_cache()
 
-        select_all_count = {"n": 0}
+        snapshot_rows = [
+            {"deal_id": f"s_{q}_{w}", "deal_value": 10000.0,
+             "pipeline_id": "new_biz", "stage_order": 3,
+             "close_date": "2026-03-15", "snapshot_date": "2026-03-15",
+             "fiscal_quarter": f"FY2027 Q{q}", "week_of_quarter": w}
+            for q in range(1, 5) for w in range(1, 14)
+        ]
+        # Prior-year 'deals': a normal win plus a reopened deal — deal_status
+        # flipped back to "open", `stage` still stale at "closedwon". Must be
+        # excluded from prior_year_actual; a regression to the old
+        # is_won(stage) filter would count it and double the proxy target.
+        deals = [
+            {"deal_id": "normal_win", "deal_status": "won", "stage": "closedwon",
+             "pipeline_id": "default", "new_arr": 100000, "expansion_arr": 0,
+             "close_date": "2025-03-15"},
+            {"deal_id": "reopened", "deal_status": "open", "stage": "closedwon",
+             "pipeline_id": "default", "new_arr": 999999, "expansion_arr": 0,
+             "close_date": "2025-03-10"},
+        ]
+        sb = StrictSupabase({"deals_snapshot": snapshot_rows, "deals": deals})
 
-        def fake_select_all(sb, table, columns=None, filters=None):
+        select_all_count = {"n": 0}
+        real_select_all = _sc.select_all
+
+        def counting_select_all(sb, table, columns=None, filters=None, page_size=1000):
             select_all_count["n"] += 1
-            if columns == 'fiscal_quarter,week_of_quarter':
-                return [
-                    {"fiscal_quarter": f"FY2027 Q{q}", "week_of_quarter": w}
-                    for q in range(1, 5) for w in range(1, 14)
-                ]
-            if columns == 'deal_id,deal_value,pipeline_id,stage_order,close_date':
-                return [
-                    {"deal_id": "d1", "deal_value": 100000.0,
-                     "pipeline_id": "new_biz", "stage_order": 3,
-                     "close_date": "2026-03-15"},
-                ]
-            if 'deal_id' in (columns or '') and 'stage' in (columns or ''):
-                return []
-            return []
+            return real_select_all(sb, table, columns=columns, filters=filters,
+                                    page_size=page_size)
 
         def fake_get_fiscal_quarter(d):
             from datetime import date
@@ -457,15 +475,8 @@ class TestCoverageProxyTargetCache:
             return (date(d.year, 11, 1), date(d.year + 1, 1, 31),
                     f"FY{fy} Q4")
 
-        sb = MagicMock()
-        fake_resp = MagicMock()
-        fake_resp.data = [{"snapshot_date": "2026-03-15"}]
-        sb.table.return_value.select.return_value.eq.return_value.limit.return_value.execute.return_value = fake_resp
-
-        with patch("supabase_client.select_all", fake_select_all), \
-             patch("utils.get_fiscal_quarter", fake_get_fiscal_quarter), \
-             patch("field_semantics._RENEWAL_PIPELINE_ID", "renewal_123"), \
-             patch("field_semantics.is_won", return_value=True):
+        with patch("supabase_client.select_all", counting_select_all), \
+             patch("utils.get_fiscal_quarter", fake_get_fiscal_quarter):
             result1 = query_coverage_proxy_target_by_week(sb)
             count_after_first = select_all_count["n"]
 
@@ -479,6 +490,11 @@ class TestCoverageProxyTargetCache:
             "Second call should return the exact same cached object"
         assert result1.get('heuristic') is True
         assert 'by_week' in result1
+        pt = result1['proxy_targets']['FY2027 Q1']
+        assert pt['value'] == 200000, (
+            f"Expected proxy target value=200000 (2x prior-year $100k, "
+            f"reopened deal excluded), got {pt} — the filter may be reading "
+            f"`stage` instead of deal_status again")
 
         clear_request_cache()
 
@@ -587,42 +603,51 @@ class TestCacheHitMissDeepEquality:
         clear_request_cache()
 
     def test_coverage_proxy_target_by_week_deep_equal(self):
+        """Uses StrictSupabase so the real deal_status/is_incremental_
+        pipeline() filter predicates run (not a hand-written select_all
+        side_effect keyed on the old 'stage' shape)."""
         from forecast_analyses import (
             query_coverage_proxy_target_by_week, _request_cache,
             clear_request_cache,
         )
+        from strict_supabase import StrictSupabase
         clear_request_cache()
 
-        def fake_select_all(sb, table, columns=None, filters=None):
-            if columns == 'fiscal_quarter,week_of_quarter':
-                return [{"fiscal_quarter": "FY2027 Q1", "week_of_quarter": w}
-                        for w in range(1, 14)]
-            if columns == 'deal_id,deal_value,pipeline_id,stage_order,close_date':
-                return [{"deal_id": "d1", "deal_value": 100000.0,
-                         "pipeline_id": "new_biz", "stage_order": 3,
-                         "close_date": "2026-03-15"}]
-            if 'deal_id' in (columns or '') and 'stage' in (columns or ''):
-                return []
-            return []
+        snapshot_rows = [
+            {"deal_id": f"s_{w}", "deal_value": 100000.0,
+             "pipeline_id": "new_biz", "stage_order": 3,
+             "close_date": "2026-03-15", "snapshot_date": "2026-03-15",
+             "fiscal_quarter": "FY2027 Q1", "week_of_quarter": w}
+            for w in range(1, 14)
+        ]
+        # A normal win plus a reopened deal (deal_status flipped back to
+        # "open", `stage` still stale at "closedwon") — must be excluded;
+        # a regression to the old is_won(stage) filter would count it.
+        deals = [
+            {"deal_id": "normal_win", "deal_status": "won", "stage": "closedwon",
+             "pipeline_id": "default", "new_arr": 100000, "expansion_arr": 0,
+             "close_date": "2025-03-15"},
+            {"deal_id": "reopened", "deal_status": "open", "stage": "closedwon",
+             "pipeline_id": "default", "new_arr": 999999, "expansion_arr": 0,
+             "close_date": "2025-03-10"},
+        ]
+        sb = StrictSupabase({"deals_snapshot": snapshot_rows, "deals": deals})
 
         def fake_gfq(d):
             from datetime import date
             return (date(d.year, 2, 1), date(d.year, 4, 30), "FY2027 Q1")
 
-        sb = MagicMock()
-        fake_resp = MagicMock()
-        fake_resp.data = [{"snapshot_date": "2026-03-15"}]
-        sb.table.return_value.select.return_value.eq.return_value.limit.return_value.execute.return_value = fake_resp
-
-        with patch("supabase_client.select_all", fake_select_all), \
-             patch("utils.get_fiscal_quarter", fake_gfq), \
-             patch("field_semantics._RENEWAL_PIPELINE_ID", "renewal_123"), \
-             patch("field_semantics.is_won", return_value=True):
+        with patch("utils.get_fiscal_quarter", fake_gfq):
             miss = query_coverage_proxy_target_by_week(sb)
             hit = query_coverage_proxy_target_by_week(sb)
 
         assert miss == hit, f"Shape mismatch: miss keys={set(miss)}, hit keys={set(hit)}"
         assert miss is hit, "Cache hit should return the same object"
+        pt = miss['proxy_targets']['FY2027 Q1']
+        assert pt['value'] == 200000, (
+            f"Expected proxy target value=200000 (2x prior-year $100k, "
+            f"reopened deal excluded), got {pt} — the filter may be reading "
+            f"`stage` instead of deal_status again")
         clear_request_cache()
 
 

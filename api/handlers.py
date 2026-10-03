@@ -1289,6 +1289,16 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
             lines = [
                 "COVERAGE GUIDANCE (say the verdict in your own words — do not "
                 "copy a fixed sentence from here):",
+                "- QTD won (the basis for the remaining-gap figures below) "
+                "INCLUDES any already-won deal's renewal-pipeline expansion "
+                "ARR — the won/incremental test is dollar-based (new_arr or "
+                "expansion_arr > 0), not pipeline-based, matching the "
+                "decision that the $1.55M target includes renewal expansion. "
+                "Separately, STILL-OPEN renewal-pipeline expansion is shown "
+                "as upside in renewal_not_weighted, not in the weighted "
+                "coverage total — that's because renewal pipeline has no "
+                "governed stage close-rate to weight it by, not because "
+                "it's out of scope.",
             ]
 
             if quota is None:

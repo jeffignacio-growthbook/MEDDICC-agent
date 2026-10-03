@@ -270,3 +270,44 @@ def test_rep_attainment_gets_no_synthesis_note_regression():
         f"REGRESSION: query_rep_attainment unexpectedly got a _synthesis_note: "
         f"{result.get('_synthesis_note')!r}")
     print("  ✓ query_rep_attainment's result carries no _synthesis_note")
+
+
+def test_guidance_states_qtd_won_includes_renewal_expansion():
+    """Decision recorded 2026-10-03: the $1.55M target INCLUDES renewal
+    expansion, so QTD won (the remaining-gap basis) correctly includes any
+    already-won deal's renewal-pipeline expansion ARR. The guidance must
+    say so, and must also distinguish that from STILL-OPEN renewal
+    expansion, which shows up separately as upside in renewal_not_weighted
+    (unweighted because renewal pipeline has no governed stage rate, not
+    because it's out of scope) — present regardless of phase/quota-met
+    branch, since it's a definitional fact, not part of the verdict."""
+    print("\n[TEST] guidance states QTD won includes renewal expansion; open renewal is separate upside")
+
+    quota_met_fixture = copy.deepcopy(BASE_FIXTURE)
+    quota_met_fixture["coverage"] = _coverage(
+        remaining_gap=0.0, nominal_coverage=None, weighted_coverage=None,
+        quota_met=True, phase="mid",
+        equations={"remaining": "$1,000,000 quota - $1,200,000 won = $0 remaining "
+                                "(quota already met, $200,000 over)",
+                   "nominal": None, "weighted": None})
+
+    no_quota_fixture = copy.deepcopy(BASE_FIXTURE)
+    no_quota_fixture["real_target"]["quota"] = None
+    no_quota_fixture["real_target"]["goal"] = None
+    no_quota_fixture["coverage"] = _coverage(
+        remaining_gap=None, nominal_coverage=None, weighted_coverage=None,
+        quota_met=None, phase="mid")
+
+    for fixture, label in (
+        (BASE_FIXTURE, "normal mid-phase"),
+        (quota_met_fixture, "quota-met"),
+        (no_quota_fixture, "no-quota"),
+    ):
+        result = asyncio.run(_run(fixture))
+        note = result.get("_synthesis_note")
+        assert note, f"expected a _synthesis_note ({label})"
+        assert "QTD won" in note and "INCLUDES" in note and "renewal-pipeline expansion" in note, (
+            f"expected QTD-won-includes-renewal-expansion guidance in the {label} case, got: {note!r}")
+        assert "renewal_not_weighted" in note and "no governed stage close-rate" in note, (
+            f"expected the open-renewal-expansion-upside distinction in the {label} case, got: {note!r}")
+    print("  ✓ present in normal, quota-met, and no-quota branches alike")
