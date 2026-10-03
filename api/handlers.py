@@ -3538,8 +3538,32 @@ async def query_rep_attainment(params: dict, sb) -> dict:
 
     METRIC BASIS:
     - All won_arr and targets use INCREMENTAL ARR basis (new_arr + expansion_arr)
-    - Renewals EXCLUDED (matches quota/target definition)
+    - Renewal pipeline deals are only excluded when they carry zero
+      incremental ARR. Exclusion uses field_semantics.is_incremental_pipeline()
+      — a DOLLAR-based test (new_arr > 0 or expansion_arr > 0), pipeline_id-
+      agnostic — the same test forecast_analyses.actual_incremental_closed_won()
+      uses. A renewal-pipeline deal that also carries real new/expansion ARR
+      (e.g. an expansion landed on a renewal) DOES count; a pure renewal
+      (renewal_revenue only, zero new/expansion ARR) does not.
+      FIXED 2026-10-03: this previously used a pipeline_id-based exclusion
+      (drop any deal whose pipeline_id was the renewal pipeline, regardless
+      of its ARR split), which disagreed with actual_incremental_closed_won
+      and undercounted team_summary.closed_won_qtd by exactly the real
+      incremental ARR on such deals — see
+      tests/test_coverage_qtd_reconciliation.py for the reconciliation proof
+      and PENDING_WORK.md for the audit that found it.
     - This is NOT deal_value (which incorrectly includes renewals)
+    - closed_won_qtd is sourced from the SAME
+      forecast_analyses.actual_incremental_closed_won() the pipeline-coverage
+      handler's qtd_won uses, so the two are identical in value and method.
+
+    ROSTER GAPS:
+    - A won, incremental-ARR deal with a missing owner_email, or with an
+      owner_email that doesn't match any rep_targets/non_quota_roles/
+      user_personas row for this period, is NEVER dropped from the team
+      total. It is aggregated into a single extra "no quota assigned" row
+      in reps[] (owner_email=None, unattributed=True) so it stays visible
+      without being misread as a named rep's own result.
     """
     # A rep name resolves to owner_email; None means "all reps" (valid here).
     owner_email, _rep_note = _resolve_owner_email(params, sb)
@@ -3627,7 +3651,15 @@ async def query_rep_attainment(params: dict, sb) -> dict:
 
     # Load won deals in time window - use INCREMENTAL ARR basis (new_arr + expansion_arr)
     # NOT deal_value (which includes renewals) - must match quota basis
-    from field_semantics import _RENEWAL_PIPELINE_ID
+    from field_semantics import is_incremental_pipeline
+    from forecast_analyses import actual_incremental_closed_won
+
+    # Team total: the SAME function and window the pipeline-coverage
+    # handler's qtd_won uses (scripts/pipeline_coverage.py ->
+    # forecast_analyses.actual_incremental_closed_won). This is the single
+    # source of truth for "closed-won incremental ARR this quarter" — never
+    # a separately-summed copy that can drift from it.
+    closed_won_qtd, closed_won_qtd_n = actual_incremental_closed_won(sb, tw["start"], tw["end"])
 
     won_filters = [
         ("eq", "deal_status", "won"),
@@ -3636,26 +3668,76 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     ]
 
     won_rows = select_all(sb, "deals",
-        columns="owner_email,new_arr,expansion_arr,pipeline_id",
+        columns="owner_email,new_arr,expansion_arr,pipeline_id,deal_status",
         filters=won_filters
     )
 
-    # Group won deals by owner - use incremental ARR (new_arr + expansion_arr), exclude renewals
+    # Canonical incremental-ARR test (dollar-based: new_arr > 0 or
+    # expansion_arr > 0, pipeline_id-agnostic) — matches
+    # actual_incremental_closed_won / query_path_to_target /
+    # assess_loss_concentration. Replaces the old pipeline_id-based
+    # renewal exclusion, which dropped a renewal-pipeline deal outright
+    # even when it carried real new/expansion ARR.
+    incremental_won_rows = [d for d in won_rows if is_incremental_pipeline(d)]
+
+    # Roster this rep's win can be attributed to without inventing a quota
+    # line nobody configured: a quota row for this period (targets_by_email),
+    # a configured non-quota role (AMs; config/targets.yaml non_quota_roles),
+    # or a registered persona (user_personas) — same definition the audit's
+    # owner_email check used (scripts/audit_qtd_filter_change.py).
+    non_quota_roles = set()
+    try:
+        targets_cfg_path = Path(__file__).parent.parent / "config" / "targets.yaml"
+        targets_cfg = yaml.safe_load(open(targets_cfg_path)) or {}
+        for _qdata in (targets_cfg.get("targets") or {}).values():
+            non_quota_roles.update((_qdata or {}).get("non_quota_roles") or [])
+    except Exception as e:
+        logger.warning(f"[REP_ATTAINMENT] could not load non_quota_roles from config/targets.yaml: {e}")
+
+    # Load persona names (unconditionally — also used below to decide
+    # whether a win's owner_email is a known, attributable rep).
+    persona_rows = select_all(sb, "user_personas",
+        columns="email,display_name,name",
+        filters=[]
+    )
+    persona_map = {}
+    for p in persona_rows:
+        email = p.get("email")
+        persona_map[email] = p.get("display_name") or p.get("name")
+
+    known_roster_emails = set(targets_by_email.keys()) | non_quota_roles | set(persona_map.keys())
+
+    # Group won deals by owner. A deal with no owner_email, or whose
+    # owner_email isn't in known_roster_emails, is a roster gap — never
+    # dropped. It is counted in closed_won_qtd (computed above from the
+    # full deal set) and aggregated into a single "no quota assigned" line
+    # below instead of either disappearing or being misattributed to a
+    # named rep who never owned it.
     won_by_email = {}
-    for deal in won_rows:
+    unattributed_total = 0.0
+    unattributed_n = 0
+    for deal in incremental_won_rows:
         owner = deal.get("owner_email")
-        pipeline_id = str(deal.get("pipeline_id") or "")
-
-        # Skip renewal pipeline deals (same exclusion as quota basis)
-        if pipeline_id == _RENEWAL_PIPELINE_ID:
-            continue
-
-        # Incremental ARR (matches quota basis)
         deal_incremental = incremental_arr(deal)
 
-        if owner:
+        if owner and owner in known_roster_emails:
             won_by_email[owner] = won_by_email.get(owner, 0) + deal_incremental
-    
+        else:
+            unattributed_total += deal_incremental
+            unattributed_n += 1
+            if not owner:
+                logger.warning(
+                    "[REP_ATTAINMENT] won deal with missing owner_email: "
+                    f"${deal_incremental:,.0f} counted in team total, "
+                    "aggregated into 'no quota assigned' line")
+            else:
+                logger.warning(
+                    f"[REP_ATTAINMENT] won deal owner_email={owner!r} not in "
+                    "quota roster (no rep_targets/non_quota_roles/"
+                    "user_personas match): "
+                    f"${deal_incremental:,.0f} counted in team total, "
+                    "aggregated into 'no quota assigned' line")
+
     # Get all unique rep emails (union of targets and won)
     all_rep_emails = set(targets_by_email.keys()) | set(won_by_email.keys())
     logger.info(f"[REP_ATTAINMENT] all_rep_emails union: {len(all_rep_emails)} reps")
@@ -3668,21 +3750,9 @@ async def query_rep_attainment(params: dict, sb) -> dict:
         logger.info(f"[REP_ATTAINMENT] filtered to owner_email={owner_email!r}: {len(all_rep_emails)} reps (was {before_filter})")
         if not all_rep_emails:
             logger.warning(f"[REP_ATTAINMENT] owner_email {owner_email!r} NOT FOUND in union of targets/won")
-    
-    # Load persona names
-    persona_map = {}
-    if all_rep_emails:
-        persona_rows = select_all(sb, "user_personas",
-            columns="email,display_name,name",
-            filters=[]
-        )
-        for p in persona_rows:
-            email = p.get("email")
-            persona_map[email] = p.get("display_name") or p.get("name")
-    
-    # Calculate closed_won_qtd using same incremental ARR basis as quota
-    # This is the team's actual closed-won incremental ARR for the quarter
-    closed_won_qtd = sum(won_by_email.values())
+        # A specific-rep query never shows the team-wide unattributed line.
+        unattributed_total = 0.0
+        unattributed_n = 0
 
     # Build rep attainment list
     reps = []
@@ -3710,10 +3780,10 @@ async def query_rep_attainment(params: dict, sb) -> dict:
         quota_attainment = rate_or_gap(won, quota) if quota else {"value": None, "data_gap": True}
         stretch_attainment = rate_or_gap(won, stretch) if stretch else {"value": None, "data_gap": True}
 
-        # Count won deals for this rep
-        deals_won = len([d for d in won_rows
-                        if d.get("owner_email") == email
-                        and str(d.get("pipeline_id") or "") != _RENEWAL_PIPELINE_ID])
+        # Count won deals for this rep (same is_incremental_pipeline test
+        # used for won_arr above, not the old pipeline_id-based exclusion)
+        deals_won = len([d for d in incremental_won_rows
+                        if d.get("owner_email") == email])
 
         reps.append({
             "owner_email": email,
@@ -3742,6 +3812,28 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             reps_above_50 += 1
         if attainment_pct and attainment_pct >= 100:
             reps_above_100 += 1
+
+    # Roster-gap wins (missing owner_email, or an owner_email not found in
+    # the quota roster) get one aggregate line here — counted in
+    # total_won/closed_won_qtd like any other win, never silently dropped,
+    # never crashing the handler, and never misattributed to a named rep.
+    if unattributed_n > 0:
+        reps.append({
+            "owner_email": None,
+            "name": "No quota assigned",
+            "quota": None,
+            "stretch": None,
+            "combined_target": None,
+            "won_arr": unattributed_total,
+            "quota_attainment": {"value": None, "data_gap": True},
+            "stretch_attainment": {"value": None, "data_gap": True},
+            "combined_attainment": {"value": None, "data_gap": True},
+            "attainment_pct": None,
+            "deals_won": unattributed_n,
+            "data_gap": True,
+            "unattributed": True,
+        })
+        total_won += unattributed_total
 
     # Sort by attainment ascending (lowest first)
     reps.sort(key=lambda x: (x["attainment_pct"] is None, x["attainment_pct"] or 0))

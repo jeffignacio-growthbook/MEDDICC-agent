@@ -390,6 +390,23 @@ KNOWN_FLAGGED_LOG_TAGS = {
     # api/handlers.py::query_pipeline_coverage's own except branch for the
     # current (still-reviewed-by-inspection, still a graceful no-op-on-
     # failure) behavior.
+    #
+    # [REP_ATTAINMENT] (api/handlers.py::query_rep_attainment), added
+    # 2026-10-03 (attainment PR, is_incremental_pipeline reconciliation):
+    # two warning sites — a won deal with a "missing owner_email" and a won
+    # deal whose owner_email is "not in quota roster" (no rep_targets /
+    # non_quota_roles / user_personas match for the period). Matched only
+    # because "missing" is in _FLAGGED_LOG_KEYWORDS. Not a detect-and-ship
+    # gap: both cases are counted in closed_won_qtd (sourced from
+    # actual_incremental_closed_won, computed over the full deal set before
+    # either branch runs) and aggregated into a single, user-visible
+    # "no quota assigned" row in reps[] (unattributed=True) — the log line
+    # documents a real, legitimate roster gap for anyone reading logs, it
+    # never suppresses or silently drops the dollar amount. See
+    # tests/test_coverage_qtd_reconciliation.py::
+    # test_query_rep_attainment_matches_other_sources for the behavioral
+    # proof.
+    "[REP_ATTAINMENT]",
 }
 
 
