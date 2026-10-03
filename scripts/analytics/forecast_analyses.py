@@ -853,7 +853,18 @@ def query_stage_close_rate(sb=None) -> Dict:
     SCOPE: New+Expansion only (renewal pipeline excluded) — must match
     assess_pipeline_coverage()'s own scope. A renewal deal's close-rate
     behavior is a different motion; it must not leak into weights
-    applied to New+Expansion pipeline.
+    applied to New+Expansion pipeline. ALSO excludes any stage_order not
+    in discovery_or_later_stages()'s qualifying set (config
+    exclude_from_analysis stages — "Meeting Set", order 0, is the one
+    that actually appears in an open snapshot row; "Review"/"Disqualified"
+    are included in the set for completeness but don't occur here since
+    deals_snapshot only ever holds OPEN rows). This must agree with
+    assess_pipeline_coverage()'s qualified_pipeline.deal_count population,
+    not just coincidentally overlap with it — confirmed live
+    (2026-10-03) that Meeting Set observations were leaking into
+    by_stage_order while being correctly excluded from deal_count,
+    producing a sum(n_observed) that didn't match deal_count for the
+    same cached payload.
 
     Counting convention: each (deal, week) snapshot observation at a
     stage_order counts once — a deal seen at the same stage across
@@ -884,6 +895,8 @@ def query_stage_close_rate(sb=None) -> Dict:
 
     from field_semantics import _RENEWAL_PIPELINE_ID
     from supabase_client import select_all
+    from loss_concentration import SALES_PIPELINE, discovery_or_later_stages
+    from utils import get_pipeline_config
 
     config = _load_config()
     min_evidence = config.get('min_evidence_count', 30)
@@ -894,6 +907,19 @@ def query_stage_close_rate(sb=None) -> Dict:
             'error': 'No complete quarters available',
             'coverage_note': 'Insufficient historical data'
         }
+
+    # Same qualifying-stage-order set assess_pipeline_coverage() builds for
+    # qualified_pipeline.deal_count (scripts/pipeline_coverage.py) — reused,
+    # not re-derived, so the two can never silently drift apart again.
+    pipeline_config = get_pipeline_config()
+    qualifying_stage_ids = set(discovery_or_later_stages(pipeline_config))
+    qualifying_orders = {
+        s.get("order")
+        for p in pipeline_config.get("pipelines", [])
+        if str(p.get("id")) == SALES_PIPELINE
+        for s in p.get("stages", [])
+        if str(s.get("id")) in qualifying_stage_ids
+    }
 
     # OUTCOME-READ (same as query_commit_outcome_by_week): terminal state
     # from the current deals table, never a snapshot row.
@@ -916,6 +942,12 @@ def query_stage_close_rate(sb=None) -> Dict:
                 continue
             stage_order = r.get('stage_order')
             if stage_order is None:
+                continue
+            if stage_order not in qualifying_orders:
+                # Same population assess_pipeline_coverage()'s
+                # qualified_pipeline.deal_count uses — a stage excluded
+                # there (e.g. "Meeting Set", exclude_from_analysis) must
+                # never contribute an observation here either.
                 continue
             outcome = _classify_deal_outcome(
                 r.get('deal_id'), q_start_iso, q_end_iso, deals_by_id)

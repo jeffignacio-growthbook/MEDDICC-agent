@@ -395,6 +395,21 @@ def save_result_cache(sb: Client, thread_ts: str, handler_name: str,
 
     IMPORTANT: Uses timedelta for expiry, NOT modular arithmetic.
     Prior bug: now.replace(hour=(now.hour+24)%24) is no-op at hour 23.
+
+    2026-10-03: the write (json.dumps + upsert) is wrapped — a bad
+    cache_payload used to be able to abort save_thread() entirely. The
+    cache write happens BEFORE save_thread()'s own conversation_threads
+    commit (that commit is the function's last statement), so an
+    uncaught exception here didn't just skip the cache — it silently
+    dropped that turn's history and entity context too, with the user
+    already having received their answer (save_thread() runs as a
+    FastAPI background task, after the Slack reply is sent). Reuses this
+    function's existing "nothing worth caching" contract (return None)
+    rather than raising, so save_thread()'s `if result_key:` check
+    already does the right thing with zero changes there. Both handlers
+    currently in the cache_payload opt-in list (query_pipeline_coverage,
+    query_rep_attainment) are confirmed serialization-safe today — this
+    guards the next one that isn't.
     """
     import logging
     logger = logging.getLogger(__name__)
@@ -408,19 +423,23 @@ def save_result_cache(sb: Client, thread_ts: str, handler_name: str,
         if isinstance(v, list):
             row_count += len(v)
 
-    key = make_result_key(thread_ts, handler_name, question)
-    # CORRECT expiry computation using timedelta
-    expires = datetime.now(timezone.utc) + timedelta(minutes=CACHE_TTL_MINUTES)
+    try:
+        key = make_result_key(thread_ts, handler_name, question)
+        # CORRECT expiry computation using timedelta
+        expires = datetime.now(timezone.utc) + timedelta(minutes=CACHE_TTL_MINUTES)
 
-    sb.table("result_cache").upsert({
-        "result_key":   key,
-        "thread_ts":    thread_ts,
-        "handler_name": handler_name,
-        "question":     question[:500],  # Truncate long questions
-        "payload":      json.dumps(payload),  # JSONB storage
-        "row_count":    row_count,
-        "expires_at":   expires.isoformat(),
-    }, on_conflict="result_key").execute()
+        sb.table("result_cache").upsert({
+            "result_key":   key,
+            "thread_ts":    thread_ts,
+            "handler_name": handler_name,
+            "question":     question[:500],  # Truncate long questions
+            "payload":      json.dumps(payload),  # JSONB storage
+            "row_count":    row_count,
+            "expires_at":   expires.isoformat(),
+        }, on_conflict="result_key").execute()
+    except Exception as e:
+        logger.error(f"[CACHE] save failed for handler={handler_name}: {e}")
+        return None
 
     logger.info(f"[CACHE] stored {row_count} rows under {key} "
                 f"(handler={handler_name}, ttl={CACHE_TTL_MINUTES}m)")
