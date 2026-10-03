@@ -485,6 +485,17 @@ def assess_pipeline_coverage(
         current_week=current_week, coverage_config=coverage_config,
     )
 
+    # Calendar-based days/weeks left — the SAME single source of truth
+    # api/quarter_health.py's exposure answer uses (quarter_days_weeks_
+    # left), not a week-index subtraction. 2026-10-03: the coverage
+    # synthesis note used to let the model derive "weeks left" itself
+    # from `13 - current_week`, which both ignores that the current
+    # week is only partially elapsed and isn't calendar-based — it said
+    # "3 weeks" the same day exposure correctly said "4 weeks left" (28
+    # calendar days).
+    from utils import quarter_days_weeks_left
+    quarter_time_left = quarter_days_weeks_left(q_end, as_of)
+
     # historical HEURISTIC curve — never blended with the real target.
     # Still computed (cache_payload, citation) even though it's no longer
     # rendered — see api/handlers.py::query_pipeline_coverage.
@@ -505,6 +516,7 @@ def assess_pipeline_coverage(
         "status": "ok",
         "fiscal_quarter": fiscal_quarter,
         "current_week": current_week,
+        "quarter_time_left": quarter_time_left,
         "is_historical": is_historical,
         "scope": scope_note,
         "qualified_pipeline": {

@@ -491,10 +491,9 @@ def _qtd_figures(loss, pipe, ft: dict, as_of: date) -> dict:
     if q != (tq.get("label") or "") or not tq.get("end"):
         return na(f"quarter mismatch: closed won is for {q!r}, the target is for {tq.get('label')!r}")
     end = date.fromisoformat(str(tq["end"])[:10])
-    days_left = max((end - as_of).days, 0)
-    weeks_left = days_left // 7
-    left = (f"{weeks_left} week{'' if weeks_left == 1 else 's'} left" if weeks_left
-            else f"{days_left} day{'' if days_left == 1 else 's'} left")
+    from utils import quarter_days_weeks_left
+    dw = quarter_days_weeks_left(end, as_of)
+    days_left, weeks_left, left = dw["days_left"], dw["weeks_left"], dw["label"]
     remaining = target - won
     gap = (f"(${remaining:,.0f} remaining)" if remaining > 0 else f"(${-remaining:,.0f} over target)")
     line = (f"${won:,.0f} closed won QTD against the ${target:,.0f} target {gap}, with {left} "

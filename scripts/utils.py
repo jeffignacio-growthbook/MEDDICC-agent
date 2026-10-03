@@ -564,6 +564,36 @@ def get_fiscal_quarter(as_of=None, config: Optional[Dict] = None) -> tuple:
     return (q_start, q_end, label)
 
 
+def quarter_days_weeks_left(end, as_of=None) -> Dict[str, Any]:
+    """Calendar-based days/weeks remaining in a fiscal quarter — the
+    single source of truth for every coverage-related handler. Promoted
+    UNMODIFIED from api/quarter_health.py::_qtd_figures (2026-10-03):
+    that handler's exposure answer correctly said "4 weeks left" (28
+    calendar days) while query_pipeline_coverage's synthesis_note let the
+    model derive its own "3 weeks" from `13 - current_week` — wrong both
+    because it ignores that the current week is only partially elapsed,
+    and because it isn't calendar-based at all. One computation, reused
+    by both.
+
+    Args:
+        end: the quarter's end date (a date, not a string).
+        as_of: "today" to measure from (default: date.today()).
+
+    Returns:
+        {"days_left": int, "weeks_left": int, "label": str} where label
+        is "N week(s) left" once at least a full week remains, else
+        "N day(s) left" — matching _qtd_figures' own phrasing exactly.
+    """
+    from datetime import date as _date
+    if as_of is None:
+        as_of = _date.today()
+    days_left = max((end - as_of).days, 0)
+    weeks_left = days_left // 7
+    label = (f"{weeks_left} week{'' if weeks_left == 1 else 's'} left" if weeks_left
+             else f"{days_left} day{'' if days_left == 1 else 's'} left")
+    return {"days_left": days_left, "weeks_left": weeks_left, "label": label}
+
+
 # ============================================================================
 # SEMANTIC CONTEXT BUILDER
 # ============================================================================

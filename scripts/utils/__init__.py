@@ -28,6 +28,7 @@ is_lost_stage = fiscal_utils.is_lost_stage
 get_segment = fiscal_utils.get_segment
 slugify = fiscal_utils.slugify
 get_fiscal_quarter = fiscal_utils.get_fiscal_quarter
+quarter_days_weeks_left = fiscal_utils.quarter_days_weeks_left
 build_semantic_context = fiscal_utils.build_semantic_context
 
 __all__ = [
@@ -44,5 +45,6 @@ __all__ = [
     'get_segment',
     'slugify',
     'get_fiscal_quarter',
+    'quarter_days_weeks_left',
     'build_semantic_context'
 ]
