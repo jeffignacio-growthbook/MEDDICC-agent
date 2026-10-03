@@ -1264,6 +1264,52 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
 
         result["cache_payload"] = dict(result)
 
+        # Show the gap-to-goal SUBTRACTION, not just its resulting delta.
+        # gap_to_goal's own .text (e.g. "$750,218 short of target") only
+        # ever states the result — real_target.quota, qualified_pipeline.
+        # raw_value, and stage_weighting.weighted_value are all present in
+        # the payload already, but nothing instructed the model to show the
+        # arithmetic connecting them, so a report whose core point IS the
+        # gap only ever asserted it. Built here (not left to the model) so
+        # the equation can never itself contain an arithmetic error.
+        try:
+            real_target = result.get("real_target") or {}
+            quota = real_target.get("quota")
+            raw_value = (result.get("qualified_pipeline") or {}).get("raw_value")
+            weighted_value = (result.get("stage_weighting") or {}).get("weighted_value")
+            gap_to_goal = result.get("gap_to_goal") or {}
+            raw_gap = gap_to_goal.get("raw_pipeline_vs_goal")
+            weighted_gap = gap_to_goal.get("weighted_pipeline_vs_goal")
+
+            def _equation(value, gap, value_label):
+                if quota is None or value is None or gap is None:
+                    return None
+                if gap["status"] == "short":
+                    return (f"${quota:,.0f} quota - ${value:,.0f} {value_label} "
+                            f"= ${gap['amount']:,.0f} short")
+                return (f"${value:,.0f} {value_label} - ${quota:,.0f} quota "
+                        f"= ${gap['amount']:,.0f} over")
+
+            raw_equation = _equation(raw_value, raw_gap, "raw qualified pipeline")
+            weighted_equation = _equation(weighted_value, weighted_gap, "weighted pipeline")
+
+            if raw_equation or weighted_equation:
+                lines = [
+                    "GAP-TO-GOAL ARITHMETIC: show the subtraction itself, not just "
+                    "the resulting delta — the gap IS the point of this report, so "
+                    "its derivation must be visible, not just asserted. Include "
+                    "these equation(s) verbatim, next to (or in) the gap-to-goal "
+                    "line(s) of your table/answer:"
+                ]
+                if raw_equation:
+                    lines.append(f"- Raw: {raw_equation}")
+                if weighted_equation:
+                    lines.append(f"- Weighted: {weighted_equation}")
+                result["_synthesis_note"] = "\n".join(lines)
+        except Exception as e:
+            logger.warning(f"[PIPELINE_COVERAGE] Failed to build gap-to-goal "
+                          f"arithmetic note: {e}")
+
     return result
 
 
