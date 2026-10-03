@@ -1,0 +1,45 @@
+name: Audit QTD Filter Change (one-off)
+
+# One-off diagnostic workflow, not part of the regular gates. READ-ONLY,
+# Supabase only.
+#
+# Before generalizing actual_incremental_closed_won()'s filter (config-
+# driven coverage, 2026-10-03): compares the OLD filter (pipeline_id-based
+# renewal exclusion + is_won(current stage)) against the proposed NEW
+# filter (is_incremental_pipeline() dollar-based exclusion + deal_status
+# =="won", matching query_path_to_target and assess_loss_concentration)
+# over REAL data — the current quarter, and every prior-year window
+# query_coverage_proxy_target_by_week() already uses. Also reports
+# query_rep_attainment's own (differently-defined) total for reference.
+#
+# Report only. No primitive is changed here. Safe to delete once this
+# one-time audit is done.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: Agent
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Audit QTD filter change: old vs new definition, real data"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          PYTHONPATH=.:scripts:api:scripts/analytics python3 scripts/audit_qtd_filter_change.py
