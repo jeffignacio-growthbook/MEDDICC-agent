@@ -79,7 +79,13 @@ def test_live_quarter_weighted_by_current_stage():
     assert (rn["deal_count"], rn["value"]) == (8, 295485.0) and "no governed" in rn["note"]
     assert "current stage" in r["scope"] and "highest_stage_order_reached" not in r["scope"]
     cols = sb.selected("deals")
-    assert all("stage" in c for c in cols), cols
+    # The qualified-pipeline fetch (first deals query) must select "stage",
+    # not highest_stage_order_reached. A later deals query exists too now
+    # (actual_incremental_closed_won's QTD-won fetch, for coverage's
+    # remaining-gap denominator) — it legitimately has no need for "stage"
+    # at all (deal_status + is_incremental_pipeline only), so this checks
+    # the specific query that matters, not every deals query.
+    assert "stage" in cols[0], cols
     print("✓ live FY2027 Q3: 44 qualified Sales deals, $4,907,066 raw, $701,826 weighted by current "
           "stage (was $1,231,113 by highest_stage_order_reached); 8 renewal deals ($295,485) not weighted")
 

@@ -5,6 +5,20 @@
 
 ---
 
+### 🔵 ROADMAP (deliberately scoped out, not an oversight): consolidate the three remaining "QTD closed-won" implementations onto the canonical definition (logged 2026-10-03)
+
+Config-driven pipeline coverage (denominator = remaining gap, `quota - qtd_won`) generalized `scripts/analytics/forecast_analyses.py::actual_incremental_closed_won` to the single definition `deal_status == "won" and is_incremental_pipeline(deal)` (dollar-based renewal test: `new_arr > 0 or expansion_arr > 0`, pipeline_id-agnostic). A shared-fixture reconciliation test (`tests/test_coverage_qtd_reconciliation.py`) proved this now agrees with two of the other three "QTD won" computations in the codebase:
+
+- `api/handlers.py::query_path_to_target` — own inline copy of the same definition (agrees).
+- `scripts/loss_concentration.py::assess_loss_concentration`'s `won_incremental_arr` — own inline copy of the same definition (agrees).
+- `api/handlers.py::query_rep_attainment` — a **different**, hybrid definition (`deal_status == "won"` + pipeline_id-based renewal exclusion, not `is_incremental_pipeline()`). Confirmed divergent on the shared fixture: **$175,000 vs. $225,000** for the other three. Left untouched — out of scope for this PR.
+
+Per explicit instruction, this PR does **not** remove `query_path_to_target`'s inline copy or `assess_loss_concentration`'s copy, even though both are now textually identical to `actual_incremental_closed_won` — keeping the PR reviewable. Still to do, as its own scoped change:
+- Replace the two now-redundant inline copies with calls to `actual_incremental_closed_won` (or a shared helper), so there is exactly one implementation of "QTD incremental closed-won" instead of three.
+- Decide whether `query_rep_attainment`'s hybrid definition is a bug (should match the other three) or intentional (rep attainment may legitimately want to count renewal-pipeline wins differently from pipeline-coverage/loss-concentration) — a product decision, not a code question — then reconcile or explicitly document the difference.
+
+---
+
 ## ✅ FIXED 2026-09-26: waterfall "new pipeline generated" silently read $0 for 7 weeks — `qualified_date` frozen, no live maintainer
 
 **The bug (high-severity):** Slack "how much pipeline did we generate this week" returned **$0 for 7 straight weeks** (Aug 17–Sep 21 2026), with an actionable-sounding "review SDR metrics" recommendation — while **58 deals / ~$5.74M** had actually crossed into qualified pipeline. Independently re-derived from `deals_snapshot` stage history: wk 8/17 $558,750 (10) · 8/24 $1,507,500 (12) · 9/07 $940,000 (12) · 9/14 $1,510,671 (11) · 9/21 $1,220,000 (13).

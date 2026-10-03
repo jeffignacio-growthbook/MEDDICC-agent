@@ -1,49 +1,47 @@
 """
-Tests for the gap-to-goal ARITHMETIC fix in query_pipeline_coverage's
-rendered output.
+Tests for query_pipeline_coverage's config-driven REMAINING-GAP coverage
+synthesis guidance (api/handlers.py), superseding PR #117's bare quota-vs-
+pipeline subtraction.
 
-Live test confirmed tonight's (2026-10-03) computations are correct
-($1,550,000 - $799,782 = $750,218), but the rendered table only showed the
-final delta ("$750,218 short of target"), never the subtraction itself.
-For a report whose core point IS the gap, the gap's own derivation should
-be shown, not just asserted.
+Context (2026-10-03): the denominator for coverage is now always the
+REMAINING gap (quota minus QTD closed-won), never the bare quota —
+scripts/pipeline_coverage.py::assess_pipeline_coverage computes
+coverage.remaining_gap/nominal_coverage/weighted_coverage/expected_
+multiple/ahead_behind/phase/equations (point 6 of that module's
+docstring). This file tests the HANDLER layer: how that primitive's
+output becomes synthesis guidance, not a template — PR #117's approach
+embedded exact sentences for the model to copy; this one states facts
+(the equations, ahead/behind, phase) and instructs the model to say the
+verdict in its own words, never scripting the prose itself.
 
-Diagnosis: gap_to_goal's own .text field (scripts/pipeline_coverage.py's
-_gap_to_goal()) only ever states the result ("$X short of target" / "$X
-over target") — it never carried the quota/value operands, and nothing in
-api/router.py's generic synthesis scaffolding (_VOICE_BASE, TABLE_FORMAT_
-RULE) instructs the model to show arithmetic for any handler. The
-established mechanism for handler-specific synthesis instructions is the
-`_synthesis_note` field (_VOICE_BASE: "ALWAYS follow the instructions in
-this field when present") — query_waterfall already uses it (its
-_headline_instruction); query_pipeline_coverage had none at all.
-
-Fix: query_pipeline_coverage's handler (api/handlers.py) now builds the
-full equation strings in CODE (never left to the model to compute, so the
-equation itself can't contain an arithmetic error) from real_target.quota,
-qualified_pipeline.raw_value, stage_weighting.weighted_value, and
-gap_to_goal's own status/amount — for BOTH the raw and weighted
-comparisons — and instructs the model via _synthesis_note to include them
-verbatim. Scoped to display/prompt only; gap_to_goal's own computation is
-untouched.
+Also covers item 6 of this task: the HEURISTIC historical_heuristic_curve
+is popped from the top-level (rendered) result but stays in cache_payload
+(built from result BEFORE the pop) — citable on request
+(explain_prior_answer) but never competing with the real remaining-gap
+figure in the primary answer again.
 
 Test groups (all offline/deterministic, no live LLM/Supabase — mirrors
 tests/test_explain_prior_answer_citation.py's handler-test pattern:
 patch pipeline_coverage.assess_pipeline_coverage, call
 handlers.query_pipeline_coverage directly):
-  1. Tonight's exact numbers reproduced as a fixture — _synthesis_note
-     contains the explicit equation for both raw and weighted.
-  2. Direction wording is correct for an "over target" result too.
-  3. No quota configured (gap_to_goal fields are None) — no fabricated
-     equation, no crash.
-  4. _synthesis_note never leaks into cache_payload (stays a top-level,
-     per-turn-only field, same convention as query_waterfall's).
-  5. REGRESSION: query_rep_attainment (shares the same generic synthesis
-     scaffolding, no gap_to_goal field of its own) gets no _synthesis_note
-     at all — this fix is scoped to query_pipeline_coverage only.
+  1. Normal (mid-phase, behind) case — equations quoted, ahead/behind
+     fact stated, no late-phase pivot instruction.
+  2. Quota-met edge case — no ratio equations, remaining-gap equation
+     states "already met".
+  3. No-quota edge case — no equations fabricated, guidance still says
+     something honest (never silent, never a bare division by nothing).
+  4. Late-phase pivot-to-named-commits instruction present; early-phase
+     has no such instruction.
+  5. historical_heuristic_curve: present in cache_payload, ABSENT from
+     the top-level (rendered) result.
+  6. _synthesis_note never leaks into cache_payload (stays a top-level,
+     per-turn-only field).
+  7. REGRESSION: query_rep_attainment (shares generic synthesis
+     scaffolding, no coverage field of its own) gets no _synthesis_note.
 """
 import sys
 import types
+import copy
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -63,11 +61,23 @@ from api import handlers  # noqa: E402
 from test_explain_prior_answer_citation import _mock_rep_attainment_sb  # noqa: E402
 
 
-# ── tonight's exact incident numbers ────────────────────────────────────
-TONIGHT_FIXTURE = {
+def _coverage(remaining_gap, nominal_coverage, weighted_coverage, quota_met,
+             expected_multiple=None, ahead_behind=None, phase="mid",
+             equations=None):
+    return {
+        "remaining_gap": remaining_gap, "quota_met": quota_met,
+        "nominal_coverage": nominal_coverage, "weighted_coverage": weighted_coverage,
+        "expected_multiple": expected_multiple, "ahead_behind": ahead_behind,
+        "phase": phase,
+        "equations": equations or {"remaining": None, "nominal": None, "weighted": None},
+        "note": "test coverage note",
+    }
+
+
+BASE_FIXTURE = {
     "status": "ok",
     "fiscal_quarter": "FY2027 Q3",
-    "current_week": 9,
+    "current_week": 7,
     "is_historical": False,
     "scope": "New+Expansion ARR only; qualified pipeline only",
     "qualified_pipeline": {"raw_value": 900000.0, "deal_count": 22},
@@ -82,12 +92,16 @@ TONIGHT_FIXTURE = {
         "stretch_note": "Ryan's personal aspiration.",
         "note": "Stated target for FY2027 Q3 — team quota from rep_targets.",
     },
-    "gap_to_goal": {
-        "raw_pipeline_vs_goal": {"status": "short", "amount": 650000.0,
-                                  "text": "$650,000 short of target"},
-        "weighted_pipeline_vs_goal": {"status": "short", "amount": 750218.0,
-                                      "text": "$750,218 short of target"},
-    },
+    "qtd_won": {"value": 500000.0, "deal_count": 10, "note": "test qtd note"},
+    "coverage": _coverage(
+        remaining_gap=1050000.0, nominal_coverage=900000.0 / 1050000.0,
+        weighted_coverage=799782.0 / 1050000.0, quota_met=False,
+        expected_multiple=1.2, ahead_behind="behind", phase="mid",
+        equations={
+            "remaining": "$1,550,000 quota - $500,000 won = $1,050,000 remaining",
+            "nominal": "$900,000 raw qualified pipeline / $1,050,000 remaining = 0.86x",
+            "weighted": "$799,782 weighted pipeline / $1,050,000 remaining = 0.76x",
+        }),
     "historical_heuristic_curve": {"by_week": {}, "proxy_targets": {},
                                    "heuristic": True, "label": "HEURISTIC",
                                    "note": "HEURISTIC."},
@@ -100,85 +114,139 @@ async def _run(fixture):
         return await handlers.query_pipeline_coverage({}, MagicMock())
 
 
-def test_synthesis_note_shows_explicit_subtraction_for_both_comparisons():
-    """THE FIX'S PROOF — tonight's exact numbers. _synthesis_note must
-    contain the full equation, not just the delta, for BOTH raw and
-    weighted."""
-    print("\n[TEST] _synthesis_note shows explicit gap-to-goal subtraction "
-          "(raw and weighted)")
-    result = asyncio.run(_run(TONIGHT_FIXTURE))
-
+def test_guidance_states_ahead_behind_and_quotes_all_three_equations():
+    """Normal mid-phase, behind-pace case: all three equations quoted
+    verbatim (never recomputed by the model), the ahead/behind FACT and
+    the expected multiple stated, and guidance says to narrate the verdict
+    in the model's own words rather than copying a scripted sentence."""
+    print("\n[TEST] guidance states ahead/behind fact, quotes all three equations")
+    result = asyncio.run(_run(BASE_FIXTURE))
     note = result.get("_synthesis_note")
-    assert note, "expected a _synthesis_note instructing the model to show the arithmetic"
+    assert note, "expected a _synthesis_note"
 
-    weighted_equation = "$1,550,000 quota - $799,782 weighted pipeline = $750,218 short"
-    raw_equation = "$1,550,000 quota - $900,000 raw qualified pipeline = $650,000 short"
-    assert weighted_equation in note, (
-        f"REGRESSION: expected the explicit weighted equation in _synthesis_note, "
-        f"got:\n{note}")
-    assert raw_equation in note, (
-        f"REGRESSION: expected the explicit raw equation in _synthesis_note, "
-        f"got:\n{note}")
-    print(f"  ✓ weighted equation present: {weighted_equation!r}")
-    print(f"  ✓ raw equation present: {raw_equation!r}")
+    assert "own words" in note.lower(), "expected guidance, not a scripted sentence"
+    assert "$1,550,000 quota - $500,000 won = $1,050,000 remaining" in note
+    assert "$900,000 raw qualified pipeline / $1,050,000 remaining = 0.86x" in note
+    assert "$799,782 weighted pipeline / $1,050,000 remaining = 0.76x" in note
+    assert "behind" in note and "1.20x" in note and "week 7" in note
+    print("  ✓ all three equations quoted verbatim; ahead/behind fact + expected multiple stated")
 
 
-def test_over_target_direction_wording():
-    """When pipeline EXCEEDS quota, the equation must read value - quota =
-    amount over (not quota - value, which would be a negative, confusing
-    read) — direction must follow gap_to_goal's own status, not be
-    hardcoded to the short-target case."""
-    print("\n[TEST] 'over target' equation reads value - quota = amount over")
-    import copy
-    fixture = copy.deepcopy(TONIGHT_FIXTURE)
-    fixture["stage_weighting"]["weighted_value"] = 2000000.0
-    fixture["gap_to_goal"]["weighted_pipeline_vs_goal"] = {
-        "status": "over", "amount": 450000.0, "text": "$450,000 over target"}
+def test_no_schedule_configured_says_so_instead_of_fabricating_ahead_behind():
+    """When ahead_behind is None (no expected_multiple_schedule entry for
+    this week), guidance must say there is no fact to state — never
+    silently omit it or invent a verdict."""
+    print("\n[TEST] no expected-multiple schedule -> guidance says so, no fabrication")
+    fixture = copy.deepcopy(BASE_FIXTURE)
+    fixture["coverage"]["ahead_behind"] = None
+    fixture["coverage"]["expected_multiple"] = None
 
     result = asyncio.run(_run(fixture))
     note = result["_synthesis_note"]
-    expected = "$2,000,000 weighted pipeline - $1,550,000 quota = $450,000 over"
-    assert expected in note, f"expected {expected!r} in:\n{note}"
-    print(f"  ✓ over-target equation present: {expected!r}")
+    assert "no expected-multiple schedule is configured" in note.lower()
+    assert "describe the ratios themselves instead" in note.lower()
+    print("  ✓ guidance explicitly states no ahead/behind fact is available")
 
 
-def test_no_synthesis_note_fabricated_without_a_quota():
-    """No team quota configured (real_target.quota is None) — gap_to_goal's
-    own fields are None too (per _gap_to_goal's None-propagation). Must not
-    fabricate an equation, must not crash building the note."""
-    print("\n[TEST] no quota configured -> no fabricated equation, no crash")
-    import copy
-    fixture = copy.deepcopy(TONIGHT_FIXTURE)
-    fixture["real_target"]["quota"] = None
-    fixture["real_target"]["goal"] = None
-    fixture["gap_to_goal"]["raw_pipeline_vs_goal"] = None
-    fixture["gap_to_goal"]["weighted_pipeline_vs_goal"] = None
+def test_quota_met_guidance_has_no_ratio_equations():
+    """Quota-met edge case: the remaining equation (stating the quarter is
+    already met) is quoted; nominal/weighted equations are absent from
+    guidance entirely (none exist to quote — no ratio was computed)."""
+    print("\n[TEST] quota met -> only the remaining equation, no ratio equations")
+    fixture = copy.deepcopy(BASE_FIXTURE)
+    fixture["coverage"] = _coverage(
+        remaining_gap=0.0, nominal_coverage=None, weighted_coverage=None,
+        quota_met=True, phase="mid",
+        equations={"remaining": "$1,000,000 quota - $1,200,000 won = $0 remaining "
+                                "(quota already met, $200,000 over)",
+                   "nominal": None, "weighted": None})
 
     result = asyncio.run(_run(fixture))
-    assert "_synthesis_note" not in result, (
-        f"expected no _synthesis_note when there is no quota to subtract "
-        f"against, got: {result.get('_synthesis_note')!r}")
-    print("  ✓ no _synthesis_note fabricated when quota/gap data is unavailable")
+    note = result["_synthesis_note"]
+    assert "already met" in note.lower()
+    assert "$1,000,000 quota - $1,200,000 won = $0 remaining" in note
+    assert "raw qualified pipeline /" not in note
+    assert "weighted pipeline /" not in note
+    print("  ✓ quota-met guidance states the headline, no ratio equations present")
+
+
+def test_no_quota_guidance_says_so_plainly():
+    """No quota configured at all: guidance must say so plainly and
+    explicitly forbid implying a coverage ratio from pipeline figures
+    alone — never silent, never a fabricated comparison."""
+    print("\n[TEST] no quota configured -> guidance says so plainly, no fabrication")
+    fixture = copy.deepcopy(BASE_FIXTURE)
+    fixture["real_target"]["quota"] = None
+    fixture["real_target"]["goal"] = None
+    fixture["coverage"] = _coverage(
+        remaining_gap=None, nominal_coverage=None, weighted_coverage=None,
+        quota_met=None, phase="mid")
+
+    result = asyncio.run(_run(fixture))
+    note = result["_synthesis_note"]
+    assert "no quota is configured" in note.lower()
+    assert "do not compute or imply a coverage ratio" in note.lower()
+    print("  ✓ no-quota guidance present and explicit")
+
+
+def test_late_phase_instructs_pivot_to_named_commits():
+    """LATE phase: guidance must instruct brevity on the ratio and a pivot
+    toward named, committed deals (if available) — the opposite of EARLY
+    phase, which has no such instruction."""
+    print("\n[TEST] late phase -> pivot-to-named-commits instruction; early phase -> none")
+    late_fixture = copy.deepcopy(BASE_FIXTURE)
+    late_fixture["coverage"]["phase"] = "late"
+    late_fixture["current_week"] = 11
+
+    result = asyncio.run(_run(late_fixture))
+    note = result["_synthesis_note"]
+    assert "late phase" in note.lower() or "LATE phase" in note
+    assert "sentence or two" in note
+    assert "named" in note.lower() and "committed" in note.lower()
+
+    early_fixture = copy.deepcopy(BASE_FIXTURE)
+    early_fixture["coverage"]["phase"] = "early"
+    early_fixture["current_week"] = 2
+    result_early = asyncio.run(_run(early_fixture))
+    note_early = result_early["_synthesis_note"]
+    assert "shift the answer's focus" not in note_early.lower(), (
+        f"early phase should carry no pivot-to-named-deals instruction, got: {note_early!r}")
+    print("  ✓ late phase instructs the pivot to named commits; early phase does not")
+
+
+def test_historical_curve_removed_from_rendered_result_kept_in_cache_payload():
+    """Item 6: historical_heuristic_curve must NOT reach synthesis (absent
+    from the top-level/rendered result) but must still be fully present
+    in cache_payload for citation (explain_prior_answer)."""
+    print("\n[TEST] historical_heuristic_curve: gone from rendered result, kept in cache_payload")
+    result = asyncio.run(_run(BASE_FIXTURE))
+
+    assert "historical_heuristic_curve" not in result, (
+        "historical_heuristic_curve must not reach the rendered/synthesis-visible result")
+    assert "historical_heuristic_curve" in result["cache_payload"], (
+        "historical_heuristic_curve must still be citable via cache_payload")
+    assert result["cache_payload"]["historical_heuristic_curve"] == \
+        BASE_FIXTURE["historical_heuristic_curve"]
+    print("  ✓ historical_heuristic_curve absent from rendered result, intact in cache_payload")
 
 
 def test_synthesis_note_not_leaked_into_cache_payload():
     """_synthesis_note is a per-turn synthesis instruction, not citable
-    structured data — must stay a top-level sibling of cache_payload, the
-    same convention query_waterfall's _headline_instruction already
-    follows, never copied INTO cache_payload itself."""
+    structured data — must stay a top-level sibling of cache_payload,
+    never copied INTO cache_payload itself."""
     print("\n[TEST] _synthesis_note stays out of cache_payload")
-    result = asyncio.run(_run(TONIGHT_FIXTURE))
+    result = asyncio.run(_run(BASE_FIXTURE))
     assert "_synthesis_note" in result
     assert "_synthesis_note" not in result["cache_payload"], (
-        "the gap-arithmetic instruction leaked into cache_payload — it "
-        "must stay a top-level, per-turn-only field")
+        "the coverage guidance leaked into cache_payload — it must stay a "
+        "top-level, per-turn-only field")
     print("  ✓ _synthesis_note present at top level, absent from cache_payload")
 
 
 def test_rep_attainment_gets_no_synthesis_note_regression():
-    """REGRESSION GUARD (task item 7): query_rep_attainment shares the same
-    generic synthesis scaffolding (_VOICE_BASE/TABLE_FORMAT_RULE) but has
-    no gap_to_goal field of its own — this fix must not have added a
+    """REGRESSION GUARD: query_rep_attainment shares the same generic
+    synthesis scaffolding (_VOICE_BASE/TABLE_FORMAT_RULE) but has no
+    coverage field of its own — this change must not have added a
     _synthesis_note to it."""
     print("\n[TEST] query_rep_attainment unaffected — no _synthesis_note added")
     import datetime as _dt
