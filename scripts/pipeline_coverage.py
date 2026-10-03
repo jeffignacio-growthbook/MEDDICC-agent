@@ -350,7 +350,8 @@ def assess_pipeline_coverage(
     Returns:
         {"status": "ok", "fiscal_quarter": str, "current_week": int,
          "scope": str,
-         "qualified_pipeline": {"raw_value": float, "deal_count": int},
+         "qualified_pipeline": {"raw_value": float, "deal_count": int,
+             "by_stage_order": {stage_order: {"deal_count": int, "value": float}}},
          "stage_weighting": {
              "weighted_value": float, "weighted_deal_count": int,
              "unweighted_value": float, "unweighted_deal_count": int,
@@ -453,6 +454,26 @@ def assess_pipeline_coverage(
 
     raw_pipeline_total = sum(d["_incremental_value"] for d in qualified_deals)
     raw_deal_count = len(qualified_deals)
+
+    # Current-pipeline-by-stage breakdown (2026-10-03, follow-up to #120):
+    # a live Slack answer claimed "most deals are sitting in Discovery and
+    # Scoping" — an unsupported model inference, since this payload never
+    # actually broke qualified pipeline out by stage. Aggregates ONLY
+    # (deal_count + dollar value per stage_order) — no deal ids, no
+    # deal-level detail of any kind, same discipline as stage_weighting.
+    # by_stage_order above. Built from qualified_deals (already in hand,
+    # same scope as raw_pipeline_total/raw_deal_count) rather than a new
+    # query. Stage names are resolved by the handler (api/handlers.py),
+    # same place stage_weighting.by_stage_order's names are resolved,
+    # using scripts/utils.py::get_sales_stage_names_by_order() — this
+    # module stays name-agnostic, keyed by stage_order only.
+    current_pipeline_by_stage_order: Dict[Any, Dict[str, Any]] = {}
+    for d in qualified_deals:
+        so = d["_stage_order"]
+        row = current_pipeline_by_stage_order.setdefault(
+            so, {"deal_count": 0, "value": 0.0})
+        row["deal_count"] += 1
+        row["value"] += d["_incremental_value"]
 
     # 3: stage-level weighting
     stage_rates = query_stage_close_rate(sb)
@@ -565,6 +586,7 @@ def assess_pipeline_coverage(
         "qualified_pipeline": {
             "raw_value": raw_pipeline_total,
             "deal_count": raw_deal_count,
+            "by_stage_order": current_pipeline_by_stage_order,
         },
         "renewal_not_weighted": {
             "deal_count": len(renewal_deals),
