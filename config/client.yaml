@@ -678,15 +678,27 @@ admin:
   # Get your Slack user ID: click your name → Profile →
   # More (⋯) → Copy member ID
 
-# NOTE: not read by any script — descriptive only (query_rep_attainment and
-# seed_targets.py hardcode role="ae", metric=config/targets.yaml's `basis`).
+# NOTE: not read anywhere except api/handlers.py::query_rep_attainment,
+# which reads this list of role `key`s to decide which rep_targets roles to
+# sum (FIXED 2026-10-04 — previously hardcoded role="ae" only). Otherwise
+# descriptive only: seed_targets.py reads `role` from each rep's own entry
+# in config/targets.yaml, not from here.
 # FIXED 2026-10-03: `ae`'s metric previously said `new_arr`, implying AE
 # quotas were new-business-only. That never matched what's actually seeded:
 # config/targets.yaml's `basis: incremental_arr` (new_arr + expansion_arr),
-# and all six `rep_targets` quota rows (role=ae) sum to exactly the $1.55M
-# team quota, which itself includes expansion. AEs stay on new + expansion
-# ARR — this is a comment fix, not a behavior change; per-role metric
-# handling (e.g. whether `am` should ever be wired up) is untouched.
+# and all six `rep_targets` quota rows (role=ae) summed to exactly the
+# then-$1.55M team quota, which itself includes expansion. AEs stay on
+# new + expansion ARR.
+# FIXED 2026-10-04: `am`'s metric previously said `expansion_arr`, implying
+# AMs were measured on a DIFFERENT metric than AEs. They are not — every
+# role is measured on the SAME incremental_arr (new_arr + expansion_arr).
+# `role` labels whose book of business the number comes from (AE = new
+# logos, AM = expansion on existing customers), never a different metric.
+# Real am-role quota rows were added this same date (Cary Rakin, Andy
+# Marshall/marsh@growthbook.io), raising the FY2027 Q3 team quota from
+# $1.55M (AE-only) to $2,031,069 (AE + AM) and establishing a Q4 quota of
+# $2,568,478 for the first time. Both fixes are comment/config-only —
+# no code ever read a per-role metric value out of this key.
 quota_roles:
   - key: ae
     name: Account Executive
@@ -694,7 +706,7 @@ quota_roles:
     team_name: AE Team
   - key: am
     name: Account Manager
-    metric: expansion_arr
+    metric: incremental_arr  # new_arr + expansion_arr — SAME metric as ae, different book of business
     team_name: AM Team
 
 cro_agent:

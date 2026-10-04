@@ -17,12 +17,69 @@ import yaml
 from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).parent))
-from supabase_client import SupabaseWriter
+
+
+def build_rows_for_quarter(quarter_key: str, quarter_data: dict) -> list:
+    """Pure row-building logic for one quarter, no I/O.
+
+    Returns the list of rep rows plus ONE computed team row (sum of the
+    rep rows it just built — never a separately hand-typed team_total).
+    Exposed as its own function (not inlined in main()) so it can be
+    unit-tested against a mock/fake Supabase client without touching the
+    network — see tests/test_seed_targets_rows.py.
+    """
+    period = quarter_key.replace('fy', 'FY').replace('_q', '_Q').upper()
+    basis = quarter_data.get('basis', 'incremental_arr')
+
+    reps = quarter_data.get('reps', {})
+    rows = []
+    team_total = 0
+
+    for email, rep_data in reps.items():
+        target = rep_data['target'] if isinstance(rep_data, dict) else rep_data
+        role = rep_data.get('role', 'ae') if isinstance(rep_data, dict) else 'ae'
+
+        # Get display name from email (first part before @)
+        entity_name = email.split('@')[0].replace('.', ' ').title()
+
+        row = {
+            "period": period,
+            "level": "rep",
+            "entity_name": entity_name,
+            "entity_email": email,
+            "role": role,
+            "metric": basis,  # "incremental_arr"
+            "target_value": target,
+            "parent_entity": "AM Team" if role == "am" else "AE Team",
+        }
+        rows.append(row)
+        team_total += target
+
+    # Team row is COMPUTED as the sum of the rep rows just built above —
+    # never read from a separate hand-typed `team_total` YAML key (that
+    # key was removed from config/targets.yaml specifically to make this
+    # the only way a team figure can be produced, so it can never drift
+    # from the rows it's supposed to equal).
+    team_row = {
+        "period": period,
+        "level": "team",
+        "entity_name": "GrowthBook Team",
+        "entity_email": None,
+        "role": None,
+        "metric": basis,
+        "target_value": team_total,
+        "parent_entity": "GrowthBook",
+    }
+    rows.append(team_row)
+
+    return rows
+
 
 def main():
     """Load targets from config/targets.yaml and upsert to rep_targets table."""
     load_dotenv(Path(__file__).parent.parent / '.env')
 
+    from supabase_client import SupabaseWriter
     writer = SupabaseWriter()
 
     # Load targets config
@@ -43,80 +100,37 @@ def main():
     total_rows = 0
 
     for quarter_key, quarter_data in targets.items():
-        # Parse quarter key (e.g., "fy2027_q3" → "FY2027_Q3")
-        period = quarter_key.replace('fy', 'FY').replace('_q', '_Q').upper()
-
-        team_total = quarter_data.get('team_total')
+        rows_to_upsert = build_rows_for_quarter(quarter_key, quarter_data)
+        period = rows_to_upsert[-1]["period"]  # team row is appended last
+        team_total = rows_to_upsert[-1]["target_value"]
         basis = quarter_data.get('basis', 'incremental_arr')
 
         print(f"Period: {period}")
-        print(f"  Team total: ${team_total:,}")
+        print(f"  Team total (computed): ${team_total:,}")
         print(f"  Basis: {basis}")
         print()
 
-        # Individual rep targets
-        reps = quarter_data.get('reps', {})
-        rows_to_upsert = []
+        for row in rows_to_upsert[:-1]:
+            ramp_note = ""
+            rep_cfg = quarter_data.get('reps', {}).get(row["entity_email"])
+            if isinstance(rep_cfg, dict) and rep_cfg.get('ramp'):
+                ramp_note = " (ramp)"
+            print(f"  ✓ {row['entity_email']} [{row['role']}]: "
+                  f"${row['target_value']:,}{ramp_note}")
 
-        for email, rep_data in reps.items():
-            target = rep_data['target'] if isinstance(rep_data, dict) else rep_data
-            is_ramp = isinstance(rep_data, dict) and rep_data.get('ramp', False)
-
-            # Get display name from email (first part before @)
-            entity_name = email.split('@')[0].replace('.', ' ').title()
-
-            # Upsert to rep_targets
-            # metric = "incremental_arr" matches the basis
-            row = {
-                "period": period,
-                "level": "rep",
-                "entity_name": entity_name,
-                "entity_email": email,
-                "role": "ae",
-                "metric": basis,  # "incremental_arr"
-                "target_value": target,
-                "parent_entity": "AE Team",
-            }
-
-            rows_to_upsert.append(row)
-
-            print(f"  ✓ {email}: ${target:,}" + (" (ramp)" if is_ramp else ""))
-
-        # Add team total row
-        team_row = {
-            "period": period,
-            "level": "team",
-            "entity_name": "AE Team",
-            "entity_email": None,
-            "role": "ae",
-            "metric": basis,
-            "target_value": team_total,
-            "parent_entity": "GrowthBook",
-        }
-        rows_to_upsert.append(team_row)
-        print(f"  ✓ AE Team total: ${team_total:,}")
-
-        # Note non-quota roles (don't create rows for them)
-        non_quota = quarter_data.get('non_quota_roles', [])
-        if non_quota:
-            print()
-            print(f"  Non-quota roles (no target rows):")
-            for email in non_quota:
-                print(f"    - {email}")
-
+        print(f"  ✓ Team total: ${team_total:,}")
         print()
 
         # Upsert all rows for this quarter
-        if rows_to_upsert:
-            for row in rows_to_upsert:
-                try:
-                    writer.client.table('rep_targets').upsert(
-                        row,
-                        on_conflict='period,level,entity_name,metric'
-                    ).execute()
-                    total_rows += 1
-                except Exception as e:
-                    print(f"  ✗ Failed to upsert {row['entity_name']}: {e}")
+        for row in rows_to_upsert:
+            try:
+                writer.client.table('rep_targets').upsert(
+                    row,
+                    on_conflict='period,level,entity_name,metric'
+                ).execute()
+                total_rows += 1
+            except Exception as e:
+                print(f"  ✗ Failed to upsert {row['entity_name']}: {e}")
 
         print()
 

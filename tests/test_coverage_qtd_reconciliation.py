@@ -256,3 +256,117 @@ def test_query_rep_attainment_matches_other_sources():
     print(f"  'no quota assigned' line: ${unattributed.get('won_arr'):,.0f} "
           f"across {unattributed.get('deals_won')} deals (missing_owner + "
           f"unmapped_owner) — counted in the team total, never dropped")
+
+
+def test_query_rep_attainment_includes_am_role_rep():
+    """FIXED 2026-10-04 (am-role attainment PR): query_rep_attainment
+    previously hardcoded role="ae" in its rep_targets filter, so an
+    am-role quota row (e.g. Cary, marsh@) was never fetched — the rep
+    would be silently absent from reps[] even if they won deals. Now it
+    fetches every role listed in config/client.yaml's quota_roles (ae,
+    am), so an am-role rep with a quota row and a win must appear with
+    their quota, not be excluded by a role filter."""
+    print("\n[TEST] query_rep_attainment: am-role rep is not excluded by role filter")
+    sb, q_start_iso, q_end_iso, label = _build_fixture_sb()
+
+    # Add an am-role rep: a real quota row (role="am") plus a won deal
+    # attributed to them. This is the "AM with real quota" case the
+    # am-role attainment fix introduces alongside the ae roster above.
+    period = label.replace(" ", "_")
+    sb.tables["rep_targets"].append({
+        "entity_email": "am-rep@x.com", "period": period, "level": "rep",
+        "role": "am", "metric": "quota", "target_value": 300000})
+    sb.tables["user_personas"].append(
+        {"email": "am-rep@x.com", "display_name": "AM Rep", "name": "AM Rep", "role": "am"})
+    sb.tables["deals"].append(
+        {"deal_id": "am_win", "pipeline_id": "default", "deal_status": "won",
+         "stage": "closedwon", "close_date": (date.fromisoformat(q_start_iso) +
+                                               (date.fromisoformat(q_end_iso) - date.fromisoformat(q_start_iso)) / 2).isoformat(),
+         "new_arr": 0, "expansion_arr": 40000, "renewal_revenue": 0,
+         "create_date": q_start_iso, "owner_email": "am-rep@x.com",
+         "segment": "SMB", "highest_stage_order_reached": 6})
+
+    with patch("api.handlers._resolve_owner_email", return_value=(None, None)):
+        ra = asyncio.run(handlers.query_rep_attainment({}, sb))
+
+    reps = ra.get("reps") or []
+    am_rep = next((r for r in reps if r.get("owner_email") == "am-rep@x.com"), None)
+    assert am_rep is not None, (
+        "am-role rep (am-rep@x.com) is missing from reps[] — the role "
+        "filter is still excluding non-ae roles")
+    assert am_rep.get("quota") == 300000, (
+        f"am-role rep's quota should be $300,000 (their own rep_targets "
+        f"row), got {am_rep.get('quota')}")
+    assert am_rep.get("won_arr") == 40000.0, (
+        f"am-role rep's won_arr should be $40,000 (their expansion win), "
+        f"got {am_rep.get('won_arr')}")
+    assert am_rep.get("data_gap") is False
+    print(f"  ✓ am-role rep appears with quota ${am_rep['quota']:,} and "
+          f"won_arr ${am_rep['won_arr']:,.0f} — not silently excluded")
+
+
+def test_query_rep_attainment_team_total_matches_pipeline_coverage_qtd_won():
+    """EXTENDS the reconciliation to query_pipeline_coverage's own QTD-won
+    figure (scripts/pipeline_coverage.py::assess_pipeline_coverage ->
+    qtd_won.value), which is built from the SAME
+    actual_incremental_closed_won() call as query_rep_attainment's
+    team_summary.closed_won_qtd. Both must trace to the identical number
+    for the identical window — this is the reconciliation invariant from
+    PR #122, now re-proven for the multi-role (ae+am) attainment fetch
+    rather than duplicating the full three-way fixture a second time."""
+    print("\n[TEST] query_rep_attainment vs assess_pipeline_coverage: QTD-won reconciliation")
+    sb, q_start_iso, q_end_iso, label = _build_fixture_sb()
+
+    from pipeline_coverage import assess_pipeline_coverage
+
+    actual_total, _ = actual_incremental_closed_won(sb, q_start_iso, q_end_iso)
+
+    with patch("api.handlers._resolve_owner_email", return_value=(None, None)):
+        ra = asyncio.run(handlers.query_rep_attainment({}, sb))
+    ra_total = (ra.get("team_summary") or {}).get("closed_won_qtd")
+
+    cov = assess_pipeline_coverage(sb, fiscal_quarter=label)
+    cov_total = (cov.get("qtd_won") or {}).get("value")
+
+    assert ra_total == cov_total == actual_total == 275000.0, (
+        f"QTD-won reconciliation broke: query_rep_attainment={ra_total}, "
+        f"assess_pipeline_coverage={cov_total}, "
+        f"actual_incremental_closed_won={actual_total} — all three must "
+        f"trace to the same number for the same window.")
+    print(f"  ✓ query_rep_attainment (${ra_total:,.0f}) == "
+          f"assess_pipeline_coverage (${cov_total:,.0f}) == "
+          f"actual_incremental_closed_won (${actual_total:,.0f})")
+
+
+def test_team_row_rep_sum_drift_logs_a_warning(caplog):
+    """FIXED 2026-10-04 (am-role attainment PR, item 12a's runtime check):
+    query_rep_attainment compares the live rep_targets 'team' row against
+    the sum of the 'rep' rows it just fetched for the same period/metric,
+    and logs a warning (never raises) if they disagree — a drift signal
+    for a manual edit or a partial reseed. PLANTED-BUG CONTROL: this
+    fixture's team row is deliberately set to $999,999 while its only rep
+    row is $500,000 — the warning MUST fire. (The green/no-drift case is
+    already implicitly covered by every other test in this file, whose
+    fixtures only ever have a single rep row and no team row at all, so
+    total_quota stays the only source of truth with nothing to drift
+    against.)"""
+    print("\n[TEST] query_rep_attainment: team-row/rep-sum drift logs a warning")
+    sb, q_start_iso, q_end_iso, label = _build_fixture_sb()
+    period = label.replace(" ", "_")
+
+    # Plant the drift: a team row that does NOT equal the single rep row's
+    # $500,000 quota.
+    sb.tables["rep_targets"].append({
+        "entity_email": None, "period": period, "level": "team",
+        "role": None, "metric": "incremental_arr", "target_value": 999999})
+
+    with patch("api.handlers._resolve_owner_email", return_value=(None, None)):
+        with caplog.at_level("WARNING"):
+            asyncio.run(handlers.query_rep_attainment({}, sb))
+
+    drift_warnings = [r.message for r in caplog.records if "DRIFT" in r.message]
+    assert drift_warnings, (
+        "expected a '[REP_TARGETS] DRIFT' warning when the live team row "
+        "($999,999) disagrees with the sum of rep rows ($500,000), got none")
+    assert "999,999" in drift_warnings[0] and "500,000" in drift_warnings[0]
+    print(f"  ✓ drift warning fired: {drift_warnings[0]}")

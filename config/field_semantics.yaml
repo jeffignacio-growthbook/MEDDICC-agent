@@ -912,20 +912,27 @@ known_hygiene_rules:
 #   - Attainment = (new_arr + expansion_arr) / target
 #
 # Team structure:
-#   - Team total is the sum of AE quotas
-#   - Account Managers (AMs) contribute revenue without a personal quota
-#   - AMs appear in revenue contribution but never in attainment %
-#   - A rep with no target is not a data gap if they are in non_quota_roles
+#   - Team total is the sum of all rep quotas, ae AND am alike — both
+#     roles share the SAME incremental_arr metric (FIXED 2026-10-04: AMs
+#     now have real per-rep quota rows too, not a blanket "no individual
+#     quota" exemption — role only labels whose book of business a rep's
+#     number comes from, new-logo vs. expansion)
+#   - A rep with no target is a genuine data gap unless they are in
+#     non_quota_roles for that period
 #
 # Gap to plan frame:
 #   - Default frame for forecast, pipeline, and attainment questions
 #   - Not: "Q3 forecast is $1.9M"
-#   - But: "Q3 forecast is $1.9M against a $1.55M target — $350K headroom"
+#   - But: "Q3 forecast is $1.9M against a $2.03M target — headroom/gap stated"
+#     (illustrative figure only — read the real target from rep_targets/
+#     config/targets.yaml, never hardcode it here)
 #
 # Required pipeline calculation:
 #   - Use measured conversion rate, not fixed coverage multiples
 #   - Required pipeline = target ÷ measured_conversion_rate
-#   - Example: $1.55M target ÷ 9.9% conversion = ~$15.7M required
+#   - Example: $2.03M target ÷ 9.9% conversion = ~$20.5M required
+#     (illustrative figure only — read the real target from rep_targets/
+#     config/targets.yaml, never hardcode it here)
 #   - Coverage multiples (2.5x, 2.0x in config) are miscalibrated vs ~9.9% actual
 #
 # Constraints:
