@@ -678,10 +678,19 @@ admin:
   # Get your Slack user ID: click your name → Profile →
   # More (⋯) → Copy member ID
 
+# NOTE: not read by any script — descriptive only (query_rep_attainment and
+# seed_targets.py hardcode role="ae", metric=config/targets.yaml's `basis`).
+# FIXED 2026-10-03: `ae`'s metric previously said `new_arr`, implying AE
+# quotas were new-business-only. That never matched what's actually seeded:
+# config/targets.yaml's `basis: incremental_arr` (new_arr + expansion_arr),
+# and all six `rep_targets` quota rows (role=ae) sum to exactly the $1.55M
+# team quota, which itself includes expansion. AEs stay on new + expansion
+# ARR — this is a comment fix, not a behavior change; per-role metric
+# handling (e.g. whether `am` should ever be wired up) is untouched.
 quota_roles:
   - key: ae
     name: Account Executive
-    metric: new_arr
+    metric: incremental_arr  # new_arr + expansion_arr — see config/targets.yaml basis
     team_name: AE Team
   - key: am
     name: Account Manager
