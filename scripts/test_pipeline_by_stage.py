@@ -120,11 +120,55 @@ def test_renewal_and_subqualified_deals_excluded_from_by_stage_order():
     print("  ✓ by_stage_order totals match qualified_pipeline exactly (2 deals, $150,000)")
 
 
+def test_by_stage_order_reconciles_with_qualified_pipeline_totals():
+    """RECONCILIATION (PR #121 review item): by_stage_order's rows must
+    sum EXACTLY to qualified_pipeline's own top-level raw_value/deal_count
+    — both are built from the same qualified_deals list, so any drift
+    between them (double-counting a deal into two stage rows, dropping a
+    stage's row from the sum) is a real bug, not just a cosmetic mismatch.
+    Uses three deals across three different stage_orders (1, 1, 2) so the
+    aggregation-by-stage and the grand total both have more than one
+    contributor to get wrong.
+
+    PLANTED-BUG CONTROL (run by hand, confirmed during this review):
+    changing pipeline_coverage.py's accumulation from
+    `row["deal_count"] += 1; row["value"] += d["_incremental_value"]` to
+    double-count (`row["deal_count"] += 2`) makes the deal_count assertion
+    below fail; dropping one qualified_deals row's contribution entirely
+    (e.g. `if so == 1: continue` before the aggregation) makes the value
+    assertion fail. Reverting restores a pass."""
+    print("\n[TEST] by_stage_order rows reconcile exactly with qualified_pipeline totals")
+
+    extra = [{"deal_id": "gated2", "pipeline_id": "default", "expansion_arr": 0,
+              "new_arr": 75000, "stage": "appointmentscheduled",
+              "highest_stage_order_reached": 1,
+              "close_date": "2026-09-22", "deal_status": "active"}]
+    result = _run(_base_deals(extra))
+    qp = result["qualified_pipeline"]
+    bso = qp["by_stage_order"]
+
+    bso_total_count = sum(row["deal_count"] for row in bso.values())
+    bso_total_value = sum(row["value"] for row in bso.values())
+
+    if bso_total_count != qp["deal_count"]:
+        raise AssertionError(
+            f"by_stage_order deal counts ({bso_total_count}) do not sum to "
+            f"qualified_pipeline.deal_count ({qp['deal_count']})")
+    if bso_total_value != qp["raw_value"]:
+        raise AssertionError(
+            f"by_stage_order values ({bso_total_value}) do not sum to "
+            f"qualified_pipeline.raw_value ({qp['raw_value']})")
+    print(f"  ✓ by_stage_order sums (deal_count={bso_total_count}, "
+          f"value={bso_total_value}) match qualified_pipeline exactly "
+          f"(deal_count={qp['deal_count']}, raw_value={qp['raw_value']})")
+
+
 def main():
     tests = [
         test_by_stage_order_aggregates_count_and_value_per_stage,
         test_multiple_deals_same_stage_aggregate_not_overwrite,
         test_renewal_and_subqualified_deals_excluded_from_by_stage_order,
+        test_by_stage_order_reconciles_with_qualified_pipeline_totals,
     ]
 
     failed = []
