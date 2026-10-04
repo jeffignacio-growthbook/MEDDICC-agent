@@ -30,7 +30,7 @@ Covers:
 """
 import sys
 from pathlib import Path
-from datetime import date
+from datetime import date, timedelta
 
 sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).parent / "analytics"))
@@ -178,6 +178,69 @@ def test_days_under_a_week_says_days_not_zero_weeks():
     print(f"  ✓ {result['label']} (not '0 weeks left')")
 
 
+def _floor_only_label(days_left: int) -> str:
+    """The OLD (pre-fix) label derivation — floors instead of rounding to
+    the nearest week. Reproduced in-memory (never patching the real
+    source) purely to prove the new rounding behavior is load-bearing,
+    matching this file's own test_planted_bug_bare_lookup_fails_unlisted_
+    weeks convention."""
+    weeks_left = days_left // 7
+    return (f"{weeks_left} week{'' if weeks_left == 1 else 's'} left" if weeks_left
+            else f"{days_left} day{'' if days_left == 1 else 's'} left")
+
+
+def test_weeks_left_wording_rounds_to_nearest_not_floor():
+    """quarter_days_weeks_left's label: exact week counts stay bare ("N
+    weeks left"), non-exact counts round to the nearest week with an
+    "about" qualifier, and sub-week counts are unchanged ("N days left").
+    28 -> exact 4; 27 -> about 4 (27/7=3.857, rounds up); 24 -> about 3
+    (24/7=3.43); 21 -> exact 3; 6 -> sub-week, unchanged."""
+    print("\n[TEST] weeks-left wording rounds to nearest week, not floor")
+    end = date(2026, 10, 31)
+    cases = {
+        28: "4 weeks left",
+        27: "about 4 weeks left",
+        24: "about 3 weeks left",
+        21: "3 weeks left",
+        6: "6 days left",
+    }
+    for days_left, expected in cases.items():
+        as_of = end - timedelta(days=days_left)
+        result = quarter_days_weeks_left(end, as_of)
+        if result["days_left"] != days_left:
+            raise AssertionError(f"days_left mismatch for case {days_left}: {result['days_left']!r}")
+        if result["label"] != expected:
+            raise AssertionError(
+                f"days_left={days_left}: expected label={expected!r}, got {result['label']!r}")
+    print("  ✓ 28->'4 weeks left' (exact), 27->'about 4 weeks left' (rounds up from 3.857), "
+          "24->'about 3 weeks left' (rounds from 3.43), 21->'3 weeks left' (exact), "
+          "6->'6 days left' (sub-week, unchanged)")
+
+
+def test_planted_bug_floor_only_label_wrong_for_27_and_24_days():
+    """PLANTED-BUG CONTROL: the OLD floor-only label (_floor_only_label,
+    reproduced above exactly as the pre-fix code read) produces the
+    misleading "3 weeks left" for both 27 and 24 days left — proving
+    test_weeks_left_wording_rounds_to_nearest_not_floor's assertions are
+    load-bearing, not vacuously true. The REAL quarter_days_weeks_left
+    must NOT match the floor-only output for these two cases."""
+    print("\n[TEST] Planted bug: floor-only label wrongly says '3 weeks left' for 27 and 24 days")
+    end = date(2026, 10, 31)
+    for days_left in (27, 24):
+        as_of = end - timedelta(days=days_left)
+        real = quarter_days_weeks_left(end, as_of)["label"]
+        broken = _floor_only_label(days_left)
+        if broken != "3 weeks left":
+            raise AssertionError(f"expected the old floor-only label to say '3 weeks left' "
+                                 f"for {days_left} days, got {broken!r}")
+        if real == broken:
+            raise AssertionError(
+                f"days_left={days_left}: the fixed label ({real!r}) must differ from the "
+                f"old floor-only label ({broken!r}) — the planted bug was NOT caught")
+    print("  ✓ old floor-only behavior ('3 weeks left') correctly differs from the fixed "
+          "rounded label for both 27 and 24 days")
+
+
 def main():
     tests = [
         test_step_lookup_resolves_growthbooks_real_schedule_at_every_week,
@@ -189,6 +252,8 @@ def main():
         test_real_config_file_loads_and_validates,
         test_nominal_and_weighted_ahead_behind_are_independent,
         test_days_under_a_week_says_days_not_zero_weeks,
+        test_weeks_left_wording_rounds_to_nearest_not_floor,
+        test_planted_bug_floor_only_label_wrong_for_27_and_24_days,
     ]
 
     failed = []

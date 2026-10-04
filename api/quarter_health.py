@@ -510,6 +510,7 @@ def _qtd_figures(loss, pipe, ft: dict, as_of: date) -> dict:
         "status": "ok", "fiscal_quarter": q,
         "closed_won_arr": won, "closed_won_count": loss.get("won_count"), "target": target,
         "remaining_to_target": remaining, "days_left": days_left, "weeks_left": weeks_left,
+        "weeks_left_label": left,
         "forecast_arr": forecast, "remaining_share_of_forecast": share,
         "line": line,
         "basis": (f"Closed won = new+expansion ARR of the {loss.get('won_count')} deals won in {q} "
@@ -743,7 +744,7 @@ def _brief_note(scenario: str, quarter: str, figures: dict) -> str:
     won       = qtd.get("closed_won_arr")
     target    = qtd.get("target")
     remaining = qtd.get("remaining_to_target")
-    weeks     = qtd.get("weeks_left")
+    weeks_label = qtd.get("weeks_left_label")
     weighted  = cov.get("weighted_arr")
     raw       = cov.get("qualified_pipeline_arr")
     ratio     = cov.get("coverage_of_remaining")
@@ -761,7 +762,10 @@ def _brief_note(scenario: str, quarter: str, figures: dict) -> str:
 
     # Line 2: closed won + target + remaining
     if qtd.get("status") == "ok" and won is not None and target is not None and remaining is not None:
-        wl = f", {weeks} week{'s' if weeks != 1 else ''} left" if weeks is not None else ""
+        # Use the label as-is (already says "about N weeks" when days_left
+        # isn't an exact multiple of 7) rather than re-deriving a floored
+        # week count here — see quarter_days_weeks_left's docstring.
+        wl = f", {weeks_label}" if weeks_label else ""
         parts.append(f"Then: \"${won:,.0f} closed won QTD against the ${target:,.0f} target "
                      f"(new+expansion ARR only, not counting renewals); "
                      f"${remaining:,.0f} remaining{wl}.\"")

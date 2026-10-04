@@ -493,6 +493,101 @@ def test_quota_missing_from_db_produces_graceful_nulls():
           "pipeline data intact")
 
 
+def test_as_of_none_defaults_to_reporting_timezone_not_server_utc():
+    """2026-10-04 bug: assess_pipeline_coverage's as_of=None default used
+    date.today() — the SERVER's wall-clock date (UTC in production) —
+    instead of the reporting timezone (America/New_York, config/
+    client.yaml's reporting.timezone). For several hours every evening
+    (UTC already past midnight, America/New_York not yet there) this
+    silently used the WRONG 'today' for every calendar calculation
+    downstream (quarter_time_left, phase, etc).
+
+    Reproduces that exact disagreement: server UTC says 2026-10-04,
+    reporting tz (America/New_York) says 2026-10-03 — patches
+    sdr_utils.today_in_reporting_tz (the established fix, already used
+    correctly by api/quarter_health.py::_today()) to return the
+    reporting-tz date, and the stdlib date.today() (what a regression
+    would silently fall back to) to the LATER server date, then calls
+    assess_pipeline_coverage(sb) with as_of=None and confirms the result
+    reflects the reporting-tz date, not the server date."""
+    print("\n[TEST] as_of=None uses the reporting timezone's date, not the server's UTC date")
+
+    sb = _mock_rep_targets_sb(2000000)
+    reporting_tz_date = date(2026, 10, 3)   # America/New_York: still Oct 3
+    server_utc_date = date(2026, 10, 4)     # UTC: already Oct 4
+
+    with patch('utils.get_fiscal_quarter') as mock_gfq, \
+         patch('utils.get_coverage_config') as mock_coverage_cfg, \
+         patch('snapshot_deals.get_week_of_quarter') as mock_gwoq, \
+         patch('time_resolver.current_quarter_label') as mock_cql, \
+         patch('supabase_client.select_all') as mock_select_all, \
+         patch('forecast_analyses.query_stage_close_rate') as mock_stage_rates, \
+         patch('forecast_analyses.query_coverage_proxy_target_by_week') as mock_curve, \
+         patch('forecast_analyses.actual_incremental_closed_won') as mock_qtd, \
+         patch('sdr_utils.today_in_reporting_tz') as mock_tirtz, \
+         patch('pipeline_coverage.date') as mock_date_cls:
+        mock_gfq.return_value = (date(2026, 8, 1), date(2026, 10, 31), 'FY2027 Q3')
+        mock_coverage_cfg.return_value = {
+            "expected_multiple_schedule": {}, "weighted_expected_multiple": None,
+            "phase_boundaries": {"early_through_week": 4, "late_from_week": 10}}
+        mock_gwoq.return_value = 10
+        mock_cql.return_value = "FY2027_Q3"
+        mock_select_all.return_value = _base_deals()
+        mock_stage_rates.return_value = _fake_stage_rates()
+        mock_curve.return_value = _fake_proxy_curve()
+        mock_qtd.return_value = (0.0, 0)
+        mock_tirtz.return_value = reporting_tz_date
+        # A regression reverting to date.today() would read THIS value —
+        # proves the test actually distinguishes the two dates, not just
+        # that today_in_reporting_tz was callable.
+        mock_date_cls.today.return_value = server_utc_date
+        mock_date_cls.fromisoformat.side_effect = date.fromisoformat
+
+        result = assess_pipeline_coverage(sb, as_of=None)
+
+    qtl = result["quarter_time_left"]
+    # Oct 31 - Oct 3 (reporting tz) = 28 days. Oct 31 - Oct 4 (server UTC)
+    # would be 27 days instead — the two dates must produce different,
+    # distinguishable results so this test cannot pass vacuously.
+    if qtl["days_left"] != 28:
+        raise AssertionError(
+            f"Expected days_left=28 (reporting-tz date {reporting_tz_date.isoformat()} to "
+            f"Oct 31), got {qtl['days_left']!r} — as_of=None is not using "
+            f"today_in_reporting_tz()")
+    if qtl["days_left"] == (date(2026, 10, 31) - server_utc_date).days:
+        raise AssertionError(
+            "days_left matches the SERVER UTC date, not the reporting timezone — "
+            "as_of=None regressed to date.today()")
+    print(f"  ✓ as_of=None resolved to {reporting_tz_date.isoformat()} (reporting tz), "
+          f"not {server_utc_date.isoformat()} (server UTC) — days_left={qtl['days_left']}")
+
+
+def test_planted_bug_as_of_none_using_server_utc_would_be_wrong():
+    """PLANTED-BUG CONTROL: simulates the OLD behavior (as_of=None ->
+    date.today(), the server's UTC date) by calling
+    assess_pipeline_coverage with that date passed EXPLICITLY, and
+    confirms it produces a result that disagrees with (and would fail)
+    the previous test's reporting-tz assertion — proving that assertion
+    is load-bearing, not vacuously true."""
+    print("\n[TEST] Planted bug: passing the server UTC date explicitly reproduces the old, wrong days_left")
+
+    server_utc_date = date(2026, 10, 4)
+    result = _run(_base_deals(), as_of=server_utc_date, current_week=10)
+    qtl = result["quarter_time_left"]
+
+    if qtl["days_left"] != 27:
+        raise AssertionError(
+            f"Expected the server-UTC-date result to give days_left=27 (Oct 31 - Oct 4), "
+            f"got {qtl['days_left']!r}")
+    if qtl["days_left"] == 28:
+        raise AssertionError(
+            "Planted bug not reproduced: server-UTC-date as_of must NOT match the "
+            "reporting-tz result's days_left=28, or the control proves nothing")
+    print(f"  ✓ confirmed: the server-UTC date (as_of=date.today()-equivalent) wrongly gives "
+          f"days_left={qtl['days_left']}, not the reporting-tz-correct 28 — the fix in "
+          f"test_as_of_none_defaults_to_reporting_timezone_not_server_utc is load-bearing")
+
+
 def main():
     tests = [
         test_scope_excludes_renewal_and_unqualified_deals,
@@ -504,6 +599,8 @@ def main():
         test_heuristic_curve_labeled_real_target_not,
         test_planted_discrepancy_missing_heuristic_label_caught,
         test_regression_renewal_deal_cannot_enter_qualified_pipeline,
+        test_as_of_none_defaults_to_reporting_timezone_not_server_utc,
+        test_planted_bug_as_of_none_using_server_utc_would_be_wrong,
     ]
 
     failed = []

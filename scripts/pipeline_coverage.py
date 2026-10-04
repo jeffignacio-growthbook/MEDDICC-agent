@@ -380,7 +380,15 @@ def assess_pipeline_coverage(
     from time_resolver import current_quarter_label
 
     if as_of is None:
-        as_of = date.today()
+        # today_in_reporting_tz, not date.today(): the server runs UTC,
+        # but "today" for quarter/week/days-left math must match the
+        # reporting timezone in client.yaml (America/New_York here) —
+        # otherwise this silently disagrees with reporting for several
+        # hours every evening (see scripts/sdr_utils.py's warning on
+        # today_in_reporting_tz(), and get_fiscal_quarter()'s identical
+        # fix in this same module).
+        from sdr_utils import today_in_reporting_tz
+        as_of = today_in_reporting_tz()
 
     # Determine which quarter we're assessing
     is_historical = False
