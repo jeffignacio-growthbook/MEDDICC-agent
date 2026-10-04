@@ -627,17 +627,27 @@ def quarter_days_weeks_left(end, as_of=None) -> Dict[str, Any]:
         as_of: "today" to measure from (default: date.today()).
 
     Returns:
-        {"days_left": int, "weeks_left": int, "label": str} where label
-        is "N week(s) left" once at least a full week remains, else
-        "N day(s) left" — matching _qtd_figures' own phrasing exactly.
+        {"days_left": int, "weeks_left": int, "label": str} where
+        weeks_left is the FLOORED whole-week count (kept for any
+        consumer that reads it directly), while label rounds to the
+        NEAREST week once at least a full week remains — with an
+        "about" qualifier when days_left isn't an exact multiple of 7
+        — else falls back to "N day(s) left" for sub-week remainders,
+        unchanged from before.
     """
     from datetime import date as _date
     if as_of is None:
         as_of = _date.today()
     days_left = max((end - as_of).days, 0)
     weeks_left = days_left // 7
-    label = (f"{weeks_left} week{'' if weeks_left == 1 else 's'} left" if weeks_left
-             else f"{days_left} day{'' if days_left == 1 else 's'} left")
+    if days_left < 7:
+        label = f"{days_left} day{'' if days_left == 1 else 's'} left"
+    elif days_left % 7 == 0:
+        exact_weeks = days_left // 7
+        label = f"{exact_weeks} week{'' if exact_weeks == 1 else 's'} left"
+    else:
+        rounded_weeks = round(days_left / 7)
+        label = f"about {rounded_weeks} week{'' if rounded_weeks == 1 else 's'} left"
     return {"days_left": days_left, "weeks_left": weeks_left, "label": label}
 
 

@@ -83,6 +83,7 @@ def _qtd_figures():
         "remaining_to_target": _REMAINING,
         "days_left": 33,
         "weeks_left": 4,
+        "weeks_left_label": "about 5 weeks left",
         "forecast_arr": _FORECAST_TOTAL,
         "remaining_share_of_forecast": _REMAINING / _FORECAST_TOTAL,
         "line": (f"${_CLOSED_WON:,.0f} closed won QTD against the ${_TARGET:,.0f} target "

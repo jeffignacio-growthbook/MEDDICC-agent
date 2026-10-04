@@ -48,9 +48,9 @@ import quarter_health_inputs as qi  # noqa: E402
 AS_OF = qi.AS_OF
 RAW = qi.RAW
 
-QTD_LINE = ("$373,400 closed won QTD against the $1,550,000 target ($1,176,600 remaining), with 5 "
-            "weeks left in the quarter. Closing that gap takes 60% of the $1,946,176 forecast "
-            "(COMMIT+MOST_LIKELY deals closing this quarter).")
+QTD_LINE = ("$373,400 closed won QTD against the $1,550,000 target ($1,176,600 remaining), with "
+            "about 5 weeks left in the quarter. Closing that gap takes 60% of the $1,946,176 "
+            "forecast (COMMIT+MOST_LIKELY deals closing this quarter).")
 BASELINE = ("That 32% comes from deals that had a full quarter to close. We're only 8 weeks into "
             "this one, so some deals that look stuck today may still close before quarter end.")
 
@@ -69,7 +69,7 @@ def test_qtd_figures_on_real_data():
     assert q["line"] == QTD_LINE, q["line"]
     assert "query_loss_concentration" in q["basis"] and "rep_targets" in q["basis"]
     print("✓ QTD: $373,400 won (the 9 wins loss_concentration counts) vs $1,550,000 → "
-          "$1,176,600 remaining, 5 weeks left, 60% of the $1,946,176 forecast")
+          "$1,176,600 remaining, about 5 weeks left, 60% of the $1,946,176 forecast")
 
 
 def test_qtd_edges():
@@ -77,7 +77,7 @@ def test_qtd_edges():
     raw["query_loss_concentration"]["won_incremental_arr"] = 1600000.0
     q = _compose("base", raw)["figures"]["quarter_to_date"]
     assert q["line"] == ("$1,600,000 closed won QTD against the $1,550,000 target ($50,000 over "
-                         "target), with 5 weeks left in the quarter."), q["line"]
+                         "target), with about 5 weeks left in the quarter."), q["line"]
     raw = copy.deepcopy(RAW)
     raw["query_pipeline"]["quarterly_target"] = None
     q = _compose("base", raw)["figures"]["quarter_to_date"]
