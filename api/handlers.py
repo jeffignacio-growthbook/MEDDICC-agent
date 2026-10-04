@@ -1250,17 +1250,28 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
         try:
             from utils import get_sales_stage_names_by_order
             names_by_order = get_sales_stage_names_by_order()
-            by_stage_order = (result.get("stage_weighting") or {}).get("by_stage_order") or {}
-            for stage_order, stage_row in by_stage_order.items():
-                if not isinstance(stage_row, dict):
-                    continue
-                name = names_by_order.get(stage_order)
-                if name is None:
-                    try:
-                        name = names_by_order.get(int(stage_order))
-                    except (TypeError, ValueError):
-                        name = None
-                stage_row["stage_name"] = name or f"stage {stage_order}"
+
+            def _annotate_stage_names(by_stage_order: dict) -> None:
+                for stage_order, stage_row in by_stage_order.items():
+                    if not isinstance(stage_row, dict):
+                        continue
+                    name = names_by_order.get(stage_order)
+                    if name is None:
+                        try:
+                            name = names_by_order.get(int(stage_order))
+                        except (TypeError, ValueError):
+                            name = None
+                    stage_row["stage_name"] = name or f"stage {stage_order}"
+
+            _annotate_stage_names(
+                (result.get("stage_weighting") or {}).get("by_stage_order") or {})
+            # 2026-10-03: current-pipeline-by-stage breakdown (deal_count +
+            # dollar value per stage, aggregates only) — same name
+            # annotation as stage_weighting.by_stage_order above, so the
+            # model can say which stage(s) hold pipeline without inferring
+            # it from the aggregate figures alone.
+            _annotate_stage_names(
+                (result.get("qualified_pipeline") or {}).get("by_stage_order") or {})
         except Exception as e:
             logger.warning(f"[PIPELINE_COVERAGE] Failed to annotate stage "
                           f"names for citation: {e}")
@@ -1306,6 +1317,26 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
                 "clause. Still-open renewal expansion stays separate, in "
                 "renewal_not_weighted, as upside only.",
             ]
+
+            # Not one of the three REQUIRED facts above — a standing
+            # caution, present in every answer regardless of branch.
+            # 2026-10-03: a live Slack answer claimed "most deals are
+            # sitting in Discovery and Scoping" when this payload never
+            # actually broke qualified pipeline out by stage — an
+            # unsupported model inference. qualified_pipeline.by_stage_order
+            # now carries a real per-stage deal_count/value breakdown when
+            # available; this line forbids guessing stage concentration
+            # when it isn't.
+            lines.append(
+                "- STAGE CLAIMS: only say which stage(s) currently hold the "
+                "most pipeline, or otherwise describe how qualified pipeline "
+                "is distributed or concentrated across stages, if "
+                "qualified_pipeline.by_stage_order is present above and "
+                "non-empty — it gives the real per-stage deal_count/value "
+                "breakdown. If that field is absent or empty, do NOT infer "
+                "or guess which stage(s) pipeline is sitting in from the "
+                "aggregate figures alone."
+            )
 
             if quota is None:
                 lines.append(
@@ -1393,8 +1424,11 @@ async def query_pipeline_coverage(params: dict, sb) -> dict:
                     "available elsewhere in this context, instead of "
                     "restating or explaining the table — the aggregate "
                     "ratio matters less this late than which deals actually "
-                    "close. If no named-deal data is available here, say so "
-                    "and suggest checking committed pipeline directly, "
+                    "close. If no named-deal data is available here, do NOT "
+                    "give a vague pointer like 'pull the committed pipeline' "
+                    "— name the EXACT follow-up question that would get that "
+                    "data (e.g. 'which deals are in commit this quarter?'), "
+                    "so the user has something actionable to ask next, "
                     "rather than dwelling on the ratio."
                 )
             elif phase == "early":

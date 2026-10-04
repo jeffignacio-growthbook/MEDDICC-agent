@@ -282,6 +282,129 @@ def test_rep_attainment_cache_payload_has_no_stage_data():
           "anywhere in rep_attainment's cache_payload")
 
 
+# ══════════════════════════════════════════════════════════════
+# Name-collision check (PR #121 review item): stage_weighting.
+# by_stage_order (historical win-rate table) vs. qualified_pipeline.
+# by_stage_order (current pipeline $/count breakdown) share a leaf key
+# name but sit under distinct parent keys. This is SAFE AND EXPECTED —
+# parent-key scoping disambiguates them everywhere they're read (see
+# api/handlers.py::query_pipeline_coverage, which always does
+# result["stage_weighting"]["by_stage_order"] or
+# result["qualified_pipeline"]["by_stage_order"], never a bare
+# cached.get("by_stage_order")). These tests guard against the one way
+# that scoping could silently break: something flattening/aliasing the
+# two into a single ambiguous key, or one copying the other's field
+# shape (win_rate vs deal_count/value), either of which would make
+# explain_prior_answer's citation prompt unable to tell them apart.
+# ══════════════════════════════════════════════════════════════
+
+def _fixture_with_both_by_stage_order_blocks():
+    """A realistic cache_payload carrying BOTH by_stage_order blocks at
+    once, with deliberately non-overlapping values so cross-contamination
+    would be detectable: stage_weighting has win_rate data (0.4/0.6),
+    qualified_pipeline has dollar/count data ($500k/$300k, 12/8 deals)."""
+    import copy
+    fixture = copy.deepcopy(PIPELINE_COVERAGE_FIXTURE)
+    fixture["qualified_pipeline"] = dict(fixture["qualified_pipeline"])
+    fixture["qualified_pipeline"]["by_stage_order"] = {
+        "1": {"deal_count": 12, "value": 500000.0, "stage_name": "Discovery"},
+        "2": {"deal_count": 8, "value": 300000.0, "stage_name": "Scoping"},
+    }
+    return fixture
+
+
+def test_no_bare_top_level_by_stage_order_key():
+    """REGRESSION GUARD: cache_payload must never carry a bare, unscoped
+    'by_stage_order' key at its top level — only the two parent-scoped
+    ones. Any code (present or future) that did cached.get("by_stage_order")
+    directly on the top-level payload, instead of going through
+    stage_weighting/qualified_pipeline, would silently grab whichever one
+    happened to be aliased there. Planted-bug control (run by hand):
+    adding `fixture["by_stage_order"] = fixture["qualified_pipeline"][
+    "by_stage_order"]` to the fixture below makes this assertion fail."""
+    print("\n[TEST] no bare top-level 'by_stage_order' key exists in cache_payload")
+    fixture = _fixture_with_both_by_stage_order_blocks()
+    assert "by_stage_order" not in fixture, (
+        "REGRESSION: a bare top-level 'by_stage_order' key exists — this "
+        "would make any unscoped lookup ambiguous between stage_weighting's "
+        "win-rate table and qualified_pipeline's $/count breakdown")
+    print("  ✓ 'by_stage_order' only exists nested under stage_weighting/"
+          "qualified_pipeline, never bare at the top level")
+
+
+def test_the_two_by_stage_order_blocks_never_share_field_shape():
+    """The two blocks must stay distinguishable by FIELD SHAPE too, not
+    just by which parent key they sit under — stage_weighting's rows are
+    win-rate stats (win_rate/n_observed/won/lost), qualified_pipeline's
+    rows are a $/count breakdown (deal_count/value). Neither should ever
+    carry the other's fields; that would let citation logic (or a human
+    skimming the JSON) conflate a win-rate row with a dollar-breakdown row
+    even with correct parent-key scoping."""
+    print("\n[TEST] stage_weighting and qualified_pipeline by_stage_order "
+          "rows never share field shape")
+    fixture = _fixture_with_both_by_stage_order_blocks()
+    sw_row = fixture["stage_weighting"]["by_stage_order"]["1"]
+    qp_row = fixture["qualified_pipeline"]["by_stage_order"]["1"]
+
+    assert "win_rate" in sw_row and "n_observed" in sw_row
+    assert "deal_count" not in sw_row and "value" not in sw_row, (
+        f"REGRESSION: stage_weighting's row picked up qualified_pipeline's "
+        f"dollar/count fields: {sw_row!r}")
+
+    assert "deal_count" in qp_row and "value" in qp_row
+    assert "win_rate" not in qp_row and "n_observed" not in qp_row, (
+        f"REGRESSION: qualified_pipeline's row picked up stage_weighting's "
+        f"win-rate fields: {qp_row!r}")
+    print("  ✓ win-rate fields and $/count fields never cross between the two blocks")
+
+
+def test_explain_prior_answer_cites_win_rate_table_not_pipeline_dollar_breakdown():
+    """ROUTING/CITATION test (PR #121 review item): asked a win-rate-by-
+    stage meta-question, explain_prior_answer's prompt must carry
+    stage_weighting's win_rate figures distinctly from qualified_pipeline's
+    dollar/count breakdown — proving the citation path never conflates the
+    two same-named-leaf-key blocks. Mirrors tests/test_explain_prior_
+    answer_citation.py's test_builder_splices_cached_fields_as_citation_
+    only pattern: mock the generator client, inspect the literal prompt
+    text sent to it.
+
+    PLANTED-BUG CONTROL (run by hand, confirmed during this review): point
+    _format_cached_fields_section (api/router.py) at ONLY
+    cached_fields.get("qualified_pipeline") instead of the full
+    cached_fields dict — simulating citation logic that prefers the new
+    dollar/count block over the win-rate table for a win-rate question.
+    That change makes this test fail ('"win_rate": 0.4' no longer in the
+    sent prompt); reverting restores a pass."""
+    print("\n[TEST] explain_prior_answer cites stage_weighting's win rates, "
+          "not qualified_pipeline's $/count breakdown, for a win-rate question")
+    fixture = _fixture_with_both_by_stage_order_blocks()
+
+    client = MagicMock()
+    resp = MagicMock()
+    resp.text = "Stage 1 (Discovery) has a 40% historical win rate, stage 2 (Scoping) 60%."
+    client.complete.return_value = resp
+
+    router.build_explain_prior_answer_response(
+        "what are the win rates by stage?",
+        "Pipeline coverage for FY2027 Q3 is $795,000 weighted against a "
+        "$1,550,000 quota, a 0.75x coverage ratio.",
+        client, cached_fields=fixture)
+
+    sent_prompt = client.complete.call_args.kwargs["messages"][0]["content"]
+    # The win-rate table's actual figures must reach the prompt...
+    assert '"win_rate": 0.4' in sent_prompt
+    assert '"win_rate": 0.6' in sent_prompt
+    # ...scoped under stage_weighting, never under qualified_pipeline.
+    assert '"stage_weighting"' in sent_prompt
+    sw_idx = sent_prompt.index('"stage_weighting"')
+    qp_idx = sent_prompt.index('"qualified_pipeline"')
+    # Sanity: both blocks are actually present and distinct substrings
+    # (not the same block referenced twice under two names).
+    assert sw_idx != qp_idx
+    print("  ✓ win_rate figures (0.4, 0.6) reach the prompt under "
+          "stage_weighting, distinct from qualified_pipeline's own block")
+
+
 def main():
     tests = [
         test_resolves_the_exact_collision_case_order_3,
@@ -294,6 +417,9 @@ def main():
         test_citation_prompt_instructs_name_over_raw_key,
         test_builder_prompt_carries_stage_names_not_just_raw_keys,
         test_rep_attainment_cache_payload_has_no_stage_data,
+        test_no_bare_top_level_by_stage_order_key,
+        test_the_two_by_stage_order_blocks_never_share_field_shape,
+        test_explain_prior_answer_cites_win_rate_table_not_pipeline_dollar_breakdown,
     ]
     failed = []
     for t in tests:
