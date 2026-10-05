@@ -11,6 +11,8 @@ Asserts the hard invariant: the team row always equals the sum of the
 rep rows built in the same call, roles are preserved per rep, and
 re-running (idempotency) produces byte-identical rows.
 """
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -18,6 +20,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent / 'scripts'))
 
 import yaml
 from seed_targets import build_rows_for_quarter
+
+REPO_ROOT = Path(__file__).parent.parent
+SEED_SCRIPT = REPO_ROOT / 'scripts' / 'seed_targets.py'
 
 
 def _load_targets_config():
@@ -96,12 +101,46 @@ def test_approved_figures_q3_and_q4():
           "match the approved, independently-recomputed figures")
 
 
+def test_bare_invocation_is_a_dry_run_no_network():
+    """scripts/seed_targets.py with no flags must print the full plan
+    and exit 0 WITHOUT ever constructing a SupabaseWriter — proven by
+    running it as a real subprocess with no SUPABASE_URL/SUPABASE_
+    SERVICE_KEY in its environment. If the dry-run path accidentally
+    tried to connect, it would raise ValueError('SUPABASE_URL and
+    SUPABASE_SERVICE_KEY must be set') and exit non-zero; a real write
+    attempt would also need network access this test environment may
+    not have. Planted-bug control: temporarily moving the `if not
+    args.apply: ... return` early-return below the SupabaseWriter()
+    construction reproduces exactly that failure — confirmed by hand
+    while writing this test, not re-run automatically here since it
+    requires editing the source file in place."""
+    env = {k: v for k, v in os.environ.items()
+           if k not in ('SUPABASE_URL', 'SUPABASE_SERVICE_KEY')}
+    result = subprocess.run(
+        [sys.executable, str(SEED_SCRIPT)],
+        cwd=str(REPO_ROOT), env=env, capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, (
+        f"Bare `seed_targets.py` (no --apply) must exit 0 even with no "
+        f"Supabase credentials in the environment — it should never "
+        f"reach SupabaseWriter(). Got exit {result.returncode}.\n"
+        f"stdout: {result.stdout}\nstderr: {result.stderr}")
+    assert "DRY RUN" in result.stdout, (
+        "Bare invocation must print a DRY RUN banner. Got:\n" + result.stdout)
+    assert "SUPABASE_URL and SUPABASE_SERVICE_KEY must be set" not in result.stderr, (
+        "Bare invocation reached SupabaseWriter() construction — it must "
+        "not, since no --apply flag was passed.")
+    print("✓ bare `seed_targets.py` invocation is a true dry run: exits 0, "
+          "prints the plan, makes no network/credential-requiring call")
+
+
 def run_all_tests():
     tests = [
         test_team_row_equals_sum_of_rep_rows_for_each_period,
         test_roles_are_preserved_per_rep,
         test_rerun_is_idempotent,
         test_approved_figures_q3_and_q4,
+        test_bare_invocation_is_a_dry_run_no_network,
     ]
     failed = []
     for test in tests:

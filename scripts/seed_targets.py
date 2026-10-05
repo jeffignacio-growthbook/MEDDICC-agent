@@ -7,10 +7,14 @@ Table is the query target (efficient joins).
 This script keeps them in sync.
 
 Run at onboarding or after editing config/targets.yaml:
-    python scripts/seed_targets.py
+    python scripts/seed_targets.py            # dry run — prints the plan, writes nothing
+    python scripts/seed_targets.py --apply    # actually writes to the live table
 
-Same pattern as seed_personas_from_config.py.
+Same pattern as seed_personas_from_config.py and
+scripts/restore_fy2027_q3_pre_amrole.py (bare invocation = dry run,
+an explicit flag is required to touch the live table).
 """
+import argparse
 import sys
 from pathlib import Path
 import yaml
@@ -175,11 +179,16 @@ def check_post_write_guard(sb_client, period: str, metric: str) -> None:
 
 
 def main():
-    """Load targets from config/targets.yaml and upsert to rep_targets table."""
-    load_dotenv(Path(__file__).parent.parent / '.env')
-
-    from supabase_client import SupabaseWriter
-    writer = SupabaseWriter()
+    """Load targets from config/targets.yaml and, with --apply, upsert
+    to the live rep_targets table. Bare invocation is a dry run: prints
+    exactly what would be written and touches nothing (no network call
+    is made at all unless --apply is passed)."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--apply', action='store_true',
+                         help='Actually write to the live rep_targets table. '
+                              'Omit for a dry run (prints the plan only, '
+                              'no network call).')
+    args = parser.parse_args()
 
     # Load targets config
     targets_path = Path(__file__).parent.parent / 'config' / 'targets.yaml'
@@ -196,19 +205,47 @@ def main():
         print("No targets configured in targets.yaml")
         return
 
-    total_rows = 0
-
+    plan = []  # [(quarter_key, quarter_data, rows_to_upsert), ...]
     for quarter_key, quarter_data in targets.items():
         rows_to_upsert = build_rows_for_quarter(quarter_key, quarter_data)
+        plan.append((quarter_key, quarter_data, rows_to_upsert))
+
         period = rows_to_upsert[-1]["period"]  # team row is appended last
         team_total = rows_to_upsert[-1]["target_value"]
-        team_row = rows_to_upsert[-1]
         basis = quarter_data.get('basis', 'incremental_arr')
 
         print(f"Period: {period}")
         print(f"  Team total (computed): ${team_total:,}")
         print(f"  Basis: {basis}")
         print()
+
+        for row in rows_to_upsert[:-1]:
+            ramp_note = ""
+            rep_cfg = quarter_data.get('reps', {}).get(row["entity_email"])
+            if isinstance(rep_cfg, dict) and rep_cfg.get('ramp'):
+                ramp_note = " (ramp)"
+            print(f"  {'✓' if args.apply else '-'} {row['entity_email']} [{row['role']}]: "
+                  f"${row['target_value']:,}{ramp_note}")
+
+        print(f"  {'✓' if args.apply else '-'} Team total: ${team_total:,}")
+        print()
+
+    if not args.apply:
+        print("=" * 70)
+        print("DRY RUN — nothing written. Re-run with --apply to write to "
+              "the live rep_targets table.")
+        print()
+        return
+
+    load_dotenv(Path(__file__).parent.parent / '.env')
+    from supabase_client import SupabaseWriter
+    writer = SupabaseWriter()
+
+    total_rows = 0
+
+    for quarter_key, quarter_data, rows_to_upsert in plan:
+        team_row = rows_to_upsert[-1]
+        period = team_row["period"]
 
         # Collision guard (live-DB-facing): before writing ANYTHING for
         # this period, check whether a 'team' row already exists for
@@ -224,27 +261,22 @@ def main():
         # motivated it.
         check_collision_guard(writer.client, period, team_row)
 
-        for row in rows_to_upsert[:-1]:
-            ramp_note = ""
-            rep_cfg = quarter_data.get('reps', {}).get(row["entity_email"])
-            if isinstance(rep_cfg, dict) and rep_cfg.get('ramp'):
-                ramp_note = " (ramp)"
-            print(f"  ✓ {row['entity_email']} [{row['role']}]: "
-                  f"${row['target_value']:,}{ramp_note}")
-
-        print(f"  ✓ Team total: ${team_total:,}")
-        print()
-
-        # Upsert all rows for this quarter
-        for row in rows_to_upsert:
-            try:
-                writer.client.table('rep_targets').upsert(
-                    row,
-                    on_conflict='period,level,entity_name,metric'
-                ).execute()
-                total_rows += 1
-            except Exception as e:
-                print(f"  ✗ Failed to upsert {row['entity_name']}: {e}")
+        # Rep rows are listed first, the team row last, in ONE batched
+        # upsert call for the whole quarter — a single multi-row
+        # upsert() is one SQL statement (one transaction) at the
+        # database level, so this is atomic per quarter: either every
+        # row in rows_to_upsert lands, or none do. (list order is kept
+        # rep-rows-then-team for readability/determinism; atomicity
+        # does not depend on it.)
+        try:
+            writer.client.table('rep_targets').upsert(
+                rows_to_upsert,
+                on_conflict='period,level,entity_name,metric'
+            ).execute()
+            total_rows += len(rows_to_upsert)
+        except Exception as e:
+            print(f"  ✗ Failed to upsert {period} rows: {e}")
+            continue
 
         # Post-write guard: confirm this write did not just create a
         # second 'team' row for this period+metric (e.g. a concurrent

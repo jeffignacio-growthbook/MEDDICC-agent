@@ -18,14 +18,20 @@ seeded:
      before this PR (confirmed), so a rollback of Q4 is simply "delete
      whatever got inserted" — there is nothing to restore it TO.
 
-DOES NOT touch the new am-role rows for Q3 (Cary, marsh) by any
-explicit delete step — they are rows the seeder added at new
-(entity_name) keys that did not exist before, so step 1's upsert alone
-does not remove them. If you need a byte-for-byte return to the
-pre-PR table (not just the 7 original rows restored), delete the Q3
-am-role rows explicitly first; this script intentionally does not do
-that automatically, to avoid a destructive delete keyed only on
-"role=am" guessing which rows are safe to remove.
+  3. Deletes the three FY2027_Q3 rows the load newly INSERTS (no prior
+     row to upsert over): entity_email in (cary@growthbook.io,
+     marsh@growthbook.io, kris@growthbook.io — two am-role, one
+     ae-role, all three new to Q3). Matched by explicit email, not by
+     role, so a future unrelated rep row is never caught by this
+     rollback.
+
+After this script, FY2027_Q3 must hold exactly 7 rows again (the 6
+rep rows + "AE Team" at $1,550,000) and FY2027_Q4 must hold zero —
+byte-for-byte the pre-PR state. Verify with:
+
+    SELECT period, count(*) FROM rep_targets
+    WHERE period IN ('FY2027_Q3', 'FY2027_Q4') GROUP BY period;
+    -- healthy: FY2027_Q3 -> 7, FY2027_Q4 absent (0 rows)
 
 SAFETY: this script is NOT run automatically by anything. It is a
 rollback net for a human to invoke deliberately, and only upserts/
@@ -46,6 +52,8 @@ sys.path.insert(0, str(REPO_ROOT / 'scripts'))
 
 BACKUP_PATH = REPO_ROOT / 'data' / 'backups' / 'fy2027_q3_pre_amrole_backup.json'
 Q4_PERIOD = 'FY2027_Q4'
+Q3_PERIOD = 'FY2027_Q3'
+Q3_NEW_INSERT_EMAILS = ['cary@growthbook.io', 'marsh@growthbook.io', 'kris@growthbook.io']
 
 
 def load_backup_rows() -> list:
@@ -82,6 +90,13 @@ def main():
     print(f"2) Delete ALL rep_targets rows where period = '{Q4_PERIOD}' "
           "(Q4 had zero rows before this PR — a rollback is a full delete).")
     print()
+    print(f"3) Delete the {len(Q3_NEW_INSERT_EMAILS)} new FY2027_Q3 rows the load "
+          f"inserted (no prior row to upsert over): "
+          f"{', '.join(Q3_NEW_INSERT_EMAILS)}")
+    print()
+    print(f"After this: {Q3_PERIOD} must hold exactly 7 rows "
+          f"(6 rep + \"AE Team\" at $1,550,000); {Q4_PERIOD} must hold 0.")
+    print()
 
     if not args.confirm:
         print("DRY RUN — nothing written. Re-run with --confirm to apply.")
@@ -116,9 +131,25 @@ def main():
         print(f"  ✗ Failed to delete {Q4_PERIOD} rows: {e}")
 
     print()
+    print(f"Deleting the {len(Q3_NEW_INSERT_EMAILS)} new {Q3_PERIOD} rows "
+          f"({', '.join(Q3_NEW_INSERT_EMAILS)})...")
+    try:
+        resp = client.table('rep_targets').delete().eq(
+            'period', Q3_PERIOD).in_(
+            'entity_email', Q3_NEW_INSERT_EMAILS).execute()
+        deleted_n = len(resp.data) if getattr(resp, 'data', None) else 0
+        print(f"  Deleted {deleted_n} new {Q3_PERIOD} row(s).")
+    except Exception as e:
+        print(f"  ✗ Failed to delete new {Q3_PERIOD} rows: {e}")
+
+    print()
     print("Done. Verify with:")
     print(f"  SELECT * FROM rep_targets WHERE period IN "
-          f"('FY2027_Q3', '{Q4_PERIOD}') ORDER BY period, level, entity_name;")
+          f"('{Q3_PERIOD}', '{Q4_PERIOD}') ORDER BY period, level, entity_name;")
+    print()
+    print("  -- Exact-count check (healthy: Q3 -> 7, Q4 -> 0):")
+    print(f"  SELECT period, count(*) FROM rep_targets "
+          f"WHERE period IN ('{Q3_PERIOD}', '{Q4_PERIOD}') GROUP BY period;")
 
 
 if __name__ == '__main__':
