@@ -1750,8 +1750,16 @@ async def query_coverage(params: dict, sb) -> dict:
     coverage_rows = []
     for t in targets:
         tv = t["target_value"] or 0
+        # Display label, not the stored entity_name: a team-level row's
+        # entity_name (e.g. "AE Team") is a legacy/historical key — it
+        # now includes am-role quotas too, so printing it verbatim here
+        # would mislead a reader into thinking this figure is AE-only.
+        # The stored key is unaffected; only what reaches the model/
+        # Slack answer is generic. Rep-level rows still show their real
+        # name (no ambiguity there).
+        display_entity = "Team" if t["level"] == "team" else t["entity_name"]
         coverage_rows.append({
-            "entity":   t["entity_name"],
+            "entity":   display_entity,
             "level":    t["level"],
             "role":     t["role"],
             "metric":   t["metric"],

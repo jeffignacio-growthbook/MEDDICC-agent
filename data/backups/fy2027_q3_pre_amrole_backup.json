@@ -1,0 +1,86 @@
+[
+ {
+  "period": "FY2027_Q3",
+  "level": "rep",
+  "entity_name": "Christian",
+  "entity_email": "christian@growthbook.io",
+  "role": "ae",
+  "metric": "incremental_arr",
+  "target_value": 250000,
+  "parent_entity": "AE Team",
+  "set_by_slack": null,
+  "set_at": null
+ },
+ {
+  "period": "FY2027_Q3",
+  "level": "rep",
+  "entity_name": "Dan",
+  "entity_email": "dan@growthbook.io",
+  "role": "ae",
+  "metric": "incremental_arr",
+  "target_value": 250000,
+  "parent_entity": "AE Team",
+  "set_by_slack": null,
+  "set_at": null
+ },
+ {
+  "period": "FY2027_Q3",
+  "level": "rep",
+  "entity_name": "Jake",
+  "entity_email": "jake@growthbook.io",
+  "role": "ae",
+  "metric": "incremental_arr",
+  "target_value": 300000,
+  "parent_entity": "AE Team",
+  "set_by_slack": null,
+  "set_at": null
+ },
+ {
+  "period": "FY2027_Q3",
+  "level": "rep",
+  "entity_name": "James Shannon",
+  "entity_email": "james.shannon@growthbook.io",
+  "role": "ae",
+  "metric": "incremental_arr",
+  "target_value": 300000,
+  "parent_entity": "AE Team",
+  "set_by_slack": null,
+  "set_at": null
+ },
+ {
+  "period": "FY2027_Q3",
+  "level": "rep",
+  "entity_name": "Marcel",
+  "entity_email": "marcel@growthbook.io",
+  "role": "ae",
+  "metric": "incremental_arr",
+  "target_value": 150000,
+  "parent_entity": "AE Team",
+  "set_by_slack": null,
+  "set_at": null
+ },
+ {
+  "period": "FY2027_Q3",
+  "level": "rep",
+  "entity_name": "Scott Keller",
+  "entity_email": "scott.keller@growthbook.io",
+  "role": "ae",
+  "metric": "incremental_arr",
+  "target_value": 300000,
+  "parent_entity": "AE Team",
+  "set_by_slack": null,
+  "set_at": null
+ },
+ {
+  "period": "FY2027_Q3",
+  "level": "team",
+  "entity_name": "AE Team",
+  "entity_email": null,
+  "role": "ae",
+  "metric": "incremental_arr",
+  "target_value": 1550000,
+  "parent_entity": "GrowthBook",
+  "set_by_slack": null,
+  "set_at": null
+ }
+]
