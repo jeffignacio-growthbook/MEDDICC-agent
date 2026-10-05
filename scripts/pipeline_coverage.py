@@ -44,8 +44,9 @@ composition, per Jeff's explicit domain specification:
      computed and cached (cache_payload, for explain_prior_answer
      citation) but no longer in the rendered answer — see 7.
   5. THE GOAL for the CURRENT quarter (FY2027 Q3) = the team quota
-     (rep_targets team-level target, $1.55M). This is the minimum
-     committed target the team is measured against.
+     (rep_targets team-level target, $2,031,069 as of 2026-10-04 — AE +
+     AM, up from $1.55M AE-only). This is the minimum committed target
+     the team is measured against.
      Stretch ($2.1M, config/targets.yaml) is Ryan's personal
      aspiration (2x YoY growth) — it is NOT additive on top of
      quota, and is reported separately as context, never summed

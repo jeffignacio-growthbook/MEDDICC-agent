@@ -203,6 +203,7 @@ def _mock_rep_attainment_sb(targets_data, deals_data, personas_data):
         chain.eq.return_value = chain
         chain.gte.return_value = chain
         chain.lte.return_value = chain
+        chain.in_.return_value = chain  # select_all() uses .in_() for an "in" filter
         chain.range.return_value = chain  # select_all() pages via .range()
         if name == "rep_targets":
             chain.execute.return_value = MagicMock(data=targets_data)

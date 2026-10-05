@@ -1750,8 +1750,16 @@ async def query_coverage(params: dict, sb) -> dict:
     coverage_rows = []
     for t in targets:
         tv = t["target_value"] or 0
+        # Display label, not the stored entity_name: a team-level row's
+        # entity_name (e.g. "AE Team") is a legacy/historical key — it
+        # now includes am-role quotas too, so printing it verbatim here
+        # would mislead a reader into thinking this figure is AE-only.
+        # The stored key is unaffected; only what reaches the model/
+        # Slack answer is generic. Rep-level rows still show their real
+        # name (no ambiguity there).
+        display_entity = "Team" if t["level"] == "team" else t["entity_name"]
         coverage_rows.append({
-            "entity":   t["entity_name"],
+            "entity":   display_entity,
             "level":    t["level"],
             "role":     t["role"],
             "metric":   t["metric"],
@@ -3555,9 +3563,17 @@ async def query_rep_pipeline(params: dict, sb) -> dict:
 
 async def query_rep_attainment(params: dict, sb) -> dict:
     """
-    Quota attainment for one or all AEs this period.
+    Quota attainment for one or all reps (AE and AM) this period.
     Used for: "who's on track to hit quota?", "show me Q3 attainment by rep",
               "which reps are above 50% to quota?", "who is furthest from their number?"
+
+    ROLES: FIXED 2026-10-04 — previously hardcoded role="ae" in the
+    rep_targets filter, so AM-role quota rows (e.g. Cary, marsh@) were
+    never fetched and their wins were invisible from attainment answers
+    even though they counted in closed_won_qtd. Now fetches every role
+    listed in config/client.yaml's quota_roles (today: ae, am) — both
+    roles share the SAME metric (incremental_arr), so summing across
+    roles is correct, not double-counting a different metric.
 
     params:
       owner_email: str or None  — if None, returns all reps
@@ -3621,15 +3637,21 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     _, _, quarter_label = get_fiscal_quarter(start_date, cfg_wrap)
     period = quarter_label.replace(" ", "_")  # e.g. "FY2027_Q3"
     
-    # Load rep targets for this period
+    # Load rep targets for this period, for EVERY quota role (ae, am, ...)
+    # configured in config/client.yaml's quota_roles — not just "ae".
+    # FIXED 2026-10-04: this previously hardcoded role="ae", so am-role
+    # quota rows (Cary, marsh@) were never fetched and their wins never
+    # showed a quota/attainment, even though they're on the same
+    # incremental_arr metric as every AE.
+    quota_role_keys = [r["key"] for r in (config.get("quota_roles") or [])] or ["ae"]
     target_filters = [
         ("eq", "period", period),
         ("eq", "level", "rep"),
-        ("eq", "role", "ae")
+        ("in", "role", quota_role_keys)
     ]
 
     logger.info(f"[REP_TARGETS] computed period={period!r} from quarter resolution")
-    logger.info(f"[REP_TARGETS] url_filters=period={period} level=rep role=ae")
+    logger.info(f"[REP_TARGETS] url_filters=period={period} level=rep role in {quota_role_keys}")
 
     target_rows = select_all(sb, "rep_targets",
         columns="entity_email,target_value,metric",
@@ -3871,6 +3893,31 @@ async def query_rep_attainment(params: dict, sb) -> dict:
 
     # Sort by attainment ascending (lowest first)
     reps.sort(key=lambda x: (x["attainment_pct"] is None, x["attainment_pct"] or 0))
+
+    # Hard invariant check (2026-10-04, am-role attainment PR): the live
+    # rep_targets 'team' row must equal the sum of this period's 'rep'
+    # rows (the same invariant scripts/seed_targets.py enforces by
+    # construction when it writes both). This handler reads rows that
+    # were written by a prior seed run, so it can't enforce the
+    # invariant the way the seeder does — it can only detect drift (a
+    # manual edit, a partial reseed, a role added to quota_roles without
+    # reseeding) and warn loudly. Never raises: a drifted team row is a
+    # data-quality signal, not a reason to fail the whole answer.
+    try:
+        team_target_rows = select_all(sb, "rep_targets",
+            columns="target_value",
+            filters=[("eq", "period", period), ("eq", "level", "team"),
+                     ("eq", "metric", "incremental_arr")])
+        if team_target_rows:
+            live_team_value = team_target_rows[0].get("target_value")
+            if (live_team_value is not None and total_quota > 0
+                    and live_team_value != total_quota):
+                logger.warning(
+                    f"[REP_TARGETS] DRIFT: live team row (${live_team_value:,.0f}) "
+                    f"!= sum of {period} rep-level quota rows (${total_quota:,.0f}) "
+                    "— rep_targets may be out of sync; re-run scripts/seed_targets.py")
+    except Exception as e:
+        logger.warning(f"[REP_TARGETS] could not verify team-row/rep-sum invariant: {e}")
 
     # Team-level attainment for all three target types
     team_quota_attainment = rate_or_gap(total_won, total_quota if total_quota > 0 else None)

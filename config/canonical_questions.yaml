@@ -81,13 +81,13 @@ questions:
     description: "Team-level attainment: total won, total target, percentage, gap"
     verified_value:
       won_arr: 197400
-      target: 1550000
-      attainment_pct: 12.7
-      gap: -1352600
-      note: "12.7% team attainment, two-thirds through Q3"
+      target: 2031069
+      attainment_pct: 9.7
+      gap: -1833669
+      note: "UPDATED 2026-10-04: target moved from $1,550,000 (AE-only) to $2,031,069 (AE + AM, after the am-role attainment fix added real am-role quota rows). won_arr/attainment_pct/gap below are RECOMPUTED against the new target, not a re-verification of the original Sep 3 won_arr figure, which is a historical point-in-time snapshot, not live."
     source: "debugging_session"
     handler: "query_rep_attainment"
-    notes: "Verified Sep 3. This is the number going to Ryan."
+    notes: "Verified Sep 3 against the then-current $1,550,000 (AE-only) target. Target figure updated 2026-10-04 to $2,031,069 (AE+AM) — see config/targets.yaml."
 
   - id: q006
     question: "How many deals are in COMMIT forecast category?"
@@ -200,11 +200,11 @@ questions:
       quarter: "Q3_FY2027"
       q3_scoped_arr: 7684208
       q3_scoped_deals: 161
-      coverage_ratio: 5.0
+      coverage_ratio: 3.78
       zero_arr_deals: 31
       zero_arr_deals_company_wide: 70
       uncategorized_deals: 39
-      note: "Incremental ARR pipeline as of Sep 6, 2026. Deal count: 306 (using is_incremental_pipeline). Dollar total: $18.6M (sum of expansion_arr + new_arr per deal, dollar-level split). Q3-scoped: $7.7M / 161 deals (5.0x coverage vs $1.55M quarterly target). Data quality: 31 hygiene issues within incremental pipeline using stage-based rules (Meeting Set excluded, renewal stages check renewal_revenue, other stages check incremental ARR). Company-wide: 70 hygiene issues. 39 uncategorized deals with no ARR classification."
+      note: "Incremental ARR pipeline as of Sep 6, 2026. Deal count: 306 (using is_incremental_pipeline). Dollar total: $18.6M (sum of expansion_arr + new_arr per deal, dollar-level split). Q3-scoped: $7.7M / 161 deals (3.78x coverage vs the $2,031,069 quarterly target). UPDATED 2026-10-04: coverage_ratio recomputed against the new $2,031,069 (AE+AM) target — was 5.0x vs the old $1,550,000 (AE-only) target at the same Sep 6 pipeline snapshot. Data quality: 31 hygiene issues within incremental pipeline using stage-based rules (Meeting Set excluded, renewal stages check renewal_revenue, other stages check incremental ARR). Company-wide: 70 hygiene issues. 39 uncategorized deals with no ARR classification."
       previous_incorrect_value_v1: 24985788
       previous_incorrect_count_v1: 444
       previous_incorrect_value_v2: 20632465

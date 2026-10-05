@@ -102,11 +102,14 @@ def check_team_attainment():
 
     won_arr = sum(d.get('deal_value', 0) or 0 for d in q3_won)
 
+    # UPDATED 2026-10-04: target moved from $1,550,000 (AE-only) to
+    # $2,031,069 (AE + AM) — see config/targets.yaml.
+    target = 2031069
     return {
         'won_arr': won_arr,
         'deal_count': len(q3_won),
-        'target': 1550000,
-        'attainment_pct': (won_arr / 1550000) * 100
+        'target': target,
+        'attainment_pct': (won_arr / target) * 100
     }
 
 def check_commit_deals():

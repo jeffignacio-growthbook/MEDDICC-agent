@@ -407,6 +407,22 @@ KNOWN_FLAGGED_LOG_TAGS = {
     # test_query_rep_attainment_matches_other_sources for the behavioral
     # proof.
     "[REP_ATTAINMENT]",
+    # Reviewed 2026-10-04 (am-role attainment PR, item 12a's runtime
+    # check): query_rep_attainment compares the live rep_targets 'team'
+    # row for this period/metric against the sum of the 'rep' rows it
+    # just fetched, and logs "[REP_TARGETS] DRIFT: ..." if they
+    # disagree. Matched only because "drift"/"mismatch" is in
+    # _FLAGGED_LOG_KEYWORDS. Not a detect-and-ship gap in the sense this
+    # checklist targets: it never changes or suppresses the dollar
+    # figures the handler returns (total_quota is always the live sum
+    # of rep rows it just computed, never the possibly-stale team row),
+    # it only flags that the STORED team row (written by a prior
+    # scripts/seed_targets.py run) may be out of sync — a data-hygiene
+    # signal for whoever re-seeds, not a user-facing answer defect. See
+    # tests/test_coverage_qtd_reconciliation.py::
+    # test_team_row_rep_sum_drift_logs_a_warning for the behavioral
+    # proof, including its own planted-bug control.
+    "[REP_TARGETS]",
 }
 
 

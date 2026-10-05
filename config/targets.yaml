@@ -1,42 +1,136 @@
 # Sales targets by quarter
 # Used to calculate gap to plan, attainment %, and required pipeline coverage
 #
-# IMPORTANT: Emails match HubSpot owner records exactly. Mixed convention is deliberate:
-# James and Scott use full form (james.shannon@, scott.keller@), others use short form.
-# HubSpot is the system of record. These are the emails that actually own deals.
-# DO NOT "normalize" to one format - it will break the join with deals.owner_email.
+# IMPORTANT: Emails match HubSpot owner records exactly. Mixed convention is
+# deliberate: James and Scott use full form (james.shannon@, scott.keller@),
+# others use short form. HubSpot is the system of record. These are the
+# emails that actually own deals.
+# DO NOT "normalize" to one format - it will break the join with
+# deals.owner_email.
+#
+# marsh@growthbook.io (Andy Marshall) and kris@growthbook.io (Kris Washburn):
+# these are the HubSpot owner-record emails, NOT andy.marshall@growthbook.io
+# or any other form. andy.marshall@growthbook.io does not own deals in
+# HubSpot and must never be used here.
+#
+# role: "ae" (new-logo/new-business book) or "am" (expansion/renewal book).
+# Both roles are measured on the SAME metric, incremental_arr (new_arr +
+# expansion_arr) — role labels whose book of business a rep's number comes
+# from, not a different metric. See config/client.yaml's quota_roles
+# comment for the full history of this fix.
+#
+# team_total is INTENTIONALLY NOT stored here. It is computed as the sum of
+# this quarter's rep targets (by scripts/seed_targets.py when writing
+# rep_targets, and by scripts/utils.py::build_semantic_context when
+# rendering semantic context) so the team figure can never drift from the
+# rows it is supposed to equal. If you need "what is the team total right
+# now", sum the reps below (or read the live rep_targets 'team' row, which
+# is written from this same computation).
 
 targets:
   fy2027_q3:
-    team_total: 1550000
     basis: incremental_arr  # Reps are measured on Incremental ARR, never renewal base
     stretch_target: 2100000
     stretch_note: >
       Ryan's personal aspiration — NOT additive on top of quota.
-      The team quota ($1.55M) is the committed goal. The stretch
-      ($2.1M) is a separate, higher aspiration: Ryan wants to beat
-      $2.1M for the quarter to hit 2x YoY growth (Q3'27 vs Q3'26).
-      Report stretch separately as aspirational context, never sum
-      it with quota. Confirmed 2026-10-01. Never assume this
-      generalizes to any future client this codebase might serve.
+      The team quota (computed from the reps below, $2,031,069 for
+      FY2027 Q3) is the committed goal. The stretch ($2.1M) is a
+      separate, higher aspiration: Ryan wants to beat $2.1M for the
+      quarter to hit 2x YoY growth (Q3'27 vs Q3'26). Report stretch
+      separately as aspirational context, never sum it with quota.
+      Confirmed 2026-10-01. Never assume this generalizes to any
+      future client this codebase might serve.
     reps:
       jake@growthbook.io:
-        target: 300000
+        role: ae
+        target: 325000
       christian@growthbook.io:
+        role: ae
         target: 250000
       james.shannon@growthbook.io:
+        role: ae
         target: 300000
         note: corrected from 250000 after week 3
       scott.keller@growthbook.io:
+        role: ae
         target: 300000
       dan@growthbook.io:
+        role: ae
         target: 250000
       marcel@growthbook.io:
-        target: 150000
+        role: ae
+        target: 135326
         ramp: true  # New AE on ramp quota (not full quota)
-    non_quota_roles:
-      - cary@growthbook.io
-      - andy.marshall@growthbook.io
-    non_quota_note: >
-      Account Managers. Incremental ARR retires to team total; no individual
-      quota by design. Not a data gap.
+        note: >
+          Ramp quota, not full quota. Start 2026-08-10, ramp factor 1/2
+          until 2026-11-09, standard quarterly quota $300,000. FY2027 Q3
+          ramp math: 300000 * (0 full_days + 83 ramp_days * 0.5) / 92 =
+          $135,326.
+      kris@growthbook.io:
+        role: ae
+        target: 81250
+        ramp: true  # New AE on ramp quota (not full quota)
+        note: >
+          Ramp quota, not full quota. Start 2026-08-24, ramp factor 1/3
+          until 2026-11-23, standard quarterly quota $325,000. FY2027 Q3
+          ramp math: 325000 * (0 full_days + 69 ramp_days * (1/3)) / 92 =
+          $81,250. kris@growthbook.io is the confirmed HubSpot
+          Owner/User email (no separate owner-only email exists for him);
+          he has zero deals yet so this can't be cross-checked against
+          deals.owner_email the way every other rep was.
+      cary@growthbook.io:
+        role: am
+        target: 300000
+      marsh@growthbook.io:
+        role: am
+        target: 89493
+        ramp: true  # New AM on ramp quota (not full quota)
+        note: >
+          Ramp quota, not full quota. Start 2026-08-17, ramp factor 1/3
+          until 2026-11-16, standard quarterly quota $325,000. FY2027 Q3
+          ramp math: 325000 * (0 full_days + 76 ramp_days * (1/3)) / 92 =
+          $89,493. marsh@growthbook.io (NOT andy.marshall@growthbook.io)
+          is the email his real deals in HubSpot use.
+
+  fy2027_q4:
+    basis: incremental_arr  # Reps are measured on Incremental ARR, never renewal base
+    reps:
+      jake@growthbook.io:
+        role: ae
+        target: 325000
+      christian@growthbook.io:
+        role: ae
+        target: 250000
+      james.shannon@growthbook.io:
+        role: ae
+        target: 300000
+      scott.keller@growthbook.io:
+        role: ae
+        target: 300000
+      dan@growthbook.io:
+        role: ae
+        target: 250000
+      marcel@growthbook.io:
+        role: ae
+        target: 285326
+        note: >
+          Still partially ramped. Ramp factor 1/2 until 2026-11-09,
+          standard quarterly quota $300,000. FY2027 Q4 ramp math:
+          300000 * (83 full_days + 9 ramp_days * 0.5) / 92 = $285,326.
+      kris@growthbook.io:
+        role: ae
+        target: 270833
+        note: >
+          Still partially ramped. Ramp factor 1/3 until 2026-11-23,
+          standard quarterly quota $325,000. FY2027 Q4 ramp math:
+          325000 * (69 full_days + 23 ramp_days * (1/3)) / 92 = $270,833.
+      cary@growthbook.io:
+        role: am
+        target: 300000
+      marsh@growthbook.io:
+        role: am
+        target: 287319
+        note: >
+          Still partially ramped. Ramp factor 1/3 until 2026-11-16,
+          standard quarterly quota $325,000. FY2027 Q4 ramp math:
+          325000 * (76 full_days + 16 ramp_days * (1/3)) / 92 = $287,319.
