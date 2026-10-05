@@ -3924,11 +3924,25 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     team_stretch_attainment = rate_or_gap(total_won, total_stretch if total_stretch > 0 else None)
     team_combined_attainment = rate_or_gap(total_won, total_combined if total_combined > 0 else None)
 
+    # Team deal count, computed in code — never left for the model to sum
+    # or count reps[] itself. 2026-10 quota-attainment incident: a live
+    # answer stated "15" team deals won when reps[].deals_won actually
+    # summed to 12 — the model invented/mis-summed the figure because this
+    # team_summary carried NO deal-count field at all to read directly.
+    # deals_won includes the "no quota assigned" roster-gap line (if any);
+    # unassigned_deals_won isolates just that count so the two reconcile:
+    # team_deals_won == sum(r["deals_won"] for r in reps) by construction,
+    # since this IS that same sum, computed once, here.
+    team_deals_won = sum(r["deals_won"] for r in reps)
+    unassigned_deals_won = unattributed_n if unattributed_n > 0 else 0
+
     result = {
         "period": period,
         "reps": reps,
         "team_summary": {
             "closed_won_qtd": closed_won_qtd,
+            "deals_won": team_deals_won,
+            "unassigned_deals_won": unassigned_deals_won,
             "total_quota": total_quota,
             "total_stretch": total_stretch,
             "total_combined": total_combined,
@@ -3937,7 +3951,20 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             "combined_attainment": team_combined_attainment,
             "reps_above_50pct": reps_above_50,
             "reps_above_100pct": reps_above_100
-        }
+        },
+        # Reaches synthesis (api/router.py's build_synthesis_prompt/_VOICE_BASE
+        # ALWAYS follows a "_synthesis_note" field when present, unlike the
+        # dynamic loop's own "never sum sample arrays" rule, which does NOT
+        # reach this handler's synthesis path at all — a different code path,
+        # confirmed while diagnosing the 2026-10 quota-attainment incident).
+        "_synthesis_note": (
+            "team_summary.deals_won is the total team deal count, computed "
+            "in code — read it directly. Never sum or count reps[] "
+            "yourself to get a team total; reps[] may include a "
+            "\"No quota assigned\" aggregate row (see "
+            "team_summary.unassigned_deals_won), and summing it yourself "
+            "risks double-counting or arithmetic drift from the real total."
+        ),
     }
     # explain_prior_answer citation support: like query_pipeline_coverage,
     # this result is aggregate-only by construction — reps[] is bounded by
