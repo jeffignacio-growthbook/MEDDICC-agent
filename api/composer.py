@@ -27,6 +27,97 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
+# AVAILABLE PRIMITIVES — derived, not hand-maintained
+#
+# This used to be a hardcoded list baked into _DECOMPOSE_PROMPT below, kept
+# in sync with api/agent_loop.py::KNOWN_PRIMITIVES (the set run_agent_loop
+# will actually accept for call_primitive) by hand. It drifted: this list
+# named "query_rep_scorecard" (no such handler ever existed — the closest
+# thing, scripts/rep_scorecard.py::assess_rep_scorecard, is an internal
+# helper of query_quarter_health, never its own primitive) and omitted
+# "query_rep_attainment" (the real, registered handler for quota-attainment
+# questions). A plan naming the fake primitive sent run_agent_loop's
+# call_primitive() to a name that doesn't exist, which fell back to a raw
+# fetch_data/filter_table sum over deals.deal_value — see
+# tests/test_composer_primitive_drift.py for the reconciliation that found
+# this ("who's on track to hit quota?" producing $349,375/23% instead of
+# the correct $520,060/33.6%).
+#
+# Fix: generate the prompt's primitive list from the SAME source
+# api/agent_loop.py::KNOWN_PRIMITIVES already derives from
+# (HANDLER_DESCRIPTIONS minus _NON_PRIMITIVE_INTENTS) — one registry, not
+# two lists that can drift apart. A curated one-liner is kept for the
+# handful of primitives most relevant to composer plans (same ones the
+# original hand-written list covered, with the fake entry removed and
+# query_rep_attainment added); any other primitive in KNOWN_PRIMITIVES gets
+# a one-line description derived from its real HANDLER_DESCRIPTIONS entry.
+
+# Curated one-liners for the primitives composer plans reach for most often.
+# Anything in KNOWN_PRIMITIVES but not listed here still appears in the
+# prompt — see _derive_description() below — just without hand-tuned prose.
+_CURATED_PRIMITIVE_DESCRIPTIONS: dict[str, str] = {
+    "query_pipeline_coverage": "active deal ARR vs quota for a period",
+    "query_path_to_target": "remaining gap to close and pace",
+    "query_waterfall": "bookings waterfall by category/week",
+    "query_pipeline_movement": "deal stage change events in a window",
+    "query_deals_at_risk": "at-risk deals with weak MEDDICC signals",
+    "query_quarter_health": "composite quarter health summary",
+    "query_win_loss": "win/loss reason breakdown",
+    "query_rep_attainment": "rep-level quota attainment — won revenue vs target",
+    "query_stage_lag": "time-in-stage distribution",
+    "query_qualification_rate": "meeting-to-qualified crossing rate",
+    "query_coaching_priorities": "coaching priorities — reps/deals needing attention",
+}
+
+# Sentinel values that may appear in the prompt's primitive list but are NOT
+# themselves governed primitives, so they are never checked for
+# getattr(handlers, name) callability and never asserted to be in
+# KNOWN_PRIMITIVES (tests/test_composer_primitive_drift.py documents this).
+_PRIMITIVE_LIST_SENTINELS: frozenset[str] = frozenset({"dynamic_query", "_computed"})
+
+
+def _derive_description(name: str, handler_descriptions: dict) -> str:
+    """One-line description for a primitive not in the curated map above.
+
+    Takes HANDLER_DESCRIPTIONS[name] (full classifier-facing prose, often
+    several sentences) and reduces it to a single short line: the first
+    sentence, truncated, with newlines collapsed.
+    """
+    raw = (handler_descriptions.get(name) or "").replace("\n", " ")
+    raw = " ".join(raw.split())  # collapse repeated whitespace
+    first_sentence = raw.split(". ")[0].strip()
+    if not first_sentence:
+        first_sentence = f"see handler {name}"
+    if len(first_sentence) > 110:
+        first_sentence = first_sentence[:107].rstrip() + "..."
+    return first_sentence
+
+
+def _build_available_primitives_block() -> str:
+    """Build the prompt's "AVAILABLE PRIMITIVES" lines from
+    agent_loop.KNOWN_PRIMITIVES — the SAME governed set run_agent_loop's
+    call_primitive() will accept — instead of a separately hand-maintained
+    list. Every primitive named here is therefore guaranteed callable and
+    guaranteed non-fake; the only two extra entries are the explicit
+    sentinels "dynamic_query" (last-resort fallback) and "_computed"
+    (arithmetic over other sub-parts), both documented as such and excluded
+    from the drift test's callability check.
+    """
+    from api.agent_loop import KNOWN_PRIMITIVES
+    from api.router import HANDLER_DESCRIPTIONS
+
+    lines = []
+    for name in sorted(KNOWN_PRIMITIVES):
+        desc = _CURATED_PRIMITIVE_DESCRIPTIONS.get(name) or _derive_description(
+            name, HANDLER_DESCRIPTIONS
+        )
+        lines.append(f"  {name:<30} - {desc}")
+    lines.append(f"  {'dynamic_query':<30} - anything not covered above (last resort)")
+    lines.append(f"  {'_computed':<30} - arithmetic over other sub-part results")
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
 # DECOMPOSE prompt
 
 _DECOMPOSE_PROMPT = """You are a query planner for a CRO analytics system.
@@ -38,19 +129,7 @@ Arithmetic over the sub-part results (e.g. ratio = A / B) is marked
 with primitive "_computed".
 
 AVAILABLE PRIMITIVES (map sub-parts only to these, or "_computed"):
-  query_pipeline_coverage       - active deal ARR vs quota for a period
-  query_path_to_target          - remaining gap to close and pace
-  query_waterfall               - bookings waterfall by category/week
-  query_pipeline_movement       - deal stage change events in a window
-  query_deal_risk               - at-risk late-stage deals
-  query_quarter_health          - composite quarter health summary
-  query_win_loss_reason         - win/loss reason breakdown
-  query_rep_scorecard           - rep-level attainment and activity
-  query_stage_lag               - time-in-stage distribution
-  query_qualification_rate      - meeting-to-qualified crossing rate
-  query_coaching_hypothesis     - coaching experiment status
-  dynamic_query                 - anything not covered above (last resort)
-  _computed                     - arithmetic over other sub-part results
+{available_primitives}
 
 Question: {question}
 Handler that was tried (inadequate): {handler_used}
@@ -100,6 +179,7 @@ async def decompose_question(
                 _DECOMPOSE_PROMPT.format(
                     question=question,
                     handler_used=handler_used,
+                    available_primitives=_build_available_primitives_block(),
                 )}]
         )
         plan = _extract_json(resp.text)
@@ -347,7 +427,23 @@ def _extract_json(text: str) -> dict | None:
 
 
 def _valid_plan(plan: dict) -> bool:
-    """Basic structural check on a decomposed plan."""
+    """Basic structural check on a decomposed plan.
+
+    NOTE: deliberately does NOT also enforce plan["sub_parts"][*]["primitive"]
+    against KNOWN_PRIMITIVES here — tests/test_compositional_layer.py and
+    tests/test_composer_verification.py exercise plan-shape scenarios with
+    illustrative primitive names that predate this PR's primitive-whitelist
+    fix (some no longer real, e.g. "query_rep_scorecard" as a stand-in for
+    "some rep-level primitive"), and an allow-list check here would reject
+    those fixtures for a reason unrelated to what they're testing. The real
+    fix for a hallucinated/fake primitive name is at the SOURCE: the prompt
+    built by _build_available_primitives_block() only ever lists real,
+    callable primitives (see tests/test_composer_primitive_drift.py), so a
+    well-behaved model has nothing fake to choose from. If stronger
+    runtime enforcement is wanted later, it belongs in the caller that
+    executes a plan's sub-parts (api/router.py's pending-plan handling),
+    not here, so it doesn't collide with these structural-only fixtures.
+    """
     if not isinstance(plan, dict):
         return False
     sub_parts = plan.get("sub_parts")

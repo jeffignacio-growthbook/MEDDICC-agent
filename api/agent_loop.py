@@ -483,6 +483,31 @@ Rules:
 - Use state_assumption only for non-sensitive ambiguity.
 - Use ask_user for ARR vs deal value, quota vs stretch, or renewals-in/out questions.
 - Keep answers concise and lead with the headline finding.
+- Won ARR, quota attainment, or "on track to hit quota" questions MUST go
+  through call_primitive("query_rep_attainment", ...) (team-wide or for one
+  rep via owner_email) — or query_pipeline_coverage / query_quarter_health
+  where those are already the right primitive for a pipeline-vs-target
+  framing instead of a won-vs-quota one. Never answer a won/attainment
+  question with a raw fetch_data/filter_table sum over the deals table.
+- deals.deal_value is NEVER the right column for a "won" or "closed-won"
+  figure — it is full contract value and includes renewal-base dollars
+  that do not belong in ARR. The correct columns are new_arr and
+  expansion_arr (their sum is "incremental ARR"); for a quota/attainment
+  total, use the governed query_rep_attainment primitive, which already
+  applies this basis and reconciles to the single source of truth,
+  forecast_analyses.actual_incremental_closed_won().
+- When a plan or prior answer referenced a primitive by name that does not
+  resolve (a call_primitive error naming it "unknown"), do NOT silently
+  fall back to fetch_data/filter_table on deals for that same question —
+  re-read the question and route to the real governed primitive instead
+  (query_rep_attainment for won/quota/attainment questions above all).
+  A real-world incident (2026-10) escalated "who's on track to hit quota?"
+  through exactly this path — a plan naming a non-existent primitive,
+  "query_rep_scorecard" — into a raw deal_value sum that overstated the
+  team total by including renewal dollars and silently dropped reps with
+  no rep_targets row from the team total. Both are avoidable by using
+  query_rep_attainment, which already handles roster gaps correctly (see
+  its own docstring).
 
 Efficiency — avoiding redundant primitive calls:
 - query_quarter_downside and query_quarter_health already run query_pipeline_coverage

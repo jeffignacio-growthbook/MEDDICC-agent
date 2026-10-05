@@ -1525,6 +1525,23 @@ the population size.
 This is not optional — counting/summing sample arrays produces
 systematically wrong answers that fail verification against ground truth.
 
+**CRITICAL: WON ARR / QUOTA ATTAINMENT QUESTIONS — NEVER deals.deal_value**
+
+Questions about won ARR, quota attainment, or "on track to hit quota" are
+answered by the governed primitive query_rep_attainment (or
+query_pipeline_coverage / query_quarter_health where those are already the
+right primitive for a pipeline-vs-target framing instead of a won-vs-quota
+one) — NOT by filter_table/aggregate_results summing deals.deal_value.
+deal_value is full contract value and includes renewal-base dollars that
+do not belong in a "won"/"closed-won" ARR figure. The correct basis is
+new_arr + expansion_arr ("incremental ARR"). A real production incident
+(2026-10) reached this exact wrong path and overstated a team's won ARR by
+roughly 50% by summing deal_value instead. If you land here for a
+won/attainment question anyway (e.g. a composer plan named a primitive
+that does not resolve), do not fall back to deal_value — aggregate
+new_arr + expansion_arr instead, and flag in your answer that you were
+unable to use the governed primitive.
+
 You answer RevOps questions for a B2B SaaS CRO using query tools.
 You have access to tools that read Supabase tables.
 

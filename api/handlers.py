@@ -4306,12 +4306,38 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
     Full AE team ranking across pipeline, attainment, and deal quality.
     Used for: "show me the team leaderboard", "rank the AEs by pipeline",
               "who's carrying the team?", "who has the most pipeline closing this quarter?"
-    
+
     params:
       time_window: dict
       sort_by: str — "pipeline" | "attainment" | "meddicc_score" | "deals_won"
                      default: "pipeline"
       limit: int   — default 10
+
+    WON-ARR BASIS: FIXED 2026-10-05 — previously summed raw deal_value for
+    each rep's won deals (full contract value, including the renewal-base
+    dollars a pure renewal carries), the same class of bug that produced a
+    wrong "$349,375/23%" answer to "who's on track to hit quota?" from the
+    composer's raw fetch_data fallback. Now uses the SAME dollar-based
+    incremental-ARR test (field_semantics.is_incremental_pipeline +
+    incremental_arr: new_arr + expansion_arr, pipeline_id-agnostic) that
+    query_rep_attainment and forecast_analyses.actual_incremental_closed_won
+    use, and the team-level won_arr total is sourced DIRECTLY from
+    actual_incremental_closed_won() — never a separately-summed copy that
+    can drift from it. See tests/test_team_leaderboard_won_arr.py for the
+    reconciliation proof.
+
+    QUOTA ROLES: FIXED 2026-10-05 — previously hardcoded role="ae" in the
+    rep_targets filter (same bug PR #124 fixed for query_rep_attainment,
+    flagged there as a known follow-up for this handler), so am-role quota
+    rows (Cary, marsh@) were never fetched. Now fetches every role listed
+    in config/client.yaml's quota_roles. Also fixed the metric filter,
+    which filtered on metric="arr_won" — a value scripts/seed_targets.py
+    never writes (it writes metric=<quarter's basis>, "incremental_arr" in
+    practice) — so targets_map was always empty and every rep showed
+    "quota not set" regardless of role. Now matches on the same metric set
+    query_rep_attainment reads (incremental_arr/quota/stretch), preferring
+    an explicit "quota" row over "incremental_arr" exactly as that handler
+    does.
     """
     tw = _resolve_tw(params)
     sort_by = params.get("sort_by", "pipeline")
@@ -4338,28 +4364,52 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
         columns="owner_email,deal_value",
         filters=[("eq", "deal_status", "active")]
     )
-    
-    # Get won deals in time window (grouped by owner)
+
+    # Get won deals in time window (grouped by owner) — INCREMENTAL ARR
+    # basis (new_arr + expansion_arr), NOT deal_value. See
+    # field_semantics.is_incremental_pipeline() docstring: dollar-based,
+    # pipeline_id-agnostic test, same one actual_incremental_closed_won()
+    # and query_rep_attainment use.
+    from field_semantics import is_incremental_pipeline
+    from forecast_analyses import actual_incremental_closed_won
+    # incremental_arr() itself is already imported at module level above
+    # (api.incremental_arr — the single allowed definition; see that
+    # import's comment).
+
     won_deals = select_all(sb, "deals",
-        columns="owner_email,deal_value",
+        columns="owner_email,new_arr,expansion_arr,pipeline_id,deal_status",
         filters=[
             ("eq", "deal_status", "won"),
             ("gte", "close_date", tw["start"]),
             ("lte", "close_date", tw["end"])
         ]
     )
-    
-    # Get targets for this period
+    won_deals = [d for d in won_deals if is_incremental_pipeline(d)]
+
+    # Get targets for this period, for EVERY quota role (ae, am, ...)
+    # configured in config/client.yaml's quota_roles — not just "ae".
+    quota_role_keys = [r["key"] for r in (config.get("quota_roles") or [])] or ["ae"]
     targets_filters = [
         ("eq", "period", period),
         ("eq", "level", "rep"),
-        ("eq", "role", "ae")
+        ("in", "role", quota_role_keys),
     ]
     logger.info(f"[QUERY_TEAM_LEADERBOARD_FILTER] table='rep_targets' filters={targets_filters!r}")
     targets = select_all(sb, "rep_targets",
         columns="entity_email,target_value,metric",
         filters=targets_filters
     )
+
+    # Team-level won ARR: the SAME function query_rep_attainment's
+    # closed_won_qtd and query_pipeline_coverage's qtd_won use — single
+    # source of truth for "closed-won incremental ARR in this window,"
+    # never a separately-summed copy that can drift from it. Placed AFTER
+    # the logged rep_targets call above (not before it) so this handler's
+    # own filter-clause logging (tests/test_handler_filter_logging.py)
+    # still fires even against a fake Supabase client that only the
+    # module-level select_all() here is patched to tolerate — this
+    # separate function does its own select_all() import.
+    team_won_arr, _team_won_n = actual_incremental_closed_won(sb, tw["start"], tw["end"])
     
     # Get all personas
     personas = select_all(sb, "user_personas",
@@ -4384,7 +4434,7 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
             rep_data[owner]["active_pipeline"] += deal["deal_value"]
         rep_data[owner]["active_deals"] += 1
     
-    # Won ARR
+    # Won ARR — incremental basis (new_arr + expansion_arr), not deal_value.
     for deal in won_deals:
         owner = deal.get("owner_email")
         if not owner:
@@ -4393,15 +4443,28 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
             rep_data[owner] = {}
         if "won_arr" not in rep_data[owner]:
             rep_data[owner]["won_arr"] = 0
-        if deal.get("deal_value"):
-            rep_data[owner]["won_arr"] += deal["deal_value"]
-    
-    # Quotas
-    targets_map = {}
+        rep_data[owner]["won_arr"] += incremental_arr(deal)
+
+    # Quotas — metric set matches what scripts/seed_targets.py actually
+    # writes (metric=<quarter's basis>, "incremental_arr" in practice, or
+    # "quota"/"stretch" where those are seeded separately) — the old
+    # metric="arr_won" filter never matched any real row, so targets_map
+    # was always empty regardless of role. Prefer an explicit "quota" row
+    # over "incremental_arr" when both exist, same precedence
+    # query_rep_attainment uses.
+    targets_by_email_component = {}
     for t in targets:
-        if t.get("metric") == "arr_won":
-            targets_map[t["entity_email"]] = t["target_value"]
-    
+        metric = t.get("metric")
+        if metric in ("incremental_arr", "quota", "stretch"):
+            email = t.get("entity_email")
+            targets_by_email_component.setdefault(email, {})[metric] = t.get("target_value")
+
+    targets_map = {
+        email: (components.get("quota") or components.get("incremental_arr"))
+        for email, components in targets_by_email_component.items()
+    }
+    targets_map = {email: quota for email, quota in targets_map.items() if quota is not None}
+
     for email, quota in targets_map.items():
         if email not in rep_data:
             rep_data[email] = {}
@@ -4416,9 +4479,15 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
     # Build leaderboard
     leaderboard = []
     team_total_pipeline = 0
-    team_won_arr = 0
+    # team_won_arr is NOT re-summed here from the per-rep rows above — it
+    # was already set from actual_incremental_closed_won() (the single
+    # source of truth for "closed-won incremental ARR in this window") so
+    # it reconciles even when a won deal's owner_email doesn't match any
+    # roster entry here (the same silent-exclusion bug this fix addresses:
+    # a rep with real wins must never be missing from the team total just
+    # because rep_data/targets_map doesn't carry a row for them).
     data_gaps = []
-    
+
     for email, data in rep_data.items():
         active_pipeline = data.get("active_pipeline")
         active_deals = data.get("active_deals")
@@ -4446,9 +4515,7 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
         
         if active_pipeline:
             team_total_pipeline += active_pipeline
-        if won_arr:
-            team_won_arr += won_arr
-    
+
     # Check for data gaps
     if not targets_map:
         data_gaps.append("quotas not set")
