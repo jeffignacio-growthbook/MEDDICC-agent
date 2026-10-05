@@ -36,7 +36,7 @@ handlers.query_pipeline_coverage directly):
      the top-level (rendered) result.
   6. _synthesis_note never leaks into cache_payload (stays a top-level,
      per-turn-only field).
-  7. REGRESSION: query_rep_attainment (shares generic synthesis
+  7. REGRESSION (updated 2026-10, see note below): query_rep_attainment (shares generic synthesis
      scaffolding, no coverage field of its own) gets no _synthesis_note.
 """
 import sys
@@ -293,11 +293,24 @@ def test_synthesis_note_not_leaked_into_cache_payload():
 
 
 def test_rep_attainment_gets_no_synthesis_note_regression():
-    """REGRESSION GUARD: query_rep_attainment shares the same generic
-    synthesis scaffolding (_VOICE_BASE/TABLE_FORMAT_RULE) but has no
-    coverage field of its own — this change must not have added a
-    _synthesis_note to it."""
-    print("\n[TEST] query_rep_attainment unaffected — no _synthesis_note added")
+    """REGRESSION GUARD (original intent, updated 2026-10): this test
+    originally asserted query_rep_attainment got NO _synthesis_note at
+    all, to prove THIS PR's (pipeline_coverage's) new field didn't leak
+    into rep_attainment via their shared generic synthesis scaffolding
+    (_VOICE_BASE/TABLE_FORMAT_RULE).
+
+    2026-10 quota-attainment retry regression fix: query_rep_attainment
+    now legitimately carries its OWN _synthesis_note — an unrelated,
+    deliberate addition (team_summary.deals_won aggregate-field guidance,
+    api/handlers.py::query_rep_attainment), using the same per-handler
+    mechanism many other handlers already use (query_pipeline, win_loss,
+    query_pipeline_movement, pipeline_coverage itself — see api/router.py
+    _VOICE_BASE's "_synthesis_note: ALWAYS follow..." rule). That is NOT
+    the leak this guard was written to catch. The guard is updated,
+    not removed: it still proves pipeline_coverage's note (recognizable by
+    its coverage/remaining-gap vocabulary) never reaches rep_attainment —
+    only rep_attainment's own, unrelated note may be present."""
+    print("\n[TEST] query_rep_attainment: only its OWN _synthesis_note, never pipeline_coverage's")
     import datetime as _dt
 
     targets = [{"entity_email": "jake@growthbook.io", "metric": "quota", "target_value": 300000}]
@@ -315,10 +328,21 @@ def test_rep_attainment_gets_no_synthesis_note_regression():
                                                           "label": "FY2027 Q3"}):
         result = asyncio.run(handlers.query_rep_attainment({}, sb))
 
-    assert "_synthesis_note" not in result, (
-        f"REGRESSION: query_rep_attainment unexpectedly got a _synthesis_note: "
-        f"{result.get('_synthesis_note')!r}")
-    print("  ✓ query_rep_attainment's result carries no _synthesis_note")
+    note = result.get("_synthesis_note")
+    assert note, (
+        "query_rep_attainment should now carry its own _synthesis_note "
+        "(deals_won aggregate-field guidance) — see api/handlers.py")
+    assert "deals_won" in note and "team_summary" in note, (
+        f"unexpected _synthesis_note content: {note!r} — expected the "
+        f"deals_won/team_summary aggregate-field guidance"
+    )
+    coverage_vocabulary = ("remaining gap", "REMAINING-GAP", "nominal_coverage",
+                          "weighted_coverage", "TIMELESS DESIGN")
+    assert not any(term in note for term in coverage_vocabulary), (
+        f"REGRESSION: pipeline_coverage's own _synthesis_note vocabulary "
+        f"leaked into query_rep_attainment's note: {note!r}")
+    print("  ✓ query_rep_attainment carries only its own _synthesis_note, "
+          "never pipeline_coverage's")
 
 
 def test_guidance_states_qtd_won_includes_renewal_expansion():
