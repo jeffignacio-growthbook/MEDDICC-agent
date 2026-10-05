@@ -7115,8 +7115,70 @@ async def _route_question(question: str, user_id: str,
         print(f"[RETRY {retry_count}] {retry_context[:100]}",
               flush=True)
 
-        # Try the suggested handler first
+        # Snapshot pre-retry state: `handler_name`/`verified`/`tool_results`
+        # may all be reassigned below (suggested-handler call, dynamic
+        # fallback), so the item-3 keep-vs-replace decision needs the
+        # ORIGINAL values to compare against, captured before any of that
+        # happens.
+        original_handler_name = handler_name
+        original_verified = verified
+        original_tool_results = tool_results
+        original_was_governed_usable = _governed_result_is_usable(
+            tool_results, original_handler_name)
+
         suggested = assessment.get("suggested_handler")
+
+        # ── Same-handler suggestion: the assessor is saying "the right
+        # handler ran but I don't believe the output" — not a routing
+        # problem. Re-synthesize once from the SAME existing tool_results,
+        # with the assessor's critique as extra guidance, and never touch
+        # dynamic_query_loop or re-call the handler for this case. This
+        # must be checked BEFORE the suggested-handler-call branch below
+        # (suggested == handler_name would otherwise silently no-op there
+        # and fall into the dynamic-loop fallback instead).
+        #
+        # 2026-10 quota-attainment retry regression: a live learning_log
+        # row showed handler_used=suggested_fix=query_rep_attainment for
+        # "Who's on track to hit quota?" — the old code had no branch for
+        # this case at all, so it fell straight into the dynamic-loop
+        # fallback below, which discarded a correct answer.
+        if suggested and suggested == handler_name:
+            candidate = None
+            try:
+                resynth_resp = generator_client.complete(
+                    messages=[
+                        *[{"role": m["role"], "content": m["content"]}
+                          for m in history[-4:]
+                          if m.get("role") in ("user", "assistant")],
+                        {"role": "user",
+                         "content": f"Question: {question}\n\n"
+                                    f"Critique: {retry_context}\n\n"
+                                    f"Data:\n{_smart_truncate_for_synthesis(tool_results, synth_payload_chars(handler_name))}"}
+                    ],
+                    system=build_synthesis_prompt(persona),
+                    max_tokens=SYNTH_MAX_TOKENS
+                )
+                candidate = resynth_resp.text.strip()
+                _c_parsed = _extract_json(candidate)
+                if _c_parsed and _c_parsed.get("answer"):
+                    candidate = _c_parsed["answer"]
+            except Exception as e:
+                logger.warning(f"[RETRY] same-handler re-synthesis failed: {e}")
+
+            chosen_is_retry = bool(candidate)
+            verified = candidate if chosen_is_retry else original_verified
+            _log_retry_decision(
+                sb, question, "same_handler_suggestion",
+                original_handler_name, original_verified,
+                handler_name, candidate,
+                "retry" if chosen_is_retry else "original",
+            )
+            # Loop back to the top: assess_correctness re-grades `verified`
+            # (or tries again up to MAX_RETRIES) — never falls through to
+            # the suggested-handler-call or dynamic-loop branches below.
+            continue
+
+        # Try the suggested handler first
         if suggested and suggested != handler_name:
             handler_fn = getattr(handlers, suggested, None)
             if handler_fn:
@@ -7128,9 +7190,22 @@ async def _route_question(question: str, user_id: str,
                           flush=True)
                     tool_results = {}
 
-        # If no suggested handler or it failed, try dynamic
-        if not tool_results or not tool_results.get("rows",
-            tool_results.get("deal")):
+        # If no suggested handler (or it failed), try dynamic — but only
+        # when the existing tool_results genuinely aren't usable. The old
+        # check here (`tool_results.get("rows", tool_results.get("deal"))`)
+        # only recognizes row-based/deal-based handler shapes; a governed,
+        # dict-shaped handler like query_rep_attainment ({period, reps,
+        # team_summary}) has neither key, so this ALWAYS tripped for it —
+        # discarding a perfectly good result regardless of whether it was
+        # actually usable. _governed_result_is_usable() closes that gap by
+        # reusing api.evaluator.evaluate_result() instead of a second,
+        # parallel classification.
+        rows_or_deal_present = bool(tool_results) and bool(
+            tool_results.get("rows", tool_results.get("deal")))
+        existing_result_usable = rows_or_deal_present or _governed_result_is_usable(
+            tool_results, handler_name)
+
+        if not existing_result_usable:
             dynamic_result = await dynamic_query_loop(
                 question=question,
                 history=history,
@@ -7145,6 +7220,33 @@ async def _route_question(question: str, user_id: str,
             dynamic_answer = dynamic_result.get("answer", "")
             dynamic_tool_results = dynamic_result.get("tool_results", {})
             if dynamic_result.get("answered"):
+                # ── Item 3: never let a non-governed retry result (the
+                # dynamic loop, possibly landing on query_pipeline_movement's
+                # fast path) silently overwrite a correct governed answer.
+                # This is exactly how the 2026-10 regression shipped a false
+                # "the attainment handler could not be called" reply: the
+                # discarded query_rep_attainment answer was correct, and the
+                # replacement (query_pipeline_movement via the dynamic loop)
+                # was for a structurally different question (open pipeline
+                # movement, not won-deals attainment).
+                retry_is_governed = _result_came_from_governed_handler(dynamic_tool_results)
+                keep_original = original_was_governed_usable and not retry_is_governed
+
+                _log_retry_decision(
+                    sb, question, "dynamic_fallback",
+                    original_handler_name, original_verified,
+                    "dynamic_query_loop", dynamic_answer,
+                    "original" if keep_original else "retry",
+                )
+
+                if keep_original:
+                    _log_learning(sb, question, original_handler_name,
+                                 assessment, retry_count)
+                    return {"answer": original_verified,
+                            "needs_ack": is_slow,
+                            "tool_results": original_tool_results,
+                            "handler_name": original_handler_name}
+
                 # Log the learning note before returning
                 _log_learning(sb, question, handler_name,
                              assessment, retry_count)
@@ -7152,6 +7254,32 @@ async def _route_question(question: str, user_id: str,
                         "needs_ack": is_slow,
                         "tool_results": dynamic_tool_results,
                         "handler_name": f"{handler_name}_retry_dynamic"}
+            break
+
+        # ── Item 3 (second replacement site): the suggested-handler-call
+        # branch above may have swapped `handler_name`/`tool_results` to a
+        # non-governed handler (e.g. a row-based primitive the assessor
+        # suggested instead). If the original answer came from a governed
+        # handler and the CURRENT handler producing this re-synthesis is
+        # not itself governed, keep the original rather than let a weaker
+        # replacement overwrite it. A legitimate governed→governed handler
+        # switch (e.g. query_rep_attainment → query_pipeline_coverage, a
+        # real wrong_handler correction) is NOT blocked by this — only a
+        # drop out of GOVERNED_HANDLERS entirely is.
+        new_handler_is_governed = handler_name in GOVERNED_HANDLERS
+        keep_original_at_resynth = (
+            original_was_governed_usable and not new_handler_is_governed
+        )
+
+        if keep_original_at_resynth:
+            _log_retry_decision(
+                sb, question, "resynthesis_fallback",
+                original_handler_name, original_verified,
+                handler_name, None, "original",
+            )
+            verified = original_verified
+            handler_name = original_handler_name
+            tool_results = original_tool_results
             break
 
         # Re-synthesize with the new tool results
@@ -7172,6 +7300,11 @@ async def _route_question(question: str, user_id: str,
         _r_parsed = _extract_json(verified)
         if _r_parsed and _r_parsed.get("answer"):
             verified = _r_parsed["answer"]
+        _log_retry_decision(
+            sb, question, "resynthesis_fallback",
+            original_handler_name, original_verified,
+            handler_name, verified, "retry",
+        )
 
     # ── 8a. Scope-mismatch escalation → composer plan ────────────────────────
     # If the assessor flags scope_mismatch, the question needs multiple
@@ -7311,6 +7444,136 @@ def _log_unanswered(sb, question, user_id, reason):
         log_unanswered(sb, question, user_id, "", "", reason)
     except Exception:
         pass
+
+
+# Handlers answered by a governed, purpose-built primitive rather than the
+# dynamic loop or a raw row-dump — see the WON ARR / QUOTA ATTAINMENT block
+# in DYNAMIC_SYSTEM_PROMPT above for the canonical list this mirrors. Used
+# by the retry loop below (_governed_result_is_usable,
+# _result_came_from_governed_handler) to decide (1) whether an existing
+# governed result is usable as-is (never discard it just because it lacks
+# "rows"/"deal" keys — see _governed_result_is_usable's docstring) and
+# (2) whether a retry's replacement answer actually came from an equally
+# governed source, or from a weaker fallback (dynamic_query_loop /
+# query_pipeline_movement / a non-governed primitive) that must not be
+# allowed to silently overwrite a correct governed answer.
+#
+# 2026-10 quota-attainment retry regression: query_rep_attainment's result
+# ({period, reps, team_summary}) has no "rows"/"deal" key, so the retry
+# loop's old usability check (`tool_results.get("rows",
+# tool_results.get("deal"))`) ALWAYS treated it as unusable and discarded a
+# correct answer into the dynamic loop, which landed on
+# query_pipeline_movement (not in this set) and finalized a false "the
+# attainment handler could not be called" answer via that handler's
+# fast-path-preservation rule.
+GOVERNED_HANDLERS = {
+    "query_rep_attainment",
+    "query_pipeline_coverage",
+    "query_quarter_health",
+    "query_path_to_target",
+}
+
+
+def _governed_result_is_usable(tool_results: dict, handler_name: str) -> bool:
+    """Is an EXISTING `tool_results` from `handler_name` usable as-is, i.e.
+    does the retry loop's fallback-to-dynamic guard need to leave it alone?
+
+    Only meaningful for GOVERNED_HANDLERS — reuses
+    api.evaluator.evaluate_result()/STRUCTURED_HANDLERS (the same
+    classification the initial handler dispatch and _call_handler_as_tool
+    already rely on) instead of inventing a second, parallel quality check.
+    "good" or "partial" both count as usable: "partial" already means real
+    data with a disclosed gap (see STRUCTURED_HANDLERS' own "message"/
+    "status" entries), not nothing to work with.
+
+    query_path_to_target is deliberately governed (see GOVERNED_HANDLERS)
+    but is NOT currently registered in STRUCTURED_HANDLERS — a pre-existing
+    gap this fix does not touch (see PR body). Its success shape
+    (bare_plan/existing_scenarios always present, no "error" key) is
+    checked directly here instead.
+    """
+    if not tool_results or handler_name not in GOVERNED_HANDLERS:
+        return False
+    from api.evaluator import evaluate_result, STRUCTURED_HANDLERS
+    if handler_name in STRUCTURED_HANDLERS:
+        return evaluate_result(tool_results, handler_name) not in ("empty", "error")
+    if handler_name == "query_path_to_target":
+        return ("error" not in tool_results and
+                bool(tool_results.get("bare_plan") or tool_results.get("existing_scenarios")))
+    return False
+
+
+def _result_came_from_governed_handler(result: dict) -> bool:
+    """Shape-check: does `result` look like ANY GOVERNED_HANDLERS output
+    (query_rep_attainment's {reps, team_summary}, query_pipeline_coverage's/
+    query_quarter_health's {status}, or query_path_to_target's
+    {bare_plan, existing_scenarios}) rather than a row-dump from
+    dynamic_query_loop or a non-governed primitive like
+    query_pipeline_movement ({rows, data_gaps, snapshot_dates})?
+
+    Used ONLY at the item-3 decision point to judge whether a retry's
+    replacement result is a legitimate governed answer, never as the
+    primary usability check (that is _governed_result_is_usable above,
+    which also knows WHICH handler is being checked). The governed shapes
+    are distinct enough by construction (reps+team_summary vs. a bare
+    status field vs. bare_plan) that a false-positive collision with
+    query_pipeline_movement's rows/data_gaps/snapshot_dates shape is not a
+    realistic risk.
+    """
+    if not result:
+        return False
+    from api.evaluator import evaluate_result, STRUCTURED_HANDLERS
+    for gh in GOVERNED_HANDLERS:
+        if gh in STRUCTURED_HANDLERS:
+            if evaluate_result(result, gh) not in ("empty", "error"):
+                return True
+    return bool(result.get("bare_plan") or result.get("existing_scenarios"))
+
+
+def _log_retry_decision(sb, question: str, reason: str,
+                        original_handler: str, original_answer: str,
+                        retry_handler: str, retry_answer: str,
+                        chosen: str):
+    """Structured log of BOTH retry candidates and which one was chosen, at
+    every point in the retry loop that decides whether to keep an existing
+    governed answer or replace it with a retry's result (item 3's
+    "log both candidate answers ... whenever a retry reaches this decision
+    point, win or lose").
+
+    Doubles as the persistence item 7 asks for: the discarded first
+    answer is never written anywhere else today. `learning_log`
+    (scripts/migrations/021_add_learning_log.sql) has no answer-text
+    column — only question/handler_used/issue_type/suggested_fix/
+    retry_succeeded/retries_used — so there is nowhere in the DB to put
+    full answer text without a new migration. This logs a line instead of
+    adding one (see PR body for why a log line was chosen over a schema
+    change here): it is queryable via Railway/log search immediately,
+    needs no migration review, and cannot be forgotten on a rollback the
+    way an unapplied migration could.
+
+    `chosen` is "original" or "retry". Logged at logger.warning so it is
+    never silently dropped by a log-level filter the way logger.info can
+    be in production.
+    """
+    logger.warning(
+        "[RETRY_DECISION] reason=%s original_handler=%s retry_handler=%s "
+        "chosen=%s question=%r original_answer_excerpt=%r "
+        "retry_answer_excerpt=%r",
+        reason, original_handler, retry_handler, chosen, question,
+        (original_answer or "")[:300], (retry_answer or "")[:300],
+    )
+    try:
+        sb.table("fallback_log").insert({
+            "question": question,
+            "trigger": f"retry_decision_{reason}",
+            "fast_path_attempted": original_handler,
+            "fast_path_failure": f"retry_handler={retry_handler} chosen={chosen}",
+            "queries_run": None,
+            "answered": True,
+            "answer_excerpt": (chosen == "retry" and retry_answer or original_answer or "")[:200],
+        }).execute()
+    except Exception as e:
+        logger.warning(f"[RETRY_DECISION] fallback_log write failed: {e}")
 
 
 def _log_learning(sb, question, handler, assessment,
@@ -7857,6 +8120,30 @@ def _detect_semantic_gap(question: str, handler_result: dict, handler_name: str)
             return ("dollar_fields",
                    f"Question asks for monetary values ({[t for t in dollar_terms if t in q_lower]}) "
                    f"but {handler_name} returned no dollar fields")
+
+    # Quota/attainment gap: query_pipeline_movement's result ({rows,
+    # data_gaps, snapshot_dates} — open-pipeline stage movement over time)
+    # structurally never carries won-ARR/quota/attainment fields BY
+    # CONSTRUCTION, so this is unconditional — no "does the result lack
+    # field X" check is needed the way dollar_fields needs one (some
+    # handlers legitimately have dollar fields, none have quota/attainment
+    # fields on this handler). Added after the 2026-10 quota-attainment
+    # retry regression: a quota-phrased question ("Who's on track to hit
+    # quota?") reached query_pipeline_movement via the dynamic-loop retry
+    # fallback, and this handler's own fast-path-preservation rule (this
+    # function is the ONLY gate standing in front of it) finalized that
+    # mismatched result as the answer with no gap detected, because
+    # dollar_terms didn't cover "quota"/"attainment"/"on track"/"hit
+    # quota"/"ahead of quota" phrasing.
+    if handler_name == "query_pipeline_movement":
+        quota_terms = ["quota", "attainment", "on track", "hit quota",
+                       "ahead of quota"]
+        matched_quota_terms = [t for t in quota_terms if t in q_lower]
+        if matched_quota_terms:
+            return ("quota_attainment_fields",
+                   f"Question asks about quota/attainment ({matched_quota_terms}) "
+                   f"but {handler_name} (open-pipeline movement) never carries "
+                   "won-ARR/quota fields — use query_rep_attainment instead")
 
     # Future gap types can be added here:
     # - "top deals" mentioned but no deal_id/company_name fields

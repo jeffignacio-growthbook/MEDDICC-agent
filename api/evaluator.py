@@ -65,6 +65,17 @@ STRUCTURED_HANDLERS = {
     "query_rep_coaching": ["status"],  # always "insufficient_data" or "ok" —
         # gated on transcript-scored calls; the gate response is a complete
         # answer with coverage_note (not empty), same as forecast_trust pattern.
+    "query_rep_attainment": ["reps", "team_summary"],  # {period, reps,
+        # team_summary} — no "rows"/"deal" key, so before this entry existed
+        # the generic row-based branch below always misread a genuinely good
+        # result as "partial" (shape-blindness, not a real data gap). Checking
+        # "reps" alone would also miss the no-targets-set data-gap shape,
+        # which returns reps=[] but a populated, honest team_summary (note:
+        # "AE quotas not set..."); checking either key non-empty covers both.
+        # This is also what api/router.py's retry-loop usability check
+        # (_governed_result_is_usable) now relies on instead of a second,
+        # parallel classification — see the 2026-10 quota-attainment retry
+        # regression this was found during.
 }
 
 
