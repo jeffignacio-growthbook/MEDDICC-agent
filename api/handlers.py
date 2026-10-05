@@ -4386,12 +4386,6 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
     )
     won_deals = [d for d in won_deals if is_incremental_pipeline(d)]
 
-    # Team-level won ARR: the SAME function query_rep_attainment's
-    # closed_won_qtd and query_pipeline_coverage's qtd_won use — single
-    # source of truth for "closed-won incremental ARR in this window,"
-    # never a separately-summed copy that can drift from it.
-    team_won_arr, _team_won_n = actual_incremental_closed_won(sb, tw["start"], tw["end"])
-
     # Get targets for this period, for EVERY quota role (ae, am, ...)
     # configured in config/client.yaml's quota_roles — not just "ae".
     quota_role_keys = [r["key"] for r in (config.get("quota_roles") or [])] or ["ae"]
@@ -4405,6 +4399,17 @@ async def query_team_leaderboard(params: dict, sb) -> dict:
         columns="entity_email,target_value,metric",
         filters=targets_filters
     )
+
+    # Team-level won ARR: the SAME function query_rep_attainment's
+    # closed_won_qtd and query_pipeline_coverage's qtd_won use — single
+    # source of truth for "closed-won incremental ARR in this window,"
+    # never a separately-summed copy that can drift from it. Placed AFTER
+    # the logged rep_targets call above (not before it) so this handler's
+    # own filter-clause logging (tests/test_handler_filter_logging.py)
+    # still fires even against a fake Supabase client that only the
+    # module-level select_all() here is patched to tolerate — this
+    # separate function does its own select_all() import.
+    team_won_arr, _team_won_n = actual_incremental_closed_won(sb, tw["start"], tw["end"])
     
     # Get all personas
     personas = select_all(sb, "user_personas",

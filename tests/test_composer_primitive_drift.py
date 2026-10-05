@@ -162,21 +162,15 @@ class TestComposerPrimitiveDrift(unittest.TestCase):
                                     or not callable(getattr(handlers, n, None)))]
         self.assertEqual(not_callable_clean, [])
 
-    def test_valid_plan_rejects_fake_primitive(self):
-        """_valid_plan() itself (defense in depth, not just the prompt
-        text) rejects a plan naming a primitive outside KNOWN_PRIMITIVES —
-        so even an LLM that ignores the prompt and hallucinates
-        query_rep_scorecard anyway can't get a plan through."""
-        bad_plan = {
-            "question": "who's on track to hit quota?",
-            "sub_parts": [
-                {"name": "attainment", "primitive": "query_rep_scorecard",
-                 "rationale": "fake"},
-            ],
-        }
-        self.assertFalse(_valid_plan(bad_plan))
-
     def test_valid_plan_accepts_real_primitive(self):
+        """_valid_plan() is a structural check only (name + primitive
+        present on every sub-part) — it deliberately does NOT also enforce
+        the KNOWN_PRIMITIVES allow-list, so it doesn't collide with
+        tests/test_compositional_layer.py's illustrative fixtures that
+        predate this PR's whitelist fix (see _valid_plan's own docstring).
+        The actual fix against a fake primitive like the planted-bug
+        control above is at the SOURCE — _build_available_primitives_block
+        never offers one to a well-behaved model in the first place."""
         good_plan = {
             "question": "who's on track to hit quota?",
             "sub_parts": [

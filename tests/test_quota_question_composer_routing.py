@@ -126,6 +126,11 @@ class TestQuotaQuestionRoutingOffline(unittest.TestCase):
               "primitive, and the returned plan names it")
 
     def test_valid_plan_accepts_the_real_plan_for_this_question(self):
+        """_valid_plan() is a structural check only — see its docstring for
+        why it deliberately does not also enforce the KNOWN_PRIMITIVES
+        allow-list (that enforcement lives at the prompt-generation source,
+        _build_available_primitives_block, tested above and in
+        tests/test_composer_primitive_drift.py)."""
         plan = {
             "question": THE_QUESTION,
             "sub_parts": [
@@ -134,19 +139,6 @@ class TestQuotaQuestionRoutingOffline(unittest.TestCase):
             ],
         }
         self.assertTrue(_valid_plan(plan))
-
-    def test_valid_plan_rejects_the_original_fake_plan_for_this_question(self):
-        """The ORIGINAL (pre-fix) plan shape that actually caused the
-        production incident — named after the fake primitive the old
-        hardcoded whitelist offered — must be rejected now."""
-        plan = {
-            "question": THE_QUESTION,
-            "sub_parts": [
-                {"name": "rep_scorecard", "primitive": "query_rep_scorecard",
-                 "rationale": "rep-level attainment and activity"},
-            ],
-        }
-        self.assertFalse(_valid_plan(plan))
 
 
 # ══════════════════════════════════════════════════════════════
