@@ -9,7 +9,7 @@
   "target_value": 250000,
   "parent_entity": "AE Team",
   "set_by_slack": null,
-  "set_at": null
+  "set_at": "2026-09-04 04:32:37.303542+00"
  },
  {
   "period": "FY2027_Q3",
@@ -21,7 +21,7 @@
   "target_value": 250000,
   "parent_entity": "AE Team",
   "set_by_slack": null,
-  "set_at": null
+  "set_at": "2026-09-04 04:32:37.754982+00"
  },
  {
   "period": "FY2027_Q3",
@@ -33,7 +33,7 @@
   "target_value": 300000,
   "parent_entity": "AE Team",
   "set_by_slack": null,
-  "set_at": null
+  "set_at": "2026-09-04 04:32:37.178204+00"
  },
  {
   "period": "FY2027_Q3",
@@ -45,7 +45,7 @@
   "target_value": 300000,
   "parent_entity": "AE Team",
   "set_by_slack": null,
-  "set_at": null
+  "set_at": "2026-09-04 04:32:37.534836+00"
  },
  {
   "period": "FY2027_Q3",
@@ -57,7 +57,7 @@
   "target_value": 150000,
   "parent_entity": "AE Team",
   "set_by_slack": null,
-  "set_at": null
+  "set_at": "2026-09-04 04:32:37.867817+00"
  },
  {
   "period": "FY2027_Q3",
@@ -69,7 +69,7 @@
   "target_value": 300000,
   "parent_entity": "AE Team",
   "set_by_slack": null,
-  "set_at": null
+  "set_at": "2026-09-04 04:32:37.651335+00"
  },
  {
   "period": "FY2027_Q3",
@@ -81,6 +81,6 @@
   "target_value": 1550000,
   "parent_entity": "GrowthBook",
   "set_by_slack": null,
-  "set_at": null
+  "set_at": "2026-09-02 22:27:01.096669+00"
  }
 ]
