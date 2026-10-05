@@ -70,6 +70,13 @@ targets:
         role: ae
         target: 81250
         ramp: true  # New AE on ramp quota (not full quota)
+        display_name: Kris Washburn  # 2026-10-05: entity_name was the
+          # mechanical "Kris" derived from the email local-part; this is
+          # his real name, documented in this file's header comment
+          # since before this field existed. See build_rows_for_quarter()
+          # in scripts/seed_targets.py — DISPLAY_NAME_OVERRIDES reads this
+          # key when set, falls back to the mechanical derivation when
+          # absent, so every other rep is unaffected.
         note: >
           Ramp quota, not full quota. Start 2026-08-24, ramp factor 1/3
           until 2026-11-23, standard quarterly quota $325,000. FY2027 Q3
@@ -85,6 +92,8 @@ targets:
         role: am
         target: 89493
         ramp: true  # New AM on ramp quota (not full quota)
+        display_name: Andy Marshall  # 2026-10-05: see kris@'s display_name
+          # comment above — same reason, same mechanism.
         note: >
           Ramp quota, not full quota. Start 2026-08-17, ramp factor 1/3
           until 2026-11-16, standard quarterly quota $325,000. FY2027 Q3
@@ -120,6 +129,7 @@ targets:
       kris@growthbook.io:
         role: ae
         target: 270833
+        display_name: Kris Washburn  # see fy2027_q3's kris@ comment
         note: >
           Still partially ramped. Ramp factor 1/3 until 2026-11-23,
           standard quarterly quota $325,000. FY2027 Q4 ramp math:
@@ -130,6 +140,7 @@ targets:
       marsh@growthbook.io:
         role: am
         target: 287319
+        display_name: Andy Marshall  # see fy2027_q3's marsh@ comment
         note: >
           Still partially ramped. Ramp factor 1/3 until 2026-11-16,
           standard quarterly quota $325,000. FY2027 Q4 ramp math:

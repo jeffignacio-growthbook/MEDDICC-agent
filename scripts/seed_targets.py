@@ -43,8 +43,16 @@ def build_rows_for_quarter(quarter_key: str, quarter_data: dict) -> list:
         target = rep_data['target'] if isinstance(rep_data, dict) else rep_data
         role = rep_data.get('role', 'ae') if isinstance(rep_data, dict) else 'ae'
 
-        # Get display name from email (first part before @)
-        entity_name = email.split('@')[0].replace('.', ' ').title()
+        # Get display name from email (first part before @), unless
+        # config/targets.yaml sets an explicit display_name for this rep
+        # (2026-10-05: marsh@/kris@'s mechanical "Marsh"/"Kris" were
+        # replaced with their real names, Andy Marshall/Kris Washburn —
+        # both already documented in this file's own header comment
+        # before this override existed). Every rep without a display_name
+        # key keeps the exact same derivation as before — unaffected.
+        explicit_name = (rep_data.get('display_name')
+                         if isinstance(rep_data, dict) else None)
+        entity_name = explicit_name or email.split('@')[0].replace('.', ' ').title()
 
         row = {
             "period": period,
