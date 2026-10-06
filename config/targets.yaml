@@ -30,6 +30,12 @@
 targets:
   fy2027_q3:
     basis: incremental_arr  # Reps are measured on Incremental ARR, never renewal base
+    non_quota_roles:  # entity_emails of known, non-quota-bearing people who
+      # own deals — read by api/handlers.py::query_rep_attainment to keep a
+      # win attributable to a real, known person instead of folding it into
+      # the "no quota assigned" roster-gap line. jennifer@growthbook.io:
+      # finance role, handles low-amount renewals, has no quota.
+      - jennifer@growthbook.io
     stretch_target: 2100000
     stretch_note: >
       Ryan's personal aspiration — NOT additive on top of quota.
@@ -103,6 +109,8 @@ targets:
 
   fy2027_q4:
     basis: incremental_arr  # Reps are measured on Incremental ARR, never renewal base
+    non_quota_roles:  # see fy2027_q3's non_quota_roles comment above
+      - jennifer@growthbook.io
     reps:
       jake@growthbook.io:
         role: ae
