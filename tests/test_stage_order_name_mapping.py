@@ -253,9 +253,21 @@ def test_builder_prompt_carries_stage_names_not_just_raw_keys():
 # ══════════════════════════════════════════════════════════════
 
 def test_rep_attainment_cache_payload_has_no_stage_data():
-    """query_rep_attainment has no by_stage_order anywhere in its output
-    — this fix must not touch it at all."""
-    print("\n[TEST] query_rep_attainment's cache_payload is unaffected")
+    """query_rep_attainment has no "by_stage_order" key anywhere in its
+    output (this fix — stage-name annotation for query_pipeline_coverage's
+    by_stage_order — must not touch it).
+
+    Updated 2026-10-06 (stage-rate citation PR): query_rep_attainment now
+    carries its OWN per-stage aggregate, "stage_rates" (deliberately a
+    different key/shape than query_pipeline_coverage's by_stage_order — see
+    tests/test_rep_attainment_stage_rate_citation.py), and now calls
+    get_sales_stage_names_by_order() itself to annotate it — so this test's
+    "never calls it" assertion no longer holds and is updated to match.
+    The by_stage_order-specific invariant (no "stage_weighting", no
+    "by_stage_order" string anywhere) is unchanged and still asserted."""
+    print("\n[TEST] query_rep_attainment's cache_payload is unaffected by "
+          "query_pipeline_coverage's by_stage_order annotation (it has its "
+          "own, differently-shaped stage_rates aggregate instead)")
     import asyncio
     import datetime as _dt
 
@@ -275,11 +287,14 @@ def test_rep_attainment_cache_payload_has_no_stage_data():
          patch("utils.get_sales_stage_names_by_order") as mock_names:
         result = asyncio.run(handlers.query_rep_attainment({}, sb))
 
-    mock_names.assert_not_called()
+    mock_names.assert_called_once()
     assert "stage_weighting" not in result["cache_payload"]
     assert "by_stage_order" not in str(result["cache_payload"])
-    print("  ✓ get_sales_stage_names_by_order never called; no stage data "
-          "anywhere in rep_attainment's cache_payload")
+    assert "stage_rates" in result["cache_payload"]
+    print("  ✓ get_sales_stage_names_by_order IS called once (for "
+          "stage_rates, its own aggregate) but no 'stage_weighting'/"
+          "'by_stage_order' key appears anywhere in rep_attainment's "
+          "cache_payload")
 
 
 # ══════════════════════════════════════════════════════════════
