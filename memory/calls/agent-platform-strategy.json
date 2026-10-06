@@ -1,0 +1,18 @@
+{
+  "company": "Agent Platform Strategy",
+  "slug": "agent-platform-strategy",
+  "last_etl_date": "2026-10-06T07:00:49.961870",
+  "calls": [
+    {
+      "id": "01M471F0CNE6HM30DB5NSD8YDA",
+      "source": "fireflies",
+      "title": "Agent Platform Strategy and Planning",
+      "date": "2026-10-05",
+      "duration_minutes": 58.15999984741211,
+      "summary": "# Agent Platform Strategy and Planning\nDate: 2026-10-05 | Duration: 58.15999984741211m\n\n## Summary\nThe discussion established a vision for human-in-the-loop agents that can modify experiments and feature flags while humans review, approve, publish, and understand outcomes. Priorities include general approval primitives, revision support, agent authentication, safer permission models, audit history, QA workflows, notifications, and make-changes functionality. The team identified a six-month opportunity to make experimentation faster and easier through agent integration and differentiate from EPO, Statsig, Amplitude, and Datadog. Proposed analysis capabilities include asynchronous, headless APIs for cohort breakdowns, warehouse searches, ad hoc filters, ephemeral dimensions, and metric drill-downs, while a Python sandbox was deferred. Additional focus areas include preventing approval bypasses, improving completion signals through webhooks and Slack, aligning safe rollouts with experimentation, and formalizing project ownership. Jeremy Dorn planned to refine the vision for engineering review, while Bryce Fitzsimons recommended sharing roadmap direction with Anthropic.\n\n## Keywords\nAgent UX, Experiment approvals, Analysis APIs, Human-in-the-loop, Audit history, Agent authentication\n\n## Action Items\n**Bryce Fitzsimons**\n- Check token implementation (07:47)\n\n**Luke Sonnet**\n- Build analysis API endpoint (29:23)\n\n**Jeremy Dorn**\n- Prepare engineering vision presentation (53:49)\n\n**Unassigned**\n- Share experimentation roadmap (56:34)",
+      "organizer": "luke@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

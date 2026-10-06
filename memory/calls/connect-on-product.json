@@ -1,0 +1,18 @@
+{
+  "company": "Connect on Product",
+  "slug": "connect-on-product",
+  "last_etl_date": "2026-10-06T07:00:49.962292",
+  "calls": [
+    {
+      "id": "01M41R8KCFZ3CN7BHQ3SZS5A8K",
+      "source": "fireflies",
+      "title": "Connect on Product Analytics use cases & insights",
+      "date": "2026-10-05",
+      "duration_minutes": 36.13999938964844,
+      "summary": "# Connect on Product Analytics use cases & insights\nDate: 2026-10-05 | Duration: 36.13999938964844m\n\n## Summary\nThe discussion focused on limited adoption of product analytics caused by overlapping tools, fragmented ownership, and weak organizational standards. Customers often prioritize consolidating feature flagging and experimentation, while product analytics is treated as a bundled bonus, especially when replacing costly tools such as Adobe or Amplitude. Sales should qualify prospects by understanding their current tools, data workflows, ownership, tagging, schemas, and reporting needs, then tailor the pitch around consolidation and savings. Mature enterprises are difficult to convert because of existing investments, while smaller or less mature companies offer stronger opportunities. Amplitude, Mixpanel, Adobe, and PostHog were identified as primary competitors. Warehouse-native analytics, BI integration, controlled data access, and easier migration from similar APIs and schemas are important advantages. Key gaps include real-time analytics and tighter experimentation-to-analytics integration. Planned improvements include real-time telemetry, the populations feature, AI-assisted analysis, and continued sales training.\n\n## Keywords\nproduct analytics, experimentation, feature flagging, platform consolidation, real-time telemetry, sales training\n\n## Action Items\n\n**Cris Dizon**\nProvide input and comments on sales talk track slides related to product analytics to improve messaging and positioning (33:35)\nHelp gather information on 1-800-Flowers’ current product analytics stack and data logging setup to support customer qualification and sales strategy (13:12)\nSupport the sales team by advising them to consistently ask customers about their current product analytics tools and data logging practices during sales conversations to identify consolidation opportunities (33:35)\n\n**Scott Bailey**\nShare the recording link of the recent product analytics sales training session with Cris Dizon and Elyse Fox to facilitate their preparation and alignment (33:17)\n\n**Elyse Fox**\nCollaborate on preparing sales training materials and framing questions around product analytics ownership and potential opportunities to lead or steer customers away from competitors like Amplitude (12:07)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

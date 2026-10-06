@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Come Near",
+  "slug": "growthbook-come-near",
+  "last_etl_date": "2026-10-06T07:00:49.962124",
+  "calls": [
+    {
+      "id": "01M428EQQN19ZKGFEKMS95D87A",
+      "source": "fireflies",
+      "title": "Growthbook <> Come Near - Sync",
+      "date": "2026-10-05",
+      "duration_minutes": 19.190000534057617,
+      "summary": "# Growthbook <> Come Near - Sync\nDate: 2026-10-05 | Duration: 19.190000534057617m\n\n## Summary\nThe team agreed to begin with GrowthBook’s Pro tier, starting with 5 users and scaling quarterly toward 30 users, to validate its value before considering Enterprise. Enterprise would add dedicated onboarding, direct engineering support, private Slack access, a typical four-hour SLA, SSO, role-based access control, and DPAs, though nonprofit budget sensitivity remains important. Okta and SAML 2.0 support governance and access control, while the availability of 2FA for Pro users will be verified. US-only region locking is configurable to support privacy and compliance requirements, and any future data-hosting or transfer changes should be communicated promptly. The organization is moving from outsourced experimentation tools toward internal experimentation, with training, onboarding, and self-hosting available. Pricing and contract discussions can proceed flexibly while Carson monitors progress and requests technical support as needed.\n\n## Keywords\nenterprise plan, Pro plan, experimentation support, data compliance, region locking, two-factor authentication\n\n## Action Items\n\n**Dan Wathne**\nShare documentation on enterprise terms and Data Processing Agreement (DPA) with Carson Ring for review (10:30)\n\n**Logan Bates**\nVerify and confirm whether two-factor authentication (2FA) is available in the Pro plan and communicate findings to Carson Ring (15:00)\n\n**Carson Ring**\nContinue using the Slack channel for ongoing technical questions and support related to GrowthBook onboarding and experimentation infrastructure (17:00)\nOversee governance and security onboarding aspects of GrowthBook for Come Near, coordinating with technical staff Eric Peterson and teams Capital and Sammy (06:30)\n\n**GrowthBook Team**\nMaintain notification protocol to Come Near if any changes occur in region locking or data handling policies on GrowthBook (12:00)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

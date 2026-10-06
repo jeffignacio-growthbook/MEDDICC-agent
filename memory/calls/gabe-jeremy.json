@@ -1,7 +1,7 @@
 {
   "company": "Gabe / Jeremy",
   "slug": "gabe-jeremy",
-  "last_etl_date": "2026-09-29T06:24:05.670931",
+  "last_etl_date": "2026-10-06T07:00:49.962634",
   "calls": [
     {
       "id": "01M32NRSS0HXWRTZ3NQJTYF7XA",
@@ -10,6 +10,17 @@
       "date": "2026-09-28",
       "duration_minutes": 28.540000915527344,
       "summary": "# Gabe / Jeremy\nDate: 2026-09-28 | Duration: 28.540000915527344m\n\n## Summary\nThe team reviewed an experiment framework nearing completion and awaiting rollout approvals, with the existing surface used temporarily during redesign. Drafts would remain editable before starting, while complex post-start changes would require approval. Diff displays are being integrated into the core UI without a modal, and the legend is being made scalable for many rules, although user-attribute display remains pending. The overview needs traffic-flow visualization showing default values, funnel logic, read-only rules, and traffic counts, while detailed traffic information is preferred in diagnostics. Notion preparation will focus on the happy path, with Bryce building the UI and a polished single surface preferred. A rough QA mockup and test button are also planned. Data-source onboarding has approximately 20% completion because setup is tedious; the proposed flow separates initial modal steps from detailed full-page setup, adds upfront terms and region selection, and replaces documentation tab switching with a task list. Validation runs after submission and needs loading-state UI, while inaccurate smart defaults support a blank-slate setup. Major UI flows and onboarding are priorities, with a major app refresh targeted for October.\n\n## Keywords\nexperiment approvals, UI redesign, diagnostics visualization, data source onboarding, user traffic flow, QA testing flow\n\n## Action Items\n**Gabe Melean**  \nProvide quick tour/demo of experiment approvals (02:13)  \nSimplify draft handling logic for initial drafts (06:50)  \nIncorporate feedback and prepare experiment details redesign (09:25)  \nThink about showing traffic flow data in rules overview (16:04)  \nContinue collaborating with Bryce on experiment redesign and QA (17:00)  \nPrepare mockup of QA testing button and flow (18:42)  \nSet up meeting with Johnny for feature rule redesign (26:00)  \n\n**Jeremy Dorn**  \nShare thoughts on handling draft and running experiment states (05:53)  \nProvide feedback on diagnostics and overview UI changes (12:04)  \nContinue refining data source onboarding flow (18:53)  \nPlay with onboarding concepts and hand over visuals to Johnny (26:00)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M41T6VE507SDZ70M99GMWB9A",
+      "source": "fireflies",
+      "title": "Gabe / Jeremy",
+      "date": "2026-10-05",
+      "duration_minutes": 27.469999313354492,
+      "summary": "# Gabe / Jeremy\nDate: 2026-10-05 | Duration: 27.469999313354492m\n\n## Summary\nThe team planned an experiment-creation deep dive, supporting screenshots, and access to a prototype repository, with linked-changes representation still in design. They emphasized a final polish pass after engineering, especially padding and spacing, and discussed avoiding duplicated interaction work, prototype-repository separation, possible merging into the main repository, and GitHub branch guardrails. Experiment updates included submitted power analysis awaiting feedback, a demo flow from draft to running state, enabling the Start button after value inputs, reconsidering the To Do section, replacing JSON naming with parameters, refining analysis-plan and timing relationships, and adding test-dropdown options. The product was positioned as improving on Statsig, with smoother interaction, while an AI setup assistant was proposed for contextual experiment configuration and planned for the create-experiment modal. Diagnostics screenshots, overview rules, presentation preparation, and possible cleanup support were also discussed.\n\n## Keywords\nexperiment creation, prototype, AI assistant, diagnostics, design polish, GitHub workflow\n\n## Action Items\n**Gabe Melean**  \nSend DM with access details to Jeremy Dorn (01:49)  \nExperiment with merging prototype repo into main repo (06:44)  \nSchedule meeting with relevant team members (07:20)  \nReach out to Lilia to discuss diagnostics experiment details (07:30)  \nImplement AI assistant feature (23:36)  \nTake high-quality screenshots of diagnostics tab (25:05)  \n\n**Jeremy Dorn**  \nDiscuss with Bryce about design reuse (05:06)  \nCompile presentation slides and materials (26:00)",
       "organizer": "gabe@growthbook.io",
       "participants": 2,
       "summary_quality": "good"
