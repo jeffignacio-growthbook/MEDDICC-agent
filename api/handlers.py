@@ -3654,7 +3654,7 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     logger.info(f"[REP_TARGETS] url_filters=period={period} level=rep role in {quota_role_keys}")
 
     target_rows = select_all(sb, "rep_targets",
-        columns="entity_email,target_value,metric",
+        columns="entity_email,entity_name,target_value,metric",
         filters=target_filters
     )
 
@@ -3665,6 +3665,13 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     # Build target map - support quota, stretch, and combined
     # Store all target components separately per email
     targets_by_email = {}  # {email: {"quota": X, "stretch": Y, "incremental_arr": Z}}
+    # Display-name fallback (2026-10-06): rep_targets.entity_name for this
+    # SAME period's level='rep' rows only (target_filters above already
+    # scopes to level='rep' — never a team row like "AE Team"), used as
+    # the second-tier name fallback below when there's no user_personas
+    # row for this email. No new join: this reads a field already present
+    # on the rows this handler already fetched for quota values.
+    rep_target_names = {}
     for t in target_rows:
         email = t["entity_email"]
         metric = t.get("metric")
@@ -3674,6 +3681,8 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             if email not in targets_by_email:
                 targets_by_email[email] = {}
             targets_by_email[email][metric] = value
+        if t.get("entity_name") and email not in rep_target_names:
+            rep_target_names[email] = t["entity_name"]
 
     logger.info(f"[REP_TARGETS] targets_by_email after filter: {len(targets_by_email)} entries")
     if targets_by_email:
@@ -3841,9 +3850,21 @@ async def query_rep_attainment(params: dict, sb) -> dict:
         deals_won = len([d for d in incremental_won_rows
                         if d.get("owner_email") == email])
 
+        # Display-name fallback (2026-10-06): persona_map.get(email) was
+        # the only source — None whenever this email has no user_personas
+        # row, which synthesis then had to improvise from the raw email
+        # (the marsh@/kris@ incident). Falls back to this period's own
+        # rep_targets.entity_name (rep_target_names, built above from the
+        # SAME rows this handler already fetched for quota — no new
+        # join), then to the email's local-part as a last resort so a
+        # real name only ever goes missing if both sources are empty.
+        display_name = (persona_map.get(email)
+                         or rep_target_names.get(email)
+                         or (email.split('@')[0] if email else None))
+
         reps.append({
             "owner_email": email,
-            "name": persona_map.get(email),
+            "name": display_name,
             "quota": quota,
             "stretch": stretch,
             "combined_target": combined,
