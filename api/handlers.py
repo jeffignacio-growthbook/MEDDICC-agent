@@ -5998,6 +5998,10 @@ async def query_pipeline_movement(params: dict, sb) -> dict:
     Pipeline movement / composition / deal-level changes / coverage curve,
     read from deals_snapshot.
 
+    deals_snapshot is written by a WEEKLY ETL — this handler's view of a
+    deal's close_date, stage, or any other field can lag the live `deals`
+    table by up to a week until the next snapshot run.
+
     Movement view now includes dollar fields (added_arr_total, exited_arr_total,
     net_arr_change) computed from deals table using canonical incremental_arr().
     This provides defense in depth with the general semantic gap detector.
