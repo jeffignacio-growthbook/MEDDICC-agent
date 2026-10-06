@@ -52,6 +52,61 @@ def detect_correction(user_message: str) -> bool:
     return bool(CORRECTION_REGEX.search(user_message))
 
 
+# 2026-10-06 incident (thread 1791259518.438989): "What weighted rates did
+# you use for each stage? or did you use forecast category weights?" tripped
+# CORRECTION_PATTERNS' `(?:use|uses|should use|value on)\s+\w+` entry on the
+# substring "use forecast" — a METHOD question, not a correction. detect_correction
+# is a bare regex .search() over the raw message with no notion of sentence
+# structure, so any matching substring anywhere fires it, question or
+# statement alike.
+#
+# is_method_question() is a guard layered in FRONT of detect_correction at
+# its call site (api/router.py's stage "-2" block) — it does NOT change
+# CORRECTION_PATTERNS itself (that regex legitimately catches real
+# corrections like "targets use HubSpot's email convention"). A message that
+# is method-shaped is NEVER a correction, regardless of whether a prior
+# answer exists in history — this is unconditional.
+_METHOD_LEADING_WORDS = ("what", "how", "why", "which")
+_METHOD_LEADING_CONJUNCTIONS = ("or ", "and ")
+_DID_YOU_RE = re.compile(r"\bdid you\b", re.IGNORECASE)
+
+
+def is_method_question(question: str) -> bool:
+    """
+    True when `question` is shaped like a question about METHOD or
+    computation ("what rates did you use", "how did you compute that",
+    "or did you use forecast category weights?") rather than a correction
+    ("that's wrong", "X should be Y").
+
+    Splits the message into clauses on sentence-ending punctuation (./?/!).
+    Any clause — after stripping a leading conjunction ("or "/"and ") —
+    that starts with what/how/why/which counts as a method question. So
+    does the whole-phrase "did you" appearing anywhere in the message
+    (word-boundary, case-insensitive), independent of clause position —
+    this covers trailing clauses like "...or did you use forecast category
+    weights?" where "did you" isn't the clause's very first word.
+    """
+    if not question:
+        return False
+
+    if _DID_YOU_RE.search(question):
+        return True
+
+    for clause in re.split(r"[.?!]", question):
+        clause = clause.strip()
+        if not clause:
+            continue
+        clause_lower = clause.lower()
+        for conj in _METHOD_LEADING_CONJUNCTIONS:
+            if clause_lower.startswith(conj):
+                clause_lower = clause_lower[len(conj):].strip()
+                break
+        if clause_lower.startswith(_METHOD_LEADING_WORDS):
+            return True
+
+    return False
+
+
 def ask_correction_scope(user_message: str) -> str:
     """
     Generate prompt asking if correction is general or specific.
