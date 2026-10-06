@@ -709,6 +709,21 @@ quota_roles:
     metric: incremental_arr  # new_arr + expansion_arr — SAME metric as ae, different book of business
     team_name: AM Team
 
+# Per-rep "on track to hit quota" tiers (api/handlers.py::query_rep_attainment).
+# projected = won_arr + weighted_open_pipeline (weighted-only; unweighted
+# pipeline, where a deal's stage has no gated win rate, is deliberately
+# excluded from projected — same discipline as
+# scripts/pipeline_coverage.py::assess_pipeline_coverage()'s own
+# weighted_value/unweighted_value split).
+#   projected / quota >= on_track_ratio     -> "on_track"
+#   within_reach_ratio <= ratio < on_track_ratio -> "within_reach"
+#   ratio < within_reach_ratio               -> "behind"
+# A config edit here changes tier behavior with no code change — never
+# hardcode these ratios in query_rep_attainment.
+attainment_tiers:
+  on_track_ratio: 1.00
+  within_reach_ratio: 0.75
+
 cro_agent:
   default_time_window: current_quarter
   # Options: 'current_quarter' | 'current_week' | 'last_30_days'

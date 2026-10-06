@@ -3613,7 +3613,53 @@ async def query_rep_attainment(params: dict, sb) -> dict:
       user_personas row for this period, is NEVER dropped from the team
       total. It is aggregated into a single extra "no quota assigned" row
       in reps[] (owner_email=None, unattributed=True) so it stays visible
-      without being misread as a named rep's own result.
+      without being misread as a named rep's own result. Same row now also
+      absorbs roster-gap OPEN pipeline (see ON-TRACK TIERS below).
+
+    ON-TRACK TIERS (added 2026-10-06, config/client.yaml:attainment_tiers):
+    - Each reps[] entry adds:
+        weighted_pipeline      — this rep's qualifying OPEN deals (same
+          population assess_pipeline_coverage() builds: active,
+          is_incremental_pipeline()-qualifying, Sales-pipeline-only,
+          close_date in this quarter, stage in the qualifying set),
+          weighted by forecast_analyses.query_stage_close_rate()'s
+          team-pooled per-stage win rate. NEVER a per-rep win rate —
+          rates are team-pooled by design (per-rep-per-stage evidence is
+          too thin to gate reliably). AE and AM reps get the IDENTICAL
+          computation, no special-casing (config/targets.yaml: both roles
+          share the same incremental_arr metric).
+        unweighted_pipeline / unweighted_pipeline_deal_count — qualifying
+          open deals whose stage has no gated win rate (win_rate is None,
+          below min_evidence_count). Excluded from weighted_pipeline/
+          projected, tracked here — NEVER defaulted to a 1.0 or 0 rate.
+        projected             — won_arr + weighted_pipeline. The
+          WEIGHTED-ONLY portion; unweighted_pipeline is deliberately
+          excluded.
+        tier                  — "on_track" | "within_reach" | "behind",
+          from projected/quota against config/client.yaml's
+          attainment_tiers.{on_track_ratio,within_reach_ratio}. None (with
+          data_gap=True) for a rep with no quota this period — never a
+          fabricated tier.
+        on_track              — bool, True only when tier=="on_track"
+          (None for a data-gap rep). A separate field from tier, not a
+          replacement for it.
+        quota_met             — bool, won_arr >= quota: closed business
+          ALONE already hits quota, independent of pipeline/tier. A
+          distinct, simpler signal than tier — don't conflate them.
+        no_wins_yet           — bool, won_arr == 0: a disclosure flag (NOT
+          a tier) meaning this rep's whole projection currently rests on
+          pipeline. Never downgrades tier/on_track and must never be
+          reported as if it were a 4th tier value.
+        open_renewal_expansion — this rep's sum of incremental_arr() over
+          RENEWAL-pipeline open deals that still carry real expansion ARR.
+          UNWEIGHTED (query_stage_close_rate() is Sales-pipeline,
+          New+Expansion-only — no stage win-rate applies to renewals) and
+          reported as supplementary AM/renewal-book color, separate from
+          weighted_pipeline/projected/tier.
+    - team_summary adds weighted_pipeline (sum of reps[].weighted_pipeline
+      + the off-roster bucket folded into the "No quota assigned" row),
+      unweighted_pipeline/unweighted_pipeline_deal_count, and
+      reps_on_track/reps_within_reach/reps_behind tier counts.
     """
     # A rep name resolves to owner_email; None means "all reps" (valid here).
     owner_email, _rep_note = _resolve_owner_email(params, sb)
@@ -3772,6 +3818,112 @@ async def query_rep_attainment(params: dict, sb) -> dict:
 
     known_roster_emails = set(targets_by_email.keys()) | non_quota_roles | set(persona_map.keys())
 
+    # --- Per-rep weighted open pipeline (on-track tiers) ----------------
+    # Reuses the SAME qualifying population and weighting
+    # scripts/pipeline_coverage.py::assess_pipeline_coverage() builds for
+    # the team-wide weighted pipeline figure — active, is_incremental_
+    # pipeline()-qualifying, Sales-pipeline-only, close_date in this
+    # quarter, stage in discovery_or_later_stages() — weighted by
+    # forecast_analyses.query_stage_close_rate()'s team-pooled,
+    # min_evidence_count-gated win rate per stage_order. NEVER a per-rep
+    # win rate: per-rep-per-stage evidence is too thin to gate reliably,
+    # so every rep (AE or AM alike) is weighted by the identical
+    # team-pooled table — no separate AM rate table, no separate AM
+    # formula (config/targets.yaml: "Both roles are measured on the SAME
+    # metric... role labels whose book of business a rep's number comes
+    # from, not a different metric").
+    from forecast_analyses import query_stage_close_rate
+    from loss_concentration import SALES_PIPELINE, discovery_or_later_stages
+    from utils import get_pipeline_config
+    from field_semantics import _RENEWAL_PIPELINE_ID
+
+    pipeline_config = get_pipeline_config()
+    qualifying_stage_ids = set(discovery_or_later_stages(pipeline_config))
+    stage_order_of = {str(s["id"]): s.get("order")
+                      for p in pipeline_config.get("pipelines", [])
+                      if str(p.get("id")) == SALES_PIPELINE for s in p.get("stages", [])}
+    stage_rates = query_stage_close_rate(sb)
+    by_stage_order = stage_rates.get("by_stage_order", {})
+
+    open_filters = [
+        ("eq", "deal_status", "active"),
+        ("gte", "close_date", tw["start"]),
+        ("lte", "close_date", tw["end"]),
+    ]
+    open_rows = select_all(sb, "deals",
+        columns="deal_id,owner_email,pipeline_id,stage,expansion_arr,new_arr,close_date,deal_status",
+        filters=open_filters)
+
+    weighted_pipeline_by_email = {}
+    unweighted_pipeline_by_email = {}
+    unweighted_pipeline_n_by_email = {}
+    renewal_expansion_by_email = {}
+    off_roster_weighted = 0.0
+    off_roster_unweighted = 0.0
+    off_roster_unweighted_n = 0
+
+    for deal in open_rows:
+        pipeline_id = str(deal.get("pipeline_id"))
+        owner = deal.get("owner_email")
+        attributed_owner = owner if (owner and owner in known_roster_emails) else None
+
+        if pipeline_id == SALES_PIPELINE:
+            # Same qualifying test as assess_pipeline_coverage: incremental
+            # ARR > 0 AND current stage in discovery_or_later_stages.
+            if not is_incremental_pipeline(deal):
+                continue
+            if str(deal.get("stage")) not in qualifying_stage_ids:
+                continue
+            so = stage_order_of.get(str(deal.get("stage")))
+            if so is None:
+                continue
+            deal_value = incremental_arr(deal)
+            stage_row = by_stage_order.get(str(so)) or by_stage_order.get(so)
+            win_rate = stage_row.get("win_rate") if stage_row else None
+            if win_rate is None:
+                # Stage has no gated win rate (below min_evidence_count) —
+                # excluded from the weighted sum, tracked separately. NEVER
+                # defaulted to 1.0 or 0 — see
+                # tests/test_rep_attainment_pipeline_tiers.py's planted-bug
+                # control.
+                if attributed_owner:
+                    unweighted_pipeline_by_email[attributed_owner] = (
+                        unweighted_pipeline_by_email.get(attributed_owner, 0.0) + deal_value)
+                    unweighted_pipeline_n_by_email[attributed_owner] = (
+                        unweighted_pipeline_n_by_email.get(attributed_owner, 0) + 1)
+                else:
+                    off_roster_unweighted += deal_value
+                    off_roster_unweighted_n += 1
+            else:
+                weighted_value = deal_value * win_rate
+                if attributed_owner:
+                    weighted_pipeline_by_email[attributed_owner] = (
+                        weighted_pipeline_by_email.get(attributed_owner, 0.0) + weighted_value)
+                else:
+                    off_roster_weighted += weighted_value
+        elif pipeline_id == _RENEWAL_PIPELINE_ID:
+            # Renewal-pipeline open deals that still carry real expansion/
+            # new ARR (is_incremental_pipeline True) — a renewal deal with
+            # real expansion ARR, not a pure renewal. UNWEIGHTED: no stage
+            # win-rate applies here — query_stage_close_rate() is
+            # explicitly Sales-pipeline, New+Expansion-only. Reported as
+            # supplementary color (open_renewal_expansion), never folded
+            # into weighted_pipeline/projected/tier.
+            if not is_incremental_pipeline(deal):
+                continue
+            if attributed_owner:
+                renewal_expansion_by_email[attributed_owner] = (
+                    renewal_expansion_by_email.get(attributed_owner, 0.0) + incremental_arr(deal))
+            # Off-roster renewal-expansion deals are not tracked in a
+            # dedicated bucket: this field is supplementary color on a
+            # named rep's book, not part of any team-level reconciled
+            # total (unlike weighted_pipeline, which off-roster deals DO
+            # feed into — see team_summary.weighted_pipeline below).
+
+    tiers_cfg = config.get("attainment_tiers") or {}
+    on_track_ratio = tiers_cfg.get("on_track_ratio", 1.00)
+    within_reach_ratio = tiers_cfg.get("within_reach_ratio", 0.75)
+
     # Group won deals by owner. A deal with no owner_email, or whose
     # owner_email isn't in known_roster_emails, is a roster gap — never
     # dropped. It is counted in closed_won_qtd (computed above from the
@@ -3818,6 +3970,9 @@ async def query_rep_attainment(params: dict, sb) -> dict:
         # A specific-rep query never shows the team-wide unattributed line.
         unattributed_total = 0.0
         unattributed_n = 0
+        off_roster_weighted = 0.0
+        off_roster_unweighted = 0.0
+        off_roster_unweighted_n = 0
 
     # Build rep attainment list
     reps = []
@@ -3827,6 +3982,12 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     total_combined = 0
     reps_above_50 = 0
     reps_above_100 = 0
+    total_weighted_pipeline = 0.0
+    total_unweighted_pipeline = 0.0
+    total_unweighted_pipeline_deal_count = 0
+    reps_on_track = 0
+    reps_within_reach = 0
+    reps_behind = 0
 
     for email in all_rep_emails:
         target_dict = targets_by_email.get(email, {})
@@ -3862,6 +4023,44 @@ async def query_rep_attainment(params: dict, sb) -> dict:
                          or rep_target_names.get(email)
                          or (email.split('@')[0] if email else None))
 
+        # Per-rep weighted open pipeline / on-track tier (see the
+        # weighted_pipeline_by_email build above, same population and
+        # weights assess_pipeline_coverage() uses team-wide).
+        weighted_pipeline = weighted_pipeline_by_email.get(email, 0.0)
+        unweighted_pipeline = unweighted_pipeline_by_email.get(email, 0.0)
+        unweighted_pipeline_deal_count = unweighted_pipeline_n_by_email.get(email, 0)
+        open_renewal_expansion = renewal_expansion_by_email.get(email, 0.0)
+        # projected is the WEIGHTED-only portion: won_arr + weighted_pipeline.
+        # unweighted_pipeline (no gated stage rate) is deliberately excluded,
+        # same as the team-level figure excludes it from weighted_value.
+        projected = won + weighted_pipeline
+
+        if quota:
+            tier_ratio = projected / quota
+            if tier_ratio >= on_track_ratio:
+                tier = "on_track"
+            elif tier_ratio >= within_reach_ratio:
+                tier = "within_reach"
+            else:
+                tier = "behind"
+            on_track = (tier == "on_track")
+            quota_met = won >= quota
+            if tier == "on_track":
+                reps_on_track += 1
+            elif tier == "within_reach":
+                reps_within_reach += 1
+            else:
+                reps_behind += 1
+        else:
+            # Data-gap rep (no quota this period) — never fabricate a tier.
+            tier = None
+            on_track = None
+            quota_met = None
+
+        # Disclosure flag, NOT a tier: "this rep's whole projection rests on
+        # pipeline, nothing closed yet". Never downgrades tier/on_track.
+        no_wins_yet = (won == 0)
+
         reps.append({
             "owner_email": email,
             "name": display_name,
@@ -3874,6 +4073,15 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             "combined_attainment": attainment,
             "attainment_pct": attainment_pct,  # Combined for sorting/filtering
             "deals_won": deals_won,
+            "weighted_pipeline": weighted_pipeline,
+            "unweighted_pipeline": unweighted_pipeline,
+            "unweighted_pipeline_deal_count": unweighted_pipeline_deal_count,
+            "open_renewal_expansion": open_renewal_expansion,
+            "projected": projected,
+            "tier": tier,
+            "on_track": on_track,
+            "quota_met": quota_met,
+            "no_wins_yet": no_wins_yet,
             "data_gap": combined is None
         })
 
@@ -3884,6 +4092,9 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             total_stretch += stretch
         if combined:
             total_combined += combined
+        total_weighted_pipeline += weighted_pipeline
+        total_unweighted_pipeline += unweighted_pipeline
+        total_unweighted_pipeline_deal_count += unweighted_pipeline_deal_count
 
         if attainment_pct and attainment_pct >= 50:
             reps_above_50 += 1
@@ -3894,7 +4105,13 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     # the quota roster) get one aggregate line here — counted in
     # total_won/closed_won_qtd like any other win, never silently dropped,
     # never crashing the handler, and never misattributed to a named rep.
-    if unattributed_n > 0:
+    # Same pattern now covers roster-gap OPEN pipeline (owner_email not on
+    # the quota roster): its weighted/unweighted value feeds
+    # team_summary.weighted_pipeline (so the team total still reconciles to
+    # the qualified-deal population) without being misattributed to a named
+    # rep — folded into this SAME "No quota assigned" line rather than a
+    # separate bucket.
+    if unattributed_n > 0 or off_roster_weighted or off_roster_unweighted:
         reps.append({
             "owner_email": None,
             "name": "No quota assigned",
@@ -3907,10 +4124,22 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             "combined_attainment": {"value": None, "data_gap": True},
             "attainment_pct": None,
             "deals_won": unattributed_n,
+            "weighted_pipeline": off_roster_weighted,
+            "unweighted_pipeline": off_roster_unweighted,
+            "unweighted_pipeline_deal_count": off_roster_unweighted_n,
+            "open_renewal_expansion": 0.0,
+            "projected": None,
+            "tier": None,
+            "on_track": None,
+            "quota_met": None,
+            "no_wins_yet": unattributed_total == 0,
             "data_gap": True,
             "unattributed": True,
         })
         total_won += unattributed_total
+        total_weighted_pipeline += off_roster_weighted
+        total_unweighted_pipeline += off_roster_unweighted
+        total_unweighted_pipeline_deal_count += off_roster_unweighted_n
 
     # Sort by attainment ascending (lowest first)
     reps.sort(key=lambda x: (x["attainment_pct"] is None, x["attainment_pct"] or 0))
@@ -3971,7 +4200,25 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             "stretch_attainment": team_stretch_attainment,
             "combined_attainment": team_combined_attainment,
             "reps_above_50pct": reps_above_50,
-            "reps_above_100pct": reps_above_100
+            "reps_above_100pct": reps_above_100,
+            # Weighted open pipeline, same population/weights as
+            # assess_pipeline_coverage()'s team-wide weighted_value:
+            # sum(reps[].weighted_pipeline) + the off-roster bucket folded
+            # into the "No quota assigned" reps[] row above — a partition
+            # of the SAME qualified-deal population, not a parallel
+            # reimplementation (see
+            # tests/test_rep_attainment_pipeline_tiers.py's reconciliation
+            # test, which also cross-checks this against
+            # assess_pipeline_coverage() directly on the same fixture).
+            "weighted_pipeline": total_weighted_pipeline,
+            # Deals whose stage has no gated win rate (min_evidence_count) —
+            # excluded from weighted_pipeline/projected, tracked here so
+            # they're never silently dropped.
+            "unweighted_pipeline": total_unweighted_pipeline,
+            "unweighted_pipeline_deal_count": total_unweighted_pipeline_deal_count,
+            "reps_on_track": reps_on_track,
+            "reps_within_reach": reps_within_reach,
+            "reps_behind": reps_behind,
         },
         # Reaches synthesis (api/router.py's build_synthesis_prompt/_VOICE_BASE
         # ALWAYS follows a "_synthesis_note" field when present, unlike the
@@ -3984,7 +4231,13 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             "yourself to get a team total; reps[] may include a "
             "\"No quota assigned\" aggregate row (see "
             "team_summary.unassigned_deals_won), and summing it yourself "
-            "risks double-counting or arithmetic drift from the real total."
+            "risks double-counting or arithmetic drift from the real total. "
+            "reps[].projected (won_arr + weighted_pipeline) is the "
+            "weighted-only forward-looking figure that reps[].tier is based "
+            "on; reps[].unweighted_pipeline is deliberately excluded from "
+            "it (no gated win rate for that stage) and reps[].no_wins_yet "
+            "is a disclosure flag, not a 4th tier value — never report it "
+            "as a tier."
         ),
     }
     # explain_prior_answer citation support: like query_pipeline_coverage,
