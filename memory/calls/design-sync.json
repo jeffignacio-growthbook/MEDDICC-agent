@@ -1,7 +1,7 @@
 {
-  "company": "Design sync",
+  "company": "Design Sync",
   "slug": "design-sync",
-  "last_etl_date": "2026-09-23T05:23:43.194695",
+  "last_etl_date": "2026-10-07T06:41:13.107397",
   "calls": [
     {
       "id": "01KZVCR674TK3ARKVTWS0G38BP",
@@ -49,6 +49,17 @@
       "summary": "# Design sync\nDate: 2026-09-22 | Duration: 33m\n\n## Summary\nWork on the experiment is nearing approval, with final analysis-plan tweaks, benchmark review, QA scheduling, power-analysis review, code reviews, and testing underway. A diagnostics prototype is being refined before broader review. Data-source onboarding should make the sample CTA and Connect warehouse option more prominent, while draft setup states and BigQuery OAuth could reduce credential friction. Managed Warehouse is favored for new organizations, with bring-your-own warehouse retained as a secondary option. A guided checklist may cover data sources, event destinations, and exposure assignment queries. Diagnostics planning focuses on aggregate evaluation trends, a debugging stream, clearer communication about query-refresh costs, filter behavior, cached results, user context, rule links, and future rule-traffic visibility. Populations work will begin with product analytics prototypes, followed by design and engineering review. Johnny also created a NITS document and encouraged cautious quick-fix pull requests.\n\n## Keywords\nFeature flags, Diagnostics, Managed warehouse, Data-source onboarding, Experiment analytics, Populations\n\n## Action Items\n**Gabe Melean**\nReview analysis benchmark (03:44)\nShare feature-flag prototype (03:44)\nSchedule QA catch-up (03:44)\nConduct design review (30:21)\n\n**Unassigned**\nShare populations prototype (30:45)\nOpen quick pull requests (32:21)\n\n**Johnny Martinez**\nRefine data-source onboarding (16:16)\nShare NITS document (31:53)",
       "organizer": "johnny@growthbook.io",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M49CV27SNY78HA16W0A5MEZD",
+      "source": "fireflies",
+      "title": "Design Sync",
+      "date": "2026-10-06",
+      "duration_minutes": 34,
+      "summary": "# Design Sync\nDate: 2026-10-06 | Duration: 34m\n\n## Summary\nThe discussion aligned multi-step modal patterns around placing Back on the lower left, keeping the next or final action on the right, and treating Delete as separate from standard modal footer actions. Two-step flows would omit steppers, while modal sizing, header actions, and existing patterns need broader review. Nobu presented first-pass design-principles documentation focused on efficient space usage and avoiding redundant explanations; Adriel supported the concept but requested lightweight, higher-level guidance with clearer rationale and separate consideration of moving automation rules to GitHub. A QA override proposal would support targeted development, staging, or shared-environment testing, regenerate payloads around cached production data, expose active overrides, and exclude production SDK keys, but remains exploratory. Settings prototypes improved discoverability through search and sidebar context, with unified navigation favored while the final navigation model remains open.\n\n## Keywords\nMulti-step modals, Design principles, Design system, QA overrides, SDK connections, Settings navigation\n\n## Action Items\n**Gabe Melean**\n- Ping Adriel Vieira (02:39)\n- Revisit side-nav collapse (32:58)\n\n**Johnny Martinez**\n- Add modal size variants (11:22)\n- Share settings prototype (28:32)\n\n**Adriel Vieira**\n- Move design review rules (20:40)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]

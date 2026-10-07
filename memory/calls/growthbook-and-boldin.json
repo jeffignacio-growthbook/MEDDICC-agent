@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook and Boldin",
+  "slug": "growthbook-and-boldin",
+  "last_etl_date": "2026-10-07T06:41:13.113724",
+  "calls": [
+    {
+      "id": "6ac5376459bf1b000c97e1ee",
+      "source": "apollo",
+      "title": "GrowthBook and Boldin Reconnect ",
+      "date": "2026-10-06",
+      "duration_minutes": 0,
+      "summary": "[Scott Keller]: Foreign.\n[Victor Mattos]: Scott, how are we doing?\n[Scott Keller]: It's going good. How are you doing? Good.\n[Victor Mattos]: End of the quarter so a lot of stuff happening.\n[Scott Keller]: Yeah, that's right. Are you guys still doing any work inside of growth book or have you been heads down on other things\n[Victor Mattos]: can tell about Jason and Amanda? I believe they are more on this book. We mostly serve data to it so that they can have. They can.",
+      "host": "Scott Keller",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

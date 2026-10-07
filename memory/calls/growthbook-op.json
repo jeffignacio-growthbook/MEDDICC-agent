@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook + Op",
   "slug": "growthbook-op",
-  "last_etl_date": "2026-09-09T06:13:44.375026",
+  "last_etl_date": "2026-10-07T06:41:13.109621",
   "calls": [
     {
       "id": "01KT7DMS83RXCGY1RPYJB8XGY3",
@@ -62,6 +62,17 @@
       "date": "2026-09-08",
       "duration_minutes": 31,
       "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-09-08 | Duration: 31m\n\n## Summary\nThe discussion reviewed sales forecasting dashboards, including closed deals, pipeline, renewal ARR, expansion ARR, billable amounts, AE-level forecasts, deal stages, and Jeff’s weekly commentary on momentum and risks. The team identified a major gap in automated activity tracking because calls and emails are not rigorously captured in HubSpot; connecting calendars and inboxes could support real-time reporting, coaching, and accountability. They discussed replacing basic lifecycle stages with more granular automated stages such as discovery, technical evaluation, negotiation, and closing, while aligning definitions with longer sales processes and POCs. Ownership cleanup was established as the top priority before activating lead scoring or expanding automation. Lead scoring is nearly complete and uses behavioral and firmographic data, but requires agreed SLAs and MQL-handling processes. The team also reviewed lead routing, workflow consolidation, sales-process standardization, and testing 30-day opt-out contracts as an alternative to POCs, which Ryan reported had achieved 100% early success.\n\n## Keywords\nHubSpot, sales forecasting, lead scoring, ownership cleanup, lifecycle stages, sales activity tracking\n\n## Action Items\n\n**Shawn Green**\nMessage Ryan McGurk on Slack and schedule an hour-long session later this week to review lead scoring details and workflows (30:20)\n\n**Shawn Green and Lyndsie Berens**\nContinue cleaning up ownership assignment and contact routing, especially for new integrations coming into HubSpot (25:46)\n\n**Ryan McGurk**\nCollaborate in the upcoming session on lead scoring and lifecycle stage definitions; provide sales input and approval on lead routing and ownership workflows (29:30)\n\n**Chris Newton**\nEnsure lead routing data and workflows remain up to date, confirming use of custom versus native HubSpot routing (30:33)\n\n**Unassigned**\nAll participants to review audit slides and lifecycle stage definitions shared before follow-up meetings (15:47)\n",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4442PY6QR7AJWNM7VZQ5ENF",
+      "source": "fireflies",
+      "title": "GrowthBook + Op Methods Weekly Check-In",
+      "date": "2026-10-06",
+      "duration_minutes": 31,
+      "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-10-06 | Duration: 31m\n\n## Summary\nThe discussion prioritized accurate licensing data before activating Customer IO synchronization and lead-routing automation, with Customer IO workflow alignment still pending. Michael Nolan is remapping Orders fields for the license-object migration, after which Shawn will test sample pushes; Growth Book Org ID should associate licenses with the correct HubSpot companies and reduce duplicates. The license hierarchy will prioritize active Enterprise over Pro over Starter. Lead scoring combines firmographic and behavioral signals, with accounts above 100 points in the top fit tier; A-tier contacts are expected to route to AEs and B-tier contacts to Jake, although final assignment rules remain open. Scoring will be evaluated over roughly one month. Renewal workflows depend on co-terming, renewal-date, ARR, and contract-field decisions. Expansion campaigns need suppression rules for actively pursued Pro customers. Email governance will consider recent-email delays and global frequency limits to prevent double-sends.\n\n## Keywords\nCustomer.io, HubSpot, licensing data, lead scoring, lifecycle stages, renewal workflows\n\n## Action Items\n**Ryan McGurk**\nReview lifecycle-stage definitions (00:40)\nConfirm upgrade-account process (23:25)\n\n**Lyndsie Berens**\nMeet Chris about workflows (01:48)\nPrepare Customer.io lists (02:29)\nReview lead-source automation (15:41)\n\n**Michael Nolan**\nUpdate license-sync mapping (03:26)\n\n**Shawn Green**\nTest license-data pushes (06:54)\nVerify email-frequency settings (30:02)\nFollow up on license testing (30:41)\n\n**Jeff Ignacio**\nCreate renewal records (18:21)\nModel renewal ARR fields (21:41)\nBuild sales suppression list (23:25)",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 7,
       "summary_quality": "good"

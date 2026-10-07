@@ -1,0 +1,18 @@
+{
+  "company": "Surround Sound News",
+  "slug": "surround-sound-news",
+  "last_etl_date": "2026-10-07T06:41:13.109874",
+  "calls": [
+    {
+      "id": "01M3WKV7B449YDZC9C0HVNBHCM",
+      "source": "fireflies",
+      "title": "Surround Sound News + GrowthBook",
+      "date": "2026-10-06",
+      "duration_minutes": 35.61000061035156,
+      "summary": "# Surround Sound News + GrowthBook\nDate: 2026-10-06 | Duration: 35.61000061035156m\n\n## Summary\nSurround Sound Media is building hyper-local digital newspapers through about 160 outlets, combining AI automation with human editors who personalize coverage of politicians, sports, schools, and community events. Its technology automates repetitive work such as scraping council meetings and drafting articles, allowing editors to focus on editorial decisions while the company scales toward thousands of outlets. After an initial growth phase, the company is exploring A/B testing for distribution, themes, content types, and AI-generated outputs. GrowthBook presented its open-source, warehouse-native experimentation platform, which supports PostgreSQL and other warehouses, customer-controlled user attributes, configurable data refreshes, advanced statistical methods, holdouts, bandits, and analysis across multiple outlets. GrowthBook also supports backend testing for AI prompts and models, although Prabhag specifically requested prompt management without code changes, which Christian agreed to investigate. The companies plan a detailed demo covering integration, production readiness, prompt testing, and workflow gaps while comparing GrowthBook with LaunchDarkly.\n\n## Keywords\nlocal news, AI automation, AB testing, warehouse-native, feature flags, experimentation platform\n\n## Action Items\n\n**Purvag Patel**\nProvide Christian Liebenow with availability via booking link for a deeper demo next week (34:05)\n\n**Christian Liebenow**\nFollow up via email regarding GrowthBook’s capabilities for managing and AB testing AI prompts outside code (31:40)\nSchedule and conduct a 45-minute deep demo including production readiness and feature discussions, involving engineers as needed (33:15)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

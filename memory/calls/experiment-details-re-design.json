@@ -1,0 +1,18 @@
+{
+  "company": "Experiment Details Re-design",
+  "slug": "experiment-details-re-design",
+  "last_etl_date": "2026-10-07T06:41:13.108930",
+  "calls": [
+    {
+      "id": "01M46JVYF0W359FGDVXPXSYKD9",
+      "source": "fireflies",
+      "title": "Experiment Details Re-design Sync",
+      "date": "2026-10-06",
+      "duration_minutes": 44.40999984741211,
+      "summary": "# Experiment Details Re-design Sync\nDate: 2026-10-06 | Duration: 44.40999984741211m\n\n## Summary\nThe discussion covered an experiment redesign focused on simplifying configuration and preserving efficient workflows. The to-do list would move into a collapsible section with completion checkboxes and separate automatic and manual checks. Inline edits would be staged as drafts before publishing, with merge-conflict control during saving. Data sources would remain a tertiary element and appear conditionally when multiple sources exist, while selection could be locked to prevent invalid metric choices. Scheduling would be grouped with timing settings, including ramp-ups, and approval would be required before starting or deferring an experiment. New experiments would begin as drafts without a separate publish step, while duplicate drafts would generally be rejected. For the UI, vertical stacks were preferred for more than three variations, power-user inline editing would be retained, and metrics, overrides, filtering, and advanced settings would be grouped separately. Drafts should clarify configuration state, change requests should be separate objects for new and running experiments, and a separate discussion was needed for approvals and revisions.\n\n## Keywords\napprovals, redesign, draft management, scheduling, data source, variation layout\n\n## Action Items\n**Bryce Fitzsimons**  \nAdvise on merge conflict strategies (09:24)  \n\n**Gabe Melean**  \nReconsider grouping of metric settings (26:12)  \nExplore stacked vertical layout prototype (30:50)  \nAdjust draft and revision flow UI (43:00)  \nSchedule meeting on approval flow (43:27)  \n\n**Luke Sonnet**  \nProvide feedback on data source UI (28:00)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

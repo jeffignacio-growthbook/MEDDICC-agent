@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Cendana",
+  "slug": "growthbook-cendana",
+  "last_etl_date": "2026-10-07T06:41:13.106248",
+  "calls": [
+    {
+      "id": "01M47VJRPK7BZAG23YFK3YTNXP",
+      "source": "fireflies",
+      "title": "Growthbook <> Cendana Capital",
+      "date": "2026-10-06",
+      "duration_minutes": 5.650000095367432,
+      "summary": "# Growthbook <> Cendana Capital\nDate: 2026-10-06 | Duration: 5.650000095367432m\n\n## Summary\nNo summary available",
+      "organizer": "graham@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

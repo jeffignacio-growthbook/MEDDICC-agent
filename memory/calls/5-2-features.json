@@ -1,0 +1,18 @@
+{
+  "company": "5.2 features &",
+  "slug": "5-2-features",
+  "last_etl_date": "2026-10-07T06:41:13.109174",
+  "calls": [
+    {
+      "id": "01M46PWQWZPGC88834G94B2F2X",
+      "source": "fireflies",
+      "title": "5.2 features & release planning",
+      "date": "2026-10-06",
+      "duration_minutes": 31,
+      "summary": "# 5.2 features & release planning\nDate: 2026-10-06 | Duration: 31m\n\n## Summary\nRelease 5.2 is an incremental update focused on improving UX and reducing user and agent pain points across major product surfaces. It introduces managed flags or experiment values for simpler experiment setup, saved groups for targeting large cohorts through CSV uploads or marketing-tool APIs, and beta interleaving experiments to accelerate ranking tests, driven by TaskRabbit’s needs. Metrics expand from seven to twelve types, including threshold and active-days metrics, while warehouse cost optimization helps users identify data expenses within the product. Agent API keys support secure enterprise workflows, including Dropbox’s custom MCP server integration, with audit logs and clear UI labeling for agent-triggered actions. Launch is targeted for late October or early November; multi data source experiments and real-time tabs are deprioritized, and the next major release is expected in early January. Messaging will emphasize simplicity, steady innovation, and interleaving experiments, while LLM trace capabilities receive limited attention until further developed.\n\n## Keywords\nexperimentation, feature flags, UX improvements, interleaving experiments, saved groups, metrics redesign\n\n## Action Items\n\n**Jeremy Dorn**\nProvide ongoing updates as plans progress for 5.2 features and timelines (21:13)\nDeprioritize multi data source experiments, real-time tab, and block storage work in Q4 roadmap to focus on core deliverables (20:01)\n\n**Scott Bailey and Elyse Fox**\nDraft and outline release messaging and communications for the 5.2 release, then loop in Jeremy for feedback (21:13)\n\n**Scott Bailey**\nPrepare minor mention content about the LLM trace feature in the release due to limited vendor support currently (17:41)\n\n**Elyse Fox, Jeremy Dorn, Scott Bailey**\nStart tentative planning toward early November launch of 5.2 release, adjusting from original end of October target (18:25)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

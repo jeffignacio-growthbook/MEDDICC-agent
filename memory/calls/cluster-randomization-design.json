@@ -1,0 +1,18 @@
+{
+  "company": "Cluster randomization design",
+  "slug": "cluster-randomization-design",
+  "last_etl_date": "2026-10-07T06:41:13.107046",
+  "calls": [
+    {
+      "id": "01M3T1F861SY1KJ97YDN9FJRKA",
+      "source": "fireflies",
+      "title": "Cluster randomization design feedback",
+      "date": "2026-10-06",
+      "duration_minutes": 25.020000457763672,
+      "summary": "# Cluster randomization design feedback\nDate: 2026-10-06 | Duration: 25.020000457763672m\n\n## Summary\nCluster randomization will be configured through a toggle under EAQ, with users selecting a subunit identifier. The option should appear only when multiple identifier types are available, while parent-child identifier relationships will not receive a health check initially, requiring user caution. Results should default to user-level metrics, show unit counts such as regions or users in drill-down statistics, and avoid placing the main identifier type prominently on top-level results. Incompatible metrics should be disabled in the selection dropdown with hover explanations, while cluster randomization expands the feasible metric set. Ratio metrics may lack cluster-specific tags, so users should receive setup warnings; a configuration-page callout may explain when metrics are analyzed at different levels. A minimal UI and results integration is preferred. Resources should first target the creation and configuration UI, followed by health checks based on existing patterns. Health tab redesign is not an immediate priority, and Cupid support is not expected to create issues.\n\n## Keywords\ncluster randomization, EAQ configuration, metric representation, subunit identifier, advanced experiment features, experiment result visualization\n\n## Action Items\n**Luke Smith**  \nImplement toggle for cluster experiment mode (05:59)  \n\n**Gabe Melean**  \nAdd metadata for main and subunit counts (14:22)  \nDisable incompatible metrics in dropdown (18:18)  \n\n**Luke Sonnet**  \nCoordinate minimal UI changes for cluster config (21:45)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

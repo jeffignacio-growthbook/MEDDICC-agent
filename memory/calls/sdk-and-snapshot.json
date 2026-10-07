@@ -1,0 +1,18 @@
+{
+  "company": "SDK and Snapshot",
+  "slug": "sdk-and-snapshot",
+  "last_etl_date": "2026-10-07T06:41:13.109274",
+  "calls": [
+    {
+      "id": "01M493JHQ28E6DAB9ZM3PDTECY",
+      "source": "fireflies",
+      "title": "SDK and Snapshot Configuration Alignment",
+      "date": "2026-10-06",
+      "duration_minutes": 16.739999771118164,
+      "summary": "# SDK and Snapshot Configuration Alignment\nDate: 2026-10-06 | Duration: 16.739999771118164m\n\n## Summary\nThe team confirmed a two-config SDK shape supporting up to two algorithms, with ranker parameters sent alongside the interleaving ID and experiment exposure configuration, while exposure targeting remains in the feature-flag payload. Reusing existing feature-flag JSON for ranker settings was discouraged as potentially messy and less reusable; Lillia will discuss implementation with Bryce, whose review is expected before finalization. Structured JSON arrays are required, with documentation, setup guidance, and health queries helping customer data teams identify invalid configurations. Parent and snapshot settings must align before the first version to avoid later migrations. Snapshots represent analysis objects created when interleaving tests are updated and progress through pending, running, and succeeded states, with successful runs populating results. Lillia will create a validator and parent-model precursor PR, while Luke continues query-runner and analysis work using sample data and a test harness. SDK work is prioritized, API CRUD work follows model alignment, and the initial UI will be minimal.\n\n## Keywords\nInterleaved experiments, Ranker configuration, SDK payload, Feature-flag targeting, Interleaving snapshot, Query runner\n\n## Action Items\n**Lillia Jackson**\nPrioritise SDK implementation (09:21)\nCreate validator parent-model PR (13:50)\nNotify Luke of readiness (15:13)\n\n**Luke Sonnet**\nContinue query-runner implementation (11:30)\nAlign interleaving snapshot model (13:50)",
+      "organizer": "luke@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

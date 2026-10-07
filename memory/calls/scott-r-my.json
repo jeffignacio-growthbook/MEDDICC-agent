@@ -1,7 +1,7 @@
 {
   "company": "Scott / Rémy",
   "slug": "scott-r-my",
-  "last_etl_date": "2026-08-08T17:33:40.676133",
+  "last_etl_date": "2026-10-07T06:41:13.113569",
   "calls": [
     {
       "id": "01KZBGW4JFY9F9TBGM33D7VCMF",
@@ -13,7 +13,19 @@
       "organizer": "scott.keller@growthbook.io",
       "participants": 2,
       "keywords": "",
-      "action_items": ""
+      "action_items": "",
+      "summary_quality": "empty"
+    },
+    {
+      "id": "01M48MSDT1TZDPBX5AQYPY1DME",
+      "source": "fireflies",
+      "title": "Scott / Rémy",
+      "date": "2026-10-06",
+      "duration_minutes": 36,
+      "summary": "# Scott / Rémy\nDate: 2026-10-06 | Duration: 36m\n\n## Summary\nThe team planned a tailored Bakra fintech demo covering feature flags, A/B testing, approval workflows, safe rollouts, impact metrics, and funnel insights for KYC and funding steps serving 500,000 monthly active users. Pricing was outlined at $1,200 per user plus a $50,000 platform fee, but user volume, event usage, managed warehouse limits, and deployment details remain open; Bakra lacks its own warehouse and cloud deployment is currently assumed. Initial integration requires a dedicated frontend engineer for approximately one day to implement the SDK and flags. The team also noted limitations including no visual editor in Pro, no mobile visual-editor support, no Microsoft Teams or Slack integrations, and limited enriched user-data export. Rémy Marin will lead an interactive demo under 60 minutes, with Scott Keller adding client context. Echo’s contract remains under review, while delayed Q4 deals—including one worth $200,000—are increasing pipeline pressure.\n\n## Keywords\nfintech, KYC, pricing, feature flags, data warehouse, AB testing\n\n## Action Items\n\n**Scott Keller**\nConfirm number of experiments Bakra intends to run to refine pricing model (09:45)\nClarify with Bakra on data warehouse usage and event volume to finalize costs (06:43)\nSchedule Echo technical meeting with Logan and Julio at 9:30 AM and confirm attendee availability (22:04)\nProvide Rémy with technical information to help prep for Echo demo and respond to outstanding technical questions (20:48)\nDevelop backup sales plan to address potential Q4 shortfalls and replace delayed deals to meet sales targets (33:19)\n\n**Rémy Marin**\nFollow up on feasibility of exporting user ID details behind test results or provide documentation with limitations to Bakra (15:52)\nPrepare for Bakra demo including recap, technical setup explanation, feature flag creation, AB test attachment, safe rollout, and approval workflow demonstration (23:13)\n\n**Rémy Marin and Scott Keller**\nCoordinate demo flow for Bakra to include dashboard insights, funnel metrics, and governance explanation (26:07)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

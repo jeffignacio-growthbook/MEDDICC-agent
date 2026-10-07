@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook + Op Methods",
   "slug": "growthbook-op-methods",
-  "last_etl_date": "2026-09-03T06:04:10.821318",
+  "last_etl_date": "2026-10-07T06:41:13.108743",
   "calls": [
     {
       "id": "01M0AYBFNWDBQ4ZVSMYZKR2W71",
@@ -23,6 +23,17 @@
       "summary": "# GrowthBook + Op Methods: Lead Score Strategy\nDate: 2026-08-25 | Duration: 31m\n\n## Summary\nThe meeting focused on improving the accuracy of the lead scoring model through addressing critical data inconsistencies and implementing data cleanup. The team identified issues with customer tagging and license plans, with Shawn Green and Graham working on reports and retroactive updates respectively. License plan expiration dates and renewal automation also require better validation, as noted by Chris and others. The preferred data source is the Growth Book system due to inaccuracies with Retool. The lead scoring strategy was refined to combine fit and engagement scores, prioritizing high fit/high engagement accounts for sales outreach. Web traffic data integration is vital as 25% of companies lack this data, affecting scoring. Operational coordination and timelines were discussed, emphasizing the importance of communication and ongoing updates.\n\n## Keywords\nLead Scoring, Customer Tagging, License Plan, Data Cleanup, Web Traffic Data, Marketing Nurture\n\n## Action Items\n\n**Ashley Stirrup**\nAsk Graham about the timeline for validation and cleanup of account tagging and license plan data (30:41)\nCoordinate with Clay hire to enhance data enrichment, including creation of a new data field for mobile app traffic (21:01)\n\n**Chris Newton**\nReview lead scoring dashboards and reports once shared by Shawn (18:38)\nAnalyze enterprise customer accounts in B and C tiers to assess scoring accuracy and identify misclassifications (17:39)\nIdentify companies without web traffic data but scoring well on other attributes for targeted enrichment (22:10)\n\n**Lyndsie Berens**\nSend over the list of accounts queued for data enrichment through Clay and review criteria to ensure accuracy before broad enrichment (24:11)\nKeep Shawn updated on Carrie's cleanup progress (29:04)\n\n**Shawn Green**\nShare cleaned and filtered account lists and lead scoring reports with Lyndsie and Chris to facilitate review and follow-up (18:38)\nRaise the B tier threshold from 35 to 50 points in the scoring model and monitor effects on account classification (25:36)\nFollow up with Carrie on cleanup task start and progress, maintaining communication flow to ensure timely completion (28:51)\nContinue refining lead scoring dashboards and run audits to support cleanup and segmentation efforts (06:09)\n\n**Carrie**\nPerform retroactive updates and cleanup in MongoDB/Growth Book for license plans and customer tagging to fix inconsistencies (05:09)\n",
       "organizer": "ashley@growthbook.io",
       "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M46RPQTVRCXR44JEVYR1NGD7",
+      "source": "fireflies",
+      "title": "GrowthBook + Op Methods - Lifecycle Overview",
+      "date": "2026-10-06",
+      "duration_minutes": 31.829999923706055,
+      "summary": "# GrowthBook + Op Methods - Lifecycle Overview\nDate: 2026-10-06 | Duration: 31.829999923706055m\n\n## Summary\nThe discussion established that a company’s lifecycle follows its furthest-progressed contact and that companies remain customers after the initial deal, including future purchases. Measurement will cover the journey from contact creation through deal creation, including marketing warm-up and sales follow-up. An Engaged stage will sit between Lead and MQL, with a 100-point engagement threshold indicating that sales should contact a lead; routing will vary by company fit and engagement. HubSpot will serve as the sales source of truth, with Shawn Green building a dashboard for demo requests, MQLs, assignments, contact details, and unworked records, while Ryan McGurk seeks aggregate account-executive visibility. Discovery will determine whether automatically created opportunities are qualified, disqualified, or recycled. Recycled leads may receive follow-up dates and reminders instead of remaining inactive open deals. Shawn Green will test the HubSpot lead object and demonstrate it to Ryan McGurk. License data testing will support classifying Pro-or-higher licenses as customers, while expired and non-renewed subscriptions may move to churn.\n\n## Keywords\nLifecycle stages, HubSpot Leads, MQL scoring, Sales accepted leads, AE dashboard, Customer churn automation\n\n## Action Items\n**Shawn Green**\nBuild HubSpot dashboard (12:56)\nAdd MQL reporting features (13:54)\nReview HubSpot Leads configuration (27:55)\nDemonstrate lead workflow (28:19)\nTest licence object integration (29:18)\nConfigure lifecycle automation (29:18)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

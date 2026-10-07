@@ -1,0 +1,18 @@
+{
+  "company": "Storio Group POC",
+  "slug": "storio-group-poc",
+  "last_etl_date": "2026-10-07T06:41:13.112915",
+  "calls": [
+    {
+      "id": "01M48R5GW4D3DB2GA5QTHTPMXH",
+      "source": "fireflies",
+      "title": "Storio Group POC",
+      "date": "2026-10-06",
+      "duration_minutes": 60.40999984741211,
+      "summary": "# Storio Group POC\nDate: 2026-10-06 | Duration: 60.40999984741211m\n\n## Summary\nThe team prioritized Growthbook’s event forwarder for a proof of concept because it can send exposure events to a dedicated Snowflake table with less engineering effort than custom ingestion or a managed warehouse. Snowflake will remain the single source of truth, while SDKs and APIs support feature flags across app, desktop, checkout, frontend, and backend surfaces. Key goals include enabling product managers to launch experiments independently, automating rollouts with guardrails, syncing metric definitions, and improving data-quality checks. Success will be assessed through data integration approval, engineering autonomy, analytics clarity, cultural change, and the decision to replace or coexist with current tooling. The team planned integration design and the first AA test by the end of the month, followed by production experiments through December to early January, with Slack communication and biweekly check-ins. SRM detection, a health tab, and developing Slack alerts will support experiment monitoring.\n\n## Keywords\nPOC, data integration, event forwarder, SDK integration, experimentation platform, Snowflake\n\n## Action Items\n\n**Emanuele Pane**\nShare kickoff document with detailed success criteria incorporating inputs from product, tech, and product analytics teams by end of week (56:30)\nCoordinate internal team discussions to clarify data platform strategy and integration approach (46:30)\nFacilitate scheduling a dedicated data call including Martech teams to address technical integration next steps (58:05)\nProvide summary and next steps in Slack following the meeting (59:00)\n\n**James Shannon**\nPropose dates for the dedicated data call to discuss integration details and security considerations (58:20)\nFollow up with commercial team to give clearer information about event forwarder option and related commercial discussions (58:55)\nGather and provide detailed documentation regarding the “enrichment” process in the event forwarder pipeline (47:20)\nSupport technical integration discussions around SDK installation and data ingestion options (00:00)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

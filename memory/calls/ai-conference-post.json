@@ -1,0 +1,18 @@
+{
+  "company": "AI Conference Post",
+  "slug": "ai-conference-post",
+  "last_etl_date": "2026-10-07T06:41:13.109066",
+  "calls": [
+    {
+      "id": "01M4948BYRKH7F2JWEBYBB5SKK",
+      "source": "fireflies",
+      "title": "AI Conference Post Event Debrief",
+      "date": "2026-10-06",
+      "duration_minutes": 29,
+      "summary": "# AI Conference Post Event Debrief\nDate: 2026-10-06 | Duration: 29m\n\n## Summary\nThe team evaluated a conference that produced solid lead quality despite lower traffic on the second day, with meaningful conversations improving from about one in five on day one to about one in three. Scott Keller followed up promptly with all 17 assigned leads, but the audience consisted largely of small companies and attendees with limited sophistication in feature flags and AI testing, creating a mismatch with GrowthBook’s focus. Low speaker quality and disorganized, general sessions reduced the event’s perceived value, while a UK events company is expected to improve organization next year. Giveaways increased booth awareness but often attracted low-quality leads, so the team favored fewer, distinctive items with stronger qualification. Future events should use earlier targeted outreach, advance lead assignment, onsite QR-code booking, immediate context capture, faster follow-up, and prompt expense reporting. Strategically, the team considered higher-caliber events such as Re:Invent, stronger speaking opportunities, and short visual demos tailored to different knowledge levels.\n\n## Keywords\nAI conference, giveaways, lead quality, pre-event outreach, meeting scheduling, attendee demographics\n\n## Action Items\n\n**Scott Keller**\nSend follow-ups to conference leads and track any engagement updates (04:25)\nImplement urgent booking of meetings at future events by scanning emails and arranging times on the spot (24:45)\n\n**Lyndsie Berens**\nShare giveaway ideas such as spinner Rubik’s Cube with Liz Fox (15:49)\nEnsure expense reports are submitted quickly to close event expenses (28:47)\n\n**Sales team overall**\nIncorporate immediate meeting booking strategies at booths using QR codes, Calendly links, or direct calendar access during conversations (20:35)\n\n**Ashley Stirrup**\nLocate and share previous spinner spreadsheet and coding method to identify quality giveaway winners (19:44)\n\n**Team**\nConsider focusing on securing higher-caliber speakers and improving video booth content for future conferences (09:44)\nPlan pre-event outreach to potential attendees to schedule booth visits and meetings ahead of conferences (26:43)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

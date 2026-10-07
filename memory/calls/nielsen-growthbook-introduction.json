@@ -1,0 +1,18 @@
+{
+  "company": "Nielsen<>GrowthBook Introduction",
+  "slug": "nielsen-growthbook-introduction",
+  "last_etl_date": "2026-10-07T06:41:13.107627",
+  "calls": [
+    {
+      "id": "01M3Z0D9W8P7BMD9GMT58RYRMR",
+      "source": "fireflies",
+      "title": "Nielsen<>GrowthBook Introduction",
+      "date": "2026-10-06",
+      "duration_minutes": 37.65999984741211,
+      "summary": "# Nielsen<>GrowthBook Introduction\nDate: 2026-10-06 | Duration: 37.65999984741211m\n\n## Summary\nNielsen is shifting from historical data selling and linear ratings toward intelligence, recommendations, and real-time product experiences, with content intelligence as a major strategic focus. The organization currently lacks a feature-flag system, experimentation platform, and established testing process, creating a need for internal dogfooding and external beta testing before launch. GrowthBook presented an open-source platform supporting feature flags, experimentation, analytics, custom metrics, experiment analysis, and warehouse-first analysis through read-only access, while keeping raw data, PII, and SQL within Nielsen’s systems. Nielsen sees stronger potential for testing product features, interfaces, customer satisfaction, renewal-related outcomes, customer behavior, and recommendation responses than directly measuring customer ROI. Licensing limits external testing, and user volumes may make statistical testing difficult for some products. GrowthBook will share Greenfield examples and reference stories, while Nielsen will explore use cases; no adoption decision was made.\n\n## Keywords\nFeature flagging, A/B experimentation, Content Intelligence, B2B product testing, Product analytics, Data warehouse integration\n\n## Action Items\n**Brandon Webb**\n- Develop experimentation use cases (33:29)\n\n**Jake Heier**\n- Send follow-up email (34:45)\n- Consult customer-success team (36:16)",
+      "organizer": "jake@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}
