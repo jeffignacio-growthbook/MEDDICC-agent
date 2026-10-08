@@ -1,7 +1,7 @@
 {
   "company": "Kenneth & James",
   "slug": "kenneth-james",
-  "last_etl_date": "2026-08-05T15:57:31.353252",
+  "last_etl_date": "2026-10-08T06:47:48.887300",
   "calls": [
     {
       "id": "01KVQAFJGHV6D4EJDTWMEF7JN0",
@@ -13,7 +13,19 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "product launch, brand onboarding, commercial structure, testing platform, peak season, partnership negotiation",
-      "action_items": "\n**James Shannon**\nPrepare and bring examples of usage, testing scenarios, and ROI cases to the Wednesday meeting to assist in building the business case (18:50)\nLead commercial and technical discussion on Wednesday to finalize partnership and product demonstration (04:26)\n\n**Kenneth Christiansen**\nProvide clearer ramp schedule and brand onboarding plan after assessing internal priorities and post-Wednesday discussions (05:59)\nFacilitate internal discussions post-demo session to confirm commitment and timeline for signing and starting setup (14:07)\nSupply current conversion and revenue data for benchmarking platform impact evaluation (18:10)\n"
+      "action_items": "\n**James Shannon**\nPrepare and bring examples of usage, testing scenarios, and ROI cases to the Wednesday meeting to assist in building the business case (18:50)\nLead commercial and technical discussion on Wednesday to finalize partnership and product demonstration (04:26)\n\n**Kenneth Christiansen**\nProvide clearer ramp schedule and brand onboarding plan after assessing internal priorities and post-Wednesday discussions (05:59)\nFacilitate internal discussions post-demo session to confirm commitment and timeline for signing and starting setup (14:07)\nSupply current conversion and revenue data for benchmarking platform impact evaluation (18:10)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M2T1BM5MGVGS069213920V1R",
+      "source": "fireflies",
+      "title": "Kenneth & James Check in",
+      "date": "2026-10-07",
+      "duration_minutes": 20,
+      "summary": "# Kenneth & James Check in\nDate: 2026-10-07 | Duration: 20m\n\n## Summary\nThe team agreed to begin with a Pro subscription proof of concept rather than immediately adopting Enterprise, because Enterprise pricing, implementation risk, and uncertain adoption require clear ROI first. Kenneth emphasized minimizing risk, building internal buy-in incrementally, and scaling only after success signals emerge. Enterprise could become more feasible once ROI is demonstrated and dedicated internal resources, potentially including a full-time hire, are available. Development of the new UI component has not started, as previous work was paused and current priorities include open source testing and two brand launches this year. Resource constraints and timing are the main blockers, while one brand has identified the new solution as a high priority. James proposed a no-cost, time-boxed POC with Enterprise access, solutions-engineer support, and a Slack channel for integration assistance. Kenneth requested written details for internal comparison. Both agreed to pause until capacity improves, after which they will revisit timing and progress. (02:04–08:16)\n\n## Keywords\nProduct subscription, proof of concept, ROI evaluation, resource allocation, brand launch, enterprise support\n\n## Action Items\n\n**James Shannon**\nFormalize and send a written proposal for a no-cost, no-contract Enterprise proof of concept (POC) including dedicated support resources and clearly defined time-box parameters (07:35)\nFollow up with Kenneth on timing and readiness to initiate the POC after internal considerations and resource availability (08:17)\n\n**Kenneth Christiansen**\nReview James’s written POC proposal and compare it against proceeding independently with the Pro subscription (07:53)\nDecide on timing and allocate resources to prioritize starting the POC implementation after current brand launches are completed (04:01)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

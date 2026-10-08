@@ -1,0 +1,18 @@
+{
+  "company": "Hannah Duhaie and",
+  "slug": "hannah-duhaie-and",
+  "last_etl_date": "2026-10-08T06:47:48.882230",
+  "calls": [
+    {
+      "id": "01M4BMYJBFSPER22XJNVA63DGK",
+      "source": "fireflies",
+      "title": "Hannah Duhaie and Scott Keller + Logan Bates",
+      "date": "2026-10-07",
+      "duration_minutes": 29,
+      "summary": "# Hannah Duhaie and Scott Keller + Logan Bates\nDate: 2026-10-07 | Duration: 29m\n\n## Summary\nThe team confirmed plans for a Growth Book proof of concept in Q4, with November 3 identified as the earliest feasible start date, subject to an internal information-security review expected to take about two weeks. The PoC is expected to last about five weeks, excluding Thanksgiving week, following a two-week Unleash PoC scheduled for mid-October. Unleash focuses on feature flags, while Growth Book provides experimentation analytics, holdout groups, multi-armed bandits, and feature-flag capabilities. The team expects SDK integration to be straightforward and will use the same core group of about five to six people, supported by US-based staff. Contract signing is unlikely before Q1 because of procurement and approval processes, even if the PoC succeeds. Scott will seek an extension of the pricing quote beyond October 30 and proposed a termination-for-convenience clause. Ben emphasized budget communication and leadership alignment, while Hannah stressed transparency about timing and decision constraints.\n\n## Keywords\nPoC planning, Infosec review, vendor evaluation, contract negotiation, experimentation platform, timeline management\n\n## Action Items\n\n**Scott Keller**\nInform Ryan during one-on-one about Q4 PoC timeline and status (16:24)\nRequest extension of quote validity beyond October 30th due to client delays (13:25)\nExplore and propose contract terms with out-clause or termination for convenience during infosec follow-up (14:15)\nConfirm formal PoC kickoff date post internal review and share the plan with client (18:14)\nOffer and potentially arrange onsite kickoff meeting in November to enhance engagement (26:22)\n\n**Hannah Duhaime**\nComplete internal zip process and infosec questionnaire regarding vendor data sharing for PoC (06:43)\nShare finalized PoC plan document internally and with Growth Book for feedback on testing scope and challenges (06:43)\nCoordinate with internal teams to align schedules for early November PoC start (08:06)\nCommunicate any additional infosec questions or requests to Growth Book (08:06)\nProvide updated timelines and keep Growth Book informed of approval progress and constraints (27:50)\nPrepare list of users including read-only access for the PoC tool usage (24:00)\n\n**Ben Hunsaker**\nReview and finalize PoC plan with the team next week and send it to Growth Book (18:23)\nCoordinate PoC scheduling to run sequentially after Unleash POC, aiming for early November start (19:11)\nKeep internal stakeholders aware of evaluation timelines and potential budget increases for next year (15:43)\nFacilitate ongoing communication with Growth Book and internal counterparts on PoC progress and vendor selection (17:43)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

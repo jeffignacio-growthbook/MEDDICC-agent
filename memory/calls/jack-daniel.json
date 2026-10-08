@@ -1,0 +1,18 @@
+{
+  "company": "jack:daniel",
+  "slug": "jack-daniel",
+  "last_etl_date": "2026-10-08T06:47:48.880905",
+  "calls": [
+    {
+      "id": "01M4A0P20280V1YSQBT0NZQ5VP",
+      "source": "fireflies",
+      "title": "jack:daniel",
+      "date": "2026-10-07",
+      "duration_minutes": 13.350000381469727,
+      "summary": "# jack:daniel\nDate: 2026-10-07 | Duration: 13.350000381469727m\n\n## Summary\nDaniel produces internal and external GrowthBook blogs focused on explaining customer features and organizing knowledge for team sharing. Jack approves these blogs for middle-funnel marketing aimed at active GrowthBook evaluators, allowing publication without additional approvals. Jack plans to rewrite the style guide by late next week to encourage personal voices from engineers and data scientists while avoiding a forced corporate tone. They agreed that customer names should be omitted unless approved, using generic references instead. Daniel suggested creating memorable branding inspired by Datadog’s mascot, while Jack said he was unsure whether the Red Panda mascot would remain after the rebrand and would discuss the opportunity with marketing lead Lindsay. Customer feedback on blog infographics has been positive, so Jack supports retaining them and plans to consult Ashley on their style. Daniel will continue writing with Jack’s review, and Jack will notify him when the blogs are published.\n\n## Keywords\nblog writing, internal documentation, marketing guidelines, customer anonymity, branding mascot, content publication\n\n## Action Items\n**Jack Virag**  \nPublish Daniel's blog posts independently (03:17)  \nRewrite GrowthBook style guide (03:39)  \nRelay feedback about mascot to marketing leadership (09:33)  \nShare blog publication status with Daniel (11:42)  \n\n**Daniel Lin**  \nContinue writing customer-focused blogs (06:58)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

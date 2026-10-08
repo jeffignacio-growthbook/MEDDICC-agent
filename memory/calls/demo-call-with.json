@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-10-07T06:41:13.110932",
+  "last_etl_date": "2026-10-08T06:47:48.885576",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -873,6 +873,17 @@
       "summary": "# Demo Call with Emma Camp from\nDate: 2026-10-06 | Duration: 29m\n\n## Summary\nLeisure Labs plans to manage experimentation for a client initially, running tests, analyzing results, and implementing winning options before potentially handing control to the client; the handoff timing remains undecided. The client will retain ownership of its data and likely its GrowthBook instance, while Leisure Labs receives delegated access. GrowthBook was considered suitable because its Pro plan costs $40 per user per month, supports around 30 users, and integrates with warehouses such as Snowflake and BigQuery. Its visual editor supports no-code UI changes, while feature flags enable full-page redesign experiments, with Bayesian and frequentist analysis, scheduling, and alerts. The client’s traffic is too limited for Optimizely, but GrowthBook may support meaningful results with smaller audiences. Leisure Labs will first pilot the starter plan on its own website, with Alex assessing technical effort. Scott Keller will provide setup materials and coordinate a technical session with a solution engineer before the client proposal is developed.\n\n## Keywords\nwebsite optimization, GrowthBook, A/B testing, data warehouse integration, experimentation platform, feature flags\n\n## Action Items\n\n**Emma Camp**\nEngage Leisure Labs developer Alex to preliminarily assess the effort required for GrowthBook integration on the Leisure Labs website and support the development of the client proposal (24:35)\n\n**Scott Keller**\nSend the Quick Start Guide and GrowthBook Starter plan account creation link to the Leisure Labs team to initiate setup and testing (27:00)\nCoordinate a technical session with GrowthBook solution engineer Logan to provide a detailed integration overview and address technical questions when Leisure Labs is ready (27:00)\n\n**Leisure Labs team**\nCreate a GrowthBook Starter account, implement the SDK on the Leisure Labs website, and run initial tests to gain familiarity with the platform before client deployment (24:35)\n",
       "organizer": "scott.keller@growthbook.io",
       "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4B3Q1ZAQX77PS0JVV77KD3X",
+      "source": "fireflies",
+      "title": "Demo Call with Irina from",
+      "date": "2026-10-07",
+      "duration_minutes": 2,
+      "summary": "# Demo Call with Irina from\nDate: 2026-10-07 | Duration: 2m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

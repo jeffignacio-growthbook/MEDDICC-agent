@@ -1,0 +1,18 @@
+{
+  "company": "New pitch deck",
+  "slug": "new-pitch-deck",
+  "last_etl_date": "2026-10-08T06:47:48.882923",
+  "calls": [
+    {
+      "id": "01M3TGKAK0Y02DZHPNQZ6G7ZY4",
+      "source": "fireflies",
+      "title": "New pitch deck rollout",
+      "date": "2026-10-07",
+      "duration_minutes": 41,
+      "summary": "# New pitch deck rollout\nDate: 2026-10-07 | Duration: 41m\n\n## Summary\nThe team finalized a concise sales deck centered on unified messaging, the ABAP differentiation acronym, AI-driven experimentation, and Growth Book’s developer-first, open-source, warehouse-native positioning. The deck is designed for five-minute presentations and encourages sales teams to practice, gather feedback, and focus on generating demo interest. AI messaging should introduce Growth Book’s capabilities without overwhelming prospects, emphasizing flexible, non-opinionated integration with existing workflows and reserving deeper details for live demonstrations. The team also proposed a “What We Heard” slide to capture customer priorities and evolve across calls. Scott Bailey demonstrated an AI-powered deck-building skill connected to Claude AI and Google Slides that uses sources such as Notion, HubSpot, and Fireflies, while preserving core messaging and enabling regional, client-specific, and optional content. James Shannon said it produces about 80% of the deck accurately, though some manual editing remains. The team discussed adoption challenges, feedback loops, and plans to share materials broadly.\n\n## Keywords\npitch deck, sales enablement, AI skills, customization, feature flagging, customer engagement\n\n## Action Items\n\n**Ashley Stirrup**\nEncourage the sales team to practice delivering the new pitch deck and provide feedback to enable iterative improvements in messaging and content (11:19)\nCollaborate to develop a more interactive, discovery-focused pitch deck format that includes embedded questions to engage customers and gather their input during presentations (16:30)\n\n**Scott Bailey**\nShare the finalized demo pitch deck link with the sales team to ensure access to the latest materials (29:08)\nContinue iterating and improving the AI-powered deck-building skill based on user feedback to reduce errors, improve accuracy, and minimize the need for manual edits (25:35)\nAssist the sales team in adopting the AI deck-building skill, providing support for customization options and establishing guardrails to prevent issues like excessive text or inappropriate quotes (16:47)\n\n**Elyse Fox**\nShare all presentation materials, including updated pitch decks and AI skill resources, in the sales channel to ensure team-wide access and facilitate ongoing feedback (30:51)\n\n**James Shannon**\nProvide further detailed feedback on the AI pitch deck skill, specifically regarding text length and inclusion of direct customer quotes, to help refine guardrails and improve output quality (24:40)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 12,
+      "summary_quality": "good"
+    }
+  ]
+}

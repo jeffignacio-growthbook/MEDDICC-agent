@@ -1,0 +1,18 @@
+{
+  "company": "Helen Tian and",
+  "slug": "helen-tian-and",
+  "last_etl_date": "2026-10-08T06:47:48.880747",
+  "calls": [
+    {
+      "id": "01M4CKSF2PMJG38Q2Z1S0BD09E",
+      "source": "fireflies",
+      "title": "Helen Tian and Andy Marshall",
+      "date": "2026-10-08",
+      "duration_minutes": 20.399999618530273,
+      "summary": "# Helen Tian and Andy Marshall\nDate: 2026-10-08 | Duration: 20.399999618530273m\n\n## Summary\nThe discussion covered renewing the existing seat count, with a target of completing renewal by the end of October after internal budget approval and CFO signature. Andy will send renewal numbers early the following week, and a delay would not interrupt service. Growth Book adoption is strong across Crypto.com, OG, and Exchange teams, with Kronos lagging behind; more than 123 experiments have been run, and Growth Book feature flags have replaced Firebase. Teams requested regular sessions on new 5.1 features, advanced capabilities such as custom dashboards and namespaces, and automation from hypothesis through results analysis. Goals include stronger experimentation governance, data quality checks, fee experiments on price elasticity with close GAG monitoring, revenue tracking, and data science models for user behavior and recommendations. September CDN traffic was approximately 400 million requests and requires tech lead confirmation before pricing is adjusted. Andy offered direct support across time zones, while Helen leads product analytics for a team mainly based in Asia.\n\n## Keywords\nGrowth Book, experimentation, feature flags, data quality, fee experiments, platform training\n\n## Action Items\n**Andy Marshall**  \nSchedule live training sessions (03:50)  \nCoordinate meetings with Growth Book team (12:00)  \nDiscuss fee experiments setup (14:50)  \nSend renewal proposal numbers (16:30)  \n\n**Helen Tian**  \nNotify Growth Book on CFO approval (17:30)  \nVerify CDN traffic projections (18:20)",
+      "organizer": "marsh@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

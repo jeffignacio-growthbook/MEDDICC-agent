@@ -1,0 +1,18 @@
+{
+  "company": "Audibene & GrowthBook",
+  "slug": "audibene-growthbook",
+  "last_etl_date": "2026-10-08T06:47:48.887461",
+  "calls": [
+    {
+      "id": "01M45TSHHVVW65THW191Q5P6ZG",
+      "source": "fireflies",
+      "title": "Audibene & GrowthBook | Erstgespräch",
+      "date": "2026-10-07",
+      "duration_minutes": 47,
+      "summary": "# Audibene & GrowthBook | Erstgespräch\nDate: 2026-10-07 | Duration: 47m\n\n## Summary\nThe discussion covered self-hosted and cloud pricing, with self-hosting costing around $6,000 per user and cloud hosting about $1,000 yearly per user. Hosting options include self-hosted, cloud, and EU cloud; self-hosting supports internal control, while cloud hosting provides stronger enterprise features and customer success support. The product centers on experiment-based testing, including complex and niche tests, contextual bandits, feature toggling, and advanced targeting across retail, e-commerce, education, and fashion. Analytics integrates with a data warehouse through read-only access to provide a single source of truth for growth metrics. Paid marketing uses Facebook, TikTok, and Instagram in Thailand, with funnel optimization and lead determination through in-app journeys. Features include SSO, training, implementation, unlimited seats on feature-flexible plans, and enterprise-grade security.\n\n## Keywords\nexperiment-based analytics, cloud hosting, self-hosting, AI assistant, growthbook pricing, customer journey analytics\n\n## Action Items\n**Tobias Knapp**  \nReview marketing channel strategies for Thailand (06:23)  \nVerify funnel and lead determination processes (06:23)  \n\n**Marcel Geldner**  \nCoordinate implementation of experiment features (08:54)  \nProvide detailed pricing for GrowthBook options (20:47)  \nFollow up on enterprise onboarding steps (23:29)  \nConfirm enterprise client references and case studies (25:39)  \n\n**Tobias Knapp**  \nCoordinate implementation of experiment features (08:54)  \nConfirm enterprise client references and case studies (25:39)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}
