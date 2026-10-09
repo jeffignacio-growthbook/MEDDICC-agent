@@ -1,0 +1,18 @@
+{
+  "company": "jackops makeup meeting",
+  "slug": "jackops-makeup-meeting",
+  "last_etl_date": "2026-10-09T06:56:43.731930",
+  "calls": [
+    {
+      "id": "01M4C4JF12ND03F13REY8CPR9N",
+      "source": "fireflies",
+      "title": "jackops makeup meeting",
+      "date": "2026-10-08",
+      "duration_minutes": 63.58000183105469,
+      "summary": "# jackops makeup meeting\nDate: 2026-10-08 | Duration: 63.58000183105469m\n\n## Summary\nThe discussion covered testing Fireflies for transcript integration while preferring Fathom for note quality, plus the need for style guides governing AI-generated and human blog writing. Website work included sharing a raw Notion board, documenting CMS specifications for blog, event, and podcast pages, and potentially rebuilding the site because of CMS complexity and inconsistent AI-generated content. Analytics problems may relate to cookies and the HubSpot switch, while homepage, pricing, and documentation journeys have low engagement and lack signup links. Content priorities include increasing blog volume, adding human perspectives from marketing, sales, and engineering, creating solution-aware playbooks and checklists, and later pursuing PR, third-party placements, podcast guests, and ghostwritten positioning articles. Karen Henke’s influence, Jack Virag’s advocacy, Yousef’s website support, expectations around collaboration, and the marketing team’s development were also discussed.\n\n## Keywords\nGrowth Book, Website Redesign, Content Strategy, AI Writing, Analytics, Customer Journey, Marketing\n\n## Action Items\n**Jack Virag**  \nShare raw Growth Book Notion board with Karen Henke (07:18)  \nSlack Growth Book home/Notion link to Karen Henke if direct sharing fails (07:43)  \nAdvocate internally for Karen Henke’s web marketing work and content initiatives (06:01)  \nMake reminder card to reach out to Karen Henke for customer journey exercises (17:25)  \nEncourage internal authors to submit blog content with partial drafts or bullet points (25:10)  \nCoordinate with Emmy on managing Growth Book marketing output (01:00:50)  \nAdvocate internally for Karen Henke’s web marketing work and content initiatives (01:01:45)  \n\n**Karen Henke**  \nShare FigJam and Figma site map and journey mapping resources with Jack Virag (14:46)  \nShare Growth Book Blog Writer’s Guide with Jack Virag for content contribution (22:34)  \nAct as sounding board to help prioritize low lift-high value website fixes (27:45)  \nCreate ticket for adding “Start for free” button on docs footer (31:31)  \nPut ticket to add sign-up button to docs and comparison pages (35:59)  \nPut ticket in website dev tracker for website button additions (36:04)",
+      "organizer": "jack@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

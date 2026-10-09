@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook POC Training",
+  "slug": "growthbook-poc-training",
+  "last_etl_date": "2026-10-09T06:56:43.736377",
+  "calls": [
+    {
+      "id": "01M48N5TKTR493W0NCGTVXPTPV",
+      "source": "fireflies",
+      "title": "GrowthBook POC Training Session",
+      "date": "2026-10-08",
+      "duration_minutes": 53,
+      "summary": "# GrowthBook POC Training Session\nDate: 2026-10-08 | Duration: 53m\n\n## Summary\nThe POC will evaluate cost, approximately 125 ms P95 latency, severity and category reporting, BigQuery connectivity, governance, and concurrent testing across multiple configurations. Success criteria include SSO, role-based access controls, live updates without restarts, multi-tenant targeting, A/B testing, feature flags, and deployment-model validation. Experiment arms can use different feature flags and JSON or structured configuration values, with environment-specific targeting, schedules, metrics, and API or UI updates. The GrowthBook SDK assigns traffic, logs experiment and variant data to the warehouse, and supports local evaluation with cached configuration. Integration was estimated at one full day to one week, depending on application size and complexity. Warehouse analysis provides statistical validation and dimensional slicing, while progressive rollouts can include approval steps, monitoring, automatic shutdowns, and webhooks. Bandit testing was requested for prompt evaluation, and a first experiment candidate has been identified. Jake will provide documentation and a recap, while Rémy will share a contextual-bandits video.\n\n## Keywords\nA/B testing, Feature flags, GrowthBook SDK, BigQuery, Statistical significance, Contextual bandits\n\n## Action Items\n**Rémy Marin**\nConfirm dependency relationship (17:45)\n\n**Ravid Cohen**\nRun bandit experiment (42:06)\n\n**Jake Heier**\nSend contextual-bandit video (36:22)\nSend documentation recap (42:17)",
+      "organizer": "jake@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

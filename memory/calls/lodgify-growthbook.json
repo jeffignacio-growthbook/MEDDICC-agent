@@ -1,0 +1,18 @@
+{
+  "company": "Lodgify & GrowthBook",
+  "slug": "lodgify-growthbook",
+  "last_etl_date": "2026-10-09T06:56:43.736438",
+  "calls": [
+    {
+      "id": "01M48J3CB1GJFCX1N2B32EPBPA",
+      "source": "fireflies",
+      "title": "Lodgify & GrowthBook | Potential future Setup",
+      "date": "2026-10-08",
+      "duration_minutes": 29.540000915527344,
+      "summary": "# Lodgify & GrowthBook | Potential future Setup\nDate: 2026-10-08 | Duration: 29.540000915527344m\n\n## Summary\nGrowthBook is mainly used for feature flags and A/B tests, but redirect tests create mismatch errors and custom metrics require a database connection. Engineering implementation is challenging across multiple product modules handled by different engineers. Experiment results are exported to BigQuery and shared through Slack notifications, but easier sharing is needed. Experiments run weekly rather than daily and focus on conversion and retention, with experimentation expanding into more product areas and expected to grow next year. Enterprise adds governance, security, SSO, SAML, role-based access, support, onboarding, training, advanced experimentation features, no seat cap, and self-hosted, cloud-hosted, or EU cloud-hosted options. Enterprise contracts are annual and invoice-based, with installment options, while Pro is monthly and credit-card based. Marcel and Remy will provide feature comparisons and videos, while Anna will evaluate the value internally with engineers, business stakeholders, and budget owners.\n\n## Keywords\nGrowthBook, A/B Testing, Enterprise Features, Experimentation, Feature Flags, Payment Terms\n\n## Action Items\n**Marcel Geldner**  \nPrepare comparison documents for GrowthBook editions (24:48)  \nShare slides on hosting options and costs (26:00)  \nMaintain communication with Lodgify team (28:09)  \n\n**Rémy Marin**  \nProvide detailed GrowthBook Enterprise features list (27:26)  \n\n**Anna Smirnova**  \nReview GrowthBook materials internally (24:48)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

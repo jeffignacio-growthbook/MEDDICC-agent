@@ -1,0 +1,18 @@
+{
+  "company": "Notifications and Approvals",
+  "slug": "notifications-and-approvals",
+  "last_etl_date": "2026-10-09T06:56:43.734168",
+  "calls": [
+    {
+      "id": "01M4C1P3Z7DJ30HYFQ5KE1Y3QD",
+      "source": "fireflies",
+      "title": "Notifications and Approvals",
+      "date": "2026-10-08",
+      "duration_minutes": 48,
+      "summary": "# Notifications and Approvals\nDate: 2026-10-08 | Duration: 48m\n\n## Summary\nThe team agreed to replace the confusing JSON-based review experience with a human-friendly system that supports assigning reviews to users or teams, sending notifications, tracking ownership, and distinguishing completed work from reviews needing attention. The redesign includes reminders, priority flags, robot-versus-human attribution, and backend agent-token support. Reviewers should be able to approve, deny, or request changes in a fast sequential flow. Change visualization will use color-coded diffs, collapsible context, human-readable condition components, and precise highlighting of modified rules or targeting. Archetype-based impact simulation was proposed as a future enhancement. The interface will unify review and publish experiences, integrate contextual comments, reduce navigation clutter through collapsible menus, improve mobile layouts, and use floating or pop-over actions. Feature and experiment review designs will be aligned through iterative releases, customer feedback, follow-up meetings, and ongoing collaboration.\n\n## Keywords\nReview System, Notifications, UI Design, Change Requests, Assignments, Diff View\n\n## Action Items\n\n**Guy Langford-lee**\nSend updated design mockups incorporating discussed improvements to the team to enable faster iteration (36:01)\nSet up a follow-up meeting (part two) once the designs mature, share details in the team channel, and invite interested members for broader participation and visibility (37:51)\n\n**Gabe Melean**\nContinue parallel work on experiment review design aligned with feature approval design, share insights with the team, and optionally include Andy White in meetings for additional context (36:15)\n\n**Unassigned**\nPrioritize redesign of the main navigation sidebar to reduce its real estate usage and improve user experience, coordinating with the team already working on this (22:43)\n",
+      "organizer": "guy@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

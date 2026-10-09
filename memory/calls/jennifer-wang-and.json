@@ -1,0 +1,18 @@
+{
+  "company": "Jennifer Wang and",
+  "slug": "jennifer-wang-and",
+  "last_etl_date": "2026-10-09T06:56:43.734236",
+  "calls": [
+    {
+      "id": "01M3ZPQWG5QDXWH2J0HMJ7Y3H3",
+      "source": "fireflies",
+      "title": "Jennifer Wang and Chris Sanders",
+      "date": "2026-10-08",
+      "duration_minutes": 36.97999954223633,
+      "summary": "# Jennifer Wang and Chris Sanders\nDate: 2026-10-08 | Duration: 36.97999954223633m\n\n## Summary\nThe discussion covered why controlled experimentation is needed: only one third of shipped features improve user outcomes, while another third harms performance and the remainder has no material effect. GrowthBook’s SDK retrieves feature and experiment payloads, evaluates targeting attributes, assigns variants, and sends exposure events containing experiment and variation IDs plus optional dimensions to the warehouse. Separate assignment and fact-table queries provide exposure and metric data for analysis. Anonymous and logged-in identities can be joined, with sticky bucketing preserving assignments. Projects and SDK connections scope applications. Mountain PTV is expected to remain on Harness in the near term, while Quick Frame plans to use GrowthBook feature flags; Harness data will require custom translation. The team will first run a Quick Frame GrowthBook AA test targeting an approximately 50/50 split, with Alli Wiley and Chang Moon identifying services, Nick Martin supporting validation, and Chris Sanders and GrowthBook Support assisting through Slack before broader enablement.\n\n## Keywords\nGrowthBook SDK, Feature flagging, AA testing, Experiment assignment queries, Warehouse analytics, Harness integration\n\n## Action Items\n**Alli Wiley**\n- Determine test environment (34:15)\n- Prepare candidate variant (34:15)\n\n**Chang Moon**\n- Determine test environment (34:15)\n\n**Nick Martin**\n- Implement AA test (34:15)\n- Validate AA test (34:15)\n\n**Chris Sanders**\n- Obtain Slack access (34:53)\n- Schedule follow-up session (35:10)",
+      "organizer": "chris@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

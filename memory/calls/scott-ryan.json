@@ -1,7 +1,7 @@
 {
-  "company": "scott & ryan",
+  "company": "Scott & Ryan",
   "slug": "scott-ryan",
-  "last_etl_date": "2026-10-01T06:40:57.213695",
+  "last_etl_date": "2026-10-09T06:56:43.732737",
   "calls": [
     {
       "id": "01KTMBGKNRFSK9N0ZZPP4BE7C2",
@@ -58,6 +58,17 @@
       "date": "2026-09-30",
       "duration_minutes": 1,
       "summary": "# scott & ryan\nDate: 2026-09-30 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4EE4Z5N45DXJN7E1H4TTCK4",
+      "source": "fireflies",
+      "title": "Scott & Ryan",
+      "date": "2026-10-08",
+      "duration_minutes": 33,
+      "summary": "# Scott & Ryan\nDate: 2026-10-08 | Duration: 33m\n\n## Summary\nThe team reviewed strong Q4 sales momentum toward a potential $700,000, led by Echo and SBF at $210,000 and OLX at around $100,000, alongside viable Natera and CarGurus opportunities. CarGurus is evaluating GrowthBook against Unleash, with a November 3 POC kickoff, an ongoing InfoSec review, and budgeting of $200,000-$300,000; GrowthBook is favored for experimentation at the scale of 100 concurrent experiments. Expedia B2B is emerging quickly after receiving a $129,500 quote. The team discussed AWS-related procurement challenges in Latam and Brazil, faster qualification through structured discovery, and firm boundaries on difficult deals. Event follow-up will target contacts from OpenAI, Datadog, and Roblox, with proactive meeting booking at Snowflake and localized engagement in the Southeast. Product priorities include advanced experimentation, AI-supported institutional knowledge, and mobile session replay. Scott Keller and Ryan McGurk remain aligned on aggressive Q4 execution.\n\n## Keywords\nAI adoption, sales pipeline, proof of concept, customer engagement, experimentation platform, international deals\n\n## Action Items\n\n**Scott Keller**\nRe-onboard new POC owners at Natera (Steve Wraith and Chris Roth Bloom) and drive POC kickoff by November 3 (14:52)\nEngage with AWS representative Rodrigo to manage tariff issues and facilitate deals in Brazil/Latam regions (22:33)\nAccelerate follow-up and negotiation with Bokra, deciding to either close the deal or drop it soon based on responsiveness (24:27)\nUse psychological sales questioning approach consistently in discovery calls and include in call recaps (28:42)\nPrepare for and conduct pricing and follow-up call with Expedia VP of product (31:46)\n\n**Ryan McGurk**\nSupport Scott with initiating regional in-person engagement events (dinners, sports outings) and provide budget as needed (10:05)\nCoordinate internally to assist with follow-up and supporting meetings at Snowflake conference next week (08:45)\nConfer with Carrie regarding Nimi (32:13)\n",
       "organizer": "scott.keller@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

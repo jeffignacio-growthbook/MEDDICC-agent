@@ -1,0 +1,18 @@
+{
+  "company": "Tamedia & GrowthBook",
+  "slug": "tamedia-growthbook",
+  "last_etl_date": "2026-10-09T06:56:43.736611",
+  "calls": [
+    {
+      "id": "01M48XH4H1WP23FGKK1CW18HEC",
+      "source": "fireflies",
+      "title": "Tamedia & GrowthBook | Enterprise Proof of Concept & further technical conversation",
+      "date": "2026-10-08",
+      "duration_minutes": 42.900001525878906,
+      "summary": "# Tamedia & GrowthBook | Enterprise Proof of Concept & further technical conversation\nDate: 2026-10-08 | Duration: 42.900001525878906m\n\n## Summary\nThe discussion covered Cloud Function performance, optimization, legal compliance, product integration, and coordination. Cold starts create high compute time, while continuous traffic keeps the function warm at about 60% utilization, below the roughly 70% comfort threshold. The current compute budget supports three concurrent experiments, with an increase to four being tested. The fnv32a function was optimized, with an engineering review planned for next week. Profiling used a custom Linux tool and AI-assisted iteration rather than the Java V8 profiler. A partial SDK was reimplemented for Cloudflare while preserving behavior, edge caching, and cost optimizations. GDPR compliance for a GB UUID used by anonymous users remains under review, and the data privacy officer is expected to respond in about one week. A fallback would limit experiments to subscribed users. Code-based experiments are preferred over the Visual Editor, with API and CLI interfaces available and possible CMS integration. PM onboarding is planned after legal clearance. Slack supports coordination, with Natasha added for support access. CMP and cookie consent are the next priority, followed by biweekly check-ins after legal clearance.\n\n## Keywords\nCloudflare function, GDPR compliance, fnv32a optimization, Proof of Concept, Visual Editor, experiment concurrency\n\n## Action Items\n**Davide Cammarata**  \nShare Cloudflare function utilization image with AWS (00:42)  \nContinue testing limits of concurrent experiments on Cloudflare functions (03:03)  \nFollow up with GrowthBook team on fnv32a optimization adoption (34:18)  \n\n**Rémy Marin**  \nPush pull request with fnv32a optimization to GrowthBook SDK (08:44)  \nReview cookie consent handling and GDPR compliance (13:17)  \nSchedule session with product team for experiment introduction (17:54)  \nShare GrowthBook CMS integration examples for Tamedia (30:26)  \nArrange bi-weekly check-ins with Tamedia for POC progress (34:18)  \nAdd Natasha to Slack channel and manage communications (40:27)  \n\n**Marcel Geldner**  \nReview and share answers to data privacy questionnaire (15:08)  \nProvide access to security and DPA documents via Vanta (37:14)  \nCoordinate legal compliance clarifications and communicate updates (38:26)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

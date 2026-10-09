@@ -1,0 +1,18 @@
+{
+  "company": "Nemlig.com and James",
+  "slug": "nemlig-com-and-james",
+  "last_etl_date": "2026-10-09T06:56:43.736495",
+  "calls": [
+    {
+      "id": "01M48KWJQCZ3TM5FR99CNXXJTW",
+      "source": "fireflies",
+      "title": "Nemlig.com and James Shannon",
+      "date": "2026-10-08",
+      "duration_minutes": 60.470001220703125,
+      "summary": "# Nemlig.com and James Shannon\nDate: 2026-10-08 | Duration: 60.470001220703125m\n\n## Summary\nThe team currently uses GrowthBook for feature flagging, AB Tasty for visual experiments, and PostHog for app session recordings, creating a complex mix of tools. GrowthBook was presented as a potential unified platform through open-source capabilities, BigQuery-native analytics, frequentist and Bayesian methods, an AI-powered Visual Editor, natural-language experiment design, bandit experiments, dashboards, APIs, CLI support, and Jira integrations. Existing SDKs and BigQuery pipelines across mobile, web, and server-side systems could support expansion, although cloud migration would require API-based flag transfers, data-connection changes, and front-end endpoint updates. The decision depends on feature parity, cost, usage-based pricing, segmentation capabilities, and enterprise support. GrowthBook Enterprise offers dedicated engineers, onboarding, training, and post-implementation assistance. Pricing discussions are planned after the Danish holiday, with a possible move to Enterprise by the end of October if terms are competitive.\n\n## Keywords\nfeature flagging, A/B testing, GrowthBook, visual editor, BigQuery integration, experimentation analytics\n\n## Action Items\n\n**James Shannon**\nSend session replay recordings examples to Nemlig team to demonstrate GrowthBook's web session replay capabilities (52:00)\nProvide a detailed pricing overview including seat-based and usage-based models to Nemlig to support their evaluation of GrowthBook enterprise licensing (58:00)\nSchedule a 15-minute commercial and pricing discussion meeting with Simon from Nemlig for early next week before James travels to Berlin (58:00)\nFollow up via email with Nemlig team including meeting notes, support materials, session replay examples, and pricing information (59:00)\n\n**Simon / Gitte Linding Thomsen**\nReview GrowthBook pricing models and prepare for follow-up commercial discussion after the Danish holiday week (56:00)\nConfirm the number of seats and users requiring access to GrowthBook enterprise platform, noting current usage of about 22 seats (58:00)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

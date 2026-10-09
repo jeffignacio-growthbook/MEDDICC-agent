@@ -1,0 +1,18 @@
+{
+  "company": "[Mandatory] KBYG Berlin",
+  "slug": "mandatory-kbyg-berlin",
+  "last_etl_date": "2026-10-09T06:56:43.735364",
+  "calls": [
+    {
+      "id": "01M48ZAHGD2WYX8FPT4GR36KFM",
+      "source": "fireflies",
+      "title": "[Mandatory] KBYG Berlin Exp Meetup",
+      "date": "2026-10-08",
+      "duration_minutes": 22,
+      "summary": "# [Mandatory] KBYG Berlin Exp Meetup\nDate: 2026-10-08 | Duration: 22m\n\n## Summary\nThe Berlin Experimentation Meetup is scheduled for October 15 from 18:30 to 22:00 at Zalando headquarters, with 100–150 attendees expected and the event effectively sold out. Success will be measured by connections with ideal customer profile prospects and meetings rather than lead scans, with a target of 25 high-value leads. The team will capture LinkedIn connections, record prospect details in HubSpot, and use Calendly to book meetings onsite. James will lead onsite logistics; the team arrives at 17:30, attendees at 18:00, and Zalando’s first talk starts at 18:30. Materials include a pop-up banner, postcards, T-shirts, stickers, and water bottles. Leftovers will be handled according to luggage space and prospect value. Final scheduling and shipment details remain pending from Marcel. After the event, contacts, companies, meetings, photos, video, and Hampus’s session should be documented. Expenses follow the existing process, with reports submitted to Jennifer within one week; hotels or Airbnb are acceptable within policy, understood as approximately 250 or less per night.\n\n## Keywords\nBerlin experimentation meetup, Zalando sponsorship, Event logistics, Calendly meeting booking, Lead tracking, Travel reimbursements\n\n## Action Items\n**Lyndsie Berens**\nSend MeasureCamp outreach page (01:19)\nSend meeting recording (02:27)\nSend team location texts (06:47)\nOrder replacement stickers (07:58)\nCheck Zalando table availability (08:08)\nSend event presentation materials (13:01)\nConfirm package shipment arrangements (14:05)\n\n**Hampus**\nLead experimentation presentation (03:23)\n\n**James Shannon**\nLead event operations (06:41)\n\n**Graham McNicoll**\nPrepare event shirt (07:11)\n\n**Marcel**\nSend event schedule (05:08)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

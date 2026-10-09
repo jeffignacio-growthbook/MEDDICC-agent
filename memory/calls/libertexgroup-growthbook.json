@@ -1,0 +1,18 @@
+{
+  "company": "Libertexgroup + Growthbook",
+  "slug": "libertexgroup-growthbook",
+  "last_etl_date": "2026-10-09T06:56:43.736309",
+  "calls": [
+    {
+      "id": "01M48Y5PMAW6GKZEWEVBKEFQJG",
+      "source": "fireflies",
+      "title": "Libertexgroup + Growthbook",
+      "date": "2026-10-08",
+      "duration_minutes": 24.209999084472656,
+      "summary": "# Libertexgroup + Growthbook\nDate: 2026-10-08 | Duration: 24.209999084472656m\n\n## Summary\nGrowth Book is used extensively for web, mobile, and desktop A/B testing, with 27 active experiments out of 100 total, as well as feature toggling and management. Minor technical issues were resolved through support chat, and the client requested a webinar or workshop on AI functionality, which has not yet been used. Renewal discussions are ongoing, including a review of 100 seats: 70 with full access and 30 read-only. Finance is concerned about a pricing increase and reduced discounts, while a spike in API requests may have temporarily increased costs. Growth Book needs usage, seat, and CDN data to prepare a quote; annual discounts are renegotiated, and multi-year terms may help stabilize pricing. The client opposes doubling costs and wants a reasonable increase. Data analysts, SRE, marketing, and marketing automation teams use the platform, while one team still uses VWO during an ongoing transition. No expansion is planned next year, but the client is interested in the learnings feature for experiment insights. Self-hosting will be considered after current contract issues are resolved.\n\n## Keywords\nGrowth Book, A/B testing, pricing negotiation, seat licenses, API request spike, contract renewal, feature toggling\n\n## Action Items\n**Andy Marshall**  \nSend training video on new Growth Book features (07:10)  \nSchedule Growth Book feature training session (07:10)  \nReview contract renewal numbers from Libertex (21:45)  \nSchedule contract discussion meeting with Veronika Tatarnikova (21:45)  \n\n**Veronika Tatarnikova**  \nCoordinate with finance on budget and seat requirements (20:30)  \n\n**Andrei Sukhaparau**  \nProvide seat count and CDN usage estimates for contract renewal (21:30)",
+      "organizer": "marsh@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "GB/SIE Bi-Weekly",
   "slug": "gb-sie-bi-weekly",
-  "last_etl_date": "2026-09-30T06:08:48.417930",
+  "last_etl_date": "2026-10-09T06:56:43.733693",
   "calls": [
     {
       "id": "01KMNXKSATD9F5333X5AADEANS",
@@ -138,6 +138,17 @@
       "date": "2026-09-29",
       "duration_minutes": 36.060001373291016,
       "summary": "# GB/SIE Bi-Weekly\nDate: 2026-09-29 | Duration: 36.060001373291016m\n\n## Summary\nThe team planned a Friday review with Snowflake representatives covering schema, performance, scaling, query structure, validation, and blockers to incremental refresh, with the goal of reducing costly full scans. Interaction-overlap analysis was added, though external data access may require further permissions review. Rows 16–17 were in final review and expected to land during the current week, while other priorities remained dependent on Snowflake decisions. Approval gating was considered fairly urgent because users can alter variant keys, potentially changing runtime identifiers and disrupting analysis; GrowthBook could provide an interim solution if needed. Participants favored deterministic analysis cutoffs, potentially using the prior day’s UTC end time, with an organization-level setting and configurable buffer considered. Delayed data and partition receive timestamps still require Snowflake discussion. Finally, the team reviewed experiment key mutation risks, the need to preserve variation IDs 0 and 1 for client console experiments, and possible validation or restrictions on editable keys.\n\n## Keywords\nSnowflake performance, Incremental refresh, Deterministic analysis windows, Late-arriving data, Experiment permissions, Variant-key validation\n\n## Action Items\n**Cary Rakin**\nSend advisory board communication (00:46)\n\n**Luke Sonnet**\nPrepare Snowflake meeting agenda (06:28)\nRaise timestamp questions (06:28)\nFix variant-key loophole (33:55)\nValidate project variation keys (33:55)\nConfirm delayed-data timeline (33:55)",
+      "organizer": "cris@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3VNNRF3PG2ERS2ETT3BY3NM",
+      "source": "fireflies",
+      "title": "GB/SIE Bi-Weekly",
+      "date": "2026-10-08",
+      "duration_minutes": 32.9900016784668,
+      "summary": "# GB/SIE Bi-Weekly\nDate: 2026-10-08 | Duration: 32.9900016784668m\n\n## Summary\nMulti-identifier EAQs have landed, supporting multiple identifier types per EAQ, consolidated exposure tables, and future cluster-randomized experiments. Project scoping is underway to import experiments and create EAQs with permissions kept within projects. Metadata-fetching optimization and improved Snowflake metadata capture were expected to land today, while a GrowthBook dashboard for experiment queries, returned metadata, and rows scanned was targeted for next week. Deterministic analysis windows were prioritized for consistent leadership reporting, with a fixed scheduled cutoff such as 4:00am for a 6:00am update accepted as the initial approach. Luke committed to landing scheduled windows early next week, while complex snapshot selection was deferred. Scheduled results may become the official reporting source, with manual updates retained for ad hoc analysis. UI labels, custom reports, and permission behavior require further review, including a reported case where a read-only user may have been able to update results.\n\n## Keywords\nDeterministic analysis windows, Scheduled versus manual updates, Warehouse observability, Snowflake metadata, Experiment permissions, Dimension breakdown consistency\n\n## Action Items\n**Luke Sonnet**\n- Ship experiment metadata optimisation (04:20)\n- Ship Snowflake metadata capture improvements (04:20)\n- Release query monitoring dashboard (05:47)\n- Check update permission model (27:14)\n- Land deterministic analysis window (29:50)\n- Explore result differentiation (29:50)\n\n**Jiong**\n- Share result representation proposals (28:42)\n\n**Angela Borgman**\n- Share Snowflake meeting outcomes (31:10)",
       "organizer": "cris@growthbook.io",
       "participants": 9,
       "summary_quality": "good"

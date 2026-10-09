@@ -1,0 +1,18 @@
+{
+  "company": "dan@growthbook.io",
+  "slug": "dan-growthbook-io",
+  "last_etl_date": "2026-10-09T06:56:43.735514",
+  "calls": [
+    {
+      "id": "01M4E0H1C0E09467BPMTNJQZSS",
+      "source": "fireflies",
+      "title": "dan@growthbook.io - Thu, 08 Oct 2026 08:01:22 PDT - Untitled",
+      "date": "2026-10-08",
+      "duration_minutes": 11.430000305175781,
+      "summary": "# dan@growthbook.io - Thu, 08 Oct 2026 08:01:22 PDT - Untitled\nDate: 2026-10-08 | Duration: 11.430000305175781m\n\n## Summary\nNo summary available",
+      "organizer": "dan@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

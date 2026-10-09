@@ -1,0 +1,18 @@
+{
+  "company": "Emily Simpson and",
+  "slug": "emily-simpson-and",
+  "last_etl_date": "2026-10-09T06:56:43.736554",
+  "calls": [
+    {
+      "id": "01M4B1VAHV9SYA9ZWTF2TH400D",
+      "source": "fireflies",
+      "title": "Emily Simpson and James Shannon",
+      "date": "2026-10-08",
+      "duration_minutes": 23.450000762939453,
+      "summary": "# Emily Simpson and James Shannon\nDate: 2026-10-08 | Duration: 23.450000762939453m\n\n## Summary\nThe team agreed to shorten the POC to three months, covering October through December, with October focused on data integration and November and December on testing. The scope will remain limited to achievable integration goals based on current data-team capacity, while the team develops a high-level design for longer-term integration. Commercial terms and contract governance, including walk-away clauses, will be addressed before full commitment, with a mid-October signature targeted to align with the POC start. Technical and commercial discussions will continue in parallel, and a face-to-face meeting with CTO DJ is planned within two weeks. The data team will conduct sizing and feasibility work next week, supported by James if needed. If sufficient resources cannot be committed, the team may pause the POC and resume later rather than accept prolonged delays.\n\n## Keywords\nPOC length, data integration, resource capacity, commercial terms, contract negotiation, CTO meeting\n\n## Action Items\n\n**James Shannon**\nAttend scheduled data call next Wednesday to assist with integration challenges (18:04)\nPrepare for face-to-face meeting with Emily’s team and CTO to finalize commercial terms and contract details (20:37)\nAwait Emily’s proposal on meeting date with CTO for contract and commercial discussion (21:24)\n\n**Emanuele Pane**\nMonitor data team’s capacity and progress next week to evaluate feasibility of proceeding or pausing the POC based on resource availability (15:37)\nProvide a high-level design and size integration efforts for a shortened POC to ensure clear scope is defined (12:22)\n\n**Emily Simpson**\nFollow up with CTO (DJ) to confirm availability for face-to-face meeting with James to discuss commercial terms and contract governance (20:51)\nMaintain momentum by progressing data conversations in parallel with contract negotiations (21:14)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

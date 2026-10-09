@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Sunfire",
+  "slug": "growthbook-sunfire",
+  "last_etl_date": "2026-10-09T06:56:43.735440",
+  "calls": [
+    {
+      "id": "01M49JM3YM13955AK3BRNT914H",
+      "source": "fireflies",
+      "title": "Growthbook <> Sunfire - Intro",
+      "date": "2026-10-08",
+      "duration_minutes": 38.470001220703125,
+      "summary": "# Growthbook <> Sunfire - Intro\nDate: 2026-10-08 | Duration: 38.470001220703125m\n\n## Summary\nThe team aims to launch foundational experimentation and feature flagging by Q4 using GrowthBook rather than building internally. The platform offers Bayesian analysis, guardrail metrics, sequential testing, multi-armed and contextual bandits, sticky bucketing, and backend and frontend SDKs. Its warehouse-native design connects directly to Postgres, supports historical experiment imports, and enables SQL, CSV, or API-based reporting. Self-hosting is preferred because the team handles PHI, expects traffic growth, and needs secure connectivity to Postgres behind a VPN; cloud hosting offers automatic updates but includes CDN costs and connectivity considerations. GrowthBook supports open-source deployment, SOC 2, HIPAA, BAAs, and disabling AI features when required. A roughly two-week trial may include historical data onboarding, dashboards, and direct technical support, followed by a POC scoping call and confirmation of legal requirements. Seat-based pricing for self-hosted usage was viewed as more predictable for backend-heavy applications.\n\n## Keywords\nwarehouse-native, feature flagging, experimentation, multi-armed bandits, healthcare compliance, self-hosted trial\n\n## Action Items\n\n**Conner Lane**\nConfirm with legal if a Business Associate Agreement (BAA) is required prior to starting the trial (33:28)\nAttend the Proof of Concept (POC) scoping call scheduled for the Wednesday following the current week to clarify success criteria and address legal or technical questions (35:14)\n\n**Dan Wathne**\nSend a follow-up email to Sunfire with the booking link for the POC scoping call (35:32)\nProvide the license key for the self-hosted trial to Sunfire via secure note sharing (35:06)\n\n**Unassigned**\nProvide standard Business Associate Agreement (BAA) and trust center security documentation to Sunfire to support compliance and procurement processes (32:58)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

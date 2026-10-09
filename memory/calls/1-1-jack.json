@@ -1,0 +1,18 @@
+{
+  "company": "1:1 Jack &",
+  "slug": "1-1-jack",
+  "last_etl_date": "2026-10-09T06:56:43.734081",
+  "calls": [
+    {
+      "id": "01M4BW8BGX3AKAFW4EHDH06F5J",
+      "source": "fireflies",
+      "title": "1:1 Jack & Alyssa",
+      "date": "2026-10-08",
+      "duration_minutes": 27.940000534057617,
+      "summary": "# 1:1 Jack & Alyssa\nDate: 2026-10-08 | Duration: 27.940000534057617m\n\n## Summary\nThe discussion covered stricter Notion task management, with tickets limited to consented tasks and automated suggestions requiring Alyssa’s manual approval. Codex is preferred over Claude because it completes tasks decisively, while Anthropic-related data ingestion is prohibited and custom filters provide a workaround. The website’s cookie banner covers much of the screen, harms user experience, and makes analytics user counts unreliable; Plausible Analytics and a Growth Book integration are being considered. Website maintenance is constrained by Chris’s half-time contractor availability and Yousef’s less-than-half-time involvement, while previous agency performance created SEO issues and a redesign is planned. The team wants a consistent, less corporate tone across the website, documentation, social media, videos, webinars, and replies, supported by a rewritten style guide and a more human, engaging blog. Alyssa prefers Slack nudges for responses, while Jack prioritizes meaningful LinkedIn connections.\n\n## Keywords\nNotion tickets, AI workflows, cookie consent banner, website analytics, content style guide, marketing communication\n\n## Action Items\n**Alyssa Nicoll**  \nSend LinkedIn connection request and track Slack messages (08:27)  \nThumbs up or down Notion tickets after meeting (01:10)  \nAdd Jack Virag to Marketing All Hands meetings (13:10)  \nSupport creating consistency across website, app, documentation (21:15)  \n\n**Jack Virag**  \nUpdate skill to create Notion tickets only for tasks he consents to (01:20)  \nMonitor Marketing All Hands invitations and Slack channels (12:30)  \nExplore switching cookie consent management to HubSpot (15:30)  \nCollaborate with Ashley and Chris to fix website analytics and cookie banner (16:58)  \nPropose implementing Growth Book analytics (17:20)  \nRefine and rewrite company style guide and content voice/tone (22:30)  \nShare Substack article on content strategy with Alyssa (24:10)",
+      "organizer": "alyssa@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

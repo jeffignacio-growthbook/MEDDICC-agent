@@ -1,0 +1,18 @@
+{
+  "company": "Planner5d + Growthbook",
+  "slug": "planner5d-growthbook",
+  "last_etl_date": "2026-10-09T06:56:43.736232",
+  "calls": [
+    {
+      "id": "01M48V6T755273FYMS08YXTM7Y",
+      "source": "fireflies",
+      "title": "Planner5d + Growthbook",
+      "date": "2026-10-08",
+      "duration_minutes": 13.039999961853027,
+      "summary": "# Planner5d + Growthbook\nDate: 2026-10-08 | Duration: 13.039999961853027m\n\n## Summary\nThe organization currently uses approximately 42–43 seats, with usage expected to decline to 30–35 next year because the development team is being downsized. Nearly all platform features are actively used. The deployment will remain self-hosted, with proxies already configured and no planned move to a cloud or hosted solution. Growth Book is the primary tool for feature flags and experimentation, replacing Firebase across the product; backend API flags provide some backup, while the product team manages flags and the analytics team runs experiments. Advanced capabilities such as Bandits are not yet fully used. Renewal is due at the end of the month, has no auto-renew clause, and would not interrupt service if delayed. Pricing and renewal figures will be shared soon. The organization prefers annual billing split across two or three installments, pending confirmation from finance early next week. Denis Makagonov is the system owner, and the CEO led the original purchase. Slack is preferred for communication, with support teams already connected and Andy Marshall reachable through Slack, email, or phone.\n\n## Keywords\nfeature flags, renewal, billing installments, self-hosted, Growthbook adoption, downsizing seats\n\n## Action Items\n**Andy Marshall**  \nGather and prepare renewal pricing details for Planner5D (08:20)  \nAsk finance team about installment billing options (10:28)  \nSend renewal offer and billing details to Denis (10:28)  \n\n**Denis Makagonov**  \nReview renewal pricing and billing options from Growthbook (10:28)  \nPlan to finalize and sign renewal agreement in Lithuania (11:07)",
+      "organizer": "marsh@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

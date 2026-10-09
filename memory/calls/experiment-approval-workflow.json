@@ -1,0 +1,18 @@
+{
+  "company": "Experiment Approval Workflow",
+  "slug": "experiment-approval-workflow",
+  "last_etl_date": "2026-10-09T06:56:43.731999",
+  "calls": [
+    {
+      "id": "01M4EF48PQZCX76JQJFF251S91",
+      "source": "fireflies",
+      "title": "Experiment Approval Workflow Review",
+      "date": "2026-10-08",
+      "duration_minutes": 48.34000015258789,
+      "summary": "# Experiment Approval Workflow Review\nDate: 2026-10-08 | Duration: 48.34000015258789m\n\n## Summary\nThe discussion focused on designing an approval workflow in which a request approval button replaces start experiment, with an optional comment modal and a disabled submission state. Reviewers would see a full-bleed callout and review CTA, while requesters would access the review surface and see an empty state while awaiting action. Review comments should be separated from experiment comments, potentially through a tabular UI or dedicated review tab. Reviewers may edit drafts depending on organization settings, although editing could affect approval eligibility and authors must be tracked for audit. Re-request approval behavior remains undecided for the MVP, and status changes after edits may depend on settings. Proposed UI elements include tab-level approval indicators, a review surface with a header, right rail, body, and Claude-provided summary, while raw JSON diffs should generally be avoided. Future work includes a consistent review surface, notification integration, mobile support, a running-experiment review state, and coordination between design and engineering teams.\n\n## Keywords\nexperiment approvals, review surface, request approval, UI design, comments integration, organizational permissions\n\n## Action Items\n**Gabe Melean**  \nAdd full bleed callout for requesters (07:35)  \nClarify separation between experiment and review comments (14:50)  \nUpdate UI copy for request approval button (17:18)  \nIncorporate navigation from experiment to review surface (20:15)  \nIntegrate approval control and status UI elements (41:40)  \nContinue design iteration on draft experiments (46:00)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

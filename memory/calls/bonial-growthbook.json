@@ -1,7 +1,7 @@
 {
   "company": "Bonial & GrowthBook",
   "slug": "bonial-growthbook",
-  "last_etl_date": "2026-10-02T06:25:29.670732",
+  "last_etl_date": "2026-10-09T06:56:43.736040",
   "calls": [
     {
       "id": "01M3KGWWGARD21EFTAZRTQ04G0",
@@ -12,6 +12,17 @@
       "summary": "# Bonial & GrowthBook | Setup Discussion and Enterprise environment\nDate: 2026-10-01 | Duration: 60m\n\n## Summary\nBonial reviewed its experimentation challenges and evaluated GrowthBook as a potential alternative to Apptimize. Bonial has used Apptimize for more than five years but cited SDK issues, unreliable user distribution, limited support, and reduced trust. GrowthBook is currently used only for A/B test analysis, while Apptimize still handles distribution and feature flagging. The team wants to expand experimentation from mobile to web and backend services, including search algorithm testing, while integrating with custom AWS S3 and Glue pipelines. GrowthBook presented its open-source platform, integrated feature flags, self-hosted and EU cloud deployment options, 27+ SDKs, targeting, streaming updates, guardrail metrics, namespaces, APIs, CLI, and cloud integrations. Web consent, flicker, sticky bucketing, and seasonality were also discussed. GrowthBook offered a no-cost proof of concept, and Bonial requested a follow-up demo focused on A/B test setup, feature flagging, and PM-friendly analytics.\n\n## Keywords\nAB testing, feature flags, GrowthBook, Apptimize, SDK architecture, GDPR consent, POC, data infrastructure\n\n## Action Items\n**Marcel Geldner**\nFollow up with draft pricing and planning (45:17)  \nSend demo invitation to participants (49:32)  \n\n**Fevzi Kahraman**  \nSend GrowthBook requirement list (48:00)  \nCheck calendars for demo scheduling (49:38)  \n\n**Rémy Marin**  \nPrepare demo on AB testing and analytics (48:30)  \nShare meeting video and transcript (49:44)  \n\n**Unassigned**  \nCoordinate and finalize demo date (49:31)",
       "organizer": "marcel@growthbook.io",
       "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M3YNC8PE2K8NB0G5K7WMQ2J8",
+      "source": "fireflies",
+      "title": "Bonial & GrowthBook | Platform Demo",
+      "date": "2026-10-08",
+      "duration_minutes": 75,
+      "summary": "# Bonial & GrowthBook | Platform Demo\nDate: 2026-10-08 | Duration: 75m\n\n## Summary\nThe discussion covered severe weather disruption to Barcelona operations, affecting 200 micro leaders on Monday, and reviewed the meeting agenda and upcoming commercial discussion. GrowthBook’s OpenFeature SDK supports JavaScript, Python, Go, .NET, and Java, but not iOS mobile. Deployment options include cloud, self-hosted, and hybrid models, with hybrid setups requiring data pipelines. Data sharing is limited to aggregate BI data, with no personal data and read-only warehouse access from a single IP. The demo covered Boolean, string, and JSON feature flags, attribute targeting, scheduled ramp-ups, approval steps, and Bayesian auto-kill guardrails. Experiments use hypotheses, traffic splits, mutually exclusive namespaces, bandits, dashboards, funnels, and SQL Explorer. User or session IDs are required for tracking and consistent sticky bucketing, while caching creates backend propagation challenges that may require warehouse mapping tables. A POC may begin before full legal clearance, with legal work running in parallel. Graham’s office visit is planned for October 14. Next steps include sharing requirements and the recording, arranging a POC follow-up, and holding deeper technical sessions.\n\n## Keywords\nfeature flags, A/B testing, ramp-up guardrails, self-hosted architecture, synthetic tests, experiment dashboard\n\n## Action Items\n**Marcel Geldner**  \nInvite participants to commercial meeting (03:07)  \nDiscuss and arrange Graham visit timing (04:36)  \nShare completed requirements list with client (59:47)  \nCoordinate deeper technical session with Graham and Amin (01:00:47)  \n\n**Rémy Marin**  \nProvide legal and security details for POC (03:07)  \nFollow up on mobile SDK support plans (07:16)  \nExplain experiment ID and exposure ID linking via SQL (33:52)  \nProvide additional documentation and sample graphs on ID architecture (37:43)  \nClarify bandit experiment traffic allocation and namespace usage (49:21)  \nConfirm API support for synthetic test middleware (57:25)  \n\n**Fevzi Kahraman**  \nAlign internal team on Growth Book architecture decisions (24:23)  \nDiscuss internal data flow pipeline between client warehouse and cloud (24:23)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 8,
       "summary_quality": "good"
     }
   ]

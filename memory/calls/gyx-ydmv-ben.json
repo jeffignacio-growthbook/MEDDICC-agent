@@ -1,0 +1,18 @@
+{
+  "company": "gyx-ydmv-ben",
+  "slug": "gyx-ydmv-ben",
+  "last_etl_date": "2026-10-09T06:56:43.732995",
+  "calls": [
+    {
+      "id": "01M4EDR3NXWGKY508KHHKVDGP1",
+      "source": "fireflies",
+      "title": "gyx-ydmv-ben",
+      "date": "2026-10-08",
+      "duration_minutes": 1,
+      "summary": "# gyx-ydmv-ben\nDate: 2026-10-08 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}
