@@ -1,0 +1,18 @@
+{
+  "company": "Nocnoc + GrowthBook",
+  "slug": "nocnoc-growthbook",
+  "last_etl_date": "2026-10-10T06:31:53.898648",
+  "calls": [
+    {
+      "id": "01M3W0N2ZSJHTZX3SBWK96PHBT",
+      "source": "fireflies",
+      "title": "Nocnoc + GrowthBook",
+      "date": "2026-10-09",
+      "duration_minutes": 53.25,
+      "summary": "# Nocnoc + GrowthBook\nDate: 2026-10-09 | Duration: 53.25m\n\n## Summary\nThe discussion focused on scaling rigorous A/B testing beyond the current limit of 2–3 concurrent experiments, which is caused by data science capacity and requires the team to handle sample selection, guidance, and analysis. The goal is to run more than 15 experiments per quarter through self-service workflows for product and business teams, including pricing and listing-quality tests. GrowthBook was presented as a warehouse-native platform that connects to AWS Athena through read-only roles, processes aggregated data, and supports custom metrics without SQL. It offers feature flags, flexible bucketing, visual and low-code experimentation tools, AI-assisted text changes, dashboards, win-rate tracking, loss avoidance, and stratified assignment. The platform supports cloud-managed and self-hosted AWS deployments. Christian offered an enterprise trial, while Macarena and Martín plan to test integrations, metrics, experiment setup, and feature flagging internally.\n\n## Keywords\nGrowthBook, A/B Testing, AWS Athena, Experimentation, Feature Flagging, Data Warehouse Integration\n\n## Action Items\n\n**Christian Liebenow**\nSend a follow-up email to Nocnoc with the demo recording and relevant documentation from the meeting to support their evaluation of GrowthBook (51:00)\nSet up an enterprise trial of GrowthBook for Nocnoc to provide full access to all demonstrated features, enabling hands-on testing (50:59)\n\n**Macarena Deana**\nTest the GrowthBook platform using the enterprise trial and evaluate its capabilities for Nocnoc's experimentation needs (51:37)\nPrepare questions and feedback based on the trial experience to discuss in a follow-up meeting with GrowthBook (51:48)\n\n**Martín Sosa**\nDiscuss internally the deployment options (managed cloud vs. self-hosted) and pricing models with the GrowthBook team to determine the best fit for Nocnoc (27:11)\n\n**GrowthBook Technical Team**\nProvide detailed explanations and support regarding GrowthBook's Athena integration and architecture during demos and technical discussions (27:57)\nSupport Nocnoc during the trial period by addressing technical queries and assisting with platform usage to ensure successful evaluation (50:53)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

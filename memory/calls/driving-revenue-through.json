@@ -1,0 +1,18 @@
+{
+  "company": "Driving Revenue Through",
+  "slug": "driving-revenue-through",
+  "last_etl_date": "2026-10-10T06:31:53.898873",
+  "calls": [
+    {
+      "id": "01M4FXJHBJTDP6JGAPDZX51RE7",
+      "source": "fireflies",
+      "title": "Driving Revenue Through Experimentation and Data Strategy",
+      "date": "2026-10-09",
+      "duration_minutes": 43.560001373291016,
+      "summary": "# Driving Revenue Through Experimentation and Data Strategy\nDate: 2026-10-09 | Duration: 43.560001373291016m\n\n## Summary\nThe discussion identified three value drivers: cash savings from removing tools and agency costs, revenue growth from increased experimentation, and developer capacity created through AI and self-service. A revenue example showed that 12 additional experiments could generate a 0.3% lift worth €15 million, based on a 0.1% lift per winning experiment and a 25% win rate. The group recommended making revenue and growth the core value message, supported by case studies such as Breeze Airways, while keeping CFO conversations simple. Sales progress depends on commercial champions who can provide data access, metrics, and follow-up. Pricing objections were considered common, but clear customer pain was viewed as more important than price. The SAS engagement involves technical and business stakeholders, with questions about integrations, best practices, growth planning, experiment volume, and traffic data. The team plans tailored revenue-growth slides using 1.5 million monthly visitors as a baseline, alongside decision trees and pre-call data-availability checks.\n\n## Keywords\nROI modeling, experimentation platform, revenue impact, SaaS sales, conversion rate, customer pain points\n\n## Action Items\n**Marcel Geldner**  \nProvide insights and data from SAS conversations (31:20)  \n\n**James Shannon**  \nBuild tailored ROI slide for SAS (41:39)  \n\n**Rémy Marin**  \nCollaborate on SAS ROI case preparation (41:42)",
+      "organizer": "remy@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

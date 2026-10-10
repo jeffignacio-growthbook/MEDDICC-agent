@@ -1,0 +1,18 @@
+{
+  "company": "Olini & GrowthBook",
+  "slug": "olini-growthbook",
+  "last_etl_date": "2026-10-10T06:31:53.898735",
+  "calls": [
+    {
+      "id": "01M4DGMJN6DH19YB9A04TJYPD4",
+      "source": "fireflies",
+      "title": "Olini & GrowthBook | Introduction call",
+      "date": "2026-10-09",
+      "duration_minutes": 42,
+      "summary": "# Olini & GrowthBook | Introduction call\nDate: 2026-10-09 | Duration: 42m\n\n## Summary\nThe discussion covered experimentation on a new Shopware platform using GrowthBook with a custom plugin, beginning with smoke tests and expanding from simple features such as sticky add-to-cart buttons to checkout changes and more complex tests. Key measures include add-to-cart rate, conversion rate, engagement, and subscription impact, with planned Sublime analytics integration for LTV, CAC, and long-term cohort analysis. Bayesian statistics support evaluation through chance-to-win thresholds, credible intervals, and power analysis; results above 95% indicate a winner, while results below 5% indicate a loser. Contextual bandits can use user context across simultaneous tests, while namespaces help prevent interference between site sections, although higher traffic is required. Parallel testing in development and production, targeting rules, and automatic rollback guardrails support ongoing feature development. The strategy prioritizes measured feature impact over intuition; typical uplift is about 1.2%, and tests may take 2–4 weeks, with parallel and segmented testing helping reduce waiting time. GrowthBook documentation and solution-engineer support were offered for continued learning.\n\n## Keywords\nA/B testing, GrowthBook, Bayesian statistics, contextual bandits, feature flags, subscription metrics\n\n## Action Items\n**Mateusz Stec**  \nBegin running simple A/B tests on Olini website (12:15)  \nLearn Growth Book knowledge base and documentation (31:03)  \n\n**Marcel Geldner**  \nShare Growth Book documentation and knowledge base links (30:09)  \nProvide ongoing support and consult with solution engineers (31:37)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

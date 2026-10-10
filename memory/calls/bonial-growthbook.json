@@ -1,7 +1,7 @@
 {
   "company": "Bonial & GrowthBook",
   "slug": "bonial-growthbook",
-  "last_etl_date": "2026-10-09T06:56:43.736040",
+  "last_etl_date": "2026-10-10T06:31:53.898500",
   "calls": [
     {
       "id": "01M3KGWWGARD21EFTAZRTQ04G0",
@@ -23,6 +23,17 @@
       "summary": "# Bonial & GrowthBook | Platform Demo\nDate: 2026-10-08 | Duration: 75m\n\n## Summary\nThe discussion covered severe weather disruption to Barcelona operations, affecting 200 micro leaders on Monday, and reviewed the meeting agenda and upcoming commercial discussion. GrowthBook’s OpenFeature SDK supports JavaScript, Python, Go, .NET, and Java, but not iOS mobile. Deployment options include cloud, self-hosted, and hybrid models, with hybrid setups requiring data pipelines. Data sharing is limited to aggregate BI data, with no personal data and read-only warehouse access from a single IP. The demo covered Boolean, string, and JSON feature flags, attribute targeting, scheduled ramp-ups, approval steps, and Bayesian auto-kill guardrails. Experiments use hypotheses, traffic splits, mutually exclusive namespaces, bandits, dashboards, funnels, and SQL Explorer. User or session IDs are required for tracking and consistent sticky bucketing, while caching creates backend propagation challenges that may require warehouse mapping tables. A POC may begin before full legal clearance, with legal work running in parallel. Graham’s office visit is planned for October 14. Next steps include sharing requirements and the recording, arranging a POC follow-up, and holding deeper technical sessions.\n\n## Keywords\nfeature flags, A/B testing, ramp-up guardrails, self-hosted architecture, synthetic tests, experiment dashboard\n\n## Action Items\n**Marcel Geldner**  \nInvite participants to commercial meeting (03:07)  \nDiscuss and arrange Graham visit timing (04:36)  \nShare completed requirements list with client (59:47)  \nCoordinate deeper technical session with Graham and Amin (01:00:47)  \n\n**Rémy Marin**  \nProvide legal and security details for POC (03:07)  \nFollow up on mobile SDK support plans (07:16)  \nExplain experiment ID and exposure ID linking via SQL (33:52)  \nProvide additional documentation and sample graphs on ID architecture (37:43)  \nClarify bandit experiment traffic allocation and namespace usage (49:21)  \nConfirm API support for synthetic test middleware (57:25)  \n\n**Fevzi Kahraman**  \nAlign internal team on Growth Book architecture decisions (24:23)  \nDiscuss internal data flow pipeline between client warehouse and cloud (24:23)",
       "organizer": "marcel@growthbook.io",
       "participants": 8,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4BS39M9G309Y1C2G8NHRBTV",
+      "source": "fireflies",
+      "title": "Bonial & GrowthBook | Commercials",
+      "date": "2026-10-09",
+      "duration_minutes": 35,
+      "summary": "# Bonial & GrowthBook | Commercials\nDate: 2026-10-09 | Duration: 35m\n\n## Summary\nThe discussion covered Growth Book’s commercial model, including a platform fee for security, governance, and support, with user-seat or experiment-based pricing. Self-hosted licensing was stated as $50,000 per year, while cloud hosting was $70,000 per year plus $1,000 per user annually; an initial estimate for 30 users was $100,000 per year, including training, onboarding, and features. Pricing and user counts remain negotiable, with lower effective per-user costs at higher volumes. Technical discussions included migration from Optimize, with Chris Sanders involved, and support for web, mobile, and backend applications. SDK performance and infrastructure speed still require review. A proof of concept was recommended before contractual and legal steps. Finance and peer discussions are needed to refine the budget and user count, while vendor assessments continue equally. Customer success support includes onboarding, training, Slack assistance, role-based access, and ongoing adoption monitoring. A response from Graham is awaited regarding a meeting on the 14th, and an in-person discussion with Armin is planned.\n\n## Keywords\nSelf-hosted solutions, Commercial pricing, User seat model, Migration process, Proof of concept (PoC), Budget planning\n\n## Action Items\n**Fevzi Kahraman**  \nDigest shared pricing and ROI materials (24:00)  \nSend brief to Armin summarizing pricing options (24:00)  \n\n**Marcel Geldner**  \nPrepare clarified pricing slides (16:51)  \nCoordinate with Chris Sanders on migration (21:00)  \nSupport planning and execution of PoC (22:30)  \nSend detailed commercial proposals to Fevzi (24:20)  \nMaintain quick responses to Fevzi’s questions (24:48)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

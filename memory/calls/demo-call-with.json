@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-10-08T06:47:48.885576",
+  "last_etl_date": "2026-10-10T06:31:53.895049",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -882,6 +882,28 @@
       "date": "2026-10-07",
       "duration_minutes": 2,
       "summary": "# Demo Call with Irina from\nDate: 2026-10-07 | Duration: 2m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4BW1V50V2182TVVKT0AZY62",
+      "source": "fireflies",
+      "title": "Demo Call with Summer McAnally from",
+      "date": "2026-10-09",
+      "duration_minutes": 31.780000686645508,
+      "summary": "# Demo Call with Summer McAnally from\nDate: 2026-10-09 | Duration: 31.780000686645508m\n\n## Summary\nThe discussion focused on increasing testing velocity from two monthly tests across three brands to rapid experimentation across 18 brands. Current challenges include manually duplicating CMS pages, fragmented insights across testing and analytics tools, slow statistical significance, unclear Contentful workflows, and cookie-related data quality issues. GrowthBook presented a warehouse-native platform connected to Snowflake, with experiment assignment data, configurable metric catalogs, real-time and historical analysis, health checks, exposure-balance monitoring, power analysis, and support for multivariate and multi-arm bandit testing. Its AI capabilities, including Claude-based workflows developed with Anthropic, are intended to accelerate test design and insight generation. The platform also offers Contentful integration, code-based and no-code workflows, open-source transparency, more than 30 SDK languages, and direct access to engineers and data scientists. A follow-up technical session will examine Contentful and Snowflake integration, identity mapping, GA4 capabilities, custom audiences, and AI testing features.\n\n## Keywords\nCRO program, experimentation velocity, Contentful CMS, cookie consent, Snowflake integration, AI workflow\n\n## Action Items\n\n**Dan Wathne**\nSend documentation on how Growth Book handles user identification and tracking with cookie consent challenges (23:39)\nVerify and confirm ability to set up custom audiences for variants that push to GA4 and communicate findings (29:14)\nSend follow-up email recap with relevant documents covering topics discussed and share a booking link to schedule a technical follow-up with the solutions engineer, Logan (29:42)\nCoordinate and confirm follow-up meeting scheduling for Tuesday or later next week based on Horizon’s availability (30:08)\n\n**Summer McAnally**\nCoordinate internal scheduling for a follow-up demo session with Growth Book team (30:03)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4GJT7TZB8BN4434XA5GYD2Y",
+      "source": "fireflies",
+      "title": "Demo Call with thomas picquet from",
+      "date": "2026-10-09",
+      "duration_minutes": 11,
+      "summary": "# Demo Call with thomas picquet from\nDate: 2026-10-09 | Duration: 11m\n\n## Summary\nThe customer team has used GrowthBook Pro for over a year and is generally satisfied with its regular updates and UI improvements. Two active users track around three or four key metrics per experiment and report results to leadership and marketing, while AI features and complex query tools are not currently used. The team tracks roughly 10 key countries and requested metric slicing by dimensions such as country or curve, a capability currently unavailable in Pro but available in Enterprise. Pro costs roughly $60 per user monthly and fits the team’s current scale, whereas Enterprise starts at a $50,000 annual platform fee with five users included, discounted to $35,000 for October. Because their largest experiment wins provide about $1,000 in value and Enterprise includes features they do not need, they plan to remain on Pro. Scott will escalate the slicing request to the CTO and share documentation about new releases.\n\n## Keywords\nmetric slices, GrowthBook Pro, Enterprise pricing, AI features, user limits, customer feature request\n\n## Action Items\n\n**Scott Keller**\nPass Thomas Picquet’s metric slices feature request on to CTO Jeremy for consideration in the GrowthBook Pro package (09:22)\nSend Thomas Picquet a follow-up email with new feature releases, relevant documentation, and contact information to support his continued use of GrowthBook Pro (10:06)\n",
       "organizer": "scott.keller@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

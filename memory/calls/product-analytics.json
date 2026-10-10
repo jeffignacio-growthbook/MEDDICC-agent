@@ -1,7 +1,7 @@
 {
   "company": "Product Analytics |",
   "slug": "product-analytics",
-  "last_etl_date": "2026-09-19T06:09:55.673250",
+  "last_etl_date": "2026-10-10T06:31:53.896973",
   "calls": [
     {
       "id": "01KGMVVVST5VWF9HEYV5ZPW8E8",
@@ -760,6 +760,17 @@
       "summary": "# Product Analytics | Squad Standup\nDate: 2026-09-18 | Duration: 10m\n\n## Summary\nThe team reviewed progress across product, analytics, billing, and engineering reliability. Cohorts specification has started, with edge cases identified and a kickoff likely next week; the prototype is functional, while interface polish, empty states, and coordination remain. Metrics feedback is largely addressed, although the count-distinct column-selector issue needs more reproduction detail. User-journey testing revealed ClickHouse memory pressure, with backend request logs representing 95% of managed-warehouse events and a proposed default exclusion for selected event names. Experimentation exposure logs are ready for review, funnel slice support remains in progress, and session replay feedback is still pending. The visual-editor cloud-code workflow and Little Break end-to-end flow are also underway; the latter has its workspace setup complete, one PR merged, and seven remaining after validation. AI usage and billing implementation is being reassessed, with Michael testing an alternative rate-list model today. Preview failures have decreased but remain, while PR-only preview builds and a tested, backward-compatible compression update are under consideration.\n\n## Keywords\nAI usage pricing, Cohorts, ClickHouse, Experimentation exposure logs, Funnel slices, Preview environments\n\n## Action Items\n**Michael Knowlton**\nSet up kickoff meeting (01:12)\nDevelop visual editor skill (01:12)\nBuild AI usage proof-of-concept (05:55)\n\n**Johnny Martinez**\nInvestigate column selector bug (02:45)\nRefine preview build process (02:45)\nComplete workspace flow testing (05:16)\nOpen remaining pull requests (05:35)\nShare cohorts prototype link (07:26)\nCreate Cohorts communication channel (09:08)",
       "organizer": "johnny@growthbook.io",
       "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4GRM2PWCSV88ZBR8A0HYV5D",
+      "source": "fireflies",
+      "title": "Product Analytics | Squad Standup",
+      "date": "2026-10-09",
+      "duration_minutes": 14,
+      "summary": "# Product Analytics | Squad Standup\nDate: 2026-10-09 | Duration: 14m\n\n## Summary\nThe team is refining the design-principles document to keep it concise and useful for real design work, with fewer iterations and course corrections as a validation signal. The attributes prototype is moving toward a simpler two-state experience, pending Jeremy’s input, while homepage and settings work continues. The metrics creation flow is feature-flagged for GrowthBook testing, and metric discovery may later address sorting and grouping challenges in large organizations. Population front-end work will initially list populations, with feature-flag setup coordinated by Ali and Nobu before SQL work. Data infrastructure efforts include reviewing four or five largely unused Confluent BigQuery connectors before customer-confirmed deletion, addressing 31 or 32 ongoing Sentry errors from the event forwarder, and merging Snowflake work. Data-source onboarding copy is being simplified around attributes, identifiers, mapping, hashing, and types. AI autocomplete model selection was approved, with lower-cost models planned for the manually maintained list. License synchronization to HubSpot is working, and onboarding copy will receive further refinement.\n\n## Keywords\nDesign principles, Attribute identifiers, Feature flags, Metric discovery, Data-source onboarding, AI autocomplete\n\n## Action Items\n**Johnny Martinez**\nRefine design-principles document (01:43)\nFinalize attribute prototypes (03:30)\nAdvance homepage implementation (03:30)\nAdvance settings implementation (03:30)\nRequest feature-flag feedback (03:30)\n\n**Unassigned**\nReview outstanding pull requests (06:20)\nInvestigate metric discovery (06:20)\nContact inactive BigQuery customers (07:51)\nMerge event-forwarder fix (07:51)\nMerge Snowflake changes (07:51)\nUpdate AI model dropdown (07:51)\n\n**Michael**\nPolish attribute terminology copy (09:23)\nPolish identifier terminology copy (09:23)\n\n**Nobu**\nReview populations feature-flag setup (11:18)\n\n**Alli**\nOpen populations listing PR (11:18)\nHide populations behind feature flag (11:18)\nContinue frontend implementation (11:18)\nStart SQL implementation (11:18)\nIncrease PR review participation (11:18)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 8,
       "summary_quality": "good"
     }
   ]

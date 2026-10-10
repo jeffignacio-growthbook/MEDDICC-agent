@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Blablacar",
+  "slug": "growthbook-blablacar",
+  "last_etl_date": "2026-10-10T06:31:53.898804",
+  "calls": [
+    {
+      "id": "01M4E335WXP4V926NNYSE1JN00",
+      "source": "fireflies",
+      "title": "Growthbook <> Blablacar - Data discussion",
+      "date": "2026-10-09",
+      "duration_minutes": 31.649999618530273,
+      "summary": "# Growthbook <> Blablacar - Data discussion\nDate: 2026-10-09 | Duration: 31.649999618530273m\n\n## Summary\nGrowthbook setup involves configuring BigQuery as a data source and using a custom event forwarder with a key file. The forwarder passes data through with minimal storage, and data is available through an EU server. Pipeline mode can optimize BigQuery costs but requires read/write access and is an enterprise feature that is off by default. Visitor ID provides consistent device tracking across logged-in and logged-out states, while user ID is added when users log in; a join table connects visitor ID, user ID, and anonymous ID for analysis, not experiment assignment. Fact tables are generated from event-forwarder data and include timestamps, user IDs, device IDs, and event attributes. Metrics use fact tables, filters, and SQL previews, with GitHub YAML synchronization supported for configuration. The first experiment is expected to generate about 5 million events, with total volume under 10 million, and deduplication occurs only within individual sessions. James will confirm API support for fact-table configuration as code and share volume information with the CTO, while Adrien will work with a data analyst on setup and infrastructure as code. Follow-up discussion is planned for local evaluation and ciphering.\n\n## Keywords\nGrowthbook, BigQuery, event forwarder, fact tables, experiment identifiers, pipeline mode\n\n## Action Items\n**James Shannon**  \nConfirm event forwarder enablement (06:01)  \nDemonstrate BigQuery data source and event forwarder (09:46)  \nFollow up on event volume estimates with CTO (27:38)  \nAddress local evaluation and encryption questions (29:51)  \n\n**Adrien LOISON**  \nFind and generate BigQuery key file (07:27)  \nWork with data analyst on configuration-as-code (26:11)  \nProvide event volume estimates to Growthbook team (27:33)  \nPing Growthbook team with further questions (30:28)  \n\n**Rémy Marin**  \nDouble-check Growthbook documentation on BigQuery key (07:58)  \nVerify API capabilities for fact tables and config-as-code (25:22)  \nFollow up with technical answers on local evaluation and encryption (29:51)",
+      "organizer": "remy@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

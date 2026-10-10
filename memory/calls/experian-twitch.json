@@ -1,0 +1,18 @@
+{
+  "company": "Experian & Twitch",
+  "slug": "experian-twitch",
+  "last_etl_date": "2026-10-10T06:31:53.896361",
+  "calls": [
+    {
+      "id": "01M4BW32KN2K14P9W4FCSS9TYM",
+      "source": "fireflies",
+      "title": "Migration (Experian & Twitch)",
+      "date": "2026-10-09",
+      "duration_minutes": 30.75,
+      "summary": "# Migration (Experian & Twitch)\nDate: 2026-10-09 | Duration: 30.75m\n\n## Summary\nThe team is refining migration strategies and customer messaging for Anthropic, Twitch, Experian, and other large customers. Anthropic’s full cutover takes 10 weeks, involving thousands of feature flags and about 1,000 metrics, while Twitch has experienced migrations lasting nearly a year and Experian has 12 holdouts planned for next year. EPO’s open-source SDK can manage holdouts with lower hashing risk and offline support, with custom scripts available if needed. Dropbox’s reported full adoption demonstrates enterprise-scale capability. Growth Book is positioned against Datadog and in-house platforms through its open-source core, scalability, realistic commitments, direct engineering access, white-glove onboarding, and self-hosting options. One-to-one mapping of metrics and flags, existing customer event pipelines, and phased analytics-first adoption can reduce migration friction. The team also plans to address customer-specific gaps, such as Anthropic’s daily participation metrics, prepare concise migration summaries, coordinate pricing around projected usage, and use leadership and in-person engagement to build trust.\n\n## Keywords\nmigration, holdouts, EPO importer, white glove onboarding, open source, Datadog\n\n## Action Items\n\n**Christian Liebenow**\nSend a note to Jessica (Twitch TPM) to clarify their specific needs and concerns regarding migration (11:40)\nPose question to Twitch regarding direct access to Datadog engineers to differentiate Growth Book’s support (15:31)\nEmphasize Growth Book’s direct line to engineering and hands-on support in communications with prospects to alleviate migration concern (21:20)\nEngage with Graham to possibly join future calls with Twitch and schedule Bay Area meeting for addressing viability questions (28:51)\n\n**Jeremy Dorn**\nContinue building and refining the EPO importer and Bow migrator tools to support migration efforts (07:02)\nPrepare to discuss and address technical migration questions with Twitch and other clients, including holdouts and metrics support (14:00)\nParticipate in Twitch’s upcoming discussions and demo within the next two weeks (28:51)\n\n**Chris Sanders**\nSupport the team by leveraging engineering connections to deliver white glove onboarding and engineering assistance in migrations (20:20)\nAssist in clarifying migration technical details, especially regarding event pipelines and Redshift warehouse compatibility (22:24)\n\n**Logan Bates**\nSupport clarifications on migration and client concerns; relay information on Twitch and other clients’ expectations for partnership and platform influence (15:01)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}
