@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-10-10T06:31:53.895049",
+  "last_etl_date": "2026-10-13T07:13:02.686642",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -906,6 +906,28 @@
       "summary": "# Demo Call with thomas picquet from\nDate: 2026-10-09 | Duration: 11m\n\n## Summary\nThe customer team has used GrowthBook Pro for over a year and is generally satisfied with its regular updates and UI improvements. Two active users track around three or four key metrics per experiment and report results to leadership and marketing, while AI features and complex query tools are not currently used. The team tracks roughly 10 key countries and requested metric slicing by dimensions such as country or curve, a capability currently unavailable in Pro but available in Enterprise. Pro costs roughly $60 per user monthly and fits the team’s current scale, whereas Enterprise starts at a $50,000 annual platform fee with five users included, discounted to $35,000 for October. Because their largest experiment wins provide about $1,000 in value and Enterprise includes features they do not need, they plan to remain on Pro. Scott will escalate the slicing request to the CTO and share documentation about new releases.\n\n## Keywords\nmetric slices, GrowthBook Pro, Enterprise pricing, AI features, user limits, customer feature request\n\n## Action Items\n\n**Scott Keller**\nPass Thomas Picquet’s metric slices feature request on to CTO Jeremy for consideration in the GrowthBook Pro package (09:22)\nSend Thomas Picquet a follow-up email with new feature releases, relevant documentation, and contact information to support his continued use of GrowthBook Pro (10:06)\n",
       "organizer": "scott.keller@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4K5HANB0FG68J1PF26XYJME",
+      "source": "fireflies",
+      "title": "Demo Call with Shoukry Mousa from",
+      "date": "2026-10-12",
+      "duration_minutes": 48.16999816894531,
+      "summary": "# Demo Call with Shoukry Mousa from\nDate: 2026-10-12 | Duration: 48.16999816894531m\n\n## Summary\nThe team urgently needs a unified platform for feature flags and experimentation to support business experiments, engineering rollouts, governance, auditing, kill switches, migrations, and clear ownership. The platform must integrate with Java and Kotlin backends, React frontends, and BigQuery, while handling approximately 42 million monthly transactions, with some months reaching 50 million, and supporting complex user- and transaction-level targeting. GrowthBook was considered a promising self-hosted, open-source option because its JavaScript, React, and Kotlin SDKs support local, real-time decisions and targeted attributes such as country, plan level, and tax ID. Flags and experiments can be managed through the UI, CLI, API, or webhooks, while exposure events and metrics are sent asynchronously to BigQuery. The team expects fewer than 20 experiments monthly across 8 domains and around 100 users, with strong emphasis on lifecycle management and cleanup. Results will use adjustable-frequency BigQuery queries, including payment authorization rates as a key metric. Evaluation starts with the free version, with commercial rollout targeted for late November and a broader demo scheduled for Monday the 26th at 3:00pm Berlin time.\n\n## Keywords\nFeature Flags, Experimentation Platform, BigQuery Integration, Self-Hosting, Traffic Metrics, Pricing Proposal\n\n## Action Items\n\n**Rémy Marin**\nShare detailed feature flag and experimentation requirements with GrowthBook team post-meeting (08:01)\nIdentify and connect GrowthBook team with commercial lead/contact for pricing discussions (40:41)\nCoordinate invitations for wider internal team and stakeholders to attend next demo session (40:17)\nConfirm internal policy on setting up Slack or other communication channels with external teams (44:02)\n\n**James Shannon**\nPrepare a tailored pricing proposal based on provided traffic and experiment usage metrics (20:08)\nShare the recording of today’s session with meeting participants (20:24)\nSchedule and send calendar invite for next demo call on November 26, 2023, at 3pm Berlin time (46:02)\nFollow up via email to summarize next steps and clarify commercial and technical engagement paths (46:34)\n\n**Nuno Filipe Vieira Marques**\nProvide concrete traffic and experimentation metrics if more precise data is needed post-call (14:14)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4JSVKPFVM2P19F314J1NMQ2",
+      "source": "fireflies",
+      "title": "Demo Call with Jai Patel from",
+      "date": "2026-10-12",
+      "duration_minutes": 31.770000457763672,
+      "summary": "# Demo Call with Jai Patel from\nDate: 2026-10-12 | Duration: 31.770000457763672m\n\n## Summary\nThe discussion evaluated GrowthBook as an A/B testing platform for the company’s website redesign and upcoming launch. Its SDK can be installed in under one day, or in under an hour using the MCP server, without involving the CRM or platform team; it embeds into front-end frameworks such as React or Next.js (29:19). The team compared Sanity integration, which lets marketers select content variants but requires context switching, with the visual editor, which offers low-code experimentation and Figma integration, although Figma is not yet used company-wide (12:29, 16:44). Because there is no internal data warehouse, GrowthBook’s managed ClickHouse warehouse would be needed, adding usage costs beyond the US$40-per-user monthly Pro license for up to 30 users and 3 projects (09:50, 08:56). Developers or product managers would configure experiments, while marketers would run tests and review results. Feature flags, traffic allocation, attribute targeting, and event tracking support controlled experimentation and analysis.\n\n## Keywords\nGrowthBook, Sanity integration, A/B testing, marketing team, visual editor, data warehouse\n\n## Action Items\n\n**James Shannon**\nSend Workspace.co documentation on Sanity integration and a video demonstrating the GrowthBook visual editor (28:48)\n\n**Workspace.co Team**\nReview provided documentation and video materials for GrowthBook Sanity integration and visual editor (28:58)\n\n**Workspace.co Development Team / Engineers**\nPlan installation of GrowthBook SDK within the website code base, estimating under an hour with MCP server or up to half a day without (29:00)\n\n**Workspace.co Product Team**\nConsider Figma adoption timeline for leveraging GrowthBook’s visual editor integration and evaluate whether to use visual editor workflow or Sanity workflow based on digital marketing tool usage (19:40)\n\n**Workspace.co Marketing Team**\nConfirm final list of end users who will run A/B tests internally and clarify collaboration with external agency on usage (06:00)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 5,
       "summary_quality": "good"
     }
   ]
