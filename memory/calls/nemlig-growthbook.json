@@ -1,0 +1,18 @@
+{
+  "company": "Nemlig & GrowthBook",
+  "slug": "nemlig-growthbook",
+  "last_etl_date": "2026-10-14T05:36:35.777001",
+  "calls": [
+    {
+      "id": "01M4NC8EA3TM5B20C5RGSQZH3D",
+      "source": "fireflies",
+      "title": "Nemlig & GrowthBook Commercial Discussion",
+      "date": "2026-10-13",
+      "duration_minutes": 23.780000686645508,
+      "summary": "# Nemlig & GrowthBook Commercial Discussion\nDate: 2026-10-13 | Duration: 23.780000686645508m\n\n## Summary\nSimon and James compared GrowthBook’s experiment-based and unlimited-license pricing against the current AB Tasty, PostHog, and Firebase setup. Simon favored the Launch model starting at $75,000, with unlimited seats and pay-per-experiment pricing, because GrowthBook’s current 22–25-seat structure includes unused licenses and is harder to align with usage. The unlimited model costs $168,750 annually for 25 seats, while AB Tasty costs about 300,000 DKK annually; PostHog and Firebase may create substantially higher costs if usage limits are removed. GrowthBook’s warehouse-native architecture, direct BigQuery data flow, privacy benefits, and centralized experimentation and feature flags were important advantages. Mobile experimentation, especially for iOS, is a key requirement, although some session replay capabilities may remain with PostHog. Simon wants a business case showing potential revenue impact, including modeling based on 60% of 3.3 billion DKK revenue from apps, a typical 0.1% conversion lift, and a 25% test-success rate. James offered migration support, a 10% first-year discount for signing before October 28th, and contract preparation. Leadership discussions were expected after the holiday week, with a Wednesday follow-up planned.\n\n## Keywords\npricing, experimentation, AB Tasty, GrowthBook, data privacy, mobile app testing\n\n## Action Items\n\n**James Shannon**\nSend Simon contract template reflecting experiment-based pricing for internal legal review (20:07)\nProvide detailed pricing numbers and model breakdown to Simon to facilitate internal financial discussion (16:45)\nFollow up with Simon on Wednesday for decision update and next steps (20:35)\nAssist with transition from self-hosted GrowthBook to cloud-based solution (09:03)\n\n**Simon Boriis**\nProvide James with internal numbers and data needed to finalize pricing proposal and business case (16:45)\nInitiate internal discussions post-holiday to evaluate GrowthBook proposal and pricing options (07:51)\nReview and coordinate with legal team regarding contract template once received (19:10)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "Gabe / Jeremy",
   "slug": "gabe-jeremy",
-  "last_etl_date": "2026-10-06T07:00:49.962634",
+  "last_etl_date": "2026-10-14T05:36:35.774785",
   "calls": [
     {
       "id": "01M32NRSS0HXWRTZ3NQJTYF7XA",
@@ -21,6 +21,17 @@
       "date": "2026-10-05",
       "duration_minutes": 27.469999313354492,
       "summary": "# Gabe / Jeremy\nDate: 2026-10-05 | Duration: 27.469999313354492m\n\n## Summary\nThe team planned an experiment-creation deep dive, supporting screenshots, and access to a prototype repository, with linked-changes representation still in design. They emphasized a final polish pass after engineering, especially padding and spacing, and discussed avoiding duplicated interaction work, prototype-repository separation, possible merging into the main repository, and GitHub branch guardrails. Experiment updates included submitted power analysis awaiting feedback, a demo flow from draft to running state, enabling the Start button after value inputs, reconsidering the To Do section, replacing JSON naming with parameters, refining analysis-plan and timing relationships, and adding test-dropdown options. The product was positioned as improving on Statsig, with smoother interaction, while an AI setup assistant was proposed for contextual experiment configuration and planned for the create-experiment modal. Diagnostics screenshots, overview rules, presentation preparation, and possible cleanup support were also discussed.\n\n## Keywords\nexperiment creation, prototype, AI assistant, diagnostics, design polish, GitHub workflow\n\n## Action Items\n**Gabe Melean**  \nSend DM with access details to Jeremy Dorn (01:49)  \nExperiment with merging prototype repo into main repo (06:44)  \nSchedule meeting with relevant team members (07:20)  \nReach out to Lilia to discuss diagnostics experiment details (07:30)  \nImplement AI assistant feature (23:36)  \nTake high-quality screenshots of diagnostics tab (25:05)  \n\n**Jeremy Dorn**  \nDiscuss with Bryce about design reuse (05:06)  \nCompile presentation slides and materials (26:00)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4EF3TV3TW01Q29851N3J7JW",
+      "source": "fireflies",
+      "title": "Gabe / Jeremy",
+      "date": "2026-10-13",
+      "duration_minutes": 28.709999084472656,
+      "summary": "# Gabe / Jeremy\nDate: 2026-10-13 | Duration: 28.709999084472656m\n\n## Summary\nThe redesign covered increasing list-view spacing to 32px, debating background colors, adding a standalone Create button, and applying hover, press, tab, and filter animations. Tables will support dense mode, editable columns, and updated pagination, although drag reordering is not fully working and bulk actions may come later. Tabs will serve as quick-filter shortcuts, with drafts, running, unhealthy, and needs decision identified as important; the group recommended limiting tabs to 6–8 and resolving overlap with filters, possibly through chips or disabling filters when a tab is active. Shared table changes affect the product broadly, while background updates require auditing about 15–20 key pages. The feature flags page will use an experiment layout, with inline editing constrained by publishing complexity and a required publish control. The design review was skipped due to a holiday, navigation work may move to the following week, and small CSS changes can be reviewed quickly.\n\n## Keywords\nlist view redesign, feature flags, filtering and tabs, UI animations, shared table components, import/create CTA configuration\n\n## Action Items\n**Gabe Melean**  \nTalk to Johnny about feature flag page redesign (01:14)  \nShare screen and design details for list view enhancements (01:14)  \nPrepare pull request for button animations and hover styles (21:29)  \nTake away feedback and refinement points (22:09)  \nDiscuss timing and planning for app chrome redesign (25:07)  \nOpen pull requests for button updates and background color adjustments (26:01)  \n\n**Jeremy Dorn**  \nShare GitHub-style filtering and search demo with Gabe (12:29)  \nCheck integration of filtering functionality with shared table component (19:39)  \nReview feature flag overview tab and layout improvements (22:17)",
       "organizer": "gabe@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

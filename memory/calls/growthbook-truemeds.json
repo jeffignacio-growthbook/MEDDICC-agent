@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Truemeds",
+  "slug": "growthbook-truemeds",
+  "last_etl_date": "2026-10-14T05:36:35.776593",
+  "calls": [
+    {
+      "id": "01M4P7192455WJN74M539BPDY4",
+      "source": "fireflies",
+      "title": "Growthbook <> Truemeds - Intro",
+      "date": "2026-10-13",
+      "duration_minutes": 36.75,
+      "summary": "# Growthbook <> Truemeds - Intro\nDate: 2026-10-13 | Duration: 36.75m\n\n## Summary\nTrue Meds is seeking to increase experimentation speed because its current platform limits the team to 24 concurrent experiments, requires 1.5 to 2 months per experiment due to low traffic, and lacks Cupid, sequential testing, and long-term holdout capabilities. Growthbook said it supports unlimited experiments, Cupid, sequential testing, multi-armed bandits, power analysis, independent experiment layers, and unified metrics. True Meds is approximately 70% migrated to Snowflake and is comparing Growthbook’s managed event-based model with its warehouse-native experiment-based model. Cost, compute, USD-to-INR currency risk, implementation ease, and execution speed are key decision factors. The team is also renegotiating Mixpanel costs and assessing whether Growthbook could consolidate dashboards. Growthbook proposed a technical deep dive, product demo, and possible proof of concept, with follow-up sessions planned during Indian business hours.\n\n## Keywords\nExperimentation, Snowflake, Warehouse-native, Growthbook, Pricing, Analytics integration\n\n## Action Items\n\n**Dan Wathne**\nSend follow-up email with proposed agenda and availability for Thursday/Friday sessions to conduct demo and technical integration with Truemeds team (34:00)\nProvide ballpark pricing estimates based on expected experiment ramp-up and events tracked for both managed and warehouse-native options (23:15)\n\n**Pranav Chavan**\nCoordinate with analytics and technical leads (Arvind and Yash) to join next technical integration and demo session with Growthbook (31:50)\nShare event volume, metrics tracked, and provide further info needed for accurate pricing and integration feasibility (23:50)\n\n**Truemeds Analytics & Technical Leads**\nPrepare for technical deep dive on Snowflake data warehousing setup, event pipelines, and integration requirements with Growthbook (18:40)\n\n**All Participants**\nPrepare questions and requirements especially around feature setup, experiment run management, analytics overlap with Mixpanel, and pricing concerns for next meeting (31:00)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "GoTyme & GrowthBook",
+  "slug": "gotyme-growthbook",
+  "last_etl_date": "2026-10-14T05:36:35.777069",
+  "calls": [
+    {
+      "id": "01M4DW0RP86XJ2ERJPDB0P5ZZJ",
+      "source": "fireflies",
+      "title": "GoTyme & GrowthBook | First Meeting",
+      "date": "2026-10-13",
+      "duration_minutes": 66.58000183105469,
+      "summary": "# GoTyme & GrowthBook | First Meeting\nDate: 2026-10-13 | Duration: 66.58000183105469m\n\n## Summary\nGoTyme is a Singapore-headquartered digital bank serving the Philippines and South Africa, with a technology hub in Vietnam. Its experimentation journey began approximately one year ago with a manual MVP process, using LaunchDarkly, Databricks, Segment, and Mixpanel. The team is evaluating a warehouse-centric solution and is interested in GrowthBook integration and a commercial model decoupled from traffic. GoTyme uses Spring Boot and Python for backend services, iOS and Android with Kotlin for mobile, and microservices with an event-driven architecture. Segment already sends experiment data to the warehouse. Required ingestion fields are experiment ID, variant ID, timestamp, and user ID, with additional attributes supported and BI metrics connected through warehouse queries. Databricks currently supports ephemeral mode only, while incremental mode is being investigated. Cloud stores exposure events and aggregates, whereas self-hosting reads from GoTyme’s warehouse. Pricing includes a platform fee, support, onboarding, security, and experimentation features, with seat-based or experiment-based models and no traffic or experiment-volume charges. Next steps include Slack-based technical discussions, a pricing review, and a 30-day enterprise trial involving one or two experiments.\n\n## Keywords\nexperimentation platform, data warehouse integration, self-hosted vs cloud, pricing model, technical integration, proof of concept (POC)\n\n## Action Items\n**Tai Nguyen**  \nCoordinate questions on multi-region deployment (42:26)  \n\n**Marcel Geldner**  \nShare technical schematics with GoTyme (45:41)  \nResend pricing details and slide decks (48:06)  \nSchedule commercial discussion meeting (01:03:43)  \n\n**Rémy Marin**  \nLead technical follow-up on Slack (45:41)  \nSummarize and respond to technical questions (45:41)  \nCoordinate GrowthBook trial POC setup (01:01:30)  \n\n**Paul**  \nCreate Slack channel for technical questions (45:41)  \nProvide GrowthBook team use case info (01:01:30)  \nEngage GoTyme teams in POC testing (01:01:30)  \n\n**Tung Nguyen**  \nCoordinate technical follow-up questions (45:41)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

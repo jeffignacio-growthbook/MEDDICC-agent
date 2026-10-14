@@ -1,0 +1,18 @@
+{
+  "company": "SingPass + GrowthBook",
+  "slug": "singpass-growthbook",
+  "last_etl_date": "2026-10-14T05:36:35.776732",
+  "calls": [
+    {
+      "id": "01M3CK8BJ6QT3DDC21B6X1DRRP",
+      "source": "fireflies",
+      "title": "SingPass + GrowthBook",
+      "date": "2026-10-13",
+      "duration_minutes": 36.540000915527344,
+      "summary": "# SingPass + GrowthBook\nDate: 2026-10-13 | Duration: 36.540000915527344m\n\n## Summary\nSingPass is seeking a centralized experimentation platform to mature engineering processes beyond environment-driven feature flags, with priorities including BYOC deployment, Snowflake warehouse integration, strict data governance, and advanced capabilities such as multi-armed bandit algorithms. GrowthBook presented a self-hosted, warehouse-native platform whose lightweight SDKs support Golang, TypeScript, Android, and iOS. Experiment events can be forwarded to SingPass’s Snowflake warehouse, while GrowthBook uses read-only access, keeping data within SingPass’s infrastructure. The expected usage is fewer than 10 experiments per month and approximately 70 to 80 internal users, with tracking across multiple user journeys, backend processes, identifiers, and transaction touchpoints. Demonstrated features included result visualization, confidence metrics, lift percentages, dimensional slicing, funnel dashboards, and an AI-powered decision assistant. Deployment supports Docker, Helm, Kubernetes operators, and infrastructure-as-code practices. Billing is available through AWS Marketplace with standard 12-month contracts. Christian offered a two-week enterprise trial, while Rémy proposed ongoing Slack support.\n\n## Keywords\nexperiment platform, feature flagging, BYOC, warehouse-native, Snowflake, data governance\n\n## Action Items\n\n**jiale**\nEmail GrowthBook team to initiate a two-week enterprise trial with one account each to explore all features fully (33:26)\n\n**Christian Liebenow**\nProvision GrowthBook enterprise trial upon Jiale’s request and send meeting recording, demo materials, and documentation with Ask AI chat link to SingPass team (34:14)\n\n**Rémy Marin**\nProvide Slack support for SingPass team for asynchronous Q&A post-meeting (34:53)\n\n**GrowthBook technical team**\nAssist SingPass team with setting up GrowthBook in BYOC environment and integration with their data warehouse and SDKs as requested (32:30)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

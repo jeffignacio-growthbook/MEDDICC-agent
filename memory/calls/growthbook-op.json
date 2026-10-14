@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook + Op",
   "slug": "growthbook-op",
-  "last_etl_date": "2026-10-07T06:41:13.109621",
+  "last_etl_date": "2026-10-14T05:36:35.774558",
   "calls": [
     {
       "id": "01KT7DMS83RXCGY1RPYJB8XGY3",
@@ -74,6 +74,17 @@
       "duration_minutes": 31,
       "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-10-06 | Duration: 31m\n\n## Summary\nThe discussion prioritized accurate licensing data before activating Customer IO synchronization and lead-routing automation, with Customer IO workflow alignment still pending. Michael Nolan is remapping Orders fields for the license-object migration, after which Shawn will test sample pushes; Growth Book Org ID should associate licenses with the correct HubSpot companies and reduce duplicates. The license hierarchy will prioritize active Enterprise over Pro over Starter. Lead scoring combines firmographic and behavioral signals, with accounts above 100 points in the top fit tier; A-tier contacts are expected to route to AEs and B-tier contacts to Jake, although final assignment rules remain open. Scoring will be evaluated over roughly one month. Renewal workflows depend on co-terming, renewal-date, ARR, and contract-field decisions. Expansion campaigns need suppression rules for actively pursued Pro customers. Email governance will consider recent-email delays and global frequency limits to prevent double-sends.\n\n## Keywords\nCustomer.io, HubSpot, licensing data, lead scoring, lifecycle stages, renewal workflows\n\n## Action Items\n**Ryan McGurk**\nReview lifecycle-stage definitions (00:40)\nConfirm upgrade-account process (23:25)\n\n**Lyndsie Berens**\nMeet Chris about workflows (01:48)\nPrepare Customer.io lists (02:29)\nReview lead-source automation (15:41)\n\n**Michael Nolan**\nUpdate license-sync mapping (03:26)\n\n**Shawn Green**\nTest license-data pushes (06:54)\nVerify email-frequency settings (30:02)\nFollow up on license testing (30:41)\n\n**Jeff Ignacio**\nCreate renewal records (18:21)\nModel renewal ARR fields (21:41)\nBuild sales suppression list (23:25)",
       "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4PF5C5KSTQ91YY59Q3B18WM",
+      "source": "fireflies",
+      "title": "GrowthBook + Op Methods Weekly Check-In",
+      "date": "2026-10-13",
+      "duration_minutes": 31.25,
+      "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-10-13 | Duration: 31.25m\n\n## Summary\nThe team identified that emails sent to salesgrowthbookio are going to spam and are not being tracked in HubSpot because the address is likely a distribution list rather than a connected shared inbox. Jennifer will investigate routing, while the team aims to replicate territory-based assignment and notification workflows. They also reviewed MQL handling: mid-tier leads may enter nurture sequences, while high-tier leads may be assigned to Account Executives, although no firm notification process exists yet. Territory fairness remains under review, with EMEA supporting two full-time reps, smaller regions potentially being combined, and Jeff preparing a report. Lead scoring currently produces few MQLs above 100, and demo submissions will remain separate to prevent duplicate alerts. High-fit accounts without identified contacts will be targeted through automated nurture and advertising, with Aaron managing nurture sequences and Jacqueline supporting ads. Finally, Michael is updating code to push Growth Book organization IDs into HubSpot company records, beginning with enterprise licenses, because accurate customer tagging is important for applying scoring and outreach effectively.\n\n## Keywords\nHubSpot, Lead Scoring, MQL Assignment, GrowthBook, Territory Management, Lead Nurturing\n\n## Action Items\n\n**Chris Newton**\nFollow up with admin Jennifer to identify current recipients of the growthbook.io sales email distribution list and investigate setup (01:31)\n\n**Shawn Green**\nSet up the shared sales inbox properly in HubSpot to enable tracking and automation (02:38)\nShare status updates in the ops channel regarding the dependency on Michael Knowlton’s code changes for company-level GrowthBook org ID pushes (27:57)\n\n**Jeff Ignacio**\nDraft a one-page report on the last five misfired leads for Ryan and coordinate sharing with James to address lead routing concerns (11:30)\n\n**Michael Knowlton**\nComplete company-level GrowthBook organization ID update push for license record matching to allow accurate customer data syncing (26:30)\n\n**Lyndsie Berens**\nIntegrate Jacqueline (new hire with ads background) into calls gradually to support ad targeting efforts for high-fit accounts with no known contacts (25:59)\n\n**Ashley**\nCoordinate with Aaron on automated nurture sequences targeting accounts with developer activity but no de-anonymized contacts (21:05)\n",
+      "organizer": "jeff.ignacio@growthbook.io",
       "participants": 7,
       "summary_quality": "good"
     }

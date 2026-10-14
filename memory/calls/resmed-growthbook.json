@@ -1,0 +1,18 @@
+{
+  "company": "ResMed + GrowthBook",
+  "slug": "resmed-growthbook",
+  "last_etl_date": "2026-10-14T05:36:35.775288",
+  "calls": [
+    {
+      "id": "01M4P4EYVH3BV9SZ3NPTT0S2T0",
+      "source": "fireflies",
+      "title": "ResMed + GrowthBook",
+      "date": "2026-10-13",
+      "duration_minutes": 57.63999938964844,
+      "summary": "# ResMed + GrowthBook\nDate: 2026-10-13 | Duration: 57.63999938964844m\n\n## Summary\nResMed is evaluating alternatives to its internal A/B testing platform because developer-heavy setup, manual cohort definition, deployment work, and passive post-experiment analytics limit scale and speed. Typically, up to three experiments run simultaneously with cohorts of up to 200,000 users. The team wants product managers to launch experiments using role-based permissions, shared success criteria, and faster feedback loops. GrowthBook offers warehouse-native querying, self-hosting or cloud deployment, an open-source core, flexible seat-based pricing, and no charges based on monthly active users or event volume. Its workflow lets data engineers define sources and metrics once, while experimenters use predefined options, targeting, traffic controls, feature flags, and SDK-based evaluation. Analytics provide Bayesian results, metric lifts, confidence levels, dimensional slicing, historical imports, and AI-generated insights. GrowthBook also described AI agents, development-pipeline integration, and contextual bandits as parts of its future experimentation vision.\n\n## Keywords\nA/B Testing, Experimentation Platform, Feature Flags, Data Warehouse Integration, AI-assisted Experimentation, Continuous Optimization\n\n## Action Items\n\n**Nitant**\nSend GrowthBook team the specific pre-listed questions regarding data retention, safety, and security for review and response (12:59)\nCoordinate internal debrief after demo and comparison with other platforms like Datadog (56:10)\n\n**Christian Liebenow**\nProvide written responses to ResMed’s pre-submitted questions on data security and retention after receiving them (13:05)\nShare the meeting recording, relevant GrowthBook SDK documentation, and architecture documents with the ResMed team (55:30)\nProvision a two-week enterprise trial environment if ResMed decides to explore GrowthBook further (51:35)\n\n**Chris Sanders**\nAssist with technical onboarding discussions, explaining SDKs and data pipelines as needed to clarify integration timeline and effort (52:03)\n\n**Karl Brown**\nWork with Nitant to schedule follow-up discussions focused on pricing and proposal details post internal review (55:50)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    }
+  ]
+}

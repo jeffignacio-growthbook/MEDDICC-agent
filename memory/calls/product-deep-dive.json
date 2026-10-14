@@ -1,0 +1,18 @@
+{
+  "company": "Product Deep Dive",
+  "slug": "product-deep-dive",
+  "last_etl_date": "2026-10-14T05:36:35.776668",
+  "calls": [
+    {
+      "id": "01M4C15X6VHWRW61YMJKEDFSTX",
+      "source": "fireflies",
+      "title": "Product Deep Dive",
+      "date": "2026-10-13",
+      "duration_minutes": 42,
+      "summary": "# Product Deep Dive\nDate: 2026-10-13 | Duration: 42m\n\n## Summary\nThe team is simplifying the product to broaden adoption beyond engineers. Version 5.2, scheduled for November 3, will reduce experiment setup fields from 23 to 5, remove separate feature-flag creation, expand metric types from 7 to 12, and introduce interleaving experiments for ranking algorithms. Session replay will enter beta to strengthen product analytics and integrate with AI agents. Growth Book’s key advantages include self-hosting, warehouse support, broad SDK coverage, warehouse-native experimentation, and visual editing, while UX and some advanced experimentation features remain areas for improvement. The team is advancing contextual bandits in the AI visual editor, strengthening agent permissions, token revocation, audit trails, and Slack-based controls. Populations and save groups will support large audiences, while a warehouse cost dashboard will improve visibility into query and compute costs. Product analytics has progressed through visual editing, funnels, metadata comparison, additional metric types, permissions, and planned cohort analysis.\n\n## Keywords\nGrowthBook, experimentation, feature flagging, UX simplification, AI visual editor, contextual bandits\n\n## Action Items\n\n**Jacqueline Thomson**\nExplore and experiment in the fly demo workspace to gain hands-on familiarity with the GrowthBook platform (28:57)\n\n**Scott Bailey**\nAdd Jacqueline Thomson to additional cloud workspaces as needed and share Zoom demo recordings to aid her learning and onboarding (29:49)\nContinue development and rollout of key features including interleaving experiments, warehouse cost dashboard, scoped agent API key permissions, and AI visual editor enhancements according to Jeremy’s roadmap priorities (01:22)\n\n**Elyse Fox**\nCoordinate with Graham to surface proactive insights and integrate Slack updates for AI-driven notifications and learnings within agent-based workflows (20:04)\n\n**Teresa**\nWork on integrating contextual bandits into the AI visual editor and develop full AI assistant capabilities within the Slack app to support advanced experimentation and personalization (21:12)\n",
+      "organizer": "elyse@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

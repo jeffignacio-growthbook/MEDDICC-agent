@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> TextExpander",
+  "slug": "growthbook-textexpander",
+  "last_etl_date": "2026-10-14T05:36:35.776457",
+  "calls": [
+    {
+      "id": "01M4RC54N85PMYMG1GRSDARZ05",
+      "source": "fireflies",
+      "title": "Growthbook <> TextExpander",
+      "date": "2026-10-13",
+      "duration_minutes": 11.829999923706055,
+      "summary": "# Growthbook <> TextExpander\nDate: 2026-10-13 | Duration: 11.829999923706055m\n\n## Summary\nAndy Hoobing said his team expanded last year but expects to remain steady this year, with no current issues or missing features on the pro plan. Dan Wathne discussed checking seat limits and offered enterprise support through a private Slack channel with direct engineering and support access for onboarding, training, and troubleshooting if the team grows. Dan also introduced full MCP integration for running experiments and analyzing results, Slack notifications for experiment updates, and newer capabilities such as contextual bandits and custom experiment fields. Andy confirmed the team uses Claude and Slack internally. Because the team self-hosts, Dan noted that newer images may be required for some features and offered to confirm compatibility with the internal team. The conversation emphasized regular, low-pressure check-ins, annual plans, bundled features, and support that can help the customer adopt new capabilities when needs evolve.\n\n## Keywords\nGrowthbook Pro Plan, MCP Integration, AI Workflow, Self-Hosting, Slack Integration, Experimentation Features\n\n## Action Items\n\n**Dan Wathne**\nSend additional context and materials about MCP integration and new AI-related features to Andy Hoobing for review (02:28)\nVerify with Growthbook’s team the compatibility of MCP benefits and updates for TextExpander’s self-hosted environment and communicate findings to Andy Hoobing (03:21)\n\n**Andy Hoobing**\nReview shared materials about new Growthbook features and determine relevance for TextExpander’s workflows (03:33)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Jake and Brent",
+  "slug": "jake-and-brent",
+  "last_etl_date": "2026-10-14T05:36:35.775223",
+  "calls": [
+    {
+      "id": "01M4V5FHEA3ZAMAX95GVQJ4BRZ",
+      "source": "fireflies",
+      "title": "Jake and Brent",
+      "date": "2026-10-13",
+      "duration_minutes": 11.260000228881836,
+      "summary": "# Jake and Brent\nDate: 2026-10-13 | Duration: 11.260000228881836m\n\n## Summary\nNo summary available",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

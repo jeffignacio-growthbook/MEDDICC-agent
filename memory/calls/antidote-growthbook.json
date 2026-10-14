@@ -1,7 +1,7 @@
 {
   "company": "Antidote + GrowthBook",
   "slug": "antidote-growthbook",
-  "last_etl_date": "2026-09-03T06:04:10.794782",
+  "last_etl_date": "2026-10-14T05:36:35.775090",
   "calls": [
     {
       "id": "01M1ENZ7D884RWWD7XC6FGG2N3",
@@ -10,6 +10,17 @@
       "date": "2026-09-02",
       "duration_minutes": 42.88999938964844,
       "summary": "# Antidote + GrowthBook\nDate: 2026-09-02 | Duration: 42.88999938964844m\n\n## Summary\nGrowthbook was presented as a strong fit for Antidote’s need for fast, simple A/B testing on landing pages with limited developer involvement. Its visual editor supports no-code copy, style, and layout changes, while developers can handle larger React-based or server-side changes. URL redirects, feature flags, granular traffic splits, targeting by URL and user attributes, and support for Shopify-backed checkout align with Antidote’s architecture. Server-side rendering, edge delivery, bootstrapping, proxy serving, and smaller SDK payloads can reduce flicker and latency. Growthbook also offers frequentist and Bayesian statistics, retroactive metric recalculation through warehouse queries, guardrail-based rollout decisions, funnels, dashboards, session replay in beta, and an AI assistant. Pricing includes a Pro plan at $40 per user monthly, a free self-hosted community edition for up to three users with limitations, and an Enterprise option with a $200,000 platform fee plus $1,250 per user annually. Growthbook highlighted its open-source model, flexibility, and startup support compared with VWO, Convert, Optimizely, and Statsig. Antidote planned additional review and a decision by mid to late September.\n\n## Keywords\nVisual Editor, Experimentation, URL Redirects, Product Analytics, Split Testing, Pricing Model\n\n## Action Items\n\n**Mike**\nShare the article comparing different growth/testing tools referenced during discussion for further evaluation (06:50)\nCoordinate with Kendra to provide feedback and questions after further demos and trial of Growthbook and competitors (41:00)\n\n**Kendra**\nParticipate in hands-on testing and experiments with Growthbook to assess ease-of-use and visual editor capabilities (40:30)\nWork with developers to explore flicker reduction options and integration related to Shopify headless setup (22:00)\n\n**Christian**\nProvide pricing details and potential customized enterprise terms for Antidote as a small startup (33:00)\nOffer access to Slack community and documentation resources for onboarding support (36:00)\nFollow up with Antidote after they complete evaluations of other tools (41:00)\n\n**Logan**\nAssist with technical questions and demo advanced experimentation use cases including feature flags and decision frameworks (00:00)\nSupport Antidote's testing of redirect use cases and user segmentation capabilities (00:00)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4H52THB47JXHPZ0JG7RW2RW",
+      "source": "fireflies",
+      "title": "Antidote + GrowthBook",
+      "date": "2026-10-13",
+      "duration_minutes": 18.530000686645508,
+      "summary": "# Antidote + GrowthBook\nDate: 2026-10-13 | Duration: 18.530000686645508m\n\n## Summary\nThe team decided to simplify tracking and slow campaign changes because rapid site updates, product launches, and tracking tweaks made it difficult to identify the causes of high CPMs. They will focus first on add-to-cart optimization, then test one variable at a time across user experience, pricing, and landing pages. Infrastructure will be prepared this week so targeted testing can begin soon, with Kendra and Mike leading setup and limited developer support. The Pro plan was recommended because it supports up to 30 users and three projects, while one project is likely sufficient for Antidote’s current responsive web app. Enterprise offers guided onboarding, stronger SLAs, and white-glove support but costs $200,000 annually plus $1,250 per user per year, making it premature. Pro onboarding is primarily self-service through documentation and email support, with technical assistance available. Kendra will review the plan and testing approach internally before proceeding. Sources: Campaign Optimization and Testing Strategy (03:16–04:33); Product and Pricing Plan Selection (07:08–13:00); Onboarding and Implementation Approach (12:17–14:44); Next Steps (15:40–15:57).\n\n## Keywords\npixel tracking, CPM optimization, add to cart, GrowthBook Pro, experiment projects, onboarding\n\n## Action Items\n\n**Kendra**\nReconfirm with the team whether Antidote will require one or multiple projects in GrowthBook for their app use cases, specifically regarding desktop and mobile web coverage (10:57)\nInitiate the subscription process for the GrowthBook Pro plan via the GrowthBook website as the next step to begin using the platform (14:44)\nFollow up with Christian and Chris from GrowthBook with any clarifying questions after internal discussions regarding GrowthBook usage and setup (16:54)\n\n**Kendra and Mike**\nReview GrowthBook documentation and prepare for SDK setup to enable experimentation and feature flagging in Antidote's environment (15:05)\n",
       "organizer": "christian@growthbook.io",
       "participants": 4,
       "summary_quality": "good"

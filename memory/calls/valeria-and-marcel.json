@@ -1,0 +1,18 @@
+{
+  "company": "valeria and Marcel",
+  "slug": "valeria-and-marcel",
+  "last_etl_date": "2026-10-14T05:36:35.776529",
+  "calls": [
+    {
+      "id": "01M4P2P5S5DA94G76YY6QPRYJZ",
+      "source": "fireflies",
+      "title": "valeria and Marcel Geldner",
+      "date": "2026-10-13",
+      "duration_minutes": 55,
+      "summary": "# valeria and Marcel Geldner\nDate: 2026-10-13 | Duration: 55m\n\n## Summary\nGrowthBook provides three main products: feature flags, experiments, and product analytics, with self-hosting or EU cloud hosting and native data warehouse integration. Its Visual Editor Chrome extension enables no-code UX changes, supports Angular and mixed frameworks through an SDK, and synchronizes changes with the GrowthBook UI. Experiments can be configured with projects, hypotheses, variants, splits, guardrail metrics, custom user groups, and rollout timing, while supporting unlimited experiments. Multi-URL tracking follows users across journeys and measures clicks, conversion rates, and paths. Primary use cases involve functional UX testing, with potential upsell and multi-step funnel testing. An AI assistant highlights winning and lost experiments and provides actionable conclusions. Enterprise pricing includes unlimited projects and experiments, a platform fee, user seat fees, no traffic or CDN usage charges, and an experiment-based pricing option. Next steps include demo access, technical integration testing, Slack support from a solution engineer, and commercial discussions after technical evaluation.\n\n## Keywords\nGrowthBook, AB Testing, Visual Editor, Data Warehouse Integration, Feature Flags, Experimentation Metrics\n\n## Action Items\n**Marcel Geldner**  \nSend meeting summary and presentation deck (43:16)  \nProvide access to Slack channel (43:16)  \nArrange demo environment for Fabrizio (43:16)  \nCoordinate follow-up call on pricing (43:16)  \n\n**Fabrizio Cavalieri**  \nReview demo environment for integration (43:16)  \n\n**Valeria Carta**  \nCoordinate user count and usage needs (43:16)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}
