@@ -1,0 +1,18 @@
+{
+  "company": "Features Re-design Sync",
+  "slug": "features-re-design-sync",
+  "last_etl_date": "2026-10-15T05:24:48.404312",
+  "calls": [
+    {
+      "id": "01M4VFXKQ641TK40DHAWMQKMFY",
+      "source": "fireflies",
+      "title": "Features Re-design Sync",
+      "date": "2026-10-14",
+      "duration_minutes": 36.439998626708984,
+      "summary": "# Features Re-design Sync\nDate: 2026-10-14 | Duration: 36.439998626708984m\n\n## Summary\nThe team discussed the feature redesign and sidebar, including Johnny’s recovery of a deleted settings canvas, Gabe’s adoption of a decision-focused cloud design, and challenges with auto layout and component movement. They reviewed metadata changes, noting that arbitrary colors were distracting, approving a move to the right rail and a simplified header, and planning a collapsible metadata panel while leaving persistence across tabs unclear. Gabe is designing a separate change request details page, with potential overlap between publish and approval tabs for features and experiments. Approval requests will appear as callouts, with one submission per request, and Johnny will review the design when shared. Gabe removed cards from experiments because of width and padding issues, while Johnny continues using cards for features. Both agreed to establish system-wide rules for card usage, sync on information architecture, combine their designs, and continue improving the approval design.\n\n## Keywords\nfeatures redesign, change requests, environment section, metadata layout, approval workflows, design system\n\n## Action Items\n**Johnny Martinez**  \nRebuild deleted settings canvases (05:31)  \nShare designs and sync on environment section (30:29)  \n\n**Gabe Melean**  \nShare change requests design for review (29:18)  \nProvide insights on approval request tab (30:41)  \nKeep Johnny posted on approval request design progress (34:22)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "karen shows jack",
+  "slug": "karen-shows-jack",
+  "last_etl_date": "2026-10-15T05:24:48.403259",
+  "calls": [
+    {
+      "id": "01M4V58HEQXMWHT265MG5R4WVK",
+      "source": "fireflies",
+      "title": "karen shows jack (maybe scott) a dashboard",
+      "date": "2026-10-14",
+      "duration_minutes": 21.09000015258789,
+      "summary": "# karen shows jack (maybe scott) a dashboard\nDate: 2026-10-14 | Duration: 21.09000015258789m\n\n## Summary\nThe discussion focused on selecting one analytics solution—GA4 or Plausible—rather than running both simultaneously. Plausible was considered a privacy-friendly alternative because it works despite cookie opt-outs and uses server-sent requests to track page loads, while Google Analytics was described as broken after cookie consent. HubSpot may have limited web analytics coverage but could centralize event tracking across multiple forms, and GrowthBook was considered for product analytics. Demo request tracking remains incomplete, potentially because of a calendar iframe, and GTM event mapping requires verification because access is unavailable. Exploration reports will support funnel analysis, especially start-for-free conversions, while sign-in clicks should be excluded from marketing sessions. Four buyer pathways were identified, including free users who never convert, free-to-Pro conversion, and enterprise buying committees. The discovery phase will document tracking needs and unify data across teams, with Slack, Google Drive, and Notion used for asynchronous sharing. Scott and Lindsey are working on ICP, personas, and pipeline integration, while Karen will collaborate with Lindsey on content and journey mapping. The goal is one scalable dashboard solution instead of fragmented patches.\n\n## Keywords\nanalytics, HubSpot, Google Analytics GA4, Plausible, GrowthBook, buyer journey\n\n## Action Items\n**Scott Bailey**  \nLead documentation of stakeholders’ analytics questions (00:12)  \nShare data and analysis linking ICPs, personas, messages, and pipeline/revenue metrics with Karen (00:18)  \n\n**Unassigned**  \nCollect analytics requirements from all marketing stakeholders (00:13)  \nAudit current Google Tag Manager tags and event tracking (00:15)  \n\n**Karen Henke**  \nShare GA4 custom explorations screenshots and reports asynchronously (00:14)  \nCollaborate with Lindsey on content and journey mapping (00:18)",
+      "organizer": "jack@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

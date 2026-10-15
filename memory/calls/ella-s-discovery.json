@@ -1,0 +1,18 @@
+{
+  "company": "Ella's discovery +",
+  "slug": "ella-s-discovery",
+  "last_etl_date": "2026-10-15T05:24:48.403463",
+  "calls": [
+    {
+      "id": "01M4RV75BZ0EC2VCNGN9NN55M6",
+      "source": "fireflies",
+      "title": "Ella's discovery + negotiation role play",
+      "date": "2026-10-14",
+      "duration_minutes": 66,
+      "summary": "# Ella's discovery + negotiation role play\nDate: 2026-10-14 | Duration: 66m\n\n## Summary\nPreparation focused on reviewing BDR and SE information, prospect priorities, and research from LinkedIn Sales Navigator, ZoomInfo, Sumble, and AI tools. Roblox needs one standardized experimentation and feature-flagging platform because engineers move between two or three homegrown systems and BI tools; it currently runs 30–40 experiments but seeks 10x more. The evaluation would involve about 100 developers and product staff, shortlist two or three vendors, and conduct a 90-day POV, with usability, production performance, and adoption as key criteria. A follow-up was scheduled for October 22 at 9:00 a.m. Pacific with Christian Liebenau. In the fictional negotiation, the offer reached $80,000 for a two-year contract paid annually, including onboarding and a case study. Feedback praised Ella Candage’s confidence, follow-up, negotiation instincts, and hiring potential, while recommending earlier impact quantification, less repetition, stronger credibility positioning, and value-based concessions. References and further compensation, hours, and equity discussions remained outstanding.\n\n## Keywords\nGrowthBook, Experimentation platforms, Feature flagging, Sales discovery, Pricing negotiation, Hiring evaluation\n\n## Action Items\n**Ella Candage**\nCheck GrowthBook trial duration (23:04)\nBring engineers to technical deep dive (23:04)\nSend customer case studies (23:41)\nSend next meeting invite (26:36)\n\n**Ryan McGurk**\nDiscuss expanded scope with Graham (01:01:47)\nAsk Ella Candage for references (01:03:54)\n\n**Brent Holloway**\nReview operating process (01:00:53)\nDiscuss expanded scope with Graham (01:02:30)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

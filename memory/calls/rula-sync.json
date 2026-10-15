@@ -1,0 +1,18 @@
+{
+  "company": "Rula Sync",
+  "slug": "rula-sync",
+  "last_etl_date": "2026-10-15T05:24:48.404134",
+  "calls": [
+    {
+      "id": "01M4XS21F1Z83X8DFPWT71CRA5",
+      "source": "fireflies",
+      "title": "Rula Sync",
+      "date": "2026-10-14",
+      "duration_minutes": 20.1299991607666,
+      "summary": "# Rula Sync\nDate: 2026-10-14 | Duration: 20.1299991607666m\n\n## Summary\nThe discussion addressed confusion caused by a blank order form marked “N/A,” which delayed contract signing. Dan Wathne confirmed that the correct one-year agreement had been reviewed, while Alem Jones clarified that the existing system record covered only the zero-dollar proof of concept. Dan’s $153,750 order form covers work beyond the POC and requires a new approval and legal review cycle. Only one request, created in July, appeared in the system, and the new order form had not been submitted by Pallavi, the requester. The approved BAA was complete, but both the new order form and customer agreement still needed to be formally submitted, ideally together. Commercial terms agreed by Dan, Christina, Pallavi, and Jessica were settled, so renegotiation was not expected. Alem planned to contact Pallavi, and Dan and Alem arranged an immediate troubleshooting call with Pallavi and Jessica. The teams aimed for signing within the next one to two weeks and recognized that legal response time remained uncertain.\n\n## Keywords\norder form, proof of concept, legal review, contract management, purchase order, customer agreement\n\n## Action Items\n\n**Dan Wathne**\nEmail Alem both the correct order form and customer agreement documents for submission to legal (04:05)\n\n**Alem Jones**\nInvestigate in Ironclad contract management system regarding the incorrect blank order form sent for signature and follow up with legal (03:08)\nNotify Pallavi to submit the new order form for the paid work in the PO system to trigger legal review (13:54)\nConfirm commercial terms already agreed upon with Jessica (14:50)\nSchedule and conduct a follow-up call with Dan and Pallavi to troubleshoot and expedite completion (16:45)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

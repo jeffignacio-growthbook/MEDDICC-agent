@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook & CCP",
+  "slug": "growthbook-ccp",
+  "last_etl_date": "2026-10-15T05:24:48.406712",
+  "calls": [
+    {
+      "id": "01M4X01137BK4K62R6Q9DTKXGN",
+      "source": "fireflies",
+      "title": "GrowthBook & CCP Games",
+      "date": "2026-10-14",
+      "duration_minutes": 16.8700008392334,
+      "summary": "# GrowthBook & CCP Games\nDate: 2026-10-14 | Duration: 16.8700008392334m\n\n## Summary\nFrontier is evaluating GrowthBook as a cost-effective, self-hosted alternative to LaunchDarkly, prioritizing warehouse-native integration, native remote evaluation, and secure attribute hashing while minimizing external data sharing and vendor dependency. Hjalti Leifsson built a custom remote evaluator for untrusted client environments, but maintaining it is burdensome. Frontier wants to expand successful adoption to EVE Online and potentially replace LaunchDarkly across CCP. The team expects roughly 10 active experiments monthly, with experiments lasting 30–60 days, and wants broad developer access without restrictive seat-based pricing. Frontier’s budget is $1,500–$3,000 annually, compared with GrowthBook’s stated enterprise pricing of about $50,000 annually plus seats; a $20,000 offer without support, tied to an end-of-October contract deadline and including 100 experiments, was discussed. A two-week cloud trial will include enterprise features, a dedicated Slack channel, and access to a GrowthBook support engineer. Frontier aims to decide within two weeks after technical, finance, and legal evaluation.\n\n## Keywords\nfeature flagging, self-hosted, experimentation, pricing negotiation, remote evaluation, GrowthBook\n\n## Action Items\n\n**Hjalti Leifsson**\nCreate a new GrowthBook cloud-hosted account and send the organization ID to James Shannon for enterprise trial upgrade (15:00)\nTake the proposed pricing offer (~$20k/year without support) back to CCP finance and management for feedback and approval (12:50)\nFollow up via email with results of internal review and decision regarding the GrowthBook enterprise licensing and trial (15:40)\n\n**James Shannon**\nProvide detailed pricing offer email including end-of-October incentive and trial key conditions (12:50)\nSet up a two-week GrowthBook enterprise trial on cloud with upgraded organization, including mid-trial check-in call and Slack support channel (14:20)\nSchedule and conduct follow-up meetings to discuss technical and business feedback during trial (14:50)\nAwait CCP’s feedback after internal review and be ready to move quickly on contract setup if approved (13:45)\n",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

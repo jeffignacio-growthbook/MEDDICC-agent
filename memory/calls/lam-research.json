@@ -1,0 +1,18 @@
+{
+  "company": "LAM Research +",
+  "slug": "lam-research",
+  "last_etl_date": "2026-10-15T05:24:48.402313",
+  "calls": [
+    {
+      "id": "01M4RH59FGX377KSWR6G2RP4R7",
+      "source": "fireflies",
+      "title": "LAM Research + GrowthBook",
+      "date": "2026-10-14",
+      "duration_minutes": 50.52000045776367,
+      "summary": "# LAM Research + GrowthBook\nDate: 2026-10-14 | Duration: 50.52000045776367m\n\n## Summary\nThe discussion evaluated whether Growthbook can support Lam’s cloud and air-gapped customer-fab deployments, where Azure feature management currently lacks isolated-site support. The team explored progressive rollouts, A/B testing, rollback workflows, and feedback loops for product decisions. Growthbook’s SDK downloads and caches a complete feature-flag payload for offline use, while event data is buffered only in memory; persistent storage and forwarding must be implemented by the customer. Growthbook uses the same codebase for cloud, self-hosted, and air-gapped deployments, with configurable endpoints, Docker-based updates, backward-compatible APIs, and licensing that may support site-level arrangements. Its warehouse-native analytics define SQL metrics without accessing raw event data and support Bayesian and frequentist analysis. Project-based environments, scoped SDK keys, custom roles, teams, CLI access, and APIs support governance. Lam planned internal discussions, with licensing scale and product analytics remaining potential follow-up topics.\n\n## Keywords\nFeature Flagging, Air Gapped Environments, Experimentation, Self-Hosting, Warehouse Native Analytics, Offline Caching\n\n## Action Items\n\n**Mikael Krivenko**\nFollow up with Daniel Harrison and GrowthBook team early next week to discuss evaluation findings and next steps for feature flagging and experimentation solution (49:11)\n\n**Chris Sanders**\nProvide LAM with technical details regarding SDK event buffering limits and persistence strategies for air gapped environments (33:57)\n\n**GrowthBook team (Christian Liebenow, Logan Bates)**\nAssist LAM with specific commercial licensing discussions related to multiple air gapped instances deployed at customer fabs (20:30)\nContinue development and communication on product analytics capabilities, particularly for air gapped and self-hosted scenarios (48:48)\n\n**LAM (Mikael Krivenko, Daniel Harrison)**\nAssess internal solutions for event buffering/persistence in disconnected devices to complement GrowthBook SDK capabilities (31:13)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "James Bao and",
+  "slug": "james-bao-and",
+  "last_etl_date": "2026-10-15T05:24:48.406210",
+  "calls": [
+    {
+      "id": "01M4RDPN61GJ8P5TM1YKJBD9BX",
+      "source": "fireflies",
+      "title": "James Bao and Graham McNicoll",
+      "date": "2026-10-14",
+      "duration_minutes": 11.380000114440918,
+      "summary": "# James Bao and Graham McNicoll\nDate: 2026-10-14 | Duration: 11.380000114440918m\n\n## Summary\nNo summary available",
+      "organizer": "graham@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

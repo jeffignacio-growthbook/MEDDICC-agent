@@ -1,0 +1,18 @@
+{
+  "company": "Taxfix",
+  "slug": "taxfix",
+  "last_etl_date": "2026-10-15T05:24:48.406370",
+  "calls": [
+    {
+      "id": "01M4TZW8NXQTFQP66670JRCYEY",
+      "source": "fireflies",
+      "title": "Taxfix - Onboard and Implementation Planning",
+      "date": "2026-10-14",
+      "duration_minutes": 29,
+      "summary": "# Taxfix - Onboard and Implementation Planning\nDate: 2026-10-14 | Duration: 29m\n\n## Summary\nThe discussion covered migrating from Apple to GrowthBook, preferably by reactivating the existing GrowthBook proof-of-concept instance because its warehouse connection and setup may already exist; a new instance remains the fallback. Chris Sanders will confirm EPO importer availability, while API transfer may address unsupported cases, and the specific legacy metrics to migrate still need to be defined. Snowflake will remain the system of record, with applications continuing to send data through Segment and the GrowthBook SDK capturing feature-flag exposure events for analysis through the UI, MCP, or API. A developer session will cover SDK integration, Segment, Snowflake data locations, and analysis queries, ending with a 50/50 A/A test. A follow-up session will cover flags, experiments, and GrowthBook usage. The customer wants completion over days, and Chris Sanders stated GrowthBook will not be the bottleneck. Slack will remain the main support channel, with additional coordination needed for the Berlin-based team and European colleagues.\n\n## Keywords\nGrowthBook, EPO migration, Feature flags, Snowflake, Segment, Experimentation\n\n## Action Items\n**Unassigned**\nPrepare developers and specialists (08:12)\nReview proof of concept account (10:50)\nSchedule implementation session (10:50)\n\n**Chris Sanders**\nVerify proof of concept status (10:50)\nSend session link and details (10:50)\nCheck EPO importer functionality (12:11)\nAdd Chris Sanders to Slack (16:06)",
+      "organizer": "jake@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

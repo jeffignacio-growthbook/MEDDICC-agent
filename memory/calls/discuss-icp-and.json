@@ -1,0 +1,18 @@
+{
+  "company": "Discuss ICP and",
+  "slug": "discuss-icp-and",
+  "last_etl_date": "2026-10-15T05:24:48.403637",
+  "calls": [
+    {
+      "id": "01M4TN2M7N7AVQ79ZJ85S1VG33",
+      "source": "fireflies",
+      "title": "Discuss ICP and sales analysis",
+      "date": "2026-10-14",
+      "duration_minutes": 39,
+      "summary": "# Discuss ICP and sales analysis\nDate: 2026-10-14 | Duration: 39m\n\n## Summary\nConsumer digital companies with more than 1,000 employees emerged as the strongest current ICP signal, while B2B appeared weaker. Mobile usage remains an important missing input because current analysis focuses on website traffic, and Ashley’s Clay enrichment is incomplete. Website traffic and employee count do not always correlate, particularly for startups, so qualification may need different signals by company type. The sales process should require an identified executive buyer before a POC, strengthen MEDDIC tracking, and capture meeting attendance and outcomes more consistently in HubSpot. Engineering and data teams remain important evaluation owners, while messaging should differ for engineering, product, and growth audiences. A lightweight PLG entry point could reduce data-warehouse friction. Pro and enterprise routing needs refinement, especially for small companies with high traffic. Incumbents contributed to 15% of lost deals, with Optimizely comparisons showing 2 wins and 6 losses. Warehouse-native, self-hosting, predictable seat-based pricing, and tool consolidation were the strongest messages. Ella reached the final role play, while Ryan McGurk and Scott Bailey will continue reviewing the findings.\n\n## Keywords\nICP analysis, Executive sponsorship, Experimentation infrastructure, Warehouse-native architecture, Sales routing, Competitive positioning\n\n## Action Items\n**Ryan McGurk**\nRoll out POC document (11:52)\nConduct sales role-play (28:28)\nAnalyze ICP data (28:45)\n\n**Lyndsie Berens**\nReview HubSpot field completion (12:13)\n\n**Scott Bailey**\nAnalyze ICP implications (28:51)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

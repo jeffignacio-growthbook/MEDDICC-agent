@@ -1,7 +1,7 @@
 {
   "company": "GB x Sony",
   "slug": "gb-x-sony",
-  "last_etl_date": "2026-09-15T06:20:33.391839",
+  "last_etl_date": "2026-10-15T05:24:48.402687",
   "calls": [
     {
       "id": "01M28HV7AKCDN5BDJV4S37X9Q7",
@@ -12,6 +12,17 @@
       "summary": "# GB x Sony: Contextual Bandits\nDate: 2026-09-14 | Duration: 30.459999084472656m\n\n## Summary\nThe discussion evaluated where contextual and regular multi-arm bandits provide value, emphasizing short campaigns, promotions, and lightweight personalization. Promotion optimization was identified as an initial pitch, with teams potentially optimizing multivariate campaigns during the first 48 hours. Two-arm tests may gain little over 50/50 allocation because changing assignment probabilities adds inference complexity. SRMs, difficult diagnosis, and unreliable logging were highlighted as deployment risks. Contextual bandits use SDK-level attributes such as region, device, role, or account plan to personalize assignments, while high-cardinality contexts are coarsened to reduce noise. The product is currently in closed beta, with public beta planned for later this month, and at least one attribute is currently required. Journey-level optimization of copy, messaging, and variants appears feasible, while ML parameter evaluation and higher-level orchestration are longer-term opportunities. Tom O’Connor will arrange a session with an ML or algorithm team, and Cris will help find a time slot.\n\n## Keywords\nContextual bandits, Multi-armed bandits, Experimentation, Personalisation, Sample-ratio mismatch, GrowthBook\n\n## Action Items\n**Luke Sonnet**\nSend bandit configuration information (23:50)\nEngage Sony machine learning team (28:48)\n\n**Tom O'Connor**\nSchedule machine learning session (27:51)\n\n**Cris**\nPropose meeting session slot (27:51)",
       "organizer": "cris@growthbook.io",
       "participants": 9,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4GVNEFATXBBDCDXE175JGHK",
+      "source": "fireflies",
+      "title": "GB x Sony: Learnings Demo & Quality Score Preview",
+      "date": "2026-10-14",
+      "duration_minutes": 49.9900016784668,
+      "summary": "# GB x Sony: Learnings Demo & Quality Score Preview\nDate: 2026-10-14 | Duration: 49.9900016784668m\n\n## Summary\nThe discussion examined synthetic testing as an alternative when full A/B testing is impractical, while noting sensitivity to profiles, personas, currencies, promotions, and model quality. A quality score planned for the next release will assess hypotheses, descriptions, metrics, restart status, and target power, with configurable AI checks, weights, presets, and organization-wide health views. Program Impact work may show metric effects over time and include avoided losses from prevented losing launches, adjusted for winner’s curse. AI-generated learnings will identify patterns across significant experiments, include contradictory evidence, support project filtering, and remain refreshable through multiple interfaces. GrowthBook is also exploring AI-assisted documentation, ingestion of experiments created elsewhere, Slack workflows, and coordination across value streams. SIE runs about 600 experiments, with about 200 in GrowthBook and roughly 50% created in another portal. A proposed 10% permanent holdout, real-time eligibility, Adobe integrations, and holdout sharing require technical validation. Participants also discussed experimentation events and peer learning.\n\n## Keywords\nSynthetic experimentation, Quality scoring, Experiment learnings, Program impact, Slack integration, Adobe Experience Platform\n\n## Action Items\n**Graham McNicoll**\n- Send synthetic-testing presentation deck (06:28)\n- Check synthetic-testing recording availability (06:56)\n- Fix GrowthBook learning filters (28:46)\n- Review GrowthBook Slack integration (40:44)\n- Raise Bay Area events idea (45:36)\n\n**David Lutz**\n- Pull experiment learnings via API (30:22)\n\n**Tom O’Connor**\n- Share external experiment artifacts (35:23)\n- Arrange engineering integration session (35:38)\n- Use Slack Watcher functionality (36:56)\n- Discuss Next Best Action design (43:28)\n- Review Adobe integration feasibility (48:12)\n\n**Cris Dizon**\n- Follow up on configuration imports (45:47)\n- Coordinate Adobe integration pilot (46:05)",
+      "organizer": "cris@growthbook.io",
+      "participants": 5,
       "summary_quality": "good"
     }
   ]

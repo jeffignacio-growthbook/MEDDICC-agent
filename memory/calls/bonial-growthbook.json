@@ -1,7 +1,7 @@
 {
-  "company": "Bonial & GrowthBook",
+  "company": "Bonial × GrowthBook",
   "slug": "bonial-growthbook",
-  "last_etl_date": "2026-10-10T06:31:53.898500",
+  "last_etl_date": "2026-10-15T05:24:48.407008",
   "calls": [
     {
       "id": "01M3KGWWGARD21EFTAZRTQ04G0",
@@ -34,6 +34,17 @@
       "summary": "# Bonial & GrowthBook | Commercials\nDate: 2026-10-09 | Duration: 35m\n\n## Summary\nThe discussion covered Growth Book’s commercial model, including a platform fee for security, governance, and support, with user-seat or experiment-based pricing. Self-hosted licensing was stated as $50,000 per year, while cloud hosting was $70,000 per year plus $1,000 per user annually; an initial estimate for 30 users was $100,000 per year, including training, onboarding, and features. Pricing and user counts remain negotiable, with lower effective per-user costs at higher volumes. Technical discussions included migration from Optimize, with Chris Sanders involved, and support for web, mobile, and backend applications. SDK performance and infrastructure speed still require review. A proof of concept was recommended before contractual and legal steps. Finance and peer discussions are needed to refine the budget and user count, while vendor assessments continue equally. Customer success support includes onboarding, training, Slack assistance, role-based access, and ongoing adoption monitoring. A response from Graham is awaited regarding a meeting on the 14th, and an in-person discussion with Armin is planned.\n\n## Keywords\nSelf-hosted solutions, Commercial pricing, User seat model, Migration process, Proof of concept (PoC), Budget planning\n\n## Action Items\n**Fevzi Kahraman**  \nDigest shared pricing and ROI materials (24:00)  \nSend brief to Armin summarizing pricing options (24:00)  \n\n**Marcel Geldner**  \nPrepare clarified pricing slides (16:51)  \nCoordinate with Chris Sanders on migration (21:00)  \nSupport planning and execution of PoC (22:30)  \nSend detailed commercial proposals to Fevzi (24:20)  \nMaintain quick responses to Fevzi’s questions (24:48)",
       "organizer": "marcel@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4T0SBRFJ7GFSJ4NKS69ZCHF",
+      "source": "fireflies",
+      "title": "Bonial × GrowthBook | Introduction",
+      "date": "2026-10-14",
+      "duration_minutes": 59.279998779296875,
+      "summary": "# Bonial × GrowthBook | Introduction\nDate: 2026-10-14 | Duration: 59.279998779296875m\n\n## Summary\nGrowthBook is an open source experimentation platform used by more than 3,500 companies, including leading AI and publishing firms, and backed by Y Combinator and Coastal Adventures. Its open source and enterprise models coexist, with enterprise features such as Cupid, interleaving, and switchback testing, while enterprise code remains source available. Cloud hosting provides uptime and support commitments, including global support, while large enterprises commonly self-host through Docker and Kubernetes for compliance. European data residency is available with some data currently based in the United States, and full European hosting is planned. Licensing can be based on users or experiments, with negotiable read-only seats, site licenses, and OAuth-based agent licensing. Migration support includes engineer collaboration, importer tools, scripts, and proxy approaches, with a tight deadline at the end of March mentioned. The roadmap emphasizes rapid experimentation, AI agents that create, run, and interpret tests, governance for thousands of experiments, and potential synthetic user testing.\n\n## Keywords\nexperimentation, self-hosting, migration, AI integration, licensing models, open source\n\n## Action Items\n**Marcel Geldner**  \nSend meeting notes and full summary (15:52)  \n\n**GrowthBook Team (Marcel Geldner / Graham)**  \nProvide example customer contacts (17:44)  \nSupport deep dive on self-hosting (32:16)  \nAssist with migration scripts and plans (39:11)  \n\n**Philipp Johannis1**  \nCoordinate internal technical discussions (30:10)  \n\n**Daria Mauerpark**  \nPresent roadmap overview and prepare clarifications (48:56)  \n\n**Fevzi Kahraman**  \nDebrief with key stakeholders on GrowthBook details (57:32)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]
