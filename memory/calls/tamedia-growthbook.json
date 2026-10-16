@@ -1,7 +1,7 @@
 {
   "company": "Tamedia & GrowthBook",
   "slug": "tamedia-growthbook",
-  "last_etl_date": "2026-10-09T06:56:43.736611",
+  "last_etl_date": "2026-10-16T05:17:01.221704",
   "calls": [
     {
       "id": "01M48XH4H1WP23FGKK1CW18HEC",
@@ -12,6 +12,28 @@
       "summary": "# Tamedia & GrowthBook | Enterprise Proof of Concept & further technical conversation\nDate: 2026-10-08 | Duration: 42.900001525878906m\n\n## Summary\nThe discussion covered Cloud Function performance, optimization, legal compliance, product integration, and coordination. Cold starts create high compute time, while continuous traffic keeps the function warm at about 60% utilization, below the roughly 70% comfort threshold. The current compute budget supports three concurrent experiments, with an increase to four being tested. The fnv32a function was optimized, with an engineering review planned for next week. Profiling used a custom Linux tool and AI-assisted iteration rather than the Java V8 profiler. A partial SDK was reimplemented for Cloudflare while preserving behavior, edge caching, and cost optimizations. GDPR compliance for a GB UUID used by anonymous users remains under review, and the data privacy officer is expected to respond in about one week. A fallback would limit experiments to subscribed users. Code-based experiments are preferred over the Visual Editor, with API and CLI interfaces available and possible CMS integration. PM onboarding is planned after legal clearance. Slack supports coordination, with Natasha added for support access. CMP and cookie consent are the next priority, followed by biweekly check-ins after legal clearance.\n\n## Keywords\nCloudflare function, GDPR compliance, fnv32a optimization, Proof of Concept, Visual Editor, experiment concurrency\n\n## Action Items\n**Davide Cammarata**  \nShare Cloudflare function utilization image with AWS (00:42)  \nContinue testing limits of concurrent experiments on Cloudflare functions (03:03)  \nFollow up with GrowthBook team on fnv32a optimization adoption (34:18)  \n\n**Rémy Marin**  \nPush pull request with fnv32a optimization to GrowthBook SDK (08:44)  \nReview cookie consent handling and GDPR compliance (13:17)  \nSchedule session with product team for experiment introduction (17:54)  \nShare GrowthBook CMS integration examples for Tamedia (30:26)  \nArrange bi-weekly check-ins with Tamedia for POC progress (34:18)  \nAdd Natasha to Slack channel and manage communications (40:27)  \n\n**Marcel Geldner**  \nReview and share answers to data privacy questionnaire (15:08)  \nProvide access to security and DPA documents via Vanta (37:14)  \nCoordinate legal compliance clarifications and communicate updates (38:26)",
       "organizer": "marcel@growthbook.io",
       "participants": 8,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4TS2JD01TZGBMEVVMN06EGY",
+      "source": "fireflies",
+      "title": "Tamedia & GrowthBook | Platform Demo for Product Team",
+      "date": "2026-10-15",
+      "duration_minutes": 54,
+      "summary": "# Tamedia & GrowthBook | Platform Demo for Product Team\nDate: 2026-10-15 | Duration: 54m\n\n## Summary\nGrowthbook is an open-source tool created by the education.com CTO and CFO, offering feature flags, experiments, and product analytics for companies of different sizes. Feature flags dynamically enable features, while experiments support audience targeting and unlimited variants. Growthbook connects to a customer’s data warehouse, which remains the single source of truth; it does not store data itself. Teams can ramp rollouts by percentage and time, use guardrail metrics with automatic kill switches, and separate mutually exclusive experiments through namespaces. Metrics are defined and computed in the warehouse, with support for existing BI metrics, custom definitions, Google Analytics, and AWS Athena. Exposure events connect to user IDs for experiment and cohort analysis, while polling frequency controls data freshness and query cost. Server-side deployment is preferred to avoid content shifts and SEO impact, although client-side and edge deployments are supported. A visual editor handles simple UI changes, while complex features require coding. Product managers can run experiments with data-team collaboration, and follow-up metric planning and integration discussions were planned, with Slack available for support.\n\n## Keywords\nFeature Flagging, Experimentation, Data Warehouse Integration, A/B Testing, Server-Side Rendering, Product Analytics\n\n## Action Items\n**Rémy Marin**  \nProvide demo on experiment data integration (16:09)  \nSchedule meeting to define five experiment metrics (43:55)  \n\n**Tamedia Data Team / Product Team**  \nReflect on experiment execution approach (40:07)  \nPrepare metric definitions for GrowthBook (35:00)  \n\n**CH-ZH-STA08-3-Bertastrasse (Christian Hefti)**  \nSummarize meeting discussion points (36:38)  \nInclude members in GrowthBook Slack channel (44:41)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 15,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4TJN22KGETPM16E3MZ9G9N4",
+      "source": "fireflies",
+      "title": "Tamedia & GrowthBook | Commercial Discussion",
+      "date": "2026-10-15",
+      "duration_minutes": 27.780000686645508,
+      "summary": "# Tamedia & GrowthBook | Commercial Discussion\nDate: 2026-10-15 | Duration: 27.780000686645508m\n\n## Summary\nThe discussion compared cloud SaaS and self-hosting, with a preference for SaaS and an EU cloud option available. Self-hosting would add operational work, while cloud hosting would cost approximately 20k CHF more under the enterprise model. Enterprise pricing includes a base fee and per-user licensing, with no traffic or event costs; the Pro version is limited to 30 users, lacks SSO and support, and includes CDN fees. The group discussed building an experimentation culture around defined metrics, learning, and growth, including a possible AI assistant for experiment insights. Adoption and ROI depend on effective team usage, so a product team session and trial were planned. There is no fixed production timeline, and budget impact for 2027 needs assessment. Payment installments, contractual adjustments, technical support through Remy, and possible leadership escalation on pricing were also offered.\n\n## Keywords\nGrowth Book, self-hosting, cloud hosting, commercial model, experimentation program, enterprise pricing\n\n## Action Items\n**Alla Roman**  \nAttend product session (00:00)  \n\n**Marcel Geldner**  \nCheck security assessment status (01:00)  \nProvide hosting cost details (05:00)  \nShare slide deck recap (07:00)  \nInclude leadership in pricing discussions (20:00)  \nSummarize call and send materials (24:00)  \nFacilitate technical question coordination (25:00)  \n\n**CH-ZH-STA08-3-Hedwigsteig (Hal Taylor)**  \nEvaluate Growth Book acceptance and timing (19:00)  \nReview slide deck and pricing details (23:00)  \nEngage product team for trial needs (24:00)  \n\n**Davide Cammarata**  \nFollow up with Remy over Slack (25:00)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 5,
       "summary_quality": "good"
     }
   ]

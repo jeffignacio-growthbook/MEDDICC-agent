@@ -1,7 +1,7 @@
 {
   "company": "Growthbook + Brex",
   "slug": "growthbook-brex",
-  "last_etl_date": "2026-09-03T06:04:10.813338",
+  "last_etl_date": "2026-10-16T05:17:01.218038",
   "calls": [
     {
       "id": "01M0X9SJRW9BDRPP6SYM0S60KD",
@@ -10,6 +10,17 @@
       "date": "2026-08-27",
       "duration_minutes": 36.06999969482422,
       "summary": "# Growthbook + Brex\nDate: 2026-08-27 | Duration: 36.06999969482422m\n\n## Summary\nThe meeting clarified the reimbursement process for employees and admins, showcasing features like easy receipt submission via drag-and-drop, email, or mobile app, with AI assisting in data extraction for timely approvals. It also emphasized admin controls to set spend limits and approval workflows linked to events, ensuring budgetary compliance and easy reconciliation through integration with QuickBooks. Moreover, the discussion addressed international reimbursement functionalities supporting over 130 countries, and AI's role in policy enforcement, particularly with restricted items. Lastly, customer context indicated seasonal usage for conferences and retreats, while ongoing support for implementation was also highlighted.\n\n## Keywords\nreimbursements, Brex, QuickBooks, receipts, expense reports, international payments\n\n## Action Items\n\n**Sara Neaveill**\nConfirm if Brex’s AI flags expenses exceeding stipulated amounts or handles detailed line-item detection such as alcohol within grouped meal expenses (11:42)\nInvestigate possibilities or workarounds for creating consolidated reimbursement reports to group multiple expenses for events or trips, aligning with Growthbook’s preferred workflow (14:58)\nVerify if there are currency conversion fees specifically for reimbursements and confirm handling of foreign currency transactions within Brex (32:45)\nCheck with banking team about receiving international customer payments in foreign currencies such as Euro and related conversion or acceptance capabilities for Growthbook (33:30)\nProvide follow-up email including step-by-step company-wide reimbursement setup instructions and relevant documentation to Jennifer (34:04)\nArrange quarterly check-in calls to review Growthbook’s Brex reimbursement usage progress and address any new questions or issues (34:04)\n",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4VF8MVNRXHT6XDPAJMERTA0",
+      "source": "fireflies",
+      "title": "Growthbook + Brex",
+      "date": "2026-10-15",
+      "duration_minutes": 24,
+      "summary": "# Growthbook + Brex\nDate: 2026-10-15 | Duration: 24m\n\n## Summary\nJennifer reviewed plans to enable Brex reimbursements for all team members, including approval routing and reimbursement policy configuration. The setup path includes Cards and Limits and Manage Policy, where documentation, receipts, memos, manager approvals, accounting rules, and approval controls can be configured. The company has a $900,000 Brex credit limit and uses approximately $250,000 per month, so no increase is needed. Limits control approved spend for reimbursements, card purchases, and bill payments, while policies define compliance requirements. Limits may be one-time or recurring, broad or individual, and can include departments, reset periods, GL coding, transaction caps, blocked categories, and card restrictions. Jennifer is considering event-level limits for travel and marketing events. The $75 daily food-cap configuration remains unresolved, while the $75 receipt threshold and itemization rules require confirmation. Brex AI can flag unusual or duplicate expenses. Jennifer will continue testing policies, limits, team setup, and event-versus-individual controls, with Sara available for support.\n\n## Keywords\nBrex reimbursements, Spend limits, Approval policies, Receipt compliance, Team administration, Expense controls\n\n## Action Items\n**Sara Neaveill**\nVerify advanced-control configuration (18:33)\nVerify itemised receipt requirements (21:16)\n\n**Jennifer Pham-Le**\nTest reimbursement configuration (23:24)\nPublish reimbursement policy changes (23:24)",
       "organizer": "jennifer@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

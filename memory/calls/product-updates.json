@@ -1,0 +1,18 @@
+{
+  "company": "Product updates",
+  "slug": "product-updates",
+  "last_etl_date": "2026-10-16T05:17:01.217755",
+  "calls": [
+    {
+      "id": "01M4Y1GVWF9GE7D9H9NYFDN2SY",
+      "source": "fireflies",
+      "title": "Product updates",
+      "date": "2026-10-15",
+      "duration_minutes": 60.029998779296875,
+      "summary": "# Product updates\nDate: 2026-10-15 | Duration: 60.029998779296875m\n\n## Summary\nThe product updates project began 2–3 months ago, with Emmy leading the initial work and Yousef building the CMS and Webflow pages. Automation remains challenging because not every PR is a product update, some PRs are folded or omitted, and human review is needed. Data is stored in Supabase, a dashboard runs on Google Cloud, and a daily batch job runs on Jack’s computer. Fireflies calls, Slack, and Notion are integrated to add customer use cases and workflow context. The preferred content style is customer-first, approachable, clear, and flexible, avoiding excessive technical language, marketing jargon, negative self-talk, unverified claims, and inaccurate historical details. Webflow performance issues include large CSS bundles, image problems, prefetching overload, and an inefficient publishing model. A Focus project may involve a brand refresh, website rebuild, and CMS improvements. Scott is preparing onboarding support and a content strategy that expands beyond SEO into editorial stories about engineering, experimentation, product development, markets, and themes.\n\n## Keywords\nProduct updates, Supabase, Brand marketing, Content strategy, Website performance, Editorial content\n\n## Action Items\n**Jack Virag**  \nIntegrate product update context into Supabase (06:54)  \nPrepare revised product updates (30:52)  \nShare updated product update results with Scott (31:08)  \nUse onboarding document and schedule orientation meeting with Scott (44:30)  \nWrite content strategy document (52:00)  \n\n**Scott Bailey**  \nReview and approve product update contents (30:19)  \nProvide onboarding document and schedule meeting with Jack (44:30)  \nDraft brand marketing and content strategy document (57:00)",
+      "organizer": "jack@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

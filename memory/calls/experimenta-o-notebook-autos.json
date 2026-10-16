@@ -1,0 +1,18 @@
+{
+  "company": "Experimentação notebook AUTOs",
+  "slug": "experimenta-o-notebook-autos",
+  "last_etl_date": "2026-10-16T05:17:01.217402",
+  "calls": [
+    {
+      "id": "01M50QKP8G8YW2HBGTQ20RMBDN",
+      "source": "fireflies",
+      "title": "Experimentação notebook AUTOs Growthbook",
+      "date": "2026-10-15",
+      "duration_minutes": 10,
+      "summary": "# Experimentação notebook AUTOs Growthbook\nDate: 2026-10-15 | Duration: 10m\n\n## Summary\nGrowthBook is expanding AI-driven experimentation through LLMs, machine learning models, visual test creation, automated workflows, and result learning. More than 30 AI agents operate through an MCP server to create flags, set up experiments, and read results while following user permissions and generating audit logs. Analysts can connect agents to query experiment metrics in plain language, with agents able to execute SQL for deeper analysis beyond dashboards. GrowthBook also provides an AI dashboard that stores learnings from experiment results and a Slack app for asking questions about experiment data while keeping the data in users’ own data warehouses. Natalia Tyminski highlighted the value of the experiment result layout and post-experiment analysis, noting that agent support was absent in 2023 but is now important. Scott Keller described the platform’s improvements since 2023 and expressed openness to further discussion about AI agents and automatic analysis.\n\n## Keywords\nGrowthBook, AI agents, experimentation, feature flagging, MCP server, post-experiment analysis\n\n## Action Items\n\n**Scott Keller**\nContinue developing AI agent capabilities and automated analysis features for GrowthBook experimentation (03:30)\nProvide additional information or follow-up on AI agent integration and automatic analysis features upon request (03:30)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 20,
+      "summary_quality": "good"
+    }
+  ]
+}

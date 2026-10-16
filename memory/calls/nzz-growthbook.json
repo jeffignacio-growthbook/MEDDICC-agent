@@ -1,0 +1,18 @@
+{
+  "company": "NZZ & GrowthBook",
+  "slug": "nzz-growthbook",
+  "last_etl_date": "2026-10-16T05:17:01.221898",
+  "calls": [
+    {
+      "id": "01M4TQBZSBJBJ48K3Q0YRWKMMH",
+      "source": "fireflies",
+      "title": "NZZ & GrowthBook | Introduction Call",
+      "date": "2026-10-15",
+      "duration_minutes": null,
+      "summary": "# NZZ & GrowthBook | Introduction Call\nDate: 2026-10-15 | Duration: Unknown\n\n## Summary\nNo summary available",
+      "organizer": "marcel@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

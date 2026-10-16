@@ -1,0 +1,18 @@
+{
+  "company": "Ryan McGurk and",
+  "slug": "ryan-mcgurk-and",
+  "last_etl_date": "2026-10-16T05:17:01.217653",
+  "calls": [
+    {
+      "id": "01M4VY8D1TYNEKNCP6815B0J8A",
+      "source": "fireflies",
+      "title": "Ryan McGurk and Sahil Patel",
+      "date": "2026-10-15",
+      "duration_minutes": 21,
+      "summary": "# Ryan McGurk and Sahil Patel\nDate: 2026-10-15 | Duration: 21m\n\n## Summary\nThe Short Story pilot is nearing its first test launch after server-side implementation failed in the core quiz flow and client-side implementation took roughly one month; a loading flash remains a concern. ClickHouse is progressing toward signature expected Monday, with GrowthBook testing underway and CEO-level support offered by Ryan. Future pilots may benefit from earlier GrowthBook technical involvement, including implementation and stack-specific guidance. GrowthBook can support evaluations when notified early, while Sahil will flag prospects and Ryan will coordinate resources. Workshops led by Sahil would review three or four high-priority website or landing-page opportunities and produce experiment concepts, mockups, and implementation guidance. The strongest customer fit is generally companies with 75 to 2,000 employees that test websites or landing pages. Ryan will identify roughly five suitable accounts, especially those facing funnel or free-trial conversion issues; company names and priority pages are sufficient for initial research. Sources: 01:50, 04:18, 05:25, 05:41, 07:52, 11:43, 13:36, 15:14, 19:39, 20:12.\n\n## Keywords\nGrowthBook, Spiralyze, Experimentation workshops, Server-side testing, Landing-page optimisation, Platform migration\n\n## Action Items\n**Ryan McGurk**\n- Flag pro tier evaluations (07:52)\n- Review customer accounts (13:06)\n- Prioritize website testing customers (13:36)\n- Identify five target accounts (19:39)\n- Request Sahil Patel’s Calendly link (19:39)\n\n**Sahil Patel**\n- Lead experimentation workshops (11:43)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

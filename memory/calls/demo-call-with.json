@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-10-13T07:13:02.686642",
+  "last_etl_date": "2026-10-16T05:17:01.219829",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -928,6 +928,17 @@
       "summary": "# Demo Call with Jai Patel from\nDate: 2026-10-12 | Duration: 31.770000457763672m\n\n## Summary\nThe discussion evaluated GrowthBook as an A/B testing platform for the company’s website redesign and upcoming launch. Its SDK can be installed in under one day, or in under an hour using the MCP server, without involving the CRM or platform team; it embeds into front-end frameworks such as React or Next.js (29:19). The team compared Sanity integration, which lets marketers select content variants but requires context switching, with the visual editor, which offers low-code experimentation and Figma integration, although Figma is not yet used company-wide (12:29, 16:44). Because there is no internal data warehouse, GrowthBook’s managed ClickHouse warehouse would be needed, adding usage costs beyond the US$40-per-user monthly Pro license for up to 30 users and 3 projects (09:50, 08:56). Developers or product managers would configure experiments, while marketers would run tests and review results. Feature flags, traffic allocation, attribute targeting, and event tracking support controlled experimentation and analysis.\n\n## Keywords\nGrowthBook, Sanity integration, A/B testing, marketing team, visual editor, data warehouse\n\n## Action Items\n\n**James Shannon**\nSend Workspace.co documentation on Sanity integration and a video demonstrating the GrowthBook visual editor (28:48)\n\n**Workspace.co Team**\nReview provided documentation and video materials for GrowthBook Sanity integration and visual editor (28:58)\n\n**Workspace.co Development Team / Engineers**\nPlan installation of GrowthBook SDK within the website code base, estimating under an hour with MCP server or up to half a day without (29:00)\n\n**Workspace.co Product Team**\nConsider Figma adoption timeline for leveraging GrowthBook’s visual editor integration and evaluate whether to use visual editor workflow or Sanity workflow based on digital marketing tool usage (19:40)\n\n**Workspace.co Marketing Team**\nConfirm final list of end users who will run A/B tests internally and clarify collaboration with external agency on usage (06:00)\n",
       "organizer": "james.shannon@growthbook.io",
       "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4VJ46V9GR14E087MMGVBMAZ",
+      "source": "fireflies",
+      "title": "Demo Call with Alex Sharpe from",
+      "date": "2026-10-15",
+      "duration_minutes": 36.279998779296875,
+      "summary": "# Demo Call with Alex Sharpe from\nDate: 2026-10-15 | Duration: 36.279998779296875m\n\n## Summary\nThe discussion covered the customer’s Webflow marketing site, previous issues with Intellimize, and a preference for controlled testing. The marketing team uses Mixpanel for analytics, while Snowflake tables serve as the source of truth; Mixpanel event synchronization is imperfect. The customer wants flexible, easy-to-launch tests with limited engineering support, mainly for copy and design changes, while remaining open to future personalization. GrowthBook demonstrated feature flags, traffic allocation, targeting rules, experiment results, SQL visibility, health checks, and a visual editor supporting manual or AI prompt-based edits and multiple variants. A native Webflow integration was not confirmed. Setup was estimated at 30–60 minutes and requires SDK deployment, a warehouse connection, exposure ID, and metric library configuration. The Pro plan was discussed as fitting a $10,000 annual budget, with monthly signup available for a trial and pricing based on user seats. The customer is also evaluating Optibase and Wing of Eyes, expects legal and security review, and plans to try multiple tools before deciding. The site has 6 million monthly unique users, and a follow-up on pricing was planned.\n\n## Keywords\nGrowthBook, Webflow, A/B testing, Mixpanel, Snowflake, feature flags\n\n## Action Items\n**Jake Heier**  \nSend warehouse connection and SDK setup link (25:01)  \n\n**Kris Washburn**  \nSend pricing and plan details for GrowthBook (30:50)  \n\n**Alex Sharpe**  \nReview GrowthBook pricing and features (30:50)  \n\n**Ivan Salim**  \nEvaluate GrowthBook trial and compare tools (34:44)",
+      "organizer": "kris@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

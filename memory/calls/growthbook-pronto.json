@@ -1,7 +1,7 @@
 {
-  "company": "Growthbook <>  Pronto",
+  "company": "Growthbook <> Pronto",
   "slug": "growthbook-pronto",
-  "last_etl_date": "2026-08-05T16:51:05.103067",
+  "last_etl_date": "2026-10-16T05:17:01.217149",
   "calls": [
     {
       "id": "01KVYZE9SK4Z4ACDZBCYAV3838",
@@ -16,7 +16,19 @@
       "action_items": "\n**Divishtha Malik**\nStart drafting a rough budget for the experimentation platform with the head of finance by Sunday for internal review (17:11)\nShare internal app walkthrough, SKU list, and experimentation plan during the scheduled demo (25:30)\nInitiate internal financial approval process promptly to meet the July 24 launch deadline (26:50)\n\n**Dan Wathne**\nOrganize and schedule a detailed demo early next week, accommodating time zone and travel constraints (15:50)\nProvide detailed pricing documentation and respond to Divishtha’s pricing match request upon receiving competitor’s offer in writing (23:59)\nFollow up with email summarizing meeting and next steps, including links to documentation and scheduling options (26:50)\n\n**Logan Bates**\nShare technical documentation on data warehouse connections and SDK integration for React Native (19:35)\nSupport demo preparation and address technical team’s questions about SDK size and server-side evaluation option (18:00)\n",
       "participant_domains": [
         "withpronto.com"
-      ]
+      ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4XVJXFNZRZZQDECS0JWVEH4",
+      "source": "fireflies",
+      "title": "Growthbook <> Pronto - Demo",
+      "date": "2026-10-16",
+      "duration_minutes": 49.40999984741211,
+      "summary": "# Growthbook <> Pronto - Demo\nDate: 2026-10-16 | Duration: 49.40999984741211m\n\n## Summary\nGrowth Book presented a flexible, open-source, warehouse-native experimentation and feature flagging platform that uses customer data warehouses such as Databricks, preserving data ownership and avoiding rebuilt pipelines. It supports isolated holdouts, namespaces, granular targeting, more than 30 SDKs, feature flagging, product analytics, and 50–100 experiments monthly. Embedded AI can generate dashboards, visualizations, experiment summaries, and data insights for technical and business users. Setup typically takes one to two days, with onboarding achievable within a week; Growth Book requires read-only Databricks access, queries raw data directly, and leaves data in the customer warehouse, although customer compute costs apply. Experiments support flexible targeting, gradual rollouts, sticky user assignments, Bayesian and Frequentist analysis, primary, secondary, and guardrail metrics, and transparent queries. Pronto plans an approximately three-week trial covering setup, experiment launch, and analysis, supported through Slack. Security and legal clearance, a POC agreement, success criteria, and parallel commercial discussions remain next steps.\n\n## Keywords\nGrowthBook, experimentation, feature flagging, Databricks, AI integration, trial onboarding\n\n## Action Items\n\n**Dan Wathne**\nFollow up via email or Slack with Pronto team to provide estimates on the compute cost impact of GrowthBook queries on the Databricks data warehouse (00:40)\nSend the Proof of Concept (POC) agreement document to Pronto's legal team for review and signature prior to trial start to ensure compliance with legal and data security requirements (00:47)\nShare documentation summarizing the meeting discussion and assist in scoping out trial success criteria and timelines with the Pronto team via Slack (00:45)\nCoordinate scheduling of follow-up sessions with Pronto to discuss commercial terms, trial progress, or deeper technical topics as needed (00:44)\n\n**Daniel Lin**\nProvide ongoing technical support and answer questions during the integration and trial period via Slack to ensure smooth onboarding and usage of GrowthBook (00:20)\nAssist with technical onboarding including SDK implementation, data warehouse integration, and experiment configuration to facilitate trial setup (00:16)\n\n**Divishtha Malik**\nAdd Pronto team members to the GrowthBook Slack channel to enable communication and support during the trial period (00:45)\nCheck with Pronto's legal team regarding any required security clearances or agreements needed before starting the GrowthBook trial (00:47)\nCoordinate internal review of trial timelines and define business requirements and success criteria for the GrowthBook trial evaluation (00:43)\n\n**Pranjal Gupta**\nIdentify potential past experiments or new test cases suitable for the GrowthBook trial and share details with the GrowthBook team to support trial evaluation (00:44)\n",
+      "organizer": "dan@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
     }
   ]
 }

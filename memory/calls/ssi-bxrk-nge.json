@@ -1,0 +1,18 @@
+{
+  "company": "ssi-bxrk-nge",
+  "slug": "ssi-bxrk-nge",
+  "last_etl_date": "2026-10-16T05:17:01.217538",
+  "calls": [
+    {
+      "id": "01M50PCMPXNCMQ2NH389QZ7TFJ",
+      "source": "fireflies",
+      "title": "ssi-bxrk-nge",
+      "date": "2026-10-15",
+      "duration_minutes": 2,
+      "summary": "# ssi-bxrk-nge\nDate: 2026-10-15 | Duration: 2m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}
