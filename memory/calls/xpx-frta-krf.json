@@ -1,0 +1,18 @@
+{
+  "company": "xpx-frta-krf",
+  "slug": "xpx-frta-krf",
+  "last_etl_date": "2026-10-17T05:11:12.180291",
+  "calls": [
+    {
+      "id": "01M53526FAFX8B34J3AGWZ2DK5",
+      "source": "fireflies",
+      "title": "xpx-frta-krf",
+      "date": "2026-10-16",
+      "duration_minutes": 1,
+      "summary": "# xpx-frta-krf\nDate: 2026-10-16 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

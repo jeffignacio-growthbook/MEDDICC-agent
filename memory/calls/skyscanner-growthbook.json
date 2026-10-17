@@ -1,7 +1,7 @@
 {
   "company": "Skyscanner + GrowthBook",
   "slug": "skyscanner-growthbook",
-  "last_etl_date": "2026-10-08T06:47:48.884096",
+  "last_etl_date": "2026-10-17T05:11:12.184860",
   "calls": [
     {
       "id": "01KZ1D9TK97FVF3J7VRS5F562J",
@@ -108,6 +108,17 @@
       "date": "2026-10-07",
       "duration_minutes": 14,
       "summary": "# Skyscanner + GrowthBook\nDate: 2026-10-07 | Duration: 14m\n\n## Summary\nThe team reviewed integration and organizational challenges affecting self-serve content experiments, with production testing now targeted for early Q1 rather than the original plan. Multiple microsites are owned by different teams, requiring bespoke coordination, technical due diligence, and design sign-offs. Engineering is moving from installing the JavaScript SDK separately on each microsite to embedding GrowthBook capabilities in shared frontend libraries, while also exploring Open Feature as a standardized, future-proof integration layer. No technical issue with the GrowthBook SDK was reported; the main challenge is architectural and organizational fit. A decision brief will support the go/no-go decision after production AA/AB validation confirms data flow and experiment readiness. Contract signing, previously planned for the end of October, will wait until technical clearance, while legal teams continue preparing redlines. David Gregory will share a high-level POC summary, and Chris Sanders will provide post-sales architectural support.\n\n## Keywords\nGrowthBook, integration challenges, microsites, Open Feature, POC evaluation, contract negotiation\n\n## Action Items\n\n**Daniel Cheng**\nWork with GrowthBook legal team to prepare and share red lines for contract ahead of final technical alignment (03:40)\nSchedule a follow-up call with Christian to discuss commercial impact of timeline changes, availability Friday or early next week (11:20)\nMaintain open, transparent communication with GrowthBook as timeline and integration challenges develop (14:25)\n\n**David Gregory**\nComplete internal engineering inputs and finalize a decision brief summarizing POC evaluation for internal alignment and share a less detailed summary with GrowthBook (12:30)\n\n**Christian Liebenow**\nCoordinate with Daniel to schedule follow-up commercial discussion (11:00)\n\n**Chris Sanders**\nProvide support and share best practices on GrowthBook SDKs and integration, especially related to Open Feature usage and architectural decisions (07:00)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4E6P106TRF8RZKVGAQRS3VK",
+      "source": "fireflies",
+      "title": "Skyscanner + GrowthBook",
+      "date": "2026-10-16",
+      "duration_minutes": 16.3799991607666,
+      "summary": "# Skyscanner + GrowthBook\nDate: 2026-10-16 | Duration: 16.3799991607666m\n\n## Summary\nThe discussion focused on coordinating with another Skyscanner team evaluating multi-armed bandits to avoid duplicate development and assess GrowthBook’s fit. Joanne, a data scientist for decision tooling, was invited to the next call and will compile technical and product questions, while Christian Liebenow will bring Luke or Jeremy for engineering or data science support. GrowthBook can either convert the trial environment or create a new production environment, with the existing proof of concept potentially repurposed as staging. Production readiness remains dependent on design reviews, technical decisions, and alignment across Flights Experience and other teams because the web front end spans multiple services and microsites. David Gregory will share a revised stakeholder plan by November 4. Experimentation Day will proceed on November 5, with Zoltan and Megan presenting and Hampus expected as a guest speaker. Rémy Marin’s shared-channel access remains pending, and the next meeting is scheduled for the following Friday. Sources: 04:11–13:18.\n\n## Keywords\nMulti-armed bandits, Production environments, Staging and sandbox, GrowthBook integration, Experimentation Day, Technical alignment\n\n## Action Items\n**Joanne**\nCompile bandit questions (04:11)\nSend questions to GrowthBook (04:11)\n\n**Christian Liebenow**\nCoordinate technical contacts (05:25)\nAddress technical questions (05:25)\n\n**David Gregory**\nShare revised integration plan (09:04)\n\n**Zoltan Bacskai**\nPrepare experimentation session (12:20)\nPresent experimentation session (12:20)\n\n**Megan Crothers**\nPrepare experimentation session (12:20)\nPresent experimentation session (12:20)",
       "organizer": "christian@growthbook.io",
       "participants": 10,
       "summary_quality": "good"

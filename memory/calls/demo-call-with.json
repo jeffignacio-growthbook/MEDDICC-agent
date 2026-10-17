@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-10-16T05:17:01.219829",
+  "last_etl_date": "2026-10-17T05:11:12.178887",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -938,6 +938,39 @@
       "duration_minutes": 36.279998779296875,
       "summary": "# Demo Call with Alex Sharpe from\nDate: 2026-10-15 | Duration: 36.279998779296875m\n\n## Summary\nThe discussion covered the customer’s Webflow marketing site, previous issues with Intellimize, and a preference for controlled testing. The marketing team uses Mixpanel for analytics, while Snowflake tables serve as the source of truth; Mixpanel event synchronization is imperfect. The customer wants flexible, easy-to-launch tests with limited engineering support, mainly for copy and design changes, while remaining open to future personalization. GrowthBook demonstrated feature flags, traffic allocation, targeting rules, experiment results, SQL visibility, health checks, and a visual editor supporting manual or AI prompt-based edits and multiple variants. A native Webflow integration was not confirmed. Setup was estimated at 30–60 minutes and requires SDK deployment, a warehouse connection, exposure ID, and metric library configuration. The Pro plan was discussed as fitting a $10,000 annual budget, with monthly signup available for a trial and pricing based on user seats. The customer is also evaluating Optibase and Wing of Eyes, expects legal and security review, and plans to try multiple tools before deciding. The site has 6 million monthly unique users, and a follow-up on pricing was planned.\n\n## Keywords\nGrowthBook, Webflow, A/B testing, Mixpanel, Snowflake, feature flags\n\n## Action Items\n**Jake Heier**  \nSend warehouse connection and SDK setup link (25:01)  \n\n**Kris Washburn**  \nSend pricing and plan details for GrowthBook (30:50)  \n\n**Alex Sharpe**  \nReview GrowthBook pricing and features (30:50)  \n\n**Ivan Salim**  \nEvaluate GrowthBook trial and compare tools (34:44)",
       "organizer": "kris@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5369FNJVE2MMYZBPAPNVR1T",
+      "source": "fireflies",
+      "title": "Demo Call with Issa Mathno from",
+      "date": "2026-10-16",
+      "duration_minutes": 39,
+      "summary": "# Demo Call with Issa Mathno from\nDate: 2026-10-16 | Duration: 39m\n\n## Summary\nThe team is evaluating GrowthBook, LaunchDarkly, and Statsig, with the decision based on overall fit and integration effort rather than price. Vendor selection is expected within one to two weeks, with the first pricing experiment targeted for Q4. The primary success metric will be per-cap, defined as revenue divided by attendance, because attendance is declining and pricing changes need to be measured against revenue outcomes. Experiments must account for weather, school breaks, events, and tourism to isolate pricing effects. GrowthBook’s Microsoft Fabric integration would keep data in the warehouse, while a one-time feature-flag connection could enable yield managers or marketers to launch future tests without additional development. The pricing workflow must preserve assigned prices through the customer journey and report checkout, abandonment, refunds, and refund reasons. A Tuesday demo will cover nontechnical workflows, visual editors, and pricing experimentation. Scott Keller will confirm Fabric requirements with Logan, after which pricing discussions will continue. Issa Mathno rated team readiness at approximately six to six and a half out of ten.\n\n## Keywords\nPricing experimentation, Per-capita revenue, Microsoft Fabric, Warehouse-native analytics, Feature flags, Dynamic pricing\n\n## Action Items\n**Issa Mathno**\nReview GrowthBook documentation (06:37)\nAttend GrowthBook demonstration (33:25)\n\n**Scott Keller**\nSend GrowthBook product deck (25:50)\nConduct end-to-end demonstration (33:25)\nSend calendar invite (36:01)\nConfirm Fabric pricing applicability (37:11)\nProvide Enterprise pricing details (37:11)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M507RAYX23VSNCTZZ7HWPXX5",
+      "source": "fireflies",
+      "title": "Demo Call with William Swaney from",
+      "date": "2026-10-16",
+      "duration_minutes": 36.36000061035156,
+      "summary": "# Demo Call with William Swaney from\nDate: 2026-10-16 | Duration: 36.36000061035156m\n\n## Summary\nThe team needs flexible A/B testing after migrating from Salesforce to Framer, including testing page templates without downstream impact across Microsoft Clarity, GA4, Catch, and related tools. The business operates nearly 200 funeral homes across 21 states, with individual cases worth $8,000–$10,000, making conversion changes financially significant. VWO use has stopped because of cost, limited native integrations, and reliance on Elizabeth, so GrowthBook is being evaluated as a lower-cost alternative with Framer, Clarity, GA4, and Azure Fabric support. GrowthBook also offers feature flags, phased rollouts, auto-rollbacks, multivariate and sequential testing, analytics, and AI-assisted analysis. The main technical risk is Framer’s extensive custom code, which may require developer support for SDK installation and warehouse connectivity. Will and Elizabeth plan to test a known experiment using the free tier, followed by a possible engineering session and a check-in in approximately a couple of weeks.\n\n## Keywords\nGrowthBook, A/B testing, Framer, Microsoft Clarity, VWO migration, Experimentation analytics\n\n## Action Items\n**Will Swaney**\n- Test GrowthBook trial (33:01)\n\n**Elizabeth**\n- Test GrowthBook trial (33:01)\n\n**Dan Wathne**\n- Send meeting recap and materials (34:31)",
+      "organizer": "dan@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4JSVKPH7YMAM1T42ZY0VP3M",
+      "source": "fireflies",
+      "title": "Demo Call with Rahul singh from",
+      "date": "2026-10-16",
+      "duration_minutes": 36.970001220703125,
+      "summary": "# Demo Call with Rahul singh from\nDate: 2026-10-16 | Duration: 36.970001220703125m\n\n## Summary\nThe discussion focused on improving supplier conversion by helping suppliers complete onboarding and a 50-question sustainability assessment with documentation, which accelerates ratings and supports revenue growth. Key barriers include a static questionnaire, lengthy completion times, ignored or distrusted email invitations, and unclear responsibility for ESG responses. Proposed solutions include dynamic questionnaires, AI-assisted answers from uploaded documents, personalized dashboards, targeted invitations, granular funnel measurement, and experiments across web and email. GrowthBook supports feature flags, phased rollouts, multi-variant and bandit testing, and server- and client-side experimentation. Its React-compatible SDK can send exposure and metric data to Azure and Databricks for SQL-based analysis. Segmentation may be synchronized across High Touch, Salesforce Marketing Cloud, and GrowthBook, with an MCP server proposed to inject attributes programmatically. The platform’s open-source core, enterprise capabilities, and reported use by more than 3,500 companies were presented as differentiators. Next steps include a deeper use-case-focused demo, trial setup, and technical support led by Remy with coordination through Rahul and participation from Emilio as needed.\n\n## Keywords\nExperimentation, Feature Flags, Supplier Conversion, Questionnaire Personalization, Data Integration, AI Workflows\n\n## Action Items\n\n**Rahul Singh**\nCoordinate scheduling of next in-depth GrowthBook demo call and follow-up with James Shannon and Emilio De la Fuente (35:42)\n\n**James Shannon**\nPrepare a demo focused on Ecovadis’s use cases including funnel metrics for questionnaire steps, feature flags, and integration with Databricks and external segmentation tools (13:26)\nProvide case studies and data insights on realistic conversion improvements and ROI linked to experimentation on supplier conversion flows (19:39)\nExplain and assist with ingestion of experiment exposure events into Ecovadis’s Azure/Databricks pipeline for analysis (33:50)\n\n**Remy**\nLead solutions engineering engagement to support trial setup, Slack channel creation, and technical assistance during evaluation phase (05:44)\n\n**James Shannon and Ecovadis engineering/data teams**\nPlan technical integration involving GrowthBook SDK initialization on front-end and server-side, attribute injection from segmentation tools (High Touch, Salesforce Marketing Cloud) into GrowthBook via MCP server for experimentation targeting (27:55)\n",
+      "organizer": "james.shannon@growthbook.io",
       "participants": 4,
       "summary_quality": "good"
     }

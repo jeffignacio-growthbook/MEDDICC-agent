@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Slack app setup & feedback",
+  "slug": "growthbook-slack-app-setup-feedback",
+  "last_etl_date": "2026-10-17T05:11:12.182999",
+  "calls": [
+    {
+      "id": "01M5076HJKRBC2T7CQZ7HF6W2P",
+      "source": "fireflies",
+      "title": "GrowthBook Slack app setup & feedback: GiftHealth",
+      "date": "2026-10-16",
+      "duration_minutes": 38,
+      "summary": "# GrowthBook Slack app setup & feedback: GiftHealth\nDate: 2026-10-16 | Duration: 38m\n\n## Summary\nThe discussion covered the pending approval of the official Slack app, with setup expected to remain unchanged after approval and Elizabeth responsible for requesting review through the Slack admin. Slack notifications can be scoped by project, environment, tag, individual, or channel and can cover experiment starts, launches, decision-ready status, results, errors, and warnings; Elizabeth plans to begin with fewer alerts to reduce noise. The read-only GrowthBook Agent can summarize experiments and answer questions about hypotheses, setup, results, and historical activity, but cannot execute actions or access MCP functionality. Adoption expanded from one experiment at a time to multiple concurrent efforts: two unique experiments ran over summer, one with three reruns, and four experiments are in progress. Public planning and experiment channels are preferred for shared learning, while owner mentions were requested to route errors and required actions to the right stakeholders. Governance priorities include documenting learnings, deleting a debugging-only experiment, and creating practical guidance for projects, tags, archiving, descriptions, and self-documenting setup.\n\n## Keywords\nSlack integration, Experiment notifications, AI assistant, Experiment ownership, Learnings library, Experiment documentation\n\n## Action Items\n**Elizabeth Gilbert**\nRequest Slack app review (12:33)\nDelete test experiment (24:28)\n\n**Elyse Fox**\nBring owner-tagging feedback (15:06)\nCheck GiftHealth adoption (16:44)\nClarify experiment deletion guidance (25:07)",
+      "organizer": "elyse@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

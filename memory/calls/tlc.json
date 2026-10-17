@@ -1,7 +1,7 @@
 {
   "company": "TLC",
   "slug": "tlc",
-  "last_etl_date": "2026-08-15T02:33:18.395548",
+  "last_etl_date": "2026-10-17T05:11:12.183597",
   "calls": [
     {
       "id": "01KKWGBR9RS5WHX3XZVMM5VG4B",
@@ -13,7 +13,8 @@
       "organizer": "graham@growthbook.io",
       "participants": 2,
       "keywords": "creative intelligence, generative AI, content labeling, response surface methodology, multi-armed bandit, campaign optimization",
-      "action_items": "\n**Juliana Jackson**\nShare sanitized version of her presentation slides as PDF for community distribution (01:05:31)\nRespond to any follow-up questions posted in TLC calls channel after the meeting (01:05:20)\n\n**TLC Kelly**\nShare the meeting recording within a few hours after processing completes (01:05:34)\nFollow up with panel invitees and speakers for upcoming panel series (01:06:10)\n\n**Unassigned**\nMonitor and manage Zoom meeting technical setups in future calls, including video layout and audio configuration troubleshooting as discussed early in the meeting (00:00)\n"
+      "action_items": "\n**Juliana Jackson**\nShare sanitized version of her presentation slides as PDF for community distribution (01:05:31)\nRespond to any follow-up questions posted in TLC calls channel after the meeting (01:05:20)\n\n**TLC Kelly**\nShare the meeting recording within a few hours after processing completes (01:05:34)\nFollow up with panel invitees and speakers for upcoming panel series (01:06:10)\n\n**Unassigned**\nMonitor and manage Zoom meeting technical setups in future calls, including video layout and audio configuration troubleshooting as discussed early in the meeting (00:00)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KYJXR9W9PRBBDVZQ2BA7G51B",
@@ -28,7 +29,8 @@
       "action_items": "\n, *, *, T, L, C,  , K, e, l, l, y, *, *, \n, U, p, l, o, a, d,  , t, h, e,  , m, e, e, t, i, n, g,  , r, e, c, o, r, d, i, n, g,  , w, i, t, h, i, n,  , a, b, o, u, t,  , a, n,  , h, o, u, r,  , a, n, d,  , s, h, a, r, e,  , i, t,  , o, n,  , t, h, e,  , r, e, c, o, r, d, i, n, g, s,  , a, n, d,  , T, L, C,  , c, a, l, l, s,  , c, h, a, n, n, e, l, s,  , (, 5, 7, :, 2, 6, ), \n, R, e, m, i, n, d,  , t, h, e,  , c, o, m, m, u, n, i, t, y,  , a, b, o, u, t,  , t, h, e,  , O, p, t, i, m, i, z, e, r, s,  , c, o, n, f, e, r, e, n, c, e,  , t, i, c, k, e, t,  , d, e, a, d, l, i, n, e,  , (, e, n, d,  , o, f,  , d, a, y,  , t, o, d, a, y, ),  , a, n, d,  , p, r, o, m, o, t, e,  , t, h, e,  , f, r, e, e,  , C, h, i, c, a, g, o,  , H, a, p, p, y,  , H, o, u, r,  , e, v, e, n, t,  , o, n,  , A, u, g, u, s, t,  , 2, 7, t, h,  , b, e, f, o, r, e,  , t, h, e,  , A, u, g, u, s, t,  , 2, 5, t, h,  , r, e, g, i, s, t, r, a, t, i, o, n,  , d, e, a, d, l, i, n, e,  , (, 5, 6, :, 3, 2, ), \n, \n, *, *, I, s, h, a, n,  , G, o, e, l, *, *, \n, B, e,  , a, v, a, i, l, a, b, l, e,  , t, o,  , a, n, s, w, e, r,  , f, u, r, t, h, e, r,  , q, u, e, s, t, i, o, n, s,  , a, n, d,  , e, n, g, a, g, e,  , i, n,  , d, i, s, c, u, s, s, i, o, n, s,  , f, o, l, l, o, w, i, n, g,  , t, h, e,  , s, e, s, s, i, o, n,  , (, 4, 9, :, 4, 7, ), \n, \n, *, *, F, l, o, r, e, n, t,  , B, u, i, s, s, o, n, *, *, \n, E, n, g, a, g, e,  , i, n,  , u, p, c, o, m, i, n, g,  , d, i, s, c, u, s, s, i, o, n, s, ,,  , i, n, c, l, u, d, i, n, g,  , s, h, a, r, i, n, g,  , e, x, p, e, r, i, e, n, c, e, s,  , w, i, t, h,  , B, a, y, e, s, i, a, n,  , p, r, i, o, r, s,  , a, n, d,  , s, t, a, t, i, s, t, i, c, a, l,  , c, h, a, l, l, e, n, g, e, s,  , i, n,  , e, x, p, e, r, i, m, e, n, t, a, t, i, o, n,  , (, 5, 0, :, 2, 2, ), \n",
       "participant_domains": [
         "testandlearn.community"
-      ]
+      ],
+      "summary_quality": "good"
     },
     {
       "id": "01KZV56PCEQECEN9SCDQFH93YG",
@@ -43,7 +45,19 @@
       "action_items": "\n, *, *, O, l, e,  , G, r, e, g, e, r, s, e, n, *, *, \n, I, n, i, t, i, a, t, e,  , a, n, d,  , f, a, c, i, l, i, t, a, t, e,  , c, r, o, s, s, -, t, e, a, m,  , c, o, n, v, e, r, s, a, t, i, o, n, s,  , b, e, t, w, e, e, n,  , m, a, r, k, e, t, i, n, g, ,,  , U, X, ,,  , c, o, n, t, e, n, t, ,,  , a, n, d,  , a, n, a, l, y, t, i, c, s,  , t, e, a, m, s,  , t, o,  , h, i, g, h, l, i, g, h, t,  , a, n, d,  , r, e, d, u, c, e,  , t, h, e,  , G, r, e, a, t,  , D, i, s, c, o, n, n, e, c, t,  , f, o, r,  , c, l, i, e, n, t,  , p, r, o, j, e, c, t, s,  , (, 5, 5, :, 0, 0, ), \n, U, s, e,  , s, t, a, k, e, h, o, l, d, e, r,  , m, a, p, s,  , a, n, d,  , g, o, a, l,  , t, r, e, e, s,  , t, o,  , c, l, a, r, i, f, y,  , c, o, n, f, l, i, c, t, i, n, g,  , p, r, i, o, r, i, t, i, e, s,  , a, n, d,  , m, e, t, r, i, c, s,  , w, i, t, h, i, n,  , c, l, i, e, n, t,  , o, r, g, a, n, i, z, a, t, i, o, n, s,  , t, o,  , a, l, i, g, n,  , t, e, a, m, s,  , o, n,  , s, h, a, r, e, d,  , s, t, r, a, t, e, g, i, c,  , o, b, j, e, c, t, i, v, e, s,  , (, 5, 8, :, 3, 0, ), \n, \n, *, *, T, L, C,  , K, e, l, l, y, *, *, \n, P, r, o, m, o, t, e,  , u, p, c, o, m, i, n, g,  , e, v, e, n, t, s,  , i, n, c, l, u, d, i, n, g,  , A, u, g, u, s, t,  , 2, 7, t, h,  , T, L, C,  , P, a, r, t, n, e, r, s, h, i, p,  , H, a, p, p, y,  , H, o, u, r,  , r, e, g, i, s, t, r, a, t, i, o, n,  , a, n, d,  , O, p, t, i, m, i, z, e, r, s,  , C, o, n, f, e, r, e, n, c, e,  , t, i, c, k, e, t,  , s, a, l, e, s,  , v, i, a,  , c, o, m, m, u, n, i, t, y,  , c, h, a, n, n, e, l, s,  , (, 0, 6, :, 0, 0, ), \n, F, o, l, l, o, w,  , u, p,  , w, i, t, h,  , I, q, b, a, l, ', s,  , u, p, c, o, m, i, n, g,  , S, e, p, t, e, m, b, e, r,  , w, e, b, i, n, a, r, s, /, w, o, r, k, s, h, o, p, s,  , o, n,  , A, I,  , t, e, c, h,  , s, t, a, c, k, s,  , a, n, d,  , s, m, a, l, l,  , m, o, d, e, l, s, ,,  , e, n, s, u, r, i, n, g,  , R, S, V, P,  , p, r, o, c, e, s, s,  , i, s,  , c, l, e, a, r,  , f, o, r,  , a, t, t, e, n, d, e, e, s,  , (, 5, 3, :, 3, 0, ), \n, \n, *, *, M, e, e, t, i, n, g,  , p, a, r, t, i, c, i, p, a, n, t, s, *, *, \n, E, x, p, l, o, r, e,  , a, n, d,  , l, e, v, e, r, a, g, e,  , A, I,  , t, o, o, l, s,  , f, o, r,  , a, u, t, o, m, a, t, i, n, g,  , e, x, t, r, a, c, t, i, o, n,  , a, n, d,  , a, n, a, l, y, s, i, s,  , o, f,  , u, s, e, r,  , b, e, h, a, v, i, o, r,  , d, a, t, a,  , f, r, o, m,  , G, A, 4,  , a, n, d,  , o, t, h, e, r,  , a, n, a, l, y, t, i, c, s,  , p, l, a, t, f, o, r, m, s,  , t, o,  , s, u, p, p, o, r, t,  , e, x, p, e, r, i, m, e, n, t, a, t, i, o, n,  , s, t, r, a, t, e, g, i, e, s,  , (, 3, 9, :, 4, 5, ), \n",
       "participant_domains": [
         "testandlearn.community"
-      ]
+      ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4XJG5B9BA4HENDJVBGVMSEY",
+      "source": "fireflies",
+      "title": "TLC: Bringing an experimentation mindset to AI search with Will Critchlow",
+      "date": "2026-10-16",
+      "duration_minutes": 62.52000045776367,
+      "summary": "# TLC: Bringing an experimentation mindset to AI search with Will Critchlow\nDate: 2026-10-16 | Duration: 62.52000045776367m\n\n## Summary\nThe discussion covered community announcements and the changing AI-search landscape. The free Atlanta meetup on October 27 will focus on AI and the Human Handoff, featuring speakers from Chick-fil-A, Statsig, Price Picks, and FanDuel; 60 people had registered. The Optimizers Conference calculator supports different participation scenarios, with full participation priced at $1,000, and the next TLC Talk on October 30 will address AI and cognitive surrender. AI-powered search is becoming more personalized and may use user history, preferences, budgets, and prior conversations. Models combine training data with live retrieval and fan-out queries, while website access and citations vary. Will Critchlow favored clean HTML with progressive enhancement and recommended controlled, page-based experiments using treatment and control groups. Proposed tests include rankings, AI summaries, recommendations, visibility, clicks, and conversions, while preserving usefulness for human users.\n\n## Keywords\nAI search experimentation, SEO testing, Retrieval-augmented generation, AI discovery visibility, E-commerce search, SearchPilot\n\n## Action Items\n**Unassigned**\n- Mute lines (02:58)\n- Join Convertsations Slack channel (04:15)\n- RSVP for Atlanta meetup (05:58)\n- Attend Halloween session (55:43)\n\n**TLC Kelly**\n- Share presentation slides (18:20)",
+      "organizer": "graham@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

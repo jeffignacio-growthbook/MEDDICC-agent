@@ -1,18 +1,8 @@
 {
   "company": "Perplexity + GrowthBook",
   "slug": "perplexity-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.325590",
+  "last_etl_date": "2026-10-17T05:11:12.182141",
   "calls": [
-    {
-      "id": "698d00e7a4227f0019f41a21",
-      "source": "apollo",
-      "title": "Perplexity + GrowthBook",
-      "date": "2026-02-11",
-      "duration_minutes": 50,
-      "summary": "[Summary failed] [Christian Liebenow]: I'd take more if we can get more at retreat. I'll always take swag.\n[Webflow Demo]: Yeah, you can just ask for more money to the store. We have quite a lot.\n[Christian Liebenow]:",
-      "host": "Christian Liebenow",
-      "participants": 2
-    },
     {
       "id": "01KH79QHJDRF7XP5XRANWGSNFM",
       "source": "fireflies",
@@ -23,7 +13,19 @@
       "organizer": "graham@growthbook.io",
       "participants": 4,
       "keywords": "Experimentation platform, feature flags, open source, AI integration, product analytics, data warehouse",
-      "action_items": "\n**Alexis Weill**\nExplore GrowthBook demo environment with real data and provide feedback on functionality and UX by next touchpoint (40:19)\nContinue gathering executive feedback on EPO pain points to clarify dissatisfaction sources (46:33)\nCirculate findings on paper-cut pain points and aggregate engineering concerns for next meeting (49:57)\n\n**Graham McNicoll**\nShare demo environment access with Alexis and team (41:49)\nProvide video or additional resources demonstrating VS Code AI integration for flag and experiment creation (33:02)\nAssist Perplexity with creating an importer tool from EPO to GrowthBook to ease migration (41:03)\nRespond to UX polish feedback from Alexis to improve the product interface (50:23)\n\n**Christian Liebenow**\nSchedule a check-in meeting with Alexis in approximately two weeks to review questions and demo feedback (49:22)\nOffer to facilitate executive-level conversations regarding contract and financial arrangements with Perplexity as needed (48:30)\n"
+      "action_items": "\n**Alexis Weill**\nExplore GrowthBook demo environment with real data and provide feedback on functionality and UX by next touchpoint (40:19)\nContinue gathering executive feedback on EPO pain points to clarify dissatisfaction sources (46:33)\nCirculate findings on paper-cut pain points and aggregate engineering concerns for next meeting (49:57)\n\n**Graham McNicoll**\nShare demo environment access with Alexis and team (41:49)\nProvide video or additional resources demonstrating VS Code AI integration for flag and experiment creation (33:02)\nAssist Perplexity with creating an importer tool from EPO to GrowthBook to ease migration (41:03)\nRespond to UX polish feedback from Alexis to improve the product interface (50:23)\n\n**Christian Liebenow**\nSchedule a check-in meeting with Alexis in approximately two weeks to review questions and demo feedback (49:22)\nOffer to facilitate executive-level conversations regarding contract and financial arrangements with Perplexity as needed (48:30)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4Y5V0TZZJ4BRVJFS0HGKDHT",
+      "source": "fireflies",
+      "title": "Perplexity + GrowthBook",
+      "date": "2026-10-16",
+      "duration_minutes": 63.52000045776367,
+      "summary": "# Perplexity + GrowthBook\nDate: 2026-10-16 | Duration: 63.52000045776367m\n\n## Summary\nPerplexity evaluated GrowthBook against an agent-first experimentation workflow covering experiment creation, registration, launch, analysis, debugging, power calculations, result retrieval, and export without using the UI. GrowthBook said its API supports most lifecycle actions, with published agent tooling, a CLI, and MCP access, while power-analysis APIs and broader guardrails remain incomplete. Governance features include project roles, scoped tokens, OAuth, audit logs, drafts, and environment-specific approvals. Snowflake and ClickHouse are supported, and Git-managed definitions, DBT synchronization, and external analysis workflows are available. Gaps include native writeback of computed results, metric-group synchronization, smoother Git-based experiment plans, and tooling for a GitHub experiment-history repository. Perplexity also discussed EPO migration uncertainty, vendor responsiveness, and AI guidance for metric selection and analysis timing. Alexis Weill and Noah Yonack requested roadmap timelines; Jeremy Dorn offered follow-up, while Christian Liebenow will send the recording and summary.\n\n## Keywords\nAgent-led experimentation, GrowthBook, MCP server, Code-managed metrics, Warehouse-native analytics, Experimentation APIs\n\n## Action Items\n**Jeremy Dorn**\nSend MCP repository link (27:15)\nShare roadmap timelines (53:25)\n\n**Christian Liebenow**\nSend meeting recording (01:01:35)\nSynthesize discussion points (01:01:35)\n\n**Alexis Weill**\nDebrief GrowthBook discussion (01:01:55)\nProvide evaluation update (01:01:55)\n\n**Noah Yonack**\nDebrief GrowthBook discussion (01:01:55)",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
     }
   ]
 }

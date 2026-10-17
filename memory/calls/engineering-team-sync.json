@@ -1,7 +1,7 @@
 {
   "company": "Engineering Team Sync",
   "slug": "engineering-team-sync",
-  "last_etl_date": "2026-10-10T06:31:53.893994",
+  "last_etl_date": "2026-10-17T05:11:12.182548",
   "calls": [
     {
       "id": "01KGT5917ZP7J7SSP08X1N1ZW3",
@@ -213,6 +213,17 @@
       "date": "2026-10-09",
       "duration_minutes": 52,
       "summary": "# Engineering Team Sync\nDate: 2026-10-09 | Duration: 52m\n\n## Summary\nClients responded positively to rapid product maturity and UI improvements, especially metric validation, inline editing, and separating experiments from features, while requesting user-variant targeting tools and stronger diagnostics. Migration is not expected until early next year, although interest remains. Data-source onboarding is being simplified through a two-column setup flow, clearer identifier management, customizable exposure queries, and planned tabs for identifiers, assignments, and fact tables. Exposure logs will support filtering, expandable payloads, and hybrid filtering to reduce expensive warehouse query reruns. Approval workflows are being redesigned around human-readable rule cards, inline comments, Slack or email notifications, saved groups, and multiple reviewers. An EPO importer is nearly complete for environments, audiences, flags, fact tables, and metrics, supporting POCs such as Twitch. Event infrastructure now delivers data to BigQuery within seconds and costs approximately $0.09 per million tracked events.\n\n## Keywords\nFeature Flags, Data Source Onboarding, Revision Reviews, Experiment Diagnostics, EPO Importer, Warehouse Cost Dashboard\n\n## Action Items\n\n**Jeremy Dorn**\nIncorporate customer feedback to allow QA forcing by entering a list of user IDs for shared staging environments (04:44)\nDemo event forwarder improvements after Snowflake and BigQuery migrations to the new in-house consumer setup, highlighting latency and cost reductions (40:47)\n\n**Michael Knowlton**\nContinue enhancing the new data source onboarding flow, including collaboration on exposure queries and tabbed page design for queries (14:02)\n\n**Johnny Martinez**\nWork on updating the exposure queries section and refine new onboarding UX elements, including tabbed page designs (18:31)\n\n**Guy Langford-lee**\nFinalize design and implementation of the revision review UI to replace raw JSON views with a human-readable rule-based interface, including notifications and commenting features (22:14)\n\n**Lillia Jackson**\nRefine experiment exposure diagnostics filtering logic and improve time zone handling in filtering features (29:02)\n\n**Andy White**\nPrepare and deliver an overview demo of remote saved groups for the next meeting, emphasizing terminology consistency and explanation of the 'remote' concept (39:55)\n",
+      "organizer": "michael@growthbook.io",
+      "participants": 29,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4F46QNBSKSHN1NQTC6QJFXB",
+      "source": "fireflies",
+      "title": "Engineering Team Sync",
+      "date": "2026-10-16",
+      "duration_minutes": 61.380001068115234,
+      "summary": "# Engineering Team Sync\nDate: 2026-10-16 | Duration: 61.380001068115234m\n\n## Summary\nThe discussion covered API design, Remote Groups, navigation, AI, event forwarding, project access, and populations. External API use was confirmed for contextual bandits, while internal routes remain necessary for billing and subscriptions. Remote Groups support oversized targeting lists by storing group values outside payloads; the initial file limit is 100 megabytes, supporting roughly 3–5 million email addresses, with versioned uploads and Redis evaluation. Navigation and settings prototypes introduced collapsible side navigation, grouped settings, search, and several unresolved placement and branding decisions. AI autocomplete shipped to production, is enabled by default, uses relevant page context, and responds in roughly 500 milliseconds, though coverage gaps remain. Shared event forwarding replaces organization-specific infrastructure with shared topics and targets $0.09 per gigabyte, while broader availability includes the free tier. Project-scoped EAQs improve resource isolation. Populations development includes a fact-table MVP with limits of five fact tables and 20 steps, while metric-pattern review and SQL generation continue.\n\n## Keywords\nRemote Groups, Feature-flag targeting, Side navigation redesign, AI autocomplete, Event forwarding, Population builder\n\n## Action Items\n**Jeremy Dorn**\nVerify OpenAPI exclusion behavior (01:39)\n\n**Andy White**\nRefine Remote Groups interface (22:38)\n\n**Gabe Melean**\nIntegrate live chat navigation (29:27)\n\n**Nhat Ho**\nRelease event-forwarding system (49:26)\n\n**Alli Leong**\nReview population builder design (58:48)",
       "organizer": "michael@growthbook.io",
       "participants": 29,
       "summary_quality": "good"
