@@ -1,7 +1,7 @@
 {
   "company": "Growthbook <> Rula",
   "slug": "growthbook-rula",
-  "last_etl_date": "2026-10-17T05:11:12.183265",
+  "last_etl_date": "2026-10-20T05:31:35.477564",
   "calls": [
     {
       "id": "01KY2RP3G2179157XP0A77RHX8",
@@ -54,6 +54,17 @@
       "summary": "# Growthbook <> Rula - Pricing Sync\nDate: 2026-10-16 | Duration: 18.100000381469727m\n\n## Summary\nRula plans to move forward with GrowthBook analytics, while experimentation evaluation and feature flagging are planned for next quarter. Initial use will focus on product, data analysts, and selected engineers, with broader adoption dependent on proving the value of experimentation and feature flagging. Dan will introduce GrowthBook’s onboarding team to support further evaluation and potential migrations. Two contract structures were discussed: a 200-seat plan beginning with 45 users at $1,000 per user and adding users at prorated rates, and a 100-seat option with 45 users at the standard rate plus 55 users at $750 per user, totaling $116,250 and reducing the commitment by approximately $37,000. Alternatively, Rula could retain the larger seat commitment and receive a 15% discount for participating in a case study, reducing the cost by approximately $23,000–$24,000; the alternatives cannot be combined. Pallabi will present the options to leadership today, while completing legal review within October remains the primary risk. Dan will send a Slack recap, and they may reconnect Monday.\n\n## Keywords\nGrowthBook pricing, Rula, Contract structure, Authorised users, Experimentation, Feature flagging\n\n## Action Items\n**Dan Wathne**\nIntroduce GrowthBook’s onboarding team (12:57)\nSend written recap (16:13)\n\n**Pallabi Barua**\nPresent contract options (14:34)",
       "organizer": "dan@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M55K850BM2FXW9J4RZKGJQV8",
+      "source": "fireflies",
+      "title": "Growthbook <> Rula - Pricing Sync",
+      "date": "2026-10-19",
+      "duration_minutes": 23.68000030517578,
+      "summary": "# Growthbook <> Rula - Pricing Sync\nDate: 2026-10-19 | Duration: 23.68000030517578m\n\n## Summary\nRula challenged GrowthBook’s self-hosted seat pricing because it bears hosting costs, expects up to 300 users, and anticipates fewer than 50 experiment creators, with most users consuming results read-only. The preferred direction is an all-you-can-eat platform fee with unlimited users up to an agreed threshold, avoiding restrictions on broader adoption. GrowthBook positioned its enterprise roadmap as a key differentiator through warehouse-native experimentation, AI agent integrations, funnel analysis, dashboards, contextual bandits, and switchback testing, alongside monthly feature releases shaped by customer feedback. Support and compliance value includes a signed BAA, onboarding, training, guidance, a private support channel, and unlimited support access. Rula currently uses LaunchDarkly for feature flagging and Amplitude for broader product analytics, so full product analytics replacement is not viable today. Dan and Ryan will prepare a revised proposal in Slack, with both sides aiming to agree and sign before the end-of-month deadline.\n\n## Keywords\nWarehouse-native experimentation, Self-hosted pricing, Enterprise roadmap, Seat-based licensing, Product analytics, Feature flagging\n\n## Action Items\n**Ryan McGurk**\nDevelop pricing arrangement (20:00)\nReturn pricing arrangement (21:05)\n\n**Dan Wathne**\nPrepare pricing proposal (20:14)\nSend pricing proposal (21:23)",
+      "organizer": "dan@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

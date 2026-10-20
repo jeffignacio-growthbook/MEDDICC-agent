@@ -1,7 +1,7 @@
 {
   "company": "Gabe / Jeremy",
   "slug": "gabe-jeremy",
-  "last_etl_date": "2026-10-14T05:36:35.774785",
+  "last_etl_date": "2026-10-20T05:31:35.471232",
   "calls": [
     {
       "id": "01M32NRSS0HXWRTZ3NQJTYF7XA",
@@ -32,6 +32,17 @@
       "date": "2026-10-13",
       "duration_minutes": 28.709999084472656,
       "summary": "# Gabe / Jeremy\nDate: 2026-10-13 | Duration: 28.709999084472656m\n\n## Summary\nThe redesign covered increasing list-view spacing to 32px, debating background colors, adding a standalone Create button, and applying hover, press, tab, and filter animations. Tables will support dense mode, editable columns, and updated pagination, although drag reordering is not fully working and bulk actions may come later. Tabs will serve as quick-filter shortcuts, with drafts, running, unhealthy, and needs decision identified as important; the group recommended limiting tabs to 6–8 and resolving overlap with filters, possibly through chips or disabling filters when a tab is active. Shared table changes affect the product broadly, while background updates require auditing about 15–20 key pages. The feature flags page will use an experiment layout, with inline editing constrained by publishing complexity and a required publish control. The design review was skipped due to a holiday, navigation work may move to the following week, and small CSS changes can be reviewed quickly.\n\n## Keywords\nlist view redesign, feature flags, filtering and tabs, UI animations, shared table components, import/create CTA configuration\n\n## Action Items\n**Gabe Melean**  \nTalk to Johnny about feature flag page redesign (01:14)  \nShare screen and design details for list view enhancements (01:14)  \nPrepare pull request for button animations and hover styles (21:29)  \nTake away feedback and refinement points (22:09)  \nDiscuss timing and planning for app chrome redesign (25:07)  \nOpen pull requests for button updates and background color adjustments (26:01)  \n\n**Jeremy Dorn**  \nShare GitHub-style filtering and search demo with Gabe (12:29)  \nCheck integration of filtering functionality with shared table component (19:39)  \nReview feature flag overview tab and layout improvements (22:17)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M534SQFNX7M80Z9ASRPZ3WFK",
+      "source": "fireflies",
+      "title": "Gabe / Jeremy",
+      "date": "2026-10-19",
+      "duration_minutes": 16.639999389648438,
+      "summary": "# Gabe / Jeremy\nDate: 2026-10-19 | Duration: 16.639999389648438m\n\n## Summary\nThe discussion covered table controls, experiment configuration, scheduling, analysis, design-system progress, release readiness, and interface polish. The Attributes table supports column customization, with an existing pattern informing the new design. Tables were preferred over card variants for comparing experiment variations, while summaries may support more complex experiments, and experiments are ready for live iteration. Start scheduling is separated from stop criteria, approval comes before a scheduled launch, and users can start experiments immediately or schedule them for later. Power analysis may become required for experiment planning. The app header is ready for Guy’s review, the design system is receiving extra time, and QA work is nearing its target state. API key settings and OAuth consent need simplification, while page wrappers, page headers, and form controls require more consistent spacing, styling, and interaction polish.\n\n## Keywords\nExperiment design, Decision criteria, Power analysis, Start scheduling, Design system, API key settings\n\n## Action Items\n**Gabe Melean**\n- Look up attributes table (00:37)\n- Send app header design (09:50)\n- Review API key settings (11:42)\n- Review Human in the Loop (11:42)\n- Review OAuth consent flows (11:42)\n- Discuss page wrapper spacing (13:30)",
       "organizer": "gabe@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

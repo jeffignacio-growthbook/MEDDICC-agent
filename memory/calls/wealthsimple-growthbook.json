@@ -1,0 +1,18 @@
+{
+  "company": "WealthSimple + GrowthBook",
+  "slug": "wealthsimple-growthbook",
+  "last_etl_date": "2026-10-20T05:31:35.477089",
+  "calls": [
+    {
+      "id": "01M55JV887H4B4RQDX7YJ3GAXY",
+      "source": "fireflies",
+      "title": "WealthSimple + GrowthBook",
+      "date": "2026-10-19",
+      "duration_minutes": 61.400001525878906,
+      "summary": "# WealthSimple + GrowthBook\nDate: 2026-10-19 | Duration: 61.400001525878906m\n\n## Summary\nWealthsimple adopted Statsig last year and is evaluating GrowthBook after increased experimentation and support issues following Amplitude’s acquisition. Its Statsig contract ends June 30, with no plan for early termination. Wealthsimple wants product managers to run controlled experiments independently using metric definitions, review workflows, safeguards, and AI guardrails; experimentation volume may eventually double from the current 200 experiments per year. Scaling is critical because Statsig gate targeting failed above 100,000 users, while Wealthsimple may need to target up to 2 million clients. Snowflake warehouse-native operation is required, along with persistent assignments, geotesting using predefined city pairs, covariate support, contextual bandits, reliability, privacy, and strong partnership quality. GrowthBook demonstrated feature flags, experimentation, analytics, Bayesian and Frequentist analysis, custom SQL, AI-assisted workflows, audit controls, and Snowflake-based analysis. Geotesting requirements remain open. GrowthBook will send materials, while Wealthsimple will review fit and may schedule deeper technical discussions before revisiting the platform several months before June 30.\n\n## Keywords\nExperimentation platforms, Warehouse-native analytics, Feature flags, Geotesting, Persistent assignments, AI-assisted experimentation\n\n## Action Items\n**Logan Bates**\n- Check Wealthsimple geotesting requirements (46:15)\n\n**Caitlin Martins**\n- Review GrowthBook documentation (51:45)\n\n**Christian Liebenow**\n- Send Wealthsimple follow-up email (56:00)",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

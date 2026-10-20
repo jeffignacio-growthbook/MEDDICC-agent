@@ -1,7 +1,7 @@
 {
   "company": "Johnny / Jeremy",
   "slug": "johnny-jeremy",
-  "last_etl_date": "2026-10-14T05:36:35.774942",
+  "last_etl_date": "2026-10-20T05:31:35.471689",
   "calls": [
     {
       "id": "01M1CPHH6FV29WP3AG291HZSWM",
@@ -43,6 +43,17 @@
       "date": "2026-10-13",
       "duration_minutes": 30,
       "summary": "# Johnny / Jeremy\nDate: 2026-10-13 | Duration: 30m\n\n## Summary\nThe team considered whether the homepage or settings should be included in the next release, with the homepage closer to release because Nobu had completed related work. Settings scope and ownership remain unclear, particularly around layout, sidebar search, save behavior, and production readiness; delivering both surfaces within two weeks is uncertain. Near-term UI cleanup will align NIAT work with the new settings layout, while Jeremy continues homepage, settings, and related UI work. For feature flags, the preferred approach uses flexible, custom-named environments and must support customers with 50 environments. The interface should represent on/off flags, partial targeting, long values, JSON, rule traffic, fallback behavior, and prerequisite explanations without overwhelming users. Status views should emphasize effective served states and remain mostly read-only, with separate editing flows for publishing and approvals. Detail and list views are especially important for validating AI-created metrics, while the broader product refresh may take a couple months. The team also identified gaps in design-system guidance and agent-generated UI quality.\n\n## Keywords\nFeature flags, Prerequisites, Release planning, Settings UI, Design system, AI agents\n\n## Action Items\n**Johnny Martinez**\n- Check metrics status (00:26)\n- Coordinate feature flags (00:26)\n- Align NIAT implementation (04:49)\n- Review feature-flag prototype (06:46)\n- Design UI variants (09:41)\n- Add rule-flow visibility (11:56)\n- Implement prerequisite states (18:51)\n- Address pull-request feedback (26:52)\n\n**Jeremy**\n- Contact Nia (04:49)\n- Confirm settings ownership (04:49)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5ARK6C5MAMRT0PPXN0AAZ12",
+      "source": "fireflies",
+      "title": "Johnny / Jeremy",
+      "date": "2026-10-19",
+      "duration_minutes": 26,
+      "summary": "# Johnny / Jeremy\nDate: 2026-10-19 | Duration: 26m\n\n## Summary\nThe discussion established the UI refresh scope, prioritizing Dashboard, Attributes, and Environments while deferring Save Groups because a new save group type would add complexity. Onboarding should explicitly collect attributes, identifiers, and environments, including environment selection from five options and drag-and-drop ordering. Production environments should be identified separately so stricter controls and approval flows can apply, while QA testing remains enabled outside production. Identifiers will use a separate table and add flow, with no filtering, sorting, or pagination expected. AI dashboard creation was prioritized through a modal offering Start Blank or Start From AI, with users describing the desired dashboard in text. Homepage changes include removing Running Now, keeping Needs Attention prominent, improving dashboard selection, and moving dashboards above the fold. Johnny owns homepage adjustments, while Jeremy will help communicate ownership of resizable attribute-table columns. Initial feedback on the Fact Table direction was positive, pending further alignment.\n\n## Keywords\nDashboard UX, Homepage redesign, Environment configuration, Attribute management, Identifier management, AI dashboard creation\n\n## Action Items\n**Johnny Martinez**\n- Refresh Environments UI (06:26)\n- Create Identifiers UI (07:10)\n- Update homepage layout (23:25)\n\n**Jeremy Dorn**\n- Notify Gabe about columns (09:56)\n- Ping Bryce about columns (10:31)",
       "organizer": "johnny@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

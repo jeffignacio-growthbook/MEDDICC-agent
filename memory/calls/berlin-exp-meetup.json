@@ -1,0 +1,18 @@
+{
+  "company": "Berlin Exp Meetup",
+  "slug": "berlin-exp-meetup",
+  "last_etl_date": "2026-10-20T05:31:35.477252",
+  "calls": [
+    {
+      "id": "01M4TSGA6887MJ018ZJSRPG6G5",
+      "source": "fireflies",
+      "title": "Berlin Exp Meetup - Post Event Debrief",
+      "date": "2026-10-19",
+      "duration_minutes": 29,
+      "summary": "# Berlin Exp Meetup - Post Event Debrief\nDate: 2026-10-19 | Duration: 29m\n\n## Summary\nThe event strengthened Growth Book’s visibility through Hampus Poppius’ talk, Graham’s panel participation, and prominent branding, reaching approximately 100 identified users or buyers. T-shirts, socks, and water bottles attracted attendees, although only five water bottles were available. The team concluded that specialized experimentation meetups provide better access to relevant practitioners and more effective mingling than large conferences, but are better suited to awareness and relationship-building than immediate sales pipeline creation. They also identified the need to clarify sponsor boundaries when events are hosted at Zalando venues, particularly because Zalando uses Epo. Follow-up actions include reviewing unassigned accounts, adding relationship context, resolving HelloFresh parent-child records, routing assigned contacts through HubSpot, and placing others into marketing nurture. The team will pursue London sponsorship, consolidate event materials, and complete expense reporting.\n\n## Keywords\nExperimentation meetups, Event sponsorship, Growth Book visibility, Lead follow-up, HubSpot account assignment, Marketing nurture\n\n## Action Items\n**Lyndsie Berens**\n- Sponsor experimentation meetups (11:55)\n- Upload event contacts to HubSpot (11:55)\n- Notify sales owners (11:55)\n- Place contacts in nurture sequence (11:55)\n- Resolve parent-child accounts (17:13)\n\n**James Shannon**\n- Assign unassigned accounts (11:55)\n- Add contact notes (11:55)\n- Provide reimbursement instructions (19:03)\n\n**Marcel Geldner**\n- Submit event expense reports (11:55)\n\n**Liz Fox**\n- Add meetup learnings document (13:33)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

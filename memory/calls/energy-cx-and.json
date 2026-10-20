@@ -1,0 +1,18 @@
+{
+  "company": "Energy CX and",
+  "slug": "energy-cx-and",
+  "last_etl_date": "2026-10-20T05:31:35.474251",
+  "calls": [
+    {
+      "id": "01M5AMT7V6MQ439FBN8VT78XD4",
+      "source": "fireflies",
+      "title": "Energy CX and GrowthBook",
+      "date": "2026-10-19",
+      "duration_minutes": 11,
+      "summary": "# Energy CX and GrowthBook\nDate: 2026-10-19 | Duration: 11m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

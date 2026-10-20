@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> The Boss",
+  "slug": "growthbook-the-boss",
+  "last_etl_date": "2026-10-20T05:31:35.470683",
+  "calls": [
+    {
+      "id": "01M5AYZAF2Q3F42S6AXMCNTYGS",
+      "source": "fireflies",
+      "title": "Growthbook <> The Boss - Demo",
+      "date": "2026-10-20",
+      "duration_minutes": 50.20000076293945,
+      "summary": "# Growthbook <> The Boss - Demo\nDate: 2026-10-20 | Duration: 50.20000076293945m\n\n## Summary\nGrowthBook was confirmed as a fit for A/B testing, feature flags, gradual rollouts, and analytics using sources such as BigQuery, Snowflake, Databricks, GA4, Amplitude, and Mixpanel. Existing metrics can be imported or defined as custom metrics, including average order value (03:43–08:55). Experiments can target player segments, use holdouts, sticky bucketing, namespaces, staged rollouts, and guardrail metrics, while projects and environments separate work across staging, production, development, and testing (11:34–24:53). Results include health checks, exposure and balance monitoring, sample-ratio checks, power analysis, a 95% confidence threshold, and Bayesian or Frequentist methods. Reports can isolate user segments and metrics, though Dan will verify whether direct segment-skew analysis is available (27:51–29:36). Rich plans a small staging or pre-production proof of concept with engineering support, while Dallas provides cohorts and player properties. The initial evaluation will use the free Starter plan with three users, one project, unlimited flags and experiments, and up to 1 million events; Pro and Enterprise provide additional capabilities and support (41:02–43:20).\n\n## Keywords\nA/B testing, Feature flags, Databricks integration, Holdout groups, Experiment analytics, GrowthBook pricing\n\n## Action Items\n**Dan Wathne**\nCheck GrowthBook segment skew (35:51)\nSend SDK configuration documentation (37:29)\nSend data-source documentation (37:51)\n\n**Rich Park**\nStart proof-of-concept experiments (41:02)\nSign up for GrowthBook Starter (48:20)\n\n**Lihini Senanayake**\nSupport experiment engineering setup (41:02)\n\n**Dallas Schnitzius**\nDefine experiment cohorts (41:02)\nDefine experiment metrics (41:02)",
+      "organizer": "dan@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

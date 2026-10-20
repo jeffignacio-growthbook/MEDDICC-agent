@@ -1,0 +1,18 @@
+{
+  "company": "Adam Zając and",
+  "slug": "adam-zaj-c-and",
+  "last_etl_date": "2026-10-20T05:31:35.478454",
+  "calls": [
+    {
+      "id": "01M4XKE19T6YAQ72Y0K9B8TYF6",
+      "source": "fireflies",
+      "title": "Adam Zając and Chris Sanders",
+      "date": "2026-10-19",
+      "duration_minutes": 41.709999084472656,
+      "summary": "# Adam Zając and Chris Sanders\nDate: 2026-10-19 | Duration: 41.709999084472656m\n\n## Summary\nThe session focused on feature-flag management for SaaS and Marketplace developers and QA, with experimentation included where relevant. GrowthBook was substantially set up, with analytics flowing through Mixpanel and Segment and Snowflake serving as the warehouse. The SDK loads features, experiments, targeting, and configuration through one CDN payload, while applications provide attributes such as country, OS, and plan for evaluation. Rollouts can target QA, development, production, and custom environments, using boolean, string, number, or JSON flags, attribute rules, saved groups, prerequisites, percentages, schedules, and approval gates. Guardrails can automatically stop unsafe experiments, while webhooks, audit history, diagnostics, and code references support governance and cleanup. Marketplace configuration and additional experimentation coverage were deferred to later sessions, and participants were encouraged to continue using the existing GrowthBook instance.\n\n## Keywords\nGrowthBook, Feature flags, Experimentation, SDK targeting, Snowflake analytics, Rollout governance",
+      "organizer": "chris@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

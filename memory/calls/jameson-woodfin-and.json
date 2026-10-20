@@ -1,0 +1,18 @@
+{
+  "company": "Jameson Woodfin and",
+  "slug": "jameson-woodfin-and",
+  "last_etl_date": "2026-10-20T05:31:35.475092",
+  "calls": [
+    {
+      "id": "01M536VVNMFSERZSSJ9GPT8X7E",
+      "source": "fireflies",
+      "title": "Jameson Woodfin and Chris Sanders + Cary Rakin",
+      "date": "2026-10-19",
+      "duration_minutes": 25.639999389648438,
+      "summary": "# Jameson Woodfin and Chris Sanders + Cary Rakin\nDate: 2026-10-19 | Duration: 25.639999389648438m\n\n## Summary\nThe discussion prioritized migrating GrowthBook from Redshift to Snowflake because Redshift queries are taking too long, while data has already been validated as matching across BI tools. The migration requires a new Snowflake data source, queries, and fact tables, with metrics generally redirected to the new fact tables. A staged approach was preferred: existing experiments would finish on the old setup, while new experiments would use Snowflake, potentially with the old environment eventually restricted from creating experiments. The migration also provides an opportunity to review numerous fact tables, remove obsolete structures, consolidate dimensional metric variants, and improve governance and permissions. GrowthBook MCP and Claude may help identify overlapping definitions. Snowflake is expected to improve performance, while metric auto-splitting should remain disabled on Redshift; pipeline mode may further improve query times. The discussion also covered rotating DocumentDB credential failures, targeted Slack support, internal question filtering, and GrowthBook-specific training.\n\n## Keywords\nSnowflake migration, Redshift performance, GrowthBook, Fact-table consolidation, Experimentation governance, DocumentDB authentication\n\n## Action Items\n**Jaime Woodfin**\nContinue fixing DocumentDB authentication (03:00)\nSupport Slack access setup (16:42)\nCoordinate migration planning meeting (23:26)\n\n**Robyn Fountain**\nCoordinate GrowthBook governance planning (13:50)\nAttend GrowthBook training sessions (24:07)\n\n**Chris Sanders**\nProvide migration support (15:26)\n\n**Cary Rakin**\nAdd Robyn Fountain to Slack (15:31)\nIntroduce Philo team to Customer Success (18:57)\nArrange GrowthBook training sessions (23:56)\n\n**Tim Rice**\nRoute GrowthBook user questions (17:47)\nDevelop GrowthBook migration plan (23:26)",
+      "organizer": "chris@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

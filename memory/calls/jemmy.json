@@ -1,0 +1,18 @@
+{
+  "company": "jemmy",
+  "slug": "jemmy",
+  "last_etl_date": "2026-10-20T05:31:35.470879",
+  "calls": [
+    {
+      "id": "01M50KRESEEN9ESRNX9Z2GVSJA",
+      "source": "fireflies",
+      "title": "jemmy",
+      "date": "2026-10-19",
+      "duration_minutes": 5.5,
+      "summary": "# jemmy\nDate: 2026-10-19 | Duration: 5.5m\n\n## Summary\nThe discussion covered a recurring Monday voice issue, with prior vocal cord problems noted. Headphones provided clear audio, while the computer microphone remained unclear. Rapid changes were causing stress, with Ashley appearing stressed and Jack moving quickly; the necessity of website work was questioned. A conversation with Ashley was planned for later, although it had not been calendared and its necessity might be challenged. Jack rejected the perception that he was directionless, while Emmy supported making proactive proposals. Jack favored aggressive leadership and visible pressure to drive change, contrasting with Karen’s extremely safe approach; a middle ground was usually found. AI proposals faced skepticism and required ongoing defense. The discussion also emphasized balancing credibility and trust with continued experimentation.\n\n## Keywords\nAI adoption, Website strategy, Change management, Team trust, Risk tolerance, Vocal-cord health",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

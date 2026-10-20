@@ -1,0 +1,18 @@
+{
+  "company": "Zeely & GrowthBook",
+  "slug": "zeely-growthbook",
+  "last_etl_date": "2026-10-20T05:31:35.478636",
+  "calls": [
+    {
+      "id": "01M54WFAT6YQESPB7CB3582MXS",
+      "source": "fireflies",
+      "title": "Zeely & GrowthBook | Introduction",
+      "date": "2026-10-19",
+      "duration_minutes": 24.3700008392334,
+      "summary": "# Zeely & GrowthBook | Introduction\nDate: 2026-10-19 | Duration: 24.3700008392334m\n\n## Summary\nGrowthBook is currently used for feature flags and experiment results with BigQuery as the data source. Implementations are developer-managed, without a visual editor, and support product managers and analytics users; cloud hosting is preferred over self-hosting. The enterprise package includes SSO, SAML, SCIM provisioning, role-based access, direct team contact, training, onboarding, migration assistance, and BigQuery optimization tools focused on reducing costs, including a query optimization calculator and CDN usage. Pricing can be based on experiments or user seats, with unlimited platform access; examples include $500 per experiment or $1,000 per user yearly, with volume pricing available. Current BigQuery spend is $800 monthly, so positive ROI is required, although the optimization impact is unknown. GrowthBook is being evaluated as a Firebase Remote Config replacement, requiring setup-specific validation. A 14-day enterprise trial, technical documentation, and developer use-case review were proposed.\n\n## Keywords\nGrowthBook Enterprise, Firebase Remote Config, BigQuery optimisation, Feature flags, Experiment pricing, A/B testing\n\n## Action Items\n**Marcel Geldner**\nShare Enterprise information (04:13)\nProvide pricing options (09:47)\nCheck experiment usage (09:47)\nConsult engineering team (14:12)\nShare BigQuery documentation (14:12)\nShare Remote Config documentation (18:19)\nSend technical documentation (21:51)\nProvide trial key (22:53)\n\n**Tania Zyziuk**\nDocument Firebase use case (21:32)\nShare Remote Config requirements (21:32)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

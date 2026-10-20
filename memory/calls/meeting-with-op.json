@@ -1,7 +1,7 @@
 {
   "company": "Meeting with Op",
   "slug": "meeting-with-op",
-  "last_etl_date": "2026-09-17T06:19:53.894945",
+  "last_etl_date": "2026-10-20T05:31:35.478187",
   "calls": [
     {
       "id": "01M1J1NB3404A45X6GNJGV0TE9",
@@ -34,6 +34,17 @@
       "summary": "# Meeting with Op Method <> GrowthBook\nDate: 2026-09-16 | Duration: 39m\n\n## Summary\nThe team agreed to use HubSpot’s orders object to track licenses, associate multiple organization IDs with customer accounts, and store license dates and plan types. Workflows will roll the highest license tier to the company level, while license archiving and validation will help prevent multiple active licenses per GrowthBook organization. License relationships will be mapped to license IDs, and MongoDB triggers will sync cloud and self-hosted license data to HubSpot. Enterprise expirations and cancellations will use status updates, human review, and Slack alerts 90 days before expiration, with audits comparing expiration and renewal data. New account fields will capture primary domain URLs and mobile app user counts. Shawn Green will build fields and workflows, while Michael Knowlton will develop and test the MongoDB-to-HubSpot sync. The team also evaluated Kappa AI and HubSpot’s chatbot, focusing on answer quality, upgrade requirements, chatbot consistency, and support visibility.\n\n## Keywords\nHubSpot integration, license management, orders object, license expiration, renewal notifications, AI chatbot\n\n## Action Items\n\n**Michael Knowlton**\nResearch HubSpot API for updating the orders object and implement Mongo-to-HubSpot sync update to push license data to orders instead of company; ensure manual overrides on status are respected to avoid reversion of cancellations (00:06)\n\n**Shawn Green**\nProvide record type ID for orders object; build necessary custom properties on orders; create workflow for syncing highest tier license info to company level; develop renewal notification workflow for Slack; build new account fields for primary domain and monthly mobile app users (00:07)\n\n**Lyndsie Berens**\nCompile list of desired custom properties for orders object and coordinate their creation with Shawn; create Slack “renewals” channel if it does not exist (00:07)\n\n**Chris Newton**\nCollaborate with Shawn on orders properties and workflow; provide property list to Michael for final confirmation; explore chatbot integration and routing options for main site AI responses (00:08)\n\n**Ashley Stirrup**\nDefine mobile app user metrics, primary domain logic, and related data points for new account fields; confirm key recipients for renewal notifications in Slack channel (00:20)\n",
       "organizer": "lyndsie@growthbook.io",
       "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4H11T4SJ1CEF3BD80XPATJY",
+      "source": "fireflies",
+      "title": "Meeting with Op Methods & GrowthBook",
+      "date": "2026-10-19",
+      "duration_minutes": 36.529998779296875,
+      "summary": "# Meeting with Op Methods & GrowthBook\nDate: 2026-10-19 | Duration: 36.529998779296875m\n\n## Summary\nThe group discussed routing the top five A-tier accounts to sales each week, with Jake handling outreach to the highest-scoring non-customer accounts lacking sales activity and marketing nurturing the remaining A-tier accounts. Sales outreach determines ownership, while accounts without sales engagement remain in nurture; accounts with more than six months without sales contact may re-enter nurture, although the rules are not yet formalized. The scoring model will replace the fixed 100-point MQL threshold with relative account fit, incorporating monthly users and recent signals such as developers active within 30 days, de-anonymized developers, and de-anonymized buyers. Missing identity data will not reduce fit. Shawn created developer and buyer HubSpot labels and will build workflows connecting Rio tags to those labels. Ashley will coordinate with Rio to transfer four account-level signals, after which Shawn will adjust scoring. A HubSpot lead object was proposed for re-engagement reminders, but the workflow remains unbuilt.\n\n## Keywords\nLead scoring, Account-based marketing, HubSpot, Rio, Marketing nurture, Sales follow-up\n\n## Action Items\n**Shawn Green**\nBuild weekly account list (11:54)\nDevelop lead-object demonstration (16:05)\nCreate Rio tag workflow (26:38)\nAdjust company-fit scoring (34:11)\n\n**Ashley Stirrup**\nConfirm Rio account fields (25:37)\nPush scoring fields to HubSpot (34:11)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]
