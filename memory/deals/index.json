@@ -1,5 +1,5 @@
 {
-  "last_etl_date": "2026-10-19T02:38:21.999783",
+  "last_etl_date": "2026-10-20T02:50:34.684166",
   "total_deals": 189,
   "excluded_closed_stages": [
     "closedwon",
@@ -33,7 +33,7 @@
       "close_date": null,
       "owner": "",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:15.652267"
+      "last_modified": "2026-10-20T02:50:28.442758"
     },
     "65080037250": {
       "deal_id": "65080037250",
@@ -51,7 +51,7 @@
       "close_date": null,
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:15.686187"
+      "last_modified": "2026-10-20T02:50:28.476355"
     },
     "9093743432": {
       "deal_id": "9093743432",
@@ -69,7 +69,7 @@
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:15.719527"
+      "last_modified": "2026-10-20T02:50:28.509813"
     },
     "11023288135": {
       "deal_id": "11023288135",
@@ -87,7 +87,7 @@
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:15.752855"
+      "last_modified": "2026-10-20T02:50:28.542971"
     },
     "11023961379": {
       "deal_id": "11023961379",
@@ -105,7 +105,7 @@
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:15.786761"
+      "last_modified": "2026-10-20T02:50:28.576680"
     },
     "11023961439": {
       "deal_id": "11023961439",
@@ -123,7 +123,7 @@
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:15.820566"
+      "last_modified": "2026-10-20T02:50:28.609943"
     },
     "11024003429": {
       "deal_id": "11024003429",
@@ -132,7 +132,7 @@
       "company_slug": "oda",
       "company_id": "7691679236",
       "company_domain": "oda.com",
-      "company_employee_count": 940,
+      "company_employee_count": 886,
       "segment": "Mid-Market",
       "segment_reason": null,
       "pipeline": "default",
@@ -141,7 +141,7 @@
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:15.854879"
+      "last_modified": "2026-10-20T02:50:28.642867"
     },
     "11029888047": {
       "deal_id": "11029888047",
@@ -159,7 +159,7 @@
       "close_date": "2023-12-31T20:13:01.971Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:15.888495"
+      "last_modified": "2026-10-20T02:50:28.675812"
     },
     "36325681303": {
       "deal_id": "36325681303",
@@ -177,7 +177,7 @@
       "close_date": "2025-07-24T22:00:37.158Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:15.922375"
+      "last_modified": "2026-10-20T02:50:28.709191"
     },
     "58135909154": {
       "deal_id": "58135909154",
@@ -195,7 +195,7 @@
       "close_date": "2026-04-30T15:49:31.995Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:15.956241"
+      "last_modified": "2026-10-20T02:50:28.742472"
     },
     "59418415718": {
       "deal_id": "59418415718",
@@ -213,7 +213,7 @@
       "close_date": "2026-06-30T13:09:33.353Z",
       "owner": "marsh@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:15.990069"
+      "last_modified": "2026-10-20T02:50:28.775591"
     },
     "59342236338": {
       "deal_id": "59342236338",
@@ -231,7 +231,7 @@
       "close_date": "2026-07-18T02:23:19.034Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.023826"
+      "last_modified": "2026-10-20T02:50:28.808719"
     },
     "58029773373": {
       "deal_id": "58029773373",
@@ -249,7 +249,7 @@
       "close_date": "2026-09-30T13:24:08.702Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.057743"
+      "last_modified": "2026-10-20T02:50:28.842013"
     },
     "54956375177": {
       "deal_id": "54956375177",
@@ -267,7 +267,7 @@
       "close_date": "2026-09-30T15:59:07.702Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.091033"
+      "last_modified": "2026-10-20T02:50:28.875126"
     },
     "60786197152": {
       "deal_id": "60786197152",
@@ -285,7 +285,7 @@
       "close_date": "2026-09-30T17:55:29.318Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.124408"
+      "last_modified": "2026-10-20T02:50:28.908081"
     },
     "43948380965": {
       "deal_id": "43948380965",
@@ -303,7 +303,7 @@
       "close_date": "2026-10-13T11:52:41.420Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.158276"
+      "last_modified": "2026-10-20T02:50:28.940996"
     },
     "63578787480": {
       "deal_id": "63578787480",
@@ -321,7 +321,7 @@
       "close_date": "2026-10-23T17:37:38.604Z",
       "owner": "dan@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.192293"
+      "last_modified": "2026-10-20T02:50:28.974172"
     },
     "58939926620": {
       "deal_id": "58939926620",
@@ -339,7 +339,7 @@
       "close_date": "2026-10-23T21:03:26.227Z",
       "owner": "dan@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.225727"
+      "last_modified": "2026-10-20T02:50:29.007130"
     },
     "62852783774": {
       "deal_id": "62852783774",
@@ -353,11 +353,11 @@
       "segment_reason": null,
       "pipeline": "default",
       "stage": "24682892",
-      "arr": "75000",
+      "arr": "70000",
       "close_date": "2026-10-28T00:00:00Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.263655"
+      "last_modified": "2026-10-20T02:50:29.039979"
     },
     "65809261846": {
       "deal_id": "65809261846",
@@ -375,7 +375,7 @@
       "close_date": "2026-10-28T12:00:00Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.297615"
+      "last_modified": "2026-10-20T02:50:29.073893"
     },
     "60275604099": {
       "deal_id": "60275604099",
@@ -393,7 +393,7 @@
       "close_date": "2026-10-29T10:24:00.613Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:16.331305"
+      "last_modified": "2026-10-20T02:50:29.107528"
     },
     "53466496122": {
       "deal_id": "53466496122",
@@ -411,7 +411,7 @@
       "close_date": "2026-10-30T01:31:59.542Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.370508"
+      "last_modified": "2026-10-20T02:50:29.147340"
     },
     "65428269637": {
       "deal_id": "65428269637",
@@ -429,25 +429,7 @@
       "close_date": "2026-10-30T08:54:17.813Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.404642"
-    },
-    "60069831015": {
-      "deal_id": "60069831015",
-      "deal_name": "InPost Deal — $145k",
-      "company_name": "InPost",
-      "company_slug": "inpost",
-      "company_id": "54795142522",
-      "company_domain": "inpost.pl",
-      "company_employee_count": 5000,
-      "segment": "Enterprise",
-      "segment_reason": null,
-      "pipeline": "default",
-      "stage": "43449439",
-      "arr": "145220",
-      "close_date": "2026-10-30T09:30:03.016Z",
-      "owner": "james.shannon@growthbook.io",
-      "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.438621"
+      "last_modified": "2026-10-20T02:50:29.180801"
     },
     "64389395879": {
       "deal_id": "64389395879",
@@ -465,7 +447,7 @@
       "close_date": "2026-10-30T10:36:17.843Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.472533"
+      "last_modified": "2026-10-20T02:50:29.214159"
     },
     "64333729870": {
       "deal_id": "64333729870",
@@ -483,7 +465,7 @@
       "close_date": "2026-10-30T11:23:03.027Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.506546"
+      "last_modified": "2026-10-20T02:50:29.247560"
     },
     "65287340832": {
       "deal_id": "65287340832",
@@ -501,7 +483,7 @@
       "close_date": "2026-10-30T12:00:00Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.540189"
+      "last_modified": "2026-10-20T02:50:29.280642"
     },
     "65083606163": {
       "deal_id": "65083606163",
@@ -519,7 +501,7 @@
       "close_date": "2026-10-30T12:36:45.245Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:16.573962"
+      "last_modified": "2026-10-20T02:50:29.313661"
     },
     "64986172075": {
       "deal_id": "64986172075",
@@ -537,7 +519,7 @@
       "close_date": "2026-10-30T13:15:07.931Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.607764"
+      "last_modified": "2026-10-20T02:50:29.346837"
     },
     "58956770692": {
       "deal_id": "58956770692",
@@ -555,7 +537,7 @@
       "close_date": "2026-10-30T14:09:42.510Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.641657"
+      "last_modified": "2026-10-20T02:50:29.380357"
     },
     "62635592329": {
       "deal_id": "62635592329",
@@ -573,7 +555,7 @@
       "close_date": "2026-10-30T14:21:14.275Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.675351"
+      "last_modified": "2026-10-20T02:50:29.413627"
     },
     "65211207029": {
       "deal_id": "65211207029",
@@ -591,25 +573,7 @@
       "close_date": "2026-10-30T14:38:25.584Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.709259"
-    },
-    "65168396726": {
-      "deal_id": "65168396726",
-      "deal_name": "Luminus - Enterprise - Outbound",
-      "company_name": "Luminus",
-      "company_slug": "luminus",
-      "company_id": "21540987152",
-      "company_domain": "luminus.be",
-      "company_employee_count": 2000,
-      "segment": "Mid-Market",
-      "segment_reason": null,
-      "pipeline": "default",
-      "stage": "qualifiedtobuy",
-      "arr": "50000",
-      "close_date": "2026-10-30T14:48:18.497Z",
-      "owner": "marcel@growthbook.io",
-      "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.743372"
+      "last_modified": "2026-10-20T02:50:29.446636"
     },
     "60652001696": {
       "deal_id": "60652001696",
@@ -627,7 +591,7 @@
       "close_date": "2026-10-30T15:49:00.145Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.777129"
+      "last_modified": "2026-10-20T02:50:29.479913"
     },
     "55660576681": {
       "deal_id": "55660576681",
@@ -645,7 +609,7 @@
       "close_date": "2026-10-30T16:16:21.840Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.811474"
+      "last_modified": "2026-10-20T02:50:29.513082"
     },
     "61437846967": {
       "deal_id": "61437846967",
@@ -663,7 +627,25 @@
       "close_date": "2026-10-30T16:55:09.687Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.845658"
+      "last_modified": "2026-10-20T02:50:29.546237"
+    },
+    "65217775664": {
+      "deal_id": "65217775664",
+      "deal_name": "Motor Presse - Demo Request",
+      "company_name": "Motor Presse",
+      "company_slug": "motor-presse",
+      "company_id": "48289835287",
+      "company_domain": "motorpresse.de",
+      "company_employee_count": 501,
+      "segment": "Mid-Market",
+      "segment_reason": null,
+      "pipeline": "default",
+      "stage": "24682892",
+      "arr": "10000",
+      "close_date": "2026-10-30T17:44:04.383Z",
+      "owner": "marcel@growthbook.io",
+      "sdr_owner_email": null,
+      "last_modified": "2026-10-20T02:50:29.579362"
     },
     "65568933699": {
       "deal_id": "65568933699",
@@ -681,7 +663,7 @@
       "close_date": "2026-10-30T18:07:10.716Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.879867"
+      "last_modified": "2026-10-20T02:50:29.612612"
     },
     "64576827032": {
       "deal_id": "64576827032",
@@ -699,7 +681,7 @@
       "close_date": "2026-10-30T20:27:10.971Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.913837"
+      "last_modified": "2026-10-20T02:50:29.645907"
     },
     "64885894788": {
       "deal_id": "64885894788",
@@ -717,7 +699,7 @@
       "close_date": "2026-10-30T21:06:35.383Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.947887"
+      "last_modified": "2026-10-20T02:50:29.679053"
     },
     "65172975263": {
       "deal_id": "65172975263",
@@ -735,7 +717,25 @@
       "close_date": "2026-10-31T02:37:21.624Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:16.981645"
+      "last_modified": "2026-10-20T02:50:29.712121"
+    },
+    "60069831015": {
+      "deal_id": "60069831015",
+      "deal_name": "InPost Deal — $145k",
+      "company_name": "InPost",
+      "company_slug": "inpost",
+      "company_id": "54795142522",
+      "company_domain": "inpost.pl",
+      "company_employee_count": 5000,
+      "segment": "Enterprise",
+      "segment_reason": null,
+      "pipeline": "default",
+      "stage": "43449439",
+      "arr": "145220",
+      "close_date": "2026-10-31T15:44:35.953Z",
+      "owner": "james.shannon@growthbook.io",
+      "sdr_owner_email": null,
+      "last_modified": "2026-10-20T02:50:29.744964"
     },
     "61176368035": {
       "deal_id": "61176368035",
@@ -748,30 +748,12 @@
       "segment": "Mid-Market",
       "segment_reason": null,
       "pipeline": "default",
-      "stage": "24682892",
+      "stage": "43449439",
       "arr": "75000",
       "close_date": "2026-10-31T18:45:52.090Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.015617"
-    },
-    "58134855076": {
-      "deal_id": "58134855076",
-      "deal_name": "Square Inc - Consolidation + Expansion ",
-      "company_name": "Square",
-      "company_slug": "square",
-      "company_id": "8861019274",
-      "company_domain": "squareup.com",
-      "company_employee_count": 8521,
-      "segment": "Enterprise",
-      "segment_reason": null,
-      "pipeline": "default",
-      "stage": "presentationscheduled",
-      "arr": "378000",
-      "close_date": "2026-10-31T20:47:44.921Z",
-      "owner": "cary@growthbook.io",
-      "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.049594"
+      "last_modified": "2026-10-20T02:50:29.778074"
     },
     "63222887693": {
       "deal_id": "63222887693",
@@ -785,11 +767,11 @@
       "segment_reason": null,
       "pipeline": "default",
       "stage": "24682892",
-      "arr": "55000",
+      "arr": "50000",
       "close_date": "2026-10-31T20:50:00.390Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.083822"
+      "last_modified": "2026-10-20T02:50:29.810958"
     },
     "54287857771": {
       "deal_id": "54287857771",
@@ -807,7 +789,7 @@
       "close_date": "2026-10-31T23:50:20.009Z",
       "owner": "jennifer@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.118705"
+      "last_modified": "2026-10-20T02:50:29.843608"
     },
     "63549963371": {
       "deal_id": "63549963371",
@@ -825,7 +807,7 @@
       "close_date": "2026-11-05T00:00:00Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.153234"
+      "last_modified": "2026-10-20T02:50:29.876449"
     },
     "64414495795": {
       "deal_id": "64414495795",
@@ -843,7 +825,7 @@
       "close_date": "2026-11-06T00:00:00Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.187365"
+      "last_modified": "2026-10-20T02:50:29.909307"
     },
     "59458798354": {
       "deal_id": "59458798354",
@@ -861,7 +843,7 @@
       "close_date": "2026-11-12T20:44:00.514Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.221691"
+      "last_modified": "2026-10-20T02:50:29.941949"
     },
     "65676296012": {
       "deal_id": "65676296012",
@@ -879,7 +861,7 @@
       "close_date": "2026-11-13T08:10:06.847Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.255980"
+      "last_modified": "2026-10-20T02:50:29.974800"
     },
     "59173115702": {
       "deal_id": "59173115702",
@@ -897,25 +879,7 @@
       "close_date": "2026-11-15T00:00:00Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.290238"
-    },
-    "64239712647": {
-      "deal_id": "64239712647",
-      "deal_name": "HolzLand Becker - Enterprise ",
-      "company_name": "HolzLand Becker",
-      "company_slug": "holzland-becker",
-      "company_id": "57676760233",
-      "company_domain": "holzlandbecker.de",
-      "company_employee_count": 200,
-      "segment": "SMB",
-      "segment_reason": null,
-      "pipeline": "default",
-      "stage": "qualifiedtobuy",
-      "arr": "30000",
-      "close_date": "2026-11-19T00:00:00Z",
-      "owner": "marcel@growthbook.io",
-      "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:17.324359"
+      "last_modified": "2026-10-20T02:50:30.007547"
     },
     "60178287462": {
       "deal_id": "60178287462",
@@ -933,7 +897,25 @@
       "close_date": "2026-11-19T14:44:17.326Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.358484"
+      "last_modified": "2026-10-20T02:50:30.040394"
+    },
+    "65897288613": {
+      "deal_id": "65897288613",
+      "deal_name": "Neue Zürcher Zeitung - Demo Request",
+      "company_name": "Neue Zürcher Zeitung",
+      "company_slug": "neue-zrcher-zeitung",
+      "company_id": "59092897594",
+      "company_domain": "nzz.ch",
+      "company_employee_count": 856,
+      "segment": "Mid-Market",
+      "segment_reason": null,
+      "pipeline": "default",
+      "stage": "qualifiedtobuy",
+      "arr": "50000",
+      "close_date": "2026-11-20T17:39:29.497Z",
+      "owner": "marcel@growthbook.io",
+      "sdr_owner_email": null,
+      "last_modified": "2026-10-20T02:50:30.074750"
     },
     "66021670762": {
       "deal_id": "66021670762",
@@ -942,7 +924,7 @@
       "company_slug": "federatoai",
       "company_id": "10605412216",
       "company_domain": "federato.ai",
-      "company_employee_count": 180,
+      "company_employee_count": 80,
       "segment": "SMB",
       "segment_reason": null,
       "pipeline": "default",
@@ -951,7 +933,7 @@
       "close_date": "2026-11-20T20:22:40.728Z",
       "owner": "kris@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.392425"
+      "last_modified": "2026-10-20T02:50:30.108348"
     },
     "62678252395": {
       "deal_id": "62678252395",
@@ -969,7 +951,7 @@
       "close_date": "2026-11-27T14:27:48.327Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.426629"
+      "last_modified": "2026-10-20T02:50:30.141370"
     },
     "64903790891": {
       "deal_id": "64903790891",
@@ -987,7 +969,7 @@
       "close_date": "2026-11-27T16:45:10.085Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.460662"
+      "last_modified": "2026-10-20T02:50:30.174541"
     },
     "61045491056": {
       "deal_id": "61045491056",
@@ -1005,7 +987,7 @@
       "close_date": "2026-11-30T00:00:00Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.494322"
+      "last_modified": "2026-10-20T02:50:30.207743"
     },
     "62725080086": {
       "deal_id": "62725080086",
@@ -1023,7 +1005,7 @@
       "close_date": "2026-11-30T10:39:30.487Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:17.528185"
+      "last_modified": "2026-10-20T02:50:30.240800"
     },
     "60419710634": {
       "deal_id": "60419710634",
@@ -1041,7 +1023,7 @@
       "close_date": "2026-11-30T15:48:49.214Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.562412"
+      "last_modified": "2026-10-20T02:50:30.273913"
     },
     "43476197521": {
       "deal_id": "43476197521",
@@ -1059,7 +1041,7 @@
       "close_date": "2026-11-30T18:00:00Z",
       "owner": "marsh@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.596172"
+      "last_modified": "2026-10-20T02:50:30.307170"
     },
     "64836805007": {
       "deal_id": "64836805007",
@@ -1077,7 +1059,7 @@
       "close_date": "2026-11-30T18:32:52.611Z",
       "owner": "marsh@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.630205"
+      "last_modified": "2026-10-20T02:50:30.340171"
     },
     "66021732986": {
       "deal_id": "66021732986",
@@ -1095,7 +1077,7 @@
       "close_date": "2026-11-30T20:25:47.749Z",
       "owner": "kris@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.664137"
+      "last_modified": "2026-10-20T02:50:30.373281"
     },
     "66021733035": {
       "deal_id": "66021733035",
@@ -1113,7 +1095,7 @@
       "close_date": "2026-11-30T20:28:07.510Z",
       "owner": "kris@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.697891"
+      "last_modified": "2026-10-20T02:50:30.406127"
     },
     "64058802499": {
       "deal_id": "64058802499",
@@ -1131,17 +1113,17 @@
       "close_date": "2026-11-30T21:01:24.703Z",
       "owner": "dan@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.731711"
+      "last_modified": "2026-10-20T02:50:30.439192"
     },
     "58169341204": {
       "deal_id": "58169341204",
       "deal_name": "Yoto- Demo Request",
-      "company_name": "Yoto",
-      "company_slug": "yoto",
+      "company_name": "YotoPlay",
+      "company_slug": "yotoplay",
       "company_id": "53110734251",
       "company_domain": "yotoplay.com",
-      "company_employee_count": 180,
-      "segment": "SMB",
+      "company_employee_count": 350,
+      "segment": "Mid-Market",
       "segment_reason": null,
       "pipeline": "default",
       "stage": "presentationscheduled",
@@ -1149,7 +1131,7 @@
       "close_date": "2026-12-02T10:57:55.776Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.765622"
+      "last_modified": "2026-10-20T02:50:30.472073"
     },
     "64696790346": {
       "deal_id": "64696790346",
@@ -1167,7 +1149,7 @@
       "close_date": "2026-12-06T11:12:11.913Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.799702"
+      "last_modified": "2026-10-20T02:50:30.505067"
     },
     "64908215831": {
       "deal_id": "64908215831",
@@ -1185,7 +1167,7 @@
       "close_date": "2026-12-09T00:00:00Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.833704"
+      "last_modified": "2026-10-20T02:50:30.538255"
     },
     "64888751461": {
       "deal_id": "64888751461",
@@ -1203,7 +1185,7 @@
       "close_date": "2026-12-10T00:00:00Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.872946"
+      "last_modified": "2026-10-20T02:50:30.571358"
     },
     "65047493986": {
       "deal_id": "65047493986",
@@ -1221,7 +1203,7 @@
       "close_date": "2026-12-14T00:00:00Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.906549"
+      "last_modified": "2026-10-20T02:50:30.610559"
     },
     "65027232136": {
       "deal_id": "65027232136",
@@ -1239,7 +1221,7 @@
       "close_date": "2026-12-15T14:45:21.065Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.939795"
+      "last_modified": "2026-10-20T02:50:30.643861"
     },
     "65027251300": {
       "deal_id": "65027251300",
@@ -1257,7 +1239,7 @@
       "close_date": "2026-12-15T16:50:51.084Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:17.972958"
+      "last_modified": "2026-10-20T02:50:30.676996"
     },
     "62160567676": {
       "deal_id": "62160567676",
@@ -1275,7 +1257,7 @@
       "close_date": "2026-12-16T10:04:43.467Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.006257"
+      "last_modified": "2026-10-20T02:50:30.710290"
     },
     "61841688666": {
       "deal_id": "61841688666",
@@ -1293,7 +1275,7 @@
       "close_date": "2026-12-16T12:58:09.726Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.039323"
+      "last_modified": "2026-10-20T02:50:30.743171"
     },
     "64576781972": {
       "deal_id": "64576781972",
@@ -1311,7 +1293,7 @@
       "close_date": "2026-12-16T16:02:06.746Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.072708"
+      "last_modified": "2026-10-20T02:50:30.775913"
     },
     "60853753009": {
       "deal_id": "60853753009",
@@ -1329,7 +1311,7 @@
       "close_date": "2026-12-16T16:41:29.311Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.106367"
+      "last_modified": "2026-10-20T02:50:30.808615"
     },
     "65076648545": {
       "deal_id": "65076648545",
@@ -1347,7 +1329,7 @@
       "close_date": "2026-12-16T16:53:50.249Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:18.139966"
+      "last_modified": "2026-10-20T02:50:30.841461"
     },
     "65810026311": {
       "deal_id": "65810026311",
@@ -1365,7 +1347,7 @@
       "close_date": "2026-12-16T17:01:15.210Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.173276"
+      "last_modified": "2026-10-20T02:50:30.874449"
     },
     "60840137793": {
       "deal_id": "60840137793",
@@ -1383,7 +1365,7 @@
       "close_date": "2026-12-16T17:18:39.558Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.206691"
+      "last_modified": "2026-10-20T02:50:30.907354"
     },
     "60715077158": {
       "deal_id": "60715077158",
@@ -1401,7 +1383,7 @@
       "close_date": "2026-12-18T13:22:17.153Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:18.240242"
+      "last_modified": "2026-10-20T02:50:30.940257"
     },
     "65204378967": {
       "deal_id": "65204378967",
@@ -1419,7 +1401,7 @@
       "close_date": "2026-12-18T14:32:18.618Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.274635"
+      "last_modified": "2026-10-20T02:50:30.973046"
     },
     "65156944933": {
       "deal_id": "65156944933",
@@ -1432,12 +1414,12 @@
       "segment": "SMB",
       "segment_reason": null,
       "pipeline": "default",
-      "stage": "appointmentscheduled",
+      "stage": "qualifiedtobuy",
       "arr": "147500",
       "close_date": "2026-12-20T13:45:02.781Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.308174"
+      "last_modified": "2026-10-20T02:50:31.005639"
     },
     "65180555081": {
       "deal_id": "65180555081",
@@ -1455,7 +1437,7 @@
       "close_date": "2026-12-21T00:00:00Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.341511"
+      "last_modified": "2026-10-20T02:50:31.038431"
     },
     "60665391542": {
       "deal_id": "60665391542",
@@ -1473,7 +1455,7 @@
       "close_date": "2026-12-23T14:53:41.303Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.375527"
+      "last_modified": "2026-10-20T02:50:31.071431"
     },
     "65264476538": {
       "deal_id": "65264476538",
@@ -1491,7 +1473,7 @@
       "close_date": "2026-12-24T15:29:40.911Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:18.409003"
+      "last_modified": "2026-10-20T02:50:31.104214"
     },
     "65291792291": {
       "deal_id": "65291792291",
@@ -1509,7 +1491,7 @@
       "close_date": "2026-12-26T00:00:00Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.441925"
+      "last_modified": "2026-10-20T02:50:31.136975"
     },
     "65352899112": {
       "deal_id": "65352899112",
@@ -1527,7 +1509,7 @@
       "close_date": "2026-12-28T14:20:01.191Z",
       "owner": "marsh@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.475106"
+      "last_modified": "2026-10-20T02:50:31.170052"
     },
     "65354946386": {
       "deal_id": "65354946386",
@@ -1545,7 +1527,7 @@
       "close_date": "2026-12-28T15:53:31.108Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:18.508478"
+      "last_modified": "2026-10-20T02:50:31.203001"
     },
     "65524944250": {
       "deal_id": "65524944250",
@@ -1563,7 +1545,7 @@
       "close_date": "2026-12-31T00:00:00Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.541776"
+      "last_modified": "2026-10-20T02:50:31.236129"
     },
     "60667714821": {
       "deal_id": "60667714821",
@@ -1581,7 +1563,25 @@
       "close_date": "2026-12-31T05:00:00Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.575130"
+      "last_modified": "2026-10-20T02:50:31.269570"
+    },
+    "58134855076": {
+      "deal_id": "58134855076",
+      "deal_name": "Square Inc - Consolidation + Expansion ",
+      "company_name": "Square",
+      "company_slug": "square",
+      "company_id": "8861019274",
+      "company_domain": "squareup.com",
+      "company_employee_count": 8521,
+      "segment": "Enterprise",
+      "segment_reason": null,
+      "pipeline": "default",
+      "stage": "presentationscheduled",
+      "arr": "378000",
+      "close_date": "2026-12-31T13:08:33.789Z",
+      "owner": "cary@growthbook.io",
+      "sdr_owner_email": null,
+      "last_modified": "2026-10-20T02:50:31.302651"
     },
     "47879623775": {
       "deal_id": "47879623775",
@@ -1599,7 +1599,7 @@
       "close_date": "2026-12-31T14:43:29.321Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.608626"
+      "last_modified": "2026-10-20T02:50:31.335894"
     },
     "60355556645": {
       "deal_id": "60355556645",
@@ -1617,7 +1617,7 @@
       "close_date": "2026-12-31T15:12:37.570Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.642005"
+      "last_modified": "2026-10-20T02:50:31.368873"
     },
     "63834925459": {
       "deal_id": "63834925459",
@@ -1635,7 +1635,7 @@
       "close_date": "2026-12-31T16:13:04.607Z",
       "owner": "marsh@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.675240"
+      "last_modified": "2026-10-20T02:50:31.402046"
     },
     "66011957864": {
       "deal_id": "66011957864",
@@ -1653,7 +1653,7 @@
       "close_date": "2026-12-31T16:44:21.976Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.708762"
+      "last_modified": "2026-10-20T02:50:31.435061"
     },
     "61626028439": {
       "deal_id": "61626028439",
@@ -1671,7 +1671,7 @@
       "close_date": "2026-12-31T18:06:08.408Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.742312"
+      "last_modified": "2026-10-20T02:50:31.468140"
     },
     "65795830446": {
       "deal_id": "65795830446",
@@ -1689,7 +1689,7 @@
       "close_date": "2026-12-31T19:19:03.216Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.776218"
+      "last_modified": "2026-10-20T02:50:31.501496"
     },
     "60053279602": {
       "deal_id": "60053279602",
@@ -1707,7 +1707,7 @@
       "close_date": "2026-12-31T20:11:35.818Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.809686"
+      "last_modified": "2026-10-20T02:50:31.534732"
     },
     "63676965456": {
       "deal_id": "63676965456",
@@ -1725,7 +1725,7 @@
       "close_date": "2026-12-31T21:01:36.029Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.843304"
+      "last_modified": "2026-10-20T02:50:31.568126"
     },
     "63516446812": {
       "deal_id": "63516446812",
@@ -1743,7 +1743,7 @@
       "close_date": "2026-12-31T21:02:25.942Z",
       "owner": "dan@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.876780"
+      "last_modified": "2026-10-20T02:50:31.601178"
     },
     "65675002750": {
       "deal_id": "65675002750",
@@ -1761,7 +1761,7 @@
       "close_date": "2027-01-03T00:00:00Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.910630"
+      "last_modified": "2026-10-20T02:50:31.634432"
     },
     "65798691955": {
       "deal_id": "65798691955",
@@ -1779,25 +1779,7 @@
       "close_date": "2027-01-05T00:00:00Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.944252"
-    },
-    "65897288613": {
-      "deal_id": "65897288613",
-      "deal_name": "Neue Zürcher Zeitung - Demo Request",
-      "company_name": "Neue Zürcher Zeitung",
-      "company_slug": "neue-zrcher-zeitung",
-      "company_id": "59092897594",
-      "company_domain": "nzz.ch",
-      "company_employee_count": 856,
-      "segment": "Mid-Market",
-      "segment_reason": null,
-      "pipeline": "default",
-      "stage": "appointmentscheduled",
-      "arr": "0",
-      "close_date": "2027-01-11T00:00:00Z",
-      "owner": "marcel@growthbook.io",
-      "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:18.977860"
+      "last_modified": "2026-10-20T02:50:31.667534"
     },
     "64175366986": {
       "deal_id": "64175366986",
@@ -1815,7 +1797,25 @@
       "close_date": "2027-01-13T11:00:35.726Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:19.011599"
+      "last_modified": "2026-10-20T02:50:31.700715"
+    },
+    "66012494957": {
+      "deal_id": "66012494957",
+      "deal_name": "Zeely - Pro-Ent",
+      "company_name": "Zeely",
+      "company_slug": "zeely",
+      "company_id": "53077184439",
+      "company_domain": "zeely.app",
+      "company_employee_count": 10,
+      "segment": "SMB",
+      "segment_reason": null,
+      "pipeline": "default",
+      "stage": "appointmentscheduled",
+      "arr": "0",
+      "close_date": "2027-01-14T00:56:27.750Z",
+      "owner": "marcel@growthbook.io",
+      "sdr_owner_email": "jake.stangl@growthbook.io",
+      "last_modified": "2026-10-20T02:50:31.733850"
     },
     "65191218711": {
       "deal_id": "65191218711",
@@ -1833,7 +1833,7 @@
       "close_date": "2027-01-25T15:41:35.471Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.045223"
+      "last_modified": "2026-10-20T02:50:31.767307"
     },
     "59021351952": {
       "deal_id": "59021351952",
@@ -1851,7 +1851,7 @@
       "close_date": "2027-01-25T16:15:30.370Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.078762"
+      "last_modified": "2026-10-20T02:50:31.800582"
     },
     "64534469266": {
       "deal_id": "64534469266",
@@ -1869,7 +1869,7 @@
       "close_date": "2027-01-25T16:29:40.517Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.112302"
+      "last_modified": "2026-10-20T02:50:31.833913"
     },
     "55478324562": {
       "deal_id": "55478324562",
@@ -1887,7 +1887,7 @@
       "close_date": "2027-01-25T18:00:54.469Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.145822"
+      "last_modified": "2026-10-20T02:50:31.867214"
     },
     "54442852124": {
       "deal_id": "54442852124",
@@ -1905,7 +1905,7 @@
       "close_date": "2027-01-25T18:07:02.894Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.179308"
+      "last_modified": "2026-10-20T02:50:31.900578"
     },
     "62622489357": {
       "deal_id": "62622489357",
@@ -1914,16 +1914,16 @@
       "company_slug": "jpmorganchase",
       "company_id": "45374707828",
       "company_domain": "jpmchase.com",
-      "company_employee_count": null,
-      "segment": "Unknown",
-      "segment_reason": "no_employee_count",
+      "company_employee_count": 238400,
+      "segment": "Enterprise",
+      "segment_reason": null,
       "pipeline": "default",
       "stage": "appointmentscheduled",
       "arr": "250000",
       "close_date": "2027-01-25T18:17:25.288Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.212645"
+      "last_modified": "2026-10-20T02:50:31.933802"
     },
     "55475383924": {
       "deal_id": "55475383924",
@@ -1941,7 +1941,7 @@
       "close_date": "2027-01-25T18:17:26.249Z",
       "owner": "marsh@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.246031"
+      "last_modified": "2026-10-20T02:50:31.967292"
     },
     "62447700618": {
       "deal_id": "62447700618",
@@ -1959,7 +1959,7 @@
       "close_date": "2027-01-25T19:42:47.097Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.279437"
+      "last_modified": "2026-10-20T02:50:32.000588"
     },
     "64248567201": {
       "deal_id": "64248567201",
@@ -1977,7 +1977,7 @@
       "close_date": "2027-01-25T20:03:56.691Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.312570"
+      "last_modified": "2026-10-20T02:50:32.033953"
     },
     "61625305118": {
       "deal_id": "61625305118",
@@ -1995,7 +1995,7 @@
       "close_date": "2027-01-25T20:27:28.030Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.350356"
+      "last_modified": "2026-10-20T02:50:32.073280"
     },
     "63220208693": {
       "deal_id": "63220208693",
@@ -2013,7 +2013,7 @@
       "close_date": "2027-01-25T20:37:36.179Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.383565"
+      "last_modified": "2026-10-20T02:50:32.106439"
     },
     "62756829850": {
       "deal_id": "62756829850",
@@ -2031,7 +2031,7 @@
       "close_date": "2027-01-25T20:59:49.500Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.416735"
+      "last_modified": "2026-10-20T02:50:32.139491"
     },
     "63433718401": {
       "deal_id": "63433718401",
@@ -2049,7 +2049,7 @@
       "close_date": "2027-01-25T21:06:17.343Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.450043"
+      "last_modified": "2026-10-20T02:50:32.172613"
     },
     "64367179643": {
       "deal_id": "64367179643",
@@ -2067,7 +2067,7 @@
       "close_date": "2027-01-25T21:06:23.438Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.483209"
+      "last_modified": "2026-10-20T02:50:32.205720"
     },
     "62985360945": {
       "deal_id": "62985360945",
@@ -2085,7 +2085,7 @@
       "close_date": "2027-01-25T21:06:51.605Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.516278"
+      "last_modified": "2026-10-20T02:50:32.238759"
     },
     "61631402640": {
       "deal_id": "61631402640",
@@ -2103,7 +2103,7 @@
       "close_date": "2027-01-25T21:18:52.656Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.550087"
+      "last_modified": "2026-10-20T02:50:32.272054"
     },
     "39350410660": {
       "deal_id": "39350410660",
@@ -2121,7 +2121,7 @@
       "close_date": "2027-01-25T21:19:43.882Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.583807"
+      "last_modified": "2026-10-20T02:50:32.305400"
     },
     "57531453253": {
       "deal_id": "57531453253",
@@ -2139,7 +2139,7 @@
       "close_date": "2027-01-25T21:20:25.389Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.617218"
+      "last_modified": "2026-10-20T02:50:32.338672"
     },
     "57531932257": {
       "deal_id": "57531932257",
@@ -2157,7 +2157,7 @@
       "close_date": "2027-01-25T21:22:23.348Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.650646"
+      "last_modified": "2026-10-20T02:50:32.371863"
     },
     "62360994147": {
       "deal_id": "62360994147",
@@ -2175,7 +2175,7 @@
       "close_date": "2027-01-25T21:22:28.983Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:19.684306"
+      "last_modified": "2026-10-20T02:50:32.404710"
     },
     "51293158260": {
       "deal_id": "51293158260",
@@ -2193,7 +2193,7 @@
       "close_date": "2027-01-25T21:22:45.328Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.717935"
+      "last_modified": "2026-10-20T02:50:32.437589"
     },
     "60964814258": {
       "deal_id": "60964814258",
@@ -2211,7 +2211,7 @@
       "close_date": "2027-01-25T21:22:57.446Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:19.751564"
+      "last_modified": "2026-10-20T02:50:32.470381"
     },
     "60423886694": {
       "deal_id": "60423886694",
@@ -2229,7 +2229,7 @@
       "close_date": "2027-01-25T21:23:06.722Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.785121"
+      "last_modified": "2026-10-20T02:50:32.503116"
     },
     "60670278001": {
       "deal_id": "60670278001",
@@ -2247,7 +2247,7 @@
       "close_date": "2027-01-25T21:24:26.541Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.818509"
+      "last_modified": "2026-10-20T02:50:32.535958"
     },
     "61076825943": {
       "deal_id": "61076825943",
@@ -2265,7 +2265,7 @@
       "close_date": "2027-01-25T21:25:00.087Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.851942"
+      "last_modified": "2026-10-20T02:50:32.568801"
     },
     "60036027012": {
       "deal_id": "60036027012",
@@ -2283,7 +2283,7 @@
       "close_date": "2027-01-25T21:25:05.581Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.885143"
+      "last_modified": "2026-10-20T02:50:32.601593"
     },
     "62355039834": {
       "deal_id": "62355039834",
@@ -2301,7 +2301,7 @@
       "close_date": "2027-01-25T21:25:28.730Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:19.918235"
+      "last_modified": "2026-10-20T02:50:32.634540"
     },
     "9092472450": {
       "deal_id": "9092472450",
@@ -2319,7 +2319,7 @@
       "close_date": "2027-01-25T21:27:26.320Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.951330"
+      "last_modified": "2026-10-20T02:50:32.667291"
     },
     "53500422798": {
       "deal_id": "53500422798",
@@ -2337,7 +2337,7 @@
       "close_date": "2027-01-25T22:51:02.485Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:19.984502"
+      "last_modified": "2026-10-20T02:50:32.699994"
     },
     "56162812495": {
       "deal_id": "56162812495",
@@ -2355,7 +2355,7 @@
       "close_date": "2027-01-25T22:57:45.533Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.017746"
+      "last_modified": "2026-10-20T02:50:32.732547"
     },
     "59720089894": {
       "deal_id": "59720089894",
@@ -2373,7 +2373,7 @@
       "close_date": "2027-01-25T22:57:54.294Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.050796"
+      "last_modified": "2026-10-20T02:50:32.765350"
     },
     "9087197490": {
       "deal_id": "9087197490",
@@ -2391,7 +2391,7 @@
       "close_date": "2027-01-25T22:58:02.999Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.084204"
+      "last_modified": "2026-10-20T02:50:32.798072"
     },
     "14545547901": {
       "deal_id": "14545547901",
@@ -2409,7 +2409,7 @@
       "close_date": "2027-01-25T22:58:12.385Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.117566"
+      "last_modified": "2026-10-20T02:50:32.830885"
     },
     "59245644951": {
       "deal_id": "59245644951",
@@ -2427,7 +2427,7 @@
       "close_date": "2027-01-25T22:58:21.310Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.150486"
+      "last_modified": "2026-10-20T02:50:32.863754"
     },
     "51050838887": {
       "deal_id": "51050838887",
@@ -2445,7 +2445,7 @@
       "close_date": "2027-01-25T22:58:29.781Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.183468"
+      "last_modified": "2026-10-20T02:50:32.896399"
     },
     "9092495692": {
       "deal_id": "9092495692",
@@ -2463,7 +2463,7 @@
       "close_date": "2027-01-25T22:58:57.964Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.216805"
+      "last_modified": "2026-10-20T02:50:32.929049"
     },
     "9092495281": {
       "deal_id": "9092495281",
@@ -2481,7 +2481,7 @@
       "close_date": "2027-01-25T22:59:22.531Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.250321"
+      "last_modified": "2026-10-20T02:50:32.962185"
     },
     "57100375199": {
       "deal_id": "57100375199",
@@ -2499,7 +2499,7 @@
       "close_date": "2027-01-25T22:59:42.768Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.283509"
+      "last_modified": "2026-10-20T02:50:32.995161"
     },
     "61626656091": {
       "deal_id": "61626656091",
@@ -2517,7 +2517,7 @@
       "close_date": "2027-01-26T00:35:25.211Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.317175"
+      "last_modified": "2026-10-20T02:50:33.028069"
     },
     "61615709775": {
       "deal_id": "61615709775",
@@ -2535,7 +2535,7 @@
       "close_date": "2027-01-28T11:46:14.383Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.350529"
+      "last_modified": "2026-10-20T02:50:33.061132"
     },
     "65354875455": {
       "deal_id": "65354875455",
@@ -2553,7 +2553,7 @@
       "close_date": "2027-01-29T08:43:13.476Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.383979"
+      "last_modified": "2026-10-20T02:50:33.094305"
     },
     "64624160587": {
       "deal_id": "64624160587",
@@ -2571,7 +2571,7 @@
       "close_date": "2027-01-29T08:44:38.400Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.417345"
+      "last_modified": "2026-10-20T02:50:33.127363"
     },
     "63191360945": {
       "deal_id": "63191360945",
@@ -2589,7 +2589,7 @@
       "close_date": "2027-01-29T12:00:00Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.450525"
+      "last_modified": "2026-10-20T02:50:33.160265"
     },
     "61582382687": {
       "deal_id": "61582382687",
@@ -2607,7 +2607,7 @@
       "close_date": "2027-01-29T13:18:13.822Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:20.483615"
+      "last_modified": "2026-10-20T02:50:33.193045"
     },
     "50347229229": {
       "deal_id": "50347229229",
@@ -2625,7 +2625,7 @@
       "close_date": "2027-01-29T14:50:18.643Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.516922"
+      "last_modified": "2026-10-20T02:50:33.226120"
     },
     "63535729507": {
       "deal_id": "63535729507",
@@ -2643,7 +2643,7 @@
       "close_date": "2027-01-29T16:38:20.986Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:20.550125"
+      "last_modified": "2026-10-20T02:50:33.258980"
     },
     "62622458398": {
       "deal_id": "62622458398",
@@ -2661,7 +2661,7 @@
       "close_date": "2027-01-29T16:38:55.870Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.583466"
+      "last_modified": "2026-10-20T02:50:33.291677"
     },
     "65027812424": {
       "deal_id": "65027812424",
@@ -2679,7 +2679,7 @@
       "close_date": "2027-01-29T16:48:02.491Z",
       "owner": "marcel@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.616919"
+      "last_modified": "2026-10-20T02:50:33.324347"
     },
     "59680315298": {
       "deal_id": "59680315298",
@@ -2697,7 +2697,7 @@
       "close_date": "2027-01-29T19:25:16.542Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:20.650787"
+      "last_modified": "2026-10-20T02:50:33.357303"
     },
     "60837964868": {
       "deal_id": "60837964868",
@@ -2715,7 +2715,7 @@
       "close_date": "2027-01-29T19:28:14.633Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.684627"
+      "last_modified": "2026-10-20T02:50:33.389987"
     },
     "56258367868": {
       "deal_id": "56258367868",
@@ -2733,7 +2733,7 @@
       "close_date": "2027-01-29T20:54:58.330Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.718284"
+      "last_modified": "2026-10-20T02:50:33.422724"
     },
     "49689180024": {
       "deal_id": "49689180024",
@@ -2751,7 +2751,7 @@
       "close_date": "2027-01-29T20:55:05.375Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.752019"
+      "last_modified": "2026-10-20T02:50:33.455492"
     },
     "60257621387": {
       "deal_id": "60257621387",
@@ -2769,7 +2769,7 @@
       "close_date": "2027-01-29T20:55:14.270Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.785995"
+      "last_modified": "2026-10-20T02:50:33.488118"
     },
     "54074159735": {
       "deal_id": "54074159735",
@@ -2787,7 +2787,7 @@
       "close_date": "2027-01-29T21:42:11.686Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.825611"
+      "last_modified": "2026-10-20T02:50:33.526829"
     },
     "61024408734": {
       "deal_id": "61024408734",
@@ -2805,7 +2805,7 @@
       "close_date": "2027-01-31T00:00:00Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.859631"
+      "last_modified": "2026-10-20T02:50:33.559791"
     },
     "61032303431": {
       "deal_id": "61032303431",
@@ -2823,7 +2823,7 @@
       "close_date": "2027-01-31T00:00:00Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.893371"
+      "last_modified": "2026-10-20T02:50:33.592664"
     },
     "65965207891": {
       "deal_id": "65965207891",
@@ -2841,7 +2841,7 @@
       "close_date": "2027-01-31T14:57:16.255Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.927319"
+      "last_modified": "2026-10-20T02:50:33.625547"
     },
     "65162368773": {
       "deal_id": "65162368773",
@@ -2859,7 +2859,7 @@
       "close_date": "2027-01-31T18:28:25.963Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.960976"
+      "last_modified": "2026-10-20T02:50:33.658306"
     },
     "58966766773": {
       "deal_id": "58966766773",
@@ -2877,7 +2877,7 @@
       "close_date": "2027-02-10T22:18:03.733Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:20.994724"
+      "last_modified": "2026-10-20T02:50:33.691209"
     },
     "60785721693": {
       "deal_id": "60785721693",
@@ -2895,7 +2895,7 @@
       "close_date": "2027-02-26T12:00:00Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.028533"
+      "last_modified": "2026-10-20T02:50:33.724165"
     },
     "64382140959": {
       "deal_id": "64382140959",
@@ -2913,7 +2913,7 @@
       "close_date": "2027-02-26T16:38:32.919Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.062414"
+      "last_modified": "2026-10-20T02:50:33.757257"
     },
     "65076782964": {
       "deal_id": "65076782964",
@@ -2931,7 +2931,7 @@
       "close_date": "2027-02-26T20:02:43.476Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.096425"
+      "last_modified": "2026-10-20T02:50:33.790184"
     },
     "59369997485": {
       "deal_id": "59369997485",
@@ -2949,7 +2949,7 @@
       "close_date": "2027-02-26T20:55:55.500Z",
       "owner": "jake@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.130436"
+      "last_modified": "2026-10-20T02:50:33.823276"
     },
     "62115522605": {
       "deal_id": "62115522605",
@@ -2967,7 +2967,7 @@
       "close_date": "2027-02-26T21:14:16.030Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.164297"
+      "last_modified": "2026-10-20T02:50:33.856304"
     },
     "60182251329": {
       "deal_id": "60182251329",
@@ -2985,7 +2985,7 @@
       "close_date": "2027-03-16T20:13:57.712Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.197995"
+      "last_modified": "2026-10-20T02:50:33.889369"
     },
     "58897463067": {
       "deal_id": "58897463067",
@@ -3003,7 +3003,7 @@
       "close_date": "2027-03-23T12:41:27.627Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.231702"
+      "last_modified": "2026-10-20T02:50:33.922507"
     },
     "62452805994": {
       "deal_id": "62452805994",
@@ -3021,7 +3021,7 @@
       "close_date": "2027-03-26T20:14:21.795Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.265812"
+      "last_modified": "2026-10-20T02:50:33.955517"
     },
     "62620904729": {
       "deal_id": "62620904729",
@@ -3039,7 +3039,7 @@
       "close_date": "2027-03-26T20:14:37.514Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.299248"
+      "last_modified": "2026-10-20T02:50:33.988184"
     },
     "63327879453": {
       "deal_id": "63327879453",
@@ -3057,7 +3057,7 @@
       "close_date": "2027-03-31T00:00:00Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.333031"
+      "last_modified": "2026-10-20T02:50:34.021087"
     },
     "64293475180": {
       "deal_id": "64293475180",
@@ -3075,7 +3075,7 @@
       "close_date": "2027-03-31T00:00:00Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.366555"
+      "last_modified": "2026-10-20T02:50:34.054206"
     },
     "60173271471": {
       "deal_id": "60173271471",
@@ -3093,7 +3093,7 @@
       "close_date": "2027-03-31T12:15:23.364Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.399993"
+      "last_modified": "2026-10-20T02:50:34.087362"
     },
     "59812480590": {
       "deal_id": "59812480590",
@@ -3111,7 +3111,7 @@
       "close_date": "2027-04-15T13:38:01.007Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.433605"
+      "last_modified": "2026-10-20T02:50:34.120461"
     },
     "63562515584": {
       "deal_id": "63562515584",
@@ -3129,7 +3129,7 @@
       "close_date": "2027-04-16T20:14:29.897Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.467037"
+      "last_modified": "2026-10-20T02:50:34.153811"
     },
     "59387794836": {
       "deal_id": "59387794836",
@@ -3147,7 +3147,7 @@
       "close_date": "2027-04-23T19:03:45.691Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.500236"
+      "last_modified": "2026-10-20T02:50:34.186660"
     },
     "60355159912": {
       "deal_id": "60355159912",
@@ -3165,7 +3165,7 @@
       "close_date": "2027-04-30T16:16:49.299Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.533482"
+      "last_modified": "2026-10-20T02:50:34.219760"
     },
     "63064855552": {
       "deal_id": "63064855552",
@@ -3183,7 +3183,7 @@
       "close_date": "2027-05-07T11:21:44.669Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.566754"
+      "last_modified": "2026-10-20T02:50:34.252885"
     },
     "59369345948": {
       "deal_id": "59369345948",
@@ -3201,7 +3201,7 @@
       "close_date": "2027-05-12T08:31:11.583Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.600067"
+      "last_modified": "2026-10-20T02:50:34.286170"
     },
     "63436694904": {
       "deal_id": "63436694904",
@@ -3219,7 +3219,7 @@
       "close_date": "2027-05-13T12:27:27.522Z",
       "owner": "james.shannon@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.633492"
+      "last_modified": "2026-10-20T02:50:34.319268"
     },
     "60643755396": {
       "deal_id": "60643755396",
@@ -3237,7 +3237,7 @@
       "close_date": "2027-05-14T20:13:52.079Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.666946"
+      "last_modified": "2026-10-20T02:50:34.352404"
     },
     "58208197272": {
       "deal_id": "58208197272",
@@ -3255,7 +3255,7 @@
       "close_date": "2027-05-19T12:23:26.710Z",
       "owner": "cary@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.700024"
+      "last_modified": "2026-10-20T02:50:34.385692"
     },
     "60644372558": {
       "deal_id": "60644372558",
@@ -3273,7 +3273,7 @@
       "close_date": "2027-05-19T15:26:01.147Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.733386"
+      "last_modified": "2026-10-20T02:50:34.418815"
     },
     "63712716454": {
       "deal_id": "63712716454",
@@ -3291,7 +3291,7 @@
       "close_date": "2027-05-19T16:22:17.973Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.766693"
+      "last_modified": "2026-10-20T02:50:34.452051"
     },
     "60860413064": {
       "deal_id": "60860413064",
@@ -3309,7 +3309,7 @@
       "close_date": "2027-05-21T20:13:41.327Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.800177"
+      "last_modified": "2026-10-20T02:50:34.485069"
     },
     "60694377392": {
       "deal_id": "60694377392",
@@ -3327,7 +3327,7 @@
       "close_date": "2027-05-28T20:14:49.465Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.833525"
+      "last_modified": "2026-10-20T02:50:34.518071"
     },
     "62135862588": {
       "deal_id": "62135862588",
@@ -3345,7 +3345,7 @@
       "close_date": "2027-06-17T20:14:08.997Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.866764"
+      "last_modified": "2026-10-20T02:50:34.551271"
     },
     "62485423801": {
       "deal_id": "62485423801",
@@ -3363,7 +3363,7 @@
       "close_date": "2027-06-30T00:00:00Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.899862"
+      "last_modified": "2026-10-20T02:50:34.584673"
     },
     "61103777792": {
       "deal_id": "61103777792",
@@ -3381,7 +3381,7 @@
       "close_date": "2027-06-30T18:08:32.501Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.933147"
+      "last_modified": "2026-10-20T02:50:34.618084"
     },
     "64432701550": {
       "deal_id": "64432701550",
@@ -3399,7 +3399,7 @@
       "close_date": "2027-07-26T22:52:17.868Z",
       "owner": "christian@growthbook.io",
       "sdr_owner_email": null,
-      "last_modified": "2026-10-19T02:38:21.966197"
+      "last_modified": "2026-10-20T02:50:34.651176"
     },
     "63087185423": {
       "deal_id": "63087185423",
@@ -3417,7 +3417,7 @@
       "close_date": "2027-10-29T16:00:00Z",
       "owner": "scott.keller@growthbook.io",
       "sdr_owner_email": "jake.stangl@growthbook.io",
-      "last_modified": "2026-10-19T02:38:21.999750"
+      "last_modified": "2026-10-20T02:50:34.684147"
     }
   }
 }
