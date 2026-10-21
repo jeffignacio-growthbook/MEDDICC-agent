@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook <> Bluesky",
+  "slug": "growthbook-bluesky",
+  "last_etl_date": "2026-10-21T05:31:34.618623",
+  "calls": [
+    {
+      "id": "01M50AN9R5DBADFC1SSFREQCH9",
+      "source": "fireflies",
+      "title": "GrowthBook <> Bluesky: Intro",
+      "date": "2026-10-20",
+      "duration_minutes": 27.780000686645508,
+      "summary": "# GrowthBook <> Bluesky: Intro\nDate: 2026-10-20 | Duration: 27.780000686645508m\n\n## Summary\nGrowthBook was selected to replace Statsig because Statsig’s event-based pricing, heavy downsampling, and large-traffic costs constrained scale, while concerns about OpenAI’s acquisition included strategic data sharing despite an existing data lake. GrowthBook matched requirements through data-lake compatibility and no per-event pricing, and onboarding was completed under pressure with BigQuery simplifying setup. Bluesky is prioritizing Atmosphere Protocol adoption, developer ecosystem growth, Bluesky application support, and third-party applications. Success will be measured through Bluesky monthly active users and active applications on AT Proto, while growth has entered a slower phase after hypergrowth and increased competition from X and Threads. The team plans more sophisticated experiments, including contextual bandits. GrowthBook currently supports feature flags and experimentation, but product analytics is unsatisfactory. Training will cover bandits, optimization criteria, guardrails, holdouts, user journeys, dashboards, and session replay for seven or eight attendees, including ML and client teams. Training is planned for Tuesday the 27th at 9am Pacific for one hour, with Andy sending the invitation, Ian adding attendees, and Slack remaining the primary support channel.\n\n## Keywords\nGrowthBook, AT Protocol, Experimentation, Contextual Bandits, Product Analytics, Session Replay\n\n## Action Items\n**Chris Sanders**\nInvestigate gateway endpoint support (17:15)\nConduct GrowthBook training session (25:30)\n\n**Ian Wesley-Smith**\nConfirm relevant training attendees (22:32)\nInvite interested Bluesky teams (23:17)\nAdd confirmed participants (25:30)\n\n**Andy Marshall**\nSend training calendar block (25:30)",
+      "organizer": "marsh@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

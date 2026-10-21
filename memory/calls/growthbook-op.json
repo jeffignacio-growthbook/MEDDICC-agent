@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook + Op",
   "slug": "growthbook-op",
-  "last_etl_date": "2026-10-14T05:36:35.774558",
+  "last_etl_date": "2026-10-21T05:31:34.614186",
   "calls": [
     {
       "id": "01KT7DMS83RXCGY1RPYJB8XGY3",
@@ -86,6 +86,17 @@
       "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-10-13 | Duration: 31.25m\n\n## Summary\nThe team identified that emails sent to salesgrowthbookio are going to spam and are not being tracked in HubSpot because the address is likely a distribution list rather than a connected shared inbox. Jennifer will investigate routing, while the team aims to replicate territory-based assignment and notification workflows. They also reviewed MQL handling: mid-tier leads may enter nurture sequences, while high-tier leads may be assigned to Account Executives, although no firm notification process exists yet. Territory fairness remains under review, with EMEA supporting two full-time reps, smaller regions potentially being combined, and Jeff preparing a report. Lead scoring currently produces few MQLs above 100, and demo submissions will remain separate to prevent duplicate alerts. High-fit accounts without identified contacts will be targeted through automated nurture and advertising, with Aaron managing nurture sequences and Jacqueline supporting ads. Finally, Michael is updating code to push Growth Book organization IDs into HubSpot company records, beginning with enterprise licenses, because accurate customer tagging is important for applying scoring and outreach effectively.\n\n## Keywords\nHubSpot, Lead Scoring, MQL Assignment, GrowthBook, Territory Management, Lead Nurturing\n\n## Action Items\n\n**Chris Newton**\nFollow up with admin Jennifer to identify current recipients of the growthbook.io sales email distribution list and investigate setup (01:31)\n\n**Shawn Green**\nSet up the shared sales inbox properly in HubSpot to enable tracking and automation (02:38)\nShare status updates in the ops channel regarding the dependency on Michael Knowlton’s code changes for company-level GrowthBook org ID pushes (27:57)\n\n**Jeff Ignacio**\nDraft a one-page report on the last five misfired leads for Ryan and coordinate sharing with James to address lead routing concerns (11:30)\n\n**Michael Knowlton**\nComplete company-level GrowthBook organization ID update push for license record matching to allow accurate customer data syncing (26:30)\n\n**Lyndsie Berens**\nIntegrate Jacqueline (new hire with ads background) into calls gradually to support ad targeting efforts for high-fit accounts with no known contacts (25:59)\n\n**Ashley**\nCoordinate with Aaron on automated nurture sequences targeting accounts with developer activity but no de-anonymized contacts (21:05)\n",
       "organizer": "jeff.ignacio@growthbook.io",
       "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M585MS9NJ7HAAKBAST2P82RW",
+      "source": "fireflies",
+      "title": "GrowthBook + Op Methods Weekly Check-In",
+      "date": "2026-10-20",
+      "duration_minutes": 31,
+      "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-10-20 | Duration: 31m\n\n## Summary\nLicensing integration and an initial test push succeeded, but historical company records still require a CSV containing company domains and GrowthBook Org IDs, delaying automation rollout. Customer licensing data must be completed before account scoring begins, while new 30-day developer and buyer activity properties will improve company-fit scores. Weekly prioritization of the five highest-scoring eligible enterprise accounts was proposed, alongside unresolved rules for marketing access. Separate meeting and MQL queues were requested, with trigger-based routing awaiting Default support and lead-source priorities still needing definition. Inbound reporting remains limited by inconsistent tagging, unclear demo flags, dashboard issues, and missing event-meeting tracking. Group demos have expanded capacity, but their progression to opportunities must be compared with one-on-one demos. Customer.io and Notion workflows have moved to HubSpot, the podcast assignment workflow is ready, and Shawn will provide brief Friday Slack updates.\n\n## Keywords\nHubSpot licensing, Lead scoring, Account routing, Inbound attribution, Group demos, RevOps\n\n## Action Items\n**Michael Nolan**\n- Provide CSV company domains and IDs (02:48)\n\n**Shawn Green**\n- Import historical company IDs (04:59)\n- Schedule licence data tests (05:05)\n- Build licence-tier workflow (05:14)\n- Follow up on CSV (06:12)\n- Adjust company-fit scoring (10:12)\n- Build weekly account report (10:12)\n- Establish event tracking process (26:33)\n- Send Friday Slack update (29:56)\n- Evaluate Asana adoption (30:10)\n\n**Chris Newton**\n- Monitor Default routing enhancement (12:49)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 8,
       "summary_quality": "good"
     }
   ]

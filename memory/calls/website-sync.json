@@ -1,7 +1,7 @@
 {
-  "company": "Website Sync",
+  "company": "website sync",
   "slug": "website-sync",
-  "last_etl_date": "2026-08-05T15:57:31.404693",
+  "last_etl_date": "2026-10-21T05:31:34.611791",
   "calls": [
     {
       "id": "01KGN55WARMH9R1PER3JDV65VB",
@@ -13,7 +13,19 @@
       "organizer": "kari@growthbook.io",
       "participants": 3,
       "keywords": "Website Design, Content Strategy, User Experience, Product Pages, Marketing Assets, Interactive Elements",
-      "action_items": "\n**Kari Kay**\nCirculate feedback to design team after meeting and confirm final version direction (00:03)\nCreate light and dark versions of design elements and explore interactive scrolling effects in Figma for better assessment (03:39)\nCoordinate animation examples for stats section and gradient use, adjusting per stakeholder preference (10:36)\nAdjust testimonials section font sizes and layout options, possibly adding a few initial quotes from CMS (23:04)\nPrepare case study card variations with reduced size and clearer copy inclusion (29:15)\nFacilitate automation of marketing thumbnails and update image assets accordingly (33:01)\nWork on CTA banner animation refinements and ensure consistent messaging placement across pages (34:40)\nShare updated pages and design status with Karen and Ashley regularly to align feedback and changes (39:44)\nCoordinate with Karen to plan collaborative session on page list, wireframes, and components (58:50)\n\n**Karen Henke**\nLead content rewrite for homepage and major pages with Ashley, ensuring tight copy aligned to user intent (40:47)\nDevelop tracker and structured list of pages with unique content and design requirements (47:07)\nProvide input on messaging and page structure, particularly for integration and product pages, to reflect user research and decision-making context (49:54)\nCoordinate scheduling and availability for design and content collaboration sessions (59:20)\n\n**Ashley Stirrup**\nCollaborate with Karen on copywriting and content planning efforts (01:00:45)\nProvide feedback on visual elements, particularly testimonials and featured case studies (23:04)\n"
+      "action_items": "\n**Kari Kay**\nCirculate feedback to design team after meeting and confirm final version direction (00:03)\nCreate light and dark versions of design elements and explore interactive scrolling effects in Figma for better assessment (03:39)\nCoordinate animation examples for stats section and gradient use, adjusting per stakeholder preference (10:36)\nAdjust testimonials section font sizes and layout options, possibly adding a few initial quotes from CMS (23:04)\nPrepare case study card variations with reduced size and clearer copy inclusion (29:15)\nFacilitate automation of marketing thumbnails and update image assets accordingly (33:01)\nWork on CTA banner animation refinements and ensure consistent messaging placement across pages (34:40)\nShare updated pages and design status with Karen and Ashley regularly to align feedback and changes (39:44)\nCoordinate with Karen to plan collaborative session on page list, wireframes, and components (58:50)\n\n**Karen Henke**\nLead content rewrite for homepage and major pages with Ashley, ensuring tight copy aligned to user intent (40:47)\nDevelop tracker and structured list of pages with unique content and design requirements (47:07)\nProvide input on messaging and page structure, particularly for integration and product pages, to reflect user research and decision-making context (49:54)\nCoordinate scheduling and availability for design and content collaboration sessions (59:20)\n\n**Ashley Stirrup**\nCollaborate with Karen on copywriting and content planning efforts (01:00:45)\nProvide feedback on visual elements, particularly testimonials and featured case studies (23:04)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M50KRESS0TMWPP4JVVV2ZATY",
+      "source": "fireflies",
+      "title": "website sync",
+      "date": "2026-10-20",
+      "duration_minutes": 13.40999984741211,
+      "summary": "# website sync\nDate: 2026-10-20 | Duration: 13.40999984741211m\n\n## Summary\nWebsite direction remains pending Ashley’s meeting, with no immediate rush. The team will prioritize performance work first, using it as a starting point and giving Yousef process exposure. Website bugs and enhancements should be consolidated and tracked in the Notion board, while Chris assesses effort and priority and assigns contributors. Ready requests can reach Yousef through the board, Slack descriptions, or Loom, although reducing informal Slack bypasses is preferred. Performance improvements may reduce CMS collections and make marketing needs more self-service. Jack is managing three projects, completed Rippling work today, and is finishing DEI training; follow-up is planned after Ashley’s discussion. Benefits enrollment was reviewed twice for November open enrollment and plan changes. Aetna provider coverage was confirmed with no provider changes expected. Opolis group coverage was recommended for the freelancer community, while its S-Corp requirement, payroll administration fee, and eligibility restrictions were noted. Potential savings and tax advantages may exceed fees, and Aetna was considered the best solo-plan option.\n\n## Keywords\nWebsite performance, Notion enhancement board, Feature request process, CMS dependencies, Contractor health insurance, Opolis\n\n## Action Items\n**Jack Virag**\nAttend discussion with Ashley (11:23)\nComplete DEI training (11:33)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

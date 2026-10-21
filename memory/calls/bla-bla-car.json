@@ -1,7 +1,7 @@
 {
   "company": "Bla Bla Car",
   "slug": "bla-bla-car",
-  "last_etl_date": "2026-10-14T05:36:35.776839",
+  "last_etl_date": "2026-10-21T05:31:34.620153",
   "calls": [
     {
       "id": "6ab284fe124f390020b1ea0e",
@@ -34,6 +34,17 @@
       "summary": "# Bla Bla Car & GrowthBook Commercials\nDate: 2026-10-13 | Duration: 12.960000038146973m\n\n## Summary\nThe discussion centered on enabling a Proof of Concept comparing Growth Book with Confidence. Alexandre Laigné proposed committing to 200 experiments annually at a capped budget of 65,000 euros per year over two years, while requesting pricing flexibility before the POC because Confidence offers a better rate. James Shannon said signing by October 28 could allow a more competitive proposal and agreed to review internal pricing models, while Alexandre requested contract review as early as October 20. The two-week trial will assess platform capabilities, planned experiment execution, usability, and stability, with James offering technical and solution support. Legal review covers the order form, DPA, and customer agreement; CEO Nicolas Brusson is the designated signer. A case study discount remains under legal review. The parties will coordinate internal approvals, resolve contract red lines, review progress in a follow-up meeting, and work toward the October 28 signing target.\n\n## Keywords\nPOC, budget negotiation, contract signing, legal review, pricing proposal, case study\n\n## Action Items\n\n**James Shannon**\nProvide a revised pricing proposal aiming to meet Bla Bla Car’s budget of €65,000 for 200 experiments, contingent on signing by October 28th (02:32)\nSupport Bla Bla Car technically and solution-wise to enable adequate product trial during the next two weeks (07:59)\nSend updated proposals and contract documents to Bla Bla Car via email for internal review before next meeting (11:29)\nSchedule a follow-up meeting early next week to discuss progress and potential next steps (11:29)\n\n**Adrien Loison**\nEnsure internal contract and data privacy reviews continue and that legal questions are addressed promptly (09:06)\nCoordinate Bla Bla Car’s testing and evaluation of the GrowthBook product during the coming two weeks (08:24)\n\n**Alexandre Laigné**\nConfirm feasibility internally to meet the budget and timing constraints, aim to provide feedback by October 20th if earlier review of proposals is needed (05:13)\n\n**Jean-Baptiste Favre**\nLiaise with Bla Bla Car’s legal team to expedite contract review and to communicate urgency on case study approval (07:00)\n",
       "organizer": "james.shannon@growthbook.io",
       "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M581MHY9A97R2TYMQ2JZE16R",
+      "source": "fireflies",
+      "title": "Bla Bla Car & GrowthBook Commercial Check In",
+      "date": "2026-10-20",
+      "duration_minutes": 21.950000762939453,
+      "summary": "# Bla Bla Car & GrowthBook Commercial Check In\nDate: 2026-10-20 | Duration: 21.950000762939453m\n\n## Summary\nTesting stopped after conversion rates declined, while full-flow integration and Adrien LOISON’s analysis remained incomplete. The contract process advanced through Jean Baptiste, but finance validation, legal review, and documentation requirements were still pending. James Shannon must update pricing to 70,000, replace the existing 60,000 or 65,000 for 100 references, and send the full contract for review, with signature targeted around the 28th. The event forwarder was rejected for long-term use because it was considered too expensive, while a Java SDK issue was fixed within 24 hours. Java SDK updates remain slower because the external support owner is on maternity leave for another two months. SLA coverage for support responsiveness must be confirmed. French consent requirements for front-end tracking remain under review, although exposure events can be configured to send only after consent and remote evaluation is available. A follow-up is planned for Friday and may move to Monday or be cancelled if no legal update is available.\n\n## Keywords\nSDK support, Contract negotiation, Enterprise SLAs, Event forwarder, A/B testing, EU consent\n\n## Action Items\n**James Shannon**\n- Send updated contract/order form (06:17)\n- Highlight SLA sections (12:28)\n- Confirm SDK maintenance ownership (12:28)\n- Obtain legal contract review (13:52)\n- Provide consent guidance (16:47)\n\n**Adrien LOISON**\n- Review contract with legal team (12:28)\n- Coordinate follow-up meeting (18:37)\n\n**Alexandre Laigné**\n- Keep follow-up meeting scheduled (19:45)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

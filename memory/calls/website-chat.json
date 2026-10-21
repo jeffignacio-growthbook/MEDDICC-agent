@@ -1,0 +1,18 @@
+{
+  "company": "website chat",
+  "slug": "website-chat",
+  "last_etl_date": "2026-10-21T05:31:34.611366",
+  "calls": [
+    {
+      "id": "01M5AJD253SQW2HYYY3PTTW8PC",
+      "source": "fireflies",
+      "title": "website chat",
+      "date": "2026-10-20",
+      "duration_minutes": 26.950000762939453,
+      "summary": "# website chat\nDate: 2026-10-20 | Duration: 26.950000762939453m\n\n## Summary\nThe performance audit found the website healthy before the rebrand, which includes new colors, a new name, a new logo, and possibly new pages. The choice between optimizing the current site and rebuilding it remains unresolved: current-site fixes are preferred, while a rebuild would add migration work involving blogs, podcasts, and manual CMS configuration. The CMS has a major gap because it lacks reusable landing pages, cards, and card shelves; improving event management would also help Lindsay. CMS ownership is undecided between Huck Finch’s expertise and Yousef’s existing experience, while previously built CMS pages may be recoverable but require retrofitting after Bright Scout removed the CMS. Several workstreams, including LaunchDarkly, Flagsmith, Firebase integrations, and an AI chatbot investigation, are not yet ready. Separate Notion boards have created coordination and ownership gaps. Next steps include a Huck Finch call this week, agency-process questions about duplication, versioning with Yousef, and performance commitments, Chris gathering project updates, and a three-person decision on performance scope, CMS ownership, and additional agency work.\n\n## Keywords\nWebflow performance, CMS migration, Huck Finch, Bright Scout, CMS landing pages, Website rebrand\n\n## Action Items\n**Jack Virag**\nResend performance documents (01:25)\nReview Yousef’s work pipeline (15:59)\nPrepare questions for Huck Finch (23:33)\nSchedule Huck Finch call (25:05)\n\n**Chris Newton**\nRequest project status updates (20:22)\nDiscuss Jack Ops automation (24:22)",
+      "organizer": "jack@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

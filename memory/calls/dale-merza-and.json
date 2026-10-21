@@ -1,0 +1,18 @@
+{
+  "company": "Dale Merza and",
+  "slug": "dale-merza-and",
+  "last_etl_date": "2026-10-21T05:31:34.613262",
+  "calls": [
+    {
+      "id": "01M4VWR7Z14WVW327XMX10VJ3X",
+      "source": "fireflies",
+      "title": "Dale Merza and Ashley Stirrup",
+      "date": "2026-10-20",
+      "duration_minutes": 19.200000762939453,
+      "summary": "# Dale Merza and Ashley Stirrup\nDate: 2026-10-20 | Duration: 19.200000762939453m\n\n## Summary\nThe discussion prioritized experimentation and feature flags as GrowthBook’s central positioning, with product teams identified as the main buyers. GrowthBook supports A/B testing alongside feature flagging, preserves experiment history and outcomes, and enables testing of AI-powered features after development. The product estimates that only 10–20% of shipped features deliver ROI, making ROI analysis and value assessment strong potential engagement themes. The preferred analyst should understand product strategy, product managers, and consumer digital-facing companies rather than focusing only on technical feature-flag coverage. Jim Mercer was considered relevant for software development and feature flags, while George was viewed as potentially better aligned with product strategy. Dale demonstrated IDC Quanta, which can connect prospects with analysts within 48 hours, and will send the media kit and request a briefing targeted for next month. Ashley will draft positioning language and identify relevant engagement options.\n\n## Keywords\nExperimentation, A/B testing, Feature flagging, ROI analysis, IDC analyst briefing, Product strategy\n\n## Action Items\n**Dale Merza**\n- Send IDC media kit (06:03)\n- Confirm IDC analysts (16:35)\n- Arrange analyst briefing (18:08)\n\n**Ashley Stirrup**\n- Write company description (15:30)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Ash Hoffman and",
+  "slug": "ash-hoffman-and",
+  "last_etl_date": "2026-10-21T05:31:34.615768",
+  "calls": [
+    {
+      "id": "01M58782TYYG6EDB2QX732CB87",
+      "source": "fireflies",
+      "title": "Ash Hoffman and Ashley Stirrup",
+      "date": "2026-10-20",
+      "duration_minutes": 11.710000038146973,
+      "summary": "# Ash Hoffman and Ashley Stirrup\nDate: 2026-10-20 | Duration: 11.710000038146973m\n\n## Summary\nNo summary available",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

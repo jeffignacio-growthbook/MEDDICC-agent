@@ -1,0 +1,18 @@
+{
+  "company": "Friday",
+  "slug": "friday",
+  "last_etl_date": "2026-10-21T05:31:34.613059",
+  "calls": [
+    {
+      "id": "01M509E060V0SHK6BQ3MPXPFXE",
+      "source": "fireflies",
+      "title": "Jake <> Brent weekly 1:1 (Friday)",
+      "date": "2026-10-20",
+      "duration_minutes": 38.900001525878906,
+      "summary": "# Jake <> Brent weekly 1:1 (Friday)\nDate: 2026-10-20 | Duration: 38.900001525878906m\n\n## Summary\nThe discussion reviewed pipeline data quality, performance, ICP priorities, and follow-up actions. Attribution was mostly accurate, but one Salesforce opportunity was wrongly assigned to Jake, Funding Pips required correction as a Dubai-based education company with 1,409 employees, and incomplete records affected opportunity and website-traffic analysis. Performance showed one win and 23 losses among 24 opportunities with outcomes, while low-fit SMB and mid-market opportunities remained a conversion problem. The recommended ICP was B2B technology or software companies with 1,000–10,000 employees, supported by website traffic, Rio signals, Pro usage, and relevant OSS activity. Accounts under 100 employees would require stronger signals, with Pro prioritized over OSS. Brent would clean the data and share findings with Ryan, while Jake would analyze high-Rio, Pro, and OSS accounts. February 1 marked Jake’s one-year point, with approximately $500,000 sourced viewed as a strong first-year outcome. Dripify sequences were deferred to the next meeting.\n\n## Keywords\nICP segmentation, Rio intent signals, Website traffic, Pipeline attribution, Sales conversion, Dripify sequences\n\n## Action Items\n**Brent Holloway**\nCorrect Salesforce attribution (05:00)\nAdd post-October opportunities (05:42)\nClean pipeline reporting data (35:34)\nSend preliminary findings to Ryan (37:05)\nReview Dripify sequences (37:17)\n\n**Jake Stangl**\nVerify sub-100 employee accounts (29:20)\nCheck Pro and OSS usage (36:11)\nCombine HubSpot and Rio data (36:53)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "GoTyme & GrowthBook",
   "slug": "gotyme-growthbook",
-  "last_etl_date": "2026-10-14T05:36:35.777069",
+  "last_etl_date": "2026-10-21T05:31:34.620870",
   "calls": [
     {
       "id": "01M4DW0RP86XJ2ERJPDB0P5ZZJ",
@@ -12,6 +12,17 @@
       "summary": "# GoTyme & GrowthBook | First Meeting\nDate: 2026-10-13 | Duration: 66.58000183105469m\n\n## Summary\nGoTyme is a Singapore-headquartered digital bank serving the Philippines and South Africa, with a technology hub in Vietnam. Its experimentation journey began approximately one year ago with a manual MVP process, using LaunchDarkly, Databricks, Segment, and Mixpanel. The team is evaluating a warehouse-centric solution and is interested in GrowthBook integration and a commercial model decoupled from traffic. GoTyme uses Spring Boot and Python for backend services, iOS and Android with Kotlin for mobile, and microservices with an event-driven architecture. Segment already sends experiment data to the warehouse. Required ingestion fields are experiment ID, variant ID, timestamp, and user ID, with additional attributes supported and BI metrics connected through warehouse queries. Databricks currently supports ephemeral mode only, while incremental mode is being investigated. Cloud stores exposure events and aggregates, whereas self-hosting reads from GoTyme’s warehouse. Pricing includes a platform fee, support, onboarding, security, and experimentation features, with seat-based or experiment-based models and no traffic or experiment-volume charges. Next steps include Slack-based technical discussions, a pricing review, and a 30-day enterprise trial involving one or two experiments.\n\n## Keywords\nexperimentation platform, data warehouse integration, self-hosted vs cloud, pricing model, technical integration, proof of concept (POC)\n\n## Action Items\n**Tai Nguyen**  \nCoordinate questions on multi-region deployment (42:26)  \n\n**Marcel Geldner**  \nShare technical schematics with GoTyme (45:41)  \nResend pricing details and slide decks (48:06)  \nSchedule commercial discussion meeting (01:03:43)  \n\n**Rémy Marin**  \nLead technical follow-up on Slack (45:41)  \nSummarize and respond to technical questions (45:41)  \nCoordinate GrowthBook trial POC setup (01:01:30)  \n\n**Paul**  \nCreate Slack channel for technical questions (45:41)  \nProvide GrowthBook team use case info (01:01:30)  \nEngage GoTyme teams in POC testing (01:01:30)  \n\n**Tung Nguyen**  \nCoordinate technical follow-up questions (45:41)",
       "organizer": "marcel@growthbook.io",
       "participants": 6,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4TSGA7HASS0HPERVNJ4CZWP",
+      "source": "fireflies",
+      "title": "GoTyme & GrowthBook | Commercial Discussion",
+      "date": "2026-10-20",
+      "duration_minutes": 33.959999084472656,
+      "summary": "# GoTyme & GrowthBook | Commercial Discussion\nDate: 2026-10-20 | Duration: 33.959999084472656m\n\n## Summary\nThe commercial model keeps the base platform license unchanged, with all features, security, and access included. Usage-based pricing remains flexible through user seats or experiments, without traffic-based charges, and one license covers markets, brands, and regions. Current demand is 20–30 seats and approximately 15 experiments next quarter, compared with a long-term estimate of 300 seats. Enterprise support includes a 99.95% SLA, a shared direct Slack channel, and access to engineering and product teams. The preferred evaluation path is Option A, a four-week POC beginning after setup and data flow, with support, training, opt-out rights, and the ability to move to an annual agreement. A two-week trial is also available with lighter support. Annual renewable contracts, longer terms, confidential terms, and prorated mid-term expansion are available. Marcel will share the best one-year offer, Paul will compare options internally, and Remy will take over the POC discussion. Sources: Commercial Model (05:52–14:22), Platform Requirements (07:27–11:41), Evaluation Options (18:01–28:15), Contracting Next Steps (26:49–31:02).\n\n## Keywords\nGrowthBook, Proof of concept, Experiment-based pricing, User-seat pricing, Feature flagging, Procurement\n\n## Action Items\n**Marcel Geldner**\nShare refined commercial offer (29:48)\nShare legal and commercial documents (31:02)\nCoordinate POC handoff (31:59)\n\n**Paul**\nDiscuss POC options (29:48)\nReview procurement timeline (31:02)\nConfirm POC option (31:59)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 5,
       "summary_quality": "good"
     }
   ]

@@ -1,0 +1,18 @@
+{
+  "company": "Ravid and Jake",
+  "slug": "ravid-and-jake",
+  "last_etl_date": "2026-10-21T05:31:34.619808",
+  "calls": [
+    {
+      "id": "01M5BV0Q9801TKVFZWDHZ3CEF4",
+      "source": "fireflies",
+      "title": "Ravid and Jake Heier",
+      "date": "2026-10-20",
+      "duration_minutes": 45,
+      "summary": "# Ravid and Jake Heier\nDate: 2026-10-20 | Duration: 45m\n\n## Summary\nThe GrowthBook POC has verified live restart-deployment updates, cached model SaaS behavior with edge-case testing still pending, and multi-tenant targeting. Anton Bogdanov is completing SSO, approval-workflow, and role-based access testing, while A/B testing remains uncovered. A two-arm experiment is active with a fixed arm, but results are not yet feeding back into GrowthBook, preventing analytics visibility and arm-reweighting assessment. BigQuery integration requires review because service-account JSON keys do not automatically rotate; read-only, dataset- or project-level access and a temporary POC exception are being considered. Cross-project features, custom roles, and configurable approval workflows are supported, although approvals may initially remain disabled. Anton prefers Boolean-only feature toggles, with Rémy Marin confirming whether string restrictions are enforceable. Enrollment is approximately 60% of production, data arrives with about a 24-hour delay, and an initial signal may be available by Thursday. Follow-up will be coordinated in Slack.\n\n## Keywords\nBigQuery security, Multi-arm bandit testing, Feature flags, RBAC, Approval workflows, MCP integrations\n\n## Action Items\n**Anton Bogdanov**\nTest deployment edge cases (01:00)\nComplete SSO implementation (01:00)\nFinish approval workflows (01:00)\nConsult security team (07:46)\nTest custom RBAC roles (12:57)\nTest project permissions (12:57)\nPost Boolean restriction question (31:05)\n\n**Uzi Smadja and Ravid Cohen**\nConnect analytics feedback loop (02:55)\nReassess experiment signals (33:50)\nDecide checkpoint timing (33:50)\n\n**Rémy Marin**\nInvestigate BigQuery access (06:30)\nCheck key rotation options (06:30)\nSend RBAC documentation (13:02)\nSend MCP documentation (22:08)\nSend API documentation (22:08)\nConfirm Boolean restrictions (30:55)\n\n**Jake Heier**\nSend meeting recap (34:20)\nCentralise POC documentation (34:20)",
+      "organizer": "jake@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

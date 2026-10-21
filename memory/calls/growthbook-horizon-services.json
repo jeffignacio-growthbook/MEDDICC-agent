@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Horizon Services",
+  "slug": "growthbook-horizon-services",
+  "last_etl_date": "2026-10-21T05:31:34.618745",
+  "calls": [
+    {
+      "id": "01M4XS1NA2GWS8026YEVCDPC9W",
+      "source": "fireflies",
+      "title": "Growthbook <> Horizon Services - Technical Demo",
+      "date": "2026-10-20",
+      "duration_minutes": 57.119998931884766,
+      "summary": "# Growthbook <> Horizon Services - Technical Demo\nDate: 2026-10-20 | Duration: 57.119998931884766m\n\n## Summary\nThe discussion evaluated GrowthBook as a potential alternative to VWO, which supports 18 brands but currently covers only a few due to traffic levels, while insights remain distributed across tools and tests require duplicated Contentful pages. VWO’s contract ends in December, creating a renewal decision point. GrowthBook could query Snowflake directly, but it should consume Jasmine Krishnan’s governed unified data layer to reduce metric-definition drift. The main data gap is that VWO’s GTM and GA4 setup reports clicks and online scheduling but not trustworthy revenue impact, which is being rebuilt in Power BI. GrowthBook offers experiment analysis, Bayesian likelihood, ship or no-ship recommendations, AI summaries, dashboards, historical comparisons, and integrations involving Claude and Figma. Summer plans to begin with a free account and may run a capped two-week trial in November using an A/A test or completed VWO test. Free supports up to three users, while enterprise pricing was discussed at approximately mid-$30K annually, subject to the final plan.\n\n## Keywords\nGrowthBook, Snowflake, Contentful, Experimentation, Claude, Semantic layer\n\n## Action Items\n**Logan Bates**\n- Share Contentful documentation (11:17)\n\n**Alex Locklair**\n- Discuss GrowthBook internally (30:11)\n\n**Dan Wathne**\n- Open GrowthBook demo environment (48:51)\n- Send meeting resources (55:28)\n\n**Summer**\n- Create GrowthBook account (54:51)",
+      "organizer": "dan@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

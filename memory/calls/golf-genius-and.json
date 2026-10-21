@@ -1,0 +1,18 @@
+{
+  "company": "Golf Genius and",
+  "slug": "golf-genius-and",
+  "last_etl_date": "2026-10-21T05:31:34.611991",
+  "calls": [
+    {
+      "id": "01M509E05C42W650S66940RH35",
+      "source": "fireflies",
+      "title": "Golf Genius and GrowthBook",
+      "date": "2026-10-20",
+      "duration_minutes": 39.970001220703125,
+      "summary": "# Golf Genius and GrowthBook\nDate: 2026-10-20 | Duration: 39.970001220703125m\n\n## Summary\nGrowth and retention testing was prioritized for Golf Genius’s three consumer apps, including Coach Now, with website conversion and onboarding identified as key areas. The team planned experiments covering copy, imagery, motivators, layouts, plan selectors, and elements above Stripe payment fields, running approximately every two weeks for a year or longer. Jacob Crisp and Jarom Longhurst planned to start with the Pro plan while engineers investigated SDK integration, with the first paywall test targeted for early the following week. Jarom confirmed that staging and data setup were underway, and the initial integration would focus on the paywall page. GrowthBook’s visual editor supports text, images, CSS, JavaScript, Figma imports, AI-generated variants, and targeted changes, while URL redirects can support materially different page designs. Measurement can use GA4, guardrail metrics, funnels, browser segments, dashboards, and holdout groups. Winning variants can become the new baseline, after which obsolete experiment code should be removed. Pro activation requires a credit card, includes a stated 30-user limit, and provides access to additional features.\n\n## Keywords\nGrowthBook, A/B testing, Stripe paywall, Visual editor, SDK integration, Conversion funnel\n\n## Action Items\n**Dan Wathne**\n- Send flicker-reduction guidance (24:44)\n- Review sign-up experiment structure (28:00)\n\n**Jarom Longhurst**\n- Review SDK implementation guidance (24:44)\n- Upgrade GrowthBook account (35:43)\n- Build conversion funnel experiments (37:00)\n\n**Jacob Crisp**\n- Define paywall experiments (05:16)\n- Coordinate engineering cleanup (32:59)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

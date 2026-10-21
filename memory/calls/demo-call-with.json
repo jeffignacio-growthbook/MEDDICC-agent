@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-10-17T05:11:12.178887",
+  "last_etl_date": "2026-10-21T05:31:34.616862",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -972,6 +972,39 @@
       "summary": "# Demo Call with Rahul singh from\nDate: 2026-10-16 | Duration: 36.970001220703125m\n\n## Summary\nThe discussion focused on improving supplier conversion by helping suppliers complete onboarding and a 50-question sustainability assessment with documentation, which accelerates ratings and supports revenue growth. Key barriers include a static questionnaire, lengthy completion times, ignored or distrusted email invitations, and unclear responsibility for ESG responses. Proposed solutions include dynamic questionnaires, AI-assisted answers from uploaded documents, personalized dashboards, targeted invitations, granular funnel measurement, and experiments across web and email. GrowthBook supports feature flags, phased rollouts, multi-variant and bandit testing, and server- and client-side experimentation. Its React-compatible SDK can send exposure and metric data to Azure and Databricks for SQL-based analysis. Segmentation may be synchronized across High Touch, Salesforce Marketing Cloud, and GrowthBook, with an MCP server proposed to inject attributes programmatically. The platform’s open-source core, enterprise capabilities, and reported use by more than 3,500 companies were presented as differentiators. Next steps include a deeper use-case-focused demo, trial setup, and technical support led by Remy with coordination through Rahul and participation from Emilio as needed.\n\n## Keywords\nExperimentation, Feature Flags, Supplier Conversion, Questionnaire Personalization, Data Integration, AI Workflows\n\n## Action Items\n\n**Rahul Singh**\nCoordinate scheduling of next in-depth GrowthBook demo call and follow-up with James Shannon and Emilio De la Fuente (35:42)\n\n**James Shannon**\nPrepare a demo focused on Ecovadis’s use cases including funnel metrics for questionnaire steps, feature flags, and integration with Databricks and external segmentation tools (13:26)\nProvide case studies and data insights on realistic conversion improvements and ROI linked to experimentation on supplier conversion flows (19:39)\nExplain and assist with ingestion of experiment exposure events into Ecovadis’s Azure/Databricks pipeline for analysis (33:50)\n\n**Remy**\nLead solutions engineering engagement to support trial setup, Slack channel creation, and technical assistance during evaluation phase (05:44)\n\n**James Shannon and Ecovadis engineering/data teams**\nPlan technical integration involving GrowthBook SDK initialization on front-end and server-side, attribute injection from segmentation tools (High Touch, Salesforce Marketing Cloud) into GrowthBook via MCP server for experimentation targeting (27:55)\n",
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5D29F25571BQ3C32NXCNR2B",
+      "source": "fireflies",
+      "title": "Demo Call with Matthew Jordan from",
+      "date": "2026-10-20",
+      "duration_minutes": 43,
+      "summary": "# Demo Call with Matthew Jordan from\nDate: 2026-10-20 | Duration: 43m\n\n## Summary\nThe discussion established that the organisation’s AI use is mature, but standardised workflows and shared operating practices are missing. GrowthBook was identified as an experimentation platform rather than an agent-builder, shifting the focus toward website, landing-page, and destination-page testing. Priority opportunities include newsletter traffic, event registration pages, paid landing pages, and the 365 brand-awareness campaign, with targeting based on campaign, UTM, state, membership, subscription, and warehouse data. Advocacy campaigns could also benefit from state-specific message testing. The warehouse-native architecture aligns with 5tran and Microsoft Fabric, while Kentico, Webflow, mobile UX, checkout changes, and web-team readiness require review. Matt is comparing three or four tools, with CTO Paul expected to guide the technical decision. GrowthBook’s Pro tier costs $40 per month, while enterprise pricing is custom and typically approximately $50,000 annually. Scott will provide follow-up materials and help arrange a deeper technical review.\n\n## Keywords\nGrowthBook, Feature flags, Experimentation, Microsoft Fabric, Paid-media landing pages, CMS integration\n\n## Action Items\n**Scott Keller**\nSend GrowthBook slide deck (18:05)\nValidate GrowthBook integration (25:32)\nSend GrowthBook overview video (33:48)\nSend meeting recap email (36:28)\nArrange technical demonstration (40:36)\n\n**Matthew Jordan**\nReview GrowthBook materials (33:48)\nGather evaluation findings (40:36)\nShare recommendations with CTO (40:36)\nCoordinate follow-up meeting (40:36)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M59PVQKF72KHQAF0MN3DN2GM",
+      "source": "fireflies",
+      "title": "Demo Call with shelly zur from",
+      "date": "2026-10-20",
+      "duration_minutes": 46.619998931884766,
+      "summary": "# Demo Call with shelly zur from\nDate: 2026-10-20 | Duration: 46.619998931884766m\n\n## Summary\nCodere is evaluating GrowthBook to replace Optimizely, which is considered overly complicated, for experiments across registration, cashier, and other user flows. The goal is to improve click-to-registration and registration-to-FTD performance through data-backed decisions. Editors should be able to configure and launch tests without recurring developer support, while developers manage technical setup. Required roles include an administrator, developers, editors, and viewers. GA4 is the planned data connection, with transparent and auditable results and no expected monthly visitor or experiment-user charges. GrowthBook supports persistent variant assignment, visual editing through a Chrome extension, mobile web changes, Figma imports, AI assistance, targeting by country or plan, configurable metrics and guardrails, and Bayesian or Frequentist analysis. Codere operates five sites and discussed enterprise pricing of a $50,000 base license plus $1,000 per seat. A 30-day proof of concept was proposed. Optimizely ends in January, and Codere aims to have replacement tooling by the end of December, subject to commercial and technical review.\n\n## Keywords\nGrowthBook, A/B testing, Optimizely replacement, Visual editor, GA4 integration, Feature flags\n\n## Action Items\n**Yael Zimermman**\nReview GrowthBook materials (45:06)\n\n**James Shannon**\nSend presentation materials (45:18)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M4TSGA6NM7TRXYTM9S3TTJ8A",
+      "source": "fireflies",
+      "title": "Demo Call with Emma Olliff from",
+      "date": "2026-10-20",
+      "duration_minutes": 33.310001373291016,
+      "summary": "# Demo Call with Emma Olliff from\nDate: 2026-10-20 | Duration: 33.310001373291016m\n\n## Summary\nThe discussion covered an ongoing Shopify Headless migration from Knob Commerce, with experimentation planned after launch because the current platform makes testing difficult. GrowthBook capabilities discussed included feature flags, targeting and rollout rules, no-code visual editing, automated releases, guardrails, funnels, user-journey analysis, variation and bandit analysis, and learning dashboards. The company wants to establish a hypothesize-test-learn approach and stronger testing culture. Data foundations require rebuilding because GA4 was recently added and has accuracy and setup concerns. The customer-owned warehouse remains the preferred source of truth, while GrowthBook uses aggregated data and returns analysis to the customer. SDK integration is required for attributes, user IDs, and data-source connections. Enterprise may be needed because of health-business data sensitivity, production data volume, security, and governance requirements. Enterprise pricing is $1,000 per user annually, with two or three users expected; Pro pricing is $40 per user monthly. Quarterly or semiannual payment may be available. Marcel Geldner will send pricing materials, and Emma Olliff will prepare budget numbers.\n\n## Keywords\nGrowthBook, A/B testing, Shopify Headless, Feature flags, Experimentation analytics, Enterprise pricing\n\n## Action Items\n**Marcel Geldner**\nShare GrowthBook slide deck (12:08)\nShare platform documentation (31:03)\nShare cost estimate (31:03)\n\n**Emma Olliff**\nReview GrowthBook materials (31:50)\nPrepare budget figures (31:50)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

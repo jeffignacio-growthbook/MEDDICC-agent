@@ -1,0 +1,18 @@
+{
+  "company": "Khan Academy + Growthbook",
+  "slug": "khan-academy-growthbook",
+  "last_etl_date": "2026-10-21T05:31:34.613166",
+  "calls": [
+    {
+      "id": "01M4XF6K96XN329T231MWRA081",
+      "source": "fireflies",
+      "title": "Khan Academy + Growthbook: 5.1 Overview",
+      "date": "2026-10-20",
+      "duration_minutes": 46.529998779296875,
+      "summary": "# Khan Academy + Growthbook: 5.1 Overview\nDate: 2026-10-20 | Duration: 46.529998779296875m\n\n## Summary\nThe discussion covered experiment operations, metrics, platform capabilities, renewal planning, and partnerships. Thread-level allocation and advanced re-randomization are supported, while phase restarts create friction and clustered analysis remains complex. Mean metrics count unexposed users as zero, with ratio workarounds available; funnel metrics provide an alternative, although continuous secondary steps are unsupported. Metric SQL editing is limited, and Git-based metric review remains a requested GrowthBook roadmap item. Platform updates include production contextual bandits, user journeys for funnel analysis, AI learnings, and MCP actions. The renewal is due in nine days, with a Friday hold scheduled for 10:00 AM Pacific and Jason added to the invite. GrowthBook also offered practitioner connections with champions from six or seven edtech companies. Sources: 08:26, 10:40, 17:04–19:25, 24:44–26:35, 31:37, 35:15, 37:41, 40:53–44:20.\n\n## Keywords\nExperimentation, AI tutoring, metric governance, thread-level randomisation, MCP server, renewal\n\n## Action Items\n**Ashley Stirrup**\nIntroduce Tushar Udeshi to Slack (15:14)\n\n**Tushar Udeshi**\nProvide SQL customization examples (21:16)\nTest advanced experiment controls (35:47)\n\n**Luke Sonnet**\nDiscuss experiment clustering via Slack (31:37)\n\n**Kelli Hill**\nConfirm renewal ownership with Jason (41:45)\nAdd Jason Chancey to meeting invite (42:50)\nOffer edtech company introductions (44:46)\n\n**Andy Marshall**\nSchedule renewal follow-up meeting (24:29)\nExplain renewal pricing details (42:57)",
+      "organizer": "marsh@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}
