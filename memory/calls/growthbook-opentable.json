@@ -1,7 +1,7 @@
 {
-  "company": "Growthbook <> OpenTable",
+  "company": "Growthbook <> Opentable",
   "slug": "growthbook-opentable",
-  "last_etl_date": "2026-10-16T05:17:01.218476",
+  "last_etl_date": "2026-10-22T05:35:51.025010",
   "calls": [
     {
       "id": "69de6935c1f9eb0011fa27dc",
@@ -170,6 +170,17 @@
       "summary": "# Growthbook <> OpenTable - Weekly POC Sync\nDate: 2026-10-15 | Duration: 19.18000030517578m\n\n## Summary\nThe teams reported steady progress on front-end and back-end A/B testing. Initial AA tests were completed, front-end tests were underway, and the back-end model was expected to be ready within a few days for testing early the following week. The plan was to run two to five A/B tests, with search-ranking model variants as a primary back-end focus. Early evaluation results were positive, but scaling access controls, feature flags, and metric integration remained important next steps. Participants discussed frequentist t-tests, Bayesian analysis, sequential testing correction, statistical power, false-positive reduction, and the challenge of interpreting results affected by weekend traffic and other seasonal variation. Interleaving was introduced as a possible method for comparing ranking algorithms, subject to attribution considerations. Pricing drafts were to be delivered the same day for budget submissions, followed by offline review and procurement engagement. Post-sales enablement would support onboarding and operational scaling after evaluation approval, while meeting-time flexibility was planned for UK stakeholders.\n\n## Keywords\nAB testing, experiment evaluation, pricing review, post-sales enablement, test interpretation, interleaving experiments\n\n## Action Items\n\n**Dan Wathne**\nDraft and send updated pricing options and a mock order form for OpenTable’s procurement review urgently to support tech budget submission (16:43)\nHold final pricing presentation if needed after OpenTable’s offline review of pricing options (06:59)\nConnect OpenTable team to Growthbook’s post-sales technical enablement team once OpenTable is closer to decision or approval (05:48)\nShare documentation and specification on the Interleaving product with OpenTable for internal evaluation (14:04)\nConsider scheduling a separate early meeting cadence to accommodate the UK team’s time zones (16:43)\n\n**Rahul Bhatia**\nFollow up with Growthbook on technical questions about environment segmentation and frequentist test setups (12:35)\nReview pricing materials once received and coordinate internally before next discussion with Growthbook (07:53)\n\n**SFO5-12-002 Trattoria**\nContinue progress on backend test setup and start AB testing next week as planned (01:04)\nReview and consider Interleaving documentation once shared by Growthbook (14:04)\n",
       "organizer": "dan@growthbook.io",
       "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5AQ04ARW1PCKVPNQ56FQ6WP",
+      "source": "fireflies",
+      "title": "Growthbook <> Opentable - EMEA Sync",
+      "date": "2026-10-21",
+      "duration_minutes": 22.8799991607666,
+      "summary": "# Growthbook <> Opentable - EMEA Sync\nDate: 2026-10-21 | Duration: 22.8799991607666m\n\n## Summary\nThe homepage A/B test is live and receiving traffic, but feature changes, traffic, and booking volume remain limited, so results need more time to converge. Federico Maffei plans an aggressive traffic ramp, while Sarah and the search team are expected to run small map-related tests. Custom goals cover actions such as clicks and completed reservations, with relevant data already available in the warehouse; Saranya and Rahul have added some goals, while remaining goals need confirmation with the data team. Secondary and guardrail metrics are preferred, and a separate event-forwarding pipeline is considered unnecessary. Federico’s team is expected to shift testing responsibility to US teams next year, with two or three weeks remaining for broader engineering validation. Contract completion is targeted for 23 November; legal and security are substantially complete, the order form needs final review, and Forrest is coordinating budget and paperwork. Post-sales support would focus on onboarding and adoption.\n\n## Keywords\nA/B testing, GrowthBook, Custom metrics, Search-map experiments, Warehouse analytics, Contracting\n\n## Action Items\n**Federico Maffei**\nAttend cash-up meeting (08:34)\nIncrease homepage experiment traffic (13:40)\nPlan search map A/B tests (13:40)\nRequest Rahul stakeholder update (18:40)\n\n**Dan Wathne**\nFinalize order form (17:38)",
+      "organizer": "dan@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

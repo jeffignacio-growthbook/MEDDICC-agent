@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook Slack app setup & feedback",
   "slug": "growthbook-slack-app-setup-feedback",
-  "last_etl_date": "2026-10-17T05:11:12.182999",
+  "last_etl_date": "2026-10-22T05:35:51.019852",
   "calls": [
     {
       "id": "01M5076HJKRBC2T7CQZ7HF6W2P",
@@ -10,6 +10,17 @@
       "date": "2026-10-16",
       "duration_minutes": 38,
       "summary": "# GrowthBook Slack app setup & feedback: GiftHealth\nDate: 2026-10-16 | Duration: 38m\n\n## Summary\nThe discussion covered the pending approval of the official Slack app, with setup expected to remain unchanged after approval and Elizabeth responsible for requesting review through the Slack admin. Slack notifications can be scoped by project, environment, tag, individual, or channel and can cover experiment starts, launches, decision-ready status, results, errors, and warnings; Elizabeth plans to begin with fewer alerts to reduce noise. The read-only GrowthBook Agent can summarize experiments and answer questions about hypotheses, setup, results, and historical activity, but cannot execute actions or access MCP functionality. Adoption expanded from one experiment at a time to multiple concurrent efforts: two unique experiments ran over summer, one with three reruns, and four experiments are in progress. Public planning and experiment channels are preferred for shared learning, while owner mentions were requested to route errors and required actions to the right stakeholders. Governance priorities include documenting learnings, deleting a debugging-only experiment, and creating practical guidance for projects, tags, archiving, descriptions, and self-documenting setup.\n\n## Keywords\nSlack integration, Experiment notifications, AI assistant, Experiment ownership, Learnings library, Experiment documentation\n\n## Action Items\n**Elizabeth Gilbert**\nRequest Slack app review (12:33)\nDelete test experiment (24:28)\n\n**Elyse Fox**\nBring owner-tagging feedback (15:06)\nCheck GiftHealth adoption (16:44)\nClarify experiment deletion guidance (25:07)",
+      "organizer": "elyse@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5D6SSN2AVB7YSWF7KCWZAZG",
+      "source": "fireflies",
+      "title": "GrowthBook Slack app setup & feedback: Upstart",
+      "date": "2026-10-21",
+      "duration_minutes": 21.549999237060547,
+      "summary": "# GrowthBook Slack app setup & feedback: Upstart\nDate: 2026-10-21 | Duration: 21.549999237060547m\n\n## Summary\nGrowthBook launched a native Slack app supporting experiment starts, health alerts, results, decisions, and stops across public and private channels; private channels require inviting the GrowthBook agent. The GrowthBook Assistant can summarize experiments, analyze data, and link users back to GrowthBook, but cannot configure flags. A weekly digest is planned, with notifications scoped by project, environment, and tag. Paige Ruppel requested custom triggers, including an alert when an experiment reaches 80% of its planned sample size, while Elyse Fox agreed to take custom-trigger and owner-tagging requests to the product team. Upstart may begin setup next week, with follow-up in two to three weeks. The new integration may also improve Slack channel standardization. Separately, digital bank feature flagging was enabled through GrowthBook proxy deployments; its MVP will use one GrowthBook instance and organization, with separate data sources anticipated when experimentation begins. Cary Rakin offered infrastructure, permissions, security, and compliance support.\n\n## Keywords\nSlack integration, Experiment notifications, GrowthBook In-App Assistant, Notification thresholds, Experimentation culture, Data segregation\n\n## Action Items\n**Elyse Fox**\nShare Slack feedback (07:54)\nFollow up with Paige Ruppel (16:32)\n\n**Paige Ruppel**\nBegin Slack notification work (16:15)",
       "organizer": "elyse@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

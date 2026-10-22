@@ -1,0 +1,18 @@
+{
+  "company": "Making Science &",
+  "slug": "making-science",
+  "last_etl_date": "2026-10-22T05:35:51.026156",
+  "calls": [
+    {
+      "id": "01M57EW0R1HZP4EM0MYJ2BQ98R",
+      "source": "fireflies",
+      "title": "Making Science & GrowthBook | Introduction Call",
+      "date": "2026-10-21",
+      "duration_minutes": 26.520000457763672,
+      "summary": "# Making Science & GrowthBook | Introduction Call\nDate: 2026-10-21 | Duration: 26.520000457763672m\n\n## Summary\nThe discussion covered analytics testing success, including conductor analytics testing and onboarding implementation causes, as well as experiment configuration options involving users, limited experiments, and unlimited users. Analytics experimentation was reviewed, and experimental implementation was discussed in the context of onboarding. Participants questioned implementation choices versus avoidance and revisited experimental work. Infrastructure topics included cloud hosting, warehouse-native capabilities, and automatic processing involving artificial intelligence and programmer experiments. Product growth topics included UX growth, regional markets such as Brazil and Argentina, and experimental validation.\n\n## Keywords\nAnalytics, Experimentation, Onboarding, Cloud hosting, Warehouse-native, UX growth",
+      "organizer": "marcel@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

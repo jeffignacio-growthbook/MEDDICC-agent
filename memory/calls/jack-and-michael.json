@@ -1,0 +1,18 @@
+{
+  "company": "jack and michael",
+  "slug": "jack-and-michael",
+  "last_etl_date": "2026-10-22T05:35:51.024629",
+  "calls": [
+    {
+      "id": "01M5B3M8W3MP8C2CC7XF1K7583",
+      "source": "fireflies",
+      "title": "jack and michael",
+      "date": "2026-10-21",
+      "duration_minutes": 16.860000610351562,
+      "summary": "# jack and michael\nDate: 2026-10-21 | Duration: 16.860000610351562m\n\n## Summary\nThe discussion reviewed HubSpot attribution and analytics. Only 33 of 416 contacts included UTM data, although signup dates were present; the requested signup fields were referral source, landing page, and UTM campaign information. Attribution is complicated because users can belong to multiple organizations, while organizations map to companies. Organization creation was favored as the primary value signal, with the originating signup channel potentially cascading to other users in the organization. Invited-user attribution remains unclear because email links lack tracking parameters. Michael will create a test link to validate signup-field capture, while Jack will test the process over the next hours through ongoing Slack coordination. Ashley’s update and the explicit report are temporarily delayed until findings are confirmed. Broader GrowthBook website analytics, a custom dashboard, and matching product-web data through dashboard access and auth-flow tracking are also planned. Sources: 05:48, 07:12, 08:33, 09:21, 11:10, 12:26, 12:43, 12:57, 14:13, 15:00.\n\n## Keywords\nHubSpot attribution, GrowthBook organisations, UTM campaign data, Signup tracking, Authentication flow, GrowthBook analytics\n\n## Action Items\n**Jack Virag**\nInvestigate HubSpot attribution fields (07:09)\nContinue GrowthBook analytics (12:57)\nUpdate Ashley on progress (15:00)\n\n**Michael Knowlton**\nTest signup attribution flow (14:13)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

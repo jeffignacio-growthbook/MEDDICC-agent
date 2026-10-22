@@ -1,0 +1,18 @@
+{
+  "company": "Multitude IT Labs & GrowthBook | Recap, Pro vs. Enterprise and next steps",
+  "slug": "multitude-it-labs-growthbook-recap-pro-vs-enterprise-and-next-steps",
+  "last_etl_date": "2026-10-22T05:35:51.025638",
+  "calls": [
+    {
+      "id": "01M5E00D9J88MYMW67EHRAMZXZ",
+      "source": "fireflies",
+      "title": "Multitude IT Labs & GrowthBook | Recap, Pro vs. Enterprise and next steps - Meeting",
+      "date": "2026-10-21",
+      "duration_minutes": 22.290000915527344,
+      "summary": "# Multitude IT Labs & GrowthBook | Recap, Pro vs. Enterprise and next steps - Meeting\nDate: 2026-10-21 | Duration: 22.290000915527344m\n\n## Summary\nLegal and DPA reviews are underway, with a standard five-to-seven-day review SLA. The target signature date is October 28, although it could move to October 30, and internal approval remains required. The 15% discount and Net-45 payment terms depend on an October 28 commitment; Net-60 is available but is the maximum, with no further extension. Existing concessions include reduced ten-seat pricing, semiannual invoicing, and five-thousand-dollar seat pricing. The renewal term runs from October 28 through 2027 and uses an anniversary-based renewal date, but written commitment is still required. Legal may request DORA review, while the Trust Center link and available DORA coverage require verification. The contract package includes the DPA, customer agreement, and order form. The self-hosted purchase covers software, so service SLAs do not apply. The current need is ten seats, with additional seats available in five-seat packs, paid separately through invoicing, and no hard ceiling for enterprise expansion. GrowthBook provides dedicated response coverage, same-day turnaround, and possible responses within a few hours.\n\n## Keywords\nEnterprise Software Licensing, Contract Negotiation, Pricing Discount Deadline, Payment Terms (Net 45/60), Self-Hosted Feature Flagging Platform, Compliance Review (DPA, DORA)\n\n## Action Items\n**Olatunji Odubote**\nCoordinate contract review (04:58)\nPush signing deadline (14:00)\nSend commercial terms email (14:00)\nFollow up with legal (20:09)\n\n**Martin Šustek**\nProvide SLA requirements (09:11)\nCoordinate signatory authority (18:28)\n\n**James**\nProvide feedback turnaround (12:37)\nConfirm Net 60 terms (16:42)\n\n**Marcel Geldner**\nProvide feedback turnaround (12:37)\nCheck DORA documentation (18:04)\nAdd trust center link (19:26)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

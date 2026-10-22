@@ -1,7 +1,7 @@
 {
   "company": "Weekly GrowthBook and",
   "slug": "weekly-growthbook-and",
-  "last_etl_date": "2026-10-14T05:36:35.773621",
+  "last_etl_date": "2026-10-22T05:35:51.023533",
   "calls": [
     {
       "id": "01KKA2YRZYW6WA7Q0DFFT230Z3",
@@ -207,6 +207,17 @@
       "date": "2026-10-13",
       "duration_minutes": 26.049999237060547,
       "summary": "# Weekly GrowthBook and Mastiff Software Meeting\nDate: 2026-10-13 | Duration: 26.049999237060547m\n\n## Summary\nGrowthBook’s sales-efficiency discussion covered an ICP scoring model using company size, website traffic, mobile activity, and other attributes, with Ashley planning to update HubSpot. The model could extend qualification by combining propensity to buy with efficient closing potential, helping prioritize outbound opportunities by ICP fit, rep, quota, and time investment; current business remains inbound. Hiring was refocused toward ascending frontline managers skilled in coaching, development, pipeline management, and deal qualification, while candidates with larger-team leadership backgrounds may be overqualified. Compensation was discussed at $300,000–$350,000 OTE for the manager role and potentially around $400,000 for more senior candidates. Brent proposed reusable, AI-assisted outbound sequences and will test them with Jake and possibly one or two account executives. Ryan remains unconvinced that outbound cannot work and will allow more time for evaluation. Ella’s role-play was scheduled for noon the following day, Brent planned a product and embedded-AI walkthrough for Mark, and additional candidate and investor or portfolio-company outreach were discussed.\n\n## Keywords\nICP scoring, Sales efficiency, Frontline sales management, Outbound sequencing, Pipeline prioritisation, Candidate sourcing\n\n## Action Items\n**Brent Holloway**\nSource sales manager candidates (15:47)\nTest outbound sequence library (22:29)\nTest outbound sequence approach (23:14)\nOffer Mark solution demonstration (23:57)\nForward Northeast candidate profile (24:22)\n\n**Ryan McGurk**\nReview Northeast candidate profile (24:22)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5AVZZD41FGWXYW8E9P12N6Z",
+      "source": "fireflies",
+      "title": "Weekly GrowthBook and Mastiff Software Meeting",
+      "date": "2026-10-21",
+      "duration_minutes": 27,
+      "summary": "# Weekly GrowthBook and Mastiff Software Meeting\nDate: 2026-10-21 | Duration: 27m\n\n## Summary\nThe discussion covered revenue performance, deal expectations, ICP prioritization, lead routing, analytics, and team capacity. $500K was closed across four or five deals in two days, with quarterly new and expansion ARR expected at $1.5M–$2M. The Anthropic deal was proposed at $6M but is expected closer to $3M–$4M, with uncapped compensation planned to maximize seller upside. Jake’s prospecting should shift toward 1,000+ employee accounts, high Rio scores, and strong website traffic, with 80%–90% of effort directed to higher-value ICP accounts. Smaller accounts and event leads should be routed selectively; 12 deals below 100 employees averaged about $56K and had lower win rates. Efficiency analysis will be rerun after next Friday, with missing source data backfilled where possible. The team is also considering another BDR, while an additional AE decision depends on quarter-end results and a six-week performance signal.\n\n## Keywords\nICP prioritisation, BDR performance, Lead routing, Website traffic, Static displacement, Sales pipeline\n\n## Action Items\n**Brent Holloway**\n- Build visual ICP representation (11:47)\n- Rerun sales efficiency report (19:50)\n- Review recommendations with Jake (20:23)\n- Review Jake performance regularly\n\n**Ryan McGurk**\n- Launch revised outreach process (21:49)\n- Discuss BDR hiring with Graham (26:39)\n- Discuss BDR hiring with Operations (26:39)\n- Refocus Jake activity",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

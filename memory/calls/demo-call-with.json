@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-10-21T05:31:34.616862",
+  "last_etl_date": "2026-10-22T05:35:51.021108",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1004,6 +1004,17 @@
       "duration_minutes": 33.310001373291016,
       "summary": "# Demo Call with Emma Olliff from\nDate: 2026-10-20 | Duration: 33.310001373291016m\n\n## Summary\nThe discussion covered an ongoing Shopify Headless migration from Knob Commerce, with experimentation planned after launch because the current platform makes testing difficult. GrowthBook capabilities discussed included feature flags, targeting and rollout rules, no-code visual editing, automated releases, guardrails, funnels, user-journey analysis, variation and bandit analysis, and learning dashboards. The company wants to establish a hypothesize-test-learn approach and stronger testing culture. Data foundations require rebuilding because GA4 was recently added and has accuracy and setup concerns. The customer-owned warehouse remains the preferred source of truth, while GrowthBook uses aggregated data and returns analysis to the customer. SDK integration is required for attributes, user IDs, and data-source connections. Enterprise may be needed because of health-business data sensitivity, production data volume, security, and governance requirements. Enterprise pricing is $1,000 per user annually, with two or three users expected; Pro pricing is $40 per user monthly. Quarterly or semiannual payment may be available. Marcel Geldner will send pricing materials, and Emma Olliff will prepare budget numbers.\n\n## Keywords\nGrowthBook, A/B testing, Shopify Headless, Feature flags, Experimentation analytics, Enterprise pricing\n\n## Action Items\n**Marcel Geldner**\nShare GrowthBook slide deck (12:08)\nShare platform documentation (31:03)\nShare cost estimate (31:03)\n\n**Emma Olliff**\nReview GrowthBook materials (31:50)\nPrepare budget figures (31:50)",
       "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5FX9BHWM0DXCMDCN9GPNJKA",
+      "source": "fireflies",
+      "title": "Demo Call with Margaritaville at Sea from",
+      "date": "2026-10-21",
+      "duration_minutes": 18,
+      "summary": "# Demo Call with Margaritaville at Sea from\nDate: 2026-10-21 | Duration: 18m\n\n## Summary\nThe new site and booking application are in staging, with deployment planned before year-end to enable controlled experimentation in the booking flow. The GrowthBook SDK is installed, baseline experiments are being built, and BigQuery and Google Analytics are connected data sources. Enterprise evaluation will wait until the new site launches and initial workflows are validated. Enterprise capabilities include governance, security, permissions, approval workflows, account-wide audit logs, holdouts, ramp schedules, contextual bandits, and dedicated engineering, data science, and hospitality support. Pricing is approximately $50,000 annually plus $100 per user, with lower per-seat pricing of $90 or $80 at higher seat volumes. The platform includes unlimited feature flags, experiments, analytics events, and monthly active users without traffic-based fees. Gavin does not plan to upgrade immediately but expects possible readiness in early to mid-January for a four-to-six-week trial. Scott will follow up around January 10–15 and can provide a proposal based on five seats.\n\n## Keywords\nGrowthBook Enterprise, Feature flags, Holdout experiments, Booking-flow optimisation, Product analytics, BigQuery integration\n\n## Action Items\n**Scott Keller**\nSend Enterprise proposal (16:41)\nSchedule follow-up meeting (17:18)\n\n**Gavin Hupp**\nLaunch website and booking flow (16:41)\nNotify Scott Keller of readiness (17:18)",
+      "organizer": "scott.keller@growthbook.io",
       "participants": 2,
       "summary_quality": "good"
     }

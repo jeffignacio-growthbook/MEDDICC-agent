@@ -1,0 +1,18 @@
+{
+  "company": "5.2 messaging review",
+  "slug": "5-2-messaging-review",
+  "last_etl_date": "2026-10-22T05:35:51.025493",
+  "calls": [
+    {
+      "id": "01M52DGCVAJ4Z89SCEETN03DFC",
+      "source": "fireflies",
+      "title": "5.2 messaging review",
+      "date": "2026-10-21",
+      "duration_minutes": 37,
+      "summary": "# 5.2 messaging review\nDate: 2026-10-21 | Duration: 37m\n\n## Summary\nThe discussion narrowed the 5.2 scope around confirmed shipments—Metric Redesign, Experiment Diagnostics, Warehouse Usage Dashboard, Agent API Keys, Contextual Bandits, AI Visual Editor, Data Source Onboarding, and Event Forwarder Free Tier—with Remote Save Groups and Interleaved Experiments considered likely. Session Replay was deprioritized, while Experiment Values and unvalidated DBT Sync remained at risk. The product story should emphasize simpler setup, agent visibility and approval workflows, and advanced capabilities, using clearer terminology than “Experiment Values.” The blog should support fast skimming with a TLDR, clear sections, and concrete capabilities. TaskRabbit may support interleaving evidence after further confirmation, while Block may provide quotes about save groups or diagnostics; marketing requests should remain lightweight. Scott will arrange Jeremy’s review of the outline and release accuracy before drafting the blog, customer email, and supporting materials. Elyse will review pricing and packaging, including Event Forwarder and Slack decisions.\n\n## Keywords\n5.2 release, experimentation, Session Replay, interleaving, customer quotes, DBT sync\n\n## Action Items\n**Scott Bailey**\nVerify TaskRabbit partnership (07:03)\nCheck TaskRabbit feedback (09:28)\nConfirm DBT sync readiness (20:47)\nConfirm event forwarder pricing (22:51)\nSchedule Jeremy review meeting (25:48)\nDraft 5.2 release materials (25:48)\n\n**Elyse Fox**\nReview release pricing structure (23:12)\n\n**Ashley Stirrup**\nReview 5.2 blog outline (27:22)",
+      "organizer": "elyse@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

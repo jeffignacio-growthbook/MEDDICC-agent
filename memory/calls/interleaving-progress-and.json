@@ -1,0 +1,18 @@
+{
+  "company": "Interleaving Progress and",
+  "slug": "interleaving-progress-and",
+  "last_etl_date": "2026-10-22T05:35:51.024187",
+  "calls": [
+    {
+      "id": "01M5FV7BVXG24M78SFZN3DT25B",
+      "source": "fireflies",
+      "title": "Interleaving Progress and Handoff Review",
+      "date": "2026-10-21",
+      "duration_minutes": 32.310001373291016,
+      "summary": "# Interleaving Progress and Handoff Review\nDate: 2026-10-21 | Duration: 32.310001373291016m\n\n## Summary\nInterleaving is working end to end through stacked API, analysis, and UI PRs, with the UI tracked as P0. The team agreed to reuse standard components, use locked displays with modal editing, and provide an experiment menu containing edit info, audit history, duplicate, archive, and delete. Results should separate paired and preference sections, hide unselected types, retain no-data rows, and preserve completed results while snapshots refresh. Remaining work includes view queries, assignment-query creation, UI wiring, prototype cleanup, and stats review. JavaScript SDK updates include ranking ID pass-through and publication preparation by the end of the week; Ruby support remains under review. Lillia will take UI ownership, while Luke will push stats and wiring changes before being away until next Thursday. Adriel remains informed, and Bryce may review SDK changes.\n\n## Keywords\nInterleaving experiments, Ranker configuration, Assignment queries, Statistics analysis, JavaScript SDK, Snapshot refresh\n\n## Action Items\n**Lillia Jackson**\n- Replace bespoke UI components (03:55)\n- Use modal editing flow (05:12)\n- Add experiment ellipsis menu (05:57)\n- Verify owner editing support (06:33)\n- Add ranker configuration section (14:27)\n- Reuse JSON infrastructure (15:02)\n- Rename variation tracking key (16:32)\n- Align results tables (16:53)\n- Hide unselected metric sections (18:00)\n- Add empty metric rows (18:07)\n- Add View queries button (18:40)\n- Record remaining UI issues (20:20)\n- Review statistics pull request (20:44)\n- Preserve displayed results (27:34)\n- Update JavaScript SDK (28:07)\n- Monitor Ruby SDK requirements (28:59)\n- Complete SDK publishing preparation (29:57)\n\n**Luke Sonnet**\n- Wire statistics and analysis data (19:41)\n- Test interleaving flow (24:29)\n- Send handoff details (25:03)\n- Implement snapshot refresh behavior (26:20)",
+      "organizer": "luke@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Jim Bodor and",
+  "slug": "jim-bodor-and",
+  "last_etl_date": "2026-10-22T05:35:51.024343",
+  "calls": [
+    {
+      "id": "01M4XVDQWCTNP454M2ZPS0PQWJ",
+      "source": "fireflies",
+      "title": "Jim Bodor and Chris Sanders",
+      "date": "2026-10-21",
+      "duration_minutes": 33.88999938964844,
+      "summary": "# Jim Bodor and Chris Sanders\nDate: 2026-10-21 | Duration: 33.88999938964844m\n\n## Summary\nThe session introduced GrowthBook experimentation, including SDK setup, project scoping, targeting attributes, exposure tracking, and the need to test feature impact rather than relying only on deployment outcomes. It covered the planned cloud deployment, confirmed Snowflake as the data warehouse, and reviewed data-transfer options involving Fivetran and a potential two-way connector. An initial 50/50 A/A test was recommended to validate user identification, bucketing, exposure tracking, and pipeline configuration. Product analytics events currently flow through Adobe into Snowflake, but Adobe’s one-hour delay and per-call charges affect the integration design. Open decisions include whether to retain Adobe, use GrowthBook-managed analytics, or combine GrowthBook exposure events with Snowflake fact tables. Dana Dealy-Reid will involve Rob, Ted, and potentially Ryan to clarify event visibility and ownership. Chris Sanders will share the presentation and recording, while further technical and experimentation sessions remain planned.\n\n## Keywords\nGrowthBook SDK, Snowflake, Adobe Analytics, Experimentation, Exposure Events, Event Forwarder\n\n## Action Items\n**Tam**\nBegin Snowflake setup (25:49)\n\n**Dana Dealy-Reid**\nContact Ted and Rob (30:19)\nCoordinate architecture discussion (30:19)\nUse Slack channel (31:42)\n\n**Chris Sanders**\nSend presentation deck (32:16)\nSend meeting recording (32:27)",
+      "organizer": "chris@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

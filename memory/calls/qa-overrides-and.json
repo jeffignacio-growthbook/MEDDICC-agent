@@ -1,0 +1,18 @@
+{
+  "company": "QA Overrides and",
+  "slug": "qa-overrides-and",
+  "last_etl_date": "2026-10-22T05:35:51.024488",
+  "calls": [
+    {
+      "id": "01M5FRW3PAN76VKKYKRA78TEH0",
+      "source": "fireflies",
+      "title": "QA Overrides and Assignment Testing Design",
+      "date": "2026-10-21",
+      "duration_minutes": 12.770000457763672,
+      "summary": "# QA Overrides and Assignment Testing Design\nDate: 2026-10-21 | Duration: 12.770000457763672m\n\n## Summary\nThe team planned QA overrides stored per SDK connection, applied when regenerating compiled Mongo payloads, and limited to SDK connections targeting the experiment project. Environment opt-in is required, with production use allowed only when explicitly enabled. Overrides will support either normal random assignment or forcing one variation through 0/1000 weights across backend, mobile, and other SDK use cases. Targeting will be separated from coverage control, allowing experiment targeting or 100% coverage, with additional targeting limited to identifier attributes and selected values. The initial launch prioritizes a new Mongo collection and UI displaying active overrides, while QA-specific results, separate tracking identifiers, QA labeling, and exposure visibility in health and diagnostics views may come later. Feature flag support is planned later. Teresa Yung will seek design support from Gabe, share the prototype, potentially join customer calls, and include Jeremy Dorn in related meetings; Michael Sampers may help with parallel work.\n\n## Keywords\nQA overrides, SDK connections, experiment targeting, MongoDB payloads, variation assignment, QA results\n\n## Action Items\n**Teresa Yung**\n- Ask Gabe for guidance (09:13)\n- Invite Jeremy Dorn (10:12)\n- Send prototype to Jeremy Dorn (10:40)\n\n**Jeremy Dorn**\n- Assist Teresa Yung (10:34)",
+      "organizer": "teresa@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}
