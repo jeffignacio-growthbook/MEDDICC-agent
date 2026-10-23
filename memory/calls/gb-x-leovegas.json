@@ -1,7 +1,7 @@
 {
   "company": "GB x LeoVegas",
   "slug": "gb-x-leovegas",
-  "last_etl_date": "2026-10-07T06:41:13.113227",
+  "last_etl_date": "2026-10-23T05:34:42.363105",
   "calls": [
     {
       "id": "01M3M9XF086Q4MP35WK1H0A2SD",
@@ -23,6 +23,17 @@
       "summary": "# GB x LeoVegas:  Intros & Enablement Planning\nDate: 2026-10-06 | Duration: 32.099998474121094m\n\n## Summary\nGrowthBook support for LeoVegas will be led by Cris Dizon, with help available for strategy, experiment design, technical coordination, data support, engineering, and data questions. Chris Cassar leads the LeoVegas Data Product team, which supports data engineering, data science, BI, analysis, dashboards, pipelines, feature monitoring, roadmaps, sprints, and backlog management. LeoVegas is moving from LaunchDarkly toward broader GrowthBook use across multiple apps and product surfaces, with self-service experimentation as a key goal. Teams should eventually configure, launch, and analyze experiments independently, supported by playbooks, training, Slack coordination, recordings, and possibly an ambassador group. Product requirements will include data and experimentation prompts earlier in development. Training will begin with GrowthBook navigation, feature flags, and core experimentation workflows, followed by power calculations, experiment interpretation, and playbooks. Separate one-hour sessions are planned for engineering and product audiences, while Cris Dizon, Chris Cassar, Denny, and Joanna will coordinate process, culture, scheduling, and ongoing enablement.\n\n## Keywords\nExperimentation enablement, GrowthBook, Feature flags, Product development lifecycle, Statistical analysis, Self-service analytics\n\n## Action Items\n**Cris Dizon**\nSchedule enablement sessions (26:20)\nPrepare training agendas (28:49)\nDevelop experimentation playbooks (19:59)\nCoordinate monthly sync meetings (30:21)\n\n**Chris Cassar**\nGather attendee lists (28:14)\nMaintain team communication (30:44)",
       "organizer": "cris@growthbook.io",
       "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5G2KW1JWFM5AF1XH61YEBRG",
+      "source": "fireflies",
+      "title": "GB x LeoVegas: Exp Program Check-In",
+      "date": "2026-10-22",
+      "duration_minutes": 32.95000076293945,
+      "summary": "# GB x LeoVegas: Exp Program Check-In\nDate: 2026-10-22 | Duration: 32.95000076293945m\n\n## Summary\nThe discussion covered a scalable experimentation process that shifts setup, power calculations, and metric selection toward product teams after training, while the central team focuses on design review, metric validation, launch coordination, and conflict management. Slack submissions currently create Jira tickets, but integrating experiments with product epics or subtasks is preferred so requirements, implementation work, tagging, feature flags, and dependencies remain connected. Joanna and Cris discussed automating GrowthBook setup through MCP and APIs, including power analysis, sample-size configuration, metric templates, and review links, subject to legal access approvals. GrowthBook is also intended to become the central experiment registry for metadata, results, checklists, and learnings. Further needs include standardized environment fields to exclude development experiments from reporting and clarification on sample-size-based stopping. Biweekly discussions and broader GrowthBook training are planned.\n\n## Keywords\nExperimentation workflow, Jira integration, GrowthBook automation, Custom fields, Experiment learnings, Sample-size stopping\n\n## Action Items\n**Cris Dizon**\nInvestigate GrowthBook automation options (15:06)\nShare GrowthBook Ideas information (20:17)\nInvestigate environment custom field filtering (23:05)\nVerify sample-size-based stopping (30:04)\nProvide experimentation process feedback (30:04)\nEstablish biweekly check-ins (30:04)\nCoordinate GrowthBook training sessions (31:16)\n\n**Joanna Sarvanidis**\nExplore GrowthBook Learnings (25:34)",
+      "organizer": "cris@growthbook.io",
+      "participants": 7,
       "summary_quality": "good"
     }
   ]

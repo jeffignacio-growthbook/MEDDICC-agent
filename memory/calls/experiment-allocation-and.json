@@ -1,0 +1,18 @@
+{
+  "company": "Experiment Allocation and",
+  "slug": "experiment-allocation-and",
+  "last_etl_date": "2026-10-23T05:34:42.356052",
+  "calls": [
+    {
+      "id": "01M5JNMQDHR3561JZA7Q42E5C5",
+      "source": "fireflies",
+      "title": "Experiment Allocation and Tracking Review",
+      "date": "2026-10-22",
+      "duration_minutes": 29.270000457763672,
+      "summary": "# Experiment Allocation and Tracking Review\nDate: 2026-10-22 | Duration: 29.270000457763672m\n\n## Summary\nThe discussion covered UI, allocation logic, SDK behavior, tracking, and validation. Luke will tighten verbose copy and merge wording changes, while the team preferred a standalone instruction for entering measurement-arm traffic and questioned the current control-traffic terminology. Luke proposed placing the measurement arm above the variation count, although this was not finalized. A percentage-input issue was identified: 5% is accepted by default, but the field does not allow deleting 2 from the value 5. Allocation ordering still requires SDK verification: for 70% traffic and 9% measurement allocation, Teresa described 6.3% measurement traffic and 63.7% bandit traffic. The design expects three seeds for traffic inclusion, measurement assignment, and variation assignment, with seed reuse supporting stable assignments. Holdout can be added through the API. Tracking should emit separate measurement-arm and bandit events, while measurement variation keys for BigQuery remain unresolved. Luke planned a tree diagram and testing, and Teresa planned to split the PR after results are confirmed.\n\n## Keywords\nMeasurement arm, Contextual bandit, Traffic allocation, SDK seeding, Variation assignment, BigQuery tracking\n\n## Action Items\n**Luke Smith**\nRework info icon copy (04:22)\nValidate SDK allocation (06:50)\nBuild allocation tree diagram (23:31)\nAdd holdout through API (23:43)\nTest submitted data (23:56)\nConfirm BigQuery tracking values (24:16)\n\n**Teresa Yung**\nAdd save error message (05:25)\nInvestigate SDK allocation order (07:11)\nSplit completed work into pull requests (24:03)\nConfirm measurement-arm variation key (27:10)",
+      "organizer": "teresa@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

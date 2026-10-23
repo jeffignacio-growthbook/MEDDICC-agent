@@ -1,7 +1,7 @@
 {
-  "company": "ResMed + GrowthBook",
+  "company": "Resmed + GrowthBook",
   "slug": "resmed-growthbook",
-  "last_etl_date": "2026-10-14T05:36:35.775288",
+  "last_etl_date": "2026-10-23T05:34:42.356818",
   "calls": [
     {
       "id": "01M4P4EYVH3BV9SZ3NPTT0S2T0",
@@ -10,6 +10,17 @@
       "date": "2026-10-13",
       "duration_minutes": 57.63999938964844,
       "summary": "# ResMed + GrowthBook\nDate: 2026-10-13 | Duration: 57.63999938964844m\n\n## Summary\nResMed is evaluating alternatives to its internal A/B testing platform because developer-heavy setup, manual cohort definition, deployment work, and passive post-experiment analytics limit scale and speed. Typically, up to three experiments run simultaneously with cohorts of up to 200,000 users. The team wants product managers to launch experiments using role-based permissions, shared success criteria, and faster feedback loops. GrowthBook offers warehouse-native querying, self-hosting or cloud deployment, an open-source core, flexible seat-based pricing, and no charges based on monthly active users or event volume. Its workflow lets data engineers define sources and metrics once, while experimenters use predefined options, targeting, traffic controls, feature flags, and SDK-based evaluation. Analytics provide Bayesian results, metric lifts, confidence levels, dimensional slicing, historical imports, and AI-generated insights. GrowthBook also described AI agents, development-pipeline integration, and contextual bandits as parts of its future experimentation vision.\n\n## Keywords\nA/B Testing, Experimentation Platform, Feature Flags, Data Warehouse Integration, AI-assisted Experimentation, Continuous Optimization\n\n## Action Items\n\n**Nitant**\nSend GrowthBook team the specific pre-listed questions regarding data retention, safety, and security for review and response (12:59)\nCoordinate internal debrief after demo and comparison with other platforms like Datadog (56:10)\n\n**Christian Liebenow**\nProvide written responses to ResMed’s pre-submitted questions on data security and retention after receiving them (13:05)\nShare the meeting recording, relevant GrowthBook SDK documentation, and architecture documents with the ResMed team (55:30)\nProvision a two-week enterprise trial environment if ResMed decides to explore GrowthBook further (51:35)\n\n**Chris Sanders**\nAssist with technical onboarding discussions, explaining SDKs and data pipelines as needed to clarify integration timeline and effort (52:03)\n\n**Karl Brown**\nWork with Nitant to schedule follow-up discussions focused on pricing and proposal details post internal review (55:50)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5DF9X7NB1SRBSRSRB62S6XQ",
+      "source": "fireflies",
+      "title": "Resmed + GrowthBook",
+      "date": "2026-10-22",
+      "duration_minutes": 62.08000183105469,
+      "summary": "# Resmed + GrowthBook\nDate: 2026-10-22 | Duration: 62.08000183105469m\n\n## Summary\nResMed favored seat-based pricing, with an initial estimate of 25–50 seats, alongside a $200,000 annual cloud platform fee or $175,000 annual self-hosted enterprise fee, plus licenses. The distinction between free open-source self-hosting and paid enterprise self-hosting requires written clarification, as does the full cost scope. Technical validation will focus on real-time DynamoDB enrollment, sub-100-millisecond SDK evaluation, hybrid client/server integration, and targeted HME demo-app access. Governance capabilities include approvals, custom roles, SSO, QA tools, and feature controls, while environment promotion and native enrollment caps remain unresolved. Historical experiment imports, MCP-based AI workflows, and the learning ledger can support analysis and future test recommendations, although some analytics workflows remain UI-based. A four-week POC, potentially preceded by an additional setup week, is being considered for early next year. ResMed’s success measures are reducing developer maintenance, enabling nontechnical experimentation, and increasing experiment volume; leadership interest is positive, but budget approval remains pending.\n\n## Keywords\nExperimentation platform, Feature flags, Real-time enrolment, Enterprise pricing, Proof of concept, MCP and AI workflows\n\n## Action Items\n**Logan Bates**\nCheck with GrowthBook team whether DynamoDB can be supported directly as data source (24:59)\nVerify whether GrowthBook has improved workflow for promoting experiments between environments (35:16)\nDiscuss experiment-enrolment caps with GrowthBook team (51:38)\nDiscuss with GrowthBook team whether experiments can be paused automatically when statistical significance is reached (52:43)\n\n**Nitant Bhartia**\nQuantify number and types of GrowthBook seats ResMed would require (15:00)\nReview GrowthBook pricing and proposed commercial model with ResMed product leadership (18:44)\nIdentify ResMed participants, technical owners, and available internal capacity for proof of concept (57:21)\nConfirm expected timing for proof of concept with ResMed team (57:21)\nDiscuss proof of concept and budget with ResMed product leadership (59:27)\n\n**Christian Liebenow**\nSend follow-up after product-leadership discussion and coordinate proof-of-concept planning with ResMed (01:00:51)",
       "organizer": "christian@growthbook.io",
       "participants": 10,
       "summary_quality": "good"

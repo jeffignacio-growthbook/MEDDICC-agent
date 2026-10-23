@@ -1,0 +1,18 @@
+{
+  "company": "GHX + GrowthBook",
+  "slug": "ghx-growthbook",
+  "last_etl_date": "2026-10-23T05:34:42.362813",
+  "calls": [
+    {
+      "id": "01M5EV8C4Q5MG5SA4KZH560VSD",
+      "source": "fireflies",
+      "title": "GHX + GrowthBook",
+      "date": "2026-10-22",
+      "duration_minutes": 24.549999237060547,
+      "summary": "# GHX + GrowthBook\nDate: 2026-10-22 | Duration: 24.549999237060547m\n\n## Summary\nGHX has used self-hosted GrowthBook for nearly one and a half years across eight to nine applications, including two production applications, with Node.js and C Sharp SDKs integrated into mobile, web, and API services. The team wants to expand beyond feature flags into A/B testing, AI testing, client-specific enablement, and deployment controls. Key requirements include live mobile flag updates without redeployment, product-level access controls, Prometheus and APM connections, analytics dashboards, custom fields, and client grouping. Self-hosting remains important because GHX is a healthcare company that wants control over its data. Christian proposed a two-week Enterprise trial, which Nilesh accepted through GrowthBook Cloud for evaluation. The proof of concept will test experimentation, client grouping, access controls, and mobile behavior. Self-hosted Enterprise pricing was presented as $175,000 annually, $1,250 per user annually, or $500 per experiment in addition to the platform fee. Leadership approval and pricing review remain necessary.\n\n## Keywords\nGrowthBook Enterprise, Self-hosted deployment, Feature flags, A/B testing, Mobile SDKs, Experiment-based pricing\n\n## Action Items\n**Christian Liebenow**\nProvision GrowthBook Enterprise trial (09:00)\nSend trial details and pricing proposal (21:26)\n\n**Nilesh**\nPresent Enterprise trial (11:56)\nReview experiment-based pricing model (15:04)",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

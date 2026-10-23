@@ -1,7 +1,7 @@
 {
-  "company": "Growthbook <> TrueMeds",
+  "company": "Growthbook <> Truemeds",
   "slug": "growthbook-truemeds",
-  "last_etl_date": "2026-10-16T05:17:01.222178",
+  "last_etl_date": "2026-10-23T05:34:42.366967",
   "calls": [
     {
       "id": "01M4P7192455WJN74M539BPDY4",
@@ -23,6 +23,17 @@
       "summary": "# Growthbook <> TrueMeds - Techincal Demo\nDate: 2026-10-15 | Duration: 63.77000045776367m\n\n## Summary\nThe discussion focused on whether GrowthBook could help expand experimentation beyond the current 24-concurrent-experiment limit toward at least 50, with GrowthBook cited as supporting customers running 100–200 experiments monthly. The team prioritized Snowflake as the single source of truth, avoiding duplicate data stores while using a metrics catalog for standardized and custom metrics. GrowthBook’s post-stratification, custom parameters, Sample Ratio Mismatch checks, namespaces, attributes, and non-overlapping buckets were discussed for managing cohorts such as first-time and repeat users. Feature flags support staged rollouts, guardrail metrics, sticky bucketing, and consistent web/mobile assignment. AI capabilities include explaining experiment outcomes, generating dashboards and reports, and tracking win rates, revenue impact, and lost opportunities. Next steps include an engineering follow-up next week, answers and examples from GrowthBook’s data science team, a trial using historical Snowflake data, and continued pricing discussions against Statsig and Eppo. Sources: discussion points at 09:01–01:00:43.\n\n## Keywords\nExperimentation, Feature Flags, Snowflake Integration, Bayesian Statistics, Cohort Stratification, AI Experimentation\n\n## Action Items\n\n**Damacharla Aravind**\nCoordinate scheduling follow-up call with TrueMeds engineering team for deeper integration discussion, targeting next week Thursday or Friday (59:00)\nCollect and send any additional technical questions from TrueMeds engineering or data teams ahead of the next call to facilitate preparation (01:02:03)\n\n**Dan Wathne**\nFollow up via email with TrueMeds team providing clarifications, screenshots from the demo, and scheduling options for next week’s integration call; initiate pricing discussion over email (01:01:00)\n\n**Rémy Marin**\nInvestigate and clarify GrowthBook’s capability to support dynamic saved groups (buckets) to avoid user overlap between multiple experiments targeting the same cohorts; provide detailed examples and screenshots to TrueMeds (42:00)\n\n**Dan Wathne & Rémy Marin**\nPrepare trial environment setup integrating Snowflake data for TrueMeds to test GrowthBook features with historical experiment data (58:00)\n",
       "organizer": "dan@growthbook.io",
       "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5C3DCG00HSV9ZQP81S2KHXA",
+      "source": "fireflies",
+      "title": "Growthbook <> Truemeds - Pricing",
+      "date": "2026-10-22",
+      "duration_minutes": 31.639999389648438,
+      "summary": "# Growthbook <> Truemeds - Pricing\nDate: 2026-10-22 | Duration: 31.639999389648438m\n\n## Summary\nGrowthBook, Statsig, and Datadog were reported to have feature parity, leaving commercial terms as the primary factor in the vendor decision. Quotes remained under evaluation, with additional Datadog estimates and static quotes expected. The Snowflake migration for Qlikstream data was delayed until November end because front-end engineering bandwidth was committed to higher-impact projects. Fundraising this quarter has increased scrutiny of gross margin, EBITDA profitability, and the return on new costs. GrowthBook proposed a $50,000 platform fee plus $300 per experiment, with higher-volume pricing potentially reducing the experiment cost toward $250; 300–500 experiments were estimated at approximately $145,000–$175,000 annually, with no rollover of unused capacity. The preferred deployment is warehouse-native through Snowflake, requiring permissions, data mapping, fact tables, and SDK integration. A three-to-four-week trial is planned after the migration, supported by onboarding and integration assistance. Follow-up actions include exploring Google Chat support, finding India or APAC customer references, and sending implementation materials.\n\n## Keywords\nSnowflake migration, Experiment pricing, GrowthBook trial, Warehouse-native experimentation, Support coverage, Vendor evaluation\n\n## Action Items\n**Pranav Chavan**\nComplete Snowflake migration (01:58)\nEvaluate vendor quotations (05:31)\nShare competing pricing quotes (25:28)\nReview trial results (27:03)\n\n**Dan Wathne**\nInvestigate Google support process (09:11)\nCheck customer reference availability (18:40)\nOpen GrowthBook trial (20:23)\nCoordinate trial onboarding (20:23)\nSend implementation documentation (22:03)\nSend meeting recap (29:54)",
+      "organizer": "dan@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]

@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook Demo for",
   "slug": "growthbook-demo-for",
-  "last_etl_date": "2026-09-05T05:59:01.761445",
+  "last_etl_date": "2026-10-23T05:34:42.358654",
   "calls": [
     {
       "id": "69b2cdd1aadf6a00115df609",
@@ -1237,6 +1237,17 @@
       "summary": "# GrowthBook Demo for CarGurus\nDate: 2026-09-04 | Duration: 65m\n\n## Summary\nGrowthBook was presented as a warehouse-native experimentation and feature flag platform that connects read-only to Snowflake without third-party storage, PII exposure, pipeline changes, or additional storage costs. Pricing is per seat, and onboarding typically takes four to six weeks. The platform supports customizable metrics from Snowflake tables or views, precomputed attribution data, feature flags with boolean or JSON values, monitored ramp-ups, automatic rollback, namespaces, approval workflows, and Slack, Jira, and webhook integrations. Experiments can run without metrics, although GrowthBook will not display results without them, allowing teams to retain in-house analysis. Optional product analytics provides AI-assisted querying, dashboards, experiment interpretation, and ship/no-ship recommendations. Holdouts can be global or experiment-specific, while QA tools support variant overrides and automated testing. The team plans to select two of three vendors for a proof of concept next quarter, targeting a decision by mid-September, with updated GrowthBook pricing still required.\n\n## Keywords\nFeature Flags, Experimentation, Product Analytics, Snowflake Integration, Holdout Groups, Ramp Up\n\n## Action Items\n\n**Scott Keller**\nProvide a pricing quote to CarGurus before the rollout of the new volume-based pricing model, ensuring current renewals are grandfathered (01:03:33)\nVerify and follow up with CarGurus on the behavior of user membership during ramp-down phases in ramp-ups to clarify stability and assignment rules (32:08)\nConfirm the behavior and configuration options regarding releasing holdout groups after their usage periods, including time-window resets and impact on rollouts (54:22)\n\n**CarGurus team**\nReview GrowthBook documentation thoroughly and raise detailed technical questions to support evaluation during the proof of concept phase (49:10)\nDetermine the finalists for the proof of concept vendor selection, aiming to select two out of three candidates by mid-September (01:02:29)\n",
       "organizer": "scott.keller@growthbook.io",
       "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5JDTHB6DH1YB5NPEQVS40PV",
+      "source": "fireflies",
+      "title": "GrowthBook Demo for APURVA SANDBHOR",
+      "date": "2026-10-22",
+      "duration_minutes": 36,
+      "summary": "# GrowthBook Demo for APURVA SANDBHOR\nDate: 2026-10-22 | Duration: 36m\n\n## Summary\nHome Depot is evaluating alternatives to Adobe Target after 10–15 years of use, with a vendor decision needed before Adobe renewal negotiations begin in February. The transition may include up to six months of overlap to avoid experimentation downtime. GrowthBook is one of four vendors considered, and only one is expected to advance to a formal proof of concept. Current operations rely on Adobe Target, Adobe Analytics, BigQuery, GCP, and a custom pipeline for metrics and statistical analysis, while Microsoft Forms, Jira, and multiple teams create significant handoff and specialist burdens. The desired platform should support the full experiment lifecycle, flexible metrics, sample-size estimation, semantic-layer connections, feature flags, monitored rollouts, client- and server-side testing, Contentful integration, product analytics, heat maps, and session recordings. Evaluation begins with a 60-minute demonstration for seven to eight Home Depot participants, followed by technical ecosystem review and potentially a focused proof of concept.\n\n## Keywords\nExperimentation platform, Adobe Target migration, Feature flags, Monitored rollout, Product analytics, Contentful integration\n\n## Action Items\n**Apurva Sandbhor**\nSend Home Depot summary (21:58)\nSend Teams invitation (34:41)\n\n**Scott Keller**\nCoordinate GrowthBook participants (27:16)\nPrepare GrowthBook demo (27:16)\nSend follow-up email (34:57)\n\n**Logan Bates**\nPrepare product analytics walkthrough (31:41)\nPrepare end-to-end demo flow (32:03)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

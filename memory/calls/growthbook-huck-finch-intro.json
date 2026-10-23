@@ -1,0 +1,18 @@
+{
+  "company": "growthbook/huck finch intro",
+  "slug": "growthbook-huck-finch-intro",
+  "last_etl_date": "2026-10-23T05:34:42.355852",
+  "calls": [
+    {
+      "id": "01M5DX99DMYQR27TKE6EYJDS5M",
+      "source": "fireflies",
+      "title": "growthbook/huck finch intro",
+      "date": "2026-10-22",
+      "duration_minutes": 33.34000015258789,
+      "summary": "# growthbook/huck finch intro\nDate: 2026-10-22 | Duration: 33.34000015258789m\n\n## Summary\nGrowthBook and Huck Finch discussed improving the website’s performance, CMS architecture, and ongoing development workflow. Huck Finch supports B2B SaaS brands through brand, Webflow, 3D, VFX, and product design work, while Yosef remains GrowthBook’s core developer because of his deep site knowledge and CMS responsibilities. The homepage Lighthouse score is in the 60s, with a target in the 80s or 90s, and bandwidth, scripts, fonts, data loading, search behavior, and duplicated blog elements require review. The agreed approach is to duplicate the site, test and validate fixes in a sandbox, and then apply approved changes to production. Proposed CMS improvements include reusable landing-page components, rich-text embedding, FAQs, schema output, collapsible displays, and scalable AI-assisted workflows connected to the Webflow API. Performance will come first, followed by broader CMS work if approved. Huck Finch proposed quarterly 25-, 50-, or 100-hour punch cards, with 50 hours viewed as a likely fit. Jack will send technical documents, Huck Finch will submit scope, and collaboration may use Slack, ClickUp, and weekly calls.\n\n## Keywords\nWebflow performance, Lighthouse optimisation, CMS architecture, Blog and podcast search, Sandbox testing, Website partnership\n\n## Action Items\n**Hien Lam**\nAudit GrowthBook website (06:25)\nTest website changes in sandbox (07:30)\nCoordinate with Yousef (14:18)\nPrepare scope-of-work proposal (30:18)\nTrack project work in ClickUp (31:09)\n\n**Matthew Hansen**\nCoordinate with Yousef (14:18)\nRecommend performance priorities (23:44)\nPrepare scope-of-work proposal (30:18)\n\n**Jack Virag**\nEmail technical documents to Huck Finch (30:18)\nAdd Huck Finch to Slack (30:48)\nArrange project kickoff (30:48)\n\n**GrowthBook team**\nReview Huck Finch proposal (30:18)\nConnect Huck Finch with Yousef (30:48)",
+      "organizer": "jack@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

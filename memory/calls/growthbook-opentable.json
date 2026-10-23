@@ -1,7 +1,7 @@
 {
-  "company": "Growthbook <> Opentable",
+  "company": "Growthbook <> OpenTable",
   "slug": "growthbook-opentable",
-  "last_etl_date": "2026-10-22T05:35:51.025010",
+  "last_etl_date": "2026-10-23T05:34:42.361575",
   "calls": [
     {
       "id": "69de6935c1f9eb0011fa27dc",
@@ -181,6 +181,17 @@
       "summary": "# Growthbook <> Opentable - EMEA Sync\nDate: 2026-10-21 | Duration: 22.8799991607666m\n\n## Summary\nThe homepage A/B test is live and receiving traffic, but feature changes, traffic, and booking volume remain limited, so results need more time to converge. Federico Maffei plans an aggressive traffic ramp, while Sarah and the search team are expected to run small map-related tests. Custom goals cover actions such as clicks and completed reservations, with relevant data already available in the warehouse; Saranya and Rahul have added some goals, while remaining goals need confirmation with the data team. Secondary and guardrail metrics are preferred, and a separate event-forwarding pipeline is considered unnecessary. Federico’s team is expected to shift testing responsibility to US teams next year, with two or three weeks remaining for broader engineering validation. Contract completion is targeted for 23 November; legal and security are substantially complete, the order form needs final review, and Forrest is coordinating budget and paperwork. Post-sales support would focus on onboarding and adoption.\n\n## Keywords\nA/B testing, GrowthBook, Custom metrics, Search-map experiments, Warehouse analytics, Contracting\n\n## Action Items\n**Federico Maffei**\nAttend cash-up meeting (08:34)\nIncrease homepage experiment traffic (13:40)\nPlan search map A/B tests (13:40)\nRequest Rahul stakeholder update (18:40)\n\n**Dan Wathne**\nFinalize order form (17:38)",
       "organizer": "dan@growthbook.io",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5DCKREMACTC2RJZJJPTQVG6",
+      "source": "fireflies",
+      "title": "Growthbook <> OpenTable - Weekly POC Sync",
+      "date": "2026-10-22",
+      "duration_minutes": 12.880000114440918,
+      "summary": "# Growthbook <> OpenTable - Weekly POC Sync\nDate: 2026-10-22 | Duration: 12.880000114440918m\n\n## Summary\nThe AB test launch was delayed by upstream model-training pipeline issues, with models expected by 01:40; if unavailable, the launch would move to Monday. Saranya HV reported no other known blockers and was responsible for updating Dan Wathne. After experiment termination, a feature flag will evaluate as true or false to route traffic to the winning variant without code redeployment, while analytics events will stop; a temporary rollout was not considered necessary. The homepage AA test showed a control skew after running at 1% of OpenTable.com homepage traffic and later increasing to 10%. Saranya HV will compare metric behavior across exposure levels and against the team’s internal experimentation tool. Federico Maffei requested a review before deciding whether to relaunch at 100% traffic and hand testing to Sarah’s team. The next phase concerns map-based multi-search, with handoff tentatively targeted for next week. Dan Wathne will explore a more West Coast-friendly meeting time, while Slack will support interim coordination.\n\n## Keywords\nA/B testing, A/A testing, Feature evaluation, Experiment termination, Traffic allocation, Model-training dependencies\n\n## Action Items\n**Saranya HV**\nRetrieve upstream models (01:40)\nLaunch A/B test (01:40)\nReview OpenTable homepage A/A test results (07:05)\nSend homepage A/A test link (09:12)\n\n**Federico Maffei**\nHand off testing work (09:40)\n\n**Dan Wathne**\nCoordinate recurring meeting time (11:14)",
+      "organizer": "dan@growthbook.io",
+      "participants": 10,
       "summary_quality": "good"
     }
   ]

@@ -1,0 +1,18 @@
+{
+  "company": "Reo emails review",
+  "slug": "reo-emails-review",
+  "last_etl_date": "2026-10-23T05:34:42.356380",
+  "calls": [
+    {
+      "id": "01M5JDNJNYRSMMF2KDYJDEVD5Y",
+      "source": "fireflies",
+      "title": "Reo emails review",
+      "date": "2026-10-22",
+      "duration_minutes": 23.510000228881836,
+      "summary": "# Reo emails review\nDate: 2026-10-22 | Duration: 23.510000228881836m\n\n## Summary\nThe team reviewed HubSpot-to-Clay automation, where company-level Reo and confidence scores drive selection and data is pulled roughly hourly or every couple of hours. Real-time HubSpot triggers, enrichment, sequencing, and webhook-based Reo connectivity remain possible expansions. Contact sourcing is shifting from narrow job-title filters to LinkedIn keyword matching, with volume, quality, outreach limits, and HubSpot history under evaluation. Outreach was estimated to be 80–90% ready, using company signals and profile keywords, while value-led CTAs will test engagement. Engineering and non-engineering sequences may be separated if contact volume and response rates support it. Karen’s analysis of approximately 25 active pipeline accounts from the last 90 days identified distinct research paths, including product-heavy users who may be better directed to MCP content. Emails are planned for next week, with Reo analysis shared as a PDF and a later review involving Ashley.\n\n## Keywords\nReo account scoring, Clay workflow automation, HubSpot triggers, LinkedIn contact sourcing, Feature flag outreach, MCP server engagement\n\n## Action Items\n**Aaron Le**\nCreate documentation page (07:07)\nRework contact-sourcing logic (12:57)\nSend outreach emails (20:47)\nSchedule follow-up meeting with Ashley (21:06)\n\n**Karen Henke**\nSend Reo investigation and behavioural analysis PDF (18:39)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "GB x Extra Space",
+  "slug": "gb-x-extra-space",
+  "last_etl_date": "2026-10-23T05:34:42.361130",
+  "calls": [
+    {
+      "id": "01M5FV6KEKS5DWMRE3W6ADDJYW",
+      "source": "fireflies",
+      "title": "GB x Extra Space: Intros & Exp Program Review",
+      "date": "2026-10-22",
+      "duration_minutes": 46.599998474121094,
+      "summary": "# GB x Extra Space: Intros & Exp Program Review\nDate: 2026-10-22 | Duration: 46.599998474121094m\n\n## Summary\nExtra Space operates an acquisition-focused experimentation program with approximately 115 tests planned this year, aiming to improve website conversion and rentals. The team is moving beyond basic A/B testing toward personalization, AI, and one-to-one experiences, although segmentation currently focuses mainly on mobile and desktop, with keyword-specific landing pages under development. The group favored starting with multi-armed bandits for practical, continuous optimization, while retaining A/B tests for major feature decisions. Contextual bandits may follow once relevant attributes and user context are defined. Potential applications include creative, copy, carousel, and promotional optimization. GrowthBook AI can support hypotheses, data retrieval, troubleshooting, experiment learning, quality scoring, and visual variant creation. Conversion rate and rental impact remain the primary measures, while holdouts could provide stronger incrementality evidence. Extra Space will propose candidate use cases, and GrowthBook will share resources and arrange a follow-up discussion in approximately one to two weeks.\n\n## Keywords\nMulti-Armed Bandits, Contextual Bandits, A/B Testing, Personalisation, Conversion Rate Optimisation, Experimentation Strategy\n\n## Action Items\n**Cris Dizon**\nHelp Extra Space configure initial Multi-Armed Bandit use cases (15:18)\nSend educational materials (23:06)\nSend availability for follow-up experimentation meeting (44:43)\nSchedule follow-up experimentation meeting (44:43)\n\n**Megan Loveland**\nPrepare Multi-Armed Bandit use cases (44:30)",
+      "organizer": "cris@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

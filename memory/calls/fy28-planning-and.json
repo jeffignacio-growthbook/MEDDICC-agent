@@ -1,0 +1,18 @@
+{
+  "company": "FY28 Planning and",
+  "slug": "fy28-planning-and",
+  "last_etl_date": "2026-10-23T05:34:42.357557",
+  "calls": [
+    {
+      "id": "01M5JEZ5ZCV3FYDXSB7WWX31MF",
+      "source": "fireflies",
+      "title": "FY28 Planning and Cash Management",
+      "date": "2026-10-22",
+      "duration_minutes": 40.06999969482422,
+      "summary": "# FY28 Planning and Cash Management\nDate: 2026-10-22 | Duration: 40.06999969482422m\n\n## Summary\nThe discussion established a FY28 planning approach aligned to the fiscal year ending January 31, 2028, with department-level budgets, monthly actuals, plan variance, and decision-support reporting. Leaders will use FY27 exit headcount to plan staffing, while separating employees, contractors, agencies, and program costs by department. The financial model will test growth, burn, and runway scenarios, including a 24-month comfort guideline, roughly 100% growth, 200% growth, and an enterprise-oriented 30-month case. Current-year total ARR is expected at approximately 16–20, with next year assuming roughly 2x growth, although reduced sales hiring creates capacity risk. A 13-week cash-flow dashboard will track collections, payments, and burn; books-close is targeted within five business days, with formal reporting around business day seven or eight. Leadership also wants early-month collections reviews, improved DSO toward the low 40s, faster large-invoice issuance, and continued monitoring of potential bad debt.\n\n## Keywords\nFinancial planning, Runway modelling, ARR growth, Department budgeting, Cash-flow forecasting, Collections management\n\n## Action Items\n**Ali Rizvi**\n- Rebuild financial planning model (00:07)\n- Build FY2028 financial plan (03:47)\n- Add growth-versus-runway scenarios (05:10)\n- Create department budget materials (13:00)\n- Move Support into Customer Success (17:54)\n- Review vendor and contractor classifications (19:42)\n- Publish 13-week rolling cash-flow model (19:42)\n- Establish accounting close and reporting cadence (21:02)\n- Review collection gaps (29:49)\n- Issue large or upcoming invoices (30:45)\n- Review vendor and contractor classifications with Ashley (32:12)\n- Maintain department-level budgeting granularity (38:26)\n\n**Lindsay**\n- Capture marketing spend by event (01:12)\n\n**Ashley Stirrup**\n- Own Marketing budget (14:34)\n- Review vendor and contractor classifications (32:58)\n\n**Ryan McGurk**\n- Own Sales budget (14:55)\n- Work through aged receivables (25:25)\n- Coordinate Anthropic invoicing (26:54)\n\n**Jeremy Dorn**\n- Own Engineering/R&D budgeting (16:40)\n- Review unidentified contractors (33:01)\n\n**Jennifer**\n- Continue aged receivables follow-up (25:25)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

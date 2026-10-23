@@ -1,7 +1,7 @@
 {
-  "company": "Neon + Growthbook",
+  "company": "Neon + GrowthBook",
   "slug": "neon-growthbook",
-  "last_etl_date": "2026-10-07T06:41:13.112729",
+  "last_etl_date": "2026-10-23T05:34:42.357249",
   "calls": [
     {
       "id": "01KWVXQW0538WN4JKK32ZF1N69",
@@ -28,6 +28,17 @@
       "summary": "# Neon + Growthbook\nDate: 2026-10-06 | Duration: 49.290000915527344m\n\n## Summary\nThe discussion addressed how to expand experimentation while avoiding tests on the full user base because they increase costs and can skew results. The organization has run 700 experiments since January 2023 and aims to launch 30 new experiments monthly, but GrowthBook’s perceived complexity and process friction limit adoption. Training is planned for the core platform and twin teams, including approximately 15–20 participants, with emphasis on troubleshooting, best practices, feature flags, governance, and new features; sessions will mainly be in English, with possible Portuguese Q&A. GrowthBook 5.1 introduces contextual bandits, AI-generated experiment learnings and insights, enhanced product analytics, and AI-agent capabilities for experiment creation. Agent-driven experimentation is a desired future direction, although strong governance is needed first. Thursday at 5 p.m. Brazil time is preferred for training, and questions will be gathered beforehand. Renewal follow-up is planned, while Andy and Chris support commercial and technical needs respectively.\n\n## Keywords\nExperimentation, GrowthBook 5.1, contextual bandits, AI learnings, feature flags, training\n\n## Action Items\n**Giuliana Viviani**\nCommunicate with Fernando Sanchez on contract renewal (12:44)  \nGather team questions for training session (46:50)  \nCoordinate training session timing with Neon meetings (46:50)  \n\n**Andy Marshall**  \nFollow up with Giuliana Viviani and Fernando Sanchez on contract renewal (12:58)  \nCoordinate with Chris Sanders and Neon teams for training sessions (46:50)  \n\n**Chris Sanders**  \nPrepare and deliver advanced training on GrowthBook 5.1 (18:52)  \nFollow up with Neon teams for training input (26:57)",
       "organizer": "marsh@growthbook.io",
       "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M50AN9R5YCYY9WS5CXM84MY1",
+      "source": "fireflies",
+      "title": "Neon + GrowthBook: Experimentation & Feature Flags Training",
+      "date": "2026-10-22",
+      "duration_minutes": 63.40999984741211,
+      "summary": "# Neon + GrowthBook: Experimentation & Feature Flags Training\nDate: 2026-10-22 | Duration: 63.40999984741211m\n\n## Summary\nGrowthBook training was planned around feature flags, experiment setup, and results interpretation, with reusable onboarding materials offered for the global homepage, feature tooling, and internal support teams. Product teams have broad experiment access, while the global homepage handles substantial volume, higher configuration complexity, and centralized questions. Experiments use feature flags with control and variant values that can be strings, booleans, numbers, or JSON; targeting rules, such as holdouts, operating systems, and countries, are applied first. Deterministic hashing supports consistent variant assignment, while namespaces limit direct traffic conflicts. Bayesian reporting is the default, with frequentist analysis, goal, secondary, and guardrail metrics also available. Power calculations guide traffic, runtime, baseline metrics, and minimum detectable effects. Bandits can adjust allocation based on performance, and health monitoring can alert teams to exposure mismatches and multiple-exposure errors. Governance discussions covered traffic allocation, sticky bucketing, rollback defaults, experiment runtime limits, automatic stopping, and continued support through Slack and additional sessions.\n\n## Keywords\nExperimentation, Feature flags, Deterministic hashing, Power analysis, Experiment governance, GrowthBook\n\n## Action Items\n**Chris Sanders**\nShare onboarding deck (14:40)\nCheck feature request status (58:17)\n\n**Cris Dizon**\nConfirm feature request status (57:20)\nSupport governance discussion (01:00:44)\n\n**Andy Marshall**\nProvide Slack channel access (01:00:16)\nArrange training sessions (01:00:16)\n\n**Giuliana Viviani**\nReview governance procedures (01:01:42)\nFollow up on shutdown procedures (01:01:42)",
+      "organizer": "marsh@growthbook.io",
+      "participants": 22,
       "summary_quality": "good"
     }
   ]

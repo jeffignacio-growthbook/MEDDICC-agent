@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-10-22T05:35:51.021108",
+  "last_etl_date": "2026-10-23T05:34:42.364599",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1015,6 +1015,17 @@
       "duration_minutes": 18,
       "summary": "# Demo Call with Margaritaville at Sea from\nDate: 2026-10-21 | Duration: 18m\n\n## Summary\nThe new site and booking application are in staging, with deployment planned before year-end to enable controlled experimentation in the booking flow. The GrowthBook SDK is installed, baseline experiments are being built, and BigQuery and Google Analytics are connected data sources. Enterprise evaluation will wait until the new site launches and initial workflows are validated. Enterprise capabilities include governance, security, permissions, approval workflows, account-wide audit logs, holdouts, ramp schedules, contextual bandits, and dedicated engineering, data science, and hospitality support. Pricing is approximately $50,000 annually plus $100 per user, with lower per-seat pricing of $90 or $80 at higher seat volumes. The platform includes unlimited feature flags, experiments, analytics events, and monthly active users without traffic-based fees. Gavin does not plan to upgrade immediately but expects possible readiness in early to mid-January for a four-to-six-week trial. Scott will follow up around January 10–15 and can provide a proposal based on five seats.\n\n## Keywords\nGrowthBook Enterprise, Feature flags, Holdout experiments, Booking-flow optimisation, Product analytics, BigQuery integration\n\n## Action Items\n**Scott Keller**\nSend Enterprise proposal (16:41)\nSchedule follow-up meeting (17:18)\n\n**Gavin Hupp**\nLaunch website and booking flow (16:41)\nNotify Scott Keller of readiness (17:18)",
       "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5CHTXXAFVD47YR1X7SK7GNR",
+      "source": "fireflies",
+      "title": "Demo Call with Agustina Razetti from",
+      "date": "2026-10-22",
+      "duration_minutes": 47.779998779296875,
+      "summary": "# Demo Call with Agustina Razetti from\nDate: 2026-10-22 | Duration: 47.779998779296875m\n\n## Summary\nBetclicgroup is evaluating GrowthBook as a single experimentation platform to replace fragmented CRM, front-end, back-end, and analytics tools. Its goals are to make A/B testing more accessible, enable self-service workflows for product teams, reduce analysts’ repeated manual joins and dashboard preparation, and improve testing discipline and repeatability. GrowthBook combines feature flags, experimentation, product analytics, mobile and server-side SDKs, and warehouse-native analysis through Snowflake, with DBT and custom ingestion pipelines potentially supported. It offers flexible KPI, funnel, breakdown, holdout, frequentist, and Bayesian analysis. Open questions include how audience attributes should be handled in mobile SDKs, the required level of AI access control, and the extent of technical fit across Betclicgroup’s architecture. Klaus Fleerkötter requested a technical demo and Flutter SDK documentation, while Edouard preferred confirming technical fit before commercial discussions. Betclicgroup will provide an RFP, GrowthBook will respond, and a vendor decision may occur before year-end, with integration targeted for the beginning of next year.\n\n## Keywords\nA/B testing, Feature flagging, Warehouse-native experimentation, Snowflake, Bayesian and frequentist analysis, Flutter SDK\n\n## Action Items\n**Unassigned**\nConduct technical deep dive (26:40)\n\n**James Shannon**\nSend meeting recording (06:24)\nComplete RFP document (42:51)\nProvide documentation links (44:19)\nSchedule technical demonstration (44:32)\n\n**Edouard**\nShare RFP document (42:01)",
+      "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "summary_quality": "good"
     }

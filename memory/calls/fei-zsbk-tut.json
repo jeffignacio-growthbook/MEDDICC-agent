@@ -1,0 +1,18 @@
+{
+  "company": "fei-zsbk-tut",
+  "slug": "fei-zsbk-tut",
+  "last_etl_date": "2026-10-23T05:34:42.360848",
+  "calls": [
+    {
+      "id": "01M5JDBX3DQANWVXPCCMNBCC3T",
+      "source": "fireflies",
+      "title": "fei-zsbk-tut",
+      "date": "2026-10-22",
+      "duration_minutes": 1,
+      "summary": "# fei-zsbk-tut\nDate: 2026-10-22 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
-  "company": "GrowthBook & InPost",
+  "company": "Growthbook <> InPost",
   "slug": "growthbook-inpost",
-  "last_etl_date": "2026-08-18T16:55:06.274634",
+  "last_etl_date": "2026-10-23T05:34:42.363463",
   "calls": [
     {
       "id": "01KY4KKQRJRVANX4ESE7F34AED",
@@ -17,6 +17,17 @@
       "participant_domains": [
         "inpost.pl"
       ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5HDT8H2VF7JFZ1F5BCNH4EH",
+      "source": "fireflies",
+      "title": "Growthbook <> InPost - Best pratices",
+      "date": "2026-10-22",
+      "duration_minutes": 29.450000762939453,
+      "summary": "# Growthbook <> InPost - Best pratices\nDate: 2026-10-22 | Duration: 29.450000762939453m\n\n## Summary\nA first PoC experiment is running with a feature flag, 50/50 allocation, and defined metrics. Metrics can be replaced using warehouse data, while results refresh manually or every six hours; user segmentation supports analysis by attributes after updating results. Novelty effects and incomplete app rollout may reduce observed lift, so CUPED, configurable metric windows, and delayed measurement periods were discussed. Funnel metrics were considered more useful for longer journeys. AI access is available, experiments can be created conversationally when the feature exists SDK-side, and graphs and product analytics visuals can support interpretation. BigQuery query-cost reduction may be possible. Rollout from 1% to 5% creates bias concerns, with attribution and activation metrics under review. James will share thoughts, Remy will investigate options, and broader communication access is pending while email and ticket processes are used.\n\n## Keywords\nGrowthBook experiments, Feature flags, Metric analysis, CUPED, App rollout bias, Activation metrics\n\n## Action Items\n**Rémy Marin**\nInvestigate rollout bias (23:59)\n\n**James Shannon**\nSend experiment guidance (28:03)",
+      "organizer": "remy@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]

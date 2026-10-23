@@ -1,7 +1,7 @@
 {
   "company": "Zoro + GrowthBook",
   "slug": "zoro-growthbook",
-  "last_etl_date": "2026-10-17T05:11:12.184371",
+  "last_etl_date": "2026-10-23T05:34:42.362314",
   "calls": [
     {
       "id": "01KVXF4DB3N44ZB5WM8AJ453WB",
@@ -135,6 +135,17 @@
       "date": "2026-10-16",
       "duration_minutes": 36.75,
       "summary": "# Zoro + GrowthBook\nDate: 2026-10-16 | Duration: 36.75m\n\n## Summary\nThe team investigated a branch-filter bug where selected branches save but are not retained or displayed; Deep Shah is changing the GitHub Action to run on pushes to Main, with validation expected in 25–30 minutes. Main-only references are preferred, while Rémy Marin will confirm Main/Master support and whether development and production environments can use independent references. Feature-flag and analytics integrations are progressing smoothly, with the GrowthBook Vue library as the final technical exploration and POC completion expected within one additional week. Christian Liebenow approved extending a trial that had zero days remaining. Per-flag Datadog webhook rollbacks were considered too manual across 10 teams and approximately 173 flags, prompting a request for native integration and faster, separately timed monitoring safeguards. Rémy will follow up with Logan and the development team. A procurement discussion was planned for 3:15 PM, with Bob potentially joining.\n\n## Keywords\nCode references, GitHub Actions, Datadog integration, Feature flags, Kill switches, Vue library\n\n## Action Items\n**Deep Shah**\nUpdate GitHub Action trigger (04:46)\n\n**Rémy Marin**\nVerify branch filtering (09:29)\nConfirm environment references (14:17)\nClarify kill switch timing (33:40)\n\n**Christian Liebenow**\nExtend GrowthBook trial (20:04)\nSurface Datadog integration request (19:18)\nSchedule procurement discussion (35:12)",
+      "organizer": "christian@growthbook.io",
+      "participants": 16,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5DA1DXQD7PTZ2NW8B6W3887",
+      "source": "fireflies",
+      "title": "Zoro + GrowthBook",
+      "date": "2026-10-22",
+      "duration_minutes": 15.239999771118164,
+      "summary": "# Zoro + GrowthBook\nDate: 2026-10-22 | Duration: 15.239999771118164m\n\n## Summary\nThe POC is scheduled to end tomorrow, with most required work completed and no major unresolved concerns. Main-branch code references are working, although Logan Bates is checking the status of a remaining UI issue. Audience-based breakdowns were validated, and the audience requirement is ready to check off. The PDP production A/B test was completed, with a comprehensive report receiving positive feedback from Donald, the product manager. Metric-slice work advanced through subgroup creation, broader value handling, and a fix for a segmentation-related issue, with a PR targeting the next cloud deployment. Broader Datadog production-support work, including webhook testing, canary releases, and automated rollback, was scoped outside the POC; three unchecked requirements remain tied to Datadog performance functionality. The customer intends to move forward with GrowthBook, while contract details remain open. Christian Liebenow will share roadmap and SLA slides, continue Datadog discussions with Logan and Jeremy, add people to Slack, and support account-manager and architect introductions.\n\n## Keywords\nDatadog integration, Automated rollback, Production A/B testing, Metric slices, Code references, Contract negotiations\n\n## Action Items\n**Logan Bates**\nCheck UI bug status (04:45)\n\n**Christian Liebenow**\nDiscuss native Datadog integration (08:17)\nShare roadmap and SLA materials (12:23)\nAdd GrowthBook contacts (13:57)\nSet up follow-up call (13:57)",
       "organizer": "christian@growthbook.io",
       "participants": 16,
       "summary_quality": "good"

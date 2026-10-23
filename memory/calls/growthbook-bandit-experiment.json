@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Bandit Experiment",
+  "slug": "growthbook-bandit-experiment",
+  "last_etl_date": "2026-10-23T05:34:42.356216",
+  "calls": [
+    {
+      "id": "01M5JKBQQY16WNS1Z0CT50GD6F",
+      "source": "fireflies",
+      "title": "GrowthBook Bandit Experiment Setup Review",
+      "date": "2026-10-22",
+      "duration_minutes": 28.540000915527344,
+      "summary": "# GrowthBook Bandit Experiment Setup Review\nDate: 2026-10-22 | Duration: 28.540000915527344m\n\n## Summary\nThe team reviewed SDK and Health Tab readiness, confirming that SDK version 8.1 still requires NPM verification and that the Health Tab should work without SDK changes once CBAQ tracking fields map correctly. Experiments will target GrowthBook.io marketing pages, including banner messaging, homepage autoplay video, and registration-page content, with separate contextual bandits for click-through, video engagement, and completed registration. Session-level assignment suits mostly anonymous visitors, while mobile-versus-desktop is the preferred initial context; country targeting was deferred. The team favored simple initial tests and roughly 5–7 variations. Contextual bandits must be created in GrowthBook before Visual Editor changes are added, and selected attributes must be exposed through the CBAQ and aligned with SDK configuration. Elyse will define variants and research attributes, Luke will identify usable Snowflake attributes and update the assignment query, and Teresa will confirm readiness after review and merge. The next sync will review CBAQ correctness and experiment configuration.\n\n## Keywords\nContextual bandits, GrowthBook marketing pages, Visual Editor, CBAQ assignment query, Health Tab, Experiment attributes\n\n## Action Items\n**Teresa Yung**\nVerify SDK 8.1 release (00:04)\nNotify Elyse Fox after merge (20:19)\nCoordinate configuration session (20:19)\n\n**Luke Smith**\nUpdate CBAQ columns (01:44)\nValidate configuration (01:44)\nConfirm Health Tab runs cleanly (01:44)\nIdentify targeting attributes (21:24)\nAdd attributes to CBAQ (21:24)\nVerify configuration (21:24)\n\n**Elyse Fox**\nDecide contextual bandits (17:46)\nFinalize experiment scope (17:46)\nDetermine video experiment structure (17:46)\nConfirm bandits to configure (17:46)\nSet up variants (26:20)\nReview setup (26:20)",
+      "organizer": "teresa@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}
