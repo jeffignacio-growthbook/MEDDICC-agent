@@ -1,0 +1,18 @@
+{
+  "company": "Experimentation Edge Retrospective",
+  "slug": "experimentation-edge-retrospective",
+  "last_etl_date": "2026-10-24T05:14:25.180297",
+  "calls": [
+    {
+      "id": "01M5H1Y2Z0QBE2CRH721TS0G14",
+      "source": "fireflies",
+      "title": "Experimentation Edge Retrospective",
+      "date": "2026-10-23",
+      "duration_minutes": 32.119998931884766,
+      "summary": "# Experimentation Edge Retrospective\nDate: 2026-10-23 | Duration: 32.119998931884766m\n\n## Summary\nTanner is taking responsibility for guest recruitment, following Jeff’s process with a B2C focus and limited B2B PLG exceptions. B2B volume remains limited, while guest quality is generally strong despite occasional role mismatches and publishing disruptions when guests depart. The team discussed uncertainty around publishing Vamsee’s interview, including an edited version and third-party review by Emmy. Lead routing uses rules to assign AEs, but better visibility into two or three post-recording touchpoints is needed without overdistributing emails. Immediate call ratings, demo-request status, prospect likelihood, and assigned AE identification were restored, while Lindsay is leading the Notion-HubSpot sync. Content efforts prioritize logos, headshots, blogs, reels, and podcast website assets, with two or three stronger reels per episode and Riverside markers for clip selection. Social improvements include clearer reel context, larger subtitles, company tagging, guest posting support, and a dashboard with pre-filled LinkedIn posts. Apple is the preferred distribution channel, supported by expanded guest follow-ups, subscription outreach, and format experiments. Upcoming work includes branded recordings, screenshots, the recap episode, and monthly highlights.\n\n## Keywords\nGuest recruitment, Lead routing, Podcast content, LinkedIn promotion, Experimentation reels, Podcast marketing\n\n## Action Items\n**Geoffrey Lugli**\nSend recording for review (04:50)\nAdd episode-quality field (08:24)\nAdd reel context (15:20)\nRework promotion dashboard (20:52)\nPublish recap episode (28:38)\n\n**Emmy Sharp**\nReview recording (04:50)\n\n**Tanner Green**\nAdd AE qualification fields (07:42)\nCoordinate Notion–HubSpot sync (08:49)\nMeet with guests (19:33)\nFollow up with guests (23:09)\nBuild product-leader list (29:07)\n\n**Ashley Stirrup**\nMark strong Riverside moments (12:33)\nReview Karen’s article (28:45)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

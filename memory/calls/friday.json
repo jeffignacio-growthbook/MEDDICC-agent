@@ -1,7 +1,7 @@
 {
   "company": "Friday",
   "slug": "friday",
-  "last_etl_date": "2026-10-21T05:31:34.613059",
+  "last_etl_date": "2026-10-24T05:14:25.175204",
   "calls": [
     {
       "id": "01M509E060V0SHK6BQ3MPXPFXE",
@@ -10,6 +10,17 @@
       "date": "2026-10-20",
       "duration_minutes": 38.900001525878906,
       "summary": "# Jake <> Brent weekly 1:1 (Friday)\nDate: 2026-10-20 | Duration: 38.900001525878906m\n\n## Summary\nThe discussion reviewed pipeline data quality, performance, ICP priorities, and follow-up actions. Attribution was mostly accurate, but one Salesforce opportunity was wrongly assigned to Jake, Funding Pips required correction as a Dubai-based education company with 1,409 employees, and incomplete records affected opportunity and website-traffic analysis. Performance showed one win and 23 losses among 24 opportunities with outcomes, while low-fit SMB and mid-market opportunities remained a conversion problem. The recommended ICP was B2B technology or software companies with 1,000–10,000 employees, supported by website traffic, Rio signals, Pro usage, and relevant OSS activity. Accounts under 100 employees would require stronger signals, with Pro prioritized over OSS. Brent would clean the data and share findings with Ryan, while Jake would analyze high-Rio, Pro, and OSS accounts. February 1 marked Jake’s one-year point, with approximately $500,000 sourced viewed as a strong first-year outcome. Dripify sequences were deferred to the next meeting.\n\n## Keywords\nICP segmentation, Rio intent signals, Website traffic, Pipeline attribution, Sales conversion, Dripify sequences\n\n## Action Items\n**Brent Holloway**\nCorrect Salesforce attribution (05:00)\nAdd post-October opportunities (05:42)\nClean pipeline reporting data (35:34)\nSend preliminary findings to Ryan (37:05)\nReview Dripify sequences (37:17)\n\n**Jake Stangl**\nVerify sub-100 employee accounts (29:20)\nCheck Pro and OSS usage (36:11)\nCombine HubSpot and Rio data (36:53)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5APA3TKTGNKMQ47257ZV19D",
+      "source": "fireflies",
+      "title": "Jake <> Brent weekly 1:1 (Friday)",
+      "date": "2026-10-23",
+      "duration_minutes": 57.970001220703125,
+      "summary": "# Jake <> Brent weekly 1:1 (Friday)\nDate: 2026-10-23 | Duration: 57.970001220703125m\n\n## Summary\nThe team reviewed multi-touch campaigns covering approximately 600 contacts across Dripify and Apollo. Phone outreach generated about one-third of meetings, while LinkedIn produced most of the remainder; email supported visibility and name recognition. Messaging was updated with stronger AI positioning, and personalized opening lines were being tested. Targeting will shift from alphabetical account selection to ICP-based prioritization, emphasizing website traffic of one million or more monthly visitors, especially accounts with 1,000 to 10,000 employees, while excluding university-heavy and weak segments. Reporting should combine Dripify and Apollo data and compare meetings and pipeline conversion by account quality, persona, seniority, traffic, and intent signals. A refined campaign will run alongside existing campaigns for at least one additional week, with separate naming and a benchmark campaign preserved. Airscale and Claude industry estimates will help address unreliable employee, traffic, and industry data. The next goals are to build approximately 200 optimized accounts, launch multi-persona sequences, review results weekly, and pursue one legitimate sub-$100K opportunity.\n\n## Keywords\nICP prioritisation, Website traffic, Apollo sequencing, Dripify campaigns, Claude enrichment, Outbound conversion\n\n## Action Items\n**Jeff Ignacio**\nCreate consolidated campaign report (03:22)\n\n**Jake Stangl**\nConnect with Jeff Ignacio (03:40)\nSend target account list to Brent Holloway (33:40)\nAdd Claude industry estimate column (33:40)\nFilter higher-education accounts (41:54)\nPrioritise high-traffic accounts (42:24)\nCreate Claude-filtered account list (52:12)\nLoad refined accounts into outreach sequences (52:12)\nKeep Dripify campaigns running (55:17)\nReview refined campaign performance weekly (55:28)\nRemove university-heavy Apollo campaigns (55:33)\nContinue conference-related outreach (55:59)\nSecure qualified sub-100 opportunity (56:16)\n\n**Brent Holloway**\nEnrich target account list in Airscale (33:40)",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

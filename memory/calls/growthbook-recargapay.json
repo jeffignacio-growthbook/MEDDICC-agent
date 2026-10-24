@@ -1,7 +1,7 @@
 {
-  "company": "Growthbook <> RecargaPay",
+  "company": "Growthbook <> Recargapay",
   "slug": "growthbook-recargapay",
-  "last_etl_date": "2026-09-03T06:04:10.794304",
+  "last_etl_date": "2026-10-24T05:14:25.180055",
   "calls": [
     {
       "id": "01M1CMR00BCWB6QBQKZS160SRB",
@@ -12,6 +12,17 @@
       "summary": "# Growthbook <> RecargaPay - Intro/Enterprise Contract Discussion\nDate: 2026-09-02 | Duration: 37.02000045776367m\n\n## Summary\nRecargapay is deciding whether to continue developing its internal experimentation platform or adopt GrowthBook’s self-hosted solution to centralize experiment and metric tracking. The evaluation reflects gaps in the current system, especially for metrics where users are randomized but offers or loans are measured. Red Magnos described repayment and conversion metrics that require beta-binomial analysis in Databricks notebooks because GrowthBook’s current ratio metrics, slicing, and statistical models may not provide sufficiently accurate confidence intervals. GrowthBook’s strengths include open-source extensibility, self-hosting, enterprise security, approval workflows, role-based access, SSO, data pipeline mode, dedicated engineering collaboration, and 24/7 support. Commercial discussions covered illustrative pricing of about $600–$750 per seat annually, a free tier limited to one project, and the need to finalize read-write and read-only users. Security documentation requires an NDA, while GrowthBook offered private Slack support, cost-comparison assistance, and Brazilian fintech references. A follow-up asynchronous session will address remaining technical questions.\n\n## Keywords\nExperimentation, self-hosted platform, data analytics, metric breakdowns, fintech compliance, open source extensibility\n\n## Action Items\n\n**Dan Wathne**\nSet up a private Slack channel with GrowthBook’s data scientists and engineering team to support RecargaPay’s asynchronous technical discussions (30:43)\nShare GrowthBook’s trust center security documentation and coordinate NDA process with RecargaPay to address fintech regulatory compliance needs (32:07)\nAwait detailed seat count and access requirements from RecargaPay to build a tailored pricing proposal for GrowthBook’s enterprise offering (31:19)\nProvide cost/benefit analysis comparing internal build versus adopting GrowthBook to assist RecargaPay’s decision-making process (34:38)\nFollow up on connecting RecargaPay with GrowthBook’s contact at Stone, a Brazilian fintech customer, for peer reference and insights (34:59)\n\n**Red Magnos**\nProvide detailed technical questions and clarifications asynchronously via Slack to support GrowthBook’s understanding of RecargaPay’s experimentation needs (27:10)\n\n**Alvaro Teijeiro**\nAnalyze internal requirements regarding the scale of read/write versus read-only seats to inform GrowthBook’s pricing and deployment planning (31:19)\nCoordinate internal security and compliance evaluation in parallel with GrowthBook to ensure adherence to fintech regulatory standards in Brazil (32:42)\nInform GrowthBook if RecargaPay requires contact with the Brazilian fintech Stone for reference and peer insights (35:35)\n\n**Jonathan Leibiusky**\nFacilitate the security documentation and compliance process between RecargaPay and GrowthBook to ensure smooth exchange and evaluation (32:38)\n",
       "organizer": "dan@growthbook.io",
       "participants": 6,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5FZ0HXAZQ0M5J64KHGD87K0",
+      "source": "fireflies",
+      "title": "Growthbook <> Recargapay - Pricing Sync",
+      "date": "2026-10-23",
+      "duration_minutes": 22.299999237060547,
+      "summary": "# Growthbook <> Recargapay - Pricing Sync\nDate: 2026-10-23 | Duration: 22.299999237060547m\n\n## Summary\nThe discussion favored a one-year GrowthBook evaluation to test adoption and internal usage, with longer-term contracting considered after value is demonstrated. The revised proposal included 45 read-write and 45 read-only seats, totaling 90 users, at $66,120 with a 20% discount and an additional $100 per-user reduction. Jonathan Leibiusky will take the commercial terms to Alvaro for approval, while Dan Wathne will prepare and send an order form containing the commercial structure and SLA terms. Legal, procurement, NDA, and security reviews remain necessary, making an early-November agreement more realistic than month-end completion. Internal experimentation-tool adoption is increasing, and future GrowthBook feature-flag use could increase read-write demand. Logan Bates explained that vulnerabilities are patched quickly, Vanta provides earlier visibility, cloud customers receive updates automatically, and self-hosted customers must pull current updates. Dan will also resend Jonathan the Slack invitation for faster communication. Sources: Progress Review 02:18–20:14; Commercial Terms 07:03–14:35; Request Callouts 15:20–18:27.\n\n## Keywords\nGrowthBook, RecargaPay, pricing negotiation, seat allocation, security review, self-hosted deployment\n\n## Action Items\n**Dan Wathne**\nDraft order form (14:35)\nSend commercial proposal (15:20)\nResend Slack invitation (18:27)\n\n**Jonathan Leibiusky**\nPresent proposal (15:20)\nConfirm security requirements (16:06)\nJoin Slack channel (18:20)",
+      "organizer": "dan@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

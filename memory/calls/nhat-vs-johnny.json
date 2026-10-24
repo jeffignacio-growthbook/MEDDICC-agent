@@ -1,0 +1,18 @@
+{
+  "company": "Nhat vs Johnny",
+  "slug": "nhat-vs-johnny",
+  "last_etl_date": "2026-10-24T05:14:25.176280",
+  "calls": [
+    {
+      "id": "01M5MWHK4ST5C8AMBWKR3NGW7N",
+      "source": "fireflies",
+      "title": "Nhat vs Johnny",
+      "date": "2026-10-23",
+      "duration_minutes": 21,
+      "summary": "# Nhat vs Johnny\nDate: 2026-10-23 | Duration: 21m\n\n## Summary\nThe discussion focused on aligning AI-assistant configuration and related screens with the intended design while preserving existing functionality. Model-selector placement, provider-session duplication, and enterprise-only visibility require information-architecture review. Cleanup includes correcting spacing, centering, line height, table widths, refresh-button placement, enterprise matching, and long-log readability. A full-width modal or side panel was favored for opening logs without losing the underlying page. Legacy owner-field behavior, navigation animation, automatic submenu collapse, and profile-dropdown controls will remain, while side highlighting will be removed and collapsed-menu patterns reviewed. Password reset placement will move toward Settings. Remaining design gaps include missing tags, custom-field and custom-mark areas, inconsistent add-row typography, search-control alignment, and the keyboard shortcut. Nhat Ho owns implementation cleanup, while Johnny Martinez handles design clarification, tags investigation, Markdown styling, screenshots, and collapsed-navigation direction. Demo readiness depends on completing the parity work.\n\n## Keywords\nAI assistant configuration, Embedded models, UI redesign, Sidebar navigation, Log viewer, Settings management\n\n## Action Items\n**Johnny Martinez**\nReview model selector placement (01:38)\nSend sidebar collapse screenshot (10:54)\nMove password reset (13:19)\nUpdate MD file (15:18)\nReview Tags design (15:53)\n\n**Nhat Ho**\nCorrect control spacing and alignment (01:55)\nImplement readable log detail view (05:08)\nMove refresh button (06:13)\nPreserve owner field support (07:51)\nRemove sidebar highlight treatment (09:28)\nProvide AI configuration screenshots (14:02)\nCorrect Add Row typography (14:24)\nRestore Tags functionality (16:53)\nAlign search close icon (18:34)\nChange search shortcut (20:12)\nComplete design cleanup (20:17)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

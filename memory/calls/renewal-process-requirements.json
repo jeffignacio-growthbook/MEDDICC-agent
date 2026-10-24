@@ -1,0 +1,18 @@
+{
+  "company": "Renewal Process Requirements",
+  "slug": "renewal-process-requirements",
+  "last_etl_date": "2026-10-24T05:14:25.175473",
+  "calls": [
+    {
+      "id": "01M5JA14XA19EXXP9VP5KSHRJQ",
+      "source": "fireflies",
+      "title": "Renewal Process Requirements Gathering",
+      "date": "2026-10-23",
+      "duration_minutes": 28,
+      "summary": "# Renewal Process Requirements Gathering\nDate: 2026-10-23 | Duration: 28m\n\n## Summary\nThe discussion addressed how to separate PepsiCo United States, PepsiCo India, Gatorade, Pepsi, and other brands when teams, budgets, or renewal timing differ, while generally keeping GrowthBook teams under one company. Renewal dates should be anchored to contract end dates, with a cutover decision needed for late-signature renewals and existing anniversary inconsistencies. Annual terms remain preferred, while multi-year and unusual terms require exception logic. Renewal and expansion ARR should reflect full recurring run rate for forecasting, while HubSpot and order forms retain prorated billing values. Proposed reporting should distinguish ARR, services revenue, TCV, ATR terminology, and one-time revenue, subject to Finance validation. Workflow requirements include updating open renewals when coterminated expansions close, formalizing renewal ownership with Ryan, standardizing renewal deal types, and addressing contraction handling. Jeff will document the design before technical specifications, build, testing, user acceptance testing, and a team demo. A 30-minute follow-up will cover contraction and auto-renewal logic.\n\n## Keywords\nRenewal automation, HubSpot data model, Contract end dates, ARR and TCV, Coterminated expansions, Contraction revenue\n\n## Action Items\n**Cary Rakin**\nWalk through PepsiCo account structure (03:53)\nShow renewal example (15:14)\n\n**Andy Marshall**\nProvide renewal field examples (26:16)\nTrain AI to check renewal calculations (26:16)\n\n**Jeff Ignacio**\nSchedule renewal requirements session (25:04)\nConsolidate renewal requirements (25:45)\nCreate functional renewal-process design (25:45)\nTranslate approved design into technical specifications (25:45)\nWork with Ops Methods on implementation (25:45)\nTest renewal workflow (25:45)\nConduct user acceptance testing (25:45)\nDemo completed process (25:45)\nCreate shared Claude skill (26:34)",
+      "organizer": "jeff.ignacio@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

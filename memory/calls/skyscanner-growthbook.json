@@ -1,7 +1,7 @@
 {
   "company": "Skyscanner + GrowthBook",
   "slug": "skyscanner-growthbook",
-  "last_etl_date": "2026-10-17T05:11:12.184860",
+  "last_etl_date": "2026-10-24T05:14:25.180838",
   "calls": [
     {
       "id": "01KZ1D9TK97FVF3J7VRS5F562J",
@@ -119,6 +119,17 @@
       "date": "2026-10-16",
       "duration_minutes": 16.3799991607666,
       "summary": "# Skyscanner + GrowthBook\nDate: 2026-10-16 | Duration: 16.3799991607666m\n\n## Summary\nThe discussion focused on coordinating with another Skyscanner team evaluating multi-armed bandits to avoid duplicate development and assess GrowthBook’s fit. Joanne, a data scientist for decision tooling, was invited to the next call and will compile technical and product questions, while Christian Liebenow will bring Luke or Jeremy for engineering or data science support. GrowthBook can either convert the trial environment or create a new production environment, with the existing proof of concept potentially repurposed as staging. Production readiness remains dependent on design reviews, technical decisions, and alignment across Flights Experience and other teams because the web front end spans multiple services and microsites. David Gregory will share a revised stakeholder plan by November 4. Experimentation Day will proceed on November 5, with Zoltan and Megan presenting and Hampus expected as a guest speaker. Rémy Marin’s shared-channel access remains pending, and the next meeting is scheduled for the following Friday. Sources: 04:11–13:18.\n\n## Keywords\nMulti-armed bandits, Production environments, Staging and sandbox, GrowthBook integration, Experimentation Day, Technical alignment\n\n## Action Items\n**Joanne**\nCompile bandit questions (04:11)\nSend questions to GrowthBook (04:11)\n\n**Christian Liebenow**\nCoordinate technical contacts (05:25)\nAddress technical questions (05:25)\n\n**David Gregory**\nShare revised integration plan (09:04)\n\n**Zoltan Bacskai**\nPrepare experimentation session (12:20)\nPresent experimentation session (12:20)\n\n**Megan Crothers**\nPrepare experimentation session (12:20)\nPresent experimentation session (12:20)",
+      "organizer": "christian@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5DNN375ZV9KXP3TCJGWKVS3",
+      "source": "fireflies",
+      "title": "Skyscanner + GrowthBook",
+      "date": "2026-10-23",
+      "duration_minutes": 23.950000762939453,
+      "summary": "# Skyscanner + GrowthBook\nDate: 2026-10-23 | Duration: 23.950000762939453m\n\n## Summary\nSkyscanner is assessing whether GrowthBook can support a dynamic homepage personalization proof of concept or whether the capability should be built in its ML platform. The homepage has three slots and potentially six modules, creating 120 configurations; a proposed alternative is to treat modules as arms and coordinate selection across slots. Contextual personalization using logged-in status, market, and platform is considered a later phase. GrowthBook supports contextual bandits, but support for combinatorial bandits remains unconfirmed, and coordinated slot bandits, nested experiments, and duplicate-module prevention require review. Operational questions include the proposed 15-minute refresh target versus GrowthBook’s hourly UI minimum and daily default, API cadence, DynamoDB availability, and online exposure and feature storage. Existing Databricks data may help with data access. Joan Capdevila will share materials, while Logan Bates will consult GrowthBook’s data science team; written responses are expected in the coming weeks before deciding on a POC or separate implementation.\n\n## Keywords\nCombinatorial bandits, Contextual bandits, Dynamic homepage personalisation, Multi-slot optimisation, Bandit refresh cadence, DynamoDB integration\n\n## Action Items\n**Logan Bates**\n- Consult GrowthBook data science team (09:51)\n- Verify GrowthBook API update intervals (16:09)\n- Review storage feasibility for bandit data (18:18)\n- Send Skyscanner feasibility response (20:20)\n\n**Joan Capdevila**\n- Share Skyscanner homepage use-case synopsis (20:35)\n- Share Skyscanner questions document (20:35)",
       "organizer": "christian@growthbook.io",
       "participants": 10,
       "summary_quality": "good"

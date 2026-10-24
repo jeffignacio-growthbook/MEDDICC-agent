@@ -1,0 +1,18 @@
+{
+  "company": "Jack Virag",
+  "slug": "jack-virag",
+  "last_etl_date": "2026-10-24T05:14:25.176156",
+  "calls": [
+    {
+      "id": "01M5JG1VT4HPS1GAD519GWVB6H",
+      "source": "fireflies",
+      "title": "30 min with Karen (Jack Virag)",
+      "date": "2026-10-23",
+      "duration_minutes": 63.599998474121094,
+      "summary": "# 30 min with Karen (Jack Virag)\nDate: 2026-10-23 | Duration: 63.599998474121094m\n\n## Summary\nWebsite resourcing centered on a parallel model: Huck Finch would handle performance optimization and CMS requests while Yousef worked through existing cards, improving rebrand readiness. The discussion emphasized a blameless approach, with unclear ownership identified as the source of friction rather than engineer performance; the backlog, target state, deadline, and resources were to be documented, with Chris’s feedback requested. For operations, the Claude folder was connected locally, GitHub authentication was completed, and the repository was updated through git pull with no uncommitted changes. Content strategy focused on closing the education-to-product gap, prioritizing core pieces, supporting nurture content, and adding more human author voices, including Karen and Jack. The Unicorn report model, campaign performance, webinars, guides, and underperforming formats were revisited. Podcast analysis began using the Opus model, while dashboards were planned to track production, performance, attribution, Plausible metrics, GrowthBook analytics, and CTA flows. Strategic planning involving Lindsay, Karen, and Ashley was proposed, with November–December considered.\n\n## Keywords\nWebsite resourcing, Huck Finch, Jack Ops, GitHub integration, Content strategy, Marketing analytics\n\n## Action Items\n**Jack Virag**\nCoordinate Huck Finch proposal (02:00)\nDefine website outcomes (06:50)\nObtain Chris’s alignment (06:50)\nDocument website current state (10:30)\nConfigure analytics metrics (56:29)\nTest Jack Ops skill (01:01:00)\n\n**Karen Henke**\nRun content analysis (42:38)\nSuggest content strategy (59:31)\nDiscuss unicorn report (59:31)\nIterate content analysis (01:01:00)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

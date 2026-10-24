@@ -1,7 +1,7 @@
 {
   "company": "Ashley / Jake",
   "slug": "ashley-jake",
-  "last_etl_date": "2026-09-25T05:35:27.952074",
+  "last_etl_date": "2026-10-24T05:14:25.176702",
   "calls": [
     {
       "id": "01KJX64F3CR10EZN5PPXSKRA9N",
@@ -179,6 +179,17 @@
       "date": "2026-09-24",
       "duration_minutes": 19.06999969482422,
       "summary": "# Ashley / Jake\nDate: 2026-09-24 | Duration: 19.06999969482422m\n\n## Summary\nThe team refined outreach around warm and hot leads at companies including Iterable, Prickett.IO, Bloomberg, Dexcom, and Nuo AI, prioritizing product managers, buyers, and other decision-makers while filtering out lower-level technical roles. Lyndsie enriched roughly 800 conference contacts using Claude and Apollo, and Jake used Rio data tabs, Apollo sequences, active-developer filters, and LinkedIn research to qualify prospects. Marketing and sales are moving toward a hybrid scoring model combining company fit and individual activity, with nurture campaigns for less active leads and personalized follow-up for hot prospects. Data-quality problems delayed scoring because integrations overwrote key fields, so cleanup and training are planned. A Jumbo demo drew 8 of 10 registrants, while AI conference follow-up was slowed by limited attendee data; Jake secured meetings with Postman and Speakeasy.com. Podcast frequency will decrease from two guests weekly to two monthly, and the spring drive campaign may be discontinued to prioritize higher-impact work.\n\n## Keywords\nlead outreach, marketing automation, lead scoring, demo event, podcast scheduling, AI conference, Apollo sequences\n\n## Action Items\n\n**Jake Stangl**\nReach out to warm/hot leads from Iterable, Prickett.IO, Bloomberg, Lamb Research, Dexcom, Nuo AI, and Lucid (01:18)\nFollow up on enterprise recurring demo lead and pre-conference meetings with Postman and Speakeasy (03:24)\nCoordinate with Chris on Speakeasy coffee meeting and highlight Speakeasy CLI use (06:44)\nAdjust podcast guest sourcing cadence to two per month and comply with PR review before prep sessions (07:14)\n\n**Lyndsie Berens**\nSet up marketing email campaigns for contacts not being reached by Jake (03:07)\nContinue extracting and enriching leads from AI conference attendee app data; share processed spreadsheet and coordinate Apollo enrichment (04:47)\nProvide updates and training for lead scoring system once backend data issues resolved and new default routing goes live (08:22)\nCoordinate with marketing on lead nurturing and passing leads to sales when they become “hot.” (14:08)\n\n**Ashley Stirrup**\nFacilitate LinkedIn outreach and manage marketing outreach process alongside Apollo campaigns (16:20)\nConfirm podcast guest cadence adjustments and introduce PR review before prep sessions to reduce prep/no-show burden (07:22)\nCollaborate on defining outreach email content and ensure standardized/generalized approach (16:43)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5APA3VGAEHKEC18MZ3EAMSV",
+      "source": "fireflies",
+      "title": "Ashley / Jake",
+      "date": "2026-10-23",
+      "duration_minutes": 28.729999542236328,
+      "summary": "# Ashley / Jake\nDate: 2026-10-23 | Duration: 28.729999542236328m\n\n## Summary\nThe team reviewed podcast promotion and follow-up, including a new post-recording process that helps guests schedule promotional posts and a plan to review the last 30 days for renewed outreach. Podcast ownership, recording dates, and guest assignments still need cleanup, while guest outcomes now flow through the connected CRM interface. Sales reps must manually create opportunities because the automated workflow was turned off. CRM views expose activity, ownership, outcomes, and recording data, although contact notes editing and data quality remain unresolved. Contact Us alerts will be routed to the shared Sales BDR leads channel. Jake will own post-conference outreach, and Lyndsie will prepare prioritized hot and warm lead lists by Monday. AEs will confirm meetings booked after conferences because HubSpot and LinkedIn activity tracking is incomplete. Jake will manually qualify fewer than 100 buyer-segment contacts, while broader filters remain in place and customer exclusion work continues.\n\n## Keywords\nPodcast follow-up, HubSpot workflows, Conference leads, Sales BDR, Prospect segmentation, Slack notifications\n\n## Action Items\n**Ashley Stirrup**\nReview podcast meetings (04:43)\nRestore buyer-segment filter (26:40)\n\n**Jake Stangl**\nAdd Jake’s name to Podcast Booked By field (07:43)\nConfirm post-conference meetings (12:45)\nBegin follow-up with conference leads (12:45)\n\n**Lyndsie Berens**\nClarify podcast ownership and assignment data (08:13)\nSend podcast follow-up list to Jake (09:50)\nCompile conference lead lists (12:05)\nImprove HubSpot meeting tracking (13:10)\nSend prioritised conference lead list to Jake (13:32)\nInvestigate contact notes editing (14:20)\nRoute Contact Us and demo notifications to Sales BDR leads channel (19:04)",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

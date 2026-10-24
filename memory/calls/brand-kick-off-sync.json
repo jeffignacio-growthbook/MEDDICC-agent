@@ -1,0 +1,18 @@
+{
+  "company": "Brand Kick-off Sync",
+  "slug": "brand-kick-off-sync",
+  "last_etl_date": "2026-10-24T05:14:25.175625",
+  "calls": [
+    {
+      "id": "01M52DGCTK68BSR0954H5D98H7",
+      "source": "fireflies",
+      "title": "Brand Kick-off Sync",
+      "date": "2026-10-23",
+      "duration_minutes": 60.29999923706055,
+      "summary": "# Brand Kick-off Sync\nDate: 2026-10-23 | Duration: 60.29999923706055m\n\n## Summary\nGrowthBook’s brand should be expert, transparent, accessible, witty, opinionated, and partnership-oriented, while avoiding specialist-only language and unearned leadership claims. Founded in 2020 from internal experimentation work, the company adopted open source after one $900-per-month customer and approximately 10 unsuccessful sales opportunities. Its differentiation includes open-source and warehouse-native experimentation, technical control, transparent analysis, self-hosting, readable code, and an independent roadmap. Enterprise organizations remain the primary audience, representing approximately 80% of revenue, while startups and growth-stage companies support self-serve expansion. Buyer and champion roles need clearer segmentation, especially for data scientists. The brand must reduce perceptions of complexity while balancing authority, approachability, technical credibility, and authenticity. The website can evolve substantially, but major product UI changes are not desired; the current logo remains preferred unless a replacement is substantially better. Next steps include refining the questionnaire, completing persona details, and beginning the external brand kickoff on Monday.\n\n## Keywords\nBrand strategy, experimentation, open source, warehouse-native analytics, product intelligence, ideal customer profile\n\n## Action Items\n**Lyndsie Berens**\nRefine GrowthBook expertise wording (04:16)\nAdd founding story details (05:58)\nUpdate working document (57:09)\nSend revised document (57:09)\nSchedule Jeremy’s interview (57:09)\nAsk external brand team about persona analysis (58:15)\n\n**Graham McNicoll**\nComplete founding story section (04:44)\n\n**Elyse Fox**\nCombine growth and risk messaging (56:20)\nComplete persona spreadsheet (57:59)\n\n**Scott Bailey**\nComplete persona spreadsheet (57:59)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

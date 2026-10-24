@@ -1,0 +1,18 @@
+{
+  "company": "Snowflake NYC",
+  "slug": "snowflake-nyc",
+  "last_etl_date": "2026-10-24T05:14:25.175758",
+  "calls": [
+    {
+      "id": "01M4QP2XRQ8ZPBGM8WMS4HQGKH",
+      "source": "fireflies",
+      "title": "Snowflake NYC - Post-Event Debrief",
+      "date": "2026-10-23",
+      "duration_minutes": 33,
+      "summary": "# Snowflake NYC - Post-Event Debrief\nDate: 2026-10-23 | Duration: 33m\n\n## Summary\nThe team assessed event performance, recording 72 booth visits after cleaned-list scans, 67 additional scans, approximately 11 hot leads, and two discussed demos. Branding, the large booth sign, and swag attracted attention, but the booth’s location and nearby speaker noise limited conversations. Lead quality varied because the free event attracted swag-focused visitors and data engineers unfamiliar with feature flagging and experimentation. Directly booking demos at the booth, including Cary Rakin’s confirmed booking and Chelsea Peers’ strong buying intent, was viewed as the best conversion path, while rep follow-up underperformed. The team proposed centralizing recent show leads with Jake, prioritizing hot accounts such as Novo Nordisk, and using Apollo automation for medium-intent contacts. Future participation could use one or two local team members, fintech-focused messaging, and paid events, while excluding Snow Cash. Planned improvements included feature-highlight slides, AWS walkthrough content, business cards, expense submission, photo uploads, and lead-list review.\n\n## Keywords\nSnowflake event, Lead generation, Demo scheduling, Booth activation, Feature flagging, Event sponsorship\n\n## Action Items\n**Lyndsie Berens**\nSubmit feedback on event lead scanner (07:29)\nSend event lead list to Cary Rakin (10:14)\nCreate business-card design (13:43)\nSend medium-intent leads to Jake Sharp (21:24)\nCompile event leads into organised list (22:24)\nPrioritise hot leads (22:49)\nMessage Ryan about lead ownership (22:54)\n\n**Cary Rakin**\nIdentify priority accounts (10:14)\n\n**Liz Fox**\nReview event prospectus (11:56)\n\n**Emmy Sharp**\nSubmit event expense reports (21:24)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

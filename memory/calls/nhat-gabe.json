@@ -1,0 +1,18 @@
+{
+  "company": "Nhat + Gabe",
+  "slug": "nhat-gabe",
+  "last_etl_date": "2026-10-24T05:14:25.176032",
+  "calls": [
+    {
+      "id": "01M5N182EZBFWF8K77JETH8NNT",
+      "source": "fireflies",
+      "title": "Nhat + Gabe + Johnny > Settings",
+      "date": "2026-10-23",
+      "duration_minutes": 16,
+      "summary": "# Nhat + Gabe + Johnny > Settings\nDate: 2026-10-23 | Duration: 16m\n\n## Summary\nThe team confirmed that Nhat Ho completed the settings-page cleanup by removing AI-tab collapse behavior, while non-collapsible navigation remains temporary until collapsible navigation returns. Settings search will remain as a local filter for settings sections and page names, while global search supports broader page discovery. The team reconsidered the slash shortcut: Nhat may restore slash or command-slash behavior, but Johnny Martinez preferred a command icon or clearer indicator because a standalone slash could be confusing. Gabe Melean demonstrated the new full-bleed app header, prompting discussion about possible conflicts with the settings header, breadcrumb placement, side-navigation hierarchy, and light-purple backgrounds. Nhat will test breadcrumb and navigation variants and prepare comparison screenshots, while Gabe will provide sidebar screenshots. The team will use these visuals to decide between integrated navigation and a detached-card treatment. Collapsible sidebar work is expected after release, and the header issue is not blocking current implementation.\n\n## Keywords\nSettings search, Collapsible sidebar, App header, Breadcrumbs, Side navigation, UI design\n\n## Action Items\n**Gabe Melean**\n- Fix sidebar navigation bug (08:31)\n- Send sidebar navigation screenshots (15:45)\n\n**Nhat Ho**\n- Test breadcrumb placement (11:41)\n- Send layout screenshots (12:43)\n- Complete remaining settings pages (12:43)\n- Review settings pull request (12:43)\n\n**Johnny Martinez**\n- Review sidebar navigation screenshots (15:45)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

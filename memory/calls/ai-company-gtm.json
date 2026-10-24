@@ -1,0 +1,18 @@
+{
+  "company": "AI Company GTM",
+  "slug": "ai-company-gtm",
+  "last_etl_date": "2026-10-24T05:14:25.180443",
+  "calls": [
+    {
+      "id": "01M5D2S307YJRNGHRQDFZ40Y3Z",
+      "source": "fireflies",
+      "title": "AI Company GTM Strategy Session",
+      "date": "2026-10-23",
+      "duration_minutes": 33.869998931884766,
+      "summary": "# AI Company GTM Strategy Session\nDate: 2026-10-23 | Duration: 33.869998931884766m\n\n## Summary\nAI companies were established as the strategic market priority, with self-hosting positioned as a key differentiator and multi-quarter market penetration expected. Kris is focused exclusively on AI companies, with quick signals and go-to-market velocity emphasized. The traditional inbound model remains important because outbound represents less than four percent and inbound deals close quickly with strong historical close rates. AI buying barriers include younger companies, limited experimentation awareness, absent budgets, and undefined projects. Key use cases include measuring feature-change impact, preserving quality while using cheaper models, reducing inference costs, reducing churn, improving activation, and optimizing pricing. Evals measure quality while experimentation measures business value, creating a potential partner-content opportunity. The group prioritized aligned positioning, shared naming, pitches, broad educational content, and account-specific assets, while the timing of full ABM remains contested. Near-term targeting includes best-fit AI companies, Statsig customers affected by acquisition, Pro-to-Enterprise expansion, EPO, and Statsig replacements. Follow-ups include sending Statsig and EPO company lists and the PowerPoint to marketing, alongside relaunching two targeted LinkedIn ad sets.\n\n## Keywords\nAI experimentation, Account-based marketing, Brand positioning, Model optimisation, Online evaluations, Statsig replacement\n\n## Action Items\n**Kris Washburn**\nParticipate in brand positioning (28:58)\nPursue segmented outreach (30:55)\nShare Statsig target list (32:08)\nShare Eppo target list (32:08)\nSend positioning presentation (32:08)\n\n**Jacqueline Thomson**\nVerify LinkedIn ad coverage (28:50)",
+      "organizer": "kris@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

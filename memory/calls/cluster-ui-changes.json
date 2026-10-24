@@ -1,0 +1,18 @@
+{
+  "company": "cluster UI changes",
+  "slug": "cluster-ui-changes",
+  "last_etl_date": "2026-10-24T05:14:25.175887",
+  "calls": [
+    {
+      "id": "01M5JDQYCF6QSRZ2RRH8S5NT9V",
+      "source": "fireflies",
+      "title": "cluster UI changes",
+      "date": "2026-10-23",
+      "duration_minutes": 18.239999771118164,
+      "summary": "# cluster UI changes\nDate: 2026-10-23 | Duration: 18.239999771118164m\n\n## Summary\nThe discussion covered experiment setup, results presentation, health checks, and controls. Checkbox supports progressive disclosure, while cluster experiments disable post-stratification and activation metrics; identifier copies must remain uniform. Results should show adjacent identifiers, allow a subunit-child relationship, clearly call out region-level analysis, and place user IDs after region IDs. Health checks default to user-ID traffic, omit user-level SRM dimensions, and include cluster mapping and assignment checks. Both checks feed status. Opt-out becomes disabled after an experiment starts, while imported experiments remain toggleable. A health-check redesign is planned eventually. Sources: Experiment Setup, Results Display, Health Checks, and Decisions And Next Steps sections.\n\n## Keywords\nCluster experiments, subunit identifiers, post-stratification, SRM checks, health checks, metric granularity\n\n## Action Items\n**Michael Samper**\nStandardize identifier labels (05:50)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

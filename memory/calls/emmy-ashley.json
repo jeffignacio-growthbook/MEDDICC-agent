@@ -1,7 +1,7 @@
 {
   "company": "Emmy/Ashley",
   "slug": "emmy-ashley",
-  "last_etl_date": "2026-09-25T05:35:27.951341",
+  "last_etl_date": "2026-10-24T05:14:25.174683",
   "calls": [
     {
       "id": "01KT4VEV3XMA0DK2CNSR6RA773",
@@ -47,6 +47,17 @@
       "date": "2026-09-24",
       "duration_minutes": 15.100000381469727,
       "summary": "# Emmy/Ashley\nDate: 2026-09-24 | Duration: 15.100000381469727m\n\n## Summary\nThe team is preparing product-page updates by compiling a comprehensive list from version 5.1 onward, after deciding that including version 5.0 would make the content too long and unwieldy. Emmy Sharp has the prompt from Scott and will prepare the list, while Scott will review it before publication in Webflow. HubSpot automation for G2 and onboarding outreach is blocked by Emmy’s lack of permission to send sequences; Lindsay recommended workflows instead, although their interface is complex and time-consuming. Ashley Stirrup plans to discuss permissions and possible workflow improvements with Lindsay. Manual outreach is inefficient, and data preparation is complicated because Growth Book sends signup data to HubSpot, while Lindsay prefers lists sourced and verified through Hex and Claude. Podcast publishing is also delayed by Tanner’s late and incomplete submissions, requiring Emmy to correct and chase content. Emmy welcomed Jack’s planned involvement in taking on responsibilities and helping free her capacity, while the team maintained a positive, friendly atmosphere.\n\n## Keywords\nproduct updates, HubSpot, automation workflow, G2 outreach, permissions, onboarding process\n\n## Action Items\n\n**Emmy Sharp**\nContinue generating the product updates list since version 5.1 and submit it for Scott’s review, then publish the updates in Webflow (03:50)\nBuild HubSpot workflow automation for G2 outreach emails following Lindsay’s advice to avoid using sales sequences (10:40)\nIf new permissions for sending sequences in HubSpot are not granted, repeat the current outreach process (11:53)\n\n**Ashley Stirrup**\nDiscuss with Lindsay the possibility of granting Emmy permission to send sequences in HubSpot or confirm the use of workflows during Ashley’s next meeting with Lindsay (11:28)\nAssist in simplifying the process of extracting qualified signup lists from Hex, Claude, and HubSpot for outreach eligibility (13:08)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5D1HEH8Q76S26ZWDWE4HJVZ",
+      "source": "fireflies",
+      "title": "Emmy/Ashley",
+      "date": "2026-10-23",
+      "duration_minutes": 6.389999866485596,
+      "summary": "# Emmy/Ashley\nDate: 2026-10-23 | Duration: 6.389999866485596m\n\n## Summary\nEmmy Sharp identified Ashley Stirrup and raised a wellbeing concern, saying Ashley had seemed more tired than usual during the previous day’s meeting. Ashley said they had not felt that tired at the time and asked which meeting Emmy meant; Emmy referred to “Growth Book” and “Huck Finch.” Emmy also acknowledged that Ashley had a lot going on. The conversation then turned to memberships, with Emmy saying Emmy Sharp was curious and seriously interested, while mentioning the phrase “Free Chelsea”; its meaning was not clarified. Ashley asked how to remove “this guy” from the call, and Emmy instructed the participant to be removed.\n\n## Keywords\nMemberships, Call removal, Previous meeting, Fatigue, Growthbook, Curious\n\n## Action Items\n**Unassigned**\nRemove unidentified participant (05:07)",
       "organizer": "ashley@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

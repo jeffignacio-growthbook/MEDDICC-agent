@@ -1,0 +1,18 @@
+{
+  "company": "SiriusXM + GrowthBook",
+  "slug": "siriusxm-growthbook",
+  "last_etl_date": "2026-10-24T05:14:25.181407",
+  "calls": [
+    {
+      "id": "01M5MHYCVHVPDD3HS92CBYDE4E",
+      "source": "fireflies",
+      "title": "SiriusXM + GrowthBook",
+      "date": "2026-10-23",
+      "duration_minutes": 38.38999938964844,
+      "summary": "# SiriusXM + GrowthBook\nDate: 2026-10-23 | Duration: 38.38999938964844m\n\n## Summary\nAdswizz selected GrowthBook for a server-side A/B testing proof of concept focused initially on yield and ad-request demand prioritization. The open-source evaluation will run alongside enterprise due diligence, using Adswizz’s internal warehouse as the experimentation data source so data remains on its premises. The open-source deployment is intended for experimentation only; feature flags are outside the current scope. Self-hosting is likely, pending infrastructure, privacy, and security review. Future use cases may include auction mechanics, pacing, pricing, demand selection, partner integrations, and marketplace-flow experiments. Enterprise capabilities discussed included governance, UI-based test management, Bayesian and Frequentist statistics, multi-armed bandits, holdouts, cumulative measurement, SSO, role-based access, dedicated Slack support, and warehouse-cost optimization. Pricing included annual platform fees of $175,000 for self-hosted or $200,000 for cloud, plus $1,250 per user and $500 per experiment. GrowthBook will provide follow-up materials, while biweekly discussions and a next meeting targeted for the first week of November were proposed.\n\n## Keywords\nWarehouse-native experimentation, Server-side A/B testing, Self-hosted deployment, Ad marketplace optimisation, Enterprise pricing, Experiment governance\n\n## Action Items\n**Drew Moncelle**\nConfirm AdsWizz deployment model (12:12)\nShare GrowthBook follow-up materials (33:54)\nCoordinate bi-weekly follow-up cadence (33:54)\n\n**Christian Liebenow**\nSend GrowthBook capability comparison (31:42)\nSend recording and product materials (33:54)\nSend NDA (35:41)",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}
