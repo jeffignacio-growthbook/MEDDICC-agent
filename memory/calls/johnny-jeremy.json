@@ -1,7 +1,7 @@
 {
   "company": "Johnny / Jeremy",
   "slug": "johnny-jeremy",
-  "last_etl_date": "2026-10-20T05:31:35.471689",
+  "last_etl_date": "2026-10-27T05:49:09.406598",
   "calls": [
     {
       "id": "01M1CPHH6FV29WP3AG291HZSWM",
@@ -56,6 +56,17 @@
       "summary": "# Johnny / Jeremy\nDate: 2026-10-19 | Duration: 26m\n\n## Summary\nThe discussion established the UI refresh scope, prioritizing Dashboard, Attributes, and Environments while deferring Save Groups because a new save group type would add complexity. Onboarding should explicitly collect attributes, identifiers, and environments, including environment selection from five options and drag-and-drop ordering. Production environments should be identified separately so stricter controls and approval flows can apply, while QA testing remains enabled outside production. Identifiers will use a separate table and add flow, with no filtering, sorting, or pagination expected. AI dashboard creation was prioritized through a modal offering Start Blank or Start From AI, with users describing the desired dashboard in text. Homepage changes include removing Running Now, keeping Needs Attention prominent, improving dashboard selection, and moving dashboards above the fold. Johnny owns homepage adjustments, while Jeremy will help communicate ownership of resizable attribute-table columns. Initial feedback on the Fact Table direction was positive, pending further alignment.\n\n## Keywords\nDashboard UX, Homepage redesign, Environment configuration, Attribute management, Identifier management, AI dashboard creation\n\n## Action Items\n**Johnny Martinez**\n- Refresh Environments UI (06:26)\n- Create Identifiers UI (07:10)\n- Update homepage layout (23:25)\n\n**Jeremy Dorn**\n- Notify Gabe about columns (09:56)\n- Ping Bryce about columns (10:31)",
       "organizer": "johnny@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5WSDK9CW7GQ0GHV8PXD8HGX",
+      "source": "fireflies",
+      "title": "Johnny / Jeremy",
+      "date": "2026-10-26",
+      "duration_minutes": 26,
+      "summary": "# Johnny / Jeremy\nDate: 2026-10-26 | Duration: 26m\n\n## Summary\nThe team favored redesigning dashboard sharing around an access-first flow with restricted or organization access, followed by view, comment, or edit permissions; public-link sharing will come later. For AI creation, a sidebar chat modeled on Claude-style progressive interaction could support iterative dashboard revisions and eventually metric creation, while avoiding conflict with the existing AI chat. Tag settings will remain simple, centered on tag names and colors, since settings mainly support editing existing tags. A tag interaction delay was fixed by correcting an extra zero, and settings implementation is nearing pull-request review. Feature flags remain the last major core application area needing a full design pass, while navigation work continues. An onboarding kickoff is likely next week, with Jeremy planning to test account setup and contact Gabe for existing onboarding screenshots.\n\n## Keywords\nDashboard sharing, AI-assisted creation, Tag management, Design system, Onboarding, Feature flags\n\n## Action Items\n**Johnny Martinez**\n- Update dashboard sharing design (06:19)\n- Mock up chat-based Create with AI flow (10:34)\n- Simplify tag settings interface (20:44)\n- Create test accounts (22:28)\n- Build initial onboarding flow locally (22:28)\n- Contact Gabe (24:44)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 1,
       "summary_quality": "good"
     }
   ]

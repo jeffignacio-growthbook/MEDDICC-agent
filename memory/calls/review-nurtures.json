@@ -1,0 +1,18 @@
+{
+  "company": "Review Nurtures",
+  "slug": "review-nurtures",
+  "last_etl_date": "2026-10-27T05:49:09.405441",
+  "calls": [
+    {
+      "id": "01M5AAYVSW85N5Q3V2E0H57AC9",
+      "source": "fireflies",
+      "title": "Review Nurtures",
+      "date": "2026-10-26",
+      "duration_minutes": 42.65999984741211,
+      "summary": "# Review Nurtures\nDate: 2026-10-26 | Duration: 42.65999984741211m\n\n## Summary\nThe team evaluated whether to use separate nurture flows or one controlled cadence, with a preference for centralized HubSpot control to reduce overlapping sends. Onboarding nurture was the highest priority and will incorporate interview requests, clearer persona and license segmentation, live demos, and relevant product links. General nurture was identified as the next design focus, potentially covering recycled leads and long-term event audiences, while post-event sequences remain distinct. Reactivation, closed-lost re-engagement, and product-triggered campaigns were deferred. AI BDR activity remains blocked by incomplete lead scoring, and sales routing still needs rules for priority accounts and hot, warm, and cold event leads. Data limitations include incomplete role information, unavailable product activity data, Rio integration work, and billing data not synchronized with HubSpot. A central repository will track active, historical, and planned nurtures.\n\n## Keywords\nNurture workflows, lead scoring, AI BDR, HubSpot data, onboarding campaigns, reactivation marketing\n\n## Action Items\n**Lyndsie Berens**\nSchedule operations stakeholder discussion (00:26)\nReview role-based contact data (02:49)\nDiscuss role-based data with Guy (03:54)\nUpdate central nurture inventory (06:36)\nDocument inactive historical nurtures (07:29)\nConsolidate nurture priorities (20:37)\nSchedule nurture prioritisation session (20:37)\nFix onboarding nurture trigger (21:17)\nReview recycled-lead definition with Sean (39:04)\nSchedule Rio data integration meeting (39:34)\n\n**Ashley Stirrup**\nContinue Rio data work (02:41)\nProvide AI BDR and Rio updates (40:45)\n\n**Emmy Sharp**\nImplement onboarding nurture updates (38:27)\nFinalise onboarding nurture with Scott and Karen (22:34)\n\n**Jacqueline Thomson**\nDefine general-purpose nurture plan (38:27)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

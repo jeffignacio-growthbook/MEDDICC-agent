@@ -1,7 +1,7 @@
 {
   "company": "Bla Bla Car",
   "slug": "bla-bla-car",
-  "last_etl_date": "2026-10-21T05:31:34.620153",
+  "last_etl_date": "2026-10-27T05:49:09.415889",
   "calls": [
     {
       "id": "6ab284fe124f390020b1ea0e",
@@ -43,6 +43,17 @@
       "date": "2026-10-20",
       "duration_minutes": 21.950000762939453,
       "summary": "# Bla Bla Car & GrowthBook Commercial Check In\nDate: 2026-10-20 | Duration: 21.950000762939453m\n\n## Summary\nTesting stopped after conversion rates declined, while full-flow integration and Adrien LOISON’s analysis remained incomplete. The contract process advanced through Jean Baptiste, but finance validation, legal review, and documentation requirements were still pending. James Shannon must update pricing to 70,000, replace the existing 60,000 or 65,000 for 100 references, and send the full contract for review, with signature targeted around the 28th. The event forwarder was rejected for long-term use because it was considered too expensive, while a Java SDK issue was fixed within 24 hours. Java SDK updates remain slower because the external support owner is on maternity leave for another two months. SLA coverage for support responsiveness must be confirmed. French consent requirements for front-end tracking remain under review, although exposure events can be configured to send only after consent and remote evaluation is available. A follow-up is planned for Friday and may move to Monday or be cancelled if no legal update is available.\n\n## Keywords\nSDK support, Contract negotiation, Enterprise SLAs, Event forwarder, A/B testing, EU consent\n\n## Action Items\n**James Shannon**\n- Send updated contract/order form (06:17)\n- Highlight SLA sections (12:28)\n- Confirm SDK maintenance ownership (12:28)\n- Obtain legal contract review (13:52)\n- Provide consent guidance (16:47)\n\n**Adrien LOISON**\n- Review contract with legal team (12:28)\n- Coordinate follow-up meeting (18:37)\n\n**Alexandre Laigné**\n- Keep follow-up meeting scheduled (19:45)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5FRTRWFAZPZ48R6HV5X8QGS",
+      "source": "fireflies",
+      "title": "Bla Bla Car & GrowthBook Catchup",
+      "date": "2026-10-26",
+      "duration_minutes": 15.880000114440918,
+      "summary": "# Bla Bla Car & GrowthBook Catchup\nDate: 2026-10-26 | Duration: 15.880000114440918m\n\n## Summary\nThe contract review focused on identifying the correct customer agreement: the order form references February 26, while the latest online version appears dated June 25. James Shannon will locate the referenced version, provide an updated order form with a change summary, upload it to the contract management system, and route it to legal. Legal review is the main timing risk, although Jean-Baptiste Favre said signing by Wednesday remains feasible if no issues arise. Weekend support wording is unresolved; standard technical support operates Monday to Friday, while the team would normally respond to a severe outage or P1 issue. Written P1 coverage language is requested, and James will seek legal feedback. The customer also requested a termination right for repeated SLA failures; James proposed exploring a 12-month performance and uptime review with a possible exit. Adrien Loison requested removal of net 60 terms and payment timing that supports payments in 2026 and 2027. The POC continues to show unusual conversion-rate figures, which Adrien will discuss with Remy while Natasha is unavailable.\n\n## Keywords\nSLA remedies, Weekend support, Contract termination, Payment terms, Contract review, Proof-of-concept data\n\n## Action Items\n**James Shannon**\n- Locate customer agreement version (01:49)\n- Consult GrowthBook’s lawyers (04:54)\n- Evaluate contract out clause (08:09)\n- Incorporate payment timing (10:10)\n- Return updated order form (13:46)\n\n**Jean-Baptiste Favre**\n- Upload customer agreement (02:23)\n- Confirm termination rights (06:29)\n- Notify James Shannon of timeline changes (10:51)\n- Route updated order form (13:17)\n\n**Adrien Loison**\n- Ask Remy about data numbers (14:39)",
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
       "summary_quality": "good"

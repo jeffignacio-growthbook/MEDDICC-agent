@@ -1,0 +1,18 @@
+{
+  "company": "jack/scott weekly",
+  "slug": "jack-scott-weekly",
+  "last_etl_date": "2026-10-27T05:49:09.406266",
+  "calls": [
+    {
+      "id": "01M5QTKP4M4E7TM25KDTHJRPKV",
+      "source": "fireflies",
+      "title": "jack/scott weekly",
+      "date": "2026-10-26",
+      "duration_minutes": 32.560001373291016,
+      "summary": "# jack/scott weekly\nDate: 2026-10-26 | Duration: 32.560001373291016m\n\n## Summary\nThe team agreed to move forward with Huck Finch using a 100-hour punch card costing under $10,000, while deferring events-page work because Lindsey’s bandwidth is constrained and the Focus Lab project is prioritized. Performance work will add bandwidth, include CMS work, and leave Yousef’s contract unchanged until completion is reviewed. Marketing responsibilities are shifting, with Jacqueline taking paid work and field support under consideration. Analytics ownership is consolidating, with Scott shepherding architecture, Lindsay handling much of the execution, and shared source-of-truth definitions. GrowthBook needs marketing-site instrumentation and product-web alignment; ClickHouse will centralize data, while Hex is preferred for initial prototypes. Product updates shipped successfully, balancing Jack’s preference for faster releases with Scott’s focus on quality, and updates may support sales enablement. An AI workflow prototype embeds Claude with Slack, calendars, email, Notion, Obsidian, and handwritten notes, though prioritization and access remain concerns. Heavy meetings limit deep work, and Jack’s vacation begins after Monday.\n\n## Keywords\nWebflow performance, GrowthBook analytics, AI productivity, Product updates, Marketing operations, Data architecture\n\n## Action Items\n**Jack Virag**\nAdvance Webflow agency decision (17:21)\nSet up GrowthBook tracking (25:48)\nInvestigate Hex reporting (30:26)\n\n**Scott Bailey**\nSurface product updates experience (19:40)\nPing Lindsey about product updates (19:40)\nShepherd analytics project (24:19)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

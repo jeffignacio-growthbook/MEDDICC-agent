@@ -1,7 +1,7 @@
 {
   "company": "Marketing Team Meetings",
   "slug": "marketing-team-meetings",
-  "last_etl_date": "2026-10-20T05:31:35.472808",
+  "last_etl_date": "2026-10-27T05:49:09.411129",
   "calls": [
     {
       "id": "01KGAQX200F3FCHJMSYE898TZD",
@@ -414,6 +414,17 @@
       "summary": "# Marketing Team Meetings\nDate: 2026-10-19 | Duration: 69.62999725341797m\n\n## Summary\nThe team reviewed priorities across marketing, research, analytics, product marketing, documentation, website work, campaigns, events, and growth engineering. Interleaving content will likely be recorded unless Luke supports a live webinar, while broader ClickHouse content is better suited for December promotion. Customer research aims to complete 10 onboarding interviews using email outreach, Amazon gift cards, and possible in-product prompts after day three. Analytics work focuses on defining a minimum KPI set for pipeline, demos, MQLs, signups, and quarterly pipeline creation, while correcting attribution, tracking, lead-routing, and inbound-reporting gaps, including a reported 40% demo-request decline caused by a tracking change and bug. Product marketing is finalizing product-update automation, shortening a 30-minute demo, and using sales-call intelligence. Documentation for version 5.2, GB Sync adoption, community visibility, website performance, engineering-led content, AWS communications, Conversion Hotel preparation, and GrowthBook funnel instrumentation also progressed. The team rejected a proposed $30,000 plan and will continue with Zoom Plus.\n\n## Keywords\nInterleaving, Product analytics, Marketing attribution, Customer onboarding, GrowthBook documentation, Webinar strategy\n\n## Action Items\n**Ashley Stirrup**\nReview Statsig earnings questions (01:28)\nContact ClickUp and Carrie (57:19)\n\n**Jacqueline Thomson**\nConfirm Hampus availability (02:36)\nDiscuss interleaving with Luke (05:56)\nPrepare AWS event communications (59:45)\nMigrate webinar platform (59:45)\nRun live group demo (59:45)\n\n**Alyssa Nicoll**\nPrepare recurring demos (25:21)\nCoordinate documentation coverage (25:21)\nFacilitate GB Sync handoff (25:21)\nCreate experiment-status channel (25:21)\n\n**Scott Bailey**\nCreate weekly metrics document (24:39)\nImprove demo environment (39:20)\nDevelop sales-call reporting (39:20)\nCreate shorter demo versions (39:20)\n\n**Emmy Sharp**\nMeet with Guy (34:22)\n\n**Elyse Fox**\nComplete audience-discovery document (44:55)\nConvert pricing instructions (44:55)\nDevelop 5.2 messaging (44:55)\nCreate sign-in demo image (44:55)",
       "organizer": "ashley@growthbook.io",
       "participants": 11,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5D1HEHF2BSVQCTYPFXE5A7Y",
+      "source": "fireflies",
+      "title": "Marketing Team Meetings",
+      "date": "2026-10-26",
+      "duration_minutes": 64.86000061035156,
+      "summary": "# Marketing Team Meetings\nDate: 2026-10-26 | Duration: 64.86000061035156m\n\n## Summary\nThe team reviewed launch risks, customer proof, analytics, product promotion, market strategy, and operational standardization. The November 3 launch depends on Interleaving and Experiment Redesign, with a possible one-week delay. Customer quotes will prioritize GrowthBook and Contextual Bandit users, while generic AI stories may avoid requiring public endorsements from Sony or Anthropic. Marketing will begin a weekly scorecard with pipeline, demos, signups, and meetings, using red, yellow, and green thresholds. Lyndsie and Chris will define pipeline metrics with Ryan and Jev, including current-quarter and Q+1 pipeline. Product Updates will be promoted through documentation, blogs, community Slack, release announcements, and website navigation, with clearer availability labels. The team also discussed Product Analytics adoption, competitor convergence, enterprise losses, preparation for the November 10 board meeting, and consolidating sales-call recordings in Fireflies.\n\n## Keywords\nContextual Bandits, Marketing analytics, Product updates, PLG funnel, Product analytics, Competitive positioning\n\n## Action Items\n**Scott Bailey**\nAssess Release 5.2 scope and timing (03:40)\nReview product analytics events (53:13)\nPrepare competitive analysis (55:52)\nGather Twitch and Notion loss feedback (01:00:58)\nIdentify remaining Apollo recording users (01:02:21)\n\n**Elyse Fox**\nCreate customer-quote outreach plan (06:21)\nSchedule board-positioning working session (55:43)\n\n**Lyndsie Berens**\nCoordinate PLG reporting fields (14:49)\nDefine pipeline metrics (36:33)\n\n**Chris Newton**\nDefine pipeline metrics (36:33)\n\n**Emmy Sharp**\nAdd product updates page to Release 5.2 announcement (40:38)\nAdd product-update availability tags (44:25)\nConfirm product-update labels with Jason (46:09)\n\n**Alyssa Nicoll**\nAdd product updates link to documentation (41:01)\n\n**Jack Virag**\nContact Graham about Jev use-case blog (47:41)\nPublish call for internal product stories (48:45)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 10,
       "summary_quality": "good"
     }
   ]

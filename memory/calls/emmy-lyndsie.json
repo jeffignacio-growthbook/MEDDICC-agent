@@ -1,0 +1,18 @@
+{
+  "company": "Emmy / Lyndsie",
+  "slug": "emmy-lyndsie",
+  "last_etl_date": "2026-10-27T05:49:09.412786",
+  "calls": [
+    {
+      "id": "01M5WG1QQA8A2WNYSCMC9YS292",
+      "source": "fireflies",
+      "title": "Emmy / Lyndsie",
+      "date": "2026-10-26",
+      "duration_minutes": 1,
+      "summary": "# Emmy / Lyndsie\nDate: 2026-10-26 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

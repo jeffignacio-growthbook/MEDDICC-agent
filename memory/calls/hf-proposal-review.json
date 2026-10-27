@@ -1,0 +1,18 @@
+{
+  "company": "HF proposal review",
+  "slug": "hf-proposal-review",
+  "last_etl_date": "2026-10-27T05:49:09.405226",
+  "calls": [
+    {
+      "id": "01M5WN0FVHZJBNQMP4QGCHRAYS",
+      "source": "fireflies",
+      "title": "HF proposal review",
+      "date": "2026-10-26",
+      "duration_minutes": 11.289999961853027,
+      "summary": "# HF proposal review\nDate: 2026-10-26 | Duration: 11.289999961853027m\n\n## Summary\nThe agency proposal was approved because it addressed unresolved CMS issues through a bundled scope, offered strong performance optimization expertise, and showed familiarity with previously built custom landing-page cards and existing specifications. The agency will take responsibility for the CMS work, including fixes that had not previously been completed. Yousef will retain special projects such as blog-author presentation and smaller iterative improvements, with handoffs to Huck Finch. The collaboration model remains flexible, with the agency handling its defined scope while Yousef continues complementary work and both groups work together on an ongoing improvement list. Chris and Ashley agreed that Yousef should be told clearly that the agency complements his contribution rather than threatening his role, while recognizing his performance. Chris will lead the agency kickoff, arrange access, support initial setup, and act as the interim contact. Jack will send a confirmation email, coordinate Slack access, explain his out-of-town status, and remain optionally available while Chris covers the kickoff.\n\n## Keywords\nCMS development, Performance optimisation, Agency proposal, Yousef collaboration, Landing page, Project kickoff\n\n## Action Items\n**Ashley Stirrup**\nAlign messaging (02:21)\n\n**Jack Virag**\nCoordinate collaboration (02:30)\nSend confirmation email (03:33)\nSupport agency handoff (03:33)\n\n**Chris Newton**\nSchedule agency kickoff (04:01)\nGrant agency access (04:01)\nLead agency onboarding (04:01)\nServe as agency contact (04:21)",
+      "organizer": "jack@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Datasite + GrowthBook",
+  "slug": "datasite-growthbook",
+  "last_etl_date": "2026-10-27T05:49:09.415265",
+  "calls": [
+    {
+      "id": "01M5DNN54SEPYME5HEEFEX98SY",
+      "source": "fireflies",
+      "title": "Datasite + GrowthBook",
+      "date": "2026-10-26",
+      "duration_minutes": 52.59000015258789,
+      "summary": "# Datasite + GrowthBook\nDate: 2026-10-26 | Duration: 52.59000015258789m\n\n## Summary\nDatasite evaluated GrowthBook as an experimentation platform to improve website conversion, demand, and revenue. The team prioritized a form-length test removing job-title and organization fields, while measuring form completion and downstream funnel progress. Other possible tests included layouts, content, images, video, media removal, and separate-page experiences. Datasite prefers managing content and variants through Sanity, and GrowthBook confirmed support for dynamic content, alternate pages, Snowflake warehouse integration, no-code metrics, audience targeting, funnel analysis, feature flags, and Bayesian or frequentist analysis. Personalization remains exploratory because Datasite has no defined strategy. GrowthBook quoted a $200,000 annual platform fee, plus user- or experiment-based pricing; Ted said this was far outside the expected range and that no experimentation platform budget had been allocated. GrowthBook will provide documentation, the recording, pricing options, Sanity details, and visual-editor guidance, while Datasite continues its evaluation.\n\n## Keywords\nGrowthBook, A/B testing, Sanity CMS, Personalisation, Snowflake analytics, Form conversion\n\n## Action Items\n**Sam Santos**\nVerify Datasite monthly website traffic figure (15:13)\n\n**Christian Liebenow**\nSend Datasite GrowthBook demonstration recording (50:53)\nSend Datasite GrowthBook documentation links (50:53)\nShare potential pricing flexibility information (50:53)",
+      "organizer": "christian@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Pratyush Kukreja and",
+  "slug": "pratyush-kukreja-and",
+  "last_etl_date": "2026-10-27T05:49:09.412914",
+  "calls": [
+    {
+      "id": "01M5J1PS0PZANNV65YD76ME0HE",
+      "source": "fireflies",
+      "title": "Pratyush Kukreja and Ashley Stirrup",
+      "date": "2026-10-26",
+      "duration_minutes": 21.5,
+      "summary": "# Pratyush Kukreja and Ashley Stirrup\nDate: 2026-10-26 | Duration: 21.5m\n\n## Summary\nThe discussion focused on transferring three raw Rio fields to HubSpot: active developers during the last 30 days, de-anonymized active people, and de-anonymized buyers or people with senior titles. Ashley preferred raw fields over a combined Rio score so HubSpot can support scoring experiments, initially considering five points per de-anonymized developer, ten per de-anonymized buyer, and five per active developer. The team considered modifying the existing Zapier-to-Slack workflow or testing a HubSpot pull model, with an API and custom fields likely required. Key risks include domain matching, duplicate or missing HubSpot accounts, update timing, failure handling, and inaccurate telemetry segments. Approximately 180 problematic domains require cleanup, while telemetry configuration needs review because changing the filter to all signals displayed 3,083 events. High-potential segments include website activity, product sign-up, and open-source usage. Pratyush’s team will prepare a scoping document for Ashley’s sign-off before implementation.\n\n## Keywords\nHubSpot integration, Lead scoring, Telemetry data, Account segmentation, Open-source users, Zapier workflow\n\n## Action Items\n**Amey Sadar**\nConfigure Slack alert routing (01:30)\nComplete Slack channel setup (01:46)\nPrepare historical domain data cleanup (03:27)\n\n**Akash**\nShare data cleanup plan (03:27)\n\n**Pratyush Kukreja**\nCreate HubSpot custom fields (19:32)\nPush raw account-signal fields into HubSpot (19:32)\nWrite integration scoping document (20:01)\n\n**Ashley Stirrup**\nReview integration scoping document (20:01)\nShare meeting recording or notes (20:20)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

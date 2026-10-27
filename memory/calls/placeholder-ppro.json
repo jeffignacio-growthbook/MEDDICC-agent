@@ -1,0 +1,18 @@
+{
+  "company": "[Placeholder] PPRO &",
+  "slug": "placeholder-ppro",
+  "last_etl_date": "2026-10-27T05:49:09.415577",
+  "calls": [
+    {
+      "id": "01M59MMG4W179HRQ2E74KJGXX2",
+      "source": "fireflies",
+      "title": "[Placeholder] PPRO & GrowthBook Demo",
+      "date": "2026-10-26",
+      "duration_minutes": 62.130001068115234,
+      "summary": "# [Placeholder] PPRO & GrowthBook Demo\nDate: 2026-10-26 | Duration: 62.130001068115234m\n\n## Summary\nThe discussion evaluated GrowthBook for feature flagging, experimentation, analytics, and controlled releases in a financial-services environment. Self-hosting was a central requirement because it keeps customer data within customer-controlled infrastructure, while BigQuery remains the analytics system of record. The proposed POC will test exposure-event delivery through Kinesis, object storage, and BigQuery, identified as the largest implementation effort. SDKs for web, mobile, and server-side products can use shared identifiers, hashing, and sticky bucketing to preserve experiment assignments across surfaces. Feature flags support targeting, staged rollouts, approval checkpoints, guardrail metrics, and automatic deactivation. GrowthBook also presented AI-assisted experiment setup, analysis, dashboards, and reusable experiment learnings. Commercial discussions covered seat-based pricing, self-hosting at 5% below cloud pricing, and a proposed 30-day no-strings-attached POC exit. A late-November decision target was stated, with technical, commercial, legal, authentication, and implementation follow-ups required.\n\n## Keywords\nFeature flagging, A/B experimentation, Self-hosting, BigQuery analytics, Payment authorisation rates, Staged rollouts\n\n## Action Items\n**James Shannon**\nPush back on weekend support (00:00)\nProvide DPA, customer agreement, order form, and proof-of-concept agreement (56:06)\nDiscuss commercial terms and implementation planning (01:00:19)\n\n**Shoukry Mousa**\nCreate dedicated Slack channel (04:21)\n\n**PPRO Data and Engineering Team**\nPublish exposure events through Kinesis (22:21)\nPropagate exposure events to BigQuery (22:21)\nDefine identity join table (44:00)\n\n**Rémy Marin**\nConfirm AI-generated experiment learnings export support (52:35)\nConfirm token rotation and OIDC support (59:36)\n\n**William Gois**\nEstimate GrowthBook platform seats (57:10)\nDiscuss commercial terms (01:00:19)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Yaga/KRISS & GrowthBook",
+  "slug": "yaga-kriss-growthbook",
+  "last_etl_date": "2026-10-27T05:49:09.416199",
+  "calls": [
+    {
+      "id": "01M5PX88JQ90QDGZG0VHEDASXE",
+      "source": "fireflies",
+      "title": "Yaga/KRISS & GrowthBook | Commercial Options",
+      "date": "2026-10-26",
+      "duration_minutes": 20.200000762939453,
+      "summary": "# Yaga/KRISS & GrowthBook | Commercial Options\nDate: 2026-10-26 | Duration: 20.200000762939453m\n\n## Summary\nThe company operates a mobile-first used-fashion marketplace across multiple markets, including South Africa, with 2.5–3.6 million registered users and tens of millions of annual visits. Its 10-person engineering team supports nearly daily releases, feature flags, and 9–10 concurrent experiments. GrowthBook has been self-hosted for roughly 1.5 years using BigQuery, Google Analytics 4, and client-side assignment events. The evaluation focuses on multi-armed bandits, CUPED, and stronger security capabilities, including role-based access, SSO, and SCIM. Enterprise is available in cloud or self-hosted forms, with a platform fee, user-based pricing, and operational support. Self-hosted Enterprise starts at $20,000 annually; pricing discussed was $30,000 for 15 users and $32,500 for 25 users. Pro is self-serve and month-to-month, while Enterprise uses an annual contract. CDN costs and usage require clarification. Boris will review pricing with the team and finance, and Marcel will send the recap, slides, transcript, and documented pricing.\n\n## Keywords\nGrowthBook, Enterprise pricing, Self-hosting, Feature flagging, Experimentation, CDN usage\n\n## Action Items\n**Boris Mihov**\nRun pricing calculations (18:31)\nConsult team and finance (18:31)\nReconnect with GrowthBook (18:31)\n\n**Marcel Geldner**\nProvide technical review (17:52)\nSend meeting recap (18:45)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

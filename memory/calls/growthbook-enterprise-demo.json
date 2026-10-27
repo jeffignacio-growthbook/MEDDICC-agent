@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Enterprise Demo",
+  "slug": "growthbook-enterprise-demo",
+  "last_etl_date": "2026-10-27T05:49:09.412632",
+  "calls": [
+    {
+      "id": "01M5WA0BQB0W3J7XKS7MZBA89H",
+      "source": "fireflies",
+      "title": "GrowthBook Enterprise Demo for Forus",
+      "date": "2026-10-26",
+      "duration_minutes": 50,
+      "summary": "# GrowthBook Enterprise Demo for Forus\nDate: 2026-10-26 | Duration: 50m\n\n## Summary\nForus is evaluating GrowthBook for provider portal and public website experiments, with an initial pilot of approximately 10–20 users and a three-person data science team seeking self-service analysis. BigQuery is the preferred warehouse, with implementation focused on read-only permissions, security, SDK integration, exposure data, and a metrics catalog. GrowthBook does not process PHI or personal data because calculations run in the customer warehouse; legal review requires BAA materials and POC documentation. The platform supports deterministic bucketing, custom attributes, practice-level targeting, cluster-based experimentation, mutually exclusive tests, namespaces, holdouts, configurable analysis, power checks, and CSV exports. A four-week POC was proposed, extendable to five or six weeks for statistical significance, with Slack coordination potentially beginning before formal kickoff. Enterprise pricing includes unlimited experiments, feature flags, and product analytics usage, with current pricing not varying by traffic or event volume. Deidra Rater may support BigQuery and SDK setup, while Rownuck, Fri Lavey, and Veena Suthendran have follow-up responsibilities.\n\n## Keywords\nGrowthBook, BigQuery, Warehouse-native experimentation, Feature flags, BAA compliance, Proof of concept\n\n## Action Items\n**Logan Bates**\nSend BAA and compliance documentation (05:01)\nProvide self-hosted deployment documentation (05:26)\nSend BigQuery connection documentation (07:43)\n\n**Scott Keller**\nCoordinate BAA review (26:19)\nPrepare shared POC success document (28:03)\nSend POC documentation (29:40)\nSend pricing outline (29:40)\nSet up external Slack channel (30:47)\nSend meeting recap (39:36)\n\n**Fri Lavey**\nSend standard BAA materials (29:40)\nCheck external Slack channel setup (30:26)\n\n**Veena Suthendran and Diedra Rater**\nCoordinate implementation timeline (29:40)\n\n**Diedra Rater**\nSupport BigQuery and SDK implementation (13:07)\n\n**Veena Suthendran**\nConfirm four-week POC timeline (30:23)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

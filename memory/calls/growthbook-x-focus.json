@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook x Focus",
+  "slug": "growthbook-x-focus",
+  "last_etl_date": "2026-10-27T05:49:09.405597",
+  "calls": [
+    {
+      "id": "01M5JEY48TE9J7SNCP8J8ASR8R",
+      "source": "fireflies",
+      "title": "Growthbook x Focus Lab Kick Off meeting",
+      "date": "2026-10-26",
+      "duration_minutes": 56.5099983215332,
+      "summary": "# Growthbook x Focus Lab Kick Off meeting\nDate: 2026-10-26 | Duration: 56.5099983215332m\n\n## Summary\nThe kickoff confirmed Focus Lab’s project team, with Mason Hawkins leading project management, Anna Beyerle Rosen leading strategy discovery, Amy Nance supporting writing, and Álvaro Ramos leading brand and digital design. GrowthBook’s team roles were also established. Positioning discussions emphasized community, education, professional growth, faster learning, and support for product and technical teams rather than a primarily marketer-focused audience. Confidence and Statsig were identified as the closest alternatives, while pricing, migration effort, existing platform investment, self-hosting, compliance, and stack integration influence customer decisions. The group discussed GrowthBook’s need for clearer category language, stronger personality, humor guardrails, and more flexible logo formats. Next steps include reviewing audiences, collecting event photos, humor examples, and a newer pitch deck, while Jeremy’s interview scheduling remains pending.\n\n## Keywords\nBrand strategy, Experimentation platforms, Competitive positioning, Developer-friendly product, Open-source software, Brand archetypes\n\n## Action Items\n**Lyndsie Berens**\nFollow up with Jeremy (08:34)\nSend event photos and materials (53:41)\nCompile humour or brand content examples (54:26)\n\n**Anna Beyerle Rosen**\nExplore brand archetype alternatives (15:44)\nResearch competitor landscape (16:25)\nLead audience-complexity discussion (52:30)\nDeliver first strategy deliverable (52:30)\nSend archetype preview (54:41)\n\n**Focus Lab team**\nResearch Growthbook brand and competitors (52:30)\n\n**Graham McNicoll**\nShare mascot poses (50:16)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 11,
+      "summary_quality": "good"
+    }
+  ]
+}

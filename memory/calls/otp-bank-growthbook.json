@@ -1,0 +1,18 @@
+{
+  "company": "OTP Bank & GrowthBook",
+  "slug": "otp-bank-growthbook",
+  "last_etl_date": "2026-10-27T05:49:09.415435",
+  "calls": [
+    {
+      "id": "01M5TBHB3DA24T7FKD7GYBP530",
+      "source": "fireflies",
+      "title": "OTP Bank & GrowthBook: PoC discussion",
+      "date": "2026-10-26",
+      "duration_minutes": 61.27000045776367,
+      "summary": "# OTP Bank & GrowthBook: PoC discussion\nDate: 2026-10-26 | Duration: 61.27000045776367m\n\n## Summary\nThe discussion covered how namespaces can isolate experiment audiences and how API workflows may be needed for launch gates, conflict warnings, alerts, and approvals because GrowthBook lacks some governance features natively. GrowthBook does not provide a complete interaction inventory, so a separate registry may remain necessary. BigQuery can support Firebase analysis using exposure events, variant and experiment identifiers, but Azure policies make BigQuery difficult and Oracle remains on-premise. Three architecture paths were identified: managed ClickHouse, self-hosted GrowthBook, or an Azure data lake, while CRM data mapping remains open. The POC should prioritize mobile and CRM, validate completed Firebase experiments, metrics, and fact tables, and support cross-team testing involving mobile, marketing automation, and potentially web. A 30-day POC with a possible 15-day extension was discussed, alongside a potential Q1 launch, free SDK initialization before the trial, and a Microsoft Teams channel pending ownership confirmation.\n\n## Keywords\nExperiment governance, Namespaces, Firebase validation, Azure data architecture, Marketing automation, PoC planning\n\n## Action Items\n**Maksym Volchenko**\nDiscuss PoC timing (36:22)\nDefine PoC scope (37:40)\nConfirm CRM integration (47:51)\nConfirm PoC architecture (58:27)\nSchedule commercial meeting (57:30)\nConfirm Teams channel ownership (52:35)\n\n**James**\nSummarise data architecture options (50:02)\nConsider PoC extension (48:48)\nSend preparation details (57:33)\n\n**OTP Bank team**\nSelect PoC experiments (37:40)\nChoose data architecture (50:02)\nValidate security requirements (54:18)\nPrepare CRM integration diagram (55:04)\n\n**Rémy Marin**\nSupport SDK integration planning (53:24)\nReview CRM connectivity (55:04)",
+      "organizer": "remy@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

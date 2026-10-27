@@ -1,7 +1,7 @@
 {
   "company": "Growth Book Weekly",
   "slug": "growth-book-weekly",
-  "last_etl_date": "2026-10-20T05:31:35.475818",
+  "last_etl_date": "2026-10-27T05:49:09.413632",
   "calls": [
     {
       "id": "01KFXSR394CVCHJ1HKJKM5HSTE",
@@ -473,6 +473,17 @@
       "summary": "# Growth Book Weekly Meeting\nDate: 2026-10-19 | Duration: 48.18000030517578m\n\n## Summary\nThe team is pursuing multiple sales opportunities for closure next Friday and has begun Anthropic’s renewal process, targeting completion in November ahead of its December renewal. Marketing reviewed a New York executive dinner, Snowflake World Tour lead quality, next year’s Circus sponsorship, and the Berlin meetup, which attracted approximately 115 ICP participants. The November release is expected around November 3 and includes redesigned data-source onboarding for managed warehouses, event forwarders, and custom sources, plus guided connection validation. Fact-table and metric creation flows are being tested through two A/B tests, with metric creation trending positively, while the exposure debugger provides detailed exposure and assignment information for diagnosing targeting issues. The EPO importer is available, the DBT integration is nearing launch, and human-in-the-loop API controls support approval of risky actions through API-key settings. Benefits enrollment, FSA enrollment, and the move to Brex for travel reimbursements are also scheduled for this week.\n\n## Keywords\nExperimentation, Data-source onboarding, Feature flags, Exposure debugging, Event forwarder, Human-in-the-Loop\n\n## Action Items\n**Ryan McGurk**\nClose sales deals (01:18)\nAdvance Anthropic renewal discussions (01:18)\nRecruit AI contacts (08:26)\n\n**Harry**\nAdvance Anthropic renewal discussions (01:18)\n\n**Lyndsie Berens**\nSend Snowflake follow-ups (02:34)\nPlan Conversion Hotel event (07:37)\nIncrease dinner invitations (07:54)\n\n**Ashley Stirrup**\nImprove pre-event marketing (03:18)\n\n**Jake**\nRecruit San Francisco attendees (08:32)\n\n**Michael Knowlton**\nComplete onboarding flow (13:05)\nRefine data-source validation (17:38)\n\n**Michael Samper**\nSupport multi-identifier queries (15:46)\nImprove project-scoped queries (37:01)\n\n**Jeremy Dorn**\nComplete product release projects (08:46)\nMonitor metric-creation experiment (29:02)\nPromote EPO importer (38:15)\n\n**Guy Langford-lee**\nValidate EPO importer (39:34)\n\n**Graham McNicoll**\nPublish EPO importer blog post (40:19)\n\n**Jennifer Pham-Le**\nComplete benefits enrollment (44:14)\nRelease reimbursement policy (44:14)\nMove reimbursements to Brex (44:14)",
       "organizer": "graham@growthbook.io",
       "participants": 40,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M58QMJ3YY2T0Z23FG3NK77CP",
+      "source": "fireflies",
+      "title": "Growth Book Weekly Meeting",
+      "date": "2026-10-26",
+      "duration_minutes": 49.68000030517578,
+      "summary": "# Growth Book Weekly Meeting\nDate: 2026-10-26 | Duration: 49.68000030517578m\n\n## Summary\nSales performance is tracking toward $1.5 million–$2 million in quarterly bookings, with $1.1 million already booked and late-stage opportunities involving Haskrabit, Zorro, and Rula. The 5.2 release remains targeted for November 3, with final scope expected tomorrow and office-hours recording planned for November 2. Product priorities include remote saved groups, agent API keys, human-in-the-loop workflows, clustered experiments, DBT Sync, and approximately 70 API endpoints. Event Forwarder may include a free tier of one million events monthly, while population targeting and product analytics support expansion. New experiment-quality, program-health, and impact views will measure best-practice adherence, experimentation performance, and business value. Strategic opportunities include personalization, agent and Slack adoption, product analytics, and an idea-to-experiment workflow. The company also discussed a February retreat in Puerto Verde and potential customer input on maturity scoring and quality capabilities.\n\n## Keywords\nExperimentation quality, Product analytics, Agent API keys, Contextual Bandits, GrowthBook 5.2, Experimentation maturity\n\n## Action Items\n**Ryan McGurk**\nShare quarterly sales update (01:29)\n\n**Scott Bailey**\nFinalize shipping scope (02:04)\nAdd incomplete feature videos (02:49)\n\n**Alyssa Nicoll**\nContact developers (02:25)\n\n**Employees**\nNotify Jennifer (08:25)\n\n**Jeremy Dorn**\nAdd follow-up agent skills (14:37)\n\n**Luke Smith**\nSend contextual bandit blurb (18:21)\nReview experiment quality documentation (39:42)\n\n**Graham McNicoll**\nConnect experiment quality scoring with actionable guidance (40:22)\nDiscuss experimentation maturity ideas and customer needs with Eric (43:39)\n\n**Nhat Ho**\nArrange Graham’s discussion with Eric (43:45)",
+      "organizer": "graham@growthbook.io",
+      "participants": 7,
       "summary_quality": "good"
     }
   ]

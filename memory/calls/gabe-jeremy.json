@@ -1,7 +1,7 @@
 {
   "company": "Gabe / Jeremy",
   "slug": "gabe-jeremy",
-  "last_etl_date": "2026-10-20T05:31:35.471232",
+  "last_etl_date": "2026-10-27T05:49:09.405966",
   "calls": [
     {
       "id": "01M32NRSS0HXWRTZ3NQJTYF7XA",
@@ -43,6 +43,17 @@
       "date": "2026-10-19",
       "duration_minutes": 16.639999389648438,
       "summary": "# Gabe / Jeremy\nDate: 2026-10-19 | Duration: 16.639999389648438m\n\n## Summary\nThe discussion covered table controls, experiment configuration, scheduling, analysis, design-system progress, release readiness, and interface polish. The Attributes table supports column customization, with an existing pattern informing the new design. Tables were preferred over card variants for comparing experiment variations, while summaries may support more complex experiments, and experiments are ready for live iteration. Start scheduling is separated from stop criteria, approval comes before a scheduled launch, and users can start experiments immediately or schedule them for later. Power analysis may become required for experiment planning. The app header is ready for Guy’s review, the design system is receiving extra time, and QA work is nearing its target state. API key settings and OAuth consent need simplification, while page wrappers, page headers, and form controls require more consistent spacing, styling, and interaction polish.\n\n## Keywords\nExperiment design, Decision criteria, Power analysis, Start scheduling, Design system, API key settings\n\n## Action Items\n**Gabe Melean**\n- Look up attributes table (00:37)\n- Send app header design (09:50)\n- Review API key settings (11:42)\n- Review Human in the Loop (11:42)\n- Review OAuth consent flows (11:42)\n- Discuss page wrapper spacing (13:30)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5QWHWGSCGP35DK417PYHMZ2",
+      "source": "fireflies",
+      "title": "Gabe / Jeremy",
+      "date": "2026-10-26",
+      "duration_minutes": 16.90999984741211,
+      "summary": "# Gabe / Jeremy\nDate: 2026-10-26 | Duration: 16.90999984741211m\n\n## Summary\nThe team reviewed three linked PRs covering the app header and sidenav base layer, with shared structure to be handled first and staff engineers available for guidance. Release readiness focused on the experiment redesign as the biggest design item, a final punch-list walkthrough this afternoon, and a Wednesday merge target for testing; interleaving follow-up will occur after V1. Page transitions and component styling enhancements remain queued, while the cohesive styling rollout and current list/details rollout were considered sufficient. Feature flag, experiment results, onboarding, and health-tab pages still need design attention, with a new list view planned after flags and an experiment quality sync tomorrow. Notifications require another quality pass, an SDK connection touchpoint is planned today, 5.2 work is the top priority, and the left-nav/header review targets today.\n\n## Keywords\nRelease 5.2, Experiment redesign, Branch structure, List view, Feature flags, Notifications\n\n## Action Items\n**Gabe Melean**\nVerify branch connections (04:34)\nDiscuss structure with Adriel (06:26)\nShare styling screenshots (11:30)\nDiscuss notifications and SDK connection (12:56)\nSync with Graham on experiment quality (13:40)\nPrioritize Release 5.2 work (14:47)\nSubmit navigation and header work (15:18)\n\n**Jeremy Dorn**\nContact Bryce about redesign (08:01)\nComplete redesign walkthrough (08:01)",
       "organizer": "gabe@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

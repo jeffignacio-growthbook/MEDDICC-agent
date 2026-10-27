@@ -1,0 +1,18 @@
+{
+  "company": "linking skill, images,",
+  "slug": "linking-skill-images",
+  "last_etl_date": "2026-10-27T05:49:09.407013",
+  "calls": [
+    {
+      "id": "01M5WK7PNPE1W5V2BPNZY4QMYB",
+      "source": "fireflies",
+      "title": "linking skill, images, key features",
+      "date": "2026-10-26",
+      "duration_minutes": 19.600000381469727,
+      "summary": "# linking skill, images, key features\nDate: 2026-10-26 | Duration: 19.600000381469727m\n\n## Summary\nThe team decided to remove the key-feature filter from V1 because the current selection lacks scale and added complexity could create confusion, while leaving open the possibility of reconsidering it later. Yousef was assigned the removal, and Emmy will request the change. Product-update navigation placement remains unresolved, with Alyssa flagging design issues; announcements will follow implementation fixes. Individual update links will support direct access and Google crawling, while a Webflow index page was proposed to improve discoverability. A site-wide linking skill was approved, along with an automated database to identify feature mentions, backfill existing content, and link the newest relevant updates without forcing irrelevant links. Synthetic publishing tests will run without Webflow publishing, with changes documented in patch notes for Jack. Suitable repository images may be pulled automatically, while oversized or nonsensical images are rejected and manual review remains planned. The hybrid publishing skill reportedly shipped, but GitHub sync and download status still require confirmation. The later meeting remains scheduled, ownership will be revisited next week, and Jack's limited availability creates a continuity risk before November 5th.\n\n## Keywords\nProduct updates, Linking skill, Internal links, Webflow, Key features, Publishing workflow\n\n## Action Items\n**Emmy Sharp**\n- Ask Yousef to remove key-feature functionality (04:51)\n- Backfill and audit website content (13:04)\n- Run synthetic linking-skill test (14:24)\n- Prepare AI-generated patch-notes summary (14:24)\n\n**Jack Virag**\n- Add image handling to publishing skill (16:25)\n- Check GitHub and Codex synchronization (17:32)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Chrystal Gregorich and",
+  "slug": "chrystal-gregorich-and",
+  "last_etl_date": "2026-10-27T05:49:09.406865",
+  "calls": [
+    {
+      "id": "01M5K0NZVJSJV2EHYD5JZY2PYP",
+      "source": "fireflies",
+      "title": "Chrystal Gregorich and Cary Rakin + Chris Sanders",
+      "date": "2026-10-26",
+      "duration_minutes": 13.149999618530273,
+      "summary": "# Chrystal Gregorich and Cary Rakin + Chris Sanders\nDate: 2026-10-26 | Duration: 13.149999618530273m\n\n## Summary\nThe discussion focused on automating paid-media and landing-page experimentation. The team ran 100 experiments last year, and repeated manual setup currently takes roughly 10 minutes; templates could reduce this to seconds by using an experiment ID to create feature IDs, experiment IDs, and populated fields. GrowthBook would remain the source of truth, supplying experiment data for automated Google Slides readouts. Claude integration is currently blocked by connector permissions and an unresolved API-key issue. After organizational approval, the GrowthBook MCP connection should use browser-based SSO and the user’s permissions, with confirmation expected for destructive actions. Reusable Claude skills could standardize experiment creation, identify missing inputs, and support analysis. Future workflows may publish readouts to Slack, while GrowthBook hooks could handle notifications directly. Chrystal planned to resolve access internally and requested examples; Eric offered GrowthBook and landing-page guidance, while Cary encouraged use of the Slack channel and existing resources.\n\n## Keywords\nClaude automation, GrowthBook MCP, A/B testing, Experiment templates, Google Slides reporting, Slack notifications\n\n## Action Items\n**Eric Sokolov**\n- Discuss Chrystal’s landing-page support needs (01:15)\n\n**Chrystal Gregorich**\n- Request approval for GrowthBook MCP connector (07:06)",
+      "organizer": "chris@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}
