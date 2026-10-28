@@ -1,0 +1,18 @@
+{
+  "company": "PPRO x GrowthBook",
+  "slug": "ppro-x-growthbook",
+  "last_etl_date": "2026-10-28T06:26:54.009906",
+  "calls": [
+    {
+      "id": "01M5HQMN8957NF52WEB01DJX0K",
+      "source": "fireflies",
+      "title": "PPRO x GrowthBook: recap, docs and next steps",
+      "date": "2026-10-27",
+      "duration_minutes": 22.709999084472656,
+      "summary": "# PPRO x GrowthBook: recap, docs and next steps\nDate: 2026-10-27 | Duration: 22.709999084472656m\n\n## Summary\nThe discussion covered integration planning, commercial terms, contract conditions, security, and next steps. The open-source setup can begin immediately, while data warehouse integration depends mainly on agreeing metric definitions; the technical process itself is not difficult. Enterprise licensing includes unlimited experimentation and traffic, with self-hosting priced at a $75,000 base license and a modeled annual seat cost of $1,000 for 50 seats. Self-hosting receives a 5% base-license discount, and higher seat volumes may reduce annual seat pricing to $750. Human GrowthBook users count as seats, while configuration delivery and SDK distribution do not create additional charges; API and high-availability requirements remain areas for clarification. A narrow multi-year break clause and quarterly payments may be possible, subject to tradeoffs. ROI materials and case studies are available, but internal approval is still pending. Draft paperwork, a Monday follow-up, and a quick kickoff are being coordinated.\n\n## Keywords\nGrowthBook, Self-hosting, Experimentation, SDK integration, Enterprise pricing, Service-level agreements\n\n## Action Items\n**James Shannon**\nPrepare ROI business case (13:31)\nProvide draft agreement (16:03)\n\n**William Gois**\nDiscuss GrowthBook fit (16:03)\nBrief data manager (20:00)\nConfirm follow-up availability (20:21)\n\n**James Baxter**\nImplement GrowthBook SDK (16:22)\nImplement experimentation metrics (16:22)\n\n**Shoukry Mousa**\nImplement GrowthBook SDK (16:22)\nImplement experimentation metrics (16:22)",
+      "organizer": "remy@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

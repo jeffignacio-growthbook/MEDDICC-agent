@@ -1,0 +1,18 @@
+{
+  "company": "Quality Tab and",
+  "slug": "quality-tab-and",
+  "last_etl_date": "2026-10-28T06:26:54.009505",
+  "calls": [
+    {
+      "id": "01M5YZP3HBSQNEN6PE4TMS5X8P",
+      "source": "fireflies",
+      "title": "Quality Tab and Experiment Redesign Planning",
+      "date": "2026-10-27",
+      "duration_minutes": 22.1299991607666,
+      "summary": "# Quality Tab and Experiment Redesign Planning\nDate: 2026-10-27 | Duration: 22.1299991607666m\n\n## Summary\nThe discussion defined the Quality experience and its delivery direction. The Quality tab should sit in the right rail, while configuration remains in the left-side workspace; a wider or collapsed rail provides more room for inline changes (00:30, 02:04, 03:45, 12:32). Descriptions should connect closely to the hypothesis, document experiment context, and remain separate from state documentation (04:50–05:52). Quality checks should be optional and customizable, with required items limited to essential entries (06:41). The scoring experience should retain the donut chart, start with content collapsed by default, expand problematic states when appropriate, and keep overrides visually secondary (08:06–10:49). Project overrides should use a CRUD table with one hierarchy level, while slider interaction and section-level disabling require attention (14:28–16:40). The design is ready for integration without higher fidelity initially; experiment redesign is targeted for version 5.2, and dashboard feedback will be handled separately (19:55–20:39).\n\n## Keywords\nQuality tab, Experiment configuration, Right rail, Project overrides, Quality scoring, Dashboard redesign\n\n## Action Items\n**Gabe Melean**\n- Add slider control (15:42)\n- Share quality designs (19:48)\n- Send design links (20:01)\n- Notify Graham about changes (20:22)\n- Discuss dashboard considerations (20:39)\n\n**Graham McNicoll**\n- Integrate approved designs (19:55)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

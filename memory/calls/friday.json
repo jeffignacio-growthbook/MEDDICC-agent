@@ -1,7 +1,7 @@
 {
   "company": "Friday",
   "slug": "friday",
-  "last_etl_date": "2026-10-24T05:14:25.175204",
+  "last_etl_date": "2026-10-28T06:26:54.004873",
   "calls": [
     {
       "id": "01M509E060V0SHK6BQ3MPXPFXE",
@@ -21,6 +21,17 @@
       "date": "2026-10-23",
       "duration_minutes": 57.970001220703125,
       "summary": "# Jake <> Brent weekly 1:1 (Friday)\nDate: 2026-10-23 | Duration: 57.970001220703125m\n\n## Summary\nThe team reviewed multi-touch campaigns covering approximately 600 contacts across Dripify and Apollo. Phone outreach generated about one-third of meetings, while LinkedIn produced most of the remainder; email supported visibility and name recognition. Messaging was updated with stronger AI positioning, and personalized opening lines were being tested. Targeting will shift from alphabetical account selection to ICP-based prioritization, emphasizing website traffic of one million or more monthly visitors, especially accounts with 1,000 to 10,000 employees, while excluding university-heavy and weak segments. Reporting should combine Dripify and Apollo data and compare meetings and pipeline conversion by account quality, persona, seniority, traffic, and intent signals. A refined campaign will run alongside existing campaigns for at least one additional week, with separate naming and a benchmark campaign preserved. Airscale and Claude industry estimates will help address unreliable employee, traffic, and industry data. The next goals are to build approximately 200 optimized accounts, launch multi-persona sequences, review results weekly, and pursue one legitimate sub-$100K opportunity.\n\n## Keywords\nICP prioritisation, Website traffic, Apollo sequencing, Dripify campaigns, Claude enrichment, Outbound conversion\n\n## Action Items\n**Jeff Ignacio**\nCreate consolidated campaign report (03:22)\n\n**Jake Stangl**\nConnect with Jeff Ignacio (03:40)\nSend target account list to Brent Holloway (33:40)\nAdd Claude industry estimate column (33:40)\nFilter higher-education accounts (41:54)\nPrioritise high-traffic accounts (42:24)\nCreate Claude-filtered account list (52:12)\nLoad refined accounts into outreach sequences (52:12)\nKeep Dripify campaigns running (55:17)\nReview refined campaign performance weekly (55:28)\nRemove university-heavy Apollo campaigns (55:33)\nContinue conference-related outreach (55:59)\nSecure qualified sub-100 opportunity (56:16)\n\n**Brent Holloway**\nEnrich target account list in Airscale (33:40)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5FEG0GB5MPDHZSFBTPTABDZ",
+      "source": "fireflies",
+      "title": "Jake <> Brent weekly 1:1 (Friday)",
+      "date": "2026-10-27",
+      "duration_minutes": 35.97999954223633,
+      "summary": "# Jake <> Brent weekly 1:1 (Friday)\nDate: 2026-10-27 | Duration: 35.97999954223633m\n\n## Summary\nThe team reviewed pipeline generation, campaign performance, and enterprise expansion. Jake prioritized approximately 90 conference leads, about 40 closed-lost accounts, and opportunities from Lamb Research and Daikin, while one podcast-generated meeting had also entered the pipeline. Three prospect sequences targeting CTOs, engineering leaders, and platform or development contacts produced no opportunities yet; LinkedIn generated 11 acceptances from 65 attempts, with three replies. Outreach for the November 5 dinner was prioritized across 472 contacts, while the other sequences were paused and LinkedIn registration-link messaging will be A/B tested. Enterprise targeting shifted from 1–100 to 1,000–10,000 employees, and a HubSpot search identified 144 Pro customers with 50–100 employees, narrowed to 38 companies with more than five licensed seats. Pricing remains a risk because the move from approximately $80 monthly to $50,000 annually may hinder conversion. Unreliable employee data, blocked HubSpot exports, and enrichment needs were also discussed. Jake is expected to spend 10–15% of his time on expansion while maintaining pipeline work, with a goal of finding one interested 100-employee Pro customer.\n\n## Keywords\nDripify outbound sequencing, Conference lead follow-up, Dinner campaign, Enterprise expansion, ICP targeting, SMB Pro customers\n\n## Action Items\n**Jake Stangl**\nComplete outreach touches (03:59)\nPause lower-priority Dripify sequences (07:38)\nSet reactivation reminder (08:15)\nRename outbound sequences (10:26)\nCorrect employee-size targeting (10:26)\nRun LinkedIn message A/B test (15:03)\nCreate enterprise-expansion sequence (26:48)\nContact three people per company (26:48)\nSave enterprise expansion list (27:04)\nCapture HubSpot export error (27:04)\nSend issue to Jeff (27:04)\nIdentify first interested Pro customer (31:26)\nBuild open-source user list (32:55)\n\n**Brent Holloway**\nExport prioritized accounts from Rio (33:11)\nEnrich account list with contacts (33:11)",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

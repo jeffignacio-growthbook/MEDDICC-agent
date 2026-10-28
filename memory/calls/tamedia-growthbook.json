@@ -1,7 +1,7 @@
 {
   "company": "Tamedia & GrowthBook",
   "slug": "tamedia-growthbook",
-  "last_etl_date": "2026-10-16T05:17:01.221704",
+  "last_etl_date": "2026-10-28T06:26:54.009746",
   "calls": [
     {
       "id": "01M48XH4H1WP23FGKK1CW18HEC",
@@ -34,6 +34,17 @@
       "summary": "# Tamedia & GrowthBook | Commercial Discussion\nDate: 2026-10-15 | Duration: 27.780000686645508m\n\n## Summary\nThe discussion compared cloud SaaS and self-hosting, with a preference for SaaS and an EU cloud option available. Self-hosting would add operational work, while cloud hosting would cost approximately 20k CHF more under the enterprise model. Enterprise pricing includes a base fee and per-user licensing, with no traffic or event costs; the Pro version is limited to 30 users, lacks SSO and support, and includes CDN fees. The group discussed building an experimentation culture around defined metrics, learning, and growth, including a possible AI assistant for experiment insights. Adoption and ROI depend on effective team usage, so a product team session and trial were planned. There is no fixed production timeline, and budget impact for 2027 needs assessment. Payment installments, contractual adjustments, technical support through Remy, and possible leadership escalation on pricing were also offered.\n\n## Keywords\nGrowth Book, self-hosting, cloud hosting, commercial model, experimentation program, enterprise pricing\n\n## Action Items\n**Alla Roman**  \nAttend product session (00:00)  \n\n**Marcel Geldner**  \nCheck security assessment status (01:00)  \nProvide hosting cost details (05:00)  \nShare slide deck recap (07:00)  \nInclude leadership in pricing discussions (20:00)  \nSummarize call and send materials (24:00)  \nFacilitate technical question coordination (25:00)  \n\n**CH-ZH-STA08-3-Hedwigsteig (Hal Taylor)**  \nEvaluate Growth Book acceptance and timing (19:00)  \nReview slide deck and pricing details (23:00)  \nEngage product team for trial needs (24:00)  \n\n**Davide Cammarata**  \nFollow up with Remy over Slack (25:00)",
       "organizer": "marcel@growthbook.io",
       "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5SSG2KQAZJCNN34B5BY36EF",
+      "source": "fireflies",
+      "title": "Tamedia & GrowthBook | Trial Setup + Timeline",
+      "date": "2026-10-27",
+      "duration_minutes": 36,
+      "summary": "# Tamedia & GrowthBook | Trial Setup + Timeline\nDate: 2026-10-27 | Duration: 36m\n\n## Summary\nThe team will test prominent and subtle button variants with identical functionality for the biggest brand, building on the preferred-source button already live on Venkatfer. The design discussion focuses on prominence, visibility, subtlety, and opt-in behavior, with evidence needed to support internal decisions. Success measures must be defined, variant performance compared, and results summarized after the trial. Data-collection questions were resolved with Alessandro, but production setup, GA4 exposure-event integration, warehouse delivery, feature-flag creation, and experiment linkage remain required. The custom implementation will use Google Analytics rather than an SDK or tracking callback. The free version can support setup, while enterprise capabilities require trial-license access; Rémy is preparing the license, and continuation will depend on results. Designs are targeted for completion this week, with launch proposed for next Tuesday pending DAI effort and data-team scheduling. Setup will be tracked in Slack, followed by a 30-minute configuration session.\n\n## Keywords\nGrowthBook Enterprise trial, A/B experiment, Feature flag, GA4 exposure tracking, BigQuery data warehouse, Production environment\n\n## Action Items\n**Rémy Marin**\nProvide Tamedia Enterprise trial licence (08:41)\nSend implementation checklist (15:38)\nSupport experiment configuration session (16:14)\nCreate Enterprise trial licence (22:10)\n\n**Tamedia implementation team**\nExtend infrastructure setup (16:14)\nConnect analytics account (16:14)\nImplement button experiment (16:14)\nSend organisation details (21:42)\nContact DAI team (22:10)\nConfirm launch readiness (22:10)\n\n**Christian Hefti**\nFinalize experiment designs (18:09)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]

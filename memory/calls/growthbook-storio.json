@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Storio",
+  "slug": "growthbook-storio",
+  "last_etl_date": "2026-10-28T06:26:54.009979",
+  "calls": [
+    {
+      "id": "01M5SDTNG9X8PDBMYW2HCNBJMP",
+      "source": "fireflies",
+      "title": "Growthbook <> Storio - A/A Test",
+      "date": "2026-10-27",
+      "duration_minutes": 22.5,
+      "summary": "# Growthbook <> Storio - A/A Test\nDate: 2026-10-27 | Duration: 22.5m\n\n## Summary\nThe discussion established GrowthBook as the primary focus while limiting scope for feasibility and proposing an AA-to-AB sequence, beginning with commercial uplift testing and a parallel feasibility spike. Five teams cover the dataflow journey, including checkout and frontend, tracking configurations, and product analytics ownership. Adobe remains the analytics source of truth for tracking and web behavior, but the Tealium integration path and acceptable data differences between competing pipelines remain unresolved; this pipeline decision blocks AA and AB testing. Product capabilities include experiment results for controls, treatments, multiple variants, and browser-level dimensions, plus health checks such as sample ratio mismatch monitoring, chance-to-win results, metric-level recommendations, and AI-assisted experiment review. Slack alerts appear feasible through webhooks, SRM notifications, and custom events. An internal design session will assess three integration options, Friday alignment will finalize AA deliverables and responsibilities, and weekly check-ins are targeted for next week. Miro will host shared diagrams, while documentation, a pre-recorded demo, an architecture diagram, and GrowthBook responses to four question areas remain follow-ups.\n\n## Keywords\nGrowthBook experimentation, A/A testing, A/B testing, Snowflake data pipeline, Tealium and Adobe integration, Sample ratio mismatch alerts\n\n## Action Items\n**Rémy Marin**\nLink GrowthBook documentation (06:54)\nVerify Slack integration capabilities (13:12)\nReview shared design materials (20:03)\n\n**James Shannon**\nShare recorded GrowthBook demo (09:51)\n\n**Shaaz Adiraja**\nAssess data-integration options (04:25)\nAlign teams on integration path (16:04)\nEstablish weekly working sessions (16:04)\nDocument end-to-end architecture (18:27)\nFinalize A/A-test deliverables (18:27)\nGrant Miro board access (19:04)",
+      "organizer": "remy@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

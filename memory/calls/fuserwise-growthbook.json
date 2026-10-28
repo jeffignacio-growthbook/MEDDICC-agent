@@ -1,0 +1,18 @@
+{
+  "company": "Fuserwise & GrowthBook",
+  "slug": "fuserwise-growthbook",
+  "last_etl_date": "2026-10-28T06:26:54.010065",
+  "calls": [
+    {
+      "id": "01M5SFN2WJCMB96G74NSF3AEC1",
+      "source": "fireflies",
+      "title": "Fuserwise & GrowthBook | Introduction Call",
+      "date": "2026-10-27",
+      "duration_minutes": 34.779998779296875,
+      "summary": "# Fuserwise & GrowthBook | Introduction Call\nDate: 2026-10-27 | Duration: 34.779998779296875m\n\n## Summary\nFuserwise, a Hungary-based provider of QA and UX testing for European startups and scale-ups, evaluated GrowthBook for its internal operations platform. The platform is being developed to organize testing workflows, track sessions, and manage features, with a possible future customer-facing UX product. An MVP feature flag has been integrated successfully as a simple on-off control, although platform navigation and unfamiliar feature areas require further exploration. GrowthBook connects feature flags with experiments, product analytics, metric dashboards, AI-generated experiment learnings, and guardrails that can automatically deactivate features after negative results. Its technical model supports existing data warehouses, web and mobile SDKs, user attributes, cloud or self-hosted deployment, European Union cloud availability, and analytical processing without PII. Internal use is the current priority; partner deployment and subscription scaling were discussed only as future possibilities. Benedek will continue independent testing, while a deeper technical session and platform materials remain available.\n\n## Keywords\nFeature flags, Experimentation, Product analytics, Warehouse-native architecture, UX testing, Fuserwise internal platform\n\n## Action Items\n**Marcel Geldner**\n- Send GrowthBook materials (26:26)\n\n**Benedek Nador-Nikitits**\n- Continue GrowthBook testing (31:55)\n- Evaluate GrowthBook capabilities (31:55)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "DevRel discussion",
+  "slug": "devrel-discussion",
+  "last_etl_date": "2026-10-28T06:26:54.008869",
+  "calls": [
+    {
+      "id": "01M5T5JB27FPVCYXY0J5G065SN",
+      "source": "fireflies",
+      "title": "DevRel discussion",
+      "date": "2026-10-27",
+      "duration_minutes": 28.959999084472656,
+      "summary": "# DevRel discussion\nDate: 2026-10-27 | Duration: 28.959999084472656m\n\n## Summary\nGrowthBook serves developers, product managers, and data scientists through open-source and cloud offerings, with strongest fit among mid-market and enterprise companies. It receives approximately 1,500 free signups monthly and converts roughly 50 free users into paid Pro customers, while Pro churn is higher than enterprise churn. Free and Pro users often struggle to connect data because they may lack established data pipelines, and onboarding improvements remain piecemeal without a shared North Star. A first-experiment UX redesign is targeted for February, and Marcos recommended auditing the current journey beforehand to test assumptions and prioritize improvements. Alyssa is rebuilding DevRel through education, demos, documentation, office hours, webinars, and community programs. GrowthBook is developing GitHub Discussions, improving analytics, and considering stronger promotion for features such as the MCP server and AI workflows. Marcos will send a proposal centered on an onboarding audit, with possible later support for community engagement and measurement.\n\n## Keywords\nDeveloper relations, Onboarding audit, Community engagement, A/B testing, Feature flags, GitHub Discussions\n\n## Action Items\n**Marcos Placona**\nPrepare onboarding audit proposal (25:57)\nSend proposal to GrowthBook (25:57)\nSchedule proposal review meeting (27:19)\n\n**Ashley Stirrup**\nAdd Alyssa Nicoll to meeting invitation (27:27)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

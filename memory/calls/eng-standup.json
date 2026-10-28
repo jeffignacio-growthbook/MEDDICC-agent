@@ -1,7 +1,7 @@
 {
   "company": "Eng Standup",
   "slug": "eng-standup",
-  "last_etl_date": "2026-10-21T05:31:34.614974",
+  "last_etl_date": "2026-10-28T06:26:54.008233",
   "calls": [
     {
       "id": "01KGJ8WY3PJ95HVBNJFF68YKB0",
@@ -341,6 +341,17 @@
       "duration_minutes": 35,
       "summary": "# Eng Standup\nDate: 2026-10-20 | Duration: 35m\n\n## Summary\nThe team reviewed TaskRabbit’s unsigned verbal agreement, which ties interleaving delivery to partner expectations. Product analytics work is progressing across data sources, populations, fact-table usability, and a searchable settings redesign; event-forwarder migration is complete. Session replay SDK work is stalled and may miss release, prompting consideration of a private SDK branch so interleaving-ready code can ship separately. Experiment redesign remains ahead of managed feature-flag values, while saved groups, diagnostics, SDK compatibility, bandit editor support, cluster-randomized experiments, and interleaving continue advancing. Platform work includes Kafka migration, security, UI-to-API alignment, and Version 5.2 planning for the first week of November. Interleaving is expected by month-end but remains beta, while cluster-randomized work is yellow. Event-forwarder and populations launch messaging is under review. AI observability remains yellow, session replay timing awaits Adriel’s scope assessment, and experiment quality, approvals, notifications, and SDK metric autocapture remain lower-priority or coupled to session replay.\n\n## Keywords\nInterleaving, Experiment redesign, SDK releases, Contextual bandits, Cluster-randomised experiments, Release planning\n\n## Action Items\n**Jeremy Dorn**\nDeliver interleaving functionality (00:02)\nDevelop populations MVP (00:33)\nRedesign fact-table page (00:33)\nTag API pull requests (12:27)\nComplete 5.2 project list (12:27)\nRevisit session replay SDK (18:44)\nEvaluate event-forwarder announcement (20:33)\nAdd populations feature (20:46)\n\n**Bryce Fitzsimons**\nRestart session replay project (03:18)\nComplete experiment redesign (04:48)\nDrive experiment-values completion (11:10)\n\n**Lillia Jackson**\nTest SDK changes (03:36)\n\n**Guy Langford-lee**\nReview SDK inconsistencies (08:38)\n\n**Luke Sonnet**\nReview contextual-bandit editor (09:34)\nComplete interleaved experimentation (11:10)\n\n**Luke Smith**\nComplete cluster-randomised experiments (11:10)\n\n**Graham McNicoll**\nResolve experiment quality questions (22:07)\nMeet experimentation team (22:43)",
       "organizer": "elyse@growthbook.io",
+      "participants": 28,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5MV4GXFXEKQAQ1HN76X11M2",
+      "source": "fireflies",
+      "title": "Eng Standup",
+      "date": "2026-10-27",
+      "duration_minutes": 27.469999313354492,
+      "summary": "# Eng Standup\nDate: 2026-10-27 | Duration: 27.469999313354492m\n\n## Summary\nThe team reviewed progress across experiment redesign, feature delivery, API coverage, and engineering review practices. Right-rail expansion was approved with a quality score tertiary tab and retained drag resizing, while the experiment redesign neared merge with final items pending. Data onboarding involved five or six PRs, most of which had landed, with a feature-flag rollout planned. Settings redesign awaited review, primarily covering UI changes, with Adriel assigned as reviewer and public pages excluded. QA overrides moved to orange because of a Health tab dependency and pending feature-flag overrides, while Cluster Randomize remained on track subject to Luke’s bandwidth and QA coverage. DBT Sync was ready to merge after Kevin’s review, and rollback support expanded to Datadog tags and custom fields without requiring feature IDs. API coverage continued through seven PRs owned by Kevin, while experiment management was deferred from 5.2 and populations were intentionally postponed. The team emphasized stronger author self-review, continued human attention for UI issues, consistent testing documentation, and a review approach trial through Friday.\n\n## Keywords\nExperiment redesign, API coverage, QA overrides, AI code review, PR automation, UI testing\n\n## Action Items\n**Gabe Melean**\nCoordinate default rail width (00:55)\nSend settings redesign PRs (03:54)\n\n**Jeremy Dorn**\nKeep redesign items pending (01:24)\nMove QA overrides to orange (04:14)\nSend API coverage PRs (08:05)\nSend API PRs to Luke (08:21)\nReport review experiment results (25:56)\n\n**Adriel Vieira**\nReview settings redesign PRs (03:09)\nPrepare experiment API plan (07:28)\n\n**Bryce Fitzsimons**\nVerify public views (03:31)\n\n**Luke Smith**\nVerify skills PR workflow (08:12)\n\n**Engineering team**\nTrial AI-assisted review process (25:56)",
+      "organizer": "alyssa@growthbook.io",
       "participants": 28,
       "summary_quality": "good"
     }

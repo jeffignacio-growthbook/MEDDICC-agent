@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook + Op",
   "slug": "growthbook-op",
-  "last_etl_date": "2026-10-21T05:31:34.614186",
+  "last_etl_date": "2026-10-28T06:26:54.009174",
   "calls": [
     {
       "id": "01KT7DMS83RXCGY1RPYJB8XGY3",
@@ -95,6 +95,17 @@
       "date": "2026-10-20",
       "duration_minutes": 31,
       "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-10-20 | Duration: 31m\n\n## Summary\nLicensing integration and an initial test push succeeded, but historical company records still require a CSV containing company domains and GrowthBook Org IDs, delaying automation rollout. Customer licensing data must be completed before account scoring begins, while new 30-day developer and buyer activity properties will improve company-fit scores. Weekly prioritization of the five highest-scoring eligible enterprise accounts was proposed, alongside unresolved rules for marketing access. Separate meeting and MQL queues were requested, with trigger-based routing awaiting Default support and lead-source priorities still needing definition. Inbound reporting remains limited by inconsistent tagging, unclear demo flags, dashboard issues, and missing event-meeting tracking. Group demos have expanded capacity, but their progression to opportunities must be compared with one-on-one demos. Customer.io and Notion workflows have moved to HubSpot, the podcast assignment workflow is ready, and Shawn will provide brief Friday Slack updates.\n\n## Keywords\nHubSpot licensing, Lead scoring, Account routing, Inbound attribution, Group demos, RevOps\n\n## Action Items\n**Michael Nolan**\n- Provide CSV company domains and IDs (02:48)\n\n**Shawn Green**\n- Import historical company IDs (04:59)\n- Schedule licence data tests (05:05)\n- Build licence-tier workflow (05:14)\n- Follow up on CSV (06:12)\n- Adjust company-fit scoring (10:12)\n- Build weekly account report (10:12)\n- Establish event tracking process (26:33)\n- Send Friday Slack update (29:56)\n- Evaluate Asana adoption (30:10)\n\n**Chris Newton**\n- Monitor Default routing enhancement (12:49)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5T6DT3EJHPZH8WD54YXJNQW",
+      "source": "fireflies",
+      "title": "GrowthBook + Op Methods Weekly Check-In",
+      "date": "2026-10-27",
+      "duration_minutes": 29,
+      "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-10-27 | Duration: 29m\n\n## Summary\nThe license-association workflow is built and ready for testing, but validation depends on receiving GrowthBook Org IDs and license data. The team will backfill company Org IDs, test Enterprise, Pro, and Starter license updates separately, and audit synced records. License data is expected to improve customer lifecycle-stage accuracy to approximately 99%; Enterprise and self-hosted accounts generally have closed-won deals, while Pro customers remain the main gap. Renewal automation is a potential next step using valid expiration dates and owner notifications. Lead-scoring preparation includes new properties and Clay-enriched mobile and combined monthly users, with Thursday’s call focused on scoring, MQL routing, traffic metrics, and possible routing for high-fit enterprise companies. HubSpot contains 916 duplicate companies, so the team will merge only confident duplicates while preserving legitimate parent-child relationships. Monitoring, ownership for cleanup, and input from Nolan and Michael Knowlton remain important dependencies.\n\n## Keywords\nLicence automation, GrowthBook organisation IDs, Lead scoring, MQL routing, HubSpot deduplication, Renewal process\n\n## Action Items\n**Chris Newton**\nReview reporting requirements (01:44)\n\n**Shawn Green**\nTest licence-association workflow (02:13)\nReview renewal-opportunity process (04:00)\nCoordinate workflow testing (05:43)\nMonitor backup monitoring (05:43)\nExecute licence-data rollout (05:53)\nMonitor licence records (05:53)\nPrepare week-over-week report (16:02)\nUpdate lead-scoring model (18:29)\nReview duplicate-company analysis (28:10)\n\n**Michael Funduc**\nCategorise duplicate companies (27:40)\nSelect primary records (27:40)\nReview duplicate-company analysis (28:10)",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 8,
       "summary_quality": "good"

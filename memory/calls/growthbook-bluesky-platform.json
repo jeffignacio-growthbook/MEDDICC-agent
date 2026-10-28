@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook+Bluesky | Platform",
+  "slug": "growthbook-bluesky-platform",
+  "last_etl_date": "2026-10-28T06:26:54.009414",
+  "calls": [
+    {
+      "id": "01M5D3R42ZRVW2RB9CEDSHJ5J7",
+      "source": "fireflies",
+      "title": "GrowthBook+Bluesky | Platform Enablement",
+      "date": "2026-10-27",
+      "duration_minutes": 59.220001220703125,
+      "summary": "# GrowthBook+Bluesky | Platform Enablement\nDate: 2026-10-27 | Duration: 59.220001220703125m\n\n## Summary\nThe discussion reviewed bandit experiments that shift traffic toward stronger variants, support many variants, and allow configurable exploratory durations and decision cadences. Contextual bandits can use attributes such as role and account plan, while guardrail behavior and arm-level weighting still require confirmation. Metrics topics included exposure-relative conversion windows, lookback alternatives, holdout populations, sticky bucketing across identity changes, and custom units for network effects. Product analytics now includes warehouse-based dashboards, journeys, funnels, and AI-assisted SQL or natural-language exploration, though licensing and managed warehouse pricing remain unresolved. Session replay requires SDK integration and is still immature; recording scope, sampling, legal implications, and engineering feedback need clarification. GrowthBook supports multiple AI models, configurable providers, MCP, and experiment learnings, while access to a custom AI gateway remains under investigation. Fireflies distribution, Slack updates, and an upcoming version 5.2 were also discussed.\n\n## Keywords\nBandits, Contextual bandits, Experiment holdouts, Sticky bucketing, Product analytics, AI and MCP\n\n## Action Items\n**Chris Sanders**\nConfirm guardrail weighting (16:05)\nInvestigate custom bandit algorithms (54:48)\nCheck custom AI endpoints (55:10)\n\n**Andy Marshall**\nPost meeting recording (56:19)",
+      "organizer": "marsh@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Valentin FEREY and",
+  "slug": "valentin-ferey-and",
+  "last_etl_date": "2026-10-28T06:26:54.010131",
+  "calls": [
+    {
+      "id": "01M5YCSA81WM3Z2AHX9SBT67WE",
+      "source": "fireflies",
+      "title": "Valentin FEREY and James Shannon + Rémy Marin",
+      "date": "2026-10-27",
+      "duration_minutes": 45.38999938964844,
+      "summary": "# Valentin FEREY and James Shannon + Rémy Marin\nDate: 2026-10-27 | Duration: 45.38999938964844m\n\n## Summary\nThe discussion clarified the visual editor as a central product area and reviewed the charge, activation, and usage-conversion flows, without recording a final conversion decision. A React direction for both web and mobile was raised, with technical complexity still unresolved; an experiment had been completed, but its outcome was not specified. Delivery topics included the front-end project squad, Marketing’s responsibility for feature-flag control, and visitor-flow considerations, though no visitor-flow change was confirmed. The order form was explicitly blocked, while per-seat calculations and the connection between the order form and signature flow were reviewed; Rémy Marin was referenced in relation to signing. General settings, proposals, and payment were also discussed, including concern about being led to pay. James Shannon stated that a seat price still needed to be created, leaving pricing definition, order-form resolution, and technical direction as open follow-ups.\n\n## Keywords\nVisual editor, React web application, Feature flagging, Order form, Per-seat pricing, Signature workflow\n\n## Action Items\n**James Shannon**\nDefine seat price (42:30)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Jack/Jason Catch Up",
+  "slug": "jack-jason-catch-up",
+  "last_etl_date": "2026-10-28T06:26:54.004460",
+  "calls": [
+    {
+      "id": "01M5TFZK40674XWPT5CVDGWNCR",
+      "source": "fireflies",
+      "title": "Jack/Jason Catch Up",
+      "date": "2026-10-27",
+      "duration_minutes": 21.06999969482422,
+      "summary": "# Jack/Jason Catch Up\nDate: 2026-10-27 | Duration: 21.06999969482422m\n\n## Summary\nThe discussion covered a transition toward Growth Book as Deadwater winds down into maintenance, with Aaron handling operations while on parental leave and no client closings planned. Airtop’s shutdown is scheduled for November 13; signups and upgrades have stopped, existing accounts remain accessible, and users must migrate workflows. Messaging, signup, and reliability issues contributed to Airtop’s product-market concerns, while Amir repeatedly rejected marketing recommendations. The Growth Book role reports to Ashley and focuses on operations, website and content ownership, and internal coordination rather than generic marketing. A small team is planned eventually, with Emmy interested in product management. The content program emphasizes internal voices, lightweight editing, pull-request summaries, and automated accuracy checks. Six or seven review layers, limited reviewer capacity, six-article monthly output, launch pressure, and Monday 9 AM meetings create execution friction, while consulting offers faster build-and-ship work without people management or daily standups.\n\n## Keywords\nGrowthBook, Deadwater, Airtop shutdown, Content operations, Approval bottlenecks, AI fact-checking\n\n## Action Items\n**Jack Virag**\nContinue winding Deadwater (01:00)\nRoute Deadwater inquiries to Aaron (01:00)\nDevelop GrowthBook content programme (15:03)\nPublish GrowthBook content programme (15:03)",
+      "organizer": "jack@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}
