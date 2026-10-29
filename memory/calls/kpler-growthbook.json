@@ -1,7 +1,7 @@
 {
-  "company": "Kpler & GrowthBook",
+  "company": "KPLER & GrowthBook",
   "slug": "kpler-growthbook",
-  "last_etl_date": "2026-09-17T06:19:53.896616",
+  "last_etl_date": "2026-10-29T06:37:21.720471",
   "calls": [
     {
       "id": "01M2GHYS12E01NH0Z30QPJGJ2Q",
@@ -12,6 +12,17 @@
       "summary": "# Kpler & GrowthBook | Enterprise Setup Conversation\nDate: 2026-09-16 | Duration: 56m\n\n## Summary\nThe Lufthansa RFP remains ongoing, with answers needed by tomorrow, while overlapping meetings with the Capilla team created scheduling conflicts. The team discussed heavy feature-flag usage and limited experimentation, noting that internal users currently rely on frontend overrides to toggle flags individually. This workaround lacks a backend source of truth, and a client SDK feature for patching flag values per user is missing. There is interest in moving from Pro to Enterprise by October 31; Enterprise includes SSO, SAML, stable pricing, and training support. The Pro plan’s pricing will change soon, with a grandfathering period available, but internal budget approval and stakeholder alignment are still needed, primarily through Rémi Becheras. Marcel will send a summary email and pricing examples the next day. A follow-up with PMs and the customer success head is planned for October 24 afternoon to clarify feature flags, experimentation workflow, and adoption support. Philippe can help coordinate SSO internally.\n\n## Keywords\nfeature flagging, GrowthBook, enterprise plan, experimentation, SSO, seat usage\n\n## Action Items\n**Rémi Becheras**  \nDiscuss experimentation goals internally (32:11)  \nInvestigate seat usage at Kpler (32:11)  \nDecide on supporting individual user toggling (27:47)  \nConfirm GrowthBook budget owner (35:22)  \n\n**Marcel Geldner**  \nInvestigate individual user toggling with GrowthBook (25:37)  \nDiscuss toggling priority with GrowthBook founders (35:47)  \nProvide Enterprise pricing examples (36:41)  \nSend summary email to Kpler (38:34)  \nSchedule follow-up meeting for October 24th (44:20)  \n\n**Rémy Marin**  \nFollow up on feature flagging overrides (25:37)",
       "organizer": "marcel@growthbook.io",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5WJP58FB0PJASV01C22830M",
+      "source": "fireflies",
+      "title": "KPLER & GrowthBook | Contract Finalisation",
+      "date": "2026-10-28",
+      "duration_minutes": 20,
+      "summary": "# KPLER & GrowthBook | Contract Finalisation\nDate: 2026-10-28 | Duration: 20m\n\n## Summary\nCustomer-side alignment was confirmed, with Scott validating the agreement in principle, although legal compliance review remained pending. The order form had been fully realigned, with requested items addressed and no additions identified; further platform use cases and deeper adoption were encouraged through QBRs. Legal flagged the AI training clause because of sensitive-data concerns, and removal of the AI provision was approved without an expected review restart. The customer also requested removal of data-retention language related to the AI clause, including aggregated-data wording. Questions about external product restrictions and feature-flag resale were addressed by explaining that agency protections cover marketing agencies and prevent client resale. The AI clause was described as the only blocker. A revised agreement was expected shortly, followed by DocuSign routing to Scott, with Ahmed, Florian, and Rémi copied. Finalization was targeted for Friday, pending the legal response and Scott’s approval. (Sources: 01:52–08:20)\n\n## Keywords\nContract finalisation, Legal compliance, AI data training, Data retention, DocuSign, Feature flags\n\n## Action Items\n**Kpler Legal and Compliance**\nReview revised customer agreement (03:22)\n\n**Marcel Geldner**\nRemove AI-training provision (06:46)\nRemove data-retention language (06:53)\n\n**James Shannon**\nSend revised customer agreement (07:45)\n\n**Scott**\nSign agreement through DocuSign (08:04)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 5,
       "summary_quality": "good"
     }
   ]

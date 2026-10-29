@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-10-28T06:26:54.006319",
+  "last_etl_date": "2026-10-29T06:37:21.717943",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1104,6 +1104,28 @@
       "summary": "# MEDDICC Sales Call Summary\n\nCall on [date unspecified in transcript] with Shubham Vishukarma (Growth Product Lead) and Shankar Gupta (Engineering Manager) from Urban Ladder, a Reliance Industries furniture e-commerce subsidiary.\n\n## Attendees and Titles\nShubham Vishukarma served as the primary contact, holding the Growth Product role at Urban Ladder with two years tenure. Shankar Gupta, Engineering Manager, accompanied the call to address technical implementation questions. Jake Heier represented GrowthBook's account team.\n\n## Quantifiable Outcomes and Metrics\nUrban Ladder currently tracked conversion rates at 0.44% with a goal to reach 0.6%, representing a 36% improvement target. Their Average Order Value (AOV) currently stood at approximately 20,000 Indian rupees, with ambitions to increase to 30,000 rupees—a 50% uplift. Additional tracked metrics included average basket size and average selling price, measured through CleverTap and Google Analytics integrations.\n\n## Budget Authority and Signals\nNo explicit budget figures were discussed. However, strong procurement advantage emerged: another Reliance Industries team was already moving forward with GrowthBook contracts, with MSA paperwork under review. Shubham acknowledged this central team approval would significantly ease their procurement process, suggesting executive alignment existed within the parent organization.\n\n## Technical Requirements\nUrban Ladder needed A/B testing capabilities for two primary use cases: feature-based experiments targeting specific audiences before full rollout, and UI-based testing (e.g., button placement optimization). A concrete hypothesis involved testing a paid installation service offering to measure conversion impact against AOV improvement. They had recently migrated their website backend from legacy to modern systems as of September, creating the optimal implementation window.\n\n## Decision Process and Timeline\nThe organization aimed to implement and run initial experiments within the current quarter if alignment occurred. Shubham indicated this accelerated timeline was feasible given proper solution selection and integration. Security reviews would follow standard organizational protocols similar to the parallel Reliance team's evaluation.\n\n## Specific Pain Points\nUrban Ladder lacked any existing A/B testing capabilities despite operating a sophisticated e-commerce platform. Their recent backend migration established infrastructure maturity, creating urgency to capitalize on newfound technical flexibility for experimentation. The team recognized feature testing as critical before broad audience rollouts.\n\n## Champion Signals\nShubham demonstrated strong champion characteristics by proactively creating a GrowthBook account for self-exploration, showing initiative and genuine interest. Shankar's presence indicated engineering commitment to implementation. Both attendees asked clarifying questions about security requirements and feature capabilities, signaling serious evaluation intent.\n\n## Competitors Mentioned\nNo competitors were explicitly mentioned during the call.\n\n## Next Steps\nJake committed to sharing additional GrowthBook information through slides, followed by a platform demonstration focusing on the specific workflows Urban Ladder required for feature-based and UI experimentation tracking their identified metrics.",
       "host": "Jake Heier",
       "participants": 69,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5WMTBE6A0R5AT1BA1V7ZVC5",
+      "source": "fireflies",
+      "title": "Demo Call with Marina Georgakila from",
+      "date": "2026-10-28",
+      "duration_minutes": 32.47999954223633,
+      "summary": "# Demo Call with Marina Georgakila from\nDate: 2026-10-28 | Duration: 32.47999954223633m\n\n## Summary\nThe team is developing an early-stage A/B testing and CRO program following its migration from WordPress to Framer, which enables easier landing-page changes but has limited native testing. Marina Georgakila and Nemanja Jovančić expect growth marketers to lead initially, starting with a small team and potentially expanding later. GrowthBook offers feature flags, experiments, analytics, visual editing, Figma and Framer workflows, and Claude automation, but its suitability remains uncertain because the team lacks dedicated marketing operations and data support. Implementation would require engineering involvement, Segment input, front-end and server-side SDKs, feature keys, consent logic, and reliable links between experiment assignments and metric events. Data modeling is the main technical risk. James Shannon recommended the Pro tier at $40 per seat per month, while Enterprise would add onboarding, dedicated support, and Slack access. The team will review documentation, compare pricing, and decide whether GrowthBook’s implementation effort is worthwhile.\n\n## Keywords\nGrowthBook, A/B testing, Framer, Segment, Feature keys, Experimentation SDK, CRO, Visual editor, Claude MCP, Figma\n\n## Action Items\n**James Shannon**\nCheck Athena support (13:20)\nSend implementation documentation (30:36)\nSend Enterprise pricing (31:16)\n\n**Sendcloud marketing team**\nReview implementation documentation (30:36)\nCompare Pro and Enterprise options (30:36)\nEvaluate GrowthBook against simpler experimentation tools (30:36)",
+      "organizer": "dan@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5W077JVSZRE1NS5HY39026Y",
+      "source": "fireflies",
+      "title": "Demo Call with Tim Fung from",
+      "date": "2026-10-28",
+      "duration_minutes": 11.430000305175781,
+      "summary": "# Demo Call with Tim Fung from\nDate: 2026-10-28 | Duration: 11.430000305175781m\n\n## Summary\nNo summary available",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

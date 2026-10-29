@@ -1,7 +1,7 @@
 {
   "company": "Ashley / Lyndsie",
   "slug": "ashley-lyndsie",
-  "last_etl_date": "2026-09-03T06:04:10.818251",
+  "last_etl_date": "2026-10-29T06:37:21.714055",
   "calls": [
     {
       "id": "01KS3K8R6C61N54NZMFAVEMKH6",
@@ -47,6 +47,17 @@
       "date": "2026-08-25",
       "duration_minutes": 24.510000228881836,
       "summary": "# Ashley / Lyndsie Weekly\nDate: 2026-08-25 | Duration: 24.510000228881836m\n\n## Summary\nThe meeting focused on enhancing outbound sales strategies, highlighting critical gaps in effectiveness and the need for better prioritization. It was noted that Jake's cold outreach has yielded low results, while warmer leads from OSS users and webinar signups show promising engagement but are underutilized. The team discussed disorganization in outreach tracking due to Jake's inconsistent use of platforms, leading to challenges in performance visibility. Concerns over data enrichment in Clay's system were mentioned, as many leads aren't effectively enriched. Additionally, a second PDR is needed to improve lead follow-up. The need for clearer priorities in Jake's role was emphasized to boost outreach efficacy, while aligning leadership directives with data insights remains a challenge.\n\n## Keywords\noutbound outreach, inbound demos, sequence performance, OSS user segmentation, data enrichment, Clay tool\n\n## Action Items\n\n**Lyndsie Berens**\nSend Allison Clark’s email and resume to Ashley for scheduling the calendar block and follow up to remove the block after confirmation (00:03)\nFollow up with Jake regarding linking LinkedIn messages to email outreach and review sequence usage and effectiveness data to improve outbound outreach (02:32)\nProvide and update OSS user lists segmented by company size and geography, focusing on ICP fit and activity scores for targeted outreach (14:12)\nCoordinate with Clay expert to diagnose and fix domain normalization and data enrichment issues affecting outreach data quality (17:00)\n\n**Ashley Stirrup**\nSchedule meeting or send email to Allison Clark based on information received from Lyndsie to finalize candidate engagement (00:32)\nReview Jake’s outreach performance metrics and advise on prioritizing high-value segments such as webinar registrants to improve outreach effectiveness (04:07)\nCoordinate with Brian about onboarding the second PDR candidate to enhance team capacity and better manage marketing leads (13:09)\nConfirm filtering and segmentation criteria on OSS users, ensuring alignment with ICP and activity scores for outreach targeting (14:22)\nFollow up with Clay tool contact to address data enrichment and domain normalization problems impacting outreach accuracy (17:30)\nEngage Aaron or relevant project lead to finalize automation rules for outreach targeting large accounts effectively, focusing on relevant personas linked to A/B testing or experimentation (20:53)\n",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5FZEJY7YYG0N2BDXJYX2PHT",
+      "source": "fireflies",
+      "title": "Ashley / Lyndsie Weekly",
+      "date": "2026-10-28",
+      "duration_minutes": 41,
+      "summary": "# Ashley / Lyndsie Weekly\nDate: 2026-10-28 | Duration: 41m\n\n## Summary\nThe discussion covered reducing event volume after lukewarm feedback on an AI conference sponsorship, with focus shifting toward stronger opportunities. Webinar outreach remains challenging, but Merritt from Breeze was identified as a promising speaker for a webinar targeted for the third week of January, with promotion beginning around mid-December; outreach to Wikimedia and ClickHouse continues. Season One content may be repackaged into selected gated and ungated resources, but a full campaign is not yet ready, and Lyndsie will clarify scope and ownership with Karen. HubSpot license-data integration remains a priority, including fields for seats, CTUs, plan, trial, cloud, air-gapped, and expired status, but organization matching is blocked by parent-child accounts and duplicates. Accurate data is needed to distinguish enterprise, pro, and free customers. About 900 duplicates require cautious cleanup, while account hierarchy, naming, ownership, and governance rules remain unresolved. RevOps hiring is desired but unfunded.\n\n## Keywords\nHubSpot deduplication, Parent-child accounts, Licence data integration, Revenue operations, Webinar planning, Event sponsorships\n\n## Action Items\n**Lyndsie Berens**\n- Investigate event outreach (02:04)\n- Defer Reach Desk initiative (03:47)\n- Schedule Wikimedia discussion (04:35)\n- Propose webinar format (05:07)\n- Discuss campaign proposal (08:45)\n- Follow up on account deduplication (27:25)\n- Share deduplication plan (31:08)",
       "organizer": "lyndsie@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

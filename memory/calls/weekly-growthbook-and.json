@@ -1,7 +1,7 @@
 {
   "company": "Weekly GrowthBook and",
   "slug": "weekly-growthbook-and",
-  "last_etl_date": "2026-10-22T05:35:51.023533",
+  "last_etl_date": "2026-10-29T06:37:21.713225",
   "calls": [
     {
       "id": "01KKA2YRZYW6WA7Q0DFFT230Z3",
@@ -218,6 +218,17 @@
       "date": "2026-10-21",
       "duration_minutes": 27,
       "summary": "# Weekly GrowthBook and Mastiff Software Meeting\nDate: 2026-10-21 | Duration: 27m\n\n## Summary\nThe discussion covered revenue performance, deal expectations, ICP prioritization, lead routing, analytics, and team capacity. $500K was closed across four or five deals in two days, with quarterly new and expansion ARR expected at $1.5M–$2M. The Anthropic deal was proposed at $6M but is expected closer to $3M–$4M, with uncapped compensation planned to maximize seller upside. Jake’s prospecting should shift toward 1,000+ employee accounts, high Rio scores, and strong website traffic, with 80%–90% of effort directed to higher-value ICP accounts. Smaller accounts and event leads should be routed selectively; 12 deals below 100 employees averaged about $56K and had lower win rates. Efficiency analysis will be rerun after next Friday, with missing source data backfilled where possible. The team is also considering another BDR, while an additional AE decision depends on quarter-end results and a six-week performance signal.\n\n## Keywords\nICP prioritisation, BDR performance, Lead routing, Website traffic, Static displacement, Sales pipeline\n\n## Action Items\n**Brent Holloway**\n- Build visual ICP representation (11:47)\n- Rerun sales efficiency report (19:50)\n- Review recommendations with Jake (20:23)\n- Review Jake performance regularly\n\n**Ryan McGurk**\n- Launch revised outreach process (21:49)\n- Discuss BDR hiring with Graham (26:39)\n- Discuss BDR hiring with Operations (26:39)\n- Refocus Jake activity",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5WWRYBGN02ERHY8978XA7RH",
+      "source": "fireflies",
+      "title": "Weekly GrowthBook and Mastiff Software Meeting",
+      "date": "2026-10-28",
+      "duration_minutes": 35,
+      "summary": "# Weekly GrowthBook and Mastiff Software Meeting\nDate: 2026-10-28 | Duration: 35m\n\n## Summary\nThe discussion focused on quarter-close execution, including an enterprise deal awaiting legal approval after commercial terms, redlines, and security questions were addressed; signature was targeted for Friday, with October finalization. The business was tracking toward 100% year-over-year growth, with an outside path to 200%. Jake’s BDR reporting required reconciliation: September showed 18 meetings, while ownership fields and excluded inbound activity affected compensation and credit reporting. The reviewed HubSpot pipeline showed approximately $2.2 million open and $300,000 weighted, although cleanup remained necessary. Ella was moving toward an offer, and a team-based BDR model supporting groups of AEs was preferred. Chris remained under evaluation for an SC role, while several candidates were placed in active or future-bench categories. HubSpot employee counts were found unreliable for segmentation, with Massive viewed as a stronger validation source. Ryan was also expected to discuss possible equity-based support for Graham.\n\n## Keywords\nBDR performance, HubSpot reconciliation, Pipeline attribution, Candidate hiring, Account segmentation, Equity arrangement\n\n## Action Items\n**Brent Holloway**\n- Reconcile Jake’s BDR activity (09:58)\n- Clean up BDR ownership fields (21:28)\n- Monitor Jake’s execution (24:03)\n- Introduce Ryan McGurk to Allan Bruner (31:46)\n\n**Ryan McGurk**\n- Check Ella’s references (24:11)\n- Prepare Ella’s offer (24:11)\n- Evaluate solutions consultant candidates (27:05)\n- Discuss equity arrangement with Graham (34:47)",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

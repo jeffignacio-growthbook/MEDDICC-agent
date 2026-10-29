@@ -1,0 +1,18 @@
+{
+  "company": "Immobiliare & GrowthBook",
+  "slug": "immobiliare-growthbook",
+  "last_etl_date": "2026-10-29T06:37:21.720682",
+  "calls": [
+    {
+      "id": "01M5W21TWAWGSXPXJ0BS1T60N1",
+      "source": "fireflies",
+      "title": "Immobiliare & GrowthBook | Setup moving forward",
+      "date": "2026-10-28",
+      "duration_minutes": 25.299999237060547,
+      "summary": "# Immobiliare & GrowthBook | Setup moving forward\nDate: 2026-10-28 | Duration: 25.299999237060547m\n\n## Summary\nGrowthBook is currently used for A/B testing, percentage-based feature rollouts, feature flags, and B2B and B2C configurations. Live experiments include checkout funnel and buyer-button variants, with GrowthBook allocating traffic and Mixpanel analyzing behavioral results. Buyer-focused evaluation centers on lead-generation metrics such as saved searches, listing views, and saved listings, while seller-focused evaluation emphasizes publishing funnels, private-seller checkout, and revenue. The Pro plan remains sufficient because it includes unlimited experiments without traffic or active-user charges. Enterprise adds SSO, provisioning, enhanced support, training, onboarding, contextual bandits, post-stratification, and AI features. An upgrade was deferred because there was no immediate strong reason, although future needs and budgeting may change. A two-week Enterprise trial was offered, and Marcel will send a recap, Enterprise information deck, and product capability documentation, including details on the Learnings AI assistant, MCP server documentation, and updated Visual Editor.\n\n## Keywords\nGrowthBook, A/B testing, Feature flags, Mixpanel, Enterprise plan, AI experimentation\n\n## Action Items\n**Marcel Geldner**\nProvide agentic capabilities documentation (21:21)\nShare Visual Editor information (22:43)\nSend Immobiliare meeting recap (23:41)\n\n**Paolo Sabatinelli**\nEvaluate Enterprise trial (19:39)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Invitation",
+  "slug": "invitation",
+  "last_etl_date": "2026-10-29T06:37:21.716538",
+  "calls": [
+    {
+      "id": "01M5Z5ARFV2YA773SX51MVKSTD",
+      "source": "fireflies",
+      "title": "Invitation: GB x Boyle: Racing/Football HP Exp",
+      "date": "2026-10-28",
+      "duration_minutes": 56.119998931884766,
+      "summary": "# Invitation: GB x Boyle: Racing/Football HP Exp\nDate: 2026-10-28 | Duration: 56.119998931884766m\n\n## Summary\nThe team defined a homepage personalization experiment comparing the current default homepage with one treatment that shows Football or racing content based on customer sport preference. Initial qualification would use a static RFM-based audience of about 4,000 Football customers and 4,500–5,000 racing customers, but the combined audience of roughly 9,000 may require a long runtime. The team will use power calculations based on homepage betting-selection conversion and realistic lift assumptions. Options to expand the audience include a three-month RFM lookback, weekly or biweekly list refreshes, adding more sports, or building dynamic eligibility into the Sportsbook application. The application must identify eligibility and sport preference, while GrowthBook handles randomization and BigQuery provides exposure data for reporting. The Squad Builder recently used players experiment has only exposed about 299 treatment users, making current results unreliable and suggesting product analytics as an interim option.\n\n## Keywords\nRFM segmentation, Homepage personalisation, Football and racing experiments, GrowthBook randomisation, BigQuery exposure data, Squad Builder analytics\n\n## Action Items\n**Richard**\nQuery GrowthBook exposure data (41:42)\nConfirm customer ID reporting process (41:42)\nEvaluate adding more sports (52:24)\n\n**Joe Taylor**\nReassess experiment population (52:10)\nReview RFM lookback period (53:03)\nReconfigure homepage experiment (53:14)\nDiscuss sport-specific homepage assignment (53:37)\n\n**Cris Dizon**\nSend experiment documentation (54:04)",
+      "organizer": "cris@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

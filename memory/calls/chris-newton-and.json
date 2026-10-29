@@ -1,7 +1,7 @@
 {
   "company": "Chris Newton and",
   "slug": "chris-newton-and",
-  "last_etl_date": "2026-08-05T15:57:31.390758",
+  "last_etl_date": "2026-10-29T06:37:21.715486",
   "calls": [
     {
       "id": "01KMGF0FYVZWGHPQ2KMXW8NG8Z",
@@ -13,7 +13,19 @@
       "organizer": "ashley@growthbook.io",
       "participants": 2,
       "keywords": "Lead Scoring, Marketing Contacts, HubSpot Integration, Rio Data, Customer IO, Email List Cleanup",
-      "action_items": "\n**Chris Newton**\nDocument the cleanup and conversion process for Rio-sourced contacts and ensure marketing contacts are correctly assigned in HubSpot (16:18)\nCreate and share segments for paying and free customers for marketing exclusion/inclusion purposes with Karen (31:05)\nLead the alignment and finalization of the lead scoring model; communicate requirements clearly to Roman for implementation and dashboard creation (25:27)\nUpdate the dashboard setup documentation and delete outdated or confusing spreadsheets/files to maintain clarity (27:20)\nExplore automation for email sequences and integrations if time permits to improve workflow efficiency (29:31)\n\n**Ashley Stirrup**\nCoordinate with Graham to clarify processes for signups and marketing email flows, particularly regarding Rio data and Customer IO integration (11:02)\nSupport oversight and prioritization of lead scoring and dashboard tasks with Chris and Roman (25:40)\nVerify and test HubSpot customer data segments, especially regarding free users and recent Stripe signups (24:26)\nEvaluate and consider canceling problematic LinkedIn event integrations, following up on discussions with Karen (31:44)\n\n**Roman**\nClean up the email list by converting Rio sourced contacts and other identified segments into marketing contacts within HubSpot (16:00)\nBuild the dashboard to display contact and company leads per the finalized lead scoring after coordination with Chris (26:58)\n\n**Karen**\nContinue to refine email campaign deliverability and suppression logic in Customer IO to improve performance and reduce duplication with HubSpot communications (22:40)\nAssist in discussions and troubleshooting with Roman regarding LinkedIn event integration and unsubscribe syncing issues (31:58)\n"
+      "action_items": "\n**Chris Newton**\nDocument the cleanup and conversion process for Rio-sourced contacts and ensure marketing contacts are correctly assigned in HubSpot (16:18)\nCreate and share segments for paying and free customers for marketing exclusion/inclusion purposes with Karen (31:05)\nLead the alignment and finalization of the lead scoring model; communicate requirements clearly to Roman for implementation and dashboard creation (25:27)\nUpdate the dashboard setup documentation and delete outdated or confusing spreadsheets/files to maintain clarity (27:20)\nExplore automation for email sequences and integrations if time permits to improve workflow efficiency (29:31)\n\n**Ashley Stirrup**\nCoordinate with Graham to clarify processes for signups and marketing email flows, particularly regarding Rio data and Customer IO integration (11:02)\nSupport oversight and prioritization of lead scoring and dashboard tasks with Chris and Roman (25:40)\nVerify and test HubSpot customer data segments, especially regarding free users and recent Stripe signups (24:26)\nEvaluate and consider canceling problematic LinkedIn event integrations, following up on discussions with Karen (31:44)\n\n**Roman**\nClean up the email list by converting Rio sourced contacts and other identified segments into marketing contacts within HubSpot (16:00)\nBuild the dashboard to display contact and company leads per the finalized lead scoring after coordination with Chris (26:58)\n\n**Karen**\nContinue to refine email campaign deliverability and suppression logic in Customer IO to improve performance and reduce duplication with HubSpot communications (22:40)\nAssist in discussions and troubleshooting with Roman regarding LinkedIn event integration and unsubscribe syncing issues (31:58)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M60BDWY23SVYWTH15CQJRH6B",
+      "source": "fireflies",
+      "title": "Chris Newton and Ashley Stirrup",
+      "date": "2026-10-28",
+      "duration_minutes": 11.640000343322754,
+      "summary": "# Chris Newton and Ashley Stirrup\nDate: 2026-10-28 | Duration: 11.640000343322754m\n\n## Summary\nThe team tested the HubSpot contact and default booking workflows. Contacts could be filtered for HubSpot users, guest emails copied from records, and booking links generated, although Sarah was not yet visible in HubSpot. The default flow worked by signing in, entering the guest email, selecting the podcast guest booking link, and submitting the form. A test link opened successfully and showed Scott as the assigned booking owner, but the test booking was later cancelled. The team agreed to retain the default booking tool because it supports round-robin tracking, automatically counts meetings, and removes cancelled meetings from totals. Key risks include links that Chris said may expire after 24 or 48 hours, while Ashley noted that podcast guests may need weeks to coordinate. The team also needs to confirm whether Scott remains assigned after a later booking and whether the blank page shown after cancellation creates a confusing guest experience. Chris will investigate expiration and ownership behavior, Jake will regenerate links for follow-ups, and Ashley will apply the process to Sarah’s upcoming recording after the open questions are resolved.\n\n## Keywords\nHubSpot, Booking links, Round-robin assignment, Link expiration, Podcast guest scheduling, Contact ownership\n\n## Action Items\n**Chris Newton**\nCheck cancellation destination (05:27)\nInvestigate booking-link expiration (09:41)\nVerify contact ownership (10:05)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
     }
   ]
 }

@@ -1,0 +1,18 @@
+{
+  "company": "Onboarding nurture in",
+  "slug": "onboarding-nurture-in",
+  "last_etl_date": "2026-10-29T06:37:21.714399",
+  "calls": [
+    {
+      "id": "01M5WSMAR13Q27VA16XDYTKDR5",
+      "source": "fireflies",
+      "title": "Onboarding nurture in hubspot",
+      "date": "2026-10-28",
+      "duration_minutes": 21.399999618530273,
+      "summary": "# Onboarding nurture in hubspot\nDate: 2026-10-28 | Duration: 21.399999618530273m\n\n## Summary\nThe five-email onboarding nurture is live, with four existing emails updated, interview requests added, and final emails finalized. The employee branch targets contacts under 1,000 employees and includes MCP installation and teammate-invite emails. Seventy-seven existing contacts passed checks, received the first two emails, and are scheduled for the third; the corrected employee filter still requires validation tomorrow or the following day. HubSpot ownership for Sales remains undecided, while Apollo sequences stay separate and activity runs through Jacqueline. Contact uploads need stricter standards, and filtering by any associated company is recommended because primary-company filters can miss subsidiaries. Duplicate safeguards are active, although manual workflow re-entry remains possible. Outreach targeting varies between 500- and 1,000-employee companies, creating coordination concerns with nurture. Interview emails should use a Calendly link instead of a HubSpot-style button while retaining unsubscribe options. Parent-child company cleanup, deduplication, and data-quality risks remain open. Marketing discussions also covered an unanswered blog-author question, Jack Ops, Context OS publishing workflows, and a possible team walkthrough.\n\n## Keywords\nHubSpot workflows, Onboarding nurture, Interview requests, Company associations, Marketing automation, GrowthBook Context OS\n\n## Action Items\n**Emmy Sharp**\nMonitor workflow enrolments (09:05)\nReplace Calendly button (12:13)\nChange HubSpot company filter (12:48)\nReport workflow problems (14:06)\nDiscuss GrowthBook tooling (18:42)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

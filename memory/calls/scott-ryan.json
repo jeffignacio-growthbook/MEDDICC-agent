@@ -1,7 +1,7 @@
 {
   "company": "Scott & Ryan",
   "slug": "scott-ryan",
-  "last_etl_date": "2026-10-21T05:31:34.613583",
+  "last_etl_date": "2026-10-29T06:37:21.714875",
   "calls": [
     {
       "id": "01KTMBGKNRFSK9N0ZZPP4BE7C2",
@@ -82,6 +82,17 @@
       "summary": "# Scott & Ryan\nDate: 2026-10-20 | Duration: 32m\n\n## Summary\nQ3 remains close to the $2 million target, but committed deals must close and one or two additional Bluebird deals may be needed. OLX Group is the largest realistic current-quarter opportunity: GrowthBook was selected after a month-long POC, but AWS Brazil’s 2P process, decision-maker response, final seat count, and transaction mechanics remain unresolved. The commercial proposal covers 220 users, a $50K platform fee, and $176K in enterprise seats, with the offer valid through October 30 and no further discounts planned. Echo also remains a priority, although Carolina’s broader review has slowed purchase intent; the team is targeting a signed order form by next Friday. Expedia remains a selected-vendor opportunity worth $130K, while SPF represents an additional Brazilian opportunity of approximately $45K–$50K. Bokra has been deprioritized after follow-up stalled.\n\n## Keywords\nOLX, AWS Brazil 2P programme, Q3 forecast, Echo procurement, Enterprise pricing, Sales pipeline\n\n## Action Items\n**Ryan McGurk**\nCoordinate OLX transaction (05:17)\nConfirm OLX meeting attendance (06:56)\nPush OLX agreement signing (10:50)\nIdentify Echo deal steps (24:44)\nCall Julio about Echo (26:00)\nEmail Carolina about Echo (26:00)\nPursue SPF opportunity (28:34)\nPursue Expedia opportunity (30:02)\nDeprioritize Bokra opportunity (30:02)",
       "organizer": "scott.keller@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M61NJH2B570REP6JKY1QVE6Y",
+      "source": "fireflies",
+      "title": "Scott & Ryan",
+      "date": "2026-10-28",
+      "duration_minutes": 1,
+      "summary": "# Scott & Ryan\nDate: 2026-10-28 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
       "summary_quality": "good"
     }
   ]

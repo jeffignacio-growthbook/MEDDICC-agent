@@ -1,0 +1,18 @@
+{
+  "company": "App Shell Review",
+  "slug": "app-shell-review",
+  "last_etl_date": "2026-10-29T06:37:21.714553",
+  "calls": [
+    {
+      "id": "01M5ZN36HJBNBC1EK7JX2TMZH4",
+      "source": "fireflies",
+      "title": "App Shell Review",
+      "date": "2026-10-28",
+      "duration_minutes": 47.400001525878906,
+      "summary": "# App Shell Review\nDate: 2026-10-28 | Duration: 47.400001525878906m\n\n## Summary\nHigh-level verbal approvals were received, but detailed review and code review remained incomplete while multiple high-impact changes were under review. The collapsible sidebar was viewed positively, although header changes could confuse users and require further alignment; the settings redesign depends on the app shell, and the page wrapper was deferred without the header. Breadcrumb issues included inaccurate ownership hierarchy, lost experiment context in reports, separate treatment needed for templates, and reduced project importance. Help relocation introduced edge cases, removed upgrade context from navigation, kept enterprise chat in the bottom-right, and required verification of trial notice rendering. A piecemeal rollout was preferred for acclimation, with the sidebar able to ship independently. Gabe was to follow up with Jeremy.\n\n## Keywords\nApp shell, Collapsible side navigation, Breadcrumb hierarchy, Project selector, Help and upgrade controls, Staged rollout\n\n## Action Items\n**Gabe Melean**\n- Verify navigation state (16:01)\n- Fix report breadcrumbs (19:28)\n- Clarify template breadcrumbs (21:31)\n- Reconcile upgrade messaging (26:17)\n- Investigate trial notice (33:59)\n- Develop project selector treatment (43:53)\n- Consult stakeholder on rollout (44:13)\n- Propose revised rollout sequence (46:03)\n\n**Adriel Vieira**\n- Review app-shell code (44:39)\n- Add pull-request feedback (44:39)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

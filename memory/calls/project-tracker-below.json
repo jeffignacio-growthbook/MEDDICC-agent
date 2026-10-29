@@ -1,7 +1,7 @@
 {
   "company": "project tracker below",
   "slug": "project-tracker-below",
-  "last_etl_date": "2026-10-22T05:35:51.018898",
+  "last_etl_date": "2026-10-29T06:37:21.712044",
   "calls": [
     {
       "id": "01KG8F03200YR3AA1KR16FG4KR",
@@ -289,6 +289,17 @@
       "date": "2026-10-21",
       "duration_minutes": 37.15999984741211,
       "summary": "# Graham <> Brent GTM weekly meeting (project tracker below)\nDate: 2026-10-21 | Duration: 37.15999984741211m\n\n## Summary\nThe discussion prioritized preserving Q3 pricing and long-term value over quarter-end acceleration through discounts, while considering the strategic recruiting signal of a potential $1 million earner and rejecting commission caps. GrowthBook’s strongest conversion efficiency was associated with companies employing 1,000–10,000 people, although the relationship remains correlational and requires further testing; non-ICP activity, including one representative spending 77% of time outside the ICP, was flagged for correction. Ella was strongly endorsed for a BDR role, while Jake was assigned structured multi-touch outbound testing using email, LinkedIn, calls, and follow-ups, including AI-assisted development messaging. Account-growth opportunities included job-description signals, tracking former champions, and potential Zalando expansion. Anthropic remains strategically important but presents fork-maintenance and displacement risks; renewal was discussed at approximately $3–7 million, with a $2 million services commitment nearing substantial utilization.\n\n## Keywords\nGrowthBook, AI-assisted experimentation, ICP segmentation, Champion tracking, Anthropic renewal, Multi-touch sequencing\n\n## Action Items\n**Brent Holloway**\n- Build customer profile breakdown (09:45)\n- Test sequencing campaign (16:04)\n- Draft AI campaign talking points (17:31)\n- Discuss Chris with Ryan (19:39)\n- Research champion-tracking vendor (24:28)\n- Analyse job-description signals (24:32)\n- Calculate tool return on investment (27:09)",
+      "organizer": "graham@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5XHC6PC34WNZX5699DAAD25",
+      "source": "fireflies",
+      "title": "Graham <> Brent GTM weekly meeting (project tracker below)",
+      "date": "2026-10-28",
+      "duration_minutes": 36.099998474121094,
+      "summary": "# Graham <> Brent GTM weekly meeting (project tracker below)\nDate: 2026-10-28 | Duration: 36.099998474121094m\n\n## Summary\nThe discussion covered an active Woodside home search involving three properties, including two fixers, with fire risk, insurance, repair costs, structural condition, and limited budget flexibility affecting offer strategy. Graham wants an independent contractor walkthrough, while Brent will locate a trusted contractor. The team identified 56 unpaid active Pro accounts that may represent roughly $100K in recoverable revenue, with outreach and account segmentation planned. Pricing remains unresolved ahead of a board meeting, with hybrid seats and consumption, warehouse-native add-ons, usage metrics, and possible Pro price increases under consideration. GTM hiring is progressing through Ella and potential sales-engineering candidate Chris Claus. The team also launched an AI-focused outbound sequence, is reviewing Jake’s opportunity generation and pipeline quality, and is cleaning reporting through Jeff Ignacio.\n\n## Keywords\nPricing strategy, Warehouse-native, Customer recovery, Enterprise upsell, Outbound pipeline, Property renovation\n\n## Action Items\n**Brent Holloway**\nSend Revenera session notes (15:16)\nLocate contractor contact information (27:56)",
       "organizer": "graham@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

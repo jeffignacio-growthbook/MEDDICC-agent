@@ -1,0 +1,18 @@
+{
+  "company": "EGYM & GrowthBook",
+  "slug": "egym-growthbook",
+  "last_etl_date": "2026-10-29T06:37:21.715201",
+  "calls": [
+    {
+      "id": "01M5WF5HFN8GBPHKRM95QRK664",
+      "source": "fireflies",
+      "title": "EGYM & GrowthBook | Introduction & Demo",
+      "date": "2026-10-28",
+      "duration_minutes": 78,
+      "summary": "# EGYM & GrowthBook | Introduction & Demo\nDate: 2026-10-28 | Duration: 78m\n\n## Summary\nGrowthBook was shortlisted for experimentation after multiple providers were reviewed following the merger, with A/B testing as the primary focus. The current gap is that the Wellpass team runs experiments across the app and frontend without A/B testing capability or sufficient measurement, creating a need for faster product learning. GrowthBook combines feature flags, experiments, and product analytics, supporting a workflow from feature development through performance measurement and impact analysis. Its warehouse-native approach uses Snowflake as the source of truth while retaining customer data ownership. The existing stack includes Snowflake, Hex, Mixpanel migration, and Fivetran pipelines for combining experiment metrics. Member attributes can support runtime eligibility, although cross-domain availability remains customer-owned. Member ID hashing can provide mobile and web consistency, while anonymous-to-member tracking, persistent anonymous identifiers, consent, and exposure confirmation require further design. A product demonstration is planned for next week, followed by POC scenario definition, requirements clarification, timeline confirmation, and EU hosting clarification. The target launch window is end-November to December.\n\n## Keywords\nExperimentation, Feature flags, Snowflake analytics, Anonymous identity, Warehouse-native analysis, Proof of concept\n\n## Action Items\n**Marcel Geldner**\nSchedule follow-up meeting (01:05:05)\nPrepare proof-of-concept structure (01:05:41)\nSend written meeting recap (01:07:51)\nAnswer EGYM questions (01:07:51)\n\n**James Shannon**\nSend technical documentation (01:06:32)\n\n**Alessandro Marseglia**\nCoordinate next meeting timing (01:07:16)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 16,
+      "summary_quality": "good"
+    }
+  ]
+}

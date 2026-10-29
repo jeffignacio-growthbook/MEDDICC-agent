@@ -1,0 +1,18 @@
+{
+  "company": "Call with Alexander",
+  "slug": "call-with-alexander",
+  "last_etl_date": "2026-10-29T06:37:21.721147",
+  "calls": [
+    {
+      "id": "6ae248f131f1a1000137f1df",
+      "source": "apollo",
+      "title": "Call with Alexander Ivakhnenko",
+      "date": "2026-10-28",
+      "duration_minutes": 1.0,
+      "summary": "# Call with Alexander Ivakhnenko\nDate: 2026-10-28 | Duration: 1.3m\n\n## Note\nNo transcript available. Meeting recorded but transcript extraction failed or is still processing.",
+      "organizer": "",
+      "participants": 0,
+      "summary_quality": "good"
+    }
+  ]
+}
