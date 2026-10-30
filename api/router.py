@@ -1240,6 +1240,15 @@ Instructions:
   figure. This rule applies even though you are only quoting a cached
   number, not computing a new one — citing a heuristic without calling it
   one is exactly as misleading as fabricating it outright.
+- CRITICAL: if the cached field you cite is named stage_rates (team-pooled
+  per-stage win rates used to weight open pipeline), you MUST describe
+  these as "governed historical stage win rates, pooled across the team
+  from closed deals in complete quarters" — and explicitly say they are
+  NOT forecast-category weights and NOT a CRM deal-stage probability
+  field. This directly answers questions shaped like "what rates did you
+  use? or did you use forecast category weights?" — the weights are
+  derived from actual historical close outcomes per stage, never from a
+  forecast-category field or a vendor-supplied stage probability.
 - Do NOT invent, estimate, or re-derive any number, multiplier, rate, or
   intermediate value that is not already written in the prior answer OR the
   cached computation details above.
@@ -6218,6 +6227,7 @@ async def _route_question(question: str, user_id: str,
     # ── -2. Wave 5a: Correction detection and proposal creation ───
     from corrections import (
         detect_correction,
+        is_method_question,
         ask_correction_scope,
         extract_correction_facts,
         create_correction_proposal
@@ -6230,10 +6240,24 @@ async def _route_question(question: str, user_id: str,
         if last_msg and isinstance(last_msg, dict):
             last_handler = last_msg.get('handler_name', '')
             if last_handler == 'correction_scope_question':
-                # User is responding to scope question
+                # User is responding to scope question. Anchored (not a bare
+                # substring check): "what's our general pipeline coverage
+                # looking like?" must fall through to normal routing, not be
+                # misread as "the user chose general scope" (2026-10-06
+                # incident diagnosis, item 1c) — only a reply that IS
+                # (modulo whitespace/trailing punctuation) "general" or
+                # "specific" triggers the scope-reply branch below.
+                # `re` is shadowed as a function-local name elsewhere in this
+                # same function scope (later `import re as _re`/`import re`
+                # statements make the top-level `import re` unreachable here
+                # per Python's whole-function local-binding rule) — import
+                # it locally, same workaround this function already uses.
+                import re as _re_corrections
                 user_response = question.lower().strip()
+                is_general_reply = _re_corrections.fullmatch(r"general[.!]?", user_response) is not None
+                is_specific_reply = _re_corrections.fullmatch(r"specific[.!]?", user_response) is not None
 
-                if 'general' in user_response:
+                if is_general_reply:
                     logger.info(f"[CORRECTION] User selected 'general' - creating proposal")
 
                     # Get the original correction from 2 messages back
@@ -6270,7 +6294,7 @@ async def _route_question(question: str, user_id: str,
                             "tool_results": {"error": str(e)}
                         }
 
-                elif 'specific' in user_response:
+                elif is_specific_reply:
                     logger.info(f"[CORRECTION] User selected 'specific' - one-off correction")
                     return {
                         "answer": "Got it — I'll just fix this answer. (One-off corrections aren't "
@@ -6281,7 +6305,20 @@ async def _route_question(question: str, user_id: str,
 
     # If user is correcting the agent, ask if correction is general or specific.
     # Corrections don't route to handlers — they ask for scope clarification.
-    if detect_correction(question):
+    #
+    # is_method_question() guard (2026-10-06 incident, thread
+    # 1791259518.438989): "What weighted rates did you use for each stage?
+    # or did you use forecast category weights?" matched CORRECTION_PATTERNS'
+    # "use X" entry on the substring "use forecast" and got intercepted here
+    # BEFORE the intent classifier ever ran — the bot asked "general or
+    # specific?" for a question about METHOD, not a correction. A
+    # method-shaped question is NEVER a correction, full stop — this is
+    # unconditional, not contingent on whether a prior answer exists in
+    # history. Suppressing correction-detection here lets execution fall
+    # through to the normal routing path (entity-scope check, pronoun
+    # resolution, classifier) below, where explain_prior_answer's existing
+    # machinery can pick it up.
+    if not is_method_question(question) and detect_correction(question):
         logger.info(f"[CORRECTION] Detected correction in question")
         scope_question = ask_correction_scope(question)
         return {

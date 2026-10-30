@@ -3862,6 +3862,25 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     off_roster_unweighted = 0.0
     off_roster_unweighted_n = 0
 
+    # explain_prior_answer citation support (2026-10-06 incident: "what
+    # weighted rates did you use for each stage?" had no real data to cite
+    # — only the final per-rep SCALAR totals above were kept, the per-stage
+    # breakdown that built them was thrown away). These two aggregates are
+    # populated alongside the scalar totals above, from the SAME loop and
+    # the SAME by_stage_order object query_stage_close_rate() already
+    # returned — never a second query, never a reimplementation:
+    #   - used_stage_orders / stage_rates: which stage_orders actually
+    #     appeared among THIS call's qualifying open deals (not the
+    #     entirety of query_stage_close_rate()'s historical by_stage_order),
+    #     with stage_name/win_rate/n_observed for citation.
+    #   - pipeline_by_stage_by_email: per-rep, per-stage deal_count +
+    #     weighted_dollars — aggregates only, no deal IDs, no deal-level
+    #     rows. A deal in an ungated stage still counts in deal_count, with
+    #     weighted_dollars left at 0 — consistent with unweighted_pipeline
+    #     already excluding ungated-rate deals from the weighted sum.
+    used_stage_orders = set()
+    pipeline_by_stage_by_email = {}
+
     for deal in open_rows:
         pipeline_id = str(deal.get("pipeline_id"))
         owner = deal.get("owner_email")
@@ -3880,6 +3899,14 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             deal_value = incremental_arr(deal)
             stage_row = by_stage_order.get(str(so)) or by_stage_order.get(so)
             win_rate = stage_row.get("win_rate") if stage_row else None
+            used_stage_orders.add(so)
+            if attributed_owner:
+                stage_bucket = pipeline_by_stage_by_email.setdefault(attributed_owner, {})
+                stage_entry = stage_bucket.setdefault(
+                    str(so), {"deal_count": 0, "weighted_dollars": 0.0})
+                stage_entry["deal_count"] += 1
+                if win_rate is not None:
+                    stage_entry["weighted_dollars"] += deal_value * win_rate
             if win_rate is None:
                 # Stage has no gated win rate (below min_evidence_count) —
                 # excluded from the weighted sum, tracked separately. NEVER
@@ -4082,7 +4109,12 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             "on_track": on_track,
             "quota_met": quota_met,
             "no_wins_yet": no_wins_yet,
-            "data_gap": combined is None
+            "data_gap": combined is None,
+            # Citation support (explain_prior_answer): per-stage breakdown
+            # of this rep's own qualifying Sales-pipeline open deals, keyed
+            # by stage_order (string) — aggregates only, no deal IDs. See
+            # pipeline_by_stage_by_email build above.
+            "pipeline_by_stage": pipeline_by_stage_by_email.get(email, {}),
         })
 
         total_won += won
@@ -4135,6 +4167,10 @@ async def query_rep_attainment(params: dict, sb) -> dict:
             "no_wins_yet": unattributed_total == 0,
             "data_gap": True,
             "unattributed": True,
+            # Off-roster deals aren't attributed to a named rep, so there's
+            # no per-rep stage bucket for this aggregate row — empty, not
+            # missing, for a consistent shape across reps[].
+            "pipeline_by_stage": {},
         })
         total_won += unattributed_total
         total_weighted_pipeline += off_roster_weighted
@@ -4186,9 +4222,44 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     team_deals_won = sum(r["deals_won"] for r in reps)
     unassigned_deals_won = unattributed_n if unattributed_n > 0 else 0
 
+    # explain_prior_answer citation support (2026-10-06 incident): team-
+    # level per-stage win-rate aggregate, scoped to just the stage_orders
+    # that actually appeared among THIS call's qualifying open deals (NOT
+    # query_stage_close_rate()'s entire historical by_stage_order) — reuses
+    # get_sales_stage_names_by_order() the same way query_pipeline_coverage
+    # already does for citation annotation (see _annotate_stage_names
+    # above), and reads win_rate/n_observed directly off the SAME
+    # by_stage_order row the per-rep weighting loop above already used —
+    # never a second query, never recomputed independently.
+    from utils import get_sales_stage_names_by_order
+    _names_by_order = get_sales_stage_names_by_order()
+    stage_rates = {}
+    for _so in used_stage_orders:
+        _key = str(_so)
+        _row = by_stage_order.get(_key) or by_stage_order.get(_so) or {}
+        _name = _names_by_order.get(_key)
+        if _name is None:
+            try:
+                _name = _names_by_order.get(int(_key))
+            except (TypeError, ValueError):
+                _name = None
+        stage_rates[_key] = {
+            "stage_name": _name or f"stage {_key}",
+            "win_rate": _row.get("win_rate"),
+            "n_observed": _row.get("n_observed"),
+        }
+
     result = {
         "period": period,
         "reps": reps,
+        # Team-pooled, evidence-gated per-stage win rates used to weight
+        # open pipeline above — see comment on the build just above. Never
+        # shown in the rendered answer/synthesis (MODEL_HIDDEN_KEYS strips
+        # cache_payload generically); only reachable via explain_prior_answer
+        # citation, where EXPLAIN_PRIOR_ANSWER_PROMPT instructs the model to
+        # describe these as governed historical stage win rates, never as
+        # forecast-category weights or a CRM stage-probability field.
+        "stage_rates": stage_rates,
         "team_summary": {
             "closed_won_qtd": closed_won_qtd,
             "deals_won": team_deals_won,
@@ -4247,6 +4318,15 @@ async def query_rep_attainment(params: dict, sb) -> dict:
     # field exclusions. Never reaches synthesis (MODEL_HIDDEN_KEYS strips
     # cache_payload generically).
     result["cache_payload"] = dict(result)
+
+    # stage_rates stays in cache_payload (citation — explain_prior_answer
+    # can quote it with the governed-historical-rate framing required by
+    # EXPLAIN_PRIOR_ANSWER_PROMPT) but comes OUT of the top-level result
+    # from here on, so it never reaches synthesis or the rendered answer
+    # un-framed — same pattern query_pipeline_coverage uses for its
+    # HEURISTIC historical curve. Popped AFTER cache_payload is built
+    # (dict(result) above already copied it in), never before.
+    result.pop("stage_rates", None)
     return result
 
 
