@@ -1,7 +1,7 @@
 {
   "company": "GB Social Time",
   "slug": "gb-social-time",
-  "last_etl_date": "2026-08-05T15:57:31.382392",
+  "last_etl_date": "2026-10-30T06:38:14.596378",
   "calls": [
     {
       "id": "01KHVVEQZN8532V0DX6CADSMB2",
@@ -13,7 +13,8 @@
       "organizer": "johnny@growthbook.io",
       "participants": 2,
       "keywords": "Open Claw, AI experimentation, hypothesis generation, basketball coaching, volleyball championship, team bonding game",
-      "action_items": "\n**Graham McNicoll**\nShare the AI sales call recording discussing hypothesis generation and analytics with Ashley Stirrup for review (18:59)\n\n**Ashley Stirrup**\nContinue setup and exploration of Open Claw AI tools, advancing beyond initial menu confusion (08:16)\n\n**All Participants**\nEngage with Open Claw or similar autonomous AI systems cautiously, focusing on safe, limited tasks initially (08:26)\n\n**Team (unspecified)**\nInvestigate integrating past experiment results with AI to enhance hypothesis generation and experimentation automation (15:00)\n\n**Luke Sonnet & Jeremy Dorn**\nReview and maintain code references functionality in the GrowthBook app to support AI-driven experimental analysis (17:13)\n\n**Johnny Martinez**\nPost shared links on AI interfaces for voice-based data interaction to the team chat (20:35)\n\n**Meeting Organizer (unassigned)**\nSchedule follow-up discussions on AI's evolving role in experimentation and product analytics based on ongoing market interest (18:11)\n"
+      "action_items": "\n**Graham McNicoll**\nShare the AI sales call recording discussing hypothesis generation and analytics with Ashley Stirrup for review (18:59)\n\n**Ashley Stirrup**\nContinue setup and exploration of Open Claw AI tools, advancing beyond initial menu confusion (08:16)\n\n**All Participants**\nEngage with Open Claw or similar autonomous AI systems cautiously, focusing on safe, limited tasks initially (08:26)\n\n**Team (unspecified)**\nInvestigate integrating past experiment results with AI to enhance hypothesis generation and experimentation automation (15:00)\n\n**Luke Sonnet & Jeremy Dorn**\nReview and maintain code references functionality in the GrowthBook app to support AI-driven experimental analysis (17:13)\n\n**Johnny Martinez**\nPost shared links on AI interfaces for voice-based data interaction to the team chat (20:35)\n\n**Meeting Organizer (unassigned)**\nSchedule follow-up discussions on AI's evolving role in experimentation and product analytics based on ongoing market interest (18:11)\n",
+      "summary_quality": "good"
     },
     {
       "id": "01KPBYBF0JQV8F3K7RRP4HKBVN",
@@ -25,7 +26,19 @@
       "organizer": "johnny@growthbook.io",
       "participants": 2,
       "keywords": "Airline Experience, Family Travel, Time Guesser Game, Maui Snorkeling, Australian Wildlife, Company Retreat",
-      "action_items": "\n**Guy Langford-lee**\nSend a screenshot of the Time Guesser game score for verification (22:16)\n\n**Jeremy Dorn**\nShare the link to the Time Guesser game in the chat for group participation (04:40)\n\n**All participants**\nSubmit Time Guesser game scores in the chat for comparison among participants (21:44)\n\n**Jennifer Pham-Le**\nMonitor and coordinate the attendee list for company retreat travel logistics (23:13)\n\n**Adriel Vieira**\nConfirm final travel arrangements and lodging details for the retreat with wife and notify the group as needed (38:33)\n\n**Dan Wathne**\nReview and share snorkeling safety tips and favorite sites in Maui as reference for retreat attendees interested in water activities (26:01)\n"
+      "action_items": "\n**Guy Langford-lee**\nSend a screenshot of the Time Guesser game score for verification (22:16)\n\n**Jeremy Dorn**\nShare the link to the Time Guesser game in the chat for group participation (04:40)\n\n**All participants**\nSubmit Time Guesser game scores in the chat for comparison among participants (21:44)\n\n**Jennifer Pham-Le**\nMonitor and coordinate the attendee list for company retreat travel logistics (23:13)\n\n**Adriel Vieira**\nConfirm final travel arrangements and lodging details for the retreat with wife and notify the group as needed (38:33)\n\n**Dan Wathne**\nReview and share snorkeling safety tips and favorite sites in Maui as reference for retreat attendees interested in water activities (26:01)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5GRA4FDCK0WATTJQ8G52TAK",
+      "source": "fireflies",
+      "title": "GB Social Time 🥳",
+      "date": "2026-10-29",
+      "duration_minutes": 47.369998931884766,
+      "summary": "# GB Social Time 🥳\nDate: 2026-10-29 | Duration: 47.369998931884766m\n\n## Summary\nParticipants discussed Halloween plans, including Dan’s annual party, a nearby church trunk-or-treat, Scott’s family’s multiple events, and Paw Patrol costumes. Jamie might switch from an inflatable costume to a Rider costume because the inflatable outfit limited walking. Colton completed his first trunk-or-treat, although he was not yet allowed sugar, so his family ate the candy. The group then completed a shared-screen virtual escape room by decoding candy-related clues and entering the sequence red, blue, yellow, green, blue, red, green, yellow, finishing in roughly ten minutes. They later played Jackbox’s Trivia Murder Party, which included trivia, eliminations, ghosts, audience influence, and several challenge rounds. Graham won the final escape. Dan and Scott left for other meetings, after which Jennifer organized a closing screenshot and participants exchanged Halloween greetings.\n\n## Keywords\nHalloween, Virtual escape room, Trivia Murder Party, Jackbox, Costumes, Team social\n\n## Action Items\n**Jennifer Pham-Le**\nShare virtual escape-room activity (11:28)\nShare escape-room screen (12:49)\nCapture group screenshot (45:42)\n\n**Graham McNicoll**\nSet up Trivia Murder Party (25:48)\nLaunch Jackbox game (29:23)",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 21,
+      "summary_quality": "good"
     }
   ]
 }

@@ -1,0 +1,18 @@
+{
+  "company": "General Legal <>",
+  "slug": "general-legal",
+  "last_etl_date": "2026-10-30T06:38:14.597268",
+  "calls": [
+    {
+      "id": "01M5Z96C5GW6XQZFQZ1JBA8F37",
+      "source": "fireflies",
+      "title": "General Legal <> Ryan",
+      "date": "2026-10-29",
+      "duration_minutes": 38,
+      "summary": "# General Legal <> Ryan\nDate: 2026-10-29 | Duration: 38m\n\n## Summary\nGrowthBook reported strong satisfaction with General Legal’s responsive support and balance between risk management and deal execution across customer agreements, privacy documents, and sales compensation letters. Slack remains the preferred workflow, including flexible private channels for sensitive matters, while portal adoption would require clearer benefits. Key operational opportunities include sending finalized order forms directly to HubSpot and tracking customer-specific negotiated documents. Chris Kleiner’s negotiation playbook is improving consistency, but GrowthBook still needs deal-size thresholds for when negotiations should occur. GrowthBook also requested recurring negotiation-learning summaries, Slack-based legal access, and MCP testing for AI-assisted analysis. Monthly reporting could summarize deals supported, closures, time spent, deal size, sales-efficiency trends, account-executive patterns, and inputs relevant to customer acquisition economics. Ryan McGurk offered product feedback and potential referrals through Stage Two.\n\n## Keywords\nSlack legal support, HubSpot integration, Contract negotiation tracking, Legal negotiation playbook, AI and MCP workflows, Legal matter dashboards\n\n## Action Items\n**Ryan McGurk**\nFinalise GrowthBook legal negotiation thresholds (13:03)\nPromote General Legal within Stage Two network (27:04)\nAggregate Stage Two participant contacts (27:45)\n\n**Javed Qadruddin**\nSend Ryan MCP setup information (21:52)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

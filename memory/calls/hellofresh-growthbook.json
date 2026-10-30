@@ -1,0 +1,18 @@
+{
+  "company": "Hellofresh & GrowthBook",
+  "slug": "hellofresh-growthbook",
+  "last_etl_date": "2026-10-30T06:38:14.599445",
+  "calls": [
+    {
+      "id": "01M5X32KNQV3A3ADPX2EFFE99Z",
+      "source": "fireflies",
+      "title": "Hellofresh & GrowthBook | Introduction Call",
+      "date": "2026-10-29",
+      "duration_minutes": 20,
+      "summary": "# Hellofresh & GrowthBook | Introduction Call\nDate: 2026-10-29 | Duration: 20m\n\n## Summary\nNo summary available",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Subscription Discussion",
+  "slug": "growthbook-subscription-discussion",
+  "last_etl_date": "2026-10-30T06:38:14.603803",
+  "calls": [
+    {
+      "id": "6ae372cf3a43f70018f19bec",
+      "source": "apollo",
+      "title": "GrowthBook Subscription Discussion with Rev",
+      "date": "2026-10-29",
+      "duration_minutes": 23,
+      "summary": "# MEDDICC Sales Call Summary\n\nCall on [date unspecified] with Sarah Mount Bonnell (Rev stakeholder) and Murat Cetinkaya (Data owner at Rev), facilitated by Kris Washburn (Account Executive, GrowthBook).\n\n**Attendees and Titles:**\nSarah Mount Bonnell served as the primary decision-maker for GrowthBook subscription at Rev, while Murat Cetinkaya participated as the data owner. Kris Washburn represented GrowthBook as account executive. A third party, Mason, was referenced as possessing budget information but did not attend the call.\n\n**Quantifiable Outcomes and Budget:**\nRev currently pays approximately $600 monthly ($20 per user) for GrowthBook Pro with 35 active users. The December 1st pricing change would increase costs to $1,200 monthly ($40 per user), representing a 100% price increase. GrowthBook's enterprise option was quoted at list price exceeding $100,000 annually, with a discounted offer around $50,000 annually—a $35,000 annual increase from current spend. Sarah explicitly stated she did not see the enterprise option \"getting approved,\" indicating budget constraints and pricing sensitivity.\n\n**Technical Requirements and Usage:**\nGrowthBook research revealed Rev's usage centers on feature flags deployed by the engineering team, with marketing conducting experiments. The current setup utilizes 35 user seats against a historically 50-user cap, now reduced to 30 users. Sarah indicated confidence that user count could be significantly reduced, suggesting inefficient seat allocation.\n\n**Decision Process and Timeline:**\nThe pricing change takes effect December 1st, establishing an immediate decision deadline. Sarah emerged as the subscription owner and budget decision authority. Murat deferred to Sarah's ownership of the decision, indicating she controls approval authority. Mason appears to hold budget oversight responsibilities.\n\n**Pain Points and Champion Signals:**\nSarah demonstrated concern about cost justification, questioning whether enterprise benefits warranted the investment. However, she displayed engagement by requesting specific pricing comparisons and exploring options before declining. Her willingness to evaluate alternatives signals openness to solutions, though budget constraints present the primary barrier. No specific operational pain points were articulated beyond cost considerations.\n\n**Competitors and Technical Advantages:**\nNo competitors were mentioned during the call. GrowthBook presented enterprise benefits including SSO, audit log exports, approval workflows, custom roles, projects, contextual bandits, and holdout capabilities—governance and experimentation features positioned as enterprise differentiators. Professional services and experimentation program ramp-up were offered as additional switching incentives.\n\n**Next Steps:**\nKris committed to verifying Rev's current pricing in GrowthBook's system post-call. Sarah declined pursuing enterprise migration given budget constraints. The parties agreed that Pro remains valuable, effectively concluding enterprise discussions. No follow-up meeting was scheduled, though Kris left the door open for future conversations if circumstances changed.",
+      "host": "Kris Washburn",
+      "participants": 98,
+      "summary_quality": "good"
+    }
+  ]
+}

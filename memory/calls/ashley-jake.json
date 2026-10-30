@@ -1,7 +1,7 @@
 {
   "company": "Ashley / Jake",
   "slug": "ashley-jake",
-  "last_etl_date": "2026-10-24T05:14:25.176702",
+  "last_etl_date": "2026-10-30T06:38:14.596847",
   "calls": [
     {
       "id": "01KJX64F3CR10EZN5PPXSKRA9N",
@@ -190,6 +190,17 @@
       "date": "2026-10-23",
       "duration_minutes": 28.729999542236328,
       "summary": "# Ashley / Jake\nDate: 2026-10-23 | Duration: 28.729999542236328m\n\n## Summary\nThe team reviewed podcast promotion and follow-up, including a new post-recording process that helps guests schedule promotional posts and a plan to review the last 30 days for renewed outreach. Podcast ownership, recording dates, and guest assignments still need cleanup, while guest outcomes now flow through the connected CRM interface. Sales reps must manually create opportunities because the automated workflow was turned off. CRM views expose activity, ownership, outcomes, and recording data, although contact notes editing and data quality remain unresolved. Contact Us alerts will be routed to the shared Sales BDR leads channel. Jake will own post-conference outreach, and Lyndsie will prepare prioritized hot and warm lead lists by Monday. AEs will confirm meetings booked after conferences because HubSpot and LinkedIn activity tracking is incomplete. Jake will manually qualify fewer than 100 buyer-segment contacts, while broader filters remain in place and customer exclusion work continues.\n\n## Keywords\nPodcast follow-up, HubSpot workflows, Conference leads, Sales BDR, Prospect segmentation, Slack notifications\n\n## Action Items\n**Ashley Stirrup**\nReview podcast meetings (04:43)\nRestore buyer-segment filter (26:40)\n\n**Jake Stangl**\nAdd Jake’s name to Podcast Booked By field (07:43)\nConfirm post-conference meetings (12:45)\nBegin follow-up with conference leads (12:45)\n\n**Lyndsie Berens**\nClarify podcast ownership and assignment data (08:13)\nSend podcast follow-up list to Jake (09:50)\nCompile conference lead lists (12:05)\nImprove HubSpot meeting tracking (13:10)\nSend prioritised conference lead list to Jake (13:32)\nInvestigate contact notes editing (14:20)\nRoute Contact Us and demo notifications to Sales BDR leads channel (19:04)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5GRA4FMZ5A983E4SDTM9T5V",
+      "source": "fireflies",
+      "title": "Ashley / Jake",
+      "date": "2026-10-29",
+      "duration_minutes": 33.459999084472656,
+      "summary": "# Ashley / Jake\nDate: 2026-10-29 | Duration: 33.459999084472656m\n\n## Summary\nThe discussion covered podcast CRM workflows, outbound lead routing, AI BDR preparation, re-engagement, and ABM. Podcast contacts are added to the CRM, but missing email addresses prevent Notion records from syncing to Lovable or HubSpot; Lovable contacts absent from HubSpot should be flagged. Jake’s manageable workload is roughly ten accounts weekly, with A, B, and C scoring intended to route leads to sales, the AI BDR, or marketing nurture. Outreach may shift to seven- or eight-touch sequences over four to five weeks. The AI BDR is not yet running and requires scoring, cleanup, customer exclusions, contact enrichment, and a confirmed delivery cadence. Re-engagement could use an Outbound Owner field and activity-based filtering. Account-level scoring and ABM are prioritized, while marketing warmup, cold-account routing, contact identification, and individual LinkedIn targeting remain to be defined or validated.\n\n## Keywords\nLead scoring, Account-based marketing, AI BDR, Outbound sequencing, HubSpot, Marketing nurture\n\n## Action Items\n**Jake Stangl**\n- Notify Lyndsie about podcast contacts (02:09)\n- Follow up with Tanner (02:11)\n\n**Ashley Stirrup**\n- Change podcast handoff process (02:55)\n- Talk to Aaron about contact lists (13:53)\n- Confirm AI BDR delivery cadence (14:32)\n- Discuss dormant accounts with sales (31:57)\n\n**Lyndsie Berens**\n- Confirm LinkedIn individual targeting (29:04)",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

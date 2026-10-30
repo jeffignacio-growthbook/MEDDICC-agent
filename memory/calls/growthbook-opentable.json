@@ -1,7 +1,7 @@
 {
   "company": "Growthbook <> OpenTable",
   "slug": "growthbook-opentable",
-  "last_etl_date": "2026-10-23T05:34:42.361575",
+  "last_etl_date": "2026-10-30T06:38:14.600196",
   "calls": [
     {
       "id": "69de6935c1f9eb0011fa27dc",
@@ -190,6 +190,17 @@
       "date": "2026-10-22",
       "duration_minutes": 12.880000114440918,
       "summary": "# Growthbook <> OpenTable - Weekly POC Sync\nDate: 2026-10-22 | Duration: 12.880000114440918m\n\n## Summary\nThe AB test launch was delayed by upstream model-training pipeline issues, with models expected by 01:40; if unavailable, the launch would move to Monday. Saranya HV reported no other known blockers and was responsible for updating Dan Wathne. After experiment termination, a feature flag will evaluate as true or false to route traffic to the winning variant without code redeployment, while analytics events will stop; a temporary rollout was not considered necessary. The homepage AA test showed a control skew after running at 1% of OpenTable.com homepage traffic and later increasing to 10%. Saranya HV will compare metric behavior across exposure levels and against the team’s internal experimentation tool. Federico Maffei requested a review before deciding whether to relaunch at 100% traffic and hand testing to Sarah’s team. The next phase concerns map-based multi-search, with handoff tentatively targeted for next week. Dan Wathne will explore a more West Coast-friendly meeting time, while Slack will support interim coordination.\n\n## Keywords\nA/B testing, A/A testing, Feature evaluation, Experiment termination, Traffic allocation, Model-training dependencies\n\n## Action Items\n**Saranya HV**\nRetrieve upstream models (01:40)\nLaunch A/B test (01:40)\nReview OpenTable homepage A/A test results (07:05)\nSend homepage A/A test link (09:12)\n\n**Federico Maffei**\nHand off testing work (09:40)\n\n**Dan Wathne**\nCoordinate recurring meeting time (11:14)",
+      "organizer": "dan@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5Z3A6K1YE8PB8NQGAE60VE3",
+      "source": "fireflies",
+      "title": "Growthbook <> OpenTable - Weekly POC Sync",
+      "date": "2026-10-29",
+      "duration_minutes": 11.680000305175781,
+      "summary": "# Growthbook <> OpenTable - Weekly POC Sync\nDate: 2026-10-29 | Duration: 11.680000305175781m\n\n## Summary\nOsteria is taking a central coordination role across front-end and model-side experimentation. A/A tests are approaching the team’s standard two-week evaluation window, and Osteria plans to reconnect with Fed early next week after Fed returns, then begin deeper analysis and raise follow-up questions. Rahul and Saranya launched a separate A/B test during the week, while Osteria continues tracking both workstreams. Fed previously handled setup work, and the handoff remains pending. Dan and Logan offered live product and feature walkthroughs, Slack follow-up, one-on-one support, and continued weekly unblocker sessions. Rahul’s team commonly uses those sessions for technical questions, and no active technical blocker was reported. Forrest’s team submitted budget requests to Finance, but no approval, timing, or outcome was provided.\n\n## Keywords\nA/B testing, POC, Experiment results, Front-end development, Product support, Budget requests\n\n## Action Items\n**SFO5-12-003 Osteria**\nConnect with Fed (01:48)\nReview OpenTable test results (01:48)\n\n**Dan Wathne**\nProvide product walkthroughs (02:26)\nProvide ongoing support (02:26)\n\n**Logan Bates**\nProvide product walkthroughs (02:26)\nProvide ongoing support (02:26)",
       "organizer": "dan@growthbook.io",
       "participants": 10,
       "summary_quality": "good"

@@ -1,7 +1,7 @@
 {
   "company": "Growthbook weekly PM",
   "slug": "growthbook-weekly-pm",
-  "last_etl_date": "2026-10-23T05:34:42.360984",
+  "last_etl_date": "2026-10-30T06:38:14.597569",
   "calls": [
     {
       "id": "01M5DB7WB2Z8EHS8DPAR57EZ52",
@@ -10,6 +10,17 @@
       "date": "2026-10-22",
       "duration_minutes": 27.280000686645508,
       "summary": "# Growthbook weekly PM Check-in\nDate: 2026-10-22 | Duration: 27.280000686645508m\n\n## Summary\nProject preparation is nearly complete, with brand discovery questions and the audience Excel document awaiting final contributions before an internal review tomorrow at 12:30 Pacific and delivery to Focus Lab before Monday’s kickoff. Anna and Laura Munoz reviewed the audience breakout, while Elise moved related material to Ashley Stirrup for review. Jeremy’s interview remains unscheduled; Laura emailed him a calendar link, and Lyndsie Berens will follow up through Slack. The interview should occur between October 26 and November 2, last about 30 minutes, and use reaction-based prompts because Anna may need to draw out his responses. Engineering is the priority audience, followed by product managers and data scientists, with marketing requiring balanced messaging. The team wants GrowthBook to develop a more distinctive identity as competitors converge around similar capabilities, including warehouse-native features. Brand strategy should also support hiring, culture, funding conversations, and the broader company presence. Leadership alignment may involve Graham, Bill Kinney, Jeremy, Ashley, and potentially the CRO. Focus Lab will kick off next week, with the first strategy deliverable expected during the first week of November; Basecamp will be the primary communication channel.\n\n## Keywords\nBrand strategy, Audience positioning, Jeremy interview, Executive alignment, Developer-friendly branding, Project kickoff\n\n## Action Items\n**Lyndsie Berens**\nHold internal preparation meeting (04:23)\nFollow up with Jeremy (04:31)\nSend Slack reminders (08:33)\nContact Jeremy through Slack (10:08)\n\n**Laura Munoz**\nReview preparation documents (06:33)\nMonitor Graham’s participation (13:32)\nBrief Focus Lab team (15:55)\nFlag leadership conversation to Bill Kinney (20:26)\nBrief Anna on interview approach (22:25)\n\n**Ashley Stirrup**\nComplete brand discovery questions document (07:47)\nReview audience Excel document (08:26)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5JEY48V5Q5VBRVQ8JK6GN98",
+      "source": "fireflies",
+      "title": "Growthbook weekly PM Check-in",
+      "date": "2026-10-29",
+      "duration_minutes": 13.510000228881836,
+      "summary": "# Growthbook weekly PM Check-in\nDate: 2026-10-29 | Duration: 13.510000228881836m\n\n## Summary\nMason Hawkins confirmed that he is taking ongoing ownership of the PM role after Laura’s pregnancy-related medical emergency and said the transition was manageable because the project was near its beginning and he had reviewed recordings and status updates. The kickoff received positive feedback from Lyndsie Berens and Ashley Stirrup, with no major concerns raised. Anna will speak with Jeremy about the company audience and ideal customer profile, while Mason will provide context about Jeremy’s sensitivity around publicly discussing visual editor investment and the balance between developer-focused and broader-buyer messaging. Anna will send archetype options by the end of the week for asynchronous review before next Tuesday, when Lyndsie will be out. Next week’s audience evaluation will examine existing audience groups and further break down engineering and data personas, with recommendations for persona-level messaging. Mason will pass the segmentation request to the internal team and remain available for questions through Slack.\n\n## Keywords\nIdeal customer profile, Audience personas, Archetype review, Developer messaging, Visual editor, Project management transition\n\n## Action Items\n**Mason Hawkins**\nBrief Anna before conversation with Jeremy (07:54)\nCommunicate persona-level audience analysis to team (12:06)\n\n**Unassigned**\nSend archetype options to Growthbook team (07:59)\nDiscuss archetypes with full group (08:35)\n\n**Growthbook team**\nReview archetype options (07:59)\nPrepare functional persona discussion (10:25)",
       "organizer": "ashley@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

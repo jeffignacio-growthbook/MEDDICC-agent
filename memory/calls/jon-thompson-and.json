@@ -1,0 +1,18 @@
+{
+  "company": "Jon Thompson and",
+  "slug": "jon-thompson-and",
+  "last_etl_date": "2026-10-30T06:38:14.600640",
+  "calls": [
+    {
+      "id": "01M61RZ8904CVPVBCZQBNJAAZ6",
+      "source": "fireflies",
+      "title": "Jon Thompson and James Shannon",
+      "date": "2026-10-29",
+      "duration_minutes": 14.59000015258789,
+      "summary": "# Jon Thompson and James Shannon\nDate: 2026-10-29 | Duration: 14.59000015258789m\n\n## Summary\nMonument Technology is evaluating GrowthBook to replace increasingly difficult-to-manage, platform-specific feature-flag approaches across its banking-platform SaaS operations for building societies and banks. The initial priority is feature flags, while product analytics and experimentation may be considered later. A self-serve model is favored because the internal engineering team can manage implementation, although onboarding, training, engineering Slack access, and customer success are included in the enterprise package. Self-hosting is strongly preferred for infrastructure control, firewall protection, maintainability, and possible Middle East data-residency requirements; cloud deployment could introduce CDN-request metering. GrowthBook supports multiple separated customer instances, role separation, SSO, audit trails, and no identified active-user limitation. Enterprise pricing starts at $50,000 annually, with seats at $1,000 each; 12 seats would total $62,000 at list price with full support. Removing support reduces the license price by 30%, and no minimum seat count was identified. Monument wants to decide soon, ahead of an early-next-year first customer launch, with John expected to confirm by email.\n\n## Keywords\nFeature flags, Self-hosting, Banking SaaS, Data residency, Enterprise pricing, Product analytics\n\n## Action Items\n**Jon Thompson**\nSend email confirming GrowthBook decision (13:02)\n\n**James Shannon**\nContact Jon Thompson (13:13)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

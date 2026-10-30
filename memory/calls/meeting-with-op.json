@@ -1,7 +1,7 @@
 {
   "company": "Meeting with Op",
   "slug": "meeting-with-op",
-  "last_etl_date": "2026-10-20T05:31:35.478187",
+  "last_etl_date": "2026-10-30T06:38:14.599726",
   "calls": [
     {
       "id": "01M1J1NB3404A45X6GNJGV0TE9",
@@ -45,6 +45,17 @@
       "summary": "# Meeting with Op Methods & GrowthBook\nDate: 2026-10-19 | Duration: 36.529998779296875m\n\n## Summary\nThe group discussed routing the top five A-tier accounts to sales each week, with Jake handling outreach to the highest-scoring non-customer accounts lacking sales activity and marketing nurturing the remaining A-tier accounts. Sales outreach determines ownership, while accounts without sales engagement remain in nurture; accounts with more than six months without sales contact may re-enter nurture, although the rules are not yet formalized. The scoring model will replace the fixed 100-point MQL threshold with relative account fit, incorporating monthly users and recent signals such as developers active within 30 days, de-anonymized developers, and de-anonymized buyers. Missing identity data will not reduce fit. Shawn created developer and buyer HubSpot labels and will build workflows connecting Rio tags to those labels. Ashley will coordinate with Rio to transfer four account-level signals, after which Shawn will adjust scoring. A HubSpot lead object was proposed for re-engagement reminders, but the workflow remains unbuilt.\n\n## Keywords\nLead scoring, Account-based marketing, HubSpot, Rio, Marketing nurture, Sales follow-up\n\n## Action Items\n**Shawn Green**\nBuild weekly account list (11:54)\nDevelop lead-object demonstration (16:05)\nCreate Rio tag workflow (26:38)\nAdjust company-fit scoring (34:11)\n\n**Ashley Stirrup**\nConfirm Rio account fields (25:37)\nPush scoring fields to HubSpot (34:11)",
       "organizer": "ashley@growthbook.io",
       "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5YVV3TV31PWNYQ8JVHA9338",
+      "source": "fireflies",
+      "title": "Meeting with Op Methods & GrowthBook",
+      "date": "2026-10-29",
+      "duration_minutes": 32.369998931884766,
+      "summary": "# Meeting with Op Methods & GrowthBook\nDate: 2026-10-29 | Duration: 32.369998931884766m\n\n## Summary\nThe discussion focused on improving lead scoring, enrichment, sales routing, ownership, and customer lifecycle automation. Web and mobile activity are now combined in scoring, while employee-range and territory calculations still require updates. Industry points apply directly, with attention remaining on A, B, and C tiers; current figures are 673 A-tier, 5.5 B-tier, and approximately 22,000 C-tier accounts, pending review. Three Rio fields were added to HubSpot, but activity data must distinguish historical engagement from current activity. The top five accounts are planned for weekly routing to Jake S, while 60 days without sales activity is the working threshold for marketing re-engagement. Apollo activity already syncs with HubSpot. The group favored an outbound owner field and automated reassignment, but ownership data needs cleanup and sales handoff rules require alignment with Ryan and Jeff. License data will improve enterprise, pro, and free-tier classification and lifecycle stages. Scoring will start first, followed by testing and further routing refinement.\n\n## Keywords\nLead scoring, HubSpot, Rio enrichment, Sales routing, Outbound ownership, Lifecycle tagging\n\n## Action Items\n**Shawn Green**\nReview Rio field coverage (04:36)\nUpdate employee-range calculator (04:50)\nMeet with Ryan and Jeff (21:30)\nImport Rio organisation IDs (28:06)\nTest license automation with Michael Knowlton (28:06)\nTag Pro-tier customers (28:06)\nSend Lyndsie Berens meeting invitation (30:37)\nReview duplicate records and parent-child accounts (30:37)\n\n**Ashley Stirrup**\nAdd business-model field (06:58)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]

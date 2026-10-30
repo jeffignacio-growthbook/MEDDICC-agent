@@ -1,0 +1,18 @@
+{
+  "company": "Skyro<>GrowthBook",
+  "slug": "skyro-growthbook",
+  "last_etl_date": "2026-10-30T06:38:14.603717",
+  "calls": [
+    {
+      "id": "01M5ZCYG8F9PHNGRXT2Y40T1HN",
+      "source": "fireflies",
+      "title": "Skyro<>GrowthBook - Demo",
+      "date": "2026-10-29",
+      "duration_minutes": 34.369998931884766,
+      "summary": "# Skyro<>GrowthBook - Demo\nDate: 2026-10-29 | Duration: 34.369998931884766m\n\n## Summary\nThe discussion evaluated using one self-hosted, warehouse-native GrowthBook instance with regional separation through projects, roles, and environments. Business users need to create experiments, target audiences, define metrics, and review results independently, while the current regional use is mainly technical feature flagging. Experiments can link feature flags to control and treatment behavior, use user or account identifiers, apply targeting rules, and analyze conversion, lift, winning probability, and dimensions such as country or plan. Exposure events would flow through the existing analytics pipeline into the warehouse, where reusable SQL metrics could connect assignments with business outcomes. Saved groups support CSV or text-based user lists, but direct Snowflake retrieval remains unconfirmed. The team requires least-privilege access to selected tables and a security review. Dmitriy's team will prepare experiment and metric tables, configure an initial experiment, and request review. Jake offered enterprise access and implementation support, while Dmitriy will collect feedback and follow up.\n\n## Keywords\nExperimentation platform, Feature flags, Warehouse-native analytics, Multi-region access control, Experiment metrics, Snowflake data integration\n\n## Action Items\n**Rémy Marin**\nConfirm GrowthBook audience loading (12:07)\n\n**Dmitriy Dekhanov**\nPrepare experiment data tables (32:05)\nRequest data setup review (32:05)\nRun GrowthBook experimentation test (32:05)\nGather Skyro colleague feedback (32:52)\nSend additional topics to GrowthBook (32:52)\n\n**Jake Heier**\nSend Skyro next-steps summary (32:29)",
+      "organizer": "jake@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

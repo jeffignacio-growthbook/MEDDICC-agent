@@ -1,0 +1,18 @@
+{
+  "company": "Amar Bank x GrowthBook",
+  "slug": "amar-bank-x-growthbook",
+  "last_etl_date": "2026-10-30T06:38:14.603627",
+  "calls": [
+    {
+      "id": "01M5HQMN899WXSQV8AY3EGZS0W",
+      "source": "fireflies",
+      "title": "Amar Bank x GrowthBook: Self-Hosted Feature Flag & Experimentation Session",
+      "date": "2026-10-29",
+      "duration_minutes": 51.81999969482422,
+      "summary": "# Amar Bank x GrowthBook: Self-Hosted Feature Flag & Experimentation Session\nDate: 2026-10-29 | Duration: 51.81999969482422m\n\n## Summary\nAmar Bank is evaluating GrowthBook as a replacement for Statsig’s experimentation and feature-flagging capabilities, with a preference for full GrowthBook adoption because it reduces system connections, data-team effort, and license costs. The proposed POC would test one experiment end to end: SDK-based assignment, exposure events sent to BigQuery, selected metric import, and GrowthBook analysis. Statsig and GrowthBook can run in parallel against the same BigQuery data, allowing direct comparison without creating separate experiments. GrowthBook provides a Statsig importer, and metrics can be migrated selectively. Technical preparation can begin immediately using the free version, including data-source connection, SDK installation, and warehouse validation. A 30-day enterprise evaluation requires additional legal and commercial documentation. The target is to decide by December 2026 and begin migrating metrics, features, and experiments by March 2027. Self-hosting improves data control but makes Amar Bank responsible for deployment, updates, monitoring, and security-patch planning.\n\n## Keywords\nGrowthBook, Statsig migration, Self-hosted experimentation, Feature flags, BigQuery exposure events, Enterprise POC\n\n## Action Items\n**James Shannon**\nVerify Statsig importer (19:51)\nPrepare importer guidance (22:27)\nCreate enterprise POC agreement (25:47)\nDiscuss POC commercial terms (49:24)\nSend importer documentation (50:00)\n\n**Rémy Marin**\nProvide migration support sessions (20:32)\nShare GrowthBook setup documentation (30:06)\nSupport SDK installation (49:06)\nSupport BigQuery integration (49:06)\n\n**Febrina Valentina Sutanto**\nDiscuss POC commercial terms internally (26:27)\nExplore Google Chat collaboration (36:11)\nCoordinate legal documentation (49:24)\n\n**Amar Bank Engineering and Data Teams**\nSet up GrowthBook environment (30:36)\nInstall GrowthBook SDKs (30:36)\nConnect BigQuery data source (30:36)\nImport selected Statsig metrics (34:26)\nPrepare GrowthBook experiment (34:46)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 13,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Hims x GrowthBook",
+  "slug": "hims-x-growthbook",
+  "last_etl_date": "2026-10-30T06:38:14.595985",
+  "calls": [
+    {
+      "id": "01M6260SA7C47G4CNK7ES2PT6J",
+      "source": "fireflies",
+      "title": "Hims x GrowthBook - Metric service / semantic Working Session",
+      "date": "2026-10-29",
+      "duration_minutes": 12.25,
+      "summary": "# Hims x GrowthBook - Metric service / semantic Working Session\nDate: 2026-10-29 | Duration: 12.25m\n\n## Summary\nThe discussion addressed fragmented experiment metric definitions across GrowthBook, Looker, and other data platforms, creating a need for one governed semantic source whose changes propagate consistently. Chris Sanders explained that DBT can manage models and metric definitions, with GrowthBook consuming DBT-generated metadata to synchronize fact-table queries and metrics while retaining source definitions in YAML. A proposed GitHub workflow would trigger DBT parsing and the GrowthBook CLI after YAML changes are committed, keeping GrowthBook queries aligned with upstream definitions and allowing additional GrowthBook metadata where needed. Eric Sokolov requested a concrete sample project to verify generated SQL, fact-table configuration, and ongoing synchronization. He planned to test the DBT CLI immediately, assess its support for his semantic-governance use case, and share gaps through Slack. The current confirmed integration covers the DBT semantic layer. Eric also began testing GrowthBook Insights’ AI learnings feature, which summarizes experiment results for later agent requests such as recommending future experiments.\n\n## Keywords\ndbt semantic layer, GrowthBook CLI, Experiment metrics, Data governance, Fact tables, AI Learnings\n\n## Action Items\n**Eric Sokolov**\n- Test GrowthBook dbt CLI integration (08:09)\n- Evaluate dbt semantic layer support (08:14)\n- Run GrowthBook Insights AI Learnings (10:46)\n- Share feedback on dbt integration and AI Learnings (10:46)",
+      "organizer": "chris@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

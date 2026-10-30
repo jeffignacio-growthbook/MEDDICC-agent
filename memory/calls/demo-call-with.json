@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-10-29T06:37:21.717943",
+  "last_etl_date": "2026-10-30T06:38:14.601878",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1126,6 +1126,28 @@
       "summary": "# Demo Call with Tim Fung from\nDate: 2026-10-28 | Duration: 11.430000305175781m\n\n## Summary\nNo summary available",
       "organizer": "james.shannon@growthbook.io",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5Z4N9S14RVGJ5SDS5ATWN5X",
+      "source": "fireflies",
+      "title": "Demo Call with Jonas Moe from",
+      "date": "2026-10-29",
+      "duration_minutes": 29.200000762939453,
+      "summary": "# Demo Call with Jonas Moe from\nDate: 2026-10-29 | Duration: 29.200000762939453m\n\n## Summary\nTV 2 Norway is reassessing its experimentation platform across TV 2 Play, news, websites, mobile apps, and big-screen TV, with streaming identified as the most important future area. Optimizely’s strengths include multi-armed bandits and accelerated statistical analysis, but unpredictable MAU pricing, additional charges, and a homepage experiment that sharply increased MAUs have created concerns. GrowthBook was presented as a warehouse-native alternative using SDKs and BigQuery, allowing TV 2 to retain existing conversion, retention, click, and view data while avoiding a separate experiment database. Discussed capabilities included sequential testing, CUPED, holdouts, post-stratification, multi-armed bandits, contextual bandits, feature flags, product analytics, and open-source extensibility. Privacy-controlled identity and event flows remain important, and the warehouse-native model may require data-team involvement. GrowthBook pricing is seat-based, with a possible need for 10–15 seats. A technical demo is scheduled for Monday at 1:00 p.m., with pricing information and technical-team feedback expected before any decision.\n\n## Keywords\nGrowthBook, Optimizely, BigQuery, Feature experimentation, Multi-armed bandits, MAU pricing\n\n## Action Items\n**Jonas Moe**\nInvite TV 2 technical leads (25:20)\nForward calendar invitation (27:41)\n\n**James Shannon**\nSend calendar invitation (27:33)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "6ae36a106064a100140deec6",
+      "source": "apollo",
+      "title": "Demo Call with jan itor1 from",
+      "date": "2026-10-29",
+      "duration_minutes": 15,
+      "summary": "# MEDDICC Analysis: Scheduled Demo Call\n\n**Call on [date not specified] with Kris Washburn (Sales) and Logan Bates (likely Sales Operations/Management).**\n\n## Attendees and Titles\nThe call included Kris Washburn and Logan Bates from the vendor side. The intended prospect from the janitor-related company (identified only as \"jan itor1\") did not accept the meeting invitation and failed to join the call, making this an internal pre-call discussion rather than a customer engagement.\n\n## Decision Process and Timeline\nNo prospect decision timeline was established since the intended attendee did not join the call. However, Kris mentioned this was an inbound demo request, suggesting the prospect had demonstrated some level of interest by submitting an inquiry.\n\n## Technical Requirements and Pain Points\nWhile no specific technical requirements emerged, Kris noted confusion about the prospect's actual use case, stating, \"they do not do anything that has to do with being a janitor from what I can tell.\" This suggests the prospect company's business model or needs diverged from their stated company description, requiring clarification on their actual technical or operational requirements.\n\n## Budget Authority Signals\nNo budget discussion occurred. However, Kris referenced broader pricing strategy challenges, noting difficulty converting Professional-tier customers to Enterprise packages due to the significant price jump between tiers. He anticipated that implementing usage-based pricing would help lower Enterprise entry costs for customers with minimal initial usage, indicating potential budget concerns among mid-market prospects.\n\n## Champion Signals\nNo champion was identified, as the prospect did not attend. However, the inbound demo request format suggests the prospect possessed at least initial interest in the solution.\n\n## Competitors Mentioned\nNo direct competitors were mentioned. Logan referenced Flow GPT as a recently signed customer with a similar profile to the no-show prospect, suggesting the solution competes in the AI/automation space for companies operating outside traditional janitorial services.\n\n## Quantifiable Outcomes and Metrics\nNo metrics or ROI outcomes were discussed. The broader conversation referenced sales pipeline metrics: Kris indicated multiple Professional-tier demo conversions that were not converting to Enterprise contracts, though specific conversion rates were not quantified.\n\n## Next Steps\nKris agreed to remain on the call briefly to determine if the prospect would join late. If they connected, he planned to demonstrate Flow GPT as a comparable customer use case. Logan offered ongoing support as needed. However, given the prospect's non-response to the calendar invitation, no definitive follow-up plan was established during this call.",
+      "host": "",
+      "participants": 57,
       "summary_quality": "good"
     }
   ]

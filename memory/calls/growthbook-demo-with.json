@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Demo with",
+  "slug": "growthbook-demo-with",
+  "last_etl_date": "2026-10-30T06:38:14.595831",
+  "calls": [
+    {
+      "id": "01M5HRENME0G92ET307DYSD3KQ",
+      "source": "fireflies",
+      "title": "GrowthBook Demo with Diona Gardner-Moore from Hugo",
+      "date": "2026-10-29",
+      "duration_minutes": 50.130001068115234,
+      "summary": "# GrowthBook Demo with Diona Gardner-Moore from Hugo\nDate: 2026-10-29 | Duration: 50.130001068115234m\n\n## Summary\nThe company is evaluating GrowthBook because its expanding go-to-market, distribution, marketing, and growth teams need a more scalable experimentation process than the current homegrown system provides. GrowthBook combines feature flags, experimentation, and product analytics, while using Snowflake as the source of truth and complementing Sigma. It supports Cloud or self-hosted deployment, flexible targeting, deterministic assignment, warehouse query transparency, Bayesian and Frequentist analysis, CUPED, post-stratification, guardrail metrics, approvals, version history, and automated decision rules. AI features include experiment brainstorming, metric creation, developer-tool connections, and planned Slack interaction. The evaluation also considers open-source ownership, customer-driven development, competing products, integration, security, pricing, and vendor lock-in. Vendor selection targets mid-November, with a pilot and at least one test planned before year-end. GrowthBook agreed to provide documentation, slides, links, integration information, and pricing, with follow-up planned during the week of the 9th.\n\n## Keywords\nGrowthBook, experimentation platform, Snowflake, feature flags, Bayesian analysis, self-hosting\n\n## Action Items\n**Scott Keller**\nProvide pricing (43:23)\nSend recap email (46:43)\nShare presentation slides (46:43)\nProvide integration documentation (47:05)\n\n**Logan Bates**\nConfirm scenario-testing support (36:52)\n\n**Diona Gardner-Moore**\nNarrow vendor selection (45:01)\nScope pilot integration (45:01)\nGather engineering feedback (46:06)\nReconnect with GrowthBook (47:05)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 11,
+      "summary_quality": "good"
+    }
+  ]
+}

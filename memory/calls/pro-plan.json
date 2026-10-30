@@ -1,0 +1,18 @@
+{
+  "company": "Pro Plan",
+  "slug": "pro-plan",
+  "last_etl_date": "2026-10-30T06:38:14.600551",
+  "calls": [
+    {
+      "id": "01M5YVV3SJWCW2648JYSSDKVVN",
+      "source": "fireflies",
+      "title": "Pro Plan: funnels + session replay",
+      "date": "2026-10-29",
+      "duration_minutes": 27.139999389648438,
+      "summary": "# Pro Plan: funnels + session replay\nDate: 2026-10-29 | Duration: 27.139999389648438m\n\n## Summary\nThe group prioritized a successful GrowthBook experience, with active free users as the primary metric and Pro upgrades as a secondary measure. The first milestone is to launch a feature flag or experiment in production within seven days. Signup funnel tracking will map progression and identify conversion drop-offs, supported by existing modal and wizard usage data. Measurement is easier through the managed warehouse, although historical comparisons are limited. Pro upgrade prompts are currently buried behind feature restrictions, so broader in-app promotion and a possible Visual Editor free trial were suggested. The Visual Editor now supports signup page experiments, while a wizard redesign with skills and MCP choices is nearing launch. Onboarding needs audience-specific paths for data scientists, marketers, and PMs. Weekly cross-functional meetings were agreed, Guy will identify a funnel owner, and Emmy and Guy will review signup friction and value messaging.\n\n## Keywords\nGrowthBook onboarding, Pro conversion funnel, Activation metrics, Feature experimentation, Visual editor, Free trial strategy\n\n## Action Items\n**Guy Langford-lee**\n- Resurrect wizard tracking pull request (04:35)\n- Verify Hex tracking availability (06:10)\n- Identify growth funnel owner (12:27)\n- Notify Emmy when wizard goes live (19:53)\n- Send wizard screenshots (20:03)\n\n**Unassigned**\n- Establish weekly cross-functional meeting (17:06)\n\n**Emmy Sharp**\n- Add wizard update to email (20:00)\n- Arrange sign-up flow walkthrough (24:39)\n- Follow up with Elise (25:41)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "Product Analytics |",
   "slug": "product-analytics",
-  "last_etl_date": "2026-10-24T05:14:25.178138",
+  "last_etl_date": "2026-10-30T06:38:14.598258",
   "calls": [
     {
       "id": "01KGMVVVST5VWF9HEYV5ZPW8E8",
@@ -782,6 +782,17 @@
       "summary": "# Product Analytics | Squad Standup\nDate: 2026-10-23 | Duration: 1m\n\n## Summary\nNo summary available",
       "organizer": "johnny@growthbook.io",
       "participants": 1,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M648HJEEF05THH1CH24R1FMN",
+      "source": "fireflies",
+      "title": "Product Analytics | Squad Standup",
+      "date": "2026-10-29",
+      "duration_minutes": 1,
+      "summary": "# Product Analytics | Squad Standup\nDate: 2026-10-29 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "johnny@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]
