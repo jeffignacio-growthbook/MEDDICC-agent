@@ -1,0 +1,18 @@
+{
+  "company": "Clay Nurture Checkin",
+  "slug": "clay-nurture-checkin",
+  "last_etl_date": "2026-10-31T06:27:44.698314",
+  "calls": [
+    {
+      "id": "01M5YVV3VSNBB7TGYYGQRDJ39K",
+      "source": "fireflies",
+      "title": "Clay Nurture Checkin",
+      "date": "2026-10-30",
+      "duration_minutes": 38.25,
+      "summary": "# Clay Nurture Checkin\nDate: 2026-10-30 | Duration: 38.25m\n\n## Summary\nThe team established a two-table Clay workflow in which HubSpot account segments enter hourly batches and a contact table prepares people for outreach. Contact discovery will use keyword and executive-title searches, with optional director-level searches, while enrichment connects LinkedIn details with Salesforce account data, Rio summaries, preferred technologies, HubSpot checks, and work emails. Initial qualification advances only contacts with direct experimentation experience, while mega-company exclusions, GitHub enrichment, HubSpot eligibility, subscription, and ownership rules remain under review. Messaging should emphasize company activity and experimentation without overclaiming LinkedIn details, and email templates require Ashley and Karen’s approval. Email outreach will precede LinkedIn, with Apollo stopping sends after replies and Slack routing follow-up. A separate Jake workflow will support high-value accounts through review and account context. Testing will use the existing segment, review approximately 30 companies, avoid weak signals, and potentially send manually in batches. Thanksgiving week and late December should be avoided, with December targeted if the data and audience work are ready.\n\n## Keywords\nClay workflow, HubSpot segmentation, Contact sourcing, Apollo sequences, Rio intent signals, Experimentation outreach\n\n## Action Items\n**Karen Henke**\nRecord meeting decisions (00:00)\n\n**Aaron Le**\nInvestigate GitHub sourcing (08:14)\nIncrease per-domain contact limit (11:17)\nConfirm Apollo sender inboxes (20:12)\nBuild Jake outreach workflow (31:08)\nAsk Jake outreach tool (33:12)\nBuild Clay workflow base (34:02)\nReview initial test contacts (34:02)\n\n**Lindsay**\nConfirm HubSpot contact rules (09:32)\n\n**Ashley Stirrup**\nConfirm customer exclusions (34:34)\nImprove Rio activity signals (34:34)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

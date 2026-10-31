@@ -1,0 +1,18 @@
+{
+  "company": "Contextual bandit dogfood",
+  "slug": "contextual-bandit-dogfood",
+  "last_etl_date": "2026-10-31T06:27:44.698390",
+  "calls": [
+    {
+      "id": "01M5Z3D3ZKGTTE5FVEK25THY1J",
+      "source": "fireflies",
+      "title": "Contextual bandit dogfood setup",
+      "date": "2026-10-30",
+      "duration_minutes": 30.559999465942383,
+      "summary": "# Contextual bandit dogfood setup\nDate: 2026-10-30 | Duration: 30.559999465942383m\n\n## Summary\nThe team reviewed an incomplete marketing contextual bandit setup for a visual-editor marketing page. Snowflake Jitsu was selected as the initial data source because GA4 data is exported there and does not flow into ClickHouse. The first test will use limited, cookie-based GA4 traffic for internal dogfooding, since experiment exposure must connect to button click-through behavior. Button click-through is the primary success signal, but existing tracking may not identify the relevant call-to-action, and the exposure-to-conversion linkage still requires validation. The team also needs to verify the marketing page’s SDK version, investigate why browser and device attributes appear in SDK DevTools but not as GrowthBook columns, and confirm that required contextual fields survive the GA4-to-Snowflake pipeline. Next steps are to validate attributes, update the Snowflake query, and confirm consistent data flow through GA4, Snowflake, and GrowthBook. Broader rollout remains dependent on clearer analytics architecture and warehouse support.\n\n## Keywords\nContextual bandits, GrowthBook, GA4, Snowflake, Webflow SDK, Experiment telemetry\n\n## Action Items\n**Teresa Yung**\nInvestigate marketing-page SDK (08:46)\nVerify marketing-page button instrumentation (17:41)\nVerify browser and device attributes (28:03)\nUpdate Snowflake query or view (28:03)\n\n**Luke Sonnet**\nClarify contextual-bandit attributes (12:42)\nCreate Snowflake configuration (17:10)",
+      "organizer": "elyse@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "Friday",
   "slug": "friday",
-  "last_etl_date": "2026-10-28T06:26:54.004873",
+  "last_etl_date": "2026-10-31T06:27:44.696554",
   "calls": [
     {
       "id": "01M509E060V0SHK6BQ3MPXPFXE",
@@ -32,6 +32,17 @@
       "date": "2026-10-27",
       "duration_minutes": 35.97999954223633,
       "summary": "# Jake <> Brent weekly 1:1 (Friday)\nDate: 2026-10-27 | Duration: 35.97999954223633m\n\n## Summary\nThe team reviewed pipeline generation, campaign performance, and enterprise expansion. Jake prioritized approximately 90 conference leads, about 40 closed-lost accounts, and opportunities from Lamb Research and Daikin, while one podcast-generated meeting had also entered the pipeline. Three prospect sequences targeting CTOs, engineering leaders, and platform or development contacts produced no opportunities yet; LinkedIn generated 11 acceptances from 65 attempts, with three replies. Outreach for the November 5 dinner was prioritized across 472 contacts, while the other sequences were paused and LinkedIn registration-link messaging will be A/B tested. Enterprise targeting shifted from 1–100 to 1,000–10,000 employees, and a HubSpot search identified 144 Pro customers with 50–100 employees, narrowed to 38 companies with more than five licensed seats. Pricing remains a risk because the move from approximately $80 monthly to $50,000 annually may hinder conversion. Unreliable employee data, blocked HubSpot exports, and enrichment needs were also discussed. Jake is expected to spend 10–15% of his time on expansion while maintaining pipeline work, with a goal of finding one interested 100-employee Pro customer.\n\n## Keywords\nDripify outbound sequencing, Conference lead follow-up, Dinner campaign, Enterprise expansion, ICP targeting, SMB Pro customers\n\n## Action Items\n**Jake Stangl**\nComplete outreach touches (03:59)\nPause lower-priority Dripify sequences (07:38)\nSet reactivation reminder (08:15)\nRename outbound sequences (10:26)\nCorrect employee-size targeting (10:26)\nRun LinkedIn message A/B test (15:03)\nCreate enterprise-expansion sequence (26:48)\nContact three people per company (26:48)\nSave enterprise expansion list (27:04)\nCapture HubSpot export error (27:04)\nSend issue to Jeff (27:04)\nIdentify first interested Pro customer (31:26)\nBuild open-source user list (32:55)\n\n**Brent Holloway**\nExport prioritized accounts from Rio (33:11)\nEnrich account list with contacts (33:11)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5Z6RQMWNSDMNNJ1W4D7KK10",
+      "source": "fireflies",
+      "title": "Jake <> Brent weekly 1:1 (Friday)",
+      "date": "2026-10-30",
+      "duration_minutes": 24.1200008392334,
+      "summary": "# Jake <> Brent weekly 1:1 (Friday)\nDate: 2026-10-30 | Duration: 24.1200008392334m\n\n## Summary\nThe team planned a separate OSS account list alongside 38 Pro accounts, using Rio as a broad starting point and prioritizing companies with 50–100 employees, high usage, and developer activity. Rio filters included all-time activity, weekly signals, ICP fit, developer funnel, activity score, employee range, geography, and customer stage. Jake raised questions about developer-field timeframes and whether totals reflected all company developers or GrowthBook activity, while Brent expected Airscale to improve employee-data accuracy. Jake was responsible for exporting the full Rio report and sending it to Brent through Slack; Brent planned to enrich it with Airscale data, website-usage estimates, and one or two key contacts per company. The resulting list would support immediate opportunities, Jake’s quota focus, and broader outbound coverage. Pro-to-enterprise outreach generated a couple of meetings, including activity involving HiPages and Creative Fabrica, with prospects exceeding seat limits; one account had approximately 1,650 seats.\n\n## Keywords\nOSS prospecting, Airscale enrichment, Developer activity, Pro-to-Enterprise, Outbound campaigns, Employee-size segmentation\n\n## Action Items\n**Brent Holloway**\nUse Airscale to enrich company list (14:38)\nIdentify relevant contacts (15:13)\nClean up prospect list (15:27)\nIdentify OSS customers segment (20:57)\n\n**Jake Stangl**\nComplete OSS report export (17:01)\nSend OSS export to Brent Holloway (21:35)",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

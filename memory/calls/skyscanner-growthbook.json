@@ -1,7 +1,7 @@
 {
   "company": "Skyscanner + GrowthBook",
   "slug": "skyscanner-growthbook",
-  "last_etl_date": "2026-10-27T05:49:09.416902",
+  "last_etl_date": "2026-10-31T06:27:44.702241",
   "calls": [
     {
       "id": "01KZ1D9TK97FVF3J7VRS5F562J",
@@ -132,6 +132,17 @@
       "summary": "# Skyscanner + GrowthBook\nDate: 2026-10-23 | Duration: 23.950000762939453m\n\n## Summary\nSkyscanner is assessing whether GrowthBook can support a dynamic homepage personalization proof of concept or whether the capability should be built in its ML platform. The homepage has three slots and potentially six modules, creating 120 configurations; a proposed alternative is to treat modules as arms and coordinate selection across slots. Contextual personalization using logged-in status, market, and platform is considered a later phase. GrowthBook supports contextual bandits, but support for combinatorial bandits remains unconfirmed, and coordinated slot bandits, nested experiments, and duplicate-module prevention require review. Operational questions include the proposed 15-minute refresh target versus GrowthBook’s hourly UI minimum and daily default, API cadence, DynamoDB availability, and online exposure and feature storage. Existing Databricks data may help with data access. Joan Capdevila will share materials, while Logan Bates will consult GrowthBook’s data science team; written responses are expected in the coming weeks before deciding on a POC or separate implementation.\n\n## Keywords\nCombinatorial bandits, Contextual bandits, Dynamic homepage personalisation, Multi-slot optimisation, Bandit refresh cadence, DynamoDB integration\n\n## Action Items\n**Logan Bates**\n- Consult GrowthBook data science team (09:51)\n- Verify GrowthBook API update intervals (16:09)\n- Review storage feasibility for bandit data (18:18)\n- Send Skyscanner feasibility response (20:20)\n\n**Joan Capdevila**\n- Share Skyscanner homepage use-case synopsis (20:35)\n- Share Skyscanner questions document (20:35)",
       "organizer": "christian@growthbook.io",
       "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "6ae4bf34cfd326001077c8e8",
+      "source": "apollo",
+      "title": "Skyscanner + GrowthBook",
+      "date": "2026-10-30",
+      "duration_minutes": 0,
+      "summary": "[Joan Capdevila]: Hey. Hello, Christian. How are you?\n[Christian Liebenow]: Yeah, doing. Doing quite well. And how about you?\n[Joan Capdevila]: Yeah, doing well as well. Ready for the weekend?\n[Christian Liebenow]: Yeah. Any. Any nice.",
+      "host": "Christian Liebenow",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

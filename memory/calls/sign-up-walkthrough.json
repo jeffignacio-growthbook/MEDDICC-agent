@@ -1,0 +1,18 @@
+{
+  "company": "Sign-up walkthrough",
+  "slug": "sign-up-walkthrough",
+  "last_etl_date": "2026-10-31T06:27:44.697845",
+  "calls": [
+    {
+      "id": "01M647XH26CJYR2Q1VMRV2V34R",
+      "source": "fireflies",
+      "title": "Sign-up walkthrough",
+      "date": "2026-10-30",
+      "duration_minutes": 46.5,
+      "summary": "# Sign-up walkthrough\nDate: 2026-10-30 | Duration: 46.5m\n\n## Summary\nThe discussion examined the fragmented onboarding flow, where organization creation and role selection lead users through different experiences, while the purpose of several questions remains unclear. A guided onboarding approach was preferred, with experience-based prompts that could recommend feature flags or experiments while allowing users to skip guidance. The new wizard is ready for testing and configures SDK connections, detects programming languages, supports environment selection, and uses Claude Code, MCP, and skills to implement changes. It can also detect existing code attributes, suggest features for flagging, add targeting attributes, and create feature flags automatically. Experiment setup can begin without metrics, but running experiments requires them, creating a need for clearer metric prompting and handover guidance. Sample data supports limited exploration, while upgrade actions, enterprise labels, and Pro feature documentation need clarification. Weekly product check-ins and testing with an example enterprise account were proposed.\n\n## Keywords\nOnboarding wizard, Sign-up flow, Feature flags, Experiment metrics, SDK integration, Enterprise upgrades\n\n## Action Items\n**Guy Langford-lee**\nSend screenshots or instructions (04:50)\nImprove account confirmation (16:51)\nLoop in team reviewer (35:40)\nProvide enterprise example account access (41:31)\n\n**Emmy Sharp**\nInvestigate sign-up flow (44:45)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

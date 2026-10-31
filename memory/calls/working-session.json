@@ -1,7 +1,7 @@
 {
-  "company": "Working Session",
+  "company": "Working session",
   "slug": "working-session",
-  "last_etl_date": "2026-08-05T15:57:31.372726",
+  "last_etl_date": "2026-10-31T06:27:44.698194",
   "calls": [
     {
       "id": "01KQWWTREFB8Q372DH62869VFT",
@@ -13,7 +13,19 @@
       "organizer": "ashley@growthbook.io",
       "participants": 5,
       "keywords": "Content Creation, Publishing Platform, Login Access, LinkedIn Posts, Transcript Review, Content Management",
-      "action_items": "\n**Tanner Green**\nSend Ashley the correct link to the content section for login and content creation access (02:26)\nSend Ashley the correct link to the content section for login and content creation access (confirmation) (02:46)\nConfirm and communicate the publishing status of content including \"Chewy\" to Ashley (03:21)\n\n**Ashley Stirrup**\nVerify and use the correct login link provided by Tanner to access the platform and begin content creation (02:50)\nExplore and review content in the publishing section, including David Massey materials and transcripts, once proper access is confirmed (04:03)\n"
+      "action_items": "\n**Tanner Green**\nSend Ashley the correct link to the content section for login and content creation access (02:26)\nSend Ashley the correct link to the content section for login and content creation access (confirmation) (02:46)\nConfirm and communicate the publishing status of content including \"Chewy\" to Ashley (03:21)\n\n**Ashley Stirrup**\nVerify and use the correct login link provided by Tanner to access the platform and begin content creation (02:50)\nExplore and review content in the publishing section, including David Massey materials and transcripts, once proper access is confirmed (04:03)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5YVV3TKV0ZKPAS7N2D3EETC",
+      "source": "fireflies",
+      "title": "Working session: Market framing for board slides",
+      "date": "2026-10-30",
+      "duration_minutes": 75,
+      "summary": "# Working session: Market framing for board slides\nDate: 2026-10-30 | Duration: 75m\n\n## Summary\nThe discussion focused on creating a board-ready marketing narrative grounded in shipped capabilities, supported by visual market maps showing incumbents, entrants, and likely six-month positioning. Competitive analysis highlighted self-improving software, embedded AI agents, APIs, MCP, context aggregation, and broader product-development platforms, with competitors targeting marketing, engineering, product, and data audiences. Growth strategy priorities included targeted account-based marketing, segment-specific messaging, customer education, stronger post-sales enablement, Europe expansion, and improved Pro product-led growth. Self-hosting, data ownership, compliance, cost control, vendor consolidation, and scaling experimentation were identified as major buying drivers. Product priorities included developer experience, experimentation, feature flags, integrations, scalability, performance, and potential AI-focused capabilities. Marketing initiatives included case studies, webinars, public relations, targeted events, product-manager education, and new channels such as a newsletter. Launch timing was narrowed to Tuesday the 3rd rather than election day because of engagement and tone risks.\n\n## Keywords\nCompetitive positioning, Self-improving software, AI agents, Product-led growth, Experimentation platforms, Vendor consolidation\n\n## Action Items\n**Scott Bailey**\nAdd slide summarising Jeremy’s investment priorities (01:02:16)\n\n**Ashley Stirrup**\nShare strategic initiative slides (59:53)\n\n**Unassigned**\nLaunch product (01:05:05)\nPublish launch announcement (01:05:13)",
+      "organizer": "elyse@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
     }
   ]
 }

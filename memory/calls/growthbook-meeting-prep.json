@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Meeting Prep",
+  "slug": "growthbook-meeting-prep",
+  "last_etl_date": "2026-10-31T06:27:44.701753",
+  "calls": [
+    {
+      "id": "01M63G8QZZPS1BARG0NRYZJY52",
+      "source": "fireflies",
+      "title": "GrowthBook Meeting Prep",
+      "date": "2026-10-30",
+      "duration_minutes": 24.459999084472656,
+      "summary": "# GrowthBook Meeting Prep\nDate: 2026-10-30 | Duration: 24.459999084472656m\n\n## Summary\nThe team planned a customer-specific, partnership-led discussion for DJ, keeping technical detail limited because internal technical support is largely in place. The agenda will cover introductions, company history, vision, roadmap, customer engagement, partnership value to Storio Group, and commercials without making pricing the centerpiece. The current proposal is about double Storio Group’s budget, while usage uncertainty and a three-year volume commitment remain concerns. Possible changes include movable experiment blocks, annual usage reviews, contract adjustments, and license tiers with included experiments, although no structure was finalized. Technically, the team expects to begin through the Adobe Analytics route for a November test while building the longer-term Tealium-to-Snowflake process in parallel; an A/B test may follow in December. A commercial preparation call is planned for Tuesday, a revised proposal and agenda are needed before DJ’s meeting next week, and coordination will continue through Slack.\n\n## Keywords\nGrowthBook, Commercial proposal, Experiment blocks, A/B testing, Adobe Analytics, Tealium-to-Snowflake\n\n## Action Items\n**James Shannon**\n- Rework commercial proposal (14:38)\n- Schedule commercial discussion (17:10)\n- Send proposed agenda and meeting details (18:14)\n\n**Emanuele Pane**\n- Request implementation update (22:10)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}
