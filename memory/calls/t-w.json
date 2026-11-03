@@ -1,0 +1,18 @@
+{
+  "company": "T& W",
+  "slug": "t-w",
+  "last_etl_date": "2026-11-03T07:23:32.478467",
+  "calls": [
+    {
+      "id": "01M66TQSDW35KNX72QTAN46QE2",
+      "source": "fireflies",
+      "title": "T& W - Growthbook. - Updates and Queries (inc Data)",
+      "date": "2026-11-02",
+      "duration_minutes": 64.29000091552734,
+      "summary": "# T& W - Growthbook. - Updates and Queries (inc Data)\nDate: 2026-11-02 | Duration: 64.29000091552734m\n\n## Summary\nBigQuery was confirmed as the warehouse for raw tracking events, cleaned event data, and conversion reporting, with Tealium and RudderStack both feeding it. GrowthBook can reuse warehouse data, while exposure events require an experiment ID, variant ID, timestamp, and user ID. Previous-day data is generally acceptable, with occasional real-time needs and manual refreshes available. Late-arriving metrics, including NPS and margin costs, are supported through timestamps, and fact tables connect users, accounts, events, dimensions, and filters. Reusable SQL metrics can be officially tagged or configured for specific experiments. Both Bayesian and Frequentist analyses are available, including adjustable parameters and chance-to-win results. Narrow targeting across web, iOS, Kotlin, and feature experiments is supported, but combined experiment preview is unavailable. An enterprise cloud POC was proposed without upfront payment, alongside customer-owned testing and self-hosted Docker or Kubernetes options. Success criteria include integration ease, iteration speed, and result accessibility. Enterprise pricing includes support, security, implementation, and migration, with pricing based on internal platform users and an estimate of around twenty users. A Slack channel and POC scheduling remain next steps.\n\n## Keywords\nGrowthBook, BigQuery, Experimentation Platform, Exposure Events, Feature Flags, Proof of Concept\n\n## Action Items\n**William Henderson**\nProvide tracking callbacks (27:41)\n\n**Marcel Geldner**\nShare security link (53:58)\nSend meeting summary (01:00:29)\nDocument commercial model (01:00:29)\nOutline proof-of-concept requirements (01:00:29)\n\n**Temple & Webster team**\nConfirm internal user count (59:03)\nConfigure proof-of-concept environment (55:18)\nApprove Slack invitations (01:02:15)\n\n**David Court**\nReview proof-of-concept approach (52:46)\nConfirm requirements next steps (01:01:37)\nCoordinate Slack feedback (01:01:37)",
+      "organizer": "remy@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

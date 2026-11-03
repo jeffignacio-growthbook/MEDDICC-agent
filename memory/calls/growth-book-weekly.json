@@ -1,7 +1,7 @@
 {
   "company": "Growth Book Weekly",
   "slug": "growth-book-weekly",
-  "last_etl_date": "2026-10-27T05:49:09.413632",
+  "last_etl_date": "2026-11-03T07:23:32.476513",
   "calls": [
     {
       "id": "01KFXSR394CVCHJ1HKJKM5HSTE",
@@ -484,6 +484,17 @@
       "summary": "# Growth Book Weekly Meeting\nDate: 2026-10-26 | Duration: 49.68000030517578m\n\n## Summary\nSales performance is tracking toward $1.5 million–$2 million in quarterly bookings, with $1.1 million already booked and late-stage opportunities involving Haskrabit, Zorro, and Rula. The 5.2 release remains targeted for November 3, with final scope expected tomorrow and office-hours recording planned for November 2. Product priorities include remote saved groups, agent API keys, human-in-the-loop workflows, clustered experiments, DBT Sync, and approximately 70 API endpoints. Event Forwarder may include a free tier of one million events monthly, while population targeting and product analytics support expansion. New experiment-quality, program-health, and impact views will measure best-practice adherence, experimentation performance, and business value. Strategic opportunities include personalization, agent and Slack adoption, product analytics, and an idea-to-experiment workflow. The company also discussed a February retreat in Puerto Verde and potential customer input on maturity scoring and quality capabilities.\n\n## Keywords\nExperimentation quality, Product analytics, Agent API keys, Contextual Bandits, GrowthBook 5.2, Experimentation maturity\n\n## Action Items\n**Ryan McGurk**\nShare quarterly sales update (01:29)\n\n**Scott Bailey**\nFinalize shipping scope (02:04)\nAdd incomplete feature videos (02:49)\n\n**Alyssa Nicoll**\nContact developers (02:25)\n\n**Employees**\nNotify Jennifer (08:25)\n\n**Jeremy Dorn**\nAdd follow-up agent skills (14:37)\n\n**Luke Smith**\nSend contextual bandit blurb (18:21)\nReview experiment quality documentation (39:42)\n\n**Graham McNicoll**\nConnect experiment quality scoring with actionable guidance (40:22)\nDiscuss experimentation maturity ideas and customer needs with Eric (43:39)\n\n**Nhat Ho**\nArrange Graham’s discussion with Eric (43:45)",
       "organizer": "graham@growthbook.io",
       "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5V20JYXT5YDGCY91MZ78RVH",
+      "source": "fireflies",
+      "title": "Growth Book Weekly Meeting",
+      "date": "2026-11-02",
+      "duration_minutes": 58.540000915527344,
+      "summary": "# Growth Book Weekly Meeting\nDate: 2026-11-02 | Duration: 58.540000915527344m\n\n## Summary\nGrowthBook reported strong Q3 performance, including $1.82M in quarterly bookings, $4.6M in new ARR year to date, 18 new logos, and ARR growth from approximately $5.7M to $10.2M. Q4 began with a $12.2M pipeline and a projected year-end range of $13M–$17M, although Anthropic timing, procurement, legal review, and contracting remain risks. Customer wins included TaskRabbit, Rula, Echo, Blah Blah Car, Taxfix, ClickHouse, Mistral, and BoyleSports, with self-hosting, warehouse-native architecture, open source, pricing, and support cited as differentiators. Production deployments approached 4,000, self-serve revenue reached approximately $1.1M MRR, and cash flow turned positive. GrowthBook 5.2 was scheduled to launch with interleaving, Datadog and DBT integrations, remote saved groups, contextual-bandit improvements, and redesigned experiment workflows. Teams also discussed adoption support, customer stories, telemetry reporting, feedback collection, and reducing conversion friction.\n\n## Keywords\nSales pipeline, ARR growth, Warehouse-native experimentation, 5.2 product release, Interleaving experiments, Datadog integration\n\n## Action Items\n**Elyse Fox**\n- Publish 5.2 product blog (38:52)\n- Publish technical blog (38:52)\n- Notify customer database (38:52)\n- Broadcast 5.2 release through Slack (38:52)\n- Update website banners and navigation (38:52)\n- Create and publish GitHub discussions (38:52)\n- Publish social media promotion (38:52)\n- Send marketing email (39:20)\n- Share office-hours video and feature clips (39:20)\n- Finalize 5.2 summary slide (40:20)\n- Finalize future roadmap slide (40:20)\n- Coordinate 5.2 training (40:20)\n\n**Jeremy Dorn**\n- Cut 5.2 release (41:38)\n- Merge application shell (53:25)\n\n**Luke Sonnet**\n- Invite users or customers to interleaving closed beta (53:13)",
+      "organizer": "graham@growthbook.io",
+      "participants": 40,
       "summary_quality": "good"
     }
   ]

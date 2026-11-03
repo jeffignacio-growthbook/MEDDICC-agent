@@ -1,0 +1,18 @@
+{
+  "company": "Pawel Lewtak and",
+  "slug": "pawel-lewtak-and",
+  "last_etl_date": "2026-11-03T07:23:32.477817",
+  "calls": [
+    {
+      "id": "01M69KYQ0Y87Q4GGMNW0S2F774",
+      "source": "fireflies",
+      "title": "Pawel Lewtak and Emmy Sharp + 2 others",
+      "date": "2026-11-02",
+      "duration_minutes": 16.75,
+      "summary": "# Pawel Lewtak and Emmy Sharp + 2 others\nDate: 2026-11-02 | Duration: 16.75m\n\n## Summary\nA backend developer with an AI focus discussed using GrowthBook on a real-estate website platform involving microservices, legacy systems, PHP, JavaScript, and Node. GrowthBook supports A/B tests, feature flags, and hiding unreleased features from target audiences because staging was insufficient for internal production demonstrations. Registration and Chrome extension setup were smooth: the existing login was recognized, flags appeared immediately, and enabled or disabled flags were easy to manage. However, overrides were unstable: after refreshes, version A repeatedly appeared instead of version B, even though the Boolean remained true, and subpage behavior was inconsistent. Repeated toggles and browser-cache clearing produced mixed results. Possible contributing factors included Cloudflare, AWS, or the legacy codebase, but the root cause remained unclear. A previous custom tool offered server-side computation, IP-location targeting, browser-header targeting, Poland-only targeting, and 10% audience testing. GrowthBook remained appealing for future or personal projects, especially with a free, ongoing tier, while two-week trials felt too short. Support offered to investigate the extension issue, potentially using screenshots.\n\n## Keywords\nFeature flagging, Chrome extension, A/B testing, Onboarding experience, Caching issues, Free tier\n\n## Action Items\n**Emmy Sharp**\nHelp connect Paweł with Support (12:03)\nSend Paweł gift card (14:38)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

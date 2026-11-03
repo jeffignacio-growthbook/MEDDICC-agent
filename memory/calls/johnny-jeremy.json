@@ -1,7 +1,7 @@
 {
   "company": "Johnny / Jeremy",
   "slug": "johnny-jeremy",
-  "last_etl_date": "2026-10-27T05:49:09.406598",
+  "last_etl_date": "2026-11-03T07:23:32.473286",
   "calls": [
     {
       "id": "01M1CPHH6FV29WP3AG291HZSWM",
@@ -67,6 +67,17 @@
       "summary": "# Johnny / Jeremy\nDate: 2026-10-26 | Duration: 26m\n\n## Summary\nThe team favored redesigning dashboard sharing around an access-first flow with restricted or organization access, followed by view, comment, or edit permissions; public-link sharing will come later. For AI creation, a sidebar chat modeled on Claude-style progressive interaction could support iterative dashboard revisions and eventually metric creation, while avoiding conflict with the existing AI chat. Tag settings will remain simple, centered on tag names and colors, since settings mainly support editing existing tags. A tag interaction delay was fixed by correcting an extra zero, and settings implementation is nearing pull-request review. Feature flags remain the last major core application area needing a full design pass, while navigation work continues. An onboarding kickoff is likely next week, with Jeremy planning to test account setup and contact Gabe for existing onboarding screenshots.\n\n## Keywords\nDashboard sharing, AI-assisted creation, Tag management, Design system, Onboarding, Feature flags\n\n## Action Items\n**Johnny Martinez**\n- Update dashboard sharing design (06:19)\n- Mock up chat-based Create with AI flow (10:34)\n- Simplify tag settings interface (20:44)\n- Create test accounts (22:28)\n- Build initial onboarding flow locally (22:28)\n- Contact Gabe (24:44)",
       "organizer": "johnny@growthbook.io",
       "participants": 1,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6EXK8FR2GDM44T69V06QRYZ",
+      "source": "fireflies",
+      "title": "Johnny / Jeremy",
+      "date": "2026-11-02",
+      "duration_minutes": 21,
+      "summary": "# Johnny / Jeremy\nDate: 2026-11-02 | Duration: 21m\n\n## Summary\nThe team brought the dashboard homepage near completion by adding hover states, simplifying navigation, removing the Create button, replacing the recent-dashboard screen with type-ahead search, and refining empty states. Feature previews for feature flags, experiments, and dashboards were separated into a broader project. Dashboard creation will use the global AI assistant, keep dashboards editable as drafts until Save, and preserve widget hover and click behavior during preview. Existing onboarding flows for GrowthBook Cloud, Enterprise, Self-Hosted, and organization presets are under review, with a deep dive planned for tomorrow around noon Pacific involving Johnny, Gabe, Michael Sampler, Michael Knowlton, and Guy. Claude-based setup may reduce the need for initial product UI, but setup guidance and onboarding messaging remain unresolved. Johnny will finish homepage revisions before handing them to No Boo, while Jeremy will prioritize analytics projects and identify design needs.\n\n## Keywords\nDashboard design, AI assistant, Feature flag previews, Onboarding, Widget interaction, Product analytics\n\n## Action Items\n**Johnny Martinez**\n- Apply dashboard home-page changes (09:30)\n- Revise AI dashboard creation flow (14:39)\n- Continue onboarding design work (14:39)\n- Continue attributes work (19:24)\n\n**Jeremy Dorn**\n- Hold onboarding deep dive (18:58)\n- Develop product analytics projects (19:47)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

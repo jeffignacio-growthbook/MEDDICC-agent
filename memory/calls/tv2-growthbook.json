@@ -1,0 +1,18 @@
+{
+  "company": "TV2 & GrowthBook",
+  "slug": "tv2-growthbook",
+  "last_etl_date": "2026-11-03T07:23:32.478267",
+  "calls": [
+    {
+      "id": "01M66TQSR7GKD8HJ3N8R43NEV8",
+      "source": "fireflies",
+      "title": "TV2 & GrowthBook Demo",
+      "date": "2026-11-02",
+      "duration_minutes": 11.460000038146973,
+      "summary": "# TV2 & GrowthBook Demo\nDate: 2026-11-02 | Duration: 11.460000038146973m\n\n## Summary\nRémy reported that one item had been closed, but additional information was still needed. The remaining follow-up concerned procurement, billing, and related matters, with Marcel identified as relevant to resolving the outstanding requests. Rémy offered to send Marcel the necessary information, while James indicated that Marcel would handle continued chasing. Attendance and responsiveness were also discussed: James had not received a message from an expected attendee, and both he and Rémy thought the person might not attend, although no reason was confirmed. James compared the situation with a previous live sport deal where a contact had stopped responding; Rémy noted that the person might simply be busy and reply later. Progress therefore remained dependent on an external response, with no alternative owner or escalation confirmed. After lunch, Rémy and James planned to review demo preparation around three or four, before Rémy’s gym session. Rémy also mentioned a meeting with Jake Higher, while James planned to work on busy work during the day.\n\n## Keywords\nDemo preparation, TV2, GrowthBook, Procurement, Billing, Meeting attendance\n\n## Action Items\n**James Shannon**\nMessage Jonas Moe (03:08)\n\n**Rémy Marin**\nSend Marcel information (03:24)\n\n**Unassigned**\nReview demo preparation (09:41)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "J.Crew + GrowthBook",
+  "slug": "j-crew-growthbook",
+  "last_etl_date": "2026-11-03T07:23:32.478116",
+  "calls": [
+    {
+      "id": "01M643NZ3WZZ2WA0WG19X1DEXY",
+      "source": "fireflies",
+      "title": "J.Crew + GrowthBook",
+      "date": "2026-11-02",
+      "duration_minutes": 39,
+      "summary": "# J.Crew + GrowthBook\nDate: 2026-11-02 | Duration: 39m\n\n## Summary\nThe session evaluated GrowthBook as a potential platform for expanding an established experimentation program from web into app testing. The current program is approximately 80% product testing and 20% commercial testing, with annual volume expected to reach about 2,250 tests. Key requirements include eliminating client-side flicker, preserving commercial testing during any server-side migration, simplifying fragmented targeting, and supporting existing web and future app workflows. BigQuery supports approximately 90% of analysis, while Google Analytics supports the remainder; GrowthBook can read aggregate warehouse results, reuse existing identifiers, and avoid transferring raw row-level or personally identifiable data. The platform demonstrated feature flags, staged rollouts, guardrail-triggered kill switches, segmentation, power calculations, and configurable Bayesian, CUPED, and frequentist analysis. Erin McElwee raised concerns about BigQuery query costs and p-hacking. Nicole Brujis requested retailer references, and Jake Heier committed to checking references and sending a recap. No final decision was stated.\n\n## Keywords\nA/B testing, feature flags, BigQuery, server-side experimentation, mobile app testing, multi-brand analytics\n\n## Action Items\n**Rémy Marin**\nProvide examples of retailer customers (23:50)\n\n**Jake Heier**\nSend meeting recap (28:53)",
+      "organizer": "jake@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}
