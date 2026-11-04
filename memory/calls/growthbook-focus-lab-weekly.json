@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook/Focus Lab Weekly",
+  "slug": "growthbook-focus-lab-weekly",
+  "last_etl_date": "2026-11-04T07:05:05.234178",
+  "calls": [
+    {
+      "id": "01M5YVV3SR57JZCP4DHAWQQFK1",
+      "source": "fireflies",
+      "title": "Growthbook/Focus Lab Weekly Meeting",
+      "date": "2026-11-03",
+      "duration_minutes": 65.3499984741211,
+      "summary": "# Growthbook/Focus Lab Weekly Meeting\nDate: 2026-11-03 | Duration: 65.3499984741211m\n\n## Summary\nThe discussion retained a Ruler-based brand strategy while adding warmth, humor, approachability, and clearer storytelling to create competitive whitespace. Product teams were identified as the broad target audience, balancing engineering-led buying with product, marketing, growth, and data stakeholders. Ideal prospects are change-ready companies with more than one million web or mobile visitors, dissatisfaction with an existing solution, and interest in both feature flagging and experimentation. Positioning should highlight growth from approximately $5 million to $13 million in revenue, stronger customer adoption, leadership, expertise, and rapid responsiveness. Experimentation messaging should promote testing product changes, stronger hypotheses, valid metrics, shared learning, and reduced rollout risk. Visually, the brand should be more dynamic than Statsig while maintaining technical credibility; humor, adaptable systems, and selective panda use were discussed. Research and evaluation materials are scheduled for Friday, review is planned for next Tuesday, and a creative brief is expected by the end of the following week.\n\n## Keywords\nAudience segmentation, Experimentation culture, Brand archetype, Product-team positioning, Visual identity, Mascot strategy\n\n## Action Items\n**Álvaro Ramos**\n- Send visual strategy questions (01:01:57)\n\n**Anna Beyerle Rosen**\n- Send research document (01:02:22)\n- Provide creative direction recommendations (01:02:56)\n\n**Ashley Stirrup**\n- Schedule internal Growthbook review (01:03:24)\n- Submit consolidated Growthbook feedback (01:03:24)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "Jake <> Brent",
   "slug": "jake-brent",
-  "last_etl_date": "2026-10-15T05:24:48.401340",
+  "last_etl_date": "2026-11-04T07:05:05.233125",
   "calls": [
     {
       "id": "01KG325ZD2GJE3VH7WZ9SNNVDP",
@@ -344,6 +344,17 @@
       "date": "2026-10-14",
       "duration_minutes": 32.599998474121094,
       "summary": "# Jake <> Brent weekly 1:1\nDate: 2026-10-14 | Duration: 32.599998474121094m\n\n## Summary\nThe team established recurring 30-minute meetings on Tuesdays at 4:00pm and Fridays at 4:30pm Eastern starting on the 20th, with possible timing adjustments. They adopted persona-based outbound campaigns using the Agoji methodology, combining Apollo email sequences with LinkedIn sequences in Dripify. Jake will choose and launch one sequence next week, using Sales Navigator to build the prospect list and updating Ryan and Brent in Slack. Because Apollo restricted bulk LinkedIn-list exports, the team discussed exporting filtered lists from Dripify to CSV and using tools such as Clay or Airscale for enrichment. Import problems, including unmapped columns and incomplete data, will be addressed by testing people uploads and refining field mapping. Brent highlighted stronger win rates for accounts with at least 2.5 million mobile users and recommended using high web traffic in prospecting. Jake will explore blending traffic data with Rio or HubSpot scoring, while pipeline visibility will track inbound and outbound contributions.\n\n## Keywords\nSales Navigator, Apollo, Dripify, Outreach Campaign, LinkedIn Integration, Data Enrichment\n\n## Action Items\n\n**Jake Stangl**\nPull own calendar and confirm weekly meeting times with Brent, finalize Tuesday and Friday 4:00-4:30pm ET slots starting on the 20th (03:15)\nReview and prepare one tailored outreach campaign sequence from the Agoji workbook for launch next week, based on prospect filtering from Sales Navigator (30:24)\nTest and troubleshoot importing LinkedIn Sales Navigator export lists into Apollo for email campaign sequences; streamline process and report progress to Brent (20:50)\nCoordinate with Ashley, Lindsey, and Jeff to enable filtering on Rio and HubSpot for combined high web traffic and engagement signals to refine outbound prospect targeting (28:45)\nNotify Ryan and Brent via Slack by end of next day with confirmed campaign choice and setup status (30:37)\n\n**Brent Holloway**\nProvide support on troubleshooting Apollo import issues and data enrichment tool discussions during sessions (20:50)\nMonitor progress of Jake’s campaign setup and integration between Apollo and Dripify for LinkedIn/email parallel outreach (30:24)\nCollaborate on defining filters combining Rio scoring and HubSpot web traffic metrics to improve sales efficiency (28:45)\n",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5Z6RQMT644RWBVBZN2HQHXW",
+      "source": "fireflies",
+      "title": "Jake <> Brent weekly 1:1",
+      "date": "2026-11-03",
+      "duration_minutes": 31.450000762939453,
+      "summary": "# Jake <> Brent weekly 1:1\nDate: 2026-11-03 | Duration: 31.450000762939453m\n\n## Summary\nThe discussion identified major data-quality issues in Rio: the surging-account segment shifted from 2,500 to 1,200 accounts, smaller accounts were absent, and employee counts sometimes differed from AirScale for companies such as Spotify and Allstate. Ashley or another support contact must investigate before Rio is used for SMB prioritization. Enterprise ICP criteria of 1,000-plus employees, high AirScale website visits, and high activity score identified 243 accounts, narrowed to 178 after excluding opportunities and customers, with 47 in the 1,000–10,000 employee range. About 120 accounts also had identified developers and became the priority tier. Jake planned to export contacts to Apollo and launch call-and-email sequences, emphasizing paid capabilities, coordinated reporting, and open-source usage. Tesla, Nvidia, and Shopify were highlighted, with Tesla prioritized for outreach. The discussion also covered missing inbound meetings, the need to identify 50–100 employee Pro customers, approximately $1.1 million across four January deals, and interpretation of the Washington Post forecast.\n\n## Keywords\nRio account segmentation, Airscale enrichment, Enterprise ICP, Open-source users, Apollo outreach, Sales pipeline forecasting\n\n## Action Items\n**Jake Stangl**\n- Ask Ashley or Rio support why SMB companies are missing from segment (08:21)\n- Focus prospecting on enterprise ICP accounts (22:37)\n- Move identified developers into Apollo (22:48)\n- Create Apollo outreach sequences (22:48)\n- Contact prioritised enterprise accounts (24:36)\n- Raise inbound meeting absence with Ryan (25:18)\n- Pursue 50–100 employee opportunities (25:39)\n- Update Ryan on enterprise ICP-plus focus (30:00)\n- Call Tesla (30:05)",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

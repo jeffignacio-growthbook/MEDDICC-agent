@@ -1,0 +1,18 @@
+{
+  "company": "Internal Home Depot",
+  "slug": "internal-home-depot",
+  "last_etl_date": "2026-11-04T07:05:05.234793",
+  "calls": [
+    {
+      "id": "01M6H33W6Z41J58ES6MM6SVQWM",
+      "source": "fireflies",
+      "title": "Internal Home Depot Demo Prep",
+      "date": "2026-11-03",
+      "duration_minutes": 11,
+      "summary": "# Internal Home Depot Demo Prep\nDate: 2026-11-03 | Duration: 11m\n\n## Summary\nThe discussion covered the need for additional sales capacity because of high deal volume, although no hiring decision or start date was confirmed after a preferred candidate joined SpaceX. Revenue was described as approximately $13–14 million, up from roughly $6 million when Logan Bates started, with $15 million identified as an annual target. Home Depot requires a largely generic, remote platform demonstration focused on pain points, technical workflows, lifecycle requirements, and platform alignment; Logan will review customer requirements forwarded by Scott Keller. Scott identified seven enterprise opportunities—Grubhub, SPF, OLX Group, Expedia, Zalando, Washington Post, and Natera—with a goal of closing them before Christmas for a cleaner January start. In a low-engagement Lockheed Martin demo, Scott used a $125,000 platform fee and a $135,000 quote for five users. Logan and Scott also discussed Pro versus enterprise packaging, account management, expansion, and the need for greater leadership transparency.\n\n## Keywords\nHome Depot demo, Enterprise sales, GrowthBook platform, Adobe Target, Sales pipeline, Pro versus Enterprise\n\n## Action Items\n**Logan Bates**\nReview Home Depot requirements email (02:59)\nPrepare Home Depot platform demo (10:27)\n\n**Scott Keller**\nConduct Home Depot demo remotely (10:34)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

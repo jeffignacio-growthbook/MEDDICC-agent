@@ -1,7 +1,7 @@
 {
   "company": "Jon-Paul Akal and",
   "slug": "jon-paul-akal-and",
-  "last_etl_date": "2026-08-05T15:57:31.350196",
+  "last_etl_date": "2026-11-04T07:05:05.233913",
   "calls": [
     {
       "id": "01KVXH4G2R9RSD63CA6W6F1XWK",
@@ -13,7 +13,19 @@
       "organizer": "ashley@growthbook.io",
       "participants": 2,
       "keywords": "podcast promotion, guest recruitment, Growth Book, podcast editing, content repurposing, targeted outreach",
-      "action_items": "\n**Jon-Paul Akal**\nSend Ashley a detailed email with pricing estimates for podcast promotion of 20 episodes per month and separate pricing for editing services, including case studies and deeper strategy details (20:40)\n\n**Ashley Stirrup**\nReview the detailed pricing and service proposal email from Jon-Paul and provide feedback or decision (22:35)\n"
+      "action_items": "\n**Jon-Paul Akal**\nSend Ashley a detailed email with pricing estimates for podcast promotion of 20 episodes per month and separate pricing for editing services, including case studies and deeper strategy details (20:40)\n\n**Ashley Stirrup**\nReview the detailed pricing and service proposal email from Jon-Paul and provide feedback or decision (22:35)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M69PDEXZ4N7YCJ1JEY61HA85",
+      "source": "fireflies",
+      "title": "Jon-Paul Akal and Ashley Stirrup",
+      "date": "2026-11-03",
+      "duration_minutes": 34.119998931884766,
+      "summary": "# Jon-Paul Akal and Ashley Stirrup\nDate: 2026-11-03 | Duration: 34.119998931884766m\n\n## Summary\nAshley and Jon-Paul reviewed a proposed 10-episode monthly podcast production and growth scope covering editing, production, promotion, distribution, analytics, and strategic review, while guest booking and communications remained outside the initial scope. The service includes an existing-show audit, host coaching, platform publishing, transcripts, artwork, social assets, three video clips per episode, and distribution across YouTube, LinkedIn, Instagram, and Twitter. They prioritized ideal listener quality and organic growth over vanity downloads, based on weak results from earlier paid activity, with only small paid experiments suggested. The strategy includes SEO, backlinks, social, partnerships, communities, cold email, guest amplification, and reuse of existing assets. A 10% month-over-month download-growth minimum was discussed. YouTube was identified as the strongest opportunity, with about 8,000 subscribers, roughly 30 monthly additions, and opportunities to improve thumbnails, hooks, and Shorts. Ashley indicated an intention to proceed after discussing reduced scope with the current vendor.\n\n## Keywords\nPodcast production, Audience quality, Organic growth, Guest outreach, Content repurposing, YouTube marketing\n\n## Action Items\n**Jon-Paul Akal**\nSchedule kickoff call (01:11)\nReview existing podcast (02:13)\nProvide host coaching (02:55)\nProvide Riverside footage access (11:40)\nReview episode format and guest preparation (22:13)\nDevelop YouTube thumbnail concepts (31:46)\nProduce YouTube Shorts and short-form clips (32:10)\n\n**Ashley Stirrup**\nDiscuss vendor scope reduction (32:54)\nContact Jon-Paul (32:54)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

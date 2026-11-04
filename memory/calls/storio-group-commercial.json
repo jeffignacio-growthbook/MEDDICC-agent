@@ -1,0 +1,18 @@
+{
+  "company": "Storio Group Commercial",
+  "slug": "storio-group-commercial",
+  "last_etl_date": "2026-11-04T07:05:05.237982",
+  "calls": [
+    {
+      "id": "01M6BEKGK48MT7CZ5TDZ7BEZ7A",
+      "source": "fireflies",
+      "title": "Storio Group Commercial Follow Up",
+      "date": "2026-11-03",
+      "duration_minutes": 24.309999465942383,
+      "summary": "# Storio Group Commercial Follow Up\nDate: 2026-11-03 | Duration: 24.309999465942383m\n\n## Summary\nThe discussion finalized a revised commercial proposal: a 5% discount for January 15 conversion and another 5% for agreeing to a customer case study reduce the €180,000 license by 10% to €162,000. Three experiment blocks were reduced to €22,500 each, totaling €67,500 and providing 150 experiments usable across a proposed two-year term; additional blocks would remain available at €22,500. The proposed January 15 invoice is €229,500. The agreement could be signed before January 15, with the period beforehand treated as a trial that does not count toward the term, while renewal increases would be capped at 10%. A commercial gap versus existing tooling remains, with further value discussion potentially involving David. Emily and Emanuele planned to brief David, with CFO input potentially relevant. James would add commercial slides to the next-meeting deck and send revised materials, while Adam and Michelle were expected to attend and ask detailed stakeholder questions.\n\n## Keywords\nGrowthBook pricing, Licence discount, Experiment blocks, Two-year contract, Case study, CFO approval\n\n## Action Items\n**Emily Simpson**\nSend Herbal House office address and postcode (07:36)\nBrief DJ on revised GrowthBook commercial proposal (18:53)\n\n**James Shannon**\nBuild stakeholder meeting presentation deck (19:47)\nSend revised GrowthBook commercial proposal (21:00)\n\n**Emanuele Pane**\nJoin Emily’s discussion with DJ (20:14)\nUpdate James on DJ’s availability (20:20)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

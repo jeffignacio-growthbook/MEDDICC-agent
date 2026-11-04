@@ -1,7 +1,7 @@
 {
-  "company": "Bonial × GrowthBook",
+  "company": "Bonial & GrowthBook",
   "slug": "bonial-growthbook",
-  "last_etl_date": "2026-10-15T05:24:48.407008",
+  "last_etl_date": "2026-11-04T07:05:05.235130",
   "calls": [
     {
       "id": "01M3KGWWGARD21EFTAZRTQ04G0",
@@ -45,6 +45,17 @@
       "summary": "# Bonial × GrowthBook | Introduction\nDate: 2026-10-14 | Duration: 59.279998779296875m\n\n## Summary\nGrowthBook is an open source experimentation platform used by more than 3,500 companies, including leading AI and publishing firms, and backed by Y Combinator and Coastal Adventures. Its open source and enterprise models coexist, with enterprise features such as Cupid, interleaving, and switchback testing, while enterprise code remains source available. Cloud hosting provides uptime and support commitments, including global support, while large enterprises commonly self-host through Docker and Kubernetes for compliance. European data residency is available with some data currently based in the United States, and full European hosting is planned. Licensing can be based on users or experiments, with negotiable read-only seats, site licenses, and OAuth-based agent licensing. Migration support includes engineer collaboration, importer tools, scripts, and proxy approaches, with a tight deadline at the end of March mentioned. The roadmap emphasizes rapid experimentation, AI agents that create, run, and interpret tests, governance for thousands of experiments, and potential synthetic user testing.\n\n## Keywords\nexperimentation, self-hosting, migration, AI integration, licensing models, open source\n\n## Action Items\n**Marcel Geldner**  \nSend meeting notes and full summary (15:52)  \n\n**GrowthBook Team (Marcel Geldner / Graham)**  \nProvide example customer contacts (17:44)  \nSupport deep dive on self-hosting (32:16)  \nAssist with migration scripts and plans (39:11)  \n\n**Philipp Johannis1**  \nCoordinate internal technical discussions (30:10)  \n\n**Daria Mauerpark**  \nPresent roadmap overview and prepare clarifications (48:56)  \n\n**Fevzi Kahraman**  \nDebrief with key stakeholders on GrowthBook details (57:32)",
       "organizer": "marcel@growthbook.io",
       "participants": 6,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6GA56HBX2HPYZSMD6N9TCTV",
+      "source": "fireflies",
+      "title": "Bonial & GrowthBook | POC & Commercials",
+      "date": "2026-11-03",
+      "duration_minutes": 36,
+      "summary": "# Bonial & GrowthBook | POC & Commercials\nDate: 2026-11-03 | Duration: 36m\n\n## Summary\nThe discussion covered an enterprise cloud requirement with 20 seats and possible reader-only users, while recognizing that unlimited experimentation and flexible subscriptions are important constraints. The current budget is €50k, €60k may be possible, and amounts above €60k are difficult; pricing levers include a proposed €70k total, a 500-user price, and a lower platform fee. The open feature is the highest internal priority, with an engineering update planned Thursday. Cloud setup guidance, including a one-page document, sources, and SDKs, is prepared, and the POC scope is targeted for completion this year before procurement follows approval. The intended path includes December signing, possible deferred payment, January integration, February traffic, and migration readiness by March. A two-year option with annual payments and fixed pricing remains open. The DPA has been shared, the customer agreement is forthcoming, and legal review is expected. Bonial is open to a case study subject to agreement language and exclusion of sensitive disclosures. Slack collaboration, POC coordination, internal approvals, and parallel legal, commercial, and product workstreams are established.\n\n## Keywords\nEnterprise cloud, POC, User licensing, Pricing negotiation, Contract commitment, Open feature\n\n## Action Items\n**Marcel Geldner**\nConfirm delivery timeline (03:09)\nDiscuss pricing reductions (10:55)\nProvide customer agreement (15:08)\nSend setup guide (20:25)\nAdd collaboration contacts (20:59)\nProvide trust portal access (23:33)\nInclude Remy in discussion (24:47)\n\n**Fevzi Kahraman**\nSeek budget approval (21:32)\nEvaluate two-year commitment (21:32)\nPrepare POC scope (22:10)\nInvolve procurement colleague (22:10)\nPursue annual signature (22:52)\nReview customer agreement (23:33)\nSchedule follow-up discussion (24:47)\n\n**Remy**\nPrepare POC requirements (22:57)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

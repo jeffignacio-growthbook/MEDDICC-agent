@@ -1,0 +1,18 @@
+{
+  "company": "Betclic & GrowthBook",
+  "slug": "betclic-growthbook",
+  "last_etl_date": "2026-11-04T07:05:05.234868",
+  "calls": [
+    {
+      "id": "01M5YA9DP2BJ62RV9PW8RRBBRP",
+      "source": "fireflies",
+      "title": "Betclic & GrowthBook Technical Demo",
+      "date": "2026-11-03",
+      "duration_minutes": 65.62999725341797,
+      "summary": "# Betclic & GrowthBook Technical Demo\nDate: 2026-11-03 | Duration: 65.62999725341797m\n\n## Summary\nBetclic’s GrowthBook evaluation is nearing final review, with the RFP response expected within the week or at the beginning of next month and a solution decision targeted by year-end. The team identified manual experiment tracking, fragmented A/B testing tools, limited conflict visibility, and dependence on engineering and data teams as key challenges. GrowthBook proposed a unified platform for mobile, web, and server-side experimentation, with Snowflake-native analysis, reusable metrics, templates, self-service workflows, feature flags, controlled rollouts, and flexible targeting. Betclic still needs deeper validation of identity mapping, exposure attribution, gaming-revenue events, stopping rules, statistical methodology, and monitoring. GrowthBook can operate alongside existing feature-management infrastructure and use read-only Snowflake access. Immediate next steps include completing the RFP, providing pricing information, exchanging sizing questions, and arranging a data-science follow-up involving GrowthBook’s lead and Betclic’s lead analyst.\n\n## Keywords\nExperimentation platform, Snowflake analytics, Feature flags, A/B testing, Statistical attribution, Experiment governance\n\n## Action Items\n**James Shannon**\nComplete GrowthBook response (06:17)\nSend pricing-input questions (17:46)\nClarify experiment attribution support (49:20)\nArrange technical session (01:03:05)\nCoordinate technical follow-up (01:04:01)\n\n**Edouard Thomas**\nProvide pricing inputs (17:46)\nDiscuss experiment identity linking (30:53)\nParticipate in technical follow-up (01:03:05)\n\n**Augusta Razetti**\nProvide pricing inputs (17:46)\n\n**Klaus Fleerkötter**\nDiscuss experiment identity linking (30:53)\nJoin technical discussion (01:03:05)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

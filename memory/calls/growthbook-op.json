@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook + Op",
   "slug": "growthbook-op",
-  "last_etl_date": "2026-10-28T06:26:54.009174",
+  "last_etl_date": "2026-11-04T07:05:05.234532",
   "calls": [
     {
       "id": "01KT7DMS83RXCGY1RPYJB8XGY3",
@@ -108,6 +108,17 @@
       "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-10-27 | Duration: 29m\n\n## Summary\nThe license-association workflow is built and ready for testing, but validation depends on receiving GrowthBook Org IDs and license data. The team will backfill company Org IDs, test Enterprise, Pro, and Starter license updates separately, and audit synced records. License data is expected to improve customer lifecycle-stage accuracy to approximately 99%; Enterprise and self-hosted accounts generally have closed-won deals, while Pro customers remain the main gap. Renewal automation is a potential next step using valid expiration dates and owner notifications. Lead-scoring preparation includes new properties and Clay-enriched mobile and combined monthly users, with Thursday’s call focused on scoring, MQL routing, traffic metrics, and possible routing for high-fit enterprise companies. HubSpot contains 916 duplicate companies, so the team will merge only confident duplicates while preserving legitimate parent-child relationships. Monitoring, ownership for cleanup, and input from Nolan and Michael Knowlton remain important dependencies.\n\n## Keywords\nLicence automation, GrowthBook organisation IDs, Lead scoring, MQL routing, HubSpot deduplication, Renewal process\n\n## Action Items\n**Chris Newton**\nReview reporting requirements (01:44)\n\n**Shawn Green**\nTest licence-association workflow (02:13)\nReview renewal-opportunity process (04:00)\nCoordinate workflow testing (05:43)\nMonitor backup monitoring (05:43)\nExecute licence-data rollout (05:53)\nMonitor licence records (05:53)\nPrepare week-over-week report (16:02)\nUpdate lead-scoring model (18:29)\nReview duplicate-company analysis (28:10)\n\n**Michael Funduc**\nCategorise duplicate companies (27:40)\nSelect primary records (27:40)\nReview duplicate-company analysis (28:10)",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 8,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6C76V7H28GPYDECGMXDBAFW",
+      "source": "fireflies",
+      "title": "GrowthBook + Op Methods Weekly Check-In",
+      "date": "2026-11-03",
+      "duration_minutes": 30,
+      "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-11-03 | Duration: 30m\n\n## Summary\nThe discussion focused on creating aligned reporting for marketing, sales, and pipeline conversations. HubSpot was designated as the shared source for Ashley and Ryan, with three dashboard levels covering demo requests, inbound conversations, held meetings, opportunities, and pipeline, plus deeper drill-down views. Paid advertising reporting should connect spend with signups, demos, SQLs, opportunities, and closed-won results, while Starter-to-Pro attribution requires license synchronization and analysis of prior marketing touches. Marketing and sales teams will align metric definitions so Ashley and Ryan see consistent results. Held-meeting rates remain unreliable because reps inconsistently record meeting outcomes, no-shows, and disqualifications. Jeff’s sales reporting covers pipeline coverage, weighted forecasts, forecast trends, pipeline hygiene, and stage progression, while Q4 was described as healthier than Q3 despite a higher target. Shawn will continue lead-scoring and marketing-reporting work, Jeff will share existing HubSpot reports, and Jeff will evaluate stronger meeting-disposition enforcement.\n\n## Keywords\nHubSpot dashboards, Marketing attribution, Pipeline forecasting, Lead scoring, Paid advertising, Sales operations\n\n## Action Items\n**Shawn Green**\nBegin lead-scoring work (00:41)\nAlign reporting definitions with Jeff Ignacio (15:33)\nBuild marketing operations dashboards (29:56)\n\n**Jacqueline Thomson**\nVerify advertising campaign destinations (07:32)\nIdentify campaign form types (08:25)\n\n**Jeff Ignacio**\nReview meeting-stage disqualification fields (19:31)\nConfirm no-show opportunity process (21:44)\nShare Ryan’s reporting dashboard (timestamp unavailable)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 9,
       "summary_quality": "good"
     }
   ]

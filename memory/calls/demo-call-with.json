@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-11-03T07:23:32.470513",
+  "last_etl_date": "2026-11-04T07:05:05.236278",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1191,6 +1191,17 @@
       "duration_minutes": 11.5600004196167,
       "summary": "# Demo Call with  from\nDate: 2026-11-02 | Duration: 11.5600004196167m\n\n## Summary\nNo summary available",
       "organizer": "dan@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6GME5GXQ45YT1BEBYVW06KQ",
+      "source": "fireflies",
+      "title": "Demo Call with Yazhou Ye from",
+      "date": "2026-11-03",
+      "duration_minutes": 26,
+      "summary": "# Demo Call with Yazhou Ye from\nDate: 2026-11-03 | Duration: 26m\n\n## Summary\nRakuten’s AI group runs self-hosted GrowthBook on Google Cloud with web and mobile SDKs and approximately 80 users. Its current plaintext SDK payload exposes feature-flag rules containing email addresses and user IDs, which conflicts with company security policy. Remote evaluation was identified as the preferred protection model because rules and sensitive identifiers remain on the server while clients receive only evaluation results. This capability was described as requiring Enterprise, which also includes encryption, hashing, unlimited projects, permission-based controls, custom roles, approval workflows, advanced experimentation features, and dedicated support. Self-hosted Enterprise pricing was introduced at US$50,000 annually, while an estimate for 80 Enterprise users was US$80,000 with possible platform-fee removal and potential discounts. Rakuten will confirm user numbers, budget, and management approval. GrowthBook will share pricing and feature documentation, and a no-cost Enterprise trial remains available.\n\n## Keywords\nRemote evaluation, Self-hosted GrowthBook, Enterprise pricing, Feature flag security, SDK encryption, Rakuten\n\n## Action Items\n**Scott Keller**\nAdd support engineers to Rakuten Slack channel (23:43)\nSend Enterprise-versus-Free comparison (24:15)\nSend Enterprise capability links (24:40)\nSend Enterprise pricing schedule link (16:35)\n\n**Yazhou Ye**\nDiscuss Enterprise pricing (17:55)\nConfirm Rakuten Enterprise user count (24:40)\nConfirm Rakuten Enterprise budget (24:40)",
+      "organizer": "scott.keller@growthbook.io",
       "participants": 2,
       "summary_quality": "good"
     }

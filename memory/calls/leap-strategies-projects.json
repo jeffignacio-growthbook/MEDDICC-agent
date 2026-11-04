@@ -1,7 +1,7 @@
 {
   "company": "Leap Strategies Projects",
   "slug": "leap-strategies-projects",
-  "last_etl_date": "2026-10-21T05:31:34.612369",
+  "last_etl_date": "2026-11-04T07:05:05.232499",
   "calls": [
     {
       "id": "01M06CGEHT3V0YX9VR4TQ6M9FG",
@@ -70,6 +70,17 @@
       "date": "2026-10-20",
       "duration_minutes": 25.149999618530273,
       "summary": "# Leap Strategies Projects Review\nDate: 2026-10-20 | Duration: 25.149999618530273m\n\n## Summary\nThe discussion reviewed mixed results from conferences, with Reinvent remaining the main opportunity. Snowflake attracted data engineers unfamiliar with feature flagging and A/B testing, while smaller expert-led events, customer speakers, and possible Stanford or Berkeley partnerships were considered stronger channels. The Wrap article is nearing completion, with Karen Henke revising AI-generated material and adding findings, customer stories, industry context, and supporting statistics. Podcast growth was identified as requiring external amplification beyond search; the current Listen Notes score is 27, compared with From A to B’s 24. Potential tactics include podcast swaps, guest appearances, recommendations in show notes, outreach to Marketing Trends, and professional growth support. The next meeting will review the Wrap article, Erin’s experimentation nurture cadence, and podcast outreach. Karen received approval to use GrowthBook figures showing 3x higher SEO impressions and 6x higher AI impressions over six months. Ashley Stirrup also offered referral support for Karen’s Databricks application.\n\n## Keywords\nA/B testing, podcast growth, SEO content, experimentation nurture, Databricks application, conference strategy\n\n## Action Items\n**Karen Henke**\nFinish Wrap article (12:24)\nComplete experimentation nurture sequence (12:24)\nShare podcast landscape tracker (12:45)\nSend completed articles (13:44)\nDraft recommendation blurb (15:09)\n\n**Ashley Stirrup**\nContact Rick Schultz (15:09)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M5YVV3T40RH35903AEJS7TAR",
+      "source": "fireflies",
+      "title": "Leap Strategies Projects Review",
+      "date": "2026-11-03",
+      "duration_minutes": 33.849998474121094,
+      "summary": "# Leap Strategies Projects Review\nDate: 2026-11-03 | Duration: 33.849998474121094m\n\n## Summary\nSourceForge updates included approving a $40 monthly starting price, keeping pricing details broad, confirming virtual training, no phone support for premium editions, on-premise support, and broad platform coverage. Integration, category, regional, competitor, and feature selections still require validation, while revised technical descriptions were targeted for publication and paid features were deferred pending more reviews and referral evidence. Content work covered visual-editor pages, version 5.2 videos, LinkedIn posts, podcast assets, and customer webinars. The podcast strategy is shifting toward customer relationships, case studies, webinars, product feedback, and experimentation themes, including AI. The discussion also addressed scalable content workflows, limited capacity for new AI tools, the need for stronger editorial direction, and an AI-generated enterprise-pricing request that showed how customer communications may increasingly originate from AI.\n\n## Keywords\nSourceForge listing, A/B testing, Podcast marketing, AI experimentation, LinkedIn content, Customer case studies\n\n## Action Items\n**Karen Henke**\n- Update GrowthBook’s SourceForge listing (03:29)\n- Validate SourceForge integrations (06:52)\n- Review SourceForge regional filters (07:58)\n- Review SourceForge competitors (09:12)\n- Change SourceForge primary category (10:17)\n- Check SourceForge education category (12:39)\n- Complete SourceForge listing (15:37)\n- Revise LinkedIn posts (19:13)\n- Revise visual-editor page (20:02)\n- Refresh GrowthBook 5.2 website content (21:21)\n- Connect with Lindsay (21:40)\n- Identify webinar YouTube improvement workflow (30:06)\n\n**Ashley Stirrup**\n- Trial Fame (21:57)\n- Read Leaf Diaries article (32:25)",
       "organizer": "ashley@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

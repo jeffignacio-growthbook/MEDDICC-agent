@@ -1,0 +1,18 @@
+{
+  "company": "Simplify Onboarding and",
+  "slug": "simplify-onboarding-and",
+  "last_etl_date": "2026-11-04T07:05:05.234035",
+  "calls": [
+    {
+      "id": "01M6HH8TFF2TC8R9PVSHZEERDS",
+      "source": "fireflies",
+      "title": "Simplify Onboarding and Expand Demo Access",
+      "date": "2026-11-03",
+      "duration_minutes": 28.190000534057617,
+      "summary": "# Simplify Onboarding and Expand Demo Access\nDate: 2026-11-03 | Duration: 28.190000534057617m\n\n## Summary\nThe team discussed simplifying the onboarding wizard by removing the separate SDK step because the wizard already determines the setup path, while keeping manual setup available but less prominent. The wizard should become the default path after signup, be discoverable from marketing pages and app entry points, and adapt guidance for engineers, product managers, and data scientists. The experience should identify codebase access early, offering installation into an existing application for users with access or a generated demo project for others. Proposed demos included a local Next.js-style starter app, a logged-out marketing demo with sample experiments and metrics, and an interactive feature-flag demo that shows application changes without login or setup. The team also considered reusing setup tracking, code scanning, and telemetry, using a managed warehouse for live demo data, and hosting a standalone demo repository. Guy will continue wizard improvements and collaborate with Gabe, while Michael showed interest in the demo environment, Jeremy considered independent prototypes, and a review of demo concepts was planned for next week.\n\n## Keywords\nWizard onboarding, Demo environment, Feature flags, SDK setup, Marketing site, Product personalisation\n\n## Action Items\n**Guy Langford-lee**\nCreate mock-up of role-based wizard flow (06:47)\nImprove wizard experience (23:04)\nCollaborate on onboarding design (25:22)\n\n**Gabe Melean**\nCollaborate on onboarding design (25:22)\n\n**Jeremy Dorn**\nSchedule follow-up discussion (27:05)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Alex Xi and",
+  "slug": "alex-xi-and",
+  "last_etl_date": "2026-11-04T07:05:05.232043",
+  "calls": [
+    {
+      "id": "01M6CXDA5FAWQRVH658SB51H9F",
+      "source": "fireflies",
+      "title": "Alex Xi and Ashley Stirrup",
+      "date": "2026-11-03",
+      "duration_minutes": 16.360000610351562,
+      "summary": "# Alex Xi and Ashley Stirrup\nDate: 2026-11-03 | Duration: 16.360000610351562m\n\n## Summary\nFlow GPT reported continued growth, reaching 3 million daily active users and 3 trillion tokens, while shifting from marketplace positioning toward a direct-to-consumer mobile content platform. The company has more than 100 employees in China and approximately 5–10 in the United States. GrowthBook has been used since mid-2023 by roughly 100 people, and the team returned to it after evaluating Statsig because integrated event tracking was not required and GrowthBook’s traffic adjustment and user experience were considered more intuitive. The team runs about 100 experiments monthly to evaluate models, allocate traffic across user groups, and improve model preference, usage, duration, and retention. Its technical environment includes native Swift and Kotlin mobile apps, internal analytics agents, and a self-hosted StarRocks warehouse. GrowthBook also supports model rollout and traffic management. Ashley Stirrup will draft a customer-story article using website and blog materials, which Alex Xi will review.\n\n## Keywords\nGrowthBook, A/B testing, feature flags, model experimentation, FlowGPT, traffic allocation\n\n## Action Items\n**Ashley Stirrup**\nReview FlowGPT website and blog (15:06)\nPrepare draft article (15:06)\n\n**Alex Xi**\nReview draft article (15:19)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

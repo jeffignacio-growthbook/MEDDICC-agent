@@ -1,0 +1,18 @@
+{
+  "company": "Onboarding Flow",
+  "slug": "onboarding-flow",
+  "last_etl_date": "2026-11-04T07:05:05.234111",
+  "calls": [
+    {
+      "id": "01M6EYRD1FRA83W9B7HPJKP1DK",
+      "source": "fireflies",
+      "title": "Onboarding Flow",
+      "date": "2026-11-03",
+      "duration_minutes": 50.119998931884766,
+      "summary": "# Onboarding Flow\nDate: 2026-11-03 | Duration: 50.119998931884766m\n\n## Summary\nThe discussion covered funnel performance, onboarding design, data quality, and the demo experience. Onboarding completion is improving across cohorts, but most conversions remain below 15%, while data-source conversion exceeds 50%. Draft counts appear inconsistent, indicating a data-quality issue requiring attention. Usage intent does not consistently lead to follow-through, and setup paths should be explicit. Role-based onboarding flows remain under consideration. The proposed experience places a frictionless demo before onboarding setup, with a demo environment capable of supporting real-time data. Michael owns the marketing-linked demo, while Guy and Gabe are associated with wizard-design polish. A prototype review is planned for next week.\n\n## Keywords\nOnboarding wizard, Activation funnel, SDK integration, Interactive product demo, Persona-based onboarding, Feature flags\n\n## Action Items\n**Jeremy Dorn**\nInvestigate run metadata (01:50)\nReview onboarding timing (02:19)\nAnalyse data-source funnel (08:32)\nClarify SDK metric (09:30)\nRecreate onboarding screenshots (16:50)\nReconvene prototype review (48:51)\n\n**Guy Langford-lee**\nVerify onboarding title requirement (04:50)\nCreate persona onboarding mockups (28:33)\nImprove onboarding wizard flow (44:51)\nPolish wizard onboarding design (47:08)\n\n**Michael Knowlton**\nCapture onboarding screenshots (19:15)\nPrototype interactive demo environment (45:17)\n\n**Gabe Melean**\nCapture onboarding screenshots (19:29)\nPrototype interactive demos (45:55)\nPolish wizard onboarding design (47:08)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}
