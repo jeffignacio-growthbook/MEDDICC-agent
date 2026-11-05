@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook <> Talbots",
   "slug": "growthbook-talbots",
-  "last_etl_date": "2026-11-03T07:23:32.477970",
+  "last_etl_date": "2026-11-05T07:32:46.022844",
   "calls": [
     {
       "id": "01M69PZQWXPJ3CA0G7NTQKPTQ7",
@@ -12,6 +12,17 @@
       "summary": "# GrowthBook <> Talbots - Intro\nDate: 2026-11-02 | Duration: 32.54999923706055m\n\n## Summary\nTalbots is evaluating GrowthBook as an alternative to Adobe Target while consolidating analytics around Snowflake. Adam leads the testing program and owns the Tealium tag-management implementation; the team wants to preserve testing, personalization, hot fixes, and temporary fixes while keeping experiment assets in company-controlled Salesforce infrastructure. GrowthBook’s warehouse-native Snowflake compatibility, Visual Editor, custom JavaScript and CSS injection, audiences, namespaces, allocation controls, QA overrides, and flicker-mitigation options appeared aligned with the primary need for testing decisioning rather than full platform adoption. The proposed deployment would use GrowthBook for authoring and decisioning while Salesforce hosts generated assets and settings files. Open questions concern direct JavaScript serving outside the Visual Editor and webhook-based file updates to Salesforce. A longer Wednesday session from 11:00 to 12:00 was planned to review the Visual Editor, namespaces, audiences, QA, and deployment behavior.\n\n## Keywords\nSnowflake experimentation, Adobe Target migration, Self-hosted SDK, Visual Editor, Audience targeting, Experiment namespaces\n\n## Action Items\n**Logan Bates**\nDiscuss GrowthBook support (20:26)\n\n**Dan Wathne**\nConduct Wednesday demonstration (30:03)\nSend calendar invitation (30:37)\nSend discovery recap (30:37)\nProvide pre-meeting documents (30:37)",
       "organizer": "dan@growthbook.io",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6EKENC3730NQ8R2D19DJH71",
+      "source": "fireflies",
+      "title": "GrowthBook <> Talbots - Demo",
+      "date": "2026-11-04",
+      "duration_minutes": 67.7699966430664,
+      "summary": "# GrowthBook <> Talbots - Demo\nDate: 2026-11-04 | Duration: 67.7699966430664m\n\n## Summary\nLeadership is exploring an Adobe exit, while the contract timeline remains unknown and may range from one to three years. GrowthBook was presented as a warehouse-native experimentation platform operating directly with Snowflake, with feature flagging and experimentation as its core focus. It supports production hotfixes, audience targeting, configurable rollouts, automatic rollback, QA, approvals, audit history, and role-based access. Existing Tealium data flows into Snowflake, while SDK attributes and exposure tracking appear compatible with the expected implementation. Namespaces, deterministic bucketing, and holdouts help prevent overlapping tests, preserve assignments, and maintain control populations. Reporting can use warehouse metrics, Bayesian comparisons, and funnel analysis. Jira and Microsoft Teams requirements still need validation. The holiday code freeze prevents live integration until January, although dummy-data evaluation remains possible. Next steps include confirming Adobe timing, involving analytics and product stakeholders, and potentially running a two-week trial.\n\n## Keywords\nGrowthBook, Feature flags, Warehouse-native experimentation, Snowflake, Experiment namespaces, Visual editor\n\n## Action Items\n**Logan Bates**\nSend Talbots demonstration video (24:26)\nTest visual editor compatibility (50:39)\n\n**Adam Goodrich**\nTest feature-flag workflows (58:41)\nValidate SDK integration (01:04:44)\n\n**Dan Wathne**\nDevelop pricing estimate (01:00:11)\nArrange follow-up demonstration (01:00:41)\nPrepare trial environment (01:00:41)\n\n**Phil Studley**\nCoordinate stakeholder participation (01:00:41)\nDiscuss evaluation internally (01:02:22)\nDetermine Adobe contract end date (01:03:31)",
+      "organizer": "dan@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]

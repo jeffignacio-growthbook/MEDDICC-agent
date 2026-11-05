@@ -1,0 +1,18 @@
+{
+  "company": "Eurecia & GrowthBook",
+  "slug": "eurecia-growthbook",
+  "last_etl_date": "2026-11-05T07:32:46.023433",
+  "calls": [
+    {
+      "id": "01M66TQSKR01NN81QABW3BASHE",
+      "source": "fireflies",
+      "title": "Eurecia & GrowthBook | First Meeting",
+      "date": "2026-11-04",
+      "duration_minutes": 39,
+      "summary": "# Eurecia & GrowthBook | First Meeting\nDate: 2026-11-04 | Duration: 39m\n\n## Summary\nThe organization currently uses a self-hosted feature-flagging tool for 40–45 users, with no plans for experimentation; feature flagging remains core. Cloud migration is being considered to reduce maintenance, with cloud hosting preferred, but security auditing and stronger governance are key requirements. The evaluation covers project and multi-organization separation, environment controls, role-based access, approval workflows, and ramp-up schedules. Enterprise pricing is a concern because the user count requires procurement and management justification, although included governance support, potential CDN cost efficiency, and a possible multi-year agreement may improve the business case. Marcel will conduct an internal pricing review, consult management, and prepare an offer targeted for Friday. Procurement and management review will follow, and no supplier-side deadline has been identified.\n\n## Keywords\nFeature flags, Governance, Security auditing, Cloud hosting, Role-based access, Enterprise pricing\n\n## Action Items\n**Marcel Geldner**\n- Review Eurecia requirements (09:17)\n- Prepare commercial offer (27:41)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

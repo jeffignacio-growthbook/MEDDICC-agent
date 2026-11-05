@@ -1,0 +1,18 @@
+{
+  "company": "5.2 sales enablement",
+  "slug": "5-2-sales-enablement",
+  "last_etl_date": "2026-11-05T07:32:46.022470",
+  "calls": [
+    {
+      "id": "01M5ZX5R6SZH7GS7SA59KJN42A",
+      "source": "fireflies",
+      "title": "5.2 sales enablement",
+      "date": "2026-11-04",
+      "duration_minutes": 59,
+      "summary": "# 5.2 sales enablement\nDate: 2026-11-04 | Duration: 59m\n\n## Summary\nGrowthBook 5.2 is positioned as a platform for solving difficult experimentation problems while simplifying routine workflows through fewer clicks and decisions. Launch enablement covers core messaging, features, buyer personas, discovery questions, roadmap topics, and field questions. Major capabilities include interleaving for ranking algorithms, human-in-the-loop approvals, agent permissions and attribution, remote saved groups, redesigned experiments and metrics, diagnostics, data onboarding, settings, and warehouse visibility. Interleaving is aimed at recommendation and ranking teams and is described as 50–100 times faster than traditional A/B testing, with a private beta initially focused on selected JavaScript SDKs. Agent governance adds approval gates, narrower token permissions, expiration rules, and audit trails. Enterprise value includes CSV uploads with millions of IDs and warehouse query visibility. Launch assets are being consolidated in Sales Launchpad, while future work includes OpenTelemetry improvements, additional experiment designs, and a January release whose timing remains flexible.\n\n## Keywords\nInterleaving experimentation, Human-in-the-loop agents, Contextual bandits, Experimentation platform UX, Warehouse-native analytics, LLM observability\n\n## Action Items\n**Cary Rakin**\nShare customer and prospect examples with Jake Heier (06:55)\n\n**Elyse Fox**\nExplore customer-facing demonstration (36:47)\nPublish 5.2 enablement materials (44:02)\nShare office-hours recording playlist (44:02)\nCreate enablement materials (44:32)\nPost meeting recording (48:15)\n\n**Ashley Stirrup**\nIdentify design partners (42:37)\nDevelop FlowGPT case study (45:38)\n\n**Dan Wathne**\nReview interleaving blog and use cases (47:32)\n\n**Scott Bailey**\nCreate interleaving one-pager with Elyse Fox (47:50)\nArrange interleaving deep-dive session (48:31)\nArrange agent-permissions deep-dive session (48:31)",
+      "organizer": "elyse@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook & GetAway",
+  "slug": "growthbook-getaway",
+  "last_etl_date": "2026-11-05T07:32:46.022572",
+  "calls": [
+    {
+      "id": "01M6KD20NAWZMNJHC60VWPT3SP",
+      "source": "fireflies",
+      "title": "GrowthBook & GetAway Group",
+      "date": "2026-11-04",
+      "duration_minutes": 25.899999618530273,
+      "summary": "# GrowthBook & GetAway Group\nDate: 2026-11-04 | Duration: 25.899999618530273m\n\n## Summary\nGrowthBook was viewed as a strong fit for GetAway, with cloud deployment preferred if pricing and compliance concerns can be resolved. Cloud Pro was estimated at approximately $22,200 annually, based on 15 seats costing $7,200 per year plus $1,000–$1,200 in monthly usage charges driven by CDN requests, experiments, feature flags, and visitors. Annual costs of $10,000–$15,000 were considered likely workable, while enterprise pricing was discussed at a $30,000 minimum; self-hosting remains an alternative. The architecture would use local SDK evaluation, BigQuery for event analysis, and aggregated results in GrowthBook, without sending experiment assignment identities to GrowthBook servers. Compliance concerns include US hosting, GDPR and PII considerations, EU–US data-transfer validation, and the lack of contractual security arrangements on Pro. James will share the DPA and investigate the enterprise position, while Lars will assess internal approval and offer a HomeToGo product introduction.\n\n## Keywords\nGrowthBook, Feature flags, A/B testing, CDN usage, Self-hosting, GDPR compliance\n\n## Action Items\n**Lars Giere**\nConfirm GetAway contract requirements (11:28)\nIntroduce James to HomeToGo contacts (21:11)\nSend GetAway decision update (22:11)\n\n**James Shannon**\nProvide GetAway standard DPA (12:06)\nEvaluate Enterprise pricing arrangement (22:11)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

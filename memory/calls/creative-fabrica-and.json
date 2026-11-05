@@ -1,0 +1,18 @@
+{
+  "company": "Creative Fabrica and",
+  "slug": "creative-fabrica-and",
+  "last_etl_date": "2026-11-05T07:32:46.023302",
+  "calls": [
+    {
+      "id": "01M675CP0ZVRHPW3BGW4XP20GW",
+      "source": "fireflies",
+      "title": "Creative Fabrica and GrowthBook",
+      "date": "2026-11-04",
+      "duration_minutes": 30.920000076293945,
+      "summary": "# Creative Fabrica and GrowthBook\nDate: 2026-11-04 | Duration: 30.920000076293945m\n\n## Summary\nCreative Fabrica’s new growth engineering team is using GrowthBook to support acquisition experimentation, with future work planned around retention and engagement. Daniel Yefet described experience with LaunchDarkly and discussed connecting GrowthBook to Redshift, where Amplitude events are exported. Pricing-funnel analysis requires a join between anonymous device or session identifiers and registered user IDs to measure trials, subscriptions, coin spending, and downstream value. GrowthBook’s visual editor, API, Figma integration, AI assistant, and Claude MCP skills could support an end-to-end workflow using Microsoft Clarity insights, hypothesis review, Jira, experiment execution, and analysis. AI can assess SRM, guardrails, chance to win, secondary metrics, ship-or-not recommendations, and dashboards. The team is moving from rapid testing toward more systematic learning, although the Learnings feature appears to require Enterprise. The account has 31 Pro seats against a 30-seat limit, and more than three projects may require Enterprise. Pricing, usage, invoices, CDN costs, and project structure will be reviewed during a proposed two-month uncapped evaluation.\n\n## Keywords\nGrowthBook experimentation, Redshift metric integration, Anonymous-to-logged-in tracking, AI experiment workflows, Learnings feature, Enterprise pricing\n\n## Action Items\n**James Shannon**\nValidate Creative Fabrica anonymous-to-logged-in join-table configuration (09:10)\nConfirm Learnings plan requirements (16:03)\nProvide two months of uncapped GrowthBook use (28:22)\nSend follow-up email (29:18)\n\n**Daniel Yefet**\nReview Creative Fabrica CDN usage and project requirements (28:22)\nUpdate Maurits about discussion and Enterprise conversation (29:31)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

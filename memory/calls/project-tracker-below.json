@@ -1,7 +1,7 @@
 {
   "company": "project tracker below",
   "slug": "project-tracker-below",
-  "last_etl_date": "2026-10-29T06:37:21.712044",
+  "last_etl_date": "2026-11-05T07:32:46.019287",
   "calls": [
     {
       "id": "01KG8F03200YR3AA1KR16FG4KR",
@@ -300,6 +300,17 @@
       "date": "2026-10-28",
       "duration_minutes": 36.099998474121094,
       "summary": "# Graham <> Brent GTM weekly meeting (project tracker below)\nDate: 2026-10-28 | Duration: 36.099998474121094m\n\n## Summary\nThe discussion covered an active Woodside home search involving three properties, including two fixers, with fire risk, insurance, repair costs, structural condition, and limited budget flexibility affecting offer strategy. Graham wants an independent contractor walkthrough, while Brent will locate a trusted contractor. The team identified 56 unpaid active Pro accounts that may represent roughly $100K in recoverable revenue, with outreach and account segmentation planned. Pricing remains unresolved ahead of a board meeting, with hybrid seats and consumption, warehouse-native add-ons, usage metrics, and possible Pro price increases under consideration. GTM hiring is progressing through Ella and potential sales-engineering candidate Chris Claus. The team also launched an AI-focused outbound sequence, is reviewing Jake’s opportunity generation and pipeline quality, and is cleaning reporting through Jeff Ignacio.\n\n## Keywords\nPricing strategy, Warehouse-native, Customer recovery, Enterprise upsell, Outbound pipeline, Property renovation\n\n## Action Items\n**Brent Holloway**\nSend Revenera session notes (15:16)\nLocate contractor contact information (27:56)",
+      "organizer": "graham@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M61PJY71WZVF0FS2N10AQ52S",
+      "source": "fireflies",
+      "title": "Graham <> Brent GTM weekly meeting (project tracker below)",
+      "date": "2026-11-04",
+      "duration_minutes": 34.70000076293945,
+      "summary": "# Graham <> Brent GTM weekly meeting (project tracker below)\nDate: 2026-11-04 | Duration: 34.70000076293945m\n\n## Summary\nEnterprise revenue grew 150% year over year, adding $2.2 million including Pro, while Pro grew about 12% quarter over quarter and added roughly $20K MRR. A potential Series B could occur in January or February, with Anthropic viewed as a strong fundraising narrative and a preference not to exceed 10% dilution. Board preparation will cover international performance, ACVs, retention trends, financial targets, pricing, and fundraising options. Predictable pricing remains important, but warehouse-native monetization is unresolved; a premium fee of $20 per user was discussed. Sales planning focused on rep productivity, quota attainment, AI-enabled selling, and stronger incentives. The company is refining ICP targeting around approximately 120 enriched accounts, while exploring automatic optimization, expansion toward PostHog and Datadog, and startup enterprise-sales advisory services.\n\n## Keywords\nFundraising, Pricing strategy, International expansion, Sales productivity, AI go-to-market, SaaS metrics\n\n## Action Items\n**Brent Holloway**\nPrepare international performance breakdown (10:24)\nAnalyse ACV trends (21:25)\nProvide NRR-like expansion trend (21:43)\nAnalyse performance by industry and funding stage (23:01)\nAnalyse website-traffic performance (23:01)\nResearch Front Runner (28:18)\nValidate AI-driven sales productivity claims (28:18)\n\n**Graham McNicoll**\nBegin preparing board meeting deck (26:55)\nShare board deck changes (26:55)\nSend Front Runner URL (28:15)",
       "organizer": "graham@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

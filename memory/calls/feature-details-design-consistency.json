@@ -1,0 +1,18 @@
+{
+  "company": "Feature Details Design/Consistency",
+  "slug": "feature-details-design-consistency",
+  "last_etl_date": "2026-11-05T07:32:46.022327",
+  "calls": [
+    {
+      "id": "01M6H9WD35V7T5G1FNCQG80JK0",
+      "source": "fireflies",
+      "title": "Feature Details Design/Consistency Sync",
+      "date": "2026-11-04",
+      "duration_minutes": 29.729999542236328,
+      "summary": "# Feature Details Design/Consistency Sync\nDate: 2026-11-04 | Duration: 29.729999542236328m\n\n## Summary\nJohnny’s feature work moved files after a Claude migration broke the UI, and a UI audit is underway while the feature page remains incomplete. The sidebar needs reevaluation, and rules actions require review. The group discouraged broad inline editing because complex changes need dedicated surfaces, preferring separate experiences for targeting and descriptions while avoiding nested revision systems and excessive modal complexity. The staging ribbon may be removed because most saves enter drafts, although it supports some less common flows. Navigation changes should be incremental, with a sticky header supporting rule navigation and visibility of the current environment. Draft status needs clearer treatment, and comments may receive contextual markers while retaining a sidebar list. The revision picker needs redesign for organizations with thousands of revisions, and saving should allow users to choose a new or existing revision, though merge conflicts remain unresolved. Gabe and Johnny will align on the chrome direction, Johnny will update the feature proposal, and Bryce will share offline design materials.\n\n## Keywords\nFeature-page redesign, Revision workflows, Inline editing, Draft/live context, CTA placement, Experiment flags\n\n## Action Items\n**Johnny Martinez**\nRepair feature-page UI (05:06)\nDefine page Chrome direction (27:43)\nResolve primary feature CTAs (27:43)\n\n**Guy Langford-lee**\nAdvance SDK stories (22:44)\n\n**Bryce Fitzsimons**\nShare lock-based proposal (26:45)\nHandle design discussions (28:06)\nProvide design walkthrough (28:19)\n\n**Gabe Melean**\nCoordinate Chrome and CTA direction (27:43)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

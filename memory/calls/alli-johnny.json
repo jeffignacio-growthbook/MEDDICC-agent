@@ -1,0 +1,18 @@
+{
+  "company": "Alli / Johnny",
+  "slug": "alli-johnny",
+  "last_etl_date": "2026-11-05T07:32:46.020206",
+  "calls": [
+    {
+      "id": "01M6M4R288T7ZEWW9VGW1AN0TE",
+      "source": "fireflies",
+      "title": "Alli / Johnny / Populations ux",
+      "date": "2026-11-04",
+      "duration_minutes": 30,
+      "summary": "# Alli / Johnny / Populations ux\nDate: 2026-11-04 | Duration: 30m\n\n## Summary\nThe discussion finalized core UI decisions for grouped metrics and related controls. Populations should remain grouped, while Add Metric should sit below the metrics container to match production. Each metric will have its own Show As radio selection, using the design-system component rather than a dropdown or segmented control. Mean metrics support Event Totals or Per User ID, while proportion metrics support Unit Count or Percentage Of Population. Mixed displays should use dual Y-axes, and percentage tooltips should show the supporting fraction before the percentage; long labels should wrap. Identifier Type should be separated from per-metric controls, and incompatible populations should be omitted because metrics and populations must reference the same fact table. Feature-flag states require different layouts. Definition links are considered valuable, but their icon, text, placement, and long-title handling remain unresolved. Alli Leong will refine implementation and spacing, while Johnny Martinez will explore definition-link treatments.\n\n## Keywords\nMetric grouping, Radio buttons, Dual Y-axes, Tooltip design, Population selector, Identifier type\n\n## Action Items\n**Alli Leong**\nRemove excess borders around metric groups (01:27)\nKeep Add metric outside metrics grouping (05:07)\nMove Show as into metric controls (06:10)\nReplace Show as control with radio group (12:42)\nUpdate tooltip presentation (18:56)\nRemove incompatible populations (22:20)\nSupport identifier-selector feature-flag states (23:07)\nCheck metric-definition link changes with Nat (29:37)\n\n**Johnny Martinez**\nReview identifier type treatment (23:50)\nCreate alternative metric-definition link treatments (28:45)\nFollow up on metric-definition link guidance (29:17)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
-  "company": "Taxfix<>GrowthBook",
+  "company": "Taxfix & GrowthBook",
   "slug": "taxfix-growthbook",
-  "last_etl_date": "2026-08-05T15:57:31.319609",
+  "last_etl_date": "2026-11-05T07:32:46.023160",
   "calls": [
     {
       "id": "69dd0d4f0d5066001d29bab8",
@@ -11,7 +11,19 @@
       "duration_minutes": 35,
       "summary": "[Summary failed] [Logan Bates]: Hello.\n[Jake Heier]: How's it going? Hey, Anna.\n[Anna Barnett]: Hello.\n[Jake Heier]: How was your weekend?\n[Anna Barnett]: It was nice. There's one day of sun, so it always gets very ex",
       "host": "Jake Heier",
-      "participants": 7
+      "participants": 7,
+      "summary_quality": "corrupted"
+    },
+    {
+      "id": "01M6EWTA5JQBHNWEVTR53M7VQ5",
+      "source": "fireflies",
+      "title": "Taxfix & GrowthBook Eppo Importer",
+      "date": "2026-11-04",
+      "duration_minutes": 95.31999969482422,
+      "summary": "# Taxfix & GrowthBook Eppo Importer\nDate: 2026-11-04 | Duration: 95.31999969482422m\n\n## Summary\nTaxfix reviewed its experimentation strategy after abandoning the importer migration, while retaining manual exports for historical metrics and conclusions. The company is moving toward an AI-first model in which builders own engineering, design, experimentation, and conclusions, while the Data Team builds supporting tools. An internal agent has created the first experiment plan and is being adapted to launch feature flags and experiments through GrowthBook skills. Discussions covered API-change monitoring, wrapping official GrowthBook skills, GitHub monitoring, and support for a sample-size calculator. Access planning focused on confirming SSO, automatic provisioning, read-only defaults, and project-based write permissions. The group also clarified project structure, SDK assignment identifiers, anonymous-to-logged-in transitions, sticky bucketing, experiment exposure rules, fact-table visibility, metric sources, warehouse costs, and analytics integrations. Training will cover feature flags, experiment linkage, hashing, data sources, metrics, and results, followed by GrowthBook and agent enablement. Follow-ups include API roadmap checks, calculator support, fact-table investigation, and SSO confirmation.\n\n## Keywords\nGrowthBook, Experimentation agent, Feature flags, Sticky bucketing, Snowflake analytics, SSO provisioning\n\n## Action Items\n**Chris Sanders**\nCheck GrowthBook roadmap (07:52)\nAsk about sample-size calculation (11:56)\nInvestigate fact-table selector (52:51)\nShare custom Markdown request (01:22:40)\nPrepare GrowthBook training (01:31:37)\n\n**Alyona Skidina**\nCreate Taxfix feature flag (13:59)\nCreate related GrowthBook experiment (13:59)\nConfirm SSO configuration (16:26)\nTest GrowthBook access (18:11)\nPrepare builder enablement sequence (01:32:58)\nRun experimentation agent session (01:32:58)",
+      "organizer": "chris@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
     }
   ]
 }

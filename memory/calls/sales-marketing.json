@@ -1,7 +1,7 @@
 {
-  "company": "Sales <> Marketing",
+  "company": "Sales & Marketing",
   "slug": "sales-marketing",
-  "last_etl_date": "2026-10-29T06:37:21.715955",
+  "last_etl_date": "2026-11-05T07:32:46.021841",
   "calls": [
     {
       "id": "01KPQQ45K217FYJM2D2Y5G20Z5",
@@ -155,6 +155,17 @@
       "summary": "# Sales <> Marketing Sync\nDate: 2026-10-28 | Duration: 20m\n\n## Summary\nProduct-update planning is advancing for GrowthBook, with individual features expected to include monthly activity, descriptions, and getting-started guidance, supported by search and featured highlights. Release coverage still needs confirmation because expectations ranged from version 4.4 onward, while entries appeared to extend through May. Website placement is also unresolved: the page is expected under Resources, but the existing product-releases link still routes to GitHub; Ashley Stirrup will share the page link in the sales channel. AWS re:Invent outreach was prioritized, with a target of at least six pre-booked meetings per attendee. The San Francisco executive dinner has 16 registrants and needs last-minute invitations today ahead of next week’s event, while EMEA registration promotion should continue. Sales was asked to provide known EPO customers and related accounts for ad-targeting audiences. Scott is still awaiting battle-card feedback before finalized materials can be distributed.\n\n## Keywords\nAWS re:Invent, Executive dinners, EPO customer targeting, Product updates, Sales enablement, Battle cards\n\n## Action Items\n**AWS re:Invent attendees**\nUse dedicated AWS re:Invent Slack channel (02:12)\nCoordinate outreach (02:12)\nBook meetings (02:12)\n\n**Sales and Marketing team**\nContinue building registrations (02:12)\nSend invitations (03:00)\nSend EPO account names to Lyndsie Berens (03:00)\nReview sales battle cards (06:32)\nProvide feedback to Scott Keller (06:32)\n\n**Ashley Stirrup**\nShare GrowthBook product updates page link (05:26)",
       "organizer": "lyndsie@growthbook.io",
       "participants": 17,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6ETD5DWR5GG8XM9CP1FJQHN",
+      "source": "fireflies",
+      "title": "Sales & Marketing Funnel Review",
+      "date": "2026-11-04",
+      "duration_minutes": 65,
+      "summary": "# Sales & Marketing Funnel Review\nDate: 2026-11-04 | Duration: 65m\n\n## Summary\nThe team set a $3M new ARR target for the quarter, excluding Anthropic, with a potential company outcome above $20M and roughly 3× year over year. The quarter began with approximately $12M of pipeline, providing 4× coverage, but much of it was early-stage, concentrated in discovery and technical evaluation, and weighted lightly. Sales will treat December 31 as the practical year-end, prioritize November and December opportunities, and use January to continue building results. New business is expected to carry the target because expansion activity is stronger but its upside remains uncertain. Demand-generation priorities include near-term inbound programs, conversion-focused paid campaigns, event-lead reactivation, and AWS re:Invent meetings. The team also proposed customer-led technical programming, discovery-call analysis, and smaller customer sessions such as a Breeze discussion. Pipeline hygiene requires attention, with approximately $1M potentially inactive or overstated, while Christian and Dan’s pipelines received particular scrutiny. EMEA capacity and expansion coverage will also be reviewed.\n\n## Keywords\nSales pipeline, ARR target, Lead generation, AWS re:Invent, CRM hygiene, Demand generation\n\n## Action Items\n**Ryan McGurk**\nSet internal quarterly target (02:34)\nOrganise pipeline brainstorming session (23:03)\nMeet with Christian to review pipeline (22:33)\n\n**Unassigned**\nReview Omni conversion opportunity (09:12)\n\n**Jeff Ignacio**\nCollect sales representatives’ forecasts (18:33)\nReview overall pipeline (19:02)\n\n**Lyndsie Berens**\nReview conversion-focused advertising opportunities (23:40)\nShare AWS re:Invent outreach resources (24:22)\n\n**Ashley Stirrup**\nJoin pipeline brainstorming session (25:26)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

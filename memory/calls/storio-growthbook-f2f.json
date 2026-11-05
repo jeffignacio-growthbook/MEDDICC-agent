@@ -1,0 +1,18 @@
+{
+  "company": "Storio/Growthbook F2F",
+  "slug": "storio-growthbook-f2f",
+  "last_etl_date": "2026-11-05T07:32:46.023526",
+  "calls": [
+    {
+      "id": "01M6E108T5T4E24JM6N96D7MF7",
+      "source": "fireflies",
+      "title": "Storio/Growthbook F2F",
+      "date": "2026-11-04",
+      "duration_minutes": 61.81999969482422,
+      "summary": "# Storio/Growthbook F2F\nDate: 2026-11-04 | Duration: 61.81999969482422m\n\n## Summary\nThe discussion focused on clarifying GrowthBook’s capabilities, contract sequencing, pilot requirements, and potential strategic partnership. GrowthBook presented its warehouse-native model, with exposure data sent to Snowflake while internal data platforms calculate trusted metrics. Feature flags, experimentation, product analytics, APIs, and AI workflows could help product teams operate more independently and reduce reliance on the central CRO team. The main technical blocker is building clean, trusted Snowflake metric tables, including future anonymous-to-authenticated identity joins. The proof of concept is expected to run through early-to-mid January, followed by a January go/no-go decision. Success criteria should include non-CRO teams running, analyzing, and deciding on experiments independently. Commercial terms included a €180,000 annual license and €25,000 for 50 experiments, while seat-based pricing was proposed to avoid limiting experimentation. Broader opportunities include centralizing experiment knowledge, developing an experimentation culture, and testing pricing and promotions. The discussion also referenced €340 million in annual revenue, 90 million website visitors, and an estimated €340,000 annual value from a 0.1% metric improvement.\n\n## Keywords\nGrowthBook, Experimentation platform, Snowflake analytics, Product analytics, Feature flags, Pricing and promotions\n\n## Action Items\n**Vidhya Karthikeyan**\nPrepare trusted Snowflake fact tables (25:19)\nAssess anonymous visitor ID joining (30:54)\n\n**Storio product and data teams**\nEstablish trusted product metrics (28:13)\n\n**GrowthBook implementation team**\nRun POC kickoff (39:56)\nDeliver experimentation training (40:29)\n\n**Emanuele Pane**\nDefine POC success outcomes (40:47)\nGather stakeholder input (43:14)\nClarify commercial path (57:43)\n\n**Michele Swaine**\nReview POC decision criteria (42:41)\n\n**Emily Simpson**\nProvide commercial structures (35:47)\nArrange customer references (46:09)\nProvide experimentation mindset document (54:12)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}

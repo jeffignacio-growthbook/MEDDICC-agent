@@ -1,0 +1,18 @@
+{
+  "company": "Non-Production QA Targeting",
+  "slug": "non-production-qa-targeting",
+  "last_etl_date": "2026-11-05T07:32:46.020076",
+  "calls": [
+    {
+      "id": "01M6MCWK6W6RSYYFB2HJADBPAM",
+      "source": "fireflies",
+      "title": "Non-Production QA Targeting and Safety",
+      "date": "2026-11-04",
+      "duration_minutes": 43.88999938964844,
+      "summary": "# Non-Production QA Targeting and Safety\nDate: 2026-11-04 | Duration: 43.88999938964844m\n\n## Summary\nThe proposed QA flow starts with environment-first selection, with optional filters for saved groups, conditions, SDK connections, identifiers, and possibly projects. QA should support testing across everyone in an environment, forced variations, and random assignment, while keeping environment targeting separate from experiment targeting. Production classification will be added, with unknown environments treated as production by default and production QA overrides blocked initially. Experiment seeds remain unchanged, distinct QA keys prevent collisions, and forced variations use 0/1 allocation so exposure paths are preserved. QA must not bypass linked-feature enablement or approval requirements, and complex flag dependencies may remain unsupported. The first version will stay narrow, focus on non-production QA, and defer full results handling and broader feature-flag override capabilities. Teresa Yung will revise the design for review, while Bryce Fitzsimons proposed staging drafts and linking users to approval when required.\n\n## Keywords\nQA overrides, Environment targeting, Production classification, Experiment payloads, Feature flag approvals, Experiment exposure tracking\n\n## Action Items\n**Teresa Yung**\nAdd production classification field (10:30)\nMigrate existing environment classifications (10:09)\nRevise QA override design (14:05)\nImplement QA override flow (42:09)\n\n**Unassigned**\nBlock QA overrides for production environments (11:44)\nAdd production status toggle (13:21)\nPreserve experiment seed (16:15)\nGenerate distinct QA experiment key (20:18)\nRequire feature flag enablement (34:08)\nSupport ordered QA override rules (40:16)\nReview initial implementation (42:09)",
+      "organizer": "luke@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

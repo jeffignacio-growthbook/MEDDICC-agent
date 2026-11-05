@@ -1,7 +1,7 @@
 {
   "company": "Ashley / Lyndsie",
   "slug": "ashley-lyndsie",
-  "last_etl_date": "2026-10-29T06:37:21.714055",
+  "last_etl_date": "2026-11-05T07:32:46.020572",
   "calls": [
     {
       "id": "01KS3K8R6C61N54NZMFAVEMKH6",
@@ -58,6 +58,17 @@
       "date": "2026-10-28",
       "duration_minutes": 41,
       "summary": "# Ashley / Lyndsie Weekly\nDate: 2026-10-28 | Duration: 41m\n\n## Summary\nThe discussion covered reducing event volume after lukewarm feedback on an AI conference sponsorship, with focus shifting toward stronger opportunities. Webinar outreach remains challenging, but Merritt from Breeze was identified as a promising speaker for a webinar targeted for the third week of January, with promotion beginning around mid-December; outreach to Wikimedia and ClickHouse continues. Season One content may be repackaged into selected gated and ungated resources, but a full campaign is not yet ready, and Lyndsie will clarify scope and ownership with Karen. HubSpot license-data integration remains a priority, including fields for seats, CTUs, plan, trial, cloud, air-gapped, and expired status, but organization matching is blocked by parent-child accounts and duplicates. Accurate data is needed to distinguish enterprise, pro, and free customers. About 900 duplicates require cautious cleanup, while account hierarchy, naming, ownership, and governance rules remain unresolved. RevOps hiring is desired but unfunded.\n\n## Keywords\nHubSpot deduplication, Parent-child accounts, Licence data integration, Revenue operations, Webinar planning, Event sponsorships\n\n## Action Items\n**Lyndsie Berens**\n- Investigate event outreach (02:04)\n- Defer Reach Desk initiative (03:47)\n- Schedule Wikimedia discussion (04:35)\n- Propose webinar format (05:07)\n- Discuss campaign proposal (08:45)\n- Follow up on account deduplication (27:25)\n- Share deduplication plan (31:08)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6FF0CNC0E3WGMAN6XVJ4CJ7",
+      "source": "fireflies",
+      "title": "Ashley / Lyndsie Weekly",
+      "date": "2026-11-04",
+      "duration_minutes": 29.059999465942383,
+      "summary": "# Ashley / Lyndsie Weekly\nDate: 2026-11-04 | Duration: 29.059999465942383m\n\n## Summary\nThe discussion examined pipeline reliability, reporting, growth targets, and demand generation. A Discovery deal aged 1,300 days and a Vanguard Group deal created in 2022 raised concerns about stale records distorting forecasts. Participants questioned inconsistent stage conversion rates, unclear historical baselines, and missing qualification fields such as an identified economic buyer. HubSpot-linked reporting was requested to show deal counts, representatives, stage history, and average time in each stage. The group also discussed setting quarterly pipeline targets using Jeff’s historical close-rate spreadsheet, while noting uncertainty about reaching 32 next year from 16 this year amid weaker Q3 pipeline generation, slowing web traffic, and flat demo requests. Marketing may need to shift from demand capture toward brand awareness and demand creation, including programmatic advertising and a possible one-month increase in Omni spend. Next steps included a pipeline working session, initial HubSpot analysis, CRM cleanup, and clarification of event follow-up and BDR coverage. Source: Pipeline Data Quality, Reporting and CRM, Pipeline Strategy, Demand Generation, and Requests And Next Steps sections.\n\n## Keywords\nPipeline reporting, CRM cleanup, Demand generation, Google Ads, Programmatic advertising, Sales-marketing alignment\n\n## Action Items\n**Lyndsie Berens**\nCreate HubSpot report (14:12)\nCheck Omni impact (23:12)\nContinue demand-generation brainstorming (27:34)\n\n**Ashley Stirrup**\nContinue demand-generation discussion (27:30)",
       "organizer": "lyndsie@growthbook.io",
       "participants": 2,
       "summary_quality": "good"
