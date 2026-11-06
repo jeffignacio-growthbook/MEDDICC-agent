@@ -1,7 +1,7 @@
 {
   "company": "InPost & GrowthBook",
   "slug": "inpost-growthbook",
-  "last_etl_date": "2026-08-18T16:55:06.271198",
+  "last_etl_date": "2026-11-06T07:30:52.830457",
   "calls": [
     {
       "id": "01KYF3N1Y970VYR4T4AACAAC8C",
@@ -17,6 +17,17 @@
       "participant_domains": [
         "inpost.pl"
       ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6ECRNBPPENY6A67E8M2WY5N",
+      "source": "fireflies",
+      "title": "InPost & GrowthBook Kick Off",
+      "date": "2026-11-05",
+      "duration_minutes": 25.450000762939453,
+      "summary": "# InPost & GrowthBook Kick Off\nDate: 2026-11-05 | Duration: 25.450000762939453m\n\n## Summary\nThe team completed a GrowthBook proof of concept and is running an A/A test to validate the statistical engine, data pipeline, event ingestion, and analysis accuracy before broader rollout. Judyta Kraus is the primary experimentation contact, while Anita Krasińska led tool selection and will support regular usage; developers and data engineers will handle SDK implementation, Postgres warehouse connectivity, query validation, and data flow. A developer enablement session will precede broader experimentation training, with Judyta documenting materials for colleagues. The team aims to establish a self-service model for product managers and growth marketing teams. A mobile experiment still shows control exposure after a 100% rollout, likely because Swift and Kotlin SDK payloads may be cached until sessions refresh or application update handling is adjusted. Microsoft Teams access remains unresolved, with email and support tickets as alternatives. Interleaving experiments may later be piloted separately for search, personalization, and recommendation teams.\n\n## Keywords\nExperimentation, A/B testing, Mobile SDK, Postgres, Interleaving experiments, Product enablement\n\n## Action Items\n**Judyta Kraus**\nConsult data engineer (10:07)\nDemonstrate GrowthBook (10:39)\nPrepare internal guidance (10:39)\nDocument experimentation training (17:25)\nCoordinate developer session (18:52)\n\n**Chris Sanders**\nExplain mobile SDK behavior (15:37)\nSend developer session link (18:52)\nSend experimentation session link (18:52)\n\n**Rémy Marin**\nFollow up on proof-of-concept question (19:20)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]

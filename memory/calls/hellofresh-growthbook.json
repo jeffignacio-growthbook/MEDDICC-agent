@@ -1,7 +1,7 @@
 {
   "company": "Hellofresh & GrowthBook",
   "slug": "hellofresh-growthbook",
-  "last_etl_date": "2026-10-30T06:38:14.599445",
+  "last_etl_date": "2026-11-06T07:30:52.825852",
   "calls": [
     {
       "id": "01M5X32KNQV3A3ADPX2EFFE99Z",
@@ -10,6 +10,17 @@
       "date": "2026-10-29",
       "duration_minutes": 20,
       "summary": "# Hellofresh & GrowthBook | Introduction Call\nDate: 2026-10-29 | Duration: 20m\n\n## Summary\nNo summary available",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M64A88QQWXFV0BAPFN30WZS0",
+      "source": "fireflies",
+      "title": "Hellofresh & GrowthBook | Introduction Call",
+      "date": "2026-11-05",
+      "duration_minutes": 27,
+      "summary": "# Hellofresh & GrowthBook | Introduction Call\nDate: 2026-11-05 | Duration: 27m\n\n## Summary\nThe discussion focused on HelloFresh’s evaluation of GrowthBook alongside its current use of Statsig for experimentation and feature flagging. GrowthBook was positioned as a unified workflow for feature flags, experimentation, and product analytics, accessible to data engineers, product managers, and design and UX teams. Its warehouse-centered architecture uses customer-owned data, supports operation within days instead of months, and pushes aggregated results back to the warehouse. Integrations mentioned included Google Analytics, Mixpanel, Segment, and Jira, with access through the UI, experimentation API, MCP, visual editor, and CLI. The experimentation workflow covers hypothesis definition, SDK-connected attributes, control and variation splits, staged rollouts, audience selection, guardrails, and impact monitoring, with AI-assisted setup and analysis also discussed. Nishanth is evaluating the solution internally but is not the final decision-maker, with support and usability identified as priorities. Marcel committed to providing enterprise setup and experiment launch videos, a one-page Statsig comparison, automation-boundary explanations, support details, and examples of simple and complex experiments.\n\n## Keywords\nExperimentation, Feature flagging, Data warehouse, Enterprise implementation, Agentic workflows, Product analytics\n\n## Action Items\n**Nishanth Kadiyala**\nShare GrowthBook TL;DR (01:22)\nInfluence internal conversations (17:09)\n\n**Marcel Geldner**\nProvide MCP capability information (09:32)\nLaunch experiment video (12:36)\nPrepare enterprise setup video (16:21)\nPrepare comparison summary (16:55)",
       "organizer": "marcel@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

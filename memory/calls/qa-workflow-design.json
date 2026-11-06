@@ -1,0 +1,18 @@
+{
+  "company": "QA Workflow design",
+  "slug": "qa-workflow-design",
+  "last_etl_date": "2026-11-06T07:30:52.824725",
+  "calls": [
+    {
+      "id": "01M6PDRSNFHTHRJJ0H2T590VJ5",
+      "source": "fireflies",
+      "title": "QA Workflow design sync",
+      "date": "2026-11-05",
+      "duration_minutes": 16.270000457763672,
+      "summary": "# QA Workflow design sync\nDate: 2026-11-05 | Duration: 16.270000457763672m\n\n## Summary\nThe discussion covered planned backend experiment testing and the need for dev-only environments. QA overrides will support random assignment that mirrors experiment behavior and forced variation testing for a specific variant. Override filters include environment, SDK, and identifier selection, with support for saved groups and projects; the advanced targeting section was removed. Environment work includes backfilling production status, creating a reusable production Boolean, adding a production checkbox for new environments, and merging the backfill before the QA workflow. Launch constraints require the feature flag to be live, block QA overrides before launch, and do not support running experiments. Visual editor changes function similarly. A design pass was requested, screenshots and a branch were provided, Teresa is closing changes today, and QA results are planned for a future project phase.\n\n## Keywords\nQA overrides, Experiment environments, Random assignment, Force variation, Feature flags, Experiment lifecycle\n\n## Action Items\n**Gabe Melean**\nCreate simpler QA Workflow mock-up (02:43)\nReview UI branch (11:23)\nPrioritize QA Workflow design (14:31)\nArrange design review discussion (14:53)\n\n**Teresa Yung**\nComplete environment backfill (08:03)\nMerge QA Workflow implementation (08:03)\nProvide UI screenshots and branch (11:06)\nAdd production-status changes (12:13)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

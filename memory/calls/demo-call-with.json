@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-11-04T07:05:05.236278",
+  "last_etl_date": "2026-11-06T07:30:52.827651",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1203,6 +1203,28 @@
       "summary": "# Demo Call with Yazhou Ye from\nDate: 2026-11-03 | Duration: 26m\n\n## Summary\nRakuten’s AI group runs self-hosted GrowthBook on Google Cloud with web and mobile SDKs and approximately 80 users. Its current plaintext SDK payload exposes feature-flag rules containing email addresses and user IDs, which conflicts with company security policy. Remote evaluation was identified as the preferred protection model because rules and sensitive identifiers remain on the server while clients receive only evaluation results. This capability was described as requiring Enterprise, which also includes encryption, hashing, unlimited projects, permission-based controls, custom roles, approval workflows, advanced experimentation features, and dedicated support. Self-hosted Enterprise pricing was introduced at US$50,000 annually, while an estimate for 80 Enterprise users was US$80,000 with possible platform-fee removal and potential discounts. Rakuten will confirm user numbers, budget, and management approval. GrowthBook will share pricing and feature documentation, and a no-cost Enterprise trial remains available.\n\n## Keywords\nRemote evaluation, Self-hosted GrowthBook, Enterprise pricing, Feature flag security, SDK encryption, Rakuten\n\n## Action Items\n**Scott Keller**\nAdd support engineers to Rakuten Slack channel (23:43)\nSend Enterprise-versus-Free comparison (24:15)\nSend Enterprise capability links (24:40)\nSend Enterprise pricing schedule link (16:35)\n\n**Yazhou Ye**\nDiscuss Enterprise pricing (17:55)\nConfirm Rakuten Enterprise user count (24:40)\nConfirm Rakuten Enterprise budget (24:40)",
       "organizer": "scott.keller@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6K3SH1188TFN33B6GNW4KY9",
+      "source": "fireflies",
+      "title": "Demo Call with Bartosz Figas from Tylko",
+      "date": "2026-11-05",
+      "duration_minutes": 50,
+      "summary": "# Demo Call with Bartosz Figas from Tylko\nDate: 2026-11-05 | Duration: 50m\n\n## Summary\nTylko is migrating to a composable architecture by replacing legacy commerce with CommerceTools and modernizing its CMS. The build-versus-buy decision favors purchasing an external A/B testing solution, with GrowthBook under evaluation to support replatforming, integrate with the experimentation stack, and replace custom code. Michał leads replatforming, Bartosz owns experimentation expertise, and Marcel leads the GrowthBook evaluation. The warehouse remains the source of truth, while GrowthBook returns aggregated results. The platform supports Bayesian and frequentist analysis, goals and guardrails, feature-flag targeting through custom properties, regions, countries, and environments, plus mutual exclusion. Rollouts can be staged by country or traffic percentage, target new sessions, require manual approvals, and use contextual bandits for adaptive allocation. Pro is self-service, while Enterprise adds onboarding, implementation, training, Slack support, SSO, SCIM, and SAML. Pricing is based on platform access rather than traffic. Pricing was requested for 10, 20, and 30 users, with an initial estimate of 10–20 users and migration targeted for Q1.\n\n## Keywords\nGrowthBook, A/B testing, Feature flags, Contextual bandits, Composable architecture, Staged rollout\n\n## Action Items\n**Marcel Geldner**\nShare technical answers (03:27)\nSend discussion summary (33:45)\nProvide platform access (33:45)\nPrepare pricing scenarios (36:00)\n\n**Bartosz Figas**\nProvide user-experience data (30:24)\nEstimate platform users (32:49)\n\n**Michał Kwiatkowski**\nIdentify evaluation stakeholders (32:49)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6H9TS36S75ZYJF82HE96WXQ",
+      "source": "fireflies",
+      "title": "Demo Call with Aristea Klanac from",
+      "date": "2026-11-05",
+      "duration_minutes": 36,
+      "summary": "# Demo Call with Aristea Klanac from\nDate: 2026-11-05 | Duration: 36m\n\n## Summary\nThe company is an Italian online-only outdoor-shading ecommerce brand selling umbrellas and custom-made shading products across 11 language-specific domains using a shared PrestaShop implementation and combined Google Analytics container. Its primary need is a UX/UI-led A/B testing platform that reduces developer dependency. GrowthBook can connect read-only to BigQuery and use Google Analytics data without owning data or using personal information, although initial SDK and warehouse setup requires engineering involvement. Proposed capabilities include visual website experiments, Figma-connected asset updates, flexible metrics such as add-to-cart analysis, feature flags, production and development publishing, configurable rollouts, approvals, and guardrails that detect significant regressions and remove features automatically. The broader platform includes personalization, product analytics, user journey analysis, and global or country-level dashboards. Enterprise packaging includes unlimited experiments and feature flags, onboarding, SAML, a data processing addendum, and European support. A proof of concept, dedicated Slack channel, and solution engineer support were also discussed. Next steps are to exchange technical questions, website details, documentation, commercial materials, and implementation plans before the high season begins in April.\n\n## Keywords\nA/B testing, Feature flagging, Visual editor, BigQuery integration, Proof of concept, Personalisation\n\n## Action Items\n**Marcel Geldner**\nSend presentation materials (00:04)\nSend proof-of-concept terms (18:58)\nSend data-processing addendum (20:02)\nSend customer agreement (20:02)\nShare customer success story (22:29)\nProvide GrowthBook offer (23:57)\nCoordinate follow-up demo (25:34)\n\n**Aristea Klanac**\nInvite Martin to demo (23:26)\nCompile practical demo questions (17:31)\nShare Maanta website link (17:31)\nProvide experimentation use case (25:34)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

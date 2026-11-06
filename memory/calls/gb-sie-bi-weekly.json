@@ -1,7 +1,7 @@
 {
   "company": "GB/SIE Bi-Weekly",
   "slug": "gb-sie-bi-weekly",
-  "last_etl_date": "2026-10-09T06:56:43.733693",
+  "last_etl_date": "2026-11-06T07:30:52.822715",
   "calls": [
     {
       "id": "01KMNXKSATD9F5333X5AADEANS",
@@ -149,6 +149,17 @@
       "date": "2026-10-08",
       "duration_minutes": 32.9900016784668,
       "summary": "# GB/SIE Bi-Weekly\nDate: 2026-10-08 | Duration: 32.9900016784668m\n\n## Summary\nMulti-identifier EAQs have landed, supporting multiple identifier types per EAQ, consolidated exposure tables, and future cluster-randomized experiments. Project scoping is underway to import experiments and create EAQs with permissions kept within projects. Metadata-fetching optimization and improved Snowflake metadata capture were expected to land today, while a GrowthBook dashboard for experiment queries, returned metadata, and rows scanned was targeted for next week. Deterministic analysis windows were prioritized for consistent leadership reporting, with a fixed scheduled cutoff such as 4:00am for a 6:00am update accepted as the initial approach. Luke committed to landing scheduled windows early next week, while complex snapshot selection was deferred. Scheduled results may become the official reporting source, with manual updates retained for ad hoc analysis. UI labels, custom reports, and permission behavior require further review, including a reported case where a read-only user may have been able to update results.\n\n## Keywords\nDeterministic analysis windows, Scheduled versus manual updates, Warehouse observability, Snowflake metadata, Experiment permissions, Dimension breakdown consistency\n\n## Action Items\n**Luke Sonnet**\n- Ship experiment metadata optimisation (04:20)\n- Ship Snowflake metadata capture improvements (04:20)\n- Release query monitoring dashboard (05:47)\n- Check update permission model (27:14)\n- Land deterministic analysis window (29:50)\n- Explore result differentiation (29:50)\n\n**Jiong**\n- Share result representation proposals (28:42)\n\n**Angela Borgman**\n- Share Snowflake meeting outcomes (31:10)",
+      "organizer": "cris@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M62JEVFTB8ZN8XPRJYV3PPTW",
+      "source": "fireflies",
+      "title": "GB/SIE Bi-Weekly",
+      "date": "2026-11-05",
+      "duration_minutes": 36.79999923706055,
+      "summary": "# GB/SIE Bi-Weekly\nDate: 2026-11-05 | Duration: 36.79999923706055m\n\n## Summary\nGrowthBook 5.2 delivered project-scoped EAQs, optimized experiment metadata fetching, and in-line experiment creation with integrated configuration and automatic feature-flag publishing. Data-source observability now shows recent experiment queries, scanned bytes, execution time, responsible users, and fact-table usage, supporting optimization even though complete Snowflake cost allocation remains external. Custom hooks can validate experiment updates through the UI and API, while built-in mandatory variation-key validation and stronger revision and approval controls remain under consideration. GrowthBook is supporting API-first agent integrations, including MCP and skills, with human approval controls for selected actions. Sony identified registry, integrity, natural-language creation, and insight-generation agents. Follow-ups include reviewing query-history pagination, testing new settings and experiment workflows, discussing snapshots, sharing an MCP example, and exploring customer introductions. Sources: Progress Review; Experiment Governance; Cost And Capacity; AI Enablement; Request Callouts; Upcoming Plans.\n\n## Keywords\nExperiment observability, Project-scoped EAQs, Snowflake usage, Custom validation hooks, GrowthBook 5.2, Experimentation AI agents\n\n## Action Items\n**Luke Sonnet**\nVerify read-only usage-tab permissions (09:14)\nCheck customer community status (25:57)\nAsk about bundled agent availability (32:51)\n\n**Jiong**\nDeploy GrowthBook 5.2 (15:18)\nSchedule snapshot discussion with Luke (23:53)\n\n**Angela Borgman**\nGather operator feedback (21:52)\n\n**Cris Dizon**\nFollow up with GrowthBook customers (30:51)",
       "organizer": "cris@growthbook.io",
       "participants": 9,
       "summary_quality": "good"

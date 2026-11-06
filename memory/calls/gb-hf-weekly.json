@@ -1,0 +1,18 @@
+{
+  "company": "GB<>HF Weekly",
+  "slug": "gb-hf-weekly",
+  "last_etl_date": "2026-11-06T07:30:52.822297",
+  "calls": [
+    {
+      "id": "01M6KX0WBPQK4V59J1SZFGJWB6",
+      "source": "fireflies",
+      "title": "GB<>HF Weekly",
+      "date": "2026-11-05",
+      "duration_minutes": 28.149999618530273,
+      "summary": "# GB<>HF Weekly\nDate: 2026-11-05 | Duration: 28.149999618530273m\n\n## Summary\nFocus Lab has begun a few-month rebrand engagement, starting with a two-to-three-week brand audit focused on positioning and future-state direction before website design. Session replay is affecting homepage completion because its SDK blocks loading; delayed loading or temporary removal is being considered while the beta remains limited and development is paused. Blog index performance improved after hidden posts were removed, but search architecture research continues around Webflow limitations, a separate search page, Algolia, and Jet Boost. Usage is passing 400, so a higher bandwidth tier is expected, with image compression assigned to Hien. A CMS-based landing-page system is underway, including reusable structures, cards, drag-and-drop components, and prebuilt patterns, while Figma access and CMS cleanup remain pending. Traffic data dropped after cookie installation in August, prompting an implementation review and simpler banners. Future agendas will be smaller, with attendance based on relevance, and next week’s Omni review creates scheduling conflicts for Ashley and Lyndsie.\n\n## Keywords\nSession replay, Website performance, Blog search, Algolia, CMS landing pages, Cookie analytics\n\n## Action Items\n**Scott Bailey**\nConfirm session replay ownership (07:40)\n\n**Hien Lam**\nResearch search solutions (11:21)\nReview GrowthBook Algolia account (15:08)\nContact Yusuf about image compression (15:25)\nContinue CMS landing-page implementation (16:40)\nCoordinate CMS consolidation (22:40)\nInvestigate cookie measurement effects (24:19)\nPrepare meeting agendas (25:07)\n\n**Lyndsie Berens**\nProvide Figma file access (22:33)\n\n**Matthew Hansen**\nCoordinate CMS consolidation (22:40)\n\n**Unassigned**\nResolve scheduling conflict (25:57)",
+      "organizer": "jack@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

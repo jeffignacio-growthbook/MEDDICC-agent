@@ -1,7 +1,7 @@
 {
   "company": "Ashley / Jake",
   "slug": "ashley-jake",
-  "last_etl_date": "2026-10-30T06:38:14.596847",
+  "last_etl_date": "2026-11-06T07:30:52.823723",
   "calls": [
     {
       "id": "01KJX64F3CR10EZN5PPXSKRA9N",
@@ -201,6 +201,17 @@
       "date": "2026-10-29",
       "duration_minutes": 33.459999084472656,
       "summary": "# Ashley / Jake\nDate: 2026-10-29 | Duration: 33.459999084472656m\n\n## Summary\nThe discussion covered podcast CRM workflows, outbound lead routing, AI BDR preparation, re-engagement, and ABM. Podcast contacts are added to the CRM, but missing email addresses prevent Notion records from syncing to Lovable or HubSpot; Lovable contacts absent from HubSpot should be flagged. Jake’s manageable workload is roughly ten accounts weekly, with A, B, and C scoring intended to route leads to sales, the AI BDR, or marketing nurture. Outreach may shift to seven- or eight-touch sequences over four to five weeks. The AI BDR is not yet running and requires scoring, cleanup, customer exclusions, contact enrichment, and a confirmed delivery cadence. Re-engagement could use an Outbound Owner field and activity-based filtering. Account-level scoring and ABM are prioritized, while marketing warmup, cold-account routing, contact identification, and individual LinkedIn targeting remain to be defined or validated.\n\n## Keywords\nLead scoring, Account-based marketing, AI BDR, Outbound sequencing, HubSpot, Marketing nurture\n\n## Action Items\n**Jake Stangl**\n- Notify Lyndsie about podcast contacts (02:09)\n- Follow up with Tanner (02:11)\n\n**Ashley Stirrup**\n- Change podcast handoff process (02:55)\n- Talk to Aaron about contact lists (13:53)\n- Confirm AI BDR delivery cadence (14:32)\n- Discuss dormant accounts with sales (31:57)\n\n**Lyndsie Berens**\n- Confirm LinkedIn individual targeting (29:04)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M675CP0X6K9MFF3N5TGFN7W6",
+      "source": "fireflies",
+      "title": "Ashley / Jake",
+      "date": "2026-11-05",
+      "duration_minutes": 20.40999984741211,
+      "summary": "# Ashley / Jake\nDate: 2026-11-05 | Duration: 20.40999984741211m\n\n## Summary\nThe team clarified the podcast dashboard scope, including guest statuses, recordings, booking ownership, and registered guests, while prioritizing follow-up for past guests such as Ashley Stirrup, Fanatics, and Chewy. Jake Stangl will add high-potential nonresponsive guests to calling lists, and Ashley Stirrup will review a filtered guest list to reconcile outdated statuses, including Dorothy Kreppen’s record. AWS re:Invent outreach is beginning through existing Apollo sequences, with Lyndsie Berens checking customer attendance and Ashley requesting a Slack announcement. HubSpot MQL integration, testing, deduplication, and data-quality fixes remain underway, with launch estimated at least another week away. Cookie consent will be disabled for broader visitor tracking, conference meetings will use the “Dash Conference” label, and Jake will focus more on calling warmer event contacts. Open-source signals from companies with more than 700 employees are currently performing best.\n\n## Keywords\nPodcast guest follow-up, AWS re:Invent, MQL, HubSpot, Account deduplication, Conference outreach\n\n## Action Items\n**Ashley Stirrup**\nReview podcast guest list (04:23)\n\n**Lyndsie Berens**\nProvide podcast guest list (05:53)\nContact Chris and Andy (10:30)\nGet update from Sean (11:11)\nWork with Jacqueline to deduplicate account data (11:11)\n\n**Jake Stangl**\nBegin AWS re:Invent outreach (08:37)\nCall conference and webinar leads (18:35)",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

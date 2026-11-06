@@ -1,0 +1,18 @@
+{
+  "company": "EGYM Wellpass &",
+  "slug": "egym-wellpass",
+  "last_etl_date": "2026-11-06T07:30:52.830687",
+  "calls": [
+    {
+      "id": "01M66TQSDWSZ3YPTBBFRE4CAQ4",
+      "source": "fireflies",
+      "title": "EGYM Wellpass & GrowthBook | Platform Demo",
+      "date": "2026-11-05",
+      "duration_minutes": 64,
+      "summary": "# EGYM Wellpass & GrowthBook | Platform Demo\nDate: 2026-11-05 | Duration: 64m\n\n## Summary\nThe session demonstrated a sign-up A/B experiment with a 50/50 traffic split and discussed Bayesian analysis, including CUPED and post-stratification, with a Frequentist option also available. Significance settings can be configured globally, per project, or per experiment, while power planning supports user-volume, effect-size, and weeks-to-power calculations. The platform uses a warehouse-native, read-only architecture with reusable metrics, official templates, and auditable SQL. Sticky bucketing preserves assignments when traffic expands, and experiments can span mobile, web, backend, frontend, and edge workers through shared identifiers. Targeting depends on SDK-provided attributes, although attribute categorization is currently limited. Web visual editing supports text, images, CSS, JavaScript, and Figma design-system import, but an SDK is required. Environment-specific SDKs, guardrail metrics, notifications, and automatic feature shutdowns support safer rollouts. Enterprise includes onboarding, training, support, and Slack access; pricing is license- and seat-based, with unlimited experiments, feature flags, and traffic. A recording, commercial discussion, and technical setup follow-up were planned.\n\n## Keywords\nExperimentation platform, Feature flags, Bayesian analysis, Warehouse-native analytics, Gradual rollouts, MCP server\n\n## Action Items\n**Marcel Geldner**\n- Provide GrowthBook access (00:04)\n- Send recording and summary (53:50)\n- Continue commercial follow-up (53:50)\n- Clarify plan options (53:50)\n- Continue technical discussions (53:50)\n\n**Rémy Marin**\n- Provide enterprise cloud skills (03:47)\n- Verify power-analysis chart (14:04)\n- Verify shared metric configuration (38:09)\n- Document identifier requirements (38:09)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    }
+  ]
+}

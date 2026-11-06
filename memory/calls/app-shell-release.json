@@ -1,0 +1,18 @@
+{
+  "company": "App Shell Release",
+  "slug": "app-shell-release",
+  "last_etl_date": "2026-11-06T07:30:52.823286",
+  "calls": [
+    {
+      "id": "01M6HMH4D2K69NZTZQA026G3Q5",
+      "source": "fireflies",
+      "title": "App Shell Release Plan",
+      "date": "2026-11-05",
+      "duration_minutes": 31.049999237060547,
+      "summary": "# App Shell Release Plan\nDate: 2026-11-05 | Duration: 31.049999237060547m\n\n## Summary\nThe app shell redesign preserves existing functionality, uses an expanded sidebar by default, and stores the sidebar state. The docked shell will merge into the main PR, but full-page testing is required before rollout. Profile and organization work remains open: the profile icon needs stronger differentiation, the placement of the multiple-organization selector is unresolved, and the enterprise badge needs a premium treatment. The non-Pylon question mark has been removed. The docked AI panel is the highest priority, while its auto-collapse behavior remains debated. Closing the panel restores the expanded sidebar, and a resizable panel handle has been requested. Validation concerns include bottom-left links obscuring the collapse control, potentially using taller buttons for visibility, workspace constraints from expanded panels, and ensuring that super-admin navigation remains accessible.\n\n## Keywords\nApp shell, Sidebar navigation, Docked AI assistant, Organisation selector, Enterprise badge, Pull request release\n\n## Action Items\n**Gabe Melean**\nSend action-items list (25:17)\nDiscuss crowded layout (25:42)\nVerify super-admin access (28:35)\nShare release plan (28:58)\n\n**Unassigned**\nTest app-shell changes (29:11)\n\n**Adriel Vieira**\nMerge docked assistant shell (29:29)\nClose redundant pull request (29:29)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}
