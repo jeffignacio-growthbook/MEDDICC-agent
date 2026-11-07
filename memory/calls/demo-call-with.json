@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-11-06T07:30:52.827651",
+  "last_etl_date": "2026-11-07T06:43:38.874204",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1225,6 +1225,28 @@
       "summary": "# Demo Call with Aristea Klanac from\nDate: 2026-11-05 | Duration: 36m\n\n## Summary\nThe company is an Italian online-only outdoor-shading ecommerce brand selling umbrellas and custom-made shading products across 11 language-specific domains using a shared PrestaShop implementation and combined Google Analytics container. Its primary need is a UX/UI-led A/B testing platform that reduces developer dependency. GrowthBook can connect read-only to BigQuery and use Google Analytics data without owning data or using personal information, although initial SDK and warehouse setup requires engineering involvement. Proposed capabilities include visual website experiments, Figma-connected asset updates, flexible metrics such as add-to-cart analysis, feature flags, production and development publishing, configurable rollouts, approvals, and guardrails that detect significant regressions and remove features automatically. The broader platform includes personalization, product analytics, user journey analysis, and global or country-level dashboards. Enterprise packaging includes unlimited experiments and feature flags, onboarding, SAML, a data processing addendum, and European support. A proof of concept, dedicated Slack channel, and solution engineer support were also discussed. Next steps are to exchange technical questions, website details, documentation, commercial materials, and implementation plans before the high season begins in April.\n\n## Keywords\nA/B testing, Feature flagging, Visual editor, BigQuery integration, Proof of concept, Personalisation\n\n## Action Items\n**Marcel Geldner**\nSend presentation materials (00:04)\nSend proof-of-concept terms (18:58)\nSend data-processing addendum (20:02)\nSend customer agreement (20:02)\nShare customer success story (22:29)\nProvide GrowthBook offer (23:57)\nCoordinate follow-up demo (25:34)\n\n**Aristea Klanac**\nInvite Martin to demo (23:26)\nCompile practical demo questions (17:31)\nShare Maanta website link (17:31)\nProvide experimentation use case (25:34)",
       "organizer": "marcel@growthbook.io",
       "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6K40ZRQ5K4QHEGMQQZK2PKT",
+      "source": "fireflies",
+      "title": "Demo Call with Adam Ray from",
+      "date": "2026-11-06",
+      "duration_minutes": 11.460000038146973,
+      "summary": "# Demo Call with Adam Ray from\nDate: 2026-11-06 | Duration: 11.460000038146973m\n\n## Summary\nHolly joined in Adam’s place to relay discussion, following a completed GrowthBook planning call where a direct call was preferred and additional topics were considered. Enterprise feedback remained pending while Holly updated Adam. The business independently generates leads for automotive manufacturers including BMW, Mercedes, and Ford, with revenue tied to client budgets and lead volume. Its recently rebuilt internal CMS supports configurable form versions and connects with GrowthBook, while experiment statistics are handled internally. Marketing mix changes can affect test performance and make CRO efficiency and incremental uplift difficult to prove, so holdouts are needed to isolate uplift and exclude confounding effects. Variants, including Cupid, were prioritized, while contextual bandits were deferred. The Pro plan does not provide holdouts, and the feature cannot be purchased separately; Enterprise unlocks holdouts, broader platform functionality, support, onboarding, and advanced features. Pricing discussion covered two users at $1,000 per user annually, with platform costs separate. Holly will consult Adam and provide enterprise feedback to Marcel.\n\n## Keywords\nHoldouts, GrowthBook Enterprise, Conversion-rate optimisation, Configurable CMS, Contextual Bandits, Lead generation\n\n## Action Items\n**Marcel Geldner**\nProvide Holly Enterprise information (00:09)\n\n**Holly Neal**\nExplain holdout packaging (07:47)\nReturn TLA feedback (07:47)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6K21S6NGZP86MRYTZGJCW8P",
+      "source": "fireflies",
+      "title": "Demo Call with Damian Przybyła from Siepomaga.pl",
+      "date": "2026-11-06",
+      "duration_minutes": 20.979999542236328,
+      "summary": "# Demo Call with Damian Przybyła from Siepomaga.pl\nDate: 2026-11-06 | Duration: 20.979999542236328m\n\n## Summary\nFundacja siepomaga, Poland’s largest medical-fundraising platform, is evaluating enterprise GrowthBook capabilities for its 50-person development team and broader compliance requirements. Self-hosting is preferred because the current self-service tier lacks SSO and configuration options, while Google identity integration, stronger controls, onboarding, training, and security governance are required. Cloud hosting remains an alternative, subject to review of GDPR and SaaS differences. An example enterprise benchmark of $1,000 per user annually was discussed, equaling $50,000 for 50 users, but this was not a final quote. Because the organization is an NGO with strict budgets and prioritizes funds for beneficiaries, a 50–60% discount target was identified; a 10–20% discount would be insufficient and even 50% may remain excessive. One annual payment is preferred, while reduced support could lower costs without removing SSO. A possible discount may be linked to an NGO case study and website publication. Marcel will send pricing and security materials, while Damian will brief managers and review the internal decision. Documentation will include GDPR, DPA, SOC 2 Type 2, and penetration-testing information.\n\n## Keywords\nEnterprise pricing, Self-hosting, SSO, GDPR compliance, NGO discount, Case study\n\n## Action Items\n**Marcel Geldner**\nInvestigate Enterprise pricing range (12:57)\nSend Enterprise options email (16:23)\nShare security documentation (16:23)\nProvide Data Processing Agreement (17:08)\n\n**Damian Przybyła**\nAssess case-study participation (15:23)\nBrief managers on Enterprise options (15:55)\nEvaluate Enterprise upgrade viability (15:55)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

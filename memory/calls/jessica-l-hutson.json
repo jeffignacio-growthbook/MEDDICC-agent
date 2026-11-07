@@ -1,0 +1,18 @@
+{
+  "company": "Jessica L Hutson",
+  "slug": "jessica-l-hutson",
+  "last_etl_date": "2026-11-07T06:43:38.872165",
+  "calls": [
+    {
+      "id": "01M6RYM70T6RYYZD7G7DFXY3T0",
+      "source": "fireflies",
+      "title": "Jessica L Hutson and Chris Sanders",
+      "date": "2026-11-06",
+      "duration_minutes": 26.850000381469727,
+      "summary": "# Jessica L Hutson and Chris Sanders\nDate: 2026-11-06 | Duration: 26.850000381469727m\n\n## Summary\nJessica Hutson is now the primary university contact, owning procurement, product strategy, and new-feature coordination, while Andy Marshall manages account needs, finances, complaints, and escalations. Chris Sanders remains the technical counterpart for applications, SDKs, experiments, and data pipelines, with Dan available for part-time technical support. The university has completed its transition from Dev Cycle and product teams now use GrowthBook mainly for production and non-production feature flags. Customer-facing experimentation has not started because several AI product releases await legal approval, although one experiment is already in place. Jessica wants monthly visibility into experiment types, product areas, and decision rationale. GrowthBook analytics capabilities were demonstrated, but differentiation from FullStory, ContentSquare, Google Analytics, and Adobe Analytics requires further review, including possible connectors. Andy and Chris will meet the experimentation designer, reconvene after Veterans Day, and hold monthly account reviews. Activity is expected to increase around Q2, with additional technical support if needed.\n\n## Keywords\nGrowthBook, Feature flags, Experimentation, Product analytics, Customer onboarding, Slack support\n\n## Action Items\n**Chris Sanders**\nGather team feedback on Fireflies or Granola standardization (01:32)\nContact colleague about transcription standardization (01:58)\nHelp onboard designer to GrowthBook experimentation (20:04)\n\n**Jessica Hutson**\nCoordinate follow-up meeting with designer (20:01)\nIntroduce Andy to assigned designer (24:34)\nMaintain monthly account touchpoints (25:02)\n\n**Andy Marshall**\nSend Jessica calendar link (20:53)\nSupport customer account (23:18)",
+      "organizer": "chris@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

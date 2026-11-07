@@ -1,7 +1,7 @@
 {
   "company": "Sales Brunch and",
   "slug": "sales-brunch-and",
-  "last_etl_date": "2026-10-10T06:31:53.898214",
+  "last_etl_date": "2026-11-07T06:43:38.872504",
   "calls": [
     {
       "id": "01M14FX0HMBYQSA7BNCWEC042G",
@@ -21,6 +21,17 @@
       "date": "2026-10-09",
       "duration_minutes": 49,
       "summary": "# Sales Brunch and Learn\nDate: 2026-10-09 | Duration: 49m\n\n## Summary\nThe discussion focused on how GrowthBook’s warehouse-native product analytics and experimentation capabilities create business impact. Logan Bates highlighted deep access to existing business data, metric-based experimentation, dashboards, agentic workflows, and exploration without SQL. Funnel analysis was presented as a way to identify user drop-offs, compare periods, and anchor experiments to observed behaviors, while dashboards were identified as the strongest demo element for showing experimentation velocity, win rate, scaled impact, and progress against North Star metrics. The team compared GrowthBook with cloud competitors such as Statsig and discussed onboarding friction caused by warehouse integration, security restrictions, incomplete data, and the lack of a feature-flag-only SKU. Proposed solutions included sandbox or synthetic-data environments, managed warehouses, simplified metrics, better flagging onboarding, feature gating, and customized contracts. The team also emphasized leading demos with dashboards and funnels, creating consistent talk tracks, using feature flags internally, improving demo permissions, and coordinating coverage during Logan Bates’s travel.\n\n## Keywords\nfeature flags, product analytics, data warehouse, experimentation, sandbox environment, sales strategy\n\n## Action Items\n\n**Logan Bates**\nConfirm and coordinate presentation of product analytics and quick demo overview as requested and prepare talk tracks/snippets for future demos (04:04)\nFollow up on plans to move scaled impact dashboard to homepage and customizable default dashboards for users (45:58)\n\n**James Shannon**\nInvestigate and document recommendations or steps to delineate production data warehouse setup from proof of concept (POC) phases to address customer concerns on setup time (11:10)\n\n**Logan Bates & James Shannon**\nDevelop sandbox/demo environment with mock or generated data for customers to test Growth Book without full data integration (12:07)\n\n**Cary Rakin**\nPush for increased internal use of feature flags on company tools and promote internal advocacy to align selling points with usage (25:40)\n\n**Nolan**\nAssess feasibility of gating product analytics and features behind feature flags for differentiated access levels (24:49)\n\n**Scott Keller**\nMonitor flagged-only customers for experimentation uptake and report findings (21:19)\n\n**Logan Bates & Kris Washburn**\nRefine AI analysis and human review processes for product analytics demos to ensure clarity and usability (48:10)\n",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 13,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6RW6D6PY3E30KR6331K9YZ1",
+      "source": "fireflies",
+      "title": "Sales Brunch and Learn",
+      "date": "2026-11-06",
+      "duration_minutes": 2,
+      "summary": "# Sales Brunch and Learn\nDate: 2026-11-06 | Duration: 2m\n\n## Summary\nThe discussion assessed whether moving existing Pro users to Enterprise would create meaningful impact. These users were described as early in adoption, with limited understanding and use of the product’s potential, so migration was expected not to change outcomes. A potential upcharge for Pro accounts was raised as an alternative to increasing Enterprise pricing, but no final pricing decision was stated. Enterprise contract values were discussed as representing the revenue customers might have paid, with pricing reflecting each account’s realistic opportunity where visibility exists. The common $50,000 default value was considered potentially unreliable because it may not represent true account potential. Scott’s battle cards were also introduced for review, and Logan asked whether others had seen them; no feedback or follow-up decision was recorded.\n\n## Keywords\nPro accounts, Enterprise contracts, pricing, potential revenue, battle cards, sales enablement\n\n## Action Items\n**Unassigned**\nReview battle cards (00:48)",
       "organizer": "scott.keller@growthbook.io",
       "participants": 13,
       "summary_quality": "good"

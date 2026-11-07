@@ -1,0 +1,18 @@
+{
+  "company": "jack/karen",
+  "slug": "jack-karen",
+  "last_etl_date": "2026-11-07T06:43:38.871639",
+  "calls": [
+    {
+      "id": "01M6M7YSS4MMMMSN8Q3YFR7984",
+      "source": "fireflies",
+      "title": "jack/karen",
+      "date": "2026-11-06",
+      "duration_minutes": 43.52000045776367,
+      "summary": "# jack/karen\nDate: 2026-11-06 | Duration: 43.52000045776367m\n\n## Summary\nThe team planned a January research campaign using customer transcripts, graphics, numbers, and Ashley-related work, with a website guide, email-gated PDF, and promotional asset to support SEO and AEO. Website work includes adding documentation CTAs, while cookie ownership, consent settings, and the Huck Finch code review remain unresolved. The team questioned the value of blog search and elaborate featured-content systems, and identified company-based podcast search as a missing capability. Growth plans include rebuilding comparison pages through the CMS, expanding feature and competitor comparisons, and connecting pillar pages with supporting blogs. Conversion work will review landing-page traffic and signup counts, test free-signup, no-card, and user-limit messaging, and implement three Figma recommendations with engineering support. Traffic metrics were deprioritized in favor of conversion blockers and clearer funnel stages.\n\n## Keywords\nContent marketing, Conversion tracking, Website performance, SEO pillar pages, Comparison pages, Plausible analytics\n\n## Action Items\n**Alyssa**\n- Add calls to action (04:24)\n\n**Karen Henke**\n- Develop January research campaign (04:37)\n- Review project proposal (35:17)\n- Inspect Plausible data (35:45)\n\n**Jack Virag**\n- Support research campaign (06:16)\n- Address podcast search (15:41)\n- Discuss website authority (17:49)\n- Ask Lilia about sign-up page (32:38)\n- Send project proposal (33:20)\n\n**Unassigned**\n- Create product-positioning document (21:34)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

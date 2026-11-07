@@ -1,0 +1,18 @@
+{
+  "company": "Temple & Webster",
+  "slug": "temple-webster",
+  "last_etl_date": "2026-11-07T06:43:38.876514",
+  "calls": [
+    {
+      "id": "01M6JNQE4Y3HCYFDK4G90WSV9A",
+      "source": "fireflies",
+      "title": "Temple & Webster and GrowthBook | Commercials, Proof of Concept, Platform Demo",
+      "date": "2026-11-06",
+      "duration_minutes": 53.45000076293945,
+      "summary": "# Temple & Webster and GrowthBook | Commercials, Proof of Concept, Platform Demo\nDate: 2026-11-06 | Duration: 53.45000076293945m\n\n## Summary\nThe discussion found that existing Optimizely logic can be migrated, including feature flags, rollouts, experiment splitting by user ID, visual web editing, and sticky bucketing using anonymous or device IDs with joined identity data. An approval workflow with RBAC publishing controls and human review was recommended. BigQuery can retain exposure events, join them with BI and revenue metrics, support variation-level conversion reporting, and enable direct SQL validation, A/A comparisons, and custom analysis. Stable customer tiers and developer-controlled targeting were preferred because changing attributes can reassign users unexpectedly. Commercially, licensing includes security, onboarding, training, and migration support; user-based pricing scenarios were discussed, with no experience-volume surcharge. Self-hosting lowers pricing but requires Temple Webster to manage DevOps, while BigQuery remains customer-controlled. The POC is planned to start November 16 for three weeks, with the decision target moved to December 16 and a follow-up scheduled for Tuesday.\n\n## Keywords\nGrowthBook, Optimizely migration, Sticky bucketing, BigQuery experimentation, Self-hosted deployment, Proof of concept\n\n## Action Items\n**David Court**\nReview GrowthBook proposal (44:17)\nPresent pricing to stakeholders (44:17)\nComplete commercial requirements (44:17)\nCompare Optimizely pricing (44:17)\nConfirm POC continuation (44:17)\n\n**Marcel Geldner**\nSend commercial slide (47:38)\nSend follow-up points (47:38)\nSend legal documents (47:38)\nProvide security documentation (47:38)\nConfirm support coverage (47:38)\n\n**Rémy Marin**\nLead Tuesday POC discussion (48:56)\nSend SDK resources (48:56)\nSend integration resources (48:56)\nCoordinate metric validation (48:56)\nCoordinate A/A test (48:56)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

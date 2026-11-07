@@ -1,0 +1,18 @@
+{
+  "company": "Jack/Ashley",
+  "slug": "jack-ashley",
+  "last_etl_date": "2026-11-07T06:43:38.871475",
+  "calls": [
+    {
+      "id": "01M6HX932M5BD5R9MBP4DZW4JS",
+      "source": "fireflies",
+      "title": "Jack/Ashley",
+      "date": "2026-11-06",
+      "duration_minutes": 36.29999923706055,
+      "summary": "# Jack/Ashley\nDate: 2026-11-06 | Duration: 36.29999923706055m\n\n## Summary\nThe discussion prioritized site performance over landing-page design, including script and CMS consolidation and replacing the search architecture that loads extensive blog content. Comparison-page CMS collections were assigned to Yousef, while a competitive-scraper knowledge base was approved, with a proposed shift from daily exhaustive reports to weekly, high-value highlights. Conversion growth was set above traffic growth, with deteriorating signups prompting Karen to analyze conversion sources and recommend content formats, internal links, and product or podcast inputs. Emmy’s immediate focus remains marketing work such as newsletters, G2 reviews, customer conversations, and free-signup research rather than broader Jack Ops responsibilities. AI initiatives require stronger validation, and Jack Ops content quality needs improvement. Marketing analytics remain paused, the paid-ads agency is under review but performing reasonably well, and competitor spending may inform future acquisition evaluation.\n\n## Keywords\nCMS comparison pages, Competitive intelligence, Website performance, Jack Ops, Conversion analysis, Paid advertising\n\n## Action Items\n**Jack Virag**\nCoordinate with Huck Finch (00:38)\nVerify cookie-consent implementation (03:13)\nDiscuss scraper architecture with Scott (05:19)\nPropose comparison-page structure to Yousef (09:40)\nRevisit Emmy’s scope (15:28)\nContinue developing marketing content (25:56)\nExplore Gina Song discussion (33:52)\n\n**Yousef**\nBuild CMS collections (04:54)\n\n**Unassigned**\nDevelop competitive-intelligence approach (06:42)\n\n**Karen**\nAnalyse website conversion sources (22:48)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}
