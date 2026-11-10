@@ -1,7 +1,7 @@
 {
-  "company": "Yoto & Growthbook",
+  "company": "Yoto & GrowthBook",
   "slug": "yoto-growthbook",
-  "last_etl_date": "2026-09-03T06:04:10.814232",
+  "last_etl_date": "2026-11-10T07:53:37.512520",
   "calls": [
     {
       "id": "01M0SWGK42TCZDDXWBP8C3AGM1",
@@ -12,6 +12,17 @@
       "summary": "# Yoto & Growthbook Demo\nDate: 2026-08-27 | Duration: 62.2400016784668m\n\n## Summary\nThe discussion covered the challenges faced by the team with their current experimentation tools, which are disjointed and unstable, leading to only 1-2 experiments per month. With the contract expiring in January, there is an urgent need to explore alternatives. The engineering team expressed frustrations about integration issues and the user experience, while product leads aim to increase experiment velocity significantly. Growth Book was highlighted as a promising solution, offering a warehouse-native platform suitable for cross-platform experimentation and feature flagging. Its integrations with tools like BigQuery also ensure robust data management, while the system’s capability for family-level user attribution aligns with the company’s needs. A vendor demo is scheduled for next week to further assess Growth Book before making a recommendation to leadership.\n\n## Keywords\nexperimentation platform, data warehouse native, Snowplow integration, feature flagging, cross-platform testing, AI-assisted analytics\n\n## Action Items\n\n**James Shannon**\nSend meeting recording and AI-assisted transcript to Yoto team (05:08)\nProvide follow-up email with documentation and links post-demo (01:01:12)\nAwait feedback from Yoto team after their internal discussion and second demo (01:00:57)\n\n**Amelie Bruhat**\nCoordinate with James Shannon to update the team on feedback post second demo scheduled on June 2nd or September (01:00:57)\nGather feedback from engineering and product teams internally and determine if additional questions arise for follow-up with Growthbook (01:00:57)\n\n**Yoto Product and Engineering Leadership**\nReview Growthbook capabilities in upcoming demo next week and deliberate on product fit in line with internal evaluation process (59:00)\nEnsure VP Product and VP Engineering are informed of recommendations for final decision (59:49)\n",
       "organizer": "james.shannon@growthbook.io",
       "participants": 18,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6JXCRP1XYMGN2FJQ8ADMQSG",
+      "source": "fireflies",
+      "title": "Yoto & GrowthBook PM Session",
+      "date": "2026-11-09",
+      "duration_minutes": 62.58000183105469,
+      "summary": "# Yoto & GrowthBook PM Session\nDate: 2026-11-09 | Duration: 62.58000183105469m\n\n## Summary\nYoto evaluated GrowthBook as an open-source experimentation platform with paid capabilities for web, mobile, and server-side testing. Its main priorities were content ranking, recommendations, carousels, audience segmentation, and experiments for a new app home surface. PM self-service was central, including reusable metrics, experiment monitoring, segmentation, reporting, visual-editor tests, and split-URL comparisons. GrowthBook described a developer-configured SDK workflow, read-only BigQuery analysis, Snowplow exposure data, funnel measurement, Bayesian and Frequentist analysis, health monitoring, and shareable results. Yoto prefers family ID for consistent assignment, but anonymous-to-authenticated merging, app Snowplow implementation, and cross-device identity linking remain dependencies. AI, MCP, development-first validation, QA previews, approval workflows, and gradual rollouts were also discussed. Yoto was in final testing, comparing GrowthBook with one other vendor, and requested follow-up information on interleaving, QA, and approval workflows before completing scoring. (References: 06:22–01:00:50.)\n\n## Keywords\nExperimentation platform, Feature flags, Cross-platform identity, BigQuery analytics, Visual editor, Split-URL testing\n\n## Action Items\n**James Shannon**\nSend information about GrowthBook interleaving experimentation capability (08:57)\nSend GrowthBook customer examples (16:19)\nProvide guidance on GrowthBook development tools (53:46)\nSend Figma design-to-variant documentation (59:26)\n\n**Rémy Marin**\nProvide product demonstration recording (19:42)\n\n**Luke Jeffery**\nComplete Yoto vendor scoring process (01:00:33)\nAdd Naomi Brady-Coutinho to shared channel (01:00:50)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 9,
       "summary_quality": "good"
     }
   ]

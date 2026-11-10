@@ -1,7 +1,7 @@
 {
   "company": "Skyscanner + GrowthBook",
   "slug": "skyscanner-growthbook",
-  "last_etl_date": "2026-10-31T06:27:44.702241",
+  "last_etl_date": "2026-11-10T07:53:37.511901",
   "calls": [
     {
       "id": "01KZ1D9TK97FVF3J7VRS5F562J",
@@ -143,6 +143,17 @@
       "summary": "[Joan Capdevila]: Hey. Hello, Christian. How are you?\n[Christian Liebenow]: Yeah, doing. Doing quite well. And how about you?\n[Joan Capdevila]: Yeah, doing well as well. Ready for the weekend?\n[Christian Liebenow]: Yeah. Any. Any nice.",
       "host": "Christian Liebenow",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6VN6A6VABY8KXG0G3WF3H4M",
+      "source": "fireflies",
+      "title": "Skyscanner + GrowthBook",
+      "date": "2026-11-09",
+      "duration_minutes": 33.41999816894531,
+      "summary": "# Skyscanner + GrowthBook\nDate: 2026-11-09 | Duration: 33.41999816894531m\n\n## Summary\nThe discussion reviewed progress on two design reviews covering string swapping and OpenFeature as an abstraction layer between microsites and GrowthBook. UXP accepted the designs only for proof-of-concept use, while production content-workflow issues remain unresolved. Flights and other microsites may require separate implementations because their string-swapping mechanisms differ, although UXP prefers a unified solution. The Flights POC is expected to test content experimentation and production OpenFeature implementation over two to four weeks, targeting completion before the end of December, possibly moving into January. The main blocker is UXP capacity: content changes require engineering approval, translation and localization, and further approval before experiment releases, increasing pull requests and engineering workload. Leadership prioritization by Narelle and Alex is required. Post-POC contract timing remains unclear, although Gareth Moger continues to target a signed contract by January 2027. Next steps include confirming POC dates, trial access, legal review timing, stakeholder priorities, and the next meeting.\n\n## Keywords\nContent experimentation, String swapping, OpenFeature, Flights POC, UXP prioritisation, GrowthBook partnership\n\n## Action Items\n**Gareth Moger**\nEscalate content-workflow prioritisation discussion (10:03)\nConfirm Flights proof-of-concept schedule (14:50)\nConfirm GrowthBook trial duration (15:25)\nConsider GrowthBook participation in prioritisation discussions (21:29)\nUpdate Christian on progress (24:23)\nSend Christian meeting invitation (31:01)\nBrief Daniel on contract implications (31:35)\n\n**Christian Liebenow**\nAsk Daniel about early legal review (26:43)\n\n**Daniel**\nTake up contract implications (31:35)\n\n**Narelle and Alex**\nDetermine UXP engineering-capacity prioritisation (19:50)",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

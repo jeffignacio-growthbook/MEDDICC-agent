@@ -1,7 +1,7 @@
 {
   "company": "Growth Book Weekly",
   "slug": "growth-book-weekly",
-  "last_etl_date": "2026-11-03T07:23:32.476513",
+  "last_etl_date": "2026-11-10T07:53:37.510813",
   "calls": [
     {
       "id": "01KFXSR394CVCHJ1HKJKM5HSTE",
@@ -495,6 +495,17 @@
       "summary": "# Growth Book Weekly Meeting\nDate: 2026-11-02 | Duration: 58.540000915527344m\n\n## Summary\nGrowthBook reported strong Q3 performance, including $1.82M in quarterly bookings, $4.6M in new ARR year to date, 18 new logos, and ARR growth from approximately $5.7M to $10.2M. Q4 began with a $12.2M pipeline and a projected year-end range of $13M–$17M, although Anthropic timing, procurement, legal review, and contracting remain risks. Customer wins included TaskRabbit, Rula, Echo, Blah Blah Car, Taxfix, ClickHouse, Mistral, and BoyleSports, with self-hosting, warehouse-native architecture, open source, pricing, and support cited as differentiators. Production deployments approached 4,000, self-serve revenue reached approximately $1.1M MRR, and cash flow turned positive. GrowthBook 5.2 was scheduled to launch with interleaving, Datadog and DBT integrations, remote saved groups, contextual-bandit improvements, and redesigned experiment workflows. Teams also discussed adoption support, customer stories, telemetry reporting, feedback collection, and reducing conversion friction.\n\n## Keywords\nSales pipeline, ARR growth, Warehouse-native experimentation, 5.2 product release, Interleaving experiments, Datadog integration\n\n## Action Items\n**Elyse Fox**\n- Publish 5.2 product blog (38:52)\n- Publish technical blog (38:52)\n- Notify customer database (38:52)\n- Broadcast 5.2 release through Slack (38:52)\n- Update website banners and navigation (38:52)\n- Create and publish GitHub discussions (38:52)\n- Publish social media promotion (38:52)\n- Send marketing email (39:20)\n- Share office-hours video and feature clips (39:20)\n- Finalize 5.2 summary slide (40:20)\n- Finalize future roadmap slide (40:20)\n- Coordinate 5.2 training (40:20)\n\n**Jeremy Dorn**\n- Cut 5.2 release (41:38)\n- Merge application shell (53:25)\n\n**Luke Sonnet**\n- Invite users or customers to interleaving closed beta (53:13)",
       "organizer": "graham@growthbook.io",
       "participants": 40,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6CS88Y3EWXHK87G7VEWH9YP",
+      "source": "fireflies",
+      "title": "Growth Book Weekly Meeting",
+      "date": "2026-11-09",
+      "duration_minutes": 97.56999969482422,
+      "summary": "# Growth Book Weekly Meeting\nDate: 2026-11-09 | Duration: 97.56999969482422m\n\n## Summary\nThe discussion covered active sales progress, including Jake’s $40K deal, late-stage opportunities, and a large deal in redlines. Skyscanner showed demand for experimentation tooling and discussed holdouts and bandits. Cluster experiments became a first-class workflow with flexible assignment and analysis units, expanded reporting, cluster-specific health checks, and use cases across marketplaces, education, and AI products; the functionality is live in Cloud and planned for self-hosted 5.3. Customer engagement included a successful executive dinner and GrowthBook co-sponsoring Circus events in London and the United States, while teams were asked to identify customer speakers. Business reached a $3M run rate, including $2.3M in subscription revenue and $737K in CDN usage, with approximately 50% overall growth. Retention concerns center on larger Pro accounts, which generate 75% of revenue from customers with 10 or more seats. Cloud onboarding, AI setup, lightweight feature flags, and improved marketing alignment are planned, while AI mention and citation rates increased substantially. Retreat guest access and reimbursement processes were also updated.\n\n## Keywords\nCluster experiments, Experimentation platform, Customer advocacy, Pro plan retention, AI onboarding, CDN usage\n\n## Action Items\n**Ryan McGurk**\nClose late-stage deal (03:16)\n\n**Luke Sonnet**\nMeet with Khan Academy (16:55)\nFollow up with Quizlet (17:18)\n\n**Cary Rakin**\nInclude customer participation in contracts (24:18)\nInvestigate Meister Labs account history (32:02)\nInvestigate Adworx account history (32:50)\nInvestigate Apollo Dynamics account history (32:50)\n\n**Ashley Stirrup**\nShare business-performance slides (31:01)\nPost CDN account list (33:15)\nAlign demo environment launch timing (36:07)\nDefine demo experience positioning (36:07)\nCreate AI feature-flag adoption content (36:16)\n\n**Jeremy Dorn**\nBuild no-account demo environment (34:15)\nExpand AI onboarding wizard (34:15)\nBuild lightweight feature-flag entry point (35:04)\n\n**Jennifer Pham-Le**\nPrioritize retreat guest requests (39:20)\nSend Brex invitations (39:58)\nAdd reimbursement instructions (40:32)",
+      "organizer": "graham@growthbook.io",
+      "participants": 39,
       "summary_quality": "good"
     }
   ]

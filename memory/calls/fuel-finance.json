@@ -1,0 +1,18 @@
+{
+  "company": "Fuel Finance +",
+  "slug": "fuel-finance",
+  "last_etl_date": "2026-11-10T07:53:37.512252",
+  "calls": [
+    {
+      "id": "01M6KBFSS24YFR96V1RCBJ432Z",
+      "source": "fireflies",
+      "title": "Fuel Finance + GrowthBook",
+      "date": "2026-11-09",
+      "duration_minutes": 27.889999389648438,
+      "summary": "# Fuel Finance + GrowthBook\nDate: 2026-11-09 | Duration: 27.889999389648438m\n\n## Summary\nFuel Finance prefers GrowthBook for safe production feature rollouts if its governance, entitlement, self-hosting, and pricing requirements are met. Entitlements remain the main gap because Fuel Finance needs persistent client controls for trials, plan-based access, and tier visibility, while sales and product users need controlled access without accidentally changing functionality. Fuel Finance requires internal deployment, making the self-hosted Enterprise option more relevant than cloud Pro or the discontinued self-hosted Pro tier. Product analytics and AI-assisted administration may expand the evaluation. Oleg also raised whether GrowthBook could restrict AI access to tools such as Google Drive, but no technical resolution was reached. Enterprise pricing includes an annual platform fee and $1,250 per year for each user who creates or modifies flags. Oleg indicated that approximately $3,000 annually could be realistic if key use cases are solved, while Christian said he would investigate feasibility and follow up with a proposal if appropriate.\n\n## Keywords\nFeature flags, Entitlement management, Self-hosting, Enterprise pricing, AI access control, Product analytics\n\n## Action Items\n**Christian Liebenow**\nInvestigate GrowthBook support (23:35)\nSend follow-up email (24:43)\nPrepare pricing proposal (24:43)",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

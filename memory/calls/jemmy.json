@@ -1,7 +1,7 @@
 {
   "company": "jemmy",
   "slug": "jemmy",
-  "last_etl_date": "2026-11-05T07:32:46.020987",
+  "last_etl_date": "2026-11-10T07:53:37.507063",
   "calls": [
     {
       "id": "01M50KRESEEN9ESRNX9Z2GVSJA",
@@ -21,6 +21,17 @@
       "date": "2026-11-04",
       "duration_minutes": 34.040000915527344,
       "summary": "# jemmy\nDate: 2026-11-04 | Duration: 34.040000915527344m\n\n## Summary\nGrowth Book AI aims to automate repetitive tasks, create new internal tools, and support work that was previously impossible. Each project should define its own metrics, compare planned outcomes with results, and include a self-grade after completion. Competitive intelligence is progressing through a partnership with Scott, beginning in Google Sheets and potentially moving to an internal database. Generated CMS comparison pages may be populated through skills and adapted for listicles. Marketing is the initial adoption area, with Lindsey and Jacqueline interested, although technical confidence remains a concern. Discovery will identify repetitive work, pain points, and existing skills, followed by possible support and sales adoption. Office hours may collect requests and guide tool development. Cross-functional meeting observation, process mapping, Fireflies records, and stakeholder collaboration will support improvement efforts. Jack Ops remains GitHub-based, with a possible company repository migration in Q1. SEO progress increased ranking keywords from 80 to hundreds, while AI citations increased 10x. Next steps are simplifying the scope document, adding metrics and evidence, obtaining Ashley’s approval, and scheduling marketing discovery with Jack available for technical support.\n\n## Keywords\nJack Ops, Internal automation, Project metrics, Marketing operations, Cross-functional workflows, SEO impact\n\n## Action Items\n**Jack Virag**\nPartner with Scott on intelligence system (00:45)\nSocialise Jack Ops internally (09:53)\nRequest skills and workflows map (28:47)\n\n**Emmy Sharp**\nAdd project metrics goal (03:14)\nBegin discovery with Lindsey, Jacqueline (04:18)\nDefine request evaluation period (17:27)\nSimplify scope document (24:37)\nAttend Huck Finch sync (31:54)\nSchedule proposal review (32:20)\nGather automation impact evidence (29:19)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6VXTVB8DC2CY85GNGKNSTJY",
+      "source": "fireflies",
+      "title": "jemmy",
+      "date": "2026-11-09",
+      "duration_minutes": 32.2400016784668,
+      "summary": "# jemmy\nDate: 2026-11-09 | Duration: 32.2400016784668m\n\n## Summary\nThe discussion covered positioning Jack Ops as enterprise-grade software, using newsletters, G2 reviews, continued product management, and weekly product updates to support approval and broader adoption. An internal presentation was moved to the following week, with marketing alignment still needed among Lindsay and Jacqueline. Jack Ops usage is expanding through product-update backfill and release marketing support. The Command Center is being developed as a personal task system that detects Slack tasks, tracks unanswered messages, reminds users about calendar deadlines, and consolidates context from Slack, Notion, Fireflies, and calendar tools, with email envisioned later. A Slack prototype supports API-based message syncing and an AI messaging interface, while a dashboard with calendar and task tabs is planned. Platform work includes recreating Slack events, supporting replies and reactions, and preserving existing prototypes, although huddles are unavailable. Content plans include competitive pages, feature-flag topics, linked landing pages, and multi-format delivery, while long-form workflows are initially excluded. Lindsay collaboration, Apollo email automation, GitHub access, and Huck Finch feedback remain important stakeholder considerations.\n\n## Keywords\nJack Ops, Command Centre, Product updates, Content automation, Apollo integration, Marketing workflows\n\n## Action Items\n**Emmy Sharp**\nPresent Jack Ops internally (02:58)\nMeet Lindsay and Jacqueline (02:58)\nEstablish product-updates process (05:42)\nDevelop audience framework (22:06)\nWork with Lindsay on workflow (25:20)\nExplore Apollo email automation (26:31)\n\n**Jack Virag**\nEstablish product-updates process (04:54)\nAdd Command Centre prototype (14:49)\nProvide Huck Finch feedback (19:08)\nProvide Lindsay repository access (25:51)\n\n**Karen**\nAdvise Jason on content topics (19:41)",
       "organizer": "jack@growthbook.io",
       "participants": 2,
       "summary_quality": "good"
