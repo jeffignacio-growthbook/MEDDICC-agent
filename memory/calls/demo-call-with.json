@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-11-07T06:43:38.874204",
+  "last_etl_date": "2026-11-11T07:22:05.833956",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1247,6 +1247,17 @@
       "summary": "# Demo Call with Damian Przybyła from Siepomaga.pl\nDate: 2026-11-06 | Duration: 20.979999542236328m\n\n## Summary\nFundacja siepomaga, Poland’s largest medical-fundraising platform, is evaluating enterprise GrowthBook capabilities for its 50-person development team and broader compliance requirements. Self-hosting is preferred because the current self-service tier lacks SSO and configuration options, while Google identity integration, stronger controls, onboarding, training, and security governance are required. Cloud hosting remains an alternative, subject to review of GDPR and SaaS differences. An example enterprise benchmark of $1,000 per user annually was discussed, equaling $50,000 for 50 users, but this was not a final quote. Because the organization is an NGO with strict budgets and prioritizes funds for beneficiaries, a 50–60% discount target was identified; a 10–20% discount would be insufficient and even 50% may remain excessive. One annual payment is preferred, while reduced support could lower costs without removing SSO. A possible discount may be linked to an NGO case study and website publication. Marcel will send pricing and security materials, while Damian will brief managers and review the internal decision. Documentation will include GDPR, DPA, SOC 2 Type 2, and penetration-testing information.\n\n## Keywords\nEnterprise pricing, Self-hosting, SSO, GDPR compliance, NGO discount, Case study\n\n## Action Items\n**Marcel Geldner**\nInvestigate Enterprise pricing range (12:57)\nSend Enterprise options email (16:23)\nShare security documentation (16:23)\nProvide Data Processing Agreement (17:08)\n\n**Damian Przybyła**\nAssess case-study participation (15:23)\nBrief managers on Enterprise options (15:55)\nEvaluate Enterprise upgrade viability (15:55)",
       "organizer": "marcel@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M70VR2HR6AK6EDFKBMXWFJAN",
+      "source": "fireflies",
+      "title": "Demo Call with  from",
+      "date": "2026-11-10",
+      "duration_minutes": 50.060001373291016,
+      "summary": "# Demo Call with  from\nDate: 2026-11-10 | Duration: 50.060001373291016m\n\n## Summary\nQuickMD leads addiction telehealth with a focus on opioid use disorder, has operated for six years, and continues growing 40–50% annually. Growth depends on experimentation, especially improving the booking workflow and acquiring new patients because retention alone is insufficient for its recurring treatment model. The current stack uses Firebase for feature flags, Segment for application events, Mixpanel for event data, and expanding Snowflake reporting, but experimentation remains hand-rolled and lacks a repeatable playbook. The team needs consistent assignments across anonymous and authenticated users, frontend and API experiences, and multiple applications. GrowthBook was discussed for flag-based experiments, attribute and saved-group targeting, prerequisite rules, controlled rollouts, guardrail rollback, holdouts, Bayesian reporting, metric dimensions, and warehouse-based power planning. Deterministic hashing, sticky bucketing, anonymous-to-authenticated identity linkage, and cross-device limitations were also reviewed. A follow-up was planned for next week, with Enterprise BAA support, warehouse execution, and self-hosted options confirmed.\n\n## Keywords\nGrowthBook, Feature flags, Experimentation, Sticky bucketing, Snowflake analytics, Power analysis\n\n## Action Items\n**Kris Washburn**\n- Check Quick.md response (47:01)\n- Send follow-up note (47:01)\n- Offer technical discussion (47:01)",
+      "organizer": "kris@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

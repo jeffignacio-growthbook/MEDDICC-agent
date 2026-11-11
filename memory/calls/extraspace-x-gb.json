@@ -1,0 +1,18 @@
+{
+  "company": "ExtraSpace x GB",
+  "slug": "extraspace-x-gb",
+  "last_etl_date": "2026-11-11T07:22:05.836661",
+  "calls": [
+    {
+      "id": "01M6PX5S7BAX6ZQMJRYWK1DH7A",
+      "source": "fireflies",
+      "title": "ExtraSpace x GB: Exp Program Sync",
+      "date": "2026-11-10",
+      "duration_minutes": 32.119998931884766,
+      "summary": "# ExtraSpace x GB: Exp Program Sync\nDate: 2026-11-10 | Duration: 32.119998931884766m\n\n## Summary\nThe team reviewed a nearly ready Black Friday homepage multivariate bandit pilot. The initial setup keeps the standard control as one bandit arm rather than using a global holdout, and tests copy-sentiment variations with control plus three treatments. Next-page conversion is the primary metric, while completed rental is secondary. Thompson sampling will gradually shift traffic toward stronger treatments after sufficient user and conversion data, subject to warehouse refresh timing. The pilot is suited to holiday traffic because the model can learn and reallocate during the promotion, while the short weekend limits the value of manually removing weaker arms. Future expansion may include lower-funnel placements, contextual bandits for device or persona-based allocation, tiered customer-journey experiences, and segmentation using historical activity or modeled propensity. The team also discussed search interleaving, distance-based ranking from ZIP code, and possible inventory inputs. Cris will share bandit and interleaving materials, while Megan will provide pilot updates and Claire and Megan will outline available segments.\n\n## Keywords\nMulti-arm bandits, Thompson sampling, Contextual personalisation, Black Friday experimentation, Interleaving experiments, Search merchandising\n\n## Action Items\n**Megan Loveland**\nReview GrowthBook bandit use cases (20:04)\nProvide Cris with bandit updates (30:30)\n\n**Cris Dizon**\nSend GrowthBook documentation (29:50)",
+      "organizer": "cris@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

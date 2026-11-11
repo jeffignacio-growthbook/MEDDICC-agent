@@ -1,0 +1,18 @@
+{
+  "company": "Pro Pricing Discussion",
+  "slug": "pro-pricing-discussion",
+  "last_etl_date": "2026-11-11T07:22:05.840968",
+  "calls": [
+    {
+      "id": "01M6HX932SRCR3KHYFY86CM4JC",
+      "source": "fireflies",
+      "title": "Pro Pricing Discussion",
+      "date": "2026-11-10",
+      "duration_minutes": 39,
+      "summary": "# Pro Pricing Discussion\nDate: 2026-11-10 | Duration: 39m\n\n## Summary\nThe discussion favored making Pro managed-warehouse-only, potentially moving bring-your-own warehouse and customer-managed event forwarders to Enterprise, while considering additional feature flagging in the free or lower funnel to attract users. Current Pro pricing was benchmarked at $40 per seat, 2,000 included monthly events, and $40 per million events, with modeled revenue near $3.2 million. Scenarios targeting $6 million, $9 million, and $12 million were evaluated, with $9 million viewed as more balanced. A Statsig-like model of $150 per account monthly, 5 million included events, and $50 per additional million was requested. Small feature-flagging customers could downgrade, while experiment-large customers generated nearly all modeled upside but might resist managed warehouses and per-event pricing. A move from about $960 to $5,000 monthly could cause churn, while approximately $3,000 was considered more acceptable. Follow-up work includes account- and segment-level modeling, retention assumptions, warehouse adoption, revenue totals, and possible concurrency pricing.\n\n## Keywords\nManaged warehouse, Event-based pricing, Statsig pricing, Feature flags, Experiment pricing, Revenue modelling\n\n## Action Items\n**Elyse Fox**\nBuild pricing model (08:39)\nBreak projected revenue down by account and segment (23:31)\nAdd total revenue calculation (24:13)\n\n**Jeremy Dorn**\nShare pricing analysis and materials (28:46)",
+      "organizer": "elyse@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

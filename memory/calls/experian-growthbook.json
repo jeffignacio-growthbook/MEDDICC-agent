@@ -1,0 +1,18 @@
+{
+  "company": "Experian + GrowthBook",
+  "slug": "experian-growthbook",
+  "last_etl_date": "2026-11-11T07:22:05.836976",
+  "calls": [
+    {
+      "id": "01M5WF8RPEMXPFTANNGSVF0GG6",
+      "source": "fireflies",
+      "title": "Experian + GrowthBook",
+      "date": "2026-11-10",
+      "duration_minutes": 32.65999984741211,
+      "summary": "# Experian + GrowthBook\nDate: 2026-11-10 | Duration: 32.65999984741211m\n\n## Summary\nDanielle Coulson described her ownership of Experian’s CDP, EPO, CMS, DAM, internal data storage, and related services after joining Experian about eight months ago. EPO migration from another vendor is approximately 80% complete, with potentially harder remaining work but no identified blocker. Experian is not required to move because of Datadog’s acquisition of EPO and would consider migration only after feature parity. Experimentation maturity varies across teams, while the reasons for limited adoption—capability, permission, or awareness—remain unclear. GrowthBook was presented as an open, warehouse-native platform supporting Bayesian, frequentist, sequential, interleaving, switchback, visual-editor, AI-assisted, and edge-deployed experimentation. GrowthBook’s platform fee is $200,000 annually, with user- and experiment-based pricing models. Danielle plans to review Datadog capacity and usage, submit EPO’s MCP server request, and continue evaluating technical capabilities and contract structure. A deeper discussion is planned for January.\n\n## Keywords\nExperimentation platforms, EPO migration, Datadog Experiments, Agent-led experimentation, Warehouse-native testing, MCP server\n\n## Action Items\n**Danielle Coulson**\nSend Experian’s EPO feature-parity requirements (14:11)\nSubmit EPO MCP server access request (26:46)\nMeet Datadog to review EPO capacity (29:07)\n\n**Christian Liebenow**\nArrange January follow-up conversation (30:11)",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

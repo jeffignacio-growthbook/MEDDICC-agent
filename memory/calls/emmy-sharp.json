@@ -1,0 +1,18 @@
+{
+  "company": "Emmy Sharp",
+  "slug": "emmy-sharp",
+  "last_etl_date": "2026-11-11T07:22:05.840791",
+  "calls": [
+    {
+      "id": "01M712MCA1MHBWEJXD0M2VA6JQ",
+      "source": "fireflies",
+      "title": "30 min with Karen (Emmy Sharp)",
+      "date": "2026-11-10",
+      "duration_minutes": 70.19000244140625,
+      "summary": "# 30 min with Karen (Emmy Sharp)\nDate: 2026-11-10 | Duration: 70.19000244140625m\n\n## Summary\nThe discussion covered executive social posts, comparison pages, content governance, and newsletter improvements. Demandy handles Graham’s content, while product posts bypass Demandy and Ashley routes approved posts. Chris’s reel is in Google Drive, with a caption still required; Chris should receive the video directly, Ashley a complete post, and Graham’s content should route through Ashley. Limited LinkedIn access prevents a complete Buffer workflow, so direct uploads are likely needed. CMS comparison pages are moving forward as the core competitor source of truth, while the Growth Book section needs a fuller narrative and the comparison table needs redesign. Governance remains unclear, including style-guide ownership and how number changes propagate across the website, sales slides, social profiles, and external profiles. The newsletter needs sharper positioning, fewer links, clearer contextual themes, a less image-heavy layout test, and a revised masthead. Emmy will revise it and Karen will review the draft, with a follow-up call likely. Sources: 02:03–19:35, 26:12–40:08, 41:48–01:07:45.\n\n## Keywords\nComparison pages, Newsletter strategy, LinkedIn content, Social media workflow, Brand governance, CMS content management\n\n## Action Items\n**Emmy Sharp**\nDownload reel assets (06:52)\nSend Chris reel materials (18:33)\nSend Ashley campaign materials (20:44)\nAsk Ashley about handoff (20:44)\nDraft comparison-page narrative (39:55)\nReview narrative with Ashley (39:55)\nRemake newsletter masthead (01:00:34)\nRework newsletter narrative (01:05:03)\nSend Karen updated newsletter draft (01:07:38)\n\n**Karen Henke**\nSend previous newsletter example (01:04:22)\nReview updated newsletter draft (01:07:38)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

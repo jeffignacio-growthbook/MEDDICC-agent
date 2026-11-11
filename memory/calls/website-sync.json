@@ -1,7 +1,7 @@
 {
   "company": "website sync",
   "slug": "website-sync",
-  "last_etl_date": "2026-10-21T05:31:34.611791",
+  "last_etl_date": "2026-11-11T07:22:05.831921",
   "calls": [
     {
       "id": "01KGN55WARMH9R1PER3JDV65VB",
@@ -23,6 +23,17 @@
       "date": "2026-10-20",
       "duration_minutes": 13.40999984741211,
       "summary": "# website sync\nDate: 2026-10-20 | Duration: 13.40999984741211m\n\n## Summary\nWebsite direction remains pending Ashley’s meeting, with no immediate rush. The team will prioritize performance work first, using it as a starting point and giving Yousef process exposure. Website bugs and enhancements should be consolidated and tracked in the Notion board, while Chris assesses effort and priority and assigns contributors. Ready requests can reach Yousef through the board, Slack descriptions, or Loom, although reducing informal Slack bypasses is preferred. Performance improvements may reduce CMS collections and make marketing needs more self-service. Jack is managing three projects, completed Rippling work today, and is finishing DEI training; follow-up is planned after Ashley’s discussion. Benefits enrollment was reviewed twice for November open enrollment and plan changes. Aetna provider coverage was confirmed with no provider changes expected. Opolis group coverage was recommended for the freelancer community, while its S-Corp requirement, payroll administration fee, and eligibility restrictions were noted. Potential savings and tax advantages may exceed fees, and Aetna was considered the best solo-plan option.\n\n## Keywords\nWebsite performance, Notion enhancement board, Feature request process, CMS dependencies, Contractor health insurance, Opolis\n\n## Action Items\n**Jack Virag**\nAttend discussion with Ashley (11:23)\nComplete DEI training (11:33)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6YX1Q7J68HTKJK2CR7YADSC",
+      "source": "fireflies",
+      "title": "website sync",
+      "date": "2026-11-10",
+      "duration_minutes": 43.54999923706055,
+      "summary": "# website sync\nDate: 2026-11-10 | Duration: 43.54999923706055m\n\n## Summary\nThe team approved a dedicated form section with a show/hide toggle, left-aligned heading and copy, and a form that stacks on mobile. HubSpot forms will use pasted raw code, with Webflow applying shared CSS across reusable landing-page structures. Forms can replace hero images through title and content fields, while optional buttons remain conditional. Events work is deferred because the existing collection lacks landing pages, Lindsay has competing priorities, and custom requirements remain unresolved. Consent changes reduced visible analytics, although Google Search Console clicks stayed stable; advanced consent limits anonymous data, and Plausible offers an alternative. GDPR controls remain partially active, with Ashley favoring disabled tracking and Chris seeking defensible consent. Analytics review is pending with possible script inspection by Huck Finch and internal follow-up by Jack. GrowthBook first-party tracking may run alongside current tools, but attribution problems, anonymization challenges, performance concerns, and limited web metrics prevent deployment. Content plans include landing-page, competitor, and product-insight work, supported by GitHub context, structured case-study production, reusable content assets, and an interactive AI dashboard.\n\n## Keywords\nLanding-page forms, HubSpot integration, Cookie consent, GA4 analytics, GrowthBook tracking, AI content operations\n\n## Action Items\n**Chris Newton**\nShare form implementation guidance (09:40)\n\n**Jack Virag**\nTell Hein implementation direction (15:02)\nRaise tracking discussion with Huck (34:30)\nSend Chris HTML dashboard (39:47)",
       "organizer": "jack@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

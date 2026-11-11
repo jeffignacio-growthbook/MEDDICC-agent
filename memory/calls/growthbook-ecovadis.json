@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Ecovadis",
+  "slug": "growthbook-ecovadis",
+  "last_etl_date": "2026-11-11T07:22:05.844097",
+  "calls": [
+    {
+      "id": "01M6JXCRPMZG23GQDKFDT0KXZB",
+      "source": "fireflies",
+      "title": "Growthbook <> Ecovadis - Demo",
+      "date": "2026-11-10",
+      "duration_minutes": 83.55999755859375,
+      "summary": "# Growthbook <> Ecovadis - Demo\nDate: 2026-11-10 | Duration: 83.55999755859375m\n\n## Summary\nThe evaluation focuses on improving supplier personalization while addressing personalization gaps, legacy tooling constraints, and engineering dependency. Web testing is prioritized, with server-side testing also considered; mobile testing is excluded. JavaScript web and server-side SDKs connect application surfaces, support runtime feature evaluation, and use programmatic attributes or cookie and storage data for supplier segmentation. Databricks remains the read-only data source for exposure events and SQL-based experiment analysis. Capabilities include feature flags, remote content control, self-service visual and DOM-based experiments, Bayesian or frequentist analysis, metric-based recommendations, gradual rollouts, guardrail monitoring, and automatic feature disabling. Claude integration, natural-language experiment creation, configurable approvals, risk-based governance, namespace traffic separation, alerts, and Slack notifications were discussed. Follow-up needs include implementation guidance, go-to-market examples, overlap visibility, and internal stakeholder discussion. The evaluation extends through December, with a possible extension into 2027.\n\n## Keywords\nExperimentation, Feature flags, Databricks, Claude MCP, Supplier personalization, Experiment governance\n\n## Action Items\n**James Shannon**\nSend Ecovadis information (30:45)\nProvide overlap prevention guidance (57:22)\nShare implementation examples (01:02:49)\nShare experimentation case studies (01:04:39)\n\n**Emilio De la Fuente**\nGather internal use cases (01:05:46)\nReconnect with GrowthBook team (01:05:46)",
+      "organizer": "remy@growthbook.io",
+      "participants": 11,
+      "summary_quality": "good"
+    }
+  ]
+}

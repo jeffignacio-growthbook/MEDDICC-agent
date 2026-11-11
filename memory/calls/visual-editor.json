@@ -1,0 +1,18 @@
+{
+  "company": "Visual Editor",
+  "slug": "visual-editor",
+  "last_etl_date": "2026-11-11T07:22:05.837118",
+  "calls": [
+    {
+      "id": "01M6YG7FPB5VTYW0GJMH05STVX",
+      "source": "fireflies",
+      "title": "Visual Editor - Sign Up",
+      "date": "2026-11-10",
+      "duration_minutes": 19.309999465942383,
+      "summary": "# Visual Editor - Sign Up\nDate: 2026-11-10 | Duration: 19.309999465942383m\n\n## Summary\nThe discussion covered unclear Free and Pro onboarding, with Jeremy taking responsibility for the free tier and a focus on highlighting Pro features during signup; trial and upgrade details remain unresolved, and Pro discoverability needs improvement. The visual editor can support site-wide changes and benefits from clear visual references, but account switching, experiment loading, and tracking issues remain. Bandit experiments include live-group-demo banner variants, mobile and desktop handling, returning-user context, and a homepage video-versus-no-video test; site-wide behavior still needs a fix because clicks revert to the control variation. Teresa oversees contextual bandits, while Luke provides expertise and is assigned the behavior fix. Initial backend implementation and tracking require engineering support, and Johnny or Gabe may assist with a cohesive product-design callout experience. Free-product implementation remains undefined. Growth Book access is restricted, a marketing updates channel was created, the marketing test tag is required, and a public review is planned to check proposed changes and experiment overlap.\n\n## Keywords\nVisual editor, GrowthBook, Contextual Bandits, Pro upgrade, Signup flow, Marketing experiments\n\n## Action Items\n**Emmy Sharp**\nCoordinate tracking metrics with Guy (11:46)\nDetermine experience changes (12:38)\nShare proposed product changes (15:57)\nApply `marketing test` tag (17:35)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

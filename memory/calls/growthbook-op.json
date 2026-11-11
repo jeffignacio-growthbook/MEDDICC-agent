@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook + Op",
   "slug": "growthbook-op",
-  "last_etl_date": "2026-11-07T06:43:38.878458",
+  "last_etl_date": "2026-11-11T07:22:05.841730",
   "calls": [
     {
       "id": "01KT7DMS83RXCGY1RPYJB8XGY3",
@@ -117,6 +117,17 @@
       "date": "2026-11-03",
       "duration_minutes": 30,
       "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-11-03 | Duration: 30m\n\n## Summary\nThe discussion focused on creating aligned reporting for marketing, sales, and pipeline conversations. HubSpot was designated as the shared source for Ashley and Ryan, with three dashboard levels covering demo requests, inbound conversations, held meetings, opportunities, and pipeline, plus deeper drill-down views. Paid advertising reporting should connect spend with signups, demos, SQLs, opportunities, and closed-won results, while Starter-to-Pro attribution requires license synchronization and analysis of prior marketing touches. Marketing and sales teams will align metric definitions so Ashley and Ryan see consistent results. Held-meeting rates remain unreliable because reps inconsistently record meeting outcomes, no-shows, and disqualifications. Jeff’s sales reporting covers pipeline coverage, weighted forecasts, forecast trends, pipeline hygiene, and stage progression, while Q4 was described as healthier than Q3 despite a higher target. Shawn will continue lead-scoring and marketing-reporting work, Jeff will share existing HubSpot reports, and Jeff will evaluate stronger meeting-disposition enforcement.\n\n## Keywords\nHubSpot dashboards, Marketing attribution, Pipeline forecasting, Lead scoring, Paid advertising, Sales operations\n\n## Action Items\n**Shawn Green**\nBegin lead-scoring work (00:41)\nAlign reporting definitions with Jeff Ignacio (15:33)\nBuild marketing operations dashboards (29:56)\n\n**Jacqueline Thomson**\nVerify advertising campaign destinations (07:32)\nIdentify campaign form types (08:25)\n\n**Jeff Ignacio**\nReview meeting-stage disqualification fields (19:31)\nConfirm no-show opportunity process (21:44)\nShare Ryan’s reporting dashboard (timestamp unavailable)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6Y7ZTW6PHQA12ZD3QEJYDH4",
+      "source": "fireflies",
+      "title": "GrowthBook + Op Methods Weekly Check-In",
+      "date": "2026-11-10",
+      "duration_minutes": 29,
+      "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-11-10 | Duration: 29m\n\n## Summary\nDeduplication is nearing completion, with Jacqueline and Lyndsie reviewing remaining records while ambiguous cases remain flagged until license and organization backfill improves matching. Updated company- and contact-level scoring models are live: 349 companies are Tier A and 1,877 are Tier B, although industry scoring—especially gambling and casinos—requires validation. MQL threshold automation will be tested on untouched prospects with engagement and strong company fit, while routing and outreach methods remain undecided. License synchronization continues to overwrite company classifications between Pro, Enterprise, and Starter, so Shawn and Michael Nolan are investigating competing updates. Pipeline hygiene work will move Disqualified deals into Closed Lost with structured reasons, while Jeff will document the revised process. Stale Discovery deals also require review with Ryan before possible automation.\n\n## Keywords\nDuplicate cleanup, Lead scoring, MQL automation, Licence synchronisation, Closed-lost reporting, Pipeline hygiene\n\n## Action Items\n**Lyndsie Berens**\nFinish duplicate-company cleanup list (07:15)\nLabel ambiguous records (07:15)\nShare completed list (07:15)\n\n**Jacqueline Thomson**\nComplete duplicate-company cleanup (07:47)\nMerge same-company records (07:47)\nDocument records requiring review (07:47)\n\n**Jeff Ignacio**\nValidate industry scoring weights (12:37)\nDocument revised deal-stage process (26:15)\nBrief sales team (26:15)\nReview stale Discovery-stage deals (27:17)\nDetermine ageing notifications (27:17)\n\n**Shawn Green**\nApply engagement thresholds to MQL automation (16:27)\nCreate monitoring list (16:27)\nMeasure threshold-crossing contacts (16:27)\nReview licence-server synchronisation (18:07)\nConsolidate Disqualified deals into Closed Lost (25:50)\nPreserve disqualification information (25:50)\nUpdate reason fields (25:50)\nNotify Jeff Ignacio (26:23)",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 9,
       "summary_quality": "good"

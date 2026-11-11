@@ -1,0 +1,18 @@
+{
+  "company": "Wellhub + GrowthBook",
+  "slug": "wellhub-growthbook",
+  "last_etl_date": "2026-11-11T07:22:05.841372",
+  "calls": [
+    {
+      "id": "01M6HX938GZB4FEDNHRVPD0F2C",
+      "source": "fireflies",
+      "title": "Wellhub + GrowthBook | Case Study Intro",
+      "date": "2026-11-10",
+      "duration_minutes": 26.18000030517578,
+      "summary": "# Wellhub + GrowthBook | Case Study Intro\nDate: 2026-11-10 | Duration: 26.18000030517578m\n\n## Summary\nThe discussion covered Wellhub’s approaching renewal, with a case study viewed as support for negotiations, and current usage of 99–100 seats with a request to expand to 130–150. GrowthBook usage is nearing one year, with positive team feedback but some confusion around the identity layer. B2B2C testing requires randomizing approximately 400 clients, while post-stratification helps reduce whale-client bias. Experimentation activity increased to 150–160 launches by September, including 66 launches in 2025 and approximately 16 monthly; the inconclusive rate fell from approximately 72% to 34%, and experiment duration decreased from approximately 42 to 27 days. Participating teams grew from 17 to 26. Product managers and engineers lead experimentation, supported by Larissa’s experimentation center, office hours, a support channel, and weekly leadership reviews. Google Chat, webhooks, and wider developer integrations are expanding. Larissa will select case study examples and participate in a podcast, while Ashley will draft the case study and follow up on the podcast. Sources: timestamps 00:33–24:05.\n\n## Keywords\nExperimentation, Post-stratification, B2B2C testing, Self-hosting, Experiment velocity, Case study\n\n## Action Items\n**Ashley Stirrup**\nDemonstrate GrowthBook workflow (07:54)\nPrepare case study draft (23:23)\nSchedule podcast participation (24:05)\n\n**Larissa Minarini**\nSelect Wellhub experiments (18:41)\nObtain communications approval (23:50)",
+      "organizer": "marsh@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

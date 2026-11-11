@@ -1,0 +1,18 @@
+{
+  "company": "Jack / Cris",
+  "slug": "jack-cris",
+  "last_etl_date": "2026-11-11T07:22:05.841239",
+  "calls": [
+    {
+      "id": "01M70RGPCCF7MS3H88Y00CYBVH",
+      "source": "fireflies",
+      "title": "Jack / Cris intro + blog ideas",
+      "date": "2026-11-10",
+      "duration_minutes": 28.8799991607666,
+      "summary": "# Jack / Cris intro + blog ideas\nDate: 2026-11-10 | Duration: 28.8799991607666m\n\n## Summary\nThe discussion covered Cris’s practitioner-led experimentation background, customer-side analytics experience, enterprise perspective, and GrowthBook customer-success work supporting strategic programs, key-account enablement, and experimentation scaling. Employee-written content was prioritized for its human perspective and visibility for technical teams, with AI-assisted content supporting reach, publishing volume, and long-tail SEO. The first article will focus on experimentation expansion, including interleaving, introduced in version 5.2, and cluster randomization, with relevance to ML and personalization teams. Cris will prepare an article shell with Claude assistance, while Jack can provide feedback, refinement, editing, or ghostwriting support. Additional ideas included streaming experimentation involving advertising, ad load, promotions, retention, cancellations, subscriber experience, efficiency, and profitability. Marketing priorities include conversion and AI-friendly onboarding, including coding-agent onboarding and free feature-flags account signup, over the next three months. A weekly or biweekly writing cadence was proposed, with an initial draft planned for tomorrow.\n\n## Keywords\nExperimentation strategy, Streaming platforms, Customer success, Interleaving, Cluster randomisation, Content marketing\n\n## Action Items\n**Cris Dizon**\n- Draft article outline (23:18)\n- Establish writing cadence (26:30)\n\n**Jack Virag**\n- Review article material (23:52)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

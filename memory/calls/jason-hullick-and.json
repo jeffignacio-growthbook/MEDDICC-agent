@@ -1,0 +1,18 @@
+{
+  "company": "Jason Hullick and",
+  "slug": "jason-hullick-and",
+  "last_etl_date": "2026-11-11T07:22:05.844238",
+  "calls": [
+    {
+      "id": "01M6HX935EH1RTK4QD7388W6BP",
+      "source": "fireflies",
+      "title": "Jason Hullick and Ashley Stirrup",
+      "date": "2026-11-10",
+      "duration_minutes": 29.260000228881836,
+      "summary": "# Jason Hullick and Ashley Stirrup\nDate: 2026-11-10 | Duration: 29.260000228881836m\n\n## Summary\nPizza Express completed its migration from Optimizely to GrowthBook roughly six months earlier, with Jason Hullick using it across experimentation, product operations, and analytics. Snowflake became the source of truth, enabling detailed business measures such as table availability, funnel conversion, search-to-availability, search-to-book, and end-to-end order time. Experiments delivered significant results: a booking incentive added two or three thousand bookings across nine days, booking and offer journey changes improved conversion by 5–10%, and a redesigned offer terms page increased offer claims by 20%. Jason’s lean team uses AI tools including Claude to create fact tables and metrics, identify funnel issues through FullStory data, generate Visual Editor experiments, upload changes through MCP, and share results. Two people currently run experiments, while successful tests move into the engineering backlog. Executive support comes from Ross, and future plans include mobile, CRM, restaurant holdouts, and broader participation by less-technical users.\n\n## Keywords\nGrowthBook experimentation, Optimizely migration, Snowflake metrics, Booking conversion, Feature flags, AI-assisted product discovery\n\n## Action Items\n**Jason Hullick**\nAsk development team for GrowthBook feedback (21:46)\n\n**Ashley Stirrup**\nSend Jason Circus London event information (26:12)\nSend Jason customer research follow-up questions (26:39)\nComplete GrowthBook customer case study with Jason (27:18)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "Eng Standup",
   "slug": "eng-standup",
-  "last_etl_date": "2026-10-28T06:26:54.008233",
+  "last_etl_date": "2026-11-11T07:22:05.842683",
   "calls": [
     {
       "id": "01KGJ8WY3PJ95HVBNJFF68YKB0",
@@ -352,6 +352,17 @@
       "duration_minutes": 27.469999313354492,
       "summary": "# Eng Standup\nDate: 2026-10-27 | Duration: 27.469999313354492m\n\n## Summary\nThe team reviewed progress across experiment redesign, feature delivery, API coverage, and engineering review practices. Right-rail expansion was approved with a quality score tertiary tab and retained drag resizing, while the experiment redesign neared merge with final items pending. Data onboarding involved five or six PRs, most of which had landed, with a feature-flag rollout planned. Settings redesign awaited review, primarily covering UI changes, with Adriel assigned as reviewer and public pages excluded. QA overrides moved to orange because of a Health tab dependency and pending feature-flag overrides, while Cluster Randomize remained on track subject to Luke’s bandwidth and QA coverage. DBT Sync was ready to merge after Kevin’s review, and rollback support expanded to Datadog tags and custom fields without requiring feature IDs. API coverage continued through seven PRs owned by Kevin, while experiment management was deferred from 5.2 and populations were intentionally postponed. The team emphasized stronger author self-review, continued human attention for UI issues, consistent testing documentation, and a review approach trial through Friday.\n\n## Keywords\nExperiment redesign, API coverage, QA overrides, AI code review, PR automation, UI testing\n\n## Action Items\n**Gabe Melean**\nCoordinate default rail width (00:55)\nSend settings redesign PRs (03:54)\n\n**Jeremy Dorn**\nKeep redesign items pending (01:24)\nMove QA overrides to orange (04:14)\nSend API coverage PRs (08:05)\nSend API PRs to Luke (08:21)\nReport review experiment results (25:56)\n\n**Adriel Vieira**\nReview settings redesign PRs (03:09)\nPrepare experiment API plan (07:28)\n\n**Bryce Fitzsimons**\nVerify public views (03:31)\n\n**Luke Smith**\nVerify skills PR workflow (08:12)\n\n**Engineering team**\nTrial AI-assisted review process (25:56)",
       "organizer": "alyssa@growthbook.io",
+      "participants": 28,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6HFV28KNYN3WTY40V3BWF0R",
+      "source": "fireflies",
+      "title": "Eng Standup",
+      "date": "2026-11-10",
+      "duration_minutes": 37,
+      "summary": "# Eng Standup\nDate: 2026-11-10 | Duration: 37m\n\n## Summary\nThe discussion centered on the 5.3 roadmap, including feature diagnostics, remote saved groups, fast follows, feature-flag redesign, QA workflows, experiment support, and continued SDK parity. Experimentation work focused on switchback testing, power-calculation improvements, ramp-ups, QA, metric analysis, API enhancements, and better notification ownership. Release scope was being consolidated for early January or approximately three weeks, while customer validation and public customer quotes remained priorities. Population targeting through remote saved groups, session-replay links to experiments, and quality dashboards were also explored. GBSync had moved into the GrowthBook organization, with further work planned on dry runs, bulk imports, and core-library standardization. Documentation navigation, community and developer campaigns, consistent design patterns, list-view improvements, and a new app shell were progressing. The app shell was planned for feature-flagged rollout, internal dogfooding, feedback collection, and an escape hatch for users who preferred the existing navigation.\n\n## Keywords\nFeature diagnostics, Experiment revisions, Switchback testing, QA workflows, Session replay, App shell\n\n## Action Items\n**Andy White**\nReview feature diagnostics plan (00:02)\nComplete mapping pull request (00:19)\n\n**Bryce Fitzsimons**\nDevelop feature diagnostics plan (00:37)\nPlan experiment revisions (02:27)\n\n**Omar**\nImprove trace ingestion (01:53)\n\n**Guy Langford-lee**\nPrepare feature review surface (03:12)\nBuild event-based notifications (07:42)\nCreate notification view (08:06)\n\n**Theresa**\nComplete experimentation prerequisite QA (04:05)\n\n**Adriel Vieira**\nDrive make changes API development (05:08)\nReview event bundling (08:32)\nTest new app shell (20:26)\nDogfood new app shell (21:49)\n\n**Jeremy Dorn**\nConsolidate 5.3 roadmap (09:21)\nEvaluate population results export (10:45)\n\n**Elyse Fox**\nIdentify customer design partners (11:57)\nSecure customer quotes (11:57)\n\n**Scott Bailey**\nExplore session replay capabilities (14:42)\nContribute to developer and community campaign (18:12)\n\n**Alyssa Nicoll**\nMaintain GBSync (16:31)\nJoin public demo environment meeting (17:04)\nInvite Scott Bailey (17:04)\nClean up documentation navigation (18:12)\nPlan developer and community campaign (18:12)\n\n**Gabe Melean**\nImplement design-system improvements (18:49)\nRedesign list views (19:25",
+      "organizer": "elyse@growthbook.io",
       "participants": 28,
       "summary_quality": "good"
     }

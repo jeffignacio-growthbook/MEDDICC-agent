@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook Demo for",
   "slug": "growthbook-demo-for",
-  "last_etl_date": "2026-10-23T05:34:42.358654",
+  "last_etl_date": "2026-11-11T07:22:05.838184",
   "calls": [
     {
       "id": "69b2cdd1aadf6a00115df609",
@@ -1248,6 +1248,17 @@
       "summary": "# GrowthBook Demo for APURVA SANDBHOR\nDate: 2026-10-22 | Duration: 36m\n\n## Summary\nHome Depot is evaluating alternatives to Adobe Target after 10–15 years of use, with a vendor decision needed before Adobe renewal negotiations begin in February. The transition may include up to six months of overlap to avoid experimentation downtime. GrowthBook is one of four vendors considered, and only one is expected to advance to a formal proof of concept. Current operations rely on Adobe Target, Adobe Analytics, BigQuery, GCP, and a custom pipeline for metrics and statistical analysis, while Microsoft Forms, Jira, and multiple teams create significant handoff and specialist burdens. The desired platform should support the full experiment lifecycle, flexible metrics, sample-size estimation, semantic-layer connections, feature flags, monitored rollouts, client- and server-side testing, Contentful integration, product analytics, heat maps, and session recordings. Evaluation begins with a 60-minute demonstration for seven to eight Home Depot participants, followed by technical ecosystem review and potentially a focused proof of concept.\n\n## Keywords\nExperimentation platform, Adobe Target migration, Feature flags, Monitored rollout, Product analytics, Contentful integration\n\n## Action Items\n**Apurva Sandbhor**\nSend Home Depot summary (21:58)\nSend Teams invitation (34:41)\n\n**Scott Keller**\nCoordinate GrowthBook participants (27:16)\nPrepare GrowthBook demo (27:16)\nSend follow-up email (34:57)\n\n**Logan Bates**\nPrepare product analytics walkthrough (31:41)\nPrepare end-to-end demo flow (32:03)",
       "organizer": "scott.keller@growthbook.io",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6FB9K9F990SYDBN1S5CGZ4T",
+      "source": "fireflies",
+      "title": "GrowthBook Demo for C6 Bank",
+      "date": "2026-11-10",
+      "duration_minutes": 60,
+      "summary": "# GrowthBook Demo for C6 Bank\nDate: 2026-11-10 | Duration: 60m\n\n## Summary\nC6 is seeking faster releases with lower risk, especially as AI usage increases, by enabling small-group testing, controlled rollouts, kill switches, and product-owned feature management. The evaluation covers GrowthBook SDK and remote evaluation options, targeting by user or device attributes, multiple environments, and Boolean, string, number, or JSON feature values. C6 prefers self-hosted deployment, can begin with Docker Compose, and may require an air-gapped setup because of bank security policies. The team will assess enterprise approvals, audit logs, governed deployments, holdouts, and multi-arm bandits. Data evaluation includes BigQuery connectivity, warehouse-native SQL sources, feature exposure tracking, product analytics, event tables, and experiment metrics. C6 is expected to select a first experiment, complete security, legal, or NDA requirements, and provide its organization ID so GrowthBook can activate an Enterprise trial. Timing remains unfinalized.\n\n## Keywords\nFeature flags, Experimentation, Self-hosted deployment, Remote evaluation, BigQuery integration, Enterprise governance\n\n## Action Items\n**Scott Keller**\nSend C6 Bank enterprise feature list (05:16)\nProvide Enterprise license key (58:18)\nSupport air-gapped Enterprise setup (58:43)\nShare demonstration recording (59:52)\n\n**C6 Bank team**\nEvaluate Docker Compose deployment (57:51)\nProvide organisation ID (58:18)\nSelect first proof-of-concept experiment (59:52)\n\n**Fernando Melo**\nConfirm proof-of-concept start date (59:17)\nCoordinate security review (59:52)\nConfirm NDA requirement (59:52)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 8,
       "summary_quality": "good"
     }
   ]

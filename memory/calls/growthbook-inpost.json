@@ -1,7 +1,7 @@
 {
-  "company": "Growthbook <> InPost",
+  "company": "GrowthBook & InPost",
   "slug": "growthbook-inpost",
-  "last_etl_date": "2026-10-23T05:34:42.363463",
+  "last_etl_date": "2026-11-11T07:22:05.844515",
   "calls": [
     {
       "id": "01KY4KKQRJRVANX4ESE7F34AED",
@@ -28,6 +28,17 @@
       "summary": "# Growthbook <> InPost - Best pratices\nDate: 2026-10-22 | Duration: 29.450000762939453m\n\n## Summary\nA first PoC experiment is running with a feature flag, 50/50 allocation, and defined metrics. Metrics can be replaced using warehouse data, while results refresh manually or every six hours; user segmentation supports analysis by attributes after updating results. Novelty effects and incomplete app rollout may reduce observed lift, so CUPED, configurable metric windows, and delayed measurement periods were discussed. Funnel metrics were considered more useful for longer journeys. AI access is available, experiments can be created conversationally when the feature exists SDK-side, and graphs and product analytics visuals can support interpretation. BigQuery query-cost reduction may be possible. Rollout from 1% to 5% creates bias concerns, with attribution and activation metrics under review. James will share thoughts, Remy will investigate options, and broader communication access is pending while email and ticket processes are used.\n\n## Keywords\nGrowthBook experiments, Feature flags, Metric analysis, CUPED, App rollout bias, Activation metrics\n\n## Action Items\n**Rémy Marin**\nInvestigate rollout bias (23:59)\n\n**James Shannon**\nSend experiment guidance (28:03)",
       "organizer": "remy@growthbook.io",
       "participants": 6,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6ZX9S6QXDFPP0XAMVVZV56R",
+      "source": "fireflies",
+      "title": "GrowthBook & InPost Integration Training",
+      "date": "2026-11-10",
+      "duration_minutes": 42.79999923706055,
+      "summary": "# GrowthBook & InPost Integration Training\nDate: 2026-11-10 | Duration: 42.79999923706055m\n\n## Summary\nThe workshop defined how application data will flow into GrowthBook for experimentation. SDKs placed in application platforms fetch feature flags and experiments from the CDN, while exposure events are sent through GA4 and the existing Databricks and Postgres pipeline. GrowthBook reads exposure and metric data from Postgres through custom SQL queries and read-only permissions. Assignment queries must include experiment and variation IDs, unit identifiers, timestamps, and optional dimensions such as country, plan, and device type. Fact tables support metrics including purchases, page views, and add-to-cart activity. Consistent user identifiers are required for deterministic assignment across application layers. An AA test is being used to validate the integration, with similar control and variant results expected. Environments, projects, audit history, approvals, APIs, and configurable refresh intervals support governance and operations. A shared technical channel and follow-up training will help colleagues configure and run AB tests independently.\n\n## Keywords\nGrowthBook SDK, GA4 exposure events, Postgres data source, Experiment assignment queries, AA testing, Feature experimentation\n\n## Action Items\n**Chris Sanders**\nSend recording link (00:56)\nSet up communication channel (39:02)\nProvide experimentation training (39:34)\n\n**Unassigned**\nImplement SDKs (38:10)\nValidate AA test integration (39:51)",
+      "organizer": "chris@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

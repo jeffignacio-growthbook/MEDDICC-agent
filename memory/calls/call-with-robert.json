@@ -1,0 +1,18 @@
+{
+  "company": "Call with Robert",
+  "slug": "call-with-robert",
+  "last_etl_date": "2026-11-11T07:22:05.846674",
+  "calls": [
+    {
+      "id": "6af3b1b74bf962000174e658",
+      "source": "apollo",
+      "title": "Call with Robert Price",
+      "date": "2026-11-11",
+      "duration_minutes": 1.0,
+      "summary": "# Call with Robert Price\nDate: 2026-11-11 | Duration: 0.6m\n\n## Note\nNo transcript available. Meeting recorded but transcript extraction failed or is still processing.",
+      "organizer": "",
+      "participants": 0,
+      "summary_quality": "good"
+    }
+  ]
+}

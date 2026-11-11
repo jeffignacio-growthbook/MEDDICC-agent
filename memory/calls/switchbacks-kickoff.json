@@ -1,0 +1,18 @@
+{
+  "company": "switchbacks kickoff",
+  "slug": "switchbacks-kickoff",
+  "last_etl_date": "2026-11-11T07:22:05.836811",
+  "calls": [
+    {
+      "id": "01M71BSF0ZZYKD1R72CB0KNPZ0",
+      "source": "fireflies",
+      "title": "switchbacks kickoff",
+      "date": "2026-11-10",
+      "duration_minutes": 31.440000534057617,
+      "summary": "# switchbacks kickoff\nDate: 2026-11-10 | Duration: 31.440000534057617m\n\n## Summary\nThe discussion covered experiment configuration, randomization, SDK and analysis behavior, and product design. V1 requires two regimes, with two variations initially proposed, while experiment windows and burn-in periods are configurable. Initial assignments split control and treatment, but network-level switching is deferred; support for more than two variations and automatic versus manual switching remains unresolved. The SDK needs additional guardrails and serves assignments during burn-in, while analysis excludes burn-in events. Switchbacks remain under experiments, scheduling requires top-level placement, and the feature is likely to be niche with organizational opt-in. Hash-time targeting is also unresolved, and Gabe is reviewing the configuration inputs.\n\n## Keywords\nSwitchback experiments, Regime scheduling, Burn-in and burnout, SDK randomisation, Time-fixed effects, Experiment configuration\n\n## Action Items\n**Luke Smith and Luke Sonnet**\n- Resolve variation scope (11:07)\n- Align randomisation approaches (29:19)\n\n**Gabe Melean**\n- Review configuration inputs (29:19)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

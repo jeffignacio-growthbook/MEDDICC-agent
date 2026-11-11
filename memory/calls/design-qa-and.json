@@ -1,0 +1,18 @@
+{
+  "company": "Design QA and",
+  "slug": "design-qa-and",
+  "last_etl_date": "2026-11-11T07:22:05.831509",
+  "calls": [
+    {
+      "id": "01M73VQWHBRE0MS9PA3DHS89ET",
+      "source": "fireflies",
+      "title": "Design QA and Targeting Usability Review",
+      "date": "2026-11-10",
+      "duration_minutes": 57.43000030517578,
+      "summary": "# Design QA and Targeting Usability Review\nDate: 2026-11-10 | Duration: 57.43000030517578m\n\n## Summary\nQA override implementation reached design-QA, with the core flow covering environment selection, filter configuration, and variation assignment. Production environments remain visible but unavailable for QA selection, while inactive features keep the flow in a waiting state until activation. The QA section stays within the experiment implementation view, and the draft status model remains unchanged for compatibility; testing information may appear on the experiment detail page instead. Interface updates include opening saved-group inputs directly, retaining current ordering for feature-flag precedence, and reusing standard variation styling. Usability work remains around action-oriented warnings, hover-only controls, tooltip and popover consistency, and clearer complex-condition displays. Major open questions concern random assignment, inherited experiment targeting, QA mode selection, and whether filters combine with or override existing targeting. Gabe will revise the design, Teresa will update design nits, and Luke will seek further input from Brian, Bryce, and Jeremy.\n\n## Keywords\nQA overrides, Experiment targeting, Feature flags, Variation assignment, Design QA, Environment filters\n\n## Action Items\n**Teresa Yung**\nOpen saved-group control in input-ready state (11:01)\nCorrect QA override coloring (29:39)\nAdd tooltip to disabled controls (30:22)\nUpdate design QA notes (54:52)\n\n**Gabe Melean**\nProvide updated QA override design notes (14:54)\nUpdate random-assignment modal (52:56)\nClarify QA targeting conditions (52:56)\nUpdate experiment-starting design (55:04)\nDefine QA visibility for running state (55:04)\n\n**Luke Sonnet**\nStart targeting discussion thread (55:11)\nCheck implementation branch (55:32)\nRecord targeting decision video (55:32)",
+      "organizer": "teresa@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

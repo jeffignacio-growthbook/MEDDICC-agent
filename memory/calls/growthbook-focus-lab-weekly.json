@@ -1,7 +1,7 @@
 {
   "company": "Growthbook/Focus Lab Weekly",
   "slug": "growthbook-focus-lab-weekly",
-  "last_etl_date": "2026-11-04T07:05:05.234178",
+  "last_etl_date": "2026-11-11T07:22:05.840586",
   "calls": [
     {
       "id": "01M5YVV3SR57JZCP4DHAWQQFK1",
@@ -11,6 +11,17 @@
       "duration_minutes": 65.3499984741211,
       "summary": "# Growthbook/Focus Lab Weekly Meeting\nDate: 2026-11-03 | Duration: 65.3499984741211m\n\n## Summary\nThe discussion retained a Ruler-based brand strategy while adding warmth, humor, approachability, and clearer storytelling to create competitive whitespace. Product teams were identified as the broad target audience, balancing engineering-led buying with product, marketing, growth, and data stakeholders. Ideal prospects are change-ready companies with more than one million web or mobile visitors, dissatisfaction with an existing solution, and interest in both feature flagging and experimentation. Positioning should highlight growth from approximately $5 million to $13 million in revenue, stronger customer adoption, leadership, expertise, and rapid responsiveness. Experimentation messaging should promote testing product changes, stronger hypotheses, valid metrics, shared learning, and reduced rollout risk. Visually, the brand should be more dynamic than Statsig while maintaining technical credibility; humor, adaptable systems, and selective panda use were discussed. Research and evaluation materials are scheduled for Friday, review is planned for next Tuesday, and a creative brief is expected by the end of the following week.\n\n## Keywords\nAudience segmentation, Experimentation culture, Brand archetype, Product-team positioning, Visual identity, Mascot strategy\n\n## Action Items\n**Álvaro Ramos**\n- Send visual strategy questions (01:01:57)\n\n**Anna Beyerle Rosen**\n- Send research document (01:02:22)\n- Provide creative direction recommendations (01:02:56)\n\n**Ashley Stirrup**\n- Schedule internal Growthbook review (01:03:24)\n- Submit consolidated Growthbook feedback (01:03:24)",
       "organizer": "ashley@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6HX932NXE1K72T2VM0DPJ9V",
+      "source": "fireflies",
+      "title": "Growthbook/Focus Lab Weekly Meeting",
+      "date": "2026-11-10",
+      "duration_minutes": 39.77000045776367,
+      "summary": "# Growthbook/Focus Lab Weekly Meeting\nDate: 2026-11-10 | Duration: 39.77000045776367m\n\n## Summary\nThe discussion validated GrowthBook’s core brand strategy, including positive feedback on its archetype, color opportunities, and competitive takeaways. The team identified opportunities for stronger opinions, clearer pain-point messaging, deeper communications, and greater emotional connection. Visual priorities included creating a recognizable brand thread, exploring customer imagery, clarifying color and typography, and keeping mascot and logo options open. Distributed design work across contractors and internal teams has created inconsistency, so approved tools, templates, workflows, maintenance ownership, and professional review are needed. Guidelines should define CMYK, RGB, Pantone, typography, spacing, imagery, emoji, and other design elements, with training for the marketing team. Anna is preparing a direction document and phase-two recommendations for Thursday, while Mason will review assignments and timing. The Thanksgiving week meeting is canceled, with no deliverable planned.\n\n## Keywords\nBrand strategy, Visual identity, Verbal identity, Design systems, Competitive positioning, Brand consistency\n\n## Action Items\n**Anna Beyerle Rosen**\nPrepare direction document (05:36)\nInclude visual identity recommendations (34:25)\n\n**GrowthBook team**\nReview Thursday deliverable (06:08)\n\n**Amy Nance**\nCreate message examples (14:42)\n\n**Mason Hawkins**\nPresent project recommendations (37:22)\nProvide project timeline (37:22)",
+      "organizer": "graham@growthbook.io",
       "participants": 10,
       "summary_quality": "good"
     }

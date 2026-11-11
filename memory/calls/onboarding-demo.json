@@ -1,0 +1,18 @@
+{
+  "company": "Onboarding Demo",
+  "slug": "onboarding-demo",
+  "last_etl_date": "2026-11-11T07:22:05.841107",
+  "calls": [
+    {
+      "id": "01M6YAGJGEB5P3E6AFNSJ00BYX",
+      "source": "fireflies",
+      "title": "Onboarding Demo",
+      "date": "2026-11-10",
+      "duration_minutes": 42,
+      "summary": "# Onboarding Demo\nDate: 2026-11-10 | Duration: 42m\n\n## Summary\nThe group explored combining several demo concepts: Jeremy Dorn’s read-only replica, story-based guided experiences, live-site demonstrations, personalized sample contexts, and controlled local interactions. The proposed demo would show feature flags, experiments, metrics, AI concepts, approvals, drafts, and setup guidance without exposing unnecessary complexity. Onboarding would begin by asking users what they want to accomplish, then offer guided setup, progress feedback, skip options, manual setup, and no-code paths. Participants favored realistic data, reset capabilities, and guardrails over unrestricted resource creation, while advanced areas could be represented through hints. Enterprise prospects should gain confidence through approval states, synthetic data, and possible sandbox experiences without connecting their own environments. The group also identified separate PLG and enterprise journeys as needing further definition. Johnny Martinez proposed a Notion component list to share in Slack, while exact scope, ownership, and implementation details remained unresolved.\n\n## Keywords\nOnboarding demo, Feature flags, Guided tour, Experimentation, AI-assisted setup, PLG and enterprise funnels\n\n## Action Items\n**Johnny Martinez**\nCreate shared Notion page (31:09)\nShare requirements page in team Slack channel (31:16)\n\n**Scott Bailey**\nExplore sandbox demos (31:25)\nMap product-led-growth and enterprise journeys (32:04)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

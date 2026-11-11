@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook + The Home Depot",
+  "slug": "growthbook-the-home-depot",
+  "last_etl_date": "2026-11-11T07:22:05.844752",
+  "calls": [
+    {
+      "id": "01M72ZB1CS13TX3DQEATT80TXN",
+      "source": "fireflies",
+      "title": "GrowthBook + The Home Depot: Pricing Review",
+      "date": "2026-11-10",
+      "duration_minutes": 25,
+      "summary": "# GrowthBook + The Home Depot: Pricing Review\nDate: 2026-11-10 | Duration: 25m\n\n## Summary\nHome Depot plans to select two vendors for initial POCs and expects a final vendor decision in Q1. Evaluation will focus on roadmap and ecosystem fit, performance impact, product analytics, customization, agentic capabilities, and data-warehouse-native architecture; cost is excluded. The GrowthBook demo was well received, particularly its open-source model and customization potential. Product analytics support BigQuery connections, funnels, trend tracking, and plain-language AI questions without a running experiment, while governance includes pre-launch checklists and custom roles for experiment creation and approval. Broad adoption requires fast workflows, support for centralized and nontechnical users, and customizable Home Depot guardrails. GrowthBook offered a free, nonbinding POC, typically lasting four weeks, with dedicated support and implementation assistance. The POC is expected to start in January after NDA execution, engineering approval, CSA, a separate POC SOW, and internal approvals. Scott will remain the primary contact.\n\n## Keywords\nGrowthBook, experimentation platform, product analytics, open source, POC, warehouse-native analytics\n\n## Action Items\n**Scott Keller**\nPrepare POC success plan (12:57)\nCreate dedicated Slack channel (13:20)\nSupport BigQuery configuration (21:43)\nSupport SDK setup (21:43)\nCoordinate data science support (21:43)\nRespond to Home Depot requests (23:30)\n\n**Apurva Sandbhor**\nComplete engineering approval (13:46)\nCoordinate POC preparation (13:46)\n\n**Kishen Jayanti**\nComplete vendor shortlisting (14:33)\nSend MNDA draft (22:18)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

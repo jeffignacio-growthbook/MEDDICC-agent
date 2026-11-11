@@ -1,0 +1,18 @@
+{
+  "company": "power kickoff",
+  "slug": "power-kickoff",
+  "last_etl_date": "2026-11-11T07:22:05.832175",
+  "calls": [
+    {
+      "id": "01M71BR5FS5ME976FCEMDCTEAH",
+      "source": "fireflies",
+      "title": "power kickoff",
+      "date": "2026-11-10",
+      "duration_minutes": 41.65999984741211,
+      "summary": "# power kickoff\nDate: 2026-11-10 | Duration: 41.65999984741211m\n\n## Summary\nThe engineering plan is to build the power model before the UI, with population work starting next week and the seed finder deferred. For the MVP, results pages are deferred, each experiment will have one attached calculation, and power is fixed at 80%. Goal metrics are required before power calculations, MDE plots are available through a toggle, and an attached analysis sets the target MDE. Adding new metrics marks the analysis as outdated. Cross-experiment power copying and scheduling integration remain follow-up work, while power checks can be configured through the to-do list. An alignment meeting is planned for early next week, and Gabe is updating the power design.\n\n## Keywords\nPower analysis, Target MDE, Experiment configuration, Goal metrics, Experiment scheduling, QA workflows\n\n## Action Items\n**Gabe Melean**\nUpdate power design (01:42)\nIncorporate meeting notes (39:15)\nCoordinate QA workflows sync (39:27)\n\n**Teresa Yung**\nBegin population-support work (03:51)\nRevise engineering plan (04:07)\nCoordinate QA workflows sync (39:27)\n\n**Luke Smith**\nSchedule follow-up meeting (38:11)\nPost meeting decisions (38:42)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}
