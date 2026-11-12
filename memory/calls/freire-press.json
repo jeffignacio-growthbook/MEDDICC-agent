@@ -1,0 +1,18 @@
+{
+  "company": "Freire Press &",
+  "slug": "freire-press",
+  "last_etl_date": "2026-11-12T07:51:48.373451",
+  "calls": [
+    {
+      "id": "01M6JK63WMSJYJ0B9ZQYXNRSRJ",
+      "source": "fireflies",
+      "title": "Freire Press & GrowthBook Kick Off",
+      "date": "2026-11-11",
+      "duration_minutes": 39.84000015258789,
+      "summary": "# Freire Press & GrowthBook Kick Off\nDate: 2026-11-11 | Duration: 39.84000015258789m\n\n## Summary\nThe team adopted a six-week GrowthBook onboarding package covering SDK connections, data setup, hands-on implementation support, integration verification, and first experiments. Implementation begins near zero: documentation was reviewed, but no proof of concept exists, and current A/B testing and feature flagging are handled by separate homegrown tools. The website is the initial priority, using a PHP server-rendered architecture with JavaScript additions; the hybrid mobile app and other web properties are future scope. GrowthBook will use SDKs, CDN-delivered JSON configuration, Google Tag Manager, Piano Analytics, and Databricks for exposure and metric analysis. The first integration gate is an A/A test, requiring accurate user, experiment, variation, timestamp, and analysis attributes. Tom Kühne will refine the Databricks event model, while the customer team will select initial metrics and attributes. Microsoft Teams coordination, presentation slides, and implementation support are immediate deliverables.\n\n## Keywords\nGrowthBook SDK, Databricks, A/B testing, Feature flags, Experiment tracking, Microsoft Teams\n\n## Action Items\n**James Shannon**\nSet up Microsoft Teams project channel (04:08)\nCoordinate GrowthBook Teams integration (37:40)\n\n**Pierre Franz**\nAdminister GrowthBook account (06:48)\n\n**Benjamin Schmidt**\nDefine initial experimentation use cases (09:05)\nProvide experimentation practices input (09:05)\n\n**Lucas Keller**\nIntegrate GrowthBook SDK (13:02)\nIdentify SDK implementation owner (15:49)\nDefine SDK attributes (35:26)\n\n**Chris Sanders**\nSupport Databricks queries (14:29)\nSupport first AA test (14:29)\nSupport SDK integration (14:59)\nSupport first real experiments (14:59)\nSend integration presentation slides (38:12)\n\n**Tom Kühne**\nOrchestrate implementation activities (16:39)\nConfigure Databricks data source (22:37)\nDefine experiment assignment query (23:07)\nDefine fact-table queries (25:15)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    }
+  ]
+}

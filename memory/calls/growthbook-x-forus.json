@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook x Forus",
+  "slug": "growthbook-x-forus",
+  "last_etl_date": "2026-11-12T07:51:48.373366",
+  "calls": [
+    {
+      "id": "01M75Q2PCBMEW26KHJEFTXJ4FP",
+      "source": "fireflies",
+      "title": "GrowthBook x Forus: Pilot Kickoff",
+      "date": "2026-11-11",
+      "duration_minutes": 33,
+      "summary": "# GrowthBook x Forus: Pilot Kickoff\nDate: 2026-11-11 | Duration: 33m\n\n## Summary\nThe team confirmed that a fully signed BAA completed the contracting phase and cleared the pilot path. Pilot planning covered success criteria, technical setup, testing duration, metrics, and analysis, with Scott responsible for circulating a living project plan. The team favored running two experiments, using experiment-specific tables without PHI to simplify setup and clarity. Fleming preferred self-hosted deployment, with Docker or Kubernetes options, while BigQuery access would begin with tightly scoped service-role permissions. Exposure data could be captured through a customer-managed callback or GrowthBook’s event forwarder, balancing control, implementation simplicity, destination-table behavior, and additional cost. The team planned to establish the self-hosted instance, license, service account, API host, BigQuery connection, and SDK integration during the first one to two weeks, launch experiments in week two, and request a six-week POC so each experiment could receive at least four weeks of data. Slack support and weekly or biweekly working sessions were available.\n\n## Keywords\nBigQuery, Self-hosting, Painted-door experiments, Experiment exposure events, Metrics catalogue, SDK integration\n\n## Action Items\n**Scott Keller**\nSet up shared Slack channel (09:29)\nProvide self-hosted pricing information (10:26)\nRequest proof-of-concept approval (11:55)\nSend updated pilot timeline (12:23)\nSend self-hosted licence key and instructions (15:52)\n\n**Fleming (Wooster, 2)**\nConnect GrowthBook to BigQuery data source (18:37)\nCreate scoped BigQuery schema (19:56)\nPrepare experiment input and assignment tables (23:01)\nSet up self-hosted GrowthBook deployment (27:55)\nLaunch pilot experiments (29:47)\n\n**Logan Bates**\nProvide self-hosting and SDK documentation (13:34)\nCheck FullStory exposure-event tracking (28:43)\n\n**Diedra Rater**\nConfigure self-hosted SDK (26:54)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "jack/karen",
   "slug": "jack-karen",
-  "last_etl_date": "2026-11-07T06:43:38.871639",
+  "last_etl_date": "2026-11-12T07:51:48.373220",
   "calls": [
     {
       "id": "01M6M7YSS4MMMMSN8Q3YFR7984",
@@ -10,6 +10,17 @@
       "date": "2026-11-06",
       "duration_minutes": 43.52000045776367,
       "summary": "# jack/karen\nDate: 2026-11-06 | Duration: 43.52000045776367m\n\n## Summary\nThe team planned a January research campaign using customer transcripts, graphics, numbers, and Ashley-related work, with a website guide, email-gated PDF, and promotional asset to support SEO and AEO. Website work includes adding documentation CTAs, while cookie ownership, consent settings, and the Huck Finch code review remain unresolved. The team questioned the value of blog search and elaborate featured-content systems, and identified company-based podcast search as a missing capability. Growth plans include rebuilding comparison pages through the CMS, expanding feature and competitor comparisons, and connecting pillar pages with supporting blogs. Conversion work will review landing-page traffic and signup counts, test free-signup, no-card, and user-limit messaging, and implement three Figma recommendations with engineering support. Traffic metrics were deprioritized in favor of conversion blockers and clearer funnel stages.\n\n## Keywords\nContent marketing, Conversion tracking, Website performance, SEO pillar pages, Comparison pages, Plausible analytics\n\n## Action Items\n**Alyssa**\n- Add calls to action (04:24)\n\n**Karen Henke**\n- Develop January research campaign (04:37)\n- Review project proposal (35:17)\n- Inspect Plausible data (35:45)\n\n**Jack Virag**\n- Support research campaign (06:16)\n- Address podcast search (15:41)\n- Discuss website authority (17:49)\n- Ask Lilia about sign-up page (32:38)\n- Send project proposal (33:20)\n\n**Unassigned**\n- Create product-positioning document (21:34)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M70Y95QEBAWK4VKJJRSSFYTB",
+      "source": "fireflies",
+      "title": "jack/karen",
+      "date": "2026-11-11",
+      "duration_minutes": 10.289999961853027,
+      "summary": "# jack/karen\nDate: 2026-11-11 | Duration: 10.289999961853027m\n\n## Summary\nWebsite work is progressing, but Jack Ops’ weekly batch remains pending. Alignment with Chris is taking effort because of strong opinions about details, particularly disputed landing-page forms, while the team weighs speed against input and avoids sunk-cost reasoning. Custom landing pages remain the preferred direction, with fewer required fields, custom-code support, and Jack Ops generating tables to reduce user work rather than relying on CMS-generated tables. Chris requested an optional form toggle that would replace the hero image; top placement is preferred, although users may scroll for context, so placement remains testable. Existing forms use HubSpot CSS, which Jack Ops is recreating, and Google Tag Manager form-fill tracking must be preserved. Form IDs require configuration in Tag Manager, but ownership is unclear, and automatic Google tagging through HubSpot remains uncertain. Split heroes are supported, with the form beside the hero content rather than using a full-width poem. Mobile ordering needs validation because the form typically moves above the content. Existing Figma designs inform implementation, and landing pages will support testing of form placement and conversion experience.\n\n## Keywords\nLanding pages, HubSpot forms, Jack Ops, Google Tag Manager, Form placement, Responsive design\n\n## Action Items\n**Jack Virag**\nComplete overdue weekly Jack Ops batch (03:16)\n\n**Unassigned**\nTest landing-page form placement (06:05)",
       "organizer": "jack@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

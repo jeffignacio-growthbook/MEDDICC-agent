@@ -1,7 +1,7 @@
 {
   "company": "Taxfix & GrowthBook",
   "slug": "taxfix-growthbook",
-  "last_etl_date": "2026-11-05T07:32:46.023160",
+  "last_etl_date": "2026-11-12T07:51:48.373672",
   "calls": [
     {
       "id": "69dd0d4f0d5066001d29bab8",
@@ -23,6 +23,17 @@
       "summary": "# Taxfix & GrowthBook Eppo Importer\nDate: 2026-11-04 | Duration: 95.31999969482422m\n\n## Summary\nTaxfix reviewed its experimentation strategy after abandoning the importer migration, while retaining manual exports for historical metrics and conclusions. The company is moving toward an AI-first model in which builders own engineering, design, experimentation, and conclusions, while the Data Team builds supporting tools. An internal agent has created the first experiment plan and is being adapted to launch feature flags and experiments through GrowthBook skills. Discussions covered API-change monitoring, wrapping official GrowthBook skills, GitHub monitoring, and support for a sample-size calculator. Access planning focused on confirming SSO, automatic provisioning, read-only defaults, and project-based write permissions. The group also clarified project structure, SDK assignment identifiers, anonymous-to-logged-in transitions, sticky bucketing, experiment exposure rules, fact-table visibility, metric sources, warehouse costs, and analytics integrations. Training will cover feature flags, experiment linkage, hashing, data sources, metrics, and results, followed by GrowthBook and agent enablement. Follow-ups include API roadmap checks, calculator support, fact-table investigation, and SSO confirmation.\n\n## Keywords\nGrowthBook, Experimentation agent, Feature flags, Sticky bucketing, Snowflake analytics, SSO provisioning\n\n## Action Items\n**Chris Sanders**\nCheck GrowthBook roadmap (07:52)\nAsk about sample-size calculation (11:56)\nInvestigate fact-table selector (52:51)\nShare custom Markdown request (01:22:40)\nPrepare GrowthBook training (01:31:37)\n\n**Alyona Skidina**\nCreate Taxfix feature flag (13:59)\nCreate related GrowthBook experiment (13:59)\nConfirm SSO configuration (16:26)\nTest GrowthBook access (18:11)\nPrepare builder enablement sequence (01:32:58)\nRun experimentation agent session (01:32:58)",
       "organizer": "chris@growthbook.io",
       "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6JK63WTH6Y7V4N94DYW85P5",
+      "source": "fireflies",
+      "title": "Taxfix & GrowthBook Experimentation Training",
+      "date": "2026-11-11",
+      "duration_minutes": 52.20000076293945,
+      "summary": "# Taxfix & GrowthBook Experimentation Training\nDate: 2026-11-11 | Duration: 52.20000076293945m\n\n## Summary\nChris Sanders led GrowthBook onboarding on customer setup, data pipelines, experimentation, feature flags, SDK behavior, analysis, governance, and advanced capabilities. The training explained how experiments isolate feature impact, using deterministic bucketing, stable rollouts, targeting rules, prerequisites, and consistent identity keys. It covered evaluation timing, exposure and product-data integration, goal, secondary, and guardrail metrics, Bayesian and frequentist analysis, health checks, A/A tests, warehouse refreshes, custom reports, project access, audit history, and review workflows. Advanced topics included bandits, contextual bandits, confirmatory A/B testing, and power planning. Daniel asked about application-version targeting, while Jan-Patrick asked about counting users only after a later event. Chris agreed to verify the best approaches, and ongoing support was available through GrowthBook Slack and data-science resources.\n\n## Keywords\nExperiment bucketing, Feature flags, Deterministic hashing, Metric analysis, Namespaces, Contextual bandits\n\n## Action Items\n**Chris Sanders**\nProvide Jan-Patrick Bößler follow-up answer (49:50)\nConfirm GrowthBook version operators and semantic-version handling (49:50)\nVerify GrowthBook prerequisite features or metrics (49:50)\nShare confirmed approach with participants (49:50)",
+      "organizer": "chris@growthbook.io",
+      "participants": 53,
       "summary_quality": "good"
     }
   ]
