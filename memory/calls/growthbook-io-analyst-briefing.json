@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook.io Analyst Briefing",
+  "slug": "growthbook-io-analyst-briefing",
+  "last_etl_date": "2026-11-13T07:28:57.906511",
+  "calls": [
+    {
+      "id": "01M731A13XZ2N9D6TBPFV065KN",
+      "source": "fireflies",
+      "title": "GrowthBook.io Analyst Briefing with IDC",
+      "date": "2026-11-12",
+      "duration_minutes": 63.540000915527344,
+      "summary": "# GrowthBook.io Analyst Briefing with IDC\nDate: 2026-11-12 | Duration: 63.540000915527344m\n\n## Summary\nGrowthBook described its warehouse-native platform combining feature flags, experimentation, and product analytics, with self-hosting, customer-controlled raw data, more than 24 SDKs, and an open-core model. The company serves product teams and reported 4,000 organizations, approximately 1,500 paying customers, and customers in more than 70 countries. Discussion covered AI governance, including human review and safer rollouts for agent-created features, plus AI-assisted experiment creation, analysis, and documentation. Customer examples included Anthropic, Khan Academy, Wikimedia, and Fed Fixer; Khan Academy reported a 5-point cognitive-engagement improvement, while Fed Fixer ran 514 experiments and grew ARR from $1 million to $35 million. GrowthBook reported business tripling over 15 months and identified fintech, health tech, edtech, channel development, and experimentation education as opportunities. IDC participants discussed coverage, analyst introductions, shared slides, and a possible CTO follow-up on AI-native workflows and governance.\n\n## Keywords\nFeature flags, A/B testing, Warehouse-native analytics, AI-assisted development, Experimentation governance, Product analytics\n\n## Action Items\n**Ashley**\n- Contact Devin Pratt (51:11)\n- Share GrowthBook presentation slides (51:25)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

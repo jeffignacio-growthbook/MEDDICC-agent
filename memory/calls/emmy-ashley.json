@@ -1,7 +1,7 @@
 {
   "company": "Emmy/Ashley",
   "slug": "emmy-ashley",
-  "last_etl_date": "2026-10-24T05:14:25.174683",
+  "last_etl_date": "2026-11-13T07:28:57.904472",
   "calls": [
     {
       "id": "01KT4VEV3XMA0DK2CNSR6RA773",
@@ -58,6 +58,17 @@
       "date": "2026-10-23",
       "duration_minutes": 6.389999866485596,
       "summary": "# Emmy/Ashley\nDate: 2026-10-23 | Duration: 6.389999866485596m\n\n## Summary\nEmmy Sharp identified Ashley Stirrup and raised a wellbeing concern, saying Ashley had seemed more tired than usual during the previous day’s meeting. Ashley said they had not felt that tired at the time and asked which meeting Emmy meant; Emmy referred to “Growth Book” and “Huck Finch.” Emmy also acknowledged that Ashley had a lot going on. The conversation then turned to memberships, with Emmy saying Emmy Sharp was curious and seriously interested, while mentioning the phrase “Free Chelsea”; its meaning was not clarified. Ashley asked how to remove “this guy” from the call, and Emmy instructed the participant to be removed.\n\n## Keywords\nMemberships, Call removal, Previous meeting, Fatigue, Growthbook, Curious\n\n## Action Items\n**Unassigned**\nRemove unidentified participant (05:07)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M731A13M87V5P522Y8VEGK86",
+      "source": "fireflies",
+      "title": "Emmy/Ashley",
+      "date": "2026-11-12",
+      "duration_minutes": 37.470001220703125,
+      "summary": "# Emmy/Ashley\nDate: 2026-11-12 | Duration: 37.470001220703125m\n\n## Summary\nThe discussion covered several product and growth priorities. Games are live on the website, with Resources favored for navigation while two-column or wider-menu layouts remain under review. The newsletter was approved for launch, but promotion timing, channels, audience, and onboarding placement still need decisions; Lindsay will be consulted. Emmy presented a prototype that combines Slack, Fireflies, email, and other sources into task lists, follow-ups, and Today’s Focus, with lightweight Slack summaries suggested to avoid adding another burdensome tool. Ashley reviewed Self Serve Pro analytics: the May cohort had 851 organizations, median time to first feature flag was 2.2 hours versus a 9.3-day average, about one quarter created none, and 34% created at least 10. Activation and retention metrics still need to be finalized. Emmy is also considering G2 outreach to regularly active customers after 90 days, potentially reaching about 100 recipients monthly while coordinating with Jaclyn.\n\n## Keywords\nSelf-Serve Pro analytics, Feature-flag activation, Newsletter promotion, Task management, Customer retention, G2 review outreach\n\n## Action Items\n**Emmy Sharp**\nSend longer list of potential game questions to Ashley (02:31)\nPrepare product updates post (03:03)\nPrepare website games announcement (03:28)\nAdd games to website (04:43)\nPublish newsletter draft (06:38)\nConsult Lindsay about newsletter promotion (07:43)\nAdd newsletter to onboarding emails (08:31)\nTest task-management tool (11:29)\nShare task-management tool with team (16:18)\nInvestigate G2 outreach criteria (35:19)\nCheck G2 outreach list with Jaclyn (35:35)\n\n**Ashley Stirrup**\nReview Resources navigation options (05:48)\nDiscuss activation metric and Self-Serve Pro findings with Jeremy (21:46)\nAdd median feature-flag analysis (23:55)\nSelect primary Self-Serve Pro metric (33:34)\nDefine G2 outreach criteria (35:45)",
       "organizer": "ashley@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

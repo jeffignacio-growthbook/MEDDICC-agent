@@ -1,7 +1,7 @@
 {
   "company": "Jake <> Brent",
   "slug": "jake-brent",
-  "last_etl_date": "2026-11-04T07:05:05.233125",
+  "last_etl_date": "2026-11-13T07:28:57.903278",
   "calls": [
     {
       "id": "01KG325ZD2GJE3VH7WZ9SNNVDP",
@@ -355,6 +355,17 @@
       "date": "2026-11-03",
       "duration_minutes": 31.450000762939453,
       "summary": "# Jake <> Brent weekly 1:1\nDate: 2026-11-03 | Duration: 31.450000762939453m\n\n## Summary\nThe discussion identified major data-quality issues in Rio: the surging-account segment shifted from 2,500 to 1,200 accounts, smaller accounts were absent, and employee counts sometimes differed from AirScale for companies such as Spotify and Allstate. Ashley or another support contact must investigate before Rio is used for SMB prioritization. Enterprise ICP criteria of 1,000-plus employees, high AirScale website visits, and high activity score identified 243 accounts, narrowed to 178 after excluding opportunities and customers, with 47 in the 1,000–10,000 employee range. About 120 accounts also had identified developers and became the priority tier. Jake planned to export contacts to Apollo and launch call-and-email sequences, emphasizing paid capabilities, coordinated reporting, and open-source usage. Tesla, Nvidia, and Shopify were highlighted, with Tesla prioritized for outreach. The discussion also covered missing inbound meetings, the need to identify 50–100 employee Pro customers, approximately $1.1 million across four January deals, and interpretation of the Washington Post forecast.\n\n## Keywords\nRio account segmentation, Airscale enrichment, Enterprise ICP, Open-source users, Apollo outreach, Sales pipeline forecasting\n\n## Action Items\n**Jake Stangl**\n- Ask Ashley or Rio support why SMB companies are missing from segment (08:21)\n- Focus prospecting on enterprise ICP accounts (22:37)\n- Move identified developers into Apollo (22:48)\n- Create Apollo outreach sequences (22:48)\n- Contact prioritised enterprise accounts (24:36)\n- Raise inbound meeting absence with Ryan (25:18)\n- Pursue 50–100 employee opportunities (25:39)\n- Update Ryan on enterprise ICP-plus focus (30:00)\n- Call Tesla (30:05)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M764DTJJ5VD1ZM09C7BE5X7V",
+      "source": "fireflies",
+      "title": "Jake <> Brent weekly 1:1 Thursday this week",
+      "date": "2026-11-12",
+      "duration_minutes": 31.420000076293945,
+      "summary": "# Jake <> Brent weekly 1:1 Thursday this week\nDate: 2026-11-12 | Duration: 31.420000076293945m\n\n## Summary\nEnterprise outreach remains focused on Rio OSS, Tesla, and companies with more than 1,000 employees, while Tesla is prioritized over SpaceX because multiple developers were active. Rio’s employee report is missing companies below 250 employees, so Jake will escalate the issue to Rio customer success and copy Brent. January 2027 pipeline includes $405,000 in scoping-stage value, with High Pages and Creative Fabrica entering scoping. The Washington Post opportunity needs a stage update, and guidance is still unclear on disqualified versus closed-loss outcomes. Dripify generated three San Francisco dinner attendees, but follow-up meetings are unconfirmed. Card has re-engaged as a qualified opportunity for enterprise self-hosted holdouts; Jake will seek Ryan’s guidance on platform and user fees before discussing pricing. Consumption pricing remains under leadership review.\n\n## Keywords\nRio OSS outreach, Enterprise prospecting, Tesla account strategy, Dripify dinner sourcing, Card holdout experiments, GrowthBook pricing model\n\n## Action Items\n**Jake Stangl**\n- Continue tracking unresolved demo request decline (03:03)\n- Follow up with Ryan or Jeff (03:03)\n- Keep issue on tracking list (03:03)\n- Follow up with Toast contact (04:14)\n- Coordinate Toast meeting (04:14)\n- Revise Tesla messaging (05:26)\n- Add related-company value proposition (05:26)\n- Review Rio OSS segment or report configuration (07:06)\n- Identify missing companies (07:06)\n- Contact Rio customer-success representative (10:08)\n- Include Brent in communication (10:08)\n- Locate Jeff’s message (12:18)\n- Review proposed opportunity definitions (12:18)\n- Send guidance to Brent (12:18)\n- Raise Washington Post stage discrepancy with Scott (13:33)\n- Ask Scott for discovery support feedback (13:33)\n- Identify appropriate AE for each dinner attendee (16:24)\n- Check AE calendars (16:24)\n- Coordinate follow-up meetings (16:24)\n- Check existing opportunities for Dripify contacts (17:06)\n- Create missing opportunities (17:06)\n- Request BDR owner attribution (17:06)\n- Prioritize outbound prospecting (21:33)\n- Develop Card opportunity (21:33)\n- Connect with Ryan about Card pricing (27:13)\n- Clarify platform and user pricing (27:13)\n- Use pricing guidance in Card conversation",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

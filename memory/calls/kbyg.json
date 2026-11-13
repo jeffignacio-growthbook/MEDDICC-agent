@@ -1,7 +1,7 @@
 {
   "company": "KBYG",
   "slug": "kbyg",
-  "last_etl_date": "2026-11-05T07:32:46.021312",
+  "last_etl_date": "2026-11-13T07:28:57.907539",
   "calls": [
     {
       "id": "01KZ1WMK7V8RWGSK5NYVSM2NPJ",
@@ -28,6 +28,17 @@
       "summary": "# KBYG - SF Dinner\nDate: 2026-11-04 | Duration: 22.739999771118164m\n\n## Summary\nThe team reviewed a candidate-engagement use case involving product recommendations, catalog search and ranking, treatment-option ordering, and personalized flows; whether it qualifies as a pricing experiment remained unresolved. Preparation for the November 5 executive dinner at Foreign Cinema covered the 6:30 start, early arrival, materials, two-table seating for 16 and 10 people, menu expectations, and dietary restrictions including Graham’s tree-nut restriction. Attendance tracking still requires confirmation for approximately 20 registrants and five GrowthBook guests. The group discussed prospects and customers, including Salesforce as a new-logo opportunity and Klaviyo, Quizlet, Change.org, and Genius Sports as potential expansion opportunities. Dossier profiles, intent signals, ICP indicators, account-owner input, and competitor-tool references will support preparation, although detected technology usage is unconfirmed. Additional goals include strategic seating, advancing active opportunities, identifying podcast guests, reconciling attendance, and improving the dossier.\n\n## Keywords\nExecutive dinner, Foreign Cinema, Attendee dossier, Salesforce, Optimizely, Customer expansion\n\n## Action Items\n**Lyndsie Berens**\nOrganise attendee confirmation tracking (03:17)\nDiscuss event seating plan (08:21)\nAsk account owners about active opportunities (17:06)\nCapture uncollected name tags (20:22)\n\n**Cary Rakin**\nClarify Salesforce organisational group (05:43)\nRun competitor checks (14:45)\n\n**Ashley Stirrup**\nBring event materials (08:30)\n\n**Event attendees**\nIdentify potential podcast guests or advocates (19:52)",
       "organizer": "lyndsie@growthbook.io",
       "participants": 9,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M787TMC7Z9W2ETQCC01HNR8R",
+      "source": "fireflies",
+      "title": "KBYG - London Dinner",
+      "date": "2026-11-12",
+      "duration_minutes": 25.030000686645508,
+      "summary": "# KBYG - London Dinner\nDate: 2026-11-12 | Duration: 25.030000686645508m\n\n## Summary\nThe team confirmed a London dinner at The Main Mayfair, beginning at 6:30, with capacity for 20 guests. The table is set for 18, while 16 attendees and five GrowthBook attendees are registered; registration is paused pending seating review. Standby, wait-list, and overflow options remain available, with seating adjusted onsite according to arrivals and no-shows. The team prepared attendee dossiers using Rio, HubSpot, LinkedIn, and registration data, with discussion focused on ClickHouse, Lendable, Bright Horizons, EDF Energy, and a potential Expedia Group attendee linked to an active deal. Setup begins around 6:00, cocktails and networking at 6:30, and James or Graham will give a brief welcome. Name tags, venue cards, seating information, travel coordination, and restaurant communication were assigned. Menu accommodations include vegetarian, turkey, rib eye, gluten-free, dairy-free, and seafood preferences, with Caesar salad anchovies requiring attention. Expenses must be submitted through Brex under “London Exec Dinner 2026,” while attendance will be confirmed through arrival tracking and name-tag collection.\n\n## Keywords\nLondon executive dinner, Seating plan, Attendee dossier, Account opportunities, Dietary requirements, Brex reimbursements\n\n## Action Items\n**Lyndsie Berens**\nSend meeting recording (00:25)\nAdd attendee to seating plan (02:38)\nCreate backup prospect list (03:11)\nConfirm Expedia Group attendee status with James (04:30)\nPrint and bring name tags (06:42)\nCollect event materials from James (07:34)\nSend backup plan (20:46)\nUpdate event tracker (20:46)\nUpdate attendee dossier (20:46)\nUpdate attendance records (20:46)\nUpdate invitee spreadsheet (22:37)\n\n**Liz Fox**\nSend final seating order to Janina (06:42)\nIdentify no-shows (21:10)\nCollect name tags (21:10)\nAdd bib lettuce salad option (16:19)\n\n**James Shannon**\nArrange local printing for event poster (06:42)\nWelcome attendees (15:33)\nConfirm Expedia attendee update with Scott (05:09)\nConfirm invited attendees (22:25)\n\n**Team**\nAdjust table cards (21:10)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 7,
       "summary_quality": "good"
     }
   ]

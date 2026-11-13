@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook x Bonial",
+  "slug": "growthbook-x-bonial",
+  "last_etl_date": "2026-11-13T07:28:57.908344",
+  "calls": [
+    {
+      "id": "01M72ZVF0AC73HJ23CDQMKV7VC",
+      "source": "fireflies",
+      "title": "Growthbook x Bonial - PoC discussion",
+      "date": "2026-11-12",
+      "duration_minutes": 66.55999755859375,
+      "summary": "# Growthbook x Bonial - PoC discussion\nDate: 2026-11-12 | Duration: 66.55999755859375m\n\n## Summary\nThe discussion defined a two-week Enterprise Cloud POC focused on successful completion and a forward plan, with self-hosting excluded. Admin access has been provisioned, and a separate staging environment is planned, with a production parent optional. Stefan owns the web SDK and Taron owns the mobile SDK; Swift integration for iOS and Kotlin integration for Android are required, using either the SDK wizard or manual setup. Frontend payload security was reviewed, including plaintext debugging and encrypted variants. Exposure events must include user or session identifiers, experiment data, and variation data. The existing Kraken tracking pipeline will be reused, while GrowthBook will read exposure data stored in the data lake and downstream joins will connect exposures with user actions. Athena configuration requires data sources, exposure queries, anonymous ID support, and IAM read access to specific tables. Outstanding work includes iOS, web, experiment, and Athena setup, with support available Monday afternoon, Tuesday morning, and asynchronously through Slack. Namespace best-practice guidance was also requested.\n\n## Keywords\nGrowthBook, A/B experimentation, SDK integration, Athena data warehouse, Exposure events, Feature flags\n\n## Action Items\n**Stefan Loeblich**\n- Create GrowthBook account (06:29)\n- Invite PoC participants (10:55)\n- Configure staging environment (17:00)\n- Set up web SDK integration (01:03:42)\n\n**Rémy Marin**\n- Provide Enterprise license (11:30)\n- Provide Slack support access (53:29)\n- Provide namespace guidance (01:04:15)\n- Share meeting recording (01:04:36)\n\n**Daria Mukhina**\n- Define exposure table access (42:52)\n- Configure Athena data connection (01:01:14)\n\n**Taron Sahakyan**\n- Add exposure information (50:43)\n- Set up mobile SDK integration (01:01:14)\n\n**Ali Heydari**\n- Validate Athena data connection (01:01:14)\n- Validate exposure event quality (50:43)\n\n**Fevzi Kahraman**\n- Debrief with PoC team (01:03:11)\n- Schedule follow-up session (01:03:11)",
+      "organizer": "remy@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

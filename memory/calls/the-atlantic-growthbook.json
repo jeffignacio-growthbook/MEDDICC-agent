@@ -1,0 +1,18 @@
+{
+  "company": "The Atlantic<>GrowthBook",
+  "slug": "the-atlantic-growthbook",
+  "last_etl_date": "2026-11-13T07:28:57.908836",
+  "calls": [
+    {
+      "id": "6af636eaec8ec400141ac494",
+      "source": "apollo",
+      "title": "The Atlantic<>GrowthBook - Deep Dive Session",
+      "date": "2026-11-12",
+      "duration_minutes": 58,
+      "summary": "# MEDDICC Sales Call Summary\n\nCall on [date not specified in transcript] with Jake Heier (GrowthBook Account Executive), Logan Bates (GrowthBook Technical Lead), Sophie Katasi (Atlantic, likely Product/Analytics Lead), Jason Langsner (Atlantic VP of Data), Derek Shin (Atlantic Data Scientist), Alisha Isaacs (Atlantic, attendee from previous call), and Rebecca (Atlantic, attendee status unclear).\n\n## Key Attendees & Authority\nJason Langsner, VP of Data, explicitly stated his role as supporter who would \"help to push it through with leadership,\" signaling budget authority and decision-making influence. Sophie Katasi appeared to lead the Atlantic team's evaluation process. Derek Shin, as a data scientist, represented technical requirements perspective, while Alisha Isaacs provided continuity from previous discussions.\n\n## Quantifiable Outcomes & Metrics\nWhile specific ROI metrics weren't discussed in this deep-dive session, the Atlantic team identified a critical objective: scaling their experimentation program to run more tests over the next 6-12 months. This timeframe established clear measurable goals around test volume and frequency, though specific numerical targets weren't articulated in the available transcript.\n\n## Technical Requirements & Pain Points\nThree primary pain points emerged: (1) need for cross-functional testing capabilities across product, engineering, and marketing teams with different requirements; (2) requirement for warehouse-native deployment ensuring data stays within their existing data warehouse infrastructure; (3) demand for transparency and ability to audit underlying SQL queries generating results. Atlantic's established data stack and data warehouse made the warehouse-native approach particularly attractive, addressing security concerns around PII exposure.\n\n## Solution Fit Discussion\nGrowthBook's three-component platform—feature flags, experimentation, and product analytics—appeared well-aligned with Atlantic's needs. The warehouse-native architecture resonated strongly, with data flowing to Atlantic's warehouse while GrowthBook maintained read-only access for aggregate analysis only. The open-source, customizable nature addressed flexibility requirements.\n\n## Technical Clarifications\nSophie Katasi raised specific questions about Visual Editor capabilities, particularly regarding mobile versus web limitations. Logan Bates clarified that the Visual Editor operates as a Chrome extension for web-only use currently, with mobile expansion contingent on customer demand. GrowthBook demonstrated traditional A/B testing and multivariant bandit testing capabilities, plus upcoming contextual multivariant bandit functionality.\n\n## Decision Process & Timeline\nNo explicit decision timeline emerged in this transcript segment, though the deep-dive demo format indicated Atlantic progressed beyond initial exploration. Jason Langsner's presence suggested movement toward evaluation completion, with leadership approval phase anticipated.\n\n## Next Steps\nThe team proceeded directly into platform demonstration, with Logan Bates walking through Visual Editor workflow and testing capabilities. No specific follow-up meeting dates or deliverables were documented in the provided transcript excerpt.",
+      "host": "Jake Heier",
+      "participants": 114,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Apollo/content automations",
+  "slug": "apollo-content-automations",
+  "last_etl_date": "2026-11-13T07:28:57.906655",
+  "calls": [
+    {
+      "id": "01M73DJWZBVA0E4PRH2GPA9Z6V",
+      "source": "fireflies",
+      "title": "Apollo/content automations",
+      "date": "2026-11-12",
+      "duration_minutes": 22.270000457763672,
+      "summary": "# Apollo/content automations\nDate: 2026-11-12 | Duration: 22.270000457763672m\n\n## Summary\nThe discussion covered Jack Ops, which combines sources, skills, and workflows to support tasks such as Webflow updates, publishing, and cross-tool usage through Claude Code, Cursor, and GitHub branches. Repeated jobs benefit from clear formats and strong examples, while the workflow library supports insights articles, product updates, podcasts, and reports. Content quality concerns included reportedly declining web traffic, uncertainty about Google’s impact, and unclear differentiation, although insights reportedly attract more traffic than blogs. Publishing automation reduces manual work by checking formatting, adding alt text, and correcting HTML tables. Proposed automation included regularly refreshing the content database, potentially weekly, ranking content by views and journey stage, and using Notion. The group also considered personalized nurture automation using Persona information, journey stages, email count, and campaign length. Jacqueline will share the nurture structure, Emmy will build an initial test while preserving manual gap review, and Jack Ops files will be shared for local installation and periodic updates.\n\n## Keywords\nJack Ops, Apollo, Content automation, Persona nurtures, Content database, Webflow publishing\n\n## Action Items\n**Emmy Sharp**\n- Present Jack Ops overview (01:26)\n- Send Jacqueline files location (19:54)\n\n**Jacqueline Thomson**\n- Test Jack Ops (16:41)\n- Schedule nurture review (18:41)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

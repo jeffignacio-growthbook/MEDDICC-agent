@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook x Zalando",
+  "slug": "growthbook-x-zalando",
+  "last_etl_date": "2026-11-13T07:28:57.907796",
+  "calls": [
+    {
+      "id": "01M7865JBMMJFNPPBXNA5YF5R7",
+      "source": "fireflies",
+      "title": "GrowthBook x Zalando: Enterprise Evaluation Review",
+      "date": "2026-11-12",
+      "duration_minutes": 24,
+      "summary": "# GrowthBook x Zalando: Enterprise Evaluation Review\nDate: 2026-11-12 | Duration: 24m\n\n## Summary\nGrowthBook’s AWS trial was technically successful: Kubernetes setup was straightforward, the product worked out of the box, and license-key setup avoided extensive approval steps. API integration, synthetic-data workflows, Databricks connectivity, and enterprise features also worked effectively, with no absolute product blockers identified. Zalando nevertheless favors a highly integrated experimentation platform built around its existing assignment service and potentially Databricks for analysis. That internal system supports roughly 50 components across product, pricing, commercial, logistics, and other workflows, within an architecture involving about 3,500 engineers and a similar number of microservices. Analysis ownership and the scope of external tooling remain under evaluation, while Databricks data pipeline mode and incremental updates are still open questions. GrowthBook received strong product feedback and was preferred over EPO by the technical evaluator, but legacy systems would require additional integration effort. Zalando expects to remain on EPO for longer, with GrowthBook follow-up materials and future relationship discussions planned.\n\n## Keywords\nGrowthBook, Zalando, Databricks, Experimentation platform, Data pipeline mode, Agentic engineering\n\n## Action Items\n**Scott Keller**\nConfirm Databricks pipeline mode support (08:38)\nPrepare Zalando trial recap (20:21)\nFollow up with Zalando (20:59)\nInform GrowthBook team about Zalando strategy (21:06)\n\n**Marcel Toben**\nAdvocate for GrowthBook internally (18:08)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
-  "company": "Storio & GrowthBook",
+  "company": "Storio × GrowthBook",
   "slug": "storio-growthbook",
-  "last_etl_date": "2026-11-11T07:22:05.846195",
+  "last_etl_date": "2026-11-13T07:28:57.908631",
   "calls": [
     {
       "id": "01M6ZR5TQ0TZ97999E3FQZYZC1",
@@ -12,6 +12,17 @@
       "summary": "# Storio & GrowthBook Commercials\nDate: 2026-11-10 | Duration: 25.290000915527344m\n\n## Summary\nThe discussion covered executive sponsorship, commercial approval, seat planning, and the transition from LaunchDarkly to GrowthBook. Emanuele briefed Michelle, CPO, who plans to discuss experimentation and GrowthBook at Thursday’s GET executive session. Marketing and commercial alignment remains important, particularly around discounting and promotion testing. Emanuele is advocating for PEAK A/B testing, with an A/A test planned to demonstrate low operational risk. James proposed seat-based pricing at 1,500 per seat per year, with greater flexibility possible for larger commitments such as 80 seats. Emily said the January 15 decision target may be difficult and requested stronger commercial terms and quarterly or biannual payments. Initial usage may require 45–50 seats, expanding to 75–80, while platform teams could raise demand to approximately 105. LaunchDarkly’s January renewal creates timing pressure, with six-month and one-year extensions under review. Next steps include updated commercial terms, seat confirmation, scaled training plans, and technical discussions.\n\n## Keywords\nGrowthBook, Seat-based pricing, A/B testing, LaunchDarkly migration, PEAK process, Experimentation budget\n\n## Action Items\n**Emanuele Pane**\nPrepare summary (05:03)\nAdvocate for A/B testing (07:41)\nProvide estimated seat count (13:02)\nAssess platform team seats (21:10)\n\n**Emily Simpson**\nNegotiate LaunchDarkly extension (18:26)\nOrganise in-person meeting (23:07)\n\n**James Shannon**\nSupport LaunchDarkly migration assessment (18:38)\nPrepare training and scaling document (22:20)\nSend updated commercial proposal (22:47)",
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M708E2RJKW7WGM2GEH1R6110",
+      "source": "fireflies",
+      "title": "Storio × GrowthBook – Integration design review",
+      "date": "2026-11-12",
+      "duration_minutes": 57.2400016784668,
+      "summary": "# Storio × GrowthBook – Integration design review\nDate: 2026-11-12 | Duration: 57.2400016784668m\n\n## Summary\nThe Express Pay pilot was approved for mobile checkout with 50/50 allocation and an AA test before AB testing. For AA option A, GrowthBook selects the variant, checkout writes the cookie, and Adobe tracking remains unchanged to preserve a trusted comparison baseline. Adobe data will feed GrowthBook through Snowflake hits, orders, and Adobe visitor identifiers, while anonymous, device, and account identifiers are supported. Historical experiments can be imported using experiment and variation IDs. The Snowflake connection succeeded with read-only access, although real datasets and assets are still needed. Warehouse fact tables will drive configurable metrics using user IDs, timestamps, and event names, including revenue per visitor, regular conversion, physical conversion, and AB funnel analysis. AB exposure events are planned through Tealium into Snowflake, with multiple identifiers captured and existing analytics retained. Consent remains a constraint in France and Germany, so the pilot will follow the existing consent pattern, potentially reducing analyzable users. Next steps are to prepare sample data, configure the AA test, review datasets, and use sticky bucketing for stable assignments.\n\n## Keywords\nGrowthBook, Snowflake, Express Pay, Experimentation, Sticky bucketing, Consent management\n\n## Action Items\n**Luuk Scholten**\n- Create updated diagram (04:42)\n\n**Rémy Marin**\n- Provide query guidance (37:48)\n\n**Christopher Taylor-Davies**\n- Confirm consent approach (41:30)\n\n**Shaaz Adiraja**\n- Consolidate integration requirements (52:47)\n- Schedule configuration meeting (52:47)",
+      "organizer": "remy@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

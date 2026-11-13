@@ -1,7 +1,7 @@
 {
   "company": "Growthbook <> Ripple",
   "slug": "growthbook-ripple",
-  "last_etl_date": "2026-10-06T07:00:49.969439",
+  "last_etl_date": "2026-11-13T07:28:57.906272",
   "calls": [
     {
       "id": "01M3N0NGB76AVJTYPJTCH8N5W3",
@@ -12,6 +12,17 @@
       "summary": "# Growthbook <> Ripple - POC Scoping\nDate: 2026-10-01 | Duration: 11.630000114440918m\n\n## Summary\nThe team agreed to evaluate Growth Book through a proof of concept rather than immediately committing to a full contract. VWO will remain in use for marketing because of its existing contract, cost considerations, and product analytics capabilities, while Growth Book will be tested for experimentation, feature flags, integration, and ease of use. The evaluation will cover simple marketing tests and more complex technical experiments, including Vercel connections and edge SDKs. Growth Book’s free starter account supports 3 users, 1 project, and 1 million events per month, while the Pro tier costs $40 per user per month and includes core experimentation features and a visual editor. Enterprise contracts begin around $30,000–$40,000 annually, but the team agreed that this may be premature. Calvin will clarify goals and account needs internally. The trial will assess integration ease, user experience, and experimentation robustness, while Dan remains available to support future enterprise discussions. Growth Book may eventually support consolidation if its analytics capabilities reach parity with VWO.\n\n## Keywords\nGrowth Book, Proof of Concept, Experimentation Platform, VWO Renewal, Pro Account, Feature Flags\n\n## Action Items\n\n**Calvin Jhunjhnuwala**\nDiscuss internally whether Growth Book Pro or enterprise plans make sense after team consultation (03:54)\nLead leveraging Growth Book for a proof of concept focusing on ease of integration, usability, robustness, and layered experimentation capabilities (04:10)\nProvide feedback on POC experience and potential expansion to enterprise contract dependent on proof of value and cost considerations (07:25)\n\n**Dan Wathne**\nSupport Calvin and team with starter/free and Pro account access and clarify feature availability (06:18)\nRemain available for questions and further collaboration as needed (09:59)\n",
       "organizer": "dan@growthbook.io",
       "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M76TSECD5TCRBMVK80KMGEXM",
+      "source": "fireflies",
+      "title": "Growthbook <> Ripple - Sync",
+      "date": "2026-11-12",
+      "duration_minutes": 15.829999923706055,
+      "summary": "# Growthbook <> Ripple - Sync\nDate: 2026-11-12 | Duration: 15.829999923706055m\n\n## Summary\nCalvin secured budget for a managed GrowthBook enterprise plan, with end-of-year procurement still targeted after the self-service route was paused because security, audit, and documentation requirements created too much work. The team selected managed deployment so GrowthBook maintains infrastructure while the customer continues using Databricks, avoiding the engineering burden of self-hosting. The draft order form is expected to include a $38k platform fee and eight seats, compared with an initial expected range of $30k–$40k. Calvin requested contractual protection against CDN and bandwidth overage charges, and Dan requested expected MAU information to size the appropriate buffer. Enterprise requirements include SSL and Okta integration, while premium support would use a private Slack channel after contracting. GrowthBook’s feature flags address current code-based workarounds, although VWO will remain for another year and may coexist during gradual migration. Heat maps remain unavailable, and analytics roadmap timing is unconfirmed. Calvin declined a separate proof of concept, and Dan committed to preparing the order form for legal or procurement review.\n\n## Keywords\nGrowthBook Enterprise, Managed Hosting, Feature Flags, Experimentation, VWO Migration, Procurement\n\n## Action Items\n**Dan Wathne**\nSend documentation to Calvin (06:06)\nStructure enterprise contract (07:26)\nPrepare enterprise order form (08:41)\nCheck analytics team heat-map roadmap (10:33)\nSend completed order form to Calvin (12:52)\n\n**Calvin Jhunjhnuwala**\nProvide expected monthly active users (07:57)\nAdvance enterprise procurement process (12:48)",
+      "organizer": "dan@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

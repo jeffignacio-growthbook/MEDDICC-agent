@@ -1,7 +1,7 @@
 {
   "company": "[Mandatory] KBYG",
   "slug": "mandatory-kbyg",
-  "last_etl_date": "2026-08-05T15:57:31.351180",
+  "last_etl_date": "2026-11-13T07:28:57.907176",
   "calls": [
     {
       "id": "01KV9GC1QMT57TRHEJJBEVDMS6",
@@ -13,7 +13,19 @@
       "organizer": "lyndsie@growthbook.io",
       "participants": 7,
       "keywords": "AI conference, booth management, lead scanning, event logistics, demo scheduling, swag distribution",
-      "action_items": "\n**Lyndsie Berens**\nCommunicate hotel booking status and finalize marketing card inclusion by Friday (05:45)\nCoordinate booth setup logistics and distribute lead scanners during setup hours (1-4pm Monday) (19:40)\nForward conference app download instructions and ensure team members have access (20:51)\nCompile and consolidate all event expenses and submit expense reports to Jennifer with Lyndsie in CC (14:45)\nCreate group text with all onsite participants for communication and share demo booking link in chat (17:45)\nEnsure post-event integration of leads and campaign data into HubSpot for tracking (18:17)\nManage shipping of leftover booth materials via FedEx after event (07:24)\nSend lead lists to Liz Fox for upload as soon as possible, preferably Thursday evening (18:29)\nProvide onsite coverage coordination, including reassignment of duties for calls or breaks (17:10)\n\n**Liz Fox**\nProvide real-time event support via Slack and assist with lead data retrieval and upload (15:20)\nShare post-meeting event materials and helpful links (03:50)\n\n**Ashley Stirrup**\nAssist with booth setup if arriving early and be on standby for possible transportation of materials (19:40)\n\n**Meeting Participants (All)**\nDownload and set up conference app with complete profile including photo (13:48)\nUse lead scanning tools (physical scanners and app) to capture contacts throughout conference (10:52)\nAdhere to booth schedule ensuring at least three staff present at all times, including demo expertise (10:50)\nActively book meetings onsite using personal or default demo booking links, reconciling after event if needed (12:04)\nParticipate in team dinner Wednesday evening (08:43)\n"
+      "action_items": "\n**Lyndsie Berens**\nCommunicate hotel booking status and finalize marketing card inclusion by Friday (05:45)\nCoordinate booth setup logistics and distribute lead scanners during setup hours (1-4pm Monday) (19:40)\nForward conference app download instructions and ensure team members have access (20:51)\nCompile and consolidate all event expenses and submit expense reports to Jennifer with Lyndsie in CC (14:45)\nCreate group text with all onsite participants for communication and share demo booking link in chat (17:45)\nEnsure post-event integration of leads and campaign data into HubSpot for tracking (18:17)\nManage shipping of leftover booth materials via FedEx after event (07:24)\nSend lead lists to Liz Fox for upload as soon as possible, preferably Thursday evening (18:29)\nProvide onsite coverage coordination, including reassignment of duties for calls or breaks (17:10)\n\n**Liz Fox**\nProvide real-time event support via Slack and assist with lead data retrieval and upload (15:20)\nShare post-meeting event materials and helpful links (03:50)\n\n**Ashley Stirrup**\nAssist with booth setup if arriving early and be on standby for possible transportation of materials (19:40)\n\n**Meeting Participants (All)**\nDownload and set up conference app with complete profile including photo (13:48)\nUse lead scanning tools (physical scanners and app) to capture contacts throughout conference (10:52)\nAdhere to booth schedule ensuring at least three staff present at all times, including demo expertise (10:50)\nActively book meetings onsite using personal or default demo booking links, reconciling after event if needed (12:04)\nParticipate in team dinner Wednesday evening (08:43)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M731A13EAXS4VCTQ0ASPBHQ0",
+      "source": "fireflies",
+      "title": "[Mandatory] KBYG - Conversion Hotel",
+      "date": "2026-11-12",
+      "duration_minutes": 32,
+      "summary": "# [Mandatory] KBYG - Conversion Hotel\nDate: 2026-11-12 | Duration: 32m\n\n## Summary\nThe discussion covered London dinner planning and preparations for Conversion Hotel, scheduled for November 20–22 at Grand Hotel Opduin on Texel, with approximately 150 attendees. The partner package includes an 8-minute main-stage presentation, a 30-minute breakout session, a lobby booth, and scheduled Saturday sessions. The booth will feature a monitor, banner, swag, and an interactive pinball competition, with targets of 10 LinkedIn connections, 5 on-site Calendly meetings, 5 demos by December 6, and 6 opportunities within 60 days. Travel includes a Thursday shuttle at 13:30 and a Sunday return at 14:00; booth move-in is Friday from 11:00 to 13:00. The team also reviewed meals, weather-related packing, staffing, evening programming, shirt quantities, game logistics, shipping, reimbursement coding, dinner-fee confirmation, and event photography.\n\n## Keywords\nConversion Hotel, Event logistics, Booth activation, Pinball competition, Lead generation, Conference travel\n\n## Action Items\n**Liz Fox**\nAsk restaurant about booking fee (01:00)\n\n**Lyndsie Berens**\nConfirm peak pinball period (14:03)\nSend Graham shipping instructions (16:45)\nSend calendar invitations (19:00)\nSend Graham hotel address (22:05)\n\n**James Shannon**\nSelect central London lunch venue (20:01)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
     }
   ]
 }

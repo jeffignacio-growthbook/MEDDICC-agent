@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook & InPost",
   "slug": "growthbook-inpost",
-  "last_etl_date": "2026-11-11T07:22:05.844515",
+  "last_etl_date": "2026-11-13T07:28:57.908080",
   "calls": [
     {
       "id": "01KY4KKQRJRVANX4ESE7F34AED",
@@ -37,6 +37,17 @@
       "date": "2026-11-10",
       "duration_minutes": 42.79999923706055,
       "summary": "# GrowthBook & InPost Integration Training\nDate: 2026-11-10 | Duration: 42.79999923706055m\n\n## Summary\nThe workshop defined how application data will flow into GrowthBook for experimentation. SDKs placed in application platforms fetch feature flags and experiments from the CDN, while exposure events are sent through GA4 and the existing Databricks and Postgres pipeline. GrowthBook reads exposure and metric data from Postgres through custom SQL queries and read-only permissions. Assignment queries must include experiment and variation IDs, unit identifiers, timestamps, and optional dimensions such as country, plan, and device type. Fact tables support metrics including purchases, page views, and add-to-cart activity. Consistent user identifiers are required for deterministic assignment across application layers. An AA test is being used to validate the integration, with similar control and variant results expected. Environments, projects, audit history, approvals, APIs, and configurable refresh intervals support governance and operations. A shared technical channel and follow-up training will help colleagues configure and run AB tests independently.\n\n## Keywords\nGrowthBook SDK, GA4 exposure events, Postgres data source, Experiment assignment queries, AA testing, Feature experimentation\n\n## Action Items\n**Chris Sanders**\nSend recording link (00:56)\nSet up communication channel (39:02)\nProvide experimentation training (39:34)\n\n**Unassigned**\nImplement SDKs (38:10)\nValidate AA test integration (39:51)",
+      "organizer": "chris@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M70NMRP3BN96ZXXJ2H5VYN0E",
+      "source": "fireflies",
+      "title": "GrowthBook & InPost Experimentation Training",
+      "date": "2026-11-12",
+      "duration_minutes": 51.15999984741211,
+      "summary": "# GrowthBook & InPost Experimentation Training\nDate: 2026-11-12 | Duration: 51.15999984741211m\n\n## Summary\nThe session demonstrated GrowthBook’s experiment setup, including checklists, holdouts, targeting, traffic allocation, and linked feature flags. Targeting can use saved groups, SDK-supplied attributes, prerequisite flags, and application version conditions. Deterministic bucketing combines experiment and unit IDs, while traffic allocation controls experiment entry and variant weights divide exposed users. Feature flags determine treatment behavior, with holdouts and static rules taking precedence over experiment assignment. Release-plan reviews, sticky bucketing, and namespaces help manage changes, identity transitions, and overlap risks. Exposure events connect user assignments with warehouse fact tables and product metrics, while dimensions and metric slices support analysis. Bayesian reporting presents winning probability, lift or loss, exposed users, and uncertainty; frequentist analysis is also available. Health checks, SQL query views, webhooks, projects, roles, approvals, and audit history support operational control. Follow-ups included confirming one-tailed versus two-tailed testing, sharing recordings, and planning workshops on advanced experimentation features.\n\n## Keywords\nGrowthBook, Experiment bucketing, Feature flags, Bayesian analysis, Warehouse metrics, Multi-armed bandits\n\n## Action Items\n**Chris Sanders**\nSend previous developer session recording (02:09)\nCheck one-tailed testing support (43:10)\nShare confirmed testing answer (43:10)\nSend current experimentation training recording (48:49)",
       "organizer": "chris@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

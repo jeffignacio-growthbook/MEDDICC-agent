@@ -1,0 +1,18 @@
+{
+  "company": "Anil Kanji and",
+  "slug": "anil-kanji-and",
+  "last_etl_date": "2026-11-13T07:28:57.902588",
+  "calls": [
+    {
+      "id": "01M739MMD1V7AGJ2EKHVJNBF4Q",
+      "source": "fireflies",
+      "title": "Anil Kanji and Ashley Stirrup",
+      "date": "2026-11-13",
+      "duration_minutes": 25.68000030517578,
+      "summary": "# Anil Kanji and Ashley Stirrup\nDate: 2026-11-13 | Duration: 25.68000030517578m\n\n## Summary\nThe planned joint presentation by Julie van der Hoop and Anil Kanji will explain how Wikipedia operates experimentation across product and fundraising. The preferred narrative combines rapid, iterative fundraising tests—covering messaging, layout, UI, UX, colors, and copy—with more deliberate product experiments, often using control-and-variant designs on a quarterly basis. Test Kitchen and GrowthBook are expected to improve shared instrumentation, reporting, language, and visibility, while encouraging product teams to test smaller changes before committing to large redesigns. Because Wikimedia is a nonprofit serving readers, contributors, editors, moderators, fundraising teams, and product teams, experiments require primary metrics and guardrails for readership, sustainability, editor growth, moderator workload, and vandalism. Privacy also shapes data collection, enrollment, event selection, data combinations, and retention. Anil and Julie will draft the abstract by the end of next week, with Lyndsie Berens and Ashley Stirrup reviewing it before submission on the 30th.\n\n## Keywords\nExperimentation culture, Wikimedia fundraising, GrowthBook, Privacy-aware analytics, Guardrail metrics, Optimizers Conference\n\n## Action Items\n**Lyndsie Berens**\nInform Kelly about joint presentation (02:33)\n\n**Julie van der Hoop and Anil Kanji**\nPrepare conference session draft (22:59)\nShare conference draft with GrowthBook (23:29)\nRevise conference abstract (23:29)\nSubmit conference abstract (23:29)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

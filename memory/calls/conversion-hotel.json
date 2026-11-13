@@ -1,0 +1,18 @@
+{
+  "company": "Conversion Hotel",
+  "slug": "conversion-hotel",
+  "last_etl_date": "2026-11-13T07:28:57.906931",
+  "calls": [
+    {
+      "id": "01M731A145QJBPZJYZ7PDZJWCB",
+      "source": "fireflies",
+      "title": "Conversion Hotel - Speaking Sync with Ton",
+      "date": "2026-11-12",
+      "duration_minutes": 36,
+      "summary": "# Conversion Hotel - Speaking Sync with Ton\nDate: 2026-11-12 | Duration: 36m\n\n## Summary\nThe discussion focused on shaping Growth Book’s presence at Experimentation Island for a broad audience of experimentation practitioners, managers, agencies, in-house teams, decision-makers, and potential users. The main stage will feature an eight-minute presentation led by Graham McNicoll, introduced by Ton Wesseling, using three slides and a memorable story about why Growth Book started, followed by prepared questions and promotion of the breakout session. The team agreed that Growth Book’s open-source roots, enterprise offering, deployment options, customer base, and safety should be explained clearly. For the breakout, the group favored moving beyond the narrow interleaving topic toward broader experimentation trends, including switchback testing, AI-related experimentation, and Growth Book fundamentals. Graham will present the breakout, while the team finalizes its title and description. Main-stage slides were requested by Wednesday, and the conference app was expected to launch Monday. Technical and travel support were also discussed, including HDMI, USB-C, backup equipment, and use of a Growth Book laptop.\n\n## Keywords\nGrowthBook, Experimentation, Open source, Interleaving experiments, Breakout session, Conversion Hotel\n\n## Action Items\n**Ashley Stirrup**\nRefine provisional main-stage title (12:46)\n\n**Ton Wesseling**\nUpdate event-app title (13:04)\nExport main-stage deck to PowerPoint (19:03)\nTest exported main-stage presentation deck (19:03)\nPrepare cue cards (11:55)\n\n**Lyndsie Berens**\nCoordinate breakout-session title and description (21:04)\nCoordinate main-stage Q&A questions (21:48)\n\n**Graham McNicoll**\nSend main-stage presentation slides to Ton (19:55)\nDevelop breakout-session title (21:11)\nWrite breakout-session description (21:11)\nPrepare main-stage Q&A questions (21:48)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

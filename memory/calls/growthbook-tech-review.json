@@ -1,0 +1,18 @@
+{
+  "company": "GROWTHBOOK Tech Review",
+  "slug": "growthbook-tech-review",
+  "last_etl_date": "2026-11-13T07:28:57.906797",
+  "calls": [
+    {
+      "id": "01M75H1BTHQM1PXS1WHZW04SBR",
+      "source": "fireflies",
+      "title": "GROWTHBOOK Tech Review",
+      "date": "2026-11-12",
+      "duration_minutes": 55,
+      "summary": "# GROWTHBOOK Tech Review\nDate: 2026-11-12 | Duration: 55m\n\n## Summary\nThe discussion evaluated GrowthBook as a unified experimentation platform for feature flags, visual and redirect tests, product and commercial experimentation, app use cases, warehouse-native data, CDP integration, and multi-brand governance. Its architecture keeps exposure events in the customer environment, connects read-only to warehouse data, and sends no PII to GrowthBook; BigQuery had been identified previously, while Snowflake was used as the primary warehouse during the walkthrough. The platform supports reusable metrics, funnels, ratios, goal and guardrail metrics, cohorts, slices, Bayesian and frequentist analysis, CUPED, confidence intervals, and extended attribution. Experiment setup includes SDK-based targeting, namespaces, holdouts, prerequisites, visual editing, and gradual rollouts with monitored rollback. Flicker was the main unresolved technical concern, with edge delivery, server-side testing, SDK optimization, and practical validation discussed. Nicole Brujis will send app questions, Jake Heier will respond, and the customer will continue evaluating vendors before sharing next steps.\n\n## Keywords\nWarehouse-native experimentation, Feature flags, Flicker-free testing, Guardrail metrics, Visual Editor, A/B testing\n\n## Action Items\n**Nicole Brujis**\nSend app-related questions (44:05)\nProvide evaluation next steps (44:24)\n\n**Jake Heier**\nSend technical review recap (44:15)\nRespond to app-testing questions (44:15)\nShare GrowthBook guidance (44:15)",
+      "organizer": "jake@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}
