@@ -1,7 +1,7 @@
 {
   "company": "AirOps Planning",
   "slug": "airops-planning",
-  "last_etl_date": "2026-11-06T07:30:52.825155",
+  "last_etl_date": "2026-11-14T07:10:06.545972",
   "calls": [
     {
       "id": "01KJXC5337E7411SK81AZFNK3P",
@@ -177,6 +177,17 @@
       "date": "2026-11-05",
       "duration_minutes": 64.66000366210938,
       "summary": "# AirOps Planning\nDate: 2026-11-05 | Duration: 64.66000366210938m\n\n## Summary\nThe discussion focused on resolving uncertainty in traffic measurement after cookie-consent changes, which may have affected Rio tracking and created differences among Plausible, Google Analytics, and Semrush. Search rankings and AI Overview visibility were reported as growing, but SERP changes may be reducing clicks, while organic search fell 2.6%. Insights visits increased by 879, blog visits decreased by 124, total visits rose 5%, demos remained broadly flat, and free signups declined slightly. The team supported rebuilding compare pages in the CMS with rich text, reusable structures, clearer customer fit, honest competitor comparisons, and stronger human usefulness. Content priorities included middle-funnel guidance, buyer evaluations, build-versus-buy topics, AI and experimentation, and 2027 trends. Jack and Emmy also planned to explore daily competitor monitoring using internal sources for fact-checking, with human review required before updates. Sources: 05:10, 11:19, 15:20, 23:53, 29:57, 36:34, 44:00, 49:47.\n\n## Keywords\nSEO performance, Compare pages, Cookie consent analytics, AirOps workflows, Competitive intelligence, Experimentation content strategy\n\n## Action Items\n**Jack Virag**\nAsk Huck Finch to review cookie scripts (08:17)\nClarify one-shot guide tracking (21:19)\nBuild competitive-monitoring workflow (36:34)\nDiscuss documentation navigation changes (18:09)\nClose loop with Scott on monitoring system (40:23)\n\n**Karen Henke**\nPrepare revised navigation mock-up (19:02)\nReview compare-page messaging (30:28)\nShare content strategy document (45:33)\nPropose middle-funnel content topics (47:02)\n\n**Jason Faber**\nIdentify Google update date (10:58)\nShare competitor comparison examples (35:08)\nPrioritise next-month content topics (01:01:45)\nAssess top Insights articles (01:02:20)\n\n**Yousef**\nBuild CMS compare-page system (23:53)\n\n**Emmy Sharp**\nBuild competitive-monitoring workflow (36:34)\nAdd reusable research to repository (01:00:26)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6KYF46R2042BR71BPT6ATDK",
+      "source": "fireflies",
+      "title": "AirOps Planning",
+      "date": "2026-11-13",
+      "duration_minutes": 62.130001068115234,
+      "summary": "# AirOps Planning\nDate: 2026-11-13 | Duration: 62.130001068115234m\n\n## Summary\nThe group discussed an always-on competitive listener using a Google Sheet to compare GrowthBook messaging with competitor claims, identify sources and contradictions, and flag outdated website or blog content. GrowthBook’s source of truth will combine Emmy’s style and brand-facts document with GitHub, dashboard, and potentially pricing-page data. Agent-facing feature flags may launch with new SDK work, enabling basic flags without an account and supporting positioning GrowthBook as an open-source standard for agents. Athena showed 15% share of voice, 78 mentions, and 58 citations versus a competitor average of 33, while results varied by model. The team also reviewed descriptive SEO H1s for product and navigation pages, expanded Jack Ops content workflows, maintained separate ownership for competitive pages, and planned weekly reviews focused on signups, conversions, Athena visibility, and selected SEO metrics.\n\n## Keywords\nCompetitive intelligence, AI-agent marketing, Free feature flags, Athena visibility tracking, SEO H1 optimisation, Content automation\n\n## Action Items\n**Emmy Sharp**\nRefresh GrowthBook writing style guide and brand facts (02:58)\nUse pricing page as authoritative reference (09:45)\nBuild audience-specific Jack Ops workflows (31:32)\n\n**Karen Henke**\nReview agent-focused marketing positioning (13:44)\nReview header-page SEO inventory (54:44)\nImprove Visual Editor product page (57:58)\n\n**Jason Faber**\nReview free feature-flag article performance (25:53)\nDistinguish branded from unbranded prompts (33:32)\nAdd free feature-flag prompts to Athena tracking (38:43)\nSend Visual Editor SEO brief to Karen (58:18)\nEvaluate Visual Editor for Athena monitoring (58:32)\nPropose recurring meeting metrics (59:46)\n\n**Jack Virag**\nGenerate header-navigation page inventory (54:44)\nAdd recommended page-title column (55:14)\nReach out to Yousef about competitive-page work (59:46)",
       "organizer": "ashley@growthbook.io",
       "participants": 7,
       "summary_quality": "good"

@@ -1,7 +1,7 @@
 {
   "company": "Engineering Team Sync",
   "slug": "engineering-team-sync",
-  "last_etl_date": "2026-10-17T05:11:12.182548",
+  "last_etl_date": "2026-11-14T07:10:06.545178",
   "calls": [
     {
       "id": "01KGT5917ZP7J7SSP08X1N1ZW3",
@@ -224,6 +224,17 @@
       "date": "2026-10-16",
       "duration_minutes": 61.380001068115234,
       "summary": "# Engineering Team Sync\nDate: 2026-10-16 | Duration: 61.380001068115234m\n\n## Summary\nThe discussion covered API design, Remote Groups, navigation, AI, event forwarding, project access, and populations. External API use was confirmed for contextual bandits, while internal routes remain necessary for billing and subscriptions. Remote Groups support oversized targeting lists by storing group values outside payloads; the initial file limit is 100 megabytes, supporting roughly 3–5 million email addresses, with versioned uploads and Redis evaluation. Navigation and settings prototypes introduced collapsible side navigation, grouped settings, search, and several unresolved placement and branding decisions. AI autocomplete shipped to production, is enabled by default, uses relevant page context, and responds in roughly 500 milliseconds, though coverage gaps remain. Shared event forwarding replaces organization-specific infrastructure with shared topics and targets $0.09 per gigabyte, while broader availability includes the free tier. Project-scoped EAQs improve resource isolation. Populations development includes a fact-table MVP with limits of five fact tables and 20 steps, while metric-pattern review and SQL generation continue.\n\n## Keywords\nRemote Groups, Feature-flag targeting, Side navigation redesign, AI autocomplete, Event forwarding, Population builder\n\n## Action Items\n**Jeremy Dorn**\nVerify OpenAPI exclusion behavior (01:39)\n\n**Andy White**\nRefine Remote Groups interface (22:38)\n\n**Gabe Melean**\nIntegrate live chat navigation (29:27)\n\n**Nhat Ho**\nRelease event-forwarding system (49:26)\n\n**Alli Leong**\nReview population builder design (58:48)",
+      "organizer": "michael@growthbook.io",
+      "participants": 29,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M6Q2WFE8JQYRHAQNDNTMPRVJ",
+      "source": "fireflies",
+      "title": "Engineering Team Sync",
+      "date": "2026-11-13",
+      "duration_minutes": 68,
+      "summary": "# Engineering Team Sync\nDate: 2026-11-13 | Duration: 68m\n\n## Summary\nThe discussion covered mixed adoption of Fable 5.2, with Fable favored for heavier analysis and Opus 5.5 preferred for faster everyday work; Fable resets expire December 10. Growthbook may adopt weekly patch releases for security and small fixes, while version 5.2.1 was planned for early the following week with support monitoring branch-specific issues. QA overrides were demonstrated for draft experiments and will disappear when experiments launch, replacing a prior SDK workaround. Fact-table details now include query editing, charts, filters, samples, event associations, metrics, refresh controls, and cached values, though expanded-row and tab styling need refinement. Population creation supports one-step definitions and denominator metrics in Metrics Explorer, while feature-flag targeting remains future work. The homepage redesign aims to support work starting through needs-attention items, recent activity, learning content, documentation, and dashboards, but its information architecture and personalization require validation. Multiple event forwarders are being restored with environment-specific ownership, while the free tier remains capped at 1 million events per month.\n\n## Keywords\nFable 5.2, Patch releases, QA overrides, Fact tables, Population metrics, Homepage redesign, Event Forwarder\n\n## Action Items\n**Adriel Vieira**\nCut release 5.2.1 (12:18)\n\n**Kevin**\nCut release 5.2.1 (12:18)\n\n**Gabe Melean**\nAdd notification to start-experiment dialog (18:57)\n\n**Nobu Ajito**\nFix expanded-row alignment (31:26)\n\n**Johnny Martinez**\nReview homepage concept (41:16)\n\n**Jeremy Dorn**\nPresent product/demo application (54:48)",
       "organizer": "michael@growthbook.io",
       "participants": 29,
       "summary_quality": "good"

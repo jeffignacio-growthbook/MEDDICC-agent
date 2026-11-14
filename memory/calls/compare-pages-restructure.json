@@ -1,0 +1,18 @@
+{
+  "company": "Compare pages restructure",
+  "slug": "compare-pages-restructure",
+  "last_etl_date": "2026-11-14T07:10:06.547305",
+  "calls": [
+    {
+      "id": "01M75V0K44RJBXTSNKP0NZPGEZ",
+      "source": "fireflies",
+      "title": "Compare pages restructure",
+      "date": "2026-11-13",
+      "duration_minutes": 56,
+      "summary": "# Compare pages restructure\nDate: 2026-11-13 | Duration: 56m\n\n## Summary\nThe discussion focused on improving the initial page experience while preserving existing content. The page should begin with a clearer narrative and short summary before presenting deeper details, while retaining the at-a-glance table covering audience and setup information with better readability and scanning. Competitive messaging under consideration includes cost, developer friendliness, and warehouse-native architecture, alongside product-team positioning around open source, self-hosted deployment, and easy technology-stack integration. The cost message should emphasize predictable pricing and a significantly cheaper position. Customer value should also highlight direct engineering access and experimentation expertise. Battle cards, pricing-page language, and FAQ content will provide source material, although battle cards need more customer-ready phrasing. Karen will draft a revised Figma page structure, Ashley will refine the battle-card format, and Emmy will schedule a three-person review next week.\n\n## Keywords\nCompetitive comparison pages, GrowthBook, Optimizely, Battle cards, Warehouse-native experimentation, Progressive disclosure\n\n## Action Items\n**Emmy Sharp**\nDiscuss comparison-page content (06:54)\nSchedule follow-up review (54:17)\n\n**Ashley Stirrup**\nDevelop battle-card format (12:21)\n\n**Karen Henke**\nCreate Figma concept (52:05)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

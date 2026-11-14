@@ -1,7 +1,7 @@
 {
-  "company": "PMM / Ashley",
+  "company": "PMM <-> Ashley",
   "slug": "pmm-ashley",
-  "last_etl_date": "2026-08-05T15:57:31.345586",
+  "last_etl_date": "2026-11-14T07:10:06.547408",
   "calls": [
     {
       "id": "01KWX05EBKZKJN257ZKCHR1VMW",
@@ -13,7 +13,19 @@
       "organizer": "elyse@growthbook.io",
       "participants": 3,
       "keywords": "release week, product strategy, experimentation platform, AI integration, competitor positioning, internal alignment",
-      "action_items": "\n**Scott Bailey**\nLead planning and execution of the release week format with daily thematic focuses to showcase multiple product themes and accommodate self-hosting tag releases (00:14)\n\n**Ashley Stirrup**\nContinue discussions with Graham and Jeremy to clarify product strategy and positioning related to AI and experimentation, ensuring alignment with market shifts and internal expectations (03:14)\n"
+      "action_items": "\n**Scott Bailey**\nLead planning and execution of the release week format with daily thematic focuses to showcase multiple product themes and accommodate self-hosting tag releases (00:14)\n\n**Ashley Stirrup**\nContinue discussions with Graham and Jeremy to clarify product strategy and positioning related to AI and experimentation, ensuring alignment with market shifts and internal expectations (03:14)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M731A13JSV74XWWGHQ10HS0X",
+      "source": "fireflies",
+      "title": "PMM <-> Ashley planning/strategy",
+      "date": "2026-11-13",
+      "duration_minutes": 32.459999084472656,
+      "summary": "# PMM <-> Ashley planning/strategy\nDate: 2026-11-13 | Duration: 32.459999084472656m\n\n## Summary\nThe discussion reaffirmed enterprise growth, higher ACV, and expansion within existing customers as the baseline strategy, while product-led growth remains an unapproved option requiring organizational commitment. Inbound is the highest marketing priority, alongside stronger customer awareness through case studies, webinars, press, and thought leadership. Product marketing should focus releases on three customer-relevant features, use customer quotes, and position session replay primarily for existing-customer expansion. A customer advisory board, customer sessions, public and private events, and podcast outreach would strengthen advocacy. Marketing and experimentation teams should dogfood GrowthBook, while adoption bets across product analytics, MCP, and AI must match product and development capacity. The developer campaign is being shaped for 2027, AI and MCP pages need immediate updates, and interactive-demo goals require clarification. Leadership alignment is needed before major bets are committed.\n\n## Keywords\nProduct-led growth, Customer advisory board, Product adoption, Developer marketing, Interactive demo, Customer marketing\n\n## Action Items\n**Elyse Fox**\nLaunch marketing-focused Slack channel (12:48)\nDefine team voting process (12:48)\nTurn selected results into content ideas (12:48)\nPrepare strategic options presentation (22:21)\nDefine product adoption tactics (29:48)\nHold strategic options working session (31:09)\n\n**Ashley Stirrup**\nDevelop customer advisory board agenda (18:51)\nArrange leadership debrief (30:59)\n\n**Scott Bailey**\nPrepare strategic options presentation (22:21)\nBring interactive demo to marketing call (24:24)\nDefine product adoption tactics (29:48)\nHold strategic options working session (31:09)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
     }
   ]
 }

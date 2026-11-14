@@ -1,0 +1,18 @@
+{
+  "company": "QA Scope and",
+  "slug": "qa-scope-and",
+  "last_etl_date": "2026-11-14T07:10:06.544862",
+  "calls": [
+    {
+      "id": "01M7B55SC0S88MNVCXYGVA3QQC",
+      "source": "fireflies",
+      "title": "QA Scope and Fact Table Planning",
+      "date": "2026-11-13",
+      "duration_minutes": 9.420000076293945,
+      "summary": "# QA Scope and Fact Table Planning\nDate: 2026-11-13 | Duration: 9.420000076293945m\n\n## Summary\nQA support is limited to draft experiments and development environments, with filters for SDKs and groups; feature-flag support is planned for a later stage. Override rules run in SDK order, while QA for running experiments is out of scope and overrides are removed after launch. A start notification is planned. The discussion also covered an expected automatic SDK path, the need to verify SDK behavior, a suggested payload-metadata enhancement, and whether to use a suffix or a separate flag. A fact-table walkthrough began, with two variations planned.\n\n## Keywords\nQA overrides, Draft experiments, SDK connections, Developer Tools, Payload metadata, Fact tables\n\n## Action Items\n**Gabe Melean**\nAdd launch notification (04:11)\n\n**Jeremy Dorn**\nReview SDK preview flow (04:39)\nConfirm QA override requirements (04:39)\nShare confirmed behavior (04:39)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

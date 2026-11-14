@@ -1,0 +1,18 @@
+{
+  "company": "Level + GrowthBook",
+  "slug": "level-growthbook",
+  "last_etl_date": "2026-11-14T07:10:06.544704",
+  "calls": [
+    {
+      "id": "01M78VKZZAA0FH19E13VHXPQR6",
+      "source": "fireflies",
+      "title": "Level + GrowthBook",
+      "date": "2026-11-13",
+      "duration_minutes": 10.34000015258789,
+      "summary": "# Level + GrowthBook\nDate: 2026-11-13 | Duration: 10.34000015258789m\n\n## Summary\nMission 42 is evaluating GrowthBook Enterprise for experimentation and long-term feature flagging, with self-hosting, SSO, audit trails, and sticky bucketing identified as important requirements. The team has tested GrowthBook in a CI environment, but missing capabilities—including sticky bucketing—must be addressed before a full-scale production release. The platform is expected to operate as part of, or closely alongside, Mission 42’s data platform, which is still in an MVP phase with production use cases not yet fully defined. The preferred approach is to begin with a limited scope and expand license counts as adoption grows, making licensing cost, deployment setup, feature coverage, and scaling important open topics. Yury L owns technical implementation, Valentin Shantarenko leads technology selection, Darren is expected to run experiments, and Law leads contract and security review. No production launch date, final contract, or purchase decision was recorded.\n\n## Keywords\nGrowthBook Enterprise, Sticky bucketing, Feature flagging, Experimentation, Self-hosting, Licensing\n\n## Action Items\n**Christian Liebenow**\nWalk Mission 42 team through GrowthBook Enterprise licensing (06:57)\nStop meeting recording (09:09)\n\n**Law Floyd**\nReview GrowthBook contract (08:37)\nSign GrowthBook contract (08:37)",
+      "organizer": "christian@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

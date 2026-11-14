@@ -1,0 +1,18 @@
+{
+  "company": "Maarten and James",
+  "slug": "maarten-and-james",
+  "last_etl_date": "2026-11-14T07:10:06.547521",
+  "calls": [
+    {
+      "id": "01M780DYYHKX5344VE515C3WXK",
+      "source": "fireflies",
+      "title": "Maarten and James Shannon",
+      "date": "2026-11-13",
+      "duration_minutes": 73.05999755859375,
+      "summary": "# Maarten and James Shannon\nDate: 2026-11-13 | Duration: 73.05999755859375m\n\n## Summary\nThe team evaluated GrowthBook as a potential platform for expanding experimentation across 21RUN and Off Running, which share a codebase and serve European markets including the Netherlands, Germany, and Belgium. Maarten described an existing server-side testing setup managed in backend code, with results analyzed through BigQuery, while Juliette is establishing CRM and experimentation workflows. GrowthBook’s read-only BigQuery integration, PHP and frontend SDKs, local experiment rules, anonymous-to-logged-in identity handling, Visual Editor, code-based testing, custom events, funnel metrics, health checks, and Slack alerts were reviewed. The team preferred starting with a limited rollout using Starter or Pro while validating SDK integration, data flow, QA, and operational processes. They will compare plan features, especially Enterprise analysis capabilities and query optimization, before deciding. Juliette will send remaining questions by email, and implementation documentation may be needed for SDK attributes, custom metrics, Figma workflows, and Visual Editor validation.\n\n## Keywords\nBigQuery experimentation, Feature flags, A/B testing, Visual editor, CUPED analysis, Magento e-commerce\n\n## Action Items\n**Maarten Duineveld**\nReview GrowthBook pricing page and capabilities (01:10:50)\n\n**Juliette Ferdinand**\nReview GrowthBook pricing page and capabilities (01:10:50)\n\n**James Shannon**\nSend design-to-variant documentation (39:05)\nAsk internally about statistical considerations (01:08:04)\nAnswer remaining All4Running questions (01:11:24)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

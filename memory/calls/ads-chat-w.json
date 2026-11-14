@@ -1,0 +1,18 @@
+{
+  "company": "ads chat w",
+  "slug": "ads-chat-w",
+  "last_etl_date": "2026-11-14T07:10:06.544530",
+  "calls": [
+    {
+      "id": "01M76NCJ92DP7GE7HM9FS2YSGB",
+      "source": "fireflies",
+      "title": "ads chat w gina :)",
+      "date": "2026-11-13",
+      "duration_minutes": 8.550000190734863,
+      "summary": "# ads chat w gina :)\nDate: 2026-11-13 | Duration: 8.550000190734863m\n\n## Summary\nThe feature-flag direction was validated as worthwhile, with an open-source SDK included. Agents are expected to create accounts and use GrowthBook feature flags, while the remaining agent handoff piece is expected next week, with Guy handling it and Jack messaging him. Vendor advertising produced limited impact, as vendors rarely exceeded internal work started by Jack and Sky. Results increased substantially after Gina joined, supported by dedicated internal ownership and her advertising background. The advertising playbook developed through six months of repeated testing across multiple channels, content approaches, and advertising methods; no magical tactic was identified, but the process established a simple working framework connected to broader marketing strategy. Jack requested practical, replicable vendor-stage guidance while excluding proprietary information. Gina raised a privacy concern about the note-taker’s OpenAI working context, and note-taking stopped after Jack agreed.\n\n## Keywords\nFeature flags, Agent-to-human handoff, Advertising vendors, Google Ads, Marketing strategy, Advertising playbook\n\n## Action Items\n**Jack Virag**\nConfirm handoff timing with Guy (01:12)\nShare confirmed timing (01:12)",
+      "organizer": "jack@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

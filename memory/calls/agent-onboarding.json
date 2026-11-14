@@ -1,0 +1,18 @@
+{
+  "company": "Agent onboarding",
+  "slug": "agent-onboarding",
+  "last_etl_date": "2026-11-14T07:10:06.544789",
+  "calls": [
+    {
+      "id": "01M7931B6QCQTE71ANWZPFMNFT",
+      "source": "fireflies",
+      "title": "Agent onboarding",
+      "date": "2026-11-13",
+      "duration_minutes": 32.18000030517578,
+      "summary": "# Agent onboarding\nDate: 2026-11-13 | Duration: 32.18000030517578m\n\n## Summary\nThe team approved an open-source, account-free SDK wedge for agents, supporting hard-coded on/off, targeting, and percentage flags locally, with a future upgrade path to GrowthBook that adds metrics and instant kill switches while retaining SDK checks. Importing configurations still requires a human to create an account and enter an email, although a frictionless claim flow using a temporary uploaded payload and sign-in or sign-up link is being explored. The JavaScript SDK release gates promotion, with availability planned for next week, alongside a polished claim UI. Launch messaging will lead with a free Feature Flags SDK rather than account creation. Agent-focused tutorials will prioritize TypeScript and cover frameworks and languages, supported by docs, Dev.to, Medium, and a submitted guide covering browser, React, and Next.js. Video content and influencer outreach were proposed after baseline content. The product tour is live, while GrowthBook domain migration and an A/B test comparing signup with free access remain pending.\n\n## Keywords\nFeature flags SDK, Coding agents, GrowthBook onboarding, TypeScript integrations, Agent-focused documentation, Interactive product demo\n\n## Action Items\n**Guy Langford-lee**\nComplete claim-flow interface (11:54)\nShip implementation for review (25:15)\n\n**Jack Virag**\nReview agent guide (22:47)\nFinish marketing content (24:10)\nContact Scott and Alyssa (24:10)\nCreate Slack channel (25:02)\nInclude Scott and Elise (25:09)\nAsk SEO team about iframe (27:23)\n\n**Jeremy Dorn**\nCoordinate video content (24:36)\nShow product-tour demo (25:52)\nShare demo URL (27:06)\nMove demo to GrowthBook domain (27:09)",
+      "organizer": "jack@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

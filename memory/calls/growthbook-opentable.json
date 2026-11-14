@@ -1,7 +1,7 @@
 {
   "company": "Growthbook <> OpenTable",
   "slug": "growthbook-opentable",
-  "last_etl_date": "2026-10-30T06:38:14.600196",
+  "last_etl_date": "2026-11-14T07:10:06.546869",
   "calls": [
     {
       "id": "69de6935c1f9eb0011fa27dc",
@@ -201,6 +201,17 @@
       "date": "2026-10-29",
       "duration_minutes": 11.680000305175781,
       "summary": "# Growthbook <> OpenTable - Weekly POC Sync\nDate: 2026-10-29 | Duration: 11.680000305175781m\n\n## Summary\nOsteria is taking a central coordination role across front-end and model-side experimentation. A/A tests are approaching the team’s standard two-week evaluation window, and Osteria plans to reconnect with Fed early next week after Fed returns, then begin deeper analysis and raise follow-up questions. Rahul and Saranya launched a separate A/B test during the week, while Osteria continues tracking both workstreams. Fed previously handled setup work, and the handoff remains pending. Dan and Logan offered live product and feature walkthroughs, Slack follow-up, one-on-one support, and continued weekly unblocker sessions. Rahul’s team commonly uses those sessions for technical questions, and no active technical blocker was reported. Forrest’s team submitted budget requests to Finance, but no approval, timing, or outcome was provided.\n\n## Keywords\nA/B testing, POC, Experiment results, Front-end development, Product support, Budget requests\n\n## Action Items\n**SFO5-12-003 Osteria**\nConnect with Fed (01:48)\nReview OpenTable test results (01:48)\n\n**Dan Wathne**\nProvide product walkthroughs (02:26)\nProvide ongoing support (02:26)\n\n**Logan Bates**\nProvide product walkthroughs (02:26)\nProvide ongoing support (02:26)",
+      "organizer": "dan@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M75WF0MB2M1XFNT3HF80FMGH",
+      "source": "fireflies",
+      "title": "Growthbook <> OpenTable - Weekly POC Sync",
+      "date": "2026-11-13",
+      "duration_minutes": 41.70000076293945,
+      "summary": "# Growthbook <> OpenTable - Weekly POC Sync\nDate: 2026-11-13 | Duration: 41.70000076293945m\n\n## Summary\nGrowthBook results were nearly identical to the internal tool, with most differences limited to 0.01–0.02 percentage points. The cancellation discrepancy was resolved after Rahul matched the internal booking-based ratio definition. The POC is progressing positively, though it may extend beyond the original end-of-November target, with success depending on GrowthBook being as easy or easier to use while adding capabilities. Remaining validation covers dashboards, power calculations, traffic splits, holdouts, platform targeting, and backend tracking. The team prefers one project with separate development and production data sources to prevent incorrect tracking, while environment-level data-source support remains a product gap. QA overrides, experiment templates, metadata retrieval, and platform behavior also require review. Several hundred internal metrics may create dashboard noise. Commercial approval is affected by the CTO transition, and read-access pricing remains the main concern. Dan proposed a 15-minute discussion next week and a technical working session for Rahul and Saranya.\n\n## Keywords\nA/B testing, GrowthBook, Feature flags, Environment isolation, Dashboarding, Seat pricing\n\n## Action Items\n**Logan Bates**\nConfirm GrowthBook QA overrides (11:10)\nShare environment-specific data source request (16:28)\nRaise environment template request (24:16)\nReview experiment metadata support (22:59)\n\n**Rahul Bhatia**\nReview dashboarding and calculator workflows (27:06)\nValidate platform targeting (30:47)\nVerify frontend platform metadata usage (35:41)\n\n**Saranya HV**\nReview dashboarding and calculator workflows (27:06)\nRun platform targeting parity test (29:18)\nParticipate in GrowthBook working session (37:07)\n\n**Forrest Rice**\nDiscuss commercial structure (38:54)\nConfirm seat pricing concerns (39:40)\n\n**Dan Wathne**\nReview remaining POC gaps (36:18)\nPropose revised seat structure (38:54)\nPrepare order form (38:54)",
       "organizer": "dan@growthbook.io",
       "participants": 10,
       "summary_quality": "good"
