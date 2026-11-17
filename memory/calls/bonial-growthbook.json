@@ -1,7 +1,7 @@
 {
   "company": "Bonial & GrowthBook",
   "slug": "bonial-growthbook",
-  "last_etl_date": "2026-11-04T07:05:05.235130",
+  "last_etl_date": "2026-11-17T08:40:23.070248",
   "calls": [
     {
       "id": "01M3KGWWGARD21EFTAZRTQ04G0",
@@ -56,6 +56,17 @@
       "summary": "# Bonial & GrowthBook | POC & Commercials\nDate: 2026-11-03 | Duration: 36m\n\n## Summary\nThe discussion covered an enterprise cloud requirement with 20 seats and possible reader-only users, while recognizing that unlimited experimentation and flexible subscriptions are important constraints. The current budget is €50k, €60k may be possible, and amounts above €60k are difficult; pricing levers include a proposed €70k total, a 500-user price, and a lower platform fee. The open feature is the highest internal priority, with an engineering update planned Thursday. Cloud setup guidance, including a one-page document, sources, and SDKs, is prepared, and the POC scope is targeted for completion this year before procurement follows approval. The intended path includes December signing, possible deferred payment, January integration, February traffic, and migration readiness by March. A two-year option with annual payments and fixed pricing remains open. The DPA has been shared, the customer agreement is forthcoming, and legal review is expected. Bonial is open to a case study subject to agreement language and exclusion of sensitive disclosures. Slack collaboration, POC coordination, internal approvals, and parallel legal, commercial, and product workstreams are established.\n\n## Keywords\nEnterprise cloud, POC, User licensing, Pricing negotiation, Contract commitment, Open feature\n\n## Action Items\n**Marcel Geldner**\nConfirm delivery timeline (03:09)\nDiscuss pricing reductions (10:55)\nProvide customer agreement (15:08)\nSend setup guide (20:25)\nAdd collaboration contacts (20:59)\nProvide trust portal access (23:33)\nInclude Remy in discussion (24:47)\n\n**Fevzi Kahraman**\nSeek budget approval (21:32)\nEvaluate two-year commitment (21:32)\nPrepare POC scope (22:10)\nInvolve procurement colleague (22:10)\nPursue annual signature (22:52)\nReview customer agreement (23:33)\nSchedule follow-up discussion (24:47)\n\n**Remy**\nPrepare POC requirements (22:57)",
       "organizer": "marcel@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7HVT3A44P3GEKWQH9NTQG3Q",
+      "source": "fireflies",
+      "title": "Bonial & GrowthBook | Sync",
+      "date": "2026-11-16",
+      "duration_minutes": 32,
+      "summary": "# Bonial & GrowthBook | Sync\nDate: 2026-11-16 | Duration: 32m\n\n## Summary\nCommercially, an NDA was selected for a two-week POC to avoid a bureaucratic agreement, while the order form still requires procurement routing under Marcel’s ownership. The DPA remains with the legal team for review, and the annual contract was deferred because the broader scope is still uncertain. POC priorities include feature experimentation, flagging guidance, SDK integration, and focused enablement sessions for web and mobile teams. Tara shared SDK questions, Stefan starts SDK work tomorrow, and the POC needs clearer tasks and guidelines. January is the implementation target, with experiments and an SDK release planned for February. GrowthBook will become the default, new Optimize experiments are prohibited, and a two-month transition buffer is planned. Existing experiments need review with fallback logic, while migration examples from Statsig and LaunchDarkly were requested. The GrowthBook setup will be redesigned across iOS, Android, and Web, prioritizing active apps over legacy brands. Fevzi will provide current-setup bullets, Rémy will propose organization, and customer success and Slack support will continue after the POC.\n\n## Keywords\nPOC contracting, NDA and DPA, Feature flagging, Experimentation setup, Optimize migration, SDK implementation\n\n## Action Items\n**Fevzi Kahraman**\nConfirm Bonial procurement requirement (03:14)\nShare platform structure (20:31)\n\n**Marcel Geldner**\nProvide NDA to Bonial (04:03)\nSend order form (17:59)\nInvestigate customer migrations (18:35)\n\n**Rémy Marin**\nCoordinate technical sessions (12:51)\nSend setup information (22:27)\n\n**Unassigned**\nBegin PLC integration (18:57)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

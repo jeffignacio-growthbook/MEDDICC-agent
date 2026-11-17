@@ -1,7 +1,7 @@
 {
   "company": "Growth Book Weekly",
   "slug": "growth-book-weekly",
-  "last_etl_date": "2026-11-10T07:53:37.510813",
+  "last_etl_date": "2026-11-17T08:40:23.068726",
   "calls": [
     {
       "id": "01KFXSR394CVCHJ1HKJKM5HSTE",
@@ -506,6 +506,17 @@
       "summary": "# Growth Book Weekly Meeting\nDate: 2026-11-09 | Duration: 97.56999969482422m\n\n## Summary\nThe discussion covered active sales progress, including Jake’s $40K deal, late-stage opportunities, and a large deal in redlines. Skyscanner showed demand for experimentation tooling and discussed holdouts and bandits. Cluster experiments became a first-class workflow with flexible assignment and analysis units, expanded reporting, cluster-specific health checks, and use cases across marketplaces, education, and AI products; the functionality is live in Cloud and planned for self-hosted 5.3. Customer engagement included a successful executive dinner and GrowthBook co-sponsoring Circus events in London and the United States, while teams were asked to identify customer speakers. Business reached a $3M run rate, including $2.3M in subscription revenue and $737K in CDN usage, with approximately 50% overall growth. Retention concerns center on larger Pro accounts, which generate 75% of revenue from customers with 10 or more seats. Cloud onboarding, AI setup, lightweight feature flags, and improved marketing alignment are planned, while AI mention and citation rates increased substantially. Retreat guest access and reimbursement processes were also updated.\n\n## Keywords\nCluster experiments, Experimentation platform, Customer advocacy, Pro plan retention, AI onboarding, CDN usage\n\n## Action Items\n**Ryan McGurk**\nClose late-stage deal (03:16)\n\n**Luke Sonnet**\nMeet with Khan Academy (16:55)\nFollow up with Quizlet (17:18)\n\n**Cary Rakin**\nInclude customer participation in contracts (24:18)\nInvestigate Meister Labs account history (32:02)\nInvestigate Adworx account history (32:50)\nInvestigate Apollo Dynamics account history (32:50)\n\n**Ashley Stirrup**\nShare business-performance slides (31:01)\nPost CDN account list (33:15)\nAlign demo environment launch timing (36:07)\nDefine demo experience positioning (36:07)\nCreate AI feature-flag adoption content (36:16)\n\n**Jeremy Dorn**\nBuild no-account demo environment (34:15)\nExpand AI onboarding wizard (34:15)\nBuild lightweight feature-flag entry point (35:04)\n\n**Jennifer Pham-Le**\nPrioritize retreat guest requests (39:20)\nSend Brex invitations (39:58)\nAdd reimbursement instructions (40:32)",
       "organizer": "graham@growthbook.io",
       "participants": 39,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7052GR08THKEDSYGKFJ9ED8",
+      "source": "fireflies",
+      "title": "Growth Book Weekly Meeting",
+      "date": "2026-11-16",
+      "duration_minutes": 49.900001525878906,
+      "summary": "# Growth Book Weekly Meeting\nDate: 2026-11-16 | Duration: 49.900001525878906m\n\n## Summary\nBoard confidence remains strong, with positive views on company progress, revenue, and execution, while encouraging further growth. The discussion reviewed experimentation research: LLM evaluations and synthetic users can screen ideas but require human calibration and often disagree with real user data, making A/B testing more dependable for final decisions. Interleaving, switchback testing, adaptive testing, parameterized interfaces, and config parameter locks were discussed as product opportunities for increasingly agentic experimentation. The Puerto Vallarta retreat will run from February 21–27, with housing, transportation, work schedules, guest policies, travel allowances, reimbursement requirements, and preparation deadlines clarified; forms are due November 30 and flight itineraries by December 18. GrowthBook is also improving agent-led discovery, SEO and AEO visibility, automated onboarding, and its no-account product tour, while keeping the tour separate from the sales demo environment.\n\n## Keywords\nExperimentation, LLM evaluations, Synthetic users, Experiment learnings, Company retreat, Product onboarding\n\n## Action Items\n**Luke Sonnet**\nShare conference learnings internally (28:15)\n\n**Graham McNicoll**\nReview GrowthBook Configs capabilities (28:30)\n\n**Jennifer Pham-Le**\nFinalize retreat logistics (30:30)\nArrange transportation (30:30)\nMaintain reimbursement guidance (30:30)\n\n**Retreat attendees**\nJoin retreat channel (39:29)\nComplete planning form (39:29)\nBook retreat flights (39:29)\nShare itinerary (39:29)\nReview expense policy (39:29)\nVerify travel requirements (39:29)\n\n**Jeremy Dorn**\nImprove product tour (47:03)\nShare onboarding updates in Slack (47:03)",
+      "organizer": "graham@growthbook.io",
+      "participants": 40,
       "summary_quality": "good"
     }
   ]

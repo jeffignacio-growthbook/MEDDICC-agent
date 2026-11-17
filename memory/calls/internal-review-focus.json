@@ -1,7 +1,7 @@
 {
   "company": "[Internal Review] Focus",
   "slug": "internal-review-focus",
-  "last_etl_date": "2026-11-10T07:53:37.507304",
+  "last_etl_date": "2026-11-17T08:40:23.070710",
   "calls": [
     {
       "id": "01M6HX935FWG5PSQJKEXD8G2C2",
@@ -10,6 +10,17 @@
       "date": "2026-11-09",
       "duration_minutes": 29.969999313354492,
       "summary": "# [Internal Review] Focus Labs Deliverables\nDate: 2026-11-09 | Duration: 29.969999313354492m\n\n## Summary\nGrowthBook’s ruler-and-every-person brand archetype and guide positioning were broadly endorsed. The team favored distinctive colors such as orange, red-orange, dark green, and teal over yellow or pink, and emphasized a memorable, consistent system that works digitally and physically. Real customer or employee photography was viewed positively, provided it avoids generic stock styling. The design system must remain usable by internal staff without a full-time designer. Participants requested clearer explanations of competitor archetypes, practical examples for phrases such as “confidently take up space” and “low-key humor,” stronger audience specificity, and more grounded differentiation. Human-centered AI messaging, user-generated content, repeatable employee visuals, and a simple recurring graphic element were identified as promising marketing directions. Lyndsie planned to consolidate feedback for the agency, while the next meeting would be handled by Scott and others.\n\n## Keywords\nBrand strategy, Brand archetypes, Competitive positioning, Visual identity, Colour palette, User-generated content\n\n## Action Items\n**Lyndsie Berens**\nSend consolidated feedback (28:27)\n\n**Scott Bailey, Ashley Stirrup, and Elyse Fox**\nRun next meeting (28:39)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M731A13WR4169A6WJ3P5CDEK",
+      "source": "fireflies",
+      "title": "[Internal Review] Focus Labs Deliverables",
+      "date": "2026-11-16",
+      "duration_minutes": 37,
+      "summary": "# [Internal Review] Focus Labs Deliverables\nDate: 2026-11-16 | Duration: 37m\n\n## Summary\nThe discussion focused on validating recommendations, resolving disagreements, and preparing for next steps. Strategic goals included clarifying the benefits of experimentation, strengthening instant recognition of GrowthBook, and positioning the brand as a category leader. The audience definition should cover self-serve, Pro, free, mid-market, and enterprise users. The “spirit of experimentation” was accepted as a possible differentiator, framed as brand direction rather than a customer claim. The preferred brand concept emphasized testing instead of guessing, learning, guardrails, faster growth, and a more open experimentation culture; “everything is possible” was considered less precise. Brand identity discussions covered balancing marketing character with product readability, potentially using separate marketing and product fonts, allowing divergent website and product visual systems, and assessing the product impact of shifting from purple to warm orange. Brand attributes should include expert and opinionated guidance alongside accessibility and partnership. Positioning feedback called for separating pricing dissatisfaction from genuine solution or capability limits when explaining why customers leave. Lyndsie will consolidate feedback, and Elyse will provide written brand-attribute wording before the next discussion.\n\n## Keywords\nBrand strategy, Experimentation, Brand positioning, Visual identity, Brand attributes, GrowthBook\n\n## Action Items\n**Elyse Fox**\nProvide revised brand-attribute wording (24:45)\n\n**Lyndsie Berens**\nConsolidate team feedback (27:35)\nSubmit consolidated feedback (27:54)",
       "organizer": "lyndsie@growthbook.io",
       "participants": 5,
       "summary_quality": "good"

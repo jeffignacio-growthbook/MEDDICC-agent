@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Kikoff",
+  "slug": "growthbook-kikoff",
+  "last_etl_date": "2026-11-17T08:40:23.061996",
+  "calls": [
+    {
+      "id": "01M7ED54PPXD28M1TFEBXH3DRT",
+      "source": "fireflies",
+      "title": "Growthbook <> Kikoff Intro",
+      "date": "2026-11-16",
+      "duration_minutes": 35.15999984741211,
+      "summary": "# Growthbook <> Kikoff Intro\nDate: 2026-11-16 | Duration: 35.15999984741211m\n\n## Summary\nKikoff currently uses Statsig effectively for core experimentation, but increasingly granular questions have led its data science team to build internal experimentation functions described as a “shadow Statsig.” Key limitations include insufficient UI and capabilities, segmented MCP data without time-series support, and the high switching cost of an existing vendor integration. GrowthBook presented its warehouse-native, open-source platform with feature flags, experimentation, product analytics, self-hosting, and direct technical support. Its roadmap includes triggered auto rollbacks, saved groups, advanced diagnostics, interleaving experiments, contextual bandits, AI workflows, and UI improvements. AI experimentation capabilities can help brainstorm, design, analyze, summarize, recommend actions, identify inconclusive results, and capture reusable learnings. Kikoff is particularly interested in automating experiment readouts and replacing manual activities as experiment volume grows. Evaluation will depend on granular MCP data, migration support, annual pricing, experiment volume, experiment types, and whether stronger capabilities or lower costs justify switching. GrowthBook offered migration assistance, a possible contract-transition gap, follow-up materials, and a broader demonstration.\n\n## Keywords\nExperimentation platform, Statsig migration, AI experiment readouts, MCP integrations, Warehouse-native analytics, Feature flags\n\n## Action Items\n**Jue Hou**\nShare manual experimentation workflows (29:34)\n\n**Dan Wathne**\nSend recap and recording (30:42)\nPrepare value proposition (30:42)\nFollow up after Thanksgiving break (30:42)",
+      "organizer": "dan@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

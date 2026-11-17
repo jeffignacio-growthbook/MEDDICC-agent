@@ -1,0 +1,18 @@
+{
+  "company": "Jack / Ryan",
+  "slug": "jack-ryan",
+  "last_etl_date": "2026-11-17T08:40:23.061843",
+  "calls": [
+    {
+      "id": "01M70RKYK2FHY0MZGS22BTBXQP",
+      "source": "fireflies",
+      "title": "Jack / Ryan: content brainstorm",
+      "date": "2026-11-16",
+      "duration_minutes": 16.610000610351562,
+      "summary": "# Jack / Ryan: content brainstorm\nDate: 2026-11-16 | Duration: 16.610000610351562m\n\n## Summary\nThe discussion focused on shifting content strategy from broad top-funnel coverage toward credibility through named employee authors, individual viewpoints, and visible company culture. Technical audiences, especially engineers, were prioritized, with potential topics including online versus offline testing, synthetic versus real testing, experimentation, feature flags, architecture, and implementation guidance. European visibility was also identified as an opportunity, supported by James Shannon’s regional presence. AI discovery efforts include targeting Gemini, Google, ChatGPT, Claude, coding agents, and longer-tail queries informed by agent prompts. Planned content includes agent-specific guides, such as start-to-finish React feature-flag setup, while coding agents may support SDK setup and future anonymous signups. Logan was identified as a strong technical contributor because of customer-call exposure and writing ability; Ryan offered coordination and introductions; and Jeremy is supporting the coding-agent initiative. The TypeScript SDK version 2.1.0 was released, making marketing support the priority this week.\n\n## Keywords\nContent marketing, Technical thought leadership, Developer experience, AI search visibility, Coding agents, Experimentation\n\n## Action Items\n**Jack Virag**\nFollow up on content topics (10:43)\nSchedule time with James Shannon (13:39)\nReach out to Logan (13:57)\nCoordinate with Jeremy (14:13)\n\n**Ryan McGurk**\nHelp coordinate contributors (13:27)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

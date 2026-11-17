@@ -1,7 +1,7 @@
 {
   "company": "jemmy",
   "slug": "jemmy",
-  "last_etl_date": "2026-11-10T07:53:37.507063",
+  "last_etl_date": "2026-11-17T08:40:23.062391",
   "calls": [
     {
       "id": "01M50KRESEEN9ESRNX9Z2GVSJA",
@@ -32,6 +32,17 @@
       "date": "2026-11-09",
       "duration_minutes": 32.2400016784668,
       "summary": "# jemmy\nDate: 2026-11-09 | Duration: 32.2400016784668m\n\n## Summary\nThe discussion covered positioning Jack Ops as enterprise-grade software, using newsletters, G2 reviews, continued product management, and weekly product updates to support approval and broader adoption. An internal presentation was moved to the following week, with marketing alignment still needed among Lindsay and Jacqueline. Jack Ops usage is expanding through product-update backfill and release marketing support. The Command Center is being developed as a personal task system that detects Slack tasks, tracks unanswered messages, reminds users about calendar deadlines, and consolidates context from Slack, Notion, Fireflies, and calendar tools, with email envisioned later. A Slack prototype supports API-based message syncing and an AI messaging interface, while a dashboard with calendar and task tabs is planned. Platform work includes recreating Slack events, supporting replies and reactions, and preserving existing prototypes, although huddles are unavailable. Content plans include competitive pages, feature-flag topics, linked landing pages, and multi-format delivery, while long-form workflows are initially excluded. Lindsay collaboration, Apollo email automation, GitHub access, and Huck Finch feedback remain important stakeholder considerations.\n\n## Keywords\nJack Ops, Command Centre, Product updates, Content automation, Apollo integration, Marketing workflows\n\n## Action Items\n**Emmy Sharp**\nPresent Jack Ops internally (02:58)\nMeet Lindsay and Jacqueline (02:58)\nEstablish product-updates process (05:42)\nDevelop audience framework (22:06)\nWork with Lindsay on workflow (25:20)\nExplore Apollo email automation (26:31)\n\n**Jack Virag**\nEstablish product-updates process (04:54)\nAdd Command Centre prototype (14:49)\nProvide Huck Finch feedback (19:08)\nProvide Lindsay repository access (25:51)\n\n**Karen**\nAdvise Jason on content topics (19:41)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M70Y95Q8KQPQ0XXZA3B9FN1S",
+      "source": "fireflies",
+      "title": "jemmy",
+      "date": "2026-11-16",
+      "duration_minutes": 35.06999969482422,
+      "summary": "# jemmy\nDate: 2026-11-16 | Duration: 35.06999969482422m\n\n## Summary\nThe team approved reinstating compact newsletter CTAs, including a right-column module and inline subscription design with an email field, while clarifying the Growth book newsletter’s benefits and retaining the Uplift identity. The newsletter launch is targeted for this week; the landing page is drafted, but HubSpot form styling remains. The blog CTA will sit below FAQs, with related articles below it, while privacy-policy wording and a locally fixed mobile width issue remain unresolved. Jack Ops priorities include defining marketing metrics, setting project-selection guardrails, assessing the value of cross-team transcript data, and reinforcing Emmy’s internal ownership. PLG research is focused on onboarding interviews and free-versus-pro pricing, with broader work and possible G2 exploration considered later. Capacity is constrained by small website and publishing requests, so workload support, automation, and improved support access are being explored. Jemmy’s launch content is targeted for Wednesday end-of-day, pending feedback from Jemmy and Guy.\n\n## Keywords\nNewsletter CTA, HubSpot forms, Jemmy, Jack Ops, PLG research, Support meetings\n\n## Action Items\n**Emmy Sharp**\nLaunch GrowthBook newsletter (07:57)\nTest HubSpot subscription form (10:09)\nDefine measurement framework (18:11)\n\n**Jack Virag**\nAdd newsletter CTA (08:12)\nFix blog article layout (26:36)\nContact August Allard (31:06)\nCoordinate Jemmy content launch (33:08)\nShare Jemmy blockers (33:08)",
       "organizer": "jack@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

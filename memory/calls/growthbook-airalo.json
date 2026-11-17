@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook & Airalo",
+  "slug": "growthbook-airalo",
+  "last_etl_date": "2026-11-17T08:40:23.070915",
+  "calls": [
+    {
+      "id": "01M70NMRP2QADVE506965MFCE9",
+      "source": "fireflies",
+      "title": "GrowthBook & Airalo Experimentation Training",
+      "date": "2026-11-16",
+      "duration_minutes": 50.880001068115234,
+      "summary": "# GrowthBook & Airalo Experimentation Training\nDate: 2026-11-16 | Duration: 50.880001068115234m\n\n## Summary\nThe session covered how deterministic bucketing assigns users consistently, while incorrect IDs or variant-weight changes can cause rebucketing and extra exposures. Experiments assign control or variants, but feature flags, Visual Editor changes, or URL redirects create user-facing effects. Targeting uses SDK-provided attributes, groups, imported IDs, and prerequisite features; participants requested clearer documentation of attribute origins. Namespaces isolate experiments but reduce sample size. Analysis depends on exposure events, assignment queries, fact tables, dimensions, metric slices, health checks, Bayesian or Frequentist methods, and guardrail metrics. Automated learnings can summarize results and identify patterns, but implementation details must be validated because an incorrect flag mapping reversed control and variant interpretation. Release plans, audit history, approvals, project separation, and SDK governance help control production changes. Follow-up will use an internal Slack channel, while contextual bandits and other advanced topics may be discussed later.\n\n## Keywords\nExperiment bucketing, Feature Flags, Visual Editor, Experiment targeting, Statistical analysis, Contextual bandits\n\n## Action Items\n**Chris Sanders**\nShare targeting metadata request (09:24)\nProvide Elizabeth Liu update (10:00)\n\n**Elizabeth Liu**\nRoute unresolved questions (48:29)\nShare training recording (48:54)",
+      "organizer": "chris@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

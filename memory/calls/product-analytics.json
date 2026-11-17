@@ -1,7 +1,7 @@
 {
   "company": "Product Analytics |",
   "slug": "product-analytics",
-  "last_etl_date": "2026-10-30T06:38:14.598258",
+  "last_etl_date": "2026-11-17T08:40:23.066384",
   "calls": [
     {
       "id": "01KGMVVVST5VWF9HEYV5ZPW8E8",
@@ -791,6 +791,17 @@
       "date": "2026-10-29",
       "duration_minutes": 1,
       "summary": "# Product Analytics | Squad Standup\nDate: 2026-10-29 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "johnny@growthbook.io",
+      "participants": 6,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7JT0FRSWM56FF8E4XF8NPTB",
+      "source": "fireflies",
+      "title": "Product Analytics | Standup",
+      "date": "2026-11-16",
+      "duration_minutes": 22,
+      "summary": "# Product Analytics | Standup\nDate: 2026-11-16 | Duration: 22m\n\n## Summary\nThe team prioritized product analytics, UX improvements, a new fact table, homepage redesign, feature diagnostics, configurable insight widgets, populations, and future OpenTelemetry dashboards. Managed warehouse dogfooding revealed onboarding and data-visibility friction, including default attributes that did not match tracked data; fixes and a new fact table page are intended to improve event visibility. Automatic dunning shipped for qualifying Pro organizations, with four failed attempts over ten days leading to cancellation for organizations spending less than $20,000 annually, beginning December 1st; customer-specific exceptions remain available. Event forwarding migration from Confluent topics to AWS MSK queues passed end-to-end testing, while automatic event replay remains under test. Homepage, mobile, populations, fact table, and reusable dashboard work continued, with populations in Metrics Explorer targeted for release today. Cloud releases should be communicated immediately, including smaller releases.\n\n## Keywords\nProduct analytics, Feature diagnostics, Managed Warehouse, Event forwarders, Fact tables, Homepage redesign\n\n## Action Items\n**Jeremy Dorn**\nBuild feature diagnostics support (04:53)\nImprove Managed Warehouse onboarding (10:14)\nInvite team to Managed Warehouse organisation (13:08)\n\n**Michael Knowlton**\nShare Orb automatic-dunning wiki (15:00)\nComplete demo-environment pull requests (15:00)\n\n**Nhat Ho**\nMerge event-forwarder pull requests (15:41)\nMerge MSK queue changes (15:41)\nTest automatic event-replay workflow (16:17)\nAddress event-forwarder UX feedback (16:17)\n\n**Johnny Martinez**\nIncorporate homepage feedback (16:54)\nCoordinate features and experiments crossover (16:54)\nRestart mobile-view development (17:29)\n\n**Alli Leong**\nComplete Metrics Explorer populations pull request (18:20)\nImplement Metrics Explorer mean-metric support (18:20)\nReview fact-table UI pull request (19:01)\n\n**Nobu Ajito**\nObtain fact-table flow pull request review (19:28)\nRefactor dashboard architecture (20:00)\nResolve fact-table and dashboard pull request dependencies (20:30)",
       "organizer": "johnny@growthbook.io",
       "participants": 6,
       "summary_quality": "good"

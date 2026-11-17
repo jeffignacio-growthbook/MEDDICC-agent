@@ -1,0 +1,18 @@
+{
+  "company": "Improving Insight Visibility",
+  "slug": "improving-insight-visibility",
+  "last_etl_date": "2026-11-17T08:40:23.065509",
+  "calls": [
+    {
+      "id": "01M7JVFQF1ZCE1KBGRZZ3ZTWZW",
+      "source": "fireflies",
+      "title": "Improving Insight Visibility and Dimension Controls",
+      "date": "2026-11-16",
+      "duration_minutes": 11.34000015258789,
+      "summary": "# Improving Insight Visibility and Dimension Controls\nDate: 2026-11-16 | Duration: 11.34000015258789m\n\n## Summary\nThe discussion addressed how existing data lacks sufficient visibility, particularly because capped outliers can distort headline results and reliable dimension breakdowns need stronger support in the results UI and API. Dimension setup was described as clunky: SQL controls columns and ordering, while pre-specified values require editing the source; improved setup forms were identified as a separate workstream. Product progress included a live drill-down summary UI, assembled by Gabe after a request from Jeremy, while pipeline improvements were assigned to Adriel. Planning focused on prioritizing work over the next weeks, beginning with lower-fidelity mocks. The statistical correction discussion moved forward, and Hampus was expected to review the notes afterward.\n\n## Keywords\nCapping, Outlier detection, Experiment dimensions, Results UI, Data pipelines, Statistical correction\n\n## Action Items\n**Adriel**\nImprove data pipelines (05:02)\n\n**Unassigned**\nPrioritize capping workstreams (06:09)\nPrioritize dimensions workstreams (06:09)\nDiscuss statistical approach (06:49)\n\n**Hampus Poppius**\nReview meeting notes (08:51)\nReview rough designs (08:51)\nShare feedback (08:51)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Andrei Urbanovich and",
+  "slug": "andrei-urbanovich-and",
+  "last_etl_date": "2026-11-17T08:40:23.071527",
+  "calls": [
+    {
+      "id": "01M7DM6HAFRMTTYSG0F4TQH0M7",
+      "source": "fireflies",
+      "title": "Andrei Urbanovich and Marcel Geldner",
+      "date": "2026-11-16",
+      "duration_minutes": 34,
+      "summary": "# Andrei Urbanovich and Marcel Geldner\nDate: 2026-11-16 | Duration: 34m\n\n## Summary\nThe company publishes mobile games across puzzles, children’s games, brain games, Sudoku, and Mahjong, with more than 10 years of publishing experience. Its portfolio includes titles with different objectives, such as scaling growth or maximizing profit, and the experimentation program is expanding beyond established pricing tests into product and revenue-stream decisions. The company runs 10–20 experiments monthly, balancing audience requirements and risk by title. GrowthBook Pro was considered a suitable initial option because it supports named spaces and smaller teams, while AI capabilities may help build experiments and summarize learnings and pricing outcomes. Pro requires cloud hosting and may incur CDN and usage-based charges. Enterprise adds SSO, SAML, SCIM, role-based access, multi-organization separation, advanced testing methods, dedicated support, a 99.95% SLA, unlimited projects, and included traffic and CDN. Self-hosted Enterprise costs $30,000 annually plus $1,000 per seat, while cloud Enterprise costs $40,000 annually plus $1,000 per seat. The company plans to compare Pro usage costs with Enterprise features, review GrowthBook materials and Version 5.2, and then select a plan.\n\n## Keywords\nGrowthBook, Mobile-game experimentation, Pro and Enterprise plans, CDN usage pricing, Contextual bandits, Experiment analytics\n\n## Action Items\n**Sergei Kleimenov and Andrew Urbanovich**\nReview event and CDN usage (19:46)\n\n**Marcel Geldner**\nSend follow-up information (22:28)\nShare GrowthBook 5.2 information (23:33)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

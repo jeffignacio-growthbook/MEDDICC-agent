@@ -1,7 +1,7 @@
 {
   "company": "MrQ + GrowthBook",
   "slug": "mrq-growthbook",
-  "last_etl_date": "2026-10-02T06:25:29.671235",
+  "last_etl_date": "2026-11-17T08:40:23.071249",
   "calls": [
     {
       "id": "6aad5077c4d1e70014d29a94",
@@ -32,6 +32,17 @@
       "date": "2026-10-01",
       "duration_minutes": 35.310001373291016,
       "summary": "# MrQ + GrowthBook\nDate: 2026-10-01 | Duration: 35.310001373291016m\n\n## Summary\nThe team is assessing whether GrowthBook Pro or Enterprise best supports its experimentation goals. Product experiment plans are expected next week to identify must-have capabilities, including holdouts, prerequisite flags, and approval workflows. Enterprise is currently viewed as more expensive than Amplitude, whose annual spend is estimated near $100,000, so GrowthBook must demonstrate comparable value or cost savings. Implementation appears manageable: SDK setup is expected to require 1–2 engineer days per surface, with up to one week total, while Pro provides cloud hosting and includes MongoDB management. Self-hosting is available through open source or Enterprise. Data pipelines and CDN support may improve query efficiency, experiment performance, and costs, while Enterprise adds training, experimentation-culture support, and partnership guidance. Product analytics remains in beta, although simple in-app reporting is desired. Follow-up demos with product, engineering, and experimentation teams will review feature gaps and PoC use cases.\n\n## Keywords\nexperimentation, product analytics, feature flags, pricing, proof of concept, data pipelines\n\n## Action Items\n\n**Alejandro Lizaguilera**\nProvide a complete list of upcoming experiments from the product team by next week to clarify feature needs (06:51)\nSend email with experiment use cases to GrowthBook for follow-up demo and PoC planning (34:19)\nClarify exact Amplitude contract renewal date and current annual spend internally (28:50)\n\n**Rémy Marin**\nShare a short video demo explaining GrowthBook’s new product analytics features, especially funnels and dashboards (22:10)\nAssist in scheduling follow-up calls to review experiment requirements and discuss PoC (22:48)\n\n**Christian Liebenow**\nFollow up with GrowthBook’s team on key differences between Amplitude and GrowthBook to provide Alejandro with feature comparison details (18:42)\nCoordinate a broader demo involving MrQ’s developers and experimentation teams to demonstrate Pro vs. Enterprise features tailored to their needs (11:25)\n\n**Jake Dalli**\nConfirm internal CDN usage with Amplitude and gather CDN cost metrics related to experimentation (30:31)\n",
+      "organizer": "christian@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7DNZ9V686DEHN4397YR74BZ",
+      "source": "fireflies",
+      "title": "MrQ + GrowthBook",
+      "date": "2026-11-16",
+      "duration_minutes": 29.6299991607666,
+      "summary": "# MrQ + GrowthBook\nDate: 2026-11-16 | Duration: 29.6299991607666m\n\n## Summary\nThe team evaluated GrowthBook as a potential replacement for Amplitude across feature flagging, experimentation, product analytics, session replay, event streaming, heat maps, and funnels. GrowthBook’s self-hosting capability was considered a strong fit for Mr. Q’s security and infrastructure preferences, although separate storage and event-query costs could reduce the financial benefit. Enterprise capabilities are required for self-hosting, single sign-on, audit logs, custom roles, and approval workflows, while the Pro plan’s 30-user limit may not support expected usage of 20 to 40 users. Proposed annual pricing was $175K for the self-hosted platform, $225K for 40 users, and $200K for 50 experiments. Budget approval is the main blocker because spending above $100K receives CFO scrutiny. A discount estimate was requested before budget discussions. If commercial alignment is reached, a four-to-six-week POC would compare parallel GrowthBook and Amplitude experiments. A follow-up was proposed for Tuesday the 24th at 3:30 PM UK time to review pricing, customer examples, POC scope, and timing.\n\n## Keywords\nGrowthBook, Amplitude replacement, Self-hosting, Experimentation platform, Product analytics, Pricing negotiation\n\n## Action Items\n**Christian Liebenow**\nShare pricing and business-value materials (13:59)\nProvide rough discount estimate (19:49)\nPrepare one-year GrowthBook proposal (24:42)\nSend follow-up calendar invitation (27:32)\n\n**Alejandro Lizaguilera**\nPresent GrowthBook pricing to CFO (19:49)\nRun GrowthBook proof of concept (20:36)\nInvite CPO to pricing review (24:42)",
       "organizer": "christian@growthbook.io",
       "participants": 4,
       "summary_quality": "good"

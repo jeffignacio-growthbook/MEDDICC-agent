@@ -1,0 +1,18 @@
+{
+  "company": "BetClic Meeting Prep",
+  "slug": "betclic-meeting-prep",
+  "last_etl_date": "2026-11-17T08:40:23.077605",
+  "calls": [
+    {
+      "id": "01M7A7Y2TSTCDCX9KY0DG2T1HW",
+      "source": "fireflies",
+      "title": "BetClic Meeting Prep",
+      "date": "2026-11-16",
+      "duration_minutes": 36.529998779296875,
+      "summary": "# BetClic Meeting Prep\nDate: 2026-11-16 | Duration: 36.529998779296875m\n\n## Summary\nThe discussion focused on a large iGaming prospect with approximately one billion dollars in annual revenue, a fragmented experimentation stack, and manual analysis based on homegrown statistical methods. The likely entry point is warehouse-native analysis using Snowflake or BigQuery, while existing SDKs, flagging, and traffic-splitting tools may remain initially; self-hosting is also likely preferred. The main technical issue is linking exposure events to outcome metrics through identifiers and timestamps, potentially using an intermediate exposure table. Other topics included sequential-testing runtime controls, decision frameworks, cluster randomization, market-level experiments across France, Portugal, and Poland, and monitoring overlapping experiments. GrowthBook offers timeline and tagging features, but interaction effects and automated overlap detection remain limited or unclear. Power analysis is being revamped because the current method is considered simplistic, while query cost remains a concern. The team will prioritize the identifier-linking question and prepare concise responses on the remaining topics.\n\n## Keywords\nWarehouse-native experimentation, Sequential testing, Cluster randomisation, Feature flags, Exposure attribution, Power calculator\n\n## Action Items\n**Hampus Poppius**\nClarify BetClic exposure events (10:15)\nReview GrowthBook decision framework (18:27)\nInvestigate overlapping experiment monitoring (22:35)\nConfirm cluster-randomised experiment identifiers (28:03)\nReview power calculator roadmap (33:39)\nPrepare BetClic technical discussion (34:37)\n\n**Rémy Marin**\nAsk Logan about overlapping experiment detection (24:32)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

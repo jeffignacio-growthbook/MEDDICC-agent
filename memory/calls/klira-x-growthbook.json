@@ -1,0 +1,18 @@
+{
+  "company": "Klira x GrowthBook",
+  "slug": "klira-x-growthbook",
+  "last_etl_date": "2026-11-17T08:40:23.071688",
+  "calls": [
+    {
+      "id": "01M7DM6H89QESE3J9KRW9KKPGC",
+      "source": "fireflies",
+      "title": "Klira x GrowthBook | Pro plan setup and VWO migration walkthrough",
+      "date": "2026-11-16",
+      "duration_minutes": 20,
+      "summary": "# Klira x GrowthBook | Pro plan setup and VWO migration walkthrough\nDate: 2026-11-16 | Duration: 20m\n\n## Summary\nGrowthBook implementation is complete on the Pro subscription, and the first A/B test has been configured, although it is not yet live because of other launch-related reasons. The technical setup was described as smooth, with no major implementation issues. Migration of earlier VWO experiments remains pending while the team reviews data usage, though an existing migration path is available and experiments can be preserved when moved. The final VWO test is being recreated in GrowthBook because its previous runtime was considered insufficient. Google Analytics is connected through BigQuery, and events are flowing successfully, leaving the experiment setup functionally ready. The team plans to launch the first A/B test this week, with next week as a backup. Technical support is available through Slack, requires direct account access, and Marcel is available by email for escalations.\n\n## Keywords\nGrowthBook, VWO migration, A/B testing, Pro plan, Google Analytics, BigQuery\n\n## Action Items\n**Marcel Geldner**\nResend migration path (02:34)\n\n**Rani**\nTransfer VWO experiment (03:08)\nReview migration process (03:27)\nLaunch first A/B test (03:58)\nLog into GrowthBook (04:56)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

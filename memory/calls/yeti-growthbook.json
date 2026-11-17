@@ -1,0 +1,18 @@
+{
+  "company": "YETI + GrowthBook",
+  "slug": "yeti-growthbook",
+  "last_etl_date": "2026-11-17T08:40:23.067971",
+  "calls": [
+    {
+      "id": "01M7DNZA03ZM2V10PT22EW54CT",
+      "source": "fireflies",
+      "title": "YETI + GrowthBook",
+      "date": "2026-11-16",
+      "duration_minutes": 39.75,
+      "summary": "# YETI + GrowthBook\nDate: 2026-11-16 | Duration: 39.75m\n\n## Summary\nYETI is rebuilding its experimentation foundation after a decentralized model left ownership, workflow, documentation, and learning storage unclear. The company runs approximately 50–100 experiments annually, usually 5–10 per month, but most tests require front-end development, creating capacity constraints. Visual-editor self-service testing is being considered for smaller initiatives, while developer involvement remains important for larger tests. Optimizely remains the incumbent platform under contract through at least 2027, with no immediate switch planned; GrowthBook is being evaluated for future fit. Its warehouse-native analysis aligns with YETI’s BigQuery workflow, while support for YETI’s iframe-based product customizer requires technical review. Val also valued GrowthBook’s learning repository, AI-accessible experiment history, automated summaries, and potential Microsoft Teams integrations. Follow-up materials and a possible developer session were planned, while leadership changes could trigger a broader platform review.\n\n## Keywords\nExperimentation maturity, Optimizely, GrowthBook, Warehouse-native analytics, Experiment learnings, MCP server\n\n## Action Items\n**Logan Bates**\nInvestigate GrowthBook support for YETI customiser (11:36)\n\n**Christian Liebenow**\nSend follow-up email to Valeria Palana (38:44)",
+      "organizer": "christian@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

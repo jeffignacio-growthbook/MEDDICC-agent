@@ -1,0 +1,18 @@
+{
+  "company": "Sales call with",
+  "slug": "sales-call-with",
+  "last_etl_date": "2026-11-17T08:40:23.061019",
+  "calls": [
+    {
+      "id": "01M7FYAQXKSVHRGVKTKA7RWQD6",
+      "source": "fireflies",
+      "title": "Sales call with Rajasekhar Jasthi from Skill Quotient",
+      "date": "2026-11-17",
+      "duration_minutes": 20.719999313354492,
+      "summary": "# Sales call with Rajasekhar Jasthi from Skill Quotient\nDate: 2026-11-17 | Duration: 20.719999313354492m\n\n## Summary\nSQ Skill Group is pursuing a UAE RFP requiring an on-premises A/B testing platform for a two-year project, with the proposal due within two weeks. Rajasekhar and Sagar expressed interest in partnering with GrowthBook to resell and manage licenses, while SQ Skill Group would remain client-facing and implement the solution if selected. GrowthBook’s self-hosted deployment appears relevant, but database compatibility, air-gapped licensing, MAF requirements, security, and critical-issue support still require validation. GrowthBook requested RFP excerpts, database details, user counts, licensing information, and environment requirements. A reseller agreement covering UAE or APAC is unresolved and is the primary commercial risk. GrowthBook proposed a roughly 45-minute demo, trial access, technical support channels, follow-up materials, and pricing discussions. SQ Skill Group will provide requirements, and both parties will assess product and pricing fit before progressing with the proposal.\n\n## Keywords\nA/B testing, Self-hosted deployment, UAE RFP, Reseller partnership, On-premises integrations, GrowthBook licensing\n\n## Action Items\n**Dan Wathne**\nDiscuss reseller agreement support (07:35)\nReview GrowthBook pricing (14:40)\nSend follow-up questions (16:14)\nConduct product walkthrough (16:14)\nSend product documentation (18:33)\n\n**Sagar Patil**\nShare RFP information (13:11)\nProvide A/B testing requirements (13:42)\nProvide integration requirements (18:33)\nReview product documentation (18:33)",
+      "organizer": "dan@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Experiment API chat",
+  "slug": "experiment-api-chat",
+  "last_etl_date": "2026-11-17T08:40:23.062646",
+  "calls": [
+    {
+      "id": "01M7DZT95K3HTMD01BZFC8K4RZ",
+      "source": "fireflies",
+      "title": "Experiment API chat",
+      "date": "2026-11-16",
+      "duration_minutes": 62.16999816894531,
+      "summary": "# Experiment API chat\nDate: 2026-11-16 | Duration: 62.16999816894531m\n\n## Summary\nThe discussion focused on API priorities, results architecture, dimension analysis, and agent-driven experiment workflows. Anthropic-specific API work was deferred while the team prioritizes UI behavior, dimension cuts, and clearer requirements. The current results workflow requires clients to create snapshots, poll until analysis completes, and refetch results, while the results endpoint mainly returns the latest matching snapshot rather than triggering new analysis. The team identified gaps in phase context, experiment-specific dimension discovery, ad hoc analysis, and the shape of result payloads. Custom reports support configurable saved analyses, but ephemeral analysis and report refresh behavior remain unresolved, and existing report quality issues were noted. Luke is rewriting the experiment analysis skill using existing endpoints, Lillia will test agent workflows through MCP, and Adriel is handling a query-related implementation. The team also recognized broader technical debt in results, snapshot, and experiment-update APIs and plans to revisit API direction after related UI work.\n\n## Keywords\nExperiment results API, Ad hoc analysis, Dimension breakdowns, Agentic workflows, Custom reports, MCP integration\n\n## Action Items\n**Lillia Jackson**\nSupport UI work (44:53)\nExplore feature-flag redesign experiment (57:38)\n\n**Luke Sonnet**\nDevelop design and product requirements (59:03)\nReview query-related work (59:58)\n\n**Adriel Vieira**\nInvestigate query-related work (59:38)",
+      "organizer": "lillia@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

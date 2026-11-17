@@ -1,0 +1,18 @@
+{
+  "company": "Zocdoc + GrowthBook",
+  "slug": "zocdoc-growthbook",
+  "last_etl_date": "2026-11-17T08:40:23.062813",
+  "calls": [
+    {
+      "id": "01M7E1DM53D7VBR3XBJ9CBKW2Y",
+      "source": "fireflies",
+      "title": "Zocdoc + GrowthBook",
+      "date": "2026-11-16",
+      "duration_minutes": 31.200000762939453,
+      "summary": "# Zocdoc + GrowthBook\nDate: 2026-11-16 | Duration: 31.200000762939453m\n\n## Summary\nZocdoc is conducting an organization-wide review of GrowthBook alongside an in-house experimentation platform, with input from product, engineering, platform, data science, and analytics stakeholders. The current assignment and randomization service is fragmented, with limited governance, poor visibility into live experiments and feature flags, and scattered analysis and reporting. The primary goal is a self-service workflow that lets product managers and engineers run straightforward experiments while preserving statistical rigor, reliable configuration, and decision quality. Key requirements include platform reliability, feature-flag governance, targeting, support for separate non-PHI and PHI environments, metric synchronization with the semantic layer, backfills, recomputation, automated ramps, monitoring, centralized readouts, result slicing, and portfolio-level impact reporting. Three role-based sessions will cover platform, data integration, and product workflows, with core capabilities prioritized over advanced use cases. Pricing and value assessment remain outstanding, and sessions are planned for two weeks after Thanksgiving. Feedback will be coordinated by Jan and aurimasracas and roll up to CTO Kam for the final decision.\n\n## Keywords\nExperimentation platform, Self-service experimentation, Feature-flag governance, Warehouse-native analytics, Experiment portfolio impact, Advanced experimentation methods\n\n## Action Items\n**Aurimas Racas**\nIdentify Zocdoc time slots (28:36)\nBlock stakeholder calendars (28:36)\n\n**Christian Liebenow**\nShare GrowthBook availability (29:02)\nCoordinate evaluation sessions (29:29)",
+      "organizer": "christian@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}
