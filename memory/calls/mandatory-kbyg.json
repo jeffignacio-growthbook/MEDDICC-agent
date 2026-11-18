@@ -1,7 +1,7 @@
 {
   "company": "[Mandatory] KBYG",
   "slug": "mandatory-kbyg",
-  "last_etl_date": "2026-11-13T07:28:57.907176",
+  "last_etl_date": "2026-11-18T08:02:54.658495",
   "calls": [
     {
       "id": "01KV9GC1QMT57TRHEJJBEVDMS6",
@@ -25,6 +25,17 @@
       "summary": "# [Mandatory] KBYG - Conversion Hotel\nDate: 2026-11-12 | Duration: 32m\n\n## Summary\nThe discussion covered London dinner planning and preparations for Conversion Hotel, scheduled for November 20–22 at Grand Hotel Opduin on Texel, with approximately 150 attendees. The partner package includes an 8-minute main-stage presentation, a 30-minute breakout session, a lobby booth, and scheduled Saturday sessions. The booth will feature a monitor, banner, swag, and an interactive pinball competition, with targets of 10 LinkedIn connections, 5 on-site Calendly meetings, 5 demos by December 6, and 6 opportunities within 60 days. Travel includes a Thursday shuttle at 13:30 and a Sunday return at 14:00; booth move-in is Friday from 11:00 to 13:00. The team also reviewed meals, weather-related packing, staffing, evening programming, shirt quantities, game logistics, shipping, reimbursement coding, dinner-fee confirmation, and event photography.\n\n## Keywords\nConversion Hotel, Event logistics, Booth activation, Pinball competition, Lead generation, Conference travel\n\n## Action Items\n**Liz Fox**\nAsk restaurant about booking fee (01:00)\n\n**Lyndsie Berens**\nConfirm peak pinball period (14:03)\nSend Graham shipping instructions (16:45)\nSend calendar invitations (19:00)\nSend Graham hotel address (22:05)\n\n**James Shannon**\nSelect central London lunch venue (20:01)",
       "organizer": "lyndsie@growthbook.io",
       "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M731A149MF4Q6C1B1X73ZG1H",
+      "source": "fireflies",
+      "title": "[Mandatory] KBYG - AWS: re:Invent",
+      "date": "2026-11-17",
+      "duration_minutes": 22,
+      "summary": "# [Mandatory] KBYG - AWS: re:Invent\nDate: 2026-11-17 | Duration: 22m\n\n## Summary\nThe team prepared for AWS Re:Invent, scheduled for November 30–December 4, with a bronze sponsorship and Booth 1682 at the Venetian. Goals are 90 ICP lead scans, 15 onsite Calendly meetings, 12 demos booked by December 11, and eight new Ops by January 31. The booth will use an Arcade Gaming theme, a custom game, daily AirPods Max 2 raffles, tiered swag, AI workflow signage, and supporting landing-page, HubSpot, communications, and playbook materials. Lyndsie is the onsite lead, with setup due Monday at noon, two to three people staffing the booth, and teardown on Thursday. Lead scanners, qualification categories, and immediate meeting booking are central to conversion; relevant scans must include qualification, notes, and an owner. The team will also network in conference sessions and halls, attend a December 1 dinner at 7:00 p.m., and use the expense memo `AWS re invent 2026`.\n\n## Keywords\nAWS re:Invent, Booth activation, Lead scanning, Calendly meetings, Event marketing, Pipeline generation\n\n## Action Items\n**Lyndsie Berens**\nLead event operations (02:36)\nSet up booth materials (04:48)\nCoordinate booth teardown (09:01)\n\n**All booth staff**\nBring event supplies (03:07)\nWear event badge (05:53)\nPick up early-access sticker (06:25)\nDownload conference app (04:48)\nArrive for booth duty (04:48)\nMaintain booth coverage (09:01)\nScan qualified leads (12:52)\nClassify scanned leads (12:52)\nAdd conversation notes (12:52)\nBook Calendly meetings (13:56)\nNetwork around conference (17:23)\n\n**Unassigned**\nSwitch Graham’s room reservation (02:36)\nSwitch Jake H.’s room reservation (02:36)\nUse reimbursement memo (15:00)\n\n**Ashley Stirrup**\nProvide Brex card (15:00)\nReview relevant sessions (16:15)\n\n**Graham**\nProvide Brex card (15:00)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 9,
       "summary_quality": "good"
     }
   ]

@@ -1,0 +1,18 @@
+{
+  "company": "Ryan Holanda and",
+  "slug": "ryan-holanda-and",
+  "last_etl_date": "2026-11-18T08:02:54.653570",
+  "calls": [
+    {
+      "id": "01M7MSBTVC33C51RXV93K412KZ",
+      "source": "fireflies",
+      "title": "Ryan Holanda and Emmy Sharp + 2 others",
+      "date": "2026-11-17",
+      "duration_minutes": 25.260000228881836,
+      "summary": "# Ryan Holanda and Emmy Sharp + 2 others\nDate: 2026-11-17 | Duration: 25.260000228881836m\n\n## Summary\nRyan is developing a Craigslist-style Brazilian marketplace for gig posters and workers targeting Latin America. The team plans to test feature access with roughly 10% of users, allowing selected users to post gigs while restricting others. GrowthBook was familiar from Ryan’s former employer, but he had not reviewed its dashboard and had no prior experience with experimentation or feature-flagging platforms. Signup felt manageable, although he wanted more product education before the configuration wizard and sought rationale before implementation. Codex helped create a project and feature flag and attach the flag to the project. Experimentation remains unconfigured, with initial learning estimated at roughly one day. Metrics are planned, PostHog is under evaluation, and GrowthBook dashboards remain unexplored. Platform choice will depend on production reliability, setup speed, AI-agent support, and the existing GrowthBook MCP configuration. Ryan planned testing in coming weeks and offered follow-up feedback on experimentation and metrics. The discussion also identified a need for earlier education about GrowthBook’s experimentation and analytics capabilities.\n\n## Keywords\nFeature flagging, Experimentation, Onboarding, AI agents, Product analytics, PostHog comparison\n\n## Action Items\n**Emmy Sharp**\nSend Ryan Amazon gift card (14:11)\n\n**Ryan Holanda**\nCompare GrowthBook and PostHog (12:54)\nTry GrowthBook experimentation (14:38)\nEmail GrowthBook feedback (14:38)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

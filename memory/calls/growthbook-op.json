@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook + Op",
   "slug": "growthbook-op",
-  "last_etl_date": "2026-11-13T07:28:57.909209",
+  "last_etl_date": "2026-11-18T08:02:54.656431",
   "calls": [
     {
       "id": "01KT7DMS83RXCGY1RPYJB8XGY3",
@@ -130,6 +130,17 @@
       "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-11-10 | Duration: 29m\n\n## Summary\nDeduplication is nearing completion, with Jacqueline and Lyndsie reviewing remaining records while ambiguous cases remain flagged until license and organization backfill improves matching. Updated company- and contact-level scoring models are live: 349 companies are Tier A and 1,877 are Tier B, although industry scoring—especially gambling and casinos—requires validation. MQL threshold automation will be tested on untouched prospects with engagement and strong company fit, while routing and outreach methods remain undecided. License synchronization continues to overwrite company classifications between Pro, Enterprise, and Starter, so Shawn and Michael Nolan are investigating competing updates. Pipeline hygiene work will move Disqualified deals into Closed Lost with structured reasons, while Jeff will document the revised process. Stale Discovery deals also require review with Ryan before possible automation.\n\n## Keywords\nDuplicate cleanup, Lead scoring, MQL automation, Licence synchronisation, Closed-lost reporting, Pipeline hygiene\n\n## Action Items\n**Lyndsie Berens**\nFinish duplicate-company cleanup list (07:15)\nLabel ambiguous records (07:15)\nShare completed list (07:15)\n\n**Jacqueline Thomson**\nComplete duplicate-company cleanup (07:47)\nMerge same-company records (07:47)\nDocument records requiring review (07:47)\n\n**Jeff Ignacio**\nValidate industry scoring weights (12:37)\nDocument revised deal-stage process (26:15)\nBrief sales team (26:15)\nReview stale Discovery-stage deals (27:17)\nDetermine ageing notifications (27:17)\n\n**Shawn Green**\nApply engagement thresholds to MQL automation (16:27)\nCreate monitoring list (16:27)\nMeasure threshold-crossing contacts (16:27)\nReview licence-server synchronisation (18:07)\nConsolidate Disqualified deals into Closed Lost (25:50)\nPreserve disqualification information (25:50)\nUpdate reason fields (25:50)\nNotify Jeff Ignacio (26:23)",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 9,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7G8S3KZQ0JM75SC6TZBKZ1T",
+      "source": "fireflies",
+      "title": "GrowthBook + Op Methods Weekly Check-In",
+      "date": "2026-11-17",
+      "duration_minutes": 29,
+      "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-11-17 | Duration: 29m\n\n## Summary\nThe MQL workflow is live: contacts crossing the engagement threshold receive MQL status, lifecycle updates, threshold details, and account-fit tier lists. Account scoring will precede contact scoring, using Rio activity, de-anonymized developers and buyers, with open-source use and plan signups considered for contacts. Hand-picked contacts will help identify missing signals, decay effects, and weighting gaps. The proposed automation uses nightly Claude processing, Zapier transfer, and HubSpot updates, while storage in Google Cloud, Google Sheets, or Zapier Tables remains undecided. Sales alerts, ownership filters, assignment, and follow-up tracking still need agreement. License automation now syncs the highest active license to company records, but organization-ID matching and duplicate records remain issues. Customer lifecycle automation, active Pro and Starter segmentation, parent-child cleanup, and formal MQL operating procedures are still in progress. Michael and Deb cover Shawn’s leave.\n\n## Keywords\nLead scoring, Claude integration, Rio segments, HubSpot automation, MQL routing, Licence synchronisation\n\n## Action Items\n**Jeff Ignacio**\nBuild Claude-based account-scoring routine (16:29)\nCoordinate integration working session (17:10)\n\n**Chris Newton**\nCreate HubSpot scoring segment (19:28)\nDesign MQL routing process (28:36)\n\n**Michael Funduc**\nBuild HubSpot scoring workflow (18:34)\nMonitor licence synchronisation (25:46)\n\n**Shawn Green**\nRefine licence synchronisation automation (25:46)\n\n**Jacqueline Thomson**\nReview parent-child account records (26:39)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 10,
       "summary_quality": "good"
     }
   ]

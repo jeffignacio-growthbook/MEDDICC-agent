@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook x Breeze Airways",
+  "slug": "growthbook-x-breeze-airways",
+  "last_etl_date": "2026-11-18T08:02:54.659178",
+  "calls": [
+    {
+      "id": "01M731A13VGAMVGW0TQEF4QCM8",
+      "source": "fireflies",
+      "title": "GrowthBook x Breeze Airways: Webinar Theme Sync",
+      "date": "2026-11-17",
+      "duration_minutes": 32.880001068115234,
+      "summary": "# GrowthBook x Breeze Airways: Webinar Theme Sync\nDate: 2026-11-17 | Duration: 32.880001068115234m\n\n## Summary\nThe discussion planned a flexible webinar covering Claude experimentation workflows, a custom stakeholder-facing portal using dimension-based result slicing and GrowthBook API integration, experimentation culture, and engineering enablement through feature-flag guidance and the Conversational Cloud Code plugin. Two people currently design between 5 and 14 experiments monthly, while teams continue developing their testing maturity and increasingly use non-inferiority tests. AI has documented experimentation guidance, strengthened junior contributors’ test plans, and increased demand for analytics and data, with two additional headcount planned. A revised authentication test produced positive results for mobile, while the web test was expected to finish within one week. The business context included approaching four profitability quarters, 40–50% annual growth, and sustained conversion rates. Webinar preparation includes an outline, abstract, title, slide review, rehearsal, marketing support, scheduling, and follow-up communication.\n\n## Keywords\nExperimentation culture, Claude Code, Feature flags, Non-inferiority testing, Experimentation ROI, GrowthBook API\n\n## Action Items\n**Merritt**\nReview webinar outline (24:40)\nProvide headshot (25:22)\n\n**Lyndsie Berens**\nSend presentation template (24:40)\nShare webinar schedule (25:55)\n\n**Jacqueline Thomson**\nArrange review meetings (25:55)\n\n**Ashley Stirrup**\nPrepare webinar outline (30:40)",
+      "organizer": "jacqueline@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

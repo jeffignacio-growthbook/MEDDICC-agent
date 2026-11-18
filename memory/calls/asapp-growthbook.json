@@ -1,7 +1,7 @@
 {
   "company": "ASAPP + GrowthBook",
   "slug": "asapp-growthbook",
-  "last_etl_date": "2026-08-08T17:33:40.672168",
+  "last_etl_date": "2026-11-18T08:02:54.653384",
   "calls": [
     {
       "id": "01KXXV2HKYASEWS4387JQRH8TC",
@@ -16,7 +16,8 @@
       "action_items": "\n**Christian Liebenow**\nSend detailed documentation on assignment queries, POC models, and privileges of enterprise license (17:53)\nShare demo recording and any additional helpful resources following the meeting (45:28)\nSet up shared Slack channel and send invite to ASAPP team for ongoing communication (50:10)\nSchedule follow-up sync meeting for next week to continue POC discussion and technical deep dive (50:17)\n\n**Logan Bates**\nAssist with creating sample synthetic experiment data for POC familiarization with GrowthBook (37:22)\nProvide documentation or clarification on query execution within customers’ data warehouse environments to support compliance evaluation (44:10)\n\n**Julian Ong**\nCoordinate with internal teams on readiness and timeline for POC setup after reviewing shared documentation and demo (49:51)\n\n**Ivan Lee**\nCollaborate with security and product teams to assess compliance and integration feasibility of GrowthBook self-hosted and cloud models based on documentation and clarifications provided (39:53)\n",
       "participant_domains": [
         "asapp.com"
-      ]
+      ],
+      "summary_quality": "good"
     },
     {
       "id": "01KYFVVPTQQ731HF3CB77XEF64",
@@ -31,17 +32,19 @@
       "action_items": "\n, *, *, I, v, a, n, *, *, \n, P, r, o, v, i, d, e,  , i, n, t, e, r, n, a, l,  , t, i, m, e, l, i, n, e,  , a, n, d,  , d, a, t, a,  , r, e, a, d, i, n, e, s, s,  , u, p, d, a, t, e,  , n, e, x, t,  , w, e, e, k,  , t, o,  , c, o, o, r, d, i, n, a, t, e,  , f, o, l, l, o, w, -, u, p,  , m, e, e, t, i, n, g,  , w, i, t, h,  , G, r, o, w, t, h, B, o, o, k,  , (, 1, 1, :, 3, 1, ), \n, R, e, a, c, h,  , o, u, t,  , o, n,  , S, l, a, c, k,  , f, o, r,  , s, c, h, e, d, u, l, i, n, g,  , n, e, x, t,  , t, e, c, h, n, i, c, a, l,  , c, o, l, l, a, b, o, r, a, t, i, o, n,  , o, n, c, e,  , p, r, o, d, u, c, t, i, o, n,  , d, a, t, a,  , i, s,  , l, i, v, e,  , a, n, d,  , P, O, C,  , i, s,  , e, s, t, a, b, l, i, s, h, e, d,  , (, 1, 0, :, 3, 1, ), \n, \n, *, *, C, h, r, i, s, t, i, a, n,  , L, i, e, b, e, n, o, w, *, *, \n, F, o, l, l, o, w,  , u, p,  , w, i, t, h,  , R, y, a, n,  , t, o,  , e, x, p, e, d, i, t, e,  , N, D, A,  , s, i, g, n, a, t, u, r, e,  , a, n, d,  , s, h, a, r, e,  , w, i, t, h,  , I, v, a, n, ’, s,  , t, e, a, m,  , (, 1, 2, :, 0, 5, ), \n, C, o, o, r, d, i, n, a, t, e,  , w, i, t, h,  , I, v, a, n,  , o, n,  , n, e, x, t,  , m, e, e, t, i, n, g,  , s, c, h, e, d, u, l, i, n, g,  , a, f, t, e, r,  , i, n, t, e, r, n, a, l,  , r, e, a, d, i, n, e, s, s,  , (, 1, 1, :, 4, 5, ), \n, \n, *, *, J, u, l, i, a, n,  , O, n, g, *, *, \n, E, n, g, a, g, e,  , G, r, o, w, t, h, B, o, o, k,  , v, i, a,  , S, l, a, c, k,  , f, o, r,  , a, n, y,  , i, m, m, e, d, i, a, t, e,  , t, e, c, h, n, i, c, a, l,  , q, u, e, s, t, i, o, n, s,  , o, r,  , c, l, a, r, i, f, i, c, a, t, i, o, n, s,  , d, u, r, i, n, g,  , P, O, C,  , (, 1, 8, :, 4, 9, ), \n, \n, *, *, C, h, r, i, s,  , S, a, n, d, e, r, s, *, *, \n, P, r, o, v, i, d, e,  , o, n, g, o, i, n, g,  , t, e, c, h, n, i, c, a, l,  , s, u, p, p, o, r, t,  , a, n, d,  , r, e, s, p, o, n, d,  , p, r, o, m, p, t, l, y,  , t, o,  , q, u, e, s, t, i, o, n, s,  , d, u, r, i, n, g,  , L, o, g, a, n, ’, s,  , a, b, s, e, n, c, e,  , v, i, a,  , S, l, a, c, k,  , (, 1, 8, :, 4, 9, ), \n",
       "participant_domains": [
         "asapp.com"
-      ]
+      ],
+      "summary_quality": "good"
     },
     {
-      "id": "6a760f70d5d27200183be25b",
-      "source": "apollo",
+      "id": "01M7GWZ8VWGTS5EW506PSJGYTV",
+      "source": "fireflies",
       "title": "ASAPP + GrowthBook",
-      "date": "2026-08-07",
-      "duration_minutes": 0,
-      "summary": "[Unknown]: [['Hey,', 3840.0, 4040.0], ['chris.', 4040.0, 4400.0]]",
-      "host": "Christian Liebenow",
-      "participants": 1
+      "date": "2026-11-17",
+      "duration_minutes": 35.279998779296875,
+      "summary": "# ASAPP + GrowthBook\nDate: 2026-11-17 | Duration: 35.279998779296875m\n\n## Summary\nThe production A/B experiment was scaled to 100% and concluded successfully, with a winning variant selected after testing an additional option. A slight decline in one quality metric was accepted because latency and cost improved, while the open-source platform continued to support configuration, metrics, and analysis needs. Several experiments are planned, with adoption expected across four or five teams during the next two quarters. Governance remains under development, especially metric ownership, new-metric requests, and trade-off decisions. Experiment configurations are maintained in GitHub, while GrowthBook’s UI is mainly used for analysis and reporting. GrowthBook may eventually replace Unleash for allocation, but migration would require changes across many services. The current $200,000 enterprise fee was viewed as high compared with nearly $40,000 in annual Unleash costs. Christian will prepare a more reasonable pricing proposal, and Julian will review it.\n\n## Keywords\nGrowthBook, A/B testing, Experiment allocation, MCP server, Multi-armed bandits, Unleash migration\n\n## Action Items\n**Julian Ong**\nLaunch experiments (09:43)\nInvestigate GrowthBook MCP server (14:34)\nReview GrowthBook skills library (16:28)\nSend ASAPP annual Unleash spend (24:49)\n\n**Christian Liebenow**\nPrepare pricing proposal (32:50)",
+      "organizer": "christian@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
     }
   ]
 }

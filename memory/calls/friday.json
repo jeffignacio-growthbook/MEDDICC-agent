@@ -1,7 +1,7 @@
 {
   "company": "Friday",
   "slug": "friday",
-  "last_etl_date": "2026-10-31T06:27:44.696554",
+  "last_etl_date": "2026-11-18T08:02:54.653911",
   "calls": [
     {
       "id": "01M509E060V0SHK6BQ3MPXPFXE",
@@ -43,6 +43,17 @@
       "date": "2026-10-30",
       "duration_minutes": 24.1200008392334,
       "summary": "# Jake <> Brent weekly 1:1 (Friday)\nDate: 2026-10-30 | Duration: 24.1200008392334m\n\n## Summary\nThe team planned a separate OSS account list alongside 38 Pro accounts, using Rio as a broad starting point and prioritizing companies with 50–100 employees, high usage, and developer activity. Rio filters included all-time activity, weekly signals, ICP fit, developer funnel, activity score, employee range, geography, and customer stage. Jake raised questions about developer-field timeframes and whether totals reflected all company developers or GrowthBook activity, while Brent expected Airscale to improve employee-data accuracy. Jake was responsible for exporting the full Rio report and sending it to Brent through Slack; Brent planned to enrich it with Airscale data, website-usage estimates, and one or two key contacts per company. The resulting list would support immediate opportunities, Jake’s quota focus, and broader outbound coverage. Pro-to-enterprise outreach generated a couple of meetings, including activity involving HiPages and Creative Fabrica, with prospects exceeding seat limits; one account had approximately 1,650 seats.\n\n## Keywords\nOSS prospecting, Airscale enrichment, Developer activity, Pro-to-Enterprise, Outbound campaigns, Employee-size segmentation\n\n## Action Items\n**Brent Holloway**\nUse Airscale to enrich company list (14:38)\nIdentify relevant contacts (15:13)\nClean up prospect list (15:27)\nIdentify OSS customers segment (20:57)\n\n**Jake Stangl**\nComplete OSS report export (17:01)\nSend OSS export to Brent Holloway (21:35)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7GYRZJWCJ6WT0DDB9DZZMMZ",
+      "source": "fireflies",
+      "title": "Jake <> Brent weekly 1:1 (Friday)",
+      "date": "2026-11-17",
+      "duration_minutes": 24.350000381469727,
+      "summary": "# Jake <> Brent weekly 1:1 (Friday)\nDate: 2026-11-17 | Duration: 24.350000381469727m\n\n## Summary\nOutreach shifted toward near-term AWS re:Invent and Optimizely displacement campaigns after existing sequences were paused because of daily email-sending limits. Two meetings had been created by Tuesday, with recent meetings involving All Four Sports, WooClap, and StatScore, while Delivery Hero came from the prior week. The team identified a hidden OSS filter that excluded accounts below 250 employees and planned a separate segment, initially targeting 51–100 employee companies in the US and Europe with high website traffic. Jake was expected to complete the sub-250 segment by end of day, pursue early wins, and potentially expand coverage later. Reporting was improved by separating created and close months, excluding Demo Request opportunities, and correcting BDR ownership; July was the strongest opportunity-creation month, with projected pipeline in December and January. Optimizely messaging should remain tactful and address broader reasons for platform changes. Brent could support website-traffic enrichment, and the next meeting was scheduled for Wednesday at 2:00 Eastern.\n\n## Keywords\nOSS segmentation, AWS re:Invent outreach, Optimizely takeout, Pipeline reporting, BDR productivity, Outbound prospecting\n\n## Action Items\n**Jake Stangl**\nCreate separate OSS segment (02:10)\nPrioritize AWS re:Invent outreach (12:56)\nRun Optimizely takeout campaign (13:38)\nTarget OSS companies (16:25)\nSend Brent target company list (17:22)\nAssign Jake as BDR owner (20:35)\n\n**Brent Holloway**\nEnrich OSS company list (17:35)\nHold next meeting Wednesday (22:51)\nCancel Thursday meeting (22:51)",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

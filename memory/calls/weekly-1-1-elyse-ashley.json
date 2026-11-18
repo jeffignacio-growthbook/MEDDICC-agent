@@ -1,7 +1,7 @@
 {
   "company": "Weekly 1:1 Elyse/Ashley",
   "slug": "weekly-1-1-elyse-ashley",
-  "last_etl_date": "2026-10-28T06:26:54.005242",
+  "last_etl_date": "2026-11-18T08:02:54.654390",
   "calls": [
     {
       "id": "01KMNXNAFYXZRY8GREHENGMFMS",
@@ -99,6 +99,17 @@
       "date": "2026-10-27",
       "duration_minutes": 28.719999313354492,
       "summary": "# Weekly 1:1 Elyse/Ashley\nDate: 2026-10-27 | Duration: 28.719999313354492m\n\n## Summary\nThe team discussed reworking the LaunchDarkly migration blog with stronger social proof, anonymized quotes, interviews, and final SEO review, while BanditDog rollout awaits SDK changes expected at least by the end of the week. Ashley and Elyse will review hypotheses, primary and secondary metrics, and data collection before launching tests across the homepage, videos, banner, and registration page. Recorded videos are outperforming earlier formats, with some clips exceeding 70 views, while PostHog was cited as a high-performing educational example with 23,000 views. Product strategy needs narrower bets across analytics, self-driving, AI evaluations, and PLG, with engagement weaker than awareness and leads. Pricing work is focused on seat-plus-event models, managed warehouse or event forwarder options, and possible BYO warehouse premiums, supported by scenario modeling and a feasibility review with Jeremy. MCP adoption showed growth toward 22% and climbing, prompting plans for contextual guidance and stronger first-party dashboards.\n\n## Keywords\nGrowthBook experimentation, LaunchDarkly migration, MCP adoption, AI product positioning, Event-based pricing, Product-led growth\n\n## Action Items\n**Ashley Stirrup**\n- Review revised LaunchDarkly migration blog (00:41)\n- Send video analysis (07:12)\n\n**Elyse Fox**\n- Send revised migration blog (01:01)\n- Confirm final SEO changes (00:53)\n- Coordinate SDK release (01:17)\n- Sync with Teresa (01:44)\n- Create experiment variations (01:44)\n- Verify video metrics (03:47)\n- Schedule experiment design review (05:40)\n- Verify event-forwarder database support (16:29)\n- Build pricing scenarios (20:16)\n- Consolidate pricing statistics and case studies (20:43)\n- Schedule pricing analysis review (20:46)\n- Coordinate pricing discussion with Jeremy (21:00)\n- Work with Guy on product-adoption dashboards (25:59)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M731A147V6FQTJHRB3N3GHDZ",
+      "source": "fireflies",
+      "title": "Weekly 1:1 Elyse/Ashley",
+      "date": "2026-11-17",
+      "duration_minutes": 32.439998626708984,
+      "summary": "# Weekly 1:1 Elyse/Ashley\nDate: 2026-11-17 | Duration: 32.439998626708984m\n\n## Summary\nThe proposed Pro model shifts pricing to $150 per seat, including 5 million events, with additional usage at $50 per million events; break-even depends on event volume, with about 0.8 million events needed per added seat to match current $40 economics. Feature-flag pricing remains broadly comparable, while experiment pricing and segmentation require further analysis, including light, medium, and large users. The account population needs reconciliation between approximately 1,300 Hex paid accounts and the 938-account analysis, while 41% of seats are inactive. Enterprise discussions may begin near 35 seats or $30,000 annually, although the 1.5 million-events-per-user assumption remains unvalidated. Managed warehouse deployment is favored, with pricing-page updates, grandfathering, migration support, and sales training required. Ashley will retrieve 12-month Stripe billing data for validation. Competitive pricing research remains incomplete, and Elyse will investigate broader experiment tracking using Plausible data in the managed warehouse.\n\n## Keywords\nPro pricing, Event-based billing, Managed warehouse, Enterprise upsell, Customer segmentation, Plausible analytics\n\n## Action Items\n**Elyse Fox**\n- Model Pro pricing scenarios (00:00)\n- Validate event-volume assumptions (11:15)\n- Retrieve Pro pricing and usage data (13:31)\n- Produce 12-month pricing breakdown (15:36)\n- Review managed-warehouse usage (19:10)\n- Coordinate pricing implementation requirements (19:23)\n- Locate competitive pricing research (22:49)\n- Follow up with Dan and Logan (25:30)\n- Review login-page bandit variants (26:18)\n- Define Plausible data export approach (27:57)\n\n**Ashley Stirrup**\n- Add light-user segment (04:46)\n- Reconcile paid-account discrepancy (13:55)\n- Retrieve monthly pricing data (15:36)\n- Locate competitive pricing spreadsheet (22:49)\n\n**Unassigned**\n- Restrict Pro warehouse options (19:23)\n- Update Pro pricing pages (19:40)\n- Define customer grandfathering (19:45)\n- Create usage alerting (20:27)\n- Prepare Sales enablement (20:49)\n- Implement Product changes (20:57)",
       "organizer": "ashley@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

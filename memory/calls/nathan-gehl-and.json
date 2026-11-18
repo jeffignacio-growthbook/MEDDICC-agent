@@ -1,0 +1,18 @@
+{
+  "company": "Nathan Gehl and",
+  "slug": "nathan-gehl-and",
+  "last_etl_date": "2026-11-18T08:02:54.658199",
+  "calls": [
+    {
+      "id": "01M7KBQEK6NK75Q4GPKN23956R",
+      "source": "fireflies",
+      "title": "Nathan Gehl and Emmy Sharp + 2 others",
+      "date": "2026-11-17",
+      "duration_minutes": 28.790000915527344,
+      "summary": "# Nathan Gehl and Emmy Sharp + 2 others\nDate: 2026-11-17 | Duration: 28.790000915527344m\n\n## Summary\nEnthusiast Enterprises is testing GrowthBook on a tire-selling website for a featured product-comparison slider, after a higher-up selected it as an enterprise-tool alternative to a prior AWS implementation. Nate supports QA by checking website functionality, the slider implementation, and coordination with developer and infrastructure partners. QA used 200 fresh incognito sessions through a personal cloud agent and confirmed an approximate 70/30 served-versus-unserved split, while separately checking feature behavior. The scope remained limited to split accuracy and functionality rather than broader experiment performance, although health checks surfaced additional issues. Onboarding initially felt easy, dashboards showed exposure counts and customer-level reporting, and an in-person developer walkthrough helped with navigation. AI chat agents were viewed skeptically because they mainly improved readability rather than adding new information. Follow-up areas include clarifying feature-flag and experiment relationships, refining role-based onboarding, explaining automated health alerts, and interviewing engineering users and other teammates.\n\n## Keywords\nA/B testing, Feature flags, QA validation, Experiment onboarding, Health checks, Persona-specific education\n\n## Action Items\n**Emmy Sharp**\nSend gift card (14:16)\nReview GrowthBook users (23:59)\nIdentify potential contacts (23:59)\nCross-reference available information (23:59)\nAdd participant roles (24:23)",
+      "organizer": "emmy@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

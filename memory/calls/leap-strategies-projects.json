@@ -1,7 +1,7 @@
 {
   "company": "Leap Strategies Projects",
   "slug": "leap-strategies-projects",
-  "last_etl_date": "2026-11-04T07:05:05.232499",
+  "last_etl_date": "2026-11-18T08:02:54.652684",
   "calls": [
     {
       "id": "01M06CGEHT3V0YX9VR4TQ6M9FG",
@@ -81,6 +81,17 @@
       "date": "2026-11-03",
       "duration_minutes": 33.849998474121094,
       "summary": "# Leap Strategies Projects Review\nDate: 2026-11-03 | Duration: 33.849998474121094m\n\n## Summary\nSourceForge updates included approving a $40 monthly starting price, keeping pricing details broad, confirming virtual training, no phone support for premium editions, on-premise support, and broad platform coverage. Integration, category, regional, competitor, and feature selections still require validation, while revised technical descriptions were targeted for publication and paid features were deferred pending more reviews and referral evidence. Content work covered visual-editor pages, version 5.2 videos, LinkedIn posts, podcast assets, and customer webinars. The podcast strategy is shifting toward customer relationships, case studies, webinars, product feedback, and experimentation themes, including AI. The discussion also addressed scalable content workflows, limited capacity for new AI tools, the need for stronger editorial direction, and an AI-generated enterprise-pricing request that showed how customer communications may increasingly originate from AI.\n\n## Keywords\nSourceForge listing, A/B testing, Podcast marketing, AI experimentation, LinkedIn content, Customer case studies\n\n## Action Items\n**Karen Henke**\n- Update GrowthBook’s SourceForge listing (03:29)\n- Validate SourceForge integrations (06:52)\n- Review SourceForge regional filters (07:58)\n- Review SourceForge competitors (09:12)\n- Change SourceForge primary category (10:17)\n- Check SourceForge education category (12:39)\n- Complete SourceForge listing (15:37)\n- Revise LinkedIn posts (19:13)\n- Revise visual-editor page (20:02)\n- Refresh GrowthBook 5.2 website content (21:21)\n- Connect with Lindsay (21:40)\n- Identify webinar YouTube improvement workflow (30:06)\n\n**Ashley Stirrup**\n- Trial Fame (21:57)\n- Read Leaf Diaries article (32:25)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M731A147FBBA43QBPJ05EJH3",
+      "source": "fireflies",
+      "title": "Leap Strategies Projects Review",
+      "date": "2026-11-17",
+      "duration_minutes": 37.33000183105469,
+      "summary": "# Leap Strategies Projects Review\nDate: 2026-11-17 | Duration: 37.33000183105469m\n\n## Summary\nThe discussion reviewed Visual Editor performance, messaging, security, page content, the self-serve demo, and social profiles. Visual Editor had 119 visitors and a 5% Start for Free conversion rate over 30 days, although free-plan users cannot use it. The page rewrite targets marketers and product managers with messaging about faster testing, personalization, audience selection, and finding winning experiences. An Optimizely security incident raised concerns about unrestricted JavaScript deployment, so security controls and FAQ content should be added before launch, with technical guidance from Jack and Jeremy. Page refinements include clearer FAQs, stronger Contextual Bandits language, Flicker compatibility, and support for Spanish, Portuguese, and German. The self-serve demo is close to completion, but its placement must be coordinated with existing demo flows to improve signup quality. LinkedIn positioning should better represent customers and product analytics, while YouTube playlists need cleanup.\n\n## Keywords\nVisual editor, Self-serve demo, Conversion optimisation, Plausible analytics, Contextual Bandits, LinkedIn marketing\n\n## Action Items\n**Karen Henke**\n- Review Elise’s feedback and incorporate relevant changes into Visual editor page (03:04)\n- Use Plausible data to analyse conversion behaviour (03:46)\n- Add prominent FAQ explaining GrowthBook security (10:51)\n- Extend security messaging to relevant pages (11:42)\n- Rewrite Contextual Bandits FAQ (18:17)\n- Decide whether to remove or reframe AI integrations FAQ (24:39)\n- Add supported languages to Visual editor FAQ set (26:13)\n- Contact Elise and Scott about promoting self-serve demo (28:00)\n- Define benchmarks and tests for self-serve demo (30:26)\n- Review GrowthBook LinkedIn page and recommend improvements (30:42)\n- Ask Elise to improve homepage video title (34:58)\n\n**Ashley Stirrup**\n- Provide Jack’s and Jeremy’s security guidance (14:22)\n- Complete Pizza Express case study (15:23)",
       "organizer": "ashley@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

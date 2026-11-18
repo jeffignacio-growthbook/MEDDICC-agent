@@ -1,7 +1,7 @@
 {
-  "company": "Growthbook <> Storio",
+  "company": "Growthbook/Storio",
   "slug": "growthbook-storio",
-  "last_etl_date": "2026-10-28T06:26:54.009979",
+  "last_etl_date": "2026-11-18T08:02:54.659011",
   "calls": [
     {
       "id": "01M5SDTNG9X8PDBMYW2HCNBJMP",
@@ -12,6 +12,17 @@
       "summary": "# Growthbook <> Storio - A/A Test\nDate: 2026-10-27 | Duration: 22.5m\n\n## Summary\nThe discussion established GrowthBook as the primary focus while limiting scope for feasibility and proposing an AA-to-AB sequence, beginning with commercial uplift testing and a parallel feasibility spike. Five teams cover the dataflow journey, including checkout and frontend, tracking configurations, and product analytics ownership. Adobe remains the analytics source of truth for tracking and web behavior, but the Tealium integration path and acceptable data differences between competing pipelines remain unresolved; this pipeline decision blocks AA and AB testing. Product capabilities include experiment results for controls, treatments, multiple variants, and browser-level dimensions, plus health checks such as sample ratio mismatch monitoring, chance-to-win results, metric-level recommendations, and AI-assisted experiment review. Slack alerts appear feasible through webhooks, SRM notifications, and custom events. An internal design session will assess three integration options, Friday alignment will finalize AA deliverables and responsibilities, and weekly check-ins are targeted for next week. Miro will host shared diagrams, while documentation, a pre-recorded demo, an architecture diagram, and GrowthBook responses to four question areas remain follow-ups.\n\n## Keywords\nGrowthBook experimentation, A/A testing, A/B testing, Snowflake data pipeline, Tealium and Adobe integration, Sample ratio mismatch alerts\n\n## Action Items\n**Rémy Marin**\nLink GrowthBook documentation (06:54)\nVerify Slack integration capabilities (13:12)\nReview shared design materials (20:03)\n\n**James Shannon**\nShare recorded GrowthBook demo (09:51)\n\n**Shaaz Adiraja**\nAssess data-integration options (04:25)\nAlign teams on integration path (16:04)\nEstablish weekly working sessions (16:04)\nDocument end-to-end architecture (18:27)\nFinalize A/A-test deliverables (18:27)\nGrant Miro board access (19:04)",
       "organizer": "remy@growthbook.io",
       "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M77F6AVVV2SDFEY13C57NGHM",
+      "source": "fireflies",
+      "title": "Growthbook/Storio - C-Team Introduction",
+      "date": "2026-11-17",
+      "duration_minutes": 66.62999725341797,
+      "summary": "# Growthbook/Storio - C-Team Introduction\nDate: 2026-11-17 | Duration: 66.62999725341797m\n\n## Summary\nStorio and GrowthBook explored how to scale customer-facing experimentation by standardizing workflows, improving data access, and reducing the time required for setup, analysis, and trusted decisions. Existing tests can take up to two weeks for human analysis, while fragmented infrastructure, limited capacity, and only approximately 3% trusted data restrict throughput (17:21; 20:24; 14:08). Core metrics such as conversion, average order value, and revenue are generally accepted, but Storio needs stronger measurement of profit impact, lifetime value, repeat purchases, and loyalty (23:06; 44:21). Pricing and promotions were identified as major commercial priorities, although previous discount changes were not controlled experiments (52:46; 54:47). The proposed path is to begin with an AA test to validate technical plumbing, then consider a pricing or promotions A/B test after peak, potentially in January (01:02:22). GrowthBook also proposed risk-based peak testing, bandit methods, strategic support, and a revised seat-based commercial model (56:38; 58:04; 01:04:23).\n\n## Keywords\nExperimentation scalability, Pricing elasticity, Promotion testing, Customer lifetime value, Warehouse-native analytics, Multi-armed bandits\n\n## Action Items\n**James Shannon**\nDefine requirements and platform capabilities (52:20)\nAssess GrowthBook promotion experimentation support (52:46)\nReview seat-based commercial model (01:04:23)\n\n**GrowthBook team**\nDesign A/A integration test (01:00:32)\nPlan pricing and promotions experiment (01:01:26)\nSupport January pricing test preparation (01:02:35)\n\n**Emanuele Pane**\nArrange pricing-test follow-up meeting (01:04:08)\nContact GrowthBook for next discussion (01:04:19)\n\n**Emily Simpson**\nReview seat-based contract options (01:04:23)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 10,
       "summary_quality": "good"
     }
   ]

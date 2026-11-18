@@ -1,7 +1,7 @@
 {
-  "company": "GrowthBook x ECCO",
+  "company": "GrowthBook x Ecco",
   "slug": "growthbook-x-ecco",
-  "last_etl_date": "2026-11-13T07:28:57.909812",
+  "last_etl_date": "2026-11-18T08:02:54.652178",
   "calls": [
     {
       "id": "01M3MHFZ4TVC45ER5JFP8RJDGG",
@@ -23,6 +23,17 @@
       "summary": "# GrowthBook x ECCO: Kickoff\nDate: 2026-11-10 | Duration: 26.690000534057617m\n\n## Summary\nECCO’s newly formed Experimentation and Personalization team is coordinating with the CRO, analytics, and front-end teams to establish website and CRM experimentation. GrowthBook was selected over the previous approach and VWO because it supports broader collaboration and avoids VWO testing limits; ECCO will use remaining VWO credits before switching. The company will use GrowthBook Cloud, with SSO planned, and position GrowthBook between Bloomreach CRM logic and website delivery. Production implementation will use the JavaScript SDK with React instead of GTM, following a Czech-market proof of concept that experienced occasional flickering. Noor and Thomas lead implementation, while Witold owns data connectivity and analytics. Snowflake connectivity has been validated, with Bloomreach, SAP, S360, Google Analytics, and BigQuery among the data sources. Metric and dimension modeling still require guidance. Code freezes and Black Friday campaigns limit production releases, so ECCO will continue local and test-environment work, aiming for validation in early December and potentially progressing from A/A to A/B testing. Technical onboarding, experimentation training, Teams integration, and SSO setup are planned.\n\n## Keywords\nGrowthBook, A/B testing, JavaScript SDK, Snowflake, Bloomreach, SSO\n\n## Action Items\n**Daniel Lin**\nSchedule implementation call (14:35)\nProvide SSO setup information (23:29)\n\n**Giulio**\nCoordinate communication-channel access (15:44)\nLead experimentation transition (21:10)\n\n**Witold Styczen**\nPrepare Snowflake data configuration (16:20)\nPrepare BigQuery data setup (16:57)\n\n**Noor Maulidiyah**\nImplement JavaScript SDK (19:45)\n\n**Tomas Sharky**\nSupport JavaScript SDK implementation (19:45)\nProvide operations contact (23:02)",
       "organizer": "scott.keller@growthbook.io",
       "participants": 14,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M73Z81H6TYD31WT5NGM3A4FF",
+      "source": "fireflies",
+      "title": "GrowthBook x Ecco: Implementation Training",
+      "date": "2026-11-18",
+      "duration_minutes": 51,
+      "summary": "# GrowthBook x Ecco: Implementation Training\nDate: 2026-11-18 | Duration: 51m\n\n## Summary\nThe discussion covered how the SDK connects an app, uses payload configurations, targets users through attributes, and emits exposure events through tracking callbacks. Without warehouse setup, data is not stored. Warehouse access requires credentials and IP allowlisting; assignment queries map users to variants, while fact tables support metric definitions, and warehouse changes may not generate warnings. Testing and production should use separate projects, SDK endpoints, experiments, frontend systems, and warehouse data. For experimentation, a JavaScript A/A test was recommended, with version control and approval workflows available, hashing used to preserve user assignments, and gradual traffic rollout supported. Follow-up actions include completing the JavaScript test setup, obtaining SSO credentials, coordinating SSO setup through Ricardo, and planning additional experimentation training.\n\n## Keywords\nGrowthBook SDK, Experiment assignment, Data warehouse integration, Feature flags, A/A testing, Environment separation\n\n## Action Items\n**Ecco data team**\nConfigure warehouse connection (15:11)\nBuild experiment assignment query (16:50)\nDefine fact-table metrics (19:05)\nReview implementation training recording (20:47)\nSeparate staging data (22:06)\nRun JavaScript A/A test (30:17)\n\n**Daniel Lin**\nSchedule experimentation training (36:44)\nSend implementation training recording (46:06)\n\n**Nur Maulidiyah**\nPass SSO configuration information (37:49)\n\n**Ricardo**\nContact Daniel for configuration (37:49)",
+      "organizer": "daniel@growthbook.io",
+      "participants": 16,
       "summary_quality": "good"
     }
   ]

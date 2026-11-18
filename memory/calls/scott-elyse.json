@@ -1,0 +1,18 @@
+{
+  "company": "Scott ↔ Elyse",
+  "slug": "scott-elyse",
+  "last_etl_date": "2026-11-18T08:02:54.658701",
+  "calls": [
+    {
+      "id": "01M7GFBG5ADBPZ31ZY9W57HZXQ",
+      "source": "fireflies",
+      "title": "Scott ↔ Elyse Weekly",
+      "date": "2026-11-17",
+      "duration_minutes": 58,
+      "summary": "# Scott ↔ Elyse Weekly\nDate: 2026-11-17 | Duration: 58m\n\n## Summary\nThe discussion centered on an enterprise-led go-to-market motion, estimated at roughly 80%, while retaining limited PLG support through free access and developer onboarding. Product-marketing priorities include pricing analysis, AI naming, MCP pages, interactive demos, nurture journeys, events, customer marketing, and product adoption. The team recommended testing adoption tactics around low-usage areas such as Product Analytics Pro, using email, webinars, in-product messaging, and feature campaigns. Customer marketing would become an ongoing program involving feedback, case studies, podcasts, webinars, and a lightweight quarterly Customer Advisory Board. Website ownership and strategy need clarification, with priority pages, industry coverage, ecommerce, media, and brand-related rebuild implications under review. ABM remains an open pilot, dependent on customer stories and technical assets, while the developer campaign currently emphasizes messaging and event submissions. Pricing variation across AEs is being analyzed. Scott will share the revised deck, Elyse will expand the adoption-tactics slide, and Scott will coordinate with Graham and Jeremy.\n\n## Keywords\nPricing consistency, enterprise go-to-market, customer marketing, product adoption, developer campaign, ABM pilot\n\n## Action Items\n**Scott Bailey**\nAnalyse concluded deal prices (02:17)\nAdd verified product adoption data (30:43)\nConfirm product adoption metric (31:46)\nSend completed planning deck (46:06)\nKeep usage-volume graphs (47:14)\nArrange follow-up discussion (47:53)\n\n**Elyse Fox**\nRefine product-adoption tactics slide (46:09)",
+      "organizer": "elyse@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Jeremy Dorn",
+  "slug": "jeremy-dorn",
+  "last_etl_date": "2026-11-18T08:02:54.654843",
+  "calls": [
+    {
+      "id": "01M7GJJ0WR95E75TG60RSR4ZCZ",
+      "source": "fireflies",
+      "title": "Sanity Tech Partnerships Connect  (Jeremy Dorn)",
+      "date": "2026-11-17",
+      "duration_minutes": 21.809999465942383,
+      "summary": "# Sanity Tech Partnerships Connect  (Jeremy Dorn)\nDate: 2026-11-17 | Duration: 21.809999465942383m\n\n## Summary\nSanity is developing first-class content variants for A/B testing and personalization and is considering GrowthBook as a launch partner and data provider. Sanity would own authoring, preview, review, scheduling, and content management, while GrowthBook would retain control of targeting, traffic allocation, randomization, exposure logging, and statistical analysis. The integration may use OAuth, surface GrowthBook feature flags or audience definitions in Sanity, and support both GrowthBook Cloud and self-hosted deployments through configurable endpoints. Sanity is targeting a February–March launch with approximately 3–5 partners, although selection remains open. A possible second phase would send Sanity content and variant information back into GrowthBook. The teams also discussed joint collateral, field enablement, social promotion, customer proof points, and continued coordination through Slack. Sanity will share its reviewed integration document, while GrowthBook will evaluate reverse-sync functionality.\n\n## Keywords\nContent Variants, GrowthBook, OAuth Integration, A/B Testing, Self-Hosted Deployment, Partner Launch\n\n## Action Items\n**Anne Prins**\nFinalise integration overview document (04:22)\nShare integration overview document (18:07)\nJoin shared Slack channel (19:06)\nAdd Ian Mahanes to shared Slack channel (19:37)\n\n**Jeremy Dorn**\nReview GrowthBook display approach (09:48)\nEvaluate Sanity metadata components (09:58)\nSupport deployment configuration (17:14)\n\n**Ian Mahanes**\nReview variant metadata display scope (15:21)\nIdentify customer opportunities (15:51)\nMap joint go-to-market activities (15:51)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "Growthbook",
   "slug": "growthbook",
-  "last_etl_date": "2026-10-21T05:31:34.619246",
+  "last_etl_date": "2026-11-18T08:02:54.655326",
   "calls": [
     {
       "id": "01KGHY46Z2XRQ494JJYXYSJ57B",
@@ -264,6 +264,17 @@
       "summary": "# Growthbook - FTR re-sync\nDate: 2026-10-20 | Duration: 46.459999084472656m\n\n## Summary\nFTR remains the most assured certification route because the existing SOC 2 audit does not include the required availability component, while the complexity and timeline of adding it are unknown. Wafer-to-FTR remediation was estimated at about one month by Kevin Chant after a high-level review, but detailed sequencing and blast-radius analysis are still pending. AWS certification and an AWS badge were prioritized because they could enable field incentives, quota attribution, and stronger Marketplace engagement; the listing already exists. The technical work includes at least three or four independent initiatives, including a major authentication overhaul and infrastructure-level changes. A small infrastructure team makes review capacity the main blocker, with Jeremy, the CTO, needed for foundational or high-risk approvals. Terraform, code review, testing, staging, and pre-verification are preferred. Kevin will reassess requirements and account configuration, including whether Control Tower is enabled, while Will Horn will investigate SOC 2, waiver, support, and funding options. Co-selling, sponsorship, and broader channel discussions will follow certification and listing work.\n\n## Keywords\nAWS Foundational Technical Review, Well-Architected Framework, SOC 2 Availability, AWS Marketplace, Infrastructure Remediation, AWS Co-Selling\n\n## Action Items\n**Will Horn**\nAsk AWS management about SOC 2 path (32:01)\nInvestigate AWS certification support (35:28)\nCheck AWS waiver availability (42:48)\nProvide AWS pathway answers (43:08)\n\n**Ashley Stirrup**\nDiscuss remediation investment with AWS (36:16)\n\n**Kevin Chant**\nReview AWS FTR requirements (42:59)\nDecide on follow-up session (43:25)",
       "organizer": "ashley@growthbook.io",
       "participants": 6,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7JX0YN8ZCQD08ZW4FBY2FEX",
+      "source": "fireflies",
+      "title": "Growthbook - Warehouse Native Product Analytics Demo",
+      "date": "2026-11-17",
+      "duration_minutes": 56.619998931884766,
+      "summary": "# Growthbook - Warehouse Native Product Analytics Demo\nDate: 2026-11-17 | Duration: 56.619998931884766m\n\n## Summary\nThe discussion evaluated GrowthBook as a warehouse-native platform aligned with Home Depot’s strategy of keeping data in BigQuery and using external tools as layers. GrowthBook demonstrated Explorer, dashboards, journeys, funnels, SQL analysis, experimentation, feature flags, and governed metrics using warehouse data. Key evaluation issues include BigQuery query latency, event freshness, configurable dashboard and experiment refreshes, and technical compatibility with Home Depot’s complex stack. Self-hosted and air-gapped deployment can keep data within Home Depot, while enterprise licensing adds certified metrics, custom AI guidance, SSO, audit logs, and fine-grained permissions. Session replay is still in development, with cohort filtering, variant-versus-control analysis, and AI summaries requiring confirmation. The next steps are NDA completion, technical discovery covering implementation and data flows, InfoSec PSRB review, and a potential January POC, subject to technical and security approval.\n\n## Keywords\nWarehouse-native analytics, BigQuery, Experimentation, Feature flags, Session replay, Metric governance\n\n## Action Items\n**Scott Keller**\nSend Home Depot follow-up summary (25:26)\nRank requested product capabilities (25:26)\n\n**Kishen Jayanti**\nInitiate Home Depot NDA process (45:01)\n\n**Home Depot technical and security teams**\nConduct deeper technical fit discussion (45:01)\nComplete InfoSec PSRB review (45:32)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 12,
       "summary_quality": "good"
     }
   ]

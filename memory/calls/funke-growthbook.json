@@ -1,0 +1,18 @@
+{
+  "company": "FUNKE & GrowthBook",
+  "slug": "funke-growthbook",
+  "last_etl_date": "2026-11-18T08:02:54.659315",
+  "calls": [
+    {
+      "id": "01M7G6K9Y842K4KJRNGT8EWA1H",
+      "source": "fireflies",
+      "title": "FUNKE & GrowthBook | Angebot und Partnerschaft",
+      "date": "2026-11-17",
+      "duration_minutes": 39,
+      "summary": "# FUNKE & GrowthBook | Angebot und Partnerschaft\nDate: 2026-11-17 | Duration: 39m\n\n## Summary\nThe discussion covered a commercial model involving a startup increase, enterprise pricing for data-center and cloud deployments, per-user deposits, and self-service monthly or annual billing. Enterprise operations included customer success management, support functions, training, onboarding, customer enablement, and implementation support. Enterprise architecture was also discussed, including an additional cost instruction and an invoice. Technical topics included event offsets, authorization, authentication, experimentation, and a transparent approach. The conversation also addressed enterprise positioning and broader growth, with growth referenced again near the close.\n\n## Keywords\nGrowthBook, FUNKE, Enterprise deployment, Billing models, Customer success, Authentication\n\n## Action Items\n**Unassigned**\nClarify enterprise offering (29:39)\nDocument deployment requirements (29:39)\nDocument billing requirements (29:39)\nConfirm security needs (29:39)\nConfirm support needs (29:39)\nSchedule follow-up discussion (29:39)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

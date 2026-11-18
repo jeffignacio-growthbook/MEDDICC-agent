@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook <> Hallmark Media",
+  "slug": "growthbook-hallmark-media",
+  "last_etl_date": "2026-11-18T08:02:54.654735",
+  "calls": [
+    {
+      "id": "01M7J2JXKGJ6SEG82XHA31X99T",
+      "source": "fireflies",
+      "title": "GrowthBook <> Hallmark Media - Intro",
+      "date": "2026-11-17",
+      "duration_minutes": 40.72999954223633,
+      "summary": "# GrowthBook <> Hallmark Media - Intro\nDate: 2026-11-17 | Duration: 40.72999954223633m\n\n## Summary\nHallmark evaluated GrowthBook primarily for feature flagging across platforms, individual users, and segmentation groups, while treating experimentation as a longer-term interest. OpenFeature compatibility was required, and GrowthBook’s documentation and SDK appeared aligned. Demonstrated capabilities included Boolean, JSON, and typed configurations; environments; targeting; gradual ramp-ups; safe rollouts with automatic reversal when guardrail metrics regress; custom SDK attributes; saved groups; prerequisite targeting; revisions; review workflows; audit logs; and historical restoration. Projects, tags, and role-based permissions support organization and team separation, although configuration functionality remains in beta. Enterprise capabilities such as SSO, access controls, uptime guarantees, onboarding, and specialist support were considered important. Free accounts allow 1 million events, while Pro allows 2 million with additional usage charges. Self-hosted enterprise pricing is seat-based, while managed enterprise pricing is event-based. Hallmark viewed the product positively but still needed follow-up on complex flag dependencies, custom targeting documentation, hosting, NDA review, and pricing.\n\n## Keywords\nFeature flagging, OpenFeature, Experimentation, Targeting, Enterprise pricing, Self-hosting\n\n## Action Items\n**Daniel Marsh and Sue Blair**\nSend NDA (37:27)\nProvide availability for pricing meeting (37:27)\n\n**Dan Wathne**\nFollow up with Hallmark on implementation patterns (30:33)\nSend written recap (38:33)\nRoute NDA through GrowthBook legal (38:33)\nCoordinate pricing discussion (38:33)",
+      "organizer": "dan@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

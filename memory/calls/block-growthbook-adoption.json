@@ -1,0 +1,18 @@
+{
+  "company": "Block GrowthBook Adoption",
+  "slug": "block-growthbook-adoption",
+  "last_etl_date": "2026-11-18T08:02:54.655936",
+  "calls": [
+    {
+      "id": "01M7NFTGPFND4AAZR2ZSCCKV3R",
+      "source": "fireflies",
+      "title": "Block GrowthBook Adoption and Query Optimization",
+      "date": "2026-11-17",
+      "duration_minutes": 42.41999816894531,
+      "summary": "# Block GrowthBook Adoption and Query Optimization\nDate: 2026-11-17 | Duration: 42.41999816894531m\n\n## Summary\nBlock is consolidating GrowthBook under Alyssa’s experimentation and LLM evaluation mandate, with enrollment, proxy-server use, and remote evaluation viewed as more strategic than dashboarding. Repeated exposure-to-fact-table joins may require separate processing for 50 or more experiments and could become more costly at larger scale. Proposed mitigations included shared processing, experiment-key and unit-ID partitioning, clustering, and separate warehouses for scheduled refreshes and ad hoc work; Block reported 61 timed-out queries costing $750 over seven days. A reusable user-metric-day rollup could support data-scientist analysis and meta-analysis, although funnel metrics require timestamp arrays and freshness, restatement, dependency, and cache-divergence risks remain. Block also needs legacy-metric cleanup, migration support, and potentially a fresh configuration. Luke planned follow-up guidance on partitioning, clustering, warehouse scheduling, pre-aggregation, and migration, with hands-on organizational support favored.\n\n## Keywords\nExperiment-data pipelines, Snowflake optimisation, Pre-aggregated tables, Metric restatement, Warehouse scaling, Legacy-metric migration\n\n## Action Items\n**Luke Sonnet**\nProvide Block guidance on query clustering and partitioning (33:49)\nRecommend Snowflake warehouse scaling and scheduling (33:49)\nPresent pre-aggregated user-day metric table opportunity (33:49)\nOffer Block migration tool (36:52)\nShare migration and legacy-metric cleanup guidance (39:35)\nShare pre-aggregated table trade-offs (40:37)",
+      "organizer": "luke@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

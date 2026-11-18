@@ -1,0 +1,18 @@
+{
+  "company": "jack:jeremy",
+  "slug": "jack-jeremy",
+  "last_etl_date": "2026-11-18T08:02:54.656041",
+  "calls": [
+    {
+      "id": "01M7NA092HQ0Y8XBF4YH8T1Y9E",
+      "source": "fireflies",
+      "title": "jack:jeremy",
+      "date": "2026-11-17",
+      "duration_minutes": 30.790000915527344,
+      "summary": "# jack:jeremy\nDate: 2026-11-17 | Duration: 30.790000915527344m\n\n## Summary\nThe discussion covered immediate response to the Optimizely incident, including removing its snippet from applications, pausing experiments, seeking vendor answers, investigating project-wide JavaScript access, and addressing customer impact. Project-wide JavaScript was described as increasing exposure because experiments can inject code and broad targeting lowers the barrier to widespread effects, while employee compromise remained unconfirmed. Content Security Policy, employee MFA, and secure vendor access were identified as protections that can limit damage. The group discussed moving toward code-based experimentation and feature flags, while recognizing that visual editors remain useful for fast launches and some DOM changes. GrowthBook’s proposed approach separates application-owned implementation from platform-controlled rollout states and supports validated text and color configuration. Self-hosting, including deployment behind a VPN, was also discussed. Jack will review the transcript, Ashley may contribute, and the draft could become a Jeremy article.\n\n## Keywords\nOptimizely security incident, Visual experimentation, Content Security Policy, Feature flags, Self-hosting, GrowthBook security\n\n## Action Items\n**Jack Virag**\nPrepare article draft (29:27)\nInvolve Ashley in review (29:27)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}
