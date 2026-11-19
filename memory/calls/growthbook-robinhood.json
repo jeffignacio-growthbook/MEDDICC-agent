@@ -1,7 +1,7 @@
 {
-  "company": "Growthbook <> Robinhood",
+  "company": "GrowthBook <> Robinhood",
   "slug": "growthbook-robinhood",
-  "last_etl_date": "2026-08-18T16:55:06.172445",
+  "last_etl_date": "2026-11-19T08:09:43.861179",
   "calls": [
     {
       "id": "01M063F4NCJA2T33C5N2DG7RKX",
@@ -17,6 +17,17 @@
       "participant_domains": [
         "robinhood.com"
       ],
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7NX2X2A8ESS7M0T4E9T6JTC",
+      "source": "fireflies",
+      "title": "GrowthBook <> Robinhood - POC Sync",
+      "date": "2026-11-18",
+      "duration_minutes": 34,
+      "summary": "# GrowthBook <> Robinhood - POC Sync\nDate: 2026-11-18 | Duration: 34m\n\n## Summary\nThe discussion focused on evaluating GrowthBook as a possible enterprise alternative to Robinhood’s internal experimentation tool. The trial will use a self-hosted deployment, a new account, real production data sets, selected experiments, custom queries, and ad hoc slicing and dicing to assess workflow fit, performance, integrations, feature gaps, and operational usability. Henry’s experimentation team and selected data science stakeholders are expected to participate, with an initial group of about 20–25 people, supported through a private Slack channel and biweekly check-ins. Henry will document table-stakes use cases and success criteria, while Dan will prepare pricing, complete legal and security materials, and coordinate the trial channel. Activation is targeted for early the following week, subject to legal approval and environment readiness, with an early-December kickoff considered. The January 17 expiration remains in place, although holidays and procurement could reduce evaluation time. Broader adoption requires team alignment and demonstrated differentiation, while production experimentation is not expected before the earliest Q2 next year.\n\n## Keywords\nExperimentation platform, GrowthBook Enterprise, Proof of concept, Self-hosted deployment, Product experimentation, Procurement and security\n\n## Action Items\n**Dan Wathne**\nReview Robinhood due-diligence and security questionnaires (07:19)\nObtain legal approval for trial documents and agreements (13:49)\nPrepare commercial pricing (16:29)\nCreate private Slack channel (20:03)\nReturn security questionnaires and PSE agreement (20:03)\nProvide trial licence key (20:51)\nCoordinate kickoff timing (22:10)\n\n**Henry Jewkes**\nDefine proof-of-concept success criteria (14:28)\nSend technical questions (17:24)\nCreate new GrowthBook account (20:51)\nSet up trial infrastructure and Okta access (21:31)",
+      "organizer": "dan@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

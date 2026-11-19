@@ -1,0 +1,18 @@
+{
+  "company": "Virginia Avunjian and",
+  "slug": "virginia-avunjian-and",
+  "last_etl_date": "2026-11-19T08:09:43.860667",
+  "calls": [
+    {
+      "id": "01M78Y8EG6CFP2RW161HTFDCAG",
+      "source": "fireflies",
+      "title": "Virginia Avunjian and Ashley Stirrup + Graham McNicoll",
+      "date": "2026-11-19",
+      "duration_minutes": 36,
+      "summary": "# Virginia Avunjian and Ashley Stirrup + Graham McNicoll\nDate: 2026-11-19 | Duration: 36m\n\n## Summary\nThe discussion established the onboarding and finance transition plan, with Virginia Avunjian leading the first 60–90 days before rolling off after one or two financial statements, while Zach Motz, Farrah Raagas, and Ali form the ongoing accounting and finance team. Priorities include moving fully to accrual accounting, improving month-end reporting, strengthening collections, and building a forecast for next year’s growth and burn outlook. The team generally targets closing books by the 15th, with board meetings preferably scheduled at least three weeks after quarter close. Open items include confirming Fondo’s contract end date and November close ownership, obtaining access to finance and payroll systems, deciding on tax-provider support, and resolving the accounting inbox structure. The company also discussed its subscription and CDN revenue model, commission processes, payroll across Rippling and Deel, the Pulley-to-Carta cap table migration, and a tentative move to Ramp for vendor payments.\n\n## Keywords\nAccrual accounting, Financial forecasting, Month-end close, Fondo transition, Ramp, Cap table migration\n\n## Action Items\n**Virginia Avunjian**\nArrange knowledge-transfer meeting with Fondo (08:39)\nRequest Carta and Pulley access (12:45)\nRequest GrowthBook accounting access (26:25)\nSupport 1099 filings (33:09)\nSupport Delaware franchise reporting (33:22)\nPrepare tax-team RFI list (33:29)\nSend onboarding recap email (35:29)\n\n**Jennifer Pham-Le**\nReview board-meeting dates (11:02)\nInvestigate dedicated accounting inbox (29:55)\nReview Bill.com plan (31:03)\nDiscuss tax-work transition with Ashley Stirrup (35:04)\nConfirm Fondo engagement end date (35:56)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    }
+  ]
+}

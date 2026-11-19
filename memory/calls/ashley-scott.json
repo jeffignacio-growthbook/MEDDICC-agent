@@ -1,7 +1,7 @@
 {
   "company": "Ashley / Scott",
   "slug": "ashley-scott",
-  "last_etl_date": "2026-10-07T06:41:13.108106",
+  "last_etl_date": "2026-11-19T08:09:43.862636",
   "calls": [
     {
       "id": "01KK7E6X9YFBZBSCQP5WB6ABGV",
@@ -166,6 +166,17 @@
       "date": "2026-10-06",
       "duration_minutes": 12.010000228881836,
       "summary": "# Ashley / Scott\nDate: 2026-10-06 | Duration: 12.010000228881836m\n\n## Summary\nScott Bailey has strengthened his knowledge of feature flagging and experimentation over seven months by practicing demos, developing the demo workspace, preparing for a webinar, and receiving coaching from Logan (01:05). Ashley Stirrup recognized his rapid progress toward mastering finer product details. Scott has built strong relationships with sales engineers Logan and Remy and is increasingly consulted by sales for product and competitive insights (03:15). He is producing high-quality content more quickly, including the LLM Trace handout and blog post, although Ashley and Scott identified a need for better internal training and marketing-engineering communication around technical assets (04:46–05:29). Scott also collaborates broadly across marketing and engineering, contributing technical clarification during engineering calls and supporting launch work with Jeremy and Graham. Alignment around version 5.2 is improving as the team gains clarity on scope, goals, and responsibilities. Scott’s main development areas are deeper product and competitor knowledge and stronger cross-team enablement.\n\n## Keywords\nProduct Knowledge, Demo Workspace, Sales Enablement, Marketing-Engineering Collaboration, Internal Training, Product Launch\n\n## Action Items\n\n**Scott Bailey**\nContinue practicing demos daily until the webinar on Thursday to improve presentation skills and product knowledge (02:00)\nCoordinate with Logan for a demo session scheduled tomorrow to enhance demo workspace architecture and collaboration (02:30)\nMaintain collaboration with Jeremy and Graham to improve alignment on product launches and scope, including follow-up on version 5.2 meeting outcomes (04:30)\nImprove internal marketing and engineering communication to enhance enablement of engineering teams regarding marketing messages (06:00)\nContinue building and nurturing relationships with SESs and sales teams by providing marketing and technical support to strengthen collaboration (03:15)\n\n**Ashley Stirrup**\nProvide training or guidance to internal team members such as Michael and Graham to clarify understanding of assets like the LLM Trace handout and address internal misunderstandings (05:30)\n",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M78Y8EFEDTS3MYC3GQT011Q7",
+      "source": "fireflies",
+      "title": "Ashley / Scott",
+      "date": "2026-11-18",
+      "duration_minutes": 33,
+      "summary": "# Ashley / Scott\nDate: 2026-11-18 | Duration: 33m\n\n## Summary\nThe discussion centered on positioning the product for teams that ship code, emphasizing faster experimentation and delivery, predictable pricing, and developer-friendly AI. Competitive messaging needs careful updates because Statsig and EPO may be regaining momentum, making “fallen behind” claims potentially outdated. Battle cards should support both preparation and live calls through short, scannable talk tracks, AI retrieval guidance, direct prospect-ready language, and more visible customer proof points. Enterprise pricing varies substantially among representatives, from $30,000 to $200,000 starting points, raising questions about consistency, win rates, and deal value. Pro pricing is being converted to a usage-based model, while Enterprise pricing remains unresolved. A gap between Pro and Enterprise affects smaller companies, prompting consideration of an intermediate tier or add-ons. Planned actions include interviewing sellers and sharing revised battle-card sections incrementally during the week.\n\n## Keywords\nCompetitive battle cards, Sales enablement, Experimentation platforms, AI roadmap, Enterprise pricing, Feature management\n\n## Action Items\n**Unassigned**\nSend competitive positioning materials (06:28)\nSet up sales representative calls (14:14)\nSpeak with Christian (14:14)\nAdd customer proof to battle cards (14:51)\nContinue pricing work with Elise (15:53)\nRevise battle-card sections (22:23)\nRevise initial battle cards (22:23)",
       "organizer": "ashley@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

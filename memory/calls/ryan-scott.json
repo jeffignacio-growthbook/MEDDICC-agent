@@ -1,0 +1,18 @@
+{
+  "company": "Ryan / Scott",
+  "slug": "ryan-scott",
+  "last_etl_date": "2026-11-19T08:09:43.865147",
+  "calls": [
+    {
+      "id": "01M7QX0C996FF9WCS8V5257P75",
+      "source": "fireflies",
+      "title": "Ryan / Scott",
+      "date": "2026-11-18",
+      "duration_minutes": 33,
+      "summary": "# Ryan / Scott\nDate: 2026-11-18 | Duration: 33m\n\n## Summary\nThe team reviewed hiring progress, including a December BDR start in Nashville and an Atlanta sales-engineer interview. Home Depot advanced to pricing after demos, with a three-year proposal exceeding $1 million, a January POC target, and a Q1 decision expected. UPS formally began its RFP, with evaluation and POC activity expected across January and February and product readiness required to compete with Adobe Target. Q4 pipeline coverage was almost 4.7x against a $500,000 forecast; Expedia selected GrowthBook, SBF signature was expected, Washington Post entered procurement, and Zalando delayed its renewal while considering Databricks. OLEX slowed after a completed POC, while CarGurus needed an early POC and parallel procurement to support a Q1 decision. Natera had three live experiments and targeted year-end selection. Inbound lead volume was weak, although outbound activity produced two meetings. Ryan offered executive support and enterprise proof points, including Anthropic’s usage.\n\n## Keywords\nHome Depot, Adobe Target, Enterprise sales pipeline, Proof of concept, CarGurus, Anthropic renewal\n\n## Action Items\n**Scott Keller**\n- Schedule Atlanta dinner (03:57)\n- Provide executive alignment for Home Depot opportunity (12:06)\n- Meet Felipe at AWS Las Vegas (20:25)\n- Start CarGurus proof of concept (26:09)\n- Begin CarGurus procurement process (27:17)\n- Interview Atlanta sales engineer candidate (29:37)\n- Send LinkedIn follow-ups to Optimizely prospects (32:30)\n- Notify Ryan McGurk when SBF agreement closes (32:44)\n\n**Ryan McGurk**\n- Support Home Depot opportunity (06:07)\n- Support UPS Adobe Target RFP opportunity (09:27)\n- Support new BDR ramp-up (03:57)\n- Send updated compensation letters through Rippling (27:49)\n- Pair new BDR with sales team (28:27)\n- Send candidate LinkedIn profile to Scott Keller (29:45)\n- Support larger customer opportunities (32:36)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Compare page working",
+  "slug": "compare-page-working",
+  "last_etl_date": "2026-11-19T08:09:43.864944",
+  "calls": [
+    {
+      "id": "01M7H0CTHG9WPPSDVVGEFVFHCC",
+      "source": "fireflies",
+      "title": "Compare page working session 2",
+      "date": "2026-11-18",
+      "duration_minutes": 20,
+      "summary": "# Compare page working session 2\nDate: 2026-11-18 | Duration: 20m\n\n## Summary\nNo summary available",
+      "organizer": "emmy@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

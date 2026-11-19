@@ -1,0 +1,18 @@
+{
+  "company": "Jacob + Christian",
+  "slug": "jacob-christian",
+  "last_etl_date": "2026-11-19T08:09:43.865052",
+  "calls": [
+    {
+      "id": "01M7J9Z07KE6NKZFJYHZQX5YSC",
+      "source": "fireflies",
+      "title": "Jacob + Christian",
+      "date": "2026-11-18",
+      "duration_minutes": 0.18333333730697632,
+      "summary": "# Jacob + Christian\nDate: 2026-11-18 | Duration: 0.18333333730697632m\n\n## Summary\nNo summary available",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

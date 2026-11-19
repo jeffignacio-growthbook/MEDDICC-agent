@@ -1,0 +1,18 @@
+{
+  "company": "Emmy / Jacqueline",
+  "slug": "emmy-jacqueline",
+  "last_etl_date": "2026-11-19T08:09:43.865795",
+  "calls": [
+    {
+      "id": "01M7JWYHG9HGQM0DB5CFQR0BWQ",
+      "source": "fireflies",
+      "title": "Emmy / Jacqueline: Nurtures x JackOps",
+      "date": "2026-11-18",
+      "duration_minutes": null,
+      "summary": "# Emmy / Jacqueline: Nurtures x JackOps\nDate: 2026-11-18 | Duration: Unknown\n\n## Summary\nNo summary available",
+      "organizer": "jacqueline@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

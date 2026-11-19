@@ -1,0 +1,18 @@
+{
+  "company": "Product Hype Intro",
+  "slug": "product-hype-intro",
+  "last_etl_date": "2026-11-19T08:09:43.861397",
+  "calls": [
+    {
+      "id": "01M78Y8EFR9FSF3QENF8CNBTSS",
+      "source": "fireflies",
+      "title": "Product Hype Intro Call",
+      "date": "2026-11-18",
+      "duration_minutes": 25,
+      "summary": "# Product Hype Intro Call\nDate: 2026-11-18 | Duration: 25m\n\n## Summary\nStory Snap presented an end-to-end B2B video service covering scripting, storyboarding, voiceover selection, production, and editing, with clients mainly providing reviews and feedback. Product videos were priced from $5K for 30 seconds to $8.5K for 60 seconds, while brand narratives were estimated at $9K–$11K. Ashley felt some samples were too marketing-focused for a developer audience and showed stronger interest in authentic testimonials and executive content. Remote developer testimonials could produce two-minute stories, 30-second cutdowns, advertising edits, and written materials; promotional pricing was $3K per video for five videos, with five customers and two cuts each estimated at approximately $17.2K. Thought-leadership videos could be filmed remotely or onsite, with onsite sessions producing multiple videos efficiently. A potential onsite customer case study was discussed at approximately $8K globally for a two-minute video or $8.3K with an additional cutdown. Dan will send samples and pricing, Ashley will review the options, and follow-up is planned after her return on December 4.\n\n## Keywords\nB2B video production, Developer testimonials, Executive thought leadership, Customer case studies, Remote video interviews, On-site video production\n\n## Action Items\n**Dan Gemmell**\nSend brand narrative sample link (11:43)\nSend testimonial format links (11:43)\nProvide pricing information (12:06)\nFollow up with Ashley (14:58)\n\n**Ashley Stirrup**\nSecure customer agreement (14:20)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

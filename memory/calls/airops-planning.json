@@ -1,7 +1,7 @@
 {
   "company": "AirOps Planning",
   "slug": "airops-planning",
-  "last_etl_date": "2026-11-14T07:10:06.545972",
+  "last_etl_date": "2026-11-19T08:09:43.861832",
   "calls": [
     {
       "id": "01KJXC5337E7411SK81AZFNK3P",
@@ -188,6 +188,17 @@
       "date": "2026-11-13",
       "duration_minutes": 62.130001068115234,
       "summary": "# AirOps Planning\nDate: 2026-11-13 | Duration: 62.130001068115234m\n\n## Summary\nThe group discussed an always-on competitive listener using a Google Sheet to compare GrowthBook messaging with competitor claims, identify sources and contradictions, and flag outdated website or blog content. GrowthBook’s source of truth will combine Emmy’s style and brand-facts document with GitHub, dashboard, and potentially pricing-page data. Agent-facing feature flags may launch with new SDK work, enabling basic flags without an account and supporting positioning GrowthBook as an open-source standard for agents. Athena showed 15% share of voice, 78 mentions, and 58 citations versus a competitor average of 33, while results varied by model. The team also reviewed descriptive SEO H1s for product and navigation pages, expanded Jack Ops content workflows, maintained separate ownership for competitive pages, and planned weekly reviews focused on signups, conversions, Athena visibility, and selected SEO metrics.\n\n## Keywords\nCompetitive intelligence, AI-agent marketing, Free feature flags, Athena visibility tracking, SEO H1 optimisation, Content automation\n\n## Action Items\n**Emmy Sharp**\nRefresh GrowthBook writing style guide and brand facts (02:58)\nUse pricing page as authoritative reference (09:45)\nBuild audience-specific Jack Ops workflows (31:32)\n\n**Karen Henke**\nReview agent-focused marketing positioning (13:44)\nReview header-page SEO inventory (54:44)\nImprove Visual Editor product page (57:58)\n\n**Jason Faber**\nReview free feature-flag article performance (25:53)\nDistinguish branded from unbranded prompts (33:32)\nAdd free feature-flag prompts to Athena tracking (38:43)\nSend Visual Editor SEO brief to Karen (58:18)\nEvaluate Visual Editor for Athena monitoring (58:32)\nPropose recurring meeting metrics (59:46)\n\n**Jack Virag**\nGenerate header-navigation page inventory (54:44)\nAdd recommended page-title column (55:14)\nReach out to Yousef about competitive-page work (59:46)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M78Y8EFKPHV8308V1C3NFB0N",
+      "source": "fireflies",
+      "title": "AirOps Planning",
+      "date": "2026-11-18",
+      "duration_minutes": 71,
+      "summary": "# AirOps Planning\nDate: 2026-11-18 | Duration: 71m\n\n## Summary\nThe discussion covered security communications, website FAQs, measurement, AI visibility, content, SEO, research, and near-term execution. Security work includes leading the newsletter with Jeremy’s timely blogs, expanding practical FAQs across relevant pages, and avoiding absolute security claims while addressing visual-editor protections, self-hosting, and API-key safety. Measurement priorities include demo requests, free-product signups, registration completion, new-versus-returning users, traffic sources, and AI visibility, with Ashley Stirrup’s spreadsheet serving as the reporting location. Athena tracking should initially focus on approximately 15–20 high-value commercial prompts, add middle-funnel questions, and incorporate feature-flagging use cases and product-update insights. Content work includes reviewing four high-impression, low-click Insights pages, evaluating blog migrations, developing interleaving content, and creating experimentation thought leadership. Near-term actions include FAQ placement, Plausible tracking, SEO review, signup measurement, reporting improvements, and product-update workflows.\n\n## Keywords\nSecurity FAQs, Plausible analytics, AI search visibility, Athena prompt tracking, Feature-flag content, SEO conversion optimisation\n\n## Action Items\n**Jack Virag**\nForward Jeremy’s security blog and supporting materials (00:00)\nIdentify site pages for security FAQs (07:49)\nRewrite security recommendations into FAQ format (10:16)\nReview underperforming Insights articles (59:04)\nContact Michael Knowlton about signup tracking (59:08)\nCoordinate Plausible tracking implementation (59:08)\n\n**Jason Faber**\nCompile security questions and prompts (05:05)\nDefine weekly reporting metrics and reference view (14:10)\nReview SEO and content topics (59:56)\nDevelop product update and AI prompt process (01:00:06)\n\n**Karen Henke**\nPrepare security FAQ notes (08:16)\nAdd Plausible tracking requirements to website plan (14:54)\nDevelop homepage tracking in Plausible (17:09)\nDevelop pricing-page tracking in Plausible (17:09)\nExpand middle-of-funnel AI prompt ideas (24:24)\n\n**Emmy Sharp**\nAsk onboarding interviewees about security (34:08)\n\n**Ashley Stirrup**\nAdd new-versus-returning users to reporting view (46:21)\nShare proposed content topics with Jason Faber (59:56)",
       "organizer": "ashley@growthbook.io",
       "participants": 7,
       "summary_quality": "good"

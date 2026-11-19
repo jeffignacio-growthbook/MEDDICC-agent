@@ -1,0 +1,18 @@
+{
+  "company": "Design Review",
+  "slug": "design-review",
+  "last_etl_date": "2026-11-19T08:09:43.863083",
+  "calls": [
+    {
+      "id": "01M7P754V4RMAGXKECQV9S0SDW",
+      "source": "fireflies",
+      "title": "Design Review: Dimensions & Capping",
+      "date": "2026-11-18",
+      "duration_minutes": 46,
+      "summary": "# Design Review: Dimensions & Capping\nDate: 2026-11-18 | Duration: 46m\n\n## Summary\nThe discussion covered several product-direction decisions and follow-ups. For dimensions, nested signals were preferred, with a dedicated signals view as the starting point, while slices and multivariations still need treatment. For results, the group considered a smart surface with signals embedded in results, requested a dynamic results mockup, and noted that dynamic configuration needs broader feedback. Pinned breakdowns were kept as separate functionality. For capping, the proposed experience includes an indicator on the metric, a warning badge, and short dynamic labels, with capping ready for implementation; generic language for capping and Cupid was also noted. Follow-up responsibilities include Gabe cleaning the capping handoff and prioritizing the results UI, Luke preparing the Cloud artifact, and verifying drill-down telemetry.\n\n## Keywords\nDimension signals, Results page, Nested tabs, Metric drill-down, Capping warnings, Experiment dashboards\n\n## Action Items\n**Gabe Melean**\nCreate comparison mockup (24:52)\nPrepare Cloud artifact (28:14)\nPropose Debug tab names (33:20)\nClean up capping design (35:44)\nHand off capping design (37:21)\n\n**Luke Sonnet**\nDraft Cloud feedback artifact (34:48)\nSync with Gabe on screenshots (34:48)\nAdd latest-state screenshots (34:48)\n\n**Michael Samper**\nCheck drill-down telemetry (33:52)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

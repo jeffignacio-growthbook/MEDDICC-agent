@@ -1,0 +1,18 @@
+{
+  "company": "AI Feedback Session",
+  "slug": "ai-feedback-session",
+  "last_etl_date": "2026-11-19T08:09:43.866341",
+  "calls": [
+    {
+      "id": "01M78Y8EFQ5YJ273YYTC8ZVBY1",
+      "source": "fireflies",
+      "title": "AI Feedback Session with LeoVegas",
+      "date": "2026-11-18",
+      "duration_minutes": 69,
+      "summary": "# AI Feedback Session with LeoVegas\nDate: 2026-11-18 | Duration: 69m\n\n## Summary\nLeoVegas moved from LaunchDarkly to GrowthBook after an acquisition created overlapping experimentation platforms, with rollout across sportsbook, gaming, landing pages, native apps, and CMS-managed experiences. Joanna is the sole remaining experimentation specialist, while product managers are expected to run experiments, review results, and record ship, iterate, or do-not-ship decisions. Uplift tests and release validations now use one workflow supported by scheduled stops and weekly Claude setup checks. Claude assists with hypothesis reviews, result summaries, and QA, while write access is deferred in favor of REST APIs, webhooks, and Atlassian automation. GrowthBook is now the source of experiment history, and planned quality scoring will assess issues such as SRM, insufficient data, restarts, and re-randomization. Joanna requested audience-based power analysis, dynamic stop extensions, automated summaries, staging filters, guardrail-only recommendations, and customized AI checks. Slack integration and data warehouse consolidation remain dependent on approval and ongoing restructuring.\n\n## Keywords\nExperiment automation, GrowthBook, Claude MCP, Experiment quality, Power analysis, Feature experimentation\n\n## Action Items\n**Joanna Sarvanidis**\nPursue GrowthBook REST API access (07:56)\nPursue GrowthBook webhook access (07:56)\nIntroduce scheduled stop dates (13:28)\nExpand self-service experiment process (13:28)\nConfigure recurring Claude-based check (14:21)\nSeek approval for GrowthBook-Slack connection (16:19)\nRecord final product decision (20:51)\nExplore Atlassian Studio workflow (22:24)\nAutomate sizing and power-analysis results (24:52)\nUse Rovo or Atlassian automation (25:48)\nDevelop Claude-based debugging capability (39:25)\nEvaluate GrowthBook metrics capability (44:13)\nDefine power analysis requirements (48:44)\nDefine automatic experiment-extension rules (51:47)\n\n**Jeremy Dorn**\nAdd decision criteria to experiment templates (35:11)\nLaunch draft-based staging QA workflow (40:04)\nDevelop experiment quality scoring (45:17)\nSupport customer-defined AI prompts and checks (48:08)\nImprove power analysis (48:19)\nBring LeoVegas requests to GrowthBook product team (52:59)\n\n**Ashley Stirrup**\nSend Joanna podcast episode (59:10)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

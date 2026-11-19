@@ -1,7 +1,7 @@
 {
-  "company": "Betclic & GrowthBook",
+  "company": "BetClic & GrowthBook",
   "slug": "betclic-growthbook",
-  "last_etl_date": "2026-11-04T07:05:05.234868",
+  "last_etl_date": "2026-11-19T08:09:43.866064",
   "calls": [
     {
       "id": "01M5YA9DP2BJ62RV9PW8RRBBRP",
@@ -12,6 +12,17 @@
       "summary": "# Betclic & GrowthBook Technical Demo\nDate: 2026-11-03 | Duration: 65.62999725341797m\n\n## Summary\nBetclic’s GrowthBook evaluation is nearing final review, with the RFP response expected within the week or at the beginning of next month and a solution decision targeted by year-end. The team identified manual experiment tracking, fragmented A/B testing tools, limited conflict visibility, and dependence on engineering and data teams as key challenges. GrowthBook proposed a unified platform for mobile, web, and server-side experimentation, with Snowflake-native analysis, reusable metrics, templates, self-service workflows, feature flags, controlled rollouts, and flexible targeting. Betclic still needs deeper validation of identity mapping, exposure attribution, gaming-revenue events, stopping rules, statistical methodology, and monitoring. GrowthBook can operate alongside existing feature-management infrastructure and use read-only Snowflake access. Immediate next steps include completing the RFP, providing pricing information, exchanging sizing questions, and arranging a data-science follow-up involving GrowthBook’s lead and Betclic’s lead analyst.\n\n## Keywords\nExperimentation platform, Snowflake analytics, Feature flags, A/B testing, Statistical attribution, Experiment governance\n\n## Action Items\n**James Shannon**\nComplete GrowthBook response (06:17)\nSend pricing-input questions (17:46)\nClarify experiment attribution support (49:20)\nArrange technical session (01:03:05)\nCoordinate technical follow-up (01:04:01)\n\n**Edouard Thomas**\nProvide pricing inputs (17:46)\nDiscuss experiment identity linking (30:53)\nParticipate in technical follow-up (01:03:05)\n\n**Augusta Razetti**\nProvide pricing inputs (17:46)\n\n**Klaus Fleerkötter**\nDiscuss experiment identity linking (30:53)\nJoin technical discussion (01:03:05)",
       "organizer": "james.shannon@growthbook.io",
       "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M77MTMFZQZ01YGVQQYXWP923",
+      "source": "fireflies",
+      "title": "BetClic & GrowthBook DS Session",
+      "date": "2026-11-18",
+      "duration_minutes": 40,
+      "summary": "# BetClic & GrowthBook DS Session\nDate: 2026-11-18 | Duration: 40m\n\n## Summary\nGrowthBook’s open-source version was tested locally by Klaus Fleerkötter with successful initial results, and its current architecture is viewed as a possible path for advancing experimentation. The preferred model uses GrowthBook as an analysis layer on Snowflake while retaining BetClic’s existing attribution layer, SDKs, impression data, and analyst workflows. A standalone exposure-assignment query would define experiment populations, variants, and exposure timestamps, while template variables could support experiment-specific event filtering. Time-windowed metrics, concurrent experimentation, sequential testing, and configurable minimum durations were discussed as safeguards for reliable analysis. BetClic’s sports betting, casino, poker, and horse products are mostly isolated, although some cross-universe activity exists; interaction effects are not expected to commonly prevent concurrent testing. Vendor evaluation will continue for approximately two weeks. January timing remains unconfirmed because IT and other teams have competing priorities. Edouard will provide further RFP details and a clearer implementation plan, while James Shannon will arrange a commercial discussion covering pricing and planning.\n\n## Keywords\nExperimentation analysis, Snowflake, Exposure attribution, Sequential testing, Parallel experiments, Cluster randomisation\n\n## Action Items\n**Klaus Fleerkötter**\nPresent proposed GrowthBook architecture (06:27)\n\n**Edouard**\nEvaluate GrowthBook vendor responses (26:10)\nSend implementation planning update (26:52)\nProvide UAP extract details (28:28)\n\n**James Shannon**\nPresent commercial model and pricing (29:05)\nSend calendar placeholder (29:48)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 9,
       "summary_quality": "good"
     }
   ]

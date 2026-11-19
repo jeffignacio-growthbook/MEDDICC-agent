@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook <> Skill Quotient",
+  "slug": "growthbook-skill-quotient",
+  "last_etl_date": "2026-11-19T08:09:43.860821",
+  "calls": [
+    {
+      "id": "01M7KE16K2JAJRHKVHN0Q8BGQB",
+      "source": "fireflies",
+      "title": "GrowthBook <> Skill Quotient - Demo",
+      "date": "2026-11-19",
+      "duration_minutes": 44,
+      "summary": "# GrowthBook <> Skill Quotient - Demo\nDate: 2026-11-19 | Duration: 44m\n\n## Summary\nThe discussion evaluated GrowthBook for a client’s experimentation, feature flagging, and product analytics requirements. GrowthBook demonstrated experiment setup, metric selection, traffic allocation, results analysis, dashboards, and warehouse-native analytics using transparent SQL. On-premises deployment within the client’s data centers was supported, with data and logs remaining in the client environment. Server-side, client-side, mobile, API, SDK, and Edge delivery capabilities were also confirmed. Custom warehouse-based metrics can measure conversion, journeys, order value, page views, revenue, and performance. The main unresolved technical detail was SAP-specific operating system and language compatibility. A tailored proposal could not yet be prepared because client goals, use cases, applications, metrics, user counts, team size, event and experiment volumes, budget context, and reporting expectations remain unclear. Authorization materials and partner-agreement examples are also needed for legal review. Dan will send a follow-up email, while Sagar’s team will review product fit and implementation effort internally.\n\n## Keywords\nGrowthBook, A/B testing, Feature flagging, Warehouse-native analytics, On-premises deployment, Experiment dashboards\n\n## Action Items\n**Rajasekhar Jasthi**\nProvide MAF or authorisation document (06:03)\nProvide partner agreement (06:03)\nProvide user and volume estimates (06:37)\n\n**Sagar Patil**\nProvide commercial context (30:55)\nDiscuss GrowthBook solution internally (33:23)\n\n**Dan Wathne**\nSend follow-up email (31:40)",
+      "organizer": "dan@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

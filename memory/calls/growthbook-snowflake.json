@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook <> Snowflake",
+  "slug": "growthbook-snowflake",
+  "last_etl_date": "2026-11-19T08:09:43.865241",
+  "calls": [
+    {
+      "id": "01M7NC1FVGM78543KZ32T6CEV7",
+      "source": "fireflies",
+      "title": "GrowthBook <> Snowflake partnership",
+      "date": "2026-11-18",
+      "duration_minutes": 30,
+      "summary": "# GrowthBook <> Snowflake partnership\nDate: 2026-11-18 | Duration: 30m\n\n## Summary\nGrowthBook and Snowflake reviewed strong partnership momentum, with Snowflake consumption through GrowthBook growing more than 150% year over year, driven largely by Block. GrowthBook is currently in the Registered SPN tier and can pursue Select and Premier tiers, with technical validation remaining the primary blocker. Block usage is roughly ten times Sony and ClickUp usage, while expansion is expected at Sony and Block usage may at least double over the next year or so. Snowflake will provide a list of 65 customers using Snowflake through GrowthBook and help connect relevant sellers. Crossbeam coordination requires a mutual NDA, and a connected Snowflake Marketplace listing could enable capacity drawdown. GrowthBook will provide solution, architecture, win-story, and customer materials, review the AI-ready document, and pursue SPN validation. Vikas will share follow-up information, Marketplace instructions, account introductions, and the customer list.\n\n## Keywords\nSnowflake Partner Network, warehouse-native experimentation, SPN technical validation, Crossbeam co-selling, Marketplace Capacity Drawdown, Cortex Code\n\n## Action Items\n**GrowthBook team**\nApply for Snowflake Ready technical validation (11:42)\nUpload GrowthBook sales overview materials (25:26)\nReview AI-ready overview document (26:29)\n\n**Ashley Stirrup**\nProvide authorized Crossbeam NDA signatory details (13:34)\n\n**Vikas Jain**\nSend mutual NDA (28:15)\nIntroduce GrowthBook contacts to Snowflake sellers (28:22)\nProvide GrowthBook Snowflake customer list (29:44)\nAdd GrowthBook contacts to shared Google Drive folder\nSend written meeting summary",
+      "organizer": "ashley@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

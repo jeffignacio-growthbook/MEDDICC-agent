@@ -1,0 +1,18 @@
+{
+  "company": "Experimentation Platform",
+  "slug": "experimentation-platform",
+  "last_etl_date": "2026-11-19T08:09:43.866215",
+  "calls": [
+    {
+      "id": "01M7J9Z07XYPMFQZBZBWADRHTA",
+      "source": "fireflies",
+      "title": "Growthbook Demo (Experimentation Platform)",
+      "date": "2026-11-18",
+      "duration_minutes": 52,
+      "summary": "# Growthbook Demo (Experimentation Platform)\nDate: 2026-11-18 | Duration: 52m\n\n## Summary\nThe discussion evaluated GrowthBook’s fit for Genius experimentation, including warehouse-native analysis, feature flags, SDKs, APIs, transparent SQL, reusable experiment templates, targeting, namespaces, guardrail metrics, controlled rollouts, and customizable reporting. Genius aims to reduce reliance on Excel and assess scalable setup, analysis, reporting, and programmatic workflows. GrowthBook described support for Genius’s Rust, Spark, and Python environments, existing event pipeline, managed ClickHouse, and edge delivery. Legend’s deployment had more than 100 experiments and feature flags, while Covers signup experimentation increased conversion from 0.14% to 0.94%, with one content-gating approach producing a reported 19x increase for blocked users. About 16 tests ran in roughly 15 days through agent-assisted workflows connected to GrowthBook and other tools. Genius will assess Bat Vision, dynamic creative optimization, fan graph and audience use cases, and app experimentation. An enterprise trial and proof of concept were proposed, with Chelsea and Christian coordinating follow-up and Greg offering reusable workflow assets.\n\n## Keywords\nWarehouse-native experimentation, Feature flags, Edge experimentation, GrowthBook MCP, Dynamic creative optimisation, Human-in-the-loop experimentation\n\n## Action Items\n**Christian Liebenow**\nSet up Enterprise trial (36:26)\n\n**Gregory Phipps**\nShare experimentation repository (48:30)\n\n**Chelsea**\nReview GrowthBook materials (49:59)\nAssess applications across Genius Sports teams (49:59)\nCoordinate internal review (49:59)\nContact GrowthBook with feedback (49:59)\nProvide team access to GrowthBook (50:28)\nDefine GrowthBook proof of concept (50:28)",
+      "organizer": "chris@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}
