@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook & Taskrabbit",
+  "slug": "growthbook-taskrabbit",
+  "last_etl_date": "2026-11-20T07:53:33.045309",
+  "calls": [
+    {
+      "id": "01M7K160PNJ4AS1GKE95QNWEC4",
+      "source": "fireflies",
+      "title": "GrowthBook & Taskrabbit Onboarding Kickoff",
+      "date": "2026-11-19",
+      "duration_minutes": 27.540000915527344,
+      "summary": "# GrowthBook & Taskrabbit Onboarding Kickoff\nDate: 2026-11-19 | Duration: 27.540000915527344m\n\n## Summary\nGrowthBook adoption is intended to increase experimentation velocity, improve win rates toward industry benchmarks, and support greater annual experiment volume at TaskRabbit. Marketing is expected to use the Visual Editor, product managers to run experiments across web, client, app, and back end, and data science to support complex use cases. Core Services will own implementation, with Tyler leading the group, Sham scoping SDK and migration options, and Matt taking over GrowthBook. Feature flags will be migrated first: the backend service is the initial step, Q2 focuses on staging, and Q3 targets production. Experiment migration will be revisited afterward, while GrowthBook and Optimizely operate in parallel during the contract extension. A Snowflake proof of concept produced matching results, but SDK deployment, exposure events, data reconciliation, and experiment migration ownership remain open. Developer training will precede an AA test, followed by experimentation training. Chris leads technical support, while Christian and an account manager handle commercial needs.\n\n## Keywords\nGrowthBook onboarding, Optimizely migration, Feature flags, Experimentation programme, Snowflake integration, AA testing\n\n## Action Items\n**Chris Sanders**\nLead developer implementation training (06:15)\nProvide implementation support (18:25)\nSend Calendly link (22:09)\n\n**Matt**\nOwn ongoing GrowthBook implementation (09:34)\n\n**TaskRabbit Core Services**\nBuild backend service (10:46)\nMigrate Optimizely feature flags (10:46)\nMove migrated feature flags to staging (10:46)\nValidate migrated feature flag in production (10:46)\n\n**Danielle Walker Rowan**\nDiscuss AA test (21:40)\nSchedule developer training (22:09)\nCoordinate experimentation training (22:22)",
+      "organizer": "chris@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

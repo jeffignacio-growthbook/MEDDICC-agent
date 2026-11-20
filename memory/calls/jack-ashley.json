@@ -1,7 +1,7 @@
 {
   "company": "Jack/Ashley",
   "slug": "jack-ashley",
-  "last_etl_date": "2026-11-07T06:43:38.871475",
+  "last_etl_date": "2026-11-20T07:53:33.044875",
   "calls": [
     {
       "id": "01M6HX932M5BD5R9MBP4DZW4JS",
@@ -10,6 +10,17 @@
       "date": "2026-11-06",
       "duration_minutes": 36.29999923706055,
       "summary": "# Jack/Ashley\nDate: 2026-11-06 | Duration: 36.29999923706055m\n\n## Summary\nThe discussion prioritized site performance over landing-page design, including script and CMS consolidation and replacing the search architecture that loads extensive blog content. Comparison-page CMS collections were assigned to Yousef, while a competitive-scraper knowledge base was approved, with a proposed shift from daily exhaustive reports to weekly, high-value highlights. Conversion growth was set above traffic growth, with deteriorating signups prompting Karen to analyze conversion sources and recommend content formats, internal links, and product or podcast inputs. Emmy’s immediate focus remains marketing work such as newsletters, G2 reviews, customer conversations, and free-signup research rather than broader Jack Ops responsibilities. AI initiatives require stronger validation, and Jack Ops content quality needs improvement. Marketing analytics remain paused, the paid-ads agency is under review but performing reasonably well, and competitor spending may inform future acquisition evaluation.\n\n## Keywords\nCMS comparison pages, Competitive intelligence, Website performance, Jack Ops, Conversion analysis, Paid advertising\n\n## Action Items\n**Jack Virag**\nCoordinate with Huck Finch (00:38)\nVerify cookie-consent implementation (03:13)\nDiscuss scraper architecture with Scott (05:19)\nPropose comparison-page structure to Yousef (09:40)\nRevisit Emmy’s scope (15:28)\nContinue developing marketing content (25:56)\nExplore Gina Song discussion (33:52)\n\n**Yousef**\nBuild CMS collections (04:54)\n\n**Unassigned**\nDevelop competitive-intelligence approach (06:42)\n\n**Karen**\nAnalyse website conversion sources (22:48)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7H0CTHHCJM79MRRKYTY8BB3",
+      "source": "fireflies",
+      "title": "Jack/Ashley",
+      "date": "2026-11-19",
+      "duration_minutes": 25.969999313354492,
+      "summary": "# Jack/Ashley\nDate: 2026-11-19 | Duration: 25.969999313354492m\n\n## Summary\nQ1 priorities are AI-agent discoverability first and security second, with GrowthBook’s existing security position informing both content and company positioning. The team will track Athena’s mention rate for JavaScript and TypeScript feature-flag questions, including implementation, adoption, use cases, and build-versus-buy decisions; Jack will draft the initial prompt list for Karen and Jason. SDK content will emphasize practical decisions between adopting GrowthBook, building internally, and using free feature-flag tools. Jack will publish free feature-flag content and rerun Claude and Codex evaluations to test SDK recommendations, effort, and potential agent-efficiency benefits. Yousef is expanding CMS-generated comparison pages using facet-level structures, landing pages, and battle-card messaging. Competitive content is viewed as a proven acquisition channel after generating more than 50% of inbound leads in Jack’s prior Statsig experience. Emmy’s long-term scope remains unresolved, with possible PLG and support responsibilities, while proposed automation could connect support questions with Context OS, Kappa, documentation, and future content.\n\n## Keywords\nAI agent discoverability, Feature flags, GrowthBook SDK, Athena prompt tracking, Competitive comparison content, Support automation\n\n## Action Items\n**Jack Virag**\nCreate Athena prompts (05:23)\nSend Athena prompt list (05:27)\nReassess GrowthBook SDK guide (09:19)\nAdd competitive comparison recommendations (10:12)\nAdd landing-page recommendations (10:43)\nReview Kappa documentation assistant (23:35)\n\n**Ashley Stirrup**\nCoordinate battle-card content (15:30)\nAdd battle-card summary (15:30)",
       "organizer": "ashley@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

@@ -1,0 +1,18 @@
+{
+  "company": "Hexvia & GrowthBook",
+  "slug": "hexvia-growthbook",
+  "last_etl_date": "2026-11-20T07:53:33.052869",
+  "calls": [
+    {
+      "id": "01M7J4CVNCWBB7QWV1BJXACH3J",
+      "source": "fireflies",
+      "title": "Hexvia & GrowthBook | First Meeting",
+      "date": "2026-11-19",
+      "duration_minutes": 37,
+      "summary": "# Hexvia & GrowthBook | First Meeting\nDate: 2026-11-19 | Duration: 37m\n\n## Summary\nThe discussion focused on improving CRO measurement across digital marketing and customer experience while making better use of existing data. A one-site launch for a new service is planned, including testing and a visual redesign. The platform supports feature-flag experiments, paired testing, pricing-change measurement, visual editing, web and mobile deployment, ramped rollouts, and guardrail metrics that can trigger removal after regressions. Customer data remains owned by the customer, with read-only warehouse access for Snowflake, Databricks, or BigQuery, aggregated analysis, no personal identification data, and results returned to the warehouse. AI-assisted experimentation is available through MCP server support, analysis assistance, and automated recommendations. Setup requires an SDK, a read-only API key, a warehouse connection, data preparation, and technical-team involvement, with implementation estimated at one day maximum. The Pro plan costs $40 per user monthly, with enterprise options and engineering support available. Next steps are reviewing the presentation and setup guide, continuing the discussion in French, and having Remy available on the next call.\n\n## Keywords\nA/B testing, Feature flags, Data warehouse integration, Visual editor, CRO, AI-assisted experimentation\n\n## Action Items\n**Marcel Geldner**\nInclude Remy in follow-up (03:02)\nSend GrowthBook presentation (26:55)\nSend technical setup guide (26:55)\n\n**Thomas Dahan**\nCoordinate warehouse connection (25:18)\nCoordinate SDK connection (25:18)\nReview presentation and documentation (27:13)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

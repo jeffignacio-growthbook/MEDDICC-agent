@@ -1,7 +1,7 @@
 {
   "company": "Ali Rizvi and",
   "slug": "ali-rizvi-and",
-  "last_etl_date": "2026-11-19T08:09:43.866620",
+  "last_etl_date": "2026-11-20T07:53:33.042960",
   "calls": [
     {
       "id": "01M3SW330M7YBDPSGY6MRYJ7WY",
@@ -34,6 +34,17 @@
       "summary": "# Ali Rizvi and Ashley Stirrup\nDate: 2026-11-18 | Duration: 67.6500015258789m\n\n## Summary\nThe plan models ARR increasing from 16.8 to approximately 33.7 by 2028, with projected 2028 costs of 18 million. AE headcount is expected to rise from 9 to 28, while total GTM headcount reaches 51 by the end of next year. Enterprise is expected to drive most new ARR, with only 2.6 attributed to Pro; PLG investment remains debated because of product-fit, traffic, and technical-resource constraints. Anthropic’s potential 2.75 million contribution is excluded and should be switchable in the model. Sales productivity appears broadly healthy, but demo volume is flat, pipeline data is stale, and only 7% or 8% of targeted quarterly dollars reportedly closed. The financial forecast will incorporate hiring, costs, ARR, cash runway, hiring payback, staggered staffing, commissions, and marketing assumptions. Operating risks include recruiter capacity, Jennifer’s workload, infrastructure readiness, and approximately 89,000 in known overdue collections. Department inputs will precede the December 7 leadership review.\n\n## Keywords\nFinancial modelling, ARR planning, Sales headcount, PLG strategy, Pipeline forecasting, Cash runway\n\n## Action Items\n**Ali Rizvi**\nRepresent Anthropic revenue separately (22:45)\nReview sales calls with Ryan (31:36)\nIntegrate operating assumptions into financial model (34:11)\nPreserve dated spreadsheet version (36:49)\nObtain commission plan (39:27)\nSend departmental budget templates (44:18)\nConsolidate departmental hiring plans (48:08)\nCreate leadership staffing slides (49:05)\nSend planning materials to executives (01:02:25)\nSet planning deadlines (01:02:51)\nReview expense classifications (01:06:19)\n\n**Ashley Stirrup**\nIntroduce Ali Rizvi to Brent (36:30)\nProvide marketing hiring plan (47:37)\nSend leadership review invitation (01:05:38)\nSend meeting transcript to Ali Rizvi (01:05:40)\nProvide marketing expense classifications (01:06:27)\n\n**Department Leads**\nProvide planned hires and vendor spend (47:37)\n\n**Ali Rizvi and Ashley Stirrup**\nHold company-wide leadership review (01:03:52)",
       "organizer": "ashley@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7R14WE1NB8XTJWRRPF2YC4V",
+      "source": "fireflies",
+      "title": "Ali Rizvi and Brent Holloway",
+      "date": "2026-11-20",
+      "duration_minutes": 33.18000030517578,
+      "summary": "# Ali Rizvi and Brent Holloway\nDate: 2026-11-20 | Duration: 33.18000030517578m\n\n## Summary\nThe discussion reviewed the go-to-market financial model, revenue outlook, hiring requirements, quota economics, pipeline coverage, segmentation, and the Massive analytics platform. The current-year exit forecast was $16.8 million, with Brent Holloway expecting closer to $18 million, while next year was modeled at $33 million. Anthropic showed $0 in the Q4 forecast as of the 15th, but Carrie’s opportunity could contribute approximately $3.4 million in the quarter. The hiring plan targeted two AEs before January 31 and six more during February–April, while management, BDR, and SE capacity remained important constraints. Quota was set at $1.2 million against approximately $300,000 OTE, but 85% average attainment could create a coverage shortfall. Pipeline was modeled as 30% AE-sourced, 20% BDR outbound, 40% marketing-sourced, and 10% other. Companies with 1,000–10,000 employees were identified as the strongest efficiency segment, and ASPs had increased toward $40,000–$60,000. Massive supports segmentation and efficiency analysis, but apparent double counting between new-logo and expansion revenue requires investigation.\n\n## Keywords\nGo-to-market modelling, Sales capacity planning, AE quota and attainment, Pipeline allocation, EMEA expansion, Cash-flow forecasting\n\n## Action Items\n**Ali Rizvi**\nCombine go-to-market model with financial model (05:12)\nAdd hiring sensitivities to financial model (22:55)\nReview Massive platform (31:26)\nSend follow-up questions (31:26)\n\n**Brent Holloway**\nInvestigate analytics inconsistency (22:04)\nProvide Massive platform access (29:36)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

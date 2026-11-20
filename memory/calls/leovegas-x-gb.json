@@ -1,0 +1,18 @@
+{
+  "company": "LeoVegas x GB",
+  "slug": "leovegas-x-gb",
+  "last_etl_date": "2026-11-20T07:53:33.048486",
+  "calls": [
+    {
+      "id": "01M7AN1MSBH7P5RRQP499VD7N7",
+      "source": "fireflies",
+      "title": "LeoVegas x GB: Program Sync",
+      "date": "2026-11-19",
+      "duration_minutes": 25.649999618530273,
+      "summary": "# LeoVegas x GB: Program Sync\nDate: 2026-11-19 | Duration: 25.649999618530273m\n\n## Summary\nTraining planning focused on using Zoom Webinar because Google Meets cannot support the planned audience of 250 people; invitations will cover feature flagging and experimentation sessions, with guidance for product managers and engineers. Joanna Sarvanidis revised and socialized the experimentation process after feedback from Cris Dizon, Ashley, and Jeremy, while four product-related PRs were reported and some development had begun. Native-app experimentation is approaching launch at Leo Vegas, with AA testing technically ready once native exposure data is available. Assignments must work across active prior and current app versions, with aggregate analysis and version-level checks recommended; forced updates remain possible when urgency requires them. Multi-armed bandits, contextual bandits, and interleaving were identified as future advanced methods, and Data Science showed interest. Datadog latency and error metrics may provide experiment guardrails, but Cris Dizon will confirm integration details, data preparation needs, and experimentation coverage.\n\n## Keywords\nNative app experimentation, feature flagging, experimentation training, Datadog integration, power analysis, performance guardrails\n\n## Action Items\n**Cris Dizon**\n- Send invitations (00:41)\n- Ping Jeremy (06:11)\n- Verify Datadog integration (22:58)\n\n**Joanna Sarvanidis**\n- Post training announcement (03:18)\n- Review Datadog integration (22:19)",
+      "organizer": "cris@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

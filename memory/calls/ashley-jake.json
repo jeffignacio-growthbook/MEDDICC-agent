@@ -1,7 +1,7 @@
 {
   "company": "Ashley / Jake",
   "slug": "ashley-jake",
-  "last_etl_date": "2026-11-13T07:28:57.905144",
+  "last_etl_date": "2026-11-20T07:53:33.046887",
   "calls": [
     {
       "id": "01KJX64F3CR10EZN5PPXSKRA9N",
@@ -223,6 +223,17 @@
       "date": "2026-11-12",
       "duration_minutes": 8.619999885559082,
       "summary": "# Ashley / Jake\nDate: 2026-11-12 | Duration: 8.619999885559082m\n\n## Summary\nThe discussion covered HubSpot renewal pricing, transactional email requirements, outreach, and podcast planning. Ashley is evaluating a reasonable Rio renewal amount and plans to follow up with Lyndsie; no final pricing decision was recorded. HubSpot’s transactional email add-on would cost $600 per month, while a dedicated IP would cost $300 per month, creating a combined increase of $900 per month. An alternative would send delivery and open events from SendGrid to HubSpot, avoiding the stated add-on requirements, though the trade-off remains under discussion. Jake began AWS prospect outreach, cloned Lyndsie’s Apollo sequence while preserving the original, and used Claude to help develop messaging. Ashley plans to reduce podcast production from 20 to 10 episodes monthly, with one firm handling marketing and Growth Wizards focusing on guest sourcing, including a target of eight sourced guests monthly. HubSpot’s “Booked by” field tracks sourcing, but missing Notion records require maintenance. The Glean guest recording moved to next Tuesday.\n\n## Keywords\nHubSpot renewal, Transactional email, AWS event outreach, Apollo sequences, Podcast guest sourcing, Growth Wizards\n\n## Action Items\n**Lyndsie Berens**\nSend Jake details (01:07)\n\n**Ashley Stirrup**\nDiscuss HubSpot renewal options (01:09)\n\n**Jake Stangl**\nContinue AWS event outreach (01:39)\nProvide outreach progress update (02:02)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M78Y8EFJR8YFKEM255BAZM58",
+      "source": "fireflies",
+      "title": "Ashley / Jake",
+      "date": "2026-11-19",
+      "duration_minutes": 11.119999885559082,
+      "summary": "# Ashley / Jake\nDate: 2026-11-19 | Duration: 11.119999885559082m\n\n## Summary\nOutreach progress included two podcast conversations arranged with Amaya from Remitly and RB Global contacts RB and Isaac. Isaac plans to connect Jake with the RB Global team before leaving and expects to meet Jake again after moving to another company, creating a potential future-company connection. A meeting with one contact was also scheduled at the AWS conference. The Rio developer sequence was flagged after bad email addresses increased the bounce rate; Jake removed contacts from India and other locations outside the United States and Europe, then relaunched the sequence, which has operated without further reported issues. Ashley and Jake agreed that Rio alerts remain noisy and often lack clear value. Lead-routing work is progressing, but no completion timeline or final decision was provided. The Optimizely takeout cadence, consisting of email and call steps, is awaiting Ashley’s review after Jake contacted Lindsey and Jacqueline about creating it.\n\n## Keywords\nPodcast outreach, AWS conference, Rio developer sequence, Email bounce rate, Lead routing, Optimizely cadence\n\n## Action Items\n**Ashley Stirrup**\n- Review email-and-call cadence (02:43)",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

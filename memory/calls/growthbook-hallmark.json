@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Hallmark",
+  "slug": "growthbook-hallmark",
+  "last_etl_date": "2026-11-20T07:53:33.043745",
+  "calls": [
+    {
+      "id": "01M7RWAEV9JK6FR5XA2H0ZZXAY",
+      "source": "fireflies",
+      "title": "Growthbook <> Hallmark - Pricing Sync",
+      "date": "2026-11-19",
+      "duration_minutes": 21.1200008392334,
+      "summary": "# Growthbook <> Hallmark - Pricing Sync\nDate: 2026-11-19 | Duration: 21.1200008392334m\n\n## Summary\nHallmark Plus development is transitioning into Hallmark’s own development sphere, with building planned through 2027, no expected traffic during that year, and launch planned for 2028. Feature flags are the initial priority, while experimentation and analytics may be reconsidered after launch or as usage expands. Cloud Warehouse Native is preferred because GrowthBook would manage platform updates while Hallmark retains its warehouse as the source of truth and preserves warehouse-based privacy and security controls. Enterprise approval requires SSO, role-based access control, team management, reviews, audit logs, and revision history. GrowthBook also presented unlimited feature flags, enterprise support, safe-rollout kill switches, and a proof-of-concept process. Hallmark expects two to five users during development and considers year-one platform cost its main concern, prompting a request for commercial flexibility. A vendor shortlist is expected early next week, with procurement discussions afterward and a contract target for January.\n\n## Keywords\nFeature flagging, Cloud Warehouse Native, Enterprise security, Pricing flexibility, Hallmark+ development, Procurement\n\n## Action Items\n**Dan Wathne**\nInvestigate pricing flexibility (17:25)\nSend pricing information (19:25)\n\n**Daniel Marsh**\nProvide vendor evaluation status (19:25)",
+      "organizer": "dan@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

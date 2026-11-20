@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook/Focus Lab PM",
+  "slug": "growthbook-focus-lab-pm",
+  "last_etl_date": "2026-11-20T07:53:33.047564",
+  "calls": [
+    {
+      "id": "01M78Y8EFFVQ21XC7S33BVN5V6",
+      "source": "fireflies",
+      "title": "Growthbook/Focus Lab PM Check-in",
+      "date": "2026-11-19",
+      "duration_minutes": 22.520000457763672,
+      "summary": "# Growthbook/Focus Lab PM Check-in\nDate: 2026-11-19 | Duration: 22.520000457763672m\n\n## Summary\nStrategy discovery was completed, with alignment on recommendations and no outstanding questions from Anna Beyerle Rosen’s team. Audience clarification and brand-concept updates remain underway, including feedback on visual questions. The team refined the audience insight around faster learning as a competitive advantage, emphasizing experimentation, curiosity, humility, and learning from unsuccessful tests. GrowthBook’s value was connected to product teams by enabling developers to experiment and learn without significant workflow friction. Visual identity work is planned to begin before year-end, while January adds brand positioning, category exploration, and verbal identity work. Monthly capacity is proposed to increase from 85 to 135 hours at a $185 hourly rate, bringing the monthly amount to $24,975. Contract documentation will be prepared and sent through DocuSign, with the existing 30-day notice provision retained. Brand work is expected to be wrapping up around the board meeting likely held during the week of February 22, with brand guidelines beginning after approvals.\n\n## Keywords\nBrand strategy, Visual identity, Audience insights, Experimentation, GrowthBook positioning, Contract planning\n\n## Action Items\n**Anna Beyerle Rosen**\nUpdate audience clarification and brand concept (12:38)\n\n**Charisse Bennett**\nPrepare January hours documentation (17:09)\nSend revised agreement through DocuSign (17:09)\nSend agreement to accounting (17:09)\n\n**Focus Lab**\nCoordinate board meeting timing (18:10)\nCurate brand materials (18:10)\nOffer presentation support (18:10)\n\n**Mason Hawkins**\nShare Netlify branding example (19:50)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

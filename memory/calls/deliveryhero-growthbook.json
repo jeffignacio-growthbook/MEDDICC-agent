@@ -1,0 +1,18 @@
+{
+  "company": "DeliveryHero & GrowthBook",
+  "slug": "deliveryhero-growthbook",
+  "last_etl_date": "2026-11-20T07:53:33.052750",
+  "calls": [
+    {
+      "id": "01M7NBCWKJQX43R1Z30M34GCWV",
+      "source": "fireflies",
+      "title": "DeliveryHero & GrowthBook | Introduction Call",
+      "date": "2026-11-19",
+      "duration_minutes": 47,
+      "summary": "# DeliveryHero & GrowthBook | Introduction Call\nDate: 2026-11-19 | Duration: 47m\n\n## Summary\nExperimentation is mature in restaurants, while quick commerce adoption is planned for a next-quarter rollout, although the supporting culture is still developing. Reliability is weakened by overlapping experiments, product rollouts, regional communication gaps, limited global mandates, and entity constraints such as smaller outlet groups and shorter testing periods. AI adoption is expanding through Claude and other models, supported by a €100 daily budget for business and technical use. Automated workflows now assist vendor pairing, expose statistical requirements, generate impact assessments after four weeks, notify teams through Slack, and track feature adoption with timestamps. GrowthBook was demonstrated as a platform for experiment dashboards, AI-assisted exploration, metric-level impact reporting, centralized hypotheses and learnings, and reusable SQL metrics through BigQuery integration. Adoption risks include uncertainty around the expected Uber acquisition, tool proliferation, and the need for curated metric definitions and approved tables. Marcel will send materials, Carlos may brief a senior BP, and a proof-of-concept discussion remains open.\n\n## Keywords\nExperimentation culture, Experiment contamination, AI automation, CUPED, Data warehouse integration, GrowthBook dashboards\n\n## Action Items\n**Marcel Geldner**\nPrepare experimentation materials (32:20)\nClarify proof-of-concept specifications (35:11)\nSend follow-up materials (36:23)\n\n**Carlos Gonzalez**\nPresent materials internally (34:44)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

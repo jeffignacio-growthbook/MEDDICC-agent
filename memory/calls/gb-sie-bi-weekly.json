@@ -1,7 +1,7 @@
 {
   "company": "GB/SIE Bi-Weekly",
   "slug": "gb-sie-bi-weekly",
-  "last_etl_date": "2026-11-06T07:30:52.822715",
+  "last_etl_date": "2026-11-20T07:53:33.045794",
   "calls": [
     {
       "id": "01KMNXKSATD9F5333X5AADEANS",
@@ -160,6 +160,17 @@
       "date": "2026-11-05",
       "duration_minutes": 36.79999923706055,
       "summary": "# GB/SIE Bi-Weekly\nDate: 2026-11-05 | Duration: 36.79999923706055m\n\n## Summary\nGrowthBook 5.2 delivered project-scoped EAQs, optimized experiment metadata fetching, and in-line experiment creation with integrated configuration and automatic feature-flag publishing. Data-source observability now shows recent experiment queries, scanned bytes, execution time, responsible users, and fact-table usage, supporting optimization even though complete Snowflake cost allocation remains external. Custom hooks can validate experiment updates through the UI and API, while built-in mandatory variation-key validation and stronger revision and approval controls remain under consideration. GrowthBook is supporting API-first agent integrations, including MCP and skills, with human approval controls for selected actions. Sony identified registry, integrity, natural-language creation, and insight-generation agents. Follow-ups include reviewing query-history pagination, testing new settings and experiment workflows, discussing snapshots, sharing an MCP example, and exploring customer introductions. Sources: Progress Review; Experiment Governance; Cost And Capacity; AI Enablement; Request Callouts; Upcoming Plans.\n\n## Keywords\nExperiment observability, Project-scoped EAQs, Snowflake usage, Custom validation hooks, GrowthBook 5.2, Experimentation AI agents\n\n## Action Items\n**Luke Sonnet**\nVerify read-only usage-tab permissions (09:14)\nCheck customer community status (25:57)\nAsk about bundled agent availability (32:51)\n\n**Jiong**\nDeploy GrowthBook 5.2 (15:18)\nSchedule snapshot discussion with Luke (23:53)\n\n**Angela Borgman**\nGather operator feedback (21:52)\n\n**Cris Dizon**\nFollow up with GrowthBook customers (30:51)",
+      "organizer": "cris@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7AN1MSYNGTS3YR8BQBWTHQK",
+      "source": "fireflies",
+      "title": "GB/SIE Bi-Weekly",
+      "date": "2026-11-19",
+      "duration_minutes": 29.59000015258789,
+      "summary": "# GB/SIE Bi-Weekly\nDate: 2026-11-19 | Duration: 29.59000015258789m\n\n## Summary\nThe discussion covered active dimension and query workstreams, including precomputed dimensions, default split-by-dimension views, support for three or more dimensions, and possible Snowflake cost increases. Incremental refresh remains the preferred implementation direction for new time-series and dimension functionality, while customer cost monitoring and feedback may affect priorities. The proposed solution for live GrowthBook-managed experiments is to block variant-ID changes and ask users to correct EAQ output instead of adding a mapping layer. Feature-flag experiment creation was considered complete and item 15 can leave active tracking. Retroactive interaction analysis is planned for multi-arm intersections and cross-experiment breakdowns, with a December walkthrough requested. The next release is targeted for January and includes time-series, dimension analysis, and experiment health scores. Participants also discussed separating active work from backlog, cleaning up item statuses, and deferring broader reprioritization until absent participants can join.\n\n## Keywords\nGrowthBook experiments, Variant ID protection, Dimension analysis, Incremental refresh, Multivariate testing, Product roadmap\n\n## Action Items\n**Luke Sonnet**\nShare dimension improvement mock-ups (06:17)\nRestrict variant ID edits (09:50)\nShow warning for protected variant ID edits (09:50)\nTrack three-plus-dimension analyses (15:43)\nAdd precomputed dimension combinations to roadmap (16:21)\nProvide next release preview (25:07)\nPrepare retroactive interaction analysis mock-up (22:30)\nWalk team through analysis approach (22:30)\nReview and reprioritise roadmap (25:56)\n\n**Cris Dizon**\nAdd dimension roadmap items to tracker (15:43)\nInvestigate completed-items history (18:18)\n\n**Jiong**\nReview roadmap priorities (25:56)\nAdd priority notes to roadmap (25:56)",
       "organizer": "cris@growthbook.io",
       "participants": 9,
       "summary_quality": "good"

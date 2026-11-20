@@ -1,7 +1,7 @@
 {
   "company": "Resmed + GrowthBook",
   "slug": "resmed-growthbook",
-  "last_etl_date": "2026-10-27T05:49:09.418934",
+  "last_etl_date": "2026-11-20T07:53:33.048037",
   "calls": [
     {
       "id": "01M4P4EYVH3BV9SZ3NPTT0S2T0",
@@ -23,6 +23,17 @@
       "summary": "# Resmed + GrowthBook\nDate: 2026-10-22 | Duration: 62.08000183105469m\n\n## Summary\nResMed favored seat-based pricing, with an initial estimate of 25–50 seats, alongside a $200,000 annual cloud platform fee or $175,000 annual self-hosted enterprise fee, plus licenses. The distinction between free open-source self-hosting and paid enterprise self-hosting requires written clarification, as does the full cost scope. Technical validation will focus on real-time DynamoDB enrollment, sub-100-millisecond SDK evaluation, hybrid client/server integration, and targeted HME demo-app access. Governance capabilities include approvals, custom roles, SSO, QA tools, and feature controls, while environment promotion and native enrollment caps remain unresolved. Historical experiment imports, MCP-based AI workflows, and the learning ledger can support analysis and future test recommendations, although some analytics workflows remain UI-based. A four-week POC, potentially preceded by an additional setup week, is being considered for early next year. ResMed’s success measures are reducing developer maintenance, enabling nontechnical experimentation, and increasing experiment volume; leadership interest is positive, but budget approval remains pending.\n\n## Keywords\nExperimentation platform, Feature flags, Real-time enrolment, Enterprise pricing, Proof of concept, MCP and AI workflows\n\n## Action Items\n**Logan Bates**\nCheck with GrowthBook team whether DynamoDB can be supported directly as data source (24:59)\nVerify whether GrowthBook has improved workflow for promoting experiments between environments (35:16)\nDiscuss experiment-enrolment caps with GrowthBook team (51:38)\nDiscuss with GrowthBook team whether experiments can be paused automatically when statistical significance is reached (52:43)\n\n**Nitant Bhartia**\nQuantify number and types of GrowthBook seats ResMed would require (15:00)\nReview GrowthBook pricing and proposed commercial model with ResMed product leadership (18:44)\nIdentify ResMed participants, technical owners, and available internal capacity for proof of concept (57:21)\nConfirm expected timing for proof of concept with ResMed team (57:21)\nDiscuss proof of concept and budget with ResMed product leadership (59:27)\n\n**Christian Liebenow**\nSend follow-up after product-leadership discussion and coordinate proof-of-concept planning with ResMed (01:00:51)",
       "organizer": "christian@growthbook.io",
       "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7NHGYB20P50HH93BHGQ0920",
+      "source": "fireflies",
+      "title": "Resmed + GrowthBook prep",
+      "date": "2026-11-19",
+      "duration_minutes": 22.600000381469727,
+      "summary": "# Resmed + GrowthBook prep\nDate: 2026-11-19 | Duration: 22.600000381469727m\n\n## Summary\nLeadership is open to evaluating a controlled proof of concept, and the organization currently favors buying over building. The POC should remain focused, demonstrate ease of use, generate useful learnings, show potential savings, and avoid adding an unused tool. Feature flags and experimentation are viewed as closely connected, with deployments expected to use feature flags. Manual analysis is a recurring bottleneck; the Healthcare Marketplace was cited as running 100 experiments through Jupyter notebooks. The demonstration should emphasize an end-to-end UI workflow, Bayesian statistical results, clear visualizations, program-level dashboards, team velocity, win rate, positive impact, and avoided losses, using relatable health-tech examples. MCP should support the story without becoming the centerpiece, while the roadmap should show increasingly AI-native capabilities. Requested ROI evidence includes examples of 20 winning experiments and one customer result worth $200K annually. Christian Liebenow and Logan Bates will prepare the demo, while Nitant may circulate supporting slides. A 45-minute session is planned, with a potential three-to-four-week POC and clear outcomes.\n\n## Keywords\nGrowthBook, ResMed, Experimentation platform, Feature flags, Proof of concept, Product analytics\n\n## Action Items\n**Christian Liebenow**\n- Prepare GrowthBook demonstration (12:43)\n- Share presentation materials (19:40)\n\n**Nitant Bhartia**\n- Inform stakeholder attendees (20:40)",
+      "organizer": "christian@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]
